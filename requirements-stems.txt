@@ -1,0 +1,3 @@
+# Optional/bundled production stem-separation plugin.
+# Model weights are cached on first use under MTA_DATA_DIR/.cache.
+demucs==4.0.1

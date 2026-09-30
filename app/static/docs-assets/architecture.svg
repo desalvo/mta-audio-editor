@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="520" viewBox="0 0 1080 520">
+<defs><marker id="m" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#5f7183"/></marker></defs>
+<rect width="1080" height="520" fill="#ffffff"/>
+<rect x="60" y="70" rx="18" width="220" height="120" fill="#f7faff" stroke="#2d6fbe" stroke-width="2"/>
+<text x="170" y="115" text-anchor="middle" font-family="Arial" font-size="20" font-weight="700" fill="#18324d">Browser DAW</text>
+<text x="170" y="145" text-anchor="middle" font-family="Arial" font-size="15" fill="#42566c">Waveform - clip - sync</text>
+<rect x="430" y="55" rx="18" width="240" height="150" fill="#eef9f0" stroke="#3a8d4b" stroke-width="2"/>
+<text x="550" y="105" text-anchor="middle" font-family="Arial" font-size="20" font-weight="700" fill="#18324d">FastAPI</text>
+<text x="550" y="135" text-anchor="middle" font-family="Arial" font-size="15" fill="#42566c">Auth - API - docs - health</text>
+<text x="550" y="162" text-anchor="middle" font-family="Arial" font-size="15" fill="#42566c">security headers - limits</text>
+<rect x="800" y="70" rx="18" width="220" height="120" fill="#fff6e8" stroke="#c78522" stroke-width="2"/>
+<text x="910" y="115" text-anchor="middle" font-family="Arial" font-size="20" font-weight="700" fill="#18324d">FFmpeg / FFprobe</text>
+<text x="910" y="145" text-anchor="middle" font-family="Arial" font-size="15" fill="#42566c">decode - render - MTA</text>
+<rect x="430" y="330" rx="18" width="240" height="130" fill="#f7faff" stroke="#2d6fbe" stroke-width="2"/>
+<text x="550" y="375" text-anchor="middle" font-family="Arial" font-size="20" font-weight="700" fill="#18324d">Persistent volume</text>
+<text x="550" y="405" text-anchor="middle" font-family="Arial" font-size="15" fill="#42566c">project.json - audio</text>
+<text x="550" y="432" text-anchor="middle" font-family="Arial" font-size="15" fill="#42566c">attachments - exports</text>
+<g stroke="#5f7183" stroke-width="2" fill="none" marker-end="url(#m)"><line x1="280" y1="130" x2="425" y2="130"/><line x1="670" y1="130" x2="795" y2="130"/><line x1="550" y1="205" x2="550" y2="325"/><line x1="800" y1="165" x2="650" y2="330"/></g>
+<text x="348" y="115" text-anchor="middle" font-family="Arial" font-size="14" fill="#42566c">HTTPS / API</text>
+<text x="734" y="115" text-anchor="middle" font-family="Arial" font-size="14" fill="#42566c">argv subprocess</text>
+<text x="585" y="275" font-family="Arial" font-size="14" fill="#42566c">JSON / files</text>
+</svg>

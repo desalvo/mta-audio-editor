@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>MTA Audio Editor</title>
+  <link rel="icon" href="/static/logo.svg">
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<div class="app-shell">
+  <header class="topbar">
+    <div class="brand-block">
+      <img src="/static/logo.svg" alt="MTA Audio Editor" class="brand-logo">
+      <div><div class="brand-name"><b>MTA</b> Audio Editor</div><div class="brand-meta">MTA / MTA8 / MTA16 &nbsp;·&nbsp; v__VERSION__ &nbsp;·&nbsp; build __BUILD__</div></div>
+    </div>
+    <div class="project-name-block"><label>Project</label><div class="project-name-field" onclick="editProjectMeta()" title="Edit project metadata"><span id="headerProjectName">No project loaded</span><span>✎</span></div></div>
+    <div class="transport">
+      <button class="transport-btn">■</button><button class="transport-btn">◀◀</button><button id="playMaster" class="transport-btn play" onclick="previewMaster()">▶</button><button class="transport-btn">▶▶</button><button class="transport-btn rec">●</button>
+    </div>
+    <div class="timebox"><strong id="transportTime">00:00.000</strong><span><b id="transportBpm">120</b> BPM &nbsp;&nbsp; 4/4</span></div>
+    <div class="top-spacer"></div>
+    <div class="zoom-top"><span>Zoom</span><input id="topZoom" type="range" min="25" max="240" value="70" oninput="setZoom(this.value)"></div>
+    <div class="header-actions"><button onclick="save()">▣ Save</button><button class="accent" onclick="openExportPanel()">⇧ Export</button><button class="more">⋮</button></div>
+  </header>
+
+  <div class="workspace">
+    <aside class="sidebar">
+      <nav>
+        <button class="nav-item active">⌂ <span>Project</span></button>
+        <label class="nav-item">⇩ <span>Import MTA</span><input id="mtafile" type="file" accept=".mta,.mta8,.mta16" hidden></label>
+        <button class="nav-item" onclick="focusImport()">♫ <span>Import Audio</span></button>
+        <button class="nav-item">☷ <span>Tracks</span></button>
+        <button class="nav-item" onclick="focusInspector()">◇ <span>Plugins</span></button>
+        <button class="nav-item" onclick="focusMixer()">▥ <span>Mixer</span></button>
+        <div class="nav-sep"></div>
+        <button class="nav-item">▤ <span>Lyrics</span></button>
+        <button class="nav-item">♬ <span>Chords</span></button>
+        <button class="nav-item">⚑ <span>Markers</span></button>
+        <div class="nav-sep"></div>
+        <button class="nav-item" onclick="openExportPanel()">⇧ <span>Export</span></button>
+        <a class="nav-item" href="/docs/user" target="_blank">? <span>Docs &amp; Help</span></a>
+      </nav>
+      <div class="sidebar-projects"><div class="side-title">PROJECTS</div><div id="projects"></div><button class="new-project" onclick="newProject()">＋ New project</button></div>
+    </aside>
+
+    <main class="main-area">
+      <section class="editor-zone">
+        <div id="emptyState" class="empty-state"><img src="/static/logo.svg" alt=""><h2>Create or import a project</h2><p>Multitrack MTA editing, MP3 stems, insert effects and master mixing.</p><button class="accent" onclick="newProject()">Create project</button></div>
+        <div id="editor" class="editor-content" hidden></div>
+      </section>
+      <section id="mixerDock" class="mixer-dock" hidden></section>
+    </main>
+  </div>
+</div>
+<div id="toast"></div>
+<input id="stemFileHidden" type="file" accept=".mp3,audio/mpeg" hidden>
+<script src="/static/app.js"></script>
+</body>
+</html>

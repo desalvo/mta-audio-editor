@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+.ruff_cache/
+.venv/
+venv/
+.env
+*.log
+*.tmp
+.DS_Store
+/data/projects/*
+!/data/projects/.gitkeep
+build/
+dist/
