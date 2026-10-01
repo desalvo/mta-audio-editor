@@ -795,6 +795,170 @@ def _ebml_vint(data: mmap.mmap, pos: int) -> tuple[int, int] | None:
     return value, length
 
 
+
+
+def _ebml_id(data: mmap.mmap, pos: int, max_len: int = 4) -> tuple[int, int] | None:
+    """Read an EBML element ID without stripping the marker bit."""
+    if pos >= len(data):
+        return None
+    first = data[pos]
+    mask = 0x80
+    length = 1
+    while length <= max_len and not (first & mask):
+        mask >>= 1
+        length += 1
+    if length > max_len or pos + length > len(data):
+        return None
+    value = 0
+    for i in range(length):
+        value = (value << 8) | data[pos + i]
+    return value, length
+
+
+def _ebml_children(data: mmap.mmap, start: int, end: int):
+    """Yield conservative EBML children from a canonical region."""
+    pos = start
+    while pos < end:
+        parsed_id = _ebml_id(data, pos)
+        if parsed_id is None:
+            return
+        element_id, id_len = parsed_id
+        parsed_size = _ebml_vint(data, pos + id_len)
+        if parsed_size is None:
+            return
+        size, size_len = parsed_size
+        payload_start = pos + id_len + size_len
+        payload_end = payload_start + size
+        if payload_end > end or payload_end < payload_start:
+            return
+        yield pos, element_id, size, payload_start, payload_end
+        pos = payload_end
+
+
+def inspect_cluster_transport(path: Path) -> dict:
+    """Inspect the canonical Matroska index and the non-canonical media region.
+
+    Stock M-Live files keep SeekHead and Cues readable, while bytes at each
+    CueClusterPosition are not normal Matroska Cluster elements.  This helper
+    deliberately does *not* call the media data decrypted; it records only the
+    index-to-byte evidence needed for continued reverse engineering.
+    """
+    result = {
+        "validated": False,
+        "seek_cluster_relative": None,
+        "seek_cluster_absolute": None,
+        "seek_target_bytes_hex": None,
+        "first_cluster_expected_id_hex": "1f43b675",
+        "first_cluster_is_canonical": None,
+        "cue_point_count": 0,
+        "cue_times_ms": [],
+        "cue_cluster_positions": [],
+        "cluster_spans": [],
+        "observed_cluster_prefixes": [],
+    }
+    with path.open("rb") as fh, mmap.mmap(fh.fileno(), 0, access=mmap.ACCESS_READ) as mm:
+        if len(mm) < 32 or mm[:4] != b"\x1a\x45\xdf\xa3":
+            return result
+        segment = mm.find(b"\x18\x53\x80\x67", 0, min(len(mm), 4096))
+        if segment < 0:
+            return result
+        parsed_segment_size = _ebml_vint(mm, segment + 4)
+        if parsed_segment_size is None:
+            return result
+        _segment_size, segment_size_len = parsed_segment_size
+        segment_data = segment + 4 + segment_size_len
+        result["segment_data_offset"] = segment_data
+
+        seek_head = None
+        cues = None
+        scan_end = min(len(mm), segment_data + 4_000_000)
+        for _pos, element_id, _size, payload_start, payload_end in _ebml_children(mm, segment_data, scan_end):
+            if element_id == 0x114D9B74:
+                seek_head = (payload_start, payload_end)
+            elif element_id == 0x1C53BB6B:
+                cues = (payload_start, payload_end)
+                break
+
+        if seek_head:
+            for _sp, sid, _ss, sstart, send in _ebml_children(mm, *seek_head):
+                if sid != 0x4DBB:
+                    continue
+                target = None
+                rel = None
+                for _ep, eid, _es, estart, eend in _ebml_children(mm, sstart, send):
+                    if eid == 0x53AB:
+                        target = int.from_bytes(mm[estart:eend], "big")
+                    elif eid == 0x53AC:
+                        rel = int.from_bytes(mm[estart:eend], "big")
+                if target == 0x1F43B675 and rel is not None:
+                    absolute = segment_data + rel
+                    result["seek_cluster_relative"] = rel
+                    result["seek_cluster_absolute"] = absolute
+                    if absolute < len(mm):
+                        result["seek_target_bytes_hex"] = bytes(mm[absolute:absolute + 16]).hex()
+                        result["first_cluster_is_canonical"] = mm[absolute:absolute + 4] == b"\x1f\x43\xb6\x75"
+                    break
+
+        cue_points: list[tuple[int | None, int | None]] = []
+        if cues:
+            for _cp, cid, _cs, cstart, cend in _ebml_children(mm, *cues):
+                if cid != 0xBB:
+                    continue
+                cue_time = None
+                cluster_pos = None
+                for _xp, xid, _xs, xstart, xend in _ebml_children(mm, cstart, cend):
+                    if xid == 0xB3:
+                        cue_time = int.from_bytes(mm[xstart:xend], "big")
+                    elif xid == 0xB7:
+                        for _tp, tid, _ts, tstart, tend in _ebml_children(mm, xstart, xend):
+                            if tid == 0xF1:
+                                cluster_pos = int.from_bytes(mm[tstart:tend], "big")
+                                break
+                if cluster_pos is not None:
+                    cue_points.append((cue_time, cluster_pos))
+
+        positions = [p for _t, p in cue_points if p is not None]
+        times = [t for t, _p in cue_points if t is not None]
+        result["cue_point_count"] = len(cue_points)
+        result["cue_times_ms"] = times[:32]
+        result["cue_cluster_positions"] = positions[:32]
+        prefixes = []
+        spans = []
+        for i, (_time, rel) in enumerate(cue_points):
+            if rel is None:
+                continue
+            absolute = segment_data + rel
+            if absolute >= len(mm):
+                continue
+            prefix = bytes(mm[absolute:absolute + 16]).hex()
+            if len(prefixes) < 32:
+                prefixes.append({"index": i, "relative": rel, "absolute": absolute, "hex": prefix})
+            if i + 1 < len(cue_points) and cue_points[i + 1][1] is not None:
+                span = cue_points[i + 1][1] - rel
+                if span > 0:
+                    spans.append(span)
+        result["observed_cluster_prefixes"] = prefixes
+        result["cluster_spans"] = spans[:64]
+        result["cluster_span_min"] = min(spans) if spans else None
+        result["cluster_span_max"] = max(spans) if spans else None
+        result["cluster_span_common"] = Counter(spans).most_common(8)
+        result["cue_positions_match_seek_cluster"] = bool(positions) and positions[0] == result["seek_cluster_relative"]
+        result["first_media_prefix_hex"] = prefixes[0]["hex"] if prefixes else result["seek_target_bytes_hex"]
+        result["first_media_magic_hex"] = (result["first_media_prefix_hex"] or "")[:8] or None
+        result["noncanonical_cluster_transport"] = bool(
+            result["cue_positions_match_seek_cluster"]
+            and result["first_cluster_is_canonical"] is False
+            and cue_points
+        )
+        result["validated"] = bool(seek_head and cues and cue_points and result["seek_cluster_relative"] is not None)
+        result["confidence_note"] = (
+            "SeekHead and Cues are canonical Matroska and identify media boundaries, but the bytes at "
+            "CueClusterPosition are not canonical Cluster IDs. This is evidence of a length-preserving "
+            "non-standard/obfuscated media transport; no cryptographic algorithm is asserted."
+        )
+    return result
+
+
 def _scan_matroska_filedata(path: Path, expected_sizes: list[int]) -> list[bytes]:
     """Fallback for MTA files whose non-canonical EBML confuses ffmpeg attachment dumping.
 
@@ -900,7 +1064,7 @@ def analyze_mta(path: Path, attachment_dir: Path | None = None) -> dict:
         if len(items) > 1
     }
     return {
-        "schema": "mta-audio-editor/reverse-analysis-v2",
+        "schema": "mta-audio-editor/reverse-analysis-v3",
         "file": {"name": path.name, "size": path.stat().st_size, "sha256": hashlib.sha256(path.read_bytes()).hexdigest()},
         "format": info.get("format") or {},
         "audio_streams": audio,
@@ -909,6 +1073,7 @@ def analyze_mta(path: Path, attachment_dir: Path | None = None) -> dict:
             "container_is_matroska": "matroska" in str((info.get("format") or {}).get("format_name", "")).lower(),
             "syl_candidates": [a["filename"] for a in attachments if a.get("looks_like_syl")],
             "duplicate_attachment_names_are_byte_identical": duplicate_pairs,
+            "cluster_transport": inspect_cluster_transport(path),
             "proprietary_semantics_are_conservative": True,
         },
     }

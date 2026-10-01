@@ -1,17 +1,21 @@
 # MTA proprietary format research
 
-Version: 0.2.0-13
+Version: 0.2.0-15
 
 This document records only findings demonstrated against the current four-file stock M-Live corpus. It is intentionally conservative: a field is not treated as a writable contract until round-trip output has been validated on real M-Live/Merish hardware.
 
 ## Corpus
 
-The current research corpus contains four independent stock MTA files:
+The accumulated research corpus contains six independent stock MTA files:
 
 - Rita Ora - Ask & You Shall Receive
 - Madonna - Into The Groove
 - Earth Wind & Fire - Boogie Wonderland
 - Michael Jackson - Man In The Mirror
+- Katrina And The Waves - Walking on sunshine
+- Rihanna - Don't Stop The Music
+
+The current Library-backed binary pass has direct access to the latter four files; findings already demonstrated on Rita Ora and Madonna remain part of the accumulated corpus record.
 
 Copyrighted MTA/audio samples are not shipped with the project. Tests use synthetic fixtures reproducing only the verified structures.
 
@@ -24,7 +28,48 @@ MTA files in the corpus are Matroska/EBML containers containing MP3 stereo 44.1 
 - ORG `MtxInfoData` XML
 - MOD XML
 
-In all four verified samples ORG and MOD copies are byte-identical. FFmpeg may emit EBML boundary warnings on stock files, so `app/mta_reverse.py` includes a conservative FileData fallback based on attachment sizes reported by FFprobe.
+Across the verified samples inspected for attachments, ORG and MOD copies are byte-identical. FFmpeg may emit EBML boundary warnings on stock files, so `app/mta_reverse.py` includes a conservative FileData fallback based on attachment sizes reported by FFprobe.
+
+
+## Matroska Cues and obfuscated media transport
+
+The six-file reverse-engineering corpus now shows a stronger split between the
+canonical Matroska index and the media payload. `SeekHead` still contains a
+normal `SeekID=1F43B675` entry for Cluster and `Cues` contains normal
+`CueClusterPosition` values. Those positions are therefore trustworthy byte
+boundaries even though the data stored there is not canonical EBML.
+
+On the four corpus files currently available in the project Library (Rihanna,
+Katrina And The Waves, Michael Jackson and Earth Wind & Fire), the first cue
+position exactly matches the Cluster position advertised by SeekHead. The first
+four bytes at that position are always:
+
+```text
+0f b2 f7 b0
+```
+
+instead of the Matroska Cluster ID `1f 43 b6 75`. FFmpeg reports the same
+non-canonical EBML boundary. This is no longer treated as a damaged SeekHead:
+the readable Cues provide hundreds of successive media boundaries.
+
+Additional cross-file evidence is especially useful: Michael Jackson and Earth
+Wind & Fire both expose 14 MP3 tracks and have the same per-cluster spacing for
+the overlapping part of the files. When their media regions are aligned to the
+first cue, the first 16 bytes at corresponding cue boundaries are byte-identical
+for the first 32 checked clusters (and the relative boundary offsets also
+match). The encrypted/obfuscated bytes therefore behave deterministically with
+respect to the media-stream position/layout and are not consistent with random
+per-file IV data at each cluster boundary.
+
+The transform is still deliberately described as **non-canonical / obfuscated
+media transport**, not as a proven cipher. The sparse/local differences between
+aligned files and long equal runs argue against an ordinary avalanche-style
+block-cipher mode over the whole region, but the exact transform and any key or
+PRNG state are not yet demonstrated.
+
+`inspect_cluster_transport()` now records the SeekHead Cluster target, Cues,
+cluster spans and observed prefixes without attempting speculative decryption.
+This gives the next stage of the reverse engineering stable known boundaries.
 
 ## SYL / ID3v2.3
 
@@ -102,7 +147,7 @@ This indicates that a COLORS record is an event in the karaoke highlight stream 
 
 MIDITK is now demonstrated to be an obfuscated Standard MIDI File, not a separate proprietary event language.
 
-After the shared keystream/global XOR and an additional XOR `0x30`, all four stock payloads reconstruct byte-exact MIDI files beginning with:
+After the shared keystream/global XOR and an additional XOR `0x30`, the verified stock payloads reconstruct byte-exact MIDI files beginning with:
 
 ```text
 MThd

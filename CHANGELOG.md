@@ -1,3 +1,14 @@
+## 0.2.0-15
+
+- Fix GitHub Actions container production gate after Trivy reported stale/vulnerable Python package metadata.
+- Force-converge `setuptools 84.0.0`, `wheel 0.48.0`, `urllib3 2.8.0`, and `msgpack 1.2.1` after optional stem dependencies.
+- Add in-image version assertions and a CI diagnostic gate before Trivy.
+- Preserve the MTA Cluster reverse-engineering additions from 0.2.0-14.
+
+- Added `inspect_cluster_transport()` to anchor reverse engineering on SeekHead/Cues rather than scanning the obfuscated media region as EBML.
+- Added synthetic regression coverage for non-canonical Cluster transport.
+- Expanded MTA format research notes to the accumulated six-file corpus.
+
 # Changelog
 
 ## 0.2.0-13

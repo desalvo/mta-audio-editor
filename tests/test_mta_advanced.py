@@ -368,3 +368,49 @@ def test_decode_miditk_from_wrapped_syl_sections():
     )
     assert decode_miditk_from_syl(wrapped) == midi
     assert decode_miditk_from_syl(b"no proprietary sections") is None
+
+
+def test_cluster_transport_uses_seekhead_and_cues_to_locate_noncanonical_media(tmp_path):
+    from app.mta_reverse import inspect_cluster_transport
+
+    def size_vint(n: int) -> bytes:
+        for length in range(1, 9):
+            if n < (1 << (7 * length)) - 1:
+                marker = 1 << (7 * length)
+                return (marker | n).to_bytes(length, "big")
+        raise ValueError(n)
+
+    def elem(element_id: bytes, payload: bytes) -> bytes:
+        return element_id + size_vint(len(payload)) + payload
+
+    cluster_id = bytes.fromhex("1f43b675")
+
+    def seek_head(cluster_rel: int) -> bytes:
+        seek = elem(b"\x53\xab", cluster_id) + elem(b"\x53\xac", cluster_rel.to_bytes(4, "big"))
+        return elem(bytes.fromhex("114d9b74"), elem(b"\x4d\xbb", seek))
+
+    def cues(cluster_rel: int) -> bytes:
+        track_positions = elem(b"\xf7", b"\x01") + elem(b"\xf1", cluster_rel.to_bytes(4, "big"))
+        point = elem(b"\xb3", b"\x00") + elem(b"\xb7", track_positions)
+        return elem(bytes.fromhex("1c53bb6b"), elem(b"\xbb", point))
+
+    # Fixed-width Seek/Cue positions make the element lengths stable, so one
+    # iteration is enough to resolve the relative media offset.
+    sh = seek_head(0)
+    cq = cues(0)
+    media_rel = len(sh) + len(cq)
+    sh = seek_head(media_rel)
+    cq = cues(media_rel)
+    media = bytes.fromhex("0fb2f7b0") + b"\x00" * 28
+    segment_payload = sh + cq + media
+    segment = bytes.fromhex("18538067") + size_vint(len(segment_payload)) + segment_payload
+    ebml = bytes.fromhex("1a45dfa3") + size_vint(8) + b"matroska"
+    src = tmp_path / "sample.mta"
+    src.write_bytes(ebml + segment)
+
+    report = inspect_cluster_transport(src)
+    assert report["validated"] is True
+    assert report["cue_positions_match_seek_cluster"] is True
+    assert report["first_media_magic_hex"] == "0fb2f7b0"
+    assert report["first_cluster_is_canonical"] is False
+    assert report["noncanonical_cluster_transport"] is True

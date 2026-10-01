@@ -3,3 +3,8 @@
 # Python 3.14 baseline: pin the current PyTorch release with cp314 amd64/arm64 wheels.
 torch==2.14.1
 demucs==4.1.0
+
+# Security floor for transitive runtime dependencies used by the stem stack.
+# Keep aligned with the final Docker convergence step and Trivy production gate.
+msgpack==1.2.1
+urllib3==2.8.0

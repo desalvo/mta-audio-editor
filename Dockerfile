@@ -1,5 +1,5 @@
 FROM python:3.14-slim-bookworm
-ARG APP_VERSION=0.2.0-13
+ARG APP_VERSION=0.2.0-15
 ARG BUILD_ID=unknown
 ARG INSTALL_STEMS=true
 LABEL org.opencontainers.image.title="MTA Audio Editor" \
@@ -16,10 +16,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg ca-certi
     && groupadd --system --gid 10001 mtaeditor && useradd --system --uid 10001 --gid 10001 --home /nonexistent --shell /usr/sbin/nologin mtaeditor
 WORKDIR /app
 COPY requirements.txt requirements-stems.txt VERSION BUILD ./
-RUN pip install --no-cache-dir -r requirements.txt \
-    && if [ "$INSTALL_STEMS" = "true" ]; then pip install --no-cache-dir -r requirements-stems.txt; fi \
-    && pip install --no-cache-dir --upgrade setuptools==84.0.0 wheel==0.48.0 \
-    && python -c "import fastapi, uvicorn, numpy" \
+RUN python -m pip install --no-cache-dir -r requirements.txt \
+    && if [ "$INSTALL_STEMS" = "true" ]; then python -m pip install --no-cache-dir -r requirements-stems.txt; fi \
+    && python -m pip install --no-cache-dir --upgrade --force-reinstall setuptools==84.0.0 wheel==0.48.0 urllib3==2.8.0 msgpack==1.2.1 \
+    && python -m pip check \
+    && python -c "from importlib.metadata import version; expected={'setuptools':'84.0.0','wheel':'0.48.0','urllib3':'2.8.0','msgpack':'1.2.1'}; actual={p:version(p) for p in expected}; print(actual); assert actual == expected, (actual, expected)"
+RUN python -c "import fastapi, uvicorn, numpy" \
     && if [ "$INSTALL_STEMS" = "true" ]; then python -c "import torch, demucs"; fi
 COPY app ./app
 COPY LICENSE NOTICE ./

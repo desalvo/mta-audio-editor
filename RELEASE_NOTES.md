@@ -1,3 +1,17 @@
+# MTA Audio Editor 0.2.0-15
+
+## GitHub Actions / container security fix
+
+This release fixes the remaining production-image gate failure reported by Trivy by converging vulnerable transitive packages to fixed versions and asserting the resulting in-image versions before the scan.
+
+## Matroska cluster transport reverse-engineering
+
+- Adds conservative parsing of canonical Matroska `SeekHead` and `Cues` around the proprietary media region.
+- Confirms that the advertised first Cluster boundary points to `0f b2 f7 b0`, not `1f 43 b6 75`, on all four Library-backed corpus files checked in this pass.
+- Records successive cue-defined media boundaries and cluster-span statistics without claiming a decryption algorithm.
+- Documents cross-file deterministic behavior: the 14-track Michael Jackson and Earth Wind & Fire samples have matching relative cluster spacing and identical first 16 bytes at corresponding early cue boundaries when media regions are aligned.
+- Keeps all prior 0.2.0-13 Python 3.14, Kubernetes/Kustomize and standalone wizard work unchanged.
+
 # MTA Audio Editor 0.2.0-13
 
 ## Python 3.14 and Kubernetes/Kustomize release
