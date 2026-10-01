@@ -1,4 +1,4 @@
-FROM python:3.11-slim-bookworm
+FROM python:3.14-slim-bookworm
 ARG APP_VERSION=0.2.0-7
 ARG BUILD_ID=unknown
 ARG INSTALL_STEMS=true
