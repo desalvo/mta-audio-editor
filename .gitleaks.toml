@@ -1,0 +1,9 @@
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Public SHA-256 fingerprint of the reverse-engineered MTA XOR transport table"
+regexTarget = "match"
+regexes = [
+  """bcb30443707bdc8b651c1a58aa4152438ce5a6632cc98b294501eb08adbb3547"""
+]

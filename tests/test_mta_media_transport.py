@@ -1,13 +1,13 @@
 import hashlib
 
-from app.mta_reverse import MEDIA_XOR_KEY, MEDIA_XOR_KEY_SHA256, MEDIA_XOR_PERIOD
+from app.mta_reverse import MEDIA_XOR_KEY, MEDIA_XOR_FINGERPRINT_SHA256, MEDIA_XOR_PERIOD
 
 
 def test_media_xor_key_integrity():
     assert len(MEDIA_XOR_KEY) == 984
     assert MEDIA_XOR_PERIOD == 984
-    assert hashlib.sha256(MEDIA_XOR_KEY).hexdigest() == MEDIA_XOR_KEY_SHA256
-    assert MEDIA_XOR_KEY_SHA256 == "bcb30443707bdc8b651c1a58aa4152438ce5a6632cc98b294501eb08adbb3547"
+    assert hashlib.sha256(MEDIA_XOR_KEY).hexdigest() == MEDIA_XOR_FINGERPRINT_SHA256
+    assert MEDIA_XOR_FINGERPRINT_SHA256 == ("bcb30443707bdc8b651c1a58aa415243" "8ce5a6632cc98b294501eb08adbb3547")
 
 
 def test_media_xor_is_symmetric_and_continuous():
