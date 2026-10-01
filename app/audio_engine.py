@@ -186,7 +186,7 @@ def render_mix(project: Project, audio_resolver, out: Path, fmt: str = "mp3", bi
     if not project.tracks:
         raise ValueError("project has no audio tracks")
     fmt = fmt.lower()
-    if fmt not in {"wav", "mp3"}:
+    if fmt not in {"wav", "mp3", "flac"}:
         raise ValueError("unsupported mix format")
     with tempfile.TemporaryDirectory() as td_raw:
         td = Path(td_raw)
@@ -220,6 +220,8 @@ def render_mix(project: Project, audio_resolver, out: Path, fmt: str = "mp3", bi
         cmd += ["-filter_complex", ";".join(filters), "-map", "[master]", "-ar", "44100"]
         if fmt == "wav":
             cmd += ["-c:a", "pcm_s24le", str(out)]
+        elif fmt == "flac":
+            cmd += ["-c:a", "flac", "-compression_level", "8", str(out)]
         else:
             cmd += ["-c:a", "libmp3lame", "-b:a", bitrate, str(out)]
         _run(cmd)
@@ -278,3 +280,26 @@ def auto_align_ms(reference: Path, candidate: Path, max_shift_ms: int = 30000) -
         return 0
     lag = int(lags[mask][int(np.argmax(correlation[mask]))])
     return round(lag * 1000 / hz)
+
+
+def render_track_export(track: Track, source: Path, out: Path, fmt: str = "wav", bitrate: str = "320k") -> Path:
+    """Render a single track exactly as heard at the track output (clips, inserts, fader, pan)."""
+    fmt = fmt.lower()
+    if fmt not in {"wav", "mp3", "flac"}:
+        raise ValueError("unsupported track export format")
+    with tempfile.TemporaryDirectory() as td_raw:
+        td = Path(td_raw)
+        rendered = td / "track.wav"
+        render_track(track, source, rendered, apply_inserts=True)
+        gain = -120.0 if track.mute else track.volume_db
+        pan = min(1.0, max(-1.0, track.pan))
+        cmd = ["ffmpeg", "-y", "-v", "error", "-i", str(rendered), "-af",
+               f"volume={gain:.3f}dB,stereotools=balance_out={pan:.4f}", "-ar", "44100"]
+        if fmt == "wav":
+            cmd += ["-c:a", "pcm_s24le", str(out)]
+        elif fmt == "flac":
+            cmd += ["-c:a", "flac", "-compression_level", "8", str(out)]
+        else:
+            cmd += ["-c:a", "libmp3lame", "-b:a", bitrate, str(out)]
+        _run(cmd)
+    return out

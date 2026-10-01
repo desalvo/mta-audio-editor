@@ -4,7 +4,11 @@ from typing import Literal
 from pydantic import BaseModel, Field, field_validator
 
 TrackType = Literal["drums", "bass", "guitars", "keyboards", "orchestra", "winds", "melody", "click", "choirs", "other"]
-PluginType = Literal["eq", "normalizer", "compressor", "limiter"]
+PluginType = Literal[
+    "eq", "normalizer", "compressor", "limiter", "delay", "reverb_lexicon",
+    "room_ambience", "graphic_eq_32", "amplify", "stereo_imager",
+    "maximizer_loudness", "mastering_wizard", "denoise", "crackle_cleaner"
+]
 
 
 class Clip(BaseModel):
@@ -24,6 +28,29 @@ class InsertPlugin(BaseModel):
     preset: str = Field(default="default", max_length=80)
     enabled: bool = True
     params: dict[str, float | int | str | bool] = Field(default_factory=dict)
+
+
+class CustomPresetRequest(BaseModel):
+    plugin: PluginType
+    name: str = Field(min_length=1, max_length=80, pattern=r"^[A-Za-z0-9][A-Za-z0-9 _.-]{0,79}$")
+    params: dict[str, float | int | str | bool] = Field(default_factory=dict)
+
+
+class AutoMixRequest(BaseModel):
+    enabled: bool
+    style: Literal["balanced", "live", "studio", "gentle"] = "balanced"
+
+
+class AutoMixTrackSnapshot(BaseModel):
+    volume_db: float
+    pan: float
+    inserts: list[InsertPlugin] = Field(default_factory=list)
+
+
+class AutoMixSnapshot(BaseModel):
+    tracks: dict[str, AutoMixTrackSnapshot] = Field(default_factory=dict)
+    master_volume_db: float = 0.0
+    master_inserts: list[InsertPlugin] = Field(default_factory=list)
 
 
 class Track(BaseModel):
@@ -82,6 +109,17 @@ class StemSplitRequest(BaseModel):
     model: str = Field(default="htdemucs", max_length=80)
 
 
+class MtaSlotMapping(BaseModel):
+    slot: int = Field(ge=1, le=16)
+    name: str = Field(max_length=200)
+    type: TrackType = "other"
+    track_ids: list[str] = Field(min_length=1)
+
+
+class MtaExportRequest(BaseModel):
+    slots: list[MtaSlotMapping] = Field(default_factory=list, max_length=16)
+
+
 class Project(BaseModel):
     id: str
     title: str = Field(max_length=200)
@@ -96,6 +134,9 @@ class Project(BaseModel):
     preserved_attachments: list[str] = Field(default_factory=list)
     master_volume_db: float = Field(default=0.0, ge=-120.0, le=24.0)
     master_inserts: list[InsertPlugin] = Field(default_factory=list, max_length=16)
+    auto_mix_enabled: bool = False
+    auto_mix_style: Literal["balanced", "live", "studio", "gentle"] = "balanced"
+    auto_mix_snapshot: AutoMixSnapshot | None = None
 
     @field_validator("preserved_attachments")
     @classmethod

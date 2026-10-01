@@ -92,7 +92,7 @@ def test_codec_import_and_metadata(tmp_path, monkeypatch):
     assert out.tracks[0].name == "Drums"
     assert out.preserved_attachments == ["meta.bin"]
     meta = codec._metadata_attachment(out)
-    assert json.loads(meta.read_text())["schema"] == "mta-audio-editor/v2"
+    assert json.loads(meta.read_text())["schema"] == "mta-audio-editor/v3"
 
 
 def test_codec_export_builds_container(tmp_path, monkeypatch):

@@ -1,4 +1,4 @@
-# MTA Audio Editor 0.2.0-2
+# MTA Audio Editor 0.2.0-5
 
 ![MTA Audio Editor](app/static/logo.svg)
 
@@ -9,7 +9,7 @@ Web DAW containerizzata per creare, importare, modificare ed esportare progetti 
 **Creatore:** Alessandro De Salvo <braket71@gmail.com>  
 **Repository:** `desalvo/mta-audio-editor`  
 **Licenza:** EUPL-1.2  
-**Versione:** `0.2.0-2`  
+**Versione:** `0.2.0-5`  
 **Build:** generato automaticamente nel formato `YYYYMMDD-HH:MM:SS`.
 
 ## Funzioni principali
@@ -25,9 +25,10 @@ Web DAW containerizzata per creare, importare, modificare ed esportare progetti 
 - mixer con fader, pan, mute, solo, meter e master bus;
 - import diretto di MP3/WAV e sostituzione di singole tracce;
 - separazione MP3 in stems indipendenti tramite plugin Demucs, da aggiungere a un MTA esistente o nuovo;
-- catene insert per traccia e master, fino a 16 effetti: EQ, normalizer, compressor e limiter con preset allow-listed;
+- catene insert per traccia e master, fino a 16 effetti, con preset factory e preset custom persistenti: EQ parametrico/32-band, normalizer, compressor, limiter, delay, Lexicon-style reverb, room/ambience, amplify, stereo imager, maximizer/loudness, mastering wizard, de-noise e crackling cleaner;
+- wizard globale **Auto Mix** reversibile con toggle e profili Balanced/Studio/Live/Gentle;
 - preview master renderizzata applicando timeline, insert, mixer e processing master;
-- export MTA8/MTA16, WAV PCM 24-bit/44.1 kHz e MP3 320 kbps;
+- export MTA8/MTA16, WAV PCM 24-bit/44.1 kHz, MP3 320 kbps e FLAC lossless;
 - gestione testo, accordi e marker temporali;
 - preservazione degli attachment MTA esistenti quando estraibili;
 - documentazione utente e amministratore integrata e scaricabile in PDF.
@@ -100,15 +101,15 @@ git init
 git branch -M main
 git remote add origin https://github.com/desalvo/mta-audio-editor.git
 git add .
-git commit -m "Initial production release 0.2.0-2"
+git commit -m "Release 0.2.0-5"
 git push -u origin main
 ```
 
 Dopo che la CI su `main` è verde, creare il tag:
 
 ```bash
-git tag -s 0.2.0-2 -m "MTA Audio Editor 0.2.0-2"
-git push origin 0.2.0-2
+git tag -s 0.2.0-5 -m "MTA Audio Editor 0.2.0-5"
+git push origin 0.2.0-5
 ```
 
 ## Packaging locale
@@ -122,3 +123,21 @@ L'applicazione applica autenticazione default-on, request-integrity header sulle
 ## Compatibilità MTA
 
 Il layer MTA è isolato in `app/codec.py`. Gli attachment non audio già presenti vengono preservati quando tecnicamente estraibili e l'editor aggiunge `mta-editor.json` con il modello non distruttivo. Metadati proprietari Merish non documentati devono essere validati su file campione reali prima di dichiarare compatibilità bit-perfect.
+
+
+## 0.2.0-3: extended mix, MTA slot mapping and reverse analysis
+
+A project is no longer constrained to the final MTA8/MTA16 slot count while editing or mixing. You may keep any practical number of project tracks. MTA8 still exports at most 8 slots and MTA16 at most 16; when the project exceeds that capacity the export dialog requires every project track to be assigned to an output slot. Multiple tracks assigned to one slot are rendered and mixed into that single MTA stream with their inserts, fader, pan, mute and solo state applied.
+
+Single tracks can be exported independently as WAV (24-bit), MP3 (320 kbps) or FLAC. The stereo master can also be exported as FLAC in addition to WAV/MP3.
+
+Imported MTA files are analyzed by the reverse-engineering module (`app/mta_reverse.py`). It inventories Matroska streams/tags and attachments, fingerprints opaque payloads, parses embedded ID3v2.3 and MtxInfoData XML, and inspects the proprietary `LYRICS`, `CHORDS`, `COLORS`, `MIDITK`/`MARKER` families. Real-file corpus analysis now provides read-only decoding for COLORS timing-like events and for LYRICS/CHORDS records: a shared 256-byte keystream, continuous byte phase, minute/centisecond timing, and XOR-0x30 text/chord labels. Unknown fields and all undocumented writer semantics are still preserved verbatim rather than rewritten speculatively.
+
+
+## 0.2.0-5: extended insert suite and Auto Mix
+
+The insert registry now includes Delay, Lexicon-style Reverb, Room/Ambience, 32-band Graphic EQ, Amplify, Stereo Imager, Maximizer/Loudness, Mastering Wizard, De-Noise and Crackling Cleaner. Every processor includes safe factory presets and validated user-custom parameters. User presets are persisted in the data volume and appear as `user:<name>` in every project.
+
+Auto Mix is a reversible project-level wizard. Before applying its rules it snapshots track faders, pan, insert chains and master processing. The selected Balanced, Studio, Live or Gentle profile then applies conservative type-aware headroom, stereo placement, EQ/dynamics/space processing and a master preparation chain. Turning Auto Mix off restores the saved snapshot exactly.
+
+`Lexicon-style` identifies a preset family/working style only: the implementation uses open FFmpeg processing and is not a proprietary Lexicon algorithm or emulation.

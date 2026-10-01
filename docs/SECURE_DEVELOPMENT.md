@@ -45,3 +45,12 @@ Seguire `SECURITY.md`. Non inserire credenziali, file MTA sensibili o exploit co
 - Stem-separation model names are allow-listed before process execution.
 - Uploaded media is size-limited and probed before processing.
 - Demucs model weights are cached under the persistent application data directory; production operators should control outbound network access and may preload the cache in restricted environments.
+
+## DSP plugins and custom presets
+
+- Raw FFmpeg expressions are never accepted from HTTP/API input.
+- Custom preset keys must match an explicit per-plugin schema.
+- Numeric parameters have enforced minimum and maximum values.
+- Factory presets are immutable; user presets are data-only JSON.
+- CI runs every factory preset and each custom-builder default through FFmpeg.
+- Auto Mix only composes allow-listed insert presets and snapshots/restores prior user settings.

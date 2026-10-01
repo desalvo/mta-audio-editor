@@ -1,86 +1,157 @@
-"""MTA container adapter with non-destructive DAW rendering."""
-import json, subprocess, uuid, tempfile
+"""MTA container adapter with non-destructive DAW rendering and export-slot merging."""
+from __future__ import annotations
+
+import json
+import subprocess
+import tempfile
+import uuid
 from pathlib import Path
-from .models import Project, Track, Clip
-from .storage import attachment_path, audio_path, pdir, save_project
+
 from .audio_engine import media_duration_ms, render_track
+from .models import Clip, MtaSlotMapping, Project, Track
+from .mta_reverse import analyze_mta
+from .storage import attachment_path, audio_path, pdir, save_project
 
-MTA8_TYPES = ["drums","bass","guitars","keyboards","orchestra","winds","melody","click"]
+MTA8_TYPES = ["drums", "bass", "guitars", "keyboards", "orchestra", "winds", "melody", "click"]
 
-def run(cmd):
+
+def run(cmd: list[str]) -> str:
     p = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    if p.returncode: raise RuntimeError(p.stderr.strip() or "command failed")
+    if p.returncode:
+        raise RuntimeError(p.stderr.strip() or "command failed")
     return p.stdout
 
+
 def ffprobe(path: Path):
-    return json.loads(run(["ffprobe","-v","error","-show_streams","-show_format","-of","json",str(path)]))
+    return json.loads(run(["ffprobe", "-v", "error", "-show_streams", "-show_format", "-of", "json", str(path)]))
+
 
 def import_mta(path: Path, project: Project) -> Project:
-    d=pdir(project.id); audio=d/"audio"; att=d/"attachments"; info=ffprobe(path)
-    audio_streams=[s for s in info.get("streams",[]) if s.get("codec_type")=="audio"]
-    tracks=[]
-    for i,s in enumerate(audio_streams):
-        name=(s.get("tags") or {}).get("title") or f"Track {i+1}"
-        typ=(s.get("tags") or {}).get("MTA_TYPE") or (MTA8_TYPES[i] if i < len(MTA8_TYPES) else "other")
-        out=audio/f"track-{i+1:02d}.mp3"
-        try: run(["ffmpeg","-y","-v","error","-i",str(path),"-map",f"0:a:{i}","-c:a","copy",str(out)])
-        except Exception: run(["ffmpeg","-y","-v","error","-i",str(path),"-map",f"0:a:{i}","-c:a","libmp3lame","-q:a","2",str(out)])
-        dur=media_duration_ms(out)
-        tracks.append(Track(id=uuid.uuid4().hex[:10],name=name,type=typ if typ in Track.model_fields['type'].annotation.__args__ else 'other',
-                            filename=out.name,duration_ms=dur,
-                            clips=[Clip(id=uuid.uuid4().hex[:10],source_start_ms=0,source_end_ms=dur,timeline_start_ms=0)]))
-    preserved=[]
-    attachment_streams=[s for s in info.get("streams",[]) if s.get("codec_type")=="attachment"]
-    for aidx,s in enumerate(attachment_streams):
-        idx=s.get("index"); tags=s.get("tags") or {}; fname=tags.get("filename") or f"attachment-{idx}.bin"
-        safe="".join(c for c in fname if c.isalnum() or c in "._-") or f"attachment-{idx}.bin"; out=att/safe
+    d = pdir(project.id); audio = d / "audio"; att = d / "attachments"; info = ffprobe(path)
+    audio_streams = [s for s in info.get("streams", []) if s.get("codec_type") == "audio"]
+    tracks = []
+    for i, s in enumerate(audio_streams):
+        name = (s.get("tags") or {}).get("title") or f"Track {i+1}"
+        typ = (s.get("tags") or {}).get("MTA_TYPE") or (MTA8_TYPES[i] if i < len(MTA8_TYPES) else "other")
+        out = audio / f"track-{i+1:02d}.mp3"
         try:
-            run(["ffmpeg","-y","-v","error",f"-dump_attachment:t:{aidx}",str(out),"-i",str(path),"-f","null","-"])
+            run(["ffmpeg", "-y", "-v", "error", "-i", str(path), "-map", f"0:a:{i}", "-c:a", "copy", str(out)])
+        except Exception:
+            run(["ffmpeg", "-y", "-v", "error", "-i", str(path), "-map", f"0:a:{i}", "-c:a", "libmp3lame", "-q:a", "2", str(out)])
+        dur = media_duration_ms(out)
+        allowed = Track.model_fields["type"].annotation.__args__
+        tracks.append(Track(id=uuid.uuid4().hex[:10], name=name, type=typ if typ in allowed else "other",
+                            filename=out.name, duration_ms=dur,
+                            clips=[Clip(id=uuid.uuid4().hex[:10], source_start_ms=0, source_end_ms=dur, timeline_start_ms=0)]))
+    preserved = []
+    attachment_streams = [s for s in info.get("streams", []) if s.get("codec_type") == "attachment"]
+    for aidx, s in enumerate(attachment_streams):
+        idx = s.get("index"); tags = s.get("tags") or {}; fname = tags.get("filename") or f"attachment-{idx}.bin"
+        safe = "".join(c for c in fname if c.isalnum() or c in "._-") or f"attachment-{idx}.bin"; out = att / safe
+        try:
+            run(["ffmpeg", "-y", "-v", "error", f"-dump_attachment:t:{aidx}", str(out), "-i", str(path), "-f", "null", "-"])
             if out.exists(): preserved.append(out.name)
-        except Exception: pass
-    project.tracks=tracks; project.preserved_attachments=preserved; project.target="MTA16" if len(tracks)>8 else "MTA8"
+        except Exception:
+            pass
+    project.tracks = tracks; project.preserved_attachments = preserved; project.target = "MTA16" if len(tracks) > 8 else "MTA8"
+    try:
+        report = analyze_mta(path, att / "reverse-analysis")
+        (d / "mta-analysis.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+    except Exception:
+        pass
     save_project(project); return project
 
+
 def _metadata_attachment(project: Project) -> Path:
-    out=pdir(project.id)/"attachments"/"mta-editor.json"
+    out = pdir(project.id) / "attachments" / "mta-editor.json"
     out.write_text(json.dumps({
-        "schema":"mta-audio-editor/v2","title":project.title,"artist":project.artist,"bpm":project.bpm,"key":project.key,
-        "tracks":[{"id":t.id,"name":t.name,"type":t.type,"pan":t.pan,"clips":[c.model_dump() for c in t.clips],"inserts":[x.model_dump() for x in t.inserts]} for t in project.tracks],
-        "master":{"volume_db":project.master_volume_db,"inserts":[x.model_dump() for x in project.master_inserts]},
-        "lyrics":[x.model_dump() for x in project.lyrics],"chords":[x.model_dump() for x in project.chords],"markers":[x.model_dump() for x in project.markers],
+        "schema": "mta-audio-editor/v3", "title": project.title, "artist": project.artist, "bpm": project.bpm, "key": project.key,
+        "tracks": [{"id": t.id, "name": t.name, "type": t.type, "pan": t.pan, "clips": [c.model_dump() for c in t.clips], "inserts": [x.model_dump() for x in t.inserts]} for t in project.tracks],
+        "master": {"volume_db": project.master_volume_db, "inserts": [x.model_dump() for x in project.master_inserts]},
+        "lyrics": [x.model_dump() for x in project.lyrics], "chords": [x.model_dump() for x in project.chords], "markers": [x.model_dump() for x in project.markers],
     }, ensure_ascii=False, indent=2), encoding="utf-8")
     return out
 
-def export_mta(project: Project, out: Path) -> Path:
-    max_tracks=8 if project.target=="MTA8" else 16; tracks=project.tracks[:max_tracks]
-    if not tracks: raise ValueError("project has no audio tracks")
-    with tempfile.TemporaryDirectory() as td:
-        td=Path(td); rendered=[]
-        for i,t in enumerate(tracks):
-            rw=td/f"track-{i:02d}.wav"; render_track(t,audio_path(project.id, t.filename),rw); rendered.append(rw)
-        cmd=["ffmpeg","-y","-v","error"]
-        for r in rendered: cmd += ["-i",str(r)]
-        any_solo=any(t.solo for t in tracks); filters=[]
-        for i,t in enumerate(tracks):
-            muted=t.mute or (any_solo and not t.solo); gain="-120dB" if muted else f"{t.volume_db}dB"
-            filters.append(f"[{i}:a:0]aformat=channel_layouts=stereo,volume={gain},stereotools=balance_out={t.pan:.4f}[a{i}]")
-        cmd += ["-filter_complex",";".join(filters)]
-        for i in range(len(tracks)): cmd += ["-map",f"[a{i}]"]
-        cmd += ["-c:a","libmp3lame","-q:a","2"]
-        for i,t in enumerate(tracks):
-            cmd += [f"-metadata:s:a:{i}",f"title={t.name}",f"-metadata:s:a:{i}",f"MTA_TYPE={t.type}"]
-        attachments=[]
+
+def suggested_slots(project: Project) -> list[dict]:
+    limit = 8 if project.target == "MTA8" else 16
+    slots = []
+    for i, track in enumerate(project.tracks[:limit]):
+        slots.append({"slot": i + 1, "name": track.name, "type": track.type, "track_ids": [track.id]})
+    return slots
+
+
+def validate_slot_mapping(project: Project, slots: list[MtaSlotMapping] | None) -> list[MtaSlotMapping]:
+    limit = 8 if project.target == "MTA8" else 16
+    if not slots:
+        if len(project.tracks) > limit:
+            raise ValueError(f"{project.target} export requires a merge mapping for {len(project.tracks)} project tracks into at most {limit} slots")
+        return [MtaSlotMapping(**x) for x in suggested_slots(project)]
+    if len(slots) > limit:
+        raise ValueError(f"{project.target} supports at most {limit} output slots")
+    if len({s.slot for s in slots}) != len(slots):
+        raise ValueError("duplicate MTA output slot")
+    known = {t.id for t in project.tracks}
+    flattened = [tid for s in slots for tid in s.track_ids]
+    if set(flattened) != known or len(flattened) != len(known):
+        raise ValueError("every project track must be assigned exactly once to an MTA output slot")
+    if len(set(flattened)) != len(flattened):
+        raise ValueError("a project track cannot be assigned to multiple MTA slots")
+    if any(s.slot > limit for s in slots):
+        raise ValueError("MTA slot is outside target capacity")
+    return sorted(slots, key=lambda x: x.slot)
+
+
+def export_mta(project: Project, out: Path, slots: list[MtaSlotMapping] | None = None) -> Path:
+    slots = validate_slot_mapping(project, slots)
+    by_id = {t.id: t for t in project.tracks}
+    with tempfile.TemporaryDirectory() as td_raw:
+        td = Path(td_raw)
+        rendered: dict[str, Path] = {}
+        for i, track in enumerate(project.tracks):
+            rw = td / f"source-{i:02d}.wav"
+            render_track(track, audio_path(project.id, track.filename), rw)
+            rendered[track.id] = rw
+
+        slot_files: list[Path] = []
+        for pos, slot in enumerate(slots):
+            tracks = [by_id[tid] for tid in slot.track_ids]
+            cmd = ["ffmpeg", "-y", "-v", "error"]
+            for t in tracks:
+                cmd += ["-i", str(rendered[t.id])]
+            any_solo = any(t.solo for t in project.tracks)
+            filters = []
+            labels = []
+            for idx, t in enumerate(tracks):
+                muted = t.mute or (any_solo and not t.solo)
+                gain = -120.0 if muted else t.volume_db
+                pan = min(1.0, max(-1.0, t.pan))
+                filters.append(f"[{idx}:a]aformat=channel_layouts=stereo,volume={gain:.3f}dB,stereotools=balance_out={pan:.4f}[s{idx}]")
+                labels.append(f"[s{idx}]")
+            if len(labels) == 1:
+                filters.append(f"{labels[0]}anull[out]")
+            else:
+                filters.append("".join(labels) + f"amix=inputs={len(labels)}:duration=longest:normalize=0[out]")
+            merged = td / f"slot-{pos+1:02d}.wav"
+            cmd += ["-filter_complex", ";".join(filters), "-map", "[out]", "-ar", "44100", "-c:a", "pcm_s24le", str(merged)]
+            run(cmd)
+            slot_files.append(merged)
+
+        cmd = ["ffmpeg", "-y", "-v", "error"]
+        for r in slot_files: cmd += ["-i", str(r)]
+        for i in range(len(slot_files)): cmd += ["-map", f"{i}:a:0"]
+        cmd += ["-c:a", "libmp3lame", "-q:a", "2"]
+        for i, slot in enumerate(slots):
+            cmd += [f"-metadata:s:a:{i}", f"title={slot.name}", f"-metadata:s:a:{i}", f"MTA_TYPE={slot.type}"]
+        attachments = []
         for name in project.preserved_attachments:
-            try:
-                f = attachment_path(project.id, name)
-            except ValueError:
-                continue
-            if f.exists():
-                attachments.append(f)
-        meta=_metadata_attachment(project)
+            try: f = attachment_path(project.id, name)
+            except ValueError: continue
+            if f.exists(): attachments.append(f)
+        meta = _metadata_attachment(project)
         if meta not in attachments: attachments.append(meta)
         for a in attachments:
-            cmd += ["-attach",str(a),"-metadata:s:t",f"filename={a.name}","-metadata:s:t","mimetype=application/octet-stream"]
-        cmd += ["-metadata",f"TITLE={project.title}","-metadata",f"ARTIST={project.artist}","-metadata",f"BPM={project.bpm}","-f","matroska",str(out)]
+            cmd += ["-attach", str(a), "-metadata:s:t", f"filename={a.name}", "-metadata:s:t", "mimetype=application/octet-stream"]
+        cmd += ["-metadata", f"TITLE={project.title}", "-metadata", f"ARTIST={project.artist}", "-metadata", f"BPM={project.bpm}", "-f", "matroska", str(out)]
         run(cmd)
     return out

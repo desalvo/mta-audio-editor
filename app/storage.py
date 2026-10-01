@@ -49,9 +49,6 @@ def create_project(title: str = "Untitled", target: str = "MTA8") -> Project:
 
 
 def validate_project_files(project: Project) -> None:
-    limit = 8 if project.target == "MTA8" else 16
-    if len(project.tracks) > limit:
-        raise ValueError(f"{project.target} supports at most {limit} tracks")
     seen_track_ids: set[str] = set()
     for track in project.tracks:
         if track.id in seen_track_ids:

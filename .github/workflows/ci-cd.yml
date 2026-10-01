@@ -22,8 +22,8 @@ jobs:
     name: Quality and unit tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
@@ -33,6 +33,10 @@ jobs:
         run: python -m compileall -q app
       - name: Build documentation PDFs
         run: python scripts/build_docs.py
+      - name: Install FFmpeg for DSP preset validation
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - name: Validate audio presets against FFmpeg
+        run: PYTHONPATH=. python scripts/validate_audio_presets.py
       - name: Ruff
         run: ruff check app tests
       - name: Unit tests and coverage gate
@@ -41,7 +45,7 @@ jobs:
           MTA_DATA_DIR: /tmp/mta-projects
         run: PYTHONPATH=. pytest --cov=app --cov-report=term-missing --cov-report=xml --cov-fail-under=70
       - name: Upload coverage
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coverage
           path: coverage.xml
@@ -50,8 +54,8 @@ jobs:
     name: SAST and dependency audit
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
@@ -62,11 +66,11 @@ jobs:
       - name: Python dependency audit
         run: pip-audit -r requirements.txt -r requirements-stems.txt --strict
       - name: Secret scan
-        uses: gitleaks/gitleaks-action@v2
+        uses: gitleaks/gitleaks-action@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Trivy filesystem scan
-        uses: aquasecurity/trivy-action@0.33.1
+        uses: aquasecurity/trivy-action@0.36.0
         with:
           scan-type: fs
           scan-ref: .
@@ -79,24 +83,24 @@ jobs:
     runs-on: ubuntu-latest
     needs: [quality, security]
     steps:
-      - uses: actions/checkout@v4
-      - uses: docker/setup-buildx-action@v3
+      - uses: actions/checkout@v7
+      - uses: docker/setup-buildx-action@v4
       - name: Generate build id
         id: build
         shell: bash
         run: echo "id=$(TZ=Europe/Rome date '+%Y%m%d-%H:%M:%S')" >> "$GITHUB_OUTPUT"
       - name: Build local validation image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           load: true
           push: false
           tags: mta-audio-editor:ci
           build-args: |
-            APP_VERSION=${{ github.ref_type == 'tag' && github.ref_name || '0.2.0-2' }}
+            APP_VERSION=${{ github.ref_type == 'tag' && github.ref_name || '0.2.0-5' }}
             BUILD_ID=${{ steps.build.outputs.id }}
       - name: Trivy image scan
-        uses: aquasecurity/trivy-action@0.33.1
+        uses: aquasecurity/trivy-action@0.36.0
         with:
           image-ref: mta-audio-editor:ci
           severity: HIGH,CRITICAL
@@ -126,17 +130,17 @@ jobs:
     runs-on: ubuntu-latest
     needs: [quality, security, container]
     steps:
-      - uses: actions/checkout@v4
-      - uses: docker/setup-qemu-action@v3
-      - uses: docker/setup-buildx-action@v3
+      - uses: actions/checkout@v7
+      - uses: docker/setup-qemu-action@v4
+      - uses: docker/setup-buildx-action@v4
       - name: Docker Hub login
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Generate metadata
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ${{ env.IMAGE_NAME }}
           tags: |
@@ -152,7 +156,7 @@ jobs:
         run: |
           if [[ "$GITHUB_REF" == refs/tags/* ]]; then echo "value=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"; else echo "value=$(cat VERSION)" >> "$GITHUB_OUTPUT"; fi
       - name: Build and push multi-arch
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           platforms: linux/amd64,linux/arm64

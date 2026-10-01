@@ -1,18 +1,27 @@
-# MTA Audio Editor 0.2.0-2
+# MTA Audio Editor 0.2.0-5 - Release Notes
 
-Build: generated automatically in `YYYYMMDD-HH:MM:SS` format.
+This release combines the extended processing/mixing system with verified, conservative reverse-engineering support for real M-Live MTA samples and fixes the GitHub production pipeline.
 
-This release turns the interface into the production DAW mockup and extends the audio engine with MP3/WAV import, plugin-based stem separation, per-track/master insert processing, a master mixing/preview console and WAV/MP3 master export.
+## Real MTA inspection
+- Decode standard ID3v2.3 text metadata embedded in SYL attachments.
+- Parse the observed DELTA and Lyrics3-like wrappers for LYRICS, COLORS, MIDITK and CHORDS.
+- Detect the verified COLORS layout: 3-byte binary prefix followed by 15-byte records with a structurally distinct terminal record.
+- Expose read-only observed decoders only when their structural invariants validate; undocumented semantics are not rewritten speculatively.
+- Parse MtxInfoData XML, including track metadata, zero padding and NoteOn vector/duration consistency.
+- Fall back to direct EBML FileData extraction when FFmpeg cannot dump attachments from non-canonical MTA containers.
+- Preserve opaque and unknown proprietary bytes for lossless round-trip handling.
 
-## New audio workflows
+## GitHub Actions
+- Keep Python 3.11 and pin NumPy to the compatible 2.4.6 release.
+- Update checkout/setup-python/upload-artifact, Docker, Gitleaks, Trivy and CodeQL actions to current generations.
+- Retain unit/coverage, DSP runtime validation, SAST, dependency audit, secret scanning, filesystem/image scanning, smoke tests, SBOM and provenance gates.
 
-- Import an MP3/WAV as a single independent track.
-- Replace a track and keep, manually set or automatically recalculate synchronization.
-- Split an MP3 through the Demucs plugin and merge the resulting stems into the current MTA project or a new MTA8/MTA16 project.
-- Apply multiple ordered inserts per track: EQ, Normalizer, Compressor and Limiter.
-- Apply a separate master insert chain to preview, WAV and MP3 exports.
-- Export MTA8/MTA16 multitrack, WAV 24-bit/44.1 kHz or MP3 320 kbps.
+## Audio processing and Auto Mix
+- Delay, Lexicon-style Reverb, Room/Ambience, 32-band Graphic EQ, Amplify, Stereo Imager, Maximizer/Loudness, Mastering Wizard, De-Noise and Crackling Cleaner.
+- Factory presets, bounded custom parameters and persistent user presets.
+- Reversible Auto Mix with Balanced, Studio, Live and Gentle profiles.
+- 87 factory/default DSP configurations validated through the real FFmpeg runtime.
 
-## Production notes
+## Reverse-analysis update
 
-Demucs model weights are cached in the persistent data volume on first use. Air-gapped deployments should preload the model cache. Plugin parameters are server-side allow-listed; no arbitrary FFmpeg expression is accepted from the browser.
+The v2 analyzer now includes a corpus-verified, read-only decoder for stock M-Live LYRICS and CHORDS records. It derives the same 256-byte keystream observed in COLORS, decodes continuously after the common 3-byte prefix, identifies `=:k\x00XX` record delimiters, reconstructs centisecond timing with minute carry, and recovers text/chord labels through XOR `0x30`. These fields are exposed for inspection only; undocumented writer compatibility is not claimed.
