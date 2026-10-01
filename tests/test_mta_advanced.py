@@ -166,11 +166,13 @@ def _fake_syl_with_sections() -> bytes:
     frame = b"TIT2" + len(text_payload).to_bytes(4, "big") + b"\x00\x00" + text_payload
     padding = b"\x00" * 16
     colors_body = b"\x28\xb6\xa9" + (b"\x10" * 15) + (b"\x20" * 15)
-    colors = b"COLORSBEGININD0000211LYR00927\r\n" + colors_body
-    colors += f"{len(b'COLORSBEGININD0000211LYR00927\\r\\n') + len(colors_body):06d}".encode() + b"COLORS200\r\n"
+    colors_header = b"COLORSBEGININD0000211LYR00927\r\n"
+    colors = colors_header + colors_body
+    colors += f"{len(colors_header) + len(colors_body):06d}".encode() + b"COLORS200\r\n"
     chords_body = b"X" * 30
-    chords = b"CHORDSBEGININD0000211LYR00030\r\n" + chords_body
-    chords += f"{len(b'CHORDSBEGININD0000211LYR00030\\r\\n') + len(chords_body):06d}".encode() + b"CHORDS200\r\n"
+    chords_header = b"CHORDSBEGININD0000211LYR00030\r\n"
+    chords = chords_header + chords_body
+    chords += f"{len(chords_header) + len(chords_body):06d}".encode() + b"CHORDS200\r\n"
     tail = padding + b"DELTABEGIN0DELTAEND\r\n" + colors + chords
     size = len(frame + tail)
     syn = bytes([(size >> 21) & 0x7F, (size >> 14) & 0x7F, (size >> 7) & 0x7F, size & 0x7F])

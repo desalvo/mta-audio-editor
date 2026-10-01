@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.2.0-5
+## 0.2.0-6
 
 - Fixed GitHub Actions compatibility: Python 3.11-compatible NumPy and current action generations (including Trivy and CodeQL).
 - Added conservative native inspection of real M-Live SYL attachments: decoded ID3v2.3 text frames and DELTA/Lyrics3-like wrappers for LYRICS, COLORS, MIDITK and CHORDS.

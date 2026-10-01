@@ -9,15 +9,18 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
 import math
 import mmap
 import re
 import struct
 import subprocess
 import tempfile
-import xml.etree.ElementTree as ET
+from defusedxml import ElementTree as ET
 from collections import Counter
 from pathlib import Path
+
+LOGGER = logging.getLogger(__name__)
 
 PRINTABLE_RE = re.compile(rb"[\x20-\x7e]{4,}")
 SECTION_NAMES = ("LYRICS", "COLORS", "MIDITK", "CHORDS")
@@ -589,8 +592,8 @@ def extract_attachments(path: Path, output_dir: Path) -> list[dict]:
         method = "ffmpeg"
         try:
             _run(["ffmpeg", "-y", "-v", "error", f"-dump_attachment:t:{ordinal}", str(target), "-i", str(path), "-f", "null", "-"])
-        except Exception:
-            pass
+        except Exception as exc:
+            LOGGER.warning("ffmpeg attachment extraction failed for %s attachment %d: %s", path, ordinal, exc)
         if not target.exists():
             if fallback_payloads is None:
                 sizes = [int(s.get("extradata_size") or 0) for s in attachments]

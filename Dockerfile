@@ -1,5 +1,5 @@
 FROM python:3.11-slim-bookworm
-ARG APP_VERSION=0.2.0-5
+ARG APP_VERSION=0.2.0-6
 ARG BUILD_ID=unknown
 ARG INSTALL_STEMS=true
 LABEL org.opencontainers.image.title="MTA Audio Editor" \

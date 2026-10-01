@@ -1,4 +1,4 @@
-# MTA Audio Editor 0.2.0-5 - Release Notes
+# MTA Audio Editor 0.2.0-6 - Release Notes
 
 This release combines the extended processing/mixing system with verified, conservative reverse-engineering support for real M-Live MTA samples and fixes the GitHub production pipeline.
 
@@ -21,7 +21,3 @@ This release combines the extended processing/mixing system with verified, conse
 - Factory presets, bounded custom parameters and persistent user presets.
 - Reversible Auto Mix with Balanced, Studio, Live and Gentle profiles.
 - 87 factory/default DSP configurations validated through the real FFmpeg runtime.
-
-## Reverse-analysis update
-
-The v2 analyzer now includes a corpus-verified, read-only decoder for stock M-Live LYRICS and CHORDS records. It derives the same 256-byte keystream observed in COLORS, decodes continuously after the common 3-byte prefix, identifies `=:k\x00XX` record delimiters, reconstructs centisecond timing with minute carry, and recovers text/chord labels through XOR `0x30`. These fields are exposed for inspection only; undocumented writer compatibility is not claimed.

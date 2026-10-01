@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import subprocess
 import tempfile
 import uuid
@@ -13,6 +14,7 @@ from .mta_reverse import analyze_mta
 from .storage import attachment_path, audio_path, pdir, save_project
 
 MTA8_TYPES = ["drums", "bass", "guitars", "keyboards", "orchestra", "winds", "melody", "click"]
+LOGGER = logging.getLogger(__name__)
 
 
 def run(cmd: list[str]) -> str:
@@ -51,14 +53,14 @@ def import_mta(path: Path, project: Project) -> Project:
         try:
             run(["ffmpeg", "-y", "-v", "error", f"-dump_attachment:t:{aidx}", str(out), "-i", str(path), "-f", "null", "-"])
             if out.exists(): preserved.append(out.name)
-        except Exception:
-            pass
+        except Exception as exc:
+            LOGGER.warning("Unable to preserve attachment %s from %s: %s", safe, path, exc)
     project.tracks = tracks; project.preserved_attachments = preserved; project.target = "MTA16" if len(tracks) > 8 else "MTA8"
     try:
         report = analyze_mta(path, att / "reverse-analysis")
         (d / "mta-analysis.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
-    except Exception:
-        pass
+    except Exception as exc:
+        LOGGER.warning("Unable to analyze imported MTA %s: %s", path, exc)
     save_project(project); return project
 
 
