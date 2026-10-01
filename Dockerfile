@@ -17,7 +17,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg ca-certi
 WORKDIR /app
 COPY requirements.txt requirements-stems.txt VERSION BUILD ./
 RUN pip install --no-cache-dir -r requirements.txt \
-    && if [ "$INSTALL_STEMS" = "true" ]; then pip install --no-cache-dir -r requirements-stems.txt; fi
+    && if [ "$INSTALL_STEMS" = "true" ]; then pip install --no-cache-dir -r requirements-stems.txt; fi \
+    && pip install --no-cache-dir --upgrade setuptools==84.0.0 wheel==0.48.0 \
+    && python -c "import fastapi, uvicorn, numpy" \
+    && if [ "$INSTALL_STEMS" = "true" ]; then python -c "import torch, torchaudio"; fi
 COPY app ./app
 COPY LICENSE NOTICE ./
 RUN mkdir -p /data/projects && chown -R 10001:10001 /data /app

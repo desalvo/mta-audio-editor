@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.0-9
+
+- Fixed the current Trivy production-image gate by upgrading runtime packaging tooling to `setuptools==84.0.0` and `wheel==0.48.0`.
+- `setuptools 84.0.0` vendors `jaraco.context 6.1.0` and `wheel 0.46.3`, eliminating CVE-2026-23949 and CVE-2026-24049 reported against the base image's `setuptools 79.0.1`.
+- Added a Docker build-time import smoke test for core runtime modules and optional Torch/Torchaudio stem-separation modules.
+- Retained all 0.2.0-8 MTA reverse-engineering, security, documentation and CI improvements.
+
 ## 0.2.0-8
 
 - Consolidated the GitHub Actions fixes for Python 3.11 and current action tags, including Trivy `v0.36.0`, CodeQL v4 and NumPy 2.4.6.

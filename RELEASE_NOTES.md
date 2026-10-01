@@ -1,15 +1,18 @@
-# MTA Audio Editor 0.2.0-8
+# MTA Audio Editor 0.2.0-9
 
-This release fixes the remaining GitHub Actions failure observed after 0.2.0-7.
+This release fixes the production container vulnerability gate reached after all quality and source-security jobs passed.
 
-## CI/security fix
+## Container security fix
 
-The smoke-test Basic Auth password is now generated dynamically at workflow runtime. This removes the Gitleaks `curl-auth-user` false positive while keeping the secret scan enabled and strict.
+The Python 3.11 base image supplied `setuptools 79.0.1`, whose vendored packages triggered two HIGH Trivy findings:
+
+- `jaraco.context 5.3.0` / CVE-2026-23949 (fixed in 6.1.0);
+- vendored `wheel 0.45.1` / CVE-2026-24049 (fixed in 0.46.2).
+
+The Docker build now upgrades the runtime packaging toolchain to `setuptools==84.0.0` and `wheel==0.48.0` after installing application dependencies. `setuptools 84.0.0` itself vendors fixed `jaraco.context 6.1.0` and `wheel 0.46.3`.
+
+A build-time import smoke test verifies FastAPI/Uvicorn/NumPy and, when stem support is enabled, Torch/Torchaudio before the image is accepted.
 
 ## Retained functionality
 
-All 0.2.0-7 functionality is retained, including verified read-only decoding of MTA `LYRICS`, `CHORDS`, `COLORS`, and `MIDITK`, standard MIDI reconstruction, EBML attachment fallback, project architecture documentation, and MTA format research notes.
-
-## Validation
-
-The package continues to target Python 3.11 and the same production quality/security gates.
+All 0.2.0-8 functionality is retained, including the current MTA reverse-engineering/analysis features, project documentation, security gates and dynamic CI smoke-test credentials.

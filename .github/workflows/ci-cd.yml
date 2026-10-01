@@ -97,7 +97,7 @@ jobs:
           push: false
           tags: mta-audio-editor:ci
           build-args: |
-            APP_VERSION=${{ github.ref_type == 'tag' && github.ref_name || '0.2.0-8' }}
+            APP_VERSION=${{ github.ref_type == 'tag' && github.ref_name || '0.2.0-9' }}
             BUILD_ID=${{ steps.build.outputs.id }}
       - name: Trivy image scan
         uses: aquasecurity/trivy-action@v0.36.0

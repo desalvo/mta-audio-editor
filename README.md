@@ -1,4 +1,4 @@
-# MTA Audio Editor 0.2.0-8
+# MTA Audio Editor 0.2.0-9
 
 ![MTA Audio Editor](app/static/logo.svg)
 
@@ -9,7 +9,7 @@ Web DAW containerizzata per creare, importare, modificare ed esportare progetti 
 **Creatore:** Alessandro De Salvo <braket71@gmail.com>  
 **Repository:** `desalvo/mta-audio-editor`  
 **Licenza:** EUPL-1.2  
-**Versione:** `0.2.0-8`  
+**Versione:** `0.2.0-9`  
 **Build:** generato automaticamente nel formato `YYYYMMDD-HH:MM:SS`.
 
 ## Funzioni principali
@@ -104,15 +104,15 @@ git init
 git branch -M main
 git remote add origin https://github.com/desalvo/mta-audio-editor.git
 git add .
-git commit -m "Release 0.2.0-8"
+git commit -m "Release 0.2.0-9"
 git push -u origin main
 ```
 
 Dopo che la CI su `main` è verde, creare il tag:
 
 ```bash
-git tag -s 0.2.0-8 -m "MTA Audio Editor 0.2.0-8"
-git push origin 0.2.0-8
+git tag -s 0.2.0-9 -m "MTA Audio Editor 0.2.0-9"
+git push origin 0.2.0-9
 ```
 
 ## Packaging locale
@@ -142,7 +142,7 @@ Imported MTA files are analyzed by the reverse-engineering module (`app/mta_reve
 
 
 
-## 0.2.0-8: verified proprietary read-only decoding
+## 0.2.0-9: verified proprietary read-only decoding
 
 The reverse-analysis layer now recovers the shared 256-byte keystream, decodes LYRICS/CHORDS timing and text, decodes COLORS timing plus progressive highlight position, and reconstructs MIDITK as byte-exact Standard MIDI with tempo/marker meta-events. These capabilities are read-only by design until controlled writer round-trips are validated on target M-Live/Merish hardware. See `docs/MTA_FORMAT_RESEARCH.md` for byte-level evidence and confidence boundaries.
 
