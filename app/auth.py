@@ -6,6 +6,7 @@ import hashlib
 import hmac
 import html
 import io
+import logging
 import os
 import re
 import secrets
@@ -23,6 +24,8 @@ from urllib.parse import quote
 import qrcode
 import qrcode.image.svg
 from fastapi import HTTPException, Request
+
+LOGGER = logging.getLogger(__name__)
 
 SESSION_COOKIE = "mta_session"
 SESSION_SECONDS = 12 * 3600
@@ -352,7 +355,7 @@ def register_user(username: str, email: str, display_name: str, password: str, b
     try:
         _send_verification_email(user_id, token, base_url)
     except Exception:
-        pass
+        LOGGER.exception("Unable to send registration verification email for user_id=%s", user_id)
     return public_user(get_user(user_id)), token
 
 
@@ -373,7 +376,7 @@ def resend_verification(identifier: str, base_url: str = "") -> None:
     try:
         _send_verification_email(row["id"],token,base_url)
     except Exception:
-        pass
+        LOGGER.exception("Unable to resend verification email for user_id=%s", row["id"])
 
 
 def authenticate(identifier: str, password: str, code: str = ""):
@@ -420,7 +423,6 @@ def session_user(request: Request):
     token = request.cookies.get(SESSION_COOKIE,"")
     if not token:
         return None
-    ua = hashlib.sha256(request.headers.get("user-agent","").encode()).hexdigest()
     with db() as con:
         row = con.execute(
             """SELECT u.* FROM sessions s JOIN users u ON u.id=s.user_id
@@ -476,7 +478,7 @@ def update_profile(user_id: int, *, display_name: str | None = None, email: str 
         try:
             _send_verification_email(user_id,token,base_url)
         except Exception:
-            pass
+            LOGGER.exception("Unable to send verification email after profile update for user_id=%s", user_id)
     return public_user(get_user(user_id)), token
 
 
@@ -637,8 +639,10 @@ def test_smtp_config(body: dict) -> None:
             client.login(cfg["username"],cfg["password"])
         client.noop()
     finally:
-        try: client.quit()
-        except Exception: pass
+        try:
+            client.quit()
+        except Exception:
+            LOGGER.debug("SMTP quit failed after connection test", exc_info=True)
 
 
 def send_mail(recipients: list[str], subject: str, plain: str, html_body: str | None = None) -> None:
@@ -661,8 +665,10 @@ def send_mail(recipients: list[str], subject: str, plain: str, html_body: str | 
             client.login(cfg["username"],cfg["password"])
         client.send_message(msg)
     finally:
-        try: client.quit()
-        except Exception: pass
+        try:
+            client.quit()
+        except Exception:
+            LOGGER.debug("SMTP quit failed after sending email", exc_info=True)
 
 
 def _notify_admins_activated(user) -> None:
@@ -719,11 +725,11 @@ def update_user_admin(target_id: int, actor_id: int, *, active: bool | None = No
                 f"Ciao {updated['display_name'] or updated['username']},\n\nil tuo account è stato approvato ed è ora attivo.\n",
             )
         except Exception:
-            pass
+            LOGGER.exception("Unable to send activation email to user_id=%s", target_id)
         try:
             _notify_admins_activated(updated)
         except Exception:
-            pass
+            LOGGER.exception("Unable to notify administrators about activation of user_id=%s", target_id)
     return public_user(updated)
 
 
@@ -758,7 +764,7 @@ def request_password_reset(identifier: str, base_url: str = "") -> None:
             f"<p><a href='{html.escape(link)}'>Reimposta la password</a></p><p>Il link scade tra 24 ore.</p>",
         )
     except Exception:
-        pass
+        LOGGER.exception("Unable to send password reset email for user_id=%s", row["id"])
 
 
 def reset_password(token: str, new_password: str) -> bool:

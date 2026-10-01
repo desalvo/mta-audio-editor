@@ -1,4 +1,4 @@
-# MTA Audio Editor 0.2.0-24
+# MTA Audio Editor 0.2.0-25
 
 ![MTA Audio Editor](app/static/logo.svg)
 
@@ -9,7 +9,7 @@ Web DAW containerizzata per creare, importare, modificare ed esportare progetti 
 **Creatore:** Alessandro De Salvo <braket71@gmail.com>  
 **Repository:** `desalvo/mta-audio-editor`  
 **Licenza:** EUPL-1.2  
-**Versione:** `0.2.0-24`  
+**Versione:** `0.2.0-25`  
 **Build:** generato automaticamente nel formato `YYYYMMDD-HH:MM:SS`.
 
 ## Funzioni principali
@@ -143,15 +143,15 @@ git init
 git branch -M main
 git remote add origin https://github.com/desalvo/mta-audio-editor.git
 git add .
-git commit -m "Release 0.2.0-24"
+git commit -m "Release 0.2.0-25"
 git push -u origin main
 ```
 
 Dopo che la CI su `main` è verde, creare il tag:
 
 ```bash
-git tag -s 0.2.0-24 -m "MTA Audio Editor 0.2.0-24"
-git push origin 0.2.0-24
+git tag -s 0.2.0-25 -m "MTA Audio Editor 0.2.0-25"
+git push origin 0.2.0-25
 ```
 
 ## Packaging locale

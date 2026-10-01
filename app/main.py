@@ -19,7 +19,7 @@ from .plugins import STEM_SPLITTER, delete_user_preset, plugin_manifest, save_us
 from .security import auth_failure_response, check_basic_auth
 from .auth import (
     authenticate, begin_totp, confirm_email, create_session, delete_session, disable_totp,
-    enable_totp, find_user, get_smtp_config, get_user, init_auth_db, list_users, public_user,
+    enable_totp, find_user, get_smtp_config, get_user, list_users, public_user,
     register_user, require_admin, require_user, resend_verification, save_smtp_config,
     session_user, test_smtp_config, totp_qr_svg, totp_uri, update_profile,
     update_user_admin, delete_user_admin, change_password, request_password_reset, reset_password,

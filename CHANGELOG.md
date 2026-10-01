@@ -1,4 +1,4 @@
-## 0.2.0-24
+## 0.2.0-25
 
 - Added full multi-user authentication with a responsive photographic login based on the approved mockup.
 - Added self-registration with mandatory email confirmation and administrator approval before activation.
@@ -100,7 +100,7 @@
 
 - Initial FastAPI/FFmpeg MTA8/MTA16 web editor prototype.
 
-## 0.2.0-24
+## 0.2.0-25
 
 - Kubernetes wizard: HAProxy ingress now always emits `kubernetes.io/ingress.class: haproxy` in addition to `spec.ingressClassName: haproxy`.
 - Reverse-engineering notes: confirmed the 181392 ns Matroska timecode scale, 40 MP3 frames per Cue interval, exact 320 kbit/s frame/SimpleBlock sizing, and frame-major per-track interleaving evidence.
