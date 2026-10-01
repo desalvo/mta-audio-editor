@@ -6,6 +6,12 @@ updates:
     groups:
       python-dependencies:
         patterns: ["*"]
+    ignore:
+      # Pydantic 2.13.x currently resolves pydantic-core 2.46.5 unreliably on
+      # CPython 3.14 in GitHub-hosted runners. Stay on 2.12.5 / core 2.41.5
+      # until the production gate is deterministic across all supported arches.
+      - dependency-name: pydantic
+        versions: ["2.13.*", "2.14.*"]
   - package-ecosystem: github-actions
     directory: /
     schedule: {interval: weekly}

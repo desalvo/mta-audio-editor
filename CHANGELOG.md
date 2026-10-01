@@ -1,7 +1,10 @@
 # Changelog
 
-## 0.2.0-11
+## 0.2.0-12
 
+- Kept the Python 3.14 production/CI baseline while making dependency resolution deterministic on GitHub-hosted runners.
+- Pinned Pydantic to 2.12.5 (pydantic-core 2.41.5), a stable Python 3.14-compatible pair, after the 2.13.5/core 2.46.5 combination intermittently failed to resolve in the Quality job.
+- Added a Dependabot guard against Pydantic 2.13.x/2.14.x until the CPython 3.14 production gate is deterministic.
 - Moved the production and CI baseline from Python 3.11 to Python 3.14, absorbing the previous Docker Dependabot PR.
 - Updated NumPy to 2.5.3 and aligned the dependency policy with the Python 3.14 baseline, absorbing the remaining grouped Python dependency PR intent.
 - Split Kubernetes assets into Namespace, PVC, Deployment and Service resources and added Kustomize base/overlays.
