@@ -1,8 +1,8 @@
-## 0.2.0-21
+## 0.2.0-22
 
 - Fixed GitHub Actions dependency auditing for the PyTorch `2.14.1+cpu` local wheel by auditing its canonical upstream `2.14.1` release while keeping CPU-only runtime installation.
 
-# MTA Audio Editor 0.2.0-21
+# MTA Audio Editor 0.2.0-22
 
 ## GitHub Actions / container security fix
 
@@ -43,6 +43,6 @@ A new `scripts/k8s-wizard.py` is downloadable directly from the GitHub raw URL a
 
 The generated `secret.yaml` contains local credentials and must not be committed. Use `--no-save-password` when password persistence is not wanted.
 
-### 0.2.0-21
+### 0.2.0-22
 
 The standalone Kubernetes wizard now emits the legacy-compatible HAProxy ingress annotation `kubernetes.io/ingress.class: haproxy` every time HAProxy ingress is selected, while retaining the Kubernetes v1 `ingressClassName` field. Reverse-engineering documentation also includes the latest Cluster transport evidence.

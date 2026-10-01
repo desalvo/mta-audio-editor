@@ -13,8 +13,8 @@ import tempfile
 import urllib.request
 from pathlib import Path
 
-WIZARD_VERSION = "0.2.0-21.1"
-APP_VERSION = "0.2.0-21"
+WIZARD_VERSION = "0.2.0-22.1"
+APP_VERSION = "0.2.0-22"
 RAW_URL = "https://raw.githubusercontent.com/desalvo/mta-audio-editor/main/scripts/k8s-wizard.py"
 DEFAULT_CONFIG = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")) / "mta-audio-editor" / "k8s-wizard.json"
 
@@ -81,6 +81,27 @@ def prompt(label: str, default: str = "", secret: bool = False) -> str:
     return value or default
 
 
+def parse_bool(value: str, *, field: str = "valore") -> bool:
+    normalized = value.strip().lower()
+    if normalized in {"1", "true", "yes", "y", "si", "sì", "on"}:
+        return True
+    if normalized in {"0", "false", "no", "n", "off", ""}:
+        return False
+    raise ValueError(f"{field} non valido: {value!r}; usare yes/no")
+
+
+def prompt_bool(label: str, default: bool = False) -> bool:
+    shown = "yes" if default else "no"
+    while True:
+        value = input(f"{label} [{shown}]: ").strip()
+        if not value:
+            return default
+        try:
+            return parse_bool(value, field=label)
+        except ValueError as exc:
+            print(exc, file=sys.stderr)
+
+
 def parse_node_selector(value: str) -> dict[str, str]:
     result: dict[str, str] = {}
     for token in [x.strip() for x in value.split(",") if x.strip()]:
@@ -116,6 +137,8 @@ def write_manifests(out: Path, values: dict) -> None:
     image = values.get("image", f"desalvo/mta-audio-editor:{APP_VERSION}")
     ingress = values.get("ingress", "none")
     host = values.get("ingress_host", "mta-audio-editor.example.com")
+    tls_termination = bool(values.get("tls_termination", False))
+    tls_secret = str(values.get("tls_secret", "")).strip()
 
     (out / "namespace.yaml").write_text(f"apiVersion: v1\nkind: Namespace\nmetadata:\n  name: {ns}\n")
     sc_line = f"  storageClassName: {yq(storage)}\n" if storage else ""
@@ -219,14 +242,26 @@ spec:
 ''')
     resources = ["namespace.yaml", "pvc.yaml", "secret.yaml", "deployment.yaml", "service.yaml"]
     if ingress in {"nginx", "haproxy"}:
-        annotation = (
-            '    nginx.ingress.kubernetes.io/proxy-body-size: "512m"\n'
-            if ingress == "nginx"
-            else (
+        if ingress == "nginx":
+            annotation = '    nginx.ingress.kubernetes.io/proxy-body-size: "512m"\n'
+        else:
+            annotation = (
                 '    kubernetes.io/ingress.class: haproxy\n'
                 '    haproxy-ingress.github.io/proxy-body-size: "512m"\n'
             )
-        )
+            if tls_termination:
+                annotation += '    haproxy-ingress.github.io/ssl-redirect: "true"\n'
+
+        tls_yaml = ""
+        if tls_termination:
+            tls_yaml = (
+                "  tls:\n"
+                "    - hosts:\n"
+                f"        - {host}\n"
+            )
+            if tls_secret:
+                tls_yaml += f"      secretName: {tls_secret}\n"
+
         ingress_yaml = f'''apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -235,7 +270,7 @@ metadata:
   annotations:
 {annotation}spec:
   ingressClassName: {ingress}
-  rules:
+{tls_yaml}  rules:
     - host: {host}
       http:
         paths:
@@ -269,6 +304,15 @@ def main() -> int:
     parser.add_argument("--node-selector")
     parser.add_argument("--ingress", choices=["none", "nginx", "haproxy"])
     parser.add_argument("--ingress-host")
+    tls_group = parser.add_mutually_exclusive_group()
+    tls_group.add_argument("--tls-termination", dest="tls_termination", action="store_true")
+    tls_group.add_argument("--no-tls-termination", dest="tls_termination", action="store_false")
+    parser.set_defaults(tls_termination=None)
+    parser.add_argument(
+        "--tls-secret",
+        default=None,
+        help="Secret Kubernetes TLS da usare; stringa vuota = certificato/default TLS dell'Ingress Controller",
+    )
     parser.add_argument("--image")
     parser.add_argument("--output-dir", default="mta-audio-editor-k8s")
     parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
@@ -289,6 +333,8 @@ def main() -> int:
         "node_selector": previous.get("node_selector", ""),
         "ingress": previous.get("ingress", "none"),
         "ingress_host": previous.get("ingress_host", "mta-audio-editor.example.com"),
+        "tls_termination": bool(previous.get("tls_termination", False)),
+        "tls_secret": previous.get("tls_secret", ""),
         "image": previous.get("image", f"desalvo/mta-audio-editor:{APP_VERSION}"),
     }
     supplied = {
@@ -299,6 +345,8 @@ def main() -> int:
         "node_selector": args.node_selector,
         "ingress": args.ingress,
         "ingress_host": args.ingress_host,
+        "tls_termination": args.tls_termination,
+        "tls_secret": args.tls_secret,
         "image": args.image,
     }
     if args.non_interactive:
@@ -306,20 +354,55 @@ def main() -> int:
     else:
         print(f"MTA Kubernetes Manifest Wizard {WIZARD_VERSION}")
         print("Invio accetta il valore mostrato. Il file di configurazione locale usa permessi 0600.")
+        ingress_value = args.ingress or prompt("Ingress (none/nginx/haproxy)", defaults["ingress"])
+        ingress_host_value = args.ingress_host or prompt("Ingress host", defaults["ingress_host"])
+        tls_termination_value = False
+        tls_secret_value = ""
+        if ingress_value in {"nginx", "haproxy"}:
+            tls_termination_value = (
+                args.tls_termination
+                if args.tls_termination is not None
+                else prompt_bool("TLS termination sull'Ingress", defaults["tls_termination"])
+            )
+            if tls_termination_value:
+                if args.tls_secret is not None:
+                    tls_secret_value = args.tls_secret
+                else:
+                    use_specific_tls_secret = prompt_bool(
+                        "Usare un Secret TLS specifico",
+                        bool(defaults["tls_secret"]),
+                    )
+                    if use_specific_tls_secret:
+                        tls_secret_value = prompt(
+                            "Nome del Secret TLS",
+                            defaults["tls_secret"],
+                        )
+                        while not tls_secret_value:
+                            print("Il nome del Secret TLS è obbligatorio se si sceglie un Secret specifico.", file=sys.stderr)
+                            tls_secret_value = prompt("Nome del Secret TLS")
+                    else:
+                        tls_secret_value = ""
         values = {
             "admin_username": args.admin_username or prompt("Username amministratore", defaults["admin_username"]),
             "admin_password": args.admin_password or prompt("Password amministratore", defaults["admin_password"], secret=True),
             "storage_class": args.storage_class if args.storage_class is not None else prompt("StorageClass PVC (vuoto = default cluster)", defaults["storage_class"]),
             "namespace": args.namespace or prompt("Namespace", defaults["namespace"]),
             "node_selector": args.node_selector if args.node_selector is not None else prompt("nodeSelector (key=value,key2=value2; vuoto = nessuno)", defaults["node_selector"]),
-            "ingress": args.ingress or prompt("Ingress (none/nginx/haproxy)", defaults["ingress"]),
-            "ingress_host": args.ingress_host or prompt("Ingress host", defaults["ingress_host"]),
+            "ingress": ingress_value,
+            "ingress_host": ingress_host_value,
+            "tls_termination": tls_termination_value,
+            "tls_secret": tls_secret_value,
             "image": args.image or prompt("Immagine container", defaults["image"]),
         }
     if not values["admin_username"] or not values["admin_password"]:
         parser.error("username e password amministratore sono obbligatori")
     if values["ingress"] not in {"none", "nginx", "haproxy"}:
         parser.error("ingress deve essere none, nginx o haproxy")
+    if values["ingress"] == "none":
+        values["tls_termination"] = False
+        values["tls_secret"] = ""
+    elif not values["tls_termination"]:
+        values["tls_secret"] = ""
     try:
         parse_node_selector(values["node_selector"])
     except ValueError as exc:

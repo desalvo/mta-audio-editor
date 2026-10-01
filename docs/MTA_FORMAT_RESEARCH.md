@@ -1,6 +1,6 @@
 # MTA proprietary format research
 
-Version: 0.2.0-21
+Version: 0.2.0-22
 
 This document records only findings demonstrated against the current four-file stock M-Live corpus. It is intentionally conservative: a field is not treated as a writable contract until round-trip output has been validated on real M-Live/Merish hardware.
 
@@ -189,7 +189,7 @@ The most useful next evidence is a controlled pair of MTA files for the same son
 
 Such pairs can identify the remaining COLORS sentinel semantics and provide writer validation with minimal ambiguity.
 
-## Cluster transport: corpus comparison update (0.2.0-21)
+## Cluster transport: corpus comparison update (0.2.0-22)
 
 A cross-file comparison of the four locally verified stock MTA files (10, 12 and 14 audio tracks) adds several useful constraints without claiming a decryption algorithm.
 

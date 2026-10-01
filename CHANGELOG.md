@@ -1,8 +1,8 @@
-## 0.2.0-21
+## 0.2.0-22
 
 - Fixed GitHub Actions dependency auditing for the PyTorch `2.14.1+cpu` local wheel by auditing its canonical upstream `2.14.1` release while keeping CPU-only runtime installation.
 
-## 0.2.0-21
+## 0.2.0-22
 
 - Fix GitHub Actions container production gate after Trivy reported stale/vulnerable Python package metadata.
 - Force-converge `setuptools 84.0.0`, `wheel 0.48.0`, `urllib3 2.8.0`, and `msgpack 1.2.1` after optional stem dependencies.
@@ -103,7 +103,7 @@
 
 - Initial FastAPI/FFmpeg MTA8/MTA16 web editor prototype.
 
-## 0.2.0-21
+## 0.2.0-22
 
 - Kubernetes wizard: HAProxy ingress now always emits `kubernetes.io/ingress.class: haproxy` in addition to `spec.ingressClassName: haproxy`.
 - Reverse-engineering notes: confirmed the 181392 ns Matroska timecode scale, 40 MP3 frames per Cue interval, exact 320 kbit/s frame/SimpleBlock sizing, and frame-major per-track interleaving evidence.

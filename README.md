@@ -1,4 +1,4 @@
-# MTA Audio Editor 0.2.0-21
+# MTA Audio Editor 0.2.0-22
 
 ![MTA Audio Editor](app/static/logo.svg)
 
@@ -9,7 +9,7 @@ Web DAW containerizzata per creare, importare, modificare ed esportare progetti 
 **Creatore:** Alessandro De Salvo <braket71@gmail.com>  
 **Repository:** `desalvo/mta-audio-editor`  
 **Licenza:** EUPL-1.2  
-**Versione:** `0.2.0-21`  
+**Versione:** `0.2.0-22`  
 **Build:** generato automaticamente nel formato `YYYYMMDD-HH:MM:SS`.
 
 ## Funzioni principali
@@ -109,15 +109,15 @@ git init
 git branch -M main
 git remote add origin https://github.com/desalvo/mta-audio-editor.git
 git add .
-git commit -m "Release 0.2.0-21"
+git commit -m "Release 0.2.0-22"
 git push -u origin main
 ```
 
 Dopo che la CI su `main` è verde, creare il tag:
 
 ```bash
-git tag -s 0.2.0-21 -m "MTA Audio Editor 0.2.0-21"
-git push origin 0.2.0-21
+git tag -s 0.2.0-22 -m "MTA Audio Editor 0.2.0-22"
+git push origin 0.2.0-22
 ```
 
 ## Packaging locale
@@ -170,3 +170,8 @@ Auto Mix is a reversible project-level wizard. Before applying its rules it snap
 ### Python 3.14 dependency compatibility
 
 The 0.2.x Python 3.14 baseline pins Pydantic 2.12.5 for deterministic CPython 3.14 wheel resolution in GitHub Actions. NumPy remains 2.5.3 and Demucs 4.1.0.
+
+
+### Kubernetes wizard: TLS termination
+
+The manifest wizard supports TLS termination for NGINX and HAProxy Ingress. With HAProxy and TLS termination enabled it emits `haproxy-ingress.github.io/ssl-redirect: "true"`. When TLS termination is enabled, a `tls:` section is always generated: specify `--tls-secret <name>` to reference a Kubernetes TLS Secret, or leave it empty to use the Ingress Controller's default TLS certificate/secret.

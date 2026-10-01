@@ -17,11 +17,13 @@ def load_wizard():
 
 def test_version_and_node_selector_helpers():
     wizard = load_wizard()
-    assert wizard.version_tuple("0.2.0-21.1") == (0, 2, 0, 21, 1)
+    assert wizard.version_tuple("0.2.0-22.1") == (0, 2, 0, 22, 1)
     assert wizard.parse_node_selector("kubernetes.io/os=linux,workload=audio") == {
         "kubernetes.io/os": "linux",
         "workload": "audio",
     }
+    assert wizard.parse_bool("yes") is True
+    assert wizard.parse_bool("no") is False
 
 
 def test_wizard_generates_custom_kustomize_manifests(tmp_path):
@@ -47,6 +49,9 @@ def test_wizard_generates_custom_kustomize_manifests(tmp_path):
             "haproxy",
             "--ingress-host",
             "mta.example.test",
+            "--tls-termination",
+            "--tls-secret",
+            "mta-example-tls",
             "--output-dir",
             str(output),
             "--config",
@@ -66,5 +71,53 @@ def test_wizard_generates_custom_kustomize_manifests(tmp_path):
     assert "ingressClassName: haproxy" in ingress
     assert "kubernetes.io/ingress.class: haproxy" in ingress
     assert "haproxy-ingress.github.io/proxy-body-size" in ingress
+    assert 'haproxy-ingress.github.io/ssl-redirect: "true"' in ingress
+    assert "tls:" in ingress
+    assert "- mta.example.test" in ingress
+    assert "secretName: mta-example-tls" in ingress
     assert "mta.example.test" in ingress
     assert config.stat().st_mode & 0o777 == 0o600
+
+
+def test_haproxy_tls_without_specific_secret(tmp_path):
+    wizard = load_wizard()
+    output = tmp_path / "generated-default-tls"
+    values = {
+        "admin_username": "operator",
+        "admin_password": "unit-test-password",
+        "storage_class": "",
+        "namespace": "audio-tools",
+        "node_selector": "",
+        "ingress": "haproxy",
+        "ingress_host": "mta-default.example.test",
+        "tls_termination": True,
+        "tls_secret": "",
+        "image": "desalvo/mta-audio-editor:0.2.0-22",
+    }
+    wizard.write_manifests(output, values)
+    ingress = (output / "ingress.yaml").read_text()
+    assert 'haproxy-ingress.github.io/ssl-redirect: "true"' in ingress
+    assert "\n  tls:\n" in ingress
+    assert "- mta-default.example.test" in ingress
+    assert "secretName:" not in ingress
+
+
+def test_haproxy_without_tls_has_no_tls_section_or_ssl_redirect(tmp_path):
+    wizard = load_wizard()
+    output = tmp_path / "generated-no-tls"
+    values = {
+        "admin_username": "operator",
+        "admin_password": "unit-test-password",
+        "storage_class": "",
+        "namespace": "audio-tools",
+        "node_selector": "",
+        "ingress": "haproxy",
+        "ingress_host": "mta-http.example.test",
+        "tls_termination": False,
+        "tls_secret": "",
+        "image": "desalvo/mta-audio-editor:0.2.0-22",
+    }
+    wizard.write_manifests(output, values)
+    ingress = (output / "ingress.yaml").read_text()
+    assert "haproxy-ingress.github.io/ssl-redirect" not in ingress
+    assert "\n  tls:\n" not in ingress
