@@ -225,35 +225,44 @@ def test_attachment_extraction_uses_ebml_fallback(tmp_path, monkeypatch):
     assert out[0]["filename"] == "x.syl"
 
 
-def test_observed_colors_decoder_recovers_decimal_modulo_timeline():
+def test_observed_colors_decoder_recovers_timing_and_highlight_position():
     from app.mta_reverse import _decode_colors_observed
-    # Build ciphertext using the observed phase rule. Plaintext byte 0 is 0x0A,
-    # therefore record byte 0 exposes the keystream XOR 0x0A (key_prime).
     key = bytes((i * 73 + 19) & 0xFF for i in range(256))
-    digit_offsets = (1, 2, 4, 5, 9)
-    times = [100, 59000, 200, 1200] + [1200 + i for i in range(253)]
-    records = []
-    for i, time_value in enumerate(times):
-        plain = [0x0A] * 15
-        digits = [int(x) for x in f"{time_value % 60000:05d}"]
-        for j, digit in zip(digit_offsets, digits):
-            plain[j] = digit
-        plain[7] = i % 2
-        plain[8] = i % 4
-        plain[14] = (i // 64) % 5
+    assert len(set(key)) == 256
+    events = []
+    minute = 0
+    source = [
+        (475, 127, 0),
+        (1101, 3, 0),
+        (1638, 6, 0),
+        (5999, 9, 1),
+    ]
+    for i in range(257):
+        if i < len(source):
+            centiseconds, position, next_minute = source[i]
+        else:
+            centiseconds, position, next_minute = (1200 + i) % 6000, (i % 90), minute
+        plain = bytearray(b"\x0a\x00\x00\x1e\x00\x00m\x00\x00\x00=:k\x00\x00")
+        digits = [int(x) for x in f"{centiseconds:04d}"]
+        plain[1], plain[2], plain[4], plain[5] = digits
+        pdigits = [int(x) for x in f"{position:03d}"]
+        plain[7], plain[8], plain[9] = pdigits
+        plain[14] = next_minute
         rec = bytearray(15)
         for j, value in enumerate(plain):
             phase = (i - 17 * j) % 256
-            rec[j] = value ^ key[phase]
-        records.append(bytes(rec))
-    # Terminal record can be arbitrary for this decoder; it is excluded.
-    body = b"\x28\xb6\xa9" + b"".join(records) + (b"\x00" * 15)
+            rec[j] = value ^ key[phase] ^ 0x0A
+        events.append(bytes(rec))
+        minute = next_minute
+    terminal = b"\x00" * 15
+    body = b"\x28\xb6\xa9" + b"".join(events) + terminal
     report = _decode_colors_observed(body)
     assert report["validated"] is True
-    assert report["decimal_digit_offsets"] == [1, 2, 4, 5, 9]
-    assert report["wrap_event_indices"] == [2]
-    assert report["events"][0]["time_mod_60000_candidate"] == 100
-    assert report["events"][2]["unwrapped_time_ms_candidate"] == 60200
+    assert report["keystream_is_complete_permutation"] is True
+    assert report["events"][0]["time_ms"] == 4750
+    assert report["events"][0]["highlight_position"] == 127
+    assert report["events"][1]["highlight_position"] == 3
+    assert report["events"][3]["next_minute_block"] == 1
 
 
 def test_observed_variable_section_decoder_recovers_records_and_text():
@@ -280,3 +289,82 @@ def test_observed_variable_section_decoder_recovers_records_and_text():
     assert report["records"][1]["time_ms"] == 1240
     assert report["timing_monotonic"] is True
     assert report["terminal_marker_present"] is True
+
+
+def test_miditk_decoder_reconstructs_standard_midi():
+    from app.mta_reverse import _decode_miditk_observed, decode_miditk_to_midi
+    key = bytes((i * 73 + 19) & 0xFF for i in range(256))
+    assert len(set(key)) == 256
+    track = (
+        b"\x00\xff\x51\x03\x07\xa1\x20"  # tempo 120 BPM
+        b"\x00\xff\x06\x05Intro"
+        b"\x83\x60\xff\x06\x06Verse1"
+        b"\x00\xff\x2f\x00"
+    )
+    midi = b"MThd\x00\x00\x00\x06\x00\x00\x00\x01\x01\xe0" + b"MTrk" + len(track).to_bytes(4, "big") + track
+    body = bytes(
+        value ^ key[(239 * (offset - 3)) % 256] ^ 0x0A ^ 0x30
+        for offset, value in enumerate(midi)
+    )
+    assert decode_miditk_to_midi(body, list(key)) == midi
+    report = _decode_miditk_observed(body, list(key))
+    assert report["validated"] is True
+    assert report["decoded_magic"] == "MThd"
+    assert report["format"] == 0
+    assert report["track_count"] == 1
+    assert report["ppq"] == 480
+    assert report["tracks"][0]["length_matches"] is True
+    assert [m["text"] for m in report["markers"]] == ["Intro", "Verse1"]
+
+
+def test_mta_miditk_download_route_uses_verified_sidecar(tmp_path, monkeypatch):
+    import app.main as main
+    import app.storage as storage
+
+    monkeypatch.setattr(storage, "ROOT", tmp_path.resolve())
+    monkeypatch.setenv("MTA_ALLOW_INSECURE_NO_AUTH", "true")
+    project = storage.create_project("MIDI source")
+    analysis_dir = storage.pdir(project.id) / "attachments" / "reverse-analysis"
+    analysis_dir.mkdir(parents=True, exist_ok=True)
+    midi = b"MThd\x00\x00\x00\x06\x00\x00\x00\x01\x01\xe0MTrk\x00\x00\x00\x04\x00\xff\x2f\x00"
+    (analysis_dir / "01-song.miditk.mid").write_bytes(midi)
+    client = TestClient(main.app, headers=WRITE_HEADERS)
+    response = client.get(f"/api/projects/{project.id}/mta-miditk")
+    assert response.status_code == 200
+    assert response.content == midi
+    assert response.headers["content-type"].startswith("audio/midi")
+
+
+def test_decode_miditk_from_wrapped_syl_sections():
+    from app.mta_reverse import decode_miditk_from_syl
+
+    key = bytes((i * 73 + 19) & 0xFF for i in range(256))
+    color_records = []
+    for i in range(257):
+        plain = bytearray(b"\x0a\x00\x00\x1e\x00\x00m\x00\x00\x00=:k\x00\x00")
+        value = (100 + i) % 6000
+        digits = [int(x) for x in f"{value:04d}"]
+        plain[1], plain[2], plain[4], plain[5] = digits
+        position = i % 90
+        pdigits = [int(x) for x in f"{position:03d}"]
+        plain[7], plain[8], plain[9] = pdigits
+        rec = bytes(
+            byte ^ key[(i - 17 * j) % 256] ^ 0x0A
+            for j, byte in enumerate(plain)
+        )
+        color_records.append(rec)
+    colors_body = b"\x28\xb6\xa9" + b"".join(color_records) + (b"\x00" * 15)
+
+    track = b"\x00\xff\x06\x05Intro\x00\xff\x2f\x00"
+    midi = b"MThd\x00\x00\x00\x06\x00\x00\x00\x01\x01\xe0" + b"MTrk" + len(track).to_bytes(4, "big") + track
+    miditk_body = bytes(
+        byte ^ key[(239 * (offset - 3)) % 256] ^ 0x0A ^ 0x30
+        for offset, byte in enumerate(midi)
+    )
+
+    wrapped = (
+        b"COLORSBEGININD0000211LYR00927\r\n" + colors_body + b"000000COLORS200\r\n"
+        + b"MIDITKBEGININD0000211LYR00927\r\n" + miditk_body + b"000000MIDITK200\r\n"
+    )
+    assert decode_miditk_from_syl(wrapped) == midi
+    assert decode_miditk_from_syl(b"no proprietary sections") is None

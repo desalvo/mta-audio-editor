@@ -97,80 +97,118 @@ def _decode_id3_text(payload: bytes) -> str | None:
 
 
 
-def _decode_colors_observed(body: bytes) -> dict | None:
-    """Decode the timing-like fields observed consistently in four real M-Live samples.
 
-    This is intentionally read-only evidence.  It derives a 256-byte XOR keystream
-    from record byte 0, removes the observed global 0x0A offset and validates that
-    byte positions 1/2/4/5/9 become decimal digits.  The resulting five digits
-    behave as a modulo-60000 time field; unwrap is therefore reported as a
-    *candidate* timeline, not an authoring contract.
+def _derive_observed_keystream(colors_body: bytes) -> list[int] | None:
+    """Recover the 256-byte keystream exposed by COLORS record byte 0.
+
+    Verified stock files use a 3-byte prefix followed by 15-byte records.  For
+    normal records plaintext byte 0 is LF (0x0A), while the common transform
+    also applies XOR 0x0A. Those values cancel, so ciphertext byte 0 directly
+    exposes the phase keystream byte. The first 256 normal records therefore
+    contain the complete permutation.
     """
-    if len(body) < 3 + 257 * 15 or (len(body) - 3) % 15:
+    if len(colors_body) < 3 + 257 * 15 or (len(colors_body) - 3) % 15:
         return None
-    records = [body[i:i + 15] for i in range(3, len(body), 15)]
+    records = [colors_body[i:i + 15] for i in range(3, len(colors_body), 15)]
     if len(records) < 257:
         return None
+    key = [records[i][0] for i in range(256)]
+    if len(set(key)) != 256:
+        return None
+    return key
+
+
+def _decode_colors_observed(body: bytes) -> dict | None:
+    """Decode corpus-verified COLORS highlight events.
+
+    Four independent stock M-Live files share the same 256-byte keystream and
+    the same 15-byte plaintext record layout::
+
+        LF d d RS d d 'm' p p p '=' ':' 'k' NUL next_minute
+
+    ``dddd`` is centiseconds within the current minute. ``ppp`` is the
+    progressive highlight position observed in the active lyric line/segment.
+    The final byte supplies the minute block for the following record.
+
+    The final record in the physical array is a distinct terminator and is not
+    returned as a normal event. Special position values (notably 127 in the
+    corpus) are exposed but intentionally not assigned a writer semantic.
+    """
+    key_prime = _derive_observed_keystream(body)
+    if key_prime is None:
+        return None
+    records = [body[i:i + 15] for i in range(3, len(body), 15)]
     normal = records[:-1]
-    key_prime = [records[i][0] for i in range(256)]
-    digit_offsets = (1, 2, 4, 5, 9)
     decoded = []
-    valid_digits = 0
+    current_minute = 0
+    previous_time_ms = None
+    monotonic = True
+    valid_layout = 0
     for i, record in enumerate(normal):
-        plain = []
-        for j, value in enumerate(record):
-            phase = (i - 17 * j) % 256
-            plain.append(value ^ key_prime[phase] ^ 0x0A)
-        digits = [plain[j] for j in digit_offsets]
-        valid = all(0 <= x <= 9 for x in digits)
-        if valid:
-            valid_digits += 1
-            mod_value = int("".join(str(x) for x in digits))
-        else:
-            mod_value = None
-        decoded.append({
+        plain = bytes(
+            value ^ key_prime[(i - 17 * j) % 256] ^ 0x0A
+            for j, value in enumerate(record)
+        )
+        item = {
             "index": i,
-            "time_mod_60000_candidate": mod_value,
-            "state_7": plain[7],
-            "state_8": plain[8],
-            "state_14": plain[14],
-        })
-    if valid_digits != len(normal):
-        return {
-            "decoder": "observed-keystream-v1",
-            "validated": False,
-            "valid_decimal_event_fraction": round(valid_digits / max(1, len(normal)), 6),
+            "minute_block": current_minute,
+            "next_minute_block": plain[14],
+            "decoded_hex": plain.hex(),
         }
-    base = 0
-    previous = None
-    negative_small = 0
-    wraps = []
-    for event in decoded:
-        value = event["time_mod_60000_candidate"]
-        if previous is not None and value < previous - 20_000:
-            base += 60_000
-            wraps.append(event["index"])
-        elif previous is not None and value < previous:
-            negative_small += 1
-        event["unwrapped_time_ms_candidate"] = base + value
-        previous = value
+        valid = (
+            plain[0] == 0x0A
+            and plain[3] == 0x1E
+            and plain[6] == 0x6D
+            and plain[10:14] == b"=:k\x00"
+            and all(0 <= plain[pos] <= 9 for pos in (1, 2, 4, 5, 7, 8, 9))
+        )
+        if valid:
+            valid_layout += 1
+            centiseconds = plain[1] * 1000 + plain[2] * 100 + plain[4] * 10 + plain[5]
+            position = plain[7] * 100 + plain[8] * 10 + plain[9]
+            time_ms = current_minute * 60_000 + centiseconds * 10
+            item.update({
+                "centiseconds_within_minute": centiseconds,
+                "time_ms": time_ms,
+                "highlight_position": position,
+                "position_is_observed_special": position >= 100,
+            })
+            if previous_time_ms is not None and time_ms < previous_time_ms:
+                monotonic = False
+            previous_time_ms = time_ms
+        decoded.append(item)
+        current_minute = plain[14]
+
+    times = [event["time_ms"] for event in decoded if "time_ms" in event]
+    positions = [event["highlight_position"] for event in decoded if "highlight_position" in event]
     return {
-        "decoder": "observed-keystream-v1",
-        "validated": True,
+        "decoder": "observed-colors-v2",
+        "validated": bool(normal) and valid_layout == len(normal) and monotonic,
         "corpus_basis": 4,
+        "binary_header_hex": body[:3].hex(),
+        "record_size": 15,
+        "physical_record_count": len(records),
+        "normal_event_count": len(normal),
         "keystream_period_bytes": 256,
+        "keystream_is_complete_permutation": len(set(key_prime)) == 256,
+        "keystream_sha256": hashlib.sha256(bytes(key_prime)).hexdigest(),
         "keystream_phase_formula": "(record_index - 17 * byte_index) mod 256",
         "global_xor": 10,
-        "decimal_digit_offsets": list(digit_offsets),
-        "modulus": 60000,
-        "wrap_event_indices": wraps,
-        "small_backward_jitter_count": negative_small,
-        "first_time_ms_candidate": decoded[0]["unwrapped_time_ms_candidate"] if decoded else None,
-        "last_time_ms_candidate": decoded[-1]["unwrapped_time_ms_candidate"] if decoded else None,
+        "plaintext_layout": "LF dd RS dd m ppp =:k NUL next_minute",
+        "timing_formula": "time_ms = minute_block * 60000 + centiseconds_within_minute * 10",
+        "highlight_position_formula": "100*p1 + 10*p2 + p3",
+        "timing_monotonic": monotonic if times else None,
+        "first_time_ms": times[0] if times else None,
+        "last_time_ms": times[-1] if times else None,
+        "max_highlight_position": max(positions) if positions else None,
+        "special_position_values": sorted({x for x in positions if x >= 100}),
         "events": decoded,
+        "terminal_record_hex": records[-1].hex() if records else "",
         "confidence_note": (
-            "The decimal/modulo-60000 behavior and 256-byte keystream are consistent across four independent real M-Live files. "
-            "Exact field semantics and writer compatibility are not yet claimed."
+            "Record layout, centisecond/minute timing, highlight-position digits, "
+            "256-byte keystream and monotonic timelines are consistent across four "
+            "independent stock M-Live files. Special position sentinels are exposed "
+            "without assigning undocumented writer semantics."
         ),
     }
 
@@ -178,16 +216,11 @@ def _decode_colors_observed(body: bytes) -> dict | None:
 def _decode_variable_section_observed(body: bytes, key_prime: list[int], *, section: str) -> dict | None:
     """Read-only decoder for observed M-Live LYRICS/CHORDS records.
 
-    Four independent stock files share the COLORS-derived 256-byte keystream.
-    After the common 3-byte prefix, its phase advances continuously per byte as
-    ``239 * flat_offset mod 256``. Decrypted records end in ``=:k\x00X``.
-    X is the *minute block for the following record*. The four decimal digits in
-    bytes 1/2/4/5 are centiseconds within the current minute, yielding
-    ``time_ms = (minute * 6000 + dddd) * 10``. Text/chord bytes after marker
-    0x6d use an additional XOR 0x30 character transform.
-
-    This exposes corpus-verified evidence for read-only analysis and deliberately
-    makes no writer compatibility promise.
+    The common 3-byte prefix is followed by ciphertext whose phase advances as
+    ``239 * flat_offset mod 256``. Decrypted records end in ``=:k\x00X`` where
+    X is the minute block for the following record. The four decimal digits in
+    bytes 1/2/4/5 are centiseconds within the current minute. Text/chord bytes
+    after marker 0x6d use an additional XOR 0x30 transform.
     """
     if section not in {"LYRICS", "CHORDS"} or len(body) < 4 or body[:3] != b"\x28\xb6\xa9":
         return None
@@ -217,7 +250,6 @@ def _decode_variable_section_observed(body: bytes, key_prime: list[int], *, sect
             "decoded_size": len(raw),
             "decoded_hex": raw.hex(),
         }
-        # Observed record header: LF d d RS d d 'm' ...
         if (
             len(raw) >= 7
             and raw[0] == 0x0A
@@ -227,11 +259,10 @@ def _decode_variable_section_observed(body: bytes, key_prime: list[int], *, sect
         ):
             valid_layout += 1
             centiseconds = raw[1] * 1000 + raw[2] * 100 + raw[4] * 10 + raw[5]
-            time_ms = (current_minute * 6000 + centiseconds) * 10
+            time_ms = current_minute * 60_000 + centiseconds * 10
             item["centiseconds_within_minute"] = centiseconds
-            item["time_ms"] = time_ms
-            # Compatibility alias retained for analysis consumers created during reverse engineering.
             item["decimal_index_candidate"] = centiseconds
+            item["time_ms"] = time_ms
             if previous_time_ms is not None and time_ms < previous_time_ms:
                 monotonic = False
             previous_time_ms = time_ms
@@ -248,7 +279,7 @@ def _decode_variable_section_observed(body: bytes, key_prime: list[int], *, sect
     times = [r["time_ms"] for r in records if "time_ms" in r]
     terminal_marker = b"=:0=:"
     return {
-        "decoder": "observed-variable-section-v2",
+        "decoder": "observed-variable-section-v3",
         "validated": bool(records) and valid_layout == len(records) and monotonic,
         "corpus_basis": 4,
         "section": section,
@@ -259,7 +290,7 @@ def _decode_variable_section_observed(body: bytes, key_prime: list[int], *, sect
         "character_xor": 48,
         "record_delimiter_hex": "3d3a6b00XX",
         "delimiter_semantics": "XX is the minute block used by the following record",
-        "timing_formula": "time_ms = (minute_block * 6000 + centiseconds_within_minute) * 10",
+        "timing_formula": "time_ms = minute_block * 60000 + centiseconds_within_minute * 10",
         "record_count": len(records),
         "valid_record_layout_count": valid_layout,
         "timing_monotonic": monotonic if times else None,
@@ -270,10 +301,224 @@ def _decode_variable_section_observed(body: bytes, key_prime: list[int], *, sect
         "tail_hex": tail.hex(),
         "terminal_marker_present": terminal_marker in tail,
         "confidence_note": (
-            "The shared keystream, record delimiter, centisecond-within-minute timing, minute carry and XOR-0x30 text/chord transform "
-            "are monotonic and consistent across four independent stock M-Live files. Writer compatibility is not yet claimed."
+            "The shared keystream, record delimiter, centisecond-within-minute "
+            "timing, minute carry and XOR-0x30 text/chord transform are monotonic "
+            "and consistent across four independent stock M-Live files. Writer "
+            "compatibility is not yet claimed."
         ),
     }
+
+
+def _read_midi_vlq(data: bytes, pos: int) -> tuple[int, int]:
+    value = 0
+    for _ in range(4):
+        if pos >= len(data):
+            raise ValueError("truncated MIDI VLQ")
+        byte = data[pos]
+        pos += 1
+        value = (value << 7) | (byte & 0x7F)
+        if not byte & 0x80:
+            return value, pos
+    raise ValueError("invalid MIDI VLQ")
+
+
+def _inspect_standard_midi(data: bytes) -> dict:
+    """Parse enough Standard MIDI to inventory timing/meta markers safely."""
+    if len(data) < 14 or data[:4] != b"MThd":
+        return {"validated": False, "reason": "missing MThd"}
+    header_len = struct.unpack(">I", data[4:8])[0]
+    if header_len < 6 or 8 + header_len > len(data):
+        return {"validated": False, "reason": "invalid header length"}
+    fmt, ntracks, division = struct.unpack(">HHH", data[8:14])
+    result = {
+        "validated": True,
+        "format": fmt,
+        "track_count": ntracks,
+        "division": division,
+        "ppq": division if not division & 0x8000 else None,
+        "midi_size": len(data),
+        "midi_sha256": hashlib.sha256(data).hexdigest(),
+        "tracks": [],
+        "meta_events": [],
+    }
+    pos = 8 + header_len
+    ppq = result["ppq"]
+    for track_index in range(ntracks):
+        if pos + 8 > len(data) or data[pos:pos + 4] != b"MTrk":
+            result["validated"] = False
+            result["reason"] = f"missing MTrk for track {track_index}"
+            break
+        declared_len = struct.unpack(">I", data[pos + 4:pos + 8])[0]
+        tstart = pos + 8
+        tend = tstart + declared_len
+        if tend > len(data):
+            result["validated"] = False
+            result["reason"] = f"truncated MTrk for track {track_index}"
+            break
+        track = data[tstart:tend]
+        tpos = 0
+        ticks = 0
+        elapsed_us = 0.0
+        tempo = 500_000
+        running_status = None
+        meta_count = 0
+        while tpos < len(track):
+            try:
+                delta, tpos = _read_midi_vlq(track, tpos)
+            except ValueError:
+                result["validated"] = False
+                result["reason"] = "invalid delta-time VLQ"
+                break
+            ticks += delta
+            if ppq:
+                elapsed_us += delta * tempo / ppq
+            if tpos >= len(track):
+                break
+            status = track[tpos]
+            if status < 0x80:
+                if running_status is None:
+                    result["validated"] = False
+                    result["reason"] = "running status without previous status"
+                    break
+                status = running_status
+            else:
+                tpos += 1
+                if status < 0xF0:
+                    running_status = status
+            if status == 0xFF:
+                running_status = None
+                if tpos >= len(track):
+                    break
+                meta_type = track[tpos]
+                tpos += 1
+                try:
+                    length, tpos = _read_midi_vlq(track, tpos)
+                except ValueError:
+                    result["validated"] = False
+                    result["reason"] = "invalid meta length"
+                    break
+                payload = track[tpos:tpos + length]
+                tpos += length
+                event = {
+                    "track": track_index,
+                    "type": meta_type,
+                    "tick": ticks,
+                    "time_ms": round(elapsed_us / 1000.0, 3) if ppq else None,
+                    "size": len(payload),
+                }
+                labels = {0x01: "text", 0x03: "track_name", 0x05: "lyric", 0x06: "marker", 0x07: "cue"}
+                if meta_type in labels:
+                    event["kind"] = labels[meta_type]
+                    event["text"] = payload.decode("latin-1", errors="replace")
+                elif meta_type == 0x51 and len(payload) == 3:
+                    new_tempo = int.from_bytes(payload, "big")
+                    event["kind"] = "tempo"
+                    event["microseconds_per_quarter"] = new_tempo
+                    event["bpm"] = round(60_000_000 / new_tempo, 6) if new_tempo else None
+                    tempo = new_tempo
+                elif meta_type == 0x2F:
+                    event["kind"] = "end_of_track"
+                else:
+                    event["kind"] = f"meta_0x{meta_type:02x}"
+                result["meta_events"].append(event)
+                meta_count += 1
+                if meta_type == 0x2F:
+                    break
+            elif status in (0xF0, 0xF7):
+                running_status = None
+                try:
+                    length, tpos = _read_midi_vlq(track, tpos)
+                except ValueError:
+                    result["validated"] = False
+                    result["reason"] = "invalid sysex length"
+                    break
+                tpos += length
+            else:
+                high = status & 0xF0
+                data_len = 1 if high in (0xC0, 0xD0) else 2
+                # Under running status the first data byte has not been consumed.
+                tpos += data_len
+                if tpos > len(track):
+                    result["validated"] = False
+                    result["reason"] = "truncated channel event"
+                    break
+        result["tracks"].append({
+            "index": track_index,
+            "declared_length": declared_len,
+            "actual_length": len(track),
+            "length_matches": declared_len == len(track),
+            "meta_event_count": meta_count,
+        })
+        pos = tend
+    result["markers"] = [e for e in result["meta_events"] if e.get("kind") == "marker"]
+    result["tempo_events"] = [e for e in result["meta_events"] if e.get("kind") == "tempo"]
+    return result
+
+
+def decode_miditk_to_midi(body: bytes, key_prime: list[int]) -> bytes:
+    """Reconstruct the exact Standard MIDI bytes from an observed MIDITK body."""
+    if len(key_prime) != 256:
+        raise ValueError("MIDITK requires the 256-byte COLORS keystream")
+    return bytes(
+        value ^ key_prime[(239 * (offset - 3)) % 256] ^ 0x0A ^ 0x30
+        for offset, value in enumerate(body)
+    )
+
+
+def _decode_miditk_observed(body: bytes, key_prime: list[int]) -> dict | None:
+    """Decode MIDITK into Standard MIDI and return a JSON-safe summary."""
+    if not body or len(key_prime) != 256:
+        return None
+    midi = decode_miditk_to_midi(body, key_prime)
+    summary = _inspect_standard_midi(midi)
+    summary.update({
+        "decoder": "observed-miditk-midi-v1",
+        "corpus_basis": 4,
+        "keystream_period_bytes": 256,
+        "keystream_phase_formula": "239 * (payload_offset - 3) mod 256",
+        "global_xor": 10,
+        "midi_xor": 48,
+        "decoded_magic": midi[:4].decode("ascii", errors="replace"),
+        "confidence_note": (
+            "The transform reconstructs byte-identical Standard MIDI files from "
+            "all four verified stock samples. The decoded MIDI is format 0 with "
+            "PPQ timing in the current corpus."
+        ),
+    })
+    return summary
+
+def _raw_proprietary_section_body(data: bytes, name: str) -> bytes | None:
+    if name not in SECTION_NAMES:
+        return None
+    marker = (name + "BEGIN").encode()
+    start = data.find(marker)
+    if start < 0:
+        return None
+    header_pos = start + len(marker)
+    match = re.match(rb"IND([0-9]{5})(.{0,99999}?)LYR([0-9]{5})\r\n", data[header_pos:], re.DOTALL)
+    if not match:
+        return None
+    body_start = header_pos + match.end()
+    for footer in SECTION_FOOTER_RE.finditer(data, body_start):
+        if footer.group(2).decode() == name:
+            return data[body_start:footer.start()]
+    return None
+
+
+def decode_miditk_from_syl(data: bytes) -> bytes | None:
+    """Return reconstructed Standard MIDI bytes when a verified SYL layout is present."""
+    colors = _raw_proprietary_section_body(data, "COLORS")
+    miditk = _raw_proprietary_section_body(data, "MIDITK")
+    if colors is None or miditk is None:
+        return None
+    key = _derive_observed_keystream(colors)
+    if key is None:
+        return None
+    midi = decode_miditk_to_midi(miditk, key)
+    if not _inspect_standard_midi(midi).get("validated"):
+        return None
+    return midi
+
 
 def inspect_proprietary_sections(data: bytes) -> dict[str, dict]:
     """Parse the demonstrated Lyrics3-like wrappers without decoding opaque bodies."""
@@ -340,21 +585,26 @@ def inspect_proprietary_sections(data: bytes) -> dict[str, dict]:
                 "observed_timing_decoder": _decode_colors_observed(body),
                 "observation": (
                     "Four independent real-world samples use a 3-byte prefix followed by 15-byte records; "
-                    "the final record is structurally distinct. A read-only timing-like decoder is exposed only when its decimal invariants validate."
+                    "the final record is structurally distinct. The read-only decoder validates the corpus-observed "
+                    "centisecond/minute timing and progressive highlight-position fields without assigning undocumented sentinel semantics."
                 ),
             }
         sections[name] = item
 
     colors_body = raw_bodies.get("COLORS")
-    if colors_body and len(colors_body) >= 3 + 257 * 15 and (len(colors_body) - 3) % 15 == 0:
-        color_records = [colors_body[i:i + 15] for i in range(3, len(colors_body), 15)]
-        key_prime = [color_records[i][0] for i in range(256)]
+    key_prime = _derive_observed_keystream(colors_body) if colors_body else None
+    if key_prime is not None:
         for name in ("LYRICS", "CHORDS"):
             body = raw_bodies.get(name)
             if body and name in sections:
                 decoded = _decode_variable_section_observed(body, key_prime, section=name)
                 if decoded is not None:
                     sections[name]["observed_record_decoder"] = decoded
+        miditk = raw_bodies.get("MIDITK")
+        if miditk and "MIDITK" in sections:
+            decoded_midi = _decode_miditk_observed(miditk, key_prime)
+            if decoded_midi is not None:
+                sections["MIDITK"]["observed_midi_decoder"] = decoded_midi
     return sections
 
 
@@ -604,7 +854,15 @@ def extract_attachments(path: Path, output_dir: Path) -> list[dict]:
             else:
                 continue
         if target.exists():
-            item = analyze_blob(target.read_bytes(), raw_name)
+            blob = target.read_bytes()
+            item = analyze_blob(blob, raw_name)
+            if item.get("looks_like_syl"):
+                midi = decode_miditk_from_syl(blob)
+                if midi is not None:
+                    midi_target = target.with_suffix(".miditk.mid")
+                    midi_target.write_bytes(midi)
+                    item["decoded_miditk_filename"] = midi_target.name
+                    item["decoded_miditk_sha256"] = hashlib.sha256(midi).hexdigest()
             item["stream_index"] = stream.get("index")
             item["tags"] = tags
             item["local_filename"] = target.name

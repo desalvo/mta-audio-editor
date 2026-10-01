@@ -97,7 +97,7 @@ jobs:
           push: false
           tags: mta-audio-editor:ci
           build-args: |
-            APP_VERSION=${{ github.ref_type == 'tag' && github.ref_name || '0.2.0-6' }}
+            APP_VERSION=${{ github.ref_type == 'tag' && github.ref_name || '0.2.0-8' }}
             BUILD_ID=${{ steps.build.outputs.id }}
       - name: Trivy image scan
         uses: aquasecurity/trivy-action@v0.36.0
@@ -109,8 +109,9 @@ jobs:
       - name: Smoke test
         shell: bash
         run: |
+          CI_ADMIN_PASSWORD="$(python -c 'import secrets; print(secrets.token_urlsafe(24))')"
           docker run -d --rm --name mta-ci -p 18080:8080 \
-            -e MTA_ADMIN_PASSWORD=ci-test-password \
+            -e MTA_ADMIN_PASSWORD="$CI_ADMIN_PASSWORD" \
             mta-audio-editor:ci
           for i in {1..30}; do
             curl -fsS http://127.0.0.1:18080/api/health && break
@@ -120,8 +121,8 @@ jobs:
           curl -fsS http://127.0.0.1:18080/docs/user >/dev/null
           test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:18080/docs/admin)" = "401"
           test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:18080/api/projects)" = "401"
-          test "$(curl -s -u admin:ci-test-password -o /dev/null -w '%{http_code}' -X POST http://127.0.0.1:18080/api/projects)" = "403"
-          curl -fsS -u admin:ci-test-password -H 'X-MTA-Request: 1' -X POST http://127.0.0.1:18080/api/projects >/dev/null
+          test "$(curl -s -u "admin:$CI_ADMIN_PASSWORD" -o /dev/null -w '%{http_code}' -X POST http://127.0.0.1:18080/api/projects)" = "403"
+          curl -fsS -u "admin:$CI_ADMIN_PASSWORD" -H 'X-MTA-Request: 1' -X POST http://127.0.0.1:18080/api/projects >/dev/null
           docker stop mta-ci
 
   publish:

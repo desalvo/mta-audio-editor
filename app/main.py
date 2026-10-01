@@ -531,6 +531,29 @@ def mta_analysis(pid: str):
     return __import__("json").loads(path.read_text(encoding="utf-8"))
 
 
+@app.get("/api/projects/{pid}/mta-miditk")
+def mta_miditk(pid: str):
+    project = load_project(pid)
+    analysis_dir = pdir(pid) / "attachments" / "reverse-analysis"
+    midi_files = sorted(analysis_dir.glob("*.miditk.mid")) if analysis_dir.exists() else []
+    if not midi_files:
+        source = pdir(pid) / "source.mta"
+        if not source.exists():
+            raise HTTPException(404, "no imported MTA source is available for MIDITK extraction")
+        try:
+            analyze_mta(source, analysis_dir)
+        except Exception as exc:
+            raise HTTPException(400, "MIDITK extraction failed") from exc
+        midi_files = sorted(analysis_dir.glob("*.miditk.mid"))
+    if not midi_files:
+        raise HTTPException(404, "no verified MIDITK Standard MIDI payload found")
+    return FileResponse(
+        midi_files[0],
+        filename=_download_name(f"{project.title}-MIDITK", "mid"),
+        media_type="audio/midi",
+    )
+
+
 @app.post("/api/mta/diff")
 async def mta_binary_diff(file_a: UploadFile = File(...), file_b: UploadFile = File(...)):
     with tempfile.TemporaryDirectory() as td_raw:
