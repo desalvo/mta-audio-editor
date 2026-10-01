@@ -1,7 +1,9 @@
 # Optional/bundled production stem-separation plugin.
 # Model weights are cached on first use under MTA_DATA_DIR/.cache.
-# Python 3.14 baseline: pin the current PyTorch release with cp314 amd64/arm64 wheels.
-torch==2.14.1
+# Python 3.14 baseline: use the official CPU-only PyTorch wheels on amd64/arm64.
+# This avoids architecture-specific NVIDIA CUDA packages in the production image.
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.14.1+cpu
 demucs==4.1.0
 
 # Security floor for transitive runtime dependencies used by the stem stack.
