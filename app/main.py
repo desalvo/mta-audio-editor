@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 import re
 import shutil
@@ -48,6 +49,7 @@ from .storage import (
 from .version import APP_VERSION, BUILD_ID, CREATOR, REPOSITORY
 
 app = FastAPI(title="MTA Audio Editor", version=APP_VERSION, docs_url=None, redoc_url=None, openapi_url=None)
+LOGGER = logging.getLogger(__name__)
 BASE = Path(__file__).parent
 MAX_UPLOAD_BYTES = int(os.getenv("MTA_MAX_UPLOAD_MB", "150")) * 1024 * 1024
 SAFE_DOWNLOAD_RE = re.compile(r"[^A-Za-z0-9._ -]+")
@@ -1210,8 +1212,12 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
                 save_project(project)
                 for path in added_files:
                     path.unlink(missing_ok=True)
-            except Exception:
-                pass
+            except Exception as cleanup_exc:
+                LOGGER.warning(
+                    "Unable to fully roll back partial stem files for job %s: %s",
+                    job_id,
+                    cleanup_exc,
+                )
             _stem_job_update(job_id, status="cancelled", progress=0, message="Separazione annullata", error=None)
         else:
             _stem_job_update(job_id, status="failed", progress=0, message="Separazione fallita", error=str(exc)[-1200:])

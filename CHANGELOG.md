@@ -1,4 +1,4 @@
-## 0.2.0-36
+## 0.2.0-37
 
 - Aggiunti input numerici sincronizzati con gli slider del volume per tracce, Inspector, Mixer e Master; valori ammessi da -60 a +12 dB con autosave.
 
@@ -107,7 +107,7 @@
 
 - Initial FastAPI/FFmpeg MTA8/MTA16 web editor prototype.
 
-## 0.2.0-36
+## 0.2.0-37
 
 - Kubernetes wizard: HAProxy ingress now always emits `kubernetes.io/ingress.class: haproxy` in addition to `spec.ingressClassName: haproxy`.
 - Reverse-engineering notes: confirmed the 181392 ns Matroska timecode scale, 40 MP3 frames per Cue interval, exact 320 kbit/s frame/SimpleBlock sizing, and frame-major per-track interleaving evidence.
