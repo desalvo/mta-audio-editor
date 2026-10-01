@@ -102,8 +102,18 @@ jobs:
           push: false
           tags: mta-audio-editor:ci
           build-args: |
-            APP_VERSION=${{ github.ref_type == 'tag' && github.ref_name || '0.2.0-17' }}
+            APP_VERSION=${{ github.ref_type == 'tag' && github.ref_name || '0.2.0-18' }}
             BUILD_ID=${{ steps.build.outputs.id }}
+      - name: Verify container OS
+        shell: bash
+        run: |
+          docker run --rm --entrypoint sh mta-audio-editor:ci -ec '
+            cat /etc/os-release
+            . /etc/os-release
+            test "$ID" = "debian"
+            test "$VERSION_CODENAME" = "trixie"
+            case "$VERSION_ID" in 13|13.*) ;; *) exit 1 ;; esac
+          '
       - name: Verify security-sensitive Python packages in image
         shell: bash
         run: |

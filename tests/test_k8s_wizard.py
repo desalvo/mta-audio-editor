@@ -17,7 +17,7 @@ def load_wizard():
 
 def test_version_and_node_selector_helpers():
     wizard = load_wizard()
-    assert wizard.version_tuple("0.2.0-17.1") == (0, 2, 0, 17, 1)
+    assert wizard.version_tuple("0.2.0-18.1") == (0, 2, 0, 18, 1)
     assert wizard.parse_node_selector("kubernetes.io/os=linux,workload=audio") == {
         "kubernetes.io/os": "linux",
         "workload": "audio",

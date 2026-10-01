@@ -1,5 +1,5 @@
-FROM python:3.14-slim-bookworm
-ARG APP_VERSION=0.2.0-17
+FROM python:3.14-slim-trixie
+ARG APP_VERSION=0.2.0-18
 ARG BUILD_ID=unknown
 ARG INSTALL_STEMS=true
 LABEL org.opencontainers.image.title="MTA Audio Editor" \
@@ -12,15 +12,25 @@ ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1 \
     MTA_DATA_DIR=/data/projects MTA_HOST=0.0.0.0 MTA_PORT=8080 \
     MTA_APP_VERSION=$APP_VERSION MTA_BUILD_ID=$BUILD_ID \
     XDG_CACHE_HOME=/data/projects/.cache TORCH_HOME=/data/projects/.cache/torch
-RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg ca-certificates tini && rm -rf /var/lib/apt/lists/* \
-    && groupadd --system --gid 10001 mtaeditor && useradd --system --uid 10001 --gid 10001 --home /nonexistent --shell /usr/sbin/nologin mtaeditor
+RUN apt-get update \
+    && apt-get upgrade -y \
+    && apt-get install -y --no-install-recommends ffmpeg ca-certificates tini \
+    && rm -rf /var/lib/apt/lists/* \
+    && groupadd --system --gid 10001 mtaeditor \
+    && useradd --system --uid 10001 --gid 10001 --home /nonexistent --shell /usr/sbin/nologin mtaeditor
 WORKDIR /app
 COPY requirements.txt requirements-stems.txt VERSION BUILD ./
-RUN python -m pip install --no-cache-dir -r requirements.txt \
+# sphn currently has no CPython 3.14/aarch64 wheel, so the arm64 build needs a C linker.
+# Install native build tools only for dependency compilation, then remove them in the same layer.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends build-essential \
+    && python -m pip install --no-cache-dir -r requirements.txt \
     && if [ "$INSTALL_STEMS" = "true" ]; then python -m pip install --no-cache-dir -r requirements-stems.txt; fi \
     && python -m pip install --no-cache-dir --upgrade --force-reinstall setuptools==84.0.0 wheel==0.48.0 urllib3==2.8.0 msgpack==1.2.1 \
     && python -m pip check \
-    && python -c "from importlib.metadata import version; expected={'setuptools':'84.0.0','wheel':'0.48.0','urllib3':'2.8.0','msgpack':'1.2.1'}; actual={p:version(p) for p in expected}; print(actual); assert actual == expected, (actual, expected)"
+    && python -c "from importlib.metadata import version; expected={'setuptools':'84.0.0','wheel':'0.48.0','urllib3':'2.8.0','msgpack':'1.2.1'}; actual={p:version(p) for p in expected}; print(actual); assert actual == expected, (actual, expected)" \
+    && apt-get purge -y --auto-remove build-essential \
+    && rm -rf /var/lib/apt/lists/*
 RUN python -c "import fastapi, uvicorn, numpy" \
     && if [ "$INSTALL_STEMS" = "true" ]; then python -c "import torch, demucs"; fi
 COPY app ./app
