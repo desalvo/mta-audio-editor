@@ -69,7 +69,14 @@ jobs:
       - name: Bandit SAST
         run: bandit -q -r app scripts/k8s-wizard.py -lll -iii
       - name: Python dependency audit
-        run: pip-audit -r requirements.txt -r requirements-stems.txt --strict
+        shell: bash
+        run: |
+          pip-audit -r requirements.txt --strict
+          # pip-audit/PyPI cannot identify PyTorch local-version wheels such as
+          # 2.14.1+cpu. Audit the equivalent upstream public version instead.
+          sed '/^--extra-index-url /d; s/^torch==\(.*\)+cpu$/torch==\1/' requirements-stems.txt > /tmp/requirements-stems-audit.txt
+          cat /tmp/requirements-stems-audit.txt
+          pip-audit -r /tmp/requirements-stems-audit.txt --strict
       - name: Secret scan
         uses: gitleaks/gitleaks-action@v3
         env:
@@ -102,7 +109,7 @@ jobs:
           push: false
           tags: mta-audio-editor:ci
           build-args: |
-            APP_VERSION=${{ github.ref_type == 'tag' && github.ref_name || '0.2.0-20' }}
+            APP_VERSION=${{ github.ref_type == 'tag' && github.ref_name || '0.2.0-21' }}
             BUILD_ID=${{ steps.build.outputs.id }}
       - name: Verify container OS
         shell: bash
@@ -136,7 +143,10 @@ jobs:
         run: |
           docker run --rm --user 0 --entrypoint sh mta-audio-editor:ci -ec '
             python -m pip install --no-cache-dir --disable-pip-version-check pip-audit
-            python -m pip_audit --strict
+            # Audit production requirements using the public torch release that
+            # corresponds to the installed 2.14.1+cpu wheel.
+            sed "/^--extra-index-url /d; s/^torch==\(.*\)+cpu$/torch==\1/" requirements-stems.txt > /tmp/stems-audit.txt
+            python -m pip_audit -r requirements.txt -r /tmp/stems-audit.txt --strict
           '
       - name: Trivy image OS scan
         uses: aquasecurity/trivy-action@v0.36.0
