@@ -13,8 +13,8 @@ import tempfile
 import urllib.request
 from pathlib import Path
 
-WIZARD_VERSION = "0.2.0-15.1"
-APP_VERSION = "0.2.0-15"
+WIZARD_VERSION = "0.2.0-17.1"
+APP_VERSION = "0.2.0-17"
 RAW_URL = "https://raw.githubusercontent.com/desalvo/mta-audio-editor/main/scripts/k8s-wizard.py"
 DEFAULT_CONFIG = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")) / "mta-audio-editor" / "k8s-wizard.json"
 
@@ -222,7 +222,10 @@ spec:
         annotation = (
             '    nginx.ingress.kubernetes.io/proxy-body-size: "512m"\n'
             if ingress == "nginx"
-            else '    haproxy-ingress.github.io/proxy-body-size: "512m"\n'
+            else (
+                '    kubernetes.io/ingress.class: haproxy\n'
+                '    haproxy-ingress.github.io/proxy-body-size: "512m"\n'
+            )
         )
         ingress_yaml = f'''apiVersion: networking.k8s.io/v1
 kind: Ingress

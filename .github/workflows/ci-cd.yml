@@ -102,17 +102,25 @@ jobs:
           push: false
           tags: mta-audio-editor:ci
           build-args: |
-            APP_VERSION=${{ github.ref_type == 'tag' && github.ref_name || '0.2.0-15' }}
+            APP_VERSION=${{ github.ref_type == 'tag' && github.ref_name || '0.2.0-17' }}
             BUILD_ID=${{ steps.build.outputs.id }}
       - name: Verify security-sensitive Python packages in image
         shell: bash
         run: |
           docker run --rm --entrypoint python mta-audio-editor:ci -c \
             'from importlib.metadata import version; expected={"setuptools":"84.0.0","wheel":"0.48.0","urllib3":"2.8.0","msgpack":"1.2.1"}; bad=[]; [(print(f"{p}=={version(p)}") or (bad.append((p,version(p),v)) if version(p)!=v else None)) for p,v in expected.items()]; raise SystemExit(1 if bad else 0)'
-      - name: Trivy image scan
+      - name: Audit installed Python environment in image
+        shell: bash
+        run: |
+          docker run --rm --user 0 --entrypoint sh mta-audio-editor:ci -ec '
+            python -m pip install --no-cache-dir --disable-pip-version-check pip-audit
+            python -m pip_audit --strict
+          '
+      - name: Trivy image OS scan
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: mta-audio-editor:ci
+          vuln-type: os
           severity: HIGH,CRITICAL
           ignore-unfixed: true
           exit-code: '1'

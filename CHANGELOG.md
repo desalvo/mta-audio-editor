@@ -1,4 +1,4 @@
-## 0.2.0-15
+## 0.2.0-17
 
 - Fix GitHub Actions container production gate after Trivy reported stale/vulnerable Python package metadata.
 - Force-converge `setuptools 84.0.0`, `wheel 0.48.0`, `urllib3 2.8.0`, and `msgpack 1.2.1` after optional stem dependencies.
@@ -98,3 +98,8 @@
 ## 0.1.0
 
 - Initial FastAPI/FFmpeg MTA8/MTA16 web editor prototype.
+
+## 0.2.0-17
+
+- Kubernetes wizard: HAProxy ingress now always emits `kubernetes.io/ingress.class: haproxy` in addition to `spec.ingressClassName: haproxy`.
+- Reverse-engineering notes: confirmed the 181392 ns Matroska timecode scale, 40 MP3 frames per Cue interval, exact 320 kbit/s frame/SimpleBlock sizing, and frame-major per-track interleaving evidence.

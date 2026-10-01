@@ -1,6 +1,6 @@
 # MTA proprietary format research
 
-Version: 0.2.0-15
+Version: 0.2.0-17
 
 This document records only findings demonstrated against the current four-file stock M-Live corpus. It is intentionally conservative: a field is not treated as a writable contract until round-trip output has been validated on real M-Live/Merish hardware.
 
@@ -188,3 +188,21 @@ The most useful next evidence is a controlled pair of MTA files for the same son
 - one changed highlighting boundary/color/state.
 
 Such pairs can identify the remaining COLORS sentinel semantics and provide writer validation with minimal ambiguity.
+
+## Cluster transport: corpus comparison update (0.2.0-17)
+
+A cross-file comparison of the four locally verified stock MTA files (10, 12 and 14 audio tracks) adds several useful constraints without claiming a decryption algorithm.
+
+- The first media boundary always starts with ciphertext bytes `0f b2 f7 b0`, while later Cue-selected media boundaries use different prefixes.
+- In the first media block, bytes 7..62 are identical across the 10-, 12- and 14-track files; only bytes 4..6 differ in the first seven bytes. This strongly suggests a stable structural/encoder prefix after a size-dependent header transform.
+- The first media spans are 420793 bytes (10 tracks), 504943 bytes (12 tracks) and 589093 bytes (14 tracks). Each additional two tracks adds exactly 84150 bytes, i.e. 42075 bytes per track for this Cue interval.
+- The Matroska `TimecodeScale` is `181392 ns`, not the default 1 ms. The common Cue delta of `5760` therefore corresponds to about `1.044818 s`.
+- Every audio track declares `DefaultDuration = 26122448 ns`, matching one 44.1 kHz MPEG-1 Layer III frame (`1152/44100 s`) to truncation. One frame is approximately 144 MTA timecode ticks, and 40 frames give the observed 5760-tick Cue interval.
+- The first media spans follow the exact corpus relation `span = 43 + 42075 * audio_track_count`: 420793 bytes (10 tracks), 504943 (12) and 589093 (14). The following common spans similarly fit `44 + 42076*N` or `44 + 42075*N`.
+- `42075/42076` bytes per track per 40-frame interval decomposes exactly as 40 Matroska `SimpleBlock` records carrying 320 kbit/s MP3 frames: a 320 kbit/s / 44.1 kHz Layer III frame is 1044 or 1045 bytes depending on the padding bit, and a normal one-frame `SimpleBlock` adds 7 bytes of Matroska overhead, yielding 1051/1052-byte records. The observed totals require 35/36 padded frames respectively.
+- Comparison of two independent 14-track songs reveals an extremely strong ~14728-byte difference periodicity (`14 * 1052`). Within those periods, nearly all differences concentrate in the first 1052-byte track slot while the other 13 slots remain almost identical during the opening material. This independently supports frame-major interleaving of one `SimpleBlock` per track and per MP3 frame.
+- A synthetic canonical Matroska file generated with 44.1 kHz stereo MP3 confirms the expected `Cluster -> Timecode -> SimpleBlock -> MP3 frame` grammar and the 7-byte one-frame SimpleBlock overhead, providing a concrete known-plaintext template for the next cryptanalysis step.
+
+For two independent 14-track songs, the corresponding first media block has the same boundary offsets and very large byte-identical regions; the first block is over 90% identical, while similarity drops after musical content begins. This behavior is more consistent with a deterministic, position-sensitive, length-preserving transform than with a conventional avalanche-mode block cipher over the entire media stream.
+
+The next targeted task is to recover the first canonical `SimpleBlock` header and MP3 frame header, then test bytewise/stream transforms separately from the 7-byte media-boundary header.

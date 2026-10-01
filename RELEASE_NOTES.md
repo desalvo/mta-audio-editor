@@ -1,4 +1,4 @@
-# MTA Audio Editor 0.2.0-15
+# MTA Audio Editor 0.2.0-17
 
 ## GitHub Actions / container security fix
 
@@ -38,3 +38,7 @@ Kubernetes resources are now split under `k8s/base` into Namespace, PVC, Deploym
 A new `scripts/k8s-wizard.py` is downloadable directly from the GitHub raw URL and uses only the Python standard library. It asks for initial administrator username/password, PVC StorageClass, namespace and nodeSelector, remembers the last values in a mode-0600 configuration file, can optionally generate NGINX/HAProxy Ingress, and creates a local Kustomization. On startup it checks GitHub for a strictly newer wizard version; after an atomic self-update it automatically restarts itself.
 
 The generated `secret.yaml` contains local credentials and must not be committed. Use `--no-save-password` when password persistence is not wanted.
+
+### 0.2.0-17
+
+The standalone Kubernetes wizard now emits the legacy-compatible HAProxy ingress annotation `kubernetes.io/ingress.class: haproxy` every time HAProxy ingress is selected, while retaining the Kubernetes v1 `ingressClassName` field. Reverse-engineering documentation also includes the latest Cluster transport evidence.

@@ -17,7 +17,7 @@ def load_wizard():
 
 def test_version_and_node_selector_helpers():
     wizard = load_wizard()
-    assert wizard.version_tuple("0.2.0-15.1") == (0, 2, 0, 15, 1)
+    assert wizard.version_tuple("0.2.0-17.1") == (0, 2, 0, 17, 1)
     assert wizard.parse_node_selector("kubernetes.io/os=linux,workload=audio") == {
         "kubernetes.io/os": "linux",
         "workload": "audio",
@@ -64,6 +64,7 @@ def test_wizard_generates_custom_kustomize_manifests(tmp_path):
     assert "workload: \"audio\"" in deployment
     ingress = (output / "ingress.yaml").read_text()
     assert "ingressClassName: haproxy" in ingress
+    assert "kubernetes.io/ingress.class: haproxy" in ingress
     assert "haproxy-ingress.github.io/proxy-body-size" in ingress
     assert "mta.example.test" in ingress
     assert config.stat().st_mode & 0o777 == 0o600
