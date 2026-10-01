@@ -1,4 +1,4 @@
-# MTA Audio Editor 0.2.0-29
+# MTA Audio Editor 0.2.0-33
 
 ![MTA Audio Editor](app/static/logo.svg)
 
@@ -9,7 +9,7 @@ Web DAW containerizzata per creare, importare, modificare ed esportare progetti 
 **Creatore:** Alessandro De Salvo <braket71@gmail.com>  
 **Repository:** `desalvo/mta-audio-editor`  
 **Licenza:** EUPL-1.2  
-**Versione:** `0.2.0-29`  
+**Versione:** `0.2.0-33`  
 **Build:** generato automaticamente nel formato `YYYYMMDD-HH:MM:SS`.
 
 ## Funzioni principali
@@ -100,6 +100,22 @@ Il wizard propone prima i default e nei run successivi gli ultimi valori usati. 
 
 ## Documentazione
 
+### Mappa della documentazione
+
+| Documento | Contenuto |
+|---|---|
+| `app/docs/MTA-Audio-Editor-User-Manual.pdf` | manuale operativo utente |
+| `app/docs/MTA-Audio-Editor-Administrator-Manual.pdf` | installazione, gestione, sicurezza, appendice MTA e architettura |
+| `docs/MTA_FORMAT_FINAL_SPEC.md` | specifica proprietaria MTA consolidata byte-level |
+| `docs/MTA_FORMAT_RESEARCH.md` | evidenze e cronologia reverse engineering |
+| `docs/PROJECT_ARCHITECTURE.md` | architettura software e flussi end-to-end |
+| `docs/DATA_MODEL.md` | modello dati e persistenza |
+| `docs/API_REFERENCE.md` | mappa API e convenzioni HTTP |
+| `docs/OPERATIONS_RUNBOOK.md` | esercizio, Kubernetes, backup, troubleshooting |
+| `docs/TESTING_AND_RELEASE.md` | test, CI/CD e criteri di release |
+| `docs/SECURE_DEVELOPMENT.md` | regole di sviluppo sicuro |
+
+
 - `/docs/user` - manuale utente online, pubblico;
 - `/docs/pdf/user` - manuale utente PDF;
 - `/docs/admin` - manuale amministratore, protetto da autenticazione;
@@ -143,15 +159,15 @@ git init
 git branch -M main
 git remote add origin https://github.com/desalvo/mta-audio-editor.git
 git add .
-git commit -m "Release 0.2.0-29"
+git commit -m "Release 0.2.0-33"
 git push -u origin main
 ```
 
 Dopo che la CI su `main` è verde, creare il tag:
 
 ```bash
-git tag -s 0.2.0-29 -m "MTA Audio Editor 0.2.0-29"
-git push origin 0.2.0-29
+git tag -s 0.2.0-33 -m "MTA Audio Editor 0.2.0-33"
+git push origin 0.2.0-33
 ```
 
 ## Packaging locale
@@ -218,6 +234,6 @@ The first administrator can be bootstrapped with `MTA_ADMIN_USERNAME`, `MTA_ADMI
 
 ### Upgrade Kubernetes e readiness
 
-Dalla 0.2.0-29 il pod imposta `fsGroup: 10001` e `fsGroupChangePolicy: OnRootMismatch` per rendere scrivibile il PVC all'utente applicativo non-root. La chiave `email` del Secret bootstrap è opzionale a runtime per mantenere compatibili gli upgrade da release precedenti; il wizard continua comunque a richiedere l'email per le nuove installazioni. È inoltre presente una `startupProbe` su `/api/health` prima di readiness e liveness.
+Dalla 0.2.0-33 il pod imposta `fsGroup: 10001` e `fsGroupChangePolicy: OnRootMismatch` per rendere scrivibile il PVC all'utente applicativo non-root. La chiave `email` del Secret bootstrap è opzionale a runtime per mantenere compatibili gli upgrade da release precedenti; il wizard continua comunque a richiedere l'email per le nuove installazioni. È inoltre presente una `startupProbe` su `/api/health` prima di readiness e liveness.
 
 Se un pod resta non Ready dopo un upgrade, controllare `kubectl describe pod` per `CreateContainerConfigError`, `permission denied` sul PVC o errori della probe.

@@ -1,6 +1,6 @@
 # MTA proprietary format research
 
-Version: 0.2.0-29
+Version: 0.2.0-33
 
 This document records only findings demonstrated against the current four-file stock M-Live corpus. It is intentionally conservative: a field is not treated as a writable contract until round-trip output has been validated on real M-Live/Merish hardware.
 
@@ -31,45 +31,71 @@ MTA files in the corpus are Matroska/EBML containers containing MP3 stereo 44.1 
 Across the verified samples inspected for attachments, ORG and MOD copies are byte-identical. FFmpeg may emit EBML boundary warnings on stock files, so `app/mta_reverse.py` includes a conservative FileData fallback based on attachment sizes reported by FFprobe.
 
 
-## Matroska Cues and obfuscated media transport
 
-The six-file reverse-engineering corpus now shows a stronger split between the
-canonical Matroska index and the media payload. `SeekHead` still contains a
-normal `SeekID=1F43B675` entry for Cluster and `Cues` contains normal
-`CueClusterPosition` values. Those positions are therefore trustworthy byte
-boundaries even though the data stored there is not canonical EBML.
+## Matroska Cues and media transport — resolved
 
-On the four corpus files currently available in the project Library (Rihanna,
-Katrina And The Waves, Michael Jackson and Earth Wind & Fire), the first cue
-position exactly matches the Cluster position advertised by SeekHead. The first
-four bytes at that position are always:
+The media transform is now demonstrated, not hypothetical. Across the four stock files currently available for byte-level verification, every byte from the first Matroska `Cluster` through EOF is transformed as:
 
 ```text
-0f b2 f7 b0
+plain[i] = stored[i] XOR key[i mod 984]
+stored[i] = plain[i] XOR key[i mod 984]
 ```
 
-instead of the Matroska Cluster ID `1f 43 b6 75`. FFmpeg reports the same
-non-canonical EBML boundary. This is no longer treated as a damaged SeekHead:
-the readable Cues provide hundreds of successive media boundaries.
+where `i=0` is the first byte of the first Cluster. The phase does **not** reset at Cluster or Cue boundaries. The recovered key is 984 bytes long and has SHA-256:
 
-Additional cross-file evidence is especially useful: Michael Jackson and Earth
-Wind & Fire both expose 14 MP3 tracks and have the same per-cluster spacing for
-the overlapping part of the files. When their media regions are aligned to the
-first cue, the first 16 bytes at corresponding cue boundaries are byte-identical
-for the first 32 checked clusters (and the relative boundary offsets also
-match). The encrypted/obfuscated bytes therefore behave deterministically with
-respect to the media-stream position/layout and are not consistent with random
-per-file IV data at each cluster boundary.
+```text
+bcb30443707bdc8b651c1a58aa4152438ce5a6632cc98b294501eb08adbb3547
+```
 
-The transform is still deliberately described as **non-canonical / obfuscated
-media transport**, not as a proven cipher. The sparse/local differences between
-aligned files and long equal runs argue against an ordinary avalanche-style
-block-cipher mode over the whole region, but the exact transform and any key or
-PRNG state are not yet demonstrated.
+The complete period was solved from canonical Matroska known plaintext (`Cluster`, `Timecode`, `SimpleBlock`, track numbers, flags and MP3 sync/header fields), not from a decrypted reference file. Applying the stream through EOF produces canonical Matroska in all four files; FFmpeg then reads every audio packet normally.
 
-`inspect_cluster_transport()` now records the SeekHead Cluster target, Cues,
-cluster spans and observed prefixes without attempting speculative decryption.
-This gives the next stage of the reverse engineering stable known boundaries.
+Verified packet counts are 8979 (Earth Wind & Fire, 14 tracks), 9111 (Katrina, 12), 10200 (Michael Jackson, 14) and 10798 (Rihanna, 10).
+
+### Exact Cluster grammar
+
+A full Cluster contains ten MP3 frame-times for every audio track, ordered frame-major. Each `SimpleBlock` contains exactly one MPEG-1 Layer III frame and has seven bytes of Matroska overhead:
+
+```text
+A3 <2-byte EBML size> <track VINT> <signed int16 relative timecode> 80 <MP3 frame>
+```
+
+Relative block timecodes are exactly:
+
+```text
+0, 144, 288, 432, 576, 720, 864, 1008, 1152, 1296
+```
+
+The absolute Cluster timecode is reproduced exactly by:
+
+```python
+cluster_timecode(i) = floor(i * (800000000 / 555513) + 1/16)
+```
+
+`TimecodeScale = 181392 ns`; each audio track has `DefaultDuration = 26122448 ns`.
+
+### Exact MP3 padding schedule
+
+Packet zero is the unpadded 1044-byte `Info` frame. Subsequent CBR 320 kbit/s / 44.1 kHz frames use:
+
+```python
+padding = [0]
+state = 4
+for each later frame:
+    state += 44
+    if state >= 49:
+        padding.append(1)
+        state -= 49
+    else:
+        padding.append(0)
+```
+
+Thus MP3 frames are 1044/1045 bytes and SimpleBlocks are 1051/1052 bytes. All tracks in all four verified files use the same sequence.
+
+The final partial Cluster uses the minimal EBML size VINT. This resolves the previous Katrina one-byte end-of-file discrepancy: predicted Cluster sizes now match every Cluster in every verified file exactly.
+
+### Cues
+
+Cue count is exactly `ceil(packet_count_per_track / 40)`. Cue `n` points to Cluster `4*n`, with `CueClusterPosition` relative to Segment data start. All Cue times and positions match the deobfuscated Cluster stream exactly.
 
 ## SYL / ID3v2.3
 
@@ -139,7 +165,7 @@ LF d d RS d d 'm' p p p '=' ':' 'k' NUL <next-minute>
 position = p1*100 + p2*10 + p3
 ```
 
-Examples such as `BOOGIE WONDERLAND` yield positions `3, 6, 9, 12, 15, 16`, matching progressive advancement through the non-space characters of the lyric line/segment. The value `127` appears as a special sentinel in the stock corpus; its exact writer semantic is intentionally not asserted yet.
+Examples such as `BOOGIE WONDERLAND` yield positions `3, 6, 9, 12, 15, 16`, matching progressive advancement through the non-space characters of the lyric line/segment. The value `127` is a display-page reset control rather than a character position. Across the four stock files it follows completion of the previous displayed lyric line and immediately precedes the first lyric record of the next display page.
 
 This indicates that a COLORS record is an event in the karaoke highlight stream rather than a fixed-rate time sample.
 
@@ -165,7 +191,7 @@ The MTrk declared length matches the reconstructed track bytes. Standard MIDI me
 
 The XML attachment is parsed defensively using `defusedxml`. Verified fields include Identity, General data and audio-track metadata.
 
-`NoteOn` is a semicolon-separated 0/1 vector whose length tracks `DurataSec` at approximately one entry per second (with an endpoint convention difference in some files). The exact energy threshold used by the original writer remains unknown.
+`NoteOn` is a semicolon-separated one-second source-activity mask. Across 4 songs, 50 tracks and 12,654 bins, decoded-audio RMS reconstructs more than 99.8% of the bits with per-track separation; residual disagreements cluster at activity boundaries and very low-level material, consistent with pre-encode/source activity rather than a fixed post-MP3 threshold.
 
 ## Read/write policy
 
@@ -189,20 +215,54 @@ The most useful next evidence is a controlled pair of MTA files for the same son
 
 Such pairs can identify the remaining COLORS sentinel semantics and provide writer validation with minimal ambiguity.
 
-## Cluster transport: corpus comparison update (0.2.0-29)
 
-A cross-file comparison of the four locally verified stock MTA files (10, 12 and 14 audio tracks) adds several useful constraints without claiming a decryption algorithm.
+## Xing/Info frame — resolved
 
-- The first media boundary always starts with ciphertext bytes `0f b2 f7 b0`, while later Cue-selected media boundaries use different prefixes.
-- In the first media block, bytes 7..62 are identical across the 10-, 12- and 14-track files; only bytes 4..6 differ in the first seven bytes. This strongly suggests a stable structural/encoder prefix after a size-dependent header transform.
-- The first media spans are 420793 bytes (10 tracks), 504943 bytes (12 tracks) and 589093 bytes (14 tracks). Each additional two tracks adds exactly 84150 bytes, i.e. 42075 bytes per track for this Cue interval.
-- The Matroska `TimecodeScale` is `181392 ns`, not the default 1 ms. The common Cue delta of `5760` therefore corresponds to about `1.044818 s`.
-- Every audio track declares `DefaultDuration = 26122448 ns`, matching one 44.1 kHz MPEG-1 Layer III frame (`1152/44100 s`) to truncation. One frame is approximately 144 MTA timecode ticks, and 40 frames give the observed 5760-tick Cue interval.
-- The first media spans follow the exact corpus relation `span = 43 + 42075 * audio_track_count`: 420793 bytes (10 tracks), 504943 (12) and 589093 (14). The following common spans similarly fit `44 + 42076*N` or `44 + 42075*N`.
-- `42075/42076` bytes per track per 40-frame interval decomposes exactly as 40 Matroska `SimpleBlock` records carrying 320 kbit/s MP3 frames: a 320 kbit/s / 44.1 kHz Layer III frame is 1044 or 1045 bytes depending on the padding bit, and a normal one-frame `SimpleBlock` adds 7 bytes of Matroska overhead, yielding 1051/1052-byte records. The observed totals require 35/36 padded frames respectively.
-- Comparison of two independent 14-track songs reveals an extremely strong ~14728-byte difference periodicity (`14 * 1052`). Within those periods, nearly all differences concentrate in the first 1052-byte track slot while the other 13 slots remain almost identical during the opening material. This independently supports frame-major interleaving of one `SimpleBlock` per track and per MP3 frame.
-- A synthetic canonical Matroska file generated with 44.1 kHz stereo MP3 confirms the expected `Cluster -> Timecode -> SimpleBlock -> MP3 frame` grammar and the 7-byte one-frame SimpleBlock overhead, providing a concrete known-plaintext template for the next cryptanalysis step.
+The first MP3 packet of every track is an unpadded 1044-byte `Info` frame matching the FFmpeg/libavformat MP3 muxer layout:
 
-For two independent 14-track songs, the corresponding first media block has the same boundary offsets and very large byte-identical regions; the first block is over 90% identical, while similarity drops after musical content begins. This behavior is more consistent with a deterministic, position-sensitive, length-preserving transform than with a conventional avalanche-mode block cipher over the entire media stream.
+```text
+36..39    "Info"
+40..43    flags = 0x0000000f
+44..47    frame count (excluding Info)
+48..51    total MP3 bytes (including Info)
+52..151   Xing TOC[100]
+152..155  quality
+156..     encoder string ("Lavc58.13" in the verified corpus)
+177..179  packed encoder delay/padding
+184..187  music length
+188..189  music CRC
+190..191  tag CRC
+```
 
-The next targeted task is to recover the first canonical `SimpleBlock` header and MP3 frame header, then test bytewise/stream transforms separately from the 7-byte media-boundary header.
+`Info.frames = packet_count - 1`; `Info.bytes == music length == sum(all MP3 frame bytes including Info)`.
+
+The TOC is the FFmpeg/LAME-style 400-entry sampling-bag algorithm and is fully determined by frame sizes.
+
+CRC fields are exact:
+
+```text
+music CRC = CRC-16/ANSI reflected, polynomial 0xA001, initial 0,
+            over every musical MP3 frame (Info excluded)
+
+tag CRC   = same CRC over Info-frame bytes 0..189
+```
+
+Recalculation reproduces the stock CRCs exactly.
+
+## SeekHead and Cues writer formulas
+
+Each Seek entry consists of a fixed 7-byte `SeekID` element plus a minimal-width `SeekPosition`; with an `n`-byte position the complete `Seek` entry is `13+n` bytes.
+
+For the verified value ranges a CuePoint is:
+
+```text
+11 + byte_length(CueTime) + byte_length(CueClusterPosition)
+```
+
+bytes long. Positions are relative to Segment data start. Segment size is exactly `file_size - segment_data_offset`, reaching EOF in all four files.
+
+These formulas plus the exact Cluster-size model are sufficient to solve all index offsets by fixed-point iteration when writing a new container.
+
+## Analysis completion status
+
+For the verified four-file stock corpus, the stored MTA format is now reverse-engineered sufficiently for deterministic reading and authoring. COLORS 127 is a display-page reset control and NoteOn is a one-second pre-encode/source activity mask. The exact private source-activity detector is not observable from a final lossy MP3 and is not an unresolved on-disk primitive. See `MTA_FORMAT_FINAL_SPEC.md`.

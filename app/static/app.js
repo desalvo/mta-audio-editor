@@ -1,3 +1,40 @@
+
+function controlName(el){
+  const explicit=el.getAttribute('aria-label')||el.dataset.tooltip||el.getAttribute('data-label');
+  if(explicit)return explicit.trim();
+  if(el.matches('input[type="file"]'))return '';
+  const text=(el.innerText||el.textContent||'').replace(/\s+/g,' ').trim();
+  if(text)return text.replace(/^[^\p{L}\p{N}]+/u,'').trim()||text;
+  const value=(el.value||'').trim();
+  return value;
+}
+function ensureControlTooltips(root=document){
+  root.querySelectorAll('button,a.nav-item,a.header-link,label.nav-item,.new-project,.tool,.toolbar-action,.tiny-btn,.dock-tab,.format-option,.analysis-btn,.preview-master').forEach(el=>{
+    if(!el.getAttribute('title')){
+      const name=controlName(el);
+      if(name)el.setAttribute('title',name);
+    }
+    if(!el.getAttribute('aria-label')){
+      const name=controlName(el);
+      if(name && !el.textContent.trim())el.setAttribute('aria-label',name);
+    }
+  });
+}
+const tooltipObserver=new MutationObserver(records=>{
+  for(const record of records){
+    for(const node of record.addedNodes){
+      if(node.nodeType===1){
+        if(node.matches?.('button,a,label'))ensureControlTooltips(node.parentElement||document);
+        else ensureControlTooltips(node);
+      }
+    }
+  }
+});
+document.addEventListener('DOMContentLoaded',()=>{
+  ensureControlTooltips();
+  tooltipObserver.observe(document.body,{childList:true,subtree:true});
+});
+
 let current=null, currentUser=null, pluginInfo={inserts:{},schemas:{},custom:{},stem_splitter:{available:false}}, pxPerSec=70;
 let sel={a:0,b:0}, dragging=false, audioCtx=null, playAudio=null, selectedTrackId=null, exportFormat='mta';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];

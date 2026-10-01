@@ -10,7 +10,13 @@ from pathlib import Path
 
 from .audio_engine import media_duration_ms, render_track
 from .models import Clip, MtaSlotMapping, Project, Track
-from .mta_reverse import analyze_mta
+from .mta_writer import normalize_matroska_for_mta
+from .mta_reverse import (
+    analyze_mta,
+    deobfuscate_media_copy,
+    inspect_cluster_transport,
+    obfuscate_media_copy,
+)
 from .storage import attachment_path, audio_path, pdir, save_project
 
 MTA8_TYPES = ["drums", "bass", "guitars", "keyboards", "orchestra", "winds", "melody", "click"]
@@ -29,40 +35,67 @@ def ffprobe(path: Path):
 
 
 def import_mta(path: Path, project: Project) -> Project:
-    d = pdir(project.id); audio = d / "audio"; att = d / "attachments"; info = ffprobe(path)
-    audio_streams = [s for s in info.get("streams", []) if s.get("codec_type") == "audio"]
-    tracks = []
-    for i, s in enumerate(audio_streams):
-        name = (s.get("tags") or {}).get("title") or f"Track {i+1}"
-        typ = (s.get("tags") or {}).get("MTA_TYPE") or (MTA8_TYPES[i] if i < len(MTA8_TYPES) else "other")
-        out = audio / f"track-{i+1:02d}.mp3"
-        try:
-            run(["ffmpeg", "-y", "-v", "error", "-i", str(path), "-map", f"0:a:{i}", "-c:a", "copy", str(out)])
-        except Exception:
-            run(["ffmpeg", "-y", "-v", "error", "-i", str(path), "-map", f"0:a:{i}", "-c:a", "libmp3lame", "-q:a", "2", str(out)])
-        dur = media_duration_ms(out)
-        allowed = Track.model_fields["type"].annotation.__args__
-        tracks.append(Track(id=uuid.uuid4().hex[:10], name=name, type=typ if typ in allowed else "other",
-                            filename=out.name, duration_ms=dur,
-                            clips=[Clip(id=uuid.uuid4().hex[:10], source_start_ms=0, source_end_ms=dur, timeline_start_ms=0)]))
-    preserved = []
-    attachment_streams = [s for s in info.get("streams", []) if s.get("codec_type") == "attachment"]
-    for aidx, s in enumerate(attachment_streams):
-        idx = s.get("index"); tags = s.get("tags") or {}; fname = tags.get("filename") or f"attachment-{idx}.bin"
-        safe = "".join(c for c in fname if c.isalnum() or c in "._-") or f"attachment-{idx}.bin"; out = att / safe
-        try:
-            run(["ffmpeg", "-y", "-v", "error", f"-dump_attachment:t:{aidx}", str(out), "-i", str(path), "-f", "null", "-"])
-            if out.exists(): preserved.append(out.name)
-        except Exception as exc:
-            LOGGER.warning("Unable to preserve attachment %s from %s: %s", safe, path, exc)
-    project.tracks = tracks; project.preserved_attachments = preserved; project.target = "MTA16" if len(tracks) > 8 else "MTA8"
+    d = pdir(project.id)
+    audio = d / "audio"
+    att = d / "attachments"
+
+    with tempfile.TemporaryDirectory() as td_raw:
+        td = Path(td_raw)
+        source = path
+        transport = inspect_cluster_transport(path)
+        if transport.get("media_xor_validated"):
+            source = td / "canonical-import.mka"
+            deobfuscate_media_copy(path, source, int(transport["seek_cluster_absolute"]))
+
+        info = ffprobe(source)
+        audio_streams = [s for s in info.get("streams", []) if s.get("codec_type") == "audio"]
+        tracks = []
+        for i, stream in enumerate(audio_streams):
+            name = (stream.get("tags") or {}).get("title") or f"Track {i+1}"
+            typ = (stream.get("tags") or {}).get("MTA_TYPE") or (MTA8_TYPES[i] if i < len(MTA8_TYPES) else "other")
+            out = audio / f"track-{i+1:02d}.mp3"
+            try:
+                run(["ffmpeg", "-y", "-v", "error", "-i", str(source), "-map", f"0:a:{i}", "-c:a", "copy", str(out)])
+            except Exception:
+                run(["ffmpeg", "-y", "-v", "error", "-i", str(source), "-map", f"0:a:{i}", "-c:a", "libmp3lame", "-b:a", "320k", str(out)])
+            dur = media_duration_ms(out)
+            allowed = Track.model_fields["type"].annotation.__args__
+            tracks.append(
+                Track(
+                    id=uuid.uuid4().hex[:10],
+                    name=name,
+                    type=typ if typ in allowed else "other",
+                    filename=out.name,
+                    duration_ms=dur,
+                    clips=[Clip(id=uuid.uuid4().hex[:10], source_start_ms=0, source_end_ms=dur, timeline_start_ms=0)],
+                )
+            )
+
+        preserved = []
+        attachment_streams = [s for s in info.get("streams", []) if s.get("codec_type") == "attachment"]
+        for aidx, stream in enumerate(attachment_streams):
+            idx = stream.get("index")
+            tags = stream.get("tags") or {}
+            fname = tags.get("filename") or f"attachment-{idx}.bin"
+            safe = "".join(ch for ch in fname if ch.isalnum() or ch in "._-") or f"attachment-{idx}.bin"
+            out = att / safe
+            try:
+                run(["ffmpeg", "-y", "-v", "error", f"-dump_attachment:t:{aidx}", str(out), "-i", str(source), "-f", "null", "-"])
+                if out.exists():
+                    preserved.append(out.name)
+            except Exception as exc:
+                LOGGER.warning("Unable to preserve attachment %s from %s: %s", safe, path, exc)
+
+    project.tracks = tracks
+    project.preserved_attachments = preserved
+    project.target = "MTA16" if len(tracks) > 8 else "MTA8"
     try:
         report = analyze_mta(path, att / "reverse-analysis")
         (d / "mta-analysis.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     except Exception as exc:
         LOGGER.warning("Unable to analyze imported MTA %s: %s", path, exc)
-    save_project(project); return project
-
+    save_project(project)
+    return project
 
 def _metadata_attachment(project: Project) -> Path:
     out = pdir(project.id) / "attachments" / "mta-editor.json"
@@ -154,6 +187,24 @@ def export_mta(project: Project, out: Path, slots: list[MtaSlotMapping] | None =
         if meta not in attachments: attachments.append(meta)
         for a in attachments:
             cmd += ["-attach", str(a), "-metadata:s:t", f"filename={a.name}", "-metadata:s:t", "mimetype=application/octet-stream"]
-        cmd += ["-metadata", f"TITLE={project.title}", "-metadata", f"ARTIST={project.artist}", "-metadata", f"BPM={project.bpm}", "-f", "matroska", str(out)]
+        canonical = td / "canonical-export.mka"
+        cmd += [
+            "-metadata", f"TITLE={project.title}",
+            "-metadata", f"ARTIST={project.artist}",
+            "-metadata", f"BPM={project.bpm}",
+            "-f", "matroska", str(canonical),
+        ]
         run(cmd)
+
+        normalized = td / "mta-layout.mka"
+        media_offset = normalize_matroska_for_mta(canonical, normalized)
+        normalized_info = inspect_cluster_transport(normalized)
+        if not normalized_info.get("first_cluster_is_canonical"):
+            raise RuntimeError("normalized MTA layout does not expose a canonical first Cluster")
+        obfuscate_media_copy(normalized, out, media_offset)
+
+        written = inspect_cluster_transport(out)
+        if not written.get("media_xor_validated"):
+            out.unlink(missing_ok=True)
+            raise RuntimeError("generated MTA media transport failed XOR validation")
     return out

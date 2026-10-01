@@ -22,6 +22,41 @@ from pathlib import Path
 
 LOGGER = logging.getLogger(__name__)
 
+
+# Stock M-Live media transport: fixed 984-byte repeating XOR stream recovered
+# independently from four stock files using canonical Matroska Cluster/SimpleBlock
+# known plaintext. The transform starts at the first Cluster byte and continues
+# without reset to EOF.
+MEDIA_XOR_KEY = bytes.fromhex(
+    """
+10f141c563f64091404c70af27b598d195361745d2fb2ff608e959dd7bee5889686458870f9db0f9ad0e2f7deac317ce
+20c171f553c670a1707c409f1785a8e1c566471582ab7fa658b9098d2bbe08d9181428f77fedc089dd7e5f0d9ab367be
+709121a5039620f1202c10cf47d5f8b1f5567725b29b4f96688939c666f145924d437dac22b29dd288290a46d7fc2af5
+05e654de7ee95d8a555b65840a9ab5faa001227eefc412cd3dde6cf656c175a27d734d9c1282ade2b8193a1687ac7aa5
+55b6048e2eb90dda050b35f47aeac58ad071520e9fb462bd4dae1ca6069125f22d231dcc42d2fdb2e8496a26b79c4a95
+658634be1e8946974a467ea12dbf9ed78f2c095bc8e129f002e357d371e45e8f525e66b935a7b6ffa7042173e0c911c8
+3adb6feb49dc76a77a764e911d8faee7bf1c396bf8d179a052b3078321b40edf020e36e965f7c68fd774510390b961b8
+4aab1f9b39ac26f72a261ec14ddffeb7ef4c693ba8814990628337b311843eef32457ba628bc93d8822f0c5ccde234ef
+1fe052d474e753805f5d63be30a48bc09a072474e5ca1cc737d86aec4cdf6bb867754b96188ca3e8b21f3c6cfdd204df
+2fb0028424b703d00f0d33ee60f4db90ca77540495ba6cb747a81a9c3caf1bc817251bc648dcf3b8e24f6c3cad82548f
+7f8032b4148733e03f3d03de2bb994dd81220351cee733ea1cfd4dc977e254855c506cb333a18cc5993a1b49e6cf1bc2
+34d565e14fda6cbd6468548b1b89a4edb1123361fed703da2ccd7df927b204d50c003ce363f1dc95c96a4b1996bf6bb2
+44a515913faa1ccd141824fb4bd9f4bde1426331ae87538a7c9d2da9178234e53c300cd353c1ecde84250652c3e83ee9
+19fa48ca6afd4986595769b03eae81c69c3d1e4adbf026c131d260e242d561be616f51880696b9eeb4153662f3d80ed9
+29ca78fa5acd79d6090739e06efed196cc6d4e1a8ba076b141a2109232a511ce111f21f876e6c9bee4456632a3885e89
+799a28aa0a9d29e6393709d05ecee1a6fc5d0557c4ed3de416f74bcf6df84a9b464a6ab539ab82cb93301d4fdcf525fc
+0eef63e745d062b36e62528d0193baf3ab083567f4dd0dd426c77bff5dc87aab767a3ae569fbd29bc3604d1f8ca575ac
+5ebf139735a012c31e1222fd71e3ca83db786537a48d5d8476972baf0d982afb262a0ad559cbe2abf3507d2fbcee38e3
+13f446c060fb4f9c434977aa24a887cc96331040d1f620fb0bec5ed878d367b46b615f820c90bff4ae0b2878e9de08d3
+23c476f050cb7fac7379479a14f8d79cc663401081a670ab5bbc0e8828a317c41b112ff27ce0cf84de7b5808998e5883
+739426a0009b2ffc232917ca44c8e7acf6537020b196409b
+    """
+)
+MEDIA_XOR_KEY_SHA256 = "bcb30443707bdc8b651c1a58aa4152438ce5a6632cc98b294501eb08adbb3547"
+MEDIA_XOR_PERIOD = 984
+assert len(MEDIA_XOR_KEY) == MEDIA_XOR_PERIOD
+assert hashlib.sha256(MEDIA_XOR_KEY).hexdigest() == MEDIA_XOR_KEY_SHA256
+
 PRINTABLE_RE = re.compile(rb"[\x20-\x7e]{4,}")
 SECTION_NAMES = ("LYRICS", "COLORS", "MIDITK", "CHORDS")
 SECTION_FOOTER_RE = re.compile(rb"([0-9]{6})(LYRICS|COLORS|MIDITK|CHORDS)200\r?\n?")
@@ -131,8 +166,9 @@ def _decode_colors_observed(body: bytes) -> dict | None:
     The final byte supplies the minute block for the following record.
 
     The final record in the physical array is a distinct terminator and is not
-    returned as a normal event. Special position values (notably 127 in the
-    corpus) are exposed but intentionally not assigned a writer semantic.
+    returned as a normal event. Decimal position 127 is a display-page reset control: in the verified
+    corpus it follows completion of the previous lyric line and precedes the
+    first lyric record of the next display page.
     """
     key_prime = _derive_observed_keystream(body)
     if key_prime is None:
@@ -172,6 +208,7 @@ def _decode_colors_observed(body: bytes) -> dict | None:
                 "time_ms": time_ms,
                 "highlight_position": position,
                 "position_is_observed_special": position >= 100,
+                "control": "page_reset" if position == 127 else None,
             })
             if previous_time_ms is not None and time_ms < previous_time_ms:
                 monotonic = False
@@ -202,13 +239,15 @@ def _decode_colors_observed(body: bytes) -> dict | None:
         "last_time_ms": times[-1] if times else None,
         "max_highlight_position": max(positions) if positions else None,
         "special_position_values": sorted({x for x in positions if x >= 100}),
+        "page_reset_position": 127 if 127 in positions else None,
+        "page_reset_event_count": sum(1 for event in decoded if event.get("control") == "page_reset"),
         "events": decoded,
         "terminal_record_hex": records[-1].hex() if records else "",
         "confidence_note": (
             "Record layout, centisecond/minute timing, highlight-position digits, "
             "256-byte keystream and monotonic timelines are consistent across four "
-            "independent stock M-Live files. Special position sentinels are exposed "
-            "without assigning undocumented writer semantics."
+            "independent stock M-Live files. Position 127 is a display-page reset "
+            "control rather than a progressive character position."
         ),
     }
 
@@ -749,8 +788,10 @@ def inspect_mtx_xml(data: bytes) -> dict | None:
         },
         "tracks": tracks,
         "note_on_observation": (
-            "Across verified real-world samples the vector length is DurataSec or DurataSec-1, consistent with second-scale bins "
-            "and endpoint convention differences. The exact threshold/semantic used by the original writer remains undocumented."
+            "Across four stock files and 50 audio tracks, NoteOn is a one-second source-activity mask. "
+            "The corpus contains 12654 bins. Decoded-MP3 RMS/peak separation reconstructs more than 99.8% "
+            "of bits; residual differences cluster at activity boundaries and very low-level material, consistent "
+            "with a pre-encode/source-timeline mask rather than a fixed threshold on decoded MP3."
         ),
     }
 
@@ -835,13 +876,96 @@ def _ebml_children(data: mmap.mmap, start: int, end: int):
         pos = payload_end
 
 
-def inspect_cluster_transport(path: Path) -> dict:
-    """Inspect the canonical Matroska index and the non-canonical media region.
 
-    Stock M-Live files keep SeekHead and Cues readable, while bytes at each
-    CueClusterPosition are not normal Matroska Cluster elements.  This helper
-    deliberately does *not* call the media data decrypted; it records only the
-    index-to-byte evidence needed for continued reverse engineering.
+def find_first_cluster_offset(path: Path) -> int | None:
+    """Locate the first canonical Cluster in a normal Matroska file.
+
+    This is used by the writer before proprietary XOR is applied. Stock MTA input
+    normally resolves the first Cluster through SeekHead because the raw Cluster
+    ID is hidden by the transport transform.
+    """
+    with path.open("rb") as fh, mmap.mmap(fh.fileno(), 0, access=mmap.ACCESS_READ) as mm:
+        if len(mm) < 32 or mm[:4] != b"\x1a\x45\xdf\xa3":
+            return None
+        segment = mm.find(b"\x18\x53\x80\x67", 0, min(len(mm), 4096))
+        if segment < 0:
+            return None
+        parsed = _ebml_vint(mm, segment + 4)
+        if parsed is None:
+            return None
+        _size, size_len = parsed
+        segment_data = segment + 4 + size_len
+        pos = mm.find(b"\x1f\x43\xb6\x75", segment_data)
+        return pos if pos >= 0 else None
+
+
+def _xor_media_prefix(data: mmap.mmap, absolute: int, length: int) -> bytes:
+    """Decode a media slice using the demonstrated 984-byte transport XOR."""
+    end = min(len(data), absolute + length)
+    return bytes(
+        data[pos] ^ MEDIA_XOR_KEY[(pos - absolute) % MEDIA_XOR_PERIOD]
+        for pos in range(absolute, end)
+    )
+
+
+def transform_media_xor_copy(source: Path, target: Path, media_offset: int | None = None) -> Path:
+    """Apply/remove the proprietary 984-byte XOR transport from first Cluster to EOF.
+
+    XOR is symmetric, so the same operation converts canonical Matroska to stored
+    MTA transport and converts stored MTA transport back to canonical Matroska.
+    """
+    if media_offset is None:
+        info = inspect_cluster_transport(source)
+        media_offset = info.get("seek_cluster_absolute")
+        if media_offset is None:
+            media_offset = find_first_cluster_offset(source)
+    if media_offset is None:
+        raise ValueError("first media/Cluster offset could not be resolved")
+    media_offset = int(media_offset)
+    key = MEDIA_XOR_KEY
+    phase = 0
+    with source.open("rb") as src, target.open("wb") as dst:
+        remaining = media_offset
+        while remaining:
+            chunk = src.read(min(1024 * 1024, remaining))
+            if not chunk:
+                raise ValueError("media offset exceeds source size")
+            dst.write(chunk)
+            remaining -= len(chunk)
+        while True:
+            chunk = src.read(1024 * 1024)
+            if not chunk:
+                break
+            out = bytearray(chunk)
+            for i, value in enumerate(out):
+                out[i] = value ^ key[(phase + i) % MEDIA_XOR_PERIOD]
+            dst.write(out)
+            phase = (phase + len(out)) % MEDIA_XOR_PERIOD
+    return target
+
+
+def deobfuscate_media_copy(source: Path, target: Path, media_offset: int | None = None) -> Path:
+    """Create a canonical Matroska copy from proprietary stored MTA media."""
+    return transform_media_xor_copy(source, target, media_offset)
+
+
+def obfuscate_media_copy(source: Path, target: Path, media_offset: int | None = None) -> Path:
+    """Create proprietary stored MTA media from canonical Matroska."""
+    return transform_media_xor_copy(source, target, media_offset)
+
+
+def is_proprietary_media_transport(path: Path) -> bool:
+    """Return True only when the first Cluster validates after applying the known XOR."""
+    info = inspect_cluster_transport(path)
+    return bool(info.get("media_xor_validated"))
+
+
+def inspect_cluster_transport(path: Path) -> dict:
+    """Inspect the canonical Matroska index and the demonstrated XOR media transport.
+
+    The current four-file stock corpus proves that bytes from the first Cluster
+    through EOF use one fixed 984-byte repeating XOR stream. SeekHead/Cues remain
+    canonical and locate the encrypted media region.
     """
     result = {
         "validated": False,
@@ -855,6 +979,10 @@ def inspect_cluster_transport(path: Path) -> dict:
         "cue_cluster_positions": [],
         "cluster_spans": [],
         "observed_cluster_prefixes": [],
+        "media_xor_period_bytes": MEDIA_XOR_PERIOD,
+        "media_xor_key_sha256": MEDIA_XOR_KEY_SHA256,
+        "media_xor_validated": False,
+        "decoded_first_cluster_prefix_hex": None,
     }
     with path.open("rb") as fh, mmap.mmap(fh.fileno(), 0, access=mmap.ACCESS_READ) as mm:
         if len(mm) < 32 or mm[:4] != b"\x1a\x45\xdf\xa3":
@@ -897,7 +1025,18 @@ def inspect_cluster_transport(path: Path) -> dict:
                     if absolute < len(mm):
                         result["seek_target_bytes_hex"] = bytes(mm[absolute:absolute + 16]).hex()
                         result["first_cluster_is_canonical"] = mm[absolute:absolute + 4] == b"\x1f\x43\xb6\x75"
+                        decoded_prefix = _xor_media_prefix(mm, absolute, 32)
+                        result["decoded_first_cluster_prefix_hex"] = decoded_prefix.hex()
+                        result["media_xor_validated"] = decoded_prefix[:4] == b"\x1f\x43\xb6\x75"
                     break
+
+        if result["seek_cluster_absolute"] is None:
+            canonical = mm.find(b"\x1f\x43\xb6\x75", segment_data)
+            if canonical >= 0:
+                result["seek_cluster_absolute"] = canonical
+                result["seek_cluster_relative"] = canonical - segment_data
+                result["seek_target_bytes_hex"] = bytes(mm[canonical:canonical + 16]).hex()
+                result["first_cluster_is_canonical"] = True
 
         cue_points: list[tuple[int | None, int | None]] = []
         if cues:
@@ -952,9 +1091,9 @@ def inspect_cluster_transport(path: Path) -> dict:
         )
         result["validated"] = bool(seek_head and cues and cue_points and result["seek_cluster_relative"] is not None)
         result["confidence_note"] = (
-            "SeekHead and Cues are canonical Matroska and identify media boundaries, but the bytes at "
-            "CueClusterPosition are not canonical Cluster IDs. This is evidence of a length-preserving "
-            "non-standard/obfuscated media transport; no cryptographic algorithm is asserted."
+            "Across four independent stock files, media bytes from the first Cluster through EOF decode "
+            "byte-for-byte as canonical Matroska under a fixed 984-byte repeating XOR stream. The key phase "
+            "starts at the first Cluster and is not reset at Cue/Cluster boundaries."
         )
     return result
 

@@ -1,5 +1,5 @@
 
-## 0.2.0-29
+## 0.2.0-33
 
 - Workspace dedicato per utente con proprietà dei progetti e visibilità dei soli progetti propri/condivisi.
 - Condivisione progetto verso altri utenti attivi e confermati; i collaboratori possono modificare, mentre gestione condivisioni ed eliminazione restano al proprietario/admin.
@@ -11,7 +11,7 @@
 - Overlay Kubernetes e Docker Compose aggiornati al nuovo limite.
 - Migrazione automatica dei progetti legacy senza proprietario verso il primo amministratore persistente che apre il workspace.
 
-# MTA Audio Editor 0.2.0-29
+# MTA Audio Editor 0.2.0-33
 
 ## Multi-user authentication and administration
 
@@ -50,6 +50,6 @@ A new `scripts/k8s-wizard.py` is downloadable directly from the GitHub raw URL a
 
 The generated `secret.yaml` contains local credentials and must not be committed. Use `--no-save-password` when password persistence is not wanted.
 
-### 0.2.0-29
+### 0.2.0-33
 
 The standalone Kubernetes wizard now emits the legacy-compatible HAProxy ingress annotation `kubernetes.io/ingress.class: haproxy` every time HAProxy ingress is selected, while retaining the Kubernetes v1 `ingressClassName` field. Reverse-engineering documentation also includes the latest Cluster transport evidence.

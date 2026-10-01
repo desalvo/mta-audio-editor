@@ -154,6 +154,9 @@ def test_export_mta_merge_executes_slot_mix(tmp_path, monkeypatch):
             Path(cmd[-1]).write_bytes(b"mta")
         return ""
     monkeypatch.setattr(codec, "run", fake_run)
+    monkeypatch.setattr(codec, "normalize_matroska_for_mta", lambda source, target: target.write_bytes(b"normalized") or 0)
+    monkeypatch.setattr(codec, "obfuscate_media_copy", lambda source, target, offset: target.write_bytes(b"mta") or target)
+    monkeypatch.setattr(codec, "inspect_cluster_transport", lambda path: {"first_cluster_is_canonical": True} if path.name == "mta-layout.mka" else {"media_xor_validated": True})
     slots = [MtaSlotMapping(slot=1, name="Merged", type="drums", track_ids=["t0", "t1"])]
     out = storage.pdir(p.id) / "result.mta8"
     assert codec.export_mta(p, out, slots) == out

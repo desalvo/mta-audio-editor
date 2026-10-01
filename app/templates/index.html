@@ -16,12 +16,18 @@
     </div>
     <div class="project-name-block"><label>Project</label><div class="project-name-field" onclick="editProjectMeta()" title="Edit project metadata"><span id="headerProjectName">No project loaded</span><span>✎</span></div></div>
     <div class="transport">
-      <button class="transport-btn">■</button><button class="transport-btn">◀◀</button><button id="playMaster" class="transport-btn play" onclick="previewMaster()">▶</button><button class="transport-btn">▶▶</button><button class="transport-btn rec">●</button>
+      <button class="transport-btn" title="Stop" aria-label="Stop">■</button><button class="transport-btn" title="Riavvolgi" aria-label="Riavvolgi">◀◀</button><button id="playMaster" class="transport-btn play" onclick="previewMaster()" title="Play / Preview" aria-label="Play / Preview">▶</button><button class="transport-btn" title="Avanti veloce" aria-label="Avanti veloce">▶▶</button><button class="transport-btn rec" title="Record" aria-label="Record">●</button>
     </div>
     <div class="timebox"><strong id="transportTime">00:00.000</strong><span><b id="transportBpm">120</b> BPM &nbsp;&nbsp; 4/4</span></div>
     <div class="top-spacer"></div>
     <div class="zoom-top"><span>Zoom</span><input id="topZoom" type="range" min="25" max="240" value="70" oninput="setZoom(this.value)"></div>
-    <div class="header-actions"><a class="header-link" href="/account" title="Profilo">👤 Account</a><a id="adminNav" class="header-link" href="/admin/users" hidden>⚙ Admin</a><button onclick="save()">▣ Save</button><button class="accent" onclick="openExportPanel()">⇧ Export</button><a class="header-link logout" href="/logout">Esci</a></div>
+    <div class="header-actions">
+      <a class="header-link" href="/account" title="Account" aria-label="Account"><span class="control-icon" aria-hidden="true">👤</span><span class="control-text">Account</span></a>
+      <a id="adminNav" class="header-link" href="/admin/users" title="Amministrazione" aria-label="Amministrazione" hidden><span class="control-icon" aria-hidden="true">⚙</span><span class="control-text">Admin</span></a>
+      <button onclick="save()" title="Save" aria-label="Save"><span class="control-icon" aria-hidden="true">▣</span><span class="control-text">Save</span></button>
+      <button class="accent" onclick="openExportPanel()" title="Export" aria-label="Export"><span class="control-icon" aria-hidden="true">⇧</span><span class="control-text">Export</span></button>
+      <a class="header-link logout" href="/logout" title="Esci" aria-label="Esci"><span class="control-icon" aria-hidden="true">↪</span><span class="control-text">Esci</span></a>
+    </div>
   </header>
 
   <div class="workspace">
