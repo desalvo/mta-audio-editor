@@ -109,7 +109,7 @@ jobs:
           push: false
           tags: mta-audio-editor:ci
           build-args: |
-            APP_VERSION=${{ github.ref_type == 'tag' && github.ref_name || '0.2.0-26' }}
+            APP_VERSION=${{ github.ref_type == 'tag' && github.ref_name || '0.2.0-27' }}
             BUILD_ID=${{ steps.build.outputs.id }}
       - name: Verify container OS
         shell: bash
@@ -162,6 +162,7 @@ jobs:
           CI_ADMIN_PASSWORD="$(python -c 'import secrets; print(secrets.token_urlsafe(24))')"
           docker run -d --rm --name mta-ci -p 18080:8080 \
             -e MTA_ADMIN_PASSWORD="$CI_ADMIN_PASSWORD" \
+            -e MTA_ADMIN_EMAIL="ci-admin@example.invalid" \
             mta-audio-editor:ci
           for i in {1..30}; do
             curl -fsS http://127.0.0.1:18080/api/health && break
@@ -169,7 +170,9 @@ jobs:
           done
           curl -fsS http://127.0.0.1:18080/api/health | grep -q '"status":"ok"'
           curl -fsS http://127.0.0.1:18080/docs/user >/dev/null
-          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:18080/docs/admin)" = "401"
+          # Browser-only protected pages now redirect unauthenticated users to the login page.
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:18080/docs/admin)" = "303"
+          curl -sSI http://127.0.0.1:18080/docs/admin | tr -d '\r' | grep -qi '^location: /login$'
           test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:18080/api/projects)" = "401"
           test "$(curl -s -u "admin:$CI_ADMIN_PASSWORD" -o /dev/null -w '%{http_code}' -X POST http://127.0.0.1:18080/api/projects)" = "403"
           curl -fsS -u "admin:$CI_ADMIN_PASSWORD" -H 'X-MTA-Request: 1' -X POST http://127.0.0.1:18080/api/projects >/dev/null
