@@ -1,3 +1,5 @@
 # Optional/bundled production stem-separation plugin.
 # Model weights are cached on first use under MTA_DATA_DIR/.cache.
-demucs==4.0.1
+# Python 3.14 baseline: pin the current PyTorch release with cp314 amd64/arm64 wheels.
+torch==2.14.1
+demucs==4.1.0

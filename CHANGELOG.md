@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.2.0-11
+
+- Moved the production and CI baseline from Python 3.11 to Python 3.14, absorbing the previous Docker Dependabot PR.
+- Updated NumPy to 2.5.3 and aligned the dependency policy with the Python 3.14 baseline, absorbing the remaining grouped Python dependency PR intent.
+- Split Kubernetes assets into Namespace, PVC, Deployment and Service resources and added Kustomize base/overlays.
+- Added NGINX Ingress and HAProxy Ingress examples.
+- Added a standalone standard-library Kubernetes manifest wizard with self-update, automatic restart after update, persistent last-used values, nodeSelector support, StorageClass selection and local Kustomization output.
+- Added wizard generation tests and security notes for locally persisted/generated credentials.
+
+
+## 0.2.0-10
+
+- Resolved the two open Dependabot proposals without changing the 0.2.x Python 3.11 support baseline.
+- Incorporated compatible dependency updates from PR #4: Demucs 4.1.0, pytest 9.1.1, pytest-cov 7.1.0, Ruff 0.16.9, Bandit 1.9.4, pip-audit 2.10.1 and WeasyPrint 70.0.
+- Kept NumPy at 2.4.6 because NumPy 2.5.x requires Python >=3.12.
+- Kept the production base image on python:3.11-slim-bookworm instead of PR #1's Python 3.14 proposal.
+- Added Dependabot ignore policy for Python 3.12+ Docker bases and NumPy 2.5+ while the 0.2.x compatibility policy remains Python 3.11.
+- Fixed Gitleaks pull-request scans by checking out full Git history in the security job.
+- Updated the Docker stem-plugin smoke import for Demucs 4.1, which no longer requires torchaudio for inference.
+- Retained setuptools 84.0.0 / wheel 0.48.0 runtime hardening for the previous Trivy findings.
+
 ## 0.2.0-9
 
 - Fixed the current Trivy production-image gate by upgrading runtime packaging tooling to `setuptools==84.0.0` and `wheel==0.48.0`.

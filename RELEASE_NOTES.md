@@ -1,18 +1,19 @@
-# MTA Audio Editor 0.2.0-9
+# MTA Audio Editor 0.2.0-11
 
-This release fixes the production container vulnerability gate reached after all quality and source-security jobs passed.
+## Python 3.14 and Kubernetes/Kustomize release
 
-## Container security fix
+This release supersedes the two previously open Dependabot proposals by adopting the Python 3.14 container baseline and the compatible dependency set instead of suppressing those updates.
 
-The Python 3.11 base image supplied `setuptools 79.0.1`, whose vendored packages triggered two HIGH Trivy findings:
+- Production and CI baseline: `python:3.14-slim-bookworm`.
+- NumPy updated to 2.5.3.
+- Demucs remains 4.1.0 and the production image validates the Python 3.14 stem stack.
+- The Docker and Python dependency PR intents are therefore incorporated into mainline package contents.
+- Gitleaks pull-request scanning keeps full Git history.
 
-- `jaraco.context 5.3.0` / CVE-2026-23949 (fixed in 6.1.0);
-- vendored `wheel 0.45.1` / CVE-2026-24049 (fixed in 0.46.2).
+## Kubernetes
 
-The Docker build now upgrades the runtime packaging toolchain to `setuptools==84.0.0` and `wheel==0.48.0` after installing application dependencies. `setuptools 84.0.0` itself vendors fixed `jaraco.context 6.1.0` and `wheel 0.46.3`.
+Kubernetes resources are now split under `k8s/base` into Namespace, PVC, Deployment and Service, with an example Secret kept outside the default Kustomization. NGINX and HAProxy Ingress examples are supplied as independent Kustomize overlays.
 
-A build-time import smoke test verifies FastAPI/Uvicorn/NumPy and, when stem support is enabled, Torch/Torchaudio before the image is accepted.
+A new `scripts/k8s-wizard.py` is downloadable directly from the GitHub raw URL and uses only the Python standard library. It asks for initial administrator username/password, PVC StorageClass, namespace and nodeSelector, remembers the last values in a mode-0600 configuration file, can optionally generate NGINX/HAProxy Ingress, and creates a local Kustomization. On startup it checks GitHub for a strictly newer wizard version; after an atomic self-update it automatically restarts itself.
 
-## Retained functionality
-
-All 0.2.0-8 functionality is retained, including the current MTA reverse-engineering/analysis features, project documentation, security gates and dynamic CI smoke-test credentials.
+The generated `secret.yaml` contains local credentials and must not be committed. Use `--no-save-password` when password persistence is not wanted.

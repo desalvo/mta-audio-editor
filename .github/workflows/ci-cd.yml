@@ -15,7 +15,7 @@ concurrency:
 
 env:
   IMAGE_NAME: desalvo/mta-audio-editor
-  PYTHON_VERSION: '3.11'
+  PYTHON_VERSION: '3.14'
 
 jobs:
   quality:
@@ -23,6 +23,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v7
         with:
           python-version: ${{ env.PYTHON_VERSION }}
@@ -30,7 +32,7 @@ jobs:
       - run: pip install -r requirements-dev.txt
       - run: pip check
       - name: Compile
-        run: python -m compileall -q app
+        run: python -m compileall -q app scripts/k8s-wizard.py
       - name: Build documentation PDFs
         run: python scripts/build_docs.py
       - name: Install FFmpeg for DSP preset validation
@@ -38,7 +40,7 @@ jobs:
       - name: Validate audio presets against FFmpeg
         run: PYTHONPATH=. python scripts/validate_audio_presets.py
       - name: Ruff
-        run: ruff check app tests
+        run: ruff check app tests scripts/k8s-wizard.py
       - name: Unit tests and coverage gate
         env:
           MTA_ALLOW_INSECURE_NO_AUTH: 'true'
@@ -55,6 +57,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          # Gitleaks needs the parent commit on pull_request events.
+          fetch-depth: 0
       - uses: actions/setup-python@v7
         with:
           python-version: ${{ env.PYTHON_VERSION }}
@@ -62,7 +67,7 @@ jobs:
       - run: pip install -r requirements-dev.txt
       - run: pip check
       - name: Bandit SAST
-        run: bandit -q -r app -lll -iii
+        run: bandit -q -r app scripts/k8s-wizard.py -lll -iii
       - name: Python dependency audit
         run: pip-audit -r requirements.txt -r requirements-stems.txt --strict
       - name: Secret scan
@@ -97,7 +102,7 @@ jobs:
           push: false
           tags: mta-audio-editor:ci
           build-args: |
-            APP_VERSION=${{ github.ref_type == 'tag' && github.ref_name || '0.2.0-9' }}
+            APP_VERSION=${{ github.ref_type == 'tag' && github.ref_name || '0.2.0-11' }}
             BUILD_ID=${{ steps.build.outputs.id }}
       - name: Trivy image scan
         uses: aquasecurity/trivy-action@v0.36.0

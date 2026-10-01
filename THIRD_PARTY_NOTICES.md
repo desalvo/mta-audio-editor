@@ -9,6 +9,8 @@ MTA Audio Editor is licensed under EUPL-1.2. Runtime dependencies retain their o
 | Pydantic | Data validation | MIT |
 | python-multipart | Multipart parsing | Apache-2.0 |
 | NumPy | Numerical processing / audio alignment | BSD-3-Clause |
+| PyTorch | Demucs tensor/inference runtime | BSD-style |
+| Demucs | Optional music source separation | MIT |
 | FFmpeg | Audio/media processing | LGPL/GPL depending on the concrete distribution build |
 | tini | Container init | MIT |
 

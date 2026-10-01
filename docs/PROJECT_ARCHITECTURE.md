@@ -1,6 +1,6 @@
 # MTA Audio Editor - project architecture
 
-Version: 0.2.0-7
+Version: 0.2.0-11
 
 ## Purpose
 
@@ -54,6 +54,14 @@ See `docs/MTA_FORMAT_RESEARCH.md` for the byte-level findings and confidence bou
 ## Security and CI
 
 Production CI checks compilation, documentation generation, real FFmpeg preset validation, Ruff, pytest/coverage, Bandit, pip-audit, Gitleaks, Trivy filesystem/image scans, container smoke tests and CodeQL. The runtime container is non-root and deployment examples apply capability dropping, seccomp/no-new-privileges and read-only filesystem controls where applicable.
+
+## Deployment architecture
+
+The production container baseline is CPython 3.14 on Debian Bookworm. NumPy 2.5.3 and PyTorch 2.14.1 are selected because they publish/support CPython 3.14 builds; Demucs 4.1.0 is the optional bundled stem-separation plugin. CI uses the same Python major/minor as the production image.
+
+Kubernetes assets are Kustomize-native and intentionally split by concern under `k8s/base`: Namespace, PVC, Deployment and Service are independent resources, while the credential Secret is provided only as an example and is not part of the default Kustomization. Two overlays demonstrate NGINX and HAProxy Ingress.
+
+`scripts/k8s-wizard.py` is a standard-library-only standalone generator. It can run outside a repository checkout, persists the last selected deployment values in a mode-0600 local config file, checks the raw GitHub script for a newer wizard version, atomically replaces itself only when the remote version is newer, and restarts itself with `exec` after a successful self-update. Generated manifests include a local Secret and should therefore be protected from source control.
 
 ## Release policy
 

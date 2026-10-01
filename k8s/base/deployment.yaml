@@ -1,17 +1,8 @@
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: mta-audio-editor-data
-spec:
-  accessModes: ["ReadWriteOnce"]
-  resources:
-    requests:
-      storage: 20Gi
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mta-audio-editor
+  namespace: mta-audio-editor
 spec:
   replicas: 1
   strategy:
@@ -28,9 +19,11 @@ spec:
       securityContext:
         seccompProfile:
           type: RuntimeDefault
+      # nodeSelector:
+      #   kubernetes.io/hostname: worker-01
       containers:
         - name: mta-audio-editor
-          image: desalvo/mta-audio-editor:0.2.0-7
+          image: desalvo/mta-audio-editor:0.2.0-11
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
@@ -87,16 +80,3 @@ spec:
         - name: tmp
           emptyDir:
             sizeLimit: 512Mi
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: mta-audio-editor
-spec:
-  selector:
-    app: mta-audio-editor
-  ports:
-    - name: http
-      port: 80
-      targetPort: http
-  type: ClusterIP

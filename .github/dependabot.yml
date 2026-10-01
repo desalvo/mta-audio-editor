@@ -15,3 +15,8 @@ updates:
   - package-ecosystem: docker
     directory: /
     schedule: {interval: weekly}
+    ignore:
+      # Python 3.14 is the current production baseline. Move to 3.15 only after
+      # PyTorch/Demucs and the full multi-arch production gate are validated.
+      - dependency-name: python
+        versions: ["3.15.*"]

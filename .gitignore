@@ -15,3 +15,5 @@ venv/
 !/data/projects/.gitkeep
 build/
 dist/
+
+mta-audio-editor-k8s/

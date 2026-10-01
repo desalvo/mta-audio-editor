@@ -1,4 +1,4 @@
-# MTA Audio Editor 0.2.0-9
+# MTA Audio Editor 0.2.0-11
 
 ![MTA Audio Editor](app/static/logo.svg)
 
@@ -9,7 +9,7 @@ Web DAW containerizzata per creare, importare, modificare ed esportare progetti 
 **Creatore:** Alessandro De Salvo <braket71@gmail.com>  
 **Repository:** `desalvo/mta-audio-editor`  
 **Licenza:** EUPL-1.2  
-**Versione:** `0.2.0-9`  
+**Versione:** `0.2.0-11`  
 **Build:** generato automaticamente nel formato `YYYYMMDD-HH:MM:SS`.
 
 ## Funzioni principali
@@ -45,19 +45,24 @@ La build production include per default il plugin Demucs. Per un’immagine core
 
 Aprire `http://localhost:8080`. L'autenticazione è abilitata per default; l'utente predefinito è `admin`, ma **non esiste una password predefinita**.
 
-## Kubernetes
+## Kubernetes / Kustomize
 
-Creare il Secret applicativo fuori dal repository e poi applicare il manifest:
+I manifest sono separati in `k8s/base/namespace.yaml`, `pvc.yaml`, `deployment.yaml` e `service.yaml`. `secret.example.yaml` è volutamente escluso dal Kustomization di base. Sono inclusi due overlay di esempio:
 
 ```bash
-kubectl create secret generic mta-audio-editor-auth \
-  --from-literal=username=admin \
-  --from-literal=password='una-password-lunga-e-casuale'
-kubectl apply -f k8s/deployment.yaml
-kubectl port-forward svc/mta-audio-editor 8080:80
+kubectl apply -k k8s/overlays/nginx
+kubectl apply -k k8s/overlays/haproxy
 ```
 
-In produzione usare un Ingress/reverse proxy HTTPS e un gestore di secret appropriato.
+Per generare manifest locali personalizzati è disponibile un wizard standalone auto-aggiornante:
+
+```bash
+curl -fsSLo mta-k8s-wizard.py \
+  https://raw.githubusercontent.com/desalvo/mta-audio-editor/main/scripts/k8s-wizard.py
+python3 mta-k8s-wizard.py
+```
+
+Il wizard propone prima i default e nei run successivi gli ultimi valori usati. Richiede username/password amministrativi, StorageClass del PVC, namespace e `nodeSelector`; consente inoltre di scegliere Ingress NGINX/HAProxy/nessuno, host e immagine. La configurazione locale usa permessi `0600`; usare `--no-save-password` per non persistere la password. Se trova una versione del wizard più nuova su GitHub aggiorna atomicamente il proprio file e si riavvia automaticamente.
 
 ## Documentazione
 
@@ -104,15 +109,15 @@ git init
 git branch -M main
 git remote add origin https://github.com/desalvo/mta-audio-editor.git
 git add .
-git commit -m "Release 0.2.0-9"
+git commit -m "Release 0.2.0-11"
 git push -u origin main
 ```
 
 Dopo che la CI su `main` è verde, creare il tag:
 
 ```bash
-git tag -s 0.2.0-9 -m "MTA Audio Editor 0.2.0-9"
-git push origin 0.2.0-9
+git tag -s 0.2.0-11 -m "MTA Audio Editor 0.2.0-11"
+git push origin 0.2.0-11
 ```
 
 ## Packaging locale
@@ -141,6 +146,13 @@ Single tracks can be exported independently as WAV (24-bit), MP3 (320 kbps) or F
 Imported MTA files are analyzed by the reverse-engineering module (`app/mta_reverse.py`). It inventories Matroska streams/tags and attachments, fingerprints opaque payloads, parses embedded ID3v2.3 and MtxInfoData XML, and inspects the proprietary `LYRICS`, `CHORDS`, `COLORS` and `MIDITK` families. Corpus analysis now provides validated read-only decoding: LYRICS/CHORDS expose readable strings and minute/centisecond timestamps; COLORS exposes the 15-byte event layout, exact timing and progressive highlight position; MIDITK reconstructs byte-exact Standard MIDI and extracts tempo/Marker meta-events. Unknown fields and undocumented writer semantics remain preserved rather than rewritten speculatively.
 
 
+
+
+## Python and dependency policy
+
+La baseline production e CI è **Python 3.14**. Questa release assorbe la precedente PR Docker verso `python:3.14-slim-bookworm` e abilita NumPy 2.5.3, che supporta Python 3.12-3.15. Il plugin stems usa Demucs 4.1.0; l'immagine verifica anche PyTorch 2.14.1, che pubblica wheel CPython 3.14 per amd64 e arm64. Dependabot può quindi aggiornare normalmente Python/NumPy entro questa baseline; Python 3.15 resta escluso finché PyTorch/Demucs e i gate multi-arch non vengono validati.
+
+Il security job usa checkout Git completo per permettere a Gitleaks di analizzare correttamente le pull request Dependabot.
 
 ## 0.2.0-9: verified proprietary read-only decoding
 

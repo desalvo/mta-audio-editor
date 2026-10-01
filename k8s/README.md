@@ -1,0 +1,36 @@
+# Kubernetes manifests
+
+The repository ships a Kustomize base split into dedicated manifests:
+
+- `namespace.yaml`
+- `pvc.yaml`
+- `deployment.yaml`
+- `service.yaml`
+- `secret.example.yaml` (example only; intentionally not included by Kustomize)
+
+Create the auth Secret before applying the base, or use the standalone wizard.
+
+```bash
+kubectl create namespace mta-audio-editor --dry-run=client -o yaml | kubectl apply -f -
+kubectl -n mta-audio-editor create secret generic mta-audio-editor-auth \
+  --from-literal=username=admin \
+  --from-literal=password='CHANGE-ME'
+kubectl apply -k k8s/base
+```
+
+Ingress examples:
+
+```bash
+kubectl apply -k k8s/overlays/nginx
+kubectl apply -k k8s/overlays/haproxy
+```
+
+## Standalone wizard
+
+```bash
+curl -fsSLo mta-k8s-wizard.py \
+  https://raw.githubusercontent.com/desalvo/mta-audio-editor/main/scripts/k8s-wizard.py
+python3 mta-k8s-wizard.py
+```
+
+The wizard is standard-library only, checks GitHub for a newer wizard version at startup, atomically updates its own file when appropriate, and automatically restarts itself after an update. It remembers the last username, StorageClass, namespace, nodeSelector, ingress selection and image. The password is also remembered by default in a local config file with mode `0600`; use `--no-save-password` if that is not desired.
