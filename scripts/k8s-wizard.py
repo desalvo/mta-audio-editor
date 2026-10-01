@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import argparse
 import getpass
-import hashlib
 import json
 import os
 import re
@@ -14,8 +13,8 @@ import tempfile
 import urllib.request
 from pathlib import Path
 
-WIZARD_VERSION = "0.2.0-12.1"
-APP_VERSION = "0.2.0-12"
+WIZARD_VERSION = "0.2.0-13.1"
+APP_VERSION = "0.2.0-13"
 RAW_URL = "https://raw.githubusercontent.com/desalvo/mta-audio-editor/main/scripts/k8s-wizard.py"
 DEFAULT_CONFIG = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")) / "mta-audio-editor" / "k8s-wizard.json"
 
@@ -37,7 +36,7 @@ def self_update(skip: bool) -> None:
         return
     try:
         req = urllib.request.Request(RAW_URL, headers={"User-Agent": "mta-audio-editor-k8s-wizard"})
-        with urllib.request.urlopen(req, timeout=5) as response:
+        with urllib.request.urlopen(req, timeout=5) as response:  # noqa: S310 -- RAW_URL is a hard-coded HTTPS GitHub URL
             data = response.read()
         rv = remote_version(data)
         if not rv or version_tuple(rv) <= version_tuple(WIZARD_VERSION):
@@ -51,7 +50,9 @@ def self_update(skip: bool) -> None:
         os.chmod(tmp_path, mode)
         os.replace(tmp_path, script)
         print(f"Wizard aggiornato automaticamente: {WIZARD_VERSION} -> {rv}. Riavvio...", file=sys.stderr)
-        os.execv(sys.executable, [sys.executable, str(script), *sys.argv[1:], "--skip-self-update"])
+        os.execv(  # noqa: S606 -- deliberate self-restart without a shell after atomic update
+            sys.executable, [sys.executable, str(script), *sys.argv[1:], "--skip-self-update"]
+        )
     except Exception as exc:  # update failure must never block manifest generation
         print(f"Nota: controllo aggiornamenti non riuscito ({exc}). Continuo con la versione locale.", file=sys.stderr)
 

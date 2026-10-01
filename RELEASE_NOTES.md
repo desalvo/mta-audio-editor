@@ -1,4 +1,4 @@
-# MTA Audio Editor 0.2.0-12
+# MTA Audio Editor 0.2.0-13
 
 ## Python 3.14 and Kubernetes/Kustomize release
 
@@ -12,6 +12,8 @@ This release supersedes the two previously open Dependabot proposals by adopting
 
 
 ## GitHub Actions reliability fix
+
+The follow-up Quality run also exposed three Ruff 0.16.9 findings in the Kubernetes wizard. The unused import was removed; the two security rules are suppressed only at the exact intentional operations (`urlopen` against the hard-coded HTTPS GitHub raw URL and `os.execv` for shell-free self-restart), with inline rationale.
 
 The Python 3.14 baseline remains enabled. The Quality job exposed an intermittent resolver failure for `pydantic==2.13.5`, which requires `pydantic-core==2.46.5`. The Security job in the same workflow could resolve it while the Quality job could not. This release pins `pydantic==2.12.5`, whose `pydantic-core==2.41.5` dependency has established CPython 3.14 wheels, and prevents Dependabot from immediately reopening the unstable 2.13/2.14 upgrade.
 
