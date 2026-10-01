@@ -102,7 +102,7 @@ jobs:
           push: false
           tags: mta-audio-editor:ci
           build-args: |
-            APP_VERSION=${{ github.ref_type == 'tag' && github.ref_name || '0.2.0-18' }}
+            APP_VERSION=${{ github.ref_type == 'tag' && github.ref_name || '0.2.0-19' }}
             BUILD_ID=${{ steps.build.outputs.id }}
       - name: Verify container OS
         shell: bash
