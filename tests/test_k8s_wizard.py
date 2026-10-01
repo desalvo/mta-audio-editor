@@ -17,7 +17,7 @@ def load_wizard():
 
 def test_version_and_node_selector_helpers():
     wizard = load_wizard()
-    assert wizard.version_tuple("0.2.0-27.1") == (0, 2, 0, 27, 1)
+    assert wizard.version_tuple("0.2.0-29.1") == (0, 2, 0, 29, 1)
     assert wizard.parse_node_selector("kubernetes.io/os=linux,workload=audio") == {
         "kubernetes.io/os": "linux",
         "workload": "audio",
@@ -56,6 +56,8 @@ def test_wizard_generates_custom_kustomize_manifests(tmp_path):
             "mta-example-tls",
             "--max-upload-mb",
             "175",
+            "--image-pull-policy",
+            "Always",
             "--output-dir",
             str(output),
             "--config",
@@ -72,6 +74,11 @@ def test_wizard_generates_custom_kustomize_manifests(tmp_path):
     assert "namespace: audio-tools" in deployment
     assert "workload: \"audio\"" in deployment
     assert 'value: "175"' in deployment
+    assert "imagePullPolicy: Always" in deployment
+    assert "fsGroup: 10001" in deployment
+    assert "fsGroupChangePolicy: OnRootMismatch" in deployment
+    assert "startupProbe:" in deployment
+    assert "optional: true" in deployment
     ingress = (output / "ingress.yaml").read_text()
     assert "ingressClassName: haproxy" in ingress
     assert "kubernetes.io/ingress.class: haproxy" in ingress
@@ -98,7 +105,7 @@ def test_haproxy_tls_without_specific_secret(tmp_path):
         "ingress_host": "mta-default.example.test",
         "tls_termination": True,
         "tls_secret": "",
-        "image": "desalvo/mta-audio-editor:0.2.0-27",
+        "image": "desalvo/mta-audio-editor:0.2.0-29",
     }
     wizard.write_manifests(output, values)
     ingress = (output / "ingress.yaml").read_text()
@@ -123,7 +130,7 @@ def test_haproxy_without_tls_has_no_tls_section_or_ssl_redirect(tmp_path):
         "ingress_host": "mta-http.example.test",
         "tls_termination": False,
         "tls_secret": "",
-        "image": "desalvo/mta-audio-editor:0.2.0-27",
+        "image": "desalvo/mta-audio-editor:0.2.0-29",
     }
     wizard.write_manifests(output, values)
     ingress = (output / "ingress.yaml").read_text()

@@ -1,6 +1,6 @@
 # MTA Audio Editor - project architecture
 
-Version: 0.2.0-27
+Version: 0.2.0-29
 
 ## Purpose
 

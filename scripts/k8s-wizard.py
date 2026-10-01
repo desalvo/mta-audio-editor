@@ -13,8 +13,8 @@ import tempfile
 import urllib.request
 from pathlib import Path
 
-WIZARD_VERSION = "0.2.0-27.1"
-APP_VERSION = "0.2.0-27"
+WIZARD_VERSION = "0.2.0-29.1"
+APP_VERSION = "0.2.0-29"
 RAW_URL = "https://raw.githubusercontent.com/desalvo/mta-audio-editor/main/scripts/k8s-wizard.py"
 DEFAULT_CONFIG = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")) / "mta-audio-editor" / "k8s-wizard.json"
 
@@ -135,6 +135,7 @@ def write_manifests(out: Path, values: dict) -> None:
     storage = values["storage_class"]
     selector = parse_node_selector(values["node_selector"])
     image = values.get("image", f"desalvo/mta-audio-editor:{APP_VERSION}")
+    image_pull_policy = values.get("image_pull_policy", "IfNotPresent")
     ingress = values.get("ingress", "none")
     host = values.get("ingress_host", "mta-audio-editor.example.com")
     tls_termination = bool(values.get("tls_termination", False))
@@ -177,10 +178,12 @@ spec:
       securityContext:
         seccompProfile:
           type: RuntimeDefault
+        fsGroup: 10001
+        fsGroupChangePolicy: OnRootMismatch
 {indent_selector(selector, 6)}      containers:
         - name: mta-audio-editor
           image: {image}
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: {image_pull_policy}
           ports:
             - containerPort: 8080
               name: http
@@ -200,6 +203,7 @@ spec:
                 secretKeyRef:
                   name: mta-audio-editor-auth
                   key: email
+                  optional: true
             - name: MTA_MAX_UPLOAD_MB
               value: "{max_upload_mb}"
           resources:
@@ -216,10 +220,16 @@ spec:
           volumeMounts:
             - {{name: data, mountPath: /data/projects}}
             - {{name: tmp, mountPath: /tmp}}
+          startupProbe:
+            httpGet: {{path: /api/health, port: http}}
+            periodSeconds: 2
+            timeoutSeconds: 2
+            failureThreshold: 60
           readinessProbe:
             httpGet: {{path: /api/health, port: http}}
-            initialDelaySeconds: 3
-            periodSeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 6
           livenessProbe:
             httpGet: {{path: /api/health, port: http}}
             initialDelaySeconds: 10
@@ -321,6 +331,11 @@ def main() -> int:
         help="Secret Kubernetes TLS da usare; stringa vuota = certificato/default TLS dell'Ingress Controller",
     )
     parser.add_argument("--image")
+    parser.add_argument(
+        "--image-pull-policy",
+        choices=["Always", "IfNotPresent", "Never"],
+        help="Kubernetes imagePullPolicy (default IfNotPresent)",
+    )
     parser.add_argument("--max-upload-mb", type=int, help="Dimensione massima upload in MB (default 150)")
     parser.add_argument("--output-dir", default="mta-audio-editor-k8s")
     parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
@@ -345,6 +360,7 @@ def main() -> int:
         "tls_termination": bool(previous.get("tls_termination", False)),
         "tls_secret": previous.get("tls_secret", ""),
         "image": previous.get("image", f"desalvo/mta-audio-editor:{APP_VERSION}"),
+        "image_pull_policy": previous.get("image_pull_policy", "IfNotPresent"),
         "max_upload_mb": int(previous.get("max_upload_mb", 150)),
     }
     supplied = {
@@ -359,6 +375,7 @@ def main() -> int:
         "tls_termination": args.tls_termination,
         "tls_secret": args.tls_secret,
         "image": args.image,
+        "image_pull_policy": args.image_pull_policy,
         "max_upload_mb": args.max_upload_mb,
     }
     if args.non_interactive:
@@ -406,6 +423,10 @@ def main() -> int:
             "tls_termination": tls_termination_value,
             "tls_secret": tls_secret_value,
             "image": args.image or prompt("Immagine container", defaults["image"]),
+            "image_pull_policy": args.image_pull_policy or prompt(
+                "imagePullPolicy (Always/IfNotPresent/Never)",
+                defaults["image_pull_policy"],
+            ),
             "max_upload_mb": args.max_upload_mb if args.max_upload_mb is not None else int(prompt("Dimensione massima upload (MB)", str(defaults["max_upload_mb"]))),
         }
     if not values["admin_username"] or not values["admin_password"] or not values["admin_email"]:
@@ -414,6 +435,8 @@ def main() -> int:
         parser.error("email amministratore non valida")
     if values["ingress"] not in {"none", "nginx", "haproxy"}:
         parser.error("ingress deve essere none, nginx o haproxy")
+    if values["image_pull_policy"] not in {"Always", "IfNotPresent", "Never"}:
+        parser.error("imagePullPolicy deve essere Always, IfNotPresent o Never")
     try:
         values["max_upload_mb"] = int(values["max_upload_mb"])
     except (TypeError, ValueError):

@@ -19,11 +19,13 @@ spec:
       securityContext:
         seccompProfile:
           type: RuntimeDefault
+        fsGroup: 10001
+        fsGroupChangePolicy: OnRootMismatch
       # nodeSelector:
       #   kubernetes.io/hostname: worker-01
       containers:
         - name: mta-audio-editor
-          image: desalvo/mta-audio-editor:0.2.0-27
+          image: desalvo/mta-audio-editor:0.2.0-29
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
@@ -44,6 +46,7 @@ spec:
                 secretKeyRef:
                   name: mta-audio-editor-auth
                   key: email
+                  optional: true
             - name: MTA_MAX_UPLOAD_MB
               value: "150"
           resources:
@@ -66,12 +69,20 @@ spec:
               mountPath: /data/projects
             - name: tmp
               mountPath: /tmp
+          startupProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            periodSeconds: 2
+            timeoutSeconds: 2
+            failureThreshold: 60
           readinessProbe:
             httpGet:
               path: /api/health
               port: http
-            initialDelaySeconds: 3
-            periodSeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 6
           livenessProbe:
             httpGet:
               path: /api/health
