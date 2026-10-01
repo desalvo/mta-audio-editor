@@ -122,6 +122,8 @@ class MtaExportRequest(BaseModel):
 
 class Project(BaseModel):
     id: str
+    owner_user_id: int | None = Field(default=None, ge=1)
+    shared_with_user_ids: list[int] = Field(default_factory=list)
     title: str = Field(max_length=200)
     artist: str = Field(default="", max_length=200)
     bpm: float = Field(default=120.0, gt=0, le=500)
@@ -137,6 +139,11 @@ class Project(BaseModel):
     auto_mix_enabled: bool = False
     auto_mix_style: Literal["balanced", "live", "studio", "gentle"] = "balanced"
     auto_mix_snapshot: AutoMixSnapshot | None = None
+
+    @field_validator("shared_with_user_ids")
+    @classmethod
+    def unique_shared_users(cls, values: list[int]) -> list[int]:
+        return sorted(set(values))
 
     @field_validator("preserved_attachments")
     @classmethod

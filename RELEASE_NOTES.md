@@ -1,20 +1,27 @@
-## 0.2.0-22
 
-- Fixed GitHub Actions dependency auditing for the PyTorch `2.14.1+cpu` local wheel by auditing its canonical upstream `2.14.1` release while keeping CPU-only runtime installation.
+## 0.2.0-24
 
-# MTA Audio Editor 0.2.0-22
+- Workspace dedicato per utente con proprietà dei progetti e visibilità dei soli progetti propri/condivisi.
+- Condivisione progetto verso altri utenti attivi e confermati; i collaboratori possono modificare, mentre gestione condivisioni ed eliminazione restano al proprietario/admin.
+- Gestione file progetto con elenco, download, upload di file originali aggiuntivi e cancellazione sicura dei file non referenziati.
+- Conservazione automatica degli upload originali in `originals/`, inclusi audio importati, sostituzioni, sorgenti MTA e input MP3 dello stem splitter.
+- Export/import completo di un progetto tramite archivio `.mta-project.zip`, con riassegnazione al nuovo proprietario e reset delle condivisioni all'import.
+- Dump amministrativo completo di tutti i progetti di tutti gli utenti, organizzato per proprietario e comprensivo dei file originari.
+- Limite upload predefinito portato a 150 MB; wizard Kubernetes configurabile con `--max-upload-mb` e annotazioni Ingress NGINX/HAProxy coerenti.
+- Overlay Kubernetes e Docker Compose aggiornati al nuovo limite.
+- Migrazione automatica dei progetti legacy senza proprietario verso il primo amministratore persistente che apre il workspace.
 
-## GitHub Actions / container security fix
+# MTA Audio Editor 0.2.0-24
 
-This release fixes the remaining production-image gate failure reported by Trivy by converging vulnerable transitive packages to fixed versions and asserting the resulting in-image versions before the scan.
+## Multi-user authentication and administration
 
-## Matroska cluster transport reverse-engineering
+This release replaces the browser-facing single-admin login flow with application-managed users and a responsive photographic login faithful to the approved visual concept. Users can self-register, must confirm a mandatory email address, and remain inactive until approved by an administrator. Administrators can manage users and roles, while safeguards prevent accidental removal of the final active administrator.
 
-- Adds conservative parsing of canonical Matroska `SeekHead` and `Cues` around the proprietary media region.
-- Confirms that the advertised first Cluster boundary points to `0f b2 f7 b0`, not `1f 43 b6 75`, on all four Library-backed corpus files checked in this pass.
-- Records successive cue-defined media boundaries and cluster-span statistics without claiming a decryption algorithm.
-- Documents cross-file deterministic behavior: the 14-track Michael Jackson and Earth Wind & Fire samples have matching relative cluster spacing and identical first 16 bytes at corresponding early cue boundaries when media regions are aligned.
-- Keeps all prior 0.2.0-13 Python 3.14, Kubernetes/Kustomize and standalone wizard work unchanged.
+Users can optionally enable TOTP from their profile. MTA Audio Editor generates the TOTP secret and QR code internally. Administrators can configure SMTP, STARTTLS or SMTPS with optional credentials, test connectivity, and use the mail service for address verification and activation notifications. All active administrators with confirmed email addresses are notified when an account is activated.
+
+Authentication state is persisted on the application data volume, browser sessions use HttpOnly/SameSite cookies, and password/email changes invalidate or re-gate access as appropriate. Docker Compose and the Kubernetes manifest wizard now include the bootstrap administrator email.
+
+The release also retains the current Python 3.14 / Debian Trixie container baseline, CPU-only PyTorch multiarch strategy, GitHub Actions security gates, Kubernetes HAProxy TLS behavior, and accumulated MTA reverse-engineering work.
 
 # MTA Audio Editor 0.2.0-13
 
@@ -43,6 +50,6 @@ A new `scripts/k8s-wizard.py` is downloadable directly from the GitHub raw URL a
 
 The generated `secret.yaml` contains local credentials and must not be committed. Use `--no-save-password` when password persistence is not wanted.
 
-### 0.2.0-22
+### 0.2.0-24
 
 The standalone Kubernetes wizard now emits the legacy-compatible HAProxy ingress annotation `kubernetes.io/ingress.class: haproxy` every time HAProxy ingress is selected, while retaining the Kubernetes v1 `ingressClassName` field. Reverse-engineering documentation also includes the latest Cluster transport evidence.

@@ -3,15 +3,16 @@ services:
     build:
       context: .
       args:
-        APP_VERSION: "0.2.0-22"
+        APP_VERSION: "0.2.0-24"
         BUILD_ID: "${BUILD_ID:-local}"
-    image: desalvo/mta-audio-editor:0.2.0-22
+    image: desalvo/mta-audio-editor:0.2.0-24
     ports:
       - "8080:8080"
     environment:
       MTA_ADMIN_USERNAME: "${MTA_ADMIN_USERNAME:-admin}"
       MTA_ADMIN_PASSWORD: "${MTA_ADMIN_PASSWORD:?set MTA_ADMIN_PASSWORD}"
-      MTA_MAX_UPLOAD_MB: "${MTA_MAX_UPLOAD_MB:-512}"
+      MTA_ADMIN_EMAIL: "${MTA_ADMIN_EMAIL:?set MTA_ADMIN_EMAIL}"
+      MTA_MAX_UPLOAD_MB: "${MTA_MAX_UPLOAD_MB:-150}"
     volumes:
       - mta-data:/data/projects
     read_only: true

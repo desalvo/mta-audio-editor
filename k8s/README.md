@@ -14,7 +14,8 @@ Create the auth Secret before applying the base, or use the standalone wizard.
 kubectl create namespace mta-audio-editor --dry-run=client -o yaml | kubectl apply -f -
 kubectl -n mta-audio-editor create secret generic mta-audio-editor-auth \
   --from-literal=username=admin \
-  --from-literal=password='CHANGE-ME'
+  --from-literal=password='CHANGE-ME' \
+  --from-literal=email='admin@example.com'
 kubectl apply -k k8s/base
 ```
 
@@ -33,4 +34,15 @@ curl -fsSLo mta-k8s-wizard.py \
 python3 mta-k8s-wizard.py
 ```
 
-The wizard is standard-library only, checks GitHub for a newer wizard version at startup, atomically updates its own file when appropriate, and automatically restarts itself after an update. It remembers the last username, StorageClass, namespace, nodeSelector, ingress selection and image. The password is also remembered by default in a local config file with mode `0600`; use `--no-save-password` if that is not desired.
+The wizard is standard-library only, checks GitHub for a newer wizard version at startup, atomically updates its own file when appropriate, and automatically restarts itself after an update. It remembers the last username, admin email, StorageClass, namespace, nodeSelector, ingress/TLS selection and image. The password is also remembered by default in a local config file with mode `0600`; use `--no-save-password` if that is not desired.
+
+
+## Upload size
+
+Il limite predefinito è **150 MB**. Il wizard imposta lo stesso valore in `MTA_MAX_UPLOAD_MB` e nell'annotazione dell'Ingress selezionato (`nginx.ingress.kubernetes.io/proxy-body-size` oppure `haproxy-ingress.github.io/proxy-body-size`). Per modificarlo:
+
+```bash
+python3 mta-k8s-wizard.py --max-upload-mb 300
+```
+
+In modalità interattiva il wizard chiede il valore e lo salva tra le opzioni riutilizzabili.

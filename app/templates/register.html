@@ -1,0 +1,9 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Registrazione · MTA Audio Editor</title><link rel="icon" href="/static/logo.svg"><link rel="stylesheet" href="/static/auth.css"></head>
+<body class="auth-body"><div class="auth-photo"></div><div class="auth-overlay"></div><main class="single-auth"><section class="login-card glass compact"><img src="/static/logo.svg" class="login-logo" alt=""><h1>Crea un account</h1><p class="lead">Conferma la tua email; poi un amministratore dovrà approvare l'account.</p>__ERROR__
+<form method="post" action="/register" class="auth-form">
+<label>Nome visualizzato<input name="display_name" maxlength="120" autocomplete="name"></label>
+<label>Username<input name="username" minlength="3" maxlength="64" required autocomplete="username"></label>
+<label>Email<input name="email" type="email" required autocomplete="email"></label>
+<label>Password<input name="password" type="password" minlength="10" required autocomplete="new-password"></label>
+<label>Conferma password<input name="password2" type="password" minlength="10" required autocomplete="new-password"></label>
+<button class="primary" type="submit">Registrati</button></form><div class="auth-link-row">Hai già un account? <a href="/login">Accedi</a></div></section></main></body></html>

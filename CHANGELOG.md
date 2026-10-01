@@ -1,17 +1,14 @@
-## 0.2.0-22
+## 0.2.0-24
 
-- Fixed GitHub Actions dependency auditing for the PyTorch `2.14.1+cpu` local wheel by auditing its canonical upstream `2.14.1` release while keeping CPU-only runtime installation.
-
-## 0.2.0-22
-
-- Fix GitHub Actions container production gate after Trivy reported stale/vulnerable Python package metadata.
-- Force-converge `setuptools 84.0.0`, `wheel 0.48.0`, `urllib3 2.8.0`, and `msgpack 1.2.1` after optional stem dependencies.
-- Add in-image version assertions and a CI diagnostic gate before Trivy.
-- Preserve the MTA Cluster reverse-engineering additions from 0.2.0-14.
-
-- Added `inspect_cluster_transport()` to anchor reverse engineering on SeekHead/Cues rather than scanning the obfuscated media region as EBML.
-- Added synthetic regression coverage for non-canonical Cluster transport.
-- Expanded MTA format research notes to the accumulated six-file corpus.
+- Added full multi-user authentication with a responsive photographic login based on the approved mockup.
+- Added self-registration with mandatory email confirmation and administrator approval before activation.
+- Added `admin`/`user` roles, admin-only user management, activation/deactivation, role changes and deletion safeguards that preserve at least one active administrator.
+- Added optional RFC 6238 TOTP with in-app secret generation and QR-code enrollment.
+- Added user profile management, email-change reverification/reapproval, password change and email password reset.
+- Added SMTP/STARTTLS/SMTPS configuration with optional credentials, connection test, confirmation mail and activation notifications to all active administrators with confirmed email addresses.
+- Added persistent SQLite authentication/session data on the application volume and HttpOnly/SameSite application sessions while keeping HTTP Basic only for operational compatibility.
+- Updated Docker Compose and Kubernetes bootstrap configuration to include the administrator email.
+- Preserved the previous Python 3.14/Trixie, CPU-only PyTorch, CI security, Kubernetes TLS and MTA reverse-engineering work.
 
 # Changelog
 
@@ -103,7 +100,7 @@
 
 - Initial FastAPI/FFmpeg MTA8/MTA16 web editor prototype.
 
-## 0.2.0-22
+## 0.2.0-24
 
 - Kubernetes wizard: HAProxy ingress now always emits `kubernetes.io/ingress.class: haproxy` in addition to `spec.ingressClassName: haproxy`.
 - Reverse-engineering notes: confirmed the 181392 ns Matroska timecode scale, 40 MP3 frames per Cue interval, exact 320 kbit/s frame/SimpleBlock sizing, and frame-major per-track interleaving evidence.

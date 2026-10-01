@@ -21,7 +21,7 @@
     <div class="timebox"><strong id="transportTime">00:00.000</strong><span><b id="transportBpm">120</b> BPM &nbsp;&nbsp; 4/4</span></div>
     <div class="top-spacer"></div>
     <div class="zoom-top"><span>Zoom</span><input id="topZoom" type="range" min="25" max="240" value="70" oninput="setZoom(this.value)"></div>
-    <div class="header-actions"><button onclick="save()">▣ Save</button><button class="accent" onclick="openExportPanel()">⇧ Export</button><button class="more">⋮</button></div>
+    <div class="header-actions"><a class="header-link" href="/account" title="Profilo">👤 Account</a><a id="adminNav" class="header-link" href="/admin/users" hidden>⚙ Admin</a><button onclick="save()">▣ Save</button><button class="accent" onclick="openExportPanel()">⇧ Export</button><a class="header-link logout" href="/logout">Esci</a></div>
   </header>
 
   <div class="workspace">
@@ -39,6 +39,10 @@
         <button class="nav-item">⚑ <span>Markers</span></button>
         <div class="nav-sep"></div>
         <button class="nav-item" onclick="openExportPanel()">⇧ <span>Export</span></button>
+        <button class="nav-item" onclick="exportProjectArchive()">⬇ <span>Export project</span></button>
+        <label class="nav-item">⬆ <span>Import project</span><input id="projectArchiveFile" type="file" accept=".zip,.mta-project.zip" hidden></label>
+        <button class="nav-item" onclick="manageProjectFiles()">▣ <span>Project files</span></button>
+        <button class="nav-item" onclick="manageProjectSharing()">⌘ <span>Share project</span></button>
         <a class="nav-item" href="/docs/user" target="_blank">? <span>Docs &amp; Help</span></a>
       </nav>
       <div class="sidebar-projects"><div class="side-title">PROJECTS</div><div id="projects"></div><button class="new-project" onclick="newProject()">＋ New project</button></div>
@@ -54,6 +58,12 @@
   </div>
 </div>
 <div id="toast"></div>
+<div id="utilityBackdrop" class="utility-backdrop hidden" onclick="if(event.target===this)closeUtilityModal()">
+  <div class="utility-modal">
+    <div class="utility-head"><h3 id="utilityTitle">Project</h3><button onclick="closeUtilityModal()">×</button></div>
+    <div id="utilityBody" class="utility-body"></div>
+  </div>
+</div>
 <input id="stemFileHidden" type="file" accept=".mp3,audio/mpeg" hidden>
 <script src="/static/app.js"></script>
 </body>

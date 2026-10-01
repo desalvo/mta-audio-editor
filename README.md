@@ -1,4 +1,4 @@
-# MTA Audio Editor 0.2.0-22
+# MTA Audio Editor 0.2.0-24
 
 ![MTA Audio Editor](app/static/logo.svg)
 
@@ -9,7 +9,7 @@ Web DAW containerizzata per creare, importare, modificare ed esportare progetti 
 **Creatore:** Alessandro De Salvo <braket71@gmail.com>  
 **Repository:** `desalvo/mta-audio-editor`  
 **Licenza:** EUPL-1.2  
-**Versione:** `0.2.0-22`  
+**Versione:** `0.2.0-24`  
 **Build:** generato automaticamente nel formato `YYYYMMDD-HH:MM:SS`.
 
 ## Funzioni principali
@@ -34,16 +34,50 @@ Web DAW containerizzata per creare, importare, modificare ed esportare progetti 
 - estrazione read-only del MIDITK proprietario come file MIDI standard scaricabile dal progetto;
 - documentazione utente e amministratore integrata e scaricabile in PDF.
 
+
+## Gestione utenti e autenticazione
+
+L'applicazione usa autenticazione multi-utente persistente su SQLite nel volume `/data/projects`. La schermata iniziale di login riprende fedelmente il mockup approvato, con layout fotografico/glassmorphism e variante responsive per smartphone.
+
+- registrazione autonoma con **email obbligatoria**;
+- conferma email tramite link prima di qualunque attivazione;
+- approvazione/disattivazione degli account riservata agli amministratori;
+- ruoli `admin` e `user`;
+- TOTP opzionale RFC 6238 attivabile dal profilo, con QR code generato internamente;
+- cambio email con nuova conferma e nuova approvazione;
+- cambio/reset password;
+- gestione SMTP/STARTTLS/SMTPS dal pannello amministrativo, con credenziali opzionali;
+- password SMTP cifrata sul volume tramite chiave applicativa locale;
+- notifica email a tutti gli amministratori con email confermata quando un utente viene attivato.
+
+Al **primo avvio** devono essere definiti `MTA_ADMIN_USERNAME`, `MTA_ADMIN_PASSWORD` e `MTA_ADMIN_EMAIL`; questi valori creano il primo account amministratore. Per i link email dietro reverse proxy è raccomandato `MTA_PUBLIC_URL=https://mta.example.com`.
+
 ## Avvio Docker
 
 ```bash
 export MTA_ADMIN_PASSWORD='una-password-lunga-e-casuale'
+export MTA_ADMIN_EMAIL='admin@example.com'
 docker compose up -d --build
 ```
 
 La build production include per default il plugin Demucs. Per un’immagine core più piccola senza stem separation: `docker build --build-arg INSTALL_STEMS=false .`.
 
-Aprire `http://localhost:8080`. L'autenticazione è abilitata per default; l'utente predefinito è `admin`, ma **non esiste una password predefinita**.
+Aprire `http://localhost:8080`. L'autenticazione è abilitata per default. Al primo avvio l'account bootstrap viene creato solo se sono presenti password ed email amministrative; **non esistono credenziali predefinite**.
+
+
+## Workspace utenti, condivisione e archivi completi
+
+Ogni utente vede un workspace dedicato contenente i progetti di cui è proprietario e quelli condivisi con lui. Il proprietario può condividere un progetto con un altro account attivo e con email confermata; il collaboratore può aprire e modificare il progetto, mentre condivisioni ed eliminazione del progetto restano riservate al proprietario (o a un amministratore).
+
+Per ogni progetto è disponibile una gestione file con elenco, download, upload di file originali aggiuntivi e cancellazione dei file non referenziati. Gli upload audio e i file MTA importati vengono conservati anche nella directory `originals/` del progetto, così i dump contengono sia lo stato corrente sia i file originari.
+
+È possibile:
+- esportare un intero progetto come archivio `.mta-project.zip`;
+- importare un archivio progetto completo, che viene assegnato all'utente che lo importa;
+- esportare/importare normalmente MTA, audio e singole tracce;
+- come amministratore, scaricare un dump ZIP di tutti i progetti di tutti gli utenti tramite il pannello utenti.
+
+Gli archivi completi includono `project.json`, audio, attachment, sorgente MTA, file originali e gli altri artefatti presenti nel progetto.
 
 ## Kubernetes / Kustomize
 
@@ -62,7 +96,7 @@ curl -fsSLo mta-k8s-wizard.py \
 python3 mta-k8s-wizard.py
 ```
 
-Il wizard propone prima i default e nei run successivi gli ultimi valori usati. Richiede username/password amministrativi, StorageClass del PVC, namespace e `nodeSelector`; consente inoltre di scegliere Ingress NGINX/HAProxy/nessuno, host e immagine. La configurazione locale usa permessi `0600`; usare `--no-save-password` per non persistere la password. Se trova una versione del wizard più nuova su GitHub aggiorna atomicamente il proprio file e si riavvia automaticamente.
+Il wizard propone prima i default e nei run successivi gli ultimi valori usati. Il limite di upload predefinito è **150 MB** ed è applicato sia all'applicazione sia alle annotazioni Ingress; può essere modificato interattivamente o con `--max-upload-mb <MB>`. Richiede username/password amministrativi, StorageClass del PVC, namespace e `nodeSelector`; consente inoltre di scegliere Ingress NGINX/HAProxy/nessuno, host e immagine. La configurazione locale usa permessi `0600`; usare `--no-save-password` per non persistere la password. Se trova una versione del wizard più nuova su GitHub aggiorna atomicamente il proprio file e si riavvia automaticamente.
 
 ## Documentazione
 
@@ -109,15 +143,15 @@ git init
 git branch -M main
 git remote add origin https://github.com/desalvo/mta-audio-editor.git
 git add .
-git commit -m "Release 0.2.0-22"
+git commit -m "Release 0.2.0-24"
 git push -u origin main
 ```
 
 Dopo che la CI su `main` è verde, creare il tag:
 
 ```bash
-git tag -s 0.2.0-22 -m "MTA Audio Editor 0.2.0-22"
-git push origin 0.2.0-22
+git tag -s 0.2.0-24 -m "MTA Audio Editor 0.2.0-24"
+git push origin 0.2.0-24
 ```
 
 ## Packaging locale
@@ -175,3 +209,9 @@ The 0.2.x Python 3.14 baseline pins Pydantic 2.12.5 for deterministic CPython 3.
 ### Kubernetes wizard: TLS termination
 
 The manifest wizard supports TLS termination for NGINX and HAProxy Ingress. With HAProxy and TLS termination enabled it emits `haproxy-ingress.github.io/ssl-redirect: "true"`. When TLS termination is enabled, a `tls:` section is always generated: specify `--tls-secret <name>` to reference a Kubernetes TLS Secret, or leave it empty to use the Ingress Controller's default TLS certificate/secret.
+
+## Multi-user authentication
+
+MTA Audio Editor now uses application-managed users and a photographic, responsive login page. Self-registration requires a unique username, a mandatory email address and a password of at least 10 characters. The email must be confirmed before an administrator can activate the account. Only administrators can activate/deactivate users, change roles or delete other users.
+
+The first administrator can be bootstrapped with `MTA_ADMIN_USERNAME`, `MTA_ADMIN_PASSWORD` and `MTA_ADMIN_EMAIL`. Each user can optionally enable TOTP from the profile page; the application generates the secret and an in-app QR code compatible with standard authenticator apps. SMTP/SMTPS/STARTTLS configuration is available to administrators under **Administration → SMTP / SMTPS** and is used for email confirmation plus activation notifications. When an account is activated, all active administrators with a confirmed email address receive a notification. Set `MTA_PUBLIC_URL` when the externally reachable application URL cannot be inferred from the incoming request/proxy.

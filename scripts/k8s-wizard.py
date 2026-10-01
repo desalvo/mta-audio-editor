@@ -13,8 +13,8 @@ import tempfile
 import urllib.request
 from pathlib import Path
 
-WIZARD_VERSION = "0.2.0-22.1"
-APP_VERSION = "0.2.0-22"
+WIZARD_VERSION = "0.2.0-24.1"
+APP_VERSION = "0.2.0-24"
 RAW_URL = "https://raw.githubusercontent.com/desalvo/mta-audio-editor/main/scripts/k8s-wizard.py"
 DEFAULT_CONFIG = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")) / "mta-audio-editor" / "k8s-wizard.json"
 
@@ -139,6 +139,7 @@ def write_manifests(out: Path, values: dict) -> None:
     host = values.get("ingress_host", "mta-audio-editor.example.com")
     tls_termination = bool(values.get("tls_termination", False))
     tls_secret = str(values.get("tls_secret", "")).strip()
+    max_upload_mb = int(values.get("max_upload_mb", 150))
 
     (out / "namespace.yaml").write_text(f"apiVersion: v1\nkind: Namespace\nmetadata:\n  name: {ns}\n")
     sc_line = f"  storageClassName: {yq(storage)}\n" if storage else ""
@@ -150,7 +151,7 @@ def write_manifests(out: Path, values: dict) -> None:
     secret = (
         "apiVersion: v1\nkind: Secret\nmetadata:\n"
         f"  name: mta-audio-editor-auth\n  namespace: {ns}\ntype: Opaque\nstringData:\n"
-        f"  username: {yq(values['admin_username'])}\n  password: {yq(values['admin_password'])}\n"
+        f"  username: {yq(values['admin_username'])}\n  password: {yq(values['admin_password'])}\n  email: {yq(values['admin_email'])}\n"
     )
     (out / "secret.yaml").write_text(secret)
     os.chmod(out / "secret.yaml", 0o600)
@@ -194,8 +195,13 @@ spec:
                 secretKeyRef:
                   name: mta-audio-editor-auth
                   key: password
+            - name: MTA_ADMIN_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: mta-audio-editor-auth
+                  key: email
             - name: MTA_MAX_UPLOAD_MB
-              value: "512"
+              value: "{max_upload_mb}"
           resources:
             requests: {{cpu: 250m, memory: 1Gi}}
             limits: {{cpu: "4", memory: 8Gi}}
@@ -243,11 +249,11 @@ spec:
     resources = ["namespace.yaml", "pvc.yaml", "secret.yaml", "deployment.yaml", "service.yaml"]
     if ingress in {"nginx", "haproxy"}:
         if ingress == "nginx":
-            annotation = '    nginx.ingress.kubernetes.io/proxy-body-size: "512m"\n'
+            annotation = f'    nginx.ingress.kubernetes.io/proxy-body-size: "{max_upload_mb}m"\n'
         else:
             annotation = (
                 '    kubernetes.io/ingress.class: haproxy\n'
-                '    haproxy-ingress.github.io/proxy-body-size: "512m"\n'
+                f'    haproxy-ingress.github.io/proxy-body-size: "{max_upload_mb}m"\n'
             )
             if tls_termination:
                 annotation += '    haproxy-ingress.github.io/ssl-redirect: "true"\n'
@@ -299,6 +305,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="MTA Audio Editor Kubernetes manifest wizard")
     parser.add_argument("--admin-username")
     parser.add_argument("--admin-password")
+    parser.add_argument("--admin-email")
     parser.add_argument("--storage-class")
     parser.add_argument("--namespace")
     parser.add_argument("--node-selector")
@@ -314,6 +321,7 @@ def main() -> int:
         help="Secret Kubernetes TLS da usare; stringa vuota = certificato/default TLS dell'Ingress Controller",
     )
     parser.add_argument("--image")
+    parser.add_argument("--max-upload-mb", type=int, help="Dimensione massima upload in MB (default 150)")
     parser.add_argument("--output-dir", default="mta-audio-editor-k8s")
     parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
     parser.add_argument("--no-save", action="store_true")
@@ -328,6 +336,7 @@ def main() -> int:
     defaults = {
         "admin_username": previous.get("admin_username", "admin"),
         "admin_password": previous.get("admin_password", ""),
+        "admin_email": previous.get("admin_email", ""),
         "storage_class": previous.get("storage_class", ""),
         "namespace": previous.get("namespace", "mta-audio-editor"),
         "node_selector": previous.get("node_selector", ""),
@@ -336,10 +345,12 @@ def main() -> int:
         "tls_termination": bool(previous.get("tls_termination", False)),
         "tls_secret": previous.get("tls_secret", ""),
         "image": previous.get("image", f"desalvo/mta-audio-editor:{APP_VERSION}"),
+        "max_upload_mb": int(previous.get("max_upload_mb", 150)),
     }
     supplied = {
         "admin_username": args.admin_username,
         "admin_password": args.admin_password,
+        "admin_email": args.admin_email,
         "storage_class": args.storage_class,
         "namespace": args.namespace,
         "node_selector": args.node_selector,
@@ -348,6 +359,7 @@ def main() -> int:
         "tls_termination": args.tls_termination,
         "tls_secret": args.tls_secret,
         "image": args.image,
+        "max_upload_mb": args.max_upload_mb,
     }
     if args.non_interactive:
         values = {key: (supplied[key] if supplied[key] is not None else defaults[key]) for key in defaults}
@@ -385,6 +397,7 @@ def main() -> int:
         values = {
             "admin_username": args.admin_username or prompt("Username amministratore", defaults["admin_username"]),
             "admin_password": args.admin_password or prompt("Password amministratore", defaults["admin_password"], secret=True),
+            "admin_email": args.admin_email or prompt("Email amministratore", defaults["admin_email"]),
             "storage_class": args.storage_class if args.storage_class is not None else prompt("StorageClass PVC (vuoto = default cluster)", defaults["storage_class"]),
             "namespace": args.namespace or prompt("Namespace", defaults["namespace"]),
             "node_selector": args.node_selector if args.node_selector is not None else prompt("nodeSelector (key=value,key2=value2; vuoto = nessuno)", defaults["node_selector"]),
@@ -393,11 +406,20 @@ def main() -> int:
             "tls_termination": tls_termination_value,
             "tls_secret": tls_secret_value,
             "image": args.image or prompt("Immagine container", defaults["image"]),
+            "max_upload_mb": args.max_upload_mb if args.max_upload_mb is not None else int(prompt("Dimensione massima upload (MB)", str(defaults["max_upload_mb"]))),
         }
-    if not values["admin_username"] or not values["admin_password"]:
-        parser.error("username e password amministratore sono obbligatori")
+    if not values["admin_username"] or not values["admin_password"] or not values["admin_email"]:
+        parser.error("username, password ed email amministratore sono obbligatori")
+    if "@" not in values["admin_email"]:
+        parser.error("email amministratore non valida")
     if values["ingress"] not in {"none", "nginx", "haproxy"}:
         parser.error("ingress deve essere none, nginx o haproxy")
+    try:
+        values["max_upload_mb"] = int(values["max_upload_mb"])
+    except (TypeError, ValueError):
+        parser.error("max-upload-mb deve essere un numero intero")
+    if not 1 <= values["max_upload_mb"] <= 10240:
+        parser.error("max-upload-mb deve essere compreso tra 1 e 10240")
     if values["ingress"] == "none":
         values["tls_termination"] = False
         values["tls_secret"] = ""

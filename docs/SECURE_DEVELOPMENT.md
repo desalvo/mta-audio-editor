@@ -4,8 +4,8 @@ MTA Audio Editor adotta una baseline **defense in depth** ispirata alle pratiche
 
 | Area | Controllo implementato |
 |---|---|
-| Access control | HTTP Basic default-on; nessuna password predefinita; manuale amministratore protetto. |
-| Request integrity | Richieste che modificano dati richiedono `X-MTA-Request: 1`, riducendo il rischio CSRF con credenziali Basic memorizzate dal browser. |
+| Access control | Sessioni HttpOnly multi-utente, ruoli admin/user, conferma email, approvazione amministrativa e TOTP opzionale; HTTP Basic solo per compatibilità operativa. |
+| Request integrity | Le API mutative richiedono `X-MTA-Request: 1`; le sessioni usano cookie HttpOnly/SameSite e le pagine pubbliche di login/registrazione non riusano automaticamente credenziali HTTP. |
 | Path confinement | Project ID, filename audio e attachment validati e confinati nel project root. |
 | Input handling | Limiti upload, limiti Pydantic, FFprobe di validazione, track-count enforcement. |
 | Security headers | CSP, nosniff, frame deny, no-referrer, Permissions-Policy e cache-control API. |
@@ -14,7 +14,7 @@ MTA Audio Editor adotta una baseline **defense in depth** ispirata alle pratiche
 | SAST / secret scanning | Bandit, CodeQL e Gitleaks. |
 | Testing | pytest + branch coverage con gate minimo 70%; smoke test container. |
 | Runtime isolation | UID/GID 10001, read-only root filesystem, capability drop, no privilege escalation, seccomp RuntimeDefault, service-account token disabilitato. |
-| Secrets | Password solo da env/Secret; nessun secret reale incluso nel repository. |
+| Secrets | Bootstrap admin da env/Secret; credenziali SMTP opzionali salvate nel volume con protezione applicativa e mai restituite dalle API; nessun secret reale incluso nel repository. |
 | Error handling | Risposte controllate senza stack trace o output FFmpeg dettagliato verso il client. |
 
 ## Threat model sintetico

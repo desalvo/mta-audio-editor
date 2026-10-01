@@ -4,7 +4,7 @@ metadata:
   name: mta-audio-editor
   namespace: mta-audio-editor
   annotations:
-    nginx.ingress.kubernetes.io/proxy-body-size: "512m"
+    nginx.ingress.kubernetes.io/proxy-body-size: "150m"
 spec:
   ingressClassName: nginx
   rules:

@@ -1,4 +1,4 @@
-let current=null, pluginInfo={inserts:{},schemas:{},custom:{},stem_splitter:{available:false}}, pxPerSec=70;
+let current=null, currentUser=null, pluginInfo={inserts:{},schemas:{},custom:{},stem_splitter:{available:false}}, pxPerSec=70;
 let sel={a:0,b:0}, dragging=false, audioCtx=null, playAudio=null, selectedTrackId=null, exportFormat='mta';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const TRACK_COLORS=['#2f81f7','#28b463','#f0a52b','#8a58db','#e9506c','#8395a7','#24b8d4','#b26ff2','#e67e22','#16a085','#d35400','#7f8c8d'];
@@ -15,8 +15,8 @@ function selectedTrackIds(){return $$('.trackSelect:checked').map(x=>x.value)}
 function linesToText(a,b){return(a||[]).map(x=>`${(x.time_ms/1000).toFixed(3)}\t${x[b]}`).join('\n')}
 function textToLines(v,key){return v.split(/\n/).map(x=>x.trim()).filter(Boolean).map(line=>{const [t,...rest]=line.split(/\t|\s{2,}/);return{time_ms:Math.max(0,Math.round(parseFloat(t)*1000)||0),[key]:rest.join(' ').trim()}})}
 
-async function init(){try{pluginInfo=await api('/api/plugins')}catch(e){}await refresh()}
-async function refresh(){const ps=await api('/api/projects');$('#projects').innerHTML=ps.map(p=>`<button class="${current&&p.id===current.id?'active':''}" onclick="openP('${p.id}')">${esc(p.title)} <small style="float:right;color:#7590a7">${p.target}</small></button>`).join('')}
+async function init(){try{currentUser=await api('/api/session');const a=$('#adminNav');if(a)a.hidden=currentUser.role!=='admin'}catch(e){}try{pluginInfo=await api('/api/plugins')}catch(e){}await refresh()}
+async function refresh(){const ps=await api('/api/projects');$('#projects').innerHTML=ps.map(p=>{const shared=currentUser&&p.owner_user_id&&p.owner_user_id!==currentUser.id;return `<button class="${current&&p.id===current.id?'active':''}" onclick="openP('${p.id}')">${shared?'⌘ ':''}${esc(p.title)} <small style="float:right;color:#7590a7">${shared?'shared · ':''}${p.target}</small></button>`}).join('')}
 async function newProject(){current=await api('/api/projects?title=Nuovo%20progetto&target=MTA8',{method:'POST'});selectedTrackId=null;render();refresh()}
 async function openP(id){current=await api('/api/projects/'+id);selectedTrackId=current.tracks[0]?.id||null;render();refresh()}
 
@@ -118,3 +118,29 @@ function editTimed(kind){if(!current)return;const config={lyrics:['text','Lyrics
 
 $('#mtafile').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;const fd=new FormData();fd.append('file',f);try{current=await api('/api/import',{method:'POST',body:fd});selectedTrackId=current.tracks[0]?.id||null;render();refresh()}catch(err){toast(err.message)}});
 init();
+
+
+function showUtilityModal(title,html){$('#utilityTitle').textContent=title;$('#utilityBody').innerHTML=html;$('#utilityBackdrop').classList.remove('hidden')}
+function closeUtilityModal(){$('#utilityBackdrop').classList.add('hidden')}
+function exportProjectArchive(){if(!current){toast('Apri prima un progetto');return}window.location.href=`/api/projects/${current.id}/archive`}
+$('#projectArchiveFile').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;const fd=new FormData();fd.append('file',f);try{current=await api('/api/project-archives/import',{method:'POST',body:fd});selectedTrackId=current.tracks[0]?.id||null;render();await refresh();toast('Progetto completo importato')}catch(err){toast('Import progetto fallito: '+err.message)}finally{e.target.value=''}})
+async function manageProjectFiles(){
+  if(!current){toast('Apri prima un progetto');return}
+  try{
+    const files=await api(`/api/projects/${current.id}/files`);
+    const rows=files.map(f=>`<tr><td>${esc(f.category)}</td><td>${esc(f.name)}</td><td>${(f.size/1024/1024).toFixed(2)} MB</td><td>${f.referenced?'in uso':''}</td><td><a class="mini-link" href="/api/projects/${current.id}/files/${encodeURIComponent(f.category)}/${encodeURIComponent(f.name)}">Scarica</a>${!f.referenced&&f.category!=='source'?` <button onclick="deleteProjectFile('${esc(f.category)}','${esc(f.name)}')">Elimina</button>`:''}</td></tr>`).join('');
+    showUtilityModal('File del progetto',`<div class="utility-actions"><label class="utility-upload">Carica file originale<input id="extraProjectFile" type="file" hidden></label></div><div class="table-scroll"><table class="users-table"><thead><tr><th>Tipo</th><th>File</th><th>Dimensione</th><th>Stato</th><th>Azioni</th></tr></thead><tbody>${rows||'<tr><td colspan="5">Nessun file.</td></tr>'}</tbody></table></div><p class="hint">I dump completi includono sempre project.json, audio, attachment, source MTA e tutti i file originali conservati nel progetto.</p>`);
+    $('#extraProjectFile').addEventListener('change',uploadExtraProjectFile);
+  }catch(e){toast(e.message)}
+}
+async function uploadExtraProjectFile(e){const f=e.target.files[0];if(!f)return;const fd=new FormData();fd.append('file',f);try{await api(`/api/projects/${current.id}/files/upload`,{method:'POST',body:fd});await manageProjectFiles();toast('File caricato')}catch(err){toast(err.message)}}
+async function deleteProjectFile(category,name){if(!confirm(`Eliminare ${name}?`))return;try{await api(`/api/projects/${current.id}/files/${encodeURIComponent(category)}/${encodeURIComponent(name)}`,{method:'DELETE'});await manageProjectFiles()}catch(e){toast(e.message)}}
+async function manageProjectSharing(){
+  if(!current){toast('Apri prima un progetto');return}
+  try{
+    const shares=await api(`/api/projects/${current.id}/shares`);
+    showUtilityModal('Condivisione progetto',`<div class="share-form"><input id="shareIdentifier" placeholder="Username o email"><button onclick="addProjectShare()">Condividi</button></div><div class="share-list">${shares.map(u=>`<div><span><b>${esc(u.display_name||u.username)}</b><small>${esc(u.username)} · ${esc(u.email)}</small></span><button onclick="removeProjectShare(${u.id})">Rimuovi</button></div>`).join('')||'<p class="hint">Il progetto non è condiviso con altri utenti.</p>'}</div><p class="hint">Gli utenti condivisi possono aprire e modificare il progetto; solo il proprietario o un amministratore possono cambiarne le condivisioni o eliminarlo.</p>`);
+  }catch(e){toast(e.message)}
+}
+async function addProjectShare(){const identifier=$('#shareIdentifier').value.trim();if(!identifier)return;try{await api(`/api/projects/${current.id}/shares`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({identifier})});await manageProjectSharing();toast('Progetto condiviso')}catch(e){toast(e.message)}}
+async function removeProjectShare(userId){try{await api(`/api/projects/${current.id}/shares/${userId}`,{method:'DELETE'});await manageProjectSharing()}catch(e){toast(e.message)}}

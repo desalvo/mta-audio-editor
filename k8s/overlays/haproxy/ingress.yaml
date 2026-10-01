@@ -4,7 +4,7 @@ metadata:
   name: mta-audio-editor
   namespace: mta-audio-editor
   annotations:
-    haproxy-ingress.github.io/proxy-body-size: "512m"
+    haproxy-ingress.github.io/proxy-body-size: "150m"
 spec:
   ingressClassName: haproxy
   rules:

@@ -1,10 +1,11 @@
+
 import base64
 import hmac
 import os
 from fastapi import Request
 from fastapi.responses import JSONResponse
 
-PUBLIC_PREFIXES = ("/static/", "/docs/", "/api/health", "/api/about")
+from .auth import session_user
 
 
 def _bool(name: str, default: bool = False) -> bool:
@@ -17,6 +18,8 @@ def auth_enabled() -> bool:
 
 def check_basic_auth(request: Request) -> bool:
     if not auth_enabled():
+        return True
+    if session_user(request) is not None:
         return True
     password = os.getenv("MTA_ADMIN_PASSWORD", "")
     if not password:
@@ -34,6 +37,4 @@ def check_basic_auth(request: Request) -> bool:
 
 
 def auth_failure_response():
-    if auth_enabled() and not os.getenv("MTA_ADMIN_PASSWORD"):
-        return JSONResponse({"detail": "Server authentication is not configured"}, status_code=503)
-    return JSONResponse({"detail": "Authentication required"}, status_code=401, headers={"WWW-Authenticate": 'Basic realm="MTA Audio Editor"'})
+    return JSONResponse({"detail": "Authentication required"}, status_code=401)

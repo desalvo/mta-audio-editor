@@ -23,8 +23,9 @@ def test_storage_roundtrip(tmp_path, monkeypatch):
     assert s.list_projects() == []
 
 
-def test_security_auth(monkeypatch):
+def test_security_auth(tmp_path, monkeypatch):
     import app.security as sec
+    monkeypatch.setenv("MTA_DATA_DIR", str(tmp_path))
     monkeypatch.delenv("MTA_ALLOW_INSECURE_NO_AUTH", raising=False)
     monkeypatch.setenv("MTA_ADMIN_USERNAME", "admin")
     monkeypatch.setenv("MTA_ADMIN_PASSWORD", "secret")
@@ -58,8 +59,9 @@ def test_main_project_crud_and_public_docs(tmp_path, monkeypatch):
     assert client.get(f"/api/projects/{pid}").status_code == 404
 
 
-def test_main_requires_auth(monkeypatch):
+def test_main_requires_auth(tmp_path, monkeypatch):
     import app.main as main
+    monkeypatch.setenv("MTA_DATA_DIR", str(tmp_path))
     monkeypatch.delenv("MTA_ALLOW_INSECURE_NO_AUTH", raising=False)
     monkeypatch.setenv("MTA_ADMIN_PASSWORD", "secret")
     c = TestClient(main.app, headers={"X-MTA-Request": "1"})
@@ -152,15 +154,18 @@ def test_main_import_route(tmp_path, monkeypatch):
     assert r.status_code == 200
 
 
-def test_request_integrity_header_and_admin_docs_protection(monkeypatch):
+def test_request_integrity_header_and_admin_docs_protection(tmp_path, monkeypatch):
     import app.main as main
 
+    monkeypatch.setenv("MTA_DATA_DIR", str(tmp_path))
     monkeypatch.delenv("MTA_ALLOW_INSECURE_NO_AUTH", raising=False)
     monkeypatch.setenv("MTA_ADMIN_PASSWORD", "secret")
     client = TestClient(main.app)
     token = base64.b64encode(b"admin:secret").decode()
     auth = {"Authorization": f"Basic {token}"}
-    assert client.get("/docs/admin").status_code == 401
+    r = client.get("/docs/admin", follow_redirects=False)
+    assert r.status_code == 303
+    assert r.headers["location"] == "/login"
     assert client.get("/docs/admin", headers=auth).status_code == 200
     assert client.post("/api/projects", headers=auth).status_code == 403
     assert client.post("/api/projects", headers={**auth, **WRITE_HEADERS}).status_code == 200
