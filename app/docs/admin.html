@@ -51,6 +51,25 @@ git push origin __VERSION__</pre>
 
 DELETE /api/presets/amplify/My%20Trim</pre>
 
+
+
+<h2 id="media-jobs">Job di import/export traccia e stima BPM</h2>
+<p>Gli import di traccia usano job asincroni consultabili tramite <code>/api/media-jobs/{job_id}</code>. L'upload espone avanzamento dal browser; il backend prosegue con validazione, eventuale stima BPM, sincronizzazione e commit del progetto. Solo il primo MP3 di un progetto viene analizzato per il BPM. Gli import successivi non cambiano il valore.</p>
+<p>Gli export di singola traccia usano analogamente un job di rendering con progress e un endpoint di download associato. Il percorso del file risultante è vincolato alla directory del progetto.</p>
+<p>Mute/Solo sono proprietà di mix, non filtri di visualizzazione: tutte le tracce rimangono presenti nel modello, nella timeline e nel mixer.</p>
+
+<h2 id="stem-jobs">Workflow persistente Import &amp; Separate</h2>
+<p>La separazione stem è implementata come job asincrono cancellabile. L'upload MP3 viene prima validato, copiato nel workspace e negli originali, aggiunto come traccia <b>Original Mix</b> e il progetto viene salvato. Solo dopo parte Demucs.</p>
+<pre>POST /api/stems/jobs
+GET  /api/stems/jobs/{job_id}
+POST /api/stems/jobs/{job_id}/cancel</pre>
+<p>Il worker aggiorna percentuale/fase, aggiunge gli stem al progetto e salva dopo ogni traccia. Un cancel usa un <code>threading.Event</code>, termina/uccide il subprocess Demucs se necessario e fa rollback degli stem parziali creati dal job. Per evitare race sul medesimo project.json è ammesso un solo job attivo per progetto.</p>
+<p>Lo stato del job è volatile, mentre progetto, MP3 originale e file già consolidati sono sul PVC. Un restart del pod interrompe il job attivo ma non cancella il progetto.</p>
+
+<h2 id="autosave">Persistenza e autosave dei progetti</h2>
+<p>La creazione di un progetto scrive immediatamente <code>project.json</code>. Le operazioni backend salvano al termine della mutazione; i controlli puramente UI usano autosave debounced. Prima di cambiare progetto o di render/export viene effettuato un flush dell'autosave pendente.</p>
+<p>L'utente può inoltre scaricare un archivio locale completo del progetto oppure cancellarlo dal workspace. La cancellazione è owner-only (oltre agli amministratori); un collaboratore condiviso non può eliminare il progetto.</p>
+
 <h2 id="appendix-mta">Appendice A. Specifica tecnica del formato proprietario MTA</h2>
 <div class="note"><b>Ambito:</b> questa appendice documenta il formato on-disk verificato sul corpus stock disponibile. "Verificato" significa che la relazione è stata ricostruita dai byte e controllata su più file indipendenti. La compatibilità con ogni revisione firmware M-Live/Merish richiede comunque una prova sul dispositivo target.</div>
 

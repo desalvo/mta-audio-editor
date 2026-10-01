@@ -125,3 +125,40 @@ Typical HTTP results:
 ```
 
 For project authorization, an inaccessible project may deliberately return 404 to avoid leaking existence to unrelated users.
+
+
+
+## Asynchronous stem separation
+
+```text
+POST /api/stems/jobs
+GET  /api/stems/jobs/{job_id}
+POST /api/stems/jobs/{job_id}/cancel
+```
+
+`POST /api/stems/jobs` accepts an MP3 multipart file and query parameters:
+
+```text
+project_id            existing destination, optional
+project_title         required by UI for a new project
+target                MTA8 | MTA16
+model                 htdemucs | htdemucs_ft | htdemucs_6s
+keep_original_track   true | false
+```
+
+The response includes both the already-persisted project and a job descriptor.
+
+Job states:
+
+```text
+queued
+running
+cancelling
+completed
+failed
+cancelled
+```
+
+The job descriptor includes `progress` (0..100), `message`, model, source filename and optional error text.
+
+The older synchronous `POST /api/stems/split` endpoint is retained for backward compatibility.

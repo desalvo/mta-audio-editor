@@ -11,6 +11,8 @@ import json
 import os
 import shutil
 import subprocess
+import re
+import selectors
 import sys
 from copy import deepcopy
 from pathlib import Path
@@ -324,7 +326,15 @@ class DemucsStemSplitter:
         }
 
     @classmethod
-    def split(cls, source: Path, output_dir: Path, model: str = "htdemucs_6s") -> list[Path]:
+    def split(
+        cls,
+        source: Path,
+        output_dir: Path,
+        model: str = "htdemucs_6s",
+        *,
+        progress=None,
+        cancel_event=None,
+    ) -> list[Path]:
         if model not in {"htdemucs", "htdemucs_ft", "htdemucs_6s"}:
             raise ValueError("unsupported Demucs model")
         if not cls.available():
@@ -334,9 +344,55 @@ class DemucsStemSplitter:
             cmd = ["demucs", "-n", model, "--out", str(output_dir), str(source)]
         else:
             cmd = [sys.executable, "-m", "demucs.separate", "-n", model, "--out", str(output_dir), str(source)]
-        proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        if progress:
+            progress(20, "Avvio del modello Demucs")
+        proc = subprocess.Popen(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            bufsize=1,
+        )
+        tail: list[str] = []
+        percent_re = re.compile(r"(?<!\d)(\d{1,3})%")
+        if proc.stdout is None:
+            proc.kill()
+            raise RuntimeError("unable to capture Demucs progress output")
+        selector = selectors.DefaultSelector()
+        selector.register(proc.stdout, selectors.EVENT_READ)
+        try:
+            while True:
+                if cancel_event is not None and cancel_event.is_set():
+                    proc.terminate()
+                    try:
+                        proc.wait(timeout=5)
+                    except subprocess.TimeoutExpired:
+                        proc.kill()
+                    raise RuntimeError("stem separation cancelled")
+                events = selector.select(timeout=0.25)
+                if events:
+                    line = proc.stdout.readline()
+                    if line:
+                        clean = line.strip()
+                        if clean:
+                            tail.append(clean)
+                            tail = tail[-40:]
+                            match = percent_re.search(clean)
+                            if match and progress:
+                                raw = max(0, min(100, int(match.group(1))))
+                                progress(20 + int(raw * 0.65), clean[-180:])
+                if proc.poll() is not None:
+                    for line in proc.stdout:
+                        clean = line.strip()
+                        if clean:
+                            tail.append(clean)
+                    break
+        finally:
+            selector.close()
         if proc.returncode:
-            raise RuntimeError(proc.stderr.strip()[-3000:] or "stem separation failed")
+            raise RuntimeError("\n".join(tail)[-3000:] or "stem separation failed")
+        if progress:
+            progress(88, "Raccolta delle tracce separate")
         candidates = sorted(output_dir.glob(f"{model}/**/*.wav"))
         if not candidates:
             candidates = sorted(output_dir.rglob("*.wav"))

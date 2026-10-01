@@ -149,3 +149,19 @@ At minimum:
 - CI/CD build logs.
 
 Do not log passwords, TOTP secrets, SMTP passwords or session tokens.
+
+
+
+## Stem-separation operations
+
+Demucs runs as a child process of the application and can be CPU/RAM intensive. The UI exposes live progress and cancellation.
+
+Operational notes:
+
+- the MP3 and project are persisted before separation starts;
+- only one active stem job is accepted per project;
+- cancellation terminates the Demucs process and rolls back partial stems;
+- a pod restart interrupts an in-flight job because the job controller is in-memory;
+- the underlying project and original MP3 remain safe on the PVC.
+
+For production AI workloads, size CPU/RAM requests according to the selected Demucs model and song duration.

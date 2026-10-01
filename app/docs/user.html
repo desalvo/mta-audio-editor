@@ -42,6 +42,26 @@
 <h3>14.1 Preset personalizzati</h3><p>Premere l'icona ingranaggio di un insert per aprire i parametri esposti. È possibile applicare la configurazione solo al progetto corrente oppure salvarla con un nome. I preset salvati vengono mostrati come <code>user:&lt;nome&gt;</code> e restano disponibili dopo riavvio perché memorizzati nel volume dati.</p>
 <h3>14.2 Auto Mix</h3><p>Il toggle <b>Auto Mix</b> applica profili Balanced, Studio, Live o Gentle con headroom, pan e processing type-aware. È reversibile: salva il mix precedente e lo ripristina quando viene disattivato. Usarlo come punto di partenza e verificare sempre in ascolto.</p>
 
+
+
+<h2 id="transport-progress">Riproduzione, Mute/Solo, progress e BPM</h2>
+<p>Un click sulla timeline posiziona il cursore di riproduzione. Il pulsante Play riproduce il master da quel punto; Stop interrompe realmente la riproduzione, mentre i pulsanti di riavvolgimento/avanzamento spostano il cursore di 5 secondi.</p>
+<p><b>Mute</b> silenzia una traccia. <b>Solo</b> rende udibili soltanto le tracce marcate Solo. In entrambi i casi le altre tracce restano visibili nella timeline e nel mixer: il loro stato audio viene indicato graficamente senza rimuovere alcuna traccia dall'interfaccia.</p>
+<p>L'import e l'export delle singole tracce mostrano una barra di avanzamento. Se l'MP3 importato è la prima traccia del progetto, l'applicazione esegue anche una stima automatica del BPM con avanzamento visibile e aggiorna il BPM del progetto. Dagli import successivi il BPM non viene più stimato né modificato automaticamente.</p>
+<p>Il pulsante <b>Save</b> forza il salvataggio persistente immediato del progetto, oltre all'autosave già attivo.</p>
+
+<h2 id="import-separate">Importazione brano completo e separazione strumenti</h2>
+<p>Dal menu <b>Import &amp; Separate</b> puoi caricare un MP3 stereo completo e separarlo in stem con Demucs.</p>
+<ol>
+<li>Scegli se aggiungere il brano al progetto corrente oppure creare un nuovo progetto.</li>
+<li>Per un nuovo progetto inserisci obbligatoriamente il nome: il progetto viene creato e salvato immediatamente nel tuo workspace.</li>
+<li>Scegli MTA8/MTA16, modello Demucs e file MP3.</li>
+<li>Premi <b>Importa e separa</b>.</li>
+</ol>
+<p>Subito dopo l'upload il brano originale viene conservato e il progetto viene salvato. La separazione continua in background e una barra grafica mostra percentuale e fase corrente. Puoi premere <b>Annulla separazione</b>: il processo AI viene terminato e gli stem parziali di quel job vengono rimossi.</p>
+<div class="note"><b>Autosave:</b> dopo la creazione, ogni modifica al progetto viene salvata automaticamente. Import audio, split, Auto Mix e altre operazioni server-side salvano subito; fader, pan, nomi e metadati usano un autosave rapido dopo la modifica.</div>
+<p>Nel riquadro Projects puoi aprire un progetto persistente, scaricarne una copia completa con l'icona ⬇ oppure eliminarlo con ×. Il comando <b>Save project locally</b> scarica un archivio completo <code>.mta-project.zip</code>, comprensivo degli originali.</p>
+
 <h2 id="mta-appendix">Appendice A. Cosa contiene un file MTA</h2>
 <p>Un MTA usa strutture Matroska/EBML per tracce, attachment e indice temporale. La regione media, dal primo Cluster a fine file, usa uno XOR proprietario periodico di 984 byte. L'applicazione rimuove automaticamente questo trasporto durante l'import e lo riapplica durante l'export.</p>
 <p>Gli attachment stock includono file SYL e MtxInfoData XML. Il SYL contiene testo, accordi, highlighting karaoke e marker MIDI. Gli originali importati vengono sempre preservati nel progetto; per dettagli byte-level consultare l'Appendice A del Manuale amministratore e <code>docs/MTA_FORMAT_FINAL_SPEC.md</code>.</p>

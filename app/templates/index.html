@@ -16,7 +16,7 @@
     </div>
     <div class="project-name-block"><label>Project</label><div class="project-name-field" onclick="editProjectMeta()" title="Edit project metadata"><span id="headerProjectName">No project loaded</span><span>✎</span></div></div>
     <div class="transport">
-      <button class="transport-btn" title="Stop" aria-label="Stop">■</button><button class="transport-btn" title="Riavvolgi" aria-label="Riavvolgi">◀◀</button><button id="playMaster" class="transport-btn play" onclick="previewMaster()" title="Play / Preview" aria-label="Play / Preview">▶</button><button class="transport-btn" title="Avanti veloce" aria-label="Avanti veloce">▶▶</button><button class="transport-btn rec" title="Record" aria-label="Record">●</button>
+      <button class="transport-btn" onclick="stopPlayback()" title="Stop" aria-label="Stop">■</button><button class="transport-btn" onclick="seekTransport(-5000)" title="Riavvolgi 5 secondi" aria-label="Riavvolgi 5 secondi">◀◀</button><button id="playMaster" class="transport-btn play" onclick="previewMaster()" title="Play / Preview" aria-label="Play / Preview">▶</button><button class="transport-btn" onclick="seekTransport(5000)" title="Avanti 5 secondi" aria-label="Avanti 5 secondi">▶▶</button><button class="transport-btn rec" title="Record" aria-label="Record">●</button>
     </div>
     <div class="timebox"><strong id="transportTime">00:00.000</strong><span><b id="transportBpm">120</b> BPM &nbsp;&nbsp; 4/4</span></div>
     <div class="top-spacer"></div>
@@ -36,6 +36,7 @@
         <button class="nav-item active">⌂ <span>Project</span></button>
         <label class="nav-item">⇩ <span>Import MTA</span><input id="mtafile" type="file" accept=".mta,.mta8,.mta16" hidden></label>
         <button class="nav-item" onclick="focusImport()">♫ <span>Import Audio</span></button>
+        <button class="nav-item" onclick="openStemWorkflow()">▥ <span>Import &amp; Separate</span></button>
         <button class="nav-item">☷ <span>Tracks</span></button>
         <button class="nav-item" onclick="focusInspector()">◇ <span>Plugins</span></button>
         <button class="nav-item" onclick="focusMixer()">▥ <span>Mixer</span></button>
@@ -45,10 +46,11 @@
         <button class="nav-item">⚑ <span>Markers</span></button>
         <div class="nav-sep"></div>
         <button class="nav-item" onclick="openExportPanel()">⇧ <span>Export</span></button>
-        <button class="nav-item" onclick="exportProjectArchive()">⬇ <span>Export project</span></button>
+        <button class="nav-item" onclick="exportProjectArchive()">⬇ <span>Save project locally</span></button>
         <label class="nav-item">⬆ <span>Import project</span><input id="projectArchiveFile" type="file" accept=".zip,.mta-project.zip" hidden></label>
         <button class="nav-item" onclick="manageProjectFiles()">▣ <span>Project files</span></button>
         <button class="nav-item" onclick="manageProjectSharing()">⌘ <span>Share project</span></button>
+        <button class="nav-item" onclick="deleteCurrentProject()">× <span>Delete project</span></button>
         <a class="nav-item" href="/docs/user" target="_blank">? <span>Docs &amp; Help</span></a>
       </nav>
       <div class="sidebar-projects"><div class="side-title">PROJECTS</div><div id="projects"></div><button class="new-project" onclick="newProject()">＋ New project</button></div>

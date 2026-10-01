@@ -1,6 +1,6 @@
 # MTA Audio Editor - project architecture
 
-Version: 0.2.0-34
+Version: 0.2.0-36
 
 ## 1. Architectural goals
 
@@ -465,3 +465,46 @@ See also:
 - `docs/OPERATIONS_RUNBOOK.md`
 - `docs/TESTING_AND_RELEASE.md`
 - `docs/SECURE_DEVELOPMENT.md`
+
+
+
+## 21. Persistent project lifecycle and stem-separation jobs
+
+Project creation is immediately persistent. The browser asks for a project name before calling `POST /api/projects`; the server creates the project directory and writes `project.json` before returning it.
+
+The editor uses two persistence layers:
+
+1. server-side operations such as audio import, replace, split/ripple, Auto Mix and stem creation save the project synchronously after the operation;
+2. purely client-side mixer/metadata changes use a debounced autosave (`PUT /api/projects/{id}`), normally within about 650 ms of the last change.
+
+Before changing project, export/render operations flush pending autosave state.
+
+### Import + Separate workflow
+
+The stem workflow is asynchronous:
+
+```text
+choose MP3
+ -> choose current/new project
+ -> if new: require project name and create persistent project
+ -> store MP3 in audio/ and originals/
+ -> create Original Mix track
+ -> save project
+ -> start Demucs worker thread
+ -> expose progress through /api/stems/jobs/{id}
+ -> append each completed stem
+ -> save project after every appended stem
+ -> mark job completed
+```
+
+The browser polls job status and displays a graphical progress bar, current phase and Cancel action. Cancellation sets a thread-safe event; the Demucs subprocess is terminated and any partial stem tracks from that job are rolled back. The imported original remains preserved.
+
+Only one active stem-separation job is allowed per project.
+
+Job state is runtime state; project/audio state is persistent. A pod restart can therefore interrupt an active AI separation, but it cannot lose the project, the original MP3 or stems already committed before a completed operation.
+
+### Local save and deletion
+
+"Save project locally" downloads the complete `.mta-project.zip` archive. This is separate from workspace persistence: projects already remain stored server-side in the user's workspace.
+
+Deletion removes the complete project directory and is allowed only to the project owner or an administrator. Shared collaborators cannot delete the owner's project.

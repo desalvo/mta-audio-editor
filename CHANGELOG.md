@@ -1,4 +1,11 @@
-## 0.2.0-34
+## 0.2.0-36
+
+- Aggiunti input numerici sincronizzati con gli slider del volume per tracce, Inspector, Mixer e Master; valori ammessi da -60 a +12 dB con autosave.
+
+
+- `Import Audio` ora avvia automaticamente l'import immediatamente dopo la scelta del file, senza richiedere un secondo click.
+- `Delete tracks` ora elimina realmente le tracce selezionate dal progetto; non richiede più una selezione temporale.
+- `Delete song segment` mantiene invece il comportamento di cancellazione intervallo/ripple sulla timeline.
 
 - Added full multi-user authentication with a responsive photographic login based on the approved mockup.
 - Added self-registration with mandatory email confirmation and administrator approval before activation.
@@ -100,7 +107,7 @@
 
 - Initial FastAPI/FFmpeg MTA8/MTA16 web editor prototype.
 
-## 0.2.0-34
+## 0.2.0-36
 
 - Kubernetes wizard: HAProxy ingress now always emits `kubernetes.io/ingress.class: haproxy` in addition to `spec.ingressClassName: haproxy`.
 - Reverse-engineering notes: confirmed the 181392 ns Matroska timecode scale, 40 MP3 frames per Cue interval, exact 320 kbit/s frame/SimpleBlock sizing, and frame-major per-track interleaving evidence.

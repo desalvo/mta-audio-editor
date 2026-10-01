@@ -263,6 +263,63 @@ def _envelope(path: Path, sample_rate: int = 4000, max_seconds: int = 1200):
     return env.astype(np.float32), 20
 
 
+
+def estimate_bpm(path: Path, progress=None) -> float:
+    """Estimate musical tempo from the first minutes of a track.
+
+    Uses a mono 4 kHz envelope, onset-energy differentiation and autocorrelation.
+    It intentionally has no optional heavyweight dependency such as librosa.
+    """
+    if progress:
+        progress(5, "Preparazione audio per la stima BPM")
+    with tempfile.TemporaryDirectory() as td:
+        wav_path = Path(td) / "bpm.wav"
+        _run(
+            [
+                "ffmpeg", "-y", "-v", "error", "-i", str(path),
+                "-ac", "1", "-ar", "4000", "-t", "240",
+                "-c:a", "pcm_s16le", str(wav_path),
+            ]
+        )
+        if progress:
+            progress(30, "Analisi dell'energia ritmica")
+        with wave.open(str(wav_path), "rb") as handle:
+            sr = handle.getframerate()
+            data = np.frombuffer(handle.readframes(handle.getnframes()), dtype=np.int16).astype(np.float32)
+    if len(data) < sr * 4:
+        raise ValueError("audio too short for BPM estimation")
+    data /= max(1.0, float(np.max(np.abs(data))))
+    hop = max(1, sr // 100)  # 100 Hz envelope
+    n = len(data) // hop
+    x = data[:n * hop].reshape(n, hop)
+    rms = np.sqrt(np.mean(x * x, axis=1) + 1e-9)
+    onset = np.maximum(0.0, np.diff(rms, prepend=rms[:1]))
+    onset -= onset.mean()
+    std = onset.std()
+    if std > 1e-9:
+        onset /= std
+    if progress:
+        progress(55, "Ricerca della periodicità")
+    hz = 100.0
+    min_bpm, max_bpm = 55.0, 200.0
+    min_lag = max(1, int(hz * 60.0 / max_bpm))
+    max_lag = max(min_lag + 1, int(hz * 60.0 / min_bpm))
+    corr = np.correlate(onset, onset, mode="full")[len(onset)-1:]
+    window = corr[min_lag:max_lag+1]
+    if not len(window) or not np.isfinite(window).any():
+        raise ValueError("unable to estimate BPM")
+    lag = min_lag + int(np.nanargmax(window))
+    bpm = 60.0 * hz / lag
+    # Fold common half/double-tempo ambiguities into a musically useful range.
+    while bpm < 70:
+        bpm *= 2
+    while bpm > 180:
+        bpm /= 2
+    if progress:
+        progress(90, f"BPM stimati: {bpm:.1f}")
+    return round(float(bpm), 1)
+
+
 def _xcorr_fft(a, b):
     count = len(a) + len(b) - 1
     size = 1 << (count - 1).bit_length()

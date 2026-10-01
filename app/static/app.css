@@ -39,3 +39,37 @@
 .control-icon{display:inline-flex;align-items:center;justify-content:center;margin-right:5px;line-height:1}
 .header-actions button,.header-actions .header-link{align-items:center;justify-content:center}
 @media(min-width:901px){.header-actions button{display:inline-flex}.header-actions .control-text{display:inline}}
+
+.project-row{display:grid;grid-template-columns:minmax(0,1fr) 30px 30px;gap:3px;align-items:center;margin:3px 0}
+.project-row.active{outline:1px solid #198be6;border-radius:5px}
+.sidebar-projects #projects .project-open{min-width:0;width:100%;display:flex;align-items:center;gap:6px;text-align:left;border:1px solid #263c50;background:#101d29;color:#dbeaf6;border-radius:4px;padding:7px 8px;font-size:10px}
+.sidebar-projects #projects .project-open span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.sidebar-projects #projects .project-open small{color:#7590a7;white-space:nowrap}
+.sidebar-projects #projects .project-mini{width:30px;height:30px;padding:0;border:1px solid #263c50;background:#101d29;color:#bdd1df;border-radius:4px}
+.sidebar-projects #projects .project-mini:hover{border-color:#2b9cf2}
+.sidebar-projects #projects .project-mini.danger{color:#ff8290}
+.workflow-field{display:grid;gap:6px;margin:10px 0}.workflow-field>span{font-size:11px;color:#9ab0c3}
+.workflow-field input,.workflow-field select{width:100%;min-height:38px;border:1px solid #365269;border-radius:7px;background:#091620;color:#eaf6ff;padding:8px}
+.workflow-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.workflow-check{display:flex;gap:8px;align-items:center;margin:12px 0;color:#d4e5f1;font-size:12px}
+.workflow-note{padding:10px 12px;border:1px solid #2a455a;border-radius:7px;background:#0b1d2a;color:#91aabd;font-size:11px;line-height:1.45}
+.stem-progress-card{display:grid;gap:12px}.stem-progress-head{display:flex;justify-content:space-between;gap:15px}
+.stem-progress{height:18px;border-radius:12px;background:#07111a;border:1px solid #314b60;overflow:hidden;box-shadow:inset 0 0 10px rgba(0,0,0,.4)}
+.stem-progress-fill{height:100%;min-width:2px;background:linear-gradient(90deg,#087fe4,#2bb7ff);transition:width .35s ease}
+.stem-progress-message{font-size:12px;color:#b7ccda;min-height:20px}
+.stem-error{max-height:180px;overflow:auto;white-space:pre-wrap;background:#1a1014;border:1px solid #61313a;border-radius:7px;padding:9px;color:#ffb9c1;font-size:10px}
+.danger-action{border-color:#8c3b47!important;background:#351920!important;color:#ffd9de!important}
+@media(max-width:650px){.workflow-grid{grid-template-columns:1fr}.project-row{grid-template-columns:minmax(0,1fr) 34px 34px}.sidebar-projects #projects .project-mini{width:34px;height:34px}}
+
+.track-head.audibly-muted,.lane.audibly-muted{opacity:.62}
+.track-head.audibly-muted{filter:saturate(.65)}
+.track-head .tiny-btn.mute.on{background:#9b3442!important;color:#fff!important;border-color:#e75c6d!important}
+.track-head .tiny-btn.solo.on{background:#a77811!important;color:#fff6c7!important;border-color:#f1c455!important}
+.project-open{cursor:pointer}
+.ruler,.lanes{cursor:crosshair}
+
+.volume-number{appearance:textfield;-moz-appearance:textfield;text-align:right;font-variant-numeric:tabular-nums}
+.volume-number::-webkit-outer-spin-button,.volume-number::-webkit-inner-spin-button{opacity:.65}
+.track-db-input{width:58px;min-width:58px;height:24px;border:1px solid #30485c;border-radius:4px;background:#0b1721;color:#dcecf7;padding:2px 5px;font-size:10px}
+.inspector-row .volume-number{width:68px;min-width:68px;height:28px;padding:3px 6px}
+.channel .volume-number{width:54px;min-width:54px;height:25px;border:1px solid #30485c;border-radius:4px;background:#0b1721;color:#dcecf7;padding:2px 4px;font-size:10px}
