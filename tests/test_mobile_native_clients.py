@@ -1,6 +1,6 @@
 from pathlib import Path
 import plistlib
-import xml.etree.ElementTree as ET
+from defusedxml import ElementTree as ET
 
 
 def test_android_native_client_files_and_storage_bridge_exist():
