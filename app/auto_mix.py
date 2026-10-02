@@ -18,13 +18,13 @@ def _fx(plugin: str, preset: str) -> InsertPlugin:
 def _track_rules(track_type: str, style: str) -> tuple[float, list[InsertPlugin]]:
     gentle = style == "gentle"
     rules = {
-        "drums": (-5.0 if gentle else -4.0, [_fx("eq", "drums-punchy"), _fx("compressor", "drums")]),
-        "bass": (-6.0 if gentle else -5.0, [_fx("eq", "bass-warm"), _fx("compressor", "bass")]),
-        "guitars": (-8.0 if gentle else -7.0, [_fx("eq", "guitar-clarity"), _fx("compressor", "moderate")]),
-        "keyboards": (-9.0 if gentle else -8.0, [_fx("eq", "piano-natural"), _fx("stereo_imager", "wide")]),
+        "drums": (-5.0 if gentle else -4.0, [_fx("graphic_eq_32", "drums-punchy"), _fx("compressor", "drums")]),
+        "bass": (-6.0 if gentle else -5.0, [_fx("graphic_eq_32", "bass-warm"), _fx("compressor", "bass")]),
+        "guitars": (-8.0 if gentle else -7.0, [_fx("graphic_eq_32", "guitar-clarity"), _fx("compressor", "moderate")]),
+        "keyboards": (-9.0 if gentle else -8.0, [_fx("graphic_eq_32", "piano-natural"), _fx("stereo_imager", "wide")]),
         "orchestra": (-9.0 if gentle else -8.0, [_fx("room_ambience", "studio-a")]),
-        "winds": (-8.0 if gentle else -7.0, [_fx("eq", "flat"), _fx("compressor", "moderate")]),
-        "melody": (-7.0 if gentle else -6.0, [_fx("denoise", "light"), _fx("eq", "vocals-presence"), _fx("compressor", "vocal"), _fx("reverb_lexicon", "lexicon-vocal-plate")]),
+        "winds": (-8.0 if gentle else -7.0, [_fx("graphic_eq_32", "flat-32"), _fx("compressor", "moderate")]),
+        "melody": (-7.0 if gentle else -6.0, [_fx("denoise", "light"), _fx("graphic_eq_32", "vocals-presence"), _fx("compressor", "vocal"), _fx("reverb_lexicon", "lexicon-vocal-plate")]),
         "click": (-14.0 if gentle else -12.0, []),
         "choirs": (-9.0 if gentle else -8.0, [_fx("compressor", "moderate"), _fx("reverb_lexicon", "lexicon-ambient"), _fx("stereo_imager", "wide")]),
         "other": (-9.0 if gentle else -8.0, [_fx("compressor", "moderate")]),

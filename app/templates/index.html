@@ -16,7 +16,7 @@
     </div>
     <div class="project-name-block"><label>Project</label><div class="project-name-field" onclick="editProjectMeta()" title="Edit project metadata"><span id="headerProjectName">No project loaded</span><span>✎</span></div></div>
     <div class="transport">
-      <button class="transport-btn" onclick="stopPlayback()" title="Stop" aria-label="Stop">■</button><button class="transport-btn" onclick="seekTransport(-5000)" title="Riavvolgi 5 secondi" aria-label="Riavvolgi 5 secondi">◀◀</button><button id="playMaster" class="transport-btn play" onclick="previewMaster()" title="Play / Preview" aria-label="Play / Preview">▶</button><button class="transport-btn" onclick="seekTransport(5000)" title="Avanti 5 secondi" aria-label="Avanti 5 secondi">▶▶</button><button id="renderBtn" class="transport-btn render-mode" onclick="toggleRenderPreview()" title="Render: include filtri e master nella preview" aria-label="Render preview">Render</button><button class="transport-btn rec" title="Record" aria-label="Record">●</button>
+      <button class="transport-btn" onclick="stopPlayback()" title="Stop" aria-label="Stop">■</button><button class="transport-btn" onclick="seekTransport(-5000)" title="Riavvolgi 5 secondi" aria-label="Riavvolgi 5 secondi">◀◀</button><button id="playMaster" class="transport-btn play" onclick="togglePlayback()" title="Play / Preview" aria-label="Play / Preview">▶</button><button class="transport-btn" onclick="seekTransport(5000)" title="Avanti 5 secondi" aria-label="Avanti 5 secondi">▶▶</button><button id="renderBtn" class="transport-btn render-mode" onclick="toggleRenderPreview()" title="Render: include filtri e master nella preview" aria-label="Render preview">Render</button><button id="followBtn" class="transport-btn follow-mode" onclick="toggleFollowPlayback()" title="Follow: mantieni il playhead visibile" aria-label="Follow playback">Follow</button><button class="transport-btn rec" title="Record" aria-label="Record">●</button>
     </div>
     <div class="timebox"><strong id="transportTime">00:00.000</strong><span><input id="transportBpmInput" class="tempo-input" type="number" min="30" max="300" step="0.1" value="120" onchange="setProjectBpm(this.value)" title="BPM progetto"><b id="transportBpm" hidden>120</b> BPM &nbsp; <input id="transportPitchInput" class="pitch-input" type="number" min="-6" max="6" step="0.1" value="0" onchange="setProjectPitch(this.value)" title="Trasposizione semitoni"> st</span></div>
     <div class="top-spacer"></div>
@@ -25,7 +25,8 @@
       <a class="header-link auth-managed" href="/account" title="Account" aria-label="Account"><span class="control-icon" aria-hidden="true">👤</span><span class="control-text">Account</span></a>
       <a id="adminNav" class="header-link auth-managed" href="/admin/users" title="Amministrazione" aria-label="Amministrazione" hidden><span class="control-icon" aria-hidden="true">⚙</span><span class="control-text">Admin</span></a>
       <button onclick="save()" title="Save" aria-label="Save"><span class="control-icon" aria-hidden="true">▣</span><span class="control-text">Save</span></button>
-      <button class="accent" onclick="openExportPanel()" title="Export" aria-label="Export"><span class="control-icon" aria-hidden="true">⇧</span><span class="control-text">Export</span></button>
+      <button id="exportPanelMenuBtn" class="accent" onclick="toggleMixerPanel('export')" title="Mostra/nascondi Export" aria-label="Export"><span class="control-icon" aria-hidden="true">⇧</span><span class="control-text">Export</span></button>
+      <button id="metaPanelMenuBtn" onclick="toggleMixerPanel('meta')" title="Mostra/nascondi Lyrics/Chords/Markers" aria-label="Mostra o nascondi Lyrics Chords Markers"><span class="control-icon" aria-hidden="true">▤</span><span class="control-text">Lyrics/Meta</span></button>
       <a class="header-link logout auth-managed" href="/logout" title="Esci" aria-label="Esci"><span class="control-icon" aria-hidden="true">↪</span><span class="control-text">Esci</span></a>
     </div>
   </header>
@@ -35,25 +36,29 @@
       <nav>
         <button class="nav-item active">⌂ <span>Project</span></button>
         <label class="nav-item">⇩ <span>Import MTA</span><input id="mtafile" type="file" accept=".mta,.mta8,.mta16" hidden></label>
-        <button class="nav-item" onclick="focusImport()">♫ <span>Import Audio</span></button>
-        <button class="nav-item" onclick="openStemWorkflow()">▥ <span>Import &amp; Separate</span></button>
+        <button class="nav-item import-action" onclick="focusImport()">♫ <span>Import Audio</span></button>
+        <button class="nav-item import-action" onclick="openStemWorkflow()">▥ <span>Import &amp; Separate</span></button>
         <button class="nav-item">☷ <span>Tracks</span></button>
         <button class="nav-item" onclick="focusInspector()">◇ <span>Plugins</span></button>
         <button class="nav-item" onclick="focusMixer()">▥ <span>Mixer</span></button>
         <div class="nav-sep"></div>
-        <button class="nav-item">▤ <span>Lyrics</span></button>
-        <button class="nav-item">♬ <span>Chords</span></button>
-        <button class="nav-item">⚑ <span>Markers</span></button>
+        <button class="nav-item" onclick="showMetaPanel('lyrics')">▤ <span>Lyrics</span></button>
+        <button class="nav-item" onclick="showMetaPanel('chords')">♬ <span>Chords</span></button>
+        <button class="nav-item" onclick="showMetaPanel('markers')">⚑ <span>Markers</span></button>
         <div class="nav-sep"></div>
         <button class="nav-item" onclick="openExportPanel()">⇧ <span>Export</span></button>
-        <button class="nav-item" onclick="exportProjectArchive()">⬇ <span>Save project locally</span></button>
-        <label class="nav-item">⬆ <span>Import project</span><input id="projectArchiveFile" type="file" accept=".zip,.mta-project.zip" hidden></label>
+        <button class="nav-item" onclick="saveProjectLocal()">⬇ <span>Save project locally</span></button>
+        <button class="nav-item" onclick="openProjectArchive()">⬆ <span>Open project</span></button><input id="projectArchiveFile" type="file" accept=".zip,.mta-project.zip" hidden>
         <button class="nav-item" onclick="manageProjectFiles()">▣ <span>Project files</span></button>
         <button class="nav-item auth-managed" onclick="manageProjectSharing()">⌘ <span>Share project</span></button>
         <button class="nav-item" onclick="deleteCurrentProject()">× <span>Delete project</span></button>
+        <button class="nav-item" onclick="showAbout()">ⓘ <span>About</span></button>
         <a class="nav-item" href="/docs/user" target="_blank">? <span>Docs &amp; Help</span></a>
       </nav>
-      <div class="sidebar-projects"><div class="side-title">PROJECTS</div><div id="projects"></div><button class="new-project" onclick="newProject()">＋ New project</button></div>
+      <div class="sidebar-projects collapsed" id="projectsPanel">
+        <button class="side-title projects-toggle" onclick="toggleProjectsPanel()" aria-expanded="false"><span>PROJECTS</span><span id="projectsChevron">▸</span></button>
+        <div class="projects-body" id="projectsBody"><div id="projects"></div><button class="new-project" onclick="newProject()">＋ New project</button></div>
+      </div>
     </aside>
 
     <main class="main-area">

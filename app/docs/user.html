@@ -80,6 +80,28 @@
 macOS:   ~/Library/Application Support/MTA Audio Editor</pre>
 <p>FFmpeg/FFprobe sono inclusi nell'installer. Anche Demucs/PyTorch fanno parte della build; al primo utilizzo della separazione strumenti vengono scaricati soltanto i pesi del modello scelto e poi riutilizzati dalla cache locale.</p>
 
+
+<h2 id="track-import-playback-native">Importazione, Tracks, playback e applicazioni native</h2>
+<p>Il dialog <b>Import &amp; Separate</b> mostra pulsanti leggibili anche su finestre piccole. Se è già stato scelto un MP3 tramite <b>Choose File / Import Audio</b>, quel file viene proposto implicitamente allo splitting e viene usato se non ne scegli un altro.</p>
+<p>Deselezionando <b>Mantieni anche la traccia Original Mix</b>, l'Original Mix non viene aggiunto al progetto; il file sorgente resta comunque conservato negli Originals.</p>
+<p>Durante la creazione di un progetto puoi scegliere esplicitamente <b>MTA8</b> oppure <b>MTA16</b>.</p>
+<p>Nella sezione Tracks la checkbox ha un'area dedicata, il nome può essere modificato direttamente o con il pulsante matita, e le tracce audio mostrano <b>STEREO</b> o <b>MONO</b> quando disponibile.</p>
+<p>Il tasto Play diventa Pause durante la riproduzione: premendolo nuovamente la riproduzione viene realmente sospesa e può essere ripresa. La barra spazio esegue Play/Stop, salvo quando stai scrivendo in un campo di testo o numerico.</p>
+<p>Le applicazioni native Windows/macOS usano la stessa icona del prodotto e il comando <b>About</b> mostra nome, versione, build, creatore, licenza e repository GitHub, allineati alle informazioni della versione Kubernetes/web.</p>
+
+
+<h2 id="track-context-split">Separazione di una traccia esistente</h2>
+<p>Puoi separare in stems anche una traccia già presente nel progetto. Fai <b>click destro</b> sul riquadro della traccia in Tracks oppure sulla sua lane nella timeline e scegli <b>Separa</b>. L'app avvia Demucs sulla traccia selezionata, mostra la barra di avanzamento e permette l'annullamento come nel workflow Import &amp; Separate.</p>
+<p>La traccia sorgente viene mantenuta. Gli stem creati ricevono il nome della sorgente come prefisso, per esempio <code>Piano Guide · Vocals</code>, <code>Piano Guide · Drums</code> e così via.</p>
+
+
+<h2 id="follow-mixer-panels-inserts">Follow, pannelli Mixer, insert e VU-meter stereo</h2>
+<p>Il pulsante <b>Follow</b> nella barra di trasporto mantiene automaticamente visibile il punto corrente di riproduzione: quando il playhead si avvicina al bordo destro, la timeline scorre verso destra.</p>
+<p>I pulsanti <b>Export</b> e <b>Lyrics/Meta</b> nella barra superiore mostrano o nascondono rispettivamente il pannello Export e il pannello Lyrics/Chords/Markers. Quando uno o entrambi vengono nascosti, il Mixer si espande automaticamente nello spazio disponibile.</p>
+<p>Nel Mixer il canale <b>MASTER</b> è separato dalle tracce da un divisore verticale ed è evidenziato con un contorno dedicato. Il pulsante <b>FX</b> di ogni canale apre la gestione degli insert della traccia; il pulsante FX del Master gestisce la catena Master. Gli insert possono essere aggiunti, configurati, bypassati e rimossi.</p>
+<p>Il vecchio insert <b>Eq</b> a banda singola non è più disponibile per nuovi insert. <b>Graphic EQ 32</b> viene configurato con 32 fader grafici verticali, uno per banda.</p>
+<p>Con <b>RealTime</b> attivo, una traccia mono mostra un solo VU-meter. Una traccia stereo mostra due meter indipendenti <b>L</b> e <b>R</b>. Il Master è sempre stereo e mostra sempre due meter indipendenti L/R. In modalità Render i meter Master misurano direttamente l'anteprima master processata.</p>
+
 <h2 id="mta-appendix">Appendice A. Cosa contiene un file MTA</h2>
 <p>Un MTA usa strutture Matroska/EBML per tracce, attachment e indice temporale. La regione media, dal primo Cluster a fine file, usa uno XOR proprietario periodico di 984 byte. L'applicazione rimuove automaticamente questo trasporto durante l'import e lo riapplica durante l'export.</p>
 <p>Gli attachment stock includono file SYL e MtxInfoData XML. Il SYL contiene testo, accordi, highlighting karaoke e marker MIDI. Gli originali importati vengono sempre preservati nel progetto; per dettagli byte-level consultare l'Appendice A del Manuale amministratore e <code>docs/MTA_FORMAT_FINAL_SPEC.md</code>.</p>

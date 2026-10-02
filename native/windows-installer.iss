@@ -27,6 +27,7 @@ OutputBaseFilename=MTA-Audio-Editor-{#MyAppVersion}-Windows-x64-Setup
 Compression=lzma2/ultra64
 SolidCompression=yes
 WizardStyle=modern
+SetupIconFile=icons\mta-audio-editor.ico
 PrivilegesRequired=lowest
 UninstallDisplayIcon={app}\{#MyAppExeName}
 

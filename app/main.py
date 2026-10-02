@@ -36,6 +36,7 @@ from .storage import (
     delete_project,
     delete_project_file,
     file_path,
+    find_duplicate_project_file,
     import_project_archive,
     list_projects,
     load_project,
@@ -89,6 +90,7 @@ def _stem_job_public(job: dict) -> dict:
     return {
         "id": job["id"],
         "project_id": job["project_id"],
+        "source_track_id": job.get("source_track_id"),
         "status": job["status"],
         "progress": job["progress"],
         "message": job["message"],
@@ -663,6 +665,11 @@ def project_get(pid: str, request: Request):
         changed = True
     for track in project.tracks:
         ensure_clips(track)
+        if track.channels == 0:
+            source = audio_path(pid, track.filename)
+            if source.exists():
+                track.channels, track.channel_layout = _audio_channel_info(source)
+                changed = True
     if changed:
         save_project(project)
     return project
@@ -745,8 +752,15 @@ async def project_file_upload(pid: str, request: Request, file: UploadFile = Fil
     with tempfile.TemporaryDirectory() as td:
         src = Path(td) / "upload.bin"
         _copy_limited(file.file, src)
+        existing = find_duplicate_project_file(pid, src)
         dst = preserve_original(pid, src, Path(file.filename or "upload.bin").name)
-    return {"ok": True, "category": "original", "name": dst.name, "size": dst.stat().st_size}
+    return {
+        "ok": True,
+        "category": "original",
+        "name": dst.name,
+        "size": dst.stat().st_size,
+        "duplicate": bool(existing),
+    }
 
 
 @app.get("/api/projects/{pid}/files/{category}/{filename}")
@@ -773,6 +787,27 @@ def project_file_delete(pid: str, category: str, filename: str, request: Request
     return {"ok": True}
 
 
+
+@app.post("/api/projects/{pid}/files/batch-delete")
+def project_files_batch_delete(pid: str, request: Request, body: list[dict]):
+    _project_for_actor(request, pid)
+    if not body:
+        raise HTTPException(400, "Nessun file selezionato.")
+    deleted: list[dict] = []
+    errors: list[dict] = []
+    for item in body:
+        category = str(item.get("category", ""))
+        filename = str(item.get("name", ""))
+        try:
+            delete_project_file(pid, category, filename)
+            deleted.append({"category": category, "name": filename})
+        except (FileNotFoundError, ValueError) as exc:
+            errors.append({"category": category, "name": filename, "error": str(exc)})
+    if errors:
+        return {"ok": False, "deleted": deleted, "errors": errors}
+    return {"ok": True, "deleted": deleted, "errors": []}
+
+
 @app.get("/api/projects/{pid}/archive")
 def project_archive_export(pid: str, request: Request):
     project = _project_for_actor(request, pid)
@@ -793,13 +828,13 @@ def project_archive_export(pid: str, request: Request):
 @app.post("/api/project-archives/import")
 async def project_archive_import(request: Request, file: UploadFile = File(...)):
     actor = _actor(request)
-    if actor["id"] <= 0:
+    if actor["id"] <= 0 and not NATIVE_SINGLE_USER:
         raise HTTPException(400, "L'import completo richiede un account utente persistente.")
     with tempfile.TemporaryDirectory() as td:
         src = Path(td) / "project.zip"
         _copy_limited(file.file, src)
         try:
-            return import_project_archive(src, actor["id"])
+            return import_project_archive(src, actor["id"] if actor["id"] > 0 else None)
         except (ValueError, zipfile.BadZipFile) as exc:
             raise HTTPException(400, f"Archivio progetto non valido: {exc}") from exc
 
@@ -838,15 +873,19 @@ def _save_upload(pid: str, file: UploadFile):
     filename = f"{uuid.uuid4().hex[:10]}{ext}"
     dst = audio_path(pid, filename)
     _copy_limited(file.file, dst)
-    original = None
     try:
-        original = preserve_original(pid, dst, Path(file.filename or filename).name)
         ffprobe(dst)
     except Exception as exc:
         dst.unlink(missing_ok=True)
-        if original is not None:
-            original.unlink(missing_ok=True)
         raise HTTPException(400, "invalid or unsupported audio file") from exc
+    duplicate = find_duplicate_project_file(pid, dst)
+    if duplicate:
+        dst.unlink(missing_ok=True)
+        raise HTTPException(
+            409,
+            f"Il file è già presente nel progetto come {duplicate['category']}/{duplicate['name']}.",
+        )
+    preserve_original(pid, dst, Path(file.filename or filename).name)
     return filename, dst, media_duration_ms(dst)
 
 
@@ -855,6 +894,21 @@ def _save_upload(pid: str, file: UploadFile):
 def _waveform_revision(path: Path) -> str:
     stat = path.stat()
     return f"{path.name}:{stat.st_size}:{stat.st_mtime_ns}"
+
+
+def _audio_channel_info(path: Path) -> tuple[int, str]:
+    try:
+        info = ffprobe(path)
+        stream = next((item for item in info.get("streams", []) if item.get("codec_type") == "audio"), None)
+        if not stream:
+            return 0, ""
+        channels = int(stream.get("channels") or 0)
+        layout = str(stream.get("channel_layout") or "").strip()
+        if not layout:
+            layout = "stereo" if channels == 2 else ("mono" if channels == 1 else "")
+        return channels, layout
+    except Exception:
+        return 0, ""
 
 
 def _waveform_worker(job_id: str, pid: str, track_id: str) -> None:
@@ -957,6 +1011,7 @@ def _track_import_worker(
         _media_job_update(job_id, status="running", progress=58, message="Validazione della traccia")
         ffprobe(dst)
         duration = media_duration_ms(dst)
+        channels, channel_layout = _audio_channel_info(dst)
         project = load_project(pid)
         if estimate_first_bpm and not project.tracks:
             def bpm_progress(value: int, message: str) -> None:
@@ -991,6 +1046,8 @@ def _track_import_worker(
             )],
             waveform_peaks=peaks,
             waveform_revision=revision,
+            channels=channels,
+            channel_layout=channel_layout,
         )
         _media_job_update(job_id, progress=91, message="Aggiunta della traccia al progetto")
         if sync_mode == "auto" and project.tracks:
@@ -1028,6 +1085,13 @@ async def start_track_import_job(
     filename = f"{uuid.uuid4().hex[:10]}{ext}"
     dst = audio_path(pid, filename)
     _copy_limited(file.file, dst)
+    duplicate = find_duplicate_project_file(pid, dst)
+    if duplicate:
+        dst.unlink(missing_ok=True)
+        raise HTTPException(
+            409,
+            f"Il file è già presente nel progetto come {duplicate['category']}/{duplicate['name']}.",
+        )
     preserve_original(pid, dst, Path(file.filename or filename).name)
     now = time.time()
     job_id = uuid.uuid4().hex[:16]
@@ -1129,6 +1193,7 @@ async def replace_track(
 
     track.filename = filename
     track.duration_ms = duration
+    track.channels, track.channel_layout = _audio_channel_info(dst)
     track.waveform_peaks = []
     track.waveform_revision = ""
     track.clips = [Clip(id=uuid.uuid4().hex[:10], source_start_ms=0, source_end_ms=duration, timeline_start_ms=0)]
@@ -1264,6 +1329,7 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
         project_id = job["project_id"]
         model = job["model"]
         estimate_project_bpm = bool(job.get("estimate_bpm"))
+        stem_name_prefix = str(job.get("stem_name_prefix") or "").strip()
 
     def progress(value: int, message: str) -> None:
         _stem_job_update(job_id, progress=max(1, min(99, int(value))), message=message)
@@ -1315,12 +1381,18 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
                 dst = audio_path(project.id, filename)
                 shutil.copyfile(stem, dst)
                 duration = media_duration_ms(dst)
+                channels, channel_layout = _audio_channel_info(dst)
+                display_name = stem.stem.title()
+                if stem_name_prefix:
+                    display_name = f"{stem_name_prefix} · {display_name}"[:200]
                 new_track = Track(
                         id=uuid.uuid4().hex[:10],
-                        name=stem.stem.title(),
+                        name=display_name,
                         type=kind,
                         filename=filename,
                         duration_ms=duration,
+                        channels=channels,
+                        channel_layout=channel_layout,
                         clips=[
                             Clip(
                                 id=uuid.uuid4().hex[:10],
@@ -1336,11 +1408,6 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
                 save_project(project)
                 progress(90 + int(index / max(1, len(stems)) * 8), f"Importata traccia {stem.stem.title()}")
         if not keep_original_track:
-            project = load_project(project_id)
-            source_tracks = [track for track in project.tracks if track.name == "Original Mix" and track.filename == source.name]
-            for track in source_tracks:
-                project.tracks.remove(track)
-            save_project(project)
             source.unlink(missing_ok=True)
         _stem_job_update(job_id, status="completed", progress=100, message="Separazione completata")
     except Exception as exc:
@@ -1359,6 +1426,9 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
                 )
             _stem_job_update(job_id, status="cancelled", progress=0, message="Separazione annullata", error=None)
         else:
+            if not keep_original_track:
+                source.unlink(missing_ok=True)
+            LOGGER.exception("Stem separation job %s failed", job_id)
             _stem_job_update(job_id, status="failed", progress=0, message="Separazione fallita", error=str(exc)[-1200:])
 
 
@@ -1405,6 +1475,14 @@ async def stem_job_start(
     audio_name = f"{uuid.uuid4().hex[:10]}.mp3"
     source = audio_path(project.id, audio_name)
     _copy_limited(file.file, source)
+    if project_id:
+        duplicate = find_duplicate_project_file(project.id, source)
+        if duplicate:
+            source.unlink(missing_ok=True)
+            raise HTTPException(
+                409,
+                "Il file è già presente nel progetto. Usa il menu contestuale della traccia e scegli 'Separa in stems'.",
+            )
     try:
         ffprobe(source)
     except Exception as exc:
@@ -1415,22 +1493,26 @@ async def stem_job_start(
 
     original = preserve_original(project.id, source, Path(file.filename or "source.mp3").name)
     duration = media_duration_ms(source)
-    original_track = Track(
-        id=uuid.uuid4().hex[:10],
-        name="Original Mix",
-        type="other",
-        filename=audio_name,
-        duration_ms=duration,
-        clips=[
-            Clip(
-                id=uuid.uuid4().hex[:10],
-                source_start_ms=0,
-                source_end_ms=duration,
-                timeline_start_ms=0,
-            )
-        ],
-    )
-    project.tracks.append(original_track)
+    channels, channel_layout = _audio_channel_info(source)
+    if keep_original_track:
+        original_track = Track(
+            id=uuid.uuid4().hex[:10],
+            name="Original Mix",
+            type="other",
+            filename=audio_name,
+            duration_ms=duration,
+            channels=channels,
+            channel_layout=channel_layout,
+            clips=[
+                Clip(
+                    id=uuid.uuid4().hex[:10],
+                    source_start_ms=0,
+                    source_end_ms=duration,
+                    timeline_start_ms=0,
+                )
+            ],
+        )
+        project.tracks.append(original_track)
     save_project(project)
 
     job_id = uuid.uuid4().hex[:16]
@@ -1449,6 +1531,8 @@ async def stem_job_start(
         "cancel_event": cancel_event,
         "error": None,
         "estimate_bpm": estimate_bpm_for_project,
+        "source_track_id": None,
+        "stem_name_prefix": "",
     }
     with STEM_JOB_LOCK:
         STEM_JOBS[job_id] = job
@@ -1540,6 +1624,69 @@ async def split_stems_compat(
             ))
     save_project(project)
     return project
+
+
+
+@app.post("/api/projects/{pid}/tracks/{track_id}/stem-jobs")
+def start_track_stem_job(
+    pid: str,
+    track_id: str,
+    request: Request,
+    model: str = "htdemucs_6s",
+):
+    project = _project_for_actor(request, pid)
+    if not STEM_SPLITTER.available():
+        raise HTTPException(503, "Demucs stem plugin is not installed in this runtime")
+    status = STEM_SPLITTER.status()
+    if model not in status["models"]:
+        raise HTTPException(400, "Modello Demucs non supportato.")
+    track = next((item for item in project.tracks if item.id == track_id), None)
+    if track is None:
+        raise HTTPException(404, "track not found")
+
+    with STEM_JOB_LOCK:
+        busy = any(
+            item["project_id"] == pid and item["status"] not in {"completed", "failed", "cancelled"}
+            for item in STEM_JOBS.values()
+        )
+    if busy:
+        raise HTTPException(409, "È già in corso una separazione strumenti per questo progetto.")
+
+    source = audio_path(pid, track.filename)
+    if not source.is_file():
+        raise HTTPException(404, "File audio della traccia non trovato.")
+    try:
+        ffprobe(source)
+    except Exception as exc:
+        raise HTTPException(400, "La traccia selezionata non contiene audio separabile.") from exc
+
+    job_id = uuid.uuid4().hex[:16]
+    now = time.time()
+    job = {
+        "id": job_id,
+        "project_id": pid,
+        "source_track_id": track.id,
+        "status": "queued",
+        "progress": 5,
+        "message": f"Separazione della traccia {track.name} in coda",
+        "model": model,
+        "filename": track.name,
+        "created_at": now,
+        "updated_at": now,
+        "cancel_event": threading.Event(),
+        "error": None,
+        "estimate_bpm": False,
+        "stem_name_prefix": track.name,
+    }
+    with STEM_JOB_LOCK:
+        STEM_JOBS[job_id] = job
+    threading.Thread(
+        target=_stem_split_worker,
+        args=(job_id, source, True),
+        daemon=True,
+        name=f"track-stem-{job_id}",
+    ).start()
+    return _stem_job_public(job)
 
 
 @app.get("/api/projects/{pid}/preview-track/{track_id}")

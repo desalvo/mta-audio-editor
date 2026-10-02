@@ -1,3 +1,4 @@
+import hashlib
 import json
 import os
 import re
@@ -132,6 +133,34 @@ def delete_project(pid: str):
     shutil.rmtree(pdir(pid), ignore_errors=True)
 
 
+def file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def find_duplicate_project_file(pid: str, candidate: Path) -> dict | None:
+    if not candidate.is_file():
+        return None
+    candidate_size = candidate.stat().st_size
+    candidate_hash = None
+    for item in project_files(pid):
+        try:
+            existing = file_path(pid, item["category"], item["name"])
+        except ValueError:
+            continue
+        if not existing.is_file() or existing.resolve() == candidate.resolve():
+            continue
+        if existing.stat().st_size != candidate_size:
+            continue
+        candidate_hash = candidate_hash or file_sha256(candidate)
+        if file_sha256(existing) == candidate_hash:
+            return item
+    return None
+
+
 def _unique_original_name(pid: str, requested: str) -> str:
     name = Path(requested).name
     if not SAFE_NAME_RE.fullmatch(name):
@@ -149,6 +178,9 @@ def _unique_original_name(pid: str, requested: str) -> str:
 
 
 def preserve_original(pid: str, source: Path, original_name: str) -> Path:
+    duplicate = find_duplicate_project_file(pid, source)
+    if duplicate and duplicate["category"] == "original":
+        return original_path(pid, duplicate["name"])
     name = _unique_original_name(pid, original_name)
     dst = original_path(pid, name)
     shutil.copy2(source, dst)
@@ -235,7 +267,7 @@ def _safe_zip_members(z: zipfile.ZipFile) -> list[zipfile.ZipInfo]:
     return out
 
 
-def import_project_archive(archive_path: Path, owner_user_id: int) -> Project:
+def import_project_archive(archive_path: Path, owner_user_id: int | None) -> Project:
     with zipfile.ZipFile(archive_path) as z:
         members = _safe_zip_members(z)
         try:

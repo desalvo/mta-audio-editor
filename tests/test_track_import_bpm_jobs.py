@@ -29,9 +29,15 @@ def test_only_first_mp3_import_estimates_and_sets_bpm(tmp_path, monkeypatch):
     monkeypatch.setattr(main, "estimate_bpm", fake_bpm)
 
     mp3 = tmp_path / "song.mp3"
+    mp3_second = tmp_path / "song2.mp3"
     subprocess.run(
         ["ffmpeg","-y","-v","error","-f","lavfi","-i","sine=frequency=440:duration=0.5",
          "-ar","44100","-ac","2","-b:a","192k",str(mp3)],
+        check=True,
+    )
+    subprocess.run(
+        ["ffmpeg","-y","-v","error","-f","lavfi","-i","sine=frequency=660:duration=0.5",
+         "-ar","44100","-ac","2","-b:a","192k",str(mp3_second)],
         check=True,
     )
 
@@ -39,8 +45,8 @@ def test_only_first_mp3_import_estimates_and_sets_bpm(tmp_path, monkeypatch):
     created = client.post("/api/projects?title=BPM%20Test&target=MTA8").json()
     pid = created["id"]
 
-    def upload(name):
-        with mp3.open("rb") as fh:
+    def upload(name, source=mp3):
+        with source.open("rb") as fh:
             r = client.post(
                 f"/api/projects/{pid}/track-import-jobs?name={name}",
                 files={"file": (f"{name}.mp3", fh, "audio/mpeg")},
@@ -61,7 +67,7 @@ def test_only_first_mp3_import_estimates_and_sets_bpm(tmp_path, monkeypatch):
     assert project.bpm == 128.0
     assert len(calls) == 1
 
-    second = upload("Second")
+    second = upload("Second", mp3_second)
     assert second["status"] == "completed"
     project = storage.load_project(pid)
     assert project.bpm == 128.0

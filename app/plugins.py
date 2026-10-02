@@ -24,8 +24,7 @@ BANDS_32 = [20, 25, 31, 40, 50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 
             800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000, 6300, 8000, 10000,
             12500, 16000, 20000, 22000]
 
-PRESETS: dict[str, dict[str, str]] = {
-    "eq": {
+LEGACY_EQ_PRESETS: dict[str, str] = {
         "default": "equalizer=f=1000:t=q:w=1:g=0",
         "flat": "equalizer=f=1000:t=q:w=1:g=0",
         "drums-punchy": "equalizer=f=80:t=q:w=1:g=2,equalizer=f=350:t=q:w=1.2:g=-2,equalizer=f=4500:t=q:w=1:g=2",
@@ -34,7 +33,9 @@ PRESETS: dict[str, dict[str, str]] = {
         "guitar-clarity": "highpass=f=70,equalizer=f=250:t=q:w=1:g=-1.5,equalizer=f=2200:t=q:w=1:g=2",
         "piano-natural": "highpass=f=45,equalizer=f=300:t=q:w=1:g=-1,equalizer=f=3500:t=q:w=1:g=1.5",
         "master-gentle": "highpass=f=25,equalizer=f=250:t=q:w=1:g=-0.5,equalizer=f=9000:t=q:w=0.7:g=0.8",
-    },
+}
+
+PRESETS: dict[str, dict[str, str]] = {
     "normalizer": {
         "default": "loudnorm=I=-14:LRA=11:TP=-1",
         "streaming-14": "loudnorm=I=-14:LRA=11:TP=-1",
@@ -80,6 +81,11 @@ PRESETS: dict[str, dict[str, str]] = {
     "graphic_eq_32": {
         "default": "anull",
         "flat-32": "anull",
+        "drums-punchy": "equalizer=f=80:t=q:w=1:g=2,equalizer=f=315:t=q:w=1:g=-2,equalizer=f=5000:t=q:w=1:g=2",
+        "bass-warm": "equalizer=f=80:t=q:w=0.8:g=3,equalizer=f=315:t=q:w=1.2:g=-2,equalizer=f=2500:t=q:w=1:g=1",
+        "vocals-presence": "highpass=f=80,equalizer=f=250:t=q:w=1:g=-1.5,equalizer=f=3150:t=q:w=1:g=2.5,equalizer=f=8000:t=q:w=1:g=1",
+        "guitar-clarity": "highpass=f=70,equalizer=f=250:t=q:w=1:g=-1.5,equalizer=f=2500:t=q:w=1:g=2",
+        "piano-natural": "highpass=f=45,equalizer=f=315:t=q:w=1:g=-1,equalizer=f=3150:t=q:w=1:g=1.5",
         "smile": "equalizer=f=63:t=q:w=1:g=2,equalizer=f=125:t=q:w=1:g=1.5,equalizer=f=500:t=q:w=1:g=-1,equalizer=f=2000:t=q:w=1:g=-1,equalizer=f=8000:t=q:w=1:g=2,equalizer=f=16000:t=q:w=1:g=1.5",
         "speech": "highpass=f=80,equalizer=f=250:t=q:w=1:g=-2,equalizer=f=1250:t=q:w=1:g=1,equalizer=f=3150:t=q:w=1:g=2.5,equalizer=f=8000:t=q:w=1:g=1",
         "master-air": "highpass=f=25,equalizer=f=125:t=q:w=1:g=0.8,equalizer=f=315:t=q:w=1:g=-0.8,equalizer=f=10000:t=q:w=1:g=1.2,equalizer=f=16000:t=q:w=1:g=0.8",
@@ -272,10 +278,12 @@ def plugin_catalog() -> dict[str, list[str]]:
 
 
 def plugin_manifest() -> dict[str, object]:
+    public_schemas = {key: value for key, value in SCHEMAS.items() if key != "eq"}
+    public_custom = {key: value for key, value in user_presets().items() if key != "eq"}
     return {
         "presets": plugin_catalog(),
-        "schemas": SCHEMAS,
-        "custom": user_presets(),
+        "schemas": public_schemas,
+        "custom": public_custom,
         "notes": {
             "reverb_lexicon": "Lexicon-style preset family implemented with open FFmpeg processing; not a Lexicon algorithm/emulation.",
             "mastering_wizard": "Rule-based mastering chain; final level should still be auditioned on representative playback systems.",
@@ -294,7 +302,10 @@ def plugin_filter(plugin: InsertPlugin) -> str | None:
         if params is None:
             raise ValueError(f"user preset not found: {plugin.preset}")
         return custom_filter(plugin.plugin, params)
-    presets = PRESETS.get(plugin.plugin)
+    if plugin.plugin == "eq":
+        presets = LEGACY_EQ_PRESETS
+    else:
+        presets = PRESETS.get(plugin.plugin)
     if not presets:
         raise ValueError(f"unsupported plugin: {plugin.plugin}")
     expr = presets.get(plugin.preset)
@@ -341,10 +352,44 @@ class DemucsStemSplitter:
         if not cls.available():
             raise RuntimeError("Demucs stem plugin is not installed in this runtime")
         output_dir.mkdir(parents=True, exist_ok=True)
+        if getattr(sys, "frozen", False):
+            # In native .app/.exe builds, starting the frozen GUI executable as a
+            # Demucs subprocess is fragile on macOS (the child can be treated as
+            # another app instance and terminate/reload the main window). Run the
+            # packaged Demucs module in the existing background worker thread.
+            if progress:
+                progress(20, "Caricamento modello Demucs nell'app nativa")
+            if cancel_event is not None and cancel_event.is_set():
+                raise RuntimeError("stem separation cancelled")
+            from demucs.separate import main as demucs_main
+
+            old_argv = sys.argv[:]
+            try:
+                sys.argv = ["demucs.separate", "-n", model, "--out", str(output_dir), str(source)]
+                try:
+                    result = demucs_main()
+                except SystemExit as exc:
+                    code = int(exc.code or 0)
+                    if code:
+                        raise RuntimeError(f"Demucs terminated with exit code {code}") from exc
+                else:
+                    if result not in {None, 0}:
+                        raise RuntimeError(f"Demucs terminated with exit code {result}")
+            finally:
+                sys.argv = old_argv
+            if cancel_event is not None and cancel_event.is_set():
+                raise RuntimeError("stem separation cancelled")
+            if progress:
+                progress(88, "Raccolta delle tracce separate")
+            candidates = sorted(output_dir.glob(f"{model}/**/*.wav"))
+            if not candidates:
+                candidates = sorted(output_dir.rglob("*.wav"))
+            if not candidates:
+                raise RuntimeError("stem separator produced no WAV files")
+            return candidates
+
         if shutil.which("demucs"):
             cmd = ["demucs", "-n", model, "--out", str(output_dir), str(source)]
-        elif getattr(sys, "frozen", False):
-            cmd = [sys.executable, "--demucs-worker", "-n", model, "--out", str(output_dir), str(source)]
         else:
             cmd = [sys.executable, "-m", "demucs.separate", "-n", model, "--out", str(output_dir), str(source)]
         if progress:

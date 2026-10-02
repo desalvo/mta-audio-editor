@@ -67,6 +67,8 @@ def import_mta(path: Path, project: Project) -> Project:
                     type=typ if typ in allowed else "other",
                     filename=out.name,
                     duration_ms=dur,
+                    channels=int(stream.get("channels") or 0),
+                    channel_layout=str(stream.get("channel_layout") or ""),
                     clips=[Clip(id=uuid.uuid4().hex[:10], source_start_ms=0, source_end_ms=dur, timeline_start_ms=0)],
                 )
             )

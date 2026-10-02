@@ -87,6 +87,22 @@ POST /api/stems/jobs/{job_id}/cancel</pre>
 <p>Le versioni native sono mono-utente e disabilitano login, registrazione, gestione account/utenti, SMTP/TOTP e sharing. I dati persistono in <code>%LOCALAPPDATA%\MTA Audio Editor</code> su Windows e <code>~/Library/Application Support/MTA Audio Editor</code> su macOS.</p>
 <p>La pipeline installa e incorpora FFmpeg/FFprobe e Demucs/PyTorch, esegue uno smoke test dell'eseguibile frozen e poi produce un installer Inno Setup su Windows e un DMG su macOS. Su tag, entrambi vengono pubblicati automaticamente nella GitHub Release.</p>
 
+
+<h2 id="native-demucs-and-metadata">Native Demucs, iconografia e metadata</h2>
+<p>Nelle build frozen Windows/macOS Demucs viene invocato in-process dal worker thread backend. Non viene più rilanciato l'eseguibile GUI con <code>--demucs-worker</code>: questo evita su macOS la creazione/terminazione di una seconda istanza applicativa durante il caricamento del modello.</p>
+<p>Le build PyInstaller includono l'icona applicativa in formato ICO/ICNS. Windows riceve anche version resources generate da <code>native/generate_native_metadata.py</code>; macOS inserisce nel bundle plist versione, build, creatore e repository.</p>
+<p>L'endpoint <code>/api/about</code> resta la fonte applicativa per nome, versione, build, creatore, repository e licenza; la stessa informazione è esposta dal dialog About nelle varianti web e native.</p>
+
+
+<h2 id="track-context-stem-job">Stem job da traccia esistente</h2>
+<p>L'endpoint <code>POST /api/projects/{pid}/tracks/{track_id}/stem-jobs</code> avvia la separazione Demucs direttamente sul working audio della traccia selezionata. Non viene creato un nuovo upload e il file sorgente non viene eliminato. Il job riusa lo stesso controller asincrono, progress reporting e cancellazione dei normali stem job.</p>
+
+
+<h2 id="realtime-stereo-metering">Follow, layout Mixer e metering L/R</h2>
+<p>Le preferenze <code>follow_playback_enabled</code>, <code>export_panel_visible</code> e <code>metadata_panel_visible</code> sono persistite nel modello Project. Il layout del Mixer ridistribuisce le colonne in base ai pannelli visibili.</p>
+<p>Il metering RealTime usa Web Audio API. Le sorgenti mono usano un singolo <code>AnalyserNode</code>; le sorgenti stereo vengono separate tramite <code>ChannelSplitterNode(2)</code> e misurate con analyser indipendenti L/R. Il Master è sempre stereo. In Render mode il master renderizzato alimenta direttamente gli analyser Master L/R; in dynamic preview il valore Master viene composto dai livelli L/R delle tracce attive.</p>
+<p>Il catalogo pubblico non espone più l'insert legacy <code>eq</code>. Il supporto di rendering legacy resta disponibile per aprire progetti preesistenti. Auto Mix usa <code>graphic_eq_32</code>. L'editor del Graphic EQ è una superficie grafica a 32 fader, mentre la validazione server-side continua ad applicare i limiti -12/+12 dB per banda.</p>
+
 <h2 id="appendix-mta">Appendice A. Specifica tecnica del formato proprietario MTA</h2>
 <div class="note"><b>Ambito:</b> questa appendice documenta il formato on-disk verificato sul corpus stock disponibile. "Verificato" significa che la relazione è stata ricostruita dai byte e controllata su più file indipendenti. La compatibilità con ogni revisione firmware M-Live/Merish richiede comunque una prova sul dispositivo target.</div>
 

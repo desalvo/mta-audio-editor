@@ -141,6 +141,64 @@ def _native_smoke(url: str) -> int:
     return 0
 
 
+
+class NativeApi:
+    """Filesystem bridge exposed only by the desktop pywebview build."""
+
+    def __init__(self) -> None:
+        self.window = None
+
+    @staticmethod
+    def _dialog_path(value):
+        if not value:
+            return None
+        if isinstance(value, (list, tuple)):
+            return Path(value[0]) if value else None
+        return Path(value)
+
+    def save_project(self, project_id: str, suggested_name: str) -> dict:
+        if self.window is None:
+            raise RuntimeError("native window is not ready")
+        import webview
+        from app.storage import write_project_archive
+
+        safe_name = "".join(ch if ch.isalnum() or ch in " ._-" else "_" for ch in suggested_name).strip(" .")
+        if not safe_name:
+            safe_name = "project"
+        if not safe_name.lower().endswith(".mta-project.zip"):
+            safe_name += ".mta-project.zip"
+
+        chosen = self.window.create_file_dialog(
+            webview.FileDialog.SAVE,
+            save_filename=safe_name,
+            file_types=("MTA Audio Editor Project (*.mta-project.zip)",),
+        )
+        path = self._dialog_path(chosen)
+        if path is None:
+            return {"ok": False, "cancelled": True}
+        if not str(path).lower().endswith(".mta-project.zip"):
+            path = Path(str(path) + ".mta-project.zip")
+        write_project_archive(project_id, path)
+        return {"ok": True, "cancelled": False, "path": str(path)}
+
+    def open_project(self) -> dict:
+        if self.window is None:
+            raise RuntimeError("native window is not ready")
+        import webview
+        from app.storage import import_project_archive
+
+        chosen = self.window.create_file_dialog(
+            webview.FileDialog.OPEN,
+            allow_multiple=False,
+            file_types=("MTA Audio Editor Project (*.mta-project.zip;*.zip)",),
+        )
+        path = self._dialog_path(chosen)
+        if path is None:
+            return {"ok": False, "cancelled": True}
+        project = import_project_archive(path, None)
+        return {"ok": True, "cancelled": False, "project": project.model_dump(mode="json")}
+
+
 def main() -> int:
     if "--demucs-worker" in sys.argv:
         return _run_demucs_worker()
@@ -156,14 +214,17 @@ def main() -> int:
 
         import webview
 
-        webview.create_window(
+        native_api = NativeApi()
+        window = webview.create_window(
             APP_NAME,
             url=url,
             width=1500,
             height=960,
             min_size=(1050, 700),
             text_select=True,
+            js_api=native_api,
         )
+        native_api.window = window
         webview.start(debug=False)
         return 0
     finally:

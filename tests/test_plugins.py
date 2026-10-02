@@ -10,7 +10,8 @@ WRITE_HEADERS = {"X-MTA-Request": "1"}
 
 def test_plugin_catalog_and_safe_chain():
     catalog = plugin_catalog()
-    assert {"eq", "normalizer", "compressor", "limiter"} <= set(catalog)
+    assert {"normalizer", "compressor", "limiter", "graphic_eq_32"} <= set(catalog)
+    assert "eq" not in catalog
     chain = chain_filter(
         [
             InsertPlugin(id="eq1", plugin="eq", preset="vocals-presence"),

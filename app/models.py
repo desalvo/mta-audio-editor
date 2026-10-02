@@ -68,6 +68,8 @@ class Track(BaseModel):
     inserts: list[InsertPlugin] = Field(default_factory=list, max_length=16)
     waveform_peaks: list[float] = Field(default_factory=list, max_length=2048)
     waveform_revision: str = Field(default="", max_length=128)
+    channels: int = Field(default=0, ge=0, le=32)
+    channel_layout: str = Field(default="", max_length=64)
 
 
 class Marker(BaseModel):
@@ -146,6 +148,9 @@ class Project(BaseModel):
     track_panel_width_px: int = Field(default=225, ge=160, le=520)
     realtime_meter_enabled: bool = False
     render_preview_enabled: bool = False
+    follow_playback_enabled: bool = False
+    export_panel_visible: bool = True
+    metadata_panel_visible: bool = True
 
     @field_validator("shared_with_user_ids")
     @classmethod

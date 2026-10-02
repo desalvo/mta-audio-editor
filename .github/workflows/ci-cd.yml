@@ -111,7 +111,7 @@ jobs:
           push: false
           tags: mta-audio-editor:ci
           build-args: |
-            APP_VERSION=${{ github.ref_type == 'tag' && github.ref_name || '0.2.0-42' }}
+            APP_VERSION=${{ github.ref_type == 'tag' && github.ref_name || '0.2.0-47' }}
             BUILD_ID=${{ steps.build.outputs.id }}
       - name: Verify container OS
         shell: bash
@@ -217,6 +217,9 @@ jobs:
         run: |
           $build=(Get-Date).ToUniversalTime().ToString("yyyyMMdd-HH:mm:ss")
           Set-Content -Path BUILD_INFO -Value $build
+      - name: Generate native application metadata
+        shell: pwsh
+        run: python native/generate_native_metadata.py
       - name: Build Windows native application
         shell: pwsh
         run: pyinstaller --noconfirm --clean native/mta_audio_editor_native.spec
@@ -265,24 +268,34 @@ jobs:
         include:
           - runner: macos-15-intel
             arch: x64
+            python: '3.12'
           - runner: macos-15
             arch: arm64
+            python: '3.14'
     runs-on: ${{ matrix.runner }}
     needs: [quality, security]
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
+          python-version: ${{ matrix.python }}
           cache: pip
       - name: Install application and native build dependencies
         shell: bash
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          # macOS PyTorch wheels do not use the Linux/Windows '+cpu' local suffix.
-          sed '/^--extra-index-url /d; s/^torch==\(.*\)+cpu$/torch==\1/' requirements-stems.txt > /tmp/requirements-native-stems.txt
-          pip install -r /tmp/requirements-native-stems.txt
+          if [[ "${{ matrix.arch }}" == "x64" ]]; then
+            # PyTorch stopped publishing Intel macOS wheels after 2.2.x.
+            # Build the Intel desktop edition with Python 3.12 + the last official
+            # x86_64 torch/torchaudio wheels while keeping Demucs 4.1.
+            pip install -r requirements-stems-macos-x64.txt
+          else
+            # Apple Silicon follows the normal current PyTorch line. macOS wheels
+            # do not use the Linux/Windows '+cpu' local suffix.
+            sed '/^--extra-index-url /d; s/^torch==\(.*\)+cpu$/torch==\1/' requirements-stems.txt > /tmp/requirements-native-stems.txt
+            pip install -r /tmp/requirements-native-stems.txt
+          fi
           pip install -r requirements-native.txt
           pip check
       - name: Install FFmpeg
@@ -294,6 +307,9 @@ jobs:
       - name: Generate native build id
         shell: bash
         run: TZ=Europe/Rome date '+%Y%m%d-%H:%M:%S' > BUILD_INFO
+      - name: Generate native application metadata
+        shell: bash
+        run: python native/generate_native_metadata.py
       - name: Build macOS native application
         shell: bash
         run: pyinstaller --noconfirm --clean native/mta_audio_editor_native.spec
