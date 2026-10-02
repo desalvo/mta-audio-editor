@@ -1,4 +1,10 @@
-## 0.2.0-62
+## 0.2.0-63
+
+- Corretto il secondo errore Android rilevato nel run GitHub Actions 37057175276: il progetto usa dipendenze AndroidX ma non abilitava `android.useAndroidX`.
+- Aggiunto `mobile/android/gradle.properties` con AndroidX abilitato e Jetifier disabilitato, dato che le dipendenze del progetto sono già AndroidX.
+- Aggiunto test regressivo per impedire la rimozione accidentale della configurazione AndroidX.
+
+## 0.2.0-63
 
 - Il menu contestuale di una traccia include anche `Rimuovi`, per eliminare la traccia selezionata dal progetto.
 
@@ -109,7 +115,7 @@
 
 - Initial FastAPI/FFmpeg MTA8/MTA16 web editor prototype.
 
-## 0.2.0-62
+## 0.2.0-63
 
 - Kubernetes wizard: HAProxy ingress now always emits `kubernetes.io/ingress.class: haproxy` in addition to `spec.ingressClassName: haproxy`.
 - Reverse-engineering notes: confirmed the 181392 ns Matroska timecode scale, 40 MP3 frames per Cue interval, exact 320 kbit/s frame/SimpleBlock sizing, and frame-major per-track interleaving evidence.

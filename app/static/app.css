@@ -74,7 +74,7 @@
 .inspector-row .volume-number{width:68px;min-width:68px;height:28px;padding:3px 6px}
 .channel .volume-number{width:54px;min-width:54px;height:25px;border:1px solid #30485c;border-radius:4px;background:#0b1721;color:#dcecf7;padding:2px 4px;font-size:10px}
 
-/* 0.2.0-62 synchronized Tracks/timeline and persistent waveform UX */
+/* 0.2.0-63 synchronized Tracks/timeline and persistent waveform UX */
 .editor-grid{grid-template-columns:var(--track-column-width,225px) 5px minmax(540px,1fr) 300px}
 .track-column{overflow:auto;scrollbar-gutter:stable;background:#0c1721}
 .track-column-head{position:sticky;top:0;z-index:18}
@@ -104,7 +104,7 @@
 
 .native-single-user .auth-managed{display:none!important}
 
-/* 0.2.0-62 UI fixes */
+/* 0.2.0-63 UI fixes */
 .track-head{
   grid-template-columns:5px 26px minmax(0,1fr) 28px;
 }
@@ -184,7 +184,7 @@
   .nav-item.import-action span{font-size:10px}
 }
 
-/* 0.2.0-62 track contextual actions */
+/* 0.2.0-63 track contextual actions */
 .track-context-menu{
   position:fixed;
   z-index:5000;
@@ -214,7 +214,7 @@
 .track-context-menu button:disabled{opacity:.42;cursor:not-allowed}
 .track-context-menu button:disabled:hover{background:transparent}
 
-/* 0.2.0-62 project list, context menu and batch file management */
+/* 0.2.0-63 project list, context menu and batch file management */
 .sidebar-projects .projects-toggle{
   width:100%;
   display:flex;
@@ -256,7 +256,7 @@
 .track-context-menu button.danger{color:#ff9ca8}
 .project-file-check{width:16px;height:16px}
 
-/* 0.2.0-62 follow, collapsible mixer panes and insert management */
+/* 0.2.0-63 follow, collapsible mixer panes and insert management */
 .transport-btn.follow-mode{width:auto;min-width:46px;padding:0 7px;font-size:9px}
 .transport-btn.follow-mode.active{background:#124e38;border-color:#36dca1;color:#caffec;box-shadow:0 0 8px rgba(54,220,161,.22)}
 .header-actions button.panel-hidden{opacity:.55;background:#111d27;color:#7d94a5;border-color:#2c4252}
@@ -357,7 +357,7 @@
   max-height:26px;
 }
 
-/* 0.2.0-62 independent mono/stereo realtime VU meters */
+/* 0.2.0-63 independent mono/stereo realtime VU meters */
 .channel-fader-area{grid-template-columns:18px auto;column-gap:4px}
 .meter-pair{min-width:13px}
 .meter-pair .meter{position:relative}
@@ -374,7 +374,7 @@
 .channel.master{width:104px}
 .master-meter-pair{min-width:36px}
 
-/* 0.2.0-62 sidebar import button containment */
+/* 0.2.0-63 sidebar import button containment */
 .sidebar .nav-item.import-audio-action{
   display:grid;
   grid-template-columns:18px minmax(0,1fr);
@@ -424,7 +424,7 @@
 .mixer-dock.sidepanels-hidden .mixer-pane{border-right:0}
 .mixer-dock.sidepanels-hidden .channels{width:100%}
 
-/* 0.2.0-62 top project name containment */
+/* 0.2.0-63 top project name containment */
 .project-name-block{
   width:320px;
   min-width:250px;
@@ -451,7 +451,7 @@
   .project-name-block{width:260px;min-width:220px;flex-basis:260px}
 }
 
-/* 0.2.0-62 interactive mixer panpots and plugin preset setup */
+/* 0.2.0-63 interactive mixer panpots and plugin preset setup */
 .pan-control{
   display:grid;
   grid-template-columns:30px minmax(0,1fr);
@@ -505,7 +505,7 @@
   padding:4px 7px;
 }
 
-/* 0.2.0-62 collapsible Project/File operations */
+/* 0.2.0-63 collapsible Project/File operations */
 .sidebar-tools{
   margin:3px 0 7px;
   border:1px solid #263f53;

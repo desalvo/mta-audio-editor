@@ -17,3 +17,9 @@ def test_ios_open_panel_is_availability_guarded_for_ios_15_target():
     marker = swift.index("@available(iOS 18.4, *)")
     method = swift.index("runOpenPanelWith parameters: WKOpenPanelParameters", marker)
     assert marker < method
+
+
+def test_android_project_enables_androidx():
+    root = Path(__file__).resolve().parents[1]
+    props = (root / "mobile/android/gradle.properties").read_text(encoding="utf-8")
+    assert "android.useAndroidX=true" in props
