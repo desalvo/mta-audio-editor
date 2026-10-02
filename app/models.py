@@ -124,6 +124,17 @@ class MtaExportRequest(BaseModel):
     slots: list[MtaSlotMapping] = Field(default_factory=list, max_length=16)
 
 
+class ProjectExportRequest(BaseModel):
+    format: Literal["mta", "wav", "mp3", "flac"] = "mta"
+    filename: str = Field(default="project", min_length=1, max_length=240)
+    mp3_bitrate_kbps: int = Field(default=320, ge=96, le=320)
+    sample_rate: Literal[44100, 48000] = 44100
+    wav_bit_depth: Literal[16, 24, 32] = 24
+    flac_compression: int = Field(default=8, ge=0, le=12)
+    slots: list[MtaSlotMapping] = Field(default_factory=list, max_length=16)
+    output_path: str | None = Field(default=None, max_length=4096)
+
+
 class Project(BaseModel):
     id: str
     owner_user_id: int | None = Field(default=None, ge=1)
@@ -151,6 +162,9 @@ class Project(BaseModel):
     follow_playback_enabled: bool = False
     export_panel_visible: bool = True
     metadata_panel_visible: bool = True
+    timeline_zoom_px_per_sec: int = Field(default=70, ge=25, le=240)
+    mixer_meta_tab: Literal["lyrics", "chords", "markers"] = "lyrics"
+    export_format: Literal["mta", "wav", "mp3", "flac"] = "mta"
 
     @field_validator("shared_with_user_ids")
     @classmethod

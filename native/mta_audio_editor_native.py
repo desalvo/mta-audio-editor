@@ -9,6 +9,7 @@ import sys
 import threading
 import time
 import http.client
+import multiprocessing
 from pathlib import Path
 
 
@@ -147,6 +148,7 @@ class NativeApi:
 
     def __init__(self) -> None:
         self.window = None
+        self.project_paths: dict[str, Path] = {}
 
     @staticmethod
     def _dialog_path(value):
@@ -156,18 +158,16 @@ class NativeApi:
             return Path(value[0]) if value else None
         return Path(value)
 
-    def save_project(self, project_id: str, suggested_name: str) -> dict:
+    def choose_project_save_path(self, suggested_name: str) -> dict:
         if self.window is None:
             raise RuntimeError("native window is not ready")
         import webview
-        from app.storage import write_project_archive
 
         safe_name = "".join(ch if ch.isalnum() or ch in " ._-" else "_" for ch in suggested_name).strip(" .")
         if not safe_name:
             safe_name = "project"
         if not safe_name.lower().endswith(".mta-project.zip"):
             safe_name += ".mta-project.zip"
-
         chosen = self.window.create_file_dialog(
             webview.FileDialog.SAVE,
             save_filename=safe_name,
@@ -178,7 +178,81 @@ class NativeApi:
             return {"ok": False, "cancelled": True}
         if not str(path).lower().endswith(".mta-project.zip"):
             path = Path(str(path) + ".mta-project.zip")
-        write_project_archive(project_id, path)
+        return {"ok": True, "cancelled": False, "path": str(path)}
+
+    def bind_project_path(self, project_id: str, path: str) -> dict:
+        from app.storage import write_project_archive
+
+        target = Path(path).expanduser().resolve()
+        target.parent.mkdir(parents=True, exist_ok=True)
+        self.project_paths[project_id] = target
+        write_project_archive(project_id, target)
+        return {"ok": True, "path": str(target)}
+
+    def sync_project(self, project_id: str) -> dict:
+        from app.storage import write_project_archive
+
+        target = self.project_paths.get(project_id)
+        if target is None:
+            return {"ok": False, "bound": False}
+        write_project_archive(project_id, target)
+        return {"ok": True, "bound": True, "path": str(target)}
+
+    def get_project_path(self, project_id: str) -> dict:
+        target = self.project_paths.get(project_id)
+        return {
+            "ok": True,
+            "bound": target is not None,
+            "path": str(target) if target is not None else "",
+        }
+
+    def save_project(self, project_id: str, suggested_name: str) -> dict:
+        chosen = self.choose_project_save_path(suggested_name)
+        if not chosen.get("ok"):
+            return chosen
+        return self.bind_project_path(project_id, str(chosen["path"]))
+
+    def save_project_copy(self, project_id: str, suggested_name: str) -> dict:
+        from app.storage import write_project_archive
+
+        chosen = self.choose_project_save_path(suggested_name)
+        if not chosen.get("ok"):
+            return chosen
+        target = Path(str(chosen["path"])).expanduser().resolve()
+        target.parent.mkdir(parents=True, exist_ok=True)
+        write_project_archive(project_id, target)
+        return {"ok": True, "cancelled": False, "path": str(target)}
+
+    def choose_export_save_path(self, suggested_name: str, extension: str) -> dict:
+        if self.window is None:
+            raise RuntimeError("native window is not ready")
+        import webview
+
+        ext = str(extension or "").lower().lstrip(".")
+        if ext not in {"mta8", "mta16", "wav", "mp3", "flac"}:
+            raise ValueError("unsupported export extension")
+        safe_name = "".join(ch if ch.isalnum() or ch in " ._-" else "_" for ch in suggested_name).strip(" .")
+        if not safe_name:
+            safe_name = "export"
+        if not safe_name.lower().endswith(f".{ext}"):
+            safe_name += f".{ext}"
+        labels = {
+            "mta8": "MTA8 (*.mta8)",
+            "mta16": "MTA16 (*.mta16)",
+            "wav": "WAV Audio (*.wav)",
+            "mp3": "MP3 Audio (*.mp3)",
+            "flac": "FLAC Audio (*.flac)",
+        }
+        chosen = self.window.create_file_dialog(
+            webview.FileDialog.SAVE,
+            save_filename=safe_name,
+            file_types=(labels[ext],),
+        )
+        path = self._dialog_path(chosen)
+        if path is None:
+            return {"ok": False, "cancelled": True}
+        if path.suffix.lower() != f".{ext}":
+            path = path.with_suffix(f".{ext}")
         return {"ok": True, "cancelled": False, "path": str(path)}
 
     def open_project(self) -> dict:
@@ -233,4 +307,8 @@ def main() -> int:
 
 
 if __name__ == "__main__":
+    # Required for PyInstaller-frozen apps using torch/demucs multiprocessing.
+    # Without this, a spawned worker can execute this launcher again and open
+    # a second empty application window instead of becoming a worker process.
+    multiprocessing.freeze_support()
     raise SystemExit(main())

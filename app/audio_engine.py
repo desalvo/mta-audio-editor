@@ -9,7 +9,7 @@ from pathlib import Path
 import numpy as np
 
 from .models import Clip, Project, Track
-from .plugins import chain_filter
+from .plugins import chain_filter, effective_output_channels
 
 
 def _run(cmd: list[str]) -> str:
@@ -34,6 +34,73 @@ def ensure_clips(track: Track) -> None:
         track.clips = [
             Clip(id=uuid.uuid4().hex[:10], source_start_ms=0, source_end_ms=track.duration_ms, timeline_start_ms=0)
         ]
+
+
+def project_duration_ms(project: Project) -> int:
+    end_ms = 0
+    for track in project.tracks:
+        ensure_clips(track)
+        if track.clips:
+            end_ms = max(
+                end_ms,
+                max((clip.timeline_start_ms + clip.duration_ms) for clip in track.clips),
+            )
+        else:
+            end_ms = max(end_ms, track.duration_ms)
+    return max(0, int(end_ms))
+
+
+def generate_metronome_wav(project: Project, out: Path, beats_per_bar: int = 4) -> int:
+    """Generate a mono PCM click track for the full current project duration."""
+    duration_ms = project_duration_ms(project)
+    if duration_ms <= 0:
+        raise ValueError("project duration is zero")
+    sample_rate = 44100
+    total_samples = max(1, round(duration_ms / 1000 * sample_rate))
+    beat_samples = max(1, round(60.0 / float(project.bpm) * sample_rate))
+    click_len = min(max(1, round(0.045 * sample_rate)), beat_samples)
+    silence_chunk = b"\x00\x00" * 8192
+
+    def click_bytes(freq: float) -> bytes:
+        t = np.arange(click_len, dtype=np.float64) / sample_rate
+        env = np.exp(-t * 55.0)
+        wave_data = np.sin(2 * np.pi * freq * t) * env * 0.82
+        return np.asarray(np.clip(wave_data, -1, 1) * 32767, dtype=np.int16).tobytes()
+
+    accent = click_bytes(1320.0)
+    regular = click_bytes(880.0)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    with wave.open(str(out), "wb") as handle:
+        handle.setnchannels(1)
+        handle.setsampwidth(2)
+        handle.setframerate(sample_rate)
+        cursor = 0
+        beat_index = 0
+        next_beat = 0
+        while cursor < total_samples:
+            if next_beat >= total_samples:
+                remaining = total_samples - cursor
+                while remaining > 0:
+                    count = min(8192, remaining)
+                    handle.writeframesraw(silence_chunk[: count * 2])
+                    cursor += count
+                    remaining -= count
+                break
+            if next_beat > cursor:
+                remaining = next_beat - cursor
+                while remaining > 0:
+                    count = min(8192, remaining)
+                    handle.writeframesraw(silence_chunk[: count * 2])
+                    cursor += count
+                    remaining -= count
+            click = accent if beat_index % max(1, beats_per_bar) == 0 else regular
+            samples_to_write = min(click_len, total_samples - cursor)
+            handle.writeframesraw(click[: samples_to_write * 2])
+            cursor += samples_to_write
+            beat_index += 1
+            next_beat = beat_index * beat_samples
+        handle.writeframes(b"")
+    return duration_ms
 
 
 def delete_range(track: Track, start_ms: int, end_ms: int, ripple: bool) -> None:
@@ -145,13 +212,14 @@ def render_track(track: Track, source: Path, out: Path, apply_inserts: bool = Tr
         return
     parts: list[str] = []
     labels: list[str] = []
+    source_layout = "mono" if int(track.channels or 0) == 1 else "stereo"
     for index, clip in enumerate(track.clips):
         start = clip.source_start_ms / 1000
         end = clip.source_end_ms / 1000
         delay = max(0, clip.timeline_start_ms)
         parts.append(
             f"[0:a]atrim=start={start:.6f}:end={end:.6f},asetpts=PTS-STARTPTS,"
-            f"adelay={delay}|{delay},aformat=channel_layouts=stereo[c{index}]"
+            f"adelay={delay}|{delay},aformat=channel_layouts={source_layout}[c{index}]"
         )
         labels.append(f"[c{index}]")
     if len(labels) == 1:
@@ -159,7 +227,13 @@ def render_track(track: Track, source: Path, out: Path, apply_inserts: bool = Tr
     else:
         base = ";".join(parts) + ";" + "".join(labels) + f"amix=inputs={len(labels)}:duration=longest:normalize=0[mix]"
     inserts = chain_filter(track.inserts) if apply_inserts else ""
-    filters = base + (f";[mix]{inserts}[out]" if inserts else ";[mix]anull[out]")
+    output_channels = effective_output_channels(track.channels, track.inserts if apply_inserts else [])
+    output_layout = "mono" if output_channels == 1 else "stereo"
+    filters = base + (
+        f";[mix]{inserts},aformat=channel_layouts={output_layout}[out]"
+        if inserts
+        else f";[mix]aformat=channel_layouts={output_layout}[out]"
+    )
     _run(
         [
             "ffmpeg",
@@ -181,8 +255,18 @@ def render_track(track: Track, source: Path, out: Path, apply_inserts: bool = Tr
     )
 
 
-def render_mix(project: Project, audio_resolver, out: Path, fmt: str = "mp3", bitrate: str = "320k") -> Path:
-    """Render stereo master for preview/WAV/MP3 export."""
+def render_mix(
+    project: Project,
+    audio_resolver,
+    out: Path,
+    fmt: str = "mp3",
+    bitrate: str = "320k",
+    *,
+    sample_rate: int = 44100,
+    wav_bit_depth: int = 24,
+    flac_compression: int = 8,
+) -> Path:
+    """Render stereo master for preview/WAV/MP3/FLAC export."""
     if not project.tracks:
         raise ValueError("project has no audio tracks")
     fmt = fmt.lower()
@@ -218,11 +302,14 @@ def render_mix(project: Project, audio_resolver, out: Path, fmt: str = "mp3", bi
             tail += "," + master_chain
         tail += "," + project_time_pitch_filter(project)
         filters.append(f"[master0]{tail}[master]")
-        cmd += ["-filter_complex", ";".join(filters), "-map", "[master]", "-ar", "44100"]
+        sample_rate = 48000 if int(sample_rate) == 48000 else 44100
+        cmd += ["-filter_complex", ";".join(filters), "-map", "[master]", "-ar", str(sample_rate)]
         if fmt == "wav":
-            cmd += ["-c:a", "pcm_s24le", str(out)]
+            codec = {16: "pcm_s16le", 24: "pcm_s24le", 32: "pcm_f32le"}.get(int(wav_bit_depth), "pcm_s24le")
+            cmd += ["-c:a", codec, str(out)]
         elif fmt == "flac":
-            cmd += ["-c:a", "flac", "-compression_level", "8", str(out)]
+            level = max(0, min(12, int(flac_compression)))
+            cmd += ["-c:a", "flac", "-compression_level", str(level), str(out)]
         else:
             cmd += ["-c:a", "libmp3lame", "-b:a", bitrate, str(out)]
         _run(cmd)

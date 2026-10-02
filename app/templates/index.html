@@ -25,6 +25,8 @@
       <a class="header-link auth-managed" href="/account" title="Account" aria-label="Account"><span class="control-icon" aria-hidden="true">👤</span><span class="control-text">Account</span></a>
       <a id="adminNav" class="header-link auth-managed" href="/admin/users" title="Amministrazione" aria-label="Amministrazione" hidden><span class="control-icon" aria-hidden="true">⚙</span><span class="control-text">Admin</span></a>
       <button onclick="save()" title="Save" aria-label="Save"><span class="control-icon" aria-hidden="true">▣</span><span class="control-text">Save</span></button>
+      <button onclick="saveAsProject()" title="Save as" aria-label="Save as"><span class="control-icon" aria-hidden="true">⇩</span><span class="control-text">Save as</span></button>
+      <button onclick="showProjectSetup()" title="Project setup" aria-label="Project setup"><span class="control-icon" aria-hidden="true">ⓘ</span><span class="control-text">Setup</span></button>
       <button id="exportPanelMenuBtn" class="accent" onclick="toggleMixerPanel('export')" title="Mostra/nascondi Export" aria-label="Export"><span class="control-icon" aria-hidden="true">⇧</span><span class="control-text">Export</span></button>
       <button id="metaPanelMenuBtn" onclick="toggleMixerPanel('meta')" title="Mostra/nascondi Lyrics/Chords/Markers" aria-label="Mostra o nascondi Lyrics Chords Markers"><span class="control-icon" aria-hidden="true">▤</span><span class="control-text">Lyrics/Meta</span></button>
       <a class="header-link logout auth-managed" href="/logout" title="Esci" aria-label="Esci"><span class="control-icon" aria-hidden="true">↪</span><span class="control-text">Esci</span></a>
@@ -36,7 +38,7 @@
       <nav>
         <button class="nav-item active">⌂ <span>Project</span></button>
         <label class="nav-item">⇩ <span>Import MTA</span><input id="mtafile" type="file" accept=".mta,.mta8,.mta16" hidden></label>
-        <button class="nav-item import-action" onclick="focusImport()">♫ <span>Import Audio</span></button>
+        <button class="nav-item import-action import-audio-action" onclick="focusImport()"><span class="nav-icon" aria-hidden="true">♫</span><span class="nav-label">Import Audio</span></button>
         <button class="nav-item import-action" onclick="openStemWorkflow()">▥ <span>Import &amp; Separate</span></button>
         <button class="nav-item">☷ <span>Tracks</span></button>
         <button class="nav-item" onclick="focusInspector()">◇ <span>Plugins</span></button>
@@ -46,12 +48,21 @@
         <button class="nav-item" onclick="showMetaPanel('chords')">♬ <span>Chords</span></button>
         <button class="nav-item" onclick="showMetaPanel('markers')">⚑ <span>Markers</span></button>
         <div class="nav-sep"></div>
-        <button class="nav-item" onclick="openExportPanel()">⇧ <span>Export</span></button>
-        <button class="nav-item" onclick="saveProjectLocal()">⬇ <span>Save project locally</span></button>
-        <button class="nav-item" onclick="openProjectArchive()">⬆ <span>Open project</span></button><input id="projectArchiveFile" type="file" accept=".zip,.mta-project.zip" hidden>
-        <button class="nav-item" onclick="manageProjectFiles()">▣ <span>Project files</span></button>
-        <button class="nav-item auth-managed" onclick="manageProjectSharing()">⌘ <span>Share project</span></button>
-        <button class="nav-item" onclick="deleteCurrentProject()">× <span>Delete project</span></button>
+        <section class="sidebar-tools collapsed" id="projectToolsPanel">
+          <button class="sidebar-tools-toggle" type="button" onclick="toggleProjectToolsPanel()" aria-expanded="false" aria-controls="projectToolsBody">
+            <span class="sidebar-tools-title">PROJECT / FILE</span>
+            <span id="projectToolsChevron" aria-hidden="true">▸</span>
+          </button>
+          <div class="sidebar-tools-body" id="projectToolsBody">
+            <button class="nav-item" onclick="openExportPanel()">⇧ <span>Export</span></button>
+            <button class="nav-item" onclick="saveProjectLocal()">⬇ <span>Save project locally</span></button>
+            <button class="nav-item" onclick="saveAsProject()">⇩ <span>Save project as…</span></button>
+            <button class="nav-item" onclick="openProjectArchive()">⬆ <span>Open project</span></button><input id="projectArchiveFile" type="file" accept=".zip,.mta-project.zip" hidden>
+            <button class="nav-item" onclick="manageProjectFiles()">▣ <span>Project files</span></button>
+            <button class="nav-item auth-managed" onclick="manageProjectSharing()">⌘ <span>Share project</span></button>
+            <button class="nav-item danger-nav" onclick="deleteCurrentProject()">× <span>Delete project</span></button>
+          </div>
+        </section>
         <button class="nav-item" onclick="showAbout()">ⓘ <span>About</span></button>
         <a class="nav-item" href="/docs/user" target="_blank">? <span>Docs &amp; Help</span></a>
       </nav>

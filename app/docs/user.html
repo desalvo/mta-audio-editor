@@ -102,6 +102,12 @@ macOS:   ~/Library/Application Support/MTA Audio Editor</pre>
 <p>Il vecchio insert <b>Eq</b> a banda singola non è più disponibile per nuovi insert. <b>Graphic EQ 32</b> viene configurato con 32 fader grafici verticali, uno per banda.</p>
 <p>Con <b>RealTime</b> attivo, una traccia mono mostra un solo VU-meter. Una traccia stereo mostra due meter indipendenti <b>L</b> e <b>R</b>. Il Master è sempre stereo e mostra sempre due meter indipendenti L/R. In modalità Render i meter Master misurano direttamente l'anteprima master processata.</p>
 
+
+<h2 id="native-new-project-save-and-stems">Nuovi progetti native e separazione stems</h2>
+<p>Nelle applicazioni native, quando <b>Import &amp; Separate</b> crea un nuovo progetto, prima dell'avvio della separazione viene richiesto dove salvare il progetto. Annullando il dialog di salvataggio il job non viene avviato.</p>
+<p>Il file <code>.mta-project.zip</code> scelto resta associato al progetto per la sessione corrente e viene aggiornato durante i salvataggi e al completamento della separazione.</p>
+<p>La separazione Demucs viene eseguita senza aprire una seconda finestra dell'applicazione: gli eventuali worker multiprocessing di PyTorch/Demucs vengono gestiti come processi worker della stessa applicazione.</p>
+
 <h2 id="mta-appendix">Appendice A. Cosa contiene un file MTA</h2>
 <p>Un MTA usa strutture Matroska/EBML per tracce, attachment e indice temporale. La regione media, dal primo Cluster a fine file, usa uno XOR proprietario periodico di 984 byte. L'applicazione rimuove automaticamente questo trasporto durante l'import e lo riapplica durante l'export.</p>
 <p>Gli attachment stock includono file SYL e MtxInfoData XML. Il SYL contiene testo, accordi, highlighting karaoke e marker MIDI. Gli originali importati vengono sempre preservati nel progetto; per dettagli byte-level consultare l'Appendice A del Manuale amministratore e <code>docs/MTA_FORMAT_FINAL_SPEC.md</code>.</p>

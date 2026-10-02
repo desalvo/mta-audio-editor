@@ -103,6 +103,11 @@ POST /api/stems/jobs/{job_id}/cancel</pre>
 <p>Il metering RealTime usa Web Audio API. Le sorgenti mono usano un singolo <code>AnalyserNode</code>; le sorgenti stereo vengono separate tramite <code>ChannelSplitterNode(2)</code> e misurate con analyser indipendenti L/R. Il Master è sempre stereo. In Render mode il master renderizzato alimenta direttamente gli analyser Master L/R; in dynamic preview il valore Master viene composto dai livelli L/R delle tracce attive.</p>
 <p>Il catalogo pubblico non espone più l'insert legacy <code>eq</code>. Il supporto di rendering legacy resta disponibile per aprire progetti preesistenti. Auto Mix usa <code>graphic_eq_32</code>. L'editor del Graphic EQ è una superficie grafica a 32 fader, mentre la validazione server-side continua ad applicare i limiti -12/+12 dB per banda.</p>
 
+
+<h2 id="native-multiprocessing-and-save-binding">Native save binding e multiprocessing</h2>
+<p>Il bridge pywebview espone <code>choose_project_save_path</code>, <code>bind_project_path</code> e <code>sync_project</code>. Il frontend richiede il percorso prima di creare un nuovo progetto tramite Import &amp; Separate, quindi associa il percorso al project ID e sincronizza l'archivio esterno a ogni salvataggio e alla fine del job.</p>
+<p>Il launcher frozen invoca <code>multiprocessing.freeze_support()</code> prima di <code>main()</code>. Questo è necessario perché Demucs/PyTorch possono creare processi worker: senza il dispatch PyInstaller, il child può rieseguire il launcher e creare una seconda finestra GUI vuota.</p>
+
 <h2 id="appendix-mta">Appendice A. Specifica tecnica del formato proprietario MTA</h2>
 <div class="note"><b>Ambito:</b> questa appendice documenta il formato on-disk verificato sul corpus stock disponibile. "Verificato" significa che la relazione è stata ricostruita dai byte e controllata su più file indipendenti. La compatibilità con ogni revisione firmware M-Live/Merish richiede comunque una prova sul dispositivo target.</div>
 

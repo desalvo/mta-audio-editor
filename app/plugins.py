@@ -99,11 +99,11 @@ PRESETS: dict[str, dict[str, str]] = {
         "minus-12db": "volume=-12dB",
     },
     "stereo_imager": {
-        "default": "stereowiden=delay=12:feedback=0.15:crossfeed=0.22:drymix=0.9",
-        "mono-safe": "stereotools=mode=lr>ms:mlev=1:slev=0.35,stereotools=mode=ms>lr",
-        "narrow": "stereotools=mode=lr>ms:mlev=1:slev=0.65,stereotools=mode=ms>lr",
-        "wide": "stereowiden=delay=14:feedback=0.18:crossfeed=0.22:drymix=0.92",
-        "extra-wide": "stereowiden=delay=20:feedback=0.24:crossfeed=0.18:drymix=0.88",
+        "default": "aformat=channel_layouts=stereo,stereowiden=delay=12:feedback=0.15:crossfeed=0.22:drymix=0.9",
+        "mono-safe": "aformat=channel_layouts=stereo,stereotools=mode=lr>ms:mlev=1:slev=0.35,stereotools=mode=ms>lr",
+        "narrow": "aformat=channel_layouts=stereo,stereotools=mode=lr>ms:mlev=1:slev=0.65,stereotools=mode=ms>lr",
+        "wide": "aformat=channel_layouts=stereo,stereowiden=delay=14:feedback=0.18:crossfeed=0.22:drymix=0.92",
+        "extra-wide": "aformat=channel_layouts=stereo,stereowiden=delay=20:feedback=0.24:crossfeed=0.18:drymix=0.88",
     },
     "maximizer_loudness": {
         "default": "acompressor=threshold=0.20:ratio=2.5:attack=18:release=180:makeup=1.25,alimiter=limit=0.891:attack=5:release=60:level=disabled",
@@ -225,8 +225,13 @@ def custom_filter(plugin: str, params: dict) -> str:
     if plugin == "amplify":
         return f"volume={p['gain_db']:.2f}dB"
     if plugin == "stereo_imager":
-        # Mid/side scaling is deterministic and mono-safe at width=0.
-        return f"stereotools=mode=lr>ms:mlev=1:slev={p['width']:.3f},stereotools=mode=ms>lr"
+        # Explicitly upmix mono to stereo before mid/side processing. This makes
+        # the insert a real mono->stereo processor when used on mono tracks.
+        return (
+            "aformat=channel_layouts=stereo,"
+            f"stereotools=mode=lr>ms:mlev=1:slev={p['width']:.3f},"
+            "stereotools=mode=ms>lr"
+        )
     if plugin == "maximizer_loudness":
         ceiling = 10 ** (p["ceiling_db"] / 20.0)
         return f"volume={p['drive_db']:.2f}dB,acompressor=threshold=0.20:ratio=2.5:attack=18:release=180:makeup=1,alimiter=limit={ceiling:.6f}:attack=5:release=70:level=disabled"
@@ -284,6 +289,9 @@ def plugin_manifest() -> dict[str, object]:
         "presets": plugin_catalog(),
         "schemas": public_schemas,
         "custom": public_custom,
+        "channel_behavior": {
+            "stereo_imager": {"mono_to_stereo": True, "output_channels": 2},
+        },
         "notes": {
             "reverb_lexicon": "Lexicon-style preset family implemented with open FFmpeg processing; not a Lexicon algorithm/emulation.",
             "mastering_wizard": "Rule-based mastering chain; final level should still be auditioned on representative playback systems.",
@@ -317,6 +325,19 @@ def plugin_filter(plugin: InsertPlugin) -> str | None:
 def chain_filter(inserts: list[InsertPlugin]) -> str:
     parts = [expr for item in inserts if (expr := plugin_filter(item))]
     return ",".join(parts)
+
+
+def insert_expands_to_stereo(plugin: InsertPlugin) -> bool:
+    """Return True when an enabled insert turns mono input into stereo output."""
+    return bool(plugin.enabled and plugin.plugin == "stereo_imager")
+
+
+def effective_output_channels(source_channels: int, inserts: list[InsertPlugin]) -> int:
+    """Resolve logical channel count after an insert chain."""
+    channels = 1 if int(source_channels or 0) == 1 else 2
+    if channels == 1 and any(insert_expands_to_stereo(item) for item in inserts):
+        return 2
+    return channels
 
 
 class DemucsStemSplitter:

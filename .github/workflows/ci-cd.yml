@@ -111,7 +111,7 @@ jobs:
           push: false
           tags: mta-audio-editor:ci
           build-args: |
-            APP_VERSION=${{ github.ref_type == 'tag' && github.ref_name || '0.2.0-47' }}
+            APP_VERSION=${{ github.ref_type == 'tag' && github.ref_name || '0.2.0-58' }}
             BUILD_ID=${{ steps.build.outputs.id }}
       - name: Verify container OS
         shell: bash
@@ -289,6 +289,13 @@ jobs:
             # PyTorch stopped publishing Intel macOS wheels after 2.2.x.
             # Build the Intel desktop edition with Python 3.12 + the last official
             # x86_64 torch/torchaudio wheels while keeping Demucs 4.1.
+            #
+            # demucs 4.1 pulls sphn, which must compile audiopus_sys on Intel macOS.
+            # GitHub's current CMake 4.x rejects the dependency's legacy
+            # cmake_minimum_required declaration unless this compatibility floor
+            # is explicitly enabled.
+            export CMAKE_POLICY_VERSION_MINIMUM=3.5
+            export MACOSX_DEPLOYMENT_TARGET=10.13
             pip install -r requirements-stems-macos-x64.txt
           else
             # Apple Silicon follows the normal current PyTorch line. macOS wheels

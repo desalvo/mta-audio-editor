@@ -16,9 +16,9 @@ from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse, Resp
 from starlette.background import BackgroundTask
 from fastapi.staticfiles import StaticFiles
 
-from .audio_engine import auto_align_ms, delete_range, delete_song_range, ensure_clips, estimate_bpm, media_duration_ms, render_mix, render_track_export, shift_track, waveform_peaks
+from .audio_engine import auto_align_ms, delete_range, delete_song_range, ensure_clips, estimate_bpm, generate_metronome_wav, media_duration_ms, project_duration_ms, render_mix, render_track, render_track_export, shift_track, waveform_peaks
 from .codec import export_mta, ffprobe, import_mta, suggested_slots, validate_slot_mapping
-from .models import AutoMixRequest, Clip, CustomPresetRequest, DeleteRangeRequest, MoveTrackRequest, MtaExportRequest, Project, Track
+from .models import AutoMixRequest, Clip, CustomPresetRequest, DeleteRangeRequest, MoveTrackRequest, MtaExportRequest, Project, ProjectExportRequest, Track
 from .plugins import STEM_SPLITTER, delete_user_preset, plugin_manifest, save_user_preset
 from .security import auth_failure_response, check_basic_auth
 from .auth import (
@@ -896,6 +896,15 @@ def _waveform_revision(path: Path) -> str:
     return f"{path.name}:{stat.st_size}:{stat.st_mtime_ns}"
 
 
+def _track_waveform_revision(track: Track, source: Path) -> str:
+    """Revision of the audible track output waveform, including insert state/config."""
+    payload = {
+        "source": _waveform_revision(source),
+        "inserts": [item.model_dump(mode="json") for item in track.inserts],
+    }
+    return hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()[:24]
+
+
 def _audio_channel_info(path: Path) -> tuple[int, str]:
     try:
         info = ffprobe(path)
@@ -922,13 +931,21 @@ def _waveform_worker(job_id: str, pid: str, track_id: str) -> None:
         def progress(value: int, message: str) -> None:
             _media_job_update(job_id, progress=max(1, min(99, int(value))), message=message)
 
-        peaks = waveform_peaks(source, 1024, progress)
+        enabled_inserts = any(item.enabled for item in track.inserts)
+        if enabled_inserts:
+            with tempfile.TemporaryDirectory(prefix="mta-waveform-") as td_raw:
+                rendered = Path(td_raw) / "processed.wav"
+                progress(10, "Rendering insert per waveform")
+                render_track(track, source, rendered, apply_inserts=True)
+                peaks = waveform_peaks(rendered, 1024, progress)
+        else:
+            peaks = waveform_peaks(source, 1024, progress)
         latest = load_project(pid)
         latest_track = next((item for item in latest.tracks if item.id == track_id), None)
         if latest_track is None:
             raise ValueError("track removed while waveform was updating")
         latest_track.waveform_peaks = peaks
-        latest_track.waveform_revision = _waveform_revision(source)
+        latest_track.waveform_revision = _track_waveform_revision(latest_track, source)
         save_project(latest)
         _media_job_update(
             job_id,
@@ -942,14 +959,14 @@ def _waveform_worker(job_id: str, pid: str, track_id: str) -> None:
 
 
 @app.post("/api/projects/{pid}/tracks/{track_id}/waveform-jobs")
-def start_waveform_job(pid: str, track_id: str, request: Request):
+def start_waveform_job(pid: str, track_id: str, request: Request, force: bool = False):
     project = _project_for_actor(request, pid)
     track = next((item for item in project.tracks if item.id == track_id), None)
     if track is None:
         raise HTTPException(404, "track not found")
     source = audio_path(pid, track.filename)
-    revision = _waveform_revision(source)
-    if track.waveform_peaks and track.waveform_revision == revision:
+    revision = _track_waveform_revision(track, source)
+    if not force and track.waveform_peaks and track.waveform_revision == revision:
         return {
             "id": "",
             "kind": "waveform",
@@ -1300,6 +1317,73 @@ def edit_delete_range(pid: str, req: DeleteRangeRequest, request: Request):
                 delete_range(track, req.start_ms, req.end_ms, req.ripple)
     save_project(project)
     return project
+
+
+
+def _mta_import_worker(job_id: str, pid: str, source_name: str) -> None:
+    try:
+        src = pdir(pid) / "source.mta"
+        _media_job_update(job_id, status="running", progress=58, message="Validazione MTA")
+        ffprobe(src)
+        _media_job_update(job_id, progress=68, message="Analisi contenitore MTA")
+        project = load_project(pid)
+        imported = import_mta(src, project)
+        _media_job_update(job_id, progress=92, message="Salvataggio progetto importato")
+        save_project(imported)
+        _media_job_update(
+            job_id,
+            status="completed",
+            progress=100,
+            message="Import MTA completato",
+            result={"project_id": imported.id, "title": imported.title, "track_count": len(imported.tracks)},
+        )
+    except Exception as exc:
+        delete_project(pid)
+        _media_job_update(
+            job_id,
+            status="failed",
+            progress=0,
+            message="Import MTA fallito",
+            error=str(exc)[-1200:],
+        )
+
+
+@app.post("/api/import-jobs")
+async def start_mta_import_job(request: Request, file: UploadFile = File(...)):
+    actor = _actor(request)
+    owner = actor["id"] if actor["id"] > 0 else None
+    project = create_project(Path(file.filename or "Imported").stem[:200], owner_user_id=owner)
+    src = pdir(project.id) / "source.mta"
+    try:
+        _copy_limited(file.file, src)
+        preserve_original(project.id, src, Path(file.filename or "source.mta").name)
+    except Exception:
+        delete_project(project.id)
+        raise
+
+    now = time.time()
+    job_id = uuid.uuid4().hex[:16]
+    job = {
+        "id": job_id,
+        "kind": "mta-import",
+        "project_id": project.id,
+        "status": "queued",
+        "progress": 55,
+        "message": "Upload MTA completato",
+        "created_at": now,
+        "updated_at": now,
+        "result": None,
+        "error": None,
+    }
+    with MEDIA_JOB_LOCK:
+        MEDIA_JOBS[job_id] = job
+    threading.Thread(
+        target=_mta_import_worker,
+        args=(job_id, project.id, Path(file.filename or "source.mta").name),
+        daemon=True,
+        name=f"mta-import-{job_id}",
+    ).start()
+    return _media_job_public(job)
 
 
 @app.post("/api/import")
@@ -1689,6 +1773,48 @@ def start_track_stem_job(
     return _stem_job_public(job)
 
 
+
+@app.post("/api/projects/{pid}/metronome-track")
+def create_metronome_track(pid: str, request: Request):
+    project = _project_for_actor(request, pid)
+    duration_ms = project_duration_ms(project)
+    if duration_ms <= 0:
+        raise HTTPException(400, "Il progetto non ha ancora una durata. Importa almeno una traccia audio prima di creare il metronomo.")
+
+    filename = f"metronome-{uuid.uuid4().hex[:10]}.wav"
+    out = audio_path(pid, filename)
+    try:
+        duration_ms = generate_metronome_wav(project, out)
+        peaks = waveform_peaks(out)
+        revision = _waveform_revision(out)
+    except Exception as exc:
+        out.unlink(missing_ok=True)
+        raise HTTPException(400, f"Creazione metronomo fallita: {str(exc)[:300]}") from exc
+
+    track = Track(
+        id=uuid.uuid4().hex[:10],
+        name=f"Metronomo {project.bpm:g} BPM",
+        type="other",
+        filename=filename,
+        duration_ms=duration_ms,
+        channels=1,
+        channel_layout="mono",
+        waveform_peaks=peaks,
+        waveform_revision=revision,
+        clips=[
+            Clip(
+                id=uuid.uuid4().hex[:10],
+                source_start_ms=0,
+                source_end_ms=duration_ms,
+                timeline_start_ms=0,
+            )
+        ],
+    )
+    project.tracks.append(track)
+    save_project(project)
+    return {"project": project, "track": track}
+
+
 @app.get("/api/projects/{pid}/preview-track/{track_id}")
 def preview_track(pid: str, track_id: str, request: Request, render: bool = False):
     project = _project_for_actor(request, pid)
@@ -1726,7 +1852,11 @@ def preview_mix(pid: str, request: Request):
     out = pdir(pid) / "preview-master.mp3"
     try:
         validate_project_files(project)
-        render_mix(project, audio_path, out, fmt="mp3", bitrate="192k")
+        preview_project = project.model_copy(deep=True)
+        # Master inserts are rendered server-side, while the master fader is kept
+        # neutral here so the browser can apply master volume live during playback.
+        preview_project.master_volume_db = 0.0
+        render_mix(preview_project, audio_path, out, fmt="mp3", bitrate="192k")
     except Exception as exc:
         raise HTTPException(400, "preview mix failed") from exc
     return FileResponse(out, media_type="audio/mpeg", filename="preview-master.mp3")
@@ -1897,6 +2027,64 @@ async def mta_binary_diff(file_a: UploadFile = File(...), file_b: UploadFile = F
         except Exception as exc:
             raise HTTPException(400, "both files must be valid media containers") from exc
         return diff_blobs(a.read_bytes(), b.read_bytes())
+
+
+
+@app.post("/api/projects/{pid}/configured-export")
+def configured_project_export(pid: str, req: ProjectExportRequest, request: Request):
+    project = _project_for_actor(request, pid)
+    fmt = req.format.lower()
+    try:
+        validate_project_files(project)
+        safe_stem = SAFE_DOWNLOAD_RE.sub("_", Path(req.filename).stem).strip(" ._")[:180] or "project"
+        if fmt == "mta":
+            ext = "mta8" if project.target == "MTA8" else "mta16"
+            out = pdir(pid) / f"configured-export.{ext}"
+            if len(project.tracks) > (8 if project.target == "MTA8" else 16):
+                slots = validate_slot_mapping(project, req.slots)
+                export_mta(project, out, slots)
+            else:
+                export_mta(project, out)
+            media_type = "application/octet-stream"
+        elif fmt in {"wav", "mp3", "flac"}:
+            ext = fmt
+            out = pdir(pid) / f"configured-export.{ext}"
+            render_mix(
+                project,
+                audio_path,
+                out,
+                fmt=fmt,
+                bitrate=f"{int(req.mp3_bitrate_kbps)}k",
+                sample_rate=int(req.sample_rate),
+                wav_bit_depth=int(req.wav_bit_depth),
+                flac_compression=int(req.flac_compression),
+            )
+            media_type = {"wav": "audio/wav", "mp3": "audio/mpeg", "flac": "audio/flac"}[fmt]
+        else:
+            raise HTTPException(400, "unsupported export format")
+
+        final_name = f"{safe_stem}.{ext}"
+        if req.output_path:
+            if not NATIVE_SINGLE_USER:
+                raise HTTPException(403, "Filesystem export path is available only in native mode")
+            destination = Path(req.output_path).expanduser().resolve()
+            if destination.suffix.lower() != f".{ext}":
+                destination = destination.with_suffix(f".{ext}")
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(out, destination)
+            return {
+                "ok": True,
+                "native": True,
+                "path": str(destination),
+                "filename": destination.name,
+                "format": fmt,
+            }
+        return FileResponse(out, filename=final_name, media_type=media_type)
+    except HTTPException:
+        raise
+    except Exception as exc:
+        LOGGER.exception("Configured project export failed")
+        raise HTTPException(400, f"export failed: {str(exc)[:300]}") from exc
 
 
 @app.get("/api/projects/{pid}/export")
