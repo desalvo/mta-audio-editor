@@ -162,3 +162,16 @@ cancelled
 The job descriptor includes `progress` (0..100), `message`, model, source filename and optional error text.
 
 The older synchronous `POST /api/stems/split` endpoint is retained for backward compatibility.
+
+
+
+## Waveform and preview
+
+```text
+POST /api/projects/{pid}/tracks/{track_id}/waveform-jobs
+GET  /api/media-jobs/{job_id}
+GET  /api/projects/{pid}/preview-track/{track_id}?render=false|true
+GET  /api/projects/{pid}/preview-mix
+```
+
+`waveform-jobs` regenerates and persists normalized waveform peaks when the source revision changes. `preview-track` renders clip layout, fader/pan and project tempo/pitch; `render=true` additionally applies the track insert chain. `preview-mix` renders the complete master chain and is used by the transport when Render mode is enabled.

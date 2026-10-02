@@ -73,3 +73,33 @@
 .track-db-input{width:58px;min-width:58px;height:24px;border:1px solid #30485c;border-radius:4px;background:#0b1721;color:#dcecf7;padding:2px 5px;font-size:10px}
 .inspector-row .volume-number{width:68px;min-width:68px;height:28px;padding:3px 6px}
 .channel .volume-number{width:54px;min-width:54px;height:25px;border:1px solid #30485c;border-radius:4px;background:#0b1721;color:#dcecf7;padding:2px 4px;font-size:10px}
+
+/* 0.2.0-39 synchronized Tracks/timeline and persistent waveform UX */
+.editor-grid{grid-template-columns:var(--track-column-width,225px) 5px minmax(540px,1fr) 300px}
+.track-column{overflow:auto;scrollbar-gutter:stable;background:#0c1721}
+.track-column-head{position:sticky;top:0;z-index:18}
+.track-resizer{cursor:col-resize;background:#162838;border-left:1px solid #28465c;border-right:1px solid #071019;position:relative}
+.track-resizer:hover,.resizing-tracks .track-resizer{background:#2696db}
+.track-resizer:after{content:"";position:absolute;left:1px;right:1px;top:40%;height:20%;border-left:1px dotted rgba(255,255,255,.45)}
+.resizing-tracks{cursor:col-resize!important;user-select:none!important}
+.timeline-pane{overflow:auto;scrollbar-gutter:stable}
+.waveform-progress{position:absolute;z-index:8;left:8px;right:8px;bottom:5px;height:15px;border:1px solid #31526a;border-radius:8px;background:rgba(5,14,22,.9);overflow:hidden;pointer-events:none}
+.waveform-progress-bar{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,#148ddd,#39c6ff);transition:width .25s ease}
+.waveform-progress span{position:absolute;inset:0;display:grid;place-items:center;font-size:8px;color:#eaf7ff;text-shadow:0 1px 2px #000}
+.channel-buttons button.on{box-shadow:0 0 0 1px rgba(255,255,255,.22) inset,0 0 8px rgba(55,179,255,.25)}
+.channel-buttons [data-mute-track].on{background:#8a4d12;color:#fff0bb;border-color:#d89431}
+.channel-buttons [data-solo-track].on{background:#0e659f;color:#e7f7ff;border-color:#35b7ff}
+.realtime-toggle.active{background:#124e38!important;color:#bfffe5!important;border-bottom-color:#36dca1!important}
+.channel-fader-area{grid-template-columns:18px 27px}
+.meter-pair{height:103px;display:flex;gap:3px;align-items:stretch}
+.meter-pair .meter{height:103px;width:10px}
+.meter-static span{background:linear-gradient(#ffb74a,#4ba7ff)}
+.meter-realtime span{background:linear-gradient(#ff4e5f 0 10%,#ffd54a 22%,#57e86c 45% 100%);transition:height .06s linear}
+.transport-btn.render-mode{width:auto;min-width:48px;padding:0 7px;font-size:9px}
+.transport-btn.render-mode.active{background:#774b12;border-color:#e3a83b;color:#fff3c7;box-shadow:0 0 9px rgba(236,170,55,.25)}
+.tempo-input,.pitch-input{width:54px;height:22px;background:#08151f;border:1px solid #324b60;border-radius:4px;color:#e4f2fb;text-align:right;font:10px ui-monospace,monospace;padding:1px 4px}
+.pitch-input{width:42px}
+@media(max-width:1200px){.editor-grid{grid-template-columns:var(--track-column-width,205px) 5px minmax(520px,1fr) 270px}}
+@media(max-width:900px){.editor-grid{grid-template-columns:var(--track-column-width,180px) 5px minmax(620px,1fr) 260px}.track-resizer{touch-action:none}}
+
+.native-single-user .auth-managed{display:none!important}

@@ -1,3 +1,4 @@
+import hashlib
 import json
 import logging
 import os
@@ -15,7 +16,7 @@ from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse, Resp
 from starlette.background import BackgroundTask
 from fastapi.staticfiles import StaticFiles
 
-from .audio_engine import auto_align_ms, delete_range, delete_song_range, ensure_clips, estimate_bpm, media_duration_ms, render_mix, render_track_export, shift_track
+from .audio_engine import auto_align_ms, delete_range, delete_song_range, ensure_clips, estimate_bpm, media_duration_ms, render_mix, render_track_export, shift_track, waveform_peaks
 from .codec import export_mta, ffprobe, import_mta, suggested_slots, validate_slot_mapping
 from .models import AutoMixRequest, Clip, CustomPresetRequest, DeleteRangeRequest, MoveTrackRequest, MtaExportRequest, Project, Track
 from .plugins import STEM_SPLITTER, delete_user_preset, plugin_manifest, save_user_preset
@@ -52,6 +53,20 @@ app = FastAPI(title="MTA Audio Editor", version=APP_VERSION, docs_url=None, redo
 LOGGER = logging.getLogger(__name__)
 BASE = Path(__file__).parent
 MAX_UPLOAD_BYTES = int(os.getenv("MTA_MAX_UPLOAD_MB", "150")) * 1024 * 1024
+NATIVE_SINGLE_USER = os.getenv("MTA_NATIVE_SINGLE_USER", "").lower() in {"1", "true", "yes", "on"}
+NATIVE_BLOCKED_PATH_PREFIXES = (
+    "/account",
+    "/admin/",
+    "/api/account",
+    "/api/admin/",
+    "/register",
+    "/forgot-password",
+    "/reset-password",
+    "/verify-email",
+    "/resend-verification",
+)
+
+
 SAFE_DOWNLOAD_RE = re.compile(r"[^A-Za-z0-9._ -]+")
 app.mount("/static", StaticFiles(directory=BASE / "static"), name="static")
 
@@ -121,6 +136,16 @@ def _is_public(path: str) -> bool:
 
 @app.middleware("http")
 async def security_middleware(request: Request, call_next):
+    if NATIVE_SINGLE_USER and (
+        request.url.path == "/login"
+        or request.url.path == "/logout"
+        or request.url.path.startswith(NATIVE_BLOCKED_PATH_PREFIXES)
+        or (request.url.path.startswith("/api/projects/") and "/shares" in request.url.path)
+    ):
+        if request.url.path.startswith("/api/"):
+            return HTMLResponse("Not available in native single-user mode", status_code=404)
+        return RedirectResponse(url="/", status_code=303)
+
     user = session_user(request)
     if not _is_public(request.url.path) and user is None and not check_basic_auth(request):
         if request.url.path.startswith("/api/"):
@@ -351,7 +376,9 @@ def admin_users_page(request: Request):
 
 @app.get("/api/session")
 def api_session(request: Request):
-    return public_user(require_user(request))
+    user = public_user(require_user(request))
+    user["native_single_user"] = NATIVE_SINGLE_USER
+    return user
 
 
 @app.get("/api/account")
@@ -511,6 +538,7 @@ def home(request: Request):
         .read_text(encoding="utf-8")
         .replace("__VERSION__", APP_VERSION)
         .replace("__BUILD__", BUILD_ID)
+        .replace("__BODY_CLASS__", "native-single-user" if NATIVE_SINGLE_USER else "")
     )
 
 
@@ -568,6 +596,7 @@ def about():
         "creator": CREATOR,
         "repository": REPOSITORY,
         "license": "EUPL-1.2",
+        "native_single_user": NATIVE_SINGLE_USER,
     }
 
 
@@ -628,8 +657,14 @@ def project_new(request: Request, title: str = "Untitled", target: str = "MTA8")
 @app.get("/api/projects/{pid}")
 def project_get(pid: str, request: Request):
     project = _project_for_actor(request, pid)
+    changed = False
+    if project.base_bpm is None:
+        project.base_bpm = project.bpm
+        changed = True
     for track in project.tracks:
         ensure_clips(track)
+    if changed:
+        save_project(project)
     return project
 
 
@@ -816,6 +851,95 @@ def _save_upload(pid: str, file: UploadFile):
 
 
 
+
+def _waveform_revision(path: Path) -> str:
+    stat = path.stat()
+    return f"{path.name}:{stat.st_size}:{stat.st_mtime_ns}"
+
+
+def _waveform_worker(job_id: str, pid: str, track_id: str) -> None:
+    try:
+        project = load_project(pid)
+        track = next((item for item in project.tracks if item.id == track_id), None)
+        if track is None:
+            raise ValueError("track not found")
+        source = audio_path(pid, track.filename)
+
+        def progress(value: int, message: str) -> None:
+            _media_job_update(job_id, progress=max(1, min(99, int(value))), message=message)
+
+        peaks = waveform_peaks(source, 1024, progress)
+        latest = load_project(pid)
+        latest_track = next((item for item in latest.tracks if item.id == track_id), None)
+        if latest_track is None:
+            raise ValueError("track removed while waveform was updating")
+        latest_track.waveform_peaks = peaks
+        latest_track.waveform_revision = _waveform_revision(source)
+        save_project(latest)
+        _media_job_update(
+            job_id,
+            status="completed",
+            progress=100,
+            message="Waveform aggiornata",
+            result={"track_id": track_id, "peaks": peaks, "revision": latest_track.waveform_revision},
+        )
+    except Exception as exc:
+        _media_job_update(job_id, status="failed", progress=0, message="Aggiornamento waveform fallito", error=str(exc)[-1200:])
+
+
+@app.post("/api/projects/{pid}/tracks/{track_id}/waveform-jobs")
+def start_waveform_job(pid: str, track_id: str, request: Request):
+    project = _project_for_actor(request, pid)
+    track = next((item for item in project.tracks if item.id == track_id), None)
+    if track is None:
+        raise HTTPException(404, "track not found")
+    source = audio_path(pid, track.filename)
+    revision = _waveform_revision(source)
+    if track.waveform_peaks and track.waveform_revision == revision:
+        return {
+            "id": "",
+            "kind": "waveform",
+            "project_id": pid,
+            "status": "completed",
+            "progress": 100,
+            "message": "Waveform già aggiornata",
+            "created_at": time.time(),
+            "updated_at": time.time(),
+            "result": {"track_id": track_id, "peaks": track.waveform_peaks, "revision": revision},
+            "error": None,
+        }
+
+    with MEDIA_JOB_LOCK:
+        for item in MEDIA_JOBS.values():
+            if (
+                item.get("kind") == "waveform"
+                and item.get("project_id") == pid
+                and item.get("track_id") == track_id
+                and item.get("status") not in {"completed", "failed", "cancelled"}
+            ):
+                return _media_job_public(item)
+
+    now = time.time()
+    job_id = uuid.uuid4().hex[:16]
+    job = {
+        "id": job_id,
+        "kind": "waveform",
+        "project_id": pid,
+        "track_id": track_id,
+        "status": "queued",
+        "progress": 2,
+        "message": "Waveform in coda",
+        "created_at": now,
+        "updated_at": now,
+        "result": None,
+        "error": None,
+    }
+    with MEDIA_JOB_LOCK:
+        MEDIA_JOBS[job_id] = job
+    threading.Thread(target=_waveform_worker, args=(job_id, pid, track_id), daemon=True, name=f"waveform-{job_id}").start()
+    return _media_job_public(job)
+
+
 def _track_import_worker(
     job_id: str,
     pid: str,
@@ -839,9 +963,19 @@ def _track_import_worker(
                 _media_job_update(job_id, progress=60 + int(max(0, min(100, value)) * 0.28), message=message)
             try:
                 project.bpm = estimate_bpm(dst, bpm_progress)
+                project.base_bpm = project.bpm
                 save_project(project)
             except Exception:
                 _media_job_update(job_id, progress=87, message="Stima BPM non conclusiva; mantengo il BPM corrente")
+        _media_job_update(job_id, progress=88, message="Generazione waveform")
+        try:
+            peaks = waveform_peaks(dst, 1024, lambda value, message: _media_job_update(
+                job_id, progress=88 + int(max(0, min(100, value)) * 0.07), message=message
+            ))
+            revision = _waveform_revision(dst)
+        except Exception:
+            peaks = []
+            revision = ""
         allowed = Track.model_fields["type"].annotation.__args__
         track = Track(
             id=uuid.uuid4().hex[:10],
@@ -855,6 +989,8 @@ def _track_import_worker(
                 source_end_ms=duration,
                 timeline_start_ms=max(0, offset_ms),
             )],
+            waveform_peaks=peaks,
+            waveform_revision=revision,
         )
         _media_job_update(job_id, progress=91, message="Aggiunta della traccia al progetto")
         if sync_mode == "auto" and project.tracks:
@@ -993,6 +1129,8 @@ async def replace_track(
 
     track.filename = filename
     track.duration_ms = duration
+    track.waveform_peaks = []
+    track.waveform_revision = ""
     track.clips = [Clip(id=uuid.uuid4().hex[:10], source_start_ms=0, source_end_ms=duration, timeline_start_ms=0)]
     try:
         if sync_mode == "manual":
@@ -1141,6 +1279,7 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
             try:
                 project_for_bpm = load_project(project_id)
                 project_for_bpm.bpm = estimate_bpm(source, bpm_progress)
+                project_for_bpm.base_bpm = project_for_bpm.bpm
                 save_project(project_for_bpm)
             except Exception:
                 progress(24, "Stima BPM non conclusiva; continuo con il BPM corrente")
@@ -1402,6 +1541,38 @@ async def split_stems_compat(
     save_project(project)
     return project
 
+
+@app.get("/api/projects/{pid}/preview-track/{track_id}")
+def preview_track(pid: str, track_id: str, request: Request, render: bool = False):
+    project = _project_for_actor(request, pid)
+    track = next((item for item in project.tracks if item.id == track_id), None)
+    if track is None:
+        raise HTTPException(404, "track not found")
+    signature = hashlib.sha256(
+        (
+            track.model_dump_json()
+            + f"|{project.bpm}|{project.base_bpm}|{project.pitch_semitones}|{int(render)}"
+        ).encode("utf-8")
+    ).hexdigest()[:20]
+    cache = pdir(pid) / ".preview"
+    cache.mkdir(exist_ok=True)
+    out = cache / f"{track.id}-{signature}.wav"
+    if not out.is_file():
+        render_track_export(
+            track,
+            audio_path(pid, track.filename),
+            out,
+            fmt="wav",
+            project=project,
+            apply_inserts=bool(render),
+        )
+        # Keep only the latest few previews per track.
+        stale = sorted(cache.glob(f"{track.id}-*.wav"), key=lambda item: item.stat().st_mtime, reverse=True)[4:]
+        for path in stale:
+            path.unlink(missing_ok=True)
+    return FileResponse(out, media_type="audio/wav", filename=f"{track.name}-preview.wav")
+
+
 @app.get("/api/projects/{pid}/preview-mix")
 def preview_mix(pid: str, request: Request):
     project = _project_for_actor(request, pid)
@@ -1451,7 +1622,7 @@ def _track_export_worker(job_id: str, pid: str, track_id: str, fmt: str) -> None
             raise ValueError("track not found")
         _media_job_update(job_id, status="running", progress=20, message="Rendering della traccia")
         out = pdir(pid) / f"track-{track.id}.{fmt}"
-        render_track_export(track, audio_path(pid, track.filename), out, fmt=fmt)
+        render_track_export(track, audio_path(pid, track.filename), out, fmt=fmt, project=project)
         _media_job_update(job_id, progress=90, message="Preparazione download")
         _media_job_update(
             job_id, status="completed", progress=100, message="Export completato",
@@ -1522,7 +1693,7 @@ def export_single_track(pid: str, track_id: str, request: Request, format: str =
     try:
         validate_project_files(project)
         out = pdir(pid) / f"track-{track.id}.{fmt}"
-        render_track_export(track, audio_path(pid, track.filename), out, fmt=fmt)
+        render_track_export(track, audio_path(pid, track.filename), out, fmt=fmt, project=project)
     except Exception as exc:
         raise HTTPException(400, "track export failed") from exc
     media = {"wav": "audio/wav", "mp3": "audio/mpeg", "flac": "audio/flac"}[fmt]

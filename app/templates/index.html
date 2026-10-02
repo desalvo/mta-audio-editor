@@ -7,7 +7,7 @@
   <link rel="icon" href="/static/logo.svg">
   <link rel="stylesheet" href="/static/app.css">
 </head>
-<body>
+<body class="__BODY_CLASS__">
 <div class="app-shell">
   <header class="topbar">
     <div class="brand-block">
@@ -16,17 +16,17 @@
     </div>
     <div class="project-name-block"><label>Project</label><div class="project-name-field" onclick="editProjectMeta()" title="Edit project metadata"><span id="headerProjectName">No project loaded</span><span>✎</span></div></div>
     <div class="transport">
-      <button class="transport-btn" onclick="stopPlayback()" title="Stop" aria-label="Stop">■</button><button class="transport-btn" onclick="seekTransport(-5000)" title="Riavvolgi 5 secondi" aria-label="Riavvolgi 5 secondi">◀◀</button><button id="playMaster" class="transport-btn play" onclick="previewMaster()" title="Play / Preview" aria-label="Play / Preview">▶</button><button class="transport-btn" onclick="seekTransport(5000)" title="Avanti 5 secondi" aria-label="Avanti 5 secondi">▶▶</button><button class="transport-btn rec" title="Record" aria-label="Record">●</button>
+      <button class="transport-btn" onclick="stopPlayback()" title="Stop" aria-label="Stop">■</button><button class="transport-btn" onclick="seekTransport(-5000)" title="Riavvolgi 5 secondi" aria-label="Riavvolgi 5 secondi">◀◀</button><button id="playMaster" class="transport-btn play" onclick="previewMaster()" title="Play / Preview" aria-label="Play / Preview">▶</button><button class="transport-btn" onclick="seekTransport(5000)" title="Avanti 5 secondi" aria-label="Avanti 5 secondi">▶▶</button><button id="renderBtn" class="transport-btn render-mode" onclick="toggleRenderPreview()" title="Render: include filtri e master nella preview" aria-label="Render preview">Render</button><button class="transport-btn rec" title="Record" aria-label="Record">●</button>
     </div>
-    <div class="timebox"><strong id="transportTime">00:00.000</strong><span><b id="transportBpm">120</b> BPM &nbsp;&nbsp; 4/4</span></div>
+    <div class="timebox"><strong id="transportTime">00:00.000</strong><span><input id="transportBpmInput" class="tempo-input" type="number" min="30" max="300" step="0.1" value="120" onchange="setProjectBpm(this.value)" title="BPM progetto"><b id="transportBpm" hidden>120</b> BPM &nbsp; <input id="transportPitchInput" class="pitch-input" type="number" min="-6" max="6" step="0.1" value="0" onchange="setProjectPitch(this.value)" title="Trasposizione semitoni"> st</span></div>
     <div class="top-spacer"></div>
     <div class="zoom-top"><span>Zoom</span><input id="topZoom" type="range" min="25" max="240" value="70" oninput="setZoom(this.value)"></div>
     <div class="header-actions">
-      <a class="header-link" href="/account" title="Account" aria-label="Account"><span class="control-icon" aria-hidden="true">👤</span><span class="control-text">Account</span></a>
-      <a id="adminNav" class="header-link" href="/admin/users" title="Amministrazione" aria-label="Amministrazione" hidden><span class="control-icon" aria-hidden="true">⚙</span><span class="control-text">Admin</span></a>
+      <a class="header-link auth-managed" href="/account" title="Account" aria-label="Account"><span class="control-icon" aria-hidden="true">👤</span><span class="control-text">Account</span></a>
+      <a id="adminNav" class="header-link auth-managed" href="/admin/users" title="Amministrazione" aria-label="Amministrazione" hidden><span class="control-icon" aria-hidden="true">⚙</span><span class="control-text">Admin</span></a>
       <button onclick="save()" title="Save" aria-label="Save"><span class="control-icon" aria-hidden="true">▣</span><span class="control-text">Save</span></button>
       <button class="accent" onclick="openExportPanel()" title="Export" aria-label="Export"><span class="control-icon" aria-hidden="true">⇧</span><span class="control-text">Export</span></button>
-      <a class="header-link logout" href="/logout" title="Esci" aria-label="Esci"><span class="control-icon" aria-hidden="true">↪</span><span class="control-text">Esci</span></a>
+      <a class="header-link logout auth-managed" href="/logout" title="Esci" aria-label="Esci"><span class="control-icon" aria-hidden="true">↪</span><span class="control-text">Esci</span></a>
     </div>
   </header>
 
@@ -49,7 +49,7 @@
         <button class="nav-item" onclick="exportProjectArchive()">⬇ <span>Save project locally</span></button>
         <label class="nav-item">⬆ <span>Import project</span><input id="projectArchiveFile" type="file" accept=".zip,.mta-project.zip" hidden></label>
         <button class="nav-item" onclick="manageProjectFiles()">▣ <span>Project files</span></button>
-        <button class="nav-item" onclick="manageProjectSharing()">⌘ <span>Share project</span></button>
+        <button class="nav-item auth-managed" onclick="manageProjectSharing()">⌘ <span>Share project</span></button>
         <button class="nav-item" onclick="deleteCurrentProject()">× <span>Delete project</span></button>
         <a class="nav-item" href="/docs/user" target="_blank">? <span>Docs &amp; Help</span></a>
       </nav>

@@ -1,6 +1,6 @@
 # MTA Audio Editor - project architecture
 
-Version: 0.2.0-37
+Version: 0.2.0-39
 
 ## 1. Architectural goals
 
@@ -508,3 +508,72 @@ Job state is runtime state; project/audio state is persistent. A pod restart can
 "Save project locally" downloads the complete `.mta-project.zip` archive. This is separate from workspace persistence: projects already remain stored server-side in the user's workspace.
 
 Deletion removes the complete project directory and is allowed only to the project owner or an administrator. Shared collaborators cannot delete the owner's project.
+
+
+## Project deletion safety
+
+La cancellazione di un progetto elimina l'intero workspace del progetto, inclusi audio, originali, attachment e file generati; l'interfaccia richiede sempre due conferme consecutive, la seconda esplicitamente irreversibile.
+
+
+
+## 22. Timeline/waveform and real-time preview architecture
+
+Track waveform data is persisted in each Track as a normalized peak array plus a source revision. The revision is based on working-source filename, size and mtime. A mismatch schedules an asynchronous waveform job; completion updates `project.json`.
+
+The editor has two vertically synchronized scroll surfaces: the Tracks column and timeline pane. The Tracks column width is a persisted project property. UI rerenders capture and restore Tracks, timeline and mixer scroll offsets.
+
+Preview has two modes:
+
+- **Dynamic**: one audio preview per audible track, preserving clip layout, fader, pan and project tempo/pitch while omitting insert processing for low-latency audition.
+- **Render**: server-rendered master including track inserts and master chain. With RealTime metering active, silent per-track rendered previews feed Web Audio analysers while the rendered master remains the audible signal.
+
+RealTime meters use RMS estimates from `AnalyserNode` time-domain buffers and are intentionally separate from the static fader-level indicator.
+
+Global tempo/pitch are persisted as `base_bpm`, target `bpm` and `pitch_semitones`. FFmpeg uses resampling plus chained `atempo` stages to keep pitch shift and time-stretch independent. Export paths use the same project transform.
+
+Project deletion is destructive: storage removes the whole project directory. The UI therefore requires two explicit confirmations before the DELETE request.
+
+
+
+## 23. Native desktop architecture
+
+Windows and macOS use a PyInstaller-packaged launcher around the existing FastAPI application and a native `pywebview` window.
+
+Startup sequence:
+
+```text
+native executable
+ -> resolve per-user application data directory
+ -> enable MTA_NATIVE_SINGLE_USER
+ -> prepend bundled FFmpeg/FFprobe directory to PATH
+ -> start FastAPI/Uvicorn on 127.0.0.1:<ephemeral-port>
+ -> wait for /api/health
+ -> open native webview
+ -> shut down Uvicorn when the native window closes
+```
+
+Native single-user mode deliberately bypasses the account database and suppresses login, registration, account administration, SMTP/TOTP, admin-user endpoints and project-sharing endpoints. Internally a synthetic local principal is used only to reuse the project authorization code paths.
+
+The native launcher supports an internal `--demucs-worker` mode so a frozen PyInstaller executable can spawn Demucs separation jobs without requiring an external Python interpreter.
+
+GitHub Actions builds both desktop installers only after quality and security jobs pass. Each packaged executable is exercised with `--native-smoke` before installer creation. Tag builds publish the generated Windows Setup executable and macOS DMG to the GitHub Release.
+
+
+
+## 23. Native desktop editions
+
+The Windows and macOS editions reuse the same application core but run with `MTA_NATIVE_SINGLE_USER=true`. The desktop launcher starts Uvicorn on an ephemeral loopback-only port and opens it inside a native `pywebview` window. Native mode injects a synthetic local administrator principal and blocks login, logout, account, registration, password-reset, SMTP/admin-user and project-sharing routes.
+
+The native application therefore keeps project authorization simple while preserving the exact editor/storage/audio/MTA pipeline used by the server edition. Projects are local to the OS user profile. No listening socket is exposed outside `127.0.0.1`.
+
+PyInstaller bundles Python, application modules, templates/static assets, documentation, FFmpeg/FFprobe, Demucs, Torch and Torchaudio. The desktop launcher contains a dedicated frozen-process Demucs worker mode so stem separation does not depend on a system Python interpreter.
+
+GitHub Actions builds:
+
+```text
+Windows x64        -> Inno Setup .exe
+macOS Intel x64    -> .app + .dmg
+macOS Apple Silicon -> .app + .dmg
+```
+
+Every native runner performs an executable-level single-user smoke test before installer creation. Tag workflows publish installer artifacts and SHA-256 sidecars to the GitHub Release.

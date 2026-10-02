@@ -417,8 +417,30 @@ def delete_session(token: str | None) -> None:
 
 
 def session_user(request: Request):
+    if os.getenv("MTA_NATIVE_SINGLE_USER", "").lower() in {"1","true","yes","on"}:
+        ts = now_ts()
+        return {
+            "id": 0,
+            "username": "local",
+            "email": "",
+            "display_name": "Local user",
+            "role": "admin",
+            "active": 1,
+            "email_confirmed": 1,
+            "totp_enabled": 0,
+            "totp_pending_enc": None,
+            "created_at": ts,
+            "updated_at": ts,
+            "approved_at": ts,
+            "last_login_at": None,
+        }
     if os.getenv("MTA_ALLOW_INSECURE_NO_AUTH", "").lower() in {"1","true","yes","on"}:
-        return {"id":0,"username":"dev","email":"dev@localhost.invalid","display_name":"Development","role":"admin","active":1,"email_confirmed":1,"totp_enabled":0,"created_at":now_ts(),"updated_at":now_ts(),"approved_at":now_ts(),"last_login_at":None}
+        ts = now_ts()
+        return {
+            "id":0,"username":"dev","email":"dev@localhost.invalid","display_name":"Development",
+            "role":"admin","active":1,"email_confirmed":1,"totp_enabled":0,"totp_pending_enc":None,
+            "created_at":ts,"updated_at":ts,"approved_at":ts,"last_login_at":None
+        }
     init_auth_db()
     token = request.cookies.get(SESSION_COOKIE,"")
     if not token:

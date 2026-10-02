@@ -62,8 +62,27 @@
 <div class="note"><b>Autosave:</b> dopo la creazione, ogni modifica al progetto viene salvata automaticamente. Import audio, split, Auto Mix e altre operazioni server-side salvano subito; fader, pan, nomi e metadati usano un autosave rapido dopo la modifica.</div>
 <p>Nel riquadro Projects puoi aprire un progetto persistente, scaricarne una copia completa con l'icona ⬇ oppure eliminarlo con ×. Il comando <b>Save project locally</b> scarica un archivio completo <code>.mta-project.zip</code>, comprensivo degli originali.</p>
 
+
+<h2 id="waveform-realtime-tempo">Tracks, waveform, RealTime, Render, BPM e tonalità</h2>
+<p>Il bordo destro del riquadro <b>Tracks</b> può essere trascinato con il mouse per modificarne la larghezza. La larghezza scelta viene memorizzata nel progetto. Lo scroll verticale del riquadro Tracks è sincronizzato con quello della timeline: il nome della traccia rimane quindi sempre allineato alla lane grafica corrispondente.</p>
+<p>Ogni traccia mostra una waveform persistente nella timeline. I picchi della waveform vengono memorizzati nel progetto e rigenerati quando cambia il file sorgente. Durante la rigenerazione compare una barra di avanzamento direttamente sulla traccia interessata.</p>
+<p>Le azioni Mute, Solo, selezione traccia e regolazione volume non riportano più Tracks o Mixer all'inizio: la posizione di scroll viene conservata. Mute e Solo restano visivamente evidenziati finché sono attivi.</p>
+<p>Nel Mixer il tasto <b>RealTime</b> abilita, durante la riproduzione, un secondo indicatore accanto alla barra del volume impostato: è il VU-meter istantaneo della traccia. Disattivando RealTime il meter dinamico viene nascosto.</p>
+<p>Accanto ai controlli Stop/Rewind/Play è disponibile <b>Render</b>. Con Render disattivato la riproduzione è una preview dinamica delle singole tracce; con Render attivato la preview viene renderizzata con insert, fader/pan, mute/solo, master processing e trasformazioni globali.</p>
+<p>Il campo <b>BPM</b> permette di velocizzare o rallentare l'intero progetto rispetto al BPM base. Il campo <b>st</b> permette di trasporre tutte le tracce da <b>-6 a +6 semitoni</b>. Le stesse trasformazioni vengono applicate agli export.</p>
+<div class="note"><b>Cancellazione progetto:</b> eliminare un progetto rimuove tutto il relativo workspace, inclusi audio, originali, attachment e file generati. L'interfaccia richiede sempre due conferme consecutive; la seconda ricorda esplicitamente che l'operazione è irreversibile.</div>
+
+
+<h2 id="native-desktop">Versioni native Windows x64 e macOS Apple Silicon/ARM64</h2>
+<p>Le versioni desktop native funzionano come applicazioni mono-utente locali. Non richiedono login e non mostrano account, gestione utenti, registrazione, SMTP/TOTP o condivisione dei progetti.</p>
+<p>I progetti vengono salvati automaticamente nel profilo locale del sistema operativo:</p>
+<pre>Windows: %LOCALAPPDATA%\MTA Audio Editor
+macOS:   ~/Library/Application Support/MTA Audio Editor</pre>
+<p>FFmpeg/FFprobe sono inclusi nell'installer. Anche Demucs/PyTorch fanno parte della build; al primo utilizzo della separazione strumenti vengono scaricati soltanto i pesi del modello scelto e poi riutilizzati dalla cache locale.</p>
+
 <h2 id="mta-appendix">Appendice A. Cosa contiene un file MTA</h2>
 <p>Un MTA usa strutture Matroska/EBML per tracce, attachment e indice temporale. La regione media, dal primo Cluster a fine file, usa uno XOR proprietario periodico di 984 byte. L'applicazione rimuove automaticamente questo trasporto durante l'import e lo riapplica durante l'export.</p>
 <p>Gli attachment stock includono file SYL e MtxInfoData XML. Il SYL contiene testo, accordi, highlighting karaoke e marker MIDI. Gli originali importati vengono sempre preservati nel progetto; per dettagli byte-level consultare l'Appendice A del Manuale amministratore e <code>docs/MTA_FORMAT_FINAL_SPEC.md</code>.</p>
 <div class="note"><b>Uso live:</b> la validazione software controlla struttura e round-trip. Prima di usare un nuovo export in uno spettacolo verificare il file sul modello/firmware Merish effettivamente utilizzato.</div>
+<p><b>Cancellazione progetto:</b> La cancellazione di un progetto elimina l'intero workspace del progetto, inclusi audio, originali, attachment e file generati; l'interfaccia richiede sempre due conferme consecutive, la seconda esplicitamente irreversibile.</p>
 </div></body></html>

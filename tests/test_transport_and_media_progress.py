@@ -37,6 +37,8 @@ def test_ui_has_working_transport_progress_and_persistent_tracks():
     assert "data-open-project" in js
     assert "audibly-muted" in js
     # Mute/Solo must not filter the visual track arrays out.
-    assert "current.tracks.filter(t=>!t.mute" not in js
+    # Playback may filter inaudible tracks, but visual rendering must always map
+    # the complete project track list.
     assert "current.tracks.map((t,i)=>trackHead" in js
     assert "current.tracks.map((t,i)=>lane" in js
+    assert "updateMuteSoloVisuals" in js

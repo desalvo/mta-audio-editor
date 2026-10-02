@@ -66,6 +66,8 @@ class Track(BaseModel):
     color: str = Field(default="#2f81f7", pattern=r"^#[0-9A-Fa-f]{6}$")
     clips: list[Clip] = Field(default_factory=list)
     inserts: list[InsertPlugin] = Field(default_factory=list, max_length=16)
+    waveform_peaks: list[float] = Field(default_factory=list, max_length=2048)
+    waveform_revision: str = Field(default="", max_length=128)
 
 
 class Marker(BaseModel):
@@ -139,6 +141,11 @@ class Project(BaseModel):
     auto_mix_enabled: bool = False
     auto_mix_style: Literal["balanced", "live", "studio", "gentle"] = "balanced"
     auto_mix_snapshot: AutoMixSnapshot | None = None
+    base_bpm: float | None = Field(default=None, gt=0, le=500)
+    pitch_semitones: float = Field(default=0.0, ge=-6.0, le=6.0)
+    track_panel_width_px: int = Field(default=225, ge=160, le=520)
+    realtime_meter_enabled: bool = False
+    render_preview_enabled: bool = False
 
     @field_validator("shared_with_user_ids")
     @classmethod

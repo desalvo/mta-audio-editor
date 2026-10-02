@@ -1,6 +1,7 @@
 name: CI / Production image
 
 on:
+  workflow_dispatch:
   pull_request:
   push:
     branches: [main]
@@ -32,7 +33,7 @@ jobs:
       - run: pip install -r requirements-dev.txt
       - run: pip check
       - name: Compile
-        run: python -m compileall -q app scripts/k8s-wizard.py
+        run: python -m compileall -q app native scripts/k8s-wizard.py
       - name: Build documentation PDFs
         run: python scripts/build_docs.py
       - name: Install FFmpeg for DSP preset validation
@@ -40,7 +41,7 @@ jobs:
       - name: Validate audio presets against FFmpeg
         run: PYTHONPATH=. python scripts/validate_audio_presets.py
       - name: Ruff
-        run: ruff check app tests scripts/k8s-wizard.py
+        run: ruff check app native tests scripts/k8s-wizard.py
       - name: Unit tests and coverage gate
         env:
           MTA_ALLOW_INSECURE_NO_AUTH: 'true'
@@ -67,11 +68,12 @@ jobs:
       - run: pip install -r requirements-dev.txt
       - run: pip check
       - name: Bandit SAST
-        run: bandit -q -r app scripts/k8s-wizard.py -lll -iii
+        run: bandit -q -r app native scripts/k8s-wizard.py -lll -iii
       - name: Python dependency audit
         shell: bash
         run: |
           pip-audit -r requirements.txt --strict
+          pip-audit -r requirements-native.txt --strict
           # pip-audit/PyPI cannot identify PyTorch local-version wheels such as
           # 2.14.1+cpu. Audit the equivalent upstream public version instead.
           sed '/^--extra-index-url /d; s/^torch==\(.*\)+cpu$/torch==\1/' requirements-stems.txt > /tmp/requirements-stems-audit.txt
@@ -109,7 +111,7 @@ jobs:
           push: false
           tags: mta-audio-editor:ci
           build-args: |
-            APP_VERSION=${{ github.ref_type == 'tag' && github.ref_name || '0.2.0-37' }}
+            APP_VERSION=${{ github.ref_type == 'tag' && github.ref_name || '0.2.0-39' }}
             BUILD_ID=${{ steps.build.outputs.id }}
       - name: Verify container OS
         shell: bash
@@ -178,6 +180,183 @@ jobs:
           curl -fsS -u "admin:$CI_ADMIN_PASSWORD" -H 'X-MTA-Request: 1' -X POST http://127.0.0.1:18080/api/projects >/dev/null
           docker stop mta-ci
 
+
+  native-windows:
+    name: Native Windows installer
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: windows-latest
+    needs: [quality, security]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+      - name: Install application and native build dependencies
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-stems.txt
+          pip install -r requirements-native.txt
+          pip check
+      - name: Install FFmpeg and Inno Setup
+        shell: pwsh
+        run: |
+          choco install ffmpeg innosetup -y --no-progress
+          $toolsRoot=Join-Path $env:ChocolateyInstall "lib"
+          $ffmpeg=(Get-ChildItem $toolsRoot -Recurse -Filter ffmpeg.exe | Where-Object { $_.FullName -notlike "*\chocolatey\bin\*" } | Select-Object -First 1).FullName
+          $ffprobe=(Get-ChildItem $toolsRoot -Recurse -Filter ffprobe.exe | Where-Object { $_.FullName -notlike "*\chocolatey\bin\*" } | Select-Object -First 1).FullName
+          if (-not $ffmpeg -or -not $ffprobe) { throw "Unable to locate the real FFmpeg binaries" }
+          "MTA_NATIVE_FFMPEG=$ffmpeg" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "MTA_NATIVE_FFPROBE=$ffprobe" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          Write-Host "ffmpeg=$ffmpeg"
+          Write-Host "ffprobe=$ffprobe"
+      - name: Generate native build id
+        shell: pwsh
+        run: |
+          $build=(Get-Date).ToUniversalTime().ToString("yyyyMMdd-HH:mm:ss")
+          Set-Content -Path BUILD -Value $build
+      - name: Build Windows native application
+        shell: pwsh
+        run: pyinstaller --noconfirm --clean native/mta_audio_editor_native.spec
+      - name: Native single-user smoke test
+        shell: pwsh
+        run: '& ".\dist\MTA Audio Editor\MTA Audio Editor.exe" --native-smoke'
+      - name: Build Windows installer
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist-installer | Out-Null
+          $version=(Get-Content VERSION -Raw).Trim()
+          $iscc=(Get-Command ISCC.exe -ErrorAction SilentlyContinue)
+          if (-not $iscc) {
+            $candidate="${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+            if (-not (Test-Path $candidate)) { throw "ISCC.exe not found" }
+            $iscc=$candidate
+          } else {
+            $iscc=$iscc.Source
+          }
+          $sourceDir=(Resolve-Path ".\dist\MTA Audio Editor").Path
+          $outputDir=(Resolve-Path ".\dist-installer").Path
+          & $iscc "/DMyAppVersion=$version" "/DSourceDir=$sourceDir" "/DOutputDir=$outputDir" "native\windows-installer.iss"
+      - name: Checksum Windows installer
+        shell: pwsh
+        run: |
+          Get-ChildItem dist-installer\*.exe | ForEach-Object {
+            $hash=(Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLower()
+            "$hash  $($_.Name)" | Set-Content "$($_.FullName).sha256"
+          }
+      - name: Upload Windows installer
+        uses: actions/upload-artifact@v7
+        with:
+          name: native-windows-${{ github.ref_name }}
+          path: |
+            dist-installer/*.exe
+            dist-installer/*.sha256
+          if-no-files-found: error
+          retention-days: 30
+
+  native-macos:
+    name: Native macOS installer (${{ matrix.arch }})
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15-intel
+            arch: x64
+          - runner: macos-15
+            arch: arm64
+    runs-on: ${{ matrix.runner }}
+    needs: [quality, security]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+      - name: Install application and native build dependencies
+        shell: bash
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          # macOS PyTorch wheels do not use the Linux/Windows '+cpu' local suffix.
+          sed '/^--extra-index-url /d; s/^torch==\(.*\)+cpu$/torch==\1/' requirements-stems.txt > /tmp/requirements-native-stems.txt
+          pip install -r /tmp/requirements-native-stems.txt
+          pip install -r requirements-native.txt
+          pip check
+      - name: Install FFmpeg
+        shell: bash
+        run: |
+          brew install ffmpeg
+          echo "MTA_NATIVE_FFMPEG=$(command -v ffmpeg)" >> "$GITHUB_ENV"
+          echo "MTA_NATIVE_FFPROBE=$(command -v ffprobe)" >> "$GITHUB_ENV"
+      - name: Generate native build id
+        shell: bash
+        run: TZ=Europe/Rome date '+%Y%m%d-%H:%M:%S' > BUILD
+      - name: Build macOS native application
+        shell: bash
+        run: pyinstaller --noconfirm --clean native/mta_audio_editor_native.spec
+      - name: Native single-user smoke test
+        shell: bash
+        run: '"dist/MTA Audio Editor.app/Contents/MacOS/MTA Audio Editor" --native-smoke'
+      - name: Build macOS DMG installer
+        shell: bash
+        run: |
+          set -euxo pipefail
+          version="$(tr -d '\r\n' < VERSION)"
+          rm -rf dist-installer dmg-root
+          mkdir -p dist-installer dmg-root
+          cp -R "dist/MTA Audio Editor.app" dmg-root/
+          ln -s /Applications "dmg-root/Applications"
+          hdiutil create \
+            -volname "MTA Audio Editor ${version}" \
+            -srcfolder dmg-root \
+            -ov -format UDZO \
+            "dist-installer/MTA-Audio-Editor-${version}-macOS-${{ matrix.arch }}.dmg"
+      - name: Checksum macOS installer
+        shell: bash
+        run: |
+          cd dist-installer
+          shasum -a 256 *.dmg > "MTA-Audio-Editor-${{ matrix.arch }}.sha256"
+      - name: Upload macOS installer
+        uses: actions/upload-artifact@v7
+        with:
+          name: native-macos-${{ matrix.arch }}-${{ github.ref_name }}
+          path: |
+            dist-installer/*.dmg
+            dist-installer/*.sha256
+          if-no-files-found: error
+          retention-days: 30
+
+  native-release:
+    name: Publish native installers to GitHub Release
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    needs: [native-windows, native-macos]
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: native-*
+          path: release-assets
+          merge-multiple: true
+      - name: Create or update GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euxo pipefail
+          if ! gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create "$GITHUB_REF_NAME" \
+              --repo "$GITHUB_REPOSITORY" \
+              --title "MTA Audio Editor $GITHUB_REF_NAME" \
+              --generate-notes
+          fi
+          gh release upload "$GITHUB_REF_NAME" release-assets/* \
+            --repo "$GITHUB_REPOSITORY" \
+            --clobber
   publish:
     name: Publish Docker Hub image
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/'))

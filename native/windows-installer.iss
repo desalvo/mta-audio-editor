@@ -1,0 +1,44 @@
+#ifndef MyAppVersion
+  #define MyAppVersion "0.0.0"
+#endif
+
+#define MyAppName "MTA Audio Editor"
+#define MyAppPublisher "Alessandro De Salvo"
+#define MyAppExeName "MTA Audio Editor.exe"
+#ifndef SourceDir
+  #define SourceDir "..\\dist\\MTA Audio Editor"
+#endif
+#ifndef OutputDir
+  #define OutputDir "..\\dist-installer"
+#endif
+
+[Setup]
+AppId={{8415208D-8D3A-4DFC-A143-C567994A3D67}
+AppName={#MyAppName}
+AppVersion={#MyAppVersion}
+AppPublisher={#MyAppPublisher}
+DefaultDirName={localappdata}\Programs\MTA Audio Editor
+DefaultGroupName=MTA Audio Editor
+DisableProgramGroupPage=yes
+ArchitecturesAllowed=x64compatible
+ArchitecturesInstallIn64BitMode=x64compatible
+OutputDir={#OutputDir}
+OutputBaseFilename=MTA-Audio-Editor-{#MyAppVersion}-Windows-x64-Setup
+Compression=lzma2/ultra64
+SolidCompression=yes
+WizardStyle=modern
+PrivilegesRequired=lowest
+UninstallDisplayIcon={app}\{#MyAppExeName}
+
+[Files]
+Source: "{#SourceDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+
+[Icons]
+Name: "{autoprograms}\MTA Audio Editor"; Filename: "{app}\{#MyAppExeName}"
+Name: "{autodesktop}\MTA Audio Editor"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+
+[Tasks]
+Name: "desktopicon"; Description: "Crea un collegamento sul desktop"; GroupDescription: "Collegamenti aggiuntivi:"
+
+[Run]
+Filename: "{app}\{#MyAppExeName}"; Description: "Avvia MTA Audio Editor"; Flags: nowait postinstall skipifsilent

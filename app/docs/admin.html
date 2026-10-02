@@ -70,6 +70,23 @@ POST /api/stems/jobs/{job_id}/cancel</pre>
 <p>La creazione di un progetto scrive immediatamente <code>project.json</code>. Le operazioni backend salvano al termine della mutazione; i controlli puramente UI usano autosave debounced. Prima di cambiare progetto o di render/export viene effettuato un flush dell'autosave pendente.</p>
 <p>L'utente può inoltre scaricare un archivio locale completo del progetto oppure cancellarlo dal workspace. La cancellazione è owner-only (oltre agli amministratori); un collaboratore condiviso non può eliminare il progetto.</p>
 
+
+<h2 id="waveform-preview-engine">Waveform persistenti e motore di preview</h2>
+<p>Le waveform sono cache persistenti nel modello Track (<code>waveform_peaks</code> e <code>waveform_revision</code>). Un job asincrono rigenera i picchi quando la revision del file audio non coincide, salva il progetto e pubblica avanzamento tramite la stessa infrastruttura <code>/api/media-jobs</code>.</p>
+<p>Il layout editor salva <code>track_panel_width_px</code> nel progetto. Tracks e timeline mantengono scroll verticali sincronizzati; lo stato UI temporaneo conserva inoltre scroll della timeline e del mixer durante i rerender necessari.</p>
+<p><code>RealTime</code> usa Web Audio API/AnalyserNode per misurare RMS istantaneo delle preview delle singole tracce. Il meter dinamico è separato dall'indicatore statico di fader.</p>
+<p>La preview <code>Render</code> usa il master render server-side per includere insert di traccia, fader/pan, mute/solo, master chain e trasformazioni globali. Quando RealTime è attivo vengono riprodotte in parallelo preview di traccia silenziate in uscita, usate soltanto come sorgenti dei meter.</p>
+<h3>Tempo e pitch globali</h3>
+<p><code>base_bpm</code> conserva il BPM di riferimento; <code>bpm</code> è il target corrente. Il rapporto determina il time-stretch. <code>pitch_semitones</code> è limitato a -6/+6. La trasformazione FFmpeg usa <code>asetrate</code> + <code>aresample</code> e una catena <code>atempo</code> per rendere pitch e tempo indipendenti. La trasformazione è applicata a preview, mix export, single-track export e slot MTA.</p>
+<h3>Cancellazione progetto</h3>
+<p>Il backend elimina l'intera directory del progetto. La UI richiede due conferme consecutive, inclusa una conferma esplicita di irreversibilità. Non esiste cestino applicativo: il recupero richiede un backup/snapshot esterno.</p>
+
+
+<h2 id="native-builds">Build native Windows x64/macOS ARM64</h2>
+<p>La pipeline CI/CD crea anche applicazioni desktop native. Il launcher usa PyInstaller + pywebview e avvia FastAPI/Uvicorn soltanto sull'interfaccia loopback <code>127.0.0.1</code>.</p>
+<p>Le versioni native sono mono-utente e disabilitano login, registrazione, gestione account/utenti, SMTP/TOTP e sharing. I dati persistono in <code>%LOCALAPPDATA%\MTA Audio Editor</code> su Windows e <code>~/Library/Application Support/MTA Audio Editor</code> su macOS.</p>
+<p>La pipeline installa e incorpora FFmpeg/FFprobe e Demucs/PyTorch, esegue uno smoke test dell'eseguibile frozen e poi produce un installer Inno Setup su Windows e un DMG su macOS. Su tag, entrambi vengono pubblicati automaticamente nella GitHub Release.</p>
+
 <h2 id="appendix-mta">Appendice A. Specifica tecnica del formato proprietario MTA</h2>
 <div class="note"><b>Ambito:</b> questa appendice documenta il formato on-disk verificato sul corpus stock disponibile. "Verificato" significa che la relazione è stata ricostruita dai byte e controllata su più file indipendenti. La compatibilità con ogni revisione firmware M-Live/Merish richiede comunque una prova sul dispositivo target.</div>
 
@@ -268,4 +285,5 @@ clip -&gt; insert traccia -&gt; fader/pan -&gt; somma stereo -&gt; master -&gt; 
 <h3>B.7 CI/CD e criteri di release</h3>
 <p>I gate coprono compilazione, pytest/coverage, Ruff, Bandit, audit dipendenze, secret scanning, CodeQL, Trivy filesystem/immagine e smoke test del container. Il test MTA di writer deve verificare che un file generato esponga il trasporto XOR, che la deobfuscazione sia FFprobe-readable e che l'import ricostruisca il numero corretto di tracce.</p>
 <p>La documentazione progettuale estesa è inoltre disponibile nei file <code>docs/PROJECT_ARCHITECTURE.md</code>, <code>DATA_MODEL.md</code>, <code>API_REFERENCE.md</code>, <code>OPERATIONS_RUNBOOK.md</code>, <code>TESTING_AND_RELEASE.md</code> e <code>MTA_FORMAT_FINAL_SPEC.md</code>.</p>
+<p><b>Cancellazione progetto:</b> La cancellazione di un progetto elimina l'intero workspace del progetto, inclusi audio, originali, attachment e file generati; l'interfaccia richiede sempre due conferme consecutive, la seconda esplicitamente irreversibile.</p>
 </div></body></html>

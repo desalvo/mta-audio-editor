@@ -8,7 +8,7 @@ import tempfile
 import uuid
 from pathlib import Path
 
-from .audio_engine import media_duration_ms, render_track
+from .audio_engine import media_duration_ms, project_time_pitch_filter, render_track
 from .models import Clip, MtaSlotMapping, Project, Track
 from .mta_writer import normalize_matroska_for_mta
 from .mta_reverse import (
@@ -163,10 +163,12 @@ def export_mta(project: Project, out: Path, slots: list[MtaSlotMapping] | None =
                 pan = min(1.0, max(-1.0, t.pan))
                 filters.append(f"[{idx}:a]aformat=channel_layouts=stereo,volume={gain:.3f}dB,stereotools=balance_out={pan:.4f}[s{idx}]")
                 labels.append(f"[s{idx}]")
+            transform = project_time_pitch_filter(project)
             if len(labels) == 1:
-                filters.append(f"{labels[0]}anull[out]")
+                filters.append(f"{labels[0]}{transform}[out]")
             else:
-                filters.append("".join(labels) + f"amix=inputs={len(labels)}:duration=longest:normalize=0[out]")
+                filters.append("".join(labels) + f"amix=inputs={len(labels)}:duration=longest:normalize=0[mix]")
+                filters.append(f"[mix]{transform}[out]")
             merged = td / f"slot-{pos+1:02d}.wav"
             cmd += ["-filter_complex", ";".join(filters), "-map", "[out]", "-ar", "44100", "-c:a", "pcm_s24le", str(merged)]
             run(cmd)

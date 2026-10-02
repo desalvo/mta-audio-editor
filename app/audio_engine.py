@@ -216,6 +216,7 @@ def render_mix(project: Project, audio_resolver, out: Path, fmt: str = "mp3", bi
         tail = f"volume={project.master_volume_db:.3f}dB"
         if master_chain:
             tail += "," + master_chain
+        tail += "," + project_time_pitch_filter(project)
         filters.append(f"[master0]{tail}[master]")
         cmd += ["-filter_complex", ";".join(filters), "-map", "[master]", "-ar", "44100"]
         if fmt == "wav":
@@ -262,6 +263,65 @@ def _envelope(path: Path, sample_rate: int = 4000, max_seconds: int = 1200):
     env = (env - env.mean()) / (env.std() + 1e-6)
     return env.astype(np.float32), 20
 
+
+
+
+def waveform_peaks(path: Path, points: int = 1024, progress=None) -> list[float]:
+    """Return normalized mono peak amplitudes suitable for persistent timeline drawing."""
+    points = max(64, min(2048, int(points)))
+    if progress:
+        progress(5, "Preparazione waveform")
+    with tempfile.TemporaryDirectory() as td:
+        wav_path = Path(td) / "waveform.wav"
+        _run(
+            [
+                "ffmpeg", "-y", "-v", "error", "-i", str(path),
+                "-ac", "1", "-ar", "4000", "-c:a", "pcm_s16le", str(wav_path),
+            ]
+        )
+        if progress:
+            progress(45, "Calcolo dei picchi")
+        with wave.open(str(wav_path), "rb") as handle:
+            data = np.frombuffer(handle.readframes(handle.getnframes()), dtype=np.int16).astype(np.float32)
+    if not len(data):
+        return [0.0] * points
+    data = np.abs(data)
+    peak = float(np.max(data)) or 1.0
+    edges = np.linspace(0, len(data), points + 1, dtype=np.int64)
+    out: list[float] = []
+    for i in range(points):
+        a, b = int(edges[i]), int(edges[i + 1])
+        value = float(np.max(data[a:b])) if b > a else 0.0
+        out.append(round(min(1.0, value / peak), 5))
+    if progress:
+        progress(95, "Waveform pronta")
+    return out
+
+
+def _atempo_chain(ratio: float) -> str:
+    ratio = max(0.05, min(20.0, float(ratio)))
+    parts: list[str] = []
+    while ratio < 0.5:
+        parts.append("atempo=0.5")
+        ratio /= 0.5
+    while ratio > 2.0:
+        parts.append("atempo=2.0")
+        ratio /= 2.0
+    parts.append(f"atempo={ratio:.8f}")
+    return ",".join(parts)
+
+
+def project_time_pitch_filter(project: Project) -> str:
+    """Build an FFmpeg filter that changes tempo and pitch independently."""
+    base_bpm = project.base_bpm or project.bpm or 120.0
+    tempo_ratio = max(0.25, min(4.0, float(project.bpm) / float(base_bpm)))
+    semitones = max(-6.0, min(6.0, float(project.pitch_semitones)))
+    pitch_ratio = 2.0 ** (semitones / 12.0)
+    # asetrate changes tempo and pitch together; atempo compensates tempo to the
+    # desired ratio while preserving the selected pitch shift.
+    rate = 44100.0 * pitch_ratio
+    tempo_after_rate = tempo_ratio / pitch_ratio
+    return f"asetrate={rate:.6f},aresample=44100,{_atempo_chain(tempo_after_rate)}"
 
 
 def estimate_bpm(path: Path, progress=None) -> float:
@@ -339,19 +399,31 @@ def auto_align_ms(reference: Path, candidate: Path, max_shift_ms: int = 30000) -
     return round(lag * 1000 / hz)
 
 
-def render_track_export(track: Track, source: Path, out: Path, fmt: str = "wav", bitrate: str = "320k") -> Path:
-    """Render a single track exactly as heard at the track output (clips, inserts, fader, pan)."""
+
+def render_track_export(
+    track: Track,
+    source: Path,
+    out: Path,
+    fmt: str = "wav",
+    bitrate: str = "320k",
+    *,
+    project: Project | None = None,
+    apply_inserts: bool = True,
+) -> Path:
+    """Render a single track as heard at track output, optionally with project tempo/pitch."""
     fmt = fmt.lower()
     if fmt not in {"wav", "mp3", "flac"}:
         raise ValueError("unsupported track export format")
     with tempfile.TemporaryDirectory() as td_raw:
         td = Path(td_raw)
         rendered = td / "track.wav"
-        render_track(track, source, rendered, apply_inserts=True)
+        render_track(track, source, rendered, apply_inserts=apply_inserts)
         gain = -120.0 if track.mute else track.volume_db
         pan = min(1.0, max(-1.0, track.pan))
-        cmd = ["ffmpeg", "-y", "-v", "error", "-i", str(rendered), "-af",
-               f"volume={gain:.3f}dB,stereotools=balance_out={pan:.4f}", "-ar", "44100"]
+        filters = [f"volume={gain:.3f}dB", f"stereotools=balance_out={pan:.4f}"]
+        if project is not None:
+            filters.append(project_time_pitch_filter(project))
+        cmd = ["ffmpeg", "-y", "-v", "error", "-i", str(rendered), "-af", ",".join(filters), "-ar", "44100"]
         if fmt == "wav":
             cmd += ["-c:a", "pcm_s24le", str(out)]
         elif fmt == "flac":

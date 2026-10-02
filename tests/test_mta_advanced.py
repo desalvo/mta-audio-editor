@@ -44,7 +44,7 @@ def test_single_track_export_and_flac_master_routes(tmp_path, monkeypatch):
     (storage.pdir(p.id) / "audio" / "t0.wav").write_bytes(b"x")
     p.tracks = [_track(0)]
     storage.save_project(p)
-    monkeypatch.setattr(main, "render_track_export", lambda track, source, out, fmt="wav": Path(out).write_bytes(b"track") or out)
+    monkeypatch.setattr(main, "render_track_export", lambda track, source, out, fmt="wav", **kwargs: Path(out).write_bytes(b"track") or out)
     monkeypatch.setattr(main, "render_mix", lambda project, resolver, out, fmt="mp3", bitrate="320k": Path(out).write_bytes(b"mix") or out)
     c = TestClient(main.app, headers=WRITE_HEADERS)
     assert c.get(f"/api/projects/{p.id}/tracks/t0/export?format=wav").status_code == 200

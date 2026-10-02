@@ -12,7 +12,8 @@ import os
 import shutil
 import subprocess
 import re
-import selectors
+import queue
+import threading
 import sys
 from copy import deepcopy
 from pathlib import Path
@@ -342,6 +343,8 @@ class DemucsStemSplitter:
         output_dir.mkdir(parents=True, exist_ok=True)
         if shutil.which("demucs"):
             cmd = ["demucs", "-n", model, "--out", str(output_dir), str(source)]
+        elif getattr(sys, "frozen", False):
+            cmd = [sys.executable, "--demucs-worker", "-n", model, "--out", str(output_dir), str(source)]
         else:
             cmd = [sys.executable, "-m", "demucs.separate", "-n", model, "--out", str(output_dir), str(source)]
         if progress:
@@ -358,37 +361,45 @@ class DemucsStemSplitter:
         if proc.stdout is None:
             proc.kill()
             raise RuntimeError("unable to capture Demucs progress output")
-        selector = selectors.DefaultSelector()
-        selector.register(proc.stdout, selectors.EVENT_READ)
-        try:
-            while True:
-                if cancel_event is not None and cancel_event.is_set():
-                    proc.terminate()
-                    try:
-                        proc.wait(timeout=5)
-                    except subprocess.TimeoutExpired:
-                        proc.kill()
-                    raise RuntimeError("stem separation cancelled")
-                events = selector.select(timeout=0.25)
-                if events:
-                    line = proc.stdout.readline()
-                    if line:
-                        clean = line.strip()
-                        if clean:
-                            tail.append(clean)
-                            tail = tail[-40:]
-                            match = percent_re.search(clean)
-                            if match and progress:
-                                raw = max(0, min(100, int(match.group(1))))
-                                progress(20 + int(raw * 0.65), clean[-180:])
-                if proc.poll() is not None:
-                    for line in proc.stdout:
-                        clean = line.strip()
-                        if clean:
-                            tail.append(clean)
-                    break
-        finally:
-            selector.close()
+
+        lines: queue.Queue[str | None] = queue.Queue()
+
+        def _read_output() -> None:
+            try:
+                for item in proc.stdout:
+                    lines.put(item)
+            finally:
+                lines.put(None)
+
+        reader = threading.Thread(target=_read_output, daemon=True, name="demucs-output")
+        reader.start()
+        stream_done = False
+        while True:
+            if cancel_event is not None and cancel_event.is_set():
+                proc.terminate()
+                try:
+                    proc.wait(timeout=5)
+                except subprocess.TimeoutExpired:
+                    proc.kill()
+                raise RuntimeError("stem separation cancelled")
+            try:
+                line = lines.get(timeout=0.25)
+            except queue.Empty:
+                line = ""
+            if line is None:
+                stream_done = True
+            elif line:
+                clean = line.strip()
+                if clean:
+                    tail.append(clean)
+                    tail = tail[-40:]
+                    match = percent_re.search(clean)
+                    if match and progress:
+                        raw = max(0, min(100, int(match.group(1))))
+                        progress(20 + int(raw * 0.65), clean[-180:])
+            if proc.poll() is not None and stream_done:
+                break
+        reader.join(timeout=1)
         if proc.returncode:
             raise RuntimeError("\n".join(tail)[-3000:] or "stem separation failed")
         if progress:
