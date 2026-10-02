@@ -74,7 +74,7 @@
 .inspector-row .volume-number{width:68px;min-width:68px;height:28px;padding:3px 6px}
 .channel .volume-number{width:54px;min-width:54px;height:25px;border:1px solid #30485c;border-radius:4px;background:#0b1721;color:#dcecf7;padding:2px 4px;font-size:10px}
 
-/* 0.2.0-39 synchronized Tracks/timeline and persistent waveform UX */
+/* 0.2.0-40 synchronized Tracks/timeline and persistent waveform UX */
 .editor-grid{grid-template-columns:var(--track-column-width,225px) 5px minmax(540px,1fr) 300px}
 .track-column{overflow:auto;scrollbar-gutter:stable;background:#0c1721}
 .track-column-head{position:sticky;top:0;z-index:18}

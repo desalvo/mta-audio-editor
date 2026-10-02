@@ -8,7 +8,7 @@ import socket
 import sys
 import threading
 import time
-import urllib.request
+import http.client
 from pathlib import Path
 
 
@@ -96,29 +96,41 @@ def _start_server(port: int):
 
 
 def _wait_ready(url: str, timeout: float = 20.0) -> None:
+    port = int(url.rsplit(":", 1)[1])
     deadline = time.monotonic() + timeout
     last_error: Exception | None = None
     while time.monotonic() < deadline:
+        conn = http.client.HTTPConnection("127.0.0.1", port, timeout=1.0)
         try:
-            with urllib.request.urlopen(url + "/api/health", timeout=1.0) as response:  # noqa: S310  # nosec B310 - loopback only
-                if response.status == 200:
-                    return
+            conn.request("GET", "/api/health")
+            response = conn.getresponse()
+            response.read()
+            if response.status == 200:
+                return
         except Exception as exc:
             last_error = exc
+        finally:
+            conn.close()
         time.sleep(0.1)
     raise RuntimeError(f"Native server did not become ready: {last_error}")
 
 
 def _native_smoke(url: str) -> int:
+    port = int(url.rsplit(":", 1)[1])
     endpoints = ["/api/health", "/api/about", "/api/session", "/api/projects"]
     result: dict[str, object] = {}
     for endpoint in endpoints:
-        request = urllib.request.Request(url + endpoint)
-        with urllib.request.urlopen(request, timeout=5.0) as response:  # noqa: S310  # nosec B310 - loopback only
+        conn = http.client.HTTPConnection("127.0.0.1", port, timeout=5.0)
+        try:
+            conn.request("GET", endpoint)
+            response = conn.getresponse()
+            raw = response.read().decode("utf-8")
             result[endpoint] = {
                 "status": response.status,
-                "body": json.loads(response.read().decode("utf-8")),
+                "body": json.loads(raw),
             }
+        finally:
+            conn.close()
     about = result["/api/about"]["body"]  # type: ignore[index]
     session = result["/api/session"]["body"]  # type: ignore[index]
     if not about.get("native_single_user"):  # type: ignore[union-attr]
