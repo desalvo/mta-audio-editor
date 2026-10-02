@@ -1,5 +1,5 @@
 FROM python:3.14-slim-trixie
-ARG APP_VERSION=0.2.0-61
+ARG APP_VERSION=0.2.0-62
 ARG BUILD_ID=unknown
 ARG INSTALL_STEMS=true
 LABEL org.opencontainers.image.title="MTA Audio Editor" \
