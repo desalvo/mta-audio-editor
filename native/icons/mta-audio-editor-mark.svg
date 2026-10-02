@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-labelledby="t d">
+<title id="t">MTA Audio Editor application mark</title>
+<desc id="d">Stylized multitrack waveform and editing cursor</desc>
+<defs>
+  <linearGradient id="g" x1="0" x2="1">
+    <stop stop-color="#58a6ff"/>
+    <stop offset="1" stop-color="#2ea043"/>
+  </linearGradient>
+</defs>
+<rect x="20" y="24" width="120" height="112" rx="18" fill="#161b22" stroke="#30363d" stroke-width="4"/>
+<path d="M34 80h10l8-24 12 62 12-78 12 70 12-48 10 34 8-16h8"
+      fill="none" stroke="url(#g)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M108 40v80" stroke="#f85149" stroke-width="4"/>
+<path d="M100 40h16l-8 12z" fill="#f85149"/>
+</svg>
