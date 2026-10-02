@@ -3,7 +3,7 @@ set -Eeuo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 BUILD_ID="$(TZ=Europe/Rome date '+%Y%m%d-%H:%M:%S')"
-printf '%s\n' "$BUILD_ID" > BUILD
+printf '%s\n' "$BUILD_ID" > BUILD_INFO
 python scripts/build_docs.py
 ./scripts/production_gate.sh
 find . -type d \( -name __pycache__ -o -name .pytest_cache -o -name .ruff_cache \) -prune -exec rm -rf {} +

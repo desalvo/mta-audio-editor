@@ -85,7 +85,7 @@ A `.sha256` sidecar is generated for integrity verification.
 
 `VERSION` stores the project release.
 
-`BUILD` stores a generated build timestamp.
+`BUILD_INFO` stores a generated build timestamp.
 
 Runtime `/api/about` exposes release/build identity.
 

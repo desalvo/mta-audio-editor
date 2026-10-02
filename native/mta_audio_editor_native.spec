@@ -13,7 +13,7 @@ datas = [
     (str(project / "app" / "docs"), "app/docs"),
     (str(project / "VERSION"), "."),
 ]
-build_file = project / "BUILD"
+build_file = project / "BUILD_INFO"
 if build_file.exists():
     datas.append((str(build_file), "."))
 

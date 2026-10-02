@@ -111,7 +111,7 @@ jobs:
           push: false
           tags: mta-audio-editor:ci
           build-args: |
-            APP_VERSION=${{ github.ref_type == 'tag' && github.ref_name || '0.2.0-40' }}
+            APP_VERSION=${{ github.ref_type == 'tag' && github.ref_name || '0.2.0-41' }}
             BUILD_ID=${{ steps.build.outputs.id }}
       - name: Verify container OS
         shell: bash
@@ -216,7 +216,7 @@ jobs:
         shell: pwsh
         run: |
           $build=(Get-Date).ToUniversalTime().ToString("yyyyMMdd-HH:mm:ss")
-          Set-Content -Path BUILD -Value $build
+          Set-Content -Path BUILD_INFO -Value $build
       - name: Build Windows native application
         shell: pwsh
         run: pyinstaller --noconfirm --clean native/mta_audio_editor_native.spec
@@ -293,7 +293,7 @@ jobs:
           echo "MTA_NATIVE_FFPROBE=$(command -v ffprobe)" >> "$GITHUB_ENV"
       - name: Generate native build id
         shell: bash
-        run: TZ=Europe/Rome date '+%Y%m%d-%H:%M:%S' > BUILD
+        run: TZ=Europe/Rome date '+%Y%m%d-%H:%M:%S' > BUILD_INFO
       - name: Build macOS native application
         shell: bash
         run: pyinstaller --noconfirm --clean native/mta_audio_editor_native.spec

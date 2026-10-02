@@ -1,5 +1,5 @@
 FROM python:3.14-slim-trixie
-ARG APP_VERSION=0.2.0-40
+ARG APP_VERSION=0.2.0-41
 ARG BUILD_ID=unknown
 ARG INSTALL_STEMS=true
 LABEL org.opencontainers.image.title="MTA Audio Editor" \
@@ -19,7 +19,7 @@ RUN apt-get update \
     && groupadd --system --gid 10001 mtaeditor \
     && useradd --system --uid 10001 --gid 10001 --home /nonexistent --shell /usr/sbin/nologin mtaeditor
 WORKDIR /app
-COPY requirements.txt requirements-stems.txt VERSION BUILD ./
+COPY requirements.txt requirements-stems.txt VERSION BUILD_INFO ./
 # sphn has no CPython 3.14/aarch64 Linux wheel. Its Opus source build also requires
 # CMake 3.x (CMake 4 removed compatibility with the project's old policy baseline).
 # Use Debian Trixie's system CMake explicitly, and remove all native build tools afterwards.

@@ -1,4 +1,4 @@
-# MTA Audio Editor 0.2.0-40
+# MTA Audio Editor 0.2.0-41
 
 ![MTA Audio Editor](app/static/logo.svg)
 
@@ -9,7 +9,7 @@ Web DAW containerizzata per creare, importare, modificare ed esportare progetti 
 **Creatore:** Alessandro De Salvo <braket71@gmail.com>  
 **Repository:** `desalvo/mta-audio-editor`  
 **Licenza:** EUPL-1.2  
-**Versione:** `0.2.0-40`  
+**Versione:** `0.2.0-41`  
 **Build:** generato automaticamente nel formato `YYYYMMDD-HH:MM:SS`.
 
 ## Funzioni principali
@@ -159,20 +159,20 @@ git init
 git branch -M main
 git remote add origin https://github.com/desalvo/mta-audio-editor.git
 git add .
-git commit -m "Release 0.2.0-40"
+git commit -m "Release 0.2.0-41"
 git push -u origin main
 ```
 
 Dopo che la CI su `main` è verde, creare il tag:
 
 ```bash
-git tag -s 0.2.0-40 -m "MTA Audio Editor 0.2.0-40"
-git push origin 0.2.0-40
+git tag -s 0.2.0-41 -m "MTA Audio Editor 0.2.0-41"
+git push origin 0.2.0-41
 ```
 
 ## Packaging locale
 
-`./scripts/package.sh` aggiorna automaticamente `BUILD`, rigenera i PDF, esegue i production gate, rimuove cache/artefatti temporanei e genera lo ZIP versionato.
+`./scripts/package.sh` aggiorna automaticamente `BUILD_INFO`, rigenera i PDF, esegue i production gate, rimuove cache/artefatti temporanei e genera lo ZIP versionato.
 
 ## Sicurezza e produzione
 
@@ -234,7 +234,7 @@ The first administrator can be bootstrapped with `MTA_ADMIN_USERNAME`, `MTA_ADMI
 
 ### Upgrade Kubernetes e readiness
 
-Dalla 0.2.0-40 il pod imposta `fsGroup: 10001` e `fsGroupChangePolicy: OnRootMismatch` per rendere scrivibile il PVC all'utente applicativo non-root. La chiave `email` del Secret bootstrap è opzionale a runtime per mantenere compatibili gli upgrade da release precedenti; il wizard continua comunque a richiedere l'email per le nuove installazioni. È inoltre presente una `startupProbe` su `/api/health` prima di readiness e liveness.
+Dalla 0.2.0-41 il pod imposta `fsGroup: 10001` e `fsGroupChangePolicy: OnRootMismatch` per rendere scrivibile il PVC all'utente applicativo non-root. La chiave `email` del Secret bootstrap è opzionale a runtime per mantenere compatibili gli upgrade da release precedenti; il wizard continua comunque a richiedere l'email per le nuove installazioni. È inoltre presente una `startupProbe` su `/api/health` prima di readiness e liveness.
 
 Se un pod resta non Ready dopo un upgrade, controllare `kubectl describe pod` per `CreateContainerConfigError`, `permission denied` sul PVC o errori della probe.
 
