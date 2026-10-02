@@ -1,6 +1,6 @@
 # MTA Audio Editor - project architecture
 
-Version: 0.2.0-59
+Version: 0.2.0-60
 
 ## 1. Architectural goals
 

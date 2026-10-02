@@ -45,6 +45,20 @@ let lastSelectedAudioFile=null, playbackPaused=false, mixerMetaTab='lyrics', pen
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const TRACK_COLORS=['#2f81f7','#28b463','#f0a52b','#8a58db','#e9506c','#8395a7','#24b8d4','#b26ff2','#e67e22','#16a085','#d35400','#7f8c8d'];
 
+function mobilePlatform(){
+  try{return window.MtaMobile?.getPlatform?.()||''}catch(e){return ''}
+}
+function isMobileClient(){return ['android','ios'].includes(mobilePlatform())}
+function setMobileBusy(value){try{window.MtaMobile?.setBusy?.(!!value)}catch(e){}}
+function mobileSaveRemoteFile(url,filename,mime='application/octet-stream',share=false){
+  if(!isMobileClient())return false;
+  try{
+    if(share&&window.MtaMobile?.shareRemoteFile)window.MtaMobile.shareRemoteFile(url,filename,mime);
+    else window.MtaMobile?.saveRemoteFile?.(url,filename,mime);
+    return true;
+  }catch(e){toast('Filesystem mobile non disponibile: '+e.message);return false}
+}
+
 async function api(url,opt={}){opt.headers=opt.headers||{};if((opt.method||'GET').toUpperCase()!=='GET')opt.headers['X-MTA-Request']='1';const r=await fetch(url,opt);if(!r.ok)throw new Error(await r.text());const ct=r.headers.get('content-type')||'';return ct.includes('json')?r.json():r}
 function esc(s){return String(s??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 function toast(s){const t=$('#toast');t.textContent=s;t.style.display='block';clearTimeout(t._timer);t._timer=setTimeout(()=>t.style.display='none',4200)}
@@ -57,7 +71,7 @@ function selectedTrackIds(){return $$('.trackSelect:checked').map(x=>x.value)}
 function linesToText(a,b){return(a||[]).map(x=>`${(x.time_ms/1000).toFixed(3)}\t${x[b]}`).join('\n')}
 function textToLines(v,key){return v.split(/\n/).map(x=>x.trim()).filter(Boolean).map(line=>{const [t,...rest]=line.split(/\t|\s{2,}/);return{time_ms:Math.max(0,Math.round(parseFloat(t)*1000)||0),[key]:rest.join(' ').trim()}})}
 
-async function init(){try{currentUser=await api('/api/session');const a=$('#adminNav');if(a)a.hidden=!!currentUser.native_single_user||currentUser.role!=='admin';if(currentUser.native_single_user)document.body.classList.add('native-single-user')}catch(e){}try{pluginInfo=await api('/api/plugins')}catch(e){}await refresh()}
+async function init(){if(isMobileClient())document.body.classList.add('mobile-client');try{currentUser=await api('/api/session');const a=$('#adminNav');if(a)a.hidden=!!currentUser.native_single_user||currentUser.role!=='admin';if(currentUser.native_single_user)document.body.classList.add('native-single-user')}catch(e){}try{pluginInfo=await api('/api/plugins')}catch(e){}await refresh()}
 
 function toggleProjectToolsPanel(){
   const panel=$('#projectToolsPanel');if(!panel)return;
@@ -824,6 +838,7 @@ async function deleteSelection(wholeSong){
 
 function showMediaProgress(title,pct,message,detail=''){
   const p=Math.max(0,Math.min(100,Number(pct)||0));
+  setMobileBusy(p<100);
   showUtilityModal(title,`<div class="stem-progress-card"><div class="stem-progress-head"><b>${esc(title)}</b><span>${p}%</span></div><div class="stem-progress"><div class="stem-progress-fill" style="width:${p}%"></div></div><div class="stem-progress-message">${esc(message||'')}</div>${detail?`<div class="workflow-note">${esc(detail)}</div>`:''}</div>`);
 }
 function uploadWithProgress(url,formData,title){
@@ -842,13 +857,16 @@ async function pollMediaJob(jobId,title,onDone){
   try{
     const job=await api(`/api/media-jobs/${jobId}`);
     showMediaProgress(title,job.progress,job.message,job.error||'');
-    if(job.status==='completed'){await onDone(job);return}
-    if(job.status==='failed'){toast(job.error||'Operazione fallita');return}
+    if(job.status==='completed'){setMobileBusy(false);await onDone(job);return}
+    if(job.status==='failed'){setMobileBusy(false);toast(job.error||'Operazione fallita');return}
     mediaProgressTimer=setTimeout(()=>pollMediaJob(jobId,title,onDone),500);
-  }catch(e){toast(e.message)}
+  }catch(e){setMobileBusy(false);toast(e.message)}
 }
-async function downloadWithProgress(url,filename,title){
+async function downloadWithProgress(url,filename,title,share=false,mime='application/octet-stream'){
   showMediaProgress(title,2,'Preparazione download');
+  if(isMobileClient()&&mobileSaveRemoteFile(url,filename,mime,share)){
+    setMobileBusy(false);$('#utilityBackdrop')?.classList.add('hidden');return;
+  }
   const r=await fetch(url);
   if(!r.ok)throw new Error(await r.text());
   const total=Number(r.headers.get('content-length')||0),reader=r.body?.getReader(),chunks=[];let loaded=0;
@@ -949,7 +967,7 @@ async function startStemWorkflow(){
     if(nativeProjectPath&&window.pywebview?.api?.bind_project_path){
       await window.pywebview.api.bind_project_path(r.project.id,nativeProjectPath);
     }
-    activeStemJob=r.job.id;
+    activeStemJob=r.job.id;setMobileBusy(true);
     activeStemProjectId=r.job.project_id;
     current=r.project;
     selectedTrackId=current.tracks.at(-1)?.id||null;
@@ -990,12 +1008,12 @@ async function pollStemJob(jobId){
       await syncNativeProjectFile(job.project_id);
       showStemProgress(job);
       activeStemJob=null;
-      activeStemProjectId=null;
+      activeStemProjectId=null;setMobileBusy(false);
       toast('Separazione completata e progetto salvato');
       return;
     }
     if(job.status==='failed'||job.status==='cancelled'){
-      activeStemJob=null;activeStemProjectId=null;
+      activeStemJob=null;activeStemProjectId=null;setMobileBusy(false);
       showStemProgress(job);
       toast(job.status==='cancelled'?'Separazione annullata':'Separazione fallita');
       return;
@@ -1275,14 +1293,15 @@ async function doExport(format=exportFormat){
       <label class="workflow-field"><span>Formato</span><input value="${format==='mta'?current.target:format.toUpperCase()}" disabled></label>
       <label class="workflow-field"><span>Nome file</span><div class="export-name-row"><input id="exportFileName" maxlength="180" value="${esc(safe)}"><span>.${ext}</span></div></label>
       ${audioParams}
-      <div class="workflow-note">${currentUser?.native_single_user?'Dopo Conferma verrà aperto il selettore del filesystem per scegliere la cartella di destinazione.':'Il browser chiederà dove salvare il file secondo le impostazioni di download del browser.'}</div>
+      <div class="workflow-note">${currentUser?.native_single_user?'Dopo Conferma verrà aperto il selettore del filesystem per scegliere la cartella di destinazione.':isMobileClient()?'L’app mobile userà il selettore file del sistema operativo. Puoi anche condividere direttamente l’output.':'Il browser chiederà dove salvare il file secondo le impostazioni di download del browser.'}</div>
       <div class="utility-actions">
-        <button class="utility-btn primary" onclick="confirmConfiguredExport('${format}')">Conferma export</button>
+        <button class="utility-btn primary" onclick="confirmConfiguredExport('${format}',false)">Conferma export</button>
+        ${isMobileClient()?`<button class="utility-btn secondary" onclick="confirmConfiguredExport('${format}',true)">Condividi…</button>`:''}
         <button class="utility-btn secondary" onclick="closeUtilityModal()">Annulla</button>
       </div>
     </div>`);
 }
-async function confirmConfiguredExport(format){
+async function confirmConfiguredExport(format,share=false){
   if(!current)return;
   const name=($('#exportFileName')?.value||'project').trim();
   if(!name)return toast('Inserisci un nome file');
@@ -1294,7 +1313,8 @@ async function confirmConfiguredExport(format){
     wav_bit_depth:Number($('#exportWavBits')?.value||24),
     flac_compression:Number($('#exportFlacCompression')?.value||8),
     slots:[],
-    output_path:null
+    output_path:null,
+    share:!!share
   };
   pendingExportConfig=config;
   closeUtilityModal();
@@ -1316,6 +1336,17 @@ async function executeConfiguredExport(config,slots=[]){
       const chosen=await window.pywebview.api.choose_export_save_path(safeName,ext);
       if(!chosen?.ok)return;
       config.output_path=chosen.path;
+    }
+    if(isMobileClient()){
+      const job=await api(`/api/projects/${current.id}/configured-export-jobs`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({...config,slots,output_path:null})});
+      showMediaProgress('Export progetto',job.progress,job.message);
+      pollMediaJob(job.id,'Export progetto',async completed=>{
+        const result=completed.result||{};
+        const mime=result.media_type||({wav:'audio/wav',mp3:'audio/mpeg',flac:'audio/flac'}[config.format]||'application/octet-stream');
+        mobileSaveRemoteFile(result.download_url,result.filename||`${safeName}.${ext}`,mime,!!config.share);
+        $('#utilityBackdrop')?.classList.add('hidden');pendingExportConfig=null;toast(config.share?'Output pronto per la condivisione':'Export pronto per il salvataggio');
+      });
+      return;
     }
     const response=await fetch(`/api/projects/${current.id}/configured-export`,{
       method:'POST',

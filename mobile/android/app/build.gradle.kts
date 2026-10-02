@@ -1,0 +1,49 @@
+plugins {
+    id("com.android.application")
+}
+
+android {
+    namespace = "com.desalvo.mtaaudioeditor.mobile"
+    compileSdk = 35
+
+    defaultConfig {
+        applicationId = "com.desalvo.mtaaudioeditor.mobile"
+        minSdk = 26
+        targetSdk = 35
+        versionCode = 20060
+        versionName = "0.2.0-60"
+    }
+
+    signingConfigs {
+        val path = System.getenv("MTA_ANDROID_KEYSTORE_PATH")
+        if (!path.isNullOrBlank()) {
+            create("releaseFromEnv") {
+                storeFile = file(path)
+                storePassword = System.getenv("MTA_ANDROID_KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("MTA_ANDROID_KEY_ALIAS")
+                keyPassword = System.getenv("MTA_ANDROID_KEY_PASSWORD")
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+            signingConfigs.findByName("releaseFromEnv")?.let { signingConfig = it }
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    packaging {
+        resources.excludes += setOf("META-INF/LICENSE*", "META-INF/NOTICE*")
+    }
+}
+
+
+dependencies {
+    implementation("androidx.core:core:1.15.0")
+}

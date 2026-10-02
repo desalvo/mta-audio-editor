@@ -26,3 +26,10 @@ updates:
       # PyTorch/Demucs and the full multi-arch production gate are validated.
       - dependency-name: python
         versions: ["3.15.*"]
+
+  - package-ecosystem: gradle
+    directory: /mobile/android
+    schedule: {interval: weekly}
+    groups:
+      android-dependencies:
+        patterns: ["*"]

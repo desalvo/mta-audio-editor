@@ -111,7 +111,7 @@ jobs:
           push: false
           tags: mta-audio-editor:ci
           build-args: |
-            APP_VERSION=${{ github.ref_type == 'tag' && github.ref_name || '0.2.0-59' }}
+            APP_VERSION=${{ github.ref_type == 'tag' && github.ref_name || '0.2.0-60' }}
             BUILD_ID=${{ steps.build.outputs.id }}
       - name: Verify container OS
         shell: bash
@@ -352,17 +352,193 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+  mobile-android:
+    name: Android APK / AAB
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    needs: [quality, security]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v5
+        with:
+          gradle-version: '8.10.2'
+      - name: Configure optional Android release signing
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        shell: bash
+        run: |
+          if [[ -n "$KEYSTORE_B64" ]]; then
+            printf '%s' "$KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/mta-android-release.keystore"
+            echo "MTA_ANDROID_KEYSTORE_PATH=$RUNNER_TEMP/mta-android-release.keystore" >> "$GITHUB_ENV"
+            echo "MTA_ANDROID_KEYSTORE_PASSWORD=$KEYSTORE_PASSWORD" >> "$GITHUB_ENV"
+            echo "MTA_ANDROID_KEY_ALIAS=$KEY_ALIAS" >> "$GITHUB_ENV"
+            echo "MTA_ANDROID_KEY_PASSWORD=$KEY_PASSWORD" >> "$GITHUB_ENV"
+          else
+            echo "Android release signing secrets not configured; AAB will be built unsigned."
+          fi
+      - name: Build Android debug APK and release AAB
+        shell: bash
+        run: |
+          gradle -p mobile/android :app:assembleDebug :app:bundleRelease --stacktrace
+      - name: Package Android artifacts
+        shell: bash
+        run: |
+          set -euxo pipefail
+          mkdir -p dist-mobile-android
+          version="$(tr -d '\r\n' < VERSION)"
+          cp mobile/android/app/build/outputs/apk/debug/app-debug.apk "dist-mobile-android/MTA-Audio-Editor-${version}-Android-debug.apk"
+          cp mobile/android/app/build/outputs/bundle/release/app-release.aab "dist-mobile-android/MTA-Audio-Editor-${version}-Android.aab"
+          cd dist-mobile-android
+          sha256sum * > SHA256SUMS
+      - uses: actions/upload-artifact@v7
+        with:
+          name: mobile-android-${{ github.ref_name }}
+          path: dist-mobile-android/*
+          if-no-files-found: error
+          retention-days: 30
+
+  mobile-ios:
+    name: iOS / iPadOS archive
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: macos-15
+    needs: [quality, security]
+    steps:
+      - uses: actions/checkout@v7
+      - name: Validate Xcode project
+        shell: bash
+        run: xcodebuild -project mobile/ios/MTAEditorMobile.xcodeproj -scheme MTAEditorMobile -showBuildSettings >/dev/null
+      - name: Build unsigned iOS archive
+        shell: bash
+        run: |
+          set -euxo pipefail
+          rm -rf build/mobile-ios
+          mkdir -p build/mobile-ios dist-mobile-ios
+          xcodebuild \
+            -project mobile/ios/MTAEditorMobile.xcodeproj \
+            -scheme MTAEditorMobile \
+            -configuration Release \
+            -sdk iphoneos \
+            -archivePath "$PWD/build/mobile-ios/MTAEditorMobile.xcarchive" \
+            CODE_SIGNING_ALLOWED=NO \
+            archive
+          version="$(tr -d '\r\n' < VERSION)"
+          ditto -c -k --sequesterRsrc --keepParent \
+            build/mobile-ios/MTAEditorMobile.xcarchive \
+            "dist-mobile-ios/MTA-Audio-Editor-${version}-iOS-unsigned.xcarchive.zip"
+      - name: Build signed IPA when Apple signing secrets are configured
+        env:
+          IOS_CERTIFICATE_P12_BASE64: ${{ secrets.IOS_CERTIFICATE_P12_BASE64 }}
+          IOS_CERTIFICATE_PASSWORD: ${{ secrets.IOS_CERTIFICATE_PASSWORD }}
+          IOS_PROVISIONING_PROFILE_BASE64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
+          IOS_TEAM_ID: ${{ secrets.IOS_TEAM_ID }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "$IOS_CERTIFICATE_P12_BASE64" || -z "$IOS_PROVISIONING_PROFILE_BASE64" || -z "$IOS_TEAM_ID" ]]; then
+            echo "Apple signing secrets not configured; skipping signed IPA."
+            exit 0
+          fi
+          KEYCHAIN="$RUNNER_TEMP/mta-mobile.keychain-db"
+          security create-keychain -p runner "$KEYCHAIN"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN"
+          security unlock-keychain -p runner "$KEYCHAIN"
+          printf '%s' "$IOS_CERTIFICATE_P12_BASE64" | base64 --decode > "$RUNNER_TEMP/cert.p12"
+          security import "$RUNNER_TEMP/cert.p12" -P "$IOS_CERTIFICATE_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN"
+          security list-keychains -d user -s "$KEYCHAIN" login.keychain-db
+          security set-key-partition-list -S apple-tool:,apple: -s -k runner "$KEYCHAIN"
+
+          mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
+          printf '%s' "$IOS_PROVISIONING_PROFILE_BASE64" | base64 --decode > "$RUNNER_TEMP/profile.mobileprovision"
+          security cms -D -i "$RUNNER_TEMP/profile.mobileprovision" > "$RUNNER_TEMP/profile.plist"
+          PROFILE_UUID=$(/usr/libexec/PlistBuddy -c 'Print :UUID' "$RUNNER_TEMP/profile.plist")
+          PROFILE_NAME=$(/usr/libexec/PlistBuddy -c 'Print :Name' "$RUNNER_TEMP/profile.plist")
+          cp "$RUNNER_TEMP/profile.mobileprovision" "$HOME/Library/MobileDevice/Provisioning Profiles/$PROFILE_UUID.mobileprovision"
+
+          rm -rf build/mobile-ios-signed build/exported-ipa
+          mkdir -p build/mobile-ios-signed build/exported-ipa
+          xcodebuild \
+            -project mobile/ios/MTAEditorMobile.xcodeproj \
+            -scheme MTAEditorMobile \
+            -configuration Release \
+            -sdk iphoneos \
+            -archivePath "$PWD/build/mobile-ios-signed/MTAEditorMobile.xcarchive" \
+            DEVELOPMENT_TEAM="$IOS_TEAM_ID" \
+            CODE_SIGN_STYLE=Manual \
+            PROVISIONING_PROFILE_SPECIFIER="$PROFILE_NAME" \
+            CODE_SIGN_IDENTITY="Apple Distribution" \
+            archive
+          cat > "$RUNNER_TEMP/ExportOptions.plist" <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0"><dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>signingStyle</key><string>manual</string>
+            <key>teamID</key><string>${IOS_TEAM_ID}</string>
+            <key>provisioningProfiles</key><dict>
+              <key>com.desalvo.mtaaudioeditor.mobile</key><string>${PROFILE_NAME}</string>
+            </dict>
+          </dict></plist>
+          EOF
+          xcodebuild -exportArchive \
+            -archivePath "$PWD/build/mobile-ios-signed/MTAEditorMobile.xcarchive" \
+            -exportPath "$PWD/build/exported-ipa" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist"
+          version="$(tr -d '\r\n' < VERSION)"
+          IPA=$(find build/exported-ipa -maxdepth 1 -name '*.ipa' -print -quit)
+          cp "$IPA" "dist-mobile-ios/MTA-Audio-Editor-${version}-iOS.ipa"
+      - name: Optional upload to TestFlight on tags
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          ASC_KEY_ID: ${{ secrets.APPSTORE_CONNECT_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.APPSTORE_CONNECT_ISSUER_ID }}
+          ASC_PRIVATE_KEY: ${{ secrets.APPSTORE_CONNECT_PRIVATE_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          IPA=$(find dist-mobile-ios -name '*.ipa' -print -quit || true)
+          if [[ -z "$IPA" || -z "$ASC_KEY_ID" || -z "$ASC_ISSUER_ID" || -z "$ASC_PRIVATE_KEY" ]]; then
+            echo "Signed IPA/App Store Connect secrets unavailable; skipping TestFlight upload."
+            exit 0
+          fi
+          mkdir -p "$HOME/.appstoreconnect/private_keys"
+          printf '%s\n' "$ASC_PRIVATE_KEY" > "$HOME/.appstoreconnect/private_keys/AuthKey_${ASC_KEY_ID}.p8"
+          xcrun altool --upload-app --type ios --file "$IPA" --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID"
+      - name: Checksums
+        shell: bash
+        run: |
+          cd dist-mobile-ios
+          shasum -a 256 * > SHA256SUMS
+      - uses: actions/upload-artifact@v7
+        with:
+          name: mobile-ios-${{ github.ref_name }}
+          path: dist-mobile-ios/*
+          if-no-files-found: error
+          retention-days: 30
+
   native-release:
-    name: Publish native installers to GitHub Release
+    name: Publish desktop/mobile installers to GitHub Release
     if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
-    needs: [native-windows, native-macos]
+    needs: [native-windows, native-macos, mobile-android, mobile-ios]
     permissions:
       contents: write
     steps:
       - uses: actions/download-artifact@v8
         with:
           pattern: native-*
+          path: release-assets
+          merge-multiple: true
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: mobile-*
           path: release-assets
           merge-multiple: true
       - name: Create or update GitHub Release

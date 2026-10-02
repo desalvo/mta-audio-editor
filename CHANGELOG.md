@@ -1,4 +1,4 @@
-## 0.2.0-59
+## 0.2.0-60
 
 - Il menu contestuale di una traccia include anche `Rimuovi`, per eliminare la traccia selezionata dal progetto.
 
@@ -109,7 +109,7 @@
 
 - Initial FastAPI/FFmpeg MTA8/MTA16 web editor prototype.
 
-## 0.2.0-59
+## 0.2.0-60
 
 - Kubernetes wizard: HAProxy ingress now always emits `kubernetes.io/ingress.class: haproxy` in addition to `spec.ingressClassName: haproxy`.
 - Reverse-engineering notes: confirmed the 181392 ns Matroska timecode scale, 40 MP3 frames per Cue interval, exact 320 kbit/s frame/SimpleBlock sizing, and frame-major per-track interleaving evidence.

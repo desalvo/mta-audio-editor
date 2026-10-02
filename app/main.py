@@ -1947,14 +1947,17 @@ def media_job_download(job_id: str, request: Request):
     if snapshot["status"] != "completed" or not snapshot.get("result"):
         raise HTTPException(409, "Job non completato")
     result = snapshot["result"]
-    if snapshot["kind"] != "track-export":
+    if snapshot["kind"] not in {"track-export", "project-export"}:
         raise HTTPException(400, "Il job non produce un file")
-    fmt = result["format"]
     project = load_project(snapshot["project_id"])
     out = Path(result["path"]).resolve()
     if out.parent != pdir(project.id).resolve() or not out.is_file():
         raise HTTPException(404, "File export non trovato")
-    media = {"wav": "audio/wav", "mp3": "audio/mpeg", "flac": "audio/flac"}[fmt]
+    if snapshot["kind"] == "project-export":
+        media = result.get("media_type") or "application/octet-stream"
+    else:
+        fmt = result["format"]
+        media = {"wav": "audio/wav", "mp3": "audio/mpeg", "flac": "audio/flac"}[fmt]
     return FileResponse(out, filename=result["filename"], media_type=media)
 
 
@@ -2030,61 +2033,111 @@ async def mta_binary_diff(file_a: UploadFile = File(...), file_b: UploadFile = F
 
 
 
+def _render_configured_project_export(pid: str, req: ProjectExportRequest) -> tuple[Path, str, str, str]:
+    project = load_project(pid)
+    fmt = req.format.lower()
+    validate_project_files(project)
+    safe_stem = SAFE_DOWNLOAD_RE.sub("_", Path(req.filename).stem).strip(" ._")[:180] or "project"
+    if fmt == "mta":
+        ext = "mta8" if project.target == "MTA8" else "mta16"
+        out = pdir(pid) / f"configured-export.{ext}"
+        if len(project.tracks) > (8 if project.target == "MTA8" else 16):
+            slots = validate_slot_mapping(project, req.slots)
+            export_mta(project, out, slots)
+        else:
+            export_mta(project, out)
+        media_type = "application/octet-stream"
+    elif fmt in {"wav", "mp3", "flac"}:
+        ext = fmt
+        out = pdir(pid) / f"configured-export.{ext}"
+        render_mix(
+            project,
+            audio_path,
+            out,
+            fmt=fmt,
+            bitrate=f"{int(req.mp3_bitrate_kbps)}k",
+            sample_rate=int(req.sample_rate),
+            wav_bit_depth=int(req.wav_bit_depth),
+            flac_compression=int(req.flac_compression),
+        )
+        media_type = {"wav": "audio/wav", "mp3": "audio/mpeg", "flac": "audio/flac"}[fmt]
+    else:
+        raise ValueError("unsupported export format")
+    return out, f"{safe_stem}.{ext}", media_type, fmt
+
+
 @app.post("/api/projects/{pid}/configured-export")
 def configured_project_export(pid: str, req: ProjectExportRequest, request: Request):
-    project = _project_for_actor(request, pid)
-    fmt = req.format.lower()
+    _project_for_actor(request, pid)
     try:
-        validate_project_files(project)
-        safe_stem = SAFE_DOWNLOAD_RE.sub("_", Path(req.filename).stem).strip(" ._")[:180] or "project"
-        if fmt == "mta":
-            ext = "mta8" if project.target == "MTA8" else "mta16"
-            out = pdir(pid) / f"configured-export.{ext}"
-            if len(project.tracks) > (8 if project.target == "MTA8" else 16):
-                slots = validate_slot_mapping(project, req.slots)
-                export_mta(project, out, slots)
-            else:
-                export_mta(project, out)
-            media_type = "application/octet-stream"
-        elif fmt in {"wav", "mp3", "flac"}:
-            ext = fmt
-            out = pdir(pid) / f"configured-export.{ext}"
-            render_mix(
-                project,
-                audio_path,
-                out,
-                fmt=fmt,
-                bitrate=f"{int(req.mp3_bitrate_kbps)}k",
-                sample_rate=int(req.sample_rate),
-                wav_bit_depth=int(req.wav_bit_depth),
-                flac_compression=int(req.flac_compression),
-            )
-            media_type = {"wav": "audio/wav", "mp3": "audio/mpeg", "flac": "audio/flac"}[fmt]
-        else:
-            raise HTTPException(400, "unsupported export format")
-
-        final_name = f"{safe_stem}.{ext}"
+        out, final_name, media_type, fmt = _render_configured_project_export(pid, req)
         if req.output_path:
             if not NATIVE_SINGLE_USER:
                 raise HTTPException(403, "Filesystem export path is available only in native mode")
             destination = Path(req.output_path).expanduser().resolve()
-            if destination.suffix.lower() != f".{ext}":
-                destination = destination.with_suffix(f".{ext}")
+            if destination.suffix.lower() != Path(final_name).suffix.lower():
+                destination = destination.with_suffix(Path(final_name).suffix)
             destination.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(out, destination)
-            return {
-                "ok": True,
-                "native": True,
-                "path": str(destination),
-                "filename": destination.name,
-                "format": fmt,
-            }
+            return {"ok": True, "native": True, "path": str(destination), "filename": destination.name, "format": fmt}
         return FileResponse(out, filename=final_name, media_type=media_type)
     except HTTPException:
         raise
     except Exception as exc:
         LOGGER.exception("Configured project export failed")
         raise HTTPException(400, f"export failed: {str(exc)[:300]}") from exc
+
+
+def _configured_export_worker(job_id: str, pid: str, req_data: dict) -> None:
+    try:
+        _media_job_update(job_id, status="running", progress=12, message="Preparazione export")
+        req = ProjectExportRequest.model_validate(req_data)
+        out, final_name, media_type, fmt = _render_configured_project_export(pid, req)
+        _media_job_update(job_id, progress=94, message="Preparazione download")
+        _media_job_update(
+            job_id,
+            status="completed",
+            progress=100,
+            message="Export completato",
+            result={
+                "download_url": f"/api/media-jobs/{job_id}/download",
+                "filename": final_name,
+                "format": fmt,
+                "media_type": media_type,
+                "path": str(out),
+            },
+        )
+    except Exception as exc:
+        LOGGER.exception("Configured export job failed")
+        _media_job_update(job_id, status="failed", progress=0, message="Export fallito", error=str(exc)[-1200:])
+
+
+@app.post("/api/projects/{pid}/configured-export-jobs")
+def start_configured_project_export_job(pid: str, req: ProjectExportRequest, request: Request):
+    _project_for_actor(request, pid)
+    now = time.time()
+    job_id = uuid.uuid4().hex[:16]
+    job = {
+        "id": job_id,
+        "kind": "project-export",
+        "project_id": pid,
+        "status": "queued",
+        "progress": 5,
+        "message": "Export in coda",
+        "created_at": now,
+        "updated_at": now,
+        "result": None,
+        "error": None,
+    }
+    with MEDIA_JOB_LOCK:
+        MEDIA_JOBS[job_id] = job
+    threading.Thread(
+        target=_configured_export_worker,
+        args=(job_id, pid, req.model_dump(mode="json")),
+        daemon=True,
+        name=f"project-export-{job_id}",
+    ).start()
+    return _media_job_public(job)
 
 
 @app.get("/api/projects/{pid}/export")
