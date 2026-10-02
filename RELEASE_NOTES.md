@@ -1,5 +1,5 @@
 
-## 0.2.0-41
+## 0.2.0-42
 
 - Aggiunti input numerici sincronizzati con gli slider del volume per tracce, Inspector, Mixer e Master; valori ammessi da -60 a +12 dB con autosave.
 
@@ -18,7 +18,7 @@
 - Overlay Kubernetes e Docker Compose aggiornati al nuovo limite.
 - Migrazione automatica dei progetti legacy senza proprietario verso il primo amministratore persistente che apre il workspace.
 
-# MTA Audio Editor 0.2.0-41
+# MTA Audio Editor 0.2.0-42
 
 ## Multi-user authentication and administration
 
@@ -57,6 +57,6 @@ A new `scripts/k8s-wizard.py` is downloadable directly from the GitHub raw URL a
 
 The generated `secret.yaml` contains local credentials and must not be committed. Use `--no-save-password` when password persistence is not wanted.
 
-### 0.2.0-41
+### 0.2.0-42
 
 The standalone Kubernetes wizard now emits the legacy-compatible HAProxy ingress annotation `kubernetes.io/ingress.class: haproxy` every time HAProxy ingress is selected, while retaining the Kubernetes v1 `ingressClassName` field. Reverse-engineering documentation also includes the latest Cluster transport evidence.

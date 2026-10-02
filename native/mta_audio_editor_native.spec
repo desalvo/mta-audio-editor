@@ -5,7 +5,7 @@ import sys
 
 from PyInstaller.utils.hooks import collect_all
 
-project = Path(SPECPATH).parent.parent
+project = Path(SPECPATH).parent
 
 datas = [
     (str(project / "app" / "templates"), "app/templates"),
