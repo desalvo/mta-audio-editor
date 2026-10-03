@@ -1,6 +1,6 @@
 # MTA proprietary format - reverse-engineered specification
 
-Version of this document: 0.2.0-68
+Version of this document: 0.2.0-69
 
 ## 1. Scope and confidence
 

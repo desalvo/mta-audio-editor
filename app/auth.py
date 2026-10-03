@@ -19,7 +19,7 @@ from contextlib import contextmanager
 from email.message import EmailMessage
 from pathlib import Path
 from typing import Any
-from urllib.parse import quote, urlencode
+from urllib.parse import quote, urlencode, urlsplit
 from urllib.request import Request as UrlRequest, urlopen
 
 import qrcode
@@ -456,9 +456,33 @@ def oauth_authorize_url(provider: str, request: Request) -> tuple[str,str]:
     if provider=="google": params["prompt"]="select_account"
     return cfg["authorize"]+'?'+urlencode(params),nonce
 
-def _oauth_json(url: str, *, data: dict|None=None, headers: dict|None=None) -> dict|list:
-    body=urlencode(data).encode() if data is not None else None; h={"Accept":"application/json","User-Agent":"MTA-Audio-Editor"}; h.update(headers or {})
-    with urlopen(UrlRequest(url,data=body,headers=h),timeout=15) as resp: return __import__('json').loads(resp.read().decode())
+OAUTH_HTTPS_HOSTS = frozenset({
+    "oauth2.googleapis.com",
+    "openidconnect.googleapis.com",
+    "github.com",
+    "api.github.com",
+    "graph.facebook.com",
+})
+
+
+def _validate_oauth_endpoint(url: str) -> str:
+    parsed = urlsplit(url)
+    if parsed.scheme != "https" or not parsed.hostname or parsed.hostname.lower() not in OAUTH_HTTPS_HOSTS:
+        raise ValueError("Endpoint OAuth non consentito: sono ammessi solo gli endpoint HTTPS dei provider configurati.")
+    if parsed.username or parsed.password or parsed.port not in (None, 443):
+        raise ValueError("Endpoint OAuth non consentito.")
+    return url
+
+
+def _oauth_json(url: str, *, data: dict | None = None, headers: dict | None = None) -> dict | list:
+    safe_url = _validate_oauth_endpoint(url)
+    body = urlencode(data).encode() if data is not None else None
+    request_headers = {"Accept": "application/json", "User-Agent": "MTA-Audio-Editor"}
+    request_headers.update(headers or {})
+    request = UrlRequest(safe_url, data=body, headers=request_headers)
+    # S310 is intentionally suppressed only after strict HTTPS + provider-host validation above.
+    with urlopen(request, timeout=15) as resp:  # noqa: S310
+        return __import__("json").loads(resp.read().decode())
 
 def oauth_exchange_profile(provider: str, code: str, request: Request) -> dict:
     if not oauth_enabled(provider): raise ValueError("Provider social non abilitato.")

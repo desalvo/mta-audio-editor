@@ -1,3 +1,8 @@
+## 0.2.0-69
+
+- Security/CI fix for social OAuth HTTP calls: endpoints are now restricted to HTTPS and to the explicit Google, GitHub and Facebook provider hosts before any network request.
+- Ruff S310 is suppressed only on the validated `urlopen` call, with regression coverage for rejected schemes, credentials, ports and untrusted hosts.
+
 ## 0.2.0-68
 
 - Added optional OAuth 2.0 login/registration with Google, Facebook and GitHub; all providers are disabled by default.
