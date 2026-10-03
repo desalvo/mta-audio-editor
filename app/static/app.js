@@ -52,16 +52,37 @@ function mobilePlatform(){
 function isMobileClient(){return ['android','ios'].includes(mobilePlatform())}
 function nativeApi(){return window.pywebview?.api||null}
 function isNativeDesktop(){return !!nativeApi()||!!currentUser?.native_single_user}
-async function waitForNativeApi(timeoutMs=2500){
+let nativeBridgeReadyPromise=null;
+function waitForPywebviewReadyEvent(timeoutMs){
+  if(nativeApi())return Promise.resolve(nativeApi());
+  if(!nativeBridgeReadyPromise){
+    nativeBridgeReadyPromise=new Promise(resolve=>{
+      let settled=false;
+      const finish=()=>{if(settled)return;settled=true;resolve(nativeApi())};
+      window.addEventListener('pywebviewready',finish,{once:true});
+      setTimeout(finish,timeoutMs);
+    }).finally(()=>{nativeBridgeReadyPromise=null});
+  }
+  return nativeBridgeReadyPromise;
+}
+async function waitForNativeApi(timeoutMs=15000){
   if(nativeApi())return nativeApi();
   if(!currentUser?.native_single_user)return null;
-  const started=Date.now();
-  while(Date.now()-started<timeoutMs){
-    await new Promise(resolve=>setTimeout(resolve,50));
-    if(nativeApi())return nativeApi();
+  const deadline=Date.now()+timeoutMs;
+  // pywebview on macOS/ARM can finish injecting js_api after the HTTP UI is
+  // already interactive. Listen for its readiness event and also poll because
+  // some WebKit versions can dispatch the event before this bundle attaches.
+  while(Date.now()<deadline){
+    const bridge=nativeApi();
+    if(bridge)return bridge;
+    await Promise.race([
+      waitForPywebviewReadyEvent(Math.min(1000,Math.max(1,deadline-Date.now()))),
+      new Promise(resolve=>setTimeout(resolve,100)),
+    ]);
   }
-  return null;
+  return nativeApi();
 }
+
 function setMobileBusy(value){try{window.MtaMobile?.setBusy?.(!!value)}catch(e){}}
 function mobileSaveRemoteFile(url,filename,mime='application/octet-stream',share=false){
   if(!isMobileClient())return false;
@@ -155,8 +176,8 @@ async function newProject(){
       <label class="workflow-field"><span>Tipo progetto</span><select id="newProjectTarget"><option value="MTA8">MTA8</option><option value="MTA16">MTA16</option></select></label>
       ${nativePathRow}
       <div class="utility-actions">
-        <button class="utility-btn primary" onclick="createProjectFromDialog()">Crea progetto</button>
-        <button class="utility-btn secondary" onclick="closeUtilityModal()">Annulla</button>
+        <button class="utility-btn primary" type="button" onclick="createProjectFromDialog()">Crea progetto</button>
+        <button class="utility-btn secondary" type="button" onclick="closeUtilityModal()">Annulla</button>
       </div>
     </div>`);
 }
@@ -1002,8 +1023,8 @@ function openStemWorkflow(){
       <label class="workflow-check"><input id="stemKeepOriginal" type="checkbox" checked> Mantieni anche la traccia “Original Mix” nel progetto</label>
       <div class="workflow-note">Il file originale viene sempre conservato in <b>Originals</b>. Il progetto viene salvato dopo l’import e dopo ogni stem aggiunto.</div>
       <div class="utility-actions">
-        <button class="utility-btn primary" onclick="startStemWorkflow()" ${stem.available?'':'disabled'}><span>Importa e separa</span></button>
-        <button class="utility-btn secondary" onclick="closeUtilityModal()"><span>Annulla</span></button>
+        <button class="utility-btn primary" type="button" onclick="startStemWorkflow()" ${stem.available?'':'disabled'}><span>Importa e separa</span></button>
+        <button class="utility-btn secondary" type="button" onclick="closeUtilityModal()"><span>Annulla</span></button>
       </div>
     </div>`);
   updateStemWorkflowMode();
@@ -1371,7 +1392,7 @@ async function doExport(format=exportFormat){
       <div class="utility-actions">
         <button class="utility-btn primary" onclick="confirmConfiguredExport('${format}',false)">Conferma export</button>
         ${isMobileClient()?`<button class="utility-btn secondary" onclick="confirmConfiguredExport('${format}',true)">Condividi…</button>`:''}
-        <button class="utility-btn secondary" onclick="closeUtilityModal()">Annulla</button>
+        <button class="utility-btn secondary" type="button" onclick="closeUtilityModal()">Annulla</button>
       </div>
     </div>`);
 }

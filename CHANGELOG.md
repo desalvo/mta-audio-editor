@@ -1,21 +1,21 @@
-## 0.2.0-72
+## 0.2.0-73
 
 - CI: remove the stale unused `revision` assignment in the waveform import fallback so Ruff F841 passes without suppressing the rule.
 
-## 0.2.0-72
+## 0.2.0-73
 
 - CI: suppress Ruff/Bandit S310 on both `urllib.request.Request` construction and `urlopen`, only after strict HTTPS/provider-host validation in `_validate_oauth_endpoint`.
 - Keeps the OAuth endpoint allowlist, HTTPS-only policy, no embedded credentials, and port 443-only validation introduced in 0.2.0-69.
 
 
-## 0.2.0-72
+## 0.2.0-73
 - Waveform cache resa esplicitamente persistente e validata all'apertura: i picchi salvati nel progetto vengono mostrati subito e la revision server-side rigenera automaticamente solo waveform mancanti o obsolete, salvando il risultato nel progetto.
 - La revisione waveform generata durante import/metronomo usa ora la stessa firma track-aware (sorgente + insert) usata per la validazione successiva.
 - Il Play/Preview resta indipendente dalla disponibilità o dal calcolo delle waveform.
 - Rimosso il pulsante Record dalla transport, non essendo associato ad alcuna funzione di registrazione.
 - Aggiunti Mute all / Unmute all, Solo all / Unsolo all e Bypass all FX / Enable all FX per tutti gli insert di traccia e master. Il cambio globale degli FX invalida e rigenera le waveform delle tracce interessate.
 
-## 0.2.0-72
+## 0.2.0-73
 
 - Security/CI fix for social OAuth HTTP calls: endpoints are now restricted to HTTPS and to the explicit Google, GitHub and Facebook provider hosts before any network request.
 - Ruff S310 is suppressed only on the validated `urlopen` call, with regression coverage for rejected schemes, credentials, ports and untrusted hosts.
@@ -172,3 +172,8 @@
 
 - Kubernetes wizard: HAProxy ingress now always emits `kubernetes.io/ingress.class: haproxy` in addition to `spec.ingressClassName: haproxy`.
 - Reverse-engineering notes: confirmed the 181392 ns Matroska timecode scale, 40 MP3 frames per Cue interval, exact 320 kbit/s frame/SimpleBlock sizing, and frame-major per-track interleaving evidence.
+
+## 0.2.0-73
+- Fixed macOS ARM native project dialogs so interacting with/selecting the default project name cannot be interpreted as a backdrop action.
+- Native filesystem actions now wait for the pywebview `pywebviewready` event and tolerate slower WebKit bridge injection (up to 15 seconds), fixing transient “Bridge nativo non ancora disponibile” errors.
+- New Project and Import & Separate modal actions now use explicit non-submit buttons and protected modal event propagation.

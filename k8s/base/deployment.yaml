@@ -25,7 +25,7 @@ spec:
       #   kubernetes.io/hostname: worker-01
       containers:
         - name: mta-audio-editor
-          image: desalvo/mta-audio-editor:0.2.0-72
+          image: desalvo/mta-audio-editor:0.2.0-73
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080

@@ -92,7 +92,7 @@
 </div>
 <div id="toast"></div>
 <div id="utilityBackdrop" class="utility-backdrop hidden" onclick="if(event.target===this)closeUtilityModal()">
-  <div class="utility-modal">
+  <div class="utility-modal" onclick="event.stopPropagation()">
     <div class="utility-head"><h3 id="utilityTitle">Project</h3><button onclick="closeUtilityModal()">×</button></div>
     <div id="utilityBody" class="utility-body"></div>
   </div>
