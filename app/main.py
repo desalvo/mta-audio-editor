@@ -27,6 +27,7 @@ from .auth import (
     register_user, require_admin, require_user, resend_verification, save_smtp_config,
     session_user, test_smtp_config, totp_qr_svg, totp_uri, update_profile,
     update_user_admin, delete_user_admin, change_password, request_password_reset, reset_password,
+    oauth_public_providers, oauth_authorize_url, oauth_verify_state, oauth_exchange_profile, social_login_or_register,
 )
 from .auto_mix import disable_auto_mix, enable_auto_mix
 from .mta_reverse import analyze_mta, diff_blobs
@@ -65,6 +66,7 @@ NATIVE_BLOCKED_PATH_PREFIXES = (
     "/reset-password",
     "/verify-email",
     "/resend-verification",
+    "/oauth/",
 )
 
 
@@ -131,6 +133,7 @@ def _is_public(path: str) -> bool:
     return (
         path.startswith("/static/")
         or path in {"/api/health", "/api/about", "/login", "/register", "/verify-email", "/resend-verification", "/forgot-password", "/reset-password"}
+        or path.startswith("/oauth/")
         or path.startswith("/docs/user")
         or path.startswith("/docs/pdf/user")
     )
@@ -239,11 +242,43 @@ def _project_archive_name(project: Project) -> str:
     return f"{clean}-{project.id}.mta-project.zip"
 
 
+def _social_buttons(mode: str) -> str:
+    providers=oauth_public_providers()
+    if not providers: return ""
+    links="".join(f'<a class="social-login social-{p["id"]}" href="/oauth/{p["id"]}/start">Continua con {p["label"]}</a>' for p in providers)
+    return f'<div class="social-auth"><div class="auth-divider"><span>oppure</span></div>{links}</div>'
+
+
+@app.get("/oauth/{provider}/start")
+def oauth_start(provider: str, request: Request):
+    try: url,nonce=oauth_authorize_url(provider,request)
+    except ValueError as exc: return HTMLResponse(_template("message.html",title="Login social non disponibile",message=str(exc),extra=""),status_code=400)
+    response=RedirectResponse(url,status_code=303);secure=request.url.scheme=="https" or request.headers.get("x-forwarded-proto","").lower()=="https"
+    response.set_cookie("mta_oauth_state",nonce,max_age=600,httponly=True,secure=secure,samesite="lax",path=f"/oauth/{provider}/callback")
+    return response
+
+@app.get("/oauth/{provider}/callback", response_class=HTMLResponse)
+def oauth_callback(provider: str, request: Request, code: str="", state: str="", error: str=""):
+    nonce=request.cookies.get("mta_oauth_state","")
+    if error or not code or not oauth_verify_state(provider,state,nonce):
+        return HTMLResponse(_template("message.html",title="Login social non riuscito",message="Richiesta OAuth annullata, scaduta o non valida.",extra=""),status_code=400)
+    try:
+        profile=oauth_exchange_profile(provider,code,request);user,created=social_login_or_register(provider,profile)
+    except (ValueError,OSError) as exc:
+        LOGGER.warning("OAuth callback failed for %s: %s",provider,exc)
+        return HTMLResponse(_template("message.html",title="Login social non riuscito",message=str(exc),extra=""),status_code=400)
+    if created or not user["active"]:
+        response=HTMLResponse(_template("message.html",title="Registrazione completata",message="La registrazione è stata completata. Il tuo indirizzo email è stato verificato dal provider social, quindi non è richiesta una conferma email separata. Il profilo resta disabilitato finché un amministratore non lo approva; quando verrà approvato riceverai automaticamente un'email di conferma.",extra=""))
+    else:
+        token=create_session(user["id"],request);response=RedirectResponse("/",status_code=303);secure=request.url.scheme=="https" or request.headers.get("x-forwarded-proto","").lower()=="https";response.set_cookie("mta_session",token,max_age=12*3600,httponly=True,secure=secure,samesite="lax",path="/")
+    response.delete_cookie("mta_oauth_state",path=f"/oauth/{provider}/callback");return response
+
+
 @app.get("/login", response_class=HTMLResponse)
 def login_page(request: Request):
     if session_user(request):
         return RedirectResponse("/", status_code=303)
-    return _template("login.html", error="")
+    return _template("login.html", error="", social_buttons=_social_buttons("login"))
 
 
 @app.post("/login", response_class=HTMLResponse)
@@ -254,7 +289,7 @@ async def login_submit(request: Request):
     totp = str(form.get("totp", "")).strip()
     user, error = authenticate(identifier, password, totp)
     if not user:
-        return HTMLResponse(_template("login.html", error=_alert(error)), status_code=401)
+        return HTMLResponse(_template("login.html", error=_alert(error), social_buttons=_social_buttons("login")), status_code=401)
     token = create_session(user["id"], request)
     response = RedirectResponse("/", status_code=303)
     secure = request.url.scheme == "https" or request.headers.get("x-forwarded-proto", "").lower() == "https"
@@ -277,14 +312,14 @@ def logout(request: Request):
 def register_page(request: Request):
     if session_user(request):
         return RedirectResponse("/", status_code=303)
-    return _template("register.html", error="")
+    return _template("register.html", error="", social_buttons=_social_buttons("register"))
 
 
 @app.post("/register", response_class=HTMLResponse)
 async def register_submit(request: Request):
     form = await request.form()
     if str(form.get("password", "")) != str(form.get("password2", "")):
-        return HTMLResponse(_template("register.html", error=_alert("Le password non coincidono.")), status_code=400)
+        return HTMLResponse(_template("register.html", error=_alert("Le password non coincidono."), social_buttons=_social_buttons("register")), status_code=400)
     try:
         user, token = register_user(
             str(form.get("username", "")),
@@ -294,14 +329,14 @@ async def register_submit(request: Request):
             base_url=str(request.base_url).rstrip("/"),
         )
     except ValueError as exc:
-        return HTMLResponse(_template("register.html", error=_alert(str(exc))), status_code=400)
+        return HTMLResponse(_template("register.html", error=_alert(str(exc)), social_buttons=_social_buttons("register")), status_code=400)
     extra = ""
     if os.getenv("MTA_DEV_EXPOSE_EMAIL_TOKENS", "").lower() in {"1","true","yes","on"}:
         extra = f'<p class="alert ok">DEV verification token: <code>{token}</code></p>'
     return HTMLResponse(_template(
         "message.html",
-        title="Conferma la tua email",
-        message=f"Abbiamo inviato un link di conferma a {user['email']}. Dopo la conferma, il tuo account resterà in attesa dell'approvazione di un amministratore.",
+        title="Registrazione completata - approvazione richiesta",
+        message=f"La registrazione è completata. Abbiamo inviato una mail di conferma a {user['email']}. La conferma dell'email non abilita automaticamente il profilo: l'account resterà disabilitato finché un amministratore non lo approverà. Dopo l'approvazione riceverai automaticamente una mail di conferma dell'abilitazione.",
         extra=extra,
     ))
 

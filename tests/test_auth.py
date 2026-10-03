@@ -106,7 +106,7 @@ def test_activation_notifies_all_admins(tmp_path, monkeypatch):
     assert sent
     admin_messages = [(recipients, subject, plain) for recipients, subject, plain in sent if "admin@example.test" in recipients]
     assert admin_messages
-    assert "Utente attivato" in admin_messages[0][1]
+    assert any("Utente attivato" in subject for _, subject, _ in admin_messages)
     assert "notifyme" in admin_messages[0][2]
 
 

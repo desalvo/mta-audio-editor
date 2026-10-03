@@ -25,7 +25,7 @@ spec:
       #   kubernetes.io/hostname: worker-01
       containers:
         - name: mta-audio-editor
-          image: desalvo/mta-audio-editor:0.2.0-65
+          image: desalvo/mta-audio-editor:0.2.0-68
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
@@ -49,6 +49,26 @@ spec:
                   optional: true
             - name: MTA_MAX_UPLOAD_MB
               value: "1024"
+            # Social login is disabled by default. Set the matching *_ENABLED to "true"
+            # and populate client credentials in mta-audio-editor-auth.
+            - name: MTA_OAUTH_GOOGLE_ENABLED
+              value: "false"
+            - name: MTA_OAUTH_GOOGLE_CLIENT_ID
+              valueFrom: {secretKeyRef: {name: mta-audio-editor-auth, key: oauth-google-client-id, optional: true}}
+            - name: MTA_OAUTH_GOOGLE_CLIENT_SECRET
+              valueFrom: {secretKeyRef: {name: mta-audio-editor-auth, key: oauth-google-client-secret, optional: true}}
+            - name: MTA_OAUTH_FACEBOOK_ENABLED
+              value: "false"
+            - name: MTA_OAUTH_FACEBOOK_CLIENT_ID
+              valueFrom: {secretKeyRef: {name: mta-audio-editor-auth, key: oauth-facebook-client-id, optional: true}}
+            - name: MTA_OAUTH_FACEBOOK_CLIENT_SECRET
+              valueFrom: {secretKeyRef: {name: mta-audio-editor-auth, key: oauth-facebook-client-secret, optional: true}}
+            - name: MTA_OAUTH_GITHUB_ENABLED
+              value: "false"
+            - name: MTA_OAUTH_GITHUB_CLIENT_ID
+              valueFrom: {secretKeyRef: {name: mta-audio-editor-auth, key: oauth-github-client-id, optional: true}}
+            - name: MTA_OAUTH_GITHUB_CLIENT_SECRET
+              valueFrom: {secretKeyRef: {name: mta-audio-editor-auth, key: oauth-github-client-secret, optional: true}}
           resources:
             requests:
               cpu: 250m

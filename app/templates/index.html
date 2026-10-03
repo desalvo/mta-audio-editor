@@ -37,13 +37,20 @@
     <aside class="sidebar">
       <button id="mobileSidebarToggle" class="mobile-sidebar-toggle" type="button" onclick="toggleMobileSidebar()" aria-expanded="false"><span aria-hidden="true">☰</span><span class="mobile-menu-label">Menu</span></button>
       <nav>
-        <button class="nav-item active">⌂ <span>Project</span></button>
-        <label class="nav-item">⇩ <span>Import MTA</span><input id="mtafile" type="file" accept=".mta,.mta8,.mta16" hidden></label>
-        <button class="nav-item import-action import-audio-action" onclick="focusImport()"><span class="nav-icon" aria-hidden="true">♫</span><span class="nav-label">Import Audio</span></button>
-        <button class="nav-item import-action" onclick="openStemWorkflow()">▥ <span>Import &amp; Separate</span></button>
-        <button class="nav-item">☷ <span>Tracks</span></button>
-        <button class="nav-item" onclick="focusInspector()">◇ <span>Plugins</span></button>
-        <button class="nav-item" onclick="focusMixer()">▥ <span>Mixer</span></button>
+        <button class="nav-item active" onclick="focusProjectWorkspace()">⌂ <span>Project</span></button>
+        <section class="sidebar-tools collapsed" id="editingToolsPanel">
+          <button class="sidebar-tools-toggle" type="button" onclick="toggleEditingToolsPanel()" aria-expanded="false" aria-controls="editingToolsBody">
+            <span class="sidebar-tools-title">EDIT / IMPORT / MIX</span><span id="editingToolsChevron" aria-hidden="true">▸</span>
+          </button>
+          <div class="sidebar-tools-body" id="editingToolsBody">
+            <label class="nav-item">⇩ <span>Import MTA</span><input id="mtafile" type="file" accept=".mta,.mta8,.mta16" hidden></label>
+            <button class="nav-item import-action import-audio-action" onclick="focusImport()"><span class="nav-icon" aria-hidden="true">♫</span><span class="nav-label">Import Audio</span></button>
+            <button class="nav-item import-action" onclick="openStemWorkflow()">▥ <span>Import &amp; Separate</span></button>
+            <button class="nav-item" onclick="focusTracks()">☷ <span>Tracks</span></button>
+            <button class="nav-item" onclick="focusInspector()">◇ <span>Plugins</span></button>
+            <button class="nav-item" onclick="focusMixer()">▥ <span>Mixer</span></button>
+          </div>
+        </section>
         <div class="nav-sep"></div>
         <button class="nav-item" onclick="showMetaPanel('lyrics')">▤ <span>Lyrics</span></button>
         <button class="nav-item" onclick="showMetaPanel('chords')">♬ <span>Chords</span></button>
@@ -51,8 +58,7 @@
         <div class="nav-sep"></div>
         <section class="sidebar-tools collapsed" id="projectToolsPanel">
           <button class="sidebar-tools-toggle" type="button" onclick="toggleProjectToolsPanel()" aria-expanded="false" aria-controls="projectToolsBody">
-            <span class="sidebar-tools-title">PROJECT / FILE</span>
-            <span id="projectToolsChevron" aria-hidden="true">▸</span>
+            <span class="sidebar-tools-title">PROJECT / FILE</span><span id="projectToolsChevron" aria-hidden="true">▸</span>
           </button>
           <div class="sidebar-tools-body" id="projectToolsBody">
             <button class="nav-item" onclick="openExportPanel()">⇧ <span>Export</span></button>
@@ -65,7 +71,7 @@
             <button class="nav-item danger-nav" onclick="deleteCurrentProject()">× <span>Delete project</span></button>
           </div>
         </section>
-        <button class="nav-item" id="nativeSettingsButton" onclick="showNativeSettings()" hidden>⚙ <span>Native settings</span></button>
+        <button class="nav-item" id="nativeSettingsButton" onclick="showNativeSettings()" hidden>⚙ <span>Settings</span></button>
         <button class="nav-item" onclick="showAbout()">ⓘ <span>About</span></button>
         <a class="nav-item" href="/docs/user" target="_blank">? <span>Docs &amp; Help</span></a>
       </nav>

@@ -37,7 +37,8 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 let current=null, currentUser=null, pluginInfo={inserts:{},schemas:{},custom:{},stem_splitter:{available:false}}, pxPerSec=70;
 let sel={a:0,b:0}, dragging=false, audioCtx=null, playAudio=null, selectedTrackId=null, exportFormat='mta';
-let autosaveTimer=null, autosaveBusy=false, autosaveQueued=false, stemPollTimer=null, activeStemJob=null, activeStemProjectId=null;
+let autosaveTimer=null, autosaveBusy=false, autosaveQueued=false, autosaveEnabled=true, projectDirty=false, stemPollTimer=null, activeStemJob=null, activeStemProjectId=null;
+let undoStack=[],redoStack=[],historyProjectId=null,lastHistoryState=null,timelineClipboard=null;
 let playCursorMs=0, playRaf=null, mediaProgressTimer=null;
 let uiState={trackTop:0,timelineTop:0,timelineLeft:0,mixerLeft:0};
 let waveformJobs={}, trackPlaybacks=[], meterRaf=null, meterRunToken=0, playbackToken=0, masterMeterAnalysers=null, masterPlaybackGainNode=null;
@@ -49,6 +50,18 @@ function mobilePlatform(){
   try{return window.MtaMobile?.getPlatform?.()||''}catch(e){return ''}
 }
 function isMobileClient(){return ['android','ios'].includes(mobilePlatform())}
+function nativeApi(){return window.pywebview?.api||null}
+function isNativeDesktop(){return !!nativeApi()||!!currentUser?.native_single_user}
+async function waitForNativeApi(timeoutMs=2500){
+  if(nativeApi())return nativeApi();
+  if(!currentUser?.native_single_user)return null;
+  const started=Date.now();
+  while(Date.now()-started<timeoutMs){
+    await new Promise(resolve=>setTimeout(resolve,50));
+    if(nativeApi())return nativeApi();
+  }
+  return null;
+}
 function setMobileBusy(value){try{window.MtaMobile?.setBusy?.(!!value)}catch(e){}}
 function mobileSaveRemoteFile(url,filename,mime='application/octet-stream',share=false){
   if(!isMobileClient())return false;
@@ -67,12 +80,18 @@ function projectEnd(){let e=10000;for(const t of current?.tracks||[])for(const c
 function widthPx(){return Math.max(980,projectEnd()/1000*pxPerSec+180)}
 function trackById(id){return current?.tracks?.find(t=>t.id===id)}
 function selectedTrack(){return trackById(selectedTrackId)||current?.tracks?.[0]||null}
-function selectedTrackIds(){return $$('.trackSelect:checked').map(x=>x.value)}
+function selectedTrackIds(){return $$('.track-check:checked').map(x=>x.value)}
 function linesToText(a,b){return(a||[]).map(x=>`${(x.time_ms/1000).toFixed(3)}\t${x[b]}`).join('\n')}
 function textToLines(v,key){return v.split(/\n/).map(x=>x.trim()).filter(Boolean).map(line=>{const [t,...rest]=line.split(/\t|\s{2,}/);return{time_ms:Math.max(0,Math.round(parseFloat(t)*1000)||0),[key]:rest.join(' ').trim()}})}
 
-async function init(){if(isMobileClient())document.body.classList.add('mobile-client');try{currentUser=await api('/api/session');const a=$('#adminNav');if(a)a.hidden=!!currentUser.native_single_user||currentUser.role!=='admin';if(currentUser.native_single_user)document.body.classList.add('native-single-user')}catch(e){}try{pluginInfo=await api('/api/plugins')}catch(e){}await refresh()}
+async function init(){if(isMobileClient())document.body.classList.add('mobile-client');try{currentUser=await api('/api/session');const a=$('#adminNav');if(a)a.hidden=!!currentUser.native_single_user||currentUser.role!=='admin';if(currentUser.native_single_user){document.body.classList.add('native-single-user');const b=$('#nativeSettingsButton');if(b)b.hidden=false}}catch(e){}if(currentUser?.native_single_user){const bridge=await waitForNativeApi();if(bridge?.get_native_settings){try{const cfg=await bridge.get_native_settings();autosaveEnabled=cfg.autosave_enabled!==false}catch(e){}}}try{pluginInfo=await api('/api/plugins')}catch(e){}await refresh()}
 
+function toggleEditingToolsPanel(){
+  const panel=$('#editingToolsPanel');if(!panel)return;
+  const collapsed=panel.classList.toggle('collapsed');
+  $('#editingToolsChevron').textContent=collapsed?'▸':'▾';
+  panel.querySelector('.sidebar-tools-toggle')?.setAttribute('aria-expanded',String(!collapsed));
+}
 function toggleProjectToolsPanel(){
   const panel=$('#projectToolsPanel');if(!panel)return;
   const collapsed=panel.classList.toggle('collapsed');
@@ -142,10 +161,12 @@ async function newProject(){
     </div>`);
 }
 async function chooseNewProjectPath(){
-  if(!currentUser?.native_single_user||!window.pywebview?.api?.choose_project_save_path)return;
+  if(!currentUser?.native_single_user)return toast('La scelta del percorso è disponibile nell’app desktop nativa');
+  const apiBridge=await waitForNativeApi();
+  if(!apiBridge?.choose_project_save_path)return toast('Bridge nativo non ancora disponibile. Riprova tra un istante.');
   const title=$('#newProjectTitle')?.value?.trim()||'Nuovo progetto';
   try{
-    const chosen=await window.pywebview.api.choose_project_save_path(title);
+    const chosen=await apiBridge.choose_project_save_path(title);
     if(!chosen?.ok)return;
     pendingNewProjectPath=chosen.path;
     if($('#newProjectPath'))$('#newProjectPath').value=chosen.path;
@@ -167,7 +188,7 @@ async function createProjectFromDialog(){
       await window.pywebview.api.bind_project_path(created.id,pendingNewProjectPath);
     }
     current=created;
-    selectedTrackId=null;
+    selectedTrackId=null;resetSessionHistory();
     closeUtilityModal();render();await refresh();
     toast(currentUser?.native_single_user?`Progetto ${target} creato in ${pendingNewProjectPath}`:`Progetto ${target} creato e salvato nel workspace`);
     pendingNewProjectPath=null;
@@ -178,7 +199,7 @@ async function openP(id){
     return toast('La separazione è in corso: resta nel progetto corrente fino al completamento.');
   }
   await flushAutosave();stopPlayback();uiState={trackTop:0,timelineTop:0,timelineLeft:0,mixerLeft:0};
-  current=await api('/api/projects/'+id);selectedTrackId=current.tracks[0]?.id||null;render();refresh();
+  current=await api('/api/projects/'+id);selectedTrackId=current.tracks[0]?.id||null;resetSessionHistory();render();refresh();
 }
 function downloadProjectArchive(id){window.location.href=`/api/projects/${id}/archive`}
 async function saveAsProject(){
@@ -267,7 +288,7 @@ function render(){
   $('#mixerDock').innerHTML=mixerHtml();
   updateMixerDockLayout();updatePanelMenuButtons();
   drawRuler();bindTimeline();bindTrackTimelineScroll();bindTrackResizer();
-  current.tracks.forEach(drawWave);ensureWaveforms();updateSel();bindModelInputs();updateMuteSoloVisuals();restoreUiState();
+  current.tracks.forEach(drawWave);ensureWaveforms();updateSel();bindModelInputs();updateMuteSoloVisuals();restoreUiState();ensureSessionHistory();updateEditActionState();
 }
 async function createMetronomeTrack(){
   if(!current)return toast('Apri prima un progetto');
@@ -292,7 +313,7 @@ function toolbarHtml(){
     <button class="toolbar-action emphasis" onclick="openStemWorkflow()">▥ Import &amp; Separate</button>
     <button class="toolbar-action" onclick="createMetronomeTrack()" title="Crea una traccia click per tutta la durata corrente del progetto">♩ Metronomo</button>
     <div class="toolbar-group"><input id="newTrackFile" type="file" accept=".mp3,.wav,.flac,.m4a,audio/*" onchange="addTrack()"><select id="newSync"><option value="manual">Manual sync</option><option value="auto">Auto sync</option></select><input id="newOffset" type="number" value="0" title="Offset ms" style="width:72px"><select id="newRef" style="max-width:115px">${refs}</select><button class="toolbar-action" onclick="addTrack()">♫ Import Audio Track</button></div>
-    <div class="toolbar-grow"></div><span class="selection-info" id="selectionInfo">0.000 → 0.000 s</span><button class="toolbar-action danger" onclick="deleteSelection(false)">Delete tracks</button><label class="hint"><input id="ripple" type="checkbox"> ripple</label><button class="toolbar-action danger" onclick="deleteSelection(true)">Delete song segment</button>
+    <div class="toolbar-sep"></div><button id="undoBtn" class="toolbar-action" onclick="undoEdit()">↶ Undo</button><button id="redoBtn" class="toolbar-action" onclick="redoEdit()">↷ Redo</button><button class="toolbar-action" onclick="cutTimelineSelection()">✂ Cut</button><button class="toolbar-action" onclick="copyTimelineSelection()">⧉ Copy</button><button id="pasteBtn" class="toolbar-action" onclick="pasteTimelineSelection()">▣ Paste</button><button class="toolbar-action danger" onclick="removeTimelineSelection()">⌫ Remove</button> <div class="toolbar-grow"></div><span class="selection-info" id="selectionInfo">0.000 → 0.000 s</span><button class="toolbar-action danger" onclick="deleteSelection(false)">Delete tracks</button><label class="hint"><input id="ripple" type="checkbox"> ripple</label><button class="toolbar-action danger" onclick="deleteSelection(true)">Delete song segment</button>
   </div>`
 }
 
@@ -630,10 +651,26 @@ function showAutoMixInfo(){alert('Auto Mix is reversible. It snapshots the curre
 
 function bindModelInputs(){$$('.model-input').forEach(el=>el.addEventListener('change',()=>{const t=current.tracks[+el.dataset.i];if(t){t[el.dataset.k]=el.value;markDirty()}}));refreshPresetSelect(false);refreshPresetSelect(true)}
 function collect(){if(!current)return;$$('.model-input').forEach(el=>{const t=current.tracks[+el.dataset.i];if(t)t[el.dataset.k]=el.value});if($('#lyrics'))current.lyrics=textToLines($('#lyrics').value,'text');if($('#chords'))current.chords=textToLines($('#chords').value,'chord');if($('#markers'))current.markers=textToLines($('#markers').value,'label')}
+function projectSnapshot(){return current?JSON.parse(JSON.stringify(current)):null}
+function resetSessionHistory(){undoStack=[];redoStack=[];historyProjectId=current?.id||null;lastHistoryState=projectSnapshot();timelineClipboard=null;updateEditActionState()}
+function ensureSessionHistory(){if((current?.id||null)!==historyProjectId)resetSessionHistory();else if(!lastHistoryState&&current)lastHistoryState=projectSnapshot()}
+function checkpointHistory(){if(!current)return;ensureSessionHistory();if(JSON.stringify(current)!==JSON.stringify(lastHistoryState)){undoStack.push(lastHistoryState);if(undoStack.length>100)undoStack.shift();redoStack=[];lastHistoryState=projectSnapshot();updateEditActionState()}}
+async function persistCurrentProject(showToast=false){if(!current)return;collect();const saved=await api('/api/projects/'+current.id,{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify(current)});if(current&&current.id===saved.id)current=saved;projectDirty=false;lastHistoryState=projectSnapshot();$('#headerProjectName').textContent=current?.title||'—';await syncNativeProjectFile(saved.id);if(showToast)toast('Progetto salvato')}
+async function restoreHistorySnapshot(snapshot,label){if(!snapshot||!current)return;current=JSON.parse(JSON.stringify(snapshot));selectedTrackId=current.tracks.some(t=>t.id===selectedTrackId)?selectedTrackId:(current.tracks[0]?.id||null);projectDirty=true;render();await persistCurrentProject(false);lastHistoryState=projectSnapshot();updateEditActionState();toast(label)}
+async function undoEdit(){ensureSessionHistory();checkpointHistory();if(!undoStack.length)return toast('Nessuna operazione da annullare');const target=undoStack.pop();redoStack.push(projectSnapshot());await restoreHistorySnapshot(target,'Undo')}
+async function redoEdit(){ensureSessionHistory();if(!redoStack.length)return toast('Nessuna operazione da ripristinare');undoStack.push(projectSnapshot());const target=redoStack.pop();await restoreHistorySnapshot(target,'Redo')}
+function editTrackIds(){let ids=selectedTrackIds();if(!ids.length&&selectedTrackId)ids=[selectedTrackId];return ids}
+function selectionBounds(){return[Math.round(Math.min(sel.a,sel.b)),Math.round(Math.max(sel.a,sel.b))]}
+function clipId(){return'clip_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,9)}
+function selectedClipFragments(){if(!current)return[];const[a,b]=selectionBounds();if(b-a<2)return[];const ids=new Set(editTrackIds()),out=[];for(const t of current.tracks){if(!ids.has(t.id))continue;for(const c of t.clips||[]){const cs=c.timeline_start_ms,ce=cs+(c.source_end_ms-c.source_start_ms),is=Math.max(a,cs),ie=Math.min(b,ce);if(ie>is)out.push({track_id:t.id,offset_ms:is-a,source_start_ms:c.source_start_ms+(is-cs),source_end_ms:c.source_start_ms+(ie-cs)})}}return out}
+function removeRangeFromTracks(a,b,trackIds){const ids=new Set(trackIds);for(const t of current.tracks){if(!ids.has(t.id))continue;const next=[];for(const c of t.clips||[]){const cs=c.timeline_start_ms,ce=cs+(c.source_end_ms-c.source_start_ms);if(ce<=a||cs>=b){next.push(c);continue}if(cs<a)next.push({...c,id:clipId(),source_end_ms:c.source_start_ms+(a-cs)});if(ce>b)next.push({...c,id:clipId(),source_start_ms:c.source_start_ms+(b-cs),timeline_start_ms:b})}t.clips=next}}
+function copyTimelineSelection(){const[a,b]=selectionBounds(),parts=selectedClipFragments();if(b-a<2)return toast('Seleziona prima un intervallo nella timeline');if(!parts.length)return toast('La selezione non contiene audio nelle tracce selezionate');timelineClipboard={duration_ms:b-a,parts};updateEditActionState();toast('Selezione copiata')}
+function cutTimelineSelection(){const[a,b]=selectionBounds(),ids=editTrackIds(),parts=selectedClipFragments();if(b-a<2)return toast('Seleziona prima un intervallo nella timeline');if(!ids.length||!parts.length)return toast('La selezione non contiene audio nelle tracce selezionate');checkpointHistory();timelineClipboard={duration_ms:b-a,parts};removeRangeFromTracks(a,b,ids);projectDirty=true;render();markDirty();updateEditActionState();toast('Selezione tagliata')}
+function pasteTimelineSelection(){if(!current||!timelineClipboard?.parts?.length)return toast('Clipboard timeline vuota');checkpointHistory();const dest=Math.max(0,Math.round(playCursorMs||Math.min(sel.a,sel.b)||0));for(const x of timelineClipboard.parts){const t=trackById(x.track_id);if(!t)continue;t.clips=t.clips||[];t.clips.push({id:clipId(),source_start_ms:x.source_start_ms,source_end_ms:x.source_end_ms,timeline_start_ms:dest+x.offset_ms});t.clips.sort((a,b)=>a.timeline_start_ms-b.timeline_start_ms)}projectDirty=true;render();markDirty();toast('Selezione incollata')}
+function removeTimelineSelection(){if(!current)return;const[a,b]=selectionBounds(),ids=editTrackIds();if(b-a<2)return toast('Seleziona prima un intervallo nella timeline');if(!ids.length)return toast('Seleziona almeno una traccia');checkpointHistory();removeRangeFromTracks(a,b,ids);projectDirty=true;render();markDirty();toast('Parte di traccia rimossa')}
+function updateEditActionState(){const set=(id,v)=>{const e=$(id);if(e)e.disabled=!!v};set('#undoBtn',!undoStack.length);set('#redoBtn',!redoStack.length);set('#pasteBtn',!timelineClipboard?.parts?.length)}
 function markDirty(delay=650){
-  if(!current)return;
-  clearTimeout(autosaveTimer);
-  autosaveTimer=setTimeout(()=>flushAutosave(false),delay);
+  if(!current)return;ensureSessionHistory();checkpointHistory();projectDirty=true;clearTimeout(autosaveTimer);if(!autosaveEnabled){updateEditActionState();return}autosaveTimer=setTimeout(()=>flushAutosave(false),delay);
 }
 async function syncNativeProjectFile(projectId){
   if(!projectId||!currentUser?.native_single_user||!window.pywebview?.api?.sync_project)return;
@@ -645,12 +682,7 @@ async function flushAutosave(showToast=false){
   if(autosaveBusy){autosaveQueued=true;return}
   autosaveBusy=true;
   try{
-    collect();
-    const saved=await api('/api/projects/'+current.id,{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify(current)});
-    if(current&&current.id===saved.id)current=saved;
-    $('#headerProjectName').textContent=current?.title||'—';
-    await syncNativeProjectFile(saved.id);
-    if(showToast)toast('Progetto salvato');
+    await persistCurrentProject(showToast);
   }catch(e){if(showToast)toast(e.message);else toast('Autosave fallito: '+e.message)}
   finally{
     autosaveBusy=false;
@@ -664,11 +696,10 @@ async function save(){
   collect();
   autosaveBusy=true;
   try{
-    current=await api('/api/projects/'+current.id,{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify(current)});
-    $('#headerProjectName').textContent=current.title;
+    await persistCurrentProject(false);
     await syncNativeProjectFile(current.id);
     await refresh();
-    toast('Progetto salvato');
+    toast('Progetto salvato manualmente');
   }catch(e){toast('Salvataggio fallito: '+e.message);throw e}
   finally{autosaveBusy=false}
 }
@@ -974,9 +1005,11 @@ async function startStemWorkflow(){
   const model=$('#stemWorkflowModel').value;
   const keep=$('#stemKeepOriginal').checked;
   let nativeProjectPath=null;
-  if(mode==='new'&&currentUser?.native_single_user&&window.pywebview?.api?.choose_project_save_path){
+  if(mode==='new'&&currentUser?.native_single_user){
+    const apiBridge=await waitForNativeApi();
+    if(!apiBridge?.choose_project_save_path)return toast('Bridge nativo non disponibile: impossibile scegliere dove salvare il nuovo progetto.');
     try{
-      const chosen=await window.pywebview.api.choose_project_save_path(title||'Nuovo progetto');
+      const chosen=await apiBridge.choose_project_save_path(title||'Nuovo progetto');
       if(!chosen?.ok)return;
       nativeProjectPath=chosen.path;
     }catch(e){return toast('Scelta destinazione progetto fallita: '+e.message)}
@@ -1468,8 +1501,11 @@ async function showAbout(){
 }
 
 function openExportPanel(){if(!current)return;if(!current.export_panel_visible){current.export_panel_visible=true;render();markDirty(100)}focusMixer();$('#exportPane')?.scrollIntoView({behavior:'smooth',block:'nearest'})}
-function focusMixer(){$('#mixerDock')?.scrollIntoView({behavior:'smooth',block:'nearest'})}
-function focusInspector(){$('#inspector')?.scrollIntoView({behavior:'smooth',block:'nearest'})}
+function requireOpenProject(action){if(current)return true;toast(`Apri o crea un progetto per ${action}`);return false}
+function focusProjectWorkspace(){if(!current){$('#emptyState')?.scrollIntoView({behavior:'smooth',block:'center'});return}$('#editor')?.scrollIntoView({behavior:'smooth',block:'start'})}
+function focusTracks(){if(!requireOpenProject('visualizzare le tracce'))return;const el=$('.tracks-scroll')||$('.tracks')||$('#editor');el?.scrollIntoView({behavior:'smooth',block:'start'});el?.classList.add('nav-focus-pulse');setTimeout(()=>el?.classList.remove('nav-focus-pulse'),900)}
+function focusMixer(){if(!requireOpenProject('aprire il mixer'))return;const el=$('#mixerDock');if(el){el.hidden=false;el.scrollIntoView({behavior:'smooth',block:'nearest'});el.classList.add('nav-focus-pulse');setTimeout(()=>el.classList.remove('nav-focus-pulse'),900)}}
+function focusInspector(){if(!requireOpenProject('aprire i plugin'))return;const el=$('#inspector');if(!el)return toast('Seleziona una traccia per visualizzare i plugin');el.scrollIntoView({behavior:'smooth',block:'nearest'});el.classList.add('nav-focus-pulse');setTimeout(()=>el.classList.remove('nav-focus-pulse'),900)}
 function focusImport(){$('#newTrackFile')?.click()}
 
 function editProjectMeta(){if(!current)return;const title=prompt('Project title',current.title);if(title!==null&&title.trim())current.title=title.trim().slice(0,200);const artist=prompt('Artist',current.artist||'');if(artist!==null)current.artist=artist.slice(0,200);const bpm=prompt('BPM',String(current.bpm));if(bpm!==null&&Number(bpm)>0)setProjectBpm(Math.min(300,Number(bpm)));render();markDirty()}
@@ -1482,6 +1518,7 @@ window.addEventListener('pointerdown',e=>{
   if(menu&&!menu.contains(e.target))closeTrackContextMenu();
 });
 window.addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&!e.altKey){const key=e.key.toLowerCase();if(key==='z'){e.preventDefault();if(e.shiftKey)redoEdit();else undoEdit();return}if(key==='y'){e.preventDefault();redoEdit();return}if(key==='x'){e.preventDefault();cutTimelineSelection();return}if(key==='c'){e.preventDefault();copyTimelineSelection();return}if(key==='v'){e.preventDefault();pasteTimelineSelection();return}if(key==='s'){e.preventDefault();save();return}}
   if(e.key==='Escape'){closeTrackContextMenu();return}
 
   if(e.code!=='Space')return;
@@ -1574,17 +1611,20 @@ async function addProjectShare(){const identifier=$('#shareIdentifier').value.tr
 async function removeProjectShare(userId){try{await api(`/api/projects/${current.id}/shares/${userId}`,{method:'DELETE'});await manageProjectSharing()}catch(e){toast(e.message)}}
 
 async function showNativeSettings(){
-  if(!window.pywebview?.api?.get_native_settings){toast('Disponibile solo nell’app desktop nativa');return}
+  if(!currentUser?.native_single_user){toast('Settings è disponibile nell’app desktop nativa');return}
+  const apiBridge=await waitForNativeApi();
+  if(!apiBridge?.get_native_settings){toast('Bridge nativo non disponibile. Riprova tra un istante.');return}
   try{
-    const cfg=await window.pywebview.api.get_native_settings();
-    showUtilityModal('Native settings',`<div class="form-grid"><label>Maximum import/upload size (MB)<input id="nativeMaxUploadMb" type="number" min="1" max="10240" step="1" value="${Number(cfg.max_upload_mb)||1024}"></label><p>Default: 1024 MB (1 GiB). Range: 1–10240 MB. The change is applied immediately and saved for future launches.</p><div class="form-actions"><button class="accent" onclick="saveNativeSettings()">Save</button></div></div>`);
+    const cfg=await apiBridge.get_native_settings();
+    showUtilityModal('Settings',`<div class="form-grid"><label>Maximum import/upload size (MB)<input id="nativeMaxUploadMb" type="number" min="1" max="10240" step="1" value="${Number(cfg.max_upload_mb)||1024}"></label><label class="workflow-check"><input id="nativeAutosaveEnabled" type="checkbox" ${cfg.autosave_enabled!==false?'checked':''}> Auto-save project changes</label><p>With Auto-save disabled, changes remain in the current session until you press <b>Save</b>. Undo/Redo is session-only.</p><div class="form-actions"><button class="accent" onclick="saveNativeSettings()">Save</button></div></div>`);
   }catch(err){toast('Impossibile leggere le impostazioni native: '+err.message)}
 }
 async function saveNativeSettings(){
   const value=Number($('#nativeMaxUploadMb')?.value);
   if(!Number.isInteger(value)||value<1||value>10240){toast('Inserisci un valore intero tra 1 e 10240 MB');return}
   try{
-    const result=await window.pywebview.api.set_native_settings(value);
+    const apiBridge=await waitForNativeApi();if(!apiBridge?.set_native_settings)return toast('Bridge nativo non disponibile');
+    const enabled=$('#nativeAutosaveEnabled')?.checked!==false;const result=await apiBridge.set_native_settings(value,enabled);autosaveEnabled=result.autosave_enabled!==false;if(autosaveEnabled&&projectDirty)markDirty(50);
     closeUtilityModal();toast(`Limite import/upload impostato a ${result.max_upload_mb} MB`);
   }catch(err){toast('Salvataggio impostazioni fallito: '+err.message)}
 }

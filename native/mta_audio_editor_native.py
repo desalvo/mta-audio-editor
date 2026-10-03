@@ -273,23 +273,29 @@ class NativeApi:
                 value = int(json.loads(path.read_text(encoding="utf-8")).get("max_upload_mb", value))
             except (OSError, ValueError, TypeError, json.JSONDecodeError):
                 pass
-        return {"max_upload_mb": min(10240, max(1, value))}
+        autosave_enabled = True
+        if path.is_file():
+            try:
+                autosave_enabled = bool(json.loads(path.read_text(encoding="utf-8")).get("autosave_enabled", True))
+            except (OSError, ValueError, TypeError, json.JSONDecodeError):
+                pass
+        return {"max_upload_mb": min(10240, max(1, value)), "autosave_enabled": autosave_enabled}
 
-    def set_native_settings(self, max_upload_mb: int) -> dict:
+    def set_native_settings(self, max_upload_mb: int, autosave_enabled: bool = True) -> dict:
         value = int(max_upload_mb)
         if not 1 <= value <= 10240:
             raise ValueError("max_upload_mb must be between 1 and 10240")
         root = _data_root()
         root.mkdir(parents=True, exist_ok=True)
         (root / "native-settings.json").write_text(
-            json.dumps({"max_upload_mb": value}, indent=2) + "\n", encoding="utf-8"
+            json.dumps({"max_upload_mb": value, "autosave_enabled": bool(autosave_enabled)}, indent=2) + "\n", encoding="utf-8"
         )
         os.environ["MTA_MAX_UPLOAD_MB"] = str(value)
         # app.main is already imported after the embedded server starts; update the
         # live request/upload limit as well as persisting it for the next launch.
         import app.main as app_main
         app_main.MAX_UPLOAD_BYTES = value * 1024 * 1024
-        return {"ok": True, "max_upload_mb": value}
+        return {"ok": True, "max_upload_mb": value, "autosave_enabled": bool(autosave_enabled)}
 
     def open_project(self) -> dict:
         if self.window is None:

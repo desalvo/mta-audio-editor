@@ -1,6 +1,6 @@
 # MTA proprietary format research
 
-Version: 0.2.0-65
+Version: 0.2.0-68
 
 This document records only findings demonstrated against the current four-file stock M-Live corpus. It is intentionally conservative: a field is not treated as a writable contract until round-trip output has been validated on real M-Live/Merish hardware.
 

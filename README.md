@@ -1,4 +1,4 @@
-# MTA Audio Editor 0.2.0-65
+# MTA Audio Editor 0.2.0-68
 
 ![MTA Audio Editor](app/static/logo.svg)
 
@@ -9,7 +9,7 @@ Web DAW containerizzata per creare, importare, modificare ed esportare progetti 
 **Creatore:** Alessandro De Salvo <braket71@gmail.com>  
 **Repository:** `desalvo/mta-audio-editor`  
 **Licenza:** EUPL-1.2  
-**Versione:** `0.2.0-65`  
+**Versione:** `0.2.0-68`  
 **Build:** generato automaticamente nel formato `YYYYMMDD-HH:MM:SS`.
 
 ## Funzioni principali
@@ -51,6 +51,10 @@ L'applicazione usa autenticazione multi-utente persistente su SQLite nel volume 
 - notifica email a tutti gli amministratori con email confermata quando un utente viene attivato.
 
 Al **primo avvio** devono essere definiti `MTA_ADMIN_USERNAME`, `MTA_ADMIN_PASSWORD` e `MTA_ADMIN_EMAIL`; questi valori creano il primo account amministratore. Per i link email dietro reverse proxy è raccomandato `MTA_PUBLIC_URL=https://mta.example.com`.
+
+### Login social (Google, Facebook, GitHub)
+
+I login OAuth social sono predisposti ma **disabilitati per default**. Gli utenti creati tramite provider social hanno email già verificata dal provider ma restano disabilitati fino all’approvazione di un amministratore; l’approvazione invia automaticamente una mail all’utente. Configurazione completa, callback e variabili Docker/Kubernetes: [`docs/SOCIAL_LOGIN.md`](docs/SOCIAL_LOGIN.md).
 
 ## Avvio Docker
 
@@ -163,15 +167,15 @@ git init
 git branch -M main
 git remote add origin https://github.com/desalvo/mta-audio-editor.git
 git add .
-git commit -m "Release 0.2.0-65"
+git commit -m "Release 0.2.0-68"
 git push -u origin main
 ```
 
 Dopo che la CI su `main` è verde, creare il tag:
 
 ```bash
-git tag -s 0.2.0-65 -m "MTA Audio Editor 0.2.0-65"
-git push origin 0.2.0-65
+git tag -s 0.2.0-68 -m "MTA Audio Editor 0.2.0-68"
+git push origin 0.2.0-68
 ```
 
 ## Packaging locale
@@ -236,9 +240,13 @@ MTA Audio Editor now uses application-managed users and a photographic, responsi
 
 The first administrator can be bootstrapped with `MTA_ADMIN_USERNAME`, `MTA_ADMIN_PASSWORD` and `MTA_ADMIN_EMAIL`. Each user can optionally enable TOTP from the profile page; the application generates the secret and an in-app QR code compatible with standard authenticator apps. SMTP/SMTPS/STARTTLS configuration is available to administrators under **Administration → SMTP / SMTPS** and is used for email confirmation plus activation notifications. When an account is activated, all active administrators with a confirmed email address receive a notification. Set `MTA_PUBLIC_URL` when the externally reachable application URL cannot be inferred from the incoming request/proxy.
 
+### Social login (Google, Facebook, GitHub)
+
+OAuth social providers are prepared but **disabled by default**. Social users receive a provider-verified email status but remain disabled until administrator approval; approval automatically sends the activation email. See [`docs/SOCIAL_LOGIN.md`](docs/SOCIAL_LOGIN.md) for provider callbacks and Docker/Kubernetes variables.
+
 ### Upgrade Kubernetes e readiness
 
-Dalla 0.2.0-65 il pod imposta `fsGroup: 10001` e `fsGroupChangePolicy: OnRootMismatch` per rendere scrivibile il PVC all'utente applicativo non-root. La chiave `email` del Secret bootstrap è opzionale a runtime per mantenere compatibili gli upgrade da release precedenti; il wizard continua comunque a richiedere l'email per le nuove installazioni. È inoltre presente una `startupProbe` su `/api/health` prima di readiness e liveness.
+Dalla 0.2.0-68 il pod imposta `fsGroup: 10001` e `fsGroupChangePolicy: OnRootMismatch` per rendere scrivibile il PVC all'utente applicativo non-root. La chiave `email` del Secret bootstrap è opzionale a runtime per mantenere compatibili gli upgrade da release precedenti; il wizard continua comunque a richiedere l'email per le nuove installazioni. È inoltre presente una `startupProbe` su `/api/health` prima di readiness e liveness.
 
 Se un pod resta non Ready dopo un upgrade, controllare `kubectl describe pod` per `CreateContainerConfigError`, `permission denied` sul PVC o errori della probe.
 

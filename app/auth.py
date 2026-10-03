@@ -19,7 +19,8 @@ from contextlib import contextmanager
 from email.message import EmailMessage
 from pathlib import Path
 from typing import Any
-from urllib.parse import quote
+from urllib.parse import quote, urlencode
+from urllib.request import Request as UrlRequest, urlopen
 
 import qrcode
 import qrcode.image.svg
@@ -155,6 +156,15 @@ def init_auth_db() -> None:
           used_at INTEGER,
           FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
         );
+        CREATE TABLE IF NOT EXISTS social_identities(
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          user_id INTEGER NOT NULL,
+          provider TEXT NOT NULL,
+          subject TEXT NOT NULL,
+          created_at INTEGER NOT NULL,
+          UNIQUE(provider,subject),
+          FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+        );
         CREATE TABLE IF NOT EXISTS sessions(
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           user_id INTEGER NOT NULL,
@@ -250,6 +260,13 @@ def _find_user(identifier: str):
         ).fetchone()
 
 
+def social_providers_for_user(user_id: int) -> list[str]:
+    init_auth_db()
+    with db() as con:
+        rows=con.execute("SELECT provider FROM social_identities WHERE user_id=? ORDER BY provider",(user_id,)).fetchall()
+    return [row["provider"] for row in rows]
+
+
 def public_user(row) -> dict:
     return {
         "id": row["id"],
@@ -265,6 +282,7 @@ def public_user(row) -> dict:
         "updated_at": row["updated_at"],
         "approved_at": row["approved_at"],
         "last_login_at": row["last_login_at"],
+        "social_providers": social_providers_for_user(row["id"]),
     }
 
 
@@ -330,6 +348,16 @@ def _send_verification_email(user_id: int, token: str, base_url: str = "") -> No
     )
 
 
+def _notify_admins_registration(user, provider: str = "local") -> None:
+    with db() as con:
+        admins=con.execute("SELECT email FROM users WHERE role='admin' AND active=1 AND email_confirmed=1 AND email<>''").fetchall()
+    recipients=[x["email"] for x in admins]
+    if not recipients:
+        return
+    source = provider if provider != "local" else "registrazione locale"
+    send_mail(recipients,"Nuovo utente in attesa · MTA Audio Editor",f"Nuovo utente {user['username']} ({user['email']}) tramite {source}. L'account richiede approvazione amministratore.")
+
+
 def register_user(username: str, email: str, display_name: str, password: str, base_url: str = ""):
     username = username.strip()
     email = email.strip().lower()
@@ -356,7 +384,12 @@ def register_user(username: str, email: str, display_name: str, password: str, b
         _send_verification_email(user_id, token, base_url)
     except Exception:
         LOGGER.exception("Unable to send registration verification email for user_id=%s", user_id)
-    return public_user(get_user(user_id)), token
+    user=public_user(get_user(user_id))
+    try:
+        _notify_admins_registration(user)
+    except Exception:
+        LOGGER.exception("Unable to notify administrators about registration user_id=%s", user_id)
+    return user, token
 
 
 def confirm_email(token: str) -> bool:
@@ -378,6 +411,93 @@ def resend_verification(identifier: str, base_url: str = "") -> None:
     except Exception:
         LOGGER.exception("Unable to resend verification email for user_id=%s", row["id"])
 
+
+OAUTH_PROVIDERS = {
+    "google": {
+        "label": "Google", "enabled_env": "MTA_OAUTH_GOOGLE_ENABLED", "client_env": "MTA_OAUTH_GOOGLE_CLIENT_ID", "secret_env": "MTA_OAUTH_GOOGLE_CLIENT_SECRET",
+        "authorize": "https://accounts.google.com/o/oauth2/v2/auth", "token": "https://oauth2.googleapis.com/token", "userinfo": "https://openidconnect.googleapis.com/v1/userinfo", "scope": "openid email profile",
+    },
+    "github": {
+        "label": "GitHub", "enabled_env": "MTA_OAUTH_GITHUB_ENABLED", "client_env": "MTA_OAUTH_GITHUB_CLIENT_ID", "secret_env": "MTA_OAUTH_GITHUB_CLIENT_SECRET",
+        "authorize": "https://github.com/login/oauth/authorize", "token": "https://github.com/login/oauth/access_token", "userinfo": "https://api.github.com/user", "scope": "read:user user:email",
+    },
+    "facebook": {
+        "label": "Facebook", "enabled_env": "MTA_OAUTH_FACEBOOK_ENABLED", "client_env": "MTA_OAUTH_FACEBOOK_CLIENT_ID", "secret_env": "MTA_OAUTH_FACEBOOK_CLIENT_SECRET",
+        "authorize": "https://www.facebook.com/dialog/oauth", "token": "https://graph.facebook.com/oauth/access_token", "userinfo": "https://graph.facebook.com/me?fields=id,name,email", "scope": "email,public_profile",
+    },
+}
+
+def oauth_enabled(provider: str) -> bool:
+    cfg=OAUTH_PROVIDERS.get(provider)
+    return bool(cfg and os.getenv(cfg["enabled_env"],"false").lower() in {"1","true","yes","on"} and os.getenv(cfg["client_env"],"") and os.getenv(cfg["secret_env"],""))
+
+def oauth_public_providers() -> list[dict]:
+    return [{"id":key,"label":cfg["label"]} for key,cfg in OAUTH_PROVIDERS.items() if oauth_enabled(key)]
+
+def oauth_redirect_uri(provider: str, request: Request) -> str:
+    base=(_base_url() or str(request.base_url).rstrip('/')).rstrip('/')
+    return f"{base}/oauth/{provider}/callback"
+
+def oauth_make_state(provider: str) -> tuple[str,str]:
+    nonce=secrets.token_urlsafe(24); payload=f"{provider}|{now_ts()+600}|{nonce}".encode(); raw=base64.urlsafe_b64encode(payload).decode().rstrip('='); sig=hmac.new(_app_key(),raw.encode(),hashlib.sha256).hexdigest(); return f"{raw}.{sig}",nonce
+
+def oauth_verify_state(provider: str, state: str, cookie_nonce: str) -> bool:
+    try:
+        raw,sig=state.split('.',1); expected=hmac.new(_app_key(),raw.encode(),hashlib.sha256).hexdigest()
+        if not hmac.compare_digest(sig,expected): return False
+        payload=base64.urlsafe_b64decode(raw+'='*(-len(raw)%4)).decode(); p,exp,nonce=payload.split('|',2)
+        return p==provider and int(exp)>=now_ts() and bool(cookie_nonce) and hmac.compare_digest(nonce,cookie_nonce)
+    except Exception: return False
+
+def oauth_authorize_url(provider: str, request: Request) -> tuple[str,str]:
+    if not oauth_enabled(provider): raise ValueError("Provider social non abilitato.")
+    cfg=OAUTH_PROVIDERS[provider]; state,nonce=oauth_make_state(provider)
+    params={"client_id":os.getenv(cfg["client_env"]),"redirect_uri":oauth_redirect_uri(provider,request),"response_type":"code","scope":cfg["scope"],"state":state}
+    if provider=="google": params["prompt"]="select_account"
+    return cfg["authorize"]+'?'+urlencode(params),nonce
+
+def _oauth_json(url: str, *, data: dict|None=None, headers: dict|None=None) -> dict|list:
+    body=urlencode(data).encode() if data is not None else None; h={"Accept":"application/json","User-Agent":"MTA-Audio-Editor"}; h.update(headers or {})
+    with urlopen(UrlRequest(url,data=body,headers=h),timeout=15) as resp: return __import__('json').loads(resp.read().decode())
+
+def oauth_exchange_profile(provider: str, code: str, request: Request) -> dict:
+    if not oauth_enabled(provider): raise ValueError("Provider social non abilitato.")
+    cfg=OAUTH_PROVIDERS[provider]
+    token=_oauth_json(cfg["token"],data={"client_id":os.getenv(cfg["client_env"]),"client_secret":os.getenv(cfg["secret_env"]),"code":code,"redirect_uri":oauth_redirect_uri(provider,request),"grant_type":"authorization_code"})
+    access=token.get("access_token") if isinstance(token,dict) else None
+    if not access: raise ValueError("Il provider non ha restituito un access token valido.")
+    profile=_oauth_json(cfg["userinfo"],headers={"Authorization":f"Bearer {access}"})
+    if provider=="github":
+        subject=str(profile.get("id",'')); emails=_oauth_json("https://api.github.com/user/emails",headers={"Authorization":f"Bearer {access}"})
+        choices=[e for e in emails if e.get("verified")]; primary=next((e for e in choices if e.get("primary")),choices[0] if choices else None)
+        email=str(primary.get("email",'')).lower() if primary else ''; verified=bool(primary)
+        name=str(profile.get("name") or profile.get("login") or '')
+    elif provider=="google":
+        subject=str(profile.get("sub",''));email=str(profile.get("email") or '').lower();verified=profile.get("email_verified") is True;name=str(profile.get("name") or '')
+    else:
+        subject=str(profile.get("id",''));email=str(profile.get("email") or '').lower();verified=bool(email);name=str(profile.get("name") or '')
+    if not subject or not EMAIL_RE.fullmatch(email) or not verified: raise ValueError("Il provider non ha fornito un indirizzo email verificato utilizzabile.")
+    return {"subject":subject,"email":email,"name":name[:120]}
+
+def _social_username(provider: str, email: str) -> str:
+    base=re.sub(r"[^A-Za-z0-9._-]","-",email.split('@',1)[0]).strip('-._') or provider
+    base=(base[:48]+'-'+provider)[:60]; candidate=base;i=1
+    with db() as con:
+        while con.execute("SELECT 1 FROM users WHERE username=? COLLATE NOCASE",(candidate,)).fetchone(): i+=1;candidate=f"{base[:55]}-{i}"
+    return candidate
+
+def social_login_or_register(provider: str, profile: dict):
+    init_auth_db(); subject=profile["subject"]
+    with db() as con:
+        identity=con.execute("SELECT user_id FROM social_identities WHERE provider=? AND subject=?",(provider,subject)).fetchone()
+        if identity: return public_user(get_user(identity["user_id"])),False
+        if con.execute("SELECT 1 FROM users WHERE email=? COLLATE NOCASE",(profile["email"],)).fetchone(): raise ValueError("Esiste già un account con questa email. Accedi con il metodo già associato all'account.")
+        ts=now_ts();cur=con.execute("INSERT INTO users(username,email,display_name,password_hash,role,active,email_confirmed,created_at,updated_at) VALUES(?,?,?,?, 'user',0,1,?,?)",(_social_username(provider,profile["email"]),profile["email"],profile["name"],"social$"+provider,ts,ts));uid=cur.lastrowid
+        con.execute("INSERT INTO social_identities(user_id,provider,subject,created_at) VALUES(?,?,?,?)",(uid,provider,subject,ts))
+    user=public_user(get_user(uid))
+    try: _notify_admins_registration(user,provider)
+    except Exception: LOGGER.exception("Unable to notify administrators about social registration user_id=%s",uid)
+    return user,True
 
 def authenticate(identifier: str, password: str, code: str = ""):
     init_auth_db()

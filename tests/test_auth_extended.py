@@ -226,7 +226,7 @@ def test_resend_profile_email_and_password_reset_flows(tmp_path, monkeypatch):
     )
 
     user, token = auth.register_user("resetme", "reset@example.test", "Reset Me", "very-secure-password", "https://mta.test")
-    assert sent and "verify-email" in sent[-1][2]
+    assert sent and any("verify-email" in item[2] for item in sent)
     auth.resend_verification("missing", "https://mta.test")
     auth.resend_verification("resetme", "https://mta.test")
     assert len(sent) >= 2

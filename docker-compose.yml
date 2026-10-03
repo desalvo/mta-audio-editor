@@ -3,9 +3,9 @@ services:
     build:
       context: .
       args:
-        APP_VERSION: "0.2.0-65"
+        APP_VERSION: "0.2.0-68"
         BUILD_ID: "${BUILD_ID:-local}"
-    image: desalvo/mta-audio-editor:0.2.0-65
+    image: desalvo/mta-audio-editor:0.2.0-68
     ports:
       - "8080:8080"
     environment:
@@ -13,6 +13,16 @@ services:
       MTA_ADMIN_PASSWORD: "${MTA_ADMIN_PASSWORD:?set MTA_ADMIN_PASSWORD}"
       MTA_ADMIN_EMAIL: "${MTA_ADMIN_EMAIL:?set MTA_ADMIN_EMAIL}"
       MTA_MAX_UPLOAD_MB: "${MTA_MAX_UPLOAD_MB:-1024}"
+      MTA_PUBLIC_URL: "${MTA_PUBLIC_URL:-}"
+      MTA_OAUTH_GOOGLE_ENABLED: "${MTA_OAUTH_GOOGLE_ENABLED:-false}"
+      MTA_OAUTH_GOOGLE_CLIENT_ID: "${MTA_OAUTH_GOOGLE_CLIENT_ID:-}"
+      MTA_OAUTH_GOOGLE_CLIENT_SECRET: "${MTA_OAUTH_GOOGLE_CLIENT_SECRET:-}"
+      MTA_OAUTH_FACEBOOK_ENABLED: "${MTA_OAUTH_FACEBOOK_ENABLED:-false}"
+      MTA_OAUTH_FACEBOOK_CLIENT_ID: "${MTA_OAUTH_FACEBOOK_CLIENT_ID:-}"
+      MTA_OAUTH_FACEBOOK_CLIENT_SECRET: "${MTA_OAUTH_FACEBOOK_CLIENT_SECRET:-}"
+      MTA_OAUTH_GITHUB_ENABLED: "${MTA_OAUTH_GITHUB_ENABLED:-false}"
+      MTA_OAUTH_GITHUB_CLIENT_ID: "${MTA_OAUTH_GITHUB_CLIENT_ID:-}"
+      MTA_OAUTH_GITHUB_CLIENT_SECRET: "${MTA_OAUTH_GITHUB_CLIENT_SECRET:-}"
     volumes:
       - mta-data:/data/projects
     read_only: true
