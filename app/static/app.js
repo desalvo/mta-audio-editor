@@ -544,6 +544,7 @@ function mixerHtml(){
   const metaPane=current.metadata_panel_visible?metaPaneHtml():'';
   return `<div class="mixer-pane" id="mixer">
     <div class="dock-tabs"><button class="dock-tab active">Mixer</button><button class="dock-tab">Master / Preview</button><button id="realtimeBtn" class="dock-tab realtime-toggle ${current.realtime_meter_enabled?'active':''}" onclick="toggleRealtimeMeters()">RealTime</button>
+      <button class="dock-tab" onclick="toggleMuteAll()">${current.tracks.length&&current.tracks.every(t=>t.mute)?'Unmute all':'Mute all'}</button><button class="dock-tab" onclick="toggleSoloAll()">${current.tracks.length&&current.tracks.every(t=>t.solo)?'Unsolo all':'Solo all'}</button><button class="dock-tab" onclick="toggleAllPlugins()">${[...(current.master_inserts||[]),...current.tracks.flatMap(t=>t.inserts||[])].some(x=>x.enabled)?'Bypass all FX':'Enable all FX'}</button>
       <div class="automix-control"><label class="switch"><input type="checkbox" ${current.auto_mix_enabled?'checked':''} onchange="setAutoMix(this.checked)"><span></span></label><b>Auto Mix</b><select id="autoMixStyle" onchange="changeAutoMixStyle(this.value)"><option value="balanced" ${current.auto_mix_style==='balanced'?'selected':''}>Balanced</option><option value="studio" ${current.auto_mix_style==='studio'?'selected':''}>Studio</option><option value="live" ${current.auto_mix_style==='live'?'selected':''}>Live</option><option value="gentle" ${current.auto_mix_style==='gentle'?'selected':''}>Gentle</option></select><button onclick="showAutoMixInfo()">?</button></div>
       <span class="capacity-badge ${over?'over':''}">${current.tracks.length} project tracks · ${limit} ${current.target} output slots</span>
     </div>
@@ -705,6 +706,25 @@ async function save(){
 }
 function selectTrack(id){captureUiState();selectedTrackId=id;render()}
 function toggleBool(btn,id,k){const t=trackById(id);if(!t)return;t[k]=!t[k];updateMuteSoloVisuals();markDirty();toast(k==='mute'?(t[k]?'Mute attivato':'Mute disattivato'):(t[k]?'Solo attivato':'Solo disattivato'))}
+function toggleMuteAll(){
+  if(!current?.tracks?.length)return;
+  const next=!current.tracks.every(t=>t.mute);
+  current.tracks.forEach(t=>{t.mute=next});updateMuteSoloVisuals();markDirty();render();toast(next?'Mute attivato su tutte le tracce':'Mute rimosso da tutte le tracce');
+}
+function toggleSoloAll(){
+  if(!current?.tracks?.length)return;
+  const next=!current.tracks.every(t=>t.solo);
+  current.tracks.forEach(t=>{t.solo=next});updateMuteSoloVisuals();markDirty();render();toast(next?'Solo attivato su tutte le tracce':'Solo rimosso da tutte le tracce');
+}
+function toggleAllPlugins(){
+  if(!current)return;
+  const plugins=[...(current.master_inserts||[]),...current.tracks.flatMap(t=>t.inserts||[])];
+  if(!plugins.length)return toast('Nessun plugin configurato');
+  const enable=!plugins.some(x=>x.enabled);
+  plugins.forEach(x=>{x.enabled=enable});
+  for(const t of current.tracks){if(t.inserts?.length)queueInsertWaveformRefresh(t.id)}
+  markDirty(100);render();toast(enable?'Tutti i plugin abilitati':'Bypass di tutti i plugin attivato');
+}
 function updateMuteSoloVisuals(){
   if(!current)return;const anySolo=current.tracks.some(t=>t.solo);
   for(const t of current.tracks){
@@ -793,14 +813,16 @@ function updateWaveProgress(trackId,pct,message){
   if(!box)return;box.classList.remove('hidden');if(bar)bar.style.width=`${Math.max(2,Math.min(100,Number(pct)||0))}%`;if(label)label.textContent=message||'Waveform…';
 }
 async function ensureWaveforms(){
+  // Persisted peaks are drawn immediately, then the server validates their revision.
+  // This keeps project opening fast while guaranteeing stale/missing waveforms are regenerated and saved.
   for(const t of current?.tracks||[]){
-    if(t.waveform_peaks?.length){drawWave(t);continue}
+    if(t.waveform_peaks?.length)drawWave(t);
     if(waveformJobs[t.id])continue;
     try{
       const job=await api(`/api/projects/${current.id}/tracks/${t.id}/waveform-jobs`,{method:'POST'});
       if(job.status==='completed'&&job.result){t.waveform_peaks=job.result.peaks||[];t.waveform_revision=job.result.revision||'';drawWave(t);$(`#wave-progress-${t.id}`)?.classList.add('hidden');continue}
       waveformJobs[t.id]=job.id;pollWaveformJob(t.id,job.id);
-    }catch(e){updateWaveProgress(t.id,0,'Waveform non disponibile')}
+    }catch(e){if(!t.waveform_peaks?.length)updateWaveProgress(t.id,0,'Waveform non disponibile')}
   }
 }
 async function pollWaveformJob(trackId,jobId){

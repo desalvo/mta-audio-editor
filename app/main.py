@@ -1082,7 +1082,6 @@ def _track_import_worker(
             peaks = waveform_peaks(dst, 1024, lambda value, message: _media_job_update(
                 job_id, progress=88 + int(max(0, min(100, value)) * 0.07), message=message
             ))
-            revision = _waveform_revision(dst)
         except Exception:
             peaks = []
             revision = ""
@@ -1100,10 +1099,11 @@ def _track_import_worker(
                 timeline_start_ms=max(0, offset_ms),
             )],
             waveform_peaks=peaks,
-            waveform_revision=revision,
+            waveform_revision="",
             channels=channels,
             channel_layout=channel_layout,
         )
+        track.waveform_revision = _track_waveform_revision(track, dst) if peaks else ""
         _media_job_update(job_id, progress=91, message="Aggiunta della traccia al progetto")
         if sync_mode == "auto" and project.tracks:
             ref = next((item for item in project.tracks if item.id == reference_track_id), project.tracks[0])
@@ -1824,7 +1824,6 @@ def create_metronome_track(pid: str, request: Request):
     try:
         duration_ms = generate_metronome_wav(project, out)
         peaks = waveform_peaks(out)
-        revision = _waveform_revision(out)
     except Exception as exc:
         out.unlink(missing_ok=True)
         raise HTTPException(400, f"Creazione metronomo fallita: {str(exc)[:300]}") from exc
@@ -1838,7 +1837,7 @@ def create_metronome_track(pid: str, request: Request):
         channels=1,
         channel_layout="mono",
         waveform_peaks=peaks,
-        waveform_revision=revision,
+        waveform_revision="",
         clips=[
             Clip(
                 id=uuid.uuid4().hex[:10],
@@ -1848,6 +1847,7 @@ def create_metronome_track(pid: str, request: Request):
             )
         ],
     )
+    track.waveform_revision = _track_waveform_revision(track, out) if peaks else ""
     project.tracks.append(track)
     save_project(project)
     return {"project": project, "track": track}
