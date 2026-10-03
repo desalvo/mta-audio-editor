@@ -479,7 +479,7 @@ def _oauth_json(url: str, *, data: dict | None = None, headers: dict | None = No
     body = urlencode(data).encode() if data is not None else None
     request_headers = {"Accept": "application/json", "User-Agent": "MTA-Audio-Editor"}
     request_headers.update(headers or {})
-    request = UrlRequest(safe_url, data=body, headers=request_headers)
+    request = UrlRequest(safe_url, data=body, headers=request_headers)  # noqa: S310
     # S310 is intentionally suppressed only after strict HTTPS + provider-host validation above.
     with urlopen(request, timeout=15) as resp:  # noqa: S310
         return __import__("json").loads(resp.read().decode())
