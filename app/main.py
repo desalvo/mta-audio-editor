@@ -1084,7 +1084,6 @@ def _track_import_worker(
             ))
         except Exception:
             peaks = []
-            revision = ""
         allowed = Track.model_fields["type"].annotation.__args__
         track = Track(
             id=uuid.uuid4().hex[:10],
