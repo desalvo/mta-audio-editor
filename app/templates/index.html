@@ -12,11 +12,11 @@
   <header class="topbar">
     <div class="brand-block">
       <img src="/static/logo.svg" alt="MTA Audio Editor" class="brand-logo">
-      <div><div class="brand-name"><b>MTA</b> Audio Editor</div><div class="brand-meta">MTA / MTA8 / MTA16 &nbsp;·&nbsp; v__VERSION__ &nbsp;·&nbsp; build __BUILD__</div></div>
+      <div><div class="brand-name"><b>MTA</b> Audio Editor</div><div class="brand-meta">Multitrack DAW / MTA8 / MTA16 &nbsp;·&nbsp; v__VERSION__ &nbsp;·&nbsp; build __BUILD__</div></div>
     </div>
     <div class="project-name-block"><label>Project</label><div class="project-name-field" onclick="editProjectMeta()" title="Edit project metadata"><span id="headerProjectName">No project loaded</span><span>✎</span></div></div>
     <div class="transport">
-      <button class="transport-btn" onclick="stopPlayback()" title="Stop" aria-label="Stop">■</button><button class="transport-btn" onclick="seekTransport(-5000)" title="Riavvolgi 5 secondi" aria-label="Riavvolgi 5 secondi">◀◀</button><button id="playMaster" class="transport-btn play" onclick="togglePlayback()" title="Play / Preview" aria-label="Play / Preview">▶</button><button class="transport-btn" onclick="seekTransport(5000)" title="Avanti 5 secondi" aria-label="Avanti 5 secondi">▶▶</button><button id="renderBtn" class="transport-btn render-mode" onclick="toggleRenderPreview()" title="Render: include filtri e master nella preview" aria-label="Render preview">Render</button><button id="followBtn" class="transport-btn follow-mode" onclick="toggleFollowPlayback()" title="Follow: mantieni il playhead visibile" aria-label="Follow playback">Follow</button>
+      <button class="transport-btn" onclick="stopPlayback()" title="Stop" aria-label="Stop">■</button><button class="transport-btn" onclick="goTransportStart()" title="Torna all'inizio" aria-label="Torna all'inizio">|◀</button><button class="transport-btn" onclick="seekTransport(-5000)" title="Riavvolgi 5 secondi" aria-label="Riavvolgi 5 secondi">◀◀</button><button id="playMaster" class="transport-btn play" onclick="togglePlayback()" title="Play / Preview" aria-label="Play / Preview">▶</button><button class="transport-btn" onclick="seekTransport(5000)" title="Avanti 5 secondi" aria-label="Avanti 5 secondi">▶▶</button><button id="renderBtn" class="transport-btn render-mode" onclick="toggleRenderPreview()" title="Render: include filtri e master nella preview" aria-label="Render preview">Render</button><button id="followBtn" class="transport-btn follow-mode" onclick="toggleFollowPlayback()" title="Follow: mantieni il playhead visibile" aria-label="Follow playback">Follow</button>
     </div>
     <div class="timebox"><strong id="transportTime">00:00.000</strong><span><input id="transportBpmInput" class="tempo-input" type="number" min="30" max="300" step="0.1" value="120" onchange="setProjectBpm(this.value)" title="BPM progetto"><b id="transportBpm" hidden>120</b> BPM &nbsp; <input id="transportPitchInput" class="pitch-input" type="number" min="-6" max="6" step="0.1" value="0" onchange="setProjectPitch(this.value)" title="Trasposizione semitoni"> st</span></div>
     <div class="top-spacer"></div>
@@ -66,6 +66,7 @@
             <button class="nav-item" onclick="saveAsProject()">⇩ <span>Save project as…</span></button>
             <button class="nav-item" onclick="openProjectArchive()">⬆ <span>Open project</span></button>
             <button class="nav-item" onclick="closeCurrentProject()">⊘ <span>Close project</span></button><input id="projectArchiveFile" type="file" accept=".zip,.mta-project.zip" hidden>
+            <button class="nav-item" onclick="showProjectInfo()">ⓘ <span>Info progetto</span></button>
             <button class="nav-item" onclick="manageProjectFiles()">▣ <span>Project files</span></button>
             <button class="nav-item auth-managed" onclick="manageProjectSharing()">⌘ <span>Share project</span></button>
             <button class="nav-item danger-nav" onclick="deleteCurrentProject()">× <span>Delete project</span></button>

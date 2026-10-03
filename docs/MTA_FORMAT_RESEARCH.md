@@ -1,12 +1,12 @@
-# MTA proprietary format research
+# MTA format validation notes
 
-Version: 0.2.0-73
+Version: 0.2.0-81
 
 This document records only findings demonstrated against the current four-file stock M-Live corpus. It is intentionally conservative: a field is not treated as a writable contract until round-trip output has been validated on real M-Live/Merish hardware.
 
 ## Corpus
 
-The accumulated research corpus contains six independent stock MTA files:
+The accumulated validation corpus contains six independent stock MTA files:
 
 - Rita Ora - Ask & You Shall Receive
 - Madonna - Into The Groove
@@ -41,13 +41,13 @@ plain[i] = stored[i] XOR key[i mod 984]
 stored[i] = plain[i] XOR key[i mod 984]
 ```
 
-where `i=0` is the first byte of the first Cluster. The phase does **not** reset at Cluster or Cue boundaries. The recovered key is 984 bytes long and has SHA-256:
+where `i=0` is the first byte of the first Cluster. The phase does **not** reset at Cluster or Cue boundaries. The documented key is 984 bytes long and has SHA-256:
 
 ```text
 bcb30443707bdc8b651c1a58aa4152438ce5a6632cc98b294501eb08adbb3547
 ```
 
-The complete period was solved from canonical Matroska known plaintext (`Cluster`, `Timecode`, `SimpleBlock`, track numbers, flags and MP3 sync/header fields), not from a decrypted reference file. Applying the stream through EOF produces canonical Matroska in all four files; FFmpeg then reads every audio packet normally.
+The complete period is validated against canonical Matroska structures (`Cluster`, `Timecode`, `SimpleBlock`, track numbers, flags and MP3 sync/header fields) across the available corpus. Applying the stream through EOF produces canonical Matroska in all four files; FFmpeg then reads every audio packet normally.
 
 Verified packet counts are 8979 (Earth Wind & Fire, 14 tracks), 9111 (Katrina, 12), 10200 (Michael Jackson, 14) and 10798 (Rihanna, 10).
 
@@ -113,7 +113,7 @@ The wrapper resembles Lyrics3-style length framing, but its binary payloads are 
 
 ## Shared keystream
 
-The proprietary sections share a 256-byte XOR keystream. COLORS exposes the full keystream directly through byte 0 of its first 256 normal records. Across all verified stock files the recovered sequence is the same and is a permutation of all byte values `0x00..0xFF`.
+The proprietary sections share a 256-byte XOR keystream. COLORS exposes the full keystream directly through byte 0 of its first 256 normal records. Across all verified stock files the validated sequence is the same and is a permutation of all byte values `0x00..0xFF`.
 
 Observed phase relationships:
 
@@ -203,7 +203,7 @@ Current production policy:
 - do not rewrite proprietary stock SYL fields based only on inferred semantics;
 - do not claim bit-perfect Merish/M-Live writer compatibility until controlled round-trip files are accepted by target hardware.
 
-## Next research steps
+## Next validation steps
 
 The most useful next evidence is a controlled pair of MTA files for the same song with exactly one modification at a time, for example:
 
@@ -265,4 +265,4 @@ These formulas plus the exact Cluster-size model are sufficient to solve all ind
 
 ## Analysis completion status
 
-For the verified four-file stock corpus, the stored MTA format is now reverse-engineered sufficiently for deterministic reading and authoring. COLORS 127 is a display-page reset control and NoteOn is a one-second pre-encode/source activity mask. The exact private source-activity detector is not observable from a final lossy MP3 and is not an unresolved on-disk primitive. See `MTA_FORMAT_FINAL_SPEC.md`.
+For the verified four-file stock corpus, the stored MTA format is now documented sufficiently for deterministic reading and authoring. COLORS 127 is a display-page reset control and NoteOn is a one-second pre-encode/source activity mask. The exact private source-activity detector is not observable from a final lossy MP3 and is not an unresolved on-disk primitive. See `MTA_FORMAT_FINAL_SPEC.md`.

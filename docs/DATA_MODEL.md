@@ -13,6 +13,7 @@ artist
 bpm
 key
 target = MTA8 | MTA16
+mta_device_profile = auto | merish5_xynthia2 | bbeat_divo | mlive_mta16_default | merish5_plus_mta16 | generic
 tracks[]
 markers[]
 lyrics[]
@@ -23,6 +24,13 @@ master_inserts[]
 auto_mix_enabled
 auto_mix_style
 auto_mix_snapshot
+base_bpm
+pitch_semitones
+realtime_meter_enabled
+render_preview_enabled
+follow_playback_enabled
+timeline_zoom_px_per_sec
+export_format
 ```
 
 ## Track
@@ -33,6 +41,7 @@ A Track stores editor/mixer state and references one working source file:
 id
 name
 type
+mta_slot
 filename
 duration_ms
 volume_db
@@ -44,7 +53,7 @@ clips[]
 inserts[]
 ```
 
-Track types are constrained to the application's known MTA/editor taxonomy such as drums, bass, guitars, keyboards, orchestra, winds, melody, click, choirs and other.
+Track types are constrained to the application's known MTA/editor taxonomy such as drums, bass, guitars, keyboards, orchestra, winds, melody, click, choirs and other. `mta_slot` is an optional persisted preferred output slot (1-8 for MTA8, 1-16 for MTA16); `null` means Auto/profile-driven placement. Confirming an export mapping updates the corresponding track slot preference.
 
 ## Clip
 
@@ -144,3 +153,25 @@ On full-project archive import:
 - share list is cleared.
 
 This prevents imported archives from granting access to unrelated local users.
+
+## MTA device profile
+
+`mta_device_profile` is persisted with the project and controls Click/Melody export placement:
+
+```text
+merish5_xynthia2: MTA8 Melody 7, Click 8
+bbeat_divo:       MTA8 Click 7, Melody 8
+mlive_mta16_default: MTA16 Click 1, Melody 9
+generic:          manual/non-device-specific mapping
+auto:             resolves to the current target default
+```
+
+The export layer may insert silent intermediate streams to preserve a physical slot number. The profile is a project preference; a configured export request can override it for one export.
+
+## Waveform cache
+
+Tracks also persist normalized waveform peaks plus a revision/signature. The UI can display cached peaks immediately when reopening a project. Missing or stale peaks are regenerated asynchronously and saved back into the project. Playback never depends on waveform availability.
+
+## Native project binding
+
+Desktop-native save-path bindings are stored outside `project.json` in the native application data directory so a project can remain portable while the local app remembers which archive path is associated with the project ID.

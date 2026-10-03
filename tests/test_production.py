@@ -48,6 +48,7 @@ def test_main_project_crud_and_public_docs(tmp_path, monkeypatch):
     assert client.get("/api/health").status_code == 200
     assert client.get("/api/about").json()["license"] == "EUPL-1.2"
     assert client.get("/docs/user").status_code == 200
+    assert client.get("/docs/user/en").status_code == 200
     r = client.post("/api/projects", params={"title": "One", "target": "MTA8"}, headers=WRITE_HEADERS)
     assert r.status_code == 200
     pid = r.json()["id"]

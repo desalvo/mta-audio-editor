@@ -1,3 +1,15 @@
+## 0.2.0-81
+
+- Added persistent editable per-track MTA slot assignment in the Track Inspector.
+- Export suggestions now honor explicit track slots and confirmed mappings update the track slot preference.
+- Factory FX presets now expose schema-valid parameter values to the client; changing preset immediately refreshes visible controls.
+- Added synchronized rotary knob + numeric controls for continuous plugin parameters, while the 32-band EQ keeps dedicated faders.
+- Expanded the IT/EN user manuals: MTA = Multi Track Audio, MTA8/MTA16 creation, project/single-track exports, online/mobile authentication/TOTP scope, track slot workflow and FX controls.
+- README now links directly to all IT/EN PDF manuals and includes an English section.
+- Replaced documentation UI screenshots derived from the historical mockup with captures rendered from the current application template/JS/CSS and a deterministic demo project.
+- Updated MTA format documentation and data/API/architecture references.
+- Regenerated all IT/EN PDF manuals and checked section-heading orphan candidates.
+
 ## 0.2.0-73
 
 - CI: remove the stale unused `revision` assignment in the waveform import fallback so Ruff F841 passes without suppressing the rule.

@@ -5,6 +5,7 @@ import UniformTypeIdentifiers
 final class MobileWebViewController: UIViewController, WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler, UIDocumentPickerDelegate {
     private enum Defaults {
         static let serverURL = "mta.server.url"
+        static let defaultServerURL = "https://mta-audio-editor.apps.desalvo.eu"
     }
 
     private var webView: WKWebView!
@@ -18,11 +19,8 @@ final class MobileWebViewController: UIViewController, WKNavigationDelegate, WKU
         configureNavigation()
         configureWebView()
 
-        if let value = UserDefaults.standard.string(forKey: Defaults.serverURL), !value.isEmpty {
-            loadServer(value)
-        } else {
-            DispatchQueue.main.async { [weak self] in self?.promptServerURL(required: true) }
-        }
+        let custom = UserDefaults.standard.string(forKey: Defaults.serverURL)
+        loadServer((custom?.isEmpty == false ? custom : nil) ?? Defaults.defaultServerURL)
     }
 
     private func configureNavigation() {
@@ -63,7 +61,7 @@ final class MobileWebViewController: UIViewController, WKNavigationDelegate, WKU
         webView = WKWebView(frame: .zero, configuration: configuration)
         webView.navigationDelegate = self
         webView.uiDelegate = self
-        webView.customUserAgent = "MTAEditorMobile/0.2.0-73 iOS"
+        webView.customUserAgent = "MTAEditorMobile/0.2.0-81 iOS"
         webView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(webView)
         NSLayoutConstraint.activate([
@@ -79,25 +77,40 @@ final class MobileWebViewController: UIViewController, WKNavigationDelegate, WKU
 
     private func promptServerURL(required: Bool) {
         let alert = UIAlertController(
-            title: "Server MTA Audio Editor",
-            message: "Inserisci l'URL HTTPS del backend Docker/Kubernetes. I server HTTP locali sono supportati dalla build mobile.",
+            title: "Impostazioni server",
+            message: "Inserisci un URL personalizzato solo per usare un server diverso da quello predefinito. I server HTTP locali sono supportati dalla build mobile.",
             preferredStyle: .alert
         )
         alert.addTextField { field in
-            field.placeholder = "https://mta.example.com"
+            field.placeholder = "URL server personalizzato (opzionale)"
             field.keyboardType = .URL
             field.autocapitalizationType = .none
             field.autocorrectionType = .no
-            field.text = UserDefaults.standard.string(forKey: Defaults.serverURL)
+            let custom = UserDefaults.standard.string(forKey: Defaults.serverURL)
+            field.text = custom == Defaults.defaultServerURL ? nil : custom
         }
-        alert.addAction(UIAlertAction(title: "Connetti", style: .default) { [weak self, weak alert] _ in
-            guard let self, let raw = alert?.textFields?.first?.text, let normalized = self.normalizeServerURL(raw) else {
-                self?.showMessage("URL non valido", "Inserisci un indirizzo http:// o https:// completo.")
-                if required { self?.promptServerURL(required: true) }
+        alert.addAction(UIAlertAction(title: "Salva", style: .default) { [weak self, weak alert] _ in
+            guard let self else { return }
+            let raw = alert?.textFields?.first?.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            if raw.isEmpty {
+                UserDefaults.standard.removeObject(forKey: Defaults.serverURL)
+                self.loadServer(Defaults.defaultServerURL)
                 return
             }
-            UserDefaults.standard.set(normalized, forKey: Defaults.serverURL)
+            guard let normalized = self.normalizeServerURL(raw) else {
+                self.showMessage("URL non valido", "Inserisci un indirizzo http:// o https:// completo.")
+                return
+            }
+            if normalized == Defaults.defaultServerURL {
+                UserDefaults.standard.removeObject(forKey: Defaults.serverURL)
+            } else {
+                UserDefaults.standard.set(normalized, forKey: Defaults.serverURL)
+            }
             self.loadServer(normalized)
+        })
+        alert.addAction(UIAlertAction(title: "Usa predefinito", style: .default) { [weak self] _ in
+            UserDefaults.standard.removeObject(forKey: Defaults.serverURL)
+            self?.loadServer(Defaults.defaultServerURL)
         })
         if !required {
             alert.addAction(UIAlertAction(title: "Annulla", style: .cancel))

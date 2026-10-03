@@ -1,3 +1,66 @@
+## 0.2.0-93
+
+- README.md is now the primary English README; README_IT.md contains the Italian version.
+- Added direct README links to user/admin manuals, IT/EN brochures and complete IT/EN MTA format specification PDFs.
+- Expanded both product brochures to two pages with operating modes, limits, server/mobile behavior, MTA limits and resource considerations.
+- Added full detailed MTA format specification PDFs in Italian and English.
+
+## 0.2.0-92
+
+- Updated documentation cover pages to use the approved mockup-style artwork for IT/EN user and administrator manuals.
+- Regenerated the documentation package with refreshed cover assets and updated version/build information.
+
+## 0.2.0-81
+
+- Added unrestricted **Multitrack DAW** project format alongside MTA8/MTA16.
+- DAW projects can export WAV/MP3/FLAC directly and choose MTA8 or MTA16 only when an MTA output is requested.
+- Selecting a track no longer causes waveform validation/recalculation; persisted waveforms are validated once per project and recomputed only when missing or explicitly invalidated.
+- Plugin numeric parameter boxes commit on Enter or focus loss; knobs commit on release/change.
+- Removed redundant static volume bars from mixer channels and enlarged the faders.
+- Regenerated real-UI documentation screenshots and corrected screenshot text artifacts.
+- Reworked PDF covers with an artistic professional DAW photograph behind the existing application data plate and a large application title/logo.
+
+## 0.2.0-81
+
+- Completely expanded the integrated **User Manual** in Italian and English with end-to-end workflows, screenshots, diagrams, examples, troubleshooting, glossary, MTA profiles, synchronized playback and live mixer behavior.
+- Expanded the **Administrator Manual** in Italian and English with architecture, deployment, security, storage/backup, audio pipeline, desktop/mobile clients, MTA format, observability, upgrades and CI/CD.
+- Rebuilt all four documentation PDFs with a photographic full-page cover, application logo, version/build/creator/license/repository plate and supported-platform badges.
+- Added PDF pagination safeguards and verified the generated manuals for orphan headings.
+- Consolidated the bilingual MTA format specification with container, media transport, MP3/SimpleBlock, Cluster/Cues/SeekHead, Xing/Info, CRC, SYL/LYRICS/CHORDS/COLORS/MIDITK, MtxInfoData, NoteOn, PreCntUSec, Click/Melody profiles, reader/writer algorithms and validation invariants.
+- Updated format documentation to present the MTA specification as corpus-validated technical documentation without describing it as reverse engineering.
+- Mobile Android and iOS/iPadOS clients now use the built-in service automatically on first launch, never prompt for a server URL during installation/first run, and never display the built-in default address. A custom URL can be set later in Server settings and may be displayed/edited because it is user-configured.
+- Added documentation regression coverage for bilingual manuals, hidden default mobile URL and format-document wording.
+
+## 0.2.0-77
+
+- Added transport **Torna all'inizio** control.
+- Dynamic playback now buffers every track before starting, starts all tracks together and continuously corrects decoder drift against a shared transport clock.
+- Added visible buffering/synchronization status before Play.
+- Render playback now keeps a dedicated master transport clock, restoring Follow during Render and across seamless rendered-master refreshes.
+- Added persistent MTA device profiles: Merish5/Xynthia2, B.Beat/DIVO family, Merish5+ PLUS MTA16 and Generic.
+- MTA8 export physically pads missing streams with silence when needed so Click/Melody stay at the documented stream positions.
+- Merish5/Xynthia2 profile uses Melody 7 / Click 8; B.Beat/DIVO family uses Click 7 / Melody 8.
+- MTA16 does not invent a universal Click/Melody position; the Merish5+ PLUS profile requires explicit mapping when Click/Melody are present.
+- Imported MTA8 files infer the device profile when the Click/Melody order is unambiguous.
+
+## 0.2.0-76
+
+- Volume, pan, mute/solo and FX chain state now update while Play remains active.
+- Track FX changes hot-swap the affected rendered preview at the current cursor; Render mode automatically refreshes the master.
+- Master fader is applied relative to the rendered baseline, avoiding double gain.
+- Fixed VU meters with Render enabled: analyser paths keep the actual audio level and only the monitor destination is muted.
+- MTA import no longer guesses Click/Melody solely from slots 7/8; explicit metadata and track names take precedence.
+- Documented M-Live device-profile difference for Click/Melody ordering.
+
+## 0.2.0-75
+
+- Native MTA import now asks where to save the project before the import starts; cancelling the save dialog cancels the import.
+- Native project file bindings are persisted across application restarts and are displayed in **Info progetto**.
+- Added **Info progetto** under Project / File with name, project ID, home/workspace, location, type, duration, track count, artist, BPM, key and autosave state.
+- Mute/solo now update the active WebAudio graph immediately during playback. All tracks stay instantiated and audibility is controlled by gain, so unmute/unsolo no longer requires Stop/Play.
+- Rendered-master preview automatically refreshes after live mute/solo changes and refreshes on Resume when changed while paused.
+- Includes the 0.2.0-74 macOS WKWebView/pywebview CSP fix (`unsafe-eval` only in native single-user mode).
+
 ## 0.2.0-73
 
 - CI: remove the stale unused `revision` assignment in the waveform import fallback so Ruff F841 passes without suppressing the rule.

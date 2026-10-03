@@ -41,7 +41,10 @@ let autosaveTimer=null, autosaveBusy=false, autosaveQueued=false, autosaveEnable
 let undoStack=[],redoStack=[],historyProjectId=null,lastHistoryState=null,timelineClipboard=null;
 let playCursorMs=0, playRaf=null, mediaProgressTimer=null;
 let uiState={trackTop:0,timelineTop:0,timelineLeft:0,mixerLeft:0};
-let waveformJobs={}, trackPlaybacks=[], meterRaf=null, meterRunToken=0, playbackToken=0, masterMeterAnalysers=null, masterPlaybackGainNode=null;
+let waveformJobs={}, waveformValidationProjectId=null, trackPlaybacks=[], meterRaf=null, meterRunToken=0, playbackToken=0, masterMeterAnalysers=null, masterPlaybackGainNode=null;
+let renderedMasterPlayback=false, renderedMasterDirty=false, renderedMasterRefreshPromise=null, renderedMasterBaseVolumeDb=0, renderedMasterAudio=null;
+let dynamicSyncClock=null, dynamicSyncTimer=null, playbackBuffering=false;
+const liveFxRefreshTimers={};
 let lastSelectedAudioFile=null, playbackPaused=false, mixerMetaTab='lyrics', pendingExportConfig=null, pendingNewProjectPath=null;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const TRACK_COLORS=['#2f81f7','#28b463','#f0a52b','#8a58db','#e9506c','#8395a7','#24b8d4','#b26ff2','#e67e22','#16a085','#d35400','#7f8c8d'];
@@ -173,7 +176,7 @@ async function newProject(){
   showUtilityModal('Nuovo progetto',`
     <div class="stem-workflow">
       <label class="workflow-field"><span>Nome progetto</span><input id="newProjectTitle" maxlength="200" value="Nuovo progetto" autofocus></label>
-      <label class="workflow-field"><span>Tipo progetto</span><select id="newProjectTarget"><option value="MTA8">MTA8</option><option value="MTA16">MTA16</option></select></label>
+      <label class="workflow-field"><span>Tipo progetto</span><select id="newProjectTarget"><option value="DAW">Multitrack DAW</option><option value="MTA8">MTA8</option><option value="MTA16">MTA16</option></select></label>
       ${nativePathRow}
       <div class="utility-actions">
         <button class="utility-btn primary" type="button" onclick="createProjectFromDialog()">Crea progetto</button>
@@ -195,7 +198,7 @@ async function chooseNewProjectPath(){
 }
 async function createProjectFromDialog(){
   const title=$('#newProjectTitle')?.value?.trim()||'';
-  const target=$('#newProjectTarget')?.value||'MTA8';
+  const target=$('#newProjectTarget')?.value||'DAW';
   if(!title)return toast('Inserisci un nome per il progetto');
   if(currentUser?.native_single_user){
     if(!pendingNewProjectPath){
@@ -309,7 +312,7 @@ function render(){
   $('#mixerDock').innerHTML=mixerHtml();
   updateMixerDockLayout();updatePanelMenuButtons();
   drawRuler();bindTimeline();bindTrackTimelineScroll();bindTrackResizer();
-  current.tracks.forEach(drawWave);ensureWaveforms();updateSel();bindModelInputs();updateMuteSoloVisuals();restoreUiState();ensureSessionHistory();updateEditActionState();
+  current.tracks.forEach(drawWave);if(waveformValidationProjectId!==current.id){waveformValidationProjectId=current.id;ensureWaveforms(true)}else ensureWaveforms(false);updateSel();bindModelInputs();updateMuteSoloVisuals();restoreUiState();ensureSessionHistory();updateEditActionState();
 }
 async function createMetronomeTrack(){
   if(!current)return toast('Apri prima un progetto');
@@ -402,9 +405,13 @@ async function startTrackStemSplit(id){
 }
 function renameTrackInline(id,value){const t=trackById(id);if(!t)return;const v=String(value||'').trim();if(!v)return;t.name=v.slice(0,200);markDirty()}
 function renameTrack(id){const t=trackById(id);if(!t)return;const value=prompt('Nome traccia',t.name);if(value===null)return;const v=value.trim();if(!v)return toast('Il nome non può essere vuoto');t.name=v.slice(0,200);render();markDirty(100)}
+
+function projectFormatLabel(target=current?.target){return target==='DAW'?'Multitrack DAW':target}
+function mtaSlotLimit(target=current?.target){return target==='MTA8'?8:16}
+function setTrackMtaSlot(id,value){const t=trackById(id);if(!t)return;const n=Number(value||0),limit=mtaSlotLimit();t.mta_slot=n>=1&&n<=limit?n:null;markDirty(100);render()}
 function lane(t,W,i){const color=t.color||TRACK_COLORS[i%TRACK_COLORS.length];const anySolo=current.tracks.some(x=>x.solo);const inaudible=t.mute||(anySolo&&!t.solo);return `<div class="lane ${inaudible?'audibly-muted':''}" id="lane-${t.id}" data-track="${t.id}" style="width:${W}px;--track-color:${color}" oncontextmenu="openTrackContextMenu(event,'${t.id}')"><canvas class="wave" id="wave-${t.id}" width="${W}" height="78"></canvas><div class="waveform-progress ${t.waveform_peaks?.length?'hidden':''}" id="wave-progress-${t.id}"><div class="waveform-progress-bar" id="wave-progress-bar-${t.id}" style="width:2%"></div><span id="wave-progress-label-${t.id}">Waveform…</span></div>${(t.clips||[]).map((c,j)=>{const l=c.timeline_start_ms/1000*pxPerSec,w=(c.source_end_ms-c.source_start_ms)/1000*pxPerSec;return `<div class="clip-block" style="left:${l}px;width:${Math.max(2,w)}px"><span class="clip-label">${esc(t.name)}_${String(j+1).padStart(2,'0')}</span></div>`}).join('')}</div>`}
 
-function inspectorHtml(){const t=selectedTrack();if(!t)return `<aside class="inspector"><div class="inspector-tabs"><button class="inspector-tab active">Inspector</button><button class="inspector-tab">Stems</button><button class="inspector-tab">Metadata</button></div><div class="inspector-body"><p class="hint">Import a track to open the inspector.</p></div></aside>`;const i=current.tracks.indexOf(t);return `<aside class="inspector" id="inspector"><div class="inspector-tabs"><button class="inspector-tab active">Inspector</button><button class="inspector-tab">Stems</button><button class="inspector-tab">Metadata</button></div><div class="inspector-body"><div class="inspector-track-title"><span>◉</span>${esc(t.name)}<label class="tool" style="margin-left:auto;min-width:auto;height:28px">Replace<input type="file" accept="audio/*,.mp3,.wav" hidden onchange="replaceTrack('${t.id}',this)"></label></div><div class="inspector-row"><label>Volume</label><input class="track-volume-range" data-volume-track="${t.id}" type="range" min="-60" max="12" step="0.5" value="${t.volume_db}" oninput="setTrackVolume('${t.id}',this.value)"><input class="valuebox volume-number" id="ins-db-${t.id}" data-volume-number="${t.id}" type="number" min="-60" max="12" step="0.1" value="${Number(t.volume_db).toFixed(1)}" oninput="setTrackVolume('${t.id}',this.value)" aria-label="Volume ${esc(t.name)} in dB" title="Volume in dB"></div><div class="inspector-row"><label>Pan</label><input type="range" min="-1" max="1" step="0.01" value="${t.pan||0}" oninput="setTrackPan('${t.id}',this.value)"><div class="valuebox" id="pan-${t.id}">${Number(t.pan||0).toFixed(2)}</div></div><div class="inspector-row"><label>Type</label><select class="model-input" data-i="${i}" data-k="type">${['drums','bass','guitars','keyboards','orchestra','winds','melody','click','choirs','other'].map(x=>`<option ${x===t.type?'selected':''}>${x}</option>`).join('')}</select><div class="valuebox">${t.duration_ms?fmtTime(t.duration_ms/1000):'--'}</div></div>${insertPanelHtml(t,false)}<div class="panel-section"><div class="section-title">Track export</div><div class="track-export-actions"><button onclick="exportTrack('${t.id}','wav')">WAV</button><button onclick="exportTrack('${t.id}','mp3')">MP3</button><button onclick="exportTrack('${t.id}','flac')">FLAC</button></div></div><div class="panel-section"><div class="collapsed-row">› Send</div><div class="collapsed-row">› Track Automation</div><div class="collapsed-row">› Advanced</div></div></div></aside>`}
+function inspectorHtml(){const t=selectedTrack();if(!t)return `<aside class="inspector"><div class="inspector-tabs"><button class="inspector-tab active">Inspector</button><button class="inspector-tab">Stems</button><button class="inspector-tab">Metadata</button></div><div class="inspector-body"><p class="hint">Import a track to open the inspector.</p></div></aside>`;const i=current.tracks.indexOf(t);return `<aside class="inspector" id="inspector"><div class="inspector-tabs"><button class="inspector-tab active">Inspector</button><button class="inspector-tab">Stems</button><button class="inspector-tab">Metadata</button></div><div class="inspector-body"><div class="inspector-track-title"><span>◉</span>${esc(t.name)}<label class="tool" style="margin-left:auto;min-width:auto;height:28px">Replace<input type="file" accept="audio/*,.mp3,.wav" hidden onchange="replaceTrack('${t.id}',this)"></label></div><div class="inspector-row"><label>Volume</label><input class="track-volume-range" data-volume-track="${t.id}" type="range" min="-60" max="12" step="0.5" value="${t.volume_db}" oninput="setTrackVolume('${t.id}',this.value)"><input class="valuebox volume-number" id="ins-db-${t.id}" data-volume-number="${t.id}" type="number" min="-60" max="12" step="0.1" value="${Number(t.volume_db).toFixed(1)}" oninput="setTrackVolume('${t.id}',this.value)" aria-label="Volume ${esc(t.name)} in dB" title="Volume in dB"></div><div class="inspector-row"><label>Pan</label><input type="range" min="-1" max="1" step="0.01" value="${t.pan||0}" oninput="setTrackPan('${t.id}',this.value)"><div class="valuebox" id="pan-${t.id}">${Number(t.pan||0).toFixed(2)}</div></div><div class="inspector-row"><label>Type</label><select class="model-input" data-i="${i}" data-k="type">${['drums','bass','guitars','keyboards','orchestra','winds','melody','click','choirs','other'].map(x=>`<option ${x===t.type?'selected':''}>${x}</option>`).join('')}</select><div class="valuebox">${t.duration_ms?fmtTime(t.duration_ms/1000):'--'}</div></div><div class="inspector-row"><label>MTA Slot</label><select onchange="setTrackMtaSlot('${t.id}',this.value)"><option value="" ${!t.mta_slot?'selected':''}>Auto</option>${Array.from({length:mtaSlotLimit()},(_,n)=>`<option value="${n+1}" ${Number(t.mta_slot)===n+1?'selected':''}>${n+1}</option>`).join('')}</select><div class="valuebox">${t.mta_slot?`Slot ${t.mta_slot}`:'Auto'}</div></div>${insertPanelHtml(t,false)}<div class="panel-section"><div class="section-title">Track export</div><div class="track-export-actions"><button onclick="exportTrack('${t.id}','wav')">WAV</button><button onclick="exportTrack('${t.id}','mp3')">MP3</button><button onclick="exportTrack('${t.id}','flac')">FLAC</button></div></div><div class="panel-section"><div class="collapsed-row">› Send</div><div class="collapsed-row">› Track Automation</div><div class="collapsed-row">› Advanced</div></div></div></aside>`}
 
 function insertPanelHtml(owner,isMaster){const inserts=owner.inserts||owner.master_inserts||[];return `<div class="panel-section"><div class="panel-section-title"><span>⌄ Inserts</span><span>${inserts.length}/16</span></div><div class="insert-list">${inserts.map((x,n)=>insertHtml(x,n,isMaster)).join('')||'<div class="hint" style="padding:7px">No inserts configured.</div>'}</div>${insertAddHtml(isMaster)}</div>`}
 function pluginLabel(x){return x.replaceAll('_',' ').replace(/\b\w/g,c=>c.toUpperCase())}
@@ -476,57 +483,71 @@ function addInsert(isMaster,trackId=''){
   if(!kind)return toast('Seleziona un insert');
   if(!arr||arr.length>=16)return toast('Maximum 16 inserts per chain');
   arr.push({id:crypto.randomUUID().replaceAll('-','').slice(0,10),plugin:kind,preset,enabled:true,params:{}});
-  markDirty(100);
+  markDirty(100);queueLiveFxRefresh(isMaster,trackId);
   if(!isMaster)queueInsertWaveformRefresh(trackId||selectedTrack()?.id||'');
   if(trackId||isMaster)openMixerInsertManager(trackId||'master');else render();
 }
 function removeInsert(isMaster,id,trackId=''){
   const arr=insertArray(isMaster,trackId);if(!arr)return;
   const idx=arr.findIndex(x=>x.id===id);if(idx<0)return;
-  arr.splice(idx,1);markDirty(100);
+  arr.splice(idx,1);markDirty(100);queueLiveFxRefresh(isMaster,trackId);
   if(!isMaster)queueInsertWaveformRefresh(trackId||selectedTrack()?.id||'');
   if(trackId||isMaster)openMixerInsertManager(trackId||'master');else render();
 }
 function toggleInsert(isMaster,id,trackId=''){
   const x=insertArray(isMaster,trackId)?.find(p=>p.id===id);if(!x)return;
-  x.enabled=!x.enabled;markDirty(100);
+  x.enabled=!x.enabled;markDirty(100);queueLiveFxRefresh(isMaster,trackId);
   if(!isMaster)queueInsertWaveformRefresh(trackId||selectedTrack()?.id||'');
   if(trackId||isMaster)openMixerInsertManager(trackId||'master');else render();
 }
+function presetParamsFor(plugin,preset){
+  if(String(preset||'').startsWith('user:'))return structuredClone(pluginInfo.custom?.[plugin]?.[String(preset).slice(5)]||{});
+  return structuredClone(pluginInfo.factory_params?.[plugin]?.[preset]||defaultPluginParams(plugin));
+}
 function changeInsertPreset(isMaster,id,preset,trackId=''){
   const x=insertArray(isMaster,trackId)?.find(p=>p.id===id);if(!x)return;
-  x.preset=preset;x.params={};markDirty(100);
+  x.preset=preset;x.params=presetParamsFor(x.plugin,preset);markDirty(100);queueLiveFxRefresh(isMaster,trackId);
   if(!isMaster)queueInsertWaveformRefresh(trackId||selectedTrack()?.id||'');
-  if(playAudio||trackPlaybacks.length){
-    const pos=playCursorMs;stopPlayback();setPlayCursor(pos);setTimeout(()=>previewMaster(),140);
-  }
 }
 function editorPresetChanged(isMaster,id,preset,trackId=''){
   changeInsertPreset(isMaster,id,preset,trackId);
   setTimeout(()=>openInsertEditor(isMaster,id,trackId),30);
 }
 function defaultPluginParams(kind){const schema=pluginInfo.schemas?.[kind]||{};return Object.fromEntries(Object.entries(schema).map(([k,v])=>[k,Number(v.default??0)]))}
-function graphicEqEditorFields(schema,params){
+function graphicEqEditorFields(schema,params,isMaster,id,trackId){
   return `<div class="geq-editor">
     <div class="geq-scale"><span>+12</span><span>0</span><span>-12</span></div>
     <div class="geq-bands">${Object.entries(schema).map(([k,v])=>{
       const freq=k.slice(1),value=Number(params[k]??v.default);
       return `<label class="geq-band" title="${freq} Hz · ${value.toFixed(1)} dB">
         <span class="geq-value" id="geq-val-${k}">${value.toFixed(1)}</span>
-        <input class="plugin-param geq-slider" data-key="${k}" type="range" min="${v.min}" max="${v.max}" step="${v.step}" value="${value}" oninput="$('#geq-val-${k}').textContent=Number(this.value).toFixed(1)">
+        <input class="plugin-param geq-slider" data-key="${k}" type="range" min="${v.min}" max="${v.max}" step="${v.step}" value="${value}" oninput="$('#geq-val-${k}').textContent=Number(this.value).toFixed(1)" onchange="commitPluginEditorParams(${isMaster},'${id}','${trackId}')">
         <span class="geq-freq">${Number(freq)>=1000?(Number(freq)/1000).toFixed(Number(freq)%1000?1:0)+'k':freq}</span>
       </label>`;
     }).join('')}</div>
   </div>`;
 }
+function commitPluginEditorParams(isMaster,id,trackId=''){
+  const x=insertArray(isMaster,trackId)?.find(p=>p.id===id);if(!x)return;
+  const params={};$$('.plugin-param').forEach(el=>params[el.dataset.key]=Number(el.value));
+  x.preset='custom';x.params=params;markDirty(80);queueLiveFxRefresh(isMaster,trackId);
+  if(!isMaster)queueInsertWaveformRefresh(trackId||selectedTrack()?.id||'');
+}
+function pluginNumberKey(event,isMaster,id,trackId=''){if(event.key==='Enter'){event.preventDefault();event.currentTarget.blur();commitPluginEditorParams(isMaster,id,trackId)}}
+function syncPluginControl(key,value,source){
+  const number=$(`#plugin-param-${CSS.escape(key)}`),knob=document.querySelector(`[data-knob-key="${CSS.escape(key)}"]`);
+  if(source!=='number'&&number)number.value=value;
+  if(source!=='knob'&&knob)knob.value=value;
+  const target=knob?.closest('.plugin-knob-shell');if(target){const min=Number(knob.min),max=Number(knob.max),v=Number(value),pct=max>min?(v-min)/(max-min):0;target.style.setProperty('--knob-turn',`${-135+pct*270}deg`)}
+}
 function openInsertEditor(isMaster,id,trackId=''){
   const x=insertArray(isMaster,trackId)?.find(p=>p.id===id);if(!x)return;
   const schema=pluginInfo.schemas?.[x.plugin]||{},custom=x.preset.startsWith('user:')?pluginInfo.custom?.[x.plugin]?.[x.preset.slice(5)]:null;
   const presets=pluginInfo.inserts?.[x.plugin]||['default'];
-  const params=Object.keys(x.params||{}).length?x.params:(custom||defaultPluginParams(x.plugin));
+  const params=Object.keys(x.params||{}).length?x.params:(custom||presetParamsFor(x.plugin,x.preset));
   const fields=x.plugin==='graphic_eq_32'
-    ?graphicEqEditorFields(schema,params)
-    :Object.entries(schema).map(([k,v])=>`<label class="plugin-field"><span>${esc(k.replaceAll('_',' '))}</span><input class="plugin-param" data-key="${k}" type="number" min="${v.min}" max="${v.max}" step="${v.step}" value="${Number(params[k]??v.default)}"><small>${v.min} … ${v.max}</small></label>`).join('');
+    ?graphicEqEditorFields(schema,params,isMaster,id,trackId)
+    :Object.entries(schema).map(([k,v])=>{const value=Number(params[k]??v.default);return `<label class="plugin-field plugin-field-knob"><span>${esc(k.replaceAll('_',' '))}</span><div class="plugin-control-pair"><div class="plugin-knob-shell" style="--knob-turn:${-135+((value-Number(v.min))/(Number(v.max)-Number(v.min)||1))*270}deg" title="${esc(k.replaceAll('_',' '))}"><input class="plugin-knob" data-knob-key="${k}" type="range" min="${v.min}" max="${v.max}" step="${v.step}" value="${value}" oninput="syncPluginControl('${k}',this.value,'knob')" onchange="commitPluginEditorParams(${isMaster},'${id}','${trackId}')"></div><input class="plugin-param plugin-number" id="plugin-param-${k}" data-key="${k}" type="number" min="${v.min}" max="${v.max}" step="${v.step}" value="${value}" oninput="syncPluginControl('${k}',this.value,'number')" onblur="commitPluginEditorParams(${isMaster},'${id}','${trackId}')" onkeydown="pluginNumberKey(event,${isMaster},'${id}','${trackId}')"></div><small>${v.min} … ${v.max}</small></label>`}).join('');
   const editorHtml=`<label class="plugin-preset-row"><span>Preset</span><select onchange="editorPresetChanged(${isMaster},'${id}',this.value,'${trackId}')">${presets.map(p=>`<option value="${esc(p)}" ${p===x.preset?'selected':''}>${esc(p)}</option>`).join('')}</select></label><p class="hint">Il preset selezionato viene applicato realmente alla catena audio. I controlli sotto servono per creare una configurazione custom.</p><p class="hint">${x.plugin==='graphic_eq_32'?'Trascina graficamente i 32 fader di banda.':'Custom values are validated server-side.'}</p><div class="${x.plugin==='graphic_eq_32'?'':'plugin-param-grid'}">${fields||'<p class="hint">This processor currently exposes factory presets only.</p>'}</div><label class="preset-save-name"><span>Custom preset name</span><input id="customPresetName" maxlength="80" placeholder="My preset"></label><div class="modal-actions"><button onclick="applyInsertConfig(${isMaster},'${id}',false,'${trackId}')">Apply custom</button><button onclick="applyInsertConfig(${isMaster},'${id}',true,'${trackId}')">Save preset & apply</button><button onclick="${trackId||isMaster?`openMixerInsertManager('${trackId||'master'}')`:'closeExportMapping()'}">Cancel</button></div>`;
   if(trackId||isMaster){
     showUtilityModal(`${pluginLabel(x.plugin)} configuration`,editorHtml);
@@ -542,7 +563,7 @@ async function applyInsertConfig(isMaster,id,savePreset,trackId=''){
     const name=$('#customPresetName')?.value?.trim();if(!name)return toast('Enter a custom preset name');
     try{const r=await api('/api/presets',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({plugin:x.plugin,name,params})});pluginInfo=await api('/api/plugins');x.preset=r.preset;x.params={};toast('Custom preset saved')}catch(e){return toast(e.message)}
   }else{x.preset='custom';x.params=params}
-  closeExportMapping();markDirty(100);
+  closeExportMapping();markDirty(100);queueLiveFxRefresh(isMaster,trackId);
   if(!isMaster)queueInsertWaveformRefresh(trackId||selectedTrack()?.id||'');
   if(trackId||isMaster)openMixerInsertManager(trackId||'master');else render();
 }
@@ -560,20 +581,20 @@ function openMixerInsertManager(owner){
   requestAnimationFrame(()=>refreshPresetSelect(isMaster,isMaster?'':track.id));
 }
 function mixerHtml(){
-  const limit=current.target==='MTA8'?8:16,over=current.tracks.length>limit;
+  const limit=current.target==='DAW'?null:mtaSlotLimit(),over=limit!==null&&current.tracks.length>limit;
   const exportPane=current.export_panel_visible?exportPaneHtml(limit,over):'';
   const metaPane=current.metadata_panel_visible?metaPaneHtml():'';
   return `<div class="mixer-pane" id="mixer">
     <div class="dock-tabs"><button class="dock-tab active">Mixer</button><button class="dock-tab">Master / Preview</button><button id="realtimeBtn" class="dock-tab realtime-toggle ${current.realtime_meter_enabled?'active':''}" onclick="toggleRealtimeMeters()">RealTime</button>
       <button class="dock-tab" onclick="toggleMuteAll()">${current.tracks.length&&current.tracks.every(t=>t.mute)?'Unmute all':'Mute all'}</button><button class="dock-tab" onclick="toggleSoloAll()">${current.tracks.length&&current.tracks.every(t=>t.solo)?'Unsolo all':'Solo all'}</button><button class="dock-tab" onclick="toggleAllPlugins()">${[...(current.master_inserts||[]),...current.tracks.flatMap(t=>t.inserts||[])].some(x=>x.enabled)?'Bypass all FX':'Enable all FX'}</button>
       <div class="automix-control"><label class="switch"><input type="checkbox" ${current.auto_mix_enabled?'checked':''} onchange="setAutoMix(this.checked)"><span></span></label><b>Auto Mix</b><select id="autoMixStyle" onchange="changeAutoMixStyle(this.value)"><option value="balanced" ${current.auto_mix_style==='balanced'?'selected':''}>Balanced</option><option value="studio" ${current.auto_mix_style==='studio'?'selected':''}>Studio</option><option value="live" ${current.auto_mix_style==='live'?'selected':''}>Live</option><option value="gentle" ${current.auto_mix_style==='gentle'?'selected':''}>Gentle</option></select><button onclick="showAutoMixInfo()">?</button></div>
-      <span class="capacity-badge ${over?'over':''}">${current.tracks.length} project tracks · ${limit} ${current.target} output slots</span>
+      <span class="capacity-badge ${over?'over':''}">${current.target==='DAW'?`${current.tracks.length} project tracks · unrestricted DAW project`:`${current.tracks.length} project tracks · ${limit} ${current.target} output slots`}</span>
     </div>
     <div class="channels">${current.tracks.map((t,i)=>channelHtml(t,i)).join('')}<div class="master-divider" aria-hidden="true"></div>${masterChannelHtml()}</div>
   </div>${exportPane}${metaPane}<div id="exportMapModal" class="modal-card export-map-modal hidden"></div>`;
 }
 function exportPaneHtml(limit,over){
-  return `<div class="export-pane" id="exportPane"><div class="dock-tabs"><button class="dock-tab active">Export</button><button class="dock-tab">Single Track Export</button><button class="dock-close" onclick="toggleMixerPanel('export')" title="Nascondi Export">×</button></div><div class="export-content"><div class="export-title">Final output</div>${over?`<div class="export-warning">Project has more tracks than ${current.target}. MTA export will ask how to merge tracks into ${limit} output slots.</div>`:''}<div class="format-option ${exportFormat==='mta'?'selected':''}" onclick="selectExport('mta')"><span>▧ MTA (${current.target})</span><span>›</span></div><div class="format-option ${exportFormat==='wav'?'selected':''}" onclick="selectExport('wav')"><span>♫ WAV (24 bit, 44.1 kHz)</span><span>›</span></div><div class="format-option ${exportFormat==='mp3'?'selected':''}" onclick="selectExport('mp3')"><span>♫ MP3 (320 kbps)</span><span>›</span></div><div class="format-option ${exportFormat==='flac'?'selected':''}" onclick="selectExport('flac')"><span>♫ FLAC (lossless)</span><span>›</span></div><div class="export-actions"><button onclick="doExport('mta')">Export MTA</button><button onclick="doExport('wav')">WAV</button><button onclick="doExport('mp3')">MP3</button><button onclick="doExport('flac')">FLAC</button></div><button class="preview-master" onclick="previewMaster()">▶ Render &amp; Preview Master</button><button class="analysis-btn" onclick="showMtaAnalysis()">⌁ MTA reverse analysis</button></div></div>`;
+  return `<div class="export-pane" id="exportPane"><div class="dock-tabs"><button class="dock-tab active">Export</button><button class="dock-tab">Single Track Export</button><button class="dock-close" onclick="toggleMixerPanel('export')" title="Nascondi Export">×</button></div><div class="export-content"><div class="export-title">Final output</div>${over?`<div class="export-warning">Project has more tracks than ${current.target}. MTA export will ask how to merge tracks into ${limit} output slots.</div>`:''}<div class="format-option ${exportFormat==='mta'?'selected':''}" onclick="selectExport('mta')"><span>▧ MTA (${current.target==='DAW'?'MTA8 / MTA16':current.target})</span><span>›</span></div><div class="format-option ${exportFormat==='wav'?'selected':''}" onclick="selectExport('wav')"><span>♫ WAV (24 bit, 44.1 kHz)</span><span>›</span></div><div class="format-option ${exportFormat==='mp3'?'selected':''}" onclick="selectExport('mp3')"><span>♫ MP3 (320 kbps)</span><span>›</span></div><div class="format-option ${exportFormat==='flac'?'selected':''}" onclick="selectExport('flac')"><span>♫ FLAC (lossless)</span><span>›</span></div><div class="export-actions"><button onclick="doExport('mta')">Export MTA</button><button onclick="doExport('wav')">WAV</button><button onclick="doExport('mp3')">MP3</button><button onclick="doExport('flac')">FLAC</button></div><button class="preview-master" onclick="previewMaster()">▶ Render &amp; Preview Master</button><button class="analysis-btn" onclick="showMtaAnalysis()">⌁ MTA format analysis</button></div></div>`;
 }
 function metaPaneHtml(){
   const config={lyrics:['text','Lyrics'],chords:['chord','Chords'],markers:['label','Markers']},[key,label]=config[mixerMetaTab]||config.lyrics,rows=current[mixerMetaTab]||[];
@@ -646,26 +667,25 @@ function resetTrackPan(id){setTrackPan(id,0)}
 function channelHtml(t,i){
   const anySolo=current.tracks.some(x=>x.solo),inaudible=t.mute||(anySolo&&!t.solo);
   const color=t.color||TRACK_COLORS[i%TRACK_COLORS.length],pan=clampPan(t.pan),angle=pan*55;
-  const staticLevel=Math.max(4,Math.min(100,(Number(t.volume_db)+60)/72*100));
   const outChannels=effectiveTrackChannels(t),stereoByFx=Number(t.channels)===1&&outChannels===2;
   return `<div class="channel ${inaudible?'audibly-muted':''}" data-channel-track="${t.id}" style="--track-color:${color}">
     <div class="channel-name">${esc(t.name)}</div>
     <div class="pan-control">
       <div id="pan-knob-${t.id}" class="pan-knob interactive" style="--pan-angle:${angle}deg" title="Pan ${pan.toFixed(2)} · trascina, doppio click = center" onpointerdown="startPanDrag(event,'${t.id}')" ondblclick="resetTrackPan('${t.id}')" role="slider" tabindex="0" aria-valuemin="-1" aria-valuemax="1" aria-valuenow="${pan.toFixed(2)}"></div>
-      <input id="pan-input-${t.id}" class="pan-value-input" type="number" min="-1" max="1" step="0.01" value="${pan.toFixed(2)}" oninput="setTrackPan('${t.id}',this.value)" aria-label="Pan ${esc(t.name)}">
+      <input id="pan-input-${t.id}" class="pan-value-input" type="number" min="-1" max="1" step="0.01" value="${pan.toFixed(2)}" onchange="setTrackPan('${t.id}',this.value)" onkeydown="if(event.key==='Enter')this.blur()" aria-label="Pan ${esc(t.name)}">
       <span id="pan-label-${t.id}" class="pan-label">${panLabel(pan)}</span>
     </div>
     <div class="channel-buttons"><button data-mute-track="${t.id}" class="${t.mute?'on':''}" onclick="toggleBool(this,'${t.id}','mute')">M</button><button data-solo-track="${t.id}" class="${t.solo?'on':''}" onclick="toggleBool(this,'${t.id}','solo')">S</button><button class="channel-fx ${t.inserts?.length?'active':''}" onclick="openMixerInsertManager('${t.id}')" title="Gestisci insert">FX${t.inserts?.length?` ${t.inserts.length}`:''}</button></div>
     <div class="channel-mode">${outChannels===1?'MONO':(stereoByFx?'STEREO · FX':'STEREO')}</div>
     <div class="channel-fader-area"><input class="v-fader track-volume-range" data-volume-track="${t.id}" type="range" min="-60" max="12" step="0.5" value="${t.volume_db}" oninput="setTrackVolume('${t.id}',this.value)">
-      <div class="meter-pair"><div class="meter meter-static" title="Volume impostato"><span style="height:${staticLevel}%"></span></div>${outChannels===1?`<div class="meter meter-realtime ${current.realtime_meter_enabled?'':'hidden'}" title="VU mono"><span id="vu-${t.id}-M" style="height:0%"></span><em>M</em></div>`:`<div class="meter meter-realtime ${current.realtime_meter_enabled?'':'hidden'}" title="VU Left"><span id="vu-${t.id}-L" style="height:0%"></span><em>L</em></div><div class="meter meter-realtime ${current.realtime_meter_enabled?'':'hidden'}" title="VU Right"><span id="vu-${t.id}-R" style="height:0%"></span><em>R</em></div>`}</div>
+      <div class="meter-pair">${outChannels===1?`<div class="meter meter-realtime ${current.realtime_meter_enabled?'':'hidden'}" title="VU mono"><span id="vu-${t.id}-M" style="height:0%"></span><em>M</em></div>`:`<div class="meter meter-realtime ${current.realtime_meter_enabled?'':'hidden'}" title="VU Left"><span id="vu-${t.id}-L" style="height:0%"></span><em>L</em></div><div class="meter meter-realtime ${current.realtime_meter_enabled?'':'hidden'}" title="VU Right"><span id="vu-${t.id}-R" style="height:0%"></span><em>R</em></div>`}</div>
     </div>
-    <input class="channel-value volume-number" id="mix-db-${t.id}" data-volume-number="${t.id}" type="number" min="-60" max="12" step="0.1" value="${Number(t.volume_db).toFixed(1)}" oninput="setTrackVolume('${t.id}',this.value)" aria-label="Volume ${esc(t.name)} in dB" title="Volume in dB">
+    <input class="channel-value volume-number" id="mix-db-${t.id}" data-volume-number="${t.id}" type="number" min="-60" max="12" step="0.1" value="${Number(t.volume_db).toFixed(1)}" onchange="setTrackVolume('${t.id}',this.value)" onkeydown="if(event.key==='Enter')this.blur()" aria-label="Volume ${esc(t.name)} in dB" title="Volume in dB">
   </div>`;
 }
 function masterChannelHtml(){
   const v=current.master_volume_db||0,fx=current.master_inserts||[];
-  return `<div class="channel master" style="--track-color:#644ce5"><div class="channel-name">MASTER</div><div class="pan-knob"></div><div class="channel-buttons"><button class="channel-fx master-fx ${fx.length?'active':''}" onclick="openMixerInsertManager('master')" title="Gestisci insert Master">FX${fx.length?` ${fx.length}`:''}</button></div><div class="channel-fader-area"><input id="master-volume-range" class="v-fader" type="range" min="-60" max="12" step="0.5" value="${v}" oninput="setMasterVolume(this.value)"><div class="meter-pair master-meter-pair"><div class="meter meter-static" title="Volume master impostato"><span style="height:${Math.max(4,Math.min(100,(Number(v)+60)/72*100))}%"></span></div><div class="meter meter-realtime ${current.realtime_meter_enabled?'':'hidden'}" title="Master Left"><span id="vu-master-L" style="height:0%"></span><em>L</em></div><div class="meter meter-realtime ${current.realtime_meter_enabled?'':'hidden'}" title="Master Right"><span id="vu-master-R" style="height:0%"></span><em>R</em></div></div></div><input class="channel-value volume-number" id="master-db" type="number" min="-60" max="12" step="0.1" value="${Number(v).toFixed(1)}" oninput="setMasterVolume(this.value)" aria-label="Master volume in dB" title="Master volume in dB"></div>`;
+  return `<div class="channel master" style="--track-color:#644ce5"><div class="channel-name">MASTER</div><div class="pan-knob"></div><div class="channel-buttons"><button class="channel-fx master-fx ${fx.length?'active':''}" onclick="openMixerInsertManager('master')" title="Gestisci insert Master">FX${fx.length?` ${fx.length}`:''}</button></div><div class="channel-fader-area"><input id="master-volume-range" class="v-fader" type="range" min="-60" max="12" step="0.5" value="${v}" oninput="setMasterVolume(this.value)"><div class="meter-pair master-meter-pair"><div class="meter meter-realtime ${current.realtime_meter_enabled?'':'hidden'}" title="Master Left"><span id="vu-master-L" style="height:0%"></span><em>L</em></div><div class="meter meter-realtime ${current.realtime_meter_enabled?'':'hidden'}" title="Master Right"><span id="vu-master-R" style="height:0%"></span><em>R</em></div></div></div><input class="channel-value volume-number" id="master-db" type="number" min="-60" max="12" step="0.1" value="${Number(v).toFixed(1)}" onchange="setMasterVolume(this.value)" onkeydown="if(event.key==='Enter')this.blur()" aria-label="Master volume in dB" title="Master volume in dB"></div>`;
 }
 async function setAutoMix(enabled){if(!current)return;try{collect();await api('/api/projects/'+current.id,{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify(current)});const style=$('#autoMixStyle')?.value||current.auto_mix_style||'balanced';current=await api(`/api/projects/${current.id}/auto-mix`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({enabled,style})});render();toast(enabled?'Auto Mix applied. Toggle off to restore your previous mix.':'Auto Mix removed; previous mix restored.')}catch(e){toast(e.message);render()}}
 async function changeAutoMixStyle(style){current.auto_mix_style=style;if(current.auto_mix_enabled)await setAutoMix(true)}
@@ -726,16 +746,105 @@ async function save(){
   finally{autosaveBusy=false}
 }
 function selectTrack(id){captureUiState();selectedTrackId=id;render()}
-function toggleBool(btn,id,k){const t=trackById(id);if(!t)return;t[k]=!t[k];updateMuteSoloVisuals();markDirty();toast(k==='mute'?(t[k]?'Mute attivato':'Mute disattivato'):(t[k]?'Solo attivato':'Solo disattivato'))}
+function trackAudibleNow(track){
+  if(!track||track.mute)return false;
+  const anySolo=(current?.tracks||[]).some(t=>t.solo);
+  return !anySolo||!!track.solo;
+}
+function playbackGainForTrack(track,item=null){
+  if(!track)return 0;
+  if(item?.respectMuteSolo!==false&&!trackAudibleNow(track))return 0;
+  return dbToGain(Number(track.volume_db||0)+Number(current?.master_volume_db||0));
+}
+function updatePlaybackGains(){
+  const now=audioCtx?.currentTime||0;
+  for(const item of trackPlaybacks){
+    const track=trackById(item.trackId);if(!track||!item.gainNode)continue;
+    item.gainNode.gain.setValueAtTime(playbackGainForTrack(track,item),now);
+  }
+}
+function refreshRenderedMasterForMixState(){
+  if(!renderedMasterPlayback)return;
+  if(playbackPaused||!playAudio||playAudio.paused){renderedMasterDirty=true;return}
+  if(renderedMasterRefreshPromise)return;
+  renderedMasterRefreshPromise=(async()=>{
+    const previous=playAudio,cursor=playCursorMs,token=++playbackToken;
+    try{
+      collect();
+      await persistCurrentProject(false);
+      const audio=new Audio(`/api/projects/${current.id}/preview-mix?t=${Date.now()}`);
+      await new Promise((resolve,reject)=>{audio.addEventListener('loadedmetadata',resolve,{once:true});audio.addEventListener('error',()=>reject(new Error('Anteprima renderizzata non disponibile')),{once:true});audio.load()});
+      if(token!==playbackToken)return;
+      audio.currentTime=Math.min(cursor/1000/tempoRatio(),Math.max(0,(audio.duration||0)-0.01));
+      renderedMasterBaseVolumeDb=Number(current?.master_volume_db||0);
+      const graph=await attachPlaybackGraph(audio,{volume_db:0,pan:0},2,false,true,false);
+      graph.gainNode.gain.setValueAtTime(1,audioCtx?.currentTime||0);
+      await audio.play();
+      try{previous.pause();previous.src=''}catch(e){}
+      playAudio=audio;renderedMasterAudio=audio;masterPlaybackGainNode=graph.gainNode;masterMeterAnalysers=graph.analysers;
+      renderedMasterDirty=false;
+      if(current?.follow_playback_enabled)followPlayhead(playCursorMs/1000*pxPerSec,true);
+      if(!playRaf)playRaf=requestAnimationFrame(movePlayhead);
+    }catch(e){
+      renderedMasterDirty=true;
+      console.warn('Aggiornamento live del master renderizzato fallito',e);
+    }finally{renderedMasterRefreshPromise=null}
+  })();
+}
+function applyLiveMuteSolo(){
+  updatePlaybackGains();
+  refreshRenderedMasterForMixState();
+}
+function queueRenderedMasterRefresh(delay=90){
+  if(!renderedMasterPlayback)return;
+  clearTimeout(liveFxRefreshTimers.master);
+  liveFxRefreshTimers.master=setTimeout(()=>{
+    delete liveFxRefreshTimers.master;
+    refreshRenderedMasterForMixState();
+  },delay);
+}
+async function refreshDynamicTrackPlayback(trackId){
+  if(renderedMasterPlayback||playbackPaused||!playbackActuallyRunning())return;
+  const track=trackById(trackId);if(!track)return;
+  const oldIndex=trackPlaybacks.findIndex(item=>item.trackId===trackId);
+  if(oldIndex<0)return;
+  const oldItem=trackPlaybacks[oldIndex],wasClock=playAudio===oldItem.audio;
+  try{
+    collect();
+    await persistCurrentProject(false);
+    const replacement=await makeTrackPlayback(track,true,false,true);
+    replacement.audio.currentTime=Math.min(playCursorMs/1000/tempoRatio(),Math.max(0,(replacement.audio.duration||0)-0.01));
+    await replacement.audio.play();
+    trackPlaybacks.splice(oldIndex,1,replacement);
+    if(wasClock)playAudio=replacement.audio;
+    try{oldItem.audio.pause();oldItem.audio.src=''}catch(e){}
+    updatePlaybackGains();
+  }catch(e){console.warn('Aggiornamento live FX traccia fallito',trackId,e)}
+}
+function queueLiveFxRefresh(isMaster,trackId='',delay=90){
+  if(!playAudio&&!trackPlaybacks.length)return;
+  if(isMaster||renderedMasterPlayback){
+    queueRenderedMasterRefresh(delay);
+    return;
+  }
+  const id=trackId||selectedTrack()?.id||'';
+  if(!id)return;
+  clearTimeout(liveFxRefreshTimers[id]);
+  liveFxRefreshTimers[id]=setTimeout(()=>{
+    delete liveFxRefreshTimers[id];
+    refreshDynamicTrackPlayback(id);
+  },delay);
+}
+function toggleBool(btn,id,k){const t=trackById(id);if(!t)return;t[k]=!t[k];updateMuteSoloVisuals();applyLiveMuteSolo();markDirty();toast(k==='mute'?(t[k]?'Mute attivato':'Mute disattivato'):(t[k]?'Solo attivato':'Solo disattivato'))}
 function toggleMuteAll(){
   if(!current?.tracks?.length)return;
   const next=!current.tracks.every(t=>t.mute);
-  current.tracks.forEach(t=>{t.mute=next});updateMuteSoloVisuals();markDirty();render();toast(next?'Mute attivato su tutte le tracce':'Mute rimosso da tutte le tracce');
+  current.tracks.forEach(t=>{t.mute=next});updateMuteSoloVisuals();applyLiveMuteSolo();markDirty();render();toast(next?'Mute attivato su tutte le tracce':'Mute rimosso da tutte le tracce');
 }
 function toggleSoloAll(){
   if(!current?.tracks?.length)return;
   const next=!current.tracks.every(t=>t.solo);
-  current.tracks.forEach(t=>{t.solo=next});updateMuteSoloVisuals();markDirty();render();toast(next?'Solo attivato su tutte le tracce':'Solo rimosso da tutte le tracce');
+  current.tracks.forEach(t=>{t.solo=next});updateMuteSoloVisuals();applyLiveMuteSolo();markDirty();render();toast(next?'Solo attivato su tutte le tracce':'Solo rimosso da tutte le tracce');
 }
 function toggleAllPlugins(){
   if(!current)return;
@@ -743,7 +852,8 @@ function toggleAllPlugins(){
   if(!plugins.length)return toast('Nessun plugin configurato');
   const enable=!plugins.some(x=>x.enabled);
   plugins.forEach(x=>{x.enabled=enable});
-  for(const t of current.tracks){if(t.inserts?.length)queueInsertWaveformRefresh(t.id)}
+  for(const t of current.tracks){if(t.inserts?.length){queueInsertWaveformRefresh(t.id);queueLiveFxRefresh(false,t.id)}}
+  if((current.master_inserts||[]).length)queueLiveFxRefresh(true,'');
   markDirty(100);render();toast(enable?'Tutti i plugin abilitati':'Bypass di tutti i plugin attivato');
 }
 function updateMuteSoloVisuals(){
@@ -761,27 +871,23 @@ function normalizeVolume(v){const n=Number(v);if(!Number.isFinite(n))return null
 function setTrackVolume(id,v){
   const t=trackById(id),n=normalizeVolume(v);if(!t||n===null)return;
   t.volume_db=n;
-  const item=trackPlaybacks.find(x=>x.trackId===id);
-  if(item?.gainNode)item.gainNode.gain.setValueAtTime(dbToGain(n+Number(current?.master_volume_db||0)),audioCtx?.currentTime||0);
+  updatePlaybackGains();
+  if(renderedMasterPlayback)queueRenderedMasterRefresh();
   $$(`[data-volume-track="${id}"]`).forEach(el=>{if(Number(el.value)!==n)el.value=n});
   $$(`[data-volume-number="${id}"]`).forEach(el=>{if(document.activeElement!==el||String(el.value)!==String(v))el.value=n.toFixed(1)});
   markDirty();
 }
 function dbToGain(db){return Math.pow(10,Number(db||0)/20)}
-function updatePlaybackGains(){
-  for(const item of trackPlaybacks){
-    const track=trackById(item.trackId);if(!track||!item.gainNode)continue;
-    const totalDb=Number(track.volume_db||0)+Number(current?.master_volume_db||0);
-    item.gainNode.gain.setValueAtTime(dbToGain(totalDb),audioCtx?.currentTime||0);
-  }
-}
 function setMasterVolume(v){
   const n=normalizeVolume(v);if(!current||n===null)return;
   current.master_volume_db=n;
   if($('#master-volume-range')&&Number($('#master-volume-range').value)!==n)$('#master-volume-range').value=n;
   if($('#master-db')&&document.activeElement!==$('#master-db'))$('#master-db').value=n.toFixed(1);
   updatePlaybackGains();
-  if(masterPlaybackGainNode)masterPlaybackGainNode.gain.setValueAtTime(dbToGain(n),audioCtx?.currentTime||0);
+  if(masterPlaybackGainNode){
+    const liveDb=renderedMasterPlayback?n-renderedMasterBaseVolumeDb:n;
+    masterPlaybackGainNode.gain.setValueAtTime(dbToGain(liveDb),audioCtx?.currentTime||0);
+  }
   markDirty();
 }
 function setTrackPan(id,v){
@@ -789,6 +895,7 @@ function setTrackPan(id,v){
   const n=clampPan(v);t.pan=n;updatePanUi(id,n);
   const item=trackPlaybacks.find(x=>x.trackId===id);
   if(item?.panner)item.panner.pan.setValueAtTime(n,audioCtx?.currentTime||0);
+  if(renderedMasterPlayback)queueRenderedMasterRefresh();
   markDirty(120);
 }
 
@@ -833,11 +940,12 @@ function updateWaveProgress(trackId,pct,message){
   const box=$(`#wave-progress-${trackId}`),bar=$(`#wave-progress-bar-${trackId}`),label=$(`#wave-progress-label-${trackId}`);
   if(!box)return;box.classList.remove('hidden');if(bar)bar.style.width=`${Math.max(2,Math.min(100,Number(pct)||0))}%`;if(label)label.textContent=message||'Waveform…';
 }
-async function ensureWaveforms(){
-  // Persisted peaks are drawn immediately, then the server validates their revision.
+async function ensureWaveforms(validateExisting=false){
+  // Selection/rerender must not trigger waveform work. Existing persisted peaks are
+  // validated once when a project is opened; later renders only request missing peaks.
   // This keeps project opening fast while guaranteeing stale/missing waveforms are regenerated and saved.
   for(const t of current?.tracks||[]){
-    if(t.waveform_peaks?.length)drawWave(t);
+    if(t.waveform_peaks?.length){drawWave(t);if(!validateExisting)continue}
     if(waveformJobs[t.id])continue;
     try{
       const job=await api(`/api/projects/${current.id}/tracks/${t.id}/waveform-jobs`,{method:'POST'});
@@ -1015,7 +1123,7 @@ function openStemWorkflow(){
       <label class="workflow-field"><span>Destinazione</span><select id="stemProjectMode" onchange="updateStemWorkflowMode()"><option value="existing" ${current?'selected':''}>Progetto corrente${current?`: ${esc(current.title)}`:''}</option><option value="new" ${current?'':'selected'}>Nuovo progetto persistente</option></select></label>
       <label class="workflow-field" id="stemProjectNameRow"><span>Nome nuovo progetto</span><input id="stemProjectTitle" maxlength="200" value="${esc(defaultName)}"></label>
       <div class="workflow-grid">
-        <label class="workflow-field"><span>Tipo progetto</span><select id="stemProjectTarget"><option value="MTA8">MTA8</option><option value="MTA16">MTA16</option></select></label>
+        <label class="workflow-field"><span>Tipo progetto</span><select id="stemProjectTarget"><option value="DAW">Multitrack DAW</option><option value="MTA8">MTA8</option><option value="MTA16">MTA16</option></select></label>
         <label class="workflow-field"><span>Modello AI</span><select id="stemWorkflowModel">${models}</select></label>
       </div>
       <label class="workflow-field"><span>Brano completo MP3</span><input id="stemWorkflowFile" type="file" accept=".mp3,audio/mpeg"></label>
@@ -1231,7 +1339,7 @@ function updateVuMeters(token=meterRunToken){
     if(token===meterRunToken)updateVuMeters(token);
   });
 }
-async function attachPlaybackGraph(audio,track,channels=2,silent=false,masterRendered=false){
+async function attachPlaybackGraph(audio,track,channels=2,silent=false,masterRendered=false,respectMuteSolo=true){
   audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();
   await audioCtx.resume();
   const source=audioCtx.createMediaElementSource(audio);
@@ -1240,7 +1348,10 @@ async function attachPlaybackGraph(audio,track,channels=2,silent=false,masterRen
   const db=masterRendered
     ? Number(current?.master_volume_db||0)
     : Number(track?.volume_db||0)+Number(current?.master_volume_db||0);
-  gainNode.gain.value=silent?0:dbToGain(db);
+  const audible=masterRendered||!respectMuteSolo||trackAudibleNow(track);
+  // Meter-only playback keeps the real level up to the analysers and is
+  // silenced only at the destination sink below.
+  gainNode.gain.value=!audible?0:dbToGain(db);
   panner.pan.value=clampPan(track?.pan||0);
   source.connect(gainNode);gainNode.connect(panner);
   const zero=audioCtx.createGain();zero.gain.value=0;zero.connect(audioCtx.destination);
@@ -1259,24 +1370,84 @@ async function attachPlaybackGraph(audio,track,channels=2,silent=false,masterRen
   }
   return {analysers,gainNode,panner};
 }
-async function makeTrackPlayback(track,renderFilters,silent=false){
+async function makeTrackPlayback(track,renderFilters,silent=false,respectMuteSolo=true){
   const audio=new Audio(`/api/projects/${current.id}/preview-track/${track.id}?render=${renderFilters?'true':'false'}&t=${Date.now()}`);
   audio.preload='auto';
   const channels=renderFilters?effectiveTrackChannels(track):(Number(track.channels)===1?1:2);
-  const graph=await attachPlaybackGraph(audio,track,channels,silent);
+  const graph=await attachPlaybackGraph(audio,track,channels,silent,false,respectMuteSolo);
   await new Promise((resolve,reject)=>{audio.addEventListener('loadedmetadata',resolve,{once:true});audio.addEventListener('error',()=>reject(new Error(`Preview non disponibile: ${track.name}`)),{once:true});audio.load()});
   audio.currentTime=Math.min(playCursorMs/1000/tempoRatio(),Math.max(0,(audio.duration||0)-0.01));
   audio.addEventListener('ended',()=>requestAnimationFrame(()=>{
     if(!playbackActuallyRunning())resetVuMeters();
   }));
-  return {trackId:track.id,audio,analysers:graph.analysers,channels,silent,meterData:{},gainNode:graph.gainNode,panner:graph.panner};
+  return {trackId:track.id,audio,analysers:graph.analysers,channels,silent,respectMuteSolo,meterData:{},gainNode:graph.gainNode,panner:graph.panner};
+}
+function waitForMediaBuffer(audio,label='traccia',timeoutMs=30000){
+  if(audio.readyState>=4)return Promise.resolve();
+  return new Promise((resolve,reject)=>{
+    let done=false;
+    const finish=()=>{if(done)return;done=true;cleanup();resolve()};
+    const fail=()=>{if(done)return;done=true;cleanup();reject(new Error(`Buffering non riuscito: ${label}`))};
+    const cleanup=()=>{clearTimeout(timer);audio.removeEventListener('canplaythrough',finish);audio.removeEventListener('error',fail)};
+    const timer=setTimeout(()=>audio.readyState>=3?finish():fail(),timeoutMs);
+    audio.addEventListener('canplaythrough',finish,{once:true});
+    audio.addEventListener('error',fail,{once:true});
+    audio.load();
+  });
+}
+function stopDynamicSyncMonitor(){
+  if(dynamicSyncTimer){clearInterval(dynamicSyncTimer);dynamicSyncTimer=null}
+  dynamicSyncClock=null;
+}
+function dynamicClockAudio(){
+  if(renderedMasterPlayback&&renderedMasterAudio)return renderedMasterAudio;
+  return dynamicSyncClock?.audio||playAudio||trackPlaybacks[0]?.audio||null;
+}
+function alignDynamicTracks(force=false){
+  if(renderedMasterPlayback||playbackPaused||!trackPlaybacks.length)return;
+  const clock=dynamicClockAudio();if(!clock||clock.paused||clock.ended)return;
+  const ref=clock.currentTime;
+  for(const item of trackPlaybacks){
+    if(item.audio===clock||item.audio.paused||item.audio.ended)continue;
+    const drift=item.audio.currentTime-ref;
+    if(force||Math.abs(drift)>0.018){
+      try{item.audio.currentTime=ref}catch(e){}
+    }
+  }
+}
+function startDynamicSyncMonitor(){
+  stopDynamicSyncMonitor();
+  dynamicSyncClock=trackPlaybacks[0]||null;
+  dynamicSyncTimer=setInterval(()=>alignDynamicTracks(false),120);
 }
 async function startDynamicTrackPreview(renderFilters,silentMeters=false){
-  const anySolo=current.tracks.some(t=>t.solo),audible=current.tracks.filter(t=>!t.mute&&(!anySolo||t.solo));
-  const items=await Promise.all(audible.map(t=>makeTrackPlayback(t,renderFilters,silentMeters)));
-  trackPlaybacks.push(...items);await Promise.all(items.map(item=>item.audio.play()));
-  if(current.realtime_meter_enabled&&!meterRaf)startVuMeterLoop();
-  return items[0]?.audio||null;
+  // Every dynamic track is completely buffered before transport starts. Once
+  // ready, all media elements are armed at the same position and started in one
+  // Promise turn; a common clock then corrects any decoder drift during playback.
+  playbackBuffering=true;
+  showMediaProgress('Buffering tracce',5,'Buffering audio… attendere');
+  try{
+    const items=await Promise.all((current.tracks||[]).map(t=>makeTrackPlayback(t,renderFilters,silentMeters,true)));
+    showMediaProgress('Buffering tracce',55,'Sincronizzazione tracce… attendere');
+    await Promise.all(items.map((item,i)=>waitForMediaBuffer(item.audio,current.tracks[i]?.name||`traccia ${i+1}`)));
+    const sec=playCursorMs/1000/tempoRatio();
+    for(const item of items){
+      item.audio.pause();
+      item.audio.currentTime=Math.min(sec,Math.max(0,(item.audio.duration||0)-0.01));
+    }
+    trackPlaybacks.push(...items);
+    updatePlaybackGains();
+    showMediaProgress('Buffering tracce',90,'Avvio sincronizzato…');
+    await Promise.all(items.map(item=>item.audio.play()));
+    dynamicSyncClock=items[0]||null;
+    alignDynamicTracks(true);
+    startDynamicSyncMonitor();
+    $('#utilityBackdrop')?.classList.add('hidden');
+    if(current.realtime_meter_enabled&&!meterRaf)startVuMeterLoop();
+    return items[0]?.audio||null;
+  }finally{
+    playbackBuffering=false;
+  }
 }
 
 function stopPlayback(){
@@ -1287,6 +1458,9 @@ function stopPlayback(){
   if(playAudio){playAudio.pause();playAudio.currentTime=0;playAudio=null}
   for(const item of trackPlaybacks){try{item.audio.pause();item.audio.currentTime=0;item.audio.src=''}catch(e){}}
   trackPlaybacks=[];masterMeterAnalysers=null;masterPlaybackGainNode=null;
+  renderedMasterPlayback=false;renderedMasterDirty=false;renderedMasterRefreshPromise=null;renderedMasterBaseVolumeDb=0;renderedMasterAudio=null;
+  stopDynamicSyncMonitor();
+  for(const key of Object.keys(liveFxRefreshTimers)){clearTimeout(liveFxRefreshTimers[key]);delete liveFxRefreshTimers[key]}
   resetVuMeters();
   requestAnimationFrame(resetVuMeters);
   if($('#playMaster')){$('#playMaster').textContent='▶';$('#playMaster').title='Play / Preview'}
@@ -1301,23 +1475,45 @@ function pausePlayback(){
   if($('#playMaster')){$('#playMaster').textContent='▶';$('#playMaster').title='Riprendi'}
 }
 async function resumePlayback(){
+  if(renderedMasterPlayback&&renderedMasterDirty)return previewMaster();
   const audios=[...new Set([playAudio,...trackPlaybacks.map(item=>item.audio)].filter(Boolean))];
   if(!audios.length)return previewMaster();
+  const ref=playCursorMs/1000/tempoRatio();
+  for(const audio of audios)try{audio.currentTime=Math.min(ref,Math.max(0,(audio.duration||0)-0.01))}catch(e){}
   await Promise.all(audios.map(audio=>audio.play()));
   playbackPaused=false;
+  if(!renderedMasterPlayback){alignDynamicTracks(true);startDynamicSyncMonitor()}
   if($('#playMaster')){$('#playMaster').textContent='❚❚';$('#playMaster').title='Pausa'}
   playRaf=requestAnimationFrame(movePlayhead);
   if(current?.realtime_meter_enabled&&!meterRaf)meterRaf=requestAnimationFrame(updateVuMeters);
+}
+function goTransportStart(){
+  setPlayCursor(0);
+  if(renderedMasterAudio)try{renderedMasterAudio.currentTime=0}catch(e){}
+  if(playAudio)try{playAudio.currentTime=0}catch(e){}
+  for(const item of trackPlaybacks)try{item.audio.currentTime=0}catch(e){}
+  alignDynamicTracks(true);
+  if($('#transportTime'))$('#transportTime').textContent='00:00.000';
+  if($('#playhead'))$('#playhead').style.left='0px';
+  if(current?.follow_playback_enabled)followPlayhead(0,true);
 }
 async function togglePlayback(){
   if(playbackPaused)return resumePlayback();
   if(playAudio&&!playAudio.paused)return pausePlayback();
   return previewMaster();
 }
-function seekTransport(deltaMs){setPlayCursor(Math.max(0,playCursorMs+deltaMs));const sec=playCursorMs/1000/tempoRatio();if(playAudio)playAudio.currentTime=sec;for(const item of trackPlaybacks)try{item.audio.currentTime=sec}catch(e){}}
+function seekTransport(deltaMs){
+  setPlayCursor(Math.max(0,playCursorMs+deltaMs));
+  const sec=playCursorMs/1000/tempoRatio();
+  if(renderedMasterAudio)try{renderedMasterAudio.currentTime=sec}catch(e){}
+  if(playAudio)try{playAudio.currentTime=sec}catch(e){}
+  for(const item of trackPlaybacks)try{item.audio.currentTime=sec}catch(e){}
+  alignDynamicTracks(true);
+  if(current?.follow_playback_enabled)followPlayhead(playCursorMs/1000*pxPerSec,true);
+}
 async function previewTrack(id){
   const t=trackById(id);if(!t)return;stopPlayback();
-  try{const item=await makeTrackPlayback(t,true,false);trackPlaybacks=[item];playAudio=item.audio;await item.audio.play();requestAnimationFrame(movePlayhead);if(current.realtime_meter_enabled)startVuMeterLoop()}catch(e){toast(e.message)}
+  try{const item=await makeTrackPlayback(t,true,false,false);trackPlaybacks=[item];playAudio=item.audio;await item.audio.play();requestAnimationFrame(movePlayhead);if(current.realtime_meter_enabled)startVuMeterLoop()}catch(e){toast(e.message)}
 }
 async function previewMaster(){
   if(!current||!current.tracks.length)return;
@@ -1325,7 +1521,9 @@ async function previewMaster(){
     await flushAutosave(false);stopPlayback();const token=++playbackToken;
     const needsRenderedMaster=!!current.render_preview_enabled||Math.abs(Number(current.master_volume_db||0))>0.001||(current.master_inserts||[]).some(x=>x.enabled);
     if(needsRenderedMaster){
-      const audio=new Audio(`/api/projects/${current.id}/preview-mix?t=${Date.now()}`);playAudio=audio;
+      renderedMasterPlayback=true;renderedMasterDirty=false;
+      renderedMasterBaseVolumeDb=Number(current.master_volume_db||0);
+      const audio=new Audio(`/api/projects/${current.id}/preview-mix?t=${Date.now()}`);playAudio=audio;renderedMasterAudio=audio;
       await new Promise((resolve,reject)=>{audio.addEventListener('loadedmetadata',resolve,{once:true});audio.addEventListener('error',()=>reject(new Error('Anteprima renderizzata non disponibile')),{once:true});audio.load()});
       if(token!==playbackToken)return;
       audio.currentTime=Math.min(playCursorMs/1000/tempoRatio(),Math.max(0,(audio.duration||0)-0.01));
@@ -1333,21 +1531,29 @@ async function previewMaster(){
         const masterGraph=await attachPlaybackGraph(audio,{volume_db:0,pan:0},2,false,true);
         masterMeterAnalysers=masterGraph.analysers;
         masterPlaybackGainNode=masterGraph.gainNode;
+        masterPlaybackGainNode.gain.setValueAtTime(1,audioCtx?.currentTime||0);
         await startDynamicTrackPreview(true,true);
       }else{
         const masterGraph=await attachPlaybackGraph(audio,{volume_db:0,pan:0},2,false,true);
         masterPlaybackGainNode=masterGraph.gainNode;
+        masterPlaybackGainNode.gain.setValueAtTime(1,audioCtx?.currentTime||0);
       }
       await audio.play();
     }else{
+      renderedMasterPlayback=false;renderedMasterDirty=false;renderedMasterAudio=null;
       playAudio=await startDynamicTrackPreview(true,false);
     }
-    if(!playAudio)return;playbackPaused=false;$('#playMaster').textContent='❚❚';$('#playMaster').title='Pausa';requestAnimationFrame(movePlayhead);toast(needsRenderedMaster?'Anteprima Master: volume e insert applicati':'Anteprima dinamica tracce');
+    if(!playAudio)return;playbackPaused=false;$('#playMaster').textContent='❚❚';$('#playMaster').title='Pausa';
+    if(current?.follow_playback_enabled)followPlayhead(playCursorMs/1000*pxPerSec,true);
+    requestAnimationFrame(movePlayhead);
+    toast(needsRenderedMaster?'Anteprima Master: volume e insert applicati':'Anteprima dinamica tracce');
   }catch(e){stopPlayback();toast(e.message)}
 }
 function movePlayhead(){
-  if(!playAudio||playAudio.paused)return;
-  playCursorMs=playAudio.currentTime*1000*tempoRatio();
+  const clock=dynamicClockAudio();
+  if(!clock||clock.paused)return;
+  playCursorMs=clock.currentTime*1000*tempoRatio();
+  if(!renderedMasterPlayback)alignDynamicTracks(false);
   const playheadX=playCursorMs/1000*pxPerSec;
   if($('#playhead'))$('#playhead').style.left=playheadX+'px';
   followPlayhead(playheadX);
@@ -1374,8 +1580,19 @@ async function doExport(format=exportFormat){
   current.export_format=format;
   markDirty(100);
   const safe=(current.title||'project').replace(/[^A-Za-z0-9._ -]+/g,'_').trim()||'project';
-  const targetExt=current.target==='MTA8'?'mta8':'mta16';
+  const initialMtaTarget=current.target==='DAW'?'MTA16':current.target;
+  const targetExt=initialMtaTarget==='MTA8'?'mta8':'mta16';
   const ext=format==='mta'?targetExt:format;
+  const mtaProfile=current.mta_device_profile||'auto';
+  const mtaTargetField=format==='mta'&&current.target==='DAW'?`<label class="workflow-field"><span>Formato MTA di destinazione</span><select id="exportMtaTarget"><option value="MTA8">MTA8</option><option value="MTA16" selected>MTA16</option></select></label>`:'';
+  const mtaProfileField=format==='mta'?`<label class="workflow-field"><span>Profilo dispositivo MTA</span><select id="exportMtaProfile">
+    <option value="auto" ${mtaProfile==='auto'?'selected':''}>Auto (MTA8: B.Beat/DIVO · MTA16: Click 1, Melody 9)</option>
+    <option value="merish5_xynthia2" ${mtaProfile==='merish5_xynthia2'?'selected':''}>Merish5 / Xynthia2 · MTA8 (Melody 7, Click 8)</option>
+    <option value="bbeat_divo" ${mtaProfile==='bbeat_divo'?'selected':''}>B.Beat / B.Beat Plus / Evo / Pro16 / DIVO · MTA8 (Click 7, Melody 8)</option>
+    <option value="mlive_mta16_default" ${mtaProfile==='mlive_mta16_default'?'selected':''}>MTA16 M-Live · default corpus (Click 1, Melody 9)</option>
+    <option value="merish5_plus_mta16" ${mtaProfile==='merish5_plus_mta16'?'selected':''}>Merish5+ PLUS · compatibilità MTA16 (Click 1, Melody 9 modificabili)</option>
+    <option value="generic" ${mtaProfile==='generic'?'selected':''}>Generic MTA · ordine manuale</option>
+  </select></label>`:'';
   const audioParams=format==='wav'
     ?`<div class="workflow-grid"><label class="workflow-field"><span>Sample rate</span><select id="exportSampleRate"><option value="44100">44.1 kHz</option><option value="48000">48 kHz</option></select></label><label class="workflow-field"><span>Bit depth</span><select id="exportWavBits"><option value="16">16 bit PCM</option><option value="24" selected>24 bit PCM</option><option value="32">32 bit float</option></select></label></div>`
     :format==='mp3'
@@ -1387,8 +1604,10 @@ async function doExport(format=exportFormat){
     <div class="stem-workflow">
       <label class="workflow-field"><span>Formato</span><input value="${format==='mta'?current.target:format.toUpperCase()}" disabled></label>
       <label class="workflow-field"><span>Nome file</span><div class="export-name-row"><input id="exportFileName" maxlength="180" value="${esc(safe)}"><span>.${ext}</span></div></label>
+      ${mtaTargetField}
+      ${mtaProfileField}
       ${audioParams}
-      <div class="workflow-note">${currentUser?.native_single_user?'Dopo Conferma verrà aperto il selettore del filesystem per scegliere la cartella di destinazione.':isMobileClient()?'L’app mobile userà il selettore file del sistema operativo. Puoi anche condividere direttamente l’output.':'Il browser chiederà dove salvare il file secondo le impostazioni di download del browser.'}</div>
+      <div class="workflow-note">${format==='mta'?'Il profilo MTA controlla l’ordine fisico delle tracce Click/Melody nel file. MTA8 mantiene le posizioni specifiche del dispositivo; per MTA16 il default derivato dal corpus è Click 1 / Melody 9. Se servono stream intermedi vengono creati slot silenziosi. ':''}${currentUser?.native_single_user?'Dopo Conferma verrà aperto il selettore del filesystem per scegliere la cartella di destinazione.':isMobileClient()?'L’app mobile userà il selettore file del sistema operativo. Puoi anche condividere direttamente l’output.':'Il browser chiederà dove salvare il file secondo le impostazioni di download del browser.'}</div>
       <div class="utility-actions">
         <button class="utility-btn primary" onclick="confirmConfiguredExport('${format}',false)">Conferma export</button>
         ${isMobileClient()?`<button class="utility-btn secondary" onclick="confirmConfiguredExport('${format}',true)">Condividi…</button>`:''}
@@ -1407,15 +1626,21 @@ async function confirmConfiguredExport(format,share=false){
     sample_rate:Number($('#exportSampleRate')?.value||44100),
     wav_bit_depth:Number($('#exportWavBits')?.value||24),
     flac_compression:Number($('#exportFlacCompression')?.value||8),
+    mta_target:$('#exportMtaTarget')?.value||(current.target==='DAW'?'MTA16':current.target),
+    mta_device_profile:$('#exportMtaProfile')?.value||current.mta_device_profile||'auto',
     slots:[],
     output_path:null,
     share:!!share
   };
+  if(format==='mta'){
+    current.mta_device_profile=config.mta_device_profile;
+    markDirty(50);
+  }
   pendingExportConfig=config;
   closeUtilityModal();
   if(format==='mta'){
     try{
-      const plan=await api(`/api/projects/${current.id}/export-plan`);
+      const plan=await api(`/api/projects/${current.id}/export-plan?profile=${encodeURIComponent(config.mta_device_profile)}&target=${encodeURIComponent(config.mta_target||current.target)}`);
       if(plan.requires_mapping){openExportMapping(plan,config);return}
     }catch(e){return toast(e.message)}
   }
@@ -1425,7 +1650,8 @@ async function executeConfiguredExport(config,slots=[]){
   if(!current)return;
   try{
     await flushAutosave();
-    const ext=config.format==='mta'?(current.target==='MTA8'?'mta8':'mta16'):config.format;
+    const exportMtaTarget=config.mta_target||(current.target==='DAW'?'MTA16':current.target);
+    const ext=config.format==='mta'?(exportMtaTarget==='MTA8'?'mta8':'mta16'):config.format;
     const safeName=(config.filename||'project').replace(/[^A-Za-z0-9._ -]+/g,'_').trim()||'project';
     if(currentUser?.native_single_user&&window.pywebview?.api?.choose_export_save_path){
       const chosen=await window.pywebview.api.choose_export_save_path(safeName,ext);
@@ -1467,12 +1693,19 @@ async function executeConfiguredExport(config,slots=[]){
 function openExportMapping(plan,config=pendingExportConfig){
   pendingExportConfig=config||pendingExportConfig;
   const m=$('#exportMapModal');const options=Array.from({length:plan.max_output_slots},(_,i)=>`<option value="${i+1}">Slot ${i+1}</option>`).join('');
-  m.innerHTML=`<h3>${plan.target} export mapping</h3><p class="hint">Assign every project track to an output slot. Tracks assigned to the same slot are mixed together before the MTA is generated.</p><div class="mapping-grid">${plan.tracks.map((t,i)=>`<label><span>${esc(t.name)} <small>${esc(t.type)}</small></span><select class="slot-map" data-track="${t.id}">${options.replace(`value=\"${Math.min(i+1,plan.max_output_slots)}\"`,`value=\"${Math.min(i+1,plan.max_output_slots)}\" selected`)}</select></label>`).join('')}</div><div class="modal-actions"><button onclick="submitExportMapping('${plan.target}')">Merge &amp; export MTA</button><button onclick="closeExportMapping()">Cancel</button></div>`;m.classList.remove('hidden')
+  const suggested={};for(const slot of plan.suggested_slots||[])for(const id of slot.track_ids||[])suggested[id]=slot.slot;
+  const warning=plan.mta16_default_roles?'<p class="workflow-note"><b>Default MTA16:</b> Click/Metronomo nello slot 1 e Melody nello slot 9, ricavati dal corpus MTA disponibile. Il mapping resta modificabile prima dell’export.</p>':'';
+  m.innerHTML=`<h3>${plan.target} export mapping</h3>${warning}<p class="hint">Assign every project track to an output slot. Tracks assigned to the same slot are mixed together before the MTA is generated.</p><div class="mapping-grid">${plan.tracks.map((t,i)=>{const wanted=Number(suggested[t.id]||Math.min(i+1,plan.max_output_slots));return`<label><span>${esc(t.name)} <small>${esc(t.type)}</small></span><select class="slot-map" data-track="${t.id}">${options.replace(`value=\"${wanted}\"`,`value=\"${wanted}\" selected`)}</select></label>`}).join('')}</div><div class="modal-actions"><button onclick="submitExportMapping('${plan.target}')">Merge &amp; export MTA</button><button onclick="closeExportMapping()">Cancel</button></div>`;m.classList.remove('hidden')
 }
 function closeExportMapping(){$('#exportMapModal')?.classList.add('hidden')}
 async function submitExportMapping(target){
   const grouped={};$$('.slot-map').forEach(x=>{(grouped[x.value]??=[]).push(x.dataset.track)});
-  const slots=Object.entries(grouped).map(([slot,ids])=>{const ts=ids.map(trackById).filter(Boolean);return{slot:Number(slot),name:ts.map(t=>t.name).join(' + ').slice(0,200),type:ts.length===1?ts[0].type:(target==='MTA8'&&Number(slot)<=8?['drums','bass','guitars','keyboards','orchestra','winds','melody','click'][Number(slot)-1]:'other'),track_ids:ids}});
+  const profile=pendingExportConfig?.mta_device_profile||current.mta_device_profile||'auto';
+  const profileTypes=profile==='merish5_xynthia2'
+    ?['drums','bass','guitars','keyboards','orchestra','winds','melody','click']
+    :['drums','bass','guitars','keyboards','orchestra','winds','click','melody'];
+  const slots=Object.entries(grouped).map(([slot,ids])=>{const ts=ids.map(trackById).filter(Boolean);for(const t of ts)t.mta_slot=Number(slot);return{slot:Number(slot),name:ts.map(t=>t.name).join(' + ').slice(0,200),type:ts.length===1?ts[0].type:(target==='MTA8'&&Number(slot)<=8?profileTypes[Number(slot)-1]:'other'),track_ids:ids}});
+  markDirty(50);
   closeExportMapping();
   const config=pendingExportConfig||{format:'mta',filename:current.title||'project',mp3_bitrate_kbps:320,sample_rate:44100,wav_bit_depth:24,flac_compression:8,output_path:null};
   await executeConfiguredExport(config,slots);
@@ -1501,7 +1734,8 @@ async function showProjectSetup(){
     <div class="project-setup-card">
       <div class="setup-grid">
         <div><span>Nome</span><b>${esc(current.title)}</b></div>
-        <div><span>Formato</span><b>${esc(current.target)}</b></div>
+        <div><span>Formato</span><b>${esc(projectFormatLabel())}</b></div>
+        <div><span>Profilo MTA</span><b>${esc(current.mta_device_profile||'auto')}</b></div>
         <div><span>Project ID</span><b>${esc(current.id)}</b></div>
         <div><span>Storage</span><b>${esc(storageMode)}</b></div>
         <div class="setup-wide"><span>Path di salvataggio</span><b>${esc(savePath)}</b></div>
@@ -1573,17 +1807,37 @@ window.addEventListener('keydown',e=>{
 
 $('#mtafile').addEventListener('change',async e=>{
   const f=e.target.files[0];if(!f)return;
-  const fd=new FormData();fd.append('file',f);
+  let nativeProjectPath=null;
   try{
+    if(currentUser?.native_single_user){
+      const bridge=await waitForNativeApi();
+      if(!bridge?.choose_project_save_path){
+        toast('Bridge nativo non disponibile: impossibile scegliere dove salvare il progetto importato.');
+        return;
+      }
+      const suggested=(f.name||'progetto').replace(/\.(mta|mta8|mta16)$/i,'')||'progetto';
+      const chosen=await bridge.choose_project_save_path(suggested);
+      if(!chosen?.ok)return;
+      nativeProjectPath=chosen.path;
+    }
+    const fd=new FormData();fd.append('file',f);
     showMediaProgress('Import MTA',1,'Preparazione upload');
     const job=await uploadWithProgress('/api/import-jobs',fd,'Import MTA');
     showMediaProgress('Import MTA',job.progress,job.message);
     pollMediaJob(job.id,'Import MTA',async completed=>{
-      current=await api(`/api/projects/${completed.result.project_id}`);
+      const projectId=completed.result.project_id;
+      if(nativeProjectPath){
+        const bridge=await waitForNativeApi();
+        if(!bridge?.bind_project_path)throw new Error('Bridge nativo non disponibile durante il salvataggio del progetto importato');
+        await bridge.bind_project_path(projectId,nativeProjectPath);
+      }
+      current=await api(`/api/projects/${projectId}`);
       selectedTrackId=current.tracks[0]?.id||null;
       render();await refresh();
       $('#utilityBackdrop').classList.add('hidden');
-      toast(`MTA importato · ${completed.result.track_count} tracce`);
+      toast(nativeProjectPath
+        ?`MTA importato · ${completed.result.track_count} tracce · progetto salvato in ${nativeProjectPath}`
+        :`MTA importato · ${completed.result.track_count} tracce`);
     });
   }catch(err){
     $('#utilityBackdrop').classList.add('hidden');
@@ -1606,6 +1860,53 @@ function closeUtilityModal(){if(activeStemJob){toast('La separazione è in corso
 function exportProjectArchive(){if(!current){toast('Apri prima un progetto');return}window.location.href=`/api/projects/${current.id}/archive`}
 async function deleteCurrentProject(){if(!current){toast('Apri prima un progetto');return}await deleteProjectFromWorkspace(current.id,current.title)}
 $('#projectArchiveFile').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;const fd=new FormData();fd.append('file',f);try{current=await api('/api/project-archives/import',{method:'POST',body:fd});selectedTrackId=current.tracks[0]?.id||null;render();await refresh();toast('Progetto completo importato')}catch(err){toast('Import progetto fallito: '+err.message)}finally{e.target.value=''}})
+function projectDurationMs(){
+  if(!current)return 0;
+  let end=0;
+  for(const t of current.tracks||[]){
+    if(t.clips?.length){
+      for(const c of t.clips)end=Math.max(end,Number(c.timeline_start_ms||0)+Math.max(0,Number(c.source_end_ms||0)-Number(c.source_start_ms||0)));
+    }else end=Math.max(end,Number(t.duration_ms||0));
+  }
+  return end;
+}
+function formatProjectDuration(ms){
+  const total=Math.max(0,Math.round(Number(ms)||0));
+  const h=Math.floor(total/3600000),m=Math.floor((total%3600000)/60000),s=Math.floor((total%60000)/1000),x=total%1000;
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${String(x).padStart(3,'0')}`;
+}
+async function showProjectInfo(){
+  if(!current)return toast('Apri prima un progetto');
+  let location='Workspace server',home='Workspace applicativo';
+  if(currentUser?.native_single_user){
+    const bridge=await waitForNativeApi();
+    if(bridge?.get_project_path){
+      try{
+        const info=await bridge.get_project_path(current.id);
+        home=info?.home||'Application Support / MTA Audio Editor';
+        location=info?.bound&&info?.path?info.path:'Workspace interno · file progetto non ancora associato';
+      }catch(e){
+        location='Workspace interno · locazione esterna non disponibile';
+      }
+    }
+  }
+  const duration=formatProjectDuration(projectDurationMs());
+  const rows=[
+    ['Nome',current.title||'—'],
+    ['ID progetto',current.id||'—'],
+    ['Home / workspace',home],
+    ['Locazione',location],
+    ['Tipo',current.target||'—'],
+    ['Profilo MTA',current.mta_device_profile||'auto'],
+    ['Durata',duration],
+    ['Tracce',String((current.tracks||[]).length)],
+    ['Artista',current.artist||'—'],
+    ['BPM',Number(current.bpm||0).toFixed(1)],
+    ['Tonalità',current.key||'—'],
+    ['Auto-save',autosaveEnabled?'Attivo':'Disattivato'],
+  ];
+  showUtilityModal('Info progetto',`<div class="table-scroll"><table class="users-table project-info-table"><tbody>${rows.map(([k,v])=>`<tr><th>${esc(k)}</th><td>${esc(v)}</td></tr>`).join('')}</tbody></table></div>`);
+}
 async function manageProjectFiles(){
   if(!current){toast('Apri prima un progetto');return}
   try{

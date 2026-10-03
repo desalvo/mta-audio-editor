@@ -36,6 +36,7 @@ public final class MainActivity extends Activity {
     private static final int REQUEST_SAVE_FILE = 1002;
     private static final String PREFS = "mta_mobile";
     private static final String PREF_SERVER_URL = "server_url";
+    private static final String DEFAULT_SERVER_URL = "https://mta-audio-editor.apps.desalvo.eu";
 
     private final ExecutorService ioExecutor = Executors.newSingleThreadExecutor();
     private WebView webView;
@@ -67,11 +68,7 @@ public final class MainActivity extends Activity {
 
         configureWebView();
         String configured = getPreferencesStore().getString(PREF_SERVER_URL, "");
-        if (configured == null || configured.trim().isEmpty()) {
-            promptServerUrl(true);
-        } else {
-            loadServer(configured);
-        }
+        loadServer(configured == null || configured.trim().isEmpty() ? DEFAULT_SERVER_URL : configured);
     }
 
     private SharedPreferences getPreferencesStore() {
@@ -88,7 +85,7 @@ public final class MainActivity extends Activity {
         settings.setMediaPlaybackRequiresUserGesture(false);
         settings.setBuiltInZoomControls(false);
         settings.setDisplayZoomControls(false);
-        settings.setUserAgentString(settings.getUserAgentString() + " MTAEditorMobile/0.2.0-73 Android");
+        settings.setUserAgentString(settings.getUserAgentString() + " MTAEditorMobile/0.2.0-81 Android");
 
         CookieManager.getInstance().setAcceptCookie(true);
         CookieManager.getInstance().setAcceptThirdPartyCookies(webView, false);
@@ -142,27 +139,43 @@ public final class MainActivity extends Activity {
     private void promptServerUrl(boolean required) {
         EditText input = new EditText(this);
         input.setSingleLine(true);
-        input.setHint("https://mta.example.com");
-        input.setText(getPreferencesStore().getString(PREF_SERVER_URL, ""));
+        input.setHint("URL server personalizzato (opzionale)");
+        String custom = getPreferencesStore().getString(PREF_SERVER_URL, "");
+        input.setText(custom == null || DEFAULT_SERVER_URL.equals(custom) ? "" : custom);
         int pad = (int) (20 * getResources().getDisplayMetrics().density);
         input.setPadding(pad, pad / 2, pad, pad / 2);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
-                .setTitle("Server MTA Audio Editor")
-                .setMessage("Inserisci l'URL HTTPS del backend Docker/Kubernetes. Per server LAN è supportato anche HTTP.")
+                .setTitle("Impostazioni server")
+                .setMessage("Inserisci un URL personalizzato solo se vuoi usare un server diverso da quello predefinito. Per server LAN è supportato anche HTTP.")
                 .setView(input)
-                .setPositiveButton("Connetti", null);
+                .setPositiveButton("Salva", null)
+                .setNeutralButton("Usa predefinito", (d, which) -> {
+                    getPreferencesStore().edit().remove(PREF_SERVER_URL).apply();
+                    loadServer(DEFAULT_SERVER_URL);
+                });
         if (!required) {
             builder.setNegativeButton("Annulla", null);
         }
         AlertDialog dialog = builder.create();
         dialog.setOnShowListener(unused -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-            String normalized = normalizeServerUrl(input.getText().toString());
+            String raw = input.getText().toString().trim();
+            if (raw.isEmpty()) {
+                getPreferencesStore().edit().remove(PREF_SERVER_URL).apply();
+                dialog.dismiss();
+                loadServer(DEFAULT_SERVER_URL);
+                return;
+            }
+            String normalized = normalizeServerUrl(raw);
             if (normalized == null) {
                 input.setError("Inserisci un URL http:// o https:// valido");
                 return;
             }
-            getPreferencesStore().edit().putString(PREF_SERVER_URL, normalized).apply();
+            if (DEFAULT_SERVER_URL.equals(normalized)) {
+                getPreferencesStore().edit().remove(PREF_SERVER_URL).apply();
+            } else {
+                getPreferencesStore().edit().putString(PREF_SERVER_URL, normalized).apply();
+            }
             dialog.dismiss();
             loadServer(normalized);
         }));
@@ -192,7 +205,7 @@ public final class MainActivity extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add("Server").setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+        menu.add("Impostazioni server").setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
         menu.add("Ricarica").setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
         return true;
     }
@@ -200,7 +213,7 @@ public final class MainActivity extends Activity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         String title = String.valueOf(item.getTitle());
-        if ("Server".equals(title)) {
+        if ("Impostazioni server".equals(title)) {
             promptServerUrl(false);
             return true;
         }

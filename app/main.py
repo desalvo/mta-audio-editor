@@ -17,7 +17,7 @@ from starlette.background import BackgroundTask
 from fastapi.staticfiles import StaticFiles
 
 from .audio_engine import auto_align_ms, delete_range, delete_song_range, ensure_clips, estimate_bpm, generate_metronome_wav, media_duration_ms, project_duration_ms, render_mix, render_track, render_track_export, shift_track, waveform_peaks
-from .codec import export_mta, ffprobe, import_mta, suggested_slots, validate_slot_mapping
+from .codec import export_mta, ffprobe, import_mta, resolve_mta_device_profile, suggested_slots, validate_slot_mapping
 from .models import AutoMixRequest, Clip, CustomPresetRequest, DeleteRangeRequest, MoveTrackRequest, MtaExportRequest, Project, ProjectExportRequest, Track
 from .plugins import STEM_SPLITTER, delete_user_preset, plugin_manifest, save_user_preset
 from .security import auth_failure_response, check_basic_auth
@@ -174,9 +174,16 @@ async def security_middleware(request: Request, call_next):
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["Referrer-Policy"] = "no-referrer"
     response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+    script_policy = "script-src 'self' 'unsafe-inline'"
+    if NATIVE_SINGLE_USER:
+        # pywebview 6.x creates js_api proxy methods with JavaScript's Function
+        # constructor. WKWebView enforces CSP for that constructor, so the native
+        # bridge stays present but empty unless unsafe-eval is enabled. Keep this
+        # exception strictly limited to the loopback-only desktop application.
+        script_policy += " 'unsafe-eval'"
     response.headers["Content-Security-Policy"] = (
         "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; "
-        "script-src 'self' 'unsafe-inline'; media-src 'self' blob:; connect-src 'self'"
+        f"{script_policy}; media-src 'self' blob:; connect-src 'self'"
     )
     response.headers["Cache-Control"] = "no-store" if request.url.path.startswith("/api/") else "no-cache"
     return response
@@ -606,6 +613,19 @@ def admin_docs(request: Request):
     return _render_doc("admin.html")
 
 
+@app.get("/docs/user/en", response_class=HTMLResponse)
+def user_docs_en():
+    return _render_doc("user-en.html")
+
+
+@app.get("/docs/admin/en", response_class=HTMLResponse)
+def admin_docs_en(request: Request):
+    user = session_user(request)
+    if user is not None and user["role"] != "admin":
+        raise HTTPException(403, "Administrator role required.")
+    return _render_doc("admin-en.html")
+
+
 @app.get("/docs/pdf/user")
 def user_pdf():
     return FileResponse(BASE / "docs" / "MTA-Audio-Editor-User-Manual.pdf", filename="MTA-Audio-Editor-User-Manual.pdf")
@@ -619,6 +639,22 @@ def admin_pdf(request: Request):
     return FileResponse(
         BASE / "docs" / "MTA-Audio-Editor-Administrator-Manual.pdf",
         filename="MTA-Audio-Editor-Administrator-Manual.pdf",
+    )
+
+
+@app.get("/docs/pdf/user/en")
+def user_pdf_en():
+    return FileResponse(BASE / "docs" / "MTA-Audio-Editor-User-Manual-EN.pdf", filename="MTA-Audio-Editor-User-Manual-EN.pdf")
+
+
+@app.get("/docs/pdf/admin/en")
+def admin_pdf_en(request: Request):
+    user = session_user(request)
+    if user is not None and user["role"] != "admin":
+        raise HTTPException(403, "Administrator role required.")
+    return FileResponse(
+        BASE / "docs" / "MTA-Audio-Editor-Administrator-Manual-EN.pdf",
+        filename="MTA-Audio-Editor-Administrator-Manual-EN.pdf",
     )
 
 
@@ -649,6 +685,7 @@ def plugins():
         "inserts": manifest["presets"],
         "schemas": manifest["schemas"],
         "custom": manifest["custom"],
+        "factory_params": manifest["factory_params"],
         "notes": manifest["notes"],
         "stem_splitter": STEM_SPLITTER.status(),
     }
@@ -691,7 +728,7 @@ def projects(request: Request):
 def project_new(request: Request, title: str = "Untitled", target: str = "MTA8"):
     actor = _actor(request)
     owner = actor["id"] if actor["id"] > 0 else None
-    return create_project(title, target if target in {"MTA8", "MTA16"} else "MTA8", owner_user_id=owner)
+    return create_project(title, target if target in {"MTA8", "MTA16", "DAW"} else "MTA8", owner_user_id=owner)
 
 
 @app.get("/api/projects/{pid}")
@@ -1578,7 +1615,7 @@ async def stem_job_start(
         title = (project_title.strip() or Path(file.filename or "Nuovo progetto").stem)[:200]
         project = create_project(
             title,
-            target if target in {"MTA8", "MTA16"} else "MTA8",
+            target if target in {"MTA8", "MTA16", "DAW"} else "MTA8",
             owner_user_id=actor["id"] if actor["id"] > 0 else None,
         )
 
@@ -1713,7 +1750,7 @@ async def split_stems_compat(
     actor = _actor(request)
     project = _project_for_actor(request, project_id) if project_id else create_project(
         Path(file.filename or "Stems").stem[:200],
-        target if target in {"MTA8", "MTA16"} else "MTA8",
+        target if target in {"MTA8", "MTA16", "DAW"} else "MTA8",
         owner_user_id=actor["id"] if actor["id"] > 0 else None,
     )
     with tempfile.TemporaryDirectory() as td_raw:
@@ -1900,15 +1937,24 @@ def preview_mix(pid: str, request: Request):
 
 
 @app.get("/api/projects/{pid}/export-plan")
-def export_plan(pid: str, request: Request):
-    project = _project_for_actor(request, pid)
+def export_plan(pid: str, request: Request, profile: str | None = None, target: str | None = None):
+    source_project = _project_for_actor(request, pid)
+    project = source_project.model_copy(deep=True)
+    if project.target == "DAW":
+        project.target = target if target in {"MTA8", "MTA16"} else "MTA16"
     limit = 8 if project.target == "MTA8" else 16
+    selected = resolve_mta_device_profile(project, profile)
+    suggested = suggested_slots(project, selected)
+    corpus_mta16 = project.target == "MTA16" and selected in {"mlive_mta16_default", "merish5_plus_mta16"}
     return {
         "target": project.target,
+        "device_profile": selected,
         "project_track_count": len(project.tracks),
         "max_output_slots": limit,
         "requires_mapping": len(project.tracks) > limit,
-        "suggested_slots": suggested_slots(project),
+        "requires_explicit_click_mapping": False,
+        "mta16_default_roles": {"click": 1, "melody": 9} if corpus_mta16 else None,
+        "suggested_slots": suggested,
         "tracks": [{"id": t.id, "name": t.name, "type": t.type} for t in project.tracks],
     }
 
@@ -2076,13 +2122,17 @@ def _render_configured_project_export(pid: str, req: ProjectExportRequest) -> tu
     validate_project_files(project)
     safe_stem = SAFE_DOWNLOAD_RE.sub("_", Path(req.filename).stem).strip(" ._")[:180] or "project"
     if fmt == "mta":
-        ext = "mta8" if project.target == "MTA8" else "mta16"
+        export_project = project.model_copy(deep=True)
+        if export_project.target == "DAW":
+            export_project.target = req.mta_target or "MTA16"
+        ext = "mta8" if export_project.target == "MTA8" else "mta16"
         out = pdir(pid) / f"configured-export.{ext}"
-        if len(project.tracks) > (8 if project.target == "MTA8" else 16):
-            slots = validate_slot_mapping(project, req.slots)
-            export_mta(project, out, slots)
+        limit = 8 if export_project.target == "MTA8" else 16
+        if len(export_project.tracks) > limit or req.slots:
+            slots = validate_slot_mapping(export_project, req.slots, req.mta_device_profile)
+            export_mta(export_project, out, slots, req.mta_device_profile)
         else:
-            export_mta(project, out)
+            export_mta(export_project, out, profile=req.mta_device_profile)
         media_type = "application/octet-stream"
     elif fmt in {"wav", "mp3", "flac"}:
         ext = fmt
@@ -2183,6 +2233,8 @@ def export(pid: str, request: Request, format: str = "mta"):
     try:
         validate_project_files(project)
         if format == "mta":
+            if project.target == "DAW":
+                raise HTTPException(409, "DAW projects require choosing MTA8 or MTA16 in configured export")
             if len(project.tracks) > (8 if project.target == "MTA8" else 16):
                 raise HTTPException(409, "MTA export mapping required; use /export-plan and /export-mta")
             ext = "mta8" if project.target == "MTA8" else "mta16"

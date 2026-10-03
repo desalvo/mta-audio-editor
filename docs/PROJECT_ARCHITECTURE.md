@@ -1,6 +1,6 @@
 # MTA Audio Editor - project architecture
 
-Version: 0.2.0-73
+Version: 0.2.0-81
 
 ## 1. Architectural goals
 
@@ -53,7 +53,7 @@ Persistent data root (/data/projects)
 | `app/plugins.py` | allow-listed DSP schemas/presets/filter construction |
 | `app/auto_mix.py` | deterministic reversible mix automation |
 | `app/codec.py` | MTA import/export, proprietary media transport integration |
-| `app/mta_reverse.py` | byte-level MTA/SYL/XML reverse analysis |
+| `app/mta_reverse.py` | byte-level MTA/SYL/XML format analysis |
 | `app/security.py` | legacy/basic compatibility and security helpers |
 | `app/version.py` | project/build identity |
 
@@ -214,9 +214,11 @@ MTA8  -> max 8 output slots
 MTA16 -> max 16 output slots
 ```
 
+Each track can persist an optional preferred `mta_slot`. The Inspector exposes this value as Auto or an explicit physical slot. Export-plan generation uses explicit track slots first, then device-profile role defaults, and finally free slots. Confirming the export mapping writes the chosen slot back to each track.
+
 If project track count exceeds capacity, every track must be assigned exactly once to an output slot. Multiple project tracks mapped to the same slot are rendered and summed before container creation.
 
-This separates creative project structure from device transport limits.
+This separates creative project structure from device transport limits while keeping the user's routing preference visible at track level.
 
 ## 9. DSP plugin architecture
 
@@ -226,6 +228,8 @@ Plugins are server-registered. The browser can select:
 - factory preset;
 - user preset;
 - validated numeric/string parameters.
+
+Factory presets expose a validated parameter dictionary to the client. Changing preset updates the visible parameter values immediately. Continuous parameters are edited through synchronized rotary and numeric controls; the 32-band EQ uses dedicated band faders.
 
 It cannot send arbitrary FFmpeg filter expressions.
 
@@ -280,7 +284,7 @@ MTA handling has two cooperating layers.
 - applies/removes proprietary media XOR transport;
 - validates generated transport.
 
-### Reverse-analysis layer
+### MTA format-analysis layer
 
 `app/mta_reverse.py` performs evidence-oriented parsing:
 
@@ -307,7 +311,7 @@ uploaded .MTA
  -> FFprobe canonical view
  -> extract audio tracks
  -> preserve/extract attachments
- -> reverse-analysis original file
+ -> analyze original MTA metadata
  -> populate project model
  -> persist project.json
 ```
@@ -459,7 +463,10 @@ Testing is layered:
 
 See also:
 
-- `docs/MTA_FORMAT_FINAL_SPEC.md`
+- `docs/MTA_FORMAT_FINAL_SPEC.md` (English alias)
+- `docs/MTA_FORMAT_FINAL_SPEC_IT.md`
+- `docs/MTA_FORMAT_FINAL_SPEC_EN.md`
+- `docs/MOBILE_APPS_IT.md` / `docs/MOBILE_APPS_EN.md`
 - `docs/DATA_MODEL.md`
 - `docs/API_REFERENCE.md`
 - `docs/OPERATIONS_RUNBOOK.md`
@@ -577,3 +584,12 @@ macOS Apple Silicon -> .app + .dmg
 ```
 
 Every native runner performs an executable-level single-user smoke test before installer creation. Tag workflows publish installer artifacts and SHA-256 sidecars to the GitHub Release.
+
+
+## Mobile server selection privacy
+
+Android and iOS/iPadOS ship with an internal default service endpoint. First launch loads it automatically and does not present an installation/onboarding URL prompt. The built-in address is intentionally not rendered in user-facing settings or user documentation. A custom server URL entered later is stored as an explicit user preference and may be shown/edited. Choosing the default removes the custom preference and reconnects without exposing the built-in value.
+
+## MTA profile-aware export
+
+The project persists an `mta_device_profile`. MTA8 profiles can reserve physical Click/Melody stream numbers; MTA16 Auto resolves to the corpus-derived Click 1 / Melody 9 default. The writer generates silent intermediate streams when required so logical slot assignment and physical stream order remain aligned. Legacy/unconfigured export paths keep their historical compact behavior, while the configured export path used by the UI applies profile-aware placement.

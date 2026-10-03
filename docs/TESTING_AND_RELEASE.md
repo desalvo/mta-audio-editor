@@ -107,3 +107,40 @@ Before declaring a release final:
 ```
 
 Physical M-Live/Merish acceptance remains a separate device/firmware qualification step.
+
+
+## Documentation publication gate
+
+Every release that changes UI behavior, MTA handling or mobile connectivity must rebuild the bilingual manuals:
+
+```bash
+python scripts/build_docs.py
+```
+
+The release gate must verify:
+
+- IT/EN user and administrator PDFs are generated;
+- page 1 is the photographic product cover with logo, version/build and supported platforms;
+- headings are kept with the beginning of the following paragraph/table/figure;
+- the PDFs render without clipping or overlap;
+- the MTA format documents are synchronized with current reader/writer behavior;
+- the mobile default server is not printed in user-visible documentation or UI.
+
+
+## Documentation build and PDF QA
+
+The integrated manuals are authored as HTML and generated with:
+
+```bash
+python scripts/build_docs.py
+```
+
+Required release checks:
+
+1. build both User and Administrator manuals in Italian and English;
+2. render each PDF to PNG pages;
+3. visually inspect every page for clipping, overlap, missing images/glyphs and cover quality;
+4. confirm the first page is the photographic project cover with logo, version/build/creator/license/repository and supported platforms;
+5. verify headings are kept with at least the beginning of their following content block;
+6. verify the built-in mobile default service URL does not appear in user-facing manuals/mobile documentation;
+7. run the full test suite after PDF regeneration.

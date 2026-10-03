@@ -24,6 +24,7 @@ POST /resend-verification
 GET/POST /forgot-password
 GET/POST /reset-password
 GET  /docs/user
+GET  /docs/user/en
 GET  /docs/pdf/user
 ```
 
@@ -95,7 +96,7 @@ The application provides routes for:
 - range delete/ripple;
 - full-song delete;
 - Auto Mix;
-- plugin/preset management;
+- plugin/preset management (including factory parameter values used by the live editor);
 - master preview;
 - individual track export;
 - WAV/MP3/FLAC export;
@@ -103,6 +104,31 @@ The application provides routes for:
 - stem separation.
 
 Refer to route definitions in `app/main.py` as the executable source of truth.
+
+
+## Configured project export and MTA profiles
+
+```text
+GET  /api/projects/{pid}/export-plan?profile=<profile>
+POST /api/projects/{pid}/configured-export
+POST /api/projects/{pid}/configured-export-jobs
+POST /api/projects/{pid}/export-mta
+```
+
+`export-plan` returns target capacity, project track count, suggested slot assignments and the resolved device profile. Supported profile identifiers include:
+
+```text
+auto
+merish5_xynthia2
+bbeat_divo
+mlive_mta16_default
+merish5_plus_mta16
+generic
+```
+
+Configured MTA export accepts `mta_device_profile` plus an optional explicit `slots[]` mapping. MTA8 device profiles preserve physical Click/Melody positions; the corpus-derived MTA16 default proposes Click 1 / Melody 9. Silent intermediate streams may be generated to preserve the requested physical position. Explicit mappings remain authoritative when supplied.
+
+For native desktop mode, `output_path` may be provided by the native file chooser. Web/mobile clients normally receive a download artifact instead.
 
 ## MTA analysis
 
@@ -175,3 +201,23 @@ GET  /api/projects/{pid}/preview-mix
 ```
 
 `waveform-jobs` regenerates and persists normalized waveform peaks when the source revision changes. `preview-track` renders clip layout, fader/pan and project tempo/pitch; `render=true` additionally applies the track insert chain. `preview-mix` renders the complete master chain and is used by the transport when Render mode is enabled.
+
+## Documentation downloads
+
+```text
+GET /docs/pdf/user
+GET /docs/pdf/user/en
+GET /docs/pdf/admin
+GET /docs/pdf/admin/en
+```
+
+The legacy `/docs/pdf/user` and `/docs/pdf/admin` endpoints serve the Italian manuals; the `/en` variants serve the English manuals.
+
+
+## Track MTA slot preference
+
+`Track.mta_slot` is optional. `null` means automatic/profile-driven placement; an integer stores the preferred physical output slot. Export-plan suggestions honor valid explicit track slots, and the UI persists slot choices when the user confirms an MTA mapping.
+
+## Plugin manifest parameter values
+
+`GET /api/plugins` returns `factory_params` alongside preset names and schemas. Every factory preset exposes a schema-valid parameter dictionary so the editor can update knobs/numeric controls immediately when preset selection changes.

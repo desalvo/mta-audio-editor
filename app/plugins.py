@@ -155,6 +155,77 @@ SCHEMAS: dict[str, dict[str, dict[str, float | str]]] = {
 CUSTOM_FILE = Path(os.environ.get("MTA_DATA_DIR", "/data/projects")).resolve() / "_custom_presets.json"
 
 
+# Human-editable parameter values associated with factory presets. These are
+# exposed to the UI so selecting a preset immediately updates every visible
+# control. The values are chosen to match the factory processing intent and are
+# validated through the same SCHEMAS used by custom presets.
+def _factory_params() -> dict[str, dict[str, dict[str, float]]]:
+    defaults = {
+        plugin: {key: float(spec["default"]) for key, spec in schema.items()}
+        for plugin, schema in SCHEMAS.items() if plugin != "eq"
+    }
+    out: dict[str, dict[str, dict[str, float]]] = {
+        plugin: {name: dict(defaults.get(plugin, {})) for name in presets}
+        for plugin, presets in PRESETS.items()
+    }
+    def put(plugin: str, preset: str, **params: float) -> None:
+        if plugin in out and preset in out[plugin]:
+            out[plugin][preset].update({k: float(v) for k, v in params.items()})
+
+    # Level / dynamics
+    put("normalizer", "streaming-14", target_lufs=-14, true_peak_db=-1)
+    put("normalizer", "broadcast-23", target_lufs=-23, true_peak_db=-2)
+    put("normalizer", "music-12", target_lufs=-12, true_peak_db=-1)
+    put("normalizer", "gentle-16", target_lufs=-16, true_peak_db=-1.5)
+    for name, th, ratio, attack, release in [
+        ("moderate", -18.1, 3, 20, 250), ("vocal", -20, 3.5, 8, 180),
+        ("drums", -15.9, 4, 5, 120), ("bass", -17.1, 4, 12, 220),
+        ("master-glue", -14.9, 2, 30, 300),
+    ]: put("compressor", name, threshold_db=th, ratio=ratio, attack_ms=attack, release_ms=release)
+    put("limiter", "brickwall-1", ceiling_db=-1)
+    put("limiter", "brickwall-0.3", ceiling_db=-0.3)
+    put("limiter", "safe-2", ceiling_db=-2)
+
+    # Time / space
+    put("delay", "slapback", delay_ms=95, decay=.24)
+    put("delay", "vocal-quarter", delay_ms=320, decay=.20)
+    put("delay", "stereo-space", delay_ms=175, decay=.20)
+    put("delay", "long-echo", delay_ms=620, decay=.20)
+    for name, size, mix, damping in [
+        ("lexicon-vocal-plate", .34, .24, 11000), ("lexicon-large-hall", .72, .24, 12000),
+        ("lexicon-small-hall", .28, .20, 13000), ("lexicon-ambient", .92, .21, 10000),
+    ]: put("reverb_lexicon", name, size=size, mix=mix, damping_hz=damping)
+    for name, size, mix in [
+        ("tight-room", .13, .10), ("studio-a", .38, .12), ("drum-room", .50, .15), ("live-stage", .84, .16),
+    ]: put("room_ambience", name, size=size, mix=mix)
+
+    # EQ: start flat and transfer named gains from the factory expression.
+    for preset, expr in PRESETS["graphic_eq_32"].items():
+        params = dict(defaults["graphic_eq_32"])
+        for freq, gain in re.findall(r"equalizer=f=([0-9.]+):[^,]*?:g=([-0-9.]+)", expr):
+            nearest = min(BANDS_32, key=lambda item: abs(item - float(freq)))
+            params[f"g{nearest}"] = float(gain)
+        out["graphic_eq_32"][preset] = params
+
+    # Gain / width / loudness
+    for name, gain in [("plus-3db",3),("plus-6db",6),("minus-3db",-3),("minus-6db",-6),("minus-12db",-12)]:
+        put("amplify", name, gain_db=gain)
+    for name, width in [("mono-safe",.35),("narrow",.65),("wide",1.35),("extra-wide",1.7)]:
+        put("stereo_imager", name, width=width)
+    for name, drive, ceiling in [("transparent",1,-1),("streaming",2,-1),("loud",6,-.6),("live",3,-1.4)]:
+        put("maximizer_loudness", name, drive_db=drive, ceiling_db=ceiling)
+    for name, tone, glue, ceiling in [
+        ("balanced",0,.50,-1),("warm",-.45,.40,-1),("clear",.55,.35,-1),("live-pa",.15,.65,-1.5),
+    ]: put("mastering_wizard", name, tone=tone, glue=glue, ceiling_db=ceiling)
+    for name, reduction, floor in [("light",6,-55),("moderate",10,-50),("strong",16,-45),("voice",12,-52)]:
+        put("denoise", name, reduction_db=reduction, noise_floor_db=floor)
+    for name, strength in [("light",.20),("moderate",.50),("strong",.85)]:
+        put("crackle_cleaner", name, strength=strength)
+    return out
+
+FACTORY_PARAMS = _factory_params()
+
+
 def _load_custom() -> dict[str, dict[str, dict[str, float | int | str | bool]]]:
     try:
         raw = json.loads(CUSTOM_FILE.read_text(encoding="utf-8"))
@@ -289,6 +360,7 @@ def plugin_manifest() -> dict[str, object]:
         "presets": plugin_catalog(),
         "schemas": public_schemas,
         "custom": public_custom,
+        "factory_params": deepcopy(FACTORY_PARAMS),
         "channel_behavior": {
             "stereo_imager": {"mono_to_stereo": True, "output_channels": 2},
         },

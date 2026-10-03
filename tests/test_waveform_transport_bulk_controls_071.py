@@ -15,10 +15,10 @@ def test_transport_record_removed_and_play_does_not_wait_for_waveform():
 
 
 def test_open_validates_persisted_waveform_revision_and_keeps_cached_draw_fast():
-    ensure = JS[JS.index("async function ensureWaveforms()") : JS.index("async function pollWaveformJob")]
-    assert "if(t.waveform_peaks?.length)drawWave(t)" in ensure
+    ensure = JS[JS.index("async function ensureWaveforms(") : JS.index("async function pollWaveformJob")]
+    assert "if(t.waveform_peaks?.length){drawWave(t);if(!validateExisting)continue}" in ensure
     assert "/waveform-jobs" in ensure
-    assert "if(t.waveform_peaks?.length){drawWave(t);continue}" not in ensure
+    assert "validateExisting" in ensure
     assert "track.waveform_revision = _track_waveform_revision(track, dst) if peaks else \"\"" in MAIN
 
 

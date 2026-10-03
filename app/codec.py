@@ -19,8 +19,76 @@ from .mta_reverse import (
 )
 from .storage import attachment_path, audio_path, pdir, save_project
 
-MTA8_TYPES = ["drums", "bass", "guitars", "keyboards", "orchestra", "winds", "melody", "click"]
+MTA8_STABLE_TYPES = ["drums", "bass", "guitars", "keyboards", "orchestra", "winds"]
 LOGGER = logging.getLogger(__name__)
+
+
+def infer_mta_track_type(index: int, tags: dict) -> str:
+    explicit = str(tags.get("MTA_TYPE") or "").strip().lower()
+    allowed = Track.model_fields["type"].annotation.__args__
+    if explicit in allowed:
+        return explicit
+    title = str(tags.get("title") or "").strip().lower()
+    if any(token in title for token in ("click", "metronome", "metronomo")):
+        return "click"
+    if any(token in title for token in ("melody", "melodia")):
+        return "melody"
+    return MTA8_STABLE_TYPES[index] if index < len(MTA8_STABLE_TYPES) else "other"
+
+
+MTA8_DEVICE_LAYOUTS = {
+    "merish5_xynthia2": {
+        "drums": 1, "bass": 2, "guitars": 3, "keyboards": 4,
+        "orchestra": 5, "winds": 6, "melody": 7, "click": 8,
+    },
+    "bbeat_divo": {
+        "drums": 1, "bass": 2, "guitars": 3, "keyboards": 4,
+        "orchestra": 5, "winds": 6, "click": 7, "melody": 8,
+    },
+}
+MTA8_SLOT_TYPES = {
+    "merish5_xynthia2": ["drums","bass","guitars","keyboards","orchestra","winds","melody","click"],
+    "bbeat_divo": ["drums","bass","guitars","keyboards","orchestra","winds","click","melody"],
+}
+
+# Corpus-derived MTA16 convention (4 real M-Live MTA files available to the
+# project): Metronome was stream 1 in all 4; explicit Melody Track was stream
+# 9 in 2/3 files carrying that label and stream 10 in 1/3.
+MTA16_DEFAULT_LAYOUT = {"click": 1, "melody": 9}
+MTA16_PROFILE_ALIASES = {"mlive_mta16_default", "merish5_plus_mta16"}
+
+
+def resolve_mta_device_profile(project: Project, requested: str | None = None) -> str:
+    # A direct/legacy backend export with no profile argument preserves the
+    # historical stream layout when the project itself is still "auto".
+    # The configured export UI explicitly sends requested="auto", which opts
+    # into the device-aware defaults below.
+    stored = (project.mta_device_profile or "auto").strip()
+    if requested is None:
+        return "generic" if stored == "auto" else stored
+    profile = (requested or "auto").strip()
+    if profile != "auto":
+        return profile
+    if project.target == "MTA8":
+        return "bbeat_divo"
+    if project.target == "MTA16":
+        return "mlive_mta16_default"
+    return "generic"
+
+
+def detect_imported_mta_profile(project: Project) -> str:
+    if project.target == "MTA8" and len(project.tracks) >= 8:
+        pair = (project.tracks[6].type, project.tracks[7].type)
+        if pair == ("melody", "click"):
+            return "merish5_xynthia2"
+        if pair == ("click", "melody"):
+            return "bbeat_divo"
+    if project.target == "MTA16" and project.tracks:
+        first_is_click = project.tracks[0].type == "click"
+        melody_positions = [i + 1 for i, track in enumerate(project.tracks) if track.type == "melody"]
+        if first_is_click and (not melody_positions or melody_positions[0] in {9, 10}):
+            return "mlive_mta16_default"
+    return "auto"
 
 
 def run(cmd: list[str]) -> str:
@@ -51,8 +119,9 @@ def import_mta(path: Path, project: Project) -> Project:
         audio_streams = [s for s in info.get("streams", []) if s.get("codec_type") == "audio"]
         tracks = []
         for i, stream in enumerate(audio_streams):
-            name = (stream.get("tags") or {}).get("title") or f"Track {i+1}"
-            typ = (stream.get("tags") or {}).get("MTA_TYPE") or (MTA8_TYPES[i] if i < len(MTA8_TYPES) else "other")
+            tags = stream.get("tags") or {}
+            name = tags.get("title") or f"Track {i+1}"
+            typ = infer_mta_track_type(i, tags)
             out = audio / f"track-{i+1:02d}.mp3"
             try:
                 run(["ffmpeg", "-y", "-v", "error", "-i", str(source), "-map", f"0:a:{i}", "-c:a", "copy", str(out)])
@@ -65,6 +134,7 @@ def import_mta(path: Path, project: Project) -> Project:
                     id=uuid.uuid4().hex[:10],
                     name=name,
                     type=typ if typ in allowed else "other",
+                    mta_slot=i + 1,
                     filename=out.name,
                     duration_ms=dur,
                     channels=int(stream.get("channels") or 0),
@@ -91,6 +161,7 @@ def import_mta(path: Path, project: Project) -> Project:
     project.tracks = tracks
     project.preserved_attachments = preserved
     project.target = "MTA16" if len(tracks) > 8 else "MTA8"
+    project.mta_device_profile = detect_imported_mta_profile(project)
     try:
         report = analyze_mta(path, att / "reverse-analysis")
         (d / "mta-analysis.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -102,28 +173,97 @@ def import_mta(path: Path, project: Project) -> Project:
 def _metadata_attachment(project: Project) -> Path:
     out = pdir(project.id) / "attachments" / "mta-editor.json"
     out.write_text(json.dumps({
-        "schema": "mta-audio-editor/v3", "title": project.title, "artist": project.artist, "bpm": project.bpm, "key": project.key,
-        "tracks": [{"id": t.id, "name": t.name, "type": t.type, "pan": t.pan, "clips": [c.model_dump() for c in t.clips], "inserts": [x.model_dump() for x in t.inserts]} for t in project.tracks],
+        "schema": "mta-audio-editor/v3", "title": project.title, "artist": project.artist, "bpm": project.bpm, "key": project.key, "mta_device_profile": project.mta_device_profile,
+        "tracks": [{"id": t.id, "name": t.name, "type": t.type, "mta_slot": t.mta_slot, "pan": t.pan, "clips": [c.model_dump() for c in t.clips], "inserts": [x.model_dump() for x in t.inserts]} for t in project.tracks],
         "master": {"volume_db": project.master_volume_db, "inserts": [x.model_dump() for x in project.master_inserts]},
         "lyrics": [x.model_dump() for x in project.lyrics], "chords": [x.model_dump() for x in project.chords], "markers": [x.model_dump() for x in project.markers],
     }, ensure_ascii=False, indent=2), encoding="utf-8")
     return out
 
 
-def suggested_slots(project: Project) -> list[dict]:
+def suggested_slots(project: Project, profile: str | None = None) -> list[dict]:
+    if project.target == "DAW":
+        raise ValueError("DAW project requires an explicit MTA8/MTA16 export target")
     limit = 8 if project.target == "MTA8" else 16
-    slots = []
-    for i, track in enumerate(project.tracks[:limit]):
-        slots.append({"slot": i + 1, "name": track.name, "type": track.type, "track_ids": [track.id]})
-    return slots
+    effective = resolve_mta_device_profile(project, profile)
+    if project.target == "MTA8":
+        layout = MTA8_DEVICE_LAYOUTS.get(effective)
+    elif project.target == "MTA16" and effective in MTA16_PROFILE_ALIASES:
+        layout = MTA16_DEFAULT_LAYOUT
+    else:
+        layout = None
+    if not layout:
+        grouped: dict[int, list] = {}
+        free = list(range(1, limit + 1))
+        remaining = []
+        for track in project.tracks:
+            explicit = int(track.mta_slot) if track.mta_slot and 1 <= int(track.mta_slot) <= limit else None
+            if explicit:
+                grouped.setdefault(explicit, []).append(track)
+                if explicit in free:
+                    free.remove(explicit)
+            else:
+                remaining.append(track)
+        for track in remaining:
+            if not free:
+                break
+            grouped.setdefault(free.pop(0), []).append(track)
+        return [
+            {"slot": slot, "name": " + ".join(t.name for t in tracks)[:200],
+             "type": tracks[0].type if len(tracks) == 1 else "other",
+             "track_ids": [t.id for t in tracks]}
+            for slot, tracks in sorted(grouped.items())
+        ]
+    grouped: dict[int, list] = {}
+    remaining = []
+    for track in project.tracks:
+        explicit_slot = int(track.mta_slot) if track.mta_slot and 1 <= int(track.mta_slot) <= limit else None
+        slot = explicit_slot or layout.get(track.type)
+        if slot:
+            grouped.setdefault(slot, []).append(track)
+        else:
+            remaining.append(track)
+    free = [slot for slot in range(1, limit + 1) if slot not in grouped]
+    for track in remaining:
+        if free:
+            grouped.setdefault(free.pop(0), []).append(track)
+        else:
+            # No free family slot remains: merge into the last non-special
+            # musical slot rather than displacing Click/Melody.
+            fallback = 6 if limit >= 8 else limit
+            grouped.setdefault(fallback, []).append(track)
+    result = []
+    for slot in sorted(grouped):
+        tracks = grouped[slot]
+        if project.target == "MTA8":
+            typ = MTA8_SLOT_TYPES[effective][slot - 1]
+        elif slot == 1 and effective in MTA16_PROFILE_ALIASES:
+            typ = "click"
+        elif slot == 9 and effective in MTA16_PROFILE_ALIASES:
+            typ = "melody"
+        else:
+            typ = tracks[0].type if len(tracks) == 1 else "other"
+        result.append({
+            "slot": slot,
+            "name": " + ".join(t.name for t in tracks)[:200],
+            "type": typ,
+            "track_ids": [t.id for t in tracks],
+        })
+    return result
 
 
-def validate_slot_mapping(project: Project, slots: list[MtaSlotMapping] | None) -> list[MtaSlotMapping]:
+def validate_slot_mapping(project: Project, slots: list[MtaSlotMapping] | None, profile: str | None = None) -> list[MtaSlotMapping]:
+    if project.target == "DAW":
+        raise ValueError("DAW project requires an explicit MTA8/MTA16 export target")
     limit = 8 if project.target == "MTA8" else 16
     if not slots:
         if len(project.tracks) > limit:
             raise ValueError(f"{project.target} export requires a merge mapping for {len(project.tracks)} project tracks into at most {limit} slots")
-        return [MtaSlotMapping(**x) for x in suggested_slots(project)]
+        suggested = suggested_slots(project, profile)
+        flattened = [tid for slot in suggested for tid in slot["track_ids"]]
+        if set(flattened) != {t.id for t in project.tracks}:
+            raise ValueError(f"{project.target} export requires an explicit mapping for all project tracks")
+        return [MtaSlotMapping(**x) for x in suggested]
     if len(slots) > limit:
         raise ValueError(f"{project.target} supports at most {limit} output slots")
     if len({s.slot for s in slots}) != len(slots):
@@ -139,8 +279,9 @@ def validate_slot_mapping(project: Project, slots: list[MtaSlotMapping] | None) 
     return sorted(slots, key=lambda x: x.slot)
 
 
-def export_mta(project: Project, out: Path, slots: list[MtaSlotMapping] | None = None) -> Path:
-    slots = validate_slot_mapping(project, slots)
+def export_mta(project: Project, out: Path, slots: list[MtaSlotMapping] | None = None, profile: str | None = None) -> Path:
+    effective_profile = resolve_mta_device_profile(project, profile)
+    slots = validate_slot_mapping(project, slots, effective_profile)
     by_id = {t.id: t for t in project.tracks}
     with tempfile.TemporaryDirectory() as td_raw:
         td = Path(td_raw)
@@ -151,7 +292,35 @@ def export_mta(project: Project, out: Path, slots: list[MtaSlotMapping] | None =
             rendered[track.id] = rw
 
         slot_files: list[Path] = []
-        for pos, slot in enumerate(slots):
+        physical_slots: list[MtaSlotMapping] = []
+        slot_by_number = {slot.slot: slot for slot in slots}
+        force_full_mta8 = project.target == "MTA8" and effective_profile in MTA8_DEVICE_LAYOUTS
+        force_mta16_roles = project.target == "MTA16" and effective_profile in MTA16_PROFILE_ALIASES
+        max_slot = 8 if force_full_mta8 else max(slot_by_number, default=0)
+        if force_mta16_roles and any(t.type == "melody" for t in project.tracks):
+            max_slot = max(max_slot, 9)
+        max_duration_ms = max((t.duration_ms for t in project.tracks), default=1000)
+        for slot_number in range(1, max_slot + 1):
+            slot = slot_by_number.get(slot_number)
+            if slot is None:
+                if force_full_mta8:
+                    typ = MTA8_SLOT_TYPES[effective_profile][slot_number - 1]
+                elif force_mta16_roles and slot_number == 1:
+                    typ = "click"
+                elif force_mta16_roles and slot_number == 9:
+                    typ = "melody"
+                else:
+                    typ = "other"
+                silent = td / f"slot-{slot_number:02d}-silence.wav"
+                run([
+                    "ffmpeg", "-y", "-v", "error", "-f", "lavfi",
+                    "-i", "anullsrc=r=44100:cl=stereo",
+                    "-t", f"{max(0.001, max_duration_ms / 1000):.3f}",
+                    "-c:a", "pcm_s24le", str(silent),
+                ])
+                slot_files.append(silent)
+                physical_slots.append(MtaSlotMapping(slot=slot_number, name=typ.title(), type=typ, track_ids=[project.tracks[0].id]))
+                continue
             tracks = [by_id[tid] for tid in slot.track_ids]
             cmd = ["ffmpeg", "-y", "-v", "error"]
             for t in tracks:
@@ -171,16 +340,17 @@ def export_mta(project: Project, out: Path, slots: list[MtaSlotMapping] | None =
             else:
                 filters.append("".join(labels) + f"amix=inputs={len(labels)}:duration=longest:normalize=0[mix]")
                 filters.append(f"[mix]{transform}[out]")
-            merged = td / f"slot-{pos+1:02d}.wav"
+            merged = td / f"slot-{slot_number:02d}.wav"
             cmd += ["-filter_complex", ";".join(filters), "-map", "[out]", "-ar", "44100", "-c:a", "pcm_s24le", str(merged)]
             run(cmd)
             slot_files.append(merged)
+            physical_slots.append(slot)
 
         cmd = ["ffmpeg", "-y", "-v", "error"]
         for r in slot_files: cmd += ["-i", str(r)]
         for i in range(len(slot_files)): cmd += ["-map", f"{i}:a:0"]
         cmd += ["-c:a", "libmp3lame", "-q:a", "2"]
-        for i, slot in enumerate(slots):
+        for i, slot in enumerate(physical_slots):
             cmd += [f"-metadata:s:a:{i}", f"title={slot.name}", f"-metadata:s:a:{i}", f"MTA_TYPE={slot.type}"]
         attachments = []
         for name in project.preserved_attachments:

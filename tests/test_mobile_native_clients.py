@@ -68,3 +68,30 @@ def test_ci_builds_android_and_ios_and_publishes_mobile_artifacts():
         "pattern: mobile-*",
     ):
         assert marker in workflow
+
+
+def test_mobile_default_server_is_automatic_and_hidden_from_ui():
+    root = Path(__file__).resolve().parents[1]
+    android = (root / "mobile" / "android" / "app" / "src" / "main" / "java" / "com" / "desalvo" / "mtaaudioeditor" / "mobile" / "MainActivity.java").read_text(encoding="utf-8")
+    ios = (root / "mobile" / "ios" / "MTAEditorMobile" / "MobileWebViewController.swift").read_text(encoding="utf-8")
+    default_url = "https://mta-audio-editor.apps.desalvo.eu"
+    assert default_url in android
+    assert default_url in ios
+    assert "loadServer(configured == null || configured.trim().isEmpty() ? DEFAULT_SERVER_URL : configured)" in android
+    assert "loadServer((custom?.isEmpty == false ? custom : nil) ?? Defaults.defaultServerURL)" in ios
+    assert 'input.setText(custom == null || DEFAULT_SERVER_URL.equals(custom) ? "" : custom)' in android
+    assert "field.text = custom == Defaults.defaultServerURL ? nil : custom" in ios
+    assert "Usa predefinito" in android and "Usa predefinito" in ios
+
+
+def test_mobile_default_server_url_is_not_published_in_user_docs():
+    root = Path(__file__).resolve().parents[1]
+    default_url = "https://mta-audio-editor.apps.desalvo.eu"
+    for rel in (
+        "app/docs/user.html",
+        "app/docs/user-en.html",
+        "docs/MOBILE_APPS.md",
+        "docs/MOBILE_APPS_IT.md",
+        "docs/MOBILE_APPS_EN.md",
+    ):
+        assert default_url not in (root / rel).read_text(encoding="utf-8")

@@ -57,6 +57,7 @@ class Track(BaseModel):
     id: str = Field(pattern=r"^[A-Za-z0-9_-]{1,64}$")
     name: str = Field(max_length=200)
     type: TrackType = "other"
+    mta_slot: int | None = Field(default=None, ge=1, le=16)
     filename: str = Field(min_length=1, max_length=128)
     duration_ms: int = Field(default=0, ge=0)
     volume_db: float = Field(default=0.0, ge=-120.0, le=24.0)
@@ -108,7 +109,7 @@ class ReorderInsertRequest(BaseModel):
 
 
 class StemSplitRequest(BaseModel):
-    target: Literal["MTA8", "MTA16", "existing"] = "existing"
+    target: Literal["MTA8", "MTA16", "DAW", "existing"] = "existing"
     project_id: str | None = None
     model: str = Field(default="htdemucs", max_length=80)
 
@@ -127,6 +128,8 @@ class MtaExportRequest(BaseModel):
 class ProjectExportRequest(BaseModel):
     format: Literal["mta", "wav", "mp3", "flac"] = "mta"
     filename: str = Field(default="project", min_length=1, max_length=240)
+    mta_target: Literal["MTA8", "MTA16"] | None = None
+    mta_device_profile: Literal["auto", "merish5_xynthia2", "bbeat_divo", "mlive_mta16_default", "merish5_plus_mta16", "generic"] = "auto" 
     mp3_bitrate_kbps: int = Field(default=320, ge=96, le=320)
     sample_rate: Literal[44100, 48000] = 44100
     wav_bit_depth: Literal[16, 24, 32] = 24
@@ -143,7 +146,8 @@ class Project(BaseModel):
     artist: str = Field(default="", max_length=200)
     bpm: float = Field(default=120.0, gt=0, le=500)
     key: str = Field(default="", max_length=40)
-    target: Literal["MTA8", "MTA16"] = "MTA8"
+    target: Literal["MTA8", "MTA16", "DAW"] = "MTA8"
+    mta_device_profile: Literal["auto", "merish5_xynthia2", "bbeat_divo", "mlive_mta16_default", "merish5_plus_mta16", "generic"] = "auto"
     tracks: list[Track] = Field(default_factory=list)
     markers: list[Marker] = Field(default_factory=list)
     lyrics: list[LyricLine] = Field(default_factory=list)

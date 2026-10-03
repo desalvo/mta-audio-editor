@@ -158,6 +158,25 @@ class NativeApi:
     def __init__(self) -> None:
         self.window = None
         self.project_paths: dict[str, Path] = {}
+        self._project_paths_file = _data_root() / "native-project-paths.json"
+        if self._project_paths_file.is_file():
+            try:
+                raw = json.loads(self._project_paths_file.read_text(encoding="utf-8"))
+                if isinstance(raw, dict):
+                    self.project_paths = {
+                        str(project_id): Path(str(path)).expanduser().resolve()
+                        for project_id, path in raw.items()
+                        if str(project_id).strip() and str(path).strip()
+                    }
+            except (OSError, TypeError, ValueError, json.JSONDecodeError):
+                self.project_paths = {}
+
+    def _persist_project_paths(self) -> None:
+        self._project_paths_file.parent.mkdir(parents=True, exist_ok=True)
+        self._project_paths_file.write_text(
+            json.dumps({key: str(value) for key, value in self.project_paths.items()}, indent=2) + "\n",
+            encoding="utf-8",
+        )
 
     @staticmethod
     def _dialog_path(value):
@@ -195,6 +214,7 @@ class NativeApi:
         target = Path(path).expanduser().resolve()
         target.parent.mkdir(parents=True, exist_ok=True)
         self.project_paths[project_id] = target
+        self._persist_project_paths()
         write_project_archive(project_id, target)
         return {"ok": True, "path": str(target)}
 
@@ -213,6 +233,7 @@ class NativeApi:
             "ok": True,
             "bound": target is not None,
             "path": str(target) if target is not None else "",
+            "home": str(_data_root()),
         }
 
     def save_project(self, project_id: str, suggested_name: str) -> dict:
@@ -312,6 +333,8 @@ class NativeApi:
         if path is None:
             return {"ok": False, "cancelled": True}
         project = import_project_archive(path, None)
+        self.project_paths[project.id] = path.expanduser().resolve()
+        self._persist_project_paths()
         return {"ok": True, "cancelled": False, "project": project.model_dump(mode="json")}
 
 
