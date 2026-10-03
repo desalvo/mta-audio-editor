@@ -20,13 +20,18 @@ def test_bilingual_manual_sources_and_pdfs_exist():
 
 
 def test_manual_covers_include_photo_logo_plate_and_platforms():
-    for rel in ("app/docs/user.html", "app/docs/user-en.html", "app/docs/admin.html", "app/docs/admin-en.html"):
+    expected = {
+        "app/docs/user.html": "cover-user-it.png",
+        "app/docs/user-en.html": "cover-user-en.png",
+        "app/docs/admin.html": "cover-admin-it.png",
+        "app/docs/admin-en.html": "cover-admin-en.png",
+    }
+    for rel, cover_asset in expected.items():
         text = (ROOT / rel).read_text(encoding="utf-8")
-        assert "cover-daw-studio.png" in text
-        assert "/static/logo.svg" in text
-        assert "__VERSION__" in text and "__BUILD__" in text
-        assert "Windows" in text and "macOS Apple Silicon" in text
-        assert "Android" in text and "iOS / iPadOS" in text
+        assert cover_asset in text
+        asset = ROOT / "app/static/docs-assets" / cover_asset
+        assert asset.is_file() and asset.stat().st_size > 100_000
+        assert "cover-fullpage" in text
 
 
 def test_user_manual_is_comprehensive_and_visual():

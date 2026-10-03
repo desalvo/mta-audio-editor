@@ -1,6 +1,6 @@
 # MTA (Multi Track Audio) format - consolidated technical specification
 
-Version of this document: 0.2.0-93
+Version of this document: 0.2.0-94
 
 ## 1. Scope and validation level
 
