@@ -49,7 +49,16 @@ def _prepare_environment() -> Path:
     os.environ["MTA_DATA_DIR"] = str(root)
     os.environ["XDG_CACHE_HOME"] = str(cache)
     os.environ["TORCH_HOME"] = str(cache / "torch")
-    os.environ.setdefault("MTA_MAX_UPLOAD_MB", "2048")
+    settings_path = root / "native-settings.json"
+    configured_upload_mb = 1024
+    if settings_path.is_file():
+        try:
+            native_settings = json.loads(settings_path.read_text(encoding="utf-8"))
+            configured_upload_mb = int(native_settings.get("max_upload_mb", configured_upload_mb))
+        except (OSError, ValueError, TypeError, json.JSONDecodeError):
+            configured_upload_mb = 1024
+    configured_upload_mb = min(10240, max(1, configured_upload_mb))
+    os.environ.setdefault("MTA_MAX_UPLOAD_MB", str(configured_upload_mb))
 
     bundled_bin = _bundle_root() / "bin"
     if bundled_bin.is_dir():
@@ -254,6 +263,33 @@ class NativeApi:
         if path.suffix.lower() != f".{ext}":
             path = path.with_suffix(f".{ext}")
         return {"ok": True, "cancelled": False, "path": str(path)}
+
+    def get_native_settings(self) -> dict:
+        root = _data_root()
+        path = root / "native-settings.json"
+        value = int(os.getenv("MTA_MAX_UPLOAD_MB", "1024"))
+        if path.is_file():
+            try:
+                value = int(json.loads(path.read_text(encoding="utf-8")).get("max_upload_mb", value))
+            except (OSError, ValueError, TypeError, json.JSONDecodeError):
+                pass
+        return {"max_upload_mb": min(10240, max(1, value))}
+
+    def set_native_settings(self, max_upload_mb: int) -> dict:
+        value = int(max_upload_mb)
+        if not 1 <= value <= 10240:
+            raise ValueError("max_upload_mb must be between 1 and 10240")
+        root = _data_root()
+        root.mkdir(parents=True, exist_ok=True)
+        (root / "native-settings.json").write_text(
+            json.dumps({"max_upload_mb": value}, indent=2) + "\n", encoding="utf-8"
+        )
+        os.environ["MTA_MAX_UPLOAD_MB"] = str(value)
+        # app.main is already imported after the embedded server starts; update the
+        # live request/upload limit as well as persisting it for the next launch.
+        import app.main as app_main
+        app_main.MAX_UPLOAD_BYTES = value * 1024 * 1024
+        return {"ok": True, "max_upload_mb": value}
 
     def open_project(self) -> dict:
         if self.window is None:

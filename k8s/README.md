@@ -39,17 +39,17 @@ The wizard is standard-library only, checks GitHub for a newer wizard version at
 
 ## Upload size
 
-Il limite predefinito è **150 MB**. Il wizard imposta lo stesso valore in `MTA_MAX_UPLOAD_MB` e nell'annotazione dell'Ingress selezionato (`nginx.ingress.kubernetes.io/proxy-body-size` oppure `haproxy-ingress.github.io/proxy-body-size`). Per modificarlo:
+Il limite predefinito è **1024 MB**. Il wizard imposta lo stesso valore in `MTA_MAX_UPLOAD_MB` e nell'annotazione dell'Ingress selezionato (`nginx.ingress.kubernetes.io/proxy-body-size` oppure `haproxy-ingress.github.io/proxy-body-size`). Per modificarlo:
 
 ```bash
-python3 mta-k8s-wizard.py --max-upload-mb 300
+python3 mta-k8s-wizard.py --max-upload-mb 1024
 ```
 
 In modalità interattiva il wizard chiede il valore e lo salva tra le opzioni riutilizzabili.
 
 ### Upgrade Kubernetes e readiness
 
-Dalla 0.2.0-63 il pod imposta `fsGroup: 10001` e `fsGroupChangePolicy: OnRootMismatch` per rendere scrivibile il PVC all'utente applicativo non-root. La chiave `email` del Secret bootstrap è opzionale a runtime per mantenere compatibili gli upgrade da release precedenti; il wizard continua comunque a richiedere l'email per le nuove installazioni. È inoltre presente una `startupProbe` su `/api/health` prima di readiness e liveness.
+Dalla 0.2.0-65 il pod imposta `fsGroup: 10001` e `fsGroupChangePolicy: OnRootMismatch` per rendere scrivibile il PVC all'utente applicativo non-root. La chiave `email` del Secret bootstrap è opzionale a runtime per mantenere compatibili gli upgrade da release precedenti; il wizard continua comunque a richiedere l'email per le nuove installazioni. È inoltre presente una `startupProbe` su `/api/health` prima di readiness e liveness.
 
 Se un pod resta non Ready dopo un upgrade, controllare `kubectl describe pod` per `CreateContainerConfigError`, `permission denied` sul PVC o errori della probe.
 

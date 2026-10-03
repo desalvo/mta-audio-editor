@@ -35,6 +35,7 @@
 
   <div class="workspace">
     <aside class="sidebar">
+      <button id="mobileSidebarToggle" class="mobile-sidebar-toggle" type="button" onclick="toggleMobileSidebar()" aria-expanded="false"><span aria-hidden="true">☰</span><span class="mobile-menu-label">Menu</span></button>
       <nav>
         <button class="nav-item active">⌂ <span>Project</span></button>
         <label class="nav-item">⇩ <span>Import MTA</span><input id="mtafile" type="file" accept=".mta,.mta8,.mta16" hidden></label>
@@ -57,12 +58,14 @@
             <button class="nav-item" onclick="openExportPanel()">⇧ <span>Export</span></button>
             <button class="nav-item" onclick="saveProjectLocal()">⬇ <span>Save project locally</span></button>
             <button class="nav-item" onclick="saveAsProject()">⇩ <span>Save project as…</span></button>
-            <button class="nav-item" onclick="openProjectArchive()">⬆ <span>Open project</span></button><input id="projectArchiveFile" type="file" accept=".zip,.mta-project.zip" hidden>
+            <button class="nav-item" onclick="openProjectArchive()">⬆ <span>Open project</span></button>
+            <button class="nav-item" onclick="closeCurrentProject()">⊘ <span>Close project</span></button><input id="projectArchiveFile" type="file" accept=".zip,.mta-project.zip" hidden>
             <button class="nav-item" onclick="manageProjectFiles()">▣ <span>Project files</span></button>
             <button class="nav-item auth-managed" onclick="manageProjectSharing()">⌘ <span>Share project</span></button>
             <button class="nav-item danger-nav" onclick="deleteCurrentProject()">× <span>Delete project</span></button>
           </div>
         </section>
+        <button class="nav-item" id="nativeSettingsButton" onclick="showNativeSettings()" hidden>⚙ <span>Native settings</span></button>
         <button class="nav-item" onclick="showAbout()">ⓘ <span>About</span></button>
         <a class="nav-item" href="/docs/user" target="_blank">? <span>Docs &amp; Help</span></a>
       </nav>

@@ -1,11 +1,18 @@
-## 0.2.0-63
+## 0.2.0-65
+
+- Portato a 1024 MB (1 GiB) il limite predefinito di import/upload per server, Docker e Kubernetes.
+- `MTA_MAX_UPLOAD_MB` resta configurabile in Docker; il wizard Kubernetes configura coerentemente applicazione e Ingress NGINX/HAProxy fino a 10240 MB.
+- Le app desktop native hanno ora **Native settings** con limite import/upload configurabile 1–10240 MB, persistente e applicato immediatamente senza riavvio.
+- Il limite continua a essere verificato sia sul `Content-Length` sia durante la copia streaming del file, evitando di caricare l’intero upload in RAM.
+
+## 0.2.0-65
 
 - Corretto il secondo errore Android rilevato nel run GitHub Actions 37057175276: il progetto usa dipendenze AndroidX ma non abilitava `android.useAndroidX`.
 - Aggiunto `mobile/android/gradle.properties` con AndroidX abilitato e Jetifier disabilitato, dato che le dipendenze del progetto sono già AndroidX.
 - Aggiunto test regressivo per impedire la rimozione accidentale della configurazione AndroidX.
 
 
-## 0.2.0-63
+## 0.2.0-65
 
 - Il menu contestuale di una traccia include anche `Rimuovi`, per eliminare la traccia selezionata dal progetto.
 
@@ -26,7 +33,7 @@
 - Overlay Kubernetes e Docker Compose aggiornati al nuovo limite.
 - Migrazione automatica dei progetti legacy senza proprietario verso il primo amministratore persistente che apre il workspace.
 
-# MTA Audio Editor 0.2.0-63
+# MTA Audio Editor 0.2.0-65
 
 ## Multi-user authentication and administration
 
@@ -65,6 +72,6 @@ A new `scripts/k8s-wizard.py` is downloadable directly from the GitHub raw URL a
 
 The generated `secret.yaml` contains local credentials and must not be committed. Use `--no-save-password` when password persistence is not wanted.
 
-### 0.2.0-63
+### 0.2.0-65
 
 The standalone Kubernetes wizard now emits the legacy-compatible HAProxy ingress annotation `kubernetes.io/ingress.class: haproxy` every time HAProxy ingress is selected, while retaining the Kubernetes v1 `ingressClassName` field. Reverse-engineering documentation also includes the latest Cluster transport evidence.

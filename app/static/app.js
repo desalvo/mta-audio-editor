@@ -40,7 +40,7 @@ let sel={a:0,b:0}, dragging=false, audioCtx=null, playAudio=null, selectedTrackI
 let autosaveTimer=null, autosaveBusy=false, autosaveQueued=false, stemPollTimer=null, activeStemJob=null, activeStemProjectId=null;
 let playCursorMs=0, playRaf=null, mediaProgressTimer=null;
 let uiState={trackTop:0,timelineTop:0,timelineLeft:0,mixerLeft:0};
-let waveformJobs={}, trackPlaybacks=[], meterRaf=null, playbackToken=0, masterMeterAnalysers=null, masterPlaybackGainNode=null;
+let waveformJobs={}, trackPlaybacks=[], meterRaf=null, meterRunToken=0, playbackToken=0, masterMeterAnalysers=null, masterPlaybackGainNode=null;
 let lastSelectedAudioFile=null, playbackPaused=false, mixerMetaTab='lyrics', pendingExportConfig=null, pendingNewProjectPath=null;
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const TRACK_COLORS=['#2f81f7','#28b463','#f0a52b','#8a58db','#e9506c','#8395a7','#24b8d4','#b26ff2','#e67e22','#16a085','#d35400','#7f8c8d'];
@@ -78,6 +78,25 @@ function toggleProjectToolsPanel(){
   const collapsed=panel.classList.toggle('collapsed');
   $('#projectToolsChevron').textContent=collapsed?'▸':'▾';
   panel.querySelector('.sidebar-tools-toggle')?.setAttribute('aria-expanded',String(!collapsed));
+}
+
+function toggleMobileSidebar(){
+  const sidebar=$('.sidebar');if(!sidebar)return;
+  const expanded=sidebar.classList.toggle('mobile-expanded');
+  document.body.classList.toggle('mobile-nav-expanded',expanded);
+  const button=$('#mobileSidebarToggle');
+  if(button){button.setAttribute('aria-expanded',String(expanded));button.querySelector('.mobile-menu-label').textContent=expanded?'Chiudi menu':'Menu'}
+}
+function closeCurrentProject(){
+  if(!current)return toast('Nessun progetto aperto');
+  if(activeStemJob&&activeStemProjectId===current.id)return toast('Attendi il completamento della separazione prima di chiudere il progetto.');
+  stopPlayback();
+  clearTimeout(autosaveTimer);autosaveTimer=null;
+  current=null;selectedTrackId=null;pendingExportConfig=null;playCursorMs=0;
+  if($('#headerProjectName'))$('#headerProjectName').textContent='No project loaded';
+  if($('#transportTime'))$('#transportTime').textContent='00:00.000';
+  render();refresh();
+  toast('Progetto chiuso');
 }
 
 function toggleProjectsPanel(){
@@ -1227,7 +1246,7 @@ async function previewTrack(id){
 async function previewMaster(){
   if(!current||!current.tracks.length)return;
   try{
-    await save();stopPlayback();const token=++playbackToken;
+    await flushAutosave(false);stopPlayback();const token=++playbackToken;
     const needsRenderedMaster=!!current.render_preview_enabled||Math.abs(Number(current.master_volume_db||0))>0.001||(current.master_inserts||[]).some(x=>x.enabled);
     if(needsRenderedMaster){
       const audio=new Audio(`/api/projects/${current.id}/preview-mix?t=${Date.now()}`);playAudio=audio;
@@ -1553,3 +1572,23 @@ async function manageProjectSharing(){
 }
 async function addProjectShare(){const identifier=$('#shareIdentifier').value.trim();if(!identifier)return;try{await api(`/api/projects/${current.id}/shares`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({identifier})});await manageProjectSharing();toast('Progetto condiviso')}catch(e){toast(e.message)}}
 async function removeProjectShare(userId){try{await api(`/api/projects/${current.id}/shares/${userId}`,{method:'DELETE'});await manageProjectSharing()}catch(e){toast(e.message)}}
+
+async function showNativeSettings(){
+  if(!window.pywebview?.api?.get_native_settings){toast('Disponibile solo nell’app desktop nativa');return}
+  try{
+    const cfg=await window.pywebview.api.get_native_settings();
+    showUtilityModal('Native settings',`<div class="form-grid"><label>Maximum import/upload size (MB)<input id="nativeMaxUploadMb" type="number" min="1" max="10240" step="1" value="${Number(cfg.max_upload_mb)||1024}"></label><p>Default: 1024 MB (1 GiB). Range: 1–10240 MB. The change is applied immediately and saved for future launches.</p><div class="form-actions"><button class="accent" onclick="saveNativeSettings()">Save</button></div></div>`);
+  }catch(err){toast('Impossibile leggere le impostazioni native: '+err.message)}
+}
+async function saveNativeSettings(){
+  const value=Number($('#nativeMaxUploadMb')?.value);
+  if(!Number.isInteger(value)||value<1||value>10240){toast('Inserisci un valore intero tra 1 e 10240 MB');return}
+  try{
+    const result=await window.pywebview.api.set_native_settings(value);
+    closeUtilityModal();toast(`Limite import/upload impostato a ${result.max_upload_mb} MB`);
+  }catch(err){toast('Salvataggio impostazioni fallito: '+err.message)}
+}
+function exposeNativeSettings(){
+  const b=$('#nativeSettingsButton');if(b&&window.pywebview?.api)b.hidden=false;
+}
+window.addEventListener('pywebviewready',exposeNativeSettings);

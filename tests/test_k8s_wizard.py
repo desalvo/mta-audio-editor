@@ -17,7 +17,7 @@ def load_wizard():
 
 def test_version_and_node_selector_helpers():
     wizard = load_wizard()
-    assert wizard.version_tuple("0.2.0-63.1") == (0, 2, 0, 63, 1)
+    assert wizard.version_tuple("0.2.0-65.1") == (0, 2, 0, 65, 1)
     assert wizard.parse_node_selector("kubernetes.io/os=linux,workload=audio") == {
         "kubernetes.io/os": "linux",
         "workload": "audio",
@@ -105,12 +105,12 @@ def test_haproxy_tls_without_specific_secret(tmp_path):
         "ingress_host": "mta-default.example.test",
         "tls_termination": True,
         "tls_secret": "",
-        "image": "desalvo/mta-audio-editor:0.2.0-63",
+        "image": "desalvo/mta-audio-editor:0.2.0-65",
     }
     wizard.write_manifests(output, values)
     ingress = (output / "ingress.yaml").read_text()
     assert 'haproxy-ingress.github.io/ssl-redirect: "true"' in ingress
-    assert 'haproxy-ingress.github.io/proxy-body-size: "150m"' in ingress
+    assert 'haproxy-ingress.github.io/proxy-body-size: "1024m"' in ingress
     assert "\n  tls:\n" in ingress
     assert "- mta-default.example.test" in ingress
     assert "secretName:" not in ingress
@@ -130,7 +130,7 @@ def test_haproxy_without_tls_has_no_tls_section_or_ssl_redirect(tmp_path):
         "ingress_host": "mta-http.example.test",
         "tls_termination": False,
         "tls_secret": "",
-        "image": "desalvo/mta-audio-editor:0.2.0-63",
+        "image": "desalvo/mta-audio-editor:0.2.0-65",
     }
     wizard.write_manifests(output, values)
     ingress = (output / "ingress.yaml").read_text()

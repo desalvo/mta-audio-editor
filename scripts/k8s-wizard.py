@@ -13,8 +13,8 @@ import tempfile
 import urllib.request
 from pathlib import Path
 
-WIZARD_VERSION = "0.2.0-63.1"
-APP_VERSION = "0.2.0-63"
+WIZARD_VERSION = "0.2.0-65.1"
+APP_VERSION = "0.2.0-65"
 RAW_URL = "https://raw.githubusercontent.com/desalvo/mta-audio-editor/main/scripts/k8s-wizard.py"
 DEFAULT_CONFIG = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")) / "mta-audio-editor" / "k8s-wizard.json"
 
@@ -140,7 +140,7 @@ def write_manifests(out: Path, values: dict) -> None:
     host = values.get("ingress_host", "mta-audio-editor.example.com")
     tls_termination = bool(values.get("tls_termination", False))
     tls_secret = str(values.get("tls_secret", "")).strip()
-    max_upload_mb = int(values.get("max_upload_mb", 150))
+    max_upload_mb = int(values.get("max_upload_mb", 1024))
 
     (out / "namespace.yaml").write_text(f"apiVersion: v1\nkind: Namespace\nmetadata:\n  name: {ns}\n")
     sc_line = f"  storageClassName: {yq(storage)}\n" if storage else ""
@@ -336,7 +336,7 @@ def main() -> int:
         choices=["Always", "IfNotPresent", "Never"],
         help="Kubernetes imagePullPolicy (default IfNotPresent)",
     )
-    parser.add_argument("--max-upload-mb", type=int, help="Dimensione massima upload in MB (default 150)")
+    parser.add_argument("--max-upload-mb", type=int, help="Dimensione massima upload in MB (default 1024)")
     parser.add_argument("--output-dir", default="mta-audio-editor-k8s")
     parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
     parser.add_argument("--no-save", action="store_true")
@@ -361,7 +361,7 @@ def main() -> int:
         "tls_secret": previous.get("tls_secret", ""),
         "image": previous.get("image", f"desalvo/mta-audio-editor:{APP_VERSION}"),
         "image_pull_policy": previous.get("image_pull_policy", "IfNotPresent"),
-        "max_upload_mb": int(previous.get("max_upload_mb", 150)),
+        "max_upload_mb": int(previous.get("max_upload_mb", 1024)),
     }
     supplied = {
         "admin_username": args.admin_username,

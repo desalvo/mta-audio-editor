@@ -53,7 +53,7 @@ from .version import APP_VERSION, BUILD_ID, CREATOR, REPOSITORY
 app = FastAPI(title="MTA Audio Editor", version=APP_VERSION, docs_url=None, redoc_url=None, openapi_url=None)
 LOGGER = logging.getLogger(__name__)
 BASE = Path(__file__).parent
-MAX_UPLOAD_BYTES = int(os.getenv("MTA_MAX_UPLOAD_MB", "150")) * 1024 * 1024
+MAX_UPLOAD_BYTES = int(os.getenv("MTA_MAX_UPLOAD_MB", "1024")) * 1024 * 1024
 NATIVE_SINGLE_USER = os.getenv("MTA_NATIVE_SINGLE_USER", "").lower() in {"1", "true", "yes", "on"}
 NATIVE_BLOCKED_PATH_PREFIXES = (
     "/account",
@@ -366,7 +366,10 @@ async def reset_password_submit(request: Request):
 
 @app.get("/account", response_class=HTMLResponse)
 def account_page(request: Request):
-    require_user(request)
+    # Browser navigation must never expose FastAPI's JSON 401 document as a white page.
+    # API endpoints keep returning 401; interactive pages redirect to login.
+    if not session_user(request):
+        return RedirectResponse(url="/login?next=/account", status_code=303)
     return _template("account.html")
 
 
