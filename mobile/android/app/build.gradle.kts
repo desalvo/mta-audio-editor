@@ -45,6 +45,6 @@ android {
 
 
 dependencies {
-    implementation("androidx.core:core:1.15.0")
-    implementation("com.microsoft.onnxruntime:onnxruntime-android:1.22.0")
+    implementation("androidx.core:core:1.19.1")
+    implementation("com.microsoft.onnxruntime:onnxruntime-android:1.30.0")
 }
