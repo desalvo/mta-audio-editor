@@ -1,3 +1,7 @@
+## 0.2.0-131
+
+- Fixed the remaining macOS x64 GitHub Actions failure caused by madmom-infer upgrading NumPy beyond the supported Numba range.
+
 ## 0.2.0-130
 
 - macOS Intel native builds now use wheel-backed Whisper JIT dependencies, avoiding llvmlite source compilation and missing-LLVM failures.

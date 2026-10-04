@@ -2,3 +2,7 @@
 # madmom-infer is pure Python/NumPy and downloads the separately licensed
 # chord checkpoints on demand into XDG_CACHE_HOME/madmom_infer/models.
 madmom-infer==0.2.0
+
+# macOS Intel / Python 3.12: keep NumPy compatible with the Whisper Numba stack.
+# madmom-infer's generic NumPy dependency would otherwise resolve to the newest NumPy.
+numpy==1.26.4; sys_platform == 'darwin' and platform_machine == 'x86_64'

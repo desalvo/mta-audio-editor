@@ -1,3 +1,7 @@
+## 0.2.0-131
+
+- Fix macOS Intel native dependency resolution: keep NumPy 1.26.4 while installing the chord engine so it remains compatible with Numba 0.61.2 / llvmlite 0.44.0 used by Whisper.
+
 ## 0.2.0-130
 
 - Fixed macOS x64 native CI packaging for Whisper by pinning numba 0.61.2 and llvmlite 0.44.0 only on Darwin/x86_64, ensuring CPython 3.12 prebuilt wheels are used instead of an LLVM source build.
