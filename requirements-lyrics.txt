@@ -1,0 +1,4 @@
+# Optional local lyrics extraction engine.
+# Whisper downloads selected model weights directly from the upstream OpenAI Whisper cache on first use.
+# large-v3 is the default for maximum transcription accuracy; override with MTA_LYRICS_WHISPER_MODEL.
+openai-whisper==20250625

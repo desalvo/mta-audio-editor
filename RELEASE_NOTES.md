@@ -1,4 +1,21 @@
-## 0.2.0-107
+## 0.2.0-115
+
+- Added iPhone/iPad and touch-device track contextual menus via a 600 ms long press on track headers and timeline lanes.
+- Long-press is cancelled when the finger moves beyond a small threshold so normal scrolling does not accidentally open menus.
+- Added a touch-friendly `⋯` menu button on every track as an accessible fallback; it is hidden for fine-pointer desktop users.
+- Preserved desktop right-click behavior and reused the same track context-menu actions on all input methods.
+- Increased contextual-menu touch targets on coarse-pointer devices and suppressed Safari touch callouts on context-enabled track surfaces.
+
+## 0.2.0-113
+
+- Per-track user-selectable colors, persisted in project files.
+- Drag-and-drop track reordering, persisted across save/reopen.
+- Lyrics + chords PDF now reports current project key and BPM.
+- Project transposition is applied non-destructively to displayed/exported chords and effective key.
+- MTA and karaoke exports receive transposed synchronized chords while source analysis data remains intact.
+- Project Info now allows editing the project key explicitly.
+
+## 0.2.0-113
 
 - Integrated the safe dependency updates from Dependabot PR #6: FastAPI 0.142.2 and msgpack 1.2.3.
 - Kept macOS Intel on torch/torchaudio 2.2.2 because newer official x86_64 macOS wheels are not available for the supported stack.
@@ -243,3 +260,8 @@ The standalone Kubernetes wizard now emits the legacy-compatible HAProxy ingress
 
 ## 0.2.0-73
 macOS ARM native-dialog reliability fix: project creation and Import & Separate now wait for the native pywebview bridge readiness event, tolerate delayed WebKit bridge injection, and keep modal interactions from closing the dialog unexpectedly.
+
+## 0.2.0-113
+- Import & Separate correctly reflects the current project type.
+- Native desktop model acquisition for splitting uses upstream Demucs directly.
+- Existing identical project files are reused for stem separation instead of rejected.

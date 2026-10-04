@@ -4,6 +4,7 @@ import logging
 import os
 import re
 import shutil
+import subprocess
 import tempfile
 import threading
 import time
@@ -18,13 +19,14 @@ from fastapi.staticfiles import StaticFiles
 
 from .audio_engine import auto_align_ms, delete_range, delete_song_range, ensure_clips, estimate_bpm, generate_metronome_wav, media_duration_ms, project_duration_ms, render_mix, render_track, render_track_export, shift_track, waveform_peaks
 from .codec import export_mta, ffprobe, import_mta, resolve_mta_device_profile, suggested_slots, validate_slot_mapping
-from .models import AutoMixRequest, Clip, CustomPresetRequest, DeleteRangeRequest, MoveTrackRequest, MtaExportRequest, Project, ProjectExportRequest, Track
+from .models import AutoMixRequest, Clip, CustomPresetRequest, DeleteRangeRequest, MoveTrackRequest, MtaExportRequest, Project, ProjectExportRequest, RightsRecord, Track
 from .plugins import STEM_SPLITTER, delete_user_preset, plugin_manifest, save_user_preset
 
 from .model_updater import (COREML_DIR, ONNX_DIR, start_background_updater, update_once as update_mobile_demucs_models,
     server_inventory as demucs_server_inventory, blacklist_model as blacklist_demucs_model,
     unblacklist_model as unblacklist_demucs_model, load_blacklist as demucs_blacklist,
-    public_catalog as demucs_public_catalog, native_bundle as demucs_native_bundle)
+    public_catalog as demucs_public_catalog, native_bundle as demucs_native_bundle,
+    delete_local_model as delete_local_demucs_model, model_storage_usage as demucs_model_storage_usage)
 COREML_DEMUCS_MODEL_DIR = Path(os.getenv("MTA_DEMUCS_COREML_MODEL_DIR", str(COREML_DIR))).expanduser()
 ONNX_DEMUCS_MODEL_DIR = Path(os.getenv("MTA_DEMUCS_ONNX_MODEL_DIR", str(ONNX_DIR))).expanduser()
 from .security import auth_failure_response, check_basic_auth
@@ -39,6 +41,7 @@ from .auth import (
 )
 from .auto_mix import disable_auto_mix, enable_auto_mix
 from .mta_reverse import analyze_mta, diff_blobs
+from .music_text import build_chordpro, build_karaoke_ass, build_lyrics_pdf, extract_chords, extract_lyrics, lyrics_engine_available, map_source_events_to_timeline, synchronized_plain_text, transpose_chords, transpose_key_name
 from .storage import (
     audio_path,
     create_project,
@@ -56,10 +59,20 @@ from .storage import (
     save_project,
     validate_project_files,
     write_project_archive,
+    ROOT as STORAGE_ROOT,
 )
+from .rights_registry import provider_catalog as rights_provider_catalog, search_provider as search_rights_provider
 from .version import APP_VERSION, BUILD_ID, CREATOR, REPOSITORY
 
 app = FastAPI(title="MTA Audio Editor", version=APP_VERSION, docs_url=None, redoc_url=None, openapi_url=None)
+
+
+def _musical_export_project(project: Project) -> Project:
+    """Return a non-destructive export view with chords/key following project transposition."""
+    export_project = project.model_copy(deep=True)
+    export_project.chords = transpose_chords(project.chords, project.pitch_semitones)
+    export_project.key = transpose_key_name(project.key, project.pitch_semitones)
+    return export_project
 
 @app.on_event("startup")
 def _start_demucs_model_updater():
@@ -114,6 +127,7 @@ def _stem_job_public(job: dict) -> dict:
         "updated_at": job["updated_at"],
         "cancel_requested": job["cancel_event"].is_set(),
         "error": job.get("error"),
+        "analysis": job.get("analysis", {}),
     }
 
 
@@ -443,6 +457,12 @@ def admin_users_page(request: Request):
     return _template("admin.html")
 
 
+@app.get("/settings", response_class=HTMLResponse)
+def settings_page(request: Request):
+    require_admin(request)
+    return _template("admin.html")
+
+
 @app.get("/api/session")
 def api_session(request: Request):
     user = public_user(require_user(request))
@@ -512,6 +532,70 @@ def api_totp_disable(request: Request, body: dict):
     return {"ok": True}
 
 
+def _tree_size(path: Path) -> int:
+    total = 0
+    if not path.exists():
+        return 0
+    for item in path.rglob("*"):
+        try:
+            if item.is_file():
+                total += item.stat().st_size
+        except OSError:
+            continue
+    return total
+
+def _workspace_usage_for_user(user_id: int) -> int:
+    total = 0
+    for project in list_projects():
+        if project.owner_user_id == user_id:
+            total += _tree_size(pdir(project.id))
+    return total
+
+def _storage_payload(request: Request) -> dict:
+    actor = _actor(request)
+    disk = shutil.disk_usage(STORAGE_ROOT)
+    model_usage = demucs_model_storage_usage()
+    users = list_users()
+    if actor["role"] != "admin":
+        users = [u for u in users if u["id"] == actor["id"]]
+    workspaces=[]
+    for user in users:
+        used=_workspace_usage_for_user(user["id"])
+        quota=int(user.get("workspace_quota_bytes") or 0)
+        workspaces.append({
+            "user_id":user["id"],"username":user["username"],"display_name":user.get("display_name") or "",
+            "used_bytes":used,"quota_bytes":quota,"remaining_bytes":max(0,quota-used) if quota else None,
+            "percent":round((used/quota)*100,1) if quota else None,
+        })
+    return {
+        "disk":{"total_bytes":disk.total,"used_bytes":disk.used,"free_bytes":disk.free},
+        "models":model_usage,"workspaces":workspaces,"max_upload_bytes":MAX_UPLOAD_BYTES,
+        "data_dir":str(STORAGE_ROOT),"version":APP_VERSION,"build":BUILD_ID,
+    }
+
+def _ensure_workspace_capacity(owner_user_id: int | None, additional_bytes: int) -> None:
+    if not owner_user_id or owner_user_id <= 0 or additional_bytes <= 0:
+        return
+    row=get_user(owner_user_id)
+    if not row:
+        return
+    quota=int(row["workspace_quota_bytes"] or 0)
+    if not quota:
+        return
+    used=_workspace_usage_for_user(owner_user_id)
+    if used + additional_bytes > quota:
+        raise HTTPException(413, f"Quota workspace superata: {used} byte usati su {quota} byte disponibili.")
+
+@app.get("/api/storage")
+def api_storage(request: Request):
+    require_user(request)
+    return _storage_payload(request)
+
+@app.get("/api/admin/web-settings")
+def api_admin_web_settings(request: Request):
+    require_admin(request)
+    return _storage_payload(request)
+
 @app.get("/api/admin/users")
 def api_admin_users(request: Request):
     require_admin(request)
@@ -522,7 +606,7 @@ def api_admin_users(request: Request):
 def api_admin_user_update(user_id: int, request: Request, body: dict):
     actor = require_admin(request)
     try:
-        return update_user_admin(user_id, actor["id"], active=body.get("active"), role=body.get("role"))
+        return update_user_admin(user_id, actor["id"], active=body.get("active"), role=body.get("role"), workspace_quota_bytes=body.get("workspace_quota_bytes"))
     except ValueError as exc:
         raise HTTPException(400, str(exc)) from exc
 
@@ -845,7 +929,8 @@ def project_file_list(pid: str, request: Request):
 
 @app.post("/api/projects/{pid}/files/upload")
 async def project_file_upload(pid: str, request: Request, file: UploadFile = File(...)):
-    _project_for_actor(request, pid)
+    project=_project_for_actor(request, pid)
+    _ensure_workspace_capacity(project.owner_user_id, int(request.headers.get("content-length") or 0))
     with tempfile.TemporaryDirectory() as td:
         src = Path(td) / "upload.bin"
         _copy_limited(file.file, src)
@@ -925,6 +1010,7 @@ def project_archive_export(pid: str, request: Request):
 @app.post("/api/project-archives/import")
 async def project_archive_import(request: Request, file: UploadFile = File(...)):
     actor = _actor(request)
+    _ensure_workspace_capacity(actor["id"] if actor["id"] > 0 else None, int(request.headers.get("content-length") or 0))
     if actor["id"] <= 0 and not NATIVE_SINGLE_USER:
         raise HTTPException(400, "L'import completo richiede un account utente persistente.")
     with tempfile.TemporaryDirectory() as td:
@@ -1192,6 +1278,7 @@ async def start_track_import_job(
     reference_track_id: str = "",
 ):
     project = _project_for_actor(request, pid)
+    _ensure_workspace_capacity(project.owner_user_id, int(request.headers.get("content-length") or 0))
     ext = Path(file.filename or "track.wav").suffix.lower() or ".bin"
     if len(ext) > 12 or not ext.replace(".", "").isalnum():
         raise HTTPException(400, "invalid file extension")
@@ -1230,6 +1317,199 @@ async def start_track_import_job(
         name=f"track-import-{job_id}",
     ).start()
     return _media_job_public(job)
+
+
+
+def _text_music_worker(job_id: str, pid: str, track_id: str, kind: str) -> None:
+    try:
+        project = load_project(pid)
+        track = next((item for item in project.tracks if item.id == track_id), None)
+        if track is None:
+            raise ValueError("track not found")
+        source = audio_path(pid, track.filename)
+        _media_job_update(job_id, status="running", progress=10, message="Preparazione analisi")
+        if kind == "lyrics":
+            _media_job_update(job_id, progress=20, message="Trascrizione lyrics con Whisper")
+            events = extract_lyrics(source)
+            mapped = map_source_events_to_timeline(track, events)
+            latest = load_project(pid)
+            latest.lyrics = mapped
+            save_project(latest)
+            _media_job_update(
+                job_id, status="completed", progress=100, message="Lyrics estratte e sincronizzate",
+                result={"kind": "lyrics", "count": len(mapped)},
+            )
+            return
+        if kind == "chords":
+            _media_job_update(job_id, progress=25, message="Analisi armonica e riconoscimento accordi")
+            events = extract_chords(source)
+            mapped = map_source_events_to_timeline(track, events)
+            latest = load_project(pid)
+            latest.chords = mapped
+            save_project(latest)
+            _media_job_update(
+                job_id, status="completed", progress=100, message="Chords estratti e sincronizzati",
+                result={"kind": "chords", "count": len(mapped)},
+            )
+            return
+        raise ValueError("unsupported analysis kind")
+    except Exception as exc:
+        LOGGER.exception("Text/music analysis job %s failed", job_id)
+        _media_job_update(job_id, status="failed", progress=0, message="Analisi fallita", error=str(exc)[-1200:])
+
+
+def _start_text_music_job(pid: str, track_id: str, request: Request, kind: str):
+    project = _project_for_actor(request, pid)
+    if not any(item.id == track_id for item in project.tracks):
+        raise HTTPException(404, "track not found")
+    if kind == "lyrics" and not lyrics_engine_available():
+        raise HTTPException(409, "Lyrics extraction requires the OpenAI Whisper engine in this runtime")
+    now = time.time()
+    job_id = uuid.uuid4().hex[:16]
+    job = {
+        "id": job_id, "kind": f"extract-{kind}", "project_id": pid,
+        "status": "queued", "progress": 5,
+        "message": "Estrazione in coda", "created_at": now, "updated_at": now,
+        "result": None, "error": None,
+    }
+    with MEDIA_JOB_LOCK:
+        MEDIA_JOBS[job_id] = job
+    threading.Thread(
+        target=_text_music_worker, args=(job_id, pid, track_id, kind),
+        daemon=True, name=f"mta-{kind}-{job_id}",
+    ).start()
+    return _media_job_public(job)
+
+
+@app.post("/api/projects/{pid}/tracks/{track_id}/extract-lyrics-jobs")
+def start_lyrics_extraction(pid: str, track_id: str, request: Request):
+    return _start_text_music_job(pid, track_id, request, "lyrics")
+
+
+@app.post("/api/projects/{pid}/tracks/{track_id}/extract-chords-jobs")
+def start_chord_extraction(pid: str, track_id: str, request: Request):
+    return _start_text_music_job(pid, track_id, request, "chords")
+
+
+@app.get("/api/projects/{pid}/lyrics.txt")
+def download_project_lyrics(pid: str, request: Request, chords: bool = False):
+    project = _project_for_actor(request, pid)
+    if chords:
+        body = synchronized_plain_text(project.lyrics, transpose_chords(project.chords, project.pitch_semitones))
+    else:
+        body = "\n".join(item.text for item in sorted(project.lyrics, key=lambda x: x.time_ms)) + ("\n" if project.lyrics else "")
+    filename = _download_name(project.title or "lyrics", "txt")
+    return Response(
+        body.encode("utf-8"), media_type="text/plain; charset=utf-8",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
+@app.get("/api/projects/{pid}/lyrics.chordpro")
+def download_project_chordpro(pid: str, request: Request):
+    project = _project_for_actor(request, pid)
+    if not project.lyrics:
+        raise HTTPException(409, "Il progetto non contiene lyrics")
+    body = build_chordpro(
+        title=project.title,
+        artist=project.artist,
+        key=transpose_key_name(project.key, project.pitch_semitones),
+        bpm=project.bpm,
+        lyrics=project.lyrics,
+        chords=transpose_chords(project.chords, project.pitch_semitones),
+        authors=project.authors,
+        rights_records=project.rights_records,
+    )
+    filename = _download_name(project.title or "lyrics", "cho")
+    return Response(
+        body.encode("utf-8"), media_type="text/plain; charset=utf-8",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
+@app.get("/api/projects/{pid}/lyrics.pdf")
+def download_project_lyrics_pdf(pid: str, request: Request, chord_color: str = "#7B1FA2"):
+    project = _project_for_actor(request, pid)
+    if not project.lyrics:
+        raise HTTPException(409, "Il progetto non contiene lyrics")
+    tmp = Path(tempfile.mkstemp(prefix=f"mta-lyrics-{pid}-", suffix=".pdf")[1])
+    if not re.fullmatch(r"#[0-9A-Fa-f]{6}", chord_color):
+        raise HTTPException(400, "Colore accordi non valido")
+    build_lyrics_pdf(
+        tmp, title=project.title, artist=project.artist,
+        lyrics=project.lyrics, chords=transpose_chords(project.chords, project.pitch_semitones), chord_color=chord_color,
+        key=transpose_key_name(project.key, project.pitch_semitones), bpm=project.bpm,
+        rights_records=project.rights_records,
+    )
+    filename = _download_name(project.title or "lyrics", "pdf")
+    return FileResponse(
+        tmp, media_type="application/pdf", filename=filename,
+        background=BackgroundTask(lambda: tmp.unlink(missing_ok=True)),
+    )
+
+
+@app.get("/api/rights-providers")
+def api_rights_providers(request: Request):
+    require_user(request)
+    return {"providers": rights_provider_catalog(), "default_active": ["SIAE", "SOUNDREEF"]}
+
+
+@app.post("/api/projects/{pid}/rights-search")
+def api_project_rights_search(pid: str, request: Request, body: dict):
+    project = _project_for_actor(request, pid)
+    societies = [str(x).upper() for x in (body.get("societies") or project.rights_societies or ["SIAE", "SOUNDREEF"]) if str(x).strip()]
+    title = str(body.get("title") or project.title or "").strip()
+    original_title = str(body.get("original_title") or project.original_title or "").strip()
+    artist = str(body.get("artist") or project.artist or "").strip()
+    authors = body.get("authors") or project.authors
+    if isinstance(authors, str):
+        authors = [x.strip() for x in authors.replace(";", ",").split(",") if x.strip()]
+    authors = [str(x).strip() for x in (authors or []) if str(x).strip()]
+    if not any([title, original_title, artist, authors]):
+        raise HTTPException(400, "Inserisci almeno titolo, titolo originale, autore o interprete")
+    providers: list[dict] = []
+    results: list[dict] = []
+    for society in societies:
+        try:
+            data = search_rights_provider(society, title=title, original_title=original_title, artist=artist, authors=authors)
+            providers.append({k: v for k, v in data.items() if k != "results"})
+            results.extend(data.get("results") or [])
+        except ValueError as exc:
+            providers.append({"provider": society, "mode": "error", "results": [], "message": str(exc), "portal_url": ""})
+        except Exception as exc:
+            LOGGER.warning("Rights provider %s search failed: %s", society, exc)
+            providers.append({"provider": society, "mode": "error", "results": [], "message": str(exc), "portal_url": ""})
+    return {"query": {"title": title, "original_title": original_title, "artist": artist, "authors": authors}, "providers": providers, "results": results}
+
+
+@app.put("/api/projects/{pid}/rights-records")
+def api_project_rights_records(pid: str, request: Request, body: dict):
+    project = _project_for_actor(request, pid)
+    raw_records = body.get("records") or []
+    if not isinstance(raw_records, list) or len(raw_records) > 32:
+        raise HTTPException(400, "Elenco risultati repertorio non valido")
+    try:
+        project.rights_records = [RightsRecord(**item) for item in raw_records]
+        raw_societies = body.get("societies")
+        if raw_societies is not None:
+            if not isinstance(raw_societies, list) or len(raw_societies) > 16:
+                raise ValueError("Elenco società non valido")
+            societies = []
+            for value in raw_societies:
+                society = str(value).strip().upper()
+                if society and society not in societies:
+                    societies.append(society)
+            project.rights_societies = societies
+    except Exception as exc:
+        raise HTTPException(400, f"Dati repertorio non validi: {exc}") from exc
+    save_project(project)
+    return {
+        "ok": True,
+        "rights_records": [item.model_dump(mode="json") for item in project.rights_records],
+        "rights_societies": project.rights_societies,
+    }
+
+
 
 
 @app.get("/api/media-jobs/{job_id}")
@@ -1447,6 +1727,7 @@ def _mta_import_worker(job_id: str, pid: str, source_name: str) -> None:
 @app.post("/api/import-jobs")
 async def start_mta_import_job(request: Request, file: UploadFile = File(...)):
     actor = _actor(request)
+    _ensure_workspace_capacity(actor["id"] if actor["id"] > 0 else None, int(request.headers.get("content-length") or 0))
     owner = actor["id"] if actor["id"] > 0 else None
     project = create_project(Path(file.filename or "Imported").stem[:200], owner_user_id=owner)
     src = pdir(project.id) / "source.mta"
@@ -1485,6 +1766,7 @@ async def start_mta_import_job(request: Request, file: UploadFile = File(...)):
 @app.post("/api/import")
 async def import_file(request: Request, file: UploadFile = File(...)):
     actor = _actor(request)
+    _ensure_workspace_capacity(actor["id"] if actor["id"] > 0 else None, int(request.headers.get("content-length") or 0))
     owner = actor["id"] if actor["id"] > 0 else None
     project = create_project(Path(file.filename or "Imported").stem[:200], owner_user_id=owner)
     src = pdir(project.id) / "source.mta"
@@ -1510,6 +1792,8 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
         model = job["model"]
         estimate_project_bpm = bool(job.get("estimate_bpm"))
         stem_name_prefix = str(job.get("stem_name_prefix") or "").strip()
+        extract_lyrics_after = bool(job.get("extract_lyrics"))
+        extract_chords_after = bool(job.get("extract_chords"))
 
     def progress(value: int, message: str) -> None:
         _stem_job_update(job_id, progress=max(1, min(99, int(value))), message=message)
@@ -1587,6 +1871,34 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
                 added_files.append(dst)
                 save_project(project)
                 progress(90 + int(index / max(1, len(stems)) * 8), f"Importata traccia {stem.stem.title()}")
+
+            # Optional musical-text analysis is intentionally non-fatal: a successful
+            # stem separation must remain usable even if Whisper/Chordino is unavailable.
+            analysis: dict[str, dict[str, object]] = {}
+            if extract_lyrics_after:
+                progress(98, "Estrazione lyrics ad alta accuratezza")
+                vocal_stem = next((Path(stem) for stem in stems if Path(stem).stem.lower() in {"vocals", "vocal"}), None)
+                lyric_source = vocal_stem or source
+                try:
+                    project = load_project(project_id)
+                    project.lyrics = extract_lyrics(lyric_source)
+                    save_project(project)
+                    analysis["lyrics"] = {"ok": True, "count": len(project.lyrics), "source": "vocals" if vocal_stem else "mix"}
+                except Exception as analysis_exc:
+                    LOGGER.exception("Lyrics extraction after stem separation failed")
+                    analysis["lyrics"] = {"ok": False, "error": str(analysis_exc)[-500:]}
+                _stem_job_update(job_id, analysis=dict(analysis))
+            if extract_chords_after:
+                progress(99, "Analisi chords ad alta accuratezza")
+                try:
+                    project = load_project(project_id)
+                    project.chords = extract_chords(source)
+                    save_project(project)
+                    analysis["chords"] = {"ok": True, "count": len(project.chords), "source": "mix"}
+                except Exception as analysis_exc:
+                    LOGGER.exception("Chord extraction after stem separation failed")
+                    analysis["chords"] = {"ok": False, "error": str(analysis_exc)[-500:]}
+                _stem_job_update(job_id, analysis=dict(analysis))
         if not keep_original_track:
             source.unlink(missing_ok=True)
         _stem_job_update(job_id, status="completed", progress=100, message="Separazione completata")
@@ -1815,6 +2127,14 @@ def admin_demucs_model_unblacklist(model_id: str, request: Request):
     require_admin(request)
     return unblacklist_demucs_model(model_id)
 
+
+@app.delete("/api/admin/demucs-models/{model_id}/local")
+def admin_demucs_model_delete_local(model_id: str, request: Request):
+    require_admin(request)
+    if not re.fullmatch(r"[A-Za-z0-9._-]{1,128}", model_id):
+        raise HTTPException(400, "Invalid model id")
+    return delete_local_demucs_model(model_id)
+
 @app.post("/api/stems/jobs")
 async def stem_job_start(
     request: Request,
@@ -1825,6 +2145,8 @@ async def stem_job_start(
     model: str = "htdemucs_6s",
     stem_count: int = 0,
     keep_original_track: bool = True,
+    extract_lyrics: bool = False,
+    extract_chords: bool = False,
 ):
     if Path(file.filename or "").suffix.lower() != ".mp3":
         raise HTTPException(400, "La separazione strumenti accetta attualmente file MP3.")
@@ -1848,6 +2170,7 @@ async def stem_job_start(
     actor = _actor(request)
     if project_id:
         project = _project_for_actor(request, project_id)
+        _ensure_workspace_capacity(project.owner_user_id, int(request.headers.get("content-length") or 0))
     else:
         title = (project_title.strip() or Path(file.filename or "Nuovo progetto").stem)[:200]
         project = create_project(
@@ -1867,34 +2190,52 @@ async def stem_job_start(
     estimate_bpm_for_project = len(project.tracks) == 0
 
     # Import/persist the complete song immediately before background separation.
+    # For an existing project, a byte-identical file is deliberately reused instead
+    # of rejected. It may live only in Originals/files and does not need to already
+    # be represented by a timeline track.
     audio_name = f"{uuid.uuid4().hex[:10]}.mp3"
-    source = audio_path(project.id, audio_name)
-    _copy_limited(file.file, source)
-    if project_id:
-        duplicate = find_duplicate_project_file(project.id, source)
-        if duplicate:
-            source.unlink(missing_ok=True)
-            raise HTTPException(
-                409,
-                "Il file è già presente nel progetto. Usa il menu contestuale della traccia e scegli 'Separa in stems'.",
-            )
+    uploaded_source = audio_path(project.id, audio_name)
+    _copy_limited(file.file, uploaded_source)
+    duplicate = find_duplicate_project_file(project.id, uploaded_source) if project_id else None
+    source = uploaded_source
+    source_audio_name = audio_name
+    source_already_on_timeline = False
+    if duplicate:
+        uploaded_source.unlink(missing_ok=True)
+        try:
+            source = file_path(project.id, duplicate["category"], duplicate["name"])
+        except ValueError as exc:
+            raise HTTPException(400, "La copia esistente del file non è riutilizzabile.") from exc
+        if duplicate["category"] == "audio":
+            source_audio_name = duplicate["name"]
+            source_already_on_timeline = any(track.filename == source_audio_name for track in project.tracks)
     try:
         ffprobe(source)
     except Exception as exc:
-        source.unlink(missing_ok=True)
+        if not duplicate:
+            uploaded_source.unlink(missing_ok=True)
         if not project_id:
             delete_project(project.id)
         raise HTTPException(400, "File MP3 non valido o non supportato.") from exc
 
-    original = preserve_original(project.id, source, Path(file.filename or "source.mp3").name)
+    if duplicate:
+        original = source
+    else:
+        original = preserve_original(project.id, source, Path(file.filename or "source.mp3").name)
     duration = media_duration_ms(source)
     channels, channel_layout = _audio_channel_info(source)
-    if keep_original_track:
+    if keep_original_track and not source_already_on_timeline:
+        # Tracks reference files from audio/. If the reusable copy exists only in
+        # Originals, create only the timeline working copy while keeping the original
+        # storage object untouched and using it directly for the split job.
+        if duplicate and duplicate["category"] != "audio":
+            source_audio_name = f"{uuid.uuid4().hex[:10]}.mp3"
+            shutil.copyfile(source, audio_path(project.id, source_audio_name))
         original_track = Track(
             id=uuid.uuid4().hex[:10],
             name="Original Mix",
             type="other",
-            filename=audio_name,
+            filename=source_audio_name,
             duration_ms=duration,
             channels=channels,
             channel_layout=channel_layout,
@@ -1929,6 +2270,9 @@ async def stem_job_start(
         "estimate_bpm": estimate_bpm_for_project,
         "source_track_id": None,
         "stem_name_prefix": "",
+        "extract_lyrics": bool(extract_lyrics),
+        "extract_chords": bool(extract_chords),
+        "analysis": {},
     }
     with STEM_JOB_LOCK:
         STEM_JOBS[job_id] = job
@@ -1986,7 +2330,12 @@ async def split_stems_compat(
     if not STEM_SPLITTER.available():
         raise HTTPException(503, "Demucs stem plugin is not installed in this runtime")
     actor = _actor(request)
-    project = _project_for_actor(request, project_id) if project_id else create_project(
+    if project_id:
+        existing_project=_project_for_actor(request, project_id)
+        _ensure_workspace_capacity(existing_project.owner_user_id, int(request.headers.get("content-length") or 0))
+    else:
+        _ensure_workspace_capacity(actor["id"] if actor["id"] > 0 else None, int(request.headers.get("content-length") or 0))
+    project = existing_project if project_id else create_project(
         Path(file.filename or "Stems").stem[:200],
         target if target in {"MTA8", "MTA16", "DAW"} else "MTA8",
         owner_user_id=actor["id"] if actor["id"] > 0 else None,
@@ -2215,10 +2564,11 @@ def export_mta_with_mapping(pid: str, req: MtaExportRequest, request: Request):
     project = _project_for_actor(request, pid)
     try:
         validate_project_files(project)
-        slots = validate_slot_mapping(project, req.slots)
-        ext = "mta8" if project.target == "MTA8" else "mta16"
+        export_project = _musical_export_project(project)
+        slots = validate_slot_mapping(export_project, req.slots)
+        ext = "mta8" if export_project.target == "MTA8" else "mta16"
         out = pdir(pid) / f"export.{ext}"
-        export_mta(project, out, slots)
+        export_mta(export_project, out, slots)
     except Exception as exc:
         raise HTTPException(400, str(exc)[:500]) from exc
     return FileResponse(out, filename=_download_name(project.title, ext), media_type="application/octet-stream")
@@ -2367,13 +2717,75 @@ async def mta_binary_diff(file_a: UploadFile = File(...), file_b: UploadFile = F
 
 
 
+def _ffmpeg_filter_path(path: Path) -> str:
+    return str(path.resolve()).replace("\\", "/").replace(":", r"\:").replace("'", r"\'")
+
+
+def _karaoke_background_path(pid: str, name: str | None) -> Path | None:
+    if not name:
+        return None
+    if Path(name).name != name or name in {".", ".."}:
+        raise ValueError("invalid karaoke background")
+    path = pdir(pid) / "karaoke" / name
+    if not path.is_file():
+        raise ValueError("karaoke background not found")
+    return path
+
+
+def _render_karaoke_video(pid: str, project: Project, out: Path, req: ProjectExportRequest) -> None:
+    if not project.lyrics:
+        raise ValueError("MP4 karaoke export requires synchronized lyrics")
+    width, height = (1280, 720) if req.karaoke_resolution == "1280x720" else (1920, 1080)
+    work = pdir(pid) / "karaoke"
+    work.mkdir(parents=True, exist_ok=True)
+    mix = work / "mix.wav"
+    ass = work / "lyrics.ass"
+    render_mix(project, audio_path, mix, fmt="wav", sample_rate=48000, wav_bit_depth=24)
+    build_karaoke_ass(
+        ass, title=project.title, artist=project.artist, lyrics=project.lyrics,
+        chords=transpose_chords(project.chords, project.pitch_semitones), include_chords=req.karaoke_chords, width=width, height=height,
+    )
+    bg = _karaoke_background_path(pid, req.karaoke_background)
+    ass_filter = _ffmpeg_filter_path(ass)
+    if bg:
+        cmd = [
+            "ffmpeg", "-y", "-v", "error", "-loop", "1", "-i", str(bg), "-i", str(mix),
+            "-vf", f"scale={width}:{height}:force_original_aspect_ratio=decrease,pad={width}:{height}:(ow-iw)/2:(oh-ih)/2,ass='{ass_filter}'",
+            "-c:v", "libx264", "-preset", "medium", "-crf", "18", "-pix_fmt", "yuv420p",
+            "-c:a", "aac", "-b:a", "320k", "-shortest", str(out),
+        ]
+    else:
+        cmd = [
+            "ffmpeg", "-y", "-v", "error", "-f", "lavfi", "-i", f"color=c=black:s={width}x{height}:r=30", "-i", str(mix),
+            "-vf", f"ass='{ass_filter}'", "-c:v", "libx264", "-preset", "medium", "-crf", "18", "-pix_fmt", "yuv420p",
+            "-c:a", "aac", "-b:a", "320k", "-shortest", str(out),
+        ]
+    proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    if proc.returncode:
+        raise RuntimeError(proc.stderr.strip() or "FFmpeg karaoke export failed")
+
+
+@app.post("/api/projects/{pid}/karaoke-background")
+async def upload_karaoke_background(pid: str, request: Request, file: UploadFile = File(...)):
+    _project_for_actor(request, pid)
+    suffix = Path(file.filename or "").suffix.lower()
+    if suffix not in {".jpg", ".jpeg", ".png", ".webp"}:
+        raise HTTPException(400, "Background non supportato: usa JPG, PNG o WEBP")
+    folder = pdir(pid) / "karaoke"
+    folder.mkdir(parents=True, exist_ok=True)
+    name = f"background-{uuid.uuid4().hex[:12]}{suffix}"
+    target = folder / name
+    _copy_limited(file.file, target)
+    return {"name": name}
+
+
 def _render_configured_project_export(pid: str, req: ProjectExportRequest) -> tuple[Path, str, str, str]:
     project = load_project(pid)
     fmt = req.format.lower()
     validate_project_files(project)
     safe_stem = SAFE_DOWNLOAD_RE.sub("_", Path(req.filename).stem).strip(" ._")[:180] or "project"
     if fmt == "mta":
-        export_project = project.model_copy(deep=True)
+        export_project = _musical_export_project(project)
         if export_project.target == "DAW":
             export_project.target = req.mta_target or "MTA16"
         ext = "mta8" if export_project.target == "MTA8" else "mta16"
@@ -2399,6 +2811,13 @@ def _render_configured_project_export(pid: str, req: ProjectExportRequest) -> tu
             flac_compression=int(req.flac_compression),
         )
         media_type = {"wav": "audio/wav", "mp3": "audio/mpeg", "flac": "audio/flac"}[fmt]
+    elif fmt == "mp4":
+        if not project.lyrics:
+            raise ValueError("MP4 karaoke export requires synchronized lyrics")
+        ext = "mp4"
+        out = pdir(pid) / "configured-export.mp4"
+        _render_karaoke_video(pid, project, out, req)
+        media_type = "video/mp4"
     else:
         raise ValueError("unsupported export format")
     return out, f"{safe_stem}.{ext}", media_type, fmt
@@ -2478,6 +2897,75 @@ def start_configured_project_export_job(pid: str, req: ProjectExportRequest, req
     return _media_job_public(job)
 
 
+
+
+def _karaoke_export_worker(job_id: str, pid: str, background_path: str | None, include_chords: bool = True) -> None:
+    bg = Path(background_path) if background_path else None
+    try:
+        project = load_project(pid)
+        if not project.lyrics:
+            raise RuntimeError("Il progetto non contiene lyrics sincronizzate")
+        _media_job_update(job_id, status="running", progress=10, message="Rendering audio progetto")
+        mix = pdir(pid) / f"karaoke-{job_id}.wav"
+        ass = pdir(pid) / f"karaoke-{job_id}.ass"
+        out = pdir(pid) / f"karaoke-{job_id}.mp4"
+        render_mix(project, audio_path, mix, fmt="wav", sample_rate=48000, wav_bit_depth=24)
+        build_karaoke_ass(
+            ass,
+            title=project.title,
+            artist=project.artist,
+            lyrics=project.lyrics,
+            chords=transpose_chords(project.chords, project.pitch_semitones),
+            include_chords=include_chords,
+        )
+        _media_job_update(job_id, progress=55, message="Rendering video karaoke")
+        ass_filter = str(ass).replace("\\", "/").replace(":", r"\:").replace("'", r"\'")
+        if bg and bg.is_file():
+            cmd = ["ffmpeg", "-y", "-v", "error", "-loop", "1", "-i", str(bg), "-i", str(mix), "-vf", f"scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,ass='{ass_filter}'", "-c:v", "libx264", "-preset", "medium", "-crf", "18", "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "320k", "-shortest", str(out)]
+        else:
+            cmd = ["ffmpeg", "-y", "-v", "error", "-f", "lavfi", "-i", "color=c=black:s=1920x1080:r=30", "-i", str(mix), "-vf", f"ass='{ass_filter}'", "-c:v", "libx264", "-preset", "medium", "-crf", "18", "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "320k", "-shortest", str(out)]
+        proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        if proc.returncode or not out.is_file():
+            raise RuntimeError(proc.stderr.strip() or "FFmpeg karaoke export failed")
+        _media_job_update(job_id, status="completed", progress=100, message="MP4 karaoke completato", result={"download_url": f"/api/media-jobs/{job_id}/download", "filename": _download_name(project.title or "karaoke", "mp4"), "format": "mp4", "media_type": "video/mp4", "path": str(out)})
+    except Exception as exc:
+        LOGGER.exception("Karaoke export failed")
+        _media_job_update(job_id, status="failed", progress=0, message="Export MP4 fallito", error=str(exc)[-1200:])
+    finally:
+        if bg:
+            bg.unlink(missing_ok=True)
+
+
+@app.post("/api/projects/{pid}/karaoke-export-jobs")
+async def start_karaoke_export_job(
+    pid: str,
+    request: Request,
+    include_chords: bool = True,
+    background: UploadFile | None = File(default=None),
+):
+    project = _project_for_actor(request, pid)
+    if not project.lyrics:
+        raise HTTPException(409, "L'export MP4 richiede lyrics sincronizzate")
+    background_path: Path | None = None
+    if background and background.filename:
+        suffix = Path(background.filename).suffix.lower()
+        if suffix not in {".jpg", ".jpeg", ".png", ".webp"}:
+            raise HTTPException(400, "Background non supportato: usa JPG, PNG o WEBP")
+        background_path = pdir(pid) / f"karaoke-background-{uuid.uuid4().hex[:10]}{suffix}"
+        _copy_limited(background.file, background_path)
+    now = time.time()
+    job_id = uuid.uuid4().hex[:16]
+    job = {"id": job_id, "kind": "project-export", "project_id": pid, "status": "queued", "progress": 5, "message": "Export MP4 in coda", "created_at": now, "updated_at": now, "result": None, "error": None}
+    with MEDIA_JOB_LOCK:
+        MEDIA_JOBS[job_id] = job
+    threading.Thread(
+        target=_karaoke_export_worker,
+        args=(job_id, pid, str(background_path) if background_path else None, include_chords),
+        daemon=True,
+        name=f"karaoke-export-{job_id}",
+    ).start()
+    return _media_job_public(job)
+
 @app.get("/api/projects/{pid}/export")
 def export(pid: str, request: Request, format: str = "mta"):
     project = _project_for_actor(request, pid)
@@ -2490,7 +2978,7 @@ def export(pid: str, request: Request, format: str = "mta"):
                 raise HTTPException(409, "MTA export mapping required; use /export-plan and /export-mta")
             ext = "mta8" if project.target == "MTA8" else "mta16"
             out = pdir(pid) / f"export.{ext}"
-            export_mta(project, out)
+            export_mta(_musical_export_project(project), out)
             media_type = "application/octet-stream"
         elif format in {"wav", "mp3", "flac"}:
             ext = format

@@ -541,12 +541,12 @@ class DemucsStemSplitter:
         if not cls.available():
             raise RuntimeError("Demucs stem plugin is not installed in this runtime")
         local_repo = os.getenv("MTA_DEMUCS_LOCAL_REPO", "").strip()
-        if getattr(sys, "frozen", False) and local_repo:
-            try:
-                from native.model_manager import ensure as ensure_native_model
-                ensure_native_model(model)
-            except Exception as exc:
-                raise RuntimeError(f"Unable to download requested native Demucs model {model}: {exc}") from exc
+        # Native desktop builds intentionally use Demucs' own upstream resolver/cache.
+        # Do not proxy model acquisition through the MTA server: this keeps native
+        # splitting usable offline after first download and avoids coupling desktop
+        # inference to server authentication/catalog availability.
+        if getattr(sys, "frozen", False):
+            local_repo = ""
         output_dir.mkdir(parents=True, exist_ok=True)
         if getattr(sys, "frozen", False):
             # In native .app/.exe builds, starting the frozen GUI executable as a

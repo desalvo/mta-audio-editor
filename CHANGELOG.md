@@ -1,3 +1,22 @@
+## 0.2.0-115
+
+- Added iPhone/iPad and touch-device track contextual menus via a 600 ms long press on track headers and timeline lanes.
+- Long-press is cancelled when the finger moves beyond a small threshold so normal scrolling does not accidentally open menus.
+- Added a touch-friendly `⋯` menu button on every track as an accessible fallback; it is hidden for fine-pointer desktop users.
+- Preserved desktop right-click behavior and reused the same track context-menu actions on all input methods.
+- Increased contextual-menu touch targets on coarse-pointer devices and suppressed Safari touch callouts on context-enabled track surfaces.
+
+## 0.2.0-114
+
+- Rights metadata is explicitly multi-provider: one project can persist simultaneous repertoire records from SIAE, Soundreef and other configured providers without collapsing them into a single match.
+- Project Info now shows every stored repertoire record and its provider, title/original title, authors, performers, publishers, identifiers and source.
+- Lyrics + Chords PDF and ChordPro exports now include all stored fields for every selected provider record, not only a subset.
+- Clarified in the repertoire UI that provider selections are search preferences while stored records are cumulative project metadata.
+
+## 0.2.0-113
+- Track colors and drag/drop ordering.
+- Key/BPM metadata in lyrics/chords PDFs and transposition-aware chord export.
+
 ## 0.2.0-97
 
 - Added native on-device stem separation for iPhone/iPad using Core ML-compatible Demucs models.
@@ -198,3 +217,8 @@
 - Fixed macOS ARM native project dialogs so interacting with/selecting the default project name cannot be interpreted as a backdrop action.
 - Native filesystem actions now wait for the pywebview `pywebviewready` event and tolerate slower WebKit bridge injection (up to 15 seconds), fixing transient “Bridge nativo non ancora disponibile” errors.
 - New Project and Import & Separate modal actions now use explicit non-submit buttons and protected modal event propagation.
+
+## 0.2.0-113
+- Fixed Import & Separate current-project type detection in the UI.
+- Native desktop Demucs splitting now uses the upstream Demucs model resolver/cache directly instead of the MTA model server.
+- Re-importing an already stored source now reuses the existing project file and starts separation even when the source is not on the timeline.

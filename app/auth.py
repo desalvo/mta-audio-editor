@@ -146,6 +146,7 @@ def init_auth_db() -> None:
           approved_at INTEGER,
           approved_by INTEGER,
           last_login_at INTEGER,
+          workspace_quota_bytes INTEGER NOT NULL DEFAULT 0,
           FOREIGN KEY(approved_by) REFERENCES users(id)
         );
         CREATE TABLE IF NOT EXISTS email_tokens(
@@ -205,6 +206,7 @@ def init_auth_db() -> None:
             "totp_secret_enc TEXT NOT NULL DEFAULT ''",
             "totp_pending_enc TEXT NOT NULL DEFAULT ''",
             "updated_at INTEGER NOT NULL DEFAULT 0",
+            "workspace_quota_bytes INTEGER NOT NULL DEFAULT 0",
         ):
             _add_column(con, "users", definition)
 
@@ -295,6 +297,7 @@ def public_user(row) -> dict:
         "updated_at": row["updated_at"],
         "approved_at": row["approved_at"],
         "last_login_at": row["last_login_at"],
+        "workspace_quota_bytes": int(row["workspace_quota_bytes"] or 0) if "workspace_quota_bytes" in row.keys() else 0,
         "social_providers": social_providers_for_user(row["id"]),
     }
 
@@ -930,12 +933,14 @@ def _notify_admins_activated(user) -> None:
     )
 
 
-def update_user_admin(target_id: int, actor_id: int, *, active: bool | None = None, role: str | None = None) -> dict[str, Any]:
+def update_user_admin(target_id: int, actor_id: int, *, active: bool | None = None, role: str | None = None, workspace_quota_bytes: int | None = None) -> dict[str, Any]:
     row = get_user(target_id)
     if not row:
         raise ValueError("Utente non trovato.")
     if role is not None and role not in {"admin", "user"}:
         raise ValueError("Ruolo non valido.")
+    if workspace_quota_bytes is not None and int(workspace_quota_bytes) < 0:
+        raise ValueError("La quota workspace non può essere negativa.")
     if active is True and not row["email_confirmed"]:
         raise ValueError("L'utente deve prima confermare il proprio indirizzo email.")
     if target_id == actor_id and active is False:
@@ -954,6 +959,8 @@ def update_user_admin(target_id: int, actor_id: int, *, active: bool | None = No
     with db() as con:
         if role is not None:
             con.execute("UPDATE users SET role=?, updated_at=? WHERE id=?", (role, ts, target_id))
+        if workspace_quota_bytes is not None:
+            con.execute("UPDATE users SET workspace_quota_bytes=?, updated_at=? WHERE id=?", (int(workspace_quota_bytes), ts, target_id))
         if active is not None:
             con.execute(
                 "UPDATE users SET active=?, approved_at=?, approved_by=?, updated_at=? WHERE id=?",

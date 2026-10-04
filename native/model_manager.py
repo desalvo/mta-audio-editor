@@ -18,7 +18,7 @@ def local_repo()->Path:
 
 def _server_url():return os.getenv("MTA_MODEL_SERVER_URL","https://mta-audio-editor.apps.desalvo.eu").rstrip('/')+'/'
 def _headers()->dict[str,str]:
-    headers=_headers()
+    headers={'User-Agent':'MTA-Audio-Editor-native-model-manager','Accept':'application/json'}
     token=os.getenv('MTA_MODEL_ACCESS_TOKEN','').strip()
     if token:headers['Authorization']='Bearer '+token
     return headers

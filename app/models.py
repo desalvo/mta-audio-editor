@@ -78,14 +78,34 @@ class Marker(BaseModel):
     label: str = Field(max_length=500)
 
 
+class LyricWord(BaseModel):
+    start_ms: int = Field(ge=0)
+    end_ms: int = Field(ge=0)
+    text: str = Field(max_length=500)
+
+
 class LyricLine(BaseModel):
     time_ms: int = Field(ge=0)
+    end_ms: int | None = Field(default=None, ge=0)
     text: str = Field(max_length=4000)
+    words: list[LyricWord] = Field(default_factory=list, max_length=500)
 
 
 class Chord(BaseModel):
     time_ms: int = Field(ge=0)
     chord: str = Field(max_length=200)
+
+
+class RightsRecord(BaseModel):
+    uid: str = Field(min_length=1, max_length=160)
+    society: str = Field(min_length=1, max_length=80)
+    title: str = Field(default="", max_length=300)
+    original_title: str = Field(default="", max_length=300)
+    authors: list[str] = Field(default_factory=list, max_length=64)
+    performers: list[str] = Field(default_factory=list, max_length=64)
+    publishers: list[str] = Field(default_factory=list, max_length=64)
+    identifiers: dict[str, str] = Field(default_factory=dict)
+    source_url: str = Field(default="", max_length=2048)
 
 
 class DeleteRangeRequest(BaseModel):
@@ -126,7 +146,7 @@ class MtaExportRequest(BaseModel):
 
 
 class ProjectExportRequest(BaseModel):
-    format: Literal["mta", "wav", "mp3", "flac"] = "mta"
+    format: Literal["mta", "wav", "mp3", "flac", "mp4"] = "mta"
     filename: str = Field(default="project", min_length=1, max_length=240)
     mta_target: Literal["MTA8", "MTA16"] | None = None
     mta_device_profile: Literal["auto", "merish5_xynthia2", "bbeat_divo", "mlive_mta16_default", "merish5_plus_mta16", "generic"] = "auto" 
@@ -134,6 +154,9 @@ class ProjectExportRequest(BaseModel):
     sample_rate: Literal[44100, 48000] = 44100
     wav_bit_depth: Literal[16, 24, 32] = 24
     flac_compression: int = Field(default=8, ge=0, le=12)
+    karaoke_resolution: Literal["1280x720", "1920x1080"] = "1920x1080"
+    karaoke_chords: bool = True
+    karaoke_background: str | None = Field(default=None, max_length=180)
     slots: list[MtaSlotMapping] = Field(default_factory=list, max_length=16)
     output_path: str | None = Field(default=None, max_length=4096)
 
@@ -144,6 +167,8 @@ class Project(BaseModel):
     shared_with_user_ids: list[int] = Field(default_factory=list)
     title: str = Field(max_length=200)
     artist: str = Field(default="", max_length=200)
+    original_title: str = Field(default="", max_length=300)
+    authors: list[str] = Field(default_factory=list, max_length=64)
     bpm: float = Field(default=120.0, gt=0, le=500)
     key: str = Field(default="", max_length=40)
     target: Literal["MTA8", "MTA16", "DAW"] = "MTA8"
@@ -152,6 +177,8 @@ class Project(BaseModel):
     markers: list[Marker] = Field(default_factory=list)
     lyrics: list[LyricLine] = Field(default_factory=list)
     chords: list[Chord] = Field(default_factory=list)
+    rights_records: list[RightsRecord] = Field(default_factory=list, max_length=32)
+    rights_societies: list[str] = Field(default_factory=lambda: ["SIAE", "SOUNDREEF"], max_length=16)
     preserved_attachments: list[str] = Field(default_factory=list)
     master_volume_db: float = Field(default=0.0, ge=-120.0, le=24.0)
     master_inserts: list[InsertPlugin] = Field(default_factory=list, max_length=16)
@@ -168,7 +195,7 @@ class Project(BaseModel):
     metadata_panel_visible: bool = True
     timeline_zoom_px_per_sec: int = Field(default=70, ge=25, le=240)
     mixer_meta_tab: Literal["lyrics", "chords", "markers"] = "lyrics"
-    export_format: Literal["mta", "wav", "mp3", "flac"] = "mta"
+    export_format: Literal["mta", "wav", "mp3", "flac", "mp4"] = "mta"
 
     @field_validator("shared_with_user_ids")
     @classmethod

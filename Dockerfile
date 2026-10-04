@@ -1,5 +1,5 @@
 FROM python:3.14-slim-trixie
-ARG APP_VERSION=0.2.0-81
+ARG APP_VERSION=0.2.0-113
 ARG BUILD_ID=unknown
 ARG INSTALL_STEMS=true
 LABEL org.opencontainers.image.title="MTA Audio Editor" \
@@ -14,7 +14,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1 \
     XDG_CACHE_HOME=/data/projects/.cache TORCH_HOME=/data/projects/.cache/torch
 RUN apt-get update \
     && apt-get upgrade -y \
-    && apt-get install -y --no-install-recommends ffmpeg ca-certificates tini \
+    && apt-get install -y --no-install-recommends ffmpeg ca-certificates tini fonts-dejavu-core \
     && rm -rf /var/lib/apt/lists/* \
     && groupadd --system --gid 10001 mtaeditor \
     && useradd --system --uid 10001 --gid 10001 --home /nonexistent --shell /usr/sbin/nologin mtaeditor
@@ -27,10 +27,10 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends build-essential cmake \
     && python -m pip install --no-cache-dir -r requirements.txt \
     && if [ "$INSTALL_STEMS" = "true" ]; then CMAKE=/usr/bin/cmake python -m pip install --no-cache-dir -r requirements-stems.txt; fi \
-    && python -m pip install --no-cache-dir --upgrade --force-reinstall setuptools==84.0.0 wheel==0.48.0 urllib3==2.8.0 msgpack==1.2.1 \
+    && python -m pip install --no-cache-dir --upgrade --force-reinstall setuptools==84.0.0 wheel==0.48.0 urllib3==2.8.0 msgpack==1.2.3 \
     && python -m pip check \
     && python -c "from importlib.metadata import distributions; n=[dist.metadata.get('Name','') for dist in distributions() if dist.metadata.get('Name','').lower().startswith('nvidia-')]; print('NVIDIA Python packages:', n); assert not n, n" \
-    && python -c "from importlib.metadata import version; expected={'setuptools':'84.0.0','wheel':'0.48.0','urllib3':'2.8.0','msgpack':'1.2.1'}; actual={p:version(p) for p in expected}; print(actual); assert actual == expected, (actual, expected)" \
+    && python -c "from importlib.metadata import version; expected={'setuptools':'84.0.0','wheel':'0.48.0','urllib3':'2.8.0','msgpack':'1.2.3'}; actual={p:version(p) for p in expected}; print(actual); assert actual == expected, (actual, expected)" \
     && apt-get purge -y --auto-remove build-essential cmake \
     && rm -rf /var/lib/apt/lists/*
 RUN python -c "import fastapi, uvicorn, numpy" \

@@ -642,3 +642,17 @@ body.mobile-client input,body.mobile-client select,body.mobile-client button{tou
 .v-fader{width:108px;height:13px}
 .meter-static{display:none!important}
 .channel-value{font-size:10px}
+
+/* Track color + drag/drop ordering */
+.track-drag-handle{width:18px;height:20px;display:inline-grid;place-items:center;cursor:grab;color:#8ba2b5;border:1px solid #31495c;border-radius:3px;font-size:10px;line-height:1;user-select:none}.track-drag-handle:active{cursor:grabbing}.track-color-picker{width:22px;height:20px;padding:0;border:1px solid #3a5063;border-radius:3px;background:transparent;cursor:pointer}.track-head.dragging{opacity:.42}.track-head.drag-target{outline:2px solid #2aa7ff;outline-offset:-2px;background:#10314a}.track-head.drag-target:before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:#57c3ff}
+
+
+/* 0.2.0-115 mobile/iOS contextual track menu */
+[data-track-context-id]{-webkit-touch-callout:none}
+.track-more-menu{font-size:16px;line-height:1;padding:0 5px;min-width:24px}
+@media (hover:hover) and (pointer:fine){.track-more-menu{display:none}}
+@media (hover:none), (pointer:coarse){
+  .track-more-menu{display:inline-flex;align-items:center;justify-content:center}
+  .track-context-menu{width:min(240px,calc(100vw - 16px));font-size:14px}
+  .track-context-menu button{min-height:44px;padding:10px 12px;font-size:14px}
+}

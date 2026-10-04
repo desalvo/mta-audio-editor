@@ -113,7 +113,7 @@ function selectedTrackIds(){return $$('.track-check:checked').map(x=>x.value)}
 function linesToText(a,b){return(a||[]).map(x=>`${(x.time_ms/1000).toFixed(3)}\t${x[b]}`).join('\n')}
 function textToLines(v,key){return v.split(/\n/).map(x=>x.trim()).filter(Boolean).map(line=>{const [t,...rest]=line.split(/\t|\s{2,}/);return{time_ms:Math.max(0,Math.round(parseFloat(t)*1000)||0),[key]:rest.join(' ').trim()}})}
 
-async function init(){if(isMobileClient())document.body.classList.add('mobile-client');try{currentUser=await api('/api/session');const a=$('#adminNav');if(a)a.hidden=!!currentUser.native_single_user||currentUser.role!=='admin';if(currentUser.native_single_user){document.body.classList.add('native-single-user');const b=$('#nativeSettingsButton');if(b)b.hidden=false}}catch(e){}if(currentUser?.native_single_user){const bridge=await waitForNativeApi();if(bridge?.get_native_settings){try{const cfg=await bridge.get_native_settings();autosaveEnabled=cfg.autosave_enabled!==false}catch(e){}}setTimeout(()=>checkNativeAppUpdate(false),1200)}try{pluginInfo=await api('/api/plugins')}catch(e){}await refresh()}
+async function init(){if(isMobileClient())document.body.classList.add('mobile-client');try{currentUser=await api('/api/session');const a=$('#adminNav');if(a)a.hidden=!!currentUser.native_single_user||currentUser.role!=='admin';const sb=$('#nativeSettingsButton');if(sb)sb.hidden=!(currentUser.native_single_user||currentUser.role==='admin');if(currentUser.native_single_user){document.body.classList.add('native-single-user')}}catch(e){}if(currentUser?.native_single_user){const bridge=await waitForNativeApi();if(bridge?.get_native_settings){try{const cfg=await bridge.get_native_settings();autosaveEnabled=cfg.autosave_enabled!==false}catch(e){}}setTimeout(()=>checkNativeAppUpdate(false),1200)}try{pluginInfo=await api('/api/plugins')}catch(e){}await refresh()}
 
 function toggleEditingToolsPanel(){
   const panel=$('#editingToolsPanel');if(!panel)return;
@@ -346,10 +346,29 @@ function toolbarHtml(){
   </div>`
 }
 
+function setTrackColor(id,value){
+  const t=trackById(id);if(!t||!/^#[0-9A-Fa-f]{6}$/.test(String(value||'')))return;
+  t.color=value;render();markDirty(100);
+}
+let draggingTrackId=null;
+function beginTrackDrag(event,id){draggingTrackId=id;event.dataTransfer.effectAllowed='move';event.dataTransfer.setData('text/plain',id);event.currentTarget.closest('.track-head')?.classList.add('dragging')}
+function endTrackDrag(){draggingTrackId=null;$$('.track-head').forEach(x=>x.classList.remove('dragging','drag-target'))}
+function trackDragOver(event,id){if(!draggingTrackId||draggingTrackId===id)return;event.preventDefault();event.dataTransfer.dropEffect='move';$$('.track-head').forEach(x=>x.classList.toggle('drag-target',x.id===`head-${id}`))}
+function dropTrack(event,targetId){
+  event.preventDefault();const sourceId=draggingTrackId||event.dataTransfer.getData('text/plain');endTrackDrag();if(!current||!sourceId||sourceId===targetId)return;
+  const from=current.tracks.findIndex(t=>t.id===sourceId),to=current.tracks.findIndex(t=>t.id===targetId);if(from<0||to<0)return;
+  const [moved]=current.tracks.splice(from,1);current.tracks.splice(to,0,moved);render();markDirty(100);toast('Ordine tracce aggiornato');
+}
+const NOTE_PC={C:0,'C#':1,Db:1,D:2,'D#':3,Eb:3,E:4,F:5,'F#':6,Gb:6,G:7,'G#':8,Ab:8,A:9,'A#':10,Bb:10,B:11};
+const SHARP_NOTES=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'],FLAT_NOTES=['C','Db','D','Eb','E','F','Gb','G','Ab','A','Bb','B'];
+function transposeNoteName(note,shift){const pc=NOTE_PC[note];if(pc===undefined)return note;const names=note.includes('b')?FLAT_NOTES:SHARP_NOTES;return names[(pc+Math.round(Number(shift||0))+120)%12]}
+function transposeChordLabel(label,shift){const n=Math.round(Number(shift||0));if(!n)return label;const m=String(label||'').match(/^([A-G](?:#|b)?)(.*)$/);if(!m)return label;let suffix=m[2].replace(/\/([A-G](?:#|b)?)/g,(_,x)=>'/'+transposeNoteName(x,n));return transposeNoteName(m[1],n)+suffix}
+function effectiveProjectKey(){const key=String(current?.key||'');const m=key.match(/^\s*([A-G](?:#|b)?)(.*)$/);return m?transposeNoteName(m[1],current?.pitch_semitones||0)+m[2]:key}
+
 function trackHead(t,i){
   const color=t.color||TRACK_COLORS[i%TRACK_COLORS.length],anySolo=current.tracks.some(x=>x.solo),inaudible=t.mute||(anySolo&&!t.solo);
   const audioMode=t.channels===2?'STEREO':(t.channels===1?'MONO':(t.channel_layout?String(t.channel_layout).toUpperCase():''));
-  return `<div class="track-head ${t.id===selectedTrackId?'selected':''} ${inaudible?'audibly-muted':''}" id="head-${t.id}" style="--track-color:${color}" onclick="selectTrack('${t.id}')" oncontextmenu="openTrackContextMenu(event,'${t.id}')">
+  return `<div class="track-head ${t.id===selectedTrackId?'selected':''} ${inaudible?'audibly-muted':''}" id="head-${t.id}" data-track-context-id="${t.id}" style="--track-color:${color}" onclick="selectTrack('${t.id}')" oncontextmenu="openTrackContextMenu(event,'${t.id}')" ondragover="trackDragOver(event,'${t.id}')" ondrop="dropTrack(event,'${t.id}')">
     <div class="track-color"></div>
     <div class="track-num">${i+1}</div>
     <div class="track-info">
@@ -358,10 +377,13 @@ function trackHead(t,i){
         <span class="track-type">${esc(t.type)}${audioMode?` · ${esc(audioMode)}`:''}</span>
       </div>
       <div class="track-buttons">
+        <span class="track-drag-handle" draggable="true" title="Trascina per riordinare" ondragstart="event.stopPropagation();beginTrackDrag(event,'${t.id}')" ondragend="endTrackDrag()" onclick="event.stopPropagation()">⋮⋮</span>
+        <input class="track-color-picker" type="color" value="${color}" title="Colore traccia" onclick="event.stopPropagation()" onchange="event.stopPropagation();setTrackColor('${t.id}',this.value)">
         <button class="tiny-btn" title="Rinomina traccia" onclick="event.stopPropagation();renameTrack('${t.id}')">✎</button>
         <button data-mute-track="${t.id}" class="tiny-btn mute ${t.mute?'on':''}" onclick="event.stopPropagation();toggleBool(this,'${t.id}','mute')">M</button>
         <button data-solo-track="${t.id}" class="tiny-btn solo ${t.solo?'on':''}" onclick="event.stopPropagation();toggleBool(this,'${t.id}','solo')">S</button>
         <button class="tiny-btn preview" onclick="event.stopPropagation();previewTrack('${t.id}')">▶</button>
+        <button class="tiny-btn track-more-menu" type="button" title="Menu traccia" aria-label="Apri menu contestuale di ${esc(t.name)}" onclick="event.stopPropagation();openTrackContextMenu(event,'${t.id}')">⋯</button>
         <input class="track-mini-slider track-volume-range" data-volume-track="${t.id}" type="range" min="-60" max="12" step="0.5" value="${t.volume_db}" oninput="setTrackVolume('${t.id}',this.value)">
         <input class="track-db-input volume-number" id="db-${t.id}" data-volume-number="${t.id}" type="number" min="-60" max="12" step="0.1" value="${Number(t.volume_db).toFixed(1)}" oninput="setTrackVolume('${t.id}',this.value)" aria-label="Volume ${esc(t.name)} in dB" title="Volume in dB">
       </div>
@@ -373,8 +395,8 @@ function closeTrackContextMenu(){
   const menu=$('#trackContextMenu');
   if(menu)menu.remove();
 }
-function openTrackContextMenu(event,id){
-  event.preventDefault();event.stopPropagation();closeTrackContextMenu();
+function openTrackContextMenuAt(id,clientX,clientY){
+  closeTrackContextMenu();
   const track=trackById(id);if(!track)return;
   selectedTrackId=id;
   $$('.track-head').forEach(el=>el.classList.toggle('selected',el.id===`head-${id}`));
@@ -383,16 +405,79 @@ function openTrackContextMenu(event,id){
   const menu=document.createElement('div');
   menu.id='trackContextMenu';
   menu.className='track-context-menu';
+  menu.setAttribute('role','menu');
   menu.innerHTML=`
     <button type="button" onclick="closeTrackContextMenu();renameTrack('${id}')">✎ <span>Rinomina</span></button>
     <button type="button" ${disabled} onclick="closeTrackContextMenu();startTrackStemSplit('${id}')">▥ <span>Separa</span></button>
+    <button type="button" onclick="closeTrackContextMenu();startTrackTextAnalysis('${id}','lyrics')">≡ <span>Estrai lyrics</span></button>
+    <button type="button" onclick="closeTrackContextMenu();startTrackTextAnalysis('${id}','chords')">♬ <span>Estrai chords</span></button>
     <button type="button" class="danger" onclick="closeTrackContextMenu();deleteTracksByIds(['${id}'])">× <span>Rimuovi</span></button>
   `;
   document.body.appendChild(menu);
   const pad=8,r=menu.getBoundingClientRect();
-  menu.style.left=`${Math.max(pad,Math.min(event.clientX,window.innerWidth-r.width-pad))}px`;
-  menu.style.top=`${Math.max(pad,Math.min(event.clientY,window.innerHeight-r.height-pad))}px`;
+  const x=Number.isFinite(Number(clientX))?Number(clientX):window.innerWidth/2;
+  const y=Number.isFinite(Number(clientY))?Number(clientY):window.innerHeight/2;
+  menu.style.left=`${Math.max(pad,Math.min(x,window.innerWidth-r.width-pad))}px`;
+  menu.style.top=`${Math.max(pad,Math.min(y,window.innerHeight-r.height-pad))}px`;
 }
+function openTrackContextMenu(event,id){
+  event?.preventDefault?.();event?.stopPropagation?.();
+  let x=event?.clientX,y=event?.clientY;
+  if((!x&&!y)&&event?.currentTarget?.getBoundingClientRect){const b=event.currentTarget.getBoundingClientRect();x=b.right;y=b.bottom}
+  openTrackContextMenuAt(id,x,y);
+}
+
+const TRACK_CONTEXT_LONG_PRESS_MS=600,TRACK_CONTEXT_MOVE_PX=12;
+let trackContextPress=null,trackContextSuppressClickUntil=0;
+function cancelTrackContextLongPress(){
+  if(trackContextPress?.timer)clearTimeout(trackContextPress.timer);
+  trackContextPress=null;
+}
+function trackContextPointerDown(event){
+  if(event.pointerType!=='touch'&&event.pointerType!=='pen')return;
+  const target=event.target.closest?.('[data-track-context-id]');
+  if(!target||event.target.closest?.('button,input,select,textarea,a,[draggable="true"]'))return;
+  cancelTrackContextLongPress();
+  const state={pointerId:event.pointerId,id:target.dataset.trackContextId,x:event.clientX,y:event.clientY,target,timer:null};
+  state.timer=setTimeout(()=>{
+    if(trackContextPress!==state)return;
+    trackContextSuppressClickUntil=Date.now()+800;
+    if(navigator.vibrate)navigator.vibrate(12);
+    openTrackContextMenuAt(state.id,state.x,state.y);
+    trackContextPress=null;
+  },TRACK_CONTEXT_LONG_PRESS_MS);
+  trackContextPress=state;
+}
+function trackContextPointerMove(event){
+  const state=trackContextPress;if(!state||state.pointerId!==event.pointerId)return;
+  if(Math.hypot(event.clientX-state.x,event.clientY-state.y)>TRACK_CONTEXT_MOVE_PX)cancelTrackContextLongPress();
+}
+function trackContextPointerEnd(event){
+  if(trackContextPress?.pointerId===event.pointerId)cancelTrackContextLongPress();
+}
+document.addEventListener('pointerdown',trackContextPointerDown,{passive:true});
+document.addEventListener('pointermove',trackContextPointerMove,{passive:true});
+document.addEventListener('pointerup',trackContextPointerEnd,{passive:true});
+document.addEventListener('pointercancel',trackContextPointerEnd,{passive:true});
+document.addEventListener('click',event=>{
+  if(Date.now()<trackContextSuppressClickUntil&&event.target.closest?.('[data-track-context-id]')){event.preventDefault();event.stopPropagation()}
+},true);
+async function startTrackTextAnalysis(id,kind){
+  if(!current)return;
+  const track=trackById(id);if(!track)return toast('Traccia non trovata');
+  const label=kind==='lyrics'?'Lyrics':'Chords';
+  await flushAutosave();
+  try{
+    const job=await api(`/api/projects/${current.id}/tracks/${id}/extract-${kind}-jobs`,{method:'POST'});
+    showMediaProgress(`Estrazione ${label}`,job.progress,job.message);
+    pollMediaJob(job.id,`Estrazione ${label}`,async()=>{
+      current=await api(`/api/projects/${current.id}`);
+      mixerMetaTab=kind;current.mixer_meta_tab=kind;
+      render();toast(`${label} estratti e sincronizzati nel progetto`);
+    });
+  }catch(e){toast(e.message)}
+}
+
 async function startTrackStemSplit(id){
   if(!current)return;
   const track=trackById(id);if(!track)return toast('Traccia non trovata');
@@ -414,7 +499,7 @@ function renameTrack(id){const t=trackById(id);if(!t)return;const value=prompt('
 function projectFormatLabel(target=current?.target){return target==='DAW'?'Multitrack DAW':target}
 function mtaSlotLimit(target=current?.target){return target==='MTA8'?8:16}
 function setTrackMtaSlot(id,value){const t=trackById(id);if(!t)return;const n=Number(value||0),limit=mtaSlotLimit();t.mta_slot=n>=1&&n<=limit?n:null;markDirty(100);render()}
-function lane(t,W,i){const color=t.color||TRACK_COLORS[i%TRACK_COLORS.length];const anySolo=current.tracks.some(x=>x.solo);const inaudible=t.mute||(anySolo&&!t.solo);return `<div class="lane ${inaudible?'audibly-muted':''}" id="lane-${t.id}" data-track="${t.id}" style="width:${W}px;--track-color:${color}" oncontextmenu="openTrackContextMenu(event,'${t.id}')"><canvas class="wave" id="wave-${t.id}" width="${W}" height="78"></canvas><div class="waveform-progress ${t.waveform_peaks?.length?'hidden':''}" id="wave-progress-${t.id}"><div class="waveform-progress-bar" id="wave-progress-bar-${t.id}" style="width:2%"></div><span id="wave-progress-label-${t.id}">Waveform…</span></div>${(t.clips||[]).map((c,j)=>{const l=c.timeline_start_ms/1000*pxPerSec,w=(c.source_end_ms-c.source_start_ms)/1000*pxPerSec;return `<div class="clip-block" style="left:${l}px;width:${Math.max(2,w)}px"><span class="clip-label">${esc(t.name)}_${String(j+1).padStart(2,'0')}</span></div>`}).join('')}</div>`}
+function lane(t,W,i){const color=t.color||TRACK_COLORS[i%TRACK_COLORS.length];const anySolo=current.tracks.some(x=>x.solo);const inaudible=t.mute||(anySolo&&!t.solo);return `<div class="lane ${inaudible?'audibly-muted':''}" id="lane-${t.id}" data-track="${t.id}" data-track-context-id="${t.id}" style="width:${W}px;--track-color:${color}" oncontextmenu="openTrackContextMenu(event,'${t.id}')"><canvas class="wave" id="wave-${t.id}" width="${W}" height="78"></canvas><div class="waveform-progress ${t.waveform_peaks?.length?'hidden':''}" id="wave-progress-${t.id}"><div class="waveform-progress-bar" id="wave-progress-bar-${t.id}" style="width:2%"></div><span id="wave-progress-label-${t.id}">Waveform…</span></div>${(t.clips||[]).map((c,j)=>{const l=c.timeline_start_ms/1000*pxPerSec,w=(c.source_end_ms-c.source_start_ms)/1000*pxPerSec;return `<div class="clip-block" style="left:${l}px;width:${Math.max(2,w)}px"><span class="clip-label">${esc(t.name)}_${String(j+1).padStart(2,'0')}</span></div>`}).join('')}</div>`}
 
 function inspectorHtml(){const t=selectedTrack();if(!t)return `<aside class="inspector"><div class="inspector-tabs"><button class="inspector-tab active">Inspector</button><button class="inspector-tab">Stems</button><button class="inspector-tab">Metadata</button></div><div class="inspector-body"><p class="hint">Import a track to open the inspector.</p></div></aside>`;const i=current.tracks.indexOf(t);return `<aside class="inspector" id="inspector"><div class="inspector-tabs"><button class="inspector-tab active">Inspector</button><button class="inspector-tab">Stems</button><button class="inspector-tab">Metadata</button></div><div class="inspector-body"><div class="inspector-track-title"><span>◉</span>${esc(t.name)}<label class="tool" style="margin-left:auto;min-width:auto;height:28px">Replace<input type="file" accept="audio/*,.mp3,.wav" hidden onchange="replaceTrack('${t.id}',this)"></label></div><div class="inspector-row"><label>Volume</label><input class="track-volume-range" data-volume-track="${t.id}" type="range" min="-60" max="12" step="0.5" value="${t.volume_db}" oninput="setTrackVolume('${t.id}',this.value)"><input class="valuebox volume-number" id="ins-db-${t.id}" data-volume-number="${t.id}" type="number" min="-60" max="12" step="0.1" value="${Number(t.volume_db).toFixed(1)}" oninput="setTrackVolume('${t.id}',this.value)" aria-label="Volume ${esc(t.name)} in dB" title="Volume in dB"></div><div class="inspector-row"><label>Pan</label><input type="range" min="-1" max="1" step="0.01" value="${t.pan||0}" oninput="setTrackPan('${t.id}',this.value)"><div class="valuebox" id="pan-${t.id}">${Number(t.pan||0).toFixed(2)}</div></div><div class="inspector-row"><label>Type</label><select class="model-input" data-i="${i}" data-k="type">${['drums','bass','guitars','keyboards','orchestra','winds','melody','click','choirs','other'].map(x=>`<option ${x===t.type?'selected':''}>${x}</option>`).join('')}</select><div class="valuebox">${t.duration_ms?fmtTime(t.duration_ms/1000):'--'}</div></div><div class="inspector-row"><label>MTA Slot</label><select onchange="setTrackMtaSlot('${t.id}',this.value)"><option value="" ${!t.mta_slot?'selected':''}>Auto</option>${Array.from({length:mtaSlotLimit()},(_,n)=>`<option value="${n+1}" ${Number(t.mta_slot)===n+1?'selected':''}>${n+1}</option>`).join('')}</select><div class="valuebox">${t.mta_slot?`Slot ${t.mta_slot}`:'Auto'}</div></div>${insertPanelHtml(t,false)}<div class="panel-section"><div class="section-title">Track export</div><div class="track-export-actions"><button onclick="exportTrack('${t.id}','wav')">WAV</button><button onclick="exportTrack('${t.id}','mp3')">MP3</button><button onclick="exportTrack('${t.id}','flac')">FLAC</button></div></div><div class="panel-section"><div class="collapsed-row">› Send</div><div class="collapsed-row">› Track Automation</div><div class="collapsed-row">› Advanced</div></div></div></aside>`}
 
@@ -599,11 +684,11 @@ function mixerHtml(){
   </div>${exportPane}${metaPane}<div id="exportMapModal" class="modal-card export-map-modal hidden"></div>`;
 }
 function exportPaneHtml(limit,over){
-  return `<div class="export-pane" id="exportPane"><div class="dock-tabs"><button class="dock-tab active">Export</button><button class="dock-tab">Single Track Export</button><button class="dock-close" onclick="toggleMixerPanel('export')" title="Nascondi Export">×</button></div><div class="export-content"><div class="export-title">Final output</div>${over?`<div class="export-warning">Project has more tracks than ${current.target}. MTA export will ask how to merge tracks into ${limit} output slots.</div>`:''}<div class="format-option ${exportFormat==='mta'?'selected':''}" onclick="selectExport('mta')"><span>▧ MTA (${current.target==='DAW'?'MTA8 / MTA16':current.target})</span><span>›</span></div><div class="format-option ${exportFormat==='wav'?'selected':''}" onclick="selectExport('wav')"><span>♫ WAV (24 bit, 44.1 kHz)</span><span>›</span></div><div class="format-option ${exportFormat==='mp3'?'selected':''}" onclick="selectExport('mp3')"><span>♫ MP3 (320 kbps)</span><span>›</span></div><div class="format-option ${exportFormat==='flac'?'selected':''}" onclick="selectExport('flac')"><span>♫ FLAC (lossless)</span><span>›</span></div><div class="export-actions"><button onclick="doExport('mta')">Export MTA</button><button onclick="doExport('wav')">WAV</button><button onclick="doExport('mp3')">MP3</button><button onclick="doExport('flac')">FLAC</button></div><button class="preview-master" onclick="previewMaster()">▶ Render &amp; Preview Master</button><button class="analysis-btn" onclick="showMtaAnalysis()">⌁ MTA format analysis</button></div></div>`;
+  return `<div class="export-pane" id="exportPane"><div class="dock-tabs"><button class="dock-tab active">Export</button><button class="dock-tab">Single Track Export</button><button class="dock-close" onclick="toggleMixerPanel('export')" title="Nascondi Export">×</button></div><div class="export-content"><div class="export-title">Final output</div>${over?`<div class="export-warning">Project has more tracks than ${current.target}. MTA export will ask how to merge tracks into ${limit} output slots.</div>`:''}<div class="format-option ${exportFormat==='mta'?'selected':''}" onclick="selectExport('mta')"><span>▧ MTA (${current.target==='DAW'?'MTA8 / MTA16':current.target})</span><span>›</span></div><div class="format-option ${exportFormat==='wav'?'selected':''}" onclick="selectExport('wav')"><span>♫ WAV (24 bit, 44.1 kHz)</span><span>›</span></div><div class="format-option ${exportFormat==='mp3'?'selected':''}" onclick="selectExport('mp3')"><span>♫ MP3 (320 kbps)</span><span>›</span></div><div class="format-option ${exportFormat==='flac'?'selected':''}" onclick="selectExport('flac')"><span>♫ FLAC (lossless)</span><span>›</span></div><div class="format-option ${exportFormat==='mp4'?'selected':''} ${current.lyrics?.length?'':'disabled'}" onclick="${current.lyrics?.length?"selectExport('mp4');openKaraokeExport()":"toast('L’export MP4 richiede lyrics sincronizzate')"}"><span>▣ MP4 Karaoke${current.lyrics?.length?'':' · lyrics richieste'}</span><span>›</span></div><div class="export-actions"><button onclick="doExport('mta')">Export MTA</button><button onclick="doExport('wav')">WAV</button><button onclick="doExport('mp3')">MP3</button><button onclick="doExport('flac')">FLAC</button><button onclick="openKaraokeExport()" ${current.lyrics?.length?'':'disabled'}>MP4 Karaoke</button></div><button class="preview-master" onclick="previewMaster()">▶ Render &amp; Preview Master</button><button class="analysis-btn" onclick="showMtaAnalysis()">⌁ MTA format analysis</button></div></div>`;
 }
 function metaPaneHtml(){
-  const config={lyrics:['text','Lyrics'],chords:['chord','Chords'],markers:['label','Markers']},[key,label]=config[mixerMetaTab]||config.lyrics,rows=current[mixerMetaTab]||[];
-  return `<div class="meta-pane" id="metaPane"><div class="dock-tabs"><button class="dock-tab ${mixerMetaTab==='lyrics'?'active':''}" onclick="showMetaPanel('lyrics')">Lyrics</button><button class="dock-tab ${mixerMetaTab==='chords'?'active':''}" onclick="showMetaPanel('chords')">Chords</button><button class="dock-tab ${mixerMetaTab==='markers'?'active':''}" onclick="showMetaPanel('markers')">Markers</button><button class="dock-close" onclick="toggleMixerPanel('meta')" title="Nascondi Lyrics/Chords/Markers">×</button></div><div class="meta-tabs-content"><div class="meta-list">${rows.map(x=>`<div class="meta-line"><time>${fmtTime(x.time_ms/1000)}</time><span>${esc(x[key])}</span></div>`).join('')||`<div class="hint">No synchronized ${label.toLowerCase()} yet.</div>`}</div><div class="meta-actions"><button class="tool" onclick="editTimed('${mixerMetaTab}')">Edit ${label.toLowerCase()}</button></div><textarea id="lyrics" hidden>${esc(linesToText(current.lyrics,'text'))}</textarea><textarea id="chords" hidden>${esc(linesToText(current.chords,'chord'))}</textarea><textarea id="markers" hidden>${esc(linesToText(current.markers,'label'))}</textarea></div></div>`;
+  const config={lyrics:['text','Lyrics'],chords:['chord','Chords'],markers:['label','Markers']},[key,label]=config[mixerMetaTab]||config.lyrics,rows=current[mixerMetaTab]||[];const displayValue=x=>mixerMetaTab==='chords'?transposeChordLabel(x[key],current.pitch_semitones||0):x[key];
+  return `<div class="meta-pane" id="metaPane"><div class="dock-tabs"><button class="dock-tab ${mixerMetaTab==='lyrics'?'active':''}" onclick="showMetaPanel('lyrics')">Lyrics</button><button class="dock-tab ${mixerMetaTab==='chords'?'active':''}" onclick="showMetaPanel('chords')">Chords</button><button class="dock-tab ${mixerMetaTab==='markers'?'active':''}" onclick="showMetaPanel('markers')">Markers</button><button class="dock-close" onclick="toggleMixerPanel('meta')" title="Nascondi Lyrics/Chords/Markers">×</button></div><div class="meta-tabs-content"><div class="meta-list">${rows.map(x=>`<div class="meta-line"><time>${fmtTime(x.time_ms/1000)}</time><span>${esc(displayValue(x))}</span></div>`).join('')||`<div class="hint">No synchronized ${label.toLowerCase()} yet.</div>`}</div><div class="meta-actions"><button class="tool" onclick="editTimed('${mixerMetaTab}')">Edit ${label.toLowerCase()}</button>${mixerMetaTab==='lyrics'?`<button class="tool" onclick="downloadProjectLyrics(false)">TXT</button><button class="tool" onclick="downloadProjectLyrics(true)">TXT + chords</button><button class="tool" onclick="downloadProjectChordPro()">ChordPro</button><label class="tool" title="Colore chords nel PDF">Chord color <input id="lyricsPdfChordColor" type="color" value="#7B1FA2" style="width:28px;height:22px;padding:0;border:0;background:none"></label><button class="tool" onclick="downloadProjectLyricsPdf()">PDF</button>`:''}</div><textarea id="lyrics" hidden>${esc(linesToText(current.lyrics,'text'))}</textarea><textarea id="chords" hidden>${esc(linesToText(current.chords,'chord'))}</textarea><textarea id="markers" hidden>${esc(linesToText(current.markers,'label'))}</textarea></div></div>`;
 }
 function updateMixerDockLayout(){
   const dock=$('#mixerDock');if(!dock||!current)return;
@@ -1142,6 +1227,8 @@ function openStemWorkflow(){
       <label class="workflow-field"><span>Brano completo MP3</span><input id="stemWorkflowFile" type="file" accept=".mp3,audio/mpeg"></label>
       ${remembered}
       <label class="workflow-check"><input id="stemKeepOriginal" type="checkbox" checked> Mantieni anche la traccia “Original Mix” nel progetto</label>
+      <label class="workflow-check"><input id="stemExtractLyrics" type="checkbox"> Estrai anche le lyrics (Whisper large-v3, timing parola per parola)</label>
+      <label class="workflow-check"><input id="stemExtractChords" type="checkbox"> Estrai anche i chords (Chordino/NNLS-Chroma se disponibile, fallback interno)</label>
       <div class="workflow-note">Il file originale viene sempre conservato in <b>Originals</b>. Il progetto viene salvato dopo l’import e dopo ogni stem aggiunto. Su iPhone/iPad, <b>Auto</b> usa Core ML sul dispositivo quando il modello richiesto è disponibile e ricade automaticamente sul server negli altri casi. I modelli locali vengono scaricati una sola volta e restano disponibili offline. 8 stem richiede un modello compatibile.</div>
       <div class="utility-actions">
         <button class="utility-btn primary" type="button" onclick="startStemWorkflow()" ${stem.available?'':'disabled'}><span>Importa e separa</span></button>
@@ -1154,10 +1241,24 @@ function updateStemWorkflowMode(){
   const mode=$('#stemProjectMode')?.value;
   const row=$('#stemProjectNameRow'),target=$('#stemProjectTarget');
   if(row)row.style.display=mode==='new'?'grid':'none';
-  if(target)target.disabled=mode!=='new';
+  if(target){
+    target.disabled=mode!=='new';
+    if(mode==='existing'&&current?.target&&['DAW','MTA8','MTA16'].includes(current.target))target.value=current.target;
+  }
 }
 
-async function startIosLocalStemWorkflow({projectId,stemCount,modelId,keep}){
+async function runTextAnalysisAndWait(projectId,trackId,kind){
+  if(!trackId)return null;
+  const job=await api(`/api/projects/${projectId}/tracks/${trackId}/extract-${kind}-jobs`,{method:'POST'});
+  for(;;){
+    const state=await api(`/api/media-jobs/${job.id}`);
+    if(state.status==='completed')return state;
+    if(state.status==='failed'||state.status==='cancelled')throw new Error(state.error||`Estrazione ${kind} non riuscita`);
+    await new Promise(resolve=>setTimeout(resolve,600));
+  }
+}
+
+async function startIosLocalStemWorkflow({projectId,stemCount,modelId,keep,extractLyrics=false,extractChords=false}){
   showUtilityModal('Separazione locale',`<div class="stem-progress-card"><div class="stem-progress-head"><b>Demucs Core ML</b><span id="localStemPct">0%</span></div><div class="stem-progress"><div id="localStemFill" class="stem-progress-fill" style="width:0%"></div></div><div id="localStemMessage" class="stem-progress-message">Preparazione modello locale…</div><div class="utility-actions"><button class="danger-action" onclick="window.MtaMobile?.cancelLocalStemSeparation?.()">Annulla separazione</button></div></div>`);
   const onProgress=e=>{const pct=Math.max(0,Math.min(100,Number(e.detail?.progress)||0));if($('#localStemPct'))$('#localStemPct').textContent=pct+'%';if($('#localStemFill'))$('#localStemFill').style.width=pct+'%';if($('#localStemMessage'))$('#localStemMessage').textContent=e.detail?.message||'Separazione locale'};
   window.addEventListener('mtaLocalStemProgress',onProgress);
@@ -1165,6 +1266,13 @@ async function startIosLocalStemWorkflow({projectId,stemCount,modelId,keep}){
     const result=await window.MtaMobile.startLocalStemSeparation(projectId,stemCount,modelId||"",keep);
     await refresh();
     current=await api(`/api/projects/${projectId}`);selectedTrackId=current.tracks.at(-1)?.id||null;render();
+    if(extractLyrics||extractChords){
+      const vocal=current.tracks.find(t=>t.type==='melody'||/vocals?/i.test(t.name||''));
+      const original=current.tracks.find(t=>/original mix/i.test(t.name||''))||current.tracks[0];
+      if(extractLyrics){if($('#localStemMessage'))$('#localStemMessage').textContent='Estrazione lyrics ad alta accuratezza…';await runTextAnalysisAndWait(projectId,vocal?.id||original?.id,'lyrics')}
+      if(extractChords){if($('#localStemMessage'))$('#localStemMessage').textContent='Analisi chords ad alta accuratezza…';await runTextAnalysisAndWait(projectId,original?.id||vocal?.id,'chords')}
+      current=await api(`/api/projects/${projectId}`);render();
+    }
     toast(`Separazione locale completata · ${result.stemCount} stem`);
     closeUtilityModal();return true;
   }finally{window.removeEventListener('mtaLocalStemProgress',onProgress)}
@@ -1193,6 +1301,7 @@ async function startStemWorkflow(){
       nativeProjectPath=chosen.path;
     }catch(e){return toast('Scelta destinazione progetto fallita: '+e.message)}
   }
+  const extractLyrics=!!$('#stemExtractLyrics')?.checked,extractChords=!!$('#stemExtractChords')?.checked;
   const execution=$('#stemExecutionMode')?.value||preferredStemExecution||'server';
   if(supportsLocalIosStems()&&execution!=='server'){
     let localProjectId=projectId;
@@ -1208,13 +1317,13 @@ async function startStemWorkflow(){
       const installed=installedCounts.includes(requested);
       if(execution==='local'||installed){
         setMobileBusy(true);
-        try{return await startIosLocalStemWorkflow({projectId:localProjectId,stemCount:stemCount,modelId:model,keep})}finally{setMobileBusy(false)}
+        try{return await startIosLocalStemWorkflow({projectId:localProjectId,stemCount:stemCount,modelId:model,keep,extractLyrics,extractChords})}finally{setMobileBusy(false)}
       }
       // Auto: native layer may download a model from the configured server. If it
       // cannot, fall through to the established server-side Demucs workflow.
       try{
         setMobileBusy(true);
-        return await startIosLocalStemWorkflow({projectId:localProjectId,stemCount:stemCount,modelId:model,keep});
+        return await startIosLocalStemWorkflow({projectId:localProjectId,stemCount:stemCount,modelId:model,keep,extractLyrics,extractChords});
       }catch(localError){
         setMobileBusy(false);
         toast('Modello locale non disponibile: uso il server.');
@@ -1228,7 +1337,7 @@ async function startStemWorkflow(){
     if(mobilePlatform()==='android'&&window.MtaMobile?.ensureLocalStemModel){
       try{const raw=window.MtaMobile.ensureLocalStemModel(model,stemCount||0);const state=typeof raw==='string'?JSON.parse(raw):raw;if(state&&!state.ok)console.warn('Android local model prefetch:',state.error)}catch(e){console.warn('Android local model prefetch failed',e)}
     }
-    const r=await api(`/api/stems/jobs?project_id=${encodeURIComponent(projectId)}&project_title=${encodeURIComponent(title)}&target=${encodeURIComponent(target)}&model=${encodeURIComponent(model)}&stem_count=${stemCount}&keep_original_track=${keep}`,{method:'POST',body:fd});
+    const r=await api(`/api/stems/jobs?project_id=${encodeURIComponent(projectId)}&project_title=${encodeURIComponent(title)}&target=${encodeURIComponent(target)}&model=${encodeURIComponent(model)}&stem_count=${stemCount}&keep_original_track=${keep}&extract_lyrics=${extractLyrics}&extract_chords=${extractChords}`,{method:'POST',body:fd});
     if(nativeProjectPath&&window.pywebview?.api?.bind_project_path){
       await window.pywebview.api.bind_project_path(r.project.id,nativeProjectPath);
     }
@@ -1249,6 +1358,7 @@ function showStemProgress(job){
       <div class="stem-progress"><div class="stem-progress-fill" style="width:${pct}%"></div></div>
       <div class="stem-progress-message">${esc(job.message||job.status)}</div>
       ${job.error?`<pre class="stem-error">${esc(job.error)}</pre>`:''}
+      ${job.analysis&&Object.keys(job.analysis).length?`<div class="workflow-note">${Object.entries(job.analysis).map(([k,v])=>`${k==='lyrics'?'Lyrics':'Chords'}: ${v.ok?`OK · ${v.count||0} eventi`:`errore · ${esc(v.error||'analisi non riuscita')}`}`).join('<br>')}</div>`:''}
       <div class="utility-actions">
         ${!done?`<button class="danger-action" onclick="cancelStemJob('${job.id}')">Annulla separazione</button>`:''}
         ${done?`<button onclick="closeUtilityModal()">Chiudi</button>`:''}
@@ -1274,7 +1384,8 @@ async function pollStemJob(jobId){
       showStemProgress(job);
       activeStemJob=null;
       activeStemProjectId=null;setMobileBusy(false);
-      toast('Separazione completata e progetto salvato');
+      const failedAnalysis=Object.entries(job.analysis||{}).filter(([,v])=>!v.ok);
+      toast(failedAnalysis.length?`Separazione completata; analisi ${failedAnalysis.map(([k])=>k).join(', ')} non riuscita`:'Separazione completata e progetto salvato');
       return;
     }
     if(job.status==='failed'||job.status==='cancelled'){
@@ -1867,7 +1978,88 @@ function focusMixer(){if(!requireOpenProject('aprire il mixer'))return;const el=
 function focusInspector(){if(!requireOpenProject('aprire i plugin'))return;const el=$('#inspector');if(!el)return toast('Seleziona una traccia per visualizzare i plugin');el.scrollIntoView({behavior:'smooth',block:'nearest'});el.classList.add('nav-focus-pulse');setTimeout(()=>el.classList.remove('nav-focus-pulse'),900)}
 function focusImport(){$('#newTrackFile')?.click()}
 
-function editProjectMeta(){if(!current)return;const title=prompt('Project title',current.title);if(title!==null&&title.trim())current.title=title.trim().slice(0,200);const artist=prompt('Artist',current.artist||'');if(artist!==null)current.artist=artist.slice(0,200);const bpm=prompt('BPM',String(current.bpm));if(bpm!==null&&Number(bpm)>0)setProjectBpm(Math.min(300,Number(bpm)));render();markDirty()}
+function editProjectMeta(){if(!current)return;const title=prompt('Project title',current.title);if(title!==null&&title.trim())current.title=title.trim().slice(0,200);const originalTitle=prompt('Titolo originale',current.original_title||'');if(originalTitle!==null)current.original_title=originalTitle.trim().slice(0,300);const authors=prompt('Autori / compositori (separati da virgola)',(current.authors||[]).join(', '));if(authors!==null)current.authors=authors.split(/[,;]/).map(x=>x.trim()).filter(Boolean).slice(0,64);const artist=prompt('Interprete / artista',current.artist||'');if(artist!==null)current.artist=artist.slice(0,200);const key=prompt('Tonalità / Key',current.key||'');if(key!==null)current.key=key.trim().slice(0,40);const bpm=prompt('BPM',String(current.bpm));if(bpm!==null&&Number(bpm)>0)setProjectBpm(Math.min(300,Number(bpm)));render();markDirty()}
+function downloadProjectLyrics(withChords=false){if(!current)return;window.location.href=`/api/projects/${current.id}/lyrics.txt?chords=${withChords?'true':'false'}`}
+function downloadProjectChordPro(){if(!current)return;if(!(current.lyrics||[]).length)return toast('Il progetto non contiene lyrics');window.location.href=`/api/projects/${current.id}/lyrics.chordpro`}
+function downloadProjectLyricsPdf(){if(!current)return;const color=$('#lyricsPdfChordColor')?.value||'#7B1FA2';window.location.href=`/api/projects/${current.id}/lyrics.pdf?chord_color=${encodeURIComponent(color)}`}
+
+let rightsCandidateRecords=[];
+function rightsRecordKey(r){return `${r.society||''}|${r.uid||''}|${r.original_title||r.title||''}|${JSON.stringify(r.identifiers||{})}`}
+function rightsRecordSummary(r){const ids=Object.entries(r.identifiers||{}).map(([k,v])=>`${k}: ${v}`).join(', ');return [r.title?`Titolo: ${r.title}`:'',r.original_title?`Titolo originale: ${r.original_title}`:'',(r.authors||[]).length?`Autori: ${(r.authors||[]).join(', ')}`:'',(r.performers||[]).length?`Interpreti: ${(r.performers||[]).join(', ')}`:'',(r.publishers||[]).length?`Editori: ${(r.publishers||[]).join(', ')}`:'',ids?`ID: ${ids}`:'',r.source_url?`Fonte: ${r.source_url}`:''].filter(Boolean).join(' · ')}
+async function openRightsSearch(){
+  if(!current)return;
+  rightsCandidateRecords=[...(current.rights_records||[])];
+  let catalog={providers:[{id:'SIAE',name:'SIAE',active_by_default:true},{id:'SOUNDREEF',name:'Soundreef',active_by_default:true}]};
+  try{catalog=await api('/api/rights-providers')}catch(e){}
+  const checks=(catalog.providers||[]).map(p=>`<label class="workflow-check"><input class="rights-provider-check" type="checkbox" value="${esc(p.id)}" ${(current.rights_societies||['SIAE','SOUNDREEF']).includes(p.id)?'checked':''}> ${esc(p.name)}${p.structured_search?'':' · portale ufficiale'}</label>`).join('');
+  showUtilityModal('Ricerca repertorio / diritti',`<div class="stem-workflow">
+    <div class="workflow-note">Ricerca usando i metadata del progetto. SIAE e Soundreef sono attivi per default. Lo stesso brano può avere registrazioni in più provider: tutte le registrazioni selezionate vengono conservate insieme nel progetto ed esportate integralmente sia nel PDF Lyrics + Chords sia nel ChordPro.</div>
+    <label class="workflow-field"><span>Titolo</span><input id="rightsTitle" value="${esc(current.title||'')}"></label>
+    <label class="workflow-field"><span>Titolo originale</span><input id="rightsOriginalTitle" value="${esc(current.original_title||'')}"></label>
+    <label class="workflow-field"><span>Autori / compositori</span><input id="rightsAuthors" value="${esc((current.authors||[]).join(', '))}"></label>
+    <label class="workflow-field"><span>Interprete / artista</span><input id="rightsArtist" value="${esc(current.artist||'')}"></label>
+    <div>${checks}</div>
+    <div class="utility-actions"><button class="utility-btn primary" onclick="performRightsSearch()">Cerca nei repertori</button><button class="utility-btn secondary" onclick="addManualRightsRecord()">Aggiungi risultato verificato</button></div>
+    <div id="rightsProviderStatus"></div><div id="rightsResults"></div>
+    <div class="utility-actions"><button class="utility-btn primary" onclick="saveRightsSelection()">Salva selezione nel progetto</button><button class="utility-btn secondary" onclick="closeUtilityModal()">Chiudi</button></div>
+  </div>`);
+  renderRightsCandidates();
+}
+function renderRightsCandidates(){
+  const el=$('#rightsResults');if(!el)return;
+  el.innerHTML=rightsCandidateRecords.length?`<div class="table-scroll"><table class="users-table"><thead><tr><th>Usa</th><th>Società</th><th>Opera</th><th>Dettagli</th></tr></thead><tbody>${rightsCandidateRecords.map((r,i)=>`<tr><td><input class="rights-result-check" type="checkbox" data-index="${i}" ${r._new===false?'checked':'checked'}></td><td>${esc(r.society||'')}</td><td><b>${esc(r.original_title||r.title||'—')}</b></td><td>${esc(rightsRecordSummary(r))}</td></tr>`).join('')}</tbody></table></div>`:'<p class="hint">Nessun risultato selezionato.</p>';
+}
+async function performRightsSearch(){
+  if(!current)return;
+  const societies=$$('.rights-provider-check:checked').map(x=>x.value);if(!societies.length)return toast('Seleziona almeno una società');
+  try{
+    const data=await api(`/api/projects/${current.id}/rights-search`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({societies,title:$('#rightsTitle')?.value||'',original_title:$('#rightsOriginalTitle')?.value||'',authors:$('#rightsAuthors')?.value||'',artist:$('#rightsArtist')?.value||''})});
+    const existing=new Set(rightsCandidateRecords.map(rightsRecordKey));for(const r of data.results||[]){if(!existing.has(rightsRecordKey(r))){rightsCandidateRecords.push(r);existing.add(rightsRecordKey(r))}}
+    $('#rightsProviderStatus').innerHTML=(data.providers||[]).map(p=>`<div class="workflow-note"><b>${esc(p.name||p.provider)}</b>: ${p.mode==='api'?'ricerca strutturata':'ricerca strutturata non configurata'}${p.message?` · ${esc(p.message)}`:''}${p.portal_url?` · <a href="${esc(p.portal_url)}" target="_blank" rel="noopener">Apri repertorio ufficiale</a>`:''}</div>`).join('');
+    renderRightsCandidates();
+  }catch(e){toast(e.message)}
+}
+function addManualRightsRecord(){
+  const society=prompt('Società (es. SIAE o SOUNDREEF)','SIAE');if(!society)return;const title=prompt('Titolo originale / opera',$('#rightsOriginalTitle')?.value||$('#rightsTitle')?.value||'');if(!title)return;const authors=prompt('Autori / compositori',$('#rightsAuthors')?.value||'')||'';const performers=prompt('Interpreti',$('#rightsArtist')?.value||'')||'';const idType=prompt('Tipo identificativo (es. ISWC, IPI, WORK_ID)','ISWC')||'';const idValue=prompt('Valore identificativo','')||'';rightsCandidateRecords.push({uid:`${society.toUpperCase()}:manual:${Date.now()}`,society:society.toUpperCase(),title,original_title:title,authors:authors.split(/[,;]/).map(x=>x.trim()).filter(Boolean),performers:performers.split(/[,;]/).map(x=>x.trim()).filter(Boolean),publishers:[],identifiers:idType&&idValue?{[idType.toUpperCase()]:idValue}:{},source_url:''});renderRightsCandidates();
+}
+async function saveRightsSelection(){
+  if(!current)return;
+  const selected=$$('.rights-result-check:checked').map(x=>rightsCandidateRecords[Number(x.dataset.index)]).filter(Boolean);
+  const societies=$$('.rights-provider-check:checked').map(x=>x.value);
+  try{
+    const d=await api(`/api/projects/${current.id}/rights-records`,{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify({records:selected,societies})});
+    current.rights_records=d.rights_records||selected;
+    current.rights_societies=d.rights_societies||societies;
+    markDirty(50);toast('Dati repertorio salvati');showProjectInfo();
+  }catch(e){toast(e.message)}
+}
+function openKaraokeExport(){
+  if(!current)return;
+  if(!(current.lyrics||[]).length)return toast('L’export MP4 richiede lyrics sincronizzate');
+  showUtilityModal('Esporta MP4 Karaoke',`<div class="stem-workflow">
+    <div class="workflow-note">Il video usa l’audio completo del progetto e le lyrics sincronizzate. Quando sono disponibili timestamp parola-per-parola, il testo viene evidenziato in stile karaoke.</div>
+    <label class="workflow-check"><input id="karaokeIncludeChords" type="checkbox" ${(current.chords||[]).length?'checked':''} ${(current.chords||[]).length?'':'disabled'}> Mostra anche i chords sincronizzati sopra alle lyrics</label>
+    <label class="workflow-field"><span>Background opzionale</span><input id="exportKaraokeBackground" type="file" accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp"></label>
+    <div class="workflow-note">Senza immagine verrà usato uno sfondo nero. L’immagine viene adattata a 1920×1080 senza deformazioni.</div>
+    <div class="utility-actions"><button class="utility-btn primary" onclick="startKaraokeExport()">Esporta MP4</button><button class="utility-btn secondary" onclick="closeUtilityModal()">Annulla</button></div>
+  </div>`);
+}
+async function startKaraokeExport(){
+  if(!current||(current.lyrics||[]).length)return toast('L’export MP4 richiede lyrics sincronizzate');
+  const fd=new FormData(),bg=$('#exportKaraokeBackground')?.files?.[0];if(bg)fd.append('background',bg);
+  try{
+    await flushAutosave();
+    const includeChords=!!$('#karaokeIncludeChords')?.checked;
+    const job=await api(`/api/projects/${current.id}/karaoke-export-jobs?include_chords=${includeChords}`,{method:'POST',body:fd});
+    showMediaProgress('Export MP4 Karaoke',job.progress,job.message);
+    pollMediaJob(job.id,'Export MP4 Karaoke',async completed=>{
+      const result=completed.result||{};
+      if(isMobileClient())mobileSaveRemoteFile(result.download_url,result.filename||'karaoke.mp4','video/mp4',false);
+      else await downloadWithProgress(result.download_url,result.filename||'karaoke.mp4','Export MP4 Karaoke');
+      toast('MP4 karaoke esportato');
+    });
+  }catch(e){toast(e.message)}
+}
 function editTimed(kind){if(!current)return;const config={lyrics:['text','Lyrics: seconds[TAB]text'],chords:['chord','Chords: seconds[TAB]chord'],markers:['label','Markers: seconds[TAB]label']}[kind];if(!config)return;const [key,label]=config;const raw=prompt(label,linesToText(current[kind],key));if(raw!==null){current[kind]=textToLines(raw,key);render();markDirty()}}
 
 
@@ -1982,12 +2174,17 @@ async function showProjectInfo(){
     ['Profilo MTA',current.mta_device_profile||'auto'],
     ['Durata',duration],
     ['Tracce',String((current.tracks||[]).length)],
-    ['Artista',current.artist||'—'],
+    ['Titolo originale',current.original_title||'—'],
+    ['Autori / compositori',(current.authors||[]).join(', ')||'—'],
+    ['Artista / interprete',current.artist||'—'],
+    ['Registrazioni repertorio',String((current.rights_records||[]).length)],
     ['BPM',Number(current.bpm||0).toFixed(1)],
-    ['Tonalità',current.key||'—'],
+    ['Tonalità',effectiveProjectKey()||'—'],
     ['Auto-save',autosaveEnabled?'Attivo':'Disattivato'],
   ];
-  showUtilityModal('Info progetto',`<div class="table-scroll"><table class="users-table project-info-table"><tbody>${rows.map(([k,v])=>`<tr><th>${esc(k)}</th><td>${esc(v)}</td></tr>`).join('')}</tbody></table></div>`);
+  const rights=(current.rights_records||[]);
+  const rightsRows=rights.length?`<h4>Dati repertorio / provider diritti</h4><div class="table-scroll"><table class="users-table"><thead><tr><th>Provider</th><th>Opera</th><th>Dati registrati</th></tr></thead><tbody>${rights.map(r=>`<tr><td><b>${esc(r.society||'—')}</b></td><td>${esc(r.original_title||r.title||'—')}</td><td>${esc(rightsRecordSummary(r))}</td></tr>`).join('')}</tbody></table></div>`:'<p class="hint">Nessun dato repertorio registrato nel progetto.</p>';
+  showUtilityModal('Info progetto',`<div class="utility-actions"><button class="utility-btn" onclick="editProjectMeta();showProjectInfo()">Modifica titolo / autore / BPM e metadata</button><button class="utility-btn secondary" onclick="openRightsSearch()">Cerca repertorio autori</button></div><div class="table-scroll"><table class="users-table project-info-table"><tbody>${rows.map(([k,v])=>`<tr><th>${esc(k)}</th><td>${esc(v)}</td></tr>`).join('')}</tbody></table></div>${rightsRows}`);
 }
 async function manageProjectFiles(){
   if(!current){toast('Apri prima un progetto');return}
@@ -2036,8 +2233,9 @@ async function manageProjectSharing(){
 async function addProjectShare(){const identifier=$('#shareIdentifier').value.trim();if(!identifier)return;try{await api(`/api/projects/${current.id}/shares`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({identifier})});await manageProjectSharing();toast('Progetto condiviso')}catch(e){toast(e.message)}}
 async function removeProjectShare(userId){try{await api(`/api/projects/${current.id}/shares/${userId}`,{method:'DELETE'});await manageProjectSharing()}catch(e){toast(e.message)}}
 
+function showSettings(){if(currentUser?.native_single_user)return showNativeSettings();if(currentUser?.role==='admin'){location.href='/settings';return}return toast('Settings non disponibile')}
 async function showNativeSettings(){
-  if(!currentUser?.native_single_user){toast('Settings è disponibile nell’app desktop nativa');return}
+  if(!currentUser?.native_single_user){if(currentUser?.role==='admin'){location.href='/settings';return}return}
   const apiBridge=await waitForNativeApi();
   if(!apiBridge?.get_native_settings){toast('Bridge nativo non disponibile. Riprova tra un istante.');return}
   try{

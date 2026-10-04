@@ -23,7 +23,7 @@
     <div class="zoom-top"><span>Zoom</span><input id="topZoom" type="range" min="25" max="240" value="70" oninput="setZoom(this.value)"></div>
     <div class="header-actions">
       <a class="header-link auth-managed" href="/account" title="Account" aria-label="Account"><span class="control-icon" aria-hidden="true">👤</span><span class="control-text">Account</span></a>
-      <a id="adminNav" class="header-link auth-managed" href="/admin/users" title="Amministrazione" aria-label="Amministrazione" hidden><span class="control-icon" aria-hidden="true">⚙</span><span class="control-text">Admin</span></a>
+      <a id="adminNav" class="header-link auth-managed" href="/settings" title="Settings" aria-label="Amministrazione" hidden><span class="control-icon" aria-hidden="true">⚙</span><span class="control-text">Settings</span></a>
       <button onclick="save()" title="Save" aria-label="Save"><span class="control-icon" aria-hidden="true">▣</span><span class="control-text">Save</span></button>
       <button onclick="saveAsProject()" title="Save as" aria-label="Save as"><span class="control-icon" aria-hidden="true">⇩</span><span class="control-text">Save as</span></button>
       <button onclick="showProjectSetup()" title="Project setup" aria-label="Project setup"><span class="control-icon" aria-hidden="true">ⓘ</span><span class="control-text">Setup</span></button>
@@ -73,7 +73,7 @@
             <button class="nav-item danger-nav" onclick="deleteCurrentProject()">× <span>Delete project</span></button>
           </div>
         </section>
-        <button class="nav-item" id="nativeSettingsButton" onclick="showNativeSettings()" hidden>⚙ <span>Settings</span></button>
+        <button class="nav-item" id="nativeSettingsButton" onclick="showSettings()" hidden>⚙ <span>Settings</span></button>
         <button class="nav-item" onclick="showAbout()">ⓘ <span>About</span></button>
         <a class="nav-item" href="/docs/user" target="_blank">? <span>Docs &amp; Help</span></a>
       </nav>

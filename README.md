@@ -124,3 +124,9 @@ MTA Audio Editor no longer hard-codes a 2/4/6/8 list. The server and mobile clie
 
 ### Demucs model catalogue / Catalogo modelli Demucs
 The server periodically synchronizes all configured Demucs/Core ML/ONNX models. Native/mobile clients download requested models on demand, can delete or force-update local copies, and server administrators can blacklist models (which also removes managed server artifacts).
+
+### Synchronized lyrics and chords
+A track context menu can extract synchronized lyrics and chords into the project. Chords use the built-in lightweight chroma analyser. Lyrics use OpenAI Whisper when available; install `requirements-lyrics.txt` in server/native environments that should perform local transcription. Whisper model weights are resolved from the upstream Whisper source/cache, not from the MTA Demucs model server. Lyrics can be downloaded as plain text or as PDF; the PDF places synchronized chords above lyric lines and uses project title/artist metadata. MTA exports embed lossless millisecond-timed lyrics/chord attachments in addition to preserved stock attachments.
+
+### Rights repertoire lookup / Repertori società d’autori
+Project Info can search selected rights societies (SIAE and Soundreef enabled by default), store multiple verified repertoire records for the same song across multiple rights providers, include all of them in MTA project metadata, display every stored record in Project Info, and export all available provider fields in both Lyrics + Chords PDF and ChordPro. Structured lookup uses authorized HTTPS endpoints configured with `MTA_RIGHTS_SIAE_SEARCH_URL` and `MTA_RIGHTS_SOUNDREEF_SEARCH_URL`; otherwise the official repertoire portal plus manual verified-result import is used. Lyrics + Chords can also be exported as ChordPro (`.cho`).

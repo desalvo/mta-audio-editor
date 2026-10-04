@@ -291,6 +291,27 @@ def public_catalog(platform:str|None=None)->dict:
     for item in items:dedup[(str(item.get('platform')),str(item.get('id')))]=item
     return {"models":list(dedup.values()),"blacklist":sorted(blacklist),"updated_at":int(time.time())}
 
+
+def model_storage_usage() -> dict:
+    def tree_size(path: Path) -> int:
+        if not path.exists(): return 0
+        total=0
+        for item in path.rglob('*'):
+            try:
+                if item.is_file(): total += item.stat().st_size
+            except OSError: pass
+        return total
+    return {
+        "total_bytes": tree_size(ROOT),
+        "coreml_bytes": tree_size(COREML_DIR),
+        "onnx_bytes": tree_size(ONNX_DIR),
+        "server_bytes": tree_size(SERVER_DIR),
+    }
+
+def delete_local_model(model_id: str) -> dict:
+    mid=_safe_id(model_id)
+    return {"model_id":mid,"blacklisted":mid in load_blacklist(),"removed":delete_model_artifacts(mid)}
+
 def server_inventory()->dict:
     blacklist=load_blacklist(); entries=cached_catalog(); models=[]
     for item in entries:
@@ -299,7 +320,13 @@ def server_inventory()->dict:
         mid=_safe_id(p.get('id') or p.get('model') or '')
         if any(x.get('id')==mid and x.get('platform')=='server' for x in models):continue
         marker=SERVER_DIR/f"{mid}.server.json"
-        models.append({"id":mid,"model":str(p.get('model') or mid),"platform":"server","engine":"demucs","stem_count":int(p.get('stem_count',0) or 0),"stem_labels":p.get('stem_labels',[]),"display_name":str(p.get('display_name') or mid),"version":"bundled-registry","installed":marker.is_file(),"size":0,"blacklisted":mid in blacklist})
+        bundle=native_bundle(mid)
+        size=0
+        for candidate in (marker,bundle,Path(str(bundle)+'.json') if bundle else None):
+            try:
+                if candidate and candidate.is_file(): size += candidate.stat().st_size
+            except OSError: pass
+        models.append({"id":mid,"model":str(p.get('model') or mid),"platform":"server","engine":"demucs","stem_count":int(p.get('stem_count',0) or 0),"stem_labels":p.get('stem_labels',[]),"display_name":str(p.get('display_name') or mid),"version":"bundled-registry","installed":marker.is_file(),"size":size,"blacklisted":mid in blacklist})
     return {"models":models,"blacklist":sorted(blacklist),"auto_update":ENABLED,"interval_seconds":INTERVAL,"manifest_url":MANIFEST_URL}
 
 def _loop():

@@ -9,7 +9,7 @@ import uuid
 from pathlib import Path
 
 from .audio_engine import media_duration_ms, project_time_pitch_filter, render_track
-from .models import Clip, MtaSlotMapping, Project, Track
+from .models import Chord, Clip, LyricLine, MtaSlotMapping, Project, Track
 from .mta_writer import normalize_matroska_for_mta
 from .mta_reverse import (
     analyze_mta,
@@ -18,6 +18,7 @@ from .mta_reverse import (
     obfuscate_media_copy,
 )
 from .storage import attachment_path, audio_path, pdir, save_project
+from .music_text import synchronized_plain_text
 
 MTA8_STABLE_TYPES = ["drums", "bass", "guitars", "keyboards", "orchestra", "winds"]
 LOGGER = logging.getLogger(__name__)
@@ -155,6 +156,17 @@ def import_mta(path: Path, project: Project) -> Project:
                 run(["ffmpeg", "-y", "-v", "error", f"-dump_attachment:t:{aidx}", str(out), "-i", str(source), "-f", "null", "-"])
                 if out.exists():
                     preserved.append(out.name)
+                    if out.name == "mta-synchronized-text.json":
+                        try:
+                            sync = json.loads(out.read_text(encoding="utf-8"))
+                            project.lyrics = [LyricLine(**item) for item in sync.get("lyrics", [])]
+                            project.chords = [Chord(**item) for item in sync.get("chords", [])]
+                            project.original_title = str(sync.get("original_title") or project.original_title or "")[:300]
+                            project.authors = [str(x)[:200] for x in (sync.get("authors") or []) if str(x).strip()][:64]
+                            project.rights_records = [RightsRecord(**item) for item in (sync.get("rights_records") or [])][:32]
+                            project.rights_societies = [str(x).strip().upper() for x in (sync.get("rights_societies") or project.rights_societies) if str(x).strip()][:16]
+                        except Exception as sync_exc:
+                            LOGGER.warning("Unable to restore synchronized text attachment %s: %s", out, sync_exc)
             except Exception as exc:
                 LOGGER.warning("Unable to preserve attachment %s from %s: %s", safe, path, exc)
 
@@ -165,6 +177,15 @@ def import_mta(path: Path, project: Project) -> Project:
     try:
         report = analyze_mta(path, att / "reverse-analysis")
         (d / "mta-analysis.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+        # Recover stock synchronized lyrics/chords when a verified SYL decoder is available.
+        for item in report.get("attachments", []):
+            sections = ((item.get("embedded_id3") or {}).get("proprietary_sections") or {})
+            lyr = (((sections.get("LYRICS") or {}).get("observed_record_decoder") or {}).get("records") or [])
+            chd = (((sections.get("CHORDS") or {}).get("observed_record_decoder") or {}).get("records") or [])
+            if lyr and not project.lyrics:
+                project.lyrics = [LyricLine(time_ms=int(row["time_ms"]), text=str(row.get("text") or "")) for row in lyr if "time_ms" in row and str(row.get("text") or "").strip()]
+            if chd and not project.chords:
+                project.chords = [Chord(time_ms=int(row["time_ms"]), chord=str(row.get("text") or "")) for row in chd if "time_ms" in row and str(row.get("text") or "").strip()]
     except Exception as exc:
         LOGGER.warning("Unable to analyze imported MTA %s: %s", path, exc)
     save_project(project)
@@ -173,11 +194,50 @@ def import_mta(path: Path, project: Project) -> Project:
 def _metadata_attachment(project: Project) -> Path:
     out = pdir(project.id) / "attachments" / "mta-editor.json"
     out.write_text(json.dumps({
-        "schema": "mta-audio-editor/v3", "title": project.title, "artist": project.artist, "bpm": project.bpm, "key": project.key, "mta_device_profile": project.mta_device_profile,
+        "schema": "mta-audio-editor/v3", "title": project.title, "original_title": project.original_title, "artist": project.artist, "authors": project.authors, "bpm": project.bpm, "key": project.key, "mta_device_profile": project.mta_device_profile,
         "tracks": [{"id": t.id, "name": t.name, "type": t.type, "mta_slot": t.mta_slot, "pan": t.pan, "clips": [c.model_dump() for c in t.clips], "inserts": [x.model_dump() for x in t.inserts]} for t in project.tracks],
         "master": {"volume_db": project.master_volume_db, "inserts": [x.model_dump() for x in project.master_inserts]},
         "lyrics": [x.model_dump() for x in project.lyrics], "chords": [x.model_dump() for x in project.chords], "markers": [x.model_dump() for x in project.markers],
+        "rights_records": [x.model_dump(mode="json") for x in project.rights_records],
+        "rights_societies": project.rights_societies,
     }, ensure_ascii=False, indent=2), encoding="utf-8")
+    return out
+
+
+def _synchronized_text_attachments(project: Project) -> list[Path]:
+    """Create timestamped project attachments embedded in every exported MTA.
+
+    These attachments preserve exact millisecond synchronization independently of
+    the audio slot mapping. Stock proprietary SYL attachments are preserved too;
+    the editor-specific JSON/LRC/TSV payloads provide a lossless round trip for
+    newly extracted or edited lyrics/chords.
+    """
+    out: list[Path] = []
+    adir = pdir(project.id) / "attachments"
+    adir.mkdir(parents=True, exist_ok=True)
+    if project.lyrics:
+        lrc = adir / "lyrics-synchronized.lrc"
+        lrc.write_text(synchronized_plain_text(project.lyrics, []), encoding="utf-8")
+        out.append(lrc)
+    if project.chords:
+        chords = adir / "chords-synchronized.tsv"
+        chords.write_text("\n".join(f"{item.time_ms}\t{item.chord}" for item in sorted(project.chords, key=lambda x: x.time_ms)) + "\n", encoding="utf-8")
+        out.append(chords)
+    if project.lyrics or project.chords or project.rights_records or project.original_title or project.authors:
+        sync = adir / "mta-synchronized-text.json"
+        sync.write_text(json.dumps({
+            "schema": "mta-audio-editor/synchronized-text-v1",
+            "timebase": "milliseconds-from-project-start",
+            "title": project.title,
+            "original_title": project.original_title,
+            "artist": project.artist,
+            "authors": project.authors,
+            "lyrics": [x.model_dump() for x in project.lyrics],
+            "chords": [x.model_dump() for x in project.chords],
+            "rights_records": [x.model_dump(mode="json") for x in project.rights_records],
+            "rights_societies": project.rights_societies,
+        }, ensure_ascii=False, indent=2), encoding="utf-8")
+        out.append(sync)
     return out
 
 
@@ -359,8 +419,12 @@ def export_mta(project: Project, out: Path, slots: list[MtaSlotMapping] | None =
             if f.exists(): attachments.append(f)
         meta = _metadata_attachment(project)
         if meta not in attachments: attachments.append(meta)
+        for synced in _synchronized_text_attachments(project):
+            if synced not in attachments:
+                attachments.append(synced)
         for a in attachments:
-            cmd += ["-attach", str(a), "-metadata:s:t", f"filename={a.name}", "-metadata:s:t", "mimetype=application/octet-stream"]
+            mimetype = "application/json" if a.suffix.lower() == ".json" else ("text/plain" if a.suffix.lower() in {".lrc", ".tsv", ".txt"} else "application/octet-stream")
+            cmd += ["-attach", str(a), "-metadata:s:t", f"filename={a.name}", "-metadata:s:t", f"mimetype={mimetype}"]
         canonical = td / "canonical-export.mka"
         cmd += [
             "-metadata", f"TITLE={project.title}",

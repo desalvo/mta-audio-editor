@@ -23,3 +23,5 @@ p,li{orphans:3;widows:3}
 
 .cover-fullpage{page:cover!important;position:relative!important;width:210mm!important;height:297mm!important;min-height:297mm!important;padding:0!important;margin:0!important;overflow:hidden!important;display:block!important;break-after:page!important;page-break-after:always!important;background:white!important}
 .cover-full-img{position:absolute!important;inset:0!important;display:block!important;width:210mm!important;height:297mm!important;max-width:none!important;max-height:none!important;object-fit:fill!important;object-position:center center!important;margin:0!important;padding:0!important}
+
+.cover-version-current{position:absolute;left:11mm;top:84mm;width:101mm;height:16mm;background:#38465d;color:white;z-index:5;padding:1.5mm 0 0 0;font-size:11.5pt;line-height:1.5;font-weight:700}.cover-version-current b{display:block}

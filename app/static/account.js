@@ -9,6 +9,7 @@ async function load(){
   q('#profileForm').elements.display_name.value=me.display_name||'';
   q('#profileForm').elements.email.value=me.email||'';
   renderTotp();
+  loadStorage();
 }
 async function saveProfile(e){e.preventDefault();const f=new FormData(e.target);try{const updated=await api('/api/account',{method:'PATCH',headers:{'content-type':'application/json'},body:JSON.stringify(Object.fromEntries(f))});if(!updated.active){alert('Email aggiornata. Controlla la nuova casella email; dopo la conferma servirà una nuova approvazione admin.');location.href='/logout';return}me=updated;load()}catch(x){alert(x.message)}}
 function renderTotp(){q('#profileForm').elements.display_name.value=me.display_name||'';q('#profileForm').elements.email.value=me.email||'';q('#totpArea').innerHTML=me.totp_enabled?`<p><span class="badge ok">TOTP attivo</span></p><form id="disableTotp" class="settings-form"><label>Password<input name="password" type="password" required></label><label>Codice TOTP<input name="code" inputmode="numeric" autocomplete="one-time-code" required></label><button>Disattiva TOTP</button></form>`:`<p><span class="badge warn">TOTP non attivo</span></p><button id="beginTotp">Configura TOTP</button>`;if(q('#beginTotp'))q('#beginTotp').onclick=beginTotp;if(q('#disableTotp'))q('#disableTotp').onsubmit=disableTotp}
@@ -18,3 +19,6 @@ async function disableTotp(e){e.preventDefault();const f=new FormData(e.target);
 q('#profileForm').onsubmit=saveProfile;
 q('#passwordForm').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);try{await api('/api/account/password',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(Object.fromEntries(f))});alert('Password aggiornata. Accedi nuovamente.');location.href='/login'}catch(x){alert(x.message)}}
 load();
+
+function fmtBytes(n){n=Number(n||0);if(n<1024)return n+' B';const u=['KB','MB','GB','TB'];let i=-1;do{n/=1024;i++}while(n>=1024&&i<u.length-1);return n.toFixed(n>=10?1:2)+' '+u[i]}
+async function loadStorage(){try{const d=await api('/api/storage'),w=(d.workspaces||[])[0];q('#storageSummary').innerHTML=w?`<div class="profile-row"><b>Usato</b><span>${fmtBytes(w.used_bytes)}</span></div><div class="profile-row"><b>Quota</b><span>${w.quota_bytes?fmtBytes(w.quota_bytes):'Illimitata'}</span></div><div class="profile-row"><b>Disponibile</b><span>${w.remaining_bytes==null?'—':fmtBytes(w.remaining_bytes)}</span></div>`:'Nessun workspace disponibile.'}catch(e){q('#storageSummary').textContent='Impossibile leggere lo spazio workspace.'}}

@@ -82,13 +82,18 @@ for src_name, out_name in outputs:
     # can resize, shift, or fragment the approved raster cover.
     import re
     text = re.sub(r'<section class="cover cover-fullpage">.*?</section>', '', text, count=1, flags=re.S)
-    text = text.replace('<body><div class="wrap">', '<body><div class="pdf-cover"></div><div class="wrap">', 1)
+    label = "Versione" if src_name in {"user.html", "admin.html"} else "Version"
+    cover_version = f'<div class="pdf-cover-version"><b>{label}: {VERSION}</b><b>Build: {BUILD}</b></div>'
+    text = text.replace('<body><div class="wrap">', '<body><div class="pdf-cover">' + cover_version + '</div><div class="wrap">', 1)
     pdf_cover_css = (
         '<style>'
         '@page cover { size:A4; margin:0; @bottom-center { content:none; } }'
         '.pdf-cover { page:cover; width:210mm; height:297mm; min-height:297mm; margin:0; padding:0; '
         'break-after:page; page-break-after:always; background-image:url("' + cover_uri + '"); '
-        'background-repeat:no-repeat; background-position:center center; background-size:210mm 297mm; }'
+        'background-repeat:no-repeat; background-position:center center; background-size:210mm 297mm; position:relative; }'
+        '.pdf-cover-version { position:absolute; left:11mm; top:84mm; width:101mm; height:16mm; background:#38465d; '
+        'color:white; padding-top:1.5mm; font:700 11.5pt/1.5 Arial,sans-serif; }'
+        '.pdf-cover-version b { display:block; }'
         '</style>'
     )
     text = text.replace("</head>", EXTRA + pdf_cover_css + "</head>")
