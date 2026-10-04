@@ -74,6 +74,8 @@ jobs:
         run: |
           pip-audit -r requirements.txt --strict
           pip-audit -r requirements-native.txt --strict
+          pip-audit -r requirements-lyrics.txt --strict
+          pip-audit -r requirements-chords.txt --strict
           # pip-audit/PyPI cannot identify PyTorch local-version wheels such as
           # 2.14.1+cpu. Audit the equivalent upstream public version instead.
           sed '/^--extra-index-url /d; s/^torch==\(.*\)+cpu$/torch==\1/' requirements-stems.txt > /tmp/requirements-stems-audit.txt
@@ -199,6 +201,8 @@ jobs:
           pip install -r requirements.txt
           pip install -r requirements-stems.txt
           pip install -r requirements-native.txt
+          pip install -r requirements-lyrics.txt
+          pip install -r requirements-chords.txt
           pip check
       - name: Install FFmpeg and Inno Setup
         shell: pwsh
@@ -304,6 +308,8 @@ jobs:
             pip install -r /tmp/requirements-native-stems.txt
           fi
           pip install -r requirements-native.txt
+          pip install -r requirements-lyrics.txt
+          pip install -r requirements-chords.txt
           pip check
       - name: Install FFmpeg
         shell: bash

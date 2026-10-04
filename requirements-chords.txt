@@ -1,0 +1,4 @@
+# Optional/bundled chord-recognition AI engine.
+# madmom-infer is pure Python/NumPy and downloads the separately licensed
+# chord checkpoints on demand into XDG_CACHE_HOME/madmom_infer/models.
+madmom-infer==0.2.0

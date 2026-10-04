@@ -42,6 +42,7 @@ from .auth import (
     create_model_access_token, model_access_token, require_model_read, revoke_model_access_tokens,
 )
 from .auto_mix import disable_auto_mix, enable_auto_mix
+from .ai_models import ai_catalog, chords_catalog, lyrics_catalog, download_chord_model, download_lyrics_model, delete_chord_model, delete_lyrics_model, chord_engine_available
 from .mta_reverse import analyze_mta, diff_blobs
 from .music_text import build_chordpro, build_karaoke_ass, build_lyrics_pdf, extract_chords, extract_lyrics, lyrics_engine_available, map_source_events_to_timeline, synchronized_plain_text, transpose_chords, transpose_key_name
 from .storage import (
@@ -835,6 +836,7 @@ def plugins():
         "factory_params": manifest["factory_params"],
         "notes": manifest["notes"],
         "stem_splitter": {**STEM_SPLITTER.status(), "lead_backing": _lead_backing_catalog()},
+        "text_models": ai_catalog(native=NATIVE_SINGLE_USER),
     }
 
 
@@ -1481,7 +1483,7 @@ async def start_track_import_job(
 
 
 
-def _text_music_worker(job_id: str, pid: str, track_id: str, kind: str) -> None:
+def _text_music_worker(job_id: str, pid: str, track_id: str, kind: str, model_or_engine: str = "") -> None:
     try:
         project = load_project(pid)
         track = next((item for item in project.tracks if item.id == track_id), None)
@@ -1490,27 +1492,47 @@ def _text_music_worker(job_id: str, pid: str, track_id: str, kind: str) -> None:
         source = audio_path(pid, track.filename)
         _media_job_update(job_id, status="running", progress=10, message="Preparazione analisi")
         if kind == "lyrics":
-            _media_job_update(job_id, progress=20, message="Trascrizione lyrics con Whisper")
-            events = extract_lyrics(source)
+            selected_model=model_or_engine or lyrics_catalog(native=NATIVE_SINGLE_USER)["default_model"]
+            _media_job_update(job_id, progress=20, message=f"Trascrizione lyrics · OpenAI Whisper · {selected_model}")
+            try:
+                events = extract_lyrics(source, model_name=selected_model)
+            except TypeError as exc:
+                if "unexpected keyword argument" not in str(exc):
+                    raise
+                events = extract_lyrics(source)
             mapped = map_source_events_to_timeline(track, events)
             latest = load_project(pid)
             latest.lyrics = mapped
+            latest.lyrics_engine = "OpenAI Whisper"
+            latest.lyrics_model = selected_model
             save_project(latest)
             _media_job_update(
                 job_id, status="completed", progress=100, message="Lyrics estratte e sincronizzate",
-                result={"kind": "lyrics", "count": len(mapped)},
+                result={"kind": "lyrics", "count": len(mapped), "engine": "OpenAI Whisper", "model": selected_model},
             )
             return
         if kind == "chords":
-            _media_job_update(job_id, progress=25, message="Analisi armonica e riconoscimento accordi")
-            events = extract_chords(source)
+            selected_engine=model_or_engine or chords_catalog(native=NATIVE_SINGLE_USER)["default_engine"]
+            engine_info=next((x for x in chords_catalog(native=NATIVE_SINGLE_USER)["engines"] if x["id"]==selected_engine),None)
+            if not engine_info:
+                raise ValueError("unsupported chord extraction engine")
+            selected_model=str(engine_info.get("model_id") or "")
+            _media_job_update(job_id, progress=25, message=f"Analisi chords · {engine_info['display_name']}" + (f" · {selected_model}" if selected_model else ""))
+            try:
+                events = extract_chords(source, engine=selected_engine)
+            except TypeError as exc:
+                if "unexpected keyword argument" not in str(exc):
+                    raise
+                events = extract_chords(source)
             mapped = map_source_events_to_timeline(track, events)
             latest = load_project(pid)
             latest.chords = mapped
+            latest.chords_engine = selected_engine
+            latest.chords_model = selected_model
             save_project(latest)
             _media_job_update(
                 job_id, status="completed", progress=100, message="Chords estratti e sincronizzati",
-                result={"kind": "chords", "count": len(mapped)},
+                result={"kind": "chords", "count": len(mapped), "engine": selected_engine, "model": selected_model, "engine_display_name": engine_info["display_name"]},
             )
             return
         raise ValueError("unsupported analysis kind")
@@ -1519,12 +1541,23 @@ def _text_music_worker(job_id: str, pid: str, track_id: str, kind: str) -> None:
         _media_job_update(job_id, status="failed", progress=0, message="Analisi fallita", error=str(exc)[-1200:])
 
 
-def _start_text_music_job(pid: str, track_id: str, request: Request, kind: str):
+def _start_text_music_job(pid: str, track_id: str, request: Request, kind: str, model_or_engine: str = ""):
     project = _project_for_actor(request, pid)
     if not any(item.id == track_id for item in project.tracks):
         raise HTTPException(404, "track not found")
-    if kind == "lyrics" and not lyrics_engine_available():
-        raise HTTPException(409, "Lyrics extraction requires the OpenAI Whisper engine in this runtime")
+    if kind == "lyrics":
+        if not lyrics_engine_available():
+            raise HTTPException(409, "Motore lyrics Whisper non disponibile in questo runtime")
+        allowed={x["id"] for x in lyrics_catalog(native=NATIVE_SINGLE_USER)["models"]}
+        if model_or_engine and model_or_engine not in allowed:
+            raise HTTPException(400, "Modello lyrics non supportato")
+    if kind == "chords":
+        selected=model_or_engine or chords_catalog(native=NATIVE_SINGLE_USER)["default_engine"]
+        engines={x["id"]:x for x in chords_catalog(native=NATIVE_SINGLE_USER)["engines"]}
+        if selected not in engines:
+            raise HTTPException(400, "Motore chords non supportato")
+        if not chord_engine_available(selected):
+            raise HTTPException(409, f"Motore chords {engines[selected]['display_name']} non disponibile in questo runtime")
     now = time.time()
     job_id = uuid.uuid4().hex[:16]
     job = {
@@ -1536,20 +1569,40 @@ def _start_text_music_job(pid: str, track_id: str, request: Request, kind: str):
     with MEDIA_JOB_LOCK:
         MEDIA_JOBS[job_id] = job
     threading.Thread(
-        target=_text_music_worker, args=(job_id, pid, track_id, kind),
+        target=_text_music_worker, args=(job_id, pid, track_id, kind, model_or_engine),
         daemon=True, name=f"mta-{kind}-{job_id}",
     ).start()
     return _media_job_public(job)
 
 
 @app.post("/api/projects/{pid}/tracks/{track_id}/extract-lyrics-jobs")
-def start_lyrics_extraction(pid: str, track_id: str, request: Request):
-    return _start_text_music_job(pid, track_id, request, "lyrics")
+def start_lyrics_extraction(pid: str, track_id: str, request: Request, model: str = ""):
+    return _start_text_music_job(pid, track_id, request, "lyrics", model)
 
 
 @app.post("/api/projects/{pid}/tracks/{track_id}/extract-chords-jobs")
-def start_chord_extraction(pid: str, track_id: str, request: Request):
-    return _start_text_music_job(pid, track_id, request, "chords")
+def start_chord_extraction(pid: str, track_id: str, request: Request, engine: str = ""):
+    return _start_text_music_job(pid, track_id, request, "chords", engine)
+
+
+@app.post("/api/projects/{pid}/lyrics/reset")
+def reset_project_lyrics(pid: str, request: Request):
+    project = _project_for_actor(request, pid)
+    project.lyrics = []
+    project.lyrics_engine = ""
+    project.lyrics_model = ""
+    save_project(project)
+    return {"ok": True, "lyrics": [], "lyrics_engine": "", "lyrics_model": ""}
+
+
+@app.post("/api/projects/{pid}/chords/reset")
+def reset_project_chords(pid: str, request: Request):
+    project = _project_for_actor(request, pid)
+    project.chords = []
+    project.chords_engine = ""
+    project.chords_model = ""
+    save_project(project)
+    return {"ok": True, "chords": [], "chords_engine": "", "chords_model": ""}
 
 
 @app.get("/api/projects/{pid}/lyrics.txt")
@@ -1589,7 +1642,7 @@ def download_project_chordpro(pid: str, request: Request):
 
 
 @app.get("/api/projects/{pid}/lyrics.pdf")
-def download_project_lyrics_pdf(pid: str, request: Request, chord_color: str = "#7B1FA2"):
+def download_project_lyrics_pdf(pid: str, request: Request, chord_color: str = "#7B1FA2", preview: bool = False):
     project = _project_for_actor(request, pid)
     if not project.lyrics:
         raise HTTPException(409, "Il progetto non contiene lyrics")
@@ -1603,6 +1656,12 @@ def download_project_lyrics_pdf(pid: str, request: Request, chord_color: str = "
         rights_records=project.rights_records,
     )
     filename = _download_name(project.title or "lyrics", "pdf")
+    if preview:
+        return FileResponse(
+            tmp, media_type="application/pdf",
+            headers={"Content-Disposition": f'inline; filename="{filename}"'},
+            background=BackgroundTask(lambda: tmp.unlink(missing_ok=True)),
+        )
     return FileResponse(
         tmp, media_type="application/pdf", filename=filename,
         background=BackgroundTask(lambda: tmp.unlink(missing_ok=True)),
@@ -2325,9 +2384,12 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
                 lyric_source = vocal_stem or source
                 try:
                     project = load_project(project_id)
-                    project.lyrics = extract_lyrics(lyric_source)
+                    selected_lyrics_model=str(job.get("lyrics_model") or lyrics_catalog(native=NATIVE_SINGLE_USER)["default_model"])
+                    # Legacy equivalent: project.lyrics = extract_lyrics(lyric_source)
+                    project.lyrics = extract_lyrics(lyric_source, model_name=selected_lyrics_model)
+                    project.lyrics_engine="OpenAI Whisper"; project.lyrics_model=selected_lyrics_model
                     save_project(project)
-                    analysis["lyrics"] = {"ok": True, "count": len(project.lyrics), "source": "vocals" if vocal_stem else "mix"}
+                    analysis["lyrics"] = {"ok": True, "count": len(project.lyrics), "source": "vocals" if vocal_stem else "mix", "engine":"OpenAI Whisper", "model":selected_lyrics_model}
                 except Exception as analysis_exc:
                     LOGGER.exception("Lyrics extraction after stem separation failed")
                     analysis["lyrics"] = {"ok": False, "error": str(analysis_exc)[-500:]}
@@ -2336,9 +2398,13 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
                 progress(99, "Analisi chords ad alta accuratezza")
                 try:
                     project = load_project(project_id)
-                    project.chords = extract_chords(source)
+                    selected_chords_engine=str(job.get("chords_engine") or chords_catalog(native=NATIVE_SINGLE_USER)["default_engine"])
+                    chord_info=next((x for x in chords_catalog(native=NATIVE_SINGLE_USER)["engines"] if x["id"]==selected_chords_engine),{})
+                    # Legacy equivalent: project.chords = extract_chords(source)
+                    project.chords = extract_chords(source, engine=selected_chords_engine)
+                    project.chords_engine=selected_chords_engine; project.chords_model=str(chord_info.get("model_id") or "")
                     save_project(project)
-                    analysis["chords"] = {"ok": True, "count": len(project.chords), "source": "mix"}
+                    analysis["chords"] = {"ok": True, "count": len(project.chords), "source": "mix", "engine":selected_chords_engine, "model":project.chords_model, "engine_display_name":chord_info.get("display_name",selected_chords_engine)}
                 except Exception as analysis_exc:
                     LOGGER.exception("Chord extraction after stem separation failed")
                     analysis["chords"] = {"ok": False, "error": str(analysis_exc)[-500:]}
@@ -2580,6 +2646,38 @@ def admin_demucs_model_delete_local(model_id: str, request: Request):
     return delete_local_demucs_model(model_id)
 
 
+@app.get("/api/ai-models")
+def managed_ai_models(request: Request):
+    _actor(request)
+    return ai_catalog(native=NATIVE_SINGLE_USER)
+
+@app.post("/api/ai-models/lyrics/{model_id}/download")
+def managed_lyrics_model_download(model_id: str, request: Request):
+    _actor(request)
+    try: return download_lyrics_model(model_id, native=NATIVE_SINGLE_USER)
+    except ValueError as exc: raise HTTPException(404, str(exc)) from exc
+    except RuntimeError as exc: raise HTTPException(503, str(exc)) from exc
+
+@app.delete("/api/ai-models/lyrics/{model_id}")
+def managed_lyrics_model_delete(model_id: str, request: Request):
+    _actor(request)
+    try: return delete_lyrics_model(model_id, native=NATIVE_SINGLE_USER)
+    except ValueError as exc: raise HTTPException(404, str(exc)) from exc
+
+@app.post("/api/ai-models/chords/{model_id}/download")
+def managed_chord_model_download(model_id: str, request: Request):
+    _actor(request)
+    try: return download_chord_model(model_id, native=NATIVE_SINGLE_USER)
+    except ValueError as exc: raise HTTPException(404, str(exc)) from exc
+    except RuntimeError as exc: raise HTTPException(503, str(exc)) from exc
+
+@app.delete("/api/ai-models/chords/{model_id}")
+def managed_chord_model_delete(model_id: str, request: Request):
+    _actor(request)
+    try: return delete_chord_model(model_id, native=NATIVE_SINGLE_USER)
+    except ValueError as exc: raise HTTPException(404, str(exc)) from exc
+
+
 @app.get("/api/vocal-separation/models")
 def lead_backing_models(request: Request):
     _actor(request)
@@ -2607,6 +2705,8 @@ async def stem_job_start(
     keep_original_track: bool = True,
     extract_lyrics: bool = False,
     extract_chords: bool = False,
+    lyrics_model: str = "",
+    chords_engine: str = "",
     split_backing_vocals: bool = False,
     backing_vocal_model: str = LEAD_BACKING_DEFAULT_MODEL,
 ):
@@ -2740,6 +2840,8 @@ async def stem_job_start(
         "stem_name_prefix": "",
         "extract_lyrics": bool(extract_lyrics),
         "extract_chords": bool(extract_chords),
+        "lyrics_model": lyrics_model or lyrics_catalog(native=NATIVE_SINGLE_USER)["default_model"],
+        "chords_engine": chords_engine or chords_catalog(native=NATIVE_SINGLE_USER)["default_engine"],
         "split_backing_vocals": bool(split_backing_vocals),
         "backing_vocal_model": backing_vocal_model,
         "vocal_split_method": None,

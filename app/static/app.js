@@ -601,8 +601,8 @@ function openTrackContextMenuAt(id,clientX,clientY){
   menu.innerHTML=`
     <button type="button" onclick="closeTrackContextMenu();renameTrack('${id}')">✎ <span>Rinomina</span></button>
     <button type="button" ${disabled} onclick="closeTrackContextMenu();startTrackStemSplit('${id}')">▥ <span>Separa</span></button>
-    <button type="button" onclick="closeTrackContextMenu();startTrackTextAnalysis('${id}','lyrics')">≡ <span>Estrai lyrics</span></button>
-    <button type="button" onclick="closeTrackContextMenu();startTrackTextAnalysis('${id}','chords')">♬ <span>Estrai chords</span></button>
+    <button type="button" onclick="closeTrackContextMenu();openTextAnalysisChooser('${id}','lyrics')">≡ <span>Estrai lyrics</span></button>
+    <button type="button" onclick="closeTrackContextMenu();openTextAnalysisChooser('${id}','chords')">♬ <span>Estrai chords</span></button>
     <button type="button" class="danger" onclick="closeTrackContextMenu();deleteTracksByIds(['${id}'])">× <span>Rimuovi</span></button>
   `;
   document.body.appendChild(menu);
@@ -654,13 +654,22 @@ document.addEventListener('pointercancel',trackContextPointerEnd,{passive:true})
 document.addEventListener('click',event=>{
   if(Date.now()<trackContextSuppressClickUntil&&event.target.closest?.('[data-track-context-id]')){event.preventDefault();event.stopPropagation()}
 },true);
-async function startTrackTextAnalysis(id,kind){
+function textModelCatalog(){return pluginInfo.text_models||{lyrics:{models:[]},chords:{engines:[],models:[]}}}
+function openTextAnalysisChooser(id,kind){
+  const cat=textModelCatalog(),track=trackById(id);if(!track)return toast('Traccia non trovata');
+  if(kind==='lyrics'){const c=cat.lyrics||{},opts=(c.models||[]).map(m=>`<option value="${esc(m.id)}" ${m.id===c.default_model?'selected':''}>${esc(m.display_name)} · ${m.installed?'installato':(c.storage==='local'?'download locale':'download server')}</option>`).join('');showUtilityModal('Estrai lyrics',`<div class="form-grid"><p><b>Motore:</b> OpenAI Whisper</p><label>Modello<select id="textAnalysisChoice">${opts}</select></label><p class="hint">Il modello viene scaricato on-demand (download modello al primo uso) e conservato ${c.storage==='local'?'localmente nell’app nativa':'sul server'}.</p><div class="form-actions"><button onclick="downloadTextAnalysisSelection('lyrics')">Scarica modello</button><button class="accent" onclick="startTrackTextAnalysis('${esc(id)}','lyrics',$('#textAnalysisChoice').value);closeUtilityModal()">Estrai lyrics</button></div></div>`);return}
+  const c=cat.chords||{},models=Object.fromEntries((c.models||[]).map(x=>[x.id,x])),opts=(c.engines||[]).map(e=>{const m=models[e.model_id]||{},state=e.model_id?(m.installed?'installato':(c.storage==='local'?'download locale':'download server')):'nessun modello';return `<option value="${esc(e.id)}" ${e.id===c.default_engine?'selected':''} ${e.available?'':'disabled'}>${esc(e.display_name)} · ${esc(state)}${e.available?'':' · non disponibile'}</option>`}).join('');showUtilityModal('Estrai chords',`<div class="form-grid"><p><b>Motore che verrà usato:</b> <span id="chordEngineLabel"></span></p><label>Motore / modello<select id="textAnalysisChoice" onchange="updateChordEngineDisclosure()">${opts}</select></label><div id="chordEngineDisclosure" class="workflow-note"></div><div class="form-actions"><button onclick="downloadTextAnalysisSelection('chords')">Scarica modello selezionato</button><button class="accent" onclick="startTrackTextAnalysis('${esc(id)}','chords',$('#textAnalysisChoice').value);closeUtilityModal()">Estrai chords</button></div></div>`);updateChordEngineDisclosure()}
+function updateChordEngineDisclosure(){const c=textModelCatalog().chords||{},id=$('#textAnalysisChoice')?.value,e=(c.engines||[]).find(x=>x.id===id),m=(c.models||[]).find(x=>x.id===e?.model_id);if($('#chordEngineLabel'))$('#chordEngineLabel').textContent=e?.display_name||id||'—';if($('#chordEngineDisclosure'))$('#chordEngineDisclosure').innerHTML=e?.model_id?`Modello: <b>${esc(m?.display_name||e.model_id)}</b> · ${m?.installed?'installato':'sarà scaricato al primo uso'}${m?.license?`<br>Licenza pesi: ${esc(m.license)}`:''}`:'Questo motore non richiede un modello AI scaricabile.'}
+async function downloadTextAnalysisSelection(kind){const cat=textModelCatalog(),choice=$('#textAnalysisChoice')?.value;try{if(kind==='lyrics'){toast('Download modello lyrics…');await api(`/api/ai-models/lyrics/${encodeURIComponent(choice)}/download`,{method:'POST'})}else{const e=(cat.chords?.engines||[]).find(x=>x.id===choice);if(!e?.model_id)return toast('Il motore selezionato non richiede un modello');toast('Download modello chords…');await api(`/api/ai-models/chords/${encodeURIComponent(e.model_id)}/download`,{method:'POST'})}pluginInfo=await api('/api/plugins');toast(currentUser?.native_single_user?'Modello scaricato localmente':'Modello scaricato sul server');if(kind==='chords')updateChordEngineDisclosure()}catch(e){toast(e.message)}}
+async function startTrackTextAnalysis(id,kind,choice=''){
   if(!current)return;
   const track=trackById(id);if(!track)return toast('Traccia non trovata');
   const label=kind==='lyrics'?'Lyrics':'Chords';
   await flushAutosave();
   try{
-    const job=await api(`/api/projects/${current.id}/tracks/${id}/extract-${kind}-jobs`,{method:'POST'});
+    const param=kind==='lyrics'?'model':'engine';
+    const suffix=choice?`?${param}=${encodeURIComponent(choice)}`:'';
+    const job=await api(`/api/projects/${current.id}/tracks/${id}/extract-${kind}-jobs${suffix}`,{method:'POST'});
     showMediaProgress(`Estrazione ${label}`,job.progress,job.message);
     pollMediaJob(job.id,`Estrazione ${label}`,async()=>{
       current=await api(`/api/projects/${current.id}`);
@@ -880,7 +889,10 @@ function exportPaneHtml(limit,over){
 }
 function metaPaneHtml(){
   const config={lyrics:['text','Lyrics'],chords:['chord','Chords'],markers:['label','Markers']},[key,label]=config[mixerMetaTab]||config.lyrics,rows=current[mixerMetaTab]||[];const displayValue=x=>mixerMetaTab==='chords'?transposeChordLabel(x[key],current.pitch_semitones||0):x[key];
-  return `<div class="meta-pane" id="metaPane"><div class="dock-tabs"><button class="dock-tab ${mixerMetaTab==='lyrics'?'active':''}" onclick="showMetaPanel('lyrics')">Lyrics</button><button class="dock-tab ${mixerMetaTab==='chords'?'active':''}" onclick="showMetaPanel('chords')">Chords</button><button class="dock-tab ${mixerMetaTab==='markers'?'active':''}" onclick="showMetaPanel('markers')">Markers</button><button class="dock-close" onclick="toggleMixerPanel('meta')" title="Nascondi Lyrics/Chords/Markers">×</button></div><div class="meta-tabs-content"><div class="meta-list">${rows.map(x=>`<div class="meta-line"><time>${fmtTime(x.time_ms/1000)}</time><span>${esc(displayValue(x))}</span></div>`).join('')||`<div class="hint">No synchronized ${label.toLowerCase()} yet.</div>`}</div><div class="meta-actions"><button class="tool" onclick="editTimed('${mixerMetaTab}')">Edit ${label.toLowerCase()}</button>${mixerMetaTab==='lyrics'?`<button class="tool" onclick="downloadProjectLyrics(false)">TXT</button><button class="tool" onclick="downloadProjectLyrics(true)">TXT + chords</button><button class="tool" onclick="downloadProjectChordPro()">ChordPro</button><label class="tool" title="Colore chords nel PDF">Chord color <input id="lyricsPdfChordColor" type="color" value="#7B1FA2" style="width:28px;height:22px;padding:0;border:0;background:none"></label><button class="tool" onclick="downloadProjectLyricsPdf()">PDF</button>`:''}</div><textarea id="lyrics" hidden>${esc(linesToText(current.lyrics,'text'))}</textarea><textarea id="chords" hidden>${esc(linesToText(current.chords,'chord'))}</textarea><textarea id="markers" hidden>${esc(linesToText(current.markers,'label'))}</textarea></div></div>`;
+  const resetButton=mixerMetaTab==='lyrics'?`<button class="tool danger" onclick="resetTimedData('lyrics')">Reset lyrics</button>`:mixerMetaTab==='chords'?`<button class="tool danger" onclick="resetTimedData('chords')">Reset chords</button>`:'';
+  const hasLyrics=!!(current.lyrics||[]).length,hasChords=!!(current.chords||[]).length;
+  const lyricsExports=mixerMetaTab==='lyrics'&&hasLyrics?`<button class="tool" onclick="downloadProjectLyrics(false)">TXT Lyrics</button>${hasChords?`<button class="tool" onclick="downloadProjectLyrics(true)">TXT Lyrics + Chords</button><button class="tool" onclick="downloadProjectChordPro()">ChordPro Lyrics + Chords</button>`:''}<label class="tool" title="Colore chords nel PDF">Chord color <input id="lyricsPdfChordColor" type="color" value="#7B1FA2" style="width:28px;height:22px;padding:0;border:0;background:none"></label><button class="tool" onclick="previewProjectLyricsPdf()">Anteprima PDF ${hasChords?'Lyrics + Chords':'Lyrics'}</button><button class="tool" onclick="downloadProjectLyricsPdf()">Scarica PDF ${hasChords?'Lyrics + Chords':'Lyrics'}</button>`:'';
+  return `<div class="meta-pane" id="metaPane"><div class="dock-tabs"><button class="dock-tab ${mixerMetaTab==='lyrics'?'active':''}" onclick="showMetaPanel('lyrics')">Lyrics</button><button class="dock-tab ${mixerMetaTab==='chords'?'active':''}" onclick="showMetaPanel('chords')">Chords</button><button class="dock-tab ${mixerMetaTab==='markers'?'active':''}" onclick="showMetaPanel('markers')">Markers</button><button class="dock-close" onclick="toggleMixerPanel('meta')" title="Nascondi Lyrics/Chords/Markers">×</button></div><div class="meta-tabs-content"><div class="meta-list">${rows.map(x=>`<div class="meta-line"><time>${fmtTime(x.time_ms/1000)}</time><span>${esc(displayValue(x))}</span></div>`).join('')||`<div class="hint">No synchronized ${label.toLowerCase()} yet.</div>`}</div><div class="meta-actions"><button class="tool" onclick="editTimed('${mixerMetaTab}')">Edit ${label.toLowerCase()}</button>${resetButton}${lyricsExports}</div><textarea id="lyrics" hidden>${esc(linesToText(current.lyrics,'text'))}</textarea><textarea id="chords" hidden>${esc(linesToText(current.chords,'chord'))}</textarea><textarea id="markers" hidden>${esc(linesToText(current.markers,'label'))}</textarea></div></div>`;
 }
 function updateMixerDockLayout(){
   const dock=$('#mixerDock');if(!dock||!current)return;
@@ -1398,6 +1410,9 @@ async function replaceTrack(id,input){
 }
 function openStemWorkflow(){
   const stem=pluginInfo.stem_splitter||{};
+  const textModels=pluginInfo.text_models||{},lyricsModels=textModels.lyrics||{},chordModels=textModels.chords||{};
+  const lyricsModelOptions=(lyricsModels.models||[]).map(m=>`<option value="${esc(m.id)}" ${m.id===lyricsModels.default_model?'selected':''}>${esc(m.display_name)} · ${m.installed?'installato':'on-demand'}</option>`).join('');
+  const chordModelMap=Object.fromEntries((chordModels.models||[]).map(m=>[m.id,m]));const chordEngineOptions=(chordModels.engines||[]).map(e=>`<option value="${esc(e.id)}" ${e.id===chordModels.default_engine?'selected':''} ${e.available?'':'disabled'}>${esc(e.display_name)}${e.model_id?' · '+(chordModelMap[e.model_id]?.installed?'installato':'on-demand'):' · no model'}</option>`).join('');
   const leadBacking=stem.lead_backing||{};const backingModels=(leadBacking.models||[]).map(m=>`<option value="${esc(m.id)}" ${m.id===leadBacking.default_model?'selected':''}>${esc(m.display_name)} · ${m.installed?'installato':(leadBacking.storage==='local'?'download locale':'download server')}</option>`).join('');
   const defaultName=current?.title||'Nuovo progetto da MP3';
   const profileMap=Object.fromEntries((stem.model_profiles||[]).map(p=>[p.model,p]));const models=(stem.models||['htdemucs_6s']).map(x=>{const p=profileMap[x]||{};return `<option value="${esc(x)}" ${x===stem.recommended_model?'selected':''}>${esc(p.display_name||x)}${p.stem_count?' · '+p.stem_count+' stem':''}</option>`}).join('');
@@ -1420,8 +1435,10 @@ function openStemWorkflow(){
       <label class="workflow-field"><span>Brano completo MP3</span><input id="stemWorkflowFile" type="file" accept=".mp3,audio/mpeg"></label>
       ${remembered}
       <label class="workflow-check"><input id="stemKeepOriginal" type="checkbox" checked> Mantieni anche la traccia “Original Mix” nel progetto</label>
-      <label class="workflow-check"><input id="stemExtractLyrics" type="checkbox"> Estrai anche le lyrics (Whisper large-v3, timing parola per parola)</label>
-      <label class="workflow-check"><input id="stemExtractChords" type="checkbox"> Estrai anche i chords (Chordino/NNLS-Chroma se disponibile, fallback interno)</label>
+      <label class="workflow-check"><input id="stemExtractLyrics" type="checkbox" onchange="$('#stemLyricsModelRow').classList.toggle('hidden',!this.checked)"> Estrai anche le lyrics</label>
+      <label class="workflow-field hidden" id="stemLyricsModelRow"><span>Motore lyrics · OpenAI Whisper</span><select id="stemLyricsModel">${lyricsModelOptions}</select><button type="button" onclick="downloadStemTextModel('lyrics')">Scarica modello</button></label>
+      <label class="workflow-check"><input id="stemExtractChords" type="checkbox" onchange="$('#stemChordsEngineRow').classList.toggle('hidden',!this.checked);updateStemChordEngineDisclosure()"> Estrai anche i chords</label>
+      <label class="workflow-field hidden" id="stemChordsEngineRow"><span>Motore chords</span><select id="stemChordsEngine" onchange="updateStemChordEngineDisclosure()">${chordEngineOptions}</select><small id="stemChordEngineDisclosure"></small><button type="button" onclick="downloadStemTextModel('chords')">Scarica modello</button></label>
       <label class="workflow-check"><input id="stemSplitBackingVocals" type="checkbox" onchange="updateBackingModelRow()"> Separa anche voce principale e backing vocals (secondo passaggio AI)</label><label class="workflow-field hidden" id="backingModelRow"><span>Modello Lead / Backing Vocals</span><select id="stemBackingVocalModel">${backingModels}<option value="ffmpeg-center-side">Fallback DSP center/side</option></select><button type="button" onclick="downloadSelectedBackingModel()">Scarica modello</button></label>
       <div class="workflow-note">Il file originale viene sempre conservato in <b>Originals</b>. Il progetto viene salvato dopo l’import e dopo ogni stem aggiunto. Su iPhone/iPad, <b>Auto</b> usa Core ML sul dispositivo quando il modello richiesto è disponibile e ricade automaticamente sul server negli altri casi. I modelli locali vengono scaricati una sola volta e restano disponibili offline. 8 stem richiede un modello compatibile.</div>
       <div class="utility-actions">
@@ -1433,6 +1450,9 @@ function openStemWorkflow(){
 }
 function updateBackingModelRow(){const row=$('#backingModelRow'),on=$('#stemSplitBackingVocals')?.checked;if(row)row.classList.toggle('hidden',!on)}
 async function downloadSelectedBackingModel(){const id=$('#stemBackingVocalModel')?.value;if(!id||id==='ffmpeg-center-side')return toast('Il fallback DSP non richiede modelli');try{toast('Download modello in corso…');await api(`/api/vocal-separation/models/${encodeURIComponent(id)}/download`,{method:'POST'});pluginInfo=await api('/api/plugins');toast(currentUser?.native_single_user?'Modello scaricato localmente':'Modello scaricato sul server')}catch(e){toast(e.message)}}
+
+function updateStemChordEngineDisclosure(){const c=textModelCatalog().chords||{},id=$('#stemChordsEngine')?.value,e=(c.engines||[]).find(x=>x.id===id),m=(c.models||[]).find(x=>x.id===e?.model_id),el=$('#stemChordEngineDisclosure');if(el)el.textContent=e?`${e.display_name}${e.model_id?' · modello '+(m?.display_name||e.model_id)+(m?.installed?' · installato':' · download on-demand'): ' · nessun modello AI'}`:''}
+async function downloadStemTextModel(kind){const cat=textModelCatalog();try{if(kind==='lyrics'){const id=$('#stemLyricsModel')?.value;if(!id)return;await api(`/api/ai-models/lyrics/${encodeURIComponent(id)}/download`,{method:'POST'})}else{const id=$('#stemChordsEngine')?.value,e=(cat.chords?.engines||[]).find(x=>x.id===id);if(!e?.model_id)return toast('Questo motore non richiede un modello');await api(`/api/ai-models/chords/${encodeURIComponent(e.model_id)}/download`,{method:'POST'})}pluginInfo=await api('/api/plugins');toast(currentUser?.native_single_user?'Modello scaricato localmente':'Modello scaricato sul server');updateStemChordEngineDisclosure()}catch(e){toast(e.message)}}
 function updateStemWorkflowMode(){
   const mode=$('#stemProjectMode')?.value;
   const row=$('#stemProjectNameRow'),target=$('#stemProjectTarget');
@@ -1443,9 +1463,9 @@ function updateStemWorkflowMode(){
   }
 }
 
-async function runTextAnalysisAndWait(projectId,trackId,kind){
+async function runTextAnalysisAndWait(projectId,trackId,kind,choice=""){
   if(!trackId)return null;
-  const job=await api(`/api/projects/${projectId}/tracks/${trackId}/extract-${kind}-jobs`,{method:'POST'});
+  const param=kind==='lyrics'?'model':'engine';const suffix=choice?`?${param}=${encodeURIComponent(choice)}`:'';const job=await api(`/api/projects/${projectId}/tracks/${trackId}/extract-${kind}-jobs${suffix}`,{method:'POST'});
   for(;;){
     const state=await api(`/api/media-jobs/${job.id}`);
     if(state.status==='completed')return state;
@@ -1454,7 +1474,7 @@ async function runTextAnalysisAndWait(projectId,trackId,kind){
   }
 }
 
-async function startIosLocalStemWorkflow({projectId,stemCount,modelId,keep,extractLyrics=false,extractChords=false}){
+async function startIosLocalStemWorkflow({projectId,stemCount,modelId,keep,extractLyrics=false,extractChords=false,lyricsModel='',chordsEngine=''}){
   showUtilityModal('Separazione locale',`<div class="stem-progress-card"><div class="stem-progress-head"><b>Demucs Core ML</b><span id="localStemPct">0%</span></div><div class="stem-progress"><div id="localStemFill" class="stem-progress-fill" style="width:0%"></div></div><div id="localStemMessage" class="stem-progress-message">Preparazione modello locale…</div><div class="utility-actions"><button class="danger-action" onclick="window.MtaMobile?.cancelLocalStemSeparation?.()">Annulla separazione</button></div></div>`);
   const onProgress=e=>{const pct=Math.max(0,Math.min(100,Number(e.detail?.progress)||0));if($('#localStemPct'))$('#localStemPct').textContent=pct+'%';if($('#localStemFill'))$('#localStemFill').style.width=pct+'%';if($('#localStemMessage'))$('#localStemMessage').textContent=e.detail?.message||'Separazione locale'};
   window.addEventListener('mtaLocalStemProgress',onProgress);
@@ -1465,8 +1485,8 @@ async function startIosLocalStemWorkflow({projectId,stemCount,modelId,keep,extra
     if(extractLyrics||extractChords){
       const vocal=current.tracks.find(t=>t.type==='melody'||/vocals?/i.test(t.name||''));
       const original=current.tracks.find(t=>/original mix/i.test(t.name||''))||current.tracks[0];
-      if(extractLyrics){if($('#localStemMessage'))$('#localStemMessage').textContent='Estrazione lyrics ad alta accuratezza…';await runTextAnalysisAndWait(projectId,vocal?.id||original?.id,'lyrics')}
-      if(extractChords){if($('#localStemMessage'))$('#localStemMessage').textContent='Analisi chords ad alta accuratezza…';await runTextAnalysisAndWait(projectId,original?.id||vocal?.id,'chords')}
+      if(extractLyrics){if($('#localStemMessage'))$('#localStemMessage').textContent='Estrazione lyrics ad alta accuratezza…';await runTextAnalysisAndWait(projectId,vocal?.id||original?.id,'lyrics',lyricsModel)}
+      if(extractChords){if($('#localStemMessage'))$('#localStemMessage').textContent='Analisi chords ad alta accuratezza…';await runTextAnalysisAndWait(projectId,original?.id||vocal?.id,'chords',chordsEngine)}
       current=await api(`/api/projects/${projectId}`);render();
     }
     toast(`Separazione locale completata · ${result.stemCount} stem`);
@@ -1498,7 +1518,10 @@ async function startStemWorkflow(){
     }catch(e){return toast('Scelta destinazione progetto fallita: '+e.message)}
   }
   const extractLyrics=!!$('#stemExtractLyrics')?.checked,extractChords=!!$('#stemExtractChords')?.checked;
+  const lyricsModel=$('#stemLyricsModel')?.value||textModelCatalog().lyrics?.default_model||'large-v3';
+  const chordsEngine=$('#stemChordsEngine')?.value||textModelCatalog().chords?.default_engine||'madmom-deep-chroma';
   const splitBackingVocals=!!$('#stemSplitBackingVocals')?.checked;
+  const backingVocalModel=$('#stemBackingVocalModel')?.value||'uvr_mdxnet_kara_2';
   let execution=$('#stemExecutionMode')?.value||preferredStemExecution||'server';
   if(splitBackingVocals&&execution!=='server'){execution='server';toast('La separazione Lead/Backing Vocals richiede il secondo passaggio sul server.');}
   if(supportsLocalIosStems()&&execution!=='server'){
@@ -1515,13 +1538,13 @@ async function startStemWorkflow(){
       const installed=installedCounts.includes(requested);
       if(execution==='local'||installed){
         setMobileBusy(true);
-        try{return await startIosLocalStemWorkflow({projectId:localProjectId,stemCount:stemCount,modelId:model,keep,extractLyrics,extractChords})}finally{setMobileBusy(false)}
+        try{return await startIosLocalStemWorkflow({projectId:localProjectId,stemCount:stemCount,modelId:model,keep,extractLyrics,extractChords,lyricsModel,chordsEngine})}finally{setMobileBusy(false)}
       }
       // Auto: native layer may download a model from the configured server. If it
       // cannot, fall through to the established server-side Demucs workflow.
       try{
         setMobileBusy(true);
-        return await startIosLocalStemWorkflow({projectId:localProjectId,stemCount:stemCount,modelId:model,keep,extractLyrics,extractChords});
+        return await startIosLocalStemWorkflow({projectId:localProjectId,stemCount:stemCount,modelId:model,keep,extractLyrics,extractChords,lyricsModel,chordsEngine});
       }catch(localError){
         setMobileBusy(false);
         toast('Modello locale non disponibile: uso il server.');
@@ -1535,7 +1558,7 @@ async function startStemWorkflow(){
     if(mobilePlatform()==='android'&&window.MtaMobile?.ensureLocalStemModel){
       try{const raw=window.MtaMobile.ensureLocalStemModel(model,stemCount||0);const state=typeof raw==='string'?JSON.parse(raw):raw;if(state&&!state.ok)console.warn('Android local model prefetch:',state.error)}catch(e){console.warn('Android local model prefetch failed',e)}
     }
-    const r=await api(`/api/stems/jobs?project_id=${encodeURIComponent(projectId)}&project_title=${encodeURIComponent(title)}&target=${encodeURIComponent(target)}&model=${encodeURIComponent(model)}&stem_count=${stemCount}&keep_original_track=${keep}&extract_lyrics=${extractLyrics}&extract_chords=${extractChords}&split_backing_vocals=${splitBackingVocals}&backing_vocal_model=${encodeURIComponent(backingVocalModel)}`,{method:'POST',body:fd});
+    const r=await api(`/api/stems/jobs?project_id=${encodeURIComponent(projectId)}&project_title=${encodeURIComponent(title)}&target=${encodeURIComponent(target)}&model=${encodeURIComponent(model)}&stem_count=${stemCount}&keep_original_track=${keep}&extract_lyrics=${extractLyrics}&extract_chords=${extractChords}&lyrics_model=${encodeURIComponent(lyricsModel)}&chords_engine=${encodeURIComponent(chordsEngine)}&split_backing_vocals=${splitBackingVocals}&backing_vocal_model=${encodeURIComponent(backingVocalModel)}`,{method:'POST',body:fd});
     if(nativeProjectPath&&window.pywebview?.api?.bind_project_path){
       await window.pywebview.api.bind_project_path(r.project.id,nativeProjectPath);
     }
@@ -2211,9 +2234,23 @@ async function startYoutubeImport(){
 function focusImport(){$('#newTrackFile')?.click()}
 
 function editProjectMeta(){if(!current)return;const title=prompt('Project title',current.title);if(title!==null&&title.trim())current.title=title.trim().slice(0,200);const originalTitle=prompt('Titolo originale',current.original_title||'');if(originalTitle!==null)current.original_title=originalTitle.trim().slice(0,300);const authors=prompt('Autori / compositori (separati da virgola)',(current.authors||[]).join(', '));if(authors!==null)current.authors=authors.split(/[,;]/).map(x=>x.trim()).filter(Boolean).slice(0,64);const artist=prompt('Interprete / artista',current.artist||'');if(artist!==null)current.artist=artist.slice(0,200);const key=prompt('Tonalità / Key',current.key||'');if(key!==null)current.key=key.trim().slice(0,40);const bpm=prompt('BPM',String(current.bpm));if(bpm!==null&&Number(bpm)>0)setProjectBpm(Math.min(300,Number(bpm)));render();markDirty()}
-function downloadProjectLyrics(withChords=false){if(!current)return;window.location.href=`/api/projects/${current.id}/lyrics.txt?chords=${withChords?'true':'false'}`}
-function downloadProjectChordPro(){if(!current)return;if(!(current.lyrics||[]).length)return toast('Il progetto non contiene lyrics');window.location.href=`/api/projects/${current.id}/lyrics.chordpro`}
-function downloadProjectLyricsPdf(){if(!current)return;const color=$('#lyricsPdfChordColor')?.value||'#7B1FA2';window.location.href=`/api/projects/${current.id}/lyrics.pdf?chord_color=${encodeURIComponent(color)}`}
+function downloadProjectLyrics(withChords=false){if(!current)return;if(!(current.lyrics||[]).length)return toast('Il progetto non contiene lyrics');if(withChords&&!(current.chords||[]).length)return toast('Il progetto non contiene chords');window.location.href=`/api/projects/${current.id}/lyrics.txt?chords=${withChords?'true':'false'}`}
+function downloadProjectChordPro(){if(!current)return;if(!(current.lyrics||[]).length)return toast('Il progetto non contiene lyrics');if(!(current.chords||[]).length)return toast('Il progetto non contiene chords');window.location.href=`/api/projects/${current.id}/lyrics.chordpro`}
+function lyricsPdfUrl(preview=false){const color=$('#lyricsPdfChordColor')?.value||'#7B1FA2';return `/api/projects/${current.id}/lyrics.pdf?chord_color=${encodeURIComponent(color)}${preview?'&preview=true':''}`}
+function downloadProjectLyricsPdf(){if(!current)return;if(!(current.lyrics||[]).length)return toast('Il progetto non contiene lyrics');window.location.href=lyricsPdfUrl(false)}
+function previewProjectLyricsPdf(){if(!current)return;if(!(current.lyrics||[]).length)return toast('Il progetto non contiene lyrics');const hasChords=!!(current.chords||[]).length,title=hasChords?'Anteprima PDF · Lyrics + Chords':'Anteprima PDF · Lyrics';showUtilityModal(title,`<div class="pdf-preview-wrap"><iframe class="pdf-preview-frame" src="${esc(lyricsPdfUrl(true))}" title="${esc(title)}"></iframe></div><div class="utility-actions pdf-preview-actions"><button class="utility-btn secondary" onclick="closeUtilityModal()">Chiudi</button><button class="utility-btn primary" onclick="downloadProjectLyricsPdf()">Scarica PDF ${hasChords?'Lyrics + Chords':'Lyrics'}</button></div>`)}
+async function resetTimedData(kind){
+  if(!current||!['lyrics','chords'].includes(kind))return;
+  const label=kind==='lyrics'?'lyrics':'chords';
+  if(!confirm(`Azzerare completamente ${label}? Potrai riscriverli o estrarli nuovamente.`))return;
+  try{
+    const result=await api(`/api/projects/${current.id}/${kind}/reset`,{method:'POST'});
+    current[kind]=[];
+    if(kind==='lyrics'){current.lyrics_engine=result.lyrics_engine||'';current.lyrics_model=result.lyrics_model||''}
+    else{current.chords_engine=result.chords_engine||'';current.chords_model=result.chords_model||''}
+    render();toast(`${kind==='lyrics'?'Lyrics':'Chords'} azzerati`);
+  }catch(e){toast(e.message)}
+}
 
 let rightsCandidateRecords=[];
 function rightsRecordKey(r){return `${r.society||''}|${r.uid||''}|${r.original_title||r.title||''}|${JSON.stringify(r.identifiers||{})}`}
@@ -2472,7 +2509,7 @@ async function showNativeSettings(){
   if(!apiBridge?.get_native_settings){toast('Bridge nativo non disponibile. Riprova tra un istante.');return}
   try{
     const cfg=await apiBridge.get_native_settings();
-    showUtilityModal('Settings',`<div class="form-grid"><label>Maximum import/upload size (MB)<input id="nativeMaxUploadMb" type="number" min="1" max="10240" step="1" value="${Number(cfg.max_upload_mb)||1024}"></label><label class="workflow-check"><input id="nativeAutosaveEnabled" type="checkbox" ${cfg.autosave_enabled!==false?'checked':''}> Auto-save project changes</label><label>Update channel<select id="nativeUpdateChannel"><option value="stable" ${cfg.update_channel!=='early'?'selected':''}>Stable · GitHub tags/releases only</option><option value="early" ${cfg.update_channel==='early'?'selected':''}>Early release · include latest main packages</option></select></label><p>Stable checks only tagged GitHub releases. Early release also checks the rolling <b>early-main</b> package produced from main.</p><div class="form-actions"><button type="button" onclick="checkNativeAppUpdate(true)">Check for updates</button><button type="button" onclick="openNativeModelManager()">Manage Demucs models</button><button class="accent" onclick="saveNativeSettings()">Save</button></div></div>`);
+    showUtilityModal('Settings',`<div class="form-grid"><label>Maximum import/upload size (MB)<input id="nativeMaxUploadMb" type="number" min="1" max="10240" step="1" value="${Number(cfg.max_upload_mb)||1024}"></label><label class="workflow-check"><input id="nativeAutosaveEnabled" type="checkbox" ${cfg.autosave_enabled!==false?'checked':''}> Auto-save project changes</label><label>Update channel<select id="nativeUpdateChannel"><option value="stable" ${cfg.update_channel!=='early'?'selected':''}>Stable · GitHub tags/releases only</option><option value="early" ${cfg.update_channel==='early'?'selected':''}>Early release · include latest main packages</option></select></label><p>Stable checks only tagged GitHub releases. Early release also checks the rolling <b>early-main</b> package produced from main.</p><div class="form-actions"><button type="button" onclick="checkNativeAppUpdate(true)">Check for updates</button><button type="button" onclick="openNativeModelManager()">Manage Demucs models</button><button type="button" onclick="openAiModelManager()">Manage Lyrics / Chords models</button><button class="accent" onclick="saveNativeSettings()">Save</button></div></div>`);
   }catch(err){toast('Impossibile leggere le impostazioni native: '+err.message)}
 }
 async function saveNativeSettings(){
@@ -2510,6 +2547,8 @@ function exposeNativeSettings(){
 }
 window.addEventListener('pywebviewready',exposeNativeSettings);
 
+async function openAiModelManager(){try{const d=await api('/api/ai-models'),l=d.lyrics||{},c=d.chords||{};const lrows=(l.models||[]).map(m=>`<tr><td>${esc(m.display_name)}</td><td>OpenAI Whisper</td><td>${m.installed?'Installato':'On-demand'}</td><td><button onclick="manageAiModel('lyrics','${esc(m.id)}','download')">${m.installed?'Verifica / riscarica':'Scarica'}</button>${m.installed?` <button onclick="manageAiModel('lyrics','${esc(m.id)}','delete')">Elimina</button>`:''}</td></tr>`).join('');const crows=(c.models||[]).map(m=>`<tr><td>${esc(m.display_name)}</td><td>${esc(m.engine)}</td><td>${m.installed?'Installato':'On-demand'}</td><td><button onclick="manageAiModel('chords','${esc(m.id)}','download')">${m.installed?'Verifica / riscarica':'Scarica'}</button>${m.installed?` <button onclick="manageAiModel('chords','${esc(m.id)}','delete')">Elimina</button>`:''}<br><small>${esc(m.license||'')}</small></td></tr>`).join('');showUtilityModal(`AI models · ${d.storage==='local'?'locale':'server'}`,`<h3>Lyrics</h3><div class="table-scroll"><table><thead><tr><th>Modello</th><th>Motore</th><th>Stato</th><th>Azioni</th></tr></thead><tbody>${lrows}</tbody></table></div><h3>Chords</h3><div class="table-scroll"><table><thead><tr><th>Modello</th><th>Motore</th><th>Stato</th><th>Azioni</th></tr></thead><tbody>${crows}</tbody></table></div><p class="hint">Nella web app i modelli sono conservati sul server; nelle applicazioni native sono conservati localmente. I motori Chordino e MTA Chromagram non richiedono pesi AI.</p>`)}catch(e){toast(e.message)}}
+async function manageAiModel(kind,id,action){try{await api(`/api/ai-models/${kind}/${encodeURIComponent(id)}${action==='delete'?'':'/download'}`,{method:action==='delete'?'DELETE':'POST'});pluginInfo=await api('/api/plugins');openAiModelManager()}catch(e){toast(e.message)}}
 async function openNativeModelManager(){const b=await waitForNativeApi();if(!b?.list_local_models)return toast('Native model manager unavailable');try{const d=await b.list_local_models(),profiles=d.catalog?.model_profiles||[],local=new Set((d.local||[]).map(x=>x.id.replace(/\.server-model$/,'')));const rows=profiles.map(p=>`<tr><td>${esc(p.display_name||p.model)}</td><td>${p.stem_count||'—'}</td><td>${local.has(p.model)?'Installed':'On demand'}</td><td><button onclick="nativeModelUpdate('${esc(p.model)}')">${local.has(p.model)?'Force update':'Download'}</button>${local.has(p.model)?` <button onclick="nativeModelDelete('${esc(p.model)}')">Delete local</button>`:''}</td></tr>`).join('');showUtilityModal('Demucs models',`<div class="table-scroll"><table><thead><tr><th>Model</th><th>Stems</th><th>Local</th><th>Actions</th></tr></thead><tbody>${rows}</tbody></table></div><p>Missing models are downloaded automatically when requested for splitting.</p>`) }catch(e){toast(e.message)}}
 async function nativeModelUpdate(id){const b=await waitForNativeApi();try{await b.update_local_model(id);toast('Model updated: '+id);openNativeModelManager()}catch(e){toast(e.message)}}
 async function nativeModelDelete(id){const b=await waitForNativeApi();try{await b.delete_local_model(id);toast('Local model deleted: '+id);openNativeModelManager()}catch(e){toast(e.message)}}

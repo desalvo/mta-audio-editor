@@ -1,3 +1,19 @@
+## 0.2.0-128
+
+Lyrics/Chords export controls are now context-aware: Lyrics exports require Lyrics, while Lyrics+Chords exports require both datasets. PDF actions are labelled according to the actual content.
+
+## 0.2.0-127
+
+Lyrics and Chords can now be reset independently so they can be rewritten or extracted again. The Lyrics + Chords PDF can also be previewed inline in the web app before downloading.
+
+## 0.2.0-126
+
+Lyrics and Chords now use the same managed, on-demand model workflow as the other AI features. Web deployments cache models on the server; native desktop editions cache them locally. Chord extraction explicitly identifies the engine/model before it runs.
+
+## 0.2.0-125
+
+Fixes the "Lyrics extraction requires the OpenAI Whisper engine in this runtime" error in production builds. Server and desktop-native packages now include the Whisper engine; only model weights are downloaded on demand.
+
 ## 0.2.0-124
 
 Selectable on-demand AI models for Lead Vocals / Backing Vocals separation, with server/native-local model storage.

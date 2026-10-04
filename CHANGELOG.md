@@ -1,3 +1,32 @@
+## 0.2.0-128
+
+- Hide all Lyrics export controls until Lyrics exist.
+- Show Lyrics+Chords TXT/ChordPro exports only when both Lyrics and Chords exist.
+- PDF preview/download labels now reflect whether the document contains Lyrics only or Lyrics + Chords.
+- Added defensive export guards for missing Lyrics/Chords.
+
+## 0.2.0-127
+
+- Added independent Lyrics and Chords reset actions with confirmation. Resetting clears both synchronized content and the corresponding engine/model provenance, without affecting the other analysis type or project rights metadata.
+- Added inline in-app preview for the Lyrics + Chords PDF, using the exact same renderer as the downloadable export.
+- Added responsive PDF preview styling for desktop and mobile web clients.
+
+## 0.2.0-126
+
+- Added unified on-demand model management for Lyrics (OpenAI Whisper) and Chords, with server storage in web deployments and local storage in native desktop applications.
+- Added selectable Whisper models (tiny/base/small/medium/large-v2/large-v3/turbo), with large-v3 as default.
+- Added explicit chord engines: Madmom Deep Chroma + CRF (default AI), Madmom CNN + CRF, Chordino / NNLS-Chroma and built-in MTA Chromagram.
+- Chord extraction UI now always discloses the exact engine/model and checkpoint licensing before extraction.
+- Added download/delete APIs and model-manager UI for Lyrics/Chords models; model choices also apply to Import & Separate workflows.
+- Persist the last Lyrics and Chords engine/model used in project metadata.
+
+## 0.2.0-125
+
+- Fix lyrics extraction in production: OpenAI Whisper is now installed in Docker/server and native builds instead of being only an optional requirements file.
+- Bundle the Whisper Python package in PyInstaller desktop applications; model weights remain on-demand and cached.
+- CI audits the lyrics dependency set and production Docker smoke validation imports Whisper.
+- Clarify in the UI that the selected Whisper model is downloaded on first use.
+
 ## 0.2.0-124
 
 - Lead/backing vocal separation now uses selectable AI karaoke models by default via audio-separator 0.47.0.

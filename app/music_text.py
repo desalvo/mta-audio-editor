@@ -112,7 +112,7 @@ def extract_lyrics(path: Path, *, model_name: str | None = None, language: str |
     """
     model_name = (model_name or os.getenv("MTA_LYRICS_WHISPER_MODEL", "large-v3")).strip() or "large-v3"
     language = (language or os.getenv("MTA_LYRICS_LANGUAGE", "")).strip() or None
-    cache_dir = Path(os.getenv("MTA_WHISPER_CACHE_DIR", str(Path.home() / ".cache" / "whisper"))).expanduser()
+    cache_dir = Path(os.getenv("MTA_LYRICS_MODEL_DIR", str(Path(os.getenv("MTA_DATA_DIR", "/data/projects")) / ".cache" / "lyrics-models"))).expanduser()
     cache_dir.mkdir(parents=True, exist_ok=True)
 
     # Prefer the Python API when bundled in native/server builds. It gives a
@@ -239,16 +239,51 @@ def _extract_chords_chordino(path: Path) -> list[Chord] | None:
     return events or None
 
 
-def extract_chords(path: Path, *, interval_ms: int = 500) -> list[Chord]:
-    """Estimate major/minor chord changes using a lightweight chromagram.
+def _normalize_madmom_chord(label: str) -> str:
+    value=str(label or "").strip()
+    if value in {"N", "N.C.", "no_chord"}:
+        return ""
+    value=value.replace(":maj", "").replace(":min", "m")
+    return value
 
-    This deliberately avoids librosa/Essentia so it works in the same runtime as
-    the existing BPM analyser. The result is intended for editable synchronized
-    project chord metadata rather than musicological score transcription.
+
+def _extract_chords_madmom(path: Path, engine: str) -> list[Chord]:
+    if engine == "madmom-deep-chroma":
+        from madmom_infer.audio.chroma import DeepChromaProcessor  # type: ignore
+        from madmom_infer.features.chords import DeepChromaChordRecognitionProcessor  # type: ignore
+        from madmom_infer.processors import SequentialProcessor  # type: ignore
+        proc=SequentialProcessor([DeepChromaProcessor(), DeepChromaChordRecognitionProcessor()])
+    elif engine == "madmom-cnn-crf":
+        from madmom_infer.features.chords import CNNChordFeatureProcessor, CRFChordRecognitionProcessor  # type: ignore
+        from madmom_infer.processors import SequentialProcessor  # type: ignore
+        proc=SequentialProcessor([CNNChordFeatureProcessor(), CRFChordRecognitionProcessor()])
+    else:
+        raise ValueError("unsupported Madmom chord engine")
+    rows=proc(str(path));events=[];last=None
+    for row in rows:
+        try: start=float(row[0]);label=_normalize_madmom_chord(str(row[2]))
+        except (TypeError, ValueError, IndexError): continue
+        if not label or label==last: continue
+        events.append(Chord(time_ms=max(0,round(start*1000)),chord=label));last=label
+    return events
+
+
+def extract_chords(path: Path, *, interval_ms: int = 500, engine: str | None = None) -> list[Chord]:
+    """Extract chord changes using the explicitly selected engine.
+
+    AI engines never silently change to a different engine: callers can therefore
+    report exactly which recognizer/model produced the project chord timeline.
     """
-    chordino = _extract_chords_chordino(path)
-    if chordino:
+    engine=(engine or "mta-chromagram").strip() or "mta-chromagram"
+    if engine in {"madmom-deep-chroma", "madmom-cnn-crf"}:
+        return _extract_chords_madmom(path, engine)
+    if engine == "chordino":
+        chordino=_extract_chords_chordino(path)
+        if not chordino:
+            raise RuntimeError("Chordino / NNLS-Chroma is not available in this runtime")
         return chordino
+    if engine != "mta-chromagram":
+        raise ValueError("unsupported chord extraction engine")
     samples, sr = _pcm_mono(path)
     if samples.size < sr:
         raise ValueError("audio too short for chord analysis")

@@ -32,7 +32,7 @@ for env_name, dest_name in (("MTA_NATIVE_FFMPEG", "ffmpeg"), ("MTA_NATIVE_FFPROB
         binaries.append((value, "bin"))
 
 hiddenimports = []
-for package in ("webview", "demucs", "torch", "torchaudio"):
+for package in ("webview", "demucs", "torch", "torchaudio", "whisper", "madmom_infer"):
     package_datas, package_binaries, package_hidden = collect_all(package)
     datas += package_datas
     binaries += package_binaries
