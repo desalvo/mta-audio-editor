@@ -1,10 +1,11 @@
-## 0.2.0-106
+## 0.2.0-107
 
-- Fixed Android mobile compilation by explicitly enabling BuildConfig generation for the application module.
-- Fixed iOS 15 compatibility by avoiding Locale.Language APIs that require iOS 16.
-- Fixed Core ML local-stem model selection by carrying modelId through the synchronous separation path.
-- Made Core ML metadata, integer min/max and regular-expression options explicit to avoid Swift type-inference failures in Xcode release builds.
-- Added mobile compiler regression checks for the Android and iOS fixes observed in GitHub Actions run #67.
+- Integrated the safe dependency updates from Dependabot PR #6: FastAPI 0.142.2 and msgpack 1.2.3.
+- Kept macOS Intel on torch/torchaudio 2.2.2 because newer official x86_64 macOS wheels are not available for the supported stack.
+- Prevented Dependabot from grouping torch/torchaudio platform-specific upgrades with ordinary Python updates.
+- Restricted grouped Python and Android dependency updates to minor/patch releases so major toolchain upgrades are reviewed separately.
+- Supersedes Dependabot PR #6 and PR #8 without merging their incompatible grouped upgrades.
+- Includes the Android BuildConfig and iOS 15/Core ML compiler fixes introduced in 0.2.0-106.
 
 ## 0.2.0-105
 

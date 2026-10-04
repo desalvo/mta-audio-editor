@@ -6,7 +6,13 @@ updates:
     groups:
       python-dependencies:
         patterns: ["*"]
+        update-types: ["minor", "patch"]
     ignore:
+      # PyTorch/Torchaudio upgrades are platform-coupled. macOS x86_64 must
+      # remain on the 2.2.x line while Linux/arm64 can use newer CPU wheels.
+      # Review these manually instead of grouping incompatible pins.
+      - dependency-name: torch
+      - dependency-name: torchaudio
       # Pydantic 2.13.x currently resolves pydantic-core 2.46.5 unreliably on
       # CPython 3.14 in GitHub-hosted runners. Stay on 2.12.5 / core 2.41.5
       # until the production gate is deterministic across all supported arches.
@@ -31,3 +37,4 @@ updates:
     groups:
       android-dependencies:
         patterns: ["*"]
+        update-types: ["minor", "patch"]
