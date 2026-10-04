@@ -30,7 +30,8 @@ def test_delete_complete_track_route(tmp_path, monkeypatch):
     response = client.post(f"/api/projects/{project.id}/delete-tracks", json=["t1"])
     assert response.status_code == 200
     assert response.json()["tracks"] == []
-    assert not audio.exists()
+    assert len(response.json()["clip_library"]) == 1
+    assert audio.exists()
 
 
 def test_import_audio_starts_on_file_selection_and_delete_tracks_is_not_range_delete():

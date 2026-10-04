@@ -72,6 +72,14 @@ def validate_project_files(project: Project) -> None:
         path = audio_path(project.id, track.filename)
         if not path.is_file():
             raise ValueError(f"audio file not found for track {track.id}")
+    seen_clip_ids: set[str] = set()
+    for clip in project.clip_library:
+        if clip.id in seen_clip_ids:
+            raise ValueError("duplicate project clip id")
+        seen_clip_ids.add(clip.id)
+        path = audio_path(project.id, clip.filename)
+        if not path.is_file():
+            raise ValueError(f"audio file not found for project clip {clip.id}")
     for name in project.preserved_attachments:
         path = attachment_path(project.id, name)
         if not path.is_file():
@@ -189,7 +197,7 @@ def preserve_original(pid: str, source: Path, original_name: str) -> Path:
 
 def project_files(pid: str) -> list[dict]:
     project = load_project(pid)
-    referenced_audio = {t.filename for t in project.tracks}
+    referenced_audio = {t.filename for t in project.tracks} | {c.filename for c in project.clip_library}
     items: list[dict] = []
     for category, subdir in (("audio","audio"),("attachment","attachments"),("original","originals")):
         base = pdir(pid) / subdir
@@ -224,8 +232,8 @@ def file_path(pid: str, category: str, filename: str) -> Path:
 
 def delete_project_file(pid: str, category: str, filename: str) -> None:
     project = load_project(pid)
-    if category == "audio" and any(t.filename == filename for t in project.tracks):
-        raise ValueError("cannot delete an audio file referenced by a track")
+    if category == "audio" and (any(t.filename == filename for t in project.tracks) or any(c.filename == filename for c in project.clip_library)):
+        raise ValueError("cannot delete an audio file referenced by a track or project clip")
     if category == "source":
         raise ValueError("cannot delete the project source file")
     path = file_path(pid, category, filename)

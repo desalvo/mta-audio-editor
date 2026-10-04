@@ -22,6 +22,33 @@ class Clip(BaseModel):
         return max(0, self.source_end_ms - self.source_start_ms)
 
 
+class ProjectClip(BaseModel):
+    id: str = Field(pattern=r"^[A-Za-z0-9_-]{1,64}$")
+    name: str = Field(max_length=200)
+    filename: str = Field(min_length=1, max_length=128)
+    duration_ms: int = Field(default=0, ge=0)
+    type: TrackType = "other"
+    channels: int = Field(default=0, ge=0, le=32)
+    channel_layout: str = Field(default="", max_length=64)
+    format: str = Field(default="", max_length=160)
+    bitrate_bps: int = Field(default=0, ge=0)
+    size_bytes: int = Field(default=0, ge=0)
+    provenance: str = Field(default="Audio del progetto", max_length=500)
+    current_location: str = Field(default="", max_length=512)
+    embedded_metadata: dict[str, str] = Field(default_factory=dict)
+    notes: str = Field(default="", max_length=4000)
+    metadata_scanned: bool = False
+
+
+class InstantiateProjectClipRequest(BaseModel):
+    timeline_start_ms: int = Field(default=0, ge=0, le=86_400_000)
+
+
+class UpdateProjectClipRequest(BaseModel):
+    name: str | None = Field(default=None, min_length=1, max_length=200)
+    notes: str | None = Field(default=None, max_length=4000)
+
+
 class InsertPlugin(BaseModel):
     id: str = Field(pattern=r"^[A-Za-z0-9_-]{1,64}$")
     plugin: PluginType
@@ -59,6 +86,7 @@ class Track(BaseModel):
     type: TrackType = "other"
     mta_slot: int | None = Field(default=None, ge=1, le=16)
     filename: str = Field(min_length=1, max_length=128)
+    source_clip_id: str | None = Field(default=None, pattern=r"^[A-Za-z0-9_-]{1,64}$")
     duration_ms: int = Field(default=0, ge=0)
     volume_db: float = Field(default=0.0, ge=-120.0, le=24.0)
     pan: float = Field(default=0.0, ge=-1.0, le=1.0)
@@ -174,6 +202,7 @@ class Project(BaseModel):
     target: Literal["MTA8", "MTA16", "DAW"] = "MTA8"
     mta_device_profile: Literal["auto", "merish5_xynthia2", "bbeat_divo", "mlive_mta16_default", "merish5_plus_mta16", "generic"] = "auto"
     tracks: list[Track] = Field(default_factory=list)
+    clip_library: list[ProjectClip] = Field(default_factory=list, max_length=512)
     markers: list[Marker] = Field(default_factory=list)
     lyrics: list[LyricLine] = Field(default_factory=list)
     chords: list[Chord] = Field(default_factory=list)

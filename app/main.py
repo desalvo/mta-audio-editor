@@ -11,6 +11,7 @@ import time
 import uuid
 import zipfile
 from pathlib import Path
+from urllib.parse import parse_qs, urlparse
 
 from fastapi import FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse, Response
@@ -19,7 +20,7 @@ from fastapi.staticfiles import StaticFiles
 
 from .audio_engine import auto_align_ms, delete_range, delete_song_range, ensure_clips, estimate_bpm, generate_metronome_wav, media_duration_ms, project_duration_ms, render_mix, render_track, render_track_export, shift_track, waveform_peaks
 from .codec import export_mta, ffprobe, import_mta, resolve_mta_device_profile, suggested_slots, validate_slot_mapping
-from .models import AutoMixRequest, Clip, CustomPresetRequest, DeleteRangeRequest, MoveTrackRequest, MtaExportRequest, Project, ProjectExportRequest, RightsRecord, Track
+from .models import AutoMixRequest, Clip, CustomPresetRequest, DeleteRangeRequest, InstantiateProjectClipRequest, UpdateProjectClipRequest, MoveTrackRequest, MtaExportRequest, Project, ProjectClip, ProjectExportRequest, RightsRecord, Track
 from .plugins import STEM_SPLITTER, delete_user_preset, plugin_manifest, save_user_preset
 
 from .model_updater import (COREML_DIR, ONNX_DIR, start_background_updater, update_once as update_mobile_demucs_models,
@@ -837,10 +838,121 @@ def project_new(request: Request, title: str = "Untitled", target: str = "MTA8")
     return create_project(title, target if target in {"MTA8", "MTA16", "DAW"} else "MTA8", owner_user_id=owner)
 
 
+def _refresh_project_clip_metadata(project: Project, asset: ProjectClip, *, force: bool = False) -> bool:
+    """Persist technical/library metadata without exposing host absolute paths."""
+    if asset.metadata_scanned and not force:
+        return False
+    changed = False
+    source = audio_path(project.id, asset.filename)
+    location = f"audio/{asset.filename}"
+    if asset.current_location != location:
+        asset.current_location = location
+        changed = True
+    if not source.is_file():
+        return changed
+    try:
+        info = ffprobe(source)
+        stream = next((item for item in info.get("streams", []) if item.get("codec_type") == "audio"), {})
+        fmt = info.get("format") or {}
+        codec = str(stream.get("codec_name") or "").strip()
+        container = str(fmt.get("format_name") or source.suffix.lstrip(".")).strip()
+        display_format = " / ".join(part for part in (codec.upper() if codec else "", container) if part)[:160]
+        bitrate = 0
+        for value in (stream.get("bit_rate"), fmt.get("bit_rate")):
+            try:
+                bitrate = max(bitrate, int(float(value or 0)))
+            except (TypeError, ValueError):
+                pass
+        tags: dict[str, str] = {}
+        for scope, values in (("format", fmt.get("tags") or {}), ("audio", stream.get("tags") or {})):
+            for key, value in values.items():
+                label = f"{scope}.{str(key)[:80]}"
+                tags[label] = str(value)[:500]
+                if len(tags) >= 64:
+                    break
+            if len(tags) >= 64:
+                break
+        size = source.stat().st_size
+        updates = {
+            "format": display_format,
+            "bitrate_bps": bitrate,
+            "size_bytes": size,
+            "embedded_metadata": tags,
+            "metadata_scanned": True,
+        }
+        for key, value in updates.items():
+            if getattr(asset, key) != value:
+                setattr(asset, key, value)
+                changed = True
+    except Exception:
+        # Keep the browser usable even if an old/temporarily unavailable asset cannot be probed.
+        pass
+    return changed
+
+
+def _ensure_project_clip_library(project: Project) -> bool:
+    """Backfill reusable project audio assets, metadata and stable track-to-asset IDs."""
+    changed = False
+    by_id = {item.id: item for item in project.clip_library}
+    by_filename = {item.filename: item for item in project.clip_library}
+    for track in project.tracks:
+        asset = by_id.get(track.source_clip_id or "")
+        if asset is None:
+            asset = by_filename.get(track.filename)
+        if asset is None:
+            asset = ProjectClip(
+                id=uuid.uuid4().hex[:12],
+                name=track.name[:200],
+                filename=track.filename,
+                duration_ms=track.duration_ms,
+                type=track.type,
+                channels=track.channels,
+                channel_layout=track.channel_layout,
+            )
+            project.clip_library.append(asset)
+            by_id[asset.id] = asset
+            by_filename[asset.filename] = asset
+            changed = True
+        if track.source_clip_id != asset.id:
+            track.source_clip_id = asset.id
+            changed = True
+    for asset in project.clip_library:
+        if _refresh_project_clip_metadata(project, asset):
+            changed = True
+    return changed
+
+
+def _register_track_source_in_library(project: Project, track: Track, provenance: str | None = None) -> ProjectClip:
+    existing = next((item for item in project.clip_library if item.id == track.source_clip_id), None)
+    if existing is None:
+        existing = next((item for item in project.clip_library if item.filename == track.filename), None)
+    if existing is not None:
+        track.source_clip_id = existing.id
+        if provenance and (not existing.provenance or existing.provenance == "Audio del progetto"):
+            existing.provenance = provenance[:500]
+        _refresh_project_clip_metadata(project, existing)
+        return existing
+    asset = ProjectClip(
+        id=uuid.uuid4().hex[:12],
+        name=track.name[:200],
+        filename=track.filename,
+        duration_ms=track.duration_ms,
+        type=track.type,
+        channels=track.channels,
+        channel_layout=track.channel_layout,
+        provenance=(provenance or "Audio del progetto")[:500],
+        current_location=f"audio/{track.filename}",
+    )
+    project.clip_library.append(asset)
+    track.source_clip_id = asset.id
+    _refresh_project_clip_metadata(project, asset)
+    return asset
+
+
 @app.get("/api/projects/{pid}")
 def project_get(pid: str, request: Request):
     project = _project_for_actor(request, pid)
-    changed = False
+    changed = _ensure_project_clip_library(project)
     if project.base_bpm is None:
         project.base_bpm = project.bpm
         changed = True
@@ -861,9 +973,16 @@ def project_put(pid: str, project: Project, request: Request):
     current = _project_for_actor(request, pid)
     if pid != project.id:
         raise HTTPException(400, "project id mismatch")
-    # Ownership/shares are managed only through dedicated endpoints.
+    # Ownership/shares and reusable audio assets are managed conservatively.
     project.owner_user_id = current.owner_user_id
     project.shared_with_user_ids = current.shared_with_user_ids
+    _ensure_project_clip_library(current)
+    known_clip_files = {item.filename for item in project.clip_library}
+    for item in current.clip_library:
+        if item.filename not in known_clip_files:
+            project.clip_library.append(item)
+            known_clip_files.add(item.filename)
+    _ensure_project_clip_library(project)
     try:
         validate_project_files(project)
     except ValueError as exc:
@@ -1205,6 +1324,7 @@ def _track_import_worker(
     sync_mode: str,
     reference_track_id: str,
     estimate_first_bpm: bool,
+    provenance: str = "Import audio",
 ) -> None:
     dst = audio_path(pid, filename)
     try:
@@ -1253,6 +1373,7 @@ def _track_import_worker(
             ref = next((item for item in project.tracks if item.id == reference_track_id), project.tracks[0])
             shift_track(track, auto_align_ms(audio_path(pid, ref.filename), dst))
         project.tracks.append(track)
+        _register_track_source_in_library(project, track, provenance)
         save_project(project)
         _media_job_update(
             job_id,
@@ -1512,6 +1633,154 @@ def api_project_rights_records(pid: str, request: Request, body: dict):
 
 
 
+
+YOUTUBE_HOSTS = {"youtube.com", "www.youtube.com", "m.youtube.com", "music.youtube.com", "youtu.be"}
+
+
+def _validated_youtube_url(value: str) -> str:
+    url = str(value or "").strip()
+    try:
+        parsed = urlparse(url)
+    except ValueError as exc:
+        raise ValueError("URL YouTube non valido") from exc
+    host = (parsed.hostname or "").lower().rstrip(".")
+    if parsed.scheme != "https" or host not in YOUTUBE_HOSTS or parsed.username or parsed.password or parsed.port not in (None, 443):
+        raise ValueError("Sono accettati solo URL HTTPS di YouTube")
+    if host == "youtu.be":
+        video_id = parsed.path.strip("/").split("/", 1)[0]
+    elif parsed.path == "/watch":
+        video_id = (parse_qs(parsed.query).get("v") or [""])[0]
+    else:
+        parts = [p for p in parsed.path.split("/") if p]
+        video_id = parts[1] if len(parts) >= 2 and parts[0] in {"shorts", "live", "embed"} else ""
+    if not re.fullmatch(r"[A-Za-z0-9_-]{6,20}", video_id or ""):
+        raise ValueError("L'URL deve identificare un singolo video YouTube")
+    return url
+
+
+def _youtube_import_worker(
+    job_id: str,
+    pid: str,
+    url: str,
+    requested_name: str,
+    track_type: str,
+    offset_ms: int,
+    sync_mode: str,
+    reference_track_id: str,
+) -> None:
+    try:
+        from yt_dlp import YoutubeDL
+
+        project = load_project(pid)
+        _media_job_update(job_id, status="running", progress=4, message="Connessione a YouTube")
+        with tempfile.TemporaryDirectory(prefix="mta-youtube-") as td:
+            work = Path(td)
+            def hook(data: dict) -> None:
+                status = data.get("status")
+                if status == "downloading":
+                    total = data.get("total_bytes") or data.get("total_bytes_estimate") or 0
+                    done = data.get("downloaded_bytes") or 0
+                    pct = int(done * 45 / total) if total else 12
+                    _media_job_update(job_id, progress=max(6, min(48, 6 + pct)), message="Download audio da YouTube")
+                elif status == "finished":
+                    _media_job_update(job_id, progress=52, message="Download completato")
+
+            options = {
+                "format": "bestaudio/best",
+                "outtmpl": str(work / "source.%(ext)s"),
+                "noplaylist": True,
+                "quiet": True,
+                "no_warnings": True,
+                "socket_timeout": 20,
+                "retries": 3,
+                "max_filesize": MAX_UPLOAD_BYTES,
+                "progress_hooks": [hook],
+                "restrictfilenames": True,
+            }
+            with YoutubeDL(options) as ydl:
+                info = ydl.extract_info(url, download=True)
+                if not info:
+                    raise ValueError("YouTube non ha restituito informazioni sul video")
+                requested = info.get("requested_downloads") or []
+                source = Path(requested[0].get("filepath")) if requested and requested[0].get("filepath") else Path(ydl.prepare_filename(info))
+            if not source.is_file():
+                candidates = [p for p in work.iterdir() if p.is_file() and not p.name.endswith(('.part', '.ytdl'))]
+                if not candidates:
+                    raise ValueError("Traccia audio scaricata non trovata")
+                source = max(candidates, key=lambda p: p.stat().st_size)
+            size = source.stat().st_size
+            if size <= 0 or size > MAX_UPLOAD_BYTES:
+                raise ValueError("La traccia YouTube supera il limite di import configurato")
+            _ensure_workspace_capacity(project.owner_user_id, size)
+            ffprobe(source)
+            duplicate = find_duplicate_project_file(pid, source)
+            if duplicate:
+                raise ValueError(f"Il contenuto è già presente nel progetto come {duplicate['category']}/{duplicate['name']}")
+            ext = source.suffix.lower()
+            if len(ext) > 12 or not ext.replace('.', '').isalnum():
+                ext = ".m4a"
+            filename = f"{uuid.uuid4().hex[:10]}{ext}"
+            dst = audio_path(pid, filename)
+            shutil.copy2(source, dst)
+            title = str(info.get("title") or requested_name or "YouTube audio").strip()[:200]
+            safe_title = SAFE_DOWNLOAD_RE.sub("_", title).strip(" ._")[:120] or "youtube-audio"
+            preserve_original(pid, dst, safe_title + ext)
+        first_track = len(project.tracks) == 0
+        _media_job_update(job_id, progress=55, message="Import della traccia nel progetto")
+        _track_import_worker(
+            job_id, pid, filename, safe_title + ext, requested_name or title,
+            track_type, offset_ms, sync_mode, reference_track_id, first_track,
+            f"YouTube: {url}",
+        )
+    except Exception as exc:
+        LOGGER.exception("YouTube import job %s failed", job_id)
+        _media_job_update(job_id, status="failed", progress=0, message="Import YouTube fallito", error=str(exc)[-1200:])
+
+
+@app.post("/api/projects/{pid}/youtube-import-jobs")
+def start_youtube_import_job(pid: str, request: Request, body: dict):
+    project = _project_for_actor(request, pid)
+    if body.get("confirm_rights") is not True:
+        raise HTTPException(400, "Conferma di disporre dei diritti necessari per importare questo contenuto")
+    try:
+        url = _validated_youtube_url(str(body.get("url", "")))
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from exc
+    sync_mode = str(body.get("sync_mode", "manual"))
+    if sync_mode not in {"manual", "auto"}:
+        raise HTTPException(400, "sync_mode non valido")
+    try:
+        offset_ms = int(body.get("offset_ms", 0))
+    except (TypeError, ValueError) as exc:
+        raise HTTPException(400, "offset_ms non valido") from exc
+    now = time.time()
+    job_id = uuid.uuid4().hex[:16]
+    job = {
+        "id": job_id,
+        "kind": "youtube-import",
+        "project_id": pid,
+        "status": "queued",
+        "progress": 2,
+        "message": "Import YouTube in coda",
+        "created_at": now,
+        "updated_at": now,
+        "result": None,
+        "error": None,
+    }
+    with MEDIA_JOB_LOCK:
+        MEDIA_JOBS[job_id] = job
+    threading.Thread(
+        target=_youtube_import_worker,
+        args=(
+            job_id, pid, url, str(body.get("name", ""))[:200], str(body.get("type", "other")),
+            offset_ms, sync_mode, str(body.get("reference_track_id", ""))[:64],
+        ),
+        daemon=True,
+        name=f"youtube-import-{job_id}",
+    ).start()
+    return _media_job_public(job)
+
+
 @app.get("/api/media-jobs/{job_id}")
 def media_job_status(job_id: str, request: Request):
     with MEDIA_JOB_LOCK:
@@ -1561,6 +1830,7 @@ async def add_track(
             dst.unlink(missing_ok=True)
             raise HTTPException(400, "automatic sync failed") from exc
     project.tracks.append(track)
+    _register_track_source_in_library(project, track, f"Import file: {Path(file.filename or filename).name}")
     save_project(project)
     return project
 
@@ -1610,16 +1880,75 @@ async def replace_track(
         dst.unlink(missing_ok=True)
         raise HTTPException(400, "automatic sync failed") from exc
 
+    _register_track_source_in_library(project, track)
     save_project(project)
-    if old.exists() and old.name != filename:
+    library_files = {item.filename for item in project.clip_library}
+    if old.exists() and old.name != filename and old.name not in library_files:
         old.unlink(missing_ok=True)
     return project
 
 
 
+@app.patch("/api/projects/{pid}/clip-library/{clip_id}")
+def update_project_clip(pid: str, clip_id: str, req: UpdateProjectClipRequest, request: Request):
+    project = _project_for_actor(request, pid)
+    _ensure_project_clip_library(project)
+    asset = next((item for item in project.clip_library if item.id == clip_id), None)
+    if asset is None:
+        raise HTTPException(404, "clip di libreria non trovata")
+    if req.name is not None:
+        name = req.name.strip()
+        if not name:
+            raise HTTPException(400, "nome clip non valido")
+        asset.name = name[:200]
+    if req.notes is not None:
+        asset.notes = req.notes[:4000]
+    _refresh_project_clip_metadata(project, asset)
+    save_project(project)
+    return {"project": project, "clip": asset}
+
+
+@app.post("/api/projects/{pid}/clip-library/{clip_id}/instantiate")
+def instantiate_project_clip(pid: str, clip_id: str, req: InstantiateProjectClipRequest, request: Request):
+    project = _project_for_actor(request, pid)
+    _ensure_project_clip_library(project)
+    asset = next((item for item in project.clip_library if item.id == clip_id), None)
+    if asset is None:
+        raise HTTPException(404, "clip di libreria non trovata")
+    source = audio_path(pid, asset.filename)
+    if not source.is_file():
+        raise HTTPException(404, "file audio della clip non trovato")
+    track = Track(
+        id=uuid.uuid4().hex[:10],
+        name=asset.name[:200],
+        type=asset.type,
+        filename=asset.filename,
+        source_clip_id=asset.id,
+        duration_ms=asset.duration_ms,
+        clips=[Clip(
+            id=uuid.uuid4().hex[:10],
+            source_start_ms=0,
+            source_end_ms=asset.duration_ms,
+            timeline_start_ms=req.timeline_start_ms,
+        )],
+        channels=asset.channels,
+        channel_layout=asset.channel_layout,
+    )
+    try:
+        track.waveform_peaks = waveform_peaks(source, 1024)
+        track.waveform_revision = _track_waveform_revision(track, source)
+    except Exception:
+        track.waveform_peaks = []
+        track.waveform_revision = ""
+    project.tracks.append(track)
+    save_project(project)
+    return {"project": project, "track": track, "clip": asset}
+
+
 @app.post("/api/projects/{pid}/delete-tracks")
 def delete_tracks(pid: str, request: Request, track_ids: list[str]):
     project = _project_for_actor(request, pid)
+    _ensure_project_clip_library(project)
     wanted = {str(track_id) for track_id in track_ids}
     if not wanted:
         raise HTTPException(400, "no tracks selected")
@@ -1630,7 +1959,7 @@ def delete_tracks(pid: str, request: Request, track_ids: list[str]):
     project.tracks = [track for track in project.tracks if track.id not in wanted]
     save_project(project)
     # Remove only working audio no longer referenced by any remaining track.
-    still_referenced = {track.filename for track in project.tracks}
+    still_referenced = {track.filename for track in project.tracks} | {item.filename for item in project.clip_library}
     for track in removed:
         if track.filename not in still_referenced:
             audio_path(pid, track.filename).unlink(missing_ok=True)

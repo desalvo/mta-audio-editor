@@ -1,3 +1,33 @@
+## 0.2.0-121
+
+- Project Clip Browser: added a collapsible per-clip details panel, collapsed by default.
+- Persist technical clip information: semantic type, codec/container format, bitrate when available, duration, byte size, provenance, project-relative location and embedded metadata.
+- Added editable per-clip notes stored in the project without changing track-to-clip `source_clip_id` associations.
+- YouTube imports record the source URL as provenance; local file imports record the original filename.
+- Existing project clips are backfilled conservatively via ffprobe and stored to avoid repeated probing.
+
+## 0.2.0-120
+
+- Project clip browser: rename reusable clips without changing existing track names or breaking associations.
+- Track-to-library association is now explicit via stable `source_clip_id`, with automatic migration of existing projects.
+- Added per-clip audio preview controls in the project clip browser.
+- Added case-insensitive clip-name search and pagination with at most 10 clips per page.
+
+## 0.2.0-119
+
+- Added a reusable project Clip Browser containing audio assets independently from their timeline instances.
+- A library clip can be inserted on the timeline any number of times without duplicating the source audio file.
+- Dragging a clip to the timeline creates a new track at the horizontal drop time; touch devices get a dedicated pointer-drag handle, with a + button fallback that inserts at the current play cursor.
+- Existing projects automatically backfill the clip library from current tracks.
+- Deleting timeline tracks no longer deletes audio assets retained by the project clip library.
+
+## 0.2.0-118
+
+- Added server-side YouTube audio import for a single `youtube.com`/`youtu.be` video, using yt-dlp stable 2026.08.19.
+- YouTube imports are audio-only, asynchronous, size-limited, restricted to validated HTTPS YouTube video URLs and reject playlist-only URLs.
+- Added explicit user confirmation that the content may lawfully be downloaded/imported.
+- Imported audio follows the normal track pipeline: ffprobe validation, duplicate detection, project original preservation, waveform generation, optional auto-sync and first-track BPM estimation.
+
 ## 0.2.0-117
 
 - Fixed the Container production gate after the msgpack 1.2.3 dependency update: the CI runtime verification now expects msgpack 1.2.3, matching the Dockerfile and installed image.

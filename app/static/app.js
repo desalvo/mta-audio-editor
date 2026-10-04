@@ -308,6 +308,7 @@ function render(){
   const W=widthPx(),trackWidth=Math.max(160,Math.min(520,Number(current.track_panel_width_px)||225));
   $('#editor').innerHTML=`
     ${toolbarHtml()}
+    ${clipBrowserHtml()}
     <div class="editor-grid" id="editorGrid" style="--track-column-width:${trackWidth}px">
       <div class="track-column" id="trackColumn"><div class="track-column-head">TRACKS</div>${current.tracks.map((t,i)=>trackHead(t,i)).join('')}</div>
       <div class="track-resizer" id="trackResizer" title="Ridimensiona Tracks"></div>
@@ -316,7 +317,7 @@ function render(){
     </div>`;
   $('#mixerDock').innerHTML=mixerHtml();
   updateMixerDockLayout();updatePanelMenuButtons();
-  drawRuler();bindTimeline();bindTrackTimelineScroll();bindTrackResizer();
+  drawRuler();bindTimeline();bindProjectClipDrop();bindTrackTimelineScroll();bindTrackResizer();
   current.tracks.forEach(drawWave);if(waveformValidationProjectId!==current.id){waveformValidationProjectId=current.id;ensureWaveforms(true)}else ensureWaveforms(false);updateSel();bindModelInputs();updateMuteSoloVisuals();restoreUiState();ensureSessionHistory();updateEditActionState();
 }
 async function createMetronomeTrack(){
@@ -340,10 +341,201 @@ function toolbarHtml(){
     <button class="tool active"><strong>➤</strong>Select</button><button class="tool"><strong>✂</strong>Split</button><button class="tool active"><strong>▭</strong>Range</button><button class="tool"><strong>↔</strong>Ripple</button>
     <div class="toolbar-sep"></div><div class="toolbar-group"><label>Snap</label><select><option>Bars</option><option>Beats</option><option>Off</option></select></div>
     <button class="toolbar-action emphasis" onclick="openStemWorkflow()">▥ Import &amp; Separate</button>
+    <button class="toolbar-action" onclick="openYoutubeImport()" title="Importa solo audio da un singolo video YouTube">▶ Import YouTube</button>
     <button class="toolbar-action" onclick="createMetronomeTrack()" title="Crea una traccia click per tutta la durata corrente del progetto">♩ Metronomo</button>
     <div class="toolbar-group"><input id="newTrackFile" type="file" accept=".mp3,.wav,.flac,.m4a,audio/*" onchange="addTrack()"><select id="newSync"><option value="manual">Manual sync</option><option value="auto">Auto sync</option></select><input id="newOffset" type="number" value="0" title="Offset ms" style="width:72px"><select id="newRef" style="max-width:115px">${refs}</select><button class="toolbar-action" onclick="addTrack()">♫ Import Audio Track</button></div>
     <div class="toolbar-sep"></div><button id="undoBtn" class="toolbar-action" onclick="undoEdit()">↶ Undo</button><button id="redoBtn" class="toolbar-action" onclick="redoEdit()">↷ Redo</button><button class="toolbar-action" onclick="cutTimelineSelection()">✂ Cut</button><button class="toolbar-action" onclick="copyTimelineSelection()">⧉ Copy</button><button id="pasteBtn" class="toolbar-action" onclick="pasteTimelineSelection()">▣ Paste</button><button class="toolbar-action danger" onclick="removeTimelineSelection()">⌫ Remove</button> <div class="toolbar-grow"></div><span class="selection-info" id="selectionInfo">0.000 → 0.000 s</span><button class="toolbar-action danger" onclick="deleteSelection(false)">Delete tracks</button><label class="hint"><input id="ripple" type="checkbox"> ripple</label><button class="toolbar-action danger" onclick="deleteSelection(true)">Delete song segment</button>
   </div>`
+}
+
+let clipBrowserExpanded=true;
+let clipBrowserQuery='';
+let clipBrowserPage=1;
+const CLIP_BROWSER_PAGE_SIZE=10;
+let draggedLibraryClipId=null;
+let clipPointerDrag=null;
+let clipPreviewAudio=null;
+let clipPreviewId=null;
+let expandedProjectClipDetails=new Set();
+
+function clipDurationHms(ms){
+  const total=Math.max(0,Math.floor((Number(ms)||0)/1000));
+  const h=Math.floor(total/3600),m=Math.floor((total%3600)/60),sec=total%60;
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+}
+function clipBytesLabel(value){
+  const n=Math.max(0,Math.round(Number(value)||0));
+  return `${n.toLocaleString('it-IT')} bytes`;
+}
+function clipMetadataHtml(item){
+  const entries=Object.entries(item.embedded_metadata||{});
+  if(!entries.length)return '<span class="clip-meta-empty">Nessun metadato embedded rilevato</span>';
+  return `<dl class="clip-embedded-meta">${entries.map(([k,v])=>`<div><dt>${esc(k)}</dt><dd>${esc(String(v))}</dd></div>`).join('')}</dl>`;
+}
+function toggleProjectClipDetails(id){
+  if(expandedProjectClipDetails.has(id))expandedProjectClipDetails.delete(id);else expandedProjectClipDetails.add(id);
+  render();
+}
+async function saveProjectClipNotes(id){
+  if(!current||!id)return;
+  const field=document.querySelector(`[data-clip-notes="${id}"]`);if(!field)return;
+  try{
+    await flushAutosave();
+    const result=await api(`/api/projects/${current.id}/clip-library/${encodeURIComponent(id)}`,{method:'PATCH',headers:{'content-type':'application/json'},body:JSON.stringify({notes:String(field.value||'')})});
+    current=result.project;expandedProjectClipDetails.add(id);render();toast('Note della clip salvate');
+  }catch(e){toast('Impossibile salvare le note: '+e.message)}
+}
+function clipBrowserHtml(){
+  const all=current?.clip_library||[];
+  const q=String(clipBrowserQuery||'').trim().toLocaleLowerCase();
+  const filtered=q?all.filter(item=>String(item.name||'').toLocaleLowerCase().includes(q)):all;
+  const pageCount=Math.max(1,Math.ceil(filtered.length/CLIP_BROWSER_PAGE_SIZE));
+  clipBrowserPage=Math.min(Math.max(1,clipBrowserPage),pageCount);
+  const start=(clipBrowserPage-1)*CLIP_BROWSER_PAGE_SIZE;
+  const items=filtered.slice(start,start+CLIP_BROWSER_PAGE_SIZE);
+  const body=items.length?items.map(item=>{
+    const expanded=expandedProjectClipDetails.has(item.id);
+    const bitrate=Number(item.bitrate_bps)||0;
+    return `<div class="project-clip-card ${expanded?'details-open':''}" draggable="true" data-project-clip="${item.id}" ondragstart="beginProjectClipDrag(event,'${item.id}')" ondragend="endProjectClipDrag()">
+      <div class="project-clip-summary">
+        <button class="clip-drag-handle" title="Trascina sulla timeline" aria-label="Trascina ${esc(item.name)} sulla timeline" onpointerdown="beginProjectClipPointer(event,'${item.id}')">⠿</button>
+        <div class="project-clip-info"><strong title="${esc(item.name)}">${esc(item.name)}</strong><span>${esc(item.type||'other')} · ${clipDurationHms(item.duration_ms)}${item.channels?` · ${item.channels===1?'mono':item.channels===2?'stereo':`${item.channels} ch`}`:''}</span></div>
+        <div class="project-clip-actions">
+          <button class="clip-preview-btn ${clipPreviewId===item.id?'active':''}" onclick="previewProjectClip('${item.id}')" title="Preview audio">${clipPreviewId===item.id?'■':'▶'}</button>
+          <button class="clip-rename-btn" onclick="renameProjectClip('${item.id}')" title="Rinomina clip">✎</button>
+          <button class="clip-add-btn" onclick="instantiateProjectClip('${item.id}',playCursorMs)" title="Aggiungi alla posizione del cursore">＋</button>
+          <button class="clip-details-btn" onclick="toggleProjectClipDetails('${item.id}')" title="${expanded?'Nascondi':'Mostra'} dettagli clip">${expanded?'⌃':'⌄'}</button>
+        </div>
+      </div>
+      ${expanded?`<div class="project-clip-details" onclick="event.stopPropagation()" ondragstart="event.preventDefault();event.stopPropagation()">
+        <dl class="clip-detail-grid">
+          <div><dt>Tipo clip</dt><dd>${esc(item.type||'other')}</dd></div>
+          <div><dt>Formato</dt><dd>${esc(item.format||'—')}</dd></div>
+          <div><dt>Bitrate</dt><dd>${bitrate?`${Math.round(bitrate/1000)} kb/s (${bitrate.toLocaleString('it-IT')} bps)`:'—'}</dd></div>
+          <div><dt>Durata</dt><dd>${clipDurationHms(item.duration_ms)}</dd></div>
+          <div><dt>Dimensione</dt><dd>${clipBytesLabel(item.size_bytes)}</dd></div>
+          <div><dt>Provenienza</dt><dd>${esc(item.provenance||'Audio del progetto')}</dd></div>
+          <div class="wide"><dt>Locazione attuale</dt><dd><code>${esc(item.current_location||`audio/${item.filename||''}`)}</code></dd></div>
+          <div class="wide"><dt>Metadati clip</dt><dd>${clipMetadataHtml(item)}</dd></div>
+          <div class="wide clip-notes-field"><dt>Note</dt><dd><textarea data-clip-notes="${item.id}" maxlength="4000" placeholder="Note sulla clip…">${esc(item.notes||'')}</textarea><button onclick="saveProjectClipNotes('${item.id}')">Salva note</button></dd></div>
+        </dl>
+      </div>`:''}
+    </div>`;
+  }).join(''):`<div class="clip-browser-empty">${q?'Nessuna clip corrisponde alla ricerca.':'Le clip audio importate appariranno qui e resteranno riutilizzabili nel progetto.'}</div>`;
+  return `<section class="clip-browser ${clipBrowserExpanded?'':'collapsed'}" id="clipBrowser">
+    <button class="clip-browser-toggle" onclick="clipBrowserExpanded=!clipBrowserExpanded;render()" title="Mostra/nascondi browser clip"><span>▦ CLIP DEL PROGETTO</span><b>${all.length}</b><i>${clipBrowserExpanded?'⌃':'⌄'}</i></button>
+    ${clipBrowserExpanded?`<div class="clip-browser-main">
+      <div class="clip-browser-controls">
+        <input class="clip-browser-search" type="search" placeholder="Cerca clip per nome…" value="${esc(clipBrowserQuery)}" oninput="setClipBrowserQuery(this.value)">
+        <span>${filtered.length} risultat${filtered.length===1?'o':'i'}</span>
+        <button ${clipBrowserPage<=1?'disabled':''} onclick="setClipBrowserPage(${clipBrowserPage-1})">‹</button>
+        <b>${clipBrowserPage}/${pageCount}</b>
+        <button ${clipBrowserPage>=pageCount?'disabled':''} onclick="setClipBrowserPage(${clipBrowserPage+1})">›</button>
+      </div>
+      <div class="clip-browser-items">${body}</div>
+    </div>`:''}
+  </section>`;
+}
+
+function setClipBrowserQuery(value){clipBrowserQuery=String(value||'');clipBrowserPage=1;render()}
+function setClipBrowserPage(page){clipBrowserPage=Math.max(1,Number(page)||1);render()}
+
+async function renameProjectClip(id){
+  if(!current||!id)return;
+  const asset=(current.clip_library||[]).find(item=>item.id===id);if(!asset)return;
+  const name=prompt('Nuovo nome della clip',asset.name||'');
+  if(name===null)return;
+  const trimmed=String(name).trim();if(!trimmed)return toast('Il nome della clip non può essere vuoto');
+  try{
+    await flushAutosave();
+    const result=await api(`/api/projects/${current.id}/clip-library/${encodeURIComponent(id)}`,{method:'PATCH',headers:{'content-type':'application/json'},body:JSON.stringify({name:trimmed})});
+    current=result.project;render();toast('Clip rinominata. Le tracce associate restano collegate tramite ID.');
+  }catch(e){toast('Impossibile rinominare la clip: '+e.message)}
+}
+
+function stopProjectClipPreview(){
+  if(clipPreviewAudio){try{clipPreviewAudio.pause();clipPreviewAudio.currentTime=0}catch(_e){}}
+  clipPreviewAudio=null;clipPreviewId=null;render();
+}
+function previewProjectClip(id){
+  if(!current||!id)return;
+  if(clipPreviewId===id){stopProjectClipPreview();return}
+  if(clipPreviewAudio){try{clipPreviewAudio.pause()}catch(_e){}}
+  const asset=(current.clip_library||[]).find(item=>item.id===id);if(!asset)return;
+  const audio=new Audio(`/api/projects/${current.id}/audio/${encodeURIComponent(asset.filename)}?t=${Date.now()}`);
+  clipPreviewAudio=audio;clipPreviewId=id;render();
+  audio.addEventListener('ended',()=>{if(clipPreviewAudio===audio){clipPreviewAudio=null;clipPreviewId=null;render()}});
+  audio.addEventListener('error',()=>{if(clipPreviewAudio===audio){clipPreviewAudio=null;clipPreviewId=null;render();toast('Preview clip non disponibile')}});
+  audio.play().catch(e=>{clipPreviewAudio=null;clipPreviewId=null;render();toast('Impossibile avviare il preview: '+e.message)});
+}
+
+function beginProjectClipDrag(event,id){
+  draggedLibraryClipId=id;
+  event.dataTransfer.effectAllowed='copy';
+  event.dataTransfer.setData('application/x-mta-project-clip',id);
+  event.dataTransfer.setData('text/plain',id);
+  event.currentTarget.classList.add('dragging');
+  $('#timelinePane')?.classList.add('clip-drop-ready');
+}
+function endProjectClipDrag(){
+  draggedLibraryClipId=null;
+  $$('.project-clip-card').forEach(x=>x.classList.remove('dragging'));
+  $('#timelinePane')?.classList.remove('clip-drop-ready','clip-drop-active');
+}
+function timelineMsFromClientX(clientX){
+  const pane=$('#timelinePane');if(!pane)return playCursorMs;
+  const r=pane.getBoundingClientRect();
+  return Math.max(0,Math.round((clientX-r.left+pane.scrollLeft)/pxPerSec*1000));
+}
+async function instantiateProjectClip(id,timelineStartMs=0){
+  if(!current||!id)return;
+  try{
+    await flushAutosave();
+    const result=await api(`/api/projects/${current.id}/clip-library/${encodeURIComponent(id)}/instantiate`,{
+      method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({timeline_start_ms:Math.max(0,Math.round(Number(timelineStartMs)||0))})
+    });
+    current=result.project;selectedTrackId=result.track.id;render();await refresh();
+    toast(`Clip aggiunta come nuova traccia a ${fmtTime((Number(timelineStartMs)||0)/1000,true)}`);
+  }catch(e){toast('Impossibile aggiungere la clip: '+e.message)}
+}
+function bindProjectClipDrop(){
+  const pane=$('#timelinePane');if(!pane)return;
+  pane.addEventListener('dragover',event=>{
+    const id=draggedLibraryClipId||event.dataTransfer?.getData('application/x-mta-project-clip');
+    if(!id)return;event.preventDefault();event.dataTransfer.dropEffect='copy';pane.classList.add('clip-drop-active');
+  });
+  pane.addEventListener('dragleave',event=>{if(!pane.contains(event.relatedTarget))pane.classList.remove('clip-drop-active')});
+  pane.addEventListener('drop',event=>{
+    const id=draggedLibraryClipId||event.dataTransfer?.getData('application/x-mta-project-clip')||event.dataTransfer?.getData('text/plain');
+    if(!id)return;event.preventDefault();const ms=timelineMsFromClientX(event.clientX);endProjectClipDrag();instantiateProjectClip(id,ms);
+  });
+}
+function beginProjectClipPointer(event,id){
+  if(event.pointerType==='mouse')return;
+  event.preventDefault();
+  const handle=event.currentTarget;handle.setPointerCapture?.(event.pointerId);
+  clipPointerDrag={id,pointerId:event.pointerId,startX:event.clientX,startY:event.clientY,x:event.clientX,y:event.clientY,active:false,handle,ghost:null};
+  const move=e=>{
+    if(!clipPointerDrag||e.pointerId!==clipPointerDrag.pointerId)return;
+    clipPointerDrag.x=e.clientX;clipPointerDrag.y=e.clientY;
+    if(!clipPointerDrag.active&&Math.hypot(e.clientX-clipPointerDrag.startX,e.clientY-clipPointerDrag.startY)>8){
+      clipPointerDrag.active=true;
+      const asset=(current?.clip_library||[]).find(x=>x.id===id);
+      const ghost=document.createElement('div');ghost.className='clip-touch-ghost';ghost.textContent=asset?.name||'Clip';document.body.appendChild(ghost);clipPointerDrag.ghost=ghost;
+      $('#timelinePane')?.classList.add('clip-drop-ready');
+    }
+    if(clipPointerDrag.active&&clipPointerDrag.ghost){clipPointerDrag.ghost.style.left=(e.clientX+12)+'px';clipPointerDrag.ghost.style.top=(e.clientY+12)+'px';const pane=$('#timelinePane');pane?.classList.toggle('clip-drop-active',!!document.elementFromPoint(e.clientX,e.clientY)?.closest?.('#timelinePane'))}
+  };
+  const end=e=>{
+    if(!clipPointerDrag||e.pointerId!==clipPointerDrag.pointerId)return;
+    const state=clipPointerDrag;clipPointerDrag=null;state.ghost?.remove();
+    const over=document.elementFromPoint(e.clientX,e.clientY)?.closest?.('#timelinePane');
+    $('#timelinePane')?.classList.remove('clip-drop-ready','clip-drop-active');
+    window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',end);window.removeEventListener('pointercancel',cancel);
+    if(state.active&&over)instantiateProjectClip(state.id,timelineMsFromClientX(e.clientX));
+  };
+  const cancel=e=>{if(!clipPointerDrag||e.pointerId!==clipPointerDrag.pointerId)return;clipPointerDrag.ghost?.remove();clipPointerDrag=null;$('#timelinePane')?.classList.remove('clip-drop-ready','clip-drop-active');window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',end);window.removeEventListener('pointercancel',cancel)};
+  window.addEventListener('pointermove',move,{passive:false});window.addEventListener('pointerup',end);window.addEventListener('pointercancel',cancel);
 }
 
 function setTrackColor(id,value){
@@ -1976,6 +2168,40 @@ function focusProjectWorkspace(){if(!current){$('#emptyState')?.scrollIntoView({
 function focusTracks(){if(!requireOpenProject('visualizzare le tracce'))return;const el=$('.tracks-scroll')||$('.tracks')||$('#editor');el?.scrollIntoView({behavior:'smooth',block:'start'});el?.classList.add('nav-focus-pulse');setTimeout(()=>el?.classList.remove('nav-focus-pulse'),900)}
 function focusMixer(){if(!requireOpenProject('aprire il mixer'))return;const el=$('#mixerDock');if(el){el.hidden=false;el.scrollIntoView({behavior:'smooth',block:'nearest'});el.classList.add('nav-focus-pulse');setTimeout(()=>el.classList.remove('nav-focus-pulse'),900)}}
 function focusInspector(){if(!requireOpenProject('aprire i plugin'))return;const el=$('#inspector');if(!el)return toast('Seleziona una traccia per visualizzare i plugin');el.scrollIntoView({behavior:'smooth',block:'nearest'});el.classList.add('nav-focus-pulse');setTimeout(()=>el.classList.remove('nav-focus-pulse'),900)}
+
+function openYoutubeImport(){
+  if(!current)return toast('Apri prima un progetto');
+  const refs=current.tracks.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join('');
+  $('#utilityTitle').textContent='Import audio da YouTube';
+  $('#utilityBody').innerHTML=`<div class="form-grid">
+    <label class="full">URL YouTube<input id="youtubeImportUrl" type="url" inputmode="url" autocomplete="off" placeholder="https://www.youtube.com/watch?v=…"></label>
+    <label class="full">Nome traccia (opzionale)<input id="youtubeImportName" type="text" maxlength="200" placeholder="Usa il titolo YouTube"></label>
+    <label>Sincronizzazione<select id="youtubeImportSync"><option value="manual">Manuale</option><option value="auto">Automatica</option></select></label>
+    <label>Offset ms<input id="youtubeImportOffset" type="number" value="0"></label>
+    <label class="full">Traccia di riferimento<select id="youtubeImportRef"><option value="">Prima traccia disponibile</option>${refs}</select></label>
+    <label class="full hint"><input id="youtubeImportRights" type="checkbox"> Confermo di essere autorizzato a scaricare/importare l'audio di questo contenuto.</label>
+    <p class="hint full">Viene importato solo l'audio di un singolo video. Playlist non supportate. Il server deve poter raggiungere YouTube.</p>
+    <div class="full modal-actions"><button onclick="closeUtilityModal()">Annulla</button><button class="accent" onclick="startYoutubeImport()">▶ Importa audio</button></div>
+  </div>`;
+  $('#utilityBackdrop').classList.remove('hidden');
+  setTimeout(()=>$('#youtubeImportUrl')?.focus(),50);
+}
+async function startYoutubeImport(){
+  if(!current)return;
+  const url=String($('#youtubeImportUrl')?.value||'').trim();
+  if(!url)return toast('Inserisci un URL YouTube');
+  if(!$('#youtubeImportRights')?.checked)return toast('Devi confermare di disporre dei diritti necessari');
+  const body={url,name:String($('#youtubeImportName')?.value||'').trim(),sync_mode:$('#youtubeImportSync')?.value||'manual',offset_ms:parseInt($('#youtubeImportOffset')?.value||'0')||0,reference_track_id:$('#youtubeImportRef')?.value||'',confirm_rights:true};
+  try{
+    await save();
+    const job=await api(`/api/projects/${current.id}/youtube-import-jobs`,{method:'POST',body:JSON.stringify(body)});
+    showMediaProgress('Import YouTube',job.progress,job.message,'Download ed estrazione della sola traccia audio.');
+    pollMediaJob(job.id,'Import YouTube',async completed=>{
+      current=await api(`/api/projects/${current.id}`);selectedTrackId=completed.result?.track_id||current.tracks.at(-1)?.id;render();await refresh();
+      $('#utilityBackdrop').classList.add('hidden');toast(`Audio YouTube importato${current.tracks.length===1?` · BPM ${current.bpm}`:''}`);
+    });
+  }catch(e){toast(e.message)}
+}
 function focusImport(){$('#newTrackFile')?.click()}
 
 function editProjectMeta(){if(!current)return;const title=prompt('Project title',current.title);if(title!==null&&title.trim())current.title=title.trim().slice(0,200);const originalTitle=prompt('Titolo originale',current.original_title||'');if(originalTitle!==null)current.original_title=originalTitle.trim().slice(0,300);const authors=prompt('Autori / compositori (separati da virgola)',(current.authors||[]).join(', '));if(authors!==null)current.authors=authors.split(/[,;]/).map(x=>x.trim()).filter(Boolean).slice(0,64);const artist=prompt('Interprete / artista',current.artist||'');if(artist!==null)current.artist=artist.slice(0,200);const key=prompt('Tonalità / Key',current.key||'');if(key!==null)current.key=key.trim().slice(0,40);const bpm=prompt('BPM',String(current.bpm));if(bpm!==null&&Number(bpm)>0)setProjectBpm(Math.min(300,Number(bpm)));render();markDirty()}

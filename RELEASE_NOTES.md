@@ -1,3 +1,20 @@
+## 0.2.0-121
+
+The project clip browser now exposes a collapsed-by-default technical details section for every clip, including type, format, bitrate, HH:MM:SS duration, exact byte size, provenance, current project-relative location, embedded tags and editable notes. Track associations remain ID-based and are unaffected by clip metadata edits.
+
+## 0.2.0-120
+
+The project clip browser now supports safe renaming, audio preview, name search, and 10-item pagination. Track-to-clip relationships use a stable asset ID instead of names.
+
+## 0.2.0-119
+
+- New project Clip Browser for reusable audio assets. Drag a clip onto the timeline to create another track instance at that position, including touch drag support on iPhone/iPad.
+- The same clip may be used repeatedly while keeping a single underlying project audio asset.
+
+## 0.2.0-118
+
+- Import Audio from YouTube is now available from the sidebar and editor toolbar. Paste one YouTube video URL, confirm authorization, and the extracted audio becomes a normal project track.
+
 ## 0.2.0-117
 
 - CI production-container verification aligned with the pinned msgpack 1.2.3 runtime package.

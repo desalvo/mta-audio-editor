@@ -13,5 +13,6 @@ MTA Audio Editor is licensed under EUPL-1.2. Runtime dependencies retain their o
 | Demucs | Optional music source separation | MIT |
 | FFmpeg | Audio/media processing | LGPL/GPL depending on the concrete distribution build |
 | tini | Container init | MIT |
+| yt-dlp | YouTube audio-only import | Unlicense / ISC/MIT components as distributed upstream |
 
 The exact license texts and enabled FFmpeg components are determined by the binary packages in the built container. Operators redistributing images should retain the notices supplied by Debian and the upstream packages and verify the resulting FFmpeg licensing configuration.
