@@ -1,6 +1,4 @@
 import hashlib, json
-from pathlib import Path
-
 import app.model_updater as mu
 
 

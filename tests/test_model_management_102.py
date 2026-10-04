@@ -27,7 +27,6 @@ def test_admin_and_client_model_management_surfaces_exist():
     assert 'deleteLocal' in android and 'forceUpdate' in android
 
 def test_model_updater_normalization_targets_and_catalog(monkeypatch,tmp_path):
-    import hashlib
     import app.model_updater as m
     monkeypatch.setattr(m,'ROOT',tmp_path)
     monkeypatch.setattr(m,'COREML_DIR',tmp_path/'coreml');monkeypatch.setattr(m,'ONNX_DIR',tmp_path/'onnx');monkeypatch.setattr(m,'SERVER_DIR',tmp_path/'server')

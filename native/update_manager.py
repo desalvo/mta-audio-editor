@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 import platform
 import re
@@ -13,6 +14,7 @@ from pathlib import Path
 REPOSITORY = "desalvo/mta-audio-editor"
 GITHUB_API = f"https://api.github.com/repos/{REPOSITORY}"
 VALID_CHANNELS = {"stable", "early"}
+LOG = logging.getLogger(__name__)
 
 
 def normalize_channel(value: str | None) -> str:
@@ -31,7 +33,9 @@ def is_newer(remote: str, local: str) -> bool:
 
 
 def _get_json(url: str) -> dict:
-    request = urllib.request.Request(
+    if not str(url).lower().startswith("https://"):
+        raise ValueError("update metadata URL must use HTTPS")
+    request = urllib.request.Request(  # noqa: S310 -- URL validated above.
         url,
         headers={
             "Accept": "application/vnd.github+json",
@@ -39,7 +43,7 @@ def _get_json(url: str) -> dict:
             "X-GitHub-Api-Version": "2022-11-28",
         },
     )
-    with urllib.request.urlopen(request, timeout=12) as response:
+    with urllib.request.urlopen(request, timeout=12) as response:  # noqa: S310 -- validated HTTPS request.
         return json.loads(response.read().decode("utf-8"))
 
 
@@ -84,8 +88,8 @@ def check_for_update(current_version: str, channel: str = "stable") -> dict:
             try:
                 manifest = _get_json(str(manifest_asset["browser_download_url"]))
                 remote_version = str(manifest.get("version") or remote_version)
-            except Exception:
-                pass
+            except Exception as exc:
+                LOG.warning("Unable to read early-release update manifest: %s", exc)
     asset = choose_asset(list(release.get("assets", [])))
     return {
         "ok": True,
@@ -105,17 +109,19 @@ def download_and_launch(asset_url: str, asset_name: str) -> dict:
         raise ValueError("update asset URL is missing")
     safe = Path(asset_name or "mta-audio-editor-update").name
     target = Path(tempfile.gettempdir()) / safe
-    request = urllib.request.Request(asset_url, headers={"User-Agent": "MTA-Audio-Editor-Updater"})
-    with urllib.request.urlopen(request, timeout=30) as response, target.open("wb") as handle:
+    if not str(asset_url).lower().startswith("https://"):
+        raise ValueError("update asset URL must use HTTPS")
+    request = urllib.request.Request(asset_url, headers={"User-Agent": "MTA-Audio-Editor-Updater"})  # noqa: S310 -- URL validated above.
+    with urllib.request.urlopen(request, timeout=30) as response, target.open("wb") as handle:  # noqa: S310 -- validated HTTPS request.
         while True:
             chunk = response.read(1024 * 1024)
             if not chunk:
                 break
             handle.write(chunk)
     if os.name == "nt":
-        os.startfile(str(target))  # type: ignore[attr-defined]
+        os.startfile(str(target))  # type: ignore[attr-defined]  # noqa: S606 -- intentional installer launcher.
     elif sys_platform() == "darwin":
-        subprocess.Popen(["open", str(target)])
+        subprocess.Popen(["open", str(target)])  # noqa: S606 -- intentional OS installer launcher.
     else:
-        subprocess.Popen(["xdg-open", str(target)])
+        subprocess.Popen(["xdg-open", str(target)])  # noqa: S606 -- intentional OS installer launcher.
     return {"ok": True, "path": str(target)}

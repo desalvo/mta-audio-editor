@@ -1,8 +1,10 @@
 from __future__ import annotations
-import hashlib,json,os,ssl,tempfile,zipfile
+import hashlib,json,logging,os,ssl,tempfile,zipfile
 from pathlib import Path
 from urllib.parse import urljoin
 from urllib.request import Request,urlopen
+
+LOG=logging.getLogger(__name__)
 
 def _data_root_path()->Path:
     from native.mta_audio_editor_native import _data_root
@@ -16,14 +18,19 @@ def local_repo()->Path:
 
 def _server_url():return os.getenv("MTA_MODEL_SERVER_URL","https://mta-audio-editor.apps.desalvo.eu").rstrip('/')+'/'
 def _fetch_json(path:str):
-    req=Request(urljoin(_server_url(),path.lstrip('/')),headers={'User-Agent':'MTA-Audio-Editor-native-model-manager'})
-    with urlopen(req,timeout=30,context=ssl.create_default_context()) as r:return json.loads(r.read())
+    url=urljoin(_server_url(),path.lstrip('/'))
+    if not url.lower().startswith('https://'):
+        raise ValueError('model server URL must use HTTPS')
+    req=Request(url,headers={'User-Agent':'MTA-Audio-Editor-native-model-manager'})  # noqa: S310 -- URL validated above.
+    with urlopen(req,timeout=30,context=ssl.create_default_context()) as r:  # noqa: S310 -- validated HTTPS request.
+        return json.loads(r.read())
 def catalog():return _fetch_json('/api/models/catalog?platform=native')
 def list_local():
     items=[]
     for marker in _root().glob('*.installed.json'):
         try:items.append(json.loads(marker.read_text(encoding='utf-8')))
-        except Exception:pass
+        except Exception as exc:
+            LOG.debug("Ignoring unreadable local model marker %s: %s", marker, exc)
     return items
 
 def _safe_id(v:str)->str:
@@ -46,8 +53,11 @@ def update(model_id:str):
     mid=_safe_id(model_id);cat=catalog();item=next((x for x in cat.get('models',[]) if x.get('id')==mid),None)
     if not item:raise RuntimeError('model not available on server')
     url=urljoin(_server_url(),str(item.get('download_url') or f'/api/models/native/{mid}').lstrip('/'))
-    req=Request(url,headers={'User-Agent':'MTA-Audio-Editor-native-model-manager'})
-    with urlopen(req,timeout=300,context=ssl.create_default_context()) as r:data=r.read()
+    if not url.lower().startswith('https://'):
+        raise ValueError('model download URL must use HTTPS')
+    req=Request(url,headers={'User-Agent':'MTA-Audio-Editor-native-model-manager'})  # noqa: S310 -- URL validated above.
+    with urlopen(req,timeout=300,context=ssl.create_default_context()) as r:  # noqa: S310 -- validated HTTPS request.
+        data=r.read()
     digest=hashlib.sha256(data).hexdigest()
     expected=str(item.get('sha256') or '')
     if expected and len(expected)==64 and expected.lower()!=digest:raise RuntimeError('SHA-256 mismatch')

@@ -1,5 +1,5 @@
 from __future__ import annotations
-import hashlib, json, logging, os, re, ssl, tempfile, threading, time, zipfile, shutil
+import hashlib, json, logging, os, re, ssl, tempfile, threading, time, zipfile
 from pathlib import Path
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
@@ -35,8 +35,8 @@ OFFICIAL_DEMUCS_MODELS={
 def _https(url:str)->bool:return urlparse(url).scheme.lower()=="https"
 def _read_url(url:str)->bytes:
     if not _https(url): raise ValueError("Demucs model updates require HTTPS")
-    req=Request(url,headers={"User-Agent":"MTA-Audio-Editor-model-updater/2"})
-    with urlopen(req,timeout=TIMEOUT,context=ssl.create_default_context()) as r:
+    req=Request(url,headers={"User-Agent":"MTA-Audio-Editor-model-updater/2"})  # noqa: S310 -- URL is validated as HTTPS above.
+    with urlopen(req,timeout=TIMEOUT,context=ssl.create_default_context()) as r:  # noqa: S310 -- validated HTTPS request.
         size=int(r.headers.get("Content-Length") or 0)
         if size and size>MAX_BYTES: raise ValueError("model payload too large")
         data=r.read(MAX_BYTES+1)
@@ -76,7 +76,9 @@ def delete_model_artifacts(model_id:str)->list[str]:
     mid=_safe_id(model_id); removed=[]
     for meta in list(_metadata_files()):
         try:data=json.loads(meta.read_text(encoding="utf-8"))
-        except Exception:continue
+        except Exception as exc:
+            LOG.debug("Ignoring unreadable model metadata %s: %s", meta, exc)
+            continue
         if str(data.get("id") or data.get("model") or "")!=mid:continue
         artifact=meta.with_suffix("") if meta.name.endswith('.json') else None
         # Metadata normally sits beside artifact as <artifact>.json.
@@ -159,13 +161,15 @@ def _registry_server_profiles()->list[dict]:
     raw=os.getenv('MTA_DEMUCS_MODEL_REGISTRY','').strip(); f=os.getenv('MTA_DEMUCS_MODEL_REGISTRY_FILE','').strip()
     if f:
         try:raw=Path(f).read_text(encoding='utf-8')
-        except OSError:pass
+        except OSError as exc:
+            LOG.warning("Unable to read Demucs model registry file %s: %s", f, exc)
     if raw:
         try:
             parsed=json.loads(raw);items=parsed.get('models',[]) if isinstance(parsed,dict) else parsed
             for x in items if isinstance(items,list) else []:
                 if isinstance(x,dict) and str(x.get('engine','demucs'))=='demucs':profiles.append(dict(x))
-        except Exception:pass
+        except Exception as exc:
+            LOG.warning("Unable to parse Demucs model registry: %s", exc)
     return profiles
 
 def _demucs_signatures(model_name:str)->tuple[Path|None,list[str]]:
