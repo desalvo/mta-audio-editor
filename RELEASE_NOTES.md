@@ -1,3 +1,11 @@
+## 0.2.0-124
+
+Selectable on-demand AI models for Lead Vocals / Backing Vocals separation, with server/native-local model storage.
+
+## 0.2.0-123
+
+- Import & Separate can now split the Demucs vocals stem into Lead Vocals and Backing Vocals.
+
 ## 0.2.0-122
 
 - CI fix: Ruff-clean clip metadata probing and YouTube import validation.

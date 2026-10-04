@@ -1,3 +1,16 @@
+## 0.2.0-124
+
+- Lead/backing vocal separation now uses selectable AI karaoke models by default via audio-separator 0.47.0.
+- Default model: UVR-MDX-NET Karaoke 2; optional Mel-RoFormer Karaoke models are selectable.
+- Models are downloaded on demand to server cache, or locally in native desktop mode.
+- Center/side DSP is retained only as an explicit fallback.
+
+## 0.2.0-123
+
+- Added optional second-pass Lead Vocals / Backing Vocals separation after Demucs.
+- Supports a configurable dedicated AI separator through MTA_LEAD_BACKING_COMMAND, with a deterministic FFmpeg center/side fallback.
+- Added web workflow option and job metadata reporting the vocal split method.
+
 ## 0.2.0-122
 
 - Fixed GitHub Actions Ruff failures in clip metadata probing and YouTube import job validation.

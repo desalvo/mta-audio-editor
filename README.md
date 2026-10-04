@@ -132,3 +132,11 @@ A track context menu can extract synchronized lyrics and chords into the project
 Project Info can search selected rights societies (SIAE and Soundreef enabled by default), store multiple verified repertoire records for the same song across multiple rights providers, include all of them in MTA project metadata, display every stored record in Project Info, and export all available provider fields in both Lyrics + Chords PDF and ChordPro. Structured lookup uses authorized HTTPS endpoints configured with `MTA_RIGHTS_SIAE_SEARCH_URL` and `MTA_RIGHTS_SOUNDREEF_SEARCH_URL`; otherwise the official repertoire portal plus manual verified-result import is used. Lyrics + Chords can also be exported as ChordPro (`.cho`).
 
 - YouTube audio import: paste a single `youtube.com`/`youtu.be` video URL to add its audio as a project track (authorization/rights confirmation required).
+
+
+### Lead Vocals / Backing Vocals
+**Import & Separate** can run a second pass on the vocal stem. When `MTA_LEAD_BACKING_COMMAND` is configured the server invokes that dedicated AI separator (supported placeholders: `{input}`, `{lead}`, `{backing}`, `{output_dir}`); otherwise it falls back to a local FFmpeg center/side split. The job records which method was used.
+
+
+### Lead / Backing Vocals AI models (0.2.0-124)
+The dedicated vocal split uses `audio-separator==0.47.0` and downloads the selected karaoke model on demand. The default is `UVR_MDXNET_KARA_2.onnx`; Mel-RoFormer Karaoke Aufr33/Viperx and Gabox V2 are selectable for higher-quality/heavier processing. Web/server deployments cache weights under `${MTA_DATA_DIR}/.cache/lead-backing-models` (override with `MTA_LEAD_BACKING_MODEL_DIR`). Native desktop applications use the same mechanism against their local data directory, so model weights stay local. `MTA_LEAD_BACKING_DEFAULT_MODEL` changes the default model. The FFmpeg center/side method is an explicit fallback, not the default.

@@ -1398,6 +1398,7 @@ async function replaceTrack(id,input){
 }
 function openStemWorkflow(){
   const stem=pluginInfo.stem_splitter||{};
+  const leadBacking=stem.lead_backing||{};const backingModels=(leadBacking.models||[]).map(m=>`<option value="${esc(m.id)}" ${m.id===leadBacking.default_model?'selected':''}>${esc(m.display_name)} · ${m.installed?'installato':(leadBacking.storage==='local'?'download locale':'download server')}</option>`).join('');
   const defaultName=current?.title||'Nuovo progetto da MP3';
   const profileMap=Object.fromEntries((stem.model_profiles||[]).map(p=>[p.model,p]));const models=(stem.models||['htdemucs_6s']).map(x=>{const p=profileMap[x]||{};return `<option value="${esc(x)}" ${x===stem.recommended_model?'selected':''}>${esc(p.display_name||x)}${p.stem_count?' · '+p.stem_count+' stem':''}</option>`}).join('');
   const stemCounts=[...new Set((stem.supported_stem_counts||[2,4,6]).map(Number).filter(n=>n>=2&&n<=64))].sort((a,b)=>a-b);
@@ -1421,6 +1422,7 @@ function openStemWorkflow(){
       <label class="workflow-check"><input id="stemKeepOriginal" type="checkbox" checked> Mantieni anche la traccia “Original Mix” nel progetto</label>
       <label class="workflow-check"><input id="stemExtractLyrics" type="checkbox"> Estrai anche le lyrics (Whisper large-v3, timing parola per parola)</label>
       <label class="workflow-check"><input id="stemExtractChords" type="checkbox"> Estrai anche i chords (Chordino/NNLS-Chroma se disponibile, fallback interno)</label>
+      <label class="workflow-check"><input id="stemSplitBackingVocals" type="checkbox" onchange="updateBackingModelRow()"> Separa anche voce principale e backing vocals (secondo passaggio AI)</label><label class="workflow-field hidden" id="backingModelRow"><span>Modello Lead / Backing Vocals</span><select id="stemBackingVocalModel">${backingModels}<option value="ffmpeg-center-side">Fallback DSP center/side</option></select><button type="button" onclick="downloadSelectedBackingModel()">Scarica modello</button></label>
       <div class="workflow-note">Il file originale viene sempre conservato in <b>Originals</b>. Il progetto viene salvato dopo l’import e dopo ogni stem aggiunto. Su iPhone/iPad, <b>Auto</b> usa Core ML sul dispositivo quando il modello richiesto è disponibile e ricade automaticamente sul server negli altri casi. I modelli locali vengono scaricati una sola volta e restano disponibili offline. 8 stem richiede un modello compatibile.</div>
       <div class="utility-actions">
         <button class="utility-btn primary" type="button" onclick="startStemWorkflow()" ${stem.available?'':'disabled'}><span>Importa e separa</span></button>
@@ -1429,6 +1431,8 @@ function openStemWorkflow(){
     </div>`);
   updateStemWorkflowMode();
 }
+function updateBackingModelRow(){const row=$('#backingModelRow'),on=$('#stemSplitBackingVocals')?.checked;if(row)row.classList.toggle('hidden',!on)}
+async function downloadSelectedBackingModel(){const id=$('#stemBackingVocalModel')?.value;if(!id||id==='ffmpeg-center-side')return toast('Il fallback DSP non richiede modelli');try{toast('Download modello in corso…');await api(`/api/vocal-separation/models/${encodeURIComponent(id)}/download`,{method:'POST'});pluginInfo=await api('/api/plugins');toast(currentUser?.native_single_user?'Modello scaricato localmente':'Modello scaricato sul server')}catch(e){toast(e.message)}}
 function updateStemWorkflowMode(){
   const mode=$('#stemProjectMode')?.value;
   const row=$('#stemProjectNameRow'),target=$('#stemProjectTarget');
@@ -1494,7 +1498,9 @@ async function startStemWorkflow(){
     }catch(e){return toast('Scelta destinazione progetto fallita: '+e.message)}
   }
   const extractLyrics=!!$('#stemExtractLyrics')?.checked,extractChords=!!$('#stemExtractChords')?.checked;
-  const execution=$('#stemExecutionMode')?.value||preferredStemExecution||'server';
+  const splitBackingVocals=!!$('#stemSplitBackingVocals')?.checked;
+  let execution=$('#stemExecutionMode')?.value||preferredStemExecution||'server';
+  if(splitBackingVocals&&execution!=='server'){execution='server';toast('La separazione Lead/Backing Vocals richiede il secondo passaggio sul server.');}
   if(supportsLocalIosStems()&&execution!=='server'){
     let localProjectId=projectId;
     if(!localProjectId){
@@ -1529,7 +1535,7 @@ async function startStemWorkflow(){
     if(mobilePlatform()==='android'&&window.MtaMobile?.ensureLocalStemModel){
       try{const raw=window.MtaMobile.ensureLocalStemModel(model,stemCount||0);const state=typeof raw==='string'?JSON.parse(raw):raw;if(state&&!state.ok)console.warn('Android local model prefetch:',state.error)}catch(e){console.warn('Android local model prefetch failed',e)}
     }
-    const r=await api(`/api/stems/jobs?project_id=${encodeURIComponent(projectId)}&project_title=${encodeURIComponent(title)}&target=${encodeURIComponent(target)}&model=${encodeURIComponent(model)}&stem_count=${stemCount}&keep_original_track=${keep}&extract_lyrics=${extractLyrics}&extract_chords=${extractChords}`,{method:'POST',body:fd});
+    const r=await api(`/api/stems/jobs?project_id=${encodeURIComponent(projectId)}&project_title=${encodeURIComponent(title)}&target=${encodeURIComponent(target)}&model=${encodeURIComponent(model)}&stem_count=${stemCount}&keep_original_track=${keep}&extract_lyrics=${extractLyrics}&extract_chords=${extractChords}&split_backing_vocals=${splitBackingVocals}&backing_vocal_model=${encodeURIComponent(backingVocalModel)}`,{method:'POST',body:fd});
     if(nativeProjectPath&&window.pywebview?.api?.bind_project_path){
       await window.pywebview.api.bind_project_path(r.project.id,nativeProjectPath);
     }

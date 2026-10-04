@@ -4,6 +4,7 @@ import logging
 import os
 import re
 import shutil
+import shlex
 import subprocess
 import tempfile
 import threading
@@ -82,6 +83,43 @@ LOGGER = logging.getLogger(__name__)
 BASE = Path(__file__).parent
 MAX_UPLOAD_BYTES = int(os.getenv("MTA_MAX_UPLOAD_MB", "1024")) * 1024 * 1024
 NATIVE_SINGLE_USER = os.getenv("MTA_NATIVE_SINGLE_USER", "").lower() in {"1", "true", "yes", "on"}
+
+
+LEAD_BACKING_MODELS = [
+    {"id": "uvr_mdxnet_kara_2", "filename": "UVR_MDXNET_KARA_2.onnx", "display_name": "UVR-MDX-NET Karaoke 2", "engine": "MDX", "quality": "balanced", "recommended": True},
+    {"id": "mel_roformer_karaoke_aufr33", "filename": "mel_band_roformer_karaoke_aufr33_viperx_sdr_10.1956.ckpt", "display_name": "Mel-RoFormer Karaoke Aufr33/Viperx", "engine": "RoFormer", "quality": "high", "recommended": False},
+    {"id": "mel_roformer_karaoke_gabox_v2", "filename": "mel_band_roformer_karaoke_gabox_v2.ckpt", "display_name": "MelBand RoFormer Karaoke Gabox V2", "engine": "RoFormer", "quality": "high", "recommended": False},
+]
+LEAD_BACKING_DEFAULT_MODEL = os.getenv("MTA_LEAD_BACKING_DEFAULT_MODEL", "uvr_mdxnet_kara_2").strip() or "uvr_mdxnet_kara_2"
+LEAD_BACKING_MODEL_DIR = Path(os.getenv("MTA_LEAD_BACKING_MODEL_DIR", str(STORAGE_ROOT / ".cache" / "lead-backing-models"))).expanduser().resolve()
+
+def _lead_backing_model_info(model_id: str) -> dict:
+    model = next((dict(item) for item in LEAD_BACKING_MODELS if item["id"] == model_id), None)
+    if model is None:
+        raise ValueError("unsupported lead/backing vocal model")
+    model["installed"] = (LEAD_BACKING_MODEL_DIR / model["filename"]).exists()
+    model["location"] = "local" if NATIVE_SINGLE_USER else "server"
+    return model
+
+def _lead_backing_catalog() -> dict:
+    return {
+        "default_model": LEAD_BACKING_DEFAULT_MODEL if any(x["id"] == LEAD_BACKING_DEFAULT_MODEL for x in LEAD_BACKING_MODELS) else "uvr_mdxnet_kara_2",
+        "models": [_lead_backing_model_info(item["id"]) for item in LEAD_BACKING_MODELS],
+        "storage": "local" if NATIVE_SINGLE_USER else "server",
+        "on_demand": True,
+    }
+
+def _download_lead_backing_model(model_id: str) -> dict:
+    info = _lead_backing_model_info(model_id)
+    LEAD_BACKING_MODEL_DIR.mkdir(parents=True, exist_ok=True)
+    try:
+        from audio_separator.separator import Separator
+    except ImportError as exc:
+        raise RuntimeError("audio-separator is not installed") from exc
+    separator = Separator(model_file_dir=str(LEAD_BACKING_MODEL_DIR), output_dir=str(LEAD_BACKING_MODEL_DIR), info_only=True)
+    separator.download_model_files(info["filename"])
+    return _lead_backing_model_info(model_id)
+
 NATIVE_BLOCKED_PATH_PREFIXES = (
     "/account",
     "/admin/",
@@ -129,6 +167,8 @@ def _stem_job_public(job: dict) -> dict:
         "cancel_requested": job["cancel_event"].is_set(),
         "error": job.get("error"),
         "analysis": job.get("analysis", {}),
+        "vocal_split_method": job.get("vocal_split_method"),
+        "backing_vocal_model": job.get("backing_vocal_model"),
     }
 
 
@@ -794,7 +834,7 @@ def plugins():
         "custom": manifest["custom"],
         "factory_params": manifest["factory_params"],
         "notes": manifest["notes"],
-        "stem_splitter": STEM_SPLITTER.status(),
+        "stem_splitter": {**STEM_SPLITTER.status(), "lead_backing": _lead_backing_catalog()},
     }
 
 
@@ -2113,6 +2153,66 @@ def _download_name(title: str, ext: str) -> str:
     return f"{clean}.{ext}"
 
 
+def _split_lead_backing_vocals(vocal_stem: Path, output_dir: Path, *, model_id: str | None = None, cancel_event=None) -> tuple[Path, Path, str]:
+    """Split an isolated vocal stem into lead and backing vocals using a selectable AI karaoke model.
+
+    Models are downloaded on demand. In server/web mode they are cached on the server;
+    in native single-user mode the same cache is local to the desktop application.
+    The legacy center/side DSP path is only used when explicitly selected.
+    """
+    output_dir.mkdir(parents=True, exist_ok=True)
+    lead = output_dir / "lead_vocals.wav"
+    backing = output_dir / "backing_vocals.wav"
+    command_template = os.getenv("MTA_LEAD_BACKING_COMMAND", "").strip()
+    if command_template:
+        values = {"input": str(vocal_stem), "lead": str(lead), "backing": str(backing), "output_dir": str(output_dir)}
+        command = [part.format(**values) for part in shlex.split(command_template)]
+        proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        while proc.poll() is None:
+            if cancel_event is not None and cancel_event.is_set():
+                proc.terminate()
+                raise RuntimeError("stem separation cancelled")
+            time.sleep(0.1)
+        output = proc.stdout.read() if proc.stdout else ""
+        if proc.returncode or not lead.exists() or not backing.exists():
+            raise RuntimeError((output or "lead/backing vocal separator failed")[-3000:])
+        return lead, backing, os.getenv("MTA_LEAD_BACKING_MODEL", "configured-ai").strip() or "configured-ai"
+    selected = (model_id or LEAD_BACKING_DEFAULT_MODEL).strip()
+    if selected == "ffmpeg-center-side":
+        if shutil.which("ffmpeg") is None:
+            raise RuntimeError("FFmpeg is required for lead/backing vocal fallback separation")
+        filter_graph = (
+            "[0:a]asplit=2[a][b];"
+            "[a]pan=stereo|c0=0.5*c0+0.5*c1|c1=0.5*c0+0.5*c1[lead];"
+            "[b]pan=stereo|c0=0.5*c0-0.5*c1|c1=0.5*c1-0.5*c0[backing]"
+        )
+        cmd = ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", str(vocal_stem), "-filter_complex", filter_graph, "-map", "[lead]", "-c:a", "pcm_s24le", str(lead), "-map", "[backing]", "-c:a", "pcm_s24le", str(backing)]
+        proc = subprocess.run(cmd, capture_output=True, text=True)
+        if proc.returncode:
+            raise RuntimeError(proc.stderr.strip() or "lead/backing vocal fallback separation failed")
+        return lead, backing, "ffmpeg-center-side"
+
+    info = _lead_backing_model_info(selected)
+    if not info["installed"]:
+        info = _download_lead_backing_model(selected)
+    try:
+        from audio_separator.separator import Separator
+    except ImportError as exc:
+        raise RuntimeError("audio-separator is required for AI lead/backing vocal separation") from exc
+    separator = Separator(model_file_dir=str(LEAD_BACKING_MODEL_DIR), output_dir=str(output_dir), output_format="WAV")
+    separator.load_model(model_filename=info["filename"])
+    if cancel_event is not None and cancel_event.is_set():
+        raise RuntimeError("stem separation cancelled")
+    outputs = [Path(item) for item in separator.separate(str(vocal_stem))]
+    vocal_output = next((x for x in outputs if "vocal" in x.name.lower() and "back" not in x.name.lower()), None)
+    backing_output = next((x for x in outputs if any(k in x.name.lower() for k in ("instrumental", "karaoke", "backing"))), None)
+    if vocal_output is None or backing_output is None:
+        raise RuntimeError(f"AI separator did not return lead/backing-compatible stems: {[x.name for x in outputs]}")
+    shutil.move(str(vocal_output), lead)
+    shutil.move(str(backing_output), backing)
+    return lead, backing, f"audio-separator:{selected}"
+
+
 def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> None:
     with STEM_JOB_LOCK:
         job = STEM_JOBS[job_id]
@@ -2123,6 +2223,8 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
         stem_name_prefix = str(job.get("stem_name_prefix") or "").strip()
         extract_lyrics_after = bool(job.get("extract_lyrics"))
         extract_chords_after = bool(job.get("extract_chords"))
+        split_backing_vocals = bool(job.get("split_backing_vocals"))
+        backing_vocal_model = str(job.get("backing_vocal_model") or LEAD_BACKING_DEFAULT_MODEL)
 
     def progress(value: int, message: str) -> None:
         _stem_job_update(job_id, progress=max(1, min(99, int(value))), message=message)
@@ -2155,6 +2257,17 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
             )
             if cancel_event.is_set():
                 raise RuntimeError("stem separation cancelled")
+            vocal_split_method = None
+            if split_backing_vocals:
+                vocal_stem = next((Path(stem) for stem in stems if Path(stem).stem.lower() in {"vocals", "vocal"}), None)
+                if vocal_stem is None:
+                    raise RuntimeError("Il modello selezionato non ha prodotto uno stem vocals da separare")
+                progress(86, "Separazione voce principale e backing vocals")
+                lead_vocal, backing_vocal, vocal_split_method = _split_lead_backing_vocals(
+                    vocal_stem, td / "lead-backing", model_id=backing_vocal_model, cancel_event=cancel_event
+                )
+                stems = [stem for stem in stems if Path(stem) != vocal_stem] + [lead_vocal, backing_vocal]
+                _stem_job_update(job_id, vocal_split_method=vocal_split_method)
             progress(90, "Importazione delle tracce nel progetto")
             project = load_project(project_id)
             mapping = {
@@ -2163,6 +2276,8 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
                 "guitar": "guitars",
                 "piano": "keyboards",
                 "vocals": "melody",
+                "lead_vocals": "melody",
+                "backing_vocals": "melody",
                 "other": "other",
             }
             for index, stem in enumerate(stems, start=1):
@@ -2175,7 +2290,7 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
                 shutil.copyfile(stem, dst)
                 duration = media_duration_ms(dst)
                 channels, channel_layout = _audio_channel_info(dst)
-                display_name = stem.stem.title()
+                display_name = {"lead_vocals": "Lead Vocals", "backing_vocals": "Backing Vocals"}.get(stem_name, stem.stem.title())
                 if stem_name_prefix:
                     display_name = f"{stem_name_prefix} · {display_name}"[:200]
                 new_track = Track(
@@ -2464,6 +2579,22 @@ def admin_demucs_model_delete_local(model_id: str, request: Request):
         raise HTTPException(400, "Invalid model id")
     return delete_local_demucs_model(model_id)
 
+
+@app.get("/api/vocal-separation/models")
+def lead_backing_models(request: Request):
+    _actor(request)
+    return _lead_backing_catalog()
+
+@app.post("/api/vocal-separation/models/{model_id}/download")
+def lead_backing_model_download(model_id: str, request: Request):
+    _actor(request)
+    try:
+        return _download_lead_backing_model(model_id)
+    except ValueError as exc:
+        raise HTTPException(404, str(exc)) from exc
+    except RuntimeError as exc:
+        raise HTTPException(503, str(exc)) from exc
+
 @app.post("/api/stems/jobs")
 async def stem_job_start(
     request: Request,
@@ -2476,6 +2607,8 @@ async def stem_job_start(
     keep_original_track: bool = True,
     extract_lyrics: bool = False,
     extract_chords: bool = False,
+    split_backing_vocals: bool = False,
+    backing_vocal_model: str = LEAD_BACKING_DEFAULT_MODEL,
 ):
     if Path(file.filename or "").suffix.lower() != ".mp3":
         raise HTTPException(400, "La separazione strumenti accetta attualmente file MP3.")
@@ -2495,6 +2628,12 @@ async def stem_job_start(
             model = str(profiles[0]["model"])
     if model not in status["models"]:
         raise HTTPException(400, "Modello di separazione non supportato.")
+
+    if split_backing_vocals and backing_vocal_model != "ffmpeg-center-side":
+        try:
+            _lead_backing_model_info(backing_vocal_model)
+        except ValueError as exc:
+            raise HTTPException(400, str(exc)) from exc
 
     actor = _actor(request)
     if project_id:
@@ -2601,6 +2740,9 @@ async def stem_job_start(
         "stem_name_prefix": "",
         "extract_lyrics": bool(extract_lyrics),
         "extract_chords": bool(extract_chords),
+        "split_backing_vocals": bool(split_backing_vocals),
+        "backing_vocal_model": backing_vocal_model,
+        "vocal_split_method": None,
         "analysis": {},
     }
     with STEM_JOB_LOCK:
