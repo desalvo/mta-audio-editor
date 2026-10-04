@@ -1,3 +1,8 @@
+## 0.2.0-116
+
+- Fixed CI Ruff F821 in `app/codec.py` by importing `RightsRecord` for synchronized MTA metadata restoration.
+- Preserved the 0.2.0-115 mobile context-menu behavior and multi-provider rights metadata features unchanged.
+
 ## 0.2.0-115
 
 - Added iPhone/iPad and touch-device track contextual menus via a 600 ms long press on track headers and timeline lanes.

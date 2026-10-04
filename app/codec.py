@@ -9,7 +9,7 @@ import uuid
 from pathlib import Path
 
 from .audio_engine import media_duration_ms, project_time_pitch_filter, render_track
-from .models import Chord, Clip, LyricLine, MtaSlotMapping, Project, Track
+from .models import Chord, Clip, LyricLine, MtaSlotMapping, Project, RightsRecord, Track
 from .mta_writer import normalize_matroska_for_mta
 from .mta_reverse import (
     analyze_mta,
