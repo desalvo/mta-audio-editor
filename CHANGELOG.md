@@ -1,3 +1,13 @@
+## 0.2.0-117
+
+- Fixed the Container production gate after the msgpack 1.2.3 dependency update: the CI runtime verification now expects msgpack 1.2.3, matching the Dockerfile and installed image.
+- Quality/Ruff/unit-test behavior from 0.2.0-116 is unchanged.
+
+## 0.2.0-117
+
+- Fixed the Container production gate after the msgpack 1.2.3 dependency update: the CI runtime verification now expects msgpack 1.2.3, matching the Dockerfile and installed image.
+- Quality/Ruff/unit-test behavior from 0.2.0-116 is unchanged.
+
 ## 0.2.0-116
 
 - Fixed CI Ruff F821 in `app/codec.py` by importing `RightsRecord` for synchronized MTA metadata restoration.

@@ -127,7 +127,7 @@ jobs:
         shell: bash
         run: |
           docker run --rm --entrypoint python mta-audio-editor:ci -c \
-            'from importlib.metadata import version; expected={"setuptools":"84.0.0","wheel":"0.48.0","urllib3":"2.8.0","msgpack":"1.2.1"}; bad=[]; [(print(f"{p}=={version(p)}") or (bad.append((p,version(p),v)) if version(p)!=v else None)) for p,v in expected.items()]; raise SystemExit(1 if bad else 0)'
+            'from importlib.metadata import version; expected={"setuptools":"84.0.0","wheel":"0.48.0","urllib3":"2.8.0","msgpack":"1.2.3"}; bad=[]; [(print(f"{p}=={version(p)}") or (bad.append((p,version(p),v)) if version(p)!=v else None)) for p,v in expected.items()]; raise SystemExit(1 if bad else 0)'
       - name: Verify CPU-only PyTorch image
         shell: bash
         run: |

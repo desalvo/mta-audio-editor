@@ -1,3 +1,11 @@
+## 0.2.0-117
+
+- CI production-container verification aligned with the pinned msgpack 1.2.3 runtime package.
+
+## 0.2.0-117
+
+- CI production-container verification aligned with the pinned msgpack 1.2.3 runtime package.
+
 ## 0.2.0-115
 
 - Added iPhone/iPad and touch-device track contextual menus via a 600 ms long press on track headers and timeline lanes.
