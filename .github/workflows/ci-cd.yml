@@ -111,7 +111,7 @@ jobs:
           push: false
           tags: mta-audio-editor:ci
           build-args: |
-            APP_VERSION=${{ github.ref_type == 'tag' && github.ref_name || '0.2.0-94' }}
+            APP_VERSION=${{ github.ref_type == 'tag' && github.ref_name || '0.2.0-100' }}
             BUILD_ID=${{ steps.build.outputs.id }}
       - name: Verify container OS
         shell: bash
@@ -367,6 +367,17 @@ jobs:
       - uses: gradle/actions/setup-gradle@v6
         with:
           gradle-version: '8.10.2'
+      - name: Bundle default Demucs ONNX model
+        shell: bash
+        env:
+          MTA_DEMUCS_BOOTSTRAP_SERVER: ${{ vars.MTA_DEMUCS_BOOTSTRAP_SERVER || 'https://mta-audio-editor.apps.desalvo.eu' }}
+        run: |
+          set -euo pipefail
+          mkdir -p mobile/android/app/src/main/assets
+          curl --fail --location --retry 3 --connect-timeout 20 --max-time 600 \
+            "$MTA_DEMUCS_BOOTSTRAP_SERVER/api/mobile/demucs-onnx/bootstrap" \
+            -o mobile/android/app/src/main/assets/demucs-default-4.onnx
+          test -s mobile/android/app/src/main/assets/demucs-default-4.onnx
       - name: Configure optional Android release signing
         env:
           KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
@@ -387,7 +398,7 @@ jobs:
       - name: Build Android debug APK and release AAB
         shell: bash
         run: |
-          gradle -p mobile/android :app:assembleDebug :app:bundleRelease --stacktrace
+          gradle -p mobile/android :app:assembleDebug :app:bundleRelease :app:assembleRelease --stacktrace
       - name: Package Android artifacts
         shell: bash
         run: |
@@ -395,6 +406,11 @@ jobs:
           mkdir -p dist-mobile-android
           version="$(tr -d '\r\n' < VERSION)"
           cp mobile/android/app/build/outputs/apk/debug/app-debug.apk "dist-mobile-android/MTA-Audio-Editor-${version}-Android-debug.apk"
+          if [[ -f mobile/android/app/build/outputs/apk/release/app-release.apk ]]; then
+            cp mobile/android/app/build/outputs/apk/release/app-release.apk "dist-mobile-android/MTA-Audio-Editor-${version}-Android-release.apk"
+          elif [[ -f mobile/android/app/build/outputs/apk/release/app-release-unsigned.apk ]]; then
+            cp mobile/android/app/build/outputs/apk/release/app-release-unsigned.apk "dist-mobile-android/MTA-Audio-Editor-${version}-Android-release-unsigned.apk"
+          fi
           cp mobile/android/app/build/outputs/bundle/release/app-release.aab "dist-mobile-android/MTA-Audio-Editor-${version}-Android.aab"
           cd dist-mobile-android
           sha256sum * > SHA256SUMS
@@ -412,6 +428,17 @@ jobs:
     needs: [quality, security]
     steps:
       - uses: actions/checkout@v7
+      - name: Bundle default Demucs Core ML model
+        shell: bash
+        env:
+          MTA_DEMUCS_BOOTSTRAP_SERVER: ${{ vars.MTA_DEMUCS_BOOTSTRAP_SERVER || 'https://mta-audio-editor.apps.desalvo.eu' }}
+        run: |
+          set -euo pipefail
+          mkdir -p mobile/ios/MTAEditorMobile/Models
+          curl --fail --location --retry 3 --connect-timeout 20 --max-time 600 \
+            "$MTA_DEMUCS_BOOTSTRAP_SERVER/api/mobile/demucs-coreml/bootstrap" \
+            -o mobile/ios/MTAEditorMobile/Models/demucs-default-4.mlmodel
+          test -s mobile/ios/MTAEditorMobile/Models/demucs-default-4.mlmodel
       - name: Validate Xcode project
         shell: bash
         run: xcodebuild -project mobile/ios/MTAEditorMobile.xcodeproj -scheme MTAEditorMobile -showBuildSettings >/dev/null
@@ -556,6 +583,54 @@ jobs:
           gh release upload "$GITHUB_REF_NAME" release-assets/* \
             --repo "$GITHUB_REPOSITORY" \
             --clobber
+  early-release:
+    name: Publish rolling early-main packages
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    needs: [native-windows, native-macos, mobile-android, mobile-ios]
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: native-*
+          path: early-assets
+          merge-multiple: true
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: mobile-*
+          path: early-assets
+          merge-multiple: true
+      - name: Build early source package and manifest
+        shell: bash
+        run: |
+          set -euxo pipefail
+          version="$(tr -d '\r\n' < VERSION)"
+          git archive --format=zip --output "early-assets/MTA-Audio-Editor-${version}-source.zip" HEAD
+          cat > early-assets/early-update.json <<EOF
+          {"channel":"early","version":"${version}","commit_sha":"${GITHUB_SHA}","ref":"main","repository":"${GITHUB_REPOSITORY}"}
+          EOF
+          sha256sum early-assets/* > early-assets/SHA256SUMS-early-main
+      - name: Update rolling early-main GitHub prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euxo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -f early-main "$GITHUB_SHA"
+          git push origin refs/tags/early-main --force
+          if gh release view early-main --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release edit early-main --repo "$GITHUB_REPOSITORY" --title "MTA Audio Editor Early Release" --prerelease --target main
+          else
+            gh release create early-main --repo "$GITHUB_REPOSITORY" --title "MTA Audio Editor Early Release" --notes "Rolling packages built from main. Use the Stable channel for tagged releases." --prerelease --target main
+          fi
+          gh release upload early-main early-assets/* --repo "$GITHUB_REPOSITORY" --clobber
+
   publish:
     name: Publish Docker Hub image
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/'))

@@ -38,6 +38,10 @@ document.addEventListener('DOMContentLoaded',()=>{
 let current=null, currentUser=null, pluginInfo={inserts:{},schemas:{},custom:{},stem_splitter:{available:false}}, pxPerSec=70;
 let sel={a:0,b:0}, dragging=false, audioCtx=null, playAudio=null, selectedTrackId=null, exportFormat='mta';
 let autosaveTimer=null, autosaveBusy=false, autosaveQueued=false, autosaveEnabled=true, projectDirty=false, stemPollTimer=null, activeStemJob=null, activeStemProjectId=null;
+let preferredStemCount=Number(localStorage.getItem('mtaStemCount')||0);if(![0,2,4,6,8].includes(preferredStemCount))preferredStemCount=0;
+function setPreferredStemCount(value){const n=Number(value||0);preferredStemCount=[0,2,4,6,8].includes(n)?n:0;localStorage.setItem('mtaStemCount',String(preferredStemCount));}
+let preferredStemExecution=localStorage.getItem('mtaStemExecution')||'auto';if(!['auto','local','server'].includes(preferredStemExecution))preferredStemExecution='auto';
+function setPreferredStemExecution(value){preferredStemExecution=['auto','local','server'].includes(value)?value:'auto';localStorage.setItem('mtaStemExecution',preferredStemExecution);}
 let undoStack=[],redoStack=[],historyProjectId=null,lastHistoryState=null,timelineClipboard=null;
 let playCursorMs=0, playRaf=null, mediaProgressTimer=null;
 let uiState={trackTop:0,timelineTop:0,timelineLeft:0,mixerLeft:0};
@@ -53,6 +57,7 @@ function mobilePlatform(){
   try{return window.MtaMobile?.getPlatform?.()||''}catch(e){return ''}
 }
 function isMobileClient(){return ['android','ios'].includes(mobilePlatform())}
+function supportsLocalIosStems(){return mobilePlatform()==='ios'&&!!window.MtaMobile?.startLocalStemSeparation}
 function nativeApi(){return window.pywebview?.api||null}
 function isNativeDesktop(){return !!nativeApi()||!!currentUser?.native_single_user}
 let nativeBridgeReadyPromise=null;
@@ -108,7 +113,7 @@ function selectedTrackIds(){return $$('.track-check:checked').map(x=>x.value)}
 function linesToText(a,b){return(a||[]).map(x=>`${(x.time_ms/1000).toFixed(3)}\t${x[b]}`).join('\n')}
 function textToLines(v,key){return v.split(/\n/).map(x=>x.trim()).filter(Boolean).map(line=>{const [t,...rest]=line.split(/\t|\s{2,}/);return{time_ms:Math.max(0,Math.round(parseFloat(t)*1000)||0),[key]:rest.join(' ').trim()}})}
 
-async function init(){if(isMobileClient())document.body.classList.add('mobile-client');try{currentUser=await api('/api/session');const a=$('#adminNav');if(a)a.hidden=!!currentUser.native_single_user||currentUser.role!=='admin';if(currentUser.native_single_user){document.body.classList.add('native-single-user');const b=$('#nativeSettingsButton');if(b)b.hidden=false}}catch(e){}if(currentUser?.native_single_user){const bridge=await waitForNativeApi();if(bridge?.get_native_settings){try{const cfg=await bridge.get_native_settings();autosaveEnabled=cfg.autosave_enabled!==false}catch(e){}}}try{pluginInfo=await api('/api/plugins')}catch(e){}await refresh()}
+async function init(){if(isMobileClient())document.body.classList.add('mobile-client');try{currentUser=await api('/api/session');const a=$('#adminNav');if(a)a.hidden=!!currentUser.native_single_user||currentUser.role!=='admin';if(currentUser.native_single_user){document.body.classList.add('native-single-user');const b=$('#nativeSettingsButton');if(b)b.hidden=false}}catch(e){}if(currentUser?.native_single_user){const bridge=await waitForNativeApi();if(bridge?.get_native_settings){try{const cfg=await bridge.get_native_settings();autosaveEnabled=cfg.autosave_enabled!==false}catch(e){}}setTimeout(()=>checkNativeAppUpdate(false),1200)}try{pluginInfo=await api('/api/plugins')}catch(e){}await refresh()}
 
 function toggleEditingToolsPanel(){
   const panel=$('#editingToolsPanel');if(!panel)return;
@@ -396,7 +401,7 @@ async function startTrackStemSplit(id){
   const model=stem.recommended_model||(stem.models||['htdemucs_6s'])[0];
   await flushAutosave();
   try{
-    const job=await api(`/api/projects/${current.id}/tracks/${id}/stem-jobs?model=${encodeURIComponent(model)}`,{method:'POST'});
+    const job=await api(`/api/projects/${current.id}/tracks/${id}/stem-jobs?model=${encodeURIComponent(model)}&stem_count=${preferredStemCount}`,{method:'POST'});
     activeStemJob=job.id;
     activeStemProjectId=job.project_id;
     showStemProgress(job);
@@ -760,6 +765,9 @@ function updatePlaybackGains(){
   const now=audioCtx?.currentTime||0;
   for(const item of trackPlaybacks){
     const track=trackById(item.trackId);if(!track||!item.gainNode)continue;
+    // Mixer controls are applied downstream of the media decoder. Never wait for
+    // buffering or a new server preview before changing volume/mute/solo.
+    item.gainNode.gain.cancelScheduledValues(now);
     item.gainNode.gain.setValueAtTime(playbackGainForTrack(track,item),now);
   }
 }
@@ -894,7 +902,7 @@ function setTrackPan(id,v){
   const t=trackById(id);if(!t)return;
   const n=clampPan(v);t.pan=n;updatePanUi(id,n);
   const item=trackPlaybacks.find(x=>x.trackId===id);
-  if(item?.panner)item.panner.pan.setValueAtTime(n,audioCtx?.currentTime||0);
+  if(item?.panner){const now=audioCtx?.currentTime||0;item.panner.pan.cancelScheduledValues(now);item.panner.pan.setValueAtTime(n,now);}
   if(renderedMasterPlayback)queueRenderedMasterRefresh();
   markDirty(120);
 }
@@ -1125,11 +1133,13 @@ function openStemWorkflow(){
       <div class="workflow-grid">
         <label class="workflow-field"><span>Tipo progetto</span><select id="stemProjectTarget"><option value="DAW">Multitrack DAW</option><option value="MTA8">MTA8</option><option value="MTA16">MTA16</option></select></label>
         <label class="workflow-field"><span>Modello AI</span><select id="stemWorkflowModel">${models}</select></label>
+        <label class="workflow-field"><span>Numero stem</span><select id="stemWorkflowCount" onchange="setPreferredStemCount(this.value)"><option value="0" ${preferredStemCount===0?'selected':''}>Auto</option><option value="2" ${preferredStemCount===2?'selected':''}>2 · Vocals / Accompaniment</option><option value="4" ${preferredStemCount===4?'selected':''}>4 · Vocals / Drums / Bass / Other</option><option value="6" ${preferredStemCount===6?'selected':''}>6 · + Guitar / Piano</option><option value="8" ${preferredStemCount===8?'selected':''}>8 · Extended backend</option></select></label>
+        ${supportsLocalIosStems()?`<label class="workflow-field"><span>Elaborazione</span><select id="stemExecutionMode" onchange="setPreferredStemExecution(this.value)"><option value="auto" ${preferredStemExecution==='auto'?'selected':''}>Auto · locale se possibile</option><option value="local" ${preferredStemExecution==='local'?'selected':''}>Locale · Core ML</option><option value="server" ${preferredStemExecution==='server'?'selected':''}>Server cloud</option></select></label>`:''}
       </div>
       <label class="workflow-field"><span>Brano completo MP3</span><input id="stemWorkflowFile" type="file" accept=".mp3,audio/mpeg"></label>
       ${remembered}
       <label class="workflow-check"><input id="stemKeepOriginal" type="checkbox" checked> Mantieni anche la traccia “Original Mix” nel progetto</label>
-      <div class="workflow-note">Il file originale viene sempre conservato in <b>Originals</b>. Il progetto viene salvato dopo l’import e dopo ogni stem aggiunto.</div>
+      <div class="workflow-note">Il file originale viene sempre conservato in <b>Originals</b>. Il progetto viene salvato dopo l’import e dopo ogni stem aggiunto. Su iPhone/iPad, <b>Auto</b> usa Core ML sul dispositivo quando il modello richiesto è disponibile e ricade automaticamente sul server negli altri casi. I modelli locali vengono scaricati una sola volta e restano disponibili offline. 8 stem richiede un modello compatibile.</div>
       <div class="utility-actions">
         <button class="utility-btn primary" type="button" onclick="startStemWorkflow()" ${stem.available?'':'disabled'}><span>Importa e separa</span></button>
         <button class="utility-btn secondary" type="button" onclick="closeUtilityModal()"><span>Annulla</span></button>
@@ -1143,6 +1153,20 @@ function updateStemWorkflowMode(){
   if(row)row.style.display=mode==='new'?'grid':'none';
   if(target)target.disabled=mode!=='new';
 }
+
+async function startIosLocalStemWorkflow({projectId,stemCount,keep}){
+  showUtilityModal('Separazione locale',`<div class="stem-progress-card"><div class="stem-progress-head"><b>Demucs Core ML</b><span id="localStemPct">0%</span></div><div class="stem-progress"><div id="localStemFill" class="stem-progress-fill" style="width:0%"></div></div><div id="localStemMessage" class="stem-progress-message">Preparazione modello locale…</div><div class="utility-actions"><button class="danger-action" onclick="window.MtaMobile?.cancelLocalStemSeparation?.()">Annulla separazione</button></div></div>`);
+  const onProgress=e=>{const pct=Math.max(0,Math.min(100,Number(e.detail?.progress)||0));if($('#localStemPct'))$('#localStemPct').textContent=pct+'%';if($('#localStemFill'))$('#localStemFill').style.width=pct+'%';if($('#localStemMessage'))$('#localStemMessage').textContent=e.detail?.message||'Separazione locale'};
+  window.addEventListener('mtaLocalStemProgress',onProgress);
+  try{
+    const result=await window.MtaMobile.startLocalStemSeparation(projectId,stemCount,keep);
+    await refresh();
+    current=await api(`/api/projects/${projectId}`);selectedTrackId=current.tracks.at(-1)?.id||null;render();
+    toast(`Separazione locale completata · ${result.stemCount} stem`);
+    closeUtilityModal();return true;
+  }finally{window.removeEventListener('mtaLocalStemProgress',onProgress)}
+}
+
 async function startStemWorkflow(){
   const f=$('#stemWorkflowFile')?.files?.[0]||(lastSelectedAudioFile&&/\.mp3$/i.test(lastSelectedAudioFile.name)?lastSelectedAudioFile:null);
   if(!f)return toast('Seleziona un file MP3');
@@ -1151,10 +1175,11 @@ async function startStemWorkflow(){
   if(mode==='new'&&!title)return toast('Inserisci il nome del nuovo progetto');
   await flushAutosave();
   const fd=new FormData();fd.append('file',f);
-  const projectId=mode==='existing'&&current?current.id:'';
+  let projectId=mode==='existing'&&current?current.id:'';
   const target=mode==='existing'?(current?.target||'MTA8'):$('#stemProjectTarget').value;
   const model=$('#stemWorkflowModel').value;
   const keep=$('#stemKeepOriginal').checked;
+  const stemCount=Number($('#stemWorkflowCount')?.value||preferredStemCount||0);setPreferredStemCount(stemCount);
   let nativeProjectPath=null;
   if(mode==='new'&&currentUser?.native_single_user){
     const apiBridge=await waitForNativeApi();
@@ -1165,8 +1190,39 @@ async function startStemWorkflow(){
       nativeProjectPath=chosen.path;
     }catch(e){return toast('Scelta destinazione progetto fallita: '+e.message)}
   }
+  const execution=$('#stemExecutionMode')?.value||preferredStemExecution||'server';
+  if(supportsLocalIosStems()&&execution!=='server'){
+    let localProjectId=projectId;
+    if(!localProjectId){
+      const created=await api(`/api/projects?title=${encodeURIComponent(title||f.name.replace(/\.mp3$/i,''))}&target=${encodeURIComponent(target)}`,{method:'POST'});
+      localProjectId=created.id;current=created;selectedTrackId=null;render();
+    }
+    try{
+      const caps=await window.MtaMobile.localStemCapabilities();
+      const installedCounts=(caps.installedStemCounts||[]).map(Number).sort((a,b)=>b-a);
+      const hardwareRecommended=Number(caps.recommendedStemCount)||4;
+      const requested=stemCount||installedCounts.find(n=>n<=hardwareRecommended)||hardwareRecommended;
+      const installed=installedCounts.includes(requested);
+      if(execution==='local'||installed){
+        setMobileBusy(true);
+        try{return await startIosLocalStemWorkflow({projectId:localProjectId,stemCount:stemCount,keep})}finally{setMobileBusy(false)}
+      }
+      // Auto: native layer may download a model from the configured server. If it
+      // cannot, fall through to the established server-side Demucs workflow.
+      try{
+        setMobileBusy(true);
+        return await startIosLocalStemWorkflow({projectId:localProjectId,stemCount:stemCount,keep});
+      }catch(localError){
+        setMobileBusy(false);
+        toast('Modello locale non disponibile: uso il server.');
+        if(!projectId)projectId=localProjectId;
+      }
+    }catch(localError){
+      if(execution==='local')return toast(localError.message);
+    }
+  }
   try{
-    const r=await api(`/api/stems/jobs?project_id=${encodeURIComponent(projectId)}&project_title=${encodeURIComponent(title)}&target=${encodeURIComponent(target)}&model=${encodeURIComponent(model)}&keep_original_track=${keep}`,{method:'POST',body:fd});
+    const r=await api(`/api/stems/jobs?project_id=${encodeURIComponent(projectId)}&project_title=${encodeURIComponent(title)}&target=${encodeURIComponent(target)}&model=${encodeURIComponent(model)}&stem_count=${stemCount}&keep_original_track=${keep}`,{method:'POST',body:fd});
     if(nativeProjectPath&&window.pywebview?.api?.bind_project_path){
       await window.pywebview.api.bind_project_path(r.project.id,nativeProjectPath);
     }
@@ -1382,15 +1438,21 @@ async function makeTrackPlayback(track,renderFilters,silent=false,respectMuteSol
   }));
   return {trackId:track.id,audio,analysers:graph.analysers,channels,silent,respectMuteSolo,meterData:{},gainNode:graph.gainNode,panner:graph.panner};
 }
-function waitForMediaBuffer(audio,label='traccia',timeoutMs=30000){
-  if(audio.readyState>=4)return Promise.resolve();
+function waitForMediaBuffer(audio,label='traccia',timeoutMs=12000){
+  // HAVE_FUTURE_DATA is enough to start smoothly. Waiting for canplaythrough on
+  // every track forces the browser to buffer almost the whole song and creates
+  // very high startup latency on large sessions.
+  if(audio.readyState>=3)return Promise.resolve();
   return new Promise((resolve,reject)=>{
     let done=false;
     const finish=()=>{if(done)return;done=true;cleanup();resolve()};
     const fail=()=>{if(done)return;done=true;cleanup();reject(new Error(`Buffering non riuscito: ${label}`))};
-    const cleanup=()=>{clearTimeout(timer);audio.removeEventListener('canplaythrough',finish);audio.removeEventListener('error',fail)};
-    const timer=setTimeout(()=>audio.readyState>=3?finish():fail(),timeoutMs);
-    audio.addEventListener('canplaythrough',finish,{once:true});
+    const check=()=>{if(audio.readyState>=3)finish()};
+    const cleanup=()=>{clearTimeout(timer);clearInterval(poll);audio.removeEventListener('canplay',finish);audio.removeEventListener('loadeddata',check);audio.removeEventListener('error',fail)};
+    const poll=setInterval(check,40);
+    const timer=setTimeout(()=>audio.readyState>=2?finish():fail(),timeoutMs);
+    audio.addEventListener('canplay',finish,{once:true});
+    audio.addEventListener('loadeddata',check);
     audio.addEventListener('error',fail,{once:true});
     audio.load();
   });
@@ -1408,37 +1470,51 @@ function alignDynamicTracks(force=false){
   const clock=dynamicClockAudio();if(!clock||clock.paused||clock.ended)return;
   const ref=clock.currentTime;
   for(const item of trackPlaybacks){
-    if(item.audio===clock||item.audio.paused||item.audio.ended)continue;
-    const drift=item.audio.currentTime-ref;
-    if(force||Math.abs(drift)>0.018){
-      try{item.audio.currentTime=ref}catch(e){}
-    }
+    const audio=item.audio;
+    if(audio===clock||audio.paused||audio.ended)continue;
+    const drift=audio.currentTime-ref;
+    try{
+      if(force||Math.abs(drift)>0.120){
+        // Large discontinuities need a hard re-lock. This is intentionally rare.
+        audio.currentTime=ref;audio.playbackRate=1;
+      }else if(Math.abs(drift)>0.012){
+        // Correct decoder drift smoothly instead of repeatedly seeking.
+        audio.playbackRate=Math.max(.985,Math.min(1.015,1-drift*.20));
+      }else if(Math.abs(audio.playbackRate-1)>.0005){
+        audio.playbackRate=1;
+      }
+    }catch(e){}
   }
 }
 function startDynamicSyncMonitor(){
   stopDynamicSyncMonitor();
   dynamicSyncClock=trackPlaybacks[0]||null;
-  dynamicSyncTimer=setInterval(()=>alignDynamicTracks(false),120);
+  dynamicSyncTimer=setInterval(()=>alignDynamicTracks(false),50);
 }
 async function startDynamicTrackPreview(renderFilters,silentMeters=false){
-  // Every dynamic track is completely buffered before transport starts. Once
-  // ready, all media elements are armed at the same position and started in one
-  // Promise turn; a common clock then corrects any decoder drift during playback.
+  // Adaptive pre-roll: only enough media is buffered to guarantee a smooth
+  // common start. Mixer controls remain live WebAudio operations and never
+  // participate in this buffering path.
   playbackBuffering=true;
-  showMediaProgress('Buffering tracce',5,'Buffering audio… attendere');
+  const tracks=current.tracks||[];
+  showMediaProgress('Buffering tracce',5,`Pre-buffer ${tracks.length} tracce… attendere`);
   try{
-    const items=await Promise.all((current.tracks||[]).map(t=>makeTrackPlayback(t,renderFilters,silentMeters,true)));
-    showMediaProgress('Buffering tracce',55,'Sincronizzazione tracce… attendere');
-    await Promise.all(items.map((item,i)=>waitForMediaBuffer(item.audio,current.tracks[i]?.name||`traccia ${i+1}`)));
+    const items=await Promise.all(tracks.map(t=>makeTrackPlayback(t,renderFilters,silentMeters,true)));
+    showMediaProgress('Buffering tracce',45,'Preparazione decoder… attendere');
+    await Promise.all(items.map((item,i)=>waitForMediaBuffer(item.audio,tracks[i]?.name||`traccia ${i+1}`)));
     const sec=playCursorMs/1000/tempoRatio();
     for(const item of items){
-      item.audio.pause();
+      item.audio.pause();item.audio.playbackRate=1;
       item.audio.currentTime=Math.min(sec,Math.max(0,(item.audio.duration||0)-0.01));
     }
     trackPlaybacks.push(...items);
     updatePlaybackGains();
-    showMediaProgress('Buffering tracce',90,'Avvio sincronizzato…');
-    await Promise.all(items.map(item=>item.audio.play()));
+    if(audioCtx?.state==='suspended')try{await audioCtx.resume()}catch(e){}
+    showMediaProgress('Buffering tracce',82,'Avvio sincronizzato…');
+    // Arm every decoder before yielding again. The drift monitor then uses tiny
+    // playback-rate corrections; it does not continuously seek the tracks.
+    const starts=items.map(item=>item.audio.play());
+    await Promise.all(starts);
     dynamicSyncClock=items[0]||null;
     alignDynamicTracks(true);
     startDynamicSyncMonitor();
@@ -1960,7 +2036,7 @@ async function showNativeSettings(){
   if(!apiBridge?.get_native_settings){toast('Bridge nativo non disponibile. Riprova tra un istante.');return}
   try{
     const cfg=await apiBridge.get_native_settings();
-    showUtilityModal('Settings',`<div class="form-grid"><label>Maximum import/upload size (MB)<input id="nativeMaxUploadMb" type="number" min="1" max="10240" step="1" value="${Number(cfg.max_upload_mb)||1024}"></label><label class="workflow-check"><input id="nativeAutosaveEnabled" type="checkbox" ${cfg.autosave_enabled!==false?'checked':''}> Auto-save project changes</label><p>With Auto-save disabled, changes remain in the current session until you press <b>Save</b>. Undo/Redo is session-only.</p><div class="form-actions"><button class="accent" onclick="saveNativeSettings()">Save</button></div></div>`);
+    showUtilityModal('Settings',`<div class="form-grid"><label>Maximum import/upload size (MB)<input id="nativeMaxUploadMb" type="number" min="1" max="10240" step="1" value="${Number(cfg.max_upload_mb)||1024}"></label><label class="workflow-check"><input id="nativeAutosaveEnabled" type="checkbox" ${cfg.autosave_enabled!==false?'checked':''}> Auto-save project changes</label><label>Update channel<select id="nativeUpdateChannel"><option value="stable" ${cfg.update_channel!=='early'?'selected':''}>Stable · GitHub tags/releases only</option><option value="early" ${cfg.update_channel==='early'?'selected':''}>Early release · include latest main packages</option></select></label><p>Stable checks only tagged GitHub releases. Early release also checks the rolling <b>early-main</b> package produced from main.</p><div class="form-actions"><button type="button" onclick="checkNativeAppUpdate(true)">Check for updates</button><button class="accent" onclick="saveNativeSettings()">Save</button></div></div>`);
   }catch(err){toast('Impossibile leggere le impostazioni native: '+err.message)}
 }
 async function saveNativeSettings(){
@@ -1968,10 +2044,31 @@ async function saveNativeSettings(){
   if(!Number.isInteger(value)||value<1||value>10240){toast('Inserisci un valore intero tra 1 e 10240 MB');return}
   try{
     const apiBridge=await waitForNativeApi();if(!apiBridge?.set_native_settings)return toast('Bridge nativo non disponibile');
-    const enabled=$('#nativeAutosaveEnabled')?.checked!==false;const result=await apiBridge.set_native_settings(value,enabled);autosaveEnabled=result.autosave_enabled!==false;if(autosaveEnabled&&projectDirty)markDirty(50);
+    const enabled=$('#nativeAutosaveEnabled')?.checked!==false;const channel=$('#nativeUpdateChannel')?.value==='early'?'early':'stable';const result=await apiBridge.set_native_settings(value,enabled,channel);autosaveEnabled=result.autosave_enabled!==false;if(autosaveEnabled&&projectDirty)markDirty(50);
     closeUtilityModal();toast(`Limite import/upload impostato a ${result.max_upload_mb} MB`);
   }catch(err){toast('Salvataggio impostazioni fallito: '+err.message)}
 }
+
+async function checkNativeAppUpdate(manual=false){
+  if(!currentUser?.native_single_user)return;
+  const bridge=await waitForNativeApi();
+  if(!bridge?.check_for_updates)return;
+  try{
+    const info=await bridge.check_for_updates();
+    if(!info?.ok){if(manual)toast('Controllo aggiornamenti non riuscito: '+(info?.error||'errore sconosciuto'));return}
+    if(!info.available){if(manual)toast(`MTA Audio Editor è aggiornato (${info.current_version})`);return}
+    const channel=info.channel==='early'?'Early release':'Stable';
+    showUtilityModal('Aggiornamento disponibile',`<div class="form-grid"><p><b>${esc(info.latest_version)}</b> è disponibile sul canale ${channel}. Versione installata: ${esc(info.current_version)}.</p><p>${info.asset_name?`Installer: <b>${esc(info.asset_name)}</b>`:'Apri la release GitHub per scegliere il pacchetto.'}</p><div class="form-actions"><button onclick="closeUtilityModal()">Più tardi</button><button class="accent" onclick="installNativeAppUpdate('${esc(info.asset_url)}','${esc(info.asset_name)}','${esc(info.release_url)}')">Aggiorna</button></div></div>`);
+  }catch(err){if(manual)toast('Controllo aggiornamenti fallito: '+err.message)}
+}
+async function installNativeAppUpdate(assetUrl,assetName,releaseUrl){
+  try{
+    const bridge=await waitForNativeApi();
+    if(assetUrl&&bridge?.install_update){toast('Download aggiornamento in corso…');await bridge.install_update(assetUrl,assetName);closeUtilityModal();return}
+    if(releaseUrl)window.open(releaseUrl,'_blank','noopener');
+  }catch(err){toast('Avvio aggiornamento fallito: '+err.message)}
+}
+
 function exposeNativeSettings(){
   const b=$('#nativeSettingsButton');if(b&&window.pywebview?.api)b.hidden=false;
 }

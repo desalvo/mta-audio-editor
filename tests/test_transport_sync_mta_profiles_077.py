@@ -13,9 +13,10 @@ def test_transport_has_go_to_start():
 
 def test_dynamic_playback_buffers_and_realigns():
     assert "function waitForMediaBuffer(" in JS
-    assert "Buffering audio… attendere" in JS
+    assert "Pre-buffer ${tracks.length} tracce… attendere" in JS
     assert "startDynamicSyncMonitor()" in JS
-    assert "Math.abs(drift)>0.018" in JS
+    assert "Math.abs(drift)>0.120" in JS
+    assert "playbackRate=Math.max(.985,Math.min(1.015,1-drift*.20))" in JS
 
 def test_render_follow_has_dedicated_clock():
     assert "renderedMasterAudio" in JS

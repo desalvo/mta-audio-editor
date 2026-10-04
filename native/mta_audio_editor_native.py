@@ -199,7 +199,7 @@ class NativeApi:
         chosen = self.window.create_file_dialog(
             webview.FileDialog.SAVE,
             save_filename=safe_name,
-            file_types=("MTA Audio Editor Project (*.mta-project.zip)",),
+            file_types=("MTA Audio Editor Project (*.zip)",),
         )
         path = self._dialog_path(chosen)
         if path is None:
@@ -295,28 +295,60 @@ class NativeApi:
             except (OSError, ValueError, TypeError, json.JSONDecodeError):
                 pass
         autosave_enabled = True
+        update_channel = "stable"
         if path.is_file():
             try:
-                autosave_enabled = bool(json.loads(path.read_text(encoding="utf-8")).get("autosave_enabled", True))
+                raw = json.loads(path.read_text(encoding="utf-8"))
+                autosave_enabled = bool(raw.get("autosave_enabled", True))
+                from native.update_manager import normalize_channel
+                update_channel = normalize_channel(raw.get("update_channel", "stable"))
             except (OSError, ValueError, TypeError, json.JSONDecodeError):
                 pass
-        return {"max_upload_mb": min(10240, max(1, value)), "autosave_enabled": autosave_enabled}
+        return {
+            "max_upload_mb": min(10240, max(1, value)),
+            "autosave_enabled": autosave_enabled,
+            "update_channel": update_channel,
+        }
 
-    def set_native_settings(self, max_upload_mb: int, autosave_enabled: bool = True) -> dict:
+    def set_native_settings(self, max_upload_mb: int, autosave_enabled: bool = True, update_channel: str = "stable") -> dict:
         value = int(max_upload_mb)
         if not 1 <= value <= 10240:
             raise ValueError("max_upload_mb must be between 1 and 10240")
         root = _data_root()
         root.mkdir(parents=True, exist_ok=True)
+        from native.update_manager import normalize_channel
+        channel = normalize_channel(update_channel)
         (root / "native-settings.json").write_text(
-            json.dumps({"max_upload_mb": value, "autosave_enabled": bool(autosave_enabled)}, indent=2) + "\n", encoding="utf-8"
+            json.dumps({
+                "max_upload_mb": value,
+                "autosave_enabled": bool(autosave_enabled),
+                "update_channel": channel,
+            }, indent=2) + "\n", encoding="utf-8"
         )
         os.environ["MTA_MAX_UPLOAD_MB"] = str(value)
         # app.main is already imported after the embedded server starts; update the
         # live request/upload limit as well as persisting it for the next launch.
         import app.main as app_main
         app_main.MAX_UPLOAD_BYTES = value * 1024 * 1024
-        return {"ok": True, "max_upload_mb": value, "autosave_enabled": bool(autosave_enabled)}
+        return {
+            "ok": True,
+            "max_upload_mb": value,
+            "autosave_enabled": bool(autosave_enabled),
+            "update_channel": channel,
+        }
+
+    def check_for_updates(self) -> dict:
+        from app.version import APP_VERSION
+        from native.update_manager import check_for_update
+        settings = self.get_native_settings()
+        try:
+            return check_for_update(APP_VERSION, settings.get("update_channel", "stable"))
+        except Exception as exc:
+            return {"ok": False, "available": False, "error": str(exc)}
+
+    def install_update(self, asset_url: str, asset_name: str = "") -> dict:
+        from native.update_manager import download_and_launch
+        return download_and_launch(asset_url, asset_name)
 
     def open_project(self) -> dict:
         if self.window is None:
@@ -327,7 +359,7 @@ class NativeApi:
         chosen = self.window.create_file_dialog(
             webview.FileDialog.OPEN,
             allow_multiple=False,
-            file_types=("MTA Audio Editor Project (*.mta-project.zip;*.zip)",),
+            file_types=("MTA Audio Editor Project (*.zip)",),
         )
         path = self._dialog_path(chosen)
         if path is None:

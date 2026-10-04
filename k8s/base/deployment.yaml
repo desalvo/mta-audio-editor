@@ -25,7 +25,7 @@ spec:
       #   kubernetes.io/hostname: worker-01
       containers:
         - name: mta-audio-editor
-          image: desalvo/mta-audio-editor:0.2.0-81
+          image: desalvo/mta-audio-editor:0.2.0-100
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
@@ -49,6 +49,14 @@ spec:
                   optional: true
             - name: MTA_MAX_UPLOAD_MB
               value: "1024"
+            - name: MTA_DEMUCS_MODEL_AUTO_UPDATE
+              value: "true"
+            - name: MTA_DEMUCS_MODEL_UPDATE_INTERVAL_SECONDS
+              value: "21600"
+            - name: MTA_DEMUCS_MODEL_MANIFEST_URL
+              value: "https://github.com/desalvo/mta-audio-editor/releases/download/demucs-models/manifest.json"
+            - name: MTA_DEMUCS_MOBILE_MODEL_DIR
+              value: "/data/projects/.models"
             # Social login is disabled by default. Set the matching *_ENABLED to "true"
             # and populate client credentials in mta-audio-editor-auth.
             - name: MTA_OAUTH_GOOGLE_ENABLED

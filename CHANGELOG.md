@@ -1,3 +1,12 @@
+## 0.2.0-97
+
+- Added native on-device stem separation for iPhone/iPad using Core ML-compatible Demucs models.
+- Added Auto / Local / Server mobile execution modes with automatic server fallback.
+- Added authenticated model provisioning and on-device model compilation/cache.
+- Added chunked 44.1 kHz stereo inference with overlap-add and WAV stem import into the project.
+- Added conservative device-aware Auto stem recommendations and a 12-minute local safety limit.
+- Added `scripts/export_demucs_coreml.py` documenting/exporting the expected Core ML model contract.
+
 ## 0.2.0-81
 
 - Added persistent editable per-track MTA slot assignment in the Track Inspector.

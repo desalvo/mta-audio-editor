@@ -38,3 +38,18 @@ Android produce APK debug e AAB release; iOS produce `.xcarchive.zip` e, con i s
 ## Modalità offline
 
 Le app mobili non incorporano Python/PyTorch/FFmpeg completi; per separazione stems e rendering master è necessario un server raggiungibile.
+
+### Numero di stem configurabile
+La separazione strumenti supporta il parametro **Auto / 2 / 4 / 6 / 8**. Auto è il default. 2 usa il profilo voce/accompagnamento, 4 il profilo standard, 6 il profilo esteso Demucs; 8 richiede un backend con modello 8-stem configurato. Su iPhone e iPad la build corrente delega Demucs al server, quindi lo stesso parametro è disponibile su entrambi i dispositivi senza caricare PyTorch nell’app.
+
+
+## On-device Demucs on iPhone/iPad (0.2.0-97)
+
+The iOS/iPadOS client can now run stem separation locally through Core ML. The mobile workflow exposes **Auto / Local / Server** execution. Auto prefers an installed local model and falls back to server-side Demucs when the requested model is unavailable or the local device constraints are exceeded. Core ML models are provisioned as `demucs-2.mlmodel`, `demucs-4.mlmodel`, `demucs-6.mlmodel`, or `demucs-8.mlmodel` from the configured backend and are compiled/cached in the app's Application Support directory for later offline use.
+
+The local runtime decodes the selected audio on-device, converts it to stereo 44.1 kHz Float32 PCM, processes fixed-size overlapping chunks through Core ML using all available compute units (CPU/GPU/Neural Engine where Core ML supports them), overlap-adds the results, writes WAV stems, and uploads the resulting tracks into the current project. The current local safety limit is **12 minutes per source file**; longer material falls back to the server in Auto mode. On iPhone, Auto is intentionally more conservative than on iPad because of memory/thermal constraints.
+
+Server administrators can expose compatible Core ML Demucs models by mounting a directory and setting `MTA_DEMUCS_COREML_MODEL_DIR`. The optional `scripts/export_demucs_coreml.py` utility documents the model contract expected by the app. Model conversion is a release-engineering step and must be validated for each Demucs architecture before publishing a model.
+
+## Aggiornamento periodico modelli Demucs
+Su iPhone/iPad e Android la preferenza **Update solo con Wi-Fi** e attiva per default. Ogni 6 ore, e all avvio, il client verifica il catalogo del server e scarica solo i modelli con SHA-256 diverso. Disabilitando lo switch sono consentiti anche i download via rete cellulare. Il server Docker/Kubernetes aggiorna a sua volta il repository locale dei modelli da un manifest HTTPS configurabile.

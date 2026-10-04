@@ -21,5 +21,5 @@ p,li{orphans:3;widows:3}
   .step{break-inside:avoid;page-break-inside:avoid}
 }
 
-.cover-fullpage{padding:0!important;margin:0 0 18px 0!important;display:block;break-after:page;page-break-after:always;overflow:hidden;background:white!important}
-.cover-full-img{display:block;width:100%;height:auto;max-width:100%;max-height:none;object-fit:contain;object-position:center top}
+.cover-fullpage{page:cover!important;position:relative!important;width:210mm!important;height:297mm!important;min-height:297mm!important;padding:0!important;margin:0!important;overflow:hidden!important;display:block!important;break-after:page!important;page-break-after:always!important;background:white!important}
+.cover-full-img{position:absolute!important;inset:0!important;display:block!important;width:210mm!important;height:297mm!important;max-width:none!important;max-height:none!important;object-fit:fill!important;object-position:center center!important;margin:0!important;padding:0!important}

@@ -20,6 +20,10 @@ from .audio_engine import auto_align_ms, delete_range, delete_song_range, ensure
 from .codec import export_mta, ffprobe, import_mta, resolve_mta_device_profile, suggested_slots, validate_slot_mapping
 from .models import AutoMixRequest, Clip, CustomPresetRequest, DeleteRangeRequest, MoveTrackRequest, MtaExportRequest, Project, ProjectExportRequest, Track
 from .plugins import STEM_SPLITTER, delete_user_preset, plugin_manifest, save_user_preset
+
+from .model_updater import COREML_DIR, ONNX_DIR, start_background_updater, update_once as update_mobile_demucs_models
+COREML_DEMUCS_MODEL_DIR = Path(os.getenv("MTA_DEMUCS_COREML_MODEL_DIR", str(COREML_DIR))).expanduser()
+ONNX_DEMUCS_MODEL_DIR = Path(os.getenv("MTA_DEMUCS_ONNX_MODEL_DIR", str(ONNX_DIR))).expanduser()
 from .security import auth_failure_response, check_basic_auth
 from .auth import (
     authenticate, begin_totp, confirm_email, create_session, delete_session, disable_totp,
@@ -52,6 +56,10 @@ from .storage import (
 from .version import APP_VERSION, BUILD_ID, CREATOR, REPOSITORY
 
 app = FastAPI(title="MTA Audio Editor", version=APP_VERSION, docs_url=None, redoc_url=None, openapi_url=None)
+
+@app.on_event("startup")
+def _start_demucs_model_updater():
+    start_background_updater()
 LOGGER = logging.getLogger(__name__)
 BASE = Path(__file__).parent
 MAX_UPLOAD_BYTES = int(os.getenv("MTA_MAX_UPLOAD_MB", "1024")) * 1024 * 1024
@@ -1590,6 +1598,101 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
             _stem_job_update(job_id, status="failed", progress=0, message="Separazione fallita", error=str(exc)[-1200:])
 
 
+
+@app.get("/api/mobile/demucs-coreml/status")
+def mobile_demucs_coreml_status(request: Request):
+    _actor(request)
+    available: list[int] = []
+    models: dict[str, dict[str, object]] = {}
+    if COREML_DEMUCS_MODEL_DIR.is_dir():
+        for count in (2, 4, 6, 8):
+            model = COREML_DEMUCS_MODEL_DIR / f"demucs-{count}.mlmodel"
+            if model.is_file():
+                payload = model.read_bytes()
+                available.append(count)
+                models[str(count)] = {
+                    "stem_count": count,
+                    "filename": model.name,
+                    "sha256": hashlib.sha256(payload).hexdigest(),
+                    "size": len(payload),
+                    "updated_at": int(model.stat().st_mtime),
+                    "url": f"/api/mobile/demucs-coreml/models/{count}",
+                }
+    return {
+        "available_stem_counts": available,
+        "default_stem_count": 4,
+        "models": models,
+        "format": "CoreML mlmodel",
+        "runtime": "on-device",
+    }
+
+
+@app.get("/api/mobile/demucs-coreml/bootstrap")
+def mobile_demucs_coreml_bootstrap():
+    """Public baseline model used to bootstrap iOS/iPadOS local separation.
+
+    Only the configured 4-stem baseline is exposed here. Server-side model
+    inventory and optional 2/6/8-stem models remain authenticated.
+    """
+    if not COREML_DEMUCS_MODEL_DIR:
+        raise HTTPException(404, "Repository modelli Core ML non configurato")
+    model = COREML_DEMUCS_MODEL_DIR / "demucs-4.mlmodel"
+    if not model.is_file():
+        raise HTTPException(404, "Modello locale predefinito non disponibile")
+    digest = hashlib.sha256(model.read_bytes()).hexdigest()
+    return FileResponse(
+        model,
+        media_type="application/octet-stream",
+        filename="demucs-default-4.mlmodel",
+        headers={"X-MTA-Model-SHA256": digest, "Cache-Control": "public, max-age=3600"},
+    )
+
+
+@app.get("/api/mobile/demucs-coreml/models/{stem_count}")
+def mobile_demucs_coreml_model(stem_count: int, request: Request):
+    _actor(request)
+    if stem_count not in {2, 4, 6, 8}:
+        raise HTTPException(404, "Modello locale non disponibile")
+    if not COREML_DEMUCS_MODEL_DIR:
+        raise HTTPException(404, "Repository modelli Core ML non configurato")
+    model = COREML_DEMUCS_MODEL_DIR / f"demucs-{stem_count}.mlmodel"
+    if not model.is_file():
+        raise HTTPException(404, "Modello locale non disponibile")
+    return FileResponse(model, media_type="application/octet-stream", filename=model.name)
+
+
+@app.get("/api/mobile/demucs-onnx/status")
+def mobile_demucs_onnx_status(request: Request):
+    _actor(request)
+    models={}; available=[]
+    if ONNX_DEMUCS_MODEL_DIR.is_dir():
+        for count in (2,4,6,8):
+            model=ONNX_DEMUCS_MODEL_DIR/f"demucs-{count}.onnx"
+            if model.is_file():
+                payload=model.read_bytes(); available.append(count)
+                models[str(count)]={"stem_count":count,"filename":model.name,"sha256":hashlib.sha256(payload).hexdigest(),"size":len(payload),"updated_at":int(model.stat().st_mtime),"url":f"/api/mobile/demucs-onnx/models/{count}"}
+    return {"available_stem_counts":available,"default_stem_count":4,"models":models,"format":"ONNX","runtime":"on-device"}
+
+@app.get("/api/mobile/demucs-onnx/bootstrap")
+def mobile_demucs_onnx_bootstrap():
+    model=ONNX_DEMUCS_MODEL_DIR/"demucs-4.onnx"
+    if not model.is_file(): raise HTTPException(404,"Modello Android locale predefinito non disponibile")
+    digest=hashlib.sha256(model.read_bytes()).hexdigest()
+    return FileResponse(model,media_type="application/octet-stream",filename="demucs-default-4.onnx",headers={"X-MTA-Model-SHA256":digest,"Cache-Control":"public, max-age=3600"})
+
+@app.get("/api/mobile/demucs-onnx/models/{stem_count}")
+def mobile_demucs_onnx_model(stem_count:int,request:Request):
+    _actor(request)
+    if stem_count not in {2,4,6,8}: raise HTTPException(404,"Modello locale non disponibile")
+    model=ONNX_DEMUCS_MODEL_DIR/f"demucs-{stem_count}.onnx"
+    if not model.is_file(): raise HTTPException(404,"Modello locale non disponibile")
+    return FileResponse(model,media_type="application/octet-stream",filename=model.name)
+
+@app.post("/api/admin/demucs-mobile-models/update")
+def admin_update_demucs_mobile_models(request:Request):
+    require_admin(request)
+    return update_mobile_demucs_models()
+
 @app.post("/api/stems/jobs")
 async def stem_job_start(
     request: Request,
@@ -1598,6 +1701,7 @@ async def stem_job_start(
     project_title: str = "",
     target: str = "MTA8",
     model: str = "htdemucs_6s",
+    stem_count: int = 0,
     keep_original_track: bool = True,
 ):
     if Path(file.filename or "").suffix.lower() != ".mp3":
@@ -1605,6 +1709,16 @@ async def stem_job_start(
     if not STEM_SPLITTER.available():
         raise HTTPException(503, "Il plugin Demucs non è installato in questo runtime.")
     status = STEM_SPLITTER.status()
+    if stem_count not in {0, 2, 4, 6, 8}:
+        raise HTTPException(400, "Numero di stem non supportato. Usa Auto, 2, 4, 6 oppure 8.")
+    if stem_count == 8 and 8 not in status.get("supported_stem_counts", []):
+        raise HTTPException(400, "La separazione a 8 stem richiede un backend con modello 8-stem configurato.")
+    if stem_count == 6:
+        model = "htdemucs_6s"
+    elif stem_count in {2, 4} and model == "htdemucs_6s":
+        model = "htdemucs"
+    elif stem_count == 8 and status.get("extended_8_model"):
+        model = str(status["extended_8_model"])
     if model not in status["models"]:
         raise HTTPException(400, "Modello Demucs non supportato.")
 
@@ -1683,6 +1797,7 @@ async def stem_job_start(
         "progress": 5,
         "message": "Brano importato e progetto salvato",
         "model": model,
+        "stem_count": stem_count,
         "filename": Path(file.filename or original.name).name,
         "created_at": now,
         "updated_at": now,
@@ -1791,10 +1906,22 @@ def start_track_stem_job(
     track_id: str,
     request: Request,
     model: str = "htdemucs_6s",
+    stem_count: int = 0,
 ):
     project = _project_for_actor(request, pid)
     if not STEM_SPLITTER.available():
         raise HTTPException(503, "Demucs stem plugin is not installed in this runtime")
+    stem_status = STEM_SPLITTER.status()
+    if stem_count not in {0, 2, 4, 6, 8}:
+        raise HTTPException(400, "Unsupported stem count")
+    if stem_count == 8 and 8 not in stem_status.get("supported_stem_counts", []):
+        raise HTTPException(400, "8-stem separation requires a compatible backend model")
+    if stem_count == 6:
+        model = "htdemucs_6s"
+    elif stem_count in {2, 4} and model == "htdemucs_6s":
+        model = "htdemucs"
+    elif stem_count == 8 and stem_status.get("extended_8_model"):
+        model = str(stem_status["extended_8_model"])
     status = STEM_SPLITTER.status()
     if model not in status["models"]:
         raise HTTPException(400, "Modello Demucs non supportato.")

@@ -1,16 +1,28 @@
 import UIKit
 import WebKit
 import UniformTypeIdentifiers
+import Network
 
 final class MobileWebViewController: UIViewController, WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler, UIDocumentPickerDelegate {
     private enum Defaults {
         static let serverURL = "mta.server.url"
         static let defaultServerURL = "https://mta-audio-editor.apps.desalvo.eu"
+        static let localStemMode = "mta.local.stems.mode"
+        static let modelUpdatesWifiOnly = "mta.demucs.modelUpdatesWifiOnly"
+        static let lastModelUpdateCheck = "mta.demucs.lastModelUpdateCheck"
     }
 
     private var webView: WKWebView!
     private var openPanelCompletion: (([URL]?) -> Void)?
     private var pendingExportTempURL: URL?
+    private var lastPickedAudioURL: URL?
+    private var activeLocalStemTask = false
+    private var didOfferAppUpdate = false
+    private var modelRefreshInFlight = false
+    private let pathMonitor = NWPathMonitor()
+    private let pathQueue = DispatchQueue(label: "mta.network.path")
+    private var networkPath: NWPath?
+    private var modelRefreshTimer: Timer?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -18,13 +30,27 @@ final class MobileWebViewController: UIViewController, WKNavigationDelegate, WKU
         view.backgroundColor = .systemBackground
         configureNavigation()
         configureWebView()
+        if UserDefaults.standard.object(forKey: Defaults.modelUpdatesWifiOnly) == nil { UserDefaults.standard.set(true, forKey: Defaults.modelUpdatesWifiOnly) }
+        pathMonitor.pathUpdateHandler = { [weak self] path in self?.networkPath = path }
+        pathMonitor.start(queue: pathQueue)
+        _ = LocalStemEngine.shared.installBundledDefaultModelIfNeeded()
+        modelRefreshTimer = Timer.scheduledTimer(withTimeInterval: 21600, repeats: true) { [weak self] _ in self?.refreshCoreMLModelsIfNeeded() }
 
         let custom = UserDefaults.standard.string(forKey: Defaults.serverURL)
         loadServer((custom?.isEmpty == false ? custom : nil) ?? Defaults.defaultServerURL)
     }
 
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        if !didOfferAppUpdate {
+            didOfferAppUpdate = true
+            checkForAppUpdate(manual: false)
+        }
+    }
+
     private func configureNavigation() {
         navigationItem.rightBarButtonItems = [
+            UIBarButtonItem(title: "Options", style: .plain, target: self, action: #selector(showOptions)),
             UIBarButtonItem(title: "Server", style: .plain, target: self, action: #selector(changeServer)),
             UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(reloadPage))
         ]
@@ -35,19 +61,24 @@ final class MobileWebViewController: UIViewController, WKNavigationDelegate, WKU
         controller.add(self, name: "mtaMobile")
         let bridge = """
         window.MtaMobile = {
+          _callbacks: {},
+          _request: function(action, payload){
+            return new Promise((resolve,reject)=>{
+              const id='mta-'+Date.now()+'-'+Math.random().toString(16).slice(2);
+              this._callbacks[id]={resolve:resolve,reject:reject};
+              window.webkit.messageHandlers.mtaMobile.postMessage(Object.assign({action:action,requestId:id},payload||{}));
+            });
+          },
+          _resolve: function(id, payload){ const cb=this._callbacks[id]; if(!cb)return; delete this._callbacks[id]; cb.resolve(payload); },
+          _reject: function(id, message){ const cb=this._callbacks[id]; if(!cb)return; delete this._callbacks[id]; cb.reject(new Error(message||'Errore mobile')); },
           getPlatform: function(){ return 'ios'; },
-          saveRemoteFile: function(url, filename, mime){
-            window.webkit.messageHandlers.mtaMobile.postMessage({action:'saveRemoteFile',url:url,filename:filename,mime:mime});
-          },
-          shareRemoteFile: function(url, filename, mime){
-            window.webkit.messageHandlers.mtaMobile.postMessage({action:'shareRemoteFile',url:url,filename:filename,mime:mime});
-          },
-          configureServer: function(){
-            window.webkit.messageHandlers.mtaMobile.postMessage({action:'configureServer'});
-          },
-          setBusy: function(value){
-            window.webkit.messageHandlers.mtaMobile.postMessage({action:'setBusy',value:!!value});
-          }
+          saveRemoteFile: function(url, filename, mime){ window.webkit.messageHandlers.mtaMobile.postMessage({action:'saveRemoteFile',url:url,filename:filename,mime:mime}); },
+          shareRemoteFile: function(url, filename, mime){ window.webkit.messageHandlers.mtaMobile.postMessage({action:'shareRemoteFile',url:url,filename:filename,mime:mime}); },
+          configureServer: function(){ window.webkit.messageHandlers.mtaMobile.postMessage({action:'configureServer'}); },
+          setBusy: function(value){ window.webkit.messageHandlers.mtaMobile.postMessage({action:'setBusy',value:!!value}); },
+          localStemCapabilities: function(){ return this._request('localStemCapabilities',{}); },
+          startLocalStemSeparation: function(projectId,stemCount,keepOriginal){ return this._request('startLocalStemSeparation',{projectId:projectId,stemCount:stemCount,keepOriginal:!!keepOriginal}); },
+          cancelLocalStemSeparation: function(){ window.webkit.messageHandlers.mtaMobile.postMessage({action:'cancelLocalStemSeparation'}); }
         };
         """
         controller.addUserScript(WKUserScript(source: bridge, injectionTime: .atDocumentStart, forMainFrameOnly: true))
@@ -61,7 +92,7 @@ final class MobileWebViewController: UIViewController, WKNavigationDelegate, WKU
         webView = WKWebView(frame: .zero, configuration: configuration)
         webView.navigationDelegate = self
         webView.uiDelegate = self
-        webView.customUserAgent = "MTAEditorMobile/0.2.0-81 iOS"
+        webView.customUserAgent = "MTAEditorMobile/0.2.0-100 iOS"
         webView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(webView)
         NSLayoutConstraint.activate([
@@ -74,6 +105,65 @@ final class MobileWebViewController: UIViewController, WKNavigationDelegate, WKU
 
     @objc private func reloadPage() { webView.reload() }
     @objc private func changeServer() { promptServerURL(required: false) }
+
+    @objc private func showOptions() {
+        let alert = UIAlertController(title: "Options", message: "Update channel: \(NativeUpdateManager.shared.channel == "early" ? "Early release" : "Stable")", preferredStyle: .actionSheet)
+        alert.addAction(UIAlertAction(title: "Stable · tags/releases", style: .default) { _ in
+            NativeUpdateManager.shared.channel = "stable"
+            self.checkForAppUpdate(manual: true)
+        })
+        alert.addAction(UIAlertAction(title: "Early release · include main", style: .default) { _ in
+            NativeUpdateManager.shared.channel = "early"
+            self.checkForAppUpdate(manual: true)
+        })
+        alert.addAction(UIAlertAction(title: "Demucs model updates…", style: .default) { _ in self.showDemucsUpdatePreferences() })
+        alert.addAction(UIAlertAction(title: "Check for updates", style: .default) { _ in self.checkForAppUpdate(manual: true) })
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        if let popover = alert.popoverPresentationController { popover.barButtonItem = navigationItem.rightBarButtonItems?.first }
+        present(alert, animated: true)
+    }
+
+    private func showDemucsUpdatePreferences() {
+        let italian = Locale.current.language.languageCode?.identifier.lowercased() == "it"
+        let alert = UIAlertController(title: italian ? "Aggiornamento modelli Demucs" : "Demucs model updates", message: "\n\n", preferredStyle: .alert)
+        let label = UILabel(); label.translatesAutoresizingMaskIntoConstraints = false
+        label.text = italian ? "Update solo con Wi-Fi" : "Update on Wi-Fi only"
+        label.font = .preferredFont(forTextStyle: .body)
+        let toggle = UISwitch(); toggle.translatesAutoresizingMaskIntoConstraints = false
+        toggle.isOn = UserDefaults.standard.object(forKey: Defaults.modelUpdatesWifiOnly) == nil ? true : UserDefaults.standard.bool(forKey: Defaults.modelUpdatesWifiOnly)
+        alert.view.addSubview(label); alert.view.addSubview(toggle)
+        NSLayoutConstraint.activate([
+            label.leadingAnchor.constraint(equalTo: alert.view.leadingAnchor, constant: 24),
+            label.topAnchor.constraint(equalTo: alert.view.topAnchor, constant: 74),
+            toggle.trailingAnchor.constraint(equalTo: alert.view.trailingAnchor, constant: -24),
+            toggle.centerYAnchor.constraint(equalTo: label.centerYAnchor)
+        ])
+        alert.addAction(UIAlertAction(title: italian ? "Salva" : "Save", style: .default) { _ in
+            UserDefaults.standard.set(toggle.isOn, forKey: Defaults.modelUpdatesWifiOnly)
+            if !toggle.isOn { self.refreshCoreMLModelsIfNeeded() }
+        })
+        alert.addAction(UIAlertAction(title: italian ? "Annulla" : "Cancel", style: .cancel))
+        present(alert, animated: true)
+    }
+
+    private func checkForAppUpdate(manual: Bool) {
+        NativeUpdateManager.shared.check { [weak self] result in
+            guard let self else { return }
+            switch result {
+            case .failure(let error):
+                if manual { self.showMessage("Update check failed", error.localizedDescription) }
+            case .success(let info):
+                if !info.available {
+                    if manual { self.showMessage("No updates", "Installed version \(info.currentVersion) is current on the \(info.channel) channel.") }
+                    return
+                }
+                let prompt = UIAlertController(title: "Update available", message: "MTA Audio Editor \(info.latestVersion) is available on the \(info.channel) channel. iOS/iPadOS requires installation through the authorized distribution flow (TestFlight/App Store or managed distribution).", preferredStyle: .alert)
+                prompt.addAction(UIAlertAction(title: "Later", style: .cancel))
+                prompt.addAction(UIAlertAction(title: "Open update", style: .default) { _ in UIApplication.shared.open(info.releaseURL) })
+                self.present(prompt, animated: true)
+            }
+        }
+    }
 
     private func promptServerURL(required: Bool) {
         let alert = UIAlertController(
@@ -127,9 +217,35 @@ final class MobileWebViewController: UIViewController, WKNavigationDelegate, WKU
         return value
     }
 
+    private func mayDownloadModelUpdate() -> Bool {
+        let wifiOnly = UserDefaults.standard.object(forKey: Defaults.modelUpdatesWifiOnly) == nil ? true : UserDefaults.standard.bool(forKey: Defaults.modelUpdatesWifiOnly)
+        guard wifiOnly else { return networkPath?.status == .satisfied }
+        return networkPath?.status == .satisfied && networkPath?.usesInterfaceType(.wifi) == true
+    }
+
     private func loadServer(_ base: String) {
         guard let url = URL(string: base + "/") else { return }
         webView.load(URLRequest(url: url, cachePolicy: .reloadRevalidatingCacheData))
+        bootstrapDefaultCoreMLModelIfNeeded(base: base)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) { [weak self] in self?.refreshCoreMLModelsIfNeeded() }
+    }
+
+    private func bootstrapDefaultCoreMLModelIfNeeded(base: String) {
+        if LocalStemEngine.shared.isModelInstalled(stemCount: 4) { return }
+        guard mayDownloadModelUpdate() else { return }
+        if LocalStemEngine.shared.installBundledDefaultModelIfNeeded() { return }
+        guard let endpoint = URL(string: base + "/api/mobile/demucs-coreml/bootstrap") else { return }
+        URLSession.shared.downloadTask(with: endpoint) { location, response, _ in
+            guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode), let location else { return }
+            do {
+                let temp = FileManager.default.temporaryDirectory.appendingPathComponent("demucs-bootstrap-\(UUID().uuidString).mlmodel")
+                try? FileManager.default.removeItem(at: temp)
+                try FileManager.default.copyItem(at: location, to: temp)
+                let fingerprint = http.value(forHTTPHeaderField: "X-MTA-Model-SHA256") ?? ""
+                try LocalStemEngine.shared.installDownloadedModel(temp, stemCount: 4, fingerprint: fingerprint)
+                try? FileManager.default.removeItem(at: temp)
+            } catch { }
+        }.resume()
     }
 
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
@@ -162,6 +278,7 @@ final class MobileWebViewController: UIViewController, WKNavigationDelegate, WKU
     }
 
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+        if let first = urls.first { lastPickedAudioURL = first }
         if let completion = openPanelCompletion {
             openPanelCompletion = nil
             completion(urls)
@@ -189,9 +306,264 @@ final class MobileWebViewController: UIViewController, WKNavigationDelegate, WKU
             promptServerURL(required: false)
         case "setBusy":
             UIApplication.shared.isIdleTimerDisabled = (payload["value"] as? Bool) ?? false
+        case "localStemCapabilities":
+            replyLocalStemCapabilities(requestId: payload["requestId"] as? String)
+        case "startLocalStemSeparation":
+            guard let requestId = payload["requestId"] as? String,
+                  let projectId = payload["projectId"] as? String else { return }
+            let requested = payload["stemCount"] as? Int ?? 0
+            let keepOriginal = payload["keepOriginal"] as? Bool ?? true
+            startLocalStemSeparation(requestId: requestId, projectId: projectId, requestedStemCount: requested, keepOriginal: keepOriginal)
+        case "cancelLocalStemSeparation":
+            LocalStemEngine.shared.cancel()
         default:
             break
         }
+    }
+
+    private func evaluateMobileCallback(_ javascript: String) {
+        DispatchQueue.main.async { [weak self] in self?.webView.evaluateJavaScript(javascript) }
+    }
+
+    private func replyLocalStemCapabilities(requestId: String?) {
+        guard let requestId else { return }
+        let caps = LocalStemEngine.shared.capabilities()
+        let installed = caps.installedStemCounts.map(String.init).joined(separator: ",")
+        let canRun = caps.canRunLocally ? "true" : "false"
+        let json = "{installedStemCounts:[\(installed)],recommendedStemCount:\(caps.recommendedStemCount),physicalMemoryBytes:\(caps.physicalMemoryBytes),canRunLocally:\(canRun)}"
+        evaluateMobileCallback("window.MtaMobile._resolve('\(requestId)',\(json));")
+    }
+
+    private func startLocalStemSeparation(requestId: String, projectId: String, requestedStemCount: Int, keepOriginal: Bool) {
+        guard !activeLocalStemTask else {
+            evaluateMobileCallback("window.MtaMobile._reject('\(requestId)','È già in corso una separazione locale.');")
+            return
+        }
+        guard let input = lastPickedAudioURL else {
+            evaluateMobileCallback("window.MtaMobile._reject('\(requestId)','Seleziona prima un file audio dal dispositivo.');")
+            return
+        }
+        let caps = LocalStemEngine.shared.capabilities()
+        let selected = requestedStemCount == 0 ? caps.recommendedStemCount : requestedStemCount
+        guard LocalStemEngine.supportedStemCounts.contains(selected) else {
+            evaluateMobileCallback("window.MtaMobile._reject('\(requestId)','Numero stem locale non supportato.');")
+            return
+        }
+        activeLocalStemTask = true
+        UIApplication.shared.isIdleTimerDisabled = true
+        ensureLocalModel(stemCount: selected) { [weak self] modelResult in
+            guard let self else { return }
+            switch modelResult {
+            case .failure(let error):
+                self.activeLocalStemTask = false
+                UIApplication.shared.isIdleTimerDisabled = false
+                self.evaluateMobileCallback("window.MtaMobile._reject('\(requestId)','\(self.jsEscaped(error.localizedDescription))');")
+            case .success:
+                self.LocalStemStart(input: input, projectId: projectId, stemCount: selected, keepOriginal: keepOriginal, requestId: requestId)
+            }
+        }
+    }
+
+    private func LocalStemStart(input: URL, projectId: String, stemCount: Int, keepOriginal: Bool, requestId: String) {
+        let beginInference = { [weak self] in
+            guard let self else { return }
+            let scoped = input.startAccessingSecurityScopedResource()
+            LocalStemEngine.shared.separate(inputURL: input, stemCount: stemCount, progress: { [weak self] pct, message in
+                guard let self else { return }
+                let safe = self.jsEscaped(message)
+                self.evaluateMobileCallback("window.dispatchEvent(new CustomEvent('mtaLocalStemProgress',{detail:{progress:\(pct),message:'\(safe)'}}));")
+            }) { [weak self] result in
+                if scoped { input.stopAccessingSecurityScopedResource() }
+                guard let self else { return }
+                switch result {
+                case .failure(let error):
+                    self.activeLocalStemTask = false
+                    UIApplication.shared.isIdleTimerDisabled = false
+                    self.evaluateMobileCallback("window.MtaMobile._reject('\(requestId)','\(self.jsEscaped(error.localizedDescription))');")
+                case .success(let files):
+                    self.uploadStemFiles(files, projectId: projectId, index: 0) { uploadResult in
+                        if let directory = files.first?.deletingLastPathComponent() { try? FileManager.default.removeItem(at: directory) }
+                        self.activeLocalStemTask = false
+                        UIApplication.shared.isIdleTimerDisabled = false
+                        switch uploadResult {
+                        case .failure(let error):
+                            self.evaluateMobileCallback("window.MtaMobile._reject('\(requestId)','\(self.jsEscaped(error.localizedDescription))');")
+                        case .success:
+                            self.evaluateMobileCallback("window.MtaMobile._resolve('\(requestId)',{ok:true,stemCount:\(stemCount)});")
+                        }
+                    }
+                }
+            }
+        }
+        let afterOriginalPreserved = { [weak self] in
+            guard let self else { return }
+            if keepOriginal {
+                self.uploadProjectTrack(fileURL: input, projectId: projectId, name: "Original Mix", type: "other") { result in
+                    switch result {
+                    case .success: beginInference()
+                    case .failure(let error):
+                        self.activeLocalStemTask = false
+                        UIApplication.shared.isIdleTimerDisabled = false
+                        self.evaluateMobileCallback("window.MtaMobile._reject('\(requestId)','\(self.jsEscaped(error.localizedDescription))');")
+                    }
+                }
+            } else {
+                beginInference()
+            }
+        }
+        uploadProjectOriginal(fileURL: input, projectId: projectId) { [weak self] result in
+            switch result {
+            case .success: afterOriginalPreserved()
+            case .failure(let error):
+                self?.activeLocalStemTask = false
+                UIApplication.shared.isIdleTimerDisabled = false
+                self?.evaluateMobileCallback("window.MtaMobile._reject('\(requestId)','\(self?.jsEscaped(error.localizedDescription) ?? "Salvataggio originale fallito")');")
+            }
+        }
+    }
+
+    private func refreshCoreMLModelsIfNeeded() {
+        guard mayDownloadModelUpdate() else { return }
+        guard !modelRefreshInFlight, let base = webView.url else { return }
+        modelRefreshInFlight = true
+        let endpoint = URL(string: "/api/mobile/demucs-coreml/status", relativeTo: base)!.absoluteURL
+        authenticatedRequest(url: endpoint, method: "GET") { [weak self] request in
+            URLSession.shared.dataTask(with: request) { data, response, _ in
+                guard let self else { return }
+                defer { DispatchQueue.main.async { self.modelRefreshInFlight = false } }
+                guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode), let data,
+                      let root = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                      let models = root["models"] as? [String: [String: Any]] else { return }
+                let defaultCount = root["default_stem_count"] as? Int ?? 4
+                let installed = Set(LocalStemEngine.shared.installedStemCounts())
+                var wanted = installed
+                wanted.insert(defaultCount)
+                let semaphore = DispatchSemaphore(value: 0)
+                for count in wanted.sorted() {
+                    guard let remote = models[String(count)], let sha = remote["sha256"] as? String, !sha.isEmpty else { continue }
+                    if LocalStemEngine.shared.isModelInstalled(stemCount: count), LocalStemEngine.shared.modelFingerprint(stemCount: count) == sha { continue }
+                    self.downloadAndInstallCoreMLModel(stemCount: count, fingerprint: sha) { _ in semaphore.signal() }
+                    _ = semaphore.wait(timeout: .now() + 180)
+                }
+            }.resume()
+        }
+    }
+
+    private func downloadAndInstallCoreMLModel(stemCount: Int, fingerprint: String = "", completion: @escaping (Result<Void, Error>) -> Void) {
+        guard let base = webView.url else { completion(.failure(LocalStemError.modelMissing(stemCount))); return }
+        let endpoint = URL(string: "/api/mobile/demucs-coreml/models/\(stemCount)", relativeTo: base)!.absoluteURL
+        authenticatedRequest(url: endpoint, method: "GET") { request in
+            URLSession.shared.downloadTask(with: request) { location, response, error in
+                if let error { DispatchQueue.main.async { completion(.failure(error)) }; return }
+                guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode), let location else {
+                    DispatchQueue.main.async { completion(.failure(LocalStemError.modelMissing(stemCount))) }; return
+                }
+                do {
+                    let temp = FileManager.default.temporaryDirectory.appendingPathComponent("demucs-\(stemCount)-\(UUID().uuidString).mlmodel")
+                    try? FileManager.default.removeItem(at: temp)
+                    try FileManager.default.copyItem(at: location, to: temp)
+                    try LocalStemEngine.shared.installDownloadedModel(temp, stemCount: stemCount, fingerprint: fingerprint)
+                    try? FileManager.default.removeItem(at: temp)
+                    DispatchQueue.main.async { completion(.success(())) }
+                } catch { DispatchQueue.main.async { completion(.failure(error)) } }
+            }.resume()
+        }
+    }
+
+    private func ensureLocalModel(stemCount: Int, completion: @escaping (Result<Void, Error>) -> Void) {
+        if LocalStemEngine.shared.isModelInstalled(stemCount: stemCount) { completion(.success(())); return }
+        if stemCount == 4, LocalStemEngine.shared.installBundledDefaultModelIfNeeded() { completion(.success(())); return }
+        downloadAndInstallCoreMLModel(stemCount: stemCount, completion: completion)
+    }
+
+    private func uploadStemFiles(_ files: [URL], projectId: String, index: Int, completion: @escaping (Result<Void, Error>) -> Void) {
+        if index >= files.count { completion(.success(())); return }
+        let file = files[index]
+        let raw = file.deletingPathExtension().lastPathComponent.lowercased()
+        let stem = raw.replacingOccurrences(of: "^\\d+-", with: "", options: .regularExpression)
+        let typeMap = ["drums":"drums","bass":"bass","guitar":"guitars","piano":"keyboards","vocals":"melody","accompaniment":"other","other":"other"]
+        uploadProjectTrack(fileURL: file, projectId: projectId, name: stem.capitalized, type: typeMap[stem] ?? "other") { [weak self] result in
+            switch result {
+            case .failure: completion(result)
+            case .success: self?.uploadStemFiles(files, projectId: projectId, index: index + 1, completion: completion)
+            }
+        }
+    }
+
+    private func uploadProjectOriginal(fileURL: URL, projectId: String, completion: @escaping (Result<Void, Error>) -> Void) {
+        guard let base = webView.url else { completion(.failure(URLError(.badURL))); return }
+        guard let url = URL(string: "/api/projects/\(projectId)/files/upload", relativeTo: base)?.absoluteURL else {
+            completion(.failure(URLError(.badURL))); return
+        }
+        authenticatedRequest(url: url, method: "POST") { request in
+            var request = request
+            let boundary = "Boundary-\(UUID().uuidString)"
+            request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+            request.setValue("1", forHTTPHeaderField: "X-MTA-Request")
+            do {
+                let data = try Data(contentsOf: fileURL, options: .mappedIfSafe)
+                var body = Data()
+                body.append("--\(boundary)\r\n".data(using: .utf8)!)
+                body.append("Content-Disposition: form-data; name=\"file\"; filename=\"\(fileURL.lastPathComponent)\"\r\n".data(using: .utf8)!)
+                body.append("Content-Type: application/octet-stream\r\n\r\n".data(using: .utf8)!)
+                body.append(data)
+                body.append("\r\n--\(boundary)--\r\n".data(using: .utf8)!)
+                request.httpBody = body
+            } catch { completion(.failure(error)); return }
+            URLSession.shared.dataTask(with: request) { _, response, error in
+                if let error { DispatchQueue.main.async { completion(.failure(error)) }; return }
+                guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
+                    DispatchQueue.main.async { completion(.failure(URLError(.badServerResponse))) }; return
+                }
+                DispatchQueue.main.async { completion(.success(())) }
+            }.resume()
+        }
+    }
+
+    private func uploadProjectTrack(fileURL: URL, projectId: String, name: String, type: String, completion: @escaping (Result<Void, Error>) -> Void) {
+        guard let base = webView.url else { completion(.failure(URLError(.badURL))); return }
+        var components = URLComponents(url: URL(string: "/api/projects/\(projectId)/tracks", relativeTo: base)!.absoluteURL, resolvingAgainstBaseURL: true)!
+        components.queryItems = [URLQueryItem(name: "name", value: name), URLQueryItem(name: "type", value: type)]
+        guard let url = components.url else { completion(.failure(URLError(.badURL))); return }
+        authenticatedRequest(url: url, method: "POST") { request in
+            var request = request
+            let boundary = "Boundary-\(UUID().uuidString)"
+            request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+            request.setValue("1", forHTTPHeaderField: "X-MTA-Request")
+            do {
+                let data = try Data(contentsOf: fileURL, options: .mappedIfSafe)
+                var body = Data()
+                body.append("--\(boundary)\r\n".data(using: .utf8)!)
+                body.append("Content-Disposition: form-data; name=\"file\"; filename=\"\(fileURL.lastPathComponent)\"\r\n".data(using: .utf8)!)
+                body.append("Content-Type: audio/wav\r\n\r\n".data(using: .utf8)!)
+                body.append(data)
+                body.append("\r\n--\(boundary)--\r\n".data(using: .utf8)!)
+                request.httpBody = body
+            } catch { completion(.failure(error)); return }
+            URLSession.shared.dataTask(with: request) { _, response, error in
+                if let error { DispatchQueue.main.async { completion(.failure(error)) }; return }
+                guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
+                    DispatchQueue.main.async { completion(.failure(URLError(.badServerResponse))) }
+                    return
+                }
+                DispatchQueue.main.async { completion(.success(())) }
+            }.resume()
+        }
+    }
+
+    private func authenticatedRequest(url: URL, method: String, completion: @escaping (URLRequest) -> Void) {
+        webView.configuration.websiteDataStore.httpCookieStore.getAllCookies { [weak self] cookies in
+            guard let self else { return }
+            var request = URLRequest(url: url)
+            request.httpMethod = method
+            for (key, value) in HTTPCookie.requestHeaderFields(with: cookies) { request.setValue(value, forHTTPHeaderField: key) }
+            request.setValue(self.webView.customUserAgent, forHTTPHeaderField: "User-Agent")
+            completion(request)
+        }
+    }
+
+    private func jsEscaped(_ value: String) -> String {
+        value.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "'", with: "\\'").replacingOccurrences(of: "\n", with: "\\n")
     }
 
     private func downloadRemote(relativeURL: String, filename: String, mime: String, share: Bool) {

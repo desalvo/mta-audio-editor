@@ -64,11 +64,34 @@ outputs = [
     ("admin.html", "MTA-Audio-Editor-Administrator-Manual-IT.pdf"),
     ("admin-en.html", "MTA-Audio-Editor-Administrator-Manual-EN.pdf"),
 ]
+cover_for_source = {
+    "user.html": STATIC / "docs-assets" / "cover-user-it.png",
+    "user-en.html": STATIC / "docs-assets" / "cover-user-en.png",
+    "admin.html": STATIC / "docs-assets" / "cover-admin-it.png",
+    "admin-en.html": STATIC / "docs-assets" / "cover-admin-en.png",
+}
+
 for src_name, out_name in outputs:
     text = (DOCS / src_name).read_text(encoding="utf-8")
     for token, path in assets.items():
         text = text.replace(token, path.as_uri())
     text = text.replace("__VERSION__", VERSION).replace("__BUILD__", BUILD).replace("__CREATOR__", CREATOR).replace("__REPOSITORY__", REPO)
-    text = text.replace("</head>", EXTRA + "</head>")
+    cover_uri = cover_for_source[src_name].as_uri()
+    # The web manual keeps its interactive cover section. For PDF output replace
+    # that section with an isolated A4 page outside .wrap so no web layout rules
+    # can resize, shift, or fragment the approved raster cover.
+    import re
+    text = re.sub(r'<section class="cover cover-fullpage">.*?</section>', '', text, count=1, flags=re.S)
+    text = text.replace('<body><div class="wrap">', '<body><div class="pdf-cover"></div><div class="wrap">', 1)
+    pdf_cover_css = (
+        '<style>'
+        '@page cover { size:A4; margin:0; @bottom-center { content:none; } }'
+        '.pdf-cover { page:cover; width:210mm; height:297mm; min-height:297mm; margin:0; padding:0; '
+        'break-after:page; page-break-after:always; background-image:url("' + cover_uri + '"); '
+        'background-repeat:no-repeat; background-position:center center; background-size:210mm 297mm; }'
+        '</style>'
+    )
+    text = text.replace("</head>", EXTRA + pdf_cover_css + "</head>")
     HTML(string=text, base_url=str(ROOT)).write_pdf(DOCS / out_name)
     print(DOCS / out_name)
+

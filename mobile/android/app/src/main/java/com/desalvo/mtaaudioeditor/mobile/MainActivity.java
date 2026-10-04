@@ -36,6 +36,8 @@ public final class MainActivity extends Activity {
     private static final int REQUEST_SAVE_FILE = 1002;
     private static final String PREFS = "mta_mobile";
     private static final String PREF_SERVER_URL = "server_url";
+    private static final String PREF_UPDATE_CHANNEL = "update_channel";
+    private static final String PREF_DEMUCS_WIFI_ONLY = DemucsModelManager.WIFI_ONLY;
     private static final String DEFAULT_SERVER_URL = "https://mta-audio-editor.apps.desalvo.eu";
 
     private final ExecutorService ioExecutor = Executors.newSingleThreadExecutor();
@@ -69,6 +71,9 @@ public final class MainActivity extends Activity {
         configureWebView();
         String configured = getPreferencesStore().getString(PREF_SERVER_URL, "");
         loadServer(configured == null || configured.trim().isEmpty() ? DEFAULT_SERVER_URL : configured);
+        webView.postDelayed(() -> checkForAppUpdate(false), 1200);
+        if (!getPreferencesStore().contains(PREF_DEMUCS_WIFI_ONLY)) getPreferencesStore().edit().putBoolean(PREF_DEMUCS_WIFI_ONLY, true).apply();
+        webView.postDelayed(this::refreshDemucsModels, 2500);
     }
 
     private SharedPreferences getPreferencesStore() {
@@ -85,7 +90,7 @@ public final class MainActivity extends Activity {
         settings.setMediaPlaybackRequiresUserGesture(false);
         settings.setBuiltInZoomControls(false);
         settings.setDisplayZoomControls(false);
-        settings.setUserAgentString(settings.getUserAgentString() + " MTAEditorMobile/0.2.0-81 Android");
+        settings.setUserAgentString(settings.getUserAgentString() + " MTAEditorMobile/0.2.0-100 Android");
 
         CookieManager.getInstance().setAcceptCookie(true);
         CookieManager.getInstance().setAcceptThirdPartyCookies(webView, false);
@@ -206,6 +211,9 @@ public final class MainActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.add("Impostazioni server").setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+        menu.add("Canale aggiornamenti").setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+        menu.add("Controlla aggiornamenti").setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+        menu.add("Update modelli solo con Wi-Fi").setCheckable(true).setChecked(getPreferencesStore().getBoolean(PREF_DEMUCS_WIFI_ONLY,true)).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
         menu.add("Ricarica").setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
         return true;
     }
@@ -217,11 +225,80 @@ public final class MainActivity extends Activity {
             promptServerUrl(false);
             return true;
         }
+        if ("Canale aggiornamenti".equals(title)) {
+            promptUpdateChannel();
+            return true;
+        }
+        if ("Update modelli solo con Wi-Fi".equals(title)) {
+            boolean value=!getPreferencesStore().getBoolean(PREF_DEMUCS_WIFI_ONLY,true); getPreferencesStore().edit().putBoolean(PREF_DEMUCS_WIFI_ONLY,value).apply(); item.setChecked(value); if(!value)refreshDemucsModels(); return true;
+        }
+        if ("Controlla aggiornamenti".equals(title)) {
+            checkForAppUpdate(true);
+            return true;
+        }
         if ("Ricarica".equals(title)) {
             webView.reload();
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+
+    private void refreshDemucsModels() {
+        String configured=getPreferencesStore().getString(PREF_SERVER_URL,""); String base=(configured==null||configured.trim().isEmpty())?DEFAULT_SERVER_URL:configured;
+        DemucsModelManager.bootstrap(this,getPreferencesStore(),ioExecutor,base);
+        DemucsModelManager.refresh(this,getPreferencesStore(),ioExecutor,base);
+        webView.postDelayed(this::refreshDemucsModels,DemucsModelManager.PERIOD_MS);
+    }
+
+    private String updateChannel() {
+        return "early".equals(getPreferencesStore().getString(PREF_UPDATE_CHANNEL, "stable")) ? "early" : "stable";
+    }
+
+    private void promptUpdateChannel() {
+        String[] values = {"Stable · solo tag/release GitHub", "Early release · include i package di main"};
+        int checked = "early".equals(updateChannel()) ? 1 : 0;
+        new AlertDialog.Builder(this)
+                .setTitle("Canale aggiornamenti")
+                .setSingleChoiceItems(values, checked, (dialog, which) -> {
+                    getPreferencesStore().edit().putString(PREF_UPDATE_CHANNEL, which == 1 ? "early" : "stable").apply();
+                    dialog.dismiss();
+                    checkForAppUpdate(true);
+                })
+                .setNegativeButton("Annulla", null)
+                .show();
+    }
+
+    private void checkForAppUpdate(boolean manual) {
+        GitHubUpdateManager.check(ioExecutor, BuildConfig.VERSION_NAME, updateChannel(), (info, error) -> runOnUiThread(() -> {
+            if (error != null) {
+                if (manual) Toast.makeText(this, "Controllo aggiornamenti fallito: " + error.getMessage(), Toast.LENGTH_LONG).show();
+                return;
+            }
+            if (info == null || !info.available) {
+                if (manual) Toast.makeText(this, "MTA Audio Editor è aggiornato (" + BuildConfig.VERSION_NAME + ")", Toast.LENGTH_LONG).show();
+                return;
+            }
+            String channelLabel = "early".equals(info.channel) ? "Early release" : "Stable";
+            new AlertDialog.Builder(this)
+                    .setTitle("Aggiornamento disponibile")
+                    .setMessage("MTA Audio Editor " + info.latestVersion + " è disponibile sul canale " + channelLabel + ".")
+                    .setNegativeButton("Più tardi", null)
+                    .setPositiveButton("Aggiorna", (d, which) -> {
+                        if (info.assetUrl != null && !info.assetUrl.isEmpty()) {
+                            Toast.makeText(this, "Download aggiornamento in corso…", Toast.LENGTH_SHORT).show();
+                            GitHubUpdateManager.downloadAndInstall(this, ioExecutor, info.assetUrl, info.assetName, installError -> runOnUiThread(() -> {
+                                if (installError != null) {
+                                    Toast.makeText(this, "Installazione non avviata: " + installError.getMessage(), Toast.LENGTH_LONG).show();
+                                    try { startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(info.releaseUrl))); } catch (Exception ignored) {}
+                                }
+                            }));
+                        } else {
+                            try { startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(info.releaseUrl))); } catch (Exception ignored) {}
+                        }
+                    })
+                    .show();
+        }));
     }
 
     @Override

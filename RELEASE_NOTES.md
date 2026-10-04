@@ -1,3 +1,35 @@
+## 0.2.0-100
+
+- Automatic periodic Demucs mobile-model refresh in Docker/Kubernetes with HTTPS manifest, SHA-256 verification and atomic replacement.
+- iPhone/iPad model refresh is periodic and Wi-Fi-only by default, configurable in Options.
+- Android receives equivalent periodic ONNX model provisioning, Wi-Fi-only by default.
+- Added New project directly inside PROJECT / FILE.
+
+## 0.2.0-100
+
+- Fixed native macOS project destination dialogs: pywebview now uses a valid ZIP filter while preserving the .mta-project.zip extension.
+- Prevented accidental utility-modal dismissal when selecting/editing the project name.
+- Reworked non-Render playback buffering to use short adaptive pre-roll rather than canplaythrough for every track.
+- Reworked multi-track drift correction to use smooth playback-rate nudging and only rare hard seeks.
+- Mixer volume, pan, mute and solo are applied immediately in WebAudio and no longer depend on buffering.
+
+## 0.2.0-97
+
+- Added native on-device stem separation for iPhone/iPad using Core ML-compatible Demucs models.
+- Added Auto / Local / Server mobile execution modes with automatic server fallback.
+- Added authenticated model provisioning and on-device model compilation/cache.
+- Added chunked 44.1 kHz stereo inference with overlap-add and WAV stem import into the project.
+- Added conservative device-aware Auto stem recommendations and a 12-minute local safety limit.
+- Added `scripts/export_demucs_coreml.py` documenting/exporting the expected Core ML model contract.
+
+## 0.2.0-96
+
+- Added configurable stem count: Auto, 2, 4, 6, or 8.
+- Added 2-stem Demucs mode (vocals/accompaniment), standard 4-stem mode, and 6-stem extended mode.
+- 8-stem mode is exposed only through a compatible backend model configured with `MTA_DEMUCS_8_MODEL`; no synthetic/duplicate stems are generated.
+- Persisted the preferred stem count in the application and reused it for full-song and single-track separation.
+- Documented identical iPhone/iPad controls; the current mobile build delegates heavy Demucs processing to the server.
+
 ## 0.2.0-95
 
 - Fixed GitHub Actions documentation regression test to validate the current bilingual cover assets.

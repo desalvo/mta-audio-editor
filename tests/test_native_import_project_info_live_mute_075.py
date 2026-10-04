@@ -26,7 +26,7 @@ def test_native_project_binding_is_persistent_and_reports_home():
     assert '"home": str(_data_root())' in NATIVE
 
 def test_dynamic_playback_instantiates_all_tracks_and_controls_gain_live():
-    assert "(current.tracks||[]).map(t=>makeTrackPlayback" in JS
+    assert "tracks.map(t=>makeTrackPlayback" in JS
     assert "function trackAudibleNow(track)" in JS
     assert "function playbackGainForTrack(track,item=null)" in JS
     assert "function applyLiveMuteSolo()" in JS

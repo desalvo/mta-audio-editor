@@ -422,12 +422,20 @@ class DemucsStemSplitter:
 
     @classmethod
     def status(cls) -> dict[str, object]:
+        extended_8_model = os.getenv("MTA_DEMUCS_8_MODEL", "").strip()
+        models = ["htdemucs", "htdemucs_ft", "htdemucs_6s"]
+        if extended_8_model and extended_8_model not in models:
+            models.append(extended_8_model)
+        supported_counts = [2, 4, 6] + ([8] if extended_8_model else [])
         return {
             "name": cls.name,
             "display_name": cls.display_name,
             "available": cls.available(),
-            "models": ["htdemucs", "htdemucs_ft", "htdemucs_6s"],
+            "models": models,
             "recommended_model": "htdemucs_6s",
+            "supported_stem_counts": supported_counts,
+            "default_stem_count": 0,
+            "extended_8_model": extended_8_model or None,
         }
 
     @classmethod
@@ -437,10 +445,25 @@ class DemucsStemSplitter:
         output_dir: Path,
         model: str = "htdemucs_6s",
         *,
+        stem_count: int = 0,
         progress=None,
         cancel_event=None,
     ) -> list[Path]:
-        if model not in {"htdemucs", "htdemucs_ft", "htdemucs_6s"}:
+        if stem_count not in {0, 2, 4, 6, 8}:
+            raise ValueError("unsupported stem count")
+        extended_8_model = os.getenv("MTA_DEMUCS_8_MODEL", "").strip()
+        if stem_count == 8:
+            if not extended_8_model:
+                raise ValueError("8-stem separation requires MTA_DEMUCS_8_MODEL on this backend")
+            model = extended_8_model
+        elif stem_count == 6:
+            model = "htdemucs_6s"
+        elif stem_count in {2, 4} and model == "htdemucs_6s":
+            model = "htdemucs"
+        allowed = {"htdemucs", "htdemucs_ft", "htdemucs_6s"}
+        if extended_8_model:
+            allowed.add(extended_8_model)
+        if model not in allowed:
             raise ValueError("unsupported Demucs model")
         if not cls.available():
             raise RuntimeError("Demucs stem plugin is not installed in this runtime")
@@ -458,7 +481,10 @@ class DemucsStemSplitter:
 
             old_argv = sys.argv[:]
             try:
-                sys.argv = ["demucs.separate", "-n", model, "--out", str(output_dir), str(source)]
+                sys.argv = ["demucs.separate", "-n", model, "--out", str(output_dir)]
+                if stem_count == 2:
+                    sys.argv += ["--two-stems", "vocals"]
+                sys.argv.append(str(source))
                 try:
                     result = demucs_main()
                 except SystemExit as exc:
@@ -482,9 +508,12 @@ class DemucsStemSplitter:
             return candidates
 
         if shutil.which("demucs"):
-            cmd = ["demucs", "-n", model, "--out", str(output_dir), str(source)]
+            cmd = ["demucs", "-n", model, "--out", str(output_dir)]
         else:
-            cmd = [sys.executable, "-m", "demucs.separate", "-n", model, "--out", str(output_dir), str(source)]
+            cmd = [sys.executable, "-m", "demucs.separate", "-n", model, "--out", str(output_dir)]
+        if stem_count == 2:
+            cmd += ["--two-stems", "vocals"]
+        cmd.append(str(source))
         if progress:
             progress(20, "Avvio del modello Demucs")
         proc = subprocess.Popen(

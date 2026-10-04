@@ -3,9 +3,9 @@ services:
     build:
       context: .
       args:
-        APP_VERSION: "0.2.0-81"
+        APP_VERSION: "0.2.0-100"
         BUILD_ID: "${BUILD_ID:-local}"
-    image: desalvo/mta-audio-editor:0.2.0-81
+    image: desalvo/mta-audio-editor:0.2.0-100
     ports:
       - "8080:8080"
     environment:
@@ -13,6 +13,10 @@ services:
       MTA_ADMIN_PASSWORD: "${MTA_ADMIN_PASSWORD:?set MTA_ADMIN_PASSWORD}"
       MTA_ADMIN_EMAIL: "${MTA_ADMIN_EMAIL:?set MTA_ADMIN_EMAIL}"
       MTA_MAX_UPLOAD_MB: "${MTA_MAX_UPLOAD_MB:-1024}"
+      MTA_DEMUCS_MODEL_AUTO_UPDATE: "${MTA_DEMUCS_MODEL_AUTO_UPDATE:-true}"
+      MTA_DEMUCS_MODEL_UPDATE_INTERVAL_SECONDS: "${MTA_DEMUCS_MODEL_UPDATE_INTERVAL_SECONDS:-21600}"
+      MTA_DEMUCS_MODEL_MANIFEST_URL: "${MTA_DEMUCS_MODEL_MANIFEST_URL:-https://github.com/desalvo/mta-audio-editor/releases/download/demucs-models/manifest.json}"
+      MTA_DEMUCS_MOBILE_MODEL_DIR: /data/projects/.models
       MTA_PUBLIC_URL: "${MTA_PUBLIC_URL:-}"
       MTA_OAUTH_GOOGLE_ENABLED: "${MTA_OAUTH_GOOGLE_ENABLED:-false}"
       MTA_OAUTH_GOOGLE_CLIENT_ID: "${MTA_OAUTH_GOOGLE_CLIENT_ID:-}"

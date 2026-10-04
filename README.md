@@ -87,3 +87,31 @@ Native Android and iOS clients are included under `mobile/android` and `mobile/i
 ## License
 
 EUPL-1.2. See the repository license file for complete terms.
+
+### Configurable stem count
+Stem separation exposes **Auto / 2 / 4 / 6 / 8**. Auto is the default. 2 uses vocals/accompaniment, 4 the standard profile, 6 the extended Demucs profile; 8 requires a backend configured with an 8-stem model. The current iPhone and iPad build delegates Demucs to the server, so the same setting is available on both devices without bundling PyTorch in the app.
+
+
+## On-device Demucs on iPhone/iPad (0.2.0-97)
+
+The iOS/iPadOS client can now run stem separation locally through Core ML. The mobile workflow exposes **Auto / Local / Server** execution. Auto prefers an installed local model and falls back to server-side Demucs when the requested model is unavailable or the local device constraints are exceeded. Core ML models are provisioned as `demucs-2.mlmodel`, `demucs-4.mlmodel`, `demucs-6.mlmodel`, or `demucs-8.mlmodel` from the configured backend and are compiled/cached in the app's Application Support directory for later offline use.
+
+The local runtime decodes the selected audio on-device, converts it to stereo 44.1 kHz Float32 PCM, processes fixed-size overlapping chunks through Core ML using all available compute units (CPU/GPU/Neural Engine where Core ML supports them), overlap-adds the results, writes WAV stems, and uploads the resulting tracks into the current project. The current local safety limit is **12 minutes per source file**; longer material falls back to the server in Auto mode. On iPhone, Auto is intentionally more conservative than on iPad because of memory/thermal constraints.
+
+Server administrators can expose compatible Core ML Demucs models by mounting a directory and setting `MTA_DEMUCS_COREML_MODEL_DIR`. The optional `scripts/export_demucs_coreml.py` utility documents the model contract expected by the app. Model conversion is a release-engineering step and must be validated for each Demucs architecture before publishing a model.
+
+## Native application updates
+
+Native Windows, macOS, Android, iPhone and iPad clients check GitHub for newer builds. The update channel is configurable in the application options:
+
+- **Stable** checks tagged GitHub releases only.
+- **Early release** also checks the rolling `early-main` prerelease generated from the latest successful `main` build.
+
+Windows/macOS download and launch the matching installer; Android can download the APK and hand it to the system package installer. iOS/iPadOS cannot silently self-install binaries from GitHub and therefore opens the authorized TestFlight/App Store or managed-distribution flow after confirmation.
+
+### iPhone/iPad local Demucs model lifecycle
+
+The iOS/iPadOS client always attempts to provision a default **4-stem Core ML Demucs** model automatically. A validated model bundled in `Models/demucs-default-4.mlmodel[c]` is preferred; otherwise the app bootstraps it from the configured MTA Audio Editor server. Installed model SHA-256 fingerprints are compared with the authenticated server model inventory and newer server versions replace the cached local model automatically. The installed model remains available offline.
+
+### Automatic mobile Demucs model lifecycle
+Docker/Kubernetes refreshes signed-by-hash mobile model payloads from the configured HTTPS manifest every 6 hours by default. iOS/iPadOS and Android check the server periodically. Mobile model downloads are Wi-Fi-only by default and can be enabled on cellular in app preferences. iOS uses Core ML; Android provisions ONNX Runtime Mobile models.

@@ -61,6 +61,7 @@
             <span class="sidebar-tools-title">PROJECT / FILE</span><span id="projectToolsChevron" aria-hidden="true">▸</span>
           </button>
           <div class="sidebar-tools-body" id="projectToolsBody">
+            <button class="nav-item" onclick="newProject()">＋ <span>New project</span></button>
             <button class="nav-item" onclick="openExportPanel()">⇧ <span>Export</span></button>
             <button class="nav-item" onclick="saveProjectLocal()">⬇ <span>Save project locally</span></button>
             <button class="nav-item" onclick="saveAsProject()">⇩ <span>Save project as…</span></button>
@@ -92,7 +93,7 @@
   </div>
 </div>
 <div id="toast"></div>
-<div id="utilityBackdrop" class="utility-backdrop hidden" onclick="if(event.target===this)closeUtilityModal()">
+<div id="utilityBackdrop" class="utility-backdrop hidden">
   <div class="utility-modal" onclick="event.stopPropagation()">
     <div class="utility-head"><h3 id="utilityTitle">Project</h3><button onclick="closeUtilityModal()">×</button></div>
     <div id="utilityBody" class="utility-body"></div>
