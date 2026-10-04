@@ -1,3 +1,7 @@
+## 0.2.0-122
+
+- CI fix: Ruff-clean clip metadata probing and YouTube import validation.
+
 ## 0.2.0-121
 
 The project clip browser now exposes a collapsed-by-default technical details section for every clip, including type, format, bitrate, HH:MM:SS duration, exact byte size, provenance, current project-relative location, embedded tags and editable notes. Track associations remain ID-based and are unaffected by clip metadata edits.

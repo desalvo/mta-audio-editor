@@ -1,3 +1,8 @@
+## 0.2.0-122
+
+- Fixed GitHub Actions Ruff failures in clip metadata probing and YouTube import job validation.
+- Clip metadata probe failures are now logged instead of silently ignored.
+
 ## 0.2.0-121
 
 - Project Clip Browser: added a collapsible per-clip details panel, collapsed by default.

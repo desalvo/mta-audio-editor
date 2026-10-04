@@ -884,9 +884,9 @@ def _refresh_project_clip_metadata(project: Project, asset: ProjectClip, *, forc
             if getattr(asset, key) != value:
                 setattr(asset, key, value)
                 changed = True
-    except Exception:
+    except Exception as exc:
         # Keep the browser usable even if an old/temporarily unavailable asset cannot be probed.
-        pass
+        LOGGER.warning("Clip metadata probe failed for %s: %s", source, exc)
     return changed
 
 
@@ -1739,7 +1739,7 @@ def _youtube_import_worker(
 
 @app.post("/api/projects/{pid}/youtube-import-jobs")
 def start_youtube_import_job(pid: str, request: Request, body: dict):
-    project = _project_for_actor(request, pid)
+    _project_for_actor(request, pid)
     if body.get("confirm_rights") is not True:
         raise HTTPException(400, "Conferma di disporre dei diritti necessari per importare questo contenuto")
     try:
