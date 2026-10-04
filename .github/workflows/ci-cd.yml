@@ -111,7 +111,7 @@ jobs:
           push: false
           tags: mta-audio-editor:ci
           build-args: |
-            APP_VERSION=${{ github.ref_type == 'tag' && github.ref_name || '0.2.0-105' }}
+            APP_VERSION=${{ github.ref_type == 'tag' && github.ref_name || '0.2.0-106' }}
             BUILD_ID=${{ steps.build.outputs.id }}
       - name: Verify container OS
         shell: bash
@@ -399,6 +399,9 @@ jobs:
           else
             echo "Android release signing secrets not configured; AAB will be built unsigned."
           fi
+      - name: Compile Android sources preflight
+        shell: bash
+        run: gradle -p mobile/android :app:compileDebugJavaWithJavac --stacktrace
       - name: Build Android debug APK and release AAB
         shell: bash
         run: |
@@ -450,6 +453,17 @@ jobs:
       - name: Validate Xcode project
         shell: bash
         run: xcodebuild -project mobile/ios/MTAEditorMobile.xcodeproj -scheme MTAEditorMobile -showBuildSettings >/dev/null
+      - name: Compile iOS sources preflight
+        shell: bash
+        run: |
+          xcodebuild \
+            -project mobile/ios/MTAEditorMobile.xcodeproj \
+            -scheme MTAEditorMobile \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            CODE_SIGNING_ALLOWED=NO \
+            build
       - name: Build unsigned iOS archive
         shell: bash
         run: |

@@ -201,7 +201,7 @@ final class LocalStemEngine {
         }
     }
 
-    private func separateSync(inputURL: URL, stemCount: Int, progress: @escaping (Int, String) -> Void) throws -> [URL] {
+    private func separateSync(inputURL: URL, modelId: String, stemCount: Int, progress: @escaping (Int, String) -> Void) throws -> [URL] {
         guard Self.supports(stemCount: stemCount) else { throw LocalStemError.unsupportedStemCount(stemCount) }
         let modelURL = compiledModelURL(modelId: modelId, stemCount: stemCount)
         guard fm.fileExists(atPath: modelURL.path) else { throw LocalStemError.modelMissing(stemCount) }
@@ -210,11 +210,11 @@ final class LocalStemEngine {
         let configuration = MLModelConfiguration()
         configuration.computeUnits = .all
         let model = try MLModel(contentsOf: modelURL, configuration: configuration)
-        let metadata = model.modelDescription.metadata[.creatorDefinedKey] as? [String: String] ?? [:]
+        let metadata = model.modelDescription.metadata[MLModelMetadataKey.creatorDefinedKey] as? [String: String] ?? [:]
         let expectedCount = Int(metadata["stem_count"] ?? "") ?? stemCount
         guard expectedCount == stemCount else { throw LocalStemError.modelContract("stem_count=\(expectedCount), richiesto \(stemCount)") }
         let labels = stemLabels(metadata: metadata, stemCount: stemCount)
-        let chunkFrames = max(44_100, Int(metadata["chunk_frames"] ?? "") ?? 441_000)
+        let chunkFrames = Swift.max(44_100, Int(metadata["chunk_frames"] ?? "") ?? 441_000)
         let inputName = metadata["input_name"] ?? "audio"
         let outputName = metadata["output_name"] ?? "stems"
 
@@ -229,8 +229,8 @@ final class LocalStemEngine {
         let maxLocalFrames = Int(Self.sampleRate * 60 * 12)
         if totalFrames > maxLocalFrames { throw LocalStemError.audioDecode("brano oltre il limite locale di 12 minuti") }
 
-        let hop = max(1, chunkFrames * 3 / 4)
-        let overlap = max(0, chunkFrames - hop)
+        let hop = Swift.max(1, chunkFrames * 3 / 4)
+        let overlap = Swift.max(0, chunkFrames - hop)
         let chunkStarts = stride(from: 0, to: totalFrames, by: hop).map { $0 }
         let format = AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: Self.sampleRate, channels: 2, interleaved: false)!
         let pcmFile = try AVAudioFile(forReading: prepared.url)
@@ -240,7 +240,7 @@ final class LocalStemEngine {
         var urls: [URL] = []
         var writers: [AVAudioFile] = []
         for stem in 0..<stemCount {
-            let safeLabel = labels[stem].replacingOccurrences(of: "[^A-Za-z0-9_-]", with: "_", options: .regularExpression)
+            let safeLabel = labels[stem].replacingOccurrences(of: "[^A-Za-z0-9_-]", with: "_", options: String.CompareOptions.regularExpression)
             let url = outputDirectory.appendingPathComponent("\(String(format: "%02d", stem + 1))-\(safeLabel).wav")
             writers.append(try AVAudioFile(forWriting: url, settings: format.settings))
             urls.append(url)
@@ -311,7 +311,7 @@ final class LocalStemEngine {
                 }
 
                 let tailStart = hop
-                let tailLength = max(0, min(overlap, available - tailStart))
+                let tailLength = Swift.max(0, Swift.min(overlap, available - tailStart))
                 if overlap > 0 {
                     for stem in 0..<stemCount {
                         for channel in 0..<2 {

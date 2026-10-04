@@ -1,3 +1,11 @@
+## 0.2.0-106
+
+- Fixed Android mobile compilation by explicitly enabling BuildConfig generation for the application module.
+- Fixed iOS 15 compatibility by avoiding Locale.Language APIs that require iOS 16.
+- Fixed Core ML local-stem model selection by carrying modelId through the synchronous separation path.
+- Made Core ML metadata, integer min/max and regular-expression options explicit to avoid Swift type-inference failures in Xcode release builds.
+- Added mobile compiler regression checks for the Android and iOS fixes observed in GitHub Actions run #67.
+
 ## 0.2.0-105
 
 - Added centralized, periodically synchronized Demucs model catalogue with official Demucs families and manifest-provided mobile/native artifacts.

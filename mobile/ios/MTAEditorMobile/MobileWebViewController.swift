@@ -94,7 +94,7 @@ final class MobileWebViewController: UIViewController, WKNavigationDelegate, WKU
         webView = WKWebView(frame: .zero, configuration: configuration)
         webView.navigationDelegate = self
         webView.uiDelegate = self
-        webView.customUserAgent = "MTAEditorMobile/0.2.0-105 iOS"
+        webView.customUserAgent = "MTAEditorMobile/0.2.0-106 iOS"
         webView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(webView)
         NSLayoutConstraint.activate([
@@ -127,7 +127,7 @@ final class MobileWebViewController: UIViewController, WKNavigationDelegate, WKU
     }
 
     private func showDemucsUpdatePreferences() {
-        let italian = Locale.current.language.languageCode?.identifier.lowercased() == "it"
+        let italian = Locale.current.languageCode?.lowercased() == "it"
         let alert = UIAlertController(title: italian ? "Aggiornamento modelli Demucs" : "Demucs model updates", message: "\n\n", preferredStyle: .alert)
         let label = UILabel(); label.translatesAutoresizingMaskIntoConstraints = false
         label.text = italian ? "Update solo con Wi-Fi" : "Update on Wi-Fi only"
@@ -491,7 +491,7 @@ final class MobileWebViewController: UIViewController, WKNavigationDelegate, WKU
         fetchCoreMLCatalog { [weak self] models in
             guard let self else { return }
             DispatchQueue.main.async {
-                let italian = Locale.current.language.languageCode?.identifier == "it"
+                let italian = Locale.current.languageCode?.lowercased() == "it"
                 let alert = UIAlertController(title: "Demucs models", message: italian ? "Scarica, aggiorna o elimina i modelli locali. I modelli mancanti vengono scaricati automaticamente quando richiesti." : "Download, update, or delete local models. Missing models are downloaded automatically when requested.", preferredStyle: .actionSheet)
                 for item in models.sorted(by: { ($0["stem_count"] as? Int ?? 0) < ($1["stem_count"] as? Int ?? 0) }) {
                     guard let id = item["id"] as? String, let count = item["stem_count"] as? Int else { continue }
