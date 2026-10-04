@@ -72,9 +72,3 @@ for src_name, out_name in outputs:
     text = text.replace("</head>", EXTRA + "</head>")
     HTML(string=text, base_url=str(ROOT)).write_pdf(DOCS / out_name)
     print(DOCS / out_name)
-# Keep legacy PDF endpoints/filenames mapped to Italian manuals.
-for src, legacy in [
-    ("MTA-Audio-Editor-User-Manual-IT.pdf", "MTA-Audio-Editor-User-Manual.pdf"),
-    ("MTA-Audio-Editor-Administrator-Manual-IT.pdf", "MTA-Audio-Editor-Administrator-Manual.pdf"),
-]:
-    (DOCS / legacy).write_bytes((DOCS / src).read_bytes())

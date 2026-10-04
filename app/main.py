@@ -628,7 +628,7 @@ def admin_docs_en(request: Request):
 
 @app.get("/docs/pdf/user")
 def user_pdf():
-    return FileResponse(BASE / "docs" / "MTA-Audio-Editor-User-Manual.pdf", filename="MTA-Audio-Editor-User-Manual.pdf")
+    return FileResponse(BASE / "docs" / "MTA-Audio-Editor-User-Manual-IT.pdf", filename="MTA-Audio-Editor-User-Manual-IT.pdf")
 
 
 @app.get("/docs/pdf/admin")
@@ -637,8 +637,8 @@ def admin_pdf(request: Request):
     if user is not None and user["role"] != "admin":
         raise HTTPException(403, "Ruolo amministratore richiesto.")
     return FileResponse(
-        BASE / "docs" / "MTA-Audio-Editor-Administrator-Manual.pdf",
-        filename="MTA-Audio-Editor-Administrator-Manual.pdf",
+        BASE / "docs" / "MTA-Audio-Editor-Administrator-Manual-IT.pdf",
+        filename="MTA-Audio-Editor-Administrator-Manual-IT.pdf",
     )
 
 

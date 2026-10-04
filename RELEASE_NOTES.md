@@ -1,9 +1,9 @@
-## 0.2.0-94
+## 0.2.0-95
 
 - Fixed GitHub Actions documentation regression test to validate the current bilingual cover assets.
 - Added meaningful audio-engine regression tests for media duration, project duration, clip initialization, track shifting and metronome WAV generation.
 - Restored CI coverage above the 70% production gate without lowering the configured threshold.
-- Updated the production-image fallback version to 0.2.0-94.
+- Updated the production-image fallback version to 0.2.0-95.
 
 ## 0.2.0-93
 

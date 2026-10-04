@@ -1,4 +1,4 @@
-# MTA Audio Editor 0.2.0-94
+# MTA Audio Editor 0.2.0-95
 
 ![MTA Audio Editor](app/static/logo.svg)
 
@@ -9,7 +9,7 @@
 Alessandro De Salvo <braket71@gmail.com>  
 **Repository:** `desalvo/mta-audio-editor`  
 **License:** EUPL-1.2  
-**Version:** `0.2.0-94`  
+**Version:** `0.2.0-95`  
 **Build:** generated as `YYYYMMDD-HH:MM:SS`.
 
 [Italian README](README_IT.md)
