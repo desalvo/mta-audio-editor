@@ -17,11 +17,16 @@ def local_repo()->Path:
     p=_root()/"repo";p.mkdir(parents=True,exist_ok=True);return p
 
 def _server_url():return os.getenv("MTA_MODEL_SERVER_URL","https://mta-audio-editor.apps.desalvo.eu").rstrip('/')+'/'
+def _headers()->dict[str,str]:
+    headers=_headers()
+    token=os.getenv('MTA_MODEL_ACCESS_TOKEN','').strip()
+    if token:headers['Authorization']='Bearer '+token
+    return headers
 def _fetch_json(path:str):
     url=urljoin(_server_url(),path.lstrip('/'))
     if not url.lower().startswith('https://'):
         raise ValueError('model server URL must use HTTPS')
-    req=Request(url,headers={'User-Agent':'MTA-Audio-Editor-native-model-manager'})  # noqa: S310 -- URL validated above.
+    req=Request(url,headers=_headers())  # noqa: S310 -- URL validated above.
     with urlopen(req,timeout=30,context=ssl.create_default_context()) as r:  # noqa: S310 -- validated HTTPS request.
         return json.loads(r.read())
 def catalog():return _fetch_json('/api/models/catalog?platform=native')
@@ -55,7 +60,7 @@ def update(model_id:str):
     url=urljoin(_server_url(),str(item.get('download_url') or f'/api/models/native/{mid}').lstrip('/'))
     if not url.lower().startswith('https://'):
         raise ValueError('model download URL must use HTTPS')
-    req=Request(url,headers={'User-Agent':'MTA-Audio-Editor-native-model-manager'})  # noqa: S310 -- URL validated above.
+    req=Request(url,headers=_headers())  # noqa: S310 -- URL validated above.
     with urlopen(req,timeout=300,context=ssl.create_default_context()) as r:  # noqa: S310 -- validated HTTPS request.
         data=r.read()
     digest=hashlib.sha256(data).hexdigest()

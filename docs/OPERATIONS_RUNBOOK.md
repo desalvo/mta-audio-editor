@@ -165,3 +165,7 @@ Operational notes:
 - the underlying project and original MP3 remain safe on the PVC.
 
 For production AI workloads, size CPU/RAM requests according to the selected Demucs model and song duration.
+
+## Scoped Demucs model access
+
+Runtime model downloads use revocable `models:read` bearer tokens issued by `POST /api/models/token`. Desktop native deployments can supply the token through `MTA_MODEL_ACCESS_TOKEN`. CI does not reuse runtime credentials: optional bundled baseline assets are read from the GitHub `demucs-models` release, with runtime authenticated bootstrap as fallback.

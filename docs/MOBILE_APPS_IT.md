@@ -58,3 +58,7 @@ Su iPhone/iPad e Android la preferenza **Update solo con Wi-Fi** e attiva per de
 ## Separazione stem estesa model-driven
 
 MTA Audio Editor non impone più un elenco fisso 2/4/6/8. Il server e i client mobili leggono dal catalogo/manifest le cardinalità realmente disponibili: 2, 4, 6, 8, 10, 12, 16 e anche valori superiori quando esiste un modello compatibile. Il limite tecnico di sicurezza corrente è 64 stem per singolo modello. I progetti Multitrack DAW non sono limitati dal numero di stem; i vincoli MTA8/MTA16 vengono applicati soltanto in export. I profili server aggiuntivi si configurano con `MTA_DEMUCS_MODEL_REGISTRY` o `MTA_DEMUCS_MODEL_REGISTRY_FILE`, dichiarando `model`, `stem_count`, `stem_labels` e opzionalmente `engine`/`display_name`.
+
+## Autenticazione download modelli
+
+I download dei modelli Demucs richiedono un token Bearer con scope `models:read`. Le app iOS/iPadOS e Android ottengono automaticamente il token dal server dopo una sessione utente valida, lo riutilizzano fino alla scadenza e lo rinnovano quando necessario. Il catalogo dei modelli resta consultabile in sola lettura; blacklist e operazioni amministrative richiedono privilegi amministrativi.

@@ -10,6 +10,8 @@ final class MobileWebViewController: UIViewController, WKNavigationDelegate, WKU
         static let localStemMode = "mta.local.stems.mode"
         static let modelUpdatesWifiOnly = "mta.demucs.modelUpdatesWifiOnly"
         static let lastModelUpdateCheck = "mta.demucs.lastModelUpdateCheck"
+        static let modelAccessToken = "mta.demucs.modelAccessToken"
+        static let modelAccessTokenExpiresAt = "mta.demucs.modelAccessTokenExpiresAt"
     }
 
     private var webView: WKWebView!
@@ -92,7 +94,7 @@ final class MobileWebViewController: UIViewController, WKNavigationDelegate, WKU
         webView = WKWebView(frame: .zero, configuration: configuration)
         webView.navigationDelegate = self
         webView.uiDelegate = self
-        webView.customUserAgent = "MTAEditorMobile/0.2.0-104 iOS"
+        webView.customUserAgent = "MTAEditorMobile/0.2.0-105 iOS"
         webView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(webView)
         NSLayoutConstraint.activate([
@@ -236,17 +238,19 @@ final class MobileWebViewController: UIViewController, WKNavigationDelegate, WKU
         guard mayDownloadModelUpdate() else { return }
         if LocalStemEngine.shared.installBundledDefaultModelIfNeeded() { return }
         guard let endpoint = URL(string: base + "/api/mobile/demucs-coreml/bootstrap") else { return }
-        URLSession.shared.downloadTask(with: endpoint) { location, response, _ in
-            guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode), let location else { return }
-            do {
-                let temp = FileManager.default.temporaryDirectory.appendingPathComponent("demucs-bootstrap-\(UUID().uuidString).mlmodel")
-                try? FileManager.default.removeItem(at: temp)
-                try FileManager.default.copyItem(at: location, to: temp)
-                let fingerprint = http.value(forHTTPHeaderField: "X-MTA-Model-SHA256") ?? ""
-                try LocalStemEngine.shared.installDownloadedModel(temp, stemCount: 4, fingerprint: fingerprint)
-                try? FileManager.default.removeItem(at: temp)
-            } catch { }
-        }.resume()
+        modelAuthorizedRequest(url: endpoint) { request in
+            URLSession.shared.downloadTask(with: request) { location, response, _ in
+                guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode), let location else { return }
+                do {
+                    let temp = FileManager.default.temporaryDirectory.appendingPathComponent("demucs-bootstrap-\(UUID().uuidString).mlmodel")
+                    try? FileManager.default.removeItem(at: temp)
+                    try FileManager.default.copyItem(at: location, to: temp)
+                    let fingerprint = http.value(forHTTPHeaderField: "X-MTA-Model-SHA256") ?? ""
+                    try LocalStemEngine.shared.installDownloadedModel(temp, stemCount: 4, fingerprint: fingerprint)
+                    try? FileManager.default.removeItem(at: temp)
+                } catch { }
+            }.resume()
+        }
     }
 
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
@@ -465,7 +469,7 @@ final class MobileWebViewController: UIViewController, WKNavigationDelegate, WKU
         guard let base = webView.url else { completion(.failure(LocalStemError.modelMissing(stemCount))); return }
         let safeId = modelId.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? modelId
         let endpoint = URL(string: "/api/models/coreml/\(safeId)", relativeTo: base)!.absoluteURL
-        authenticatedRequest(url: endpoint, method: "GET") { request in
+        modelAuthorizedRequest(url: endpoint) { request in
             URLSession.shared.downloadTask(with: request) { location, response, error in
                 if let error { DispatchQueue.main.async { completion(.failure(error)) }; return }
                 guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode), let location else {
@@ -582,6 +586,43 @@ final class MobileWebViewController: UIViewController, WKNavigationDelegate, WKU
                     return
                 }
                 DispatchQueue.main.async { completion(.success(())) }
+            }.resume()
+        }
+    }
+
+    private func modelAuthorizedRequest(url: URL, completion: @escaping (URLRequest) -> Void) {
+        let expiry = UserDefaults.standard.double(forKey: Defaults.modelAccessTokenExpiresAt)
+        if let token = UserDefaults.standard.string(forKey: Defaults.modelAccessToken), !token.isEmpty, expiry > Date().timeIntervalSince1970 + 300 {
+            var request = URLRequest(url: url)
+            request.httpMethod = "GET"
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+            request.setValue(webView.customUserAgent, forHTTPHeaderField: "User-Agent")
+            completion(request)
+            return
+        }
+        guard let base = webView.url, let tokenURL = URL(string: "/api/models/token", relativeTo: base)?.absoluteURL else {
+            authenticatedRequest(url: url, method: "GET", completion: completion)
+            return
+        }
+        authenticatedRequest(url: tokenURL, method: "POST") { request in
+            var request = request
+            request.setValue("1", forHTTPHeaderField: "X-MTA-Request")
+            request.setValue("ios", forHTTPHeaderField: "X-MTA-Client")
+            URLSession.shared.dataTask(with: request) { data, response, _ in
+                if let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode), let data,
+                   let root = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                   let token = root["token"] as? String, !token.isEmpty {
+                    UserDefaults.standard.set(token, forKey: Defaults.modelAccessToken)
+                    if let expires = root["expires_at"] as? Double { UserDefaults.standard.set(expires, forKey: Defaults.modelAccessTokenExpiresAt) }
+                    else if let expires = root["expires_at"] as? Int { UserDefaults.standard.set(Double(expires), forKey: Defaults.modelAccessTokenExpiresAt) }
+                    var authorized = URLRequest(url: url)
+                    authorized.httpMethod = "GET"
+                    authorized.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+                    authorized.setValue(self.webView.customUserAgent, forHTTPHeaderField: "User-Agent")
+                    completion(authorized)
+                } else {
+                    self.authenticatedRequest(url: url, method: "GET", completion: completion)
+                }
             }.resume()
         }
     }

@@ -13,6 +13,7 @@ import org.json.*;
 final class DemucsModelManager {
     // Legacy baseline filename retained for build/test compatibility: demucs-4.onnx
     static final String WIFI_ONLY="demucs_wifi_only";
+    static final String MODEL_TOKEN="demucs_model_access_token";
     static final long PERIOD_MS=6L*60*60*1000;
 
     static boolean networkAvailable(Context c){
@@ -31,6 +32,15 @@ final class DemucsModelManager {
     static String safeId(String value){String v=value==null?"":value.replaceAll("[^A-Za-z0-9._-]+","-").replaceAll("^[.-]+|[.-]+$","");if(v.isEmpty())throw new IllegalArgumentException("invalid model id");return v;}
     static File target(Context c,String modelId){return new File(dir(c),safeId(modelId)+".onnx");}
     static File metadata(Context c,String modelId){return new File(dir(c),safeId(modelId)+".json");}
+
+    static SharedPreferences prefs(Context c){return c.getSharedPreferences("mta_mobile",Context.MODE_PRIVATE);}
+    static String ensureModelToken(Context c,String base)throws Exception{
+        String existing=prefs(c).getString(MODEL_TOKEN,"");if(existing!=null&&!existing.isEmpty())return existing;
+        URL u=new URL(base+"/api/models/token");HttpURLConnection x=(HttpURLConnection)u.openConnection();x.setRequestMethod("POST");x.setRequestProperty("X-MTA-Request","1");x.setRequestProperty("X-MTA-Client","android");
+        String ck=CookieManager.getInstance().getCookie(u.toString());if(ck!=null)x.setRequestProperty("Cookie",ck);
+        if(x.getResponseCode()/100!=2)throw new IOException("model token HTTP "+x.getResponseCode());
+        JSONObject root=new JSONObject(new String(x.getInputStream().readAllBytes()));String token=root.optString("token","");if(token.isEmpty())throw new IOException("missing model token");prefs(c).edit().putString(MODEL_TOKEN,token).apply();return token;
+    }
 
     static JSONObject fetchCatalog(String base)throws Exception{
         URL u=new URL(base+"/api/models/catalog?platform=android");
@@ -87,6 +97,7 @@ final class DemucsModelManager {
     }
     static void download(Context c,String url,File target,String expected)throws Exception{
         HttpURLConnection x=(HttpURLConnection)new URL(url).openConnection();String ck=CookieManager.getInstance().getCookie(url);if(ck!=null)x.setRequestProperty("Cookie",ck);
+        try{x.setRequestProperty("Authorization","Bearer "+ensureModelToken(c,new URL(url).getProtocol()+"://"+new URL(url).getAuthority()));}catch(Exception ignored){}
         if(x.getResponseCode()/100!=2)throw new IOException("HTTP "+x.getResponseCode());File tmp=new File(target.getParentFile(),target.getName()+".tmp");
         try(InputStream in=x.getInputStream();OutputStream out=new FileOutputStream(tmp)){in.transferTo(out);}if(!expected.isEmpty()&&!expected.equalsIgnoreCase(hash(tmp))){tmp.delete();throw new IOException("SHA-256 mismatch");}
         if(target.exists())target.delete();if(!tmp.renameTo(target))throw new IOException("Cannot install model");

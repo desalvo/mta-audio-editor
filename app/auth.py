@@ -31,6 +31,7 @@ LOGGER = logging.getLogger(__name__)
 SESSION_COOKIE = "mta_session"
 SESSION_SECONDS = 12 * 3600
 TOKEN_SECONDS = 24 * 3600
+MODEL_TOKEN_SECONDS = int(os.getenv("MTA_MODEL_TOKEN_SECONDS", str(30 * 24 * 3600)))
 PBKDF2_ITERS = 310_000
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 DATA_ROOT: Path | None = None
@@ -174,6 +175,18 @@ def init_auth_db() -> None:
           user_agent_hash TEXT NOT NULL DEFAULT '',
           FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
         );
+        CREATE TABLE IF NOT EXISTS model_access_tokens(
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          user_id INTEGER NOT NULL,
+          token_hash TEXT NOT NULL UNIQUE,
+          scopes TEXT NOT NULL DEFAULT 'models:read',
+          label TEXT NOT NULL DEFAULT '',
+          created_at INTEGER NOT NULL,
+          expires_at INTEGER NOT NULL,
+          revoked_at INTEGER,
+          FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+        );
+        CREATE INDEX IF NOT EXISTS idx_model_access_tokens_user ON model_access_tokens(user_id);
         CREATE TABLE IF NOT EXISTS smtp_config(
           id INTEGER PRIMARY KEY CHECK(id=1),
           host TEXT NOT NULL DEFAULT '',
@@ -600,6 +613,70 @@ def session_user(request: Request):
         # User-Agent binding is intentionally soft to avoid breaking reverse proxies
         # and mobile app upgrades; the token itself is high entropy, HttpOnly and SameSite.
         return row
+
+
+def create_model_access_token(user_id: int, *, label: str = "client", scopes: tuple[str, ...] = ("models:read",), ttl_seconds: int | None = None) -> dict[str, Any]:
+    """Issue a revocable bearer token limited to model download operations."""
+    init_auth_db()
+    allowed = {"models:read"}
+    clean = sorted({scope for scope in scopes if scope in allowed})
+    if not clean:
+        raise ValueError("At least one valid model scope is required")
+    ttl = MODEL_TOKEN_SECONDS if ttl_seconds is None else max(300, min(int(ttl_seconds), 90 * 24 * 3600))
+    token = secrets.token_urlsafe(40)
+    created = now_ts()
+    expires = created + ttl
+    with db() as con:
+        con.execute(
+            "INSERT INTO model_access_tokens(user_id,token_hash,scopes,label,created_at,expires_at) VALUES(?,?,?,?,?,?)",
+            (user_id, _token_hash(token), " ".join(clean), label[:120], created, expires),
+        )
+    return {"token": token, "token_type": "Bearer", "scopes": clean, "expires_at": expires}
+
+
+def model_access_token(request: Request, required_scope: str = "models:read"):
+    """Return token metadata when Authorization carries a valid scoped model token."""
+    header = request.headers.get("authorization", "")
+    if not header.lower().startswith("bearer "):
+        return None
+    raw = header[7:].strip()
+    if not raw:
+        return None
+    init_auth_db()
+    with db() as con:
+        row = con.execute(
+            """SELECT t.*,u.username,u.role,u.active,u.email_confirmed
+               FROM model_access_tokens t JOIN users u ON u.id=t.user_id
+               WHERE t.token_hash=? AND t.expires_at>? AND t.revoked_at IS NULL""",
+            (_token_hash(raw), now_ts()),
+        ).fetchone()
+        if not row or not row["active"] or not row["email_confirmed"]:
+            return None
+        scopes = set(str(row["scopes"] or "").split())
+        if required_scope not in scopes:
+            return None
+        return row
+
+
+def require_model_read(request: Request):
+    """Allow an authenticated user session or a scoped models:read bearer token."""
+    user = session_user(request)
+    if user is not None:
+        return user
+    token = model_access_token(request, "models:read")
+    if token is None:
+        raise HTTPException(401, "Model download authentication required.")
+    return token
+
+
+def revoke_model_access_tokens(user_id: int) -> int:
+    init_auth_db()
+    with db() as con:
+        cur = con.execute(
+            "UPDATE model_access_tokens SET revoked_at=? WHERE user_id=? AND revoked_at IS NULL",
+            (now_ts(), user_id),
+        )
+        return int(cur.rowcount or 0)
 
 
 def require_user(request: Request):

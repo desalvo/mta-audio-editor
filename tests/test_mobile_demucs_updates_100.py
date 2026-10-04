@@ -19,9 +19,10 @@ def test_project_file_contains_new_project_action():
 
 def test_mobile_release_builds_bundle_default_models():
     ci=(ROOT/'.github/workflows/ci-cd.yml').read_text()
-    assert '/api/mobile/demucs-coreml/bootstrap' in ci
+    assert 'releases/download/demucs-models/demucs-default-4.mlmodel' in ci
     assert 'demucs-default-4.mlmodel' in ci
-    assert '/api/mobile/demucs-onnx/bootstrap' in ci
+    assert 'releases/download/demucs-models/demucs-default-4.onnx' in ci
     assert 'demucs-default-4.onnx' in ci
+    assert 'runtime authenticated bootstrap will be used' in ci
     android=(ROOT/'mobile/android/app/src/main/java/com/desalvo/mtaaudioeditor/mobile/DemucsModelManager.java').read_text()
     assert 'installBundledDefault' in android

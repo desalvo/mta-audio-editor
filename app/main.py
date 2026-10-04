@@ -35,6 +35,7 @@ from .auth import (
     session_user, test_smtp_config, totp_qr_svg, totp_uri, update_profile,
     update_user_admin, delete_user_admin, change_password, request_password_reset, reset_password,
     oauth_public_providers, oauth_authorize_url, oauth_verify_state, oauth_exchange_profile, social_login_or_register,
+    create_model_access_token, model_access_token, require_model_read, revoke_model_access_tokens,
 )
 from .auto_mix import disable_auto_mix, enable_auto_mix
 from .mta_reverse import analyze_mta, diff_blobs
@@ -147,6 +148,7 @@ def _is_public(path: str) -> bool:
         or path.startswith("/oauth/")
         or path.startswith("/docs/user")
         or path.startswith("/docs/pdf/user")
+        or path == "/api/models/catalog"
     )
 
 
@@ -163,7 +165,16 @@ async def security_middleware(request: Request, call_next):
         return RedirectResponse(url="/", status_code=303)
 
     user = session_user(request)
-    if not _is_public(request.url.path) and user is None and not check_basic_auth(request):
+    model_bearer_ok = (
+        request.method in {"GET", "HEAD"}
+        and (
+            request.url.path.startswith("/api/models/")
+            or request.url.path.startswith("/api/mobile/demucs-coreml/")
+            or request.url.path.startswith("/api/mobile/demucs-onnx/")
+        )
+        and model_access_token(request, "models:read") is not None
+    )
+    if not _is_public(request.url.path) and user is None and not model_bearer_ok and not check_basic_auth(request):
         if request.url.path.startswith("/api/"):
             return auth_failure_response()
         return RedirectResponse(url="/login", status_code=303)
@@ -1660,12 +1671,13 @@ def mobile_demucs_coreml_status(request: Request):
 
 
 @app.get("/api/mobile/demucs-coreml/bootstrap")
-def mobile_demucs_coreml_bootstrap():
-    """Public baseline model used to bootstrap iOS/iPadOS local separation.
+def mobile_demucs_coreml_bootstrap(request: Request):
+    """Authenticated baseline model used to bootstrap iOS/iPadOS local separation.
 
     Only the configured 4-stem baseline is exposed here. Server-side model
     inventory and optional 2/6/8-stem models remain authenticated.
     """
+    require_model_read(request)
     if not COREML_DEMUCS_MODEL_DIR:
         raise HTTPException(404, "Repository modelli Core ML non configurato")
     model = COREML_DEMUCS_MODEL_DIR / "demucs-4.mlmodel"
@@ -1682,7 +1694,7 @@ def mobile_demucs_coreml_bootstrap():
 
 @app.get("/api/mobile/demucs-coreml/models/{stem_count}")
 def mobile_demucs_coreml_model(stem_count: int, request: Request):
-    _actor(request)
+    require_model_read(request)
     if stem_count < 2 or stem_count > 64:
         raise HTTPException(404, "Modello locale non disponibile")
     if not COREML_DEMUCS_MODEL_DIR:
@@ -1701,7 +1713,8 @@ def mobile_demucs_onnx_status(request: Request):
 
 
 @app.get("/api/mobile/demucs-onnx/bootstrap")
-def mobile_demucs_onnx_bootstrap():
+def mobile_demucs_onnx_bootstrap(request: Request):
+    require_model_read(request)
     model=ONNX_DEMUCS_MODEL_DIR/"demucs-4.onnx"
     if not model.is_file(): raise HTTPException(404,"Modello Android locale predefinito non disponibile")
     digest=hashlib.sha256(model.read_bytes()).hexdigest()
@@ -1709,18 +1722,32 @@ def mobile_demucs_onnx_bootstrap():
 
 @app.get("/api/mobile/demucs-onnx/models/{stem_count}")
 def mobile_demucs_onnx_model(stem_count:int,request:Request):
-    _actor(request)
+    require_model_read(request)
     if stem_count < 2 or stem_count > 64: raise HTTPException(404,"Modello locale non disponibile")
     model=ONNX_DEMUCS_MODEL_DIR/f"demucs-{stem_count}.onnx"
     if not model.is_file(): raise HTTPException(404,"Modello locale non disponibile")
     return FileResponse(model,media_type="application/octet-stream",filename=model.name)
+
+@app.post("/api/models/token")
+def issue_model_access_token(request: Request):
+    user = require_user(request)
+    label = request.headers.get("x-mta-client", "client")[:120]
+    return create_model_access_token(int(user["id"]), label=label, scopes=("models:read",))
+
+
+@app.delete("/api/models/tokens")
+def revoke_my_model_access_tokens(request: Request):
+    user = require_user(request)
+    return {"ok": True, "revoked": revoke_model_access_tokens(int(user["id"]))}
+
 
 @app.get("/api/models/catalog")
 def demucs_model_catalog(platform: str = ""):
     return demucs_public_catalog(platform or None)
 
 @app.get("/api/models/native/{model_id}")
-def demucs_native_model_download(model_id: str):
+def demucs_native_model_download(model_id: str, request: Request):
+    require_model_read(request)
     if not re.fullmatch(r"[A-Za-z0-9._-]{1,128}", model_id) or model_id in demucs_blacklist():
         raise HTTPException(404, "Model unavailable")
     bundle = demucs_native_bundle(model_id)
@@ -1733,7 +1760,8 @@ def demucs_native_model_download(model_id: str):
     return FileResponse(bundle, media_type="application/zip", filename=bundle.name)
 
 @app.get("/api/models/coreml/{model_id}")
-def demucs_coreml_model_by_id(model_id: str):
+def demucs_coreml_model_by_id(model_id: str, request: Request):
+    require_model_read(request)
     if not re.fullmatch(r"[A-Za-z0-9._-]{1,128}", model_id) or model_id in demucs_blacklist(): raise HTTPException(404,"Model unavailable")
     for item in demucs_public_catalog("ios").get("models",[]):
         if item.get("id") == model_id:
@@ -1744,7 +1772,8 @@ def demucs_coreml_model_by_id(model_id: str):
     raise HTTPException(404,"Model unavailable")
 
 @app.get("/api/models/onnx/{model_id}")
-def demucs_onnx_model_by_id(model_id: str):
+def demucs_onnx_model_by_id(model_id: str, request: Request):
+    require_model_read(request)
     if not re.fullmatch(r"[A-Za-z0-9._-]{1,128}", model_id) or model_id in demucs_blacklist(): raise HTTPException(404,"Model unavailable")
     for item in demucs_public_catalog("android").get("models",[]):
         if item.get("id") == model_id:

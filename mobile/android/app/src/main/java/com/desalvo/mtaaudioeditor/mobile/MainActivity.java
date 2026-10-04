@@ -90,7 +90,7 @@ public final class MainActivity extends Activity {
         settings.setMediaPlaybackRequiresUserGesture(false);
         settings.setBuiltInZoomControls(false);
         settings.setDisplayZoomControls(false);
-        settings.setUserAgentString(settings.getUserAgentString() + " MTAEditorMobile/0.2.0-104 Android");
+        settings.setUserAgentString(settings.getUserAgentString() + " MTAEditorMobile/0.2.0-105 Android");
 
         CookieManager.getInstance().setAcceptCookie(true);
         CookieManager.getInstance().setAcceptThirdPartyCookies(webView, false);

@@ -52,7 +52,7 @@ def test_ci_publishes_rolling_early_main_packages():
     assert ":app:assembleRelease" in workflow
 
 
-def test_coreml_status_exposes_fingerprints_and_public_default(tmp_path, monkeypatch):
+def test_coreml_status_exposes_fingerprints_and_authenticated_default(tmp_path, monkeypatch):
     monkeypatch.setenv("MTA_ALLOW_INSECURE_NO_AUTH", "true")
     from fastapi.testclient import TestClient
     import app.main as main

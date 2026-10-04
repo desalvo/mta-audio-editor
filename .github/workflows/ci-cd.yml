@@ -111,7 +111,7 @@ jobs:
           push: false
           tags: mta-audio-editor:ci
           build-args: |
-            APP_VERSION=${{ github.ref_type == 'tag' && github.ref_name || '0.2.0-104' }}
+            APP_VERSION=${{ github.ref_type == 'tag' && github.ref_name || '0.2.0-105' }}
             BUILD_ID=${{ steps.build.outputs.id }}
       - name: Verify container OS
         shell: bash
@@ -367,17 +367,21 @@ jobs:
       - uses: gradle/actions/setup-gradle@v6
         with:
           gradle-version: '8.10.2'
-      - name: Bundle default Demucs ONNX model
+      - name: Bundle default Demucs ONNX model when release asset is available
         shell: bash
         env:
-          MTA_DEMUCS_BOOTSTRAP_SERVER: ${{ vars.MTA_DEMUCS_BOOTSTRAP_SERVER || 'https://mta-audio-editor.apps.desalvo.eu' }}
+          MTA_DEMUCS_ONNX_BASELINE_URL: ${{ vars.MTA_DEMUCS_ONNX_BASELINE_URL || 'https://github.com/desalvo/mta-audio-editor/releases/download/demucs-models/demucs-default-4.onnx' }}
         run: |
           set -euo pipefail
           mkdir -p mobile/android/app/src/main/assets
-          curl --fail --location --retry 3 --connect-timeout 20 --max-time 600 \
-            "$MTA_DEMUCS_BOOTSTRAP_SERVER/api/mobile/demucs-onnx/bootstrap" \
-            -o mobile/android/app/src/main/assets/demucs-default-4.onnx
-          test -s mobile/android/app/src/main/assets/demucs-default-4.onnx
+          target=mobile/android/app/src/main/assets/demucs-default-4.onnx
+          if curl --fail --location --retry 2 --connect-timeout 20 --max-time 600 "$MTA_DEMUCS_ONNX_BASELINE_URL" -o "$target"; then
+            test -s "$target"
+            echo "Bundled baseline ONNX model from model release."
+          else
+            rm -f "$target"
+            echo "Baseline ONNX release asset unavailable; runtime authenticated bootstrap will be used."
+          fi
       - name: Configure optional Android release signing
         env:
           KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
@@ -428,17 +432,21 @@ jobs:
     needs: [quality, security]
     steps:
       - uses: actions/checkout@v7
-      - name: Bundle default Demucs Core ML model
+      - name: Bundle default Demucs Core ML model when release asset is available
         shell: bash
         env:
-          MTA_DEMUCS_BOOTSTRAP_SERVER: ${{ vars.MTA_DEMUCS_BOOTSTRAP_SERVER || 'https://mta-audio-editor.apps.desalvo.eu' }}
+          MTA_DEMUCS_COREML_BASELINE_URL: ${{ vars.MTA_DEMUCS_COREML_BASELINE_URL || 'https://github.com/desalvo/mta-audio-editor/releases/download/demucs-models/demucs-default-4.mlmodel' }}
         run: |
           set -euo pipefail
           mkdir -p mobile/ios/MTAEditorMobile/Models
-          curl --fail --location --retry 3 --connect-timeout 20 --max-time 600 \
-            "$MTA_DEMUCS_BOOTSTRAP_SERVER/api/mobile/demucs-coreml/bootstrap" \
-            -o mobile/ios/MTAEditorMobile/Models/demucs-default-4.mlmodel
-          test -s mobile/ios/MTAEditorMobile/Models/demucs-default-4.mlmodel
+          target=mobile/ios/MTAEditorMobile/Models/demucs-default-4.mlmodel
+          if curl --fail --location --retry 2 --connect-timeout 20 --max-time 600 "$MTA_DEMUCS_COREML_BASELINE_URL" -o "$target"; then
+            test -s "$target"
+            echo "Bundled baseline Core ML model from model release."
+          else
+            rm -f "$target"
+            echo "Baseline Core ML release asset unavailable; runtime authenticated bootstrap will be used."
+          fi
       - name: Validate Xcode project
         shell: bash
         run: xcodebuild -project mobile/ios/MTAEditorMobile.xcodeproj -scheme MTAEditorMobile -showBuildSettings >/dev/null
