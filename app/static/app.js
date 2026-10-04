@@ -38,8 +38,8 @@ document.addEventListener('DOMContentLoaded',()=>{
 let current=null, currentUser=null, pluginInfo={inserts:{},schemas:{},custom:{},stem_splitter:{available:false}}, pxPerSec=70;
 let sel={a:0,b:0}, dragging=false, audioCtx=null, playAudio=null, selectedTrackId=null, exportFormat='mta';
 let autosaveTimer=null, autosaveBusy=false, autosaveQueued=false, autosaveEnabled=true, projectDirty=false, stemPollTimer=null, activeStemJob=null, activeStemProjectId=null;
-let preferredStemCount=Number(localStorage.getItem('mtaStemCount')||0);if(![0,2,4,6,8].includes(preferredStemCount))preferredStemCount=0;
-function setPreferredStemCount(value){const n=Number(value||0);preferredStemCount=[0,2,4,6,8].includes(n)?n:0;localStorage.setItem('mtaStemCount',String(preferredStemCount));}
+let preferredStemCount=Number(localStorage.getItem('mtaStemCount')||0);if(preferredStemCount!==0&&(preferredStemCount<2||preferredStemCount>64))preferredStemCount=0;
+function setPreferredStemCount(value){const n=Number(value||0);preferredStemCount=(n===0||(n>=2&&n<=64))?n:0;localStorage.setItem('mtaStemCount',String(preferredStemCount));}
 let preferredStemExecution=localStorage.getItem('mtaStemExecution')||'auto';if(!['auto','local','server'].includes(preferredStemExecution))preferredStemExecution='auto';
 function setPreferredStemExecution(value){preferredStemExecution=['auto','local','server'].includes(value)?value:'auto';localStorage.setItem('mtaStemExecution',preferredStemExecution);}
 let undoStack=[],redoStack=[],historyProjectId=null,lastHistoryState=null,timelineClipboard=null;
@@ -1122,7 +1122,10 @@ async function replaceTrack(id,input){
 function openStemWorkflow(){
   const stem=pluginInfo.stem_splitter||{};
   const defaultName=current?.title||'Nuovo progetto da MP3';
-  const models=(stem.models||['htdemucs_6s']).map(x=>`<option value="${esc(x)}" ${x===stem.recommended_model?'selected':''}>${esc(x)}</option>`).join('');
+  const profileMap=Object.fromEntries((stem.model_profiles||[]).map(p=>[p.model,p]));const models=(stem.models||['htdemucs_6s']).map(x=>{const p=profileMap[x]||{};return `<option value="${esc(x)}" ${x===stem.recommended_model?'selected':''}>${esc(p.display_name||x)}${p.stem_count?' · '+p.stem_count+' stem':''}</option>`}).join('');
+  const stemCounts=[...new Set((stem.supported_stem_counts||[2,4,6]).map(Number).filter(n=>n>=2&&n<=64))].sort((a,b)=>a-b);
+  const profiles=stem.model_profiles||[];
+  const stemCountOptions=['<option value="0" '+(preferredStemCount===0?'selected':'')+'>Auto · model-driven</option>',...stemCounts.map(n=>{const p=profiles.find(x=>Number(x.stem_count)===n),labels=(p?.stem_labels||[]);const detail=labels.length&&labels.length<=8?' · '+labels.join(' / '):(p?.display_name?' · '+p.display_name:'');return `<option value="${n}" ${preferredStemCount===n?'selected':''}>${n} stem${esc(detail)}</option>`;})].join('');
   const rememberedFile=lastSelectedAudioFile&&/\.mp3$/i.test(lastSelectedAudioFile.name)?lastSelectedAudioFile:null;
   const remembered=rememberedFile?.name?`<div class="workflow-note">File MP3 già selezionato: <b>${esc(rememberedFile.name)}</b>. Verrà usato se non ne scegli un altro.</div>`:'';
   showUtilityModal('Importa brano e separa strumenti',`
@@ -1133,7 +1136,7 @@ function openStemWorkflow(){
       <div class="workflow-grid">
         <label class="workflow-field"><span>Tipo progetto</span><select id="stemProjectTarget"><option value="DAW">Multitrack DAW</option><option value="MTA8">MTA8</option><option value="MTA16">MTA16</option></select></label>
         <label class="workflow-field"><span>Modello AI</span><select id="stemWorkflowModel">${models}</select></label>
-        <label class="workflow-field"><span>Numero stem</span><select id="stemWorkflowCount" onchange="setPreferredStemCount(this.value)"><option value="0" ${preferredStemCount===0?'selected':''}>Auto</option><option value="2" ${preferredStemCount===2?'selected':''}>2 · Vocals / Accompaniment</option><option value="4" ${preferredStemCount===4?'selected':''}>4 · Vocals / Drums / Bass / Other</option><option value="6" ${preferredStemCount===6?'selected':''}>6 · + Guitar / Piano</option><option value="8" ${preferredStemCount===8?'selected':''}>8 · Extended backend</option></select></label>
+        <label class="workflow-field"><span>Numero stem</span><select id="stemWorkflowCount" onchange="setPreferredStemCount(this.value)">${stemCountOptions}</select></label>
         ${supportsLocalIosStems()?`<label class="workflow-field"><span>Elaborazione</span><select id="stemExecutionMode" onchange="setPreferredStemExecution(this.value)"><option value="auto" ${preferredStemExecution==='auto'?'selected':''}>Auto · locale se possibile</option><option value="local" ${preferredStemExecution==='local'?'selected':''}>Locale · Core ML</option><option value="server" ${preferredStemExecution==='server'?'selected':''}>Server cloud</option></select></label>`:''}
       </div>
       <label class="workflow-field"><span>Brano completo MP3</span><input id="stemWorkflowFile" type="file" accept=".mp3,audio/mpeg"></label>
@@ -1154,12 +1157,12 @@ function updateStemWorkflowMode(){
   if(target)target.disabled=mode!=='new';
 }
 
-async function startIosLocalStemWorkflow({projectId,stemCount,keep}){
+async function startIosLocalStemWorkflow({projectId,stemCount,modelId,keep}){
   showUtilityModal('Separazione locale',`<div class="stem-progress-card"><div class="stem-progress-head"><b>Demucs Core ML</b><span id="localStemPct">0%</span></div><div class="stem-progress"><div id="localStemFill" class="stem-progress-fill" style="width:0%"></div></div><div id="localStemMessage" class="stem-progress-message">Preparazione modello locale…</div><div class="utility-actions"><button class="danger-action" onclick="window.MtaMobile?.cancelLocalStemSeparation?.()">Annulla separazione</button></div></div>`);
   const onProgress=e=>{const pct=Math.max(0,Math.min(100,Number(e.detail?.progress)||0));if($('#localStemPct'))$('#localStemPct').textContent=pct+'%';if($('#localStemFill'))$('#localStemFill').style.width=pct+'%';if($('#localStemMessage'))$('#localStemMessage').textContent=e.detail?.message||'Separazione locale'};
   window.addEventListener('mtaLocalStemProgress',onProgress);
   try{
-    const result=await window.MtaMobile.startLocalStemSeparation(projectId,stemCount,keep);
+    const result=await window.MtaMobile.startLocalStemSeparation(projectId,stemCount,modelId||"",keep);
     await refresh();
     current=await api(`/api/projects/${projectId}`);selectedTrackId=current.tracks.at(-1)?.id||null;render();
     toast(`Separazione locale completata · ${result.stemCount} stem`);
@@ -1205,13 +1208,13 @@ async function startStemWorkflow(){
       const installed=installedCounts.includes(requested);
       if(execution==='local'||installed){
         setMobileBusy(true);
-        try{return await startIosLocalStemWorkflow({projectId:localProjectId,stemCount:stemCount,keep})}finally{setMobileBusy(false)}
+        try{return await startIosLocalStemWorkflow({projectId:localProjectId,stemCount:stemCount,modelId:model,keep})}finally{setMobileBusy(false)}
       }
       // Auto: native layer may download a model from the configured server. If it
       // cannot, fall through to the established server-side Demucs workflow.
       try{
         setMobileBusy(true);
-        return await startIosLocalStemWorkflow({projectId:localProjectId,stemCount:stemCount,keep});
+        return await startIosLocalStemWorkflow({projectId:localProjectId,stemCount:stemCount,modelId:model,keep});
       }catch(localError){
         setMobileBusy(false);
         toast('Modello locale non disponibile: uso il server.');
@@ -1222,6 +1225,9 @@ async function startStemWorkflow(){
     }
   }
   try{
+    if(mobilePlatform()==='android'&&window.MtaMobile?.ensureLocalStemModel){
+      try{const raw=window.MtaMobile.ensureLocalStemModel(model,stemCount||0);const state=typeof raw==='string'?JSON.parse(raw):raw;if(state&&!state.ok)console.warn('Android local model prefetch:',state.error)}catch(e){console.warn('Android local model prefetch failed',e)}
+    }
     const r=await api(`/api/stems/jobs?project_id=${encodeURIComponent(projectId)}&project_title=${encodeURIComponent(title)}&target=${encodeURIComponent(target)}&model=${encodeURIComponent(model)}&stem_count=${stemCount}&keep_original_track=${keep}`,{method:'POST',body:fd});
     if(nativeProjectPath&&window.pywebview?.api?.bind_project_path){
       await window.pywebview.api.bind_project_path(r.project.id,nativeProjectPath);
@@ -2036,7 +2042,7 @@ async function showNativeSettings(){
   if(!apiBridge?.get_native_settings){toast('Bridge nativo non disponibile. Riprova tra un istante.');return}
   try{
     const cfg=await apiBridge.get_native_settings();
-    showUtilityModal('Settings',`<div class="form-grid"><label>Maximum import/upload size (MB)<input id="nativeMaxUploadMb" type="number" min="1" max="10240" step="1" value="${Number(cfg.max_upload_mb)||1024}"></label><label class="workflow-check"><input id="nativeAutosaveEnabled" type="checkbox" ${cfg.autosave_enabled!==false?'checked':''}> Auto-save project changes</label><label>Update channel<select id="nativeUpdateChannel"><option value="stable" ${cfg.update_channel!=='early'?'selected':''}>Stable · GitHub tags/releases only</option><option value="early" ${cfg.update_channel==='early'?'selected':''}>Early release · include latest main packages</option></select></label><p>Stable checks only tagged GitHub releases. Early release also checks the rolling <b>early-main</b> package produced from main.</p><div class="form-actions"><button type="button" onclick="checkNativeAppUpdate(true)">Check for updates</button><button class="accent" onclick="saveNativeSettings()">Save</button></div></div>`);
+    showUtilityModal('Settings',`<div class="form-grid"><label>Maximum import/upload size (MB)<input id="nativeMaxUploadMb" type="number" min="1" max="10240" step="1" value="${Number(cfg.max_upload_mb)||1024}"></label><label class="workflow-check"><input id="nativeAutosaveEnabled" type="checkbox" ${cfg.autosave_enabled!==false?'checked':''}> Auto-save project changes</label><label>Update channel<select id="nativeUpdateChannel"><option value="stable" ${cfg.update_channel!=='early'?'selected':''}>Stable · GitHub tags/releases only</option><option value="early" ${cfg.update_channel==='early'?'selected':''}>Early release · include latest main packages</option></select></label><p>Stable checks only tagged GitHub releases. Early release also checks the rolling <b>early-main</b> package produced from main.</p><div class="form-actions"><button type="button" onclick="checkNativeAppUpdate(true)">Check for updates</button><button type="button" onclick="openNativeModelManager()">Manage Demucs models</button><button class="accent" onclick="saveNativeSettings()">Save</button></div></div>`);
   }catch(err){toast('Impossibile leggere le impostazioni native: '+err.message)}
 }
 async function saveNativeSettings(){
@@ -2073,3 +2079,7 @@ function exposeNativeSettings(){
   const b=$('#nativeSettingsButton');if(b&&window.pywebview?.api)b.hidden=false;
 }
 window.addEventListener('pywebviewready',exposeNativeSettings);
+
+async function openNativeModelManager(){const b=await waitForNativeApi();if(!b?.list_local_models)return toast('Native model manager unavailable');try{const d=await b.list_local_models(),profiles=d.catalog?.model_profiles||[],local=new Set((d.local||[]).map(x=>x.id.replace(/\.server-model$/,'')));const rows=profiles.map(p=>`<tr><td>${esc(p.display_name||p.model)}</td><td>${p.stem_count||'—'}</td><td>${local.has(p.model)?'Installed':'On demand'}</td><td><button onclick="nativeModelUpdate('${esc(p.model)}')">${local.has(p.model)?'Force update':'Download'}</button>${local.has(p.model)?` <button onclick="nativeModelDelete('${esc(p.model)}')">Delete local</button>`:''}</td></tr>`).join('');showUtilityModal('Demucs models',`<div class="table-scroll"><table><thead><tr><th>Model</th><th>Stems</th><th>Local</th><th>Actions</th></tr></thead><tbody>${rows}</tbody></table></div><p>Missing models are downloaded automatically when requested for splitting.</p>`) }catch(e){toast(e.message)}}
+async function nativeModelUpdate(id){const b=await waitForNativeApi();try{await b.update_local_model(id);toast('Model updated: '+id);openNativeModelManager()}catch(e){toast(e.message)}}
+async function nativeModelDelete(id){const b=await waitForNativeApi();try{await b.delete_local_model(id);toast('Local model deleted: '+id);openNativeModelManager()}catch(e){toast(e.message)}}

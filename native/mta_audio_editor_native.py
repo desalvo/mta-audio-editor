@@ -49,6 +49,7 @@ def _prepare_environment() -> Path:
     os.environ["MTA_DATA_DIR"] = str(root)
     os.environ["XDG_CACHE_HOME"] = str(cache)
     os.environ["TORCH_HOME"] = str(cache / "torch")
+    os.environ["MTA_DEMUCS_LOCAL_REPO"] = str(root / "demucs-models" / "repo")
     settings_path = root / "native-settings.json"
     configured_upload_mb = 1024
     if settings_path.is_file():
@@ -336,6 +337,20 @@ class NativeApi:
             "autosave_enabled": bool(autosave_enabled),
             "update_channel": channel,
         }
+
+    def list_local_models(self) -> dict:
+        from native.model_manager import list_local, catalog
+        try: remote = catalog()
+        except Exception as exc: remote = {"error": str(exc), "model_profiles": []}
+        return {"ok": True, "local": list_local(), "catalog": remote}
+
+    def update_local_model(self, model_id: str) -> dict:
+        from native.model_manager import update
+        return update(model_id)
+
+    def delete_local_model(self, model_id: str) -> dict:
+        from native.model_manager import delete
+        return delete(model_id)
 
     def check_for_updates(self) -> dict:
         from app.version import APP_VERSION

@@ -115,3 +115,12 @@ The iOS/iPadOS client always attempts to provision a default **4-stem Core ML De
 
 ### Automatic mobile Demucs model lifecycle
 Docker/Kubernetes refreshes signed-by-hash mobile model payloads from the configured HTTPS manifest every 6 hours by default. iOS/iPadOS and Android check the server periodically. Mobile model downloads are Wi-Fi-only by default and can be enabled on cellular in app preferences. iOS uses Core ML; Android provisions ONNX Runtime Mobile models.
+
+
+## Model-driven extended stem separation
+
+MTA Audio Editor no longer hard-codes a 2/4/6/8 list. The server and mobile clients discover the stem counts actually published by the model catalogue/manifest: 2, 4, 6, 8, 10, 12, 16, and larger values whenever a compatible model exists. The current safety ceiling is 64 stems per model. Multitrack DAW projects are not constrained by the stem count; MTA8/MTA16 limits are enforced only at export time. Additional server profiles are configured through `MTA_DEMUCS_MODEL_REGISTRY` or `MTA_DEMUCS_MODEL_REGISTRY_FILE`, declaring `model`, `stem_count`, `stem_labels`, and optionally `engine`/`display_name`.
+
+
+### Demucs model catalogue / Catalogo modelli Demucs
+The server periodically synchronizes all configured Demucs/Core ML/ONNX models. Native/mobile clients download requested models on demand, can delete or force-update local copies, and server administrators can blacklist models (which also removes managed server artifacts).

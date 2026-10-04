@@ -62,3 +62,7 @@ In modalità non interattiva usare, ad esempio:
 ```bash
 python3 mta-k8s-wizard.py --image-pull-policy Always
 ```
+
+## Demucs model catalogue and blacklist
+
+The container periodically synchronizes the configured Demucs model catalogue. Managed artifacts are stored under the persistent project volume in `.models/` (Core ML, ONNX and native/server bundles). Configure `MTA_DEMUCS_MODEL_MANIFEST_URL`, `MTA_DEMUCS_MODEL_UPDATE_INTERVAL_SECONDS`, and `MTA_DEMUCS_MODEL_AUTO_UPDATE` as needed. Administrators can force updates or blacklist/unblacklist individual models from **Administration -> Modelli AI**. Blacklisting removes managed server artifacts and hides the model from web/native/mobile catalogues.

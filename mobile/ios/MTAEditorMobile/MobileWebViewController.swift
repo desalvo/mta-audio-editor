@@ -77,7 +77,7 @@ final class MobileWebViewController: UIViewController, WKNavigationDelegate, WKU
           configureServer: function(){ window.webkit.messageHandlers.mtaMobile.postMessage({action:'configureServer'}); },
           setBusy: function(value){ window.webkit.messageHandlers.mtaMobile.postMessage({action:'setBusy',value:!!value}); },
           localStemCapabilities: function(){ return this._request('localStemCapabilities',{}); },
-          startLocalStemSeparation: function(projectId,stemCount,keepOriginal){ return this._request('startLocalStemSeparation',{projectId:projectId,stemCount:stemCount,keepOriginal:!!keepOriginal}); },
+          startLocalStemSeparation: function(projectId,stemCount,modelId,keepOriginal){ return this._request('startLocalStemSeparation',{projectId:projectId,stemCount:stemCount,modelId:modelId||'',keepOriginal:!!keepOriginal}); },
           cancelLocalStemSeparation: function(){ window.webkit.messageHandlers.mtaMobile.postMessage({action:'cancelLocalStemSeparation'}); }
         };
         """
@@ -92,7 +92,7 @@ final class MobileWebViewController: UIViewController, WKNavigationDelegate, WKU
         webView = WKWebView(frame: .zero, configuration: configuration)
         webView.navigationDelegate = self
         webView.uiDelegate = self
-        webView.customUserAgent = "MTAEditorMobile/0.2.0-100 iOS"
+        webView.customUserAgent = "MTAEditorMobile/0.2.0-102 iOS"
         webView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(webView)
         NSLayoutConstraint.activate([
@@ -117,6 +117,7 @@ final class MobileWebViewController: UIViewController, WKNavigationDelegate, WKU
             self.checkForAppUpdate(manual: true)
         })
         alert.addAction(UIAlertAction(title: "Demucs model updates…", style: .default) { _ in self.showDemucsUpdatePreferences() })
+        alert.addAction(UIAlertAction(title: "Demucs models…", style: .default) { _ in self.showDemucsModelManager() })
         alert.addAction(UIAlertAction(title: "Check for updates", style: .default) { _ in self.checkForAppUpdate(manual: true) })
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         if let popover = alert.popoverPresentationController { popover.barButtonItem = navigationItem.rightBarButtonItems?.first }
@@ -312,8 +313,9 @@ final class MobileWebViewController: UIViewController, WKNavigationDelegate, WKU
             guard let requestId = payload["requestId"] as? String,
                   let projectId = payload["projectId"] as? String else { return }
             let requested = payload["stemCount"] as? Int ?? 0
+            let modelId = (payload["modelId"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
             let keepOriginal = payload["keepOriginal"] as? Bool ?? true
-            startLocalStemSeparation(requestId: requestId, projectId: projectId, requestedStemCount: requested, keepOriginal: keepOriginal)
+            startLocalStemSeparation(requestId: requestId, projectId: projectId, requestedStemCount: requested, modelId: modelId, keepOriginal: keepOriginal)
         case "cancelLocalStemSeparation":
             LocalStemEngine.shared.cancel()
         default:
@@ -334,7 +336,7 @@ final class MobileWebViewController: UIViewController, WKNavigationDelegate, WKU
         evaluateMobileCallback("window.MtaMobile._resolve('\(requestId)',\(json));")
     }
 
-    private func startLocalStemSeparation(requestId: String, projectId: String, requestedStemCount: Int, keepOriginal: Bool) {
+    private func startLocalStemSeparation(requestId: String, projectId: String, requestedStemCount: Int, modelId: String, keepOriginal: Bool) {
         guard !activeLocalStemTask else {
             evaluateMobileCallback("window.MtaMobile._reject('\(requestId)','È già in corso una separazione locale.');")
             return
@@ -345,13 +347,14 @@ final class MobileWebViewController: UIViewController, WKNavigationDelegate, WKU
         }
         let caps = LocalStemEngine.shared.capabilities()
         let selected = requestedStemCount == 0 ? caps.recommendedStemCount : requestedStemCount
-        guard LocalStemEngine.supportedStemCounts.contains(selected) else {
+        guard LocalStemEngine.supports(stemCount: selected) else {
             evaluateMobileCallback("window.MtaMobile._reject('\(requestId)','Numero stem locale non supportato.');")
             return
         }
         activeLocalStemTask = true
         UIApplication.shared.isIdleTimerDisabled = true
-        ensureLocalModel(stemCount: selected) { [weak self] modelResult in
+        let requestedModelId = modelId.isEmpty ? "demucs-\(selected)" : modelId
+        ensureLocalModel(modelId: requestedModelId, stemCount: selected) { [weak self] modelResult in
             guard let self else { return }
             switch modelResult {
             case .failure(let error):
@@ -359,16 +362,16 @@ final class MobileWebViewController: UIViewController, WKNavigationDelegate, WKU
                 UIApplication.shared.isIdleTimerDisabled = false
                 self.evaluateMobileCallback("window.MtaMobile._reject('\(requestId)','\(self.jsEscaped(error.localizedDescription))');")
             case .success:
-                self.LocalStemStart(input: input, projectId: projectId, stemCount: selected, keepOriginal: keepOriginal, requestId: requestId)
+                self.LocalStemStart(input: input, projectId: projectId, modelId: requestedModelId, stemCount: selected, keepOriginal: keepOriginal, requestId: requestId)
             }
         }
     }
 
-    private func LocalStemStart(input: URL, projectId: String, stemCount: Int, keepOriginal: Bool, requestId: String) {
+    private func LocalStemStart(input: URL, projectId: String, modelId: String, stemCount: Int, keepOriginal: Bool, requestId: String) {
         let beginInference = { [weak self] in
             guard let self else { return }
             let scoped = input.startAccessingSecurityScopedResource()
-            LocalStemEngine.shared.separate(inputURL: input, stemCount: stemCount, progress: { [weak self] pct, message in
+            LocalStemEngine.shared.separate(inputURL: input, modelId: modelId, stemCount: stemCount, progress: { [weak self] pct, message in
                 guard let self else { return }
                 let safe = self.jsEscaped(message)
                 self.evaluateMobileCallback("window.dispatchEvent(new CustomEvent('mtaLocalStemProgress',{detail:{progress:\(pct),message:'\(safe)'}}));")
@@ -422,36 +425,46 @@ final class MobileWebViewController: UIViewController, WKNavigationDelegate, WKU
         }
     }
 
-    private func refreshCoreMLModelsIfNeeded() {
-        guard mayDownloadModelUpdate() else { return }
-        guard !modelRefreshInFlight, let base = webView.url else { return }
-        modelRefreshInFlight = true
-        let endpoint = URL(string: "/api/mobile/demucs-coreml/status", relativeTo: base)!.absoluteURL
-        authenticatedRequest(url: endpoint, method: "GET") { [weak self] request in
+    private func fetchCoreMLCatalog(_ completion: @escaping ([[String: Any]]) -> Void) {
+        guard let base = webView.url else { completion([]); return }
+        let endpoint = URL(string: "/api/models/catalog?platform=ios", relativeTo: base)!.absoluteURL
+        authenticatedRequest(url: endpoint, method: "GET") { request in
             URLSession.shared.dataTask(with: request) { data, response, _ in
-                guard let self else { return }
-                defer { DispatchQueue.main.async { self.modelRefreshInFlight = false } }
                 guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode), let data,
                       let root = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-                      let models = root["models"] as? [String: [String: Any]] else { return }
-                let defaultCount = root["default_stem_count"] as? Int ?? 4
-                let installed = Set(LocalStemEngine.shared.installedStemCounts())
-                var wanted = installed
-                wanted.insert(defaultCount)
-                let semaphore = DispatchSemaphore(value: 0)
-                for count in wanted.sorted() {
-                    guard let remote = models[String(count)], let sha = remote["sha256"] as? String, !sha.isEmpty else { continue }
-                    if LocalStemEngine.shared.isModelInstalled(stemCount: count), LocalStemEngine.shared.modelFingerprint(stemCount: count) == sha { continue }
-                    self.downloadAndInstallCoreMLModel(stemCount: count, fingerprint: sha) { _ in semaphore.signal() }
-                    _ = semaphore.wait(timeout: .now() + 180)
-                }
+                      let models = root["models"] as? [[String: Any]] else { completion([]); return }
+                completion(models)
             }.resume()
         }
     }
 
-    private func downloadAndInstallCoreMLModel(stemCount: Int, fingerprint: String = "", completion: @escaping (Result<Void, Error>) -> Void) {
+    private func refreshCoreMLModelsIfNeeded() {
+        guard mayDownloadModelUpdate(), !modelRefreshInFlight else { return }
+        modelRefreshInFlight = true
+        fetchCoreMLCatalog { [weak self] models in
+            guard let self else { return }
+            defer { DispatchQueue.main.async { self.modelRefreshInFlight = false } }
+            let installedIds = Set(LocalStemEngine.shared.installedModelIds())
+            let wanted = models.filter { item in
+                let id = item["id"] as? String ?? ""
+                return id == "demucs-4" || installedIds.contains(id)
+            }
+            let semaphore = DispatchSemaphore(value: 0)
+            for item in wanted {
+                guard let id = item["id"] as? String, let count = item["stem_count"] as? Int else { continue }
+                let sha = item["sha256"] as? String ?? ""
+                if LocalStemEngine.shared.isModelInstalled(modelId: id, stemCount: count), !sha.isEmpty,
+                   LocalStemEngine.shared.modelFingerprint(modelId: id, stemCount: count) == sha { continue }
+                self.downloadAndInstallCoreMLModel(modelId: id, stemCount: count, fingerprint: sha) { _ in semaphore.signal() }
+                _ = semaphore.wait(timeout: .now() + 300)
+            }
+        }
+    }
+
+    private func downloadAndInstallCoreMLModel(modelId: String, stemCount: Int, fingerprint: String = "", completion: @escaping (Result<Void, Error>) -> Void) {
         guard let base = webView.url else { completion(.failure(LocalStemError.modelMissing(stemCount))); return }
-        let endpoint = URL(string: "/api/mobile/demucs-coreml/models/\(stemCount)", relativeTo: base)!.absoluteURL
+        let safeId = modelId.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? modelId
+        let endpoint = URL(string: "/api/models/coreml/\(safeId)", relativeTo: base)!.absoluteURL
         authenticatedRequest(url: endpoint, method: "GET") { request in
             URLSession.shared.downloadTask(with: request) { location, response, error in
                 if let error { DispatchQueue.main.async { completion(.failure(error)) }; return }
@@ -459,10 +472,10 @@ final class MobileWebViewController: UIViewController, WKNavigationDelegate, WKU
                     DispatchQueue.main.async { completion(.failure(LocalStemError.modelMissing(stemCount))) }; return
                 }
                 do {
-                    let temp = FileManager.default.temporaryDirectory.appendingPathComponent("demucs-\(stemCount)-\(UUID().uuidString).mlmodel")
+                    let temp = FileManager.default.temporaryDirectory.appendingPathComponent("\(modelId)-\(UUID().uuidString).mlmodel")
                     try? FileManager.default.removeItem(at: temp)
                     try FileManager.default.copyItem(at: location, to: temp)
-                    try LocalStemEngine.shared.installDownloadedModel(temp, stemCount: stemCount, fingerprint: fingerprint)
+                    try LocalStemEngine.shared.installDownloadedModel(temp, modelId: modelId, stemCount: stemCount, fingerprint: fingerprint)
                     try? FileManager.default.removeItem(at: temp)
                     DispatchQueue.main.async { completion(.success(())) }
                 } catch { DispatchQueue.main.async { completion(.failure(error)) } }
@@ -470,10 +483,32 @@ final class MobileWebViewController: UIViewController, WKNavigationDelegate, WKU
         }
     }
 
-    private func ensureLocalModel(stemCount: Int, completion: @escaping (Result<Void, Error>) -> Void) {
-        if LocalStemEngine.shared.isModelInstalled(stemCount: stemCount) { completion(.success(())); return }
-        if stemCount == 4, LocalStemEngine.shared.installBundledDefaultModelIfNeeded() { completion(.success(())); return }
-        downloadAndInstallCoreMLModel(stemCount: stemCount, completion: completion)
+    private func showDemucsModelManager() {
+        fetchCoreMLCatalog { [weak self] models in
+            guard let self else { return }
+            DispatchQueue.main.async {
+                let italian = Locale.current.language.languageCode?.identifier == "it"
+                let alert = UIAlertController(title: "Demucs models", message: italian ? "Scarica, aggiorna o elimina i modelli locali. I modelli mancanti vengono scaricati automaticamente quando richiesti." : "Download, update, or delete local models. Missing models are downloaded automatically when requested.", preferredStyle: .actionSheet)
+                for item in models.sorted(by: { ($0["stem_count"] as? Int ?? 0) < ($1["stem_count"] as? Int ?? 0) }) {
+                    guard let id = item["id"] as? String, let count = item["stem_count"] as? Int else { continue }
+                    let title = item["display_name"] as? String ?? id
+                    let installed = LocalStemEngine.shared.isModelInstalled(modelId: id, stemCount: count)
+                    alert.addAction(UIAlertAction(title: "\(title) · \(count) stem · \(installed ? "installed" : "available")", style: .default) { _ in
+                        let sub = UIAlertController(title: title, message: nil, preferredStyle: .actionSheet)
+                        sub.addAction(UIAlertAction(title: installed ? "Force update" : "Download", style: .default) { _ in self.downloadAndInstallCoreMLModel(modelId: id, stemCount: count) { _ in } })
+                        if installed { sub.addAction(UIAlertAction(title: "Delete local model", style: .destructive) { _ in try? LocalStemEngine.shared.deleteInstalledModel(modelId: id, stemCount: count) }) }
+                        sub.addAction(UIAlertAction(title: "Cancel", style: .cancel)); self.present(sub, animated: true)
+                    })
+                }
+                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel)); self.present(alert, animated: true)
+            }
+        }
+    }
+
+    private func ensureLocalModel(modelId: String, stemCount: Int, completion: @escaping (Result<Void, Error>) -> Void) {
+        if LocalStemEngine.shared.isModelInstalled(modelId: modelId, stemCount: stemCount) { completion(.success(())); return }
+        if stemCount == 4, modelId == "demucs-4", LocalStemEngine.shared.installBundledDefaultModelIfNeeded() { completion(.success(())); return }
+        downloadAndInstallCoreMLModel(modelId: modelId, stemCount: stemCount, completion: completion)
     }
 
     private func uploadStemFiles(_ files: [URL], projectId: String, index: Int, completion: @escaping (Result<Void, Error>) -> Void) {

@@ -34,7 +34,12 @@ enum LocalStemError: LocalizedError {
 final class LocalStemEngine {
     static let shared = LocalStemEngine()
     static let sampleRate: Double = 44_100
-    static let supportedStemCounts = [2, 4, 6, 8]
+    static let minimumStemCount = 2
+    static let maximumStemCount = 64
+
+    static func supports(stemCount: Int) -> Bool {
+        stemCount >= minimumStemCount && stemCount <= maximumStemCount
+    }
 
     private let fm = FileManager.default
     private var cancellationRequested = false
@@ -49,22 +54,37 @@ final class LocalStemEngine {
         return dir
     }
 
-    func compiledModelURL(stemCount: Int) -> URL {
-        modelsDirectory.appendingPathComponent("demucs-\(stemCount).mlmodelc", isDirectory: true)
+    private func safeModelId(_ modelId: String) -> String {
+        let allowed = CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789._-")
+        let cleaned = modelId.unicodeScalars.map { allowed.contains($0) ? Character(String($0)) : Character("-") }
+        return String(cleaned).trimmingCharacters(in: CharacterSet(charactersIn: "-."))
+    }
+
+    func compiledModelURL(modelId: String, stemCount: Int) -> URL {
+        let safe = safeModelId(modelId)
+        return modelsDirectory.appendingPathComponent("\(safe)-\(stemCount).mlmodelc", isDirectory: true)
+    }
+
+    func compiledModelURL(stemCount: Int) -> URL { compiledModelURL(modelId: "demucs", stemCount: stemCount) }
+
+    func isModelInstalled(modelId: String, stemCount: Int) -> Bool {
+        fm.fileExists(atPath: compiledModelURL(modelId: modelId, stemCount: stemCount).path)
     }
 
     func isModelInstalled(stemCount: Int) -> Bool {
-        fm.fileExists(atPath: compiledModelURL(stemCount: stemCount).path)
+        isModelInstalled(modelId: "demucs", stemCount: stemCount) || isModelInstalled(modelId: "demucs-\(stemCount)", stemCount: stemCount)
     }
 
-    private func fingerprintKey(stemCount: Int) -> String { "mta.demucs.coreml.sha256.\(stemCount)" }
+    private func fingerprintKey(modelId: String, stemCount: Int) -> String { "mta.demucs.coreml.sha256.\(safeModelId(modelId)).\(stemCount)" }
 
-    func modelFingerprint(stemCount: Int) -> String {
-        UserDefaults.standard.string(forKey: fingerprintKey(stemCount: stemCount)) ?? ""
+    func modelFingerprint(modelId: String, stemCount: Int) -> String {
+        UserDefaults.standard.string(forKey: fingerprintKey(modelId: modelId, stemCount: stemCount)) ?? ""
     }
 
-    private func setModelFingerprint(_ value: String, stemCount: Int) {
-        UserDefaults.standard.set(value, forKey: fingerprintKey(stemCount: stemCount))
+    func modelFingerprint(stemCount: Int) -> String { modelFingerprint(modelId: "demucs", stemCount: stemCount) }
+
+    private func setModelFingerprint(_ value: String, modelId: String, stemCount: Int) {
+        UserDefaults.standard.set(value, forKey: fingerprintKey(modelId: modelId, stemCount: stemCount))
     }
 
     private func sha256(of url: URL) -> String {
@@ -74,32 +94,47 @@ final class LocalStemEngine {
 
     @discardableResult
     func installBundledDefaultModelIfNeeded() -> Bool {
-        let stemCount = 4
-        if isModelInstalled(stemCount: stemCount) { return true }
+        let stemCount = 4, modelId = "demucs-4"
+        if isModelInstalled(modelId: modelId, stemCount: stemCount) { return true }
         do {
             if let compiled = Bundle.main.url(forResource: "demucs-default-4", withExtension: "mlmodelc", subdirectory: "Models") ?? Bundle.main.url(forResource: "demucs-default-4", withExtension: "mlmodelc") {
-                let destination = compiledModelURL(stemCount: stemCount)
+                let destination = compiledModelURL(modelId: modelId, stemCount: stemCount)
                 try? fm.removeItem(at: destination)
                 try fm.copyItem(at: compiled, to: destination)
-                setModelFingerprint("bundled-default", stemCount: stemCount)
+                setModelFingerprint("bundled-default", modelId: modelId, stemCount: stemCount)
                 return true
             }
             if let source = Bundle.main.url(forResource: "demucs-default-4", withExtension: "mlmodel", subdirectory: "Models") ?? Bundle.main.url(forResource: "demucs-default-4", withExtension: "mlmodel") {
                 let compiled = try MLModel.compileModel(at: source)
-                let destination = compiledModelURL(stemCount: stemCount)
+                let destination = compiledModelURL(modelId: modelId, stemCount: stemCount)
                 try? fm.removeItem(at: destination)
                 try fm.copyItem(at: compiled, to: destination)
-                setModelFingerprint(sha256(of: source), stemCount: stemCount)
+                setModelFingerprint(sha256(of: source), modelId: modelId, stemCount: stemCount)
                 return true
             }
-        } catch {
-            return false
-        }
+        } catch { return false }
         return false
     }
 
     func installedStemCounts() -> [Int] {
-        Self.supportedStemCounts.filter { isModelInstalled(stemCount: $0) }
+        guard let entries = try? fm.contentsOfDirectory(at: modelsDirectory, includingPropertiesForKeys: nil) else { return [] }
+        let regex = try? NSRegularExpression(pattern: #"-(\d+)\.mlmodelc$"#)
+        return Array(Set(entries.compactMap { url -> Int? in
+            let name = url.lastPathComponent
+            guard let match = regex?.firstMatch(in: name, range: NSRange(name.startIndex..., in: name)),
+                  let range = Range(match.range(at: 1), in: name),
+                  let count = Int(name[range]), Self.supports(stemCount: count) else { return nil }
+            return count
+        })).sorted()
+    }
+
+    func installedModelIds() -> [String] {
+        guard let entries = try? fm.contentsOfDirectory(at: modelsDirectory, includingPropertiesForKeys: nil) else { return [] }
+        return entries.filter { $0.pathExtension == "mlmodelc" }.compactMap { url in
+            let base = url.deletingPathExtension().lastPathComponent
+            guard let dash = base.lastIndex(of: "-") else { return nil }
+            return String(base[..<dash])
+        }.sorted()
     }
 
     func recommendedStemCount() -> Int {
@@ -112,8 +147,6 @@ final class LocalStemEngine {
             if gib >= 8 { return 6 }
             return 4
         }
-        // iPhone defaults are deliberately more conservative because sustained
-        // Core ML workloads can hit memory and thermal pressure sooner than iPad.
         if gib >= 8 { return 6 }
         if gib >= 5 { return 4 }
         return 2
@@ -121,27 +154,37 @@ final class LocalStemEngine {
     }
 
     func capabilities() -> LocalStemCapabilities {
-        LocalStemCapabilities(
-            installedStemCounts: installedStemCounts(),
-            recommendedStemCount: recommendedStemCount(),
-            physicalMemoryBytes: ProcessInfo.processInfo.physicalMemory,
-            canRunLocally: !installedStemCounts().isEmpty
-        )
+        LocalStemCapabilities(installedStemCounts: installedStemCounts(), recommendedStemCount: recommendedStemCount(), physicalMemoryBytes: ProcessInfo.processInfo.physicalMemory, canRunLocally: !installedStemCounts().isEmpty)
     }
 
     func cancel() { cancellationRequested = true }
 
-    func installDownloadedModel(_ modelURL: URL, stemCount: Int, fingerprint: String = "") throws {
-        guard Self.supportedStemCounts.contains(stemCount) else { throw LocalStemError.unsupportedStemCount(stemCount) }
+    func installDownloadedModel(_ modelURL: URL, modelId: String, stemCount: Int, fingerprint: String = "") throws {
+        guard Self.supports(stemCount: stemCount) else { throw LocalStemError.unsupportedStemCount(stemCount) }
         let compiled = try MLModel.compileModel(at: modelURL)
-        let destination = compiledModelURL(stemCount: stemCount)
+        let destination = compiledModelURL(modelId: modelId, stemCount: stemCount)
         try? fm.removeItem(at: destination)
         try fm.copyItem(at: compiled, to: destination)
-        setModelFingerprint(fingerprint.isEmpty ? sha256(of: modelURL) : fingerprint, stemCount: stemCount)
+        setModelFingerprint(fingerprint.isEmpty ? sha256(of: modelURL) : fingerprint, modelId: modelId, stemCount: stemCount)
+    }
+
+    func installDownloadedModel(_ modelURL: URL, stemCount: Int, fingerprint: String = "") throws {
+        try installDownloadedModel(modelURL, modelId: "demucs-\(stemCount)", stemCount: stemCount, fingerprint: fingerprint)
+    }
+
+    func deleteInstalledModel(modelId: String, stemCount: Int) throws {
+        let url = compiledModelURL(modelId: modelId, stemCount: stemCount)
+        if fm.fileExists(atPath: url.path) { try fm.removeItem(at: url) }
+        UserDefaults.standard.removeObject(forKey: fingerprintKey(modelId: modelId, stemCount: stemCount))
+    }
+
+    func deleteInstalledModel(stemCount: Int) throws {
+        for id in installedModelIds() where isModelInstalled(modelId: id, stemCount: stemCount) { try deleteInstalledModel(modelId: id, stemCount: stemCount) }
     }
 
     func separate(
         inputURL: URL,
+        modelId: String = "demucs",
         stemCount: Int,
         progress: @escaping (Int, String) -> Void,
         completion: @escaping (Result<[URL], Error>) -> Void
@@ -150,7 +193,7 @@ final class LocalStemEngine {
         queue.async { [weak self] in
             guard let self else { return }
             do {
-                let urls = try self.separateSync(inputURL: inputURL, stemCount: stemCount, progress: progress)
+                let urls = try self.separateSync(inputURL: inputURL, modelId: modelId, stemCount: stemCount, progress: progress)
                 DispatchQueue.main.async { completion(.success(urls)) }
             } catch {
                 DispatchQueue.main.async { completion(.failure(error)) }
@@ -159,8 +202,8 @@ final class LocalStemEngine {
     }
 
     private func separateSync(inputURL: URL, stemCount: Int, progress: @escaping (Int, String) -> Void) throws -> [URL] {
-        guard Self.supportedStemCounts.contains(stemCount) else { throw LocalStemError.unsupportedStemCount(stemCount) }
-        let modelURL = compiledModelURL(stemCount: stemCount)
+        guard Self.supports(stemCount: stemCount) else { throw LocalStemError.unsupportedStemCount(stemCount) }
+        let modelURL = compiledModelURL(modelId: modelId, stemCount: stemCount)
         guard fm.fileExists(atPath: modelURL.path) else { throw LocalStemError.modelMissing(stemCount) }
 
         progress(3, "Caricamento modello Core ML")

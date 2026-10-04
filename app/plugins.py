@@ -421,21 +421,94 @@ class DemucsStemSplitter:
         return shutil.which("demucs") is not None or importlib.util.find_spec("demucs") is not None
 
     @classmethod
-    def status(cls) -> dict[str, object]:
+    def _model_profiles(cls) -> list[dict[str, object]]:
+        """Return built-in and administrator-configured stem model profiles.
+
+        Custom profiles are supplied through MTA_DEMUCS_MODEL_REGISTRY as JSON,
+        or MTA_DEMUCS_MODEL_REGISTRY_FILE pointing to a JSON file.  The registry
+        may be either a list of profile objects or {"models": [...]}.  A profile
+        minimally declares id/model and stem_count; labels and display_name are
+        optional.  This keeps the application independent from a hard-coded
+        maximum such as 8 or 16 stems.
+        """
+        profiles: list[dict[str, object]] = [
+            {"id": "htdemucs", "model": "htdemucs", "stem_count": 4, "display_name": "HTDemucs 4 stem", "stem_labels": ["drums", "bass", "other", "vocals"]},
+            {"id": "htdemucs_ft", "model": "htdemucs_ft", "stem_count": 4, "display_name": "HTDemucs FT 4 stem", "stem_labels": ["drums", "bass", "other", "vocals"]},
+            {"id": "htdemucs_6s", "model": "htdemucs_6s", "stem_count": 6, "display_name": "HTDemucs 6 stem", "stem_labels": ["drums", "bass", "other", "vocals", "guitar", "piano"]},
+            {"id": "hdemucs_mmi", "model": "hdemucs_mmi", "stem_count": 4, "display_name": "HDemucs MMI", "stem_labels": ["drums", "bass", "other", "vocals"]},
+            {"id": "mdx", "model": "mdx", "stem_count": 4, "display_name": "MDX", "stem_labels": ["drums", "bass", "other", "vocals"]},
+            {"id": "mdx_extra", "model": "mdx_extra", "stem_count": 4, "display_name": "MDX Extra", "stem_labels": ["drums", "bass", "other", "vocals"]},
+            {"id": "mdx_q", "model": "mdx_q", "stem_count": 4, "display_name": "MDX Quantized", "stem_labels": ["drums", "bass", "other", "vocals"]},
+            {"id": "mdx_extra_q", "model": "mdx_extra_q", "stem_count": 4, "display_name": "MDX Extra Quantized", "stem_labels": ["drums", "bass", "other", "vocals"]},
+            {"id": "repro_mdx_a", "model": "repro_mdx_a", "stem_count": 4, "display_name": "Repro MDX A", "stem_labels": ["drums", "bass", "other", "vocals"]},
+            {"id": "repro_mdx_a_hybrid_only", "model": "repro_mdx_a_hybrid_only", "stem_count": 4, "display_name": "Repro MDX A Hybrid", "stem_labels": ["drums", "bass", "other", "vocals"]},
+            {"id": "repro_mdx_a_time_only", "model": "repro_mdx_a_time_only", "stem_count": 4, "display_name": "Repro MDX A Time", "stem_labels": ["drums", "bass", "other", "vocals"]},
+        ]
+        raw = os.getenv("MTA_DEMUCS_MODEL_REGISTRY", "").strip()
+        registry_file = os.getenv("MTA_DEMUCS_MODEL_REGISTRY_FILE", "").strip()
+        if registry_file:
+            try:
+                raw = Path(registry_file).read_text(encoding="utf-8")
+            except OSError:
+                raw = raw or ""
+        if raw:
+            try:
+                parsed = json.loads(raw)
+                items = parsed.get("models", []) if isinstance(parsed, dict) else parsed
+                for item in items if isinstance(items, list) else []:
+                    if not isinstance(item, dict):
+                        continue
+                    model = str(item.get("model") or item.get("id") or "").strip()
+                    try:
+                        count = int(item.get("stem_count", 0))
+                    except (TypeError, ValueError):
+                        continue
+                    if not model or count < 2 or count > 64:
+                        continue
+                    labels = item.get("stem_labels")
+                    if not isinstance(labels, list) or len(labels) != count:
+                        labels = [f"stem_{index + 1}" for index in range(count)]
+                    profiles.append({
+                        "id": str(item.get("id") or model),
+                        "model": model,
+                        "stem_count": count,
+                        "display_name": str(item.get("display_name") or f"{model} ({count} stem)"),
+                        "stem_labels": [str(label) for label in labels],
+                        "engine": str(item.get("engine") or "demucs"),
+                    })
+            except (ValueError, TypeError):
+                pass
+        # Backward-compatible 8-stem environment variable.
         extended_8_model = os.getenv("MTA_DEMUCS_8_MODEL", "").strip()
-        models = ["htdemucs", "htdemucs_ft", "htdemucs_6s"]
-        if extended_8_model and extended_8_model not in models:
-            models.append(extended_8_model)
-        supported_counts = [2, 4, 6] + ([8] if extended_8_model else [])
+        if extended_8_model and not any(str(item.get("model")) == extended_8_model for item in profiles):
+            profiles.append({"id": extended_8_model, "model": extended_8_model, "stem_count": 8, "display_name": f"{extended_8_model} (8 stem)", "stem_labels": [f"stem_{index + 1}" for index in range(8)], "engine": "demucs"})
+        # Deduplicate by model id while preserving administrator overrides.
+        dedup: dict[str, dict[str, object]] = {}
+        for item in profiles:
+            dedup[str(item["model"])] = item
+        try:
+            from .model_updater import load_blacklist
+            blacklist = load_blacklist()
+        except Exception:
+            blacklist = set()
+        return [item for item in dedup.values() if str(item.get("id") or item.get("model")) not in blacklist and str(item.get("model")) not in blacklist]
+
+    @classmethod
+    def status(cls) -> dict[str, object]:
+        profiles = cls._model_profiles()
+        models = [str(item["model"]) for item in profiles]
+        supported_counts = sorted({2, *(int(item["stem_count"]) for item in profiles)})
         return {
             "name": cls.name,
             "display_name": cls.display_name,
             "available": cls.available(),
             "models": models,
+            "model_profiles": profiles,
             "recommended_model": "htdemucs_6s",
             "supported_stem_counts": supported_counts,
             "default_stem_count": 0,
-            "extended_8_model": extended_8_model or None,
+            "max_supported_stem_count": max(supported_counts, default=6),
+            "model_driven": True,
         }
 
     @classmethod
@@ -449,24 +522,31 @@ class DemucsStemSplitter:
         progress=None,
         cancel_event=None,
     ) -> list[Path]:
-        if stem_count not in {0, 2, 4, 6, 8}:
+        if stem_count != 0 and not 2 <= stem_count <= 64:
             raise ValueError("unsupported stem count")
-        extended_8_model = os.getenv("MTA_DEMUCS_8_MODEL", "").strip()
-        if stem_count == 8:
-            if not extended_8_model:
-                raise ValueError("8-stem separation requires MTA_DEMUCS_8_MODEL on this backend")
-            model = extended_8_model
-        elif stem_count == 6:
-            model = "htdemucs_6s"
-        elif stem_count in {2, 4} and model == "htdemucs_6s":
-            model = "htdemucs"
-        allowed = {"htdemucs", "htdemucs_ft", "htdemucs_6s"}
-        if extended_8_model:
-            allowed.add(extended_8_model)
-        if model not in allowed:
+        profiles = cls._model_profiles()
+        by_model = {str(item["model"]): item for item in profiles}
+        if stem_count == 2:
+            # Demucs two-stem mode is derived from the standard 4-stem model.
+            if model not in {"htdemucs", "htdemucs_ft"}:
+                model = "htdemucs"
+        elif stem_count:
+            matching = [item for item in profiles if int(item["stem_count"]) == stem_count]
+            if model not in by_model or int(by_model[model]["stem_count"]) != stem_count:
+                if not matching:
+                    raise ValueError(f"no configured model provides {stem_count} stems")
+                model = str(matching[0]["model"])
+        if model not in by_model:
             raise ValueError("unsupported Demucs model")
         if not cls.available():
             raise RuntimeError("Demucs stem plugin is not installed in this runtime")
+        local_repo = os.getenv("MTA_DEMUCS_LOCAL_REPO", "").strip()
+        if getattr(sys, "frozen", False) and local_repo:
+            try:
+                from native.model_manager import ensure as ensure_native_model
+                ensure_native_model(model)
+            except Exception as exc:
+                raise RuntimeError(f"Unable to download requested native Demucs model {model}: {exc}") from exc
         output_dir.mkdir(parents=True, exist_ok=True)
         if getattr(sys, "frozen", False):
             # In native .app/.exe builds, starting the frozen GUI executable as a
@@ -482,6 +562,8 @@ class DemucsStemSplitter:
             old_argv = sys.argv[:]
             try:
                 sys.argv = ["demucs.separate", "-n", model, "--out", str(output_dir)]
+                if local_repo:
+                    sys.argv += ["--repo", local_repo]
                 if stem_count == 2:
                     sys.argv += ["--two-stems", "vocals"]
                 sys.argv.append(str(source))
@@ -511,6 +593,8 @@ class DemucsStemSplitter:
             cmd = ["demucs", "-n", model, "--out", str(output_dir)]
         else:
             cmd = [sys.executable, "-m", "demucs.separate", "-n", model, "--out", str(output_dir)]
+        if local_repo:
+            cmd += ["--repo", local_repo]
         if stem_count == 2:
             cmd += ["--two-stems", "vocals"]
         cmd.append(str(source))

@@ -21,7 +21,10 @@ from .codec import export_mta, ffprobe, import_mta, resolve_mta_device_profile, 
 from .models import AutoMixRequest, Clip, CustomPresetRequest, DeleteRangeRequest, MoveTrackRequest, MtaExportRequest, Project, ProjectExportRequest, Track
 from .plugins import STEM_SPLITTER, delete_user_preset, plugin_manifest, save_user_preset
 
-from .model_updater import COREML_DIR, ONNX_DIR, start_background_updater, update_once as update_mobile_demucs_models
+from .model_updater import (COREML_DIR, ONNX_DIR, start_background_updater, update_once as update_mobile_demucs_models,
+    server_inventory as demucs_server_inventory, blacklist_model as blacklist_demucs_model,
+    unblacklist_model as unblacklist_demucs_model, load_blacklist as demucs_blacklist,
+    public_catalog as demucs_public_catalog, native_bundle as demucs_native_bundle)
 COREML_DEMUCS_MODEL_DIR = Path(os.getenv("MTA_DEMUCS_COREML_MODEL_DIR", str(COREML_DIR))).expanduser()
 ONNX_DEMUCS_MODEL_DIR = Path(os.getenv("MTA_DEMUCS_ONNX_MODEL_DIR", str(ONNX_DIR))).expanduser()
 from .security import auth_failure_response, check_basic_auth
@@ -1599,31 +1602,60 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
 
 
 
+def _mobile_demucs_inventory(directory: Path, extension: str, route_prefix: str) -> tuple[list[int], dict[str, dict[str, object]]]:
+    """Discover every valid demucs-N model instead of assuming 2/4/6/8."""
+    available: list[int] = []
+    models: dict[str, dict[str, object]] = {}
+    if not directory.is_dir():
+        return available, models
+    pattern = re.compile(rf"^demucs-(\d+)\{extension}$")
+    for model in sorted(directory.glob(f"demucs-*{extension}")):
+        match = pattern.match(model.name)
+        if not match:
+            continue
+        count = int(match.group(1))
+        if count < 2 or count > 64:
+            continue
+        payload = model.read_bytes()
+        available.append(count)
+        meta_path = model.with_suffix(model.suffix + ".json")
+        metadata: dict[str, object] = {}
+        if meta_path.is_file():
+            try:
+                parsed = json.loads(meta_path.read_text(encoding="utf-8"))
+                if isinstance(parsed, dict):
+                    metadata = parsed
+            except (OSError, ValueError):
+                pass
+        model_id = str(metadata.get("id") or metadata.get("model") or f"demucs-{count}")
+        if model_id in demucs_blacklist():
+            continue
+        models[str(count)] = {
+            "id": model_id,
+            "stem_count": count,
+            "filename": model.name,
+            "sha256": hashlib.sha256(payload).hexdigest(),
+            "size": len(payload),
+            "updated_at": int(model.stat().st_mtime),
+            "url": f"{route_prefix}/{count}",
+            "version": str(metadata.get("version", "")),
+            "stem_labels": metadata.get("stem_labels", []),
+        }
+    return sorted(set(available)), models
+
+
 @app.get("/api/mobile/demucs-coreml/status")
 def mobile_demucs_coreml_status(request: Request):
     _actor(request)
-    available: list[int] = []
-    models: dict[str, dict[str, object]] = {}
-    if COREML_DEMUCS_MODEL_DIR.is_dir():
-        for count in (2, 4, 6, 8):
-            model = COREML_DEMUCS_MODEL_DIR / f"demucs-{count}.mlmodel"
-            if model.is_file():
-                payload = model.read_bytes()
-                available.append(count)
-                models[str(count)] = {
-                    "stem_count": count,
-                    "filename": model.name,
-                    "sha256": hashlib.sha256(payload).hexdigest(),
-                    "size": len(payload),
-                    "updated_at": int(model.stat().st_mtime),
-                    "url": f"/api/mobile/demucs-coreml/models/{count}",
-                }
+    available, models = _mobile_demucs_inventory(COREML_DEMUCS_MODEL_DIR, ".mlmodel", "/api/mobile/demucs-coreml/models")
     return {
         "available_stem_counts": available,
         "default_stem_count": 4,
         "models": models,
         "format": "CoreML mlmodel",
         "runtime": "on-device",
+        "model_driven": True,
+        "max_stem_count": max(available, default=4),
     }
 
 
@@ -1651,7 +1683,7 @@ def mobile_demucs_coreml_bootstrap():
 @app.get("/api/mobile/demucs-coreml/models/{stem_count}")
 def mobile_demucs_coreml_model(stem_count: int, request: Request):
     _actor(request)
-    if stem_count not in {2, 4, 6, 8}:
+    if stem_count < 2 or stem_count > 64:
         raise HTTPException(404, "Modello locale non disponibile")
     if not COREML_DEMUCS_MODEL_DIR:
         raise HTTPException(404, "Repository modelli Core ML non configurato")
@@ -1664,14 +1696,9 @@ def mobile_demucs_coreml_model(stem_count: int, request: Request):
 @app.get("/api/mobile/demucs-onnx/status")
 def mobile_demucs_onnx_status(request: Request):
     _actor(request)
-    models={}; available=[]
-    if ONNX_DEMUCS_MODEL_DIR.is_dir():
-        for count in (2,4,6,8):
-            model=ONNX_DEMUCS_MODEL_DIR/f"demucs-{count}.onnx"
-            if model.is_file():
-                payload=model.read_bytes(); available.append(count)
-                models[str(count)]={"stem_count":count,"filename":model.name,"sha256":hashlib.sha256(payload).hexdigest(),"size":len(payload),"updated_at":int(model.stat().st_mtime),"url":f"/api/mobile/demucs-onnx/models/{count}"}
-    return {"available_stem_counts":available,"default_stem_count":4,"models":models,"format":"ONNX","runtime":"on-device"}
+    available, models = _mobile_demucs_inventory(ONNX_DEMUCS_MODEL_DIR, ".onnx", "/api/mobile/demucs-onnx/models")
+    return {"available_stem_counts": available, "default_stem_count": 4, "models": models, "format": "ONNX", "runtime": "on-device", "model_driven": True, "max_stem_count": max(available, default=4)}
+
 
 @app.get("/api/mobile/demucs-onnx/bootstrap")
 def mobile_demucs_onnx_bootstrap():
@@ -1683,15 +1710,81 @@ def mobile_demucs_onnx_bootstrap():
 @app.get("/api/mobile/demucs-onnx/models/{stem_count}")
 def mobile_demucs_onnx_model(stem_count:int,request:Request):
     _actor(request)
-    if stem_count not in {2,4,6,8}: raise HTTPException(404,"Modello locale non disponibile")
+    if stem_count < 2 or stem_count > 64: raise HTTPException(404,"Modello locale non disponibile")
     model=ONNX_DEMUCS_MODEL_DIR/f"demucs-{stem_count}.onnx"
     if not model.is_file(): raise HTTPException(404,"Modello locale non disponibile")
     return FileResponse(model,media_type="application/octet-stream",filename=model.name)
+
+@app.get("/api/models/catalog")
+def demucs_model_catalog(platform: str = ""):
+    return demucs_public_catalog(platform or None)
+
+@app.get("/api/models/native/{model_id}")
+def demucs_native_model_download(model_id: str):
+    if not re.fullmatch(r"[A-Za-z0-9._-]{1,128}", model_id) or model_id in demucs_blacklist():
+        raise HTTPException(404, "Model unavailable")
+    bundle = demucs_native_bundle(model_id)
+    if bundle is None:
+        # Requesting a model also acts as an on-demand server refresh.
+        update_mobile_demucs_models({model_id}, force=False)
+        bundle = demucs_native_bundle(model_id)
+    if bundle is None:
+        raise HTTPException(404, "Native model bundle unavailable")
+    return FileResponse(bundle, media_type="application/zip", filename=bundle.name)
+
+@app.get("/api/models/coreml/{model_id}")
+def demucs_coreml_model_by_id(model_id: str):
+    if not re.fullmatch(r"[A-Za-z0-9._-]{1,128}", model_id) or model_id in demucs_blacklist(): raise HTTPException(404,"Model unavailable")
+    for item in demucs_public_catalog("ios").get("models",[]):
+        if item.get("id") == model_id:
+            from .model_updater import COREML_DIR
+            candidates=list(COREML_DIR.glob(f"{model_id}.mlmodel"))
+            if not candidates: update_mobile_demucs_models({model_id}, force=False); candidates=list(COREML_DIR.glob(f"{model_id}.mlmodel"))
+            if candidates:return FileResponse(candidates[0],media_type="application/octet-stream",filename=candidates[0].name)
+    raise HTTPException(404,"Model unavailable")
+
+@app.get("/api/models/onnx/{model_id}")
+def demucs_onnx_model_by_id(model_id: str):
+    if not re.fullmatch(r"[A-Za-z0-9._-]{1,128}", model_id) or model_id in demucs_blacklist(): raise HTTPException(404,"Model unavailable")
+    for item in demucs_public_catalog("android").get("models",[]):
+        if item.get("id") == model_id:
+            from .model_updater import ONNX_DIR
+            candidates=list(ONNX_DIR.glob(f"{model_id}.onnx"))
+            if not candidates:update_mobile_demucs_models({model_id},force=False);candidates=list(ONNX_DIR.glob(f"{model_id}.onnx"))
+            if candidates:return FileResponse(candidates[0],media_type="application/octet-stream",filename=candidates[0].name)
+    raise HTTPException(404,"Model unavailable")
 
 @app.post("/api/admin/demucs-mobile-models/update")
 def admin_update_demucs_mobile_models(request:Request):
     require_admin(request)
     return update_mobile_demucs_models()
+
+@app.get("/api/admin/demucs-models")
+def admin_demucs_models(request: Request):
+    require_admin(request)
+    return demucs_server_inventory()
+
+@app.post("/api/admin/demucs-models/update")
+def admin_demucs_models_update(request: Request):
+    require_admin(request)
+    return update_mobile_demucs_models(force=True, prefetch_server=True)
+
+@app.post("/api/admin/demucs-models/{model_id}/update")
+def admin_demucs_model_update(model_id: str, request: Request):
+    require_admin(request)
+    if not re.fullmatch(r"[A-Za-z0-9._-]{1,128}", model_id):
+        raise HTTPException(400, "Invalid model id")
+    return update_mobile_demucs_models({model_id}, force=True, prefetch_server=True)
+
+@app.post("/api/admin/demucs-models/{model_id}/blacklist")
+def admin_demucs_model_blacklist(model_id: str, request: Request):
+    require_admin(request)
+    return blacklist_demucs_model(model_id)
+
+@app.delete("/api/admin/demucs-models/{model_id}/blacklist")
+def admin_demucs_model_unblacklist(model_id: str, request: Request):
+    require_admin(request)
+    return unblacklist_demucs_model(model_id)
 
 @app.post("/api/stems/jobs")
 async def stem_job_start(
@@ -1709,18 +1802,19 @@ async def stem_job_start(
     if not STEM_SPLITTER.available():
         raise HTTPException(503, "Il plugin Demucs non è installato in questo runtime.")
     status = STEM_SPLITTER.status()
-    if stem_count not in {0, 2, 4, 6, 8}:
-        raise HTTPException(400, "Numero di stem non supportato. Usa Auto, 2, 4, 6 oppure 8.")
-    if stem_count == 8 and 8 not in status.get("supported_stem_counts", []):
-        raise HTTPException(400, "La separazione a 8 stem richiede un backend con modello 8-stem configurato.")
-    if stem_count == 6:
-        model = "htdemucs_6s"
-    elif stem_count in {2, 4} and model == "htdemucs_6s":
-        model = "htdemucs"
-    elif stem_count == 8 and status.get("extended_8_model"):
-        model = str(status["extended_8_model"])
+    supported_counts = [int(value) for value in status.get("supported_stem_counts", [])]
+    if stem_count != 0 and (stem_count < 2 or stem_count > 64):
+        raise HTTPException(400, "Numero di stem non valido. Usa Auto oppure una cardinalità tra 2 e 64.")
+    if stem_count and stem_count not in supported_counts:
+        raise HTTPException(400, f"Nessun modello configurato fornisce {stem_count} stem.")
+    if stem_count == 2:
+        model = "htdemucs" if model not in {"htdemucs", "htdemucs_ft"} else model
+    elif stem_count:
+        profiles = [item for item in status.get("model_profiles", []) if int(item.get("stem_count", 0)) == stem_count]
+        if profiles and (model not in status["models"] or next((int(item.get("stem_count", 0)) for item in status.get("model_profiles", []) if item.get("model") == model), -1) != stem_count):
+            model = str(profiles[0]["model"])
     if model not in status["models"]:
-        raise HTTPException(400, "Modello Demucs non supportato.")
+        raise HTTPException(400, "Modello di separazione non supportato.")
 
     actor = _actor(request)
     if project_id:
@@ -1912,19 +2006,20 @@ def start_track_stem_job(
     if not STEM_SPLITTER.available():
         raise HTTPException(503, "Demucs stem plugin is not installed in this runtime")
     stem_status = STEM_SPLITTER.status()
-    if stem_count not in {0, 2, 4, 6, 8}:
+    supported_counts = [int(value) for value in stem_status.get("supported_stem_counts", [])]
+    if stem_count != 0 and (stem_count < 2 or stem_count > 64):
         raise HTTPException(400, "Unsupported stem count")
-    if stem_count == 8 and 8 not in stem_status.get("supported_stem_counts", []):
-        raise HTTPException(400, "8-stem separation requires a compatible backend model")
-    if stem_count == 6:
-        model = "htdemucs_6s"
-    elif stem_count in {2, 4} and model == "htdemucs_6s":
-        model = "htdemucs"
-    elif stem_count == 8 and stem_status.get("extended_8_model"):
-        model = str(stem_status["extended_8_model"])
+    if stem_count and stem_count not in supported_counts:
+        raise HTTPException(400, f"No configured model provides {stem_count} stems")
+    if stem_count == 2:
+        model = "htdemucs" if model not in {"htdemucs", "htdemucs_ft"} else model
+    elif stem_count:
+        profiles = [item for item in stem_status.get("model_profiles", []) if int(item.get("stem_count", 0)) == stem_count]
+        if profiles and (model not in stem_status["models"] or next((int(item.get("stem_count", 0)) for item in stem_status.get("model_profiles", []) if item.get("model") == model), -1) != stem_count):
+            model = str(profiles[0]["model"])
     status = STEM_SPLITTER.status()
     if model not in status["models"]:
-        raise HTTPException(400, "Modello Demucs non supportato.")
+        raise HTTPException(400, "Modello di separazione non supportato.")
     track = next((item for item in project.tracks if item.id == track_id), None)
     if track is None:
         raise HTTPException(404, "track not found")

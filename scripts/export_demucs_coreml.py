@@ -17,10 +17,13 @@ from pathlib import Path
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", default="htdemucs")
-    parser.add_argument("--stem-count", type=int, choices=(2,4,6,8), required=True)
+    parser.add_argument("--stem-count", type=int, required=True, help="Expected source count (2..64)")
+    parser.add_argument("--engine", default="demucs", help="Model engine metadata; exporter currently supports Demucs-compatible PyTorch models")
     parser.add_argument("--chunk-seconds", type=float, default=10.0)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
+    if not 2 <= args.stem_count <= 64:
+        raise SystemExit("--stem-count must be between 2 and 64")
     try:
         import torch
         import numpy as np
@@ -60,6 +63,7 @@ def main() -> None:
         "input_name": "audio",
         "output_name": "stems",
         "source_model": args.model,
+        "engine": args.engine,
     })
     args.output.parent.mkdir(parents=True, exist_ok=True)
     mlmodel.save(str(args.output))

@@ -90,7 +90,7 @@ public final class MainActivity extends Activity {
         settings.setMediaPlaybackRequiresUserGesture(false);
         settings.setBuiltInZoomControls(false);
         settings.setDisplayZoomControls(false);
-        settings.setUserAgentString(settings.getUserAgentString() + " MTAEditorMobile/0.2.0-100 Android");
+        settings.setUserAgentString(settings.getUserAgentString() + " MTAEditorMobile/0.2.0-102 Android");
 
         CookieManager.getInstance().setAcceptCookie(true);
         CookieManager.getInstance().setAcceptThirdPartyCookies(webView, false);
@@ -213,6 +213,7 @@ public final class MainActivity extends Activity {
         menu.add("Impostazioni server").setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
         menu.add("Canale aggiornamenti").setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
         menu.add("Controlla aggiornamenti").setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+        menu.add("Gestione modelli Demucs").setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
         menu.add("Update modelli solo con Wi-Fi").setCheckable(true).setChecked(getPreferencesStore().getBoolean(PREF_DEMUCS_WIFI_ONLY,true)).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
         menu.add("Ricarica").setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
         return true;
@@ -229,6 +230,10 @@ public final class MainActivity extends Activity {
             promptUpdateChannel();
             return true;
         }
+        if ("Gestione modelli Demucs".equals(title)) {
+            showDemucsModelManager();
+            return true;
+        }
         if ("Update modelli solo con Wi-Fi".equals(title)) {
             boolean value=!getPreferencesStore().getBoolean(PREF_DEMUCS_WIFI_ONLY,true); getPreferencesStore().edit().putBoolean(PREF_DEMUCS_WIFI_ONLY,value).apply(); item.setChecked(value); if(!value)refreshDemucsModels(); return true;
         }
@@ -243,6 +248,25 @@ public final class MainActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+
+    private void showDemucsModelManager() {
+        String configured=getPreferencesStore().getString(PREF_SERVER_URL,""); String base=(configured==null||configured.trim().isEmpty())?DEFAULT_SERVER_URL:configured;
+        ioExecutor.submit(()->{try{
+            org.json.JSONObject root=DemucsModelManager.fetchCatalog(base); org.json.JSONArray models=DemucsModelManager.models(root);
+            java.util.Set<String> installed=new java.util.HashSet<>(); for(org.json.JSONObject x:DemucsModelManager.installed(this))installed.add(x.optString("id"));
+            java.util.ArrayList<org.json.JSONObject> entries=new java.util.ArrayList<>(); for(int i=0;i<models.length();i++){org.json.JSONObject m=models.optJSONObject(i);if(m!=null)entries.add(m);}
+            runOnUiThread(()->{
+                String[] labels=new String[entries.size()]; for(int i=0;i<entries.size();i++){org.json.JSONObject m=entries.get(i);String id=m.optString("id");labels[i]=m.optString("display_name",id)+" · "+m.optInt("stem_count",0)+" stem · "+(installed.contains(id)?"installato":"disponibile");}
+                new AlertDialog.Builder(this).setTitle("Modelli Demucs").setItems(labels,(d,which)->{
+                    org.json.JSONObject m=entries.get(which);String id=m.optString("id");boolean local=installed.contains(id);
+                    AlertDialog.Builder sub=new AlertDialog.Builder(this).setTitle(m.optString("display_name",id));
+                    sub.setPositiveButton(local?"Aggiorna forzatamente":"Scarica",(x,w)->DemucsModelManager.forceUpdate(this,ioExecutor,base,id,error->runOnUiThread(()->Toast.makeText(this,error==null?"Modello pronto":"Aggiornamento fallito: "+error.getMessage(),Toast.LENGTH_LONG).show())));
+                    if(local)sub.setNeutralButton("Elimina locale",(x,w)->{DemucsModelManager.deleteLocal(this,id);Toast.makeText(this,"Modello locale eliminato",Toast.LENGTH_SHORT).show();});
+                    sub.setNegativeButton("Annulla",null).show();
+                }).setNegativeButton("Chiudi",null).show();
+            });
+        }catch(Exception e){runOnUiThread(()->Toast.makeText(this,"Catalogo modelli non disponibile: "+e.getMessage(),Toast.LENGTH_LONG).show());}});
+    }
 
     private void refreshDemucsModels() {
         String configured=getPreferencesStore().getString(PREF_SERVER_URL,""); String base=(configured==null||configured.trim().isEmpty())?DEFAULT_SERVER_URL:configured;
@@ -465,6 +489,18 @@ public final class MainActivity extends Activity {
         @JavascriptInterface
         public void setBusy(boolean busy) {
             MainActivity.this.setBusy(busy);
+        }
+
+        @JavascriptInterface
+        public String ensureLocalStemModel(String modelId, int stemCount) {
+            String configured=getPreferencesStore().getString(PREF_SERVER_URL,"");
+            String base=(configured==null||configured.trim().isEmpty())?DEFAULT_SERVER_URL:configured;
+            java.util.concurrent.CountDownLatch latch=new java.util.concurrent.CountDownLatch(1);
+            final Exception[] failure=new Exception[1];
+            DemucsModelManager.ensureRequested(MainActivity.this,ioExecutor,base,modelId,stemCount,error->{failure[0]=error;latch.countDown();});
+            try{if(!latch.await(5,java.util.concurrent.TimeUnit.MINUTES))return "{\"ok\":false,\"error\":\"timeout\"}";}catch(InterruptedException e){Thread.currentThread().interrupt();return "{\"ok\":false,\"error\":\"interrupted\"}";}
+            if(failure[0]!=null)return "{\"ok\":false,\"error\":\""+failure[0].getMessage().replace("\"","'")+"\"}";
+            return "{\"ok\":true}";
         }
 
         @JavascriptInterface

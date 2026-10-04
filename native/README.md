@@ -25,3 +25,7 @@ GitHub Actions produces:
 - Windows x64 `Setup.exe`
 
 Tag builds additionally upload both installers to the GitHub Release for that tag.
+
+## Native Demucs model management
+
+Windows/macOS desktop builds obtain requested Demucs models from the configured MTA Audio Editor model server. The server publishes native ZIP bundles containing the model YAML and checkpoints. A requested model is installed automatically before splitting; Settings -> **Manage Demucs models** can force an update or delete the local copy. `MTA_MODEL_SERVER_URL` can override the default model server.

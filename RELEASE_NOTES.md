@@ -1,11 +1,19 @@
-## 0.2.0-100
+## 0.2.0-102
+
+- Added centralized, periodically synchronized Demucs model catalogue with official Demucs families and manifest-provided mobile/native artifacts.
+- Added server model blacklist with managed-storage deletion and web/mobile/native visibility filtering.
+- Added server administration UI for model update/blacklist management.
+- Added local model management hooks for desktop, iOS/iPadOS, and Android (download/update/delete).
+- Native/mobile clients download missing models on demand for splitting.
+
+## 0.2.0-102
 
 - Automatic periodic Demucs mobile-model refresh in Docker/Kubernetes with HTTPS manifest, SHA-256 verification and atomic replacement.
 - iPhone/iPad model refresh is periodic and Wi-Fi-only by default, configurable in Options.
 - Android receives equivalent periodic ONNX model provisioning, Wi-Fi-only by default.
 - Added New project directly inside PROJECT / FILE.
 
-## 0.2.0-100
+## 0.2.0-102
 
 - Fixed native macOS project destination dialogs: pywebview now uses a valid ZIP filter while preserving the .mta-project.zip extension.
 - Prevented accidental utility-modal dismissal when selecting/editing the project name.

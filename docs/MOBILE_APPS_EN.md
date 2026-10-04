@@ -53,3 +53,8 @@ Server administrators can expose compatible Core ML Demucs models by mounting a 
 
 ## Periodic Demucs model updates
 On iPhone/iPad and Android, **Update on Wi-Fi only** is enabled by default. Every six hours and at startup, the client checks the server catalogue and downloads only models whose SHA-256 changed. Disabling the switch permits cellular downloads. The Docker/Kubernetes server periodically refreshes its local mobile-model repository from a configurable HTTPS manifest.
+
+
+## Model-driven extended stem separation
+
+MTA Audio Editor no longer hard-codes a 2/4/6/8 list. The server and mobile clients discover the stem counts actually published by the model catalogue/manifest: 2, 4, 6, 8, 10, 12, 16, and larger values whenever a compatible model exists. The current safety ceiling is 64 stems per model. Multitrack DAW projects are not constrained by the stem count; MTA8/MTA16 limits are enforced only at export time. Additional server profiles are configured through `MTA_DEMUCS_MODEL_REGISTRY` or `MTA_DEMUCS_MODEL_REGISTRY_FILE`, declaring `model`, `stem_count`, `stem_labels`, and optionally `engine`/`display_name`.

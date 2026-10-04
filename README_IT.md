@@ -360,3 +360,12 @@ Il client iOS/iPadOS prova sempre a rendere disponibile automaticamente un model
 
 ### Ciclo automatico modelli Demucs mobile
 Docker/Kubernetes aggiorna automaticamente i modelli mobili dal manifest HTTPS configurato ogni 6 ore per default, verificandone SHA-256. iOS/iPadOS e Android controllano periodicamente il server. Il download dei modelli e attivo solo su Wi-Fi per default e puo essere abilitato anche su rete cellulare dalle preferenze. iOS usa Core ML; Android usa modelli ONNX Runtime Mobile.
+
+
+## Separazione stem estesa model-driven
+
+MTA Audio Editor non impone più un elenco fisso 2/4/6/8. Il server e i client mobili leggono dal catalogo/manifest le cardinalità realmente disponibili: 2, 4, 6, 8, 10, 12, 16 e anche valori superiori quando esiste un modello compatibile. Il limite tecnico di sicurezza corrente è 64 stem per singolo modello. I progetti Multitrack DAW non sono limitati dal numero di stem; i vincoli MTA8/MTA16 vengono applicati soltanto in export. I profili server aggiuntivi si configurano con `MTA_DEMUCS_MODEL_REGISTRY` o `MTA_DEMUCS_MODEL_REGISTRY_FILE`, dichiarando `model`, `stem_count`, `stem_labels` e opzionalmente `engine`/`display_name`.
+
+
+### Demucs model catalogue / Catalogo modelli Demucs
+The server periodically synchronizes all configured Demucs/Core ML/ONNX models. Native/mobile clients download requested models on demand, can delete or force-update local copies, and server administrators can blacklist models (which also removes managed server artifacts).

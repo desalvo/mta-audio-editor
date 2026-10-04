@@ -15,7 +15,9 @@ def test_coreml_local_engine_is_part_of_ios_target():
 
 
 def test_local_engine_supports_requested_counts_and_chunking():
-    assert "supportedStemCounts = [2, 4, 6, 8]" in SWIFT
+    assert "minimumStemCount = 2" in SWIFT
+    assert "maximumStemCount = 64" in SWIFT
+    assert "supports(stemCount:" in SWIFT
     assert "chunkFrames" in SWIFT
     assert "overlap-add" in SWIFT
     assert "12 minutes" in SWIFT
