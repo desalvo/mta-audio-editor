@@ -106,8 +106,7 @@ def test_server_inventory_and_prefetch(monkeypatch,tmp_path):
     import app.model_updater as m
     monkeypatch.setattr(m,'SERVER_DIR',tmp_path/'server');monkeypatch.setattr(m,'BLACKLIST_FILE',tmp_path/'blacklist.json');monkeypatch.setattr(m,'CATALOG_FILE',tmp_path/'catalog.json')
     monkeypatch.setattr(m,'_registry_server_profiles',lambda:[{'id':'fake','model':'fake','stem_count':4,'stem_labels':['a']*4,'display_name':'Fake'}])
-    import demucs.pretrained
-    monkeypatch.setattr(demucs.pretrained,'get_model',lambda name: object())
+    monkeypatch.setattr(m,'_load_server_model',lambda name: object())
     monkeypatch.setattr(m,'_server_bundle',lambda name: (m.SERVER_DIR/'bundles/fake.zip'))
     r={'updated':[],'unchanged':[],'server_ready':[],'skipped_blacklist':[],'errors':[]}
     m._prefetch_server_models(r)

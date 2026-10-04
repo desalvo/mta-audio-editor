@@ -26,8 +26,12 @@ def test_update_once_installs_and_then_detects_unchanged(tmp_path, monkeypatch):
         'https://models.invalid/demucs-4.mlmodel':ios,
         'https://models.invalid/demucs-4.onnx':android,
     }
+    monkeypatch.setattr(mu,'ROOT',tmp_path)
     monkeypatch.setattr(mu,'COREML_DIR',tmp_path/'coreml')
     monkeypatch.setattr(mu,'ONNX_DIR',tmp_path/'onnx')
+    monkeypatch.setattr(mu,'SERVER_DIR',tmp_path/'server')
+    monkeypatch.setattr(mu,'BLACKLIST_FILE',tmp_path/'blacklist.json')
+    monkeypatch.setattr(mu,'CATALOG_FILE',tmp_path/'catalog.json')
     monkeypatch.setattr(mu,'ENABLED',True)
     monkeypatch.setattr(mu,'_read_url',lambda u:mapping[u])
     result=mu.update_once()
@@ -44,8 +48,12 @@ def test_update_once_rejects_bad_digest_and_invalid_entries(tmp_path, monkeypatc
         '4':{'url':'https://models.invalid/bad.mlmodel','sha256':'0'*64},
         '3':{'url':'https://models.invalid/three.mlmodel','sha256':'1'*64},
     }}}
+    monkeypatch.setattr(mu,'ROOT',tmp_path)
     monkeypatch.setattr(mu,'COREML_DIR',tmp_path/'coreml')
     monkeypatch.setattr(mu,'ONNX_DIR',tmp_path/'onnx')
+    monkeypatch.setattr(mu,'SERVER_DIR',tmp_path/'server')
+    monkeypatch.setattr(mu,'BLACKLIST_FILE',tmp_path/'blacklist.json')
+    monkeypatch.setattr(mu,'CATALOG_FILE',tmp_path/'catalog.json')
     monkeypatch.setattr(mu,'ENABLED',True)
     monkeypatch.setattr(mu,'_read_url',lambda u: json.dumps(manifest).encode() if u==mu.MANIFEST_URL else b'wrong')
     result=mu.update_once()

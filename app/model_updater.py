@@ -209,6 +209,19 @@ def native_bundle(model_id:str)->Path|None:
     p=SERVER_DIR/"bundles"/f"{_safe_id(model_id)}.zip"
     return p if p.is_file() else None
 
+def _load_server_model(model_name:str):
+    """Load/download one Demucs model into the managed torch hub cache.
+
+    Kept behind a helper so the lightweight quality-test environment does not
+    need the large Demucs/PyTorch stem dependencies installed. Production
+    containers/native builds still call the real implementation.
+    """
+    import torch
+    torch.hub.set_dir(str(SERVER_DIR/'torch-hub'))
+    from demucs.pretrained import get_model
+    return get_model(model_name)
+
+
 def _prefetch_server_models(result:dict,only:set[str]|None=None):
     if os.getenv('MTA_DEMUCS_SERVER_PREFETCH','true').lower() not in {'1','true','yes','on'}:return
     blacklist=load_blacklist();SERVER_DIR.mkdir(parents=True,exist_ok=True)
@@ -218,12 +231,10 @@ def _prefetch_server_models(result:dict,only:set[str]|None=None):
         if mid in blacklist or (only is not None and mid not in only):continue
         marker=SERVER_DIR/f"{mid}.server.json"
         try:
-            import torch
-            torch.hub.set_dir(str(SERVER_DIR/'torch-hub'))
-            from demucs.pretrained import get_model
-            get_model(str(p.get('model') or mid))
-            _server_bundle(str(p.get('model') or mid))
-            meta={"id":mid,"model":str(p.get('model') or mid),"platform":"server","engine":"demucs","stem_count":int(p.get('stem_count',0) or 0),"stem_labels":p.get('stem_labels',[]),"display_name":str(p.get('display_name') or mid),"updated_at":int(time.time()),"managed_cache":True}
+            model_name=str(p.get('model') or mid)
+            _load_server_model(model_name)
+            _server_bundle(model_name)
+            meta={"id":mid,"model":model_name,"platform":"server","engine":"demucs","stem_count":int(p.get('stem_count',0) or 0),"stem_labels":p.get('stem_labels',[]),"display_name":str(p.get('display_name') or mid),"updated_at":int(time.time()),"managed_cache":True}
             _atomic_write(marker,json.dumps(meta,sort_keys=True).encode());result['server_ready'].append(mid)
         except Exception as exc:
             result['errors'].append(f"server:{mid}: {exc}");LOG.warning("Demucs prefetch failed for %s: %s",mid,exc)
