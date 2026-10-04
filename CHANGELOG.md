@@ -1,3 +1,8 @@
+## 0.2.0-129
+
+- Fixed GitHub Actions coverage gate after AI model manager growth by adding focused coverage for Lyrics/Chords model download, catalog, availability, cache and deletion paths.
+- Kept the production coverage threshold at 70%; full suite now reaches 70.13%.
+
 ## 0.2.0-128
 
 - Hide all Lyrics export controls until Lyrics exist.

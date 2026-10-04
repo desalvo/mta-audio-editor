@@ -1,3 +1,7 @@
+## 0.2.0-129
+
+- CI coverage regression fixed without lowering the quality gate. AI model manager coverage increased to 99%.
+
 ## 0.2.0-128
 
 Lyrics/Chords export controls are now context-aware: Lyrics exports require Lyrics, while Lyrics+Chords exports require both datasets. PDF actions are labelled according to the actual content.
