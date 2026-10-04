@@ -1,3 +1,7 @@
+## 0.2.0-130
+
+- Fixed macOS x64 native CI packaging for Whisper by pinning numba 0.61.2 and llvmlite 0.44.0 only on Darwin/x86_64, ensuring CPython 3.12 prebuilt wheels are used instead of an LLVM source build.
+
 ## 0.2.0-129
 
 - Fixed GitHub Actions coverage gate after AI model manager growth by adding focused coverage for Lyrics/Chords model download, catalog, availability, cache and deletion paths.

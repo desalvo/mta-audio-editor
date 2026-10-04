@@ -1,3 +1,7 @@
+## 0.2.0-130
+
+- macOS Intel native builds now use wheel-backed Whisper JIT dependencies, avoiding llvmlite source compilation and missing-LLVM failures.
+
 ## 0.2.0-129
 
 - CI coverage regression fixed without lowering the quality gate. AI model manager coverage increased to 99%.
