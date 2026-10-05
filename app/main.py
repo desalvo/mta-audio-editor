@@ -21,7 +21,7 @@ from fastapi.staticfiles import StaticFiles
 
 from .audio_engine import auto_align_ms, delete_range, delete_song_range, ensure_clips, estimate_bpm, generate_metronome_wav, media_duration_ms, project_duration_ms, render_mix, render_track, render_track_export, shift_track, waveform_peaks
 from .codec import export_mta, ffprobe, import_mta, resolve_mta_device_profile, suggested_slots, validate_slot_mapping
-from .models import AutoMixRequest, Clip, CustomPresetRequest, DeleteRangeRequest, InstantiateProjectClipRequest, UpdateProjectClipRequest, MoveTrackRequest, SampleEditorRequest, MtaExportRequest, Project, ProjectClip, ProjectExportRequest, RightsRecord, Track, SampleEditRequest, SampleEffectRequest
+from .models import AutoMixRequest, Clip, CustomPresetRequest, DeleteRangeRequest, InstantiateProjectClipRequest, UpdateProjectClipRequest, MoveTrackRequest, MtaExportRequest, Project, ProjectClip, ProjectExportRequest, RightsRecord, Track, SampleEditRequest, SampleEffectRequest
 from .plugins import STEM_SPLITTER, delete_user_preset, plugin_manifest, save_user_preset
 
 from .model_updater import (COREML_DIR, ONNX_DIR, start_background_updater, update_once as update_mobile_demucs_models,

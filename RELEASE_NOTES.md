@@ -1,3 +1,8 @@
+## 0.2.0-140
+
+- CI reliability fixes for Ruff and dependency audit.
+- Android dependency refresh from Dependabot PR #9: androidx.core 1.19.1 and onnxruntime-android 1.30.0.
+
 ## 0.2.0-139
 
 - Clip del progetto collapsed by default on every project open.

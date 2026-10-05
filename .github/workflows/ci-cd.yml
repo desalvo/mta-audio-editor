@@ -76,17 +76,23 @@ jobs:
           pip-audit -r requirements-native.txt --strict
           pip-audit -r requirements-lyrics.txt --strict
           # requirements-chords uses a commit-pinned direct URL because the latest PyPI
-          # release predates the chord/chroma modules. Audit the resolved installed
-          # environment instead of asking pip-audit to parse the direct URL requirement.
-          python -m venv /tmp/mta-chords-audit
-          /tmp/mta-chords-audit/bin/python -m pip install --upgrade pip pip-audit
-          /tmp/mta-chords-audit/bin/python -m pip install -r requirements-chords.txt
-          /tmp/mta-chords-audit/bin/pip-audit --strict
+          # release predates the chord/chroma modules. Install that reviewed commit in
+          # an isolated environment, then audit every PyPI-resolvable dependency from
+          # the resolved freeze while excluding only the non-PyPI madmom-infer source.
+          CHORDS_VENV="$RUNNER_TEMP/mta-chords-audit"
+          CHORDS_AUDIT_REQ="$RUNNER_TEMP/requirements-chords-audit.txt"
+          python -m venv "$CHORDS_VENV"
+          "$CHORDS_VENV/bin/python" -m pip install --upgrade pip
+          "$CHORDS_VENV/bin/python" -m pip install -r requirements-chords.txt
+          "$CHORDS_VENV/bin/python" -m pip freeze | grep -v '^madmom-infer @' > "$CHORDS_AUDIT_REQ"
+          cat "$CHORDS_AUDIT_REQ"
+          pip-audit -r "$CHORDS_AUDIT_REQ" --strict
           # pip-audit/PyPI cannot identify PyTorch local-version wheels such as
           # 2.14.1+cpu. Audit the equivalent upstream public version instead.
-          sed '/^--extra-index-url /d; s/^torch==\(.*\)+cpu$/torch==\1/' requirements-stems.txt > /tmp/requirements-stems-audit.txt
-          cat /tmp/requirements-stems-audit.txt
-          pip-audit -r /tmp/requirements-stems-audit.txt --strict
+          STEMS_AUDIT_REQ="$RUNNER_TEMP/requirements-stems-audit.txt"
+          sed '/^--extra-index-url /d; s/^torch==\(.*\)+cpu$/torch==\1/' requirements-stems.txt > "$STEMS_AUDIT_REQ"
+          cat "$STEMS_AUDIT_REQ"
+          pip-audit -r "$STEMS_AUDIT_REQ" --strict
       - name: Secret scan
         uses: gitleaks/gitleaks-action@v3
         env:

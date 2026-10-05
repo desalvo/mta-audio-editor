@@ -1,3 +1,9 @@
+## 0.2.0-140
+
+- Fixed GitHub Actions Ruff regressions in sample-editor/native TLS code.
+- Fixed chord dependency auditing for the commit-pinned non-PyPI madmom-infer package while retaining strict auditing of all resolved PyPI dependencies.
+- Integrated Dependabot Android updates: androidx.core 1.19.1 and ONNX Runtime Android 1.30.0.
+
 ## 0.2.0-139
 
 - Project Clip browser now starts collapsed and resets to collapsed whenever a project is created, opened or imported.

@@ -40,8 +40,9 @@ def test_model_download_endpoints_translate_unexpected_failures():
     assert 'HTTPException(502' in main
 
 
-def test_chord_direct_dependency_is_audited_as_installed_environment():
+def test_chord_direct_dependency_audits_resolved_pypi_dependencies():
     workflow = (ROOT / ".github/workflows/ci-cd.yml").read_text(encoding="utf-8")
-    assert "/tmp/mta-chords-audit/bin/python -m pip install -r requirements-chords.txt" in workflow
-    assert "/tmp/mta-chords-audit/bin/pip-audit --strict" in workflow
+    assert 'CHORDS_VENV="$RUNNER_TEMP/mta-chords-audit"' in workflow
+    assert "pip freeze | grep -v '^madmom-infer @'" in workflow
+    assert 'pip-audit -r "$CHORDS_AUDIT_REQ" --strict' in workflow
     assert "pip-audit -r requirements-chords.txt --strict" not in workflow

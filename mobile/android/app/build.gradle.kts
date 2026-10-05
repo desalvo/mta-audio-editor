@@ -10,8 +10,8 @@ android {
         applicationId = "com.desalvo.mtaaudioeditor.mobile"
         minSdk = 26
         targetSdk = 35
-        versionCode = 20113
-        versionName = "0.2.0-113"
+        versionCode = 20140
+        versionName = "0.2.0-140"
     }
 
     signingConfigs {
@@ -49,6 +49,6 @@ android {
 
 
 dependencies {
-    implementation("androidx.core:core:1.15.0")
-    implementation("com.microsoft.onnxruntime:onnxruntime-android:1.22.0")
+    implementation("androidx.core:core:1.19.1")
+    implementation("com.microsoft.onnxruntime:onnxruntime-android:1.30.0")
 }

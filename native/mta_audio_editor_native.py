@@ -27,8 +27,8 @@ def _configure_native_tls() -> None:
             import certifi
             os.environ.setdefault("SSL_CERT_FILE", certifi.where())
             os.environ.setdefault("REQUESTS_CA_BUNDLE", certifi.where())
-        except Exception:
-            pass
+        except Exception as exc:
+            print(f"Native TLS fallback unavailable: {exc}", file=sys.stderr)
 
 
 if not getattr(sys, "frozen", False):
