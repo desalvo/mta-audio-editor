@@ -111,5 +111,25 @@ if sys.platform == "darwin":
             "MTAEditorCreator": "Alessandro De Salvo",
             "MTAEditorRepository": "https://github.com/desalvo/mta-audio-editor",
             "NSHighResolutionCapable": True,
+            "CFBundleDocumentTypes": [
+                {
+                    "CFBundleTypeName": "MTA Audio Editor Project",
+                    "CFBundleTypeRole": "Editor",
+                    "LSHandlerRank": "Owner",
+                    "LSItemContentTypes": ["com.desalvo.mtaaudioeditor.project"],
+                    "CFBundleTypeExtensions": ["maeproj"],
+                }
+            ],
+            "UTExportedTypeDeclarations": [
+                {
+                    "UTTypeIdentifier": "com.desalvo.mtaaudioeditor.project",
+                    "UTTypeDescription": "MTA Audio Editor Project",
+                    "UTTypeConformsTo": ["public.data"],
+                    "UTTypeTagSpecification": {
+                        "public.filename-extension": ["maeproj"],
+                        "public.mime-type": "application/vnd.mta-audio-editor.project",
+                    },
+                }
+            ],
         },
     )

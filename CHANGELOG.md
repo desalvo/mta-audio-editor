@@ -1,3 +1,23 @@
+## 0.2.0-151
+
+- Reworked realtime transport around an `AudioContext` master clock instead of using one track as the timing authority.
+- Added background decoder/source prewarming when a project opens so Play normally starts without a visible buffering phase.
+- Reduced startup buffering to the minimum decodable window near the cursor; deep buffering continues in the background.
+- Tracks start muted, hard-lock to the transport clock, then fade in over 8 ms to avoid audible inter-track start skew.
+- Sync monitoring now runs every 120 ms with tighter micro drift correction and hard relock only for meaningful drift or decoder recovery.
+- Non-render playback starts from dry/direct sources immediately; enabled track FX are prepared in the background and hot-swapped with a short clock-locked crossfade.
+- Master volume no longer forces a rendered preview; it stays a realtime Web Audio gain control. Rendered-master mode remains available through the explicit Render Preview toggle.
+- Mute, Solo, Pan and Volume remain downstream realtime controls and therefore do not wait for server render or buffering.
+
+## 0.2.0-150
+
+- Project files now use the dedicated `.maeproj` extension instead of `.zip` / `.mta-project.zip`.
+- New project saves/exports use MIME type `application/vnd.mta-audio-editor.project`; legacy `.mta-project.zip` and `.zip` project archives remain readable.
+- Windows installer registers `.maeproj` with MTA Audio Editor and double-click launches the application with the selected project.
+- macOS bundle declares the `.maeproj` document type and exported UTI `com.desalvo.mtaaudioeditor.project`.
+- Native desktop startup consumes an associated project path and opens it automatically in the editor.
+- Android and iOS declare the same project MIME/UTI for platform file association/document pickers.
+
 ## 0.2.0-149
 
 - Restore New project activation: after creation the app now reopens the canonical project through the same `openP()` path used by Open project, immediately restoring Tracks, Mixer, timeline and toolbars.

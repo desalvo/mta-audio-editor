@@ -42,7 +42,7 @@ def test_native_api_can_save_and_open_project_archive(tmp_path, monkeypatch):
 
     save_path = tmp_path / "exports" / "chosen"
     save_path.parent.mkdir(parents=True)
-    archive_path = Path(str(save_path) + ".mta-project.zip")
+    archive_path = Path(str(save_path) + ".maeproj")
 
     class FakeWindow:
         def __init__(self):

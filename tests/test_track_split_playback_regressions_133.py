@@ -27,9 +27,9 @@ def test_dynamic_playback_does_not_seek_buffering_tracks_repeatedly():
     root = Path(__file__).resolve().parents[1]
     js = (root / "app/static/app.js").read_text(encoding="utf-8")
     assert "if(audio.readyState<3||audio.seeking){audio.playbackRate=1;item.needsRelock=true;continue}" in js
-    assert "setInterval(()=>alignDynamicTracks(false),250)" in js
-    assert "Math.max(.995,Math.min(1.005" in js
-    assert "audio.buffered.end(i)-pos>=Math.min(.45" in js
+    assert "setInterval(()=>alignDynamicTracks(false),120)" in js
+    assert "Math.max(.997,Math.min(1.003" in js
+    assert "audio.buffered.end(i)-pos>=Math.min(.08" in js
 
 
 def test_stop_invalidates_pending_playback_and_render_requests():

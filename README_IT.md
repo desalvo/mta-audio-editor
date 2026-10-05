@@ -96,7 +96,7 @@ Ogni utente vede un workspace dedicato contenente i progetti di cui è proprieta
 Per ogni progetto è disponibile una gestione file con elenco, download, upload di file originali aggiuntivi e cancellazione dei file non referenziati. Gli upload audio e i file MTA importati vengono conservati anche nella directory `originals/` del progetto, così i dump contengono sia lo stato corrente sia i file originari.
 
 È possibile:
-- esportare un intero progetto come archivio `.mta-project.zip`;
+- esportare un intero progetto come archivio `.maeproj`;
 - importare un archivio progetto completo, che viene assegnato all'utente che lo importa;
 - esportare/importare normalmente MTA, audio e singole tracce;
 - come amministratore, scaricare un dump ZIP di tutti i progetti di tutti gli utenti tramite il pannello utenti.

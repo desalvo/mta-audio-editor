@@ -512,7 +512,7 @@ Job state is runtime state; project/audio state is persistent. A pod restart can
 
 ### Local save and deletion
 
-"Save project locally" downloads the complete `.mta-project.zip` archive. This is separate from workspace persistence: projects already remain stored server-side in the user's workspace.
+"Save project locally" downloads the complete `.maeproj` project file. This is separate from workspace persistence: projects already remain stored server-side in the user's workspace.
 
 Deletion removes the complete project directory and is allowed only to the project owner or an administrator. Shared collaborators cannot delete the owner's project.
 

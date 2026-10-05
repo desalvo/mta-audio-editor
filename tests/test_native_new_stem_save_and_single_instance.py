@@ -62,7 +62,7 @@ def test_native_api_choose_bind_and_sync_project(tmp_path, monkeypatch):
 
     chosen = api.choose_project_save_path(project.title)
     assert chosen["ok"] is True
-    assert chosen["path"].endswith(".mta-project.zip")
+    assert chosen["path"].endswith(".maeproj")
 
     bound = api.bind_project_path(project.id, chosen["path"])
     assert bound["ok"] is True

@@ -9,8 +9,30 @@
     <key>CFBundleInfoDictionaryVersion</key><string>6.0</string>
     <key>CFBundleName</key><string>$(PRODUCT_NAME)</string>
     <key>CFBundlePackageType</key><string>APPL</string>
-    <key>CFBundleShortVersionString</key><string>0.2.0-113</string>
-    <key>CFBundleVersion</key><string>20097</string>
+    <key>CFBundleShortVersionString</key><string>0.2.0-150</string>
+    <key>CFBundleVersion</key><string>20150</string>
+    <key>CFBundleDocumentTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleTypeName</key><string>MTA Audio Editor Project</string>
+            <key>CFBundleTypeRole</key><string>Editor</string>
+            <key>LSHandlerRank</key><string>Owner</string>
+            <key>LSItemContentTypes</key><array><string>com.desalvo.mtaaudioeditor.project</string></array>
+        </dict>
+    </array>
+    <key>UTExportedTypeDeclarations</key>
+    <array>
+        <dict>
+            <key>UTTypeIdentifier</key><string>com.desalvo.mtaaudioeditor.project</string>
+            <key>UTTypeDescription</key><string>MTA Audio Editor Project</string>
+            <key>UTTypeConformsTo</key><array><string>public.data</string></array>
+            <key>UTTypeTagSpecification</key>
+            <dict>
+                <key>public.filename-extension</key><array><string>maeproj</string></array>
+                <key>public.mime-type</key><string>application/vnd.mta-audio-editor.project</string>
+            </dict>
+        </dict>
+    </array>
     <key>LSRequiresIPhoneOS</key><true/>
     <key>NSAppTransportSecurity</key>
     <dict>

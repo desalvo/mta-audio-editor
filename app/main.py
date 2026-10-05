@@ -329,7 +329,7 @@ def _project_for_actor(request: Request, pid: str, *, owner_only: bool = False) 
 
 def _project_archive_name(project: Project) -> str:
     clean = SAFE_DOWNLOAD_RE.sub("_", project.title).strip(" ._")[:100] or "project"
-    return f"{clean}-{project.id}.mta-project.zip"
+    return f"{clean}-{project.id}.maeproj"
 
 
 def _social_buttons(mode: str) -> str:
@@ -1159,7 +1159,7 @@ def project_files_batch_delete(pid: str, request: Request, body: list[dict]):
 @app.get("/api/projects/{pid}/archive")
 def project_archive_export(pid: str, request: Request):
     project = _project_for_actor(request, pid)
-    tmp = Path(tempfile.mkstemp(prefix=f"mta-project-{pid}-", suffix=".zip")[1])
+    tmp = Path(tempfile.mkstemp(prefix=f"mta-project-{pid}-", suffix=".maeproj")[1])
     try:
         write_project_archive(pid, tmp)
     except Exception:
@@ -1167,7 +1167,7 @@ def project_archive_export(pid: str, request: Request):
         raise
     return FileResponse(
         tmp,
-        media_type="application/zip",
+        media_type="application/vnd.mta-audio-editor.project",
         filename=_project_archive_name(project),
         background=BackgroundTask(lambda: tmp.unlink(missing_ok=True)),
     )
@@ -1180,7 +1180,7 @@ async def project_archive_import(request: Request, file: UploadFile = File(...))
     if actor["id"] <= 0 and not NATIVE_SINGLE_USER:
         raise HTTPException(400, "L'import completo richiede un account utente persistente.")
     with tempfile.TemporaryDirectory() as td:
-        src = Path(td) / "project.zip"
+        src = Path(td) / "project.maeproj"
         _copy_limited(file.file, src)
         try:
             return import_project_archive(src, actor["id"] if actor["id"] > 0 else None)

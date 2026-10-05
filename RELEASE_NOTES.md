@@ -1,3 +1,16 @@
+# 0.2.0-151
+
+Questa release ridisegna il transport per ridurre drasticamente la latenza di Play senza sacrificare la sincronizzazione. Il clock del progetto è ora indipendente dai decoder delle singole tracce e usa `AudioContext.currentTime`; i decoder vengono pre-riscaldati in background, l'avvio richiede soltanto un piccolo buffer vicino al cursore e le tracce vengono rese udibili solo dopo il primo lock temporale. Gli insert di traccia possono essere preparati mentre il playback dry è già in corso e vengono sostituiti con un breve crossfade sincronizzato.
+
+# MTA Audio Editor 0.2.0-150
+
+- Project files now use the dedicated `.maeproj` extension instead of `.zip` / `.mta-project.zip`.
+- New project saves/exports use MIME type `application/vnd.mta-audio-editor.project`; legacy `.mta-project.zip` and `.zip` project archives remain readable.
+- Windows installer registers `.maeproj` with MTA Audio Editor and double-click launches the application with the selected project.
+- macOS bundle declares the `.maeproj` document type and exported UTI `com.desalvo.mtaaudioeditor.project`.
+- Native desktop startup consumes an associated project path and opens it automatically in the editor.
+- Android and iOS declare the same project MIME/UTI for platform file association/document pickers.
+
 ## 0.2.0-149
 
 Newly created projects are now activated through the exact same load path as Open project, so the complete editor workspace appears immediately after creation. Native YouTube import can read the real operating-system clipboard when the embedded WebView clipboard API is unavailable, and its dialog has been reorganized into clearer responsive sections.

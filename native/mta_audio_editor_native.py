@@ -15,6 +15,8 @@ from pathlib import Path
 
 
 APP_NAME = "MTA Audio Editor"
+PROJECT_EXTENSION = ".maeproj"
+LEGACY_PROJECT_EXTENSIONS = (".mta-project.zip", ".zip")
 
 
 def _configure_native_tls() -> None:
@@ -258,18 +260,18 @@ class NativeApi:
         safe_name = "".join(ch if ch.isalnum() or ch in " ._-" else "_" for ch in suggested_name).strip(" .")
         if not safe_name:
             safe_name = "project"
-        if not safe_name.lower().endswith(".mta-project.zip"):
-            safe_name += ".mta-project.zip"
+        if not safe_name.lower().endswith(PROJECT_EXTENSION):
+            safe_name += PROJECT_EXTENSION
         chosen = self.window.create_file_dialog(
             webview.FileDialog.SAVE,
             save_filename=safe_name,
-            file_types=("MTA Audio Editor Project (*.zip)",),
+            file_types=("MTA Audio Editor Project (*.maeproj)",),
         )
         path = self._dialog_path(chosen)
         if path is None:
             return {"ok": False, "cancelled": True}
-        if not str(path).lower().endswith(".mta-project.zip"):
-            path = Path(str(path) + ".mta-project.zip")
+        if not str(path).lower().endswith(PROJECT_EXTENSION):
+            path = Path(str(path) + PROJECT_EXTENSION)
         return {"ok": True, "cancelled": False, "path": str(path)}
 
     def bind_project_path(self, project_id: str, path: str) -> dict:
@@ -464,24 +466,55 @@ class NativeApi:
         from native.update_manager import download_and_launch
         return download_and_launch(asset_url, asset_name)
 
+    def _import_project_path(self, path: Path) -> dict:
+        from app.storage import import_project_archive
+
+        project = import_project_archive(path, None)
+        resolved = path.expanduser().resolve()
+        self.project_paths[project.id] = resolved
+        self._persist_project_paths()
+        return {"ok": True, "cancelled": False, "project": project.model_dump(mode="json"), "path": str(resolved)}
+
+    def consume_startup_project(self) -> dict:
+        pending = getattr(self, "startup_project_path", None)
+        if pending is None:
+            return {"ok": True, "project": None}
+        self.startup_project_path = None
+        try:
+            return self._import_project_path(Path(pending))
+        except Exception as exc:
+            return {"ok": False, "project": None, "error": str(exc)}
+
     def open_project(self) -> dict:
         if self.window is None:
             raise RuntimeError("native window is not ready")
         import webview
-        from app.storage import import_project_archive
 
         chosen = self.window.create_file_dialog(
             webview.FileDialog.OPEN,
             allow_multiple=False,
-            file_types=("MTA Audio Editor Project (*.zip)",),
+            file_types=(
+                "MTA Audio Editor Project (*.maeproj)",
+                "Legacy MTA Audio Editor Project (*.zip)",
+            ),
         )
         path = self._dialog_path(chosen)
         if path is None:
             return {"ok": False, "cancelled": True}
-        project = import_project_archive(path, None)
-        self.project_paths[project.id] = path.expanduser().resolve()
-        self._persist_project_paths()
-        return {"ok": True, "cancelled": False, "project": project.model_dump(mode="json")}
+        return self._import_project_path(path)
+
+
+def _startup_project_path(argv: list[str] | None = None) -> Path | None:
+    args = list(sys.argv[1:] if argv is None else argv)
+    for raw in args:
+        if not raw or raw.startswith("--"):
+            continue
+        candidate = Path(raw).expanduser()
+        lower = candidate.name.lower()
+        if lower.endswith(PROJECT_EXTENSION) or lower.endswith(LEGACY_PROJECT_EXTENSIONS):
+            if candidate.is_file():
+                return candidate.resolve()
+    return None
 
 
 def main() -> int:
@@ -500,6 +533,7 @@ def main() -> int:
         import webview
 
         native_api = NativeApi()
+        native_api.startup_project_path = _startup_project_path()
         window = webview.create_window(
             APP_NAME,
             url=url,

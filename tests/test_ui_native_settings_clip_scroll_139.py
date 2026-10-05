@@ -9,7 +9,7 @@ INDEX = (ROOT / 'app/templates/index.html').read_text(encoding='utf-8')
 def test_project_clip_browser_is_collapsed_by_default_and_reset_on_open():
     assert 'let clipBrowserExpanded=false;' in APP_JS
     assert "function resetProjectUiForOpen(){clipBrowserExpanded=false;" in APP_JS
-    assert 'resetProjectUiForOpen();resetSessionHistory();render();refresh();' in APP_JS
+    assert 'resetProjectUiForOpen();resetSessionHistory();render();schedulePlaybackPrewarm(40);refresh();' in APP_JS
     assert 'resetProjectUiForOpen();render();await refresh();toast(\'Progetto aperto dal filesystem\')' in APP_JS
 
 

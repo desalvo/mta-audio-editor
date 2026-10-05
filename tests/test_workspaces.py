@@ -89,7 +89,7 @@ def test_dedicated_workspaces_sharing_archives_and_admin_dump(tmp_path, monkeypa
     # Importing a complete project creates an independent project owned by importer.
     imported = bob.post(
         "/api/project-archives/import",
-        files={"file": ("alice-project.mta-project.zip", archive.content, "application/zip")},
+        files={"file": ("alice-project.maeproj", archive.content, "application/zip")},
     )
     assert imported.status_code == 200
     imported_project = imported.json()

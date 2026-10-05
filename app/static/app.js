@@ -49,6 +49,8 @@ let uiState={trackTop:0,timelineTop:0,timelineLeft:0,mixerLeft:0};
 let waveformJobs={}, waveformValidationProjectId=null, trackPlaybacks=[], meterRaf=null, meterRunToken=0, playbackToken=0, masterMeterAnalysers=null, masterPlaybackGainNode=null;
 let renderedMasterPlayback=false, renderedMasterDirty=false, renderedMasterRefreshPromise=null, renderedMasterRefreshQueued=false, renderedMasterBaseVolumeDb=0, renderedMasterAudio=null;
 let dynamicSyncClock=null, dynamicSyncTimer=null, playbackBuffering=false;
+let transportClockStartCtx=0, transportClockCursorMs=0, transportClockRunning=false;
+let playbackWarmCache=new Map(), playbackWarmProjectId=null, playbackWarmSignature='', playbackWarmTimer=null;
 const liveFxRefreshTimers={};
 let lastSelectedAudioFile=null, playbackPaused=false, mixerMetaTab='lyrics', pendingExportConfig=null, pendingNewProjectPath=null;
 let sampleEditor=null,sampleEditorPreviewAbort=null,sampleEditorPreviewTimer=null,serverProjects=[];
@@ -117,7 +119,7 @@ function selectedTrackIds(){return $$('.track-check:checked').map(x=>x.value)}
 function linesToText(a,b){return(a||[]).map(x=>`${(x.time_ms/1000).toFixed(3)}\t${x[b]}`).join('\n')}
 function textToLines(v,key){return v.split(/\n/).map(x=>x.trim()).filter(Boolean).map(line=>{const [t,...rest]=line.split(/\t|\s{2,}/);return{time_ms:Math.max(0,Math.round(parseFloat(t)*1000)||0),[key]:rest.join(' ').trim()}})}
 
-async function init(){if(isMobileClient())document.body.classList.add('mobile-client');try{currentUser=await api('/api/session');const a=$('#adminNav');if(a)a.hidden=!!currentUser.native_single_user||currentUser.role!=='admin';const sb=$('#nativeSettingsButton');if(sb)sb.hidden=false;const recentBtn=$('#openRecentProjectBtn'),localBtn=$('#openLocalProjectBtn');if(currentUser.native_single_user){document.body.classList.add('native-single-user');if(recentBtn)recentBtn.hidden=false;if(localBtn)localBtn.hidden=true}else{if(recentBtn)recentBtn.hidden=true;if(localBtn)localBtn.hidden=false}}catch(e){}if(currentUser?.native_single_user)installNativeViewportGuard();if(currentUser&&!currentUser.native_single_user)autosaveEnabled=localStorage.getItem('mtaWebAutosaveEnabled')!=='false';if(currentUser?.native_single_user){const bridge=await waitForNativeApi();if(bridge?.get_native_settings){try{const cfg=await bridge.get_native_settings();autosaveEnabled=cfg.autosave_enabled!==false;nativeRecentProjects=Array.isArray(cfg.recent_projects)?cfg.recent_projects.map(String).filter(Boolean):[]}catch(e){}}setTimeout(()=>checkNativeAppUpdate(false),1200)}try{pluginInfo=await api('/api/plugins')}catch(e){}await refresh()}
+async function init(){if(isMobileClient())document.body.classList.add('mobile-client');try{currentUser=await api('/api/session');const a=$('#adminNav');if(a)a.hidden=!!currentUser.native_single_user||currentUser.role!=='admin';const sb=$('#nativeSettingsButton');if(sb)sb.hidden=false;const recentBtn=$('#openRecentProjectBtn'),localBtn=$('#openLocalProjectBtn');if(currentUser.native_single_user){document.body.classList.add('native-single-user');if(recentBtn)recentBtn.hidden=false;if(localBtn)localBtn.hidden=true}else{if(recentBtn)recentBtn.hidden=true;if(localBtn)localBtn.hidden=false}}catch(e){}if(currentUser?.native_single_user)installNativeViewportGuard();if(currentUser&&!currentUser.native_single_user)autosaveEnabled=localStorage.getItem('mtaWebAutosaveEnabled')!=='false';let nativeBridge=null;if(currentUser?.native_single_user){nativeBridge=await waitForNativeApi();if(nativeBridge?.get_native_settings){try{const cfg=await nativeBridge.get_native_settings();autosaveEnabled=cfg.autosave_enabled!==false;nativeRecentProjects=Array.isArray(cfg.recent_projects)?cfg.recent_projects.map(String).filter(Boolean):[]}catch(e){}}setTimeout(()=>checkNativeAppUpdate(false),1200)}try{pluginInfo=await api('/api/plugins')}catch(e){}if(nativeBridge?.consume_startup_project){try{const startup=await nativeBridge.consume_startup_project();if(startup?.project?.id){rememberRecentProject(startup.project.id);await openP(startup.project.id);return}if(startup&&!startup.ok&&startup.error)toast('Impossibile aprire il progetto: '+startup.error)}catch(e){toast('Impossibile aprire il progetto: '+e.message)}}await refresh()}
 
 function toggleEditingToolsPanel(){
   const panel=$('#editingToolsPanel');if(!panel)return;
@@ -256,7 +258,7 @@ async function openP(id){
     return toast('La separazione è in corso: resta nel progetto corrente fino al completamento.');
   }
   await flushAutosave();stopPlayback();
-  current=await api('/api/projects/'+id);rememberRecentProject(current.id);selectedTrackId=current.tracks[0]?.id||null;resetProjectUiForOpen();resetSessionHistory();render();refresh();
+  current=await api('/api/projects/'+id);rememberRecentProject(current.id);selectedTrackId=current.tracks[0]?.id||null;resetProjectUiForOpen();resetSessionHistory();render();schedulePlaybackPrewarm(40);refresh();
 }
 function downloadProjectArchive(id){window.location.href=`/api/projects/${id}/archive`}
 async function saveAsProject(){
@@ -347,7 +349,7 @@ function render(){
   $('#mixerDock').innerHTML=mixerHtml();
   updateMixerDockLayout();updatePanelMenuButtons();
   drawRuler();bindTimeline();bindProjectClipDrop();bindTrackTimelineScroll();bindTrackResizer();
-  current.tracks.forEach(drawWave);if(waveformValidationProjectId!==current.id){waveformValidationProjectId=current.id;ensureWaveforms(true)}else ensureWaveforms(false);updateSel();bindModelInputs();updateMuteSoloVisuals();restoreUiState();ensureSessionHistory();updateEditActionState();forceNativeViewportTop();
+  current.tracks.forEach(drawWave);if(waveformValidationProjectId!==current.id){waveformValidationProjectId=current.id;ensureWaveforms(true)}else ensureWaveforms(false);updateSel();bindModelInputs();updateMuteSoloVisuals();restoreUiState();ensureSessionHistory();updateEditActionState();forceNativeViewportTop();schedulePlaybackPrewarm(180);
 }
 async function createMetronomeTrack(){
   if(!current)return toast('Apri prima un progetto');
@@ -1176,13 +1178,21 @@ async function refreshDynamicTrackPlayback(trackId){
   try{
     collect();
     await persistCurrentProject(false);
-    const replacement=await makeTrackPlayback(track,true,false,true);
-    replacement.audio.currentTime=Math.min(playCursorMs/1000/tempoRatio(),Math.max(0,(replacement.audio.duration||0)-0.01));
+    // Keep the old decoder audible while the processed replacement is built.
+    // The replacement joins the central transport clock muted, then crossfades.
+    const replacement=await makeTrackPlayback(track,true,false,true,true);
+    const expected=transportClockRunning?transportMediaSeconds():playCursorMs/1000/tempoRatio();
+    replacement.audio.currentTime=Math.min(expected,Math.max(0,(replacement.audio.duration||0)-0.01));
+    await waitForMediaBuffer(replacement.audio,track.name,1600);
     await replacement.audio.play();
+    const locked=transportClockRunning?transportMediaSeconds():expected;
+    try{replacement.audio.currentTime=Math.min(locked,Math.max(0,(replacement.audio.duration||locked)-0.005))}catch(e){}
+    const now=audioCtx?.currentTime||0,target=playbackGainForTrack(track,replacement);
+    replacement.gainNode.gain.cancelScheduledValues(now);replacement.gainNode.gain.setValueAtTime(0,now);replacement.gainNode.gain.linearRampToValueAtTime(target,now+.018);
+    if(oldItem.gainNode){const oldNow=audioCtx?.currentTime||now,oldValue=oldItem.gainNode.gain.value;oldItem.gainNode.gain.cancelScheduledValues(oldNow);oldItem.gainNode.gain.setValueAtTime(oldValue,oldNow);oldItem.gainNode.gain.linearRampToValueAtTime(0,oldNow+.018)}
     trackPlaybacks.splice(oldIndex,1,replacement);
     if(wasClock)playAudio=replacement.audio;
-    try{oldItem.audio.pause();oldItem.audio.src=''}catch(e){}
-    updatePlaybackGains();
+    setTimeout(()=>{try{oldItem.audio.pause();oldItem.audio.removeAttribute('src');oldItem.audio.load()}catch(e){}},24);
   }catch(e){console.warn('Aggiornamento live FX traccia fallito',trackId,e)}
 }
 function queueLiveFxRefresh(isMaster,trackId='',delay=90){
@@ -1900,21 +1910,66 @@ function canDirectPlayTrack(track,renderFilters=true){
   const clips=track.clips||[];if(!clips.length)return true;if(clips.length!==1)return false;
   const c=clips[0],dur=Number(track.duration_ms||0);return Number(c.timeline_start_ms||0)===0&&Number(c.source_start_ms||0)===0&&(!dur||Math.abs(Number(c.source_end_ms||0)-dur)<100);
 }
-async function makeTrackPlayback(track,renderFilters,silent=false,respectMuteSolo=true){
+function playbackSourceForTrack(track,renderFilters=false){
   const direct=canDirectPlayTrack(track,renderFilters);
-  const url=direct?`/api/projects/${current.id}/audio/${encodeURIComponent(track.filename)}`:`/api/projects/${current.id}/preview-track/${track.id}?render=${renderFilters?'true':'false'}`;
-  const audio=new Audio(url);audio.preload='auto';
+  return {direct,url:direct?`/api/projects/${current.id}/audio/${encodeURIComponent(track.filename)}`:`/api/projects/${current.id}/preview-track/${track.id}?render=${renderFilters?'true':'false'}`};
+}
+function playbackWarmStateSignature(){
+  if(!current)return '';
+  return JSON.stringify({id:current.id,bpm:current.bpm,base:current.base_bpm,pitch:current.pitch_semitones,tracks:(current.tracks||[]).map(t=>[t.id,t.filename,t.duration_ms,t.clips])});
+}
+function clearPlaybackWarmCache(){
+  clearTimeout(playbackWarmTimer);playbackWarmTimer=null;
+  for(const entry of playbackWarmCache.values())try{entry.audio.pause();entry.audio.removeAttribute('src');entry.audio.load()}catch(e){}
+  playbackWarmCache.clear();playbackWarmProjectId=null;playbackWarmSignature='';
+}
+function schedulePlaybackPrewarm(delay=120){
+  clearTimeout(playbackWarmTimer);
+  if(!current||playAudio||trackPlaybacks.length||playbackBuffering)return;
+  playbackWarmTimer=setTimeout(()=>{playbackWarmTimer=null;void prewarmPlaybackSources()},delay);
+}
+async function prewarmPlaybackSources(){
+  if(!current||playAudio||trackPlaybacks.length||playbackBuffering)return;
+  const sig=playbackWarmStateSignature();
+  if(playbackWarmProjectId===current.id&&playbackWarmSignature===sig&&playbackWarmCache.size===(current.tracks||[]).length)return;
+  clearPlaybackWarmCache();playbackWarmProjectId=current.id;playbackWarmSignature=sig;
+  for(const track of current.tracks||[]){
+    const source=playbackSourceForTrack(track,false),audio=new Audio(source.url);audio.preload='auto';
+    playbackWarmCache.set(track.id,{audio,url:source.url,direct:source.direct});
+    try{audio.load()}catch(e){}
+  }
+}
+function takeWarmPlaybackAudio(track,renderFilters){
+  const source=playbackSourceForTrack(track,renderFilters),entry=!renderFilters?playbackWarmCache.get(track.id):null;
+  if(entry&&entry.url===source.url){playbackWarmCache.delete(track.id);return {audio:entry.audio,direct:entry.direct,url:entry.url}}
+  const audio=new Audio(source.url);audio.preload='auto';return {audio,direct:source.direct,url:source.url};
+}
+function ensureTransportAudioContext(){audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();return audioCtx}
+function transportMediaSeconds(){
+  const base=transportClockCursorMs/1000/tempoRatio();
+  if(!transportClockRunning||!audioCtx)return base;
+  return Math.max(0,base+(audioCtx.currentTime-transportClockStartCtx));
+}
+function startTransportClock(cursorMs=playCursorMs){const ctx=ensureTransportAudioContext();transportClockCursorMs=cursorMs;transportClockStartCtx=ctx.currentTime;transportClockRunning=true}
+function pauseTransportClock(){if(transportClockRunning){playCursorMs=transportMediaSeconds()*1000*tempoRatio();transportClockCursorMs=playCursorMs;transportClockRunning=false}}
+function reanchorTransportClock(cursorMs=playCursorMs){transportClockCursorMs=cursorMs;if(audioCtx)transportClockStartCtx=audioCtx.currentTime}
+async function makeTrackPlayback(track,renderFilters,silent=false,respectMuteSolo=true,startupMuted=false){
+  const warm=takeWarmPlaybackAudio(track,renderFilters),audio=warm.audio,direct=warm.direct;
   const channels=direct?(Number(track.channels)===1?1:2):(renderFilters?effectiveTrackChannels(track):(Number(track.channels)===1?1:2));
   const graph=await attachPlaybackGraph(audio,track,channels,silent,false,respectMuteSolo);
+  const targetGain=playbackGainForTrack(track,{respectMuteSolo});
+  if(startupMuted)graph.gainNode.gain.setValueAtTime(0,audioCtx?.currentTime||0);
   await new Promise((resolve,reject)=>{const ready=()=>resolve();audio.addEventListener('loadedmetadata',ready,{once:true});audio.addEventListener('error',()=>reject(new Error(`Preview non disponibile: ${track.name}`)),{once:true});audio.load();if(audio.readyState>=1)resolve()});
   audio.currentTime=Math.min(playCursorMs/1000/tempoRatio(),Math.max(0,(audio.duration||0)-0.01));
   audio.addEventListener('ended',()=>requestAnimationFrame(()=>{if(!playbackActuallyRunning())resetVuMeters()}));
-  return {trackId:track.id,audio,analysers:graph.analysers,channels,silent,respectMuteSolo,meterData:{},gainNode:graph.gainNode,panner:graph.panner,direct};
+  return {trackId:track.id,audio,analysers:graph.analysers,channels,silent,respectMuteSolo,meterData:{},gainNode:graph.gainNode,panner:graph.panner,direct,targetGain,startupMuted};
 }
-function waitForMediaBuffer(audio,label='traccia',timeoutMs=12000){
-  const enough=()=>{if(audio.readyState<2)return false;try{const pos=audio.currentTime||0;for(let i=0;i<audio.buffered.length;i++){if(audio.buffered.start(i)<=pos+.05&&audio.buffered.end(i)-pos>=Math.min(.45,Math.max(.15,(audio.duration||.45)-pos)))return true}}catch(e){}return audio.readyState>=3};
+function waitForMediaBuffer(audio,label='traccia',timeoutMs=1800){
+  // Low-latency transport only waits for a decodable frame near the cursor.
+  // Deep buffering happens in the background and must never gate Play.
+  const enough=()=>{if(audio.readyState<2)return false;try{const pos=audio.currentTime||0;for(let i=0;i<audio.buffered.length;i++){if(audio.buffered.start(i)<=pos+.03&&audio.buffered.end(i)-pos>=Math.min(.08,Math.max(.025,(audio.duration||.08)-pos)))return true}}catch(e){}return audio.readyState>=3};
   if(enough())return Promise.resolve();
-  return new Promise((resolve,reject)=>{let done=false;const finish=()=>{if(done)return;done=true;cleanup();resolve()},fail=()=>{if(done)return;done=true;cleanup();reject(new Error(`Buffering non riuscito: ${label}`))},check=()=>{if(enough())finish()},cleanup=()=>{clearTimeout(timer);clearInterval(poll);audio.removeEventListener('canplaythrough',check);audio.removeEventListener('progress',check);audio.removeEventListener('error',fail)},poll=setInterval(check,100),timer=setTimeout(()=>audio.readyState>=3?finish():fail(),timeoutMs);audio.addEventListener('canplaythrough',check);audio.addEventListener('progress',check);audio.addEventListener('error',fail,{once:true});audio.load()});
+  return new Promise((resolve,reject)=>{let done=false;const finish=()=>{if(done)return;done=true;cleanup();resolve()},fail=()=>{if(done)return;done=true;cleanup();audio.readyState>=2?resolve():reject(new Error(`Buffering non riuscito: ${label}`))},check=()=>{if(enough())finish()},cleanup=()=>{clearTimeout(timer);clearInterval(poll);audio.removeEventListener('canplay',check);audio.removeEventListener('progress',check);audio.removeEventListener('error',fail)},poll=setInterval(check,35),timer=setTimeout(fail,timeoutMs);audio.addEventListener('canplay',check);audio.addEventListener('progress',check);audio.addEventListener('error',fail,{once:true});audio.load()});
 }
 function stopDynamicSyncMonitor(){
   if(dynamicSyncTimer){clearInterval(dynamicSyncTimer);dynamicSyncTimer=null}
@@ -1922,55 +1977,66 @@ function stopDynamicSyncMonitor(){
 }
 function dynamicClockAudio(){
   if(renderedMasterPlayback&&renderedMasterAudio)return renderedMasterAudio;
-  const preferred=dynamicSyncClock?.audio||playAudio;if(preferred&&!preferred.ended&&preferred.readyState>=2)return preferred;
   const active=trackPlaybacks.find(item=>item.audio&&!item.audio.paused&&!item.audio.ended&&item.audio.readyState>=2);
-  if(active){dynamicSyncClock=active;return active.audio}
-  return preferred||trackPlaybacks[0]?.audio||null;
+  return active?.audio||playAudio||trackPlaybacks[0]?.audio||null;
 }
 function alignDynamicTracks(force=false){
-  if(renderedMasterPlayback||playbackPaused||!trackPlaybacks.length)return;
-  const clock=dynamicClockAudio();if(!clock||clock.paused||clock.ended||clock.readyState<2)return;
-  const ref=clock.currentTime,now=Date.now();
+  if(renderedMasterPlayback||playbackPaused||!trackPlaybacks.length||!transportClockRunning)return;
+  const ref=transportMediaSeconds(),now=Date.now();
   for(const item of trackPlaybacks){
-    const audio=item.audio;if(audio===clock||audio.paused||audio.ended)continue;
-    // Never chase a buffering decoder with repeated seeks: that can keep it in
-    // permanent starvation. A forced relock is reserved for start/seek/resume.
+    const audio=item.audio;if(audio.paused||audio.ended)continue;
+    // AudioContext is the authoritative transport clock. Decoder stalls do not
+    // move the timeline and are corrected only after the decoder is playable.
     if(audio.readyState<3||audio.seeking){audio.playbackRate=1;item.needsRelock=true;continue}
     const drift=audio.currentTime-ref;
     try{
-      if(force||(item.needsRelock&&Math.abs(drift)>.080)){
-        audio.currentTime=ref;audio.playbackRate=1;item.needsRelock=false;item.lastHardSync=now;
-      }else if(Math.abs(drift)>.035){
-        audio.playbackRate=Math.max(.995,Math.min(1.005,1-drift*.06));
-      }else if(Math.abs(audio.playbackRate-1)>.0005){audio.playbackRate=1}
+      if(force||(item.needsRelock&&Math.abs(drift)>.045)||Math.abs(drift)>.120){
+        audio.currentTime=Math.min(ref,Math.max(0,(audio.duration||ref)-0.005));audio.playbackRate=1;item.needsRelock=false;item.lastHardSync=now;
+      }else if(Math.abs(drift)>.018){
+        audio.playbackRate=Math.max(.997,Math.min(1.003,1-drift*.045));
+      }else if(Math.abs(audio.playbackRate-1)>.0003){audio.playbackRate=1}
     }catch(e){}
   }
 }
 function startDynamicSyncMonitor(){
   stopDynamicSyncMonitor();dynamicSyncClock=trackPlaybacks.find(x=>x.audio&&!x.audio.ended)||null;
-  // HTML media elements already share the browser media clock. We only correct
-  // meaningful drift and never hammer stalled decoders.
-  dynamicSyncTimer=setInterval(()=>alignDynamicTracks(false),250);
+  dynamicSyncTimer=setInterval(()=>alignDynamicTracks(false),120);
 }
-async function startDynamicTrackPreview(renderFilters,silentMeters=false,token=playbackToken){
-  playbackBuffering=true;const tracks=current.tracks||[];showMediaProgress('Buffering tracce',5,`Pre-buffer ${tracks.length} tracce… attendere`);
+function releaseStartupMute(items){
+  const now=audioCtx?.currentTime||0;
+  for(const item of items){if(!item.gainNode)continue;const track=trackById(item.trackId),target=playbackGainForTrack(track,item);item.gainNode.gain.cancelScheduledValues(now);item.gainNode.gain.setValueAtTime(0,now);item.gainNode.gain.linearRampToValueAtTime(target,now+.008);item.startupMuted=false}
+}
+function queueInitialTrackFxUpgrades(){
+  if(renderedMasterPlayback)return;
+  for(const track of current?.tracks||[]){if((track.inserts||[]).some(x=>x.enabled))setTimeout(()=>refreshDynamicTrackPlayback(track.id),20)}
+}
+async function startDynamicTrackPreview(renderFilters=false,silentMeters=false,token=playbackToken){
+  playbackBuffering=true;const tracks=current.tracks||[],slowTimer=setTimeout(()=>{if(token===playbackToken)showMediaProgress('Preparazione audio',18,'Avvio decoder…')},220);
   try{
-    const items=await Promise.all(tracks.map(t=>makeTrackPlayback(t,renderFilters,silentMeters,true)));if(token!==playbackToken)return null;
-    showMediaProgress('Buffering tracce',45,'Preparazione decoder… attendere');
-    await Promise.all(items.map((item,i)=>waitForMediaBuffer(item.audio,tracks[i]?.name||`traccia ${i+1}`,8000)));if(token!==playbackToken)return null;
+    const items=await Promise.all(tracks.map(t=>makeTrackPlayback(t,renderFilters,silentMeters,true,true)));if(token!==playbackToken)return null;
+    await Promise.all(items.map((item,i)=>waitForMediaBuffer(item.audio,tracks[i]?.name||`traccia ${i+1}`,1600)));if(token!==playbackToken)return null;
     const sec=playCursorMs/1000/tempoRatio();
     for(const item of items){item.audio.pause();item.audio.playbackRate=1;item.needsRelock=false;item.lastHardSync=0;item.audio.currentTime=Math.min(sec,Math.max(0,(item.audio.duration||0)-0.01))}
-    trackPlaybacks.push(...items);updatePlaybackGains();if(audioCtx?.state==='suspended')try{await audioCtx.resume()}catch(e){}
-    showMediaProgress('Buffering tracce',82,'Avvio sincronizzato…');
-    await Promise.all(items.map(item=>item.audio.play()));if(token!==playbackToken){for(const item of items)try{item.audio.pause()}catch(e){};return null}
-    dynamicSyncClock=items.find(x=>x.audio&&!x.audio.ended)||items[0]||null;alignDynamicTracks(true);startDynamicSyncMonitor();$('#utilityBackdrop')?.classList.add('hidden');if(current.realtime_meter_enabled&&!meterRaf)startVuMeterLoop();return dynamicSyncClock?.audio||null;
-  }finally{if(token===playbackToken)playbackBuffering=false}
+    trackPlaybacks.push(...items);if(audioCtx?.state==='suspended')try{await audioCtx.resume()}catch(e){}
+    // Start all muted, establish one AudioContext transport epoch, then reveal
+    // audio only after the first hard lock. This avoids audible start skew.
+    startTransportClock(playCursorMs);
+    const starts=items.map(item=>item.audio.play());
+    await Promise.all(starts);if(token!==playbackToken){for(const item of items)try{item.audio.pause()}catch(e){};return null}
+    alignDynamicTracks(true);releaseStartupMute(items);
+    setTimeout(()=>{if(token===playbackToken)alignDynamicTracks(true)},45);
+    setTimeout(()=>{if(token===playbackToken)alignDynamicTracks(true)},120);
+    dynamicSyncClock=items.find(x=>x.audio&&!x.audio.ended)||items[0]||null;startDynamicSyncMonitor();$('#utilityBackdrop')?.classList.add('hidden');if(current.realtime_meter_enabled&&!meterRaf)startVuMeterLoop();
+    if(!renderFilters)queueInitialTrackFxUpgrades();
+    return dynamicSyncClock?.audio||null;
+  }finally{clearTimeout(slowTimer);if(token===playbackToken)playbackBuffering=false}
 }
 
 function stopPlayback(){
   ++playbackToken;
   playbackBuffering=false;
   playbackPaused=false;
+  transportClockRunning=false;transportClockCursorMs=playCursorMs;
   meterRunToken++;
   if(playRaf){cancelAnimationFrame(playRaf);playRaf=null}
   if(meterRaf){cancelAnimationFrame(meterRaf);meterRaf=null}
@@ -1983,9 +2049,11 @@ function stopPlayback(){
   resetVuMeters();
   requestAnimationFrame(resetVuMeters);
   if($('#playMaster')){$('#playMaster').textContent='▶';$('#playMaster').title='Play / Preview'}
+  schedulePlaybackPrewarm(120);
 }
 function pausePlayback(){
   if(!playAudio&&!trackPlaybacks.length)return;
+  pauseTransportClock();
   if(playAudio)playAudio.pause();
   for(const item of trackPlaybacks)try{item.audio.pause()}catch(e){}
   playbackPaused=true;
@@ -1999,15 +2067,16 @@ async function resumePlayback(){
   if(!audios.length)return previewMaster();
   const ref=playCursorMs/1000/tempoRatio();
   for(const audio of audios)try{audio.currentTime=Math.min(ref,Math.max(0,(audio.duration||0)-0.01))}catch(e){}
+  startTransportClock(playCursorMs);
   await Promise.all(audios.map(audio=>audio.play()));
   playbackPaused=false;
-  if(!renderedMasterPlayback){alignDynamicTracks(true);startDynamicSyncMonitor()}
+  if(!renderedMasterPlayback){alignDynamicTracks(true);startDynamicSyncMonitor();setTimeout(()=>alignDynamicTracks(true),50)}
   if($('#playMaster')){$('#playMaster').textContent='❚❚';$('#playMaster').title='Pausa'}
   playRaf=requestAnimationFrame(movePlayhead);
   if(current?.realtime_meter_enabled&&!meterRaf)meterRaf=requestAnimationFrame(updateVuMeters);
 }
 function goTransportStart(){
-  setPlayCursor(0);
+  setPlayCursor(0);reanchorTransportClock(0);
   if(renderedMasterAudio)try{renderedMasterAudio.currentTime=0}catch(e){}
   if(playAudio)try{playAudio.currentTime=0}catch(e){}
   for(const item of trackPlaybacks)try{item.audio.currentTime=0}catch(e){}
@@ -2022,7 +2091,7 @@ async function togglePlayback(){
   return previewMaster();
 }
 function seekTransport(deltaMs){
-  setPlayCursor(Math.max(0,playCursorMs+deltaMs));
+  setPlayCursor(Math.max(0,playCursorMs+deltaMs));reanchorTransportClock(playCursorMs);
   const sec=playCursorMs/1000/tempoRatio();
   if(renderedMasterAudio)try{renderedMasterAudio.currentTime=sec}catch(e){}
   if(playAudio)try{playAudio.currentTime=sec}catch(e){}
@@ -2038,7 +2107,7 @@ async function previewMaster(){
   if(!current||!current.tracks.length)return;
   try{
     collect();stopPlayback();const token=++playbackToken;
-    const needsRenderedMaster=!!current.render_preview_enabled||Math.abs(Number(current.master_volume_db||0))>0.001||(current.master_inserts||[]).some(x=>x.enabled);
+    const needsRenderedMaster=!!current.render_preview_enabled;
     if(needsRenderedMaster){
       renderedMasterPlayback=true;renderedMasterDirty=false;
       renderedMasterBaseVolumeDb=Number(current.master_volume_db||0);
@@ -2060,7 +2129,7 @@ async function previewMaster(){
       await audio.play();
     }else{
       renderedMasterPlayback=false;renderedMasterDirty=false;renderedMasterAudio=null;
-      playAudio=await startDynamicTrackPreview(true,false,token);if(token!==playbackToken)return;
+      playAudio=await startDynamicTrackPreview(false,false,token);if(token!==playbackToken)return;
     }
     if(!playAudio)return;playbackPaused=false;$('#playMaster').textContent='❚❚';$('#playMaster').title='Pausa';
     if(current?.follow_playback_enabled)followPlayhead(playCursorMs/1000*pxPerSec,true);
@@ -2071,7 +2140,7 @@ async function previewMaster(){
 function movePlayhead(){
   const clock=dynamicClockAudio();
   if(!clock||clock.paused)return;
-  playCursorMs=clock.currentTime*1000*tempoRatio();
+  playCursorMs=(renderedMasterPlayback?clock.currentTime:transportMediaSeconds())*1000*tempoRatio();
   if(!renderedMasterPlayback)alignDynamicTracks(false);
   const playheadX=playCursorMs/1000*pxPerSec;
   if($('#playhead'))$('#playhead').style.left=playheadX+'px';

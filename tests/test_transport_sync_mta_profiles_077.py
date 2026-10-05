@@ -13,11 +13,12 @@ def test_transport_has_go_to_start():
 
 def test_dynamic_playback_buffers_and_realigns():
     assert "function waitForMediaBuffer(" in JS
-    assert "Pre-buffer ${tracks.length} tracce… attendere" in JS
+    assert "Low-latency transport only waits for a decodable frame" in JS
+    assert "startTransportClock(playCursorMs)" in JS
     assert "startDynamicSyncMonitor()" in JS
     assert "audio.readyState<3||audio.seeking" in JS
     assert "item.needsRelock=true" in JS
-    assert "playbackRate=Math.max(.995,Math.min(1.005,1-drift*.06))" in JS
+    assert "playbackRate=Math.max(.997,Math.min(1.003,1-drift*.045))" in JS
 
 def test_render_follow_has_dedicated_clock():
     assert "renderedMasterAudio" in JS

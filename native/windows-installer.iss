@@ -30,6 +30,7 @@ WizardStyle=modern
 SetupIconFile=icons\mta-audio-editor.ico
 PrivilegesRequired=lowest
 UninstallDisplayIcon={app}\{#MyAppExeName}
+ChangesAssociations=yes
 
 [Files]
 Source: "{#SourceDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
@@ -40,6 +41,13 @@ Name: "{autodesktop}\MTA Audio Editor"; Filename: "{app}\{#MyAppExeName}"; Tasks
 
 [Tasks]
 Name: "desktopicon"; Description: "Crea un collegamento sul desktop"; GroupDescription: "Collegamenti aggiuntivi:"
+
+[Registry]
+Root: HKCU; Subkey: "Software\Classes\.maeproj"; ValueType: string; ValueName: ""; ValueData: "MTA.AudioEditor.Project"; Flags: uninsdeletevalue
+Root: HKCU; Subkey: "Software\Classes\MTA.AudioEditor.Project"; ValueType: string; ValueName: ""; ValueData: "MTA Audio Editor Project"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Classes\MTA.AudioEditor.Project\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\{#MyAppExeName},0"
+Root: HKCU; Subkey: "Software\Classes\MTA.AudioEditor.Project\shell\open\command"; ValueType: string; ValueName: ""; ValueData: ""{app}\{#MyAppExeName}" "%1""
+Root: HKCU; Subkey: "Software\Classes\MTA.AudioEditor.Project"; ValueType: string; ValueName: "Content Type"; ValueData: "application/vnd.mta-audio-editor.project"
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "Avvia MTA Audio Editor"; Flags: nowait postinstall skipifsilent
