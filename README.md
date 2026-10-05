@@ -155,3 +155,6 @@ Double-click a timeline waveform or use the track context menu to open the dedic
 - The old sidebar **PROJECTS** section has been removed.
 - In the web app, **Open project** lists projects already available on the server and **Open local project** imports a project archive from the device.
 - In the native desktop app, **Open recent** lists recently opened projects that still exist in the local workspace, while **Open project** uses the native filesystem picker.
+
+### Structured Lyrics editor
+“Edit lyrics” now opens a large resizable window with separate Start, End and Text columns; rows can be added/removed and text/timing edited independently.

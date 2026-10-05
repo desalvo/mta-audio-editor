@@ -13,5 +13,5 @@ def test_android_dependabot_updates_are_integrated():
 
 def test_android_package_version_matches_release():
     gradle = (ROOT / "mobile/android/app/build.gradle.kts").read_text(encoding="utf-8")
-    assert 'versionCode = 20146' in gradle
-    assert 'versionName = "0.2.0-146"' in gradle
+    assert 'versionCode = 20147' in gradle
+    assert 'versionName = "0.2.0-147"' in gradle

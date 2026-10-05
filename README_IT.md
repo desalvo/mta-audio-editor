@@ -400,3 +400,6 @@ Dalla waveform della timeline (doppio click) o dal menu contestuale di una tracc
 - La vecchia sezione laterale **PROJECTS** è stata rimossa.
 - Nella web app **Open project** elenca i progetti già disponibili sul server e **Open local project** importa un archivio progetto dal dispositivo.
 - Nell'app desktop nativa **Open recent** mostra i progetti aperti di recente ancora presenti nel workspace locale, mentre **Open project** usa il selettore filesystem nativo.
+
+### Editor Lyrics strutturato
+“Edit lyrics” apre ora una finestra ampia e ridimensionabile con colonne separate Inizio, Fine e Testo; è possibile aggiungere/eliminare righe e modificare testo e tempi indipendentemente.

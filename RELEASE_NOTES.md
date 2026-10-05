@@ -1,3 +1,7 @@
+## 0.2.0-147
+
+The Lyrics/Chords/Markers editor is now a dedicated structured workspace. Lyrics can be edited row-by-row with separate Start, End and Text columns in a large resizable window; Chords and Markers get equivalent Time/Value editing. Rows can be added, removed and reordered automatically by time, with responsive/mobile scrolling.
+
 # 0.2.0-146
 
 - Fix GitHub Actions Ruff S110 failures in native AI accelerator probing by logging non-fatal CUDA/MPS probe errors instead of silently passing.

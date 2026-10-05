@@ -1,3 +1,10 @@
+## 0.2.0-147
+
+- Lyrics editor redesigned as a large structured, resizable editor instead of a one-line prompt.
+- Lyrics rows expose Start, End and Text as separate editable fields; Chords and Markers use the same structured Time/Value workflow.
+- Timed editors support `mm:ss.mmm` or seconds, add/remove rows, automatic sorting by start time and mobile-safe scrolling.
+- Editing a Lyrics row invalidates stale per-word karaoke timing only for the changed row.
+
 ## 0.2.0-146
 
 - Fix GitHub Actions Ruff S110 failures in native AI accelerator probing by logging non-fatal CUDA/MPS probe errors instead of silently passing.
