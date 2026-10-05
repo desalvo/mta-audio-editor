@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import os
 import socket
+import subprocess
 import sys
 import threading
 import time
@@ -195,6 +196,51 @@ class NativeApi:
             json.dumps({key: str(value) for key, value in self.project_paths.items()}, indent=2) + "\n",
             encoding="utf-8",
         )
+
+    def read_clipboard(self) -> dict:
+        """Return text from the operating-system clipboard for native WebViews."""
+        try:
+            if sys.platform == "darwin":
+                result = subprocess.run(
+                    ["/usr/bin/pbpaste"],
+                    check=False,
+                    capture_output=True,
+                    text=True,
+                    timeout=2,
+                )
+                return {"ok": result.returncode == 0, "text": result.stdout if result.returncode == 0 else ""}
+            if os.name == "nt":
+                import ctypes
+                user32 = ctypes.windll.user32
+                kernel32 = ctypes.windll.kernel32
+                cf_unicode_text = 13
+                if not user32.OpenClipboard(None):
+                    return {"ok": False, "text": ""}
+                try:
+                    handle = user32.GetClipboardData(cf_unicode_text)
+                    if not handle:
+                        return {"ok": True, "text": ""}
+                    kernel32.GlobalLock.restype = ctypes.c_void_p
+                    pointer = kernel32.GlobalLock(handle)
+                    if not pointer:
+                        return {"ok": False, "text": ""}
+                    try:
+                        return {"ok": True, "text": ctypes.wstring_at(pointer)}
+                    finally:
+                        kernel32.GlobalUnlock(handle)
+                finally:
+                    user32.CloseClipboard()
+            for command in (["wl-paste", "--no-newline"], ["xclip", "-selection", "clipboard", "-o"]):
+                try:
+                    result = subprocess.run(command, check=False, capture_output=True, text=True, timeout=2)
+                    if result.returncode == 0:
+                        return {"ok": True, "text": result.stdout}
+                except (FileNotFoundError, OSError, subprocess.SubprocessError):
+                    continue
+        except Exception as exc:
+            print(f"Native clipboard read failed: {exc}", file=sys.stderr)
+            return {"ok": False, "text": "", "error": str(exc)}
+        return {"ok": False, "text": ""}
 
     @staticmethod
     def _dialog_path(value):

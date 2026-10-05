@@ -1,3 +1,17 @@
+## 0.2.0-149
+
+- Restore New project activation: after creation the app now reopens the canonical project through the same `openP()` path used by Open project, immediately restoring Tracks, Mixer, timeline and toolbars.
+- Native YouTube import adds operating-system clipboard fallback (macOS `pbpaste`, Windows native clipboard API, Linux Wayland/X11 fallback) plus explicit Paste buttons for URL and track-name fields.
+- Redesign YouTube import into clear Source, Positioning and Rights sections with responsive layout for narrow native windows.
+
+## 0.2.0-148
+
+- Lyrics editor: insert new rows anywhere with **+ above** / **+ below** controls.
+- Lyrics editor: add a dedicated **Split** action that divides a segment timing at its midpoint and creates an editable row below.
+- Lyrics editor: delete any row before saving, with confirmation for non-empty rows.
+- Chords editor now mirrors the Lyrics row workflow with **+ above**, **+ below**, **Split** and **Delete** on every chord row; Split creates an editable chord point at the temporal midpoint.
+- Preserve word-level timing against the original lyric row even when rows are inserted or removed.
+
 ## 0.2.0-147
 
 - Lyrics editor redesigned as a large structured, resizable editor instead of a one-line prompt.

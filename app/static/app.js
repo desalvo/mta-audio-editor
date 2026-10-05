@@ -243,9 +243,10 @@ async function createProjectFromDialog(){
     if(currentUser?.native_single_user&&pendingNewProjectPath&&window.pywebview?.api?.bind_project_path){
       await window.pywebview.api.bind_project_path(created.id,pendingNewProjectPath);
     }
-    current=created;rememberRecentProject(current.id);
-    selectedTrackId=null;resetProjectUiForOpen();resetSessionHistory();
-    closeUtilityModal();render();await refresh();
+    const createdId=created.id;
+    closeUtilityModal();
+    await openP(createdId);
+    focusProjectWorkspace();
     toast(currentUser?.native_single_user?`Progetto ${target} creato in ${pendingNewProjectPath}`:`Progetto ${target} creato e salvato nel workspace`);
     pendingNewProjectPath=null;
   }catch(e){toast(e.message)}
@@ -2305,21 +2306,48 @@ function focusTracks(){if(!requireOpenProject('visualizzare le tracce'))return;c
 function focusMixer(){if(!requireOpenProject('aprire il mixer'))return;const el=$('#mixerDock');if(el){el.hidden=false;el.scrollIntoView({behavior:'smooth',block:'nearest'});el.classList.add('nav-focus-pulse');setTimeout(()=>el.classList.remove('nav-focus-pulse'),900)}}
 function focusInspector(){if(!requireOpenProject('aprire i plugin'))return;const el=$('#inspector');if(!el)return toast('Seleziona una traccia per visualizzare i plugin');el.scrollIntoView({behavior:'smooth',block:'nearest'});el.classList.add('nav-focus-pulse');setTimeout(()=>el.classList.remove('nav-focus-pulse'),900)}
 
+async function readSystemClipboard(){
+  let value='';
+  try{value=String(await navigator.clipboard?.readText?.()||'')}catch(_e){}
+  if(value)return value;
+  if(currentUser?.native_single_user){
+    try{const bridge=await waitForNativeApi();const result=await bridge?.read_clipboard?.();value=String(result?.text||'')}catch(e){console.warn('Native clipboard read failed',e)}
+  }
+  return value;
+}
+async function pasteSystemClipboardTo(id){
+  const input=$(id);if(!input)return;
+  const text=await readSystemClipboard();
+  if(!text)return toast('Clipboard vuota o non accessibile');
+  const start=Number.isFinite(input.selectionStart)?input.selectionStart:input.value.length,end=Number.isFinite(input.selectionEnd)?input.selectionEnd:start;
+  input.value=input.value.slice(0,start)+text+input.value.slice(end);
+  const pos=start+text.length;try{input.setSelectionRange(pos,pos)}catch(_e){}
+  input.dispatchEvent(new Event('input',{bubbles:true}));input.focus();
+}
 function openYoutubeImport(){
   if(!current)return toast('Apri prima un progetto');
   const refs=current.tracks.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join('');
-  $('#utilityTitle').textContent='Import audio da YouTube';
-  $('#utilityBody').innerHTML=`<div class="form-grid">
-    <label class="full">URL YouTube<input id="youtubeImportUrl" type="url" inputmode="url" autocomplete="off" placeholder="https://www.youtube.com/watch?v=…"></label>
-    <label class="full">Nome traccia (opzionale)<input id="youtubeImportName" type="text" maxlength="200" placeholder="Usa il titolo YouTube"></label>
-    <label>Sincronizzazione<select id="youtubeImportSync"><option value="manual">Manuale</option><option value="auto">Automatica</option></select></label>
-    <label>Offset ms<input id="youtubeImportOffset" type="number" value="0"></label>
-    <label class="full">Traccia di riferimento<select id="youtubeImportRef"><option value="">Prima traccia disponibile</option>${refs}</select></label>
-    <label class="full hint"><input id="youtubeImportRights" type="checkbox"> Confermo di essere autorizzato a scaricare/importare l'audio di questo contenuto.</label>
-    <p class="hint full">Viene importato solo l'audio di un singolo video. Playlist non supportate. Il server deve poter raggiungere YouTube.</p>
-    <div class="full modal-actions"><button onclick="closeUtilityModal()">Annulla</button><button class="accent" onclick="startYoutubeImport()">▶ Importa audio</button></div>
-  </div>`;
-  $('#utilityBackdrop').classList.remove('hidden');
+  showUtilityModal('Import audio da YouTube',`<div class="youtube-import-dialog">
+    <section class="youtube-import-section">
+      <div class="youtube-import-section-title"><b>1. Sorgente</b><span>Importa solo l'audio di un singolo video YouTube.</span></div>
+      <label class="workflow-field"><span>URL YouTube</span><div class="youtube-input-row"><input id="youtubeImportUrl" type="url" inputmode="url" autocomplete="off" placeholder="https://www.youtube.com/watch?v=…"><button class="utility-btn secondary youtube-paste-btn" type="button" onclick="pasteSystemClipboardTo('#youtubeImportUrl')">Incolla</button></div></label>
+      <label class="workflow-field"><span>Nome traccia <small>(opzionale)</small></span><div class="youtube-input-row"><input id="youtubeImportName" type="text" maxlength="200" placeholder="Usa il titolo YouTube"><button class="utility-btn secondary youtube-paste-btn" type="button" onclick="pasteSystemClipboardTo('#youtubeImportName')">Incolla</button></div></label>
+    </section>
+    <section class="youtube-import-section">
+      <div class="youtube-import-section-title"><b>2. Posizionamento</b><span>Imposta sincronizzazione e posizione nella timeline.</span></div>
+      <div class="youtube-options-grid">
+        <label class="workflow-field"><span>Sincronizzazione</span><select id="youtubeImportSync"><option value="manual">Manuale</option><option value="auto">Automatica</option></select></label>
+        <label class="workflow-field"><span>Offset</span><div class="youtube-offset-row"><input id="youtubeImportOffset" type="number" value="0"><span>ms</span></div></label>
+      </div>
+      <label class="workflow-field"><span>Traccia di riferimento</span><select id="youtubeImportRef"><option value="">Prima traccia disponibile</option>${refs}</select></label>
+    </section>
+    <section class="youtube-import-section youtube-rights-section">
+      <label class="youtube-rights-check"><input id="youtubeImportRights" type="checkbox"><span>Confermo di essere autorizzato a scaricare/importare l'audio di questo contenuto.</span></label>
+      <p class="hint">Playlist non supportate. Il server deve poter raggiungere YouTube.</p>
+    </section>
+    <div class="utility-actions youtube-import-actions"><button class="utility-btn secondary" type="button" onclick="closeUtilityModal()">Annulla</button><button class="utility-btn primary" type="button" onclick="startYoutubeImport()">▶ Importa audio</button></div>
+  </div>`);
+  document.querySelector('.utility-modal')?.classList.add('youtube-import-modal');
   setTimeout(()=>$('#youtubeImportUrl')?.focus(),50);
 }
 async function startYoutubeImport(){
@@ -2458,12 +2486,17 @@ async function recalculateBpmFromTrack(trackId){
 function timedEditorConfig(kind){return {lyrics:{key:'text',label:'Lyrics',end:true,valueLabel:'Testo'},chords:{key:'chord',label:'Chords',end:false,valueLabel:'Accordo'},markers:{key:'label',label:'Markers',end:false,valueLabel:'Etichetta'}}[kind]||null}
 function timedEditorTime(ms){const n=Math.max(0,Number(ms)||0),m=Math.floor(n/60000),s=(n%60000)/1000;return `${m}:${s.toFixed(3).padStart(6,'0')}`}
 function parseTimedEditorTime(value){const raw=String(value??'').trim();if(!raw)return 0;if(raw.includes(':')){const parts=raw.split(':').map(x=>x.trim());if(parts.length===2){const m=Number(parts[0]),s=Number(parts[1]);if(Number.isFinite(m)&&Number.isFinite(s)&&m>=0&&s>=0)return Math.max(0,Math.round((m*60+s)*1000))}if(parts.length===3){const h=Number(parts[0]),m=Number(parts[1]),s=Number(parts[2]);if([h,m,s].every(Number.isFinite)&&h>=0&&m>=0&&s>=0)return Math.max(0,Math.round((h*3600+m*60+s)*1000))}}const seconds=Number(raw.replace(',','.'));return Number.isFinite(seconds)&&seconds>=0?Math.round(seconds*1000):NaN}
-function timedEditorRow(kind,item={},idx=0){const cfg=timedEditorConfig(kind),start=timedEditorTime(item.time_ms||0),end=cfg.end?(item.end_ms==null?'':timedEditorTime(item.end_ms)):'';return `<tr class="timed-editor-row" data-index="${idx}"><td class="timed-editor-index">${idx+1}</td><td><input class="timed-start" value="${esc(start)}" inputmode="decimal" aria-label="Tempo iniziale"></td>${cfg.end?`<td><input class="timed-end" value="${esc(end)}" inputmode="decimal" placeholder="auto" aria-label="Tempo finale"></td>`:''}<td class="timed-editor-value"><textarea class="timed-value" rows="2" aria-label="${esc(cfg.valueLabel)}">${esc(item[cfg.key]||'')}</textarea></td><td><button class="timed-row-delete" type="button" onclick="removeTimedEditorRow(this)" title="Elimina riga">×</button></td></tr>`}
+function timedEditorRow(kind,item={},idx=0,originalIndex=null){const cfg=timedEditorConfig(kind),start=timedEditorTime(item.time_ms||0),end=cfg.end?(item.end_ms==null?'':timedEditorTime(item.end_ms)):'';const original=originalIndex==null?'':String(originalIndex);const split=(kind==='lyrics'||kind==='chords')?`<button class="timed-row-action" type="button" onclick="splitTimedEditorRow(this,'${kind}')" title="Dividi riga">Dividi</button>`:'';return `<tr class="timed-editor-row" data-index="${idx}" data-original-index="${original}"><td class="timed-editor-index">${idx+1}</td><td><input class="timed-start" value="${esc(start)}" inputmode="decimal" aria-label="Tempo iniziale"></td>${cfg.end?`<td><input class="timed-end" value="${esc(end)}" inputmode="decimal" placeholder="auto" aria-label="Tempo finale"></td>`:''}<td class="timed-editor-value"><textarea class="timed-value" rows="2" aria-label="${esc(cfg.valueLabel)}">${esc(item[cfg.key]||'')}</textarea></td><td class="timed-row-actions"><button class="timed-row-action" type="button" onclick="insertTimedEditorRow(this,'${kind}','above')" title="Inserisci riga sopra">＋ sopra</button><button class="timed-row-action" type="button" onclick="insertTimedEditorRow(this,'${kind}','below')" title="Inserisci riga sotto">＋ sotto</button>${split}<button class="timed-row-delete" type="button" onclick="removeTimedEditorRow(this)" title="Elimina riga">Elimina</button></td></tr>`}
 function renumberTimedEditorRows(){document.querySelectorAll('#timedEditorRows .timed-editor-row').forEach((row,i)=>{row.dataset.index=String(i);const cell=row.querySelector('.timed-editor-index');if(cell)cell.textContent=String(i+1)})}
-function addTimedEditorRow(kind){const body=$('#timedEditorRows');if(!body)return;body.insertAdjacentHTML('beforeend',timedEditorRow(kind,{time_ms:0},body.children.length));renumberTimedEditorRows();const row=body.lastElementChild;row?.querySelector('.timed-start')?.focus();row?.scrollIntoView({block:'nearest'})}
-function removeTimedEditorRow(button){button?.closest('.timed-editor-row')?.remove();renumberTimedEditorRows()}
-function saveTimedEditor(kind){if(!current)return;const cfg=timedEditorConfig(kind);if(!cfg)return;const old=current[kind]||[],out=[];for(const [i,row] of [...document.querySelectorAll('#timedEditorRows .timed-editor-row')].entries()){const start=parseTimedEditorTime(row.querySelector('.timed-start')?.value);if(!Number.isFinite(start))return toast(`Tempo non valido alla riga ${i+1}`);let end=null;if(cfg.end){const raw=String(row.querySelector('.timed-end')?.value||'').trim();if(raw){end=parseTimedEditorTime(raw);if(!Number.isFinite(end)||end<start)return toast(`Tempo finale non valido alla riga ${i+1}`)}}const value=String(row.querySelector('.timed-value')?.value||'').trim();if(!value)continue;const item={time_ms:start,[cfg.key]:value};if(cfg.end)item.end_ms=end;const prev=old[i];if(kind==='lyrics'&&prev&&Number(prev.time_ms)===start&&Number(prev.end_ms??-1)===Number(end??-1)&&String(prev.text||'')===value)item.words=prev.words||[];else if(kind==='lyrics')item.words=[];out.push(item)}out.sort((a,b)=>a.time_ms-b.time_ms);current[kind]=out;render();markDirty(50);closeUtilityModal();toast(`${cfg.label} aggiornati`)}
-function editTimed(kind){if(!current)return;const cfg=timedEditorConfig(kind);if(!cfg)return;const rows=(current[kind]||[]).map((item,i)=>timedEditorRow(kind,item,i)).join('');showUtilityModal(`Edit ${cfg.label}`,`<div class="timed-editor" data-kind="${kind}"><div class="timed-editor-toolbar"><p>Modifica separatamente i tempi e ${kind==='lyrics'?'il testo':'il valore'}. I tempi accettano <code>mm:ss.mmm</code> oppure secondi.</p><button class="utility-btn secondary" type="button" onclick="addTimedEditorRow('${kind}')">＋ Aggiungi riga</button></div><div class="timed-editor-table-wrap"><table class="timed-editor-table"><thead><tr><th>#</th><th>Inizio</th>${cfg.end?'<th>Fine</th>':''}<th>${esc(cfg.valueLabel)}</th><th></th></tr></thead><tbody id="timedEditorRows">${rows||timedEditorRow(kind,{time_ms:0},0)}</tbody></table></div>${kind==='lyrics'?'<p class="hint">Se modifichi testo o timing di una riga, il timing parola-per-parola di quella sola riga viene rimosso per evitare un karaoke incoerente.</p>':''}<div class="utility-actions timed-editor-actions"><button class="utility-btn primary" type="button" onclick="saveTimedEditor('${kind}')">Salva</button><button class="utility-btn secondary" type="button" onclick="closeUtilityModal()">Annulla</button></div></div>`);document.querySelector('.utility-modal')?.classList.add('timed-editor-modal')}
+function timedRowStart(row){return parseTimedEditorTime(row?.querySelector('.timed-start')?.value)}
+function timedRowEnd(row){const raw=String(row?.querySelector('.timed-end')?.value||'').trim();return raw?parseTimedEditorTime(raw):NaN}
+function suggestedTimedRow(kind,row,where){const cfg=timedEditorConfig(kind),prev=where==='above'?row?.previousElementSibling:row,next=where==='above'?row:row?.nextElementSibling;const prevStart=timedRowStart(prev),prevEnd=timedRowEnd(prev),nextStart=timedRowStart(next);let left=Number.isFinite(prevEnd)?prevEnd:(Number.isFinite(prevStart)?prevStart:0),right=Number.isFinite(nextStart)?nextStart:left+2000;if(right<left)right=left+1000;let start=Math.max(0,Math.round((left+right)/2));if(where==='above'&&!prev)start=Math.max(0,Number.isFinite(nextStart)?nextStart-1000:0);if(where==='below'&&!next)start=Math.max(0,Number.isFinite(prevEnd)?prevEnd:(Number.isFinite(prevStart)?prevStart+1000:0));const item={time_ms:start};if(cfg?.end)item.end_ms=Number.isFinite(nextStart)&&nextStart>start?nextStart:start+1000;return item}
+function insertTimedEditorRow(button,kind,where='below'){const row=button?.closest('.timed-editor-row'),body=$('#timedEditorRows');if(!row||!body)return;const item=suggestedTimedRow(kind,row,where),html=timedEditorRow(kind,item,0,null);if(where==='above')row.insertAdjacentHTML('beforebegin',html);else row.insertAdjacentHTML('afterend',html);renumberTimedEditorRows();const inserted=where==='above'?row.previousElementSibling:row.nextElementSibling;inserted?.querySelector('.timed-value')?.focus();inserted?.scrollIntoView({block:'nearest'})}
+function addTimedEditorRow(kind){const body=$('#timedEditorRows');if(!body)return;if(body.lastElementChild){const fake=body.lastElementChild.querySelector('.timed-row-action');if(fake)return insertTimedEditorRow(fake,kind,'below')}body.insertAdjacentHTML('beforeend',timedEditorRow(kind,{time_ms:0},0,null));renumberTimedEditorRows();body.lastElementChild?.querySelector('.timed-value')?.focus()}
+function splitTimedEditorRow(button,kind){if(kind!=='lyrics'&&kind!=='chords')return;const row=button?.closest('.timed-editor-row');if(!row)return;const start=timedRowStart(row),rawEnd=timedRowEnd(row),nextStart=timedRowStart(row.nextElementSibling);if(!Number.isFinite(start))return toast('Tempo iniziale non valido');let end=Number.isFinite(rawEnd)?rawEnd:(Number.isFinite(nextStart)&&nextStart>start?nextStart:start+2000);if(end<=start)end=start+1000;const middle=Math.round((start+end)/2);if(kind==='lyrics'){const endInput=row.querySelector('.timed-end');if(endInput)endInput.value=timedEditorTime(middle);row.insertAdjacentHTML('afterend',timedEditorRow('lyrics',{time_ms:middle,end_ms:end,text:''},0,null))}else{row.insertAdjacentHTML('afterend',timedEditorRow('chords',{time_ms:middle,chord:''},0,null))}renumberTimedEditorRows();const inserted=row.nextElementSibling;inserted?.querySelector('.timed-value')?.focus();inserted?.scrollIntoView({block:'nearest'})}
+function removeTimedEditorRow(button){const row=button?.closest('.timed-editor-row');if(!row)return;const value=String(row.querySelector('.timed-value')?.value||'').trim();if(value&&!window.confirm('Eliminare questa riga? La modifica sarà applicata solo premendo Salva.'))return;row.remove();renumberTimedEditorRows()}
+function saveTimedEditor(kind){if(!current)return;const cfg=timedEditorConfig(kind);if(!cfg)return;const old=current[kind]||[],out=[];for(const [i,row] of [...document.querySelectorAll('#timedEditorRows .timed-editor-row')].entries()){const start=parseTimedEditorTime(row.querySelector('.timed-start')?.value);if(!Number.isFinite(start))return toast(`Tempo non valido alla riga ${i+1}`);let end=null;if(cfg.end){const raw=String(row.querySelector('.timed-end')?.value||'').trim();if(raw){end=parseTimedEditorTime(raw);if(!Number.isFinite(end)||end<start)return toast(`Tempo finale non valido alla riga ${i+1}`)}}const value=String(row.querySelector('.timed-value')?.value||'').trim();if(!value)continue;const item={time_ms:start,[cfg.key]:value};if(cfg.end)item.end_ms=end;const originalIndex=Number(row.dataset.originalIndex),prev=Number.isInteger(originalIndex)&&originalIndex>=0?old[originalIndex]:null;if(kind==='lyrics'&&prev&&Number(prev.time_ms)===start&&Number(prev.end_ms??-1)===Number(end??-1)&&String(prev.text||'')===value)item.words=prev.words||[];else if(kind==='lyrics')item.words=[];out.push(item)}out.sort((a,b)=>a.time_ms-b.time_ms);current[kind]=out;render();markDirty(50);closeUtilityModal();toast(`${cfg.label} aggiornati`)}
+function editTimed(kind){if(!current)return;const cfg=timedEditorConfig(kind);if(!cfg)return;const rows=(current[kind]||[]).map((item,i)=>timedEditorRow(kind,item,i,i)).join('');showUtilityModal(`Edit ${cfg.label}`,`<div class="timed-editor" data-kind="${kind}"><div class="timed-editor-toolbar"><p>Modifica separatamente i tempi e ${kind==='lyrics'?'il testo':'il valore'}. I tempi accettano <code>mm:ss.mmm</code> oppure secondi. Usa <b>+ sopra</b>/<b>+ sotto</b> per inserire righe in qualsiasi punto${(kind==='lyrics'||kind==='chords')?' oppure <b>Dividi</b> per spezzare temporalmente un segmento':''}.</p><button class="utility-btn secondary" type="button" onclick="addTimedEditorRow('${kind}')">＋ Aggiungi in fondo</button></div><div class="timed-editor-table-wrap"><table class="timed-editor-table"><thead><tr><th>#</th><th>Inizio</th>${cfg.end?'<th>Fine</th>':''}<th>${esc(cfg.valueLabel)}</th><th>Azioni</th></tr></thead><tbody id="timedEditorRows">${rows||timedEditorRow(kind,{time_ms:0},0,null)}</tbody></table></div>${kind==='lyrics'?'<p class="hint">Le righe possono essere inserite, divise o eliminate prima di Salva. Se modifichi testo o timing di una riga, il timing parola-per-parola di quella sola riga viene rimosso per evitare un karaoke incoerente.</p>':kind==='chords'?'<p class="hint">Gli accordi possono essere inseriti, divisi o eliminati prima di Salva. Dividi crea un nuovo punto accordo a metà dell’intervallo corrente.</p>':''}<div class="utility-actions timed-editor-actions"><button class="utility-btn primary" type="button" onclick="saveTimedEditor('${kind}')">Salva</button><button class="utility-btn secondary" type="button" onclick="closeUtilityModal()">Annulla</button></div></div>`);document.querySelector('.utility-modal')?.classList.add('timed-editor-modal')}
 
 
 
@@ -2555,7 +2588,7 @@ function showUtilityModal(title,html,stemProgress=false){
   }
   $('#utilityTitle').textContent=title;$('#utilityBody').innerHTML=html;$('#utilityBackdrop').classList.remove('hidden');
 }
-function closeUtilityModal(){if(activeStemJob){toast('La separazione è in corso: usa Annulla separazione se vuoi interromperla.');return}$('#utilityBackdrop').classList.add('hidden');document.querySelector('.utility-modal')?.classList.remove('sample-editor-modal','meta-expanded-modal','pdf-html-preview-modal','timed-editor-modal');sampleEditorState=null;clearTimeout(samplePreviewTimer);forceNativeViewportTop()}
+function closeUtilityModal(){if(activeStemJob){toast('La separazione è in corso: usa Annulla separazione se vuoi interromperla.');return}$('#utilityBackdrop').classList.add('hidden');document.querySelector('.utility-modal')?.classList.remove('sample-editor-modal','meta-expanded-modal','pdf-html-preview-modal','timed-editor-modal','youtube-import-modal');sampleEditorState=null;clearTimeout(samplePreviewTimer);forceNativeViewportTop()}
 function exportProjectArchive(){if(!current){toast('Apri prima un progetto');return}window.location.href=`/api/projects/${current.id}/archive`}
 async function deleteCurrentProject(){if(!current){toast('Apri prima un progetto');return}await deleteProjectFromWorkspace(current.id,current.title)}
 $('#projectArchiveFile').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;const fd=new FormData();fd.append('file',f);try{current=await api('/api/project-archives/import',{method:'POST',body:fd});rememberRecentProject(current.id);selectedTrackId=current.tracks[0]?.id||null;resetProjectUiForOpen();render();await refresh();toast('Progetto completo importato')}catch(err){toast('Import progetto fallito: '+err.message)}finally{e.target.value=''}})

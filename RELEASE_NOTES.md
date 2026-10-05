@@ -1,3 +1,11 @@
+## 0.2.0-149
+
+Newly created projects are now activated through the exact same load path as Open project, so the complete editor workspace appears immediately after creation. Native YouTube import can read the real operating-system clipboard when the embedded WebView clipboard API is unavailable, and its dialog has been reorganized into clearer responsive sections.
+
+## 0.2.0-148
+
+The structured Lyrics editor now supports inserting rows above or below any existing segment, splitting a timed segment in place, and deleting rows before committing changes. The Chords editor now provides the same per-row **+ above / + below / Split / Delete** workflow; splitting inserts a new editable chord point at the midpoint of the current harmonic interval. Suggested timestamps remain editable. Word-level timing preservation follows the original lyric row identity rather than its current table position.
+
 ## 0.2.0-147
 
 The Lyrics/Chords/Markers editor is now a dedicated structured workspace. Lyrics can be edited row-by-row with separate Start, End and Text columns in a large resizable window; Chords and Markers get equivalent Time/Value editing. Rows can be added, removed and reordered automatically by time, with responsive/mobile scrolling.

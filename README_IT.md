@@ -388,7 +388,7 @@ The dedicated vocal split uses `audio-separator==0.47.0` and downloads the selec
 
 ### Gestione modelli Lyrics e Chords
 
-Dalla versione 0.2.0-126, i modelli Lyrics e Chords sono gestiti on-demand come gli altri modelli AI. Nella web app i pesi sono memorizzati sul server; nelle applicazioni native desktop sono memorizzati localmente. Per Lyrics è possibile scegliere tra i modelli OpenAI Whisper disponibili (default `large-v3`). Per Chords è possibile scegliere il motore prima di ogni estrazione: Madmom Deep Chroma + CRF (default AI), Madmom CNN + CRF, Chordino / NNLS-Chroma oppure l'analizzatore MTA Chromagram. L'interfaccia mostra sempre il motore/modello effettivo e, per i checkpoint Madmom, la licenza CC BY-NC-SA 4.0 non-commerciale dei pesi.
+Dalla versione 0.2.0-126, i modelli Lyrics e Chords sono gestiti on-demand come gli altri modelli AI. Nella web app i pesi sono memorizzati sul server; nelle applicazioni native desktop sono memorizzati localmente. Per Lyrics è possibile scegliere tra i modelli OpenAI Whisper disponibili (default `base`). Per Chords è possibile scegliere il motore prima di ogni estrazione: Madmom Deep Chroma + CRF (default AI), Madmom CNN + CRF, Chordino / NNLS-Chroma oppure l'analizzatore MTA Chromagram. L'interfaccia mostra sempre il motore/modello effettivo e, per i checkpoint Madmom, la licenza CC BY-NC-SA 4.0 non-commerciale dei pesi.
 
 ### Editor waveform/campioni
 Dalla waveform della timeline (doppio click) o dal menu contestuale di una traccia è disponibile un editor dedicato ad alta risoluzione. La selezione mostra i campioni esatti e consente Taglia/Copia/Incolla/Rimuovi. Sono disponibili processing in-place con preview A/B dinamica: Pitch Correction fine (semitoni + centesimi), Auto-Tune pitch-to-scale con tonalità/scala/strength, Normalizer, Maximizer ed EQ grafico a 32 bande con preset. Il commit crea una nuova sorgente per la sola traccia modificata, senza alterare altre istanze che condividevano il file originale.
@@ -403,3 +403,13 @@ Dalla waveform della timeline (doppio click) o dal menu contestuale di una tracc
 
 ### Editor Lyrics strutturato
 “Edit lyrics” apre ora una finestra ampia e ridimensionabile con colonne separate Inizio, Fine e Testo; è possibile aggiungere/eliminare righe e modificare testo e tempi indipendentemente.
+
+### Editor Lyrics strutturato
+È possibile inserire nuove righe Lyrics in qualsiasi punto con **+ sopra** / **+ sotto**, dividere un segmento temporale con **Dividi** ed eliminare righe prima del salvataggio. I timestamp proposti sono sempre modificabili.
+
+### Editor Chords strutturato
+Ogni riga Chords dispone della stessa logica dell’editor Lyrics: **+ sopra**, **+ sotto**, **Dividi** ed **Elimina**. **Dividi** inserisce un nuovo punto accordo a metà dell’intervallo temporale corrente; timestamp e accordo restano modificabili prima del salvataggio.
+
+### Migliorie native 0.2.0-149
+
+Dopo la creazione un nuovo progetto viene immediatamente caricato nell’editor completo. Import YouTube usa un fallback alla clipboard di sistema nelle app native e presenta un layout più ordinato e responsivo.

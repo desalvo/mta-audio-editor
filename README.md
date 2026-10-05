@@ -158,3 +158,14 @@ Double-click a timeline waveform or use the track context menu to open the dedic
 
 ### Structured Lyrics editor
 “Edit lyrics” now opens a large resizable window with separate Start, End and Text columns; rows can be added/removed and text/timing edited independently.
+
+### Structured Lyrics editor
+Lyrics rows can be inserted anywhere with **+ above** / **+ below**, timed segments can be split with **Split**, and rows can be deleted before saving. Suggested timestamps remain fully editable.
+
+
+### Structured Chords editor
+Each Chords row uses the same workflow as Lyrics: **+ above**, **+ below**, **Split**, and **Delete**. Split inserts a new editable chord point at the midpoint of the current time interval.
+
+### Native improvements 0.2.0-149
+
+New projects are immediately loaded into the complete editor workspace. YouTube import now falls back to the operating-system clipboard in native apps and uses a clearer responsive layout.
