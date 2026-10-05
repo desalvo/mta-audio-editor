@@ -17,7 +17,7 @@ LYRICS_MODELS = [
     {"id": "large-v3", "display_name": "Whisper large-v3", "quality": "recommended", "approx_bytes": 3_000_000_000, "recommended": True},
     {"id": "turbo", "display_name": "Whisper turbo", "quality": "fast-high", "approx_bytes": 1_700_000_000},
 ]
-LYRICS_DEFAULT_MODEL = os.getenv("MTA_LYRICS_WHISPER_MODEL", "large-v3").strip() or "large-v3"
+LYRICS_DEFAULT_MODEL = os.getenv("MTA_LYRICS_WHISPER_MODEL", "base").strip() or "base"
 
 CHORD_MODELS = [
     {
@@ -73,7 +73,7 @@ def lyrics_catalog(*, native: bool = False) -> dict:
         item["engine"]="OpenAI Whisper"
         item["license"]="MIT code; model weights downloaded from the upstream Whisper model source"
         items.append(item)
-    default=LYRICS_DEFAULT_MODEL if any(x["id"]==LYRICS_DEFAULT_MODEL for x in LYRICS_MODELS) else "large-v3"
+    default=LYRICS_DEFAULT_MODEL if any(x["id"]==LYRICS_DEFAULT_MODEL for x in LYRICS_MODELS) else "base"
     return {"engine":"OpenAI Whisper","default_model":default,"models":items,"storage":"local" if native else "server","on_demand":True,"model_dir":str(directory)}
 
 
@@ -188,5 +188,24 @@ def delete_chord_model(model_id: str, *, native: bool = False) -> dict:
     return {"ok":True,"model_id":model_id,"removed":removed,"storage":"local" if native else "server"}
 
 
+
+def _accelerator_info() -> dict:
+    forced=os.getenv("MTA_AI_DEVICE","").strip()
+    if forced:
+        return {"device":forced,"hardware_accelerated":forced.lower()!="cpu","source":"MTA_AI_DEVICE"}
+    try:
+        import torch  # type: ignore
+        if torch.cuda.is_available():
+            name="CUDA"
+            try: name=f"CUDA · {torch.cuda.get_device_name(0)}"
+            except Exception: pass
+            return {"device":name,"hardware_accelerated":True,"source":"torch"}
+        mps=getattr(getattr(torch,"backends",None),"mps",None)
+        if mps is not None and mps.is_available():
+            return {"device":"Apple Metal / MPS","hardware_accelerated":True,"source":"torch"}
+    except Exception:
+        pass
+    return {"device":"CPU","hardware_accelerated":False,"source":"fallback"}
+
 def ai_catalog(*, native: bool = False) -> dict:
-    return {"storage":"local" if native else "server","lyrics":lyrics_catalog(native=native),"chords":chords_catalog(native=native)}
+    return {"storage":"local" if native else "server","lyrics":lyrics_catalog(native=native),"chords":chords_catalog(native=native),"accelerator":_accelerator_info()}

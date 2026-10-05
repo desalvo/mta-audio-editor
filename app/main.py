@@ -44,7 +44,7 @@ from .auth import (
 from .auto_mix import disable_auto_mix, enable_auto_mix
 from .ai_models import ai_catalog, chords_catalog, lyrics_catalog, download_chord_model, download_lyrics_model, delete_chord_model, delete_lyrics_model, chord_engine_available
 from .mta_reverse import analyze_mta, diff_blobs
-from .music_text import build_chordpro, build_karaoke_ass, build_lyrics_pdf, extract_chords, extract_lyrics, lyrics_engine_available, map_source_events_to_timeline, synchronized_plain_text, transpose_chords, transpose_key_name
+from .music_text import build_chordpro, build_karaoke_ass, build_lyrics_pdf, extract_chords, extract_chords_progressive, extract_lyrics, extract_lyrics_progressive, lyrics_engine_available, map_source_events_to_timeline, synchronized_plain_text, transpose_chords, transpose_key_name
 from .storage import (
     audio_path,
     create_project,
@@ -183,10 +183,11 @@ def _media_job_update(job_id: str, **changes) -> None:
 
 
 def _media_job_public(job: dict) -> dict:
+    cancel_event=job.get("cancel_event")
     return {
         "id": job["id"],
         "kind": job["kind"],
-        "project_id": job["project_id"],
+        "project_id": job.get("project_id"),
         "status": job["status"],
         "progress": job["progress"],
         "message": job["message"],
@@ -194,6 +195,9 @@ def _media_job_public(job: dict) -> dict:
         "updated_at": job["updated_at"],
         "result": job.get("result"),
         "error": job.get("error"),
+        "partial": job.get("partial"),
+        "cancel_supported": cancel_event is not None,
+        "cancel_requested": bool(cancel_event and cancel_event.is_set()),
     }
 
 
@@ -1563,21 +1567,32 @@ def _text_music_worker(job_id: str, pid: str, track_id: str, kind: str, model_or
         if track is None:
             raise ValueError("track not found")
         source = audio_path(pid, track.filename)
-        _media_job_update(job_id, status="running", progress=10, message="Preparazione analisi")
+        _media_job_update(job_id, status="running", progress=3, message="Preparazione analisi e verifica sorgente")
         if kind == "lyrics":
             selected_model=model_or_engine or lyrics_catalog(native=NATIVE_SINGLE_USER)["default_model"]
-            _media_job_update(job_id, progress=20, message=f"Trascrizione lyrics · OpenAI Whisper · {selected_model}")
-            try:
-                events = extract_lyrics(source, model_name=selected_model)
-            except TypeError as exc:
-                if "unexpected keyword argument" not in str(exc):
-                    raise
-                events = extract_lyrics(source)
+            _media_job_update(job_id, progress=5, message=f"Verifica modello lyrics · OpenAI Whisper · {selected_model}")
+            cancel_event=MEDIA_JOBS[job_id].get("cancel_event")
+            def lyrics_progress(pct, items, message):
+                partial=[{"time_ms":x.time_ms,"end_ms":x.end_ms,"text":x.text} for x in items[-120:]]
+                _media_job_update(job_id,progress=pct,message=message,partial={"kind":"lyrics","items":partial})
+            if getattr(extract_lyrics,"__module__","") != "app.music_text":
+                try: events=extract_lyrics(source,model_name=selected_model)
+                except TypeError: events=extract_lyrics(source)
+                lyrics_progress(90,events,"Trascrizione lyrics")
+            else:
+                events=extract_lyrics_progressive(
+                    source,model_name=selected_model,progress=lyrics_progress,
+                    cancelled=(lambda: bool(cancel_event and cancel_event.is_set())),
+                )
+            if cancel_event and cancel_event.is_set():
+                raise InterruptedError("Lyrics extraction cancelled")
+            _media_job_update(job_id, progress=96, message="Sincronizzazione lyrics sulla timeline")
             mapped = map_source_events_to_timeline(track, events)
             latest = load_project(pid)
             latest.lyrics = mapped
             latest.lyrics_engine = "OpenAI Whisper"
             latest.lyrics_model = selected_model
+            _media_job_update(job_id, progress=98, message="Salvataggio lyrics nel progetto")
             save_project(latest)
             _media_job_update(
                 job_id, status="completed", progress=100, message="Lyrics estratte e sincronizzate",
@@ -1590,18 +1605,29 @@ def _text_music_worker(job_id: str, pid: str, track_id: str, kind: str, model_or
             if not engine_info:
                 raise ValueError("unsupported chord extraction engine")
             selected_model=str(engine_info.get("model_id") or "")
-            _media_job_update(job_id, progress=25, message=f"Analisi chords · {engine_info['display_name']}" + (f" · {selected_model}" if selected_model else ""))
-            try:
-                events = extract_chords(source, engine=selected_engine)
-            except TypeError as exc:
-                if "unexpected keyword argument" not in str(exc):
-                    raise
-                events = extract_chords(source)
+            _media_job_update(job_id, progress=5, message=f"Preparazione chords · {engine_info['display_name']}" + (f" · {selected_model}" if selected_model else ""))
+            cancel_event=MEDIA_JOBS[job_id].get("cancel_event")
+            def chords_progress(pct, items, message):
+                partial=[{"time_ms":x.time_ms,"chord":x.chord} for x in items[-240:]]
+                _media_job_update(job_id,progress=pct,message=message,partial={"kind":"chords","items":partial})
+            if getattr(extract_chords,"__module__","") != "app.music_text":
+                try: events=extract_chords(source,engine=selected_engine)
+                except TypeError: events=extract_chords(source)
+                chords_progress(90,events,"Analisi chords")
+            else:
+                events=extract_chords_progressive(
+                    source,engine=selected_engine,progress=chords_progress,
+                    cancelled=(lambda: bool(cancel_event and cancel_event.is_set())),
+                )
+            if cancel_event and cancel_event.is_set():
+                raise InterruptedError("Chord extraction cancelled")
+            _media_job_update(job_id, progress=96, message="Sincronizzazione chords sulla timeline")
             mapped = map_source_events_to_timeline(track, events)
             latest = load_project(pid)
             latest.chords = mapped
             latest.chords_engine = selected_engine
             latest.chords_model = selected_model
+            _media_job_update(job_id, progress=98, message="Salvataggio chords nel progetto")
             save_project(latest)
             _media_job_update(
                 job_id, status="completed", progress=100, message="Chords estratti e sincronizzati",
@@ -1609,6 +1635,8 @@ def _text_music_worker(job_id: str, pid: str, track_id: str, kind: str, model_or
             )
             return
         raise ValueError("unsupported analysis kind")
+    except InterruptedError as exc:
+        _media_job_update(job_id,status="cancelled",message="Estrazione annullata",error=str(exc),result=None)
     except Exception as exc:
         LOGGER.exception("Text/music analysis job %s failed", job_id)
         _media_job_update(job_id, status="failed", progress=0, message="Analisi fallita", error=str(exc)[-1200:])
@@ -1635,9 +1663,9 @@ def _start_text_music_job(pid: str, track_id: str, request: Request, kind: str, 
     job_id = uuid.uuid4().hex[:16]
     job = {
         "id": job_id, "kind": f"extract-{kind}", "project_id": pid,
-        "status": "queued", "progress": 5,
-        "message": "Estrazione in coda", "created_at": now, "updated_at": now,
-        "result": None, "error": None,
+        "status": "queued", "progress": 1,
+        "message": "Creazione job di estrazione", "created_at": now, "updated_at": now,
+        "result": None, "error": None, "partial": None, "cancel_event": threading.Event(),
     }
     with MEDIA_JOB_LOCK:
         MEDIA_JOBS[job_id] = job
@@ -1960,8 +1988,32 @@ def media_job_status(job_id: str, request: Request):
         if job is None:
             raise HTTPException(404, "Job non trovato")
         snapshot = dict(job)
-    _project_for_actor(request, snapshot["project_id"])
+    if snapshot.get("project_id"):
+        _project_for_actor(request, snapshot["project_id"])
+    else:
+        _actor(request)
     return _media_job_public(snapshot)
+
+
+@app.post("/api/media-jobs/{job_id}/cancel")
+def cancel_media_job(job_id: str, request: Request):
+    with MEDIA_JOB_LOCK:
+        job=MEDIA_JOBS.get(job_id)
+        if job is None:
+            raise HTTPException(404,"Job non trovato")
+        snapshot=dict(job)
+        event=job.get("cancel_event")
+        if event is None:
+            raise HTTPException(409,"Questo job non supporta l'annullamento")
+        event.set()
+        if job.get("status") in {"queued","running"}:
+            job["message"]="Annullamento richiesto…"
+            job["updated_at"]=time.time()
+    if snapshot.get("project_id"):
+        _project_for_actor(request,snapshot["project_id"])
+    else:
+        _actor(request)
+    return _media_job_public(job)
 
 
 @app.post("/api/projects/{pid}/tracks")
@@ -2736,6 +2788,44 @@ def managed_lyrics_model_download(model_id: str, request: Request):
         LOGGER.exception("Lyrics model download failed")
         raise HTTPException(502, f"Download modello lyrics fallito: {exc}") from exc
 
+def _ai_model_download_worker(job_id: str, kind: str, model_id: str) -> None:
+    try:
+        _media_job_update(job_id,status="running",progress=8,message="Preparazione download modello")
+        if kind=="lyrics":
+            _media_job_update(job_id,progress=-1,message="Download / verifica modello Whisper")
+            result=download_lyrics_model(model_id,native=NATIVE_SINGLE_USER)
+        else:
+            _media_job_update(job_id,progress=-1,message="Download / verifica modello Chords")
+            result=download_chord_model(model_id,native=NATIVE_SINGLE_USER)
+        _media_job_update(job_id,status="completed",progress=100,message="Modello pronto",result=result)
+    except Exception as exc:
+        LOGGER.exception("AI model download job %s failed",job_id)
+        _media_job_update(job_id,status="failed",progress=0,message="Download modello fallito",error=str(exc)[-1200:])
+
+
+def _start_ai_model_download_job(kind: str, model_id: str, request: Request):
+    _actor(request)
+    now=time.time();job_id=uuid.uuid4().hex[:16]
+    job={"id":job_id,"kind":f"download-{kind}-model","project_id":None,"status":"queued","progress":3,"message":"Download modello in coda","created_at":now,"updated_at":now,"result":None,"error":None}
+    with MEDIA_JOB_LOCK: MEDIA_JOBS[job_id]=job
+    threading.Thread(target=_ai_model_download_worker,args=(job_id,kind,model_id),daemon=True,name=f"model-download-{job_id}").start()
+    return _media_job_public(job)
+
+
+@app.post("/api/ai-models/lyrics/{model_id}/download-jobs")
+def managed_lyrics_model_download_job(model_id: str, request: Request):
+    if not any(x["id"]==model_id for x in lyrics_catalog(native=NATIVE_SINGLE_USER)["models"]):
+        raise HTTPException(404,"unsupported lyrics model")
+    return _start_ai_model_download_job("lyrics",model_id,request)
+
+
+@app.post("/api/ai-models/chords/{model_id}/download-jobs")
+def managed_chord_model_download_job(model_id: str, request: Request):
+    if not any(x["id"]==model_id for x in chords_catalog(native=NATIVE_SINGLE_USER)["models"]):
+        raise HTTPException(404,"unsupported chord model")
+    return _start_ai_model_download_job("chords",model_id,request)
+
+
 @app.delete("/api/ai-models/lyrics/{model_id}")
 def managed_lyrics_model_delete(model_id: str, request: Request):
     _actor(request)
@@ -3152,6 +3242,22 @@ def create_metronome_track(pid: str, request: Request):
     project.tracks.append(track)
     save_project(project)
     return {"project": project, "track": track}
+
+
+@app.post("/api/projects/{pid}/tracks/{track_id}/estimate-bpm")
+def estimate_track_bpm(pid: str, track_id: str, request: Request):
+    project = _project_for_actor(request, pid)
+    track = next((item for item in project.tracks if item.id == track_id), None)
+    if track is None:
+        raise HTTPException(404, "track not found")
+    try:
+        bpm = float(estimate_bpm(audio_path(pid, track.filename)))
+    except (ValueError, RuntimeError) as exc:
+        raise HTTPException(422, f"Impossibile stimare i BPM: {exc}") from exc
+    project.bpm = bpm
+    project.base_bpm = bpm
+    save_project(project)
+    return {"ok": True, "track_id": track_id, "bpm": bpm}
 
 
 @app.get("/api/projects/{pid}/preview-track/{track_id}")

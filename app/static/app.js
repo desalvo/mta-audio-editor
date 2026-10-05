@@ -38,6 +38,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 let current=null, currentUser=null, pluginInfo={inserts:{},schemas:{},custom:{},stem_splitter:{available:false}}, pxPerSec=70;
 let sel={a:0,b:0}, dragging=false, audioCtx=null, playAudio=null, selectedTrackId=null, exportFormat='mta';
 let autosaveTimer=null, autosaveBusy=false, autosaveQueued=false, autosaveEnabled=true, projectDirty=false, stemPollTimer=null, activeStemJob=null, activeStemProjectId=null;
+let nativeRecentProjects=[];
 let preferredStemCount=Number(localStorage.getItem('mtaStemCount')||0);if(preferredStemCount!==0&&(preferredStemCount<2||preferredStemCount>64))preferredStemCount=0;
 function setPreferredStemCount(value){const n=Number(value||0);preferredStemCount=(n===0||(n>=2&&n<=64))?n:0;localStorage.setItem('mtaStemCount',String(preferredStemCount));}
 let preferredStemExecution=localStorage.getItem('mtaStemExecution')||'auto';if(!['auto','local','server'].includes(preferredStemExecution))preferredStemExecution='auto';
@@ -46,7 +47,7 @@ let undoStack=[],redoStack=[],historyProjectId=null,lastHistoryState=null,timeli
 let playCursorMs=0, playRaf=null, mediaProgressTimer=null;
 let uiState={trackTop:0,timelineTop:0,timelineLeft:0,mixerLeft:0};
 let waveformJobs={}, waveformValidationProjectId=null, trackPlaybacks=[], meterRaf=null, meterRunToken=0, playbackToken=0, masterMeterAnalysers=null, masterPlaybackGainNode=null;
-let renderedMasterPlayback=false, renderedMasterDirty=false, renderedMasterRefreshPromise=null, renderedMasterBaseVolumeDb=0, renderedMasterAudio=null;
+let renderedMasterPlayback=false, renderedMasterDirty=false, renderedMasterRefreshPromise=null, renderedMasterRefreshQueued=false, renderedMasterBaseVolumeDb=0, renderedMasterAudio=null;
 let dynamicSyncClock=null, dynamicSyncTimer=null, playbackBuffering=false;
 const liveFxRefreshTimers={};
 let lastSelectedAudioFile=null, playbackPaused=false, mixerMetaTab='lyrics', pendingExportConfig=null, pendingNewProjectPath=null;
@@ -116,7 +117,7 @@ function selectedTrackIds(){return $$('.track-check:checked').map(x=>x.value)}
 function linesToText(a,b){return(a||[]).map(x=>`${(x.time_ms/1000).toFixed(3)}\t${x[b]}`).join('\n')}
 function textToLines(v,key){return v.split(/\n/).map(x=>x.trim()).filter(Boolean).map(line=>{const [t,...rest]=line.split(/\t|\s{2,}/);return{time_ms:Math.max(0,Math.round(parseFloat(t)*1000)||0),[key]:rest.join(' ').trim()}})}
 
-async function init(){if(isMobileClient())document.body.classList.add('mobile-client');try{currentUser=await api('/api/session');const a=$('#adminNav');if(a)a.hidden=!!currentUser.native_single_user||currentUser.role!=='admin';const sb=$('#nativeSettingsButton');if(sb)sb.hidden=false;const recentBtn=$('#openRecentProjectBtn'),localBtn=$('#openLocalProjectBtn');if(currentUser.native_single_user){document.body.classList.add('native-single-user');if(recentBtn)recentBtn.hidden=false;if(localBtn)localBtn.hidden=true}else{if(recentBtn)recentBtn.hidden=true;if(localBtn)localBtn.hidden=false}}catch(e){}if(currentUser?.native_single_user)installNativeViewportGuard();if(currentUser&&!currentUser.native_single_user)autosaveEnabled=localStorage.getItem('mtaWebAutosaveEnabled')!=='false';if(currentUser?.native_single_user){const bridge=await waitForNativeApi();if(bridge?.get_native_settings){try{const cfg=await bridge.get_native_settings();autosaveEnabled=cfg.autosave_enabled!==false}catch(e){}}setTimeout(()=>checkNativeAppUpdate(false),1200)}try{pluginInfo=await api('/api/plugins')}catch(e){}await refresh()}
+async function init(){if(isMobileClient())document.body.classList.add('mobile-client');try{currentUser=await api('/api/session');const a=$('#adminNav');if(a)a.hidden=!!currentUser.native_single_user||currentUser.role!=='admin';const sb=$('#nativeSettingsButton');if(sb)sb.hidden=false;const recentBtn=$('#openRecentProjectBtn'),localBtn=$('#openLocalProjectBtn');if(currentUser.native_single_user){document.body.classList.add('native-single-user');if(recentBtn)recentBtn.hidden=false;if(localBtn)localBtn.hidden=true}else{if(recentBtn)recentBtn.hidden=true;if(localBtn)localBtn.hidden=false}}catch(e){}if(currentUser?.native_single_user)installNativeViewportGuard();if(currentUser&&!currentUser.native_single_user)autosaveEnabled=localStorage.getItem('mtaWebAutosaveEnabled')!=='false';if(currentUser?.native_single_user){const bridge=await waitForNativeApi();if(bridge?.get_native_settings){try{const cfg=await bridge.get_native_settings();autosaveEnabled=cfg.autosave_enabled!==false;nativeRecentProjects=Array.isArray(cfg.recent_projects)?cfg.recent_projects.map(String).filter(Boolean):[]}catch(e){}}setTimeout(()=>checkNativeAppUpdate(false),1200)}try{pluginInfo=await api('/api/plugins')}catch(e){}await refresh()}
 
 function toggleEditingToolsPanel(){
   const panel=$('#editingToolsPanel');if(!panel)return;
@@ -150,9 +151,25 @@ function closeCurrentProject(){
   toast('Progetto chiuso');
 }
 
-function recentProjectIds(){try{return JSON.parse(localStorage.getItem('mtaRecentProjects')||'[]').filter(Boolean)}catch(e){return[]}}
-function rememberRecentProject(id){if(!id)return;const ids=[String(id),...recentProjectIds().filter(x=>String(x)!==String(id))].slice(0,12);localStorage.setItem('mtaRecentProjects',JSON.stringify(ids))}
-function forgetRecentProject(id){localStorage.setItem('mtaRecentProjects',JSON.stringify(recentProjectIds().filter(x=>String(x)!==String(id))))}
+function recentProjectIds(){
+  if(currentUser?.native_single_user)return [...nativeRecentProjects];
+  try{return JSON.parse(localStorage.getItem('mtaRecentProjects')||'[]').filter(Boolean)}catch(e){return[]}
+}
+async function persistNativeRecentProjects(){
+  if(!currentUser?.native_single_user)return;
+  const bridge=await waitForNativeApi();
+  if(bridge?.set_recent_projects){try{await bridge.set_recent_projects(nativeRecentProjects)}catch(e){console.warn('Persist recent projects failed',e)}}
+}
+function rememberRecentProject(id){
+  if(!id)return;const ids=[String(id),...recentProjectIds().filter(x=>String(x)!==String(id))].slice(0,12);
+  if(currentUser?.native_single_user){nativeRecentProjects=ids;void persistNativeRecentProjects()}
+  else localStorage.setItem('mtaRecentProjects',JSON.stringify(ids));
+}
+function forgetRecentProject(id){
+  const ids=recentProjectIds().filter(x=>String(x)!==String(id));
+  if(currentUser?.native_single_user){nativeRecentProjects=ids;void persistNativeRecentProjects()}
+  else localStorage.setItem('mtaRecentProjects',JSON.stringify(ids));
+}
 function resetProjectUiForOpen(){clipBrowserExpanded=false;clipBrowserQuery='';clipBrowserPage=1;expandedProjectClipDetails=new Set();uiState={trackTop:0,timelineTop:0,timelineLeft:0,mixerLeft:0};if(currentUser?.native_single_user)forceNativeViewportTop()}
 async function refresh(){
   try{serverProjects=await api('/api/projects')}catch(e){serverProjects=[]}
@@ -613,6 +630,7 @@ function openTrackContextMenuAt(id,clientX,clientY){
     <button type="button" onclick="closeTrackContextMenu();renameTrack('${id}')">✎ <span>Rinomina</span></button>
     <button type="button" ${disabled} onclick="closeTrackContextMenu();openTrackStemWorkflow('${id}')">▥ <span>Separa</span></button>
     <button type="button" onclick="closeTrackContextMenu();openSampleEditor('${id}')">⌁ <span>Editor waveform / campioni</span></button>
+    <button type="button" onclick="closeTrackContextMenu();recalculateBpmFromTrack('${id}')">♩ <span>Ricalcola BPM da questa traccia</span></button>
     <button type="button" onclick="closeTrackContextMenu();openTextAnalysisChooser('${id}','lyrics')">≡ <span>Estrai lyrics</span></button>
     <button type="button" onclick="closeTrackContextMenu();openTextAnalysisChooser('${id}','chords')">♬ <span>Estrai chords</span></button>
     <button type="button" class="danger" onclick="closeTrackContextMenu();deleteTracksByIds(['${id}'])">× <span>Rimuovi</span></button>
@@ -669,26 +687,46 @@ document.addEventListener('click',event=>{
 function textModelCatalog(){return pluginInfo.text_models||{lyrics:{models:[]},chords:{engines:[],models:[]}}}
 function openTextAnalysisChooser(id,kind){
   const cat=textModelCatalog(),track=trackById(id);if(!track)return toast('Traccia non trovata');
-  if(kind==='lyrics'){const c=cat.lyrics||{},opts=(c.models||[]).map(m=>`<option value="${esc(m.id)}" ${m.id===c.default_model?'selected':''}>${esc(m.display_name)} · ${m.installed?'installato':(c.storage==='local'?'download locale':'download server')}</option>`).join('');showUtilityModal('Estrai lyrics',`<div class="form-grid"><p><b>Motore:</b> OpenAI Whisper</p><label>Modello<select id="textAnalysisChoice">${opts}</select></label><p class="hint">Il modello viene scaricato on-demand (download modello al primo uso) e conservato ${c.storage==='local'?'localmente nell’app nativa':'sul server'}.</p><div class="form-actions"><button class="utility-btn secondary model-download-btn" type="button" onclick="downloadTextAnalysisSelection('lyrics')">Scarica modello</button><button class="utility-btn primary accent" type="button" onclick="startTrackTextAnalysis('${esc(id)}','lyrics',$('#textAnalysisChoice').value);closeUtilityModal()">Estrai lyrics</button></div></div>`);return}
-  const c=cat.chords||{},models=Object.fromEntries((c.models||[]).map(x=>[x.id,x])),opts=(c.engines||[]).map(e=>{const m=models[e.model_id]||{};let state;if(e.model_id)state=m.installed?'modello installato':(c.storage==='local'?'modello scaricabile localmente':'modello scaricabile sul server');else if(e.id==='chordino')state=e.available?'nessun modello AI · motore locale disponibile':'nessun modello AI · richiede Sonic Annotator + Chordino';else state='nessun modello AI richiesto';return `<option value="${esc(e.id)}" ${e.id===c.default_engine?'selected':''} ${e.available?'':'disabled'}>${esc(e.display_name)} · ${esc(state)}</option>`}).join('');showUtilityModal('Estrai chords',`<div class="form-grid"><p><b>Motore che verrà usato:</b> <span id="chordEngineLabel"></span></p><label>Motore / modello<select id="textAnalysisChoice" onchange="updateChordEngineDisclosure()">${opts}</select></label><div id="chordEngineDisclosure" class="workflow-note"></div><div class="form-actions"><button class="utility-btn secondary model-download-btn" type="button" onclick="downloadTextAnalysisSelection('chords')">Scarica modello selezionato</button><button class="utility-btn primary accent" type="button" onclick="startTrackTextAnalysis('${esc(id)}','chords',$('#textAnalysisChoice').value);closeUtilityModal()">Estrai chords</button></div></div>`);updateChordEngineDisclosure()}
+  if(kind==='lyrics'){const c=cat.lyrics||{},opts=(c.models||[]).map(m=>`<option value="${esc(m.id)}" ${m.id===c.default_model?'selected':''}>${esc(m.display_name)} · ${m.installed?'installato':(c.storage==='local'?'download locale':'download server')}</option>`).join('');showUtilityModal('Estrai lyrics',`<div class="form-grid"><p><b>Motore:</b> OpenAI Whisper</p><label>Modello<select id="textAnalysisChoice">${opts}</select></label><p class="hint">Il modello viene scaricato on-demand (download modello al primo uso) e conservato ${c.storage==='local'?'localmente nell’app nativa':'sul server'}.</p><div class="form-actions"><button class="utility-btn secondary model-download-btn" type="button" onclick="downloadTextAnalysisSelection('lyrics')">Scarica modello</button><button class="utility-btn primary accent" type="button" onclick="startTrackTextAnalysis('${esc(id)}','lyrics',$('#textAnalysisChoice').value)">Estrai lyrics</button></div></div>`);return}
+  const c=cat.chords||{},models=Object.fromEntries((c.models||[]).map(x=>[x.id,x])),opts=(c.engines||[]).map(e=>{const m=models[e.model_id]||{};let state;if(e.model_id)state=m.installed?'modello installato':(c.storage==='local'?'modello scaricabile localmente':'modello scaricabile sul server');else if(e.id==='chordino')state=e.available?'nessun modello AI · motore locale disponibile':'nessun modello AI · richiede Sonic Annotator + Chordino';else state='nessun modello AI richiesto';return `<option value="${esc(e.id)}" ${e.id===c.default_engine?'selected':''} ${e.available?'':'disabled'}>${esc(e.display_name)} · ${esc(state)}</option>`}).join('');showUtilityModal('Estrai chords',`<div class="form-grid"><p><b>Motore che verrà usato:</b> <span id="chordEngineLabel"></span></p><label>Motore / modello<select id="textAnalysisChoice" onchange="updateChordEngineDisclosure()">${opts}</select></label><div id="chordEngineDisclosure" class="workflow-note"></div><div class="form-actions"><button class="utility-btn secondary model-download-btn" type="button" onclick="downloadTextAnalysisSelection('chords')">Scarica modello selezionato</button><button class="utility-btn primary accent" type="button" onclick="startTrackTextAnalysis('${esc(id)}','chords',$('#textAnalysisChoice').value)">Estrai chords</button></div></div>`);updateChordEngineDisclosure()}
 function updateChordEngineDisclosure(){const c=textModelCatalog().chords||{},id=$('#textAnalysisChoice')?.value,e=(c.engines||[]).find(x=>x.id===id),m=(c.models||[]).find(x=>x.id===e?.model_id);if($('#chordEngineLabel'))$('#chordEngineLabel').textContent=e?.display_name||id||'—';if($('#chordEngineDisclosure'))$('#chordEngineDisclosure').innerHTML=e?.model_id?`Modello: <b>${esc(m?.display_name||e.model_id)}</b> · ${m?.installed?'installato':'sarà scaricato al primo uso'}${m?.license?`<br>Licenza pesi: ${esc(m.license)}`:''}`:'Questo motore non richiede un modello AI scaricabile.'}
-async function downloadTextAnalysisSelection(kind){const cat=textModelCatalog(),choice=$('#textAnalysisChoice')?.value;try{if(kind==='lyrics'){toast('Download modello lyrics…');await api(`/api/ai-models/lyrics/${encodeURIComponent(choice)}/download`,{method:'POST'})}else{const e=(cat.chords?.engines||[]).find(x=>x.id===choice);if(!e?.model_id)return toast('Il motore selezionato non richiede un modello');toast('Download modello chords…');await api(`/api/ai-models/chords/${encodeURIComponent(e.model_id)}/download`,{method:'POST'})}pluginInfo=await api('/api/plugins');toast(currentUser?.native_single_user?'Modello scaricato localmente':'Modello scaricato sul server');if(kind==='chords')updateChordEngineDisclosure()}catch(e){toast(e.message)}}
+async function downloadTextAnalysisSelection(kind){const cat=textModelCatalog(),choice=$('#textAnalysisChoice')?.value;try{let modelId=choice;if(kind==='chords'){const e=(cat.chords?.engines||[]).find(x=>x.id===choice);if(!e?.model_id)return toast('Il motore selezionato non richiede un modello');modelId=e.model_id}await startModelDownload(kind,modelId,async()=>{pluginInfo=await api('/api/plugins');toast(currentUser?.native_single_user?'Modello scaricato localmente':'Modello scaricato sul server');if(kind==='chords')updateChordEngineDisclosure()})}catch(e){toast(e.message)}}
 async function startTrackTextAnalysis(id,kind,choice=''){
   if(!current)return;
   const track=trackById(id);if(!track)return toast('Traccia non trovata');
   const label=kind==='lyrics'?'Lyrics':'Chords';
-  await flushAutosave();
+  const startButton=$('#utilityBody .form-actions .primary');
+  const cancelButton=$('#utilityBody .form-actions .secondary:not(.model-download-btn)');
+  const previousStartText=startButton?.textContent||'';
+  if(startButton){startButton.disabled=true;startButton.textContent='Preparazione…'}
+  if(cancelButton)cancelButton.disabled=true;
+  let status=$('#textAnalysisLaunchStatus');
+  if(!status){status=document.createElement('div');status.id='textAnalysisLaunchStatus';status.className='workflow-note';$('#utilityBody .form-grid')?.appendChild(status)}
+  if(status)status.textContent='Preparazione del progetto e verifica del modello…';
   try{
+    await flushAutosave();
+    if(status)status.textContent='Avvio del job di estrazione…';
     const param=kind==='lyrics'?'model':'engine';
     const suffix=choice?`?${param}=${encodeURIComponent(choice)}`:'';
     const job=await api(`/api/projects/${current.id}/tracks/${id}/extract-${kind}-jobs${suffix}`,{method:'POST'});
-    showMediaProgress(`Estrazione ${label}`,job.progress,job.message);
+    // Only now replace the chooser: the progress dialog is already backed by a real job.
+    showMediaProgress(`Estrazione ${label}`,job.progress,job.message||'Job avviato','',job.id);
     pollMediaJob(job.id,`Estrazione ${label}`,async()=>{
       current=await api(`/api/projects/${current.id}`);
       mixerMetaTab=kind;current.mixer_meta_tab=kind;
+      // The extraction job saves the internal workspace. Native apps also keep a
+      // bound archive on disk, so sync it immediately or the next launch could
+      // reopen a stale archive without the freshly extracted timed text.
+      await persistCurrentProject(false);
+      await syncNativeProjectFile(current.id);
       render();toast(`${label} estratti e sincronizzati nel progetto`);
     });
-  }catch(e){toast(e.message)}
+  }catch(e){
+    if(startButton){startButton.disabled=false;startButton.textContent=previousStartText||`Estrai ${kind}`}
+    if(cancelButton)cancelButton.disabled=false;
+    if(status)status.textContent='Avvio non riuscito: '+e.message;
+    toast(e.message);
+  }
 }
 
 function openTrackStemWorkflow(id){
@@ -911,13 +949,24 @@ function exportWindowHtml(){
   const limit=current.target==='DAW'?null:mtaSlotLimit(),over=limit!==null&&current.tracks.length>limit;
   return `<div class="export-dialog"><div class="export-title">Final output</div>${over?`<div class="export-warning">Project has more tracks than ${current.target}. MTA export will ask how to merge tracks into ${limit} output slots.</div>`:''}<div class="export-format-grid"><button class="format-option" onclick="doExport('mta')"><span>▧ MTA (${current.target==='DAW'?'MTA8 / MTA16':current.target})</span><span>Configura ›</span></button><button class="format-option" onclick="doExport('wav')"><span>♫ WAV</span><span>24 bit / PCM ›</span></button><button class="format-option" onclick="doExport('mp3')"><span>♫ MP3</span><span>Configura bitrate ›</span></button><button class="format-option" onclick="doExport('flac')"><span>♫ FLAC</span><span>Lossless ›</span></button><button class="format-option ${current.lyrics?.length?'':'disabled'}" ${current.lyrics?.length?'onclick="openKaraokeExport()"':'disabled'}><span>▣ MP4 Karaoke</span><span>${current.lyrics?.length?'Configura ›':'Lyrics richieste'}</span></button></div><div class="export-dialog-tools"><button class="utility-btn secondary" onclick="previewMaster()">▶ Render &amp; Preview Master</button><button class="utility-btn secondary" onclick="showMtaAnalysis()">⌁ MTA format analysis</button></div><div class="utility-actions"><button class="utility-btn secondary" onclick="closeUtilityModal()">Annulla</button></div></div>`;
 }
-function metaPaneHtml(){
+function metaPanelBodyHtml(expanded=false){
   const config={lyrics:['text','Lyrics'],chords:['chord','Chords'],markers:['label','Markers']},[key,label]=config[mixerMetaTab]||config.lyrics,rows=current[mixerMetaTab]||[];const displayValue=x=>mixerMetaTab==='chords'?transposeChordLabel(x[key],current.pitch_semitones||0):x[key];
   const resetButton=mixerMetaTab==='lyrics'?`<button class="tool danger" onclick="resetTimedData('lyrics')">Reset lyrics</button>`:mixerMetaTab==='chords'?`<button class="tool danger" onclick="resetTimedData('chords')">Reset chords</button>`:'';
   const hasLyrics=!!(current.lyrics||[]).length,hasChords=!!(current.chords||[]).length;
-  const lyricsExports=mixerMetaTab==='lyrics'&&hasLyrics?`<button class="tool" onclick="downloadProjectLyrics(false)">TXT Lyrics</button>${hasChords?`<button class="tool" onclick="downloadProjectLyrics(true)">TXT Lyrics + Chords</button><button class="tool" onclick="downloadProjectChordPro()">ChordPro Lyrics + Chords</button>`:''}<label class="tool" title="Colore chords nel PDF">Chord color <input id="lyricsPdfChordColor" type="color" value="#7B1FA2" style="width:28px;height:22px;padding:0;border:0;background:none"></label><button class="tool" onclick="previewProjectLyricsPdf()">Anteprima PDF ${hasChords?'Lyrics + Chords':'Lyrics'}</button><button class="tool" onclick="downloadProjectLyricsPdf()">Scarica PDF ${hasChords?'Lyrics + Chords':'Lyrics'}</button>`:'';
-  return `<div class="meta-pane" id="metaPane"><div class="dock-tabs"><button class="dock-tab ${mixerMetaTab==='lyrics'?'active':''}" onclick="showMetaPanel('lyrics')">Lyrics</button><button class="dock-tab ${mixerMetaTab==='chords'?'active':''}" onclick="showMetaPanel('chords')">Chords</button><button class="dock-tab ${mixerMetaTab==='markers'?'active':''}" onclick="showMetaPanel('markers')">Markers</button><button class="dock-close" onclick="toggleMixerPanel('meta')" title="Nascondi Lyrics/Chords/Markers">×</button></div><div class="meta-tabs-content"><div class="meta-list">${rows.map(x=>`<div class="meta-line"><time>${fmtTime(x.time_ms/1000)}</time><span>${esc(displayValue(x))}</span></div>`).join('')||`<div class="hint">No synchronized ${label.toLowerCase()} yet.</div>`}</div><div class="meta-actions"><button class="tool" onclick="editTimed('${mixerMetaTab}')">Edit ${label.toLowerCase()}</button>${resetButton}${lyricsExports}</div><textarea id="lyrics" hidden>${esc(linesToText(current.lyrics,'text'))}</textarea><textarea id="chords" hidden>${esc(linesToText(current.chords,'chord'))}</textarea><textarea id="markers" hidden>${esc(linesToText(current.markers,'label'))}</textarea></div></div>`;
+  const lyricsExports=mixerMetaTab==='lyrics'&&hasLyrics?`<button class="tool" onclick="downloadProjectLyrics(false)">TXT Lyrics</button>${hasChords?`<button class="tool" onclick="downloadProjectLyrics(true)">TXT Lyrics + Chords</button><button class="tool" onclick="downloadProjectChordPro()">ChordPro Lyrics + Chords</button>`:''}<label class="tool meta-color-tool" title="Colore chords nel PDF"><span>Chord color</span><input id="lyricsPdfChordColor${expanded?'Expanded':''}" type="color" value="#7B1FA2"></label><button class="tool" onclick="previewProjectLyricsPdf()">Anteprima PDF ${hasChords?'Lyrics + Chords':'Lyrics'}</button><button class="tool" onclick="downloadProjectLyricsPdf()">Scarica PDF ${hasChords?'Lyrics + Chords':'Lyrics'}</button>`:'';
+  return `<div class="meta-tabs-content ${expanded?'meta-expanded-content':''}"><div class="meta-list">${rows.map(x=>`<div class="meta-line"><time>${fmtTime(x.time_ms/1000)}</time><span>${esc(displayValue(x))}</span></div>`).join('')||`<div class="hint">No synchronized ${label.toLowerCase()} yet.</div>`}</div><div class="meta-actions"><button class="tool" onclick="editTimed('${mixerMetaTab}')">Edit ${label.toLowerCase()}</button>${resetButton}${lyricsExports}</div>${expanded?'':`<textarea id="lyrics" hidden>${esc(linesToText(current.lyrics,'text'))}</textarea><textarea id="chords" hidden>${esc(linesToText(current.chords,'chord'))}</textarea><textarea id="markers" hidden>${esc(linesToText(current.markers,'label'))}</textarea>`}</div>`;
 }
+function metaPaneHtml(){
+  return `<div class="meta-pane" id="metaPane"><div class="dock-tabs meta-dock-tabs"><button class="dock-tab ${mixerMetaTab==='lyrics'?'active':''}" onclick="showMetaPanel('lyrics')">Lyrics</button><button class="dock-tab ${mixerMetaTab==='chords'?'active':''}" onclick="showMetaPanel('chords')">Chords</button><button class="dock-tab ${mixerMetaTab==='markers'?'active':''}" onclick="showMetaPanel('markers')">Markers</button><button class="dock-expand" onclick="openExpandedMetaPanel()" title="Espandi in finestra dedicata">⛶</button><button class="dock-close" onclick="toggleMixerPanel('meta')" title="Nascondi Lyrics/Chords/Markers">×</button></div>${metaPanelBodyHtml(false)}</div>`;
+}
+function openExpandedMetaPanel(){
+  if(!current)return;
+  const label={lyrics:'Lyrics',chords:'Chords',markers:'Markers'}[mixerMetaTab]||'Lyrics';
+  showUtilityModal(`Lyrics / Chords / Markers · ${label}`,`<div class="expanded-meta-window"><div class="dock-tabs meta-dock-tabs"><button class="dock-tab ${mixerMetaTab==='lyrics'?'active':''}" onclick="showExpandedMetaTab('lyrics')">Lyrics</button><button class="dock-tab ${mixerMetaTab==='chords'?'active':''}" onclick="showExpandedMetaTab('chords')">Chords</button><button class="dock-tab ${mixerMetaTab==='markers'?'active':''}" onclick="showExpandedMetaTab('markers')">Markers</button><button class="dock-close" onclick="closeUtilityModal()" title="Torna alla dimensione standard">↙</button></div><div id="expandedMetaBody">${metaPanelBodyHtml(true)}</div></div>`);
+  document.querySelector('.utility-modal')?.classList.add('meta-expanded-modal');
+}
+function showExpandedMetaTab(tab){mixerMetaTab=tab;if(current){current.mixer_meta_tab=tab;markDirty(250)};const body=$('#expandedMetaBody');if(body)body.innerHTML=metaPanelBodyHtml(true);}
+
 function updateMixerDockLayout(){
   const dock=$('#mixerDock');if(!dock||!current)return;
   const meta=!!current.metadata_panel_visible;
@@ -1076,7 +1125,8 @@ function updatePlaybackGains(){
 function refreshRenderedMasterForMixState(){
   if(!renderedMasterPlayback)return;
   if(playbackPaused||!playAudio||playAudio.paused){renderedMasterDirty=true;return}
-  if(renderedMasterRefreshPromise)return;
+  if(renderedMasterRefreshPromise){renderedMasterRefreshQueued=true;return}
+  renderedMasterRefreshQueued=false;
   renderedMasterRefreshPromise=(async()=>{
     const previous=playAudio,cursor=playCursorMs,token=++playbackToken;
     try{
@@ -1098,7 +1148,10 @@ function refreshRenderedMasterForMixState(){
     }catch(e){
       renderedMasterDirty=true;
       console.warn('Aggiornamento live del master renderizzato fallito',e);
-    }finally{renderedMasterRefreshPromise=null}
+    }finally{
+      renderedMasterRefreshPromise=null;
+      if(renderedMasterRefreshQueued){renderedMasterRefreshQueued=false;setTimeout(()=>refreshRenderedMasterForMixState(),0)}
+    }
   })();
 }
 function applyLiveMuteSolo(){
@@ -1353,11 +1406,20 @@ async function deleteSelection(wholeSong){
   sel={a:0,b:0};render();toast('Segmento del brano eliminato con ripple globale');
 }
 
-function showMediaProgress(title,pct,message,detail=''){
-  const p=Math.max(0,Math.min(100,Number(pct)||0));
-  setMobileBusy(p<100);
-  showUtilityModal(title,`<div class="stem-progress-card"><div class="stem-progress-head"><b>${esc(title)}</b><span>${p}%</span></div><div class="stem-progress"><div class="stem-progress-fill" style="width:${p}%"></div></div><div class="stem-progress-message">${esc(message||'')}</div>${detail?`<div class="workflow-note">${esc(detail)}</div>`:''}</div>`);
+function showMediaProgress(title,pct,message,detail='',cancelJobId=''){
+  const raw=Number(pct),indeterminate=Number.isFinite(raw)&&raw<0,p=indeterminate?35:Math.max(0,Math.min(100,raw||0));
+  setMobileBusy(indeterminate||p<100);
+  const cancel=cancelJobId?`<div class="utility-actions"><button class="utility-btn danger-action ai-model-action-btn" onclick="cancelMediaJob('${esc(cancelJobId)}')">Annulla estrazione</button></div>`:'';
+  const partial=detail?`<div class="workflow-note media-live-output">${esc(detail)}</div>`:'';
+  showUtilityModal(title,`<div class="stem-progress-card"><div class="stem-progress-head"><b>${esc(title)}</b><span>${indeterminate?'…':p+'%'}</span></div><div class="stem-progress ${indeterminate?'indeterminate':''}"><div class="stem-progress-fill" style="width:${p}%"></div></div><div class="stem-progress-message">${esc(message||'')}</div>${partial}${cancel}</div>`);
 }
+function mediaPartialText(job){
+  const p=job?.partial;if(!p?.items?.length)return '';
+  if(p.kind==='lyrics')return p.items.map(x=>x.text||'').filter(Boolean).join('\n');
+  if(p.kind==='chords')return p.items.map(x=>{const ms=Number(x.time_ms||0),m=Math.floor(ms/60000),sec=Math.floor(ms/1000)%60;return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}  ${x.chord||''}`}).join('\n');
+  return '';
+}
+async function cancelMediaJob(jobId){try{await api(`/api/media-jobs/${jobId}/cancel`,{method:'POST'});toast('Annullamento richiesto…')}catch(e){toast(e.message)}}
 function uploadWithProgress(url,formData,title){
   return new Promise((resolve,reject)=>{
     const xhr=new XMLHttpRequest();
@@ -1373,9 +1435,10 @@ async function pollMediaJob(jobId,title,onDone){
   clearTimeout(mediaProgressTimer);
   try{
     const job=await api(`/api/media-jobs/${jobId}`);
-    showMediaProgress(title,job.progress,job.message,job.error||'');
+    const live=mediaPartialText(job);
+    showMediaProgress(title,job.progress,job.message,live||job.error||'',job.cancel_supported&&['queued','running'].includes(job.status)?jobId:'');
     if(job.status==='completed'){setMobileBusy(false);await onDone(job);return}
-    if(job.status==='failed'){setMobileBusy(false);toast(job.error||'Operazione fallita');return}
+    if(job.status==='failed'||job.status==='cancelled'){setMobileBusy(false);toast(job.status==='cancelled'?'Estrazione annullata':(job.error||'Operazione fallita'));return}
     mediaProgressTimer=setTimeout(()=>pollMediaJob(jobId,title,onDone),500);
   }catch(e){setMobileBusy(false);toast(e.message)}
 }
@@ -1471,7 +1534,7 @@ function updateBackingModelRow(){const row=$('#backingModelRow'),on=$('#stemSpli
 async function downloadSelectedBackingModel(){const id=$('#stemBackingVocalModel')?.value;if(!id||id==='ffmpeg-center-side')return toast('Il fallback DSP non richiede modelli');try{toast('Download modello in corso…');await api(`/api/vocal-separation/models/${encodeURIComponent(id)}/download`,{method:'POST'});pluginInfo=await api('/api/plugins');toast(currentUser?.native_single_user?'Modello scaricato localmente':'Modello scaricato sul server')}catch(e){toast(e.message)}}
 
 function updateStemChordEngineDisclosure(){const c=textModelCatalog().chords||{},id=$('#stemChordsEngine')?.value,e=(c.engines||[]).find(x=>x.id===id),m=(c.models||[]).find(x=>x.id===e?.model_id),el=$('#stemChordEngineDisclosure');if(el)el.textContent=e?`${e.display_name}${e.model_id?' · modello '+(m?.display_name||e.model_id)+(m?.installed?' · installato':' · download on-demand'): ' · nessun modello AI'}`:''}
-async function downloadStemTextModel(kind){const cat=textModelCatalog();try{if(kind==='lyrics'){const id=$('#stemLyricsModel')?.value;if(!id)return;await api(`/api/ai-models/lyrics/${encodeURIComponent(id)}/download`,{method:'POST'})}else{const id=$('#stemChordsEngine')?.value,e=(cat.chords?.engines||[]).find(x=>x.id===id);if(!e?.model_id)return toast('Questo motore non richiede un modello');await api(`/api/ai-models/chords/${encodeURIComponent(e.model_id)}/download`,{method:'POST'})}pluginInfo=await api('/api/plugins');toast(currentUser?.native_single_user?'Modello scaricato localmente':'Modello scaricato sul server');updateStemChordEngineDisclosure()}catch(e){toast(e.message)}}
+async function downloadStemTextModel(kind){const cat=textModelCatalog();try{let modelId;if(kind==='lyrics'){modelId=$('#stemLyricsModel')?.value;if(!modelId)return}else{const id=$('#stemChordsEngine')?.value,e=(cat.chords?.engines||[]).find(x=>x.id===id);if(!e?.model_id)return toast('Questo motore non richiede un modello');modelId=e.model_id}await startModelDownload(kind,modelId,async()=>{pluginInfo=await api('/api/plugins');toast(currentUser?.native_single_user?'Modello scaricato localmente':'Modello scaricato sul server');updateStemChordEngineDisclosure()})}catch(e){toast(e.message)}}
 function updateStemWorkflowMode(){
   const mode=$('#stemProjectMode')?.value;
   const row=$('#stemProjectNameRow'),target=$('#stemProjectTarget');
@@ -1484,12 +1547,13 @@ function updateStemWorkflowMode(){
 
 async function runTextAnalysisAndWait(projectId,trackId,kind,choice=""){
   if(!trackId)return null;
-  const param=kind==='lyrics'?'model':'engine';const suffix=choice?`?${param}=${encodeURIComponent(choice)}`:'';const job=await api(`/api/projects/${projectId}/tracks/${trackId}/extract-${kind}-jobs${suffix}`,{method:'POST'});
+  const label=kind==='lyrics'?'Lyrics':'Chords',param=kind==='lyrics'?'model':'engine';const suffix=choice?`?${param}=${encodeURIComponent(choice)}`:'';const job=await api(`/api/projects/${projectId}/tracks/${trackId}/extract-${kind}-jobs${suffix}`,{method:'POST'});
   for(;;){
     const state=await api(`/api/media-jobs/${job.id}`);
+    showMediaProgress(`Estrazione ${label}`,state.progress,state.message,mediaPartialText(state),state.cancel_supported&&['queued','running'].includes(state.status)?job.id:'');
     if(state.status==='completed')return state;
-    if(state.status==='failed'||state.status==='cancelled')throw new Error(state.error||`Estrazione ${kind} non riuscita`);
-    await new Promise(resolve=>setTimeout(resolve,600));
+    if(state.status==='failed'||state.status==='cancelled')throw new Error(state.error||(state.status==='cancelled'?`Estrazione ${kind} annullata`:`Estrazione ${kind} non riuscita`));
+    await new Promise(resolve=>setTimeout(resolve,500));
   }
 }
 
@@ -1537,7 +1601,7 @@ async function startStemWorkflow(){
     }catch(e){return toast('Scelta destinazione progetto fallita: '+e.message)}
   }
   const extractLyrics=!!$('#stemExtractLyrics')?.checked,extractChords=!!$('#stemExtractChords')?.checked;
-  const lyricsModel=$('#stemLyricsModel')?.value||textModelCatalog().lyrics?.default_model||'large-v3';
+  const lyricsModel=$('#stemLyricsModel')?.value||textModelCatalog().lyrics?.default_model||'base';
   const chordsEngine=$('#stemChordsEngine')?.value||textModelCatalog().chords?.default_engine||'madmom-deep-chroma';
   const splitBackingVocals=!!$('#stemSplitBackingVocals')?.checked;
   const backingVocalModel=$('#stemBackingVocalModel')?.value||'uvr_mdxnet_kara_2';
@@ -1662,17 +1726,25 @@ async function drawWave(t){
     const firstBin=Math.max(0,Math.min(peaks.length-1,Math.floor(sourceStart/durationMs*peaks.length)));
     const lastBin=Math.max(firstBin+1,Math.min(peaks.length,Math.ceil(sourceEnd/durationMs*peaks.length)));
     const sourceBins=Math.max(1,lastBin-firstBin);
-    // Never draw more columns than either the visible pixel width or the cached
-    // source detail.  Zooming in increases spacing/detail without inventing points;
-    // zooming out aggregates source bins into one pixel column.
-    const columns=Math.max(1,Math.min(Math.ceil(tw),sourceBins));
+    // One visual column per visible pixel keeps the waveform dense at every zoom.
+    // When zoomed out each pixel aggregates source peaks; when zoomed in we
+    // interpolate between cached peaks instead of leaving large empty gaps.
+    const columns=Math.max(1,Math.ceil(tw));
     const xStep=tw/columns;
     ctx.beginPath();
     for(let col=0;col<columns;col++){
-      const a=firstBin+Math.floor(col*sourceBins/columns);
-      const b=Math.max(a+1,firstBin+Math.ceil((col+1)*sourceBins/columns));
+      const from=firstBin+col*sourceBins/columns;
+      const to=firstBin+(col+1)*sourceBins/columns;
       let peak=0;
-      for(let i=a;i<Math.min(lastBin,b);i++)peak=Math.max(peak,Number(peaks[i]||0));
+      if(to-from>=1){
+        const a=Math.floor(from),b=Math.max(a+1,Math.ceil(to));
+        for(let i=a;i<Math.min(lastBin,b);i++)peak=Math.max(peak,Number(peaks[i]||0));
+      }else{
+        const a=Math.max(firstBin,Math.min(lastBin-1,Math.floor(from)));
+        const b=Math.max(firstBin,Math.min(lastBin-1,a+1));
+        const frac=Math.max(0,Math.min(1,from-a));
+        peak=Number(peaks[a]||0)*(1-frac)+Number(peaks[b]||0)*frac;
+      }
       const x=tl+(col+.5)*xStep;
       const h=Math.min(1,peak)*amp;
       ctx.moveTo(x,mid-h);ctx.lineTo(x,mid+h);
@@ -1819,20 +1891,27 @@ async function attachPlaybackGraph(audio,track,channels=2,silent=false,masterRen
   }
   return {analysers,gainNode,panner};
 }
+function canDirectPlayTrack(track,renderFilters=true){
+  if(!track||!track.filename)return false;
+  if(renderFilters&&(track.inserts||[]).some(x=>x.enabled))return false;
+  if(Math.abs(Number(current?.pitch_semitones||0))>.001)return false;
+  const base=Number(current?.base_bpm||current?.bpm||120),bpm=Number(current?.bpm||base);if(Math.abs(bpm-base)>.01)return false;
+  const clips=track.clips||[];if(!clips.length)return true;if(clips.length!==1)return false;
+  const c=clips[0],dur=Number(track.duration_ms||0);return Number(c.timeline_start_ms||0)===0&&Number(c.source_start_ms||0)===0&&(!dur||Math.abs(Number(c.source_end_ms||0)-dur)<100);
+}
 async function makeTrackPlayback(track,renderFilters,silent=false,respectMuteSolo=true){
-  const audio=new Audio(`/api/projects/${current.id}/preview-track/${track.id}?render=${renderFilters?'true':'false'}&t=${Date.now()}`);
-  audio.preload='auto';
-  const channels=renderFilters?effectiveTrackChannels(track):(Number(track.channels)===1?1:2);
+  const direct=canDirectPlayTrack(track,renderFilters);
+  const url=direct?`/api/projects/${current.id}/audio/${encodeURIComponent(track.filename)}`:`/api/projects/${current.id}/preview-track/${track.id}?render=${renderFilters?'true':'false'}`;
+  const audio=new Audio(url);audio.preload='auto';
+  const channels=direct?(Number(track.channels)===1?1:2):(renderFilters?effectiveTrackChannels(track):(Number(track.channels)===1?1:2));
   const graph=await attachPlaybackGraph(audio,track,channels,silent,false,respectMuteSolo);
-  await new Promise((resolve,reject)=>{audio.addEventListener('loadedmetadata',resolve,{once:true});audio.addEventListener('error',()=>reject(new Error(`Preview non disponibile: ${track.name}`)),{once:true});audio.load()});
+  await new Promise((resolve,reject)=>{const ready=()=>resolve();audio.addEventListener('loadedmetadata',ready,{once:true});audio.addEventListener('error',()=>reject(new Error(`Preview non disponibile: ${track.name}`)),{once:true});audio.load();if(audio.readyState>=1)resolve()});
   audio.currentTime=Math.min(playCursorMs/1000/tempoRatio(),Math.max(0,(audio.duration||0)-0.01));
-  audio.addEventListener('ended',()=>requestAnimationFrame(()=>{
-    if(!playbackActuallyRunning())resetVuMeters();
-  }));
-  return {trackId:track.id,audio,analysers:graph.analysers,channels,silent,respectMuteSolo,meterData:{},gainNode:graph.gainNode,panner:graph.panner};
+  audio.addEventListener('ended',()=>requestAnimationFrame(()=>{if(!playbackActuallyRunning())resetVuMeters()}));
+  return {trackId:track.id,audio,analysers:graph.analysers,channels,silent,respectMuteSolo,meterData:{},gainNode:graph.gainNode,panner:graph.panner,direct};
 }
 function waitForMediaBuffer(audio,label='traccia',timeoutMs=12000){
-  const enough=()=>{if(audio.readyState<3)return false;try{const pos=audio.currentTime||0;for(let i=0;i<audio.buffered.length;i++){if(audio.buffered.start(i)<=pos+.05&&audio.buffered.end(i)-pos>=Math.min(3,Math.max(.5,(audio.duration||3)-pos)))return true}}catch(e){}return audio.readyState>=4};
+  const enough=()=>{if(audio.readyState<2)return false;try{const pos=audio.currentTime||0;for(let i=0;i<audio.buffered.length;i++){if(audio.buffered.start(i)<=pos+.05&&audio.buffered.end(i)-pos>=Math.min(.45,Math.max(.15,(audio.duration||.45)-pos)))return true}}catch(e){}return audio.readyState>=3};
   if(enough())return Promise.resolve();
   return new Promise((resolve,reject)=>{let done=false;const finish=()=>{if(done)return;done=true;cleanup();resolve()},fail=()=>{if(done)return;done=true;cleanup();reject(new Error(`Buffering non riuscito: ${label}`))},check=()=>{if(enough())finish()},cleanup=()=>{clearTimeout(timer);clearInterval(poll);audio.removeEventListener('canplaythrough',check);audio.removeEventListener('progress',check);audio.removeEventListener('error',fail)},poll=setInterval(check,100),timer=setTimeout(()=>audio.readyState>=3?finish():fail(),timeoutMs);audio.addEventListener('canplaythrough',check);audio.addEventListener('progress',check);audio.addEventListener('error',fail,{once:true});audio.load()});
 }
@@ -1877,7 +1956,7 @@ async function startDynamicTrackPreview(renderFilters,silentMeters=false,token=p
   try{
     const items=await Promise.all(tracks.map(t=>makeTrackPlayback(t,renderFilters,silentMeters,true)));if(token!==playbackToken)return null;
     showMediaProgress('Buffering tracce',45,'Preparazione decoder… attendere');
-    await Promise.all(items.map((item,i)=>waitForMediaBuffer(item.audio,tracks[i]?.name||`traccia ${i+1}`,18000)));if(token!==playbackToken)return null;
+    await Promise.all(items.map((item,i)=>waitForMediaBuffer(item.audio,tracks[i]?.name||`traccia ${i+1}`,8000)));if(token!==playbackToken)return null;
     const sec=playCursorMs/1000/tempoRatio();
     for(const item of items){item.audio.pause();item.audio.playbackRate=1;item.needsRelock=false;item.lastHardSync=0;item.audio.currentTime=Math.min(sec,Math.max(0,(item.audio.duration||0)-0.01))}
     trackPlaybacks.push(...items);updatePlaybackGains();if(audioCtx?.state==='suspended')try{await audioCtx.resume()}catch(e){}
@@ -1897,7 +1976,7 @@ function stopPlayback(){
   if(playAudio){playAudio.pause();playAudio.currentTime=0;playAudio=null}
   for(const item of trackPlaybacks){try{item.audio.pause();item.audio.currentTime=0;item.audio.removeAttribute('src');item.audio.load()}catch(e){}}
   trackPlaybacks=[];masterMeterAnalysers=null;masterPlaybackGainNode=null;
-  renderedMasterPlayback=false;renderedMasterDirty=false;renderedMasterRefreshPromise=null;renderedMasterBaseVolumeDb=0;renderedMasterAudio=null;
+  renderedMasterPlayback=false;renderedMasterDirty=false;renderedMasterRefreshPromise=null;renderedMasterRefreshQueued=false;renderedMasterBaseVolumeDb=0;renderedMasterAudio=null;
   stopDynamicSyncMonitor();
   for(const key of Object.keys(liveFxRefreshTimers)){clearTimeout(liveFxRefreshTimers[key]);delete liveFxRefreshTimers[key]}
   resetVuMeters();
@@ -1957,7 +2036,7 @@ async function previewTrack(id){
 async function previewMaster(){
   if(!current||!current.tracks.length)return;
   try{
-    await flushAutosave(false);stopPlayback();const token=++playbackToken;
+    collect();stopPlayback();const token=++playbackToken;
     const needsRenderedMaster=!!current.render_preview_enabled||Math.abs(Number(current.master_volume_db||0))>0.001||(current.master_inserts||[]).some(x=>x.enabled);
     if(needsRenderedMaster){
       renderedMasterPlayback=true;renderedMasterDirty=false;
@@ -2264,9 +2343,23 @@ function focusImport(){$('#newTrackFile')?.click()}
 function editProjectMeta(){if(!current)return;const title=prompt('Project title',current.title);if(title!==null&&title.trim())current.title=title.trim().slice(0,200);const originalTitle=prompt('Titolo originale',current.original_title||'');if(originalTitle!==null)current.original_title=originalTitle.trim().slice(0,300);const authors=prompt('Autori / compositori (separati da virgola)',(current.authors||[]).join(', '));if(authors!==null)current.authors=authors.split(/[,;]/).map(x=>x.trim()).filter(Boolean).slice(0,64);const artist=prompt('Interprete / artista',current.artist||'');if(artist!==null)current.artist=artist.slice(0,200);const key=prompt('Tonalità / Key',current.key||'');if(key!==null)current.key=key.trim().slice(0,40);const bpm=prompt('BPM',String(current.bpm));if(bpm!==null&&Number(bpm)>0)setProjectBpm(Math.min(300,Number(bpm)));render();markDirty()}
 function downloadProjectLyrics(withChords=false){if(!current)return;if(!(current.lyrics||[]).length)return toast('Il progetto non contiene lyrics');if(withChords&&!(current.chords||[]).length)return toast('Il progetto non contiene chords');window.location.href=`/api/projects/${current.id}/lyrics.txt?chords=${withChords?'true':'false'}`}
 function downloadProjectChordPro(){if(!current)return;if(!(current.lyrics||[]).length)return toast('Il progetto non contiene lyrics');if(!(current.chords||[]).length)return toast('Il progetto non contiene chords');window.location.href=`/api/projects/${current.id}/lyrics.chordpro`}
-function lyricsPdfUrl(preview=false){const color=$('#lyricsPdfChordColor')?.value||'#7B1FA2';return `/api/projects/${current.id}/lyrics.pdf?chord_color=${encodeURIComponent(color)}${preview?'&preview=true':''}`}
+function lyricsPdfUrl(preview=false){const color=$('#lyricsPdfChordColorExpanded')?.value||$('#lyricsPdfChordColor')?.value||'#7B1FA2';return `/api/projects/${current.id}/lyrics.pdf?chord_color=${encodeURIComponent(color)}${preview?'&preview=true':''}`}
 function downloadProjectLyricsPdf(){if(!current)return;if(!(current.lyrics||[]).length)return toast('Il progetto non contiene lyrics');window.location.href=lyricsPdfUrl(false)}
-function previewProjectLyricsPdf(){if(!current)return;if(!(current.lyrics||[]).length)return toast('Il progetto non contiene lyrics');const hasChords=!!(current.chords||[]).length,title=hasChords?'Anteprima PDF · Lyrics + Chords':'Anteprima PDF · Lyrics';showUtilityModal(title,`<div class="pdf-preview-wrap"><iframe class="pdf-preview-frame" src="${esc(lyricsPdfUrl(true))}" title="${esc(title)}"></iframe></div><div class="utility-actions pdf-preview-actions"><button class="utility-btn secondary" onclick="closeUtilityModal()">Chiudi</button><button class="utility-btn primary" onclick="downloadProjectLyricsPdf()">Scarica PDF ${hasChords?'Lyrics + Chords':'Lyrics'}</button></div>`)}
+function previewProjectLyricsPdf(){
+  if(!current)return;if(!(current.lyrics||[]).length)return toast('Il progetto non contiene lyrics');
+  const hasChords=!!(current.chords||[]).length,title=hasChords?'Anteprima PDF · Lyrics + Chords':'Anteprima PDF · Lyrics';
+  const chords=[...(current.chords||[])].sort((a,b)=>a.time_ms-b.time_ms);let ci=0,lastChord='';
+  const lines=(current.lyrics||[]).map(line=>{while(ci<chords.length&&Number(chords[ci].time_ms)<=Number(line.time_ms)+250){lastChord=transposeChordLabel(chords[ci].chord,current.pitch_semitones||0);ci++}return `<div class="pdf-sheet-line">${hasChords&&lastChord?`<div class="pdf-sheet-chord">${esc(lastChord)}</div>`:''}<div class="pdf-sheet-lyric">${esc(line.text||'')}</div></div>`}).join('');
+  showUtilityModal(title,`<div class="pdf-preview-toolbar"><button class="utility-btn secondary" onclick="closeLyricsPdfPreview()">← Torna all'editor</button><button class="utility-btn primary" onclick="downloadProjectLyricsPdf()">Scarica PDF ${hasChords?'Lyrics + Chords':'Lyrics'}</button></div><div class="pdf-preview-wrap"><article class="pdf-sheet"><header><h1>${esc(current.title||'Lyrics')}</h1>${current.artist?`<h2>${esc(current.artist)}</h2>`:''}<p>${current.key?`Key ${esc(effectiveProjectKey())} · `:''}${Number(current.bpm||0).toFixed(1)} BPM</p></header>${lines}</article></div><div class="utility-actions pdf-preview-actions"><button class="utility-btn secondary" onclick="closeLyricsPdfPreview()">← Torna all'editor</button><button class="utility-btn primary" onclick="downloadProjectLyricsPdf()">Scarica PDF ${hasChords?'Lyrics + Chords':'Lyrics'}</button></div>`);
+  document.querySelector('.utility-modal')?.classList.add('pdf-html-preview-modal');
+  requestAnimationFrame(()=>{const m=document.querySelector('.utility-modal');if(m)m.scrollTop=0;forceNativeViewportTop()});
+}
+function closeLyricsPdfPreview(){
+  const backdrop=$('#utilityBackdrop');if(backdrop)backdrop.classList.add('hidden');
+  document.querySelector('.utility-modal')?.classList.remove('pdf-html-preview-modal');
+  forceNativeViewportTop();
+  requestAnimationFrame(()=>{forceNativeViewportTop();$('#mixer')?.focus?.({preventScroll:true});document.querySelector('.main')?.scrollTo?.({top:0,left:0,behavior:'instant'})});
+}
 async function resetTimedData(kind){
   if(!current||!['lyrics','chords'].includes(kind))return;
   const label=kind==='lyrics'?'lyrics':'chords';
@@ -2357,6 +2450,11 @@ async function startKaraokeExport(){
     });
   }catch(e){toast(e.message)}
 }
+async function recalculateBpmFromTrack(trackId){
+  if(!current)return;const track=trackById(trackId);if(!track)return;
+  showMediaProgress('Ricalcolo BPM',10,`Analisi ritmica di ${track.name}…`);
+  try{const result=await api(`/api/projects/${current.id}/tracks/${trackId}/estimate-bpm`,{method:'POST'});current.bpm=Number(result.bpm);current.base_bpm=Number(result.bpm);render();markDirty(50);$('#utilityBackdrop')?.classList.add('hidden');toast(`BPM ricalcolati da ${track.name}: ${Number(result.bpm).toFixed(1)}`)}catch(e){$('#utilityBackdrop')?.classList.add('hidden');toast('Ricalcolo BPM: '+e.message)}
+}
 function editTimed(kind){if(!current)return;const config={lyrics:['text','Lyrics: seconds[TAB]text'],chords:['chord','Chords: seconds[TAB]chord'],markers:['label','Markers: seconds[TAB]label']}[kind];if(!config)return;const [key,label]=config;const raw=prompt(label,linesToText(current[kind],key));if(raw!==null){current[kind]=textToLines(raw,key);render();markDirty()}}
 
 
@@ -2369,12 +2467,12 @@ window.addEventListener('keydown',e=>{
   if((e.ctrlKey||e.metaKey)&&!e.altKey){const key=e.key.toLowerCase();if(key==='z'){e.preventDefault();if(e.shiftKey)redoEdit();else undoEdit();return}if(key==='y'){e.preventDefault();redoEdit();return}if(key==='x'){e.preventDefault();cutTimelineSelection();return}if(key==='c'){e.preventDefault();copyTimelineSelection();return}if(key==='v'){e.preventDefault();pasteTimelineSelection();return}if(key==='s'){e.preventDefault();save();return}}
   if(e.key==='Escape'){closeTrackContextMenu();return}
 
-  if(e.code!=='Space')return;
+  if(!(e.code==='Space'||e.key===' '||e.key==='Spacebar'))return;
   const target=e.target;
   if(target instanceof HTMLInputElement||target instanceof HTMLTextAreaElement||target instanceof HTMLSelectElement||target?.isContentEditable)return;
-  e.preventDefault();
-  if(playAudio||trackPlaybacks.length||playbackPaused)stopPlayback();else previewMaster();
-});
+  if(e.repeat)return;e.preventDefault();e.stopPropagation();
+  if(playAudio||trackPlaybacks.length||playbackPaused||playbackBuffering)stopPlayback();else previewMaster();
+},true);
 
 $('#mtafile').addEventListener('change',async e=>{
   const f=e.target.files[0];if(!f)return;
@@ -2448,7 +2546,7 @@ function showUtilityModal(title,html,stemProgress=false){
   }
   $('#utilityTitle').textContent=title;$('#utilityBody').innerHTML=html;$('#utilityBackdrop').classList.remove('hidden');
 }
-function closeUtilityModal(){if(activeStemJob){toast('La separazione è in corso: usa Annulla separazione se vuoi interromperla.');return}$('#utilityBackdrop').classList.add('hidden');document.querySelector('.utility-modal')?.classList.remove('sample-editor-modal');sampleEditorState=null;clearTimeout(samplePreviewTimer);forceNativeViewportTop()}
+function closeUtilityModal(){if(activeStemJob){toast('La separazione è in corso: usa Annulla separazione se vuoi interromperla.');return}$('#utilityBackdrop').classList.add('hidden');document.querySelector('.utility-modal')?.classList.remove('sample-editor-modal','meta-expanded-modal','pdf-html-preview-modal');sampleEditorState=null;clearTimeout(samplePreviewTimer);forceNativeViewportTop()}
 function exportProjectArchive(){if(!current){toast('Apri prima un progetto');return}window.location.href=`/api/projects/${current.id}/archive`}
 async function deleteCurrentProject(){if(!current){toast('Apri prima un progetto');return}await deleteProjectFromWorkspace(current.id,current.title)}
 $('#projectArchiveFile').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;const fd=new FormData();fd.append('file',f);try{current=await api('/api/project-archives/import',{method:'POST',body:fd});rememberRecentProject(current.id);selectedTrackId=current.tracks[0]?.id||null;resetProjectUiForOpen();render();await refresh();toast('Progetto completo importato')}catch(err){toast('Import progetto fallito: '+err.message)}finally{e.target.value=''}})
@@ -2605,8 +2703,16 @@ function exposeNativeSettings(){
 }
 window.addEventListener('pywebviewready',exposeNativeSettings);
 
-async function openAiModelManager(){try{const d=await api('/api/ai-models'),l=d.lyrics||{},c=d.chords||{};const lrows=(l.models||[]).map(m=>`<tr><td>${esc(m.display_name)}</td><td>OpenAI Whisper</td><td>${m.installed?'Installato':'On-demand'}</td><td><button onclick="manageAiModel('lyrics','${esc(m.id)}','download')">${m.installed?'Verifica / riscarica':'Scarica'}</button>${m.installed?` <button onclick="manageAiModel('lyrics','${esc(m.id)}','delete')">Elimina</button>`:''}</td></tr>`).join('');const crows=(c.models||[]).map(m=>`<tr><td>${esc(m.display_name)}</td><td>${esc(m.engine)}</td><td>${m.installed?'Installato':'On-demand'}</td><td><button onclick="manageAiModel('chords','${esc(m.id)}','download')">${m.installed?'Verifica / riscarica':'Scarica'}</button>${m.installed?` <button onclick="manageAiModel('chords','${esc(m.id)}','delete')">Elimina</button>`:''}<br><small>${esc(m.license||'')}</small></td></tr>`).join('');showUtilityModal(`AI models · ${d.storage==='local'?'locale':'server'}`,`<h3>Lyrics</h3><div class="table-scroll"><table><thead><tr><th>Modello</th><th>Motore</th><th>Stato</th><th>Azioni</th></tr></thead><tbody>${lrows}</tbody></table></div><h3>Chords</h3><div class="table-scroll"><table><thead><tr><th>Modello</th><th>Motore</th><th>Stato</th><th>Azioni</th></tr></thead><tbody>${crows}</tbody></table></div><p class="hint">Nella web app i modelli sono conservati sul server; nelle applicazioni native sono conservati localmente. I motori Chordino e MTA Chromagram non richiedono pesi AI.</p>`)}catch(e){toast(e.message)}}
-async function manageAiModel(kind,id,action){try{await api(`/api/ai-models/${kind}/${encodeURIComponent(id)}${action==='delete'?'':'/download'}`,{method:action==='delete'?'DELETE':'POST'});pluginInfo=await api('/api/plugins');openAiModelManager()}catch(e){toast(e.message)}}
+async function openAiModelManager(){try{const d=await api('/api/ai-models'),l=d.lyrics||{},c=d.chords||{};const btn=(kind,id,label,action='download',danger=false)=>`<button class="utility-btn ai-model-action-btn ${danger?'danger-action':'secondary'}" onclick="manageAiModel('${kind}','${esc(id)}','${action}')">${esc(label)}</button>`;const lrows=(l.models||[]).map(m=>`<tr><td>${esc(m.display_name)}</td><td>OpenAI Whisper</td><td>${m.installed?'Installato':'On-demand'}</td><td><div class="ai-model-actions">${btn('lyrics',m.id,m.installed?'Verifica / riscarica':'Scarica')}${m.installed?btn('lyrics',m.id,'Elimina','delete',true):''}</div></td></tr>`).join('');const crows=(c.models||[]).map(m=>`<tr><td>${esc(m.display_name)}</td><td>${esc(m.engine)}</td><td>${m.installed?'Installato':'On-demand'}</td><td><div class="ai-model-actions">${btn('chords',m.id,m.installed?'Verifica / riscarica':'Scarica')}${m.installed?btn('chords',m.id,'Elimina','delete',true):''}</div><small>${esc(m.license||'')}</small></td></tr>`).join('');showUtilityModal(`AI models · ${d.storage==='local'?'locale':'server'}`,`<h3>Lyrics</h3><div class="table-scroll"><table><thead><tr><th>Modello</th><th>Motore</th><th>Stato</th><th>Azioni</th></tr></thead><tbody>${lrows}</tbody></table></div><h3>Chords</h3><div class="table-scroll"><table><thead><tr><th>Modello</th><th>Motore</th><th>Stato</th><th>Azioni</th></tr></thead><tbody>${crows}</tbody></table></div><p class="hint">Nella web app i modelli sono conservati sul server; nelle applicazioni native sono conservati localmente. I motori Chordino e MTA Chromagram non richiedono pesi AI.${d.accelerator?.device?`<br>Acceleratore AI: <b>${esc(d.accelerator.device)}</b>${d.accelerator.hardware_accelerated?' · attivo':' · CPU fallback'}`:''}</p>`)}catch(e){toast(e.message)}}
+async function pollModelDownloadJob(jobId,title,onDone){
+  try{const job=await api(`/api/media-jobs/${jobId}`);showMediaProgress(title,job.progress,job.message,job.error||'');if(job.status==='completed'){setMobileBusy(false);await onDone(job);return}if(job.status==='failed'){setMobileBusy(false);toast(job.error||'Download modello fallito');return}setTimeout(()=>pollModelDownloadJob(jobId,title,onDone),500)}catch(e){setMobileBusy(false);toast(e.message)}
+}
+async function startModelDownload(kind,id,onDone){
+  const title=`Download modello ${kind==='lyrics'?'Lyrics':'Chords'}`;
+  const job=await api(`/api/ai-models/${kind}/${encodeURIComponent(id)}/download-jobs`,{method:'POST'});
+  showMediaProgress(title,job.progress,job.message);pollModelDownloadJob(job.id,title,onDone||(()=>{}));
+}
+async function manageAiModel(kind,id,action){try{if(action==='delete'){await api(`/api/ai-models/${kind}/${encodeURIComponent(id)}`,{method:'DELETE'});pluginInfo=await api('/api/plugins');openAiModelManager();return}await startModelDownload(kind,id,async()=>{pluginInfo=await api('/api/plugins');openAiModelManager();toast('Modello pronto')})}catch(e){toast(e.message)}}
 async function openNativeModelManager(){const b=await waitForNativeApi();if(!b?.list_local_models)return toast('Native model manager unavailable');try{const d=await b.list_local_models(),profiles=d.catalog?.model_profiles||[],local=new Set((d.local||[]).map(x=>x.id.replace(/\.server-model$/,'')));const rows=profiles.map(p=>`<tr><td>${esc(p.display_name||p.model)}</td><td>${p.stem_count||'—'}</td><td>${local.has(p.model)?'Installed':'On demand'}</td><td><button onclick="nativeModelUpdate('${esc(p.model)}')">${local.has(p.model)?'Force update':'Download'}</button>${local.has(p.model)?` <button onclick="nativeModelDelete('${esc(p.model)}')">Delete local</button>`:''}</td></tr>`).join('');showUtilityModal('Demucs models',`<div class="table-scroll"><table><thead><tr><th>Model</th><th>Stems</th><th>Local</th><th>Actions</th></tr></thead><tbody>${rows}</tbody></table></div><p>Missing models are downloaded automatically when requested for splitting.</p>`) }catch(e){toast(e.message)}}
 async function nativeModelUpdate(id){const b=await waitForNativeApi();try{await b.update_local_model(id);toast('Model updated: '+id);openNativeModelManager()}catch(e){toast(e.message)}}
 async function nativeModelDelete(id){const b=await waitForNativeApi();try{await b.delete_local_model(id);toast('Local model deleted: '+id);openNativeModelManager()}catch(e){toast(e.message)}}

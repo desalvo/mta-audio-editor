@@ -1,3 +1,29 @@
+## 0.2.0-145
+- Lyrics/Chords extraction chooser stays open until a real background job exists and the progress dialog can show a concrete preparation/download/analysis state.
+- Extraction progress now uses real audio time in 5-second chunks, with indeterminate progress while a model is being loaded/downloaded and monotonic percentages during analysis/sync/save.
+- Native Open recent is persisted by the native bridge in `native-settings.json`, so recent projects survive WebView/app restarts.
+- Lyrics/Chords extracted by background jobs are immediately persisted, reloaded into the UI, and synchronized to any bound native project archive so they survive the next launch.
+- Added regression tests for timed-text JSON round-trip and native recent-project persistence.
+
+## 0.2.0-144
+- Lyrics extraction now defaults to OpenAI Whisper **base** (still user-selectable).
+- Lyrics/Chords/Markers panel is responsive, wraps controls safely on narrow windows, and can expand into a dedicated full-size working window and return to the docked view.
+- PDF preview no longer relies on an embedded PDF viewer in native WebViews; it renders a faithful printable HTML preview while keeping real PDF download/export unchanged.
+- Native/web transport startup is faster for simple unprocessed tracks by playing the original project audio directly; dynamic prebuffer requirements were reduced and playback no longer waits for a full autosave before starting.
+- Spacebar play/stop handling is captured more robustly across native WebViews.
+- Mute/Solo changes now queue a second rendered-master refresh when a previous refresh is still running, so the latest mixer state is never dropped.
+- Track context menu adds **Recalculate BPM from this track**, updating project/base BPM from the selected track.
+
+## 0.2.0-143
+
+- Native AI Models: pulsanti Lyrics/Chords con testo sempre leggibile nelle WebView native.
+- Waveform timeline più densa: rendering per pixel visibile con interpolazione tra i picchi persistiti, mantenendo il rendering leggero.
+- Lyrics e Chords: estrazione progressiva con output parziale live, progressbar e comando Annulla estrazione.
+- Download modelli Lyrics/Chords tramite job con progressbar (indeterminata quando il backend non espone i byte totali).
+- Accelerazione AI automatica: CUDA o Apple Metal/MPS quando disponibili, fallback CPU; Madmom prova il backend Torch accelerato prima del fallback NumPy.
+- Madmom Deep Chroma/CNN: input convertito automaticamente in WAV PCM RIFF 44.1 kHz prima dell'analisi, eliminando gli errori sui contenitori MP3/M4A/AAC.
+- Android metadata aggiornati a versionCode 20143 / versionName 0.2.0-143.
+
 # 0.2.0-142
 
 - Android CI: installa i package SDK reali `platforms;android-37.0` e `build-tools;37.0.0`, mantenendo compileSdk 37, AGP 9.1.1 e Gradle 9.3.1.

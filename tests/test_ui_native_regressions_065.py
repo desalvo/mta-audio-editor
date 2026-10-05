@@ -11,7 +11,8 @@ def test_meter_token_is_declared_and_playback_save_is_silent():
     assert 'meterRunToken=0' in JS
     start = JS.index('async function previewMaster()')
     body = JS[start: start + 450]
-    assert 'await flushAutosave(false)' in body
+    assert 'collect();stopPlayback()' in body
+    assert 'await flushAutosave(false)' not in body
     assert 'await save()' not in body
 
 

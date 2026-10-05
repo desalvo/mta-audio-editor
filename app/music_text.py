@@ -12,6 +12,7 @@ import subprocess
 import tempfile
 import wave
 from pathlib import Path
+from typing import Callable
 
 import numpy as np
 
@@ -103,6 +104,120 @@ def _whisper_result_to_lines(result: dict) -> list[LyricLine]:
     return items
 
 
+def native_ai_device() -> str:
+    """Return the best PyTorch device available to native/server AI workloads.
+
+    Explicit MTA_AI_DEVICE wins. Otherwise CUDA is preferred, then Apple MPS,
+    then CPU. This keeps inference portable while using hardware acceleration
+    whenever the bundled runtime exposes it.
+    """
+    forced = os.getenv("MTA_AI_DEVICE", "").strip()
+    if forced:
+        return forced
+    try:
+        import torch  # type: ignore
+        if torch.cuda.is_available():
+            return "cuda"
+        mps = getattr(getattr(torch, "backends", None), "mps", None)
+        if mps is not None and mps.is_available():
+            return "mps"
+    except Exception as exc:
+        logger.debug("AI accelerator detection fell back to CPU: %s", exc)
+    return "cpu"
+
+
+def _lyrics_transcribe_kwargs(language: str | None, device: str) -> dict:
+    kwargs = {
+        "verbose": False,
+        "word_timestamps": True,
+        "temperature": 0.0,
+        "beam_size": max(1, int(os.getenv("MTA_LYRICS_BEAM_SIZE", "8"))),
+        "patience": 1.2,
+        "condition_on_previous_text": True,
+        "fp16": device == "cuda",
+    }
+    if language:
+        kwargs["language"] = language
+    return kwargs
+
+
+def _offset_lyrics(items: list[LyricLine], offset_ms: int) -> list[LyricLine]:
+    out=[]
+    for item in items:
+        words=[LyricWord(start_ms=w.start_ms+offset_ms,end_ms=w.end_ms+offset_ms,text=w.text) for w in item.words]
+        out.append(LyricLine(time_ms=item.time_ms+offset_ms,end_ms=(item.end_ms+offset_ms if item.end_ms is not None else None),text=item.text,words=words))
+    return out
+
+
+def _duration_seconds(path: Path) -> float:
+    try:
+        raw=_run(["ffprobe","-v","error","-show_entries","format=duration","-of","default=noprint_wrappers=1:nokey=1",str(path)]).strip()
+        return max(0.0,float(raw))
+    except Exception:
+        return 0.0
+
+
+def extract_lyrics_progressive(
+    path: Path, *, model_name: str | None = None, language: str | None = None,
+    progress: Callable[[int, list[LyricLine], str], None] | None = None,
+    cancelled: Callable[[], bool] | None = None, chunk_seconds: int = 5,
+) -> list[LyricLine]:
+    """Chunked Whisper transcription used by UI jobs for live partial results/cancel."""
+    model_name=(model_name or os.getenv("MTA_LYRICS_WHISPER_MODEL","base")).strip() or "base"
+    language=(language or os.getenv("MTA_LYRICS_LANGUAGE","")).strip() or None
+    cache_dir=Path(os.getenv("MTA_LYRICS_MODEL_DIR",str(Path(os.getenv("MTA_DATA_DIR","/data/projects"))/".cache"/"lyrics-models"))).expanduser()
+    cache_dir.mkdir(parents=True,exist_ok=True)
+    device=native_ai_device()
+    duration=_duration_seconds(path)
+    if progress: progress(6,[],f"Verifica modello Whisper {model_name} · {device}")
+    python_whisper=bool(importlib.util.find_spec("whisper"))
+    model=None
+    if python_whisper:
+        import whisper  # type: ignore
+        if progress: progress(-1,[],f"Caricamento/download Whisper {model_name} · {device}")
+        try:
+            model=whisper.load_model(model_name,download_root=str(cache_dir),device=device)
+        except TypeError as exc:
+            if "device" not in str(exc):
+                raise
+            model=whisper.load_model(model_name,download_root=str(cache_dir))
+        if progress: progress(18,[],f"Modello Whisper {model_name} pronto · {device}")
+    else:
+        if progress: progress(12,[],"Whisper CLI disponibile · preparazione estrazione")
+    if duration<=0:
+        if cancelled and cancelled(): raise InterruptedError("Lyrics extraction cancelled")
+        result=(
+            _whisper_result_to_lines(model.transcribe(str(path),**_lyrics_transcribe_kwargs(language,device)))
+            if model is not None else extract_lyrics(path,model_name=model_name,language=language)
+        )
+        if progress: progress(96,result,"Trascrizione completata")
+        return result
+    items=[]
+    step=max(5,int(chunk_seconds))
+    total=max(1,int(math.ceil(duration/step)))
+    with tempfile.TemporaryDirectory(prefix="mta-whisper-live-") as td_raw:
+        td=Path(td_raw)
+        for index in range(total):
+            if cancelled and cancelled():
+                raise InterruptedError("Lyrics extraction cancelled")
+            start=index*step;remaining=max(0.1,duration-start);length=min(step,remaining)
+            base=20+round(index/total*74)
+            if progress: progress(base,items,f"Preparazione audio {index+1}/{total} · {start:.0f}-{start+length:.0f}s")
+            chunk=td/f"chunk-{index:04d}.wav"
+            _run(["ffmpeg","-y","-v","error","-ss",str(start),"-t",str(length),"-i",str(path),"-ac","1","-ar","16000","-c:a","pcm_s16le",str(chunk)])
+            if cancelled and cancelled(): raise InterruptedError("Lyrics extraction cancelled")
+            if progress: progress(min(93,base+max(1,round(30/total))),items,f"Trascrizione audio {index+1}/{total} · {device}")
+            result=(
+                model.transcribe(str(chunk),**_lyrics_transcribe_kwargs(language,device))
+                if model is not None else None
+            )
+            part=_whisper_result_to_lines(result) if result is not None else extract_lyrics(chunk,model_name=model_name,language=language)
+            items.extend(_offset_lyrics(part,round(start*1000)))
+            pct=20+round((index+1)/total*74)
+            if progress: progress(min(94,pct),items,f"Lyrics elaborate {index+1}/{total} · {min(duration,start+length):.0f}/{duration:.0f}s")
+    return items
+
+
 def extract_lyrics(path: Path, *, model_name: str | None = None, language: str | None = None) -> list[LyricLine]:
     """Transcribe a track with upstream OpenAI Whisper and preserve segment timing.
 
@@ -110,7 +225,7 @@ def extract_lyrics(path: Path, *, model_name: str | None = None, language: str |
     download it from the upstream Whisper model source/cache rather than the MTA
     model repository.
     """
-    model_name = (model_name or os.getenv("MTA_LYRICS_WHISPER_MODEL", "large-v3")).strip() or "large-v3"
+    model_name = (model_name or os.getenv("MTA_LYRICS_WHISPER_MODEL", "base")).strip() or "base"
     language = (language or os.getenv("MTA_LYRICS_LANGUAGE", "")).strip() or None
     cache_dir = Path(os.getenv("MTA_LYRICS_MODEL_DIR", str(Path(os.getenv("MTA_DATA_DIR", "/data/projects")) / ".cache" / "lyrics-models"))).expanduser()
     cache_dir.mkdir(parents=True, exist_ok=True)
@@ -120,17 +235,14 @@ def extract_lyrics(path: Path, *, model_name: str | None = None, language: str |
     if importlib.util.find_spec("whisper"):
         import whisper  # type: ignore
 
-        model = whisper.load_model(model_name, download_root=str(cache_dir))
-        kwargs = {
-            "verbose": False,
-            "word_timestamps": True,
-            "temperature": 0.0,
-            "beam_size": max(1, int(os.getenv("MTA_LYRICS_BEAM_SIZE", "8"))),
-            "patience": 1.2,
-            "condition_on_previous_text": True,
-        }
-        if language:
-            kwargs["language"] = language
+        device = native_ai_device()
+        try:
+            model = whisper.load_model(model_name, download_root=str(cache_dir), device=device)
+        except TypeError as exc:
+            if "device" not in str(exc):
+                raise
+            model = whisper.load_model(model_name, download_root=str(cache_dir))
+        kwargs = _lyrics_transcribe_kwargs(language, device)
         result = model.transcribe(str(path), **kwargs)
         return _whisper_result_to_lines(result)
 
@@ -247,24 +359,99 @@ def _normalize_madmom_chord(label: str) -> str:
     return value
 
 
-def _extract_chords_madmom(path: Path, engine: str) -> list[Chord]:
+def _madmom_processor(engine: str):
+    device=native_ai_device()
+    use_torch=device != "cpu"
     if engine == "madmom-deep-chroma":
         from madmom_infer.audio.chroma import DeepChromaProcessor  # type: ignore
         from madmom_infer.features.chords import DeepChromaChordRecognitionProcessor  # type: ignore
         from madmom_infer.processors import SequentialProcessor  # type: ignore
-        proc=SequentialProcessor([DeepChromaProcessor(), DeepChromaChordRecognitionProcessor()])
-    elif engine == "madmom-cnn-crf":
+        try:
+            feature=DeepChromaProcessor(backend="torch",device=device) if use_torch else DeepChromaProcessor()
+        except Exception as exc:
+            logger.warning("Madmom accelerator %s unavailable, using NumPy backend: %s",device,exc)
+            feature=DeepChromaProcessor()
+        return SequentialProcessor([feature,DeepChromaChordRecognitionProcessor()]),device if use_torch else "cpu"
+    if engine == "madmom-cnn-crf":
         from madmom_infer.features.chords import CNNChordFeatureProcessor, CRFChordRecognitionProcessor  # type: ignore
         from madmom_infer.processors import SequentialProcessor  # type: ignore
-        proc=SequentialProcessor([CNNChordFeatureProcessor(), CRFChordRecognitionProcessor()])
-    else:
-        raise ValueError("unsupported Madmom chord engine")
-    rows=proc(str(path));events=[];last=None
+        try:
+            feature=CNNChordFeatureProcessor(backend="torch",device=device) if use_torch else CNNChordFeatureProcessor()
+        except Exception as exc:
+            logger.warning("Madmom accelerator %s unavailable, using NumPy backend: %s",device,exc)
+            feature=CNNChordFeatureProcessor()
+        return SequentialProcessor([feature,CRFChordRecognitionProcessor()]),device if use_torch else "cpu"
+    raise ValueError("unsupported Madmom chord engine")
+
+
+def _madmom_pcm_wav(path: Path, destination: Path) -> Path:
+    # madmom-infer's wave reader accepts RIFF/RIFX/RF64 PCM, not MP3/M4A/AAC
+    # payloads. Always canonicalise the analysis input and leave project media intact.
+    _run(["ffmpeg","-y","-v","error","-i",str(path),"-ac","1","-ar","44100","-c:a","pcm_s16le",str(destination)])
+    return destination
+
+
+def _madmom_rows_to_events(rows, offset_ms: int = 0) -> list[Chord]:
+    events=[];last=None
     for row in rows:
         try: start=float(row[0]);label=_normalize_madmom_chord(str(row[2]))
-        except (TypeError, ValueError, IndexError): continue
+        except (TypeError,ValueError,IndexError): continue
         if not label or label==last: continue
-        events.append(Chord(time_ms=max(0,round(start*1000)),chord=label));last=label
+        events.append(Chord(time_ms=max(0,round(start*1000)+offset_ms),chord=label));last=label
+    return events
+
+
+def _extract_chords_madmom(path: Path, engine: str) -> list[Chord]:
+    proc,_device=_madmom_processor(engine)
+    with tempfile.TemporaryDirectory(prefix="mta-madmom-") as td_raw:
+        wav=_madmom_pcm_wav(path,Path(td_raw)/"analysis.wav")
+        return _madmom_rows_to_events(proc(str(wav)))
+
+
+def extract_chords_progressive(
+    path: Path, *, engine: str, progress: Callable[[int,list[Chord],str],None] | None = None,
+    cancelled: Callable[[],bool] | None = None, chunk_seconds: int = 5,
+) -> list[Chord]:
+    """Extract chords in chunks so jobs can expose partial results and cancel."""
+    duration=_duration_seconds(path)
+    events=[];last=None
+    proc=None;device="CPU"
+    if engine in {"madmom-deep-chroma","madmom-cnn-crf"}:
+        if progress: progress(-1,[],"Caricamento/download modello Madmom / backend AI")
+        proc,device=_madmom_processor(engine)
+        if progress: progress(16,[],f"Modello chords pronto · {device}")
+    elif progress:
+        progress(10,[],f"Preparazione motore chords · {engine}")
+    with tempfile.TemporaryDirectory(prefix="mta-chords-live-") as td_raw:
+        td=Path(td_raw)
+        if duration<=0:
+            if cancelled and cancelled(): raise InterruptedError("Chord extraction cancelled")
+            if proc is not None:
+                wav=_madmom_pcm_wav(path,td/"analysis.wav")
+                events=_madmom_rows_to_events(proc(str(wav)))
+            else:
+                events=extract_chords(path,engine=engine)
+            if progress: progress(96,events,"Analisi chords completata")
+            return events
+        step=max(5,int(chunk_seconds));total=max(1,int(math.ceil(duration/step)))
+        for index in range(total):
+            if cancelled and cancelled(): raise InterruptedError("Chord extraction cancelled")
+            start=index*step;length=min(step,max(.1,duration-start));base=20+round(index/total*74)
+            if progress: progress(base,events,f"Preparazione audio chords {index+1}/{total} · {start:.0f}-{start+length:.0f}s")
+            chunk=td/f"chunk-{index:04d}.wav"
+            _run(["ffmpeg","-y","-v","error","-ss",str(start),"-t",str(length),"-i",str(path),"-ac","1","-ar","44100","-c:a","pcm_s16le",str(chunk)])
+            if cancelled and cancelled(): raise InterruptedError("Chord extraction cancelled")
+            if progress: progress(min(93,base+max(1,round(30/total))),events,f"Analisi chords {index+1}/{total} · {device}")
+            part=(
+                _madmom_rows_to_events(proc(str(chunk)),round(start*1000))
+                if proc is not None else
+                [Chord(time_ms=item.time_ms+round(start*1000),chord=item.chord) for item in extract_chords(chunk,engine=engine)]
+            )
+            for item in part:
+                if item.chord==last: continue
+                events.append(item);last=item.chord
+            pct=20+round((index+1)/total*74)
+            if progress: progress(min(94,pct),events,f"Chords elaborati {index+1}/{total} · {min(duration,start+length):.0f}/{duration:.0f}s")
     return events
 
 

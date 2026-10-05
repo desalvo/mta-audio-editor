@@ -322,10 +322,18 @@ class NativeApi:
                 update_channel = normalize_channel(raw.get("update_channel", "stable"))
             except (OSError, ValueError, TypeError, json.JSONDecodeError):
                 pass
+        recent_projects = []
+        if path.is_file():
+            try:
+                raw = json.loads(path.read_text(encoding="utf-8"))
+                recent_projects = [str(x) for x in raw.get("recent_projects", []) if str(x).strip()][:12]
+            except (OSError, ValueError, TypeError, json.JSONDecodeError):
+                recent_projects = []
         return {
             "max_upload_mb": min(10240, max(1, value)),
             "autosave_enabled": autosave_enabled,
             "update_channel": update_channel,
+            "recent_projects": recent_projects,
         }
 
     def set_native_settings(self, max_upload_mb: int, autosave_enabled: bool = True, update_channel: str = "stable") -> dict:
@@ -336,13 +344,19 @@ class NativeApi:
         root.mkdir(parents=True, exist_ok=True)
         from native.update_manager import normalize_channel
         channel = normalize_channel(update_channel)
-        (root / "native-settings.json").write_text(
-            json.dumps({
-                "max_upload_mb": value,
-                "autosave_enabled": bool(autosave_enabled),
-                "update_channel": channel,
-            }, indent=2) + "\n", encoding="utf-8"
-        )
+        settings_path = root / "native-settings.json"
+        existing = {}
+        if settings_path.is_file():
+            try:
+                existing = json.loads(settings_path.read_text(encoding="utf-8"))
+            except (OSError, ValueError, TypeError, json.JSONDecodeError):
+                existing = {}
+        existing.update({
+            "max_upload_mb": value,
+            "autosave_enabled": bool(autosave_enabled),
+            "update_channel": channel,
+        })
+        settings_path.write_text(json.dumps(existing, indent=2) + "\n", encoding="utf-8")
         os.environ["MTA_MAX_UPLOAD_MB"] = str(value)
         # app.main is already imported after the embedded server starts; update the
         # live request/upload limit as well as persisting it for the next launch.
@@ -354,6 +368,28 @@ class NativeApi:
             "autosave_enabled": bool(autosave_enabled),
             "update_channel": channel,
         }
+
+
+    def set_recent_projects(self, project_ids: list[str]) -> dict:
+        root = _data_root()
+        root.mkdir(parents=True, exist_ok=True)
+        path = root / "native-settings.json"
+        raw = {}
+        if path.is_file():
+            try:
+                raw = json.loads(path.read_text(encoding="utf-8"))
+            except (OSError, ValueError, TypeError, json.JSONDecodeError):
+                raw = {}
+        clean = []
+        for project_id in project_ids or []:
+            value = str(project_id).strip()
+            if value and value not in clean:
+                clean.append(value)
+            if len(clean) >= 12:
+                break
+        raw["recent_projects"] = clean
+        path.write_text(json.dumps(raw, indent=2) + "\n", encoding="utf-8")
+        return {"ok": True, "recent_projects": clean}
 
     def list_local_models(self) -> dict:
         from native.model_manager import list_local, catalog

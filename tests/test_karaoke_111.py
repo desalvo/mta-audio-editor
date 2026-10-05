@@ -64,7 +64,7 @@ def test_pdf_chord_color_and_mp4_ui_are_exposed():
 
 def test_accuracy_defaults_prefer_large_whisper_and_chordino():
     music = (ROOT / "app/music_text.py").read_text(encoding="utf-8")
-    assert 'MTA_LYRICS_WHISPER_MODEL", "large-v3"' in music
+    assert 'MTA_LYRICS_WHISPER_MODEL' in music and '"base"' in music
     assert '"word_timestamps": True' in music
     assert '"beam_size": max(1, int(os.getenv("MTA_LYRICS_BEAM_SIZE", "8")))' in music
     assert "vamp:nnls-chroma:chordino:simplechord" in music
