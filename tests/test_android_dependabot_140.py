@@ -13,5 +13,7 @@ def test_android_dependabot_updates_are_integrated():
 
 def test_android_package_version_matches_release():
     gradle = (ROOT / "mobile/android/app/build.gradle.kts").read_text(encoding="utf-8")
-    assert 'versionCode = 20151' in gradle
-    assert 'versionName = "0.2.0-151"' in gradle
+    version = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
+    revision = int(version.rsplit("-", 1)[1])
+    assert f'versionCode = {20000 + revision}' in gradle
+    assert f'versionName = "{version}"' in gradle

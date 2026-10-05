@@ -1,3 +1,9 @@
+# 0.2.0-153
+
+- Fixed the GitHub Actions Quality gate after 0.2.0-152: the Android package-version regression test no longer hardcodes the previous release number.
+- The Android release test now derives both `versionName` and `versionCode` from the repository `VERSION`, preventing the same CI failure on subsequent revision bumps.
+- Advanced Android/iOS/native package metadata to 0.2.0-153 while preserving the 0.2.0-152 Windows `.maeproj` Inno Setup quoting fix and all 0.2.0-151 playback changes.
+
 # 0.2.0-152
 
 - Fixed the Native Windows installer Inno Setup compile failure in the `.maeproj` file association.
