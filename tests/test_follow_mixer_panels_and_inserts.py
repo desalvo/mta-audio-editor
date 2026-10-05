@@ -41,9 +41,10 @@ def test_ui_has_follow_collapsible_mixer_panels_master_divider_and_mixer_insert_
     assert "pane.scrollLeft=Math.max" in js
     assert "followPlayhead(playheadX)" in js
 
-    assert "toggleMixerPanel('export')" in html
+    assert 'onclick="openExportPanel()"' in html
     assert "toggleMixerPanel('meta')" in html
-    assert "export_panel_visible" in js
+    assert "function exportWindowHtml()" in js
+    assert "exportPaneHtml" not in js
     assert "metadata_panel_visible" in js
     assert "gridTemplateColumns" in js
 

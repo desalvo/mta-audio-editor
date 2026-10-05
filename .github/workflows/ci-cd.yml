@@ -75,7 +75,13 @@ jobs:
           pip-audit -r requirements.txt --strict
           pip-audit -r requirements-native.txt --strict
           pip-audit -r requirements-lyrics.txt --strict
-          pip-audit -r requirements-chords.txt --strict
+          # requirements-chords uses a commit-pinned direct URL because the latest PyPI
+          # release predates the chord/chroma modules. Audit the resolved installed
+          # environment instead of asking pip-audit to parse the direct URL requirement.
+          python -m venv /tmp/mta-chords-audit
+          /tmp/mta-chords-audit/bin/python -m pip install --upgrade pip pip-audit
+          /tmp/mta-chords-audit/bin/python -m pip install -r requirements-chords.txt
+          /tmp/mta-chords-audit/bin/pip-audit --strict
           # pip-audit/PyPI cannot identify PyTorch local-version wheels such as
           # 2.14.1+cpu. Audit the equivalent upstream public version instead.
           sed '/^--extra-index-url /d; s/^torch==\(.*\)+cpu$/torch==\1/' requirements-stems.txt > /tmp/requirements-stems-audit.txt
@@ -104,7 +110,7 @@ jobs:
       - name: Generate build id
         id: build
         shell: bash
-        run: echo "id=$(TZ=Europe/Rome date '+%Y%m%d-%H:%M:%S')" >> "$GITHUB_OUTPUT"
+        run: echo "id=$(TZ=Europe/Rome date '+%Y%m%d%H%M%S')" >> "$GITHUB_OUTPUT"
       - name: Build local validation image
         uses: docker/build-push-action@v7
         with:
@@ -219,7 +225,7 @@ jobs:
       - name: Generate native build id
         shell: pwsh
         run: |
-          $build=(Get-Date).ToUniversalTime().ToString("yyyyMMdd-HH:mm:ss")
+          $build=(Get-Date).ToUniversalTime().ToString("yyyyMMddHHmmss")
           Set-Content -Path BUILD_INFO -Value $build
       - name: Generate native application metadata
         shell: pwsh
@@ -319,7 +325,7 @@ jobs:
           echo "MTA_NATIVE_FFPROBE=$(command -v ffprobe)" >> "$GITHUB_ENV"
       - name: Generate native build id
         shell: bash
-        run: TZ=Europe/Rome date '+%Y%m%d-%H:%M:%S' > BUILD_INFO
+        run: TZ=Europe/Rome date '+%Y%m%d%H%M%S' > BUILD_INFO
       - name: Generate native application metadata
         shell: bash
         run: python native/generate_native_metadata.py
@@ -684,7 +690,7 @@ jobs:
       - name: Generate build id
         id: build
         shell: bash
-        run: echo "id=$(TZ=Europe/Rome date '+%Y%m%d-%H:%M:%S')" >> "$GITHUB_OUTPUT"
+        run: echo "id=$(TZ=Europe/Rome date '+%Y%m%d%H%M%S')" >> "$GITHUB_OUTPUT"
       - name: Resolve application version
         id: version
         shell: bash

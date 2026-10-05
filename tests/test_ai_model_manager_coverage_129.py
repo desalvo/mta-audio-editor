@@ -92,7 +92,7 @@ def test_chord_catalog_availability_snapshot_and_validation(monkeypatch, tmp_pat
     monkeypatch.setenv("MTA_DATA_DIR", str(tmp_path))
     monkeypatch.setenv("XDG_CACHE_HOME", str(tmp_path / "xdg"))
     real_find_spec = m.importlib.util.find_spec
-    monkeypatch.setattr(m.importlib.util, "find_spec", lambda name: object() if name == "madmom_infer" else real_find_spec(name))
+    monkeypatch.setattr(m.importlib.util, "find_spec", lambda name: object() if name.startswith("madmom_infer") else real_find_spec(name))
     monkeypatch.setattr("shutil.which", lambda name: "/usr/bin/sonic-annotator" if name == "sonic-annotator" else None)
 
     assert m.chord_engine_available("madmom-deep-chroma") is True
@@ -128,7 +128,7 @@ def test_chord_model_downloads_and_safe_delete(monkeypatch, tmp_path):
     monkeypatch.setenv("XDG_CACHE_HOME", str(tmp_path / "xdg"))
     _fake_madmom(monkeypatch)
     real_find_spec = m.importlib.util.find_spec
-    monkeypatch.setattr(m.importlib.util, "find_spec", lambda name: object() if name == "madmom_infer" else real_find_spec(name))
+    monkeypatch.setattr(m.importlib.util, "find_spec", lambda name: object() if name.startswith("madmom_infer") else real_find_spec(name))
 
     snapshots = [set(), {"deep.bin"}, {"deep.bin"}, {"deep.bin", "cnn.bin"}]
     monkeypatch.setattr(m, "_cache_snapshot", lambda: snapshots.pop(0))

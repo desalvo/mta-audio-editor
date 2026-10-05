@@ -10,7 +10,7 @@ Alessandro De Salvo <braket71@gmail.com>
 **Repository:** `desalvo/mta-audio-editor`  
 **License:** EUPL-1.2  
 **Version:** `0.2.0-95`  
-**Build:** generated as `YYYYMMDD-HH:MM:SS`.
+**Build:** generated as `YYYYMMDDhhmmss`.
 
 [Italian README](README_IT.md)
 
@@ -144,3 +144,14 @@ The dedicated vocal split uses `audio-separator==0.47.0` and downloads the selec
 ### Lyrics and Chords model management
 
 Since 0.2.0-126, Lyrics and Chords models are managed on demand like the other AI models. Web deployments cache weights on the server; native desktop applications cache them locally. Lyrics can use the selectable OpenAI Whisper models (`large-v3` by default). Chords always exposes the selected engine before extraction: Madmom Deep Chroma + CRF (default AI), Madmom CNN + CRF, Chordino / NNLS-Chroma, or the built-in MTA Chromagram analyser. The UI also discloses the non-commercial CC BY-NC-SA 4.0 license of the Madmom checkpoint weights.
+
+### Waveform/sample editor
+Double-click a timeline waveform or use the track context menu to open the dedicated high-resolution editor. Sample-addressable selections support Cut/Copy/Paste/Remove. In-place processing provides debounced A/B preview for fine Pitch Correction (semitones + cents), pitch-to-scale Auto-Tune (key/scale/strength), Normalizer, Maximizer and a 32-band Graphic EQ with presets. Committing creates a new source for the edited track only, leaving other instances of the original asset untouched.
+
+
+### Project navigation and Export
+
+- **Export** opens a dedicated on-demand dialog instead of occupying a persistent mixer-side panel.
+- The old sidebar **PROJECTS** section has been removed.
+- In the web app, **Open project** lists projects already available on the server and **Open local project** imports a project archive from the device.
+- In the native desktop app, **Open recent** lists recently opened projects that still exist in the local workspace, while **Open project** uses the native filesystem picker.

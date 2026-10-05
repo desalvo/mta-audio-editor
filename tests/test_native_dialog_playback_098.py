@@ -19,12 +19,13 @@ def test_utility_backdrop_does_not_close_on_incidental_clicks():
 
 def test_dynamic_playback_uses_adaptive_buffer_and_smooth_drift_correction():
     text = (ROOT / "app/static/app.js").read_text(encoding="utf-8")
-    assert "if(audio.readyState>=3)return Promise.resolve()" in text
-    assert "audio.addEventListener('canplay',finish" in text
-    assert "audio.addEventListener('canplaythrough'" not in text[text.index("function waitForMediaBuffer"):text.index("function stopDynamicSyncMonitor")]
-    assert "audio.playbackRate=Math.max(.985,Math.min(1.015,1-drift*.20))" in text
-    assert "Math.abs(drift)>0.120" in text
-    assert "setInterval(()=>alignDynamicTracks(false),50)" in text
+    buffer_block = text[text.index("function waitForMediaBuffer"):text.index("function stopDynamicSyncMonitor")]
+    assert "audio.buffered.end(i)-pos>=Math.min(3" in buffer_block
+    assert "audio.addEventListener('canplaythrough',check)" in buffer_block
+    assert "audio.addEventListener('progress',check)" in buffer_block
+    assert "audio.readyState<3||audio.seeking" in text
+    assert "audio.playbackRate=Math.max(.995,Math.min(1.005,1-drift*.06))" in text
+    assert "setInterval(()=>alignDynamicTracks(false),250)" in text
 
 
 def test_live_mixer_controls_are_not_buffer_gated():

@@ -2,7 +2,7 @@
 set -Eeuo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
-BUILD_ID="$(TZ=Europe/Rome date '+%Y%m%d-%H:%M:%S')"
+BUILD_ID="$(TZ=Europe/Rome date '+%Y%m%d%H%M%S')"
 printf '%s\n' "$BUILD_ID" > BUILD_INFO
 python scripts/build_docs.py
 ./scripts/production_gate.sh

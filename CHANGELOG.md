@@ -1,3 +1,60 @@
+## 0.2.0-139
+
+- Project Clip browser now starts collapsed and resets to collapsed whenever a project is created, opened or imported.
+- Web Settings are robustly available to administrators and reload the session if needed before routing.
+- Native desktop viewport is pinned to the application frame so accidental document scrolling cannot strand the UI below the top.
+
+## 0.2.0-138
+
+- Redesigned About dialog with a large application logo and documentation cover photo background that does not interfere with application information.
+- Build identifiers now use the strict 14-digit `YYYYMMDDhhmmss` format.
+- Native Settings buttons use explicit WebView-safe text styling.
+- Settings is now available to normal web users with editor preferences, AI model management and account access; administrators also get server administration access.
+
+## 0.2.0-137
+
+- Export is now an on-demand dedicated dialog and is no longer kept as a persistent panel beside the mixer.
+- Removed the vertical PROJECTS section from the sidebar.
+- Added native-only Open recent under PROJECT / FILE, limited to projects that still exist in the native workspace.
+- Web Open project now lists projects already active on the server; Open local project imports a project archive from the user's device.
+- Native Open project keeps the filesystem-native project picker.
+
+## 0.2.0-136
+
+- Added a dedicated high-resolution waveform/sample editor opened from a track context menu or by double-clicking its timeline waveform.
+- Added sample-addressable selection/readout plus cut, copy, paste and remove operations that create an isolated edited source for the selected track.
+- Added in-place Pitch Correction (semitones + cents), pitch-to-scale Auto-Tune, Normalizer, Maximizer and 32-band Graphic EQ with factory presets and debounced processed previews.
+- The sample editor uses a cached pre-insert track render and an adaptive min/max envelope pyramid so waveform detail follows the current zoom without plotting every audio sample.
+
+## 0.2.0-135
+
+- Fix native Madmom chord recognition bundling by explicitly freezing its lazily imported chord/chroma/CRF modules and checking real submodule availability.
+- Clarify Chordino/NNLS-Chroma status: it uses no AI model and requires an installed Sonic Annotator + Chordino engine.
+- Replace slow waveform full-audio fetch/decode rendering with zoom-aware drawing from persisted waveform peaks only.
+
+## 0.2.0-134
+
+- Fixed native Lyrics/Chords model download buttons and native TLS trust-store handling.
+- Native TLS now uses the OS trust store via truststore, with verification kept enabled.
+- Fixed Chords AI runtime by pinning madmom-infer to an upstream commit that actually contains chroma/chord modules; PyPI 0.2.0 predates them.
+- Model download endpoints now return useful diagnostics instead of a generic HTTP 500.
+
+## 0.2.0-133
+
+- Track context menu: “Separa” now always opens a parameter wizard before starting, with explicit Demucs model, stem count and optional Lead/Backing model selection.
+- Track stem jobs now pass the selected stem_count to the Demucs plugin instead of only storing it in the job metadata.
+- Dynamic multitrack playback: removed aggressive 50 ms hard-seek correction that could starve buffering tracks after 1–2 seconds; buffering recovery is now conservative and drift correction is smooth.
+- Dynamic multitrack playback: require a real buffered-ahead window before synchronized start and use a healthier active media clock when the previous clock stalls/ends.
+- Transport Stop now invalidates pending playback/render startups immediately and aborts media loading where possible, preventing delayed restart after Stop.
+- Improved timeline/audio synchronization during start, seek, resume and recovery from buffering.
+
+## 0.2.0-132
+
+- Mixer: separate fader, dB scale and realtime VU columns so meters never overlap the volume control.
+- Mixer: always-visible graduated dB scale beside every track and Master fader.
+- Mixer: double-clicking the volume fader resets the level to 0 dB for tracks and Master.
+- Mixer: add realtime-only red PEAK LEDs, latched at 0 dBFS until meter reset/stop.
+
 ## 0.2.0-131
 
 - Fix macOS Intel native dependency resolution: keep NumPy 1.26.4 while installing the chord engine so it remains compatible with Numba 0.61.2 / llvmlite 0.44.0 used by Whisper.

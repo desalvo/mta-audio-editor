@@ -15,8 +15,10 @@ def test_track_context_menu_exposes_separate_action():
     css = (root / "app/static/app.css").read_text(encoding="utf-8")
 
     assert "openTrackContextMenu(event" in js
+    assert "openTrackStemWorkflow(" in js
     assert "startTrackStemSplit(" in js
-    assert "/stem-jobs?model=" in js
+    assert "new URLSearchParams({model,stem_count:String(stemCount)" in js
+    assert "Avvia separazione" in js
     assert "<span>Separa</span>" in js
     assert ".track-context-menu" in css
 
@@ -67,7 +69,7 @@ def test_existing_track_can_start_stem_job_and_original_track_is_kept(tmp_path, 
             }
 
         @classmethod
-        def split(cls, source, output_dir, model="htdemucs_6s", *, progress=None, cancel_event=None):
+        def split(cls, source, output_dir, model="htdemucs_6s", *, stem_count=0, progress=None, cancel_event=None):
             output_dir.mkdir(parents=True, exist_ok=True)
             result = []
             for name in ("vocals", "other"):

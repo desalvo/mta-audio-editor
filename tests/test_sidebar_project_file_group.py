@@ -9,7 +9,7 @@ def test_project_file_sidebar_group_is_collapsible_and_collapsed_by_default():
 
     assert 'class="sidebar-tools collapsed" id="projectToolsPanel"' in html
     assert "PROJECT / FILE" in html
-    for label in ("Export", "Save project locally", "Save project as", "Open project", "Project files", "Delete project"):
+    for label in ("Export", "Save project locally", "Save project as", "Open recent", "Open project", "Open local project", "Project files", "Delete project"):
         assert label in html
     assert "function toggleProjectToolsPanel()" in js
     assert ".sidebar-tools.collapsed .sidebar-tools-body{display:none}" in css

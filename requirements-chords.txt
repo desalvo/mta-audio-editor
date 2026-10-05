@@ -1,7 +1,7 @@
 # Optional/bundled chord-recognition AI engine.
-# madmom-infer is pure Python/NumPy and downloads the separately licensed
-# chord checkpoints on demand into XDG_CACHE_HOME/madmom_infer/models.
-madmom-infer==0.2.0
+# Chord/chroma support is pinned to a reviewed upstream commit because PyPI 0.2.0
+# predates these modules. Model weights remain runtime-only and separately licensed.
+madmom-infer @ https://github.com/openmirlab/madmom-infer/archive/bffead9be61857fd44b2e0d3a2510d9d94c8f2d2.zip
 
 # macOS Intel / Python 3.12: keep NumPy compatible with the Whisper Numba stack.
 # madmom-infer's generic NumPy dependency would otherwise resolve to the newest NumPy.

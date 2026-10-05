@@ -50,6 +50,7 @@ let renderedMasterPlayback=false, renderedMasterDirty=false, renderedMasterRefre
 let dynamicSyncClock=null, dynamicSyncTimer=null, playbackBuffering=false;
 const liveFxRefreshTimers={};
 let lastSelectedAudioFile=null, playbackPaused=false, mixerMetaTab='lyrics', pendingExportConfig=null, pendingNewProjectPath=null;
+let sampleEditor=null,sampleEditorPreviewAbort=null,sampleEditorPreviewTimer=null,serverProjects=[];
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const TRACK_COLORS=['#2f81f7','#28b463','#f0a52b','#8a58db','#e9506c','#8395a7','#24b8d4','#b26ff2','#e67e22','#16a085','#d35400','#7f8c8d'];
 
@@ -60,6 +61,8 @@ function isMobileClient(){return ['android','ios'].includes(mobilePlatform())}
 function supportsLocalIosStems(){return mobilePlatform()==='ios'&&!!window.MtaMobile?.startLocalStemSeparation}
 function nativeApi(){return window.pywebview?.api||null}
 function isNativeDesktop(){return !!nativeApi()||!!currentUser?.native_single_user}
+function forceNativeViewportTop(){if(!currentUser?.native_single_user&&!document.body.classList.contains('native-single-user'))return;requestAnimationFrame(()=>{window.scrollTo(0,0);document.documentElement.scrollTop=0;document.body.scrollTop=0})}
+function installNativeViewportGuard(){if(!currentUser?.native_single_user)return;document.body.classList.add('native-single-user');const guard=()=>{if(window.scrollY||document.documentElement.scrollTop||document.body.scrollTop)forceNativeViewportTop()};window.addEventListener('scroll',guard,{passive:true});window.addEventListener('focus',forceNativeViewportTop);document.addEventListener('focusin',()=>setTimeout(forceNativeViewportTop,0));forceNativeViewportTop()}
 let nativeBridgeReadyPromise=null;
 function waitForPywebviewReadyEvent(timeoutMs){
   if(nativeApi())return Promise.resolve(nativeApi());
@@ -113,7 +116,7 @@ function selectedTrackIds(){return $$('.track-check:checked').map(x=>x.value)}
 function linesToText(a,b){return(a||[]).map(x=>`${(x.time_ms/1000).toFixed(3)}\t${x[b]}`).join('\n')}
 function textToLines(v,key){return v.split(/\n/).map(x=>x.trim()).filter(Boolean).map(line=>{const [t,...rest]=line.split(/\t|\s{2,}/);return{time_ms:Math.max(0,Math.round(parseFloat(t)*1000)||0),[key]:rest.join(' ').trim()}})}
 
-async function init(){if(isMobileClient())document.body.classList.add('mobile-client');try{currentUser=await api('/api/session');const a=$('#adminNav');if(a)a.hidden=!!currentUser.native_single_user||currentUser.role!=='admin';const sb=$('#nativeSettingsButton');if(sb)sb.hidden=!(currentUser.native_single_user||currentUser.role==='admin');if(currentUser.native_single_user){document.body.classList.add('native-single-user')}}catch(e){}if(currentUser?.native_single_user){const bridge=await waitForNativeApi();if(bridge?.get_native_settings){try{const cfg=await bridge.get_native_settings();autosaveEnabled=cfg.autosave_enabled!==false}catch(e){}}setTimeout(()=>checkNativeAppUpdate(false),1200)}try{pluginInfo=await api('/api/plugins')}catch(e){}await refresh()}
+async function init(){if(isMobileClient())document.body.classList.add('mobile-client');try{currentUser=await api('/api/session');const a=$('#adminNav');if(a)a.hidden=!!currentUser.native_single_user||currentUser.role!=='admin';const sb=$('#nativeSettingsButton');if(sb)sb.hidden=false;const recentBtn=$('#openRecentProjectBtn'),localBtn=$('#openLocalProjectBtn');if(currentUser.native_single_user){document.body.classList.add('native-single-user');if(recentBtn)recentBtn.hidden=false;if(localBtn)localBtn.hidden=true}else{if(recentBtn)recentBtn.hidden=true;if(localBtn)localBtn.hidden=false}}catch(e){}if(currentUser?.native_single_user)installNativeViewportGuard();if(currentUser&&!currentUser.native_single_user)autosaveEnabled=localStorage.getItem('mtaWebAutosaveEnabled')!=='false';if(currentUser?.native_single_user){const bridge=await waitForNativeApi();if(bridge?.get_native_settings){try{const cfg=await bridge.get_native_settings();autosaveEnabled=cfg.autosave_enabled!==false}catch(e){}}setTimeout(()=>checkNativeAppUpdate(false),1200)}try{pluginInfo=await api('/api/plugins')}catch(e){}await refresh()}
 
 function toggleEditingToolsPanel(){
   const panel=$('#editingToolsPanel');if(!panel)return;
@@ -147,25 +150,32 @@ function closeCurrentProject(){
   toast('Progetto chiuso');
 }
 
-function toggleProjectsPanel(){
-  const panel=$('#projectsPanel');if(!panel)return;
-  const collapsed=panel.classList.toggle('collapsed');
-  $('#projectsChevron').textContent=collapsed?'▸':'▾';
-  panel.querySelector('.projects-toggle')?.setAttribute('aria-expanded',String(!collapsed));
-}
+function recentProjectIds(){try{return JSON.parse(localStorage.getItem('mtaRecentProjects')||'[]').filter(Boolean)}catch(e){return[]}}
+function rememberRecentProject(id){if(!id)return;const ids=[String(id),...recentProjectIds().filter(x=>String(x)!==String(id))].slice(0,12);localStorage.setItem('mtaRecentProjects',JSON.stringify(ids))}
+function forgetRecentProject(id){localStorage.setItem('mtaRecentProjects',JSON.stringify(recentProjectIds().filter(x=>String(x)!==String(id))))}
+function resetProjectUiForOpen(){clipBrowserExpanded=false;clipBrowserQuery='';clipBrowserPage=1;expandedProjectClipDetails=new Set();uiState={trackTop:0,timelineTop:0,timelineLeft:0,mixerLeft:0};if(currentUser?.native_single_user)forceNativeViewportTop()}
 async function refresh(){
-  const ps=await api('/api/projects');
-  $('#projects').innerHTML=ps.map(p=>{
-    const shared=currentUser&&p.owner_user_id&&p.owner_user_id!==currentUser.id;
-    return `<div class="project-row ${current&&p.id===current.id?'active':''}" data-project="${p.id}">
-      <button class="project-open" data-open-project="${p.id}" title="Apri ${esc(p.title)}">${shared?'⌘ ':''}<span>${esc(p.title)}</span><small>${shared?'shared · ':''}${p.target}</small></button>
-      <button class="project-mini" data-download-project="${p.id}" title="Salva progetto localmente">⬇</button>
-      ${!shared?`<button class="project-mini danger" data-delete-project="${p.id}" data-project-title="${encodeURIComponent(p.title)}" title="Elimina progetto">×</button>`:''}
-    </div>`;
-  }).join('');
-  $$('[data-open-project]').forEach(el=>el.addEventListener('click',()=>openP(el.dataset.openProject)));
-  $$('[data-download-project]').forEach(el=>el.addEventListener('click',()=>downloadProjectArchive(el.dataset.downloadProject)));
-  $$('[data-delete-project]').forEach(el=>el.addEventListener('click',()=>deleteProjectFromWorkspace(el.dataset.deleteProject,decodeURIComponent(el.dataset.projectTitle||''))));
+  try{serverProjects=await api('/api/projects')}catch(e){serverProjects=[]}
+  return serverProjects;
+}
+function projectPickerRows(projects,emptyMessage){
+  return projects.length?`<div class="project-picker-list">${projects.map(p=>{const shared=currentUser&&p.owner_user_id&&p.owner_user_id!==currentUser.id;return `<button class="project-picker-row" onclick="openProjectFromPicker('${esc(p.id)}')"><span><b>${shared?'⌘ ':''}${esc(p.title)}</b><small>${shared?'Shared · ':''}${esc(p.target||'DAW')}</small></span><strong>Apri ›</strong></button>`}).join('')}</div>`:`<p class="hint">${esc(emptyMessage)}</p>`;
+}
+async function openProjectFromPicker(id){closeUtilityModal();await openP(id)}
+async function openProjectSelector(){
+  if(currentUser?.native_single_user)return openProjectArchive();
+  const projects=await refresh();
+  showUtilityModal('Open project',`${projectPickerRows(projects,'Nessun progetto attivo sul server.')}<div class="utility-actions"><button class="utility-btn secondary" onclick="closeUtilityModal()">Annulla</button></div>`);
+}
+async function openRecentProjects(){
+  if(!currentUser?.native_single_user)return;
+  const projects=await refresh(),byId=new Map(projects.map(p=>[String(p.id),p]));
+  const recent=recentProjectIds().map(id=>byId.get(String(id))).filter(Boolean);
+  showUtilityModal('Open recent',`${projectPickerRows(recent,'Nessun progetto recente ancora disponibile.')}<div class="utility-actions"><button class="utility-btn secondary" onclick="closeUtilityModal()">Annulla</button></div>`);
+}
+function openLocalProject(){
+  if(currentUser?.native_single_user)return openProjectArchive();
+  $('#projectArchiveFile')?.click();
 }
 async function newProject(){
   if(activeStemJob)return toast('Attendi il completamento della separazione prima di creare un altro progetto.');
@@ -216,8 +226,8 @@ async function createProjectFromDialog(){
     if(currentUser?.native_single_user&&pendingNewProjectPath&&window.pywebview?.api?.bind_project_path){
       await window.pywebview.api.bind_project_path(created.id,pendingNewProjectPath);
     }
-    current=created;
-    selectedTrackId=null;resetSessionHistory();
+    current=created;rememberRecentProject(current.id);
+    selectedTrackId=null;resetProjectUiForOpen();resetSessionHistory();
     closeUtilityModal();render();await refresh();
     toast(currentUser?.native_single_user?`Progetto ${target} creato in ${pendingNewProjectPath}`:`Progetto ${target} creato e salvato nel workspace`);
     pendingNewProjectPath=null;
@@ -227,8 +237,8 @@ async function openP(id){
   if(activeStemJob&&activeStemProjectId&&id!==activeStemProjectId){
     return toast('La separazione è in corso: resta nel progetto corrente fino al completamento.');
   }
-  await flushAutosave();stopPlayback();uiState={trackTop:0,timelineTop:0,timelineLeft:0,mixerLeft:0};
-  current=await api('/api/projects/'+id);selectedTrackId=current.tracks[0]?.id||null;resetSessionHistory();render();refresh();
+  await flushAutosave();stopPlayback();
+  current=await api('/api/projects/'+id);rememberRecentProject(current.id);selectedTrackId=current.tracks[0]?.id||null;resetProjectUiForOpen();resetSessionHistory();render();refresh();
 }
 function downloadProjectArchive(id){window.location.href=`/api/projects/${id}/archive`}
 async function saveAsProject(){
@@ -262,7 +272,7 @@ async function openProjectArchive(){
     try{
       const result=await window.pywebview.api.open_project();
       if(!result?.ok)return;
-      current=result.project;selectedTrackId=current.tracks[0]?.id||null;render();await refresh();toast('Progetto aperto dal filesystem');return;
+      current=result.project;rememberRecentProject(current.id);selectedTrackId=current.tracks[0]?.id||null;resetProjectUiForOpen();render();await refresh();toast('Progetto aperto dal filesystem');return;
     }catch(e){toast('Apertura progetto fallita: '+e.message);return}
   }
   $('#projectArchiveFile')?.click();
@@ -274,6 +284,7 @@ async function deleteProjectFromWorkspace(id,title){
   try{
     stopPlayback();
     await api(`/api/projects/${id}`,{method:'DELETE'});
+    forgetRecentProject(id);
     if(current?.id===id){current=null;selectedTrackId=null;render()}
     await refresh();toast('Progetto e relativi file eliminati dal workspace');
   }catch(e){toast(e.message)}
@@ -318,7 +329,7 @@ function render(){
   $('#mixerDock').innerHTML=mixerHtml();
   updateMixerDockLayout();updatePanelMenuButtons();
   drawRuler();bindTimeline();bindProjectClipDrop();bindTrackTimelineScroll();bindTrackResizer();
-  current.tracks.forEach(drawWave);if(waveformValidationProjectId!==current.id){waveformValidationProjectId=current.id;ensureWaveforms(true)}else ensureWaveforms(false);updateSel();bindModelInputs();updateMuteSoloVisuals();restoreUiState();ensureSessionHistory();updateEditActionState();
+  current.tracks.forEach(drawWave);if(waveformValidationProjectId!==current.id){waveformValidationProjectId=current.id;ensureWaveforms(true)}else ensureWaveforms(false);updateSel();bindModelInputs();updateMuteSoloVisuals();restoreUiState();ensureSessionHistory();updateEditActionState();forceNativeViewportTop();
 }
 async function createMetronomeTrack(){
   if(!current)return toast('Apri prima un progetto');
@@ -348,7 +359,7 @@ function toolbarHtml(){
   </div>`
 }
 
-let clipBrowserExpanded=true;
+let clipBrowserExpanded=false;
 let clipBrowserQuery='';
 let clipBrowserPage=1;
 const CLIP_BROWSER_PAGE_SIZE=10;
@@ -600,7 +611,8 @@ function openTrackContextMenuAt(id,clientX,clientY){
   menu.setAttribute('role','menu');
   menu.innerHTML=`
     <button type="button" onclick="closeTrackContextMenu();renameTrack('${id}')">✎ <span>Rinomina</span></button>
-    <button type="button" ${disabled} onclick="closeTrackContextMenu();startTrackStemSplit('${id}')">▥ <span>Separa</span></button>
+    <button type="button" ${disabled} onclick="closeTrackContextMenu();openTrackStemWorkflow('${id}')">▥ <span>Separa</span></button>
+    <button type="button" onclick="closeTrackContextMenu();openSampleEditor('${id}')">⌁ <span>Editor waveform / campioni</span></button>
     <button type="button" onclick="closeTrackContextMenu();openTextAnalysisChooser('${id}','lyrics')">≡ <span>Estrai lyrics</span></button>
     <button type="button" onclick="closeTrackContextMenu();openTextAnalysisChooser('${id}','chords')">♬ <span>Estrai chords</span></button>
     <button type="button" class="danger" onclick="closeTrackContextMenu();deleteTracksByIds(['${id}'])">× <span>Rimuovi</span></button>
@@ -657,8 +669,8 @@ document.addEventListener('click',event=>{
 function textModelCatalog(){return pluginInfo.text_models||{lyrics:{models:[]},chords:{engines:[],models:[]}}}
 function openTextAnalysisChooser(id,kind){
   const cat=textModelCatalog(),track=trackById(id);if(!track)return toast('Traccia non trovata');
-  if(kind==='lyrics'){const c=cat.lyrics||{},opts=(c.models||[]).map(m=>`<option value="${esc(m.id)}" ${m.id===c.default_model?'selected':''}>${esc(m.display_name)} · ${m.installed?'installato':(c.storage==='local'?'download locale':'download server')}</option>`).join('');showUtilityModal('Estrai lyrics',`<div class="form-grid"><p><b>Motore:</b> OpenAI Whisper</p><label>Modello<select id="textAnalysisChoice">${opts}</select></label><p class="hint">Il modello viene scaricato on-demand (download modello al primo uso) e conservato ${c.storage==='local'?'localmente nell’app nativa':'sul server'}.</p><div class="form-actions"><button onclick="downloadTextAnalysisSelection('lyrics')">Scarica modello</button><button class="accent" onclick="startTrackTextAnalysis('${esc(id)}','lyrics',$('#textAnalysisChoice').value);closeUtilityModal()">Estrai lyrics</button></div></div>`);return}
-  const c=cat.chords||{},models=Object.fromEntries((c.models||[]).map(x=>[x.id,x])),opts=(c.engines||[]).map(e=>{const m=models[e.model_id]||{},state=e.model_id?(m.installed?'installato':(c.storage==='local'?'download locale':'download server')):'nessun modello';return `<option value="${esc(e.id)}" ${e.id===c.default_engine?'selected':''} ${e.available?'':'disabled'}>${esc(e.display_name)} · ${esc(state)}${e.available?'':' · non disponibile'}</option>`}).join('');showUtilityModal('Estrai chords',`<div class="form-grid"><p><b>Motore che verrà usato:</b> <span id="chordEngineLabel"></span></p><label>Motore / modello<select id="textAnalysisChoice" onchange="updateChordEngineDisclosure()">${opts}</select></label><div id="chordEngineDisclosure" class="workflow-note"></div><div class="form-actions"><button onclick="downloadTextAnalysisSelection('chords')">Scarica modello selezionato</button><button class="accent" onclick="startTrackTextAnalysis('${esc(id)}','chords',$('#textAnalysisChoice').value);closeUtilityModal()">Estrai chords</button></div></div>`);updateChordEngineDisclosure()}
+  if(kind==='lyrics'){const c=cat.lyrics||{},opts=(c.models||[]).map(m=>`<option value="${esc(m.id)}" ${m.id===c.default_model?'selected':''}>${esc(m.display_name)} · ${m.installed?'installato':(c.storage==='local'?'download locale':'download server')}</option>`).join('');showUtilityModal('Estrai lyrics',`<div class="form-grid"><p><b>Motore:</b> OpenAI Whisper</p><label>Modello<select id="textAnalysisChoice">${opts}</select></label><p class="hint">Il modello viene scaricato on-demand (download modello al primo uso) e conservato ${c.storage==='local'?'localmente nell’app nativa':'sul server'}.</p><div class="form-actions"><button class="utility-btn secondary model-download-btn" type="button" onclick="downloadTextAnalysisSelection('lyrics')">Scarica modello</button><button class="utility-btn primary accent" type="button" onclick="startTrackTextAnalysis('${esc(id)}','lyrics',$('#textAnalysisChoice').value);closeUtilityModal()">Estrai lyrics</button></div></div>`);return}
+  const c=cat.chords||{},models=Object.fromEntries((c.models||[]).map(x=>[x.id,x])),opts=(c.engines||[]).map(e=>{const m=models[e.model_id]||{};let state;if(e.model_id)state=m.installed?'modello installato':(c.storage==='local'?'modello scaricabile localmente':'modello scaricabile sul server');else if(e.id==='chordino')state=e.available?'nessun modello AI · motore locale disponibile':'nessun modello AI · richiede Sonic Annotator + Chordino';else state='nessun modello AI richiesto';return `<option value="${esc(e.id)}" ${e.id===c.default_engine?'selected':''} ${e.available?'':'disabled'}>${esc(e.display_name)} · ${esc(state)}</option>`}).join('');showUtilityModal('Estrai chords',`<div class="form-grid"><p><b>Motore che verrà usato:</b> <span id="chordEngineLabel"></span></p><label>Motore / modello<select id="textAnalysisChoice" onchange="updateChordEngineDisclosure()">${opts}</select></label><div id="chordEngineDisclosure" class="workflow-note"></div><div class="form-actions"><button class="utility-btn secondary model-download-btn" type="button" onclick="downloadTextAnalysisSelection('chords')">Scarica modello selezionato</button><button class="utility-btn primary accent" type="button" onclick="startTrackTextAnalysis('${esc(id)}','chords',$('#textAnalysisChoice').value);closeUtilityModal()">Estrai chords</button></div></div>`);updateChordEngineDisclosure()}
 function updateChordEngineDisclosure(){const c=textModelCatalog().chords||{},id=$('#textAnalysisChoice')?.value,e=(c.engines||[]).find(x=>x.id===id),m=(c.models||[]).find(x=>x.id===e?.model_id);if($('#chordEngineLabel'))$('#chordEngineLabel').textContent=e?.display_name||id||'—';if($('#chordEngineDisclosure'))$('#chordEngineDisclosure').innerHTML=e?.model_id?`Modello: <b>${esc(m?.display_name||e.model_id)}</b> · ${m?.installed?'installato':'sarà scaricato al primo uso'}${m?.license?`<br>Licenza pesi: ${esc(m.license)}`:''}`:'Questo motore non richiede un modello AI scaricabile.'}
 async function downloadTextAnalysisSelection(kind){const cat=textModelCatalog(),choice=$('#textAnalysisChoice')?.value;try{if(kind==='lyrics'){toast('Download modello lyrics…');await api(`/api/ai-models/lyrics/${encodeURIComponent(choice)}/download`,{method:'POST'})}else{const e=(cat.chords?.engines||[]).find(x=>x.id===choice);if(!e?.model_id)return toast('Il motore selezionato non richiede un modello');toast('Download modello chords…');await api(`/api/ai-models/chords/${encodeURIComponent(e.model_id)}/download`,{method:'POST'})}pluginInfo=await api('/api/plugins');toast(currentUser?.native_single_user?'Modello scaricato localmente':'Modello scaricato sul server');if(kind==='chords')updateChordEngineDisclosure()}catch(e){toast(e.message)}}
 async function startTrackTextAnalysis(id,kind,choice=''){
@@ -679,20 +691,32 @@ async function startTrackTextAnalysis(id,kind,choice=''){
   }catch(e){toast(e.message)}
 }
 
-async function startTrackStemSplit(id){
-  if(!current)return;
+function openTrackStemWorkflow(id){
   const track=trackById(id);if(!track)return toast('Traccia non trovata');
-  const stem=pluginInfo.stem_splitter||{};
-  if(!stem.available)return toast('Demucs non è disponibile in questo runtime');
-  const model=stem.recommended_model||(stem.models||['htdemucs_6s'])[0];
+  const stem=pluginInfo.stem_splitter||{};if(!stem.available)return toast('Demucs non è disponibile in questo runtime');
+  const profiles=stem.model_profiles||[],profileMap=Object.fromEntries(profiles.map(p=>[p.model,p]));
+  const recommended=stem.recommended_model||(stem.models||['htdemucs_6s'])[0];
+  const models=(stem.models||['htdemucs_6s']).map(x=>{const p=profileMap[x]||{};return `<option value="${esc(x)}" ${x===recommended?'selected':''}>${esc(p.display_name||x)}${p.stem_count?' · '+p.stem_count+' stem':''}</option>`}).join('');
+  const counts=[...new Set((stem.supported_stem_counts||[2,4,6]).map(Number).filter(n=>n>=2&&n<=64))].sort((a,b)=>a-b);
+  const recommendedCount=Number(profileMap[recommended]?.stem_count)||counts[0]||4;
+  const countOptions=counts.map(n=>{const p=profiles.find(x=>Number(x.stem_count)===n),labels=p?.stem_labels||[];const detail=labels.length&&labels.length<=8?' · '+labels.join(' / '):(p?.display_name?' · '+p.display_name:'');return `<option value="${n}" ${n===recommendedCount?'selected':''}>${n} stem${esc(detail)}</option>`}).join('');
+  const leadBacking=stem.lead_backing||{},backingModels=(leadBacking.models||[]).map(m=>`<option value="${esc(m.id)}" ${m.id===leadBacking.default_model?'selected':''}>${esc(m.display_name)} · ${m.installed?'installato':(leadBacking.storage==='local'?'download locale':'download server')}</option>`).join('');
+  showUtilityModal('Separa traccia',`<div class="stem-workflow"><p class="hint">Sorgente: <b>${esc(track.name)}</b>. La separazione partirà solo dopo la conferma dei parametri.</p><div class="workflow-grid"><label class="workflow-field"><span>Modello AI</span><select id="trackStemModel" onchange="syncTrackStemModelCount('model')">${models}</select></label><label class="workflow-field"><span>Numero stem</span><select id="trackStemCount" onchange="syncTrackStemModelCount('count')">${countOptions}</select></label></div><label class="workflow-check"><input id="trackSplitBackingVocals" type="checkbox" onchange="$('#trackBackingModelRow').classList.toggle('hidden',!this.checked)"> Separa anche voce principale e backing vocals</label><label class="workflow-field hidden" id="trackBackingModelRow"><span>Modello Lead / Backing Vocals</span><select id="trackBackingVocalModel">${backingModels}<option value="ffmpeg-center-side">Fallback DSP center/side</option></select><button type="button" onclick="downloadTrackBackingModel()">Scarica modello</button></label><div id="trackStemDisclosure" class="workflow-note"></div><div class="utility-actions"><button class="utility-btn primary" type="button" onclick="startTrackStemSplit('${esc(id)}')">Avvia separazione</button><button class="utility-btn secondary" type="button" onclick="closeUtilityModal()">Annulla</button></div></div>`);
+  syncTrackStemModelCount('model');
+}
+function syncTrackStemModelCount(source){
+  const stem=pluginInfo.stem_splitter||{},profiles=stem.model_profiles||[],modelEl=$('#trackStemModel'),countEl=$('#trackStemCount');if(!modelEl||!countEl)return;
+  if(source==='model'){const p=profiles.find(x=>x.model===modelEl.value);if(p?.stem_count)countEl.value=String(p.stem_count)}
+  else{const n=Number(countEl.value),p=profiles.find(x=>Number(x.stem_count)===n);if(p)modelEl.value=p.model}
+  const p=profiles.find(x=>x.model===modelEl.value),labels=p?.stem_labels||[],el=$('#trackStemDisclosure');if(el)el.textContent=`Parametri selezionati: ${p?.display_name||modelEl.value} · ${countEl.value} stem${labels.length?' · '+labels.join(' / '):''}`;
+}
+async function downloadTrackBackingModel(){const id=$('#trackBackingVocalModel')?.value;if(!id||id==='ffmpeg-center-side')return toast('Il fallback DSP non richiede modelli');try{await api(`/api/vocal-separation/models/${encodeURIComponent(id)}/download`,{method:'POST'});pluginInfo=await api('/api/plugins');toast(currentUser?.native_single_user?'Modello scaricato localmente':'Modello scaricato sul server')}catch(e){toast(e.message)}}
+async function startTrackStemSplit(id){
+  if(!current)return;const track=trackById(id);if(!track)return toast('Traccia non trovata');const stem=pluginInfo.stem_splitter||{};if(!stem.available)return toast('Demucs non è disponibile in questo runtime');
+  const model=$('#trackStemModel')?.value,stemCount=Number($('#trackStemCount')?.value||0),splitBackingVocals=!!$('#trackSplitBackingVocals')?.checked,backingVocalModel=$('#trackBackingVocalModel')?.value||'uvr_mdxnet_kara_2';
+  if(!model||!stemCount)return toast('Seleziona modello AI e numero di stem prima di procedere');
   await flushAutosave();
-  try{
-    const job=await api(`/api/projects/${current.id}/tracks/${id}/stem-jobs?model=${encodeURIComponent(model)}&stem_count=${preferredStemCount}`,{method:'POST'});
-    activeStemJob=job.id;
-    activeStemProjectId=job.project_id;
-    showStemProgress(job);
-    pollStemJob(job.id);
-  }catch(e){toast(e.message)}
+  try{const q=new URLSearchParams({model,stem_count:String(stemCount),split_backing_vocals:String(splitBackingVocals),backing_vocal_model:backingVocalModel});const job=await api(`/api/projects/${current.id}/tracks/${id}/stem-jobs?${q}`,{method:'POST'});closeUtilityModal();activeStemJob=job.id;activeStemProjectId=job.project_id;showStemProgress(job);pollStemJob(job.id)}catch(e){toast(e.message)}
 }
 function renameTrackInline(id,value){const t=trackById(id);if(!t)return;const v=String(value||'').trim();if(!v)return;t.name=v.slice(0,200);markDirty()}
 function renameTrack(id){const t=trackById(id);if(!t)return;const value=prompt('Nome traccia',t.name);if(value===null)return;const v=value.trim();if(!v)return toast('Il nome non può essere vuoto');t.name=v.slice(0,200);render();markDirty(100)}
@@ -700,7 +724,7 @@ function renameTrack(id){const t=trackById(id);if(!t)return;const value=prompt('
 function projectFormatLabel(target=current?.target){return target==='DAW'?'Multitrack DAW':target}
 function mtaSlotLimit(target=current?.target){return target==='MTA8'?8:16}
 function setTrackMtaSlot(id,value){const t=trackById(id);if(!t)return;const n=Number(value||0),limit=mtaSlotLimit();t.mta_slot=n>=1&&n<=limit?n:null;markDirty(100);render()}
-function lane(t,W,i){const color=t.color||TRACK_COLORS[i%TRACK_COLORS.length];const anySolo=current.tracks.some(x=>x.solo);const inaudible=t.mute||(anySolo&&!t.solo);return `<div class="lane ${inaudible?'audibly-muted':''}" id="lane-${t.id}" data-track="${t.id}" data-track-context-id="${t.id}" style="width:${W}px;--track-color:${color}" oncontextmenu="openTrackContextMenu(event,'${t.id}')"><canvas class="wave" id="wave-${t.id}" width="${W}" height="78"></canvas><div class="waveform-progress ${t.waveform_peaks?.length?'hidden':''}" id="wave-progress-${t.id}"><div class="waveform-progress-bar" id="wave-progress-bar-${t.id}" style="width:2%"></div><span id="wave-progress-label-${t.id}">Waveform…</span></div>${(t.clips||[]).map((c,j)=>{const l=c.timeline_start_ms/1000*pxPerSec,w=(c.source_end_ms-c.source_start_ms)/1000*pxPerSec;return `<div class="clip-block" style="left:${l}px;width:${Math.max(2,w)}px"><span class="clip-label">${esc(t.name)}_${String(j+1).padStart(2,'0')}</span></div>`}).join('')}</div>`}
+function lane(t,W,i){const color=t.color||TRACK_COLORS[i%TRACK_COLORS.length];const anySolo=current.tracks.some(x=>x.solo);const inaudible=t.mute||(anySolo&&!t.solo);return `<div class="lane ${inaudible?'audibly-muted':''}" id="lane-${t.id}" data-track="${t.id}" data-track-context-id="${t.id}" style="width:${W}px;--track-color:${color}" oncontextmenu="openTrackContextMenu(event,'${t.id}')"><canvas class="wave" id="wave-${t.id}" width="${W}" height="78" ondblclick="event.stopPropagation();openSampleEditor('${t.id}')" title="Doppio click: editor waveform/campioni"></canvas><div class="waveform-progress ${t.waveform_peaks?.length?'hidden':''}" id="wave-progress-${t.id}"><div class="waveform-progress-bar" id="wave-progress-bar-${t.id}" style="width:2%"></div><span id="wave-progress-label-${t.id}">Waveform…</span></div>${(t.clips||[]).map((c,j)=>{const l=c.timeline_start_ms/1000*pxPerSec,w=(c.source_end_ms-c.source_start_ms)/1000*pxPerSec;return `<div class="clip-block" style="left:${l}px;width:${Math.max(2,w)}px"><span class="clip-label">${esc(t.name)}_${String(j+1).padStart(2,'0')}</span></div>`}).join('')}</div>`}
 
 function inspectorHtml(){const t=selectedTrack();if(!t)return `<aside class="inspector"><div class="inspector-tabs"><button class="inspector-tab active">Inspector</button><button class="inspector-tab">Stems</button><button class="inspector-tab">Metadata</button></div><div class="inspector-body"><p class="hint">Import a track to open the inspector.</p></div></aside>`;const i=current.tracks.indexOf(t);return `<aside class="inspector" id="inspector"><div class="inspector-tabs"><button class="inspector-tab active">Inspector</button><button class="inspector-tab">Stems</button><button class="inspector-tab">Metadata</button></div><div class="inspector-body"><div class="inspector-track-title"><span>◉</span>${esc(t.name)}<label class="tool" style="margin-left:auto;min-width:auto;height:28px">Replace<input type="file" accept="audio/*,.mp3,.wav" hidden onchange="replaceTrack('${t.id}',this)"></label></div><div class="inspector-row"><label>Volume</label><input class="track-volume-range" data-volume-track="${t.id}" type="range" min="-60" max="12" step="0.5" value="${t.volume_db}" oninput="setTrackVolume('${t.id}',this.value)"><input class="valuebox volume-number" id="ins-db-${t.id}" data-volume-number="${t.id}" type="number" min="-60" max="12" step="0.1" value="${Number(t.volume_db).toFixed(1)}" oninput="setTrackVolume('${t.id}',this.value)" aria-label="Volume ${esc(t.name)} in dB" title="Volume in dB"></div><div class="inspector-row"><label>Pan</label><input type="range" min="-1" max="1" step="0.01" value="${t.pan||0}" oninput="setTrackPan('${t.id}',this.value)"><div class="valuebox" id="pan-${t.id}">${Number(t.pan||0).toFixed(2)}</div></div><div class="inspector-row"><label>Type</label><select class="model-input" data-i="${i}" data-k="type">${['drums','bass','guitars','keyboards','orchestra','winds','melody','click','choirs','other'].map(x=>`<option ${x===t.type?'selected':''}>${x}</option>`).join('')}</select><div class="valuebox">${t.duration_ms?fmtTime(t.duration_ms/1000):'--'}</div></div><div class="inspector-row"><label>MTA Slot</label><select onchange="setTrackMtaSlot('${t.id}',this.value)"><option value="" ${!t.mta_slot?'selected':''}>Auto</option>${Array.from({length:mtaSlotLimit()},(_,n)=>`<option value="${n+1}" ${Number(t.mta_slot)===n+1?'selected':''}>${n+1}</option>`).join('')}</select><div class="valuebox">${t.mta_slot?`Slot ${t.mta_slot}`:'Auto'}</div></div>${insertPanelHtml(t,false)}<div class="panel-section"><div class="section-title">Track export</div><div class="track-export-actions"><button onclick="exportTrack('${t.id}','wav')">WAV</button><button onclick="exportTrack('${t.id}','mp3')">MP3</button><button onclick="exportTrack('${t.id}','flac')">FLAC</button></div></div><div class="panel-section"><div class="collapsed-row">› Send</div><div class="collapsed-row">› Track Automation</div><div class="collapsed-row">› Advanced</div></div></div></aside>`}
 
@@ -873,7 +897,6 @@ function openMixerInsertManager(owner){
 }
 function mixerHtml(){
   const limit=current.target==='DAW'?null:mtaSlotLimit(),over=limit!==null&&current.tracks.length>limit;
-  const exportPane=current.export_panel_visible?exportPaneHtml(limit,over):'';
   const metaPane=current.metadata_panel_visible?metaPaneHtml():'';
   return `<div class="mixer-pane" id="mixer">
     <div class="dock-tabs"><button class="dock-tab active">Mixer</button><button class="dock-tab">Master / Preview</button><button id="realtimeBtn" class="dock-tab realtime-toggle ${current.realtime_meter_enabled?'active':''}" onclick="toggleRealtimeMeters()">RealTime</button>
@@ -882,10 +905,11 @@ function mixerHtml(){
       <span class="capacity-badge ${over?'over':''}">${current.target==='DAW'?`${current.tracks.length} project tracks · unrestricted DAW project`:`${current.tracks.length} project tracks · ${limit} ${current.target} output slots`}</span>
     </div>
     <div class="channels">${current.tracks.map((t,i)=>channelHtml(t,i)).join('')}<div class="master-divider" aria-hidden="true"></div>${masterChannelHtml()}</div>
-  </div>${exportPane}${metaPane}<div id="exportMapModal" class="modal-card export-map-modal hidden"></div>`;
+  </div>${metaPane}<div id="exportMapModal" class="modal-card export-map-modal hidden"></div>`;
 }
-function exportPaneHtml(limit,over){
-  return `<div class="export-pane" id="exportPane"><div class="dock-tabs"><button class="dock-tab active">Export</button><button class="dock-tab">Single Track Export</button><button class="dock-close" onclick="toggleMixerPanel('export')" title="Nascondi Export">×</button></div><div class="export-content"><div class="export-title">Final output</div>${over?`<div class="export-warning">Project has more tracks than ${current.target}. MTA export will ask how to merge tracks into ${limit} output slots.</div>`:''}<div class="format-option ${exportFormat==='mta'?'selected':''}" onclick="selectExport('mta')"><span>▧ MTA (${current.target==='DAW'?'MTA8 / MTA16':current.target})</span><span>›</span></div><div class="format-option ${exportFormat==='wav'?'selected':''}" onclick="selectExport('wav')"><span>♫ WAV (24 bit, 44.1 kHz)</span><span>›</span></div><div class="format-option ${exportFormat==='mp3'?'selected':''}" onclick="selectExport('mp3')"><span>♫ MP3 (320 kbps)</span><span>›</span></div><div class="format-option ${exportFormat==='flac'?'selected':''}" onclick="selectExport('flac')"><span>♫ FLAC (lossless)</span><span>›</span></div><div class="format-option ${exportFormat==='mp4'?'selected':''} ${current.lyrics?.length?'':'disabled'}" onclick="${current.lyrics?.length?"selectExport('mp4');openKaraokeExport()":"toast('L’export MP4 richiede lyrics sincronizzate')"}"><span>▣ MP4 Karaoke${current.lyrics?.length?'':' · lyrics richieste'}</span><span>›</span></div><div class="export-actions"><button onclick="doExport('mta')">Export MTA</button><button onclick="doExport('wav')">WAV</button><button onclick="doExport('mp3')">MP3</button><button onclick="doExport('flac')">FLAC</button><button onclick="openKaraokeExport()" ${current.lyrics?.length?'':'disabled'}>MP4 Karaoke</button></div><button class="preview-master" onclick="previewMaster()">▶ Render &amp; Preview Master</button><button class="analysis-btn" onclick="showMtaAnalysis()">⌁ MTA format analysis</button></div></div>`;
+function exportWindowHtml(){
+  const limit=current.target==='DAW'?null:mtaSlotLimit(),over=limit!==null&&current.tracks.length>limit;
+  return `<div class="export-dialog"><div class="export-title">Final output</div>${over?`<div class="export-warning">Project has more tracks than ${current.target}. MTA export will ask how to merge tracks into ${limit} output slots.</div>`:''}<div class="export-format-grid"><button class="format-option" onclick="doExport('mta')"><span>▧ MTA (${current.target==='DAW'?'MTA8 / MTA16':current.target})</span><span>Configura ›</span></button><button class="format-option" onclick="doExport('wav')"><span>♫ WAV</span><span>24 bit / PCM ›</span></button><button class="format-option" onclick="doExport('mp3')"><span>♫ MP3</span><span>Configura bitrate ›</span></button><button class="format-option" onclick="doExport('flac')"><span>♫ FLAC</span><span>Lossless ›</span></button><button class="format-option ${current.lyrics?.length?'':'disabled'}" ${current.lyrics?.length?'onclick="openKaraokeExport()"':'disabled'}><span>▣ MP4 Karaoke</span><span>${current.lyrics?.length?'Configura ›':'Lyrics richieste'}</span></button></div><div class="export-dialog-tools"><button class="utility-btn secondary" onclick="previewMaster()">▶ Render &amp; Preview Master</button><button class="utility-btn secondary" onclick="showMtaAnalysis()">⌁ MTA format analysis</button></div><div class="utility-actions"><button class="utility-btn secondary" onclick="closeUtilityModal()">Annulla</button></div></div>`;
 }
 function metaPaneHtml(){
   const config={lyrics:['text','Lyrics'],chords:['chord','Chords'],markers:['label','Markers']},[key,label]=config[mixerMetaTab]||config.lyrics,rows=current[mixerMetaTab]||[];const displayValue=x=>mixerMetaTab==='chords'?transposeChordLabel(x[key],current.pitch_semitones||0):x[key];
@@ -896,35 +920,22 @@ function metaPaneHtml(){
 }
 function updateMixerDockLayout(){
   const dock=$('#mixerDock');if(!dock||!current)return;
-  const exp=!!current.export_panel_visible,meta=!!current.metadata_panel_visible;
-  dock.classList.toggle('export-hidden',!exp);
+  const meta=!!current.metadata_panel_visible;
   dock.classList.toggle('meta-hidden',!meta);
-  dock.classList.toggle('sidepanels-hidden',!exp&&!meta);
-  dock.style.gridTemplateColumns=exp&&meta
-    ?'minmax(0,1fr) 350px 320px'
-    :exp
-      ?'minmax(0,1fr) 350px'
-      :meta
-        ?'minmax(0,1fr) 320px'
-        :'minmax(0,1fr)';
-  const mixer=$('#mixer');
-  if(mixer)mixer.style.width='100%';
+  dock.classList.toggle('sidepanels-hidden',!meta);
+  dock.style.gridTemplateColumns=meta?'minmax(0,1fr) 320px':'minmax(0,1fr)';
+  const mixer=$('#mixer');if(mixer)mixer.style.width='100%';
 }
 function updatePanelMenuButtons(){
-  $('#exportPanelMenuBtn')?.classList.toggle('panel-hidden',!current?.export_panel_visible);
   $('#metaPanelMenuBtn')?.classList.toggle('panel-hidden',!current?.metadata_panel_visible);
 }
 function toggleMixerPanel(which){
   if(!current)return;
-  if(which==='export')current.export_panel_visible=!current.export_panel_visible;
-  else current.metadata_panel_visible=!current.metadata_panel_visible;
+  if(which==='export'){openExportPanel();return}
+  current.metadata_panel_visible=!current.metadata_panel_visible;
   render();
-  requestAnimationFrame(()=>{
-    updateMixerDockLayout();
-    $('#mixer')?.scrollIntoView({block:'nearest'});
-  });
-  markDirty(100);
-  focusMixer();
+  requestAnimationFrame(()=>{updateMixerDockLayout();$('#mixer')?.scrollIntoView({block:'nearest'})});
+  markDirty(100);focusMixer();
 }
 function showMetaPanel(kind='lyrics'){
   if(!current)return;mixerMetaTab=kind;
@@ -971,15 +982,17 @@ function channelHtml(t,i){
     </div>
     <div class="channel-buttons"><button data-mute-track="${t.id}" class="${t.mute?'on':''}" onclick="toggleBool(this,'${t.id}','mute')">M</button><button data-solo-track="${t.id}" class="${t.solo?'on':''}" onclick="toggleBool(this,'${t.id}','solo')">S</button><button class="channel-fx ${t.inserts?.length?'active':''}" onclick="openMixerInsertManager('${t.id}')" title="Gestisci insert">FX${t.inserts?.length?` ${t.inserts.length}`:''}</button></div>
     <div class="channel-mode">${outChannels===1?'MONO':(stereoByFx?'STEREO · FX':'STEREO')}</div>
-    <div class="channel-fader-area"><input class="v-fader track-volume-range" data-volume-track="${t.id}" type="range" min="-60" max="12" step="0.5" value="${t.volume_db}" oninput="setTrackVolume('${t.id}',this.value)">
-      <div class="meter-pair">${outChannels===1?`<div class="meter meter-realtime ${current.realtime_meter_enabled?'':'hidden'}" title="VU mono"><span id="vu-${t.id}-M" style="height:0%"></span><em>M</em></div>`:`<div class="meter meter-realtime ${current.realtime_meter_enabled?'':'hidden'}" title="VU Left"><span id="vu-${t.id}-L" style="height:0%"></span><em>L</em></div><div class="meter meter-realtime ${current.realtime_meter_enabled?'':'hidden'}" title="VU Right"><span id="vu-${t.id}-R" style="height:0%"></span><em>R</em></div>`}</div>
+    <div class="channel-fader-area">
+      <div class="fader-column"><input class="v-fader track-volume-range" data-volume-track="${t.id}" type="range" min="-60" max="12" step="0.5" value="${t.volume_db}" oninput="setTrackVolume('${t.id}',this.value)" ondblclick="resetTrackVolumeToUnity('${t.id}',event)" title="Volume · doppio click = 0 dB"></div>
+      <div class="db-scale" aria-hidden="true"><span>+12</span><span>+6</span><span>0</span><span>-6</span><span>-12</span><span>-24</span><span>-36</span><span>-48</span><span>-60</span></div>
+      <div class="meter-stack"><div id="peak-${t.id}" class="peak-led ${current.realtime_meter_enabled?'':'hidden'}" title="Peak 0 dBFS">PEAK</div><div class="meter-pair">${outChannels===1?`<div class="meter meter-realtime ${current.realtime_meter_enabled?'':'hidden'}" title="VU mono"><span id="vu-${t.id}-M" style="height:0%"></span><em>M</em></div>`:`<div class="meter meter-realtime ${current.realtime_meter_enabled?'':'hidden'}" title="VU Left"><span id="vu-${t.id}-L" style="height:0%"></span><em>L</em></div><div class="meter meter-realtime ${current.realtime_meter_enabled?'':'hidden'}" title="VU Right"><span id="vu-${t.id}-R" style="height:0%"></span><em>R</em></div>`}</div></div>
     </div>
     <input class="channel-value volume-number" id="mix-db-${t.id}" data-volume-number="${t.id}" type="number" min="-60" max="12" step="0.1" value="${Number(t.volume_db).toFixed(1)}" onchange="setTrackVolume('${t.id}',this.value)" onkeydown="if(event.key==='Enter')this.blur()" aria-label="Volume ${esc(t.name)} in dB" title="Volume in dB">
   </div>`;
 }
 function masterChannelHtml(){
   const v=current.master_volume_db||0,fx=current.master_inserts||[];
-  return `<div class="channel master" style="--track-color:#644ce5"><div class="channel-name">MASTER</div><div class="pan-knob"></div><div class="channel-buttons"><button class="channel-fx master-fx ${fx.length?'active':''}" onclick="openMixerInsertManager('master')" title="Gestisci insert Master">FX${fx.length?` ${fx.length}`:''}</button></div><div class="channel-fader-area"><input id="master-volume-range" class="v-fader" type="range" min="-60" max="12" step="0.5" value="${v}" oninput="setMasterVolume(this.value)"><div class="meter-pair master-meter-pair"><div class="meter meter-realtime ${current.realtime_meter_enabled?'':'hidden'}" title="Master Left"><span id="vu-master-L" style="height:0%"></span><em>L</em></div><div class="meter meter-realtime ${current.realtime_meter_enabled?'':'hidden'}" title="Master Right"><span id="vu-master-R" style="height:0%"></span><em>R</em></div></div></div><input class="channel-value volume-number" id="master-db" type="number" min="-60" max="12" step="0.1" value="${Number(v).toFixed(1)}" onchange="setMasterVolume(this.value)" onkeydown="if(event.key==='Enter')this.blur()" aria-label="Master volume in dB" title="Master volume in dB"></div>`;
+  return `<div class="channel master" style="--track-color:#644ce5"><div class="channel-name">MASTER</div><div class="pan-knob"></div><div class="channel-buttons"><button class="channel-fx master-fx ${fx.length?'active':''}" onclick="openMixerInsertManager('master')" title="Gestisci insert Master">FX${fx.length?` ${fx.length}`:''}</button></div><div class="channel-fader-area"><div class="fader-column"><input id="master-volume-range" class="v-fader" type="range" min="-60" max="12" step="0.5" value="${v}" oninput="setMasterVolume(this.value)" ondblclick="resetMasterVolumeToUnity(event)" title="Master volume · doppio click = 0 dB"></div><div class="db-scale" aria-hidden="true"><span>+12</span><span>+6</span><span>0</span><span>-6</span><span>-12</span><span>-24</span><span>-36</span><span>-48</span><span>-60</span></div><div class="meter-stack"><div id="peak-master" class="peak-led ${current.realtime_meter_enabled?'':'hidden'}" title="Master peak 0 dBFS">PEAK</div><div class="meter-pair master-meter-pair"><div class="meter meter-realtime ${current.realtime_meter_enabled?'':'hidden'}" title="Master Left"><span id="vu-master-L" style="height:0%"></span><em>L</em></div><div class="meter meter-realtime ${current.realtime_meter_enabled?'':'hidden'}" title="Master Right"><span id="vu-master-R" style="height:0%"></span><em>R</em></div></div></div></div><input class="channel-value volume-number" id="master-db" type="number" min="-60" max="12" step="0.1" value="${Number(v).toFixed(1)}" onchange="setMasterVolume(this.value)" onkeydown="if(event.key==='Enter')this.blur()" aria-label="Master volume in dB" title="Master volume in dB"></div>`;
 }
 async function setAutoMix(enabled){if(!current)return;try{collect();await api('/api/projects/'+current.id,{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify(current)});const style=$('#autoMixStyle')?.value||current.auto_mix_style||'balanced';current=await api(`/api/projects/${current.id}/auto-mix`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({enabled,style})});render();toast(enabled?'Auto Mix applied. Toggle off to restore your previous mix.':'Auto Mix removed; previous mix restored.')}catch(e){toast(e.message);render()}}
 async function changeAutoMixStyle(style){current.auto_mix_style=style;if(current.auto_mix_enabled)await setAutoMix(true)}
@@ -1175,6 +1188,12 @@ function setTrackVolume(id,v){
   markDirty();
 }
 function dbToGain(db){return Math.pow(10,Number(db||0)/20)}
+function resetTrackVolumeToUnity(id,event){
+  event?.preventDefault();event?.stopPropagation();setTrackVolume(id,0);markDirty();
+}
+function resetMasterVolumeToUnity(event){
+  event?.preventDefault();event?.stopPropagation();setMasterVolume(0);markDirty();
+}
 function setMasterVolume(v){
   const n=normalizeVolume(v);if(!current||n===null)return;
   current.master_volume_db=n;
@@ -1626,7 +1645,41 @@ async function cancelStemJob(jobId){
 }
 function toggleStemCard(){openStemWorkflow()}
 
-async function drawWave(t){const c=$('#wave-'+t.id);if(!c)return;const ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);try{audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();const ab=await fetch(`/api/projects/${current.id}/audio/${encodeURIComponent(t.filename)}`).then(r=>r.arrayBuffer());const b=await audioCtx.decodeAudioData(ab);const d=b.getChannelData(0),color=t.color||'#2f81f7';ctx.strokeStyle=color;ctx.globalAlpha=.86;ctx.lineWidth=1;for(const clip of t.clips||[]){const tl=clip.timeline_start_ms/1000*pxPerSec,tw=(clip.source_end_ms-clip.source_start_ms)/1000*pxPerSec,x0=Math.floor(tl),x1=Math.ceil(tl+tw);ctx.beginPath();for(let x=x0;x<x1;x++){const frac=(x-tl)/Math.max(1,tw),srcMs=clip.source_start_ms+frac*(clip.source_end_ms-clip.source_start_ms),center=Math.floor(srcMs/1000*b.sampleRate),span=Math.max(1,Math.floor(b.sampleRate/pxPerSec/2));let mn=1,mx=-1;for(let j=Math.max(0,center-span);j<Math.min(d.length,center+span);j+=Math.max(1,Math.floor(span/20))){mn=Math.min(mn,d[j]);mx=Math.max(mx,d[j])}ctx.moveTo(x+.5,39-mx*28);ctx.lineTo(x+.5,39-mn*28)}ctx.stroke()}}catch(e){ctx.fillStyle='#6d8294';ctx.fillText('waveform unavailable',10,39)}}
+async function drawWave(t){
+  const c=$('#wave-'+t.id);if(!c)return;
+  const ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);
+  const peaks=Array.isArray(t.waveform_peaks)?t.waveform_peaks:[];
+  if(!peaks.length){ctx.fillStyle='#6d8294';ctx.fillText('waveform unavailable',10,39);return}
+  const color=t.color||'#2f81f7',mid=c.height/2,amp=Math.max(4,c.height*.36);
+  ctx.strokeStyle=color;ctx.globalAlpha=.86;ctx.lineWidth=1;
+  const durationMs=Math.max(1,Number(t.duration_ms||0));
+  for(const clip of t.clips||[]){
+    const sourceStart=Math.max(0,Number(clip.source_start_ms||0));
+    const sourceEnd=Math.max(sourceStart+1,Number(clip.source_end_ms||durationMs));
+    const tl=Number(clip.timeline_start_ms||0)/1000*pxPerSec;
+    const tw=(sourceEnd-sourceStart)/1000*pxPerSec;
+    if(tw<=0)continue;
+    const firstBin=Math.max(0,Math.min(peaks.length-1,Math.floor(sourceStart/durationMs*peaks.length)));
+    const lastBin=Math.max(firstBin+1,Math.min(peaks.length,Math.ceil(sourceEnd/durationMs*peaks.length)));
+    const sourceBins=Math.max(1,lastBin-firstBin);
+    // Never draw more columns than either the visible pixel width or the cached
+    // source detail.  Zooming in increases spacing/detail without inventing points;
+    // zooming out aggregates source bins into one pixel column.
+    const columns=Math.max(1,Math.min(Math.ceil(tw),sourceBins));
+    const xStep=tw/columns;
+    ctx.beginPath();
+    for(let col=0;col<columns;col++){
+      const a=firstBin+Math.floor(col*sourceBins/columns);
+      const b=Math.max(a+1,firstBin+Math.ceil((col+1)*sourceBins/columns));
+      let peak=0;
+      for(let i=a;i<Math.min(lastBin,b);i++)peak=Math.max(peak,Number(peaks[i]||0));
+      const x=tl+(col+.5)*xStep;
+      const h=Math.min(1,peak)*amp;
+      ctx.moveTo(x,mid-h);ctx.lineTo(x,mid+h);
+    }
+    ctx.stroke();
+  }
+}
 function setZoom(v){pxPerSec=Number(v);if(current){current.timeline_zoom_px_per_sec=pxPerSec;markDirty(150)}if($('#topZoom'))$('#topZoom').value=v;render()}
 
 function tempoRatio(){const base=Number(current?.base_bpm||current?.bpm||120);return Math.max(.25,Math.min(4,Number(current?.bpm||base)/base))}
@@ -1661,7 +1714,7 @@ function followPlayhead(x,force=false){
 }
 
 function toggleRealtimeMeters(){
-  if(!current)return;current.realtime_meter_enabled=!current.realtime_meter_enabled;$('#realtimeBtn')?.classList.toggle('active',current.realtime_meter_enabled);$$('.meter-realtime').forEach(x=>x.classList.toggle('hidden',!current.realtime_meter_enabled));markDirty();
+  if(!current)return;current.realtime_meter_enabled=!current.realtime_meter_enabled;$('#realtimeBtn')?.classList.toggle('active',current.realtime_meter_enabled);$$('.meter-realtime,.peak-led').forEach(x=>x.classList.toggle('hidden',!current.realtime_meter_enabled));markDirty();
   if(!current.realtime_meter_enabled)resetVuMeters();
   if(playAudio||trackPlaybacks.length){const pos=playCursorMs;stopPlayback();setPlayCursor(pos);previewMaster()}
 }
@@ -1671,6 +1724,7 @@ function updateTransportToggleButtons(){
 }
 function resetVuMeters(){
   $$('[id^="vu-"]').forEach(x=>x.style.height='0%');
+  $$('.peak-led').forEach(x=>x.classList.remove('active'));
 }
 function playbackActuallyRunning(){
   const masterRunning=!!(playAudio&&!playAudio.paused&&!playAudio.ended);
@@ -1698,6 +1752,7 @@ function analyserLevel(analyser,cacheOwner,key){
   return Math.max(0,Math.min(100,(db+60)/60*100));
 }
 function setVu(id,pct){const el=$(id);if(el)el.style.height=`${pct}%`}
+function latchPeak(id,pct){if(pct>=99.5)$(id)?.classList.add('active')}
 function updateVuMeters(token=meterRunToken){
   if(token!==meterRunToken)return;
   if(!current?.realtime_meter_enabled||!playbackActuallyRunning()){
@@ -1711,23 +1766,23 @@ function updateVuMeters(token=meterRunToken){
     if(!analysers.length)continue;
     if(item.channels===1){
       const mono=analyserLevel(analysers[0],item,'m');
-      setVu(`#vu-${item.trackId}-M`,mono);
+      setVu(`#vu-${item.trackId}-M`,mono);latchPeak(`#peak-${item.trackId}`,mono);
       masterLeftEnergy+=mono*mono;masterRightEnergy+=mono*mono;
     }else{
       const left=analyserLevel(analysers[0],item,'l');
       const right=analyserLevel(analysers[1],item,'r');
-      setVu(`#vu-${item.trackId}-L`,left);setVu(`#vu-${item.trackId}-R`,right);
+      setVu(`#vu-${item.trackId}-L`,left);setVu(`#vu-${item.trackId}-R`,right);latchPeak(`#peak-${item.trackId}`,Math.max(left,right));
       masterLeftEnergy+=left*left;masterRightEnergy+=right*right;
     }
   }
   if(masterMeterAnalysers?.length===2){
     const holder=masterMeterAnalysers;
     holder.meterData=holder.meterData||{};
-    setVu('#vu-master-L',analyserLevel(holder[0],holder,'l'));
-    setVu('#vu-master-R',analyserLevel(holder[1],holder,'r'));
+    const masterL=analyserLevel(holder[0],holder,'l'),masterR=analyserLevel(holder[1],holder,'r');
+    setVu('#vu-master-L',masterL);setVu('#vu-master-R',masterR);latchPeak('#peak-master',Math.max(masterL,masterR));
   }else{
-    setVu('#vu-master-L',Math.min(100,Math.sqrt(masterLeftEnergy)));
-    setVu('#vu-master-R',Math.min(100,Math.sqrt(masterRightEnergy)));
+    const masterL=Math.min(100,Math.sqrt(masterLeftEnergy)),masterR=Math.min(100,Math.sqrt(masterRightEnergy));
+    setVu('#vu-master-L',masterL);setVu('#vu-master-R',masterR);latchPeak('#peak-master',Math.max(masterL,masterR));
   }
   meterRaf=requestAnimationFrame(()=>{
     if(token===meterRunToken)updateVuMeters(token);
@@ -1777,23 +1832,9 @@ async function makeTrackPlayback(track,renderFilters,silent=false,respectMuteSol
   return {trackId:track.id,audio,analysers:graph.analysers,channels,silent,respectMuteSolo,meterData:{},gainNode:graph.gainNode,panner:graph.panner};
 }
 function waitForMediaBuffer(audio,label='traccia',timeoutMs=12000){
-  // HAVE_FUTURE_DATA is enough to start smoothly. Waiting for canplaythrough on
-  // every track forces the browser to buffer almost the whole song and creates
-  // very high startup latency on large sessions.
-  if(audio.readyState>=3)return Promise.resolve();
-  return new Promise((resolve,reject)=>{
-    let done=false;
-    const finish=()=>{if(done)return;done=true;cleanup();resolve()};
-    const fail=()=>{if(done)return;done=true;cleanup();reject(new Error(`Buffering non riuscito: ${label}`))};
-    const check=()=>{if(audio.readyState>=3)finish()};
-    const cleanup=()=>{clearTimeout(timer);clearInterval(poll);audio.removeEventListener('canplay',finish);audio.removeEventListener('loadeddata',check);audio.removeEventListener('error',fail)};
-    const poll=setInterval(check,40);
-    const timer=setTimeout(()=>audio.readyState>=2?finish():fail(),timeoutMs);
-    audio.addEventListener('canplay',finish,{once:true});
-    audio.addEventListener('loadeddata',check);
-    audio.addEventListener('error',fail,{once:true});
-    audio.load();
-  });
+  const enough=()=>{if(audio.readyState<3)return false;try{const pos=audio.currentTime||0;for(let i=0;i<audio.buffered.length;i++){if(audio.buffered.start(i)<=pos+.05&&audio.buffered.end(i)-pos>=Math.min(3,Math.max(.5,(audio.duration||3)-pos)))return true}}catch(e){}return audio.readyState>=4};
+  if(enough())return Promise.resolve();
+  return new Promise((resolve,reject)=>{let done=false;const finish=()=>{if(done)return;done=true;cleanup();resolve()},fail=()=>{if(done)return;done=true;cleanup();reject(new Error(`Buffering non riuscito: ${label}`))},check=()=>{if(enough())finish()},cleanup=()=>{clearTimeout(timer);clearInterval(poll);audio.removeEventListener('canplaythrough',check);audio.removeEventListener('progress',check);audio.removeEventListener('error',fail)},poll=setInterval(check,100),timer=setTimeout(()=>audio.readyState>=3?finish():fail(),timeoutMs);audio.addEventListener('canplaythrough',check);audio.addEventListener('progress',check);audio.addEventListener('error',fail,{once:true});audio.load()});
 }
 function stopDynamicSyncMonitor(){
   if(dynamicSyncTimer){clearInterval(dynamicSyncTimer);dynamicSyncTimer=null}
@@ -1801,76 +1842,60 @@ function stopDynamicSyncMonitor(){
 }
 function dynamicClockAudio(){
   if(renderedMasterPlayback&&renderedMasterAudio)return renderedMasterAudio;
-  return dynamicSyncClock?.audio||playAudio||trackPlaybacks[0]?.audio||null;
+  const preferred=dynamicSyncClock?.audio||playAudio;if(preferred&&!preferred.ended&&preferred.readyState>=2)return preferred;
+  const active=trackPlaybacks.find(item=>item.audio&&!item.audio.paused&&!item.audio.ended&&item.audio.readyState>=2);
+  if(active){dynamicSyncClock=active;return active.audio}
+  return preferred||trackPlaybacks[0]?.audio||null;
 }
 function alignDynamicTracks(force=false){
   if(renderedMasterPlayback||playbackPaused||!trackPlaybacks.length)return;
-  const clock=dynamicClockAudio();if(!clock||clock.paused||clock.ended)return;
-  const ref=clock.currentTime;
+  const clock=dynamicClockAudio();if(!clock||clock.paused||clock.ended||clock.readyState<2)return;
+  const ref=clock.currentTime,now=Date.now();
   for(const item of trackPlaybacks){
-    const audio=item.audio;
-    if(audio===clock||audio.paused||audio.ended)continue;
+    const audio=item.audio;if(audio===clock||audio.paused||audio.ended)continue;
+    // Never chase a buffering decoder with repeated seeks: that can keep it in
+    // permanent starvation. A forced relock is reserved for start/seek/resume.
+    if(audio.readyState<3||audio.seeking){audio.playbackRate=1;item.needsRelock=true;continue}
     const drift=audio.currentTime-ref;
     try{
-      if(force||Math.abs(drift)>0.120){
-        // Large discontinuities need a hard re-lock. This is intentionally rare.
-        audio.currentTime=ref;audio.playbackRate=1;
-      }else if(Math.abs(drift)>0.012){
-        // Correct decoder drift smoothly instead of repeatedly seeking.
-        audio.playbackRate=Math.max(.985,Math.min(1.015,1-drift*.20));
-      }else if(Math.abs(audio.playbackRate-1)>.0005){
-        audio.playbackRate=1;
-      }
+      if(force||(item.needsRelock&&Math.abs(drift)>.080)){
+        audio.currentTime=ref;audio.playbackRate=1;item.needsRelock=false;item.lastHardSync=now;
+      }else if(Math.abs(drift)>.035){
+        audio.playbackRate=Math.max(.995,Math.min(1.005,1-drift*.06));
+      }else if(Math.abs(audio.playbackRate-1)>.0005){audio.playbackRate=1}
     }catch(e){}
   }
 }
 function startDynamicSyncMonitor(){
-  stopDynamicSyncMonitor();
-  dynamicSyncClock=trackPlaybacks[0]||null;
-  dynamicSyncTimer=setInterval(()=>alignDynamicTracks(false),50);
+  stopDynamicSyncMonitor();dynamicSyncClock=trackPlaybacks.find(x=>x.audio&&!x.audio.ended)||null;
+  // HTML media elements already share the browser media clock. We only correct
+  // meaningful drift and never hammer stalled decoders.
+  dynamicSyncTimer=setInterval(()=>alignDynamicTracks(false),250);
 }
-async function startDynamicTrackPreview(renderFilters,silentMeters=false){
-  // Adaptive pre-roll: only enough media is buffered to guarantee a smooth
-  // common start. Mixer controls remain live WebAudio operations and never
-  // participate in this buffering path.
-  playbackBuffering=true;
-  const tracks=current.tracks||[];
-  showMediaProgress('Buffering tracce',5,`Pre-buffer ${tracks.length} tracce… attendere`);
+async function startDynamicTrackPreview(renderFilters,silentMeters=false,token=playbackToken){
+  playbackBuffering=true;const tracks=current.tracks||[];showMediaProgress('Buffering tracce',5,`Pre-buffer ${tracks.length} tracce… attendere`);
   try{
-    const items=await Promise.all(tracks.map(t=>makeTrackPlayback(t,renderFilters,silentMeters,true)));
+    const items=await Promise.all(tracks.map(t=>makeTrackPlayback(t,renderFilters,silentMeters,true)));if(token!==playbackToken)return null;
     showMediaProgress('Buffering tracce',45,'Preparazione decoder… attendere');
-    await Promise.all(items.map((item,i)=>waitForMediaBuffer(item.audio,tracks[i]?.name||`traccia ${i+1}`)));
+    await Promise.all(items.map((item,i)=>waitForMediaBuffer(item.audio,tracks[i]?.name||`traccia ${i+1}`,18000)));if(token!==playbackToken)return null;
     const sec=playCursorMs/1000/tempoRatio();
-    for(const item of items){
-      item.audio.pause();item.audio.playbackRate=1;
-      item.audio.currentTime=Math.min(sec,Math.max(0,(item.audio.duration||0)-0.01));
-    }
-    trackPlaybacks.push(...items);
-    updatePlaybackGains();
-    if(audioCtx?.state==='suspended')try{await audioCtx.resume()}catch(e){}
+    for(const item of items){item.audio.pause();item.audio.playbackRate=1;item.needsRelock=false;item.lastHardSync=0;item.audio.currentTime=Math.min(sec,Math.max(0,(item.audio.duration||0)-0.01))}
+    trackPlaybacks.push(...items);updatePlaybackGains();if(audioCtx?.state==='suspended')try{await audioCtx.resume()}catch(e){}
     showMediaProgress('Buffering tracce',82,'Avvio sincronizzato…');
-    // Arm every decoder before yielding again. The drift monitor then uses tiny
-    // playback-rate corrections; it does not continuously seek the tracks.
-    const starts=items.map(item=>item.audio.play());
-    await Promise.all(starts);
-    dynamicSyncClock=items[0]||null;
-    alignDynamicTracks(true);
-    startDynamicSyncMonitor();
-    $('#utilityBackdrop')?.classList.add('hidden');
-    if(current.realtime_meter_enabled&&!meterRaf)startVuMeterLoop();
-    return items[0]?.audio||null;
-  }finally{
-    playbackBuffering=false;
-  }
+    await Promise.all(items.map(item=>item.audio.play()));if(token!==playbackToken){for(const item of items)try{item.audio.pause()}catch(e){};return null}
+    dynamicSyncClock=items.find(x=>x.audio&&!x.audio.ended)||items[0]||null;alignDynamicTracks(true);startDynamicSyncMonitor();$('#utilityBackdrop')?.classList.add('hidden');if(current.realtime_meter_enabled&&!meterRaf)startVuMeterLoop();return dynamicSyncClock?.audio||null;
+  }finally{if(token===playbackToken)playbackBuffering=false}
 }
 
 function stopPlayback(){
+  ++playbackToken;
+  playbackBuffering=false;
   playbackPaused=false;
   meterRunToken++;
   if(playRaf){cancelAnimationFrame(playRaf);playRaf=null}
   if(meterRaf){cancelAnimationFrame(meterRaf);meterRaf=null}
   if(playAudio){playAudio.pause();playAudio.currentTime=0;playAudio=null}
-  for(const item of trackPlaybacks){try{item.audio.pause();item.audio.currentTime=0;item.audio.src=''}catch(e){}}
+  for(const item of trackPlaybacks){try{item.audio.pause();item.audio.currentTime=0;item.audio.removeAttribute('src');item.audio.load()}catch(e){}}
   trackPlaybacks=[];masterMeterAnalysers=null;masterPlaybackGainNode=null;
   renderedMasterPlayback=false;renderedMasterDirty=false;renderedMasterRefreshPromise=null;renderedMasterBaseVolumeDb=0;renderedMasterAudio=null;
   stopDynamicSyncMonitor();
@@ -1946,7 +1971,7 @@ async function previewMaster(){
         masterMeterAnalysers=masterGraph.analysers;
         masterPlaybackGainNode=masterGraph.gainNode;
         masterPlaybackGainNode.gain.setValueAtTime(1,audioCtx?.currentTime||0);
-        await startDynamicTrackPreview(true,true);
+        await startDynamicTrackPreview(true,true,token);if(token!==playbackToken)return;
       }else{
         const masterGraph=await attachPlaybackGraph(audio,{volume_db:0,pan:0},2,false,true);
         masterPlaybackGainNode=masterGraph.gainNode;
@@ -1955,7 +1980,7 @@ async function previewMaster(){
       await audio.play();
     }else{
       renderedMasterPlayback=false;renderedMasterDirty=false;renderedMasterAudio=null;
-      playAudio=await startDynamicTrackPreview(true,false);
+      playAudio=await startDynamicTrackPreview(true,false,token);if(token!==playbackToken)return;
     }
     if(!playAudio)return;playbackPaused=false;$('#playMaster').textContent='❚❚';$('#playMaster').title='Pausa';
     if(current?.follow_playback_enabled)followPlayhead(playCursorMs/1000*pxPerSec,true);
@@ -1974,7 +1999,7 @@ function movePlayhead(){
   if($('#transportTime'))$('#transportTime').textContent=fmtTime(playCursorMs/1000,true);
   playRaf=requestAnimationFrame(movePlayhead);
 }
-function selectExport(format){exportFormat=format;if(current){current.export_format=format;markDirty(150)}render()}
+function selectExport(format){exportFormat=format;if(current){current.export_format=format;markDirty(150)}}
 async function exportTrack(id,format){
   if(!current)return;
   await save();
@@ -2177,21 +2202,24 @@ async function showAbout(){
     const info=await api('/api/about');
     showUtilityModal('Informazioni',`
       <div class="about-card">
-        <img src="/static/logo.svg" alt="MTA Audio Editor" class="about-logo">
-        <h3>${esc(info.name||'MTA Audio Editor')}</h3>
-        <dl>
-          <dt>Versione</dt><dd>${esc(info.version||'')}</dd>
-          <dt>Build</dt><dd>${esc(info.build||'')}</dd>
-          <dt>Creatore</dt><dd>${esc(info.creator||'')}</dd>
-          <dt>Licenza</dt><dd>${esc(info.license||'')}</dd>
-          <dt>Progetto</dt><dd><a href="${esc(info.repository||'#')}" target="_blank" rel="noopener">${esc(info.repository||'')}</a></dd>
-        </dl>
-        <div class="utility-actions"><button class="utility-btn primary" onclick="closeUtilityModal()">Chiudi</button></div>
+        <div class="about-photo" aria-hidden="true"></div>
+        <div class="about-info-panel">
+          <img src="/static/logo.svg" alt="MTA Audio Editor" class="about-logo">
+          <h3>${esc(info.name||'MTA Audio Editor')}</h3>
+          <dl>
+            <dt>Versione</dt><dd>${esc(info.version||'')}</dd>
+            <dt>Build</dt><dd>${esc(info.build||'')}</dd>
+            <dt>Creatore</dt><dd>${esc(info.creator||'')}</dd>
+            <dt>Licenza</dt><dd>${esc(info.license||'')}</dd>
+            <dt>Progetto</dt><dd><a href="${esc(info.repository||'#')}" target="_blank" rel="noopener">${esc(info.repository||'')}</a></dd>
+          </dl>
+          <div class="utility-actions"><button class="utility-btn primary" onclick="closeUtilityModal()">Chiudi</button></div>
+        </div>
       </div>`);
   }catch(e){toast(e.message)}
 }
 
-function openExportPanel(){if(!current)return;if(!current.export_panel_visible){current.export_panel_visible=true;render();markDirty(100)}focusMixer();$('#exportPane')?.scrollIntoView({behavior:'smooth',block:'nearest'})}
+function openExportPanel(){if(!current)return toast('Apri prima un progetto');showUtilityModal('Export',exportWindowHtml())}
 function requireOpenProject(action){if(current)return true;toast(`Apri o crea un progetto per ${action}`);return false}
 function focusProjectWorkspace(){if(!current){$('#emptyState')?.scrollIntoView({behavior:'smooth',block:'center'});return}$('#editor')?.scrollIntoView({behavior:'smooth',block:'start'})}
 function focusTracks(){if(!requireOpenProject('visualizzare le tracce'))return;const el=$('.tracks-scroll')||$('.tracks')||$('#editor');el?.scrollIntoView({behavior:'smooth',block:'start'});el?.classList.add('nav-focus-pulse');setTimeout(()=>el?.classList.remove('nav-focus-pulse'),900)}
@@ -2392,6 +2420,27 @@ $('#mtafile').addEventListener('change',async e=>{
 init();
 
 
+
+function seSel(){if(!sampleEditor)return[0,0];let a=Math.round(Math.min(sampleEditor.a,sampleEditor.b)),b=Math.round(Math.max(sampleEditor.a,sampleEditor.b));if(b<=a){a=sampleEditor.viewStart;b=sampleEditor.viewEnd}return[a,b]}
+function seDefaults(effect,preset){if(effect==='pitch')return{semitones:0,cents:0};if(effect==='autotune')return{key:(current?.key||'C').split(/\s+/)[0]||'C',scale:/min/i.test(current?.key||'')?'minor':'major',strength:preset==='hard'?1:preset==='gentle'?.45:.75};if(effect==='normalizer'){const x={streaming:[-14,-1],broadcast:[-23,-2],music:[-12,-1],gentle:[-16,-1.5]}[preset]||[-14,-1];return{target_lufs:x[0],true_peak_db:x[1]}}if(effect==='maximizer'){const x={gentle:[1.5,-1],balanced:[3,-1],loud:[6,-.8],live:[2,-1.5]}[preset]||[3,-1];return{drive_db:x[0],ceiling_db:x[1]}}if(effect==='eq32')return{gains:Array(32).fill(0)};return{}}
+function seEffectHtml(){const e=sampleEditor.effect,p=sampleEditor.preset,q=sampleEditor.params||seDefaults(e,p),presets=sampleEditor.info.presets[e]||[];let f='';if(e==='pitch')f=`<div class="sample-param-grid"><label>Semitoni<input id="seSemi" type="number" min="-12" max="12" step="0.01" value="${q.semitones||0}" oninput="seParam()"></label><label>Centesimi<input id="seCents" type="number" min="-100" max="100" step="1" value="${q.cents||0}" oninput="seParam()"></label></div>`;if(e==='autotune')f=`<div class="sample-param-grid"><label>Tonalità<select id="seKey" onchange="seParam()">${['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'].map(x=>`<option ${x===q.key?'selected':''}>${x}</option>`).join('')}</select></label><label>Scala<select id="seScale" onchange="seParam()"><option value="major" ${q.scale==='major'?'selected':''}>Major</option><option value="minor" ${q.scale==='minor'?'selected':''}>Minor</option></select></label><label>Strength<input id="seStrength" type="range" min="0" max="1" step="0.05" value="${q.strength??.75}" oninput="seParam()"></label></div>`;if(e==='normalizer')f=`<div class="sample-param-grid"><label>Target LUFS<input id="seLufs" type="number" min="-30" max="-5" step="0.5" value="${q.target_lufs??-14}" oninput="seParam()"></label><label>True Peak dB<input id="sePeak" type="number" min="-6" max="-.1" step=".1" value="${q.true_peak_db??-1}" oninput="seParam()"></label></div>`;if(e==='maximizer')f=`<div class="sample-param-grid"><label>Drive dB<input id="seDrive" type="number" min="0" max="12" step=".1" value="${q.drive_db??3}" oninput="seParam()"></label><label>Ceiling dB<input id="seCeil" type="number" min="-6" max="-.1" step=".1" value="${q.ceiling_db??-1}" oninput="seParam()"></label></div>`;if(e==='eq32'){const bands=sampleEditor.info.eq_bands,g=q.gains||Array(32).fill(0);f=`<div class="sample-eq32">${bands.map((x,i)=>`<label><span>${x>=1000?(x/1000)+'k':x}</span><input class="seEq" type="range" min="-18" max="18" step=".5" value="${g[i]||0}" oninput="seParam()"><em>${Number(g[i]||0).toFixed(1)}</em></label>`).join('')}</div>`}return `<div class="sample-effect-head"><label>Processore<select id="seEffect" onchange="seEffectChange(this.value)"><option value="pitch" ${e==='pitch'?'selected':''}>Pitch correction</option><option value="autotune" ${e==='autotune'?'selected':''}>Auto-Tune</option><option value="normalizer" ${e==='normalizer'?'selected':''}>Normalizer</option><option value="maximizer" ${e==='maximizer'?'selected':''}>Maximizer</option><option value="eq32" ${e==='eq32'?'selected':''}>EQ grafico 32 bande</option></select></label><label>Preset<select id="sePreset" onchange="sePresetChange(this.value)">${presets.map(x=>`<option ${x===p?'selected':''}>${x}</option>`).join('')}</select></label></div>${f}<div class="sample-effect-actions"><button onclick="sePlayOriginal()">A · Originale</button><button onclick="sePreview(false)">B · Preview</button><button class="accent" onclick="seApply()">Applica in-place</button><span id="seStatus" class="hint"></span></div>`}
+function seEffectChange(v){sampleEditor.effect=v;sampleEditor.preset=(sampleEditor.info.presets[v]||[])[0]||'default';sampleEditor.params=seDefaults(v,sampleEditor.preset);$('#sampleFx').innerHTML=seEffectHtml();seSchedule()}
+function sePresetChange(v){sampleEditor.preset=v;sampleEditor.params=seDefaults(sampleEditor.effect,v);$('#sampleFx').innerHTML=seEffectHtml();seSchedule()}
+function seParam(){const e=sampleEditor.effect,p={};if(e==='pitch'){p.semitones=Number($('#seSemi')?.value||0);p.cents=Number($('#seCents')?.value||0)}if(e==='autotune'){p.key=$('#seKey')?.value||'C';p.scale=$('#seScale')?.value||'major';p.strength=Number($('#seStrength')?.value||.75)}if(e==='normalizer'){p.target_lufs=Number($('#seLufs')?.value||-14);p.true_peak_db=Number($('#sePeak')?.value||-1)}if(e==='maximizer'){p.drive_db=Number($('#seDrive')?.value||3);p.ceiling_db=Number($('#seCeil')?.value||-1)}if(e==='eq32')p.gains=$$('.seEq').map(x=>{const v=Number(x.value);x.parentElement.querySelector('em').textContent=v.toFixed(1);return v});sampleEditor.params=p;seSchedule()}
+function seReq(){const[a,b]=seSel();return{effect:sampleEditor.effect,start_sample:a,end_sample:b,preset:sampleEditor.preset,params:sampleEditor.params||{}}}
+function seSchedule(){clearTimeout(sampleEditorPreviewTimer);sampleEditorPreviewTimer=setTimeout(()=>sePreview(true),350)}
+async function sePreview(auto=false){if(sampleEditorPreviewAbort)sampleEditorPreviewAbort.abort();sampleEditorPreviewAbort=new AbortController();const st=$('#seStatus');if(st)st.textContent='Rendering…';try{const r=await fetch(`/api/projects/${current.id}/tracks/${sampleEditor.trackId}/sample-editor/effect-preview`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(seReq()),signal:sampleEditorPreviewAbort.signal});if(!r.ok)throw new Error(await r.text());const b=await r.blob();if(sampleEditor.preview)URL.revokeObjectURL(sampleEditor.preview);sampleEditor.preview=URL.createObjectURL(b);const a=$('#sampleAudio');if(a){a.src=sampleEditor.preview;if(!auto)await a.play().catch(()=>{})}if(st)st.textContent='Preview aggiornata'}catch(e){if(e.name!=='AbortError'&&st)st.textContent=e.message}}
+function sePlayOriginal(){const a=$('#sampleAudio');if(a){a.src=sampleEditor.audioUrl;a.currentTime=seSel()[0]/sampleEditor.info.sample_rate;a.play().catch(()=>{})}}
+async function seApply(){if(!confirm('Applicare il processing in-place alla selezione?'))return;const r=await api(`/api/projects/${current.id}/tracks/${sampleEditor.trackId}/sample-editor/effect-apply`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(seReq())});current=r.project;toast('Processing applicato');await openSampleEditor(sampleEditor.trackId,true)}
+async function seEdit(action){const[a,b]=seSel();if(['cut','delete'].includes(action)&&!confirm(action==='cut'?'Tagliare la selezione?':'Rimuovere la selezione?'))return;const r=await api(`/api/projects/${current.id}/tracks/${sampleEditor.trackId}/sample-editor/edit`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action,start_sample:a,end_sample:b,cursor_sample:sampleEditor.cursor||a})});if(action==='copy')return toast('Campioni copiati');current=r.project;toast('Traccia aggiornata');await openSampleEditor(sampleEditor.trackId,true)}
+function seEnvelope(buf,block=256){const out=[];for(let ch=0;ch<buf.numberOfChannels;ch++){const d=buf.getChannelData(ch),n=Math.ceil(d.length/block),mn=new Float32Array(n),mx=new Float32Array(n);for(let i=0;i<n;i++){let lo=1,hi=-1;for(let j=i*block;j<Math.min(d.length,(i+1)*block);j++){const v=d[j];if(v<lo)lo=v;if(v>hi)hi=v}mn[i]=lo;mx[i]=hi}out.push({mn,mx})}return{block,channels:out}}
+function seDraw(){const s=sampleEditor,c=$('#sampleCanvas');if(!s||!c)return;const w=Math.max(300,c.clientWidth),h=Math.max(180,c.clientHeight),dpr=devicePixelRatio||1;c.width=Math.round(w*dpr);c.height=Math.round(h*dpr);const x=c.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);x.fillStyle='#07131d';x.fillRect(0,0,w,h);const span=s.viewEnd-s.viewStart,spp=span/w,e=s.env;x.strokeStyle='#47b8ff';x.beginPath();for(let px=0;px<w;px++){const a=Math.floor(s.viewStart+px*spp),b=Math.ceil(s.viewStart+(px+1)*spp);let lo=1,hi=-1;if(spp>=e.block*.75){for(const ch of e.channels)for(let i=Math.floor(a/e.block);i<Math.ceil(b/e.block)&&i<ch.mn.length;i++){lo=Math.min(lo,ch.mn[i]);hi=Math.max(hi,ch.mx[i])}}else{for(let ch=0;ch<s.buffer.numberOfChannels;ch++){const d=s.buffer.getChannelData(ch);for(let i=a;i<b&&i<d.length;i++){lo=Math.min(lo,d[i]);hi=Math.max(hi,d[i])}}}if(hi<lo)lo=hi=0;x.moveTo(px+.5,h/2-hi*h*.46);x.lineTo(px+.5,h/2-lo*h*.46)}x.stroke();const[a,b]=seSel(),sx=(a-s.viewStart)/span*w,ex=(b-s.viewStart)/span*w;x.fillStyle='rgba(68,170,255,.2)';x.fillRect(Math.max(0,sx),0,Math.max(1,Math.min(w,ex)-Math.max(0,sx)),h);$('#seStart').value=a;$('#seEnd').value=b;$('#seRead').textContent=`${(a/s.info.sample_rate).toFixed(6)}s → ${(b/s.info.sample_rate).toFixed(6)}s · ${(b-a).toLocaleString()} campioni`;$('#sePos').value=Math.round(s.viewStart)}
+function seBind(){const c=$('#sampleCanvas'),at=e=>{const r=c.getBoundingClientRect();return Math.round(sampleEditor.viewStart+(e.clientX-r.left)/r.width*(sampleEditor.viewEnd-sampleEditor.viewStart))};let down=false;c.onpointerdown=e=>{down=true;c.setPointerCapture(e.pointerId);sampleEditor.a=sampleEditor.b=sampleEditor.cursor=at(e);seDraw()};c.onpointermove=e=>{if(down){sampleEditor.b=sampleEditor.cursor=at(e);seDraw()}};c.onpointerup=e=>{down=false;sampleEditor.b=sampleEditor.cursor=at(e);seDraw();seSchedule()};c.onwheel=e=>{e.preventDefault();const z=$('#seZoom');z.value=Math.max(0,Math.min(100,Number(z.value)+(e.deltaY<0?5:-5)));seZoom(z.value)}}
+function seZoom(v){const s=sampleEditor,min=Math.max(128,Math.round(s.info.sample_rate*.004)),max=s.info.total_samples,span=Math.round(min*Math.pow(max/min,1-Number(v)/100)),center=(s.viewStart+s.viewEnd)/2;s.viewStart=Math.max(0,Math.min(max-span,Math.round(center-span/2)));s.viewEnd=s.viewStart+span;$('#sePos').max=Math.max(0,max-span);seDraw()}
+function sePosition(v){const s=sampleEditor,span=s.viewEnd-s.viewStart;s.viewStart=Math.max(0,Math.min(s.info.total_samples-span,Number(v)||0));s.viewEnd=s.viewStart+span;seDraw()}
+function seInputs(){sampleEditor.a=Math.max(0,Math.min(sampleEditor.info.total_samples,Number($('#seStart').value)||0));sampleEditor.b=Math.max(0,Math.min(sampleEditor.info.total_samples,Number($('#seEnd').value)||0));sampleEditor.cursor=sampleEditor.a;seDraw();seSchedule()}
+async function openSampleEditor(trackId,reopen=false){try{if(!reopen)showUtilityModal('Editor waveform / campioni','<p class="hint">Preparazione audio…</p>');const info=await api(`/api/projects/${current.id}/tracks/${trackId}/sample-editor`),audioUrl=info.audio_url+'?v='+Date.now(),r=await fetch(audioUrl),ab=await r.arrayBuffer(),ctx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();audioCtx=ctx;const buf=await ctx.decodeAudioData(ab.slice(0)),seconds=Math.max(.25,Math.min(buf.duration,Math.max(2,1100/Math.max(25,pxPerSec)))),span=Math.min(info.total_samples,Math.round(seconds*info.sample_rate));sampleEditor={trackId,info,buffer:buf,env:seEnvelope(buf),audioUrl,preview:null,viewStart:0,viewEnd:span,a:0,b:Math.min(span,info.sample_rate),cursor:0,effect:'pitch',preset:'subtle',params:seDefaults('pitch','subtle')};showUtilityModal(`Editor waveform / campioni · ${esc(info.name)}`,`<div class="sample-editor"><div class="sample-toolbar"><button onclick="seEdit('cut')">✂ Taglia</button><button onclick="seEdit('copy')">⧉ Copia</button><button onclick="seEdit('paste')">▣ Incolla</button><button class="danger" onclick="seEdit('delete')">⌫ Rimuovi</button><span class="sample-rate">${info.sample_rate.toLocaleString()} Hz · ${info.total_samples.toLocaleString()} campioni</span></div><canvas id="sampleCanvas" class="sample-editor-wave"></canvas><div class="sample-nav"><label>Zoom<input id="seZoom" type="range" min="0" max="100" value="42" oninput="seZoom(this.value)"></label><label>Posizione<input id="sePos" type="range" min="0" max="${Math.max(0,info.total_samples-span)}" value="0" oninput="sePosition(this.value)"></label></div><div class="sample-selection"><label>Campione iniziale<input id="seStart" type="number" onchange="seInputs()"></label><label>Campione finale<input id="seEnd" type="number" onchange="seInputs()"></label><strong id="seRead"></strong></div><audio id="sampleAudio" controls src="${audioUrl}"></audio><section id="sampleFx" class="sample-effect-panel">${seEffectHtml()}</section><p class="hint">La vista iniziale segue lo zoom della timeline; usa rotella/Zoom per arrivare al dettaglio dei campioni. Il processing è pre-insert e il commit crea una nuova sorgente solo per questa traccia.</p></div>`);seBind();seDraw()}catch(e){toast('Editor waveform: '+e.message)}}
+
 function showUtilityModal(title,html,stemProgress=false){
   if(activeStemJob&&!stemProgress){
     toast('La separazione è in corso: la barra di progresso rimane visibile fino al completamento.');
@@ -2399,10 +2448,10 @@ function showUtilityModal(title,html,stemProgress=false){
   }
   $('#utilityTitle').textContent=title;$('#utilityBody').innerHTML=html;$('#utilityBackdrop').classList.remove('hidden');
 }
-function closeUtilityModal(){if(activeStemJob){toast('La separazione è in corso: usa Annulla separazione se vuoi interromperla.');return}$('#utilityBackdrop').classList.add('hidden')}
+function closeUtilityModal(){if(activeStemJob){toast('La separazione è in corso: usa Annulla separazione se vuoi interromperla.');return}$('#utilityBackdrop').classList.add('hidden');document.querySelector('.utility-modal')?.classList.remove('sample-editor-modal');sampleEditorState=null;clearTimeout(samplePreviewTimer);forceNativeViewportTop()}
 function exportProjectArchive(){if(!current){toast('Apri prima un progetto');return}window.location.href=`/api/projects/${current.id}/archive`}
 async function deleteCurrentProject(){if(!current){toast('Apri prima un progetto');return}await deleteProjectFromWorkspace(current.id,current.title)}
-$('#projectArchiveFile').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;const fd=new FormData();fd.append('file',f);try{current=await api('/api/project-archives/import',{method:'POST',body:fd});selectedTrackId=current.tracks[0]?.id||null;render();await refresh();toast('Progetto completo importato')}catch(err){toast('Import progetto fallito: '+err.message)}finally{e.target.value=''}})
+$('#projectArchiveFile').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;const fd=new FormData();fd.append('file',f);try{current=await api('/api/project-archives/import',{method:'POST',body:fd});rememberRecentProject(current.id);selectedTrackId=current.tracks[0]?.id||null;resetProjectUiForOpen();render();await refresh();toast('Progetto completo importato')}catch(err){toast('Import progetto fallito: '+err.message)}finally{e.target.value=''}})
 function projectDurationMs(){
   if(!current)return 0;
   let end=0;
@@ -2502,14 +2551,23 @@ async function manageProjectSharing(){
 async function addProjectShare(){const identifier=$('#shareIdentifier').value.trim();if(!identifier)return;try{await api(`/api/projects/${current.id}/shares`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({identifier})});await manageProjectSharing();toast('Progetto condiviso')}catch(e){toast(e.message)}}
 async function removeProjectShare(userId){try{await api(`/api/projects/${current.id}/shares/${userId}`,{method:'DELETE'});await manageProjectSharing()}catch(e){toast(e.message)}}
 
-function showSettings(){if(currentUser?.native_single_user)return showNativeSettings();if(currentUser?.role==='admin'){location.href='/settings';return}return toast('Settings non disponibile')}
+async function showSettings(){
+  if(!currentUser){try{currentUser=await api('/api/session')}catch(e){return toast('Impossibile caricare la sessione: '+e.message)}}
+  if(currentUser?.native_single_user)return showNativeSettings();
+  return showWebSettings();
+}
+function showWebSettings(){
+  const enabled=localStorage.getItem('mtaWebAutosaveEnabled')!=='false';
+  showUtilityModal('Settings',`<div class="form-grid web-settings"><label class="workflow-check"><input id="webAutosaveEnabled" type="checkbox" ${enabled?'checked':''}> Auto-save project changes</label><p class="hint">Le preferenze dell'editor sono salvate in questo browser. I modelli AI della web app sono invece gestiti sul server.</p><div class="form-actions"><button type="button" onclick="openAiModelManager()">Manage Lyrics / Chords models</button><button type="button" onclick="location.href='/account'">Account / Profile</button>${currentUser?.role==='admin'?`<button type="button" onclick="location.href='/settings'">Server administration</button>`:''}<button class="accent" onclick="saveWebSettings()">Save</button></div></div>`);
+}
+function saveWebSettings(){const enabled=$('#webAutosaveEnabled')?.checked!==false;localStorage.setItem('mtaWebAutosaveEnabled',enabled?'true':'false');autosaveEnabled=enabled;if(autosaveEnabled&&projectDirty)markDirty(50);closeUtilityModal();toast('Settings salvati')}
 async function showNativeSettings(){
   if(!currentUser?.native_single_user){if(currentUser?.role==='admin'){location.href='/settings';return}return}
   const apiBridge=await waitForNativeApi();
   if(!apiBridge?.get_native_settings){toast('Bridge nativo non disponibile. Riprova tra un istante.');return}
   try{
     const cfg=await apiBridge.get_native_settings();
-    showUtilityModal('Settings',`<div class="form-grid"><label>Maximum import/upload size (MB)<input id="nativeMaxUploadMb" type="number" min="1" max="10240" step="1" value="${Number(cfg.max_upload_mb)||1024}"></label><label class="workflow-check"><input id="nativeAutosaveEnabled" type="checkbox" ${cfg.autosave_enabled!==false?'checked':''}> Auto-save project changes</label><label>Update channel<select id="nativeUpdateChannel"><option value="stable" ${cfg.update_channel!=='early'?'selected':''}>Stable · GitHub tags/releases only</option><option value="early" ${cfg.update_channel==='early'?'selected':''}>Early release · include latest main packages</option></select></label><p>Stable checks only tagged GitHub releases. Early release also checks the rolling <b>early-main</b> package produced from main.</p><div class="form-actions"><button type="button" onclick="checkNativeAppUpdate(true)">Check for updates</button><button type="button" onclick="openNativeModelManager()">Manage Demucs models</button><button type="button" onclick="openAiModelManager()">Manage Lyrics / Chords models</button><button class="accent" onclick="saveNativeSettings()">Save</button></div></div>`);
+    showUtilityModal('Settings',`<div class="form-grid native-settings"><label>Maximum import/upload size (MB)<input id="nativeMaxUploadMb" type="number" min="1" max="10240" step="1" value="${Number(cfg.max_upload_mb)||1024}"></label><label class="workflow-check"><input id="nativeAutosaveEnabled" type="checkbox" ${cfg.autosave_enabled!==false?'checked':''}> Auto-save project changes</label><label>Update channel<select id="nativeUpdateChannel"><option value="stable" ${cfg.update_channel!=='early'?'selected':''}>Stable · GitHub tags/releases only</option><option value="early" ${cfg.update_channel==='early'?'selected':''}>Early release · include latest main packages</option></select></label><p>Stable checks only tagged GitHub releases. Early release also checks the rolling <b>early-main</b> package produced from main.</p><div class="form-actions"><button type="button" onclick="checkNativeAppUpdate(true)">Check for updates</button><button type="button" onclick="openNativeModelManager()">Manage Demucs models</button><button type="button" onclick="openAiModelManager()">Manage Lyrics / Chords models</button><button class="accent" onclick="saveNativeSettings()">Save</button></div></div>`);
   }catch(err){toast('Impossibile leggere le impostazioni native: '+err.message)}
 }
 async function saveNativeSettings(){
@@ -2543,7 +2601,7 @@ async function installNativeAppUpdate(assetUrl,assetName,releaseUrl){
 }
 
 function exposeNativeSettings(){
-  const b=$('#nativeSettingsButton');if(b&&window.pywebview?.api)b.hidden=false;
+  const b=$('#nativeSettingsButton');if(b)b.hidden=false;
 }
 window.addEventListener('pywebviewready',exposeNativeSettings);
 

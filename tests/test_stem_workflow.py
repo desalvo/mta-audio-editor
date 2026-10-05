@@ -40,7 +40,7 @@ def test_async_stem_workflow_persists_project_and_progress(tmp_path, monkeypatch
             }
 
         @classmethod
-        def split(cls, source, output_dir, model="htdemucs_6s", *, progress=None, cancel_event=None):
+        def split(cls, source, output_dir, model="htdemucs_6s", *, stem_count=0, progress=None, cancel_event=None):
             output_dir.mkdir(parents=True, exist_ok=True)
             if progress:
                 progress(35, "analysing")
@@ -146,7 +146,7 @@ def test_async_stem_workflow_can_be_cancelled(tmp_path, monkeypatch):
             return {"available": True, "models": ["htdemucs_6s"], "recommended_model": "htdemucs_6s"}
 
         @classmethod
-        def split(cls, source, output_dir, model="htdemucs_6s", *, progress=None, cancel_event=None):
+        def split(cls, source, output_dir, model="htdemucs_6s", *, stem_count=0, progress=None, cancel_event=None):
             for i in range(100):
                 if cancel_event is not None and cancel_event.is_set():
                     raise RuntimeError("stem separation cancelled")

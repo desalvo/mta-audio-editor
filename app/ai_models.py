@@ -115,12 +115,22 @@ def _chord_marker(model_id: str) -> Path:
 
 
 def chord_engine_available(engine_id: str) -> bool:
-    if engine_id in {"madmom-deep-chroma","madmom-cnn-crf"}:
-        return bool(importlib.util.find_spec("madmom_infer"))
-    if engine_id=="chordino":
+    if engine_id in {"madmom-deep-chroma", "madmom-cnn-crf"}:
+        # Check the actual lazily-imported modules, not only the top-level package.
+        # This keeps frozen/native builds from advertising an engine whose PyInstaller
+        # bundle is missing the chord recogniser modules.
+        return bool(
+            importlib.util.find_spec("madmom_infer")
+            and importlib.util.find_spec("madmom_infer.features.chords")
+            and importlib.util.find_spec("madmom_infer.audio.chroma")
+        )
+    if engine_id == "chordino":
         import shutil
+
+        # Chordino has no downloadable AI weights.  It is an external Vamp
+        # analyser and is available only when Sonic Annotator is installed.
         return bool(shutil.which("sonic-annotator"))
-    return engine_id=="mta-chromagram"
+    return engine_id == "mta-chromagram"
 
 
 def chords_catalog(*, native: bool = False) -> dict:

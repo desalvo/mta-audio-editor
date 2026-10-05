@@ -37,7 +37,9 @@ def test_web_ui_discloses_chord_engine_and_model_selection():
 
 
 def test_chord_runtime_is_packaged_for_server_and_native():
-    assert "madmom-infer==0.2.0" in (ROOT / "requirements-chords.txt").read_text(encoding="utf-8")
+    req = (ROOT / "requirements-chords.txt").read_text(encoding="utf-8")
+    assert "madmom-infer @ https://github.com/openmirlab/madmom-infer/archive/" in req
+    assert "bffead9be61857fd44b2e0d3a2510d9d94c8f2d2" in req
     docker = (ROOT / "Dockerfile").read_text(encoding="utf-8")
     spec = (ROOT / "native/mta_audio_editor_native.spec").read_text(encoding="utf-8")
     workflow = (ROOT / ".github/workflows/ci-cd.yml").read_text(encoding="utf-8")

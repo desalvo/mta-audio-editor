@@ -1,3 +1,45 @@
+## 0.2.0-139
+
+- Clip del progetto collapsed by default on every project open.
+- Web admin Settings availability hardened.
+- Native WebView viewport recovery prevents the whole app page from becoming stuck scrolled downward.
+
+## 0.2.0-138
+
+- Redesigned About dialog with a large application logo and documentation cover photo background that does not interfere with application information.
+- Build identifiers now use the strict 14-digit `YYYYMMDDhhmmss` format.
+- Native Settings buttons use explicit WebView-safe text styling.
+- Settings is now available to normal web users with editor preferences, AI model management and account access; administrators also get server administration access.
+
+## 0.2.0-137
+
+Export and project navigation were simplified: Export opens only when requested, PROJECTS was removed from the sidebar, native desktop gains Open recent, and the web client cleanly separates server projects from local project imports.
+
+## 0.2.0-136
+
+- Added a dedicated high-resolution waveform/sample editor opened from a track context menu or by double-clicking its timeline waveform.
+- Added sample-addressable selection/readout plus cut, copy, paste and remove operations that create an isolated edited source for the selected track.
+- Added in-place Pitch Correction (semitones + cents), pitch-to-scale Auto-Tune, Normalizer, Maximizer and 32-band Graphic EQ with factory presets and debounced processed previews.
+- The sample editor uses a cached pre-insert track render and an adaptive min/max envelope pyramid so waveform detail follows the current zoom without plotting every audio sample.
+
+## 0.2.0-135
+
+- Native Chords: fixed missing `madmom_infer.features.chords` in frozen builds and improved Chordino availability messaging.
+- Waveforms: previews now render from cached project peaks with adaptive decimation instead of re-downloading and decoding every audio file.
+
+## 0.2.0-134
+
+Native AI text-analysis fixes: readable model-download controls, OS-backed TLS validation for model downloads, and a working Madmom chord/chroma runtime.
+
+## 0.2.0-133
+
+- Separation from a track context menu is no longer implicit: all separation parameters must be confirmed first.
+- Fixed severe multitrack playback stalls, delayed/ineffective Stop during Render preparation, and timeline/audio drift caused by repeated hard seeks while tracks were buffering.
+
+## 0.2.0-132
+
+- Improved mixer fader/VU layout, added permanent dB scales, double-click unity-gain reset, and realtime peak LEDs for tracks and Master.
+
 ## 0.2.0-131
 
 - Fixed the remaining macOS x64 GitHub Actions failure caused by madmom-infer upgrading NumPy beyond the supported Numba range.

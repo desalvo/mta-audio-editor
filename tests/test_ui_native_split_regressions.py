@@ -105,7 +105,7 @@ def test_stem_split_without_original_mix_never_adds_original_track(tmp_path, mon
         def status(cls):
             return {"available": True, "models": ["htdemucs_6s"], "recommended_model": "htdemucs_6s"}
         @classmethod
-        def split(cls, source, output_dir, model="htdemucs_6s", *, progress=None, cancel_event=None):
+        def split(cls, source, output_dir, model="htdemucs_6s", *, stem_count=0, progress=None, cancel_event=None):
             output_dir.mkdir(parents=True, exist_ok=True)
             out = output_dir / "vocals.wav"
             subprocess.run(["ffmpeg", "-y", "-v", "error", "-i", str(source), str(out)], check=True)

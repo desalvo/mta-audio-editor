@@ -21,7 +21,7 @@ from fastapi.staticfiles import StaticFiles
 
 from .audio_engine import auto_align_ms, delete_range, delete_song_range, ensure_clips, estimate_bpm, generate_metronome_wav, media_duration_ms, project_duration_ms, render_mix, render_track, render_track_export, shift_track, waveform_peaks
 from .codec import export_mta, ffprobe, import_mta, resolve_mta_device_profile, suggested_slots, validate_slot_mapping
-from .models import AutoMixRequest, Clip, CustomPresetRequest, DeleteRangeRequest, InstantiateProjectClipRequest, UpdateProjectClipRequest, MoveTrackRequest, MtaExportRequest, Project, ProjectClip, ProjectExportRequest, RightsRecord, Track
+from .models import AutoMixRequest, Clip, CustomPresetRequest, DeleteRangeRequest, InstantiateProjectClipRequest, UpdateProjectClipRequest, MoveTrackRequest, SampleEditorRequest, MtaExportRequest, Project, ProjectClip, ProjectExportRequest, RightsRecord, Track, SampleEditRequest, SampleEffectRequest
 from .plugins import STEM_SPLITTER, delete_user_preset, plugin_manifest, save_user_preset
 
 from .model_updater import (COREML_DIR, ONNX_DIR, start_background_updater, update_once as update_mobile_demucs_models,
@@ -65,6 +65,7 @@ from .storage import (
     ROOT as STORAGE_ROOT,
 )
 from .rights_registry import provider_catalog as rights_provider_catalog, search_provider as search_rights_provider
+from . import sample_editor as sample_editor_engine
 from .version import APP_VERSION, BUILD_ID, CREATOR, REPOSITORY
 
 app = FastAPI(title="MTA Audio Editor", version=APP_VERSION, docs_url=None, redoc_url=None, openapi_url=None)
@@ -1195,6 +1196,78 @@ def project_audio(pid: str, filename: str, request: Request):
     return FileResponse(path)
 
 
+
+
+@app.get("/api/projects/{pid}/tracks/{track_id}/sample-editor")
+def sample_editor_info(pid: str, track_id: str, request: Request):
+    project = _project_for_actor(request, pid)
+    track = next((x for x in project.tracks if x.id == track_id), None)
+    if track is None:
+        raise HTTPException(404, "traccia non trovata")
+    src = sample_editor_engine.rendered_source(pid, track)
+    rate = sample_editor_engine.sample_rate(src)
+    duration = media_duration_ms(src)
+    return {"track_id": track.id, "name": track.name, "sample_rate": rate, "duration_ms": duration,
+            "total_samples": round(duration / 1000 * rate),
+            "audio_url": f"/api/projects/{pid}/tracks/{track_id}/sample-editor/audio",
+            "eq_bands": sample_editor_engine.EQ_BANDS, "presets": sample_editor_engine.PRESETS}
+
+
+@app.get("/api/projects/{pid}/tracks/{track_id}/sample-editor/audio")
+def sample_editor_audio(pid: str, track_id: str, request: Request):
+    project = _project_for_actor(request, pid)
+    track = next((x for x in project.tracks if x.id == track_id), None)
+    if track is None:
+        raise HTTPException(404, "traccia non trovata")
+    src = sample_editor_engine.rendered_source(pid, track)
+    return FileResponse(src, media_type="audio/wav", filename=f"{track.name}-sample-editor.wav")
+
+
+@app.post("/api/projects/{pid}/tracks/{track_id}/sample-editor/edit")
+def sample_editor_edit(pid: str, track_id: str, req: SampleEditRequest, request: Request):
+    project = _project_for_actor(request, pid)
+    track = next((x for x in project.tracks if x.id == track_id), None)
+    if track is None:
+        raise HTTPException(404, "traccia non trovata")
+    try:
+        result = sample_editor_engine.edit(project, track, req)
+    except (ValueError, RuntimeError) as exc:
+        raise HTTPException(400, str(exc)) from exc
+    if req.action == "copy":
+        return {"ok": True, **result}
+    _register_track_source_in_library(project, track, "Sample editor commit")
+    save_project(project)
+    return {"ok": True, "project": project, "track": track}
+
+
+@app.post("/api/projects/{pid}/tracks/{track_id}/sample-editor/effect-preview")
+def sample_editor_effect_preview(pid: str, track_id: str, req: SampleEffectRequest, request: Request):
+    project = _project_for_actor(request, pid)
+    track = next((x for x in project.tracks if x.id == track_id), None)
+    if track is None:
+        raise HTTPException(404, "traccia non trovata")
+    try:
+        out = sample_editor_engine.apply_effect(project, track, req, True)
+    except (ValueError, RuntimeError) as exc:
+        raise HTTPException(400, str(exc)) from exc
+    return FileResponse(out, media_type="audio/mpeg", filename="sample-effect-preview.mp3", background=BackgroundTask(lambda: out.unlink(missing_ok=True)))
+
+
+@app.post("/api/projects/{pid}/tracks/{track_id}/sample-editor/effect-apply")
+def sample_editor_effect_apply(pid: str, track_id: str, req: SampleEffectRequest, request: Request):
+    project = _project_for_actor(request, pid)
+    track = next((x for x in project.tracks if x.id == track_id), None)
+    if track is None:
+        raise HTTPException(404, "traccia non trovata")
+    try:
+        out = sample_editor_engine.apply_effect(project, track, req, False)
+        sample_editor_engine.commit(project, track, out)
+    except (ValueError, RuntimeError) as exc:
+        raise HTTPException(400, str(exc)) from exc
+    _register_track_source_in_library(project, track, "Sample editor effect")
+    save_project(project)
+    return {"ok": True, "project": project, "track": track}
+
 def _copy_limited(src, dst: Path):
     total = 0
     with dst.open("wb") as out:
@@ -2284,6 +2357,7 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
         extract_chords_after = bool(job.get("extract_chords"))
         split_backing_vocals = bool(job.get("split_backing_vocals"))
         backing_vocal_model = str(job.get("backing_vocal_model") or LEAD_BACKING_DEFAULT_MODEL)
+        stem_count = int(job.get("stem_count") or 0)
 
     def progress(value: int, message: str) -> None:
         _stem_job_update(job_id, progress=max(1, min(99, int(value))), message=message)
@@ -2311,6 +2385,7 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
                 source,
                 td / "stems",
                 model=model,
+                stem_count=stem_count,
                 progress=progress,
                 cancel_event=cancel_event,
             )
@@ -2657,6 +2732,9 @@ def managed_lyrics_model_download(model_id: str, request: Request):
     try: return download_lyrics_model(model_id, native=NATIVE_SINGLE_USER)
     except ValueError as exc: raise HTTPException(404, str(exc)) from exc
     except RuntimeError as exc: raise HTTPException(503, str(exc)) from exc
+    except Exception as exc:
+        LOGGER.exception("Lyrics model download failed")
+        raise HTTPException(502, f"Download modello lyrics fallito: {exc}") from exc
 
 @app.delete("/api/ai-models/lyrics/{model_id}")
 def managed_lyrics_model_delete(model_id: str, request: Request):
@@ -2670,6 +2748,9 @@ def managed_chord_model_download(model_id: str, request: Request):
     try: return download_chord_model(model_id, native=NATIVE_SINGLE_USER)
     except ValueError as exc: raise HTTPException(404, str(exc)) from exc
     except RuntimeError as exc: raise HTTPException(503, str(exc)) from exc
+    except Exception as exc:
+        LOGGER.exception("Chords model download failed")
+        raise HTTPException(502, f"Download modello chords fallito: {exc}") from exc
 
 @app.delete("/api/ai-models/chords/{model_id}")
 def managed_chord_model_delete(model_id: str, request: Request):
@@ -2952,6 +3033,8 @@ def start_track_stem_job(
     request: Request,
     model: str = "htdemucs_6s",
     stem_count: int = 0,
+    split_backing_vocals: bool = False,
+    backing_vocal_model: str = LEAD_BACKING_DEFAULT_MODEL,
 ):
     project = _project_for_actor(request, pid)
     if not STEM_SPLITTER.available():
@@ -2971,6 +3054,11 @@ def start_track_stem_job(
     status = STEM_SPLITTER.status()
     if model not in status["models"]:
         raise HTTPException(400, "Modello di separazione non supportato.")
+    if split_backing_vocals and backing_vocal_model != "ffmpeg-center-side":
+        try:
+            _lead_backing_model_info(backing_vocal_model)
+        except ValueError as exc:
+            raise HTTPException(400, str(exc)) from exc
     track = next((item for item in project.tracks if item.id == track_id), None)
     if track is None:
         raise HTTPException(404, "track not found")
@@ -3001,6 +3089,10 @@ def start_track_stem_job(
         "progress": 5,
         "message": f"Separazione della traccia {track.name} in coda",
         "model": model,
+        "stem_count": stem_count,
+        "split_backing_vocals": bool(split_backing_vocals),
+        "backing_vocal_model": backing_vocal_model,
+        "vocal_split_method": None,
         "filename": track.name,
         "created_at": now,
         "updated_at": now,

@@ -15,6 +15,22 @@ from pathlib import Path
 
 APP_NAME = "MTA Audio Editor"
 
+
+def _configure_native_tls() -> None:
+    """Use the operating-system trust store in frozen native applications."""
+    try:
+        import truststore
+        truststore.inject_into_ssl()
+    except Exception:
+        # Keep normal Python TLS behaviour as a safe fallback; never disable verification.
+        try:
+            import certifi
+            os.environ.setdefault("SSL_CERT_FILE", certifi.where())
+            os.environ.setdefault("REQUESTS_CA_BUNDLE", certifi.where())
+        except Exception:
+            pass
+
+
 if not getattr(sys, "frozen", False):
     project_root = Path(__file__).resolve().parents[1]
     if str(project_root) not in sys.path:
@@ -39,6 +55,7 @@ def _data_root() -> Path:
 
 
 def _prepare_environment() -> Path:
+    _configure_native_tls()
     root = _data_root()
     root.mkdir(parents=True, exist_ok=True)
     cache = root / ".cache"

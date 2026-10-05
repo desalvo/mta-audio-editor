@@ -9,23 +9,27 @@ from fastapi.testclient import TestClient
 WRITE = {"X-MTA-Request": "1"}
 
 
-def test_projects_panel_collapsed_and_contextual_split_ui():
+def test_project_file_navigation_and_contextual_split_ui():
     root = Path(__file__).resolve().parents[1]
     html = (root / "app/templates/index.html").read_text(encoding="utf-8")
     js = (root / "app/static/app.js").read_text(encoding="utf-8")
     css = (root / "app/static/app.css").read_text(encoding="utf-8")
 
-    assert 'id="projectsPanel"' in html
-    assert 'sidebar-projects collapsed' in html
-    assert "toggleProjectsPanel" in js
+    assert 'id="projectsPanel"' not in html
+    assert '>PROJECTS<' not in html
+    assert "toggleProjectsPanel" not in js
+    assert 'id="openRecentProjectBtn"' in html
+    assert 'id="openLocalProjectBtn"' in html
+    assert "openProjectSelector()" in html
+    assert "function openRecentProjects()" in js
     assert "openTrackContextMenu" in js
     assert "<span>Separa</span>" in js
     assert "<span>Rimuovi</span>" in js
     assert "/stem-jobs" in js
     assert ".track-context-menu" in css
-    assert ".sidebar-projects.collapsed .projects-body" in css
+    assert ".project-picker-list" in css
     assert "saveProjectLocal()" in html
-    assert "openProjectArchive()" in html
+    assert "Open local project" in html
 
 
 def test_native_api_can_save_and_open_project_archive(tmp_path, monkeypatch):
@@ -171,7 +175,7 @@ def test_contextual_track_stem_job_adds_stems_without_duplicate_source(tmp_path,
             return {"available": True, "models": ["htdemucs_6s"], "recommended_model": "htdemucs_6s"}
 
         @classmethod
-        def split(cls, source, output_dir, model="htdemucs_6s", *, progress=None, cancel_event=None):
+        def split(cls, source, output_dir, model="htdemucs_6s", *, stem_count=0, progress=None, cancel_event=None):
             output_dir.mkdir(parents=True, exist_ok=True)
             out = output_dir / "vocals.wav"
             shutil.copy2(source, out)

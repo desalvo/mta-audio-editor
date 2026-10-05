@@ -143,6 +143,17 @@ class DeleteRangeRequest(BaseModel):
     ripple: bool = False
 
 
+
+
+class SampleEditorRequest(BaseModel):
+    action: Literal["copy", "cut", "remove", "paste", "process"]
+    start_sample: int = Field(default=0, ge=0)
+    end_sample: int = Field(default=0, ge=0)
+    insert_sample: int = Field(default=0, ge=0)
+    processor: Literal["pitch", "autotune", "normalizer", "maximizer", "eq32"] | None = None
+    params: dict[str, float | int | str | bool | list[float]] = Field(default_factory=dict)
+    preview: bool = False
+
 class MoveTrackRequest(BaseModel):
     offset_ms: int = Field(ge=-86_400_000, le=86_400_000)
 
@@ -187,6 +198,21 @@ class ProjectExportRequest(BaseModel):
     karaoke_background: str | None = Field(default=None, max_length=180)
     slots: list[MtaSlotMapping] = Field(default_factory=list, max_length=16)
     output_path: str | None = Field(default=None, max_length=4096)
+
+
+class SampleEditRequest(BaseModel):
+    action: Literal["copy", "cut", "delete", "paste"]
+    start_sample: int = Field(default=0, ge=0)
+    end_sample: int = Field(default=0, ge=0)
+    cursor_sample: int = Field(default=0, ge=0)
+
+
+class SampleEffectRequest(BaseModel):
+    effect: Literal["pitch", "autotune", "normalizer", "maximizer", "eq32"]
+    start_sample: int = Field(default=0, ge=0)
+    end_sample: int = Field(default=0, ge=0)
+    preset: str = Field(default="default", max_length=80)
+    params: dict[str, float | str | bool | list[float]] = Field(default_factory=dict)
 
 
 class Project(BaseModel):

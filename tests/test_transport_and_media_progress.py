@@ -34,7 +34,8 @@ def test_ui_has_working_transport_progress_and_persistent_tracks():
     assert "function showMediaProgress(" in js
     assert "track-import-jobs" in js
     assert "track-export-jobs" in js
-    assert "data-open-project" in js
+    assert "function openProjectSelector()" in js
+    assert "projectPickerRows" in js
     assert "audibly-muted" in js
     # Mute/Solo must not filter the visual track arrays out.
     # Playback may filter inaudible tracks, but visual rendering must always map

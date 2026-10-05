@@ -15,8 +15,9 @@ def test_dynamic_playback_buffers_and_realigns():
     assert "function waitForMediaBuffer(" in JS
     assert "Pre-buffer ${tracks.length} tracce… attendere" in JS
     assert "startDynamicSyncMonitor()" in JS
-    assert "Math.abs(drift)>0.120" in JS
-    assert "playbackRate=Math.max(.985,Math.min(1.015,1-drift*.20))" in JS
+    assert "audio.readyState<3||audio.seeking" in JS
+    assert "item.needsRelock=true" in JS
+    assert "playbackRate=Math.max(.995,Math.min(1.005,1-drift*.06))" in JS
 
 def test_render_follow_has_dedicated_clock():
     assert "renderedMasterAudio" in JS

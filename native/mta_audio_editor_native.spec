@@ -32,11 +32,28 @@ for env_name, dest_name in (("MTA_NATIVE_FFMPEG", "ffmpeg"), ("MTA_NATIVE_FFPROB
         binaries.append((value, "bin"))
 
 hiddenimports = []
-for package in ("webview", "demucs", "torch", "torchaudio", "whisper", "madmom_infer"):
+for package in ("webview", "demucs", "torch", "torchaudio", "whisper", "madmom_infer", "truststore", "certifi"):
     package_datas, package_binaries, package_hidden = collect_all(package)
     datas += package_datas
     binaries += package_binaries
     hiddenimports += package_hidden
+
+# madmom-infer loads the chord processors lazily at runtime.  Keep these
+# explicit even when collect_all() cannot discover them while freezing.
+for module in (
+    "madmom_infer.features.chords",
+    "madmom_infer.audio.chroma",
+    "madmom_infer.audio.signal",
+    "madmom_infer.audio.stft",
+    "madmom_infer.audio.spectrogram",
+    "madmom_infer.ml.crf",
+    "madmom_infer.ml.nn",
+    "madmom_infer.models",
+    "madmom_infer.backends",
+    "madmom_infer.processors",
+):
+    if module not in hiddenimports:
+        hiddenimports.append(module)
 
 a = Analysis(
     [str(project / "native" / "mta_audio_editor_native.py")],

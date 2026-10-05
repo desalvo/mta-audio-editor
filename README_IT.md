@@ -10,7 +10,7 @@ Alessandro De Salvo <braket71@gmail.com>
 **Repository:** `desalvo/mta-audio-editor`  
 **Licenza:** EUPL-1.2  
 **Versione:** `0.2.0-95`  
-**Build:** generato automaticamente nel formato `YYYYMMDD-HH:MM:SS`.
+**Build:** generato automaticamente nel formato `YYYYMMDDhhmmss`.
 
 
 ## Manuali PDF / PDF manuals
@@ -389,3 +389,14 @@ The dedicated vocal split uses `audio-separator==0.47.0` and downloads the selec
 ### Gestione modelli Lyrics e Chords
 
 Dalla versione 0.2.0-126, i modelli Lyrics e Chords sono gestiti on-demand come gli altri modelli AI. Nella web app i pesi sono memorizzati sul server; nelle applicazioni native desktop sono memorizzati localmente. Per Lyrics è possibile scegliere tra i modelli OpenAI Whisper disponibili (default `large-v3`). Per Chords è possibile scegliere il motore prima di ogni estrazione: Madmom Deep Chroma + CRF (default AI), Madmom CNN + CRF, Chordino / NNLS-Chroma oppure l'analizzatore MTA Chromagram. L'interfaccia mostra sempre il motore/modello effettivo e, per i checkpoint Madmom, la licenza CC BY-NC-SA 4.0 non-commerciale dei pesi.
+
+### Editor waveform/campioni
+Dalla waveform della timeline (doppio click) o dal menu contestuale di una traccia è disponibile un editor dedicato ad alta risoluzione. La selezione mostra i campioni esatti e consente Taglia/Copia/Incolla/Rimuovi. Sono disponibili processing in-place con preview A/B dinamica: Pitch Correction fine (semitoni + centesimi), Auto-Tune pitch-to-scale con tonalità/scala/strength, Normalizer, Maximizer ed EQ grafico a 32 bande con preset. Il commit crea una nuova sorgente per la sola traccia modificata, senza alterare altre istanze che condividevano il file originale.
+
+
+### Navigazione progetti ed Export
+
+- **Export** apre una finestra dedicata solo quando richiesto; non occupa più spazio accanto al mixer.
+- La vecchia sezione laterale **PROJECTS** è stata rimossa.
+- Nella web app **Open project** elenca i progetti già disponibili sul server e **Open local project** importa un archivio progetto dal dispositivo.
+- Nell'app desktop nativa **Open recent** mostra i progetti aperti di recente ancora presenti nel workspace locale, mentre **Open project** usa il selettore filesystem nativo.
