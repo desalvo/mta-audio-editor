@@ -1,3 +1,7 @@
+# 0.2.0-146
+
+- Fix GitHub Actions Ruff S110 failures in native AI accelerator probing by logging non-fatal CUDA/MPS probe errors instead of silently passing.
+
 ## 0.2.0-145
 - Lyrics/Chords extraction chooser stays open until a real background job exists and the progress dialog can show a concrete preparation/download/analysis state.
 - Extraction progress now uses real audio time in 5-second chunks, with indeterminate progress while a model is being loaded/downloaded and monotonic percentages during analysis/sync/save.

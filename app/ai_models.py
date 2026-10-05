@@ -3,9 +3,13 @@ from __future__ import annotations
 import gc
 import importlib.util
 import json
+import logging
 import os
 from pathlib import Path
 from urllib.parse import urlparse
+
+
+LOGGER = logging.getLogger(__name__)
 
 
 LYRICS_MODELS = [
@@ -197,14 +201,16 @@ def _accelerator_info() -> dict:
         import torch  # type: ignore
         if torch.cuda.is_available():
             name="CUDA"
-            try: name=f"CUDA · {torch.cuda.get_device_name(0)}"
-            except Exception: pass
+            try:
+                name = f"CUDA · {torch.cuda.get_device_name(0)}"
+            except Exception as exc:
+                LOGGER.debug("Unable to read CUDA device name: %s", exc)
             return {"device":name,"hardware_accelerated":True,"source":"torch"}
         mps=getattr(getattr(torch,"backends",None),"mps",None)
         if mps is not None and mps.is_available():
             return {"device":"Apple Metal / MPS","hardware_accelerated":True,"source":"torch"}
-    except Exception:
-        pass
+    except Exception as exc:
+        LOGGER.debug("Unable to probe Torch AI accelerators: %s", exc)
     return {"device":"CPU","hardware_accelerated":False,"source":"fallback"}
 
 def ai_catalog(*, native: bool = False) -> dict:
