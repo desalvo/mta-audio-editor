@@ -1,3 +1,8 @@
+## 0.2.0-142
+
+- Android CI: installa i package SDK reali `platforms;android-37.0` e `build-tools;37.0.0`, mantenendo compileSdk 37, AGP 9.1.1 e Gradle 9.3.1.
+- Corretto il fallimento `Failed to find package platforms;android-37` sui runner GitHub Actions.
+
 ## 0.2.0-141
 
 - Android toolchain aligned with androidx.core 1.19.1: compileSdk 37, AGP 9.1.1, Gradle 9.3.1, explicit API 37/build-tools install in CI.

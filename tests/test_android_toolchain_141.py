@@ -12,4 +12,4 @@ def test_android_api37_toolchain_matches_androidx_core_1191():
     assert 'onnxruntime-android:1.30.0' in app
     assert 'version "9.1.1"' in root
     assert "gradle-version: '9.3.1'" in workflow
-    assert 'sdkmanager "platforms;android-37" "build-tools;36.0.0"' in workflow
+    assert 'sdkmanager "platforms;android-37.0" "build-tools;37.0.0"' in workflow
