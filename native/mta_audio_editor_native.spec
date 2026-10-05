@@ -7,8 +7,9 @@ from PyInstaller.utils.hooks import collect_all
 
 project = Path(SPECPATH).parent
 version_text = (project / "VERSION").read_text(encoding="utf-8").strip()
+revision_text = (project / "REVISION").read_text(encoding="utf-8").strip()
 build_text = (project / "BUILD_INFO").read_text(encoding="utf-8").strip() if (project / "BUILD_INFO").exists() else "unknown"
-numeric_version = ".".join(__import__("re").findall(r"\d+", version_text)[:4])
+numeric_version = ".".join(__import__("re").findall(r"\d+", version_text)[:3] + [revision_text])
 icon_dir = project / "native" / "icons"
 windows_icon = icon_dir / "mta-audio-editor.ico"
 mac_icon = icon_dir / "mta-audio-editor.icns"
@@ -19,6 +20,7 @@ datas = [
     (str(project / "app" / "static"), "app/static"),
     (str(project / "app" / "docs"), "app/docs"),
     (str(project / "VERSION"), "."),
+    (str(project / "REVISION"), "."),
 ]
 build_file = project / "BUILD_INFO"
 if build_file.exists():
@@ -105,7 +107,8 @@ if sys.platform == "darwin":
             "CFBundleDisplayName": "MTA Audio Editor",
             "CFBundleName": "MTA Audio Editor",
             "CFBundleShortVersionString": version_text,
-            "CFBundleVersion": numeric_version or "0.0.0.0",
+            "CFBundleVersion": revision_text,
+            "MTAEditorRevision": revision_text,
             "NSHumanReadableCopyright": "Alessandro De Salvo - EUPL-1.2",
             "MTAEditorBuild": build_text,
             "MTAEditorCreator": "Alessandro De Salvo",

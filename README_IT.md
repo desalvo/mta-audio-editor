@@ -1,4 +1,4 @@
-# MTA Audio Editor 0.2.0-95
+# MTA Audio Editor 0.2.0
 
 ![MTA Audio Editor](app/static/logo.svg)
 
@@ -9,7 +9,8 @@ Web DAW containerizzata per creare, importare, modificare ed esportare progetti 
 Alessandro De Salvo <braket71@gmail.com>  
 **Repository:** `desalvo/mta-audio-editor`  
 **Licenza:** EUPL-1.2  
-**Versione:** `0.2.0-95`  
+**Versione:** `0.2.0`  
+**Revision:** `153`  
 **Build:** generato automaticamente nel formato `YYYYMMDDhhmmss`.
 
 
@@ -188,15 +189,15 @@ git init
 git branch -M main
 git remote add origin https://github.com/desalvo/mta-audio-editor.git
 git add .
-git commit -m "Release 0.2.0-95"
+git commit -m "Release 0.2.0 revision 153"
 git push -u origin main
 ```
 
 Dopo che la CI su `main` è verde, creare il tag:
 
 ```bash
-git tag -s 0.2.0-95 -m "MTA Audio Editor 0.2.0-95"
-git push origin 0.2.0-95
+git tag -s v0.2.0 -m "MTA Audio Editor 0.2.0"
+git push origin v0.2.0
 ```
 
 ## Packaging locale
@@ -413,3 +414,7 @@ Ogni riga Chords dispone della stessa logica dell’editor Lyrics: **+ sopra**, 
 ### Migliorie native 0.2.0-149
 
 Dopo la creazione un nuovo progetto viene immediatamente caricato nell’editor completo. Import YouTube usa un fallback alla clipboard di sistema nelle app native e presenta un layout più ordinato e responsivo.
+
+## Versionamento
+
+Le release pubbliche usano tag semantici come `v0.2.0`. `REVISION` identifica la revisione esatta del sorgente/package all'interno della release, mentre `BUILD_INFO` resta l'identificativo di build indipendente a 14 cifre.

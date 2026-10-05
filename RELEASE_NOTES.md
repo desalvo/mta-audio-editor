@@ -1,8 +1,19 @@
-# 0.2.0-153
+# 0.2.0 · Revision 154
 
-- Fixed the GitHub Actions Quality gate after 0.2.0-152: the Android package-version regression test no longer hardcodes the previous release number.
-- The Android release test now derives both `versionName` and `versionCode` from the repository `VERSION`, preventing the same CI failure on subsequent revision bumps.
-- Advanced Android/iOS/native package metadata to 0.2.0-153 while preserving the 0.2.0-152 Windows `.maeproj` Inno Setup quoting fix and all 0.2.0-151 playback changes.
+- Fixed extracted chords being lost by stale hidden timed-text fields before persistence; extracted chords now populate the Chords list immediately.
+- Fixed Whisper lyrics extraction on Apple MPS by keeping inference in float32 and transparently retrying on CPU when upstream MPS code attempts an unsupported float64 tensor conversion.
+- BPM values are now rounded to whole numbers in the project UI and BPM-estimation endpoints.
+- Fixed YouTube import: the Import audio button now sends a proper JSON request and gives launch feedback.
+- YouTube Paste buttons have explicit readable styling; standard Ctrl/Cmd copy/cut/paste/select shortcuts are preserved inside text inputs.
+- Moved PROJECT / FILE above EDIT / IMPORT / MIX in the vertical sidebar.
+
+# 0.2.0 — revision 153
+
+- Adopted the final release identity convention: public product version `0.2.0`, source/package revision `153`, and the existing 14-digit `BUILD_INFO` as the independent build identifier.
+- Stable Git/GitHub release tag is `v0.2.0`; exact downloadable artifacts use `0.2.0-r154` when the revision must be visible.
+- Runtime metadata, native installers, Android/iOS packages and Docker builds now keep version, revision and build as separate concepts.
+- The Android regression test derives its package identity from `VERSION` + `REVISION`, avoiding hardcoded revision failures.
+- Preserved the Windows `.maeproj` Inno Setup quoting fix and all realtime playback improvements from the preceding revisions.
 
 # 0.2.0-152
 

@@ -5,13 +5,16 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 version = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
+revision = (ROOT / "REVISION").read_text(encoding="utf-8").strip()
 build = (ROOT / "BUILD_INFO").read_text(encoding="utf-8").strip() if (ROOT / "BUILD_INFO").exists() else "unknown"
 
-numbers = [int(x) for x in re.findall(r"\d+", version)[:4]]
-while len(numbers) < 4:
+numbers = [int(x) for x in re.findall(r"\d+", version)[:3]]
+while len(numbers) < 3:
     numbers.append(0)
-major, minor, patch, revision = numbers[:4]
-tuple_text = f"({major}, {minor}, {patch}, {revision})"
+major, minor, patch = numbers[:3]
+revision_number = int(revision)
+tuple_text = f"({major}, {minor}, {patch}, {revision_number})"
+release = f"{version}-r{revision}"
 
 creator = "Alessandro De Salvo"
 repository = "https://github.com/desalvo/mta-audio-editor"
@@ -34,13 +37,13 @@ content = f"""VSVersionInfo(
         [
           StringStruct('CompanyName', '{creator}'),
           StringStruct('FileDescription', 'MTA Audio Editor'),
-          StringStruct('FileVersion', '{version}'),
+          StringStruct('FileVersion', '{release}'),
           StringStruct('InternalName', 'MTA Audio Editor'),
           StringStruct('LegalCopyright', 'EUPL-1.2'),
           StringStruct('OriginalFilename', 'MTA Audio Editor.exe'),
           StringStruct('ProductName', 'MTA Audio Editor'),
           StringStruct('ProductVersion', '{version}'),
-          StringStruct('Comments', 'Build {build} - {repository}')
+          StringStruct('Comments', 'Revision {revision} - Build {build} - {repository}')
         ]
       )
     ]),
@@ -49,4 +52,4 @@ content = f"""VSVersionInfo(
 )
 """
 (ROOT / "native" / "windows-version-info.txt").write_text(content, encoding="utf-8")
-print(f"Generated Windows metadata for {version} build {build}")
+print(f"Generated Windows metadata for {version} revision {revision} build {build}")

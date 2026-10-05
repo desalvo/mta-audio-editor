@@ -1,3 +1,12 @@
+# Changelog
+
+## 0.2.0 — revision 153
+
+- Standardized release identity into three independent fields: product version `0.2.0`, revision `153`, and 14-digit `BUILD_INFO`.
+- Stable release tag convention is now `v0.2.0`; exact artifacts use `0.2.0-r153`.
+- Propagated the convention across runtime metadata, CI/CD, Docker, Kubernetes, Windows/macOS installers and Android/iOS packages.
+- Preserved the `.maeproj` association fix and realtime playback work from the preceding revision chain.
+
 ## 0.2.0-151
 
 - Reworked realtime transport around an `AudioContext` master clock instead of using one track as the timing authority.

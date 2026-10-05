@@ -1,4 +1,4 @@
-# MTA Audio Editor 0.2.0-95
+# MTA Audio Editor 0.2.0
 
 ![MTA Audio Editor](app/static/logo.svg)
 
@@ -9,7 +9,8 @@
 Alessandro De Salvo <braket71@gmail.com>  
 **Repository:** `desalvo/mta-audio-editor`  
 **License:** EUPL-1.2  
-**Version:** `0.2.0-95`  
+**Version:** `0.2.0`  
+**Revision:** `153`  
 **Build:** generated as `YYYYMMDDhhmmss`.
 
 [Italian README](README_IT.md)
@@ -169,3 +170,7 @@ Each Chords row uses the same workflow as Lyrics: **+ above**, **+ below**, **Sp
 ### Native improvements 0.2.0-149
 
 New projects are immediately loaded into the complete editor workspace. YouTube import now falls back to the operating-system clipboard in native apps and uses a clearer responsive layout.
+
+## Versioning
+
+Public releases use semantic version tags such as `v0.2.0`. `REVISION` identifies the exact source/package revision within that release, while `BUILD_INFO` is the independent 14-digit build identifier.

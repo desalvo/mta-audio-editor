@@ -141,6 +141,33 @@ def _lyrics_transcribe_kwargs(language: str | None, device: str) -> dict:
     return kwargs
 
 
+def _whisper_transcribe(model, source: str, *, language: str | None, device: str):
+    """Run Whisper safely on CUDA/MPS/CPU, avoiding unsupported MPS float64 tensors.
+
+    Upstream Whisper and some torch/NumPy paths may create float64 intermediates on
+    Apple MPS. Keep the model in float32 and transparently retry on CPU if MPS still
+    rejects a float64 conversion.
+    """
+    try:
+        if hasattr(model, "float"):
+            model.float()
+        return model.transcribe(source, **_lyrics_transcribe_kwargs(language, device))
+    except (RuntimeError, TypeError) as exc:
+        message = str(exc).lower()
+        if device != "mps" or ("float64" not in message and "mps" not in message):
+            raise
+        logger.warning("Whisper MPS float64 incompatibility; retrying transcription on CPU: %s", exc)
+        try:
+            if hasattr(model, "to"):
+                model = model.to("cpu")
+            if hasattr(model, "float"):
+                model.float()
+        except Exception:
+            logger.exception("Could not move Whisper model from MPS to CPU")
+            raise
+        return model.transcribe(source, **_lyrics_transcribe_kwargs(language, "cpu"))
+
+
 def _offset_lyrics(items: list[LyricLine], offset_ms: int) -> list[LyricLine]:
     out=[]
     for item in items:
@@ -187,7 +214,7 @@ def extract_lyrics_progressive(
     if duration<=0:
         if cancelled and cancelled(): raise InterruptedError("Lyrics extraction cancelled")
         result=(
-            _whisper_result_to_lines(model.transcribe(str(path),**_lyrics_transcribe_kwargs(language,device)))
+            _whisper_result_to_lines(_whisper_transcribe(model, str(path), language=language, device=device))
             if model is not None else extract_lyrics(path,model_name=model_name,language=language)
         )
         if progress: progress(96,result,"Trascrizione completata")
@@ -208,7 +235,7 @@ def extract_lyrics_progressive(
             if cancelled and cancelled(): raise InterruptedError("Lyrics extraction cancelled")
             if progress: progress(min(93,base+max(1,round(30/total))),items,f"Trascrizione audio {index+1}/{total} · {device}")
             result=(
-                model.transcribe(str(chunk),**_lyrics_transcribe_kwargs(language,device))
+                _whisper_transcribe(model, str(chunk), language=language, device=device)
                 if model is not None else None
             )
             part=_whisper_result_to_lines(result) if result is not None else extract_lyrics(chunk,model_name=model_name,language=language)
@@ -242,8 +269,7 @@ def extract_lyrics(path: Path, *, model_name: str | None = None, language: str |
             if "device" not in str(exc):
                 raise
             model = whisper.load_model(model_name, download_root=str(cache_dir))
-        kwargs = _lyrics_transcribe_kwargs(language, device)
-        result = model.transcribe(str(path), **kwargs)
+        result = _whisper_transcribe(model, str(path), language=language, device=device)
         return _whisper_result_to_lines(result)
 
     cli = shutil.which("whisper")

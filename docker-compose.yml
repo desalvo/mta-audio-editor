@@ -3,9 +3,10 @@ services:
     build:
       context: .
       args:
-        APP_VERSION: "0.2.0-113"
+        APP_VERSION: "0.2.0"
+        APP_REVISION: "153"
         BUILD_ID: "${BUILD_ID:-local}"
-    image: desalvo/mta-audio-editor:0.2.0-113
+    image: desalvo/mta-audio-editor:0.2.0
     ports:
       - "8080:8080"
     environment:

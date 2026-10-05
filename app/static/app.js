@@ -330,8 +330,8 @@ function render(){
   if(!current){$('#emptyState').classList.remove('hidden');$('#editor').hidden=true;$('#mixerDock').hidden=true;return}
   $('#emptyState').classList.add('hidden');$('#editor').hidden=false;$('#mixerDock').hidden=false;
   $('#headerProjectName').textContent=current.title;
-  $('#transportBpm').textContent=Number(current.bpm||120).toFixed(1);
-  if($('#transportBpmInput'))$('#transportBpmInput').value=Number(current.bpm||120).toFixed(1);
+  $('#transportBpm').textContent=String(Math.round(Number(current.bpm||120)));
+  if($('#transportBpmInput'))$('#transportBpmInput').value=String(Math.round(Number(current.bpm||120)));
   if($('#transportPitchInput'))$('#transportPitchInput').value=Number(current.pitch_semitones||0).toFixed(1);
   $('#topZoom').value=pxPerSec;
   updateTransportToggleButtons();
@@ -717,9 +717,10 @@ async function startTrackTextAnalysis(id,kind,choice=''){
     pollMediaJob(job.id,`Estrazione ${label}`,async()=>{
       current=await api(`/api/projects/${current.id}`);
       mixerMetaTab=kind;current.mixer_meta_tab=kind;
-      // The extraction job saves the internal workspace. Native apps also keep a
-      // bound archive on disk, so sync it immediately or the next launch could
-      // reopen a stale archive without the freshly extracted timed text.
+      // Render the freshly loaded timed-text state before persisting UI metadata.
+      // collect() reads the hidden lyrics/chords fields; persisting before render
+      // would overwrite newly extracted events with the stale pre-job DOM values.
+      render();
       await persistCurrentProject(false);
       await syncNativeProjectFile(current.id);
       render();toast(`${label} estratti e sincronizzati nel progetto`);
@@ -1767,9 +1768,9 @@ function setZoom(v){pxPerSec=Number(v);if(current){current.timeline_zoom_px_per_
 
 function tempoRatio(){const base=Number(current?.base_bpm||current?.bpm||120);return Math.max(.25,Math.min(4,Number(current?.bpm||base)/base))}
 function setProjectBpm(v){
-  if(!current)return;const n=Math.max(30,Math.min(300,Number(v)||current.bpm));
+  if(!current)return;const n=Math.round(Math.max(30,Math.min(300,Number(v)||current.bpm)));
   if(!current.base_bpm)current.base_bpm=current.bpm||n;
-  current.bpm=n;$('#transportBpm').textContent=n.toFixed(1);if($('#transportBpmInput'))$('#transportBpmInput').value=n.toFixed(1);markDirty();stopPlayback();
+  current.bpm=n;$('#transportBpm').textContent=String(n);if($('#transportBpmInput'))$('#transportBpmInput').value=String(n);markDirty();stopPlayback();
 }
 function setProjectPitch(v){
   if(!current)return;const n=Math.max(-6,Math.min(6,Number(v)||0));current.pitch_semitones=n;if($('#transportPitchInput'))$('#transportPitchInput').value=n.toFixed(1);markDirty();stopPlayback();
@@ -2425,15 +2426,18 @@ async function startYoutubeImport(){
   if(!url)return toast('Inserisci un URL YouTube');
   if(!$('#youtubeImportRights')?.checked)return toast('Devi confermare di disporre dei diritti necessari');
   const body={url,name:String($('#youtubeImportName')?.value||'').trim(),sync_mode:$('#youtubeImportSync')?.value||'manual',offset_ms:parseInt($('#youtubeImportOffset')?.value||'0')||0,reference_track_id:$('#youtubeImportRef')?.value||'',confirm_rights:true};
+  const button=document.querySelector('.youtube-import-actions .primary');
+  const previousText=button?.textContent||'Importa audio';
+  if(button){button.disabled=true;button.textContent='Avvio import…'}
   try{
     await save();
-    const job=await api(`/api/projects/${current.id}/youtube-import-jobs`,{method:'POST',body:JSON.stringify(body)});
+    const job=await api(`/api/projects/${current.id}/youtube-import-jobs`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});
     showMediaProgress('Import YouTube',job.progress,job.message,'Download ed estrazione della sola traccia audio.');
     pollMediaJob(job.id,'Import YouTube',async completed=>{
       current=await api(`/api/projects/${current.id}`);selectedTrackId=completed.result?.track_id||current.tracks.at(-1)?.id;render();await refresh();
       $('#utilityBackdrop').classList.add('hidden');toast(`Audio YouTube importato${current.tracks.length===1?` · BPM ${current.bpm}`:''}`);
     });
-  }catch(e){toast(e.message)}
+  }catch(e){if(button){button.disabled=false;button.textContent=previousText}toast(e.message)}
 }
 function focusImport(){$('#newTrackFile')?.click()}
 
@@ -2447,7 +2451,7 @@ function previewProjectLyricsPdf(){
   const hasChords=!!(current.chords||[]).length,title=hasChords?'Anteprima PDF · Lyrics + Chords':'Anteprima PDF · Lyrics';
   const chords=[...(current.chords||[])].sort((a,b)=>a.time_ms-b.time_ms);let ci=0,lastChord='';
   const lines=(current.lyrics||[]).map(line=>{while(ci<chords.length&&Number(chords[ci].time_ms)<=Number(line.time_ms)+250){lastChord=transposeChordLabel(chords[ci].chord,current.pitch_semitones||0);ci++}return `<div class="pdf-sheet-line">${hasChords&&lastChord?`<div class="pdf-sheet-chord">${esc(lastChord)}</div>`:''}<div class="pdf-sheet-lyric">${esc(line.text||'')}</div></div>`}).join('');
-  showUtilityModal(title,`<div class="pdf-preview-toolbar"><button class="utility-btn secondary" onclick="closeLyricsPdfPreview()">← Torna all'editor</button><button class="utility-btn primary" onclick="downloadProjectLyricsPdf()">Scarica PDF ${hasChords?'Lyrics + Chords':'Lyrics'}</button></div><div class="pdf-preview-wrap"><article class="pdf-sheet"><header><h1>${esc(current.title||'Lyrics')}</h1>${current.artist?`<h2>${esc(current.artist)}</h2>`:''}<p>${current.key?`Key ${esc(effectiveProjectKey())} · `:''}${Number(current.bpm||0).toFixed(1)} BPM</p></header>${lines}</article></div><div class="utility-actions pdf-preview-actions"><button class="utility-btn secondary" onclick="closeLyricsPdfPreview()">← Torna all'editor</button><button class="utility-btn primary" onclick="downloadProjectLyricsPdf()">Scarica PDF ${hasChords?'Lyrics + Chords':'Lyrics'}</button></div>`);
+  showUtilityModal(title,`<div class="pdf-preview-toolbar"><button class="utility-btn secondary" onclick="closeLyricsPdfPreview()">← Torna all'editor</button><button class="utility-btn primary" onclick="downloadProjectLyricsPdf()">Scarica PDF ${hasChords?'Lyrics + Chords':'Lyrics'}</button></div><div class="pdf-preview-wrap"><article class="pdf-sheet"><header><h1>${esc(current.title||'Lyrics')}</h1>${current.artist?`<h2>${esc(current.artist)}</h2>`:''}<p>${current.key?`Key ${esc(effectiveProjectKey())} · `:''}${Math.round(Number(current.bpm||0))} BPM</p></header>${lines}</article></div><div class="utility-actions pdf-preview-actions"><button class="utility-btn secondary" onclick="closeLyricsPdfPreview()">← Torna all'editor</button><button class="utility-btn primary" onclick="downloadProjectLyricsPdf()">Scarica PDF ${hasChords?'Lyrics + Chords':'Lyrics'}</button></div>`);
   document.querySelector('.utility-modal')?.classList.add('pdf-html-preview-modal');
   requestAnimationFrame(()=>{const m=document.querySelector('.utility-modal');if(m)m.scrollTop=0;forceNativeViewportTop()});
 }
@@ -2550,7 +2554,7 @@ async function startKaraokeExport(){
 async function recalculateBpmFromTrack(trackId){
   if(!current)return;const track=trackById(trackId);if(!track)return;
   showMediaProgress('Ricalcolo BPM',10,`Analisi ritmica di ${track.name}…`);
-  try{const result=await api(`/api/projects/${current.id}/tracks/${trackId}/estimate-bpm`,{method:'POST'});current.bpm=Number(result.bpm);current.base_bpm=Number(result.bpm);render();markDirty(50);$('#utilityBackdrop')?.classList.add('hidden');toast(`BPM ricalcolati da ${track.name}: ${Number(result.bpm).toFixed(1)}`)}catch(e){$('#utilityBackdrop')?.classList.add('hidden');toast('Ricalcolo BPM: '+e.message)}
+  try{const result=await api(`/api/projects/${current.id}/tracks/${trackId}/estimate-bpm`,{method:'POST'});current.bpm=Number(result.bpm);current.base_bpm=Number(result.bpm);render();markDirty(50);$('#utilityBackdrop')?.classList.add('hidden');toast(`BPM ricalcolati da ${track.name}: ${Math.round(Number(result.bpm))}`)}catch(e){$('#utilityBackdrop')?.classList.add('hidden');toast('Ricalcolo BPM: '+e.message)}
 }
 function timedEditorConfig(kind){return {lyrics:{key:'text',label:'Lyrics',end:true,valueLabel:'Testo'},chords:{key:'chord',label:'Chords',end:false,valueLabel:'Accordo'},markers:{key:'label',label:'Markers',end:false,valueLabel:'Etichetta'}}[kind]||null}
 function timedEditorTime(ms){const n=Math.max(0,Number(ms)||0),m=Math.floor(n/60000),s=(n%60000)/1000;return `${m}:${s.toFixed(3).padStart(6,'0')}`}
@@ -2575,12 +2579,18 @@ window.addEventListener('pointerdown',e=>{
   if(menu&&!menu.contains(e.target))closeTrackContextMenu();
 });
 window.addEventListener('keydown',e=>{
-  if((e.ctrlKey||e.metaKey)&&!e.altKey){const key=e.key.toLowerCase();if(key==='z'){e.preventDefault();if(e.shiftKey)redoEdit();else undoEdit();return}if(key==='y'){e.preventDefault();redoEdit();return}if(key==='x'){e.preventDefault();cutTimelineSelection();return}if(key==='c'){e.preventDefault();copyTimelineSelection();return}if(key==='v'){e.preventDefault();pasteTimelineSelection();return}if(key==='s'){e.preventDefault();save();return}}
+  const target=e.target;
+  const editable=target instanceof HTMLInputElement||target instanceof HTMLTextAreaElement||target instanceof HTMLSelectElement||target?.isContentEditable;
+  if((e.ctrlKey||e.metaKey)&&!e.altKey){
+    // Preserve native editing shortcuts (Cmd/Ctrl+C/X/V/A/Z) inside form fields,
+    // including the YouTube URL/name inputs. Outside fields they remain DAW shortcuts.
+    if(editable)return;
+    const key=e.key.toLowerCase();if(key==='z'){e.preventDefault();if(e.shiftKey)redoEdit();else undoEdit();return}if(key==='y'){e.preventDefault();redoEdit();return}if(key==='x'){e.preventDefault();cutTimelineSelection();return}if(key==='c'){e.preventDefault();copyTimelineSelection();return}if(key==='v'){e.preventDefault();pasteTimelineSelection();return}if(key==='s'){e.preventDefault();save();return}
+  }
   if(e.key==='Escape'){closeTrackContextMenu();return}
 
   if(!(e.code==='Space'||e.key===' '||e.key==='Spacebar'))return;
-  const target=e.target;
-  if(target instanceof HTMLInputElement||target instanceof HTMLTextAreaElement||target instanceof HTMLSelectElement||target?.isContentEditable)return;
+  if(editable)return;
   if(e.repeat)return;e.preventDefault();e.stopPropagation();
   if(playAudio||trackPlaybacks.length||playbackPaused||playbackBuffering)stopPlayback();else previewMaster();
 },true);
@@ -2705,7 +2715,7 @@ async function showProjectInfo(){
     ['Autori / compositori',(current.authors||[]).join(', ')||'—'],
     ['Artista / interprete',current.artist||'—'],
     ['Registrazioni repertorio',String((current.rights_records||[]).length)],
-    ['BPM',Number(current.bpm||0).toFixed(1)],
+    ['BPM',String(Math.round(Number(current.bpm||0)))],
     ['Tonalità',effectiveProjectKey()||'—'],
     ['Auto-save',autosaveEnabled?'Attivo':'Disattivato'],
   ];

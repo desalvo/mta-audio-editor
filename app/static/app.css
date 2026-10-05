@@ -808,7 +808,7 @@ body.native-single-user .main-area,body.native-single-user .editor-zone,body.nat
 .youtube-import-section-title{display:flex;align-items:baseline;justify-content:space-between;gap:14px;border-bottom:1px solid #20384b;padding-bottom:8px}
 .youtube-import-section-title b{font-size:13px;color:#e9f6ff}.youtube-import-section-title span{font-size:10px;color:#87a2b7;text-align:right}
 .youtube-input-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:stretch}
-.youtube-input-row input{min-width:0}.youtube-paste-btn{min-width:82px;margin:0;white-space:nowrap}
+.youtube-input-row input{min-width:0}.youtube-paste-btn{display:inline-flex!important;align-items:center;justify-content:center;min-width:92px;min-height:38px;margin:0;padding:8px 12px;border:1px solid #425d72!important;border-radius:7px;background:#182735!important;color:#f4fbff!important;-webkit-text-fill-color:#f4fbff!important;font-weight:700;font-size:11px;line-height:1.2;white-space:nowrap;opacity:1!important;visibility:visible!important}
 .youtube-options-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(180px,.55fr);gap:12px}
 .youtube-offset-row{display:grid;grid-template-columns:minmax(0,1fr) 32px;gap:6px;align-items:center}.youtube-offset-row>span{font-size:11px;color:#91aabd}
 .youtube-rights-section{background:#0c1d28}.youtube-rights-check{display:flex;gap:10px;align-items:flex-start;font-size:12px;line-height:1.45;color:#d8e9f5}.youtube-rights-check input{margin-top:3px;flex:0 0 auto}

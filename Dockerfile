@@ -1,5 +1,6 @@
 FROM python:3.14-slim-trixie
-ARG APP_VERSION=0.2.0-125
+ARG APP_VERSION=0.2.0
+ARG APP_REVISION=153
 ARG BUILD_ID=unknown
 ARG INSTALL_STEMS=true
 LABEL org.opencontainers.image.title="MTA Audio Editor" \
@@ -7,10 +8,11 @@ LABEL org.opencontainers.image.title="MTA Audio Editor" \
       org.opencontainers.image.source="https://github.com/desalvo/mta-audio-editor" \
       org.opencontainers.image.licenses="EUPL-1.2" \
       org.opencontainers.image.authors="Alessandro De Salvo <braket71@gmail.com>" \
-      org.opencontainers.image.version="$APP_VERSION"
+      org.opencontainers.image.version="$APP_VERSION" \
+      io.github.desalvo.mta-audio-editor.revision="$APP_REVISION"
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1 \
     MTA_DATA_DIR=/data/projects MTA_HOST=0.0.0.0 MTA_PORT=8080 \
-    MTA_APP_VERSION=$APP_VERSION MTA_BUILD_ID=$BUILD_ID \
+    MTA_APP_VERSION=$APP_VERSION MTA_APP_REVISION=$APP_REVISION MTA_BUILD_ID=$BUILD_ID \
     XDG_CACHE_HOME=/data/projects/.cache TORCH_HOME=/data/projects/.cache/torch
 RUN apt-get update \
     && apt-get upgrade -y \
@@ -19,7 +21,7 @@ RUN apt-get update \
     && groupadd --system --gid 10001 mtaeditor \
     && useradd --system --uid 10001 --gid 10001 --home /nonexistent --shell /usr/sbin/nologin mtaeditor
 WORKDIR /app
-COPY requirements.txt requirements-stems.txt requirements-lyrics.txt requirements-chords.txt VERSION BUILD_INFO ./
+COPY requirements.txt requirements-stems.txt requirements-lyrics.txt requirements-chords.txt VERSION REVISION BUILD_INFO ./
 # sphn has no CPython 3.14/aarch64 Linux wheel. Its Opus source build also requires
 # CMake 3.x (CMake 4 removed compatibility with the project's old policy baseline).
 # Use Debian Trixie's system CMake explicitly, and remove all native build tools afterwards.

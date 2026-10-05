@@ -8,7 +8,7 @@ python scripts/build_docs.py
 ./scripts/production_gate.sh
 find . -type d \( -name __pycache__ -o -name .pytest_cache -o -name .ruff_cache \) -prune -exec rm -rf {} +
 rm -f .coverage coverage.xml
-OUT="${1:-$ROOT/../mta-audio-editor-$(cat VERSION).zip}"
+OUT="${1:-$ROOT/../mta-audio-editor-$(cat VERSION)-r$(cat REVISION).zip}"
 python - "$ROOT" "$OUT" <<'PY'
 import sys, zipfile
 from pathlib import Path

@@ -12,13 +12,13 @@
   <header class="topbar">
     <div class="brand-block">
       <img src="/static/logo.svg" alt="MTA Audio Editor" class="brand-logo">
-      <div><div class="brand-name"><b>MTA</b> Audio Editor</div><div class="brand-meta">Multitrack DAW / MTA8 / MTA16 &nbsp;·&nbsp; v__VERSION__ &nbsp;·&nbsp; build __BUILD__</div></div>
+      <div><div class="brand-name"><b>MTA</b> Audio Editor</div><div class="brand-meta">Multitrack DAW / MTA8 / MTA16 &nbsp;·&nbsp; v__VERSION__ &nbsp;·&nbsp; rev __REVISION__ &nbsp;·&nbsp; build __BUILD__</div></div>
     </div>
     <div class="project-name-block"><label>Project</label><div class="project-name-field" onclick="editProjectMeta()" title="Edit project metadata"><span id="headerProjectName">No project loaded</span><span>✎</span></div></div>
     <div class="transport">
       <button class="transport-btn" onclick="stopPlayback()" title="Stop" aria-label="Stop">■</button><button class="transport-btn" onclick="goTransportStart()" title="Torna all'inizio" aria-label="Torna all'inizio">|◀</button><button class="transport-btn" onclick="seekTransport(-5000)" title="Riavvolgi 5 secondi" aria-label="Riavvolgi 5 secondi">◀◀</button><button id="playMaster" class="transport-btn play" onclick="togglePlayback()" title="Play / Preview" aria-label="Play / Preview">▶</button><button class="transport-btn" onclick="seekTransport(5000)" title="Avanti 5 secondi" aria-label="Avanti 5 secondi">▶▶</button><button id="renderBtn" class="transport-btn render-mode" onclick="toggleRenderPreview()" title="Render: include filtri e master nella preview" aria-label="Render preview">Render</button><button id="followBtn" class="transport-btn follow-mode" onclick="toggleFollowPlayback()" title="Follow: mantieni il playhead visibile" aria-label="Follow playback">Follow</button>
     </div>
-    <div class="timebox"><strong id="transportTime">00:00.000</strong><span><input id="transportBpmInput" class="tempo-input" type="number" min="30" max="300" step="0.1" value="120" onchange="setProjectBpm(this.value)" title="BPM progetto"><b id="transportBpm" hidden>120</b> BPM &nbsp; <input id="transportPitchInput" class="pitch-input" type="number" min="-6" max="6" step="0.1" value="0" onchange="setProjectPitch(this.value)" title="Trasposizione semitoni"> st</span></div>
+    <div class="timebox"><strong id="transportTime">00:00.000</strong><span><input id="transportBpmInput" class="tempo-input" type="number" min="30" max="300" step="1" value="120" onchange="setProjectBpm(this.value)" title="BPM progetto"><b id="transportBpm" hidden>120</b> BPM &nbsp; <input id="transportPitchInput" class="pitch-input" type="number" min="-6" max="6" step="0.1" value="0" onchange="setProjectPitch(this.value)" title="Trasposizione semitoni"> st</span></div>
     <div class="top-spacer"></div>
     <div class="zoom-top"><span>Zoom</span><input id="topZoom" type="range" min="25" max="240" value="70" oninput="setZoom(this.value)"></div>
     <div class="header-actions">
@@ -38,25 +38,6 @@
       <button id="mobileSidebarToggle" class="mobile-sidebar-toggle" type="button" onclick="toggleMobileSidebar()" aria-expanded="false"><span aria-hidden="true">☰</span><span class="mobile-menu-label">Menu</span></button>
       <nav>
         <button class="nav-item active" onclick="focusProjectWorkspace()">⌂ <span>Project</span></button>
-        <section class="sidebar-tools collapsed" id="editingToolsPanel">
-          <button class="sidebar-tools-toggle" type="button" onclick="toggleEditingToolsPanel()" aria-expanded="false" aria-controls="editingToolsBody">
-            <span class="sidebar-tools-title">EDIT / IMPORT / MIX</span><span id="editingToolsChevron" aria-hidden="true">▸</span>
-          </button>
-          <div class="sidebar-tools-body" id="editingToolsBody">
-            <label class="nav-item">⇩ <span>Import MTA</span><input id="mtafile" type="file" accept=".mta,.mta8,.mta16" hidden></label>
-            <button class="nav-item import-action import-audio-action" onclick="focusImport()"><span class="nav-icon" aria-hidden="true">♫</span><span class="nav-label">Import Audio</span></button>
-            <button class="nav-item import-action" onclick="openYoutubeImport()">▶ <span>Import YouTube</span></button>
-            <button class="nav-item import-action" onclick="openStemWorkflow()">▥ <span>Import &amp; Separate</span></button>
-            <button class="nav-item" onclick="focusTracks()">☷ <span>Tracks</span></button>
-            <button class="nav-item" onclick="focusInspector()">◇ <span>Plugins</span></button>
-            <button class="nav-item" onclick="focusMixer()">▥ <span>Mixer</span></button>
-          </div>
-        </section>
-        <div class="nav-sep"></div>
-        <button class="nav-item" onclick="showMetaPanel('lyrics')">▤ <span>Lyrics</span></button>
-        <button class="nav-item" onclick="showMetaPanel('chords')">♬ <span>Chords</span></button>
-        <button class="nav-item" onclick="showMetaPanel('markers')">⚑ <span>Markers</span></button>
-        <div class="nav-sep"></div>
         <section class="sidebar-tools collapsed" id="projectToolsPanel">
           <button class="sidebar-tools-toggle" type="button" onclick="toggleProjectToolsPanel()" aria-expanded="false" aria-controls="projectToolsBody">
             <span class="sidebar-tools-title">PROJECT / FILE</span><span id="projectToolsChevron" aria-hidden="true">▸</span>
@@ -76,6 +57,26 @@
             <button class="nav-item danger-nav" onclick="deleteCurrentProject()">× <span>Delete project</span></button>
           </div>
         </section>
+        <div class="nav-sep"></div>
+        <section class="sidebar-tools collapsed" id="editingToolsPanel">
+          <button class="sidebar-tools-toggle" type="button" onclick="toggleEditingToolsPanel()" aria-expanded="false" aria-controls="editingToolsBody">
+            <span class="sidebar-tools-title">EDIT / IMPORT / MIX</span><span id="editingToolsChevron" aria-hidden="true">▸</span>
+          </button>
+          <div class="sidebar-tools-body" id="editingToolsBody">
+            <label class="nav-item">⇩ <span>Import MTA</span><input id="mtafile" type="file" accept=".mta,.mta8,.mta16" hidden></label>
+            <button class="nav-item import-action import-audio-action" onclick="focusImport()"><span class="nav-icon" aria-hidden="true">♫</span><span class="nav-label">Import Audio</span></button>
+            <button class="nav-item import-action" onclick="openYoutubeImport()">▶ <span>Import YouTube</span></button>
+            <button class="nav-item import-action" onclick="openStemWorkflow()">▥ <span>Import &amp; Separate</span></button>
+            <button class="nav-item" onclick="focusTracks()">☷ <span>Tracks</span></button>
+            <button class="nav-item" onclick="focusInspector()">◇ <span>Plugins</span></button>
+            <button class="nav-item" onclick="focusMixer()">▥ <span>Mixer</span></button>
+          </div>
+        </section>
+        <div class="nav-sep"></div>
+        <button class="nav-item" onclick="showMetaPanel('lyrics')">▤ <span>Lyrics</span></button>
+        <button class="nav-item" onclick="showMetaPanel('chords')">♬ <span>Chords</span></button>
+        <button class="nav-item" onclick="showMetaPanel('markers')">⚑ <span>Markers</span></button>
+        <div class="nav-sep"></div>
         <button class="nav-item" id="nativeSettingsButton" onclick="showSettings()" hidden>⚙ <span>Settings</span></button>
         <button class="nav-item" onclick="showAbout()">ⓘ <span>About</span></button>
         <a class="nav-item" href="/docs/user" target="_blank">? <span>Docs &amp; Help</span></a>

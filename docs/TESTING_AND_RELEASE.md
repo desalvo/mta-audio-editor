@@ -83,11 +83,13 @@ A `.sha256` sidecar is generated for integrity verification.
 
 ## Version/build identity
 
-`VERSION` stores the project release.
+`VERSION` stores the public product release (for example `0.2.0`).
 
-`BUILD_INFO` stores a generated build timestamp.
+`REVISION` stores the source/package revision within that release (for example `153`). It is not a build number.
 
-Runtime `/api/about` exposes release/build identity.
+`BUILD_INFO` stores the generated 14-digit build timestamp and remains independent from the revision.
+
+Stable Git tags use `v< VERSION >` (for example `v0.2.0`). Release assets may include `-r<REVISION>` to identify the exact packaged revision. Runtime `/api/about` exposes version, revision, combined release identity, and build separately.
 
 ## Final acceptance checklist
 
@@ -120,7 +122,7 @@ python scripts/build_docs.py
 The release gate must verify:
 
 - IT/EN user and administrator PDFs are generated;
-- page 1 is the photographic product cover with logo, version/build and supported platforms;
+- page 1 is the photographic product cover with logo, version/revision/build and supported platforms;
 - headings are kept with the beginning of the following paragraph/table/figure;
 - the PDFs render without clipping or overlap;
 - the MTA format documents are synchronized with current reader/writer behavior;
@@ -140,7 +142,7 @@ Required release checks:
 1. build both User and Administrator manuals in Italian and English;
 2. render each PDF to PNG pages;
 3. visually inspect every page for clipping, overlap, missing images/glyphs and cover quality;
-4. confirm the first page is the photographic project cover with logo, version/build/creator/license/repository and supported platforms;
+4. confirm the first page is the photographic project cover with logo, version/revision/build/creator/license/repository and supported platforms;
 5. verify headings are kept with at least the beginning of their following content block;
 6. verify the built-in mobile default service URL does not appear in user-facing manuals/mobile documentation;
 7. run the full test suite after PDF regeneration.

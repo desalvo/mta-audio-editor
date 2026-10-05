@@ -1,6 +1,9 @@
 #ifndef MyAppVersion
   #define MyAppVersion "0.0.0"
 #endif
+#ifndef MyAppRevision
+  #define MyAppRevision "0"
+#endif
 
 #define MyAppName "MTA Audio Editor"
 #define MyAppPublisher "Alessandro De Salvo"
@@ -23,7 +26,7 @@ DisableProgramGroupPage=yes
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 OutputDir={#OutputDir}
-OutputBaseFilename=MTA-Audio-Editor-{#MyAppVersion}-Windows-x64-Setup
+OutputBaseFilename=MTA-Audio-Editor-{#MyAppVersion}-r{#MyAppRevision}-Windows-x64-Setup
 Compression=lzma2/ultra64
 SolidCompression=yes
 WizardStyle=modern

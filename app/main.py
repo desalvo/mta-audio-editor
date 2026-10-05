@@ -66,7 +66,7 @@ from .storage import (
 )
 from .rights_registry import provider_catalog as rights_provider_catalog, search_provider as search_rights_provider
 from . import sample_editor as sample_editor_engine
-from .version import APP_VERSION, BUILD_ID, CREATOR, REPOSITORY
+from .version import APP_RELEASE, APP_REVISION, APP_VERSION, BUILD_ID, CREATOR, REPOSITORY
 
 app = FastAPI(title="MTA Audio Editor", version=APP_VERSION, docs_url=None, redoc_url=None, openapi_url=None)
 
@@ -274,7 +274,7 @@ async def security_middleware(request: Request, call_next):
 
 def _template(name: str, **replacements) -> str:
     text = (BASE / "templates" / name).read_text(encoding="utf-8")
-    text = text.replace("__VERSION__", APP_VERSION).replace("__BUILD__", BUILD_ID)
+    text = text.replace("__VERSION__", APP_VERSION).replace("__REVISION__", APP_REVISION).replace("__BUILD__", BUILD_ID)
     for key, value in replacements.items():
         text = text.replace(f"__{key.upper()}__", str(value))
     return text
@@ -701,6 +701,8 @@ def api_admin_projects_dump(request: Request):
     manifest = {
         "schema": "mta-audio-editor/all-projects-dump/v1",
         "version": APP_VERSION,
+        "revision": APP_REVISION,
+        "release": APP_RELEASE,
         "created_at": __import__("datetime").datetime.now(__import__("datetime").timezone.utc).isoformat(),
         "users": [
             {"id": u["id"], "username": u["username"], "email": u["email"], "role": u["role"]}
@@ -722,7 +724,7 @@ def api_admin_projects_dump(request: Request):
         return FileResponse(
             tmp,
             media_type="application/zip",
-            filename=f"mta-audio-editor-all-projects-{APP_VERSION}.zip",
+            filename=f"mta-audio-editor-all-projects-{APP_RELEASE}.zip",
             background=BackgroundTask(lambda: tmp.unlink(missing_ok=True)),
         )
     except Exception:
@@ -737,6 +739,7 @@ def home(request: Request):
         (BASE / "templates" / "index.html")
         .read_text(encoding="utf-8")
         .replace("__VERSION__", APP_VERSION)
+        .replace("__REVISION__", APP_REVISION)
         .replace("__BUILD__", BUILD_ID)
         .replace("__BODY_CLASS__", "native-single-user" if NATIVE_SINGLE_USER else "")
     )
@@ -747,6 +750,7 @@ def _render_doc(name: str) -> str:
         (BASE / "docs" / name)
         .read_text(encoding="utf-8")
         .replace("__VERSION__", APP_VERSION)
+        .replace("__REVISION__", APP_REVISION)
         .replace("__BUILD__", BUILD_ID)
         .replace("__CREATOR__", CREATOR)
         .replace("__REPOSITORY__", REPOSITORY)
@@ -813,7 +817,7 @@ def admin_pdf_en(request: Request):
 
 @app.get("/api/health")
 def health():
-    return {"status": "ok", "version": APP_VERSION, "build": BUILD_ID}
+    return {"status": "ok", "version": APP_VERSION, "revision": APP_REVISION, "build": BUILD_ID}
 
 
 @app.get("/api/about")
@@ -821,6 +825,8 @@ def about():
     return {
         "name": "MTA Audio Editor",
         "version": APP_VERSION,
+        "revision": APP_REVISION,
+        "release": APP_RELEASE,
         "build": BUILD_ID,
         "creator": CREATOR,
         "repository": REPOSITORY,
@@ -1456,7 +1462,7 @@ def _track_import_worker(
             def bpm_progress(value: int, message: str) -> None:
                 _media_job_update(job_id, progress=60 + int(max(0, min(100, value)) * 0.28), message=message)
             try:
-                project.bpm = estimate_bpm(dst, bpm_progress)
+                project.bpm = float(round(estimate_bpm(dst, bpm_progress)))
                 project.base_bpm = project.bpm
                 save_project(project)
             except Exception:
@@ -2424,7 +2430,7 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
                 progress(12 + int(max(0, min(100, value)) * 0.12), message)
             try:
                 project_for_bpm = load_project(project_id)
-                project_for_bpm.bpm = estimate_bpm(source, bpm_progress)
+                project_for_bpm.bpm = float(round(estimate_bpm(source, bpm_progress)))
                 project_for_bpm.base_bpm = project_for_bpm.bpm
                 save_project(project_for_bpm)
             except Exception:
@@ -3251,7 +3257,7 @@ def estimate_track_bpm(pid: str, track_id: str, request: Request):
     if track is None:
         raise HTTPException(404, "track not found")
     try:
-        bpm = float(estimate_bpm(audio_path(pid, track.filename)))
+        bpm = float(round(estimate_bpm(audio_path(pid, track.filename))))
     except (ValueError, RuntimeError) as exc:
         raise HTTPException(422, f"Impossibile stimare i BPM: {exc}") from exc
     project.bpm = bpm
