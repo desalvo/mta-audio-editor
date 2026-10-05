@@ -1,3 +1,10 @@
+# 0.2.0-152
+
+- Fixed the Native Windows installer Inno Setup compile failure in the `.maeproj` file association.
+- The Windows open-command registry value now uses valid Inno Setup embedded quoting, producing the intended command line `"MTA Audio Editor.exe" "%1"` for double-click project opening.
+- Preserved the dedicated `.maeproj` format, MIME/UTI associations, native startup project opening, and all 0.2.0-151 realtime playback improvements.
+- Aligned Android and iOS package metadata to 0.2.0-152, regenerated Windows version metadata, and refreshed the non-tag container fallback version.
+
 # 0.2.0-151
 
 Questa release ridisegna il transport per ridurre drasticamente la latenza di Play senza sacrificare la sincronizzazione. Il clock del progetto è ora indipendente dai decoder delle singole tracce e usa `AudioContext.currentTime`; i decoder vengono pre-riscaldati in background, l'avvio richiede soltanto un piccolo buffer vicino al cursore e le tracce vengono rese udibili solo dopo il primo lock temporale. Gli insert di traccia possono essere preparati mentre il playback dry è già in corso e vengono sostituiti con un breve crossfade sincronizzato.

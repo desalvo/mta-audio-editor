@@ -46,7 +46,7 @@ Name: "desktopicon"; Description: "Crea un collegamento sul desktop"; GroupDescr
 Root: HKCU; Subkey: "Software\Classes\.maeproj"; ValueType: string; ValueName: ""; ValueData: "MTA.AudioEditor.Project"; Flags: uninsdeletevalue
 Root: HKCU; Subkey: "Software\Classes\MTA.AudioEditor.Project"; ValueType: string; ValueName: ""; ValueData: "MTA Audio Editor Project"; Flags: uninsdeletekey
 Root: HKCU; Subkey: "Software\Classes\MTA.AudioEditor.Project\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\{#MyAppExeName},0"
-Root: HKCU; Subkey: "Software\Classes\MTA.AudioEditor.Project\shell\open\command"; ValueType: string; ValueName: ""; ValueData: ""{app}\{#MyAppExeName}" "%1""
+Root: HKCU; Subkey: "Software\Classes\MTA.AudioEditor.Project\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""
 Root: HKCU; Subkey: "Software\Classes\MTA.AudioEditor.Project"; ValueType: string; ValueName: "Content Type"; ValueData: "application/vnd.mta-audio-editor.project"
 
 [Run]
