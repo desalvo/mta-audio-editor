@@ -1,3 +1,7 @@
+## 0.2.0-141
+
+- Android toolchain aligned with androidx.core 1.19.1: compileSdk 37, AGP 9.1.1, Gradle 9.3.1, explicit API 37/build-tools install in CI.
+
 ## 0.2.0-140
 
 - Fixed GitHub Actions Ruff regressions in sample-editor/native TLS code.

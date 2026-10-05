@@ -4,14 +4,14 @@ plugins {
 
 android {
     namespace = "com.desalvo.mtaaudioeditor.mobile"
-    compileSdk = 35
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.desalvo.mtaaudioeditor.mobile"
         minSdk = 26
         targetSdk = 35
-        versionCode = 20140
-        versionName = "0.2.0-140"
+        versionCode = 20141
+        versionName = "0.2.0-141"
     }
 
     signingConfigs {

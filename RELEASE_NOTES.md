@@ -1,3 +1,7 @@
+## 0.2.0-141
+
+- Fix Android CI preflight after Dependabot updates by moving to the supported API 37 / AGP 9.1.1 / Gradle 9.3.1 toolchain.
+
 ## 0.2.0-140
 
 - CI reliability fixes for Ruff and dependency audit.
