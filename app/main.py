@@ -3369,9 +3369,26 @@ def estimate_track_bpm(pid: str, track_id: str, request: Request, time_signature
         if preferred and preferred not in {"2/4", "3/4", "4/4", "5/4", "6/8", "7/8", "9/8", "12/8"}:
             raise HTTPException(400, "time signature non valida")
         bpm, signature = estimate_bpm_and_signature(audio_path(pid, track.filename), preferred_signature=preferred)
-        bpm = float(round(bpm))
+        # Tempo estimators are inherently octave-ambiguous (e.g. 72 vs 144 BPM).
+        # When the user is only changing the meter, preserve the established
+        # musical pulse by selecting the x2/x0.5 equivalent closest to the
+        # project's current BPM instead of allowing a signature change to double
+        # or halve the perceived metronome speed.
         if preferred:
+            reference_bpm = float(getattr(project, "bpm", 0) or 0)
+            if reference_bpm > 0:
+                candidates = {float(bpm)}
+                value = float(bpm)
+                while value / 2.0 >= 30.0:
+                    value /= 2.0
+                    candidates.add(value)
+                value = float(bpm)
+                while value * 2.0 <= 300.0:
+                    value *= 2.0
+                    candidates.add(value)
+                bpm = min(candidates, key=lambda candidate: abs(candidate - reference_bpm))
             signature = preferred
+        bpm = float(round(bpm))
     except (ValueError, RuntimeError) as exc:
         raise HTTPException(422, f"Impossibile stimare i BPM: {exc}") from exc
     project.bpm = bpm

@@ -1,3 +1,14 @@
+## 0.2.0-r184
+
+- Lyrics + Chords + Markers: double-click words, chords, and markers to edit them.
+- Lyrics text can be edited inline without changing timestamps.
+- Chords anchored to deleted words/syllables are reassigned to the previous available token, then the next one, with line-start fallback.
+
+
+## 0.2.0-r182
+- Corrected metronome timing when changing meter from 4/4 to 6/8 (and other /8 signatures): the denominator no longer doubles the audible click rate.
+- Manual time-signature BPM recalculation now resolves half/double-tempo ambiguity against the current project BPM, preventing unintended x2/x0.5 jumps.
+- Compound meters 6/8, 9/8 and 12/8 retain their grouped accent behavior without changing pulse speed.
 - Lyrics + Chords + Markers editor: keep only the combined view, remove duplicate Chords/Markers sections, and provide an explicit persistent vertical scrollbar.
 
 ## 0.2.0-r180
@@ -524,3 +535,11 @@
 - Added context-menu marker creation with required start time and optional end time.
 - Lyric line timestamps are directly clickable/editable with m:ss.mmm / mm:ss.mmm validation.
 - Updating lyric times preserves manual chord anchors.
+
+## 0.2.0-r183
+- PDF Lyrics + Chords + Markers preview rebuilt as native-WebView-safe HTML preview.
+- Fixed chord styling when a PDF page begins with a chord row.
+- Granular chord anchors: line start/end, word/syllable, and chord-to-chord sequences.
+- Editor preserves scroll position after operations; added cut/copy/paste and undo/redo.
+- Moved Dividi qui to the word context menu and compacted editor rows/timestamps.
+- Added saving-in-progress overlay and close protection while persistence completes.

@@ -1115,8 +1115,19 @@ def build_lyrics_pdf(
         if not word_entries:
             rel=max(0,min(1,(int(chord.time_ms)-line_start)/max(1,line_end-line_start)))
             return margin+rel*usable_width
+        anchor_kind = str(getattr(chord, "anchor_kind", "word") or "word")
+        if chord.manual_anchor and anchor_kind == "start":
+            return margin
+        if chord.manual_anchor and anchor_kind == "end":
+            return margin + usable_width
         manual_index = _manual_chord_word_index(chord, len(word_entries))
         if manual_index is not None:
+            entry = word_entries[manual_index]
+            syllable_index = getattr(chord, "anchor_syllable_index", None)
+            syllables = entry.get("syllables") or []
+            if syllable_index is not None and syllables:
+                si = max(0, min(int(syllable_index), len(syllables) - 1))
+                return syllables[si]["x"]
             return word_entries[manual_index]["x"]
         t=int(chord.time_ms)
         for i,w in enumerate(word_entries):
@@ -1193,10 +1204,14 @@ def build_lyrics_pdf(
         if previous and (not line_chords or previous[-1].time_ms<line_start):
             line_chords=[previous[-1]]+line_chords
         chord_font,chord_size,_ = st("chords")
-        c.setFont(chord_font, chord_size)
-        c.setFillColor(current_section_color or st("chords")[2])
         if line_chords:
+            # ensure() may call showPage(), which resets ReportLab graphics state.
+            # Perform the page break before applying the chord font/color so a
+            # page beginning with chords uses the exact same style as any other row.
             ensure(chord_size+16)
+            c.setFont(chord_font, chord_size)
+            c.setFillColor(current_section_color or st("chords")[2])
+            line_chords.sort(key=lambda ch: (chord_x(ch, words, line_start, line_end), int(getattr(ch, "anchor_order", 0)), int(ch.time_ms)))
             prev_right=margin-8
             for ch in line_chords:
                 label=safe(ch.chord)

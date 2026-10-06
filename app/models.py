@@ -145,6 +145,11 @@ class Chord(BaseModel):
     anchor_line_time_ms: int | None = Field(default=None, ge=0)
     anchor_word_index: int | None = Field(default=None, ge=0)
     anchor_word_text: str = Field(default="", max_length=500)
+    # r183 granular layout anchors: start/end of line, word/syllable offset, and
+    # stable ordering for chord sequences sharing the same anchor.
+    anchor_kind: Literal["start", "word", "end"] = "word"
+    anchor_syllable_index: int | None = Field(default=None, ge=0)
+    anchor_order: int = Field(default=0, ge=0)
     manual_anchor: bool = False
     # Joint Lyrics + Chords editor can hide a detected chord without deleting the
     # source analysis event. Excluded chords are ignored by playback, documents and

@@ -1,3 +1,12 @@
+## 0.2.0-r184
+
+Lyrics + Chords + Markers editing is faster: double-click opens structured editing, lyric tokens are editable inline, and chord anchors survive token deletion by moving to the nearest valid syllable/word.
+
+
+## 0.2.0-r182
+- Corrected metronome timing when changing meter from 4/4 to 6/8 (and other /8 signatures): the denominator no longer doubles the audible click rate.
+- Manual time-signature BPM recalculation now resolves half/double-tempo ambiguity against the current project BPM, preventing unintended x2/x0.5 jumps.
+- Compound meters 6/8, 9/8 and 12/8 retain their grouped accent behavior without changing pulse speed.
 - Lyrics + Chords + Markers editor: keep only the combined view, remove duplicate Chords/Markers sections, and provide an explicit persistent vertical scrollbar.
 
 ## 0.2.0-r180
@@ -486,3 +495,6 @@ macOS ARM native-dialog reliability fix: project creation and Import & Separate 
 ## 0.2.0-r181
 
 The combined Lyrics + Chords + Markers editor now uses contextual actions for whole lyric lines, individual chords and markers. Marker insertion supports required start and optional end times, and lyric timestamps can be edited directly.
+
+### r183
+Improves Lyrics + Chords + Markers PDF preview and editing, including syllable/edge/chord-sequence anchors, stable scrolling, clipboard/history, compact rows, context split, page-break chord styling, and explicit save progress.

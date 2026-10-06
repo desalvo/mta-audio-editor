@@ -54,9 +54,11 @@ def project_duration_ms(project: Project) -> int:
 def generate_metronome_wav(project: Project, out: Path, beats_per_bar: int | None = None) -> int:
     """Generate a mono PCM click track honoring the project's time signature.
 
-    BPM is stored as quarter-note BPM in the project.  The denominator therefore
-    determines the click subdivision (e.g. 6/8 emits six eighth-note clicks per
-    bar), while the numerator determines bar accents.
+    Project BPM represents the audible metronome pulse rate. The time-signature
+    numerator controls how pulses are grouped into bars and the denominator
+    controls notation/accent grouping; changing 4/4 to 6/8 must not silently
+    double the click rate. Compound /8 meters receive secondary accents every
+    three subdivisions.
     """
     duration_ms = project_duration_ms(project)
     if duration_ms <= 0:
@@ -69,9 +71,9 @@ def generate_metronome_wav(project: Project, out: Path, beats_per_bar: int | Non
     except (TypeError, ValueError):
         numerator, denominator = 4, 4
     beats_per_bar = max(1, int(beats_per_bar or numerator))
-    # Project BPM is quarter-note BPM; scale the click interval to the notated
-    # denominator so 6/8, 9/8 and 12/8 no longer sound like 4/4.
-    beat_seconds = (60.0 / float(project.bpm)) * (4.0 / max(1, denominator))
+    # BPM is the audible pulse/subdivision rate. A meter change must never
+    # multiply the playback speed merely because the denominator changes.
+    beat_seconds = 60.0 / float(project.bpm)
     beat_samples = max(1, round(beat_seconds * sample_rate))
     click_len = min(max(1, round(0.045 * sample_rate)), beat_samples)
     silence_chunk = b"\x00\x00" * 8192

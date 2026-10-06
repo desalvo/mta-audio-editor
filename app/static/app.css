@@ -1129,3 +1129,25 @@ body.native-single-user .main-area{grid-template-rows:minmax(120px,1fr) var(--mi
 .lc-marker-chip.deleted,.lc-chord-wrap.deleted,.lc-chord.deleted{opacity:.42;text-decoration:line-through}
 .lc-marker-edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}.lc-marker-edit-grid label{display:grid;gap:5px;color:#c5d6e2}.lc-marker-edit-grid input{min-height:38px;background:#08131d;border:1px solid #35516a;border-radius:6px;color:#eef8ff;padding:7px 9px}.lc-marker-edit-grid label:nth-child(3){grid-column:1/-1}
 @media(max-width:640px){.lc-marker-edit-grid{grid-template-columns:1fr}.lc-marker-edit-grid label:nth-child(3){grid-column:auto}}
+/* r183 compact granular Lyrics + Chords + Markers editor */
+.lyrics-chords-editor-modal .utility-body{overflow:hidden!important}
+.lyrics-chords-editor{position:relative;height:100%;display:flex;flex-direction:column;min-height:0}
+.lc-line{grid-template-columns:66px minmax(0,1fr)!important;gap:5px!important;padding:4px 6px!important;margin-bottom:3px!important;min-height:36px!important}
+.lc-time{font-size:10px!important;line-height:1!important;white-space:nowrap!important;word-break:keep-all!important;padding:3px 2px!important;align-self:center}
+.lc-content{display:flex;align-items:flex-end;gap:3px;min-width:0}
+.lc-words{gap:1px 3px!important;align-items:flex-end}
+.lc-word{display:inline-flex!important;flex-direction:row!important;gap:0!important;padding:0!important;align-items:flex-end!important}
+.lc-syllable-anchor,.lc-edge-anchor{display:inline-flex;flex-direction:column;align-items:flex-start;min-width:4px;border-radius:3px;padding:0 1px;cursor:pointer}
+.lc-syllable-anchor:hover,.lc-edge-anchor:hover{background:rgba(83,150,235,.14)}
+.lc-syllable{font-size:13px;line-height:1.05;white-space:pre}
+.lc-edge-anchor{color:#77a9ca;font-size:10px;min-width:8px;align-items:center}
+.lc-chord-slot{min-height:13px;display:flex;align-items:flex-end;gap:2px;white-space:nowrap}
+.lc-chord{min-height:18px!important;height:18px!important;padding:1px 4px!important;font-size:10px!important;line-height:1!important}
+.lc-marker-row{min-height:0!important;gap:3px!important}
+.lc-marker-chip{padding:1px 5px!important;font-size:10px!important;line-height:1.2}
+.lc-editor-fixed-toolbar .workflow-note{padding:5px 7px!important;margin:0!important;font-size:10px!important;line-height:1.2}
+.lc-toolbar{gap:4px!important;margin:4px 0 5px!important}.lc-toolbar .utility-btn{min-height:28px!important;padding:4px 7px!important;font-size:10px!important}
+.lc-saving-overlay{position:absolute;inset:0;z-index:200;background:rgba(4,12,19,.78);display:grid;place-items:center}.lc-saving-card{background:#102333;border:1px solid #4c7592;border-radius:10px;padding:20px;max-width:430px;text-align:center;color:#eef8ff}.lc-saving-spinner{width:28px;height:28px;border:3px solid #4d6577;border-top-color:#dff5ff;border-radius:50%;margin:0 auto 12px;animation:lcspin .8s linear infinite}@keyframes lcspin{to{transform:rotate(360deg)}}
+/* r184 inline lyrics editing */
+.lyrics-chords-editor-modal .lc-lyrics-inline{min-width:.35em;outline:0;border-radius:3px;padding:0 1px;cursor:text;white-space:pre}
+.lyrics-chords-editor-modal .lc-lyrics-inline:focus{outline:1px solid currentColor;background:rgba(127,127,127,.12)}

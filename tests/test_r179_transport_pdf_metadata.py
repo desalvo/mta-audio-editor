@@ -17,9 +17,10 @@ def test_metronome_honours_signature_denominator(tmp_path):
     generate_metronome_wav(_project("6/8"), p6)
     with wave.open(str(p4), "rb") as a, wave.open(str(p6), "rb") as b:
         assert a.getnframes() == b.getnframes()
-    # Source-level regression: 6/8 uses the denominator-scaled subdivision and compound accents.
+    # Meter changes must not alter the audible pulse rate; compound meters only
+    # change grouping/accent structure.
     source = Path("app/audio_engine.py").read_text(encoding="utf-8")
-    assert "beat_seconds = (60.0 / float(project.bpm)) * (4.0 / max(1, denominator))" in source
+    assert "beat_seconds = 60.0 / float(project.bpm)" in source
     assert "numerator in {6, 9, 12}" in source
 
 
