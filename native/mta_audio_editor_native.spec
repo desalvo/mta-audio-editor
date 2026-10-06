@@ -21,6 +21,7 @@ datas = [
     (str(project / "app" / "docs"), "app/docs"),
     (str(project / "VERSION"), "."),
     (str(project / "REVISION"), "."),
+    (str(project / "RELEASE_CHANNEL"), "."),
 ]
 build_file = project / "BUILD_INFO"
 if build_file.exists():

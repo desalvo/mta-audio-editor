@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import base64
 import json
+import locale
 import os
 import socket
 import subprocess
@@ -396,12 +397,16 @@ class NativeApi:
                 pass
         autosave_enabled = True
         update_channel = "stable"
+        language = "auto"
         if path.is_file():
             try:
                 raw = json.loads(path.read_text(encoding="utf-8"))
                 autosave_enabled = bool(raw.get("autosave_enabled", True))
                 from native.update_manager import normalize_channel
                 update_channel = normalize_channel(raw.get("update_channel", "stable"))
+                language = str(raw.get("language", "auto")).lower()
+                if language not in {"auto", "it", "en"}:
+                    language = "auto"
             except (OSError, ValueError, TypeError, json.JSONDecodeError):
                 pass
         recent_projects = []
@@ -416,9 +421,11 @@ class NativeApi:
             "autosave_enabled": autosave_enabled,
             "update_channel": update_channel,
             "recent_projects": recent_projects,
+            "language": language,
+            "system_language": (locale.getlocale()[0] or os.getenv("LANG", "en")).split(".", 1)[0].replace("_", "-"),
         }
 
-    def set_native_settings(self, max_upload_mb: int, autosave_enabled: bool = True, update_channel: str = "stable") -> dict:
+    def set_native_settings(self, max_upload_mb: int, autosave_enabled: bool = True, update_channel: str = "stable", language: str = "auto") -> dict:
         value = int(max_upload_mb)
         if not 1 <= value <= 10240:
             raise ValueError("max_upload_mb must be between 1 and 10240")
@@ -426,6 +433,9 @@ class NativeApi:
         root.mkdir(parents=True, exist_ok=True)
         from native.update_manager import normalize_channel
         channel = normalize_channel(update_channel)
+        language = str(language or "auto").lower()
+        if language not in {"auto", "it", "en"}:
+            raise ValueError("language must be auto, it or en")
         settings_path = root / "native-settings.json"
         existing = {}
         if settings_path.is_file():
@@ -437,6 +447,7 @@ class NativeApi:
             "max_upload_mb": value,
             "autosave_enabled": bool(autosave_enabled),
             "update_channel": channel,
+            "language": language,
         })
         settings_path.write_text(json.dumps(existing, indent=2) + "\n", encoding="utf-8")
         os.environ["MTA_MAX_UPLOAD_MB"] = str(value)
@@ -449,6 +460,8 @@ class NativeApi:
             "max_upload_mb": value,
             "autosave_enabled": bool(autosave_enabled),
             "update_channel": channel,
+            "language": language,
+            "system_language": (locale.getlocale()[0] or os.getenv("LANG", "en")).split(".", 1)[0].replace("_", "-"),
         }
 
 

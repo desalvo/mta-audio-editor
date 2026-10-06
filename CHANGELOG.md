@@ -1,3 +1,9 @@
+
+## 0.2.0-r177
+- Fixed unreadable Lyrics + Chords editor controls.
+- Timeline selection/range overlays are now drawn only on selected tracks; the toolbar shows the selected-track count.
+- Moved Delete tracks / Delete selected range into the compact upper editor toolbar.
+- Added native OS-language detection with Auto/Italiano/English override and bilingual native UI translation.
 # Changelog
 
 ## 0.2.0 — revision 175

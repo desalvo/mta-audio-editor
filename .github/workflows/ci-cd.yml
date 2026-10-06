@@ -123,6 +123,7 @@ jobs:
         run: |
           echo "version=$(tr -d '\r\n' < VERSION)" >> "$GITHUB_OUTPUT"
           echo "revision=$(tr -d '\r\n' < REVISION)" >> "$GITHUB_OUTPUT"
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then echo "channel=stable" >> "$GITHUB_OUTPUT"; else echo "channel=early" >> "$GITHUB_OUTPUT"; fi
       - name: Build local validation image
         uses: docker/build-push-action@v7
         with:
@@ -133,6 +134,7 @@ jobs:
           build-args: |
             APP_VERSION=${{ steps.identity.outputs.version }}
             APP_REVISION=${{ steps.identity.outputs.revision }}
+            RELEASE_CHANNEL=${{ steps.identity.outputs.channel }}
             BUILD_ID=${{ steps.build.outputs.id }}
       - name: Verify container OS
         shell: bash
@@ -240,6 +242,11 @@ jobs:
         run: |
           $build=(Get-Date).ToUniversalTime().ToString("yyyyMMddHHmmss")
           Set-Content -Path BUILD_INFO -Value $build
+      - name: Stamp native release channel
+        shell: pwsh
+        run: |
+          $channel = if ($env:GITHUB_REF -like "refs/tags/*") { "stable" } else { "early" }
+          Set-Content -Path RELEASE_CHANNEL -Value $channel
       - name: Generate native application metadata
         shell: pwsh
         run: python native/generate_native_metadata.py
@@ -340,6 +347,9 @@ jobs:
       - name: Generate native build id
         shell: bash
         run: TZ=Europe/Rome date '+%Y%m%d%H%M%S' > BUILD_INFO
+      - name: Stamp native release channel
+        shell: bash
+        run: if [[ "$GITHUB_REF" == refs/tags/* ]]; then echo stable > RELEASE_CHANNEL; else echo early > RELEASE_CHANNEL; fi
       - name: Generate native application metadata
         shell: bash
         run: python native/generate_native_metadata.py
@@ -734,6 +744,7 @@ jobs:
           fi
           echo "value=${version}" >> "$GITHUB_OUTPUT"
           echo "revision=${revision}" >> "$GITHUB_OUTPUT"
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then echo "channel=stable" >> "$GITHUB_OUTPUT"; else echo "channel=early" >> "$GITHUB_OUTPUT"; fi
       - name: Build and push multi-arch
         uses: docker/build-push-action@v7
         with:
@@ -747,4 +758,5 @@ jobs:
           build-args: |
             APP_VERSION=${{ steps.version.outputs.value }}
             APP_REVISION=${{ steps.version.outputs.revision }}
+            RELEASE_CHANNEL=${{ steps.version.outputs.channel }}
             BUILD_ID=${{ steps.build.outputs.id }}

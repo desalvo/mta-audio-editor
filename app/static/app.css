@@ -1003,3 +1003,17 @@ body.native-single-user .main-area{grid-template-rows:minmax(120px,1fr) var(--mi
 
 /* r176: single-window project metadata editor. */
 .project-meta-editor th{width:32%;min-width:150px;vertical-align:middle}.project-meta-editor td{min-width:260px}.project-meta-input{box-sizing:border-box;width:100%;min-width:0;max-width:100%;padding:8px 10px;border-radius:8px}.project-meta-editor input[type=number]{width:100%}
+
+/* r177: Lyrics + Chords editor buttons are always readable, including native WebViews. */
+.lc-toolbar button,.lc-toolbar .utility-btn,.lc-line-actions button,.lc-line-actions .utility-btn,.lyrics-chords-editor button,.lyrics-chords-editor .utility-btn,.timed-editor-modal button{
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;
+  width:auto!important;max-width:100%!important;height:auto!important;min-height:36px!important;
+  padding:7px 10px!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;
+  overflow-wrap:anywhere!important;line-height:1.2!important;text-align:center!important;
+  color:#eef8ff!important;-webkit-text-fill-color:#eef8ff!important;opacity:1!important;visibility:visible!important;
+}
+.lc-toolbar{align-items:stretch!important;flex-wrap:wrap!important}.lc-line-actions{align-items:stretch!important;flex-wrap:wrap!important}
+.lc-toolbar button:disabled,.lc-line-actions button:disabled{color:#a8bac6!important;-webkit-text-fill-color:#a8bac6!important;opacity:.52!important}
+
+/* r177: compact destructive actions share the upper editor toolbar instead of using a dedicated row. */
+.editor-toolbar{flex-wrap:wrap;align-content:center}.toolbar-action.compact-delete{flex:0 1 auto;min-width:94px;height:auto;min-height:34px;white-space:normal;line-height:1.1;padding:5px 8px}.selected-track-count{font:10px ui-monospace,monospace;color:#8fd0ff;white-space:nowrap;padding:0 4px}.lane.edit-selected{box-shadow:inset 3px 0 0 var(--track-color)}.lane-selection{top:0;bottom:0}

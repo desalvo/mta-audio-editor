@@ -66,7 +66,7 @@ from .storage import (
 )
 from .rights_registry import (provider_catalog as rights_provider_catalog, search_provider as search_rights_provider, search_musicbrainz_metadata, resolve_musicbrainz_metadata)
 from . import sample_editor as sample_editor_engine
-from .version import APP_RELEASE, APP_REVISION, APP_VERSION, BUILD_ID, CREATOR, REPOSITORY
+from .version import APP_RELEASE, APP_RELEASE_CHANNEL, APP_REVISION, APP_VERSION, BUILD_ID, CREATOR, REPOSITORY
 
 app = FastAPI(title="MTA Audio Editor", version=APP_VERSION, docs_url=None, redoc_url=None, openapi_url=None)
 
@@ -836,6 +836,7 @@ def about():
         "version": APP_VERSION,
         "revision": APP_REVISION,
         "release": APP_RELEASE,
+        "release_channel": APP_RELEASE_CHANNEL,
         "build": BUILD_ID,
         "creator": CREATOR,
         "repository": REPOSITORY,
