@@ -20,4 +20,4 @@ def test_lyrics_plus_chords_exports_require_chords():
 
 def test_pdf_preview_title_matches_available_content():
     js = Path('app/static/app.js').read_text(encoding='utf-8')
-    assert "title=hasChords?'Anteprima PDF · Lyrics + Chords':'Anteprima PDF · Lyrics'" in js
+    assert "title=hasChords?'Anteprima PDF · Lyrics + Chords + Markers':'Anteprima PDF · Lyrics + Markers'" in js

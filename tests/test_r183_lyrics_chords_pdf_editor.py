@@ -7,10 +7,10 @@ MODELS = (ROOT / 'app/models.py').read_text(encoding='utf-8')
 MUSIC = (ROOT / 'app/music_text.py').read_text(encoding='utf-8')
 
 
-def test_pdf_preview_uses_html_not_pdf_iframe():
+def test_pdf_preview_uses_exact_generated_pdf_pages():
     tail = JS[JS.rfind('async function previewProjectLyricsPdf'):]
-    assert 'lyricsPdfHtmlPreview()' in tail
-    assert '<iframe' not in tail.split('function closeLyricsPdfPreview', 1)[0]
+    assert '/lyrics.pdf.preview' in tail
+    assert 'lyricsPdfHtmlPreview()' not in tail
 
 
 def test_editor_has_granular_anchors_and_chord_sequences():

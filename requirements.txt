@@ -8,6 +8,7 @@ qrcode==8.2
 
 # Runtime PDF export for synchronized lyrics/chords.
 reportlab==4.4.9
+PyMuPDF==1.26.7
 
 # YouTube audio import.
 yt-dlp==2026.8.19

@@ -1,3 +1,20 @@
+## 0.2.0-r190
+
+- Lyrics + Chords + Markers: clicking an already selected chord now deselects it; double-click still opens structured editing.
+
+## 0.2.0-r189
+
+- Replaced multi-HTMLMediaElement playback with one deterministic WebAudio AudioContext transport.
+- Track/master/metronome VU meters now read the actual WebAudio graph.
+- Mixer controls are live; rendered track FX are hot-swapped without restarting transport.
+- Lyrics editor automatically syllabifies words visually for fine chord anchoring without changing persisted lyric text.
+- Disabled lyric lines remain timing boundaries, so they never steal or hide chords from the preceding active line.
+
+## 0.2.0-r188
+
+- PDF Lyrics + Chords + Markers preview now renders the actual generated PDF pages, eliminating divergence from export.
+- Native WebViews preview rasterized pages from the same PDF backend instead of a parallel HTML reconstruction.
+
 ## 0.2.0-r187
 
 - Playback: removed periodic hard-seek synchronization that caused regular drop-outs in non-Render mode. Re-lock now occurs only at transport actions or after real decoder stalls.

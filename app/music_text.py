@@ -1194,6 +1194,11 @@ def build_lyrics_pdf(
     y -= 22
 
     active_lyrics=[x for x in lyrics if not getattr(x,"disabled",False) and not getattr(x,"deleted",False)]
+    # Keep disabled lyrics as timing boundaries even though they are not rendered.
+    # Otherwise the previous visible lyric line expands across the disabled line
+    # and can steal/lose chords that belong to a different time window.
+    boundary_lyrics=sorted((x for x in lyrics if not getattr(x,"deleted",False)), key=lambda x:x.time_ms)
+    boundary_times=[int(x.time_ms) for x in boundary_lyrics]
     active_chords=[x for x in chords if not getattr(x,"excluded",False) and not getattr(x,"deleted",False)]
     active_markers=[x for x in (markers or []) if not getattr(x,"disabled",False) and not getattr(x,"deleted",False)]
     ordered_lyrics=sorted(_estimated_word_and_syllable_timing(active_lyrics),key=lambda x:x.time_ms)
@@ -1204,7 +1209,8 @@ def build_lyrics_pdf(
 
     for i,lyric in enumerate(ordered_lyrics):
         line_start=int(lyric.time_ms)
-        line_end=int(ordered_lyrics[i+1].time_ms if i+1<len(ordered_lyrics) else (lyric.end_ms or line_start+6000))
+        next_boundary=next((t for t in boundary_times if t>line_start), None)
+        line_end=int(next_boundary if next_boundary is not None else (lyric.end_ms or line_start+6000))
         while marker_idx<len(ordered_markers) and int(ordered_markers[marker_idx].time_ms)<=line_start:
             current_section_color = draw_marker(ordered_markers[marker_idx]);marker_idx+=1
         words=estimated_words(lyric,line_end)

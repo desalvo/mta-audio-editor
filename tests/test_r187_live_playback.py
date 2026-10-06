@@ -33,8 +33,8 @@ def test_plugin_parameter_controls_schedule_live_updates():
     assert 'refreshDynamicTrackPlayback(id)' in JS
 
 
-def test_revision_187_metadata_is_consistent():
-    rev = Path('REVISION').read_text().strip()
-    assert rev == '187'
+def test_revision_metadata_is_consistent():
+    rev = int(Path('REVISION').read_text().strip())
+    assert rev >= 187
     assert f'versionCode = 20{rev}' in Path('mobile/android/app/build.gradle.kts').read_text()
     assert f'<string>20{rev}</string>' in Path('mobile/ios/MTAEditorMobile/Info.plist').read_text()

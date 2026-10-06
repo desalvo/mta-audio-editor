@@ -1,3 +1,4 @@
+import base64
 import hashlib
 import json
 import logging
@@ -1793,14 +1794,10 @@ def download_project_chordpro(pid: str, request: Request):
     )
 
 
-@app.get("/api/projects/{pid}/lyrics.pdf")
-def download_project_lyrics_pdf(pid: str, request: Request, chord_color: str = "#7B1FA2", preview: bool = False):
-    project = _project_for_actor(request, pid)
-    if not project.lyrics:
-        raise HTTPException(409, "Il progetto non contiene lyrics")
-    tmp = Path(tempfile.mkstemp(prefix=f"mta-lyrics-{pid}-", suffix=".pdf")[1])
+def _build_project_lyrics_pdf(project: Project, chord_color: str) -> Path:
     if not re.fullmatch(r"#[0-9A-Fa-f]{6}", chord_color):
         raise HTTPException(400, "Colore accordi non valido")
+    tmp = Path(tempfile.mkstemp(prefix=f"mta-lyrics-{project.id}-", suffix=".pdf")[1])
     build_lyrics_pdf(
         tmp, title=project.title, artist=project.artist,
         lyrics=project.lyrics, chords=transpose_chords(project.chords, project.pitch_semitones), chord_color=chord_color,
@@ -1808,6 +1805,15 @@ def download_project_lyrics_pdf(pid: str, request: Request, chord_color: str = "
         rights_records=project.rights_records, markers=project.markers,
         pdf_style=project.lyrics_pdf_style.model_dump(),
     )
+    return tmp
+
+
+@app.get("/api/projects/{pid}/lyrics.pdf")
+def download_project_lyrics_pdf(pid: str, request: Request, chord_color: str = "#7B1FA2", preview: bool = False):
+    project = _project_for_actor(request, pid)
+    if not project.lyrics:
+        raise HTTPException(409, "Il progetto non contiene lyrics")
+    tmp = _build_project_lyrics_pdf(project, chord_color)
     filename = _download_name(project.title or "lyrics", "pdf")
     if preview:
         return FileResponse(
@@ -1819,6 +1825,42 @@ def download_project_lyrics_pdf(pid: str, request: Request, chord_color: str = "
         tmp, media_type="application/pdf", filename=filename,
         background=BackgroundTask(lambda: tmp.unlink(missing_ok=True)),
     )
+
+
+@app.get("/api/projects/{pid}/lyrics.pdf.preview")
+def preview_project_lyrics_pdf_exact(pid: str, request: Request, chord_color: str = "#7B1FA2"):
+    """Render the actual exported PDF pages for native-safe, pixel-faithful preview."""
+    project = _project_for_actor(request, pid)
+    if not project.lyrics:
+        raise HTTPException(409, "Il progetto non contiene lyrics")
+    pdf_path = _build_project_lyrics_pdf(project, chord_color)
+    try:
+        import fitz  # PyMuPDF: rasterizes the exact generated PDF, not a parallel HTML layout.
+
+        doc = fitz.open(pdf_path)
+        pages = []
+        matrix = fitz.Matrix(1.45, 1.45)
+        for number, page in enumerate(doc, start=1):
+            pixmap = page.get_pixmap(matrix=matrix, alpha=False)
+            encoded = base64.b64encode(pixmap.tobytes("png")).decode("ascii")
+            pages.append(
+                f'<figure class="pdf-page"><img alt="Pagina {number}" src="data:image/png;base64,{encoded}">'
+                f'<figcaption>Pagina {number} / {doc.page_count}</figcaption></figure>'
+            )
+        doc.close()
+        html = (
+            '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+            '<style>html,body{margin:0;background:#4f5963;color:#eef8ff;font-family:system-ui,sans-serif}'
+            '.pages{padding:12px;display:grid;gap:14px;justify-items:center}.pdf-page{margin:0;max-width:100%}'
+            '.pdf-page img{display:block;max-width:100%;height:auto;background:#fff;box-shadow:0 2px 12px #0008}'
+            '.pdf-page figcaption{text-align:center;font-size:12px;padding:5px 0 0;color:#d6e4ee}</style></head>'
+            f'<body><main class="pages">{"".join(pages)}</main></body></html>'
+        )
+        return HTMLResponse(html, headers={"Cache-Control": "no-store"})
+    except ImportError as exc:
+        raise HTTPException(500, "Renderer anteprima PDF non disponibile") from exc
+    finally:
+        pdf_path.unlink(missing_ok=True)
 
 
 @app.post("/api/projects/{pid}/metadata-search")

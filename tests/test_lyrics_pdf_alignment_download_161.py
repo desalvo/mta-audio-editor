@@ -33,7 +33,7 @@ def test_pdf_layout_uses_best_guess_when_word_timing_missing(tmp_path):
 
 def test_pdf_preview_and_download_use_same_server_generator():
     js = Path("app/static/app.js").read_text(encoding="utf-8")
-    assert "lyricsPdfUrl(true)" in js
+    assert "/lyrics.pdf.preview" in js
     assert "lyricsPdfUrl(false)" in js
     assert "response.blob()" in js
     assert "saveGeneratedBlob" in js
