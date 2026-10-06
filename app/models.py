@@ -273,6 +273,7 @@ class Project(BaseModel):
     original_title: str = Field(default="", max_length=300)
     authors: list[str] = Field(default_factory=list, max_length=64)
     bpm: float = Field(default=120.0, gt=0, le=500)
+    time_signature: str = Field(default="4/4", pattern=r"^(?:2/4|3/4|4/4|5/4|6/8|7/8|9/8|12/8)$")
     key: str = Field(default="", max_length=40)
     target: Literal["MTA8", "MTA16", "DAW"] = "MTA8"
     mta_device_profile: Literal["auto", "merish5_xynthia2", "bbeat_divo", "mlive_mta16_default", "merish5_plus_mta16", "generic"] = "auto"
@@ -305,6 +306,7 @@ class Project(BaseModel):
     export_panel_visible: bool = True
     metadata_panel_visible: bool = True
     timeline_zoom_px_per_sec: int = Field(default=70, ge=25, le=240)
+    mixer_height_px: int = Field(default=262, ge=180, le=900)
     mixer_meta_tab: Literal["lyrics", "chords", "markers"] = "lyrics"
     export_format: Literal["mta", "wav", "mp3", "flac", "mp4"] = "mta"
 

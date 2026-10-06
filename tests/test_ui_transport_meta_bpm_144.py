@@ -44,4 +44,5 @@ def test_track_context_can_recalculate_bpm():
     assert "Ricalcola BPM da questa traccia" in js
     assert "recalculateBpmFromTrack" in js
     assert '@app.post("/api/projects/{pid}/tracks/{track_id}/estimate-bpm")' in main
-    assert "estimate_bpm(audio_path(pid, track.filename))" in main
+    assert "estimate_bpm_and_signature(audio_path(pid, track.filename)" in main
+    assert "time_signature" in main

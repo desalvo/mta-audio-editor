@@ -429,23 +429,16 @@ def project_time_pitch_filter(project: Project) -> str:
     return f"asetrate={rate:.6f},aresample=44100,{_atempo_chain(tempo_after_rate)}"
 
 
-def estimate_bpm(path: Path, progress=None) -> float:
-    """Estimate musical tempo from the first minutes of a track.
-
-    Uses a mono 4 kHz envelope, onset-energy differentiation and autocorrelation.
-    It intentionally has no optional heavyweight dependency such as librosa.
-    """
+def _rhythm_onset_envelope(path: Path, progress=None) -> tuple[np.ndarray, float]:
     if progress:
-        progress(5, "Preparazione audio per la stima BPM")
+        progress(5, "Preparazione audio per la stima BPM/tempo")
     with tempfile.TemporaryDirectory() as td:
         wav_path = Path(td) / "bpm.wav"
-        _run(
-            [
-                "ffmpeg", "-y", "-v", "error", "-i", str(path),
-                "-ac", "1", "-ar", "4000", "-t", "240",
-                "-c:a", "pcm_s16le", str(wav_path),
-            ]
-        )
+        _run([
+            "ffmpeg", "-y", "-v", "error", "-i", str(path),
+            "-ac", "1", "-ar", "4000", "-t", "240",
+            "-c:a", "pcm_s16le", str(wav_path),
+        ])
         if progress:
             progress(30, "Analisi dell'energia ritmica")
         with wave.open(str(wav_path), "rb") as handle:
@@ -454,18 +447,52 @@ def estimate_bpm(path: Path, progress=None) -> float:
     if len(data) < sr * 4:
         raise ValueError("audio too short for BPM estimation")
     data /= max(1.0, float(np.max(np.abs(data))))
-    hop = max(1, sr // 100)  # 100 Hz envelope
+    hop = max(1, sr // 100)
     n = len(data) // hop
-    x = data[:n * hop].reshape(n, hop)
+    x = data[: n * hop].reshape(n, hop)
     rms = np.sqrt(np.mean(x * x, axis=1) + 1e-9)
     onset = np.maximum(0.0, np.diff(rms, prepend=rms[:1]))
     onset -= onset.mean()
     std = onset.std()
     if std > 1e-9:
         onset /= std
+    return onset, 100.0
+
+
+def _estimate_meter(onset: np.ndarray, hz: float, beat_lag: int, preferred_signature: str = "4/4") -> str:
+    """Estimate a conservative time signature from periodic accent structure.
+
+    4/4 is deliberately favored unless another candidate has clearly stronger
+    bar-level periodicity, matching the application's default assumption.
+    """
+    candidates = {"4/4": 4.0, "3/4": 3.0, "6/8": 6.0, "2/4": 2.0, "5/4": 5.0, "7/8": 7.0, "9/8": 9.0, "12/8": 12.0}
+    corr = np.correlate(onset, onset, mode="full")[len(onset)-1:]
+    base = max(1e-9, float(corr[beat_lag]) if beat_lag < len(corr) else 1.0)
+    scores: dict[str, float] = {}
+    for sig, beats in candidates.items():
+        lag = int(round(beat_lag * beats))
+        if lag <= 0 or lag >= len(corr):
+            scores[sig] = -1.0
+            continue
+        # Bar periodicity plus a mild preference for the requested/default meter.
+        score = float(corr[lag]) / base
+        if sig == preferred_signature:
+            score += 0.10
+        if sig == "4/4":
+            score += 0.06
+        scores[sig] = score
+    best = max(scores, key=scores.get)
+    # Only leave 4/4/default if the alternative is meaningfully stronger.
+    preferred = preferred_signature if preferred_signature in scores else "4/4"
+    if best != preferred and scores[best] < scores[preferred] + 0.08:
+        return preferred
+    return best
+
+
+def estimate_bpm_and_signature(path: Path, progress=None, preferred_signature: str = "4/4") -> tuple[float, str]:
+    onset, hz = _rhythm_onset_envelope(path, progress)
     if progress:
-        progress(55, "Ricerca della periodicità")
-    hz = 100.0
+        progress(55, "Ricerca della periodicità e del tempo musicale")
     min_bpm, max_bpm = 55.0, 200.0
     min_lag = max(1, int(hz * 60.0 / max_bpm))
     max_lag = max(min_lag + 1, int(hz * 60.0 / min_bpm))
@@ -475,15 +502,20 @@ def estimate_bpm(path: Path, progress=None) -> float:
         raise ValueError("unable to estimate BPM")
     lag = min_lag + int(np.nanargmax(window))
     bpm = 60.0 * hz / lag
-    # Fold common half/double-tempo ambiguities into a musically useful range.
     while bpm < 70:
         bpm *= 2
+        lag = max(1, int(round(hz * 60.0 / bpm)))
     while bpm > 180:
         bpm /= 2
+        lag = max(1, int(round(hz * 60.0 / bpm)))
+    signature = _estimate_meter(onset, hz, lag, preferred_signature or "4/4")
     if progress:
-        progress(90, f"BPM stimati: {bpm:.1f}")
-    return round(float(bpm), 1)
+        progress(90, f"BPM stimati: {bpm:.1f} · tempo {signature}")
+    return round(float(bpm), 1), signature
 
+
+def estimate_bpm(path: Path, progress=None, preferred_signature: str = "4/4") -> float:
+    return estimate_bpm_and_signature(path, progress, preferred_signature)[0]
 
 def _xcorr_fft(a, b):
     count = len(a) + len(b) - 1

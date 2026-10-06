@@ -48,6 +48,7 @@ function setPreferredStemExecution(value){preferredStemExecution=['auto','local'
 let undoStack=[],redoStack=[],historyProjectId=null,lastHistoryState=null,timelineClipboard=null;
 let playCursorMs=0, playRaf=null, mediaProgressTimer=null;
 let uiState={trackTop:0,timelineTop:0,timelineLeft:0,mixerLeft:0};
+let mixerResizeState=null;
 let waveformJobs={}, waveformValidationProjectId=null, trackPlaybacks=[], meterRaf=null, meterRunToken=0, playbackToken=0, masterMeterAnalysers=null, masterPlaybackGainNode=null;
 let renderedMasterPlayback=false, renderedMasterDirty=false, renderedMasterRefreshPromise=null, renderedMasterRefreshQueued=false, renderedMasterBaseVolumeDb=0, renderedMasterAudio=null;
 let dynamicSyncClock=null, dynamicSyncTimer=null, playbackBuffering=false;
@@ -185,7 +186,7 @@ function forgetRecentProject(id){
   if(currentUser?.native_single_user){nativeRecentProjects=ids;void persistNativeRecentProjects()}
   else localStorage.setItem('mtaRecentProjects',JSON.stringify(ids));
 }
-function resetProjectUiForOpen(){clipBrowserExpanded=false;clipBrowserQuery='';clipBrowserPage=1;expandedProjectClipDetails=new Set();uiState={trackTop:0,timelineTop:0,timelineLeft:0,mixerLeft:0};if(currentUser?.native_single_user)forceNativeViewportTop()}
+function resetProjectUiForOpen(){clipBrowserExpanded=false;clipBrowserQuery='';clipBrowserPage=1;expandedProjectClipDetails=new Set();uiState={trackTop:0,timelineTop:0,timelineLeft:0,mixerLeft:0};mixerResizeState=null;if(currentUser?.native_single_user)forceNativeViewportTop()}
 async function refresh(){
   try{serverProjects=await api('/api/projects')}catch(e){serverProjects=[]}
   return serverProjects;
@@ -381,7 +382,7 @@ function render(){
       ${inspectorHtml()}
     </div>`;
   $('#mixerDock').innerHTML=mixerHtml();
-  updateMixerDockLayout();updatePanelMenuButtons();
+  updateMixerDockLayout();updatePanelMenuButtons();bindMixerResizer();
   drawRuler();bindTimeline();bindProjectClipDrop();bindTrackTimelineScroll();bindTrackResizer();
   current.tracks.forEach(drawWave);if(waveformValidationProjectId!==current.id){waveformValidationProjectId=current.id;ensureWaveforms(true)}else ensureWaveforms(false);updateSel();bindModelInputs();updateMuteSoloVisuals();restoreUiState();ensureSessionHistory();updateEditActionState();forceNativeViewportTop();schedulePlaybackPrewarm(180);
 }
@@ -702,20 +703,20 @@ async function syncMetronomeToTrack(id){
 function delayMsFromUnit(value,unit){
   const n=Number(value);if(!Number.isFinite(n))return 0;
   const bpm=Math.max(1,Number(current?.bpm||120));
-  if(unit==='bars')return Math.round(n*4*60000/bpm);
+  if(unit==='bars'){const beats=Math.max(1,Number(String(current?.time_signature||'4/4').split('/')[0])||4);return Math.round(n*beats*60000/bpm);}
   if(unit==='quarters')return Math.round(n*60000/bpm);
   return Math.round(n);
 }
 function delayValueFromMs(ms,unit){
   const bpm=Math.max(1,Number(current?.bpm||120));
-  if(unit==='bars')return Number(ms)*bpm/(4*60000);
+  if(unit==='bars'){const beats=Math.max(1,Number(String(current?.time_signature||'4/4').split('/')[0])||4);return Number(ms)*bpm/(beats*60000);}
   if(unit==='quarters')return Number(ms)*bpm/60000;
   return Number(ms);
 }
 function openTrackDelayDialog(id){
   const track=trackById(id);if(!track)return;
   const currentMs=trackDelayMs(track);
-  showUtilityModal('Delay / anticipo traccia',`<div class="form-grid"><p><b>${esc(track.name)}</b></p><p class="hint">Valori positivi ritardano la traccia; valori negativi la anticipano. L'offset è non distruttivo e viene applicato a playback, Render ed export.</p><label>Unità<select id="trackDelayUnit" onchange="trackDelayUnitChanged('${esc(id)}')"><option value="ms">Millisecondi</option><option value="quarters">Quarti / battiti</option><option value="bars">Battute (4/4)</option></select></label><label>Valore<input id="trackDelayValue" type="number" step="1" value="${currentMs}"></label><div class="workflow-note">Offset attuale: <b id="trackDelayComputed">${currentMs>=0?'+':''}${currentMs} ms</b> · BPM progetto: ${Number(current?.bpm||120).toFixed(1)}</div><div class="form-actions"><button class="utility-btn secondary" onclick="closeUtilityModal()">Annulla</button><button class="utility-btn secondary" onclick="setTrackDelay('${esc(id)}',0,'ms')">Azzera</button><button class="utility-btn primary" onclick="applyTrackDelayDialog('${esc(id)}')">Applica</button></div></div>`);
+  showUtilityModal('Delay / anticipo traccia',`<div class="form-grid"><p><b>${esc(track.name)}</b></p><p class="hint">Valori positivi ritardano la traccia; valori negativi la anticipano. L'offset è non distruttivo e viene applicato a playback, Render ed export.</p><label>Unità<select id="trackDelayUnit" onchange="trackDelayUnitChanged('${esc(id)}')"><option value="ms">Millisecondi</option><option value="quarters">Quarti / battiti</option><option value="bars">Battute (${current?.time_signature||'4/4'})</option></select></label><label>Valore<input id="trackDelayValue" type="number" step="1" value="${currentMs}"></label><div class="workflow-note">Offset attuale: <b id="trackDelayComputed">${currentMs>=0?'+':''}${currentMs} ms</b> · BPM progetto: ${Number(current?.bpm||120).toFixed(1)}</div><div class="form-actions"><button class="utility-btn secondary" onclick="closeUtilityModal()">Annulla</button><button class="utility-btn secondary" onclick="setTrackDelay('${esc(id)}',0,'ms')">Azzera</button><button class="utility-btn primary" onclick="applyTrackDelayDialog('${esc(id)}')">Applica</button></div></div>`);
   $('#trackDelayValue')?.addEventListener('input',()=>updateTrackDelayComputed());
 }
 function trackDelayUnitChanged(id){const track=trackById(id);if(!track)return;const unit=$('#trackDelayUnit')?.value||'ms';const v=delayValueFromMs(trackDelayMs(track),unit);const input=$('#trackDelayValue');if(input){input.step=unit==='ms'?'1':'0.01';input.value=unit==='ms'?String(Math.round(v)):String(Math.round(v*1000)/1000)}updateTrackDelayComputed()}
@@ -1018,7 +1019,7 @@ function openMixerInsertManager(owner){
 function mixerHtml(){
   const limit=current.target==='DAW'?null:mtaSlotLimit(),over=limit!==null&&current.tracks.length>limit;
   const metaPane=current.metadata_panel_visible?metaPaneHtml():'';
-  return `<div class="mixer-pane" id="mixer">
+  return `<div class="mixer-resizer" id="mixerResizer" title="Trascina per ridimensionare il mixer" role="separator" aria-orientation="horizontal" tabindex="0"><span></span></div><div class="mixer-pane" id="mixer">
     <div class="dock-tabs"><button class="dock-tab active">Mixer</button><button class="dock-tab">Master / Preview</button><button id="realtimeBtn" class="dock-tab realtime-toggle ${current.realtime_meter_enabled?'active':''}" onclick="toggleRealtimeMeters()">RealTime</button>
       <button class="dock-tab" onclick="toggleMuteAll()">${current.tracks.length&&current.tracks.every(t=>t.mute)?'Unmute all':'Mute all'}</button><button class="dock-tab" onclick="toggleSoloAll()">${current.tracks.length&&current.tracks.every(t=>t.solo)?'Unsolo all':'Solo all'}</button><button class="dock-tab" onclick="toggleAllPlugins()">${[...(current.master_inserts||[]),...current.tracks.flatMap(t=>t.inserts||[])].some(x=>x.enabled)?'Bypass all FX':'Enable all FX'}</button>
       <div class="automix-control"><label class="switch"><input type="checkbox" ${current.auto_mix_enabled?'checked':''} onchange="setAutoMix(this.checked)"><span></span></label><b>Auto Mix</b><select id="autoMixStyle" onchange="changeAutoMixStyle(this.value)"><option value="balanced" ${current.auto_mix_style==='balanced'?'selected':''}>Balanced</option><option value="studio" ${current.auto_mix_style==='studio'?'selected':''}>Studio</option><option value="live" ${current.auto_mix_style==='live'?'selected':''}>Live</option><option value="gentle" ${current.auto_mix_style==='gentle'?'selected':''}>Gentle</option></select><button onclick="showAutoMixInfo()">?</button></div>
@@ -1126,14 +1127,63 @@ function openExpandedMetaPanel(){
 }
 function showExpandedMetaTab(tab){mixerMetaTab=tab;if(current){current.mixer_meta_tab=tab;markDirty(250)};const body=$('#expandedMetaBody');if(body)body.innerHTML=metaPanelBodyHtml(true);}
 
+function mixerHeightBounds(){
+  const main=document.querySelector('.main-area');
+  const available=Math.max(180,Math.floor(main?.getBoundingClientRect().height||window.innerHeight||700));
+  const min=180;
+  const editorMin=Math.min(260,Math.max(120,Math.floor(available*.28)));
+  const max=Math.max(min,Math.min(900,available-editorMin));
+  return{min,max};
+}
+function applyMixerHeight(value,{persist=false}={}){
+  if(!current)return;
+  const {min,max}=mixerHeightBounds();
+  const requested=Number(value||current.mixer_height_px||262);
+  const height=Math.max(min,Math.min(max,Number.isFinite(requested)?requested:262));
+  const main=document.querySelector('.main-area');
+  if(main)main.style.setProperty('--mixer-height',`${height}px`);
+  const dock=$('#mixerDock');if(dock)dock.style.height=`${height}px`;
+  if(persist&&Number(current.mixer_height_px)!==height){current.mixer_height_px=Math.round(height);markDirty(180)}
+  return height;
+}
 function updateMixerDockLayout(){
   const dock=$('#mixerDock');if(!dock||!current)return;
   const meta=!!current.metadata_panel_visible;
   dock.classList.toggle('meta-hidden',!meta);
   dock.classList.toggle('sidepanels-hidden',!meta);
   dock.style.gridTemplateColumns=meta?'minmax(0,1fr) 320px':'minmax(0,1fr)';
+  applyMixerHeight(current.mixer_height_px||262);
   const mixer=$('#mixer');if(mixer)mixer.style.width='100%';
 }
+function bindMixerResizer(){
+  const handle=$('#mixerResizer');if(!handle||!current)return;
+  const finish=()=>{
+    if(!mixerResizeState)return;
+    document.body.classList.remove('mixer-resizing');
+    const height=applyMixerHeight(mixerResizeState.height,{persist:true});
+    mixerResizeState=null;
+    if(height)current.mixer_height_px=Math.round(height);
+  };
+  handle.addEventListener('pointerdown',e=>{
+    if(e.button!==0&&e.pointerType!=='touch')return;
+    e.preventDefault();handle.setPointerCapture?.(e.pointerId);
+    mixerResizeState={startY:e.clientY,startHeight:applyMixerHeight(current.mixer_height_px||262)||262,height:Number(current.mixer_height_px||262)};
+    document.body.classList.add('mixer-resizing');
+  });
+  handle.addEventListener('pointermove',e=>{
+    if(!mixerResizeState)return;
+    mixerResizeState.height=mixerResizeState.startHeight-(e.clientY-mixerResizeState.startY);
+    mixerResizeState.height=applyMixerHeight(mixerResizeState.height)||mixerResizeState.height;
+  });
+  handle.addEventListener('pointerup',finish);handle.addEventListener('pointercancel',finish);
+  handle.addEventListener('keydown',e=>{
+    if(!['ArrowUp','ArrowDown','Home','End'].includes(e.key))return;
+    e.preventDefault();const {min,max}=mixerHeightBounds();let next=Number(current.mixer_height_px||262);
+    if(e.key==='ArrowUp')next+=20;else if(e.key==='ArrowDown')next-=20;else if(e.key==='Home')next=min;else next=max;
+    const height=applyMixerHeight(next,{persist:true});if(height)current.mixer_height_px=Math.round(height);
+  });
+}
+window.addEventListener('resize',()=>{if(current)requestAnimationFrame(()=>applyMixerHeight(current.mixer_height_px||262))});
 function updatePanelMenuButtons(){
   $('#metaPanelMenuBtn')?.classList.toggle('panel-hidden',!current?.metadata_panel_visible);
 }
@@ -2001,6 +2051,15 @@ function setProjectBpm(v){
   if(!current.base_bpm)current.base_bpm=current.bpm||n;
   current.bpm=n;$('#transportBpm').textContent=String(n);if($('#transportBpmInput'))$('#transportBpmInput').value=String(n);markDirty();stopPlayback();
 }
+async function setProjectTimeSignature(value,recalculate=true){
+  if(!current)return;const allowed=['2/4','3/4','4/4','5/4','6/8','7/8','9/8','12/8'];const sig=allowed.includes(String(value))?String(value):'4/4';
+  if(current.time_signature===sig&&!recalculate)return;current.time_signature=sig;markDirty(20);
+  if(!recalculate)return render();
+  const track=(current.tracks||[]).find(t=>t.type!=='metronome')||(current.tracks||[])[0];
+  if(!track){render();return}
+  showMediaProgress('Ricalcolo BPM',10,`Tempo impostato a ${sig}. Ricalcolo BPM…`);
+  try{const result=await api(`/api/projects/${current.id}/tracks/${track.id}/estimate-bpm?time_signature=${encodeURIComponent(sig)}`,{method:'POST'});current.bpm=Number(result.bpm);current.base_bpm=Number(result.bpm);current.time_signature=sig;render();markDirty(20);$('#utilityBackdrop')?.classList.add('hidden');toast(`Tempo ${sig} · BPM ${Math.round(current.bpm)}`)}catch(e){$('#utilityBackdrop')?.classList.add('hidden');render();toast('Tempo aggiornato; ricalcolo BPM non riuscito: '+e.message)}
+}
 function setProjectPitch(v){
   if(!current)return;const n=Math.max(-6,Math.min(6,Number(v)||0));current.pitch_semitones=n;if($('#transportPitchInput'))$('#transportPitchInput').value=n.toFixed(1);markDirty();stopPlayback();
 }
@@ -2028,8 +2087,36 @@ function followPlayhead(x,force=false){
 
 function togglePlaybackLyrics(){if(!current)return;current.show_lyrics_playback=!current.show_lyrics_playback;updateTransportToggleButtons();markDirty();updateTimedPlaybackOverlay(playCursorMs)}
 function togglePlaybackChords(){if(!current)return;current.show_chords_playback=!current.show_chords_playback;updateTransportToggleButtons();markDirty();updateTimedPlaybackOverlay(playCursorMs)}
-function activeTimedItem(items,timeMs){let active=null;for(const item of items||[]){if(item?.excluded)continue;if(Number(item.time_ms||0)>timeMs)break;active=item}return active}
-function updateTimedPlaybackOverlay(timeMs){const overlay=$('#liveTimedOverlay'),lyricBox=$('#liveLyricBox'),chordBox=$('#liveChordBox');if(!overlay||!lyricBox||!chordBox)return;const running=playbackActuallyRunning()||playbackPaused;const showL=!!current?.show_lyrics_playback&&running,showC=!!current?.show_chords_playback&&running;if(!showL&&!showC){overlay.classList.add('hidden');lyricBox.classList.add('hidden');chordBox.classList.add('hidden');return}overlay.classList.remove('hidden');if(showC){const chord=activeTimedItem(current?.chords,timeMs);chordBox.textContent=chord?transposeChordLabel(chord.chord,current?.pitch_semitones||0):'—';chordBox.classList.remove('hidden')}else chordBox.classList.add('hidden');if(showL){const lyrics=current?.lyrics||[];let lyric=activeTimedItem(lyrics,timeMs);if(lyric&&lyric.end_ms!=null&&timeMs>Number(lyric.end_ms)+350)lyric=null;lyricBox.textContent=lyric?.text||' ';lyricBox.classList.remove('hidden')}else lyricBox.classList.add('hidden')}
+function appDisplayPreference(key,defaultValue=false){const value=localStorage.getItem(`mta.${key}`);return value==null?defaultValue:value==='true'}
+function setAppDisplayPreference(key,value){localStorage.setItem(`mta.${key}`,value?'true':'false')}
+function timedItemTriplet(items,timeMs){
+  const visible=(items||[]).filter(item=>item&&!item.excluded&&!item.disabled&&!item.deleted).slice().sort((a,b)=>Number(a.time_ms||0)-Number(b.time_ms||0));
+  if(!visible.length)return {previous:null,current:null,next:null,index:-1};
+  let index=-1;for(let i=0;i<visible.length;i++){if(Number(visible[i].time_ms||0)<=timeMs)index=i;else break}
+  return {previous:index>0?visible[index-1]:null,current:index>=0?visible[index]:null,next:index+1<visible.length?visible[index+1]:null,index};
+}
+function activeTimedItem(items,timeMs){return timedItemTriplet(items,timeMs).current}
+function timedOverlayTripletHtml(previous,current,next,formatter){
+  const item=(value,role)=>`<span class="timed-overlay-item ${role}">${esc(value?formatter(value):'')}</span>`;
+  return `${item(previous,'previous')}${item(current,'current')}${item(next,'next')}`;
+}
+function updateTimedPlaybackOverlay(timeMs){
+  const overlay=$('#liveTimedOverlay'),lyricBox=$('#liveLyricBox'),chordBox=$('#liveChordBox');if(!overlay||!lyricBox||!chordBox)return;
+  const running=playbackActuallyRunning()||playbackPaused;const showL=!!current?.show_lyrics_playback&&running,showC=!!current?.show_chords_playback&&running;
+  if(!showL&&!showC){overlay.classList.add('hidden');lyricBox.classList.add('hidden');chordBox.classList.add('hidden');return}
+  overlay.classList.remove('hidden');
+  if(showC){
+    const t=timedItemTriplet(current?.chords,timeMs),showNeighbors=appDisplayPreference('showPreviousNextChords',false),format=c=>transposeChordLabel(c.chord,current?.pitch_semitones||0);
+    chordBox.innerHTML=showNeighbors?timedOverlayTripletHtml(t.previous,t.current,t.next,format):esc(t.current?format(t.current):'—');
+    chordBox.classList.toggle('with-neighbors',showNeighbors);chordBox.classList.remove('hidden');
+  }else chordBox.classList.add('hidden');
+  if(showL){
+    const t=timedItemTriplet(current?.lyrics,timeMs);let lyric=t.current;if(lyric&&lyric.end_ms!=null&&timeMs>Number(lyric.end_ms)+350)lyric=null;
+    const showNeighbors=appDisplayPreference('showPreviousNextLyrics',false);
+    if(showNeighbors){const previous=lyric?t.previous:null,next=lyric?t.next:(t.current?t.next:null);lyricBox.innerHTML=timedOverlayTripletHtml(previous,lyric,next,l=>l.text||' ')}else lyricBox.textContent=lyric?.text||' ';
+    lyricBox.classList.toggle('with-neighbors',showNeighbors);lyricBox.classList.remove('hidden');
+  }else lyricBox.classList.add('hidden');
+}
 function toggleRealtimeMeters(){
   if(!current)return;current.realtime_meter_enabled=!current.realtime_meter_enabled;$('#realtimeBtn')?.classList.toggle('active',current.realtime_meter_enabled);$$('.meter-realtime,.peak-led').forEach(x=>x.classList.toggle('hidden',!current.realtime_meter_enabled));markDirty();
   if(!current.realtime_meter_enabled)resetVuMeters();
@@ -2685,7 +2772,7 @@ async function startYoutubeImport(){
 }
 function focusImport(){$('#newTrackFile')?.click()}
 
-function editProjectMeta(){if(!current)return;const title=prompt('Project title',current.title);if(title!==null&&title.trim())current.title=title.trim().slice(0,200);const originalTitle=prompt('Titolo originale',current.original_title||'');if(originalTitle!==null)current.original_title=originalTitle.trim().slice(0,300);const authors=prompt('Autori / compositori (separati da virgola)',(current.authors||[]).join(', '));if(authors!==null)current.authors=authors.split(/[,;]/).map(x=>x.trim()).filter(Boolean).slice(0,64);const artist=prompt('Interprete / artista',current.artist||'');if(artist!==null)current.artist=artist.slice(0,200);const key=prompt('Tonalità / Key',current.key||'');if(key!==null)current.key=key.trim().slice(0,40);const bpm=prompt('BPM',String(current.bpm));if(bpm!==null&&Number(bpm)>0)setProjectBpm(Math.min(300,Number(bpm)));render();markDirty()}
+function editProjectMeta(){if(!current)return;const title=prompt('Project title',current.title);if(title!==null&&title.trim())current.title=title.trim().slice(0,200);const originalTitle=prompt('Titolo originale',current.original_title||'');if(originalTitle!==null)current.original_title=originalTitle.trim().slice(0,300);const authors=prompt('Autori / compositori (separati da virgola)',(current.authors||[]).join(', '));if(authors!==null)current.authors=authors.split(/[,;]/).map(x=>x.trim()).filter(Boolean).slice(0,64);const artist=prompt('Interprete / artista',current.artist||'');if(artist!==null)current.artist=artist.slice(0,200);const key=prompt('Tonalità / Key',current.key||'');if(key!==null)current.key=key.trim().slice(0,40);const bpm=prompt('BPM',String(current.bpm));if(bpm!==null&&Number(bpm)>0)setProjectBpm(Math.min(300,Number(bpm)));const sig=prompt('Time signature (es. 4/4, 3/4, 6/8)',current.time_signature||'4/4');if(sig!==null&&sig.trim()&&sig.trim()!==(current.time_signature||'4/4'))setProjectTimeSignature(sig.trim(),true);render();markDirty()}
 async function downloadProjectLyrics(withChords=false){if(!current)return;if(!(current.lyrics||[]).length)return toast('Il progetto non contiene lyrics');if(withChords&&!(current.chords||[]).some(ch=>!ch.excluded))return toast('Il progetto non contiene chords attivi');const ext='txt';const safeName=(current.title||'lyrics').replace(/[\/:*?"<>|]+/g,'_').trim()||'lyrics';try{await downloadWithProgress(`/api/projects/${current.id}/lyrics.txt?chords=${withChords?'true':'false'}`,`${safeName}.${ext}`,withChords?'Download lyrics + chords':'Download lyrics',false,'text/plain')}catch(e){toast(e.message)}}
 async function downloadProjectChordPro(){if(!current)return;if(!(current.lyrics||[]).length)return toast('Il progetto non contiene lyrics');if(!(current.chords||[]).some(ch=>!ch.excluded))return toast('Il progetto non contiene chords attivi');const safeName=(current.title||'lyrics').replace(/[\/:*?"<>|]+/g,'_').trim()||'lyrics';try{await downloadWithProgress(`/api/projects/${current.id}/lyrics.chordpro`,`${safeName}.cho`,'Download ChordPro',false,'text/plain')}catch(e){toast(e.message)}}
 function lyricsPdfUrl(preview=false){const color=$('#lyricsPdfChordColorExpanded')?.value||$('#lyricsPdfChordColor')?.value||'#7B1FA2';return `/api/projects/${current.id}/lyrics.pdf?chord_color=${encodeURIComponent(color)}${preview?'&preview=true':''}`}
@@ -2820,7 +2907,7 @@ async function startKaraokeExport(){
 async function recalculateBpmFromTrack(trackId){
   if(!current)return;const track=trackById(trackId);if(!track)return;
   showMediaProgress('Ricalcolo BPM',10,`Analisi ritmica di ${track.name}…`);
-  try{const result=await api(`/api/projects/${current.id}/tracks/${trackId}/estimate-bpm`,{method:'POST'});current.bpm=Number(result.bpm);current.base_bpm=Number(result.bpm);render();markDirty(50);$('#utilityBackdrop')?.classList.add('hidden');toast(`BPM ricalcolati da ${track.name}: ${Math.round(Number(result.bpm))}`)}catch(e){$('#utilityBackdrop')?.classList.add('hidden');toast('Ricalcolo BPM: '+e.message)}
+  try{const result=await api(`/api/projects/${current.id}/tracks/${trackId}/estimate-bpm`,{method:'POST'});current.bpm=Number(result.bpm);current.base_bpm=Number(result.bpm);render();markDirty(50);$('#utilityBackdrop')?.classList.add('hidden');if(result.time_signature)current.time_signature=result.time_signature;toast(`BPM ricalcolati da ${track.name}: ${Math.round(Number(result.bpm))} · ${current.time_signature||'4/4'}`)}catch(e){$('#utilityBackdrop')?.classList.add('hidden');toast('Ricalcolo BPM: '+e.message)}
 }
 function timedEditorConfig(kind){return {lyrics:{key:'text',label:'Lyrics',end:true,valueLabel:'Testo'},chords:{key:'chord',label:'Chords',end:false,valueLabel:'Accordo'},markers:{key:'label',label:'Markers',end:false,valueLabel:'Etichetta'}}[kind]||null}
 function timedEditorTime(ms){const n=Math.max(0,Number(ms)||0),m=Math.floor(n/60000),s=(n%60000)/1000;return `${m}:${s.toFixed(3).padStart(6,'0')}`}
@@ -2982,6 +3069,7 @@ async function showProjectInfo(){
     ['Artista / interprete',current.artist||'—'],
     ['Registrazioni repertorio',String((current.rights_records||[]).length)],
     ['BPM',String(Math.round(Number(current.bpm||0)))],
+    ['Time signature',current.time_signature||'4/4'],
     ['Tonalità',effectiveProjectKey()||'—'],
     ['Auto-save',autosaveEnabled?'Attivo':'Disattivato'],
   ];
@@ -3043,16 +3131,18 @@ async function showSettings(){
 }
 function showWebSettings(){
   const enabled=localStorage.getItem('mtaWebAutosaveEnabled')!=='false';
-  showUtilityModal('Settings',`<div class="form-grid web-settings"><label class="workflow-check"><input id="webAutosaveEnabled" type="checkbox" ${enabled?'checked':''}> Auto-save project changes</label><p class="hint">Le preferenze dell'editor sono salvate in questo browser. I modelli AI della web app sono invece gestiti sul server.</p><div class="form-actions"><button type="button" onclick="openAiModelManager()">Manage Lyrics / Chords models</button><button type="button" onclick="location.href='/account'">Account / Profile</button>${currentUser?.role==='admin'?`<button type="button" onclick="location.href='/settings'">Server administration</button>`:''}<button class="accent" onclick="saveWebSettings()">Save</button></div></div>`);
+  const showChordNeighbors=appDisplayPreference('showPreviousNextChords',false),showLyricNeighbors=appDisplayPreference('showPreviousNextLyrics',false);
+  showUtilityModal('Settings',`<div class="form-grid web-settings"><label class="workflow-check"><input id="webAutosaveEnabled" type="checkbox" ${enabled?'checked':''}> Auto-save project changes</label><label class="workflow-check"><input id="showPreviousNextChords" type="checkbox" ${showChordNeighbors?'checked':''}> Show previous and next chords</label><label class="workflow-check"><input id="showPreviousNextLyrics" type="checkbox" ${showLyricNeighbors?'checked':''}> Show previous and next lyrics</label><p class="hint">Quando abilitate, le viste Lyrics/Chords sopra la timeline mostrano precedente, corrente e successivo; l'evento corrente resta evidenziato. Le preferenze dell'editor sono salvate in questa app/browser.</p><div class="form-actions"><button type="button" onclick="openAiModelManager()">Manage Lyrics / Chords models</button><button type="button" onclick="location.href='/account'">Account / Profile</button>${currentUser?.role==='admin'?`<button type="button" onclick="location.href='/settings'">Server administration</button>`:''}<button class="accent" onclick="saveWebSettings()">Save</button></div></div>`);
 }
-function saveWebSettings(){const enabled=$('#webAutosaveEnabled')?.checked!==false;localStorage.setItem('mtaWebAutosaveEnabled',enabled?'true':'false');autosaveEnabled=enabled;if(autosaveEnabled&&projectDirty)markDirty(50);closeUtilityModal();toast('Settings salvati')}
+function saveWebSettings(){const enabled=$('#webAutosaveEnabled')?.checked!==false;localStorage.setItem('mtaWebAutosaveEnabled',enabled?'true':'false');setAppDisplayPreference('showPreviousNextChords',$('#showPreviousNextChords')?.checked===true);setAppDisplayPreference('showPreviousNextLyrics',$('#showPreviousNextLyrics')?.checked===true);autosaveEnabled=enabled;if(autosaveEnabled&&projectDirty)markDirty(50);updateTimedPlaybackOverlay(playCursorMs);closeUtilityModal();toast('Settings salvati')}
 async function showNativeSettings(){
   if(!currentUser?.native_single_user){if(currentUser?.role==='admin'){location.href='/settings';return}return}
   const apiBridge=await waitForNativeApi();
   if(!apiBridge?.get_native_settings){toast('Bridge nativo non disponibile. Riprova tra un istante.');return}
   try{
     const cfg=await apiBridge.get_native_settings();
-    showUtilityModal('Settings',`<div class="form-grid native-settings"><label>Maximum import/upload size (MB)<input id="nativeMaxUploadMb" type="number" min="1" max="10240" step="1" value="${Number(cfg.max_upload_mb)||1024}"></label><label class="workflow-check"><input id="nativeAutosaveEnabled" type="checkbox" ${cfg.autosave_enabled!==false?'checked':''}> Auto-save project changes</label><label>Update channel<select id="nativeUpdateChannel"><option value="stable" ${cfg.update_channel!=='early'?'selected':''}>Stable · GitHub tags/releases only</option><option value="early" ${cfg.update_channel==='early'?'selected':''}>Early release · include latest main packages</option></select></label><p>Stable checks only tagged GitHub releases. Early release also checks the rolling <b>early-main</b> package produced from main.</p><div class="form-actions"><button type="button" onclick="checkNativeAppUpdate(true)">Check for updates</button><button type="button" onclick="openNativeModelManager()">Manage Demucs models</button><button type="button" onclick="openAiModelManager()">Manage Lyrics / Chords models</button><button class="accent" onclick="saveNativeSettings()">Save</button></div></div>`);
+    const showChordNeighbors=appDisplayPreference('showPreviousNextChords',false),showLyricNeighbors=appDisplayPreference('showPreviousNextLyrics',false);
+    showUtilityModal('Settings',`<div class="form-grid native-settings"><label>Maximum import/upload size (MB)<input id="nativeMaxUploadMb" type="number" min="1" max="10240" step="1" value="${Number(cfg.max_upload_mb)||1024}"></label><label class="workflow-check"><input id="nativeAutosaveEnabled" type="checkbox" ${cfg.autosave_enabled!==false?'checked':''}> Auto-save project changes</label><label class="workflow-check"><input id="showPreviousNextChords" type="checkbox" ${showChordNeighbors?'checked':''}> Show previous and next chords</label><label class="workflow-check"><input id="showPreviousNextLyrics" type="checkbox" ${showLyricNeighbors?'checked':''}> Show previous and next lyrics</label><label>Update channel<select id="nativeUpdateChannel"><option value="stable" ${cfg.update_channel!=='early'?'selected':''}>Stable · GitHub tags/releases only</option><option value="early" ${cfg.update_channel==='early'?'selected':''}>Early release · include latest main packages</option></select></label><p>Stable checks only tagged GitHub releases. Early release also checks the rolling <b>early-main</b> package produced from main.</p><p class="hint">Con le opzioni previous/next attive, la vista sopra la timeline scorre mostrando l'evento precedente e successivo attenuati e quello corrente evidenziato.</p><div class="form-actions"><button type="button" onclick="checkNativeAppUpdate(true)">Check for updates</button><button type="button" onclick="openNativeModelManager()">Manage Demucs models</button><button type="button" onclick="openAiModelManager()">Manage Lyrics / Chords models</button><button class="accent" onclick="saveNativeSettings()">Save</button></div></div>`);
   }catch(err){toast('Impossibile leggere le impostazioni native: '+err.message)}
 }
 async function saveNativeSettings(){
@@ -3060,8 +3150,8 @@ async function saveNativeSettings(){
   if(!Number.isInteger(value)||value<1||value>10240){toast('Inserisci un valore intero tra 1 e 10240 MB');return}
   try{
     const apiBridge=await waitForNativeApi();if(!apiBridge?.set_native_settings)return toast('Bridge nativo non disponibile');
-    const enabled=$('#nativeAutosaveEnabled')?.checked!==false;const channel=$('#nativeUpdateChannel')?.value==='early'?'early':'stable';const result=await apiBridge.set_native_settings(value,enabled,channel);autosaveEnabled=result.autosave_enabled!==false;if(autosaveEnabled&&projectDirty)markDirty(50);
-    closeUtilityModal();toast(`Limite import/upload impostato a ${result.max_upload_mb} MB`);
+    const enabled=$('#nativeAutosaveEnabled')?.checked!==false;const channel=$('#nativeUpdateChannel')?.value==='early'?'early':'stable';const result=await apiBridge.set_native_settings(value,enabled,channel);setAppDisplayPreference('showPreviousNextChords',$('#showPreviousNextChords')?.checked===true);setAppDisplayPreference('showPreviousNextLyrics',$('#showPreviousNextLyrics')?.checked===true);autosaveEnabled=result.autosave_enabled!==false;if(autosaveEnabled&&projectDirty)markDirty(50);updateTimedPlaybackOverlay(playCursorMs);
+    closeUtilityModal();toast(`Impostazioni salvate · limite import/upload ${result.max_upload_mb} MB`);
   }catch(err){toast('Salvataggio impostazioni fallito: '+err.message)}
 }
 

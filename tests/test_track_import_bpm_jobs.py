@@ -19,14 +19,14 @@ def test_only_first_mp3_import_estimates_and_sets_bpm(tmp_path, monkeypatch):
         main.MEDIA_JOBS.clear()
 
     calls = []
-    def fake_bpm(path, progress=None):
+    def fake_bpm_and_signature(path, progress=None, preferred_signature="4/4"):
         calls.append(path)
         if progress:
             progress(50, "Stima BPM")
-            progress(90, "BPM stimati: 128.0")
-        return 128.0
+            progress(90, "BPM stimati: 128.0 · tempo 4/4")
+        return 128.0, preferred_signature
 
-    monkeypatch.setattr(main, "estimate_bpm", fake_bpm)
+    monkeypatch.setattr(main, "estimate_bpm_and_signature", fake_bpm_and_signature)
 
     mp3 = tmp_path / "song.mp3"
     mp3_second = tmp_path / "song2.mp3"

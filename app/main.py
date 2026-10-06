@@ -19,7 +19,7 @@ from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse, Resp
 from starlette.background import BackgroundTask
 from fastapi.staticfiles import StaticFiles
 
-from .audio_engine import auto_align_ms, delete_range, delete_song_range, ensure_clips, estimate_bpm, generate_metronome_wav, media_duration_ms, project_duration_ms, render_mix, render_track, render_track_export, shift_track, waveform_peaks
+from .audio_engine import auto_align_ms, delete_range, delete_song_range, ensure_clips, estimate_bpm_and_signature, generate_metronome_wav, media_duration_ms, project_duration_ms, render_mix, render_track, render_track_export, shift_track, waveform_peaks
 from .codec import export_mta, ffprobe, import_mta, resolve_mta_device_profile, suggested_slots, validate_slot_mapping
 from .models import AutoMixRequest, Clip, CustomPresetRequest, DeleteRangeRequest, InstantiateProjectClipRequest, UpdateProjectClipRequest, MoveTrackRequest, TrackDelayRequest, MtaExportRequest, Project, ProjectClip, ProjectExportRequest, RightsRecord, Track, SampleEditRequest, SampleEffectRequest
 from .plugins import STEM_SPLITTER, delete_user_preset, plugin_manifest, save_user_preset
@@ -1462,7 +1462,8 @@ def _track_import_worker(
             def bpm_progress(value: int, message: str) -> None:
                 _media_job_update(job_id, progress=60 + int(max(0, min(100, value)) * 0.28), message=message)
             try:
-                project.bpm = float(round(estimate_bpm(dst, bpm_progress)))
+                project.bpm, project.time_signature = estimate_bpm_and_signature(dst, bpm_progress, project.time_signature or "4/4")
+                project.bpm = float(round(project.bpm))
                 project.base_bpm = project.bpm
                 save_project(project)
             except Exception:
@@ -1781,7 +1782,7 @@ def download_project_lyrics_pdf(pid: str, request: Request, chord_color: str = "
     build_lyrics_pdf(
         tmp, title=project.title, artist=project.artist,
         lyrics=project.lyrics, chords=transpose_chords(project.chords, project.pitch_semitones), chord_color=chord_color,
-        key=transpose_key_name(project.key, project.pitch_semitones), bpm=project.bpm,
+        key=transpose_key_name(project.key, project.pitch_semitones), bpm=project.bpm, time_signature=project.time_signature,
         rights_records=project.rights_records, markers=project.markers,
         pdf_style=project.lyrics_pdf_style.model_dump(),
     )
@@ -2515,7 +2516,8 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
                 progress(12 + int(max(0, min(100, value)) * 0.12), message)
             try:
                 project_for_bpm = load_project(project_id)
-                project_for_bpm.bpm = float(round(estimate_bpm(source, bpm_progress)))
+                project_for_bpm.bpm, project_for_bpm.time_signature = estimate_bpm_and_signature(source, bpm_progress, project_for_bpm.time_signature or "4/4")
+                project_for_bpm.bpm = float(round(project_for_bpm.bpm))
                 project_for_bpm.base_bpm = project_for_bpm.bpm
                 save_project(project_for_bpm)
             except Exception:
@@ -3336,19 +3338,26 @@ def create_metronome_track(pid: str, request: Request):
 
 
 @app.post("/api/projects/{pid}/tracks/{track_id}/estimate-bpm")
-def estimate_track_bpm(pid: str, track_id: str, request: Request):
+def estimate_track_bpm(pid: str, track_id: str, request: Request, time_signature: str | None = None):
     project = _project_for_actor(request, pid)
     track = next((item for item in project.tracks if item.id == track_id), None)
     if track is None:
         raise HTTPException(404, "track not found")
     try:
-        bpm = float(round(estimate_bpm(audio_path(pid, track.filename))))
+        preferred = time_signature or project.time_signature or "4/4"
+        if preferred not in {"2/4", "3/4", "4/4", "5/4", "6/8", "7/8", "9/8", "12/8"}:
+            raise HTTPException(400, "time signature non valida")
+        bpm, signature = estimate_bpm_and_signature(audio_path(pid, track.filename), preferred_signature=preferred)
+        bpm = float(round(bpm))
+        if time_signature:
+            signature = preferred
     except (ValueError, RuntimeError) as exc:
         raise HTTPException(422, f"Impossibile stimare i BPM: {exc}") from exc
     project.bpm = bpm
     project.base_bpm = bpm
+    project.time_signature = signature
     save_project(project)
-    return {"ok": True, "track_id": track_id, "bpm": bpm}
+    return {"ok": True, "track_id": track_id, "bpm": bpm, "time_signature": signature}
 
 
 @app.get("/api/projects/{pid}/preview-track/{track_id}")

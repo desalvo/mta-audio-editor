@@ -997,7 +997,7 @@ def _pdf_fonts() -> dict[str, str]:
 
 def build_lyrics_pdf(
     out: Path, *, title: str, artist: str, lyrics: list[LyricLine], chords: list[Chord],
-    chord_color: str = "#7B1FA2", key: str = "", bpm: float | None = None,
+    chord_color: str = "#7B1FA2", key: str = "", bpm: float | None = None, time_signature: str = "4/4",
     rights_records: list[RightsRecord] | None = None, markers: list[Marker] | None = None,
     pdf_style: dict | None = None,
 ) -> Path:
@@ -1157,8 +1157,13 @@ def build_lyrics_pdf(
     if key: subtitle_parts.append(f"Key: {key}")
     if subtitle_parts:
         f,s=set_style("subtitle");c.drawString(margin,y,safe("  ·  ".join(subtitle_parts)));y-=s+8
+    meta_parts=[]
     if bpm is not None and float(bpm)>0:
-        f,s=set_style("bpm");c.drawString(margin,y,f"BPM: {int(round(float(bpm)))}");y-=s+8
+        meta_parts.append(f"BPM: {int(round(float(bpm)))}")
+    if time_signature:
+        meta_parts.append(f"Time signature: {time_signature}")
+    if meta_parts:
+        f,s=set_style("bpm");c.drawString(margin,y,"  ·  ".join(meta_parts));y-=s+8
     # Requested visual breathing room between title/metadata and the song body.
     y -= 22
 

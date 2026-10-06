@@ -2,7 +2,7 @@ from pathlib import Path
 
 from fastapi.testclient import TestClient
 
-from app.models import Clip, Project, Track
+from app.models import Clip, Track
 
 
 def test_musicbrainz_user_agent_uses_release(monkeypatch):

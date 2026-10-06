@@ -195,7 +195,7 @@ def import_mta(path: Path, project: Project) -> Project:
 def _metadata_attachment(project: Project) -> Path:
     out = pdir(project.id) / "attachments" / "mta-editor.json"
     out.write_text(json.dumps({
-        "schema": "mta-audio-editor/v3", "title": project.title, "original_title": project.original_title, "artist": project.artist, "authors": project.authors, "bpm": project.bpm, "key": project.key, "mta_device_profile": project.mta_device_profile,
+        "schema": "mta-audio-editor/v3", "title": project.title, "original_title": project.original_title, "artist": project.artist, "authors": project.authors, "bpm": project.bpm, "time_signature": project.time_signature, "key": project.key, "mta_device_profile": project.mta_device_profile,
         "tracks": [{"id": t.id, "name": t.name, "type": t.type, "mta_slot": t.mta_slot, "pan": t.pan, "clips": [c.model_dump() for c in t.clips], "inserts": [x.model_dump() for x in t.inserts]} for t in project.tracks],
         "master": {"volume_db": project.master_volume_db, "inserts": [x.model_dump() for x in project.master_inserts]},
         "lyrics": [x.model_dump() for x in project.lyrics], "chords": [x.model_dump() for x in project.chords], "markers": [x.model_dump() for x in project.markers],
