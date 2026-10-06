@@ -106,10 +106,17 @@ class Marker(BaseModel):
     label: str = Field(max_length=500)
 
 
+class LyricSyllable(BaseModel):
+    start_ms: int = Field(ge=0)
+    end_ms: int = Field(ge=0)
+    text: str = Field(max_length=120)
+
+
 class LyricWord(BaseModel):
     start_ms: int = Field(ge=0)
     end_ms: int = Field(ge=0)
     text: str = Field(max_length=500)
+    syllables: list[LyricSyllable] = Field(default_factory=list, max_length=64)
 
 
 class LyricLine(BaseModel):
@@ -250,6 +257,8 @@ class Project(BaseModel):
     realtime_meter_enabled: bool = False
     render_preview_enabled: bool = False
     follow_playback_enabled: bool = False
+    show_lyrics_playback: bool = False
+    show_chords_playback: bool = False
     export_panel_visible: bool = True
     metadata_panel_visible: bool = True
     timeline_zoom_px_per_sec: int = Field(default=70, ge=25, le=240)

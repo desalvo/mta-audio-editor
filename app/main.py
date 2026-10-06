@@ -1566,7 +1566,7 @@ async def start_track_import_job(
 
 
 
-def _text_music_worker(job_id: str, pid: str, track_id: str, kind: str, model_or_engine: str = "") -> None:
+def _text_music_worker(job_id: str, pid: str, track_id: str, kind: str, model_or_engine: str = "", advanced_alignment: bool = False) -> None:
     try:
         project = load_project(pid)
         track = next((item for item in project.tracks if item.id == track_id), None)
@@ -1579,16 +1579,18 @@ def _text_music_worker(job_id: str, pid: str, track_id: str, kind: str, model_or
             _media_job_update(job_id, progress=5, message=f"Verifica modello lyrics · OpenAI Whisper · {selected_model}")
             cancel_event=MEDIA_JOBS[job_id].get("cancel_event")
             def lyrics_progress(pct, items, message):
-                partial=[{"time_ms":x.time_ms,"end_ms":x.end_ms,"text":x.text} for x in items[-120:]]
-                _media_job_update(job_id,progress=pct,message=message,partial={"kind":"lyrics","items":partial})
+                # Do not expose incremental transcript text while Whisper is running:
+                # it may encourage chunk stitching artefacts (repeated/missing phrases).
+                _media_job_update(job_id,progress=pct,message=message,partial={"kind":"lyrics","items":[]})
             if getattr(extract_lyrics,"__module__","") != "app.music_text":
                 try: events=extract_lyrics(source,model_name=selected_model)
                 except TypeError: events=extract_lyrics(source)
-                lyrics_progress(90,events,"Trascrizione lyrics")
+                lyrics_progress(90,events,"Trascrizione lyrics completa")
             else:
                 events=extract_lyrics_progressive(
                     source,model_name=selected_model,progress=lyrics_progress,
                     cancelled=(lambda: bool(cancel_event and cancel_event.is_set())),
+                    advanced_alignment=advanced_alignment,
                 )
             if cancel_event and cancel_event.is_set():
                 raise InterruptedError("Lyrics extraction cancelled")
@@ -1602,7 +1604,7 @@ def _text_music_worker(job_id: str, pid: str, track_id: str, kind: str, model_or
             save_project(latest)
             _media_job_update(
                 job_id, status="completed", progress=100, message="Lyrics estratte e sincronizzate",
-                result={"kind": "lyrics", "count": len(mapped), "engine": "OpenAI Whisper", "model": selected_model},
+                result={"kind": "lyrics", "count": len(mapped), "engine": "OpenAI Whisper", "model": selected_model, "advanced_alignment": advanced_alignment},
             )
             return
         if kind == "chords":
@@ -1648,7 +1650,7 @@ def _text_music_worker(job_id: str, pid: str, track_id: str, kind: str, model_or
         _media_job_update(job_id, status="failed", progress=0, message="Analisi fallita", error=str(exc)[-1200:])
 
 
-def _start_text_music_job(pid: str, track_id: str, request: Request, kind: str, model_or_engine: str = ""):
+def _start_text_music_job(pid: str, track_id: str, request: Request, kind: str, model_or_engine: str = "", advanced_alignment: bool = False):
     project = _project_for_actor(request, pid)
     if not any(item.id == track_id for item in project.tracks):
         raise HTTPException(404, "track not found")
@@ -1676,15 +1678,15 @@ def _start_text_music_job(pid: str, track_id: str, request: Request, kind: str, 
     with MEDIA_JOB_LOCK:
         MEDIA_JOBS[job_id] = job
     threading.Thread(
-        target=_text_music_worker, args=(job_id, pid, track_id, kind, model_or_engine),
+        target=_text_music_worker, args=(job_id, pid, track_id, kind, model_or_engine, advanced_alignment),
         daemon=True, name=f"mta-{kind}-{job_id}",
     ).start()
     return _media_job_public(job)
 
 
 @app.post("/api/projects/{pid}/tracks/{track_id}/extract-lyrics-jobs")
-def start_lyrics_extraction(pid: str, track_id: str, request: Request, model: str = ""):
-    return _start_text_music_job(pid, track_id, request, "lyrics", model)
+def start_lyrics_extraction(pid: str, track_id: str, request: Request, model: str = "", advanced_alignment: bool = False):
+    return _start_text_music_job(pid, track_id, request, "lyrics", model, advanced_alignment)
 
 
 @app.post("/api/projects/{pid}/tracks/{track_id}/extract-chords-jobs")

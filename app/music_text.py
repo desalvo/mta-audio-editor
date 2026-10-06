@@ -16,7 +16,7 @@ from typing import Callable
 
 import numpy as np
 
-from .models import Chord, LyricLine, LyricWord, RightsRecord, Track
+from .models import Chord, LyricLine, LyricSyllable, LyricWord, RightsRecord, Track
 
 
 logger = logging.getLogger(__name__)
@@ -104,6 +104,166 @@ def _whisper_result_to_lines(result: dict) -> list[LyricLine]:
     return items
 
 
+def _normalize_word_token(token: str) -> str:
+    return re.sub(r"\s+", " ", str(token or "").strip())
+
+
+def _clean_lyric_text(text: str) -> str:
+    return re.sub(r"\s+", " ", str(text or "").strip())
+
+
+def _normalize_lyric_items(items: list[LyricLine]) -> list[LyricLine]:
+    """Normalize Whisper output and drop obvious chunk-boundary duplicates."""
+    normalized: list[LyricLine] = []
+    for item in sorted(items, key=lambda x: (x.time_ms, x.end_ms or x.time_ms, x.text)):
+        text = _clean_lyric_text(item.text)
+        if not text:
+            continue
+        words: list[LyricWord] = []
+        last_word_key = None
+        for word in item.words or []:
+            token = _normalize_word_token(word.text)
+            if not token:
+                continue
+            start_ms = int(max(0, word.start_ms))
+            end_ms = int(max(start_ms, word.end_ms))
+            key = (token.casefold(), start_ms, end_ms)
+            if key == last_word_key:
+                continue
+            syllables=[LyricSyllable(**x.model_dump()) for x in getattr(word, "syllables", [])]
+            words.append(LyricWord(start_ms=start_ms, end_ms=end_ms, text=token, syllables=syllables))
+            last_word_key = key
+        cleaned = LyricLine(
+            time_ms=int(max(0, item.time_ms)),
+            end_ms=(None if item.end_ms is None else int(max(item.time_ms, item.end_ms))),
+            text=text,
+            words=words,
+        )
+        if normalized:
+            prev = normalized[-1]
+            if prev.text.casefold() == cleaned.text.casefold() and abs(prev.time_ms - cleaned.time_ms) <= 450:
+                prev.end_ms = max(prev.end_ms or prev.time_ms, cleaned.end_ms or cleaned.time_ms)
+                merged_words = list(prev.words)
+                seen = {(w.text.casefold(), w.start_ms, w.end_ms) for w in merged_words}
+                for word in cleaned.words:
+                    key = (word.text.casefold(), word.start_ms, word.end_ms)
+                    if key not in seen:
+                        merged_words.append(word)
+                        seen.add(key)
+                merged_words.sort(key=lambda w: (w.start_ms, w.end_ms, w.text))
+                prev.words = merged_words
+                continue
+        normalized.append(cleaned)
+    return normalized
+
+
+def _syllable_parts(token: str) -> list[str]:
+    """Conservative language-agnostic syllable approximation for timing anchors."""
+    raw = str(token or "").strip()
+    if not raw:
+        return []
+    prefix = re.match(r"^[^A-Za-zÀ-ÖØ-öø-ÿ]+", raw)
+    suffix = re.search(r"[^A-Za-zÀ-ÖØ-öø-ÿ]+$", raw)
+    core = raw[(len(prefix.group(0)) if prefix else 0):(len(raw)-len(suffix.group(0)) if suffix else len(raw))]
+    if not core:
+        return [raw]
+    vowels = "aeiouyàèéìòóùAEIOUYÀÈÉÌÒÓÙ"
+    parts: list[str] = []
+    start = 0
+    seen_vowel = False
+    for i, ch in enumerate(core):
+        if ch in vowels:
+            seen_vowel = True
+            continue
+        if seen_vowel and i + 1 < len(core) and core[i + 1] in vowels:
+            parts.append(core[start:i + 1])
+            start = i + 1
+            seen_vowel = False
+    if start < len(core):
+        parts.append(core[start:])
+    parts = [p for p in parts if p]
+    if not parts:
+        parts = [core]
+    if prefix:
+        parts[0] = prefix.group(0) + parts[0]
+    if suffix:
+        parts[-1] = parts[-1] + suffix.group(0)
+    return parts
+
+
+def _snap_to_energy_minimum(samples: np.ndarray, sr: int, time_ms: int, radius_ms: int = 75) -> int:
+    if samples.size == 0 or sr <= 0:
+        return max(0, int(time_ms))
+    center = int(max(0, time_ms) * sr / 1000)
+    radius = max(1, int(radius_ms * sr / 1000))
+    lo = max(0, center - radius)
+    hi = min(samples.size, center + radius)
+    if hi - lo < 8:
+        return max(0, int(time_ms))
+    window = max(8, int(0.012 * sr))
+    best_i, best_e = center, None
+    step = max(1, window // 3)
+    for i in range(lo, hi, step):
+        a = max(0, i - window // 2)
+        b = min(samples.size, i + window // 2)
+        if b <= a:
+            continue
+        block = samples[a:b].astype(np.float32, copy=False)
+        energy = float(np.mean(block * block))
+        distance_penalty = abs(i - center) / max(1, radius) * 0.08
+        score = energy + distance_penalty
+        if best_e is None or score < best_e:
+            best_e = score
+            best_i = i
+    return max(0, round(best_i * 1000 / sr))
+
+
+def forced_align_lyrics(path: Path, items: list[LyricLine]) -> list[LyricLine]:
+    """Refine Whisper word timing against local acoustic minima and add syllable timing."""
+    normalized = _normalize_lyric_items(items)
+    try:
+        samples, sr = _pcm_mono(path, sample_rate=16000)
+    except Exception as exc:
+        logger.warning("Forced alignment PCM extraction failed, using Whisper word timing: %s", exc)
+        samples = np.zeros(0, dtype=np.float32)
+        sr = 16000
+    out: list[LyricLine] = []
+    last_end = 0
+    for line in normalized:
+        words: list[LyricWord] = []
+        for word in line.words:
+            start = max(last_end, _snap_to_energy_minimum(samples, sr, word.start_ms, 65))
+            end = max(start + 20, _snap_to_energy_minimum(samples, sr, word.end_ms, 65))
+            if end <= start:
+                end = max(start + 40, word.end_ms)
+            parts = _syllable_parts(word.text)
+            syllables: list[LyricSyllable] = []
+            if parts:
+                weights = [max(1, len(re.sub(r"[^A-Za-zÀ-ÖØ-öø-ÿ]", "", p))) for p in parts]
+                total = sum(weights)
+                cursor = start
+                remaining = end - start
+                used = 0
+                for idx, (part, weight) in enumerate(zip(parts, weights)):
+                    if idx == len(parts) - 1:
+                        s_end = end
+                    else:
+                        used += weight
+                        s_end = start + round(remaining * used / total)
+                    syllables.append(LyricSyllable(start_ms=cursor, end_ms=max(cursor, s_end), text=part))
+                    cursor = s_end
+            words.append(LyricWord(start_ms=start, end_ms=end, text=word.text, syllables=syllables))
+            last_end = end
+        if words:
+            line_start = words[0].start_ms
+            line_end = words[-1].end_ms
+        else:
+            line_start = max(last_end, line.time_ms)
+            line_end = max(line_start, line.end_ms or line.time_ms)
+        out.append(LyricLine(time_ms=line_start, end_ms=line_end, text=line.text, words=words))
+    return _normalize_lyric_items(out)
+
+
 def native_ai_device() -> str:
     """Return the best PyTorch device available to native/server AI workloads.
 
@@ -133,7 +293,7 @@ def _lyrics_transcribe_kwargs(language: str | None, device: str) -> dict:
         "temperature": 0.0,
         "beam_size": max(1, int(os.getenv("MTA_LYRICS_BEAM_SIZE", "8"))),
         "patience": 1.2,
-        "condition_on_previous_text": True,
+        "condition_on_previous_text": False,
         "fp16": device == "cuda",
     }
     if language:
@@ -171,7 +331,7 @@ def _whisper_transcribe(model, source: str, *, language: str | None, device: str
 def _offset_lyrics(items: list[LyricLine], offset_ms: int) -> list[LyricLine]:
     out=[]
     for item in items:
-        words=[LyricWord(start_ms=w.start_ms+offset_ms,end_ms=w.end_ms+offset_ms,text=w.text) for w in item.words]
+        words=[LyricWord(start_ms=w.start_ms+offset_ms,end_ms=w.end_ms+offset_ms,text=w.text,syllables=[LyricSyllable(start_ms=s.start_ms+offset_ms,end_ms=s.end_ms+offset_ms,text=s.text) for s in getattr(w,"syllables",[])]) for w in item.words]
         out.append(LyricLine(time_ms=item.time_ms+offset_ms,end_ms=(item.end_ms+offset_ms if item.end_ms is not None else None),text=item.text,words=words))
     return out
 
@@ -187,65 +347,33 @@ def _duration_seconds(path: Path) -> float:
 def extract_lyrics_progressive(
     path: Path, *, model_name: str | None = None, language: str | None = None,
     progress: Callable[[int, list[LyricLine], str], None] | None = None,
-    cancelled: Callable[[], bool] | None = None, chunk_seconds: int = 5,
+    cancelled: Callable[[], bool] | None = None, chunk_seconds: int = 5, advanced_alignment: bool = False,
 ) -> list[LyricLine]:
-    """Chunked Whisper transcription used by UI jobs for live partial results/cancel."""
-    model_name=(model_name or os.getenv("MTA_LYRICS_WHISPER_MODEL","base")).strip() or "base"
-    language=(language or os.getenv("MTA_LYRICS_LANGUAGE","")).strip() or None
-    cache_dir=Path(os.getenv("MTA_LYRICS_MODEL_DIR",str(Path(os.getenv("MTA_DATA_DIR","/data/projects"))/".cache"/"lyrics-models"))).expanduser()
-    cache_dir.mkdir(parents=True,exist_ok=True)
-    device=native_ai_device()
-    duration=_duration_seconds(path)
-    if progress: progress(6,[],f"Verifica modello Whisper {model_name} · {device}")
-    python_whisper=bool(importlib.util.find_spec("whisper"))
-    model=None
-    if python_whisper:
-        import whisper  # type: ignore
-        if progress: progress(-1,[],f"Caricamento/download Whisper {model_name} · {device}")
-        try:
-            model=whisper.load_model(model_name,download_root=str(cache_dir),device=device)
-        except TypeError as exc:
-            if "device" not in str(exc):
-                raise
-            model=whisper.load_model(model_name,download_root=str(cache_dir))
-        if progress: progress(18,[],f"Modello Whisper {model_name} pronto · {device}")
-    else:
-        if progress: progress(12,[],"Whisper CLI disponibile · preparazione estrazione")
-    if duration<=0:
-        if cancelled and cancelled(): raise InterruptedError("Lyrics extraction cancelled")
-        result=(
-            _whisper_result_to_lines(_whisper_transcribe(model, str(path), language=language, device=device))
-            if model is not None else extract_lyrics(path,model_name=model_name,language=language)
-        )
-        if progress: progress(96,result,"Trascrizione completata")
-        return result
-    items=[]
-    step=max(5,int(chunk_seconds))
-    total=max(1,int(math.ceil(duration/step)))
-    with tempfile.TemporaryDirectory(prefix="mta-whisper-live-") as td_raw:
-        td=Path(td_raw)
-        for index in range(total):
-            if cancelled and cancelled():
-                raise InterruptedError("Lyrics extraction cancelled")
-            start=index*step;remaining=max(0.1,duration-start);length=min(step,remaining)
-            base=20+round(index/total*74)
-            if progress: progress(base,items,f"Preparazione audio {index+1}/{total} · {start:.0f}-{start+length:.0f}s")
-            chunk=td/f"chunk-{index:04d}.wav"
-            _run(["ffmpeg","-y","-v","error","-ss",str(start),"-t",str(length),"-i",str(path),"-ac","1","-ar","16000","-c:a","pcm_s16le",str(chunk)])
-            if cancelled and cancelled(): raise InterruptedError("Lyrics extraction cancelled")
-            if progress: progress(min(93,base+max(1,round(30/total))),items,f"Trascrizione audio {index+1}/{total} · {device}")
-            result=(
-                _whisper_transcribe(model, str(chunk), language=language, device=device)
-                if model is not None else None
-            )
-            part=_whisper_result_to_lines(result) if result is not None else extract_lyrics(chunk,model_name=model_name,language=language)
-            items.extend(_offset_lyrics(part,round(start*1000)))
-            pct=20+round((index+1)/total*74)
-            if progress: progress(min(94,pct),items,f"Lyrics elaborate {index+1}/{total} · {min(duration,start+length):.0f}/{duration:.0f}s")
-    return items
+    """High-accuracy lyrics transcription for UI jobs.
+
+    Live partial text can perturb chunk-based stitching and lead to repeated or
+    missing phrases around chunk boundaries. For interactive jobs we therefore
+    prioritize accuracy over incremental text preview: run a single complete
+    Whisper pass and publish only status updates until the final result is ready.
+    """
+    model_name = (model_name or os.getenv("MTA_LYRICS_WHISPER_MODEL", "base")).strip() or "base"
+    language = (language or os.getenv("MTA_LYRICS_LANGUAGE", "")).strip() or None
+    device = native_ai_device()
+    if cancelled and cancelled():
+        raise InterruptedError("Lyrics extraction cancelled")
+    if progress:
+        progress(8, [], f"Verifica modello Whisper {model_name} · {device}")
+        progress(18, [], f"Trascrizione completa in corso · {device}")
+    result = extract_lyrics(path, model_name=model_name, language=language, advanced_alignment=advanced_alignment)
+    if cancelled and cancelled():
+        raise InterruptedError("Lyrics extraction cancelled")
+    if progress:
+        progress(94, [], "Trascrizione completa terminata")
+        progress(96, result, "Lyrics elaborate")
+    return _normalize_lyric_items(result)
 
 
-def extract_lyrics(path: Path, *, model_name: str | None = None, language: str | None = None) -> list[LyricLine]:
+def extract_lyrics(path: Path, *, model_name: str | None = None, language: str | None = None, advanced_alignment: bool = False) -> list[LyricLine]:
     """Transcribe a track with upstream OpenAI Whisper and preserve segment timing.
 
     The model is intentionally resolved by Whisper itself so native/server runtimes
@@ -270,7 +398,8 @@ def extract_lyrics(path: Path, *, model_name: str | None = None, language: str |
                 raise
             model = whisper.load_model(model_name, download_root=str(cache_dir))
         result = _whisper_transcribe(model, str(path), language=language, device=device)
-        return _whisper_result_to_lines(result)
+        lines = _normalize_lyric_items(_whisper_result_to_lines(result))
+        return forced_align_lyrics(path, lines) if advanced_alignment else lines
 
     cli = shutil.which("whisper")
     if not cli:
@@ -295,7 +424,8 @@ def extract_lyrics(path: Path, *, model_name: str | None = None, language: str |
             if not matches:
                 raise RuntimeError("Whisper completed without producing a JSON transcript")
             output = matches[0]
-        return _whisper_result_to_lines(json.loads(output.read_text(encoding="utf-8")))
+        lines = _normalize_lyric_items(_whisper_result_to_lines(json.loads(output.read_text(encoding="utf-8"))))
+        return forced_align_lyrics(path, lines) if advanced_alignment else lines
 
 
 def _pcm_mono(path: Path, sample_rate: int = 11025) -> tuple[np.ndarray, int]:
@@ -579,6 +709,9 @@ def map_source_events_to_timeline(track: Track, events: list[LyricLine] | list[C
                     for word in payload.get("words") or []:
                         word["start_ms"] = max(0, int(word["start_ms"]) + delta)
                         word["end_ms"] = max(word["start_ms"], int(word["end_ms"]) + delta)
+                        for syllable in word.get("syllables") or []:
+                            syllable["start_ms"] = max(0, int(syllable["start_ms"]) + delta)
+                            syllable["end_ms"] = max(syllable["start_ms"], int(syllable["end_ms"]) + delta)
                 mapped.append(type(event)(**payload))
     mapped.sort(key=lambda item: item.time_ms)
     return mapped
@@ -696,7 +829,13 @@ def build_lyrics_pdf(out: Path, *, title: str, artist: str, lyrics: list[LyricLi
     c = canvas.Canvas(str(out), pagesize=A4, pageCompression=1)
     width, height = A4
     margin = 48
+    usable_width = width - 2 * margin
     y = height - 54
+
+    try:
+        chord_fill = HexColor(chord_color)
+    except Exception:
+        chord_fill = HexColor("#7B1FA2")
 
     def new_page() -> None:
         nonlocal y
@@ -707,6 +846,166 @@ def build_lyrics_pdf(out: Path, *, title: str, artist: str, lyrics: list[LyricLi
         if font == "Helvetica":
             return text.encode("latin-1", errors="replace").decode("latin-1")
         return text
+
+    def wrap_plain(text: str, size: int) -> list[str]:
+        words = safe(text).split()
+        if not words:
+            return [""]
+        lines: list[str] = []
+        line = ""
+        for word in words:
+            candidate = f"{line} {word}".strip()
+            if c.stringWidth(candidate, font, size) > usable_width and line:
+                lines.append(line)
+                line = word
+            else:
+                line = candidate
+        if line:
+            lines.append(line)
+        return lines or [""]
+
+    def ensure(space: float) -> None:
+        nonlocal y
+        if y - space < 56:
+            new_page()
+
+    def chord_anchor_x(word_entries: list[dict], chord_time: int) -> float:
+        if not word_entries:
+            return margin
+        for idx, entry in enumerate(word_entries):
+            start_ms = entry["start_ms"]
+            end_ms = entry["end_ms"]
+            word_end_x = entry["x"] + entry["width"]
+            if start_ms <= chord_time <= max(start_ms, end_ms):
+                syllables = entry.get("syllables") or []
+                if syllables:
+                    for syllable in syllables:
+                        if syllable["start_ms"] <= chord_time <= syllable["end_ms"]:
+                            span = max(1, syllable["end_ms"] - syllable["start_ms"])
+                            rel = max(0.0, min(1.0, (chord_time - syllable["start_ms"]) / span))
+                            return syllable["x"] + rel * max(3.0, syllable["width"])
+                span = max(1, end_ms - start_ms)
+                rel = max(0.0, min(1.0, (chord_time - start_ms) / span))
+                return entry["x"] + rel * max(4.0, entry["width"])
+            if idx + 1 < len(word_entries):
+                next_entry = word_entries[idx + 1]
+                if end_ms <= chord_time < next_entry["start_ms"]:
+                    span = max(1, next_entry["start_ms"] - end_ms)
+                    rel = max(0.0, min(1.0, (chord_time - end_ms) / span))
+                    gap = max(4.0, next_entry["x"] - word_end_x)
+                    return word_end_x + rel * gap
+        if chord_time < word_entries[0]["start_ms"]:
+            return word_entries[0]["x"]
+        last = word_entries[-1]
+        return last["x"] + last["width"]
+
+    def draw_wrapped_lyric_line(lyric: LyricLine, line_chords: list[Chord]) -> None:
+        nonlocal y
+        words = [w for w in (lyric.words or []) if str(w.text or "").strip()]
+        if not words:
+            blocks = wrap_plain(lyric.text, 11)
+            ensure((13 + 15) * len(blocks) + 18)
+            if line_chords:
+                c.setFillColor(chord_fill)
+                c.setFont(font, 9)
+                x = margin
+                previous_right = margin
+                for chord in line_chords:
+                    label = safe(chord.chord)
+                    x = max(x, previous_right + 6)
+                    c.drawString(x, y, label)
+                    previous_right = x + c.stringWidth(label, font, 9)
+                    x = previous_right + 10
+                y -= 13
+                c.setFillColor(black)
+            c.setFont(font, 11)
+            for part in blocks:
+                ensure(18)
+                c.drawString(margin, y, safe(part))
+                y -= 15
+            y -= 8
+            return
+
+        word_entries: list[dict] = []
+        current: list[dict] = []
+        x = margin
+        space_w = c.stringWidth(" ", font, 11)
+        for word in words:
+            token = safe(str(word.text).strip())
+            token_w = c.stringWidth(token, font, 11)
+            needed = token_w if not current else token_w + space_w
+            if current and x + needed > margin + usable_width:
+                word_entries.extend(current)
+                current = []
+                x = margin
+            if current:
+                x += space_w
+            syllable_entries=[]
+            syllable_x=x
+            for syllable in getattr(word, "syllables", []) or []:
+                syllable_text=safe(str(syllable.text or ""))
+                syllable_w=c.stringWidth(syllable_text, font, 11)
+                syllable_entries.append({"text":syllable_text,"x":syllable_x,"width":syllable_w,"start_ms":int(syllable.start_ms),"end_ms":int(max(syllable.start_ms,syllable.end_ms))})
+                syllable_x += syllable_w
+            entry = {
+                "text": token,
+                "x": x,
+                "width": token_w,
+                "start_ms": int(word.start_ms),
+                "end_ms": int(max(word.start_ms, word.end_ms)),
+                "syllables": syllable_entries,
+            }
+            current.append(entry)
+            x += token_w
+        if current:
+            word_entries.extend(current)
+
+        display_lines: list[list[dict]] = []
+        cursor: list[dict] = []
+        last_x = margin
+        for entry in word_entries:
+            if cursor and entry["x"] <= last_x:
+                display_lines.append(cursor)
+                cursor = []
+            cursor.append(entry)
+            last_x = entry["x"]
+        if cursor:
+            display_lines.append(cursor)
+
+        active_before = [ch for ch in line_chords if ch.time_ms <= display_lines[0][0]["start_ms"]] if display_lines else []
+        ensure(sum(30 for _ in display_lines) + 20)
+        pending_before = active_before[-1:] if active_before else []
+        for line_idx, line_words in enumerate(display_lines):
+            line_start = line_words[0]["start_ms"]
+            line_end = line_words[-1]["end_ms"]
+            if line_idx + 1 < len(display_lines):
+                line_end = max(line_end, display_lines[line_idx + 1][0]["start_ms"] - 1)
+            local_chords = [ch for ch in line_chords if line_start <= ch.time_ms <= line_end]
+            if pending_before:
+                lead = pending_before[-1]
+                if not local_chords or local_chords[0].time_ms > line_start:
+                    local_chords = [lead] + local_chords
+                pending_before = []
+            if local_chords:
+                c.setFillColor(chord_fill)
+                c.setFont(font, 9)
+                previous_right = margin - 8
+                for chord in local_chords:
+                    label = safe(chord.chord)
+                    anchor_x = chord_anchor_x(line_words, chord.time_ms)
+                    text_w = c.stringWidth(label, font, 9)
+                    draw_x = max(margin, min(anchor_x, margin + usable_width - text_w))
+                    if draw_x < previous_right + 6:
+                        draw_x = previous_right + 6
+                    c.drawString(draw_x, y, label)
+                    previous_right = draw_x + text_w
+                y -= 13
+                c.setFillColor(black)
+            c.setFont(font, 11)
+            for idx, entry in enumerate(line_words):
+                c.drawString(entry["x"], y, entry["text"])
+            y -= 15
+        y -= 8
 
     c.setTitle(title or "Lyrics")
     if artist:
@@ -720,7 +1019,7 @@ def build_lyrics_pdf(out: Path, *, title: str, artist: str, lyrics: list[LyricLi
     if key:
         info_parts.append(f"Key: {key}")
     if bpm is not None and float(bpm) > 0:
-        info_parts.append(f"BPM: {float(bpm):g}")
+        info_parts.append(f"BPM: {int(round(float(bpm)))}")
     if info_parts:
         c.setFont(font, 11)
         c.drawString(margin, y, safe("  ·  ".join(info_parts)))
@@ -728,53 +1027,15 @@ def build_lyrics_pdf(out: Path, *, title: str, artist: str, lyrics: list[LyricLi
     else:
         y -= 8
 
-    ordered_lyrics = sorted(lyrics, key=lambda x: x.time_ms)
+    ordered_lyrics = sorted(_normalize_lyric_items(lyrics), key=lambda x: x.time_ms)
     ordered_chords = sorted(chords, key=lambda x: x.time_ms)
     for i, lyric in enumerate(ordered_lyrics):
-        next_time = ordered_lyrics[i + 1].time_ms if i + 1 < len(ordered_lyrics) else 2**63 - 1
-        current_chords = [ch for ch in ordered_chords if lyric.time_ms <= ch.time_ms < next_time]
-        # If there is no change inside this lyric interval, carry the last known chord.
-        if not current_chords:
-            previous = [ch for ch in ordered_chords if ch.time_ms <= lyric.time_ms]
-            if previous:
-                current_chords = [previous[-1]]
-        if y < 82:
-            new_page()
-        if current_chords:
-            try:
-                c.setFillColor(HexColor(chord_color))
-            except Exception:
-                c.setFillColor(HexColor("#7B1FA2"))
-            c.setFont(font, 9)
-            available = width - 2 * margin
-            span = max(1, next_time - lyric.time_ms) if next_time < 2**63 - 1 else max(1, 5000)
-            for chord in current_chords:
-                rel = max(0.0, min(1.0, (chord.time_ms - lyric.time_ms) / span))
-                c.drawString(margin + rel * available, y, safe(chord.chord))
-            y -= 13
-            c.setFillColor(black)
-        c.setFont(font, 11)
-        text = safe(lyric.text)
-        # Simple width-aware wrapping without changing synchronization semantics.
-        words = text.split()
-        line = ""
-        wrapped: list[str] = []
-        for word in words:
-            candidate = f"{line} {word}".strip()
-            if c.stringWidth(candidate, font, 11) > width - 2 * margin and line:
-                wrapped.append(line)
-                line = word
-            else:
-                line = candidate
-        if line or not wrapped:
-            wrapped.append(line)
-        for part in wrapped:
-            if y < 64:
-                new_page()
-                c.setFont(font, 11)
-            c.drawString(margin, y, part)
-            y -= 15
-        y -= 8
+        next_time = ordered_lyrics[i + 1].time_ms if i + 1 < len(ordered_lyrics) else (lyric.end_ms or lyric.time_ms + 6000)
+        relevant = [ch for ch in ordered_chords if lyric.time_ms <= ch.time_ms < next_time]
+        previous = [ch for ch in ordered_chords if ch.time_ms <= lyric.time_ms]
+        if previous and (not relevant or previous[-1].time_ms < lyric.time_ms):
+            relevant = [previous[-1]] + relevant
+        draw_wrapped_lyric_line(lyric, relevant)
 
     if rights_records:
         if y < 150:
@@ -810,7 +1071,7 @@ def build_lyrics_pdf(out: Path, *, title: str, artist: str, lyrics: list[LyricLi
             wrapped: list[str] = []
             for word in words:
                 candidate = f"{line} {word}".strip()
-                if c.stringWidth(candidate, font, 8) > width - 2 * margin and line:
+                if c.stringWidth(candidate, font, 8) > usable_width and line:
                     wrapped.append(line)
                     line = word
                 else:
@@ -826,7 +1087,6 @@ def build_lyrics_pdf(out: Path, *, title: str, artist: str, lyrics: list[LyricLi
             y -= 4
     c.save()
     return out
-
 
 
 def _ass_time(ms: int) -> str:

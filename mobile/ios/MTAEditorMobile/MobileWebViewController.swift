@@ -94,7 +94,7 @@ final class MobileWebViewController: UIViewController, WKNavigationDelegate, WKU
         webView = WKWebView(frame: .zero, configuration: configuration)
         webView.navigationDelegate = self
         webView.uiDelegate = self
-        webView.customUserAgent = "MTAEditorMobile/0.2.0-r154 iOS"
+        webView.customUserAgent = "MTAEditorMobile/0.2.0-r158 iOS"
         webView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(webView)
         NSLayoutConstraint.activate([
