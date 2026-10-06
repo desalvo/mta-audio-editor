@@ -20,12 +20,13 @@ def test_utility_backdrop_does_not_close_on_incidental_clicks():
 def test_dynamic_playback_uses_adaptive_buffer_and_smooth_drift_correction():
     text = (ROOT / "app/static/app.js").read_text(encoding="utf-8")
     buffer_block = text[text.index("function waitForMediaBuffer"):text.index("function stopDynamicSyncMonitor")]
-    assert "audio.buffered.end(i)-pos>=Math.min(.08" in buffer_block
+    assert "audio.buffered.end(i)-pos>=Math.min(.40" in buffer_block
     assert "audio.readyState<2" in buffer_block
     assert "audio.addEventListener('canplay',check)" in buffer_block
     assert "audio.addEventListener('progress',check)" in buffer_block
     assert "audio.readyState<3||audio.seeking" in text
-    assert "audio.playbackRate=Math.max(.997,Math.min(1.003,1-drift*.045))" in text
+    assert "audio.playbackRate=1" in text
+    assert "Math.abs(drift)>.180" in text
     assert "setInterval(()=>alignDynamicTracks(false),120)" in text
     assert "transportMediaSeconds()" in text
 

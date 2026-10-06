@@ -188,9 +188,24 @@ async function openProjectSelector(){
 }
 async function openRecentProjects(){
   if(!currentUser?.native_single_user)return;
-  const projects=await refresh(),byId=new Map(projects.map(p=>[String(p.id),p]));
-  const recent=recentProjectIds().map(id=>byId.get(String(id))).filter(Boolean);
-  showUtilityModal('Open recent',`${projectPickerRows(recent,'Nessun progetto recente ancora disponibile.')}<div class="utility-actions"><button class="utility-btn secondary" onclick="closeUtilityModal()">Annulla</button></div>`);
+  const bridge=await waitForNativeApi();
+  if(!bridge?.list_recent_projects)return toast('Bridge nativo non disponibile. Riprova tra un istante.');
+  try{
+    const result=await bridge.list_recent_projects();
+    const recent=Array.isArray(result?.projects)?result.projects:[];
+    const body=recent.length?`<div class="project-picker-list">${recent.map(p=>`<button class="project-picker-row" onclick="openRecentNativeProject('${esc(p.id)}')"><span><b>${esc(p.name||'Project')}</b><small>${esc(p.path||'')}</small></span><strong>Apri ›</strong></button>`).join('')}</div>`:'<p class="hint">Nessun progetto recente ancora disponibile.</p>';
+    showUtilityModal('Open recent',`${body}<div class="utility-actions"><button class="utility-btn secondary" onclick="closeUtilityModal()">Annulla</button></div>`);
+  }catch(e){toast('Impossibile leggere i progetti recenti: '+e.message)}
+}
+async function openRecentNativeProject(id){
+  const bridge=await waitForNativeApi();
+  if(!bridge?.open_recent_project)return toast('Bridge nativo non disponibile.');
+  try{
+    const result=await bridge.open_recent_project(id);
+    if(!result?.ok||!result?.project?.id)throw new Error(result?.error||'Progetto recente non disponibile');
+    closeUtilityModal();
+    current=result.project;rememberRecentProject(current.id);selectedTrackId=current.tracks?.[0]?.id||null;resetProjectUiForOpen();resetSessionHistory();render();await refresh();schedulePlaybackPrewarm(40);focusProjectWorkspace();toast('Progetto recente aperto');
+  }catch(e){toast('Apertura progetto recente fallita: '+e.message)}
 }
 function openLocalProject(){
   if(currentUser?.native_single_user)return openProjectArchive();
@@ -247,8 +262,13 @@ async function createProjectFromDialog(){
     }
     const createdId=created.id;
     closeUtilityModal();
-    await openP(createdId);
-    focusProjectWorkspace();
+    // Load the newly-created project explicitly before refreshing the native workspace.
+    // This avoids the historical native flow where the archive was created but the editor stayed empty.
+    current=await api('/api/projects/'+createdId);
+    rememberRecentProject(current.id);
+    selectedTrackId=current.tracks?.[0]?.id||null;
+    resetProjectUiForOpen();resetSessionHistory();render();
+    await refresh();schedulePlaybackPrewarm(40);focusProjectWorkspace();
     toast(currentUser?.native_single_user?`Progetto ${target} creato in ${pendingNewProjectPath}`:`Progetto ${target} creato e salvato nel workspace`);
     pendingNewProjectPath=null;
   }catch(e){toast(e.message)}
@@ -1972,10 +1992,10 @@ async function makeTrackPlayback(track,renderFilters,silent=false,respectMuteSol
   audio.addEventListener('ended',()=>requestAnimationFrame(()=>{if(!playbackActuallyRunning())resetVuMeters()}));
   return {trackId:track.id,audio,analysers:graph.analysers,channels,silent,respectMuteSolo,meterData:{},gainNode:graph.gainNode,panner:graph.panner,direct,targetGain,startupMuted};
 }
-function waitForMediaBuffer(audio,label='traccia',timeoutMs=1800){
+function waitForMediaBuffer(audio,label='traccia',timeoutMs=2600){
   // Low-latency transport only waits for a decodable frame near the cursor.
   // Deep buffering happens in the background and must never gate Play.
-  const enough=()=>{if(audio.readyState<2)return false;try{const pos=audio.currentTime||0;for(let i=0;i<audio.buffered.length;i++){if(audio.buffered.start(i)<=pos+.03&&audio.buffered.end(i)-pos>=Math.min(.08,Math.max(.025,(audio.duration||.08)-pos)))return true}}catch(e){}return audio.readyState>=3};
+  const enough=()=>{if(audio.readyState<2)return false;try{const pos=audio.currentTime||0;for(let i=0;i<audio.buffered.length;i++){if(audio.buffered.start(i)<=pos+.03&&audio.buffered.end(i)-pos>=Math.min(.40,Math.max(.12,(audio.duration||.40)-pos)))return true}}catch(e){}return audio.readyState>=3};
   if(enough())return Promise.resolve();
   return new Promise((resolve,reject)=>{let done=false;const finish=()=>{if(done)return;done=true;cleanup();resolve()},fail=()=>{if(done)return;done=true;cleanup();audio.readyState>=2?resolve():reject(new Error(`Buffering non riuscito: ${label}`))},check=()=>{if(enough())finish()},cleanup=()=>{clearTimeout(timer);clearInterval(poll);audio.removeEventListener('canplay',check);audio.removeEventListener('progress',check);audio.removeEventListener('error',fail)},poll=setInterval(check,35),timer=setTimeout(fail,timeoutMs);audio.addEventListener('canplay',check);audio.addEventListener('progress',check);audio.addEventListener('error',fail,{once:true});audio.load()});
 }
@@ -1993,19 +2013,21 @@ function alignDynamicTracks(force=false){
   const ref=transportMediaSeconds(),now=Date.now();
   for(const item of trackPlaybacks){
     const audio=item.audio;if(audio.paused||audio.ended)continue;
-    // AudioContext is the authoritative transport clock. Decoder stalls do not
-    // move the timeline and are corrected only after the decoder is playable.
-    if(audio.readyState<3||audio.seeking){audio.playbackRate=1;item.needsRelock=true;continue}
+    // Keep every decoder at normal speed. Frequent playbackRate nudges were audible
+    // as crackle/warble with several simultaneous HTMLMediaElements.
+    audio.playbackRate=1;
+    if(audio.readyState<3||audio.seeking){item.needsRelock=true;continue}
     const drift=audio.currentTime-ref;
     try{
-      if(force||(item.needsRelock&&Math.abs(drift)>.045)||Math.abs(drift)>.120){
-        audio.currentTime=Math.min(ref,Math.max(0,(audio.duration||ref)-0.005));audio.playbackRate=1;item.needsRelock=false;item.lastHardSync=now;
-      }else if(Math.abs(drift)>.018){
-        audio.playbackRate=Math.max(.997,Math.min(1.003,1-drift*.045));
-      }else if(Math.abs(audio.playbackRate-1)>.0003){audio.playbackRate=1}
+      const canRelock=force||!item.lastHardSync||(now-item.lastHardSync)>900;
+      if(canRelock&&(force||Math.abs(drift)>.180)){
+        audio.currentTime=Math.min(ref,Math.max(0,(audio.duration||ref)-0.005));
+        item.needsRelock=false;item.lastHardSync=now;
+      }
     }catch(e){}
   }
 }
+
 function startDynamicSyncMonitor(){
   stopDynamicSyncMonitor();dynamicSyncClock=trackPlaybacks.find(x=>x.audio&&!x.audio.ended)||null;
   dynamicSyncTimer=setInterval(()=>alignDynamicTracks(false),120);
@@ -2125,17 +2147,14 @@ async function previewMaster(){
       await new Promise((resolve,reject)=>{audio.addEventListener('loadedmetadata',resolve,{once:true});audio.addEventListener('error',()=>reject(new Error('Anteprima renderizzata non disponibile')),{once:true});audio.load()});
       if(token!==playbackToken)return;
       audio.currentTime=Math.min(playCursorMs/1000/tempoRatio(),Math.max(0,(audio.duration||0)-0.01));
-      if(current.realtime_meter_enabled){
-        const masterGraph=await attachPlaybackGraph(audio,{volume_db:0,pan:0},2,false,true);
-        masterMeterAnalysers=masterGraph.analysers;
-        masterPlaybackGainNode=masterGraph.gainNode;
-        masterPlaybackGainNode.gain.setValueAtTime(1,audioCtx?.currentTime||0);
-        await startDynamicTrackPreview(true,true,token);if(token!==playbackToken)return;
-      }else{
-        const masterGraph=await attachPlaybackGraph(audio,{volume_db:0,pan:0},2,false,true);
-        masterPlaybackGainNode=masterGraph.gainNode;
-        masterPlaybackGainNode.gain.setValueAtTime(1,audioCtx?.currentTime||0);
-      }
+      const masterGraph=await attachPlaybackGraph(audio,{volume_db:0,pan:0},2,false,true);
+      masterMeterAnalysers=masterGraph.analysers;
+      masterPlaybackGainNode=masterGraph.gainNode;
+      masterPlaybackGainNode.gain.setValueAtTime(1,audioCtx?.currentTime||0);
+      // In Render mode the rendered master is the only audible/playing media source.
+      // Starting per-track silent media elements for meters could leak/double in some
+      // native WebViews and produced a short echo, especially after YouTube imports.
+      trackPlaybacks=[];
       await audio.play();
     }else{
       renderedMasterPlayback=false;renderedMasterDirty=false;renderedMasterAudio=null;

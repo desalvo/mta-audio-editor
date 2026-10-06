@@ -11,7 +11,8 @@ def test_new_project_reopens_through_canonical_open_flow():
     end = JS.index("async function openP", start)
     block = JS[start:end]
     assert "const createdId=created.id" in block
-    assert "await openP(createdId)" in block
+    assert "current=await api('/api/projects/'+createdId)" in block
+    assert "focusProjectWorkspace()" in block
     assert "focusProjectWorkspace()" in block
     assert "current=created" not in block
 

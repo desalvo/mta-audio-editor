@@ -503,6 +503,36 @@ class NativeApi:
             return {"ok": False, "cancelled": True}
         return self._import_project_path(path)
 
+    def list_recent_projects(self) -> dict:
+        """Return recent native projects that still have an accessible archive path."""
+        settings = self.get_native_settings()
+        rows = []
+        for project_id in settings.get("recent_projects", []):
+            path = self.project_paths.get(str(project_id))
+            if path is None or not path.is_file():
+                continue
+            rows.append({
+                "id": str(project_id),
+                "path": str(path),
+                "name": path.stem,
+            })
+        return {"ok": True, "projects": rows}
+
+    def open_recent_project(self, project_id: str) -> dict:
+        """Open a native recent project from its bound .maeproj archive path."""
+        key = str(project_id or "").strip()
+        if not key:
+            return {"ok": False, "error": "project id missing"}
+        path = self.project_paths.get(key)
+        if path is None:
+            return {"ok": False, "error": "recent project path not found"}
+        if not path.is_file():
+            return {"ok": False, "error": "recent project file no longer exists", "path": str(path)}
+        try:
+            return self._import_project_path(path)
+        except Exception as exc:
+            return {"ok": False, "error": str(exc), "path": str(path)}
+
 
 def _startup_project_path(argv: list[str] | None = None) -> Path | None:
     args = list(sys.argv[1:] if argv is None else argv)
