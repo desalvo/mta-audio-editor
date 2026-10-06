@@ -152,6 +152,7 @@ STEM_JOBS: dict[str, dict] = {}
 STEM_JOB_LOCK = threading.Lock()
 MEDIA_JOBS: dict[str, dict] = {}
 MEDIA_JOB_LOCK = threading.Lock()
+METRONOME_TRACK_LOCK = threading.Lock()
 
 
 
@@ -3319,44 +3320,83 @@ def start_track_stem_job(
 
 @app.post("/api/projects/{pid}/metronome-track")
 def create_metronome_track(pid: str, request: Request):
+    with METRONOME_TRACK_LOCK:
+        return _create_metronome_track_locked(pid, request)
+
+
+def _create_metronome_track_locked(pid: str, request: Request):
     project = _project_for_actor(request, pid)
     duration_ms = project_duration_ms(project)
     if duration_ms <= 0:
         raise HTTPException(400, "Il progetto non ha ancora una durata. Importa almeno una traccia audio prima di creare il metronomo.")
 
-    filename = f"metronome-{uuid.uuid4().hex[:10]}.wav"
+    def is_metronome_track(item: Track) -> bool:
+        name = str(getattr(item, "name", "") or "").lower()
+        return str(getattr(item, "type", "") or "").lower() == "click" or "metronom" in name
+
+    existing = [item for item in project.tracks if is_metronome_track(item)]
+    track = existing[0] if existing else None
+    reused = track is not None
+
+    # Enforce the invariant at persistence level as well: one project, one metronome.
+    # Old duplicates are removed together with their generated audio files.
+    if len(existing) > 1:
+        duplicate_ids = {item.id for item in existing[1:]}
+        for item in existing[1:]:
+            if item.filename:
+                audio_path(pid, item.filename).unlink(missing_ok=True)
+        project.tracks = [item for item in project.tracks if item.id not in duplicate_ids]
+
+    filename = track.filename if track and track.filename else f"metronome-{uuid.uuid4().hex[:10]}.wav"
     out = audio_path(pid, filename)
     try:
         duration_ms = generate_metronome_wav(project, out)
         peaks = waveform_peaks(out)
     except Exception as exc:
-        out.unlink(missing_ok=True)
+        if not reused:
+            out.unlink(missing_ok=True)
         raise HTTPException(400, f"Creazione metronomo fallita: {str(exc)[:300]}") from exc
 
-    track = Track(
-        id=uuid.uuid4().hex[:10],
-        name=f"Metronomo {project.bpm:g} BPM",
-        type="click",
-        filename=filename,
-        duration_ms=duration_ms,
-        channels=1,
-        channel_layout="mono",
-        waveform_peaks=peaks,
-        waveform_revision="",
-        clips=[
+    if track is None:
+        track = Track(
+            id=uuid.uuid4().hex[:10],
+            name=f"Metronomo {project.bpm:g} BPM",
+            type="click",
+            filename=filename,
+            duration_ms=duration_ms,
+            channels=1,
+            channel_layout="mono",
+            waveform_peaks=peaks,
+            waveform_revision="",
+            clips=[
+                Clip(
+                    id=uuid.uuid4().hex[:10],
+                    source_start_ms=0,
+                    source_end_ms=duration_ms,
+                    timeline_start_ms=0,
+                )
+            ],
+        )
+        project.tracks.append(track)
+    else:
+        track.name = f"Metronomo {project.bpm:g} BPM"
+        track.type = "click"
+        track.filename = filename
+        track.duration_ms = duration_ms
+        track.channels = 1
+        track.channel_layout = "mono"
+        track.waveform_peaks = peaks
+        track.clips = [
             Clip(
-                id=uuid.uuid4().hex[:10],
+                id=(track.clips[0].id if track.clips else uuid.uuid4().hex[:10]),
                 source_start_ms=0,
                 source_end_ms=duration_ms,
                 timeline_start_ms=0,
             )
-        ],
-    )
+        ]
     track.waveform_revision = _track_waveform_revision(track, out) if peaks else ""
-    project.tracks.append(track)
     save_project(project)
-    return {"project": project, "track": track}
-
+    return {"project": project, "track": track, "reused": reused}
 
 @app.post("/api/projects/{pid}/tracks/{track_id}/estimate-bpm")
 def estimate_track_bpm(pid: str, track_id: str, request: Request, time_signature: str | None = None):
@@ -3404,9 +3444,16 @@ def preview_track(pid: str, track_id: str, request: Request, render: bool = Fals
     track = next((item for item in project.tracks if item.id == track_id), None)
     if track is None:
         raise HTTPException(404, "track not found")
+    # Preview stems deliberately keep mixer controls neutral. Volume, pan,
+    # mute and solo are applied downstream in the browser WebAudio graph so
+    # faders react immediately without re-rendering/restarting playback.
+    preview_track_model = track.model_copy(deep=True)
+    preview_track_model.volume_db = 0.0
+    preview_track_model.pan = 0.0
+    preview_track_model.mute = False
     signature = hashlib.sha256(
         (
-            track.model_dump_json()
+            preview_track_model.model_dump_json()
             + f"|{project.bpm}|{project.base_bpm}|{project.pitch_semitones}|{int(render)}"
         ).encode("utf-8")
     ).hexdigest()[:20]
@@ -3415,7 +3462,7 @@ def preview_track(pid: str, track_id: str, request: Request, render: bool = Fals
     out = cache / f"{track.id}-{signature}.wav"
     if not out.is_file():
         render_track_export(
-            track,
+            preview_track_model,
             audio_path(pid, track.filename),
             out,
             fmt="wav",

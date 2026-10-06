@@ -11,7 +11,7 @@ def test_render_meter_only_graph_keeps_real_gain():
 
 def test_track_volume_pan_and_fx_are_live():
     assert "if(renderedMasterPlayback)queueRenderedMasterRefresh()" in JS
-    assert "function queueLiveFxRefresh(isMaster,trackId='',delay=90)" in JS
+    assert "function queueLiveFxRefresh(isMaster,trackId='',delay=70)" in JS
     assert "async function refreshDynamicTrackPlayback(trackId)" in JS
     assert "x.enabled=!x.enabled;markDirty(100);queueLiveFxRefresh(isMaster,trackId)" in JS
     assert "x.preset=preset;x.params=presetParamsFor(x.plugin,preset);markDirty(100);queueLiveFxRefresh(isMaster,trackId)" in JS

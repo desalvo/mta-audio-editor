@@ -16,10 +16,11 @@ def test_dynamic_playback_buffers_and_realigns():
     assert "Low-latency transport only waits for a decodable frame" in JS
     assert "startTransportClock(playCursorMs)" in JS
     assert "startDynamicSyncMonitor()" in JS
-    assert "audio.readyState<3||audio.seeking" in JS
+    assert "if(audio.readyState<2||audio.seeking)continue" in JS
+    assert "addEventListener('stalled',mark)" in JS
     assert "item.needsRelock=true" in JS
     assert "audio.playbackRate=1" in JS
-    assert "Math.abs(drift)>.180" in JS
+    assert "Math.abs(drift)>.060" in JS
 
 def test_render_follow_has_dedicated_clock():
     assert "renderedMasterAudio" in JS

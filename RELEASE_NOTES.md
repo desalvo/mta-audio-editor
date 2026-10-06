@@ -1,3 +1,14 @@
+## 0.2.0-r187
+
+- Playback: removed periodic hard-seek synchronization that caused regular drop-outs in non-Render mode. Re-lock now occurs only at transport actions or after real decoder stalls.
+- Render playback: switched from one immutable rendered master to processed per-track stems so volume, pan, mute and solo are live WebAudio controls.
+- Insert controls: parameter sliders now schedule live processed-stem replacement while playback continues.
+- Preview stems keep volume/pan/mute neutral server-side to avoid double-applying mixer controls.
+
+## 0.2.0-r186
+
+Fixes chord/lyric association and PDF styling, adds marker color editing and sub-word chord anchors, and guarantees a single reusable metronome track per project.
+
 ## 0.2.0-r185
 
 CI maintenance release: fixes Ruff F401 failures in the compound-meter regression test and makes revision metadata checks revision-agnostic; no application behavior changes.

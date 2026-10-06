@@ -1128,6 +1128,12 @@ def build_lyrics_pdf(
             if syllable_index is not None and syllables:
                 si = max(0, min(int(syllable_index), len(syllables) - 1))
                 return syllables[si]["x"]
+            char_offset = getattr(chord, "anchor_char_offset", None)
+            if char_offset is not None:
+                text = str(entry.get("text") or "")
+                ci = max(0, min(int(char_offset), len(text)))
+                if text:
+                    return entry["x"] + c.stringWidth(safe(text[:ci]), *st("lyrics")[:2])
             return word_entries[manual_index]["x"]
         t=int(chord.time_ms)
         for i,w in enumerate(word_entries):
@@ -1141,7 +1147,11 @@ def build_lyrics_pdf(
             if i+1<len(word_entries) and w["end_ms"] < t < word_entries[i+1]["start_ms"]:
                 rel=(t-w["end_ms"])/max(1,word_entries[i+1]["start_ms"]-w["end_ms"])
                 return (w["x"]+w["width"])+rel*max(4,word_entries[i+1]["x"]-(w["x"]+w["width"]))
-        return word_entries[0]["x"] if t<word_entries[0]["start_ms"] else word_entries[-1]["x"]+word_entries[-1]["width"]
+        # Do not snap an automatic chord that occurs before the first sung word
+        # onto that word. Pre-lyric chords require an explicit line-start anchor.
+        if t < word_entries[0]["start_ms"]:
+            return float("nan")
+        return word_entries[-1]["x"]+word_entries[-1]["width"]
 
     def marker_color(marker: Marker):
         try:
@@ -1200,9 +1210,26 @@ def build_lyrics_pdf(
         words=estimated_words(lyric,line_end)
         lyric_lines=wrap_text(lyric.text,"lyrics")
         line_chords=[ch for ch in ordered_chords if _manual_chord_line_match(ch, lyric) or (not ch.manual_anchor and line_start<=ch.time_ms<line_end)]
-        previous=[ch for ch in ordered_chords if not ch.manual_anchor and ch.time_ms<=line_start]
-        if previous and (not line_chords or previous[-1].time_ms<line_start):
-            line_chords=[previous[-1]]+line_chords
+        # Never carry a previous automatic chord onto the next lyric line.
+        # A chord before the first word must be explicitly anchored to line start.
+        if words:
+            first_word_start = int(words[0].get("start_ms", line_start))
+            manual_first = any(
+                ch.manual_anchor
+                and str(getattr(ch, "anchor_kind", "word") or "word") == "word"
+                and int(getattr(ch, "anchor_word_index", 0) or 0) == 0
+                for ch in line_chords
+            )
+            line_chords = [
+                ch for ch in line_chords
+                if ch.manual_anchor or int(ch.time_ms) >= first_word_start
+            ]
+            if manual_first:
+                line_chords = [
+                    ch for ch in line_chords
+                    if ch.manual_anchor
+                    or not (first_word_start <= int(ch.time_ms) <= int(words[0].get("end_ms", first_word_start)))
+                ]
         chord_font,chord_size,_ = st("chords")
         if line_chords:
             # ensure() may call showPage(), which resets ReportLab graphics state.
@@ -1210,16 +1237,19 @@ def build_lyrics_pdf(
             # page beginning with chords uses the exact same style as any other row.
             ensure(chord_size+16)
             c.setFont(chord_font, chord_size)
-            c.setFillColor(current_section_color or st("chords")[2])
-            line_chords.sort(key=lambda ch: (chord_x(ch, words, line_start, line_end), int(getattr(ch, "anchor_order", 0)), int(ch.time_ms)))
-            prev_right=margin-8
-            for ch in line_chords:
-                label=safe(ch.chord)
-                tw=c.stringWidth(label,chord_font,chord_size)
-                x=chord_x(ch,words,line_start,line_end)
-                x=max(prev_right+5,min(x,margin+usable_width-tw))
-                c.drawString(x,y,label);prev_right=x+tw
-            y-=chord_size+7
+            # Chords always use their own PDF style; marker/section colors never leak into them.
+            c.setFillColor(st("chords")[2])
+            positioned=[(chord_x(ch, words, line_start, line_end), ch) for ch in line_chords]
+            positioned=[(x,ch) for x,ch in positioned if x == x]
+            positioned.sort(key=lambda item: (item[0], int(getattr(item[1], "anchor_order", 0)), int(item[1].time_ms)))
+            if positioned:
+                prev_right=margin-8
+                for x,ch in positioned:
+                    label=safe(ch.chord)
+                    tw=c.stringWidth(label,chord_font,chord_size)
+                    x=max(prev_right+5,min(x,margin+usable_width-tw))
+                    c.drawString(x,y,label);prev_right=x+tw
+                y-=chord_size+7
         lyric_font,lyric_size,_ = st("lyrics")
         c.setFont(lyric_font, lyric_size)
         c.setFillColor(current_section_color or st("lyrics")[2])

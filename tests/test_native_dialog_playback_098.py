@@ -24,10 +24,11 @@ def test_dynamic_playback_uses_adaptive_buffer_and_smooth_drift_correction():
     assert "audio.readyState<2" in buffer_block
     assert "audio.addEventListener('canplay',check)" in buffer_block
     assert "audio.addEventListener('progress',check)" in buffer_block
-    assert "audio.readyState<3||audio.seeking" in text
+    assert "if(audio.readyState<2||audio.seeking)continue" in text
+    assert "addEventListener('waiting',mark)" in text
     assert "audio.playbackRate=1" in text
-    assert "Math.abs(drift)>.180" in text
-    assert "setInterval(()=>alignDynamicTracks(false),120)" in text
+    assert "Math.abs(drift)>.060" in text
+    assert "dynamicSyncTimer=setInterval" not in text
     assert "transportMediaSeconds()" in text
 
 

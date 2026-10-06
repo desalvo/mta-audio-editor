@@ -21,11 +21,13 @@ def test_new_native_project_is_loaded_into_editor_after_creation():
     assert "focusProjectWorkspace();" in block
 
 
-def test_render_mode_never_starts_parallel_track_media_elements():
+def test_render_mode_uses_processed_stems_not_parallel_master_and_tracks():
     start = JS.index("async function previewMaster()")
     end = JS.index("function movePlayhead()", start)
     block = JS[start:end]
-    assert "trackPlaybacks=[];" in block
+    assert "renderedStemPlayback=true" in block
+    assert "startDynamicTrackPreview(true,false,token)" in block
+    assert "/preview-mix?t=" not in block
     assert "startDynamicTrackPreview(true,true" not in block
 
 
@@ -35,4 +37,5 @@ def test_dynamic_sync_keeps_normal_playback_rate_to_avoid_crackle():
     block = JS[start:end]
     assert "audio.playbackRate=1;" in block
     assert "playbackRate=Math.max" not in block
-    assert "Math.abs(drift)>.180" in block
+    assert "if(!force&&!item.needsRelock)continue" in block
+    assert "Math.abs(drift)>.060" in block

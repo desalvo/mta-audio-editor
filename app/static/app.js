@@ -50,7 +50,7 @@ let playCursorMs=0, playRaf=null, mediaProgressTimer=null;
 let uiState={trackTop:0,timelineTop:0,timelineLeft:0,mixerLeft:0};
 let mixerResizeState=null;
 let waveformJobs={}, waveformValidationProjectId=null, trackPlaybacks=[], meterRaf=null, meterRunToken=0, playbackToken=0, masterMeterAnalysers=null, masterPlaybackGainNode=null;
-let renderedMasterPlayback=false, renderedMasterDirty=false, renderedMasterRefreshPromise=null, renderedMasterRefreshQueued=false, renderedMasterBaseVolumeDb=0, renderedMasterAudio=null;
+let renderedMasterPlayback=false, renderedStemPlayback=false, renderedMasterDirty=false, renderedMasterRefreshPromise=null, renderedMasterRefreshQueued=false, renderedMasterBaseVolumeDb=0, renderedMasterAudio=null;
 let dynamicSyncClock=null, dynamicSyncTimer=null, playbackBuffering=false;
 let transportClockStartCtx=0, transportClockCursorMs=0, transportClockRunning=false;
 let playbackWarmCache=new Map(), playbackWarmProjectId=null, playbackWarmSignature='', playbackWarmTimer=null;
@@ -405,18 +405,21 @@ function render(){
   drawRuler();bindTimeline();bindProjectClipDrop();bindTrackTimelineScroll();bindTrackResizer();
   current.tracks.forEach(drawWave);if(waveformValidationProjectId!==current.id){waveformValidationProjectId=current.id;ensureWaveforms(true)}else ensureWaveforms(false);updateSel();bindModelInputs();updateMuteSoloVisuals();restoreUiState();ensureSessionHistory();updateEditActionState();applyInterfaceLanguage();forceNativeViewportTop();schedulePlaybackPrewarm(180);
 }
+let metronomeCreatePending=false;
 async function createMetronomeTrack(){
+  if(metronomeCreatePending)return toast('Creazione/aggiornamento metronomo già in corso…');
   if(!current)return toast('Apri prima un progetto');
   if(!current.tracks.length)return toast('Importa almeno una traccia audio per definire la durata del progetto');
   try{
+    metronomeCreatePending=true;
     await flushAutosave();
     const result=await api(`/api/projects/${current.id}/metronome-track`,{method:'POST'});
     current=result.project;
     selectedTrackId=result.track.id;
     render();
     await refresh();
-    toast(`Traccia metronomo creata a ${Number(current.bpm).toFixed(1)} BPM`);
-  }catch(e){toast(e.message)}
+    toast(`${result.reused?'Traccia metronomo aggiornata':'Traccia metronomo creata'} a ${Number(current.bpm).toFixed(1)} BPM`);
+  }catch(e){toast(e.message)}finally{metronomeCreatePending=false}
 }
 
 function toolbarHtml(){
@@ -1000,7 +1003,7 @@ function graphicEqEditorFields(schema,params,isMaster,id,trackId){
       const freq=k.slice(1),value=Number(params[k]??v.default);
       return `<label class="geq-band" title="${freq} Hz · ${value.toFixed(1)} dB">
         <span class="geq-value" id="geq-val-${k}">${value.toFixed(1)}</span>
-        <input class="plugin-param geq-slider" data-key="${k}" type="range" min="${v.min}" max="${v.max}" step="${v.step}" value="${value}" oninput="$('#geq-val-${k}').textContent=Number(this.value).toFixed(1)" onchange="commitPluginEditorParams(${isMaster},'${id}','${trackId}')">
+        <input class="plugin-param geq-slider" data-key="${k}" type="range" min="${v.min}" max="${v.max}" step="${v.step}" value="${value}" oninput="$('#geq-val-${k}').textContent=Number(this.value).toFixed(1);scheduleLivePluginParamCommit(${isMaster},'${id}','${trackId}')">
         <span class="geq-freq">${Number(freq)>=1000?(Number(freq)/1000).toFixed(Number(freq)%1000?1:0)+'k':freq}</span>
       </label>`;
     }).join('')}</div>
@@ -1013,6 +1016,15 @@ function commitPluginEditorParams(isMaster,id,trackId=''){
   if(!isMaster)queueInsertWaveformRefresh(trackId||selectedTrack()?.id||'');
 }
 function pluginNumberKey(event,isMaster,id,trackId=''){if(event.key==='Enter'){event.preventDefault();event.currentTarget.blur();commitPluginEditorParams(isMaster,id,trackId)}}
+function scheduleLivePluginParamCommit(isMaster,id,trackId=''){
+  const key=`param:${isMaster?'master':trackId}:${id}`;
+  clearTimeout(liveFxRefreshTimers[key]);
+  liveFxRefreshTimers[key]=setTimeout(()=>{delete liveFxRefreshTimers[key];commitPluginEditorParams(isMaster,id,trackId)},65);
+}
+function livePluginControlChanged(key,value,source,isMaster,id,trackId=''){
+  syncPluginControl(key,value,source);
+  scheduleLivePluginParamCommit(isMaster,id,trackId);
+}
 function syncPluginControl(key,value,source){
   const number=$(`#plugin-param-${CSS.escape(key)}`),knob=document.querySelector(`[data-knob-key="${CSS.escape(key)}"]`);
   if(source!=='number'&&number)number.value=value;
@@ -1026,7 +1038,7 @@ function openInsertEditor(isMaster,id,trackId=''){
   const params=Object.keys(x.params||{}).length?x.params:(custom||presetParamsFor(x.plugin,x.preset));
   const fields=x.plugin==='graphic_eq_32'
     ?graphicEqEditorFields(schema,params,isMaster,id,trackId)
-    :Object.entries(schema).map(([k,v])=>{const value=Number(params[k]??v.default);return `<label class="plugin-field plugin-field-knob"><span>${esc(k.replaceAll('_',' '))}</span><div class="plugin-control-pair"><div class="plugin-knob-shell" style="--knob-turn:${-135+((value-Number(v.min))/(Number(v.max)-Number(v.min)||1))*270}deg" title="${esc(k.replaceAll('_',' '))}"><input class="plugin-knob" data-knob-key="${k}" type="range" min="${v.min}" max="${v.max}" step="${v.step}" value="${value}" oninput="syncPluginControl('${k}',this.value,'knob')" onchange="commitPluginEditorParams(${isMaster},'${id}','${trackId}')"></div><input class="plugin-param plugin-number" id="plugin-param-${k}" data-key="${k}" type="number" min="${v.min}" max="${v.max}" step="${v.step}" value="${value}" oninput="syncPluginControl('${k}',this.value,'number')" onblur="commitPluginEditorParams(${isMaster},'${id}','${trackId}')" onkeydown="pluginNumberKey(event,${isMaster},'${id}','${trackId}')"></div><small>${v.min} … ${v.max}</small></label>`}).join('');
+    :Object.entries(schema).map(([k,v])=>{const value=Number(params[k]??v.default);return `<label class="plugin-field plugin-field-knob"><span>${esc(k.replaceAll('_',' '))}</span><div class="plugin-control-pair"><div class="plugin-knob-shell" style="--knob-turn:${-135+((value-Number(v.min))/(Number(v.max)-Number(v.min)||1))*270}deg" title="${esc(k.replaceAll('_',' '))}"><input class="plugin-knob" data-knob-key="${k}" type="range" min="${v.min}" max="${v.max}" step="${v.step}" value="${value}" oninput="livePluginControlChanged('${k}',this.value,'knob',${isMaster},'${id}','${trackId}')"></div><input class="plugin-param plugin-number" id="plugin-param-${k}" data-key="${k}" type="number" min="${v.min}" max="${v.max}" step="${v.step}" value="${value}" oninput="livePluginControlChanged('${k}',this.value,'number',${isMaster},'${id}','${trackId}')" onblur="commitPluginEditorParams(${isMaster},'${id}','${trackId}')" onkeydown="pluginNumberKey(event,${isMaster},'${id}','${trackId}')"></div><small>${v.min} … ${v.max}</small></label>`}).join('');
   const editorHtml=`<label class="plugin-preset-row"><span>Preset</span><select onchange="editorPresetChanged(${isMaster},'${id}',this.value,'${trackId}')">${presets.map(p=>`<option value="${esc(p)}" ${p===x.preset?'selected':''}>${esc(p)}</option>`).join('')}</select></label><p class="hint">Il preset selezionato viene applicato realmente alla catena audio. I controlli sotto servono per creare una configurazione custom.</p><p class="hint">${x.plugin==='graphic_eq_32'?'Trascina graficamente i 32 fader di banda.':'Custom values are validated server-side.'}</p><div class="${x.plugin==='graphic_eq_32'?'':'plugin-param-grid'}">${fields||'<p class="hint">This processor currently exposes factory presets only.</p>'}</div><label class="preset-save-name"><span>Custom preset name</span><input id="customPresetName" maxlength="80" placeholder="My preset"></label><div class="modal-actions"><button onclick="applyInsertConfig(${isMaster},'${id}',false,'${trackId}')">Apply custom</button><button onclick="applyInsertConfig(${isMaster},'${id}',true,'${trackId}')">Save preset & apply</button><button onclick="${trackId||isMaster?`openMixerInsertManager('${trackId||'master'}')`:'closeExportMapping()'}">Cancel</button></div>`;
   if(trackId||isMaster){
     showUtilityModal(`${pluginLabel(x.plugin)} configuration`,editorHtml);
@@ -1482,7 +1494,7 @@ async function refreshDynamicTrackPlayback(trackId){
     await persistCurrentProject(false);
     // Keep the old decoder audible while the processed replacement is built.
     // The replacement joins the central transport clock muted, then crossfades.
-    const replacement=await makeTrackPlayback(track,true,false,true,true);
+    const replacement=await makeTrackPlayback(track,true,false,true,true);installPlaybackRecovery(replacement);
     const expected=transportClockRunning?transportMediaSeconds():playCursorMs/1000/tempoRatio();
     replacement.audio.currentTime=Math.min(expected,Math.max(0,(replacement.audio.duration||0)-0.01));
     await waitForMediaBuffer(replacement.audio,track.name,1600);
@@ -1497,10 +1509,19 @@ async function refreshDynamicTrackPlayback(trackId){
     setTimeout(()=>{try{oldItem.audio.pause();oldItem.audio.removeAttribute('src');oldItem.audio.load()}catch(e){}},24);
   }catch(e){console.warn('Aggiornamento live FX traccia fallito',trackId,e)}
 }
-function queueLiveFxRefresh(isMaster,trackId='',delay=90){
+function queueLiveFxRefresh(isMaster,trackId='',delay=70){
   if(!playAudio&&!trackPlaybacks.length)return;
-  if(isMaster||renderedMasterPlayback){
-    queueRenderedMasterRefresh(delay);
+  if(renderedMasterPlayback){queueRenderedMasterRefresh(delay);return}
+  if(isMaster){
+    // Master inserts operate on the summed signal. In stem-render mode keep the
+    // transport running and rebuild processed stems without stopping playback;
+    // track controls themselves remain fully live in WebAudio.
+    if(renderedStemPlayback){
+      for(const t of current?.tracks||[]){
+        clearTimeout(liveFxRefreshTimers[t.id]);
+        liveFxRefreshTimers[t.id]=setTimeout(()=>{delete liveFxRefreshTimers[t.id];refreshDynamicTrackPlayback(t.id)},delay);
+      }
+    }
     return;
   }
   const id=trackId||selectedTrack()?.id||'';
@@ -2371,40 +2392,49 @@ function dynamicClockAudio(){
 }
 function alignDynamicTracks(force=false){
   if(renderedMasterPlayback||playbackPaused||!trackPlaybacks.length||!transportClockRunning)return;
-  const ref=transportMediaSeconds(),now=Date.now();
+  const ref=transportMediaSeconds();
   for(const item of trackPlaybacks){
     const audio=item.audio;if(audio.paused||audio.ended)continue;
-    // Keep every decoder at normal speed. Frequent playbackRate nudges were audible
-    // as crackle/warble with several simultaneous HTMLMediaElements.
     audio.playbackRate=1;
-    if(audio.readyState<3||audio.seeking){item.needsRelock=true;continue}
-    const drift=audio.currentTime-ref;
+    // Never perform periodic corrective seeks during healthy playback: they are
+    // audible as regular drop-outs. Re-lock only at explicit transport events or
+    // after the decoder reported a real stall/underrun.
+    if(!force&&!item.needsRelock)continue;
+    if(audio.readyState<2||audio.seeking)continue;
     try{
-      const canRelock=force||!item.lastHardSync||(now-item.lastHardSync)>900;
-      if(canRelock&&(force||Math.abs(drift)>.180)){
-        audio.currentTime=Math.min(ref,Math.max(0,(audio.duration||ref)-0.005));
-        item.needsRelock=false;item.lastHardSync=now;
-      }
+      const drift=audio.currentTime-ref;
+      if(force||Math.abs(drift)>.060){audio.currentTime=Math.min(ref,Math.max(0,(audio.duration||ref)-0.005))}
+      item.needsRelock=false;
     }catch(e){}
   }
 }
-
+function installPlaybackRecovery(item){
+  if(!item?.audio||item.recoveryInstalled)return;
+  item.recoveryInstalled=true;
+  const mark=()=>{item.needsRelock=true};
+  const recover=()=>{if(item.needsRelock&&!playbackPaused&&transportClockRunning)requestAnimationFrame(()=>alignDynamicTracks(false))};
+  item.audio.addEventListener('waiting',mark);
+  item.audio.addEventListener('stalled',mark);
+  item.audio.addEventListener('suspend',()=>{if(item.audio.readyState<3)mark()});
+  item.audio.addEventListener('canplay',recover);
+  item.audio.addEventListener('playing',recover);
+}
 function startDynamicSyncMonitor(){
+  // The AudioContext transport clock is authoritative. No polling/periodic seeks.
   stopDynamicSyncMonitor();dynamicSyncClock=trackPlaybacks.find(x=>x.audio&&!x.audio.ended)||null;
-  dynamicSyncTimer=setInterval(()=>alignDynamicTracks(false),120);
 }
 function releaseStartupMute(items){
   const now=audioCtx?.currentTime||0;
   for(const item of items){if(!item.gainNode)continue;const track=trackById(item.trackId),target=playbackGainForTrack(track,item);item.gainNode.gain.cancelScheduledValues(now);item.gainNode.gain.setValueAtTime(0,now);item.gainNode.gain.linearRampToValueAtTime(target,now+.008);item.startupMuted=false}
 }
 function queueInitialTrackFxUpgrades(){
-  if(renderedMasterPlayback)return;
+  if(renderedMasterPlayback||renderedStemPlayback)return;
   for(const track of current?.tracks||[]){if((track.inserts||[]).some(x=>x.enabled))setTimeout(()=>refreshDynamicTrackPlayback(track.id),20)}
 }
 async function startDynamicTrackPreview(renderFilters=false,silentMeters=false,token=playbackToken){
   playbackBuffering=true;const tracks=current.tracks||[],slowTimer=setTimeout(()=>{if(token===playbackToken)showMediaProgress('Preparazione audio',18,'Avvio decoder…')},220);
   try{
-    const items=await Promise.all(tracks.map(t=>makeTrackPlayback(t,renderFilters,silentMeters,true,true)));if(token!==playbackToken)return null;
+    const items=await Promise.all(tracks.map(t=>makeTrackPlayback(t,renderFilters,silentMeters,true,true)));if(token!==playbackToken)return null;items.forEach(installPlaybackRecovery);
     await Promise.all(items.map((item,i)=>waitForMediaBuffer(item.audio,tracks[i]?.name||`traccia ${i+1}`,1600)));if(token!==playbackToken)return null;
     const sec=playCursorMs/1000/tempoRatio();
     for(const item of items){item.audio.pause();item.audio.playbackRate=1;item.needsRelock=false;item.lastHardSync=0;item.audio.currentTime=Math.min(sec,Math.max(0,(item.audio.duration||0)-0.01))}
@@ -2415,8 +2445,6 @@ async function startDynamicTrackPreview(renderFilters=false,silentMeters=false,t
     const starts=items.map(item=>item.audio.play());
     await Promise.all(starts);if(token!==playbackToken){for(const item of items)try{item.audio.pause()}catch(e){};return null}
     alignDynamicTracks(true);releaseStartupMute(items);
-    setTimeout(()=>{if(token===playbackToken)alignDynamicTracks(true)},45);
-    setTimeout(()=>{if(token===playbackToken)alignDynamicTracks(true)},120);
     dynamicSyncClock=items.find(x=>x.audio&&!x.audio.ended)||items[0]||null;startDynamicSyncMonitor();$('#utilityBackdrop')?.classList.add('hidden');if(current.realtime_meter_enabled&&!meterRaf)startVuMeterLoop();
     if(!renderFilters)queueInitialTrackFxUpgrades();
     return dynamicSyncClock?.audio||null;
@@ -2434,7 +2462,7 @@ function stopPlayback(){
   if(playAudio){playAudio.pause();playAudio.currentTime=0;playAudio=null}
   for(const item of trackPlaybacks){try{item.audio.pause();item.audio.currentTime=0;item.audio.removeAttribute('src');item.audio.load()}catch(e){}}
   trackPlaybacks=[];masterMeterAnalysers=null;masterPlaybackGainNode=null;
-  renderedMasterPlayback=false;renderedMasterDirty=false;renderedMasterRefreshPromise=null;renderedMasterRefreshQueued=false;renderedMasterBaseVolumeDb=0;renderedMasterAudio=null;
+  renderedMasterPlayback=false;renderedStemPlayback=false;renderedMasterDirty=false;renderedMasterRefreshPromise=null;renderedMasterRefreshQueued=false;renderedMasterBaseVolumeDb=0;renderedMasterAudio=null;
   stopDynamicSyncMonitor();
   for(const key of Object.keys(liveFxRefreshTimers)){clearTimeout(liveFxRefreshTimers[key]);delete liveFxRefreshTimers[key]}
   resetVuMeters();
@@ -2462,7 +2490,7 @@ async function resumePlayback(){
   startTransportClock(playCursorMs);
   await Promise.all(audios.map(audio=>audio.play()));
   playbackPaused=false;
-  if(!renderedMasterPlayback){alignDynamicTracks(true);startDynamicSyncMonitor();setTimeout(()=>alignDynamicTracks(true),50)}
+  if(!renderedMasterPlayback){alignDynamicTracks(true);startDynamicSyncMonitor()}
   if($('#playMaster')){$('#playMaster').textContent='❚❚';$('#playMaster').title='Pausa'}
   playRaf=requestAnimationFrame(movePlayhead);
   if(current?.realtime_meter_enabled&&!meterRaf)meterRaf=requestAnimationFrame(updateVuMeters);
@@ -2518,28 +2546,15 @@ async function previewMaster(){
     collect();stopPlayback();const token=++playbackToken;
     const needsRenderedMaster=!!current.render_preview_enabled;
     if(needsRenderedMaster){
+      // Render mode uses one processed stem per track rather than one immutable
+      // master file. Track inserts are server-rendered, while fader/pan/mute/solo
+      // stay downstream in WebAudio and therefore react immediately during play.
       setRenderPlaybackPreparing(true);
-      renderedMasterPlayback=true;renderedMasterDirty=false;
-      renderedMasterBaseVolumeDb=Number(current.master_volume_db||0);
-      const audio=new Audio(`/api/projects/${current.id}/preview-mix?t=${Date.now()}`);playAudio=audio;renderedMasterAudio=audio;
-      await new Promise((resolve,reject)=>{audio.addEventListener('loadedmetadata',resolve,{once:true});audio.addEventListener('error',()=>reject(new Error('Anteprima renderizzata non disponibile')),{once:true});audio.load()});
-      if(token!==playbackToken)return;
-      audio.currentTime=Math.min(playCursorMs/1000/tempoRatio(),Math.max(0,(audio.duration||0)-0.01));
-      const masterGraph=await attachPlaybackGraph(audio,{volume_db:0,pan:0},2,false,true);
-      masterMeterAnalysers=masterGraph.analysers;
-      masterPlaybackGainNode=masterGraph.gainNode;
-      masterPlaybackGainNode.gain.setValueAtTime(1,audioCtx?.currentTime||0);
-      // In Render mode the rendered master is the only audible/playing media source.
-      // Starting per-track silent media elements for meters could leak/double in some
-      // native WebViews and produced a short echo, especially after YouTube imports.
-      trackPlaybacks=[];
-      await audio.play();
+      renderedMasterPlayback=false;renderedStemPlayback=true;renderedMasterDirty=false;renderedMasterAudio=null;
+      playAudio=await startDynamicTrackPreview(true,false,token);if(token!==playbackToken)return;
       setRenderPlaybackPreparing(false);
-      // Render mode uses only the rendered master as audible media, but its
-      // analyser graph still needs the same animation loop as dynamic playback.
-      if(current.realtime_meter_enabled)startVuMeterLoop();
     }else{
-      renderedMasterPlayback=false;renderedMasterDirty=false;renderedMasterAudio=null;
+      renderedMasterPlayback=false;renderedStemPlayback=false;renderedMasterDirty=false;renderedMasterAudio=null;
       playAudio=await startDynamicTrackPreview(false,false,token);if(token!==playbackToken)return;
     }
     if(!playAudio)return;playbackPaused=false;$('#playMaster').textContent='❚❚';$('#playMaster').title='Pausa';
@@ -2552,7 +2567,6 @@ function movePlayhead(){
   const clock=dynamicClockAudio();
   if(!clock||clock.paused)return;
   playCursorMs=(renderedMasterPlayback?clock.currentTime:transportMediaSeconds())*1000*tempoRatio();
-  if(!renderedMasterPlayback)alignDynamicTracks(false);
   const playheadX=playCursorMs/1000*pxPerSec;
   if($('#playhead'))$('#playhead').style.left=playheadX+'px';
   followPlayhead(playheadX);
@@ -3421,12 +3435,13 @@ function editDraftEvent(kind,index){
   const arr=lyricsChordsEditorArrays(kind),ev=arr?.[Number(index)];if(!ev)return;
   const labels={lyrics:'Lyrics',chords:'Chord',markers:'Marker'},key=kind==='lyrics'?'text':kind==='chords'?'chord':'label';
   const value=String(ev[key]||'');
-  showUtilityModal(`Modifica ${labels[kind]||'evento'}`,`<div class="lc-event-edit-dialog"><div class="workflow-note"><b>Formato posizione:</b> <code>m:ss.mmm</code> oppure <code>mm:ss.mmm</code>. Il primo zero dei minuti è facoltativo; i millisecondi accettano da 1 a 3 cifre.</div><div class="lc-event-edit-table-wrap"><table class="lc-event-edit-table"><thead><tr><th>Posizione</th><th>Testo</th></tr></thead><tbody><tr><td><input id="lcEventEditPosition" value="${esc(lyricsChordsEditorPosition(ev.time_ms||0))}" inputmode="decimal" aria-label="Posizione"></td><td><textarea id="lcEventEditText" rows="3" aria-label="Testo">${esc(value)}</textarea></td></tr></tbody></table></div><div class="utility-actions"><button class="utility-btn primary" onclick="applyDraftEventEdit('${kind}',${Number(index)})">Salva modifica</button><button class="utility-btn secondary" onclick="restoreLyricsChordsEditorModal()">Annulla</button></div></div>`);
+  const colorField=kind==='markers'?`<label class="field lc-marker-color-edit">Colore marker<input id="lcEventEditColor" type="color" value="${esc(ev.color||'#204A87')}"></label>`:'';
+  showUtilityModal(`Modifica ${labels[kind]||'evento'}`,`<div class="lc-event-edit-dialog"><div class="workflow-note"><b>Formato posizione:</b> <code>m:ss.mmm</code> oppure <code>mm:ss.mmm</code>. Il primo zero dei minuti è facoltativo; i millisecondi accettano da 1 a 3 cifre.</div><div class="lc-event-edit-table-wrap"><table class="lc-event-edit-table"><thead><tr><th>Posizione</th><th>Testo</th></tr></thead><tbody><tr><td><input id="lcEventEditPosition" value="${esc(lyricsChordsEditorPosition(ev.time_ms||0))}" inputmode="decimal" aria-label="Posizione"></td><td><textarea id="lcEventEditText" rows="3" aria-label="Testo">${esc(value)}</textarea></td></tr></tbody></table></div>${colorField}<div class="utility-actions"><button class="utility-btn primary" onclick="applyDraftEventEdit('${kind}',${Number(index)})">Salva modifica</button><button class="utility-btn secondary" onclick="restoreLyricsChordsEditorModal()">Annulla</button></div></div>`);
 }
 function applyDraftEventEdit(kind,index){
   const arr=lyricsChordsEditorArrays(kind),ev=arr?.[Number(index)];if(!ev)return restoreLyricsChordsEditorModal();
   const ms=parseLyricsChordsEditorPosition($('#lcEventEditPosition')?.value),text=String($('#lcEventEditText')?.value??'').trim();if(!Number.isFinite(ms))return toast('Posizione non valida: usa m:ss.mmm o mm:ss.mmm, con 1-3 cifre per i millisecondi');if(!text)return toast('Il testo non può essere vuoto');
-  const oldTime=Number(ev.time_ms||0);ensureEventSnapshot(ev);ev.time_ms=ms;if(kind==='lyrics'){if(String(ev.text||'')!==text)ev.words=[];ev.text=text;updateLyricsLineAnchors(oldTime,ms)}else if(kind==='chords')ev.chord=text;else ev.label=text;arr.sort((a,b)=>Number(a.time_ms||0)-Number(b.time_ms||0));restoreLyricsChordsEditorModal();
+  const oldTime=Number(ev.time_ms||0);ensureEventSnapshot(ev);ev.time_ms=ms;if(kind==='lyrics'){if(String(ev.text||'')!==text)ev.words=[];ev.text=text;updateLyricsLineAnchors(oldTime,ms)}else if(kind==='chords')ev.chord=text;else{ev.label=text;const color=String($('#lcEventEditColor')?.value||ev.color||'#204A87');if(/^#[0-9a-fA-F]{6}$/.test(color))ev.color=color}arr.sort((a,b)=>Number(a.time_ms||0)-Number(b.time_ms||0));restoreLyricsChordsEditorModal();
 }
 function editLyricsLineTime(index){
   const ev=lyricsChordsEditorEvent('lyrics',index);if(!ev)return;
@@ -3546,12 +3561,14 @@ function pasteLyricsChordsItem(){if(!lyricsChordsEditorClipboard)return toast('C
 function editorWordUnits(word){const syll=(word?.syllables||[]).filter(s=>String(s.text||'').trim());if(syll.length)return syll.map((s,i)=>({text:String(s.text),syllable:i,start_ms:Number(s.start_ms??word.start_ms??0),end_ms:Number(s.end_ms??s.start_ms??word.end_ms??0)}));return [{text:String(word?.text||''),syllable:null,start_ms:Number(word?.start_ms||0),end_ms:Number(word?.end_ms||word?.start_ms||0)}]}
 function editorChordAnchor(chord){
   const lyrics=editorDraftLyrics();
-  if(chord?.manual_anchor&&chord.anchor_line_time_ms!=null){const li=lyrics.findIndex(l=>Number(l.time_ms)===Number(chord.anchor_line_time_ms));if(li>=0)return{line:li,word:Number(chord.anchor_word_index||0),syllable:chord.anchor_syllable_index==null?null:Number(chord.anchor_syllable_index),kind:String(chord.anchor_kind||'word'),order:Number(chord.anchor_order||0)}}
-  const a=editorAutoAnchor(chord);return{...a,syllable:null,kind:'word',order:0};
+  if(chord?.manual_anchor&&chord.anchor_line_time_ms!=null){const li=lyrics.findIndex(l=>Number(l.time_ms)===Number(chord.anchor_line_time_ms));if(li>=0)return{line:li,word:Number(chord.anchor_word_index||0),syllable:chord.anchor_syllable_index==null?null:Number(chord.anchor_syllable_index),charOffset:chord.anchor_char_offset==null?null:Number(chord.anchor_char_offset),kind:String(chord.anchor_kind||'word'),order:Number(chord.anchor_order||0)}}
+  const a=editorAutoAnchor(chord);return{...a,syllable:null,charOffset:null,kind:'word',order:0};
 }
-function assignLyricsChord(index,lineIndex,wordIndex,syllableIndex=null,kind='word',order=null){const ch=lyricsChordsEditorDraft?.[Number(index)],line=editorDraftLyrics()?.[Number(lineIndex)];if(!ch||!line)return;const words=editorLineWords(line,Number(lineIndex)),word=words[Math.max(0,Math.min(Number(wordIndex)||0,Math.max(0,words.length-1)))];ensureEventSnapshot(ch);ch.manual_anchor=true;ch.anchor_line_time_ms=Number(line.time_ms||0);ch.anchor_kind=kind;ch.anchor_word_index=kind==='end'?Math.max(0,words.length-1):Math.max(0,Number(wordIndex)||0);ch.anchor_word_text=word?String(word.text||''):'';ch.anchor_syllable_index=kind==='word'&&syllableIndex!=null?Number(syllableIndex):null;ch.anchor_order=order==null?Number(ch.anchor_order||0):Math.max(0,Number(order)||0);ch.excluded=false;ch.deleted=false;lyricsChordsEditorSelected=Number(index);lyricsChordsEditorFocus={kind:'chords',index:Number(index)};refreshLyricsChordsEditor()}
-function assignSelectedLyricsChord(lineIndex,wordIndex,syllableIndex=null,kind='word'){if(lyricsChordsEditorSelected<0)return;assignLyricsChord(lyricsChordsEditorSelected,lineIndex,wordIndex,syllableIndex,kind)}
-function dropLyricsChord(event,lineIndex,wordIndex,syllableIndex=null,kind='word'){event.preventDefault();event.stopPropagation();const raw=event.dataTransfer?.getData('text/plain'),idx=raw!==''?Number(raw):lyricsChordsEditorSelected;if(Number.isFinite(idx))assignLyricsChord(idx,lineIndex,wordIndex,syllableIndex,kind)}
+function assignLyricsChord(index,lineIndex,wordIndex,syllableIndex=null,kind='word',order=null,charOffset=null){const ch=lyricsChordsEditorDraft?.[Number(index)],line=editorDraftLyrics()?.[Number(lineIndex)];if(!ch||!line)return;const words=editorLineWords(line,Number(lineIndex)),word=words[Math.max(0,Math.min(Number(wordIndex)||0,Math.max(0,words.length-1)))];ensureEventSnapshot(ch);ch.manual_anchor=true;ch.anchor_line_time_ms=Number(line.time_ms||0);ch.anchor_kind=kind;ch.anchor_word_index=kind==='end'?Math.max(0,words.length-1):Math.max(0,Number(wordIndex)||0);ch.anchor_word_text=word?String(word.text||''):'';ch.anchor_syllable_index=kind==='word'&&syllableIndex!=null?Number(syllableIndex):null;ch.anchor_char_offset=kind==='word'&&syllableIndex==null&&charOffset!=null?Math.max(0,Number(charOffset)||0):null;ch.anchor_order=order==null?Number(ch.anchor_order||0):Math.max(0,Number(order)||0);ch.excluded=false;ch.deleted=false;lyricsChordsEditorSelected=Number(index);lyricsChordsEditorFocus={kind:'chords',index:Number(index)};refreshLyricsChordsEditor()}
+function assignSelectedLyricsChord(lineIndex,wordIndex,syllableIndex=null,kind='word',charOffset=null){if(lyricsChordsEditorSelected<0)return;assignLyricsChord(lyricsChordsEditorSelected,lineIndex,wordIndex,syllableIndex,kind,null,charOffset)}
+function lcWordCharOffset(event){const el=event.currentTarget?.querySelector?.('.lc-lyrics-inline')||event.currentTarget;if(!el)return null;const text=String(el.textContent||''),r=el.getBoundingClientRect?.();if(!text||!r||!r.width)return null;const x=Math.max(0,Math.min(r.width,Number(event.clientX||r.left)-r.left));return Math.max(0,Math.min(text.length,Math.round(text.length*x/r.width)))}
+function assignSelectedLyricsChordPart(event,lineIndex,wordIndex,syllableIndex=null){if(lyricsChordsEditorSelected<0)return;event.preventDefault();event.stopPropagation();const charOffset=syllableIndex==null?lcWordCharOffset(event):null;assignLyricsChord(lyricsChordsEditorSelected,lineIndex,wordIndex,syllableIndex,'word',null,charOffset)}
+function dropLyricsChord(event,lineIndex,wordIndex,syllableIndex=null,kind='word'){event.preventDefault();event.stopPropagation();const raw=event.dataTransfer?.getData('text/plain'),idx=raw!==''?Number(raw):lyricsChordsEditorSelected;if(Number.isFinite(idx)){const charOffset=kind==='word'&&syllableIndex==null?lcWordCharOffset(event):null;assignLyricsChord(idx,lineIndex,wordIndex,syllableIndex,kind,null,charOffset)}}
 function dropLyricsChordOnChord(event,targetIndex){event.preventDefault();event.stopPropagation();const raw=event.dataTransfer?.getData('text/plain'),idx=raw!==''?Number(raw):lyricsChordsEditorSelected,target=lyricsChordsEditorDraft?.[Number(targetIndex)];if(!Number.isFinite(idx)||!target||idx===Number(targetIndex))return;const a=editorChordAnchor(target),targetOrder=Number(target.anchor_order||0);(lyricsChordsEditorDraft||[]).forEach((ch,ci)=>{if(ci===idx||ci===Number(targetIndex))return;const ca=editorChordAnchor(ch);if(lcAnchorKey(ca)===lcAnchorKey(a)&&Number(ch.anchor_order||0)>targetOrder){ensureEventSnapshot(ch);ch.anchor_order=Number(ch.anchor_order||0)+1}});assignLyricsChord(idx,a.line,a.word,a.syllable,a.kind,targetOrder+1)}
 function lcAnchorKey(a){return `${a.line}:${a.kind}:${a.word}:${a.syllable==null?'x':a.syllable}`}
 function openLyricsWordContextMenu(event,lineIndex,wordIndex){event.preventDefault();event.stopPropagation();closeLyricsChordsContextMenu();lyricsChordsEditorFocus={kind:'lyrics',index:Number(lineIndex)};const menu=document.createElement('div');menu.id='lyricsChordsContextMenu';menu.className='lc-context-menu';menu.innerHTML=`<div class="lc-context-title">Parola</div><button type="button" role="menuitem" onclick="closeLyricsChordsContextMenu();splitLyricsEditorLine(${Number(lineIndex)},${Number(wordIndex)+1})">Dividi qui</button>`;document.body.appendChild(menu);const x=Math.max(8,Math.min(event.clientX,window.innerWidth-menu.offsetWidth-8)),y=Math.max(8,Math.min(event.clientY,window.innerHeight-menu.offsetHeight-8));menu.style.left=`${x}px`;menu.style.top=`${y}px`;return false}
@@ -3607,21 +3624,21 @@ function lyricsChordsEditorHtml(){
   for(const list of byAnchor.values())list.sort((x,y)=>Number(x.ch.anchor_order||0)-Number(y.ch.anchor_order||0)||Number(x.ch.time_ms||0)-Number(y.ch.time_ms||0));
   const chip=({ch,ci})=>`<span class="lc-chord-wrap ${ch.excluded?'excluded':''} ${ch.deleted?'deleted':''}"><button type="button" draggable="${ch.deleted?'false':'true'}" class="lc-chord ${lyricsChordsEditorSelected===ci?'selected':''} ${ch.manual_anchor?'manual':'auto'}" onclick="event.stopPropagation();lyricsChordsEditorSelected=${ci};lyricsChordsEditorFocus={kind:'chords',index:${ci}};refreshLyricsChordsEditor()" oncontextmenu="return openLyricsChordsContextMenu(event,'chords',${ci})" ondragstart="dragLyricsChord(event,${ci})" ondragover="event.preventDefault()" ondrop="dropLyricsChordOnChord(event,${ci})" ondblclick="event.stopPropagation();lcRememberScroll();editDraftEvent('chords',${ci})" title="Doppio click: modifica chord · Click destro: menu chord · trascina qui per sequenza">${esc(transposeChordLabel(ch.chord,current.pitch_semitones||0))}</button></span>`;
   const markersFor=(li)=>{const start=Number(lyrics[li]?.time_ms||0),end=Number(lyrics[li+1]?.time_ms||Infinity);return (lyricsChordsEditorMarkersDraft||[]).map((m,mi)=>({m,mi})).filter(({m})=>Number(m.time_ms||0)>=start&&Number(m.time_ms||0)<end)};
-  const rows=lyrics.map((line,li)=>{const words=editorLineWords(line,li),lineCtx=`oncontextmenu="return openLyricsChordsContextMenu(event,'lyrics',${li})"`;const startCh=(byAnchor.get(`${li}:start:0:x`)||[]).map(chip).join(''),endKey=`${li}:end:${Math.max(0,words.length-1)}:x`,endCh=(byAnchor.get(endKey)||[]).map(chip).join('');const markers=markersFor(li).map(({m,mi})=>`<span class="lc-marker-chip ${m.disabled?'disabled':''} ${m.deleted?'deleted':''}" ondblclick="event.stopPropagation();lcRememberScroll();editDraftEvent('markers',${mi})" oncontextmenu="return openLyricsChordsContextMenu(event,'markers',${mi})" title="Doppio click: modifica marker · Click destro: menu marker">⚑ ${esc(m.label)}</span>`).join('');const wordHtml=words.map((w,wi)=>{const units=editorWordUnits(w),unitHtml=units.map((u,si)=>{const syll=u.syllable==null?null:si,key=`${li}:word:${wi}:${syll==null?'x':syll}`,chips=(byAnchor.get(key)||[]).map(chip).join('');return `<span class="lc-syllable-anchor" ondragover="event.preventDefault()" ondrop="dropLyricsChord(event,${li},${wi},${syll==null?'null':syll},'word')" onclick="event.stopPropagation();assignSelectedLyricsChord(${li},${wi},${syll==null?'null':syll},'word')"><span class="lc-chord-slot">${chips}</span><span class="lc-syllable lc-lyrics-inline" contenteditable="true" spellcheck="false" data-original-text="${esc(u.text)}" onclick="event.stopPropagation()" ondblclick="event.stopPropagation();lcRememberScroll();editDraftEvent('lyrics',${li})" onkeydown="return lyricsInlineKey(event)" onblur="commitLyricsInlineUnit(${li},${wi},${syll==null?'null':syll},this.textContent)">${esc(u.text)}</span></span>`}).join('');return `<span class="lc-word" ondblclick="event.stopPropagation();lcRememberScroll();editDraftEvent('lyrics',${li})" oncontextmenu="return openLyricsWordContextMenu(event,${li},${wi})">${unitHtml}</span>`}).join('');return `<div class="lc-line ${line.disabled?'lc-disabled':''} ${line.deleted?'lc-deleted':''}" ${lineCtx}><div class="lc-marker-row">${markers}</div><button type="button" class="lc-time lc-time-edit" onclick="event.stopPropagation();lcRememberScroll();editLyricsLineTime(${li})">${esc(lyricsChordsEditorPosition(line.time_ms||0))}</button><div class="lc-content"><div class="lc-edge-anchor lc-edge-start" ondragover="event.preventDefault()" ondrop="dropLyricsChord(event,${li},0,null,'start')" onclick="assignSelectedLyricsChord(${li},0,null,'start')"><span class="lc-chord-slot">${startCh}</span><span>◂</span></div><div class="lc-words">${wordHtml||`<span class="lc-token">${esc(line.text||'.')}</span>`}</div><div class="lc-edge-anchor lc-edge-end" ondragover="event.preventDefault()" ondrop="dropLyricsChord(event,${li},${Math.max(0,words.length-1)},null,'end')" onclick="assignSelectedLyricsChord(${li},${Math.max(0,words.length-1)},null,'end')"><span class="lc-chord-slot">${endCh}</span><span>▸</span></div></div></div>`}).join('');
+  const rows=lyrics.map((line,li)=>{const words=editorLineWords(line,li),lineCtx=`oncontextmenu="return openLyricsChordsContextMenu(event,'lyrics',${li})"`;const startCh=(byAnchor.get(`${li}:start:0:x`)||[]).map(chip).join(''),endKey=`${li}:end:${Math.max(0,words.length-1)}:x`,endCh=(byAnchor.get(endKey)||[]).map(chip).join('');const markers=markersFor(li).map(({m,mi})=>`<span class="lc-marker-chip ${m.disabled?'disabled':''} ${m.deleted?'deleted':''}" ondblclick="event.stopPropagation();lcRememberScroll();editDraftEvent('markers',${mi})" oncontextmenu="return openLyricsChordsContextMenu(event,'markers',${mi})" title="Doppio click: modifica marker · Click destro: menu marker">⚑ ${esc(m.label)}</span>`).join('');const wordHtml=words.map((w,wi)=>{const units=editorWordUnits(w),unitHtml=units.map((u,si)=>{const syll=u.syllable==null?null:si,key=`${li}:word:${wi}:${syll==null?'x':syll}`,chips=(byAnchor.get(key)||[]).map(chip).join('');return `<span class="lc-syllable-anchor" ondragover="event.preventDefault()" ondrop="dropLyricsChord(event,${li},${wi},${syll==null?'null':syll},'word')" onclick="assignSelectedLyricsChordPart(event,${li},${wi},${syll==null?'null':syll})"><span class="lc-chord-slot">${chips}</span><span class="lc-syllable lc-lyrics-inline" contenteditable="true" spellcheck="false" data-original-text="${esc(u.text)}" onclick="if(lyricsChordsEditorSelected>=0){assignSelectedLyricsChordPart(event,${li},${wi},${syll==null?'null':syll})}else event.stopPropagation()" ondblclick="event.stopPropagation();lcRememberScroll();editDraftEvent('lyrics',${li})" onkeydown="return lyricsInlineKey(event)" onblur="commitLyricsInlineUnit(${li},${wi},${syll==null?'null':syll},this.textContent)">${esc(u.text)}</span></span>`}).join('');return `<span class="lc-word" ondblclick="event.stopPropagation();lcRememberScroll();editDraftEvent('lyrics',${li})" oncontextmenu="return openLyricsWordContextMenu(event,${li},${wi})">${unitHtml}</span>`}).join('');return `<div class="lc-line ${line.disabled?'lc-disabled':''} ${line.deleted?'lc-deleted':''}" ${lineCtx}><div class="lc-marker-row">${markers}</div><button type="button" class="lc-time lc-time-edit" onclick="event.stopPropagation();lcRememberScroll();editLyricsLineTime(${li})">${esc(lyricsChordsEditorPosition(line.time_ms||0))}</button><div class="lc-content"><div class="lc-edge-anchor lc-edge-start" ondragover="event.preventDefault()" ondrop="dropLyricsChord(event,${li},0,null,'start')" onclick="assignSelectedLyricsChord(${li},0,null,'start')"><span class="lc-chord-slot">${startCh}</span><span>◂</span></div><div class="lc-words">${wordHtml||`<span class="lc-token">${esc(line.text||'.')}</span>`}</div><div class="lc-edge-anchor lc-edge-end" ondragover="event.preventDefault()" ondrop="dropLyricsChord(event,${li},${Math.max(0,words.length-1)},null,'end')" onclick="assignSelectedLyricsChord(${li},${Math.max(0,words.length-1)},null,'end')"><span class="lc-chord-slot">${endCh}</span><span>▸</span></div></div></div>`}).join('');
   const selected=lyricsChordsEditorSelected>=0?chords[lyricsChordsEditorSelected]:null;
-  return `<div class="lyrics-chords-editor"><div class="lc-editor-fixed-toolbar"><div class="workflow-note"><b>Editor Lyrics + Chords + Markers</b> · questa vista contiene solo l'editor combinato Lyrics + Chords + Markers. Formato tempo: <code>m:ss.mmm</code>/<code>mm:ss.mmm</code>. Gli anchor ◂/▸ rappresentano inizio/fine riga. Trascina un chord su una sillaba, un anchor o un altro chord. Click destro su una parola: <b>Dividi qui</b>.</div><div class="lc-toolbar"><button class="utility-btn" onclick="undoLyricsChordsEditor()" ${lyricsChordsEditorUndoStack.length?'':'disabled'}>Undo</button><button class="utility-btn" onclick="redoLyricsChordsEditor()" ${lyricsChordsEditorRedoStack.length?'':'disabled'}>Redo</button><button class="utility-btn" onclick="cutLyricsChordsItem()">Taglia</button><button class="utility-btn" onclick="copyLyricsChordsItem()">Copia</button><button class="utility-btn" onclick="pasteLyricsChordsItem()">Incolla</button><button class="utility-btn primary lc-save-btn" onclick="saveLyricsChordsEditor()">Salva</button><button class="utility-btn secondary" onclick="addLyricsEditorLine()">+ Lyrics</button><button class="utility-btn secondary" onclick="addChordEditorEvent()">+ Chord</button><button class="utility-btn secondary" onclick="addInstrumentalSection()">+ Instrumental</button><button class="utility-btn secondary" onclick="resetLyricsChordAnchors()">Reset anchor</button><button class="utility-btn secondary" onclick="openLyricsPdfStylePanel()">Stile PDF</button></div></div><div class="lc-editor-scroll" oncontextmenu="if(event.target===this)return openLyricsChordsContextMenu(event,'editor',-1)"><div class="lc-grid">${rows||'<div class="workflow-note">Nessuna lyric.</div>'}</div>${selected?`<div class="workflow-note">Chord selezionato: <b>${esc(selected.chord)}</b></div>`:''}</div><div class="utility-actions lc-editor-footer"><button class="utility-btn primary" onclick="saveLyricsChordsEditor()">Salva</button><button class="utility-btn secondary" onclick="closeLyricsChordsEditor()">Chiudi</button></div></div>`
+  return `<div class="lyrics-chords-editor"><div class="lc-editor-fixed-toolbar"><div class="workflow-note"><b>Editor Lyrics + Chords + Markers</b> · questa vista contiene solo l'editor combinato Lyrics + Chords + Markers. Formato tempo: <code>m:ss.mmm</code>/<code>mm:ss.mmm</code>. Gli anchor ◂/▸ rappresentano inizio/fine riga. Trascina/clicca un chord su una sillaba o su una posizione interna della parola, oppure su un anchor o un altro chord. Click destro su una parola: <b>Dividi qui</b>.</div><div class="lc-toolbar"><button class="utility-btn" onclick="undoLyricsChordsEditor()" ${lyricsChordsEditorUndoStack.length?'':'disabled'}>Undo</button><button class="utility-btn" onclick="redoLyricsChordsEditor()" ${lyricsChordsEditorRedoStack.length?'':'disabled'}>Redo</button><button class="utility-btn" onclick="cutLyricsChordsItem()">Taglia</button><button class="utility-btn" onclick="copyLyricsChordsItem()">Copia</button><button class="utility-btn" onclick="pasteLyricsChordsItem()">Incolla</button><button class="utility-btn primary lc-save-btn" onclick="saveLyricsChordsEditor()">Salva</button><button class="utility-btn secondary" onclick="addLyricsEditorLine()">+ Lyrics</button><button class="utility-btn secondary" onclick="addChordEditorEvent()">+ Chord</button><button class="utility-btn secondary" onclick="addInstrumentalSection()">+ Instrumental</button><button class="utility-btn secondary" onclick="resetLyricsChordAnchors()">Reset anchor</button><button class="utility-btn secondary" onclick="openLyricsPdfStylePanel()">Stile PDF</button></div></div><div class="lc-editor-scroll" oncontextmenu="if(event.target===this)return openLyricsChordsContextMenu(event,'editor',-1)"><div class="lc-grid">${rows||'<div class="workflow-note">Nessuna lyric.</div>'}</div>${selected?`<div class="workflow-note">Chord selezionato: <b>${esc(selected.chord)}</b></div>`:''}</div><div class="utility-actions lc-editor-footer"><button class="utility-btn primary" onclick="saveLyricsChordsEditor()">Salva</button><button class="utility-btn secondary" onclick="closeLyricsChordsEditor()">Chiudi</button></div></div>`
 }
 function refreshLyricsChordsEditor(){lcRememberScroll();lcCommitHistory();const body=document.querySelector('.utility-modal .lyrics-chords-editor');if(!body)return restoreLyricsChordsEditorModal();body.outerHTML=lyricsChordsEditorHtml();lcRestoreScroll()}
 function restoreLyricsChordsEditorModal(){lcCommitHistory();showUtilityModal('Editor Lyrics + Chords + Markers',lyricsChordsEditorHtml());const modal=document.querySelector('.utility-modal');modal?.classList.remove('meta-expanded-modal');modal?.classList.add('lyrics-chords-editor-modal');lcRestoreScroll()}
 function openLyricsChordsEditor(){if(!current)return;lyricsChordsEditorLyricsDraft=JSON.parse(JSON.stringify(current.lyrics||[]));lyricsChordsEditorDraft=JSON.parse(JSON.stringify(current.chords||[]));lyricsChordsEditorMarkersDraft=JSON.parse(JSON.stringify(current.markers||[]));lyricsChordsEditorOriginalDraft={lyrics:JSON.parse(JSON.stringify(current.lyrics||[])),chords:JSON.parse(JSON.stringify(current.chords||[])),markers:JSON.parse(JSON.stringify(current.markers||[]))};lyricsChordsEditorSelected=-1;lyricsChordsEditorFocus=null;lyricsChordsEditorScrollTop=0;lyricsChordsEditorUndoStack=[];lyricsChordsEditorRedoStack=[];lyricsChordsEditorHistoryState=lcSnapshot();restoreLyricsChordsEditorModal()}
 function selectLyricsChord(index){lyricsChordsEditorSelected=Number(index);lyricsChordsEditorFocus={kind:'chords',index:Number(index)};refreshLyricsChordsEditor()}
-function resetLyricsChordAnchors(){(lyricsChordsEditorDraft||[]).forEach(ch=>{if(ch.manual_anchor){ensureEventSnapshot(ch);ch.manual_anchor=false;ch.anchor_line_time_ms=null;ch.anchor_word_index=null;ch.anchor_word_text='';ch.anchor_kind='word';ch.anchor_syllable_index=null;ch.anchor_order=0}});lyricsChordsEditorSelected=-1;refreshLyricsChordsEditor()}
+function resetLyricsChordAnchors(){(lyricsChordsEditorDraft||[]).forEach(ch=>{if(ch.manual_anchor){ensureEventSnapshot(ch);ch.manual_anchor=false;ch.anchor_line_time_ms=null;ch.anchor_word_index=null;ch.anchor_word_text='';ch.anchor_kind='word';ch.anchor_syllable_index=null;ch.anchor_char_offset=null;ch.anchor_order=0}});lyricsChordsEditorSelected=-1;refreshLyricsChordsEditor()}
 
 function closeLyricsChordsEditor(){if(lyricsChordsSaving)return toast('Salvataggio in corso… attendere');if(!lyricsChordsEditorHasChanges()){lyricsChordsEditorOriginalDraft=null;return closeUtilityModal()}showLyricsChordsClosePrompt()}
 function showLyricsChordsSaving(){const host=document.querySelector('.lyrics-chords-editor')||document.querySelector('.utility-card');if(!host)return;host.querySelector('.lc-saving-overlay')?.remove();const x=document.createElement('div');x.className='lc-saving-overlay';x.innerHTML='<div class="lc-saving-card"><div class="lc-saving-spinner"></div><b>Salvataggio in corso…</b><p>Attendere: Lyrics, Chords e Markers vengono persistiti nel progetto.</p></div>';host.appendChild(x)}
 async function saveLyricsChordsEditor(){if(!current||lyricsChordsSaving)return;lyricsChordsSaving=true;lcRememberScroll();showLyricsChordsSaving();current.lyrics=JSON.parse(JSON.stringify(lyricsChordsEditorLyricsDraft||[])).sort((a,b)=>Number(a.time_ms||0)-Number(b.time_ms||0));current.chords=JSON.parse(JSON.stringify(lyricsChordsEditorDraft||[])).sort((a,b)=>Number(a.time_ms||0)-Number(b.time_ms||0));current.markers=JSON.parse(JSON.stringify(lyricsChordsEditorMarkersDraft||[])).sort((a,b)=>Number(a.time_ms||0)-Number(b.time_ms||0));try{const saved=await api('/api/projects/'+current.id,{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify(current)});await syncNativeProjectFile(saved.id);current=saved;projectDirty=false;lastHistoryState=projectSnapshot();lyricsChordsEditorOriginalDraft=null;closeUtilityModal();render();toast('Lyrics/Chords/Markers salvati nel progetto')}catch(e){document.querySelector('.lc-saving-overlay')?.remove();toast('Salvataggio non riuscito: '+e.message)}finally{lyricsChordsSaving=false}}
 
-function lyricsPdfHtmlPreview(){const style=normalizeLyricsPdfStyle(),lyrics=(current.lyrics||[]).filter(x=>eventIsActive(x,'lyrics')),chords=(current.chords||[]).filter(x=>eventIsActive(x,'chords')),markers=(current.markers||[]).filter(x=>eventIsActive(x,'markers'));const css=(k)=>{const x=style[k];return `font-size:${Number(x.size)}pt;font-weight:${x.style==='bold'?700:400};font-style:${x.style==='italic'?'italic':'normal'};color:${esc(x.color)}`};let mi=0;const rows=lyrics.map((line,li)=>{const start=Number(line.time_ms||0),end=Number(lyrics[li+1]?.time_ms||line.end_ms||start+6000),m=[];while(mi<markers.length&&Number(markers[mi].time_ms)<=start){m.push(`<div class="pdf-html-marker" style="${css('markers')}">${esc(markers[mi].label)}</div>`);mi++}const words=editorLineWords(line,li),lineCh=chords.filter(ch=>Number(ch.anchor_line_time_ms)===start||(ch.anchor_line_time_ms==null&&Number(ch.time_ms)>=start&&Number(ch.time_ms)<end)).sort((a,b)=>Number(a.anchor_order||0)-Number(b.anchor_order||0)||Number(a.time_ms)-Number(b.time_ms));const chordLine=lineCh.length?`<div class="pdf-sheet-chord" style="${css('chords')}">${lineCh.map(ch=>esc(transposeChordLabel(ch.chord,current.pitch_semitones||0))).join('&nbsp;&nbsp;&nbsp;')}</div>`:'';return `${m.join('')}<div class="pdf-sheet-line" style="margin-bottom:${Number(style.line_spacing)}px">${chordLine}<div class="pdf-sheet-lyric" style="${css('lyrics')}">${esc(line.text)}</div></div>`}).join('');return `<div class="pdf-sheet"><header><h1 style="${css('title')}">${esc(current.title||'Lyrics')}</h1><h2 style="${css('subtitle')}">${esc([current.artist,current.key?`Key: ${current.key}`:''].filter(Boolean).join(' · '))}</h2><div style="${css('bpm')}">${esc([current.bpm?`BPM: ${Math.round(current.bpm)}`:'',current.time_signature?`Time signature: ${current.time_signature}`:''].filter(Boolean).join(' · '))}</div></header>${rows}</div>`}
+function lyricsPdfHtmlPreview(){const style=normalizeLyricsPdfStyle(),lyrics=(current.lyrics||[]).filter(x=>eventIsActive(x,'lyrics')),chords=(current.chords||[]).filter(x=>eventIsActive(x,'chords')),markers=(current.markers||[]).filter(x=>eventIsActive(x,'markers'));const css=(k)=>{const x=style[k];return `font-size:${Number(x.size)}pt;font-weight:${x.style==='bold'?700:400};font-style:${x.style==='italic'?'italic':'normal'};color:${esc(x.color)}`};let mi=0;const rows=lyrics.map((line,li)=>{const start=Number(line.time_ms||0),end=Number(lyrics[li+1]?.time_ms||line.end_ms||start+6000),m=[];while(mi<markers.length&&Number(markers[mi].time_ms)<=start){m.push(`<div class="pdf-html-marker" style="${css('markers')};color:${esc(markers[mi].color||style.markers.color)}">${esc(markers[mi].label)}</div>`);mi++}const words=editorLineWords(line,li),lineCh=chords.filter(ch=>Number(ch.anchor_line_time_ms)===start||(ch.anchor_line_time_ms==null&&Number(ch.time_ms)>=start&&Number(ch.time_ms)<end)).sort((a,b)=>Number(a.anchor_order||0)-Number(b.anchor_order||0)||Number(a.time_ms)-Number(b.time_ms));const chordLine=lineCh.length?`<div class="pdf-sheet-chord" style="${css('chords')}">${lineCh.map(ch=>esc(transposeChordLabel(ch.chord,current.pitch_semitones||0))).join('&nbsp;&nbsp;&nbsp;')}</div>`:'';return `${m.join('')}<div class="pdf-sheet-line" style="margin-bottom:${Number(style.line_spacing)}px">${chordLine}<div class="pdf-sheet-lyric" style="${css('lyrics')}">${esc(line.text)}</div></div>`}).join('');return `<div class="pdf-sheet"><header><h1 style="${css('title')}">${esc(current.title||'Lyrics')}</h1><h2 style="${css('subtitle')}">${esc([current.artist,current.key?`Key: ${current.key}`:''].filter(Boolean).join(' · '))}</h2><div style="${css('bpm')}">${esc([current.bpm?`BPM: ${Math.round(current.bpm)}`:'',current.time_signature?`Time signature: ${current.time_signature}`:''].filter(Boolean).join(' · '))}</div></header>${rows}</div>`}
 async function previewProjectLyricsPdf(){if(!current)return;if(!(current.lyrics||[]).length)return toast('Il progetto non contiene lyrics');const hasChords=(current.chords||[]).some(ch=>eventIsActive(ch,'chords')),title=hasChords?'Anteprima PDF · Lyrics + Chords + Markers':'Anteprima PDF · Lyrics + Markers';showUtilityModal(title,`<div class="pdf-preview-toolbar"><button class="utility-btn secondary pdf-preview-return" onclick="closeLyricsPdfPreview()">← Torna all'editor</button><button class="utility-btn primary pdf-preview-save" onclick="downloadProjectLyricsPdf()">Salva PDF Lyrics + Chords + Markers</button></div><div class="pdf-preview-wrap">${lyricsPdfHtmlPreview()}</div><div class="utility-actions pdf-preview-actions"><button class="utility-btn secondary pdf-preview-return" onclick="closeLyricsPdfPreview()">← Torna all'editor</button><button class="utility-btn primary pdf-preview-save" onclick="downloadProjectLyricsPdf()">Salva PDF Lyrics + Chords + Markers</button></div>`);document.querySelector('.utility-modal')?.classList.add('pdf-html-preview-modal')}
 
 function defaultLyricsPdfStyle(){return {title:{style:'bold',size:18,color:'#111111'},subtitle:{style:'normal',size:11,color:'#333333'},bpm:{style:'normal',size:11,color:'#333333'},lyrics:{style:'normal',size:11,color:'#111111'},chords:{style:'bold',size:9,color:'#7B1FA2'},markers:{style:'bold',size:12,color:'#204A87'},line_spacing:8}}

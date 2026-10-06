@@ -5,10 +5,11 @@ JS = (ROOT / "app/static/app.js").read_text(encoding="utf-8")
 CSS = (ROOT / "app/static/app.css").read_text(encoding="utf-8")
 
 
-def test_render_preview_restarts_realtime_vu_loop():
+def test_render_preview_uses_processed_stems_with_realtime_meters():
     render_block = JS[JS.index("async function previewMaster()") : JS.index("function movePlayhead()") ]
-    assert "await audio.play();" in render_block
-    assert "if(current.realtime_meter_enabled)startVuMeterLoop();" in render_block
+    assert "renderedStemPlayback=true" in render_block
+    assert "startDynamicTrackPreview(true,false,token)" in render_block
+    assert "startDynamicTrackPreview" in JS and "startVuMeterLoop()" in JS
 
 
 def test_mixer_channels_scroll_inside_viewport_instead_of_escaping():

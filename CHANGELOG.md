@@ -1,3 +1,18 @@
+## 0.2.0-r187
+
+- Playback: removed periodic hard-seek synchronization that caused regular drop-outs in non-Render mode. Re-lock now occurs only at transport actions or after real decoder stalls.
+- Render playback: switched from one immutable rendered master to processed per-track stems so volume, pan, mute and solo are live WebAudio controls.
+- Insert controls: parameter sliders now schedule live processed-stem replacement while playback continues.
+- Preview stems keep volume/pan/mute neutral server-side to avoid double-applying mixer controls.
+
+## 0.2.0-r186
+
+- Lyrics + Chords + Markers: automatic chords before the first sung word are no longer forced onto that word; explicit/manual anchors take precedence.
+- Marker editing now includes marker color.
+- PDF chords always use the Chords style and never inherit marker/section styling.
+- Chords can be anchored to a character position inside a word when syllable timing is unavailable.
+- Metronome creation is idempotent: a project can contain only one metronome track, which is regenerated/reused on repeated requests.
+
 ## 0.2.0-r185
 
 - CI maintenance: removed unused imports from the compound-meter regression test so Ruff no longer stops the production workflow; revision metadata tests now validate alignment dynamically instead of hard-coding r184.
