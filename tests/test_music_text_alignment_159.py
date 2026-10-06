@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import numpy as np
 
 from app.models import Chord, Clip, LyricLine, LyricSyllable, LyricWord, Track

@@ -86,15 +86,40 @@ def validate_project_files(project: Project) -> None:
             raise ValueError(f"attachment not found: {name}")
 
 
+def _fsync_directory(path: Path) -> None:
+    """Best-effort directory fsync so atomic renames survive abrupt shutdowns."""
+    try:
+        fd = os.open(path, os.O_RDONLY)
+    except OSError:
+        return
+    try:
+        os.fsync(fd)
+    except OSError:
+        pass
+    finally:
+        os.close(fd)
+
+
 def save_project(project: Project):
     d = pdir(project.id)
     d.mkdir(parents=True, exist_ok=True)
     (d / "audio").mkdir(exist_ok=True)
     (d / "attachments").mkdir(exist_ok=True)
     (d / "originals").mkdir(exist_ok=True)
-    tmp = d / "project.json.tmp"
-    tmp.write_text(project.model_dump_json(indent=2), encoding="utf-8")
-    tmp.replace(d / "project.json")
+    target = d / "project.json"
+    tmp = d / f".project.json.{uuid.uuid4().hex}.tmp"
+    payload = project.model_dump_json(indent=2).encode("utf-8")
+    try:
+        with tmp.open("wb") as handle:
+            handle.write(payload)
+            handle.flush()
+            os.fsync(handle.fileno())
+        # Validate the exact bytes that will become authoritative before replace.
+        Project.model_validate_json(tmp.read_bytes())
+        os.replace(tmp, target)
+        _fsync_directory(d)
+    finally:
+        tmp.unlink(missing_ok=True)
 
 
 def load_project(pid: str) -> Project:
@@ -243,9 +268,17 @@ def delete_project_file(pid: str, category: str, filename: str) -> None:
 
 
 def write_project_archive(pid: str, archive_path: Path) -> Path:
+    """Write a .maeproj atomically so autosave can never expose a partial ZIP.
+
+    The archive is assembled and validated in a sibling temporary file, fsynced,
+    and only then atomically replaces the previous project file. If the process
+    exits or is killed during autosave, the prior valid archive stays untouched.
+    """
     project = load_project(pid)
     validate_project_files(project)
     base = pdir(pid)
+    archive_path = Path(archive_path)
+    archive_path.parent.mkdir(parents=True, exist_ok=True)
     manifest = {
         "schema": PROJECT_ARCHIVE_SCHEMA,
         "project_id": project.id,
@@ -253,11 +286,26 @@ def write_project_archive(pid: str, archive_path: Path) -> Path:
         "owner_user_id": project.owner_user_id,
         "includes_originals": True,
     }
-    with zipfile.ZipFile(archive_path, "w", zipfile.ZIP_DEFLATED, allowZip64=True) as z:
-        z.writestr("archive-manifest.json", json.dumps(manifest, indent=2))
-        for path in sorted(base.rglob("*")):
-            if path.is_file() and path.name != "project.json.tmp":
-                z.write(path, Path("project") / path.relative_to(base))
+    tmp = archive_path.parent / f".{archive_path.name}.{uuid.uuid4().hex}.tmp"
+    try:
+        with zipfile.ZipFile(tmp, "w", zipfile.ZIP_DEFLATED, allowZip64=True) as z:
+            z.writestr("archive-manifest.json", json.dumps(manifest, indent=2))
+            for path in sorted(base.rglob("*")):
+                if path.is_file() and not (path.name.startswith(".project.json.") and path.name.endswith(".tmp")):
+                    z.write(path, Path("project") / path.relative_to(base))
+        with tmp.open("rb") as handle:
+            os.fsync(handle.fileno())
+        # Refuse to replace a valid existing archive with an incomplete/corrupt one.
+        with zipfile.ZipFile(tmp, "r") as z:
+            if z.testzip() is not None:
+                raise ValueError("corrupt project archive")
+            if "archive-manifest.json" not in z.namelist() or "project/project.json" not in z.namelist():
+                raise ValueError("incomplete project archive")
+            Project.model_validate_json(z.read("project/project.json"))
+        os.replace(tmp, archive_path)
+        _fsync_directory(archive_path.parent)
+    finally:
+        tmp.unlink(missing_ok=True)
     return archive_path
 
 

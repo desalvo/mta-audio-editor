@@ -141,8 +141,24 @@ def _normalize_lyric_items(items: list[LyricLine]) -> list[LyricLine]:
         )
         if normalized:
             prev = normalized[-1]
-            if prev.text.casefold() == cleaned.text.casefold() and abs(prev.time_ms - cleaned.time_ms) <= 450:
-                prev.end_ms = max(prev.end_ms or prev.time_ms, cleaned.end_ms or cleaned.time_ms)
+            # Only collapse the same text when the two segments clearly describe
+            # the *same audio interval*. Repeated lyrics are legitimate content:
+            # identical words/phrases at distinct timestamps must be preserved.
+            prev_end = int(prev.end_ms or prev.time_ms)
+            cur_end = int(cleaned.end_ms or cleaned.time_ms)
+            overlap_ms = max(0, min(prev_end, cur_end) - max(prev.time_ms, cleaned.time_ms))
+            prev_span = max(1, prev_end - prev.time_ms)
+            cur_span = max(1, cur_end - cleaned.time_ms)
+            overlap_ratio = overlap_ms / max(1, min(prev_span, cur_span))
+            prev_word_keys = {(w.text.casefold(), w.start_ms, w.end_ms) for w in prev.words}
+            cur_word_keys = {(w.text.casefold(), w.start_ms, w.end_ms) for w in cleaned.words}
+            exact_word_overlap = bool(prev_word_keys and cur_word_keys and (prev_word_keys & cur_word_keys))
+            same_audio_duplicate = (
+                prev.text.casefold() == cleaned.text.casefold()
+                and (overlap_ratio >= 0.55 or exact_word_overlap)
+            )
+            if same_audio_duplicate:
+                prev.end_ms = max(prev_end, cur_end)
                 merged_words = list(prev.words)
                 seen = {(w.text.casefold(), w.start_ms, w.end_ms) for w in merged_words}
                 for word in cleaned.words:
