@@ -59,7 +59,7 @@ def _read_json(url: str, params: dict[str, str]) -> Any:
     base = _validated_https(url)
     sep = "&" if "?" in base else "?"
     request_url = f"{base}{sep}{urlencode(params)}"
-    req = Request(request_url, headers={"Accept": "application/json", "User-Agent": "MTA-Audio-Editor/rights-search"})  # noqa: S310
+    req = Request(request_url, headers={"Accept": "application/json", "User-Agent": "MTA-Audio-Editor/0.2.0 (https://github.com/desalvo/mta-audio-editor)"})  # noqa: S310
     with urlopen(req, timeout=20) as response:  # noqa: S310
         payload = response.read(2_000_000)
     return json.loads(payload.decode("utf-8"))
@@ -162,4 +162,115 @@ def search_provider(provider_id: str, *, title: str, original_title: str = "", a
         "mode": "api",
         "results": [item.model_dump(mode="json") for item in _normalise_rows(provider, payload)],
         "message": "",
+    }
+
+MUSICBRAINZ_API = "https://musicbrainz.org/ws/2"
+
+
+def _mb_artist_credit(value: Any) -> list[str]:
+    out: list[str] = []
+    for item in value or []:
+        if not isinstance(item, dict):
+            continue
+        artist = item.get("artist") if isinstance(item.get("artist"), dict) else {}
+        name = str(item.get("name") or artist.get("name") or "").strip()
+        if name and name not in out:
+            out.append(name)
+    return out
+
+
+def search_musicbrainz_metadata(*, title: str, artist: str = "", limit: int = 12) -> list[dict[str, Any]]:
+    """Search public MusicBrainz recording metadata by song title.
+
+    The search result intentionally stays lightweight: authors/composers are
+    resolved only for the candidate selected by the user, keeping the public
+    MusicBrainz service request count low.
+    """
+    title = str(title or "").strip()
+    if not title:
+        return []
+    query = f'recording:"{title.replace(chr(34), "")}"'
+    if str(artist or "").strip():
+        query += f' AND artist:"{str(artist).replace(chr(34), "").strip()}"'
+    payload = _read_json(f"{MUSICBRAINZ_API}/recording/", {
+        "query": query,
+        "fmt": "json",
+        "limit": str(max(1, min(25, int(limit)))),
+    })
+    results: list[dict[str, Any]] = []
+    for row in (payload.get("recordings") or []) if isinstance(payload, dict) else []:
+        if not isinstance(row, dict) or not row.get("id"):
+            continue
+        performers = _mb_artist_credit(row.get("artist-credit"))
+        results.append({
+            "provider": "MUSICBRAINZ",
+            "mbid": str(row.get("id")),
+            "title": str(row.get("title") or title),
+            "performers": performers,
+            "first_release_date": str(row.get("first-release-date") or ""),
+            "isrcs": [str(x) for x in (row.get("isrcs") or []) if str(x).strip()][:8],
+            "score": int(row.get("score") or 0),
+            "disambiguation": str(row.get("disambiguation") or ""),
+            "source_url": f"https://musicbrainz.org/recording/{row.get('id')}",
+        })
+    return results
+
+
+def resolve_musicbrainz_metadata(recording_mbid: str) -> dict[str, Any]:
+    """Resolve performers and work authors for one selected MusicBrainz recording."""
+    import time
+
+    mbid = str(recording_mbid or "").strip()
+    if not mbid:
+        raise ValueError("MusicBrainz recording id missing")
+    recording = _read_json(f"{MUSICBRAINZ_API}/recording/{mbid}", {
+        "fmt": "json",
+        "inc": "artist-credits+work-rels+isrcs",
+    })
+    performers = _mb_artist_credit(recording.get("artist-credit") if isinstance(recording, dict) else [])
+    works: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for rel in (recording.get("relations") or []) if isinstance(recording, dict) else []:
+        if not isinstance(rel, dict) or not isinstance(rel.get("work"), dict):
+            continue
+        work = rel["work"]
+        wid = str(work.get("id") or "").strip()
+        if wid and wid not in seen:
+            seen.add(wid)
+            works.append(work)
+    authors: list[str] = []
+    identifiers: dict[str, str] = {}
+    original_title = ""
+    # MusicBrainz asks clients to stay at or below one request per second.
+    for index, work in enumerate(works[:3]):
+        if index or recording:
+            time.sleep(1.05)
+        wid = str(work.get("id") or "")
+        full = _read_json(f"{MUSICBRAINZ_API}/work/{wid}", {"fmt": "json", "inc": "artist-rels"})
+        if not original_title:
+            original_title = str(full.get("title") or work.get("title") or "").strip()
+        iswcs = full.get("iswcs") or []
+        if iswcs and "ISWC" not in identifiers:
+            identifiers["ISWC"] = str(iswcs[0])
+        for rel in full.get("relations") or []:
+            if not isinstance(rel, dict) or not isinstance(rel.get("artist"), dict):
+                continue
+            if str(rel.get("type") or "").lower() not in {"composer", "lyricist", "writer", "librettist"}:
+                continue
+            name = str(rel["artist"].get("name") or "").strip()
+            if name and name not in authors:
+                authors.append(name)
+    isrcs = recording.get("isrcs") or [] if isinstance(recording, dict) else []
+    if isrcs:
+        identifiers["ISRC"] = str(isrcs[0])
+    identifiers["MUSICBRAINZ_RECORDING"] = mbid
+    return {
+        "provider": "MUSICBRAINZ",
+        "mbid": mbid,
+        "title": str(recording.get("title") or "") if isinstance(recording, dict) else "",
+        "original_title": original_title,
+        "authors": authors,
+        "performers": performers,
+        "identifiers": identifiers,
+        "source_url": f"https://musicbrainz.org/recording/{mbid}",
     }

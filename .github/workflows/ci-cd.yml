@@ -669,7 +669,7 @@ jobs:
           revision="$(tr -d '\r\n' < REVISION)"
           git archive --format=zip --output "early-assets/MTA-Audio-Editor-${version}-r${revision}-source.zip" HEAD
           cat > early-assets/early-update.json <<EOF
-          {"channel":"early","version":"${version}","revision":"${revision}","commit_sha":"${GITHUB_SHA}","ref":"main","repository":"${GITHUB_REPOSITORY}"}
+          {"channel":"early","version":"${version}","revision":"${revision}","release":"${version}-r${revision}","commit_sha":"${GITHUB_SHA}","ref":"main","repository":"${GITHUB_REPOSITORY}"}
           EOF
           sha256sum early-assets/* > early-assets/SHA256SUMS-early-main
       - name: Update rolling early-main GitHub prerelease
@@ -684,6 +684,13 @@ jobs:
           git push origin refs/tags/early-main --force
           if gh release view early-main --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             gh release edit early-main --repo "$GITHUB_REPOSITORY" --title "MTA Audio Editor Early Release" --prerelease --target main
+            # early-main is rolling: remove assets from previous revisions so
+            # native clients cannot accidentally select a stale installer.
+            release_id="$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/early-main" --jq .id)"
+            gh api "repos/${GITHUB_REPOSITORY}/releases/${release_id}/assets" --paginate --jq '.[].id' > /tmp/early-main-asset-ids
+            while read -r asset_id; do
+              [ -n "$asset_id" ] && gh api -X DELETE "repos/${GITHUB_REPOSITORY}/releases/assets/${asset_id}"
+            done < /tmp/early-main-asset-ids
           else
             gh release create early-main --repo "$GITHUB_REPOSITORY" --title "MTA Audio Editor Early Release" --notes "Rolling packages built from main. Use the Stable channel for tagged releases." --prerelease --target main
           fi

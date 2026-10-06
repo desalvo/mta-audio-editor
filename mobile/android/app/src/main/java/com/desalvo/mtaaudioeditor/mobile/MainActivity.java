@@ -294,13 +294,13 @@ public final class MainActivity extends Activity {
     }
 
     private void checkForAppUpdate(boolean manual) {
-        GitHubUpdateManager.check(ioExecutor, BuildConfig.VERSION_NAME, updateChannel(), (info, error) -> runOnUiThread(() -> {
+        GitHubUpdateManager.check(ioExecutor, BuildConfig.VERSION_NAME + "-r" + BuildConfig.MTA_REVISION, updateChannel(), (info, error) -> runOnUiThread(() -> {
             if (error != null) {
                 if (manual) Toast.makeText(this, "Controllo aggiornamenti fallito: " + error.getMessage(), Toast.LENGTH_LONG).show();
                 return;
             }
             if (info == null || !info.available) {
-                if (manual) Toast.makeText(this, "MTA Audio Editor è aggiornato (" + BuildConfig.VERSION_NAME + ")", Toast.LENGTH_LONG).show();
+                if (manual) Toast.makeText(this, "MTA Audio Editor è aggiornato (" + BuildConfig.VERSION_NAME + "-r" + BuildConfig.MTA_REVISION + ")", Toast.LENGTH_LONG).show();
                 return;
             }
             String channelLabel = "early".equals(info.channel) ? "Early release" : "Stable";

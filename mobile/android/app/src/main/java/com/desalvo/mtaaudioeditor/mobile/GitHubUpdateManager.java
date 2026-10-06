@@ -51,14 +51,31 @@ final class GitHubUpdateManager {
                 String assetUrl = "", assetName = "";
                 JSONArray assets = root.optJSONArray("assets");
                 if (assets != null) {
+                    if ("early".equals(channel)) {
+                        String rolling = latestAssetRelease(assets);
+                        if (!rolling.isEmpty()) latest = rolling;
+                    }
+                    List<JSONObject> apkCandidates = new ArrayList<>();
                     for (int i = 0; i < assets.length(); i++) {
                         JSONObject asset = assets.getJSONObject(i);
                         String name = asset.optString("name", "");
                         String low = name.toLowerCase();
-                        if (low.endsWith(".apk") && low.contains("android") && (low.contains("release") || assetName.isEmpty())) {
-                            assetName = name;
-                            assetUrl = asset.optString("browser_download_url", "");
-                            if (low.contains("release")) break;
+                        if (low.endsWith(".apk") && low.contains("android")) apkCandidates.add(asset);
+                    }
+                    for (JSONObject asset : apkCandidates) {
+                        String name = asset.optString("name", "");
+                        String low = name.toLowerCase();
+                        if (name.contains(latest) && low.contains("release")) {
+                            assetName = name; assetUrl = asset.optString("browser_download_url", ""); break;
+                        }
+                    }
+                    if (assetName.isEmpty()) {
+                        for (int i = apkCandidates.size() - 1; i >= 0; i--) {
+                            JSONObject asset = apkCandidates.get(i);
+                            String name = asset.optString("name", "");
+                            if (name.toLowerCase().contains("release")) {
+                                assetName = name; assetUrl = asset.optString("browser_download_url", ""); break;
+                            }
                         }
                     }
                 }
@@ -66,6 +83,20 @@ final class GitHubUpdateManager {
             } catch (Exception exc) { callback.done(null, exc); }
             finally { if (c != null) c.disconnect(); }
         });
+    }
+
+
+    private static String latestAssetRelease(JSONArray assets) {
+        String best = "";
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("(\\d+\\.\\d+\\.\\d+)(?:-r?|-)(\\d+)", java.util.regex.Pattern.CASE_INSENSITIVE);
+        for (int i = 0; i < assets.length(); i++) {
+            String name = assets.optJSONObject(i) == null ? "" : assets.optJSONObject(i).optString("name", "");
+            java.util.regex.Matcher matcher = pattern.matcher(name);
+            if (!matcher.find()) continue;
+            String candidate = matcher.group(1) + "-r" + matcher.group(2);
+            if (best.isEmpty() || isNewer(candidate, best)) best = candidate;
+        }
+        return best;
     }
 
     static boolean isNewer(String remote, String local) {

@@ -26,6 +26,21 @@ final class NativeUpdateManager {
         value.split(whereSeparator: { !$0.isNumber }).compactMap { Int($0) }
     }
 
+    private func latestAssetRelease(_ assets: [[String: Any]]) -> String? {
+        let regex = try? NSRegularExpression(pattern: #"(\d+\.\d+\.\d+)(?:-r?|-)(\d+)"#, options: [.caseInsensitive])
+        var best = ""
+        for asset in assets {
+            let name = String(describing: asset["name"] ?? "")
+            let range = NSRange(name.startIndex..<name.endIndex, in: name)
+            guard let match = regex?.firstMatch(in: name, range: range),
+                  let vRange = Range(match.range(at: 1), in: name),
+                  let rRange = Range(match.range(at: 2), in: name) else { continue }
+            let candidate = "\(name[vRange])-r\(name[rRange])"
+            if best.isEmpty || isNewer(candidate, than: best) { best = candidate }
+        }
+        return best.isEmpty ? nil : best
+    }
+
     private func isNewer(_ remote: String, than local: String) -> Bool {
         let a = versionKey(remote), b = versionKey(local)
         let count = max(a.count, b.count)
@@ -54,12 +69,20 @@ final class NativeUpdateManager {
                 let object = try JSONSerialization.jsonObject(with: data) as? [String: Any] ?? [:]
                 let tag = String(describing: object["tag_name"] ?? "")
                 let name = String(describing: object["name"] ?? "")
-                let remote = name.replacingOccurrences(of: "MTA Audio Editor ", with: "").isEmpty ? tag : name.replacingOccurrences(of: "MTA Audio Editor ", with: "")
-                let current = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0"
+                var remote = name.replacingOccurrences(of: "MTA Audio Editor ", with: "").isEmpty ? tag : name.replacingOccurrences(of: "MTA Audio Editor ", with: "")
+                let shortVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0"
+                let revision = Bundle.main.object(forInfoDictionaryKey: "MTAEditorRevision") as? String ?? "0"
+                let current = "\(shortVersion)-r\(revision)"
                 let release = URL(string: String(describing: object["html_url"] ?? "https://github.com/\(Self.repository)/releases"))!
                 var assetURL: URL?
                 if let assets = object["assets"] as? [[String: Any]] {
-                    let ipa = assets.first { String(describing: $0["name"] ?? "").lowercased().hasSuffix(".ipa") }
+                    if selected == "early", let rolling = self.latestAssetRelease(assets), !rolling.isEmpty {
+                        remote = rolling
+                    }
+                    let ipa = assets.reversed().first { asset in
+                        let assetName = String(describing: asset["name"] ?? "")
+                        return assetName.lowercased().hasSuffix(".ipa") && (remote.isEmpty || assetName.contains(remote))
+                    }
                     if let raw = ipa?["browser_download_url"] as? String { assetURL = URL(string: raw) }
                 }
                 let info = GitHubUpdateInfo(channel: selected, currentVersion: current, latestVersion: remote, available: self.isNewer(remote, than: current), releaseURL: release, assetURL: assetURL)

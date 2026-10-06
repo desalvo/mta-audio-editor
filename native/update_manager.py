@@ -32,6 +32,24 @@ def is_newer(remote: str, local: str) -> bool:
     return a + (0,) * (size - len(a)) > b + (0,) * (size - len(b))
 
 
+def asset_release_version(name: str) -> str:
+    match = re.search(r"(\d+\.\d+\.\d+(?:-r?\d+|-\d+)?)", str(name or ""), re.IGNORECASE)
+    if not match:
+        return ""
+    value = match.group(1)
+    # Historical early packages used 0.2.0-106; normalize them to the
+    # current 0.2.0-r106 convention for consistent display/comparison.
+    return re.sub(r"-(\d+)$", r"-r\1", value)
+
+
+def latest_asset_release(assets: list[dict]) -> str:
+    versions = [asset_release_version(str(asset.get("name", ""))) for asset in assets]
+    versions = [value for value in versions if value]
+    if not versions:
+        return ""
+    return max(versions, key=version_key)
+
+
 def _get_json(url: str) -> dict:
     if not str(url).lower().startswith("https://"):
         raise ValueError("update metadata URL must use HTTPS")
@@ -62,19 +80,30 @@ def sys_platform() -> str:
     return sys.platform
 
 
-def choose_asset(assets: list[dict]) -> dict | None:
+def choose_asset(assets: list[dict], release_version: str = "") -> dict | None:
     names = [(asset, str(asset.get("name", "")).lower()) for asset in assets]
-    if os.name == "nt":
-        for asset, name in names:
-            if name.endswith(".exe") and "windows" in name:
-                return asset
-    elif sys_platform() == "darwin":
-        machine = platform.machine().lower()
-        arch = "arm64" if machine in {"arm64", "aarch64"} else "x64"
-        for asset, name in names:
-            if name.endswith(".dmg") and "macos" in name and arch in name:
-                return asset
-    return None
+    wanted = str(release_version or "").strip().lower()
+
+    def eligible(name: str) -> bool:
+        if os.name == "nt":
+            return name.endswith(".exe") and "windows" in name
+        if sys_platform() == "darwin":
+            machine = platform.machine().lower()
+            arch = "arm64" if machine in {"arm64", "aarch64"} else "x64"
+            return name.endswith(".dmg") and "macos" in name and arch in name
+        return False
+
+    candidates = [(asset, name) for asset, name in names if eligible(name)]
+    if not candidates:
+        return None
+    if wanted:
+        exact = [(asset, name) for asset, name in candidates if wanted in name]
+        if exact:
+            candidates = exact
+    # Rolling early-main can retain assets from older revisions. Prefer the
+    # newest candidate when an exact version match is unavailable.
+    candidates.sort(key=lambda item: (str(item[0].get("created_at") or ""), int(item[0].get("id") or 0)), reverse=True)
+    return candidates[0][0]
 
 
 def check_for_update(current_version: str, channel: str = "stable") -> dict:
@@ -82,15 +111,31 @@ def check_for_update(current_version: str, channel: str = "stable") -> dict:
     endpoint = f"{GITHUB_API}/releases/latest" if normalized == "stable" else f"{GITHUB_API}/releases/tags/early-main"
     release = _get_json(endpoint)
     remote_version = str(release.get("name") or release.get("tag_name") or "").replace("MTA Audio Editor ", "").strip()
+    assets = list(release.get("assets", []))
+    manifest: dict = {}
     if normalized == "early":
-        manifest_asset = next((a for a in release.get("assets", []) if a.get("name") == "early-update.json"), None)
+        # The early-main GitHub release has a fixed human-readable name, so
+        # derive a usable release from its actual packages even if the manifest
+        # is temporarily unavailable.
+        asset_release = latest_asset_release(assets)
+        if asset_release:
+            remote_version = asset_release
+        manifest_asset = next((a for a in assets if a.get("name") == "early-update.json"), None)
         if manifest_asset and manifest_asset.get("browser_download_url"):
             try:
                 manifest = _get_json(str(manifest_asset["browser_download_url"]))
-                remote_version = str(manifest.get("version") or remote_version)
+                manifest_version = str(manifest.get("version") or "").strip()
+                manifest_revision = str(manifest.get("revision") or "").strip()
+                manifest_release = str(manifest.get("release") or "").strip()
+                if manifest_release:
+                    remote_version = manifest_release
+                elif manifest_version and manifest_revision:
+                    remote_version = f"{manifest_version}-r{manifest_revision}"
+                elif manifest_version:
+                    remote_version = manifest_version
             except Exception as exc:
                 LOG.warning("Unable to read early-release update manifest: %s", exc)
-    asset = choose_asset(list(release.get("assets", [])))
+    asset = choose_asset(assets, remote_version)
     return {
         "ok": True,
         "channel": normalized,

@@ -9,7 +9,7 @@ import uuid
 from pathlib import Path
 
 from .audio_engine import media_duration_ms, project_time_pitch_filter, render_track
-from .models import Chord, Clip, LyricLine, MtaSlotMapping, Project, RightsRecord, Track
+from .models import Chord, Clip, LyricLine, Marker, MtaSlotMapping, Project, RightsRecord, Track
 from .mta_writer import normalize_matroska_for_mta
 from .mta_reverse import (
     analyze_mta,
@@ -161,6 +161,7 @@ def import_mta(path: Path, project: Project) -> Project:
                             sync = json.loads(out.read_text(encoding="utf-8"))
                             project.lyrics = [LyricLine(**item) for item in sync.get("lyrics", [])]
                             project.chords = [Chord(**item) for item in sync.get("chords", [])]
+                            project.markers = [Marker(**item) for item in sync.get("markers", [])]
                             project.original_title = str(sync.get("original_title") or project.original_title or "")[:300]
                             project.authors = [str(x)[:200] for x in (sync.get("authors") or []) if str(x).strip()][:64]
                             project.rights_records = [RightsRecord(**item) for item in (sync.get("rights_records") or [])][:32]
@@ -205,37 +206,43 @@ def _metadata_attachment(project: Project) -> Path:
 
 
 def _synchronized_text_attachments(project: Project) -> list[Path]:
-    """Create timestamped project attachments embedded in every exported MTA.
+    """Create lossless synchronized-event attachments for MTA exports.
 
-    These attachments preserve exact millisecond synchronization independently of
-    the audio slot mapping. Stock proprietary SYL attachments are preserved too;
-    the editor-specific JSON/LRC/TSV payloads provide a lossless round trip for
-    newly extracted or edited lyrics/chords.
+    Manual editor overrides are authoritative. Disabled/deleted events remain in
+    mta-editor.json for recovery but are intentionally omitted from synchronized
+    playback attachments.
     """
     out: list[Path] = []
     adir = pdir(project.id) / "attachments"
     adir.mkdir(parents=True, exist_ok=True)
-    if project.lyrics:
+    active_lyrics = [x for x in project.lyrics if not getattr(x, "disabled", False) and not getattr(x, "deleted", False)]
+    active_chords = [x for x in project.chords if not x.excluded and not getattr(x, "deleted", False)]
+    active_markers = [x for x in project.markers if not getattr(x, "disabled", False) and not getattr(x, "deleted", False)]
+    if active_lyrics:
         lrc = adir / "lyrics-synchronized.lrc"
-        lrc.write_text(synchronized_plain_text(project.lyrics, []), encoding="utf-8")
+        lrc.write_text(synchronized_plain_text(active_lyrics, []), encoding="utf-8")
         out.append(lrc)
-    active_chords = [item for item in project.chords if not item.excluded]
     if active_chords:
         chords = adir / "chords-synchronized.tsv"
         chords.write_text("\n".join(f"{item.time_ms}\t{item.chord}" for item in sorted(active_chords, key=lambda x: x.time_ms)) + "\n", encoding="utf-8")
         out.append(chords)
-    if project.lyrics or active_chords or project.rights_records or project.original_title or project.authors:
+    if active_markers:
+        markers = adir / "markers-synchronized.tsv"
+        markers.write_text("\n".join(f"{item.time_ms}\t{item.label}\t{item.color}" for item in sorted(active_markers, key=lambda x: x.time_ms)) + "\n", encoding="utf-8")
+        out.append(markers)
+    if active_lyrics or active_chords or active_markers or project.rights_records or project.original_title or project.authors:
         sync = adir / "mta-synchronized-text.json"
         sync.write_text(json.dumps({
-            "schema": "mta-audio-editor/synchronized-text-v1",
+            "schema": "mta-audio-editor/synchronized-text-v2",
             "timebase": "milliseconds-from-project-start",
             "title": project.title,
             "original_title": project.original_title,
             "artist": project.artist,
             "authors": project.authors,
-            "lyrics": [x.model_dump() for x in project.lyrics],
-            "chords": [x.model_dump(exclude={"excluded"}) for x in active_chords],
-            "editor_overrides_applied": True,
+            "lyrics": [x.model_dump(exclude={"disabled", "deleted", "source_snapshot"}) for x in active_lyrics],
+            "chords": [x.model_dump(exclude={"excluded", "deleted", "source_snapshot"}) for x in active_chords],
+            "markers": [x.model_dump(exclude={"disabled", "deleted", "source_snapshot"}) for x in active_markers],
+            "editor_overrides_applied": any(getattr(x, "manual_override", False) for x in [*project.lyrics, *project.chords, *project.markers]) or any(x.manual_anchor for x in project.chords),
             "rights_records": [x.model_dump(mode="json") for x in project.rights_records],
             "rights_societies": project.rights_societies,
         }, ensure_ascii=False, indent=2), encoding="utf-8")

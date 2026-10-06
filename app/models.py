@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -104,6 +104,11 @@ class Track(BaseModel):
 class Marker(BaseModel):
     time_ms: int = Field(ge=0)
     label: str = Field(max_length=500)
+    color: str = Field(default="#204A87", pattern=r"^#[0-9A-Fa-f]{6}$")
+    disabled: bool = False
+    deleted: bool = False
+    manual_override: bool = False
+    source_snapshot: dict[str, Any] | None = None
 
 
 class LyricSyllable(BaseModel):
@@ -124,6 +129,10 @@ class LyricLine(BaseModel):
     end_ms: int | None = Field(default=None, ge=0)
     text: str = Field(max_length=4000)
     words: list[LyricWord] = Field(default_factory=list, max_length=500)
+    disabled: bool = False
+    deleted: bool = False
+    manual_override: bool = False
+    source_snapshot: dict[str, Any] | None = None
 
 
 class Chord(BaseModel):
@@ -139,6 +148,24 @@ class Chord(BaseModel):
     # source analysis event. Excluded chords are ignored by playback, documents and
     # synchronized MTA export events, while remaining recoverable in the project.
     excluded: bool = False
+    deleted: bool = False
+    manual_override: bool = False
+    source_snapshot: dict[str, Any] | None = None
+
+
+class PdfTextStyle(BaseModel):
+    style: Literal["normal", "bold", "italic"] = "normal"
+    size: float = Field(default=11.0, ge=6.0, le=48.0)
+    color: str = Field(default="#111111", pattern=r"^#[0-9A-Fa-f]{6}$")
+
+
+class LyricsPdfStyle(BaseModel):
+    title: PdfTextStyle = Field(default_factory=lambda: PdfTextStyle(style="bold", size=18, color="#111111"))
+    subtitle: PdfTextStyle = Field(default_factory=lambda: PdfTextStyle(style="normal", size=11, color="#333333"))
+    bpm: PdfTextStyle = Field(default_factory=lambda: PdfTextStyle(style="normal", size=11, color="#333333"))
+    lyrics: PdfTextStyle = Field(default_factory=lambda: PdfTextStyle(style="normal", size=11, color="#111111"))
+    chords: PdfTextStyle = Field(default_factory=lambda: PdfTextStyle(style="bold", size=9, color="#7B1FA2"))
+    markers: PdfTextStyle = Field(default_factory=lambda: PdfTextStyle(style="bold", size=12, color="#204A87"))
 
 
 class RightsRecord(BaseModel):
@@ -249,6 +276,7 @@ class Project(BaseModel):
     markers: list[Marker] = Field(default_factory=list)
     lyrics: list[LyricLine] = Field(default_factory=list)
     chords: list[Chord] = Field(default_factory=list)
+    lyrics_pdf_style: LyricsPdfStyle = Field(default_factory=LyricsPdfStyle)
     lyrics_engine: str = Field(default="", max_length=80)
     lyrics_model: str = Field(default="", max_length=80)
     chords_engine: str = Field(default="", max_length=80)

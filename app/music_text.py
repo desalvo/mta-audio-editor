@@ -16,7 +16,7 @@ from typing import Callable
 
 import numpy as np
 
-from .models import Chord, LyricLine, LyricSyllable, LyricWord, RightsRecord, Track
+from .models import Chord, LyricLine, LyricSyllable, LyricWord, Marker, RightsRecord, Track
 
 
 logger = logging.getLogger(__name__)
@@ -773,7 +773,7 @@ def extract_chords(path: Path, *, interval_ms: int = 500, engine: str | None = N
     return events
 
 
-def map_source_events_to_timeline(track: Track, events: list[LyricLine] | list[Chord]) -> list[LyricLine] | list[Chord]:
+def map_source_events_to_timeline(track: Track, events: list[LyricLine] | list[Chord] | list[Marker]) -> list[LyricLine] | list[Chord] | list[Marker]:
     if not track.clips:
         return events
     mapped = []
@@ -797,12 +797,71 @@ def map_source_events_to_timeline(track: Track, events: list[LyricLine] | list[C
     return mapped
 
 
+
+def extract_markers(path: Path, *, progress: Callable[[int, list[Marker], str], None] | None = None, cancelled: Callable[[], bool] | None = None) -> list[Marker]:
+    """Infer coarse musical section boundaries from spectral/energy novelty.
+
+    This is intentionally conservative: it emits section markers, not a marker for
+    every local audio change. Users can refine/rename them in the joint editor.
+    """
+    if cancelled and cancelled():
+        raise InterruptedError("Marker extraction cancelled")
+    if progress:
+        progress(12, [], "Analisi struttura del brano")
+    samples, sr = _pcm_mono(path)
+    if samples.size < sr * 4:
+        return [Marker(time_ms=0, label="Intro")]
+    hop = max(1, int(sr * 1.0))
+    win = max(hop, int(sr * 2.0))
+    energies=[]; centroids=[]; times=[]
+    for start in range(0, max(1, len(samples)-win+1), hop):
+        if cancelled and cancelled():
+            raise InterruptedError("Marker extraction cancelled")
+        chunk=samples[start:start+win]
+        if len(chunk)<win:
+            chunk=np.pad(chunk,(0,win-len(chunk)))
+        rms=float(np.sqrt(np.mean(np.square(chunk, dtype=np.float64))+1e-12))
+        spec=np.abs(np.fft.rfft(chunk*np.hanning(len(chunk))))
+        freqs=np.fft.rfftfreq(len(chunk),1.0/sr)
+        centroid=float((spec*freqs).sum()/max(1e-9,spec.sum()))
+        energies.append(rms);centroids.append(centroid);times.append(int(start/sr*1000))
+    e=np.asarray(energies,dtype=np.float64);c=np.asarray(centroids,dtype=np.float64)
+    def z(v):
+        return (v-np.median(v))/(np.std(v)+1e-9)
+    novelty=np.zeros_like(e)
+    if len(e)>1:
+        novelty[1:]=np.abs(np.diff(z(e)))+0.45*np.abs(np.diff(z(c)))
+    duration_ms=int(len(samples)/sr*1000)
+    min_gap_ms=8000
+    max_sections=max(2,min(10,int(duration_ms/30000)+2))
+    candidates=sorted(range(1,len(novelty)), key=lambda i: float(novelty[i]), reverse=True)
+    chosen=[0]
+    for idx in candidates:
+        t=times[idx]
+        if t<5000 or duration_ms-t<5000:
+            continue
+        if all(abs(t-times[j])>=min_gap_ms for j in chosen):
+            chosen.append(idx)
+        if len(chosen)>=max_sections:
+            break
+    chosen=sorted(chosen,key=lambda i:times[i])
+    labels=[]
+    cycle=["Verse", "Chorus", "Verse", "Chorus", "Bridge", "Chorus"]
+    for pos,idx in enumerate(chosen):
+        if pos==0: label="Intro"
+        elif pos==len(chosen)-1 and duration_ms-times[idx] < 20000: label="Outro"
+        else: label=cycle[(pos-1)%len(cycle)]
+        labels.append(Marker(time_ms=max(0,times[idx]),label=label))
+    if progress:
+        progress(96, [], "Marker/sezioni estratti")
+    return labels
+
 def synchronized_plain_text(lyrics: list[LyricLine], chords: list[Chord] | None = None) -> str:
-    chords = sorted((ch for ch in (chords or []) if not ch.excluded), key=lambda x: x.time_ms)
+    chords = sorted((ch for ch in (chords or []) if not ch.excluded and not getattr(ch, "deleted", False)), key=lambda x: x.time_ms)
     lines: list[str] = []
     ci = 0
     active = ""
-    for lyric in sorted(lyrics, key=lambda x: x.time_ms):
+    for lyric in sorted((x for x in lyrics if not getattr(x, "disabled", False) and not getattr(x, "deleted", False)), key=lambda x: x.time_ms):
         while ci < len(chords) and chords[ci].time_ms <= lyric.time_ms:
             active = chords[ci].chord
             ci += 1
@@ -830,7 +889,7 @@ def build_chordpro(*, title: str, artist: str, key: str, bpm: float | None, lyri
         lines.append(f"{{tempo: {float(bpm):g}}}")
     lines.append("")
     ordered_chords = sorted((ch for ch in chords if not ch.excluded), key=lambda x: x.time_ms)
-    ordered_lyrics = sorted(lyrics, key=lambda x: x.time_ms)
+    ordered_lyrics = sorted((x for x in lyrics if not getattr(x, "disabled", False) and not getattr(x, "deleted", False)), key=lambda x: x.time_ms)
     for li, lyric in enumerate(ordered_lyrics):
         next_time = ordered_lyrics[li + 1].time_ms if li + 1 < len(ordered_lyrics) else (lyric.end_ms or lyric.time_ms + 8000)
         inside = [c for c in ordered_chords if lyric.time_ms <= c.time_ms < next_time]
@@ -913,299 +972,252 @@ def _manual_chord_word_index(chord: Chord, word_count: int) -> int | None:
     return max(0, min(int(chord.anchor_word_index), word_count - 1))
 
 
-def build_lyrics_pdf(out: Path, *, title: str, artist: str, lyrics: list[LyricLine], chords: list[Chord], chord_color: str = "#7B1FA2", key: str = "", bpm: float | None = None, rights_records: list[RightsRecord] | None = None) -> Path:
+def _pdf_fonts() -> dict[str, str]:
+    from reportlab.pdfbase import pdfmetrics
+    from reportlab.pdfbase.ttfonts import TTFont
+
+    candidates = {
+        "normal": [Path("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"), Path("C:/Windows/Fonts/arial.ttf")],
+        "bold": [Path("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"), Path("C:/Windows/Fonts/arialbd.ttf")],
+        "italic": [Path("/usr/share/fonts/truetype/dejavu/DejaVuSans-Oblique.ttf"), Path("C:/Windows/Fonts/ariali.ttf")],
+    }
+    names = {"normal": "Helvetica", "bold": "Helvetica-Bold", "italic": "Helvetica-Oblique"}
+    for style, paths in candidates.items():
+        for candidate in paths:
+            if candidate.is_file():
+                name = f"MTAUnicode-{style}"
+                try:
+                    pdfmetrics.registerFont(TTFont(name, str(candidate)))
+                    names[style] = name
+                    break
+                except Exception as exc:
+                    logger.debug("Unable to register PDF font %s: %s", candidate, exc)
+    return names
+
+
+def build_lyrics_pdf(
+    out: Path, *, title: str, artist: str, lyrics: list[LyricLine], chords: list[Chord],
+    chord_color: str = "#7B1FA2", key: str = "", bpm: float | None = None,
+    rights_records: list[RightsRecord] | None = None, markers: list[Marker] | None = None,
+    pdf_style: dict | None = None,
+) -> Path:
     from reportlab.lib.pagesizes import A4
     from reportlab.lib.colors import HexColor, black
     from reportlab.pdfgen import canvas
 
     out.parent.mkdir(parents=True, exist_ok=True)
-    font = _pdf_font()
+    fonts = _pdf_fonts()
+    default_style = {
+        "title": {"style": "bold", "size": 18, "color": "#111111"},
+        "subtitle": {"style": "normal", "size": 11, "color": "#333333"},
+        "bpm": {"style": "normal", "size": 11, "color": "#333333"},
+        "lyrics": {"style": "normal", "size": 11, "color": "#111111"},
+        "chords": {"style": "bold", "size": 9, "color": chord_color},
+        "markers": {"style": "bold", "size": 12, "color": "#204A87"},
+    }
+    # Preserve direct chord_color compatibility for older callers/tests; project
+    # typography may override it below.
+    try:
+        legacy_chord_fill = HexColor(chord_color)
+    except Exception:
+        legacy_chord_fill = HexColor("#7B1FA2")
+    del legacy_chord_fill
+    incoming = pdf_style or {}
+    styles = {k: {**v, **(incoming.get(k) or {})} for k, v in default_style.items()}
+    if chord_color and chord_color != "#7B1FA2" and not (incoming.get("chords") or {}).get("color"):
+        styles["chords"]["color"] = chord_color
+
+    def st(kind: str) -> tuple[str, float, object]:
+        cfg = styles[kind]
+        style_name = str(cfg.get("style") or "normal").lower()
+        if style_name not in fonts:
+            style_name = "normal"
+        try:
+            color = HexColor(str(cfg.get("color") or "#111111"))
+        except Exception:
+            color = black
+        return fonts[style_name], float(cfg.get("size") or 11), color
+
     c = canvas.Canvas(str(out), pagesize=A4, pageCompression=1)
     width, height = A4
     margin = 48
     usable_width = width - 2 * margin
     y = height - 54
 
-    try:
-        chord_fill = HexColor(chord_color)
-    except Exception:
-        chord_fill = HexColor("#7B1FA2")
+    def safe(text: str) -> str:
+        return str(text or "")
+
+    def set_style(kind: str) -> tuple[str, float]:
+        font, size, color = st(kind)
+        c.setFont(font, size)
+        c.setFillColor(color)
+        return font, size
 
     def new_page() -> None:
         nonlocal y
         c.showPage()
         y = height - 54
 
-    def safe(text: str) -> str:
-        if font == "Helvetica":
-            return text.encode("latin-1", errors="replace").decode("latin-1")
-        return text
-
-    def wrap_plain(text: str, size: int) -> list[str]:
-        words = safe(text).split()
-        if not words:
-            return [""]
-        lines: list[str] = []
-        line = ""
-        for word in words:
-            candidate = f"{line} {word}".strip()
-            if c.stringWidth(candidate, font, size) > usable_width and line:
-                lines.append(line)
-                line = word
-            else:
-                line = candidate
-        if line:
-            lines.append(line)
-        return lines or [""]
-
     def ensure(space: float) -> None:
-        nonlocal y
         if y - space < 56:
             new_page()
 
-    def chord_anchor_x(word_entries: list[dict], chord: Chord) -> float:
+    def wrap_text(text: str, kind: str, max_width: float = usable_width) -> list[str]:
+        font, size, _ = st(kind)
+        words = safe(text).split()
+        if not words:
+            return [""]
+        lines=[]; line=""
+        for word in words:
+            candidate=f"{line} {word}".strip()
+            if line and c.stringWidth(candidate,font,size)>max_width:
+                lines.append(line);line=word
+            else:
+                line=candidate
+        if line: lines.append(line)
+        return lines or [""]
+
+    def estimated_words(lyric: LyricLine, line_end: int) -> list[dict]:
+        lyric_style = st("lyrics")
+        font,size,_ = lyric_style
+        words = [w for w in (lyric.words or []) if str(w.text or "").strip()]
+        if words:
+            source=[{"text":str(w.text).strip(),"start_ms":int(w.start_ms),"end_ms":int(max(w.start_ms,w.end_ms)),"syllables":getattr(w,"syllables",[]) or []} for w in words]
+        else:
+            tokens=str(lyric.text or "").split()
+            start=int(lyric.time_ms); end=max(start+1,int(lyric.end_ms or line_end or start+max(1200,len(tokens)*420)))
+            span=end-start
+            source=[]
+            for i,token in enumerate(tokens):
+                source.append({"text":token,"start_ms":round(start+span*i/max(1,len(tokens))),"end_ms":round(start+span*(i+1)/max(1,len(tokens))),"syllables":[]})
+        entries=[];x=margin;space=c.stringWidth(" ",font,size)
+        for item in source:
+            text=safe(item["text"]); w=c.stringWidth(text,font,size)
+            if entries and x+w>margin+usable_width:
+                # This function models one visual row at a time; callers split by x reset.
+                x=margin
+            syll=[];sx=x
+            raw_syll=item.get("syllables") or []
+            for syl in raw_syll:
+                sw=c.stringWidth(safe(getattr(syl,"text","")),font,size)
+                syll.append({"start_ms":int(getattr(syl,"start_ms",item["start_ms"])),"end_ms":int(getattr(syl,"end_ms",item["end_ms"])),"x":sx,"width":sw})
+                sx+=sw
+            entries.append({**item,"x":x,"width":w,"syllables":syll})
+            x+=w+space
+        return entries
+
+    def chord_x(chord: Chord, word_entries: list[dict], line_start: int, line_end: int) -> float:
         if not word_entries:
-            return margin
+            rel=max(0,min(1,(int(chord.time_ms)-line_start)/max(1,line_end-line_start)))
+            return margin+rel*usable_width
         manual_index = _manual_chord_word_index(chord, len(word_entries))
         if manual_index is not None:
             return word_entries[manual_index]["x"]
-        chord_time = int(chord.time_ms)
-        for idx, entry in enumerate(word_entries):
-            start_ms = entry["start_ms"]
-            end_ms = entry["end_ms"]
-            word_end_x = entry["x"] + entry["width"]
-            if start_ms <= chord_time <= max(start_ms, end_ms):
-                syllables = entry.get("syllables") or []
-                if syllables:
-                    for syllable in syllables:
-                        if syllable["start_ms"] <= chord_time <= syllable["end_ms"]:
-                            span = max(1, syllable["end_ms"] - syllable["start_ms"])
-                            rel = max(0.0, min(1.0, (chord_time - syllable["start_ms"]) / span))
-                            return syllable["x"] + rel * max(3.0, syllable["width"])
-                span = max(1, end_ms - start_ms)
-                rel = max(0.0, min(1.0, (chord_time - start_ms) / span))
-                return entry["x"] + rel * max(4.0, entry["width"])
-            if idx + 1 < len(word_entries):
-                next_entry = word_entries[idx + 1]
-                if end_ms <= chord_time < next_entry["start_ms"]:
-                    span = max(1, next_entry["start_ms"] - end_ms)
-                    rel = max(0.0, min(1.0, (chord_time - end_ms) / span))
-                    gap = max(4.0, next_entry["x"] - word_end_x)
-                    return word_end_x + rel * gap
-        if chord_time < word_entries[0]["start_ms"]:
-            return word_entries[0]["x"]
-        last = word_entries[-1]
-        return last["x"] + last["width"]
+        t=int(chord.time_ms)
+        for i,w in enumerate(word_entries):
+            if w["start_ms"] <= t <= max(w["start_ms"],w["end_ms"]):
+                for syl in w.get("syllables") or []:
+                    if syl["start_ms"] <= t <= syl["end_ms"]:
+                        rel=(t-syl["start_ms"])/max(1,syl["end_ms"]-syl["start_ms"])
+                        return syl["x"]+rel*max(3,syl["width"])
+                rel=(t-w["start_ms"])/max(1,w["end_ms"]-w["start_ms"])
+                return w["x"]+rel*max(4,w["width"])
+            if i+1<len(word_entries) and w["end_ms"] < t < word_entries[i+1]["start_ms"]:
+                rel=(t-w["end_ms"])/max(1,word_entries[i+1]["start_ms"]-w["end_ms"])
+                return (w["x"]+w["width"])+rel*max(4,word_entries[i+1]["x"]-(w["x"]+w["width"]))
+        return word_entries[0]["x"] if t<word_entries[0]["start_ms"] else word_entries[-1]["x"]+word_entries[-1]["width"]
 
-    def draw_wrapped_lyric_line(lyric: LyricLine, line_chords: list[Chord]) -> None:
+    def marker_color(marker: Marker):
+        try:
+            return HexColor(str(getattr(marker, "color", "") or styles["markers"]["color"]))
+        except Exception:
+            return st("markers")[2]
+
+    def draw_marker(marker: Marker) -> object:
         nonlocal y
-        words = [w for w in (lyric.words or []) if str(w.text or "").strip()]
-        if not words:
-            blocks = wrap_plain(lyric.text, 11)
-            ensure((13 + 15) * len(blocks) + 18)
-            if line_chords:
-                c.setFillColor(chord_fill)
-                c.setFont(font, 9)
-                line_start = int(lyric.time_ms)
-                line_end = int(lyric.end_ms or (line_start + max(900, len(lyric.text) * 85)))
-                text_width = min(usable_width, max(12.0, c.stringWidth(safe(lyric.text), font, 11)))
-                previous_right = margin - 8
-                for chord in line_chords:
-                    label = safe(chord.chord)
-                    rel = max(0.0, min(1.0, (int(chord.time_ms) - line_start) / max(1, line_end - line_start)))
-                    x = margin + rel * text_width
-                    text_w = c.stringWidth(label, font, 9)
-                    x = max(previous_right + 6, min(x, margin + usable_width - text_w))
-                    c.drawString(x, y, label)
-                    previous_right = x + text_w
-                y -= 13
-                c.setFillColor(black)
-            c.setFont(font, 11)
-            for part in blocks:
-                ensure(18)
-                c.drawString(margin, y, safe(part))
-                y -= 15
-            y -= 8
-            return
-
-        word_entries: list[dict] = []
-        current: list[dict] = []
-        x = margin
-        space_w = c.stringWidth(" ", font, 11)
-        for word in words:
-            token = safe(str(word.text).strip())
-            token_w = c.stringWidth(token, font, 11)
-            needed = token_w if not current else token_w + space_w
-            if current and x + needed > margin + usable_width:
-                word_entries.extend(current)
-                current = []
-                x = margin
-            if current:
-                x += space_w
-            syllable_entries=[]
-            syllable_x=x
-            for syllable in getattr(word, "syllables", []) or []:
-                syllable_text=safe(str(syllable.text or ""))
-                syllable_w=c.stringWidth(syllable_text, font, 11)
-                syllable_entries.append({"text":syllable_text,"x":syllable_x,"width":syllable_w,"start_ms":int(syllable.start_ms),"end_ms":int(max(syllable.start_ms,syllable.end_ms))})
-                syllable_x += syllable_w
-            entry = {
-                "text": token,
-                "x": x,
-                "width": token_w,
-                "start_ms": int(word.start_ms),
-                "end_ms": int(max(word.start_ms, word.end_ms)),
-                "syllables": syllable_entries,
-            }
-            current.append(entry)
-            x += token_w
-        if current:
-            word_entries.extend(current)
-
-        display_lines: list[list[dict]] = []
-        cursor: list[dict] = []
-        last_x = margin
-        for entry in word_entries:
-            if cursor and entry["x"] <= last_x:
-                display_lines.append(cursor)
-                cursor = []
-            cursor.append(entry)
-            last_x = entry["x"]
-        if cursor:
-            display_lines.append(cursor)
-
-        active_before = [ch for ch in line_chords if ch.time_ms <= display_lines[0][0]["start_ms"]] if display_lines else []
-        ensure(sum(30 for _ in display_lines) + 20)
-        pending_before = active_before[-1:] if active_before else []
-        for line_idx, line_words in enumerate(display_lines):
-            line_start = line_words[0]["start_ms"]
-            line_end = line_words[-1]["end_ms"]
-            if line_idx + 1 < len(display_lines):
-                line_end = max(line_end, display_lines[line_idx + 1][0]["start_ms"] - 1)
-            line_word_indexes = {word_entries.index(entry) for entry in line_words}
-            local_chords = []
-            for ch in line_chords:
-                manual_index = _manual_chord_word_index(ch, len(word_entries))
-                if manual_index is not None:
-                    if manual_index in line_word_indexes:
-                        local_chords.append(ch)
-                elif line_start <= ch.time_ms <= line_end:
-                    local_chords.append(ch)
-            if pending_before:
-                lead = pending_before[-1]
-                if not local_chords or local_chords[0].time_ms > line_start:
-                    local_chords = [lead] + local_chords
-                pending_before = []
-            if local_chords:
-                c.setFillColor(chord_fill)
-                c.setFont(font, 9)
-                previous_right = margin - 8
-                for chord in local_chords:
-                    label = safe(chord.chord)
-                    anchor_x = chord_anchor_x(line_words, chord)
-                    text_w = c.stringWidth(label, font, 9)
-                    draw_x = max(margin, min(anchor_x, margin + usable_width - text_w))
-                    if draw_x < previous_right + 6:
-                        draw_x = previous_right + 6
-                    c.drawString(draw_x, y, label)
-                    previous_right = draw_x + text_w
-                y -= 13
-                c.setFillColor(black)
-            c.setFont(font, 11)
-            for idx, entry in enumerate(line_words):
-                c.drawString(entry["x"], y, entry["text"])
-            y -= 15
-        y -= 8
+        ensure(30)
+        font,size,_ = st("markers")
+        c.setFont(font, size)
+        color = marker_color(marker)
+        c.setFillColor(color)
+        label=safe(marker.label).strip()
+        if label and not label.endswith(":"):
+            label += ":"
+        c.drawString(margin,y,label)
+        y -= max(18,size+8)
+        return color
 
     c.setTitle(title or "Lyrics")
-    if artist:
-        c.setAuthor(artist)
-    c.setFont(font, 18)
-    c.drawString(margin, y, safe(title or "Lyrics"))
-    y -= 24
-    info_parts: list[str] = []
-    if artist:
-        info_parts.append(artist)
-    if key:
-        info_parts.append(f"Key: {key}")
-    if bpm is not None and float(bpm) > 0:
-        info_parts.append(f"BPM: {int(round(float(bpm)))}")
-    if info_parts:
-        c.setFont(font, 11)
-        c.drawString(margin, y, safe("  ·  ".join(info_parts)))
-        y -= 26
-    else:
-        y -= 8
+    if artist: c.setAuthor(artist)
+    title_font,title_size=set_style("title")
+    c.drawString(margin,y,safe(title or "Lyrics"));y-=title_size+10
+    # Subtitle data kept separate from BPM so each can be styled independently.
+    subtitle_parts=[]
+    if artist: subtitle_parts.append(artist)
+    if key: subtitle_parts.append(f"Key: {key}")
+    if subtitle_parts:
+        f,s=set_style("subtitle");c.drawString(margin,y,safe("  ·  ".join(subtitle_parts)));y-=s+8
+    if bpm is not None and float(bpm)>0:
+        f,s=set_style("bpm");c.drawString(margin,y,f"BPM: {int(round(float(bpm)))}");y-=s+8
+    # Requested visual breathing room between title/metadata and the song body.
+    y -= 22
 
-    # Use the same timing model for both final PDF and preview. If fine-grained
-    # timestamps are unavailable (manual/imported lyrics), derive a conservative
-    # per-word/per-syllable best guess from the segment duration so chords are
-    # positioned proportionally instead of being stacked at the line start.
-    ordered_lyrics = sorted(_estimated_word_and_syllable_timing(lyrics), key=lambda x: x.time_ms)
-    ordered_chords = sorted((ch for ch in chords if not ch.excluded), key=lambda x: x.time_ms)
-    for i, lyric in enumerate(ordered_lyrics):
-        next_time = ordered_lyrics[i + 1].time_ms if i + 1 < len(ordered_lyrics) else (lyric.end_ms or lyric.time_ms + 6000)
-        relevant = [
-            ch for ch in ordered_chords
-            if _manual_chord_line_match(ch, lyric)
-            or (not ch.manual_anchor and lyric.time_ms <= ch.time_ms < next_time)
-        ]
-        previous = [ch for ch in ordered_chords if not ch.manual_anchor and ch.time_ms <= lyric.time_ms]
-        if previous and (not relevant or previous[-1].time_ms < lyric.time_ms):
-            relevant = [previous[-1]] + relevant
-        draw_wrapped_lyric_line(lyric, relevant)
+    active_lyrics=[x for x in lyrics if not getattr(x,"disabled",False) and not getattr(x,"deleted",False)]
+    active_chords=[x for x in chords if not getattr(x,"excluded",False) and not getattr(x,"deleted",False)]
+    active_markers=[x for x in (markers or []) if not getattr(x,"disabled",False) and not getattr(x,"deleted",False)]
+    ordered_lyrics=sorted(_estimated_word_and_syllable_timing(active_lyrics),key=lambda x:x.time_ms)
+    ordered_chords=sorted(active_chords,key=lambda x:x.time_ms)
+    ordered_markers=sorted(active_markers,key=lambda x:x.time_ms)
+    marker_idx=0
+    current_section_color = None
+
+    for i,lyric in enumerate(ordered_lyrics):
+        line_start=int(lyric.time_ms)
+        line_end=int(ordered_lyrics[i+1].time_ms if i+1<len(ordered_lyrics) else (lyric.end_ms or line_start+6000))
+        while marker_idx<len(ordered_markers) and int(ordered_markers[marker_idx].time_ms)<=line_start:
+            current_section_color = draw_marker(ordered_markers[marker_idx]);marker_idx+=1
+        words=estimated_words(lyric,line_end)
+        lyric_lines=wrap_text(lyric.text,"lyrics")
+        line_chords=[ch for ch in ordered_chords if _manual_chord_line_match(ch, lyric) or (not ch.manual_anchor and line_start<=ch.time_ms<line_end)]
+        previous=[ch for ch in ordered_chords if not ch.manual_anchor and ch.time_ms<=line_start]
+        if previous and (not line_chords or previous[-1].time_ms<line_start):
+            line_chords=[previous[-1]]+line_chords
+        chord_font,chord_size,_ = st("chords")
+        c.setFont(chord_font, chord_size)
+        c.setFillColor(current_section_color or st("chords")[2])
+        if line_chords:
+            ensure(chord_size+16)
+            prev_right=margin-8
+            for ch in line_chords:
+                label=safe(ch.chord)
+                tw=c.stringWidth(label,chord_font,chord_size)
+                x=chord_x(ch,words,line_start,line_end)
+                x=max(prev_right+5,min(x,margin+usable_width-tw))
+                c.drawString(x,y,label);prev_right=x+tw
+            y-=chord_size+7
+        lyric_font,lyric_size,_ = st("lyrics")
+        c.setFont(lyric_font, lyric_size)
+        c.setFillColor(current_section_color or st("lyrics")[2])
+        for part in lyric_lines:
+            ensure(lyric_size+8)
+            c.drawString(margin,y,safe(part));y-=lyric_size+6
+        y-=8
+
+    while marker_idx<len(ordered_markers):
+        current_section_color = draw_marker(ordered_markers[marker_idx]);marker_idx+=1
 
     if rights_records:
-        if y < 150:
-            new_page()
-        y -= 8
-        c.setFillColor(black)
-        c.setFont(font, 10)
-        c.drawString(margin, y, safe("Dati repertorio / Rights information"))
-        y -= 16
-        c.setFont(font, 8)
+        ensure(80);y-=8;c.setFillColor(black);c.setFont(fonts["bold"],10);c.drawString(margin,y,"Dati repertorio / Rights information");y-=16
+        c.setFont(fonts["normal"],8)
         for record in rights_records:
-            if y < 72:
-                new_page()
-                c.setFont(font, 8)
-            identifiers = ", ".join(f"{k}: {v}" for k, v in record.identifiers.items())
-            authors_text = ", ".join(record.authors)
-            performers_text = ", ".join(record.performers)
-            publishers_text = ", ".join(record.publishers)
-            parts = [
-                f"Provider: {record.society}" if record.society else "",
-                f"UID: {record.uid}" if record.uid else "",
-                f"Titolo: {record.title}" if record.title else "",
-                f"Titolo originale: {record.original_title}" if record.original_title else "",
-                f"Autori: {authors_text}" if authors_text else "",
-                f"Interpreti: {performers_text}" if performers_text else "",
-                f"Editori: {publishers_text}" if publishers_text else "",
-                f"Identificativi: {identifiers}" if identifiers else "",
-                f"Fonte: {record.source_url}" if record.source_url else "",
-            ]
-            text = safe(" · ".join(x for x in parts if x))
-            words = text.split()
-            line = ""
-            wrapped: list[str] = []
-            for word in words:
-                candidate = f"{line} {word}".strip()
-                if c.stringWidth(candidate, font, 8) > usable_width and line:
-                    wrapped.append(line)
-                    line = word
-                else:
-                    line = candidate
-            if line:
-                wrapped.append(line)
-            for part in wrapped or [""]:
-                if y < 64:
-                    new_page()
-                    c.setFont(font, 8)
-                c.drawString(margin, y, part)
-                y -= 11
-            y -= 4
+            ensure(28)
+            identifiers=", ".join(f"{k}: {v}" for k,v in record.identifiers.items())
+            parts=[f"Provider: {record.society}" if record.society else "",f"UID: {record.uid}" if record.uid else "",f"Titolo: {record.title}" if record.title else "",f"Autori: {', '.join(record.authors)}" if record.authors else "",f"Identificativi: {identifiers}" if identifiers else ""]
+            for part in wrap_text(" · ".join(x for x in parts if x),"subtitle"):
+                c.drawString(margin,y,safe(part));y-=11
+            y-=4
     c.save()
     return out
-
 
 def _ass_time(ms: int) -> str:
     cs = max(0, int(ms)) // 10
@@ -1245,8 +1257,8 @@ def build_karaoke_ass(
     meta = " · ".join(x for x in [title.strip(), artist.strip()] if x)
     if meta:
         events.append(f"Dialogue: 0,0:00:00.00,0:00:06.00,Meta,,0,0,0,,{_ass_escape(meta)}")
-    ordered = sorted(lyrics, key=lambda x: x.time_ms)
-    chord_rows = sorted((ch for ch in (chords or []) if not ch.excluded), key=lambda x: x.time_ms)
+    ordered = sorted((x for x in lyrics if not getattr(x, "disabled", False) and not getattr(x, "deleted", False)), key=lambda x: x.time_ms)
+    chord_rows = sorted((ch for ch in (chords or []) if not ch.excluded and not getattr(ch, "deleted", False)), key=lambda x: x.time_ms)
     for i, line in enumerate(ordered):
         start = line.time_ms
         default_end = ordered[i + 1].time_ms - 20 if i + 1 < len(ordered) else start + 6000

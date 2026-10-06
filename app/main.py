@@ -44,7 +44,7 @@ from .auth import (
 from .auto_mix import disable_auto_mix, enable_auto_mix
 from .ai_models import ai_catalog, chords_catalog, lyrics_catalog, download_chord_model, download_lyrics_model, delete_chord_model, delete_lyrics_model, chord_engine_available
 from .mta_reverse import analyze_mta, diff_blobs
-from .music_text import build_chordpro, build_karaoke_ass, build_lyrics_pdf, extract_chords, extract_chords_progressive, extract_lyrics, extract_lyrics_progressive, lyrics_engine_available, map_source_events_to_timeline, synchronized_plain_text, transpose_chords, transpose_key_name
+from .music_text import build_chordpro, build_karaoke_ass, build_lyrics_pdf, extract_chords, extract_chords_progressive, extract_lyrics, extract_lyrics_progressive, extract_markers, lyrics_engine_available, map_source_events_to_timeline, synchronized_plain_text, transpose_chords, transpose_key_name
 from .storage import (
     audio_path,
     create_project,
@@ -64,7 +64,7 @@ from .storage import (
     write_project_archive,
     ROOT as STORAGE_ROOT,
 )
-from .rights_registry import provider_catalog as rights_provider_catalog, search_provider as search_rights_provider
+from .rights_registry import (provider_catalog as rights_provider_catalog, search_provider as search_rights_provider, search_musicbrainz_metadata, resolve_musicbrainz_metadata)
 from . import sample_editor as sample_editor_engine
 from .version import APP_RELEASE, APP_REVISION, APP_VERSION, BUILD_ID, CREATOR, REPOSITORY
 
@@ -1644,6 +1644,19 @@ def _text_music_worker(job_id: str, pid: str, track_id: str, kind: str, model_or
                 result={"kind": "chords", "count": len(mapped), "engine": selected_engine, "model": selected_model, "engine_display_name": engine_info["display_name"]},
             )
             return
+        if kind == "markers":
+            cancel_event=MEDIA_JOBS[job_id].get("cancel_event")
+            def markers_progress(pct, items, message):
+                _media_job_update(job_id,progress=pct,message=message,partial={"kind":"markers","items":[]})
+            events=extract_markers(source,progress=markers_progress,cancelled=(lambda: bool(cancel_event and cancel_event.is_set())))
+            if cancel_event and cancel_event.is_set():
+                raise InterruptedError("Marker extraction cancelled")
+            mapped=map_source_events_to_timeline(track,events)
+            latest=load_project(pid)
+            latest.markers=mapped
+            save_project(latest)
+            _media_job_update(job_id,status="completed",progress=100,message="Marker/sezioni estratti e sincronizzati",result={"kind":"markers","count":len(mapped),"engine":"MTA structural analysis"})
+            return
         raise ValueError("unsupported analysis kind")
     except InterruptedError as exc:
         _media_job_update(job_id,status="cancelled",message="Estrazione annullata",error=str(exc),result=None)
@@ -1694,6 +1707,11 @@ def start_lyrics_extraction(pid: str, track_id: str, request: Request, model: st
 @app.post("/api/projects/{pid}/tracks/{track_id}/extract-chords-jobs")
 def start_chord_extraction(pid: str, track_id: str, request: Request, engine: str = ""):
     return _start_text_music_job(pid, track_id, request, "chords", engine)
+
+
+@app.post("/api/projects/{pid}/tracks/{track_id}/extract-markers-jobs")
+def start_marker_extraction(pid: str, track_id: str, request: Request):
+    return _start_text_music_job(pid, track_id, request, "markers")
 
 
 @app.post("/api/projects/{pid}/lyrics/reset")
@@ -1764,7 +1782,8 @@ def download_project_lyrics_pdf(pid: str, request: Request, chord_color: str = "
         tmp, title=project.title, artist=project.artist,
         lyrics=project.lyrics, chords=transpose_chords(project.chords, project.pitch_semitones), chord_color=chord_color,
         key=transpose_key_name(project.key, project.pitch_semitones), bpm=project.bpm,
-        rights_records=project.rights_records,
+        rights_records=project.rights_records, markers=project.markers,
+        pdf_style=project.lyrics_pdf_style.model_dump(),
     )
     filename = _download_name(project.title or "lyrics", "pdf")
     if preview:
@@ -1777,6 +1796,39 @@ def download_project_lyrics_pdf(pid: str, request: Request, chord_color: str = "
         tmp, media_type="application/pdf", filename=filename,
         background=BackgroundTask(lambda: tmp.unlink(missing_ok=True)),
     )
+
+
+@app.post("/api/projects/{pid}/metadata-search")
+def api_project_metadata_search(pid: str, request: Request, body: dict):
+    project = _project_for_actor(request, pid)
+    title = str(body.get("title") or project.title or "").strip()
+    artist = str(body.get("artist") or project.artist or "").strip()
+    if not title:
+        raise HTTPException(400, "Inserisci il titolo del brano")
+    try:
+        results = search_musicbrainz_metadata(title=title, artist=artist, limit=15)
+    except Exception as exc:
+        LOGGER.warning("MusicBrainz metadata search failed: %s", exc)
+        raise HTTPException(502, f"Ricerca metadata online non riuscita: {exc}") from exc
+    return {
+        "query": {"title": title, "artist": artist},
+        "results": results,
+        "catalogs": [
+            {"id": "MUSICBRAINZ", "name": "MusicBrainz", "mode": "api", "portal_url": "https://musicbrainz.org/"},
+            {"id": "SIAE", "name": "SIAE", "mode": "portal", "portal_url": "https://www.siae.it/it/repertorio/"},
+            {"id": "SOUNDREEF", "name": "Soundreef / LEA", "mode": "portal", "portal_url": "https://www.soundreef.com/"},
+        ],
+    }
+
+
+@app.get("/api/projects/{pid}/metadata-resolve/{mbid}")
+def api_project_metadata_resolve(pid: str, mbid: str, request: Request):
+    _project_for_actor(request, pid)
+    try:
+        return resolve_musicbrainz_metadata(mbid)
+    except Exception as exc:
+        LOGGER.warning("MusicBrainz metadata resolve failed: %s", exc)
+        raise HTTPException(502, f"Risoluzione metadata online non riuscita: {exc}") from exc
 
 
 @app.get("/api/rights-providers")

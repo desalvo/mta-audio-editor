@@ -488,11 +488,11 @@ class NativeApi:
         return delete(model_id)
 
     def check_for_updates(self) -> dict:
-        from app.version import APP_VERSION
+        from app.version import APP_RELEASE
         from native.update_manager import check_for_update
         settings = self.get_native_settings()
         try:
-            return check_for_update(APP_VERSION, settings.get("update_channel", "stable"))
+            return check_for_update(APP_RELEASE, settings.get("update_channel", "stable"))
         except Exception as exc:
             return {"ok": False, "available": False, "error": str(exc)}
 
