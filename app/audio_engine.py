@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import subprocess
 import tempfile
 import uuid
@@ -283,6 +284,7 @@ def render_mix(
     sample_rate: int = 44100,
     wav_bit_depth: int = 24,
     flac_compression: int = 8,
+    normalize_peak_db: float | None = None,
 ) -> Path:
     """Render stereo master for preview/WAV/MP3/FLAC export."""
     if not project.tracks:
@@ -322,15 +324,42 @@ def render_mix(
         filters.append(f"[master0]{tail}[master]")
         sample_rate = 48000 if int(sample_rate) == 48000 else 44100
         cmd += ["-filter_complex", ";".join(filters), "-map", "[master]", "-ar", str(sample_rate)]
-        if fmt == "wav":
-            codec = {16: "pcm_s16le", 24: "pcm_s24le", 32: "pcm_f32le"}.get(int(wav_bit_depth), "pcm_s24le")
-            cmd += ["-c:a", codec, str(out)]
-        elif fmt == "flac":
-            level = max(0, min(12, int(flac_compression)))
-            cmd += ["-c:a", "flac", "-compression_level", str(level), str(out)]
+
+        def _codec_args(target: Path) -> list[str]:
+            if fmt == "wav":
+                codec = {16: "pcm_s16le", 24: "pcm_s24le", 32: "pcm_f32le"}.get(int(wav_bit_depth), "pcm_s24le")
+                return ["-c:a", codec, str(target)]
+            if fmt == "flac":
+                level = max(0, min(12, int(flac_compression)))
+                return ["-c:a", "flac", "-compression_level", str(level), str(target)]
+            return ["-c:a", "libmp3lame", "-b:a", bitrate, str(target)]
+
+        if normalize_peak_db is None:
+            _run(cmd + _codec_args(out))
         else:
-            cmd += ["-c:a", "libmp3lame", "-b:a", bitrate, str(out)]
-        _run(cmd)
+            # Peak-normalize only after the complete master chain has been rendered.
+            # This avoids changing the relative balance between tracks and applies the
+            # requested dBFS target consistently to WAV/MP3/FLAC.
+            target_db = max(-30.0, min(0.0, float(normalize_peak_db)))
+            master_wav = td / "master-before-normalize.wav"
+            _run(cmd + ["-c:a", "pcm_f32le", str(master_wav)])
+            probe = subprocess.run(
+                ["ffmpeg", "-hide_banner", "-v", "info", "-i", str(master_wav), "-af", "volumedetect", "-f", "null", "-"],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+            )
+            if probe.returncode:
+                raise RuntimeError(probe.stderr.strip() or "normalization analysis failed")
+            match = re.search(r"max_volume:\s*(-?\d+(?:\.\d+)?)\s*dB", probe.stderr)
+            gain_db = 0.0
+            if match:
+                gain_db = target_db - float(match.group(1))
+            encode = ["ffmpeg", "-y", "-v", "error", "-i", str(master_wav)]
+            if abs(gain_db) > 0.0001:
+                encode += ["-af", f"volume={gain_db:.4f}dB"]
+            encode += ["-ar", str(sample_rate)] + _codec_args(out)
+            _run(encode)
     return out
 
 

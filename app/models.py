@@ -100,6 +100,7 @@ class Track(BaseModel):
     channels: int = Field(default=0, ge=0, le=32)
     channel_layout: str = Field(default="", max_length=64)
     delay_ms: int = Field(default=0, ge=-86_400_000, le=86_400_000)
+    height_px: int = Field(default=78, ge=78, le=420)
 
 
 class Marker(BaseModel):
@@ -242,6 +243,8 @@ class ProjectExportRequest(BaseModel):
     sample_rate: Literal[44100, 48000] = 44100
     wav_bit_depth: Literal[16, 24, 32] = 24
     flac_compression: int = Field(default=8, ge=0, le=12)
+    normalize_audio: bool = False
+    normalize_peak_db: float = Field(default=-1.0, ge=-30.0, le=0.0)
     karaoke_resolution: Literal["1280x720", "1920x1080"] = "1920x1080"
     karaoke_chords: bool = True
     karaoke_background: str | None = Field(default=None, max_length=180)
@@ -305,6 +308,7 @@ class Project(BaseModel):
     show_chords_playback: bool = False
     export_panel_visible: bool = True
     metadata_panel_visible: bool = True
+    inspector_visible: bool = True
     timeline_zoom_px_per_sec: int = Field(default=70, ge=25, le=240)
     mixer_height_px: int = Field(default=262, ge=180, le=900)
     mixer_meta_tab: Literal["lyrics", "chords", "markers"] = "lyrics"

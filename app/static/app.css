@@ -916,3 +916,90 @@ body.native-single-user .main-area{grid-template-rows:minmax(120px,1fr) var(--mi
 .live-lyric-box .timed-overlay-item.current{color:#fff}.live-chord-box .timed-overlay-item.current{color:#80dcff}
 .live-chord-box .timed-overlay-item.previous,.live-chord-box .timed-overlay-item.next{color:#91a8b9}.live-lyric-box .timed-overlay-item.previous,.live-lyric-box .timed-overlay-item.next{color:#aab7c1}
 @media(max-width:760px){.live-chord-box.with-neighbors,.live-lyric-box.with-neighbors{width:94vw;gap:8px}.timed-overlay-item.previous,.timed-overlay-item.next{font-size:.78em}.timed-overlay-item.current{font-size:.94em}}
+
+/* r173: per-track vertical resizing in the Tracks/timeline view. */
+.track-head,.lane{min-height:78px}
+.track-height-resizer{position:absolute;left:0;right:0;bottom:-2px;height:7px;cursor:row-resize;z-index:25;background:transparent;touch-action:none}
+.track-height-resizer:hover,.resizing-track-height .track-height-resizer{background:rgba(42,167,255,.35)}
+.resizing-track-height{cursor:row-resize!important;user-select:none!important}
+.clip-block{height:calc(100% - 16px)}
+
+/* 0.2.0-r175: export controls must never clip or hide their labels. */
+.export-dialog,
+.export-dialog *{box-sizing:border-box}
+.export-dialog .export-format-grid{align-items:stretch;min-width:0}
+.export-dialog .format-option{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:10px!important;
+  width:100%!important;
+  min-width:0!important;
+  height:auto!important;
+  min-height:58px!important;
+  padding:10px 12px!important;
+  white-space:normal!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+  line-height:1.2!important;
+  color:#eef8ff!important;
+  -webkit-text-fill-color:#eef8ff!important;
+}
+.export-dialog .format-option>span{
+  display:block!important;
+  min-width:0!important;
+  max-width:100%!important;
+  white-space:normal!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+  overflow-wrap:anywhere!important;
+  word-break:normal!important;
+  line-height:1.2!important;
+  color:inherit!important;
+  -webkit-text-fill-color:currentColor!important;
+}
+.export-dialog .format-option>span:first-child{flex:1 1 auto;font-weight:650}
+.export-dialog .format-option>span:last-child{flex:0 1 46%;text-align:right;color:#a9c9dc!important;-webkit-text-fill-color:#a9c9dc!important}
+.export-dialog-tools{align-items:stretch}
+.export-dialog-tools .utility-btn,
+.export-dialog .utility-actions .utility-btn{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  flex:1 1 180px!important;
+  min-width:0!important;
+  max-width:100%!important;
+  height:auto!important;
+  min-height:42px!important;
+  padding:9px 12px!important;
+  white-space:normal!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+  overflow-wrap:anywhere!important;
+  line-height:1.2!important;
+  text-align:center!important;
+  color:#eef8ff!important;
+  -webkit-text-fill-color:#eef8ff!important;
+}
+@media(max-width:650px){
+  .export-dialog .format-option{align-items:flex-start!important;flex-direction:column!important;gap:4px!important}
+  .export-dialog .format-option>span:last-child{flex:1 1 auto;text-align:left}
+  .export-dialog-tools .utility-btn,.export-dialog .utility-actions .utility-btn{width:100%!important;flex-basis:auto!important}
+}
+/* r174: export preview has an explicit stop control. */
+.export-dialog-tools .export-preview-stop:disabled{opacity:.48!important;cursor:not-allowed!important;color:#b9c8d3!important;-webkit-text-fill-color:#b9c8d3!important}
+.export-dialog-tools .export-preview-stop:not(:disabled){border-color:#b45b62!important;background:#3a1d24!important;color:#ffe9eb!important;-webkit-text-fill-color:#ffe9eb!important}
+
+.export-normalize-panel{margin:10px 0;padding:10px;border:1px solid #29465d;border-radius:6px;background:#0c1823}.workflow-check{display:flex;align-items:center;gap:8px;color:#e7f5ff;min-height:32px}.workflow-check input{flex:0 0 auto}.export-normalize-target{margin-top:8px}.export-normalize-target small{display:block;color:#86a8bf;margin-top:4px;line-height:1.35}
+
+/* r175: editable time signature in the main transport bar. */
+.signature-input{height:22px;min-width:54px;border:1px solid #36536c;border-radius:4px;background:#0b1722;color:#dff1ff;padding:1px 4px;font-size:10px;vertical-align:middle}.timebox .signature-input:focus{border-color:#2da2ff;outline:none;box-shadow:0 0 0 2px rgba(45,162,255,.14)}
+
+/* r175: closable/reopenable Plugins inspector. */
+.editor-grid.inspector-hidden{grid-template-columns:var(--track-column-width,225px) 5px minmax(540px,1fr)}
+.inspector-tabs{align-items:center}.inspector-close{flex:0 0 30px!important;width:30px!important;height:30px;border:0;border-left:1px solid #2d455a;background:#111f2b;color:#b9cad7;font-size:18px;line-height:1}.inspector-close:hover{background:#40202a;color:#ffd6dc}
+@media(max-width:1200px){.editor-grid.inspector-hidden{grid-template-columns:var(--track-column-width,205px) 5px minmax(520px,1fr)}}
+@media(max-width:900px){.editor-grid.inspector-hidden{grid-template-columns:var(--track-column-width,180px) 5px minmax(620px,1fr)}}
+
+/* r176: single-window project metadata editor. */
+.project-meta-editor th{width:32%;min-width:150px;vertical-align:middle}.project-meta-editor td{min-width:260px}.project-meta-input{box-sizing:border-box;width:100%;min-width:0;max-width:100%;padding:8px 10px;border-radius:8px}.project-meta-editor input[type=number]{width:100%}

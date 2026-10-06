@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.2.0 — revision 175
+
+- Main transport now exposes the project time signature directly next to BPM; changing it recalculates BPM using the selected meter.
+- Plugins/Inspector frame can be closed with an explicit × button and reopened from the Plugins sidebar entry without losing plugin state; visibility is persisted in the project.
+- Carries forward adaptive/persisted mixer height, per-track vertical resizing, previous/current/next lyrics/chords display options, and time-signature-aware BPM estimation/PDF metadata.
+- Project export excludes muted tracks using the live project state, offers optional peak normalization for WAV/MP3/FLAC, includes an explicit Stop Preview control, keeps export-button labels readable, and uses a single atomic overwrite path in native mode.
+- Native sidebar keeps Save project, hides redundant Save project locally, and preserves Save project as.
+- Updated desktop/mobile build metadata to revision 175 and retains the GitHub Actions Ruff/coverage fixes.
+
+## 0.2.0 — revision 173
+
+- Project exports now omit tracks explicitly marked Mute; MTA slot planning and mapping ignore muted tracks as well.
+- Added per-track vertical height resizing in the Tracks/timeline view, persisted in the project with a 78 px minimum/default.
+- Native desktop sidebar now hides the redundant “Save project locally” action and exposes “Save project” for an explicit manual save of the current project.
+
 ## 0.2.0 — revision 153
 
 - Standardized release identity into three independent fields: product version `0.2.0`, revision `153`, and 14-digit `BUILD_INFO`.

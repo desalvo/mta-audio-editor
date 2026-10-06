@@ -130,10 +130,11 @@ function ensureTrackSelection(){
   if(selectedTrackId&&!selectedTrackIdSet.has(selectedTrackId))selectedTrackId=[...selectedTrackIdSet][0]||null;
 }
 function selectedTrackIds(){ensureTrackSelection();return (current?.tracks||[]).filter(t=>selectedTrackIdSet.has(t.id)).map(t=>t.id)}
+function trackHeightPx(t){return Math.max(78,Math.min(420,Math.round(Number(t?.height_px)||78)))}
 function linesToText(a,b){return(a||[]).map(x=>`${(x.time_ms/1000).toFixed(3)}\t${x[b]}`).join('\n')}
 function textToLines(v,key){return v.split(/\n/).map(x=>x.trim()).filter(Boolean).map(line=>{const [t,...rest]=line.split(/\t|\s{2,}/);return{time_ms:Math.max(0,Math.round(parseFloat(t)*1000)||0),[key]:rest.join(' ').trim()}})}
 
-async function init(){if(isMobileClient())document.body.classList.add('mobile-client');try{currentUser=await api('/api/session');const a=$('#adminNav');if(a)a.hidden=!!currentUser.native_single_user||currentUser.role!=='admin';const sb=$('#nativeSettingsButton');if(sb)sb.hidden=false;const recentBtn=$('#openRecentProjectBtn'),localBtn=$('#openLocalProjectBtn');if(currentUser.native_single_user){document.body.classList.add('native-single-user');if(recentBtn)recentBtn.hidden=false;if(localBtn)localBtn.hidden=true}else{if(recentBtn)recentBtn.hidden=true;if(localBtn)localBtn.hidden=false}}catch(e){}if(currentUser?.native_single_user)installNativeViewportGuard();if(currentUser&&!currentUser.native_single_user)autosaveEnabled=localStorage.getItem('mtaWebAutosaveEnabled')!=='false';let nativeBridge=null;if(currentUser?.native_single_user){nativeBridge=await waitForNativeApi();if(nativeBridge?.get_native_settings){try{const cfg=await nativeBridge.get_native_settings();autosaveEnabled=cfg.autosave_enabled!==false;nativeRecentProjects=Array.isArray(cfg.recent_projects)?cfg.recent_projects.map(String).filter(Boolean):[]}catch(e){}}setTimeout(()=>checkNativeAppUpdate(false),1200)}try{pluginInfo=await api('/api/plugins')}catch(e){}if(nativeBridge?.consume_startup_project){try{const startup=await nativeBridge.consume_startup_project();if(startup?.project?.id){rememberRecentProject(startup.project.id);await openP(startup.project.id);return}if(startup&&!startup.ok&&startup.error)toast('Impossibile aprire il progetto: '+startup.error)}catch(e){toast('Impossibile aprire il progetto: '+e.message)}}await refresh()}
+async function init(){if(isMobileClient())document.body.classList.add('mobile-client');try{currentUser=await api('/api/session');const a=$('#adminNav');if(a)a.hidden=!!currentUser.native_single_user||currentUser.role!=='admin';const sb=$('#nativeSettingsButton');if(sb)sb.hidden=false;const recentBtn=$('#openRecentProjectBtn'),localBtn=$('#openLocalProjectBtn'),manualSave=$('#saveProjectManualNav'),localSave=$('#saveProjectLocalNav');if(currentUser.native_single_user){document.body.classList.add('native-single-user');if(recentBtn)recentBtn.hidden=false;if(localBtn)localBtn.hidden=true;if(manualSave)manualSave.hidden=false;if(localSave)localSave.hidden=true}else{if(recentBtn)recentBtn.hidden=true;if(localBtn)localBtn.hidden=false;if(manualSave)manualSave.hidden=true;if(localSave)localSave.hidden=false}}catch(e){}if(currentUser?.native_single_user)installNativeViewportGuard();if(currentUser&&!currentUser.native_single_user)autosaveEnabled=localStorage.getItem('mtaWebAutosaveEnabled')!=='false';let nativeBridge=null;if(currentUser?.native_single_user){nativeBridge=await waitForNativeApi();if(nativeBridge?.get_native_settings){try{const cfg=await nativeBridge.get_native_settings();autosaveEnabled=cfg.autosave_enabled!==false;nativeRecentProjects=Array.isArray(cfg.recent_projects)?cfg.recent_projects.map(String).filter(Boolean):[]}catch(e){}}setTimeout(()=>checkNativeAppUpdate(false),1200)}try{pluginInfo=await api('/api/plugins')}catch(e){}if(nativeBridge?.consume_startup_project){try{const startup=await nativeBridge.consume_startup_project();if(startup?.project?.id){rememberRecentProject(startup.project.id);await openP(startup.project.id);return}if(startup&&!startup.ok&&startup.error)toast('Impossibile aprire il progetto: '+startup.error)}catch(e){toast('Impossibile aprire il progetto: '+e.message)}}await refresh()}
 
 function toggleEditingToolsPanel(){
   const panel=$('#editingToolsPanel');if(!panel)return;
@@ -366,6 +367,7 @@ function render(){
   $('#headerProjectName').textContent=current.title;
   $('#transportBpm').textContent=String(Math.round(Number(current.bpm||120)));
   if($('#transportBpmInput'))$('#transportBpmInput').value=String(Math.round(Number(current.bpm||120)));
+  if($('#transportTimeSignature'))$('#transportTimeSignature').value=current.time_signature||'4/4';
   if($('#transportPitchInput'))$('#transportPitchInput').value=Number(current.pitch_semitones||0).toFixed(1);
   $('#topZoom').value=pxPerSec;
   updateTransportToggleButtons();
@@ -375,7 +377,7 @@ function render(){
   $('#editor').innerHTML=`
     ${toolbarHtml()}
     ${clipBrowserHtml()}
-    <div class="editor-grid" id="editorGrid" style="--track-column-width:${trackWidth}px">
+    <div class="editor-grid ${current.inspector_visible===false?'inspector-hidden':''}" id="editorGrid" style="--track-column-width:${trackWidth}px">
       <div class="track-column" id="trackColumn"><div class="track-column-head">TRACKS</div>${current.tracks.map((t,i)=>trackHead(t,i)).join('')}</div>
       <div class="track-resizer" id="trackResizer" title="Ridimensiona Tracks"></div>
       <div class="timeline-pane" id="timelinePane"><div class="ruler"><canvas id="ruler" width="${W}" height="30"></canvas></div><div class="lanes" id="lanes" style="width:${W}px">${current.tracks.map((t,i)=>lane(t,W,i)).join('')}<div class="selection" id="selection" style="display:none"></div><div class="playhead" id="playhead" style="left:${playCursorMs/1000*pxPerSec}px"></div></div></div>
@@ -617,6 +619,18 @@ function dropTrack(event,targetId){
   const from=current.tracks.findIndex(t=>t.id===sourceId),to=current.tracks.findIndex(t=>t.id===targetId);if(from<0||to<0)return;
   const [moved]=current.tracks.splice(from,1);current.tracks.splice(to,0,moved);render();markDirty(100);toast('Ordine tracce aggiornato');
 }
+function beginTrackHeightResize(event,id){
+  const t=trackById(id);if(!t)return;
+  event.preventDefault();event.stopPropagation();
+  const startY=event.clientY,startH=trackHeightPx(t);document.body.classList.add('resizing-track-height');
+  const move=e=>{
+    const h=Math.max(78,Math.min(420,Math.round(startH+(e.clientY-startY))));if(h===trackHeightPx(t))return;t.height_px=h;
+    const head=$(`#head-${id}`),ln=$(`#lane-${id}`),canvas=$(`#wave-${id}`);
+    if(head)head.style.height=`${h}px`;if(ln)ln.style.height=`${h}px`;if(canvas){canvas.height=h;drawWave(t)}
+  };
+  const up=()=>{window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',up);window.removeEventListener('pointercancel',up);document.body.classList.remove('resizing-track-height');markDirty(80)};
+  window.addEventListener('pointermove',move,{passive:false});window.addEventListener('pointerup',up);window.addEventListener('pointercancel',up);
+}
 const NOTE_PC={C:0,'C#':1,Db:1,D:2,'D#':3,Eb:3,E:4,F:5,'F#':6,Gb:6,G:7,'G#':8,Ab:8,A:9,'A#':10,Bb:10,B:11};
 const SHARP_NOTES=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'],FLAT_NOTES=['C','Db','D','Eb','E','F','Gb','G','Ab','A','Bb','B'];
 function transposeNoteName(note,shift){const pc=NOTE_PC[note];if(pc===undefined)return note;const names=note.includes('b')?FLAT_NOTES:SHARP_NOTES;return names[(pc+Math.round(Number(shift||0))+120)%12]}
@@ -626,7 +640,8 @@ function effectiveProjectKey(){const key=String(current?.key||'');const m=key.ma
 function trackHead(t,i){
   const color=t.color||TRACK_COLORS[i%TRACK_COLORS.length],anySolo=current.tracks.some(x=>x.solo),inaudible=t.mute||(anySolo&&!t.solo);
   const audioMode=t.channels===2?'STEREO':(t.channels===1?'MONO':(t.channel_layout?String(t.channel_layout).toUpperCase():''));
-  return `<div class="track-head ${selectedTrackIdSet.has(t.id)?'selected':''} ${t.id===selectedTrackId?'primary-selected':''} ${inaudible?'audibly-muted':''}" id="head-${t.id}" data-track-context-id="${t.id}" style="--track-color:${color}" onclick="selectTrack('${t.id}',event)" oncontextmenu="openTrackContextMenu(event,'${t.id}')" ondragover="trackDragOver(event,'${t.id}')" ondrop="dropTrack(event,'${t.id}')">
+  const height=trackHeightPx(t);
+  return `<div class="track-head ${selectedTrackIdSet.has(t.id)?'selected':''} ${t.id===selectedTrackId?'primary-selected':''} ${inaudible?'audibly-muted':''}" id="head-${t.id}" data-track-context-id="${t.id}" style="--track-color:${color};height:${height}px" onclick="selectTrack('${t.id}',event)" oncontextmenu="openTrackContextMenu(event,'${t.id}')" ondragover="trackDragOver(event,'${t.id}')" ondrop="dropTrack(event,'${t.id}')">
     <div class="track-color"></div>
     <div class="track-num">${i+1}</div>
     <div class="track-info">
@@ -646,6 +661,7 @@ function trackHead(t,i){
         <input class="track-db-input volume-number" id="db-${t.id}" data-volume-number="${t.id}" type="number" min="-60" max="12" step="0.1" value="${Number(t.volume_db).toFixed(1)}" oninput="setTrackVolume('${t.id}',this.value)" aria-label="Volume ${esc(t.name)} in dB" title="Volume in dB">
       </div>
     </div>
+    <div class="track-height-resizer" title="Trascina per modificare l'altezza della traccia" onpointerdown="beginTrackHeightResize(event,'${t.id}')"></div>
   </div>`;
 }
 function closeTrackContextMenu(){
@@ -845,9 +861,17 @@ function renameTrack(id){const t=trackById(id);if(!t)return;const value=prompt('
 function projectFormatLabel(target=current?.target){return target==='DAW'?'Multitrack DAW':target}
 function mtaSlotLimit(target=current?.target){return target==='MTA8'?8:16}
 function setTrackMtaSlot(id,value){const t=trackById(id);if(!t)return;const n=Number(value||0),limit=mtaSlotLimit();t.mta_slot=n>=1&&n<=limit?n:null;markDirty(100);render()}
-function lane(t,W,i){const color=t.color||TRACK_COLORS[i%TRACK_COLORS.length];const anySolo=current.tracks.some(x=>x.solo);const inaudible=t.mute||(anySolo&&!t.solo);return `<div class="lane ${inaudible?'audibly-muted':''}" id="lane-${t.id}" data-track="${t.id}" data-track-context-id="${t.id}" style="width:${W}px;--track-color:${color}" oncontextmenu="openTrackContextMenu(event,'${t.id}')"><canvas class="wave" id="wave-${t.id}" width="${W}" height="78" ondblclick="event.stopPropagation();openSampleEditor('${t.id}')" title="Doppio click: editor waveform/campioni"></canvas><div class="waveform-progress ${t.waveform_peaks?.length?'hidden':''}" id="wave-progress-${t.id}"><div class="waveform-progress-bar" id="wave-progress-bar-${t.id}" style="width:2%"></div><span id="wave-progress-label-${t.id}">Waveform…</span></div>${(t.clips||[]).map((c,j)=>{const l=Math.max(0,effectiveClipStartMs(t,c))/1000*pxPerSec,w=(c.source_end_ms-c.source_start_ms)/1000*pxPerSec;return `<div class="clip-block" style="left:${l}px;width:${Math.max(2,w)}px"><span class="clip-label">${esc(t.name)}_${String(j+1).padStart(2,'0')}</span></div>`}).join('')}</div>`}
+function lane(t,W,i){const color=t.color||TRACK_COLORS[i%TRACK_COLORS.length];const anySolo=current.tracks.some(x=>x.solo);const inaudible=t.mute||(anySolo&&!t.solo),height=trackHeightPx(t);return `<div class="lane ${inaudible?'audibly-muted':''}" id="lane-${t.id}" data-track="${t.id}" data-track-context-id="${t.id}" style="width:${W}px;--track-color:${color};height:${height}px" oncontextmenu="openTrackContextMenu(event,'${t.id}')"><canvas class="wave" id="wave-${t.id}" width="${W}" height="${height}" ondblclick="event.stopPropagation();openSampleEditor('${t.id}')" title="Doppio click: editor waveform/campioni"></canvas><div class="waveform-progress ${t.waveform_peaks?.length?'hidden':''}" id="wave-progress-${t.id}"><div class="waveform-progress-bar" id="wave-progress-bar-${t.id}" style="width:2%"></div><span id="wave-progress-label-${t.id}">Waveform…</span></div>${(t.clips||[]).map((c,j)=>{const l=Math.max(0,effectiveClipStartMs(t,c))/1000*pxPerSec,w=(c.source_end_ms-c.source_start_ms)/1000*pxPerSec;return `<div class="clip-block" style="left:${l}px;width:${Math.max(2,w)}px"><span class="clip-label">${esc(t.name)}_${String(j+1).padStart(2,'0')}</span></div>`}).join('')}</div>`}
 
-function inspectorHtml(){const t=selectedTrack();if(!t)return `<aside class="inspector"><div class="inspector-tabs"><button class="inspector-tab active">Inspector</button><button class="inspector-tab">Stems</button><button class="inspector-tab">Metadata</button></div><div class="inspector-body"><p class="hint">Import a track to open the inspector.</p></div></aside>`;const i=current.tracks.indexOf(t);return `<aside class="inspector" id="inspector"><div class="inspector-tabs"><button class="inspector-tab active">Inspector</button><button class="inspector-tab">Stems</button><button class="inspector-tab">Metadata</button></div><div class="inspector-body"><div class="inspector-track-title"><span>◉</span>${esc(t.name)}<label class="tool" style="margin-left:auto;min-width:auto;height:28px">Replace<input type="file" accept="audio/*,.mp3,.wav" hidden onchange="replaceTrack('${t.id}',this)"></label></div><div class="inspector-row"><label>Volume</label><input class="track-volume-range" data-volume-track="${t.id}" type="range" min="-60" max="12" step="0.5" value="${t.volume_db}" oninput="setTrackVolume('${t.id}',this.value)"><input class="valuebox volume-number" id="ins-db-${t.id}" data-volume-number="${t.id}" type="number" min="-60" max="12" step="0.1" value="${Number(t.volume_db).toFixed(1)}" oninput="setTrackVolume('${t.id}',this.value)" aria-label="Volume ${esc(t.name)} in dB" title="Volume in dB"></div><div class="inspector-row"><label>Pan</label><input type="range" min="-1" max="1" step="0.01" value="${t.pan||0}" oninput="setTrackPan('${t.id}',this.value)"><div class="valuebox" id="pan-${t.id}">${Number(t.pan||0).toFixed(2)}</div></div><div class="inspector-row"><label>Type</label><select class="model-input" data-i="${i}" data-k="type">${['drums','bass','guitars','keyboards','orchestra','winds','melody','click','choirs','other'].map(x=>`<option ${x===t.type?'selected':''}>${x}</option>`).join('')}</select><div class="valuebox">${t.duration_ms?fmtTime(t.duration_ms/1000):'--'}</div></div><div class="inspector-row"><label>MTA Slot</label><select onchange="setTrackMtaSlot('${t.id}',this.value)"><option value="" ${!t.mta_slot?'selected':''}>Auto</option>${Array.from({length:mtaSlotLimit()},(_,n)=>`<option value="${n+1}" ${Number(t.mta_slot)===n+1?'selected':''}>${n+1}</option>`).join('')}</select><div class="valuebox">${t.mta_slot?`Slot ${t.mta_slot}`:'Auto'}</div></div>${insertPanelHtml(t,false)}<div class="panel-section"><div class="section-title">Track export</div><div class="track-export-actions"><button onclick="exportTrack('${t.id}','wav')">WAV</button><button onclick="exportTrack('${t.id}','mp3')">MP3</button><button onclick="exportTrack('${t.id}','flac')">FLAC</button></div></div><div class="panel-section"><div class="collapsed-row">› Send</div><div class="collapsed-row">› Track Automation</div><div class="collapsed-row">› Advanced</div></div></div></aside>`}
+function inspectorHtml(){
+  if(current?.inspector_visible===false)return '';
+  const close='<button class="inspector-close" type="button" onclick="closeInspectorPanel()" title="Chiudi pannello Plugins" aria-label="Chiudi pannello Plugins">×</button>';
+  const t=selectedTrack();
+  if(!t)return `<aside class="inspector" id="inspector"><div class="inspector-tabs"><button class="inspector-tab active">Inspector</button><button class="inspector-tab">Stems</button><button class="inspector-tab">Metadata</button>${close}</div><div class="inspector-body"><p class="hint">Import a track to open the inspector.</p></div></aside>`;
+  const i=current.tracks.indexOf(t);
+  return `<aside class="inspector" id="inspector"><div class="inspector-tabs"><button class="inspector-tab active">Inspector</button><button class="inspector-tab">Stems</button><button class="inspector-tab">Metadata</button>${close}</div><div class="inspector-body"><div class="inspector-track-title"><span>◉</span>${esc(t.name)}<label class="tool" style="margin-left:auto;min-width:auto;height:28px">Replace<input type="file" accept="audio/*,.mp3,.wav" hidden onchange="replaceTrack('${t.id}',this)"></label></div><div class="inspector-row"><label>Volume</label><input class="track-volume-range" data-volume-track="${t.id}" type="range" min="-60" max="12" step="0.5" value="${t.volume_db}" oninput="setTrackVolume('${t.id}',this.value)"><input class="valuebox volume-number" id="ins-db-${t.id}" data-volume-number="${t.id}" type="number" min="-60" max="12" step="0.1" value="${Number(t.volume_db).toFixed(1)}" oninput="setTrackVolume('${t.id}',this.value)" aria-label="Volume ${esc(t.name)} in dB" title="Volume in dB"></div><div class="inspector-row"><label>Pan</label><input type="range" min="-1" max="1" step="0.01" value="${t.pan||0}" oninput="setTrackPan('${t.id}',this.value)"><div class="valuebox" id="pan-${t.id}">${Number(t.pan||0).toFixed(2)}</div></div><div class="inspector-row"><label>Type</label><select class="model-input" data-i="${i}" data-k="type">${['drums','bass','guitars','keyboards','orchestra','winds','melody','click','choirs','other'].map(x=>`<option ${x===t.type?'selected':''}>${x}</option>`).join('')}</select><div class="valuebox">${t.duration_ms?fmtTime(t.duration_ms/1000):'--'}</div></div><div class="inspector-row"><label>MTA Slot</label><select onchange="setTrackMtaSlot('${t.id}',this.value)"><option value="" ${!t.mta_slot?'selected':''}>Auto</option>${Array.from({length:mtaSlotLimit()},(_,n)=>`<option value="${n+1}" ${Number(t.mta_slot)===n+1?'selected':''}>${n+1}</option>`).join('')}</select><div class="valuebox">${t.mta_slot?`Slot ${t.mta_slot}`:'Auto'}</div></div>${insertPanelHtml(t,false)}<div class="panel-section"><div class="section-title">Track export</div><div class="track-export-actions"><button onclick="exportTrack('${t.id}','wav')">WAV</button><button onclick="exportTrack('${t.id}','mp3')">MP3</button><button onclick="exportTrack('${t.id}','flac')">FLAC</button></div></div><div class="panel-section"><div class="collapsed-row">› Send</div><div class="collapsed-row">› Track Automation</div><div class="collapsed-row">› Advanced</div></div></div></aside>`;
+}
+function closeInspectorPanel(){if(!current)return;current.inspector_visible=false;render();markDirty(80)}
 
 function insertPanelHtml(owner,isMaster){const inserts=owner.inserts||owner.master_inserts||[];return `<div class="panel-section"><div class="panel-section-title"><span>⌄ Inserts</span><span>${inserts.length}/16</span></div><div class="insert-list">${inserts.map((x,n)=>insertHtml(x,n,isMaster)).join('')||'<div class="hint" style="padding:7px">No inserts configured.</div>'}</div>${insertAddHtml(isMaster)}</div>`}
 function pluginLabel(x){return x.replaceAll('_',' ').replace(/\b\w/g,c=>c.toUpperCase())}
@@ -1030,7 +1054,7 @@ function mixerHtml(){
 }
 function exportWindowHtml(){
   const limit=current.target==='DAW'?null:mtaSlotLimit(),over=limit!==null&&current.tracks.length>limit;
-  return `<div class="export-dialog"><div class="export-title">Final output</div>${over?`<div class="export-warning">Project has more tracks than ${current.target}. MTA export will ask how to merge tracks into ${limit} output slots.</div>`:''}<div class="export-format-grid"><button class="format-option" onclick="doExport('mta')"><span>▧ MTA (${current.target==='DAW'?'MTA8 / MTA16':current.target})</span><span>Configura ›</span></button><button class="format-option" onclick="doExport('wav')"><span>♫ WAV</span><span>24 bit / PCM ›</span></button><button class="format-option" onclick="doExport('mp3')"><span>♫ MP3</span><span>Configura bitrate ›</span></button><button class="format-option" onclick="doExport('flac')"><span>♫ FLAC</span><span>Lossless ›</span></button><button class="format-option ${current.lyrics?.length?'':'disabled'}" ${current.lyrics?.length?'onclick="openKaraokeExport()"':'disabled'}><span>▣ MP4 Karaoke</span><span>${current.lyrics?.length?'Configura ›':'Lyrics richieste'}</span></button></div><div class="export-dialog-tools"><button class="utility-btn secondary" onclick="previewMaster()">▶ Render &amp; Preview Master</button><button class="utility-btn secondary" onclick="showMtaAnalysis()">⌁ MTA format analysis</button></div><div class="utility-actions"><button class="utility-btn secondary" onclick="closeUtilityModal()">Annulla</button></div></div>`;
+  return `<div class="export-dialog"><div class="export-title">Final output</div>${over?`<div class="export-warning">Project has more tracks than ${current.target}. MTA export will ask how to merge tracks into ${limit} output slots.</div>`:''}<div class="export-format-grid"><button class="format-option" onclick="doExport('mta')"><span>▧ MTA (${current.target==='DAW'?'MTA8 / MTA16':current.target})</span><span>Configura ›</span></button><button class="format-option" onclick="doExport('wav')"><span>♫ WAV</span><span>24 bit / PCM ›</span></button><button class="format-option" onclick="doExport('mp3')"><span>♫ MP3</span><span>Configura bitrate ›</span></button><button class="format-option" onclick="doExport('flac')"><span>♫ FLAC</span><span>Lossless ›</span></button><button class="format-option ${current.lyrics?.length?'':'disabled'}" ${current.lyrics?.length?'onclick="openKaraokeExport()"':'disabled'}><span>▣ MP4 Karaoke</span><span>${current.lyrics?.length?'Configura ›':'Lyrics richieste'}</span></button></div><div class="export-dialog-tools"><button id="exportPreviewStart" class="utility-btn secondary" onclick="previewExportMaster()">▶ Render &amp; Preview Master</button><button id="exportPreviewStop" class="utility-btn secondary export-preview-stop" onclick="stopExportPreview()" disabled>■ Stop anteprima</button><button class="utility-btn secondary" onclick="showMtaAnalysis()">⌁ MTA format analysis</button></div><div class="utility-actions"><button class="utility-btn secondary" onclick="closeUtilityModal()">Annulla</button></div></div>`;
 }
 let lyricsChordsEditorDraft=null;
 let lyricsChordsEditorLyricsDraft=null;
@@ -2428,6 +2452,22 @@ function seekTransport(deltaMs){
   if(current?.follow_playback_enabled)followPlayhead(playCursorMs/1000*pxPerSec,true);
   updateTimedPlaybackOverlay(playCursorMs);
 }
+function syncExportPreviewControls(){
+  const start=$('#exportPreviewStart'),stop=$('#exportPreviewStop');
+  const active=!!(playAudio||trackPlaybacks.length||playbackPaused||playbackBuffering);
+  if(start){start.disabled=active;start.textContent=active?'Anteprima in riproduzione…':'▶ Render & Preview Master'}
+  if(stop)stop.disabled=!active;
+}
+async function previewExportMaster(){
+  syncExportPreviewControls();
+  try{await previewMaster()}finally{syncExportPreviewControls()}
+}
+function stopExportPreview(){
+  stopPlayback();
+  syncExportPreviewControls();
+  toast('Anteprima interrotta');
+}
+
 async function previewTrack(id){
   const t=trackById(id);if(!t)return;stopPlayback();
   try{const item=await makeTrackPlayback(t,true,false,false);trackPlaybacks=[item];playAudio=item.audio;await item.audio.play();requestAnimationFrame(movePlayhead);if(current.realtime_meter_enabled)startVuMeterLoop()}catch(e){toast(e.message)}
@@ -2520,6 +2560,7 @@ async function doExport(format=exportFormat){
       :format==='flac'
         ?`<div class="workflow-grid"><label class="workflow-field"><span>Sample rate</span><select id="exportSampleRate"><option value="44100">44.1 kHz</option><option value="48000">48 kHz</option></select></label><label class="workflow-field"><span>Compressione</span><select id="exportFlacCompression">${Array.from({length:13},(_,i)=>`<option value="${i}" ${i===8?'selected':''}>${i}</option>`).join('')}</select></label></div>`
         :`<div class="workflow-note">Formato progetto: <b>${esc(current.target)}</b>. L'export MTA userà l'estensione <b>.${ext}</b>.</div>`;
+  const normalizeParams=['wav','mp3','flac'].includes(format)?`<div class="export-normalize-panel"><label class="workflow-check"><input id="exportNormalize" type="checkbox" onchange="toggleExportNormalizeTarget()"><span>Normalizza prima dell’export</span></label><label id="exportNormalizeTargetRow" class="workflow-field export-normalize-target" hidden><span>Picco target (dBFS)</span><input id="exportNormalizeDb" type="number" min="-30" max="0" step="0.1" value="-1.0"><small>0 dBFS è il massimo digitale; -1 dBFS è un valore tipico per evitare clipping.</small></label></div>`:'';
   showUtilityModal('Esporta progetto',`
     <div class="stem-workflow">
       <label class="workflow-field"><span>Formato</span><input value="${format==='mta'?current.target:format.toUpperCase()}" disabled></label>
@@ -2527,6 +2568,7 @@ async function doExport(format=exportFormat){
       ${mtaTargetField}
       ${mtaProfileField}
       ${audioParams}
+      ${normalizeParams}
       <div class="workflow-note">${format==='mta'?'Il profilo MTA controlla l’ordine fisico delle tracce Click/Melody nel file. MTA8 mantiene le posizioni specifiche del dispositivo; per MTA16 il default derivato dal corpus è Click 1 / Melody 9. Se servono stream intermedi vengono creati slot silenziosi. ':''}${currentUser?.native_single_user?'Dopo Conferma verrà aperto il selettore del filesystem per scegliere la cartella di destinazione.':isMobileClient()?'L’app mobile userà il selettore file del sistema operativo. Puoi anche condividere direttamente l’output.':'Il browser chiederà dove salvare il file secondo le impostazioni di download del browser.'}</div>
       <div class="utility-actions">
         <button class="utility-btn primary" onclick="confirmConfiguredExport('${format}',false)">Conferma export</button>
@@ -2535,6 +2577,7 @@ async function doExport(format=exportFormat){
       </div>
     </div>`);
 }
+function toggleExportNormalizeTarget(){const enabled=!!$('#exportNormalize')?.checked;const row=$('#exportNormalizeTargetRow');if(row)row.hidden=!enabled}
 async function confirmConfiguredExport(format,share=false){
   if(!current)return;
   const name=($('#exportFileName')?.value||'project').trim();
@@ -2546,6 +2589,8 @@ async function confirmConfiguredExport(format,share=false){
     sample_rate:Number($('#exportSampleRate')?.value||44100),
     wav_bit_depth:Number($('#exportWavBits')?.value||24),
     flac_compression:Number($('#exportFlacCompression')?.value||8),
+    normalize_audio:!!$('#exportNormalize')?.checked,
+    normalize_peak_db:Number($('#exportNormalizeDb')?.value||-1),
     mta_target:$('#exportMtaTarget')?.value||(current.target==='DAW'?'MTA16':current.target),
     mta_device_profile:$('#exportMtaProfile')?.value||current.mta_device_profile||'auto',
     slots:[],
@@ -2705,7 +2750,7 @@ function requireOpenProject(action){if(current)return true;toast(`Apri o crea un
 function focusProjectWorkspace(){if(!current){$('#emptyState')?.scrollIntoView({behavior:'smooth',block:'center'});return}$('#editor')?.scrollIntoView({behavior:'smooth',block:'start'})}
 function focusTracks(){if(!requireOpenProject('visualizzare le tracce'))return;const el=$('.tracks-scroll')||$('.tracks')||$('#editor');el?.scrollIntoView({behavior:'smooth',block:'start'});el?.classList.add('nav-focus-pulse');setTimeout(()=>el?.classList.remove('nav-focus-pulse'),900)}
 function focusMixer(){if(!requireOpenProject('aprire il mixer'))return;const el=$('#mixerDock');if(el){el.hidden=false;el.scrollIntoView({behavior:'smooth',block:'nearest'});el.classList.add('nav-focus-pulse');setTimeout(()=>el.classList.remove('nav-focus-pulse'),900)}}
-function focusInspector(){if(!requireOpenProject('aprire i plugin'))return;const el=$('#inspector');if(!el)return toast('Seleziona una traccia per visualizzare i plugin');el.scrollIntoView({behavior:'smooth',block:'nearest'});el.classList.add('nav-focus-pulse');setTimeout(()=>el.classList.remove('nav-focus-pulse'),900)}
+function focusInspector(){if(!requireOpenProject('aprire i plugin'))return;if(current.inspector_visible===false){current.inspector_visible=true;render();markDirty(80)}const el=$('#inspector');if(!el)return toast('Seleziona una traccia per visualizzare i plugin');el.scrollIntoView({behavior:'smooth',block:'nearest'});el.classList.add('nav-focus-pulse');setTimeout(()=>el.classList.remove('nav-focus-pulse'),900)}
 
 async function readSystemClipboard(){
   let value='';
@@ -2772,7 +2817,55 @@ async function startYoutubeImport(){
 }
 function focusImport(){$('#newTrackFile')?.click()}
 
-function editProjectMeta(){if(!current)return;const title=prompt('Project title',current.title);if(title!==null&&title.trim())current.title=title.trim().slice(0,200);const originalTitle=prompt('Titolo originale',current.original_title||'');if(originalTitle!==null)current.original_title=originalTitle.trim().slice(0,300);const authors=prompt('Autori / compositori (separati da virgola)',(current.authors||[]).join(', '));if(authors!==null)current.authors=authors.split(/[,;]/).map(x=>x.trim()).filter(Boolean).slice(0,64);const artist=prompt('Interprete / artista',current.artist||'');if(artist!==null)current.artist=artist.slice(0,200);const key=prompt('Tonalità / Key',current.key||'');if(key!==null)current.key=key.trim().slice(0,40);const bpm=prompt('BPM',String(current.bpm));if(bpm!==null&&Number(bpm)>0)setProjectBpm(Math.min(300,Number(bpm)));const sig=prompt('Time signature (es. 4/4, 3/4, 6/8)',current.time_signature||'4/4');if(sig!==null&&sig.trim()&&sig.trim()!==(current.time_signature||'4/4'))setProjectTimeSignature(sig.trim(),true);render();markDirty()}
+function editProjectMeta(){
+  if(!current)return;
+  const signatures=['2/4','3/4','4/4','5/4','6/8','7/8','9/8','12/8'];
+  const targets=['MTA8','MTA16','DAW'];
+  const profiles=[['auto','Auto'],['merish5_xynthia2','Merish5 / Xynthia2'],['bbeat_divo','B.Beat / Divo'],['mlive_mta16_default','M-Live MTA16'],['merish5_plus_mta16','Merish5+ MTA16'],['generic','Generic']];
+  const row=(label,control)=>`<tr><th>${esc(label)}</th><td>${control}</td></tr>`;
+  const input=(id,value,max=300,type='text')=>`<input id="${id}" type="${type}" value="${esc(value??'')}" maxlength="${max}" class="project-meta-input">`;
+  const select=(id,value,options)=>`<select id="${id}" class="project-meta-input">${options.map(([v,l])=>`<option value="${esc(v)}" ${String(value)===String(v)?'selected':''}>${esc(l)}</option>`).join('')}</select>`;
+  showUtilityModal('Modifica metadata progetto',`<div class="table-scroll"><table class="users-table project-meta-editor"><tbody>${[
+    row('Titolo',input('projectMetaTitle',current.title,200)),
+    row('Titolo originale',input('projectMetaOriginalTitle',current.original_title||'',300)),
+    row('Autori / compositori',input('projectMetaAuthors',(current.authors||[]).join(', '),1000)),
+    row('Artista / interprete',input('projectMetaArtist',current.artist||'',200)),
+    row('Tonalità / Key',input('projectMetaKey',current.key||'',40)),
+    row('BPM',`<input id="projectMetaBpm" type="number" min="30" max="300" step="1" value="${esc(String(Math.round(Number(current.bpm)||120)))}" class="project-meta-input">`),
+    row('Time signature',select('projectMetaTimeSignature',current.time_signature||'4/4',signatures.map(x=>[x,x]))),
+    row('Tipo progetto',select('projectMetaTarget',current.target||'MTA8',targets.map(x=>[x,x]))),
+    row('Profilo MTA',select('projectMetaDeviceProfile',current.mta_device_profile||'auto',profiles)),
+    row('Società repertorio',input('projectMetaRightsSocieties',(current.rights_societies||[]).join(', '),500)),
+  ].join('')}</tbody></table></div><p class="hint">Tutti i campi vengono salvati insieme nel progetto. Se modifichi il time signature, i BPM vengono ricalcolati usando la nuova metrica.</p><div class="utility-actions"><button class="utility-btn primary" onclick="saveProjectMetaEditor()">Save</button><button class="utility-btn secondary" onclick="closeUtilityModal()">Annulla</button></div>`);
+}
+async function saveProjectMetaEditor(){
+  if(!current)return;
+  const title=($('#projectMetaTitle')?.value||'').trim();
+  if(!title){toast('Il titolo del progetto non può essere vuoto');return}
+  const newSig=$('#projectMetaTimeSignature')?.value||'4/4',oldSig=current.time_signature||'4/4';
+  current.title=title.slice(0,200);
+  current.original_title=($('#projectMetaOriginalTitle')?.value||'').trim().slice(0,300);
+  current.authors=($('#projectMetaAuthors')?.value||'').split(/[,;\n]/).map(x=>x.trim()).filter(Boolean).slice(0,64);
+  current.artist=($('#projectMetaArtist')?.value||'').trim().slice(0,200);
+  current.key=($('#projectMetaKey')?.value||'').trim().slice(0,40);
+  const bpm=Math.max(30,Math.min(300,Number($('#projectMetaBpm')?.value)||Number(current.bpm)||120));
+  current.bpm=Math.round(bpm);if(!current.base_bpm)current.base_bpm=current.bpm;
+  current.target=$('#projectMetaTarget')?.value||current.target||'MTA8';
+  current.mta_device_profile=$('#projectMetaDeviceProfile')?.value||'auto';
+  current.rights_societies=($('#projectMetaRightsSocieties')?.value||'').split(/[,;\n]/).map(x=>x.trim().toUpperCase()).filter(Boolean).slice(0,16);
+  current.time_signature=newSig;
+  try{
+    if(newSig!==oldSig){
+      const track=(current.tracks||[]).find(t=>t.type!=='metronome')||(current.tracks||[])[0];
+      if(track){
+        showMediaProgress('Ricalcolo BPM',10,`Tempo impostato a ${newSig}. Ricalcolo BPM…`);
+        try{const result=await api(`/api/projects/${current.id}/tracks/${track.id}/estimate-bpm?time_signature=${encodeURIComponent(newSig)}`,{method:'POST'});current.bpm=Number(result.bpm)||current.bpm;current.base_bpm=current.bpm}catch(e){toast('Metadata salvati; ricalcolo BPM non riuscito: '+e.message)}
+      }
+    }
+    await api('/api/projects/'+current.id,{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify(current)});
+    projectDirty=false;closeUtilityModal();render();toast('Metadata progetto salvati');
+  }catch(e){toast(e.message)}
+}
 async function downloadProjectLyrics(withChords=false){if(!current)return;if(!(current.lyrics||[]).length)return toast('Il progetto non contiene lyrics');if(withChords&&!(current.chords||[]).some(ch=>!ch.excluded))return toast('Il progetto non contiene chords attivi');const ext='txt';const safeName=(current.title||'lyrics').replace(/[\/:*?"<>|]+/g,'_').trim()||'lyrics';try{await downloadWithProgress(`/api/projects/${current.id}/lyrics.txt?chords=${withChords?'true':'false'}`,`${safeName}.${ext}`,withChords?'Download lyrics + chords':'Download lyrics',false,'text/plain')}catch(e){toast(e.message)}}
 async function downloadProjectChordPro(){if(!current)return;if(!(current.lyrics||[]).length)return toast('Il progetto non contiene lyrics');if(!(current.chords||[]).some(ch=>!ch.excluded))return toast('Il progetto non contiene chords attivi');const safeName=(current.title||'lyrics').replace(/[\/:*?"<>|]+/g,'_').trim()||'lyrics';try{await downloadWithProgress(`/api/projects/${current.id}/lyrics.chordpro`,`${safeName}.cho`,'Download ChordPro',false,'text/plain')}catch(e){toast(e.message)}}
 function lyricsPdfUrl(preview=false){const color=$('#lyricsPdfChordColorExpanded')?.value||$('#lyricsPdfChordColor')?.value||'#7B1FA2';return `/api/projects/${current.id}/lyrics.pdf?chord_color=${encodeURIComponent(color)}${preview?'&preview=true':''}`}
@@ -3020,7 +3113,7 @@ function showUtilityModal(title,html,stemProgress=false){
   }
   $('#utilityTitle').textContent=title;$('#utilityBody').innerHTML=html;$('#utilityBackdrop').classList.remove('hidden');
 }
-function closeUtilityModal(){if(activeStemJob){toast('La separazione è in corso: usa Annulla separazione se vuoi interromperla.');return}$('#utilityBackdrop').classList.add('hidden');document.querySelector('.utility-modal')?.classList.remove('sample-editor-modal','meta-expanded-modal','pdf-html-preview-modal','timed-editor-modal','youtube-import-modal');sampleEditorState=null;clearTimeout(sampleEditorPreviewTimer);sampleEditorPreviewTimer=null;forceNativeViewportTop()}
+function closeUtilityModal(){if(activeStemJob){toast('La separazione è in corso: usa Annulla separazione se vuoi interromperla.');return}if(document.querySelector('.utility-modal .export-dialog')&&(playAudio||trackPlaybacks.length||playbackPaused||playbackBuffering))stopPlayback();$('#utilityBackdrop').classList.add('hidden');document.querySelector('.utility-modal')?.classList.remove('sample-editor-modal','meta-expanded-modal','pdf-html-preview-modal','timed-editor-modal','youtube-import-modal');sampleEditorState=null;clearTimeout(sampleEditorPreviewTimer);sampleEditorPreviewTimer=null;forceNativeViewportTop()}
 function exportProjectArchive(){if(!current){toast('Apri prima un progetto');return}window.location.href=`/api/projects/${current.id}/archive`}
 async function deleteCurrentProject(){if(!current){toast('Apri prima un progetto');return}await deleteProjectFromWorkspace(current.id,current.title)}
 $('#projectArchiveFile').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;const fd=new FormData();fd.append('file',f);try{current=await api('/api/project-archives/import',{method:'POST',body:fd});rememberRecentProject(current.id);selectedTrackId=current.tracks[0]?.id||null;resetProjectUiForOpen();render();await refresh();toast('Progetto completo importato')}catch(err){toast('Import progetto fallito: '+err.message)}finally{e.target.value=''}})
@@ -3075,7 +3168,7 @@ async function showProjectInfo(){
   ];
   const rights=(current.rights_records||[]);
   const rightsRows=rights.length?`<h4>Dati repertorio / provider diritti</h4><div class="table-scroll"><table class="users-table"><thead><tr><th>Provider</th><th>Opera</th><th>Dati registrati</th></tr></thead><tbody>${rights.map(r=>`<tr><td><b>${esc(r.society||'—')}</b></td><td>${esc(r.original_title||r.title||'—')}</td><td>${esc(rightsRecordSummary(r))}</td></tr>`).join('')}</tbody></table></div>`:'<p class="hint">Nessun dato repertorio registrato nel progetto.</p>';
-  showUtilityModal('Info progetto',`<div class="utility-actions"><button class="utility-btn" onclick="editProjectMeta();showProjectInfo()">Modifica titolo / autore / BPM e metadata</button><button class="utility-btn secondary" onclick="openProjectMetadataSearch()">Cerca autori/interpreti online</button><button class="utility-btn secondary" onclick="openRightsSearch()">Cerca repertorio autori</button></div><div class="table-scroll"><table class="users-table project-info-table"><tbody>${rows.map(([k,v])=>`<tr><th>${esc(k)}</th><td>${esc(v)}</td></tr>`).join('')}</tbody></table></div>${rightsRows}`);
+  showUtilityModal('Info progetto',`<div class="utility-actions"><button class="utility-btn" onclick="editProjectMeta()">Modifica titolo / autore / BPM e metadata</button><button class="utility-btn secondary" onclick="openProjectMetadataSearch()">Cerca autori/interpreti online</button><button class="utility-btn secondary" onclick="openRightsSearch()">Cerca repertorio autori</button></div><div class="table-scroll"><table class="users-table project-info-table"><tbody>${rows.map(([k,v])=>`<tr><th>${esc(k)}</th><td>${esc(v)}</td></tr>`).join('')}</tbody></table></div>${rightsRows}`);
 }
 async function manageProjectFiles(){
   if(!current){toast('Apri prima un progetto');return}

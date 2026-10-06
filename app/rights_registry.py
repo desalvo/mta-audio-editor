@@ -180,41 +180,87 @@ def _mb_artist_credit(value: Any) -> list[str]:
     return out
 
 
-def search_musicbrainz_metadata(*, title: str, artist: str = "", limit: int = 12) -> list[dict[str, Any]]:
-    """Search public MusicBrainz recording metadata by song title.
-
-    The search result intentionally stays lightweight: authors/composers are
-    resolved only for the candidate selected by the user, keeping the public
-    MusicBrainz service request count low.
-    """
-    title = str(title or "").strip()
-    if not title:
-        return []
-    query = f'recording:"{title.replace(chr(34), "")}"'
-    if str(artist or "").strip():
-        query += f' AND artist:"{str(artist).replace(chr(34), "").strip()}"'
+def _musicbrainz_search_rows(query: str, limit: int) -> list[dict[str, Any]]:
     payload = _read_json(f"{MUSICBRAINZ_API}/recording/", {
         "query": query,
         "fmt": "json",
         "limit": str(max(1, min(25, int(limit)))),
     })
+    return (payload.get("recordings") or []) if isinstance(payload, dict) else []
+
+
+def _normalise_mb_search_text(value: str) -> str:
+    import re
+    text = str(value or "").replace("\u2018", "'").replace("\u2019", "'").replace("\u201c", '"').replace("\u201d", '"')
+    text = re.sub(r"[^\w\s'&+-]", " ", text, flags=re.UNICODE)
+    return " ".join(text.split()).strip()
+
+
+def search_musicbrainz_metadata(*, title: str, artist: str = "", limit: int = 12) -> list[dict[str, Any]]:
+    """Search public MusicBrainz recording metadata with graceful fallbacks.
+
+    Artist metadata in projects can contain combined credits (for example
+    ``Lady Gaga & Bruno Mars``). MusicBrainz' ``artist:`` field is stricter,
+    so a zero-result artist-qualified query must never suppress a perfectly
+    valid title match. Queries therefore progress from precise to permissive.
+    """
+    import time
+
+    clean_title = _normalise_mb_search_text(title)
+    clean_artist = _normalise_mb_search_text(artist)
+    if not clean_title:
+        return []
+    safe_title = clean_title.replace('"', '')
+    safe_artist = clean_artist.replace('"', '')
+    queries: list[str] = []
+    if safe_artist:
+        queries.append(f'recording:"{safe_title}" AND artist:"{safe_artist}"')
+    queries.append(f'recording:"{safe_title}"')
+    # Last fallback uses MusicBrainz' general Lucene search, which tolerates
+    # punctuation, alternate credits and small title variations much better.
+    queries.append(safe_title)
+
+    raw_rows: list[dict[str, Any]] = []
+    for index, query in enumerate(dict.fromkeys(queries)):
+        if index:
+            time.sleep(1.05)
+        rows = _musicbrainz_search_rows(query, max(limit, 15))
+        if rows:
+            raw_rows.extend(row for row in rows if isinstance(row, dict))
+            # A title-only result is already broad enough; do not spend another
+            # MusicBrainz request unless all precise queries were empty.
+            if query == f'recording:"{safe_title}"' or (safe_artist and index == 0):
+                break
+
     results: list[dict[str, Any]] = []
-    for row in (payload.get("recordings") or []) if isinstance(payload, dict) else []:
-        if not isinstance(row, dict) or not row.get("id"):
+    seen: set[str] = set()
+    title_fold = clean_title.casefold()
+    artist_fold = clean_artist.casefold()
+    for row in raw_rows:
+        mbid = str(row.get("id") or "").strip()
+        if not mbid or mbid in seen:
             continue
+        seen.add(mbid)
         performers = _mb_artist_credit(row.get("artist-credit"))
+        row_title = str(row.get("title") or clean_title).strip()
+        score = int(row.get("score") or 0)
+        if _normalise_mb_search_text(row_title).casefold() == title_fold:
+            score += 25
+        if artist_fold and any(artist_fold in _normalise_mb_search_text(name).casefold() or _normalise_mb_search_text(name).casefold() in artist_fold for name in performers):
+            score += 15
         results.append({
             "provider": "MUSICBRAINZ",
-            "mbid": str(row.get("id")),
-            "title": str(row.get("title") or title),
+            "mbid": mbid,
+            "title": row_title,
             "performers": performers,
             "first_release_date": str(row.get("first-release-date") or ""),
             "isrcs": [str(x) for x in (row.get("isrcs") or []) if str(x).strip()][:8],
-            "score": int(row.get("score") or 0),
+            "score": score,
             "disambiguation": str(row.get("disambiguation") or ""),
-            "source_url": f"https://musicbrainz.org/recording/{row.get('id')}",
+            "source_url": f"https://musicbrainz.org/recording/{mbid}",
         })
-    return results
+    results.sort(key=lambda item: (-int(item.get("score") or 0), str(item.get("title") or "").casefold()))
+    return results[:max(1, min(25, int(limit)))]
 
 
 def resolve_musicbrainz_metadata(recording_mbid: str) -> dict[str, Any]:

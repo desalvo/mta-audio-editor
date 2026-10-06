@@ -71,9 +71,18 @@ from .version import APP_RELEASE, APP_REVISION, APP_VERSION, BUILD_ID, CREATOR, 
 app = FastAPI(title="MTA Audio Editor", version=APP_VERSION, docs_url=None, redoc_url=None, openapi_url=None)
 
 
-def _musical_export_project(project: Project) -> Project:
-    """Return a non-destructive export view with chords/key following project transposition."""
+def _audible_export_project(project: Project) -> Project:
+    """Return an export-only view that omits tracks explicitly muted by the user."""
     export_project = project.model_copy(deep=True)
+    export_project.tracks = [track for track in export_project.tracks if not track.mute]
+    if not export_project.tracks:
+        raise ValueError("all project tracks are muted")
+    return export_project
+
+
+def _musical_export_project(project: Project) -> Project:
+    """Return a non-destructive MTA export view with mute filtering and transposition."""
+    export_project = _audible_export_project(project)
     export_project.chords = transpose_chords([ch for ch in project.chords if not ch.excluded], project.pitch_semitones)
     export_project.key = transpose_key_name(project.key, project.pitch_semitones)
     return export_project
@@ -3410,7 +3419,10 @@ def preview_mix(pid: str, request: Request):
 @app.get("/api/projects/{pid}/export-plan")
 def export_plan(pid: str, request: Request, profile: str | None = None, target: str | None = None):
     source_project = _project_for_actor(request, pid)
-    project = source_project.model_copy(deep=True)
+    try:
+        project = _audible_export_project(source_project)
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from exc
     if project.target == "DAW":
         project.target = target if target in {"MTA8", "MTA16"} else "MTA16"
     limit = 8 if project.target == "MTA8" else 16
@@ -3436,7 +3448,13 @@ def export_mta_with_mapping(pid: str, req: MtaExportRequest, request: Request):
     try:
         validate_project_files(project)
         export_project = _musical_export_project(project)
-        slots = validate_slot_mapping(export_project, req.slots)
+        known = {track.id for track in export_project.tracks}
+        requested_slots = [
+            slot.model_copy(update={"track_ids": [track_id for track_id in slot.track_ids if track_id in known]})
+            for slot in req.slots
+        ]
+        requested_slots = [slot for slot in requested_slots if slot.track_ids]
+        slots = validate_slot_mapping(export_project, requested_slots)
         ext = "mta8" if export_project.target == "MTA8" else "mta16"
         out = pdir(pid) / f"export.{ext}"
         export_mta(export_project, out, slots)
@@ -3651,19 +3669,25 @@ async def upload_karaoke_background(pid: str, request: Request, file: UploadFile
 
 
 def _render_configured_project_export(pid: str, req: ProjectExportRequest) -> tuple[Path, str, str, str]:
-    project = load_project(pid)
+    source_project = load_project(pid)
     fmt = req.format.lower()
-    validate_project_files(project)
+    validate_project_files(source_project)
     safe_stem = SAFE_DOWNLOAD_RE.sub("_", Path(req.filename).stem).strip(" ._")[:180] or "project"
     if fmt == "mta":
-        export_project = _musical_export_project(project)
+        export_project = _musical_export_project(source_project)
         if export_project.target == "DAW":
             export_project.target = req.mta_target or "MTA16"
         ext = "mta8" if export_project.target == "MTA8" else "mta16"
         out = pdir(pid) / f"configured-export.{ext}"
         limit = 8 if export_project.target == "MTA8" else 16
         if len(export_project.tracks) > limit or req.slots:
-            slots = validate_slot_mapping(export_project, req.slots, req.mta_device_profile)
+            known = {track.id for track in export_project.tracks}
+            requested_slots = [
+                slot.model_copy(update={"track_ids": [track_id for track_id in slot.track_ids if track_id in known]})
+                for slot in req.slots
+            ]
+            requested_slots = [slot for slot in requested_slots if slot.track_ids]
+            slots = validate_slot_mapping(export_project, requested_slots, req.mta_device_profile)
             export_mta(export_project, out, slots, req.mta_device_profile)
         else:
             export_mta(export_project, out, profile=req.mta_device_profile)
@@ -3671,8 +3695,9 @@ def _render_configured_project_export(pid: str, req: ProjectExportRequest) -> tu
     elif fmt in {"wav", "mp3", "flac"}:
         ext = fmt
         out = pdir(pid) / f"configured-export.{ext}"
+        export_project = _audible_export_project(source_project)
         render_mix(
-            project,
+            export_project,
             audio_path,
             out,
             fmt=fmt,
@@ -3680,14 +3705,16 @@ def _render_configured_project_export(pid: str, req: ProjectExportRequest) -> tu
             sample_rate=int(req.sample_rate),
             wav_bit_depth=int(req.wav_bit_depth),
             flac_compression=int(req.flac_compression),
+            normalize_peak_db=float(req.normalize_peak_db) if req.normalize_audio else None,
         )
         media_type = {"wav": "audio/wav", "mp3": "audio/mpeg", "flac": "audio/flac"}[fmt]
     elif fmt == "mp4":
-        if not project.lyrics:
+        export_project = _audible_export_project(source_project)
+        if not export_project.lyrics:
             raise ValueError("MP4 karaoke export requires synchronized lyrics")
         ext = "mp4"
         out = pdir(pid) / "configured-export.mp4"
-        _render_karaoke_video(pid, project, out, req)
+        _render_karaoke_video(pid, export_project, out, req)
         media_type = "video/mp4"
     else:
         raise ValueError("unsupported export format")
@@ -3706,7 +3733,25 @@ def configured_project_export(pid: str, req: ProjectExportRequest, request: Requ
             if destination.suffix.lower() != Path(final_name).suffix.lower():
                 destination = destination.with_suffix(Path(final_name).suffix)
             destination.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(out, destination)
+            # Write to a sibling temporary file and replace once. Some native file
+            # dialogs may leave the previous file visible while export is running;
+            # atomic replace prevents a stale copy from reappearing after overwrite.
+            temp_destination = destination.with_name(f".{destination.name}.export-{uuid.uuid4().hex}.tmp")
+            try:
+                shutil.copyfile(out, temp_destination)
+                with temp_destination.open("rb") as handle:
+                    os.fsync(handle.fileno())
+                os.replace(temp_destination, destination)
+                try:
+                    dir_fd = os.open(str(destination.parent), os.O_RDONLY)
+                    try:
+                        os.fsync(dir_fd)
+                    finally:
+                        os.close(dir_fd)
+                except OSError:
+                    pass
+            finally:
+                temp_destination.unlink(missing_ok=True)
             return {"ok": True, "native": True, "path": str(destination), "filename": destination.name, "format": fmt}
         return FileResponse(out, filename=final_name, media_type=media_type)
     except HTTPException:
@@ -3842,19 +3887,20 @@ def export(pid: str, request: Request, format: str = "mta"):
     project = _project_for_actor(request, pid)
     try:
         validate_project_files(project)
+        export_project = _audible_export_project(project)
         if format == "mta":
-            if project.target == "DAW":
+            if export_project.target == "DAW":
                 raise HTTPException(409, "DAW projects require choosing MTA8 or MTA16 in configured export")
-            if len(project.tracks) > (8 if project.target == "MTA8" else 16):
+            if len(export_project.tracks) > (8 if export_project.target == "MTA8" else 16):
                 raise HTTPException(409, "MTA export mapping required; use /export-plan and /export-mta")
-            ext = "mta8" if project.target == "MTA8" else "mta16"
+            ext = "mta8" if export_project.target == "MTA8" else "mta16"
             out = pdir(pid) / f"export.{ext}"
             export_mta(_musical_export_project(project), out)
             media_type = "application/octet-stream"
         elif format in {"wav", "mp3", "flac"}:
             ext = format
             out = pdir(pid) / f"export.{ext}"
-            render_mix(project, audio_path, out, fmt=ext, bitrate="320k")
+            render_mix(export_project, audio_path, out, fmt=ext, bitrate="320k")
             media_type = {"wav": "audio/wav", "mp3": "audio/mpeg", "flac": "audio/flac"}[ext]
         else:
             raise HTTPException(400, "unsupported export format")

@@ -13,6 +13,8 @@ def test_export_dialog_asks_name_and_format_specific_parameters():
     assert 'id="exportWavBits"' in js
     assert 'id="exportMp3Bitrate"' in js
     assert 'id="exportFlacCompression"' in js
+    assert 'id="exportNormalize"' in js
+    assert 'id="exportNormalizeDb"' in js
     assert "confirmConfiguredExport" in js
     assert "executeConfiguredExport" in js
     assert "/configured-export" in js
@@ -41,6 +43,8 @@ def test_configured_export_request_model_contains_audio_parameters():
     assert request.wav_bit_depth == 32
     assert request.mp3_bitrate_kbps == 320
     assert request.flac_compression == 8
+    assert request.normalize_audio is False
+    assert request.normalize_peak_db == -1.0
 
 
 def test_native_export_dialog_extension_validation(tmp_path, monkeypatch):
