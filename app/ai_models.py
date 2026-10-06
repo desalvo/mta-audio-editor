@@ -21,7 +21,7 @@ LYRICS_MODELS = [
     {"id": "large-v3", "display_name": "Whisper large-v3", "quality": "recommended", "approx_bytes": 3_000_000_000, "recommended": True},
     {"id": "turbo", "display_name": "Whisper turbo", "quality": "fast-high", "approx_bytes": 1_700_000_000},
 ]
-LYRICS_DEFAULT_MODEL = os.getenv("MTA_LYRICS_WHISPER_MODEL", "base").strip() or "base"
+LYRICS_DEFAULT_MODEL = os.getenv("MTA_LYRICS_WHISPER_MODEL", "turbo").strip() or "turbo"
 
 CHORD_MODELS = [
     {

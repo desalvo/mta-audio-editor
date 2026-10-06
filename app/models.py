@@ -129,6 +129,16 @@ class LyricLine(BaseModel):
 class Chord(BaseModel):
     time_ms: int = Field(ge=0)
     chord: str = Field(max_length=200)
+    # Optional manual layout override used by the joint Lyrics + Chords editor.
+    # Playback timing remains time_ms; these fields affect document/layout placement only.
+    anchor_line_time_ms: int | None = Field(default=None, ge=0)
+    anchor_word_index: int | None = Field(default=None, ge=0)
+    anchor_word_text: str = Field(default="", max_length=500)
+    manual_anchor: bool = False
+    # Joint Lyrics + Chords editor can hide a detected chord without deleting the
+    # source analysis event. Excluded chords are ignored by playback, documents and
+    # synchronized MTA export events, while remaining recoverable in the project.
+    excluded: bool = False
 
 
 class RightsRecord(BaseModel):

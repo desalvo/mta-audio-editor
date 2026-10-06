@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import base64
 import json
 import os
 import socket
@@ -325,7 +326,7 @@ class NativeApi:
         import webview
 
         ext = str(extension or "").lower().lstrip(".")
-        if ext not in {"mta8", "mta16", "wav", "mp3", "flac"}:
+        if ext not in {"mta8", "mta16", "wav", "mp3", "flac", "pdf", "txt", "cho"}:
             raise ValueError("unsupported export extension")
         safe_name = "".join(ch if ch.isalnum() or ch in " ._-" else "_" for ch in suggested_name).strip(" .")
         if not safe_name:
@@ -338,6 +339,9 @@ class NativeApi:
             "wav": "WAV Audio (*.wav)",
             "mp3": "MP3 Audio (*.mp3)",
             "flac": "FLAC Audio (*.flac)",
+            "pdf": "PDF Document (*.pdf)",
+            "txt": "Text File (*.txt)",
+            "cho": "ChordPro (*.cho)",
         }
         chosen = self.window.create_file_dialog(
             webview.FileDialog.SAVE,
@@ -350,6 +354,36 @@ class NativeApi:
         if path.suffix.lower() != f".{ext}":
             path = path.with_suffix(f".{ext}")
         return {"ok": True, "cancelled": False, "path": str(path)}
+
+    def save_generated_file(self, suggested_name: str, extension: str, data_base64: str) -> dict:
+        """Show the native save dialog and atomically persist generated content."""
+        chosen = self.choose_export_save_path(suggested_name, extension)
+        if not chosen.get("ok"):
+            return chosen
+        target = Path(str(chosen["path"])).expanduser().resolve()
+        target.parent.mkdir(parents=True, exist_ok=True)
+        raw = str(data_base64 or "")
+        if "," in raw and raw.lstrip().startswith("data:"):
+            raw = raw.split(",", 1)[1]
+        payload = base64.b64decode(raw, validate=False)
+        temp = target.with_name(f".{target.name}.tmp-{os.getpid()}-{time.time_ns()}")
+        try:
+            with temp.open("wb") as handle:
+                handle.write(payload)
+                handle.flush()
+                os.fsync(handle.fileno())
+            os.replace(temp, target)
+            try:
+                dir_fd = os.open(str(target.parent), os.O_RDONLY)
+                try:
+                    os.fsync(dir_fd)
+                finally:
+                    os.close(dir_fd)
+            except OSError:
+                pass
+        finally:
+            temp.unlink(missing_ok=True)
+        return {"ok": True, "cancelled": False, "path": str(target), "bytes": len(payload)}
 
     def get_native_settings(self) -> dict:
         root = _data_root()

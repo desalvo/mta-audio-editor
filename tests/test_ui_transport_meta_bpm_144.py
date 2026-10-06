@@ -3,11 +3,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_lyrics_default_is_whisper_base():
+def test_lyrics_default_is_whisper_turbo():
     ai = (ROOT / "app/ai_models.py").read_text(encoding="utf-8")
     music = (ROOT / "app/music_text.py").read_text(encoding="utf-8")
-    assert 'MTA_LYRICS_WHISPER_MODEL", "base"' in ai
-    assert 'MTA_LYRICS_WHISPER_MODEL' in music and '"base"' in music
+    assert 'MTA_LYRICS_WHISPER_MODEL", "turbo"' in ai
+    assert 'MTA_LYRICS_WHISPER_MODEL' in music and '"turbo"' in music
 
 
 def test_meta_panel_is_responsive_and_expandable():
@@ -20,10 +20,13 @@ def test_meta_panel_is_responsive_and_expandable():
     assert "white-space:normal" in css
 
 
-def test_pdf_preview_uses_webview_safe_html_sheet():
+def test_pdf_preview_uses_the_real_generated_pdf():
     js = (ROOT / "app/static/app.js").read_text(encoding="utf-8")
-    assert "pdf-sheet" in js
-    assert "pdf-preview-frame" not in js[js.index("function previewProjectLyricsPdf"):js.index("async function resetTimedData")]
+    block = js[js.index("async function previewProjectLyricsPdf"):js.index("async function resetTimedData")]
+    assert "lyricsPdfUrl(true)" in block
+    assert "response.blob()" in block
+    assert "pdf-preview-frame" in block
+    assert "pdf-sheet" not in block
 
 
 def test_fast_playback_and_spacebar_regressions():

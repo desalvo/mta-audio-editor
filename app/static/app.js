@@ -38,6 +38,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 let current=null, currentUser=null, pluginInfo={inserts:{},schemas:{},custom:{},stem_splitter:{available:false}}, pxPerSec=70;
 let sel={a:0,b:0}, dragging=false, audioCtx=null, playAudio=null, selectedTrackId=null, exportFormat='mta';
 let autosaveTimer=null, autosaveBusy=false, autosaveQueued=false, autosaveEnabled=true, projectDirty=false, stemPollTimer=null, activeStemJob=null, activeStemProjectId=null;
+let lyricsPdfPreviewObjectUrl=null;
 let nativeRecentProjects=[];
 let preferredStemCount=Number(localStorage.getItem('mtaStemCount')||0);if(preferredStemCount!==0&&(preferredStemCount<2||preferredStemCount>64))preferredStemCount=0;
 function setPreferredStemCount(value){const n=Number(value||0);preferredStemCount=(n===0||(n>=2&&n<=64))?n:0;localStorage.setItem('mtaStemCount',String(preferredStemCount));}
@@ -110,6 +111,7 @@ function mobileSaveRemoteFile(url,filename,mime='application/octet-stream',share
 async function api(url,opt={}){opt.headers=opt.headers||{};if((opt.method||'GET').toUpperCase()!=='GET')opt.headers['X-MTA-Request']='1';const r=await fetch(url,opt);if(!r.ok)throw new Error(await r.text());const ct=r.headers.get('content-type')||'';return ct.includes('json')?r.json():r}
 function esc(s){return String(s??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 function toast(s){const t=$('#toast');t.textContent=s;t.style.display='block';clearTimeout(t._timer);t._timer=setTimeout(()=>t.style.display='none',4200)}
+function setRenderPlaybackPreparing(active){const b=$('#playMaster'),t=$('#toast');if(active){if(b){b.dataset.prepareText=b.textContent||'▶';b.textContent='…';b.title='Preparazione render in corso';b.classList.add('preparing')}if(t){clearTimeout(t._timer);t.textContent='Preparazione del render in corso, attendere…';t.style.display='block'}}else{if(b){if(b.classList.contains('preparing'))b.textContent='▶';b.classList.remove('preparing');b.title='Play / Preview'}if(t&&t.textContent==='Preparazione del render in corso, attendere…')t.style.display='none'}}
 function fmtTime(sec,ms=false){sec=Math.max(0,sec);const m=Math.floor(sec/60),s=sec-m*60;return ms?`${String(m).padStart(2,'0')}:${String(Math.floor(s)).padStart(2,'0')}.${String(Math.floor((s%1)*1000)).padStart(3,'0')}`:`${m}:${String(Math.floor(s)).padStart(2,'0')}`}
 function projectEnd(){let e=10000;for(const t of current?.tracks||[])for(const c of t.clips||[])e=Math.max(e,c.timeline_start_ms+(c.source_end_ms-c.source_start_ms));return e}
 function widthPx(){return Math.max(980,projectEnd()/1000*pxPerSec+180)}
@@ -710,8 +712,8 @@ document.addEventListener('click',event=>{
 function textModelCatalog(){return pluginInfo.text_models||{lyrics:{models:[]},chords:{engines:[],models:[]}}}
 function openTextAnalysisChooser(id,kind){
   const cat=textModelCatalog(),track=trackById(id);if(!track)return toast('Traccia non trovata');
-  if(kind==='lyrics'){const c=cat.lyrics||{},opts=(c.models||[]).map(m=>`<option value="${esc(m.id)}" ${m.id===c.default_model?'selected':''}>${esc(m.display_name)} · ${m.installed?'installato':(c.storage==='local'?'download locale':'download server')}</option>`).join('');showUtilityModal('Estrai lyrics',`<div class="form-grid"><p><b>Motore:</b> OpenAI Whisper</p><label>Modello<select id="textAnalysisChoice">${opts}</select></label><label class="workflow-check"><input id="lyricsAdvancedAlignment" type="checkbox"> Allineamento avanzato parola / sillaba</label><p class="hint">Pipeline opzionale: Whisper → word timestamps → forced alignment acustico → suddivisione sillabica → timeline MTA. Migliora il posizionamento di lyrics e chords. L’estrazione viene sempre eseguita dall’inizio della traccia e il testo parziale non viene mostrato durante la generazione per evitare duplicati o frasi spezzate.</p><p class="hint">Il modello viene scaricato on-demand (download modello al primo uso) e conservato ${c.storage==='local'?'localmente nell’app nativa':'sul server'}.</p><div class="form-actions"><button class="utility-btn secondary model-download-btn" type="button" onclick="downloadTextAnalysisSelection('lyrics')">Scarica modello</button><button class="utility-btn primary accent" type="button" onclick="startTrackTextAnalysis('${esc(id)}','lyrics',$('#textAnalysisChoice').value)">Estrai lyrics</button></div></div>`);return}
-  const c=cat.chords||{},models=Object.fromEntries((c.models||[]).map(x=>[x.id,x])),opts=(c.engines||[]).map(e=>{const m=models[e.model_id]||{};let state;if(e.model_id)state=m.installed?'modello installato':(c.storage==='local'?'modello scaricabile localmente':'modello scaricabile sul server');else if(e.id==='chordino')state=e.available?'nessun modello AI · motore locale disponibile':'nessun modello AI · richiede Sonic Annotator + Chordino';else state='nessun modello AI richiesto';return `<option value="${esc(e.id)}" ${e.id===c.default_engine?'selected':''} ${e.available?'':'disabled'}>${esc(e.display_name)} · ${esc(state)}</option>`}).join('');showUtilityModal('Estrai chords',`<div class="form-grid"><p><b>Motore che verrà usato:</b> <span id="chordEngineLabel"></span></p><label>Motore / modello<select id="textAnalysisChoice" onchange="updateChordEngineDisclosure()">${opts}</select></label><div id="chordEngineDisclosure" class="workflow-note"></div><div class="form-actions"><button class="utility-btn secondary model-download-btn" type="button" onclick="downloadTextAnalysisSelection('chords')">Scarica modello selezionato</button><button class="utility-btn primary accent" type="button" onclick="startTrackTextAnalysis('${esc(id)}','chords',$('#textAnalysisChoice').value)">Estrai chords</button></div></div>`);updateChordEngineDisclosure()}
+  if(kind==='lyrics'){const c=cat.lyrics||{},opts=(c.models||[]).map(m=>`<option value="${esc(m.id)}" ${m.id===c.default_model?'selected':''}>${esc(m.display_name)} · ${m.installed?'installato':(c.storage==='local'?'download locale':'download server')}</option>`).join('');showUtilityModal('Estrai lyrics',`<div class="form-grid"><p><b>Motore:</b> OpenAI Whisper</p><label>Modello<select id="textAnalysisChoice">${opts}</select></label><label class="workflow-check"><input id="lyricsAdvancedAlignment" type="checkbox"> Allineamento avanzato parola / sillaba</label><p class="hint">Pipeline opzionale: Whisper → word timestamps → forced alignment acustico → suddivisione sillabica → timeline MTA. Migliora il posizionamento di lyrics e chords. L’estrazione viene sempre eseguita dall’inizio della traccia e il testo parziale non viene mostrato durante la generazione per evitare duplicati o frasi spezzate.</p><p class="hint">Il modello viene scaricato on-demand (download modello al primo uso) e conservato ${c.storage==='local'?'localmente nell’app nativa':'sul server'}.</p><div class="workflow-note warning"><b>Attenzione:</b> l’estrazione può richiedere molto tempo. La durata dipende dalla lunghezza della traccia, dal modello scelto e dall’hardware CPU/GPU disponibile. Durante l’analisi evita di chiudere l’app o interrompere il dispositivo.</div><div class="form-actions"><button class="utility-btn secondary model-download-btn" type="button" onclick="downloadTextAnalysisSelection('lyrics')">Scarica modello</button><button class="utility-btn primary accent" type="button" onclick="startTrackTextAnalysis('${esc(id)}','lyrics',$('#textAnalysisChoice').value)">Estrai lyrics</button></div></div>`);return}
+  const c=cat.chords||{},models=Object.fromEntries((c.models||[]).map(x=>[x.id,x])),opts=(c.engines||[]).map(e=>{const m=models[e.model_id]||{};let state;if(e.model_id)state=m.installed?'modello installato':(c.storage==='local'?'modello scaricabile localmente':'modello scaricabile sul server');else if(e.id==='chordino')state=e.available?'nessun modello AI · motore locale disponibile':'nessun modello AI · richiede Sonic Annotator + Chordino';else state='nessun modello AI richiesto';return `<option value="${esc(e.id)}" ${e.id===c.default_engine?'selected':''} ${e.available?'':'disabled'}>${esc(e.display_name)} · ${esc(state)}</option>`}).join('');showUtilityModal('Estrai chords',`<div class="form-grid"><p><b>Motore che verrà usato:</b> <span id="chordEngineLabel"></span></p><label>Motore / modello<select id="textAnalysisChoice" onchange="updateChordEngineDisclosure()">${opts}</select></label><div id="chordEngineDisclosure" class="workflow-note"></div><div class="workflow-note warning"><b>Attenzione:</b> l’analisi degli accordi può richiedere molto tempo, soprattutto con i motori AI. La durata dipende dalla traccia e dall’hardware CPU/GPU disponibile. Per aumentare la precisione l’analisi viene completata sull’intera traccia prima di mostrare gli accordi finali.</div><div class="form-actions"><button class="utility-btn secondary model-download-btn" type="button" onclick="downloadTextAnalysisSelection('chords')">Scarica modello selezionato</button><button class="utility-btn primary accent" type="button" onclick="startTrackTextAnalysis('${esc(id)}','chords',$('#textAnalysisChoice').value)">Estrai chords</button></div></div>`);updateChordEngineDisclosure()}
 function updateChordEngineDisclosure(){const c=textModelCatalog().chords||{},id=$('#textAnalysisChoice')?.value,e=(c.engines||[]).find(x=>x.id===id),m=(c.models||[]).find(x=>x.id===e?.model_id);if($('#chordEngineLabel'))$('#chordEngineLabel').textContent=e?.display_name||id||'—';if($('#chordEngineDisclosure'))$('#chordEngineDisclosure').innerHTML=e?.model_id?`Modello: <b>${esc(m?.display_name||e.model_id)}</b> · ${m?.installed?'installato':'sarà scaricato al primo uso'}${m?.license?`<br>Licenza pesi: ${esc(m.license)}`:''}`:'Questo motore non richiede un modello AI scaricabile.'}
 async function downloadTextAnalysisSelection(kind){const cat=textModelCatalog(),choice=$('#textAnalysisChoice')?.value;try{let modelId=choice;if(kind==='chords'){const e=(cat.chords?.engines||[]).find(x=>x.id===choice);if(!e?.model_id)return toast('Il motore selezionato non richiede un modello');modelId=e.model_id}await startModelDownload(kind,modelId,async()=>{pluginInfo=await api('/api/plugins');toast(currentUser?.native_single_user?'Modello scaricato localmente':'Modello scaricato sul server');if(kind==='chords')updateChordEngineDisclosure()})}catch(e){toast(e.message)}}
 async function startTrackTextAnalysis(id,kind,choice=''){
@@ -973,11 +975,81 @@ function exportWindowHtml(){
   const limit=current.target==='DAW'?null:mtaSlotLimit(),over=limit!==null&&current.tracks.length>limit;
   return `<div class="export-dialog"><div class="export-title">Final output</div>${over?`<div class="export-warning">Project has more tracks than ${current.target}. MTA export will ask how to merge tracks into ${limit} output slots.</div>`:''}<div class="export-format-grid"><button class="format-option" onclick="doExport('mta')"><span>▧ MTA (${current.target==='DAW'?'MTA8 / MTA16':current.target})</span><span>Configura ›</span></button><button class="format-option" onclick="doExport('wav')"><span>♫ WAV</span><span>24 bit / PCM ›</span></button><button class="format-option" onclick="doExport('mp3')"><span>♫ MP3</span><span>Configura bitrate ›</span></button><button class="format-option" onclick="doExport('flac')"><span>♫ FLAC</span><span>Lossless ›</span></button><button class="format-option ${current.lyrics?.length?'':'disabled'}" ${current.lyrics?.length?'onclick="openKaraokeExport()"':'disabled'}><span>▣ MP4 Karaoke</span><span>${current.lyrics?.length?'Configura ›':'Lyrics richieste'}</span></button></div><div class="export-dialog-tools"><button class="utility-btn secondary" onclick="previewMaster()">▶ Render &amp; Preview Master</button><button class="utility-btn secondary" onclick="showMtaAnalysis()">⌁ MTA format analysis</button></div><div class="utility-actions"><button class="utility-btn secondary" onclick="closeUtilityModal()">Annulla</button></div></div>`;
 }
+let lyricsChordsEditorDraft=null;
+let lyricsChordsEditorLyricsDraft=null;
+let lyricsChordsEditorSelected=-1;
+function editorDraftLyrics(){return lyricsChordsEditorLyricsDraft||current?.lyrics||[]}
+function editorLineWords(line,lineIndex){
+  const actual=(line?.words||[]).filter(w=>String(w.text||'').trim());
+  if(actual.length)return actual.map((w,i)=>({...JSON.parse(JSON.stringify(w)),text:String(w.text||'').trim(),start_ms:Number(w.start_ms??line.time_ms??0),end_ms:Number(w.end_ms??w.start_ms??line.time_ms??0),index:i}));
+  const lyrics=editorDraftLyrics(),tokens=String(line?.text||'').trim().split(/\s+/).filter(Boolean),next=lyrics?.[lineIndex+1];
+  const start=Number(line?.time_ms||0),end=Number(line?.end_ms||next?.time_ms||start+Math.max(1200,tokens.length*420)),span=Math.max(1,end-start);
+  return tokens.map((text,i)=>({text,start_ms:Math.round(start+span*i/Math.max(1,tokens.length)),end_ms:Math.round(start+span*(i+1)/Math.max(1,tokens.length)),syllables:[],index:i}));
+}
+function editorAutoAnchor(chord){
+  const lyrics=editorDraftLyrics();if(!lyrics.length)return{line:0,word:0};
+  let li=0;
+  for(let i=0;i<lyrics.length;i++){const next=lyrics[i+1]?.time_ms??(lyrics[i].end_ms||Infinity);if(chord.time_ms>=lyrics[i].time_ms&&chord.time_ms<next){li=i;break}if(chord.time_ms>=lyrics[i].time_ms)li=i}
+  const words=editorLineWords(lyrics[li],li);if(!words.length)return{line:li,word:0};
+  let wi=0,best=Infinity;
+  words.forEach((w,i)=>{const mid=(Number(w.start_ms)+Number(w.end_ms))/2,d=Math.abs(mid-Number(chord.time_ms||0));if(d<best){best=d;wi=i}});
+  return{line:li,word:wi};
+}
+function editorChordAnchor(chord){
+  const lyrics=editorDraftLyrics();
+  if(chord?.manual_anchor&&chord.anchor_line_time_ms!=null&&chord.anchor_word_index!=null){const li=lyrics.findIndex(l=>Number(l.time_ms)===Number(chord.anchor_line_time_ms));if(li>=0)return{line:li,word:Number(chord.anchor_word_index)}}
+  return editorAutoAnchor(chord);
+}
+function lyricsChordsEditorHtml(){
+  const lyrics=editorDraftLyrics(),chords=lyricsChordsEditorDraft||[];
+  const byLine=new Map();chords.forEach((ch,ci)=>{const a=editorChordAnchor(ch);const key=`${a.line}:${a.word}`;if(!byLine.has(key))byLine.set(key,[]);byLine.get(key).push({ch,ci})});
+  const rows=lyrics.map((line,li)=>{const words=editorLineWords(line,li);const wordHtml=words.map((w,wi)=>{const chips=(byLine.get(`${li}:${wi}`)||[]).map(({ch,ci})=>`<button type="button" draggable="true" class="lc-chord ${lyricsChordsEditorSelected===ci?'selected':''} ${ch.manual_anchor?'manual':'auto'} ${ch.excluded?'excluded':''}" data-chord-index="${ci}" onclick="event.stopPropagation();selectLyricsChord(${ci})" ondragstart="dragLyricsChord(event,${ci})" title="${ch.excluded?'Escluso dall’output':(ch.manual_anchor?'Associazione manuale':'Posizione automatica')} · ${fmtTime(Number(ch.time_ms||0)/1000)}">${esc(transposeChordLabel(ch.chord,current.pitch_semitones||0))}</button>`).join('');const split=wi<words.length-1?`<button type="button" class="lc-split-word" onclick="event.stopPropagation();splitLyricsEditorLine(${li},${wi+1})" title="Dividi la riga dopo questa parola">↵</button>`:'';return `<span class="lc-word" data-line-index="${li}" data-word-index="${wi}" ondragover="event.preventDefault()" ondrop="dropLyricsChord(event,${li},${wi})" onclick="assignSelectedLyricsChord(${li},${wi})"><span class="lc-chord-slot">${chips}</span><span class="lc-token">${esc(w.text)}</span>${split}</span>`}).join('');const merge=li<lyrics.length-1?`<button type="button" class="utility-btn compact secondary lc-merge" onclick="mergeLyricsEditorLine(${li})" title="Accorpa con la riga successiva">Accorpa ↓</button>`:'';return `<div class="lc-line"><div class="lc-time">${fmtTime(Number(line.time_ms||0)/1000)}</div><div class="lc-words">${wordHtml}</div><div class="lc-line-actions">${merge}</div></div>`}).join('');
+  const selected=lyricsChordsEditorSelected>=0?chords[lyricsChordsEditorSelected]:null;
+  const excludeLabel=selected?.excluded?'Reincludi chord selezionato':'Escludi chord selezionato';
+  return `<div class="lyrics-chords-editor"><div class="workflow-note"><b>Editor Lyrics + Chords</b><br>Trascina un accordo sopra una parola o selezionalo e fai clic sulla parola. Il simbolo ↵ divide una riga dopo quella parola; <b>Accorpa ↓</b> unisce la riga con la successiva. Gli accordi esclusi restano recuperabili nel progetto ma non vengono usati in playback, PDF o eventi sincronizzati MTA.</div><div class="lc-toolbar"><button type="button" class="utility-btn secondary" onclick="resetLyricsChordAnchors()">Ripristina posizioni automatiche</button><button type="button" class="utility-btn secondary" onclick="toggleSelectedLyricsChordExcluded()" ${selected?'':'disabled'}>${excludeLabel}</button><button type="button" class="utility-btn secondary" onclick="includeAllLyricsChords()">Reincludi tutti</button><button type="button" class="utility-btn primary accent" onclick="saveLyricsChordsEditor()">Salva editor e sincronizzazione MTA</button></div><div class="lc-scroll">${rows||'<div class="hint">Lyrics non disponibili.</div>'}</div></div>`;
+}
+function openLyricsChordsEditor(){if(!current?.lyrics?.length||!current?.chords?.length)return toast('Servono sia lyrics sia chords');lyricsChordsEditorLyricsDraft=JSON.parse(JSON.stringify(current.lyrics));lyricsChordsEditorDraft=JSON.parse(JSON.stringify(current.chords));lyricsChordsEditorSelected=-1;showUtilityModal('Editor Lyrics + Chords',lyricsChordsEditorHtml());document.querySelector('.utility-modal')?.classList.add('lyrics-chords-editor-modal')}
+function refreshLyricsChordsEditor(){const body=document.querySelector('.utility-modal .lyrics-chords-editor');if(!body)return;body.outerHTML=lyricsChordsEditorHtml()}
+function selectLyricsChord(index){lyricsChordsEditorSelected=Number(index);refreshLyricsChordsEditor()}
+function dragLyricsChord(event,index){lyricsChordsEditorSelected=Number(index);event.dataTransfer?.setData('text/plain',String(index));if(event.dataTransfer)event.dataTransfer.effectAllowed='move'}
+function assignLyricsChord(index,lineIndex,wordIndex){const ch=lyricsChordsEditorDraft?.[Number(index)],line=editorDraftLyrics()?.[Number(lineIndex)],word=editorLineWords(line||{},Number(lineIndex))[Number(wordIndex)];if(!ch||!line||!word)return;ch.excluded=false;ch.manual_anchor=true;ch.anchor_line_time_ms=Number(line.time_ms||0);ch.anchor_word_index=Number(wordIndex);ch.anchor_word_text=String(word.text||'');lyricsChordsEditorSelected=Number(index);refreshLyricsChordsEditor()}
+function assignSelectedLyricsChord(lineIndex,wordIndex){if(lyricsChordsEditorSelected<0)return;assignLyricsChord(lyricsChordsEditorSelected,lineIndex,wordIndex)}
+function dropLyricsChord(event,lineIndex,wordIndex){event.preventDefault();const raw=event.dataTransfer?.getData('text/plain'),idx=raw!==''?Number(raw):lyricsChordsEditorSelected;if(Number.isFinite(idx))assignLyricsChord(idx,lineIndex,wordIndex)}
+function toggleSelectedLyricsChordExcluded(){if(lyricsChordsEditorSelected<0||!lyricsChordsEditorDraft?.[lyricsChordsEditorSelected])return;const ch=lyricsChordsEditorDraft[lyricsChordsEditorSelected];ch.excluded=!ch.excluded;refreshLyricsChordsEditor()}
+function includeAllLyricsChords(){if(!lyricsChordsEditorDraft)return;lyricsChordsEditorDraft.forEach(ch=>ch.excluded=false);refreshLyricsChordsEditor()}
+function resetLyricsChordAnchors(){if(!lyricsChordsEditorDraft)return;lyricsChordsEditorDraft.forEach(ch=>{ch.manual_anchor=false;ch.anchor_line_time_ms=null;ch.anchor_word_index=null;ch.anchor_word_text=''});lyricsChordsEditorSelected=-1;refreshLyricsChordsEditor()}
+function editorWordPayload(word){return{text:String(word?.text||''),start_ms:Number(word?.start_ms||0),end_ms:Number(word?.end_ms??word?.start_ms??0),syllables:JSON.parse(JSON.stringify(word?.syllables||[]))}}
+function splitLyricsEditorLine(lineIndex,splitIndex){
+  const lyrics=editorDraftLyrics(),li=Number(lineIndex),line=lyrics?.[li];if(!line)return;
+  const words=editorLineWords(line,li),cut=Number(splitIndex);if(!Number.isFinite(cut)||cut<=0||cut>=words.length)return toast('Scegli un punto interno alla riga');
+  const left=words.slice(0,cut).map(editorWordPayload),right=words.slice(cut).map(editorWordPayload),oldTime=Number(line.time_ms||0),nextTime=Number(lyrics[li+1]?.time_ms||Infinity);
+  let newTime=Math.max(oldTime+1,Number(right[0]?.start_ms||oldTime+1));if(Number.isFinite(nextTime))newTime=Math.min(newTime,Math.max(oldTime+1,nextTime-1));
+  const originalEnd=line.end_ms!=null?Number(line.end_ms):null;
+  const first={...JSON.parse(JSON.stringify(line)),text:left.map(w=>w.text).join(' '),words:left,end_ms:Math.max(oldTime,newTime-1)};
+  const second={...JSON.parse(JSON.stringify(line)),time_ms:newTime,text:right.map(w=>w.text).join(' '),words:right,end_ms:originalEnd!=null?Math.max(newTime,originalEnd):null};
+  lyrics.splice(li,1,first,second);
+  (lyricsChordsEditorDraft||[]).forEach(ch=>{if(!ch.manual_anchor||Number(ch.anchor_line_time_ms)!==oldTime)return;const wi=Number(ch.anchor_word_index||0);if(wi>=cut){ch.anchor_line_time_ms=newTime;ch.anchor_word_index=wi-cut;ch.anchor_word_text=String(right[Math.max(0,Math.min(wi-cut,right.length-1))]?.text||'')}else ch.anchor_word_text=String(left[Math.max(0,Math.min(wi,left.length-1))]?.text||'')});
+  refreshLyricsChordsEditor();
+}
+function mergeLyricsEditorLine(lineIndex){
+  const lyrics=editorDraftLyrics(),li=Number(lineIndex),a=lyrics?.[li],b=lyrics?.[li+1];if(!a||!b)return;
+  const aw=editorLineWords(a,li).map(editorWordPayload),bw=editorLineWords(b,li+1).map(editorWordPayload),aTime=Number(a.time_ms||0),bTime=Number(b.time_ms||0),offset=aw.length;
+  lyrics.splice(li,2,{...JSON.parse(JSON.stringify(a)),text:[a.text,b.text].filter(Boolean).join(' ').replace(/\s+/g,' ').trim(),words:[...aw,...bw],end_ms:b.end_ms!=null?Number(b.end_ms):(a.end_ms!=null?Number(a.end_ms):null)});
+  (lyricsChordsEditorDraft||[]).forEach(ch=>{if(!ch.manual_anchor)return;if(Number(ch.anchor_line_time_ms)===bTime){const wi=Number(ch.anchor_word_index||0);ch.anchor_line_time_ms=aTime;ch.anchor_word_index=offset+wi;ch.anchor_word_text=String(bw[Math.max(0,Math.min(wi,bw.length-1))]?.text||ch.anchor_word_text||'')}else if(Number(ch.anchor_line_time_ms)===aTime){const wi=Number(ch.anchor_word_index||0);ch.anchor_word_text=String(aw[Math.max(0,Math.min(wi,aw.length-1))]?.text||ch.anchor_word_text||'')}});
+  refreshLyricsChordsEditor();
+}
+async function saveLyricsChordsEditor(){
+  if(!current||!lyricsChordsEditorDraft||!lyricsChordsEditorLyricsDraft)return;
+  current.lyrics=JSON.parse(JSON.stringify(lyricsChordsEditorLyricsDraft)).sort((a,b)=>Number(a.time_ms||0)-Number(b.time_ms||0));
+  current.chords=JSON.parse(JSON.stringify(lyricsChordsEditorDraft)).sort((a,b)=>Number(a.time_ms||0)-Number(b.time_ms||0));
+  try{const saved=await api('/api/projects/'+current.id,{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify(current)});current=saved;projectDirty=false;lastHistoryState=projectSnapshot();await syncNativeProjectFile(saved.id);closeUtilityModal();render();toast('Editor Lyrics + Chords salvato: override applicati anche agli eventi MTA')}catch(e){toast(e.message)}
+}
+
 function metaPanelBodyHtml(expanded=false){
   const config={lyrics:['text','Lyrics'],chords:['chord','Chords'],markers:['label','Markers']},[key,label]=config[mixerMetaTab]||config.lyrics,rows=current[mixerMetaTab]||[];const displayValue=x=>mixerMetaTab==='chords'?transposeChordLabel(x[key],current.pitch_semitones||0):x[key];
   const resetButton=mixerMetaTab==='lyrics'?`<button class="tool danger" onclick="resetTimedData('lyrics')">Reset lyrics</button>`:mixerMetaTab==='chords'?`<button class="tool danger" onclick="resetTimedData('chords')">Reset chords</button>`:'';
-  const hasLyrics=!!(current.lyrics||[]).length,hasChords=!!(current.chords||[]).length;
-  const lyricsExports=mixerMetaTab==='lyrics'&&hasLyrics?`<button class="tool" onclick="downloadProjectLyrics(false)">TXT Lyrics</button>${hasChords?`<button class="tool" onclick="downloadProjectLyrics(true)">TXT Lyrics + Chords</button><button class="tool" onclick="downloadProjectChordPro()">ChordPro Lyrics + Chords</button>`:''}<label class="tool meta-color-tool" title="Colore chords nel PDF"><span>Chord color</span><input id="lyricsPdfChordColor${expanded?'Expanded':''}" type="color" value="#7B1FA2"></label><button class="tool" onclick="previewProjectLyricsPdf()">Anteprima PDF ${hasChords?'Lyrics + Chords':'Lyrics'}</button><button class="tool" onclick="downloadProjectLyricsPdf()">Scarica PDF ${hasChords?'Lyrics + Chords':'Lyrics'}</button>`:'';
+  const hasLyrics=!!(current.lyrics||[]).length,hasChords=(current.chords||[]).some(ch=>!ch.excluded);
+  const lyricsExports=mixerMetaTab==='lyrics'&&hasLyrics?`<button class="tool" onclick="downloadProjectLyrics(false)">TXT Lyrics</button>${hasChords?`<button class="tool" onclick="downloadProjectLyrics(true)">TXT Lyrics + Chords</button><button class="tool" onclick="downloadProjectChordPro()">ChordPro Lyrics + Chords</button><button class="tool accent" onclick="openLyricsChordsEditor()">Editor Lyrics + Chords</button>`:''}<label class="tool meta-color-tool" title="Colore chords nel PDF"><span>Chord color</span><input id="lyricsPdfChordColor${expanded?'Expanded':''}" type="color" value="#7B1FA2"></label><button class="tool" onclick="previewProjectLyricsPdf()">Anteprima PDF ${hasChords?'Lyrics + Chords':'Lyrics'}</button><button class="tool" onclick="downloadProjectLyricsPdf()">Scarica PDF ${hasChords?'Lyrics + Chords':'Lyrics'}</button>`:'';
   return `<div class="meta-tabs-content ${expanded?'meta-expanded-content':''}"><div class="meta-list">${rows.map(x=>`<div class="meta-line"><time>${fmtTime(x.time_ms/1000)}</time><span>${esc(displayValue(x))}</span></div>`).join('')||`<div class="hint">No synchronized ${label.toLowerCase()} yet.</div>`}</div><div class="meta-actions"><button class="tool" onclick="editTimed('${mixerMetaTab}')">Edit ${label.toLowerCase()}</button>${resetButton}${lyricsExports}</div>${expanded?'':`<textarea id="lyrics" hidden>${esc(linesToText(current.lyrics,'text'))}</textarea><textarea id="chords" hidden>${esc(linesToText(current.chords,'chord'))}</textarea><textarea id="markers" hidden>${esc(linesToText(current.markers,'label'))}</textarea>`}</div>`;
 }
 function metaPaneHtml(){
@@ -1158,7 +1230,7 @@ function refreshRenderedMasterForMixState(){
       await persistCurrentProject(false);
       const audio=new Audio(`/api/projects/${current.id}/preview-mix?t=${Date.now()}`);
       await new Promise((resolve,reject)=>{audio.addEventListener('loadedmetadata',resolve,{once:true});audio.addEventListener('error',()=>reject(new Error('Anteprima renderizzata non disponibile')),{once:true});audio.load()});
-      if(token!==playbackToken)return;
+      if(token!==playbackToken){setRenderPlaybackPreparing(false);return}
       audio.currentTime=Math.min(cursor/1000/tempoRatio(),Math.max(0,(audio.duration||0)-0.01));
       renderedMasterBaseVolumeDb=Number(current?.master_volume_db||0);
       const graph=await attachPlaybackGraph(audio,{volume_db:0,pan:0},2,false,true,false);
@@ -1474,6 +1546,23 @@ async function pollMediaJob(jobId,title,onDone){
     mediaProgressTimer=setTimeout(()=>pollMediaJob(jobId,title,onDone),500);
   }catch(e){setMobileBusy(false);toast(e.message)}
 }
+async function blobToDataUrl(blob){return await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result||''));reader.onerror=()=>reject(reader.error||new Error('Impossibile leggere il file generato'));reader.readAsDataURL(blob)})}
+async function saveGeneratedBlob(blob,filename,mime='application/octet-stream'){
+  const dot=filename.lastIndexOf('.'),ext=(dot>=0?filename.slice(dot+1):'').toLowerCase();
+  if(currentUser?.native_single_user&&window.pywebview?.api?.save_generated_file&&['pdf','txt','cho'].includes(ext)){
+    const dataUrl=await blobToDataUrl(blob);
+    const saved=await window.pywebview.api.save_generated_file(filename.replace(/\.[^.]+$/,''),ext,dataUrl);
+    if(saved?.ok){toast(`File salvato in ${saved.path}`);return true}
+    if(saved?.cancelled)return true;
+  }
+  if(typeof window.showSaveFilePicker==='function'&&['pdf','txt','cho'].includes(ext)){
+    try{
+      const handle=await window.showSaveFilePicker({suggestedName:filename,types:[{description:ext==='pdf'?'PDF Document':(ext==='cho'?'ChordPro':'Text File'),accept:{[mime||'application/octet-stream']:[`.${ext}`]}}]});
+      const writable=await handle.createWritable();await writable.write(blob);await writable.close();toast(`File salvato: ${filename}`);return true;
+    }catch(e){if(e?.name==='AbortError')return true;throw e}
+  }
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1500);return true;
+}
 async function downloadWithProgress(url,filename,title,share=false,mime='application/octet-stream'){
   showMediaProgress(title,2,'Preparazione download');
   if(isMobileClient()&&mobileSaveRemoteFile(url,filename,mime,share)){
@@ -1481,14 +1570,15 @@ async function downloadWithProgress(url,filename,title,share=false,mime='applica
   }
   const r=await fetch(url);
   if(!r.ok)throw new Error(await r.text());
-  const total=Number(r.headers.get('content-length')||0),reader=r.body?.getReader(),chunks=[];let loaded=0;
+  const total=Number(r.headers.get('content-length')||0),reader=r.body?.getReader(),chunks=[];let loaded=0,blob;
   if(reader){
     while(true){const {done,value}=await reader.read();if(done)break;chunks.push(value);loaded+=value.length;if(total)showMediaProgress(title,90+Math.round(loaded/total*10),'Download del file')}
-    const blob=new Blob(chunks);
-    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1200);
-  }else{const blob=await r.blob();const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click()}
-  $('#utilityBackdrop').classList.add('hidden');
+    blob=new Blob(chunks,{type:mime||r.headers.get('content-type')||'application/octet-stream'});
+  }else blob=await r.blob();
+  await saveGeneratedBlob(blob,filename,mime||r.headers.get('content-type')||'application/octet-stream');
+  $('#utilityBackdrop')?.classList.add('hidden');
 }
+
 async function addTrack(){
   const f=$('#newTrackFile')?.files?.[0];if(!f)return toast('Choose an MP3/WAV/audio file');lastSelectedAudioFile=f;
   await save();
@@ -1553,7 +1643,7 @@ function openStemWorkflow(){
       <label class="workflow-field hidden" id="stemLyricsModelRow"><span>Motore lyrics · OpenAI Whisper</span><select id="stemLyricsModel">${lyricsModelOptions}</select><button type="button" onclick="downloadStemTextModel('lyrics')">Scarica modello</button></label>
       <label class="workflow-check"><input id="stemExtractChords" type="checkbox" onchange="$('#stemChordsEngineRow').classList.toggle('hidden',!this.checked);updateStemChordEngineDisclosure()"> Estrai anche i chords</label>
       <label class="workflow-field hidden" id="stemChordsEngineRow"><span>Motore chords</span><select id="stemChordsEngine" onchange="updateStemChordEngineDisclosure()">${chordEngineOptions}</select><small id="stemChordEngineDisclosure"></small><button type="button" onclick="downloadStemTextModel('chords')">Scarica modello</button></label>
-      <label class="workflow-check"><input id="stemSplitBackingVocals" type="checkbox" onchange="updateBackingModelRow()"> Separa anche voce principale e backing vocals (secondo passaggio AI)</label><label class="workflow-field hidden" id="backingModelRow"><span>Modello Lead / Backing Vocals</span><select id="stemBackingVocalModel">${backingModels}<option value="ffmpeg-center-side">Fallback DSP center/side</option></select><button type="button" onclick="downloadSelectedBackingModel()">Scarica modello</button></label>
+      <div class="workflow-note warning"><b>Nota sui tempi di elaborazione:</b> separazione stem, estrazione lyrics e analisi chords possono richiedere parecchio tempo in base alla durata del brano, ai modelli scelti e all’hardware disponibile.</div><label class="workflow-check"><input id="stemSplitBackingVocals" type="checkbox" onchange="updateBackingModelRow()"> Separa anche voce principale e backing vocals (secondo passaggio AI)</label><label class="workflow-field hidden" id="backingModelRow"><span>Modello Lead / Backing Vocals</span><select id="stemBackingVocalModel">${backingModels}<option value="ffmpeg-center-side">Fallback DSP center/side</option></select><button type="button" onclick="downloadSelectedBackingModel()">Scarica modello</button></label>
       <div class="workflow-note">Il file originale viene sempre conservato in <b>Originals</b>. Il progetto viene salvato dopo l’import e dopo ogni stem aggiunto. Su iPhone/iPad, <b>Auto</b> usa Core ML sul dispositivo quando il modello richiesto è disponibile e ricade automaticamente sul server negli altri casi. I modelli locali vengono scaricati una sola volta e restano disponibili offline. 8 stem richiede un modello compatibile.</div>
       <div class="utility-actions">
         <button class="utility-btn primary" type="button" onclick="startStemWorkflow()" ${stem.available?'':'disabled'}><span>Importa e separa</span></button>
@@ -1633,7 +1723,7 @@ async function startStemWorkflow(){
     }catch(e){return toast('Scelta destinazione progetto fallita: '+e.message)}
   }
   const extractLyrics=!!$('#stemExtractLyrics')?.checked,extractChords=!!$('#stemExtractChords')?.checked;
-  const lyricsModel=$('#stemLyricsModel')?.value||textModelCatalog().lyrics?.default_model||'base';
+  const lyricsModel=$('#stemLyricsModel')?.value||textModelCatalog().lyrics?.default_model||'turbo';
   const chordsEngine=$('#stemChordsEngine')?.value||textModelCatalog().chords?.default_engine||'madmom-deep-chroma';
   const splitBackingVocals=!!$('#stemSplitBackingVocals')?.checked;
   const backingVocalModel=$('#stemBackingVocalModel')?.value||'uvr_mdxnet_kara_2';
@@ -1819,7 +1909,7 @@ function followPlayhead(x,force=false){
 
 function togglePlaybackLyrics(){if(!current)return;current.show_lyrics_playback=!current.show_lyrics_playback;updateTransportToggleButtons();markDirty();updateTimedPlaybackOverlay(playCursorMs)}
 function togglePlaybackChords(){if(!current)return;current.show_chords_playback=!current.show_chords_playback;updateTransportToggleButtons();markDirty();updateTimedPlaybackOverlay(playCursorMs)}
-function activeTimedItem(items,timeMs){let active=null;for(const item of items||[]){if(Number(item.time_ms||0)>timeMs)break;active=item}return active}
+function activeTimedItem(items,timeMs){let active=null;for(const item of items||[]){if(item?.excluded)continue;if(Number(item.time_ms||0)>timeMs)break;active=item}return active}
 function updateTimedPlaybackOverlay(timeMs){const overlay=$('#liveTimedOverlay'),lyricBox=$('#liveLyricBox'),chordBox=$('#liveChordBox');if(!overlay||!lyricBox||!chordBox)return;const running=playbackActuallyRunning()||playbackPaused;const showL=!!current?.show_lyrics_playback&&running,showC=!!current?.show_chords_playback&&running;if(!showL&&!showC){overlay.classList.add('hidden');lyricBox.classList.add('hidden');chordBox.classList.add('hidden');return}overlay.classList.remove('hidden');if(showC){const chord=activeTimedItem(current?.chords,timeMs);chordBox.textContent=chord?transposeChordLabel(chord.chord,current?.pitch_semitones||0):'—';chordBox.classList.remove('hidden')}else chordBox.classList.add('hidden');if(showL){const lyrics=current?.lyrics||[];let lyric=activeTimedItem(lyrics,timeMs);if(lyric&&lyric.end_ms!=null&&timeMs>Number(lyric.end_ms)+350)lyric=null;lyricBox.textContent=lyric?.text||' ';lyricBox.classList.remove('hidden')}else lyricBox.classList.add('hidden')}
 function toggleRealtimeMeters(){
   if(!current)return;current.realtime_meter_enabled=!current.realtime_meter_enabled;$('#realtimeBtn')?.classList.toggle('active',current.realtime_meter_enabled);$$('.meter-realtime,.peak-led').forEach(x=>x.classList.toggle('hidden',!current.realtime_meter_enabled));markDirty();
@@ -2141,6 +2231,7 @@ async function previewMaster(){
     collect();stopPlayback();const token=++playbackToken;
     const needsRenderedMaster=!!current.render_preview_enabled;
     if(needsRenderedMaster){
+      setRenderPlaybackPreparing(true);
       renderedMasterPlayback=true;renderedMasterDirty=false;
       renderedMasterBaseVolumeDb=Number(current.master_volume_db||0);
       const audio=new Audio(`/api/projects/${current.id}/preview-mix?t=${Date.now()}`);playAudio=audio;renderedMasterAudio=audio;
@@ -2156,6 +2247,10 @@ async function previewMaster(){
       // native WebViews and produced a short echo, especially after YouTube imports.
       trackPlaybacks=[];
       await audio.play();
+      setRenderPlaybackPreparing(false);
+      // Render mode uses only the rendered master as audible media, but its
+      // analyser graph still needs the same animation loop as dynamic playback.
+      if(current.realtime_meter_enabled)startVuMeterLoop();
     }else{
       renderedMasterPlayback=false;renderedMasterDirty=false;renderedMasterAudio=null;
       playAudio=await startDynamicTrackPreview(false,false,token);if(token!==playbackToken)return;
@@ -2164,7 +2259,7 @@ async function previewMaster(){
     if(current?.follow_playback_enabled)followPlayhead(playCursorMs/1000*pxPerSec,true);
     requestAnimationFrame(movePlayhead);
     toast(needsRenderedMaster?'Anteprima Master: volume e insert applicati':'Anteprima dinamica tracce');
-  }catch(e){stopPlayback();toast(e.message)}
+  }catch(e){setRenderPlaybackPreparing(false);stopPlayback();toast(e.message)}
 }
 function movePlayhead(){
   const clock=dynamicClockAudio();
@@ -2471,25 +2566,36 @@ async function startYoutubeImport(){
 function focusImport(){$('#newTrackFile')?.click()}
 
 function editProjectMeta(){if(!current)return;const title=prompt('Project title',current.title);if(title!==null&&title.trim())current.title=title.trim().slice(0,200);const originalTitle=prompt('Titolo originale',current.original_title||'');if(originalTitle!==null)current.original_title=originalTitle.trim().slice(0,300);const authors=prompt('Autori / compositori (separati da virgola)',(current.authors||[]).join(', '));if(authors!==null)current.authors=authors.split(/[,;]/).map(x=>x.trim()).filter(Boolean).slice(0,64);const artist=prompt('Interprete / artista',current.artist||'');if(artist!==null)current.artist=artist.slice(0,200);const key=prompt('Tonalità / Key',current.key||'');if(key!==null)current.key=key.trim().slice(0,40);const bpm=prompt('BPM',String(current.bpm));if(bpm!==null&&Number(bpm)>0)setProjectBpm(Math.min(300,Number(bpm)));render();markDirty()}
-async function downloadProjectLyrics(withChords=false){if(!current)return;if(!(current.lyrics||[]).length)return toast('Il progetto non contiene lyrics');if(withChords&&!(current.chords||[]).length)return toast('Il progetto non contiene chords');const ext='txt';const safeName=(current.title||'lyrics').replace(/[\/:*?"<>|]+/g,'_').trim()||'lyrics';try{await downloadWithProgress(`/api/projects/${current.id}/lyrics.txt?chords=${withChords?'true':'false'}`,`${safeName}.${ext}`,withChords?'Download lyrics + chords':'Download lyrics',false,'text/plain')}catch(e){toast(e.message)}}
-async function downloadProjectChordPro(){if(!current)return;if(!(current.lyrics||[]).length)return toast('Il progetto non contiene lyrics');if(!(current.chords||[]).length)return toast('Il progetto non contiene chords');const safeName=(current.title||'lyrics').replace(/[\/:*?"<>|]+/g,'_').trim()||'lyrics';try{await downloadWithProgress(`/api/projects/${current.id}/lyrics.chordpro`,`${safeName}.cho`,'Download ChordPro',false,'text/plain')}catch(e){toast(e.message)}}
+async function downloadProjectLyrics(withChords=false){if(!current)return;if(!(current.lyrics||[]).length)return toast('Il progetto non contiene lyrics');if(withChords&&!(current.chords||[]).some(ch=>!ch.excluded))return toast('Il progetto non contiene chords attivi');const ext='txt';const safeName=(current.title||'lyrics').replace(/[\/:*?"<>|]+/g,'_').trim()||'lyrics';try{await downloadWithProgress(`/api/projects/${current.id}/lyrics.txt?chords=${withChords?'true':'false'}`,`${safeName}.${ext}`,withChords?'Download lyrics + chords':'Download lyrics',false,'text/plain')}catch(e){toast(e.message)}}
+async function downloadProjectChordPro(){if(!current)return;if(!(current.lyrics||[]).length)return toast('Il progetto non contiene lyrics');if(!(current.chords||[]).some(ch=>!ch.excluded))return toast('Il progetto non contiene chords attivi');const safeName=(current.title||'lyrics').replace(/[\/:*?"<>|]+/g,'_').trim()||'lyrics';try{await downloadWithProgress(`/api/projects/${current.id}/lyrics.chordpro`,`${safeName}.cho`,'Download ChordPro',false,'text/plain')}catch(e){toast(e.message)}}
 function lyricsPdfUrl(preview=false){const color=$('#lyricsPdfChordColorExpanded')?.value||$('#lyricsPdfChordColor')?.value||'#7B1FA2';return `/api/projects/${current.id}/lyrics.pdf?chord_color=${encodeURIComponent(color)}${preview?'&preview=true':''}`}
-function downloadProjectLyricsPdf(){if(!current)return;if(!(current.lyrics||[]).length)return toast('Il progetto non contiene lyrics');window.location.href=lyricsPdfUrl(false)}
-function previewProjectLyricsPdf(){
+async function downloadProjectLyricsPdf(){
   if(!current)return;if(!(current.lyrics||[]).length)return toast('Il progetto non contiene lyrics');
-  const hasChords=!!(current.chords||[]).length,title=hasChords?'Anteprima PDF · Lyrics + Chords':'Anteprima PDF · Lyrics';
-  const chords=[...(current.chords||[])].sort((a,b)=>a.time_ms-b.time_ms);let ci=0,lastChord='';
-  const lines=(current.lyrics||[]).map(line=>{while(ci<chords.length&&Number(chords[ci].time_ms)<=Number(line.time_ms)+250){lastChord=transposeChordLabel(chords[ci].chord,current.pitch_semitones||0);ci++}return `<div class="pdf-sheet-line">${hasChords&&lastChord?`<div class="pdf-sheet-chord">${esc(lastChord)}</div>`:''}<div class="pdf-sheet-lyric">${esc(line.text||'')}</div></div>`}).join('');
-  showUtilityModal(title,`<div class="pdf-preview-toolbar"><button class="utility-btn secondary" onclick="closeLyricsPdfPreview()">← Torna all'editor</button><button class="utility-btn primary" onclick="downloadProjectLyricsPdf()">Scarica PDF ${hasChords?'Lyrics + Chords':'Lyrics'}</button></div><div class="pdf-preview-wrap"><article class="pdf-sheet"><header><h1>${esc(current.title||'Lyrics')}</h1>${current.artist?`<h2>${esc(current.artist)}</h2>`:''}<p>${current.key?`Key ${esc(effectiveProjectKey())} · `:''}${Math.round(Number(current.bpm||0))} BPM</p></header>${lines}</article></div><div class="utility-actions pdf-preview-actions"><button class="utility-btn secondary" onclick="closeLyricsPdfPreview()">← Torna all'editor</button><button class="utility-btn primary" onclick="downloadProjectLyricsPdf()">Scarica PDF ${hasChords?'Lyrics + Chords':'Lyrics'}</button></div>`);
-  document.querySelector('.utility-modal')?.classList.add('pdf-html-preview-modal');
-  requestAnimationFrame(()=>{const m=document.querySelector('.utility-modal');if(m)m.scrollTop=0;forceNativeViewportTop()});
+  const safeName=(current.title||'lyrics').replace(/[\/:*?"<>|]+/g,'_').trim()||'lyrics';
+  try{await downloadWithProgress(lyricsPdfUrl(false),`${safeName}.pdf`,(current.chords||[]).some(ch=>!ch.excluded)?'Salva PDF Lyrics + Chords':'Salva PDF Lyrics',false,'application/pdf')}catch(e){toast(e.message)}
+}
+async function previewProjectLyricsPdf(){
+  if(!current)return;if(!(current.lyrics||[]).length)return toast('Il progetto non contiene lyrics');
+  const hasChords=(current.chords||[]).some(ch=>!ch.excluded),title=hasChords?'Anteprima PDF · Lyrics + Chords':'Anteprima PDF · Lyrics';
+  try{
+    showMediaProgress(title,12,'Generazione anteprima PDF reale');
+    const response=await fetch(lyricsPdfUrl(true));if(!response.ok)throw new Error(await response.text());
+    const blob=await response.blob();
+    if(lyricsPdfPreviewObjectUrl)URL.revokeObjectURL(lyricsPdfPreviewObjectUrl);
+    lyricsPdfPreviewObjectUrl=URL.createObjectURL(blob);
+    showUtilityModal(title,`<div class="pdf-preview-toolbar"><button class="utility-btn secondary" type="button" onclick="closeLyricsPdfPreview()">← Torna all'editor</button><button class="utility-btn primary" type="button" onclick="downloadProjectLyricsPdf()">Salva PDF ${hasChords?'Lyrics + Chords':'Lyrics'}</button></div><div class="pdf-preview-wrap"><iframe class="pdf-preview-frame" title="${esc(title)}" src="${lyricsPdfPreviewObjectUrl}"></iframe></div><div class="utility-actions pdf-preview-actions"><button class="utility-btn secondary" type="button" onclick="closeLyricsPdfPreview()">← Torna all'editor</button><button class="utility-btn primary" type="button" onclick="downloadProjectLyricsPdf()">Salva PDF ${hasChords?'Lyrics + Chords':'Lyrics'}</button></div>`);
+    document.querySelector('.utility-modal')?.classList.add('pdf-real-preview-modal');
+    requestAnimationFrame(()=>{const m=document.querySelector('.utility-modal');if(m)m.scrollTop=0;forceNativeViewportTop()});
+  }catch(e){toast(e.message)}
 }
 function closeLyricsPdfPreview(){
   const backdrop=$('#utilityBackdrop');if(backdrop)backdrop.classList.add('hidden');
-  document.querySelector('.utility-modal')?.classList.remove('pdf-html-preview-modal');
+  document.querySelector('.utility-modal')?.classList.remove('pdf-real-preview-modal');
+  if(lyricsPdfPreviewObjectUrl){URL.revokeObjectURL(lyricsPdfPreviewObjectUrl);lyricsPdfPreviewObjectUrl=null}
   forceNativeViewportTop();
   requestAnimationFrame(()=>{forceNativeViewportTop();$('#mixer')?.focus?.({preventScroll:true});document.querySelector('.main')?.scrollTo?.({top:0,left:0,behavior:'instant'})});
 }
+
 async function resetTimedData(kind){
   if(!current||!['lyrics','chords'].includes(kind))return;
   const label=kind==='lyrics'?'lyrics':'chords';

@@ -74,7 +74,7 @@ app = FastAPI(title="MTA Audio Editor", version=APP_VERSION, docs_url=None, redo
 def _musical_export_project(project: Project) -> Project:
     """Return a non-destructive export view with chords/key following project transposition."""
     export_project = project.model_copy(deep=True)
-    export_project.chords = transpose_chords(project.chords, project.pitch_semitones)
+    export_project.chords = transpose_chords([ch for ch in project.chords if not ch.excluded], project.pitch_semitones)
     export_project.key = transpose_key_name(project.key, project.pitch_semitones)
     return export_project
 
@@ -1616,8 +1616,10 @@ def _text_music_worker(job_id: str, pid: str, track_id: str, kind: str, model_or
             _media_job_update(job_id, progress=5, message=f"Preparazione chords · {engine_info['display_name']}" + (f" · {selected_model}" if selected_model else ""))
             cancel_event=MEDIA_JOBS[job_id].get("cancel_event")
             def chords_progress(pct, items, message):
-                partial=[{"time_ms":x.time_ms,"chord":x.chord} for x in items[-240:]]
-                _media_job_update(job_id,progress=pct,message=message,partial={"kind":"chords","items":partial})
+                # Do not expose inline chord guesses while analysis is running.
+                # Chunk/partial labels are unstable and can create many transient
+                # intermediate chords that disappear in the final full-pass result.
+                _media_job_update(job_id,progress=pct,message=message,partial={"kind":"chords","items":[]})
             if getattr(extract_chords,"__module__","") != "app.music_text":
                 try: events=extract_chords(source,engine=selected_engine)
                 except TypeError: events=extract_chords(source)

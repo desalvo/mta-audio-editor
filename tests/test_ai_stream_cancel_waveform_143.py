@@ -115,20 +115,17 @@ def test_progressive_lyrics_cancelled_before_cli_fallback(monkeypatch,tmp_path):
         raise AssertionError('expected cancellation')
 
 
-def test_progressive_madmom_chunks_and_deduplicates(monkeypatch,tmp_path):
+def test_progressive_madmom_runs_one_full_pass_without_inline_events(monkeypatch,tmp_path):
     import app.music_text as mt
     class Proc:
         def __call__(self,path):
             return [(0.0,1.0,'C:maj'),(1.0,2.0,'G:maj')]
     monkeypatch.setattr(mt,'_madmom_processor',lambda engine:(Proc(),'cuda'))
-    monkeypatch.setattr(mt,'_duration_seconds',lambda path:45.0)
-    def fake_run(cmd):
-        if cmd[0]=='ffmpeg': Path(cmd[-1]).write_bytes(b'RIFF')
-        return ''
-    monkeypatch.setattr(mt,'_run',fake_run)
+    monkeypatch.setattr(mt,'extract_chords',lambda path,engine=None:[mt.Chord(time_ms=0,chord='C'),mt.Chord(time_ms=1000,chord='G')])
     updates=[]
     rows=mt.extract_chords_progressive(tmp_path/'song.m4a',engine='madmom-cnn-crf',progress=lambda p,i,m:updates.append((p,len(i),m)),chunk_seconds=30)
-    assert [(x.time_ms,x.chord) for x in rows]==[(0,'C'),(1000,'G'),(30000,'C'),(31000,'G')]
+    assert [(x.time_ms,x.chord) for x in rows]==[(0,'C'),(1000,'G')]
+    assert all(count == 0 for _, count, _ in updates)
     assert any('cuda' in msg for _,_,msg in updates)
 
 
@@ -139,7 +136,7 @@ def test_madmom_rows_and_non_ai_progressive_path(monkeypatch,tmp_path):
     monkeypatch.setattr(mt,'extract_chords',lambda path,engine=None:[mt.Chord(time_ms=0,chord='F')])
     updates=[]
     out=mt.extract_chords_progressive(tmp_path/'x.wav',engine='mta-chromagram',progress=lambda p,i,m:updates.append(p))
-    assert out[0].chord=='F' and updates==[10,96]
+    assert out[0].chord=='F' and updates==[12,35,96]
 
 
 def test_ai_catalog_reports_hardware_acceleration(monkeypatch):

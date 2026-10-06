@@ -819,3 +819,60 @@ body.native-single-user .main-area,body.native-single-user .editor-zone,body.nat
 .live-timed-overlay.hidden,.live-timed-overlay .hidden{display:none!important}.live-chord-box,.live-lyric-box{background:rgba(5,16,35,.86);border:1px solid rgba(94,190,255,.72);box-shadow:0 10px 34px rgba(0,0,0,.35);border-radius:14px;color:#fff;text-align:center;backdrop-filter:blur(8px)}
 .live-chord-box{font-size:28px;font-weight:800;padding:8px 22px;color:#80dcff;min-width:110px}.live-lyric-box{font-size:22px;font-weight:650;padding:10px 24px;max-width:min(82vw,980px);line-height:1.3}
 @media(max-width:760px){.live-timed-overlay{top:92px;max-width:94vw}.live-chord-box{font-size:22px}.live-lyric-box{font-size:18px;padding:8px 14px}}
+
+/* 0.2.0-161 timed transport + PDF export visibility */
+.transport-btn.timed-display-mode{width:auto;min-width:86px;max-width:118px;height:38px;padding:0 10px;font-size:10px;line-height:1.15;white-space:normal;overflow-wrap:normal;text-align:center;color:#d8e6f1}
+.transport-btn.timed-display-mode.active{background:linear-gradient(#0c5c4c,#0b4037);border-color:#40d9ae;color:#eafff7;box-shadow:0 0 10px rgba(64,217,174,.28),inset 0 0 0 1px rgba(92,239,195,.12)}
+.transport-btn.timed-display-mode:not(.active){opacity:.82}
+.meta-actions .tool,.meta-expanded-content .meta-actions .tool{display:inline-flex;align-items:center;justify-content:center;min-width:118px;max-width:100%;height:auto;min-height:38px;padding:7px 10px;white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere;line-height:1.18;color:#e8f5ff!important;-webkit-text-fill-color:#e8f5ff!important}
+.pdf-real-preview-modal{width:min(1050px,97vw)!important;max-width:97vw!important;height:min(92vh,980px)}
+.pdf-real-preview-modal .utility-body{height:calc(100% - 48px);overflow:auto}
+.pdf-real-preview-modal .pdf-preview-wrap{height:min(75vh,900px);min-height:480px;padding:0;background:#525d67}
+.pdf-real-preview-modal .pdf-preview-frame{display:block;width:100%;height:100%;border:0;background:#fff}
+.pdf-preview-toolbar,.pdf-preview-actions{flex-wrap:wrap}.pdf-preview-toolbar .utility-btn,.pdf-preview-actions .utility-btn{min-width:170px;min-height:40px;padding:8px 12px;white-space:normal;line-height:1.2;color:#eef8ff!important;-webkit-text-fill-color:#eef8ff!important}
+@media(max-width:760px){.transport-btn.timed-display-mode{min-width:74px;max-width:96px;padding:0 7px;font-size:9px}.pdf-real-preview-modal{width:100vw!important;max-width:100vw!important;height:100dvh;margin:0;border-radius:0}.pdf-real-preview-modal .pdf-preview-wrap{height:72dvh;min-height:360px}}
+
+.native-single-user .web-project-action{display:none!important}
+
+/* 0.2.0-r163 joint Lyrics + Chords visual editor */
+.lyrics-chords-editor-modal .utility-card{width:min(1180px,96vw);max-width:1180px;max-height:92vh}
+.lyrics-chords-editor{display:flex;flex-direction:column;gap:12px;min-width:0}
+.lc-toolbar{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+.lc-scroll{max-height:68vh;overflow:auto;padding:10px;border:1px solid rgba(110,160,220,.28);border-radius:14px;background:rgba(5,16,34,.55)}
+.lc-line{display:grid;grid-template-columns:74px minmax(0,1fr);gap:10px;align-items:start;padding:10px 8px;border-bottom:1px solid rgba(140,170,210,.16)}
+.lc-line:last-child{border-bottom:0}
+.lc-time{font-variant-numeric:tabular-nums;color:#9db5d4;font-size:12px;padding-top:28px}
+.lc-words{display:flex;flex-wrap:wrap;align-items:flex-end;gap:4px 8px;min-width:0}
+.lc-word{display:inline-flex;flex-direction:column;align-items:flex-start;min-width:max-content;max-width:100%;padding:3px 2px 2px;border-radius:8px;cursor:pointer;transition:background .15s ease,outline-color .15s ease;outline:1px solid transparent}
+.lc-word:hover{background:rgba(83,150,235,.12);outline-color:rgba(92,173,255,.35)}
+.lc-token{font-size:16px;line-height:1.35;color:var(--text,#eef4ff);white-space:nowrap}
+.lc-chord-slot{display:flex;flex-wrap:wrap;gap:3px;min-height:26px;align-items:flex-end}
+.lc-chord{appearance:none;border:1px solid rgba(104,173,255,.65);background:#153766;color:#eaf4ff;border-radius:7px;padding:3px 7px;min-height:24px;font-size:12px;font-weight:700;line-height:1;cursor:grab;white-space:nowrap;max-width:140px;overflow:hidden;text-overflow:ellipsis}
+.lc-chord.auto{opacity:.82;border-style:dashed}
+.lc-chord.manual{background:#4d286d;border-color:#bd78ff}
+.lc-chord.selected{outline:2px solid #67ddff;outline-offset:2px}
+.lc-chord:active{cursor:grabbing}
+@media (max-width:720px){.lc-line{grid-template-columns:1fr}.lc-time{padding-top:0}.lc-token{font-size:15px}.lyrics-chords-editor-modal .utility-card{width:98vw}}
+
+
+/* 0.2.0-r164: keep mixer strips inside the viewport and make overflow scroll internally. */
+.mixer-dock{min-width:0;max-width:100%;overflow:hidden}
+.mixer-dock .mixer-pane{min-width:0;max-width:100%;overflow-x:auto!important;overflow-y:hidden!important;overscroll-behavior-x:contain;scrollbar-gutter:stable}
+.mixer-dock .channels{display:flex;flex-wrap:nowrap;align-items:stretch;width:max-content;min-width:100%;max-width:none;box-sizing:border-box;overflow:visible}
+.mixer-dock .channel{flex:0 0 78px;box-sizing:border-box}
+.mixer-dock .channel.master{flex:0 0 88px}
+.mixer-dock .channel:has(.meter-realtime:not(.hidden) + .meter-realtime:not(.hidden)){flex-basis:110px}
+.mixer-dock .master-divider{flex:0 0 auto}
+.mixer-dock .dock-tabs{min-width:max-content}
+body.native-single-user .mixer-dock .mixer-pane{touch-action:pan-x pan-y;-webkit-overflow-scrolling:touch}
+@media(max-width:900px){.mixer-dock .mixer-pane{overflow-x:auto!important}.mixer-dock .channels{min-width:max-content}}
+
+/* 0.2.0-r165: structural Lyrics + Chords editor overrides. */
+.lc-line{grid-template-columns:74px minmax(0,1fr) auto}
+.lc-line-actions{display:flex;align-items:center;gap:6px;padding-top:24px}
+.lc-split-word{appearance:none;border:0;background:transparent;color:#7fcfff;font-size:13px;line-height:1;padding:1px 2px;margin-top:1px;cursor:pointer;opacity:.55}
+.lc-split-word:hover{opacity:1;color:#d5f3ff}
+.lc-chord.excluded{text-decoration:line-through;opacity:.42;filter:saturate(.45)}
+.lc-toolbar .utility-btn:disabled{opacity:.45;cursor:not-allowed}
+.lc-merge{white-space:nowrap;min-height:28px;padding:4px 8px;font-size:12px}
+@media (max-width:720px){.lc-line{grid-template-columns:1fr}.lc-line-actions{padding-top:0;justify-content:flex-end}.lc-split-word{font-size:15px}}

@@ -26,8 +26,11 @@ def test_web_ui_exposes_independent_resets_and_pdf_preview():
     assert "resetTimedData('chords')" in js
     assert 'previewProjectLyricsPdf()' in js
     assert 'Anteprima PDF · Lyrics + Chords' in js
-    assert 'pdf-sheet' in js
-    assert 'pdf-preview-frame' not in js[js.index('function previewProjectLyricsPdf'):js.index('async function resetTimedData')]
+    block = js[js.index('async function previewProjectLyricsPdf'):js.index('async function resetTimedData')]
+    assert 'pdf-preview-frame' in block
+    assert 'lyricsPdfUrl(true)' in block
+    assert 'response.blob()' in block
+    assert 'pdf-sheet' not in block
 
 
 def test_pdf_preview_css_is_responsive():

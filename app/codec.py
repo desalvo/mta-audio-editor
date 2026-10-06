@@ -219,11 +219,12 @@ def _synchronized_text_attachments(project: Project) -> list[Path]:
         lrc = adir / "lyrics-synchronized.lrc"
         lrc.write_text(synchronized_plain_text(project.lyrics, []), encoding="utf-8")
         out.append(lrc)
-    if project.chords:
+    active_chords = [item for item in project.chords if not item.excluded]
+    if active_chords:
         chords = adir / "chords-synchronized.tsv"
-        chords.write_text("\n".join(f"{item.time_ms}\t{item.chord}" for item in sorted(project.chords, key=lambda x: x.time_ms)) + "\n", encoding="utf-8")
+        chords.write_text("\n".join(f"{item.time_ms}\t{item.chord}" for item in sorted(active_chords, key=lambda x: x.time_ms)) + "\n", encoding="utf-8")
         out.append(chords)
-    if project.lyrics or project.chords or project.rights_records or project.original_title or project.authors:
+    if project.lyrics or active_chords or project.rights_records or project.original_title or project.authors:
         sync = adir / "mta-synchronized-text.json"
         sync.write_text(json.dumps({
             "schema": "mta-audio-editor/synchronized-text-v1",
@@ -233,7 +234,8 @@ def _synchronized_text_attachments(project: Project) -> list[Path]:
             "artist": project.artist,
             "authors": project.authors,
             "lyrics": [x.model_dump() for x in project.lyrics],
-            "chords": [x.model_dump() for x in project.chords],
+            "chords": [x.model_dump(exclude={"excluded"}) for x in active_chords],
+            "editor_overrides_applied": True,
             "rights_records": [x.model_dump(mode="json") for x in project.rights_records],
             "rights_societies": project.rights_societies,
         }, ensure_ascii=False, indent=2), encoding="utf-8")
