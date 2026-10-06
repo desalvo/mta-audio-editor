@@ -1,3 +1,7 @@
+## 0.2.0-r185
+
+- CI maintenance: removed unused imports from the compound-meter regression test so Ruff no longer stops the production workflow; revision metadata tests now validate alignment dynamically instead of hard-coding r184.
+
 ## 0.2.0-r184
 
 - Lyrics + Chords + Markers: double-click words, chords, and markers to edit them.

@@ -1,3 +1,7 @@
+## 0.2.0-r185
+
+CI maintenance release: fixes Ruff F401 failures in the compound-meter regression test and makes revision metadata checks revision-agnostic; no application behavior changes.
+
 ## 0.2.0-r184
 
 Lyrics + Chords + Markers editing is faster: double-click opens structured editing, lyric tokens are editable inline, and chord anchors survive token deletion by moving to the nearest valid syllable/word.

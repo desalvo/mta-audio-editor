@@ -1,10 +1,5 @@
 from pathlib import Path
-from unittest.mock import patch
-
-from fastapi.testclient import TestClient
-
 from app.audio_engine import generate_metronome_wav
-from app.main import app
 from app.models import Clip, Project, Track
 
 
