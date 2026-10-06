@@ -168,6 +168,7 @@ class LyricsPdfStyle(BaseModel):
     lyrics: PdfTextStyle = Field(default_factory=lambda: PdfTextStyle(style="normal", size=11, color="#111111"))
     chords: PdfTextStyle = Field(default_factory=lambda: PdfTextStyle(style="bold", size=9, color="#7B1FA2"))
     markers: PdfTextStyle = Field(default_factory=lambda: PdfTextStyle(style="bold", size=12, color="#204A87"))
+    line_spacing: float = Field(default=8.0, ge=0.0, le=48.0)
 
 
 class RightsRecord(BaseModel):

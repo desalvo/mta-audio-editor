@@ -1,3 +1,20 @@
+- Lyrics + Chords + Markers editor: keep only the combined view, remove duplicate Chords/Markers sections, and provide an explicit persistent vertical scrollbar.
+
+## 0.2.0-r180
+- Lyrics + Chords + Markers editor: persistent Save action in top toolbar and footer.
+- Prevent accidental loss of unsaved editor changes on close.
+- Make all editor action labels readable in native WebViews.
+- Make the complete editor body vertically scrollable while keeping controls accessible.
+
+## 0.2.0-r179
+- Fixed Render playback echo by preventing parallel rendered-master and per-track audio paths.
+- Stabilized non-render playback and track VU metering.
+- Metronome and BPM/time-signature analysis now honor compound meters such as 6/8.
+- Lyrics + Chords PDF preview/native button readability fixed; added configurable lyric line spacing.
+- Added automatic marker extraction from the track context menu.
+- MusicBrainz matches now expose richer hover details, scrolling and pagination (10/page).
+- Lyrics + Chords graphical editor button readability improved and individual chords can be enabled/disabled independently.
+- Delete tracks / Delete selected range moved into the Select/Split/Range/Ripple toolbar row.
 # 0.2.0 · Revision 154
 
 - Fixed extracted chords being lost by stale hidden timed-text fields before persistence; extracted chords now populate the Chords list immediately.
@@ -465,3 +482,7 @@ macOS ARM native-dialog reliability fix: project creation and Import & Separate 
 - Import & Separate correctly reflects the current project type.
 - Native desktop model acquisition for splitting uses upstream Demucs directly.
 - Existing identical project files are reused for stem separation instead of rejected.
+
+## 0.2.0-r181
+
+The combined Lyrics + Chords + Markers editor now uses contextual actions for whole lyric lines, individual chords and markers. Marker insertion supports required start and optional end times, and lyric timestamps can be edited directly.

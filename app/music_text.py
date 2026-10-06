@@ -1014,6 +1014,7 @@ def build_lyrics_pdf(
         "lyrics": {"style": "normal", "size": 11, "color": "#111111"},
         "chords": {"style": "bold", "size": 9, "color": chord_color},
         "markers": {"style": "bold", "size": 12, "color": "#204A87"},
+        "line_spacing": 8.0,
     }
     # Preserve direct chord_color compatibility for older callers/tests; project
     # typography may override it below.
@@ -1023,7 +1024,11 @@ def build_lyrics_pdf(
         legacy_chord_fill = HexColor("#7B1FA2")
     del legacy_chord_fill
     incoming = pdf_style or {}
-    styles = {k: {**v, **(incoming.get(k) or {})} for k, v in default_style.items()}
+    styles = {k: {**v, **(incoming.get(k) or {})} for k, v in default_style.items() if isinstance(v, dict)}
+    try:
+        line_spacing = max(0.0, min(48.0, float(incoming.get("line_spacing", default_style["line_spacing"]))))
+    except (TypeError, ValueError):
+        line_spacing = float(default_style["line_spacing"])
     if chord_color and chord_color != "#7B1FA2" and not (incoming.get("chords") or {}).get("color"):
         styles["chords"]["color"] = chord_color
 
@@ -1206,7 +1211,7 @@ def build_lyrics_pdf(
         for part in lyric_lines:
             ensure(lyric_size+8)
             c.drawString(margin,y,safe(part));y-=lyric_size+6
-        y-=8
+        y-=line_spacing
 
     while marker_idx<len(ordered_markers):
         current_section_color = draw_marker(ordered_markers[marker_idx]);marker_idx+=1

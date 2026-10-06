@@ -1472,7 +1472,7 @@ def _track_import_worker(
             def bpm_progress(value: int, message: str) -> None:
                 _media_job_update(job_id, progress=60 + int(max(0, min(100, value)) * 0.28), message=message)
             try:
-                project.bpm, project.time_signature = estimate_bpm_and_signature(dst, bpm_progress, project.time_signature or "4/4")
+                project.bpm, project.time_signature = estimate_bpm_and_signature(dst, bpm_progress)
                 project.bpm = float(round(project.bpm))
                 project.base_bpm = project.bpm
                 save_project(project)
@@ -1664,9 +1664,20 @@ def _text_music_worker(job_id: str, pid: str, track_id: str, kind: str, model_or
                 raise InterruptedError("Marker extraction cancelled")
             mapped=map_source_events_to_timeline(track,events)
             latest=load_project(pid)
-            latest.markers=mapped
+            # Preserve existing/manual markers and only add structural markers that
+            # are not already represented nearby. This makes repeated extraction
+            # idempotent and avoids destroying user edits.
+            existing=list(latest.markers or [])
+            merged=list(existing)
+            added=0
+            for marker in mapped:
+                near=any(abs(int(item.time_ms)-int(marker.time_ms)) < 2500 for item in merged if not getattr(item,"deleted",False))
+                if near:
+                    continue
+                merged.append(marker); added += 1
+            latest.markers=sorted(merged,key=lambda item:int(item.time_ms))
             save_project(latest)
-            _media_job_update(job_id,status="completed",progress=100,message="Marker/sezioni estratti e sincronizzati",result={"kind":"markers","count":len(mapped),"engine":"MTA structural analysis"})
+            _media_job_update(job_id,status="completed",progress=100,message="Marker/sezioni estratti e sincronizzati",result={"kind":"markers","count":len(mapped),"added":added,"total":len(latest.markers),"engine":"MTA structural analysis"})
             return
         raise ValueError("unsupported analysis kind")
     except InterruptedError as exc:
@@ -1817,7 +1828,7 @@ def api_project_metadata_search(pid: str, request: Request, body: dict):
     if not title:
         raise HTTPException(400, "Inserisci il titolo del brano")
     try:
-        results = search_musicbrainz_metadata(title=title, artist=artist, limit=15)
+        results = search_musicbrainz_metadata(title=title, artist=artist, limit=25)
     except Exception as exc:
         LOGGER.warning("MusicBrainz metadata search failed: %s", exc)
         raise HTTPException(502, f"Ricerca metadata online non riuscita: {exc}") from exc
@@ -2526,7 +2537,7 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
                 progress(12 + int(max(0, min(100, value)) * 0.12), message)
             try:
                 project_for_bpm = load_project(project_id)
-                project_for_bpm.bpm, project_for_bpm.time_signature = estimate_bpm_and_signature(source, bpm_progress, project_for_bpm.time_signature or "4/4")
+                project_for_bpm.bpm, project_for_bpm.time_signature = estimate_bpm_and_signature(source, bpm_progress)
                 project_for_bpm.bpm = float(round(project_for_bpm.bpm))
                 project_for_bpm.base_bpm = project_for_bpm.bpm
                 save_project(project_for_bpm)
@@ -3354,12 +3365,12 @@ def estimate_track_bpm(pid: str, track_id: str, request: Request, time_signature
     if track is None:
         raise HTTPException(404, "track not found")
     try:
-        preferred = time_signature or project.time_signature or "4/4"
-        if preferred not in {"2/4", "3/4", "4/4", "5/4", "6/8", "7/8", "9/8", "12/8"}:
+        preferred = str(time_signature or "").strip()
+        if preferred and preferred not in {"2/4", "3/4", "4/4", "5/4", "6/8", "7/8", "9/8", "12/8"}:
             raise HTTPException(400, "time signature non valida")
         bpm, signature = estimate_bpm_and_signature(audio_path(pid, track.filename), preferred_signature=preferred)
         bpm = float(round(bpm))
-        if time_signature:
+        if preferred:
             signature = preferred
     except (ValueError, RuntimeError) as exc:
         raise HTTPException(422, f"Impossibile stimare i BPM: {exc}") from exc

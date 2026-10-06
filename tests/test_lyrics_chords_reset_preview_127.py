@@ -29,7 +29,9 @@ def test_web_ui_exposes_independent_resets_and_pdf_preview():
     block = js[js.index('async function previewProjectLyricsPdf'):js.index('async function resetTimedData')]
     assert 'pdf-preview-frame' in block
     assert 'lyricsPdfUrl(true)' in block
-    assert 'response.blob()' in block
+    assert 'response.blob()' not in block
+    assert 'src="${previewUrl}"' in block
+    assert "credentials:'same-origin'" in block
     assert 'pdf-sheet' not in block
 
 

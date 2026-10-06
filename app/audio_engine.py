@@ -51,14 +51,28 @@ def project_duration_ms(project: Project) -> int:
     return max(0, int(end_ms))
 
 
-def generate_metronome_wav(project: Project, out: Path, beats_per_bar: int = 4) -> int:
-    """Generate a mono PCM click track for the full current project duration."""
+def generate_metronome_wav(project: Project, out: Path, beats_per_bar: int | None = None) -> int:
+    """Generate a mono PCM click track honoring the project's time signature.
+
+    BPM is stored as quarter-note BPM in the project.  The denominator therefore
+    determines the click subdivision (e.g. 6/8 emits six eighth-note clicks per
+    bar), while the numerator determines bar accents.
+    """
     duration_ms = project_duration_ms(project)
     if duration_ms <= 0:
         raise ValueError("project duration is zero")
     sample_rate = 44100
     total_samples = max(1, round(duration_ms / 1000 * sample_rate))
-    beat_samples = max(1, round(60.0 / float(project.bpm) * sample_rate))
+    try:
+        numerator_text, denominator_text = str(getattr(project, "time_signature", "4/4") or "4/4").split("/", 1)
+        numerator, denominator = int(numerator_text), int(denominator_text)
+    except (TypeError, ValueError):
+        numerator, denominator = 4, 4
+    beats_per_bar = max(1, int(beats_per_bar or numerator))
+    # Project BPM is quarter-note BPM; scale the click interval to the notated
+    # denominator so 6/8, 9/8 and 12/8 no longer sound like 4/4.
+    beat_seconds = (60.0 / float(project.bpm)) * (4.0 / max(1, denominator))
+    beat_samples = max(1, round(beat_seconds * sample_rate))
     click_len = min(max(1, round(0.045 * sample_rate)), beat_samples)
     silence_chunk = b"\x00\x00" * 8192
 
@@ -69,6 +83,7 @@ def generate_metronome_wav(project: Project, out: Path, beats_per_bar: int = 4) 
         return np.asarray(np.clip(wave_data, -1, 1) * 32767, dtype=np.int16).tobytes()
 
     accent = click_bytes(1320.0)
+    secondary_accent = click_bytes(1100.0)
     regular = click_bytes(880.0)
     out.parent.mkdir(parents=True, exist_ok=True)
     with wave.open(str(out), "wb") as handle:
@@ -94,7 +109,13 @@ def generate_metronome_wav(project: Project, out: Path, beats_per_bar: int = 4) 
                     handle.writeframesraw(silence_chunk[: count * 2])
                     cursor += count
                     remaining -= count
-            click = accent if beat_index % max(1, beats_per_bar) == 0 else regular
+            pos_in_bar = beat_index % beats_per_bar
+            if pos_in_bar == 0:
+                click = accent
+            elif denominator == 8 and numerator in {6, 9, 12} and pos_in_bar % 3 == 0:
+                click = secondary_accent
+            else:
+                click = regular
             samples_to_write = min(click_len, total_samples - cursor)
             handle.writeframesraw(click[: samples_to_write * 2])
             cursor += samples_to_write
@@ -488,7 +509,7 @@ def _rhythm_onset_envelope(path: Path, progress=None) -> tuple[np.ndarray, float
     return onset, 100.0
 
 
-def _estimate_meter(onset: np.ndarray, hz: float, beat_lag: int, preferred_signature: str = "4/4") -> str:
+def _estimate_meter(onset: np.ndarray, hz: float, beat_lag: int, preferred_signature: str = "") -> str:
     """Estimate a conservative time signature from periodic accent structure.
 
     4/4 is deliberately favored unless another candidate has clearly stronger
@@ -503,22 +524,25 @@ def _estimate_meter(onset: np.ndarray, hz: float, beat_lag: int, preferred_signa
         if lag <= 0 or lag >= len(corr):
             scores[sig] = -1.0
             continue
-        # Bar periodicity plus a mild preference for the requested/default meter.
+        # Bar periodicity plus a mild preference only when the caller explicitly
+        # supplied a meter. Automatic analysis must not silently bias every track
+        # toward 4/4.
         score = float(corr[lag]) / base
-        if sig == preferred_signature:
+        if preferred_signature and sig == preferred_signature:
             score += 0.10
-        if sig == "4/4":
-            score += 0.06
+        if not preferred_signature and sig == "4/4":
+            score += 0.015
         scores[sig] = score
     best = max(scores, key=scores.get)
     # Only leave 4/4/default if the alternative is meaningfully stronger.
-    preferred = preferred_signature if preferred_signature in scores else "4/4"
-    if best != preferred and scores[best] < scores[preferred] + 0.08:
-        return preferred
+    if preferred_signature in scores:
+        preferred = preferred_signature
+        if best != preferred and scores[best] < scores[preferred] + 0.08:
+            return preferred
     return best
 
 
-def estimate_bpm_and_signature(path: Path, progress=None, preferred_signature: str = "4/4") -> tuple[float, str]:
+def estimate_bpm_and_signature(path: Path, progress=None, preferred_signature: str = "") -> tuple[float, str]:
     onset, hz = _rhythm_onset_envelope(path, progress)
     if progress:
         progress(55, "Ricerca della periodicità e del tempo musicale")
@@ -537,7 +561,7 @@ def estimate_bpm_and_signature(path: Path, progress=None, preferred_signature: s
     while bpm > 180:
         bpm /= 2
         lag = max(1, int(round(hz * 60.0 / bpm)))
-    signature = _estimate_meter(onset, hz, lag, preferred_signature or "4/4")
+    signature = _estimate_meter(onset, hz, lag, preferred_signature or "")
     if progress:
         progress(90, f"BPM stimati: {bpm:.1f} · tempo {signature}")
     return round(float(bpm), 1), signature

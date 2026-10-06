@@ -1,3 +1,20 @@
+- Lyrics + Chords + Markers editor: keep only the combined view, remove duplicate Chords/Markers sections, and provide an explicit persistent vertical scrollbar.
+
+## 0.2.0-r180
+- Lyrics + Chords + Markers editor: persistent Save action in top toolbar and footer.
+- Prevent accidental loss of unsaved editor changes on close.
+- Make all editor action labels readable in native WebViews.
+- Make the complete editor body vertically scrollable while keeping controls accessible.
+
+## 0.2.0-r179
+- Fixed Render playback echo by preventing parallel rendered-master and per-track audio paths.
+- Stabilized non-render playback and track VU metering.
+- Metronome and BPM/time-signature analysis now honor compound meters such as 6/8.
+- Lyrics + Chords PDF preview/native button readability fixed; added configurable lyric line spacing.
+- Added automatic marker extraction from the track context menu.
+- MusicBrainz matches now expose richer hover details, scrolling and pagination (10/page).
+- Lyrics + Chords graphical editor button readability improved and individual chords can be enabled/disabled independently.
+- Delete tracks / Delete selected range moved into the Select/Split/Range/Ripple toolbar row.
 
 ## 0.2.0-r177
 - Fixed unreadable Lyrics + Chords editor controls.
@@ -500,3 +517,10 @@
 - Fixed Import & Separate current-project type detection in the UI.
 - Native desktop Demucs splitting now uses the upstream Demucs model resolver/cache directly instead of the MTA model server.
 - Re-importing an already stored source now reuses the existing project file and starts separation even when the source is not on the timeline.
+
+## 0.2.0-r181
+
+- Lyrics + Chords + Markers editor: moved per-event Modify/Enable-Disable/Merge/Delete/Restore actions to context menus for lyric lines, individual chords, and markers.
+- Added context-menu marker creation with required start time and optional end time.
+- Lyric line timestamps are directly clickable/editable with m:ss.mmm / mm:ss.mmm validation.
+- Updating lyric times preserves manual chord anchors.

@@ -70,6 +70,7 @@ def test_joint_editor_and_render_meter_regression_strings_present():
     assert "lyricsChordsEditorMarkersDraft" in js
     assert "openLyricsPdfStylePanel" in js
     assert "extractMarkersFromSelectedTrack" in js
-    assert "sinkGain" in js
-    assert "engageRenderLiveFallback" in js
+    assert "waveformMeterLevel" in js
+    assert "rendered master is the only audible/playing media source" in js
+    assert "engageRenderLiveFallback" not in js
     assert "Hidden legacy textareas are display mirrors only" in js
