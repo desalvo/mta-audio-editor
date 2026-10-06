@@ -43,7 +43,7 @@ def project_duration_ms(project: Project) -> int:
         if track.clips:
             end_ms = max(
                 end_ms,
-                max((clip.timeline_start_ms + clip.duration_ms) for clip in track.clips),
+                max((max(0, clip.timeline_start_ms + int(getattr(track, "delay_ms", 0) or 0)) + clip.duration_ms) for clip in track.clips),
             )
         else:
             end_ms = max(end_ms, track.duration_ms)
@@ -213,15 +213,33 @@ def render_track(track: Track, source: Path, out: Path, apply_inserts: bool = Tr
     parts: list[str] = []
     labels: list[str] = []
     source_layout = "mono" if int(track.channels or 0) == 1 else "stereo"
+    track_delay = int(getattr(track, "delay_ms", 0) or 0)
     for index, clip in enumerate(track.clips):
-        start = clip.source_start_ms / 1000
-        end = clip.source_end_ms / 1000
-        delay = max(0, clip.timeline_start_ms)
+        source_start_ms = int(clip.source_start_ms)
+        source_end_ms = int(clip.source_end_ms)
+        timeline_start_ms = int(clip.timeline_start_ms) + track_delay
+        # Negative track delays are non-destructive: audio that would begin before
+        # project time zero is trimmed only in the rendered/playback view.
+        if timeline_start_ms < 0:
+            trim_ms = min(source_end_ms - source_start_ms, -timeline_start_ms)
+            source_start_ms += trim_ms
+            timeline_start_ms = 0
+        if source_end_ms <= source_start_ms:
+            continue
+        start = source_start_ms / 1000
+        end = source_end_ms / 1000
+        delay = max(0, timeline_start_ms)
         parts.append(
             f"[0:a]atrim=start={start:.6f}:end={end:.6f},asetpts=PTS-STARTPTS,"
             f"adelay={delay}|{delay},aformat=channel_layouts={source_layout}[c{index}]"
         )
         labels.append(f"[c{index}]")
+    if not labels:
+        _run([
+            "ffmpeg", "-y", "-v", "error", "-f", "lavfi", "-i",
+            "anullsrc=r=44100:cl=stereo", "-t", "0.05", "-c:a", "pcm_s16le", str(out),
+        ])
+        return
     if len(labels) == 1:
         base = parts[0] + f";{labels[0]}anull[mix]"
     else:

@@ -99,6 +99,7 @@ class Track(BaseModel):
     waveform_revision: str = Field(default="", max_length=128)
     channels: int = Field(default=0, ge=0, le=32)
     channel_layout: str = Field(default="", max_length=64)
+    delay_ms: int = Field(default=0, ge=-86_400_000, le=86_400_000)
 
 
 class Marker(BaseModel):
@@ -200,6 +201,10 @@ class SampleEditorRequest(BaseModel):
 
 class MoveTrackRequest(BaseModel):
     offset_ms: int = Field(ge=-86_400_000, le=86_400_000)
+
+
+class TrackDelayRequest(BaseModel):
+    delay_ms: int = Field(ge=-86_400_000, le=86_400_000)
 
 
 class AddInsertRequest(BaseModel):

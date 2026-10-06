@@ -21,7 +21,7 @@ from fastapi.staticfiles import StaticFiles
 
 from .audio_engine import auto_align_ms, delete_range, delete_song_range, ensure_clips, estimate_bpm, generate_metronome_wav, media_duration_ms, project_duration_ms, render_mix, render_track, render_track_export, shift_track, waveform_peaks
 from .codec import export_mta, ffprobe, import_mta, resolve_mta_device_profile, suggested_slots, validate_slot_mapping
-from .models import AutoMixRequest, Clip, CustomPresetRequest, DeleteRangeRequest, InstantiateProjectClipRequest, UpdateProjectClipRequest, MoveTrackRequest, MtaExportRequest, Project, ProjectClip, ProjectExportRequest, RightsRecord, Track, SampleEditRequest, SampleEffectRequest
+from .models import AutoMixRequest, Clip, CustomPresetRequest, DeleteRangeRequest, InstantiateProjectClipRequest, UpdateProjectClipRequest, MoveTrackRequest, TrackDelayRequest, MtaExportRequest, Project, ProjectClip, ProjectExportRequest, RightsRecord, Track, SampleEditRequest, SampleEffectRequest
 from .plugins import STEM_SPLITTER, delete_user_preset, plugin_manifest, save_user_preset
 
 from .model_updater import (COREML_DIR, ONNX_DIR, start_background_updater, update_once as update_mobile_demucs_models,
@@ -2252,6 +2252,35 @@ def delete_tracks(pid: str, request: Request, track_ids: list[str]):
     return project
 
 
+@app.post("/api/projects/{pid}/tracks/{track_id}/delay")
+def set_track_delay(pid: str, track_id: str, req: TrackDelayRequest, request: Request):
+    project = _project_for_actor(request, pid)
+    track = next((item for item in project.tracks if item.id == track_id), None)
+    if not track:
+        raise HTTPException(404, "track not found")
+    track.delay_ms = int(req.delay_ms)
+    save_project(project)
+    return {"project": project, "track_id": track.id, "delay_ms": track.delay_ms}
+
+
+@app.post("/api/projects/{pid}/tracks/{track_id}/sync-metronome")
+def sync_metronome_to_track(pid: str, track_id: str, request: Request):
+    project = _project_for_actor(request, pid)
+    reference = next((item for item in project.tracks if item.id == track_id), None)
+    if not reference:
+        raise HTTPException(404, "track not found")
+    metronome = next((item for item in project.tracks if item.id != track_id and (item.type == "click" or "metronom" in item.name.lower() or "metronome" in item.name.lower() or "click" in item.name.lower())), None)
+    if not metronome:
+        raise HTTPException(400, "Traccia metronomo non trovata")
+    try:
+        delta = auto_align_ms(audio_path(pid, reference.filename), audio_path(pid, metronome.filename))
+    except Exception as exc:
+        raise HTTPException(400, "Sincronizzazione metronomo fallita") from exc
+    metronome.delay_ms = int(getattr(metronome, "delay_ms", 0) or 0) + int(delta)
+    save_project(project)
+    return {"project": project, "reference_track_id": reference.id, "metronome_track_id": metronome.id, "delta_ms": int(delta), "delay_ms": metronome.delay_ms}
+
+
 @app.post("/api/projects/{pid}/tracks/{track_id}/move")
 def move_track(pid: str, track_id: str, req: MoveTrackRequest, request: Request):
     project = _project_for_actor(request, pid)
@@ -3284,7 +3313,7 @@ def create_metronome_track(pid: str, request: Request):
     track = Track(
         id=uuid.uuid4().hex[:10],
         name=f"Metronomo {project.bpm:g} BPM",
-        type="other",
+        type="click",
         filename=filename,
         duration_ms=duration_ms,
         channels=1,

@@ -4,5 +4,5 @@ def test_autosave_manual(): assert "autosaveEnabled=true" in J and "if(!autosave
 def test_undo_redo(): assert "async function undoEdit()" in J and "async function redoEdit()" in J
 def test_timeline_editing():
     assert all(f"function {x}(" in J for x in ["cutTimelineSelection","copyTimelineSelection","pasteTimelineSelection","removeTimelineSelection"])
-    assert "$$('.track-check:checked')" in J
+    assert "selectedTrackIdSet=new Set()" in J and "function selectedTrackIds()" in J
 def test_shortcuts(): assert all(x in J for x in ["key==='z'","key==='x'","key==='c'","key==='v'","key==='s'"])

@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 let current=null, currentUser=null, pluginInfo={inserts:{},schemas:{},custom:{},stem_splitter:{available:false}}, pxPerSec=70;
 let sel={a:0,b:0}, dragging=false, audioCtx=null, playAudio=null, selectedTrackId=null, exportFormat='mta';
+let selectedTrackIdSet=new Set(), timelineTool='range', rippleEnabled=false;
 let autosaveTimer=null, autosaveBusy=false, autosaveQueued=false, autosaveEnabled=true, projectDirty=false, stemPollTimer=null, activeStemJob=null, activeStemProjectId=null;
 let lyricsPdfPreviewObjectUrl=null;
 let nativeRecentProjects=[];
@@ -113,11 +114,21 @@ function esc(s){return String(s??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&l
 function toast(s){const t=$('#toast');t.textContent=s;t.style.display='block';clearTimeout(t._timer);t._timer=setTimeout(()=>t.style.display='none',4200)}
 function setRenderPlaybackPreparing(active){const b=$('#playMaster'),t=$('#toast');if(active){if(b){b.dataset.prepareText=b.textContent||'▶';b.textContent='…';b.title='Preparazione render in corso';b.classList.add('preparing')}if(t){clearTimeout(t._timer);t.textContent='Preparazione del render in corso, attendere…';t.style.display='block'}}else{if(b){if(b.classList.contains('preparing'))b.textContent='▶';b.classList.remove('preparing');b.title='Play / Preview'}if(t&&t.textContent==='Preparazione del render in corso, attendere…')t.style.display='none'}}
 function fmtTime(sec,ms=false){sec=Math.max(0,sec);const m=Math.floor(sec/60),s=sec-m*60;return ms?`${String(m).padStart(2,'0')}:${String(Math.floor(s)).padStart(2,'0')}.${String(Math.floor((s%1)*1000)).padStart(3,'0')}`:`${m}:${String(Math.floor(s)).padStart(2,'0')}`}
-function projectEnd(){let e=10000;for(const t of current?.tracks||[])for(const c of t.clips||[])e=Math.max(e,c.timeline_start_ms+(c.source_end_ms-c.source_start_ms));return e}
+function trackDelayMs(t){return Number(t?.delay_ms||0)||0}
+function effectiveClipStartMs(t,c){return Number(c?.timeline_start_ms||0)+trackDelayMs(t)}
+function projectEnd(){let e=10000;for(const t of current?.tracks||[])for(const c of t.clips||[])e=Math.max(e,Math.max(0,effectiveClipStartMs(t,c))+(c.source_end_ms-c.source_start_ms));return e}
 function widthPx(){return Math.max(980,projectEnd()/1000*pxPerSec+180)}
 function trackById(id){return current?.tracks?.find(t=>t.id===id)}
 function selectedTrack(){return trackById(selectedTrackId)||current?.tracks?.[0]||null}
-function selectedTrackIds(){return $$('.track-check:checked').map(x=>x.value)}
+function ensureTrackSelection(){
+  if(!current){selectedTrackIdSet.clear();return}
+  const known=new Set((current.tracks||[]).map(t=>t.id));
+  selectedTrackIdSet=new Set([...selectedTrackIdSet].filter(id=>known.has(id)));
+  if(selectedTrackId&&!known.has(selectedTrackId))selectedTrackId=null;
+  if(!selectedTrackIdSet.size&&current.tracks?.length){const id=selectedTrackId||current.tracks[0].id;selectedTrackId=id;selectedTrackIdSet.add(id)}
+  if(selectedTrackId&&!selectedTrackIdSet.has(selectedTrackId))selectedTrackId=[...selectedTrackIdSet][0]||null;
+}
+function selectedTrackIds(){ensureTrackSelection();return (current?.tracks||[]).filter(t=>selectedTrackIdSet.has(t.id)).map(t=>t.id)}
 function linesToText(a,b){return(a||[]).map(x=>`${(x.time_ms/1000).toFixed(3)}\t${x[b]}`).join('\n')}
 function textToLines(v,key){return v.split(/\n/).map(x=>x.trim()).filter(Boolean).map(line=>{const [t,...rest]=line.split(/\t|\s{2,}/);return{time_ms:Math.max(0,Math.round(parseFloat(t)*1000)||0),[key]:rest.join(' ').trim()}})}
 
@@ -358,6 +369,7 @@ function render(){
   $('#topZoom').value=pxPerSec;
   updateTransportToggleButtons();
   if(!selectedTrackId||!trackById(selectedTrackId))selectedTrackId=current.tracks[0]?.id||null;
+  ensureTrackSelection();
   const W=widthPx(),trackWidth=Math.max(160,Math.min(520,Number(current.track_panel_width_px)||225));
   $('#editor').innerHTML=`
     ${toolbarHtml()}
@@ -391,13 +403,13 @@ function toolbarHtml(){
   const refs=current.tracks.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join('');
   const stem=pluginInfo.stem_splitter||{};
   return `<div class="editor-toolbar">
-    <button class="tool active"><strong>➤</strong>Select</button><button class="tool"><strong>✂</strong>Split</button><button class="tool active"><strong>▭</strong>Range</button><button class="tool"><strong>↔</strong>Ripple</button>
+    <button id="toolSelect" class="tool ${timelineTool==='select'?'active':''}" onclick="setTimelineTool('select')"><strong>➤</strong>Select</button><button id="toolSplit" class="tool ${timelineTool==='split'?'active':''}" onclick="setTimelineTool('split')"><strong>✂</strong>Split</button><button id="toolRange" class="tool ${timelineTool==='range'?'active':''}" onclick="setTimelineTool('range')"><strong>▭</strong>Range</button><button id="toolRipple" class="tool ${rippleEnabled?'active':''}" onclick="toggleRippleTool()" aria-pressed="${rippleEnabled?'true':'false'}"><strong>↔</strong>Ripple</button>
     <div class="toolbar-sep"></div><div class="toolbar-group"><label>Snap</label><select><option>Bars</option><option>Beats</option><option>Off</option></select></div>
     <button class="toolbar-action emphasis" onclick="openStemWorkflow()">▥ Import &amp; Separate</button>
     <button class="toolbar-action" onclick="openYoutubeImport()" title="Importa solo audio da un singolo video YouTube">▶ Import YouTube</button>
     <button class="toolbar-action" onclick="createMetronomeTrack()" title="Crea una traccia click per tutta la durata corrente del progetto">♩ Metronomo</button>
     <div class="toolbar-group"><input id="newTrackFile" type="file" accept=".mp3,.wav,.flac,.m4a,audio/*" onchange="addTrack()"><select id="newSync"><option value="manual">Manual sync</option><option value="auto">Auto sync</option></select><input id="newOffset" type="number" value="0" title="Offset ms" style="width:72px"><select id="newRef" style="max-width:115px">${refs}</select><button class="toolbar-action" onclick="addTrack()">♫ Import Audio Track</button></div>
-    <div class="toolbar-sep"></div><button id="undoBtn" class="toolbar-action" onclick="undoEdit()">↶ Undo</button><button id="redoBtn" class="toolbar-action" onclick="redoEdit()">↷ Redo</button><button class="toolbar-action" onclick="cutTimelineSelection()">✂ Cut</button><button class="toolbar-action" onclick="copyTimelineSelection()">⧉ Copy</button><button id="pasteBtn" class="toolbar-action" onclick="pasteTimelineSelection()">▣ Paste</button><button class="toolbar-action danger" onclick="removeTimelineSelection()">⌫ Remove</button> <div class="toolbar-grow"></div><span class="selection-info" id="selectionInfo">0.000 → 0.000 s</span><button class="toolbar-action danger" onclick="deleteSelection(false)">Delete tracks</button><label class="hint"><input id="ripple" type="checkbox"> ripple</label><button class="toolbar-action danger" onclick="deleteSelection(true)">Delete song segment</button>
+    <div class="toolbar-sep"></div><button id="undoBtn" class="toolbar-action" onclick="undoEdit()">↶ Undo</button><button id="redoBtn" class="toolbar-action" onclick="redoEdit()">↷ Redo</button><button class="toolbar-action" onclick="cutTimelineSelection()">✂ Cut</button><button class="toolbar-action" onclick="copyTimelineSelection()">⧉ Copy</button><button id="pasteBtn" class="toolbar-action" onclick="pasteTimelineSelection()">▣ Paste</button><button class="toolbar-action danger" onclick="removeTimelineSelection()">⌫ Remove</button> <div class="toolbar-grow"></div><span class="selection-info" id="selectionInfo">0.000 → 0.000 s</span><button class="toolbar-action danger" onclick="deleteSelection(false)">Delete tracks</button><button class="toolbar-action danger" onclick="deleteSelection(true)">Delete selected range</button>
   </div>`
 }
 
@@ -613,7 +625,7 @@ function effectiveProjectKey(){const key=String(current?.key||'');const m=key.ma
 function trackHead(t,i){
   const color=t.color||TRACK_COLORS[i%TRACK_COLORS.length],anySolo=current.tracks.some(x=>x.solo),inaudible=t.mute||(anySolo&&!t.solo);
   const audioMode=t.channels===2?'STEREO':(t.channels===1?'MONO':(t.channel_layout?String(t.channel_layout).toUpperCase():''));
-  return `<div class="track-head ${t.id===selectedTrackId?'selected':''} ${inaudible?'audibly-muted':''}" id="head-${t.id}" data-track-context-id="${t.id}" style="--track-color:${color}" onclick="selectTrack('${t.id}')" oncontextmenu="openTrackContextMenu(event,'${t.id}')" ondragover="trackDragOver(event,'${t.id}')" ondrop="dropTrack(event,'${t.id}')">
+  return `<div class="track-head ${selectedTrackIdSet.has(t.id)?'selected':''} ${t.id===selectedTrackId?'primary-selected':''} ${inaudible?'audibly-muted':''}" id="head-${t.id}" data-track-context-id="${t.id}" style="--track-color:${color}" onclick="selectTrack('${t.id}',event)" oncontextmenu="openTrackContextMenu(event,'${t.id}')" ondragover="trackDragOver(event,'${t.id}')" ondrop="dropTrack(event,'${t.id}')">
     <div class="track-color"></div>
     <div class="track-num">${i+1}</div>
     <div class="track-info">
@@ -633,7 +645,6 @@ function trackHead(t,i){
         <input class="track-db-input volume-number" id="db-${t.id}" data-volume-number="${t.id}" type="number" min="-60" max="12" step="0.1" value="${Number(t.volume_db).toFixed(1)}" oninput="setTrackVolume('${t.id}',this.value)" aria-label="Volume ${esc(t.name)} in dB" title="Volume in dB">
       </div>
     </div>
-    <label class="track-select-wrap" title="Seleziona traccia" onclick="event.stopPropagation()"><input class="track-check" type="checkbox" value="${t.id}"></label>
   </div>`;
 }
 function closeTrackContextMenu(){
@@ -643,8 +654,9 @@ function closeTrackContextMenu(){
 function openTrackContextMenuAt(id,clientX,clientY){
   closeTrackContextMenu();
   const track=trackById(id);if(!track)return;
+  if(!selectedTrackIdSet.has(id)){selectedTrackIdSet=new Set([id])}
   selectedTrackId=id;
-  $$('.track-head').forEach(el=>el.classList.toggle('selected',el.id===`head-${id}`));
+  $$('.track-head').forEach(el=>{const tid=el.id.replace(/^head-/,'');el.classList.toggle('selected',selectedTrackIdSet.has(tid));el.classList.toggle('primary-selected',tid===id)});
   const stem=pluginInfo.stem_splitter||{};
   const disabled=stem.available?'':'disabled';
   const menu=document.createElement('div');
@@ -658,6 +670,8 @@ function openTrackContextMenuAt(id,clientX,clientY){
     <button type="button" onclick="closeTrackContextMenu();recalculateBpmFromTrack('${id}')">♩ <span>Ricalcola BPM da questa traccia</span></button>
     <button type="button" onclick="closeTrackContextMenu();openTextAnalysisChooser('${id}','lyrics')">≡ <span>Estrai lyrics</span></button>
     <button type="button" onclick="closeTrackContextMenu();openTextAnalysisChooser('${id}','chords')">♬ <span>Estrai chords</span></button>
+    <button type="button" onclick="closeTrackContextMenu();syncMetronomeToTrack('${id}')">⌁ <span>Sincronizza metronomo</span></button>
+    <button type="button" onclick="closeTrackContextMenu();openTrackDelayDialog('${id}')">↔ <span>Delay / anticipo traccia…</span></button>
     <button type="button" class="danger" onclick="closeTrackContextMenu();deleteTracksByIds(['${id}'])">× <span>Rimuovi</span></button>
   `;
   document.body.appendChild(menu);
@@ -672,6 +686,48 @@ function openTrackContextMenu(event,id){
   let x=event?.clientX,y=event?.clientY;
   if((!x&&!y)&&event?.currentTarget?.getBoundingClientRect){const b=event.currentTarget.getBoundingClientRect();x=b.right;y=b.bottom}
   openTrackContextMenuAt(id,x,y);
+}
+
+async function syncMetronomeToTrack(id){
+  const track=trackById(id);if(!track)return;
+  try{
+    toast(`Sincronizzazione metronomo con ${track.name}…`);
+    const result=await api(`/api/projects/${current.id}/tracks/${id}/sync-metronome`,{method:'POST'});
+    current=result.project;
+    render();markDirty(0);
+    const sign=Number(result.delta_ms)>=0?'+':'';
+    toast(`Metronomo sincronizzato: ${sign}${Number(result.delta_ms)} ms`);
+  }catch(e){toast(e.message||'Sincronizzazione metronomo fallita')}
+}
+function delayMsFromUnit(value,unit){
+  const n=Number(value);if(!Number.isFinite(n))return 0;
+  const bpm=Math.max(1,Number(current?.bpm||120));
+  if(unit==='bars')return Math.round(n*4*60000/bpm);
+  if(unit==='quarters')return Math.round(n*60000/bpm);
+  return Math.round(n);
+}
+function delayValueFromMs(ms,unit){
+  const bpm=Math.max(1,Number(current?.bpm||120));
+  if(unit==='bars')return Number(ms)*bpm/(4*60000);
+  if(unit==='quarters')return Number(ms)*bpm/60000;
+  return Number(ms);
+}
+function openTrackDelayDialog(id){
+  const track=trackById(id);if(!track)return;
+  const currentMs=trackDelayMs(track);
+  showUtilityModal('Delay / anticipo traccia',`<div class="form-grid"><p><b>${esc(track.name)}</b></p><p class="hint">Valori positivi ritardano la traccia; valori negativi la anticipano. L'offset è non distruttivo e viene applicato a playback, Render ed export.</p><label>Unità<select id="trackDelayUnit" onchange="trackDelayUnitChanged('${esc(id)}')"><option value="ms">Millisecondi</option><option value="quarters">Quarti / battiti</option><option value="bars">Battute (4/4)</option></select></label><label>Valore<input id="trackDelayValue" type="number" step="1" value="${currentMs}"></label><div class="workflow-note">Offset attuale: <b id="trackDelayComputed">${currentMs>=0?'+':''}${currentMs} ms</b> · BPM progetto: ${Number(current?.bpm||120).toFixed(1)}</div><div class="form-actions"><button class="utility-btn secondary" onclick="closeUtilityModal()">Annulla</button><button class="utility-btn secondary" onclick="setTrackDelay('${esc(id)}',0,'ms')">Azzera</button><button class="utility-btn primary" onclick="applyTrackDelayDialog('${esc(id)}')">Applica</button></div></div>`);
+  $('#trackDelayValue')?.addEventListener('input',()=>updateTrackDelayComputed());
+}
+function trackDelayUnitChanged(id){const track=trackById(id);if(!track)return;const unit=$('#trackDelayUnit')?.value||'ms';const v=delayValueFromMs(trackDelayMs(track),unit);const input=$('#trackDelayValue');if(input){input.step=unit==='ms'?'1':'0.01';input.value=unit==='ms'?String(Math.round(v)):String(Math.round(v*1000)/1000)}updateTrackDelayComputed()}
+function updateTrackDelayComputed(){const unit=$('#trackDelayUnit')?.value||'ms',value=$('#trackDelayValue')?.value||0,ms=delayMsFromUnit(value,unit);const el=$('#trackDelayComputed');if(el)el.textContent=`${ms>=0?'+':''}${ms} ms`}
+async function applyTrackDelayDialog(id){const unit=$('#trackDelayUnit')?.value||'ms',value=$('#trackDelayValue')?.value||0;await setTrackDelay(id,value,unit)}
+async function setTrackDelay(id,value,unit='ms'){
+  const ms=delayMsFromUnit(value,unit);
+  try{
+    const result=await api(`/api/projects/${current.id}/tracks/${id}/delay`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({delay_ms:ms})});
+    current=result.project;clearPlaybackWarmCache();closeUtilityModal();render();markDirty(0);
+    toast(ms?`Offset traccia impostato a ${ms>=0?'+':''}${ms} ms`:'Offset traccia azzerato');
+  }catch(e){toast(e.message||'Impostazione offset fallita')}
 }
 
 const TRACK_CONTEXT_LONG_PRESS_MS=600,TRACK_CONTEXT_MOVE_PX=12;
@@ -788,7 +844,7 @@ function renameTrack(id){const t=trackById(id);if(!t)return;const value=prompt('
 function projectFormatLabel(target=current?.target){return target==='DAW'?'Multitrack DAW':target}
 function mtaSlotLimit(target=current?.target){return target==='MTA8'?8:16}
 function setTrackMtaSlot(id,value){const t=trackById(id);if(!t)return;const n=Number(value||0),limit=mtaSlotLimit();t.mta_slot=n>=1&&n<=limit?n:null;markDirty(100);render()}
-function lane(t,W,i){const color=t.color||TRACK_COLORS[i%TRACK_COLORS.length];const anySolo=current.tracks.some(x=>x.solo);const inaudible=t.mute||(anySolo&&!t.solo);return `<div class="lane ${inaudible?'audibly-muted':''}" id="lane-${t.id}" data-track="${t.id}" data-track-context-id="${t.id}" style="width:${W}px;--track-color:${color}" oncontextmenu="openTrackContextMenu(event,'${t.id}')"><canvas class="wave" id="wave-${t.id}" width="${W}" height="78" ondblclick="event.stopPropagation();openSampleEditor('${t.id}')" title="Doppio click: editor waveform/campioni"></canvas><div class="waveform-progress ${t.waveform_peaks?.length?'hidden':''}" id="wave-progress-${t.id}"><div class="waveform-progress-bar" id="wave-progress-bar-${t.id}" style="width:2%"></div><span id="wave-progress-label-${t.id}">Waveform…</span></div>${(t.clips||[]).map((c,j)=>{const l=c.timeline_start_ms/1000*pxPerSec,w=(c.source_end_ms-c.source_start_ms)/1000*pxPerSec;return `<div class="clip-block" style="left:${l}px;width:${Math.max(2,w)}px"><span class="clip-label">${esc(t.name)}_${String(j+1).padStart(2,'0')}</span></div>`}).join('')}</div>`}
+function lane(t,W,i){const color=t.color||TRACK_COLORS[i%TRACK_COLORS.length];const anySolo=current.tracks.some(x=>x.solo);const inaudible=t.mute||(anySolo&&!t.solo);return `<div class="lane ${inaudible?'audibly-muted':''}" id="lane-${t.id}" data-track="${t.id}" data-track-context-id="${t.id}" style="width:${W}px;--track-color:${color}" oncontextmenu="openTrackContextMenu(event,'${t.id}')"><canvas class="wave" id="wave-${t.id}" width="${W}" height="78" ondblclick="event.stopPropagation();openSampleEditor('${t.id}')" title="Doppio click: editor waveform/campioni"></canvas><div class="waveform-progress ${t.waveform_peaks?.length?'hidden':''}" id="wave-progress-${t.id}"><div class="waveform-progress-bar" id="wave-progress-bar-${t.id}" style="width:2%"></div><span id="wave-progress-label-${t.id}">Waveform…</span></div>${(t.clips||[]).map((c,j)=>{const l=Math.max(0,effectiveClipStartMs(t,c))/1000*pxPerSec,w=(c.source_end_ms-c.source_start_ms)/1000*pxPerSec;return `<div class="clip-block" style="left:${l}px;width:${Math.max(2,w)}px"><span class="clip-label">${esc(t.name)}_${String(j+1).padStart(2,'0')}</span></div>`}).join('')}</div>`}
 
 function inspectorHtml(){const t=selectedTrack();if(!t)return `<aside class="inspector"><div class="inspector-tabs"><button class="inspector-tab active">Inspector</button><button class="inspector-tab">Stems</button><button class="inspector-tab">Metadata</button></div><div class="inspector-body"><p class="hint">Import a track to open the inspector.</p></div></aside>`;const i=current.tracks.indexOf(t);return `<aside class="inspector" id="inspector"><div class="inspector-tabs"><button class="inspector-tab active">Inspector</button><button class="inspector-tab">Stems</button><button class="inspector-tab">Metadata</button></div><div class="inspector-body"><div class="inspector-track-title"><span>◉</span>${esc(t.name)}<label class="tool" style="margin-left:auto;min-width:auto;height:28px">Replace<input type="file" accept="audio/*,.mp3,.wav" hidden onchange="replaceTrack('${t.id}',this)"></label></div><div class="inspector-row"><label>Volume</label><input class="track-volume-range" data-volume-track="${t.id}" type="range" min="-60" max="12" step="0.5" value="${t.volume_db}" oninput="setTrackVolume('${t.id}',this.value)"><input class="valuebox volume-number" id="ins-db-${t.id}" data-volume-number="${t.id}" type="number" min="-60" max="12" step="0.1" value="${Number(t.volume_db).toFixed(1)}" oninput="setTrackVolume('${t.id}',this.value)" aria-label="Volume ${esc(t.name)} in dB" title="Volume in dB"></div><div class="inspector-row"><label>Pan</label><input type="range" min="-1" max="1" step="0.01" value="${t.pan||0}" oninput="setTrackPan('${t.id}',this.value)"><div class="valuebox" id="pan-${t.id}">${Number(t.pan||0).toFixed(2)}</div></div><div class="inspector-row"><label>Type</label><select class="model-input" data-i="${i}" data-k="type">${['drums','bass','guitars','keyboards','orchestra','winds','melody','click','choirs','other'].map(x=>`<option ${x===t.type?'selected':''}>${x}</option>`).join('')}</select><div class="valuebox">${t.duration_ms?fmtTime(t.duration_ms/1000):'--'}</div></div><div class="inspector-row"><label>MTA Slot</label><select onchange="setTrackMtaSlot('${t.id}',this.value)"><option value="" ${!t.mta_slot?'selected':''}>Auto</option>${Array.from({length:mtaSlotLimit()},(_,n)=>`<option value="${n+1}" ${Number(t.mta_slot)===n+1?'selected':''}>${n+1}</option>`).join('')}</select><div class="valuebox">${t.mta_slot?`Slot ${t.mta_slot}`:'Auto'}</div></div>${insertPanelHtml(t,false)}<div class="panel-section"><div class="section-title">Track export</div><div class="track-export-actions"><button onclick="exportTrack('${t.id}','wav')">WAV</button><button onclick="exportTrack('${t.id}','mp3')">MP3</button><button onclick="exportTrack('${t.id}','flac')">FLAC</button></div></div><div class="panel-section"><div class="collapsed-row">› Send</div><div class="collapsed-row">› Track Automation</div><div class="collapsed-row">› Advanced</div></div></div></aside>`}
 
@@ -1163,12 +1219,55 @@ async function redoEdit(){ensureSessionHistory();if(!redoStack.length)return toa
 function editTrackIds(){let ids=selectedTrackIds();if(!ids.length&&selectedTrackId)ids=[selectedTrackId];return ids}
 function selectionBounds(){return[Math.round(Math.min(sel.a,sel.b)),Math.round(Math.max(sel.a,sel.b))]}
 function clipId(){return'clip_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,9)}
-function selectedClipFragments(){if(!current)return[];const[a,b]=selectionBounds();if(b-a<2)return[];const ids=new Set(editTrackIds()),out=[];for(const t of current.tracks){if(!ids.has(t.id))continue;for(const c of t.clips||[]){const cs=c.timeline_start_ms,ce=cs+(c.source_end_ms-c.source_start_ms),is=Math.max(a,cs),ie=Math.min(b,ce);if(ie>is)out.push({track_id:t.id,offset_ms:is-a,source_start_ms:c.source_start_ms+(is-cs),source_end_ms:c.source_start_ms+(ie-cs)})}}return out}
-function removeRangeFromTracks(a,b,trackIds){const ids=new Set(trackIds);for(const t of current.tracks){if(!ids.has(t.id))continue;const next=[];for(const c of t.clips||[]){const cs=c.timeline_start_ms,ce=cs+(c.source_end_ms-c.source_start_ms);if(ce<=a||cs>=b){next.push(c);continue}if(cs<a)next.push({...c,id:clipId(),source_end_ms:c.source_start_ms+(a-cs)});if(ce>b)next.push({...c,id:clipId(),source_start_ms:c.source_start_ms+(b-cs),timeline_start_ms:b})}t.clips=next}}
+function selectedClipFragments(){if(!current)return[];const[a,b]=selectionBounds();if(b-a<2)return[];const ids=new Set(editTrackIds()),out=[];for(const t of current.tracks){if(!ids.has(t.id))continue;const delay=trackDelayMs(t);for(const c of t.clips||[]){const cs=Number(c.timeline_start_ms||0)+delay,ce=cs+(c.source_end_ms-c.source_start_ms),is=Math.max(a,cs),ie=Math.min(b,ce);if(ie>is)out.push({track_id:t.id,offset_ms:is-a,source_start_ms:c.source_start_ms+(is-cs),source_end_ms:c.source_start_ms+(ie-cs)})}}return out}
+function removeRangeFromTracks(a,b,trackIds,ripple=false){
+  const ids=new Set(trackIds),duration=Math.max(0,b-a);
+  for(const t of current.tracks){
+    if(!ids.has(t.id))continue;
+    const delay=trackDelayMs(t),next=[];
+    for(const c of t.clips||[]){
+      const raw=Number(c.timeline_start_ms||0),cs=raw+delay,ce=cs+(c.source_end_ms-c.source_start_ms);
+      if(ce<=a){next.push(c);continue}
+      if(cs>=b){next.push(ripple?{...c,timeline_start_ms:raw-duration}:c);continue}
+      if(cs<a)next.push({...c,id:clipId(),source_end_ms:c.source_start_ms+(a-cs)});
+      if(ce>b){
+        const visibleStart=ripple?a:b;
+        next.push({...c,id:clipId(),source_start_ms:c.source_start_ms+(b-cs),timeline_start_ms:visibleStart-delay});
+      }
+    }
+    t.clips=next.sort((x,y)=>x.timeline_start_ms-y.timeline_start_ms);
+  }
+}
+function splitSelectedTracksAt(ms){
+  if(!current)return;
+  const ids=selectedTrackIds();if(!ids.length)return toast('Seleziona almeno una traccia');
+  const at=Math.max(0,Math.round(ms));let count=0;checkpointHistory();
+  for(const t of current.tracks){
+    if(!ids.includes(t.id))continue;
+    const delay=trackDelayMs(t),out=[];
+    for(const c of t.clips||[]){
+      const raw=Number(c.timeline_start_ms||0),cs=raw+delay,ce=cs+(c.source_end_ms-c.source_start_ms);
+      if(at<=cs||at>=ce){out.push(c);continue}
+      const sourceCut=c.source_start_ms+(at-cs);
+      out.push({...c,id:clipId(),source_end_ms:sourceCut});
+      out.push({...c,id:clipId(),source_start_ms:sourceCut,timeline_start_ms:at-delay});
+      count++;
+    }
+    t.clips=out.sort((x,y)=>x.timeline_start_ms-y.timeline_start_ms);
+  }
+  if(!count)return toast('Nessun clip attraversa il punto di split nelle tracce selezionate');
+  projectDirty=true;render();markDirty();toast(`Split applicato a ${count} clip nelle tracce selezionate`);
+}
+function setTimelineTool(tool){
+  if(!['select','split','range'].includes(tool))return;
+  timelineTool=tool;render();
+}
+function toggleRippleTool(){rippleEnabled=!rippleEnabled;render();toast(rippleEnabled?'Ripple attivo sulle tracce selezionate':'Ripple disattivato')}
+
 function copyTimelineSelection(){const[a,b]=selectionBounds(),parts=selectedClipFragments();if(b-a<2)return toast('Seleziona prima un intervallo nella timeline');if(!parts.length)return toast('La selezione non contiene audio nelle tracce selezionate');timelineClipboard={duration_ms:b-a,parts};updateEditActionState();toast('Selezione copiata')}
-function cutTimelineSelection(){const[a,b]=selectionBounds(),ids=editTrackIds(),parts=selectedClipFragments();if(b-a<2)return toast('Seleziona prima un intervallo nella timeline');if(!ids.length||!parts.length)return toast('La selezione non contiene audio nelle tracce selezionate');checkpointHistory();timelineClipboard={duration_ms:b-a,parts};removeRangeFromTracks(a,b,ids);projectDirty=true;render();markDirty();updateEditActionState();toast('Selezione tagliata')}
+function cutTimelineSelection(){const[a,b]=selectionBounds(),ids=editTrackIds(),parts=selectedClipFragments();if(b-a<2)return toast('Seleziona prima un intervallo nella timeline');if(!ids.length||!parts.length)return toast('La selezione non contiene audio nelle tracce selezionate');checkpointHistory();timelineClipboard={duration_ms:b-a,parts};removeRangeFromTracks(a,b,ids,rippleEnabled);projectDirty=true;render();markDirty();updateEditActionState();toast(rippleEnabled?'Selezione tagliata con ripple':'Selezione tagliata')}
 function pasteTimelineSelection(){if(!current||!timelineClipboard?.parts?.length)return toast('Clipboard timeline vuota');checkpointHistory();const dest=Math.max(0,Math.round(playCursorMs||Math.min(sel.a,sel.b)||0));for(const x of timelineClipboard.parts){const t=trackById(x.track_id);if(!t)continue;t.clips=t.clips||[];t.clips.push({id:clipId(),source_start_ms:x.source_start_ms,source_end_ms:x.source_end_ms,timeline_start_ms:dest+x.offset_ms});t.clips.sort((a,b)=>a.timeline_start_ms-b.timeline_start_ms)}projectDirty=true;render();markDirty();toast('Selezione incollata')}
-function removeTimelineSelection(){if(!current)return;const[a,b]=selectionBounds(),ids=editTrackIds();if(b-a<2)return toast('Seleziona prima un intervallo nella timeline');if(!ids.length)return toast('Seleziona almeno una traccia');checkpointHistory();removeRangeFromTracks(a,b,ids);projectDirty=true;render();markDirty();toast('Parte di traccia rimossa')}
+function removeTimelineSelection(){if(!current)return;const[a,b]=selectionBounds(),ids=editTrackIds();if(b-a<2)return toast('Seleziona prima un intervallo nella timeline');if(!ids.length)return toast('Seleziona almeno una traccia');checkpointHistory();removeRangeFromTracks(a,b,ids,rippleEnabled);projectDirty=true;render();markDirty();toast(rippleEnabled?'Parte rimossa con ripple':'Parte di traccia rimossa')}
 function updateEditActionState(){const set=(id,v)=>{const e=$(id);if(e)e.disabled=!!v};set('#undoBtn',!undoStack.length);set('#redoBtn',!redoStack.length);set('#pasteBtn',!timelineClipboard?.parts?.length)}
 function markDirty(delay=650){
   if(!current)return;ensureSessionHistory();checkpointHistory();projectDirty=true;clearTimeout(autosaveTimer);if(!autosaveEnabled){updateEditActionState();return}autosaveTimer=setTimeout(()=>flushAutosave(false),delay);
@@ -1204,7 +1303,17 @@ async function save(){
   }catch(e){toast('Salvataggio fallito: '+e.message);throw e}
   finally{autosaveBusy=false}
 }
-function selectTrack(id){captureUiState();selectedTrackId=id;render()}
+function selectTrack(id,event=null){
+  captureUiState();
+  const multi=!!(event&&(event.ctrlKey||event.metaKey));
+  if(multi){
+    if(selectedTrackIdSet.has(id)){
+      if(selectedTrackIdSet.size>1)selectedTrackIdSet.delete(id);
+    }else selectedTrackIdSet.add(id);
+    selectedTrackId=selectedTrackIdSet.has(id)?id:([...selectedTrackIdSet][0]||id);
+  }else{selectedTrackIdSet=new Set([id]);selectedTrackId=id}
+  render();
+}
 function trackAudibleNow(track){
   if(!track||track.mute)return false;
   const anySolo=(current?.tracks||[]).some(t=>t.solo);
@@ -1403,7 +1512,7 @@ function drawWave(t){
   const color=t.color||'#2f81f7';ctx.strokeStyle=color;ctx.globalAlpha=.9;ctx.lineWidth=1;
   const sourceDuration=Math.max(1,t.duration_ms||1);
   for(const clip of t.clips||[]){
-    const tl=clip.timeline_start_ms/1000*pxPerSec,tw=(clip.source_end_ms-clip.source_start_ms)/1000*pxPerSec;
+    const tl=Math.max(0,effectiveClipStartMs(t,clip))/1000*pxPerSec,tw=(clip.source_end_ms-clip.source_start_ms)/1000*pxPerSec;
     const x0=Math.max(0,Math.floor(tl)),x1=Math.min(c.width,Math.ceil(tl+tw));
     ctx.beginPath();
     for(let x=x0;x<x1;x++){
@@ -1463,6 +1572,8 @@ function bindTimeline(){
     const r=pane.getBoundingClientRect();
     downX=e.clientX; moved=false;
     downMs=Math.max(0,(e.clientX-r.left+pane.scrollLeft)/pxPerSec*1000);
+    if(timelineTool==='split'){e.preventDefault();splitSelectedTracksAt(downMs);setPlayCursor(downMs);return}
+    if(timelineTool==='select'){sel={a:0,b:0};updateSel();setPlayCursor(downMs);return}
     dragging=true;sel.a=sel.b=downMs;updateSel();
   };
   window.onmousemove=e=>{
@@ -1506,15 +1617,16 @@ async function deleteSelection(wholeSong){
     await deleteTracksByIds(ids);
     return;
   }
-  const a=Math.round(Math.min(sel.a,sel.b)),b=Math.round(Math.max(sel.a,sel.b));
+  const a=Math.round(Math.min(sel.a,sel.b)),b=Math.round(Math.max(sel.a,sel.b)),ids=selectedTrackIds();
   if(b-a<2)return toast('Seleziona prima un intervallo nella timeline');
+  if(!ids.length)return toast('Seleziona almeno una traccia');
   await save();
   current=await api(`/api/projects/${current.id}/delete-range`,{
     method:'POST',
     headers:{'content-type':'application/json'},
-    body:JSON.stringify({start_ms:a,end_ms:b,track_ids:null,ripple:true})
+    body:JSON.stringify({start_ms:a,end_ms:b,track_ids:ids,ripple:rippleEnabled})
   });
-  sel={a:0,b:0};render();toast('Segmento del brano eliminato con ripple globale');
+  sel={a:0,b:0};render();toast(rippleEnabled?'Intervallo eliminato con ripple sulle tracce selezionate':'Intervallo eliminato dalle tracce selezionate');
 }
 
 function showMediaProgress(title,pct,message,detail='',cancelJobId=''){
@@ -1849,7 +1961,7 @@ async function drawWave(t){
   for(const clip of t.clips||[]){
     const sourceStart=Math.max(0,Number(clip.source_start_ms||0));
     const sourceEnd=Math.max(sourceStart+1,Number(clip.source_end_ms||durationMs));
-    const tl=Number(clip.timeline_start_ms||0)/1000*pxPerSec;
+    const tl=Math.max(0,effectiveClipStartMs(t,clip))/1000*pxPerSec;
     const tw=(sourceEnd-sourceStart)/1000*pxPerSec;
     if(tw<=0)continue;
     const firstBin=Math.max(0,Math.min(peaks.length-1,Math.floor(sourceStart/durationMs*peaks.length)));
@@ -2029,6 +2141,7 @@ async function attachPlaybackGraph(audio,track,channels=2,silent=false,masterRen
 }
 function canDirectPlayTrack(track,renderFilters=true){
   if(!track||!track.filename)return false;
+  if(trackDelayMs(track)!==0)return false;
   if(renderFilters&&(track.inserts||[]).some(x=>x.enabled))return false;
   if(Math.abs(Number(current?.pitch_semitones||0))>.001)return false;
   const base=Number(current?.base_bpm||current?.bpm||120),bpm=Number(current?.bpm||base);if(Math.abs(bpm-base)>.01)return false;
@@ -2041,7 +2154,7 @@ function playbackSourceForTrack(track,renderFilters=false){
 }
 function playbackWarmStateSignature(){
   if(!current)return '';
-  return JSON.stringify({id:current.id,bpm:current.bpm,base:current.base_bpm,pitch:current.pitch_semitones,tracks:(current.tracks||[]).map(t=>[t.id,t.filename,t.duration_ms,t.clips])});
+  return JSON.stringify({id:current.id,bpm:current.bpm,base:current.base_bpm,pitch:current.pitch_semitones,tracks:(current.tracks||[]).map(t=>[t.id,t.filename,t.duration_ms,t.delay_ms||0,t.clips])});
 }
 function clearPlaybackWarmCache(){
   clearTimeout(playbackWarmTimer);playbackWarmTimer=null;

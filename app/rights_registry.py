@@ -8,6 +8,7 @@ from urllib.parse import urlencode, urlparse
 from urllib.request import Request, urlopen
 
 from .models import RightsRecord
+from .version import APP_RELEASE
 
 
 @dataclass(frozen=True)
@@ -59,7 +60,7 @@ def _read_json(url: str, params: dict[str, str]) -> Any:
     base = _validated_https(url)
     sep = "&" if "?" in base else "?"
     request_url = f"{base}{sep}{urlencode(params)}"
-    req = Request(request_url, headers={"Accept": "application/json", "User-Agent": "MTA-Audio-Editor/0.2.0 (https://github.com/desalvo/mta-audio-editor)"})  # noqa: S310
+    req = Request(request_url, headers={"Accept": "application/json", "User-Agent": f"MTA-Audio-Editor/{APP_RELEASE} (https://github.com/desalvo/mta-audio-editor)"})  # noqa: S310
     with urlopen(req, timeout=20) as response:  # noqa: S310
         payload = response.read(2_000_000)
     return json.loads(payload.decode("utf-8"))
