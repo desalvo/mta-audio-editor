@@ -20,7 +20,7 @@ from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse, Resp
 from starlette.background import BackgroundTask
 from fastapi.staticfiles import StaticFiles
 
-from .audio_engine import auto_align_ms, delete_range, delete_song_range, ensure_clips, estimate_bpm_and_signature, generate_chords_piano_wav, generate_metronome_wav, media_duration_ms, project_duration_ms, render_mix, render_track, render_track_export, shift_track, waveform_peaks
+from .audio_engine import auto_align_ms, delete_range, delete_song_range, ensure_clips, estimate_bpm_and_signature, generate_chords_piano_wav, generate_silent_chords_wav, refresh_chords_piano_wav_region, generate_metronome_wav, media_duration_ms, project_duration_ms, render_mix, render_track, render_track_export, shift_track, waveform_peaks
 from .codec import export_mta, ffprobe, import_mta, resolve_mta_device_profile, suggested_slots, validate_slot_mapping
 from .models import AutoMixRequest, Clip, CustomPresetRequest, DeleteRangeRequest, DeleteTracksRequest, InstantiateProjectClipRequest, UpdateProjectClipRequest, MoveTrackRequest, TrackDelayRequest, MtaExportRequest, Project, ProjectClip, ProjectExportRequest, TrackExportRequest, RightsRecord, Track, SampleEditRequest, SampleEffectRequest
 from .plugins import STEM_SPLITTER, delete_user_preset, plugin_manifest, save_user_preset
@@ -3533,6 +3533,41 @@ def _create_metronome_track_locked(pid: str, request: Request):
 def create_chords_track(pid: str, request: Request):
     with CHORDS_TRACK_LOCK:
         return _create_chords_track_locked(pid, request)
+
+
+@app.post("/api/projects/{pid}/chords-track/refresh")
+def refresh_chords_track(pid: str, request: Request, old_time_ms: int, new_time_ms: int):
+    """Refresh an existing generated Chords track after any chord mutation."""
+    with CHORDS_TRACK_LOCK:
+        project = _project_for_actor(request, pid)
+        def is_chords_track(item: Track) -> bool:
+            name = str(getattr(item, "name", "") or "").strip().lower()
+            filename = str(getattr(item, "filename", "") or "").lower()
+            return name in {"chords", "accordi", "chords piano", "accordi piano"} or filename.startswith("chords-piano-")
+        track = next((item for item in project.tracks if is_chords_track(item)), None)
+        if track is None or not track.filename:
+            return {"project": project, "refreshed": False, "mode": "none"}
+        out = audio_path(pid, track.filename)
+        mode = "fast"
+        refresh_start_ms = 0
+        refresh_end_ms = project_duration_ms(project)
+        try:
+            refresh_start_ms, refresh_end_ms = refresh_chords_piano_wav_region(project, out, old_time_ms, new_time_ms)
+        except Exception:
+            mode = "full"
+            active_chords = [c for c in project.chords if not c.excluded and not c.deleted]
+            if active_chords:
+                generate_chords_piano_wav(project, out)
+            else:
+                generate_silent_chords_wav(project, out)
+        track.duration_ms = media_duration_ms(out)
+        track.waveform_peaks = waveform_peaks(out)
+        track.waveform_revision = _track_waveform_revision(track, out) if track.waveform_peaks else ""
+        save_project(project)
+        return {
+            "project": project, "track": track, "refreshed": True, "mode": mode,
+            "refresh_start_ms": refresh_start_ms, "refresh_end_ms": refresh_end_ms,
+        }
 
 
 def _create_chords_track_locked(pid: str, request: Request):

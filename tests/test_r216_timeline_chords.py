@@ -21,7 +21,8 @@ def test_timeline_chords_support_drag_inline_edit_and_context_menu():
 
 def test_timeline_can_add_chord_at_playhead():
     assert 'addTimelineChordAtPlayhead()' in JS
-    assert 'time_ms:Math.max(0,Math.round(playCursorMs||0))' in JS
+    assert 'const timeMs=Math.max(0,Math.round(playCursorMs||0));' in JS
+    assert 'current.chords.push({time_ms:Math.max(0,Math.round(Number(timeMs)||0))' in JS
     assert '+ Chord alla posizione corrente' in JS
 
 def test_chord_lane_does_not_change_track_geometry():

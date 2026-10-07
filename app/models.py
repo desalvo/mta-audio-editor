@@ -107,6 +107,10 @@ class Marker(BaseModel):
     time_ms: int = Field(ge=0)
     label: str = Field(max_length=500)
     color: str = Field(default="#204A87", pattern=r"^#[0-9A-Fa-f]{6}$")
+    # Optional document-layout settings for the section starting at this marker.
+    # The value is expressed in millimetres so it maps directly to print layout.
+    section_indent_enabled: bool = False
+    section_indent_mm: float = Field(default=0.0, ge=0.0, le=100.0)
     disabled: bool = False
     deleted: bool = False
     manual_override: bool = False
@@ -176,6 +180,7 @@ class LyricsPdfStyle(BaseModel):
     chords: PdfTextStyle = Field(default_factory=lambda: PdfTextStyle(style="bold", size=9, color="#7B1FA2"))
     markers: PdfTextStyle = Field(default_factory=lambda: PdfTextStyle(style="bold", size=12, color="#204A87"))
     line_spacing: float = Field(default=8.0, ge=0.0, le=48.0)
+    marker_section_spacing: float = Field(default=10.0, ge=0.0, le=72.0)
 
 
 class RightsRecord(BaseModel):

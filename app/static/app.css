@@ -1219,3 +1219,12 @@ body:has(#topZoom:active) .wave{image-rendering:auto}
 .timeline-chord-marker.deleted{opacity:.28}
 .timeline-chord-inline{width:72px;min-width:48px;height:18px;padding:0 3px;border:1px solid #9ee3ff;border-radius:3px;background:#071019;color:#fff;font:inherit;outline:none}
 .timeline-chord-context-menu{z-index:10020}
+/* r220: precise chord drag guide and popularity shortcuts. */
+.timeline-chord-drag-guide{position:absolute;top:0;bottom:0;width:0;z-index:18;pointer-events:none}
+.timeline-chord-drag-line{position:absolute;top:28px;bottom:0;left:0;border-left:1px solid rgba(255,255,255,.95);box-shadow:0 0 5px rgba(127,214,255,.8)}
+.timeline-chord-drag-time{position:absolute;top:30px;left:6px;padding:2px 5px;border:1px solid rgba(127,214,255,.65);border-radius:4px;background:rgba(5,18,28,.94);color:#eaf8ff;font-size:10px;font-weight:700;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.35)}
+.chord-shortcuts-popover{position:fixed;z-index:12050;min-width:170px;max-width:360px;padding:7px;border:1px solid #46758d;border-radius:6px;background:#091822;box-shadow:0 8px 24px rgba(0,0,0,.55)}
+.chord-shortcuts-title,.chord-shortcuts>span{display:block;margin:0 0 5px;color:#a8c9d9;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.chord-shortcuts{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin:7px 0}
+.chord-shortcuts button{min-width:34px;padding:3px 7px;border:1px solid #37677e;border-radius:10px;background:#102a38;color:#eaf8ff;font-size:11px;font-weight:700;cursor:pointer}
+.chord-shortcuts button:hover{border-color:#9ee3ff;background:#17445d}

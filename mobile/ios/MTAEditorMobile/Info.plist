@@ -10,23 +10,39 @@
     <key>CFBundleName</key><string>$(PRODUCT_NAME)</string>
     <key>CFBundlePackageType</key><string>APPL</string>
     <key>CFBundleShortVersionString</key><string>0.2.0</string>
-    <key>CFBundleVersion</key><string>20218</string>
-    <key>MTAEditorRevision</key><string>218</string>
+    <key>CFBundleVersion</key><string>20224</string>
+    <key>MTAEditorRevision</key><string>224</string>
     <key>MTAEditorBuild</key><string>20261007123700</string>
     <key>CFBundleDocumentTypes</key>
     <array>
         <dict>
-            <key>CFBundleTypeName</key><string>MTA Audio Editor Project</string>
+            <key>CFBundleTypeName</key><string>Portable MTA Audio Editor Project</string>
             <key>CFBundleTypeRole</key><string>Editor</string>
             <key>LSHandlerRank</key><string>Owner</string>
+            <key>LSItemContentTypes</key><array><string>com.desalvo.mtaaudioeditor.portable-project</string></array>
+        </dict>
+        <dict>
+            <key>CFBundleTypeName</key><string>MTA Audio Editor Project (Legacy)</string>
+            <key>CFBundleTypeRole</key><string>Editor</string>
+            <key>LSHandlerRank</key><string>Alternate</string>
             <key>LSItemContentTypes</key><array><string>com.desalvo.mtaaudioeditor.project</string></array>
         </dict>
     </array>
     <key>UTExportedTypeDeclarations</key>
     <array>
         <dict>
+            <key>UTTypeIdentifier</key><string>com.desalvo.mtaaudioeditor.portable-project</string>
+            <key>UTTypeDescription</key><string>Portable MTA Audio Editor Project</string>
+            <key>UTTypeConformsTo</key><array><string>public.data</string></array>
+            <key>UTTypeTagSpecification</key>
+            <dict>
+                <key>public.filename-extension</key><array><string>maeprojz</string></array>
+                <key>public.mime-type</key><string>application/vnd.mta-audio-editor.portable-project</string>
+            </dict>
+        </dict>
+        <dict>
             <key>UTTypeIdentifier</key><string>com.desalvo.mtaaudioeditor.project</string>
-            <key>UTTypeDescription</key><string>MTA Audio Editor Project</string>
+            <key>UTTypeDescription</key><string>MTA Audio Editor Project (Legacy)</string>
             <key>UTTypeConformsTo</key><array><string>public.data</string></array>
             <key>UTTypeTagSpecification</key>
             <dict>

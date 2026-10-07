@@ -136,23 +136,39 @@ if sys.platform == "darwin":
             "NSHighResolutionCapable": True,
             "CFBundleDocumentTypes": [
                 {
-                    "CFBundleTypeName": "MTA Audio Editor Project",
+                    "CFBundleTypeName": "Portable MTA Audio Editor Project",
                     "CFBundleTypeRole": "Editor",
                     "LSHandlerRank": "Owner",
+                    "LSItemContentTypes": ["com.desalvo.mtaaudioeditor.portable-project"],
+                    "CFBundleTypeExtensions": ["maeprojz"],
+                },
+                {
+                    "CFBundleTypeName": "MTA Audio Editor Project (Legacy)",
+                    "CFBundleTypeRole": "Editor",
+                    "LSHandlerRank": "Alternate",
                     "LSItemContentTypes": ["com.desalvo.mtaaudioeditor.project"],
                     "CFBundleTypeExtensions": ["maeproj"],
-                }
+                },
             ],
             "UTExportedTypeDeclarations": [
                 {
+                    "UTTypeIdentifier": "com.desalvo.mtaaudioeditor.portable-project",
+                    "UTTypeDescription": "Portable MTA Audio Editor Project",
+                    "UTTypeConformsTo": ["public.data"],
+                    "UTTypeTagSpecification": {
+                        "public.filename-extension": ["maeprojz"],
+                        "public.mime-type": "application/vnd.mta-audio-editor.portable-project",
+                    },
+                },
+                {
                     "UTTypeIdentifier": "com.desalvo.mtaaudioeditor.project",
-                    "UTTypeDescription": "MTA Audio Editor Project",
+                    "UTTypeDescription": "MTA Audio Editor Project (Legacy)",
                     "UTTypeConformsTo": ["public.data"],
                     "UTTypeTagSpecification": {
                         "public.filename-extension": ["maeproj"],
                         "public.mime-type": "application/vnd.mta-audio-editor.project",
                     },
-                }
+                },
             ],
         },
     )

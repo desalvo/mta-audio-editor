@@ -648,6 +648,143 @@ def _chord_midi_notes(symbol: str) -> list[int]:
     return sorted(dict.fromkeys(notes))
 
 
+def _render_chords_piano_region(project: Project, start_ms: int, end_ms: int, sample_rate: int = 44100) -> np.ndarray:
+    """Render only a time window of the synchronized piano guide.
+
+    The event envelopes keep their original absolute chord start/end times, so the
+    synthesized window can be spliced into an existing generated Chords WAV.
+    """
+    duration_ms = project_duration_ms(project)
+    start_ms = max(0, int(start_ms))
+    end_ms = min(duration_ms, max(start_ms + 1, int(end_ms)))
+    frames_total = max(1, round((end_ms - start_ms) / 1000.0 * sample_rate))
+    audio = np.zeros((frames_total, 2), dtype=np.float64)
+    events = sorted(
+        [c for c in project.chords if not getattr(c, "excluded", False) and not getattr(c, "deleted", False)],
+        key=lambda c: int(c.time_ms),
+    )
+    for index, chord in enumerate(events):
+        chord_start_ms = max(0, int(chord.time_ms))
+        if chord_start_ms >= duration_ms:
+            continue
+        next_ms = int(events[index + 1].time_ms) if index + 1 < len(events) else duration_ms
+        chord_end_ms = min(duration_ms, max(chord_start_ms + 120, next_ms))
+        overlap_start_ms = max(start_ms, chord_start_ms)
+        overlap_end_ms = min(end_ms, chord_end_ms)
+        if overlap_end_ms <= overlap_start_ms:
+            continue
+        notes = _chord_midi_notes(chord.chord)
+        if not notes:
+            continue
+        note_ms = max(90, chord_end_ms - chord_start_ms)
+        full_frames = max(1, round(note_ms / 1000.0 * sample_rate))
+        local_start = round((overlap_start_ms - start_ms) / 1000.0 * sample_rate)
+        source_start = round((overlap_start_ms - chord_start_ms) / 1000.0 * sample_rate)
+        frames = min(
+            frames_total - local_start,
+            full_frames - source_start,
+            round((overlap_end_ms - overlap_start_ms) / 1000.0 * sample_rate),
+        )
+        if frames <= 0:
+            continue
+        source_indexes = np.arange(source_start, source_start + frames, dtype=np.float64)
+        t = source_indexes / sample_rate
+        attack = np.minimum(1.0, t / 0.008)
+        env = attack * (0.72 * np.exp(-t * 1.35) + 0.28 * np.exp(-t * 0.24))
+        release_len = min(full_frames, round(0.08 * sample_rate))
+        release_start = full_frames - release_len
+        if release_len > 1:
+            mask = source_indexes >= release_start
+            if mask.any():
+                env[mask] *= np.maximum(0.0, (full_frames - 1 - source_indexes[mask]) / max(1, release_len - 1))
+        mono = np.zeros(frames, dtype=np.float64)
+        for ni, midi in enumerate(notes):
+            freq = 440.0 * (2.0 ** ((midi - 69) / 12.0))
+            phase = 0.13 * ni
+            tone = (
+                np.sin(2 * np.pi * freq * t + phase)
+                + 0.34 * np.sin(2 * np.pi * freq * 2.0 * t + phase * 1.7)
+                + 0.12 * np.sin(2 * np.pi * freq * 3.0 * t + phase * 2.1)
+            )
+            mono += tone / max(1.0, len(notes) ** 0.72)
+        mono *= env * 0.21
+        pan = -0.16 if index % 2 == 0 else 0.16
+        audio[local_start:local_start + frames, 0] += mono * np.sqrt((1.0 - pan) * 0.5)
+        audio[local_start:local_start + frames, 1] += mono * np.sqrt((1.0 + pan) * 0.5)
+    return audio
+
+
+def refresh_chords_piano_wav_region(project: Project, out: Path, old_time_ms: int, new_time_ms: int) -> tuple[int, int]:
+    """Fast-refresh the smallest safe Chords-track region after a chord move.
+
+    Returns the actual [start_ms, end_ms] window patched. Raises ValueError when
+    the existing file cannot be safely patched, allowing callers to fall back to
+    a complete render.
+    """
+    duration_ms = project_duration_ms(project)
+    if duration_ms <= 0 or not out.is_file():
+        raise ValueError("chords track is not patchable")
+    events = sorted(
+        [c for c in project.chords if not getattr(c, "excluded", False) and not getattr(c, "deleted", False)],
+        key=lambda c: int(c.time_ms),
+    )
+    if not events:
+        raise ValueError("project has no active chords")
+    low, high = sorted((max(0, int(old_time_ms)), max(0, int(new_time_ms))))
+    times = [int(c.time_ms) for c in events]
+    previous = max((t for t in times if t < low), default=0)
+    following = min((t for t in times if t > high), default=duration_ms)
+    start_ms = max(0, previous)
+    end_ms = min(duration_ms, max(following, high + 120))
+    if end_ms <= start_ms:
+        raise ValueError("invalid chords refresh window")
+    # If the edit affects most of the song, a full render is safer and no slower.
+    if (end_ms - start_ms) >= max(15000, int(duration_ms * 0.70)):
+        raise ValueError("refresh window too large for fast mode")
+    with wave.open(str(out), "rb") as handle:
+        params = handle.getparams()
+        if params.nchannels != 2 or params.sampwidth != 2 or params.framerate != 44100 or params.comptype != "NONE":
+            raise ValueError("unsupported chords track WAV format")
+        raw = bytearray(handle.readframes(params.nframes))
+    sample_rate = params.framerate
+    start_frame = max(0, min(params.nframes, round(start_ms / 1000.0 * sample_rate)))
+    end_frame = max(start_frame + 1, min(params.nframes, round(end_ms / 1000.0 * sample_rate)))
+    region = _render_chords_piano_region(project, start_ms, end_ms, sample_rate)
+    peak = float(np.max(np.abs(region))) if region.size else 0.0
+    if peak > 0.0:
+        region /= peak
+    pcm = np.asarray(np.clip(region, -1.0, 1.0) * 32767.0, dtype=np.int16).tobytes()
+    frame_bytes = params.nchannels * params.sampwidth
+    expected = (end_frame - start_frame) * frame_bytes
+    if len(pcm) < expected:
+        pcm += b"\x00" * (expected - len(pcm))
+    elif len(pcm) > expected:
+        pcm = pcm[:expected]
+    raw[start_frame * frame_bytes:end_frame * frame_bytes] = pcm
+    tmp = out.with_suffix(out.suffix + ".refresh.tmp")
+    with wave.open(str(tmp), "wb") as handle:
+        handle.setparams(params)
+        handle.writeframes(bytes(raw))
+    tmp.replace(out)
+    return start_ms, end_ms
+
+
+
+def generate_silent_chords_wav(project: Project, out: Path) -> int:
+    """Render a silent stereo WAV matching the project duration for an existing Chords track."""
+    duration_ms = project_duration_ms(project)
+    if duration_ms <= 0:
+        raise ValueError("project duration is zero")
+    sample_rate = 44100
+    total = max(1, round(duration_ms / 1000.0 * sample_rate))
+    out.parent.mkdir(parents=True, exist_ok=True)
+    with wave.open(str(out), "wb") as handle:
+        handle.setnchannels(2)
+        handle.setsampwidth(2)
+        handle.setframerate(sample_rate)
+        handle.writeframes(bytes(total * 2 * 2))
+    return duration_ms
+
 def generate_chords_piano_wav(project: Project, out: Path) -> int:
     """Render active project chords as a synchronized digital-piano guide track."""
     duration_ms = project_duration_ms(project)

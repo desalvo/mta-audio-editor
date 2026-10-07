@@ -1,3 +1,38 @@
+## 0.2.0-r224
+
+- Rigenerazione automatica della traccia Chords dopo ogni mutazione audio-rilevante: spostamento, modifica, aggiunta, disabilitazione, riabilitazione, eliminazione, reset ed estrazione.
+- Refresh fast/parziale preferito sulla minima regione temporale interessata, con fallback automatico al render completo.
+- Avviso di attesa sempre visibile durante il refresh della traccia Chords.
+- Se non restano chords attivi, il refresh di una traccia Chords esistente genera correttamente una guida silenziosa invece di lasciare audio obsoleto.
+
+## 0.2.0-r223
+Moving a chord on the timeline now refreshes an existing Chords guide track. The editor prefers a fast partial refresh of the affected interval, automatically falls back to a complete regeneration when necessary, and always warns the user to wait while the audio track is refreshed.
+
+# 0.2.0-r222
+
+- Lyrics/Chords PDF and preview: end-of-line anchored chords now stay close to the end of the lyric text or to the preceding chord instead of being pushed to the far-right page margin.
+- PDF style now includes configurable vertical spacing between consecutive marker sections.
+- Markers can indent their whole section by a configurable value in millimetres; preview and PDF apply the same geometry.
+- New/edit marker forms automatically reuse color, section indentation and related marker options from the latest previous marker with the same name after leaving the name field.
+
+## 0.2.0-r221
+- Added keyboard shortcut C to add a chord at the current playhead when Show Chords is enabled, with popular/recent project chord shortcuts.
+
+# MTA Audio Editor 0.2.0-r220
+
+- Deleting a chord now removes it completely instead of leaving a struck-through soft-deleted event. The behavior is consistent in the timeline lane, Chords pane, combined Lyrics/Chords editor and chord cut/merge operations.
+- Old soft-deleted chords from earlier revisions are automatically purged from the live project model and disappear from the UI.
+- Timeline chord double-click editing now works reliably.
+- Dragging a chord on the timeline displays a vertical guide through the waveform and a live `m:ss.mmm` timestamp beside the guide.
+- Chord editors now provide visual shortcuts for the most-used chords in the current project, ranked by frequency and then recency.
+
+
+## 0.2.0-r219
+- Registered Portable MTA Audio Editor (`.maeprojz`) as the primary OS document type on Windows and macOS.
+- Added `.maeprojz` document/file associations on iOS and Android.
+- Kept `.maeproj` registered as a legacy-compatible project type.
+- Added regression tests for native/mobile portable project associations.
+
 # MTA Audio Editor 0.2.0-r218
 
 - CI: removed an unused `fmt` assignment in the track export endpoint that caused Ruff F841 and blocked downstream GitHub Actions jobs.

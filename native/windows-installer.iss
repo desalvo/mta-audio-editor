@@ -46,8 +46,15 @@ Name: "{autodesktop}\MTA Audio Editor"; Filename: "{app}\{#MyAppExeName}"; Tasks
 Name: "desktopicon"; Description: "Crea un collegamento sul desktop"; GroupDescription: "Collegamenti aggiuntivi:"
 
 [Registry]
+; Portable project is the primary native document type.
+Root: HKCU; Subkey: "Software\Classes\.maeprojz"; ValueType: string; ValueName: ""; ValueData: "MTA.AudioEditor.PortableProject"; Flags: uninsdeletevalue
+Root: HKCU; Subkey: "Software\Classes\MTA.AudioEditor.PortableProject"; ValueType: string; ValueName: ""; ValueData: "Portable MTA Audio Editor Project"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Classes\MTA.AudioEditor.PortableProject\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\{#MyAppExeName},0"
+Root: HKCU; Subkey: "Software\Classes\MTA.AudioEditor.PortableProject\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""
+Root: HKCU; Subkey: "Software\Classes\MTA.AudioEditor.PortableProject"; ValueType: string; ValueName: "Content Type"; ValueData: "application/vnd.mta-audio-editor.portable-project"
+; Legacy workspace project association remains supported.
 Root: HKCU; Subkey: "Software\Classes\.maeproj"; ValueType: string; ValueName: ""; ValueData: "MTA.AudioEditor.Project"; Flags: uninsdeletevalue
-Root: HKCU; Subkey: "Software\Classes\MTA.AudioEditor.Project"; ValueType: string; ValueName: ""; ValueData: "MTA Audio Editor Project"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Classes\MTA.AudioEditor.Project"; ValueType: string; ValueName: ""; ValueData: "MTA Audio Editor Project (Legacy)"; Flags: uninsdeletekey
 Root: HKCU; Subkey: "Software\Classes\MTA.AudioEditor.Project\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\{#MyAppExeName},0"
 Root: HKCU; Subkey: "Software\Classes\MTA.AudioEditor.Project\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""
 Root: HKCU; Subkey: "Software\Classes\MTA.AudioEditor.Project"; ValueType: string; ValueName: "Content Type"; ValueData: "application/vnd.mta-audio-editor.project"

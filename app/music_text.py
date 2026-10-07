@@ -1494,6 +1494,7 @@ def build_lyrics_pdf(
         "chords": {"style": "bold", "size": 9, "color": chord_color},
         "markers": {"style": "bold", "size": 12, "color": "#204A87"},
         "line_spacing": 8.0,
+        "marker_section_spacing": 10.0,
     }
     # Preserve direct chord_color compatibility for older callers/tests; project
     # typography may override it below.
@@ -1508,6 +1509,10 @@ def build_lyrics_pdf(
         line_spacing = max(0.0, min(48.0, float(incoming.get("line_spacing", default_style["line_spacing"]))))
     except (TypeError, ValueError):
         line_spacing = float(default_style["line_spacing"])
+    try:
+        marker_section_spacing = max(0.0, min(72.0, float(incoming.get("marker_section_spacing", default_style["marker_section_spacing"]))))
+    except (TypeError, ValueError):
+        marker_section_spacing = float(default_style["marker_section_spacing"])
     if chord_color and chord_color != "#7B1FA2" and not (incoming.get("chords") or {}).get("color"):
         styles["chords"]["color"] = chord_color
 
@@ -1561,7 +1566,7 @@ def build_lyrics_pdf(
         if line: lines.append(line)
         return lines or [""]
 
-    def estimated_words(lyric: LyricLine, line_end: int) -> list[dict]:
+    def estimated_words(lyric: LyricLine, line_end: int, base_margin: float = margin, max_width: float = usable_width) -> list[dict]:
         lyric_style = st("lyrics")
         font,size,_ = lyric_style
         words = [w for w in (lyric.words or []) if str(w.text or "").strip()]
@@ -1574,12 +1579,12 @@ def build_lyrics_pdf(
             source=[]
             for i,token in enumerate(tokens):
                 source.append({"text":token,"start_ms":round(start+span*i/max(1,len(tokens))),"end_ms":round(start+span*(i+1)/max(1,len(tokens))),"syllables":[]})
-        entries=[];x=margin;space=c.stringWidth(" ",font,size)
+        entries=[];x=base_margin;space=c.stringWidth(" ",font,size)
         for item in source:
             text=safe(item["text"]); w=c.stringWidth(text,font,size)
-            if entries and x+w>margin+usable_width:
+            if entries and x+w>base_margin+max_width:
                 # This function models one visual row at a time; callers split by x reset.
-                x=margin
+                x=base_margin
             syll=[];sx=x
             raw_syll=item.get("syllables") or []
             for syl in raw_syll:
@@ -1590,15 +1595,19 @@ def build_lyrics_pdf(
             x+=w+space
         return entries
 
-    def chord_x(chord: Chord, word_entries: list[dict], line_start: int, line_end: int) -> float:
+    def chord_x(chord: Chord, word_entries: list[dict], line_start: int, line_end: int, base_margin: float = margin, max_width: float = usable_width) -> float:
         if not word_entries:
             rel=max(0,min(1,(int(chord.time_ms)-line_start)/max(1,line_end-line_start)))
-            return margin+rel*usable_width
+            return base_margin+rel*max_width
         anchor_kind = str(getattr(chord, "anchor_kind", "word") or "word")
         if chord.manual_anchor and anchor_kind == "start":
-            return margin
+            return base_margin
         if chord.manual_anchor and anchor_kind == "end":
-            return margin + usable_width
+            # Keep end-of-line chords visually attached to the content instead of
+            # pushing them to the far right edge of the printable area.  The
+            # collision pass below will still place them after any preceding chord.
+            last = word_entries[-1]
+            return last["x"] + last["width"] + 8
         manual_index = _manual_chord_word_index(chord, len(word_entries))
         if manual_index is not None:
             entry = word_entries[manual_index]
@@ -1638,9 +1647,23 @@ def build_lyrics_pdf(
         except Exception:
             return st("markers")[2]
 
-    def draw_marker(marker: Marker) -> object:
-        nonlocal y
-        ensure(30)
+    marker_draw_count = 0
+
+    def marker_indent_points(marker: Marker) -> float:
+        if not bool(getattr(marker, "section_indent_enabled", False)):
+            return 0.0
+        try:
+            mm = max(0.0, min(100.0, float(getattr(marker, "section_indent_mm", 0.0) or 0.0)))
+        except (TypeError, ValueError):
+            mm = 0.0
+        return mm * 72.0 / 25.4
+
+    def draw_marker(marker: Marker) -> tuple[object, float]:
+        nonlocal y, marker_draw_count
+        extra = marker_section_spacing if marker_draw_count else 0.0
+        ensure(30 + extra)
+        if extra:
+            y -= extra
         font,size,_ = st("markers")
         c.setFont(font, size)
         color = marker_color(marker)
@@ -1648,9 +1671,11 @@ def build_lyrics_pdf(
         label=safe(marker.label).strip()
         if label and not label.endswith(":"):
             label += ":"
-        c.drawString(margin,y,label)
+        indent = marker_indent_points(marker)
+        c.drawString(margin + indent,y,label)
         y -= max(18,size+8)
-        return color
+        marker_draw_count += 1
+        return color, indent
 
     c.setTitle(title or "Lyrics")
     if artist: c.setAuthor(artist)
@@ -1685,15 +1710,18 @@ def build_lyrics_pdf(
     ordered_markers=sorted(active_markers,key=lambda x:x.time_ms)
     marker_idx=0
     current_section_color = None
+    current_section_indent = 0.0
 
     for i,lyric in enumerate(ordered_lyrics):
         line_start=int(lyric.time_ms)
         next_boundary=next((t for t in boundary_times if t>line_start), None)
         line_end=int(next_boundary if next_boundary is not None else (lyric.end_ms or line_start+6000))
         while marker_idx<len(ordered_markers) and int(ordered_markers[marker_idx].time_ms)<=line_start:
-            current_section_color = draw_marker(ordered_markers[marker_idx]);marker_idx+=1
-        words=estimated_words(lyric,line_end)
-        lyric_lines=wrap_text(lyric.text,"lyrics")
+            current_section_color, current_section_indent = draw_marker(ordered_markers[marker_idx]);marker_idx+=1
+        section_margin = margin + current_section_indent
+        section_width = max(72.0, usable_width - current_section_indent)
+        words=estimated_words(lyric,line_end,section_margin,section_width)
+        lyric_lines=wrap_text(lyric.text,"lyrics",section_width)
         line_chords=[ch for ch in ordered_chords if _manual_chord_line_match(ch, lyric) or (not ch.manual_anchor and line_start<=ch.time_ms<line_end)]
         # Never carry a previous automatic chord onto the next lyric line.
         # A chord before the first word must be explicitly anchored to line start.
@@ -1724,15 +1752,15 @@ def build_lyrics_pdf(
             c.setFont(chord_font, chord_size)
             # Chords always use their own PDF style; marker/section colors never leak into them.
             c.setFillColor(st("chords")[2])
-            positioned=[(chord_x(ch, words, line_start, line_end), ch) for ch in line_chords]
+            positioned=[(chord_x(ch, words, line_start, line_end, section_margin, section_width), ch) for ch in line_chords]
             positioned=[(x,ch) for x,ch in positioned if x == x]
             positioned.sort(key=lambda item: (item[0], int(getattr(item[1], "anchor_order", 0)), int(item[1].time_ms)))
             if positioned:
-                prev_right=margin-8
+                prev_right=section_margin-8
                 for x,ch in positioned:
                     label=safe(ch.chord)
                     tw=c.stringWidth(label,chord_font,chord_size)
-                    x=max(prev_right+5,min(x,margin+usable_width-tw))
+                    x=max(prev_right+5,min(x,section_margin+section_width-tw))
                     c.drawString(x,y,label);prev_right=x+tw
                 y-=chord_size+7
         lyric_font,lyric_size,_ = st("lyrics")
@@ -1740,11 +1768,11 @@ def build_lyrics_pdf(
         c.setFillColor(current_section_color or st("lyrics")[2])
         for part in lyric_lines:
             ensure(lyric_size+8)
-            c.drawString(margin,y,safe(part));y-=lyric_size+6
+            c.drawString(section_margin,y,safe(part));y-=lyric_size+6
         y-=line_spacing
 
     while marker_idx<len(ordered_markers):
-        current_section_color = draw_marker(ordered_markers[marker_idx]);marker_idx+=1
+        current_section_color, current_section_indent = draw_marker(ordered_markers[marker_idx]);marker_idx+=1
 
     if rights_records:
         ensure(80);y-=8;c.setFillColor(black);c.setFont(fonts["bold"],10);c.drawString(margin,y,"Dati repertorio / Rights information");y-=16
