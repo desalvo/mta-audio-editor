@@ -1,3 +1,4 @@
+- r208: Fix GitHub Actions Ruff failure caused by two unused pathlib.Path imports in tests.
 ## 0.2.0-r207
 
 - Reworked timeline waveforms with a 4096-bin signed min/max envelope instead of the legacy 1024 absolute peaks.

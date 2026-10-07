@@ -1,3 +1,4 @@
+- r208: CI maintenance: remove unused test imports that blocked Ruff after r207.
 ## 0.2.0-r207
 
 - Reworked timeline waveforms with a 4096-bin signed min/max envelope instead of the legacy 1024 absolute peaks.

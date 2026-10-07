@@ -1,4 +1,3 @@
-from pathlib import Path
 
 from app import storage
 from app.models import Project, Track
