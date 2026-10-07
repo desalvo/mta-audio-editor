@@ -401,7 +401,14 @@ jobs:
         run: pyinstaller --noconfirm --clean native/mta_audio_editor_native.spec
       - name: Native single-user smoke test
         shell: bash
-        run: '"dist/MTA Audio Editor.app/Contents/MacOS/MTA Audio Editor" --native-smoke'
+        run: |
+          env -u MTA_NATIVE_CHORDINO_BIN_DIR \
+              -u MTA_NATIVE_CHORDINO_VAMP_DIR \
+              -u MTA_CHORDINO_HOST \
+              -u MTA_SONIC_ANNOTATOR \
+              -u MTA_VAMP_PATH \
+              -u VAMP_PATH \
+              "dist/MTA Audio Editor.app/Contents/MacOS/MTA Audio Editor" --native-smoke
       - name: Build macOS DMG installer
         shell: bash
         run: |

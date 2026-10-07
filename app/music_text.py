@@ -671,9 +671,134 @@ def _simplify_chord_label(label: str) -> str:
     return simple
 
 
+
+
+def _normalize_chord_options(options: dict | None = None) -> dict:
+    raw = dict(options or {})
+    preset = str(raw.get("preset") or "stable")
+    defaults = {
+        "stable": dict(sensitivity=25, harmonic_refinement=False, detect_sevenths=False, detect_sus=False, detect_dim_aug=False, detect_slash_bass=False, temporal_smoothing=True, beat_sync=False, min_chord_ms=1800, max_changes_per_minute=24),
+        "balanced": dict(sensitivity=45, harmonic_refinement=True, detect_sevenths=True, detect_sus=True, detect_dim_aug=False, detect_slash_bass=False, temporal_smoothing=True, beat_sync=False, min_chord_ms=1100, max_changes_per_minute=36),
+        "detailed": dict(sensitivity=70, harmonic_refinement=True, detect_sevenths=True, detect_sus=True, detect_dim_aug=True, detect_slash_bass=True, temporal_smoothing=True, beat_sync=False, min_chord_ms=550, max_changes_per_minute=60),
+        "raw": dict(sensitivity=100, harmonic_refinement=False, detect_sevenths=True, detect_sus=True, detect_dim_aug=True, detect_slash_bass=True, temporal_smoothing=False, beat_sync=False, min_chord_ms=0, max_changes_per_minute=0),
+    }.get(preset, {})
+    out = {"preset": preset, **defaults}
+    out.update({k: v for k, v in raw.items() if v is not None})
+    out["sensitivity"] = max(0, min(100, int(out.get("sensitivity", 25))))
+    out["min_chord_ms"] = max(0, min(10000, int(out.get("min_chord_ms", 0))))
+    out["max_changes_per_minute"] = max(0, min(240, int(out.get("max_changes_per_minute", 0))))
+    for key in ("harmonic_refinement", "detect_sevenths", "detect_sus", "detect_dim_aug", "detect_slash_bass", "temporal_smoothing", "beat_sync"):
+        out[key] = bool(out.get(key, False))
+    return out
+
+
+def _limit_chord_vocabulary(label: str, options: dict) -> str:
+    value = _simplify_chord_label(label)
+    if value == "N":
+        return value
+    bass = ""
+    if "/" in value:
+        value, bass = value.split("/", 1)
+    match = re.match(r"^([A-G](?:#|b)?)(.*)$", value)
+    if not match:
+        return value
+    root, suffix = match.groups()
+    if suffix in {"7", "maj7", "m7"} and not options.get("detect_sevenths"):
+        suffix = "m" if suffix == "m7" else ""
+    if suffix in {"sus2", "sus4"} and not options.get("detect_sus"):
+        suffix = ""
+    if suffix in {"dim", "aug"} and not options.get("detect_dim_aug"):
+        suffix = "m" if suffix == "dim" else ""
+    result = root + suffix
+    if options.get("detect_slash_bass") and bass and bass != root:
+        result += f"/{bass}"
+    return result
+
+
+def _postprocess_chord_events(
+    events: list[Chord], options: dict | None = None, *, bpm: float | None = None, beat_origin_ms: int = 0,
+) -> list[Chord]:
+    opts = _normalize_chord_options(options)
+    if not events:
+        return []
+    cleaned: list[Chord] = []
+    for item in sorted(events, key=lambda x: int(x.time_ms)):
+        label = _limit_chord_vocabulary(item.chord, opts)
+        if label == "N":
+            continue
+        candidate = _copy_chord_with_label(item, label)
+        if cleaned and candidate.chord == cleaned[-1].chord:
+            continue
+        cleaned.append(candidate)
+    if not opts.get("temporal_smoothing"):
+        return cleaned
+
+    sensitivity = int(opts["sensitivity"])
+    min_ms = int(opts.get("min_chord_ms", round(2800 - 24 * sensitivity)))
+    min_ms = max(250, min_ms) if min_ms else 0
+
+    # Remove fleeting labels. Prefer merging A-B-A back into A, otherwise absorb
+    # a very short event into the previous stable chord. Repeat because removing
+    # one transient can expose another adjacent transient.
+    if min_ms and len(cleaned) >= 2:
+        changed = True
+        while changed and len(cleaned) >= 2:
+            changed = False
+            out: list[Chord] = []
+            for idx, item in enumerate(cleaned):
+                if idx == len(cleaned) - 1:
+                    out.append(item); continue
+                duration = int(cleaned[idx + 1].time_ms) - int(item.time_ms)
+                if idx > 0 and duration < min_ms:
+                    if idx + 1 < len(cleaned) and out and out[-1].chord == cleaned[idx + 1].chord:
+                        changed = True
+                        continue
+                    # Conservative mode absorbs a fleeting event into the prior chord.
+                    if sensitivity < 80:
+                        changed = True
+                        continue
+                out.append(item)
+            cleaned = out
+
+    # Optional beat-grid snapping. This uses the project BPM and therefore avoids
+    # inventing sub-beat harmonic changes from frame noise.
+    if opts.get("beat_sync") and bpm and bpm > 0:
+        beat_ms = 60000.0 / float(bpm)
+        snapped: list[Chord] = []
+        for item in cleaned:
+            q = round((int(item.time_ms) - beat_origin_ms) / beat_ms)
+            t = max(0, round(beat_origin_ms + q * beat_ms))
+            candidate = item.model_copy(update={"time_ms": t})
+            if snapped and candidate.time_ms == snapped[-1].time_ms:
+                snapped[-1] = candidate
+            elif not snapped or candidate.chord != snapped[-1].chord:
+                snapped.append(candidate)
+        cleaned = snapped
+
+    # Hard density ceiling, useful for songbook-style output. Remove the shortest
+    # segments first until the requested changes/minute ceiling is met.
+    limit = int(opts.get("max_changes_per_minute") or 0)
+    if limit > 0 and len(cleaned) > 2:
+        span_ms = max(60000, int(cleaned[-1].time_ms) - int(cleaned[0].time_ms) + max(min_ms, 1000))
+        max_events = max(2, int(math.ceil((span_ms / 60000.0) * limit)) + 1)
+        while len(cleaned) > max_events and len(cleaned) > 2:
+            durations = []
+            for idx in range(1, len(cleaned) - 1):
+                durations.append((int(cleaned[idx + 1].time_ms) - int(cleaned[idx].time_ms), idx))
+            if not durations:
+                break
+            _, idx = min(durations)
+            del cleaned[idx]
+        # collapse equal neighbours created by removals
+        collapsed: list[Chord] = []
+        for item in cleaned:
+            if not collapsed or item.chord != collapsed[-1].chord:
+                collapsed.append(item)
+        cleaned = collapsed
+    return cleaned
 def _refine_extended_harmony(
     path: Path, base_events: list[Chord], *, progress: Callable[[int, list[Chord], str], None] | None = None,
-    cancelled: Callable[[], bool] | None = None,
+    cancelled: Callable[[], bool] | None = None, options: dict | None = None,
 ) -> list[Chord]:
     """Refine root/quality/inversion using extended chroma and bass-chroma analysis."""
     # Unit/integration wrappers can supply synthetic recognizer results without a
@@ -690,7 +815,18 @@ def _refine_extended_harmony(
         raise InterruptedError("Chord extraction cancelled")
     if not len(times):
         return base_events
+    # Direct legacy/internal calls without pipeline options keep the historical
+    # detailed behaviour. The user-facing progressive pipeline always supplies
+    # explicit options, so Stable/Balanced can disable slash bass and extensions.
+    opts = _normalize_chord_options(options if options is not None else {"preset": "detailed"})
     templates = _chord_templates()
+    def allowed(name: str) -> bool:
+        suffix = re.sub(r"^[A-G](?:#|b)?", "", name)
+        if suffix in {"7", "maj7", "m7"} and not opts.get("detect_sevenths"): return False
+        if suffix in {"sus2", "sus4"} and not opts.get("detect_sus"): return False
+        if suffix in {"dim", "aug"} and not opts.get("detect_dim_aug"): return False
+        return True
+    templates = [item for item in templates if allowed(item[0])]
     names = [name for name, _ in templates]
     matrix = np.stack([tpl for _, tpl in templates], axis=0)
     roots = np.asarray([_chord_root_pc(name) for name in names], dtype=np.int16)
@@ -725,11 +861,13 @@ def _refine_extended_harmony(
         labels.append(label)
         confidences.append(max(0.0, margin))
     if progress:
-        progress(78, [], "Analisi basso e inversioni / slash chords")
+        progress(78, [], "Analisi basso e inversioni / slash chords" if opts.get("detect_slash_bass") else "Inversioni / slash bass disattivati")
     # Attach a slash bass only when the bass evidence is stable and meaningfully
     # stronger than the runner-up. Non-chord pedal bass is allowed, but requires
     # stronger evidence than an inversion using a chord tone.
     for i, label in enumerate(labels):
+        if not opts.get("detect_slash_bass"):
+            break
         if label == "N" or "/" in label:
             continue
         b = bass[i]
@@ -893,7 +1031,9 @@ def _extract_chords_madmom(path: Path, engine: str) -> list[Chord]:
 
 def _profile_engine_candidates(profile: str) -> list[str]:
     from .ai_models import chord_engine_available
-    if profile == "fast":
+    if profile == "stable":
+        ordered = ["madmom-deep-chroma", "madmom-cnn-crf", "chordino", "mta-chromagram"]
+    elif profile == "fast":
         ordered = ["chordino", "mta-chromagram"]
     elif profile == "accurate":
         ordered = ["chordformer", "btc-hcqt", "madmom-deep-chroma", "chordino", "mta-chromagram"]
@@ -970,10 +1110,12 @@ def _extract_profile_base(path: Path, profile: str, progress=None, cancelled=Non
 
 def extract_chords_progressive(
     path: Path, *, engine: str, progress: Callable[[int,list[Chord],str],None] | None = None,
-    cancelled: Callable[[],bool] | None = None, chunk_seconds: int = 5,
+    cancelled: Callable[[],bool] | None = None, chunk_seconds: int = 5, options: dict | None = None,
+    bpm: float | None = None, beat_origin_ms: int = 0,
 ) -> list[Chord]:
     """Multi-stage chord extraction with selectable speed/accuracy profiles."""
     del chunk_seconds
+    opts = _normalize_chord_options(options)
     if cancelled and cancelled():
         raise InterruptedError("Chord extraction cancelled")
     profile = engine.removeprefix("profile-") if engine.startswith("profile-") else ""
@@ -994,18 +1136,20 @@ def extract_chords_progressive(
         base_events = extract_chords(path, engine=engine)
     if cancelled and cancelled():
         raise InterruptedError("Chord extraction cancelled")
-    if progress:
-        progress(64, [], "Step 3 · chroma armonica ad alta risoluzione")
-    events = _refine_extended_harmony(path, [_copy_chord_with_label(x, _simplify_chord_label(x.chord)) for x in base_events], progress=progress, cancelled=cancelled)
+    prepared = [_copy_chord_with_label(x, _limit_chord_vocabulary(x.chord, opts)) for x in base_events]
+    if opts.get("harmonic_refinement"):
+        if progress:
+            progress(64, [], "Step 3 · chroma armonica ad alta risoluzione")
+        events = _refine_extended_harmony(path, prepared, progress=progress, cancelled=cancelled, options=opts)
+    else:
+        events = prepared
+        if progress:
+            progress(72, [], "Refinement chroma disattivato · mantengo il recognizer")
     if cancelled and cancelled():
         raise InterruptedError("Chord extraction cancelled")
-    cleaned: list[Chord] = []
-    for item in sorted(events, key=lambda x: x.time_ms):
-        if cleaned and item.chord == cleaned[-1].chord:
-            continue
-        cleaned.append(item)
+    cleaned = _postprocess_chord_events(events, opts, bpm=bpm, beat_origin_ms=beat_origin_ms)
     if progress:
-        progress(90, [], "Step finale · semplificazione e stabilizzazione temporale")
+        progress(90, [], f"Step finale · densità controllata · {len(cleaned)} cambi")
         progress(96, [], "Analisi armonica completata")
     return cleaned
 
@@ -1031,7 +1175,13 @@ def extract_chords(path: Path, *, interval_ms: int = 500, engine: str | None = N
     if engine == "chordino":
         chordino=_extract_chords_chordino(path)
         if not chordino:
-            raise RuntimeError("Chordino / NNLS-Chroma is not available in this runtime")
+            from .chordino_runtime import chordino_status
+            status = chordino_status()
+            reason = status.get("reason") or "unknown"
+            host = status.get("host") or "not found"
+            diagnostic = str(status.get("diagnostic") or "").strip().replace("\n", " ")[-300:]
+            detail = f" · {diagnostic}" if diagnostic else ""
+            raise RuntimeError(f"Chordino / NNLS-Chroma unavailable: {reason}; host={host}{detail}")
         return chordino
     if engine != "mta-chromagram":
         raise ValueError("unsupported chord extraction engine")

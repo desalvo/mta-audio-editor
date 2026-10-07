@@ -317,7 +317,7 @@ class Project(BaseModel):
     export_panel_visible: bool = True
     metadata_panel_visible: bool = True
     inspector_visible: bool = True
-    timeline_zoom_px_per_sec: int = Field(default=70, ge=25, le=240)
+    timeline_zoom_px_per_sec: int = Field(default=70, ge=25, le=1200)
     mixer_height_px: int = Field(default=262, ge=180, le=900)
     mixer_meta_tab: Literal["lyrics", "chords", "markers"] = "lyrics"
     export_format: Literal["mta", "wav", "mp3", "flac", "mp4"] = "mta"

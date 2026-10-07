@@ -121,4 +121,4 @@ def edit(project:Project,track:Track,req:SampleEditRequest)->dict:
  raise ValueError('operazione non valida')
 
 def apply_effect(project:Project,track:Track,req:SampleEffectRequest,preview:bool)->Path:
- src=rendered_source(project.id,track);sr=sample_rate(src);dur=media_duration_ms(src)/1000;graph=effect_graph(src,req,sr,dur,preview);suffix='.mp3' if preview else '.wav';out=storage.pdir(project.id)/f".sample-fx-{uuid.uuid4().hex}{suffix}";cmd=["ffmpeg","-y","-v","error","-i",str(src),"-filter_complex",graph,"-map","[out]"]+(["-c:a","libmp3lame","-b:a","192k"] if preview else ["-c:a","pcm_s24le"])+[str(out)];run(cmd);return out
+ src=rendered_source(project.id,track);sr=sample_rate(src);dur=media_duration_ms(src)/1000;graph=effect_graph(src,req,sr,dur,preview);suffix='.mp3' if preview else '.wav';base=storage.session_preview_dir(project.id) if preview else storage.pdir(project.id);out=base/f".sample-fx-{uuid.uuid4().hex}{suffix}";cmd=["ffmpeg","-y","-v","error","-i",str(src),"-filter_complex",graph,"-map","[out]"]+(["-c:a","libmp3lame","-b:a","192k"] if preview else ["-c:a","pcm_s24le"])+[str(out)];run(cmd);return out

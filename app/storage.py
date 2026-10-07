@@ -5,6 +5,7 @@ import re
 import shutil
 import threading
 import time
+import tempfile
 import uuid
 import zipfile
 from pathlib import Path
@@ -25,6 +26,38 @@ SHARED_INDEX_PATH = SHARED_MEDIA_ROOT / "index.json"
 _GC_LOCK = threading.RLock()
 _GC_ACTIVE: set[str] = set()
 _SHARED_LOCK = threading.RLock()
+_SESSION_PREVIEW_ROOT = Path(tempfile.mkdtemp(prefix="mta-audio-editor-preview-")).resolve()
+_SESSION_PREVIEW_LOCK = threading.RLock()
+
+
+def session_preview_dir(pid: str) -> Path:
+    """Return this process/session's preview cache for a project.
+
+    The cache deliberately lives outside ROOT/project workspaces so derived
+    preview media can never become project state or leak into portable exports.
+    """
+    if not PID_RE.fullmatch(str(pid)):
+        raise ValueError("invalid project id")
+    path = _SESSION_PREVIEW_ROOT / str(pid)
+    path.mkdir(parents=True, exist_ok=True)
+    return path
+
+
+def cleanup_session_preview_cache(pid: str | None = None) -> dict[str, int]:
+    """Delete temporary preview media for one project or for the whole app session."""
+    removed = 0
+    with _SESSION_PREVIEW_LOCK:
+        targets = [_SESSION_PREVIEW_ROOT / str(pid)] if pid is not None else [_SESSION_PREVIEW_ROOT]
+        for target in targets:
+            if not target.exists():
+                continue
+            for item in target.rglob("*"):
+                if item.is_file():
+                    removed += 1
+            shutil.rmtree(target, ignore_errors=True)
+        if pid is not None:
+            _SESSION_PREVIEW_ROOT.mkdir(parents=True, exist_ok=True)
+    return {"session_preview_deleted": removed}
 
 
 def _sha256_file(path: Path) -> str:
@@ -170,60 +203,33 @@ def rescan_shared_media(*, delete_unreferenced: bool = False) -> dict[str, int]:
 
 
 
-def cleanup_project_preview_cache(pid: str, *, keep_per_track: int = 2) -> dict[str, int]:
-    """Remove rebuildable preview cache files that are no longer useful.
+def cleanup_project_preview_cache(pid: str, *, keep_per_track: int = 0) -> dict[str, int]:
+    """Remove legacy preview artifacts from a project workspace.
 
-    Preview WAV files are derived artifacts, never authoritative project media.
-    Keep only a small recent set for tracks that still exist; remove previews for
-    deleted tracks and stale temporary/master preview artifacts. This function is
-    safe to call on project open and after crashes because missing previews are
-    regenerated on demand.
+    Since r210 previews are session-only temporary files outside the project.
+    Any historic ``.preview`` tree or ``preview-master.mp3`` found inside a
+    workspace is obsolete and is removed in full when the project is opened.
+    ``keep_per_track`` remains accepted for compatibility but is ignored.
     """
-    removed = kept = 0
-    try:
-        project = load_project(pid)
-    except (OSError, ValueError):
-        return {"preview_deleted": 0, "preview_kept": 0}
-
-    cache = pdir(pid) / ".preview"
-    track_ids = {t.id for t in project.tracks}
+    del keep_per_track
+    removed = 0
+    base = pdir(pid)
+    cache = base / ".preview"
     if cache.exists():
-        by_track: dict[str, list[Path]] = {track_id: [] for track_id in track_ids}
-        for path in cache.iterdir():
-            if not path.is_file():
-                continue
-            if path.name.startswith('.') or path.suffix.lower() != '.wav':
-                path.unlink(missing_ok=True)
+        for path in cache.rglob("*"):
+            if path.is_file():
                 removed += 1
-                continue
-            owner = next((track_id for track_id in track_ids if path.name.startswith(f"{track_id}-")), None)
-            if owner is None:
-                path.unlink(missing_ok=True)
-                removed += 1
-                continue
-            by_track[owner].append(path)
-
-        limit = max(0, int(keep_per_track))
-        for files in by_track.values():
-            ordered = sorted(files, key=lambda item: item.stat().st_mtime, reverse=True)
-            kept += min(limit, len(ordered))
-            for path in ordered[limit:]:
-                path.unlink(missing_ok=True)
-                removed += 1
-        try:
-            cache.rmdir()
-        except OSError:
-            pass
-
-    # Rendered master previews are also derived and can always be rebuilt.
-    master = pdir(pid) / "preview-master.mp3"
+        shutil.rmtree(cache, ignore_errors=True)
+    master = base / "preview-master.mp3"
     if master.exists():
-        try:
-            master.unlink()
+        master.unlink(missing_ok=True)
+        removed += 1
+    # r209 and earlier could briefly place Sample Editor effect previews here.
+    for path in base.glob(".sample-fx-*"):
+        if path.is_file():
+            path.unlink(missing_ok=True)
             removed += 1
-        except OSError:
-            pass
-    return {"preview_deleted": removed, "preview_kept": kept}
+    return {"preview_deleted": removed, "preview_kept": 0}
 
 def maintain_project_storage(pid: str) -> dict[str, int]:
     """Opening-time maintenance for project media and rebuildable caches."""
@@ -683,7 +689,12 @@ def write_project_archive(pid: str, archive_path: Path) -> Path:
             for path in sorted(base.rglob("*")):
                 if not path.is_file():
                     continue
+                rel = path.relative_to(base)
                 if path.name == GC_QUEUE_NAME or (path.name.startswith(".project.json.") and path.name.endswith(".tmp")):
+                    continue
+                if rel.parts and rel.parts[0] == ".preview":
+                    continue
+                if path.name == "preview-master.mp3" or path.name.startswith(".sample-fx-"):
                     continue
                 if path.parent == (base / "audio") and path.name in pending_gc:
                     continue
@@ -739,6 +750,10 @@ def import_project_archive(archive_path: Path, owner_user_id: int | None) -> Pro
                     continue
                 rel = Path(info.filename).relative_to("project")
                 if rel.name == GC_QUEUE_NAME:
+                    continue
+                if rel.parts and rel.parts[0] == ".preview":
+                    continue
+                if rel.name == "preview-master.mp3" or rel.name.startswith(".sample-fx-"):
                     continue
                 dst = (target / rel).resolve()
                 if target.resolve() not in dst.parents:

@@ -8,9 +8,10 @@ def test_chord_catalog_exposes_profiles_and_new_models(monkeypatch):
     monkeypatch.setattr(ai_models, "chord_engine_available", lambda engine: True)
     catalog = ai_models.chords_catalog(native=False)
     ids = [item["id"] for item in catalog["engines"]]
-    assert ids[:3] == ["profile-fast", "profile-accurate", "profile-maximum"]
+    assert ids[:4] == ["profile-stable", "profile-fast", "profile-accurate", "profile-maximum"]
     assert {m["id"] for m in catalog["models"]} >= {"btc-hcqt", "chordformer"}
-    assert catalog["default_engine"] == "profile-accurate"
+    assert catalog["default_engine"] == "profile-stable"
+    assert {p["id"] for p in catalog["presets"]} == {"stable", "balanced", "detailed", "raw"}
 
 
 def test_accurate_profile_prefers_chordformer(monkeypatch, tmp_path: Path):

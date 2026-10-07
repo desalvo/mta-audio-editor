@@ -15,7 +15,7 @@ def _mk_project(tmp_path, monkeypatch):
     return project
 
 
-def test_preview_gc_removes_deleted_track_and_keeps_recent(tmp_path, monkeypatch):
+def test_preview_gc_removes_all_legacy_track_previews(tmp_path, monkeypatch):
     project = _mk_project(tmp_path, monkeypatch)
     cache = storage.pdir(project.id) / '.preview'
     cache.mkdir()
@@ -28,10 +28,10 @@ def test_preview_gc_removes_deleted_track_and_keeps_recent(tmp_path, monkeypatch
     orphan = cache / 'deleted-track-old.wav'
     orphan.write_bytes(b'x')
     result = storage.cleanup_project_preview_cache(project.id, keep_per_track=2)
-    assert result['preview_deleted'] == 3
-    assert result['preview_kept'] == 2
+    assert result['preview_deleted'] == 5
+    assert result['preview_kept'] == 0
     assert not orphan.exists()
-    assert len(list(cache.glob('track-a-*.wav'))) == 2
+    assert not cache.exists()
 
 
 def test_preview_gc_removes_master_preview(tmp_path, monkeypatch):

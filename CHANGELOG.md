@@ -1,3 +1,35 @@
+## 0.2.0-r213
+
+- Fixed insert-plugin configuration windows being hidden below the absolute Plugins/Inspector overlay by moving utility dialogs to a higher application modal layer.
+- Native single-track WAV/MP3/FLAC export now asks for the destination path before rendering starts; cancelling the save dialog prevents the render job from starting.
+- Added atomic native save-to-preselected-path support for rendered audio files.
+- Browser track/audio exports use the Save File picker for WAV/MP3/FLAC when supported, with download fallback otherwise.
+
+## 0.2.0-r212
+
+- Zoom timeline reso fluido: durante il trascinamento dello slider viene mostrato immediatamente un preview grossolano scalando la waveform già renderizzata; il redraw completo avviene una sola volta al rilascio.
+- Aggiunti pulsanti `−` e `+` per variare gradualmente lo zoom.
+- Doppio click sul cursore dello zoom per ripristinare il valore di default (100% / 70 px/s).
+- Aggiunto selettore di preset zoom percentuali (25–400%), temporali (1/5/10 s, Fit) e musicali (1/2 beat, 1/2/4/8 misure).
+- I preset beat/misure sono calcolati dinamicamente da BPM e time signature del progetto e adattati alla larghezza visibile della timeline.
+- Range massimo dello zoom esteso a 1200 px/s per consentire viste musicali ravvicinate.
+- Test completi: 705 test passati, coverage 71,23%.
+
+## 0.2.0-r211
+
+- Added direct horizontal clip movement in Select mode.
+- Added Shift+drag grouped movement for all clips of selected track(s).
+- Added Delete selected range to the timeline context menu.
+
+## 0.2.0-r209
+
+- Chord extraction: new Songbook/Stable, Balanced, Detailed and Raw pipeline presets with explicit sensitivity, minimum chord duration, density ceiling and optional beat quantisation.
+- Chord extraction: harmonic refinement, sevenths, sus, dim/aug, slash-bass/inversions and temporal smoothing can be enabled/disabled independently.
+- Chord extraction: Stable profile prioritises Madmom Deep Chroma + CRF / CNN+CRF for a more regular major/minor progression, then falls back to Chordino/MTA.
+- Native macOS: Chordino discovery now uses only the runtime actually inside the frozen .app; stale CI/Homebrew paths are ignored.
+- Native macOS CI: packaged-app smoke test is run with Chordino build/runtime variables removed, preventing false positives from the build workspace.
+- Chordino diagnostics now distinguish missing Vamp host, missing plugin and host execution failures.
+
 - r208: CI maintenance: remove unused test imports that blocked Ruff after r207.
 ## 0.2.0-r207
 

@@ -69,6 +69,8 @@ def _prepare_environment() -> Path:
 
     os.environ["MTA_NATIVE_SINGLE_USER"] = "true"
     os.environ["MTA_ALLOW_INSECURE_NO_AUTH"] = "true"
+    if getattr(sys, "frozen", False):
+        os.environ["MTA_NATIVE_REQUIRE_BUNDLED_CHORDINO"] = "true"
     os.environ["MTA_DATA_DIR"] = str(root)
     os.environ["XDG_CACHE_HOME"] = str(cache)
     os.environ["TORCH_HOME"] = str(cache / "torch")
@@ -387,12 +389,9 @@ class NativeApi:
             path = path.with_suffix(f".{ext}")
         return {"ok": True, "cancelled": False, "path": str(path)}
 
-    def save_generated_file(self, suggested_name: str, extension: str, data_base64: str) -> dict:
-        """Show the native save dialog and atomically persist generated content."""
-        chosen = self.choose_export_save_path(suggested_name, extension)
-        if not chosen.get("ok"):
-            return chosen
-        target = Path(str(chosen["path"])).expanduser().resolve()
+    def _write_generated_file_to_path(self, path: str, data_base64: str) -> dict:
+        """Atomically persist generated content to a path already approved by a native save dialog."""
+        target = Path(str(path or "")).expanduser().resolve()
         target.parent.mkdir(parents=True, exist_ok=True)
         raw = str(data_base64 or "")
         if "," in raw and raw.lstrip().startswith("data:"):
@@ -416,6 +415,20 @@ class NativeApi:
         finally:
             temp.unlink(missing_ok=True)
         return {"ok": True, "cancelled": False, "path": str(target), "bytes": len(payload)}
+
+    def save_generated_file_to_path(self, path: str, data_base64: str) -> dict:
+        """Persist bytes to a destination returned by choose_export_save_path()."""
+        target = Path(str(path or "")).expanduser().resolve()
+        if target.suffix.lower().lstrip(".") not in {"wav", "mp3", "flac", "pdf", "txt", "cho", "mta8", "mta16"}:
+            raise ValueError("unsupported generated-file extension")
+        return self._write_generated_file_to_path(str(target), data_base64)
+
+    def save_generated_file(self, suggested_name: str, extension: str, data_base64: str) -> dict:
+        """Show the native save dialog and atomically persist generated content."""
+        chosen = self.choose_export_save_path(suggested_name, extension)
+        if not chosen.get("ok"):
+            return chosen
+        return self._write_generated_file_to_path(str(chosen["path"]), data_base64)
 
     def get_native_settings(self) -> dict:
         root = _data_root()

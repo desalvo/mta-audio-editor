@@ -43,6 +43,7 @@ CHORD_MODELS = [
     {"id": "chordformer", "display_name": "ChordFormer 5-fold ensemble", "engine": "chordformer", "quality": "very-high", "license": "Research implementation; upstream checkpoints downloaded on demand"},
 ]
 CHORD_ENGINES = [
+    {"id": "profile-stable", "display_name": "Songbook / Stable · Madmom CRF / Chordino · fewer changes", "model_id": None, "ai": True, "profile": "stable", "recommended": True},
     {"id": "profile-fast", "display_name": "Fast · Chordino/Chromagram + harmonic refinement", "model_id": None, "ai": False, "profile": "fast"},
     {"id": "profile-accurate", "display_name": "Accurate · ChordFormer/BTC + harmonic refinement", "model_id": None, "ai": True, "profile": "accurate"},
     {"id": "profile-maximum", "display_name": "Maximum accuracy · Ensemble multi-engine", "model_id": None, "ai": True, "profile": "maximum"},
@@ -53,7 +54,23 @@ CHORD_ENGINES = [
     {"id": "chordino", "display_name": "Chordino / NNLS-Chroma", "model_id": None, "ai": False},
     {"id": "mta-chromagram", "display_name": "MTA Chromagram", "model_id": None, "ai": False},
 ]
-CHORD_DEFAULT_ENGINE = os.getenv("MTA_CHORDS_ENGINE", "profile-accurate").strip() or "profile-accurate"
+CHORD_DEFAULT_ENGINE = os.getenv("MTA_CHORDS_ENGINE", "profile-stable").strip() or "profile-stable"
+
+CHORD_PIPELINE_PRESETS = [
+    {"id":"stable","display_name":"Songbook / Stabile","description":"Pochi cambi, accordi leggibili; privilegia major/minor e stabilità temporale.","sensitivity":25,"harmonic_refinement":False,"detect_sevenths":False,"detect_sus":False,"detect_dim_aug":False,"detect_slash_bass":False,"temporal_smoothing":True,"beat_sync":False,"min_chord_ms":1800,"max_changes_per_minute":24},
+    {"id":"balanced","display_name":"Bilanciato","description":"Buon compromesso tra dettaglio armonico e numero di cambi.","sensitivity":45,"harmonic_refinement":True,"detect_sevenths":True,"detect_sus":True,"detect_dim_aug":False,"detect_slash_bass":False,"temporal_smoothing":True,"beat_sync":False,"min_chord_ms":1100,"max_changes_per_minute":36},
+    {"id":"detailed","display_name":"Dettagliato","description":"Più cambi e qualità armoniche; adatto a revisione manuale successiva.","sensitivity":70,"harmonic_refinement":True,"detect_sevenths":True,"detect_sus":True,"detect_dim_aug":True,"detect_slash_bass":True,"temporal_smoothing":True,"beat_sync":False,"min_chord_ms":550,"max_changes_per_minute":60},
+    {"id":"raw","display_name":"Solo recognizer / Raw","description":"Nessun refinement MTA e nessun filtro di densità; restituisce il recognizer quasi direttamente.","sensitivity":100,"harmonic_refinement":False,"detect_sevenths":True,"detect_sus":True,"detect_dim_aug":True,"detect_slash_bass":True,"temporal_smoothing":False,"beat_sync":False,"min_chord_ms":0,"max_changes_per_minute":0},
+]
+CHORD_PIPELINE_STAGES = [
+    {"id":"harmonic_refinement","display_name":"Refinement chroma armonica"},
+    {"id":"detect_sevenths","display_name":"Riconosci 7 / maj7 / m7"},
+    {"id":"detect_sus","display_name":"Riconosci sus2 / sus4"},
+    {"id":"detect_dim_aug","display_name":"Riconosci dim / aug"},
+    {"id":"detect_slash_bass","display_name":"Inversioni / slash bass"},
+    {"id":"temporal_smoothing","display_name":"Stabilizzazione temporale"},
+    {"id":"beat_sync","display_name":"Quantizza i cambi ai beat del progetto"},
+]
 
 
 def _data_root() -> Path:
@@ -126,7 +143,7 @@ def _chord_marker(model_id: str) -> Path:
 
 
 def chord_engine_available(engine_id: str) -> bool:
-    if engine_id in {"profile-fast", "profile-accurate", "profile-maximum"}:
+    if engine_id in {"profile-stable", "profile-fast", "profile-accurate", "profile-maximum"}:
         return True
     if engine_id in {"btc-hcqt", "chordformer"}:
         from .chord_ml import engine_available
@@ -164,7 +181,7 @@ def chords_catalog(*, native: bool = False) -> dict:
             item["runtime"] = chordino_status()
         engines.append(item)
     default=CHORD_DEFAULT_ENGINE if any(x["id"]==CHORD_DEFAULT_ENGINE for x in CHORD_ENGINES) else "madmom-deep-chroma"
-    return {"default_engine":default,"engines":engines,"models":models,"storage":"local" if native else "server","on_demand":True,"model_dir":str(_chord_cache_root())}
+    return {"default_engine":default,"engines":engines,"models":models,"presets":CHORD_PIPELINE_PRESETS,"pipeline_stages":CHORD_PIPELINE_STAGES,"storage":"local" if native else "server","on_demand":True,"model_dir":str(_chord_cache_root())}
 
 
 def _cache_snapshot() -> set[str]:

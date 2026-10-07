@@ -1,3 +1,36 @@
+## 0.2.0-r213
+
+- Fixed insert-plugin configuration windows being hidden below the absolute Plugins/Inspector overlay by moving utility dialogs to a higher application modal layer.
+- Native single-track WAV/MP3/FLAC export now asks for the destination path before rendering starts; cancelling the save dialog prevents the render job from starting.
+- Added atomic native save-to-preselected-path support for rendered audio files.
+- Browser track/audio exports use the Save File picker for WAV/MP3/FLAC when supported, with download fallback otherwise.
+
+## 0.2.0-r212
+
+- Zoom timeline reso fluido: durante il trascinamento dello slider viene mostrato immediatamente un preview grossolano scalando la waveform già renderizzata; il redraw completo avviene una sola volta al rilascio.
+- Aggiunti pulsanti `−` e `+` per variare gradualmente lo zoom.
+- Doppio click sul cursore dello zoom per ripristinare il valore di default (100% / 70 px/s).
+- Aggiunto selettore di preset zoom percentuali (25–400%), temporali (1/5/10 s, Fit) e musicali (1/2 beat, 1/2/4/8 misure).
+- I preset beat/misure sono calcolati dinamicamente da BPM e time signature del progetto e adattati alla larghezza visibile della timeline.
+- Range massimo dello zoom esteso a 1200 px/s per consentire viste musicali ravvicinate.
+- Test completi: 705 test passati, coverage 71,23%.
+
+# MTA Audio Editor 0.2.0-r211
+
+- Timeline Select tool: drag a clip segment horizontally to reposition it manually.
+- Shift+drag a clip moves every segment of the selected track, or all segments of all currently multi-selected tracks, preserving their relative offsets.
+- Timeline/track context menu now includes **Delete selected range**.
+- Existing Ripple remains the automatic close-gap mode for Range deletion.
+
+## 0.2.0-r209
+
+- Chord extraction: new Songbook/Stable, Balanced, Detailed and Raw pipeline presets with explicit sensitivity, minimum chord duration, density ceiling and optional beat quantisation.
+- Chord extraction: harmonic refinement, sevenths, sus, dim/aug, slash-bass/inversions and temporal smoothing can be enabled/disabled independently.
+- Chord extraction: Stable profile prioritises Madmom Deep Chroma + CRF / CNN+CRF for a more regular major/minor progression, then falls back to Chordino/MTA.
+- Native macOS: Chordino discovery now uses only the runtime actually inside the frozen .app; stale CI/Homebrew paths are ignored.
+- Native macOS CI: packaged-app smoke test is run with Chordino build/runtime variables removed, preventing false positives from the build workspace.
+- Chordino diagnostics now distinguish missing Vamp host, missing plugin and host execution failures.
+
 - r208: Fix GitHub Actions Ruff failure caused by two unused pathlib.Path imports in tests.
 ## 0.2.0-r207
 
@@ -618,3 +651,11 @@ The combined Lyrics + Chords + Markers editor now uses contextual actions for wh
 Improves Lyrics + Chords + Markers PDF preview and editing, including syllable/edge/chord-sequence anchors, stable scrolling, clipboard/history, compact rows, context split, page-break chord styling, and explicit save progress.
 
 - Edit Lyrics / Edit Chords / Edit Markers now open scrolled to the event nearest the current timeline/playhead position, without moving the transport.
+
+## 0.2.0-r210
+
+- Audio preview media is now session-only temporary cache outside project workspaces. Track WAV previews, rendered master preview and Sample Editor effect previews are never project files.
+- Closing a project or the application removes its temporary preview cache. Opening a project removes legacy `.preview`, `preview-master.mp3` and stale Sample Editor preview artifacts.
+- Legacy portable project imports ignore embedded preview artifacts, and `.maeprojz` export excludes them even if a legacy workspace has not yet been cleaned.
+- The Plugins / Plugin Inspector frame is now a true overlay outside the editor grid, so opening or closing it no longer changes track/timeline geometry or vertical placement.
+- Keeps the r209 configurable Chords extraction pipeline and native macOS Chordino runtime fix unchanged.

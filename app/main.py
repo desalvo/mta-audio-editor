@@ -68,6 +68,8 @@ from .storage import (
     resume_pending_gc,
     maintain_project_storage,
     rescan_shared_media,
+    session_preview_dir,
+    cleanup_session_preview_cache,
 )
 from .rights_registry import (provider_catalog as rights_provider_catalog, search_provider as search_rights_provider, search_musicbrainz_metadata, resolve_musicbrainz_metadata)
 from . import sample_editor as sample_editor_engine
@@ -96,6 +98,11 @@ def _musical_export_project(project: Project) -> Project:
 def _start_background_services():
     start_background_updater()
     resume_pending_gc()
+
+
+@app.on_event("shutdown")
+def _cleanup_session_previews_on_shutdown():
+    cleanup_session_preview_cache()
 LOGGER = logging.getLogger(__name__)
 BASE = Path(__file__).parent
 MAX_UPLOAD_BYTES = int(os.getenv("MTA_MAX_UPLOAD_MB", "1024")) * 1024 * 1024
@@ -1595,7 +1602,7 @@ async def start_track_import_job(
 
 
 
-def _text_music_worker(job_id: str, pid: str, track_id: str, kind: str, model_or_engine: str = "", advanced_alignment: bool = False) -> None:
+def _text_music_worker(job_id: str, pid: str, track_id: str, kind: str, model_or_engine: str = "", advanced_alignment: bool = False, chord_options: dict | None = None) -> None:
     try:
         project = load_project(pid)
         track = next((item for item in project.tracks if item.id == track_id), None)
@@ -1657,6 +1664,8 @@ def _text_music_worker(job_id: str, pid: str, track_id: str, kind: str, model_or
                 events=extract_chords_progressive(
                     source,engine=selected_engine,progress=chords_progress,
                     cancelled=(lambda: bool(cancel_event and cancel_event.is_set())),
+                    options=chord_options, bpm=float(project.bpm or 120.0),
+                    beat_origin_ms=(-int(getattr(track, "delay_ms", 0) or 0)),
                 )
             if cancel_event and cancel_event.is_set():
                 raise InterruptedError("Chord extraction cancelled")
@@ -1705,7 +1714,7 @@ def _text_music_worker(job_id: str, pid: str, track_id: str, kind: str, model_or
         _media_job_update(job_id, status="failed", progress=0, message="Analisi fallita", error=str(exc)[-1200:])
 
 
-def _start_text_music_job(pid: str, track_id: str, request: Request, kind: str, model_or_engine: str = "", advanced_alignment: bool = False):
+def _start_text_music_job(pid: str, track_id: str, request: Request, kind: str, model_or_engine: str = "", advanced_alignment: bool = False, chord_options: dict | None = None):
     project = _project_for_actor(request, pid)
     if not any(item.id == track_id for item in project.tracks):
         raise HTTPException(404, "track not found")
@@ -1733,7 +1742,7 @@ def _start_text_music_job(pid: str, track_id: str, request: Request, kind: str, 
     with MEDIA_JOB_LOCK:
         MEDIA_JOBS[job_id] = job
     threading.Thread(
-        target=_text_music_worker, args=(job_id, pid, track_id, kind, model_or_engine, advanced_alignment),
+        target=_text_music_worker, args=(job_id, pid, track_id, kind, model_or_engine, advanced_alignment, chord_options),
         daemon=True, name=f"mta-{kind}-{job_id}",
     ).start()
     return _media_job_public(job)
@@ -1745,8 +1754,26 @@ def start_lyrics_extraction(pid: str, track_id: str, request: Request, model: st
 
 
 @app.post("/api/projects/{pid}/tracks/{track_id}/extract-chords-jobs")
-def start_chord_extraction(pid: str, track_id: str, request: Request, engine: str = ""):
-    return _start_text_music_job(pid, track_id, request, "chords", engine)
+def start_chord_extraction(
+    pid: str, track_id: str, request: Request, engine: str = "", preset: str = "stable",
+    sensitivity: int | None = None, harmonic_refinement: bool | None = None,
+    detect_sevenths: bool | None = None, detect_sus: bool | None = None,
+    detect_dim_aug: bool | None = None, detect_slash_bass: bool | None = None,
+    temporal_smoothing: bool | None = None, beat_sync: bool | None = None,
+    min_chord_ms: int | None = None, max_changes_per_minute: int | None = None,
+):
+    if preset not in {"stable", "balanced", "detailed", "raw"}:
+        raise HTTPException(400, "Profilo chords non supportato")
+    if sensitivity is not None and not 0 <= sensitivity <= 100:
+        raise HTTPException(400, "Sensibilità chords fuori intervallo 0..100")
+    options = {
+        "preset": preset, "sensitivity": sensitivity, "harmonic_refinement": harmonic_refinement,
+        "detect_sevenths": detect_sevenths, "detect_sus": detect_sus, "detect_dim_aug": detect_dim_aug,
+        "detect_slash_bass": detect_slash_bass, "temporal_smoothing": temporal_smoothing,
+        "beat_sync": beat_sync, "min_chord_ms": min_chord_ms,
+        "max_changes_per_minute": max_changes_per_minute,
+    }
+    return _start_text_music_job(pid, track_id, request, "chords", engine, chord_options=options)
 
 
 @app.post("/api/projects/{pid}/tracks/{track_id}/extract-markers-jobs")
@@ -3634,8 +3661,8 @@ def preview_track(pid: str, track_id: str, request: Request, render: bool = Fals
             + f"|{project.bpm}|{project.base_bpm}|{project.pitch_semitones}|{int(render)}"
         ).encode("utf-8")
     ).hexdigest()[:20]
-    cache = pdir(pid) / ".preview"
-    cache.mkdir(exist_ok=True)
+    cache = session_preview_dir(pid) / "tracks"
+    cache.mkdir(parents=True, exist_ok=True)
     out = cache / f"{track.id}-{signature}.wav"
     if not out.is_file():
         render_track_export(
@@ -3656,7 +3683,7 @@ def preview_track(pid: str, track_id: str, request: Request, render: bool = Fals
 @app.get("/api/projects/{pid}/preview-mix")
 def preview_mix(pid: str, request: Request):
     project = _project_for_actor(request, pid)
-    out = pdir(pid) / "preview-master.mp3"
+    out = session_preview_dir(pid) / "preview-master.mp3"
     try:
         validate_project_files(project)
         preview_project = project.model_copy(deep=True)
@@ -3667,6 +3694,12 @@ def preview_mix(pid: str, request: Request):
     except Exception as exc:
         raise HTTPException(400, "preview mix failed") from exc
     return FileResponse(out, media_type="audio/mpeg", filename="preview-master.mp3")
+
+
+@app.delete("/api/projects/{pid}/preview-cache")
+def clear_project_preview_cache(pid: str, request: Request):
+    _project_for_actor(request, pid)
+    return {"ok": True, **cleanup_session_preview_cache(pid)}
 
 
 @app.get("/api/projects/{pid}/export-plan")
