@@ -3795,7 +3795,6 @@ def start_track_export_job(pid: str, track_id: str, request: Request, body: Trac
         req = body or TrackExportRequest(format=format.lower())
     except Exception as exc:
         raise HTTPException(400, str(exc)[:500]) from exc
-    fmt = req.format.lower()
     now = time.time()
     job_id = uuid.uuid4().hex[:16]
     job = {

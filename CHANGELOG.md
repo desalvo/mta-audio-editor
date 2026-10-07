@@ -1,3 +1,7 @@
+## 0.2.0-r218
+
+- CI: fixed Ruff F841 in the track-export endpoint so the production workflow can proceed to downstream build jobs.
+
 
 ## 0.2.0-r217
 - Portable MTA Audio Editor (`.maeprojz`) is now the default native save/open format; opened portable files stay bound so autosave/manual Save rewrite the portable file instead of only the internal workspace.

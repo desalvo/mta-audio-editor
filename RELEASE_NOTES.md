@@ -1,4 +1,6 @@
-# MTA Audio Editor 0.2.0-r217
+# MTA Audio Editor 0.2.0-r218
+
+- CI: removed an unused `fmt` assignment in the track export endpoint that caused Ruff F841 and blocked downstream GitHub Actions jobs.
 
 - Portable MTA Audio Editor (`.maeprojz`) is the default native project file for Save/New and the first Open format, with legacy `.maeproj`/`.zip` still supported for opening.
 - Opening a portable project binds the imported workspace back to that file; autosave and manual Save atomically update it, fixing extracted Chords disappearing after reopening.
