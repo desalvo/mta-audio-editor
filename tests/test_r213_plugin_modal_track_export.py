@@ -38,7 +38,6 @@ def test_browser_generated_audio_uses_save_picker_when_available():
 
 def test_r213_mobile_build_numbers_match_revision():
     rev = int(Path("REVISION").read_text().strip())
-    assert rev == 213
     assert f"versionCode = {20000 + rev}" in Path("mobile/android/app/build.gradle.kts").read_text()
     info = Path("mobile/ios/MTAEditorMobile/Info.plist").read_text()
     assert f"<key>CFBundleVersion</key><string>{20000 + rev}</string>" in info

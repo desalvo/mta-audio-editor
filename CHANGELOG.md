@@ -1,3 +1,8 @@
+## 0.2.0-r214
+- CI: removed unused `io` import reported by Ruff F401 in the r210 preview/overlay regression tests.
+- Tests: revision/build-number validation is now revision-agnostic so future revisions do not fail on a hard-coded r213 assertion.
+- Mobile/native packaging metadata aligned to revision 214.
+
 ## 0.2.0-r213
 
 - Fixed insert-plugin configuration windows being hidden below the absolute Plugins/Inspector overlay by moving utility dialogs to a higher application modal layer.
