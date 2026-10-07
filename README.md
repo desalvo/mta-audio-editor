@@ -177,3 +177,6 @@ Public releases use semantic version tags such as `v0.2.0`. `REVISION` identifie
 
 ### Chord extraction profiles (r195)
 Chord extraction now offers **Fast**, **Accurate**, and **Maximum accuracy** profiles. Fast favors Chordino/MTA Chromagram; Accurate uses the best installed recognizer (ChordFormer, BTC-HCQT, Madmom, Chordino); Maximum combines multiple recognizers using a weighted ensemble and then applies extended-harmony and bass-chroma refinement. ChordFormer and BTC-HCQT are available on demand from the AI Model Manager.
+
+### Modular workspace and shared media
+Since r198 native autosave updates the persistent modular workspace instead of rewriting the complete `.maeproj`. The `.maeproj` remains a portable snapshot refreshed by Save/Save Copy. Identical audio across projects is deduplicated in a SHA-256 content-addressed shared media store; project-local references remain valid and use hardlinks where possible. A global rescan can rebuild the reference index from every `project.json` and garbage-collect only blobs that no project still references.

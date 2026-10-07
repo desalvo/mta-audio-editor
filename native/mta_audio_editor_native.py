@@ -579,12 +579,19 @@ class NativeApi:
         path = self.project_paths.get(key)
         if path is None:
             return {"ok": False, "error": "recent project path not found"}
-        if not path.is_file():
-            return {"ok": False, "error": "recent project file no longer exists", "path": str(path)}
         try:
-            return self._import_project_path(path)
-        except Exception as exc:
-            return {"ok": False, "error": str(exc), "path": str(path)}
+            from app.storage import load_project
+            # The persistent modular workspace is authoritative after first import.
+            # The .maeproj path is a portable snapshot refreshed only by explicit Save.
+            project = load_project(key)
+            return {"ok": True, "cancelled": False, "project": project.model_dump(mode="json"), "path": str(path), "workspace": True}
+        except Exception:
+            if not path.is_file():
+                return {"ok": False, "error": "recent project workspace and archive are unavailable", "path": str(path)}
+            try:
+                return self._import_project_path(path)
+            except Exception as exc:
+                return {"ok": False, "error": str(exc), "path": str(path)}
 
 
 def _startup_project_path(argv: list[str] | None = None) -> Path | None:

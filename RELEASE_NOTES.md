@@ -1,3 +1,11 @@
+## 0.2.0-r198
+
+- Project-open storage maintenance now removes unreferenced local audio before editing begins.
+- Added content-addressed shared media store across projects with SHA-256 deduplication, hardlink-first local references, safe copy fallback, and reconstructible global reference index.
+- Added emergency shared-media rescan/rebuild + garbage collection that scans every project before deleting any shared blob.
+- Native autosave now writes only the persistent modular workspace; `.maeproj` is refreshed on explicit Save/Save Copy rather than every autosave.
+- Recent native projects reopen their persistent workspace first, preserving crash-recovery state newer than the last portable archive snapshot.
+
 ## 0.2.0-r197
 
 Generated Metronome and Chords tracks are now peak-normalized to 0 dBFS. Track deletion commits logical state immediately and moves physical file cleanup to a durable background GC queue that survives crashes/restarts while never deleting referenced Project Clip assets.

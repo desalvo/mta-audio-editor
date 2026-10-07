@@ -18,8 +18,161 @@ SAFE_NAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._ -]{0,127}$")
 PROJECT_ARCHIVE_SCHEMA = "mta-audio-editor/project-archive/v1"
 
 GC_QUEUE_NAME = ".gc-pending.json"
+SHARED_MEDIA_ROOT = Path(os.environ.get("MTA_SHARED_MEDIA_DIR", str(ROOT.parent / "shared-media"))).resolve()
+SHARED_AUDIO_ROOT = SHARED_MEDIA_ROOT / "audio"
+SHARED_INDEX_PATH = SHARED_MEDIA_ROOT / "index.json"
 _GC_LOCK = threading.RLock()
 _GC_ACTIVE: set[str] = set()
+_SHARED_LOCK = threading.RLock()
+
+
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _shared_blob_path(digest: str, suffix: str = "") -> Path:
+    if not re.fullmatch(r"[a-f0-9]{64}", digest):
+        raise ValueError("invalid shared media digest")
+    ext = re.sub(r"[^A-Za-z0-9.]", "", suffix or "")[:16]
+    return SHARED_AUDIO_ROOT / digest[:2] / f"{digest}{ext}"
+
+
+def _load_shared_index() -> dict:
+    try:
+        raw = json.loads(SHARED_INDEX_PATH.read_text(encoding="utf-8"))
+        if isinstance(raw, dict) and raw.get("version") == 1:
+            return raw
+    except (OSError, ValueError, TypeError):
+        pass
+    return {"version": 1, "assets": {}, "updated_at": 0}
+
+
+def _write_shared_index(index: dict) -> None:
+    SHARED_MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
+    index["version"] = 1
+    index["updated_at"] = int(time.time())
+    _atomic_json_write(SHARED_INDEX_PATH, index)
+
+
+def _link_or_copy_shared(blob: Path, local: Path) -> None:
+    if local.exists():
+        try:
+            if os.path.samefile(blob, local):
+                return
+        except OSError:
+            pass
+    tmp = local.parent / f".{local.name}.{uuid.uuid4().hex}.sharedtmp"
+    tmp.unlink(missing_ok=True)
+    try:
+        os.link(blob, tmp)
+    except OSError:
+        shutil.copy2(blob, tmp)
+    os.replace(tmp, local)
+
+
+def promote_project_audio_to_shared(pid: str) -> dict[str, int]:
+    """Deduplicate referenced project audio into a content-addressed shared store.
+
+    Project-local paths remain valid and self-contained. When supported by the
+    filesystem they become hardlinks to the shared blob, otherwise a local copy
+    is retained. The global index is reconstructible and never authoritative.
+    """
+    project = load_project(pid)
+    referenced = referenced_audio_files(project)
+    promoted = linked = 0
+    with _SHARED_LOCK:
+        index = _load_shared_index()
+        assets = index.setdefault("assets", {})
+        for name in sorted(referenced):
+            try:
+                local = audio_path(pid, name)
+            except ValueError:
+                continue
+            if not local.is_file():
+                continue
+            digest = _sha256_file(local)
+            blob = _shared_blob_path(digest, local.suffix.lower())
+            blob.parent.mkdir(parents=True, exist_ok=True)
+            if not blob.exists():
+                tmp = blob.parent / f".{blob.name}.{uuid.uuid4().hex}.tmp"
+                shutil.copy2(local, tmp)
+                os.replace(tmp, blob)
+                promoted += 1
+            _link_or_copy_shared(blob, local)
+            linked += 1
+            row = assets.setdefault(digest, {"path": str(blob.relative_to(SHARED_MEDIA_ROOT)), "size": blob.stat().st_size, "refs": []})
+            refs = {str(x) for x in row.get("refs", [])}
+            refs.add(f"{pid}/audio/{name}")
+            row["refs"] = sorted(refs)
+            row["path"] = str(blob.relative_to(SHARED_MEDIA_ROOT))
+            row["size"] = blob.stat().st_size
+        _write_shared_index(index)
+    return {"promoted": promoted, "linked": linked}
+
+
+def rescan_shared_media(*, delete_unreferenced: bool = False) -> dict[str, int]:
+    """Rebuild the shared-media reference index from every project.
+
+    This emergency-safe rescan treats project.json + clip-library references as
+    authoritative. Shared blobs are deleted only after the complete rescan proves
+    that no project references their content.
+    """
+    assets: dict[str, dict] = {}
+    projects = references = missing = deleted = 0
+    with _SHARED_LOCK:
+        if ROOT.exists():
+            for d in sorted(ROOT.iterdir()):
+                if not d.is_dir() or not PID_RE.fullmatch(d.name) or not (d / "project.json").exists():
+                    continue
+                projects += 1
+                try:
+                    project = load_project(d.name)
+                except (OSError, ValueError):
+                    continue
+                for name in sorted(referenced_audio_files(project)):
+                    try:
+                        local = audio_path(d.name, name)
+                    except ValueError:
+                        continue
+                    if not local.is_file():
+                        missing += 1
+                        continue
+                    digest = _sha256_file(local)
+                    blob = _shared_blob_path(digest, local.suffix.lower())
+                    blob.parent.mkdir(parents=True, exist_ok=True)
+                    if not blob.exists():
+                        tmp = blob.parent / f".{blob.name}.{uuid.uuid4().hex}.tmp"
+                        shutil.copy2(local, tmp)
+                        os.replace(tmp, blob)
+                    _link_or_copy_shared(blob, local)
+                    row = assets.setdefault(digest, {"path": str(blob.relative_to(SHARED_MEDIA_ROOT)), "size": blob.stat().st_size, "refs": []})
+                    row["refs"].append(f"{d.name}/audio/{name}")
+                    references += 1
+        if delete_unreferenced and SHARED_AUDIO_ROOT.exists():
+            keep_paths = {(SHARED_MEDIA_ROOT / row["path"]).resolve() for row in assets.values()}
+            for blob in SHARED_AUDIO_ROOT.rglob("*"):
+                if blob.is_file() and blob.resolve() not in keep_paths:
+                    blob.unlink(missing_ok=True)
+                    deleted += 1
+            for folder in sorted((p for p in SHARED_AUDIO_ROOT.rglob("*") if p.is_dir()), reverse=True):
+                try:
+                    folder.rmdir()
+                except OSError:
+                    pass
+        _write_shared_index({"version": 1, "assets": assets, "updated_at": int(time.time())})
+    return {"projects": projects, "references": references, "missing": missing, "deleted": deleted, "assets": len(assets)}
+
+
+def maintain_project_storage(pid: str) -> dict[str, int]:
+    """Opening-time maintenance: delete local orphans and deduplicate live audio."""
+    reconcile_project_gc(pid, None)
+    gc_result = run_project_gc(pid)
+    shared = promote_project_audio_to_shared(pid)
+    return {**gc_result, **shared}
 
 
 def _gc_queue_path(pid: str) -> Path:
@@ -300,11 +453,7 @@ def delete_project(pid: str):
 
 
 def file_sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
+    return _sha256_file(path)
 
 
 def find_duplicate_project_file(pid: str, candidate: Path) -> dict | None:

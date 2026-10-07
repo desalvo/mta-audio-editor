@@ -66,6 +66,8 @@ from .storage import (
     ROOT as STORAGE_ROOT,
     schedule_project_gc,
     resume_pending_gc,
+    maintain_project_storage,
+    rescan_shared_media,
 )
 from .rights_registry import (provider_catalog as rights_provider_catalog, search_provider as search_rights_provider, search_musicbrainz_metadata, resolve_musicbrainz_metadata)
 from . import sample_editor as sample_editor_engine
@@ -653,6 +655,12 @@ def api_storage(request: Request):
     require_user(request)
     return _storage_payload(request)
 
+
+@app.post("/api/storage/shared/rescan")
+def api_storage_shared_rescan(request: Request, delete_unreferenced: bool = True):
+    require_admin(request)
+    return rescan_shared_media(delete_unreferenced=delete_unreferenced)
+
 @app.get("/api/admin/web-settings")
 def api_admin_web_settings(request: Request):
     require_admin(request)
@@ -1021,6 +1029,9 @@ def _register_track_source_in_library(project: Project, track: Track, provenance
 @app.get("/api/projects/{pid}")
 def project_get(pid: str, request: Request):
     project = _project_for_actor(request, pid)
+    # Opening a project is also a safe maintenance boundary: project.json is
+    # authoritative, so stale local audio can be removed before the editor uses it.
+    maintain_project_storage(pid)
     changed = _ensure_project_clip_library(project)
     if project.base_bpm is None:
         project.base_bpm = project.bpm
