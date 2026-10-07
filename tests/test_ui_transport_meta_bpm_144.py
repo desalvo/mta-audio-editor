@@ -27,7 +27,8 @@ def test_pdf_preview_uses_the_real_generated_pdf():
     # r179: native WebViews render the real PDF URL directly; blob object URLs produced blank previews.
     assert "response.blob()" not in block
     assert "/lyrics.pdf.preview" in block
-    assert "pdf-preview-frame" in block
+    assert "pdf-rendered-pages" in block
+    assert "<iframe" not in block
     assert "pdf-sheet" not in block
 
 

@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import shutil
 import subprocess
+import sys
 from functools import lru_cache
 from pathlib import Path
 
@@ -36,22 +37,75 @@ def host_kind(path: str | None = None) -> str | None:
     return None
 
 
-def configure_chordino_environment(*, bundle_root: Path | None = None) -> None:
+
+def _candidate_bundle_roots(bundle_root: Path | None) -> list[Path]:
+    roots: list[Path] = []
+
+    def add(value: Path | None) -> None:
+        if value is None:
+            return
+        try:
+            value = value.resolve()
+        except OSError:
+            pass
+        if value not in roots:
+            roots.append(value)
+    add(bundle_root)
     if bundle_root is not None:
-        bindir = bundle_root / "bin"
-        vampdir = bundle_root / "vamp"
-        if bindir.is_dir():
-            os.environ["PATH"] = str(bindir) + os.pathsep + os.environ.get("PATH", "")
-            for name in ("sonic-annotator.exe", "sonic-annotator", "vamp-simple-host.exe", "vamp-simple-host"):
-                candidate = bindir / name
-                if candidate.is_file():
-                    os.environ.setdefault("MTA_CHORDINO_HOST", str(candidate))
-                    break
-        if vampdir.is_dir():
-            current = os.environ.get("VAMP_PATH", "")
-            value = str(vampdir) + (os.pathsep + current if current else "")
-            os.environ["VAMP_PATH"] = value
-            os.environ.setdefault("MTA_VAMP_PATH", value)
+        add(bundle_root.parent)
+        add(bundle_root.parent / "Resources")
+        add(bundle_root.parent / "Frameworks")
+    try:
+        exe = Path(os.environ.get("MTA_NATIVE_EXECUTABLE", "") or sys.executable).resolve()
+        add(exe.parent)
+        contents = exe.parent.parent
+        if contents.name == "Contents":
+            add(contents / "Frameworks")
+            add(contents / "Resources")
+            add(contents / "MacOS")
+    except OSError:
+        pass
+    return roots
+
+
+def _discover_bundled_runtime(bundle_root: Path | None) -> tuple[Path | None, list[Path]]:
+    hosts = ("sonic-annotator.exe", "sonic-annotator", "vamp-simple-host.exe", "vamp-simple-host")
+    host: Path | None = None
+    vamp_dirs: list[Path] = []
+    for root in _candidate_bundle_roots(bundle_root):
+        for rel in (Path("bin"), Path("."), Path("Frameworks/bin"), Path("Resources/bin")):
+            directory = root / rel
+            if host is None and directory.is_dir():
+                for name in hosts:
+                    candidate = directory / name
+                    if candidate.is_file():
+                        host = candidate
+                        break
+        for rel in (Path("vamp"), Path("Frameworks/vamp"), Path("Resources/vamp")):
+            directory = root / rel
+            if directory.is_dir() and any(directory.glob("nnls-chroma.*")) and directory not in vamp_dirs:
+                vamp_dirs.append(directory)
+    return host, vamp_dirs
+
+def configure_chordino_environment(*, bundle_root: Path | None = None) -> None:
+    host, vamp_dirs = _discover_bundled_runtime(bundle_root)
+    roots = _candidate_bundle_roots(bundle_root)
+    bin_dirs: list[str] = []
+    for root in roots:
+        for rel in (Path("bin"), Path("Frameworks/bin"), Path("Resources/bin")):
+            directory = root / rel
+            if directory.is_dir():
+                bin_dirs.append(str(directory))
+    if bin_dirs:
+        current_path = os.environ.get("PATH", "")
+        os.environ["PATH"] = os.pathsep.join(dict.fromkeys([*bin_dirs, current_path]))
+    if host is not None:
+        os.environ["MTA_CHORDINO_HOST"] = str(host)
+    if vamp_dirs:
+        existing = [x for x in os.environ.get("VAMP_PATH", "").split(os.pathsep) if x]
+        value = os.pathsep.join(dict.fromkeys([*(str(x) for x in vamp_dirs), *existing]))
+        os.environ["VAMP_PATH"] = value
+        os.environ["MTA_VAMP_PATH"] = value
     explicit = os.getenv("MTA_VAMP_PATH", "").strip()
     if explicit:
         os.environ["VAMP_PATH"] = explicit
@@ -74,13 +128,17 @@ def chordino_status() -> dict:
         return {"available": False, "host": host, "host_kind": kind, "plugin": False, "reason": "vamp-host-failed"}
     listing = (proc.stdout or "") + "\n" + (proc.stderr or "")
     plugin = "nnls-chroma:chordino" in listing
+    available = bool(proc.returncode == 0 and plugin)
+    reason = None if available else ("vamp-host-failed" if proc.returncode != 0 else "chordino-plugin-missing")
     return {
-        "available": bool(proc.returncode == 0 and plugin),
+        "available": available,
         "host": host,
         "host_kind": kind,
         "plugin": plugin,
-        "reason": None if proc.returncode == 0 and plugin else "chordino-plugin-missing",
+        "reason": reason,
         "vamp_path": os.getenv("VAMP_PATH", ""),
+        "returncode": proc.returncode,
+        "diagnostic": listing[-2000:].strip(),
     }
 
 

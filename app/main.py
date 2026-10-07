@@ -346,7 +346,7 @@ def _project_for_actor(request: Request, pid: str, *, owner_only: bool = False) 
 
 def _project_archive_name(project: Project) -> str:
     clean = SAFE_DOWNLOAD_RE.sub("_", project.title).strip(" ._")[:100] or "project"
-    return f"{clean}-{project.id}.maeproj"
+    return f"{clean}-{project.id}.maeprojz"
 
 
 def _social_buttons(mode: str) -> str:
@@ -1354,6 +1354,7 @@ def _track_waveform_revision(track: Track, source: Path) -> str:
     """Revision of the audible track output waveform, including insert state/config."""
     payload = {
         "source": _waveform_revision(source),
+        "waveform_format": "signed-minmax-v2-4096",
         "inserts": [item.model_dump(mode="json") for item in track.inserts],
     }
     return hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()[:24]
@@ -1391,9 +1392,9 @@ def _waveform_worker(job_id: str, pid: str, track_id: str) -> None:
                 rendered = Path(td_raw) / "processed.wav"
                 progress(10, "Rendering insert per waveform")
                 render_track(track, source, rendered, apply_inserts=True)
-                peaks = waveform_peaks(rendered, 1024, progress)
+                peaks = waveform_peaks(rendered, 4096, progress)
         else:
-            peaks = waveform_peaks(source, 1024, progress)
+            peaks = waveform_peaks(source, 4096, progress)
         latest = load_project(pid)
         latest_track = next((item for item in latest.tracks if item.id == track_id), None)
         if latest_track is None:
@@ -1497,7 +1498,7 @@ def _track_import_worker(
                 _media_job_update(job_id, progress=87, message="Stima BPM non conclusiva; mantengo il BPM corrente")
         _media_job_update(job_id, progress=88, message="Generazione waveform")
         try:
-            peaks = waveform_peaks(dst, 1024, lambda value, message: _media_job_update(
+            peaks = waveform_peaks(dst, 4096, lambda value, message: _media_job_update(
                 job_id, progress=88 + int(max(0, min(100, value)) * 0.07), message=message
             ))
         except Exception:
@@ -2301,7 +2302,7 @@ def instantiate_project_clip(pid: str, clip_id: str, req: InstantiateProjectClip
         channel_layout=asset.channel_layout,
     )
     try:
-        track.waveform_peaks = waveform_peaks(source, 1024)
+        track.waveform_peaks = waveform_peaks(source, 4096)
         track.waveform_revision = _track_waveform_revision(track, source)
     except Exception:
         track.waveform_peaks = []

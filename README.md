@@ -180,3 +180,7 @@ Chord extraction now offers **Fast**, **Accurate**, and **Maximum accuracy** pro
 
 ### Modular workspace and shared media
 Since r198 native autosave updates the persistent modular workspace instead of rewriting the complete `.maeproj`. The `.maeproj` remains a portable snapshot refreshed by Save/Save Copy. Identical audio across projects is deduplicated in a SHA-256 content-addressed shared media store; project-local references remain valid and use hardlinks where possible. A global rescan can rebuild the reference index from every `project.json` and garbage-collect only blobs that no project still references.
+
+
+### Modular native project format
+Native `.maeproj` files are lightweight JSON manifests backed by the modular workspace and shared-media store; they are not ZIP archives. Use the portable project archive (`.maeprojz`) when a self-contained file is required for transfer or backup. Legacy ZIP-based `.maeproj` files remain supported for import.

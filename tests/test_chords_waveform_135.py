@@ -26,8 +26,8 @@ def test_waveform_preview_uses_persisted_peaks_without_fetching_audio():
     assert "fetch(" not in draw
     assert "decodeAudioData" not in draw
     assert "columns=Math.max(1,Math.ceil(tw))" in draw
-    assert "interpolate between cached peaks" in draw
-    assert "sourceStart/durationMs*peaks.length" in draw
+    assert "zoomed in columns interpolate between cached bins" in draw
+    assert "sourceStart/durationMs*bins" in draw
 
 
 def test_madmom_availability_checks_real_lazy_modules():

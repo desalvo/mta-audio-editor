@@ -5,8 +5,8 @@ JS = Path("app/static/app.js").read_text(encoding="utf-8")
 
 
 def test_inspector_header_is_sticky_and_body_scrolls():
-    assert ".inspector{position:relative;z-index:30" in CSS
-    assert ".inspector-tabs{position:sticky;top:0;z-index:40" in CSS
+    assert ".inspector{position:relative;z-index:100" in CSS
+    assert ".inspector-tabs{position:sticky;top:0;z-index:120" in CSS
     assert ".inspector-body{flex:1 1 auto;min-height:0;overflow-y:auto" in CSS
     assert "overflow:hidden!important;display:flex;flex-direction:column" in CSS
 

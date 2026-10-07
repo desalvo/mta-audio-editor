@@ -16,6 +16,7 @@ ROOT.mkdir(parents=True, exist_ok=True)
 PID_RE = re.compile(r"^[a-f0-9]{12}$")
 SAFE_NAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._ -]{0,127}$")
 PROJECT_ARCHIVE_SCHEMA = "mta-audio-editor/project-archive/v1"
+PROJECT_LINK_SCHEMA = "mta-audio-editor/project-link/v1"
 
 GC_QUEUE_NAME = ".gc-pending.json"
 SHARED_MEDIA_ROOT = Path(os.environ.get("MTA_SHARED_MEDIA_DIR", str(ROOT.parent / "shared-media"))).resolve()
@@ -167,12 +168,70 @@ def rescan_shared_media(*, delete_unreferenced: bool = False) -> dict[str, int]:
     return {"projects": projects, "references": references, "missing": missing, "deleted": deleted, "assets": len(assets)}
 
 
+
+
+def cleanup_project_preview_cache(pid: str, *, keep_per_track: int = 2) -> dict[str, int]:
+    """Remove rebuildable preview cache files that are no longer useful.
+
+    Preview WAV files are derived artifacts, never authoritative project media.
+    Keep only a small recent set for tracks that still exist; remove previews for
+    deleted tracks and stale temporary/master preview artifacts. This function is
+    safe to call on project open and after crashes because missing previews are
+    regenerated on demand.
+    """
+    removed = kept = 0
+    try:
+        project = load_project(pid)
+    except (OSError, ValueError):
+        return {"preview_deleted": 0, "preview_kept": 0}
+
+    cache = pdir(pid) / ".preview"
+    track_ids = {t.id for t in project.tracks}
+    if cache.exists():
+        by_track: dict[str, list[Path]] = {track_id: [] for track_id in track_ids}
+        for path in cache.iterdir():
+            if not path.is_file():
+                continue
+            if path.name.startswith('.') or path.suffix.lower() != '.wav':
+                path.unlink(missing_ok=True)
+                removed += 1
+                continue
+            owner = next((track_id for track_id in track_ids if path.name.startswith(f"{track_id}-")), None)
+            if owner is None:
+                path.unlink(missing_ok=True)
+                removed += 1
+                continue
+            by_track[owner].append(path)
+
+        limit = max(0, int(keep_per_track))
+        for files in by_track.values():
+            ordered = sorted(files, key=lambda item: item.stat().st_mtime, reverse=True)
+            kept += min(limit, len(ordered))
+            for path in ordered[limit:]:
+                path.unlink(missing_ok=True)
+                removed += 1
+        try:
+            cache.rmdir()
+        except OSError:
+            pass
+
+    # Rendered master previews are also derived and can always be rebuilt.
+    master = pdir(pid) / "preview-master.mp3"
+    if master.exists():
+        try:
+            master.unlink()
+            removed += 1
+        except OSError:
+            pass
+    return {"preview_deleted": removed, "preview_kept": kept}
+
 def maintain_project_storage(pid: str) -> dict[str, int]:
-    """Opening-time maintenance: delete local orphans and deduplicate live audio."""
+    """Opening-time maintenance for project media and rebuildable caches."""
     reconcile_project_gc(pid, None)
     gc_result = run_project_gc(pid)
+    previews = cleanup_project_preview_cache(pid)
     shared = promote_project_audio_to_shared(pid)
-    return {**gc_result, **shared}
+    return {**gc_result, **previews, **shared}
 
 
 def _gc_queue_path(pid: str) -> Path:
@@ -548,6 +607,54 @@ def delete_project_file(pid: str, category: str, filename: str) -> None:
         raise FileNotFoundError(filename)
     path.unlink()
 
+
+
+def write_project_link(pid: str, link_path: Path) -> Path:
+    """Write a lightweight native .maeproj manifest atomically.
+
+    The heavy project data remains in the modular workspace/shared-media store.
+    This file is intentionally small and is never a ZIP archive.
+    """
+    project = load_project(pid)
+    validate_project_files(project)
+    link_path = Path(link_path)
+    link_path.parent.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "schema": PROJECT_LINK_SCHEMA,
+        "project_id": project.id,
+        "title": project.title,
+        "owner_user_id": project.owner_user_id,
+        "workspace_format": 1,
+    }
+    _atomic_json_write(link_path, payload)
+    return link_path
+
+
+def read_project_link(link_path: Path) -> Project:
+    """Open a lightweight .maeproj manifest from the local modular workspace."""
+    link_path = Path(link_path)
+    if zipfile.is_zipfile(link_path):
+        raise ValueError("legacy portable project archive")
+    try:
+        payload = json.loads(link_path.read_text(encoding="utf-8"))
+    except (OSError, ValueError, TypeError) as exc:
+        raise ValueError("invalid project manifest") from exc
+    if payload.get("schema") != PROJECT_LINK_SCHEMA:
+        raise ValueError("unsupported project manifest schema")
+    pid = str(payload.get("project_id") or "")
+    if not PID_RE.fullmatch(pid):
+        raise ValueError("invalid project id in manifest")
+    project = load_project(pid)
+    validate_project_files(project)
+    return project
+
+
+def is_portable_project_archive(path: Path) -> bool:
+    """Return True for legacy/current portable ZIP project archives."""
+    try:
+        return zipfile.is_zipfile(path)
+    except OSError:
+        return False
 
 def write_project_archive(pid: str, archive_path: Path) -> Path:
     """Write a .maeproj atomically so autosave can never expose a partial ZIP.

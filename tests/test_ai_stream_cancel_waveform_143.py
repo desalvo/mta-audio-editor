@@ -36,7 +36,7 @@ def test_waveform_is_dense_per_visible_pixel_not_limited_to_cached_bins():
     end=js.index('\nfunction ',start+10)
     draw=js[start:end]
     assert 'columns=Math.max(1,Math.ceil(tw))' in draw
-    assert 'interpolate between cached peaks' in draw
+    assert 'zoomed in columns interpolate between cached bins' in draw
     assert 'Math.min(Math.ceil(tw),sourceBins)' not in draw
 
 

@@ -1,3 +1,37 @@
+## 0.2.0-r207
+
+- Reworked timeline waveforms with a 4096-bin signed min/max envelope instead of the legacy 1024 absolute peaks.
+- Waveform cache now preserves upper/lower signal asymmetry and transient detail and is sampled at 8 kHz before envelope extraction.
+- Timeline rendering uses a filled high-resolution envelope with zoom-aware aggregation/interpolation and light visual smoothing.
+- Legacy waveform caches remain readable and are automatically regenerated because the waveform revision now includes the new cache format.
+
+## 0.2.0-r206
+
+- Simplified automatic chord extraction to a conservative vocabulary (major/minor, 7, maj7, m7, sus2/sus4, dim, aug) with stronger temporal stabilization and fewer slash chords.
+- Complex/altered chord symbols remain supported for manual editing and existing projects, but are no longer aggressively proposed by automatic extraction.
+- Native macOS Chordino runtime discovery now searches actual PyInstaller app bundle locations (Frameworks/Resources/MacOS/_MEIPASS), builds VAMP_PATH from discovered plugin directories, and exposes runtime diagnostics when the host/plugin cannot load.
+
+
+## 0.2.0-r205
+- Project preview WAV garbage collection: orphaned/stale `.preview/*.wav` files are cleaned during project maintenance.
+- Preview files belonging to deleted tracks are removed; only the two most recent previews per existing track are retained.
+- Rebuildable `preview-master.mp3` is cleaned as part of project maintenance.
+- Preview GC never touches source audio, Clip Library media, or shared-media blobs.
+
+## 0.2.0-r204
+- Fixed the Lyrics + Chords + Markers PDF preview in native WebViews by removing the iframe layer and injecting the exact rasterized PDF pages directly into the preview modal.
+- Fixed the Plugins/Inspector stacking context so its header and close button stay above the Project Clips bar.
+- Kept the Inspector header sticky while only the plugin body scrolls.
+
+
+## 0.2.0-r203
+- Clear Lyrics/Chords playback overlays immediately on Stop and project close. Pause keeps the current overlay visible.
+- Widen the Lyrics + Chords + Markers timestamp column and force single-line timestamps.
+## 0.2.0-r202
+- Native `.maeproj` is now a lightweight modular project manifest, not a ZIP archive.
+- Portable self-contained project archives use `.maeprojz`; legacy ZIP-based `.maeproj` files remain importable.
+- Normal Save updates only the small manifest/workspace; Save Copy creates a portable archive.
+
 ## 0.2.0-r201
 
 - Fix macOS arm64 Chordino provisioning: use the Homebrew include root for Vamp SDK headers while linking `libvamp-sdk.a` from the library directory.

@@ -96,7 +96,7 @@ def effect_graph(src:Path,req:SampleEffectRequest,sr:int,dur:float,preview:bool)
  return ';'.join(parts)+';'+''.join(labels)+f"concat=n={len(labels)}:v=0:a=1[out]"
 
 def commit(project:Project,track:Track,tmp:Path)->Track:
- duration=media_duration_ms(tmp);name=f"sampleedit-{uuid.uuid4().hex[:12]}.wav";dst=storage.audio_path(project.id,name);shutil.move(str(tmp),dst);offset=min((c.timeline_start_ms for c in track.clips),default=0);track.filename=name;track.source_clip_id=None;track.duration_ms=duration;track.clips=[Clip(id=uuid.uuid4().hex[:10],source_start_ms=0,source_end_ms=duration,timeline_start_ms=offset)];track.waveform_peaks=waveform_peaks(dst,1024);track.waveform_revision="";storage.save_project(project);return track
+ duration=media_duration_ms(tmp);name=f"sampleedit-{uuid.uuid4().hex[:12]}.wav";dst=storage.audio_path(project.id,name);shutil.move(str(tmp),dst);offset=min((c.timeline_start_ms for c in track.clips),default=0);track.filename=name;track.source_clip_id=None;track.duration_ms=duration;track.clips=[Clip(id=uuid.uuid4().hex[:10],source_start_ms=0,source_end_ms=duration,timeline_start_ms=offset)];track.waveform_peaks=waveform_peaks(dst,4096);track.waveform_revision="";storage.save_project(project);return track
 
 def edit(project:Project,track:Track,req:SampleEditRequest)->dict:
  src=rendered_source(project.id,track);sr=sample_rate(src);dur=media_duration_ms(src)/1000;total=round(dur*sr);a=min(req.start_sample,total);b=min(max(a,req.end_sample),total);cursor=min(req.cursor_sample,total);clip=storage.pdir(project.id)/f".sample-clipboard-{track.id}.wav"

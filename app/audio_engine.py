@@ -426,9 +426,16 @@ def _envelope(path: Path, sample_rate: int = 4000, max_seconds: int = 1200):
 
 
 
-def waveform_peaks(path: Path, points: int = 1024, progress=None) -> list[float]:
-    """Return normalized mono peak amplitudes suitable for persistent timeline drawing."""
-    points = max(64, min(2048, int(points)))
+def waveform_peaks(path: Path, points: int = 4096, progress=None) -> list[float]:
+    """Return a normalized signed min/max envelope for persistent timeline drawing.
+
+    Each logical waveform bin is stored as two consecutive floats: ``min, max``.
+    Keeping both extrema preserves the real asymmetry and transients of the signal,
+    unlike the legacy absolute-peak representation.  Older projects containing the
+    legacy positive-only array remain readable by the frontend and are regenerated
+    automatically because the waveform revision includes the envelope format version.
+    """
+    points = max(256, min(4096, int(points)))
     if progress:
         progress(5, "Preparazione waveform")
     with tempfile.TemporaryDirectory() as td:
@@ -436,23 +443,27 @@ def waveform_peaks(path: Path, points: int = 1024, progress=None) -> list[float]
         _run(
             [
                 "ffmpeg", "-y", "-v", "error", "-i", str(path),
-                "-ac", "1", "-ar", "4000", "-c:a", "pcm_s16le", str(wav_path),
+                "-ac", "1", "-ar", "8000", "-c:a", "pcm_s16le", str(wav_path),
             ]
         )
         if progress:
-            progress(45, "Calcolo dei picchi")
+            progress(45, "Calcolo envelope waveform")
         with wave.open(str(wav_path), "rb") as handle:
             data = np.frombuffer(handle.readframes(handle.getnframes()), dtype=np.int16).astype(np.float32)
     if not len(data):
-        return [0.0] * points
-    data = np.abs(data)
-    peak = float(np.max(data)) or 1.0
+        return [0.0] * (points * 2)
+    peak = float(np.max(np.abs(data))) or 1.0
     edges = np.linspace(0, len(data), points + 1, dtype=np.int64)
     out: list[float] = []
     for i in range(points):
         a, b = int(edges[i]), int(edges[i + 1])
-        value = float(np.max(data[a:b])) if b > a else 0.0
-        out.append(round(min(1.0, value / peak), 5))
+        if b > a:
+            chunk = data[a:b]
+            lo = float(np.min(chunk)) / peak
+            hi = float(np.max(chunk)) / peak
+        else:
+            lo = hi = 0.0
+        out.extend((round(max(-1.0, min(1.0, lo)), 5), round(max(-1.0, min(1.0, hi)), 5)))
     if progress:
         progress(95, "Waveform pronta")
     return out

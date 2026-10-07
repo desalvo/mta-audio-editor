@@ -3,9 +3,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_project_download_uses_maeproj_extension():
+def test_portable_project_download_uses_maeprojz_extension():
     main = (ROOT / "app/main.py").read_text(encoding="utf-8")
-    assert 'return f"{clean}-{project.id}.maeproj"' in main
+    assert 'return f"{clean}-{project.id}.maeprojz"' in main
     assert 'application/vnd.mta-audio-editor.project' in main
 
 

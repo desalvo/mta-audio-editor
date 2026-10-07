@@ -38,7 +38,8 @@ def test_split_here_is_context_menu_not_per_word_button():
 
 def test_editor_is_compact_and_timestamp_stays_one_line():
     assert 'white-space:nowrap!important' in CSS
-    assert '.lc-line{grid-template-columns:66px' in CSS
+    assert '.lc-line{grid-template-columns:76px' in CSS
+    assert 'min-width:72px!important' in CSS
     assert '.lc-syllable{font-size:13px' in CSS
 
 

@@ -1132,8 +1132,8 @@ body.native-single-user .main-area{grid-template-rows:minmax(120px,1fr) var(--mi
 /* r183 compact granular Lyrics + Chords + Markers editor */
 .lyrics-chords-editor-modal .utility-body{overflow:hidden!important}
 .lyrics-chords-editor{position:relative;height:100%;display:flex;flex-direction:column;min-height:0}
-.lc-line{grid-template-columns:66px minmax(0,1fr)!important;gap:5px!important;padding:4px 6px!important;margin-bottom:3px!important;min-height:36px!important}
-.lc-time{font-size:10px!important;line-height:1!important;white-space:nowrap!important;word-break:keep-all!important;padding:3px 2px!important;align-self:center}
+.lc-line{grid-template-columns:76px minmax(0,1fr)!important;gap:5px!important;padding:4px 6px!important;margin-bottom:3px!important;min-height:36px!important}
+.lc-time{font-size:10px!important;line-height:1!important;white-space:nowrap!important;word-break:keep-all!important;min-width:72px!important;padding:3px 4px!important;align-self:center}
 .lc-content{display:flex;align-items:flex-end;gap:3px;min-width:0}
 .lc-words{gap:1px 3px!important;align-items:flex-end}
 .lc-word{display:inline-flex!important;flex-direction:row!important;gap:0!important;padding:0!important;align-items:flex-end!important}
@@ -1152,13 +1152,19 @@ body.native-single-user .main-area{grid-template-rows:minmax(120px,1fr) var(--mi
 .lyrics-chords-editor-modal .lc-lyrics-inline{min-width:.35em;outline:0;border-radius:3px;padding:0 1px;cursor:text;white-space:pre}
 .lyrics-chords-editor-modal .lc-lyrics-inline:focus{outline:1px solid currentColor;background:rgba(127,127,127,.12)}
 
-/* r193 inspector/plugin frame visibility and scrolling */
+/* r193/r204 inspector/plugin frame visibility and scrolling */
 .editor-zone{position:relative;z-index:2;isolation:isolate}
-.editor-grid{position:relative;z-index:1;min-height:0;overflow:hidden}
-.inspector{position:relative;z-index:30;min-width:0;min-height:0;max-height:100%;overflow:hidden!important;display:flex;flex-direction:column;isolation:isolate;background:#0c1721;scrollbar-gutter:stable}
-.inspector-tabs{position:sticky;top:0;z-index:40;flex:0 0 31px;background:#0c1721;box-shadow:0 1px 0 #2d455a,0 4px 10px rgba(0,0,0,.28)}
+.editor-content{position:relative;isolation:isolate}
+/* Clip Library and editor grid are siblings.  Keep the editor grid above the
+   clip-browser stacking context so the Plugins/Inspector header can never be
+   painted underneath the project-clips bar when a native/webview layout
+   overlaps the rows during resize or scroll restoration. */
+.clip-browser{position:relative;z-index:10}
+.editor-grid{position:relative;z-index:30;min-height:0;overflow:hidden;isolation:isolate}
+.inspector{position:relative;z-index:100;min-width:0;min-height:0;max-height:100%;overflow:hidden!important;display:flex;flex-direction:column;isolation:isolate;background:#0c1721;scrollbar-gutter:stable}
+.inspector-tabs{position:sticky;top:0;z-index:120;flex:0 0 31px;min-height:31px;background:#0c1721;box-shadow:0 1px 0 #2d455a,0 4px 10px rgba(0,0,0,.42)}
 .inspector-body{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-gutter:stable;padding:10px;position:relative;z-index:1}
-.inspector-close{position:sticky;right:0;z-index:45}
+.inspector-close{position:relative;right:auto;z-index:125;flex:0 0 34px!important;width:34px!important;min-width:34px!important;align-self:stretch}
 .mixer-dock{z-index:0}
 @media(max-width:900px){.inspector{max-height:none}.inspector-body{-webkit-overflow-scrolling:touch}}
 
@@ -1168,3 +1174,11 @@ body.native-single-user .main-area{grid-template-rows:minmax(120px,1fr) var(--mi
   outline: 2px solid currentColor;
   outline-offset: -2px;
 }
+
+/* r204: render exact PDF preview pages directly in the modal instead of an iframe.
+   Some native WebViews rendered the self-hosted iframe as a blank white page. */
+.pdf-real-preview-modal .pdf-preview-wrap{overflow:auto!important;padding:12px!important;background:#525d67!important}
+.pdf-rendered-pages{display:grid;gap:14px;justify-items:center;width:100%;min-height:100%}
+.pdf-rendered-pages .pdf-page{margin:0;max-width:100%;display:grid;justify-items:center}
+.pdf-rendered-pages .pdf-page img{display:block;max-width:100%;height:auto;background:#fff;box-shadow:0 2px 12px rgba(0,0,0,.55)}
+.pdf-rendered-pages .pdf-page figcaption{text-align:center;font-size:12px;padding:5px 0 0;color:#d6e4ee}

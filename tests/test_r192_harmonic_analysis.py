@@ -6,10 +6,12 @@ from app.models import Chord
 from app.music_text import _chord_pitch_classes, _chord_templates, _refine_extended_harmony
 
 
-def test_extended_chord_vocabulary_contains_complex_qualities():
+def test_automatic_chord_vocabulary_is_readable_and_conservative():
     names = {name for name, _ in _chord_templates()}
-    for label in ["C7", "Cmaj7", "Cm7", "Cdim7", "Cm7b5", "Caug", "C9", "Cmaj9", "Cm9", "C7b9", "C7#9"]:
+    for label in ["C", "Cm", "C7", "Cmaj7", "Cm7", "Cdim", "Caug", "Csus2", "Csus4"]:
         assert label in names
+    for label in ["Cdim7", "Cm7b5", "C9", "Cmaj9", "Cm9", "C7b9", "C7#9"]:
+        assert label not in names
 
 
 def test_chord_pitch_classes_understand_extended_qualities():

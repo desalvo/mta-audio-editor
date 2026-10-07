@@ -536,30 +536,15 @@ def _chord_templates() -> list[tuple[str, np.ndarray]]:
     """
     out: list[tuple[str, np.ndarray]] = []
     qualities = (
-        ("", (0, 4, 7), (1.00, 0.88, 0.78)),
-        ("m", (0, 3, 7), (1.00, 0.88, 0.78)),
-        ("5", (0, 7), (1.00, 0.80)),
-        ("6", (0, 4, 7, 9), (1.00, 0.84, 0.74, 0.60)),
-        ("m6", (0, 3, 7, 9), (1.00, 0.84, 0.74, 0.60)),
-        ("7", (0, 4, 7, 10), (1.00, 0.84, 0.74, 0.68)),
-        ("maj7", (0, 4, 7, 11), (1.00, 0.84, 0.74, 0.68)),
-        ("m7", (0, 3, 7, 10), (1.00, 0.84, 0.74, 0.68)),
-        ("mMaj7", (0, 3, 7, 11), (1.00, 0.84, 0.74, 0.64)),
-        ("dim", (0, 3, 6), (1.00, 0.86, 0.78)),
-        ("dim7", (0, 3, 6, 9), (1.00, 0.84, 0.78, 0.64)),
-        ("m7b5", (0, 3, 6, 10), (1.00, 0.84, 0.78, 0.66)),
-        ("aug", (0, 4, 8), (1.00, 0.86, 0.78)),
-        ("sus2", (0, 2, 7), (1.00, 0.82, 0.76)),
-        ("sus4", (0, 5, 7), (1.00, 0.82, 0.76)),
-        ("add9", (0, 2, 4, 7), (1.00, 0.56, 0.84, 0.74)),
-        ("9", (0, 2, 4, 7, 10), (1.00, 0.52, 0.82, 0.72, 0.62)),
-        ("maj9", (0, 2, 4, 7, 11), (1.00, 0.52, 0.82, 0.72, 0.62)),
-        ("m9", (0, 2, 3, 7, 10), (1.00, 0.52, 0.82, 0.72, 0.62)),
-        ("7sus4", (0, 5, 7, 10), (1.00, 0.80, 0.72, 0.62)),
-        ("7b5", (0, 4, 6, 10), (1.00, 0.82, 0.72, 0.62)),
-        ("7#5", (0, 4, 8, 10), (1.00, 0.82, 0.72, 0.62)),
-        ("7b9", (0, 1, 4, 7, 10), (1.00, 0.48, 0.82, 0.72, 0.62)),
-        ("7#9", (0, 3, 4, 7, 10), (1.00, 0.48, 0.82, 0.72, 0.62)),
+        ("", (0, 4, 7), (1.00, 0.90, 0.80)),
+        ("m", (0, 3, 7), (1.00, 0.90, 0.80)),
+        ("7", (0, 4, 7, 10), (1.00, 0.86, 0.76, 0.64)),
+        ("maj7", (0, 4, 7, 11), (1.00, 0.86, 0.76, 0.64)),
+        ("m7", (0, 3, 7, 10), (1.00, 0.86, 0.76, 0.64)),
+        ("dim", (0, 3, 6), (1.00, 0.88, 0.80)),
+        ("aug", (0, 4, 8), (1.00, 0.88, 0.80)),
+        ("sus2", (0, 2, 7), (1.00, 0.84, 0.78)),
+        ("sus4", (0, 5, 7), (1.00, 0.84, 0.78)),
     )
     for root in range(12):
         for suffix, intervals, weights in qualities:
@@ -657,6 +642,35 @@ def _base_label_at(events: list[Chord], time_ms: int) -> str:
     return label
 
 
+def _copy_chord_with_label(item: Chord, label: str) -> Chord:
+    return item.model_copy(update={"chord": label})
+
+
+def _simplify_chord_label(label: str) -> str:
+    """Collapse extended/altered labels to a conservative live-performance vocabulary."""
+    value = str(label or "").strip()
+    if not value or value in {"N", "N.C.", "no_chord"}:
+        return "N"
+    bass = ""
+    if "/" in value:
+        value, bass = value.split("/", 1)
+    match = re.match(r"^([A-G](?:#|b)?)(.*)$", value)
+    if not match:
+        return value
+    root, suffix = match.groups()
+    mapping = {
+        "": "", "5": "", "6": "", "add9": "", "9": "7", "maj9": "maj7",
+        "m": "m", "m6": "m", "m9": "m7", "mMaj7": "m",
+        "7": "7", "7b5": "7", "7#5": "7", "7b9": "7", "7#9": "7",
+        "maj7": "maj7", "m7": "m7", "dim": "dim", "dim7": "dim", "m7b5": "dim",
+        "aug": "aug", "sus2": "sus2", "sus4": "sus4", "7sus4": "sus4",
+    }
+    simple = root + mapping.get(suffix, ("m" if suffix.startswith("m") else ""))
+    if bass and bass != root and re.match(r"^[A-G](?:#|b)?$", bass):
+        simple += f"/{bass}"
+    return simple
+
+
 def _refine_extended_harmony(
     path: Path, base_events: list[Chord], *, progress: Callable[[int, list[Chord], str], None] | None = None,
     cancelled: Callable[[], bool] | None = None,
@@ -684,15 +698,14 @@ def _refine_extended_harmony(
     # over-labelling ordinary triads as altered/extended chords.
     complexity = np.asarray([
         0.000 if re.match(r"^[A-G](?:#|b)?m?$", n) else
-        0.008 if any(n.endswith(x) for x in ("7", "maj7", "m7", "6", "m6", "sus2", "sus4", "dim", "aug")) else
-        0.016 if any(x in n for x in ("9", "m7b5", "dim7", "mMaj7", "add9", "7sus4")) else 0.024
+        0.014 if any(n.endswith(x) for x in ("7", "maj7", "m7", "sus2", "sus4", "dim", "aug")) else 0.030
         for n in names
     ], dtype=np.float64)
     labels: list[str] = []
     confidences: list[float] = []
     median_energy = max(1e-9, float(np.median(energy)))
     if progress:
-        progress(68, [], "Classificazione qualità: 7e, diminuite, sus, estensioni e alterazioni")
+        progress(68, [], "Classificazione armonica semplificata: triadi, 7e, sus, dim e aug")
     for i, time_ms in enumerate(times):
         if cancelled and cancelled():
             raise InterruptedError("Chord extraction cancelled")
@@ -708,7 +721,7 @@ def _refine_extended_harmony(
         order = np.argsort(score)[::-1]
         best, second = int(order[0]), int(order[1])
         margin = float(score[best] - score[second])
-        label = names[best] if float(score[best]) >= 0.46 and margin >= 0.006 else (_base_label_at(base_events, time_ms) or "N")
+        label = names[best] if float(score[best]) >= 0.49 and margin >= 0.012 else (_simplify_chord_label(_base_label_at(base_events, time_ms)) or "N")
         labels.append(label)
         confidences.append(max(0.0, margin))
     if progress:
@@ -727,8 +740,8 @@ def _refine_extended_harmony(
             continue
         ratio = float((b[bass_pc] + 1e-9) / (b[second_pc] + 1e-9))
         chord_pcs = _chord_pitch_classes(label)
-        threshold = 1.16 if bass_pc in chord_pcs else 1.42
-        if ratio >= threshold and float(b[bass_pc]) >= 0.34:
+        threshold = 1.35 if bass_pc in chord_pcs else 9.99
+        if ratio >= threshold and float(b[bass_pc]) >= 0.42:
             labels[i] = f"{label}/{NOTE_NAMES[bass_pc]}"
     if progress:
         progress(86, [], "Stabilizzazione temporale e rimozione transitori armonici")
@@ -737,7 +750,7 @@ def _refine_extended_harmony(
     smooth = labels[:]
     for i in range(len(labels)):
         votes: dict[str, float] = {}
-        for j in range(max(0, i - 2), min(len(labels), i + 3)):
+        for j in range(max(0, i - 3), min(len(labels), i + 4)):
             weight = (1.0 / (1.0 + abs(i - j))) * max(0.04, confidences[j] + 0.04)
             votes[labels[j]] = votes.get(labels[j], 0.0) + weight
         if votes:
@@ -755,7 +768,7 @@ def _refine_extended_harmony(
         for idx, item in enumerate(events):
             if 0 < idx < len(events) - 1:
                 duration = events[idx + 1].time_ms - item.time_ms
-                if duration < 500 and filtered and filtered[-1].chord == events[idx + 1].chord:
+                if duration < 1000 and filtered and filtered[-1].chord == events[idx + 1].chord:
                     continue
             filtered.append(item)
         events = filtered
@@ -983,7 +996,7 @@ def extract_chords_progressive(
         raise InterruptedError("Chord extraction cancelled")
     if progress:
         progress(64, [], "Step 3 · chroma armonica ad alta risoluzione")
-    events = _refine_extended_harmony(path, base_events, progress=progress, cancelled=cancelled)
+    events = _refine_extended_harmony(path, [_copy_chord_with_label(x, _simplify_chord_label(x.chord)) for x in base_events], progress=progress, cancelled=cancelled)
     if cancelled and cancelled():
         raise InterruptedError("Chord extraction cancelled")
     cleaned: list[Chord] = []
@@ -992,7 +1005,7 @@ def extract_chords_progressive(
             continue
         cleaned.append(item)
     if progress:
-        progress(90, [], "Step finale · stabilizzazione temporale e slash-bass")
+        progress(90, [], "Step finale · semplificazione e stabilizzazione temporale")
         progress(96, [], "Analisi armonica completata")
     return cleaned
 

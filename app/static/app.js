@@ -177,6 +177,7 @@ function closeCurrentProject(){
   if(!current)return toast('Nessun progetto aperto');
   if(activeStemJob&&activeStemProjectId===current.id)return toast('Attendi il completamento della separazione prima di chiudere il progetto.');
   stopPlayback();
+  clearTimedPlaybackOverlay();
   clearTimeout(autosaveTimer);autosaveTimer=null;
   current=null;selectedTrackId=null;pendingExportConfig=null;playCursorMs=0;
   if($('#headerProjectName'))$('#headerProjectName').textContent='No project loaded';
@@ -820,7 +821,7 @@ function textModelCatalog(){return pluginInfo.text_models||{lyrics:{models:[]},c
 function openTextAnalysisChooser(id,kind){
   const cat=textModelCatalog(),track=trackById(id);if(!track)return toast('Traccia non trovata');
   if(kind==='lyrics'){const c=cat.lyrics||{},opts=(c.models||[]).map(m=>`<option value="${esc(m.id)}" ${m.id===c.default_model?'selected':''}>${esc(m.display_name)} · ${m.installed?'installato':(c.storage==='local'?'download locale':'download server')}</option>`).join('');showUtilityModal('Estrai lyrics',`<div class="form-grid"><p><b>Motore:</b> OpenAI Whisper</p><label>Modello<select id="textAnalysisChoice">${opts}</select></label><label class="workflow-check"><input id="lyricsAdvancedAlignment" type="checkbox"> Allineamento avanzato parola / sillaba</label><p class="hint">Pipeline opzionale: Whisper → word timestamps → forced alignment acustico → suddivisione sillabica → timeline MTA. Migliora il posizionamento di lyrics e chords. L’estrazione viene sempre eseguita dall’inizio della traccia e il testo parziale non viene mostrato durante la generazione per evitare duplicati o frasi spezzate.</p><p class="hint">Il modello viene scaricato on-demand (download modello al primo uso) e conservato ${c.storage==='local'?'localmente nell’app nativa':'sul server'}.</p><div class="workflow-note warning"><b>Attenzione:</b> l’estrazione può richiedere molto tempo. La durata dipende dalla lunghezza della traccia, dal modello scelto e dall’hardware CPU/GPU disponibile. Durante l’analisi evita di chiudere l’app o interrompere il dispositivo.</div><div class="form-actions"><button class="utility-btn secondary model-download-btn" type="button" onclick="downloadTextAnalysisSelection('lyrics')">Scarica modello</button><button class="utility-btn primary accent" type="button" onclick="startTrackTextAnalysis('${esc(id)}','lyrics',$('#textAnalysisChoice').value)">Estrai lyrics</button></div></div>`);return}
-  const c=cat.chords||{},models=Object.fromEntries((c.models||[]).map(x=>[x.id,x])),opts=(c.engines||[]).map(e=>{const m=models[e.model_id]||{};let state;if(e.model_id)state=m.installed?'modello installato':(c.storage==='local'?'modello scaricabile localmente':'modello scaricabile sul server');else if(e.id==='chordino'){const r=e.runtime||{};state=e.available?`nessun modello AI · Chordino incluso (${r.host_kind||'Vamp host'})`:(r.reason==='chordino-plugin-missing'?'host Vamp presente · plugin Chordino non rilevato':'runtime Chordino non disponibile');}else state='nessun modello AI richiesto';return `<option value="${esc(e.id)}" ${e.id===c.default_engine?'selected':''} ${e.available?'':'disabled'}>${esc(e.display_name)} · ${esc(state)}</option>`}).join('');showUtilityModal('Estrai chords',`<div class="form-grid"><p><b>Motore che verrà usato:</b> <span id="chordEngineLabel"></span></p><label>Motore / modello<select id="textAnalysisChoice" onchange="updateChordEngineDisclosure()">${opts}</select></label><div id="chordEngineDisclosure" class="workflow-note"></div><div class="workflow-note warning"><b>Attenzione:</b> l’analisi degli accordi può richiedere molto tempo, soprattutto con i motori AI. La durata dipende dalla traccia e dall’hardware CPU/GPU disponibile. L’analisi usa più step: riconoscimento base, chroma armonica estesa, qualità/alterazioni, basso/inversioni e stabilizzazione temporale. La barra di progresso mostra lo step corrente; gli accordi finali vengono pubblicati solo a pipeline conclusa.</div><div class="form-actions"><button class="utility-btn secondary model-download-btn" type="button" onclick="downloadTextAnalysisSelection('chords')">Scarica modello selezionato</button><button class="utility-btn primary accent" type="button" onclick="startTrackTextAnalysis('${esc(id)}','chords',$('#textAnalysisChoice').value)">Estrai chords</button></div></div>`);updateChordEngineDisclosure()}
+  const c=cat.chords||{},models=Object.fromEntries((c.models||[]).map(x=>[x.id,x])),opts=(c.engines||[]).map(e=>{const m=models[e.model_id]||{};let state;if(e.model_id)state=m.installed?'modello installato':(c.storage==='local'?'modello scaricabile localmente':'modello scaricabile sul server');else if(e.id==='chordino'){const r=e.runtime||{};state=e.available?`nessun modello AI · Chordino incluso (${r.host_kind||'Vamp host'})`:(r.reason==='chordino-plugin-missing'?'host Vamp presente · plugin Chordino non rilevato':'runtime Chordino non disponibile');}else state='nessun modello AI richiesto';return `<option value="${esc(e.id)}" ${e.id===c.default_engine?'selected':''} ${e.available?'':'disabled'}>${esc(e.display_name)} · ${esc(state)}</option>`}).join('');showUtilityModal('Estrai chords',`<div class="form-grid"><p><b>Motore che verrà usato:</b> <span id="chordEngineLabel"></span></p><label>Motore / modello<select id="textAnalysisChoice" onchange="updateChordEngineDisclosure()">${opts}</select></label><div id="chordEngineDisclosure" class="workflow-note"></div><div class="workflow-note warning"><b>Attenzione:</b> l’analisi degli accordi può richiedere molto tempo, soprattutto con i motori AI. La durata dipende dalla traccia e dall’hardware CPU/GPU disponibile. L’analisi usa più step: riconoscimento base, chroma armonica, classificazione semplificata, basso/inversioni e stabilizzazione temporale. La barra di progresso mostra lo step corrente; gli accordi finali vengono pubblicati solo a pipeline conclusa.</div><div class="form-actions"><button class="utility-btn secondary model-download-btn" type="button" onclick="downloadTextAnalysisSelection('chords')">Scarica modello selezionato</button><button class="utility-btn primary accent" type="button" onclick="startTrackTextAnalysis('${esc(id)}','chords',$('#textAnalysisChoice').value)">Estrai chords</button></div></div>`);updateChordEngineDisclosure()}
 function updateChordEngineDisclosure(){const c=textModelCatalog().chords||{},id=$('#textAnalysisChoice')?.value,e=(c.engines||[]).find(x=>x.id===id),m=(c.models||[]).find(x=>x.id===e?.model_id),models=Object.fromEntries((c.models||[]).map(x=>[x.id,x]));if($('#chordEngineLabel'))$('#chordEngineLabel').textContent=e?.display_name||id||'—';let html='';if(e?.profile==='fast')html='<b>Fast:</b> usa Chordino se disponibile, altrimenti MTA Chromagram, poi applica il refinement armonico esteso.';else if(e?.profile==='accurate')html=`<b>Accurate:</b> priorità ChordFormer → BTC-HCQT → Madmom → Chordino. ChordFormer: ${models.chordformer?.installed?'installato':'non installato'}; BTC-HCQT: ${models['btc-hcqt']?.installed?'installato':'non installato'}.`;else if(e?.profile==='maximum')html=`<b>Maximum accuracy:</b> ensemble dei recognizer disponibili (ChordFormer, BTC-HCQT, Chordino, Madmom) con voto pesato + bass-chroma/refinement. ChordFormer: ${models.chordformer?.installed?'installato':'non installato'}; BTC-HCQT: ${models['btc-hcqt']?.installed?'installato':'non installato'}.`;else if(e?.model_id)html=`Modello: <b>${esc(m?.display_name||e.model_id)}</b> · ${m?.installed?'installato':'scaricabile dal gestore modelli'}${m?.license?`<br>Licenza/pesi: ${esc(m.license)}`:''}`;else html='Questo motore non richiede un modello AI scaricabile.';if($('#chordEngineDisclosure'))$('#chordEngineDisclosure').innerHTML=html}
 async function downloadTextAnalysisSelection(kind){const cat=textModelCatalog(),choice=$('#textAnalysisChoice')?.value;try{let modelId=choice;if(kind==='chords'){const e=(cat.chords?.engines||[]).find(x=>x.id===choice);if(!e?.model_id)return toast('Il motore selezionato non richiede un modello');modelId=e.model_id}await startModelDownload(kind,modelId,async()=>{pluginInfo=await api('/api/plugins');toast(currentUser?.native_single_user?'Modello scaricato localmente':'Modello scaricato sul server');if(kind==='chords')updateChordEngineDisclosure()})}catch(e){toast(e.message)}}
 async function startTrackTextAnalysis(id,kind,choice=''){
@@ -1631,26 +1632,7 @@ function bindTrackResizer(){
     window.addEventListener('mousemove',move);window.addEventListener('mouseup',up);
   };
 }
-function drawWave(t){
-  const c=$('#wave-'+t.id);if(!c)return;
-  const ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);
-  const peaks=t.waveform_peaks||[];if(!peaks.length)return;
-  const color=t.color||'#2f81f7';ctx.strokeStyle=color;ctx.globalAlpha=.9;ctx.lineWidth=1;
-  const sourceDuration=Math.max(1,t.duration_ms||1);
-  for(const clip of t.clips||[]){
-    const tl=Math.max(0,effectiveClipStartMs(t,clip))/1000*pxPerSec,tw=(clip.source_end_ms-clip.source_start_ms)/1000*pxPerSec;
-    const x0=Math.max(0,Math.floor(tl)),x1=Math.min(c.width,Math.ceil(tl+tw));
-    ctx.beginPath();
-    for(let x=x0;x<x1;x++){
-      const frac=(x-tl)/Math.max(1,tw);
-      const srcMs=clip.source_start_ms+frac*(clip.source_end_ms-clip.source_start_ms);
-      const idx=Math.max(0,Math.min(peaks.length-1,Math.floor(srcMs/sourceDuration*peaks.length)));
-      const amp=Number(peaks[idx]||0);
-      ctx.moveTo(x+.5,39-amp*29);ctx.lineTo(x+.5,39+amp*29);
-    }
-    ctx.stroke();
-  }
-}
+// Waveform renderer is defined later with zoom-aware high-resolution envelope support.
 function updateWaveProgress(trackId,pct,message){
   const box=$(`#wave-progress-${trackId}`),bar=$(`#wave-progress-bar-${trackId}`),label=$(`#wave-progress-label-${trackId}`);
   if(!box)return;box.classList.remove('hidden');if(bar)bar.style.width=`${Math.max(2,Math.min(100,Number(pct)||0))}%`;if(label)label.textContent=message||'Waveform…';
@@ -2096,43 +2078,63 @@ async function drawWave(t){
   const c=$('#wave-'+t.id);if(!c)return;
   const ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);
   const peaks=Array.isArray(t.waveform_peaks)?t.waveform_peaks:[];
-  if(!peaks.length){ctx.fillStyle='#6d8294';ctx.fillText('waveform unavailable',10,39);return}
-  const color=t.color||'#2f81f7',mid=c.height/2,amp=Math.max(4,c.height*.36);
-  ctx.strokeStyle=color;ctx.globalAlpha=.86;ctx.lineWidth=1;
+  if(!peaks.length){ctx.fillStyle='#6d8294';ctx.fillText('waveform unavailable',10,Math.max(16,c.height/2));return}
+  const color=t.color||'#2f81f7',mid=c.height/2,scale=Math.max(4,c.height*.43);
+  // r207 signed min/max cache: [min0,max0,min1,max1,...]. Legacy projects
+  // contain positive absolute peaks only and remain fully drawable until their
+  // waveform revision causes an automatic high-resolution regeneration.
+  const signedEnvelope=peaks.length>=4096&&peaks.length%2===0&&peaks.some(v=>Number(v)<0);
+  const bins=signedEnvelope?peaks.length/2:peaks.length;
   const durationMs=Math.max(1,Number(t.duration_ms||0));
+  const sampleBin=(position,fromBin,toBin)=>{
+    const a=Math.max(fromBin,Math.min(toBin-1,Math.floor(position)));
+    const b=Math.max(fromBin,Math.min(toBin-1,a+1));
+    const f=Math.max(0,Math.min(1,position-a));
+    if(signedEnvelope){
+      return [Number(peaks[a*2]||0)*(1-f)+Number(peaks[b*2]||0)*f,Number(peaks[a*2+1]||0)*(1-f)+Number(peaks[b*2+1]||0)*f];
+    }
+    const v=Number(peaks[a]||0)*(1-f)+Number(peaks[b]||0)*f;return[-v,v];
+  };
   for(const clip of t.clips||[]){
     const sourceStart=Math.max(0,Number(clip.source_start_ms||0));
     const sourceEnd=Math.max(sourceStart+1,Number(clip.source_end_ms||durationMs));
     const tl=Math.max(0,effectiveClipStartMs(t,clip))/1000*pxPerSec;
-    const tw=(sourceEnd-sourceStart)/1000*pxPerSec;
-    if(tw<=0)continue;
-    const firstBin=Math.max(0,Math.min(peaks.length-1,Math.floor(sourceStart/durationMs*peaks.length)));
-    const lastBin=Math.max(firstBin+1,Math.min(peaks.length,Math.ceil(sourceEnd/durationMs*peaks.length)));
+    const tw=(sourceEnd-sourceStart)/1000*pxPerSec;if(tw<=0)continue;
+    const firstBin=Math.max(0,Math.min(bins-1,Math.floor(sourceStart/durationMs*bins)));
+    const lastBin=Math.max(firstBin+1,Math.min(bins,Math.ceil(sourceEnd/durationMs*bins)));
     const sourceBins=Math.max(1,lastBin-firstBin);
-    // One visual column per visible pixel keeps the waveform dense at every zoom.
-    // When zoomed out each pixel aggregates source peaks; when zoomed in we
-    // interpolate between cached peaks instead of leaving large empty gaps.
+    // Match visible detail to the screen: zoomed out pixels aggregate all extrema
+    // falling in the pixel; zoomed in columns interpolate between cached bins.
     const columns=Math.max(1,Math.ceil(tw));
-    const xStep=tw/columns;
-    ctx.beginPath();
+    const xStep=tw/columns,tops=[],bottoms=[];
     for(let col=0;col<columns;col++){
-      const from=firstBin+col*sourceBins/columns;
-      const to=firstBin+(col+1)*sourceBins/columns;
-      let peak=0;
+      const from=firstBin+col*sourceBins/columns,to=firstBin+(col+1)*sourceBins/columns;
+      let lo=0,hi=0;
       if(to-from>=1){
-        const a=Math.floor(from),b=Math.max(a+1,Math.ceil(to));
-        for(let i=a;i<Math.min(lastBin,b);i++)peak=Math.max(peak,Number(peaks[i]||0));
-      }else{
-        const a=Math.max(firstBin,Math.min(lastBin-1,Math.floor(from)));
-        const b=Math.max(firstBin,Math.min(lastBin-1,a+1));
-        const frac=Math.max(0,Math.min(1,from-a));
-        peak=Number(peaks[a]||0)*(1-frac)+Number(peaks[b]||0)*frac;
-      }
+        const a=Math.max(firstBin,Math.floor(from)),b=Math.min(lastBin,Math.max(a+1,Math.ceil(to)));
+        lo=1;hi=-1;
+        for(let i=a;i<b;i++){
+          if(signedEnvelope){lo=Math.min(lo,Number(peaks[i*2]||0));hi=Math.max(hi,Number(peaks[i*2+1]||0))}
+          else{const v=Math.max(0,Number(peaks[i]||0));lo=Math.min(lo,-v);hi=Math.max(hi,v)}
+        }
+        if(lo>hi){lo=hi=0}
+      }else [lo,hi]=sampleBin(from,firstBin,lastBin);
+      // Tiny visual interpolation avoids staircase edges without altering transient height.
+      if(col>0){lo=lo*.82+bottoms[col-1].v*.18;hi=hi*.82+tops[col-1].v*.18}
       const x=tl+(col+.5)*xStep;
-      const h=Math.min(1,peak)*amp;
-      ctx.moveTo(x,mid-h);ctx.lineTo(x,mid+h);
+      tops.push({x,y:mid-Math.max(-1,Math.min(1,hi))*scale,v:hi});
+      bottoms.push({x,y:mid-Math.max(-1,Math.min(1,lo))*scale,v:lo});
     }
-    ctx.stroke();
+    if(!tops.length)continue;
+    ctx.save();
+    ctx.globalAlpha=.28;ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(tops[0].x,tops[0].y);
+    for(let i=1;i<tops.length;i++)ctx.lineTo(tops[i].x,tops[i].y);
+    for(let i=bottoms.length-1;i>=0;i--)ctx.lineTo(bottoms[i].x,bottoms[i].y);
+    ctx.closePath();ctx.fill();
+    ctx.globalAlpha=.9;ctx.strokeStyle=color;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(tops[0].x,tops[0].y);
+    for(let i=1;i<tops.length;i++)ctx.lineTo(tops[i].x,tops[i].y);ctx.stroke();
+    ctx.globalAlpha=.62;ctx.beginPath();ctx.moveTo(bottoms[0].x,bottoms[0].y);
+    for(let i=1;i<bottoms.length;i++)ctx.lineTo(bottoms[i].x,bottoms[i].y);ctx.stroke();ctx.restore();
   }
 }
 function setZoom(v){pxPerSec=Number(v);if(current){current.timeline_zoom_px_per_sec=pxPerSec;markDirty(150)}if($('#topZoom'))$('#topZoom').value=v;render()}
@@ -2191,6 +2193,12 @@ function activeTimedItem(items,timeMs){return timedItemTriplet(items,timeMs).cur
 function timedOverlayTripletHtml(previous,current,next,formatter){
   const item=(value,role)=>`<span class="timed-overlay-item ${role}">${esc(value?formatter(value):'')}</span>`;
   return `${item(previous,'previous')}${item(current,'current')}${item(next,'next')}`;
+}
+function clearTimedPlaybackOverlay(){
+  const overlay=$('#liveTimedOverlay'),lyricBox=$('#liveLyricBox'),chordBox=$('#liveChordBox');
+  if(lyricBox){lyricBox.textContent='';lyricBox.innerHTML='';lyricBox.classList.add('hidden');lyricBox.classList.remove('with-neighbors')}
+  if(chordBox){chordBox.textContent='';chordBox.innerHTML='';chordBox.classList.add('hidden');chordBox.classList.remove('with-neighbors')}
+  overlay?.classList.add('hidden');
 }
 function updateTimedPlaybackOverlay(timeMs){
   const overlay=$('#liveTimedOverlay'),lyricBox=$('#liveLyricBox'),chordBox=$('#liveChordBox');if(!overlay||!lyricBox||!chordBox)return;
@@ -2969,7 +2977,9 @@ async function previewProjectLyricsPdf(){
     const color=$('#lyricsPdfChordColorExpanded')?.value||$('#lyricsPdfChordColor')?.value||'#7B1FA2';
     const previewUrl=`/api/projects/${current.id}/lyrics.pdf.preview?chord_color=${encodeURIComponent(color)}&t=${Date.now()}`;
     const probe=await fetch(previewUrl,{credentials:'same-origin'});if(!probe.ok)throw new Error(await probe.text());
-    showUtilityModal(title,`<div class="pdf-preview-toolbar"><button class="utility-btn secondary pdf-preview-return" type="button" onclick="closeLyricsPdfPreview()">← Torna all'editor</button><button class="utility-btn primary pdf-preview-save" type="button" onclick="downloadProjectLyricsPdf()">Salva PDF Lyrics + Chords + Markers</button></div><div class="pdf-preview-wrap"><iframe class="pdf-preview-frame" title="${esc(title)}" src="${previewUrl}"></iframe></div><div class="utility-actions pdf-preview-actions"><button class="utility-btn secondary pdf-preview-return" type="button" onclick="closeLyricsPdfPreview()">← Torna all'editor</button><button class="utility-btn primary pdf-preview-save" type="button" onclick="downloadProjectLyricsPdf()">Salva PDF Lyrics + Chords + Markers</button></div>`);
+    const previewHtml=await probe.text(),parsed=new DOMParser().parseFromString(previewHtml,'text/html');
+    const pages=parsed.querySelector('.pages');if(!pages||!pages.querySelector('img'))throw new Error('Anteprima PDF vuota');
+    showUtilityModal(title,`<div class="pdf-preview-toolbar"><button class="utility-btn secondary pdf-preview-return" type="button" onclick="closeLyricsPdfPreview()">← Torna all'editor</button><button class="utility-btn primary pdf-preview-save" type="button" onclick="downloadProjectLyricsPdf()">Salva PDF Lyrics + Chords + Markers</button></div><div class="pdf-preview-wrap"><div class="pdf-rendered-pages">${pages.innerHTML}</div></div><div class="utility-actions pdf-preview-actions"><button class="utility-btn secondary pdf-preview-return" type="button" onclick="closeLyricsPdfPreview()">← Torna all'editor</button><button class="utility-btn primary pdf-preview-save" type="button" onclick="downloadProjectLyricsPdf()">Salva PDF Lyrics + Chords + Markers</button></div>`);
     document.querySelector('.utility-modal')?.classList.add('pdf-real-preview-modal');
     hideMediaProgress();
   }catch(e){hideMediaProgress();toast(e.message)}
@@ -3758,8 +3768,8 @@ async function refreshDynamicTrackPlayback(trackId){
 }
 function playbackActuallyRunning(){if(waPlaybackActive)return !waPlaybackPaused;const masterRunning=!!(playAudio&&!playAudio.paused&&!playAudio.ended);return masterRunning||trackPlaybacks.some(item=>item.audio&&!item.audio.paused&&!item.audio.ended)}
 function stopPlayback(){
-  if(waPlaybackActive){playCursorMs=waProjectCursorMs();waStopSources();for(const item of trackPlaybacks)for(const n of [item.gainNode,item.panner,item.splitter,...(item.analysers||[])])try{n?.disconnect()}catch(e){};trackPlaybacks=[];try{waMasterBus?.disconnect()}catch(e){};try{masterPlaybackGainNode?.disconnect()}catch(e){};waMasterBus=null;masterPlaybackGainNode=null;masterMeterAnalysers=null;waPlaybackActive=false;waPlaybackPaused=false;playAudio=null;meterRunToken++;if(playRaf){cancelAnimationFrame(playRaf);playRaf=null}if(meterRaf){cancelAnimationFrame(meterRaf);meterRaf=null}resetVuMeters();if($('#playMaster')){$('#playMaster').textContent='▶';$('#playMaster').title='Play / Preview'};return}
-  ++playbackToken;playbackBuffering=false;playbackPaused=false;transportClockRunning=false;transportClockCursorMs=playCursorMs;meterRunToken++;if(playRaf){cancelAnimationFrame(playRaf);playRaf=null}if(meterRaf){cancelAnimationFrame(meterRaf);meterRaf=null}if(playAudio){playAudio.pause();playAudio.currentTime=0;playAudio=null}for(const item of trackPlaybacks){try{item.audio.pause();item.audio.currentTime=0;item.audio.removeAttribute('src');item.audio.load()}catch(e){}}trackPlaybacks=[];masterMeterAnalysers=null;masterPlaybackGainNode=null;renderedMasterPlayback=false;renderedStemPlayback=false;resetVuMeters()
+  if(waPlaybackActive){playCursorMs=waProjectCursorMs();waStopSources();for(const item of trackPlaybacks)for(const n of [item.gainNode,item.panner,item.splitter,...(item.analysers||[])])try{n?.disconnect()}catch(e){};trackPlaybacks=[];try{waMasterBus?.disconnect()}catch(e){};try{masterPlaybackGainNode?.disconnect()}catch(e){};waMasterBus=null;masterPlaybackGainNode=null;masterMeterAnalysers=null;waPlaybackActive=false;waPlaybackPaused=false;playAudio=null;meterRunToken++;if(playRaf){cancelAnimationFrame(playRaf);playRaf=null}if(meterRaf){cancelAnimationFrame(meterRaf);meterRaf=null}resetVuMeters();if($('#playMaster')){$('#playMaster').textContent='▶';$('#playMaster').title='Play / Preview'};clearTimedPlaybackOverlay();return}
+  ++playbackToken;playbackBuffering=false;playbackPaused=false;transportClockRunning=false;transportClockCursorMs=playCursorMs;meterRunToken++;if(playRaf){cancelAnimationFrame(playRaf);playRaf=null}if(meterRaf){cancelAnimationFrame(meterRaf);meterRaf=null}if(playAudio){playAudio.pause();playAudio.currentTime=0;playAudio=null}for(const item of trackPlaybacks){try{item.audio.pause();item.audio.currentTime=0;item.audio.removeAttribute('src');item.audio.load()}catch(e){}}trackPlaybacks=[];masterMeterAnalysers=null;masterPlaybackGainNode=null;renderedMasterPlayback=false;renderedStemPlayback=false;resetVuMeters();clearTimedPlaybackOverlay()
 }
 function pausePlayback(){if(waPlaybackActive){playCursorMs=waProjectCursorMs();waStartCursorMs=playCursorMs;waPlaybackPaused=true;waStopSources();if(playRaf){cancelAnimationFrame(playRaf);playRaf=null}if($('#playMaster')){$('#playMaster').textContent='▶';$('#playMaster').title='Riprendi'};return}if(!playAudio&&!trackPlaybacks.length)return;pauseTransportClock();if(playAudio)playAudio.pause();for(const item of trackPlaybacks)try{item.audio.pause()}catch(e){};playbackPaused=true}
 async function resumePlayback(){if(waPlaybackActive){await audioCtx.resume();waScheduleAll(playCursorMs);if($('#playMaster')){$('#playMaster').textContent='❚❚';$('#playMaster').title='Pausa'};if(!playRaf)playRaf=requestAnimationFrame(movePlayhead);if(current?.realtime_meter_enabled&&!meterRaf)startVuMeterLoop();return}return previewMaster()}

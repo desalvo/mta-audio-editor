@@ -67,7 +67,8 @@ def test_native_api_can_save_and_open_project_archive(tmp_path, monkeypatch):
     opened = api.open_project()
     assert opened["ok"] is True
     assert opened["project"]["target"] == "MTA16"
-    assert opened["project"]["id"] != project.id
+    assert opened["project"]["id"] == project.id
+    assert opened.get("workspace") is True
 
 
 @pytest.mark.skipif(shutil.which("ffmpeg") is None, reason="FFmpeg required")

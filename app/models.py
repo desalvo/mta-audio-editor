@@ -95,7 +95,7 @@ class Track(BaseModel):
     color: str = Field(default="#2f81f7", pattern=r"^#[0-9A-Fa-f]{6}$")
     clips: list[Clip] = Field(default_factory=list)
     inserts: list[InsertPlugin] = Field(default_factory=list, max_length=16)
-    waveform_peaks: list[float] = Field(default_factory=list, max_length=2048)
+    waveform_peaks: list[float] = Field(default_factory=list, max_length=8192)
     waveform_revision: str = Field(default="", max_length=128)
     channels: int = Field(default=0, ge=0, le=32)
     channel_layout: str = Field(default="", max_length=64)
