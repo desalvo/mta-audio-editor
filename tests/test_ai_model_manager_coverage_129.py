@@ -93,7 +93,9 @@ def test_chord_catalog_availability_snapshot_and_validation(monkeypatch, tmp_pat
     monkeypatch.setenv("XDG_CACHE_HOME", str(tmp_path / "xdg"))
     real_find_spec = m.importlib.util.find_spec
     monkeypatch.setattr(m.importlib.util, "find_spec", lambda name: object() if name.startswith("madmom_infer") else real_find_spec(name))
-    monkeypatch.setattr("shutil.which", lambda name: "/usr/bin/sonic-annotator" if name == "sonic-annotator" else None)
+    import app.chordino_runtime as cr
+    cr.clear_chordino_probe_cache()
+    monkeypatch.setattr(cr, "chordino_status", lambda: {"available": True, "host": "/usr/bin/sonic-annotator", "host_kind": "sonic-annotator", "plugin": True, "reason": None})
 
     assert m.chord_engine_available("madmom-deep-chroma") is True
     assert m.chord_engine_available("madmom-cnn-crf") is True

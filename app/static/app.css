@@ -1161,3 +1161,10 @@ body.native-single-user .main-area{grid-template-rows:minmax(120px,1fr) var(--mi
 .inspector-close{position:sticky;right:0;z-index:45}
 .mixer-dock{z-index:0}
 @media(max-width:900px){.inspector{max-height:none}.inspector-body{-webkit-overflow-scrolling:touch}}
+
+/* r197: when opening timed Lyrics/Chords/Markers editors, keep the event nearest
+   to the current transport position visibly identifiable. */
+.timed-editor-row.timed-current-row {
+  outline: 2px solid currentColor;
+  outline-offset: -2px;
+}

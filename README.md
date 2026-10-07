@@ -174,3 +174,6 @@ New projects are immediately loaded into the complete editor workspace. YouTube 
 ## Versioning
 
 Public releases use semantic version tags such as `v0.2.0`. `REVISION` identifies the exact source/package revision within that release, while `BUILD_INFO` is the independent 14-digit build identifier.
+
+### Chord extraction profiles (r195)
+Chord extraction now offers **Fast**, **Accurate**, and **Maximum accuracy** profiles. Fast favors Chordino/MTA Chromagram; Accurate uses the best installed recognizer (ChordFormer, BTC-HCQT, Madmom, Chordino); Maximum combines multiple recognizers using a weighted ensemble and then applies extended-harmony and bass-chroma refinement. ChordFormer and BTC-HCQT are available on demand from the AI Model Manager.

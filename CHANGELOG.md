@@ -1,3 +1,28 @@
+## 0.2.0-r197
+
+- Peak-normalize generated Metronome and Chords guide audio to 0 dBFS and reset their generated-track faders to 0.0 dB.
+- Track deletion is now a single logical-delete transaction; the UI updates immediately without a pre-delete full native archive save.
+- Added a persistent, crash-safe project garbage-collection journal for unreferenced audio. Cleanup runs asynchronously and resumes/reconciles on restart.
+- Generated Metronome/Chords assets are disposable when their tracks are deleted; reusable imported Project Clips remain protected.
+- Native project archives exclude pending-GC journal entries and files already logically deleted.
+
+
+## 0.2.0-r196
+- Fixed Lyrics + Chords + Markers editor rendering so word-level/automatic chords remain visible when lyrics are editor-only auto-syllabified; chords can again be selected and reassigned to individual syllables.
+- Added staged project-opening progress for workspace, recent native projects, and native project files, covering project loading, metadata/tracks initialization, waveform/UI setup, workspace refresh, and audio prewarm.
+
+## 0.2.0-r195
+- Added Fast, Accurate and Maximum-accuracy chord extraction profiles.
+- Added on-demand BTC-HCQT and ChordFormer model integrations.
+- Added weighted multi-engine ensemble recognition with common extended harmony/bass refinement.
+- Added model-manager metadata and progress disclosure for the new chord engines.
+
+## 0.2.0-r194
+- Chordino/NNLS-Chroma is now bundled in Docker/Kubernetes and native desktop builds instead of relying on a host installation.
+- Linux/Kubernetes builds compile upstream NNLS-Chroma natively and use vamp-simple-host, including amd64/arm64 images.
+- macOS native builds compile and bundle Chordino plus a private Vamp host; Windows bundles Sonic Annotator plus an x64 NNLS-Chroma runtime.
+- Runtime discovery validates the actual `nnls-chroma:chordino` plugin and exposes host/plugin diagnostics to the UI.
+- Native apps configure private PATH/VAMP_PATH automatically, so no system-wide plugin installation is required.
 ## 0.2.0-r193
 
 - Inspector/plugin panel header is now always visible and reachable.
@@ -599,3 +624,5 @@
 - Editor preserves scroll position after operations; added cut/copy/paste and undo/redo.
 - Moved Dividi qui to the word context menu and compacted editor rows/timestamps.
 - Added saving-in-progress overlay and close protection while persistence completes.
+
+- Edit Lyrics / Edit Chords / Edit Markers now open scrolled to the event nearest the current timeline/playhead position, without moving the transport.

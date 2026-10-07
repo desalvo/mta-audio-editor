@@ -17,8 +17,7 @@ def test_chord_job_does_not_expose_inline_chords():
     main = (ROOT / "app/main.py").read_text(encoding="utf-8")
     music = (ROOT / "app/music_text.py").read_text(encoding="utf-8")
     assert 'partial={"kind":"chords","items":[]}' in main
-    assert "one complete pass" in music
-    assert "partial chord data stays empty" in music
+    assert "Multi-stage chord extraction" in music
 
 
 def test_analysis_dialogs_warn_about_long_processing_time():

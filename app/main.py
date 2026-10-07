@@ -22,7 +22,7 @@ from fastapi.staticfiles import StaticFiles
 
 from .audio_engine import auto_align_ms, delete_range, delete_song_range, ensure_clips, estimate_bpm_and_signature, generate_chords_piano_wav, generate_metronome_wav, media_duration_ms, project_duration_ms, render_mix, render_track, render_track_export, shift_track, waveform_peaks
 from .codec import export_mta, ffprobe, import_mta, resolve_mta_device_profile, suggested_slots, validate_slot_mapping
-from .models import AutoMixRequest, Clip, CustomPresetRequest, DeleteRangeRequest, InstantiateProjectClipRequest, UpdateProjectClipRequest, MoveTrackRequest, TrackDelayRequest, MtaExportRequest, Project, ProjectClip, ProjectExportRequest, RightsRecord, Track, SampleEditRequest, SampleEffectRequest
+from .models import AutoMixRequest, Clip, CustomPresetRequest, DeleteRangeRequest, DeleteTracksRequest, InstantiateProjectClipRequest, UpdateProjectClipRequest, MoveTrackRequest, TrackDelayRequest, MtaExportRequest, Project, ProjectClip, ProjectExportRequest, RightsRecord, Track, SampleEditRequest, SampleEffectRequest
 from .plugins import STEM_SPLITTER, delete_user_preset, plugin_manifest, save_user_preset
 
 from .model_updater import (COREML_DIR, ONNX_DIR, start_background_updater, update_once as update_mobile_demucs_models,
@@ -64,6 +64,8 @@ from .storage import (
     validate_project_files,
     write_project_archive,
     ROOT as STORAGE_ROOT,
+    schedule_project_gc,
+    resume_pending_gc,
 )
 from .rights_registry import (provider_catalog as rights_provider_catalog, search_provider as search_rights_provider, search_musicbrainz_metadata, resolve_musicbrainz_metadata)
 from . import sample_editor as sample_editor_engine
@@ -89,8 +91,9 @@ def _musical_export_project(project: Project) -> Project:
     return export_project
 
 @app.on_event("startup")
-def _start_demucs_model_updater():
+def _start_background_services():
     start_background_updater()
+    resume_pending_gc()
 LOGGER = logging.getLogger(__name__)
 BASE = Path(__file__).parent
 MAX_UPLOAD_BYTES = int(os.getenv("MTA_MAX_UPLOAD_MB", "1024")) * 1024 * 1024
@@ -2297,11 +2300,38 @@ def instantiate_project_clip(pid: str, clip_id: str, req: InstantiateProjectClip
     return {"project": project, "track": track, "clip": asset}
 
 
+def _disposable_generated_track(track: Track) -> bool:
+    name = str(getattr(track, "name", "") or "").strip().lower()
+    filename = str(getattr(track, "filename", "") or "").lower()
+    return (
+        str(getattr(track, "type", "") or "").lower() == "click"
+        or "metronom" in name
+        or filename.startswith("metronome-")
+        or name in {"chords", "accordi", "chords piano", "accordi piano"}
+        or filename.startswith("chords-piano-")
+    )
+
+
 @app.post("/api/projects/{pid}/delete-tracks")
-def delete_tracks(pid: str, request: Request, track_ids: list[str]):
-    project = _project_for_actor(request, pid)
+def delete_tracks(pid: str, req: DeleteTracksRequest | list[str], request: Request):
+    persisted = _project_for_actor(request, pid)
+    snapshot = req.project if isinstance(req, DeleteTracksRequest) else None
+    requested_ids = req.track_ids if isinstance(req, DeleteTracksRequest) else req
+    project = snapshot.model_copy(deep=True) if snapshot is not None else persisted.model_copy(deep=True)
+    if project.id != pid:
+        raise HTTPException(400, "project id mismatch")
+    # Preserve security-owned fields and durable reusable clip assets from the authoritative copy.
+    project.owner_user_id = persisted.owner_user_id
+    project.shared_with_user_ids = persisted.shared_with_user_ids
+    _ensure_project_clip_library(persisted)
+    known_clip_files = {item.filename for item in project.clip_library}
+    for item in persisted.clip_library:
+        if item.filename not in known_clip_files:
+            project.clip_library.append(item)
+            known_clip_files.add(item.filename)
     _ensure_project_clip_library(project)
-    wanted = {str(track_id) for track_id in track_ids}
+
+    wanted = {str(track_id) for track_id in requested_ids}
     if not wanted:
         raise HTTPException(400, "no tracks selected")
     known = {track.id for track in project.tracks}
@@ -2309,12 +2339,28 @@ def delete_tracks(pid: str, request: Request, track_ids: list[str]):
         raise HTTPException(400, "unknown track id")
     removed = [track for track in project.tracks if track.id in wanted]
     project.tracks = [track for track in project.tracks if track.id not in wanted]
+
+    # Generated guide tracks are disposable assets; imported/project clips remain reusable.
+    remaining_files = {track.filename for track in project.tracks}
+    disposable_asset_ids = {track.source_clip_id for track in removed if track.source_clip_id and _disposable_generated_track(track)}
+    disposable_files = {track.filename for track in removed if _disposable_generated_track(track)}
+    project.clip_library = [
+        item for item in project.clip_library
+        if not (
+            item.filename not in remaining_files
+            and (item.id in disposable_asset_ids or item.filename in disposable_files)
+        )
+    ]
+
+    try:
+        validate_project_files(project)
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from exc
+
+    # Logical delete is the transaction boundary: commit project.json first.
     save_project(project)
-    # Remove only working audio no longer referenced by any remaining track.
-    still_referenced = {track.filename for track in project.tracks} | {item.filename for item in project.clip_library}
-    for track in removed:
-        if track.filename not in still_referenced:
-            audio_path(pid, track.filename).unlink(missing_ok=True)
+    # Physical cleanup is durable, retryable and intentionally outside request latency.
+    schedule_project_gc(pid, {track.filename for track in removed if track.filename})
     return project
 
 
@@ -3409,6 +3455,7 @@ def _create_metronome_track_locked(pid: str, request: Request):
             duration_ms=duration_ms,
             channels=1,
             channel_layout="mono",
+            volume_db=0.0,
             waveform_peaks=peaks,
             waveform_revision="",
             clips=[
@@ -3428,6 +3475,7 @@ def _create_metronome_track_locked(pid: str, request: Request):
         track.duration_ms = duration_ms
         track.channels = 1
         track.channel_layout = "mono"
+        track.volume_db = 0.0
         track.waveform_peaks = peaks
         track.clips = [
             Clip(
@@ -3491,6 +3539,7 @@ def _create_chords_track_locked(pid: str, request: Request):
             duration_ms=duration_ms,
             channels=2,
             channel_layout="stereo",
+            volume_db=0.0,
             color="#8B5CF6",
             waveform_peaks=peaks,
             waveform_revision="",
@@ -3504,6 +3553,7 @@ def _create_chords_track_locked(pid: str, request: Request):
         track.duration_ms = duration_ms
         track.channels = 2
         track.channel_layout = "stereo"
+        track.volume_db = 0.0
         track.waveform_peaks = peaks
         track.clips = [Clip(
             id=(track.clips[0].id if track.clips else uuid.uuid4().hex[:10]),

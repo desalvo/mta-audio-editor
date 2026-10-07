@@ -41,7 +41,10 @@ def test_karaoke_ass_line_level_and_can_hide_chords(tmp_path: Path):
 
 def test_chordino_backend_parses_stdout(monkeypatch, tmp_path: Path):
     import app.music_text as mt
-    monkeypatch.setattr(mt.shutil, "which", lambda name: "/usr/bin/sonic-annotator" if name == "sonic-annotator" else None)
+    import app.chordino_runtime as cr
+    monkeypatch.setattr(cr, "chordino_status", lambda: {"available": True, "host": "/usr/bin/sonic-annotator", "host_kind": "sonic-annotator", "plugin": True})
+    monkeypatch.setattr(cr, "chordino_host_path", lambda: "/usr/bin/sonic-annotator")
+    monkeypatch.setattr(cr, "host_kind", lambda path=None: "sonic-annotator")
     monkeypatch.setattr(
         mt.subprocess,
         "run",

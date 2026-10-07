@@ -86,6 +86,12 @@ def _prepare_environment() -> Path:
     bundled_bin = _bundle_root() / "bin"
     if bundled_bin.is_dir():
         os.environ["PATH"] = str(bundled_bin) + os.pathsep + os.environ.get("PATH", "")
+    try:
+        from app.chordino_runtime import configure_chordino_environment, clear_chordino_probe_cache
+        configure_chordino_environment(bundle_root=_bundle_root())
+        clear_chordino_probe_cache()
+    except Exception as exc:
+        print(f"Chordino runtime setup unavailable: {exc}", file=sys.stderr)
     return root
 
 

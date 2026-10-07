@@ -1,3 +1,21 @@
+## 0.2.0-r197
+
+Generated Metronome and Chords tracks are now peak-normalized to 0 dBFS. Track deletion commits logical state immediately and moves physical file cleanup to a durable background GC queue that survives crashes/restarts while never deleting referenced Project Clip assets.
+
+
+## 0.2.0-r196
+- Fixed Lyrics + Chords + Markers editor rendering so word-level/automatic chords remain visible when lyrics are editor-only auto-syllabified; chords can again be selected and reassigned to individual syllables.
+- Added staged project-opening progress for workspace, recent native projects, and native project files, covering project loading, metadata/tracks initialization, waveform/UI setup, workspace refresh, and audio prewarm.
+
+## 0.2.0-r195
+Chord extraction now offers Fast, Accurate and Maximum accuracy profiles. Accurate can use ChordFormer or BTC-HCQT when installed; Maximum combines multiple available recognizers and applies the existing extended harmony and bass/inversion refinement. Models are downloaded on demand through the AI Model Manager.
+
+## 0.2.0-r194
+- Chordino/NNLS-Chroma is now bundled in Docker/Kubernetes and native desktop builds instead of relying on a host installation.
+- Linux/Kubernetes builds compile upstream NNLS-Chroma natively and use vamp-simple-host, including amd64/arm64 images.
+- macOS native builds compile and bundle Chordino plus a private Vamp host; Windows bundles Sonic Annotator plus an x64 NNLS-Chroma runtime.
+- Runtime discovery validates the actual `nnls-chroma:chordino` plugin and exposes host/plugin diagnostics to the UI.
+- Native apps configure private PATH/VAMP_PATH automatically, so no system-wide plugin installation is required.
 ## 0.2.0-r193
 
 - Inspector/plugin panel header is now always visible and reachable.
@@ -543,3 +561,5 @@ The combined Lyrics + Chords + Markers editor now uses contextual actions for wh
 
 ### r183
 Improves Lyrics + Chords + Markers PDF preview and editing, including syllable/edge/chord-sequence anchors, stable scrolling, clipboard/history, compact rows, context split, page-break chord styling, and explicit save progress.
+
+- Edit Lyrics / Edit Chords / Edit Markers now open scrolled to the event nearest the current timeline/playhead position, without moving the transport.

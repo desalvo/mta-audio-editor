@@ -37,7 +37,7 @@ def test_harmonic_refinement_can_emit_slash_bass(monkeypatch, tmp_path):
 
 def test_progressive_pipeline_reports_multiple_harmonic_steps():
     source = Path("app/music_text.py").read_text(encoding="utf-8")
-    for token in ["Step 1/5", "Step 2/5", "Analisi basso e inversioni / slash chords", "Step 5/5"]:
+    for token in ["Step 1", "Step 3", "Analisi basso e inversioni / slash chords", "Step finale"]:
         assert token in source
 
 

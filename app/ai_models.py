@@ -39,14 +39,21 @@ CHORD_MODELS = [
         "quality": "high",
         "license": "CC BY-NC-SA 4.0 (checkpoint weights; non-commercial)",
     },
+    {"id": "btc-hcqt", "display_name": "BTC-HCQT (Beatles-FT)", "engine": "btc-hcqt", "quality": "high", "license": "MIT (code + published weights)"},
+    {"id": "chordformer", "display_name": "ChordFormer 5-fold ensemble", "engine": "chordformer", "quality": "very-high", "license": "Research implementation; upstream checkpoints downloaded on demand"},
 ]
 CHORD_ENGINES = [
+    {"id": "profile-fast", "display_name": "Fast · Chordino/Chromagram + harmonic refinement", "model_id": None, "ai": False, "profile": "fast"},
+    {"id": "profile-accurate", "display_name": "Accurate · ChordFormer/BTC + harmonic refinement", "model_id": None, "ai": True, "profile": "accurate"},
+    {"id": "profile-maximum", "display_name": "Maximum accuracy · Ensemble multi-engine", "model_id": None, "ai": True, "profile": "maximum"},
+    {"id": "chordformer", "display_name": "ChordFormer 5-fold ensemble", "model_id": "chordformer", "ai": True},
+    {"id": "btc-hcqt", "display_name": "BTC-HCQT (Beatles-FT)", "model_id": "btc-hcqt", "ai": True},
     {"id": "madmom-deep-chroma", "display_name": "Madmom Deep Chroma + CRF", "model_id": "madmom-deep-chroma-crf", "ai": True},
     {"id": "madmom-cnn-crf", "display_name": "Madmom CNN + CRF", "model_id": "madmom-cnn-crf", "ai": True},
     {"id": "chordino", "display_name": "Chordino / NNLS-Chroma", "model_id": None, "ai": False},
     {"id": "mta-chromagram", "display_name": "MTA Chromagram", "model_id": None, "ai": False},
 ]
-CHORD_DEFAULT_ENGINE = os.getenv("MTA_CHORDS_ENGINE", "madmom-deep-chroma").strip() or "madmom-deep-chroma"
+CHORD_DEFAULT_ENGINE = os.getenv("MTA_CHORDS_ENGINE", "profile-accurate").strip() or "profile-accurate"
 
 
 def _data_root() -> Path:
@@ -119,6 +126,11 @@ def _chord_marker(model_id: str) -> Path:
 
 
 def chord_engine_available(engine_id: str) -> bool:
+    if engine_id in {"profile-fast", "profile-accurate", "profile-maximum"}:
+        return True
+    if engine_id in {"btc-hcqt", "chordformer"}:
+        from .chord_ml import engine_available
+        return engine_available(engine_id)
     if engine_id in {"madmom-deep-chroma", "madmom-cnn-crf"}:
         # Check the actual lazily-imported modules, not only the top-level package.
         # This keeps frozen/native builds from advertising an engine whose PyInstaller
@@ -129,21 +141,28 @@ def chord_engine_available(engine_id: str) -> bool:
             and importlib.util.find_spec("madmom_infer.audio.chroma")
         )
     if engine_id == "chordino":
-        import shutil
-
-        # Chordino has no downloadable AI weights.  It is an external Vamp
-        # analyser and is available only when Sonic Annotator is installed.
-        return bool(shutil.which("sonic-annotator"))
+        from .chordino_runtime import chordino_status
+        return bool(chordino_status()["available"])
     return engine_id == "mta-chromagram"
 
 
 def chords_catalog(*, native: bool = False) -> dict:
     models=[]
     for raw in CHORD_MODELS:
-        item=dict(raw);item["installed"]=_chord_marker(item["id"]).is_file();models.append(item)
+        item=dict(raw)
+        if item["id"] in {"btc-hcqt", "chordformer"}:
+            from .chord_ml import installed
+            item["installed"] = installed(item["id"])
+        else:
+            item["installed"]=_chord_marker(item["id"]).is_file()
+        models.append(item)
     engines=[]
     for raw in CHORD_ENGINES:
-        item=dict(raw);item["available"]=chord_engine_available(item["id"]);engines.append(item)
+        item=dict(raw);item["available"]=chord_engine_available(item["id"])
+        if item["id"] == "chordino":
+            from .chordino_runtime import chordino_status
+            item["runtime"] = chordino_status()
+        engines.append(item)
     default=CHORD_DEFAULT_ENGINE if any(x["id"]==CHORD_DEFAULT_ENGINE for x in CHORD_ENGINES) else "madmom-deep-chroma"
     return {"default_engine":default,"engines":engines,"models":models,"storage":"local" if native else "server","on_demand":True,"model_dir":str(_chord_cache_root())}
 
@@ -157,6 +176,10 @@ def _cache_snapshot() -> set[str]:
 def download_chord_model(model_id: str, *, native: bool = False) -> dict:
     spec=next((x for x in CHORD_MODELS if x["id"]==model_id),None)
     if not spec: raise ValueError("unsupported chord model")
+    if model_id in {"btc-hcqt", "chordformer"}:
+        from .chord_ml import download_model
+        download_model(model_id)
+        return next(x for x in chords_catalog(native=native)["models"] if x["id"]==model_id)
     if not importlib.util.find_spec("madmom_infer"):
         raise RuntimeError("madmom-infer is not installed in this runtime")
     before=_cache_snapshot()
@@ -178,6 +201,10 @@ def download_chord_model(model_id: str, *, native: bool = False) -> dict:
 def delete_chord_model(model_id: str, *, native: bool = False) -> dict:
     spec=next((x for x in CHORD_MODELS if x["id"]==model_id),None)
     if not spec: raise ValueError("unsupported chord model")
+    if model_id in {"btc-hcqt", "chordformer"}:
+        from .chord_ml import delete_model
+        removed = delete_model(model_id)
+        return {"ok": True, "model_id": model_id, "removed": [model_id] if removed else [], "storage": "local" if native else "server"}
     marker=_chord_marker(model_id);removed=[]
     if marker.is_file():
         try: meta=json.loads(marker.read_text(encoding='utf-8'))

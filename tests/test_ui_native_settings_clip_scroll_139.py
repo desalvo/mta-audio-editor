@@ -9,8 +9,10 @@ INDEX = (ROOT / 'app/templates/index.html').read_text(encoding='utf-8')
 def test_project_clip_browser_is_collapsed_by_default_and_reset_on_open():
     assert 'let clipBrowserExpanded=false;' in APP_JS
     assert "function resetProjectUiForOpen(){clipBrowserExpanded=false;" in APP_JS
-    assert 'resetProjectUiForOpen();resetSessionHistory();render();schedulePlaybackPrewarm(40);refresh();' in APP_JS
-    assert 'resetProjectUiForOpen();render();await refresh();toast(\'Progetto aperto dal filesystem\')' in APP_JS
+    assert "showProjectOpenProgress(68,'Caricamento waveform e interfaccia…')" in APP_JS
+    assert "showProjectOpenProgress(86,'Preparazione motore audio…')" in APP_JS
+    assert "Selezione e lettura file progetto…" in APP_JS
+    assert 'finishProjectOpenProgress()' in APP_JS
 
 
 def test_web_settings_are_available_to_admin_from_sidebar():

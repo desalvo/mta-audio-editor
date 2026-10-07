@@ -762,20 +762,22 @@ def _refine_extended_harmony(
     return events or base_events
 
 def _extract_chords_chordino(path: Path) -> list[Chord] | None:
-    """Prefer NNLS-Chroma/Chordino when available for higher chord accuracy."""
-    sonic = shutil.which("sonic-annotator")
-    if not sonic:
+    """Run bundled/system Chordino using Sonic Annotator or vamp-simple-host."""
+    from .chordino_runtime import chordino_host_path, chordino_status, host_kind
+    status = chordino_status()
+    host = chordino_host_path() if status.get("available") else None
+    kind = host_kind(host)
+    if not host or not kind:
         return None
     try:
-        proc = subprocess.run(
-            [sonic, "-d", "vamp:nnls-chroma:chordino:simplechord", "-w", "csv", "--csv-stdout", str(path)],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
-        )
+        if kind == "sonic-annotator":
+            command = [host, "-d", "vamp:nnls-chroma:chordino:simplechord", "-w", "csv", "--csv-stdout", str(path)]
+        else:
+            command = [host, "nnls-chroma:chordino:simplechord", str(path)]
+        proc = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         if proc.returncode:
             raise RuntimeError(getattr(proc, "stderr", "") or "Chordino failed")
         output = getattr(proc, "stdout", "") or ""
-        # Test/dev wrappers may materialize the CSV in the supplied path; never
-        # rely on that for real audio, but accept textual CSV as a compatibility path.
         if not output:
             try:
                 candidate = path.read_text(encoding="utf-8")
@@ -788,17 +790,32 @@ def _extract_chords_chordino(path: Path) -> list[Chord] | None:
         return None
     events: list[Chord] = []
     last = None
-    for row in csv.reader(output.splitlines()):
-        if len(row) < 3:
-            continue
-        try:
-            time_ms = max(0, round(float(row[1]) * 1000))
-        except ValueError:
-            continue
-        label = row[-1].strip().strip('"')
+    if kind == "sonic-annotator":
+        rows = []
+        for row in csv.reader(output.splitlines()):
+            if len(row) < 3:
+                continue
+            try:
+                seconds = float(row[1])
+            except ValueError:
+                continue
+            rows.append((seconds, row[-1].strip().strip('"')))
+    else:
+        rows = []
+        for line in output.splitlines():
+            line = line.strip()
+            if not line or ":" not in line:
+                continue
+            left, label = line.split(":", 1)
+            try:
+                seconds = float(left.strip())
+            except ValueError:
+                continue
+            rows.append((seconds, label.strip().strip('"')))
+    for seconds, label in rows:
         if not label or label in {"N", "N.C.", "no_chord"} or label == last:
             continue
-        events.append(Chord(time_ms=time_ms, chord=label))
+        events.append(Chord(time_ms=max(0, round(seconds * 1000)), chord=label))
         last = label
     return events or None
 
@@ -860,39 +877,111 @@ def _extract_chords_madmom(path: Path, engine: str) -> list[Chord]:
         return _madmom_rows_to_events(proc(str(wav)))
 
 
+
+def _profile_engine_candidates(profile: str) -> list[str]:
+    from .ai_models import chord_engine_available
+    if profile == "fast":
+        ordered = ["chordino", "mta-chromagram"]
+    elif profile == "accurate":
+        ordered = ["chordformer", "btc-hcqt", "madmom-deep-chroma", "chordino", "mta-chromagram"]
+    else:
+        ordered = ["chordformer", "btc-hcqt", "chordino", "madmom-deep-chroma", "mta-chromagram"]
+    return [engine for engine in ordered if chord_engine_available(engine)]
+
+
+def _label_at(events: list[Chord], time_ms: int) -> str | None:
+    label = None
+    for event in events:
+        if event.time_ms > time_ms:
+            break
+        if not event.deleted and not event.excluded:
+            label = event.chord
+    return label
+
+
+def _ensemble_chord_events(results: dict[str, list[Chord]]) -> list[Chord]:
+    if not results:
+        return []
+    weights = {"chordformer": 1.45, "btc-hcqt": 1.30, "chordino": 1.05, "madmom-deep-chroma": 0.90, "madmom-cnn-crf": 0.85, "mta-chromagram": 0.65}
+    boundaries = sorted({0, *(event.time_ms for events in results.values() for event in events)})
+    out: list[Chord] = []
+    last = None
+    for idx, start in enumerate(boundaries):
+        next_start = boundaries[idx + 1] if idx + 1 < len(boundaries) else start + 500
+        probe = start + max(1, (next_start - start) // 2)
+        votes: dict[str, float] = {}
+        for engine, events in results.items():
+            label = _label_at(events, probe)
+            if not label:
+                continue
+            votes[label] = votes.get(label, 0.0) + weights.get(engine, 0.75)
+        if not votes:
+            continue
+        chosen = max(votes.items(), key=lambda item: (item[1], item[0]))[0]
+        if chosen != last:
+            out.append(Chord(time_ms=start, chord=chosen))
+            last = chosen
+    return out
+
+
+def _extract_profile_base(path: Path, profile: str, progress=None, cancelled=None) -> tuple[list[Chord], str]:
+    candidates = _profile_engine_candidates(profile)
+    if not candidates:
+        raise RuntimeError("No chord recognition engine is available")
+    if profile != "maximum":
+        engine = candidates[0]
+        if progress:
+            progress(28, [], f"Recognizer {engine} · analisi base")
+        return extract_chords(path, engine=engine), engine
+    selected = candidates[:4]
+    results: dict[str, list[Chord]] = {}
+    start_pct, end_pct = 18, 56
+    for index, engine in enumerate(selected):
+        if cancelled and cancelled():
+            raise InterruptedError("Chord extraction cancelled")
+        pct = start_pct + round((end_pct - start_pct) * index / max(1, len(selected)))
+        if progress:
+            progress(pct, [], f"Ensemble {index + 1}/{len(selected)} · {engine}")
+        try:
+            result = extract_chords(path, engine=engine)
+        except Exception:
+            continue
+        if result:
+            results[engine] = result
+    if not results:
+        raise RuntimeError("All ensemble chord engines failed")
+    if progress:
+        progress(58, [], f"Consensus ensemble · {len(results)} recognizer")
+    return _ensemble_chord_events(results), "ensemble:" + "+".join(results)
+
 def extract_chords_progressive(
     path: Path, *, engine: str, progress: Callable[[int,list[Chord],str],None] | None = None,
     cancelled: Callable[[],bool] | None = None, chunk_seconds: int = 5,
 ) -> list[Chord]:
-    """High-accuracy chord extraction for interactive jobs.
-
-    Chord extraction intentionally runs as one complete pass instead of exposing
-    per-chunk/inline chord events. Chunk boundaries can create short transient
-    chord labels and duplicate transitions that are not present in the real song.
-    Status progress is still reported, but partial chord data stays empty until
-    the final, globally analysed timeline is available.
-    """
-    del chunk_seconds  # retained for API compatibility
+    """Multi-stage chord extraction with selectable speed/accuracy profiles."""
+    del chunk_seconds
     if cancelled and cancelled():
         raise InterruptedError("Chord extraction cancelled")
-    device = "CPU"
-    if engine in {"madmom-deep-chroma", "madmom-cnn-crf"}:
+    profile = engine.removeprefix("profile-") if engine.startswith("profile-") else ""
+    if progress:
+        progress(8, [], "Step 1 · preparazione motori e acceleratore")
+    if profile:
+        base_events, used = _extract_profile_base(path, profile, progress=progress, cancelled=cancelled)
         if progress:
-            progress(-1, [], "Caricamento/download modello Madmom / backend AI")
-        _proc, device = _madmom_processor(engine)
+            progress(60 if profile == "maximum" else 42, [], f"Recognizer completato · {used}")
+    else:
+        device = "CPU"
+        if engine in {"madmom-deep-chroma", "madmom-cnn-crf"}:
+            if progress:
+                progress(-1, [], "Caricamento/download modello Madmom / backend AI")
+            _proc, device = _madmom_processor(engine)
         if progress:
-            progress(20, [], f"Modello chords pronto · {device}")
-    elif progress:
-        progress(12, [], f"Preparazione motore chords · {engine}")
+            progress(30, [], f"Step 2 · riconoscimento base · {engine} · {device}")
+        base_events = extract_chords(path, engine=engine)
     if cancelled and cancelled():
         raise InterruptedError("Chord extraction cancelled")
     if progress:
-        progress(32, [], f"Step 1/5 · riconoscimento base root/cambi · {device}")
-    base_events = extract_chords(path, engine=engine)
-    if cancelled and cancelled():
-        raise InterruptedError("Chord extraction cancelled")
-    if progress:
-        progress(46, [], "Step 2/5 · preparazione analisi armonica estesa")
+        progress(64, [], "Step 3 · chroma armonica ad alta risoluzione")
     events = _refine_extended_harmony(path, base_events, progress=progress, cancelled=cancelled)
     if cancelled and cancelled():
         raise InterruptedError("Chord extraction cancelled")
@@ -902,10 +991,9 @@ def extract_chords_progressive(
             continue
         cleaned.append(item)
     if progress:
-        progress(94, [], "Step 5/5 · timeline armonica finale")
-        progress(96, [], "Analisi armonica estesa completata")
+        progress(90, [], "Step finale · stabilizzazione temporale e slash-bass")
+        progress(96, [], "Analisi armonica completata")
     return cleaned
-
 
 def extract_chords(path: Path, *, interval_ms: int = 500, engine: str | None = None) -> list[Chord]:
     """Extract chord changes using the explicitly selected engine.
@@ -914,6 +1002,16 @@ def extract_chords(path: Path, *, interval_ms: int = 500, engine: str | None = N
     report exactly which recognizer/model produced the project chord timeline.
     """
     engine=(engine or "mta-chromagram").strip() or "mta-chromagram"
+    if engine.startswith("profile-"):
+        profile = engine.removeprefix("profile-")
+        events, _used = _extract_profile_base(path, profile)
+        return events
+    if engine == "btc-hcqt":
+        from .chord_ml import extract_btc_hcqt
+        return extract_btc_hcqt(path)
+    if engine == "chordformer":
+        from .chord_ml import extract_chordformer
+        return extract_chordformer(path)
     if engine in {"madmom-deep-chroma", "madmom-cnn-crf"}:
         return _extract_chords_madmom(path, engine)
     if engine == "chordino":

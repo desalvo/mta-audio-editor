@@ -81,7 +81,10 @@ def generate_metronome_wav(project: Project, out: Path, beats_per_bar: int | Non
     def click_bytes(freq: float) -> bytes:
         t = np.arange(click_len, dtype=np.float64) / sample_rate
         env = np.exp(-t * 55.0)
-        wave_data = np.sin(2 * np.pi * freq * t) * env * 0.82
+        wave_data = np.sin(2 * np.pi * freq * t) * env
+        peak = float(np.max(np.abs(wave_data))) if wave_data.size else 0.0
+        if peak > 0.0:
+            wave_data /= peak  # generated click is peak-normalized to exactly 0 dBFS
         return np.asarray(np.clip(wave_data, -1, 1) * 32767, dtype=np.int16).tobytes()
 
     accent = click_bytes(1320.0)
@@ -689,8 +692,8 @@ def generate_chords_piano_wav(project: Project, out: Path) -> int:
         audio[start:start + frames, 0] += left
         audio[start:start + frames, 1] += right
     peak = float(np.max(np.abs(audio))) if audio.size else 0.0
-    if peak > 0.94:
-        audio *= 0.94 / peak
+    if peak > 0.0:
+        audio /= peak  # generated piano guide is peak-normalized to exactly 0 dBFS
     pcm = np.asarray(np.clip(audio, -1.0, 1.0) * 32767.0, dtype=np.int16)
     out.parent.mkdir(parents=True, exist_ok=True)
     with wave.open(str(out), "wb") as handle:

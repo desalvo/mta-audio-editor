@@ -418,3 +418,6 @@ Dopo la creazione un nuovo progetto viene immediatamente caricato nell’editor 
 ## Versionamento
 
 Le release pubbliche usano tag semantici come `v0.2.0`. `REVISION` identifica la revisione esatta del sorgente/package all'interno della release, mentre `BUILD_INFO` resta l'identificativo di build indipendente a 14 cifre.
+
+### Profili di estrazione accordi (r195)
+L'estrazione chords offre i profili **Fast**, **Accurate** e **Maximum accuracy**. Fast privilegia Chordino/MTA Chromagram; Accurate usa il miglior recognizer installato (ChordFormer, BTC-HCQT, Madmom, Chordino); Maximum combina più recognizer con ensemble pesato e applica l'analisi armonica estesa e bass-chroma. ChordFormer e BTC-HCQT sono scaricabili on-demand dal Gestore modelli AI.

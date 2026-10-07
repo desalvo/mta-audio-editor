@@ -14,10 +14,11 @@ LABEL org.opencontainers.image.title="MTA Audio Editor" \
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1 \
     MTA_DATA_DIR=/data/projects MTA_HOST=0.0.0.0 MTA_PORT=8080 \
     MTA_APP_VERSION=$APP_VERSION MTA_APP_REVISION=$APP_REVISION MTA_RELEASE_CHANNEL=$RELEASE_CHANNEL MTA_BUILD_ID=$BUILD_ID \
-    XDG_CACHE_HOME=/data/projects/.cache TORCH_HOME=/data/projects/.cache/torch
+    XDG_CACHE_HOME=/data/projects/.cache TORCH_HOME=/data/projects/.cache/torch \
+    VAMP_PATH=/opt/mta/vamp MTA_VAMP_PATH=/opt/mta/vamp MTA_CHORDINO_HOST=/usr/bin/vamp-simple-host
 RUN apt-get update \
     && apt-get upgrade -y \
-    && apt-get install -y --no-install-recommends ffmpeg ca-certificates tini fonts-dejavu-core \
+    && apt-get install -y --no-install-recommends ffmpeg ca-certificates tini fonts-dejavu-core vamp-examples \
     && rm -rf /var/lib/apt/lists/* \
     && groupadd --system --gid 10001 mtaeditor \
     && useradd --system --uid 10001 --gid 10001 --home /nonexistent --shell /usr/sbin/nologin mtaeditor
@@ -27,16 +28,23 @@ COPY requirements.txt requirements-stems.txt requirements-lyrics.txt requirement
 # CMake 3.x (CMake 4 removed compatibility with the project's old policy baseline).
 # Use Debian Trixie's system CMake explicitly, and remove all native build tools afterwards.
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends build-essential cmake \
+    && apt-get install -y --no-install-recommends build-essential cmake curl libboost-all-dev vamp-plugin-sdk \
     && python -m pip install --no-cache-dir -r requirements.txt \
     && if [ "$INSTALL_STEMS" = "true" ]; then CMAKE=/usr/bin/cmake python -m pip install --no-cache-dir -r requirements-stems.txt; fi \
     && python -m pip install --no-cache-dir -r requirements-lyrics.txt \
     && python -m pip install --no-cache-dir -r requirements-chords.txt \
     && python -m pip install --no-cache-dir --upgrade --force-reinstall setuptools==84.0.0 wheel==0.48.0 urllib3==2.8.0 msgpack==1.2.3 \
     && python -m pip check \
+    && curl -fsSL https://github.com/c4dm/nnls-chroma/archive/refs/heads/master.tar.gz -o /tmp/nnls.tar.gz \
+    && mkdir -p /tmp/nnls /opt/mta/vamp \
+    && tar -xzf /tmp/nnls.tar.gz -C /tmp/nnls --strip-components=1 \
+    && make -C /tmp/nnls -f Makefile.linux VAMP_SDK_DIR=/usr/include/vamp-sdk \
+    && cp /tmp/nnls/nnls-chroma.so /tmp/nnls/nnls-chroma.cat /tmp/nnls/nnls-chroma.n3 /opt/mta/vamp/ \
+    && VAMP_PATH=/opt/mta/vamp vamp-simple-host --list-ids | grep -q 'nnls-chroma:chordino' \
+    && rm -rf /tmp/nnls /tmp/nnls.tar.gz \
     && python -c "from importlib.metadata import distributions; n=[dist.metadata.get('Name','') for dist in distributions() if dist.metadata.get('Name','').lower().startswith('nvidia-')]; print('NVIDIA Python packages:', n); assert not n, n" \
     && python -c "from importlib.metadata import version; expected={'setuptools':'84.0.0','wheel':'0.48.0','urllib3':'2.8.0','msgpack':'1.2.3'}; actual={p:version(p) for p in expected}; print(actual); assert actual == expected, (actual, expected)" \
-    && apt-get purge -y --auto-remove build-essential cmake \
+    && apt-get purge -y --auto-remove build-essential cmake curl libboost-all-dev vamp-plugin-sdk \
     && rm -rf /var/lib/apt/lists/*
 RUN python -c "import fastapi, uvicorn, numpy, whisper, madmom_infer" \
     && if [ "$INSTALL_STEMS" = "true" ]; then python -c "import torch, demucs"; fi

@@ -237,6 +237,9 @@ jobs:
           "MTA_NATIVE_FFPROBE=$ffprobe" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           Write-Host "ffmpeg=$ffmpeg"
           Write-Host "ffprobe=$ffprobe"
+      - name: Provision bundled Chordino runtime
+        shell: pwsh
+        run: .\scripts\provision_chordino_windows.ps1
       - name: Generate native build id
         shell: pwsh
         run: |
@@ -344,6 +347,13 @@ jobs:
           brew install ffmpeg
           echo "MTA_NATIVE_FFMPEG=$(command -v ffmpeg)" >> "$GITHUB_ENV"
           echo "MTA_NATIVE_FFPROBE=$(command -v ffprobe)" >> "$GITHUB_ENV"
+      - name: Provision bundled Chordino runtime
+        shell: bash
+        run: |
+          brew install vamp-plugin-sdk boost
+          ./scripts/build_chordino_unix.sh native/runtime/chordino
+          echo "MTA_NATIVE_CHORDINO_BIN_DIR=$PWD/native/runtime/chordino/bin" >> "$GITHUB_ENV"
+          echo "MTA_NATIVE_CHORDINO_VAMP_DIR=$PWD/native/runtime/chordino/vamp" >> "$GITHUB_ENV"
       - name: Generate native build id
         shell: bash
         run: TZ=Europe/Rome date '+%Y%m%d%H%M%S' > BUILD_INFO

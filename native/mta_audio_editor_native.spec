@@ -34,6 +34,25 @@ for env_name, dest_name in (("MTA_NATIVE_FFMPEG", "ffmpeg"), ("MTA_NATIVE_FFPROB
         suffix = ".exe" if os.name == "nt" else ""
         binaries.append((value, "bin"))
 
+
+# Optional private Chordino runtime provisioned by CI.  It is bundled beside
+# FFmpeg and never needs to be installed into the user's system directories.
+chordino_bin = os.environ.get("MTA_NATIVE_CHORDINO_BIN_DIR", "")
+chordino_vamp = os.environ.get("MTA_NATIVE_CHORDINO_VAMP_DIR", "")
+if chordino_bin and Path(chordino_bin).is_dir():
+    for child in Path(chordino_bin).iterdir():
+        if child.is_file():
+            binaries.append((str(child), "bin"))
+if chordino_vamp and Path(chordino_vamp).is_dir():
+    for child in Path(chordino_vamp).iterdir():
+        if child.is_file():
+            # Dynamic library files must be collected as binaries; RDF/category
+            # metadata is ordinary data but lives in the same private Vamp dir.
+            if child.suffix.lower() in {".dll", ".dylib", ".so"}:
+                binaries.append((str(child), "vamp"))
+            else:
+                datas.append((str(child), "vamp"))
+
 hiddenimports = []
 for package in ("webview", "demucs", "torch", "torchaudio", "whisper", "madmom_infer", "truststore", "certifi"):
     package_datas, package_binaries, package_hidden = collect_all(package)

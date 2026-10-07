@@ -136,7 +136,7 @@ def test_madmom_rows_and_non_ai_progressive_path(monkeypatch,tmp_path):
     monkeypatch.setattr(mt,'extract_chords',lambda path,engine=None:[mt.Chord(time_ms=0,chord='F')])
     updates=[]
     out=mt.extract_chords_progressive(tmp_path/'x.wav',engine='mta-chromagram',progress=lambda p,i,m:updates.append(p))
-    assert out[0].chord=='F' and updates[0]==12 and updates[-1]==96 and len(updates)>=5
+    assert out[0].chord=='F' and updates[0]==8 and updates[-1]==96 and len(updates)>=5
 
 
 def test_ai_catalog_reports_hardware_acceleration(monkeypatch):

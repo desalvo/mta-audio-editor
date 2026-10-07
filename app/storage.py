@@ -3,6 +3,8 @@ import json
 import os
 import re
 import shutil
+import threading
+import time
 import uuid
 import zipfile
 from pathlib import Path
@@ -14,6 +16,137 @@ ROOT.mkdir(parents=True, exist_ok=True)
 PID_RE = re.compile(r"^[a-f0-9]{12}$")
 SAFE_NAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._ -]{0,127}$")
 PROJECT_ARCHIVE_SCHEMA = "mta-audio-editor/project-archive/v1"
+
+GC_QUEUE_NAME = ".gc-pending.json"
+_GC_LOCK = threading.RLock()
+_GC_ACTIVE: set[str] = set()
+
+
+def _gc_queue_path(pid: str) -> Path:
+    return pdir(pid) / GC_QUEUE_NAME
+
+
+def _atomic_json_write(path: Path, payload: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.parent / f".{path.name}.{uuid.uuid4().hex}.tmp"
+    data = json.dumps(payload, indent=2, sort_keys=True).encode("utf-8")
+    try:
+        with tmp.open("wb") as handle:
+            handle.write(data)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(tmp, path)
+        _fsync_directory(path.parent)
+    finally:
+        tmp.unlink(missing_ok=True)
+
+
+def referenced_audio_files(project: Project) -> set[str]:
+    return {t.filename for t in project.tracks} | {c.filename for c in project.clip_library}
+
+
+def _read_gc_queue(pid: str) -> set[str]:
+    path = _gc_queue_path(pid)
+    try:
+        raw = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError, TypeError):
+        return set()
+    return {str(x) for x in raw.get("audio", []) if isinstance(x, str) and SAFE_NAME_RE.fullmatch(x)}
+
+
+def _write_gc_queue(pid: str, names: set[str]) -> None:
+    path = _gc_queue_path(pid)
+    if not names:
+        path.unlink(missing_ok=True)
+        _fsync_directory(path.parent)
+        return
+    _atomic_json_write(path, {"version": 1, "audio": sorted(names), "updated_at": int(time.time())})
+
+
+def reconcile_project_gc(pid: str, candidates: set[str] | None = None) -> set[str]:
+    """Durably queue unreferenced project audio for crash-safe background cleanup.
+
+    project.json is always authoritative: referenced files are never queued. On
+    startup, candidates=None additionally discovers orphan files left by a crash
+    between the logical-delete commit and journal creation.
+    """
+    with _GC_LOCK:
+        project = load_project(pid)
+        referenced = referenced_audio_files(project)
+        queued = _read_gc_queue(pid)
+        audio_dir = pdir(pid) / "audio"
+        if candidates is None and audio_dir.exists():
+            candidates = {f.name for f in audio_dir.iterdir() if f.is_file() and SAFE_NAME_RE.fullmatch(f.name)}
+        for name in candidates or set():
+            if SAFE_NAME_RE.fullmatch(name) and name not in referenced:
+                queued.add(name)
+        queued.difference_update(referenced)
+        _write_gc_queue(pid, queued)
+        return queued
+
+
+def run_project_gc(pid: str) -> dict[str, int]:
+    """Process a durable GC queue. Safe to retry after interruption/crash."""
+    deleted = skipped = 0
+    with _GC_LOCK:
+        try:
+            project = load_project(pid)
+        except (OSError, ValueError):
+            return {"deleted": 0, "skipped": 0}
+        referenced = referenced_audio_files(project)
+        queued = _read_gc_queue(pid)
+        remaining: set[str] = set()
+        for name in sorted(queued):
+            if name in referenced:
+                skipped += 1
+                continue
+            try:
+                audio_path(pid, name).unlink(missing_ok=True)
+                deleted += 1
+            except OSError:
+                remaining.add(name)
+        try:
+            _fsync_directory(pdir(pid) / "audio")
+        finally:
+            _write_gc_queue(pid, remaining)
+    return {"deleted": deleted, "skipped": skipped}
+
+
+def _gc_worker(pid: str) -> None:
+    # Tiny defer keeps physical cleanup off the request's latency path.
+    time.sleep(0.05)
+    while True:
+        run_project_gc(pid)
+        with _GC_LOCK:
+            # If another request queued work while this worker was active, drain it
+            # before releasing the active marker. This closes the enqueue/exit race.
+            if _read_gc_queue(pid):
+                continue
+            _GC_ACTIVE.discard(pid)
+            break
+
+
+def schedule_project_gc(pid: str, candidates: set[str] | None = None, *, reconcile_orphans: bool = False) -> None:
+    try:
+        reconcile_project_gc(pid, None if reconcile_orphans else (candidates or set()))
+    except (OSError, ValueError):
+        return
+    with _GC_LOCK:
+        if pid in _GC_ACTIVE:
+            return
+        _GC_ACTIVE.add(pid)
+    threading.Thread(target=_gc_worker, args=(pid,), name=f"mta-gc-{pid}", daemon=True).start()
+
+
+def resume_pending_gc() -> None:
+    """Reconcile orphan audio and resume interrupted GC for every project."""
+    if not ROOT.exists():
+        return
+    for d in ROOT.iterdir():
+        if not d.is_dir() or not PID_RE.fullmatch(d.name) or not (d / "project.json").exists():
+            continue
+        schedule_project_gc(d.name, reconcile_orphans=True)
+
 
 
 def pdir(pid: str) -> Path:
@@ -288,11 +421,17 @@ def write_project_archive(pid: str, archive_path: Path) -> Path:
     }
     tmp = archive_path.parent / f".{archive_path.name}.{uuid.uuid4().hex}.tmp"
     try:
+        pending_gc = _read_gc_queue(pid)
         with zipfile.ZipFile(tmp, "w", zipfile.ZIP_DEFLATED, allowZip64=True) as z:
             z.writestr("archive-manifest.json", json.dumps(manifest, indent=2))
             for path in sorted(base.rglob("*")):
-                if path.is_file() and not (path.name.startswith(".project.json.") and path.name.endswith(".tmp")):
-                    z.write(path, Path("project") / path.relative_to(base))
+                if not path.is_file():
+                    continue
+                if path.name == GC_QUEUE_NAME or (path.name.startswith(".project.json.") and path.name.endswith(".tmp")):
+                    continue
+                if path.parent == (base / "audio") and path.name in pending_gc:
+                    continue
+                z.write(path, Path("project") / path.relative_to(base))
         with tmp.open("rb") as handle:
             os.fsync(handle.fileno())
         # Refuse to replace a valid existing archive with an incomplete/corrupt one.
@@ -343,6 +482,8 @@ def import_project_archive(archive_path: Path, owner_user_id: int | None) -> Pro
                 if not info.filename.startswith("project/"):
                     continue
                 rel = Path(info.filename).relative_to("project")
+                if rel.name == GC_QUEUE_NAME:
+                    continue
                 dst = (target / rel).resolve()
                 if target.resolve() not in dst.parents:
                     raise ValueError("unsafe project archive path")

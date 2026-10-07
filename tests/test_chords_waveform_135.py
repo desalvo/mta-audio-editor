@@ -12,7 +12,8 @@ def test_native_bundle_explicitly_includes_madmom_chord_modules():
 
 def test_chordino_ui_distinguishes_no_model_from_missing_external_engine():
     js = (ROOT / "app/static/app.js").read_text(encoding="utf-8")
-    assert "nessun modello AI · richiede Sonic Annotator + Chordino" in js
+    assert "runtime Chordino non disponibile" in js
+    assert "host Vamp presente · plugin Chordino non rilevato" in js
     assert "nessun modello AI richiesto" in js
 
 

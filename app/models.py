@@ -334,3 +334,8 @@ class Project(BaseModel):
             if not value or Path(value).name != value or value in {".", ".."}:
                 raise ValueError("attachment names must be local basenames")
         return values
+
+
+class DeleteTracksRequest(BaseModel):
+    track_ids: list[str] = Field(default_factory=list, max_length=256)
+    project: Project | None = None
