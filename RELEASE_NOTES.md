@@ -1,3 +1,7 @@
+## 0.2.0-r230
+
+- CI: removed unused `io` import from `app/mp3g.py` to satisfy Ruff.
+
 ## 0.2.0-r229
 
 - Added project sample rate (44.1/48/96 kHz, default 44.1 kHz), fixed after the first active track is present and editable again only with no tracks.
