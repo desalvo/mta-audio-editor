@@ -528,16 +528,38 @@ def _pcm_mono(path: Path, sample_rate: int = 11025) -> tuple[np.ndarray, int]:
 
 
 def _chord_templates() -> list[tuple[str, np.ndarray]]:
+    """Extended harmonic vocabulary used by MTA's refinement stage.
+
+    The first recognizer (Madmom/Chordino/internal) is treated as a robust source
+    of chord-change/root priors.  These templates refine quality/extensions and
+    inversion from the actual spectrum instead of being limited to maj/min.
+    """
     out: list[tuple[str, np.ndarray]] = []
     qualities = (
-        ("", (0, 4, 7), (1.0, 0.82, 0.72)),
-        ("m", (0, 3, 7), (1.0, 0.82, 0.72)),
-        ("7", (0, 4, 7, 10), (1.0, 0.78, 0.70, 0.58)),
-        ("maj7", (0, 4, 7, 11), (1.0, 0.78, 0.70, 0.58)),
-        ("m7", (0, 3, 7, 10), (1.0, 0.78, 0.70, 0.58)),
-        ("sus2", (0, 2, 7), (1.0, 0.75, 0.72)),
-        ("sus4", (0, 5, 7), (1.0, 0.75, 0.72)),
-        ("dim", (0, 3, 6), (1.0, 0.80, 0.72)),
+        ("", (0, 4, 7), (1.00, 0.88, 0.78)),
+        ("m", (0, 3, 7), (1.00, 0.88, 0.78)),
+        ("5", (0, 7), (1.00, 0.80)),
+        ("6", (0, 4, 7, 9), (1.00, 0.84, 0.74, 0.60)),
+        ("m6", (0, 3, 7, 9), (1.00, 0.84, 0.74, 0.60)),
+        ("7", (0, 4, 7, 10), (1.00, 0.84, 0.74, 0.68)),
+        ("maj7", (0, 4, 7, 11), (1.00, 0.84, 0.74, 0.68)),
+        ("m7", (0, 3, 7, 10), (1.00, 0.84, 0.74, 0.68)),
+        ("mMaj7", (0, 3, 7, 11), (1.00, 0.84, 0.74, 0.64)),
+        ("dim", (0, 3, 6), (1.00, 0.86, 0.78)),
+        ("dim7", (0, 3, 6, 9), (1.00, 0.84, 0.78, 0.64)),
+        ("m7b5", (0, 3, 6, 10), (1.00, 0.84, 0.78, 0.66)),
+        ("aug", (0, 4, 8), (1.00, 0.86, 0.78)),
+        ("sus2", (0, 2, 7), (1.00, 0.82, 0.76)),
+        ("sus4", (0, 5, 7), (1.00, 0.82, 0.76)),
+        ("add9", (0, 2, 4, 7), (1.00, 0.56, 0.84, 0.74)),
+        ("9", (0, 2, 4, 7, 10), (1.00, 0.52, 0.82, 0.72, 0.62)),
+        ("maj9", (0, 2, 4, 7, 11), (1.00, 0.52, 0.82, 0.72, 0.62)),
+        ("m9", (0, 2, 3, 7, 10), (1.00, 0.52, 0.82, 0.72, 0.62)),
+        ("7sus4", (0, 5, 7, 10), (1.00, 0.80, 0.72, 0.62)),
+        ("7b5", (0, 4, 6, 10), (1.00, 0.82, 0.72, 0.62)),
+        ("7#5", (0, 4, 8, 10), (1.00, 0.82, 0.72, 0.62)),
+        ("7b9", (0, 1, 4, 7, 10), (1.00, 0.48, 0.82, 0.72, 0.62)),
+        ("7#9", (0, 3, 4, 7, 10), (1.00, 0.48, 0.82, 0.72, 0.62)),
     )
     for root in range(12):
         for suffix, intervals, weights in qualities:
@@ -548,6 +570,196 @@ def _chord_templates() -> list[tuple[str, np.ndarray]]:
             out.append((NOTE_NAMES[root] + suffix, v))
     return out
 
+
+def _chord_root_pc(label: str) -> int | None:
+    match = re.match(r"^([A-G](?:#|b)?)", str(label or ""))
+    return _NOTE_TO_PC.get(match.group(1)) if match else None
+
+
+def _chord_pitch_classes(label: str) -> set[int]:
+    root = _chord_root_pc(label)
+    if root is None:
+        return set()
+    symbol = str(label).split("/", 1)[0]
+    suffix = symbol[len(re.match(r"^[A-G](?:#|b)?", symbol).group(0)):]
+    intervals = {
+        "": (0, 4, 7), "m": (0, 3, 7), "5": (0, 7),
+        "6": (0, 4, 7, 9), "m6": (0, 3, 7, 9),
+        "7": (0, 4, 7, 10), "maj7": (0, 4, 7, 11), "m7": (0, 3, 7, 10),
+        "mMaj7": (0, 3, 7, 11), "dim": (0, 3, 6), "dim7": (0, 3, 6, 9),
+        "m7b5": (0, 3, 6, 10), "aug": (0, 4, 8), "sus2": (0, 2, 7),
+        "sus4": (0, 5, 7), "add9": (0, 2, 4, 7), "9": (0, 2, 4, 7, 10),
+        "maj9": (0, 2, 4, 7, 11), "m9": (0, 2, 3, 7, 10),
+        "7sus4": (0, 5, 7, 10), "7b5": (0, 4, 6, 10), "7#5": (0, 4, 8, 10),
+        "7b9": (0, 1, 4, 7, 10), "7#9": (0, 3, 4, 7, 10),
+    }.get(suffix, (0, 4, 7))
+    return {(root + x) % 12 for x in intervals}
+
+
+def _harmonic_features(path: Path, *, interval_ms: int = 250) -> tuple[list[int], np.ndarray, np.ndarray, np.ndarray]:
+    """Return timestamps, chroma, bass-chroma and energy for harmonic refinement."""
+    samples, sr = _pcm_mono(path)
+    if samples.size < sr:
+        raise ValueError("audio too short for chord analysis")
+    frame = 8192
+    hop = 2048
+    window = np.hanning(frame).astype(np.float64)
+    freqs = np.fft.rfftfreq(frame, 1.0 / sr)
+    full_idx = np.nonzero((freqs >= 55.0) & (freqs <= 2200.0))[0]
+    bass_idx = np.nonzero((freqs >= 41.0) & (freqs <= 300.0))[0]
+    pcs = np.full(freqs.shape, -1, dtype=np.int16)
+    for idx in np.unique(np.concatenate((full_idx, bass_idx))):
+        midi = int(round(69 + 12 * math.log2(float(freqs[idx]) / 440.0)))
+        pcs[idx] = midi % 12
+    chroma_frames: list[np.ndarray] = []
+    bass_frames: list[np.ndarray] = []
+    energies: list[float] = []
+    for start in range(0, max(1, len(samples) - frame + 1), hop):
+        chunk = samples[start:start + frame]
+        if len(chunk) < frame:
+            chunk = np.pad(chunk, (0, frame - len(chunk)))
+        spec = np.abs(np.fft.rfft(chunk * window)) ** 2
+        chroma = np.zeros(12, dtype=np.float64)
+        bass = np.zeros(12, dtype=np.float64)
+        for idx in full_idx:
+            chroma[int(pcs[idx])] += float(spec[idx]) / math.sqrt(max(1.0, float(freqs[idx])))
+        for idx in bass_idx:
+            # stronger preference for fundamentals in the true bass range
+            bass[int(pcs[idx])] += float(spec[idx]) / max(1.0, float(freqs[idx]) ** 0.35)
+        cn = np.linalg.norm(chroma)
+        bn = np.linalg.norm(bass)
+        if cn > 0:
+            chroma /= cn
+        if bn > 0:
+            bass /= bn
+        chroma_frames.append(chroma)
+        bass_frames.append(bass)
+        energies.append(float(np.sqrt(np.mean(np.square(chunk, dtype=np.float64)) + 1e-12)))
+    group = max(1, round((interval_ms / 1000.0) * sr / hop))
+    times: list[int] = []
+    cgroups: list[np.ndarray] = []
+    bgroups: list[np.ndarray] = []
+    egroups: list[float] = []
+    for start in range(0, len(chroma_frames), group):
+        times.append(round(start * hop * 1000 / sr))
+        cgroups.append(np.mean(chroma_frames[start:start + group], axis=0))
+        bgroups.append(np.mean(bass_frames[start:start + group], axis=0))
+        egroups.append(float(np.mean(energies[start:start + group])))
+    return times, np.asarray(cgroups), np.asarray(bgroups), np.asarray(egroups)
+
+
+def _base_label_at(events: list[Chord], time_ms: int) -> str:
+    label = ""
+    for item in events:
+        if item.time_ms > time_ms:
+            break
+        label = item.chord
+    return label
+
+
+def _refine_extended_harmony(
+    path: Path, base_events: list[Chord], *, progress: Callable[[int, list[Chord], str], None] | None = None,
+    cancelled: Callable[[], bool] | None = None,
+) -> list[Chord]:
+    """Refine root/quality/inversion using extended chroma and bass-chroma analysis."""
+    # Unit/integration wrappers can supply synthetic recognizer results without a
+    # physical audio file. In production the source always exists; in wrappers,
+    # preserve the base recognizer result rather than failing an unrelated FFmpeg step.
+    if not Path(path).is_file():
+        if progress:
+            progress(90, [], "Raffinamento armonico non disponibile: mantengo il risultato base")
+        return base_events
+    if progress:
+        progress(52, [], "Estrazione chroma armonica ad alta risoluzione")
+    times, chroma, bass, energy = _harmonic_features(path, interval_ms=250)
+    if cancelled and cancelled():
+        raise InterruptedError("Chord extraction cancelled")
+    if not len(times):
+        return base_events
+    templates = _chord_templates()
+    names = [name for name, _ in templates]
+    matrix = np.stack([tpl for _, tpl in templates], axis=0)
+    roots = np.asarray([_chord_root_pc(name) for name in names], dtype=np.int16)
+    # More complex qualities need a slightly clearer spectral advantage to avoid
+    # over-labelling ordinary triads as altered/extended chords.
+    complexity = np.asarray([
+        0.000 if re.match(r"^[A-G](?:#|b)?m?$", n) else
+        0.008 if any(n.endswith(x) for x in ("7", "maj7", "m7", "6", "m6", "sus2", "sus4", "dim", "aug")) else
+        0.016 if any(x in n for x in ("9", "m7b5", "dim7", "mMaj7", "add9", "7sus4")) else 0.024
+        for n in names
+    ], dtype=np.float64)
+    labels: list[str] = []
+    confidences: list[float] = []
+    median_energy = max(1e-9, float(np.median(energy)))
+    if progress:
+        progress(68, [], "Classificazione qualità: 7e, diminuite, sus, estensioni e alterazioni")
+    for i, time_ms in enumerate(times):
+        if cancelled and cancelled():
+            raise InterruptedError("Chord extraction cancelled")
+        c = chroma[i]
+        norm = np.linalg.norm(c)
+        if norm <= 1e-9 or energy[i] < median_energy * 0.08:
+            labels.append("N"); confidences.append(0.0); continue
+        c = c / norm
+        score = matrix @ c - complexity
+        prior = _chord_root_pc(_base_label_at(base_events, time_ms))
+        if prior is not None:
+            score = score + (roots == prior) * 0.055
+        order = np.argsort(score)[::-1]
+        best, second = int(order[0]), int(order[1])
+        margin = float(score[best] - score[second])
+        label = names[best] if float(score[best]) >= 0.46 and margin >= 0.006 else (_base_label_at(base_events, time_ms) or "N")
+        labels.append(label)
+        confidences.append(max(0.0, margin))
+    if progress:
+        progress(78, [], "Analisi basso e inversioni / slash chords")
+    # Attach a slash bass only when the bass evidence is stable and meaningfully
+    # stronger than the runner-up. Non-chord pedal bass is allowed, but requires
+    # stronger evidence than an inversion using a chord tone.
+    for i, label in enumerate(labels):
+        if label == "N" or "/" in label:
+            continue
+        b = bass[i]
+        order = np.argsort(b)[::-1]
+        bass_pc, second_pc = int(order[0]), int(order[1])
+        root = _chord_root_pc(label)
+        if root is None or bass_pc == root:
+            continue
+        ratio = float((b[bass_pc] + 1e-9) / (b[second_pc] + 1e-9))
+        chord_pcs = _chord_pitch_classes(label)
+        threshold = 1.16 if bass_pc in chord_pcs else 1.42
+        if ratio >= threshold and float(b[bass_pc]) >= 0.34:
+            labels[i] = f"{label}/{NOTE_NAMES[bass_pc]}"
+    if progress:
+        progress(86, [], "Stabilizzazione temporale e rimozione transitori armonici")
+    # Weighted local voting + hysteresis. Keep slash/inversion information only
+    # when it persists long enough to be musically plausible.
+    smooth = labels[:]
+    for i in range(len(labels)):
+        votes: dict[str, float] = {}
+        for j in range(max(0, i - 2), min(len(labels), i + 3)):
+            weight = (1.0 / (1.0 + abs(i - j))) * max(0.04, confidences[j] + 0.04)
+            votes[labels[j]] = votes.get(labels[j], 0.0) + weight
+        if votes:
+            smooth[i] = max(votes, key=votes.get)
+    events: list[Chord] = []
+    last = ""
+    for time_ms, label in zip(times, smooth):
+        if label == "N" or label == last:
+            continue
+        # suppress isolated <500 ms labels between equal neighbours
+        events.append(Chord(time_ms=int(time_ms), chord=label))
+        last = label
+    if len(events) >= 3:
+        filtered: list[Chord] = []
+        for idx, item in enumerate(events):
+            if 0 < idx < len(events) - 1:
+                duration = events[idx + 1].time_ms - item.time_ms
+                if duration < 500 and filtered and filtered[-1].chord == events[idx + 1].chord:
+                    continue
+            filtered.append(item)
+        events = filtered
+    return events or base_events
 
 def _extract_chords_chordino(path: Path) -> list[Chord] | None:
     """Prefer NNLS-Chroma/Chordino when available for higher chord accuracy."""
@@ -675,19 +887,23 @@ def extract_chords_progressive(
     if cancelled and cancelled():
         raise InterruptedError("Chord extraction cancelled")
     if progress:
-        progress(35, [], f"Analisi completa chords · {device}")
-    events = extract_chords(path, engine=engine)
+        progress(32, [], f"Step 1/5 · riconoscimento base root/cambi · {device}")
+    base_events = extract_chords(path, engine=engine)
     if cancelled and cancelled():
         raise InterruptedError("Chord extraction cancelled")
-    # Collapse only adjacent events carrying the same chord. This preserves real
-    # later repetitions while avoiding redundant labels produced by a recognizer.
+    if progress:
+        progress(46, [], "Step 2/5 · preparazione analisi armonica estesa")
+    events = _refine_extended_harmony(path, base_events, progress=progress, cancelled=cancelled)
+    if cancelled and cancelled():
+        raise InterruptedError("Chord extraction cancelled")
     cleaned: list[Chord] = []
     for item in sorted(events, key=lambda x: x.time_ms):
         if cleaned and item.chord == cleaned[-1].chord:
             continue
         cleaned.append(item)
     if progress:
-        progress(96, [], "Analisi chords completata")
+        progress(94, [], "Step 5/5 · timeline armonica finale")
+        progress(96, [], "Analisi armonica estesa completata")
     return cleaned
 
 

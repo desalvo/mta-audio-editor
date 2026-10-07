@@ -20,7 +20,7 @@ from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse, Resp
 from starlette.background import BackgroundTask
 from fastapi.staticfiles import StaticFiles
 
-from .audio_engine import auto_align_ms, delete_range, delete_song_range, ensure_clips, estimate_bpm_and_signature, generate_metronome_wav, media_duration_ms, project_duration_ms, render_mix, render_track, render_track_export, shift_track, waveform_peaks
+from .audio_engine import auto_align_ms, delete_range, delete_song_range, ensure_clips, estimate_bpm_and_signature, generate_chords_piano_wav, generate_metronome_wav, media_duration_ms, project_duration_ms, render_mix, render_track, render_track_export, shift_track, waveform_peaks
 from .codec import export_mta, ffprobe, import_mta, resolve_mta_device_profile, suggested_slots, validate_slot_mapping
 from .models import AutoMixRequest, Clip, CustomPresetRequest, DeleteRangeRequest, InstantiateProjectClipRequest, UpdateProjectClipRequest, MoveTrackRequest, TrackDelayRequest, MtaExportRequest, Project, ProjectClip, ProjectExportRequest, RightsRecord, Track, SampleEditRequest, SampleEffectRequest
 from .plugins import STEM_SPLITTER, delete_user_preset, plugin_manifest, save_user_preset
@@ -154,6 +154,7 @@ STEM_JOB_LOCK = threading.Lock()
 MEDIA_JOBS: dict[str, dict] = {}
 MEDIA_JOB_LOCK = threading.Lock()
 METRONOME_TRACK_LOCK = threading.Lock()
+CHORDS_TRACK_LOCK = threading.Lock()
 
 
 
@@ -3439,6 +3440,78 @@ def _create_metronome_track_locked(pid: str, request: Request):
     track.waveform_revision = _track_waveform_revision(track, out) if peaks else ""
     save_project(project)
     return {"project": project, "track": track, "reused": reused}
+
+
+@app.post("/api/projects/{pid}/chords-track")
+def create_chords_track(pid: str, request: Request):
+    with CHORDS_TRACK_LOCK:
+        return _create_chords_track_locked(pid, request)
+
+
+def _create_chords_track_locked(pid: str, request: Request):
+    project = _project_for_actor(request, pid)
+    duration_ms = project_duration_ms(project)
+    if duration_ms <= 0:
+        raise HTTPException(400, "Il progetto non ha ancora una durata. Importa almeno una traccia audio prima di creare la traccia accordi.")
+    active_chords = [c for c in project.chords if not c.excluded and not c.deleted]
+    if not active_chords:
+        raise HTTPException(400, "Il progetto non contiene chords attivi")
+
+    def is_chords_track(item: Track) -> bool:
+        name = str(getattr(item, "name", "") or "").strip().lower()
+        filename = str(getattr(item, "filename", "") or "").lower()
+        return name in {"chords", "accordi", "chords piano", "accordi piano"} or filename.startswith("chords-piano-")
+
+    existing = [item for item in project.tracks if is_chords_track(item)]
+    track = existing[0] if existing else None
+    reused = track is not None
+    if len(existing) > 1:
+        duplicate_ids = {item.id for item in existing[1:]}
+        for item in existing[1:]:
+            if item.filename:
+                audio_path(pid, item.filename).unlink(missing_ok=True)
+        project.tracks = [item for item in project.tracks if item.id not in duplicate_ids]
+
+    filename = track.filename if track and track.filename else f"chords-piano-{uuid.uuid4().hex[:10]}.wav"
+    out = audio_path(pid, filename)
+    try:
+        duration_ms = generate_chords_piano_wav(project, out)
+        peaks = waveform_peaks(out)
+    except Exception as exc:
+        if not reused:
+            out.unlink(missing_ok=True)
+        raise HTTPException(400, f"Creazione traccia accordi fallita: {str(exc)[:300]}") from exc
+
+    if track is None:
+        track = Track(
+            id=uuid.uuid4().hex[:10],
+            name="Chords",
+            type="keyboards",
+            filename=filename,
+            duration_ms=duration_ms,
+            channels=2,
+            channel_layout="stereo",
+            color="#8B5CF6",
+            waveform_peaks=peaks,
+            waveform_revision="",
+            clips=[Clip(id=uuid.uuid4().hex[:10], source_start_ms=0, source_end_ms=duration_ms, timeline_start_ms=0)],
+        )
+        project.tracks.append(track)
+    else:
+        track.name = "Chords"
+        track.type = "keyboards"
+        track.filename = filename
+        track.duration_ms = duration_ms
+        track.channels = 2
+        track.channel_layout = "stereo"
+        track.waveform_peaks = peaks
+        track.clips = [Clip(
+            id=(track.clips[0].id if track.clips else uuid.uuid4().hex[:10]),
+            source_start_ms=0, source_end_ms=duration_ms, timeline_start_ms=0,
+        )]
+    track.waveform_revision = _track_waveform_revision(track, out) if peaks else ""
+    save_project(project)
+    return {"project": project, "track": track, "reused": reused, "chord_count": len(active_chords)}
 
 @app.post("/api/projects/{pid}/tracks/{track_id}/estimate-bpm")
 def estimate_track_bpm(pid: str, track_id: str, request: Request, time_signature: str | None = None):

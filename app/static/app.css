@@ -1151,3 +1151,13 @@ body.native-single-user .main-area{grid-template-rows:minmax(120px,1fr) var(--mi
 /* r184 inline lyrics editing */
 .lyrics-chords-editor-modal .lc-lyrics-inline{min-width:.35em;outline:0;border-radius:3px;padding:0 1px;cursor:text;white-space:pre}
 .lyrics-chords-editor-modal .lc-lyrics-inline:focus{outline:1px solid currentColor;background:rgba(127,127,127,.12)}
+
+/* r193 inspector/plugin frame visibility and scrolling */
+.editor-zone{position:relative;z-index:2;isolation:isolate}
+.editor-grid{position:relative;z-index:1;min-height:0;overflow:hidden}
+.inspector{position:relative;z-index:30;min-width:0;min-height:0;max-height:100%;overflow:hidden!important;display:flex;flex-direction:column;isolation:isolate;background:#0c1721;scrollbar-gutter:stable}
+.inspector-tabs{position:sticky;top:0;z-index:40;flex:0 0 31px;background:#0c1721;box-shadow:0 1px 0 #2d455a,0 4px 10px rgba(0,0,0,.28)}
+.inspector-body{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-gutter:stable;padding:10px;position:relative;z-index:1}
+.inspector-close{position:sticky;right:0;z-index:45}
+.mixer-dock{z-index:0}
+@media(max-width:900px){.inspector{max-height:none}.inspector-body{-webkit-overflow-scrolling:touch}}

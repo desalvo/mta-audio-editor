@@ -578,6 +578,128 @@ def _xcorr_fft(a, b):
     return np.fft.irfft(np.fft.rfft(a, size) * np.fft.rfft(b[::-1], size), size)[:count]
 
 
+
+_CHORD_ROOTS = {
+    "C": 0, "C#": 1, "DB": 1, "D": 2, "D#": 3, "EB": 3, "E": 4,
+    "F": 5, "F#": 6, "GB": 6, "G": 7, "G#": 8, "AB": 8, "A": 9,
+    "A#": 10, "BB": 10, "B": 11,
+}
+
+def _chord_midi_notes(symbol: str) -> list[int]:
+    """Return a compact piano voicing for a common chord symbol.
+
+    Unknown/unsupported decorations fall back to a major/minor triad when the
+    root can be identified. Slash bass is honoured when present.
+    """
+    raw = str(symbol or "").strip().replace("♯", "#").replace("♭", "b")
+    if not raw or raw.upper() in {"N", "NC", "N.C.", "NOCHORD"}:
+        return []
+    m = re.match(r"^([A-Ga-g])([#b]?)([^/]*)?(?:/([A-Ga-g])([#b]?))?$", raw)
+    if not m:
+        return []
+    root_name = (m.group(1).upper() + (m.group(2) or "")).upper()
+    root_pc = _CHORD_ROOTS.get(root_name)
+    if root_pc is None:
+        return []
+    quality = (m.group(3) or "").lower().replace(" ", "")
+    if "dim" in quality or "°" in quality:
+        intervals = [0, 3, 6]
+    elif "aug" in quality or "+" in quality:
+        intervals = [0, 4, 8]
+    elif "sus2" in quality:
+        intervals = [0, 2, 7]
+    elif "sus" in quality:
+        intervals = [0, 5, 7]
+    elif re.match(r"^(m|min)(?!aj)", quality):
+        intervals = [0, 3, 7]
+    else:
+        intervals = [0, 4, 7]
+    if "maj7" in quality or "ma7" in quality or "△7" in quality:
+        intervals.append(11)
+    elif "7" in quality:
+        intervals.append(10)
+    elif "6" in quality:
+        intervals.append(9)
+    if "9" in quality:
+        intervals.append(14)
+    # Middle-register voicing, deliberately conservative to avoid clipping.
+    root_midi = 48 + root_pc  # C3..B3
+    notes = [root_midi + i for i in intervals]
+    bass = m.group(4)
+    if bass:
+        bass_name = (bass.upper() + (m.group(5) or "")).upper()
+        bass_pc = _CHORD_ROOTS.get(bass_name)
+        if bass_pc is not None:
+            notes.insert(0, 36 + bass_pc)
+    return sorted(dict.fromkeys(notes))
+
+
+def generate_chords_piano_wav(project: Project, out: Path) -> int:
+    """Render active project chords as a synchronized digital-piano guide track."""
+    duration_ms = project_duration_ms(project)
+    if duration_ms <= 0:
+        raise ValueError("project duration is zero")
+    events = sorted(
+        [c for c in project.chords if not getattr(c, "excluded", False) and not getattr(c, "deleted", False)],
+        key=lambda c: int(c.time_ms),
+    )
+    if not events:
+        raise ValueError("project has no active chords")
+    sample_rate = 44100
+    total = max(1, round(duration_ms / 1000.0 * sample_rate))
+    audio = np.zeros((total, 2), dtype=np.float64)
+    for index, chord in enumerate(events):
+        start_ms = max(0, int(chord.time_ms))
+        if start_ms >= duration_ms:
+            continue
+        next_ms = int(events[index + 1].time_ms) if index + 1 < len(events) else duration_ms
+        # Leave a tiny articulation gap while still following the chord list exactly.
+        end_ms = min(duration_ms, max(start_ms + 120, next_ms))
+        note_ms = max(90, end_ms - start_ms)
+        start = round(start_ms / 1000.0 * sample_rate)
+        frames = min(total - start, round(note_ms / 1000.0 * sample_rate))
+        if frames <= 0:
+            continue
+        notes = _chord_midi_notes(chord.chord)
+        if not notes:
+            continue
+        t = np.arange(frames, dtype=np.float64) / sample_rate
+        # Fast piano attack, dual exponential decay and a short release at the next chord.
+        attack = np.minimum(1.0, t / 0.008)
+        env = attack * (0.72 * np.exp(-t * 1.35) + 0.28 * np.exp(-t * 0.24))
+        release_len = min(frames, round(0.08 * sample_rate))
+        if release_len > 1:
+            env[-release_len:] *= np.linspace(1.0, 0.0, release_len)
+        mono = np.zeros(frames, dtype=np.float64)
+        for ni, midi in enumerate(notes):
+            freq = 440.0 * (2.0 ** ((midi - 69) / 12.0))
+            # Additive electric/digital-piano timbre, with progressively softer harmonics.
+            phase = 0.13 * ni
+            tone = (
+                np.sin(2 * np.pi * freq * t + phase)
+                + 0.34 * np.sin(2 * np.pi * freq * 2.0 * t + phase * 1.7)
+                + 0.12 * np.sin(2 * np.pi * freq * 3.0 * t + phase * 2.1)
+            )
+            mono += tone / max(1.0, len(notes) ** 0.72)
+        mono *= env * 0.21
+        # Subtle stereo spread by voicing index; preserves mono compatibility.
+        pan = -0.16 if index % 2 == 0 else 0.16
+        left = mono * np.sqrt((1.0 - pan) * 0.5)
+        right = mono * np.sqrt((1.0 + pan) * 0.5)
+        audio[start:start + frames, 0] += left
+        audio[start:start + frames, 1] += right
+    peak = float(np.max(np.abs(audio))) if audio.size else 0.0
+    if peak > 0.94:
+        audio *= 0.94 / peak
+    pcm = np.asarray(np.clip(audio, -1.0, 1.0) * 32767.0, dtype=np.int16)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    with wave.open(str(out), "wb") as handle:
+        handle.setnchannels(2)
+        handle.setsampwidth(2)
+        handle.setframerate(sample_rate)
+        handle.writeframes(pcm.tobytes())
+    return duration_ms
+
 def auto_align_ms(reference: Path, candidate: Path, max_shift_ms: int = 30000) -> int:
     a, hz = _envelope(reference)
     b, _ = _envelope(candidate)

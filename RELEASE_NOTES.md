@@ -1,3 +1,17 @@
+## 0.2.0-r193
+
+- Inspector/plugin panel header is now always visible and reachable.
+- Inspector content scrolls inside its own body while Inspector/Stems/Metadata and the close button remain sticky.
+- Fixed panel stacking so timeline/mixer layers cannot cover the plugin frame header.
+
+## 0.2.0-r192
+
+Chord extraction now runs a multi-stage harmonic-analysis pipeline: the selected recognizer supplies robust roots/change points, then MTA performs high-resolution chroma analysis, extended chord-quality classification, dedicated bass/inversion detection for slash chords, and temporal stabilization. The extraction dialog shows progress across these stages.
+
+## 0.2.0-r191
+
+Adds a single synchronized Chords guide track rendered with a digital-piano timbre from the project chord list, useful for live harmonic verification. Recreating it updates the existing guide instead of adding duplicates.
+
 ## 0.2.0-r190
 
 - Lyrics + Chords + Markers: clicking an already selected chord now deselects it; double-click still opens structured editing.

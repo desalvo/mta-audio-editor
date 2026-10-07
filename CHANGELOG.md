@@ -1,3 +1,23 @@
+## 0.2.0-r193
+
+- Inspector/plugin panel header is now always visible and reachable.
+- Inspector content scrolls inside its own body while Inspector/Stems/Metadata and the close button remain sticky.
+- Fixed panel stacking so timeline/mixer layers cannot cover the plugin frame header.
+
+## 0.2.0-r192
+
+- Added multi-stage high-fidelity harmonic analysis after the selected base recognizer.
+- Extended chord vocabulary: sevenths, diminished/half-diminished, augmented, sixths, suspensions, added/extended ninths, altered dominant chords.
+- Added dedicated bass-chroma analysis for inversions and slash chords (for example C/E and G7/B).
+- Added temporal stabilization and base-engine root priors to reduce transient/over-complex labels.
+- Chord extraction progress now reports the individual harmonic-analysis stages.
+
+## 0.2.0-r191
+
+- Added a unique generated Chords/Accordi guide track with synchronized digital-piano playback from active project chord events.
+- Repeated creation regenerates/reuses the same Chords track and consolidates old duplicates.
+- Chords guide participates in the normal mixer, live controls, playback graph and VU metering.
+
 ## 0.2.0-r190
 
 - Lyrics + Chords + Markers: clicking an already selected chord now deselects it; double-click still opens structured editing.
