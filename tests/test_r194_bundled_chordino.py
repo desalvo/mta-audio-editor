@@ -55,5 +55,6 @@ def test_packaging_bundles_chordino_for_container_and_native():
     assert "MTA_NATIVE_CHORDINO_BIN_DIR" in workflow and "MTA_NATIVE_CHORDINO_VAMP_DIR" in workflow
     assert '"vamp"' in spec and "MTA_NATIVE_CHORDINO_VAMP_DIR" in spec
     assert "configure_chordino_environment" in launcher
-    assert "sonic-annotator" in windows and "nnls-chroma-win64" in windows
+    assert "sonic-annotator" in windows and "PrebuiltPlugin" in windows
+    assert "nnls-chroma-win64" in workflow and "chordino-windows-x64-runtime" in workflow
     assert "Makefile.osx" in unix and "vamp-simple-host" in unix

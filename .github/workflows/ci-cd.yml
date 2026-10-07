@@ -106,6 +106,34 @@ jobs:
           ignore-unfixed: true
           exit-code: '1'
 
+  chordino-windows-runtime:
+    name: Build Windows Chordino runtime
+    runs-on: ubuntu-latest
+    needs: [quality, security]
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install cross-compiler dependencies
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mingw-w64 libboost-dev git
+      - name: Cross-compile NNLS-Chroma / Chordino x64
+        shell: bash
+        run: |
+          set -euxo pipefail
+          work="$RUNNER_TEMP/nnls-chroma-win64"
+          git clone https://github.com/jotapemj/nnls-chroma-win64.git "$work"
+          git -C "$work" checkout a84ba3a4dc7d8c04796cd3487704aee6fd18ca84
+          bash "$work/build.sh"
+          test -s "$work/dist/nnls-chroma.dll"
+      - name: Upload Windows Chordino runtime
+        uses: actions/upload-artifact@v7
+        with:
+          name: chordino-windows-x64-runtime
+          path: ${{ runner.temp }}/nnls-chroma-win64/dist/*
+          if-no-files-found: error
+          retention-days: 7
+
   container:
     name: Container production gate
     runs-on: ubuntu-latest
@@ -208,7 +236,7 @@ jobs:
     name: Native Windows installer
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     runs-on: windows-latest
-    needs: [quality, security]
+    needs: [quality, security, chordino-windows-runtime]
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
@@ -237,6 +265,11 @@ jobs:
           "MTA_NATIVE_FFPROBE=$ffprobe" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           Write-Host "ffmpeg=$ffmpeg"
           Write-Host "ffprobe=$ffprobe"
+      - name: Download prebuilt Chordino x64 runtime
+        uses: actions/download-artifact@v8
+        with:
+          name: chordino-windows-x64-runtime
+          path: native/runtime/chordino-prebuilt
       - name: Provision bundled Chordino runtime
         shell: pwsh
         run: .\scripts\provision_chordino_windows.ps1

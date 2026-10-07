@@ -1,3 +1,7 @@
+## 0.2.0-r200
+
+CI/native packaging fix for bundled Chordino on Windows and macOS. No intended application behavior changes.
+
 ## 0.2.0-r199
 
 - CI maintenance: fix Ruff/Bandit findings from r198 (HTTPS validation for chord model downloads, logged ensemble failures, remove unused test import).

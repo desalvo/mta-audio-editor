@@ -1,3 +1,9 @@
+## 0.2.0-r200
+
+- Fix native Chordino provisioning in GitHub Actions on Windows and macOS.
+- Windows now cross-compiles NNLS-Chroma x64 reproducibly on Linux and transfers it as a same-run artifact.
+- macOS now uses the runner architecture, Homebrew Boost headers, and the actual Homebrew libvamp-sdk.a path.
+
 ## 0.2.0-r199
 
 - CI maintenance: fix Ruff/Bandit findings from r198 (HTTPS validation for chord model downloads, logged ensemble failures, remove unused test import).
