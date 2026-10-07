@@ -1,3 +1,8 @@
+## 0.2.0-r201
+
+- Fix macOS arm64 Chordino provisioning: use the Homebrew include root for Vamp SDK headers while linking `libvamp-sdk.a` from the library directory.
+- No application behavior changes.
+
 ## 0.2.0-r200
 
 CI/native packaging fix for bundled Chordino on Windows and macOS. No intended application behavior changes.

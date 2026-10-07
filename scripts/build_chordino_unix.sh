@@ -22,7 +22,7 @@ VAMP_SDK_DIR="${VAMP_SDK_DIR:-/usr/include/vamp-sdk}"
 if [[ "$(uname -s)" == "Darwin" ]]; then
   BREW_PREFIX="$(brew --prefix vamp-plugin-sdk)"
   BOOST_PREFIX="$(brew --prefix boost)"
-  VAMP_SDK_DIR="${VAMP_SDK_DIR_MAC:-$BREW_PREFIX/include/vamp-sdk}"
+  VAMP_SDK_DIR="${VAMP_SDK_DIR_MAC:-$BREW_PREFIX/include}"
   VAMP_SDK_LIB="$BREW_PREFIX/lib/libvamp-sdk.a"
   [[ -f "$VAMP_SDK_LIB" ]] || { echo "libvamp-sdk.a not found at $VAMP_SDK_LIB" >&2; exit 4; }
   case "$(uname -m)" in
