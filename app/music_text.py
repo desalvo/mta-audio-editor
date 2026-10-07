@@ -944,7 +944,8 @@ def _extract_profile_base(path: Path, profile: str, progress=None, cancelled=Non
             progress(pct, [], f"Ensemble {index + 1}/{len(selected)} · {engine}")
         try:
             result = extract_chords(path, engine=engine)
-        except Exception:
+        except Exception as exc:
+            logger.warning("Chord ensemble engine %s failed: %s", engine, exc)
             continue
         if result:
             results[engine] = result

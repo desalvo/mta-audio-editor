@@ -8,6 +8,7 @@ import subprocess
 import sys
 import tempfile
 import urllib.request
+from urllib.parse import urlparse
 import zipfile
 from pathlib import Path
 from typing import Iterable
@@ -78,7 +79,10 @@ def _flatten_single_directory(destination: Path) -> None:
 
 
 def _download_zip(url: str, destination: Path) -> None:
-    req = urllib.request.Request(url, headers={"User-Agent": "MTA-Audio-Editor/0.2"})
+    parsed = urlparse(url)
+    if parsed.scheme != "https" or not parsed.netloc:
+        raise ValueError("model downloads require an HTTPS URL")
+    req = urllib.request.Request(url, headers={"User-Agent": "MTA-Audio-Editor/0.2"})  # noqa: S310
     with urllib.request.urlopen(req, timeout=180) as response, destination.open("wb") as out:  # noqa: S310
         shutil.copyfileobj(response, out)
 

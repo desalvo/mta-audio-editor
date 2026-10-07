@@ -56,7 +56,12 @@ def test_native_autosave_no_longer_rewrites_maeproj():
     assert 'syncNativeProjectFile(current.id)' in js[save_start:save_start+800]
 
 
-def test_revision_198_metadata():
-    assert Path('REVISION').read_text().strip() == '198'
-    assert 'versionCode = 20198' in Path('mobile/android/app/build.gradle.kts').read_text()
-    assert '<string>20198</string>' in Path('mobile/ios/MTAEditorMobile/Info.plist').read_text()
+def test_revision_metadata_alignment():
+    revision = int(Path('REVISION').read_text().strip())
+    build_number = 20000 + revision
+    android = Path('mobile/android/app/build.gradle.kts').read_text()
+    ios = Path('mobile/ios/MTAEditorMobile/Info.plist').read_text()
+    assert f'versionCode = {build_number}' in android
+    assert f'buildConfigField("String", "MTA_REVISION", "\\"{revision}\\"")' in android
+    assert f'<string>{build_number}</string>' in ios
+    assert f'<key>MTAEditorRevision</key><string>{revision}</string>' in ios
