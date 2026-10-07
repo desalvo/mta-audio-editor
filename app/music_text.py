@@ -1527,10 +1527,38 @@ def build_lyrics_pdf(
             color = black
         return fonts[style_name], float(cfg.get("size") or 11), color
 
-    c = canvas.Canvas(str(out), pagesize=A4, pageCompression=1)
     width, height = A4
     margin = 48
     usable_width = width - 2 * margin
+
+    class NumberedCanvas(canvas.Canvas):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self._saved_page_states = []
+
+        def _snapshot_page(self):
+            state = dict(self.__dict__)
+            state.pop("_saved_page_states", None)
+            self._saved_page_states.append(state)
+
+        def showPage(self):
+            self._snapshot_page()
+            self._startPage()
+
+        def save(self):
+            self._snapshot_page()
+            page_count = len(self._saved_page_states)
+            for index, state in enumerate(self._saved_page_states, start=1):
+                self.__dict__.update(state)
+                self.saveState()
+                self.setFont(fonts["normal"], 8)
+                self.setFillColor(HexColor("#666666"))
+                self.drawCentredString(width / 2.0, 24, f"{index}/{page_count}")
+                self.restoreState()
+                canvas.Canvas.showPage(self)
+            canvas.Canvas.save(self)
+
+    c = NumberedCanvas(str(out), pagesize=A4, pageCompression=1)
     y = height - 54
 
     def safe(text: str) -> str:
@@ -1712,11 +1740,45 @@ def build_lyrics_pdf(
     current_section_color = None
     current_section_indent = 0.0
 
+    def estimate_lyric_block_height(index: int, indent: float) -> float:
+        if index < 0 or index >= len(ordered_lyrics):
+            return 0.0
+        lyric = ordered_lyrics[index]
+        line_start = int(lyric.time_ms)
+        next_boundary = next((t for t in boundary_times if t > line_start), None)
+        line_end = int(next_boundary if next_boundary is not None else (lyric.end_ms or line_start + 6000))
+        section_width = max(72.0, usable_width - indent)
+        lyric_lines = wrap_text(lyric.text, "lyrics", section_width)
+        lyric_size = st("lyrics")[1]
+        chord_size = st("chords")[1]
+        has_chords = any(
+            _manual_chord_line_match(ch, lyric)
+            or (not ch.manual_anchor and line_start <= ch.time_ms < line_end)
+            for ch in ordered_chords
+        )
+        return (chord_size + 7 if has_chords else 0.0) + len(lyric_lines) * (lyric_size + 6) + line_spacing
+
+    def ensure_marker_with_two_lyrics(marker: Marker, lyric_index: int) -> None:
+        # Avoid an orphaned section marker at the foot of a page. If at least two
+        # lyric rows remain in the document, keep the marker and those two rows
+        # together on the same page; otherwise there is no possible two-line block.
+        if lyric_index + 1 >= len(ordered_lyrics):
+            return
+        extra = marker_section_spacing if marker_draw_count else 0.0
+        marker_size = st("markers")[1]
+        marker_height = max(18.0, marker_size + 8.0)
+        indent = marker_indent_points(marker)
+        required = extra + marker_height
+        required += estimate_lyric_block_height(lyric_index, indent)
+        required += estimate_lyric_block_height(lyric_index + 1, indent)
+        ensure(required)
+
     for i,lyric in enumerate(ordered_lyrics):
         line_start=int(lyric.time_ms)
         next_boundary=next((t for t in boundary_times if t>line_start), None)
         line_end=int(next_boundary if next_boundary is not None else (lyric.end_ms or line_start+6000))
         while marker_idx<len(ordered_markers) and int(ordered_markers[marker_idx].time_ms)<=line_start:
+            ensure_marker_with_two_lyrics(ordered_markers[marker_idx], i)
             current_section_color, current_section_indent = draw_marker(ordered_markers[marker_idx]);marker_idx+=1
         section_margin = margin + current_section_indent
         section_width = max(72.0, usable_width - current_section_indent)

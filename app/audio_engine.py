@@ -745,7 +745,6 @@ def refresh_chords_piano_wav_region(project: Project, out: Path, old_time_ms: in
         params = handle.getparams()
         if params.nchannels != 2 or params.sampwidth != 2 or params.framerate != 44100 or params.comptype != "NONE":
             raise ValueError("unsupported chords track WAV format")
-        raw = bytearray(handle.readframes(params.nframes))
     sample_rate = params.framerate
     start_frame = max(0, min(params.nframes, round(start_ms / 1000.0 * sample_rate)))
     end_frame = max(start_frame + 1, min(params.nframes, round(end_ms / 1000.0 * sample_rate)))
@@ -760,12 +759,31 @@ def refresh_chords_piano_wav_region(project: Project, out: Path, old_time_ms: in
         pcm += b"\x00" * (expected - len(pcm))
     elif len(pcm) > expected:
         pcm = pcm[:expected]
-    raw[start_frame * frame_bytes:end_frame * frame_bytes] = pcm
-    tmp = out.with_suffix(out.suffix + ".refresh.tmp")
-    with wave.open(str(tmp), "wb") as handle:
-        handle.setparams(params)
-        handle.writeframes(bytes(raw))
-    tmp.replace(out)
+    # Patch only the PCM data window in-place. Rewriting the whole WAV made a
+    # supposedly fast chord edit scale with total song length and delayed UI refresh.
+    data_offset = None
+    with out.open("rb") as handle:
+        if handle.read(4) != b"RIFF":
+            raise ValueError("unsupported WAV header")
+        handle.seek(12)
+        while True:
+            chunk_id = handle.read(4)
+            if len(chunk_id) < 4:
+                break
+            size_raw = handle.read(4)
+            if len(size_raw) < 4:
+                break
+            chunk_size = int.from_bytes(size_raw, "little", signed=False)
+            if chunk_id == b"data":
+                data_offset = handle.tell()
+                break
+            handle.seek(chunk_size + (chunk_size & 1), 1)
+    if data_offset is None:
+        raise ValueError("WAV data chunk not found")
+    with out.open("r+b", buffering=0) as handle:
+        handle.seek(data_offset + start_frame * frame_bytes)
+        handle.write(pcm)
+        handle.flush()
     return start_ms, end_ms
 
 

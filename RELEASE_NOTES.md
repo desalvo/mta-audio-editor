@@ -1,4 +1,4 @@
-## 0.2.0-r225
+## 0.2.0-r227
 
 - Rigenerazione automatica della traccia Chords dopo ogni mutazione audio-rilevante: spostamento, modifica, aggiunta, disabilitazione, riabilitazione, eliminazione, reset ed estrazione.
 - Refresh fast/parziale preferito sulla minima regione temporale interessata, con fallback automatico al render completo.

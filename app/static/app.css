@@ -1228,3 +1228,10 @@ body:has(#topZoom:active) .wave{image-rendering:auto}
 .chord-shortcuts{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin:7px 0}
 .chord-shortcuts button{min-width:34px;padding:3px 7px;border:1px solid #37677e;border-radius:10px;background:#102a38;color:#eaf8ff;font-size:11px;font-weight:700;cursor:pointer}
 .chord-shortcuts button:hover{border-color:#9ee3ff;background:#17445d}
+
+/* r227: compact Chords refresh progress and editable transport clock. */
+.transport-time-input{width:92px;max-width:28vw;background:transparent;color:inherit;border:1px solid transparent;border-radius:5px;font:inherit;font-weight:700;padding:2px 4px;text-align:center}
+.transport-time-input:hover,.transport-time-input:focus{border-color:#4d738e;background:#08131d;outline:none}
+.utility-modal.chords-refresh-progress-modal{width:min(460px,92vw)!important;max-height:min(260px,70vh)!important;resize:none!important;overflow:hidden!important}
+.utility-modal.chords-refresh-progress-modal .utility-body{padding:14px!important}
+.utility-modal.chords-refresh-progress-modal .media-live-output{max-height:72px;overflow:auto}
