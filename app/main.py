@@ -23,6 +23,8 @@ from fastapi.staticfiles import StaticFiles
 from .audio_engine import auto_align_ms, delete_range, delete_song_range, ensure_clips, estimate_bpm_and_signature, generate_chords_piano_wav, generate_silent_chords_wav, refresh_chords_piano_wav_region, generate_metronome_wav, media_duration_ms, project_duration_ms, render_mix, render_track, render_track_export, shift_track, waveform_peaks
 from .codec import export_mta, ffprobe, import_mta, resolve_mta_device_profile, suggested_slots, validate_slot_mapping
 from .models import AutoMixRequest, Clip, CustomPresetRequest, DeleteRangeRequest, DeleteTracksRequest, InstantiateProjectClipRequest, UpdateProjectClipRequest, MoveTrackRequest, TrackDelayRequest, MtaExportRequest, Project, ProjectClip, ProjectExportRequest, TrackExportRequest, RightsRecord, Track, SampleEditRequest, SampleEffectRequest
+from .mlive_mp3 import embed_mlive_merish_metadata
+from .mp3g import build_mp3g_zip
 from .plugins import STEM_SPLITTER, delete_user_preset, plugin_manifest, save_user_preset
 
 from .model_updater import (COREML_DIR, ONNX_DIR, start_background_updater, update_once as update_mobile_demucs_models,
@@ -916,10 +918,11 @@ def projects(request: Request):
 
 
 @app.post("/api/projects")
-def project_new(request: Request, title: str = "Untitled", target: str = "MTA8"):
+def project_new(request: Request, title: str = "Untitled", target: str = "MTA8", sample_rate: int = 44100):
     actor = _actor(request)
     owner = actor["id"] if actor["id"] > 0 else None
-    return create_project(title, target if target in {"MTA8", "MTA16", "DAW"} else "MTA8", owner_user_id=owner)
+    rate = int(sample_rate) if int(sample_rate) in {44100, 48000, 96000} else 44100
+    return create_project(title, target if target in {"MTA8", "MTA16", "DAW"} else "MTA8", owner_user_id=owner, sample_rate=rate)
 
 
 def _refresh_project_clip_metadata(project: Project, asset: ProjectClip, *, force: bool = False) -> bool:
@@ -942,6 +945,10 @@ def _refresh_project_clip_metadata(project: Project, asset: ProjectClip, *, forc
         container = str(fmt.get("format_name") or source.suffix.lstrip(".")).strip()
         display_format = " / ".join(part for part in (codec.upper() if codec else "", container) if part)[:160]
         bitrate = 0
+        try:
+            sample_rate = int(stream.get("sample_rate") or 0)
+        except (TypeError, ValueError):
+            sample_rate = 0
         for value in (stream.get("bit_rate"), fmt.get("bit_rate")):
             try:
                 bitrate = max(bitrate, int(float(value or 0)))
@@ -960,6 +967,7 @@ def _refresh_project_clip_metadata(project: Project, asset: ProjectClip, *, forc
         updates = {
             "format": display_format,
             "bitrate_bps": bitrate,
+            "sample_rate": sample_rate if sample_rate in {44100, 48000, 96000} else 44100,
             "size_bytes": size,
             "embedded_metadata": tags,
             "metadata_scanned": True,
@@ -1060,6 +1068,8 @@ def project_put(pid: str, project: Project, request: Request):
     current = _project_for_actor(request, pid)
     if pid != project.id:
         raise HTTPException(400, "project id mismatch")
+    if int(project.sample_rate) != int(current.sample_rate) and current.tracks:
+        raise HTTPException(409, "Il sample rate del progetto può essere modificato solo quando non ci sono tracce attive")
     # Ownership/shares and reusable audio assets are managed conservatively.
     project.owner_user_id = current.owner_user_id
     project.shared_with_user_ids = current.shared_with_user_ids
@@ -1327,7 +1337,41 @@ def _copy_limited(src, dst: Path):
             out.write(chunk)
 
 
-def _save_upload(pid: str, file: UploadFile):
+def _audio_sample_rate(path: Path) -> int:
+    info = ffprobe(path)
+    stream = next((item for item in info.get("streams", []) if item.get("codec_type") == "audio"), {})
+    try:
+        return int(stream.get("sample_rate") or 0)
+    except (TypeError, ValueError):
+        return 0
+
+
+def _normalize_audio_to_project_rate(pid: str, filename: str, project_rate: int, *, strict: bool = True) -> tuple[str, Path, int]:
+    source = audio_path(pid, filename)
+    source_rate = _audio_sample_rate(source)
+    if source_rate not in {44100, 48000, 96000}:
+        if not strict:
+            return filename, source, int(project_rate) if int(project_rate) in {44100, 48000, 96000} else 44100
+        raise ValueError(f"sample rate audio non supportato: {source_rate or 'sconosciuto'} Hz; usa 44.1, 48 o 96 kHz")
+    target_rate = int(project_rate) if int(project_rate) in {44100, 48000, 96000} else 44100
+    if source_rate == target_rate:
+        return filename, source, source_rate
+    converted_name = f"{Path(filename).stem}-sr{target_rate}.wav"
+    converted = audio_path(pid, converted_name)
+    tmp = converted.with_name(f".{converted.name}.{uuid.uuid4().hex}.tmp.wav")
+    proc = subprocess.run([
+        "ffmpeg", "-y", "-v", "error", "-i", str(source), "-map", "0:a:0",
+        "-ar", str(target_rate), "-c:a", "pcm_s24le", str(tmp),
+    ], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    if proc.returncode or not tmp.is_file():
+        tmp.unlink(missing_ok=True)
+        raise ValueError(proc.stderr.strip() or "conversione sample rate fallita")
+    os.replace(tmp, converted)
+    source.unlink(missing_ok=True)
+    return converted_name, converted, source_rate
+
+
+def _save_upload(pid: str, file: UploadFile, project_rate: int | None = None):
     ext = Path(file.filename or "track.wav").suffix.lower() or ".bin"
     if len(ext) > 12 or not ext.replace(".", "").isalnum():
         raise HTTPException(400, "invalid file extension")
@@ -1347,6 +1391,13 @@ def _save_upload(pid: str, file: UploadFile):
             f"Il file è già presente nel progetto come {duplicate['category']}/{duplicate['name']}.",
         )
     preserve_original(pid, dst, Path(file.filename or filename).name)
+    if project_rate is None:
+        project_rate = int(load_project(pid).sample_rate)
+    try:
+        filename, dst, _ = _normalize_audio_to_project_rate(pid, filename, project_rate)
+    except ValueError as exc:
+        dst.unlink(missing_ok=True)
+        raise HTTPException(400, str(exc)) from exc
     return filename, dst, media_duration_ms(dst)
 
 
@@ -1490,9 +1541,10 @@ def _track_import_worker(
     try:
         _media_job_update(job_id, status="running", progress=58, message="Validazione della traccia")
         ffprobe(dst)
+        project = load_project(pid)
+        filename, dst, _ = _normalize_audio_to_project_rate(pid, filename, project.sample_rate)
         duration = media_duration_ms(dst)
         channels, channel_layout = _audio_channel_info(dst)
-        project = load_project(pid)
         if estimate_first_bpm and not project.tracks:
             def bpm_progress(value: int, message: str) -> None:
                 _media_job_update(job_id, progress=60 + int(max(0, min(100, value)) * 0.28), message=message)
@@ -1527,6 +1579,7 @@ def _track_import_worker(
             waveform_revision="",
             channels=channels,
             channel_layout=channel_layout,
+            sample_rate=int(project.sample_rate),
         )
         track.waveform_revision = _track_waveform_revision(track, dst) if peaks else ""
         _media_job_update(job_id, progress=91, message="Aggiunta della traccia al progetto")
@@ -2206,6 +2259,7 @@ async def add_track(
         type=type if type in allowed else "other",
         filename=filename,
         duration_ms=duration,
+        sample_rate=int(project.sample_rate),
         clips=[
             Clip(
                 id=uuid.uuid4().hex[:10],
@@ -2251,6 +2305,7 @@ async def replace_track(
     track.filename = filename
     track.duration_ms = duration
     track.channels, track.channel_layout = _audio_channel_info(dst)
+    track.sample_rate = int(project.sample_rate)
     track.waveform_peaks = []
     track.waveform_revision = ""
     track.clips = [Clip(id=uuid.uuid4().hex[:10], source_start_ms=0, source_end_ms=duration, timeline_start_ms=0)]
@@ -2312,11 +2367,30 @@ def instantiate_project_clip(pid: str, clip_id: str, req: InstantiateProjectClip
     source = audio_path(pid, asset.filename)
     if not source.is_file():
         raise HTTPException(404, "file audio della clip non trovato")
+    track_filename = asset.filename
+    track_source = source
+    try:
+        source_rate = _audio_sample_rate(source)
+    except Exception:
+        source_rate = int(getattr(asset, "sample_rate", 44100) or 44100)
+    if source_rate in {44100, 48000, 96000} and source_rate != int(project.sample_rate):
+        # Keep the reusable library asset untouched. Timeline instances get their own
+        # project-rate working copy so a project-rate change remains non-destructive.
+        working_name = f"{uuid.uuid4().hex[:10]}{source.suffix.lower() or '.wav'}"
+        working = audio_path(pid, working_name)
+        shutil.copyfile(source, working)
+        try:
+            track_filename, track_source, _ = _normalize_audio_to_project_rate(
+                pid, working_name, project.sample_rate
+            )
+        except Exception:
+            working.unlink(missing_ok=True)
+            raise
     track = Track(
         id=uuid.uuid4().hex[:10],
         name=asset.name[:200],
         type=asset.type,
-        filename=asset.filename,
+        filename=track_filename,
         source_clip_id=asset.id,
         duration_ms=asset.duration_ms,
         clips=[Clip(
@@ -2327,10 +2401,11 @@ def instantiate_project_clip(pid: str, clip_id: str, req: InstantiateProjectClip
         )],
         channels=asset.channels,
         channel_layout=asset.channel_layout,
+        sample_rate=int(project.sample_rate),
     )
     try:
-        track.waveform_peaks = waveform_peaks(source, 4096)
-        track.waveform_revision = _track_waveform_revision(track, source)
+        track.waveform_peaks = waveform_peaks(track_source, 4096)
+        track.waveform_revision = _track_waveform_revision(track, track_source)
     except Exception:
         track.waveform_peaks = []
         track.waveform_revision = ""
@@ -2717,6 +2792,7 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
                 filename = f"{uuid.uuid4().hex[:10]}.wav"
                 dst = audio_path(project.id, filename)
                 shutil.copyfile(stem, dst)
+                filename, dst, _ = _normalize_audio_to_project_rate(project.id, filename, project.sample_rate, strict=False)
                 duration = media_duration_ms(dst)
                 channels, channel_layout = _audio_channel_info(dst)
                 display_name = {"lead_vocals": "Lead Vocals", "backing_vocals": "Backing Vocals"}.get(stem_name, stem.stem.title())
@@ -2730,6 +2806,7 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
                         duration_ms=duration,
                         channels=channels,
                         channel_layout=channel_layout,
+                        sample_rate=int(project.sample_rate),
                         clips=[
                             Clip(
                                 id=uuid.uuid4().hex[:10],
@@ -3345,6 +3422,7 @@ async def split_stems_compat(
             filename = f"{uuid.uuid4().hex[:10]}.wav"
             dst = audio_path(project.id, filename)
             shutil.copyfile(stem, dst)
+            filename, dst, _ = _normalize_audio_to_project_rate(project.id, filename, project.sample_rate, strict=False)
             duration = media_duration_ms(dst)
             project.tracks.append(Track(
                 id=uuid.uuid4().hex[:10],
@@ -3352,6 +3430,7 @@ async def split_stems_compat(
                 type=mapping.get(stem.stem.lower(), "other"),
                 filename=filename,
                 duration_ms=duration,
+                sample_rate=int(project.sample_rate),
                 clips=[Clip(id=uuid.uuid4().hex[:10], source_start_ms=0, source_end_ms=duration, timeline_start_ms=0)],
             ))
     save_project(project)
@@ -3494,6 +3573,7 @@ def _create_metronome_track_locked(pid: str, request: Request):
             duration_ms=duration_ms,
             channels=1,
             channel_layout="mono",
+            sample_rate=int(project.sample_rate),
             volume_db=0.0,
             waveform_peaks=peaks,
             waveform_revision="",
@@ -3514,6 +3594,7 @@ def _create_metronome_track_locked(pid: str, request: Request):
         track.duration_ms = duration_ms
         track.channels = 1
         track.channel_layout = "mono"
+        track.sample_rate = int(project.sample_rate)
         track.volume_db = 0.0
         track.waveform_peaks = peaks
         track.clips = [
@@ -3613,6 +3694,7 @@ def _create_chords_track_locked(pid: str, request: Request):
             duration_ms=duration_ms,
             channels=2,
             channel_layout="stereo",
+            sample_rate=int(project.sample_rate),
             volume_db=0.0,
             color="#8B5CF6",
             waveform_peaks=peaks,
@@ -3627,6 +3709,7 @@ def _create_chords_track_locked(pid: str, request: Request):
         track.duration_ms = duration_ms
         track.channels = 2
         track.channel_layout = "stereo"
+        track.sample_rate = int(project.sample_rate)
         track.volume_db = 0.0
         track.waveform_peaks = peaks
         track.clips = [Clip(
@@ -3725,7 +3808,7 @@ def preview_mix(pid: str, request: Request):
         # Master inserts are rendered server-side, while the master fader is kept
         # neutral here so the browser can apply master volume live during playback.
         preview_project.master_volume_db = 0.0
-        render_mix(preview_project, audio_path, out, fmt="mp3", bitrate="192k")
+        render_mix(preview_project, audio_path, out, fmt="mp3", bitrate="192k", sample_rate=int(preview_project.sample_rate))
     except Exception as exc:
         raise HTTPException(400, "preview mix failed") from exc
     return FileResponse(out, media_type="audio/mpeg", filename="preview-master.mp3")
@@ -4027,22 +4110,43 @@ def _render_configured_project_export(pid: str, req: ProjectExportRequest) -> tu
         else:
             export_mta(export_project, out, profile=req.mta_device_profile)
         media_type = "application/octet-stream"
-    elif fmt in {"wav", "mp3", "flac"}:
-        ext = fmt
+    elif fmt in {"wav", "mp3", "mlive_mp3", "mp3g", "flac"}:
+        if fmt == "mp3g" and not any(not line.disabled and not line.deleted and str(line.text).strip() for line in source_project.lyrics):
+            raise ValueError("MP3+G export requires synchronized lyrics")
+        ext = "mp3" if fmt == "mlive_mp3" else ("zip" if fmt == "mp3g" else fmt)
         out = pdir(pid) / f"configured-export.{ext}"
         export_project = _audible_export_project(source_project)
-        render_mix(
-            export_project,
-            audio_path,
-            out,
-            fmt=fmt,
-            bitrate=f"{int(req.mp3_bitrate_kbps)}k",
-            sample_rate=int(req.sample_rate),
-            wav_bit_depth=int(req.wav_bit_depth),
-            flac_compression=int(req.flac_compression),
-            normalize_peak_db=float(req.normalize_peak_db) if req.normalize_audio else None,
-        )
-        media_type = {"wav": "audio/wav", "mp3": "audio/mpeg", "flac": "audio/flac"}[fmt]
+        audio_out = pdir(pid) / "configured-export-mp3g.mp3" if fmt == "mp3g" else out
+        if fmt == "mp3g":
+            render_mix(
+                export_project,
+                audio_path,
+                audio_out,
+                fmt="mp3",
+                bitrate=f"{int(req.mp3_bitrate_kbps)}k",
+                sample_rate=int(req.sample_rate),
+                wav_bit_depth=int(req.wav_bit_depth),
+                flac_compression=int(req.flac_compression),
+                normalize_peak_db=float(req.normalize_peak_db) if req.normalize_audio else None,
+            )
+        else:
+            render_mix(
+                export_project,
+                audio_path,
+                audio_out,
+                fmt="mp3" if fmt == "mlive_mp3" else fmt,
+                bitrate=f"{int(req.mp3_bitrate_kbps)}k",
+                sample_rate=int(req.sample_rate),
+                wav_bit_depth=int(req.wav_bit_depth),
+                flac_compression=int(req.flac_compression),
+                normalize_peak_db=float(req.normalize_peak_db) if req.normalize_audio else None,
+            )
+        if fmt == "mlive_mp3":
+            embed_mlive_merish_metadata(out, source_project)
+        elif fmt == "mp3g":
+            build_mp3g_zip(source_project, audio_out, out, safe_stem, media_duration_ms(audio_out))
+            audio_out.unlink(missing_ok=True)
+        media_type = {"wav": "audio/wav", "mp3": "audio/mpeg", "mlive_mp3": "audio/mpeg", "mp3g": "application/zip", "flac": "audio/flac"}[fmt]
     elif fmt == "mp4":
         export_project = _audible_export_project(source_project)
         if not export_project.lyrics:
@@ -4232,11 +4336,19 @@ def export(pid: str, request: Request, format: str = "mta"):
             out = pdir(pid) / f"export.{ext}"
             export_mta(_musical_export_project(project), out)
             media_type = "application/octet-stream"
-        elif format in {"wav", "mp3", "flac"}:
-            ext = format
+        elif format in {"wav", "mp3", "mlive_mp3", "mp3g", "flac"}:
+            if format == "mp3g" and not any(not line.disabled and not line.deleted and str(line.text).strip() for line in project.lyrics):
+                raise HTTPException(409, "L'export MP3+G richiede lyrics sincronizzate")
+            ext = "mp3" if format == "mlive_mp3" else ("zip" if format == "mp3g" else format)
             out = pdir(pid) / f"export.{ext}"
-            render_mix(export_project, audio_path, out, fmt=ext, bitrate="320k")
-            media_type = {"wav": "audio/wav", "mp3": "audio/mpeg", "flac": "audio/flac"}[ext]
+            audio_out = pdir(pid) / "export-mp3g.mp3" if format == "mp3g" else out
+            render_mix(export_project, audio_path, audio_out, fmt="mp3" if format in {"mlive_mp3", "mp3g"} else ext, bitrate="320k")
+            if format == "mlive_mp3":
+                embed_mlive_merish_metadata(out, project)
+            elif format == "mp3g":
+                build_mp3g_zip(project, audio_out, out, SAFE_DOWNLOAD_RE.sub("_", project.title or "karaoke").strip(" ._") or "karaoke", media_duration_ms(audio_out))
+                audio_out.unlink(missing_ok=True)
+            media_type = {"wav": "audio/wav", "mp3": "audio/mpeg", "flac": "audio/flac", "zip": "application/zip"}[ext]
         else:
             raise HTTPException(400, "unsupported export format")
     except HTTPException:

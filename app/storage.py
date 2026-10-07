@@ -403,13 +403,14 @@ def original_path(pid: str, filename: str) -> Path:
     return _safe_child(originals_dir(pid), filename)
 
 
-def create_project(title: str = "Untitled", target: str = "MTA8", owner_user_id: int | None = None) -> Project:
+def create_project(title: str = "Untitled", target: str = "MTA8", owner_user_id: int | None = None, sample_rate: int = 44100) -> Project:
     pid = uuid.uuid4().hex[:12]
     d = pdir(pid)
     (d / "audio").mkdir(parents=True)
     (d / "attachments").mkdir()
     (d / "originals").mkdir()
-    p = Project(id=pid, owner_user_id=owner_user_id, title=title[:200], target=target)
+    rate = int(sample_rate) if int(sample_rate) in {44100, 48000, 96000} else 44100
+    p = Project(id=pid, owner_user_id=owner_user_id, title=title[:200], target=target, sample_rate=rate)
     save_project(p)
     return p
 

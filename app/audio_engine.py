@@ -63,7 +63,7 @@ def generate_metronome_wav(project: Project, out: Path, beats_per_bar: int | Non
     duration_ms = project_duration_ms(project)
     if duration_ms <= 0:
         raise ValueError("project duration is zero")
-    sample_rate = 44100
+    sample_rate = int(getattr(project, "sample_rate", 44100) or 44100)
     total_samples = max(1, round(duration_ms / 1000 * sample_rate))
     try:
         numerator_text, denominator_text = str(getattr(project, "time_signature", "4/4") or "4/4").split("/", 1)
@@ -211,12 +211,15 @@ def delete_song_range(project: Project, start_ms: int, end_ms: int) -> None:
     project.chords = _shift_timed(project.chords, start_ms, end_ms)
 
 
-def render_track(track: Track, source: Path, out: Path, apply_inserts: bool = True) -> None:
+def render_track(track: Track, source: Path, out: Path, apply_inserts: bool = True, sample_rate: int | None = None) -> None:
     """Render DAW clips for one track and apply its insert chain.
 
     Track fader/pan/mute/solo are intentionally not baked here; they are handled
     by the container exporter or final mix stage.
     """
+    sample_rate = int(sample_rate or getattr(track, "sample_rate", 44100) or 44100)
+    if sample_rate not in {44100, 48000, 96000}:
+        sample_rate = 44100
     ensure_clips(track)
     if not track.clips:
         _run(
@@ -228,7 +231,7 @@ def render_track(track: Track, source: Path, out: Path, apply_inserts: bool = Tr
                 "-f",
                 "lavfi",
                 "-i",
-                "anullsrc=r=44100:cl=stereo",
+                f"anullsrc=r={int(sample_rate)}:cl=stereo",
                 "-t",
                 "0.05",
                 "-c:a",
@@ -264,7 +267,7 @@ def render_track(track: Track, source: Path, out: Path, apply_inserts: bool = Tr
     if not labels:
         _run([
             "ffmpeg", "-y", "-v", "error", "-f", "lavfi", "-i",
-            "anullsrc=r=44100:cl=stereo", "-t", "0.05", "-c:a", "pcm_s16le", str(out),
+            f"anullsrc=r={int(sample_rate)}:cl=stereo", "-t", "0.05", "-c:a", "pcm_s16le", str(out),
         ])
         return
     if len(labels) == 1:
@@ -292,7 +295,7 @@ def render_track(track: Track, source: Path, out: Path, apply_inserts: bool = Tr
             "-map",
             "[out]",
             "-ar",
-            "44100",
+            str(int(sample_rate)),
             "-c:a",
             "pcm_s24le",
             str(out),
@@ -307,7 +310,7 @@ def render_mix(
     fmt: str = "mp3",
     bitrate: str = "320k",
     *,
-    sample_rate: int = 44100,
+    sample_rate: int | None = None,
     wav_bit_depth: int = 24,
     flac_compression: int = 8,
     normalize_peak_db: float | None = None,
@@ -348,7 +351,10 @@ def render_mix(
             tail += "," + master_chain
         tail += "," + project_time_pitch_filter(project)
         filters.append(f"[master0]{tail}[master]")
-        sample_rate = 48000 if int(sample_rate) == 48000 else 44100
+        sample_rate = int(sample_rate or getattr(project, "sample_rate", 44100) or 44100)
+        sample_rate = sample_rate if sample_rate in {44100, 48000, 96000} else 44100
+        if fmt == "mp3" and sample_rate == 96000:
+            sample_rate = 48000
         cmd += ["-filter_complex", ";".join(filters), "-map", "[master]", "-ar", str(sample_rate)]
 
         def _codec_args(target: Path) -> list[str]:
@@ -490,9 +496,10 @@ def project_time_pitch_filter(project: Project) -> str:
     pitch_ratio = 2.0 ** (semitones / 12.0)
     # asetrate changes tempo and pitch together; atempo compensates tempo to the
     # desired ratio while preserving the selected pitch shift.
-    rate = 44100.0 * pitch_ratio
+    project_rate = float(int(getattr(project, "sample_rate", 44100) or 44100))
+    rate = project_rate * pitch_ratio
     tempo_after_rate = tempo_ratio / pitch_ratio
-    return f"asetrate={rate:.6f},aresample=44100,{_atempo_chain(tempo_after_rate)}"
+    return f"asetrate={rate:.6f},aresample={int(project_rate)},{_atempo_chain(tempo_after_rate)}"
 
 
 def _rhythm_onset_envelope(path: Path, progress=None) -> tuple[np.ndarray, float]:
@@ -743,7 +750,8 @@ def refresh_chords_piano_wav_region(project: Project, out: Path, old_time_ms: in
         raise ValueError("refresh window too large for fast mode")
     with wave.open(str(out), "rb") as handle:
         params = handle.getparams()
-        if params.nchannels != 2 or params.sampwidth != 2 or params.framerate != 44100 or params.comptype != "NONE":
+        expected_rate = int(getattr(project, "sample_rate", 44100) or 44100)
+        if params.nchannels != 2 or params.sampwidth != 2 or params.framerate != expected_rate or params.comptype != "NONE":
             raise ValueError("unsupported chords track WAV format")
     sample_rate = params.framerate
     start_frame = max(0, min(params.nframes, round(start_ms / 1000.0 * sample_rate)))
@@ -793,7 +801,7 @@ def generate_silent_chords_wav(project: Project, out: Path) -> int:
     duration_ms = project_duration_ms(project)
     if duration_ms <= 0:
         raise ValueError("project duration is zero")
-    sample_rate = 44100
+    sample_rate = int(getattr(project, "sample_rate", 44100) or 44100)
     total = max(1, round(duration_ms / 1000.0 * sample_rate))
     out.parent.mkdir(parents=True, exist_ok=True)
     with wave.open(str(out), "wb") as handle:
@@ -814,7 +822,7 @@ def generate_chords_piano_wav(project: Project, out: Path) -> int:
     )
     if not events:
         raise ValueError("project has no active chords")
-    sample_rate = 44100
+    sample_rate = int(getattr(project, "sample_rate", 44100) or 44100)
     total = max(1, round(duration_ms / 1000.0 * sample_rate))
     audio = np.zeros((total, 2), dtype=np.float64)
     for index, chord in enumerate(events):
@@ -910,7 +918,9 @@ def render_track_export(
         filters = [f"volume={gain:.3f}dB", f"stereotools=balance_out={pan:.4f}"]
         if project is not None:
             filters.append(project_time_pitch_filter(project))
-        sample_rate = 48000 if int(sample_rate) == 48000 else 44100
+        sample_rate = int(sample_rate) if int(sample_rate) in {44100, 48000, 96000} else 44100
+        if fmt == "mp3" and sample_rate == 96000:
+            sample_rate = 48000
         cmd = ["ffmpeg", "-y", "-v", "error", "-i", str(rendered), "-af", ",".join(filters), "-ar", str(sample_rate)]
         safe_metadata = {
             str(k).strip().lower(): str(v).strip()[:1000]

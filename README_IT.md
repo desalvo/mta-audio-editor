@@ -428,3 +428,7 @@ Dalla r198 l'autosave native aggiorna il workspace modulare persistente invece d
 
 ### Modular native project format
 Native `.maeproj` files are lightweight JSON manifests backed by the modular workspace and shared-media store; they are not ZIP archives. Use the portable project archive (`.maeprojz`) when a self-contained file is required for transfer or backup. Legacy ZIP-based `.maeproj` files remain supported for import.
+
+### Sample rate ed export karaoke
+
+I progetti supportano sample rate 44.1/48/96 kHz (44.1 kHz default), con conversione automatica delle sorgenti importate al rate del progetto. L’export include WAV 24/32 bit a 44.1/48/96 kHz, MP3 standard, MP3 M-Live/Merish e MP3+G (ZIP con coppia MP3+CDG).

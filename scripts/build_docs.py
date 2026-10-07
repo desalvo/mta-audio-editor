@@ -96,3 +96,7 @@ for src_name, out_name in outputs:
     HTML(string=text, base_url=str(ROOT)).write_pdf(DOCS / out_name)
     print(DOCS / out_name)
 
+
+# Build the M-Live/Merish MP3 interoperability specification alongside the manuals.
+import subprocess as _subprocess
+_subprocess.run(["python", str(ROOT / "scripts" / "build_mlive_mp3_spec.py")], check=True)

@@ -1,3 +1,17 @@
+## 0.2.0-r229
+
+- Added project sample rate (44.1/48/96 kHz, default 44.1 kHz), fixed after the first active track is present and editable again only with no tracks.
+- Audio imported at 44.1/48/96 kHz is normalized to the project sample rate for timeline use while originals are preserved.
+- Added WAV export at 24-bit PCM or 32-bit float with 44.1/48/96 kHz output rates.
+- Added MP3+G karaoke export as a ZIP containing same-basename MP3 audio and CDG synchronized graphics for lyrics/chords.
+- Updated generated Metronome/Chords/stem tracks to honor the project sample rate.
+- Restyled the M-Live/Merish MP3 specification cover to match the other MTA Audio Editor manuals.
+
+## 0.2.0-r228
+
+- Added M-Live / Merish compatible MP3 export using ID3v2.3 synchronized lyrics (SYLT), chords (SYLT chord content type), markers/events and USLT fallback.
+- Added bilingual M-Live / Merish MP3 interoperability specification PDFs and validation tests.
+
 ## 0.2.0-r227
 
 - Rigenerazione automatica della traccia Chords dopo ogni mutazione audio-rilevante: spostamento, modifica, aggiunta, disabilitazione, riabilitazione, eliminazione, reset ed estrazione.

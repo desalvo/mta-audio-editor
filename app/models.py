@@ -32,6 +32,7 @@ class ProjectClip(BaseModel):
     channel_layout: str = Field(default="", max_length=64)
     format: str = Field(default="", max_length=160)
     bitrate_bps: int = Field(default=0, ge=0)
+    sample_rate: Literal[44100, 48000, 96000] = 44100
     size_bytes: int = Field(default=0, ge=0)
     provenance: str = Field(default="Audio del progetto", max_length=500)
     current_location: str = Field(default="", max_length=512)
@@ -99,6 +100,7 @@ class Track(BaseModel):
     waveform_revision: str = Field(default="", max_length=128)
     channels: int = Field(default=0, ge=0, le=32)
     channel_layout: str = Field(default="", max_length=64)
+    sample_rate: Literal[44100, 48000, 96000] = 44100
     delay_ms: int = Field(default=0, ge=-86_400_000, le=86_400_000)
     height_px: int = Field(default=78, ge=78, le=420)
 
@@ -250,19 +252,19 @@ class MtaExportRequest(BaseModel):
 class TrackExportRequest(BaseModel):
     format: Literal["wav", "mp3", "flac"] = "wav"
     mp3_bitrate_kbps: int = Field(default=320, ge=96, le=320)
-    sample_rate: Literal[44100, 48000] = 44100
+    sample_rate: Literal[44100, 48000, 96000] = 44100
     wav_bit_depth: Literal[16, 24, 32] = 24
     flac_compression: int = Field(default=8, ge=0, le=12)
     metadata: dict[str, str] = Field(default_factory=dict, max_length=32)
 
 
 class ProjectExportRequest(BaseModel):
-    format: Literal["mta", "wav", "mp3", "flac", "mp4"] = "mta"
+    format: Literal["mta", "wav", "mp3", "mlive_mp3", "mp3g", "flac", "mp4"] = "mta"
     filename: str = Field(default="project", min_length=1, max_length=240)
     mta_target: Literal["MTA8", "MTA16"] | None = None
     mta_device_profile: Literal["auto", "merish5_xynthia2", "bbeat_divo", "mlive_mta16_default", "merish5_plus_mta16", "generic"] = "auto" 
     mp3_bitrate_kbps: int = Field(default=320, ge=96, le=320)
-    sample_rate: Literal[44100, 48000] = 44100
+    sample_rate: Literal[44100, 48000, 96000] = 44100
     wav_bit_depth: Literal[16, 24, 32] = 24
     flac_compression: int = Field(default=8, ge=0, le=12)
     normalize_audio: bool = False
@@ -301,6 +303,7 @@ class Project(BaseModel):
     time_signature: str = Field(default="4/4", pattern=r"^(?:2/4|3/4|4/4|5/4|6/8|7/8|9/8|12/8)$")
     key: str = Field(default="", max_length=40)
     target: Literal["MTA8", "MTA16", "DAW"] = "MTA8"
+    sample_rate: Literal[44100, 48000, 96000] = 44100
     mta_device_profile: Literal["auto", "merish5_xynthia2", "bbeat_divo", "mlive_mta16_default", "merish5_plus_mta16", "generic"] = "auto"
     tracks: list[Track] = Field(default_factory=list)
     clip_library: list[ProjectClip] = Field(default_factory=list, max_length=512)
@@ -334,7 +337,7 @@ class Project(BaseModel):
     timeline_zoom_px_per_sec: int = Field(default=70, ge=25, le=1200)
     mixer_height_px: int = Field(default=262, ge=180, le=900)
     mixer_meta_tab: Literal["lyrics", "chords", "markers"] = "lyrics"
-    export_format: Literal["mta", "wav", "mp3", "flac", "mp4"] = "mta"
+    export_format: Literal["mta", "wav", "mp3", "mlive_mp3", "mp3g", "flac", "mp4"] = "mta"
 
     @field_validator("shared_with_user_ids")
     @classmethod
