@@ -10,7 +10,7 @@ def test_text_model_catalog_defaults_and_storage(monkeypatch, tmp_path):
     assert catalog["storage"] == "server"
     assert catalog["lyrics"]["default_model"] == "turbo"
     assert any(item["id"] == "large-v3" for item in catalog["lyrics"]["models"])
-    assert catalog["chords"]["default_engine"] == "profile-stable"
+    assert catalog["chords"]["default_engine"] == "madmom-deep-chroma"
     assert any(item["id"] == "madmom-deep-chroma" for item in catalog["chords"]["engines"])
 
 

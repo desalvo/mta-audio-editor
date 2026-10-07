@@ -675,8 +675,9 @@ def _simplify_chord_label(label: str) -> str:
 
 def _normalize_chord_options(options: dict | None = None) -> dict:
     raw = dict(options or {})
-    preset = str(raw.get("preset") or "stable")
+    preset = str(raw.get("preset") or "default-complete")
     defaults = {
+        "default-complete": dict(sensitivity=45, harmonic_refinement=True, detect_sevenths=True, detect_sus=True, detect_dim_aug=True, detect_slash_bass=True, temporal_smoothing=True, beat_sync=False, min_chord_ms=1100, max_changes_per_minute=36),
         "stable": dict(sensitivity=25, harmonic_refinement=False, detect_sevenths=False, detect_sus=False, detect_dim_aug=False, detect_slash_bass=False, temporal_smoothing=True, beat_sync=False, min_chord_ms=1800, max_changes_per_minute=24),
         "balanced": dict(sensitivity=45, harmonic_refinement=True, detect_sevenths=True, detect_sus=True, detect_dim_aug=False, detect_slash_bass=False, temporal_smoothing=True, beat_sync=False, min_chord_ms=1100, max_changes_per_minute=36),
         "detailed": dict(sensitivity=70, harmonic_refinement=True, detect_sevenths=True, detect_sus=True, detect_dim_aug=True, detect_slash_bass=True, temporal_smoothing=True, beat_sync=False, min_chord_ms=550, max_changes_per_minute=60),
@@ -684,7 +685,7 @@ def _normalize_chord_options(options: dict | None = None) -> dict:
     }.get(preset, {})
     out = {"preset": preset, **defaults}
     out.update({k: v for k, v in raw.items() if v is not None})
-    out["sensitivity"] = max(0, min(100, int(out.get("sensitivity", 25))))
+    out["sensitivity"] = max(0, min(100, int(out.get("sensitivity", 45))))
     out["min_chord_ms"] = max(0, min(10000, int(out.get("min_chord_ms", 0))))
     out["max_changes_per_minute"] = max(0, min(240, int(out.get("max_changes_per_minute", 0))))
     for key in ("harmonic_refinement", "detect_sevenths", "detect_sus", "detect_dim_aug", "detect_slash_bass", "temporal_smoothing", "beat_sync"):

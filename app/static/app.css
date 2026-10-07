@@ -1189,6 +1189,10 @@ body.native-single-user .main-area{grid-template-rows:minmax(120px,1fr) var(--mi
 .inspector{position:absolute!important;top:0;right:0;bottom:0;width:min(360px,42vw);max-height:none!important;z-index:180!important;box-shadow:-10px 0 28px rgba(0,0,0,.42);border-left:1px solid #35536c;background:#0c1721}
 .editor-grid.inspector-hidden .inspector{display:none!important}
 @media(max-width:900px){.inspector{width:min(360px,78vw)}}
+/* r217: Inspector remains an overlay, but the usable timeline viewport stops at its left edge.
+   This keeps waveform/playhead/follow navigation visible instead of scrolling beneath the panel. */
+.editor-grid:not(.inspector-hidden) .timeline-pane{margin-right:min(360px,42vw)}
+@media(max-width:900px){.editor-grid:not(.inspector-hidden) .timeline-pane{margin-right:min(360px,78vw)}}
 \n/* r211: timeline clips are directly movable in Select mode without changing lane geometry. */
 .clip-block{pointer-events:auto}
 body.moving-timeline-clip .clip-block{transition:none!important}
@@ -1201,3 +1205,17 @@ body.moving-timeline-clip .clip-block{cursor:grabbing}
 #lanes.zoom-preview-active .lane{transition:none!important;will-change:transform}
 #ruler.zoom-preview-active{transition:none!important;will-change:transform}
 body:has(#topZoom:active) .wave{image-rendering:auto}
+/* r215: synchronized Lyrics/Chords quick editing and playback follow. */
+.meta-line.meta-editable{cursor:default}.meta-line.meta-editable time,.meta-line.meta-editable .meta-value{cursor:text;border-radius:4px}.meta-line.meta-editable time:hover,.meta-line.meta-editable .meta-value:hover{background:rgba(57,145,205,.14)}
+.meta-line.meta-disabled{opacity:.48}.meta-line.meta-deleted{opacity:.34;text-decoration:line-through}.meta-line.active-playback{background:#0f3a5b;color:#ddf4ff;box-shadow:inset 3px 0 #38b6ff}.meta-line.active-playback time{color:#bfe7ff}
+.meta-inline-input{width:100%;min-width:0;background:#07111a;color:#eef8ff;border:1px solid #46a9e6;border-radius:4px;padding:3px 5px;font:inherit;outline:none}.meta-context-menu button:disabled{opacity:.38;cursor:not-allowed;background:transparent!important}
+
+/* r216: interactive chord lane overlays the first timeline track without changing track geometry. */
+.timeline-chord-lane{position:absolute;left:0;right:0;top:0;height:28px;z-index:13;pointer-events:none;overflow:visible}
+.timeline-chord-lane.hidden{display:none}
+.timeline-chord-marker{position:absolute;top:2px;transform:translateX(-4px);height:23px;min-width:32px;max-width:92px;padding:2px 7px;border:1px solid #7fd6ff;border-radius:5px;background:rgba(9,31,47,.94);color:#eaf8ff;font-size:11px;font-weight:700;line-height:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:auto;cursor:ew-resize;box-shadow:0 2px 8px rgba(0,0,0,.35);user-select:none}
+.timeline-chord-marker:hover,.timeline-chord-marker.dragging{border-color:#fff;background:#123d59;z-index:3}
+.timeline-chord-marker.inactive{opacity:.45;text-decoration:line-through}
+.timeline-chord-marker.deleted{opacity:.28}
+.timeline-chord-inline{width:72px;min-width:48px;height:18px;padding:0 3px;border:1px solid #9ee3ff;border-radius:3px;background:#071019;color:#fff;font:inherit;outline:none}
+.timeline-chord-context-menu{z-index:10020}

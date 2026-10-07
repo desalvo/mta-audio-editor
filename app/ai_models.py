@@ -54,9 +54,10 @@ CHORD_ENGINES = [
     {"id": "chordino", "display_name": "Chordino / NNLS-Chroma", "model_id": None, "ai": False},
     {"id": "mta-chromagram", "display_name": "MTA Chromagram", "model_id": None, "ai": False},
 ]
-CHORD_DEFAULT_ENGINE = os.getenv("MTA_CHORDS_ENGINE", "profile-stable").strip() or "profile-stable"
+CHORD_DEFAULT_ENGINE = os.getenv("MTA_CHORDS_ENGINE", "madmom-deep-chroma").strip() or "madmom-deep-chroma"
 
 CHORD_PIPELINE_PRESETS = [
+    {"id":"default-complete","display_name":"Default / Completa","description":"Default MTA: sensibilità 45, tutti gli stadi armonici e di stabilizzazione attivi tranne la quantizzazione ai beat.","sensitivity":45,"harmonic_refinement":True,"detect_sevenths":True,"detect_sus":True,"detect_dim_aug":True,"detect_slash_bass":True,"temporal_smoothing":True,"beat_sync":False,"min_chord_ms":1100,"max_changes_per_minute":36},
     {"id":"stable","display_name":"Songbook / Stabile","description":"Pochi cambi, accordi leggibili; privilegia major/minor e stabilità temporale.","sensitivity":25,"harmonic_refinement":False,"detect_sevenths":False,"detect_sus":False,"detect_dim_aug":False,"detect_slash_bass":False,"temporal_smoothing":True,"beat_sync":False,"min_chord_ms":1800,"max_changes_per_minute":24},
     {"id":"balanced","display_name":"Bilanciato","description":"Buon compromesso tra dettaglio armonico e numero di cambi.","sensitivity":45,"harmonic_refinement":True,"detect_sevenths":True,"detect_sus":True,"detect_dim_aug":False,"detect_slash_bass":False,"temporal_smoothing":True,"beat_sync":False,"min_chord_ms":1100,"max_changes_per_minute":36},
     {"id":"detailed","display_name":"Dettagliato","description":"Più cambi e qualità armoniche; adatto a revisione manuale successiva.","sensitivity":70,"harmonic_refinement":True,"detect_sevenths":True,"detect_sus":True,"detect_dim_aug":True,"detect_slash_bass":True,"temporal_smoothing":True,"beat_sync":False,"min_chord_ms":550,"max_changes_per_minute":60},

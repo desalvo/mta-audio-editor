@@ -22,7 +22,7 @@ from fastapi.staticfiles import StaticFiles
 
 from .audio_engine import auto_align_ms, delete_range, delete_song_range, ensure_clips, estimate_bpm_and_signature, generate_chords_piano_wav, generate_metronome_wav, media_duration_ms, project_duration_ms, render_mix, render_track, render_track_export, shift_track, waveform_peaks
 from .codec import export_mta, ffprobe, import_mta, resolve_mta_device_profile, suggested_slots, validate_slot_mapping
-from .models import AutoMixRequest, Clip, CustomPresetRequest, DeleteRangeRequest, DeleteTracksRequest, InstantiateProjectClipRequest, UpdateProjectClipRequest, MoveTrackRequest, TrackDelayRequest, MtaExportRequest, Project, ProjectClip, ProjectExportRequest, RightsRecord, Track, SampleEditRequest, SampleEffectRequest
+from .models import AutoMixRequest, Clip, CustomPresetRequest, DeleteRangeRequest, DeleteTracksRequest, InstantiateProjectClipRequest, UpdateProjectClipRequest, MoveTrackRequest, TrackDelayRequest, MtaExportRequest, Project, ProjectClip, ProjectExportRequest, TrackExportRequest, RightsRecord, Track, SampleEditRequest, SampleEffectRequest
 from .plugins import STEM_SPLITTER, delete_user_preset, plugin_manifest, save_user_preset
 
 from .model_updater import (COREML_DIR, ONNX_DIR, start_background_updater, update_once as update_mobile_demucs_models,
@@ -3750,15 +3750,28 @@ def export_mta_with_mapping(pid: str, req: MtaExportRequest, request: Request):
 
 
 
-def _track_export_worker(job_id: str, pid: str, track_id: str, fmt: str) -> None:
+def _track_export_worker(job_id: str, pid: str, track_id: str, options: dict) -> None:
     try:
         project = load_project(pid)
         track = next((item for item in project.tracks if item.id == track_id), None)
         if track is None:
             raise ValueError("track not found")
+        req = TrackExportRequest.model_validate(options)
+        fmt = req.format
         _media_job_update(job_id, status="running", progress=20, message="Rendering della traccia")
         out = pdir(pid) / f"track-{track.id}.{fmt}"
-        render_track_export(track, audio_path(pid, track.filename), out, fmt=fmt, project=project)
+        render_track_export(
+            track,
+            audio_path(pid, track.filename),
+            out,
+            fmt=fmt,
+            bitrate=f"{int(req.mp3_bitrate_kbps)}k",
+            sample_rate=int(req.sample_rate),
+            wav_bit_depth=int(req.wav_bit_depth),
+            flac_compression=int(req.flac_compression),
+            metadata=req.metadata,
+            project=project,
+        )
         _media_job_update(job_id, progress=90, message="Preparazione download")
         _media_job_update(
             job_id, status="completed", progress=100, message="Export completato",
@@ -3774,13 +3787,15 @@ def _track_export_worker(job_id: str, pid: str, track_id: str, fmt: str) -> None
 
 
 @app.post("/api/projects/{pid}/tracks/{track_id}/track-export-jobs")
-def start_track_export_job(pid: str, track_id: str, request: Request, format: str = "wav"):
+def start_track_export_job(pid: str, track_id: str, request: Request, body: TrackExportRequest | None = None, format: str = "wav"):
     project = _project_for_actor(request, pid)
     if not any(item.id == track_id for item in project.tracks):
         raise HTTPException(404, "track not found")
-    fmt = format.lower()
-    if fmt not in {"wav", "mp3", "flac"}:
-        raise HTTPException(400, "unsupported track export format")
+    try:
+        req = body or TrackExportRequest(format=format.lower())
+    except Exception as exc:
+        raise HTTPException(400, str(exc)[:500]) from exc
+    fmt = req.format.lower()
     now = time.time()
     job_id = uuid.uuid4().hex[:16]
     job = {
@@ -3791,7 +3806,7 @@ def start_track_export_job(pid: str, track_id: str, request: Request, format: st
     }
     with MEDIA_JOB_LOCK:
         MEDIA_JOBS[job_id] = job
-    threading.Thread(target=_track_export_worker, args=(job_id, pid, track_id, fmt), daemon=True).start()
+    threading.Thread(target=_track_export_worker, args=(job_id, pid, track_id, req.model_dump()), daemon=True).start()
     return _media_job_public(job)
 
 

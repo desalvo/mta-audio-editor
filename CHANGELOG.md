@@ -1,4 +1,17 @@
-## 0.2.0-r214
+
+## 0.2.0-r217
+- Portable MTA Audio Editor (`.maeprojz`) is now the default native save/open format; opened portable files stay bound so autosave/manual Save rewrite the portable file instead of only the internal workspace.
+- Fixed Chords extraction persistence: refreshed extracted state is rendered before collection/persistence and synchronized to the bound portable project.
+- Plugin Inspector now reserves horizontal timeline viewport while open so tracks/playhead/follow never continue underneath it.
+- Insert plugin setup opened from Inspector is routed to the top-level utility modal and remains above the Inspector.
+- Single-track MP3 export from Plugins/Inspector now asks bitrate, sample rate and editable ID3 metadata before destination selection/rendering.
+
+## 0.2.0-r216
+- Added an interactive Chords lane above the first timeline track when Show Chords is enabled.
+- Chord markers can be dragged to retime them, edited by double click, and disabled, deleted or re-enabled from their context menu.
+- Added “+ Chord at current position” to the timeline context menu.
+
+## 0.2.0-r215
 - CI: removed unused `io` import reported by Ruff F401 in the r210 preview/overlay regression tests.
 - Tests: revision/build-number validation is now revision-agnostic so future revisions do not fail on a hard-coded r213 assertion.
 - Mobile/native packaging metadata aligned to revision 214.

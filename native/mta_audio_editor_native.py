@@ -279,38 +279,55 @@ class NativeApi:
         safe_name = "".join(ch if ch.isalnum() or ch in " ._-" else "_" for ch in suggested_name).strip(" .")
         if not safe_name:
             safe_name = "project"
-        if not safe_name.lower().endswith(PROJECT_EXTENSION):
-            safe_name += PROJECT_EXTENSION
+        # r217: portable projects are the default native project format.
+        # The lightweight .maeproj manifest remains supported for legacy/workspace
+        # compatibility, but every newly chosen project file is self-contained.
+        if safe_name.lower().endswith(PROJECT_EXTENSION):
+            safe_name = safe_name[:-len(PROJECT_EXTENSION)]
+        if not safe_name.lower().endswith(PORTABLE_PROJECT_EXTENSION):
+            safe_name += PORTABLE_PROJECT_EXTENSION
         chosen = self.window.create_file_dialog(
             webview.FileDialog.SAVE,
             save_filename=safe_name,
-            file_types=("MTA Audio Editor Project (*.maeproj)",),
+            file_types=("Portable MTA Audio Editor Project (*.maeprojz)",),
         )
         path = self._dialog_path(chosen)
         if path is None:
             return {"ok": False, "cancelled": True}
-        if not str(path).lower().endswith(PROJECT_EXTENSION):
-            path = Path(str(path) + PROJECT_EXTENSION)
+        if not str(path).lower().endswith(PORTABLE_PROJECT_EXTENSION):
+            path = Path(str(path) + PORTABLE_PROJECT_EXTENSION)
         return {"ok": True, "cancelled": False, "path": str(path)}
 
-    def bind_project_path(self, project_id: str, path: str) -> dict:
-        from app.storage import write_project_link
+    @staticmethod
+    def _write_bound_project(project_id: str, target: Path) -> str:
+        from app.storage import is_portable_project_archive, write_project_archive, write_project_link
 
+        lower = target.name.lower()
+        portable = lower.endswith(PORTABLE_PROJECT_EXTENSION) or lower.endswith(".mta-project.zip") or lower.endswith(".zip")
+        # Legacy .maeproj files may themselves be portable ZIP archives. Preserve
+        # that representation when an existing archive is opened and rebound.
+        if lower.endswith(PROJECT_EXTENSION) and target.exists() and is_portable_project_archive(target):
+            portable = True
+        if portable:
+            write_project_archive(project_id, target)
+            return "portable"
+        write_project_link(project_id, target)
+        return "manifest"
+
+    def bind_project_path(self, project_id: str, path: str) -> dict:
         target = Path(path).expanduser().resolve()
         target.parent.mkdir(parents=True, exist_ok=True)
         self.project_paths[project_id] = target
         self._persist_project_paths()
-        write_project_link(project_id, target)
-        return {"ok": True, "path": str(target)}
+        project_format = self._write_bound_project(project_id, target)
+        return {"ok": True, "path": str(target), "format": project_format, "portable": project_format == "portable"}
 
     def sync_project(self, project_id: str) -> dict:
-        from app.storage import write_project_link
-
         target = self.project_paths.get(project_id)
         if target is None:
             return {"ok": False, "bound": False}
-        write_project_link(project_id, target)
-        return {"ok": True, "bound": True, "path": str(target)}
+        project_format = self._write_bound_project(project_id, target)
+        return {"ok": True, "bound": True, "path": str(target), "format": project_format, "portable": project_format == "portable"}
 
     def get_project_path(self, project_id: str) -> dict:
         target = self.project_paths.get(project_id)
@@ -563,9 +580,12 @@ class NativeApi:
         resolved = path.expanduser().resolve()
         if is_portable_project_archive(resolved):
             project = import_project_archive(resolved, None)
-            # A portable archive is imported into the modular workspace. It is not
-            # rebound as the live manifest until the user explicitly saves it.
-            return {"ok": True, "cancelled": False, "project": project.model_dump(mode="json"), "path": str(resolved), "portable_import": True}
+            # r217: an opened portable project remains bound to the file that the
+            # user opened. Autosave and manual Save therefore atomically rewrite
+            # that .maeprojz instead of only updating the hidden workspace copy.
+            self.project_paths[project.id] = resolved
+            self._persist_project_paths()
+            return {"ok": True, "cancelled": False, "project": project.model_dump(mode="json"), "path": str(resolved), "portable_import": True, "bound": True}
         project = read_project_link(resolved)
         self.project_paths[project.id] = resolved
         self._persist_project_paths()
@@ -590,8 +610,8 @@ class NativeApi:
             webview.FileDialog.OPEN,
             allow_multiple=False,
             file_types=(
-                "MTA Audio Editor Project (*.maeproj)",
                 "Portable MTA Audio Editor Project (*.maeprojz)",
+                "MTA Audio Editor Project (*.maeproj)",
                 "Legacy MTA Audio Editor Project (*.zip)",
             ),
         )
@@ -601,7 +621,7 @@ class NativeApi:
         return self._import_project_path(path)
 
     def list_recent_projects(self) -> dict:
-        """Return recent native projects that still have an accessible .maeproj manifest."""
+        """Return recent native projects that still have an accessible project file."""
         settings = self.get_native_settings()
         rows = []
         for project_id in settings.get("recent_projects", []):
@@ -616,7 +636,7 @@ class NativeApi:
         return {"ok": True, "projects": rows}
 
     def open_recent_project(self, project_id: str) -> dict:
-        """Open a native recent project from its bound modular .maeproj manifest."""
+        """Open a native recent project from its bound project file/workspace."""
         key = str(project_id or "").strip()
         if not key:
             return {"ok": False, "error": "project id missing"}

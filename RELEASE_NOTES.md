@@ -1,3 +1,22 @@
+# MTA Audio Editor 0.2.0-r217
+
+- Portable MTA Audio Editor (`.maeprojz`) is the default native project file for Save/New and the first Open format, with legacy `.maeproj`/`.zip` still supported for opening.
+- Opening a portable project binds the imported workspace back to that file; autosave and manual Save atomically update it, fixing extracted Chords disappearing after reopening.
+- Chords extraction refreshes the server project before render/collect/save, preventing stale hidden UI fields from overwriting newly extracted Chords.
+- Plugin Inspector reduces the usable timeline width while open, keeping waveform, playhead and Follow visible instead of underneath the overlay.
+- Insert setup from the Inspector opens in the top-level modal stack above the Inspector.
+- Track MP3 export from the Plugins/Inspector asks for bitrate (128/192/256/320 kbps), sample rate, and editable ID3 title/artist/album/composer/genre/date/comment metadata prefilled from project/track data before asking for the destination.
+
+## 0.2.0-r216
+Interactive timeline Chords lane: Show Chords now displays chord markers over the first track at their timing. Markers can be dragged, edited on double click, disabled, deleted or re-enabled via context menu. A new chord can also be inserted at the current playhead position from the timeline context menu.
+
+## 0.2.0-r215
+
+- Chords extraction defaults to Madmom Deep Chroma + CRF, sensitivity 45, all optional stages enabled except beat quantization.
+- Last-used Chords extraction settings persist globally across projects and sessions.
+- Lyrics/Chords panes follow playback when Show Lyrics/Show Chords is enabled.
+- Lyrics/Chords rows support inline timestamp/value editing and context actions: edit, disable, delete, re-enable.
+
 ## 0.2.0-r213
 
 - Fixed insert-plugin configuration windows being hidden below the absolute Plugins/Inspector overlay by moving utility dialogs to a higher application modal layer.

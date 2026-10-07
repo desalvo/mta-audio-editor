@@ -242,6 +242,15 @@ class MtaExportRequest(BaseModel):
     slots: list[MtaSlotMapping] = Field(default_factory=list, max_length=16)
 
 
+class TrackExportRequest(BaseModel):
+    format: Literal["wav", "mp3", "flac"] = "wav"
+    mp3_bitrate_kbps: int = Field(default=320, ge=96, le=320)
+    sample_rate: Literal[44100, 48000] = 44100
+    wav_bit_depth: Literal[16, 24, 32] = 24
+    flac_compression: int = Field(default=8, ge=0, le=12)
+    metadata: dict[str, str] = Field(default_factory=dict, max_length=32)
+
+
 class ProjectExportRequest(BaseModel):
     format: Literal["mta", "wav", "mp3", "flac", "mp4"] = "mta"
     filename: str = Field(default="project", min_length=1, max_length=240)

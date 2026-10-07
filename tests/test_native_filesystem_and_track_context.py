@@ -42,7 +42,7 @@ def test_native_api_can_save_and_open_project_archive(tmp_path, monkeypatch):
 
     save_path = tmp_path / "exports" / "chosen"
     save_path.parent.mkdir(parents=True)
-    archive_path = Path(str(save_path) + ".maeproj")
+    archive_path = Path(str(save_path) + ".maeprojz")
 
     class FakeWindow:
         def __init__(self):
@@ -67,8 +67,9 @@ def test_native_api_can_save_and_open_project_archive(tmp_path, monkeypatch):
     opened = api.open_project()
     assert opened["ok"] is True
     assert opened["project"]["target"] == "MTA16"
-    assert opened["project"]["id"] == project.id
-    assert opened.get("workspace") is True
+    assert opened["project"]["title"] == project.title
+    assert opened.get("portable_import") is True
+    assert opened.get("bound") is True
 
 
 @pytest.mark.skipif(shutil.which("ffmpeg") is None, reason="FFmpeg required")

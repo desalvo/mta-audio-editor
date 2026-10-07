@@ -11,7 +11,7 @@ def test_plugin_setup_modal_stacks_above_inspector_overlay():
 
 def test_native_track_export_asks_destination_before_render_job():
     js = Path("app/static/app.js").read_text()
-    body = js.split("async function exportTrack(id,format){", 1)[1].split("async function doExport", 1)[0]
+    body = js.split("async function exportTrack(id,format,options=null){", 1)[1].split("async function doExport", 1)[0]
     choose = body.index("choose_export_save_path")
     start_job = body.index("track-export-jobs")
     assert choose < start_job

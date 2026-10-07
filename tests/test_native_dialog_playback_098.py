@@ -3,12 +3,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_native_project_dialog_uses_maeproj_filter_and_legacy_open_filter():
+def test_native_project_dialog_defaults_to_portable_and_keeps_legacy_open_filters():
     text = (ROOT / "native/mta_audio_editor_native.py").read_text(encoding="utf-8")
     assert 'PROJECT_EXTENSION = ".maeproj"' in text
     assert 'MTA Audio Editor Project (*.maeproj)' in text
     assert 'Legacy MTA Audio Editor Project (*.zip)' in text
-    assert 'safe_name += PROJECT_EXTENSION' in text
+    assert 'safe_name += PORTABLE_PROJECT_EXTENSION' in text
+    assert 'Portable MTA Audio Editor Project (*.maeprojz)' in text
 
 
 def test_utility_backdrop_does_not_close_on_incidental_clicks():

@@ -734,6 +734,10 @@ def render_track_export(
     out: Path,
     fmt: str = "wav",
     bitrate: str = "320k",
+    sample_rate: int = 44100,
+    wav_bit_depth: int = 24,
+    flac_compression: int = 8,
+    metadata: dict[str, str] | None = None,
     *,
     project: Project | None = None,
     apply_inserts: bool = True,
@@ -751,12 +755,21 @@ def render_track_export(
         filters = [f"volume={gain:.3f}dB", f"stereotools=balance_out={pan:.4f}"]
         if project is not None:
             filters.append(project_time_pitch_filter(project))
-        cmd = ["ffmpeg", "-y", "-v", "error", "-i", str(rendered), "-af", ",".join(filters), "-ar", "44100"]
+        sample_rate = 48000 if int(sample_rate) == 48000 else 44100
+        cmd = ["ffmpeg", "-y", "-v", "error", "-i", str(rendered), "-af", ",".join(filters), "-ar", str(sample_rate)]
+        safe_metadata = {
+            str(k).strip().lower(): str(v).strip()[:1000]
+            for k, v in (metadata or {}).items()
+            if str(k).strip().lower() in {"title", "artist", "album", "album_artist", "composer", "genre", "date", "comment"} and str(v).strip()
+        }
+        for key, value in safe_metadata.items():
+            cmd += ["-metadata", f"{key}={value}"]
         if fmt == "wav":
-            cmd += ["-c:a", "pcm_s24le", str(out)]
+            codec = {16: "pcm_s16le", 24: "pcm_s24le", 32: "pcm_f32le"}.get(int(wav_bit_depth), "pcm_s24le")
+            cmd += ["-c:a", codec, str(out)]
         elif fmt == "flac":
-            cmd += ["-c:a", "flac", "-compression_level", "8", str(out)]
+            cmd += ["-c:a", "flac", "-compression_level", str(max(0, min(12, int(flac_compression)))), str(out)]
         else:
-            cmd += ["-c:a", "libmp3lame", "-b:a", bitrate, str(out)]
+            cmd += ["-c:a", "libmp3lame", "-b:a", bitrate, "-id3v2_version", "3", str(out)]
         _run(cmd)
     return out
