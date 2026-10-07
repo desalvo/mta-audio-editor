@@ -12,5 +12,5 @@ numpy==1.26.4; sys_platform == 'darwin' and platform_machine == 'x86_64'
 librosa>=0.11.0,<0.12
 soundfile>=0.13.1,<0.14
 mir_eval>=0.8.2,<0.9
-PyYAML>=6.0.2,<7
+PyYAML>=6.0.3,<7
 h5py>=3.14,<4
