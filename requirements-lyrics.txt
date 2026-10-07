@@ -4,5 +4,5 @@
 openai-whisper==20250625
 # macOS Intel / Python 3.12: keep Whisper's optional JIT stack on prebuilt wheels.
 # Newer numba/llvmlite releases may fall back to a source build that requires LLVM.
-numba==0.61.2; sys_platform == 'darwin' and platform_machine == 'x86_64'
-llvmlite==0.44.0; sys_platform == 'darwin' and platform_machine == 'x86_64'
+numba==0.68.0; sys_platform == 'darwin' and platform_machine == 'x86_64'
+llvmlite==0.50.0; sys_platform == 'darwin' and platform_machine == 'x86_64'
