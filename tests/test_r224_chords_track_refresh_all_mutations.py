@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from app.audio_engine import generate_silent_chords_wav
-from app.models import Chord, Clip, Project, Track
+from app.models import Clip, Project, Track
 
 ROOT = Path(__file__).resolve().parents[1]
 JS = (ROOT / "app/static/app.js").read_text(encoding="utf-8")
