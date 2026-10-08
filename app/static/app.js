@@ -58,12 +58,13 @@ let transportClockStartCtx=0, transportClockCursorMs=0, transportClockRunning=fa
 let playbackWarmCache=new Map(), playbackWarmProjectId=null, playbackWarmSignature='', playbackWarmTimer=null;
 const liveFxRefreshTimers={};
 let lastSelectedAudioFile=null, playbackPaused=false, mixerMetaTab='lyrics', pendingExportConfig=null, pendingNewProjectPath=null;
+const metaMultiSelection={lyrics:new Set(),chords:new Set()};
 let sampleEditor=null,sampleEditorPreviewAbort=null,sampleEditorPreviewTimer=null,serverProjects=[];
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const TRACK_COLORS=['#2f81f7','#28b463','#f0a52b','#8a58db','#e9506c','#8395a7','#24b8d4','#b26ff2','#e67e22','#16a085','#d35400','#7f8c8d'];
 
 const UI_TEXT_PAIRS=[
-['Project','Progetto'],['No project loaded','Nessun progetto caricato'],['New project','Nuovo progetto'],['Open project','Apri progetto'],['Open recent','Apri recenti'],['Close project','Chiudi progetto'],['Delete project','Elimina progetto'],['Project files','File progetto'],['Share project','Condividi progetto'],['Info progetto','Info progetto'],['Save','Salva'],['Save as','Salva con nome'],['Save project','Salva progetto'],['Save project as…','Salva progetto con nome…'],['Save project locally','Salva progetto localmente'],['Open local project','Apri progetto locale'],['Open recent','Apri recenti'],['Export','Esporta'],['Settings','Impostazioni'],['About','Informazioni'],['Docs & Help','Documentazione e aiuto'],['Account','Account'],['Esci','Esci'],['Tracks','Tracce'],['Mixer','Mixer'],['Plugins','Plugin'],['Lyrics','Testo'],['Chords','Accordi'],['Markers','Marker'],['Select','Seleziona'],['Split','Dividi'],['Range','Intervallo'],['Ripple','Ripple'],['Bars','Battute'],['Beats','Quarti'],['Off','Disattivato'],['Import Audio Track','Importa traccia audio'],['Import Audio','Importa audio'],['Import YouTube','Importa YouTube'],['Import & Separate','Importa e separa'],['Metronomo','Metronomo'],['Undo','Annulla'],['Redo','Ripristina'],['Cut','Taglia'],['Copy','Copia'],['Paste','Incolla'],['Remove','Rimuovi'],['Delete tracks','Elimina tracce'],['Delete selected range','Elimina intervallo selezionato'],['Show Lyrics','Mostra testo'],['Show Chords','Mostra accordi'],['Follow','Segui'],['Render','Render'],['Setup','Impostazioni progetto'],['Maximum import/upload size (MB)','Dimensione massima import/upload (MB)'],['Auto-save project changes','Salvataggio automatico modifiche progetto'],['Show previous and next chords','Mostra accordo precedente e successivo'],['Show previous and next lyrics','Mostra testo precedente e successivo'],['Update channel','Canale aggiornamenti'],['Stable · GitHub tags/releases only','Stabile · solo tag/release GitHub'],['Early release · include latest main packages','Early release · include gli ultimi pacchetti main'],['Check for updates','Controlla aggiornamenti'],['Manage Demucs models','Gestisci modelli Demucs'],['Manage Lyrics / Chords models','Gestisci modelli Lyrics / Chords'],['Cancel','Annulla'],['Annulla','Annulla'],['Apply','Applica'],['Applica','Applica'],['Reset','Ripristina'],['Ripristina','Ripristina'],['Normal','Normale'],['Bold','Grassetto'],['Italic','Corsivo'],['Title','Titolo'],['Subtitle','Sottotitolo'],['BPM','BPM'],['Time signature','Metrica'],['Artist / performer','Artista / interprete'],['Original title','Titolo originale'],['Authors / composers','Autori / compositori'],['Key','Tonalità'],['Project type','Tipo progetto'],['MTA profile','Profilo MTA'],['Rights societies','Società repertorio'],['Edit project metadata','Modifica metadata progetto'],['Save project manually','Salva progetto manualmente'],['Check for updates','Controlla aggiornamenti'],['Language','Lingua'],['Auto (system)','Auto (sistema)'],['Italian','Italiano'],['English','Inglese'],['selected','selezionate'],['TRACKS','TRACCE'],['Inspector','Inspector'],['Stems','Stem'],['Metadata','Metadata'],['Volume','Volume'],['Pan','Pan'],['Type','Tipo'],['Replace','Sostituisci'],['Track export','Export traccia'],['Advanced','Avanzate'],['Send','Send'],['Track Automation','Automazione traccia'],['Rinomina','Rinomina'],['Separa','Separa'],['Estrai lyrics','Estrai testo'],['Estrai chords','Estrai accordi'],['Sincronizza metronomo','Sincronizza metronomo'],['Delay / anticipo traccia…','Ritardo / anticipo traccia…'],['Modifica metadata progetto','Modifica metadata progetto'],['Titolo','Titolo'],['Titolo originale','Titolo originale'],['Autori / compositori','Autori / compositori'],['Artista / interprete','Artista / interprete'],['Tonalità / Key','Tonalità'],['Tipo progetto','Tipo progetto'],['Profilo MTA','Profilo MTA'],['Società repertorio','Società repertorio'],['Salva','Salva'],['Version','Versione'],['Revision','Revisione'],['Release','Release'],['Build','Build'],['Creator','Creatore'],['License','Licenza'],['Repository','Progetto'],['Early Access','Accesso anticipato'],['Close','Chiudi'],['Chiudi menu','Chiudi menu'],['Menu','Menu']
+['Project','Progetto'],['No project loaded','Nessun progetto caricato'],['New project','Nuovo progetto'],['Open project','Apri progetto'],['Open recent','Apri recenti'],['Close project','Chiudi progetto'],['Delete project','Elimina progetto'],['Project files','File progetto'],['Share project','Condividi progetto'],['Info progetto','Info progetto'],['Save','Salva'],['Save as','Salva con nome'],['Save project','Salva progetto'],['Save project as…','Salva progetto con nome…'],['Save project locally','Salva progetto localmente'],['Open local project','Apri progetto locale'],['Open recent','Apri recenti'],['Export','Esporta'],['Settings','Impostazioni'],['About','Informazioni'],['Docs & Help','Documentazione e aiuto'],['Account','Account'],['Esci','Esci'],['Tracks','Tracce'],['Mixer','Mixer'],['Plugins','Plugin'],['Lyrics','Testo'],['Chords','Accordi'],['Markers','Marker'],['Select','Seleziona'],['Split','Dividi'],['Range','Intervallo'],['Ripple','Ripple'],['Bars','Battute'],['Beats','Quarti'],['Off','Disattivato'],['Import Audio Track','Importa traccia audio'],['Import Audio','Importa audio'],['Import YouTube','Importa YouTube'],['Import & Separate','Importa e separa'],['Metronomo','Metronomo'],['Adattivo','Adaptive'],['Metronomo adattivo','Adaptive metronome'],['Undo','Annulla'],['Redo','Ripristina'],['Cut','Taglia'],['Copy','Copia'],['Paste','Incolla'],['Remove','Rimuovi'],['Delete tracks','Elimina tracce'],['Delete selected range','Elimina intervallo selezionato'],['Show Lyrics','Mostra testo'],['Show Chords','Mostra accordi'],['Follow','Segui'],['Render','Render'],['Setup','Impostazioni progetto'],['Maximum import/upload size (MB)','Dimensione massima import/upload (MB)'],['Auto-save project changes','Salvataggio automatico modifiche progetto'],['Show previous and next chords','Mostra accordo precedente e successivo'],['Show previous and next lyrics','Mostra testo precedente e successivo'],['Update channel','Canale aggiornamenti'],['Stable · GitHub tags/releases only','Stabile · solo tag/release GitHub'],['Early release · include latest main packages','Early release · include gli ultimi pacchetti main'],['Check for updates','Controlla aggiornamenti'],['Manage Demucs models','Gestisci modelli Demucs'],['Manage Lyrics / Chords models','Gestisci modelli Lyrics / Chords'],['Cancel','Annulla'],['Annulla','Annulla'],['Apply','Applica'],['Applica','Applica'],['Reset','Ripristina'],['Ripristina','Ripristina'],['Normal','Normale'],['Bold','Grassetto'],['Italic','Corsivo'],['Title','Titolo'],['Subtitle','Sottotitolo'],['BPM','BPM'],['Time signature','Metrica'],['Artist / performer','Artista / interprete'],['Original title','Titolo originale'],['Authors / composers','Autori / compositori'],['Key','Tonalità'],['Project type','Tipo progetto'],['MTA profile','Profilo MTA'],['Rights societies','Società repertorio'],['Edit project metadata','Modifica metadata progetto'],['Save project manually','Salva progetto manualmente'],['Check for updates','Controlla aggiornamenti'],['Language','Lingua'],['Auto (system)','Auto (sistema)'],['Italian','Italiano'],['English','Inglese'],['selected','selezionate'],['TRACKS','TRACCE'],['Inspector','Inspector'],['Stems','Stem'],['Metadata','Metadata'],['Volume','Volume'],['Pan','Pan'],['Type','Tipo'],['Replace','Sostituisci'],['Track export','Export traccia'],['Advanced','Avanzate'],['Send','Send'],['Track Automation','Automazione traccia'],['Rinomina','Rinomina'],['Separa','Separa'],['Estrai lyrics','Estrai testo'],['Estrai chords','Estrai accordi'],['Sincronizza metronomo','Sincronizza metronomo'],['Delay / anticipo traccia…','Ritardo / anticipo traccia…'],['Modifica metadata progetto','Modifica metadata progetto'],['Titolo','Titolo'],['Titolo originale','Titolo originale'],['Autori / compositori','Autori / compositori'],['Artista / interprete','Artista / interprete'],['Tonalità / Key','Tonalità'],['Tipo progetto','Tipo progetto'],['Profilo MTA','Profilo MTA'],['Società repertorio','Società repertorio'],['Salva','Salva'],['Version','Versione'],['Revision','Revisione'],['Release','Release'],['Build','Build'],['Creator','Creatore'],['License','Licenza'],['Repository','Progetto'],['Early Access','Accesso anticipato'],['Close','Chiudi'],['Chiudi menu','Chiudi menu'],['Menu','Menu']
 ];
 let uiLanguage=null;
 const UI_EN_IT=new Map(UI_TEXT_PAIRS),UI_IT_EN=new Map(UI_TEXT_PAIRS.map(([en,it])=>[it,en]));
@@ -432,11 +433,21 @@ function chordTrackRefreshBounds(before,after){
 }
 async function refreshGeneratedChordsTrack(oldTimeMs,newTimeMs,reason='modifica'){
   if(!current||!hasGeneratedChordsTrack())return null;
+  const editorialState={
+    lyrics:JSON.parse(JSON.stringify(current.lyrics||[])),
+    chords:JSON.parse(JSON.stringify(current.chords||[])),
+    markers:JSON.parse(JSON.stringify(current.markers||[]))
+  };
   showMediaProgress('Refresh traccia Chords',-1,'Attendere: aggiornamento della traccia Chords in corso…',`Aggiornamento dopo ${reason}. Viene usata di preferenza la rigenerazione fast della sola porzione interessata.`);document.querySelector('.utility-modal')?.classList.add('chords-refresh-progress-modal');await new Promise(requestAnimationFrame);
   try{
     const q=new URLSearchParams({old_time_ms:String(Math.max(0,Math.round(oldTimeMs||0))),new_time_ms:String(Math.max(0,Math.round(newTimeMs||0)))});
     const result=await api(`/api/projects/${current.id}/chords-track/refresh?${q}`,{method:'POST'});
-    if(result?.project)current=result.project;
+    if(result?.project){
+      result.project.lyrics=editorialState.lyrics;
+      result.project.chords=editorialState.chords;
+      result.project.markers=editorialState.markers;
+      current=result.project;
+    }
     const refreshedTrack=result?.track;if(refreshedTrack)invalidateTrackAudioCache(refreshedTrack.id);
     render();closeUtilityModal();
     if(result?.refreshed)toast(result.mode==='fast'?'Traccia Chords aggiornata · refresh fast':'Traccia Chords aggiornata · rigenerazione completa');
@@ -466,20 +477,27 @@ async function createChordsTrack(){
 }
 
 let metronomeCreatePending=false;
-async function createMetronomeTrack(){
+async function createMetronomeTrack(mode='fixed'){
   if(metronomeCreatePending)return toast('Creazione/aggiornamento metronomo già in corso…');
   if(!current)return toast('Apri prima un progetto');
   if(!current.tracks.length)return toast('Importa almeno una traccia audio per definire la durata del progetto');
+  const adaptive=mode==='adaptive';
   try{
     metronomeCreatePending=true;
     await flushAutosave();
-    const result=await api(`/api/projects/${current.id}/metronome-track`,{method:'POST'});
+    if(adaptive)showUtilityModal('Metronomo adattivo',`<div class="stem-progress-card"><div class="stem-progress-head"><b>Analisi completa delle variazioni di tempo…</b><span>…</span></div><div class="stem-progress indeterminate"><div class="stem-progress-fill"></div></div><div class="stem-progress-message">La tempo map precedente non viene riutilizzata: tutti i beat e tutte le variazioni vengono ricalcolati sul brano corrente.</div></div>`);
+    const result=await api(`/api/projects/${current.id}/metronome-track?mode=${adaptive?'adaptive':'fixed'}`,{method:'POST'});
     current=result.project;
     selectedTrackId=result.track.id;
+    if(adaptive)closeUtilityModal();
     render();
     await refresh();
-    toast(`${result.reused?'Traccia metronomo aggiornata':'Traccia metronomo creata'} a ${Number(current.bpm).toFixed(1)} BPM`);
-  }catch(e){toast(e.message)}finally{metronomeCreatePending=false}
+    if(adaptive){
+      const values=(result.tempo_map||[]).map(p=>Number(p.bpm)).filter(Number.isFinite);
+      const range=values.length?` · ${Math.min(...values).toFixed(1)}–${Math.max(...values).toFixed(1)} BPM`:'';
+      toast(`${result.reused?'Metronomo adattivo aggiornato':'Metronomo adattivo creato'} · ${values.length} beat ricalcolati${range}`);
+    }else toast(`${result.reused?'Traccia metronomo aggiornata':'Traccia metronomo creata'} a ${Number(current.bpm).toFixed(1)} BPM`);
+  }catch(e){if(adaptive)closeUtilityModal();toast(e.message)}finally{metronomeCreatePending=false}
 }
 
 function toolbarHtml(){
@@ -491,7 +509,7 @@ function toolbarHtml(){
     <div class="toolbar-sep"></div><div class="toolbar-group"><label>Snap</label><select><option>Bars</option><option>Beats</option><option>Off</option></select></div>
     <button class="toolbar-action emphasis" onclick="openStemWorkflow()">▥ Import &amp; Separate</button>
     <button class="toolbar-action" onclick="openYoutubeImport()" title="Importa solo audio da un singolo video YouTube">▶ Import YouTube</button>
-    <button class="toolbar-action" onclick="createMetronomeTrack()" title="Crea una traccia click per tutta la durata corrente del progetto">♩ Metronomo</button><button class="toolbar-action" onclick="createChordsTrack()" title="Crea o rigenera una sola traccia Chords con piano digitale sincronizzato agli accordi del progetto">♬ Chords</button>
+    <button class="toolbar-action" onclick="createMetronomeTrack('fixed')" title="Crea una traccia click a BPM fisso per tutta la durata corrente del progetto">♩ Metronomo</button><button class="toolbar-action emphasis" onclick="createMetronomeTrack('adaptive')" title="Ricalcola tutte le variazioni di tempo del brano e crea una traccia click adattiva">♩≈ Adattivo</button><button class="toolbar-action" onclick="createChordsTrack()" title="Crea o rigenera una sola traccia Chords con piano digitale sincronizzato agli accordi del progetto">♬ Chords</button>
     <div class="toolbar-group"><input id="newTrackFile" type="file" accept=".mp3,.wav,.flac,.m4a,audio/*" onchange="addTrack()"><select id="newSync"><option value="manual">Manual sync</option><option value="auto">Auto sync</option></select><input id="newOffset" type="number" value="0" title="Offset ms" style="width:72px"><select id="newRef" style="max-width:115px">${refs}</select><button class="toolbar-action" onclick="addTrack()">♫ Import Audio Track</button></div>
     <div class="toolbar-sep"></div><button id="undoBtn" class="toolbar-action" onclick="undoEdit()">↶ Undo</button><button id="redoBtn" class="toolbar-action" onclick="redoEdit()">↷ Redo</button><button class="toolbar-action" onclick="cutTimelineSelection()">✂ Cut</button><button class="toolbar-action" onclick="copyTimelineSelection()">⧉ Copy</button><button id="pasteBtn" class="toolbar-action" onclick="pasteTimelineSelection()">▣ Paste</button><button class="toolbar-action danger" onclick="removeTimelineSelection()">⌫ Remove</button><div class="toolbar-grow"></div><span class="selected-track-count" id="selectedTrackCount">${selectedTrackIds().length} selected</span><span class="selection-info" id="selectionInfo">0.000 → 0.000 s</span>
   </div>`
@@ -867,10 +885,12 @@ document.addEventListener('click',event=>{
   if(Date.now()<trackContextSuppressClickUntil&&event.target.closest?.('[data-track-context-id]')){event.preventDefault();event.stopPropagation()}
 },true);
 function textModelCatalog(){return pluginInfo.text_models||{lyrics:{models:[]},chords:{engines:[],models:[]}}}
+function currentExtractionRange(){const [a,b]=selectionBounds();return b-a>=2?{start_ms:a,end_ms:b,duration_ms:b-a}:null}
+function extractionRangeHtml(){const r=currentExtractionRange();if(!r)return '<div class="workflow-note">Nessun intervallo selezionato: verrà analizzata l’intera traccia.</div>';return `<label class="workflow-check"><input id="textAnalysisSelectedRange" type="checkbox" checked> Solo intervallo selezionato · ${lyricsChordsEditorPosition(r.start_ms)} → ${lyricsChordsEditorPosition(r.end_ms)}</label><div class="hint">L’analisi sostituirà soltanto Lyrics/Chords dentro questo intervallo; gli eventi prima e dopo resteranno invariati.</div>`}
 function openTextAnalysisChooser(id,kind){
   const cat=textModelCatalog(),track=trackById(id);if(!track)return toast('Traccia non trovata');
-  if(kind==='lyrics'){const c=cat.lyrics||{},opts=(c.models||[]).map(m=>`<option value="${esc(m.id)}" ${m.id===c.default_model?'selected':''}>${esc(m.display_name)} · ${m.installed?'installato':(c.storage==='local'?'download locale':'download server')}</option>`).join('');showUtilityModal('Estrai lyrics',`<div class="form-grid"><p><b>Motore:</b> OpenAI Whisper</p><label>Modello<select id="textAnalysisChoice">${opts}</select></label><label class="workflow-check"><input id="lyricsAdvancedAlignment" type="checkbox"> Allineamento avanzato parola / sillaba</label><p class="hint">Pipeline opzionale: Whisper → word timestamps → forced alignment acustico → suddivisione sillabica → timeline MTA. Migliora il posizionamento di lyrics e chords. L’estrazione viene sempre eseguita dall’inizio della traccia e il testo parziale non viene mostrato durante la generazione per evitare duplicati o frasi spezzate.</p><p class="hint">Il modello viene scaricato on-demand (download modello al primo uso) e conservato ${c.storage==='local'?'localmente nell’app nativa':'sul server'}.</p><div class="workflow-note warning"><b>Attenzione:</b> l’estrazione può richiedere molto tempo. La durata dipende dalla lunghezza della traccia, dal modello scelto e dall’hardware CPU/GPU disponibile. Durante l’analisi evita di chiudere l’app o interrompere il dispositivo.</div><div class="form-actions"><button class="utility-btn secondary model-download-btn" type="button" onclick="downloadTextAnalysisSelection('lyrics')">Scarica modello</button><button class="utility-btn primary accent" type="button" onclick="startTrackTextAnalysis('${esc(id)}','lyrics',$('#textAnalysisChoice').value)">Estrai lyrics</button></div></div>`);return}
-  const c=cat.chords||{},models=Object.fromEntries((c.models||[]).map(x=>[x.id,x])),opts=(c.engines||[]).map(e=>{const m=models[e.model_id]||{};let state;if(e.model_id)state=m.installed?'modello installato':(c.storage==='local'?'modello scaricabile localmente':'modello scaricabile sul server');else if(e.id==='chordino'){const r=e.runtime||{};const reason={ 'chordino-plugin-missing':'host Vamp presente · plugin Chordino non rilevato','vamp-host-missing':'host Vamp incluso non trovato nel bundle','vamp-host-failed':'host Vamp trovato ma non avviabile'}[r.reason]||'runtime Chordino non disponibile';state=e.available?`nessun modello AI · Chordino incluso (${r.host_kind||'Vamp host'} · ${r.host||'bundle'})`:`${reason}${r.host?` · ${r.host}`:''}`;}else state='nessun modello AI richiesto';return `<option value="${esc(e.id)}" ${e.id===c.default_engine?'selected':''} ${e.available?'':'disabled'}>${esc(e.display_name)} · ${esc(state)}</option>`}).join(''),presets=(c.presets||[]).map(x=>`<option value="${esc(x.id)}">${esc(x.display_name)}</option>`).join('');showUtilityModal('Estrai chords',`<div class="form-grid chord-extraction-config"><p><b>Motore che verrà usato:</b> <span id="chordEngineLabel"></span></p><label>Motore / modello<select id="textAnalysisChoice" onchange="updateChordEngineDisclosure()">${opts}</select></label><div id="chordEngineDisclosure" class="workflow-note"></div><label>Profilo del risultato<select id="chordPipelinePreset" onchange="applyChordPipelinePreset(this.value)">${presets}</select></label><div id="chordPresetDescription" class="hint"></div><label>Sensibilità ai cambi accordo <span id="chordSensitivityValue">45</span>/100<input id="chordSensitivity" type="range" min="0" max="100" step="1" value="45" oninput="$('#chordSensitivityValue').textContent=this.value"></label><div class="workflow-note"><b>Meno sensibilità</b> = meno accordi, segmenti più lunghi e maggiore soppressione dei transitori. <b>Più sensibilità</b> = segue cambi armonici più brevi.</div><details class="workflow-note"><summary><b>Pipeline avanzata / stadi opzionali</b></summary><div class="form-grid compact"><label class="workflow-check"><input id="chordHarmonicRefinement" type="checkbox"> Refinement chroma armonica</label><label class="workflow-check"><input id="chordDetectSevenths" type="checkbox"> 7 / maj7 / m7</label><label class="workflow-check"><input id="chordDetectSus" type="checkbox"> sus2 / sus4</label><label class="workflow-check"><input id="chordDetectDimAug" type="checkbox"> dim / aug</label><label class="workflow-check"><input id="chordDetectSlashBass" type="checkbox"> Inversioni / slash bass</label><label class="workflow-check"><input id="chordTemporalSmoothing" type="checkbox"> Stabilizzazione temporale</label><label class="workflow-check"><input id="chordBeatSync" type="checkbox"> Quantizza cambi ai beat del progetto</label><label>Durata minima accordo (ms)<input id="chordMinDuration" type="number" min="0" max="10000" step="100" value="1800"></label><label>Massimo cambi/minuto<input id="chordMaxChanges" type="number" min="0" max="240" step="1" value="24"></label></div></details><div class="workflow-note warning">l’analisi degli accordi può richiedere molto tempo, soprattutto con modelli AI o ensemble.</div><div class="workflow-note warning"><b>Suggerimento:</b> per una progressione leggibile usa Songbook/Stabile. “Solo recognizer / Raw” salta refinement e filtri MTA; è utile per confrontare il risultato originale del motore.</div><div class="form-actions"><button class="utility-btn secondary model-download-btn" type="button" onclick="downloadTextAnalysisSelection('chords')">Scarica modello selezionato</button><button class="utility-btn primary accent" type="button" onclick="startTrackTextAnalysis('${esc(id)}','chords',$('#textAnalysisChoice').value)">Estrai chords</button></div></div>`);updateChordEngineDisclosure();restoreChordExtractionSettings()}
+  if(kind==='lyrics'){const c=cat.lyrics||{},opts=(c.models||[]).map(m=>`<option value="${esc(m.id)}" ${m.id===c.default_model?'selected':''}>${esc(m.display_name)} · ${m.installed?'installato':(c.storage==='local'?'download locale':'download server')}</option>`).join('');showUtilityModal('Estrai lyrics',`<div class="form-grid"><p><b>Motore:</b> OpenAI Whisper</p><label>Modello<select id="textAnalysisChoice">${opts}</select></label><label class="workflow-check"><input id="lyricsAdvancedAlignment" type="checkbox"> Allineamento avanzato parola / sillaba</label>${extractionRangeHtml()}<p class="hint">Pipeline opzionale: Whisper → word timestamps → forced alignment acustico → suddivisione sillabica → timeline MTA. Migliora il posizionamento di lyrics e chords. Se è attivo "Solo intervallo selezionato", viene analizzata esclusivamente quella porzione; altrimenti l’intera traccia. Il testo parziale non viene mostrato durante la generazione per evitare duplicati o frasi spezzate.</p><p class="hint">Il modello viene scaricato on-demand (download modello al primo uso) e conservato ${c.storage==='local'?'localmente nell’app nativa':'sul server'}.</p><div class="workflow-note warning"><b>Attenzione:</b> l’estrazione può richiedere molto tempo. La durata dipende dalla lunghezza della traccia, dal modello scelto e dall’hardware CPU/GPU disponibile. Durante l’analisi evita di chiudere l’app o interrompere il dispositivo.</div><div class="form-actions"><button class="utility-btn secondary model-download-btn" type="button" onclick="downloadTextAnalysisSelection('lyrics')">Scarica modello</button><button class="utility-btn primary accent" type="button" onclick="startTrackTextAnalysis('${esc(id)}','lyrics',$('#textAnalysisChoice').value)">Estrai lyrics</button></div></div>`);return}
+  const c=cat.chords||{},models=Object.fromEntries((c.models||[]).map(x=>[x.id,x])),opts=(c.engines||[]).map(e=>{const m=models[e.model_id]||{};let state;if(e.model_id)state=m.installed?'modello installato':(c.storage==='local'?'modello scaricabile localmente':'modello scaricabile sul server');else if(e.id==='chordino'){const r=e.runtime||{};const reason={ 'chordino-plugin-missing':'host Vamp presente · plugin Chordino non rilevato','vamp-host-missing':'host Vamp incluso non trovato nel bundle','vamp-host-failed':'host Vamp trovato ma non avviabile'}[r.reason]||'runtime Chordino non disponibile';state=e.available?`nessun modello AI · Chordino incluso (${r.host_kind||'Vamp host'} · ${r.host||'bundle'})`:`${reason}${r.host?` · ${r.host}`:''}`;}else state='nessun modello AI richiesto';return `<option value="${esc(e.id)}" ${e.id===c.default_engine?'selected':''} ${e.available?'':'disabled'}>${esc(e.display_name)} · ${esc(state)}</option>`}).join(''),presets=(c.presets||[]).map(x=>`<option value="${esc(x.id)}">${esc(x.display_name)}</option>`).join('');showUtilityModal('Estrai chords',`<div class="form-grid chord-extraction-config"><p><b>Motore che verrà usato:</b> <span id="chordEngineLabel"></span></p><label>Motore / modello<select id="textAnalysisChoice" onchange="updateChordEngineDisclosure()">${opts}</select></label><div id="chordEngineDisclosure" class="workflow-note"></div>${extractionRangeHtml()}<label>Profilo del risultato<select id="chordPipelinePreset" onchange="applyChordPipelinePreset(this.value)">${presets}</select></label><div id="chordPresetDescription" class="hint"></div><label>Sensibilità ai cambi accordo <span id="chordSensitivityValue">45</span>/100<input id="chordSensitivity" type="range" min="0" max="100" step="1" value="45" oninput="$('#chordSensitivityValue').textContent=this.value"></label><div class="workflow-note"><b>Meno sensibilità</b> = meno accordi, segmenti più lunghi e maggiore soppressione dei transitori. <b>Più sensibilità</b> = segue cambi armonici più brevi.</div><details class="workflow-note"><summary><b>Pipeline avanzata / stadi opzionali</b></summary><div class="form-grid compact"><label class="workflow-check"><input id="chordHarmonicRefinement" type="checkbox"> Refinement chroma armonica</label><label class="workflow-check"><input id="chordDetectSevenths" type="checkbox"> 7 / maj7 / m7</label><label class="workflow-check"><input id="chordDetectSus" type="checkbox"> sus2 / sus4</label><label class="workflow-check"><input id="chordDetectDimAug" type="checkbox"> dim / aug</label><label class="workflow-check"><input id="chordDetectSlashBass" type="checkbox"> Inversioni / slash bass</label><label class="workflow-check"><input id="chordTemporalSmoothing" type="checkbox"> Stabilizzazione temporale</label><label class="workflow-check"><input id="chordBeatSync" type="checkbox"> Quantizza cambi ai beat del progetto</label><label>Durata minima accordo (ms)<input id="chordMinDuration" type="number" min="0" max="10000" step="100" value="1800"></label><label>Massimo cambi/minuto<input id="chordMaxChanges" type="number" min="0" max="240" step="1" value="24"></label></div></details><div class="workflow-note warning">l’analisi degli accordi può richiedere molto tempo, soprattutto con modelli AI o ensemble.</div><div class="workflow-note warning"><b>Suggerimento:</b> per una progressione leggibile usa Songbook/Stabile. “Solo recognizer / Raw” salta refinement e filtri MTA; è utile per confrontare il risultato originale del motore.</div><div class="form-actions"><button class="utility-btn secondary model-download-btn" type="button" onclick="downloadTextAnalysisSelection('chords')">Scarica modello selezionato</button><button class="utility-btn primary accent" type="button" onclick="startTrackTextAnalysis('${esc(id)}','chords',$('#textAnalysisChoice').value)">Estrai chords</button></div></div>`);updateChordEngineDisclosure();restoreChordExtractionSettings()}
 const CHORD_EXTRACTION_SETTINGS_KEY='mta.chordExtractionSettings.v1';
 function defaultChordExtractionSettings(){return {engine:'madmom-deep-chroma',preset:'default-complete',sensitivity:45,harmonic_refinement:true,detect_sevenths:true,detect_sus:true,detect_dim_aug:true,detect_slash_bass:true,temporal_smoothing:true,beat_sync:false,min_chord_ms:1100,max_changes_per_minute:36}}
 function loadChordExtractionSettings(){const defaults=defaultChordExtractionSettings();try{const saved=JSON.parse(localStorage.getItem(CHORD_EXTRACTION_SETTINGS_KEY)||'null');return saved&&typeof saved==='object'?{...defaults,...saved}:defaults}catch(e){return defaults}}
@@ -900,7 +920,7 @@ async function startTrackTextAnalysis(id,kind,choice=''){
     await flushAutosave();
     if(status)status.textContent='Avvio del job di estrazione…';
     const param=kind==='lyrics'?'model':'engine';
-    let query=[];if(choice)query.push(`${param}=${encodeURIComponent(choice)}`);if(kind==='lyrics'&&$('#lyricsAdvancedAlignment')?.checked)query.push('advanced_alignment=true');if(kind==='chords'){saveChordExtractionSettings();query.push(...chordPipelineQuery());}const suffix=query.length?'?'+query.join('&'):'';
+    let query=[];if(choice)query.push(`${param}=${encodeURIComponent(choice)}`);if(kind==='lyrics'&&$('#lyricsAdvancedAlignment')?.checked)query.push('advanced_alignment=true');if(kind==='chords'){saveChordExtractionSettings();query.push(...chordPipelineQuery());}const range=currentExtractionRange();if(range&&$('#textAnalysisSelectedRange')?.checked){query.push(`range_start_ms=${range.start_ms}`,`range_end_ms=${range.end_ms}`)}const suffix=query.length?'?'+query.join('&'):'';
     const job=await api(`/api/projects/${current.id}/tracks/${id}/extract-${kind}-jobs${suffix}`,{method:'POST'});
     // Only now replace the chooser: the progress dialog is already backed by a real job.
     showMediaProgress(`Estrazione ${label}`,job.progress,job.message||'Job avviato','',job.id);
@@ -1978,16 +1998,16 @@ function uploadWithProgress(url,formData,title){
     xhr.send(formData);
   });
 }
-async function pollMediaJob(jobId,title,onDone){
+async function pollMediaJob(jobId,title,onDone,onFinish=null){
   clearTimeout(mediaProgressTimer);
   try{
     const job=await api(`/api/media-jobs/${jobId}`);
     const live=mediaPartialText(job);
     showMediaProgress(title,job.progress,job.message,live||job.error||'',job.cancel_supported&&['queued','running'].includes(job.status)?jobId:'');
-    if(job.status==='completed'){setMobileBusy(false);await onDone(job);return}
-    if(job.status==='failed'||job.status==='cancelled'){setMobileBusy(false);toast(job.status==='cancelled'?'Estrazione annullata':(job.error||'Operazione fallita'));return}
+    if(job.status==='completed'){setMobileBusy(false);try{await onDone(job)}finally{if(onFinish)onFinish(job)}return}
+    if(job.status==='failed'||job.status==='cancelled'){setMobileBusy(false);if(onFinish)onFinish(job);toast(job.status==='cancelled'?'Estrazione annullata':(job.error||'Operazione fallita'));return}
     mediaProgressTimer=setTimeout(()=>pollMediaJob(jobId,title,onDone),500);
-  }catch(e){setMobileBusy(false);toast(e.message)}
+  }catch(e){setMobileBusy(false);if(onFinish)onFinish(null);toast(e.message)}
 }
 async function blobToDataUrl(blob){return await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result||''));reader.onerror=()=>reject(reader.error||new Error('Impossibile leggere il file generato'));reader.readAsDataURL(blob)})}
 async function saveGeneratedBlob(blob,filename,mime='application/octet-stream'){
@@ -2020,17 +2040,17 @@ async function downloadWithProgress(url,filename,title,share=false,mime='applica
   if(isMobileClient()&&mobileSaveRemoteFile(url,filename,mime,share)){
     setMobileBusy(false);$('#utilityBackdrop')?.classList.add('hidden');return;
   }
-  const r=await fetch(url);
-  if(!r.ok)throw new Error(await r.text());
-  const total=Number(r.headers.get('content-length')||0),reader=r.body?.getReader(),chunks=[];let loaded=0,blob;
+  const response=await fetch(url);
+  if(!response.ok)throw new Error(await response.text());
+  const total=Number(response.headers.get('content-length')||0),reader=response.body?.getReader(),chunks=[];let loaded=0,blob;
   if(reader){
     while(true){const {done,value}=await reader.read();if(done)break;chunks.push(value);loaded+=value.length;if(total)showMediaProgress(title,90+Math.round(loaded/total*10),'Download del file')}
-    blob=new Blob(chunks,{type:mime||r.headers.get('content-type')||'application/octet-stream'});
-  }else blob=await r.blob();
+    blob=new Blob(chunks,{type:mime||response.headers.get('content-type')||'application/octet-stream'});
+  }else blob=await response.blob();
   if(nativeOutputPath){
     const saved=await saveGeneratedBlobToNativePath(blob,nativeOutputPath);
-    if(!saved)await saveGeneratedBlob(blob,filename,mime||r.headers.get('content-type')||'application/octet-stream');
-  }else await saveGeneratedBlob(blob,filename,mime||r.headers.get('content-type')||'application/octet-stream');
+    if(!saved)await saveGeneratedBlob(blob,filename,mime||response.headers.get('content-type')||'application/octet-stream');
+  }else await saveGeneratedBlob(blob,filename,mime||response.headers.get('content-type')||'application/octet-stream');
   setMobileBusy(false);$('#utilityBackdrop')?.classList.add('hidden');
 }
 
@@ -3012,46 +3032,29 @@ async function confirmConfiguredExport(format,share=false){
 async function executeConfiguredExport(config,slots=[]){
   if(!current)return;
   try{
-    await flushAutosave();
     const exportMtaTarget=config.mta_target||(current.target==='DAW'?'MTA16':current.target);
     const ext=config.format==='mta'?(exportMtaTarget==='MTA8'?'mta8':'mta16'):(config.format==='mlive_mp3'?'mp3':config.format==='mp3g'?'zip':config.format);
     const safeName=(config.filename||'project').replace(/[^A-Za-z0-9._ -]+/g,'_').trim()||'project';
+    let nativeOutputPath='';
     if(currentUser?.native_single_user&&window.pywebview?.api?.choose_export_save_path){
       const chosen=await window.pywebview.api.choose_export_save_path(safeName,ext);
       if(!chosen?.ok)return;
-      config.output_path=chosen.path;
+      nativeOutputPath=chosen.path||'';
     }
-    if(isMobileClient()){
-      const job=await api(`/api/projects/${current.id}/configured-export-jobs`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({...config,slots,output_path:null})});
-      showMediaProgress('Export progetto',job.progress,job.message);
-      pollMediaJob(job.id,'Export progetto',async completed=>{
-        const result=completed.result||{};
-        const mime=result.media_type||({wav:'audio/wav',mp3:'audio/mpeg',flac:'audio/flac'}[config.format]||'application/octet-stream');
-        mobileSaveRemoteFile(result.download_url,result.filename||`${safeName}.${ext}`,mime,!!config.share);
-        $('#utilityBackdrop')?.classList.add('hidden');pendingExportConfig=null;toast(config.share?'Output pronto per la condivisione':'Export pronto per il salvataggio');
-      });
-      return;
-    }
-    const response=await fetch(`/api/projects/${current.id}/configured-export`,{
-      method:'POST',
-      headers:{'content-type':'application/json','X-MTA-Request':'1'},
-      body:JSON.stringify({...config,slots})
+    showMediaProgress('Export progetto',2,'Preparazione progetto per l’export');
+    await new Promise(requestAnimationFrame);
+    await flushAutosave();
+    const job=await api(`/api/projects/${current.id}/configured-export-jobs`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({...config,slots,output_path:null})});
+    showMediaProgress('Export progetto',job.progress,job.message);
+    pollMediaJob(job.id,'Export progetto',async completed=>{
+      const result=completed.result||{};
+      const mime=result.media_type||({wav:'audio/wav',mp3:'audio/mpeg',flac:'audio/flac',zip:'application/zip'}[config.format]||'application/octet-stream');
+      const filename=result.filename||`${safeName}.${ext}`;
+      if(isMobileClient())mobileSaveRemoteFile(result.download_url,filename,mime,!!config.share);
+      else await downloadWithProgress(result.download_url,filename,'Export progetto',false,mime,nativeOutputPath);
+      $('#utilityBackdrop')?.classList.add('hidden');pendingExportConfig=null;toast(config.share?'Output pronto per la condivisione':'Export completato');
     });
-    if(!response.ok)throw new Error(await response.text());
-    if(config.output_path){
-      const result=await response.json();
-      toast(`Export salvato in ${result.path}`);
-      pendingExportConfig=null;
-      return;
-    }
-    const blob=await response.blob();
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement('a');
-    a.href=url;a.download=`${safeName}.${ext}`;document.body.appendChild(a);a.click();a.remove();
-    setTimeout(()=>URL.revokeObjectURL(url),1500);
-    pendingExportConfig=null;
-    toast('Export completato');
-  }catch(e){toast(e.message)}
+  }catch(e){setMobileBusy(false);toast(e.message)}
 }
 function openExportMapping(plan,config=pendingExportConfig){
   pendingExportConfig=config||pendingExportConfig;
@@ -3411,21 +3414,33 @@ function openKaraokeExport(){
     <div class="utility-actions"><button class="utility-btn primary" onclick="startKaraokeExport()">Esporta MP4</button><button class="utility-btn secondary" onclick="closeUtilityModal()">Annulla</button></div>
   </div>`);
 }
+let karaokeExportPending=false;
 async function startKaraokeExport(){
+  if(karaokeExportPending)return toast('Export MP4 già in corso…');
   if(!current||(current.lyrics||[]).length)return toast('L’export MP4 richiede lyrics sincronizzate');
   const fd=new FormData(),bg=$('#exportKaraokeBackground')?.files?.[0];if(bg)fd.append('background',bg);
+  let nativeOutputPath='';
   try{
+    karaokeExportPending=true;
+    if(currentUser?.native_single_user&&window.pywebview?.api?.choose_export_save_path){
+      const chosen=await window.pywebview.api.choose_export_save_path((current.title||'karaoke').replace(/[^A-Za-z0-9._ -]+/g,'_'),'mp4');
+      if(!chosen?.ok){karaokeExportPending=false;return}
+      nativeOutputPath=chosen.path||'';
+    }
+    showMediaProgress('Export MP4 Karaoke',2,'Preparazione audio e sottotitoli karaoke');
+    await new Promise(requestAnimationFrame);
     await flushAutosave();
     const includeChords=!!$('#karaokeIncludeChords')?.checked;
     const job=await api(`/api/projects/${current.id}/karaoke-export-jobs?include_chords=${includeChords}`,{method:'POST',body:fd});
     showMediaProgress('Export MP4 Karaoke',job.progress,job.message);
     pollMediaJob(job.id,'Export MP4 Karaoke',async completed=>{
       const result=completed.result||{};
-      if(isMobileClient())mobileSaveRemoteFile(result.download_url,result.filename||'karaoke.mp4','video/mp4',false);
-      else await downloadWithProgress(result.download_url,result.filename||'karaoke.mp4','Export MP4 Karaoke');
+      const filename=result.filename||'karaoke.mp4';
+      if(isMobileClient())mobileSaveRemoteFile(result.download_url,filename,'video/mp4',false);
+      else await downloadWithProgress(result.download_url,filename,'Export MP4 Karaoke',false,'video/mp4',nativeOutputPath);
       toast('MP4 karaoke esportato');
-    });
-  }catch(e){toast(e.message)}
+    },()=>{karaokeExportPending=false});
+  }catch(e){karaokeExportPending=false;setMobileBusy(false);toast('Export MP4 fallito: '+e.message)}
 }
 async function recalculateBpmFromTrack(trackId){
   if(!current)return;const track=trackById(trackId);if(!track)return;
@@ -3823,8 +3838,9 @@ function mergeDraftEvent(kind,index){
 }
 function addLyricsEditorLine(){
   const text=prompt('Nuova lyric (usa "." per una sezione strumentale senza testo)','');if(text===null)return;
-  const t=prompt('Tempo iniziale in secondi',String(Math.max(0,playCursorMs||0)/1000));if(t===null||!Number.isFinite(Number(t)))return;
-  lyricsChordsEditorLyricsDraft=lyricsChordsEditorLyricsDraft||[];lyricsChordsEditorLyricsDraft.push(newOverrideEvent({time_ms:Math.max(0,Math.round(Number(t)*1000)),end_ms:null,text:text||'.',words:[],disabled:false,deleted:false}));lyricsChordsEditorLyricsDraft.sort((a,b)=>a.time_ms-b.time_ms);refreshLyricsChordsEditor();
+  const raw=prompt('Tempo iniziale (m:ss.mmm / mm:ss.mmm)',lyricsChordsEditorPosition(Math.max(0,playCursorMs||0)));if(raw===null)return;
+  const timeMs=parseLyricsChordsEditorPosition(raw);if(!Number.isFinite(timeMs))return toast('Timestamp non valido: usa m:ss.mmm o mm:ss.mmm');
+  lyricsChordsEditorLyricsDraft=lyricsChordsEditorLyricsDraft||[];lyricsChordsEditorLyricsDraft.push(newOverrideEvent({time_ms:timeMs,end_ms:null,text:text||'.',words:[],disabled:false,deleted:false}));lyricsChordsEditorLyricsDraft.sort((a,b)=>a.time_ms-b.time_ms);refreshLyricsChordsEditor();
 }
 function addChordEditorEvent(){
   const chord=prompt('Nuovo chord','C');if(!chord)return;const t=prompt('Tempo chord in secondi',String(Math.max(0,playCursorMs||0)/1000));if(t===null||!Number.isFinite(Number(t)))return;
@@ -4012,6 +4028,10 @@ async function runTextAnalysisAndWait(projectId,trackId,kind,choice=""){
   if(!trackId)return null;const labels={lyrics:'Lyrics',chords:'Chords',markers:'Markers / sezioni'},label=labels[kind]||kind;let query=[];if(choice&&kind!=='markers')query.push(`${kind==='lyrics'?'model':'engine'}=${encodeURIComponent(choice)}`);if(kind==='lyrics'&&$('#lyricsAdvancedAlignment')?.checked)query.push('advanced_alignment=true');const suffix=query.length?'?'+query.join('&'):'';const job=await api(`/api/projects/${projectId}/tracks/${trackId}/extract-${kind}-jobs${suffix}`,{method:'POST'});for(;;){const state=await api(`/api/media-jobs/${job.id}`);showMediaProgress(`Estrazione ${label}`,state.progress,state.message,mediaPartialText(state),state.cancel_supported&&['queued','running'].includes(state.status)?job.id:'');if(state.status==='completed')return state;if(state.status==='failed'||state.status==='cancelled')throw new Error(state.error||(state.status==='cancelled'?`Estrazione ${kind} annullata`:`Estrazione ${kind} non riuscita`));await new Promise(resolve=>setTimeout(resolve,500))}}
 
 let metaPlaybackScrollIndex={lyrics:-1,chords:-1};
+function metaSelectionSet(kind){return metaMultiSelection[kind]||null}
+function metaEventClick(event,kind,index){const set=metaSelectionSet(kind);if(!set)return;if(event?.metaKey||event?.ctrlKey){event.preventDefault();event.stopPropagation();set.has(Number(index))?set.delete(Number(index)):set.add(Number(index));refreshMetaPanels();return}if(set.size){set.clear();set.add(Number(index));refreshMetaPanels()}}
+function clearMetaMultiSelection(kind=null){if(kind){metaSelectionSet(kind)?.clear();return}Object.values(metaMultiSelection).forEach(set=>set.clear())}
+async function deleteSelectedMetaEvents(kind){const set=metaSelectionSet(kind);if(!set?.size)return;const indexes=[...set].map(Number).filter(Number.isFinite).sort((a,b)=>b-a),count=indexes.length;if(!confirm(`Cancellare ${count} ${kind==='chords'?'chords':'lyrics'} selezionati?`))return;const chordsBefore=kind==='chords'?JSON.parse(JSON.stringify(current.chords||[])):null;checkpointHistory();for(const index of indexes){if(index>=0&&index<(current[kind]||[]).length)current[kind].splice(index,1)}set.clear();await saveMetaQuickEdit(chordsBefore,kind==='chords'?'eliminazione batch chords':'eliminazione batch lyrics');if(kind==='chords')refreshTimelineChordLane();toast(`${count} ${kind==='chords'?'chords':'lyrics'} eliminati`)}
 function metaEventInactive(kind,item){return !!item?.deleted||(kind==='chords'?!!item?.excluded:!!item?.disabled)}
 function metaEventStateClass(kind,item){return `${kind==='lyrics'||kind==='chords'?' meta-editable':''}${item?.deleted?' meta-deleted':''}${kind==='chords'&&item?.excluded?' meta-disabled':''}${kind==='lyrics'&&item?.disabled?' meta-disabled':''}`}
 function refreshMetaPanels(){const normal=document.querySelector('#metaPane .meta-tabs-content');if(normal)normal.outerHTML=metaPanelBodyHtml(false);const expanded=$('#expandedMetaBody');if(expanded)expanded.innerHTML=metaPanelBodyHtml(true);syncTimedMetaPanel(playCursorMs)}
@@ -4025,12 +4045,12 @@ function beginMetaInlineEdit(event,kind,index,field='value'){
   input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();input.blur()}else if(e.key==='Escape'){e.preventDefault();input.dataset.committed='1';cancel()}});input.addEventListener('blur',commit,{once:true});return false
 }
 function closeMetaContextMenu(){document.querySelector('#metaContextMenu')?.remove()}
-function openMetaContextMenu(event,kind,index){if(!['lyrics','chords','markers'].includes(kind))return false;event?.preventDefault?.();event?.stopPropagation?.();closeMetaContextMenu();const item=current?.[kind]?.[Number(index)];if(!item)return false;const inactive=metaEventInactive(kind,item),menu=document.createElement('div');menu.id='metaContextMenu';menu.className='lc-context-menu meta-context-menu';menu.innerHTML=`<div class="lc-context-title">${kind==='chords'?'Chord':kind==='markers'?'Marker':'Lyrics'}</div><button type="button" data-meta-action="goto">Go-To</button><button type="button" data-meta-action="edit">Modifica</button><button type="button" data-meta-action="disable" ${inactive?'disabled':''}>Disabilita</button><button type="button" class="danger-action" data-meta-action="delete">Cancella</button><button type="button" data-meta-action="enable" ${inactive?'':'disabled'}>Riabilita</button>`;document.body.appendChild(menu);menu.querySelectorAll('[data-meta-action]').forEach(btn=>btn.addEventListener('click',()=>{if(btn.disabled)return;const action=btn.dataset.metaAction;closeMetaContextMenu();metaContextAction(action,kind,Number(index),event)}));const x=Math.max(8,Math.min(Number(event?.clientX||0),window.innerWidth-menu.offsetWidth-8)),y=Math.max(8,Math.min(Number(event?.clientY||0),window.innerHeight-menu.offsetHeight-8));menu.style.left=`${x}px`;menu.style.top=`${y}px`;return false}
+function openMetaContextMenu(event,kind,index){if(!['lyrics','chords','markers'].includes(kind))return false;event?.preventDefault?.();event?.stopPropagation?.();closeMetaContextMenu();const item=current?.[kind]?.[Number(index)];if(!item)return false;const set=metaSelectionSet(kind);if(set&&(event?.metaKey||event?.ctrlKey)){set.has(Number(index))?set.delete(Number(index)):set.add(Number(index));refreshMetaPanels()}else if(set&&set.size&&!set.has(Number(index))){set.clear();set.add(Number(index));refreshMetaPanels()}const multiCount=set?.size||0,inactive=metaEventInactive(kind,item),menu=document.createElement('div');menu.id='metaContextMenu';menu.className='lc-context-menu meta-context-menu';menu.innerHTML=`<div class="lc-context-title">${kind==='chords'?'Chord':kind==='markers'?'Marker':'Lyrics'}${multiCount>1?` · ${multiCount} selezionati`:''}</div><button type="button" data-meta-action="goto">Go-To</button><button type="button" data-meta-action="edit" ${multiCount>1?'disabled':''}>Modifica</button><button type="button" data-meta-action="disable" ${inactive||multiCount>1?'disabled':''}>Disabilita</button>${multiCount>1&&set?`<button type="button" class="danger-action" data-meta-action="delete-selected">Cancella ${multiCount} selezionati</button>`:`<button type="button" class="danger-action" data-meta-action="delete">Cancella</button>`}<button type="button" data-meta-action="enable" ${inactive&&multiCount<=1?'':'disabled'}>Riabilita</button>`;document.body.appendChild(menu);menu.querySelectorAll('[data-meta-action]').forEach(btn=>btn.addEventListener('click',()=>{if(btn.disabled)return;const action=btn.dataset.metaAction;closeMetaContextMenu();if(action==='delete-selected')return deleteSelectedMetaEvents(kind);metaContextAction(action,kind,Number(index),event)}));const x=Math.max(8,Math.min(Number(event?.clientX||0),window.innerWidth-menu.offsetWidth-8)),y=Math.max(8,Math.min(Number(event?.clientY||0),window.innerHeight-menu.offsetHeight-8));menu.style.left=`${x}px`;menu.style.top=`${y}px`;return false}
 async function metaContextAction(action,kind,index,event){const item=current?.[kind]?.[Number(index)];if(!item)return;if(action==='goto'){goToTimestamp(item.time_ms);return}if(action==='edit'){const row=document.querySelector(`.meta-line[data-meta-kind="${kind}"][data-event-index="${Number(index)}"] .meta-value`);if(row)return beginMetaInlineEdit({preventDefault(){},stopPropagation(){},currentTarget:row},kind,index,'value');return}const chordsBefore=kind==='chords'?JSON.parse(JSON.stringify(current.chords||[])):null;if(action==='delete'&&(kind==='chords'||kind==='markers')){checkpointHistory();current[kind].splice(Number(index),1);await saveMetaQuickEdit(chordsBefore,kind==='chords'?'eliminazione chord':'eliminazione marker');if(kind==='chords')refreshTimelineChordLane();return}ensureEventSnapshot(item);if(action==='disable'){if(kind==='chords')item.excluded=true;else{item.deleted=false;item.disabled=true}}else if(action==='delete'){item.deleted=true}else if(action==='enable'){if(kind==='chords')item.excluded=false;else{item.deleted=false;item.disabled=false}}await saveMetaQuickEdit(chordsBefore,action==='disable'?'disabilitazione chord':action==='enable'?'riabilitazione chord':'modifica chord')}
 document.addEventListener('click',e=>{if(!e.target.closest?.('#metaContextMenu'))closeMetaContextMenu()});
 function syncTimedMetaPanel(timeMs){if(!current)return;const running=playbackActuallyRunning()||(typeof waPlaybackActive!=='undefined'&&waPlaybackActive&&!waPlaybackPaused);for(const kind of ['lyrics','chords']){const enabled=kind==='lyrics'?!!current.show_lyrics_playback:!!current.show_chords_playback;const rows=[...document.querySelectorAll(`.meta-line[data-meta-kind="${kind}"]`)];rows.forEach(row=>row.classList.remove('active-playback'));if(!enabled||!running){metaPlaybackScrollIndex[kind]=-1;continue}const arr=current[kind]||[];let idx=-1;for(let i=0;i<arr.length;i++){if(!eventIsActive(arr[i],kind))continue;if(Number(arr[i].time_ms||0)<=Number(timeMs||0))idx=i;else break}if(idx<0)continue;const active=rows.filter(row=>Number(row.dataset.eventIndex)===idx);active.forEach(row=>row.classList.add('active-playback'));if(metaPlaybackScrollIndex[kind]!==idx){active.forEach(row=>row.scrollIntoView({block:'nearest',behavior:'auto'}));metaPlaybackScrollIndex[kind]=idx}}}
 function metaPanelBodyHtml(expanded=false){
-  const config={lyrics:['text','Lyrics'],chords:['chord','Chords'],markers:['label','Markers']},[key,label]=config[mixerMetaTab]||config.lyrics,source=current[mixerMetaTab]||[],rows=source.map((x,index)=>({x,index}));const editable=['lyrics','chords','markers'].includes(mixerMetaTab);const displayValue=x=>mixerMetaTab==='chords'?transposeChordLabel(x[key],current.pitch_semitones||0):x[key];const resetButton=mixerMetaTab==='lyrics'?`<button class="tool danger" onclick="resetTimedData('lyrics')">Reset lyrics</button>`:mixerMetaTab==='chords'?`<button class="tool danger" onclick="resetTimedData('chords')">Reset chords</button>`:'';const hasLyrics=(current.lyrics||[]).some(x=>eventIsActive(x,'lyrics')),hasChords=(current.chords||[]).some(x=>eventIsActive(x,'chords'));const editor=`<button class="tool accent" onclick="openLyricsChordsEditor()">Editor Lyrics + Chords + Markers</button>`;const exports=mixerMetaTab==='lyrics'&&hasLyrics?`<button class="tool" onclick="downloadProjectLyrics(false)">TXT Lyrics</button>${hasChords?`<button class="tool" onclick="downloadProjectLyrics(true)">TXT Lyrics + Chords</button><button class="tool" onclick="downloadProjectChordPro()">ChordPro</button>`:''}<button class="tool" onclick="openLyricsPdfStylePanel()">Stile PDF</button><button class="tool" onclick="previewProjectLyricsPdf()">Anteprima PDF</button><button class="tool" onclick="downloadProjectLyricsPdf()">Salva PDF</button>`:'';const markerExtract=mixerMetaTab==='markers'?`<button class="tool" onclick="extractMarkersFromSelectedTrack()">Estrai markers</button>`:'';const lineHtml=rows.map(({x,index})=>`<div class="meta-line${metaEventStateClass(mixerMetaTab,x)}" data-meta-kind="${mixerMetaTab}" data-event-index="${index}" data-time-ms="${Number(x.time_ms||0)}" ${editable?`oncontextmenu="return openMetaContextMenu(event,'${mixerMetaTab}',${index})"`:''}><time ${editable?`ondblclick="return beginMetaInlineEdit(event,'${mixerMetaTab}',${index},'time')" title="Doppio click per modificare il timestamp"`:''}>${fmtTime(x.time_ms/1000)}</time><span class="meta-value" ${editable?`ondblclick="return beginMetaInlineEdit(event,'${mixerMetaTab}',${index},'value')" title="Doppio click per modificare"`:''}>${esc(displayValue(x))}</span></div>`).join('');return `<div class="meta-tabs-content ${expanded?'meta-expanded-content':''}"><div class="meta-list">${lineHtml||`<div class="hint">No synchronized ${label.toLowerCase()} yet.</div>`}</div><div class="meta-actions"><button class="tool" onclick="editTimed('${mixerMetaTab}')">Edit ${label.toLowerCase()}</button>${resetButton}${markerExtract}${editor}${exports}</div>${expanded?'':`<textarea id="lyrics" hidden>${esc(linesToText(current.lyrics,'text'))}</textarea><textarea id="chords" hidden>${esc(linesToText(current.chords,'chord'))}</textarea><textarea id="markers" hidden>${esc(linesToText(current.markers,'label'))}</textarea>`}</div>`;
+  const config={lyrics:['text','Lyrics'],chords:['chord','Chords'],markers:['label','Markers']},[key,label]=config[mixerMetaTab]||config.lyrics,source=current[mixerMetaTab]||[],rows=source.map((x,index)=>({x,index}));const editable=['lyrics','chords','markers'].includes(mixerMetaTab);const displayValue=x=>mixerMetaTab==='chords'?transposeChordLabel(x[key],current.pitch_semitones||0):x[key];const resetButton=mixerMetaTab==='lyrics'?`<button class="tool danger" onclick="resetTimedData('lyrics')">Reset lyrics</button>`:mixerMetaTab==='chords'?`<button class="tool danger" onclick="resetTimedData('chords')">Reset chords</button>`:'';const hasLyrics=(current.lyrics||[]).some(x=>eventIsActive(x,'lyrics')),hasChords=(current.chords||[]).some(x=>eventIsActive(x,'chords'));const editor=`<button class="tool accent" onclick="openLyricsChordsEditor()">Editor Lyrics + Chords + Markers</button>`;const exports=mixerMetaTab==='lyrics'&&hasLyrics?`<button class="tool" onclick="downloadProjectLyrics(false)">TXT Lyrics</button>${hasChords?`<button class="tool" onclick="downloadProjectLyrics(true)">TXT Lyrics + Chords</button><button class="tool" onclick="downloadProjectChordPro()">ChordPro</button>`:''}<button class="tool" onclick="openLyricsPdfStylePanel()">Stile PDF</button><button class="tool" onclick="previewProjectLyricsPdf()">Anteprima PDF</button><button class="tool" onclick="downloadProjectLyricsPdf()">Salva PDF</button>`:'';const markerExtract=mixerMetaTab==='markers'?`<button class="tool" onclick="extractMarkersFromSelectedTrack()">Estrai markers</button>`:'';const lineHtml=rows.map(({x,index})=>`<div class="meta-line${metaEventStateClass(mixerMetaTab,x)} ${metaSelectionSet(mixerMetaTab)?.has(index)?'meta-multi-selected':''}" data-meta-kind="${mixerMetaTab}" data-event-index="${index}" data-time-ms="${Number(x.time_ms||0)}" ${editable?`onclick="metaEventClick(event,'${mixerMetaTab}',${index})" oncontextmenu="return openMetaContextMenu(event,'${mixerMetaTab}',${index})"`:''}><time ${editable?`ondblclick="return beginMetaInlineEdit(event,'${mixerMetaTab}',${index},'time')" title="Doppio click per modificare il timestamp"`:''}>${fmtTime(x.time_ms/1000)}</time><span class="meta-value" ${editable?`ondblclick="return beginMetaInlineEdit(event,'${mixerMetaTab}',${index},'value')" title="Doppio click per modificare"`:''}>${esc(displayValue(x))}</span></div>`).join('');return `<div class="meta-tabs-content ${expanded?'meta-expanded-content':''}"><div class="meta-list">${lineHtml||`<div class="hint">No synchronized ${label.toLowerCase()} yet.</div>`}</div><div class="meta-actions"><button class="tool" onclick="editTimed('${mixerMetaTab}')">Edit ${label.toLowerCase()}</button>${resetButton}${markerExtract}${editor}${exports}</div>${expanded?'':`<textarea id="lyrics" hidden>${esc(linesToText(current.lyrics,'text'))}</textarea><textarea id="chords" hidden>${esc(linesToText(current.chords,'chord'))}</textarea><textarea id="markers" hidden>${esc(linesToText(current.markers,'label'))}</textarea>`}</div>`;
 }
 
 /* r189 deterministic WebAudio transport: one AudioContext clock, one scheduled source per track. */

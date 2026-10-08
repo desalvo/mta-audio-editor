@@ -1825,11 +1825,14 @@ def build_lyrics_pdf(
                     x=max(prev_right+5,min(x,section_margin+section_width-tw))
                     c.drawString(x,y,label);prev_right=x+tw
                 y-=chord_size+7
-        lyric_font,lyric_size,_ = st("lyrics")
-        c.setFont(lyric_font, lyric_size)
-        c.setFillColor(current_section_color or st("lyrics")[2])
+        lyric_font,lyric_size,lyric_color = st("lyrics")
         for part in lyric_lines:
+            # ensure() may open a new page and reset ReportLab's graphics state.
+            # Always apply the Lyrics typography after the possible page break so
+            # a lyric-only row at the top of a page keeps the configured style.
             ensure(lyric_size+8)
+            c.setFont(lyric_font, lyric_size)
+            c.setFillColor(current_section_color or lyric_color)
             c.drawString(section_margin,y,safe(part));y-=lyric_size+6
         y-=line_spacing
 

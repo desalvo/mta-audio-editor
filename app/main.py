@@ -20,7 +20,7 @@ from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse, Resp
 from starlette.background import BackgroundTask
 from fastapi.staticfiles import StaticFiles
 
-from .audio_engine import auto_align_ms, delete_range, delete_song_range, ensure_clips, estimate_bpm_and_signature, generate_chords_piano_wav, generate_silent_chords_wav, refresh_chords_piano_wav_region, generate_metronome_wav, media_duration_ms, project_duration_ms, render_mix, render_track, render_track_export, shift_track, waveform_peaks
+from .audio_engine import auto_align_ms, delete_range, delete_song_range, ensure_clips, estimate_bpm_and_signature, estimate_adaptive_tempo_map, generate_adaptive_metronome_wav, generate_chords_piano_wav, generate_silent_chords_wav, refresh_chords_piano_wav_region, generate_metronome_wav, media_duration_ms, project_duration_ms, render_mix, render_track, render_track_export, shift_track, waveform_peaks
 from .codec import export_mta, ffprobe, import_mta, resolve_mta_device_profile, suggested_slots, validate_slot_mapping
 from .models import AutoMixRequest, Clip, CustomPresetRequest, DeleteRangeRequest, DeleteTracksRequest, InstantiateProjectClipRequest, UpdateProjectClipRequest, MoveTrackRequest, TrackDelayRequest, MtaExportRequest, Project, ProjectClip, ProjectExportRequest, TrackExportRequest, RightsRecord, Track, SampleEditRequest, SampleEffectRequest
 from .mlive_mp3 import embed_mlive_merish_metadata
@@ -1655,13 +1655,48 @@ async def start_track_import_job(
 
 
 
-def _text_music_worker(job_id: str, pid: str, track_id: str, kind: str, model_or_engine: str = "", advanced_alignment: bool = False, chord_options: dict | None = None) -> None:
+def _shift_timed_events(events, offset_ms: int):
+    shifted=[]
+    for event in events:
+        payload=event.model_dump()
+        payload["time_ms"]=int(payload.get("time_ms") or 0)+int(offset_ms)
+        if payload.get("end_ms") is not None:
+            payload["end_ms"]=int(payload["end_ms"])+int(offset_ms)
+        for word in payload.get("words") or []:
+            word["start_ms"]=int(word.get("start_ms") or 0)+int(offset_ms)
+            word["end_ms"]=int(word.get("end_ms") or 0)+int(offset_ms)
+            for syllable in word.get("syllables") or []:
+                syllable["start_ms"]=int(syllable.get("start_ms") or 0)+int(offset_ms)
+                syllable["end_ms"]=int(syllable.get("end_ms") or 0)+int(offset_ms)
+        shifted.append(type(event)(**payload))
+    return shifted
+
+
+def _replace_timed_range(existing, replacement, start_ms: int, end_ms: int):
+    kept=[item for item in (existing or []) if not (int(start_ms) <= int(getattr(item,"time_ms",0) or 0) < int(end_ms))]
+    return sorted([*kept, *replacement], key=lambda item:int(getattr(item,"time_ms",0) or 0))
+
+
+def _text_music_worker(job_id: str, pid: str, track_id: str, kind: str, model_or_engine: str = "", advanced_alignment: bool = False, chord_options: dict | None = None, range_start_ms: int | None = None, range_end_ms: int | None = None) -> None:
+    range_tmp = None
     try:
         project = load_project(pid)
         track = next((item for item in project.tracks if item.id == track_id), None)
         if track is None:
             raise ValueError("track not found")
         source = audio_path(pid, track.filename)
+        range_mode = range_start_ms is not None and range_end_ms is not None and int(range_end_ms) > int(range_start_ms)
+        if range_mode and kind in {"lyrics", "chords"}:
+            _media_job_update(job_id, status="running", progress=2, message="Preparazione intervallo selezionato")
+            tmp_dir = Path(tempfile.mkdtemp(prefix=f"mta-{kind}-range-"))
+            rendered = tmp_dir / "track.wav"
+            clipped = tmp_dir / "range.wav"
+            render_track(track, source, rendered, apply_inserts=True, sample_rate=int(getattr(project,"sample_rate",44100) or 44100))
+            start_s=max(0,int(range_start_ms))/1000.0
+            duration_s=max(0.001,(int(range_end_ms)-int(range_start_ms))/1000.0)
+            subprocess.run(["ffmpeg","-y","-v","error","-ss",f"{start_s:.6f}","-t",f"{duration_s:.6f}","-i",str(rendered),"-vn","-acodec","pcm_s16le",str(clipped)],check=True)
+            source = clipped
+            range_tmp = tmp_dir
         _media_job_update(job_id, status="running", progress=3, message="Preparazione analisi e verifica sorgente")
         if kind == "lyrics":
             selected_model=model_or_engine or lyrics_catalog(native=NATIVE_SINGLE_USER)["default_model"]
@@ -1684,16 +1719,16 @@ def _text_music_worker(job_id: str, pid: str, track_id: str, kind: str, model_or
             if cancel_event and cancel_event.is_set():
                 raise InterruptedError("Lyrics extraction cancelled")
             _media_job_update(job_id, progress=96, message="Sincronizzazione lyrics sulla timeline")
-            mapped = map_source_events_to_timeline(track, events)
+            mapped = _shift_timed_events(events, int(range_start_ms)) if range_mode else map_source_events_to_timeline(track, events)
             latest = load_project(pid)
-            latest.lyrics = mapped
+            latest.lyrics = _replace_timed_range(latest.lyrics, mapped, int(range_start_ms), int(range_end_ms)) if range_mode else mapped
             latest.lyrics_engine = "OpenAI Whisper"
             latest.lyrics_model = selected_model
             _media_job_update(job_id, progress=98, message="Salvataggio lyrics nel progetto")
             save_project(latest)
             _media_job_update(
                 job_id, status="completed", progress=100, message="Lyrics estratte e sincronizzate",
-                result={"kind": "lyrics", "count": len(mapped), "engine": "OpenAI Whisper", "model": selected_model, "advanced_alignment": advanced_alignment},
+                result={"kind": "lyrics", "count": len(mapped), "engine": "OpenAI Whisper", "model": selected_model, "advanced_alignment": advanced_alignment, "range_start_ms": range_start_ms if range_mode else None, "range_end_ms": range_end_ms if range_mode else None},
             )
             return
         if kind == "chords":
@@ -1723,16 +1758,16 @@ def _text_music_worker(job_id: str, pid: str, track_id: str, kind: str, model_or
             if cancel_event and cancel_event.is_set():
                 raise InterruptedError("Chord extraction cancelled")
             _media_job_update(job_id, progress=96, message="Sincronizzazione chords sulla timeline")
-            mapped = map_source_events_to_timeline(track, events)
+            mapped = _shift_timed_events(events, int(range_start_ms)) if range_mode else map_source_events_to_timeline(track, events)
             latest = load_project(pid)
-            latest.chords = mapped
+            latest.chords = _replace_timed_range(latest.chords, mapped, int(range_start_ms), int(range_end_ms)) if range_mode else mapped
             latest.chords_engine = selected_engine
             latest.chords_model = selected_model
             _media_job_update(job_id, progress=98, message="Salvataggio chords nel progetto")
             save_project(latest)
             _media_job_update(
                 job_id, status="completed", progress=100, message="Chords estratti e sincronizzati",
-                result={"kind": "chords", "count": len(mapped), "engine": selected_engine, "model": selected_model, "engine_display_name": engine_info["display_name"]},
+                result={"kind": "chords", "count": len(mapped), "engine": selected_engine, "model": selected_model, "engine_display_name": engine_info["display_name"], "range_start_ms": range_start_ms if range_mode else None, "range_end_ms": range_end_ms if range_mode else None},
             )
             return
         if kind == "markers":
@@ -1765,9 +1800,12 @@ def _text_music_worker(job_id: str, pid: str, track_id: str, kind: str, model_or
     except Exception as exc:
         LOGGER.exception("Text/music analysis job %s failed", job_id)
         _media_job_update(job_id, status="failed", progress=0, message="Analisi fallita", error=str(exc)[-1200:])
+    finally:
+        if range_tmp is not None:
+            shutil.rmtree(range_tmp, ignore_errors=True)
 
 
-def _start_text_music_job(pid: str, track_id: str, request: Request, kind: str, model_or_engine: str = "", advanced_alignment: bool = False, chord_options: dict | None = None):
+def _start_text_music_job(pid: str, track_id: str, request: Request, kind: str, model_or_engine: str = "", advanced_alignment: bool = False, chord_options: dict | None = None, range_start_ms: int | None = None, range_end_ms: int | None = None):
     project = _project_for_actor(request, pid)
     if not any(item.id == track_id for item in project.tracks):
         raise HTTPException(404, "track not found")
@@ -1784,6 +1822,11 @@ def _start_text_music_job(pid: str, track_id: str, request: Request, kind: str, 
             raise HTTPException(400, "Motore chords non supportato")
         if not chord_engine_available(selected):
             raise HTTPException(409, f"Motore chords {engines[selected]['display_name']} non disponibile in questo runtime")
+    if (range_start_ms is None) != (range_end_ms is None):
+        raise HTTPException(400, "Specificare entrambi i limiti dell’intervallo")
+    if range_start_ms is not None:
+        if int(range_start_ms) < 0 or int(range_end_ms) <= int(range_start_ms):
+            raise HTTPException(400, "Intervallo di estrazione non valido")
     now = time.time()
     job_id = uuid.uuid4().hex[:16]
     job = {
@@ -1795,15 +1838,15 @@ def _start_text_music_job(pid: str, track_id: str, request: Request, kind: str, 
     with MEDIA_JOB_LOCK:
         MEDIA_JOBS[job_id] = job
     threading.Thread(
-        target=_text_music_worker, args=(job_id, pid, track_id, kind, model_or_engine, advanced_alignment, chord_options),
+        target=_text_music_worker, args=(job_id, pid, track_id, kind, model_or_engine, advanced_alignment, chord_options, range_start_ms, range_end_ms),
         daemon=True, name=f"mta-{kind}-{job_id}",
     ).start()
     return _media_job_public(job)
 
 
 @app.post("/api/projects/{pid}/tracks/{track_id}/extract-lyrics-jobs")
-def start_lyrics_extraction(pid: str, track_id: str, request: Request, model: str = "", advanced_alignment: bool = False):
-    return _start_text_music_job(pid, track_id, request, "lyrics", model, advanced_alignment)
+def start_lyrics_extraction(pid: str, track_id: str, request: Request, model: str = "", advanced_alignment: bool = False, range_start_ms: int | None = None, range_end_ms: int | None = None):
+    return _start_text_music_job(pid, track_id, request, "lyrics", model, advanced_alignment, range_start_ms=range_start_ms, range_end_ms=range_end_ms)
 
 
 @app.post("/api/projects/{pid}/tracks/{track_id}/extract-chords-jobs")
@@ -1814,6 +1857,7 @@ def start_chord_extraction(
     detect_dim_aug: bool | None = None, detect_slash_bass: bool | None = None,
     temporal_smoothing: bool | None = None, beat_sync: bool | None = None,
     min_chord_ms: int | None = None, max_changes_per_minute: int | None = None,
+    range_start_ms: int | None = None, range_end_ms: int | None = None,
 ):
     if preset not in {"stable", "balanced", "detailed", "raw"}:
         raise HTTPException(400, "Profilo chords non supportato")
@@ -1826,7 +1870,7 @@ def start_chord_extraction(
         "beat_sync": beat_sync, "min_chord_ms": min_chord_ms,
         "max_changes_per_minute": max_changes_per_minute,
     }
-    return _start_text_music_job(pid, track_id, request, "chords", engine, chord_options=options)
+    return _start_text_music_job(pid, track_id, request, "chords", engine, chord_options=options, range_start_ms=range_start_ms, range_end_ms=range_end_ms)
 
 
 @app.post("/api/projects/{pid}/tracks/{track_id}/extract-markers-jobs")
@@ -3526,12 +3570,12 @@ def start_track_stem_job(
 
 
 @app.post("/api/projects/{pid}/metronome-track")
-def create_metronome_track(pid: str, request: Request):
+def create_metronome_track(pid: str, request: Request, mode: str = "fixed"):
     with METRONOME_TRACK_LOCK:
-        return _create_metronome_track_locked(pid, request)
+        return _create_metronome_track_locked(pid, request, mode=mode)
 
 
-def _create_metronome_track_locked(pid: str, request: Request):
+def _create_metronome_track_locked(pid: str, request: Request, mode: str = "fixed"):
     project = _project_for_actor(request, pid)
     duration_ms = project_duration_ms(project)
     if duration_ms <= 0:
@@ -3554,10 +3598,33 @@ def _create_metronome_track_locked(pid: str, request: Request):
                 audio_path(pid, item.filename).unlink(missing_ok=True)
         project.tracks = [item for item in project.tracks if item.id not in duplicate_ids]
 
+    mode = str(mode or "fixed").strip().lower()
+    if mode not in {"fixed", "adaptive"}:
+        raise HTTPException(400, "Tipo metronomo non valido")
     filename = track.filename if track and track.filename else f"metronome-{uuid.uuid4().hex[:10]}.wav"
     out = audio_path(pid, filename)
+    tempo_points = []
     try:
-        duration_ms = generate_metronome_wav(project, out)
+        if mode == "adaptive":
+            # Recalculate the complete adaptive map every time. Never reuse an
+            # earlier map: edits, cuts or newly imported tracks may have changed
+            # any tempo variation in the song. Existing click tracks are excluded
+            # from the analysis so they cannot bias the beat detector.
+            analysis_project = project.model_copy(deep=True)
+            analysis_project.tracks = [item for item in analysis_project.tracks if not is_metronome_track(item)]
+            if not analysis_project.tracks:
+                raise ValueError("nessuna traccia musicale disponibile per l'analisi adattiva")
+            with tempfile.TemporaryDirectory() as td:
+                analysis_audio = Path(td) / "adaptive-source.wav"
+                render_mix(analysis_project, audio_path, analysis_audio, fmt="wav", sample_rate=int(project.sample_rate), wav_bit_depth=16)
+                beat_times_ms, tempo_points = estimate_adaptive_tempo_map(analysis_audio)
+            duration_ms = generate_adaptive_metronome_wav(project, out, beat_times_ms)
+            project.adaptive_tempo_map = tempo_points
+            project.metronome_mode = "adaptive"
+        else:
+            duration_ms = generate_metronome_wav(project, out)
+            project.metronome_mode = "fixed"
+            project.adaptive_tempo_map = []
         peaks = waveform_peaks(out)
     except Exception as exc:
         if not reused:
@@ -3567,7 +3634,7 @@ def _create_metronome_track_locked(pid: str, request: Request):
     if track is None:
         track = Track(
             id=uuid.uuid4().hex[:10],
-            name=f"Metronomo {project.bpm:g} BPM",
+            name=("Metronomo adattivo" if mode == "adaptive" else f"Metronomo {project.bpm:g} BPM"),
             type="click",
             filename=filename,
             duration_ms=duration_ms,
@@ -3588,7 +3655,7 @@ def _create_metronome_track_locked(pid: str, request: Request):
         )
         project.tracks.append(track)
     else:
-        track.name = f"Metronomo {project.bpm:g} BPM"
+        track.name = "Metronomo adattivo" if mode == "adaptive" else f"Metronomo {project.bpm:g} BPM"
         track.type = "click"
         track.filename = filename
         track.duration_ms = duration_ms
@@ -3607,7 +3674,7 @@ def _create_metronome_track_locked(pid: str, request: Request):
         ]
     track.waveform_revision = _track_waveform_revision(track, out) if peaks else ""
     save_project(project)
-    return {"project": project, "track": track, "reused": reused}
+    return {"project": project, "track": track, "reused": reused, "mode": mode, "tempo_map": tempo_points if mode == "adaptive" else []}
 
 
 @app.post("/api/projects/{pid}/chords-track")

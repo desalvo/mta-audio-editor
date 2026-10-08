@@ -377,7 +377,7 @@ class NativeApi:
         import webview
 
         ext = str(extension or "").lower().lstrip(".")
-        if ext not in {"mta8", "mta16", "wav", "mp3", "flac", "pdf", "txt", "cho"}:
+        if ext not in {"mta8", "mta16", "wav", "mp3", "flac", "pdf", "txt", "cho", "zip", "mp4"}:
             raise ValueError("unsupported export extension")
         safe_name = "".join(ch if ch.isalnum() or ch in " ._-" else "_" for ch in suggested_name).strip(" .")
         if not safe_name:
@@ -390,6 +390,8 @@ class NativeApi:
             "wav": "WAV Audio (*.wav)",
             "mp3": "MP3 Audio (*.mp3)",
             "flac": "FLAC Audio (*.flac)",
+            "zip": "ZIP Archive (*.zip)",
+            "mp4": "MP4 Video (*.mp4)",
             "pdf": "PDF Document (*.pdf)",
             "txt": "Text File (*.txt)",
             "cho": "ChordPro (*.cho)",

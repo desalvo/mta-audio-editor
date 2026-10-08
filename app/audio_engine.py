@@ -9,7 +9,7 @@ from pathlib import Path
 
 import numpy as np
 
-from .models import Clip, Project, Track
+from .models import AdaptiveTempoPoint, Clip, Project, Track
 from .plugins import chain_filter, effective_output_channels
 
 
@@ -49,6 +49,172 @@ def project_duration_ms(project: Project) -> int:
         else:
             end_ms = max(end_ms, track.duration_ms)
     return max(0, int(end_ms))
+
+
+def _adaptive_global_lag(onset: np.ndarray, hz: float) -> int:
+    min_bpm, max_bpm = 55.0, 200.0
+    min_lag = max(1, int(hz * 60.0 / max_bpm))
+    max_lag = max(min_lag + 1, int(hz * 60.0 / min_bpm))
+    corr = np.correlate(onset, onset, mode="full")[len(onset)-1:]
+    window = corr[min_lag:max_lag+1]
+    if not len(window) or not np.isfinite(window).any():
+        raise ValueError("unable to estimate adaptive tempo")
+    lag = min_lag + int(np.nanargmax(window))
+    bpm = 60.0 * hz / lag
+    while bpm < 70:
+        bpm *= 2
+        lag = max(1, int(round(hz * 60.0 / bpm)))
+    while bpm > 180:
+        bpm /= 2
+        lag = max(1, int(round(hz * 60.0 / bpm)))
+    return max(1, lag)
+
+
+def estimate_adaptive_tempo_map(path: Path, progress=None) -> tuple[list[int], list[AdaptiveTempoPoint]]:
+    """Recalculate a beat-by-beat tempo map from the complete rendered song.
+
+    No previous project tempo map is consulted. The tracker follows local onset
+    maxima around the predicted next beat and continuously adapts its interval,
+    which lets accelerando, ritardando and discrete tempo changes move the click
+    grid without forcing the whole song onto one BPM value.
+    """
+    if progress:
+        progress(3, "Preparazione analisi metronomo adattivo")
+    # Unlike the ordinary BPM estimator, analyse the whole file: adaptive tempo
+    # changes near the end of long songs must not be ignored.
+    with tempfile.TemporaryDirectory() as td:
+        wav_path = Path(td) / "adaptive-tempo.wav"
+        _run(["ffmpeg", "-y", "-v", "error", "-i", str(path), "-ac", "1", "-ar", "4000", "-c:a", "pcm_s16le", str(wav_path)])
+        with wave.open(str(wav_path), "rb") as handle:
+            sr = handle.getframerate()
+            data = np.frombuffer(handle.readframes(handle.getnframes()), dtype=np.int16).astype(np.float32)
+    if len(data) < sr * 4:
+        raise ValueError("audio too short for adaptive tempo estimation")
+    if progress:
+        progress(18, "Calcolo degli attacchi ritmici")
+    data /= max(1.0, float(np.max(np.abs(data))))
+    hop = max(1, sr // 100)
+    n = len(data) // hop
+    x = data[:n * hop].reshape(n, hop)
+    rms = np.sqrt(np.mean(x * x, axis=1) + 1e-9)
+    onset = np.maximum(0.0, np.diff(rms, prepend=rms[:1]))
+    onset -= onset.mean()
+    std = float(onset.std())
+    if std > 1e-9:
+        onset /= std
+    hz = float(sr) / hop
+    lag = _adaptive_global_lag(onset, hz)
+    if progress:
+        progress(36, "Tracciamento di tutte le variazioni di tempo")
+    # Candidate onsets. A permissive threshold is intentional: distance from the
+    # predicted beat is part of the score, so weak musical beats remain usable.
+    positive = onset[onset > 0]
+    threshold = float(np.percentile(positive, 45)) if positive.size else 0.0
+    candidates = np.flatnonzero((onset >= np.roll(onset, 1)) & (onset > np.roll(onset, -1)) & (onset >= threshold))
+    candidates = candidates[(candidates > 0) & (candidates < len(onset)-1)]
+    if candidates.size < 4:
+        raise ValueError("not enough rhythmic events for adaptive tempo")
+    # Seed from a strong event in the first few expected beats, avoiding a late
+    # global maximum that would discard the beginning of the song.
+    seed_limit = min(len(onset), max(int(6 * lag), int(8 * hz)))
+    early = candidates[candidates < seed_limit]
+    if not early.size:
+        early = candidates[:1]
+    seed = int(early[np.argmax(onset[early])])
+    beat_frames = [seed]
+    interval = float(lag)
+    last = float(seed)
+    max_frame = len(onset) - 1
+    while True:
+        expected = last + interval
+        if expected > max_frame:
+            break
+        lo = int(max(last + interval * 0.52, expected - interval * 0.42))
+        hi = int(min(max_frame, expected + interval * 0.42))
+        options = candidates[(candidates >= lo) & (candidates <= hi)]
+        if options.size:
+            dist = np.abs(options.astype(np.float64) - expected) / max(1.0, interval)
+            scores = onset[options] - 1.35 * dist
+            chosen = float(options[int(np.argmax(scores))])
+        else:
+            chosen = expected
+        observed = chosen - last
+        min_interval = hz * 60.0 / 220.0
+        max_interval = hz * 60.0 / 45.0
+        if min_interval <= observed <= max_interval:
+            # Moderate smoothing follows real tempo ramps without reacting wildly
+            # to one syncopated onset.
+            interval = 0.68 * interval + 0.32 * observed
+        interval = max(min_interval, min(max_interval, interval))
+        frame = int(round(chosen))
+        if frame <= beat_frames[-1]:
+            frame = beat_frames[-1] + max(1, int(round(interval)))
+        beat_frames.append(frame)
+        last = float(frame)
+    if len(beat_frames) < 4:
+        raise ValueError("adaptive beat tracking failed")
+    beat_ms = [max(0, int(round(frame * 1000.0 / hz))) for frame in beat_frames]
+    intervals_ms = np.diff(np.asarray(beat_ms, dtype=np.float64))
+    tempo_points: list[AdaptiveTempoPoint] = []
+    for i, when in enumerate(beat_ms):
+        if intervals_ms.size:
+            a = max(0, i - 2)
+            b = min(len(intervals_ms), i + 2)
+            local = float(np.median(intervals_ms[a:b])) if b > a else float(np.median(intervals_ms))
+            bpm = 60000.0 / max(1.0, local)
+        else:
+            bpm = 120.0
+        tempo_points.append(AdaptiveTempoPoint(time_ms=when, bpm=round(max(1.0, min(500.0, bpm)), 2), beat_index=i))
+    if progress:
+        values = [p.bpm for p in tempo_points]
+        progress(88, f"Tempo adattivo rilevato: {min(values):.1f}–{max(values):.1f} BPM")
+    return beat_ms, tempo_points
+
+
+def generate_adaptive_metronome_wav(project: Project, out: Path, beat_times_ms: list[int], beats_per_bar: int | None = None) -> int:
+    """Generate a click WAV at the exact beat timestamps of an adaptive tempo map."""
+    duration_ms = project_duration_ms(project)
+    if duration_ms <= 0 or not beat_times_ms:
+        raise ValueError("adaptive metronome has no beat map")
+    sample_rate = int(getattr(project, "sample_rate", 44100) or 44100)
+    total_samples = max(1, round(duration_ms / 1000 * sample_rate))
+    try:
+        numerator_text, denominator_text = str(getattr(project, "time_signature", "4/4") or "4/4").split("/", 1)
+        numerator, denominator = int(numerator_text), int(denominator_text)
+    except (TypeError, ValueError):
+        numerator, denominator = 4, 4
+    beats_per_bar = max(1, int(beats_per_bar or numerator))
+    click_len = max(1, round(0.045 * sample_rate))
+    silence_chunk = b"\x00\x00" * 8192
+    def click_bytes(freq: float) -> bytes:
+        t = np.arange(click_len, dtype=np.float64) / sample_rate
+        wave_data = np.sin(2 * np.pi * freq * t) * np.exp(-t * 55.0)
+        peak = float(np.max(np.abs(wave_data))) if wave_data.size else 0.0
+        if peak > 0.0:
+            wave_data /= peak
+        return np.asarray(np.clip(wave_data, -1, 1) * 32767, dtype=np.int16).tobytes()
+    accent, secondary, regular = click_bytes(1320.0), click_bytes(1100.0), click_bytes(880.0)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    with wave.open(str(out), "wb") as handle:
+        handle.setnchannels(1); handle.setsampwidth(2); handle.setframerate(sample_rate)
+        cursor = 0
+        for beat_index, when_ms in enumerate(beat_times_ms):
+            target = max(0, min(total_samples, round(float(when_ms) / 1000.0 * sample_rate)))
+            if target < cursor:
+                continue
+            remaining = target - cursor
+            while remaining > 0:
+                count = min(8192, remaining); handle.writeframesraw(silence_chunk[:count * 2]); cursor += count; remaining -= count
+            pos = beat_index % beats_per_bar
+            click = accent if pos == 0 else (secondary if denominator == 8 and numerator in {6,9,12} and pos % 3 == 0 else regular)
+            count = min(click_len, total_samples - cursor)
+            if count <= 0: break
+            handle.writeframesraw(click[:count * 2]); cursor += count
+        remaining = total_samples - cursor
+        while remaining > 0:
+            count = min(8192, remaining); handle.writeframesraw(silence_chunk[:count * 2]); cursor += count; remaining -= count
+        handle.writeframes(b"")
+    return duration_ms
 
 
 def generate_metronome_wav(project: Project, out: Path, beats_per_bar: int | None = None) -> int:

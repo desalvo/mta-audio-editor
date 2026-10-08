@@ -1235,3 +1235,4 @@ body:has(#topZoom:active) .wave{image-rendering:auto}
 .utility-modal.chords-refresh-progress-modal{width:min(460px,92vw)!important;max-height:min(260px,70vh)!important;resize:none!important;overflow:hidden!important}
 .utility-modal.chords-refresh-progress-modal .utility-body{padding:14px!important}
 .utility-modal.chords-refresh-progress-modal .media-live-output{max-height:72px;overflow:auto}
+.meta-line.meta-multi-selected{background:#173f5d;color:#eef8ff;box-shadow:inset 3px 0 #39b5ff}.meta-line.meta-multi-selected time{color:#c8ebff}

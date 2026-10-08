@@ -291,6 +291,13 @@ class SampleEffectRequest(BaseModel):
     params: dict[str, float | str | bool | list[float]] = Field(default_factory=dict)
 
 
+
+
+class AdaptiveTempoPoint(BaseModel):
+    time_ms: int = Field(ge=0)
+    bpm: float = Field(gt=0, le=500)
+    beat_index: int = Field(ge=0)
+
 class Project(BaseModel):
     id: str
     owner_user_id: int | None = Field(default=None, ge=1)
@@ -324,6 +331,8 @@ class Project(BaseModel):
     auto_mix_style: Literal["balanced", "live", "studio", "gentle"] = "balanced"
     auto_mix_snapshot: AutoMixSnapshot | None = None
     base_bpm: float | None = Field(default=None, gt=0, le=500)
+    metronome_mode: Literal["fixed", "adaptive"] = "fixed"
+    adaptive_tempo_map: list[AdaptiveTempoPoint] = Field(default_factory=list, max_length=20000)
     pitch_semitones: float = Field(default=0.0, ge=-6.0, le=6.0)
     track_panel_width_px: int = Field(default=225, ge=160, le=520)
     realtime_meter_enabled: bool = False

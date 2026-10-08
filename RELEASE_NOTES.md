@@ -1,3 +1,27 @@
+# MTA Audio Editor 0.2.0-r235
+
+- Added Adaptive Metronome: every request recalculates the complete beat-by-beat tempo map from the current song and regenerates the click track to follow internal tempo changes.
+- Adaptive analysis excludes existing metronome tracks and persists the newly detected local BPM map in the project.
+
+## 0.2.0-r234
+
+- Preserva gli anchor manuali lyrics/chords durante aggiunte, eliminazioni e refresh della traccia Chords.
+- Corregge export MP4 Karaoke e unifica la barra di progresso per gli export di progetto.
+- Corregge apertura .maeprojz dal Finder su macOS tramite file-open argv emulation.
+
+## 0.2.0-r233
+- PDF Lyrics: una riga di lyrics che apre una nuova pagina mantiene sempre la formattazione Lyrics configurata anche quando non ha chords.
+
+## 0.2.0-r232
+
+- Lyrics + Chords + Markers: il timestamp di una nuova linea Lyrics usa ora il formato standard `m:ss.mmm` / `mm:ss.mmm`, con playhead precompilato e validazione coerente con gli altri editor.
+
+## 0.2.0-r231
+
+- Added CTRL/CMD multi-selection for synchronized Lyrics and Chords with one-shot batch deletion.
+- Added partial Lyrics/Chords extraction over the current timeline range; only events inside the selected interval are replaced while events outside remain unchanged.
+- Partial Chords extraction triggers a single Chords guide-track refresh after completion.
+
 ## 0.2.0-r230
 
 - CI: removed unused `io` import from `app/mp3g.py` to satisfy Ruff.

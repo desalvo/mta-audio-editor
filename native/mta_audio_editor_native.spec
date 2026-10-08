@@ -104,6 +104,7 @@ exe = EXE(
     upx=False,
     console=False,
     disable_windowed_traceback=False,
+    argv_emulation=(sys.platform == "darwin"),
     icon=str(windows_icon) if os.name == "nt" and windows_icon.exists() else None,
     version=str(version_file) if os.name == "nt" and version_file.exists() else None,
 )
