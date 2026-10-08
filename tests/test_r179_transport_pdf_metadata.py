@@ -27,7 +27,8 @@ def test_metronome_honours_signature_denominator(tmp_path):
 def test_r179_ui_features_present():
     js = Path("app/static/app.js").read_text(encoding="utf-8")
     css = Path("app/static/app.css").read_text(encoding="utf-8")
-    assert "Estrai marker automaticamente" in js
+    assert "Estrai marker</span>" in js
+    assert "Estrai marker automaticamente</span>" not in js
     assert "metadataSearchPageSize=10" in js
     assert "showMetadataCandidateDetails" in js
     assert "metadata-results-scroll" in css

@@ -10,9 +10,9 @@ android {
         applicationId = "com.desalvo.mtaaudioeditor.mobile"
         minSdk = 26
         targetSdk = 35
-        versionCode = 20255
+        versionCode = 20256
         versionName = "0.2.0"
-        buildConfigField("String", "MTA_REVISION", "\"255\"")
+        buildConfigField("String", "MTA_REVISION", "\"256\"")
     }
 
     signingConfigs {

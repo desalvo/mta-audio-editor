@@ -22,5 +22,6 @@ def test_exact_alignment_and_wider_timestamps():
     assert 'meta-inline-time' in JS and 'min-width:145px' in CSS
 
 def test_revision_metadata():
-    assert (ROOT/'REVISION').read_text().strip()=='252'
-    assert 'MTA_REVISION", "\\"252\\"' in (ROOT/'mobile/android/app/build.gradle.kts').read_text()
+    revision=(ROOT/'REVISION').read_text().strip()
+    assert revision.isdecimal()
+    assert f'MTA_REVISION", "\\"{revision}\\"' in (ROOT/'mobile/android/app/build.gradle.kts').read_text()

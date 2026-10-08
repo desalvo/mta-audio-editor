@@ -1,3 +1,8 @@
+## 0.2.0-r256
+
+- CI regression fixes: update legacy context-menu text assertions to the current Add chord / Extract marker labels.
+- Make revision metadata regression tests version-independent while preserving Android revision and versionCode consistency checks.
+
 ## 0.2.0-r255
 
 - Stabilized Lyrics/Chords/Markers double-click editing without rerendering on single click, preserving scroll and last-row edits.
