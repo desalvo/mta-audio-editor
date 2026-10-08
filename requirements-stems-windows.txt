@@ -6,3 +6,6 @@ torch==2.14.1+cpu
 demucs==4.1.0
 msgpack==1.2.3
 urllib3==2.8.0
+
+# Imported by audio_separator.separator.uvr_lib_v5.pyrb at runtime.
+six>=1.16,<2

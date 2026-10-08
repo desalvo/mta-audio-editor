@@ -1,3 +1,8 @@
+## 0.2.0-r258 — native audio-separator dependency fixes
+- macOS Intel: enforce binary NumPy 1.26.4 / Numba 0.61.2 / llvmlite 0.44.0 wheels, including a constraint on the optional resampy runtime installation.
+- Windows: explicitly install and freeze six, required by audio-separator UVR runtime.
+- Keep native separator import checks as production gates.
+
 ## 0.2.0-r257 — Native stem dependency convergence
 
 - ARM64: install missing audioread explicitly before validating audio-separator.

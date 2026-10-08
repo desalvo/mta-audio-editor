@@ -1,0 +1,4 @@
+# Preserve prebuilt macOS x86_64 / Python 3.12 wheels across subsequent pip operations.
+numpy==1.26.4
+numba==0.61.2
+llvmlite==0.44.0
