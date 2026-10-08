@@ -2,6 +2,7 @@ package com.desalvo.mtaaudioeditor.mobile;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -310,8 +311,26 @@ public final class MainActivity extends Activity {
                     .setNegativeButton("Più tardi", null)
                     .setPositiveButton("Aggiorna", (d, which) -> {
                         if (info.assetUrl != null && !info.assetUrl.isEmpty()) {
-                            Toast.makeText(this, "Download aggiornamento in corso…", Toast.LENGTH_SHORT).show();
-                            GitHubUpdateManager.downloadAndInstall(this, ioExecutor, info.assetUrl, info.assetName, installError -> runOnUiThread(() -> {
+                            ProgressDialog downloadDialog = new ProgressDialog(this);
+                            downloadDialog.setTitle("Download aggiornamento");
+                            downloadDialog.setMessage("Connessione al server…");
+                            downloadDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                            downloadDialog.setMax(100);
+                            downloadDialog.setCancelable(false);
+                            downloadDialog.setIndeterminate(true);
+                            downloadDialog.show();
+                            GitHubUpdateManager.downloadAndInstall(this, ioExecutor, info.assetUrl, info.assetName,
+                              (received, total) -> runOnUiThread(() -> {
+                                  if (total > 0) {
+                                      downloadDialog.setIndeterminate(false);
+                                      downloadDialog.setProgress((int)Math.min(100, received * 100 / total));
+                                      downloadDialog.setMessage(String.format(java.util.Locale.getDefault(), "%.1f / %.1f MB", received / 1048576.0, total / 1048576.0));
+                                  } else {
+                                      downloadDialog.setIndeterminate(true);
+                                      downloadDialog.setMessage(String.format(java.util.Locale.getDefault(), "%.1f MB scaricati", received / 1048576.0));
+                                  }
+                              }), installError -> runOnUiThread(() -> {
+                                downloadDialog.dismiss();
                                 if (installError != null) {
                                     Toast.makeText(this, "Installazione non avviata: " + installError.getMessage(), Toast.LENGTH_LONG).show();
                                     try { startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(info.releaseUrl))); } catch (Exception ignored) {}

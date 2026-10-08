@@ -1,3 +1,14 @@
+## 0.2.0-r251
+- Timeline marker captions are placed below the chord-label band to avoid collisions when Show Chords and Show Markers are both enabled.
+
+## 0.2.0-r250
+- Timeline markers: drag and reposition, with context menu to add, enable, disable or delete while markers are visible. Markers use a vivid high-contrast magenta line and handle with distinct hover and disabled states.
+- Includes r249 update-download progress indicators.
+
+## 0.2.0-r249
+- Native desktop and Android installer downloads show live progress, downloaded/total MB and an indeterminate fallback when the server omits Content-Length.
+- Desktop installer download is staged atomically, with incomplete transfers rejected.
+
 ## 0.2.0-r248
 - Piano / Chord Lab falls back to a draggable and resizable in-app detached window when popup permission is unavailable.
 - Enlarged Show Lyrics/Chords/Markers icons fill compact 38px toggle buttons, preserving title tooltips and aria-labels.

@@ -197,6 +197,8 @@ class NativeApi:
 
     def __init__(self) -> None:
         self.window = None
+        self._update_download_status = {"state": "idle", "received": 0, "total": 0}
+        self._update_download_lock = threading.Lock()
         self.project_paths: dict[str, Path] = {}
         self._project_paths_file = _data_root() / "native-project-paths.json"
         if self._project_paths_file.is_file():
@@ -591,9 +593,32 @@ class NativeApi:
         except Exception as exc:
             return {"ok": False, "available": False, "error": str(exc)}
 
+    def update_download_status(self) -> dict:
+        with self._update_download_lock:
+            return dict(self._update_download_status)
+
     def install_update(self, asset_url: str, asset_name: str = "") -> dict:
         from native.update_manager import download_and_launch
-        return download_and_launch(asset_url, asset_name)
+        with self._update_download_lock:
+            if self._update_download_status["state"] == "downloading":
+                return {"ok": False, "error": "Download already in progress"}
+            self._update_download_status = {"state": "downloading", "received": 0, "total": 0}
+
+        def report(received: int, total: int) -> None:
+            with self._update_download_lock:
+                self._update_download_status.update(received=received, total=total)
+
+        def worker() -> None:
+            try:
+                result = download_and_launch(asset_url, asset_name, progress=report)
+                with self._update_download_lock:
+                    self._update_download_status.update(state="complete", path=result["path"])
+            except Exception as exc:
+                with self._update_download_lock:
+                    self._update_download_status.update(state="error", error=str(exc))
+
+        threading.Thread(target=worker, daemon=True, name="mta-update-download").start()
+        return {"ok": True, "state": "downloading"}
 
     def _import_project_path(self, path: Path) -> dict:
         from app.storage import import_project_archive, is_portable_project_archive, read_project_link

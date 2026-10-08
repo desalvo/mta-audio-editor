@@ -149,7 +149,7 @@ def check_for_update(current_version: str, channel: str = "stable") -> dict:
     }
 
 
-def download_and_launch(asset_url: str, asset_name: str) -> dict:
+def download_and_launch(asset_url: str, asset_name: str, progress=None) -> dict:
     if not asset_url:
         raise ValueError("update asset URL is missing")
     safe = Path(asset_name or "mta-audio-editor-update").name
@@ -157,12 +157,29 @@ def download_and_launch(asset_url: str, asset_name: str) -> dict:
     if not str(asset_url).lower().startswith("https://"):
         raise ValueError("update asset URL must use HTTPS")
     request = urllib.request.Request(asset_url, headers={"User-Agent": "MTA-Audio-Editor-Updater"})  # noqa: S310 -- URL validated above.
-    with urllib.request.urlopen(request, timeout=30) as response, target.open("wb") as handle:  # noqa: S310 -- validated HTTPS request.
-        while True:
-            chunk = response.read(1024 * 1024)
-            if not chunk:
-                break
-            handle.write(chunk)
+    staging = target.with_name(target.name + ".download")
+    received = 0
+    try:
+        with urllib.request.urlopen(request, timeout=30) as response, staging.open("wb") as handle:  # noqa: S310 -- validated HTTPS request.
+            total = int(response.headers.get("Content-Length") or 0)
+            if progress:
+                progress(received, total)
+            while True:
+                chunk = response.read(256 * 1024)
+                if not chunk:
+                    break
+                handle.write(chunk)
+                received += len(chunk)
+                if progress:
+                    progress(received, total)
+            handle.flush()
+            os.fsync(handle.fileno())
+        if total and received != total:
+            raise OSError("Incomplete update download")
+        os.replace(staging, target)
+    except Exception:
+        staging.unlink(missing_ok=True)
+        raise
     if os.name == "nt":
         os.startfile(str(target))  # type: ignore[attr-defined]  # noqa: S606 -- intentional installer launcher.
     elif sys_platform() == "darwin":

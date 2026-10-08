@@ -32,6 +32,7 @@ final class GitHubUpdateManager {
 
     interface Callback { void done(UpdateInfo info, Exception error); }
     interface InstallCallback { void done(Exception error); }
+    interface ProgressCallback { void onProgress(long received, long total); }
 
     static void check(ExecutorService executor, String currentVersion, String channel, Callback callback) {
         executor.submit(() -> {
@@ -116,7 +117,7 @@ final class GitHubUpdateManager {
         return out;
     }
 
-    static void downloadAndInstall(Context context, ExecutorService executor, String url, String name, InstallCallback callback) {
+    static void downloadAndInstall(Context context, ExecutorService executor, String url, String name, ProgressCallback progress, InstallCallback callback) {
         executor.submit(() -> {
             HttpURLConnection c = null;
             try {
@@ -126,7 +127,19 @@ final class GitHubUpdateManager {
                 c = (HttpURLConnection) new URL(url).openConnection();
                 c.setConnectTimeout(20000); c.setReadTimeout(180000);
                 c.setRequestProperty("User-Agent", "MTA-Audio-Editor-Android-Updater");
-                try (InputStream in = c.getInputStream(); FileOutputStream out = new FileOutputStream(file)) { in.transferTo(out); }
+                long total = c.getContentLengthLong();
+                long received = 0;
+                try (InputStream in = c.getInputStream(); FileOutputStream out = new FileOutputStream(file)) {
+                    byte[] buffer = new byte[65536]; int count;
+                    progress.onProgress(0, total);
+                    while ((count = in.read(buffer)) != -1) {
+                        out.write(buffer, 0, count);
+                        received += count;
+                        progress.onProgress(received, total);
+                    }
+                    out.getFD().sync();
+                }
+                if (total > 0 && received != total) throw new java.io.IOException("Incomplete APK download");
                 Uri uri = FileProvider.getUriForFile(context, context.getPackageName() + ".files", file);
                 Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.setDataAndType(uri, "application/vnd.android.package-archive");

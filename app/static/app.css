@@ -1262,7 +1262,7 @@ body:has(#topZoom:active) .wave{image-rendering:auto}
 /* r243: keep the left edge resize handle above neighboring mixer content. */
 .piano-lab-resize.left{left:0;z-index:35}.piano-lab-resize.right{right:0;z-index:35}
 
-.project-marker-line{position:absolute;top:0;bottom:0;border-left:2px solid #204A87;pointer-events:none;z-index:7;opacity:.85}.project-marker-line>span{position:absolute;top:1px;left:3px;white-space:nowrap;background:rgba(20,25,35,.86);padding:2px 5px;border-radius:3px;color:white;font-size:11px}
+.project-marker-line{position:absolute;top:0;bottom:0;width:12px;margin-left:-6px;border-left:2px solid var(--marker-color,#204A87);background:linear-gradient(90deg,transparent 0,rgba(110,160,235,.09) 45%,transparent 100%);z-index:7;opacity:.95;cursor:ew-resize;touch-action:none;user-select:none}.project-marker-caption{position:absolute;top:1px;left:8px;white-space:nowrap;background:rgba(20,25,35,.9);padding:2px 5px;border-radius:3px;color:white;font-size:11px;pointer-events:none}.project-marker-handle{position:absolute;bottom:2px;left:-6px;display:flex;align-items:center;justify-content:center;width:18px;height:20px;border-radius:4px;background:var(--marker-color,#204A87);color:white;box-shadow:0 0 0 1px #fff5;font-size:12px;pointer-events:none}.project-marker-line.marker-disabled{opacity:.38;border-left-style:dashed}.project-marker-line.dragging{z-index:25;opacity:1}.project-marker-line:hover .project-marker-handle{box-shadow:0 0 0 2px #fff9}
 
 /* r247: primary project actions are compact, consistently icon-only at any width. */
 .header-actions .primary-icon-action{display:inline-flex;align-items:center;justify-content:center;min-width:34px;width:34px;height:34px;padding:0}
@@ -1277,3 +1277,52 @@ body:has(#topZoom:active) .wave{image-rendering:auto}
 .piano-floating-head{position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;padding:10px 13px;background:#14354b;cursor:move;touch-action:none;z-index:3;user-select:none}
 .piano-floating-head button{font-size:25px;color:white;background:transparent;border:0;cursor:pointer}
 .piano-floating-body{padding:12px}.piano-floating-body .piano-keyboard-scroll{overflow:auto;max-width:100%}
+
+
+/* r250: vivid, high-contrast timeline markers; distinct from waveform and track grids. */
+.project-marker-line{
+  --marker-visibility-accent:#ff3f94;
+  width:16px;
+  margin-left:-8px;
+  border-left:3px solid var(--marker-visibility-accent);
+  background:linear-gradient(90deg,rgba(255,63,148,.23),rgba(255,63,148,.08) 45%,transparent 100%);
+  box-shadow:-1px 0 0 rgba(255,255,255,.82),2px 0 8px rgba(255,63,148,.6);
+  opacity:1;
+}
+.project-marker-line .project-marker-caption{
+  left:10px;
+  background:#3b1029;
+  border:1px solid #ff75b1;
+  color:#fff;
+  font-weight:750;
+  box-shadow:0 2px 9px rgba(0,0,0,.6);
+}
+.project-marker-line .project-marker-handle{
+  left:-9px;
+  bottom:1px;
+  width:23px;
+  height:25px;
+  border:2px solid #ffe0f0;
+  border-radius:6px;
+  background:#f72585;
+  box-shadow:0 0 0 2px rgba(14,18,25,.75),0 0 11px rgba(255,63,148,.75);
+  font-size:14px;
+  font-weight:800;
+}
+.project-marker-line:hover,.project-marker-line.dragging{
+  --marker-visibility-accent:#ff85c2;
+  box-shadow:-1px 0 0 #fff,2px 0 14px rgba(255,63,148,.94);
+}
+.project-marker-line:hover .project-marker-handle,.project-marker-line.dragging .project-marker-handle{
+  background:#ff489d;
+  border-color:#fff;
+  box-shadow:0 0 0 3px #fff,0 0 17px rgba(255,63,148,.95);
+}
+.project-marker-line.marker-disabled{
+  opacity:.65;
+  border-left-style:dashed;
+  filter:saturate(.65);
+}
+
+/* r251: reserve the first 28px for chord labels; marker captions sit below. */
+.project-marker-line .project-marker-caption{top:32px;left:10px;z-index:1;max-width:180px;overflow:hidden;text-overflow:ellipsis}

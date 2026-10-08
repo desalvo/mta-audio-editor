@@ -1052,8 +1052,68 @@ let timelineChordSelectedIndices=new Set();
 function normalizeTimelineChordSelection(){const n=current?.chords?.length||0;timelineChordSelectedIndices=new Set([...timelineChordSelectedIndices].filter(i=>Number.isInteger(i)&&i>=0&&i<n&&!current.chords[i]?.deleted));}
 function timelineMarkersHtml(){
   if(!current?.show_markers_playback)return '';
-  return (current.markers||[]).filter(m=>!m.deleted&&!m.disabled).map(m=>`<div class="project-marker-line" style="left:${Number(m.time_ms||0)/1000*pxPerSec}px;border-left-color:${esc(m.color||'#204A87')}" title="${esc(m.label||'Marker')}"><span>${esc(m.label||'Marker')}</span></div>`).join('');
+  return (current.markers||[]).map((m,index)=>({m,index})).filter(({m})=>!m.deleted).map(({m,index})=>`<div class="project-marker-line ${m.disabled?'marker-disabled':''}" data-marker-index="${index}" style="left:${Math.max(0,Number(m.time_ms||0))/1000*pxPerSec}px;--marker-color:${esc(m.color||'#204A87')}" onpointerdown="beginTimelineMarkerDrag(event,${index})" oncontextmenu="return openTimelineMarkerContextMenu(event,${index})" title="${esc(m.label||'Marker')} · ${esc(lyricsChordsEditorPosition(m.time_ms||0))}"><span class="project-marker-caption">${esc(m.label||'Marker')}</span><span class="project-marker-handle" aria-hidden="true">◆</span></div>`).join('');
 }
+function refreshTimelineMarkers(){
+  const lanes=$('#lanes');if(!lanes)return;
+  lanes.querySelectorAll('.project-marker-line').forEach(node=>node.remove());
+  if(!current?.show_markers_playback)return;
+  const playhead=lanes.querySelector('#playhead'),tmp=document.createElement('div');tmp.innerHTML=timelineMarkersHtml();
+  while(tmp.firstChild)lanes.insertBefore(tmp.firstChild,playhead||null);
+}
+let timelineMarkerDrag=null;
+function beginTimelineMarkerDrag(event,index){
+  if(!current?.show_markers_playback||event.button!==0)return;
+  const marker=current?.markers?.[index],el=event.currentTarget;if(!marker||marker.deleted||!el)return;
+  event.preventDefault();event.stopPropagation();
+  const drag={index,item:marker,startX:event.clientX,startTime:Number(marker.time_ms||0),lastTime:Number(marker.time_ms||0),pointerId:event.pointerId,el,moved:false};
+  timelineMarkerDrag=drag;el.setPointerCapture?.(event.pointerId);el.classList.add('dragging');
+  const move=ev=>{if(timelineMarkerDrag!==drag||ev.pointerId!==drag.pointerId)return;
+    drag.moved ||= Math.abs(ev.clientX-drag.startX)>2;
+    drag.lastTime=Math.max(0,Math.round(drag.startTime+(ev.clientX-drag.startX)*1000/Math.max(1,pxPerSec)));
+    el.style.left=`${drag.lastTime/1000*pxPerSec}px`;
+    el.title=`${marker.label||'Marker'} · ${lyricsChordsEditorPosition(drag.lastTime)}`;
+  };
+  const clean=()=>{window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',finish);window.removeEventListener('pointercancel',cancel);el.classList.remove('dragging');timelineMarkerDrag=null;};
+  const finish=async ev=>{if(timelineMarkerDrag!==drag||ev.pointerId!==drag.pointerId)return;clean();
+    if(!drag.moved||drag.startTime===drag.lastTime){refreshTimelineMarkers();return;}
+    if(!current?.markers?.includes(drag.item))return;
+    checkpointHistory();ensureEventSnapshot(drag.item);drag.item.time_ms=drag.lastTime;
+    current.markers.sort((a,b)=>Number(a.time_ms||0)-Number(b.time_ms||0));projectDirty=true;
+    refreshTimelineMarkers();refreshMetaPanels();updateEditActionState();
+    await saveMetaQuickEdit(null,'spostamento marker');refreshTimelineMarkers();
+  };
+  const cancel=ev=>{if(timelineMarkerDrag!==drag||ev.pointerId!==drag.pointerId)return;clean();refreshTimelineMarkers()};
+  window.addEventListener('pointermove',move);window.addEventListener('pointerup',finish);window.addEventListener('pointercancel',cancel);
+}
+function closeTimelineMarkerContextMenu(){document.querySelector('#timelineMarkerContextMenu')?.remove()}
+function openTimelineMarkerContextMenu(event,index){
+  event?.preventDefault?.();event?.stopPropagation?.();closeTimelineMarkerContextMenu();
+  if(!current?.show_markers_playback)return false;
+  const marker=current?.markers?.[index];if(!marker||marker.deleted)return false;
+  const menu=document.createElement('div');menu.id='timelineMarkerContextMenu';menu.className='lc-context-menu timeline-marker-context-menu';
+  menu.innerHTML=`<div class="lc-context-title">Marker · ${esc(marker.label||'Marker')}</div><button type="button" data-action="add">${esc(tr('Add marker','Aggiungi marker'))}</button><button type="button" data-action="disable" ${marker.disabled?'disabled':''}>${esc(tr('Disable','Disabilita'))}</button><button type="button" data-action="enable" ${!marker.disabled?'disabled':''}>${esc(tr('Enable','Riabilita'))}</button><button type="button" class="danger-action" data-action="delete">${esc(tr('Delete','Elimina'))}</button>`;
+  document.body.appendChild(menu);
+  for(const btn of menu.querySelectorAll('[data-action]'))btn.addEventListener('click',()=>{const action=btn.dataset.action;closeTimelineMarkerContextMenu();void timelineMarkerContextAction(action,marker)});
+  menu.style.left=`${Math.max(8,Math.min(event.clientX,window.innerWidth-menu.offsetWidth-8))}px`;
+  menu.style.top=`${Math.max(8,Math.min(event.clientY,window.innerHeight-menu.offsetHeight-8))}px`;return false;
+}
+async function timelineMarkerContextAction(action,marker){
+  if(!current?.show_markers_playback)return;
+  if(action==='add'){
+    const label=prompt(tr('Section / marker name','Nome sezione / marker'),'Marker');if(label===null||!label.trim())return;
+    checkpointHistory();current.markers.push({time_ms:Math.max(0,Math.round(Number(playCursorMs)||0)),label:label.trim(),disabled:false,deleted:false});
+  }else{
+    if(!current.markers.includes(marker))return;
+    checkpointHistory();ensureEventSnapshot(marker);
+    if(action==='delete')current.markers.splice(current.markers.indexOf(marker),1);
+    else if(action==='disable')marker.disabled=true;
+    else if(action==='enable'){marker.disabled=false;marker.deleted=false;}
+  }
+  current.markers.sort((a,b)=>Number(a.time_ms||0)-Number(b.time_ms||0));projectDirty=true;
+  refreshTimelineMarkers();refreshMetaPanels();await saveMetaQuickEdit(null,'modifica marker timeline');refreshTimelineMarkers();
+}
+document.addEventListener('pointerdown',event=>{if(!event.target.closest?.('#timelineMarkerContextMenu, .project-marker-line'))closeTimelineMarkerContextMenu()});
 function timelineChordLaneHtml(W=widthPx()){
   if(!current?.show_chords_playback)return '';
   normalizeTimelineChordSelection();
@@ -3896,7 +3956,28 @@ async function checkNativeAppUpdate(manual=false){
 async function installNativeAppUpdate(assetUrl,assetName,releaseUrl){
   try{
     const bridge=await waitForNativeApi();
-    if(assetUrl&&bridge?.install_update){toast('Download aggiornamento in corso…');await bridge.install_update(assetUrl,assetName);closeUtilityModal();return}
+    if(assetUrl&&bridge?.install_update){
+      const result=await bridge.install_update(assetUrl,assetName);
+      if(result?.ok===false)throw new Error(result.error||'Download non avviato');
+      const body=document.querySelector('#utilityModal .modal-body')||document.querySelector('#utilityModalBody')||document.querySelector('.utility-modal .modal-body');
+      const markup=`<div id="nativeUpdateProgress" role="status" aria-live="polite"><p id="nativeUpdateProgressText">Download aggiornamento…</p><progress id="nativeUpdateProgressBar" max="100" style="width:100%;height:20px"></progress><p id="nativeUpdateProgressBytes" class="hint"></p></div>`;
+      if(body)body.innerHTML=markup;else showUtilityModal('Download aggiornamento',markup);
+      if(!bridge.update_download_status){toast('Download avviato');return}
+      const sizeText=n=>(n/1048576).toFixed(1)+' MB';
+      for(;;){
+        const status=await bridge.update_download_status();
+        const progress=document.getElementById('nativeUpdateProgressBar');
+        const label=document.getElementById('nativeUpdateProgressText');
+        const bytes=document.getElementById('nativeUpdateProgressBytes');
+        if(!progress||!label||!bytes)break;
+        if(status.total>0){progress.value=Math.min(100,Math.round(status.received*100/status.total));bytes.textContent=`${sizeText(status.received)} / ${sizeText(status.total)}`;label.textContent=`Download aggiornamento: ${progress.value}%`}
+        else{progress.removeAttribute('value');bytes.textContent=`${sizeText(status.received||0)} scaricati`;}
+        if(status.state==='complete'){progress.value=100;label.textContent='Download completato. Apertura installer…';break}
+        if(status.state==='error')throw new Error(status.error||'Download non riuscito');
+        await new Promise(resolve=>setTimeout(resolve,250));
+      }
+      return;
+    }
     if(releaseUrl)window.open(releaseUrl,'_blank','noopener');
   }catch(err){toast('Avvio aggiornamento fallito: '+err.message)}
 }
@@ -4222,7 +4303,7 @@ async function setSelectedMetaEventsEnabled(kind,enabled){const set=metaSelectio
 function metaEventInactive(kind,item){return !!item?.deleted||(kind==='chords'?!!item?.excluded:!!item?.disabled)}
 function metaEventStateClass(kind,item){return `${kind==='lyrics'||kind==='chords'?' meta-editable':''}${item?.deleted?' meta-deleted':''}${kind==='chords'&&item?.excluded?' meta-disabled':''}${kind==='lyrics'&&item?.disabled?' meta-disabled':''}`}
 function refreshMetaPanels(){const normal=document.querySelector('#metaPane .meta-tabs-content');if(normal)normal.outerHTML=metaPanelBodyHtml(false);const expanded=$('#expandedMetaBody');if(expanded)expanded.innerHTML=metaPanelBodyHtml(true);syncTimedMetaPanel(playCursorMs)}
-async function saveMetaQuickEdit(chordsBefore=null,chordReason='modifica chord',refreshBounds=null){if(!current)return;try{const projectId=current.id;const saved=await api('/api/projects/'+projectId,{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify(current)});if(current?.id!==projectId)return;current=saved;projectDirty=false;lastHistoryState=projectSnapshot();refreshMetaPanels();const bounds=refreshBounds||(chordsBefore?chordTrackRefreshBounds(chordsBefore,saved.chords):null);if(bounds&&hasGeneratedChordsTrack()){await enqueueChordsRefresh(bounds.oldTimeMs,bounds.newTimeMs,chordReason)}void syncNativeProjectFile(projectId)}catch(e){toast(e.message||'Salvataggio non riuscito')}}
+async function saveMetaQuickEdit(chordsBefore=null,chordReason='modifica chord',refreshBounds=null){if(!current)return;try{const projectId=current.id;const saved=await api('/api/projects/'+projectId,{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify(current)});if(current?.id!==projectId)return;current=saved;projectDirty=false;lastHistoryState=projectSnapshot();refreshMetaPanels();refreshTimelineMarkers();const bounds=refreshBounds||(chordsBefore?chordTrackRefreshBounds(chordsBefore,saved.chords):null);if(bounds&&hasGeneratedChordsTrack()){await enqueueChordsRefresh(bounds.oldTimeMs,bounds.newTimeMs,chordReason)}void syncNativeProjectFile(projectId)}catch(e){toast(e.message||'Salvataggio non riuscito')}}
 function metaRawValue(kind,item){return kind==='chords'?String(item?.chord||''):kind==='markers'?String(item?.label||''):String(item?.text||'')}
 function metaDisplayValue(kind,item){return kind==='chords'?transposeChordLabel(item?.chord||'',current?.pitch_semitones||0):kind==='markers'?String(item?.label||''):String(item?.text||'')}
 function beginMetaInlineEdit(event,kind,index,field='value'){
