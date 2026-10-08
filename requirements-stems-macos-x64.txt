@@ -8,4 +8,5 @@ msgpack==1.2.3
 urllib3==2.8.0
 
 # Lead/backing vocal AI model download and inference (on-demand).
-audio-separator[cpu]==0.47.0
+# The legacy Intel torch/numpy stack cannot resolve audio-separator 0.47 dependencies.
+# Install its model runtime separately without replacing NumPy 1.26 / Demucs.

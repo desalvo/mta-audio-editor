@@ -1,3 +1,10 @@
+## 0.2.0-r257 — Native stem dependency convergence
+
+- ARM64: install missing audioread explicitly before validating audio-separator.
+- Intel macOS: isolate a legacy NumPy 1.x-compatible audio-separator wheel from Demucs 4.1 and NumPy 1.26.
+- Windows: bypass broken diffq-fixed sdist via controlled wheel installation and explicit inference dependencies.
+- Add Windows-specific requirements and native preflight validation.
+
 ## 0.2.0-r256
 
 - CI regression fixes: update legacy context-menu text assertions to the current Add chord / Extract marker labels.

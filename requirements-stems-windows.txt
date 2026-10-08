@@ -1,0 +1,8 @@
+# Windows native runtime: diffq-fixed 0.2.4 source distribution is incomplete.
+# Install Demucs/PyTorch first. The audio-separator wheel is installed --no-deps
+# by the CI with explicit runtime packages, avoiding this broken source build.
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.14.1+cpu
+demucs==4.1.0
+msgpack==1.2.3
+urllib3==2.8.0

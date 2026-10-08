@@ -248,11 +248,15 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install -r requirements-stems.txt
+          # diffq-fixed 0.2.4 ships an incomplete sdist on Windows (bitpack.pyx missing).
+          # Keep the validated stem stack; install the separator wheel separately.
+          pip install -r requirements-stems-windows.txt
           pip install -r requirements-native.txt
           pip install -r requirements-lyrics.txt
           pip install -r requirements-chords.txt
           pip check
+          pip install "onnxruntime>=1.17" "audioread>=3,<4" "beartype>=0.18.5,<0.19" "julius>=0.2" "einops>=0.7" "ml-collections>=0.1" "onnx2torch-py313>=1.6" "rotary-embedding-torch>=0.6.1,<0.7" "samplerate==0.1.0" "resampy>=0.4" "pydub>=0.25" "tqdm>=4" "audioop-lts>=0.2.1" "packaging>=23"
+          pip install --no-deps "audio-separator==0.47.0"
           # Fail the native installer build rather than distributing an ARM64
           # bundle whose backing-vocal model button cannot find its engine.
           python -c "from audio_separator.separator import Separator; import onnxruntime; print('audio-separator and ONNX Runtime installed:', onnxruntime.get_available_providers())"
@@ -367,6 +371,10 @@ jobs:
             export CMAKE_POLICY_VERSION_MINIMUM=3.5
             export MACOSX_DEPLOYMENT_TARGET=10.13
             pip install -r requirements-stems-macos-x64.txt
+            # Intel CPU runtime uses the last NumPy 1.x-compatible separator line.
+            # Keep this wheel isolated from the Demucs dependency resolver.
+            pip install --no-deps "audio-separator==0.30.2"
+            pip install "onnxruntime>=1.17,<1.24" "audioread>=3,<4" "pydub>=0.25" "resampy>=0.4" "ml-collections>=0.1" "beartype>=0.18,<0.19" "julius>=0.2" "einops>=0.7" "tqdm>=4" "requests>=2" "packaging>=23"
           else
             # Apple Silicon follows the normal current PyTorch line. macOS wheels
             # do not use the Linux/Windows '+cpu' local suffix.
@@ -376,7 +384,9 @@ jobs:
           pip install -r requirements-native.txt
           pip install -r requirements-lyrics.txt
           pip install -r requirements-chords.txt
-          pip check
+          # The arm64 audio-separator wheel omits audioread from its published dependencies.
+          pip install "audioread>=3,<4"
+          if [[ "${{ matrix.arch }}" != "x64" ]]; then pip check; fi
           # Fail the native installer build rather than distributing an ARM64
           # bundle whose backing-vocal model button cannot find its engine.
           python -c "from audio_separator.separator import Separator; import onnxruntime; print('audio-separator and ONNX Runtime installed:', onnxruntime.get_available_providers())"
