@@ -1,4 +1,5 @@
 from pathlib import Path
+import uuid
 from typing import Any, Literal
 
 from pydantic import BaseModel, Field, field_validator
@@ -106,6 +107,7 @@ class Track(BaseModel):
 
 
 class Marker(BaseModel):
+    id: str = Field(default_factory=lambda: uuid.uuid4().hex[:12])
     time_ms: int = Field(ge=0)
     label: str = Field(max_length=500)
     color: str = Field(default="#204A87", pattern=r"^#[0-9A-Fa-f]{6}$")
@@ -337,6 +339,7 @@ class Project(BaseModel):
     metronome_reference_track_id: str = Field(default="", max_length=80)
     metronome_reference_track_name: str = Field(default="", max_length=200)
     metronome_zone_bpms: dict[str, float] = Field(default_factory=dict)
+    metronome_manual_zone_bpms: dict[str, float] = Field(default_factory=dict)
     metronome_grid_origin_ms: int = Field(default=0, ge=-3600000, le=3600000)
     metronome_shift_ms: int = Field(default=0, ge=-3600000, le=3600000)
     transport_time_mode: Literal["time", "musical"] = "time"

@@ -1,3 +1,19 @@
+## 0.2.0-r263
+
+- Zoned metronome BPM labels with per-zone manual/auto edit and atomic partial regeneration; marker boundary ID based persistence.
+
+## 0.2.0-r262
+- Fix marker-label double-click on timeline: retain DOM across clicks and avoid initiating a drag on caption.
+- Remove inert “Master / Preview” mixer-tab button; preview/master controls remain available in their working locations.
+
+## 0.2.0-r261
+
+- Fixed native backing-vocals AI splitting failures caused by missing or mismatched torchvision::nms C++ operators. Added dependency pins, package collection and build-time smoke checks.
+
+## 0.2.0-r260
+
+- Removed the standalone Project sidebar shortcut; retained Project / File and existing project commands.
+
 ## 0.2.0-r259 — model management, sidebar preferences, bilingual UI
 
 - Central model-manager lists Demucs and backing-vocal models, including their filesystem paths and download/delete commands.

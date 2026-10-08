@@ -1,3 +1,21 @@
+## 0.2.0-r263
+
+- Zoned metronome BPM labels with per-zone manual/auto edit and atomic partial regeneration; marker boundary ID based persistence.
+
+## 0.2.0-r262
+- Fix marker-label double-click on timeline: retain DOM across clicks and avoid initiating a drag on caption.
+- Remove inert “Master / Preview” mixer-tab button; preview/master controls remain available in their working locations.
+
+## 0.2.0-r261 — PyTorch/torchvision native-operator compatibility
+
+- Align torchvision with the installed PyTorch release on Windows, macOS ARM64 and macOS Intel.
+- Package torchvision native extensions and validate the torchvision::nms operator in GitHub Actions before building native installers.
+- Surface an actionable error if an existing runtime has incompatible torch/torchvision libraries.
+
+## 0.2.0-r260 — 2026-10-08
+
+- Removed the redundant standalone “Project” sidebar button. The collapsible Project / File section and all project commands remain available.
+
 ## 0.2.0-r259 — model management, sidebar preferences, bilingual UI
 
 - Central model-manager lists Demucs and backing-vocal models, including their filesystem paths and download/delete commands.

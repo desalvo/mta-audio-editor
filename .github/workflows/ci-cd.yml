@@ -90,7 +90,7 @@ jobs:
           # pip-audit/PyPI cannot identify PyTorch local-version wheels such as
           # 2.14.1+cpu. Audit the equivalent upstream public version instead.
           STEMS_AUDIT_REQ="$RUNNER_TEMP/requirements-stems-audit.txt"
-          sed '/^--extra-index-url /d; s/^torch==\(.*\)+cpu$/torch==\1/' requirements-stems.txt > "$STEMS_AUDIT_REQ"
+          sed '/^--extra-index-url /d; s/^torch==\(.*\)+cpu$/torch==\1/; s/^torchvision==\(.*\)+cpu$/torchvision==\1/' requirements-stems.txt > "$STEMS_AUDIT_REQ"
           cat "$STEMS_AUDIT_REQ"
           pip-audit -r "$STEMS_AUDIT_REQ" --strict
       - name: Secret scan
@@ -198,7 +198,7 @@ jobs:
             python -m pip install --no-cache-dir --disable-pip-version-check pip-audit
             # Audit production requirements using the public torch release that
             # corresponds to the installed 2.14.1+cpu wheel.
-            sed "/^--extra-index-url /d; s/^torch==\(.*\)+cpu$/torch==\1/" requirements-stems.txt > /tmp/stems-audit.txt
+            sed "/^--extra-index-url /d; s/^torch==\(.*\)+cpu$/torch==\1/; s/^torchvision==\(.*\)+cpu$/torchvision==\1/" requirements-stems.txt > /tmp/stems-audit.txt
             python -m pip_audit -r requirements.txt -r /tmp/stems-audit.txt --strict
           '
       - name: Trivy image OS scan
@@ -260,6 +260,7 @@ jobs:
           # Fail the native installer build rather than distributing an ARM64
           # bundle whose backing-vocal model button cannot find its engine.
           python -c "from audio_separator.separator import Separator; import onnxruntime; print('audio-separator and ONNX Runtime installed:', onnxruntime.get_available_providers())"
+          python -c "import torch, torchvision; from torchvision.ops import nms; import torch as t; assert nms(t.empty((0,4)),t.empty((0,)),0.5).numel()==0; print('torchvision nms OK:',torch.__version__,torchvision.__version__)"
       - name: Install FFmpeg and Inno Setup
         shell: pwsh
         run: |
@@ -379,7 +380,7 @@ jobs:
           else
             # Apple Silicon follows the normal current PyTorch line. macOS wheels
             # do not use the Linux/Windows '+cpu' local suffix.
-            sed '/^--extra-index-url /d; s/^torch==\(.*\)+cpu$/torch==\1/' requirements-stems.txt > /tmp/requirements-native-stems.txt
+            sed '/^--extra-index-url /d; s/^torch==\(.*\)+cpu$/torch==\1/; s/^torchvision==\(.*\)+cpu$/torchvision==\1/' requirements-stems.txt > /tmp/requirements-native-stems.txt
             pip install -r /tmp/requirements-native-stems.txt
           fi
           pip install -r requirements-native.txt
@@ -391,6 +392,7 @@ jobs:
           # Fail the native installer build rather than distributing an ARM64
           # bundle whose backing-vocal model button cannot find its engine.
           python -c "from audio_separator.separator import Separator; import onnxruntime; print('audio-separator and ONNX Runtime installed:', onnxruntime.get_available_providers())"
+          python -c "import torch, torchvision; from torchvision.ops import nms; import torch as t; assert nms(t.empty((0,4)),t.empty((0,)),0.5).numel()==0; print('torchvision nms OK:',torch.__version__,torchvision.__version__)"
       - name: Install FFmpeg
         shell: bash
         run: |

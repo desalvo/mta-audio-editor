@@ -475,7 +475,13 @@ def save_project(project: Project):
 
 
 def load_project(pid: str) -> Project:
-    return Project.model_validate_json((pdir(pid) / "project.json").read_text(encoding="utf-8"))
+    raw = (pdir(pid) / "project.json").read_text(encoding="utf-8")
+    project = Project.model_validate_json(raw)
+    # One-time migration: old marker entries predate persistent IDs. The IDs
+    # must be saved before the next request, or each load would assign new IDs.
+    if any(not marker.get("id") for marker in json.loads(raw).get("markers", [])):
+        save_project(project)
+    return project
 
 
 def list_projects(owner_user_id: int | None = None, include_shared: bool = True, is_admin: bool = False):

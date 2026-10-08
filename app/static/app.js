@@ -1060,10 +1060,40 @@ function renameTrack(id){const t=trackById(id);if(!t)return;const value=prompt('
 function projectFormatLabel(target=current?.target){return target==='DAW'?'Multitrack DAW':target}
 function mtaSlotLimit(target=current?.target){return target==='MTA8'?8:16}
 function setTrackMtaSlot(id,value){const t=trackById(id);if(!t)return;const n=Number(value||0),limit=mtaSlotLimit();t.mta_slot=n>=1&&n<=limit?n:null;markDirty(100);render()}
+function metronomeZoneDescriptors(){
+  if(!current || current.metronome_mode!=='zones')return [];
+  const duration=Math.max(0,...(current.tracks||[]).map(t=>Number(t.duration_ms)||0));
+  const markers=(current.markers||[]).filter(m=>!m.disabled&&!m.deleted&&m.time_ms>0&&m.time_ms<duration).sort((a,b)=>a.time_ms-b.time_ms);
+  const points=[{time_ms:0,id:'START'},...markers,{time_ms:duration,id:'END'}],manual=current.metronome_manual_zone_bpms||{};
+  return points.slice(0,-1).map((m,i)=>{
+    const right=points[i+1],key=`${m.id}|${right.id}`,matches=Object.entries(manual).filter(([k])=>k.split('|')[0]===m.id||k.split('|')[1]===right.id);
+    const manualBpm=manual[key]??(matches.length===1?matches[0][1]:null);
+    return {start:m.time_ms,end:right.time_ms,bpm:manualBpm??current.metronome_zone_bpms?.[String(m.time_ms)]??current.bpm,manual:manualBpm!==null};
+  });
+}
+async function editMetronomeZoneBpm(start,reset=false){
+  const zone=metronomeZoneDescriptors().find(z=>z.start===start);if(!zone)return;
+  let bpm=zone.bpm;
+  if(!reset){const entry=prompt(tr('BPM for this zone (20–400)','BPM per questa zona (20–400)'),String(zone.bpm));if(entry===null)return;bpm=Number(entry.replace(',','.'));if(!Number.isFinite(bpm)||bpm<20||bpm>400)return toast(tr('Enter a BPM between 20 and 400','Inserire un BPM tra 20 e 400'));}
+  const id=current.id;showMediaProgress(tr('Updating metronome zone','Aggiornamento zona metronomo'),-1,tr('Regenerating zone audio…','Rigenerazione audio della zona…'));
+  try{const q=new URLSearchParams({time_ms:String(start),automatic:String(reset)});if(!reset)q.set('bpm',String(bpm));const result=await api(`/api/projects/${id}/metronome-zone-bpm?${q}`,{method:'POST'});if(current?.id===id){current=result.project;invalidateTrackAudioCache(result.track.id);render();}}
+  catch(e){toast(e.message)}finally{closeUtilityModal()}
+}
+function openMetronomeBpmContext(event,start){
+  event.preventDefault();event.stopPropagation();closeTrackContextMenu();
+  const zone=metronomeZoneDescriptors().find(z=>z.start===start);if(!zone)return;
+  const menu=document.createElement('div');menu.id='trackContextMenu';menu.className='track-context-menu';menu.setAttribute('role','menu');
+  const button=document.createElement('button');button.type='button';button.textContent=zone.manual?tr('Return to Auto','Riporta in Auto'):tr('Edit BPM manually','Modifica BPM manualmente');
+  button.addEventListener('click',()=>{closeTrackContextMenu();editMetronomeZoneBpm(start,zone.manual)});menu.appendChild(button);
+  document.body.appendChild(menu);menu.style.left=Math.min(event.clientX,window.innerWidth-220)+'px';menu.style.top=Math.min(event.clientY,window.innerHeight-80)+'px';
+}
+function metronomeZoneLabelsHtml(t){if(t.type!=='click'||current.metronome_mode!=='zones')return '';
+  return metronomeZoneDescriptors().map(z=>`<div class="metronome-zone-label" style="left:${z.start/1000*pxPerSec+6}px" ondblclick="event.stopPropagation();editMetronomeZoneBpm(${z.start})" oncontextmenu="openMetronomeBpmContext(event,${z.start})" title="${z.manual?'Manual · '+tr('Right-click for Auto','Tasto destro per Auto'):'Auto'} · ${tr('Double-click to edit BPM','Doppio click per modificare BPM')}">${Number(z.bpm).toFixed(1)} BPM <small>${z.manual?'Manual':'Auto'}</small></div>`).join('');
+}
 function lane(t,W,i){
   const color=t.color||TRACK_COLORS[i%TRACK_COLORS.length];
   const anySolo=current.tracks.some(x=>x.solo),inaudible=t.mute||(anySolo&&!t.solo),height=trackHeightPx(t);
-  return `<div class="lane ${inaudible?'audibly-muted':''} ${selectedTrackIdSet.has(t.id)?'edit-selected':''}" id="lane-${t.id}" data-track="${t.id}" data-track-context-id="${t.id}" style="width:${W}px;--track-color:${color};height:${height}px" oncontextmenu="openTrackContextMenu(event,'${t.id}')"><canvas class="wave" id="wave-${t.id}" width="${W}" height="${height}" ondblclick="event.stopPropagation();openSampleEditor('${t.id}')" title="Doppio click: editor waveform/campioni"></canvas><div class="waveform-progress ${t.waveform_peaks?.length?'hidden':''}" id="wave-progress-${t.id}"><div class="waveform-progress-bar" id="wave-progress-bar-${t.id}" style="width:2%"></div><span id="wave-progress-label-${t.id}">Waveform…</span></div><div class="selection lane-selection" data-selection-track="${t.id}" style="display:none"></div>${(t.clips||[]).map((c,j)=>{const l=Math.max(0,effectiveClipStartMs(t,c))/1000*pxPerSec,w=(c.source_end_ms-c.source_start_ms)/1000*pxPerSec;return `<div class="clip-block" data-track-id="${t.id}" data-clip-id="${c.id}" style="left:${l}px;width:${Math.max(2,w)}px" onpointerdown="beginTimelineClipDrag(event,'${t.id}','${c.id}')" ondblclick="event.stopPropagation();openSampleEditor('${t.id}')" title="Select: trascina il segmento · Shift+trascina: sposta tutti i segmenti della traccia/tracce selezionate"><span class="clip-label">${esc(t.name)}_${String(j+1).padStart(2,'0')}</span></div>`}).join('')}</div>`
+  return `<div class="lane ${inaudible?'audibly-muted':''} ${selectedTrackIdSet.has(t.id)?'edit-selected':''}" id="lane-${t.id}" data-track="${t.id}" data-track-context-id="${t.id}" style="width:${W}px;--track-color:${color};height:${height}px" oncontextmenu="openTrackContextMenu(event,'${t.id}')"><canvas class="wave" id="wave-${t.id}" width="${W}" height="${height}" ondblclick="event.stopPropagation();openSampleEditor('${t.id}')" title="Doppio click: editor waveform/campioni"></canvas><div class="waveform-progress ${t.waveform_peaks?.length?'hidden':''}" id="wave-progress-${t.id}"><div class="waveform-progress-bar" id="wave-progress-bar-${t.id}" style="width:2%"></div><span id="wave-progress-label-${t.id}">Waveform…</span></div><div class="selection lane-selection" data-selection-track="${t.id}" style="display:none"></div>${(t.clips||[]).map((c,j)=>{const l=Math.max(0,effectiveClipStartMs(t,c))/1000*pxPerSec,w=(c.source_end_ms-c.source_start_ms)/1000*pxPerSec;return `<div class="clip-block" data-track-id="${t.id}" data-clip-id="${c.id}" style="left:${l}px;width:${Math.max(2,w)}px" onpointerdown="beginTimelineClipDrag(event,'${t.id}','${c.id}')" ondblclick="event.stopPropagation();openSampleEditor('${t.id}')" title="Select: trascina il segmento · Shift+trascina: sposta tutti i segmenti della traccia/tracce selezionate"><span class="clip-label">${esc(t.name)}_${String(j+1).padStart(2,'0')}</span></div>`}).join('')}${metronomeZoneLabelsHtml(t)}</div>`
 }
 
 
@@ -1092,7 +1122,7 @@ let timelineChordSelectedIndices=new Set();
 function normalizeTimelineChordSelection(){const n=current?.chords?.length||0;timelineChordSelectedIndices=new Set([...timelineChordSelectedIndices].filter(i=>Number.isInteger(i)&&i>=0&&i<n&&!current.chords[i]?.deleted));}
 function timelineMarkersHtml(){
   if(!current?.show_markers_playback)return '';
-  return (current.markers||[]).map((m,index)=>({m,index})).filter(({m})=>!m.deleted).map(({m,index})=>`<div class="project-marker-line ${m.disabled?'marker-disabled':''}" data-marker-index="${index}" style="left:${Math.max(0,Number(m.time_ms||0))/1000*pxPerSec}px;--marker-color:${esc(m.color||'#204A87')}" onpointerdown="beginTimelineMarkerDrag(event,${index})" ondblclick="return beginTimelineMarkerInlineEdit(event,${index})" oncontextmenu="return openTimelineMarkerContextMenu(event,${index})" title="${esc(m.label||'Marker')} · ${esc(lyricsChordsEditorPosition(m.time_ms||0))}"><span class="project-marker-caption">${esc(m.label||'Marker')}</span><span class="project-marker-handle" aria-hidden="true">◆</span></div>`).join('');
+  return (current.markers||[]).map((m,index)=>({m,index})).filter(({m})=>!m.deleted).map(({m,index})=>`<div class="project-marker-line ${m.disabled?'marker-disabled':''}" data-marker-index="${index}" style="left:${Math.max(0,Number(m.time_ms||0))/1000*pxPerSec}px;--marker-color:${esc(m.color||'#204A87')}" onpointerdown="beginTimelineMarkerDrag(event,${index})" ondblclick="return beginTimelineMarkerInlineEdit(event,${index})" oncontextmenu="return openTimelineMarkerContextMenu(event,${index})" title="${esc(m.label||'Marker')} · ${esc(lyricsChordsEditorPosition(m.time_ms||0))}"><span class="project-marker-caption" ondblclick="return beginTimelineMarkerInlineEdit(event,${index})">${esc(m.label||'Marker')}</span><span class="project-marker-handle" aria-hidden="true">◆</span></div>`).join('');
 }
 function refreshTimelineMarkers(){
   const lanes=$('#lanes');if(!lanes)return;
@@ -1104,7 +1134,7 @@ function refreshTimelineMarkers(){
 let timelineMarkerDrag=null;
 function beginTimelineMarkerInlineEdit(event,index){
   event?.preventDefault?.();event?.stopPropagation?.();closeTimelineMarkerContextMenu();
-  const marker=current?.markers?.[index],host=event?.currentTarget?.querySelector?.('.project-marker-caption');
+  const marker=current?.markers?.[index],target=event?.currentTarget,host=target?.matches?.('.project-marker-caption')?target:target?.querySelector?.('.project-marker-caption');
   if(!marker||marker.deleted||!host)return false;
   const input=document.createElement('input');input.className='timeline-marker-inline';input.value=String(marker.label||'');
   host.replaceChildren(input);input.focus();input.select();
@@ -1123,6 +1153,8 @@ function beginTimelineMarkerInlineEdit(event,index){
 function beginTimelineMarkerDrag(event,index){
   if(!current?.show_markers_playback||event.button!==0)return;
   const marker=current?.markers?.[index],el=event.currentTarget;if(!marker||marker.deleted||!el)return;
+  // Editing the caption must not initiate a drag (or replace its DOM node).
+  if(event.target?.closest?.('.project-marker-caption, .timeline-marker-inline'))return;
   event.preventDefault();event.stopPropagation();
   const drag={index,item:marker,startX:event.clientX,startTime:Number(marker.time_ms||0),lastTime:Number(marker.time_ms||0),pointerId:event.pointerId,el,moved:false};
   timelineMarkerDrag=drag;el.setPointerCapture?.(event.pointerId);el.classList.add('dragging');
@@ -1134,7 +1166,7 @@ function beginTimelineMarkerDrag(event,index){
   };
   const clean=()=>{window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',finish);window.removeEventListener('pointercancel',cancel);el.classList.remove('dragging');timelineMarkerDrag=null;};
   const finish=async ev=>{if(timelineMarkerDrag!==drag||ev.pointerId!==drag.pointerId)return;clean();
-    if(!drag.moved||drag.startTime===drag.lastTime){refreshTimelineMarkers();return;}
+    if(!drag.moved||drag.startTime===drag.lastTime){return;}
     if(!current?.markers?.includes(drag.item))return;
     checkpointHistory();ensureEventSnapshot(drag.item);drag.item.time_ms=drag.lastTime;
     current.markers.sort((a,b)=>Number(a.time_ms||0)-Number(b.time_ms||0));projectDirty=true;
@@ -1470,7 +1502,7 @@ function mixerHtml(){
   const metaPane=current.metadata_panel_visible?metaPaneHtml():'';
   const pianoPane=current.piano_panel_visible&&!pianoLabDetached?pianoChordLabHtml():'';
   return `<div class="mixer-resizer" id="mixerResizer" title="Trascina per ridimensionare il mixer" role="separator" aria-orientation="horizontal" tabindex="0"><span></span></div><div class="mixer-pane" id="mixer">
-    <div class="dock-tabs"><button class="dock-tab active">Mixer</button><button class="dock-tab">Master / Preview</button><button id="realtimeBtn" class="dock-tab realtime-toggle ${current.realtime_meter_enabled?'active':''}" onclick="toggleRealtimeMeters()">RealTime</button>
+    <div class="dock-tabs"><button class="dock-tab active">Mixer</button><button id="realtimeBtn" class="dock-tab realtime-toggle ${current.realtime_meter_enabled?'active':''}" onclick="toggleRealtimeMeters()">RealTime</button>
       <button class="dock-tab" onclick="toggleMuteAll()">${current.tracks.length&&current.tracks.every(t=>t.mute)?'Unmute all':'Mute all'}</button><button class="dock-tab" onclick="toggleSoloAll()">${current.tracks.length&&current.tracks.every(t=>t.solo)?'Unsolo all':'Solo all'}</button><button class="dock-tab" onclick="toggleAllPlugins()">${[...(current.master_inserts||[]),...current.tracks.flatMap(t=>t.inserts||[])].some(x=>x.enabled)?'Bypass all FX':'Enable all FX'}</button>
       <div class="automix-control"><label class="switch"><input type="checkbox" ${current.auto_mix_enabled?'checked':''} onchange="setAutoMix(this.checked)"><span></span></label><b>Auto Mix</b><select id="autoMixStyle" onchange="changeAutoMixStyle(this.value)"><option value="balanced" ${current.auto_mix_style==='balanced'?'selected':''}>Balanced</option><option value="studio" ${current.auto_mix_style==='studio'?'selected':''}>Studio</option><option value="live" ${current.auto_mix_style==='live'?'selected':''}>Live</option><option value="gentle" ${current.auto_mix_style==='gentle'?'selected':''}>Gentle</option></select><button onclick="showAutoMixInfo()">?</button></div>
       <span class="capacity-badge ${over?'over':''}">${current.target==='DAW'?`${current.tracks.length} project tracks · unrestricted DAW project`:`${current.tracks.length} project tracks · ${limit} ${current.target} output slots`}</span>

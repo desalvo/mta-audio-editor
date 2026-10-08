@@ -2760,6 +2760,16 @@ def _split_lead_backing_vocals(vocal_stem: Path, output_dir: Path, *, model_id: 
         from audio_separator.separator import Separator
     except ImportError as exc:
         raise RuntimeError("audio-separator is required for AI lead/backing vocal separation") from exc
+    try:
+        import torch
+        from torchvision.ops import nms
+        # Validate the compiled torchvision extension; importing torchvision is not sufficient.
+        nms(torch.empty((0, 4)), torch.empty((0,)), 0.5)
+    except (ImportError, RuntimeError, OSError) as exc:
+        raise RuntimeError(
+            "Incompatible PyTorch/torchvision native operators (torchvision::nms). "
+            "Reinstall matching PyTorch and torchvision builds for your OS/architecture."
+        ) from exc
     separator = Separator(model_file_dir=str(LEAD_BACKING_MODEL_DIR), output_dir=str(output_dir), output_format="WAV")
     separator.load_model(model_filename=info["filename"])
     if cancel_event is not None and cancel_event.is_set():
@@ -3674,6 +3684,7 @@ def _create_metronome_track_locked(pid: str, request: Request, mode: str = "fixe
         elif mode == "zones":
             boundaries = [0] + sorted({int(m.time_ms) for m in project.markers if not m.disabled and not m.deleted and 0 < m.time_ms < duration_ms}) + [duration_ms]
             zone_bpms = dict(project.metronome_zone_bpms or {})
+            keyed_boundaries = _metronome_zone_boundaries(project, duration_ms)
             if reference_track is not None:
                 with tempfile.TemporaryDirectory() as td:
                     rendered = Path(td) / "reference.wav"
@@ -3681,6 +3692,10 @@ def _create_metronome_track_locked(pid: str, request: Request, mode: str = "fixe
                     with wave.open(str(rendered), "rb") as source:
                         rate = source.getframerate()
                         for start, end in zip(boundaries, boundaries[1:]):
+                            manual_bpm = _metronome_manual_for_zone(project, keyed_boundaries[boundaries.index(start)][1], keyed_boundaries[boundaries.index(start)+1][1])
+                            if manual_bpm is not None:
+                                zone_bpms[str(start)] = manual_bpm
+                                continue
                             if end-start < 1800:
                                 zone_bpms[str(start)] = float(project.bpm)
                                 continue
@@ -3695,7 +3710,7 @@ def _create_metronome_track_locked(pid: str, request: Request, mode: str = "fixe
                                 zone_bpms[str(start)] = bpm
                             except (ValueError, RuntimeError, OSError):
                                 zone_bpms[str(start)] = float(project.bpm)
-            project.metronome_zone_bpms = {str(start): float(zone_bpms.get(str(start), project.bpm)) for start in boundaries[:-1]}
+            project.metronome_zone_bpms = {str(start): float(_metronome_manual_for_zone(project, keyed_boundaries[i][1], keyed_boundaries[i+1][1]) or zone_bpms.get(str(start), project.bpm)) for i,start in enumerate(boundaries[:-1])}
             beat_times_ms = zoned_metronome_beats(project, duration_ms, project.metronome_zone_bpms)
             zone_starts = sorted(m.time_ms for m in project.markers if not m.disabled and not m.deleted and 0 < m.time_ms < duration_ms)
             duration_ms = generate_adaptive_metronome_wav(project, out, beat_times_ms, accent_reset_ms=zone_starts)
@@ -3793,6 +3808,24 @@ def _create_metronome_track_locked(pid: str, request: Request, mode: str = "fixe
     return {"project": project, "track": track, "reused": reused, "mode": mode, "tempo_map": tempo_points if mode == "adaptive" else [], "reference_track_id": project.metronome_reference_track_id, "reference_track_name": project.metronome_reference_track_name}
 
 
+def _metronome_zone_boundaries(project: Project, duration: int):
+    marks = sorted((m for m in project.markers if not m.disabled and not m.deleted and 0 < m.time_ms < duration), key=lambda m: m.time_ms)
+    return [(0, "START"), *((int(m.time_ms), m.id) for m in marks), (duration, "END")]
+
+
+def _metronome_manual_for_zone(project: Project, left: str, right: str):
+    # Match exact boundaries first, then a surviving boundary when a single marker changes.
+    manual = project.metronome_manual_zone_bpms or {}
+    # Zones survive a moved boundary because keys use marker identity, not time.
+    exact = f"{left}|{right}"
+    if exact in manual:
+        return float(manual[exact])
+    candidates = [(key, value) for key, value in manual.items() if key.split("|")[0] == left or key.split("|")[-1] == right]
+    if len(candidates) == 1:
+        return float(candidates[0][1])
+    return None
+
+
 def _update_metronome_zone_locked(pid: str, request: Request, time_ms: int, track_id: str):
     """Analyze one marker zone, replace only its PCM and envelope bins atomically."""
     import numpy as np
@@ -3804,6 +3837,13 @@ def _update_metronome_zone_locked(pid: str, request: Request, time_ms: int, trac
     marks = sorted({int(m.time_ms) for m in project.markers if not m.disabled and not m.deleted and 0 < m.time_ms < duration})
     boundaries = [0, *marks, duration]
     start, end = next(((a, b) for a,b in zip(boundaries, boundaries[1:]) if a <= time_ms < b), (boundaries[-2], duration))
+    keyed_boundaries = _metronome_zone_boundaries(project, duration)
+    present_ids = {identifier for _, identifier in keyed_boundaries}
+    project.metronome_manual_zone_bpms = {key: value for key, value in project.metronome_manual_zone_bpms.items()
+        if len(key.split("|")) == 2 and any(identifier in present_ids for identifier in key.split("|"))}
+    zone_index = boundaries.index(start)
+    left_id, right_id = keyed_boundaries[zone_index][1], keyed_boundaries[zone_index+1][1]
+    manual_bpm = _metronome_manual_for_zone(project, left_id, right_id)
     click_track = next((t for t in project.tracks if t.type == "click"), None)
     if click_track is None:
         raise HTTPException(400, "Traccia metronomo assente")
@@ -3811,8 +3851,8 @@ def _update_metronome_zone_locked(pid: str, request: Request, time_ms: int, trac
     reference = next((t for t in project.tracks if t.id == reference_id and t.type != "click" and t.filename), None)
     if track_id and reference is None:
         raise HTTPException(400, "Selezionare una traccia audio di riferimento valida")
-    bpm = float(project.bpm)
-    if reference is not None and end-start >= 1800:
+    bpm = float(manual_bpm if manual_bpm is not None else project.bpm)
+    if manual_bpm is None and reference is not None and end-start >= 1800:
         try:
             with tempfile.TemporaryDirectory() as td:
                 rendered=Path(td)/"source.wav"; excerpt=Path(td)/"zone.wav"
@@ -3874,6 +3914,30 @@ def _update_metronome_zone_locked(pid: str, request: Request, time_ms: int, trac
         temp.unlink(missing_ok=True)
     return {"project":project,"track":click_track,"zone_start_ms":start,"zone_end_ms":end,
         "refresh_scope":"zone_atomic","zone_bpm":bpm}
+
+
+@app.post("/api/projects/{pid}/metronome-zone-bpm")
+def set_metronome_zone_bpm(pid: str, request: Request, time_ms: int = 0, bpm: float | None = None, automatic: bool = False):
+    with METRONOME_TRACK_LOCK:
+        project = _project_for_actor(request, pid)
+        if project.metronome_mode != "zones":
+            raise HTTPException(400, "Metronome must be in zone mode")
+        duration = project_duration_ms(project)
+        points = _metronome_zone_boundaries(project, duration)
+        zone = next((i for i in range(len(points)-1) if points[i][0] <= time_ms < points[i+1][0]), len(points)-2)
+        left, right = points[zone][1], points[zone+1][1]
+        key = f"{left}|{right}"
+        if automatic:
+            for oldkey in list(project.metronome_manual_zone_bpms):
+                a,b = oldkey.split("|",1)
+                if a == left or b == right:
+                    del project.metronome_manual_zone_bpms[oldkey]
+        else:
+            if bpm is None or not 20 <= bpm <= 400:
+                raise HTTPException(400, "BPM must be between 20 and 400")
+            project.metronome_manual_zone_bpms[key] = round(float(bpm), 2)
+        save_project(project)
+        return _update_metronome_zone_locked(pid, request, time_ms, "")
 
 
 @app.post("/api/projects/{pid}/metronome-track/refresh")

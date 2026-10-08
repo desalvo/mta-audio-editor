@@ -1352,3 +1352,8 @@ body:has(#topZoom:active) .wave{image-rendering:auto}
 
 /* r255: avoid shrinking inline editors and losing double-click targets on narrow docks. */
 .meta-line .meta-value{min-width:0;overflow-wrap:anywhere}.meta-line time{overflow:visible}.meta-line:has(.meta-inline-input){position:relative;z-index:3}.meta-inline-input{min-height:26px}.meta-inline-time{width:16ch!important;min-width:150px!important}
+
+/* Per-zone metronome BPM controls */
+.metronome-zone-label{position:absolute;top:6px;z-index:12;display:inline-flex;align-items:center;gap:5px;padding:3px 7px;border:1px solid #32c6ff;border-radius:6px;background:#07324b;color:#fff;font-size:12px;font-weight:700;white-space:nowrap;cursor:text;pointer-events:auto;box-shadow:0 1px 5px #0009}
+.metronome-zone-label small{font-size:10px;color:#78e3ff}
+.metronome-zone-label:hover{background:#075a7b;border-color:#b7efff}

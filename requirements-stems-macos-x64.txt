@@ -3,6 +3,8 @@
 # Python 3.12 is the newest interpreter line covered by those Intel wheels.
 torch==2.2.2
 torchaudio==2.2.2
+# torchvision 0.17.2 is ABI-matched to the last macOS Intel torch wheels.
+torchvision==0.17.2
 demucs==4.1.0
 msgpack==1.2.3
 urllib3==2.8.0

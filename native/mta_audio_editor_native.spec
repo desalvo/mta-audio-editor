@@ -54,7 +54,7 @@ if chordino_vamp and Path(chordino_vamp).is_dir():
                 datas.append((str(child), "vamp"))
 
 hiddenimports = []
-for package in ("webview", "demucs", "torch", "torchaudio", "audio_separator", "onnxruntime", "librosa", "soundfile", "whisper", "madmom_infer", "truststore", "certifi", "six"):
+for package in ("webview", "demucs", "torch", "torchaudio", "torchvision", "audio_separator", "onnxruntime", "librosa", "soundfile", "whisper", "madmom_infer", "truststore", "certifi", "six"):
     package_datas, package_binaries, package_hidden = collect_all(package)
     datas += package_datas
     binaries += package_binaries
