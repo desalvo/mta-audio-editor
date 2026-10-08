@@ -1,3 +1,12 @@
+## 0.2.0-r248
+- Piano / Chord Lab falls back to a draggable and resizable in-app detached window when popup permission is unavailable.
+- Enlarged Show Lyrics/Chords/Markers icons fill compact 38px toggle buttons, preserving title tooltips and aria-labels.
+
+## 0.2.0-r247
+- Compact icon-only New project, Open, Save, Save as, Setup and Export header actions with accessible labels/tooltips.
+- Collapsed-by-default View/Vista menu: Lyrics, Chords, Markers, Piano / Chord Lab, Tracks, Plugins, Mixer.
+- Removed redundant Lyrics/Meta and Piano header buttons.
+
 ## 0.2.0-r246
 - Metronome: standard/zones/adaptive modes and persisted sensitivity.
 - Context refresh for click and generated chords; markers overlay and icon toggles.

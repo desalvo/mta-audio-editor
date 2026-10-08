@@ -16,7 +16,7 @@
     </div>
     <div class="project-name-block"><label>Project</label><div class="project-name-field" onclick="editProjectMeta()" title="Edit project metadata"><span id="headerProjectName">No project loaded</span><span>✎</span></div></div>
     <div class="transport">
-      <button class="transport-btn" onclick="stopPlayback()" title="Stop" aria-label="Stop">■</button><button class="transport-btn" onclick="goTransportStart()" title="Torna all'inizio" aria-label="Torna all'inizio">|◀</button><button class="transport-btn" onclick="seekTransport(-5000)" title="Riavvolgi 5 secondi" aria-label="Riavvolgi 5 secondi">◀◀</button><button id="playMaster" class="transport-btn play" onclick="togglePlayback()" title="Play / Preview" aria-label="Play / Preview">▶</button><button class="transport-btn" onclick="seekTransport(5000)" title="Avanti 5 secondi" aria-label="Avanti 5 secondi">▶▶</button><button id="renderBtn" class="transport-btn render-mode" onclick="toggleRenderPreview()" title="Render: include filtri e master nella preview" aria-label="Render preview">Render</button><button id="followBtn" class="transport-btn follow-mode" onclick="toggleFollowPlayback()" title="Follow: mantieni il playhead visibile" aria-label="Follow playback">Follow</button><button id="showLyricsBtn" class="transport-btn timed-display-mode" onclick="togglePlaybackLyrics()" title="Show Lyrics durante il play">≡</button><button id="showMarkersBtn" class="transport-btn timed-display-mode" onclick="togglePlaybackMarkers()" title="Show Markers" aria-label="Show Markers">⚑</button><button id="showChordsBtn" class="transport-btn timed-display-mode" onclick="togglePlaybackChords()" title="Show Chords durante il play">♬</button>
+      <button class="transport-btn" onclick="stopPlayback()" title="Stop" aria-label="Stop">■</button><button class="transport-btn" onclick="goTransportStart()" title="Torna all'inizio" aria-label="Torna all'inizio">|◀</button><button class="transport-btn" onclick="seekTransport(-5000)" title="Riavvolgi 5 secondi" aria-label="Riavvolgi 5 secondi">◀◀</button><button id="playMaster" class="transport-btn play" onclick="togglePlayback()" title="Play / Preview" aria-label="Play / Preview">▶</button><button class="transport-btn" onclick="seekTransport(5000)" title="Avanti 5 secondi" aria-label="Avanti 5 secondi">▶▶</button><button id="renderBtn" class="transport-btn render-mode" onclick="toggleRenderPreview()" title="Render: include filtri e master nella preview" aria-label="Render preview">Render</button><button id="followBtn" class="transport-btn follow-mode" onclick="toggleFollowPlayback()" title="Follow: mantieni il playhead visibile" aria-label="Follow playback">Follow</button><button id="showLyricsBtn" class="transport-btn timed-display-mode" aria-label="Show Lyrics durante il play" onclick="togglePlaybackLyrics()" title="Show Lyrics durante il play"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M4 10h16M4 15h10M4 20h7"/></svg></button><button id="showMarkersBtn" class="transport-btn timed-display-mode" onclick="togglePlaybackMarkers()" title="Show Markers" aria-label="Show Markers"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 22V2m0 2h14l-4 5 4 5H5"/></svg></button><button id="showChordsBtn" class="transport-btn timed-display-mode" aria-label="Show Chords durante il play" onclick="togglePlaybackChords()" title="Show Chords durante il play"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 18V4l12-2v14M8 7l12-2"/><ellipse cx="5" cy="18" rx="3" ry="2"/><ellipse cx="17" cy="16" rx="3" ry="2"/></svg></button>
     </div>
     <div class="timebox"><input id="transportTime" class="transport-time-input" type="text" value="00:00.000" inputmode="decimal" aria-label="Posizione transport" title="Digita m:ss.mmm oppure misura:beat e premi Invio" onchange="setTransportTime(this.value)" onkeydown="transportTimeKeydown(event)"><select id="transportDisplayMode" class="transport-display-mode" onchange="setTransportDisplayMode(this.value)" title="Formato posizione transport"><option value="time">mm:ss.ms</option><option value="musical">Misure:Beat</option></select><span><input id="transportBpmInput" class="tempo-input" type="number" min="30" max="300" step="1" value="120" onchange="setProjectBpm(this.value)" title="BPM progetto"><b id="transportBpm" hidden>120</b> BPM &nbsp; <select id="transportTimeSignature" class="signature-input" onchange="setProjectTimeSignature(this.value,true)" title="Time signature progetto" aria-label="Time signature"><option>2/4</option><option>3/4</option><option selected>4/4</option><option>5/4</option><option>6/8</option><option>7/8</option><option>9/8</option><option>12/8</option></select> &nbsp; <input id="transportPitchInput" class="pitch-input" type="number" min="-6" max="6" step="0.1" value="0" onchange="setProjectPitch(this.value)" title="Trasposizione semitoni"> st</span></div>
     <div class="top-spacer"></div>
@@ -24,12 +24,12 @@
     <div class="header-actions">
       <a class="header-link auth-managed" href="/account" title="Account" aria-label="Account"><span class="control-icon" aria-hidden="true">👤</span><span class="control-text">Account</span></a>
       <a id="adminNav" class="header-link auth-managed" href="/settings" title="Settings" aria-label="Amministrazione" hidden><span class="control-icon" aria-hidden="true">⚙</span><span class="control-text">Settings</span></a>
-      <button onclick="save()" title="Save" aria-label="Save"><span class="control-icon" aria-hidden="true">▣</span><span class="control-text">Save</span></button>
-      <button onclick="saveAsProject()" title="Save as" aria-label="Save as"><span class="control-icon" aria-hidden="true">⇩</span><span class="control-text">Save as</span></button>
-      <button onclick="showProjectSetup()" title="Project setup" aria-label="Project setup"><span class="control-icon" aria-hidden="true">ⓘ</span><span class="control-text">Setup</span></button>
-      <button id="exportPanelMenuBtn" class="accent" onclick="openExportPanel()" title="Apri Export" aria-label="Export"><span class="control-icon" aria-hidden="true">⇧</span><span class="control-text">Export</span></button>
-      <button id="metaPanelMenuBtn" onclick="toggleMixerPanel('meta')" title="Mostra/nascondi Lyrics/Chords/Markers" aria-label="Mostra o nascondi Lyrics Chords Markers"><span class="control-icon" aria-hidden="true">▤</span><span class="control-text">Lyrics/Meta</span></button>
-      <button id="pianoPanelMenuBtn" onclick="togglePianoPanel()" title="Mostra/nascondi Piano / Chord Lab" aria-label="Mostra o nascondi Piano Chord Lab"><span class="control-icon" aria-hidden="true">♹</span><span class="control-text">Piano</span></button>
+      <button class="primary-icon-action" onclick="newProject()" title="New project" aria-label="New project"><span class="control-icon" aria-hidden="true">⊞</span></button>
+      <button class="primary-icon-action" onclick="openProjectSelector()" title="Open project" aria-label="Open project"><span class="control-icon" aria-hidden="true">📂</span></button>
+      <button class="primary-icon-action" onclick="save()" title="Save" aria-label="Save"><span class="control-icon" aria-hidden="true">💾</span></button>
+      <button class="primary-icon-action" onclick="saveAsProject()" title="Save as" aria-label="Save as"><span class="control-icon" aria-hidden="true">▣</span></button>
+      <button class="primary-icon-action" onclick="showProjectSetup()" title="Setup" aria-label="Setup"><span class="control-icon" aria-hidden="true">⚙</span></button>
+      <button id="exportPanelMenuBtn" class="accent primary-icon-action" onclick="openExportPanel()" title="Export" aria-label="Export"><span class="control-icon" aria-hidden="true">⤴</span></button>
       <a class="header-link logout auth-managed" href="/logout" title="Esci" aria-label="Esci"><span class="control-icon" aria-hidden="true">↪</span><span class="control-text">Esci</span></a>
     </div>
   </header>
@@ -70,16 +70,23 @@
             <button class="nav-item import-action import-audio-action" onclick="focusImport()"><span class="nav-icon" aria-hidden="true">♫</span><span class="nav-label">Import Audio</span></button>
             <button class="nav-item import-action" onclick="openYoutubeImport()">▶ <span>Import YouTube</span></button>
             <button class="nav-item import-action" onclick="openStemWorkflow()">▥ <span>Import &amp; Separate</span></button>
-            <button class="nav-item" onclick="focusTracks()">☷ <span>Tracks</span></button>
-            <button class="nav-item" onclick="focusInspector()">◇ <span>Plugins</span></button>
-            <button class="nav-item" onclick="focusMixer()">▥ <span>Mixer</span></button>
-            <button class="nav-item" onclick="togglePianoPanel()">♹ <span>Piano / Chord Lab</span></button>
           </div>
         </section>
         <div class="nav-sep"></div>
-        <button class="nav-item" onclick="showMetaPanel('lyrics')">▤ <span>Lyrics</span></button>
-        <button class="nav-item" onclick="showMetaPanel('chords')">♬ <span>Chords</span></button>
-        <button class="nav-item" onclick="showMetaPanel('markers')">⚑ <span>Markers</span></button>
+        <section class="sidebar-tools collapsed" id="viewToolsPanel">
+          <button class="sidebar-tools-toggle" type="button" onclick="toggleViewToolsPanel()" aria-expanded="false" aria-controls="viewToolsBody">
+            <span class="sidebar-tools-title">VIEW</span><span id="viewToolsChevron" aria-hidden="true">▸</span>
+          </button>
+          <div class="sidebar-tools-body" id="viewToolsBody">
+            <button class="nav-item" onclick="showMetaPanel('lyrics')">▤ <span>Lyrics</span></button>
+            <button class="nav-item" onclick="showMetaPanel('chords')">♬ <span>Chords</span></button>
+            <button class="nav-item" onclick="showMetaPanel('markers')">⚑ <span>Markers</span></button>
+            <button class="nav-item" onclick="togglePianoPanel()">♹ <span>Piano / Chord Lab</span></button>
+            <button class="nav-item" onclick="focusTracks()">☷ <span>Tracks</span></button>
+            <button class="nav-item" onclick="focusInspector()">◇ <span>Plugins</span></button>
+            <button class="nav-item" onclick="focusMixer()">▥ <span>Mixer</span></button>
+          </div>
+        </section>
         <div class="nav-sep"></div>
         <button class="nav-item" id="nativeSettingsButton" onclick="showSettings()" hidden>⚙ <span>Settings</span></button>
         <button class="nav-item" onclick="showAbout()">ⓘ <span>About</span></button>

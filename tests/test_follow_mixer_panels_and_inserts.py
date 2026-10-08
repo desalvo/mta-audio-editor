@@ -42,7 +42,7 @@ def test_ui_has_follow_collapsible_mixer_panels_master_divider_and_mixer_insert_
     assert "followPlayhead(playheadX)" in js
 
     assert 'onclick="openExportPanel()"' in html
-    assert "toggleMixerPanel('meta')" in html
+    assert "showMetaPanel('lyrics')" in html and "id=\"viewToolsPanel\"" in html
     assert "function exportWindowHtml()" in js
     assert "exportPaneHtml" not in js
     assert "metadata_panel_visible" in js

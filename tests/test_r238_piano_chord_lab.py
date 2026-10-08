@@ -19,7 +19,8 @@ def test_project_persists_piano_panel_state_and_width():
 
 
 def test_piano_lab_is_toggleable_and_resizable():
-    assert 'id="pianoPanelMenuBtn"' in HTML
+    assert 'id="pianoPanelMenuBtn"' not in HTML
+    assert 'id="viewToolsPanel"' in HTML
     assert 'togglePianoPanel()' in HTML
     assert 'function togglePianoPanel()' in JS
     assert 'function bindPianoLabResizer()' in JS
