@@ -453,7 +453,7 @@ jobs:
       - uses: android-actions/setup-android@v4
       - uses: gradle/actions/setup-gradle@v6
         with:
-          gradle-version: '9.3.1'
+          gradle-version: '9.6.0'
       - name: Install Android API 37 SDK
         shell: bash
         run: |
