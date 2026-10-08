@@ -1,3 +1,8 @@
+## 0.2.0-r241
+- Reconciled dependency PRs #10–#15 and adjusted Android/macOS Intel regression tests.
+- Android Gradle Plugin 9.4.1, PyMuPDF 1.28.2, Ruff 0.16.10, Numba 0.68.0, llvmlite 0.50.0, NumPy 2.5.3 (macOS Intel), librosa 1.0.x, SoundFile 0.14.x and PyYAML 6.0.3+.
+- Preserves all r240 editor behavior; macOS Intel/native build compatibility must be validated on CI runners before production release.
+
 ## 0.2.0-r240
 - Timeline Chords: single click selects exclusively, Ctrl/Cmd+click toggles additive selection, clicking outside clears the selection.
 - Preserve chord drag and double-click inline editing without replacing captured DOM nodes.

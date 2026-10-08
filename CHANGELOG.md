@@ -1,3 +1,9 @@
+## 0.2.0-r241 — dependency PR reconciliation
+
+- Integrate GitHub Dependabot PRs #10–#15: Android Gradle Plugin 9.4.1; Ruff 0.16.10; PyMuPDF 1.28.2; macOS Intel Numba 0.68.0 / llvmlite 0.50.0 / NumPy 2.5.3; librosa 1.0.x; SoundFile 0.14.x; PyYAML 6.0.3+.
+- Update platform toolchain regression checks and Android/iOS/Windows revision metadata.
+- Verify deployment builds for macOS Intel, Android, Windows and iOS in GitHub Actions before publishing a production release.
+
 ## 0.2.0-r238
 
 - Added a dockable, closable and resizable Piano / Chord Lab beside the Mixer with a scrollable two-octave mini keyboard.
