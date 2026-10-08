@@ -126,6 +126,7 @@ def _lead_backing_model_info(model_id: str) -> dict:
         raise ValueError("unsupported lead/backing vocal model")
     model["installed"] = (LEAD_BACKING_MODEL_DIR / model["filename"]).exists()
     model["location"] = "local" if NATIVE_SINGLE_USER else "server"
+    model["path"] = str(LEAD_BACKING_MODEL_DIR / model["filename"])
     return model
 
 def _lead_backing_engine_available() -> bool:
@@ -144,6 +145,7 @@ def _lead_backing_catalog() -> dict:
         "storage": "local" if NATIVE_SINGLE_USER else "server",
         "on_demand": True,
         "engine_available": _lead_backing_engine_available(),
+        "model_directory": str(LEAD_BACKING_MODEL_DIR),
     }
 
 def _download_lead_backing_model(model_id: str) -> dict:
@@ -3233,6 +3235,18 @@ def managed_chord_model_delete(model_id: str, request: Request):
 def lead_backing_models(request: Request):
     _actor(request)
     return _lead_backing_catalog()
+
+@app.delete("/api/vocal-separation/models/{model_id}")
+def lead_backing_model_delete(model_id: str, request: Request):
+    _actor(request)
+    try:
+        info = _lead_backing_model_info(model_id)
+    except ValueError as exc:
+        raise HTTPException(404, str(exc)) from exc
+    # Only remove known files within the dedicated model directory.
+    path = LEAD_BACKING_MODEL_DIR / info["filename"]
+    path.unlink(missing_ok=True)
+    return {"ok": True, "model": model_id, "path": str(path)}
 
 @app.post("/api/vocal-separation/models/{model_id}/download")
 def lead_backing_model_download(model_id: str, request: Request):

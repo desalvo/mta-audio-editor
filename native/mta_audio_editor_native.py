@@ -571,10 +571,10 @@ class NativeApi:
         return {"ok": True, "recent_projects": clean}
 
     def list_local_models(self) -> dict:
-        from native.model_manager import list_local, catalog
+        from native.model_manager import list_local, catalog, local_repo
         try: remote = catalog()
         except Exception as exc: remote = {"error": str(exc), "model_profiles": []}
-        return {"ok": True, "local": list_local(), "catalog": remote}
+        return {"ok": True, "local": list_local(), "catalog": remote, "storage_path": str(local_repo())}
 
     def update_local_model(self, model_id: str) -> dict:
         from native.model_manager import update
@@ -761,7 +761,23 @@ def main() -> int:
         thread.join(timeout=5)
 
 
+def _hide_background_worker_dock_icon() -> None:
+    """Prevent macOS multiprocessing / frozen model workers from appearing in Dock."""
+    if sys.platform != "darwin":
+        return
+    args = " ".join(sys.argv[1:])
+    if not ("--multiprocessing-fork" in args or "--demucs-worker" in args or "resource_tracker" in args):
+        return
+    try:
+        from AppKit import NSApplication, NSApplicationActivationPolicyProhibited
+        NSApplication.sharedApplication().setActivationPolicy_(NSApplicationActivationPolicyProhibited)
+    except ImportError:
+        # PyObjC is optional; do not break workers when it is unavailable.
+        pass
+
+
 if __name__ == "__main__":
+    _hide_background_worker_dock_icon()
     # Required for PyInstaller-frozen apps using torch/demucs multiprocessing.
     # Without this, a spawned worker can execute this launcher again and open
     # a second empty application window instead of becoming a worker process.

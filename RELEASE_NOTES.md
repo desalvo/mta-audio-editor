@@ -1,3 +1,10 @@
+## 0.2.0-r259 — model management, sidebar preferences, bilingual UI
+
+- Central model-manager lists Demucs and backing-vocal models, including their filesystem paths and download/delete commands.
+- Sidebar sections remember their open/closed state globally across projects.
+- Additional IT/EN translations for vocal separation dialogs, download and status messages.
+- Background macOS multiprocessing workers request a no-Dock activation policy.
+
 ## 0.2.0-r258
 - macOS Intel: enforce binary NumPy 1.26.4 / Numba 0.61.2 / llvmlite 0.44.0 wheels, including a constraint on the optional resampy runtime installation.
 - Windows: explicitly install and freeze six, required by audio-separator UVR runtime.
