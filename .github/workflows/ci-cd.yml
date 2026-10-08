@@ -253,6 +253,9 @@ jobs:
           pip install -r requirements-lyrics.txt
           pip install -r requirements-chords.txt
           pip check
+          # Fail the native installer build rather than distributing an ARM64
+          # bundle whose backing-vocal model button cannot find its engine.
+          python -c "from audio_separator.separator import Separator; import onnxruntime; print('audio-separator and ONNX Runtime installed:', onnxruntime.get_available_providers())"
       - name: Install FFmpeg and Inno Setup
         shell: pwsh
         run: |
@@ -374,6 +377,9 @@ jobs:
           pip install -r requirements-lyrics.txt
           pip install -r requirements-chords.txt
           pip check
+          # Fail the native installer build rather than distributing an ARM64
+          # bundle whose backing-vocal model button cannot find its engine.
+          python -c "from audio_separator.separator import Separator; import onnxruntime; print('audio-separator and ONNX Runtime installed:', onnxruntime.get_available_providers())"
       - name: Install FFmpeg
         shell: bash
         run: |

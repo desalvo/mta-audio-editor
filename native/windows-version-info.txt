@@ -1,7 +1,7 @@
 VSVersionInfo(
   ffi=FixedFileInfo(
-    filevers=(0, 2, 0, 251),
-    prodvers=(0, 2, 0, 251),
+    filevers=(0, 2, 0, 255),
+    prodvers=(0, 2, 0, 255),
     mask=0x3f,
     flags=0x0,
     OS=0x40004,
@@ -16,13 +16,13 @@ VSVersionInfo(
         [
           StringStruct('CompanyName', 'Alessandro De Salvo'),
           StringStruct('FileDescription', 'MTA Audio Editor'),
-          StringStruct('FileVersion', '0.2.0-r251'),
+          StringStruct('FileVersion', '0.2.0-r255'),
           StringStruct('InternalName', 'MTA Audio Editor'),
           StringStruct('LegalCopyright', 'EUPL-1.2'),
           StringStruct('OriginalFilename', 'MTA Audio Editor.exe'),
           StringStruct('ProductName', 'MTA Audio Editor'),
           StringStruct('ProductVersion', '0.2.0'),
-          StringStruct('Comments', 'Revision 251 - Build 20261008095000 - https://github.com/desalvo/mta-audio-editor')
+          StringStruct('Comments', 'Revision 255 - Build 20261008165000 - https://github.com/desalvo/mta-audio-editor')
         ]
       )
     ]),

@@ -1783,8 +1783,20 @@ def build_lyrics_pdf(
             current_section_color, current_section_indent = draw_marker(ordered_markers[marker_idx]);marker_idx+=1
         section_margin = margin + current_section_indent
         section_width = max(72.0, usable_width - current_section_indent)
-        words=estimated_words(lyric,line_end,section_margin,section_width)
-        lyric_lines=wrap_text(lyric.text,"lyrics",section_width)
+        # Chords anchored before the first word occupy a dedicated leading column.
+        # Reserve that width before calculating word positions and wrapping lyrics.
+        pre_line_chords = sorted((ch for ch in ordered_chords if ch.manual_anchor
+            and str(getattr(ch, "anchor_kind", "word") or "word") == "start"
+            and _manual_chord_line_match(ch, lyric)),
+            key=lambda ch: (int(getattr(ch, "anchor_order", 0)), int(ch.time_ms)))
+        chord_lead_width = 0.0
+        if pre_line_chords:
+            chord_font, chord_size, _ = st("chords")
+            chord_lead_width = min(section_width * 0.40, sum(c.stringWidth(safe(ch.chord), chord_font, chord_size) + 5 for ch in pre_line_chords) + 9)
+        lyric_margin = section_margin + chord_lead_width
+        lyric_width = max(72.0, section_width - chord_lead_width)
+        words=estimated_words(lyric,line_end,lyric_margin,lyric_width)
+        lyric_lines=wrap_text(lyric.text,"lyrics",lyric_width)
         line_chords=[ch for ch in ordered_chords if _manual_chord_line_match(ch, lyric) or (not ch.manual_anchor and line_start<=ch.time_ms<line_end)]
         # Never carry a previous automatic chord onto the next lyric line.
         # A chord before the first word must be explicitly anchored to line start.
@@ -1823,7 +1835,10 @@ def build_lyrics_pdf(
                 for x,ch in positioned:
                     label=safe(ch.chord)
                     tw=c.stringWidth(label,chord_font,chord_size)
-                    x=max(prev_right+5,min(x,section_margin+section_width-tw))
+                    if ch.manual_anchor and str(getattr(ch, "anchor_kind", "word") or "word") == "start":
+                        x = section_margin if prev_right < section_margin else prev_right + 5
+                    else:
+                        x=max(prev_right+5,min(x,section_margin+section_width-tw))
                     c.drawString(x,y,label);prev_right=x+tw
                 y-=chord_size+7
         lyric_font,lyric_size,lyric_color = st("lyrics")
@@ -1834,7 +1849,7 @@ def build_lyrics_pdf(
             ensure(lyric_size+8)
             c.setFont(lyric_font, lyric_size)
             c.setFillColor(current_section_color or lyric_color)
-            c.drawString(section_margin,y,safe(part));y-=lyric_size+6
+            c.drawString(lyric_margin,y,safe(part));y-=lyric_size+6
         y-=line_spacing
 
     while marker_idx<len(ordered_markers):

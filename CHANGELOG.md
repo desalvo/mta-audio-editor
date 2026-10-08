@@ -1,3 +1,19 @@
+## 0.2.0-r255
+
+- Stabilized Lyrics/Chords/Markers double-click editing without rerendering on single click, preserving scroll and last-row edits.
+- PDF Lyrics+Chords reserves a leading column for line-start anchored chords.
+- macOS Apple Silicon PyInstaller bundles audio_separator and ONNX Runtime; CI fails when the backing-vocal engine cannot be imported.
+
+## 0.2.0-r253
+- Metronome source-track refresh with zone-aware recalculation, marker-driven updates, and transport arrow nudging.
+- Timeline shortcut M and track/waveform context menu Add marker; simplified Add chord and Extract marker labels.
+
+## 0.2.0-r252
+- Double-click timeline marker labels to rename.
+- Exact timestamp alignment for marker guide and chord label.
+- Playback marker highlighting and synchronized metadata list scrolling.
+- Wider inline timestamp editor for lyrics/chords/markers.
+
 ## 0.2.0-r251
 - Timeline marker captions are placed below the chord-label band to avoid collisions when Show Chords and Show Markers are both enabled.
 

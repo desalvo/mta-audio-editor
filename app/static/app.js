@@ -390,7 +390,9 @@ function restoreUiState(){
     if(mx)mx.scrollLeft=uiState.mixerLeft||0;
   });
 }
+let lastMetronomeZoneProjectId=null;
 function render(){
+  if(current?.id!==lastMetronomeZoneProjectId){lastMetronomeZoneProjectId=current?.id||null;lastMetronomeZoneSignature=metronomeZoneSignature(current)}
   if(current?.chords?.some(ch=>ch?.deleted))current.chords=current.chords.filter(ch=>!ch?.deleted);
   if(current?.markers?.some(marker=>marker?.deleted))current.markers=current.markers.filter(marker=>!marker?.deleted);
   if(current){pxPerSec=Number(current.timeline_zoom_px_per_sec||70);mixerMetaTab=current.mixer_meta_tab||'lyrics';exportFormat=current.export_format||'mta';}
@@ -491,14 +493,14 @@ async function createChordsTrack(){
 function openMetronomeSettings(){
   if(!current)return toast('Apri prima un progetto');
   const mode=current.metronome_mode||'fixed', sensitivity=Number(current.metronome_sensitivity??0.35);
-  showUtilityModal('Impostazioni metronomo',`<div class="workflow-grid"><label class="workflow-field"><span>Tipo di metronomo</span><select id="metronomeMode"><option value="fixed" ${mode==='fixed'?'selected':''}>Standard · intero progetto</option><option value="zones" ${mode==='zones'?'selected':''}>A zone · tra marker</option><option value="adaptive" ${mode==='adaptive'?'selected':''}>Adattivo · analisi ritmica</option></select></label><label class="workflow-field"><span>Sensibilità adattiva (0 stabile – 1 reattiva)</span><input id="metronomeSensitivity" type="range" min="0" max="1" step="0.05" value="${sensitivity}"></label></div><p class="muted">I marker attivi delimitano le zone; la griglia riparte a ogni marker. Le opzioni sono salvate nel progetto.</p><div class="modal-actions"><button onclick="closeUtilityModal()">Annulla</button><button class="primary" onclick="applyMetronomeSettings()">Genera metronomo</button></div>`);
+  showUtilityModal('Impostazioni metronomo',`<div class="workflow-grid"><label class="workflow-field"><span>Tipo di metronomo</span><select id="metronomeMode"><option value="fixed" ${mode==='fixed'?'selected':''}>Standard · intero progetto</option><option value="zones" ${mode==='zones'?'selected':''}>A zone · tra marker</option><option value="adaptive" ${mode==='adaptive'?'selected':''}>Adattivo · analisi ritmica</option></select></label><label class="workflow-field"><span>Sensibilità adattiva (0 stabile – 1 reattiva)</span><input id="metronomeSensitivity" type="range" min="0" max="1" step="0.05" value="${sensitivity}"></label></div><p class="muted">I marker attivi delimitano le zone; la griglia riparte a ogni marker. Le opzioni sono salvate nel progetto.</p><div class="modal-actions metronome-modal-actions"><button type="button" onclick="closeUtilityModal()">Annulla</button><button type="button" class="primary metronome-generate-button" onclick="applyMetronomeSettings()">Genera metronomo</button></div>`);
 }
 async function applyMetronomeSettings(){
   if(!current)return;
   const mode=$('#metronomeMode')?.value||'fixed';
   const sensitivity=Number($('#metronomeSensitivity')?.value||0.35);
   current.metronome_mode=mode;current.metronome_sensitivity=sensitivity;
-  closeUtilityModal();await createMetronomeTrack(mode);
+  closeUtilityModal();const reference=mode==='zones'?(current.tracks||[]).find(t=>t.type!=='click'&&!isGeneratedChordsTrack(t)&&t.filename):null;await createMetronomeTrack(mode,reference?.id||'');
 }
 async function refreshGeneratedTrackFromContext(id){
   if(!current)return;
@@ -511,6 +513,30 @@ async function refreshGeneratedTrackFromContext(id){
       await flushAutosave();await enqueueChordsRefresh(0,Math.round((current?.tracks||[]).reduce((m,t)=>Math.max(m,Number(t.duration_ms||0)),0)),'refresh manuale');
     }
   }catch(e){toast('Refresh fallito: '+e.message)}
+}
+let metronomeRefreshQueue=Promise.resolve();
+function metronomeZoneSignature(project=current){return (project?.markers||[]).filter(m=>!m.deleted&&!m.disabled).map(m=>Math.round(Number(m.time_ms)||0)).filter(t=>t>0).sort((a,b)=>a-b).join(',')}
+let lastMetronomeZoneSignature=null;
+function enqueueMetronomeZoneRefresh(sourceId='',timeMs=playCursorMs){
+  const projectId=current?.id;
+  metronomeRefreshQueue=metronomeRefreshQueue.catch(()=>{}).then(async()=>{
+    if(!current||current.id!==projectId||current.metronome_mode!=='zones'||!(current.tracks||[]).some(t=>t.type==='click'))return;
+    showMediaProgress('Aggiornamento metronomo a zone',-1,'Analisi della zona selezionata e aggiornamento audio…');
+    try{
+      const q=new URLSearchParams({time_ms:String(Math.max(0,Math.round(timeMs||0))),track_id:sourceId||current.metronome_reference_track_id||''});
+      const response=await api(`/api/projects/${projectId}/metronome-track/refresh?${q}`,{method:'POST'});
+      if(current?.id===projectId){current=response.project;invalidateTrackAudioCache(response.track.id);render();toast(`Metronomo a zone aggiornato · ${fmtTime((response.zone_start_ms||0)/1000)}–${fmtTime((response.zone_end_ms||0)/1000)}`)}
+    }catch(e){toast('Aggiornamento metronomo non riuscito: '+e.message)}finally{closeUtilityModal()}
+  });return metronomeRefreshQueue;
+}
+async function updateMetronomeFromAudioTrack(id){
+  if(!current||!(current.tracks||[]).some(t=>t.type==='click'))return toast('Crea prima una traccia metronomo');
+  if(selectedTrackIdSet.size!==1||!selectedTrackIdSet.has(id))return toast('Seleziona una sola traccia audio per aggiornare il metronomo');
+  const reference=trackById(id);
+  if(!reference||reference.type==='click'||isGeneratedChordsTrack(reference))return toast('Seleziona una traccia audio valida');
+  if(current.metronome_mode==='zones')return enqueueMetronomeZoneRefresh(id,playCursorMs);
+  showMediaProgress('Aggiornamento metronomo',-1,'Analisi ritmica della traccia selezionata…');
+  try{await createMetronomeTrack(current.metronome_mode||'fixed',id)}finally{closeUtilityModal()}
 }
 let metronomeCreatePending=false;
 async function createMetronomeTrack(mode='fixed',referenceTrackId=''){
@@ -830,10 +856,12 @@ function openTrackContextMenuAt(id,clientX,clientY){
 
     <button type="button" onclick="closeTrackContextMenu();openTextAnalysisChooser('${id}','lyrics')">≡ <span>Estrai lyrics</span></button>
     <button type="button" onclick="closeTrackContextMenu();openTextAnalysisChooser('${id}','chords')">♬ <span>Estrai chords</span></button>
-    <button type="button" onclick="closeTrackContextMenu();extractMarkersFromTrack('${id}')">⚑ <span>Estrai marker automaticamente</span></button>
+    <button type="button" onclick="closeTrackContextMenu();extractMarkersFromTrack('${id}')">⚑ <span>Estrai marker</span></button>
     ${(track.type==='click'||isGeneratedChordsTrack(track))?`<button type="button" onclick="closeTrackContextMenu();refreshGeneratedTrackFromContext('${id}')">⟳ <span>Rigenera traccia</span></button>`:''}
+    ${!(track.type==='click'||isGeneratedChordsTrack(track))&&(current.tracks||[]).some(t=>t.type==='click')?`<button type="button" onclick="closeTrackContextMenu();updateMetronomeFromAudioTrack('${id}')">♩ <span>Aggiorna metronomo</span></button>`:''}
     <button type="button" onclick="closeTrackContextMenu();openTrackDelayDialog('${id}')">↔ <span>Delay / anticipo traccia…</span></button>
-    <button type="button" onclick="closeTrackContextMenu();addTimelineChordAtPlayhead()">♬ <span class="context-menu-label">+ Chord alla posizione corrente</span><kbd class="context-shortcut">C</kbd></button>
+    <button type="button" onclick="closeTrackContextMenu();addTimelineChordAtPlayhead()">♬ <span class="context-menu-label">Aggiungi chord</span><kbd class="context-shortcut">C</kbd></button>
+    <button type="button" onclick="closeTrackContextMenu();addTimelineMarkerAtPlayhead()">⚑ <span class="context-menu-label">Aggiungi marker</span><kbd class="context-shortcut">M</kbd></button>
     <button type="button" class="danger" onclick="closeTrackContextMenu();deleteSelection(true)">⌫ <span>Delete selected range</span></button>
     <button type="button" class="danger" onclick="closeTrackContextMenu();deleteTracksByIds(['${id}'])">× <span>Rimuovi</span></button>
   `;
@@ -997,7 +1025,7 @@ function openTrackStemWorkflow(id){
   const recommendedCount=Number(profileMap[recommended]?.stem_count)||counts[0]||4;
   const countOptions=counts.map(n=>{const p=profiles.find(x=>Number(x.stem_count)===n),labels=p?.stem_labels||[];const detail=labels.length&&labels.length<=8?' · '+labels.join(' / '):(p?.display_name?' · '+p.display_name:'');return `<option value="${n}" ${n===recommendedCount?'selected':''}>${n} stem${esc(detail)}</option>`}).join('');
   const leadBacking=stem.lead_backing||{},backingModels=(leadBacking.models||[]).map(m=>`<option value="${esc(m.id)}" ${m.id===leadBacking.default_model?'selected':''}>${esc(m.display_name)} · ${m.installed?'installato':(leadBacking.storage==='local'?'download locale':'download server')}</option>`).join('');
-  showUtilityModal('Separa traccia',`<div class="stem-workflow"><p class="hint">Sorgente: <b>${esc(track.name)}</b>. La separazione partirà solo dopo la conferma dei parametri.</p><div class="workflow-grid"><label class="workflow-field"><span>Modello AI</span><select id="trackStemModel" onchange="syncTrackStemModelCount('model')">${models}</select></label><label class="workflow-field"><span>Numero stem</span><select id="trackStemCount" onchange="syncTrackStemModelCount('count')">${countOptions}</select></label></div><label class="workflow-check"><input id="trackSplitBackingVocals" type="checkbox" onchange="$('#trackBackingModelRow').classList.toggle('hidden',!this.checked)"> Separa anche voce principale e backing vocals</label><label class="workflow-field hidden" id="trackBackingModelRow"><span>Modello Lead / Backing Vocals</span><select id="trackBackingVocalModel">${backingModels}<option value="ffmpeg-center-side">Fallback DSP center/side</option></select><button type="button" onclick="downloadTrackBackingModel()">Scarica modello</button></label><div id="trackStemDisclosure" class="workflow-note"></div><div class="utility-actions"><button class="utility-btn primary" type="button" onclick="startTrackStemSplit('${esc(id)}')">Avvia separazione</button><button class="utility-btn secondary" type="button" onclick="closeUtilityModal()">Annulla</button></div></div>`);
+  showUtilityModal('Separa traccia',`<div class="stem-workflow"><p class="hint">Sorgente: <b>${esc(track.name)}</b>. La separazione partirà solo dopo la conferma dei parametri.</p><div class="workflow-grid"><label class="workflow-field"><span>Modello AI</span><select id="trackStemModel" onchange="syncTrackStemModelCount('model')">${models}</select></label><label class="workflow-field"><span>Numero stem</span><select id="trackStemCount" onchange="syncTrackStemModelCount('count')">${countOptions}</select></label></div><label class="workflow-check"><input id="trackSplitBackingVocals" type="checkbox" onchange="$('#trackBackingModelRow').classList.toggle('hidden',!this.checked)"> Separa anche voce principale e backing vocals</label><label class="workflow-field hidden" id="trackBackingModelRow"><span>Modello Lead / Backing Vocals</span><select id="trackBackingVocalModel">${backingModels}<option value="ffmpeg-center-side">Fallback DSP center/side</option></select><button class="backing-model-download utility-btn primary" type="button" onclick="downloadTrackBackingModel()">Scarica modello</button></label><div id="trackStemDisclosure" class="workflow-note"></div><div class="utility-actions"><button class="utility-btn primary" type="button" onclick="startTrackStemSplit('${esc(id)}')">Avvia separazione</button><button class="utility-btn secondary" type="button" onclick="closeUtilityModal()">Annulla</button></div></div>`);
   syncTrackStemModelCount('model');
 }
 function syncTrackStemModelCount(source){
@@ -1052,7 +1080,7 @@ let timelineChordSelectedIndices=new Set();
 function normalizeTimelineChordSelection(){const n=current?.chords?.length||0;timelineChordSelectedIndices=new Set([...timelineChordSelectedIndices].filter(i=>Number.isInteger(i)&&i>=0&&i<n&&!current.chords[i]?.deleted));}
 function timelineMarkersHtml(){
   if(!current?.show_markers_playback)return '';
-  return (current.markers||[]).map((m,index)=>({m,index})).filter(({m})=>!m.deleted).map(({m,index})=>`<div class="project-marker-line ${m.disabled?'marker-disabled':''}" data-marker-index="${index}" style="left:${Math.max(0,Number(m.time_ms||0))/1000*pxPerSec}px;--marker-color:${esc(m.color||'#204A87')}" onpointerdown="beginTimelineMarkerDrag(event,${index})" oncontextmenu="return openTimelineMarkerContextMenu(event,${index})" title="${esc(m.label||'Marker')} · ${esc(lyricsChordsEditorPosition(m.time_ms||0))}"><span class="project-marker-caption">${esc(m.label||'Marker')}</span><span class="project-marker-handle" aria-hidden="true">◆</span></div>`).join('');
+  return (current.markers||[]).map((m,index)=>({m,index})).filter(({m})=>!m.deleted).map(({m,index})=>`<div class="project-marker-line ${m.disabled?'marker-disabled':''}" data-marker-index="${index}" style="left:${Math.max(0,Number(m.time_ms||0))/1000*pxPerSec}px;--marker-color:${esc(m.color||'#204A87')}" onpointerdown="beginTimelineMarkerDrag(event,${index})" ondblclick="return beginTimelineMarkerInlineEdit(event,${index})" oncontextmenu="return openTimelineMarkerContextMenu(event,${index})" title="${esc(m.label||'Marker')} · ${esc(lyricsChordsEditorPosition(m.time_ms||0))}"><span class="project-marker-caption">${esc(m.label||'Marker')}</span><span class="project-marker-handle" aria-hidden="true">◆</span></div>`).join('');
 }
 function refreshTimelineMarkers(){
   const lanes=$('#lanes');if(!lanes)return;
@@ -1062,6 +1090,24 @@ function refreshTimelineMarkers(){
   while(tmp.firstChild)lanes.insertBefore(tmp.firstChild,playhead||null);
 }
 let timelineMarkerDrag=null;
+function beginTimelineMarkerInlineEdit(event,index){
+  event?.preventDefault?.();event?.stopPropagation?.();closeTimelineMarkerContextMenu();
+  const marker=current?.markers?.[index],host=event?.currentTarget?.querySelector?.('.project-marker-caption');
+  if(!marker||marker.deleted||!host)return false;
+  const input=document.createElement('input');input.className='timeline-marker-inline';input.value=String(marker.label||'');
+  host.replaceChildren(input);input.focus();input.select();
+  const cancel=()=>refreshTimelineMarkers();
+  const commit=async()=>{if(input.dataset.committed==='1')return;input.dataset.committed='1';
+    const label=String(input.value||'').trim();if(!label||!current?.markers?.includes(marker)){cancel();return;}
+    if(label!==marker.label){checkpointHistory();ensureEventSnapshot(marker);marker.label=label;projectDirty=true;refreshTimelineMarkers();refreshMetaPanels();await saveMetaQuickEdit(null,'modifica nome marker');}
+    else refreshTimelineMarkers();
+  };
+  input.addEventListener('pointerdown',e=>e.stopPropagation());
+  input.addEventListener('dblclick',e=>e.stopPropagation());
+  input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();input.blur()}else if(e.key==='Escape'){e.preventDefault();input.dataset.committed='1';cancel()}});
+  input.addEventListener('blur',commit,{once:true});return false;
+}
+
 function beginTimelineMarkerDrag(event,index){
   if(!current?.show_markers_playback||event.button!==0)return;
   const marker=current?.markers?.[index],el=event.currentTarget;if(!marker||marker.deleted||!el)return;
@@ -1085,6 +1131,17 @@ function beginTimelineMarkerDrag(event,index){
   };
   const cancel=ev=>{if(timelineMarkerDrag!==drag||ev.pointerId!==drag.pointerId)return;clean();refreshTimelineMarkers()};
   window.addEventListener('pointermove',move);window.addEventListener('pointerup',finish);window.addEventListener('pointercancel',cancel);
+}
+async function addTimelineMarkerAtPlayhead(){
+  if(!current)return;
+  const label=prompt(tr('Section / marker name','Nome sezione / marker'),'Marker');
+  if(label===null||!label.trim())return;
+  checkpointHistory();
+  current.markers=current.markers||[];
+  current.markers.push({time_ms:Math.max(0,Math.round(Number(playCursorMs)||0)),label:label.trim(),disabled:false,deleted:false});
+  current.markers.sort((a,b)=>Number(a.time_ms||0)-Number(b.time_ms||0));
+  projectDirty=true;refreshTimelineMarkers();refreshMetaPanels();
+  await saveMetaQuickEdit(null,'aggiunta marker timeline');refreshTimelineMarkers();
 }
 function closeTimelineMarkerContextMenu(){document.querySelector('#timelineMarkerContextMenu')?.remove()}
 function openTimelineMarkerContextMenu(event,index){
@@ -2357,7 +2414,7 @@ function openStemWorkflow(){
       <label class="workflow-field hidden" id="stemLyricsModelRow"><span>Motore lyrics · OpenAI Whisper</span><select id="stemLyricsModel">${lyricsModelOptions}</select><button type="button" onclick="downloadStemTextModel('lyrics')">Scarica modello</button></label>
       <label class="workflow-check"><input id="stemExtractChords" type="checkbox" onchange="$('#stemChordsEngineRow').classList.toggle('hidden',!this.checked);updateStemChordEngineDisclosure()"> Estrai anche i chords</label>
       <label class="workflow-field hidden" id="stemChordsEngineRow"><span>Motore chords</span><select id="stemChordsEngine" onchange="updateStemChordEngineDisclosure()">${chordEngineOptions}</select><small id="stemChordEngineDisclosure"></small><button type="button" onclick="downloadStemTextModel('chords')">Scarica modello</button></label>
-      <div class="workflow-note warning"><b>Nota sui tempi di elaborazione:</b> separazione stem, estrazione lyrics e analisi chords possono richiedere parecchio tempo in base alla durata del brano, ai modelli scelti e all’hardware disponibile.</div><label class="workflow-check"><input id="stemSplitBackingVocals" type="checkbox" onchange="updateBackingModelRow()"> Separa anche voce principale e backing vocals (secondo passaggio AI)</label><label class="workflow-field hidden" id="backingModelRow"><span>Modello Lead / Backing Vocals</span><select id="stemBackingVocalModel">${backingModels}<option value="ffmpeg-center-side">Fallback DSP center/side</option></select><button type="button" onclick="downloadSelectedBackingModel()">Scarica modello</button></label>
+      <div class="workflow-note warning"><b>Nota sui tempi di elaborazione:</b> separazione stem, estrazione lyrics e analisi chords possono richiedere parecchio tempo in base alla durata del brano, ai modelli scelti e all’hardware disponibile.</div><label class="workflow-check"><input id="stemSplitBackingVocals" type="checkbox" onchange="updateBackingModelRow()"> Separa anche voce principale e backing vocals (secondo passaggio AI)</label><label class="workflow-field hidden" id="backingModelRow"><span>Modello Lead / Backing Vocals</span><select id="stemBackingVocalModel">${backingModels}<option value="ffmpeg-center-side">Fallback DSP center/side</option></select><button class="backing-model-download utility-btn primary" type="button" onclick="downloadSelectedBackingModel()">Scarica modello</button></label>
       <div class="workflow-note">Il file originale viene sempre conservato in <b>Originals</b>. Il progetto viene salvato dopo l’import e dopo ogni stem aggiunto. Su iPhone/iPad, <b>Auto</b> usa Core ML sul dispositivo quando il modello richiesto è disponibile e ricade automaticamente sul server negli altri casi. I modelli locali vengono scaricati una sola volta e restano disponibili offline. 8 stem richiede un modello compatibile.</div>
       <div class="utility-actions">
         <button class="utility-btn primary" type="button" onclick="startStemWorkflow()" ${stem.available?'':'disabled'}><span>Importa e separa</span></button>
@@ -2497,6 +2554,7 @@ function showStemProgress(job){
       <div class="stem-progress-head"><b>${esc(job.filename)}</b><span>${pct}%</span></div>
       <div class="stem-progress"><div class="stem-progress-fill" style="width:${pct}%"></div></div>
       <div class="stem-progress-message">${esc(job.message||job.status)}</div>
+      ${job.split_backing_vocals?`<div class="workflow-note">Backing vocals: ${esc(job.vocal_split_method || (job.backing_vocal_model==='ffmpeg-center-side'?'DSP FFmpeg center/side':'AI audio-separator · '+String(job.backing_vocal_model||'modello predefinito')))}</div>`:''}
       ${job.error?`<pre class="stem-error">${esc(job.error)}</pre>`:''}
       ${job.analysis&&Object.keys(job.analysis).length?`<div class="workflow-note">${Object.entries(job.analysis).map(([k,v])=>`${k==='lyrics'?'Lyrics':'Chords'}: ${v.ok?`OK · ${v.count||0} eventi`:`errore · ${esc(v.error||'analisi non riuscita')}`}`).join('<br>')}</div>`:''}
       <div class="utility-actions">
@@ -3720,8 +3778,10 @@ window.addEventListener('keydown',e=>{
     if(editable)return;
     const key=e.key.toLowerCase();if(key==='z'){e.preventDefault();if(e.shiftKey)redoEdit();else undoEdit();return}if(key==='y'){e.preventDefault();redoEdit();return}if(key==='x'){e.preventDefault();cutTimelineSelection();return}if(key==='c'){e.preventDefault();copyTimelineSelection();return}if(key==='v'){e.preventDefault();pasteTimelineSelection();return}if(key==='s'){e.preventDefault();save();return}
   }
+  if(!editable&&current&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&(e.key==='ArrowLeft'||e.key==='ArrowRight')&&(document.activeElement?.closest?.('#timeline')||document.activeElement?.closest?.('.timeline')||document.activeElement===document.body)){e.preventDefault();const increment=Math.max(1,Math.round(4/Math.max(0.01,pxPerSec)*1000));goToTimestamp(playCursorMs+(e.key==='ArrowRight'?increment:-increment));return}
   if(e.key==='Escape'){closeTrackContextMenu();return}
   if(!editable&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&!e.repeat&&(e.key==='Backspace'||e.key==='Delete')&&timelineChordSelectedIndices.size){e.preventDefault();e.stopPropagation();deleteSelectedTimelineChords();return}
+  if(!editable&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&!e.shiftKey&&!e.repeat&&e.key.toLowerCase()==='m'&&current){e.preventDefault();e.stopPropagation();void addTimelineMarkerAtPlayhead();return}
   if(!editable&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&!e.shiftKey&&!e.repeat&&e.key.toLowerCase()==='c'&&current?.show_chords_playback){e.preventDefault();e.stopPropagation();openAddTimelineChordDialog();return}
 
   if(!(e.code==='Space'||e.key===' '||e.key==='Spacebar'))return;
@@ -4293,22 +4353,41 @@ async function extractMarkersFromSelectedTrack(){const t=selectedTrack()||curren
 async function runTextAnalysisAndWait(projectId,trackId,kind,choice=""){
   if(!trackId)return null;const labels={lyrics:'Lyrics',chords:'Chords',markers:'Markers / sezioni'},label=labels[kind]||kind;let query=[];if(choice&&kind!=='markers')query.push(`${kind==='lyrics'?'model':'engine'}=${encodeURIComponent(choice)}`);if(kind==='lyrics'&&$('#lyricsAdvancedAlignment')?.checked)query.push('advanced_alignment=true');const suffix=query.length?'?'+query.join('&'):'';const job=await api(`/api/projects/${projectId}/tracks/${trackId}/extract-${kind}-jobs${suffix}`,{method:'POST'});for(;;){const state=await api(`/api/media-jobs/${job.id}`);showMediaProgress(`Estrazione ${label}`,state.progress,state.message,mediaPartialText(state),state.cancel_supported&&['queued','running'].includes(state.status)?job.id:'');if(state.status==='completed')return state;if(state.status==='failed'||state.status==='cancelled')throw new Error(state.error||(state.status==='cancelled'?`Estrazione ${kind} annullata`:`Estrazione ${kind} non riuscita`));await new Promise(resolve=>setTimeout(resolve,500))}}
 
-let metaPlaybackScrollIndex={lyrics:-1,chords:-1};
+let metaPlaybackScrollIndex={lyrics:-1,chords:-1,markers:-1};
 function metaSelectionSet(kind){return metaMultiSelection[kind]||null}
-function metaEventClick(event,kind,index){const set=metaSelectionSet(kind);if(!set)return;if(event?.metaKey||event?.ctrlKey){event.preventDefault();event.stopPropagation();set.has(Number(index))?set.delete(Number(index)):set.add(Number(index));refreshMetaPanels();return}if(set.size){set.clear();set.add(Number(index));refreshMetaPanels()}}
+function metaEventClick(event,kind,index){
+  // Never replace list nodes between clicks: doing so cancels dblclick/inline edit,
+  // blurs the last lyric row and resets scrollTop to zero.
+  const set=metaSelectionSet(kind);if(!set||event?.target?.closest?.('[data-meta-inline]'))return;
+  const n=Number(index);
+  if(event?.metaKey||event?.ctrlKey){event.preventDefault();event.stopPropagation();set.has(n)?set.delete(n):set.add(n)}
+  else if(set.size){set.clear();set.add(n)}
+  document.querySelectorAll(`.meta-line[data-meta-kind="${kind}"]`).forEach(row=>row.classList.toggle('meta-multi-selected',set.has(Number(row.dataset.eventIndex))));
+}
 function clearMetaMultiSelection(kind=null){if(kind){metaSelectionSet(kind)?.clear();return}Object.values(metaMultiSelection).forEach(set=>set.clear())}
 function metaKindLabel(kind,count=1){if(kind==='chords')return 'chords';if(kind==='markers')return count===1?'marker':'markers';return count===1?'lyric':'lyrics'}
 async function deleteSelectedMetaEvents(kind){const set=metaSelectionSet(kind);if(!set?.size)return;const indexes=[...set].map(Number).filter(Number.isFinite).sort((a,b)=>b-a),count=indexes.length,label=metaKindLabel(kind,count);if(!confirm(`Cancellare ${count} ${label} selezionati?`))return;const chordsBefore=kind==='chords'?JSON.parse(JSON.stringify(current.chords||[])):null;checkpointHistory();for(const index of indexes){if(index>=0&&index<(current[kind]||[]).length)current[kind].splice(index,1)}set.clear();const reason=kind==='chords'?'eliminazione batch chords':kind==='markers'?'eliminazione batch markers':'eliminazione batch lyrics';await saveMetaQuickEdit(chordsBefore,reason);if(kind==='chords')refreshTimelineChordLane();toast(`${count} ${label} eliminati`)}
 async function setSelectedMetaEventsEnabled(kind,enabled){const set=metaSelectionSet(kind);if(!set?.size)return;const indexes=[...set].map(Number).filter(Number.isFinite).sort((a,b)=>a-b),count=indexes.length,label=metaKindLabel(kind,count),chordsBefore=kind==='chords'?JSON.parse(JSON.stringify(current.chords||[])):null;checkpointHistory();for(const index of indexes){const item=current?.[kind]?.[index];if(!item)continue;ensureEventSnapshot(item);if(kind==='chords')item.excluded=!enabled;else{item.deleted=false;item.disabled=!enabled}}await saveMetaQuickEdit(chordsBefore,`${enabled?'riabilitazione':'disabilitazione'} batch ${label}`);if(kind==='chords')refreshTimelineChordLane();refreshMetaPanels();toast(`${count} ${label} ${enabled?'riabilitati':'disabilitati'}`)}
 function metaEventInactive(kind,item){return !!item?.deleted||(kind==='chords'?!!item?.excluded:!!item?.disabled)}
 function metaEventStateClass(kind,item){return `${kind==='lyrics'||kind==='chords'?' meta-editable':''}${item?.deleted?' meta-deleted':''}${kind==='chords'&&item?.excluded?' meta-disabled':''}${kind==='lyrics'&&item?.disabled?' meta-disabled':''}`}
-function refreshMetaPanels(){const normal=document.querySelector('#metaPane .meta-tabs-content');if(normal)normal.outerHTML=metaPanelBodyHtml(false);const expanded=$('#expandedMetaBody');if(expanded)expanded.innerHTML=metaPanelBodyHtml(true);syncTimedMetaPanel(playCursorMs)}
-async function saveMetaQuickEdit(chordsBefore=null,chordReason='modifica chord',refreshBounds=null){if(!current)return;try{const projectId=current.id;const saved=await api('/api/projects/'+projectId,{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify(current)});if(current?.id!==projectId)return;current=saved;projectDirty=false;lastHistoryState=projectSnapshot();refreshMetaPanels();refreshTimelineMarkers();const bounds=refreshBounds||(chordsBefore?chordTrackRefreshBounds(chordsBefore,saved.chords):null);if(bounds&&hasGeneratedChordsTrack()){await enqueueChordsRefresh(bounds.oldTimeMs,bounds.newTimeMs,chordReason)}void syncNativeProjectFile(projectId)}catch(e){toast(e.message||'Salvataggio non riuscito')}}
+function refreshMetaPanels(){
+  const scrolls=[...document.querySelectorAll('#metaPane .meta-list,#expandedMetaBody .meta-list')].map(el=>el.scrollTop);
+  const normal=document.querySelector('#metaPane .meta-tabs-content');if(normal)normal.outerHTML=metaPanelBodyHtml(false);
+  const expanded=$('#expandedMetaBody');if(expanded)expanded.innerHTML=metaPanelBodyHtml(true);
+  [...document.querySelectorAll('#metaPane .meta-list,#expandedMetaBody .meta-list')].forEach((el,i)=>{el.scrollTop=scrolls[i]||0});
+  syncTimedMetaPanel(playCursorMs)
+}
+async function saveMetaQuickEdit(chordsBefore=null,chordReason='modifica chord',refreshBounds=null){if(!current)return;try{const projectId=current.id;const previousZoneSignature=lastMetronomeZoneSignature;const newZoneSignature=metronomeZoneSignature(current);const saved=await api('/api/projects/'+projectId,{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify(current)});if(current?.id!==projectId)return;current=saved;projectDirty=false;lastHistoryState=projectSnapshot();refreshMetaPanels();refreshTimelineMarkers();const bounds=refreshBounds||(chordsBefore?chordTrackRefreshBounds(chordsBefore,saved.chords):null);if(bounds&&hasGeneratedChordsTrack()){await enqueueChordsRefresh(bounds.oldTimeMs,bounds.newTimeMs,chordReason)}lastMetronomeZoneSignature=newZoneSignature;if(saved.metronome_mode==='zones'&&previousZoneSignature!==null&&previousZoneSignature!==newZoneSignature){
+      const oldSet=new Set(previousZoneSignature.split(',').filter(Boolean)),newSet=new Set(newZoneSignature.split(',').filter(Boolean));
+      const changed=[...new Set([...oldSet,...newSet].filter(v=>oldSet.has(v)!==newSet.has(v)).map(Number))];
+      const times=new Set([playCursorMs]);for(const time of changed){times.add(Math.max(0,time-1));times.add(time+1)}
+      for(const time of times)void enqueueMetronomeZoneRefresh('',time);
+    }void syncNativeProjectFile(projectId)}catch(e){toast(e.message||'Salvataggio non riuscito')}}
 function metaRawValue(kind,item){return kind==='chords'?String(item?.chord||''):kind==='markers'?String(item?.label||''):String(item?.text||'')}
 function metaDisplayValue(kind,item){return kind==='chords'?transposeChordLabel(item?.chord||'',current?.pitch_semitones||0):kind==='markers'?String(item?.label||''):String(item?.text||'')}
 function beginMetaInlineEdit(event,kind,index,field='value'){
   event?.preventDefault?.();event?.stopPropagation?.();if(!['lyrics','chords','markers'].includes(kind))return false;const item=current?.[kind]?.[Number(index)],host=event?.currentTarget;if(!item||!host)return false;
-  const input=document.createElement('input');input.className='meta-inline-input';input.dataset.metaInline='1';input.value=field==='time'?lyricsChordsEditorPosition(item.time_ms||0):metaRawValue(kind,item);host.replaceChildren(input);input.focus();input.select();if(kind==='chords'&&field==='value')attachChordShortcutPopover(input,host);
+  const input=document.createElement('input');input.className=field==='time'?'meta-inline-input meta-inline-time':'meta-inline-input';input.dataset.metaInline='1';input.value=field==='time'?lyricsChordsEditorPosition(item.time_ms||0):metaRawValue(kind,item);host.replaceChildren(input);input.focus();input.select();if(kind==='chords'&&field==='value')attachChordShortcutPopover(input,host);
   const cancel=()=>{closeChordShortcutPopover();refreshMetaPanels()};const commit=async()=>{if(input.dataset.committed==='1')return;input.dataset.committed='1';if(!input.isConnected)return;const chordsBefore=kind==='chords'?JSON.parse(JSON.stringify(current.chords||[])):null,oldTime=Number(item.time_ms||0),value=String(input.value??'').trim();if(field==='time'){const ms=parseLyricsChordsEditorPosition(value);if(!Number.isFinite(ms)){toast('Timestamp non valido: usa m:ss.mmm o mm:ss.mmm');return cancel()}ensureEventSnapshot(item);item.time_ms=ms;if(kind==='lyrics'&&oldTime!==ms)(current.chords||[]).forEach(ch=>{if(ch.manual_anchor&&Number(ch.anchor_line_time_ms)===oldTime){ensureEventSnapshot(ch);ch.anchor_line_time_ms=ms}})}else{if(!value){toast(kind==='chords'?'Il chord non può essere vuoto':'La lyric non può essere vuota');return cancel()}ensureEventSnapshot(item);if(kind==='chords'){item.chord=value;item.manual_override=true;const history=(current.chord_manual_recency||[]).filter(x=>x!==value.toLowerCase());history.push(value.toLowerCase());current.chord_manual_recency=history.slice(-80)}else if(kind==='markers')item.label=value;else{if(String(item.text||'')!==value)item.words=[];item.text=value}}current[kind].sort((a,b)=>Number(a.time_ms||0)-Number(b.time_ms||0));closeChordShortcutPopover();await saveMetaQuickEdit(chordsBefore,field==='time'?'spostamento chord':'modifica chord')};
   input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();input.blur()}else if(e.key==='Escape'){e.preventDefault();input.dataset.committed='1';cancel()}});input.addEventListener('blur',commit,{once:true});return false
 }
@@ -4316,7 +4395,32 @@ function closeMetaContextMenu(){document.querySelector('#metaContextMenu')?.remo
 function openMetaContextMenu(event,kind,index){if(!['lyrics','chords','markers'].includes(kind))return false;event?.preventDefault?.();event?.stopPropagation?.();closeMetaContextMenu();const item=current?.[kind]?.[Number(index)];if(!item)return false;const set=metaSelectionSet(kind);if(set&&(event?.metaKey||event?.ctrlKey)){set.has(Number(index))?set.delete(Number(index)):set.add(Number(index));refreshMetaPanels()}else if(set&&set.size&&!set.has(Number(index))){set.clear();set.add(Number(index));refreshMetaPanels()}if(set&&!set.size)set.add(Number(index));const selected=[...(set||new Set([Number(index)]))].map(Number).filter(i=>current?.[kind]?.[i]),multiCount=selected.length,inactive=metaEventInactive(kind,item),allInactive=selected.length>0&&selected.every(i=>metaEventInactive(kind,current[kind][i])),allActive=selected.length>0&&selected.every(i=>!metaEventInactive(kind,current[kind][i])),menu=document.createElement('div');menu.id='metaContextMenu';menu.className='lc-context-menu meta-context-menu';const shortcut=(label,key)=>`<span class="context-menu-label">${label}</span><kbd class="context-shortcut">${key}</kbd>`;menu.innerHTML=`<div class="lc-context-title">${kind==='chords'?'Chord':kind==='markers'?'Marker':'Lyrics'}${multiCount>1?` · ${multiCount} selezionati`:''}</div><button type="button" data-meta-action="goto">Go-To</button><button type="button" data-meta-action="edit" ${multiCount>1?'disabled':''}>Modifica</button><button type="button" data-meta-action="disable-selected" ${multiCount>1?(allInactive?'disabled':''):'hidden'}>Disabilita selezionati</button><button type="button" data-meta-action="disable" ${multiCount>1||inactive?'disabled':''}>Disabilita</button>${multiCount>1&&set?`<button type="button" class="danger-action" data-meta-action="delete-selected">${shortcut(`Cancella ${multiCount} selezionati`,'⌫')}</button>`:`<button type="button" class="danger-action" data-meta-action="delete">${shortcut('Cancella','⌫')}</button>`}<button type="button" data-meta-action="enable-selected" ${multiCount>1?(allActive?'disabled':''):'hidden'}>Riabilita selezionati</button><button type="button" data-meta-action="enable" ${multiCount>1||!inactive?'disabled':''}>Riabilita</button>`;document.body.appendChild(menu);menu.querySelectorAll('[data-meta-action]').forEach(btn=>btn.addEventListener('click',()=>{if(btn.disabled)return;const action=btn.dataset.metaAction;closeMetaContextMenu();if(action==='delete-selected')return deleteSelectedMetaEvents(kind);if(action==='disable-selected')return setSelectedMetaEventsEnabled(kind,false);if(action==='enable-selected')return setSelectedMetaEventsEnabled(kind,true);metaContextAction(action,kind,Number(index),event)}));const x=Math.max(8,Math.min(Number(event?.clientX||0),window.innerWidth-menu.offsetWidth-8)),y=Math.max(8,Math.min(Number(event?.clientY||0),window.innerHeight-menu.offsetHeight-8));menu.style.left=`${x}px`;menu.style.top=`${y}px`;return false}
 async function metaContextAction(action,kind,index,event){const item=current?.[kind]?.[Number(index)];if(!item)return;if(action==='goto'){goToTimestamp(item.time_ms);return}if(action==='edit'){const row=document.querySelector(`.meta-line[data-meta-kind="${kind}"][data-event-index="${Number(index)}"] .meta-value`);if(row)return beginMetaInlineEdit({preventDefault(){},stopPropagation(){},currentTarget:row},kind,index,'value');return}const chordsBefore=kind==='chords'?JSON.parse(JSON.stringify(current.chords||[])):null;if(action==='delete'&&(kind==='chords'||kind==='markers')){checkpointHistory();current[kind].splice(Number(index),1);await saveMetaQuickEdit(chordsBefore,kind==='chords'?'eliminazione chord':'eliminazione marker');if(kind==='chords')refreshTimelineChordLane();return}ensureEventSnapshot(item);if(action==='disable'){if(kind==='chords')item.excluded=true;else{item.deleted=false;item.disabled=true}}else if(action==='delete'){item.deleted=true}else if(action==='enable'){if(kind==='chords')item.excluded=false;else{item.deleted=false;item.disabled=false}}await saveMetaQuickEdit(chordsBefore,action==='disable'?'disabilitazione chord':action==='enable'?'riabilitazione chord':'modifica chord')}
 document.addEventListener('click',e=>{if(!e.target.closest?.('#metaContextMenu'))closeMetaContextMenu()});
-function syncTimedMetaPanel(timeMs){if(!current)return;const running=playbackActuallyRunning()||(typeof waPlaybackActive!=='undefined'&&waPlaybackActive&&!waPlaybackPaused);for(const kind of ['lyrics','chords']){const enabled=kind==='lyrics'?!!current.show_lyrics_playback:!!current.show_chords_playback;const rows=[...document.querySelectorAll(`.meta-line[data-meta-kind="${kind}"]`)];rows.forEach(row=>row.classList.remove('active-playback'));if(!enabled||!running){metaPlaybackScrollIndex[kind]=-1;continue}const arr=current[kind]||[];let idx=-1;for(let i=0;i<arr.length;i++){if(!eventIsActive(arr[i],kind))continue;if(Number(arr[i].time_ms||0)<=Number(timeMs||0))idx=i;else break}if(idx<0)continue;const active=rows.filter(row=>Number(row.dataset.eventIndex)===idx);active.forEach(row=>row.classList.add('active-playback'));if(metaPlaybackScrollIndex[kind]!==idx){active.forEach(row=>row.scrollIntoView({block:'nearest',behavior:'auto'}));metaPlaybackScrollIndex[kind]=idx}}}
+function syncTimedMetaPanel(timeMs){
+  if(!current)return;
+  const running=playbackActuallyRunning()||(typeof waPlaybackActive!=='undefined'&&waPlaybackActive&&!waPlaybackPaused);
+  for(const kind of ['lyrics','chords','markers']){
+    const enabled=kind==='lyrics'?!!current.show_lyrics_playback:kind==='chords'?!!current.show_chords_playback:!!current.show_markers_playback;
+    const rows=[...document.querySelectorAll(`.meta-line[data-meta-kind="${kind}"]`)];
+    rows.forEach(row=>row.classList.remove('active-playback'));
+    if(!enabled||!running){metaPlaybackScrollIndex[kind]=-1;continue}
+    const arr=current[kind]||[];let idx=-1;
+    for(let i=0;i<arr.length;i++){if(!eventIsActive(arr[i],kind))continue;if(Number(arr[i].time_ms||0)<=Number(timeMs||0))idx=i;else break}
+    if(idx<0)continue;
+    const active=rows.filter(row=>Number(row.dataset.eventIndex)===idx);
+    active.forEach(row=>row.classList.add('active-playback'));
+    if(metaPlaybackScrollIndex[kind]!==idx){active.forEach(row=>row.scrollIntoView({block:'nearest',behavior:'auto'}));metaPlaybackScrollIndex[kind]=idx}
+  }
+  const markerLines=[...document.querySelectorAll('.project-marker-line[data-marker-index]')];
+  let activeIndex=-1;
+  if(running&&current.show_markers_playback){
+    (current.markers||[]).forEach((marker,i)=>{if(!marker.deleted&&!marker.disabled&&Number(marker.time_ms||0)<=Number(timeMs||0))activeIndex=i});
+  }
+  markerLines.forEach(el=>{
+    const i=Number(el.dataset.markerIndex),marker=current.markers?.[i];
+    el.classList.toggle('marker-playback-active',i===activeIndex);
+    el.classList.toggle('marker-playback-exact',running&&!!marker&&!marker.deleted&&!marker.disabled&&Math.abs(Number(timeMs||0)-Number(marker.time_ms||0))<=90);
+  });
+}
 function metaPanelBodyHtml(expanded=false){
   const config={lyrics:['text','Lyrics'],chords:['chord','Chords'],markers:['label','Markers']},[key,label]=config[mixerMetaTab]||config.lyrics,source=current[mixerMetaTab]||[],rows=source.map((x,index)=>({x,index}));const editable=['lyrics','chords','markers'].includes(mixerMetaTab);const displayValue=x=>mixerMetaTab==='chords'?transposeChordLabel(x[key],current.pitch_semitones||0):x[key];const resetButton=mixerMetaTab==='lyrics'?`<button class="tool danger" onclick="resetTimedData('lyrics')">Reset lyrics</button>`:mixerMetaTab==='chords'?`<button class="tool danger" onclick="resetTimedData('chords')">Reset chords</button>`:'';const hasLyrics=(current.lyrics||[]).some(x=>eventIsActive(x,'lyrics')),hasChords=(current.chords||[]).some(x=>eventIsActive(x,'chords'));const editor=`<button class="tool accent" onclick="openLyricsChordsEditor()">Editor Lyrics + Chords + Markers</button>`;const exports=mixerMetaTab==='lyrics'&&hasLyrics?`<button class="tool" onclick="downloadProjectLyrics(false)">TXT Lyrics</button>${hasChords?`<button class="tool" onclick="downloadProjectLyrics(true)">TXT Lyrics + Chords</button><button class="tool" onclick="downloadProjectChordPro()">ChordPro</button>`:''}<button class="tool" onclick="openLyricsPdfStylePanel()">Stile PDF</button><button class="tool" onclick="previewProjectLyricsPdf()">Anteprima PDF</button><button class="tool" onclick="downloadProjectLyricsPdf()">Salva PDF</button>`:'';const markerExtract=mixerMetaTab==='markers'?`<button class="tool" onclick="extractMarkersFromSelectedTrack()">Estrai markers</button>`:'';const lineHtml=rows.map(({x,index})=>`<div class="meta-line${metaEventStateClass(mixerMetaTab,x)} ${metaSelectionSet(mixerMetaTab)?.has(index)?'meta-multi-selected':''}" data-meta-kind="${mixerMetaTab}" data-event-index="${index}" data-time-ms="${Number(x.time_ms||0)}" ${editable?`onclick="metaEventClick(event,'${mixerMetaTab}',${index})" oncontextmenu="return openMetaContextMenu(event,'${mixerMetaTab}',${index})"`:''}><time ${editable?`ondblclick="return beginMetaInlineEdit(event,'${mixerMetaTab}',${index},'time')" title="Doppio click per modificare il timestamp"`:''}>${fmtTime(x.time_ms/1000)}</time><span class="meta-value" ${editable?`ondblclick="return beginMetaInlineEdit(event,'${mixerMetaTab}',${index},'value')" title="Doppio click per modificare"`:''}>${esc(displayValue(x))}</span></div>`).join('');return `<div class="meta-tabs-content ${expanded?'meta-expanded-content':''}"><div class="meta-list">${lineHtml||`<div class="hint">No synchronized ${label.toLowerCase()} yet.</div>`}</div><div class="meta-actions"><button class="tool" onclick="editTimed('${mixerMetaTab}')">Edit ${label.toLowerCase()}</button>${resetButton}${markerExtract}${editor}${exports}</div>${expanded?'':`<textarea id="lyrics" hidden>${esc(linesToText(current.lyrics,'text'))}</textarea><textarea id="chords" hidden>${esc(linesToText(current.chords,'chord'))}</textarea><textarea id="markers" hidden>${esc(linesToText(current.markers,'label'))}</textarea>`}</div>`;
 }

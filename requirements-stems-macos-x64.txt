@@ -6,3 +6,6 @@ torchaudio==2.2.2
 demucs==4.1.0
 msgpack==1.2.3
 urllib3==2.8.0
+
+# Lead/backing vocal AI model download and inference (on-demand).
+audio-separator[cpu]==0.47.0

@@ -12,6 +12,7 @@ import threading
 import time
 import uuid
 import zipfile
+import wave
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
@@ -127,12 +128,22 @@ def _lead_backing_model_info(model_id: str) -> dict:
     model["location"] = "local" if NATIVE_SINGLE_USER else "server"
     return model
 
+def _lead_backing_engine_available() -> bool:
+    # Do not import the heavy ML stack to render a settings dialog.
+    import importlib.util
+    try:
+        return importlib.util.find_spec("audio_separator") is not None
+    except (ImportError, ValueError):
+        return False
+
+
 def _lead_backing_catalog() -> dict:
     return {
         "default_model": LEAD_BACKING_DEFAULT_MODEL if any(x["id"] == LEAD_BACKING_DEFAULT_MODEL for x in LEAD_BACKING_MODELS) else "uvr_mdxnet_kara_2",
         "models": [_lead_backing_model_info(item["id"]) for item in LEAD_BACKING_MODELS],
         "storage": "local" if NATIVE_SINGLE_USER else "server",
         "on_demand": True,
+        "engine_available": _lead_backing_engine_available(),
     }
 
 def _download_lead_backing_model(model_id: str) -> dict:
@@ -141,7 +152,7 @@ def _download_lead_backing_model(model_id: str) -> dict:
     try:
         from audio_separator.separator import Separator
     except ImportError as exc:
-        raise RuntimeError("audio-separator is not installed") from exc
+        raise RuntimeError("Il motore audio-separator non è installato in questo runtime. Installare le dipendenze di separazione (requirements-stems.txt) e riavviare l’app, oppure selezionare il metodo DSP FFmpeg center/side.") from exc
     separator = Separator(model_file_dir=str(LEAD_BACKING_MODEL_DIR), output_dir=str(LEAD_BACKING_MODEL_DIR), info_only=True)
     separator.download_model_files(info["filename"])
     return _lead_backing_model_info(model_id)
@@ -197,6 +208,7 @@ def _stem_job_public(job: dict) -> dict:
         "analysis": job.get("analysis", {}),
         "vocal_split_method": job.get("vocal_split_method"),
         "backing_vocal_model": job.get("backing_vocal_model"),
+        "split_backing_vocals": bool(job.get("split_backing_vocals")),
     }
 
 
@@ -2812,7 +2824,9 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
                 vocal_stem = next((Path(stem) for stem in stems if Path(stem).stem.lower() in {"vocals", "vocal"}), None)
                 if vocal_stem is None:
                     raise RuntimeError("Il modello selezionato non ha prodotto uno stem vocals da separare")
-                progress(86, "Separazione voce principale e backing vocals")
+                method_label = ("DSP FFmpeg center/side" if backing_vocal_model == "ffmpeg-center-side"
+                                else next((x["display_name"] for x in LEAD_BACKING_MODELS if x["id"] == backing_vocal_model), backing_vocal_model))
+                progress(86, f"Separazione lead/backing vocals: {method_label}")
                 lead_vocal, backing_vocal, vocal_split_method = _split_lead_backing_vocals(
                     vocal_stem, td / "lead-backing", model_id=backing_vocal_model, cancel_event=cancel_event
                 )
@@ -3644,7 +3658,31 @@ def _create_metronome_track_locked(pid: str, request: Request, mode: str = "fixe
             project.metronome_shift_ms = 0
             project.metronome_grid_origin_ms = int(beat_times_ms[0]) if beat_times_ms else 0
         elif mode == "zones":
-            beat_times_ms = zoned_metronome_beats(project, duration_ms)
+            boundaries = [0] + sorted({int(m.time_ms) for m in project.markers if not m.disabled and not m.deleted and 0 < m.time_ms < duration_ms}) + [duration_ms]
+            zone_bpms = dict(project.metronome_zone_bpms or {})
+            if reference_track is not None:
+                with tempfile.TemporaryDirectory() as td:
+                    rendered = Path(td) / "reference.wav"
+                    render_track(reference_track, audio_path(pid, reference_track.filename), rendered, sample_rate=int(project.sample_rate))
+                    with wave.open(str(rendered), "rb") as source:
+                        rate = source.getframerate()
+                        for start, end in zip(boundaries, boundaries[1:]):
+                            if end-start < 1800:
+                                zone_bpms[str(start)] = float(project.bpm)
+                                continue
+                            source.setpos(min(source.getnframes(), int(start * rate / 1000)))
+                            length = min(source.getnframes()-source.tell(), int((end-start)*rate/1000))
+                            excerpt = Path(td) / f"zone-{start}.wav"
+                            with wave.open(str(excerpt), "wb") as segment:
+                                segment.setparams(source.getparams())
+                                segment.writeframes(source.readframes(max(0,length)))
+                            try:
+                                bpm, _ = estimate_bpm_and_signature(excerpt)
+                                zone_bpms[str(start)] = bpm
+                            except (ValueError, RuntimeError, OSError):
+                                zone_bpms[str(start)] = float(project.bpm)
+            project.metronome_zone_bpms = {str(start): float(zone_bpms.get(str(start), project.bpm)) for start in boundaries[:-1]}
+            beat_times_ms = zoned_metronome_beats(project, duration_ms, project.metronome_zone_bpms)
             zone_starts = sorted(m.time_ms for m in project.markers if not m.disabled and not m.deleted and 0 < m.time_ms < duration_ms)
             duration_ms = generate_adaptive_metronome_wav(project, out, beat_times_ms, accent_reset_ms=zone_starts)
             project.metronome_mode = "zones"
@@ -3741,8 +3779,91 @@ def _create_metronome_track_locked(pid: str, request: Request, mode: str = "fixe
     return {"project": project, "track": track, "reused": reused, "mode": mode, "tempo_map": tempo_points if mode == "adaptive" else [], "reference_track_id": project.metronome_reference_track_id, "reference_track_name": project.metronome_reference_track_name}
 
 
+def _update_metronome_zone_locked(pid: str, request: Request, time_ms: int, track_id: str):
+    """Analyze one marker zone, replace only its PCM and envelope bins atomically."""
+    import numpy as np
+    project = _project_for_actor(request, pid)
+    if project.metronome_mode != "zones":
+        return _create_metronome_track_locked(pid, request, mode=project.metronome_mode,
+            track_id=track_id or project.metronome_reference_track_id, sensitivity=project.metronome_sensitivity)
+    duration = project_duration_ms(project)
+    marks = sorted({int(m.time_ms) for m in project.markers if not m.disabled and not m.deleted and 0 < m.time_ms < duration})
+    boundaries = [0, *marks, duration]
+    start, end = next(((a, b) for a,b in zip(boundaries, boundaries[1:]) if a <= time_ms < b), (boundaries[-2], duration))
+    click_track = next((t for t in project.tracks if t.type == "click"), None)
+    if click_track is None:
+        raise HTTPException(400, "Traccia metronomo assente")
+    reference_id = track_id or project.metronome_reference_track_id
+    reference = next((t for t in project.tracks if t.id == reference_id and t.type != "click" and t.filename), None)
+    if track_id and reference is None:
+        raise HTTPException(400, "Selezionare una traccia audio di riferimento valida")
+    bpm = float(project.bpm)
+    if reference is not None and end-start >= 1800:
+        try:
+            with tempfile.TemporaryDirectory() as td:
+                rendered=Path(td)/"source.wav"; excerpt=Path(td)/"zone.wav"
+                render_track(reference, audio_path(pid, reference.filename), rendered, sample_rate=int(project.sample_rate))
+                with wave.open(str(rendered), "rb") as source:
+                    rate=source.getframerate(); source.setpos(min(source.getnframes(), int(start*rate/1000)))
+                    data=source.readframes(max(0, min(source.getnframes()-source.tell(), int((end-start)*rate/1000))))
+                    with wave.open(str(excerpt), "wb") as segment:
+                        segment.setparams(source.getparams()); segment.writeframes(data)
+                bpm,_=estimate_bpm_and_signature(excerpt)
+        except (ValueError, RuntimeError, OSError):
+            bpm=float(project.bpm)
+    original=audio_path(pid,click_track.filename)
+    if not original.exists():
+        raise HTTPException(409,"Audio metronomo non trovato")
+    temp=original.with_name(f".{original.stem}.{uuid.uuid4().hex}.tmp.wav")
+    try:
+        with wave.open(str(original), "rb") as source:
+            if source.getnchannels()!=1 or source.getsampwidth()!=2 or source.getcomptype()!="NONE":
+                raise HTTPException(409,"Metronomo non compatibile con refresh parziale")
+            rate=source.getframerate(); frames=source.getnframes()
+            lo=max(0,min(frames,round(start*rate/1000))); hi=max(lo,min(frames,round(end*rate/1000)))
+            length=hi-lo
+            pcm=np.zeros(length,dtype=np.int16)
+            click_len=max(1,round(.045*rate))
+            tone_t=np.arange(click_len,dtype=np.float64)/rate
+            tick_num=max(1,int(str(project.time_signature or "4/4").split("/")[0]))
+            step=60000.0/max(1.0,float(bpm))
+            for index in range(max(0,int((end-start)/step)+2)):
+                local=round(index*step*rate/1000)
+                if local>=length:break
+                freq=1320.0 if index%tick_num==0 else 880.0
+                tone=np.sin(2*np.pi*freq*tone_t)*np.exp(-tone_t*55.0)
+                count=min(click_len,length-local)
+                pcm[local:local+count]=np.asarray(np.clip(tone[:count],-1,1)*32767,dtype=np.int16)
+            with wave.open(str(temp),"wb") as output:
+                output.setparams(source.getparams())
+                source.setpos(0)
+                remaining=lo
+                while remaining:
+                    chunk=min(65536,remaining);output.writeframesraw(source.readframes(chunk));remaining-=chunk
+                output.writeframesraw(pcm.tobytes())
+                source.setpos(hi);remaining=frames-hi
+                while remaining:
+                    chunk=min(65536,remaining);output.writeframesraw(source.readframes(chunk));remaining-=chunk
+                output.writeframes(b"")
+        # Build metadata before atomic replacement; preserve old WAV on any failure.
+        new_peaks=waveform_peaks(temp)
+        with temp.open('rb') as fd:os.fsync(fd.fileno())
+        os.replace(temp,original)
+        project.metronome_zone_bpms[str(start)] = round(float(bpm),1)
+        if reference is not None:
+            project.metronome_reference_track_id=reference.id
+            project.metronome_reference_track_name=reference.name
+        click_track.waveform_peaks=new_peaks
+        click_track.waveform_revision=_track_waveform_revision(click_track,original)
+        save_project(project)
+    finally:
+        temp.unlink(missing_ok=True)
+    return {"project":project,"track":click_track,"zone_start_ms":start,"zone_end_ms":end,
+        "refresh_scope":"zone_atomic","zone_bpm":bpm}
+
+
 @app.post("/api/projects/{pid}/metronome-track/refresh")
-def refresh_metronome_at_playhead(pid: str, request: Request, time_ms: int = 0):
+def refresh_metronome_at_playhead(pid: str, request: Request, time_ms: int = 0, track_id: str = ""):
     project = _project_for_actor(request, pid)
     mode = project.metronome_mode
     # Reuses the stored mode/settings. Zones are selected by the playhead;
@@ -3751,7 +3872,9 @@ def refresh_metronome_at_playhead(pid: str, request: Request, time_ms: int = 0):
     bounds = [0] + [t for t in markers if t < project_duration_ms(project)] + [project_duration_ms(project)]
     zone = next(((a, b) for a, b in zip(bounds, bounds[1:]) if a <= time_ms < b), (0, project_duration_ms(project)))
     with METRONOME_TRACK_LOCK:
-        result = _create_metronome_track_locked(pid, request, mode=mode, sensitivity=project.metronome_sensitivity)
+        if mode == "zones":
+            return _update_metronome_zone_locked(pid, request, time_ms, track_id)
+        result = _create_metronome_track_locked(pid, request, mode=mode, track_id=track_id or project.metronome_reference_track_id, sensitivity=project.metronome_sensitivity)
     result["zone_start_ms"], result["zone_end_ms"] = zone
     result["refresh_scope"] = "full_atomic"
     return result

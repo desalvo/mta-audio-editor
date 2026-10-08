@@ -223,12 +223,13 @@ def generate_adaptive_metronome_wav(project: Project, out: Path, beat_times_ms: 
     return duration_ms
 
 
-def zoned_metronome_beats(project: Project, duration_ms: int) -> list[int]:
+def zoned_metronome_beats(project: Project, duration_ms: int, zone_bpms: dict[str, float] | None = None) -> list[int]:
     """Rephase every zone at an active marker; each zone starts with an accented beat."""
     boundaries = [0] + sorted({int(m.time_ms) for m in project.markers if not m.deleted and not m.disabled and 0 < m.time_ms < duration_ms}) + [duration_ms]
-    step = 60000.0 / max(1.0, float(project.bpm))
     beats = []
+    zone_bpms = zone_bpms or {}
     for start, end in zip(boundaries, boundaries[1:]):
+        step = 60000.0 / max(1.0, float(zone_bpms.get(str(start), project.bpm)))
         i = 0
         while start + round(i * step) < end:
             beats.append(start + round(i * step))
