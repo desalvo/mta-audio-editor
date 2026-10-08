@@ -71,7 +71,7 @@ def test_metronome_helper_creates_then_reuses_single_track(monkeypatch, tmp_path
     monkeypatch.setattr(main_module, "_project_for_actor", lambda request, pid: project)
     monkeypatch.setattr(main_module, "project_duration_ms", lambda p: 4000)
     monkeypatch.setattr(main_module, "audio_path", lambda pid, filename: tmp_path / filename)
-    monkeypatch.setattr(main_module, "generate_metronome_wav", lambda p, out: 4000)
+    monkeypatch.setattr(main_module, "generate_metronome_wav", lambda p, out: (Path(out).write_bytes(b"mock-wav"), 4000)[1])
     monkeypatch.setattr(main_module, "waveform_peaks", lambda out: [0.1, 0.2])
     monkeypatch.setattr(main_module, "_track_waveform_revision", lambda track, out: "rev")
     monkeypatch.setattr(main_module, "save_project", lambda p: saved.append(p.model_copy(deep=True)))
@@ -103,7 +103,7 @@ def test_metronome_helper_consolidates_old_duplicates(monkeypatch, tmp_path):
     monkeypatch.setattr(main_module, "_project_for_actor", lambda request, pid: project)
     monkeypatch.setattr(main_module, "project_duration_ms", lambda p: 3000)
     monkeypatch.setattr(main_module, "audio_path", lambda pid, filename: tmp_path / filename)
-    monkeypatch.setattr(main_module, "generate_metronome_wav", lambda p, out: 3000)
+    monkeypatch.setattr(main_module, "generate_metronome_wav", lambda p, out: (Path(out).write_bytes(b"mock-wav"), 3000)[1])
     monkeypatch.setattr(main_module, "waveform_peaks", lambda out: [])
     monkeypatch.setattr(main_module, "save_project", lambda p: None)
 

@@ -41,8 +41,8 @@ def test_project_persists_adaptive_tempo_map_and_frontend_exposes_mode():
     restored = Project.model_validate_json(project.model_dump_json())
     assert restored.metronome_mode == "adaptive"
     assert restored.adaptive_tempo_map[0].bpm == 120
-    assert "createMetronomeTrack('adaptive')" in JS
-    assert "tutti i beat e tutte le variazioni vengono ricalcolati" in JS
+    assert "openMetronomeSettings()" in JS
+    assert "Sensibilità adattiva" in JS
     assert "project.adaptive_tempo_map = tempo_points" in MAIN
 
 

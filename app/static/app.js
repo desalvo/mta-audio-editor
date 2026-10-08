@@ -413,7 +413,7 @@ function render(){
     <div class="editor-grid ${current.inspector_visible===false?'inspector-hidden':''}" id="editorGrid" style="--track-column-width:${trackWidth}px">
       <div class="track-column" id="trackColumn"><div class="track-column-head">TRACKS</div>${current.tracks.map((t,i)=>trackHead(t,i)).join('')}</div>
       <div class="track-resizer" id="trackResizer" title="Ridimensiona Tracks"></div>
-      <div class="timeline-pane" id="timelinePane"><div class="ruler"><canvas id="ruler" width="${W}" height="30"></canvas></div><div class="lanes" id="lanes" style="width:${W}px"><div class="timeline-chord-lane ${current.show_chords_playback?'':'hidden'}" id="timelineChordLane">${timelineChordLaneHtml(W)}</div>${current.tracks.map((t,i)=>lane(t,W,i)).join('')}<div class="playhead" id="playhead" style="left:${playCursorMs/1000*pxPerSec}px"></div></div></div>
+      <div class="timeline-pane" id="timelinePane"><div class="ruler"><canvas id="ruler" width="${W}" height="30"></canvas></div><div class="lanes" id="lanes" style="width:${W}px"><div class="timeline-chord-lane ${current.show_chords_playback?'':'hidden'}" id="timelineChordLane">${timelineChordLaneHtml(W)}</div>${current.tracks.map((t,i)=>lane(t,W,i)).join('')}${timelineMarkersHtml()}<div class="playhead" id="playhead" style="left:${playCursorMs/1000*pxPerSec}px"></div></div></div>
       ${inspectorHtml()}
     </div>`;
   $('#mixerDock').innerHTML=mixerHtml();
@@ -432,6 +432,15 @@ function chordTrackRefreshBounds(before,after){
   const reverse=new Map();for(const ch of b){const k=chordTrackAudioSignature(ch);reverse.set(k,(reverse.get(k)||0)+1)}
   for(const ch of a){const k=chordTrackAudioSignature(ch),n=reverse.get(k)||0;if(n)reverse.set(k,n-1);else changed.push(Number(ch.time_ms||0))}
   if(!changed.length)return null;return {oldTimeMs:Math.max(0,Math.round(Math.min(...changed))),newTimeMs:Math.max(0,Math.round(Math.max(...changed)))}
+}
+let chordsRefreshQueue=Promise.resolve();
+function enqueueChordsRefresh(oldMs,newMs,reason){
+  const projectId=current?.id;
+  chordsRefreshQueue=chordsRefreshQueue.catch(()=>{}).then(()=>{
+    if(current?.id!==projectId)return null;
+    return refreshGeneratedChordsTrack(oldMs,newMs,reason);
+  });
+  return chordsRefreshQueue;
 }
 async function refreshGeneratedChordsTrack(oldTimeMs,newTimeMs,reason='modifica'){
   if(!current||!hasGeneratedChordsTrack())return null;
@@ -478,6 +487,30 @@ async function createChordsTrack(){
   }catch(e){toast(e.message)}finally{chordsTrackCreatePending=false}
 }
 
+function openMetronomeSettings(){
+  if(!current)return toast('Apri prima un progetto');
+  const mode=current.metronome_mode||'fixed', sensitivity=Number(current.metronome_sensitivity??0.35);
+  showUtilityModal('Impostazioni metronomo',`<div class="workflow-grid"><label class="workflow-field"><span>Tipo di metronomo</span><select id="metronomeMode"><option value="fixed" ${mode==='fixed'?'selected':''}>Standard · intero progetto</option><option value="zones" ${mode==='zones'?'selected':''}>A zone · tra marker</option><option value="adaptive" ${mode==='adaptive'?'selected':''}>Adattivo · analisi ritmica</option></select></label><label class="workflow-field"><span>Sensibilità adattiva (0 stabile – 1 reattiva)</span><input id="metronomeSensitivity" type="range" min="0" max="1" step="0.05" value="${sensitivity}"></label></div><p class="muted">I marker attivi delimitano le zone; la griglia riparte a ogni marker. Le opzioni sono salvate nel progetto.</p><div class="modal-actions"><button onclick="closeUtilityModal()">Annulla</button><button class="primary" onclick="applyMetronomeSettings()">Genera metronomo</button></div>`);
+}
+async function applyMetronomeSettings(){
+  if(!current)return;
+  const mode=$('#metronomeMode')?.value||'fixed';
+  const sensitivity=Number($('#metronomeSensitivity')?.value||0.35);
+  current.metronome_mode=mode;current.metronome_sensitivity=sensitivity;
+  closeUtilityModal();await createMetronomeTrack(mode);
+}
+async function refreshGeneratedTrackFromContext(id){
+  if(!current)return;
+  const t=trackById(id);if(!t)return;
+  try{
+    if(t.type==='click'||String(t.name||'').toLowerCase().includes('metronom')){
+      const result=await api(`/api/projects/${current.id}/metronome-track/refresh?time_ms=${Math.max(0,Math.round(playCursorMs||0))}`,{method:'POST'});
+      current=result.project;invalidateTrackAudioCache(result.track.id);render();toast('Metronomo rigenerato');
+    }else if(isGeneratedChordsTrack(t)){
+      await flushAutosave();await enqueueChordsRefresh(0,Math.round((current?.tracks||[]).reduce((m,t)=>Math.max(m,Number(t.duration_ms||0)),0)),'refresh manuale');
+    }
+  }catch(e){toast('Refresh fallito: '+e.message)}
+}
 let metronomeCreatePending=false;
 async function createMetronomeTrack(mode='fixed',referenceTrackId=''){
   if(metronomeCreatePending)return toast('Creazione/aggiornamento metronomo già in corso…');
@@ -489,7 +522,7 @@ async function createMetronomeTrack(mode='fixed',referenceTrackId=''){
     await flushAutosave();
     if(adaptive)showUtilityModal('Metronomo adattivo',`<div class="stem-progress-card"><div class="stem-progress-head"><b>Analisi completa delle variazioni di tempo…</b><span>…</span></div><div class="stem-progress indeterminate"><div class="stem-progress-fill"></div></div><div class="stem-progress-message">La tempo map precedente non viene riutilizzata: tutti i beat e tutte le variazioni vengono ricalcolati sul brano corrente.</div></div>`);
     const reference=referenceTrackId?trackById(referenceTrackId):null;
-    const query=`mode=${adaptive?'adaptive':'fixed'}${referenceTrackId?`&track_id=${encodeURIComponent(referenceTrackId)}`:''}`;
+    const query=`mode=${encodeURIComponent(mode)}&sensitivity=${encodeURIComponent(current.metronome_sensitivity??0.35)}${referenceTrackId?`&track_id=${encodeURIComponent(referenceTrackId)}`:''}`;
     const result=await api(`/api/projects/${current.id}/metronome-track?${query}`,{method:'POST'});
     current=result.project;
     selectedTrackId=result.track.id;
@@ -517,7 +550,7 @@ function toolbarHtml(){
     <div class="toolbar-sep"></div><div class="toolbar-group"><label>Snap</label><select><option>Bars</option><option>Beats</option><option>Off</option></select></div>
     <button class="toolbar-action emphasis" onclick="openStemWorkflow()">▥ Import &amp; Separate</button>
     <button class="toolbar-action" onclick="openYoutubeImport()" title="Importa solo audio da un singolo video YouTube">▶ Import YouTube</button>
-    <button class="toolbar-action" onclick="createMetronomeTrack('fixed')" title="Crea una traccia click a BPM fisso per tutta la durata corrente del progetto">♩ Metronomo</button><button class="toolbar-action emphasis" onclick="createMetronomeTrack('adaptive')" title="Ricalcola tutte le variazioni di tempo del brano e crea una traccia click adattiva">♩≈ Adattivo</button><button class="toolbar-action" onclick="openAdaptiveMetronomeShift()" title="Sposta il metronomo adattivo in millisecondi o beat">↔ Shift adattivo</button><button class="toolbar-action" onclick="createChordsTrack()" title="Crea o rigenera una sola traccia Chords con piano digitale sincronizzato agli accordi del progetto">♬ Chords</button>
+    <button class="toolbar-action" onclick="openMetronomeSettings()" title="Configura e crea metronomo">♩ Metronomo</button><button class="toolbar-action" onclick="openAdaptiveMetronomeShift()" title="Sposta il metronomo adattivo in millisecondi o beat">↔ Shift adattivo</button><button class="toolbar-action" onclick="createChordsTrack()" title="Crea o rigenera una sola traccia Chords con piano digitale sincronizzato agli accordi del progetto">♬ Chords</button>
     <div class="toolbar-group"><input id="newTrackFile" type="file" accept=".mp3,.wav,.flac,.m4a,audio/*" onchange="addTrack()"><select id="newSync"><option value="manual">Manual sync</option><option value="auto">Auto sync</option></select><input id="newOffset" type="number" value="0" title="Offset ms" style="width:72px"><select id="newRef" style="max-width:115px">${refs}</select><button class="toolbar-action" onclick="addTrack()">♫ Import Audio Track</button></div>
     <div class="toolbar-sep"></div><button id="undoBtn" class="toolbar-action" onclick="undoEdit()">↶ Undo</button><button id="redoBtn" class="toolbar-action" onclick="redoEdit()">↷ Redo</button><button class="toolbar-action" onclick="cutTimelineSelection()">✂ Cut</button><button class="toolbar-action" onclick="copyTimelineSelection()">⧉ Copy</button><button id="pasteBtn" class="toolbar-action" onclick="pasteTimelineSelection()">▣ Paste</button><button class="toolbar-action danger" onclick="removeTimelineSelection()">⌫ Remove</button><div class="toolbar-grow"></div><span class="selected-track-count" id="selectedTrackCount">${selectedTrackIds().length} selected</span><span class="selection-info" id="selectionInfo">0.000 → 0.000 s</span>
   </div>`
@@ -792,12 +825,12 @@ function openTrackContextMenuAt(id,clientX,clientY){
     <button type="button" ${disabled} onclick="closeTrackContextMenu();openTrackStemWorkflow('${id}')">▥ <span>Separa</span></button>
     <button type="button" onclick="closeTrackContextMenu();openSampleEditor('${id}')">⌁ <span>Editor waveform / campioni</span></button>
     <button type="button" onclick="closeTrackContextMenu();recalculateBpmFromTrack('${id}')">♩ <span>Ricalcola BPM da questa traccia</span></button>
-    <button type="button" onclick="closeTrackContextMenu();createMetronomeTrack('fixed','${id}')">♩ <span>Metronomo da questa traccia</span></button>
-    <button type="button" onclick="closeTrackContextMenu();createMetronomeTrack('adaptive','${id}')">♩≈ <span>Metronomo adattivo da questa traccia</span></button>
+
+
     <button type="button" onclick="closeTrackContextMenu();openTextAnalysisChooser('${id}','lyrics')">≡ <span>Estrai lyrics</span></button>
     <button type="button" onclick="closeTrackContextMenu();openTextAnalysisChooser('${id}','chords')">♬ <span>Estrai chords</span></button>
     <button type="button" onclick="closeTrackContextMenu();extractMarkersFromTrack('${id}')">⚑ <span>Estrai marker automaticamente</span></button>
-    <button type="button" onclick="closeTrackContextMenu();syncMetronomeToTrack('${id}')">⌁ <span>Sincronizza metronomo</span></button>
+    ${(track.type==='click'||isGeneratedChordsTrack(track))?`<button type="button" onclick="closeTrackContextMenu();refreshGeneratedTrackFromContext('${id}')">⟳ <span>Rigenera traccia</span></button>`:''}
     <button type="button" onclick="closeTrackContextMenu();openTrackDelayDialog('${id}')">↔ <span>Delay / anticipo traccia…</span></button>
     <button type="button" onclick="closeTrackContextMenu();addTimelineChordAtPlayhead()">♬ <span class="context-menu-label">+ Chord alla posizione corrente</span><kbd class="context-shortcut">C</kbd></button>
     <button type="button" class="danger" onclick="closeTrackContextMenu();deleteSelection(true)">⌫ <span>Delete selected range</span></button>
@@ -1016,6 +1049,10 @@ function updateTimelineChordDragGuide(guide,timeMs){if(!guide)return;guide.style
 function removeTimelineChordDragGuide(){document.querySelector('#timelineChordDragGuide')?.remove()}
 let timelineChordSelectedIndices=new Set();
 function normalizeTimelineChordSelection(){const n=current?.chords?.length||0;timelineChordSelectedIndices=new Set([...timelineChordSelectedIndices].filter(i=>Number.isInteger(i)&&i>=0&&i<n&&!current.chords[i]?.deleted));}
+function timelineMarkersHtml(){
+  if(!current?.show_markers_playback)return '';
+  return (current.markers||[]).filter(m=>!m.deleted&&!m.disabled).map(m=>`<div class="project-marker-line" style="left:${Number(m.time_ms||0)/1000*pxPerSec}px;border-left-color:${esc(m.color||'#204A87')}" title="${esc(m.label||'Marker')}"><span>${esc(m.label||'Marker')}</span></div>`).join('');
+}
 function timelineChordLaneHtml(W=widthPx()){
   if(!current?.show_chords_playback)return '';
   normalizeTimelineChordSelection();
@@ -1066,7 +1103,7 @@ function beginTimelineChordDrag(event,index){
   timelineChordDrag={index:Number(index),startTime,startX,pointerId,el,moved:false,lastTime:startTime,guide:createTimelineChordDragGuide(startTime)};
   el.setPointerCapture?.(pointerId);el.classList.add('dragging');
   const move=ev=>{const d=timelineChordDrag;if(!d||ev.pointerId!==d.pointerId)return;const delta=(ev.clientX-d.startX)/Math.max(1,pxPerSec)*1000;d.lastTime=Math.max(0,Math.round(d.startTime+delta));d.moved=d.moved||Math.abs(ev.clientX-d.startX)>2;d.el.style.left=`${d.lastTime/1000*pxPerSec}px`;d.el.title=`${lyricsChordsEditorPosition(d.lastTime)} · rilascio per salvare`;updateTimelineChordDragGuide(d.guide,d.lastTime);};
-  const finish=async ev=>{const d=timelineChordDrag;if(!d||ev.pointerId!==d.pointerId)return;window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',finish);window.removeEventListener('pointercancel',cancel);d.el.classList.remove('dragging');removeTimelineChordDragGuide();timelineChordDrag=null;if(!d.moved)return;const chord=current?.chords?.[d.index];if(!chord)return;const oldTime=d.startTime,newTime=d.lastTime,refreshTrack=hasGeneratedChordsTrack();checkpointHistory();ensureEventSnapshot(chord);chord.time_ms=d.lastTime;current.chords.sort((a,b)=>Number(a.time_ms||0)-Number(b.time_ms||0));projectDirty=true;await saveMetaQuickEdit();refreshTimelineChordLane();markDirty(0);if(refreshTrack)await refreshGeneratedChordsTrack(oldTime,newTime,'spostamento chord');};
+  const finish=async ev=>{const d=timelineChordDrag;if(!d||ev.pointerId!==d.pointerId)return;window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',finish);window.removeEventListener('pointercancel',cancel);d.el.classList.remove('dragging');removeTimelineChordDragGuide();timelineChordDrag=null;if(!d.moved)return;const chord=current?.chords?.[d.index];if(!chord)return;const oldTime=d.startTime,newTime=d.lastTime,refreshTrack=hasGeneratedChordsTrack();checkpointHistory();ensureEventSnapshot(chord);chord.time_ms=d.lastTime;current.chords.sort((a,b)=>Number(a.time_ms||0)-Number(b.time_ms||0));projectDirty=true;refreshTimelineChordLane();updateEditActionState();await saveMetaQuickEdit(null,'spostamento chord',refreshTrack?{oldTimeMs:oldTime,newTimeMs:newTime}:null);};
   const cancel=ev=>{const d=timelineChordDrag;if(!d||ev.pointerId!==d.pointerId)return;window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',finish);window.removeEventListener('pointercancel',cancel);d.el.classList.remove('dragging');removeTimelineChordDragGuide();timelineChordDrag=null;refreshTimelineChordLane();};
   window.addEventListener('pointermove',move);window.addEventListener('pointerup',finish);window.addEventListener('pointercancel',cancel);
 }
@@ -2586,6 +2623,7 @@ function followPlayhead(x,force=false){
 }
 
 function togglePlaybackLyrics(){if(!current)return;current.show_lyrics_playback=!current.show_lyrics_playback;updateTransportToggleButtons();markDirty();updateTimedPlaybackOverlay(playCursorMs)}
+function togglePlaybackMarkers(){if(!current)return;current.show_markers_playback=!current.show_markers_playback;render();markDirty()}
 function togglePlaybackChords(){if(!current)return;current.show_chords_playback=!current.show_chords_playback;updateTransportToggleButtons();refreshTimelineChordLane();markDirty();updateTimedPlaybackOverlay(playCursorMs)}
 function appDisplayPreference(key,defaultValue=false){const value=localStorage.getItem(`mta.${key}`);return value==null?defaultValue:value==='true'}
 function setAppDisplayPreference(key,value){localStorage.setItem(`mta.${key}`,value?'true':'false')}
@@ -2634,6 +2672,7 @@ function updateTransportToggleButtons(){
   $('#followBtn')?.classList.toggle('active',!!current?.follow_playback_enabled);
   $('#showLyricsBtn')?.classList.toggle('active',!!current?.show_lyrics_playback);
   $('#showChordsBtn')?.classList.toggle('active',!!current?.show_chords_playback);
+  $('#showMarkersBtn')?.classList.toggle('active',!!current?.show_markers_playback);
   updateTimedPlaybackOverlay(playCursorMs);
 }
 function resetVuMeters(){
@@ -4168,7 +4207,7 @@ async function setSelectedMetaEventsEnabled(kind,enabled){const set=metaSelectio
 function metaEventInactive(kind,item){return !!item?.deleted||(kind==='chords'?!!item?.excluded:!!item?.disabled)}
 function metaEventStateClass(kind,item){return `${kind==='lyrics'||kind==='chords'?' meta-editable':''}${item?.deleted?' meta-deleted':''}${kind==='chords'&&item?.excluded?' meta-disabled':''}${kind==='lyrics'&&item?.disabled?' meta-disabled':''}`}
 function refreshMetaPanels(){const normal=document.querySelector('#metaPane .meta-tabs-content');if(normal)normal.outerHTML=metaPanelBodyHtml(false);const expanded=$('#expandedMetaBody');if(expanded)expanded.innerHTML=metaPanelBodyHtml(true);syncTimedMetaPanel(playCursorMs)}
-async function saveMetaQuickEdit(chordsBefore=null,chordReason='modifica chord'){if(!current)return;try{const saved=await api('/api/projects/'+current.id,{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify(current)});current=saved;projectDirty=false;lastHistoryState=projectSnapshot();await syncNativeProjectFile(saved.id);refreshMetaPanels();if(chordsBefore)await refreshGeneratedChordsTrackForMutation(chordsBefore,current.chords,chordReason)}catch(e){toast(e.message||'Salvataggio non riuscito')}}
+async function saveMetaQuickEdit(chordsBefore=null,chordReason='modifica chord',refreshBounds=null){if(!current)return;try{const projectId=current.id;const saved=await api('/api/projects/'+projectId,{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify(current)});if(current?.id!==projectId)return;current=saved;projectDirty=false;lastHistoryState=projectSnapshot();refreshMetaPanels();const bounds=refreshBounds||(chordsBefore?chordTrackRefreshBounds(chordsBefore,saved.chords):null);if(bounds&&hasGeneratedChordsTrack()){await enqueueChordsRefresh(bounds.oldTimeMs,bounds.newTimeMs,chordReason)}void syncNativeProjectFile(projectId)}catch(e){toast(e.message||'Salvataggio non riuscito')}}
 function metaRawValue(kind,item){return kind==='chords'?String(item?.chord||''):kind==='markers'?String(item?.label||''):String(item?.text||'')}
 function metaDisplayValue(kind,item){return kind==='chords'?transposeChordLabel(item?.chord||'',current?.pitch_semitones||0):kind==='markers'?String(item?.label||''):String(item?.text||'')}
 function beginMetaInlineEdit(event,kind,index,field='value'){

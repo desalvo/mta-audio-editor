@@ -1,4 +1,4 @@
-## 0.2.0-r244
+## 0.2.0-r245
 
 - Fix macOS Intel x86_64 CI dependency resolution: librosa 0.11.x with NumPy 1.26.4, while using librosa 1.0.x on other platforms.
 - Keep the preceding r243 Chord Lab features unchanged; align Android, iOS, and Windows revision metadata.
@@ -855,3 +855,8 @@
 - Added saving-in-progress overlay and close protection while persistence completes.
 
 - Edit Lyrics / Edit Chords / Edit Markers now open scrolled to the event nearest the current timeline/playhead position, without moving the transport.
+
+## 0.2.0-r245
+- Chords: refresh starts after project PUT, without waiting for native synchronization.
+- Fast WAV patch updates only affected samples and waveform envelope bins.
+- Serialized generated-Chords refresh requests to prevent overlapping operations.

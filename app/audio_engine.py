@@ -171,7 +171,7 @@ def estimate_adaptive_tempo_map(path: Path, progress=None) -> tuple[list[int], l
     return beat_ms, tempo_points
 
 
-def generate_adaptive_metronome_wav(project: Project, out: Path, beat_times_ms: list[int], beats_per_bar: int | None = None) -> int:
+def generate_adaptive_metronome_wav(project: Project, out: Path, beat_times_ms: list[int], beats_per_bar: int | None = None, accent_reset_ms: list[int] | None = None) -> int:
     """Generate a click WAV at the exact beat timestamps of an adaptive tempo map."""
     duration_ms = project_duration_ms(project)
     if duration_ms <= 0 or not beat_times_ms:
@@ -198,14 +198,20 @@ def generate_adaptive_metronome_wav(project: Project, out: Path, beat_times_ms: 
     with wave.open(str(out), "wb") as handle:
         handle.setnchannels(1); handle.setsampwidth(2); handle.setframerate(sample_rate)
         cursor = 0
+        zone_start_index = 0
+        reset_points = sorted(accent_reset_ms or [])
+        reset_index = 0
         for beat_index, when_ms in enumerate(beat_times_ms):
+            while reset_index < len(reset_points) and when_ms >= reset_points[reset_index]:
+                zone_start_index = beat_index
+                reset_index += 1
             target = max(0, min(total_samples, round(float(when_ms) / 1000.0 * sample_rate)))
             if target < cursor:
                 continue
             remaining = target - cursor
             while remaining > 0:
                 count = min(8192, remaining); handle.writeframesraw(silence_chunk[:count * 2]); cursor += count; remaining -= count
-            pos = beat_index % beats_per_bar
+            pos = (beat_index - zone_start_index) % beats_per_bar
             click = accent if pos == 0 else (secondary if denominator == 8 and numerator in {6,9,12} and pos % 3 == 0 else regular)
             count = min(click_len, total_samples - cursor)
             if count <= 0: break
@@ -215,6 +221,36 @@ def generate_adaptive_metronome_wav(project: Project, out: Path, beat_times_ms: 
             count = min(8192, remaining); handle.writeframesraw(silence_chunk[:count * 2]); cursor += count; remaining -= count
         handle.writeframes(b"")
     return duration_ms
+
+
+def zoned_metronome_beats(project: Project, duration_ms: int) -> list[int]:
+    """Rephase every zone at an active marker; each zone starts with an accented beat."""
+    boundaries = [0] + sorted({int(m.time_ms) for m in project.markers if not m.deleted and not m.disabled and 0 < m.time_ms < duration_ms}) + [duration_ms]
+    step = 60000.0 / max(1.0, float(project.bpm))
+    beats = []
+    for start, end in zip(boundaries, boundaries[1:]):
+        i = 0
+        while start + round(i * step) < end:
+            beats.append(start + round(i * step))
+            i += 1
+    return beats
+
+
+def stabilize_adaptive_beats(beats: list[int], sensitivity: float) -> list[int]:
+    """Restrain isolated onset timing jumps while retaining a slowly changing tempo."""
+    if len(beats) < 4:
+        return beats
+    sensitivity = max(0.0, min(1.0, float(sensitivity)))
+    intervals = np.diff(np.asarray(beats, dtype=np.float64))
+    median = float(np.median(intervals))
+    alpha = 0.04 + 0.40 * sensitivity
+    step = median
+    result = [int(beats[0])]
+    for observed in intervals:
+        target = float(np.clip(observed, step * (0.90 - 0.25 * sensitivity), step * (1.10 + 0.35 * sensitivity)))
+        step = (1.0 - alpha) * step + alpha * target
+        result.append(int(round(result[-1] + step)))
+    return result
 
 
 def generate_metronome_wav(project: Project, out: Path, beats_per_bar: int | None = None) -> int:
@@ -960,6 +996,33 @@ def refresh_chords_piano_wav_region(project: Project, out: Path, old_time_ms: in
         handle.flush()
     return start_ms, end_ms
 
+
+
+def refresh_chords_waveform_region(path: Path, previous: list[float], start_ms: int, end_ms: int) -> list[float]:
+    """Update only affected envelope bins of a 16-bit stereo WAV.
+
+    Falls back to the existing full-envelope path on incompatible WAVs.
+    """
+    if len(previous) != 8192:
+        raise ValueError("waveform envelope unavailable")
+    with wave.open(str(path), "rb") as handle:
+        if handle.getnchannels() != 2 or handle.getsampwidth() != 2 or handle.getcomptype() != "NONE":
+            raise ValueError("unsupported waveform source")
+        rate, frames = handle.getframerate(), handle.getnframes()
+        if not frames or not rate:
+            raise ValueError("empty waveform source")
+        bins = len(previous) // 2
+        lo = max(0, min(bins - 1, int(start_ms / 1000 * rate * bins / frames) - 1))
+        hi = max(lo + 1, min(bins, int(end_ms / 1000 * rate * bins / frames) + 2))
+        out = list(previous)
+        for idx in range(lo, hi):
+            begin, stop = frames * idx // bins, frames * (idx + 1) // bins
+            handle.setpos(begin)
+            data = np.frombuffer(handle.readframes(max(1, stop - begin)), dtype=np.int16)
+            if data.size:
+                mono = data.astype(np.float32).reshape(-1, 2).mean(axis=1) / 32768.0
+                out[2 * idx], out[2 * idx + 1] = float(mono.min()), float(mono.max())
+        return out
 
 
 def generate_silent_chords_wav(project: Project, out: Path) -> int:

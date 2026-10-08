@@ -1,4 +1,10 @@
-## 0.2.0-r244
+## 0.2.0-r246
+- Metronome: standard/zones/adaptive modes and persisted sensitivity.
+- Context refresh for click and generated chords; markers overlay and icon toggles.
+- Atomic staged metronome WAV replacement.
+- Zone refresh currently falls back to atomic whole-track render.
+
+## 0.2.0-r245
 
 - Fix macOS Intel x86_64 CI dependency resolution: librosa 0.11.x with NumPy 1.26.4, while using librosa 1.0.x on other platforms.
 - Keep the preceding r243 Chord Lab features unchanged; align Android, iOS, and Windows revision metadata.

@@ -331,7 +331,9 @@ class Project(BaseModel):
     auto_mix_style: Literal["balanced", "live", "studio", "gentle"] = "balanced"
     auto_mix_snapshot: AutoMixSnapshot | None = None
     base_bpm: float | None = Field(default=None, gt=0, le=500)
-    metronome_mode: Literal["fixed", "adaptive"] = "fixed"
+    metronome_mode: Literal["fixed", "zones", "adaptive"] = "fixed"
+    metronome_sensitivity: float = Field(default=0.35, ge=0.0, le=1.0)
+    show_markers_playback: bool = False
     metronome_reference_track_id: str = Field(default="", max_length=80)
     metronome_reference_track_name: str = Field(default="", max_length=200)
     metronome_grid_origin_ms: int = Field(default=0, ge=-3600000, le=3600000)

@@ -27,6 +27,7 @@ def test_timeline_move_warns_and_refreshes_existing_chords_track():
     assert "function hasGeneratedChordsTrack()" in JS
     assert "Attendere: aggiornamento della traccia Chords in corso" in JS
     assert "async function refreshGeneratedChordsTrack(oldTimeMs,newTimeMs,reason='modifica')" in JS
-    assert "if(refreshTrack)await refreshGeneratedChordsTrack(oldTime,newTime,'spostamento chord')" in JS
+    assert "refreshTrack?{oldTimeMs:oldTime,newTimeMs:newTime}:null" in JS
+    assert "await enqueueChordsRefresh(" in JS
     assert '@app.post("/api/projects/{pid}/chords-track/refresh")' in MAIN
     assert 'mode = "fast"' in MAIN and 'mode = "full"' in MAIN

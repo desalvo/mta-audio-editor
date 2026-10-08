@@ -24,10 +24,9 @@ def test_project_persists_metronome_source_shift_and_transport_mode():
 
 
 def test_track_context_menu_has_fixed_and_adaptive_reference_actions():
-    assert "Metronomo da questa traccia" in JS
-    assert "Metronomo adattivo da questa traccia" in JS
-    assert "createMetronomeTrack('fixed','${id}')" in JS
-    assert "createMetronomeTrack('adaptive','${id}')" in JS
+    assert "refreshGeneratedTrackFromContext" in JS
+    assert "Rigenera traccia" in JS
+    assert "openMetronomeSettings" in JS
 
 
 def test_adaptive_shift_reuses_saved_tempo_map_without_analysis():

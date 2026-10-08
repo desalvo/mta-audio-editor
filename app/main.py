@@ -20,7 +20,7 @@ from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse, Resp
 from starlette.background import BackgroundTask
 from fastapi.staticfiles import StaticFiles
 
-from .audio_engine import auto_align_ms, delete_range, delete_song_range, ensure_clips, estimate_bpm_and_signature, estimate_adaptive_tempo_map, generate_adaptive_metronome_wav, generate_chords_piano_wav, generate_silent_chords_wav, refresh_chords_piano_wav_region, generate_metronome_wav, media_duration_ms, project_duration_ms, render_mix, render_track, render_track_export, shift_track, waveform_peaks
+from .audio_engine import auto_align_ms, delete_range, delete_song_range, ensure_clips, estimate_bpm_and_signature, estimate_adaptive_tempo_map, generate_adaptive_metronome_wav, generate_chords_piano_wav, generate_silent_chords_wav, refresh_chords_piano_wav_region, refresh_chords_waveform_region, generate_metronome_wav, zoned_metronome_beats, stabilize_adaptive_beats, media_duration_ms, project_duration_ms, render_mix, render_track, render_track_export, shift_track, waveform_peaks
 from .codec import export_mta, ffprobe, import_mta, resolve_mta_device_profile, suggested_slots, validate_slot_mapping
 from .models import AutoMixRequest, Clip, CustomPresetRequest, DeleteRangeRequest, DeleteTracksRequest, InstantiateProjectClipRequest, UpdateProjectClipRequest, MoveTrackRequest, TrackDelayRequest, MtaExportRequest, Project, ProjectClip, ProjectExportRequest, TrackExportRequest, RightsRecord, Track, SampleEditRequest, SampleEffectRequest
 from .mlive_mp3 import embed_mlive_merish_metadata
@@ -3572,12 +3572,12 @@ def start_track_stem_job(
 
 
 @app.post("/api/projects/{pid}/metronome-track")
-def create_metronome_track(pid: str, request: Request, mode: str = "fixed", track_id: str = ""):
+def create_metronome_track(pid: str, request: Request, mode: str = "fixed", track_id: str = "", sensitivity: float = 0.35):
     with METRONOME_TRACK_LOCK:
-        return _create_metronome_track_locked(pid, request, mode=mode, track_id=track_id)
+        return _create_metronome_track_locked(pid, request, mode=mode, track_id=track_id, sensitivity=sensitivity)
 
 
-def _create_metronome_track_locked(pid: str, request: Request, mode: str = "fixed", track_id: str = ""):
+def _create_metronome_track_locked(pid: str, request: Request, mode: str = "fixed", track_id: str = "", sensitivity: float = 0.35):
     project = _project_for_actor(request, pid)
     duration_ms = project_duration_ms(project)
     if duration_ms <= 0:
@@ -3601,11 +3601,13 @@ def _create_metronome_track_locked(pid: str, request: Request, mode: str = "fixe
         project.tracks = [item for item in project.tracks if item.id not in duplicate_ids]
 
     mode = str(mode or "fixed").strip().lower()
-    if mode not in {"fixed", "adaptive"}:
+    if mode not in {"fixed", "zones", "adaptive"}:
         raise HTTPException(400, "Tipo metronomo non valido")
     filename = track.filename if track and track.filename else f"metronome-{uuid.uuid4().hex[:10]}.wav"
-    out = audio_path(pid, filename)
+    target_out = audio_path(pid, filename)
+    out = target_out.with_name(f".{target_out.stem}.{uuid.uuid4().hex}.tmp.wav")
     tempo_points = []
+    project.metronome_sensitivity = max(0.0, min(1.0, float(sensitivity)))
     reference_track = None
     if track_id:
         reference_track = next((item for item in project.tracks if item.id == track_id), None)
@@ -3617,7 +3619,7 @@ def _create_metronome_track_locked(pid: str, request: Request, mode: str = "fixe
             raise HTTPException(400, "La traccia di riferimento non contiene audio")
     try:
         beat_times_ms = []
-        if mode == "adaptive" or reference_track is not None:
+        if mode == "adaptive" or (reference_track is not None and mode == "fixed"):
             # Every adaptive request and every track-referenced request performs a
             # fresh rhythmic analysis. No previous beat/tempo map is reused.
             with tempfile.TemporaryDirectory() as td:
@@ -3633,11 +3635,22 @@ def _create_metronome_track_locked(pid: str, request: Request, mode: str = "fixe
                 beat_times_ms, tempo_points = estimate_adaptive_tempo_map(analysis_audio)
 
         if mode == "adaptive":
+            beat_times_ms = stabilize_adaptive_beats(beat_times_ms, project.metronome_sensitivity)
+            # Keep the transport's tempo map aligned to the actual generated clicks.
+            tempo_points = [point.model_copy(update={"time_ms": beat_times_ms[i]}) for i, point in enumerate(tempo_points) if i < len(beat_times_ms)]
             duration_ms = generate_adaptive_metronome_wav(project, out, beat_times_ms)
             project.adaptive_tempo_map = tempo_points
             project.metronome_mode = "adaptive"
             project.metronome_shift_ms = 0
             project.metronome_grid_origin_ms = int(beat_times_ms[0]) if beat_times_ms else 0
+        elif mode == "zones":
+            beat_times_ms = zoned_metronome_beats(project, duration_ms)
+            zone_starts = sorted(m.time_ms for m in project.markers if not m.disabled and not m.deleted and 0 < m.time_ms < duration_ms)
+            duration_ms = generate_adaptive_metronome_wav(project, out, beat_times_ms, accent_reset_ms=zone_starts)
+            project.metronome_mode = "zones"
+            project.metronome_grid_origin_ms = 0
+            project.metronome_shift_ms = 0
+            project.adaptive_tempo_map = []
         elif reference_track is not None:
             # For a fixed metronome referenced to one track, use the freshly
             # detected beat phase and a single robust BPM (median local tempo).
@@ -3678,7 +3691,7 @@ def _create_metronome_track_locked(pid: str, request: Request, mode: str = "fixe
     if track is None:
         track = Track(
             id=uuid.uuid4().hex[:10],
-            name=("Metronomo adattivo" if mode == "adaptive" else f"Metronomo {project.bpm:g} BPM"),
+            name=("Metronomo adattivo" if mode == "adaptive" else ("Metronomo a zone" if mode == "zones" else f"Metronomo {project.bpm:g} BPM")),
             type="click",
             filename=filename,
             duration_ms=duration_ms,
@@ -3699,7 +3712,7 @@ def _create_metronome_track_locked(pid: str, request: Request, mode: str = "fixe
         )
         project.tracks.append(track)
     else:
-        track.name = "Metronomo adattivo" if mode == "adaptive" else f"Metronomo {project.bpm:g} BPM"
+        track.name = "Metronomo adattivo" if mode == "adaptive" else ("Metronomo a zone" if mode == "zones" else f"Metronomo {project.bpm:g} BPM")
         track.type = "click"
         track.filename = filename
         track.duration_ms = duration_ms
@@ -3716,9 +3729,32 @@ def _create_metronome_track_locked(pid: str, request: Request, mode: str = "fixe
                 timeline_start_ms=0,
             )
         ]
-    track.waveform_revision = _track_waveform_revision(track, out) if peaks else ""
-    save_project(project)
+    # Never overwrite the previously valid WAV with a partial render.
+    try:
+        with out.open("rb") as handle:
+            os.fsync(handle.fileno())
+        os.replace(out, target_out)
+        track.waveform_revision = _track_waveform_revision(track, target_out) if peaks else ""
+        save_project(project)
+    finally:
+        out.unlink(missing_ok=True)
     return {"project": project, "track": track, "reused": reused, "mode": mode, "tempo_map": tempo_points if mode == "adaptive" else [], "reference_track_id": project.metronome_reference_track_id, "reference_track_name": project.metronome_reference_track_name}
+
+
+@app.post("/api/projects/{pid}/metronome-track/refresh")
+def refresh_metronome_at_playhead(pid: str, request: Request, time_ms: int = 0):
+    project = _project_for_actor(request, pid)
+    mode = project.metronome_mode
+    # Reuses the stored mode/settings. Zones are selected by the playhead;
+    # the renderer currently regenerates the complete WAV atomically.
+    markers = sorted(m.time_ms for m in project.markers if not m.deleted and not m.disabled)
+    bounds = [0] + [t for t in markers if t < project_duration_ms(project)] + [project_duration_ms(project)]
+    zone = next(((a, b) for a, b in zip(bounds, bounds[1:]) if a <= time_ms < b), (0, project_duration_ms(project)))
+    with METRONOME_TRACK_LOCK:
+        result = _create_metronome_track_locked(pid, request, mode=mode, sensitivity=project.metronome_sensitivity)
+    result["zone_start_ms"], result["zone_end_ms"] = zone
+    result["refresh_scope"] = "full_atomic"
+    return result
 
 
 @app.post("/api/projects/{pid}/metronome-shift")
@@ -3745,9 +3781,15 @@ def shift_adaptive_metronome(pid: str, request: Request, value: float = 0.0, uni
     if track is None or not track.filename:
         raise HTTPException(400, "Traccia metronomo non trovata")
     out = audio_path(pid, track.filename)
-    duration_ms = generate_adaptive_metronome_wav(project, out, beat_times)
+    staged = out.with_name(f".{out.stem}.{uuid.uuid4().hex}.tmp.wav")
+    try:
+        duration_ms = generate_adaptive_metronome_wav(project, staged, beat_times)
+        peaks = waveform_peaks(staged)
+        os.replace(staged, out)
+    finally:
+        staged.unlink(missing_ok=True)
     track.duration_ms = duration_ms
-    track.waveform_peaks = waveform_peaks(out)
+    track.waveform_peaks = peaks
     track.waveform_revision = _track_waveform_revision(track, out) if track.waveform_peaks else ""
     track.clips = [Clip(id=(track.clips[0].id if track.clips else uuid.uuid4().hex[:10]), source_start_ms=0, source_end_ms=duration_ms, timeline_start_ms=0)]
     save_project(project)
@@ -3782,23 +3824,41 @@ def refresh_chords_track(pid: str, request: Request, old_time_ms: int, new_time_
         track = next((item for item in project.tracks if is_chords_track(item)), None)
         if track is None or not track.filename:
             return {"project": project, "refreshed": False, "mode": "none"}
-        out = audio_path(pid, track.filename)
+        target = audio_path(pid, track.filename)
+        staged = target.with_name(f".{target.stem}.{uuid.uuid4().hex}.tmp.wav")
         mode = "fast"
         refresh_start_ms = 0
         refresh_end_ms = project_duration_ms(project)
         try:
-            refresh_start_ms, refresh_end_ms = refresh_chords_piano_wav_region(project, out, old_time_ms, new_time_ms)
-        except Exception:
-            mode = "full"
-            active_chords = [c for c in project.chords if not c.excluded and not c.deleted]
-            if active_chords:
-                generate_chords_piano_wav(project, out)
+            if target.exists():
+                shutil.copyfile(target, staged)
+            try:
+                refresh_start_ms, refresh_end_ms = refresh_chords_piano_wav_region(project, staged, old_time_ms, new_time_ms)
+            except Exception:
+                mode = "full"
+                active_chords = [c for c in project.chords if not c.excluded and not c.deleted]
+                if active_chords:
+                    generate_chords_piano_wav(project, staged)
+                else:
+                    generate_silent_chords_wav(project, staged)
+            track.duration_ms = media_duration_ms(staged)
+            if mode == "fast":
+                try:
+                    track.waveform_peaks = refresh_chords_waveform_region(
+                        staged, track.waveform_peaks, refresh_start_ms, refresh_end_ms
+                    )
+                except (ValueError, OSError, TypeError):
+                    track.waveform_peaks = waveform_peaks(staged)
             else:
-                generate_silent_chords_wav(project, out)
-        track.duration_ms = media_duration_ms(out)
-        track.waveform_peaks = waveform_peaks(out)
-        track.waveform_revision = _track_waveform_revision(track, out) if track.waveform_peaks else ""
-        save_project(project)
+                track.waveform_peaks = waveform_peaks(staged)
+            # A crash during any earlier step leaves the previously valid WAV intact.
+            with staged.open("rb") as handle:
+                os.fsync(handle.fileno())
+            os.replace(staged, target)
+            track.waveform_revision = _track_waveform_revision(track, target) if track.waveform_peaks else ""
+            save_project(project)
+        finally:
+            staged.unlink(missing_ok=True)
         return {
             "project": project, "track": track, "refreshed": True, "mode": mode,
             "refresh_start_ms": refresh_start_ms, "refresh_end_ms": refresh_end_ms,
