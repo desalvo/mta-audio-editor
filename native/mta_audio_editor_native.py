@@ -476,7 +476,13 @@ class NativeApi:
         if path.is_file():
             try:
                 raw = json.loads(path.read_text(encoding="utf-8"))
-                recent_projects = [str(x) for x in raw.get("recent_projects", []) if str(x).strip()][:12]
+                recent_projects = []
+                for x in raw.get("recent_projects", []):
+                    recent_id = str(x).strip()
+                    if recent_id and recent_id not in recent_projects:
+                        recent_projects.append(recent_id)
+                    if len(recent_projects) >= 15:
+                        break
             except (OSError, ValueError, TypeError, json.JSONDecodeError):
                 recent_projects = []
         return {
@@ -539,11 +545,24 @@ class NativeApi:
             except (OSError, ValueError, TypeError, json.JSONDecodeError):
                 raw = {}
         clean = []
+        seen_paths = set()
         for project_id in project_ids or []:
             value = str(project_id).strip()
-            if value and value not in clean:
-                clean.append(value)
-            if len(clean) >= 12:
+            if not value or value in clean:
+                continue
+            bound = self.project_paths.get(value)
+            path_key = None
+            if bound is not None:
+                try:
+                    path_key = str(bound.expanduser().resolve()).casefold()
+                except (OSError, RuntimeError):
+                    path_key = str(bound).casefold()
+            if path_key and path_key in seen_paths:
+                continue
+            clean.append(value)
+            if path_key:
+                seen_paths.add(path_key)
+            if len(clean) >= 15:
                 break
         raw["recent_projects"] = clean
         path.write_text(json.dumps(raw, indent=2) + "\n", encoding="utf-8")
@@ -626,15 +645,25 @@ class NativeApi:
         """Return recent native projects that still have an accessible project file."""
         settings = self.get_native_settings()
         rows = []
+        seen_paths = set()
         for project_id in settings.get("recent_projects", []):
             path = self.project_paths.get(str(project_id))
             if path is None or not path.is_file():
                 continue
+            try:
+                path_key = str(path.expanduser().resolve()).casefold()
+            except (OSError, RuntimeError):
+                path_key = str(path).casefold()
+            if path_key in seen_paths:
+                continue
+            seen_paths.add(path_key)
             rows.append({
                 "id": str(project_id),
                 "path": str(path),
                 "name": path.stem,
             })
+            if len(rows) >= 15:
+                break
         return {"ok": True, "projects": rows}
 
     def open_recent_project(self, project_id: str) -> dict:

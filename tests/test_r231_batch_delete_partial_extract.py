@@ -38,7 +38,8 @@ def test_partial_extraction_api_and_ui_are_wired():
     assert "_replace_timed_range(latest.lyrics" in MAIN
     assert "_replace_timed_range(latest.chords" in MAIN
     assert "function currentExtractionRange()" in JS
-    assert 'id="textAnalysisSelectedRange"' in JS
+    assert 'id="textAnalysisSelectedRange"' not in JS
+    assert "if(range){query.push(`range_start_ms=${range.start_ms}`,`range_end_ms=${range.end_ms}`)}" in JS
     assert "range_start_ms=${range.start_ms}" in JS
     assert "range_end_ms=${range.end_ms}" in JS
     assert "Solo intervallo selezionato" in JS

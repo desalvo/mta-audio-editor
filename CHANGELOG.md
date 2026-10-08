@@ -1,3 +1,26 @@
+## 0.2.0-r238
+
+- Added a dockable, closable and resizable Piano / Chord Lab beside the Mixer with a scrollable two-octave mini keyboard.
+- Added live note audition and common chord presets (major/minor/7/maj7/m7/dim/dim7/aug/sus2/sus4).
+- Shift+click builds a live chord on the keyboard, highlights accumulated notes, plays them, and names the recognized chord when Shift is released.
+- Piano panel visibility and width are persisted in the project.
+
+## 0.2.0-r237
+
+- Chord extraction defaults to Balanced (sensitivity 45, all advanced stages except beat quantization); legacy Default/Completo is migrated and removed.
+- Lyrics/Chords extraction is automatically constrained to an active timeline Range.
+- Utility/progress/extraction modals reset transient sizing on every open and keep safe minimum dimensions.
+- Timeline Chords support CTRL/CMD multi-selection with batch disable/re-enable/delete; Backspace/Delete removes the selected Chords.
+- Context menus display keyboard shortcuts for actions that have one.
+
+## 0.2.0-r236
+
+- Added track-referenced fixed/adaptive metronome generation from the track context menu; rhythmic analysis can use one selected track as the sole timing source.
+- Added adaptive metronome shift in milliseconds or beats without recalculating the detected tempo map.
+- Added transport display/input mode for absolute time (`mm:ss.mmm`) or musical position (`bar:beat`) using fixed tempo or the adaptive beat map.
+- Persisted the metronome reference track, grid origin, shift and transport time mode in project data.
+- Preserved the mixer as vertical channel strips with vertical level faders.
+
 ## 0.2.0-r235
 
 - Added Adaptive Metronome: every request recalculates the complete beat-by-beat tempo map from the current song and regenerates the click track to follow internal tempo changes.

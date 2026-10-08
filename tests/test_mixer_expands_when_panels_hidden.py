@@ -8,7 +8,9 @@ def test_mixer_expands_when_metadata_panel_is_hidden_and_export_is_modal():
     assert "function exportWindowHtml()" in js
     assert "exportPaneHtml" not in js
     assert "dock.classList.toggle('meta-hidden',!meta)" in js
-    assert "dock.classList.toggle('sidepanels-hidden',!meta)" in js
-    assert ":'minmax(0,1fr)'" in js
+    assert "dock.classList.toggle('sidepanels-hidden',!meta&&!piano)" in js
+    assert "const cols=['minmax(0,1fr)']" in js
+    assert "if(meta)cols.push('320px')" in js
+    assert "if(piano)cols.push" in js
     assert ".mixer-dock.sidepanels-hidden" in css
     assert ".mixer-dock .mixer-pane{width:100%" in css

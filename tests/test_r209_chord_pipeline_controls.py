@@ -34,10 +34,10 @@ def test_stable_pipeline_removes_short_chord_chatter_and_slash_bass():
     assert len(out) < len(events)
 
 
-def test_balanced_can_keep_sevenths_but_not_slash_bass():
+def test_balanced_keeps_all_advanced_chord_qualities_except_beat_quantization():
     events = [c(0, "Cmaj7/E"), c(2500, "G7/B")]
     out = _postprocess_chord_events(events, {"preset": "balanced", "min_chord_ms": 0})
-    assert [x.chord for x in out] == ["Cmaj7", "G7"]
+    assert [x.chord for x in out] == ["Cmaj7/E", "G7/B"]
 
 
 def test_detailed_can_keep_slash_bass():

@@ -5,7 +5,7 @@ from app.models import Project
 
 def test_project_persists_mixer_height():
     p = Project(id="p", title="Mixer")
-    assert p.mixer_height_px == 262
+    assert p.mixer_height_px == 320
     p2 = Project.model_validate({**p.model_dump(), "mixer_height_px": 420})
     assert p2.mixer_height_px == 420
 

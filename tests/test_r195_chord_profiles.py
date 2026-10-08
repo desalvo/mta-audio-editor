@@ -11,7 +11,7 @@ def test_chord_catalog_exposes_profiles_and_new_models(monkeypatch):
     assert ids[:4] == ["profile-stable", "profile-fast", "profile-accurate", "profile-maximum"]
     assert {m["id"] for m in catalog["models"]} >= {"btc-hcqt", "chordformer"}
     assert catalog["default_engine"] == "madmom-deep-chroma"
-    assert {p["id"] for p in catalog["presets"]} == {"default-complete", "stable", "balanced", "detailed", "raw"}
+    assert {p["id"] for p in catalog["presets"]} == {"stable", "balanced", "detailed", "raw"}
 
 
 def test_accurate_profile_prefers_chordformer(monkeypatch, tmp_path: Path):

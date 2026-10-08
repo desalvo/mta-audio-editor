@@ -332,6 +332,11 @@ class Project(BaseModel):
     auto_mix_snapshot: AutoMixSnapshot | None = None
     base_bpm: float | None = Field(default=None, gt=0, le=500)
     metronome_mode: Literal["fixed", "adaptive"] = "fixed"
+    metronome_reference_track_id: str = Field(default="", max_length=80)
+    metronome_reference_track_name: str = Field(default="", max_length=200)
+    metronome_grid_origin_ms: int = Field(default=0, ge=-3600000, le=3600000)
+    metronome_shift_ms: int = Field(default=0, ge=-3600000, le=3600000)
+    transport_time_mode: Literal["time", "musical"] = "time"
     adaptive_tempo_map: list[AdaptiveTempoPoint] = Field(default_factory=list, max_length=20000)
     pitch_semitones: float = Field(default=0.0, ge=-6.0, le=6.0)
     track_panel_width_px: int = Field(default=225, ge=160, le=520)
@@ -342,9 +347,11 @@ class Project(BaseModel):
     show_chords_playback: bool = False
     export_panel_visible: bool = True
     metadata_panel_visible: bool = True
+    piano_panel_visible: bool = False
+    piano_panel_width_px: int = Field(default=360, ge=250, le=620)
     inspector_visible: bool = True
     timeline_zoom_px_per_sec: int = Field(default=70, ge=25, le=1200)
-    mixer_height_px: int = Field(default=262, ge=180, le=900)
+    mixer_height_px: int = Field(default=320, ge=180, le=900)
     mixer_meta_tab: Literal["lyrics", "chords", "markers"] = "lyrics"
     export_format: Literal["mta", "wav", "mp3", "mlive_mp3", "mp3g", "flac", "mp4"] = "mta"
 

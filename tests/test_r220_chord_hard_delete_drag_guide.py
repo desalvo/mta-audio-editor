@@ -6,7 +6,7 @@ CSS = (ROOT / "app/static/app.css").read_text(encoding="utf-8")
 
 
 def test_chord_delete_is_hard_delete_everywhere():
-    assert "if(action==='delete'){current.chords.splice(Number(index),1)}" in JS
+    assert "for(const i of [...selected].sort((a,b)=>b-a))if(current.chords?.[i])current.chords.splice(i,1)" in JS
     assert "if(action==='delete'&&(kind==='chords'||kind==='markers')){checkpointHistory();current[kind].splice(Number(index),1)" in JS
     assert "if(kind==='chords'||kind==='markers'){arr.splice(i,1);if(kind==='chords')lyricsChordsEditorSelected=-1}" in JS
     assert "if(f.kind==='chords'||f.kind==='markers')arr.splice(f.index,1)" in JS

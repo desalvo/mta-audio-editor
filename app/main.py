@@ -1851,7 +1851,7 @@ def start_lyrics_extraction(pid: str, track_id: str, request: Request, model: st
 
 @app.post("/api/projects/{pid}/tracks/{track_id}/extract-chords-jobs")
 def start_chord_extraction(
-    pid: str, track_id: str, request: Request, engine: str = "", preset: str = "stable",
+    pid: str, track_id: str, request: Request, engine: str = "", preset: str = "balanced",
     sensitivity: int | None = None, harmonic_refinement: bool | None = None,
     detect_sevenths: bool | None = None, detect_sus: bool | None = None,
     detect_dim_aug: bool | None = None, detect_slash_bass: bool | None = None,
@@ -1859,6 +1859,8 @@ def start_chord_extraction(
     min_chord_ms: int | None = None, max_changes_per_minute: int | None = None,
     range_start_ms: int | None = None, range_end_ms: int | None = None,
 ):
+    if preset == "default-complete":
+        preset = "balanced"
     if preset not in {"stable", "balanced", "detailed", "raw"}:
         raise HTTPException(400, "Profilo chords non supportato")
     if sensitivity is not None and not 0 <= sensitivity <= 100:
@@ -3570,12 +3572,12 @@ def start_track_stem_job(
 
 
 @app.post("/api/projects/{pid}/metronome-track")
-def create_metronome_track(pid: str, request: Request, mode: str = "fixed"):
+def create_metronome_track(pid: str, request: Request, mode: str = "fixed", track_id: str = ""):
     with METRONOME_TRACK_LOCK:
-        return _create_metronome_track_locked(pid, request, mode=mode)
+        return _create_metronome_track_locked(pid, request, mode=mode, track_id=track_id)
 
 
-def _create_metronome_track_locked(pid: str, request: Request, mode: str = "fixed"):
+def _create_metronome_track_locked(pid: str, request: Request, mode: str = "fixed", track_id: str = ""):
     project = _project_for_actor(request, pid)
     duration_ms = project_duration_ms(project)
     if duration_ms <= 0:
@@ -3604,27 +3606,69 @@ def _create_metronome_track_locked(pid: str, request: Request, mode: str = "fixe
     filename = track.filename if track and track.filename else f"metronome-{uuid.uuid4().hex[:10]}.wav"
     out = audio_path(pid, filename)
     tempo_points = []
+    reference_track = None
+    if track_id:
+        reference_track = next((item for item in project.tracks if item.id == track_id), None)
+        if reference_track is None:
+            raise HTTPException(404, "Traccia di riferimento non trovata")
+        if is_metronome_track(reference_track):
+            raise HTTPException(400, "La traccia metronomo non può essere usata come riferimento ritmico")
+        if not reference_track.filename:
+            raise HTTPException(400, "La traccia di riferimento non contiene audio")
     try:
-        if mode == "adaptive":
-            # Recalculate the complete adaptive map every time. Never reuse an
-            # earlier map: edits, cuts or newly imported tracks may have changed
-            # any tempo variation in the song. Existing click tracks are excluded
-            # from the analysis so they cannot bias the beat detector.
-            analysis_project = project.model_copy(deep=True)
-            analysis_project.tracks = [item for item in analysis_project.tracks if not is_metronome_track(item)]
-            if not analysis_project.tracks:
-                raise ValueError("nessuna traccia musicale disponibile per l'analisi adattiva")
+        beat_times_ms = []
+        if mode == "adaptive" or reference_track is not None:
+            # Every adaptive request and every track-referenced request performs a
+            # fresh rhythmic analysis. No previous beat/tempo map is reused.
             with tempfile.TemporaryDirectory() as td:
-                analysis_audio = Path(td) / "adaptive-source.wav"
-                render_mix(analysis_project, audio_path, analysis_audio, fmt="wav", sample_rate=int(project.sample_rate), wav_bit_depth=16)
+                analysis_audio = Path(td) / ("reference-track.wav" if reference_track is not None else "adaptive-source.wav")
+                if reference_track is not None:
+                    render_track(reference_track, audio_path(pid, reference_track.filename), analysis_audio, sample_rate=int(project.sample_rate))
+                else:
+                    analysis_project = project.model_copy(deep=True)
+                    analysis_project.tracks = [item for item in analysis_project.tracks if not is_metronome_track(item)]
+                    if not analysis_project.tracks:
+                        raise ValueError("nessuna traccia musicale disponibile per l'analisi adattiva")
+                    render_mix(analysis_project, audio_path, analysis_audio, fmt="wav", sample_rate=int(project.sample_rate), wav_bit_depth=16)
                 beat_times_ms, tempo_points = estimate_adaptive_tempo_map(analysis_audio)
+
+        if mode == "adaptive":
             duration_ms = generate_adaptive_metronome_wav(project, out, beat_times_ms)
             project.adaptive_tempo_map = tempo_points
             project.metronome_mode = "adaptive"
+            project.metronome_shift_ms = 0
+            project.metronome_grid_origin_ms = int(beat_times_ms[0]) if beat_times_ms else 0
+        elif reference_track is not None:
+            # For a fixed metronome referenced to one track, use the freshly
+            # detected beat phase and a single robust BPM (median local tempo).
+            bpms = sorted(float(point.bpm) for point in tempo_points if float(point.bpm) > 0)
+            if not bpms or not beat_times_ms:
+                raise ValueError("tempo non rilevabile dalla traccia di riferimento")
+            ref_bpm = bpms[len(bpms)//2]
+            project.bpm = round(ref_bpm, 1)
+            project.base_bpm = project.bpm
+            interval_ms = 60000.0 / max(1.0, project.bpm)
+            seed = float(beat_times_ms[0])
+            while seed - interval_ms >= 0:
+                seed -= interval_ms
+            fixed_beats = []
+            value = seed
+            while value <= duration_ms:
+                fixed_beats.append(max(0, int(round(value))))
+                value += interval_ms
+            duration_ms = generate_adaptive_metronome_wav(project, out, fixed_beats)
+            project.metronome_mode = "fixed"
+            project.metronome_grid_origin_ms = int(round(seed))
+            project.metronome_shift_ms = 0
+            project.adaptive_tempo_map = []
         else:
             duration_ms = generate_metronome_wav(project, out)
             project.metronome_mode = "fixed"
+            project.metronome_grid_origin_ms = 0
+            project.metronome_shift_ms = 0
             project.adaptive_tempo_map = []
+        project.metronome_reference_track_id = reference_track.id if reference_track is not None else ""
+        project.metronome_reference_track_name = reference_track.name if reference_track is not None else ""
         peaks = waveform_peaks(out)
     except Exception as exc:
         if not reused:
@@ -3674,7 +3718,50 @@ def _create_metronome_track_locked(pid: str, request: Request, mode: str = "fixe
         ]
     track.waveform_revision = _track_waveform_revision(track, out) if peaks else ""
     save_project(project)
-    return {"project": project, "track": track, "reused": reused, "mode": mode, "tempo_map": tempo_points if mode == "adaptive" else []}
+    return {"project": project, "track": track, "reused": reused, "mode": mode, "tempo_map": tempo_points if mode == "adaptive" else [], "reference_track_id": project.metronome_reference_track_id, "reference_track_name": project.metronome_reference_track_name}
+
+
+@app.post("/api/projects/{pid}/metronome-shift")
+def shift_adaptive_metronome(pid: str, request: Request, value: float = 0.0, unit: str = "ms"):
+    project = _project_for_actor(request, pid)
+    if project.metronome_mode != "adaptive" or not project.adaptive_tempo_map:
+        raise HTTPException(400, "Lo shift in beat/ms richiede un metronomo adattivo con tempo map")
+    unit = str(unit or "ms").strip().lower()
+    if unit not in {"ms", "beat", "beats"}:
+        raise HTTPException(400, "Unità shift non valida")
+    shift_ms = float(value)
+    if unit in {"beat", "beats"}:
+        times = [int(p.time_ms) for p in project.adaptive_tempo_map]
+        intervals = [b-a for a,b in zip(times, times[1:]) if b>a]
+        if not intervals:
+            raise HTTPException(400, "Tempo map insufficiente per lo shift in beat")
+        intervals.sort()
+        beat_ms = float(intervals[len(intervals)//2])
+        shift_ms = float(value) * beat_ms
+    project.metronome_shift_ms = max(-3600000, min(3600000, int(round(shift_ms))))
+    beat_times = [max(0, int(p.time_ms) + project.metronome_shift_ms) for p in project.adaptive_tempo_map]
+    beat_times = sorted(set(beat_times))
+    track = next((t for t in project.tracks if str(getattr(t,"type","")).lower()=="click" or "metronom" in str(getattr(t,"name","")).lower()), None)
+    if track is None or not track.filename:
+        raise HTTPException(400, "Traccia metronomo non trovata")
+    out = audio_path(pid, track.filename)
+    duration_ms = generate_adaptive_metronome_wav(project, out, beat_times)
+    track.duration_ms = duration_ms
+    track.waveform_peaks = waveform_peaks(out)
+    track.waveform_revision = _track_waveform_revision(track, out) if track.waveform_peaks else ""
+    track.clips = [Clip(id=(track.clips[0].id if track.clips else uuid.uuid4().hex[:10]), source_start_ms=0, source_end_ms=duration_ms, timeline_start_ms=0)]
+    save_project(project)
+    return {"project": project, "track": track, "shift_ms": project.metronome_shift_ms}
+
+@app.post("/api/projects/{pid}/transport-time-mode")
+def set_transport_time_mode(pid: str, request: Request, mode: str = "time"):
+    project = _project_for_actor(request, pid)
+    mode = str(mode or "time").strip().lower()
+    if mode not in {"time", "musical"}:
+        raise HTTPException(400, "Modalità transport non valida")
+    project.transport_time_mode = mode
+    save_project(project)
+    return {"project": project}
 
 
 @app.post("/api/projects/{pid}/chords-track")
