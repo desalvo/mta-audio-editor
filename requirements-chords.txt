@@ -3,13 +3,15 @@
 # predates these modules. Model weights remain runtime-only and separately licensed.
 madmom-infer @ https://github.com/openmirlab/madmom-infer/archive/bffead9be61857fd44b2e0d3a2510d9d94c8f2d2.zip
 
-# macOS Intel / Python 3.12: align NumPy with the updated Numba 0.68 stack.
+# macOS Intel / Python 3.12: retain NumPy 1.26.4 for the prebuilt Whisper/Numba stack.
 # madmom-infer's generic NumPy dependency would otherwise resolve to the newest NumPy.
 numpy==1.26.4; sys_platform == 'darwin' and platform_machine == 'x86_64'
 
 # r195 optional high-accuracy chord engines. Torch is supplied by the bundled
 # stem runtime in production/native builds; these are the lightweight MIR deps.
-librosa>=1.0.0,<1.1
+# librosa 1.0 requires NumPy >=2.1; keep compatible librosa 0.11 on macOS Intel.
+librosa>=0.11.0,<0.12; sys_platform == 'darwin' and platform_machine == 'x86_64'
+librosa>=1.0.0,<1.1; sys_platform != 'darwin' or platform_machine != 'x86_64'
 soundfile>=0.14.0,<0.15
 mir_eval>=0.8.2,<0.9
 PyYAML>=6.0.3,<7

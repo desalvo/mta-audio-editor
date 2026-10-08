@@ -347,6 +347,7 @@ class Project(BaseModel):
     show_chords_playback: bool = False
     export_panel_visible: bool = True
     metadata_panel_visible: bool = True
+    chord_manual_recency: list[str] = Field(default_factory=list)
     piano_panel_visible: bool = False
     piano_panel_width_px: int = Field(default=360, ge=250, le=620)
     inspector_visible: bool = True

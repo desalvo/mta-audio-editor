@@ -1,4 +1,17 @@
-## 0.2.0-r242
+## 0.2.0-r244
+
+- Fix macOS Intel x86_64 CI dependency resolution: librosa 0.11.x with NumPy 1.26.4, while using librosa 1.0.x on other platforms.
+- Keep the preceding r243 Chord Lab features unchanged; align Android, iOS, and Windows revision metadata.
+
+## 0.2.0-r243
+
+- Real 2-octave piano keyboard layout (C3–B4) with 7 white and 5 black keys per octave, correctly spaced E–F/B–C boundaries and narrower keys.
+- Piano / Chord Lab detachable into a movable, resizable native browser window with ↗, synchronized notes and presets. Popup close restores the docked panel.
+- Left-edge panel resizer correctly adjusts the left boundary in the mixer grid.
+- Most-used chord suggestions rank project-local manually entered recent chords ahead of raw frequency; recency is stored with the project.
+- No changes to the audio engine or other existing project features.
+
+## 0.2.0-r243
 
 - Fix Android AGP 9.4.1 compatibility: GitHub Actions Gradle 9.6.0 (formerly 9.3.1).
 - Restore macOS x86_64 Python 3.12 known working NumPy 1.26.4, Numba 0.61.2 and llvmlite 0.44.0 to avoid missing LLVM while preserving other r241 updates.

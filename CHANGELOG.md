@@ -1,4 +1,9 @@
-## 0.2.0-r242
+## 0.2.0-r244
+
+- Fix macOS Intel x86_64 CI dependency resolution: librosa 0.11.x with NumPy 1.26.4, while using librosa 1.0.x on other platforms.
+- Keep the preceding r243 Chord Lab features unchanged; align Android, iOS, and Windows revision metadata.
+
+## 0.2.0-r243
 
 - Android Gradle toolchain compatibility fix (Gradle 9.6.0).
 - Restore wheel-compatible macOS Intel NumPy/Numba/llvmlite dependency pins.
