@@ -1,3 +1,41 @@
+## 0.2.0-r273 — Optional FLAC project storage + MTA compatibility
+
+- Global opt-in setting for FLAC project storage in web/native Settings; defaults to WAV.
+- Persist storage mode per project, and ask explicitly before migrating a WAV project when opening it.
+- Convert integer PCM WAV assets to fast FLAC level 1 with decoding verification; retain 32-bit/float files without silent quantization.
+- Keep previews and export PCM in ephemeral locations outside the portable project; portable archives carry referenced FLAC assets.
+- MTA export continues to render all sources to a common time-aligned PCM timeline, then writes MP3 audio slots; no raw FLAC streams in MTA.
+- End-to-end FLAC conversion → `.maeprojz` archive → `.mta` export tests and regression coverage.
+
+## 0.2.0-r272 — DrumSep hybrid ONNX inference
+
+- Combine frequency-domain ISTFT with time-domain predictions; align centred Hann STFT and overlap-add windows.
+- DrumSep kit-only mix is reconstructed from kick, snare, toms and cymbals rather than copying Demucs drums.
+- Non-kit percussions remain a separate SAM Audio model selection; no misleading DrumSep claim.
+- Real-model inference and subjective separation quality require native testing.
+
+## 0.2.0-r271 — DrumSep ONNX integration
+
+- Optional ONNX model download with SHA-256 and atomic installation; selectable Kick/Snare/Toms/Cymbals.
+- Demucs to DrumSep selective extraction; SAM Audio remains for non-kit percussion.
+
+## 0.2.0-r270 — optional SAM Audio percussion separation
+
+- Select SAM Audio Small/Base/Large or DSP; the selection is remembered across projects.
+- Selectively extract kick, snare, toms, cymbals or non-kit percussion through Demucs and optional SAM Audio.
+- SAM Audio uses an isolated Python worker; user-authorized gated checkpoints are not bundled.
+- Only requested outputs are imported.
+
+## 0.2.0-r269 — selective stem extraction and percussion split
+
+- Add selective re-extraction of lead vocals, percussions, drum body and Other on an existing track.
+- Add optional drums/percussions second-pass spectral separation; imports only requested stems.
+- Preserve existing stem workflow and add explicit validation of selection.
+
+## 0.2.0-r268 — transport scrubber and MusicBrainz hover
+- Add a viewport-independent seek slider in the transport with whole-project progress during playback; frame zoom and project navigation as distinct controls.
+- Position MusicBrainz candidate details near the hovered row within viewport bounds rather than underneath the scrolling results list.
+
 ## 0.2.0-r267 — RoFormer beartype validator compatibility
 - Override legacy beartype 0.18.x with a PEP 604-compatible validator in native packaging, and add a smoke check for Callable | None.
 - Make RoFormer failure actionable with an explicit dependency diagnostic.

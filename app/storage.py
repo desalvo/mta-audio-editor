@@ -2,6 +2,7 @@ import hashlib
 import json
 import os
 import re
+import subprocess
 import shutil
 import threading
 import time
@@ -403,14 +404,14 @@ def original_path(pid: str, filename: str) -> Path:
     return _safe_child(originals_dir(pid), filename)
 
 
-def create_project(title: str = "Untitled", target: str = "MTA8", owner_user_id: int | None = None, sample_rate: int = 44100) -> Project:
+def create_project(title: str = "Untitled", target: str = "MTA8", owner_user_id: int | None = None, sample_rate: int = 44100, audio_storage_mode: str = "wav") -> Project:
     pid = uuid.uuid4().hex[:12]
     d = pdir(pid)
     (d / "audio").mkdir(parents=True)
     (d / "attachments").mkdir()
     (d / "originals").mkdir()
     rate = int(sample_rate) if int(sample_rate) in {44100, 48000, 96000} else 44100
-    p = Project(id=pid, owner_user_id=owner_user_id, title=title[:200], target=target, sample_rate=rate)
+    p = Project(id=pid, owner_user_id=owner_user_id, title=title[:200], target=target, sample_rate=rate, audio_storage_mode="flac" if audio_storage_mode == "flac" else "wav")
     save_project(p)
     return p
 
@@ -452,7 +453,72 @@ def _fsync_directory(path: Path) -> None:
         os.close(fd)
 
 
-def save_project(project: Project):
+def migrate_project_audio_to_flac(project: Project) -> dict:
+    """Stage+verify all integer-PCM assets, atomically commit references, then delete old WAVs.
+
+    Only explicit user action should call this for a legacy project. Floating-point
+    PCM is deliberately left untouched: integer FLAC cannot represent it exactly.
+    """
+    validate_project_files(project)
+    filenames = {t.filename for t in project.tracks} | {c.filename for c in project.clip_library}
+    staged: dict[str, tuple[Path, Path]] = {}
+    skipped: list[str] = []
+    try:
+        for old_name in sorted(filenames):
+            if Path(old_name).suffix.lower() != ".wav":
+                continue
+            source = audio_path(project.id, old_name)
+            probe = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "a:0", "-show_entries", "stream=codec_name,sample_rate,channels", "-of", "json", str(source)], capture_output=True, text=True, check=True)
+            stream = json.loads(probe.stdout).get("streams", [{}])[0]
+            codec = stream.get("codec_name", "")
+            if codec not in {"pcm_s16le", "pcm_s24le", "pcm_u8"}:
+                skipped.append(old_name)
+                continue
+            final = source.with_name(f"{source.stem}-{uuid.uuid4().hex[:8]}.flac")
+            tmp = final.with_name(f".{final.stem}.staged.flac")
+            # FLAC stores integer PCM without sample-value loss; retain channel count/rate.
+            run = subprocess.run(["ffmpeg", "-nostdin", "-y", "-v", "error", "-i", str(source), "-map", "0:a:0", "-c:a", "flac", "-compression_level", "1", str(tmp)], capture_output=True, text=True)
+            if run.returncode:
+                raise RuntimeError(f"FLAC conversion failed for {old_name}: {run.stderr.strip()}")
+            verified = subprocess.run(["ffmpeg", "-nostdin", "-v", "error", "-i", str(tmp), "-f", "null", "-"], capture_output=True, text=True)
+            if verified.returncode or not tmp.is_file() or tmp.stat().st_size == 0:
+                raise RuntimeError(f"FLAC decode validation failed for {old_name}")
+            # Validate key timing characteristics before publishing the new file.
+            result = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "a:0", "-show_entries", "stream=sample_rate,channels", "-of", "json", str(tmp)], capture_output=True, text=True, check=True)
+            converted = json.loads(result.stdout).get("streams", [{}])[0]
+            if any(str(converted.get(k)) != str(stream.get(k)) for k in ("sample_rate", "channels")):
+                raise RuntimeError(f"FLAC channel/sample rate mismatch for {old_name}")
+            staged[old_name] = (tmp, final)
+        # File publication first; project.json remains authoritative until save.
+        for tmp, final in staged.values():
+            os.replace(tmp, final)
+        old_names = {old: final.name for old, (_, final) in staged.items()}
+        for track in project.tracks:
+            track.filename = old_names.get(track.filename, track.filename)
+        for clip in project.clip_library:
+            if clip.filename in old_names:
+                clip.filename = old_names[clip.filename]
+                clip.current_location = f"audio/{clip.filename}"
+        project.audio_storage_mode = "flac"
+        save_project(project, _skip_flac_conversion=True)
+        for old in old_names:
+            audio_path(project.id, old).unlink(missing_ok=True)
+        return {"converted": len(staged), "skipped": skipped, "audio_storage_mode": "flac"}
+    except Exception:
+        # No metadata is committed before conversion completes; a failed stage leaves WAV usable.
+        for tmp, final in staged.values():
+            tmp.unlink(missing_ok=True)
+        raise
+
+
+def save_project(project: Project, *, _skip_flac_conversion: bool = False):
+    # FLAC is a project storage policy, not a global rewrite of WAV projects.
+    # Persist newly rendered integer-PCM sources as FLAC only for opted-in projects.
+    if not _skip_flac_conversion and project.audio_storage_mode == "flac":
+        names = {t.filename for t in project.tracks} | {c.filename for c in project.clip_library}
+        if any(Path(name).suffix.lower() == ".wav" for name in names):
+            migrate_project_audio_to_flac(project)
+            return
     d = pdir(project.id)
     d.mkdir(parents=True, exist_ok=True)
     (d / "audio").mkdir(exist_ok=True)

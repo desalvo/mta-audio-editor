@@ -315,6 +315,7 @@ class Project(BaseModel):
     key: str = Field(default="", max_length=40)
     target: Literal["MTA8", "MTA16", "DAW"] = "MTA8"
     sample_rate: Literal[44100, 48000, 96000] = 44100
+    audio_storage_mode: Literal["wav", "flac"] = "wav"
     mta_device_profile: Literal["auto", "merish5_xynthia2", "bbeat_divo", "mlive_mta16_default", "merish5_plus_mta16", "generic"] = "auto"
     tracks: list[Track] = Field(default_factory=list)
     clip_library: list[ProjectClip] = Field(default_factory=list, max_length=512)

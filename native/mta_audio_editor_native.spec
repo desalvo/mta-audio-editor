@@ -19,6 +19,8 @@ datas = [
     (str(project / "app" / "templates"), "app/templates"),
     (str(project / "app" / "static"), "app/static"),
     (str(project / "app" / "docs"), "app/docs"),
+    (str(project / "app" / "sam_audio_worker.py"), "app"),
+    (str(project / "app" / "drumsep_onnx_worker.py"), "app"),
     (str(project / "VERSION"), "."),
     (str(project / "REVISION"), "."),
     (str(project / "RELEASE_CHANNEL"), "."),

@@ -357,6 +357,9 @@ def export_mta(project: Project, out: Path, slots: list[MtaSlotMapping] | None =
         rendered: dict[str, Path] = {}
         for i, track in enumerate(project.tracks):
             rw = td / f"source-{i:02d}.wav"
+            # The MTA transport expects MP3 streams, never raw FLAC streams.
+            # render_track decodes either WAV or FLAC at source and preserves the
+            # same millisecond clip offsets before slot mixing and MP3 encoding.
             render_track(track, audio_path(project.id, track.filename), rw)
             rendered[track.id] = rw
 
