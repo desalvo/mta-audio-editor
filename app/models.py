@@ -338,6 +338,7 @@ class Project(BaseModel):
     auto_mix_style: Literal["balanced", "live", "studio", "gentle"] = "balanced"
     auto_mix_snapshot: AutoMixSnapshot | None = None
     base_bpm: float | None = Field(default=None, gt=0, le=500)
+    original_bpm: float | None = Field(default=None, gt=0, le=500)
     metronome_mode: Literal["fixed", "zones", "adaptive"] = "fixed"
     metronome_sensitivity: float = Field(default=0.35, ge=0.0, le=1.0)
     metronome_start_ms: int = Field(default=0, ge=0, le=86_400_000)

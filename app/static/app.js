@@ -2985,7 +2985,7 @@ function tapProjectTempo(){
   const mid=Math.floor(gaps.length/2);
   const period=gaps.length%2?gaps[mid]:(gaps[mid-1]+gaps[mid])/2;
   const bpm=Math.max(30,Math.min(300,Math.round(60000/period)));
-  setProjectBpm(bpm);
+  setManualProjectBpm(bpm);
 }
 let metronomeTempoRegenerationTimer=null;
 function scheduleMetronomeTempoRegeneration(){
@@ -2999,6 +2999,50 @@ function scheduleMetronomeTempoRegeneration(){
     catch(e){toast(tr('Metronome regeneration failed','Rigenerazione metronomo fallita')+': '+e.message)}
   },450);
 }
+function projectOriginalBpm(){
+  return Number(current?.original_bpm||current?.base_bpm||current?.bpm||120);
+}
+function setManualProjectBpm(value){
+  if(!current)return;
+  const bpm=Math.round(Math.max(30,Math.min(300,Number(value)||Number(current.bpm)||120)));
+  if(!current.original_bpm)current.original_bpm=projectOriginalBpm();
+  // The reference tempo and displayed tempo move together: audio playback stays at 1x.
+  current.base_bpm=bpm;
+  current.bpm=bpm;
+  const input=$('#transportBpmInput');if(input)input.value=String(bpm);
+  const label=$('#transportBpm');if(label)label.textContent=String(bpm);
+  markDirty();stopPlayback();scheduleMetronomeTempoRegeneration();
+}
+function resetProjectBpm(){
+  if(!current)return;
+  const original=projectOriginalBpm();
+  current.base_bpm=original;
+  current.bpm=original;
+  const input=$('#transportBpmInput');if(input)input.value=String(Math.round(original));
+  const label=$('#transportBpm');if(label)label.textContent=String(Math.round(original));
+  markDirty();stopPlayback();scheduleMetronomeTempoRegeneration();
+}
+function closeBpmContextMenu(){document.querySelector('#bpmContextMenu')?.remove()}
+function openBpmContextMenu(event){
+  if(!current)return false;
+  event.preventDefault();event.stopPropagation();closeBpmContextMenu();
+  const menu=document.createElement('div');menu.id='bpmContextMenu';menu.className='lc-context-menu';
+  const manual=document.createElement('button');manual.type='button';manual.textContent=tr('Manual BPM','BPM manuali');
+  const reset=document.createElement('button');reset.type='button';reset.textContent=tr('Reset BPM','Reset BPM');
+  manual.addEventListener('click',()=>{
+    closeBpmContextMenu();const entry=$('#transportBpmInput');
+    const proposal=entry?.value||String(current?.bpm||120);
+    const answer=window.prompt(tr('Manual BPM (audio speed unchanged)','BPM manuali (velocità audio invariata)'),proposal);
+    if(answer!==null&&answer.trim()!==''&&Number.isFinite(Number(answer))&&Number(answer)>0)setManualProjectBpm(answer);
+  });
+  reset.addEventListener('click',()=>{closeBpmContextMenu();resetProjectBpm()});
+  menu.append(manual,reset);document.body.appendChild(menu);
+  menu.style.left=Math.max(8,Math.min(event.clientX,window.innerWidth-menu.offsetWidth-8))+'px';
+  menu.style.top=Math.max(8,Math.min(event.clientY,window.innerHeight-menu.offsetHeight-8))+'px';
+  const outside=(ev)=>{if(!menu.contains(ev.target)){closeBpmContextMenu();document.removeEventListener('pointerdown',outside,true)}};
+  setTimeout(()=>document.addEventListener('pointerdown',outside,true),0);
+  return false;
+}
 function setProjectBpm(v){
   if(!current)return;const n=Math.round(Math.max(30,Math.min(300,Number(v)||current.bpm)));
   if(!current.base_bpm)current.base_bpm=current.bpm||n;
@@ -3011,7 +3055,7 @@ async function setProjectTimeSignature(value,recalculate=true){
   const track=(current.tracks||[]).find(t=>t.type!=='metronome')||(current.tracks||[])[0];
   if(!track){render();scheduleMetronomeTempoRegeneration();return}
   showMediaProgress('Ricalcolo BPM',10,`Tempo impostato a ${sig}. Ricalcolo BPM…`);
-  try{const result=await api(`/api/projects/${current.id}/tracks/${track.id}/estimate-bpm?time_signature=${encodeURIComponent(sig)}`,{method:'POST'});current.bpm=Number(result.bpm);current.base_bpm=Number(result.bpm);current.time_signature=sig;render();markDirty(20);scheduleMetronomeTempoRegeneration();$('#utilityBackdrop')?.classList.add('hidden');toast(`Tempo ${sig} · BPM ${Math.round(current.bpm)}`)}catch(e){$('#utilityBackdrop')?.classList.add('hidden');render();scheduleMetronomeTempoRegeneration();toast('Tempo aggiornato; ricalcolo BPM non riuscito: '+e.message)}
+  try{const result=await api(`/api/projects/${current.id}/tracks/${track.id}/estimate-bpm?time_signature=${encodeURIComponent(sig)}`,{method:'POST'});current.bpm=Number(result.bpm);current.base_bpm=Number(result.bpm);current.original_bpm=Number(result.bpm);current.time_signature=sig;render();markDirty(20);scheduleMetronomeTempoRegeneration();$('#utilityBackdrop')?.classList.add('hidden');toast(`Tempo ${sig} · BPM ${Math.round(current.bpm)}`)}catch(e){$('#utilityBackdrop')?.classList.add('hidden');render();scheduleMetronomeTempoRegeneration();toast('Tempo aggiornato; ricalcolo BPM non riuscito: '+e.message)}
 }
 function setProjectPitch(v){
   if(!current)return;const n=Math.max(-6,Math.min(6,Number(v)||0));current.pitch_semitones=n;if($('#transportPitchInput'))$('#transportPitchInput').value=n.toFixed(1);markDirty();stopPlayback();
@@ -3850,7 +3894,7 @@ async function saveProjectMetaEditor(){
       const track=(current.tracks||[]).find(t=>t.type!=='metronome')||(current.tracks||[])[0];
       if(track){
         showMediaProgress('Ricalcolo BPM',10,`Tempo impostato a ${newSig}. Ricalcolo BPM…`);
-        try{const result=await api(`/api/projects/${current.id}/tracks/${track.id}/estimate-bpm?time_signature=${encodeURIComponent(newSig)}`,{method:'POST'});current.bpm=Number(result.bpm)||current.bpm;current.base_bpm=current.bpm}catch(e){toast('Metadata salvati; ricalcolo BPM non riuscito: '+e.message)}
+        try{const result=await api(`/api/projects/${current.id}/tracks/${track.id}/estimate-bpm?time_signature=${encodeURIComponent(newSig)}`,{method:'POST'});current.bpm=Number(result.bpm)||current.bpm;current.base_bpm=current.bpm;current.original_bpm=current.bpm}catch(e){toast('Metadata salvati; ricalcolo BPM non riuscito: '+e.message)}
       }
     }
     await api('/api/projects/'+current.id,{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify(current)});
@@ -4047,7 +4091,7 @@ async function startKaraokeExport(){
 async function recalculateBpmFromTrack(trackId){
   if(!current)return;const track=trackById(trackId);if(!track)return;
   showMediaProgress('Ricalcolo BPM',10,`Analisi ritmica di ${track.name}…`);
-  try{const result=await api(`/api/projects/${current.id}/tracks/${trackId}/estimate-bpm`,{method:'POST'});current.bpm=Number(result.bpm);current.base_bpm=Number(result.bpm);render();markDirty(50);$('#utilityBackdrop')?.classList.add('hidden');if(result.time_signature)current.time_signature=result.time_signature;toast(`BPM ricalcolati da ${track.name}: ${Math.round(Number(result.bpm))} · ${current.time_signature||'4/4'}`)}catch(e){$('#utilityBackdrop')?.classList.add('hidden');toast('Ricalcolo BPM: '+e.message)}
+  try{const result=await api(`/api/projects/${current.id}/tracks/${trackId}/estimate-bpm`,{method:'POST'});current.bpm=Number(result.bpm);current.base_bpm=Number(result.bpm);current.original_bpm=Number(result.bpm);render();markDirty(50);$('#utilityBackdrop')?.classList.add('hidden');if(result.time_signature)current.time_signature=result.time_signature;toast(`BPM ricalcolati da ${track.name}: ${Math.round(Number(result.bpm))} · ${current.time_signature||'4/4'}`)}catch(e){$('#utilityBackdrop')?.classList.add('hidden');toast('Ricalcolo BPM: '+e.message)}
 }
 function timedEditorConfig(kind){return {lyrics:{key:'text',label:'Lyrics',end:true,valueLabel:'Testo'},chords:{key:'chord',label:'Chords',end:true,valueLabel:'Accordo'},markers:{key:'label',label:'Markers',end:true,valueLabel:'Etichetta'}}[kind]||null}
 function timedEditorTime(ms){const n=Math.max(0,Number(ms)||0),m=Math.floor(n/60000),s=(n%60000)/1000;return `${m}:${s.toFixed(3).padStart(6,'0')}`}

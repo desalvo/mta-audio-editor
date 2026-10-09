@@ -1,3 +1,8 @@
+## 0.2.0-r289
+- BPM context menu: Manual BPM sets the musical tempo without changing audio playback speed; Reset BPM restores the original detected tempo and original speed.
+- Tap Tempo sets manual BPM. Direct input continues to change playback speed.
+- Original detected BPM is persisted independently from the musical reference tempo.
+
 ## 0.2.0-r288
 - Tap Tempo icon next to BPM; manual BPM/time signature edits regenerate active metronome tracks.
 - New/updated metronome tracks no longer have BPM in their name.
