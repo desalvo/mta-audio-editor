@@ -1,4 +1,4 @@
-## 0.2.0-r273 — Optional FLAC project storage + MTA compatibility
+## 0.2.0-r274 — Optional FLAC project storage + MTA compatibility
 
 - Global opt-in setting for FLAC project storage in web/native Settings; defaults to WAV.
 - Persist storage mode per project, and ask explicitly before migrating a WAV project when opening it.

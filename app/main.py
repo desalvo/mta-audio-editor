@@ -2882,7 +2882,6 @@ def _sam_audio_extract(source: Path, output_dir: Path, model_id: str, target: st
     no weights or Hugging Face credentials are bundled in the release.
     """
     import subprocess
-    import sys
     if model_id not in _SAM_AUDIO_MODELS or target not in _SAM_PROMPTS:
         raise ValueError("Unsupported SAM Audio model or instrument")
     python_binary = os.environ.get("MTA_SAM_AUDIO_PYTHON", "").strip()
