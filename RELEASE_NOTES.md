@@ -1,3 +1,12 @@
+## 0.2.0-r267 — RoFormer beartype validator compatibility
+- Override legacy beartype 0.18.x with a PEP 604-compatible validator in native packaging, and add a smoke check for Callable | None.
+- Make RoFormer failure actionable with an explicit dependency diagnostic.
+- Preserve installed model files and existing separation/outputs.
+
+## 0.2.0-r266 — AI backing vocal output path fix
+- Resolve audio-separator relative WAV filenames inside the per-job output directory, rather than the process working directory.
+- Validate both generated stems before moving them; add regression coverage for UVR MDX-NET karaoke output naming.
+
 ## 0.2.0-r265 — editor/PDF marker/lyric associations
 - Align all marker placements with lyric START times, preserve multiple markers between lines, and persist explicit manual lyric anchors in the Marker schema.
 - Apply the same auto/manual associations when rendering Lyrics+Chords PDF.

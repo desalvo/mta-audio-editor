@@ -257,8 +257,12 @@ jobs:
           pip check
           pip install "onnxruntime>=1.17" "audioread>=3,<4" "beartype>=0.18.5,<0.19" "julius>=0.2" "einops>=0.7" "ml-collections>=0.1" "onnx2torch-py313>=1.6" "rotary-embedding-torch>=0.6.1,<0.7" "samplerate==0.1.0" "resampy>=0.4" "pydub>=0.25" "tqdm>=4" "audioop-lts>=0.2.1" "packaging>=23" "six>=1.16,<2"
           pip install --no-deps "audio-separator==0.47.0"
+          # audio-separator pins beartype 0.18.x, which cannot validate RoFormer
+          # Callable | None annotations on Python 3.14. Override only the checker.
+          pip install --no-deps "beartype>=0.22.2,<0.23"
           # Fail the native installer build rather than distributing an ARM64
           # bundle whose backing-vocal model button cannot find its engine.
+          python -c "from beartype import beartype; from collections.abc import Callable; from beartype.door import is_bearable; assert is_bearable(None, Callable | None); print('RoFormer Callable | None annotation OK')"
           python -c "from audio_separator.separator import Separator; import onnxruntime; print('audio-separator and ONNX Runtime installed:', onnxruntime.get_available_providers())"
           python -c "import torch, torchvision; from torchvision.ops import nms; import torch as t; assert nms(t.empty((0,4)),t.empty((0,)),0.5).numel()==0; print('torchvision nms OK:',torch.__version__,torchvision.__version__)"
       - name: Install FFmpeg and Inno Setup
@@ -389,8 +393,12 @@ jobs:
           # The arm64 audio-separator wheel omits audioread from its published dependencies.
           pip install "audioread>=3,<4"
           if [[ "${{ matrix.arch }}" != "x64" ]]; then pip check; fi
+          # Install modern beartype after dependency validation to support
+          # RoFormer PEP 604 annotations in the bundled Python 3.14 runtime.
+          pip install --no-deps "beartype>=0.22.2,<0.23"
           # Fail the native installer build rather than distributing an ARM64
           # bundle whose backing-vocal model button cannot find its engine.
+          python -c "from beartype import beartype; from collections.abc import Callable; from beartype.door import is_bearable; assert is_bearable(None, Callable | None); print('RoFormer Callable | None annotation OK')"
           python -c "from audio_separator.separator import Separator; import onnxruntime; print('audio-separator and ONNX Runtime installed:', onnxruntime.get_available_providers())"
           python -c "import torch, torchvision; from torchvision.ops import nms; import torch as t; assert nms(t.empty((0,4)),t.empty((0,)),0.5).numel()==0; print('torchvision nms OK:',torch.__version__,torchvision.__version__)"
       - name: Install FFmpeg

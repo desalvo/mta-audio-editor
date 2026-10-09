@@ -2771,14 +2771,38 @@ def _split_lead_backing_vocals(vocal_stem: Path, output_dir: Path, *, model_id: 
             "Reinstall matching PyTorch and torchvision builds for your OS/architecture."
         ) from exc
     separator = Separator(model_file_dir=str(LEAD_BACKING_MODEL_DIR), output_dir=str(output_dir), output_format="WAV")
-    separator.load_model(model_filename=info["filename"])
+    try:
+        separator.load_model(model_filename=info["filename"])
+    except Exception as exc:
+        if "beartype" in str(exc).lower() and ("callable" in str(exc).lower() or "pep" in str(exc).lower()):
+            raise RuntimeError(
+                "RoFormer model cannot be loaded with the installed beartype validator. "
+                "Install a compatible beartype >= 0.22.2 build, then restart MTA Audio Editor. "
+                f"Original error: {exc}"
+            ) from exc
+        raise
     if cancel_event is not None and cancel_event.is_set():
         raise RuntimeError("stem separation cancelled")
-    outputs = [Path(item) for item in separator.separate(str(vocal_stem))]
+    # audio-separator may return bare filenames even when output_dir is configured.
+    # Never resolve those against the server's current working directory.
+    raw_outputs = separator.separate(str(vocal_stem)) or []
+    outputs = []
+    for item in raw_outputs:
+        path = Path(item)
+        if not path.is_absolute():
+            # Some versions return a relative path including output_dir; others
+            # return only the filename. Prefer the actual job output directory.
+            candidates = (output_dir / path, output_dir / path.name)
+            path = next((candidate for candidate in candidates if candidate.is_file()), candidates[0])
+        if path.is_file() and path.parent.resolve() == output_dir.resolve():
+            outputs.append(path)
     vocal_output = next((x for x in outputs if "vocal" in x.name.lower() and "back" not in x.name.lower()), None)
     backing_output = next((x for x in outputs if any(k in x.name.lower() for k in ("instrumental", "karaoke", "backing"))), None)
-    if vocal_output is None or backing_output is None:
-        raise RuntimeError(f"AI separator did not return lead/backing-compatible stems: {[x.name for x in outputs]}")
+    if vocal_output is None or backing_output is None or vocal_output == backing_output:
+        raise RuntimeError(
+            "AI separator did not produce both lead and backing stems in its output directory: "
+            f"{[str(x) for x in outputs]} (returned: {[str(x) for x in raw_outputs]})"
+        )
     shutil.move(str(vocal_output), lead)
     shutil.move(str(backing_output), backing)
     return lead, backing, f"audio-separator:{selected}"

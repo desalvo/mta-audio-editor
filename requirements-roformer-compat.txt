@@ -1,0 +1,4 @@
+# RoFormer PEP 604 type-hint compatibility for Python 3.14 native builds.
+# Installed --no-deps AFTER audio-separator because its published metadata pins beartype<0.19.
+# The dependency override is deliberate and requires native integration testing.
+beartype>=0.22.2,<0.23
