@@ -1,3 +1,22 @@
+## 0.2.0-r288
+- Tap Tempo icon next to BPM; manual BPM/time signature edits regenerate active metronome tracks.
+- New/updated metronome tracks no longer have BPM in their name.
+
+## 0.2.0-r287 — Track delay and metronome interval
+
+- Inline delay under track volume (milliseconds or beats based on transport mode), applied to playback/timeline/render/export via existing persisted track delay.
+- Generated metronome and chords tracks preserve their non-destructive track delay across refreshes.
+- Metronome start and stop (milliseconds) are persistent; empty stop means project end. Generated metronome WAV is silent outside the requested range, with unmodified timeline timestamps.
+
+## 0.2.0-r287 — Track delay controls
+
+- Inline delay under track volume (milliseconds or beats based on transport mode), applied to playback/timeline/render/export via existing persisted track delay.
+- Generated metronome and chords tracks preserve their non-destructive track delay across refreshes.
+
+## 0.2.0-r286 — YouTube guidance and initial track alignment
+- Explain browser playback before YouTube URL import (Italian/English).
+- Reset initial Tracks/timeline vertical scroll on first track insertion and disable scroll anchoring.
+
 ## 0.2.0-r285 — timeline chord and marker visibility
 - Keep chord labels and marker editing handles visible during vertical track scrolling without changing their timestamp positions or event handlers.
 

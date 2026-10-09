@@ -4025,6 +4025,40 @@ def start_track_stem_job(
 
 
 
+def _limit_metronome_wav(path: Path, start_ms: int, stop_ms: int | None) -> None:
+    """Mute outside [start, stop) without shifting the generated beat timeline."""
+    if start_ms == 0 and stop_ms is None:
+        return
+    with wave.open(str(path), "rb") as src:
+        params = src.getparams()
+        if params.comptype != "NONE":
+            raise ValueError("Metronome WAV must be uncompressed PCM")
+        rate, count = src.getframerate(), src.getnframes()
+        start = max(0, min(count, round(start_ms * rate / 1000)))
+        stop = count if stop_ms is None else max(start, min(count, round(stop_ms * rate / 1000)))
+        if start == 0 and stop == count:
+            return
+        sample_width = params.nchannels * params.sampwidth
+        replacement = path.with_name(path.name + ".window.wav")
+        try:
+            with wave.open(str(replacement), "wb") as dest:
+                dest.setparams(params)
+                block = 32768
+                for i in range(0, count, block):
+                    n = min(block, count - i)
+                    raw = bytearray(src.readframes(n))
+                    if i < start:
+                        zero_to = min(n, start - i)
+                        raw[:zero_to * sample_width] = b"\x00" * (zero_to * sample_width)
+                    if i + n > stop:
+                        zero_from = max(0, stop - i)
+                        raw[zero_from * sample_width:] = b"\x00" * ((n-zero_from) * sample_width)
+                    dest.writeframesraw(raw)
+            os.replace(replacement, path)
+        finally:
+            replacement.unlink(missing_ok=True)
+
+
 @app.post("/api/projects/{pid}/metronome-track")
 def create_metronome_track(pid: str, request: Request, mode: str = "fixed", track_id: str = "", sensitivity: float = 0.35):
     with METRONOME_TRACK_LOCK:
@@ -4165,6 +4199,7 @@ def _create_metronome_track_locked(pid: str, request: Request, mode: str = "fixe
             project.adaptive_tempo_map = []
         project.metronome_reference_track_id = reference_track.id if reference_track is not None else ""
         project.metronome_reference_track_name = reference_track.name if reference_track is not None else ""
+        _limit_metronome_wav(out, project.metronome_start_ms, project.metronome_stop_ms)
         peaks = waveform_peaks(out)
     except Exception as exc:
         if not reused:
@@ -4174,7 +4209,7 @@ def _create_metronome_track_locked(pid: str, request: Request, mode: str = "fixe
     if track is None:
         track = Track(
             id=uuid.uuid4().hex[:10],
-            name=("Metronomo adattivo" if mode == "adaptive" else ("Metronomo a zone" if mode == "zones" else f"Metronomo {project.bpm:g} BPM")),
+            name=("Metronomo adattivo" if mode == "adaptive" else ("Metronomo a zone" if mode == "zones" else "Metronomo")),
             type="click",
             filename=filename,
             duration_ms=duration_ms,
@@ -4195,7 +4230,7 @@ def _create_metronome_track_locked(pid: str, request: Request, mode: str = "fixe
         )
         project.tracks.append(track)
     else:
-        track.name = "Metronomo adattivo" if mode == "adaptive" else ("Metronomo a zone" if mode == "zones" else f"Metronomo {project.bpm:g} BPM")
+        track.name = "Metronomo adattivo" if mode == "adaptive" else ("Metronomo a zone" if mode == "zones" else "Metronomo")
         track.type = "click"
         track.filename = filename
         track.duration_ms = duration_ms

@@ -132,7 +132,7 @@ A track context menu can extract synchronized lyrics and chords into the project
 ### Rights repertoire lookup / Repertori società d’autori
 Project Info can search selected rights societies (SIAE and Soundreef enabled by default), store multiple verified repertoire records for the same song across multiple rights providers, include all of them in MTA project metadata, display every stored record in Project Info, and export all available provider fields in both Lyrics + Chords PDF and ChordPro. Structured lookup uses authorized HTTPS endpoints configured with `MTA_RIGHTS_SIAE_SEARCH_URL` and `MTA_RIGHTS_SOUNDREEF_SEARCH_URL`; otherwise the official repertoire portal plus manual verified-result import is used. Lyrics + Chords can also be exported as ChordPro (`.cho`).
 
-- YouTube audio import: paste a single `youtube.com`/`youtu.be` video URL to add its audio as a project track (authorization/rights confirmation required).
+- YouTube audio import: first play the video audio in your browser, then copy and paste a single `youtube.com`/`youtu.be` video URL to add its audio as a project track (authorization/rights confirmation required).
 
 
 ### Lead Vocals / Backing Vocals

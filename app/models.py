@@ -340,6 +340,8 @@ class Project(BaseModel):
     base_bpm: float | None = Field(default=None, gt=0, le=500)
     metronome_mode: Literal["fixed", "zones", "adaptive"] = "fixed"
     metronome_sensitivity: float = Field(default=0.35, ge=0.0, le=1.0)
+    metronome_start_ms: int = Field(default=0, ge=0, le=86_400_000)
+    metronome_stop_ms: int | None = Field(default=None, ge=0, le=86_400_000)
     show_markers_playback: bool = False
     metronome_reference_track_id: str = Field(default="", max_length=80)
     metronome_reference_track_name: str = Field(default="", max_length=200)

@@ -69,7 +69,7 @@ const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const TRACK_COLORS=['#2f81f7','#28b463','#f0a52b','#8a58db','#e9506c','#8395a7','#24b8d4','#b26ff2','#e67e22','#16a085','#d35400','#7f8c8d'];
 
 const UI_TEXT_PAIRS=[
-['Project','Progetto'],['No project loaded','Nessun progetto caricato'],['New project','Nuovo progetto'],['Open project','Apri progetto'],['Open recent','Apri recenti'],['Close project','Chiudi progetto'],['Delete project','Elimina progetto'],['Project files','File progetto'],['Share project','Condividi progetto'],['Info progetto','Info progetto'],['Save','Salva'],['Save as','Salva con nome'],['Save project','Salva progetto'],['Save project as…','Salva progetto con nome…'],['Save project locally','Salva progetto localmente'],['Open local project','Apri progetto locale'],['Open recent','Apri recenti'],['Export','Esporta'],['Settings','Impostazioni'],['About','Informazioni'],['Docs & Help','Documentazione e aiuto'],['Account','Account'],['Esci','Esci'],['View','Vista'],['VIEW','VISTA'],['Tracks','Tracce'],['Mixer','Mixer'],['Piano / Chord Lab','Piano / Chord Lab'],['Mostra/nascondi Piano / Chord Lab','Show/hide Piano / Chord Lab'],['Plugins','Plugin'],['Lyrics','Testo'],['Chords','Accordi'],['Markers','Marker'],['Select','Seleziona'],['Split','Dividi'],['Range','Intervallo'],['Ripple','Ripple'],['Bars','Battute'],['Beats','Quarti'],['Off','Disattivato'],['Import Audio Track','Importa traccia audio'],['Import Audio','Importa audio'],['Import YouTube','Importa YouTube'],['Import & Separate','Importa e separa'],['Metronomo','Metronomo'],['Adattivo','Adaptive'],['Metronomo adattivo','Adaptive metronome'],['Undo','Annulla'],['Redo','Ripristina'],['Cut','Taglia'],['Copy','Copia'],['Paste','Incolla'],['Remove','Rimuovi'],['Delete tracks','Elimina tracce'],['Delete selected range','Elimina intervallo selezionato'],['Show Lyrics','Mostra testo'],['Show Chords','Mostra accordi'],['Follow','Segui'],['Render','Render'],['Setup','Impostazioni progetto'],['Maximum import/upload size (MB)','Dimensione massima import/upload (MB)'],['Auto-save project changes','Salvataggio automatico modifiche progetto'],['Show previous and next chords','Mostra accordo precedente e successivo'],['Show previous and next lyrics','Mostra testo precedente e successivo'],['Update channel','Canale aggiornamenti'],['Stable · GitHub tags/releases only','Stabile · solo tag/release GitHub'],['Early release · include latest main packages','Early release · include gli ultimi pacchetti main'],['Check for updates','Controlla aggiornamenti'],['Manage Demucs models','Gestisci modelli Demucs'],['Manage Lyrics / Chords models','Gestisci modelli Lyrics / Chords'],['Cancel','Annulla'],['Annulla','Annulla'],['Apply','Applica'],['Applica','Applica'],['Reset','Ripristina'],['Ripristina','Ripristina'],['Normal','Normale'],['Bold','Grassetto'],['Italic','Corsivo'],['Title','Titolo'],['Subtitle','Sottotitolo'],['BPM','BPM'],['Time signature','Metrica'],['Artist / performer','Artista / interprete'],['Original title','Titolo originale'],['Authors / composers','Autori / compositori'],['Key','Tonalità'],['Project type','Tipo progetto'],['MTA profile','Profilo MTA'],['Rights societies','Società repertorio'],['Edit project metadata','Modifica metadata progetto'],['Save project manually','Salva progetto manualmente'],['Check for updates','Controlla aggiornamenti'],['Language','Lingua'],['Auto (system)','Auto (sistema)'],['Italian','Italiano'],['English','Inglese'],['selected','selezionate'],['TRACKS','TRACCE'],['Inspector','Inspector'],['Stems','Stem'],['Metadata','Metadata'],['Volume','Volume'],['Pan','Pan'],['Type','Tipo'],['Replace','Sostituisci'],['Track export','Export traccia'],['Advanced','Avanzate'],['Send','Send'],['Track Automation','Automazione traccia'],['Rinomina','Rinomina'],['Separa','Separa'],['Estrai lyrics','Estrai testo'],['Estrai chords','Estrai accordi'],['Sincronizza metronomo','Sincronizza metronomo'],['Delay / anticipo traccia…','Ritardo / anticipo traccia…'],['Modifica metadata progetto','Modifica metadata progetto'],['Titolo','Titolo'],['Titolo originale','Titolo originale'],['Autori / compositori','Autori / compositori'],['Artista / interprete','Artista / interprete'],['Tonalità / Key','Tonalità'],['Tipo progetto','Tipo progetto'],['Profilo MTA','Profilo MTA'],['Società repertorio','Società repertorio'],['Salva','Salva'],['Version','Versione'],['Revision','Revisione'],['Release','Release'],['Build','Build'],['Creator','Creatore'],['License','Licenza'],['Repository','Progetto'],['Early Access','Accesso anticipato'],['Close','Chiudi'],['Chiudi menu','Chiudi menu'],['Menu','Menu']
+['Project','Progetto'],['No project loaded','Nessun progetto caricato'],['New project','Nuovo progetto'],['Open project','Apri progetto'],['Open recent','Apri recenti'],['Close project','Chiudi progetto'],['Delete project','Elimina progetto'],['Project files','File progetto'],['Share project','Condividi progetto'],['Info progetto','Info progetto'],['Save','Salva'],['Save as','Salva con nome'],['Save project','Salva progetto'],['Save project as…','Salva progetto con nome…'],['Save project locally','Salva progetto localmente'],['Open local project','Apri progetto locale'],['Open recent','Apri recenti'],['Export','Esporta'],['Settings','Impostazioni'],['About','Informazioni'],['Docs & Help','Documentazione e aiuto'],['Account','Account'],['Esci','Esci'],['View','Vista'],['VIEW','VISTA'],['Tracks','Tracce'],['Mixer','Mixer'],['Piano / Chord Lab','Piano / Chord Lab'],['Mostra/nascondi Piano / Chord Lab','Show/hide Piano / Chord Lab'],['Plugins','Plugin'],['Lyrics','Testo'],['Chords','Accordi'],['Markers','Marker'],['Select','Seleziona'],['Split','Dividi'],['Range','Intervallo'],['Ripple','Ripple'],['Bars','Battute'],['Beats','Quarti'],['Off','Disattivato'],['Import Audio Track','Importa traccia audio'],['Import Audio','Importa audio'],['Copia e incolla l’URL del video. Prima di importare, apri il video nel browser e avviane la riproduzione audio: senza questo passaggio l’importazione potrebbe fallire.','Copy and paste the video URL. Before importing, open the video in your browser and start audio playback: otherwise the import may fail.'],['Import YouTube','Importa YouTube'],['Import & Separate','Importa e separa'],['Metronomo','Metronomo'],['Adattivo','Adaptive'],['Metronomo adattivo','Adaptive metronome'],['Undo','Annulla'],['Redo','Ripristina'],['Cut','Taglia'],['Copy','Copia'],['Paste','Incolla'],['Remove','Rimuovi'],['Delete tracks','Elimina tracce'],['Delete selected range','Elimina intervallo selezionato'],['Show Lyrics','Mostra testo'],['Show Chords','Mostra accordi'],['Follow','Segui'],['Render','Render'],['Setup','Impostazioni progetto'],['Maximum import/upload size (MB)','Dimensione massima import/upload (MB)'],['Auto-save project changes','Salvataggio automatico modifiche progetto'],['Show previous and next chords','Mostra accordo precedente e successivo'],['Show previous and next lyrics','Mostra testo precedente e successivo'],['Update channel','Canale aggiornamenti'],['Stable · GitHub tags/releases only','Stabile · solo tag/release GitHub'],['Early release · include latest main packages','Early release · include gli ultimi pacchetti main'],['Check for updates','Controlla aggiornamenti'],['Manage Demucs models','Gestisci modelli Demucs'],['Manage Lyrics / Chords models','Gestisci modelli Lyrics / Chords'],['Cancel','Annulla'],['Annulla','Annulla'],['Apply','Applica'],['Applica','Applica'],['Reset','Ripristina'],['Ripristina','Ripristina'],['Normal','Normale'],['Bold','Grassetto'],['Italic','Corsivo'],['Title','Titolo'],['Subtitle','Sottotitolo'],['Tap tempo · press repeatedly to set BPM','Tap tempo · premi ripetutamente per impostare i BPM'],['BPM','BPM'],['Time signature','Metrica'],['Artist / performer','Artista / interprete'],['Original title','Titolo originale'],['Authors / composers','Autori / compositori'],['Key','Tonalità'],['Project type','Tipo progetto'],['MTA profile','Profilo MTA'],['Rights societies','Società repertorio'],['Edit project metadata','Modifica metadata progetto'],['Save project manually','Salva progetto manualmente'],['Check for updates','Controlla aggiornamenti'],['Language','Lingua'],['Auto (system)','Auto (sistema)'],['Italian','Italiano'],['English','Inglese'],['selected','selezionate'],['TRACKS','TRACCE'],['Inspector','Inspector'],['Stems','Stem'],['Metadata','Metadata'],['Volume','Volume'],['Pan','Pan'],['Type','Tipo'],['Replace','Sostituisci'],['Track export','Export traccia'],['Advanced','Avanzate'],['Send','Send'],['Track Automation','Automazione traccia'],['Rinomina','Rinomina'],['Separa','Separa'],['Estrai lyrics','Estrai testo'],['Estrai chords','Estrai accordi'],['Sincronizza metronomo','Sincronizza metronomo'],['Delay / anticipo traccia…','Ritardo / anticipo traccia…'],['Modifica metadata progetto','Modifica metadata progetto'],['Titolo','Titolo'],['Titolo originale','Titolo originale'],['Autori / compositori','Autori / compositori'],['Artista / interprete','Artista / interprete'],['Tonalità / Key','Tonalità'],['Tipo progetto','Tipo progetto'],['Profilo MTA','Profilo MTA'],['Società repertorio','Società repertorio'],['Salva','Salva'],['Version','Versione'],['Revision','Revisione'],['Release','Release'],['Build','Build'],['Creator','Creatore'],['License','Licenza'],['Repository','Progetto'],['Early Access','Accesso anticipato'],['Close','Chiudi'],['Chiudi menu','Chiudi menu'],['Menu','Menu']
 ];
 let uiLanguage=null;
 const UI_EN_IT=new Map(UI_TEXT_PAIRS),UI_IT_EN=new Map(UI_TEXT_PAIRS.map(([en,it])=>[it,en]));
@@ -452,12 +452,16 @@ function restoreUiState(){
   });
 }
 let lastMetronomeZoneProjectId=null;
+let previousRenderedTrackState={projectId:null,count:0};
 function render(){
   if(current?.id!==lastMetronomeZoneProjectId){lastMetronomeZoneProjectId=current?.id||null;lastMetronomeZoneSignature=metronomeZoneSignature(current)}
   if(current?.chords?.some(ch=>ch?.deleted))current.chords=current.chords.filter(ch=>!ch?.deleted);
   if(current?.markers?.some(marker=>marker?.deleted))current.markers=current.markers.filter(marker=>!marker?.deleted);
   if(current){pxPerSec=Number(current.timeline_zoom_px_per_sec||70);mixerMetaTab=current.mixer_meta_tab||'lyrics';exportFormat=current.export_format||'mta';}
+  const firstTracksAdded=!!current&&previousRenderedTrackState.projectId===current.id&&previousRenderedTrackState.count===0&&(current.tracks?.length||0)>0;
   captureUiState();
+  if(firstTracksAdded){uiState.trackTop=0;uiState.timelineTop=0;}
+  previousRenderedTrackState={projectId:current?.id||null,count:current?.tracks?.length||0};
   if(!current){$('#emptyState').classList.remove('hidden');$('#editor').hidden=true;$('#mixerDock').hidden=true;return}
   $('#emptyState').classList.add('hidden');$('#editor').hidden=false;$('#mixerDock').hidden=false;
   $('#headerProjectName').textContent=current.title;
@@ -484,7 +488,7 @@ function render(){
   syncZoomControls(pxPerSec);
   updateMixerDockLayout();updatePanelMenuButtons();bindMixerResizer();bindPianoLabResizer();
   drawRuler();bindTimeline();bindProjectClipDrop();bindTrackTimelineScroll();bindTrackResizer();
-  current.tracks.forEach(drawWave);if(waveformValidationProjectId!==current.id){waveformValidationProjectId=current.id;ensureWaveforms(true)}else ensureWaveforms(false);updateSel();bindModelInputs();updateMuteSoloVisuals();restoreUiState();ensureSessionHistory();updateEditActionState();applyInterfaceLanguage();forceNativeViewportTop();schedulePlaybackPrewarm(180);
+  current.tracks.forEach(drawWave);if(waveformValidationProjectId!==current.id){waveformValidationProjectId=current.id;ensureWaveforms(true)}else ensureWaveforms(false);updateSel();bindModelInputs();updateMuteSoloVisuals();restoreUiState();if(firstTracksAdded)requestAnimationFrame(()=>{const tracks=$('#trackColumn'),timeline=$('#timelinePane');if(tracks)tracks.scrollTop=0;if(timeline)timeline.scrollTop=0;});ensureSessionHistory();updateEditActionState();applyInterfaceLanguage();forceNativeViewportTop();schedulePlaybackPrewarm(180);
 }
 function isGeneratedChordsTrack(track){const name=String(track?.name||'').trim().toLowerCase(),filename=String(track?.filename||'').toLowerCase();return ['chords','accordi','chords piano','accordi piano'].includes(name)||filename.startsWith('chords-piano-')}
 function hasGeneratedChordsTrack(){return !!current?.tracks?.some(isGeneratedChordsTrack)}
@@ -554,12 +558,17 @@ async function createChordsTrack(){
 function openMetronomeSettings(){
   if(!current)return toast('Apri prima un progetto');
   const mode=current.metronome_mode||'fixed', sensitivity=Number(current.metronome_sensitivity??0.35);
-  showUtilityModal('Impostazioni metronomo',`<div class="workflow-grid"><label class="workflow-field"><span>Tipo di metronomo</span><select id="metronomeMode"><option value="fixed" ${mode==='fixed'?'selected':''}>Standard · intero progetto</option><option value="zones" ${mode==='zones'?'selected':''}>A zone · tra marker</option><option value="adaptive" ${mode==='adaptive'?'selected':''}>Adattivo · analisi ritmica</option></select></label><label class="workflow-field"><span>Sensibilità adattiva (0 stabile – 1 reattiva)</span><input id="metronomeSensitivity" type="range" min="0" max="1" step="0.05" value="${sensitivity}"></label></div><p class="muted">I marker attivi delimitano le zone; la griglia riparte a ogni marker. Le opzioni sono salvate nel progetto.</p><div class="modal-actions metronome-modal-actions"><button type="button" onclick="closeUtilityModal()">Annulla</button><button type="button" class="primary metronome-generate-button" onclick="applyMetronomeSettings()">Genera metronomo</button></div>`);
+  showUtilityModal('Impostazioni metronomo',`<div class="workflow-grid"><label class="workflow-field"><span>Tipo di metronomo</span><select id="metronomeMode"><option value="fixed" ${mode==='fixed'?'selected':''}>Standard · intero progetto</option><option value="zones" ${mode==='zones'?'selected':''}>A zone · tra marker</option><option value="adaptive" ${mode==='adaptive'?'selected':''}>Adattivo · analisi ritmica</option></select></label><label class="workflow-field"><span>Start (ms)</span><input id="metronomeStartMs" type="number" min="0" step="1" value="${Number(current.metronome_start_ms||0)}"></label><label class="workflow-field"><span>Stop (ms) · ${tr('blank = end of project','vuoto = fine progetto')}</span><input id="metronomeStopMs" type="number" min="0" step="1" placeholder="${tr('End of project','Fine progetto')}" value="${current.metronome_stop_ms==null?'':Number(current.metronome_stop_ms)}"></label><label class="workflow-field"><span>Sensibilità adattiva (0 stabile – 1 reattiva)</span><input id="metronomeSensitivity" type="range" min="0" max="1" step="0.05" value="${sensitivity}"></label></div><p class="muted">I marker attivi delimitano le zone; la griglia riparte a ogni marker. Le opzioni sono salvate nel progetto.</p><div class="modal-actions metronome-modal-actions"><button type="button" onclick="closeUtilityModal()">Annulla</button><button type="button" class="primary metronome-generate-button" onclick="applyMetronomeSettings()">Genera metronomo</button></div>`);
 }
 async function applyMetronomeSettings(){
   if(!current)return;
   const mode=$('#metronomeMode')?.value||'fixed';
   const sensitivity=Number($('#metronomeSensitivity')?.value||0.35);
+  const start=Number($('#metronomeStartMs')?.value||0);
+  const rawStop=String($('#metronomeStopMs')?.value||'').trim();
+  const stop=rawStop===''?null:Number(rawStop);
+  if(!Number.isInteger(start)||start<0||start>86400000||stop!==null&&(!Number.isInteger(stop)||stop<=start||stop>86400000))return toast(tr('Invalid metronome start/stop times','Intervallo start/stop metronomo non valido'));
+  current.metronome_start_ms=start;current.metronome_stop_ms=stop;
   current.metronome_mode=mode;current.metronome_sensitivity=sensitivity;
   closeUtilityModal();const reference=mode==='zones'?(current.tracks||[]).find(t=>t.type!=='click'&&!isGeneratedChordsTrack(t)&&t.filename):null;await createMetronomeTrack(mode,reference?.id||'');
 }
@@ -608,6 +617,7 @@ async function createMetronomeTrack(mode='fixed',referenceTrackId=''){
   try{
     metronomeCreatePending=true;
     await flushAutosave();
+    current=await api('/api/projects/'+current.id,{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify(current)});
     if(adaptive)showUtilityModal('Metronomo adattivo',`<div class="stem-progress-card"><div class="stem-progress-head"><b>Analisi completa delle variazioni di tempo…</b><span>…</span></div><div class="stem-progress indeterminate"><div class="stem-progress-fill"></div></div><div class="stem-progress-message">La tempo map precedente non viene riutilizzata: tutti i beat e tutte le variazioni vengono ricalcolati sul brano corrente.</div></div>`);
     const reference=referenceTrackId?trackById(referenceTrackId):null;
     const query=`mode=${encodeURIComponent(mode)}&sensitivity=${encodeURIComponent(current.metronome_sensitivity??0.35)}${referenceTrackId?`&track_id=${encodeURIComponent(referenceTrackId)}`:''}`;
@@ -895,6 +905,16 @@ function trackHead(t,i){
         <input class="track-mini-slider track-volume-range" data-volume-track="${t.id}" type="range" min="-60" max="12" step="0.5" value="${t.volume_db}" oninput="setTrackVolume('${t.id}',this.value)">
         <input class="track-db-input volume-number" id="db-${t.id}" data-volume-number="${t.id}" type="number" min="-60" max="12" step="0.1" value="${Number(t.volume_db).toFixed(1)}" oninput="setTrackVolume('${t.id}',this.value)" aria-label="Volume ${esc(t.name)} in dB" title="Volume in dB">
       </div>
+      <div class="track-delay-row" onclick="event.stopPropagation()">
+        <label for="track-delay-${t.id}">${esc(tr('Delay','Ritardo'))}</label>
+        <input id="track-delay-${t.id}" class="track-delay-input" data-delay-track="${t.id}" type="number" step="${current?.transport_time_mode==='musical'?'0.01':'1'}" value="${trackDelayInputValue(t)}" onkeydown="if(event.key==='Enter'){this.blur()}" onchange="setTrackDelayFromInput('${t.id}',this.value)" title="${esc(tr('Track delay (positive or negative)','Ritardo traccia (positivo o negativo)'))}">
+        <span class="track-delay-unit">${current?.transport_time_mode==='musical'?'beats':'ms'}</span>
+      </div>
+      <div class="track-delay-row" onclick="event.stopPropagation()">
+        <label for="track-delay-${t.id}">${esc(tr('Delay','Ritardo'))}</label>
+        <input id="track-delay-${t.id}" class="track-delay-input" data-delay-track="${t.id}" type="number" step="${current?.transport_time_mode==='musical'?'0.01':'1'}" value="${trackDelayInputValue(t)}" onkeydown="if(event.key==='Enter'){this.blur()}" onchange="setTrackDelayFromInput('${t.id}',this.value)" title="${esc(tr('Track delay (positive or negative)','Ritardo traccia (positivo o negativo)'))}">
+        <span class="track-delay-unit">${current?.transport_time_mode==='musical'?'beats':'ms'}</span>
+      </div>
       ${t.type==='click'?`<div class="track-metronome-kind" title="${esc(metronomeTrackModeLabel(t))}" aria-label="${esc(metronomeTrackModeLabel(t))}">${esc(metronomeTrackModeLabel(t))}</div>`:''}
     </div>
     <div class="track-height-resizer" title="Trascina per modificare l'altezza della traccia" onpointerdown="beginTrackHeightResize(event,'${t.id}')"></div>
@@ -971,6 +991,54 @@ function delayValueFromMs(ms,unit){
   if(unit==='bars'){const beats=Math.max(1,Number(String(current?.time_signature||'4/4').split('/')[0])||4);return Number(ms)*bpm/(beats*60000);}
   if(unit==='quarters')return Number(ms)*bpm/60000;
   return Number(ms);
+}
+function trackDelayInputValue(track){
+  const musical=current?.transport_time_mode==='musical';
+  const value=delayValueFromMs(trackDelayMs(track),musical?'quarters':'ms');
+  return musical?String(Math.round(value*1000)/1000):String(Math.round(value));
+}
+async function setTrackDelayFromInput(id,value){
+  const track=trackById(id);if(!track)return;
+  const n=Number(value);
+  if(!String(value).trim()||!Number.isFinite(n)){
+    toast(tr('Invalid track delay','Ritardo traccia non valido'));
+    const input=$(`[data-delay-track="${id}"]`);if(input)input.value=trackDelayInputValue(track);
+    return;
+  }
+  await setTrackDelay(id,n,current?.transport_time_mode==='musical'?'quarters':'ms');
+}
+function updateTrackDelayUnitDisplay(){
+  $$('.track-delay-row').forEach(row=>{
+    const input=row.querySelector('[data-delay-track]');if(!input)return;
+    const track=trackById(input.dataset.delayTrack);if(!track)return;
+    input.step=current?.transport_time_mode==='musical'?'0.01':'1';
+    input.value=trackDelayInputValue(track);
+    const unit=row.querySelector('.track-delay-unit');if(unit)unit.textContent=current?.transport_time_mode==='musical'?'beats':'ms';
+  });
+}
+function trackDelayInputValue(track){
+  const musical=current?.transport_time_mode==='musical';
+  const value=delayValueFromMs(trackDelayMs(track),musical?'quarters':'ms');
+  return musical?String(Math.round(value*1000)/1000):String(Math.round(value));
+}
+async function setTrackDelayFromInput(id,value){
+  const track=trackById(id);if(!track)return;
+  const n=Number(value);
+  if(!String(value).trim()||!Number.isFinite(n)){
+    toast(tr('Invalid track delay','Ritardo traccia non valido'));
+    const input=$(`[data-delay-track="${id}"]`);if(input)input.value=trackDelayInputValue(track);
+    return;
+  }
+  await setTrackDelay(id,n,current?.transport_time_mode==='musical'?'quarters':'ms');
+}
+function updateTrackDelayUnitDisplay(){
+  $$('.track-delay-row').forEach(row=>{
+    const input=row.querySelector('[data-delay-track]');if(!input)return;
+    const track=trackById(input.dataset.delayTrack);if(!track)return;
+    input.step=current?.transport_time_mode==='musical'?'0.01':'1';
+    input.value=trackDelayInputValue(track);
+    const unit=row.querySelector('.track-delay-unit');if(unit)unit.textContent=current?.transport_time_mode==='musical'?'beats':'ms';
+  });
 }
 function openTrackDelayDialog(id){
   const track=trackById(id);if(!track)return;
@@ -2354,7 +2422,7 @@ function seekProjectFromSlider(value){
   const fraction=Math.max(0,Math.min(1,Number(value)/1000));goToTimestamp(Math.round(duration*fraction));
 }
 function updateTransportPositionDisplay(){if($('#transportTime'))$('#transportTime').value=transportPositionText(playCursorMs);updateTransportSeekSlider()}
-async function setTransportDisplayMode(mode){if(!current)return;mode=mode==='musical'?'musical':'time';current.transport_time_mode=mode;updateTransportPositionDisplay();try{await api(`/api/projects/${current.id}/transport-time-mode?mode=${mode}`,{method:'POST'})}catch(e){markDirty(100)}}
+async function setTransportDisplayMode(mode){if(!current)return;mode=mode==='musical'?'musical':'time';current.transport_time_mode=mode;updateTransportPositionDisplay();updateTrackDelayUnitDisplay();updateTrackDelayUnitDisplay();try{await api(`/api/projects/${current.id}/transport-time-mode?mode=${mode}`,{method:'POST'})}catch(e){markDirty(100)}}
 function setPlayCursor(ms){
   playCursorMs=Math.max(0,Math.round(ms));
   const playheadX=playCursorMs/1000*pxPerSec;
@@ -2903,19 +2971,47 @@ function zoomPresetValue(spec){
 function applyZoomPreset(spec){if(!current||spec==='custom')return;const next=zoomPresetValue(spec);previewZoom(next,spec);requestAnimationFrame(()=>commitZoom(next,spec))}
 
 function tempoRatio(){const base=Number(current?.base_bpm||current?.bpm||120);return Math.max(.25,Math.min(4,Number(current?.bpm||base)/base))}
+// Four or more taps establish a rolling median period; long pauses start a fresh series.
+let tempoTapTimestamps=[];
+function tapProjectTempo(){
+  if(!current)return;
+  const now=performance.now();
+  if(tempoTapTimestamps.length && now-tempoTapTimestamps.at(-1)>2500)tempoTapTimestamps=[];
+  tempoTapTimestamps.push(now);
+  tempoTapTimestamps=tempoTapTimestamps.slice(-7);
+  if(tempoTapTimestamps.length<2)return;
+  const gaps=tempoTapTimestamps.slice(1).map((t,i)=>t-tempoTapTimestamps[i]).filter(v=>v>=200&&v<=2000).sort((a,b)=>a-b);
+  if(!gaps.length)return;
+  const mid=Math.floor(gaps.length/2);
+  const period=gaps.length%2?gaps[mid]:(gaps[mid-1]+gaps[mid])/2;
+  const bpm=Math.max(30,Math.min(300,Math.round(60000/period)));
+  setProjectBpm(bpm);
+}
+let metronomeTempoRegenerationTimer=null;
+function scheduleMetronomeTempoRegeneration(){
+  if(metronomeTempoRegenerationTimer!==null)clearTimeout(metronomeTempoRegenerationTimer);
+  if(!current?.tracks?.some(t=>t.type==='click'&&!t.mute))return;
+  const projectId=current.id;
+  metronomeTempoRegenerationTimer=setTimeout(async()=>{
+    metronomeTempoRegenerationTimer=null;
+    if(current?.id!==projectId)return;
+    try{await createMetronomeTrack(current.metronome_mode||'fixed',current.metronome_reference_track_id||'');}
+    catch(e){toast(tr('Metronome regeneration failed','Rigenerazione metronomo fallita')+': '+e.message)}
+  },450);
+}
 function setProjectBpm(v){
   if(!current)return;const n=Math.round(Math.max(30,Math.min(300,Number(v)||current.bpm)));
   if(!current.base_bpm)current.base_bpm=current.bpm||n;
-  current.bpm=n;$('#transportBpm').textContent=String(n);if($('#transportBpmInput'))$('#transportBpmInput').value=String(n);markDirty();stopPlayback();
+  current.bpm=n;$('#transportBpm').textContent=String(n);if($('#transportBpmInput'))$('#transportBpmInput').value=String(n);markDirty();stopPlayback();scheduleMetronomeTempoRegeneration();
 }
 async function setProjectTimeSignature(value,recalculate=true){
   if(!current)return;const allowed=['2/4','3/4','4/4','5/4','6/8','7/8','9/8','12/8'];const sig=allowed.includes(String(value))?String(value):'4/4';
   if(current.time_signature===sig&&!recalculate)return;current.time_signature=sig;markDirty(20);
-  if(!recalculate)return render();
+  if(!recalculate){render();scheduleMetronomeTempoRegeneration();return}
   const track=(current.tracks||[]).find(t=>t.type!=='metronome')||(current.tracks||[])[0];
-  if(!track){render();return}
+  if(!track){render();scheduleMetronomeTempoRegeneration();return}
   showMediaProgress('Ricalcolo BPM',10,`Tempo impostato a ${sig}. Ricalcolo BPM…`);
-  try{const result=await api(`/api/projects/${current.id}/tracks/${track.id}/estimate-bpm?time_signature=${encodeURIComponent(sig)}`,{method:'POST'});current.bpm=Number(result.bpm);current.base_bpm=Number(result.bpm);current.time_signature=sig;render();markDirty(20);$('#utilityBackdrop')?.classList.add('hidden');toast(`Tempo ${sig} · BPM ${Math.round(current.bpm)}`)}catch(e){$('#utilityBackdrop')?.classList.add('hidden');render();toast('Tempo aggiornato; ricalcolo BPM non riuscito: '+e.message)}
+  try{const result=await api(`/api/projects/${current.id}/tracks/${track.id}/estimate-bpm?time_signature=${encodeURIComponent(sig)}`,{method:'POST'});current.bpm=Number(result.bpm);current.base_bpm=Number(result.bpm);current.time_signature=sig;render();markDirty(20);scheduleMetronomeTempoRegeneration();$('#utilityBackdrop')?.classList.add('hidden');toast(`Tempo ${sig} · BPM ${Math.round(current.bpm)}`)}catch(e){$('#utilityBackdrop')?.classList.add('hidden');render();scheduleMetronomeTempoRegeneration();toast('Tempo aggiornato; ricalcolo BPM non riuscito: '+e.message)}
 }
 function setProjectPitch(v){
   if(!current)return;const n=Math.max(-6,Math.min(6,Number(v)||0));current.pitch_semitones=n;if($('#transportPitchInput'))$('#transportPitchInput').value=n.toFixed(1);markDirty();stopPlayback();
@@ -3668,6 +3764,7 @@ function openYoutubeImport(){
   showUtilityModal('Import audio da YouTube',`<div class="youtube-import-dialog">
     <section class="youtube-import-section">
       <div class="youtube-import-section-title"><b>1. Sorgente</b><span>Importa solo l'audio di un singolo video YouTube.</span></div>
+      <p class="hint youtube-playback-hint">Copia e incolla l’URL del video. Prima di importare, apri il video nel browser e avviane la riproduzione audio: senza questo passaggio l’importazione potrebbe fallire.</p>
       <label class="workflow-field"><span>URL YouTube</span><div class="youtube-input-row"><input id="youtubeImportUrl" type="url" inputmode="url" autocomplete="off" placeholder="https://www.youtube.com/watch?v=…"><button class="utility-btn secondary youtube-paste-btn" type="button" onclick="pasteSystemClipboardTo('#youtubeImportUrl')">Incolla</button></div></label>
       <label class="workflow-field"><span>Nome traccia <small>(opzionale)</small></span><div class="youtube-input-row"><input id="youtubeImportName" type="text" maxlength="200" placeholder="Usa il titolo YouTube"><button class="utility-btn secondary youtube-paste-btn" type="button" onclick="pasteSystemClipboardTo('#youtubeImportName')">Incolla</button></div></label>
     </section>
