@@ -1,3 +1,12 @@
+## 0.2.0-r265 — editor/PDF marker/lyric associations
+- Align all marker placements with lyric START times, preserve multiple markers between lines, and persist explicit manual lyric anchors in the Marker schema.
+- Apply the same auto/manual associations when rendering Lyrics+Chords PDF.
+
+## 0.2.0-r264 (2026-10-09)
+
+- Lyrics editor: marker sections grouped by lyric start timestamp; drag a marker chip onto a lyric line to persist a manual association, restore Auto via context menu.
+- Preserve manual lyric-line association when its timestamp changes.
+
 ## 0.2.0-r263
 
 - Zoned metronome BPM labels with per-zone manual/auto edit and atomic partial regeneration; marker boundary ID based persistence.

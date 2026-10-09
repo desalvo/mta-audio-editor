@@ -115,6 +115,8 @@ class Marker(BaseModel):
     # The value is expressed in millimetres so it maps directly to print layout.
     section_indent_enabled: bool = False
     section_indent_mm: float = Field(default=0.0, ge=0.0, le=100.0)
+    manual_lyric_anchor: bool = False
+    anchor_lyric_time_ms: int | None = Field(default=None, ge=0)
     disabled: bool = False
     deleted: bool = False
     manual_override: bool = False

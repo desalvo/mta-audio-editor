@@ -1737,7 +1737,22 @@ def build_lyrics_pdf(
     ordered_lyrics=sorted(_estimated_word_and_syllable_timing(active_lyrics),key=lambda x:x.time_ms)
     ordered_chords=sorted(active_chords,key=lambda x:x.time_ms)
     ordered_markers=sorted(active_markers,key=lambda x:x.time_ms)
+    # Align section association with Lyrics/Chords/Markers editor.
+    # Each marker belongs to the first visible lyric starting at or after its
+    # timestamp, unless it explicitly anchors a lyric line.
     marker_idx=0
+    marker_targets = {}
+    lyric_starts = [int(x.time_ms) for x in ordered_lyrics]
+    for marker in ordered_markers:
+        manual = bool(getattr(marker, 'manual_lyric_anchor', False))
+        anchor = getattr(marker, 'anchor_lyric_time_ms', None)
+        if manual and anchor is not None and int(anchor) in lyric_starts:
+            target = lyric_starts.index(int(anchor))
+        else:
+            target = next((i for i, t in enumerate(lyric_starts) if t >= int(marker.time_ms)), len(lyric_starts))
+        marker_targets.setdefault(target, []).append(marker)
+    for group in marker_targets.values():
+        group.sort(key=lambda m: (int(m.time_ms), str(getattr(m, 'id', ''))))
     current_section_color = None
     current_section_indent = 0.0
 
@@ -1778,9 +1793,10 @@ def build_lyrics_pdf(
         line_start=int(lyric.time_ms)
         next_boundary=next((t for t in boundary_times if t>line_start), None)
         line_end=int(next_boundary if next_boundary is not None else (lyric.end_ms or line_start+6000))
-        while marker_idx<len(ordered_markers) and int(ordered_markers[marker_idx].time_ms)<=line_start:
-            ensure_marker_with_two_lyrics(ordered_markers[marker_idx], i)
-            current_section_color, current_section_indent = draw_marker(ordered_markers[marker_idx]);marker_idx+=1
+        for section_marker in marker_targets.get(i, []):
+            ensure_marker_with_two_lyrics(section_marker, i)
+            current_section_color, current_section_indent = draw_marker(section_marker)
+            marker_idx += 1
         section_margin = margin + current_section_indent
         section_width = max(72.0, usable_width - current_section_indent)
         # Chords anchored before the first word occupy a dedicated leading column.
@@ -1852,8 +1868,9 @@ def build_lyrics_pdf(
             c.drawString(lyric_margin,y,safe(part));y-=lyric_size+6
         y-=line_spacing
 
-    while marker_idx<len(ordered_markers):
-        current_section_color, current_section_indent = draw_marker(ordered_markers[marker_idx]);marker_idx+=1
+    for section_marker in marker_targets.get(len(ordered_lyrics), []):
+        current_section_color, current_section_indent = draw_marker(section_marker)
+        marker_idx += 1
 
     if rights_records:
         ensure(80);y-=8;c.setFillColor(black);c.setFont(fonts["bold"],10);c.drawString(margin,y,"Dati repertorio / Rights information");y-=16
