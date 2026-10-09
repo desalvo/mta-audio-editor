@@ -1,3 +1,13 @@
+## 0.2.0-r276 — Singer separation and GitHub CI coverage fix
+
+- Add an experimental SAM Audio multi-singer mode (2–8 singers) to new-song and existing-track stem workflows.
+- Each singer receives a solo positive time-span reference; all other singers' reference spans become negative anchors, as supported by SAM Audio.
+- Extract all singers or only one selected singer. Song-relative references are validated, and generated tracks begin at timeline offset zero.
+- Keep separate singer names, selected model, and last selected singer target; retain existing WAV/FLAC project storage, MTA export and percussive separation workflows.
+- Fix the CI `scipy` ModuleNotFoundError: install both SciPy and SoundFile in base/runtime requirements, including the test image.
+- Add test coverage for real DSP/ONNX framing, the SAM CLI temporal anchors, singer reference validation and selective track replacement, keeping the 70% coverage gate unchanged.
+- No model weights or Hugging Face credentials are bundled. SAM inference with licensed checkpoints and overlapping singers still needs testing in the native runtime.
+
 ## 0.2.0-r274 — Optional FLAC project storage + MTA compatibility
 
 - Global opt-in setting for FLAC project storage in web/native Settings; defaults to WAV.

@@ -1,4 +1,9 @@
-## 0.2.0-r275
+## 0.2.0-r276
+
+- Multi-singer SAM Audio temporal-anchor extraction, 2–8 singers, including selective re-extraction and persisted UI model choice.
+- Fix SciPy missing from GitHub Actions; add worker/audio model tests to satisfy the production coverage gate without lowering its threshold.
+
+## 0.2.0-r276
 - CI: install soundfile as a development/test dependency; the selective-stem regression test imports it during pytest collection.
 - Preserve all r274 FLAC project storage, MTA export, and AI separation behavior.
 

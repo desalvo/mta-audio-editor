@@ -214,6 +214,10 @@ def _stem_job_public(job: dict) -> dict:
         "split_backing_vocals": bool(job.get("split_backing_vocals")),
         "split_percussions": bool(job.get("split_percussions")),
         "stem_targets": job.get("stem_targets", ["all"]),
+        "singer_mode": bool(job.get("singer_mode")),
+        "singer_model": job.get("singer_model"),
+        "singer_target": job.get("singer_target"),
+        "singers": job.get("singers", []),
     }
 
 
@@ -2875,14 +2879,14 @@ _SAM_PROMPTS = {
 }
 
 
-def _sam_audio_extract(source: Path, output_dir: Path, model_id: str, target: str) -> Path:
+def _sam_audio_extract(source: Path, output_dir: Path, model_id: str, target: str, anchors: list | None = None) -> Path:
     """Run real SAM inference in an optional separate Python environment.
 
     The user must obtain licensed, gated checkpoints and install SAM themselves;
     no weights or Hugging Face credentials are bundled in the release.
     """
     import subprocess
-    if model_id not in _SAM_AUDIO_MODELS or target not in _SAM_PROMPTS:
+    if model_id not in _SAM_AUDIO_MODELS or (target not in _SAM_PROMPTS and not re.fullmatch(r"singer_[1-8]", target)):
         raise ValueError("Unsupported SAM Audio model or instrument")
     python_binary = os.environ.get("MTA_SAM_AUDIO_PYTHON", "").strip()
     if not python_binary:
@@ -2890,7 +2894,9 @@ def _sam_audio_extract(source: Path, output_dir: Path, model_id: str, target: st
     runner = Path(__file__).with_name("sam_audio_worker.py")
     output_dir.mkdir(parents=True, exist_ok=True)
     result = output_dir / f"{target}.wav"
-    args = [python_binary, str(runner), "--source", str(source), "--output", str(result), "--model", f"facebook/{model_id}", "--prompt", _SAM_PROMPTS[target]]
+    args = [python_binary, str(runner), "--source", str(source), "--output", str(result), "--model", f"facebook/{model_id}", "--prompt", _SAM_PROMPTS.get(target, "singing voice")]
+    if anchors:
+        args.extend(["--anchors-json", json.dumps(anchors, separators=(",", ":"))])
     run = subprocess.run(args, capture_output=True, text=True, timeout=7200, check=False)
     if run.returncode != 0 or not result.is_file() or result.stat().st_size < 44:
         raise RuntimeError("SAM Audio inference failed: " + (run.stderr or run.stdout or "no WAV was generated")[-1600:])
@@ -2901,6 +2907,68 @@ def _requested_sam_target(target: str) -> str:
     return target if target in _SAM_PROMPTS else "percussions"
 
 _STEM_TARGETS = {"all", "lead_vocals", "percussions", "drums_without_percussions", "other", "kick", "snare", "toms", "cymbals"}
+
+_SINGER_MODEL_IDS = _SAM_AUDIO_MODELS
+
+
+def _parse_singers_json(value: str, model: str, selected: str = "all") -> tuple[list[dict], str]:
+    """Validate multiple singer anchors independently of the source format.
+
+    Reference ranges are seconds measured from the beginning of the *original*
+    track/song. Each range must contain primarily one singer. SAM uses the other
+    singer ranges as negative anchors, reducing the risk of voice swaps.
+    """
+    if model not in _SINGER_MODEL_IDS:
+        raise ValueError("Unsupported SAM Audio singer model")
+    try:
+        items = json.loads(value)
+    except (ValueError, TypeError) as exc:
+        raise ValueError("Invalid singer reference JSON") from exc
+    if not isinstance(items, list) or not 2 <= len(items) <= 8:
+        raise ValueError("Specify 2 to 8 singers with one solo reference interval each")
+    names = set()
+    result = []
+    for index, item in enumerate(items, 1):
+        if not isinstance(item, dict):
+            raise ValueError("Invalid singer reference")
+        name = str(item.get("name") or "").strip()
+        if not 1 <= len(name) <= 80 or name.casefold() in names:
+            raise ValueError("Singer names must be unique and 1-80 characters long")
+        names.add(name.casefold())
+        try:
+            start = float(item["start"])
+            end = float(item["end"])
+        except (ValueError, TypeError, KeyError) as exc:
+            raise ValueError("Singer reference must contain numeric start/end seconds") from exc
+        if not (float("-inf") < start < float("inf") and float("-inf") < end < float("inf") and 0 <= start < end <= 86400 and 0.5 <= end - start <= 60):
+            raise ValueError("Each singer needs a reference interval of 0.5-60 seconds")
+        result.append({"id": f"singer_{index}", "name": name, "start": start, "end": end})
+    for i, singer in enumerate(result):
+        for other in result[i + 1:]:
+            if singer["start"] < other["end"] and other["start"] < singer["end"]:
+                raise ValueError("Solo singer reference intervals cannot overlap")
+    allowed = {"all"} | {entry["id"] for entry in result}
+    if selected not in allowed:
+        raise ValueError("Selected singer is not defined")
+    return result, selected
+
+
+def _extract_singer_stems(source: Path, output_dir: Path, model: str, singers: list[dict], selected: str = "all") -> list[Path]:
+    """Run singer-conditioned SAM span prompts independently at song time zero.
+
+    This is experimental prompt-based separation, not the distinct Singer-Informed
+    embedding model; independent targets can bleed into one another.
+    """
+    output_dir.mkdir(parents=True, exist_ok=True)
+    results = []
+    for singer in singers:
+        if selected != "all" and selected != singer["id"]:
+            continue
+        anchors = [["+", singer["start"], singer["end"]]]
+        anchors.extend(["-", other["start"], other["end"]] for other in singers if other["id"] != singer["id"])
+        results.append(_sam_audio_extract(source, output_dir / singer["id"], model, singer["id"], anchors=anchors))
+    return results
+
 
 
 def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> None:
@@ -2918,6 +2986,10 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
         percussion_method = str(job.get("percussion_method") or "dsp")
         split_percussions = bool(job.get("split_percussions")) or bool(stem_targets & {"percussions", "drums_without_percussions", "kick", "snare", "toms", "cymbals"})
         backing_vocal_model = str(job.get("backing_vocal_model") or LEAD_BACKING_DEFAULT_MODEL)
+        singer_mode = bool(job.get("singer_mode"))
+        singers = list(job.get("singers") or [])
+        singer_model = str(job.get("singer_model") or "sam-audio-small")
+        singer_target = str(job.get("singer_target") or "all")
         stem_count = int(job.get("stem_count") or 0)
 
     def progress(value: int, message: str) -> None:
@@ -2954,7 +3026,22 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
             if cancel_event.is_set():
                 raise RuntimeError("stem separation cancelled")
             vocal_split_method = None
-            if split_backing_vocals or "lead_vocals" in stem_targets:
+            if singer_mode:
+                vocal_stem = next((Path(stem) for stem in stems if Path(stem).stem.lower() in {"vocals", "vocal"}), None)
+                if vocal_stem is None:
+                    raise RuntimeError("Singer separation requires a vocals stem from Demucs")
+                progress(85, f"Separazione di {len(singers)} cantanti con {singer_model}")
+                # Time anchors are absolute with respect to the original track;
+                # reject out-of-bounds references rather than silently extracting
+                # the wrong singer.
+                vocal_duration = media_duration_ms(vocal_stem) / 1000.0
+                if any(singer["end"] > vocal_duration + 0.2 for singer in singers):
+                    raise RuntimeError("Singer reference interval exceeds the source audio duration")
+                singer_outputs = _extract_singer_stems(vocal_stem, td / "singers", singer_model, singers, singer_target)
+                # A singer-specific run imports ONLY the requested voice. An all-
+                # singers run replaces Vocals but retains the instrumental stems.
+                stems = ([stem for stem in stems if Path(stem) != vocal_stem] if singer_target == "all" else []) + singer_outputs
+            if (not singer_mode) and (split_backing_vocals or "lead_vocals" in stem_targets):
                 vocal_stem = next((Path(stem) for stem in stems if Path(stem).stem.lower() in {"vocals", "vocal"}), None)
                 if vocal_stem is None:
                     raise RuntimeError("Il modello selezionato non ha prodotto uno stem vocals da separare")
@@ -3012,7 +3099,7 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
                         shutil.copyfile(drums_stem, kit_path)
                         results.append(kit_path)
                     stems = [stem for stem in stems if Path(stem) != drums_stem] + results
-            if "all" not in stem_targets:
+            if "all" not in stem_targets and not singer_mode:
                 stems = [stem for stem in stems if Path(stem).stem.lower() in stem_targets]
                 if not stems:
                     raise RuntimeError("The separation model produced none of the requested stems")
@@ -3035,7 +3122,7 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
                 if cancel_event.is_set():
                     raise RuntimeError("stem separation cancelled")
                 stem_name = stem.stem.lower()
-                kind = mapping.get(stem_name, "other")
+                kind = "melody" if stem_name.startswith("singer_") else mapping.get(stem_name, "other")
                 filename = f"{uuid.uuid4().hex[:10]}.wav"
                 dst = audio_path(project.id, filename)
                 shutil.copyfile(stem, dst)
@@ -3043,6 +3130,8 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
                 duration = media_duration_ms(dst)
                 channels, channel_layout = _audio_channel_info(dst)
                 display_name = {"lead_vocals": "Lead Vocals", "backing_vocals": "Backing Vocals", "percussions": "Percussions", "drums_without_percussions": "Drums (no percussions)", "kick": "Kick", "snare": "Snare", "toms": "Toms", "cymbals": "Cymbals"}.get(stem_name, stem.stem.title())
+                if stem_name.startswith("singer_"):
+                    display_name = next((entry["name"] for entry in singers if entry["id"] == stem_name), display_name)
                 if stem_name_prefix:
                     display_name = f"{stem_name_prefix} · {display_name}"[:200]
                 new_track = Track(
@@ -3067,7 +3156,7 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
                 # of duplicating it. Preserve its identity and mixer settings.
                 original_track_id = str(job.get("source_track_id") or "")
                 existing_output = None
-                if original_track_id and "all" not in stem_targets:
+                if original_track_id and ("all" not in stem_targets or (singer_mode and singer_target != "all")):
                     existing_output = next((item for item in project.tracks
                         if item.id != original_track_id and item.name == display_name), None)
                 if existing_output is not None:
@@ -3556,10 +3645,22 @@ async def stem_job_start(
     split_percussions: bool = False,
     percussion_method: str = "dsp",
     stem_targets: str = "all",
+    singers_json: str = "",
+    singer_model: str = "sam-audio-small",
+    singer_target: str = "all",
 ):
     requested_targets = {value.strip().lower() for value in stem_targets.split(",") if value.strip()}
     if not requested_targets or not requested_targets <= _STEM_TARGETS or ("all" in requested_targets and len(requested_targets) > 1):
         raise HTTPException(400, "Invalid stem selection")
+    if singers_json:
+        try:
+            singers, singer_target = _parse_singers_json(singers_json, singer_model, singer_target)
+        except ValueError as exc:
+            raise HTTPException(400, str(exc)) from exc
+        if requested_targets != {"all"} or split_backing_vocals or split_percussions:
+            raise HTTPException(400, "Singer separation cannot be combined with other selective splitting")
+    else:
+        singers = []
     if "lead_vocals" in requested_targets:
         split_backing_vocals = True
     if requested_targets & {"percussions", "drums_without_percussions", "kick", "snare", "toms", "cymbals"}:
@@ -3702,6 +3803,8 @@ async def stem_job_start(
         "split_percussions": bool(split_percussions),
         "percussion_method": percussion_method,
         "stem_targets": sorted(requested_targets),
+        "singer_mode": bool(singers), "singers": singers,
+        "singer_model": singer_model, "singer_target": singer_target,
         "backing_vocal_model": backing_vocal_model,
         "vocal_split_method": None,
         "analysis": {},
@@ -3818,6 +3921,9 @@ def start_track_stem_job(
     split_percussions: bool = False,
     percussion_method: str = "dsp",
     stem_targets: str = "all",
+    singers_json: str = "",
+    singer_model: str = "sam-audio-small",
+    singer_target: str = "all",
 ):
     project = _project_for_actor(request, pid)
     if not STEM_SPLITTER.available():
@@ -3840,6 +3946,15 @@ def start_track_stem_job(
     requested_targets = {item.strip().lower() for item in stem_targets.split(",") if item.strip()}
     if not requested_targets or not requested_targets <= _STEM_TARGETS or ("all" in requested_targets and len(requested_targets) > 1):
         raise HTTPException(400, "Invalid stem selection")
+    if singers_json:
+        try:
+            singers, singer_target = _parse_singers_json(singers_json, singer_model, singer_target)
+        except ValueError as exc:
+            raise HTTPException(400, str(exc)) from exc
+        if requested_targets != {"all"} or split_backing_vocals or split_percussions:
+            raise HTTPException(400, "Singer separation cannot be combined with other selective splitting")
+    else:
+        singers = []
     if "lead_vocals" in requested_targets:
         split_backing_vocals = True
     if requested_targets & {"percussions", "drums_without_percussions", "kick", "snare", "toms", "cymbals"}:
@@ -3886,6 +4001,8 @@ def start_track_stem_job(
         "split_percussions": bool(split_percussions),
         "percussion_method": percussion_method,
         "stem_targets": sorted(requested_targets),
+        "singer_mode": bool(singers), "singers": singers,
+        "singer_model": singer_model, "singer_target": singer_target,
         "backing_vocal_model": backing_vocal_model,
         "vocal_split_method": None,
         "filename": track.name,

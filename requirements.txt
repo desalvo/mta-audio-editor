@@ -12,3 +12,7 @@ PyMuPDF==1.28.2
 
 # YouTube audio import.
 yt-dlp==2026.8.19
+
+# Waveform DSP, DrumSep STFT/ISTFT and source-separation postprocessing.
+scipy>=1.16.0,<1.18.0
+soundfile>=0.14.0,<0.15

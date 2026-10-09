@@ -188,3 +188,5 @@ Native `.maeproj` files are lightweight JSON manifests backed by the modular wor
 ### Sample rate and karaoke export
 
 Projects support 44.1/48/96 kHz sample rates (44.1 kHz default), with automatic resampling of imported sources to the project rate. Export includes 24/32-bit WAV at 44.1/48/96 kHz, standard MP3, M-Live/Merish MP3 and MP3+G (ZIP containing an MP3+CDG pair).
+
+Multi-singer SAM Audio setup (experimental): see [SINGER_SEPARATION_SETUP.md](SINGER_SEPARATION_SETUP.md).
