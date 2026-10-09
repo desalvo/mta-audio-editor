@@ -1076,3 +1076,7 @@
 - Chords: refresh starts after project PUT, without waiting for native synchronization.
 - Fast WAV patch updates only affected samples and waveform envelope bins.
 - Serialized generated-Chords refresh requests to prevent overlapping operations.
+
+### 0.2.0-r295
+- Prevent recursive MutationObserver localization attribute writes that can lock the native WebView on sidebar clicks, even without a project.
+- Translate changed title/ARIA attributes only when their values differ, without rewalking the entire subtree.

@@ -111,7 +111,7 @@ function trDynamic(value){const raw=String(value??'');if(!uiLanguage)return raw;
   for(const [a,b] of prefixes)if(core.startsWith(a+' '))return lead+b+core.slice(a.length)+trail;
   const patterns=uiLanguage==='it'?[[/^(\d+) selected$/,'$1 selezionate'],[/^Settings saved$/,'Impostazioni salvate'],[/^Project saved$/,'Progetto salvato'],[/^No project open$/,'Nessun progetto aperto'],[/^Open a project first$/,'Apri prima un progetto']]:[[/^(\d+) selezionat[ae]$/,'$1 selected'],[/^Impostazioni salvate$/,'Settings saved'],[/^Progetto salvato(?: manualmente)?$/,'Project saved'],[/^Nessun progetto aperto$/,'No project open'],[/^Apri prima un progetto$/,'Open a project first']];
   for(const [re,repl] of patterns)if(re.test(core))return lead+core.replace(re,repl)+trail;return raw}
-function applyInterfaceLanguage(root=document){if(!uiLanguage||!root)return;document.documentElement.lang=uiLanguage;const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);for(const n of nodes){if(n.parentElement?.matches('script,style,textarea,input'))continue;const x=trDynamic(n.nodeValue);if(x!==n.nodeValue)n.nodeValue=x}root.querySelectorAll?.('[title],[aria-label],[placeholder]').forEach(el=>{for(const a of ['title','aria-label','placeholder']){if(el.hasAttribute(a))el.setAttribute(a,trDynamic(el.getAttribute(a)))}});ensureControlTooltips(root)}
+function applyInterfaceLanguage(root=document){if(!uiLanguage||!root)return;document.documentElement.lang=uiLanguage;const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);for(const n of nodes){if(n.parentElement?.matches('script,style,textarea,input'))continue;const x=trDynamic(n.nodeValue);if(x!==n.nodeValue)n.nodeValue=x}root.querySelectorAll?.('[title],[aria-label],[placeholder]').forEach(el=>{for(const a of ['title','aria-label','placeholder']){if(el.hasAttribute(a)){const original=el.getAttribute(a),translated=trDynamic(original);if(translated!==original)el.setAttribute(a,translated)}}});ensureControlTooltips(root)}
 // Localize only the inserted nodes. A document-wide translation on every
 // mutation makes settings and tool dialogs stall in large multitrack projects.
 let localizationObserver=null,localizationScheduled=false,localizationPending=new Set();
@@ -125,7 +125,13 @@ function ensureLiveLocalization(){
           if(node.nodeType===Node.ELEMENT_NODE||node.nodeType===Node.TEXT_NODE)localizationPending.add(node);
         });
       }else if(change.type==='characterData')localizationPending.add(change.target);
-      else if(change.type==='attributes'&&change.target?.nodeType===Node.ELEMENT_NODE)localizationPending.add(change.target);
+      else if(change.type==='attributes'&&change.target?.nodeType===Node.ELEMENT_NODE){
+        const element=change.target,attribute=change.attributeName;
+        if(attribute&&element.hasAttribute(attribute)){
+          const original=element.getAttribute(attribute),translated=trDynamic(original);
+          if(translated!==original)element.setAttribute(attribute,translated);
+        }
+      }
     }
     if(localizationScheduled||!localizationPending.size)return;
     localizationScheduled=true;

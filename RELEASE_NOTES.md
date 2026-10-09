@@ -278,3 +278,6 @@ Reduced UI latency with projects containing many audio tracks and stems. Switchi
 
 This revision fixes chord-extraction defaults and modal sizing, makes selected-range text/music extraction automatic, and adds timeline Chord batch selection/actions with visible shortcuts.
 
+
+### 0.2.0-r295
+- Fix sidebar and Settings freezes with no project open, caused by repeated localization attribute mutations.
