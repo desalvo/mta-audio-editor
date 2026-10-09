@@ -1,3 +1,7 @@
+## 0.2.0-r275
+- CI: install soundfile as a development/test dependency; the selective-stem regression test imports it during pytest collection.
+- Preserve all r274 FLAC project storage, MTA export, and AI separation behavior.
+
 ## 0.2.0-r274 — Optional FLAC project storage + MTA compatibility
 
 - Global opt-in setting for FLAC project storage in web/native Settings; defaults to WAV.
