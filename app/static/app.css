@@ -1412,3 +1412,47 @@ body:has(#topZoom:active) .wave{image-rendering:auto}
 .channel-buttons .channel-insert-action.active{border-color:#3ce2b9;color:#baffed;background:#105443}
 .channel-buttons .channel-insert-action:hover{background:#175d83;color:white}
 @media(max-width:900px){.topbar{min-height:48px;flex-wrap:nowrap;overflow-x:auto}.sidebar-brand{padding:8px 2px}.sidebar-brand .brand-name,.sidebar-brand .brand-meta{display:none}.sidebar-brand .brand-logo{width:34px;height:34px}.topbar .zoom-top{display:flex;flex-direction:column}.topbar .timebox{margin-left:0}}
+
+/* r284: native app mark at the top-left, project title directly below transport controls. */
+.topbar .app-github-mark{display:flex;align-items:center;justify-content:center;flex:0 0 45px;width:45px;height:45px;border:1px solid #325873;border-radius:9px;background:#10273a;overflow:hidden;text-decoration:none}
+.topbar .app-github-mark:hover,.topbar .app-github-mark:focus-visible{border-color:#52b6fa;box-shadow:0 0 0 2px #225c80;outline:0}
+.topbar .app-github-mark img{display:block;width:39px;height:39px;object-fit:contain}
+.topbar .transport-stack{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;flex:none;min-width:0;max-width:345px;gap:3px}
+.topbar .transport-project-name{display:block;max-width:100%;min-width:0;box-sizing:border-box;padding:0 3px;color:#b6dafa;font-size:11px;font-weight:650;line-height:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topbar .transport-project-name[hidden]{display:none}
+.sidebar-brand{padding:16px 10px 19px}
+.sidebar-brand .brand-block{gap:9px}
+.sidebar-brand .brand-logo{width:min(100%,170px);height:auto;min-height:66px;max-height:96px;object-fit:contain}
+.sidebar-brand .brand-name{font-size:14px}
+.sidebar-brand .brand-meta{font-size:9px}
+@media(max-width:900px){.topbar .app-github-mark{flex-basis:37px;width:37px;height:37px}.topbar .app-github-mark img{width:33px;height:33px}.sidebar-brand .brand-logo{width:51px;height:51px;min-height:0}.topbar .transport-project-name{font-size:10px}}
+
+/* r285: chord labels and marker controls remain visible when the audio tracks
+   scroll vertically.  Their timeline X coordinates and pointer handlers stay
+   unchanged, so dragging/editing continues to use the existing timeline. */
+.timeline-chord-lane:not(.hidden){
+  position:sticky;
+  top:30px;
+  left:0;
+  right:auto;
+  width:100%;
+  z-index:17;
+  height:28px;
+  margin-bottom:-28px;
+  background:linear-gradient(180deg,rgba(7,16,25,.94),rgba(7,16,25,.74));
+}
+.project-marker-line .project-marker-caption{
+  position:sticky;
+  top:61px;
+  display:inline-block;
+  vertical-align:top;
+  left:18px;
+  z-index:19;
+}
+.project-marker-line .project-marker-handle{
+  position:sticky;
+  top:89px;
+  bottom:auto;
+  left:-3px;
+  z-index:18;
+}

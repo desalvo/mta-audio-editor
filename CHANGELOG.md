@@ -1,3 +1,11 @@
+## 0.2.0-r285 — timeline chord and marker visibility
+- Keep chord labels and marker editing handles visible during vertical track scrolling without changing their timestamp positions or event handlers.
+
+## 0.2.0-r284 — branding and project title layout
+- Top-left native application mark links to the GitHub project.
+- Project title follows the playback controls on the line below.
+- Enlarged sidebar branding while retaining responsive layout.
+
 ## 0.2.0-r283
 - Fix GC cleanup test race: wait for both deleted audio and committed journal removal in CI.
 
