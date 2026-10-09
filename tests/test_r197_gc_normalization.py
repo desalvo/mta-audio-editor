@@ -95,10 +95,13 @@ def test_generated_track_delete_is_logical_then_gc_removes_file_and_asset(tmp_pa
     # Logical state is authoritative immediately, before physical cleanup matters.
     assert storage.load_project(project.id).tracks == []
     deadline = time.time() + 2.0
-    while audio.exists() and time.time() < deadline:
+    journal = storage.pdir(project.id) / storage.GC_QUEUE_NAME
+    # The GC worker unlinks audio before durably clearing its journal. Wait
+    # for both postconditions instead of racing the final journal fsync.
+    while (audio.exists() or journal.exists()) and time.time() < deadline:
         time.sleep(0.02)
     assert not audio.exists()
-    assert not (storage.pdir(project.id) / storage.GC_QUEUE_NAME).exists()
+    assert not journal.exists()
 
 
 def test_gc_resume_reconciles_orphan_after_crash_gap(tmp_path, monkeypatch):

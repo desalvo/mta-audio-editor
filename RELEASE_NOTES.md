@@ -1,3 +1,6 @@
+## 0.2.0-r283
+- Stabilize the asynchronous garbage-collection regression test on GitHub Actions without changing production cleanup behavior.
+
 ## 0.2.0-r282
 - Compact transport header, sidebar branding, mixer-channel Insert controls.
 

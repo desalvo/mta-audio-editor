@@ -1,3 +1,6 @@
+## 0.2.0-r283
+- Fix GC cleanup test race: wait for both deleted audio and committed journal removal in CI.
+
 ## 0.2.0-r282
 - Compact the transport into a single toolbar; move branding to the sidebar footer and remove the redundant project title box.
 - Display a dedicated Insert button in every mixer channel and master strip, opening that channel's insert manager.
