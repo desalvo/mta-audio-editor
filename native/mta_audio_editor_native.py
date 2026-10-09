@@ -524,8 +524,10 @@ class NativeApi:
         os.environ["MTA_MAX_UPLOAD_MB"] = str(value)
         # app.main is already imported after the embedded server starts; update the
         # live request/upload limit as well as persisting it for the next launch.
-        import app.main as app_main
-        app_main.MAX_UPLOAD_BYTES = value * 1024 * 1024
+        import sys
+        app_main = sys.modules.get("app.main")
+        if app_main is not None:
+            app_main.MAX_UPLOAD_BYTES = value * 1024 * 1024
         return {
             "ok": True,
             "max_upload_mb": value,

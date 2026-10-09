@@ -1,3 +1,27 @@
+## 0.2.0-r294 — Native Settings Save freeze fix
+
+- Avoid synchronous full-page localization during Settings Save.
+- Avoid importing the server module inside the native-settings IPC handler.
+- Prevent concurrent saves and report bridge errors/timeouts.
+- Keep playback updates deferred and unnecessary work out of Save.
+
+## 0.2.0-r293 — Fast Settings dialog and save
+
+- Localize only updated DOM subtrees rather than translating the entire track-heavy page for each mutation.
+- Show Settings immediately while native configuration is loading.
+- Avoid relocalizing the entire interface on save unless the language actually changed.
+- Skip expensive playback metadata sync on Settings save while idle.
+
+## 0.2.0-r292
+- Select/Split/Range/Ripple and track selection no longer rerender the entire project.
+
+## 0.2.0-r292 — Insert setup button legibility
+
+- Explicit readable colors and native WebView text-fill for Save preset & apply, Apply custom and Cancel in insert setup dialogs.
+
+## 0.2.0-r290
+- Keep the sticky Chords lane fully transparent: only chord labels appear over the first track, without the dark band. Chord drag/edit and marker behavior are unchanged.
+
 ## 0.2.0-r289
 - BPM context menu: Manual BPM sets the musical tempo without changing audio playback speed; Reset BPM restores the original detected tempo and original speed.
 - Tap Tempo sets manual BPM. Direct input continues to change playback speed.

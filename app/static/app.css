@@ -1439,7 +1439,7 @@ body:has(#topZoom:active) .wave{image-rendering:auto}
   z-index:17;
   height:28px;
   margin-bottom:-28px;
-  background:linear-gradient(180deg,rgba(7,16,25,.94),rgba(7,16,25,.74));
+  background:transparent; /* r290: only chord chips overlay the track; never shade its waveform */
 }
 .project-marker-line .project-marker-caption{
   position:sticky;
@@ -1478,3 +1478,20 @@ body:has(#topZoom:active) .wave{image-rendering:auto}
 /* r288: compact icon-only tap tempo adjacent to the BPM control. */
 .tap-tempo-icon{display:inline-flex;align-items:center;justify-content:center;min-width:26px;min-height:26px;padding:2px 5px;border:1px solid var(--border,#718096);border-radius:6px;background:transparent;color:inherit;font-size:1.05rem;cursor:pointer;vertical-align:middle}
 .tap-tempo-icon:hover,.tap-tempo-icon:focus-visible{background:rgba(128,128,128,.18);outline-offset:2px}
+
+/* r291: mixer insert parameter editor buttons remain legible in native WebViews.
+   Apply specifically to the insert setup dialog, without altering other dialogs. */
+.insert-setup-actions button{
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;
+  min-height:36px!important;padding:7px 12px!important;
+  background:#19354a!important;border:1px solid #54718b!important;border-radius:7px!important;
+  color:#f3f9ff!important;-webkit-text-fill-color:#f3f9ff!important;
+  opacity:1!important;visibility:visible!important;font-weight:650!important;
+  white-space:normal!important;line-height:1.2!important;
+}
+.insert-setup-actions button:hover{background:#23506b!important}
+.insert-setup-actions button:disabled{
+  color:#b9cbd8!important;-webkit-text-fill-color:#b9cbd8!important;opacity:.6!important;
+}
+.insert-setup-actions button:first-child,
+.insert-setup-actions button:nth-child(2){background:#0c608f!important;border-color:#1a94d3!important;color:#fff!important;-webkit-text-fill-color:#fff!important}

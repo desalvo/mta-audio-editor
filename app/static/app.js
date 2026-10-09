@@ -112,15 +112,39 @@ function trDynamic(value){const raw=String(value??'');if(!uiLanguage)return raw;
   const patterns=uiLanguage==='it'?[[/^(\d+) selected$/,'$1 selezionate'],[/^Settings saved$/,'Impostazioni salvate'],[/^Project saved$/,'Progetto salvato'],[/^No project open$/,'Nessun progetto aperto'],[/^Open a project first$/,'Apri prima un progetto']]:[[/^(\d+) selezionat[ae]$/,'$1 selected'],[/^Impostazioni salvate$/,'Settings saved'],[/^Progetto salvato(?: manualmente)?$/,'Project saved'],[/^Nessun progetto aperto$/,'No project open'],[/^Apri prima un progetto$/,'Open a project first']];
   for(const [re,repl] of patterns)if(re.test(core))return lead+core.replace(re,repl)+trail;return raw}
 function applyInterfaceLanguage(root=document){if(!uiLanguage||!root)return;document.documentElement.lang=uiLanguage;const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);for(const n of nodes){if(n.parentElement?.matches('script,style,textarea,input'))continue;const x=trDynamic(n.nodeValue);if(x!==n.nodeValue)n.nodeValue=x}root.querySelectorAll?.('[title],[aria-label],[placeholder]').forEach(el=>{for(const a of ['title','aria-label','placeholder']){if(el.hasAttribute(a))el.setAttribute(a,trDynamic(el.getAttribute(a)))}});ensureControlTooltips(root)}
-// Observe asynchronously inserted menu entries and dialog content, including native bridge updates.
-let localizationObserver=null,localizationScheduled=false;
+// Localize only the inserted nodes. A document-wide translation on every
+// mutation makes settings and tool dialogs stall in large multitrack projects.
+let localizationObserver=null,localizationScheduled=false,localizationPending=new Set();
 function ensureLiveLocalization(){
   if(localizationObserver||typeof MutationObserver==='undefined'||!document.body)return;
   localizationObserver=new MutationObserver(changes=>{
-    if(!uiLanguage||localizationScheduled)return;
-    if(!changes.some(c=>c.type==='childList'||c.type==='characterData'||c.type==='attributes'))return;
+    if(!uiLanguage)return;
+    for(const change of changes){
+      if(change.type==='childList'){
+        change.addedNodes.forEach(node=>{
+          if(node.nodeType===Node.ELEMENT_NODE||node.nodeType===Node.TEXT_NODE)localizationPending.add(node);
+        });
+      }else if(change.type==='characterData')localizationPending.add(change.target);
+      else if(change.type==='attributes'&&change.target?.nodeType===Node.ELEMENT_NODE)localizationPending.add(change.target);
+    }
+    if(localizationScheduled||!localizationPending.size)return;
     localizationScheduled=true;
-    queueMicrotask(()=>{localizationScheduled=false;applyInterfaceLanguage()});
+    queueMicrotask(()=>{
+      localizationScheduled=false;
+      const pending=[...localizationPending];localizationPending.clear();
+      for(const node of pending){
+        if(!node.isConnected)continue;
+        if(node.nodeType===Node.TEXT_NODE){
+          if(node.parentElement?.matches('script,style,textarea,input'))continue;
+          const translated=trDynamic(node.nodeValue);
+          if(translated!==node.nodeValue)node.nodeValue=translated;
+        }else if(node.nodeType===Node.ELEMENT_NODE){
+          // A subtree added in a single update is translated once; tiny
+          // attribute changes do not cause whole-page traversals.
+          applyInterfaceLanguage(node);
+        }
+      }
+    });
   });
   localizationObserver.observe(document.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['title','aria-label','placeholder']});
 }
@@ -1640,7 +1664,7 @@ function openInsertEditor(isMaster,id,trackId=''){
   const fields=x.plugin==='graphic_eq_32'
     ?graphicEqEditorFields(schema,params,isMaster,id,trackId)
     :Object.entries(schema).map(([k,v])=>{const value=Number(params[k]??v.default);return `<label class="plugin-field plugin-field-knob"><span>${esc(k.replaceAll('_',' '))}</span><div class="plugin-control-pair"><div class="plugin-knob-shell" style="--knob-turn:${-135+((value-Number(v.min))/(Number(v.max)-Number(v.min)||1))*270}deg" title="${esc(k.replaceAll('_',' '))}"><input class="plugin-knob" data-knob-key="${k}" type="range" min="${v.min}" max="${v.max}" step="${v.step}" value="${value}" oninput="livePluginControlChanged('${k}',this.value,'knob',${isMaster},'${id}','${trackId}')"></div><input class="plugin-param plugin-number" id="plugin-param-${k}" data-key="${k}" type="number" min="${v.min}" max="${v.max}" step="${v.step}" value="${value}" oninput="livePluginControlChanged('${k}',this.value,'number',${isMaster},'${id}','${trackId}')" onblur="commitPluginEditorParams(${isMaster},'${id}','${trackId}')" onkeydown="pluginNumberKey(event,${isMaster},'${id}','${trackId}')"></div><small>${v.min} … ${v.max}</small></label>`}).join('');
-  const editorHtml=`<label class="plugin-preset-row"><span>Preset</span><select onchange="editorPresetChanged(${isMaster},'${id}',this.value,'${trackId}')">${presets.map(p=>`<option value="${esc(p)}" ${p===x.preset?'selected':''}>${esc(p)}</option>`).join('')}</select></label><p class="hint">Il preset selezionato viene applicato realmente alla catena audio. I controlli sotto servono per creare una configurazione custom.</p><p class="hint">${x.plugin==='graphic_eq_32'?'Trascina graficamente i 32 fader di banda.':'Custom values are validated server-side.'}</p><div class="${x.plugin==='graphic_eq_32'?'':'plugin-param-grid'}">${fields||'<p class="hint">This processor currently exposes factory presets only.</p>'}</div><label class="preset-save-name"><span>Custom preset name</span><input id="customPresetName" maxlength="80" placeholder="My preset"></label><div class="modal-actions"><button onclick="applyInsertConfig(${isMaster},'${id}',false,'${trackId}')">Apply custom</button><button onclick="applyInsertConfig(${isMaster},'${id}',true,'${trackId}')">Save preset & apply</button><button onclick="${trackId||isMaster?`openMixerInsertManager('${trackId||'master'}')`:'closeExportMapping()'}">Cancel</button></div>`;
+  const editorHtml=`<label class="plugin-preset-row"><span>Preset</span><select onchange="editorPresetChanged(${isMaster},'${id}',this.value,'${trackId}')">${presets.map(p=>`<option value="${esc(p)}" ${p===x.preset?'selected':''}>${esc(p)}</option>`).join('')}</select></label><p class="hint">Il preset selezionato viene applicato realmente alla catena audio. I controlli sotto servono per creare una configurazione custom.</p><p class="hint">${x.plugin==='graphic_eq_32'?'Trascina graficamente i 32 fader di banda.':'Custom values are validated server-side.'}</p><div class="${x.plugin==='graphic_eq_32'?'':'plugin-param-grid'}">${fields||'<p class="hint">This processor currently exposes factory presets only.</p>'}</div><label class="preset-save-name"><span>Custom preset name</span><input id="customPresetName" maxlength="80" placeholder="My preset"></label><div class="modal-actions insert-setup-actions"><button onclick="applyInsertConfig(${isMaster},'${id}',false,'${trackId}')">Apply custom</button><button onclick="applyInsertConfig(${isMaster},'${id}',true,'${trackId}')">Save preset & apply</button><button onclick="${trackId||isMaster?`openMixerInsertManager('${trackId||'master'}')`:'closeExportMapping()'}">Cancel</button></div>`;
   if(trackId||isMaster){
     showUtilityModal(`${pluginLabel(x.plugin)} configuration`,editorHtml);
   }else{
@@ -2106,11 +2130,24 @@ function beginTimelineClipDrag(event,trackId,clipId){
   };
   window.addEventListener('pointermove',move,{passive:false});window.addEventListener('pointerup',finish);window.addEventListener('pointercancel',cancel);
 }
+function refreshTimelineToolControls(){
+  for(const [id,active] of [['toolSelect',timelineTool==='select'],['toolSplit',timelineTool==='split'],['toolRange',timelineTool==='range'],['toolRipple',rippleEnabled]]){
+    const button=$('#'+id);
+    if(!button)continue;
+    button.classList.toggle('active',active);
+    button.setAttribute('aria-pressed',String(active));
+  }
+}
 function setTimelineTool(tool){
   if(!['select','split','range'].includes(tool))return;
-  timelineTool=tool;render();
+  timelineTool=tool;
+  refreshTimelineToolControls();
 }
-function toggleRippleTool(){rippleEnabled=!rippleEnabled;render();toast(rippleEnabled?'Ripple attivo sulle tracce selezionate':'Ripple disattivato')}
+function toggleRippleTool(){
+  rippleEnabled=!rippleEnabled;
+  refreshTimelineToolControls();
+  toast(rippleEnabled?'Ripple attivo sulle tracce selezionate':'Ripple disattivato');
+}
 
 function copyTimelineSelection(){const[a,b]=selectionBounds(),parts=selectedClipFragments();if(b-a<2)return toast('Seleziona prima un intervallo nella timeline');if(!parts.length)return toast('La selezione non contiene audio nelle tracce selezionate');timelineClipboard={duration_ms:b-a,parts};updateEditActionState();toast('Selezione copiata')}
 function cutTimelineSelection(){const[a,b]=selectionBounds(),ids=editTrackIds(),parts=selectedClipFragments();if(b-a<2)return toast('Seleziona prima un intervallo nella timeline');if(!ids.length||!parts.length)return toast('La selezione non contiene audio nelle tracce selezionate');checkpointHistory();timelineClipboard={duration_ms:b-a,parts};removeRangeFromTracks(a,b,ids,rippleEnabled);projectDirty=true;render();markDirty();updateEditActionState();toast(rippleEnabled?'Selezione tagliata con ripple':'Selezione tagliata')}
@@ -2153,7 +2190,7 @@ async function save(){
   finally{autosaveBusy=false}
 }
 function selectTrack(id,event=null){
-  captureUiState();
+  if(!trackById(id))return;
   const multi=!!(event&&(event.ctrlKey||event.metaKey));
   if(multi){
     if(selectedTrackIdSet.has(id)){
@@ -2161,7 +2198,15 @@ function selectTrack(id,event=null){
     }else selectedTrackIdSet.add(id);
     selectedTrackId=selectedTrackIdSet.has(id)?id:([...selectedTrackIdSet][0]||id);
   }else{selectedTrackIdSet=new Set([id]);selectedTrackId=id}
-  render();
+  // Selection is a CSS/state-only change. Never rebuild canvases, waveforms,
+  // mixer or plugin editors just because the user clicked a track.
+  $$('.track-head').forEach(el=>{
+    const tid=el.id.replace(/^head-/,'');
+    el.classList.toggle('selected',selectedTrackIdSet.has(tid));
+    el.classList.toggle('primary-selected',tid===selectedTrackId);
+  });
+  $$('.lane').forEach(el=>el.classList.toggle('edit-selected',selectedTrackIdSet.has(el.dataset.track)));
+  updateSel();
 }
 function trackAudibleNow(track){
   if(!track||track.mute)return false;
@@ -4359,9 +4404,10 @@ function showWebSettings(){
   showUtilityModal('Settings',`<div class="form-grid web-settings"><label class="workflow-check"><input id="webAutosaveEnabled" type="checkbox" ${enabled?'checked':''}> Auto-save project changes</label><label class="workflow-check"><input id="useFlacStorage" type="checkbox" ${appDisplayPreference('useFlacStorage')?'checked':''}> Use FLAC for new projects; ask before migrating WAV projects</label><label class="workflow-check"><input id="showPreviousNextChords" type="checkbox" ${showChordNeighbors?'checked':''}> Show previous and next chords</label><label class="workflow-check"><input id="showPreviousNextLyrics" type="checkbox" ${showLyricNeighbors?'checked':''}> Show previous and next lyrics</label><p class="hint">Quando abilitate, le viste Lyrics/Chords sopra la timeline mostrano precedente, corrente e successivo; l'evento corrente resta evidenziato. Le preferenze dell'editor sono salvate in questa app/browser.</p><div class="form-actions"><button type="button" onclick="openAiModelManager()">Manage Lyrics / Chords models</button><button type="button" onclick="rescanSharedMedia()">Rescan / GC shared media</button><button type="button" onclick="location.href='/account'">Account / Profile</button>${currentUser?.role==='admin'?`<button type="button" onclick="location.href='/settings'">Server administration</button>`:''}<button class="accent" onclick="saveWebSettings()">Save</button></div></div>`);
 }
 async function rescanSharedMedia(){try{const r=await api('/api/storage/shared/rescan?delete_unreferenced=true',{method:'POST'});toast(`Shared media: ${r.assets||0} asset, ${r.deleted||0} eliminati, ${r.references||0} riferimenti`)}catch(e){toast('Rescan shared media fallito: '+e.message)}}
-function saveWebSettings(){setAppDisplayPreference('useFlacStorage',$('#useFlacStorage')?.checked===true);const enabled=$('#webAutosaveEnabled')?.checked!==false;localStorage.setItem('mtaWebAutosaveEnabled',enabled?'true':'false');setAppDisplayPreference('showPreviousNextChords',$('#showPreviousNextChords')?.checked===true);setAppDisplayPreference('showPreviousNextLyrics',$('#showPreviousNextLyrics')?.checked===true);autosaveEnabled=enabled;if(autosaveEnabled&&projectDirty)markDirty(50);updateTimedPlaybackOverlay(playCursorMs);closeUtilityModal();toast('Settings salvati')}
+function saveWebSettings(){setAppDisplayPreference('useFlacStorage',$('#useFlacStorage')?.checked===true);const enabled=$('#webAutosaveEnabled')?.checked!==false;localStorage.setItem('mtaWebAutosaveEnabled',enabled?'true':'false');setAppDisplayPreference('showPreviousNextChords',$('#showPreviousNextChords')?.checked===true);setAppDisplayPreference('showPreviousNextLyrics',$('#showPreviousNextLyrics')?.checked===true);autosaveEnabled=enabled;if(autosaveEnabled&&projectDirty)markDirty(50);closeUtilityModal();if(playbackActuallyRunning()||playbackPaused)updateTimedPlaybackOverlay(playCursorMs);toast('Settings salvati')}
 async function showNativeSettings(){
   if(!currentUser?.native_single_user){if(currentUser?.role==='admin'){location.href='/settings';return}return}
+  showUtilityModal('Settings','<p class="hint">Loading settings…</p>');
   const apiBridge=await waitForNativeApi();
   if(!apiBridge?.get_native_settings){toast('Bridge nativo non disponibile. Riprova tra un istante.');return}
   try{
@@ -4370,14 +4416,49 @@ async function showNativeSettings(){
     showUtilityModal('Settings',`<div class="form-grid native-settings"><label>Maximum import/upload size (MB)<input id="nativeMaxUploadMb" type="number" min="1" max="10240" step="1" value="${Number(cfg.max_upload_mb)||1024}"></label><label class="workflow-check"><input id="nativeAutosaveEnabled" type="checkbox" ${cfg.autosave_enabled!==false?'checked':''}> Auto-save project changes</label><label class="workflow-check"><input id="useFlacStorage" type="checkbox" ${appDisplayPreference('useFlacStorage')?'checked':''}> Use FLAC for new projects; ask before migrating WAV projects</label><label class="workflow-check"><input id="showPreviousNextChords" type="checkbox" ${showChordNeighbors?'checked':''}> Show previous and next chords</label><label class="workflow-check"><input id="showPreviousNextLyrics" type="checkbox" ${showLyricNeighbors?'checked':''}> Show previous and next lyrics</label><label>Language<select id="nativeLanguage"><option value="auto" ${!['it','en'].includes(cfg.language)?'selected':''}>Auto (system) · ${esc(cfg.system_language||'en')}</option><option value="it" ${cfg.language==='it'?'selected':''}>Italiano</option><option value="en" ${cfg.language==='en'?'selected':''}>English</option></select></label><label>Update channel<select id="nativeUpdateChannel"><option value="stable" ${cfg.update_channel!=='early'?'selected':''}>Stable · GitHub tags/releases only</option><option value="early" ${cfg.update_channel==='early'?'selected':''}>Early release · include latest main packages</option></select></label><p>Stable checks only tagged GitHub releases. Early release also checks the rolling <b>early-main</b> package produced from main.</p><p class="hint">Con le opzioni previous/next attive, la vista sopra la timeline scorre mostrando l'evento precedente e successivo attenuati e quello corrente evidenziato.</p><div class="form-actions"><button type="button" onclick="checkNativeAppUpdate(true)">Check for updates</button><button type="button" onclick="openNativeModelManager()">Manage Demucs models</button><button type="button" onclick="openAiModelManager()">Manage Lyrics / Chords models</button><button type="button" onclick="rescanSharedMedia()">Rescan / GC shared media</button><button class="accent" onclick="saveNativeSettings()">Save</button></div></div>`);
   }catch(err){toast('Impossibile leggere le impostazioni native: '+err.message)}
 }
+// Settings save never scans the full timeline or rebuilds track DOM.
+let nativeSettingsSaveInProgress=false;
 async function saveNativeSettings(){
+  if(nativeSettingsSaveInProgress)return;
   const value=Number($('#nativeMaxUploadMb')?.value);
   if(!Number.isInteger(value)||value<1||value>10240){toast('Inserisci un valore intero tra 1 e 10240 MB');return}
+  // Capture controls before awaiting the native bridge. Never query removed modal
+  // nodes after the native operation completes.
+  const preferences={
+    flac:$('#useFlacStorage')?.checked===true,
+    chords:$('#showPreviousNextChords')?.checked===true,
+    lyrics:$('#showPreviousNextLyrics')?.checked===true,
+    autosave:$('#nativeAutosaveEnabled')?.checked!==false,
+    channel:$('#nativeUpdateChannel')?.value==='early'?'early':'stable',
+    language:['it','en'].includes($('#nativeLanguage')?.value)?$('#nativeLanguage').value:'auto',
+  };
+  nativeSettingsSaveInProgress=true;
+  const saveButton=document.querySelector('.native-settings .form-actions button.accent');
+  if(saveButton)saveButton.disabled=true;
   try{
-    const apiBridge=await waitForNativeApi();if(!apiBridge?.set_native_settings)return toast('Bridge nativo non disponibile');
-    setAppDisplayPreference('useFlacStorage',$('#useFlacStorage')?.checked===true);const enabled=$('#nativeAutosaveEnabled')?.checked!==false;const channel=$('#nativeUpdateChannel')?.value==='early'?'early':'stable';const language=['it','en'].includes($('#nativeLanguage')?.value)?$('#nativeLanguage').value:'auto';const result=await apiBridge.set_native_settings(value,enabled,channel,language);uiLanguage=result.language==='auto'?(String(result.system_language||'en').toLowerCase().startsWith('it')?'it':'en'):result.language;applyInterfaceLanguage();ensureLiveLocalization();setAppDisplayPreference('showPreviousNextChords',$('#showPreviousNextChords')?.checked===true);setAppDisplayPreference('showPreviousNextLyrics',$('#showPreviousNextLyrics')?.checked===true);autosaveEnabled=result.autosave_enabled!==false;if(autosaveEnabled&&projectDirty)markDirty(50);updateTimedPlaybackOverlay(playCursorMs);
-    closeUtilityModal();toast(`Impostazioni salvate · limite import/upload ${result.max_upload_mb} MB`);
+    const apiBridge=await waitForNativeApi(3000);
+    if(!apiBridge?.set_native_settings)throw new Error('Native settings bridge unavailable');
+    const result=await Promise.race([
+      apiBridge.set_native_settings(value,preferences.autosave,preferences.channel,preferences.language),
+      new Promise((_,reject)=>setTimeout(()=>reject(new Error('Native settings save timed out')),8000)),
+    ]);
+    if(!result||result.ok===false)throw new Error(result?.error||'Native settings save failed');
+    setAppDisplayPreference('useFlacStorage',preferences.flac);
+    setAppDisplayPreference('showPreviousNextChords',preferences.chords);
+    setAppDisplayPreference('showPreviousNextLyrics',preferences.lyrics);
+    autosaveEnabled=result.autosave_enabled!==false;
+    const nextLanguage=result.language==='auto'?(String(result.system_language||'en').toLowerCase().startsWith('it')?'it':'en'):result.language;
+    const languageChanged=nextLanguage!==uiLanguage;
+    uiLanguage=nextLanguage;
+    closeUtilityModal();
+    toast(`Impostazioni salvate · limite import/upload ${result.max_upload_mb} MB`);
+    // A language change is rare. Yield to the UI and translate the interface
+    // outside the Save event rather than locking the modal on large projects.
+    if(languageChanged)setTimeout(()=>applyInterfaceLanguage(),0);
+    if((playbackActuallyRunning()||playbackPaused)&&current)setTimeout(()=>updateTimedPlaybackOverlay(playCursorMs),0);
+    if(autosaveEnabled&&projectDirty)markDirty(50);
   }catch(err){toast('Salvataggio impostazioni fallito: '+err.message)}
+  finally{nativeSettingsSaveInProgress=false;if(saveButton?.isConnected)saveButton.disabled=false}
 }
 
 async function checkNativeAppUpdate(manual=false){
