@@ -1369,3 +1369,46 @@ body:has(#topZoom:active) .wave{image-rendering:auto}
 /* Fixed viewport overlay: never clipped beneath MusicBrainz's scroll container. */
 .metadata-hover-host{position:fixed!important;right:auto;top:auto;z-index:10010;max-height:min(300px,calc(100vh - 24px));overflow-y:auto;pointer-events:auto}
 @media(max-width:1200px){.transport-seek-box{width:145px;min-width:125px}.zoom-top{min-width:210px}}
+
+/* r277: compact, accessible MusicBrainz result rows and a non-clipped information panel. */
+.metadata-results-scroll{max-height:min(340px,45vh)!important}
+.metadata-results-table{font-size:11px!important;line-height:1.22!important}
+.metadata-results-table th,.metadata-results-table td{padding:4px 6px!important;vertical-align:middle}
+.metadata-results-table td:first-child{white-space:nowrap;min-width:96px}
+.metadata-results-table .utility-btn{min-width:0!important;min-height:27px!important;height:auto!important;padding:4px 7px!important;font-size:11px!important;line-height:1.15!important;color:#f6fbff!important;-webkit-text-fill-color:#f6fbff!important;opacity:1!important}
+.metadata-results-table .metadata-info-btn{padding:3px 9px!important;font-size:14px!important;font-weight:750!important}
+.metadata-pagination .utility-btn,.metadata-info-heading .utility-btn{display:inline-flex!important;align-items:center;justify-content:center;min-width:104px;min-height:32px;padding:5px 10px;background:#183247!important;color:#f6fbff!important;-webkit-text-fill-color:#f6fbff!important;font-size:12px!important;line-height:1.25!important;font-weight:650!important;opacity:1!important;visibility:visible!important}
+.metadata-pagination .utility-btn:disabled{opacity:.55!important;color:#d2dce4!important;-webkit-text-fill-color:#d2dce4!important}
+.metadata-info-panel:not([hidden]){display:block;margin-top:8px;border:1px solid #4c708b;background:#102638;color:#eef8ff;border-radius:8px;padding:9px;max-height:min(240px,32vh);overflow:auto;font-size:12px}
+.metadata-info-panel[hidden]{display:none!important}
+.metadata-info-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:5px}
+@media(max-width:700px){.metadata-results-table{font-size:10px!important}.metadata-results-table th,.metadata-results-table td{padding:3px 4px!important}.metadata-pagination{justify-content:space-between}.metadata-pagination .utility-btn{min-width:88px}}
+
+/* Metronome mode stays visible in the Tracks header below the volume controls. */
+.track-metronome-kind{display:inline-block;margin-top:3px;padding:2px 6px;border:1px solid #365970;border-radius:4px;color:#c2e2f5;background:#152d40;font-size:9px;line-height:1.25;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;}
+
+/* r282: compact single-row transport; branding lives at the bottom of the sidebar. */
+.topbar{display:flex;flex-wrap:nowrap;align-items:center;gap:5px;min-height:54px;height:auto;padding:5px 9px;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin}
+.topbar .project-name-block,.topbar .brand-block{display:none}
+.topbar .transport{display:flex;flex-wrap:nowrap;gap:3px;flex:none}
+.topbar .transport-btn,.topbar .transport-btn.timed-display-mode{width:29px;min-width:29px;max-width:none;height:29px;padding:2px;font-size:11px}
+.topbar .transport-btn.render-mode,.topbar .transport-btn.follow-mode{width:auto;min-width:39px;padding:0 4px;font-size:9px}
+.topbar .transport-btn.timed-display-mode svg{width:23px;height:23px}
+.topbar .timebox{min-width:135px;padding:3px 5px}
+.topbar .transport-time-input{width:75px;font-size:11px}
+.topbar .transport-seek-box{width:115px;min-width:115px;padding:3px 6px;gap:2px}
+.topbar .zoom-top{min-width:178px;padding:3px 6px}
+.topbar .zoom-controls{grid-template-columns:20px minmax(45px,1fr) 20px 68px;gap:2px}
+.topbar .header-actions{flex:none;gap:3px;flex-wrap:nowrap}
+.topbar .header-actions button,.topbar .header-actions .header-link{height:29px;min-width:29px;padding:0 5px}
+.topbar .top-spacer{flex:1 1 8px;min-width:0}
+.workspace{min-height:0}
+.sidebar-brand{margin-top:auto;padding:12px 7px;border-top:1px solid #294155;flex-shrink:0}
+.sidebar-brand .brand-block{display:flex;min-width:0;gap:5px;flex-direction:column;align-items:center;text-align:center}
+.sidebar-brand .brand-logo{width:46px;height:44px}
+.sidebar-brand .brand-name{font-size:12px;white-space:normal}
+.sidebar-brand .brand-meta{font-size:8px;line-height:1.3;overflow-wrap:anywhere}
+.channel-buttons .channel-insert-action{width:auto;min-width:40px;max-width:65px;padding:0 3px;font-size:9px;font-weight:700;color:#d7f2ff;border-color:#327ba5;background:#103451}
+.channel-buttons .channel-insert-action.active{border-color:#3ce2b9;color:#baffed;background:#105443}
+.channel-buttons .channel-insert-action:hover{background:#175d83;color:white}
+@media(max-width:900px){.topbar{min-height:48px;flex-wrap:nowrap;overflow-x:auto}.sidebar-brand{padding:8px 2px}.sidebar-brand .brand-name,.sidebar-brand .brand-meta{display:none}.sidebar-brand .brand-logo{width:34px;height:34px}.topbar .zoom-top{display:flex;flex-direction:column}.topbar .timebox{margin-left:0}}

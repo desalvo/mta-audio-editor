@@ -10,11 +10,7 @@
 <body class="__BODY_CLASS__">
 <div class="app-shell">
   <header class="topbar">
-    <div class="brand-block">
-      <img src="/static/logo.svg" alt="MTA Audio Editor" class="brand-logo">
-      <div><div class="brand-name"><b>MTA</b> Audio Editor</div><div class="brand-meta">Multitrack DAW / MTA8 / MTA16 &nbsp;·&nbsp; v__VERSION__ &nbsp;·&nbsp; rev __REVISION__ &nbsp;·&nbsp; build __BUILD__</div></div>
-    </div>
-    <div class="project-name-block"><label>Project</label><div class="project-name-field" onclick="editProjectMeta()" title="Edit project metadata"><span id="headerProjectName">No project loaded</span><span>✎</span></div></div>
+    <span id="headerProjectName" hidden>No project loaded</span>
     <div class="transport">
       <button class="transport-btn" onclick="stopPlayback()" title="Stop" aria-label="Stop">■</button><button class="transport-btn" onclick="goTransportStart()" title="Torna all'inizio" aria-label="Torna all'inizio">|◀</button><button class="transport-btn" onclick="seekTransport(-5000)" title="Riavvolgi 5 secondi" aria-label="Riavvolgi 5 secondi">◀◀</button><button id="playMaster" class="transport-btn play" onclick="togglePlayback()" title="Play / Preview" aria-label="Play / Preview">▶</button><button class="transport-btn" onclick="seekTransport(5000)" title="Avanti 5 secondi" aria-label="Avanti 5 secondi">▶▶</button><button id="renderBtn" class="transport-btn render-mode" onclick="toggleRenderPreview()" title="Render: include filtri e master nella preview" aria-label="Render preview">Render</button><button id="followBtn" class="transport-btn follow-mode" onclick="toggleFollowPlayback()" title="Follow: mantieni il playhead visibile" aria-label="Follow playback">Follow</button><button id="showLyricsBtn" class="transport-btn timed-display-mode" aria-label="Show Lyrics durante il play" onclick="togglePlaybackLyrics()" title="Show Lyrics durante il play"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M4 10h16M4 15h10M4 20h7"/></svg></button><button id="showMarkersBtn" class="transport-btn timed-display-mode" onclick="togglePlaybackMarkers()" title="Show Markers" aria-label="Show Markers"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 22V2m0 2h14l-4 5 4 5H5"/></svg></button><button id="showChordsBtn" class="transport-btn timed-display-mode" aria-label="Show Chords durante il play" onclick="togglePlaybackChords()" title="Show Chords durante il play"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 18V4l12-2v14M8 7l12-2"/><ellipse cx="5" cy="18" rx="3" ry="2"/><ellipse cx="17" cy="16" rx="3" ry="2"/></svg></button>
     </div>
@@ -92,6 +88,10 @@
         <button class="nav-item" onclick="showAbout()">ⓘ <span>About</span></button>
         <a class="nav-item" href="/docs/user" target="_blank">? <span>Docs &amp; Help</span></a>
       </nav>
+      <div class="sidebar-brand" aria-label="MTA Audio Editor"><div class="brand-block">
+      <img src="/static/logo.svg" alt="MTA Audio Editor" class="brand-logo">
+      <div><div class="brand-name"><b>MTA</b> Audio Editor</div><div class="brand-meta">Multitrack DAW / MTA8 / MTA16 &nbsp;·&nbsp; v__VERSION__ &nbsp;·&nbsp; rev __REVISION__ &nbsp;·&nbsp; build __BUILD__</div></div>
+    </div></div>
 
     </aside>
 

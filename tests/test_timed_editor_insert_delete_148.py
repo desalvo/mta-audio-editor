@@ -11,7 +11,7 @@ def test_lyrics_rows_can_be_inserted_above_below_or_split():
     assert "＋ sotto" in JS
     assert "function splitTimedEditorRow(button,kind)" in JS
     assert "title=\"Dividi riga\"" in JS
-    assert "const middle=Math.round((start+end)/2)" in JS
+    assert "const middle=start+Math.floor((end-start)/2)" in JS
 
 
 def test_lyrics_rows_can_be_deleted_with_save_only_semantics():
@@ -41,6 +41,6 @@ def test_action_column_is_wide_and_wraps():
 
 def test_chord_rows_have_same_insert_split_delete_workflow():
     assert "kind==='lyrics'||kind==='chords'" in JS
-    assert "timedEditorRow('chords',{time_ms:middle,chord:''}" in JS
-    assert "Dividi crea un nuovo punto accordo" in JS
+    assert 'timedEditorRow(kind,{time_ms:middle,end_ms:end,[cfg.key]' in JS
+    assert "Riconcilia timestamp" in JS
     assert "removeTimedEditorRow(this)" in JS

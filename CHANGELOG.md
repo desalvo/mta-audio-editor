@@ -1,3 +1,31 @@
+## 0.2.0-r282
+- Compact the transport into a single toolbar; move branding to the sidebar footer and remove the redundant project title box.
+- Display a dedicated Insert button in every mixer channel and master strip, opening that channel's insert manager.
+
+## 0.2.0-r281
+
+- Optimize embedded Lyrics/Chords/Markers tab switching: update metadata dock only, without rebuilding tracks, waveform canvases, or plugin UI.
+- Opening the Plugins inspector no longer rebuilds the entire timeline when its hidden DOM is already available.
+
+## 0.2.0-r280 — Timed row split and reconcile
+- Preserve start/end boundaries when splitting Lyrics, Chords or Markers rows.
+- Add contextual Reconcile timestamp on start/end fields and optional end timestamps for Chords and Markers.
+
+## 0.2.0-r279 — Metronome type indicator in Tracks
+
+- Display Standard / Adaptive / Zone metronome beneath the volume controls of each metronome track.
+- The label follows the project metronome mode and active IT/EN interface language.
+
+## 0.2.0-r278 — Native UI localization fixes
+
+- Reapply active locale to dynamically inserted contextual menu items and dialog titles.
+- Expand EN/IT translations for metadata search, stem separation, model management, and editing actions.
+- Keep language preference Auto / Italiano / English.
+
+## 0.2.0-r277
+- MusicBrainz results: per-row information button and compact layout; pagination button legibility.
+- GitHub Actions macOS Chordino: execute installer script through bash.
+
 ## 0.2.0-r276
 
 - Multi-singer SAM Audio temporal-anchor extraction, 2–8 singers, including selective re-extraction and persisted UI model choice.

@@ -107,6 +107,7 @@ class Track(BaseModel):
 
 
 class Marker(BaseModel):
+    end_ms: int | None = Field(default=None, ge=0)
     id: str = Field(default_factory=lambda: uuid.uuid4().hex[:12])
     time_ms: int = Field(ge=0)
     label: str = Field(max_length=500)
@@ -148,6 +149,7 @@ class LyricLine(BaseModel):
 
 
 class Chord(BaseModel):
+    end_ms: int | None = Field(default=None, ge=0)
     time_ms: int = Field(ge=0)
     chord: str = Field(max_length=200)
     # Optional manual layout override used by the joint Lyrics + Chords editor.

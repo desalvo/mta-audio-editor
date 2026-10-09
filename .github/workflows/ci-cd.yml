@@ -411,7 +411,7 @@ jobs:
         shell: bash
         run: |
           brew install vamp-plugin-sdk boost
-          ./scripts/build_chordino_unix.sh native/runtime/chordino
+          bash ./scripts/build_chordino_unix.sh native/runtime/chordino
           echo "MTA_NATIVE_CHORDINO_BIN_DIR=$PWD/native/runtime/chordino/bin" >> "$GITHUB_ENV"
           echo "MTA_NATIVE_CHORDINO_VAMP_DIR=$PWD/native/runtime/chordino/vamp" >> "$GITHUB_ENV"
       - name: Generate native build id
