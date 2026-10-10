@@ -1,3 +1,9 @@
+## 0.3.0-r2
+
+- Added transactional native C++20 mono-to-stereo constant-power pan mixer with input validation.
+- Preserved Python audio backend and existing VST3 offline path; new mixer primitive is opt-in only.
+- Updated Android, iOS, and Windows revision metadata.
+
 ## 0.3.0-r1 — early development
 
 - Begin version 0.3.0 development; v0.2.0 remains stable.

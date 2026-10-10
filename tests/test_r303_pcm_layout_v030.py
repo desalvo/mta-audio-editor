@@ -31,9 +31,10 @@ def test_native_pcm_layout_roundtrip():
         assert list(output) == list(data)
 
 
-def test_early_version_030_r1_consistent():
+def test_early_version_030_consistent():
     assert (ROOT/'VERSION').read_text().strip() == '0.3.0'
-    assert (ROOT/'REVISION').read_text().strip() == '1'
+    revision = int((ROOT/'REVISION').read_text().strip())
+    assert revision >= 1
     assert (ROOT/'RELEASE_CHANNEL').read_text().strip() == 'early'
-    assert 'versionCode = 30001' in (ROOT/'mobile/android/app/build.gradle.kts').read_text()
-    assert '<string>30001</string>' in (ROOT/'mobile/ios/MTAEditorMobile/Info.plist').read_text()
+    assert f'versionCode = {30000 + revision}' in (ROOT/'mobile/android/app/build.gradle.kts').read_text()
+    assert f'<string>{30000 + revision}</string>' in (ROOT/'mobile/ios/MTAEditorMobile/Info.plist').read_text()

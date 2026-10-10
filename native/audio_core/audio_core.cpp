@@ -89,3 +89,34 @@ MTA_EXPORT int mta_pcm_interleave(const float* const* channels_in, float* dest,
     for (unsigned c=0;c<channels;++c) dest[frame*channels+c] = channels_in[c][frame];
   return 0;
 }
+
+// Stereo constant-power pan mixer for a mono source. The gain coefficient is
+// applied before panning; center (-3 dB per side) maintains perceived loudness.
+// Validation is transactional: bad input never modifies the destination.
+// pan = -1 left, 0 center, +1 right. Frames are interleaved LRLR...
+MTA_EXPORT int mta_pcm_mix_mono_stereo(float* stereo_destination,
+                                       const float* mono_source,
+                                       std::size_t frames,
+                                       float gain, float pan) noexcept {
+  if (!stereo_destination || !mono_source || frames == 0 ||
+      frames > SIZE_MAX / 2 || !std::isfinite(gain) ||
+      !std::isfinite(pan) || gain < -128.0f || gain > 128.0f ||
+      pan < -1.0f || pan > 1.0f) return -1;
+  constexpr float kPiOverFour = 0.7853981633974483096f;
+  const float angle = (pan + 1.0f) * kPiOverFour;
+  const float l = gain * std::cos(angle);
+  const float r = gain * std::sin(angle);
+  for (std::size_t i = 0; i < frames; ++i) {
+    const float sample = mono_source[i];
+    const float dl = stereo_destination[i * 2];
+    const float dr = stereo_destination[i * 2 + 1];
+    if (!std::isfinite(sample) || !std::isfinite(dl) || !std::isfinite(dr) ||
+        !std::isfinite(dl + sample * l) ||
+        !std::isfinite(dr + sample * r)) return -2;
+  }
+  for (std::size_t i = 0; i < frames; ++i) {
+    stereo_destination[i * 2] += mono_source[i] * l;
+    stereo_destination[i * 2 + 1] += mono_source[i] * r;
+  }
+  return 0;
+}
