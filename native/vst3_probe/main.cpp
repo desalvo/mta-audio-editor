@@ -161,6 +161,7 @@ int main(int argc, char** argv) {
   double offlineInputEnergy = 0.0;
   double offlineOutputEnergy = 0.0;
   double offlineOutputPeak = 0.0;
+  bool offlineOutputAudible = false;
   int latencySamples = -1;
   int tailSamples = -1;
   bool editController = false;
@@ -321,10 +322,10 @@ int main(int argc, char** argv) {
                       data.numOutputs = outCount;
                       data.inputs = inBuses.empty() ? nullptr : inBuses.data();
                       data.outputs = outBuses.empty() ? nullptr : outBuses.data();
-                      // Deterministic non-silent stimulus, 16 consecutive blocks. No
+                      // Deterministic non-silent stimulus, 128 consecutive blocks. No
                       // file I/O or allocations take place between process calls.
                       // No events, automation or musical transport are supplied yet.
-                      constexpr int kBlocks = 16;
+                      constexpr int kBlocks = 128;
                       constexpr double kPi = 3.14159265358979323846;
                       constexpr double kAmplitude = 0.125;
                       offlineProcessSucceeded = true;
@@ -391,6 +392,7 @@ int main(int argc, char** argv) {
                         offlineOutputChannels += processingSampleSize == 32
                             ? int(storage.samples32.size()) : int(storage.samples64.size());
                       if (offlineNonFiniteSamples) offlineProcessSucceeded = false;
+                      offlineOutputAudible = offlineOutputEnergy > 1e-12;
                       processor->setProcessing(false);
                     }
                     offlineDeactivated = component->setActive(false) == Steinberg::kResultOk;
@@ -443,6 +445,7 @@ int main(int argc, char** argv) {
             << ",\"offline_input_energy\":" << offlineInputEnergy
             << ",\"offline_output_energy\":" << offlineOutputEnergy
             << ",\"offline_output_peak\":" << offlineOutputPeak
+            << ",\"offline_output_audible\":" << (offlineOutputAudible ? "true" : "false")
             << ",\"buses\":" << busDetails.str() << ",\"native_host_ready\":false}\n";
 #else
   if (instantiate) { std::cerr << "Instance creation requires MTA_VST3_SDK_ROOT\n"; return 8; }

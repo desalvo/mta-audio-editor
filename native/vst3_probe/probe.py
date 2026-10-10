@@ -125,11 +125,12 @@ def probe_plugin(path: str, executable: str, timeout: float = 5,
             'offline_processing_started': offline and payload.get('offline_processing_started') is True,
             'offline_process_succeeded': offline and payload.get('offline_process_succeeded') is True,
             'offline_deactivated': offline and payload.get('offline_deactivated') is True,
+            'offline_output_audible': offline and payload.get('offline_output_audible') is True,
             'offline_output_channels': (payload.get('offline_output_channels') if offline and type(payload.get('offline_output_channels')) is int and 0 <= payload['offline_output_channels'] <= 256 else None),
             'offline_nonfinite_samples': (payload.get('offline_nonfinite_samples') if offline and type(payload.get('offline_nonfinite_samples')) is int and 0 <= payload['offline_nonfinite_samples'] <= 131072 else None),
             'offline_blocks_processed': (payload.get('offline_blocks_processed') if offline and
                                          type(payload.get('offline_blocks_processed')) is int and
-                                         0 <= payload['offline_blocks_processed'] <= 16 else None),
+                                         0 <= payload['offline_blocks_processed'] <= 128 else None),
             **{key: value for key in ('offline_input_energy', 'offline_output_energy', 'offline_output_peak')
                if offline and isinstance((value := payload.get(key)), (int, float))
                and not isinstance(value, bool) and math.isfinite(value) and 0 <= value <= 1e12},

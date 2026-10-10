@@ -1,3 +1,7 @@
+## 0.3.0-r26 — extended offline signal validation
+
+Expanded the isolated VST3 diagnostic to 128 consecutive 512-sample blocks at 48 kHz to exercise the one-second default Steinberg ADelay effect. Reports output energy and a derived non-silent flag. No realtime readiness claim: MIDI, parameter automation, latency alignment, bounded RT callbacks and platform validation remain outstanding.
+
 # MTA Audio Editor 0.3.0-r25
 
 - Native VST3 offline diagnostic: 16 sequential blocks with deterministic non-silent input and measured output energy/peak.

@@ -31,11 +31,13 @@ def main() -> int:
                   'offline_process_succeeded', 'offline_deactivated', 'instance_terminated'):
         if data.get(field) is not True:
             raise AssertionError(f'{field} failed: {data}')
-    assert data['offline_blocks_processed'] == 16, data
+    assert data['offline_blocks_processed'] == 128, data
     assert data['offline_input_energy'] > 0, data
     assert data['offline_nonfinite_samples'] == 0, data
+    assert data['offline_output_energy'] > 1, data
+    assert data['offline_output_audible'] is True, data
     assert data['native_host_ready'] is False, data
-    print('ADelay VST3 SDK acceptance: 16 offline blocks, finite samples, clean teardown')
+    print('ADelay VST3 SDK acceptance: 128 offline blocks, finite samples, clean teardown')
     return 0
 
 
