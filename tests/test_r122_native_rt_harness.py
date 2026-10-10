@@ -1,7 +1,5 @@
 """r122: native SPSC -> Python worker thread -> isolated VST3 IPC smoke checks."""
 from pathlib import Path
-import shutil
-import subprocess
 
 import pytest
 
