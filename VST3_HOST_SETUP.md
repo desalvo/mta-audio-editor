@@ -55,3 +55,7 @@ GitHub-generated VST3 SDK ZIP archives omit Git submodule sources. Use `git clon
 
 ### r27 transport context
 The isolated offline diagnostic now supplies deterministic musical transport (120 BPM, 4/4), with sample position and musical time advancing each block. This is diagnostic-only; it does not activate the VST3 host for realtime playback.
+
+### Offline WAV export (r35)
+
+Python API `native.vst3_probe.native_chain.render_native_wav(source, destination, plugins, executable)` supports 48 kHz mono/stereo PCM16 files up to 1,048,576 frames. Requires an SDK-enabled probe and VST3 plug-in(s). This is an opt-in test/export path, not the realtime engine. Output replaces the destination only after success.

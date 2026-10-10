@@ -1,3 +1,12 @@
+## 0.3.0-r35 — GitHub Actions correction and isolated WAV renderer
+
+- Remove the unused MAX_FRAMES import that caused Ruff F401 in the latest workflow logs.
+- Add opt-in offline WAV-to-WAV processing backed by the existing native isolated VST3 PCM chain.
+- Support 48 kHz, 16-bit PCM, mono/stereo WAV up to 1,048,576 frames with exact frame preservation.
+- Publish outputs atomically; leave existing exports intact when plugin processing fails.
+- Add conversion, unsupported-format, partial-frame, and failed-export regression tests.
+- No realtime activation; SDK remains an external MIT-licensed dependency.
+
 ## 0.3.0-r34 — GitHub Actions Ruff correction
 
 - Resolve unused-import F401 in the native VST3 PCM chain and its regression tests.

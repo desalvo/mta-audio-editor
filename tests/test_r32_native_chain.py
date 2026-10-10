@@ -2,7 +2,7 @@
 import math
 from pathlib import Path
 import pytest
-from native.vst3_probe.native_chain import MAX_FRAMES, render_native_chain
+from native.vst3_probe.native_chain import render_native_chain
 
 
 def test_chain_rejects_invalid_buffers_before_any_plugin_load(tmp_path):
