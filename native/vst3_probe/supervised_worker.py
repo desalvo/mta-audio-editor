@@ -8,10 +8,13 @@ Never use this object in a realtime audio callback.
 from __future__ import annotations
 
 from dataclasses import dataclass
+import logging
 from typing import Callable
 
 from .native_chain import NativeChainError
 from .stream_worker import EventBlock, NativeVST3Worker
+
+_LOGGER = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -94,7 +97,7 @@ class SupervisedVST3Worker:
             try:
                 old.close(force=True)
             except Exception:
-                pass  # Never mask the originating plugin fault.
+                _LOGGER.warning("VST3 worker cleanup failed after plugin fault", exc_info=True)
 
     def _ensure_worker(self) -> bool:
         if self._disabled or self._closed:
@@ -152,7 +155,7 @@ class SupervisedVST3Worker:
                 try:
                     worker.close(force=True)
                 except Exception:
-                    pass
+                    _LOGGER.warning("VST3 worker cleanup failed after rejected start", exc_info=True)
             self._faults += 1
             if self._restarts >= self.max_restarts:
                 self._disabled = True

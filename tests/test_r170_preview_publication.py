@@ -1,4 +1,3 @@
-import threading
 import wave
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor

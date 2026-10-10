@@ -1,5 +1,4 @@
 """r168: link project VST3 insert snapshots to the control-thread supervisor."""
-from pathlib import Path
 import pytest
 from app import storage
 from app.models import InsertPlugin

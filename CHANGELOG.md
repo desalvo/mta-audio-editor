@@ -1,3 +1,8 @@
+## 0.3.0-r171 — Quality / Ruff fixes
+
+- Fix six Ruff violations detected by CI on r170, with diagnostic logging for VST3 worker cleanup failures.
+- Preserve VST3 fault isolation and all previous functionality; no native host readiness change.
+
 ## 0.3.0-r170 — Safe concurrent rendered playback previews
 
 - Serialize duplicate preview renders and atomically publish only valid WAV outputs; incomplete results never enter the playback cache.

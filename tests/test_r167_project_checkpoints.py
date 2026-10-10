@@ -1,6 +1,5 @@
 """r167: project-scoped VST3 checkpoint archive and stale identity defenses."""
 import zipfile
-from pathlib import Path
 
 import pytest
 
@@ -29,7 +28,7 @@ def test_state_roundtrip_project_export_import(sample_project, tmp_path):
     archive = tmp_path / 'portable.maeprojz'
     storage.write_project_archive(pid, archive)
     with zipfile.ZipFile(archive) as z:
-        assert f'project/vst3-checkpoints/master--my-vst.json' in z.namelist()
+        assert 'project/vst3-checkpoints/master--my-vst.json' in z.namelist()
     imported = storage.import_project_archive(archive, None)
     assert load_insert_checkpoint(imported.id, 'master', 'my-vst') == (b'component', b'controller')
 
