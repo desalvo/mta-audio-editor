@@ -1,3 +1,9 @@
+## 0.3.0-r50 — VST3 multi-rate test compatibility
+
+- Fix two obsolete tests reported by GitHub Actions: processing configuration and transport musical position now use the negotiated `pcmSampleRate` rather than requiring 48 kHz.
+- Keep the multi-rate audio implementation unchanged.
+- Previous CI run: 1105 passing tests, 2 obsolete assertions failing, coverage 70.12%.
+
 ## 0.3.0-r49 — five-iteration development batch
 
 - r45: Fix Ruff F401 unused run_batch import in sample-rate tests.

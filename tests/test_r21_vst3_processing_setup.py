@@ -19,7 +19,8 @@ def test_configuration_is_explicit_and_safe():
     assert '"--configure"' in code
     assert 'processor->setupProcessing(setup)' in code
     assert 'setup.maxSamplesPerBlock = 512' in code
-    assert 'setup.sampleRate = 48000.0' in code
+    assert 'setup.sampleRate = static_cast<double>(pcmSampleRate)' in code
+    assert 'processor->setupProcessing(setup)' in code
     assert 'processor->setActive(' not in code
     assert 'processor->process(data)' in code
     assert 'if (offline && processor && processingSetupSucceeded)' in code

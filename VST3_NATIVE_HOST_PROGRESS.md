@@ -1,3 +1,7 @@
+## r50: multi-rate CI regression tests
+
+Two tests from r21 and r27 now assert `pcmSampleRate` in the actual C++ processing setup and musical transport math instead of the obsolete hardcoded 48000 Hz. The runtime is unchanged, and native realtime readiness remains false.
+
 ## 0.3.0-r44 (three integrated internal iterations: r42–r44)
 
 - r42: Consolidated batch input/output preflight for atomic publishing.

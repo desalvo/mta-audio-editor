@@ -6,7 +6,7 @@ def test_transport_context_is_sample_accurate():
     source = (ROOT / "native/vst3_probe/main.cpp").read_text()
     assert "data.processContext = &transport" in source
     assert "transport.projectTimeSamples = projectSample" in source
-    assert "transport.projectTimeMusic = double(projectSample) * 120.0 / (60.0 * 48000.0)" in source
+    assert "transport.projectTimeMusic = double(projectSample) * 120.0 / (60.0 * pcmSampleRate)" in source
     assert "offlineTransportContinuous" in source
     assert "offline_last_project_sample" in source
 

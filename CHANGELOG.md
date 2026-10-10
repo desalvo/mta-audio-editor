@@ -1,3 +1,8 @@
+## 0.3.0-r50 — VST3 multi-rate regression CI fixes
+
+- Update r21 and r27 regression tests to assert the dynamic `pcmSampleRate` used by the C++ probe for processing configuration and musical transport; retain the supported 44.1/48/96 kHz behavior.
+- Preserve the 70% coverage threshold and all r49 VST3 batch features.
+
 ## 0.3.0-r49 — five-iteration development batch
 
 - r45: Fix Ruff F401 unused run_batch import in sample-rate tests.
