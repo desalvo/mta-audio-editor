@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.18)
+project(mta_vst3_probe LANGUAGES CXX)
+add_executable(mta_vst3_probe main.cpp)
+target_compile_features(mta_vst3_probe PRIVATE cxx_std_20)
+if(UNIX AND NOT APPLE)
+  target_link_libraries(mta_vst3_probe PRIVATE ${CMAKE_DL_LIBS})
+endif()

@@ -17,3 +17,19 @@ Nel mixer scegli **Insert → VST3 (desktop)**, seleziona un plugin rilevato e a
 The Insert VST3 setup scans exposed normalized parameters (0–1), lets you adjust them, and passes them to the isolated renderer. This is not the native VST3 graphical interface and does not enable real-time hosting.
 
 Il setup VST3 legge i parametri normalizzati (0–1), consente di modificarli e li passa al renderer isolato. Non è l’interfaccia grafica originale del plugin e non abilita il processamento live.
+
+## 0.3.0-r4: isolated native binary factory probe
+
+`native/vst3_probe` builds a C++20 CLI with CMake. It checks whether a
+native VST3 module exports Steinberg's `GetPluginFactory` symbol. Run it only
+through `native.vst3_probe.probe.probe_plugin` (a separate process with a
+bounded timeout). **This does not instantiate a VST3 plugin**, process sound,
+open an editor or implement a working real-time VST3 host. The existing
+Pedalboard offline fallback remains unchanged. VST3 bundles execute untrusted
+native code during loading: test unknown plugins only in a restricted environment.
+
+`native/vst3_probe` compila un tool C++20 che verifica l'esportazione
+`GetPluginFactory` nel binario del plugin. Eseguirlo tramite `probe_plugin`,
+in processo separato e con timeout. Non è ancora un host VST3 completo:
+non istanzia plugin e non elabora audio live. L'host Pedalboard offline resta
+invariato. Il caricamento di binari esterni esegue codice di terze parti.
