@@ -1,7 +1,7 @@
 """Opt-in bounded offline serial VST3 insert chain via isolated subprocesses.
 
 Requires the Steinberg-SDK-enabled native probe. No realtime use, no project writes.
-The r33 transport supports mono/stereo interleaved float32, 1..1048576 frames at 48 kHz.
+The r33 transport supports mono/stereo interleaved float32, 1..1048576 frames at 44.1/48/96 kHz.
 """
 from __future__ import annotations
 
@@ -28,12 +28,14 @@ class NativeChainError(RuntimeError):
 
 
 def render_native_chain(audio: Sequence[float], plugins: Sequence[tuple[str, str]],
-                        executable: str, *, timeout: float = 15.0) -> list[float]:
+                        executable: str, *, timeout: float = 15.0, sample_rate: int = 48000) -> list[float]:
     """Run each VST3 module in a separate bounded process, passing PCM by file.
 
     Channels may be 1 (flat float samples) or 2 (sequence of stereo frames).
     This diagnostic API rejects MIDI and does not claim latency compensation.
     """
+    if type(sample_rate) is not int or sample_rate not in (44100, 48000, 96000):
+        raise ValueError('Sample rate must be 44100, 48000, or 96000')
     if not isinstance(timeout, (int, float)) or isinstance(timeout, bool) or not math.isfinite(timeout) or timeout <= 0:
         raise ValueError('Timeout must be a positive finite number')
     if not 1 <= len(audio) <= MAX_FRAMES or not 1 <= len(plugins) <= MAX_INSERTS:
@@ -64,7 +66,7 @@ def render_native_chain(audio: Sequence[float], plugins: Sequence[tuple[str, str
             input_path.write_bytes(current.tobytes())
             try:
                 proc = subprocess.run([str(probe), str(binary), '--render-pcm', cid.lower(),
-                                       str(input_path), str(output_path), str(channels)],
+                                       str(input_path), str(output_path), str(channels), str(sample_rate)],
                                       capture_output=True, text=True, timeout=max(0.5, min(timeout, 120)))
                 if proc.returncode:
                     raise NativeChainError(f'VST3 insert {index} failed: {proc.stderr[:250]}')
@@ -122,7 +124,7 @@ def render_native_wav(source: str | Path, destination: str | Path,
                       *, timeout: float = 15.0) -> Path:
     """Bounded isolated WAV->VST3->WAV with atomic publication.
 
-    Supports 48 kHz, mono/stereo, integer PCM16/24/32. The WAV standard
+    Supports 44.1/48/96 kHz, mono/stereo, integer PCM16/24/32. The WAV standard
     IEEE-float format is intentionally not accepted by Python wave.
     """
     if not 1 <= len(plugins) <= MAX_INSERTS:
@@ -137,16 +139,17 @@ def render_native_wav(source: str | Path, destination: str | Path,
         channels = wav.getnchannels()
         frames = wav.getnframes()
         width = wav.getsampwidth()
-        if wav.getcomptype() != 'NONE' or width not in (2, 3, 4) or wav.getframerate() != 48000 or channels not in (1, 2):
-            raise NativeWavError('Only 48 kHz mono/stereo PCM16/24/32 WAV is supported')
+        if wav.getcomptype() != 'NONE' or width not in (2, 3, 4) or wav.getframerate() not in (44100, 48000, 96000) or channels not in (1, 2):
+            raise NativeWavError('Only 44.1/48/96 kHz mono/stereo PCM16/24/32 WAV is supported')
         if not 1 <= frames <= MAX_FRAMES:
             raise NativeWavError('WAV length exceeds the bounded native VST3 limit')
+        sample_rate = wav.getframerate()
         pcm = wav.readframes(frames)
         if len(pcm) != frames * channels * width:
             raise NativeWavError('Truncated WAV input')
         values = _decode_pcm_wav(pcm, width)
         audio = list(zip(values[::2], values[1::2])) if channels == 2 else values
-    rendered = render_native_chain(audio, plugins, executable, timeout=timeout)
+    rendered = render_native_chain(audio, plugins, executable, timeout=timeout, sample_rate=sample_rate)
     flat = [sample for frame in rendered for sample in frame] if channels == 2 else rendered
     if len(flat) != frames * channels:
         raise NativeWavError('VST3 returned the wrong frame count')
@@ -158,7 +161,7 @@ def render_native_wav(source: str | Path, destination: str | Path,
         with wave.open(temp_name, 'wb') as wav:
             wav.setnchannels(channels)
             wav.setsampwidth(width)
-            wav.setframerate(48000)
+            wav.setframerate(sample_rate)
             wav.writeframes(output)
         os.replace(temp_name, destination_path)
     finally:

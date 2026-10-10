@@ -4,6 +4,9 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import os
+import shutil
+import tempfile
 from pathlib import Path
 import sys
 import wave
@@ -15,7 +18,7 @@ MAX_MANIFEST_BYTES = 256 * 1024
 
 
 def run_batch(manifest: Path, executable: str, *, timeout: float = 15.0,
-              stop_on_error: bool = False, dry_run: bool = False) -> dict:
+              stop_on_error: bool = False, dry_run: bool = False, atomic_batch: bool = False) -> dict:
     """Run validated exports. Each destination is atomically published separately."""
     if not isinstance(timeout, (int, float)) or isinstance(timeout, bool) or not math.isfinite(timeout) or timeout <= 0:
         raise ValueError("Timeout must be positive and finite")
@@ -52,13 +55,13 @@ def run_batch(manifest: Path, executable: str, *, timeout: float = 15.0,
         planned.append((src, dest, [(pair[0], pair[1]) for pair in plugins]))
     if any(source in destinations for source, _, _ in planned):
         raise ValueError("A batch output may not overwrite any batch input")
-    if dry_run:
+    if dry_run or atomic_batch:
         checks = []
         for index, (source, destination, plugins) in enumerate(planned):
             with wave.open(str(source), 'rb') as wav:
                 channels, frames, width = wav.getnchannels(), wav.getnframes(), wav.getsampwidth()
                 if (wav.getcomptype() != 'NONE' or channels not in (1, 2) or
-                    width not in (2, 3, 4) or wav.getframerate() != 48000 or
+                    width not in (2, 3, 4) or wav.getframerate() not in (44100, 48000, 96000) or
                     not 1 <= frames <= MAX_FRAMES):
                     raise ValueError(f'Unsupported WAV format in job {index}')
                 if len(wav.readframes(frames)) != frames * channels * width:
@@ -69,8 +72,11 @@ def run_batch(manifest: Path, executable: str, *, timeout: float = 15.0,
                            'destination': str(destination), 'frames': frames,
                            'channels': channels, 'bit_depth': width * 8,
                            'inserts': len(plugins)})
-        return {'status': 'ready', 'requested': len(planned), 'processed': 0,
-                'results': checks}
+        if dry_run:
+            return {'status': 'ready', 'requested': len(planned), 'processed': 0,
+                    'results': checks}
+    if atomic_batch:
+        return _run_atomic_batch(planned, executable, timeout)
     results = []
     for index, (source, destination, plugins) in enumerate(planned):
         try:
@@ -88,6 +94,60 @@ def run_batch(manifest: Path, executable: str, *, timeout: float = 15.0,
             "requested": len(planned), "processed": len(results), "results": results}
 
 
+
+def _run_atomic_batch(planned: list, executable: str, timeout: float) -> dict:
+    """All-or-nothing WAV batch, including restoration on publication failures.
+
+    Plugins run before the first destination is changed. Staging and backups
+    are created beside destinations to guarantee same-filesystem os.replace.
+    An OS crash/power loss during publication remains outside this guarantee.
+    """
+    staged: list[tuple[Path, Path]] = []
+    backups: dict[Path, Path] = {}
+    published: list[Path] = []
+    try:
+        for source, dest, plugins in planned:
+            fd, name = tempfile.mkstemp(prefix='.mta-stage-', suffix='.wav', dir=dest.parent)
+            os.close(fd)
+            stage = Path(name)
+            staged.append((stage, dest))
+            render_native_wav(source, stage, plugins, executable, timeout=timeout)
+        # Backup originals before publishing. copy2 preserves destination until commit.
+        for _, dest in staged:
+            if dest.exists():
+                fd, name = tempfile.mkstemp(prefix='.mta-backup-', suffix='.wav', dir=dest.parent)
+                os.close(fd)
+                backup = Path(name)
+                backups[dest] = backup
+                shutil.copy2(dest, backup)
+        for stage, dest in staged:
+            os.replace(stage, dest)
+            published.append(dest)
+        return {'status': 'ok', 'requested': len(planned), 'processed': len(planned),
+                'atomic_batch': True,
+                'results': [{'index': i, 'status': 'ok', 'destination': str(dest)}
+                            for i, (_, dest) in enumerate(staged)]}
+    except Exception as exc:
+        rollback_errors = []
+        for dest in reversed(published):
+            try:
+                backup = backups.get(dest)
+                if backup is None:
+                    dest.unlink(missing_ok=True)
+                else:
+                    os.replace(backup, dest)
+            except OSError as rollback_exc:
+                rollback_errors.append(f'{dest}: {rollback_exc}')
+        return {'status': 'partial_failure' if rollback_errors else 'rolled_back',
+                'requested': len(planned), 'processed': 0, 'atomic_batch': True,
+                'error': str(exc)[:512], 'rollback_errors': rollback_errors[:8],
+                'results': []}
+    finally:
+        for stage, _ in staged:
+            stage.unlink(missing_ok=True)
+        for backup in backups.values():
+            backup.unlink(missing_ok=True)
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Experimental VST3 WAV batch renderer")
     parser.add_argument('manifest', type=Path)
@@ -95,10 +155,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument('--timeout', type=float, default=15.0)
     parser.add_argument('--stop-on-error', action='store_true')
     parser.add_argument('--dry-run', action='store_true', help='Validate WAV inputs and output paths without launching plugins')
+    parser.add_argument('--atomic-batch', action='store_true', help='Stage every render before publishing any destination')
     args = parser.parse_args(argv)
     try:
         result = run_batch(args.manifest, args.probe, timeout=args.timeout,
-                           stop_on_error=args.stop_on_error, dry_run=args.dry_run)
+                           stop_on_error=args.stop_on_error, dry_run=args.dry_run,
+                           atomic_batch=args.atomic_batch)
     except (OSError, ValueError, UnicodeError, json.JSONDecodeError) as exc:
         print(json.dumps({"status": "invalid_manifest", "error": str(exc)[:512]}), file=sys.stderr)
         return 2

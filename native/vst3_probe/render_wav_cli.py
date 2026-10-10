@@ -11,7 +11,7 @@ from .native_chain import NativeChainError, render_native_wav
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Render 48-kHz PCM16/24/32 WAV through isolated VST3 inserts (experimental)")
+    parser = argparse.ArgumentParser(description="Render 44.1/48/96-kHz PCM16/24/32 WAV through isolated VST3 inserts (experimental)")
     parser.add_argument("source", type=Path)
     parser.add_argument("destination", type=Path)
     parser.add_argument("--probe", required=True, help="Native SDK-enabled probe executable")

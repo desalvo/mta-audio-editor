@@ -1,3 +1,9 @@
+## 0.3.0-r44 (three integrated internal iterations: r42–r44)
+
+- r42: Consolidated batch input/output preflight for atomic publishing.
+- r43: Experimental `--atomic-batch` stages every WAV before touching destinations, with same-filesystem backups and best-effort rollback of replaced files.
+- r44: Added regression tests for staging failures and rollback. Real-time playback remains unchanged; native persistent worker remains pending.
+
 ## 0.3.0-r40 — VST3 batch WAV preflight
 - Add `--dry-run` to the isolated VST3 WAV batch CLI, validating all source WAV formats, sizes, directory targets and collisions before launching plugins.
 - Produce machine-readable `ready` reports with bit depth, channel count and frame count; do not create or overwrite outputs during preflight.
@@ -72,3 +78,5 @@ Python API `native.vst3_probe.native_chain.render_native_wav(source, destination
 
 ### Experimental batch render (r38)
 Create a JSON manifest with `{ "schema": 1, "jobs": [{"source":"input.wav", "destination":"output.wav", "plugins":[["/path/plugin.vst3", "32hexCID"]]}] }`, and run `python -m native.vst3_probe.batch_wav_cli batch.json --probe /path/mta_vst3_probe`. Output JSON summarizes successes and failures. Relative WAV paths resolve from manifest directory. Outputs are independently atomic, not a multi-output transaction.
+
+Revision r41: isolated WAV/PCM paths support 44.1, 48, or 96 kHz (native `--render-pcm` accepts an optional sample-rate argument; default 48 kHz). The plugin worker is not persistent.

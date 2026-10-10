@@ -36,7 +36,7 @@ def test_mono_and_partial_frames(tmp_path):
         assert wav.getnframes() == 513
 
 
-@pytest.mark.parametrize('settings', [{'rate':44100}, {'channels':3}, {'width':1}])
+@pytest.mark.parametrize('settings', [{'rate':32000}, {'channels':3}, {'width':1}])
 def test_reject_unsupported_wav(tmp_path, settings):
     source = tmp_path / 'in.wav'
     wav_file(source, **settings)

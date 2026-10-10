@@ -1,3 +1,15 @@
+## 0.3.0-r44 (three integrated internal iterations: r42–r44)
+
+- r42: Consolidated batch input/output preflight for atomic publishing.
+- r43: Experimental `--atomic-batch` stages every WAV before touching destinations, with same-filesystem backups and best-effort rollback of replaced files.
+- r44: Added regression tests for staging failures and rollback. Real-time playback remains unchanged; native persistent worker remains pending.
+
+## 0.3.0-r41 — configurable VST3 offline sample rates
+- Add 44.1 kHz, 48 kHz, and 96 kHz support to the isolated native PCM renderer and WAV export.
+- Propagate the requested rate to VST3 setupProcessing and ProcessContext, including musical transport timestamps and test stimulus.
+- Preserve source sample rate and PCM bit depth in the output WAV; validate unsupported rates before launching the probe.
+- Keep the plugin isolated and the realtime engine disabled; a persistent C++ worker is not yet implemented.
+
 ## 0.3.0-r40 — VST3 batch WAV preflight
 - Add `--dry-run` to the isolated VST3 WAV batch CLI, validating all source WAV formats, sizes, directory targets and collisions before launching plugins.
 - Produce machine-readable `ready` reports with bit depth, channel count and frame count; do not create or overwrite outputs during preflight.

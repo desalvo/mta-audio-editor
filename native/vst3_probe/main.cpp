@@ -90,7 +90,7 @@ static std::string class_cid(const Steinberg::TUID& id) {
 }
 #endif
 int main(int argc, char** argv) {
-  const bool renderPcm = argc == 7 && std::string(argv[2]) == "--render-pcm";
+  const bool renderPcm = (argc == 7 || argc == 8) && std::string(argv[2]) == "--render-pcm";
   const bool offline = (argc == 4 && std::string(argv[2]) == "--offline") || renderPcm;
   const bool configure = renderPcm || (argc == 4 && (std::string(argv[2]) == "--configure" || offline));
   const bool lifecycle = renderPcm || (argc == 4 && (std::string(argv[2]) == "--lifecycle" || configure));
@@ -101,6 +101,14 @@ int main(int argc, char** argv) {
   // Offline interleaved float32 PCM, 1 or 2 channels, 1..1,048,576 frames.
   // File IPC only; never invoke this path on the realtime audio thread.
   constexpr size_t kMaxPcmFrames = 1048576;
+  int pcmSampleRate = 48000;
+  if (renderPcm && argc == 8) {
+    const std::string rate = argv[7];
+    if (rate != "44100" && rate != "48000" && rate != "96000") {
+      std::cerr << "Unsupported PCM sample rate\n"; return 8;
+    }
+    pcmSampleRate = std::stoi(rate);
+  }
   int pcmChannels = 0;
   size_t pcmFrames = 0;
   std::vector<float> pcmInput;
@@ -278,7 +286,7 @@ int main(int argc, char** argv) {
                   setup.processMode = offline ? Steinberg::Vst::kOffline : Steinberg::Vst::kRealtime;
                   setup.symbolicSampleSize = supports32Bit ? Steinberg::Vst::kSample32 : Steinberg::Vst::kSample64;
                   setup.maxSamplesPerBlock = 512;
-                  setup.sampleRate = 48000.0;
+                  setup.sampleRate = static_cast<double>(pcmSampleRate);
                   processingSampleSize = supports32Bit ? 32 : 64;
                   processingSetupSucceeded = processor->setupProcessing(setup) == Steinberg::kResultOk;
                 }
@@ -376,7 +384,7 @@ int main(int argc, char** argv) {
                                         Steinberg::Vst::ProcessContext::kTempoValid |
                                         Steinberg::Vst::ProcessContext::kTimeSigValid |
                                         Steinberg::Vst::ProcessContext::kProjectTimeMusicValid;
-                      transport.sampleRate = 48000.0;
+                      transport.sampleRate = static_cast<double>(pcmSampleRate);
                       transport.tempo = 120.0;
                       transport.timeSigNumerator = 4;
                       transport.timeSigDenominator = 4;
@@ -423,7 +431,7 @@ int main(int argc, char** argv) {
                         if (offlineLastProjectSample >= 0 && projectSample != offlineLastProjectSample + 512)
                           offlineTransportContinuous = false;
                         transport.projectTimeSamples = projectSample;
-                        transport.projectTimeMusic = double(projectSample) * 120.0 / (60.0 * 48000.0);
+                        transport.projectTimeMusic = double(projectSample) * 120.0 / (60.0 * pcmSampleRate);
                         offlineLastProjectSample = projectSample;
                         events.clear();
                         outputEvents.clear();
@@ -467,7 +475,7 @@ int main(int argc, char** argv) {
                               const int channelIndex = static_cast<int>(&channel - storage.samples32.data());
                               for (int frame = 0; frame < 512; ++frame) {
                                 const double sample = renderPcm ? (frame < validFrames ? pcmInput[(size_t(block) * 512 + frame) * pcmChannels + std::min(channelIndex, pcmChannels - 1)] : 0.0) :
-                                    kAmplitude * std::sin(2.0 * kPi * 440.0 * (block * 512 + frame) / 48000.0);
+                                    kAmplitude * std::sin(2.0 * kPi * 440.0 * (block * 512 + frame) / pcmSampleRate);
                                 channel[frame] = static_cast<Steinberg::Vst::Sample32>(sample);
                                 offlineInputEnergy += sample * sample;
                               }
@@ -477,7 +485,7 @@ int main(int argc, char** argv) {
                               const int channelIndex = static_cast<int>(&channel - storage.samples64.data());
                               for (int frame = 0; frame < 512; ++frame) {
                                 const double sample = renderPcm ? (frame < validFrames ? pcmInput[(size_t(block) * 512 + frame) * pcmChannels + std::min(channelIndex, pcmChannels - 1)] : 0.0) :
-                                    kAmplitude * std::sin(2.0 * kPi * 440.0 * (block * 512 + frame) / 48000.0);
+                                    kAmplitude * std::sin(2.0 * kPi * 440.0 * (block * 512 + frame) / pcmSampleRate);
                                 channel[frame] = sample;
                                 offlineInputEnergy += sample * sample;
                               }
@@ -587,7 +595,7 @@ int main(int argc, char** argv) {
             << ",\"tail_samples\":" << tailSamples
             << ",\"processing_setup_requested\":" << (processingSetupRequested ? "true" : "false")
             << ",\"processing_setup_succeeded\":" << (processingSetupSucceeded ? "true" : "false")
-            << ",\"processing_sample_rate\":" << (processingSetupRequested ? 48000 : 0)
+            << ",\"processing_sample_rate\":" << (processingSetupRequested ? pcmSampleRate : 0)
             << ",\"processing_block_size\":" << (processingSetupRequested ? 512 : 0)
             << ",\"processing_sample_size\":" << processingSampleSize
             << ",\"offline_requested\":" << (offlineRequested ? "true" : "false")

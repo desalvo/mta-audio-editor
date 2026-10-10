@@ -37,7 +37,7 @@ def test_preflight_validates_wav_without_running_plugins(tmp_path):
 
 
 def test_preflight_rejects_incompatible_rate(tmp_path):
-    m = manifest(tmp_path, rate=44100)
+    m = manifest(tmp_path, rate=32000)
     with pytest.raises(ValueError, match='Unsupported WAV'):
         run_batch(m, '/missing/probe', dry_run=True)
 
