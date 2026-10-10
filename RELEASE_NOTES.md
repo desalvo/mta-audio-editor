@@ -1,3 +1,9 @@
+## 0.3.0-r20 (2026-10-10)
+
+- Add isolated VST3 processor tail-length diagnostics (getTailSamples) after successful lifecycle initialization, bounded in C++ and validated in Python.
+- Compile the standalone VST3 factory probe without SDK in both Linux DEB/RPM CI matrix targets, including ARM64.
+- Keep realtime native VST3 hosting disabled pending official SDK and plugin interoperability tests.
+
 ## 0.3.0-r19 (2026-10-10)
 
 - Fix Linux ARM64 packaging: install libopus-dev and pkg-config, and verify the Opus pkg-config entry before installing sphn/Demucs. This prevents audiopus_sys from building the incompatible bundled Opus source with modern CMake.

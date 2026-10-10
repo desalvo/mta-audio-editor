@@ -118,6 +118,9 @@ def probe_plugin(path: str, executable: str, timeout: float = 5,
             'latency_samples': (payload['latency_samples'] if lifecycle and
                                 type(payload.get('latency_samples')) is int and
                                 0 <= payload['latency_samples'] <= 10000000 else None),
+            'tail_samples': (payload['tail_samples'] if lifecycle and
+                             type(payload.get('tail_samples')) is int and
+                             0 <= payload['tail_samples'] <= 10000000 else None),
             'buses': safe_buses, 'binary': str(binary), 'classes': classes,
             **({'factory_classes': payload['factory_classes']}
                if isinstance(payload.get('factory_classes'), int) and not isinstance(payload.get('factory_classes'), bool)

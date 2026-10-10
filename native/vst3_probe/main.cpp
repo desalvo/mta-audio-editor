@@ -144,6 +144,7 @@ int main(int argc, char** argv) {
   bool supports64Bit = false;
   bool sampleSizeQueried = false;
   int latencySamples = -1;
+  int tailSamples = -1;
   bool editController = false;
   bool audioProcessorQueried = false;
   bool editControllerQueried = false;
@@ -199,6 +200,9 @@ int main(int argc, char** argv) {
               supports64Bit = processor->canProcessSampleSize(Steinberg::Vst::kSample64) == Steinberg::kResultOk;
               const auto reportedLatency = processor->getLatencySamples();
               if (reportedLatency <= 10000000U) latencySamples = static_cast<int>(reportedLatency);
+              const auto reportedTail = processor->getTailSamples();
+              // kInfiniteTail is a special SDK value; leave it unknown rather than overflow.
+              if (reportedTail <= 10000000U) tailSamples = static_cast<int>(reportedTail);
             }
             // Read-only bus inspection in the isolated probe, before terminate().
             for (const auto media : {Steinberg::Vst::kAudio, Steinberg::Vst::kEvent}) {
@@ -246,6 +250,7 @@ int main(int argc, char** argv) {
             << ",\"supports_32_bit\":" << (supports32Bit ? "true" : "false")
             << ",\"supports_64_bit\":" << (supports64Bit ? "true" : "false")
             << ",\"latency_samples\":" << latencySamples
+            << ",\"tail_samples\":" << tailSamples
             << ",\"buses\":" << busDetails.str() << ",\"native_host_ready\":false}\n";
 #else
   if (instantiate) { std::cerr << "Instance creation requires MTA_VST3_SDK_ROOT\n"; return 8; }

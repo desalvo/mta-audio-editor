@@ -738,6 +738,11 @@ jobs:
           cmake -S native/audio_core -B build/audio_core -DCMAKE_BUILD_TYPE=Release
           cmake --build build/audio_core --config Release -j 2
           test -s build/audio_core/libmta_audio_core.so
+      - name: Compile isolated VST3 factory probe (without SDK)
+        run: |
+          cmake -S native/vst3_probe -B build/vst3_probe -DCMAKE_BUILD_TYPE=Release
+          cmake --build build/vst3_probe --config Release -j 2
+          test -x build/vst3_probe/mta_vst3_probe
       - name: Freeze local native application
         env:
           MTA_NATIVE_FFMPEG: /usr/bin/ffmpeg
