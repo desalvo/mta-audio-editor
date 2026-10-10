@@ -1,3 +1,8 @@
+## 0.3.0-r29
+- Fix immediate track rename propagation across Tracks and Mixer without rebuilding the DAW UI.
+- Wire mixer name editor Enter/Escape/blur to commit/cancel and prevent duplicate generic handlers.
+- Keep track-name saves asynchronous and debounced.
+
 ## 0.3.0-r28 — offline VST3 event/parameter queues and latency metadata
 
 - Allocated Steinberg SDK event and parameter queues outside the offline processing loop.

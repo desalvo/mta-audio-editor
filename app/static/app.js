@@ -45,6 +45,7 @@ const DEFAULT_ZOOM_PX_PER_SEC=70,MIN_ZOOM_PX_PER_SEC=25,MAX_ZOOM_PX_PER_SEC=1200
 let zoomPreviewState=null;
 let sel={a:0,b:0}, dragging=false, audioCtx=null, playAudio=null, selectedTrackId=null, exportFormat='mta';
 let selectedTrackIdSet=new Set(), timelineTool='range', rippleEnabled=false, timelineClipDrag=null;
+let projectMutationSerial=0;
 let autosaveTimer=null, autosaveBusy=false, autosaveQueued=false, autosaveEnabled=true, projectDirty=false, stemPollTimer=null, activeStemJob=null, activeStemProjectId=null;
 let lyricsPdfPreviewObjectUrl=null;
 let nativeRecentProjects=[];
@@ -1259,36 +1260,62 @@ async function startTrackStemSplit(id){
   if(singers&&(splitBackingVocals||splitPercussions||stemTargets!=='all'))throw Error('La separazione cantanti è alternativa alla separazione Lead/Backing e a quella selettiva strumenti');
   const q=new URLSearchParams({model,stem_count:String(stemCount),split_backing_vocals:String(splitBackingVocals),backing_vocal_model:backingVocalModel,split_percussions:String(splitPercussions),percussion_method:($('#trackPercussionMethod')?.value||'dsp'),stem_targets:stemTargets,...(singers||{})});const job=await api(`/api/projects/${current.id}/tracks/${id}/stem-jobs?${q}`,{method:'POST'});closeUtilityModal();activeStemJob=job.id;activeStemProjectId=job.project_id;showStemProgress(job);pollStemJob(job.id)}catch(e){toast(e.message)}
 }
-function renameTrackInline(id,value){const t=trackById(id);if(!t)return;const v=String(value||'').trim();if(!v)return;t.name=v.slice(0,200);markDirty()}
-function renameTrack(id){const t=trackById(id);if(!t)return;const value=prompt('Nome traccia',t.name);if(value===null)return;const v=value.trim();if(!v)return toast('Il nome non può essere vuoto');t.name=v.slice(0,200);render();markDirty(100)}
+// Track renaming must never force a full DAW render: that destroys mixer editors,
+// timeline canvases and can defer the visible label until unrelated UI work.
+function applyTrackName(id,value){
+  const t=trackById(id);if(!t)return false;
+  const name=String(value??'').trim().slice(0,200);
+  if(!name){toast('Il nome non può essere vuoto');return false}
+  const changed=t.name!==name;
+  t.name=name;
+  document.querySelectorAll('.channel-name[data-track-name]').forEach(host=>{
+    if(host.dataset.trackName!==id||host.querySelector('input'))return;
+    host.textContent=name;
+  });
+  document.querySelectorAll('.track-name.model-input').forEach(input=>{
+    if(current?.tracks?.[Number(input.dataset.i)]?.id===id&&document.activeElement!==input)input.value=name;
+  });
+  document.querySelectorAll(`[data-track-context-id] .track-more-menu`).forEach(button=>{
+    if(button.closest('[data-track-context-id]')?.dataset.trackContextId===id)
+      button.setAttribute('aria-label',`Apri menu contestuale di ${name}`);
+  });
+  if(changed)markDirty(100);
+  return true;
+}
+function renameTrackInline(id,value){
+  const input=Array.from(document.querySelectorAll('.track-name.model-input')).find(el=>current?.tracks?.[Number(el.dataset.i)]?.id===id);
+  if(!String(value??'').trim()){if(input)input.value=trackById(id)?.name||'';toast('Il nome non può essere vuoto');return}
+  applyTrackName(id,value);
+}
+function renameTrack(id){const t=trackById(id);if(!t)return;const value=prompt('Nome traccia',t.name);if(value!==null)applyTrackName(id,value)}
 function beginMixerTrackNameEdit(id){
-  const host=document.querySelector(`.channel-name[data-track-name="${CSS.escape(id)}"]`),t=trackById(id);if(!host||!t)return;
-  if(host.querySelector('input'))return;
-  const value=t.name||'';
-  host.dataset.originalName=value;
-  host.innerHTML=`<input class="channel-name-editor" maxlength="200" value="${esc(value)}" aria-label="Track name">`;
-  host.classList.add('editing');
-  const input=host.querySelector('input');
-  if(!input)return;
-  input.focus({preventScroll:true});
-  try{input.select()}catch(_e){}
+  const host=Array.from(document.querySelectorAll('.channel-name[data-track-name]')).find(el=>el.dataset.trackName===id),t=trackById(id);
+  if(!host||!t||host.querySelector('input'))return;
+  const input=document.createElement('input');
+  input.className='channel-name-editor';input.maxLength=200;input.value=t.name||'';input.setAttribute('aria-label','Track name');
+  host.dataset.originalName=t.name||'';
+  host.replaceChildren(input);host.classList.add('editing');
+  // Register handlers on the actual input, not on its non-input parent.
+  input.addEventListener('keydown',event=>mixerTrackNameEditorKey(event,id));
+  input.addEventListener('blur',()=>{if(input.isConnected&&host.contains(input))commitMixerTrackNameEdit(id,input.value)});
+  input.addEventListener('click',event=>event.stopPropagation());
+  input.addEventListener('dblclick',event=>event.stopPropagation());
+  input.focus({preventScroll:true});input.select();
 }
 function commitMixerTrackNameEdit(id,forceValue){
-  const host=document.querySelector(`.channel-name[data-track-name="${CSS.escape(id)}"]`),t=trackById(id);if(!host||!t)return;
+  const host=Array.from(document.querySelectorAll('.channel-name[data-track-name]')).find(el=>el.dataset.trackName===id);
+  const t=trackById(id);if(!host||!t)return;
   const input=host.querySelector('input');if(!input)return;
-  const raw=forceValue!=null?String(forceValue):String(input.value||'');
-  const v=raw.trim();
-  if(!v){host.classList.remove('editing');host.textContent=t.name||host.dataset.originalName||'';toast('Il nome non può essere vuoto');return;}
-  t.name=v.slice(0,200);
-  host.classList.remove('editing');
-  host.textContent=t.name;
-  markDirty(100);
-  render();
+  const name=String(forceValue??input.value).trim();
+  if(!name){cancelMixerTrackNameEdit(id);toast('Il nome non può essere vuoto');return}
+  // Replace first, so applyTrackName can update the mixer label in place.
+  host.classList.remove('editing');host.replaceChildren(document.createTextNode(t.name||''));
+  applyTrackName(id,name);
 }
 function cancelMixerTrackNameEdit(id){
-  const host=document.querySelector(`.channel-name[data-track-name="${CSS.escape(id)}"]`),t=trackById(id);if(!host)return;
-  host.classList.remove('editing');
-  host.textContent=(t?.name)||host.dataset.originalName||'';
+  const host=Array.from(document.querySelectorAll('.channel-name[data-track-name]')).find(el=>el.dataset.trackName===id);
+  if(!host)return;
+  host.classList.remove('editing');host.replaceChildren(document.createTextNode(trackById(id)?.name||host.dataset.originalName||''));
 }
 function mixerTrackNameEditorKey(event,id){
   if(event.key==='Enter'){event.preventDefault();commitMixerTrackNameEdit(id,event.currentTarget.value)}
@@ -2130,13 +2157,31 @@ async function setAutoMix(enabled){if(!current)return;try{collect();await api('/
 async function changeAutoMixStyle(style){current.auto_mix_style=style;if(current.auto_mix_enabled)await setAutoMix(true)}
 function showAutoMixInfo(){alert('Auto Mix is reversible. It snapshots the current mix, applies conservative type-based headroom, panning, EQ/dynamics/space rules and a master preparation chain. Turning it off restores the snapshot. Always audition the result before export.')}
 
-function bindModelInputs(){$$('.model-input').forEach(el=>el.addEventListener('change',()=>{const t=current.tracks[+el.dataset.i];if(t){t[el.dataset.k]=el.value;markDirty()}}));refreshPresetSelect(false);refreshPresetSelect(true)}
-function collect(){if(!current)return;$$('.model-input').forEach(el=>{const t=current.tracks[+el.dataset.i];if(t)t[el.dataset.k]=el.value});/* Timed lyrics/chords/markers are structured project events. Hidden legacy textareas are display mirrors only and must never overwrite word timing, manual anchors, disabled/deleted flags, snapshots or MTA overrides. */}
+function bindModelInputs(){$$('.model-input').forEach(el=>el.addEventListener('change',()=>{if(el.dataset.k==='name')return;const t=current.tracks[+el.dataset.i];if(t){t[el.dataset.k]=el.value;markDirty()}}));refreshPresetSelect(false);refreshPresetSelect(true)}
+function collect(){if(!current)return;$$('.model-input').forEach(el=>{const t=current.tracks[+el.dataset.i];if(t&&el.dataset.k!=='name')t[el.dataset.k]=el.value});/* Timed lyrics/chords/markers are structured project events. Hidden legacy textareas are display mirrors only and must never overwrite word timing, manual anchors, disabled/deleted flags, snapshots or MTA overrides. */}
 function projectSnapshot(){return current?JSON.parse(JSON.stringify(current)):null}
 function resetSessionHistory(){undoStack=[];redoStack=[];historyProjectId=current?.id||null;lastHistoryState=projectSnapshot();timelineClipboard=null;updateEditActionState()}
 function ensureSessionHistory(){if((current?.id||null)!==historyProjectId)resetSessionHistory();else if(!lastHistoryState&&current)lastHistoryState=projectSnapshot()}
 function checkpointHistory(){if(!current)return;ensureSessionHistory();if(JSON.stringify(current)!==JSON.stringify(lastHistoryState)){undoStack.push(lastHistoryState);if(undoStack.length>100)undoStack.shift();redoStack=[];lastHistoryState=projectSnapshot();updateEditActionState()}}
-async function persistCurrentProject(showToast=false){if(!current)return;collect();const saved=await api('/api/projects/'+current.id,{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify(current)});if(current&&current.id===saved.id)current=saved;projectDirty=false;lastHistoryState=projectSnapshot();$('#headerProjectName').textContent=current?.title||'—';if(showToast)toast('Progetto salvato')}
+async function persistCurrentProject(showToast=false){
+  if(!current)return;
+  collect();
+  const projectId=current.id,mutationAtStart=projectMutationSerial;
+  const payload=JSON.stringify(current);
+  const saved=await api('/api/projects/'+projectId,{method:'PUT',headers:{'content-type':'application/json'},body:payload});
+  if(!current||current.id!==projectId)return;
+  if(projectMutationSerial!==mutationAtStart){
+    // A newer user edit happened in flight: never overwrite it with old server data.
+    projectDirty=true;
+    autosaveQueued=true;
+    return;
+  }
+  current=saved;
+  projectDirty=false;
+  lastHistoryState=projectSnapshot();
+  $('#headerProjectName').textContent=current?.title||'—';
+  if(showToast)toast('Progetto salvato');
+}
 async function restoreHistorySnapshot(snapshot,label){if(!snapshot||!current)return;current=JSON.parse(JSON.stringify(snapshot));selectedTrackId=current.tracks.some(t=>t.id===selectedTrackId)?selectedTrackId:(current.tracks[0]?.id||null);projectDirty=true;render();await persistCurrentProject(false);lastHistoryState=projectSnapshot();updateEditActionState();toast(label)}
 async function undoEdit(){ensureSessionHistory();checkpointHistory();if(!undoStack.length)return toast('Nessuna operazione da annullare');const target=undoStack.pop();redoStack.push(projectSnapshot());await restoreHistorySnapshot(target,'Undo')}
 async function redoEdit(){ensureSessionHistory();if(!redoStack.length)return toast('Nessuna operazione da ripristinare');undoStack.push(projectSnapshot());const target=redoStack.pop();await restoreHistorySnapshot(target,'Redo')}
@@ -2263,7 +2308,7 @@ function pasteTimelineSelection(){if(!current||!timelineClipboard?.parts?.length
 function removeTimelineSelection(){if(!current)return;const[a,b]=selectionBounds(),ids=editTrackIds();if(b-a<2)return toast('Seleziona prima un intervallo nella timeline');if(!ids.length)return toast('Seleziona almeno una traccia');checkpointHistory();removeRangeFromTracks(a,b,ids,rippleEnabled);projectDirty=true;render();markDirty();toast(rippleEnabled?'Parte rimossa con ripple':'Parte di traccia rimossa')}
 function updateEditActionState(){const set=(id,v)=>{const e=$(id);if(e)e.disabled=!!v};set('#undoBtn',!undoStack.length);set('#redoBtn',!redoStack.length);set('#pasteBtn',!timelineClipboard?.parts?.length)}
 function markDirty(delay=650){
-  if(!current)return;ensureSessionHistory();checkpointHistory();projectDirty=true;clearTimeout(autosaveTimer);if(!autosaveEnabled){updateEditActionState();return}autosaveTimer=setTimeout(()=>flushAutosave(false),delay);
+  if(!current)return;projectMutationSerial++;ensureSessionHistory();checkpointHistory();projectDirty=true;clearTimeout(autosaveTimer);if(!autosaveEnabled){updateEditActionState();return}autosaveTimer=setTimeout(()=>flushAutosave(false),delay);
 }
 async function syncNativeProjectFile(projectId){
   if(!projectId||!currentUser?.native_single_user||!window.pywebview?.api?.sync_project)return;

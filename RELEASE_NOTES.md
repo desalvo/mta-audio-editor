@@ -1,3 +1,6 @@
+## 0.3.0-r29
+- Track names now update instantly in Tracks and Mixer; mixer renaming commits on Enter or blur and cancels on Escape.
+
 ## 0.3.0-r28 — offline VST3 event/parameter queues and latency metadata
 
 - Allocated Steinberg SDK event and parameter queues outside the offline processing loop.
