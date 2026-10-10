@@ -157,6 +157,10 @@ int main(int argc, char** argv) {
   bool offlineDeactivated = false;
   int offlineOutputChannels = 0;
   int offlineNonFiniteSamples = 0;
+  int offlineBlocksProcessed = 0;
+  double offlineInputEnergy = 0.0;
+  double offlineOutputEnergy = 0.0;
+  double offlineOutputPeak = 0.0;
   int latencySamples = -1;
   int tailSamples = -1;
   bool editController = false;
@@ -273,8 +277,9 @@ int main(int argc, char** argv) {
                     if (component->getBusInfo(Steinberg::Vst::kAudio, direction, i, info) != Steinberg::kResultOk ||
                         info.channelCount < 0 || info.channelCount > 32) return false;
                     buses[i].numChannels = info.channelCount;
-                    buses[i].silenceFlags = info.channelCount < 64
-                        ? ((uint64_t{1} << info.channelCount) - 1) : 0;
+                    // A non-silent test signal will be written to the input buffers.
+                    // Output is also marked non-silent so processors do not skip it.
+                    buses[i].silenceFlags = 0;
                     if (processingSampleSize == 32) {
                       storage[i].samples32.resize(info.channelCount, std::vector<Steinberg::Vst::Sample32>(512, 0));
                       for (auto& channel : storage[i].samples32) storage[i].ptr32.push_back(channel.data());
@@ -316,23 +321,76 @@ int main(int argc, char** argv) {
                       data.numOutputs = outCount;
                       data.inputs = inBuses.empty() ? nullptr : inBuses.data();
                       data.outputs = outBuses.empty() ? nullptr : outBuses.data();
+                      // Deterministic non-silent stimulus, 16 consecutive blocks. No
+                      // file I/O or allocations take place between process calls.
                       // No events, automation or musical transport are supplied yet.
-                      offlineProcessSucceeded = processor->process(data) == Steinberg::kResultOk;
-                      if (offlineProcessSucceeded) {
-                        for (const auto& b : outputStorage) {
+                      constexpr int kBlocks = 16;
+                      constexpr double kPi = 3.14159265358979323846;
+                      constexpr double kAmplitude = 0.125;
+                      offlineProcessSucceeded = true;
+                      for (int block = 0; block < kBlocks; ++block) {
+                        for (auto& storage : inputStorage) {
                           if (processingSampleSize == 32) {
-                            for (const auto& c : b.samples32) {
-                              ++offlineOutputChannels;
-                              for (auto v : c) if (!std::isfinite(v)) ++offlineNonFiniteSamples;
+                            for (auto& channel : storage.samples32) {
+                              for (int frame = 0; frame < 512; ++frame) {
+                                const double sample = kAmplitude * std::sin(2.0 * kPi * 440.0 *
+                                    (block * 512 + frame) / 48000.0);
+                                channel[frame] = static_cast<Steinberg::Vst::Sample32>(sample);
+                                offlineInputEnergy += sample * sample;
+                              }
                             }
                           } else {
-                            for (const auto& c : b.samples64) {
-                              ++offlineOutputChannels;
-                              for (auto v : c) if (!std::isfinite(v)) ++offlineNonFiniteSamples;
+                            for (auto& channel : storage.samples64) {
+                              for (int frame = 0; frame < 512; ++frame) {
+                                const double sample = kAmplitude * std::sin(2.0 * kPi * 440.0 *
+                                    (block * 512 + frame) / 48000.0);
+                                channel[frame] = sample;
+                                offlineInputEnergy += sample * sample;
+                              }
+                            }
+                          }
+                        }
+                        // Clear output buffers before each invocation, including plugins
+                        // that only write a subset of their declared output buses.
+                        for (auto& storage : outputStorage) {
+                          if (processingSampleSize == 32) {
+                            for (auto& channel : storage.samples32)
+                              std::fill(channel.begin(), channel.end(), 0.0f);
+                          } else {
+                            for (auto& channel : storage.samples64)
+                              std::fill(channel.begin(), channel.end(), 0.0);
+                          }
+                        }
+                        if (processor->process(data) != Steinberg::kResultOk) {
+                          offlineProcessSucceeded = false;
+                          break;
+                        }
+                        ++offlineBlocksProcessed;
+                        for (const auto& storage : outputStorage) {
+                          if (processingSampleSize == 32) {
+                            for (const auto& channel : storage.samples32) {
+                              for (auto sample : channel) {
+                                if (!std::isfinite(sample)) { ++offlineNonFiniteSamples; continue; }
+                                offlineOutputEnergy += double(sample) * double(sample);
+                                offlineOutputPeak = std::max(offlineOutputPeak, std::abs(double(sample)));
+                              }
+                            }
+                          } else {
+                            for (const auto& channel : storage.samples64) {
+                              for (auto sample : channel) {
+                                if (!std::isfinite(sample)) { ++offlineNonFiniteSamples; continue; }
+                                offlineOutputEnergy += sample * sample;
+                                offlineOutputPeak = std::max(offlineOutputPeak, std::abs(sample));
+                              }
                             }
                           }
                         }
                       }
+                      // Count channels only once, not once per processed block.
+                      for (const auto& storage : outputStorage)
+                        offlineOutputChannels += processingSampleSize == 32
+                            ? int(storage.samples32.size()) : int(storage.samples64.size());
+                      if (offlineNonFiniteSamples) offlineProcessSucceeded = false;
                       processor->setProcessing(false);
                     }
                     offlineDeactivated = component->setActive(false) == Steinberg::kResultOk;
@@ -381,6 +439,10 @@ int main(int argc, char** argv) {
             << ",\"offline_deactivated\":" << (offlineDeactivated ? "true" : "false")
             << ",\"offline_output_channels\":" << offlineOutputChannels
             << ",\"offline_nonfinite_samples\":" << offlineNonFiniteSamples
+            << ",\"offline_blocks_processed\":" << offlineBlocksProcessed
+            << ",\"offline_input_energy\":" << offlineInputEnergy
+            << ",\"offline_output_energy\":" << offlineOutputEnergy
+            << ",\"offline_output_peak\":" << offlineOutputPeak
             << ",\"buses\":" << busDetails.str() << ",\"native_host_ready\":false}\n";
 #else
   if (instantiate) { std::cerr << "Instance creation requires MTA_VST3_SDK_ROOT\n"; return 8; }

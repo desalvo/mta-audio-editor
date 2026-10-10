@@ -81,6 +81,17 @@ jobs:
           cmake -S native/vst3_probe -B /tmp/mta-vst3-real-sdk -DCMAKE_BUILD_TYPE=Release -DMTA_VST3_SDK_ROOT="$PWD/.external/vst3sdk"
           cmake --build /tmp/mta-vst3-real-sdk --parallel 2
           test -x /tmp/mta-vst3-real-sdk/mta_vst3_probe
+      - name: Build Steinberg ADelay reference plugin and exercise 16 offline blocks
+        run: |
+          cmake -S .external/vst3sdk -B /tmp/mta-vst3-example \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DSMTG_ENABLE_VSTGUI_SUPPORT=OFF \
+            -DSMTG_ENABLE_VST3_HOSTING_EXAMPLES=OFF \
+            -DSMTG_RUN_VST_VALIDATOR=OFF
+          cmake --build /tmp/mta-vst3-example --target adelay --parallel 2
+          python scripts/test_vst3_adelay_offline.py \
+            /tmp/mta-vst3-real-sdk/mta_vst3_probe \
+            /tmp/mta-vst3-example/VST3/Release/adelay.vst3/Contents/x86_64-linux/adelay.so
 
   security:
     name: SAST and dependency audit

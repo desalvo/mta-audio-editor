@@ -1,3 +1,7 @@
+## 0.3.0-r25
+
+Isolated VST3 probe: 16-block 440 Hz deterministic signal processing; per-block buffer clearing, bounded output energy and non-finite diagnostics. This remains experimental; no realtime integration or validated MIDI/automation/latency compensation.
+
 ## 0.3.0-r24
 
 - Experimental offline processing probe for one silent block; diagnostic only.

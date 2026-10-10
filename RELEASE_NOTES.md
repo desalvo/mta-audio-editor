@@ -1,3 +1,14 @@
+# MTA Audio Editor 0.3.0-r25
+
+- Native VST3 offline diagnostic: 16 sequential blocks with deterministic non-silent input and measured output energy/peak.
+- Steinberg ADelay reference plugin end-to-end acceptance test, integrated in Linux SDK CI job.
+- Input buses correctly marked non-silent, output buffers cleared between blocks, bounded untrusted diagnostics.
+- No realtime integration: further compatibility and performance gates remain open.
+
+## 0.3.0-r25
+
+Isolated VST3 probe: 16-block 440 Hz deterministic signal processing; per-block buffer clearing, bounded output energy and non-finite diagnostics. This remains experimental; no realtime integration or validated MIDI/automation/latency compensation.
+
 ## 0.3.0-r24
 
 - Added SDK-built isolated VST3 single-block offline smoke-test, explicitly opt-in.
