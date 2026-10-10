@@ -1,3 +1,9 @@
+## 0.3.0-r11
+
+- Added opt-in isolated VST3 IComponent lifecycle diagnostic (--lifecycle CID): initialize with null host context, terminate only after successful initialization, always release.
+- Kept the previous create-only mode and production playback untouched.
+- Some plugins reject a null host context; this diagnostic is not a realtime-host certification.
+
 ## 0.3.0-r10
 
 - Optional VST3 SDK-backed audio-component instance creation diagnostic by exact CID; release immediately, no playback activation.

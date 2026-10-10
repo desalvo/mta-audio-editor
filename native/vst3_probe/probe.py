@@ -34,12 +34,17 @@ def resolve_module_binary(bundle: Path) -> Path:
 
 
 def probe_plugin(path: str, executable: str, timeout: float = 5,
-                 instantiate_cid: str | None = None) -> dict:
+                 instantiate_cid: str | None = None,
+                 lifecycle: bool = False) -> dict:
+    if lifecycle and instantiate_cid is None:
+        raise ValueError('Lifecycle diagnostic requires an explicit class CID')
     plugin = validate_plugin_path(path)
     binary = resolve_module_binary(plugin)
     probe = Path(executable).resolve()
     if not probe.is_file():
         raise FileNotFoundError(f'VST3 probe executable not found: {probe}')
+    if lifecycle and instantiate_cid is None:
+        raise ValueError('Lifecycle diagnostic requires an explicit class CID')
     if instantiate_cid is not None:
         if not isinstance(instantiate_cid, str) or len(instantiate_cid) != 32 or any(
             char not in '0123456789abcdefABCDEF' for char in instantiate_cid
@@ -47,7 +52,7 @@ def probe_plugin(path: str, executable: str, timeout: float = 5,
             raise ValueError('Expected a 32-character hexadecimal VST3 class CID')
     command = [str(probe), str(binary)]
     if instantiate_cid is not None:
-        command.extend(['--instantiate', instantiate_cid.lower()])
+        command.extend(['--lifecycle' if lifecycle else '--instantiate', instantiate_cid.lower()])
     result = subprocess.run(command, text=True, capture_output=True,
                             timeout=min(max(float(timeout), 0.5), 15), check=False)
     if result.returncode:
@@ -81,6 +86,9 @@ def probe_plugin(path: str, executable: str, timeout: float = 5,
             'instance_requested': instantiate_cid is not None,
             'instance_found': payload.get('instance_found') is True if instantiate_cid is not None else False,
             'instance_created': payload.get('instance_created') is True if instantiate_cid is not None else False,
+            'lifecycle_requested': lifecycle,
+            'instance_initialized': payload.get('instance_initialized') is True if lifecycle else False,
+            'instance_terminated': payload.get('instance_terminated') is True if lifecycle else False,
             'native_host_ready': False, 'binary': str(binary), 'classes': classes,
             **({'factory_classes': payload['factory_classes']}
                if isinstance(payload.get('factory_classes'), int) and not isinstance(payload.get('factory_classes'), bool)

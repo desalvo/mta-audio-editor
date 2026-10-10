@@ -25,3 +25,7 @@ not be bundled into MTA packages without explicit redistribution rights.
 ## 0.3.0-r10
 
 Optional exact-CID IComponent creation diagnostic through IPluginFactory::createInstance(), followed by immediate release. No initialization, bus setup or processing. The probe is never called from realtime playback.
+
+## 0.3.0-r11
+
+The `--lifecycle <CID>` opt-in subprocess diagnostic attempts `IComponent::initialize(nullptr)` then calls `terminate()` only if initialization succeeded, and always releases the interface. A null host context is an intentional limitation; production host interfaces, module entry lifecycle, realtime processing and GUI integration are not implemented. `--instantiate` remains unchanged.

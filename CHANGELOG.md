@@ -1,3 +1,6 @@
+## 0.3.0-r11
+- Experimental isolated VST3 lifecycle diagnostic, no audio processing enabled.
+
 ## 0.3.0-r10
 
 - Optional VST3 SDK-backed audio-component instance creation diagnostic by exact CID; release immediately, no playback activation.

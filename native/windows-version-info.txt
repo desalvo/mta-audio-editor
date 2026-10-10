@@ -16,7 +16,7 @@ VSVersionInfo(
         [
           StringStruct('CompanyName', 'Alessandro De Salvo'),
           StringStruct('FileDescription', 'MTA Audio Editor'),
-          StringStruct('FileVersion', '0.3.0-r10'),
+          StringStruct('FileVersion', '0.3.0-r11'),
           StringStruct('InternalName', 'MTA Audio Editor'),
           StringStruct('LegalCopyright', 'EUPL-1.2'),
           StringStruct('OriginalFilename', 'MTA Audio Editor.exe'),

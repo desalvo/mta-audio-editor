@@ -2,7 +2,7 @@
 
 Features, limitations and licensing
 
-**MTA Audio Editor 0.3.0-r10 — Early release**
+**MTA Audio Editor 0.3.0-r11 — Early release**
 
 ## Overview
 
@@ -32,7 +32,7 @@ The offline pipeline runs built-in inserts before enabled VST3 inserts. If a bui
 
 The C++20 factory probe checks GetPluginFactory and, when built against the Steinberg SDK, can inspect class names and categories. It runs out of process with a timeout. Every VST3 executes third-party native code; install only trusted plugins. The probe does NOT provide live audio hosting.
 
-## Limitations in 0.3.0-r10
+## Limitations in 0.3.0-r11
 
 Not yet supported: original VST3 editor windows, SDK-based low-latency realtime processing, MIDI events, VST3 automation, plugin delay compensation, and Master-channel VST3 processing. Use built-in inserts for unsupported scenarios. Discovery alone is not evidence of compatibility.
 
@@ -48,3 +48,6 @@ Recent Steinberg VST3 SDK releases use MIT; third-party plugin licenses are sepa
 
 ### r10: isolated instance creation
 With the independently installed VST3 SDK, run `mta_vst3_probe /path/to/module --instantiate <32-hex-CID>` in the diagnostic subprocess. The component is released immediately; this does not initialize the plugin, process audio or enable realtime hosting.
+
+### r11: isolated lifecycle diagnostic
+`mta_vst3_probe /path/to/module --lifecycle <32-hex-CID>` tries initialization with a null host context and termination only after successful initialization. Some plugins will reject this context. This does not activate audio, GUI, MIDI, or realtime playback.

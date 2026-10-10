@@ -37,9 +37,10 @@ static std::string class_cid(const Steinberg::TUID& id) {
 }
 #endif
 int main(int argc, char** argv) {
-  const bool instantiate = argc == 4 && std::string(argv[2]) == "--instantiate";
+  const bool lifecycle = argc == 4 && std::string(argv[2]) == "--lifecycle";
+  const bool instantiate = argc == 4 && (std::string(argv[2]) == "--instantiate" || lifecycle);
   if ((argc != 2 && !instantiate) || !std::filesystem::exists(argv[1]) || !std::filesystem::is_regular_file(argv[1])) {
-    std::cerr << "usage: mta_vst3_probe <VST3 module binary> [--instantiate <32-hex-CID>]\n";return 2;
+    std::cerr << "usage: mta_vst3_probe <VST3 module binary> [--instantiate|--lifecycle <32-hex-CID>]\n";return 2;
   }
 #if defined(_WIN32)
   HMODULE module = LoadLibraryA(argv[1]);
@@ -73,10 +74,11 @@ int main(int argc, char** argv) {
             << ",\"category\":" << json_quote(info.category) << "}";
   }
   classes << "]";
-  // Opt-in creation-only diagnostic. Never call initialize(), setupProcessing(),
-  // setActive() or process(): a valid instance is NOT a verified realtime host.
+  // Both modes are opt-in diagnostics. Never call setupProcessing(), setActive() or process().
   bool created = false;
   bool found = false;
+  bool initialized = false;
+  bool terminated = false;
   if (instantiate) {
     const std::string wanted = argv[3];
     if (wanted.size() != 32 || !std::all_of(wanted.begin(), wanted.end(), [](unsigned char c) {
@@ -98,7 +100,16 @@ int main(int argc, char** argv) {
       Steinberg::Vst::IComponent* component = nullptr;
       const auto result = pluginFactory->createInstance(info.cid, Steinberg::Vst::IComponent::iid,
                                                          reinterpret_cast<void**>(&component));
-      if (result == Steinberg::kResultOk && component != nullptr) created = true;
+      if (result == Steinberg::kResultOk && component != nullptr) {
+        created = true;
+        if (lifecycle) {
+          // Null host context intentionally does not claim a production host contract.
+          // Some plugins require a real IHostApplication and will correctly refuse.
+          const auto initResult = component->initialize(nullptr);
+          initialized = (initResult == Steinberg::kResultOk);
+          if (initialized) terminated = (component->terminate() == Steinberg::kResultOk);
+        }
+      }
       if (component) component->release();
       break;
     }
@@ -109,6 +120,9 @@ int main(int argc, char** argv) {
             << ",\"instance_requested\":" << (instantiate ? "true" : "false")
             << ",\"instance_found\":" << (found ? "true" : "false")
             << ",\"instance_created\":" << (created ? "true" : "false")
+            << ",\"lifecycle_requested\":" << (lifecycle ? "true" : "false")
+            << ",\"instance_initialized\":" << (initialized ? "true" : "false")
+            << ",\"instance_terminated\":" << (terminated ? "true" : "false")
             << ",\"native_host_ready\":false}\n";
 #else
   if (instantiate) { std::cerr << "Instance creation requires MTA_VST3_SDK_ROOT\n"; return 8; }
