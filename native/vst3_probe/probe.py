@@ -5,7 +5,6 @@ This is not a VST3 host and does not process audio or open plugin editors.
 from __future__ import annotations
 
 import json
-import os
 from pathlib import Path
 import platform
 import subprocess
@@ -107,6 +106,12 @@ def probe_plugin(path: str, executable: str, timeout: float = 5,
             'audio_processor_available': payload.get('audio_processor_available') is True if instantiate_cid else False,
             'edit_controller_queried': payload.get('edit_controller_queried') is True if instantiate_cid else False,
             'edit_controller_available': payload.get('edit_controller_available') is True if instantiate_cid else False,
+            'sample_size_queried': payload.get('sample_size_queried') is True if lifecycle else False,
+            'supports_32_bit': payload.get('supports_32_bit') is True if lifecycle else False,
+            'supports_64_bit': payload.get('supports_64_bit') is True if lifecycle else False,
+            'latency_samples': (payload['latency_samples'] if lifecycle and
+                                type(payload.get('latency_samples')) is int and
+                                0 <= payload['latency_samples'] <= 10000000 else None),
             'buses': safe_buses, 'binary': str(binary), 'classes': classes,
             **({'factory_classes': payload['factory_classes']}
                if isinstance(payload.get('factory_classes'), int) and not isinstance(payload.get('factory_classes'), bool)

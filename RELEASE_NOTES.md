@@ -1,3 +1,10 @@
+## 0.3.0-r15 — VST3 processor capability diagnostics and CI build gate
+
+- Isolated lifecycle mode now probes supported 32-bit/64-bit sample formats and reported plugin latency. Values are sanitized in the Python adapter; no audio processing is enabled.
+- GitHub Actions quality job now builds the standalone C++20 VST3 probe without Steinberg SDK as a regression gate.
+- Added tests for capability decoding, invalid latency data and playback isolation.
+- SDK-backed compilation and real plugin interoperability remain unverified. No claims of resolving remote Actions failures without corresponding logs.
+
 ## 0.3.0-r14 — Isolated VST3 diagnostic host context
 
 - Added a stack-scoped minimal `IHostApplication` implementation with host name, interface negotiation and reference counting in the subprocess only.

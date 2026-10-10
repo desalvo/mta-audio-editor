@@ -40,6 +40,11 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - name: Validate audio presets against FFmpeg
         run: PYTHONPATH=. python scripts/validate_audio_presets.py
+      - name: Compile isolated C++20 VST3 probe without SDK
+        run: |
+          cmake -S native/vst3_probe -B /tmp/mta-vst3-probe-build -DCMAKE_BUILD_TYPE=Release
+          cmake --build /tmp/mta-vst3-probe-build --parallel 2
+          test -x /tmp/mta-vst3-probe-build/mta_vst3_probe
       - name: Ruff
         run: ruff check app native tests scripts/k8s-wizard.py
       - name: Unit tests and coverage gate

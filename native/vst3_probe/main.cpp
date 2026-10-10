@@ -119,6 +119,10 @@ int main(int argc, char** argv) {
   bool hostContextProvided = false;
   bool terminated = false;
   bool audioProcessor = false;
+  bool supports32Bit = false;
+  bool supports64Bit = false;
+  bool sampleSizeQueried = false;
+  int latencySamples = -1;
   bool editController = false;
   bool audioProcessorQueried = false;
   bool editControllerQueried = false;
@@ -146,17 +150,18 @@ int main(int argc, char** argv) {
       Steinberg::Vst::IComponent* component = nullptr;
       const auto result = pluginFactory->createInstance(info.cid, Steinberg::Vst::IComponent::iid,
                                                          reinterpret_cast<void**>(&component));
+      Steinberg::Vst::IAudioProcessor* processor = nullptr;
       if (result == Steinberg::kResultOk && component != nullptr) {
         created = true;
         // Discovery only: query interfaces without calling setupProcessing, setActive,
         // process or creating a GUI. A component need not implement IEditController.
-        Steinberg::Vst::IAudioProcessor* processor = nullptr;
         audioProcessorQueried = true;
         if (component->queryInterface(Steinberg::Vst::IAudioProcessor::iid,
                                       reinterpret_cast<void**>(&processor)) == Steinberg::kResultOk && processor) {
           audioProcessor = true;
         }
-        if (processor) processor->release();
+        // Query read-only processor capabilities after component initialization below.
+        // Retain the processor interface until the diagnostic cycle is complete.
         Steinberg::Vst::IEditController* controller = nullptr;
         editControllerQueried = true;
         if (component->queryInterface(Steinberg::Vst::IEditController::iid,
@@ -172,6 +177,13 @@ int main(int argc, char** argv) {
           const auto initResult = component->initialize(&host);
           initialized = (initResult == Steinberg::kResultOk);
           if (initialized) {
+            if (processor) {
+              sampleSizeQueried = true;
+              supports32Bit = processor->canProcessSampleSize(Steinberg::Vst::kSample32) == Steinberg::kResultOk;
+              supports64Bit = processor->canProcessSampleSize(Steinberg::Vst::kSample64) == Steinberg::kResultOk;
+              const auto reportedLatency = processor->getLatencySamples();
+              if (reportedLatency <= 10000000U) latencySamples = static_cast<int>(reportedLatency);
+            }
             // Read-only bus inspection in the isolated probe, before terminate().
             for (const auto media : {Steinberg::Vst::kAudio, Steinberg::Vst::kEvent}) {
               for (const auto direction : {Steinberg::Vst::kInput, Steinberg::Vst::kOutput}) {
@@ -193,6 +205,7 @@ int main(int argc, char** argv) {
           }
         }
       }
+      if (processor) processor->release();
       if (component) component->release();
       break;
     }
@@ -212,6 +225,10 @@ int main(int argc, char** argv) {
             << ",\"audio_processor_available\":" << (audioProcessor ? "true" : "false")
             << ",\"edit_controller_queried\":" << (editControllerQueried ? "true" : "false")
             << ",\"edit_controller_available\":" << (editController ? "true" : "false")
+            << ",\"sample_size_queried\":" << (sampleSizeQueried ? "true" : "false")
+            << ",\"supports_32_bit\":" << (supports32Bit ? "true" : "false")
+            << ",\"supports_64_bit\":" << (supports64Bit ? "true" : "false")
+            << ",\"latency_samples\":" << latencySamples
             << ",\"buses\":" << busDetails.str() << ",\"native_host_ready\":false}\n";
 #else
   if (instantiate) { std::cerr << "Instance creation requires MTA_VST3_SDK_ROOT\n"; return 8; }

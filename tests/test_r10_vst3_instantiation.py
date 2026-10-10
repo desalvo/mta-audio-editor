@@ -1,6 +1,5 @@
 """r10: explicit opt-in instance diagnostic safety checks."""
 import json
-from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
 import pytest

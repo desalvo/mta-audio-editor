@@ -1,4 +1,3 @@
-from pathlib import Path
 import pytest
 from app.models import InsertPlugin, Track
 from app.plugins import chain_filter
@@ -6,8 +5,8 @@ from app.vst3_host import discover_plugins, validate_plugin_path
 
 
 def test_vst3_model_preserves_path_and_bypass():
-    item = InsertPlugin(id='vst1', plugin='vst3', params={'path': '/tmp/fake.vst3'})
-    assert item.model_dump()['params']['path'] == '/tmp/fake.vst3'
+    item = InsertPlugin(id='vst1', plugin='vst3', params={'path': 'fixtures/fake.vst3'})
+    assert item.model_dump()['params']['path'] == 'fixtures/fake.vst3'
     assert chain_filter([item]) == ''
     assert chain_filter([item.model_copy(update={'enabled': False})]) == ''
 

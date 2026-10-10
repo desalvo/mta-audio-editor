@@ -1,5 +1,4 @@
 from types import SimpleNamespace
-from unittest.mock import patch
 import pytest
 from app.vst3_host import apply_parameters
 

@@ -1,5 +1,4 @@
 """r8: reject malformed VST3 class metadata returned by a third-party probe."""
-from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
 import json
