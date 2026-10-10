@@ -1,3 +1,17 @@
+### r70 — Experimental interactive VST3 offline worker
+
+`native/vst3_probe/stream_worker.py` implements `NativeVST3Worker` (persistent IPC
+per plugin) and `render_stream_wav()` (bounded-memory PCM16/24/32 WAV export).
+The C++ probe's `--stream-pcm <CID> <channels> <rate>` protocol exchanges
+little-endian uint32 frame counts plus interleaved Float32 PCM on stdin/stdout,
+1–512 frames at a time; zero frames signals graceful shutdown. This is not a
+realtime callback-safe integration. A Python watchdog kills stalled workers,
+rejects malformed/nonfinite replies, and leaves preexisting WAV outputs intact
+on export errors. Supported sample rates: 44100, 48000, 96000; mono/stereo.
+The real ADelay streaming and session acceptance tests run in Linux VST3 SDK CI.
+Read `native/vst3_probe/READINESS_GATES.md` before enabling the native host.
+**`native_host_ready=false` remains intentional.**
+
 ### r60 experimental offline session API
 
 `native.vst3_probe.offline_session.render_native_session(requests, plugin, executable, channels=1, sample_rate=48000, timeout=30.0)` processes multiple consecutive flat float32 PCM requests in one VST3 activation. Supported rates: 44.1/48/96 kHz; mono/stereo; maximum 128 jobs and 1,048,576 frames total. Use `render_native_session_chain` for 1–8 serial inserts. Binary protocol `MTASPCM1` uses little-endian u32 header, each request length in frames and interleaved float32 payload. Failed processing invalidates all outputs. This is offline diagnostic functionality and **not** a realtime-safe, interactive worker.
@@ -84,3 +98,17 @@ Python API `native.vst3_probe.native_chain.render_native_wav(source, destination
 Create a JSON manifest with `{ "schema": 1, "jobs": [{"source":"input.wav", "destination":"output.wav", "plugins":[["/path/plugin.vst3", "32hexCID"]]}] }`, and run `python -m native.vst3_probe.batch_wav_cli batch.json --probe /path/mta_vst3_probe`. Output JSON summarizes successes and failures. Relative WAV paths resolve from manifest directory. Outputs are independently atomic, not a multi-output transaction.
 
 Revision r41: isolated WAV/PCM paths support 44.1, 48, or 96 kHz (native `--render-pcm` accepts an optional sample-rate argument; default 48 kHz). The plugin worker is not persistent.
+
+### r78–r87: experimental native realtime contract (host remains disabled)
+
+`native/audio_core/vst3_rt_contract.hpp` adds bounded, allocation-free
+building blocks for playback quantum validation, seek/restart epoch tokens,
+frame-based deadlines, combined IPC and plugin latency calculations, dry/wet
+bypass ramping, ordered parameter automation events, ordered MIDI packets,
+a worker fault circuit-breaker, and PCM finite/clipping validation. These
+control-plane utilities do not connect a VST3 plugin to the actual native
+audio callback; this is **not** a realtime host acceptance milestone.
+Run `pytest -q tests/test_r87_native_contract.py` to compile and execute the
+native C++20 smoke tests on platforms with a C++ compiler. `native_host_ready`
+remains false; do not enable it without native playback, scheduler, latency,
+MIDI/automation and cross-platform fault/stress acceptance tests.

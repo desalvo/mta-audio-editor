@@ -100,6 +100,14 @@ jobs:
             python scripts/test_vst3_adelay_variable.py \
               /tmp/mta-vst3-real-sdk/mta_vst3_probe \
               /tmp/mta-vst3-example/VST3/Release/adelay.vst3
+          MTA_VST3_PATHS=/tmp/mta-vst3-example/VST3/Release \
+            python scripts/test_vst3_adelay_session.py \
+              /tmp/mta-vst3-real-sdk/mta_vst3_probe \
+              /tmp/mta-vst3-example/VST3/Release/adelay.vst3
+          MTA_VST3_PATHS=/tmp/mta-vst3-example/VST3/Release \
+            python scripts/test_vst3_adelay_stream.py \
+              /tmp/mta-vst3-real-sdk/mta_vst3_probe \
+              /tmp/mta-vst3-example/VST3/Release/adelay.vst3
 
   security:
     name: SAST and dependency audit

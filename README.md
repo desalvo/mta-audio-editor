@@ -1,3 +1,17 @@
+### r70 — Experimental interactive VST3 offline worker
+
+`native/vst3_probe/stream_worker.py` implements `NativeVST3Worker` (persistent IPC
+per plugin) and `render_stream_wav()` (bounded-memory PCM16/24/32 WAV export).
+The C++ probe's `--stream-pcm <CID> <channels> <rate>` protocol exchanges
+little-endian uint32 frame counts plus interleaved Float32 PCM on stdin/stdout,
+1–512 frames at a time; zero frames signals graceful shutdown. This is not a
+realtime callback-safe integration. A Python watchdog kills stalled workers,
+rejects malformed/nonfinite replies, and leaves preexisting WAV outputs intact
+on export errors. Supported sample rates: 44100, 48000, 96000; mono/stereo.
+The real ADelay streaming and session acceptance tests run in Linux VST3 SDK CI.
+Read `native/vst3_probe/READINESS_GATES.md` before enabling the native host.
+**`native_host_ready=false` remains intentional.**
+
 ### VST3 experimental offline session — r60
 
 The native probe now processes a bounded list of PCM requests with one plug-in activation, preserving the plug-in's state between requests. The Python `render_native_session()` and `render_native_session_chain()` APIs are experimental and must not run on the realtime audio callback. This is not yet an interactive worker daemon. See `VST3_HOST_SETUP.md`.

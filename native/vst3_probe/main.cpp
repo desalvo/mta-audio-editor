@@ -91,8 +91,10 @@ static std::string class_cid(const Steinberg::TUID& id) {
 }
 #endif
 int main(int argc, char** argv) {
+  // Interactive offline worker: stdin/stdout PCM frames, never the audio callback.
+  const bool renderStream = argc == 6 && std::string(argv[2]) == "--stream-pcm";
   const bool renderSession = argc == 6 && std::string(argv[2]) == "--render-session";
-  const bool renderPcm = ((argc == 7 || argc == 8) && std::string(argv[2]) == "--render-pcm") || renderSession;
+  const bool renderPcm = ((argc == 7 || argc == 8) && std::string(argv[2]) == "--render-pcm") || renderSession || renderStream;
   const bool offline = (argc == 4 && std::string(argv[2]) == "--offline") || renderPcm;
   const bool configure = renderPcm || (argc == 4 && (std::string(argv[2]) == "--configure" || offline));
   const bool lifecycle = renderPcm || (argc == 4 && (std::string(argv[2]) == "--lifecycle" || configure));
@@ -106,8 +108,8 @@ int main(int argc, char** argv) {
   int pcmSampleRate = 48000;
   std::vector<uint32_t> sessionFrames;
   const std::string sessionMagic = "MTASPCM1";
-  if (renderPcm && argc == 8) {
-    const std::string rate = argv[7];
+  if (renderPcm && (argc == 8 || renderStream)) {
+    const std::string rate = renderStream ? argv[5] : argv[7];
     if (rate != "44100" && rate != "48000" && rate != "96000") {
       std::cerr << "Unsupported PCM sample rate\n"; return 8;
     }
@@ -166,7 +168,18 @@ int main(int argc, char** argv) {
     }
     pcmOutput.reserve(pcmInput.size());
   }
-  if (renderPcm && !renderSession) {
+  if (renderStream) {
+    const std::string channelArg = argv[4];
+    if (channelArg != "1" && channelArg != "2") {
+      std::cerr << "Invalid streaming PCM channel count\n"; return 8;
+    }
+    pcmChannels = channelArg == "1" ? 1 : 2;
+    // Bound the maximum memory in the interactive worker to one process block.
+    pcmFrames = 512;
+    pcmInput.resize(512 * pcmChannels);
+    pcmOutput.reserve(512 * pcmChannels);
+  }
+  if (renderPcm && !renderSession && !renderStream) {
     const std::string channelArg = argv[6];
     if (channelArg != "1" && channelArg != "2") {
       std::cerr << "PCM channels must be 1 or 2\n";return 8;
@@ -477,22 +490,48 @@ int main(int argc, char** argv) {
                       constexpr double kPi = 3.14159265358979323846;
                       constexpr double kAmplitude = 0.125;
                       offlineProcessSucceeded = true;
-                      for (int block = 0; block < kBlocks; ++block) {
-                        const auto projectSample = static_cast<Steinberg::int64>(block) * 512;
-                        const int validFrames = renderPcm ? static_cast<int>(std::min<size_t>(512, pcmFrames - size_t(block) * 512)) : 512;
+                      Steinberg::int64 processedSampleFrames = 0;
+                      Steinberg::int64 previousValidFrames = 0;
+                      for (int block = 0; renderStream || block < kBlocks; ++block) {
+                        // Persistent worker protocol: little-endian uint32 frame count,
+                        // followed by interleaved float32 PCM. Zero closes the session.
+                        int streamFrames = 0;
+                        if (renderStream) {
+                          unsigned char header[4]{};
+                          std::cin.read(reinterpret_cast<char*>(header), 4);
+                          if (!std::cin) { offlineProcessSucceeded = false; break; }
+                          const uint32_t count = uint32_t(header[0]) |
+                              (uint32_t(header[1]) << 8) | (uint32_t(header[2]) << 16) |
+                              (uint32_t(header[3]) << 24);
+                          if (count == 0) break;
+                          if (count > 512) { offlineProcessSucceeded = false; break; }
+                          streamFrames = static_cast<int>(count);
+                          std::cin.read(reinterpret_cast<char*>(pcmInput.data()),
+                              std::streamsize(size_t(count) * pcmChannels * sizeof(float)));
+                          if (!std::cin || !std::all_of(pcmInput.begin(),
+                              pcmInput.begin() + size_t(count) * pcmChannels,
+                              [](float value) { return std::isfinite(value) && std::abs(value) <= 16.0f; })) {
+                            offlineProcessSucceeded = false; break;
+                          }
+                          pcmOutput.clear();
+                        }
+                        const auto projectSample = processedSampleFrames;
+                        const int validFrames = renderStream ? streamFrames :
+                            (renderPcm ? static_cast<int>(std::min<size_t>(512, pcmFrames - size_t(block) * 512)) : 512);
                         data.numSamples = validFrames;
-                        if (offlineLastProjectSample >= 0 && projectSample != offlineLastProjectSample + 512)
+                        if (offlineLastProjectSample >= 0 && projectSample != offlineLastProjectSample + previousValidFrames)
                           offlineTransportContinuous = false;
                         transport.projectTimeSamples = projectSample;
                         transport.projectTimeMusic = double(projectSample) * 120.0 / (60.0 * pcmSampleRate);
                         offlineLastProjectSample = projectSample;
+                        previousValidFrames = validFrames;
                         events.clear();
                         outputEvents.clear();
                         parameterChanges.clearQueue();
                         outputParameters.clearQueue();
                         // A sample-offset note-on/note-off pair provides a bounded
                         // event-path smoke test, not a MIDI sequencer implementation.
-                        if (hasEventInput && block == 0) {
+                        if (!renderStream && hasEventInput && block == 0) {
                           Steinberg::Vst::Event note{};
                           note.busIndex = 0;
                           note.sampleOffset = 0;
@@ -503,7 +542,7 @@ int main(int argc, char** argv) {
                           note.noteOn.noteId = 1;
                           if (events.addEvent(note) == Steinberg::kResultOk) ++offlineMidiEventsSent;
                         }
-                        if (hasEventInput && block == 1) {
+                        if (!renderStream && hasEventInput && block == 1) {
                           Steinberg::Vst::Event note{};
                           note.busIndex = 0;
                           note.sampleOffset = 32;
@@ -513,7 +552,7 @@ int main(int argc, char** argv) {
                           note.noteOff.noteId = 1;
                           if (events.addEvent(note) == Steinberg::kResultOk) ++offlineMidiEventsSent;
                         }
-                        if (hasTestParam && block == 0) {
+                        if (!renderStream && hasTestParam && block == 0) {
                           Steinberg::int32 queueIndex = -1;
                           auto* queue = parameterChanges.addParameterData(testParam, queueIndex);
                           if (queue) {
@@ -527,7 +566,7 @@ int main(int argc, char** argv) {
                             for (auto& channel : storage.samples32) {
                               const int channelIndex = static_cast<int>(&channel - storage.samples32.data());
                               for (int frame = 0; frame < 512; ++frame) {
-                                const double sample = renderPcm ? (frame < validFrames ? pcmInput[(size_t(block) * 512 + frame) * pcmChannels + std::min(channelIndex, pcmChannels - 1)] : 0.0) :
+                                const double sample = renderPcm ? (frame < validFrames ? pcmInput[(size_t(renderStream ? 0 : block) * 512 + frame) * pcmChannels + std::min(channelIndex, pcmChannels - 1)] : 0.0) :
                                     kAmplitude * std::sin(2.0 * kPi * 440.0 * (block * 512 + frame) / pcmSampleRate);
                                 channel[frame] = static_cast<Steinberg::Vst::Sample32>(sample);
                                 offlineInputEnergy += sample * sample;
@@ -537,7 +576,7 @@ int main(int argc, char** argv) {
                             for (auto& channel : storage.samples64) {
                               const int channelIndex = static_cast<int>(&channel - storage.samples64.data());
                               for (int frame = 0; frame < 512; ++frame) {
-                                const double sample = renderPcm ? (frame < validFrames ? pcmInput[(size_t(block) * 512 + frame) * pcmChannels + std::min(channelIndex, pcmChannels - 1)] : 0.0) :
+                                const double sample = renderPcm ? (frame < validFrames ? pcmInput[(size_t(renderStream ? 0 : block) * 512 + frame) * pcmChannels + std::min(channelIndex, pcmChannels - 1)] : 0.0) :
                                     kAmplitude * std::sin(2.0 * kPi * 440.0 * (block * 512 + frame) / pcmSampleRate);
                                 channel[frame] = sample;
                                 offlineInputEnergy += sample * sample;
@@ -561,6 +600,7 @@ int main(int argc, char** argv) {
                           break;
                         }
                         ++offlineBlocksProcessed;
+                        processedSampleFrames += validFrames;
                         if (renderPcm) {
                           if (outputStorage.empty() || (processingSampleSize == 32 && outputStorage[0].samples32.size() < static_cast<size_t>(pcmChannels)) ||
                               (processingSampleSize == 64 && outputStorage[0].samples64.size() < static_cast<size_t>(pcmChannels))) {
@@ -572,6 +612,18 @@ int main(int argc, char** argv) {
                               pcmOutput.push_back(processingSampleSize == 32 ?
                                 outputStorage[0].samples32[channel][frame] :
                                 static_cast<float>(outputStorage[0].samples64[channel][frame]));
+                        }
+                        if (renderStream) {
+                          // No JSON or diagnostic text goes to stdout during streaming.
+                          const unsigned char header[4] = {
+                              static_cast<unsigned char>(validFrames & 255),
+                              static_cast<unsigned char>((validFrames >> 8) & 255),
+                              0, 0};
+                          std::cout.write(reinterpret_cast<const char*>(header), 4);
+                          std::cout.write(reinterpret_cast<const char*>(pcmOutput.data()),
+                              std::streamsize(size_t(validFrames) * pcmChannels * sizeof(float)));
+                          std::cout.flush();
+                          if (!std::cout) { offlineProcessSucceeded = false; break; }
                         }
                         for (const auto& storage : outputStorage) {
                           if (processingSampleSize == 32) {
@@ -615,7 +667,7 @@ int main(int argc, char** argv) {
       break;
     }
   }
-  if (renderPcm) {
+  if (renderPcm && !renderStream) {
     if (!offlineProcessSucceeded || offlineNonFiniteSamples || pcmOutput.size() != pcmFrames * pcmChannels ||
         !std::all_of(pcmOutput.begin(), pcmOutput.end(), [](float v){return std::isfinite(v);})) {
       std::cerr << "Offline PCM rendering did not complete safely: succeeded=" << offlineProcessSucceeded << " blocks=" << offlineBlocksProcessed << " output=" << pcmOutput.size() << " nonfinite=" << offlineNonFiniteSamples << "\n";
@@ -650,6 +702,13 @@ int main(int argc, char** argv) {
   }
   busDetails << "]";
   pluginFactory->release();
+  if (renderStream) {
+    if (!offlineProcessSucceeded || offlineNonFiniteSamples || !offlineProcessingStarted) {
+      std::cerr << "Streaming VST3 worker ended with invalid processing state\n";
+      return 9;
+    }
+    return 0;
+  }
   std::cout << "{\"factory_export\":true,\"factory_classes\":" << classCount
             << ",\"classes\":" << classes.str()
             << ",\"instance_requested\":" << (instantiate ? "true" : "false")

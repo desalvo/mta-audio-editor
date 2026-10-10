@@ -1,3 +1,81 @@
+## 0.3.0-r120 — cumulative r101–r120 native readiness gate
+
+This release includes every uncommitted change from r65 through r100. Twenty distinct control-plane validations (quantum, channel shape, sample rate, queue sizing, lookahead, worker scheduling, quiescence, IPC handshake/version, plugin lifecycle, processing, latency, crash recovery, MIDI, automation, platforms and realtime stress) are explicitly checked in native C++ and exercised by parameterized compiled tests. Existing worker runtime now refuses an unsafe restart that could replay stale queue data. **These are acceptance checks, not proof they are all satisfied by MTA's production engine.** The actual realtime host remains disabled: `native_host_ready=false`. End-to-end IPC binding to the native callback, measured latency compensation and multi-platform tests remain open. No claim of production readiness.
+
+## 0.3.0-r100 — native worker runtime (r88–r100)
+
+Cumulative changes since r65 including r87. Thirteen native worker engineering increments: bounded worker configuration, lifecycle states, processor ownership, control-thread start/join, callback/IPC separation, fault latch, scheduling fairness, worker-thread backoff, fault diagnostics, immutable quantum, watchdog integration point, stop statistics and disabled readiness gate. This is an experimental control-plane worker runtime, NOT an end-to-end VST3 realtime host. `native_host_ready` remains `false`.
+
+## 0.3.0-r87 — native VST3 realtime readiness contracts (r78–r87)
+
+Ten cumulative engineering iterations: negotiated playback quantum, transport epoch tokens, frame deadlines, latency budgets, bounded bypass ramps, parameter automation packets, MIDI event packets, worker fault circuit breaker, PCM sanitization, and readiness guard. All are experimental worker/control-plane building blocks; none enable the realtime host. `native_host_ready` stays `false`.
+
+## 0.3.0-r77 — native worker pump and playout shape safety
+
+- Introduced a bounded worker-only processor adapter with finite-output validation and dry bypass on failure.
+- Fixed native callback handling of irregular frame counts: delayed output is accepted only for matching shapes; shape mismatch becomes silence instead of a buffer overflow.
+- Preserved all cumulative changes through r76; native_host_ready remains false.
+
+## 0.3.0-r76 — native audio playout boundary (experimental)
+
+- Add `Vst3PlayoutBridge`: bounded native SPSC input/output queues and preallocated dry lookahead.
+- Callback-facing `callback()` performs no IPC, waits, heap allocations or VST3 calls; worker-facing take/return remain separate.
+- Deterministic late block discard and dry bypass with diagnostic counters.
+- Add compiled C++20 tests for audio order, delayed wet output and missing blocks. Readiness remains false.
+
+## 0.3.0-r75 — native PCM block queue (experimental)
+
+- Added fixed-capacity C++20 SPSC block exchange retaining sequence, channel count and exact frame count.
+- All memory allocated at initialization; push/pop perform bounded copies without locks, I/O or allocation.
+- Added compiled C++ concurrency and overflow regression tests. No audio callback wiring yet; readiness stays false.
+
+## 0.3.0-r74 — bounded VST3 IPC playout scheduling
+
+Experimental application-thread playout coordinator with explicit block-period lookahead, deterministic dry bypass, late-result discard, bounded backpressure and metrics, seek/stop dry flush. Not suitable for hard realtime callbacks; native_host_ready remains false. Includes all uncommitted r65–r73 revisions.
+
+## 0.3.0-r73 — latency planning and dry-path reference alignment
+
+Adds explicit sample-rate-aware IPC lookahead + plugin delay accounting, bounded PCM delay-line reference, and tests for stereo/mono alignment across irregular blocks. This is an offline reference only; realtime safety and native_host_ready=true remain blocked. Includes r65–r72 cumulatively.
+
+## 0.3.0-r72 — experimental ordered asynchronous VST3 delivery
+
+Adds bounded, application-thread-only block coordinator with ordered processed results, stale-result discard, deterministic dry bypass on late/error output, and regression tests. This is NOT an audio callback integration and native_host_ready remains false. Includes all changes since r65.
+
+## 0.3.0-r71 (includes unpublished r65–r70)
+
+- Experimental bounded asynchronous VST3 IPC bridge (`native/vst3_probe/async_bridge.py`): nonwaiting enqueue/poll, ordered results, backpressure, fault latching and explicit shutdown.
+- Python bridge is NOT hard realtime safe: Python locks, allocations, queue operations and scheduling are forbidden in the audio callback.
+- Realtime host readiness remains false; latency alignment, bypass recovery, MIDI/state and multiplatform validation still missing.
+
+## 0.3.0-r70 (cumulative, unpublished r65 and r66 included)
+
+- r67: Add real Steinberg ADelay acceptance for bounded multi-request VST3 sessions, including uneven request lengths and sample-rate/channel coverage in GitHub Actions.
+- r68: Add an experimental interactive C++ `--stream-pcm` worker accepting bounded little-endian Float32 PCM frames through stdin/stdout without reinitializing the plug-in.
+- r69: Add a Python watchdog-controlled persistent worker with timeout, process-crash handling, response validation, and deterministic shutdown; asynchronous worker I/O is off the audio thread.
+- r70: Add atomic, bounded-memory, long-duration WAV PCM16/24/32 render through live VST3 insert workers and real ADelay IPC parity acceptance on Linux CI.
+- Keep `native_host_ready=false` and realtime routing disabled; more platform, callback, latency, and crash-recovery work is required before enabling native host.
+
+## 0.3.0-r67
+
+- Added real-Steinberg-SDK ADelay multi-request session acceptance to Linux CI: mono/stereo, 44.1/48/96 kHz, irregular frame boundaries, continuity against unsegmented rendering and a two-insert chain.
+- Documented explicit blocking requirements before native VST3 host activation; readiness remains false.
+- Includes all unpublished r65/r66 improvements; no intermediate commit is necessary.
+
+## 0.3.0-r66
+- Added bounded, state-continuous multi-block VST3 WAV export via offline session chains.
+- Preserves PCM16/24/32, mono/stereo, 44.1/48/96 kHz, with atomic output protection.
+- Native realtime readiness remains disabled; this path is offline-only.
+
+## 0.3.0-r65 — Offline VST3 session transport hardening (r61–r65 cumulative)
+
+- r61: transport sample positions use the actual processed frames rather than fixed 512-frame strides.
+- r62: compare consecutive blocks using previous actual frame length; PPQ follows the real sample clock.
+- r63: proactively refuse session requests larger than the remaining frame budget before materializing them.
+- r64: reject non-sequence and bytes/string PCM containers; keep native process isolation.
+- r65: add odd-sized mono/stereo and input-security regressions, package/revision updates.
+
+Limitations: This is still a bounded offline multi-request subprocess. Interactive IPC and hard realtime guarantees are not implemented; native_host_ready remains false. Existing startup/process-per-session limitation persists.
+
 ## 0.3.0-r60 — Native VST3 multi-request offline session (r51–r60 cumulative)
 
 - R51–R52: bounded binary MTASPCM1 session envelope and C++ parser, with up to 128 PCM requests.

@@ -29,11 +29,15 @@ def _pack_requests(requests: Sequence[Sequence[float]], channels: int, sample_ra
         raise ValueError('Channels must be 1 or 2')
     if type(sample_rate) is not int or sample_rate not in RATES:
         raise ValueError('Unsupported session sample rate')
-    if not 1 <= len(requests) <= MAX_REQUESTS:
+    if isinstance(requests, (bytes, bytearray, str)) or not 1 <= len(requests) <= MAX_REQUESTS:
         raise ValueError('Expected 1..128 requests')
     data = bytearray(MAGIC + struct.pack('<III', channels, sample_rate, len(requests)))
     frames_total = 0
     for request in requests:
+        if isinstance(request, (bytes, bytearray, str)) or not hasattr(request, '__len__'):
+            raise ValueError('PCM request must be a finite sized sequence')
+        if len(request) > (MAX_FRAMES - frames_total) * channels:
+            raise ValueError('Session exceeds cumulative frame limit')
         samples = list(request)
         if not samples or len(samples) % channels:
             raise ValueError('Invalid interleaved request length')
@@ -136,3 +140,65 @@ def render_native_session_chain(requests: Sequence[Sequence[float]],
         current = render_native_session(current, plugin, executable, channels=channels,
                                         sample_rate=sample_rate, timeout=timeout)
     return current
+
+
+def render_native_session_wav(source: str | Path, destination: str | Path,
+                              plugins: Sequence[tuple[str, str]], executable: str,
+                              *, block_frames: int = 16384, timeout: float = 30.0) -> Path:
+    """Offline WAV rendering via state-continuous multi-request insert sessions.
+
+    Unlike the regular WAV renderer, each insert receives several logically separate
+    PCM requests without resetting plugin state between them. No realtime guarantees.
+    Each independent render is bounded by MAX_FRAMES and MAX_REQUESTS.
+    """
+    import os
+    import tempfile
+    import wave
+    from .native_chain import NativeWavError, _decode_pcm_wav, _encode_pcm_wav
+
+    if type(block_frames) is not int or block_frames < 1 or block_frames > MAX_FRAMES:
+        raise ValueError('Invalid block size')
+    if not 1 <= len(plugins) <= 8:
+        raise ValueError('Expected 1..8 inserts')
+    if isinstance(timeout, bool) or not isinstance(timeout, (int, float)) or not math.isfinite(timeout) or timeout <= 0:
+        raise ValueError('Invalid session timeout')
+    source_path = Path(source).resolve(strict=True)
+    destination_path = Path(destination).resolve()
+    if source_path == destination_path or (destination_path.exists() and os.path.samefile(source_path, destination_path)):
+        raise ValueError('Source and destination must be distinct files')
+    with wave.open(str(source_path), 'rb') as reader:
+        channels, width, rate, frames = (reader.getnchannels(), reader.getsampwidth(),
+                                          reader.getframerate(), reader.getnframes())
+        if (reader.getcomptype() != 'NONE' or channels not in (1, 2) or
+                width not in (2, 3, 4) or rate not in RATES or not 1 <= frames <= MAX_FRAMES):
+            raise NativeWavError('Unsupported or oversized WAV source')
+        count = (frames + block_frames - 1) // block_frames
+        if count > MAX_REQUESTS:
+            raise ValueError('Session has too many blocks; increase block_frames')
+        requests = []
+        for index in range(count):
+            frame_count = min(block_frames, frames - index * block_frames)
+            raw = reader.readframes(frame_count)
+            if len(raw) != frame_count * channels * width:
+                raise NativeWavError('Truncated WAV input')
+            requests.append(_decode_pcm_wav(raw, width))
+    outputs = render_native_session_chain(requests, plugins, executable,
+                                          channels=channels, sample_rate=rate, timeout=timeout)
+    if len(outputs) != count or any(len(output) != len(request) for output, request in zip(outputs, requests)):
+        raise NativeWavError('VST3 session returned mismatched blocks')
+    if not destination_path.parent.is_dir():
+        raise FileNotFoundError('Output directory does not exist')
+    fd, temporary = tempfile.mkstemp(prefix='.mta-vst3-session-', suffix='.wav', dir=str(destination_path.parent))
+    os.close(fd)
+    try:
+        with wave.open(temporary, 'wb') as writer:
+            writer.setnchannels(channels)
+            writer.setsampwidth(width)
+            writer.setframerate(rate)
+            for output in outputs:
+                writer.writeframesraw(_encode_pcm_wav(output, width))
+        os.replace(temporary, destination_path)
+    finally:
+        if os.path.exists(temporary):
+            os.unlink(temporary)
+    return destination_path

@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 def test_multiblock_source_contract():
     source = (ROOT / 'native/vst3_probe/main.cpp').read_text()
     assert 'renderPcm ? static_cast<int>((pcmFrames + 511) / 512) : 128' in source
-    assert 'for (int block = 0; block < kBlocks; ++block)' in source
+    assert 'for (int block = 0; renderStream || block < kBlocks; ++block)' in source
     assert 'offlineBlocksProcessed' in source
     assert 'offlineInputEnergy' in source
     assert 'offlineOutputEnergy' in source
