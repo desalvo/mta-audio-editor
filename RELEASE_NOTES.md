@@ -1,3 +1,8 @@
+## 0.3.0-r6
+
+- Compliance: archive scanner for source/release ZIP and TAR; rejects unreviewed bundled VST3/AU/AAX and traversal paths.
+- Packaging behavior unchanged; native audio host remains experimental.
+
 ## 0.3.0-r2
 
 - Added transactional native C++20 mono-to-stereo constant-power pan mixer with input validation.

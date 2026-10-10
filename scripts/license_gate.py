@@ -10,6 +10,8 @@ import argparse
 import json
 from pathlib import Path
 import re
+import tarfile
+import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 FORBIDDEN_SUFFIXES = {'.vst3', '.component', '.aaxplugin'}
@@ -48,11 +50,51 @@ def audit(root: Path) -> dict:
             'message': 'Static source guard only: review compiled bundles, transitive dependencies and media codecs before distribution.'}
 
 
+
+def audit_archive(archive: Path) -> dict:
+    """Scan members without extracting/untrusted filesystem writes.
+
+    Binary distributables like .deb/.rpm require a separate package audit;
+    never claim this archive scanner handles those formats.
+    """
+    errors: list[str] = []
+    members: list[str] = []
+    try:
+        if zipfile.is_zipfile(archive):
+            with zipfile.ZipFile(archive) as zf:
+                members = [x.filename for x in zf.infolist() if not x.is_dir()]
+        elif tarfile.is_tarfile(archive):
+            with tarfile.open(archive, 'r:*') as tf:
+                members = [x.name for x in tf.getmembers() if x.isfile()]
+        else:
+            return {'ok': False, 'errors': [f'Unsupported archive format: {archive.name}'], 'members_checked': 0}
+    except (OSError, ValueError, EOFError, tarfile.TarError, zipfile.BadZipFile) as exc:
+        return {'ok': False, 'errors': [f'Unreadable archive: {exc}'], 'members_checked': 0}
+    for name in members:
+        normalized = name.replace('\\', '/')
+        parts = Path(normalized).parts
+        if normalized.startswith('/') or '..' in parts:
+            errors.append(f'Unsafe archive member path: {name}')
+        if any(part.lower().endswith(tuple(FORBIDDEN_SUFFIXES)) for part in parts):
+            errors.append(f'Unreviewed bundled plugin: {name}')
+        if Path(normalized).suffix.lower() in BINARY_SUFFIXES and any(
+            term in normalized.lower() for term in ('vst3', 'steinberg')
+        ):
+            errors.append(f'Unreviewed VST binary: {name}')
+    return {'ok': not errors, 'errors': errors, 'members_checked': len(members),
+            'message': 'Archive contents static scan; external runtime and binary license audit still required.'}
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--root', type=Path, default=ROOT)
+    parser.add_argument('--archive', type=Path, action='append', default=[],
+                        help='Also inspect ZIP/TAR source or release archives without extracting')
     args = parser.parse_args()
     result = audit(args.root.resolve())
+    result['archives'] = {str(path): audit_archive(path) for path in args.archive}
+    if any(not item['ok'] for item in result['archives'].values()):
+        result['ok'] = False
     print(json.dumps(result, indent=2))
     return 0 if result['ok'] else 1
 
