@@ -1,3 +1,13 @@
+## 0.3.0-r49 — five-iteration development batch
+
+- r45: Fix Ruff F401 unused run_batch import in sample-rate tests.
+- r46: Detect hard-linked output/input aliasing in batch preflight.
+- r47: Add configurable cumulative frame budget for atomic and dry-run batches.
+- r48: Add an atomic JSON report file for batch CLI results.
+- r49: Expand regression coverage and align release metadata.
+
+Realtime VST3 hosting remains disabled; native persistent worker not yet implemented.
+
 ## 0.3.0-r44 (three integrated internal iterations: r42–r44)
 
 - r42: Consolidated batch input/output preflight for atomic publishing.

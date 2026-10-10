@@ -15,13 +15,17 @@ from .native_chain import MAX_FRAMES, MAX_INSERTS, NativeChainError, render_nati
 
 MAX_JOBS = 128
 MAX_MANIFEST_BYTES = 256 * 1024
+MAX_TOTAL_FRAMES = 16 * MAX_FRAMES
 
 
 def run_batch(manifest: Path, executable: str, *, timeout: float = 15.0,
-              stop_on_error: bool = False, dry_run: bool = False, atomic_batch: bool = False) -> dict:
+              stop_on_error: bool = False, dry_run: bool = False, atomic_batch: bool = False,
+              max_total_frames: int = MAX_TOTAL_FRAMES) -> dict:
     """Run validated exports. Each destination is atomically published separately."""
     if not isinstance(timeout, (int, float)) or isinstance(timeout, bool) or not math.isfinite(timeout) or timeout <= 0:
         raise ValueError("Timeout must be positive and finite")
+    if isinstance(max_total_frames, bool) or not isinstance(max_total_frames, int) or not 1 <= max_total_frames <= MAX_TOTAL_FRAMES:
+        raise ValueError("Invalid total frame budget")
     manifest = Path(manifest).resolve(strict=True)
     if manifest.stat().st_size > MAX_MANIFEST_BYTES:
         raise ValueError("Batch manifest is too large")
@@ -33,6 +37,7 @@ def run_batch(manifest: Path, executable: str, *, timeout: float = 15.0,
         raise ValueError("Expected 1..128 batch jobs")
     planned = []
     destinations = set()
+    source_inodes = set()
     for number, job in enumerate(entries):
         if not isinstance(job, dict) or set(job) != {"source", "destination", "plugins"}:
             raise ValueError(f"Invalid job {number}")
@@ -52,11 +57,16 @@ def run_batch(manifest: Path, executable: str, *, timeout: float = 15.0,
         if src == dest or dest in destinations or src in destinations:
             raise ValueError("Duplicate or colliding batch destination")
         destinations.add(dest)
+        source_inodes.add((src.stat().st_dev, src.stat().st_ino))
         planned.append((src, dest, [(pair[0], pair[1]) for pair in plugins]))
+    if any(dest.exists() and (dest.stat().st_dev, dest.stat().st_ino) in source_inodes
+           for _, dest, _ in planned):
+        raise ValueError("A batch destination aliases an input by hard link")
     if any(source in destinations for source, _, _ in planned):
         raise ValueError("A batch output may not overwrite any batch input")
     if dry_run or atomic_batch:
         checks = []
+        total_frames = 0
         for index, (source, destination, plugins) in enumerate(planned):
             with wave.open(str(source), 'rb') as wav:
                 channels, frames, width = wav.getnchannels(), wav.getnframes(), wav.getsampwidth()
@@ -66,6 +76,9 @@ def run_batch(manifest: Path, executable: str, *, timeout: float = 15.0,
                     raise ValueError(f'Unsupported WAV format in job {index}')
                 if len(wav.readframes(frames)) != frames * channels * width:
                     raise ValueError(f'Truncated WAV in job {index}')
+            total_frames += frames
+            if total_frames > max_total_frames:
+                raise ValueError('Batch exceeds total frame budget')
             if not destination.parent.is_dir():
                 raise ValueError(f'Output folder does not exist in job {index}')
             checks.append({'index': index, 'status': 'ready', 'source': str(source),
@@ -74,7 +87,7 @@ def run_batch(manifest: Path, executable: str, *, timeout: float = 15.0,
                            'inserts': len(plugins)})
         if dry_run:
             return {'status': 'ready', 'requested': len(planned), 'processed': 0,
-                    'results': checks}
+                    'total_frames': total_frames, 'results': checks}
     if atomic_batch:
         return _run_atomic_batch(planned, executable, timeout)
     results = []
@@ -148,6 +161,23 @@ def _run_atomic_batch(planned: list, executable: str, timeout: float) -> dict:
         for backup in backups.values():
             backup.unlink(missing_ok=True)
 
+def _write_report(destination: Path, result: dict) -> None:
+    """Save a batch receipt using same-directory atomic replace."""
+    destination = Path(destination)
+    if not destination.parent.is_dir():
+        raise ValueError('Report directory does not exist')
+    fd, path = tempfile.mkstemp(prefix='.mta-report-', suffix='.json', dir=destination.parent)
+    try:
+        with os.fdopen(fd, 'w', encoding='utf-8') as stream:
+            json.dump(result, stream, sort_keys=True, indent=2)
+            stream.write('\n')
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(path, destination)
+    finally:
+        Path(path).unlink(missing_ok=True)
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Experimental VST3 WAV batch renderer")
     parser.add_argument('manifest', type=Path)
@@ -155,15 +185,24 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument('--timeout', type=float, default=15.0)
     parser.add_argument('--stop-on-error', action='store_true')
     parser.add_argument('--dry-run', action='store_true', help='Validate WAV inputs and output paths without launching plugins')
+    parser.add_argument('--max-total-frames', type=int, default=MAX_TOTAL_FRAMES,
+                        help='Maximum cumulative source frames (dry-run/atomic batch)')
+    parser.add_argument('--report', type=Path, help='Write validated JSON result atomically')
     parser.add_argument('--atomic-batch', action='store_true', help='Stage every render before publishing any destination')
     args = parser.parse_args(argv)
     try:
         result = run_batch(args.manifest, args.probe, timeout=args.timeout,
                            stop_on_error=args.stop_on_error, dry_run=args.dry_run,
-                           atomic_batch=args.atomic_batch)
+                           atomic_batch=args.atomic_batch, max_total_frames=args.max_total_frames)
     except (OSError, ValueError, UnicodeError, json.JSONDecodeError) as exc:
         print(json.dumps({"status": "invalid_manifest", "error": str(exc)[:512]}), file=sys.stderr)
         return 2
+    if args.report is not None:
+        try:
+            _write_report(args.report, result)
+        except (OSError, ValueError) as exc:
+            print(json.dumps({'status': 'report_error', 'error': str(exc)[:512]}), file=sys.stderr)
+            return 2
     print(json.dumps(result, sort_keys=True))
     return 0 if result['status'] in ('ok', 'ready') else 1
 

@@ -4,7 +4,6 @@ from pathlib import Path
 from unittest.mock import patch
 import pytest
 from native.vst3_probe.native_chain import render_native_chain, render_native_wav
-from native.vst3_probe.batch_wav_cli import run_batch
 
 @pytest.mark.parametrize('rate', [44100, 48000, 96000])
 def test_reject_bool_and_invalid_rates(rate):
