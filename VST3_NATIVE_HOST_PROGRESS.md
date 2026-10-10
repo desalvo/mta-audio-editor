@@ -1,3 +1,9 @@
+
+## 0.3.0-r39 — GitHub Actions regressions and VST3 host tests
+- Replace obsolete 128-block-only source assertions with checks for the variable-length PCM path and fixed 128-block diagnostic fallback.
+- Add functional, mocked tests of VST3 discovery, parameter validation, CLI error handling, and optional dependency failure to increase real application coverage without relaxing the 70% gate.
+- Keep the experimental VST3 host isolated from the realtime playback engine.
+
 ## 0.3.0-r38 — Safe batch VST3 offline WAV rendering
 - Added experimental manifest-driven batch CLI (`python -m native.vst3_probe.batch_wav_cli`) for up to 128 WAV exports.
 - Validates all outputs, collisions, CIDs and limits before executing any plugin.

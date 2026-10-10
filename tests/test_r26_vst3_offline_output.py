@@ -5,7 +5,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def test_offline_signal_runs_longer_than_one_second():
     cpp = (ROOT / "native/vst3_probe/main.cpp").read_text()
-    assert "constexpr int kBlocks = 128;" in cpp
+    assert "renderPcm ? static_cast<int>((pcmFrames + 511) / 512) : 128" in cpp
     assert "offlineOutputAudible = offlineOutputEnergy > 1e-12" in cpp
     assert "offline_nonfinite_samples" in cpp
 

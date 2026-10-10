@@ -16,13 +16,13 @@ VSVersionInfo(
         [
           StringStruct('CompanyName', 'Alessandro De Salvo'),
           StringStruct('FileDescription', 'MTA Audio Editor'),
-          StringStruct('FileVersion', '0.3.0-r38'),
+          StringStruct('FileVersion', '0.3.0-r39'),
           StringStruct('InternalName', 'MTA Audio Editor'),
           StringStruct('LegalCopyright', 'EUPL-1.2'),
           StringStruct('OriginalFilename', 'MTA Audio Editor.exe'),
           StringStruct('ProductName', 'MTA Audio Editor'),
           StringStruct('ProductVersion', '0.3.0'),
-          StringStruct('Comments', 'Revision 38 - Build 20261010131345 - https://github.com/desalvo/mta-audio-editor')
+          StringStruct('Comments', 'Revision 39 - Build 20261010131748 - https://github.com/desalvo/mta-audio-editor')
         ]
       )
     ]),
