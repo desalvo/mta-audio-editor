@@ -21,3 +21,7 @@ Pedalboard offline rendering is still the default; nothing here claims realtime 
 License and distribution: SDK not vendored; retain upstream license and notices
 where required. Third-party plugins must be installed by the end user and must
 not be bundled into MTA packages without explicit redistribution rights.
+
+## 0.3.0-r10
+
+Optional exact-CID IComponent creation diagnostic through IPluginFactory::createInstance(), followed by immediate release. No initialization, bus setup or processing. The probe is never called from realtime playback.

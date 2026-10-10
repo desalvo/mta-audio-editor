@@ -6,8 +6,11 @@
 #include <iomanip>
 #include <sstream>
 #include <algorithm>
+#include <cctype>
 #ifdef MTA_HAS_VST3_SDK
 #include "pluginterfaces/base/ipluginbase.h"
+#include "pluginterfaces/vst/ivstcomponent.h"
+#include <cstring>
 #endif
 #if defined(_WIN32)
 #define NOMINMAX
@@ -34,8 +37,9 @@ static std::string class_cid(const Steinberg::TUID& id) {
 }
 #endif
 int main(int argc, char** argv) {
-  if (argc != 2 || !std::filesystem::exists(argv[1]) || !std::filesystem::is_regular_file(argv[1])) {
-    std::cerr << "usage: mta_vst3_probe <VST3 module binary>\n";return 2;
+  const bool instantiate = argc == 4 && std::string(argv[2]) == "--instantiate";
+  if ((argc != 2 && !instantiate) || !std::filesystem::exists(argv[1]) || !std::filesystem::is_regular_file(argv[1])) {
+    std::cerr << "usage: mta_vst3_probe <VST3 module binary> [--instantiate <32-hex-CID>]\n";return 2;
   }
 #if defined(_WIN32)
   HMODULE module = LoadLibraryA(argv[1]);
@@ -69,11 +73,45 @@ int main(int argc, char** argv) {
             << ",\"category\":" << json_quote(info.category) << "}";
   }
   classes << "]";
+  // Opt-in creation-only diagnostic. Never call initialize(), setupProcessing(),
+  // setActive() or process(): a valid instance is NOT a verified realtime host.
+  bool created = false;
+  bool found = false;
+  if (instantiate) {
+    const std::string wanted = argv[3];
+    if (wanted.size() != 32 || !std::all_of(wanted.begin(), wanted.end(), [](unsigned char c) {
+          return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
+        })) {
+      pluginFactory->release(); std::cerr << "Invalid class CID (expected 32 hexadecimal digits)\n"; return 7;
+    }
+    for (Steinberg::int32 i = 0; i < classCount; ++i) {
+      Steinberg::PClassInfo info{};
+      if (pluginFactory->getClassInfo(i, &info) != Steinberg::kResultOk) continue;
+      auto hex = class_cid(info.cid);
+      std::transform(hex.begin(), hex.end(), hex.begin(), [](unsigned char c) { return char(std::tolower(c)); });
+      std::string target = wanted;
+      std::transform(target.begin(), target.end(), target.begin(), [](unsigned char c) { return char(std::tolower(c)); });
+      if (hex != target) continue;
+      found = true;
+      // Explicitly require an audio component class; controller-only entries are excluded.
+      if (std::string(info.category) != "Audio Module Class") break;
+      Steinberg::Vst::IComponent* component = nullptr;
+      const auto result = pluginFactory->createInstance(info.cid, Steinberg::Vst::IComponent::iid,
+                                                         reinterpret_cast<void**>(&component));
+      if (result == Steinberg::kResultOk && component != nullptr) created = true;
+      if (component) component->release();
+      break;
+    }
+  }
   pluginFactory->release();
   std::cout << "{\"factory_export\":true,\"factory_classes\":" << classCount
             << ",\"classes\":" << classes.str()
+            << ",\"instance_requested\":" << (instantiate ? "true" : "false")
+            << ",\"instance_found\":" << (found ? "true" : "false")
+            << ",\"instance_created\":" << (created ? "true" : "false")
             << ",\"native_host_ready\":false}\n";
 #else
+  if (instantiate) { std::cerr << "Instance creation requires MTA_VST3_SDK_ROOT\n"; return 8; }
   // Without the SDK the export can be checked but no Steinberg interfaces are invoked.
   std::cout << "{\"factory_export\":true,\"native_host_ready\":false}\n";
 #endif

@@ -1,3 +1,9 @@
+## 0.3.0-r10
+
+- Optional VST3 SDK-backed audio-component instance creation diagnostic by exact CID; release immediately, no playback activation.
+- Validate instance creation request and report results independently of factory enumeration.
+- Keep all realtime VST3 processing, GUI, MIDI and automation experimental and disabled.
+
 ## 0.3.0-r9
 
 - Added bilingual VST3 manuals (Markdown and PDF) with the exact existing user manual cover page.

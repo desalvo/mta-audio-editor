@@ -33,13 +33,22 @@ def resolve_module_binary(bundle: Path) -> Path:
     raise FileNotFoundError(f'No VST3 binary matching {system} {arch}: {bundle.name}')
 
 
-def probe_plugin(path: str, executable: str, timeout: float = 5) -> dict:
+def probe_plugin(path: str, executable: str, timeout: float = 5,
+                 instantiate_cid: str | None = None) -> dict:
     plugin = validate_plugin_path(path)
     binary = resolve_module_binary(plugin)
     probe = Path(executable).resolve()
     if not probe.is_file():
         raise FileNotFoundError(f'VST3 probe executable not found: {probe}')
-    result = subprocess.run([str(probe), str(binary)], text=True, capture_output=True,
+    if instantiate_cid is not None:
+        if not isinstance(instantiate_cid, str) or len(instantiate_cid) != 32 or any(
+            char not in '0123456789abcdefABCDEF' for char in instantiate_cid
+        ):
+            raise ValueError('Expected a 32-character hexadecimal VST3 class CID')
+    command = [str(probe), str(binary)]
+    if instantiate_cid is not None:
+        command.extend(['--instantiate', instantiate_cid.lower()])
+    result = subprocess.run(command, text=True, capture_output=True,
                             timeout=min(max(float(timeout), 0.5), 15), check=False)
     if result.returncode:
         raise RuntimeError(f'VST3 probe failed ({result.returncode}): {result.stderr.strip()[:300]}')
@@ -69,6 +78,9 @@ def probe_plugin(path: str, executable: str, timeout: float = 5) -> dict:
         safe_classes.append({**entry, 'cid': cid})
     classes = safe_classes
     return {'name': plugin.stem, 'factory_export': True,
+            'instance_requested': instantiate_cid is not None,
+            'instance_found': payload.get('instance_found') is True if instantiate_cid is not None else False,
+            'instance_created': payload.get('instance_created') is True if instantiate_cid is not None else False,
             'native_host_ready': False, 'binary': str(binary), 'classes': classes,
             **({'factory_classes': payload['factory_classes']}
                if isinstance(payload.get('factory_classes'), int) and not isinstance(payload.get('factory_classes'), bool)
