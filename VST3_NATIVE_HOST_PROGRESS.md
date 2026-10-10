@@ -1,3 +1,9 @@
+## 0.3.0-r18 (2026-10-10)
+
+- Fix Android and iOS revision metadata mismatch causing six pytest failures in GitHub Actions.
+- Add tests for VST3 discovery, path restrictions, and optional runtime; preserve the 70% coverage gate.
+- Keep native VST3 probe experimental and isolated from playback.
+
 ## 0.3.0-r17 (2026-10-10)
 
 - Harden VST3 factory class-name and category parsing by bounding reads of Steinberg fixed-size arrays.
