@@ -1,3 +1,8 @@
+## 0.3.0-r13
+- Correct VST3 manual cover titles in both PDFs and display current revision.
+- Add isolated, opt-in VST3 IAudioProcessor/IEditController interface discovery; no realtime host activation.
+- Preserve existing playback and exports.
+
 ## 0.3.0-r12
 - Add isolated VST3 bus information diagnostics after successful component initialization; no realtime processing.
 - Update VST3 support manual titles and license-only sections in Italian and English; regenerate PDFs retaining cover artwork.

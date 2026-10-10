@@ -10,6 +10,8 @@
 #ifdef MTA_HAS_VST3_SDK
 #include "pluginterfaces/base/ipluginbase.h"
 #include "pluginterfaces/vst/ivstcomponent.h"
+#include "pluginterfaces/vst/ivstaudioprocessor.h"
+#include "pluginterfaces/vst/ivsteditcontroller.h"
 #include <cstring>
 #endif
 #if defined(_WIN32)
@@ -79,6 +81,10 @@ int main(int argc, char** argv) {
   bool found = false;
   bool initialized = false;
   bool terminated = false;
+  bool audioProcessor = false;
+  bool editController = false;
+  bool audioProcessorQueried = false;
+  bool editControllerQueried = false;
   std::ostringstream busDetails;
   busDetails << "[";
   int reportedBuses = 0;
@@ -105,6 +111,22 @@ int main(int argc, char** argv) {
                                                          reinterpret_cast<void**>(&component));
       if (result == Steinberg::kResultOk && component != nullptr) {
         created = true;
+        // Discovery only: query interfaces without calling setupProcessing, setActive,
+        // process or creating a GUI. A component need not implement IEditController.
+        Steinberg::Vst::IAudioProcessor* processor = nullptr;
+        audioProcessorQueried = true;
+        if (component->queryInterface(Steinberg::Vst::IAudioProcessor::iid,
+                                      reinterpret_cast<void**>(&processor)) == Steinberg::kResultOk && processor) {
+          audioProcessor = true;
+        }
+        if (processor) processor->release();
+        Steinberg::Vst::IEditController* controller = nullptr;
+        editControllerQueried = true;
+        if (component->queryInterface(Steinberg::Vst::IEditController::iid,
+                                      reinterpret_cast<void**>(&controller)) == Steinberg::kResultOk && controller) {
+          editController = true;
+        }
+        if (controller) controller->release();
         if (lifecycle) {
           // Null host context intentionally does not claim a production host contract.
           // Some plugins require a real IHostApplication and will correctly refuse.
@@ -146,6 +168,10 @@ int main(int argc, char** argv) {
             << ",\"lifecycle_requested\":" << (lifecycle ? "true" : "false")
             << ",\"instance_initialized\":" << (initialized ? "true" : "false")
             << ",\"instance_terminated\":" << (terminated ? "true" : "false")
+            << ",\"audio_processor_queried\":" << (audioProcessorQueried ? "true" : "false")
+            << ",\"audio_processor_available\":" << (audioProcessor ? "true" : "false")
+            << ",\"edit_controller_queried\":" << (editControllerQueried ? "true" : "false")
+            << ",\"edit_controller_available\":" << (editController ? "true" : "false")
             << ",\"buses\":" << busDetails.str() << ",\"native_host_ready\":false}\n";
 #else
   if (instantiate) { std::cerr << "Instance creation requires MTA_VST3_SDK_ROOT\n"; return 8; }

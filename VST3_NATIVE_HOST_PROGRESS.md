@@ -33,3 +33,8 @@ The `--lifecycle <CID>` opt-in subprocess diagnostic attempts `IComponent::initi
 ## 0.3.0-r12
 - Isolated bus metadata interrogation after successful lifecycle initialization (audio/event buses only).
 - Host context, activation, processing and GUI remain unimplemented; no changes to playback.
+
+## 0.3.0-r13
+- Optional component interface query for IAudioProcessor and IEditController.
+- The processor and controller queries are diagnostic only and their result is never used in playback.
+- Build against an actual Steinberg SDK and test plugin instances before claiming host readiness.

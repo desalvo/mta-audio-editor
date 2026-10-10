@@ -101,7 +101,12 @@ def probe_plugin(path: str, executable: str, timeout: float = 5,
             'lifecycle_requested': lifecycle,
             'instance_initialized': payload.get('instance_initialized') is True if lifecycle else False,
             'instance_terminated': payload.get('instance_terminated') is True if lifecycle else False,
-            'native_host_ready': False, 'buses': safe_buses, 'binary': str(binary), 'classes': classes,
+            'native_host_ready': False,
+            'audio_processor_queried': payload.get('audio_processor_queried') is True if instantiate_cid else False,
+            'audio_processor_available': payload.get('audio_processor_available') is True if instantiate_cid else False,
+            'edit_controller_queried': payload.get('edit_controller_queried') is True if instantiate_cid else False,
+            'edit_controller_available': payload.get('edit_controller_available') is True if instantiate_cid else False,
+            'buses': safe_buses, 'binary': str(binary), 'classes': classes,
             **({'factory_classes': payload['factory_classes']}
                if isinstance(payload.get('factory_classes'), int) and not isinstance(payload.get('factory_classes'), bool)
                and 0 <= payload['factory_classes'] <= 10000 else {})}
