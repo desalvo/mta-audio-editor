@@ -1,3 +1,6 @@
+## 0.3.0-r31
+Offline serial-insert render graph with deterministic multiblock scheduling and latency/tail flush. Tested with fake DSP processors; SDK probe remains separate, and real plugin adapter/realtime callbacks are NOT yet implemented.
+
 ## 0.3.0-r30
 Offline VST3 graph timing toolkit: validated plugin latency and tail budgets; compensation of rendered streams, deterministic parallel-stem alignment and mixing. Not activated in realtime playback.
 

@@ -144,3 +144,93 @@ def events_for_blocks(events: Sequence[ScheduledEvent], *, block_size: int,
         block, offset = divmod(event.sample, block_size)
         batches[block].append((offset, event))
     return batches
+
+
+# Offline insert-graph executor (not the application realtime callback).
+from collections.abc import Callable
+
+MAX_INSERTS = 32
+MAX_BLOCKS = 65536
+
+
+@dataclass(frozen=True)
+class OfflineInsert:
+    """An externally hosted plugin's declared timing and offline block callback.
+
+    A production adapter must run untrusted callbacks in a supervised subprocess.
+    This API intentionally does not load arbitrary shared libraries into Python.
+    """
+    name: str
+    timing: PluginTiming
+    process: Callable[[list[list[float]], list[tuple[int, ScheduledEvent]]], Sequence[Sequence[float]]]
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.name, str) or not 1 <= len(self.name) <= 128:
+            raise ValueError("Invalid insert name")
+        if not callable(self.process):
+            raise ValueError("Insert processor must be callable")
+
+
+@dataclass(frozen=True)
+class OfflineRenderResult:
+    audio: list[list[float]]
+    latency_samples: int
+    tail_samples: int
+    blocks_processed: int
+    events_dispatched: int
+
+
+class OfflineRenderError(RuntimeError):
+    """A failed insert invalidates the entire render; no partial audio escapes."""
+
+
+def render_insert_chain(audio: Sequence[Sequence[float]], inserts: Sequence[OfflineInsert],
+                        *, block_size: int = 512, events: Sequence[ScheduledEvent] = (),
+                        include_tail: bool = False) -> OfflineRenderResult:
+    """Process bounded offline audio, dispatching sample-offset events to the first insert.
+
+    Each insert receives all blocks, including upstream flush. Declared latency
+    is removed *only after* every insert has rendered its extra flush frames.
+    Insert callbacks must produce exactly the input block's channel/frame shape.
+    No plugin is allowed to return partial output on failure.
+    """
+    frames = _validate_audio(audio)
+    if not 1 <= block_size <= 8192 or type(block_size) is not int:
+        raise ValueError("Invalid block size")
+    if not inserts or len(inserts) > MAX_INSERTS:
+        raise ValueError("Insert chain must contain 1..32 processors")
+    if any(not isinstance(insert, OfflineInsert) for insert in inserts):
+        raise ValueError("Invalid insert")
+    total_latency = sum(insert.timing.latency_samples for insert in inserts)
+    total_tail = pending_tail_frames([insert.timing for insert in inserts]) if include_tail else 0
+    flush = total_latency + total_tail
+    if frames + flush > MAX_FRAMES or (frames + flush + block_size - 1) // block_size > MAX_BLOCKS:
+        raise ValueError("Render exceeds resource limits")
+    batches = events_for_blocks(events, block_size=block_size, frames=frames)
+    processed = [list(channel) + [0.0] * flush for channel in audio]
+    processed_blocks = 0
+    dispatched = 0
+    for index, insert in enumerate(inserts):
+        result = [[] for _ in processed]
+        for start in range(0, frames + flush, block_size):
+            end = min(start + block_size, frames + flush)
+            block = [channel[start:end] for channel in processed]
+            batch = batches[start // block_size] if index == 0 and start < frames else []
+            try:
+                output = insert.process(block, batch)
+                if isinstance(output, (str, bytes)) or len(output) != len(block):
+                    raise ValueError("Unexpected channel count")
+                if any(len(channel) != end - start for channel in output):
+                    raise ValueError("Unexpected frame count")
+                if any(not math.isfinite(sample) for channel in output for sample in channel):
+                    raise ValueError("Non-finite plugin output")
+                for target, channel in zip(result, output):
+                    target.extend(channel)
+            except Exception as exc:
+                raise OfflineRenderError(f"Insert {index} ({insert.name}) failed at frame {start}") from exc
+            processed_blocks += 1
+            dispatched += len(batch)
+        processed = result
+    length = frames + total_tail if include_tail else frames
+    output = compensate_latency(processed, total_latency, target_frames=length)
+    return OfflineRenderResult(output, total_latency, total_tail, processed_blocks, dispatched)

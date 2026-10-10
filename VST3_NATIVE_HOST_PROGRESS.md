@@ -1,3 +1,6 @@
+## r31 — offline graph executor
+Deterministic Python offline insert pipeline with block sample offsets, chain latency compensation, tail flush and fail-closed processing. It does **not** invoke plugins directly: real VST3 subprocess adapter, cross-platform runtime isolation and realtime audits are outstanding.
+
 ## r30: Offline graph timing helpers
 Implemented native/vst3_probe/offline_graph.py for bounded offline render latency compensation, parallel stem alignment, mixing and tail budgeting and sample-offset MIDI/parameter event batching with regression tests. This is not a plugin host or a realtime-safe callback implementation; no bypass of native_host_ready=false.
 

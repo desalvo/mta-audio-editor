@@ -1,3 +1,7 @@
+## 0.3.0-r31
+- Added fail-closed offline insert graph executor with sequential DSP blocks, sample-offset event dispatch, latency flush, bounded tails, finite-output validation, and deterministic chain tests.
+- Fixed stale Windows version resource metadata. Production realtime VST3 host remains disabled.
+
 ## 0.3.0-r30
 - Add bounded VST3 offline graph helpers for latency compensation, parallel stem alignment, stable mixing bounded tail budgeting, and sample-accurate offline MIDI/parameter event batching.
 - Add deterministic regression coverage for impulse alignment, corrupted/nonfinite audio, and timing limits.
