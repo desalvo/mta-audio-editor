@@ -24,8 +24,8 @@ def test_native_safe_renderer_dependency_is_pinned():
 
 def test_revision_metadata_consistency():
     rev = int(Path('REVISION').read_text().strip())
-    assert f'versionCode = {20000 + rev}' in Path('mobile/android/app/build.gradle.kts').read_text()
-    assert f'<string>{20000 + rev}</string>' in Path('mobile/ios/MTAEditorMobile/Info.plist').read_text()
+    assert f'versionCode = {30000 + rev}' in Path('mobile/android/app/build.gradle.kts').read_text()
+    assert f'<string>{30000 + rev}</string>' in Path('mobile/ios/MTAEditorMobile/Info.plist').read_text()
 
 
 def test_exact_preview_endpoint_rasterizes_real_pdf(tmp_path, monkeypatch):

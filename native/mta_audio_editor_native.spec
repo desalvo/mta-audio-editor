@@ -37,6 +37,11 @@ for env_name, dest_name in (("MTA_NATIVE_FFMPEG", "ffmpeg"), ("MTA_NATIVE_FFPROB
         binaries.append((value, "bin"))
 
 
+# Optional portable C++ DSP metering component; Python remains the fallback.
+audio_core_path = os.environ.get("MTA_NATIVE_AUDIO_CORE", "")
+if audio_core_path and Path(audio_core_path).is_file():
+    binaries.append((audio_core_path, "bin"))
+
 # Optional private Chordino runtime provisioned by CI.  It is bundled beside
 # FFmpeg and never needs to be installed into the user's system directories.
 chordino_bin = os.environ.get("MTA_NATIVE_CHORDINO_BIN_DIR", "")

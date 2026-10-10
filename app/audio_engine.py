@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import json
+
 import re
+import sys
 import subprocess
 import tempfile
 import uuid
@@ -477,7 +480,14 @@ def render_track(track: Track, source: Path, out: Path, apply_inserts: bool = Tr
         base = parts[0] + f";{labels[0]}anull[mix]"
     else:
         base = ";".join(parts) + ";" + "".join(labels) + f"amix=inputs={len(labels)}:duration=longest:normalize=0[mix]"
-    inserts = chain_filter(track.inserts) if apply_inserts else ""
+    active = [item for item in track.inserts if item.enabled] if apply_inserts else []
+    vst_started = False
+    for item in active:
+        if item.plugin == 'vst3':
+            vst_started = True
+        elif vst_started:
+            raise ValueError('VST3 inserts must be placed after built-in inserts in this revision')
+    inserts = chain_filter(active)
     output_channels = effective_output_channels(track.channels, track.inserts if apply_inserts else [])
     output_layout = "mono" if output_channels == 1 else "stereo"
     filters = base + (
@@ -485,25 +495,26 @@ def render_track(track: Track, source: Path, out: Path, apply_inserts: bool = Tr
         if inserts
         else f";[mix]aformat=channel_layouts={output_layout}[out]"
     )
-    _run(
-        [
-            "ffmpeg",
-            "-y",
-            "-v",
-            "error",
-            "-i",
-            str(source),
-            "-filter_complex",
-            filters,
-            "-map",
-            "[out]",
-            "-ar",
-            str(int(sample_rate)),
-            "-c:a",
-            "pcm_s24le",
-            str(out),
-        ]
-    )
+    active_vst = [item for item in active if item.plugin == 'vst3']
+    with tempfile.TemporaryDirectory(prefix='mta-vst3-') as scratch:
+        intermediate = Path(scratch) / 'pre-vst.wav' if active_vst else out
+        _run([
+            "ffmpeg", "-y", "-v", "error", "-i", str(source),
+            "-filter_complex", filters, "-map", "[out]", "-ar", str(sample_rate),
+            "-c:a", "pcm_s24le", str(intermediate),
+        ])
+        for index, item in enumerate(active_vst):
+            from .vst3_host import validate_plugin_path
+            plugin_path = validate_plugin_path(str(item.params.get('path', '')))
+            next_file = out if index == len(active_vst) - 1 else Path(scratch) / f'vst-{index}.wav'
+            proc = subprocess.run([
+                sys.executable, '-m', 'app.vst3_host', '--process',
+                str(intermediate), str(next_file), str(plugin_path),
+                '--parameters-json', json.dumps({k: v for k, v in item.params.items() if k != 'path'}),
+            ], capture_output=True, text=True, timeout=600)
+            if proc.returncode:
+                raise RuntimeError('VST3 failed: ' + (proc.stderr.strip()[-1200:] or str(proc.returncode)))
+            intermediate = next_file
 
 
 def render_mix(

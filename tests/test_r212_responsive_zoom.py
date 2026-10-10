@@ -41,6 +41,6 @@ def test_zoom_range_supports_deep_musical_zoom():
 
 def test_r212_mobile_build_numbers_match_revision():
     rev = int(Path("REVISION").read_text().strip())
-    assert rev >= 212
-    assert f"versionCode = {20000 + rev}" in Path("mobile/android/app/build.gradle.kts").read_text()
-    assert f"<key>CFBundleVersion</key><string>{20000 + rev}</string>" in Path("mobile/ios/MTAEditorMobile/Info.plist").read_text()
+    assert rev >= 1
+    assert f"versionCode = {30000 + rev}" in Path("mobile/android/app/build.gradle.kts").read_text()
+    assert f"<key>CFBundleVersion</key><string>{30000 + rev}</string>" in Path("mobile/ios/MTAEditorMobile/Info.plist").read_text()

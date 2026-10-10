@@ -891,6 +891,34 @@ def about():
 
 
 
+@app.get("/api/vst3/plugins")
+def vst3_plugin_list(request: Request):
+    from .vst3_host import discover_plugins, runtime_available
+    # Only the locally installed desktop host can access external plugin binaries.
+    if not NATIVE_SINGLE_USER:
+        return {"available": False, "plugins": [], "reason": "Desktop application required"}
+    return {"available": runtime_available(), "plugins": discover_plugins()}
+
+
+@app.get("/api/vst3/parameters")
+def vst3_parameters(request: Request, path: str):
+    import subprocess
+    import sys
+    import json
+    from .vst3_host import validate_plugin_path, runtime_available
+    if not NATIVE_SINGLE_USER or not runtime_available():
+        raise HTTPException(status_code=403, detail="Desktop VST3 host required")
+    try:
+        plugin = validate_plugin_path(path)
+        proc = subprocess.run([sys.executable, '-m', 'app.vst3_host', '--inspect-plugin', str(plugin)],
+                              capture_output=True, text=True, timeout=15)
+        if proc.returncode:
+            raise ValueError(proc.stderr[-500:] or 'VST3 inspection failed')
+        return json.loads(proc.stdout)
+    except (ValueError, FileNotFoundError, subprocess.TimeoutExpired) as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
 @app.get("/api/plugins")
 def plugins():
     manifest = plugin_manifest()

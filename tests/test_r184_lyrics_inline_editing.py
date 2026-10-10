@@ -27,7 +27,7 @@ def test_deleted_token_reanchors_chords_previous_then_next():
 
 def test_revision_metadata_alignment():
     revision = int(Path('REVISION').read_text().strip())
-    build_number = 20000 + revision
+    build_number = 30000 + revision
     android = Path('mobile/android/app/build.gradle.kts').read_text()
     ios = Path('mobile/ios/MTAEditorMobile/Info.plist').read_text()
     assert f'versionCode = {build_number}' in android

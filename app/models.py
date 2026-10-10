@@ -8,7 +8,7 @@ TrackType = Literal["drums", "bass", "guitars", "keyboards", "orchestra", "winds
 PluginType = Literal[
     "eq", "normalizer", "compressor", "limiter", "delay", "reverb_lexicon",
     "room_ambience", "graphic_eq_32", "amplify", "stereo_imager",
-    "maximizer_loudness", "mastering_wizard", "denoise", "crackle_cleaner"
+    "maximizer_loudness", "mastering_wizard", "denoise", "crackle_cleaner", "vst3"
 ]
 
 

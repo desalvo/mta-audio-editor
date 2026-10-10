@@ -36,5 +36,5 @@ def test_editor_auto_syllabifies_without_changing_saved_text_model():
 
 def test_revision_metadata_consistency():
     rev = int(Path("REVISION").read_text().strip())
-    assert f"versionCode = {20000 + rev}" in Path("mobile/android/app/build.gradle.kts").read_text()
-    assert f"<string>{20000 + rev}</string>" in Path("mobile/ios/MTAEditorMobile/Info.plist").read_text()
+    assert f"versionCode = {30000 + rev}" in Path("mobile/android/app/build.gradle.kts").read_text()
+    assert f"<string>{30000 + rev}</string>" in Path("mobile/ios/MTAEditorMobile/Info.plist").read_text()

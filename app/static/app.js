@@ -1261,6 +1261,39 @@ async function startTrackStemSplit(id){
 }
 function renameTrackInline(id,value){const t=trackById(id);if(!t)return;const v=String(value||'').trim();if(!v)return;t.name=v.slice(0,200);markDirty()}
 function renameTrack(id){const t=trackById(id);if(!t)return;const value=prompt('Nome traccia',t.name);if(value===null)return;const v=value.trim();if(!v)return toast('Il nome non può essere vuoto');t.name=v.slice(0,200);render();markDirty(100)}
+function beginMixerTrackNameEdit(id){
+  const host=document.querySelector(`.channel-name[data-track-name="${CSS.escape(id)}"]`),t=trackById(id);if(!host||!t)return;
+  if(host.querySelector('input'))return;
+  const value=t.name||'';
+  host.dataset.originalName=value;
+  host.innerHTML=`<input class="channel-name-editor" maxlength="200" value="${esc(value)}" aria-label="Track name">`;
+  host.classList.add('editing');
+  const input=host.querySelector('input');
+  if(!input)return;
+  input.focus({preventScroll:true});
+  try{input.select()}catch(_e){}
+}
+function commitMixerTrackNameEdit(id,forceValue){
+  const host=document.querySelector(`.channel-name[data-track-name="${CSS.escape(id)}"]`),t=trackById(id);if(!host||!t)return;
+  const input=host.querySelector('input');if(!input)return;
+  const raw=forceValue!=null?String(forceValue):String(input.value||'');
+  const v=raw.trim();
+  if(!v){host.classList.remove('editing');host.textContent=t.name||host.dataset.originalName||'';toast('Il nome non può essere vuoto');return;}
+  t.name=v.slice(0,200);
+  host.classList.remove('editing');
+  host.textContent=t.name;
+  markDirty(100);
+  render();
+}
+function cancelMixerTrackNameEdit(id){
+  const host=document.querySelector(`.channel-name[data-track-name="${CSS.escape(id)}"]`),t=trackById(id);if(!host)return;
+  host.classList.remove('editing');
+  host.textContent=(t?.name)||host.dataset.originalName||'';
+}
+function mixerTrackNameEditorKey(event,id){
+  if(event.key==='Enter'){event.preventDefault();commitMixerTrackNameEdit(id,event.currentTarget.value)}
+  else if(event.key==='Escape'){event.preventDefault();cancelMixerTrackNameEdit(id)}
+}
 
 function projectFormatLabel(target=current?.target){return target==='DAW'?'Multitrack DAW':target}
 function mtaSlotLimit(target=current?.target){return target==='MTA8'?8:16}
@@ -1527,10 +1560,10 @@ function inspectorHtml(){
 function closeInspectorPanel(){if(!current)return;current.inspector_visible=false;render();markDirty(80)}
 
 function insertPanelHtml(owner,isMaster,trackId=''){const inserts=owner.inserts||owner.master_inserts||[];return `<div class="panel-section"><div class="panel-section-title"><span>⌄ Inserts</span><span>${inserts.length}/16</span></div><div class="insert-list">${inserts.map((x,n)=>insertHtml(x,n,isMaster,trackId)).join('')||'<div class="hint" style="padding:7px">No inserts configured.</div>'}</div>${insertAddHtml(isMaster,trackId)}</div>`}
-function pluginLabel(x){return x.replaceAll('_',' ').replace(/\b\w/g,c=>c.toUpperCase())}
+function pluginLabel(x){return x==='vst3'?'VST3 (desktop)':x.replaceAll('_',' ').replace(/\b\w/g,c=>c.toUpperCase())}
 function insertHtml(x,n,isMaster,trackId=''){
   const presets=pluginInfo.inserts?.[x.plugin]||['default'];
-  const all=(x.params&&Object.keys(x.params).length&&!presets.includes(x.preset))?[...presets,x.preset]:presets;
+  const all=x.plugin==='vst3'?['Installed plugin']:(x.params&&Object.keys(x.params).length&&!presets.includes(x.preset))?[...presets,x.preset]:presets;
   const icons={normalizer:'↕',compressor:'◫',limiter:'│',delay:'↝',reverb_lexicon:'◌',room_ambience:'⌂',graphic_eq_32:'▥',amplify:'＋',stereo_imager:'↔',maximizer_loudness:'▲',mastering_wizard:'✦',denoise:'≈',crackle_cleaner:'⌁'};
   const tid=trackId||'';
   return `<div class="insert">
@@ -1544,7 +1577,7 @@ function insertHtml(x,n,isMaster,trackId=''){
   </div>`;
 }
 function insertAddHtml(isMaster,trackId=''){
-  const kinds=Object.keys(pluginInfo.inserts||{});
+  const kinds=[...Object.keys(pluginInfo.inserts||{}),...(currentUser?.native_single_user?['vst3']:[])];
   const suffix=isMaster?'master':(trackId?`mix-${trackId}`:'track');
   return `<div class="insert-add">
     <select id="${suffix}PluginType" onchange="refreshPresetSelect(${isMaster},'${trackId}')">${kinds.map(x=>`<option value="${x}">${esc(pluginLabel(x))}</option>`).join('')}</select>
@@ -1556,6 +1589,23 @@ function insertArray(isMaster,trackId=''){
   if(isMaster)return current.master_inserts;
   const t=trackId?trackById(trackId):selectedTrack();
   return t?.inserts||[];
+}
+function refreshMixerInsertBadges(){
+  if(!current)return;
+  const update=(button,items)=>{
+    if(!button)return;
+    const count=items.length,enabled=items.filter(x=>x.enabled!==false).length;
+    button.classList.toggle('has-inserts',count>0);
+    button.classList.toggle('active',enabled>0);
+    button.classList.toggle('all-bypassed',count>0&&enabled===0);
+    button.textContent=`Insert${count?` ${count}`:''}`;
+    button.title=count?`${count} insert(s) · ${enabled} enabled`:'No inserts · click to add';
+  };
+  for(const track of current.tracks||[]){
+    const channel=[...document.querySelectorAll('[data-channel-track]')].find(el=>el.dataset.channelTrack===track.id);
+    update(channel?.querySelector('.channel-insert-action'),track.inserts||[]);
+  }
+  update(document.querySelector('.channel.master .channel-insert-action'),current.master_inserts||[]);
 }
 function insertControlPrefix(isMaster,trackId=''){return isMaster?'master':(trackId?`mix-${trackId}`:'track')}
 const insertWaveformTimers={};
@@ -1589,27 +1639,62 @@ function queueInsertWaveformRefresh(trackId){
 function refreshPresetSelect(isMaster,trackId=''){
   const pre=insertControlPrefix(isMaster,trackId),kind=$(`#${pre}PluginType`)?.value,el=$(`#${pre}PluginPreset`);
   if(!el)return;
-  el.innerHTML=(pluginInfo.inserts?.[kind]||['default']).map(x=>`<option>${esc(x)}</option>`).join('');
+  el.innerHTML=(kind==='vst3'?['Select installed plugin']:(pluginInfo.inserts?.[kind]||['default'])).map(x=>`<option>${esc(x)}</option>`).join('');
 }
 function addInsert(isMaster,trackId=''){
   const pre=insertControlPrefix(isMaster,trackId),kind=$(`#${pre}PluginType`)?.value,preset=$(`#${pre}PluginPreset`)?.value||'default',arr=insertArray(isMaster,trackId);
   if(!kind)return toast('Seleziona un insert');
   if(!arr||arr.length>=16)return toast('Maximum 16 inserts per chain');
+  if(kind==='vst3'){
+    if(isMaster)return toast('VST3 on Master is not available in this version');
+    return addVst3Insert(trackId);
+  }
   arr.push({id:crypto.randomUUID().replaceAll('-','').slice(0,10),plugin:kind,preset,enabled:true,params:{}});
-  markDirty(100);queueLiveFxRefresh(isMaster,trackId);
+  markDirty(100);queueLiveFxRefresh(isMaster,trackId);refreshMixerInsertBadges();
   if(!isMaster)queueInsertWaveformRefresh(trackId||selectedTrack()?.id||'');
   if(trackId||isMaster)openMixerInsertManager(trackId||'master');else render();
+}
+async function addVst3Insert(trackId){
+  try{
+    const catalog=await api('/api/vst3/plugins');
+    if(!catalog.available)return toast('Install the optional pedalboard VST3 host (requirements-vst3.txt)');
+    if(!catalog.plugins?.length)return toast('No VST3 plug-ins found in local VST3 folders');
+    const arr=insertArray(false,trackId);if(!arr||arr.length>=16)return toast('Maximum 16 inserts');
+    const list=catalog.plugins.map((p,i)=>`<option value="${i}">${esc(p.name)}</option>`).join('');
+    showUtilityModal('Add VST3 insert',`<div class="form-grid"><label>Installed VST3<select id="vst3PluginChoice">${list}</select></label><p class="hint">Plugins remain installed on this computer. VST3 processing runs in rendered preview, playback with FX and export. Native low-latency hosting is not yet available.</p><div class="form-actions"><button onclick="closeUtilityModal()">Cancel</button><button class="accent" onclick="confirmVst3Insert('${trackId}')">Add VST3</button></div></div>`);
+    window._vst3Catalog=catalog.plugins;
+  }catch(e){toast(e.message)}
+}
+function confirmVst3Insert(trackId){
+  const i=Number($('#vst3PluginChoice')?.value),p=window._vst3Catalog?.[i];if(!p)return;
+  const arr=insertArray(false,trackId);if(!arr)return;
+  arr.push({id:crypto.randomUUID().replaceAll('-','').slice(0,10),plugin:'vst3',preset:'default',enabled:true,params:{path:p.path}});
+  markDirty(100);refreshMixerInsertBadges();queueLiveFxRefresh(false,trackId);closeUtilityModal();openMixerInsertManager(trackId);queueInsertWaveformRefresh(trackId);
+}
+async function openVst3Config(isMaster,id,trackId=''){
+  const x=insertArray(isMaster,trackId)?.find(p=>p.id===id);if(!x)return;
+  showUtilityModal('VST3 insert',`<div class="form-grid"><p><b>${esc(x.params?.path||'')}</b></p><p class="hint">Loading plugin parameters…</p></div>`);
+  try{
+    const info=await api('/api/vst3/parameters?path='+encodeURIComponent(x.params.path));
+    const fields=(info.parameters||[]).map((p,i)=>`<label class="plugin-field"><span>${esc(p.name)}</span><input class="vst3-parameter" data-name="${esc(p.name)}" type="range" min="0" max="1" step="0.001" value="${Number(x.params[p.name]??p.value)}" oninput="this.nextElementSibling.textContent=Number(this.value).toFixed(3)"><output>${Number(x.params[p.name]??p.value).toFixed(3)}</output></label>`).join('');
+    showUtilityModal('VST3 · '+(x.params.path?.split(/[\\/]/).pop()||''),`<div class="insert-plugin-setup insert-theme-vst3"><div class="insert-setup-hero">${insertSetupIcon('vst3')}<div class="insert-setup-overline">VST3 insert</div><div class="insert-setup-title">${esc(x.params.path?.split(/[\\/]/).pop()||'VST3')}</div></div><div class="insert-setup-panel"><p class="hint">${esc(x.params.path||'')}</p><div class="plugin-param-grid">${fields||'<p class="hint">No adjustable parameters exposed.</p>'}</div><p class="hint">Changes apply to rendered track playback and export. Native plugin GUI and low-latency monitoring are not yet supported.</p><div class="modal-actions insert-setup-actions"><button onclick="saveVst3Parameters('${id}','${trackId}')">Save parameters</button><button onclick="openMixerInsertManager('${trackId||'master'}')">Cancel</button></div></div></div>`);
+  }catch(e){showUtilityModal('VST3 insert',`<div class="form-grid"><p>${esc(e.message)}</p><button onclick="openMixerInsertManager('${trackId||'master'}')">Close</button></div>`)}
+}
+function saveVst3Parameters(id,trackId=''){
+  const x=insertArray(false,trackId)?.find(p=>p.id===id);if(!x)return;
+  for(const el of $$('.vst3-parameter'))x.params[el.dataset.name]=Number(el.value);
+  markDirty(100);refreshMixerInsertBadges();queueLiveFxRefresh(false,trackId);queueInsertWaveformRefresh(trackId);openMixerInsertManager(trackId);
 }
 function removeInsert(isMaster,id,trackId=''){
   const arr=insertArray(isMaster,trackId);if(!arr)return;
   const idx=arr.findIndex(x=>x.id===id);if(idx<0)return;
-  arr.splice(idx,1);markDirty(100);queueLiveFxRefresh(isMaster,trackId);
+  arr.splice(idx,1);markDirty(100);queueLiveFxRefresh(isMaster,trackId);refreshMixerInsertBadges();
   if(!isMaster)queueInsertWaveformRefresh(trackId||selectedTrack()?.id||'');
   if(trackId||isMaster)openMixerInsertManager(trackId||'master');else render();
 }
 function toggleInsert(isMaster,id,trackId=''){
   const x=insertArray(isMaster,trackId)?.find(p=>p.id===id);if(!x)return;
-  x.enabled=!x.enabled;markDirty(100);queueLiveFxRefresh(isMaster,trackId);
+  x.enabled=!x.enabled;markDirty(100);queueLiveFxRefresh(isMaster,trackId);refreshMixerInsertBadges();
   if(!isMaster)queueInsertWaveformRefresh(trackId||selectedTrack()?.id||'');
   if(trackId||isMaster)openMixerInsertManager(trackId||'master');else render();
 }
@@ -1619,7 +1704,7 @@ function presetParamsFor(plugin,preset){
 }
 function changeInsertPreset(isMaster,id,preset,trackId=''){
   const x=insertArray(isMaster,trackId)?.find(p=>p.id===id);if(!x)return;
-  x.preset=preset;x.params=presetParamsFor(x.plugin,preset);markDirty(100);queueLiveFxRefresh(isMaster,trackId);
+  x.preset=preset;x.params=presetParamsFor(x.plugin,preset);markDirty(100);queueLiveFxRefresh(isMaster,trackId);refreshMixerInsertBadges();
   if(!isMaster)queueInsertWaveformRefresh(trackId||selectedTrack()?.id||'');
 }
 function editorPresetChanged(isMaster,id,preset,trackId=''){
@@ -1662,20 +1747,37 @@ function syncPluginControl(key,value,source){
   if(source!=='knob'&&knob)knob.value=value;
   const target=knob?.closest('.plugin-knob-shell');if(target){const min=Number(knob.min),max=Number(knob.max),v=Number(value),pct=max>min?(v-min)/(max-min):0;target.style.setProperty('--knob-turn',`${-135+pct*270}deg`)}
 }
+function pluginSetupTheme(plugin=''){
+  const key=String(plugin||'').toLowerCase();
+  if(key.includes('eq')||key.includes('filter')||key.includes('tone'))return 'eq';
+  if(key.includes('comp')||key.includes('limiter')||key.includes('gate'))return 'dynamics';
+  if(key.includes('reverb')||key.includes('room')||key.includes('plate')||key.includes('hall'))return 'space';
+  if(key.includes('delay')||key.includes('echo')||key.includes('slap'))return 'delay';
+  if(key.includes('satur')||key.includes('drive')||key.includes('distort')||key.includes('tube'))return 'saturation';
+  if(key.includes('chorus')||key.includes('flanger')||key.includes('phaser')||key.includes('widener'))return 'modulation';
+  return 'studio';
+}
+function insertSetupIcon(theme){
+  const paths={eq:`<path d="M4 18V8M10 18V4M16 18v-9M22 18v-5"/><path d="M2 18h24"/>`,dynamics:`<path d="M3 19h22M3 19V3"/><path d="m5 16 5-6 4-2 4-1 6-1"/><circle cx="14" cy="8" r="2"/>`,space:`<circle cx="14" cy="12" r="3"/><path d="M7 5a11 11 0 0 0 0 14M21 5a11 11 0 0 1 0 14M3 1a17 17 0 0 0 0 22M25 1a17 17 0 0 1 0 22"/>`,delay:`<path d="M3 7h13a7 7 0 1 1-7 7"/><path d="m12 11-3 3 3 3"/><circle cx="20" cy="7" r="2"/>`,saturation:`<path d="M3 14c3-16 5 16 9 0s6-12 12 0"/><path d="M3 3v22M3 14h22"/>`,modulation:`<path d="M2 16q3-12 6 0t6 0t6 0t6 0"/><path d="M2 23q3-12 6 0t6 0t6 0t6 0"/>`,studio:`<rect x="4" y="4" width="20" height="20" rx="4"/><circle cx="14" cy="14" r="6"/><circle cx="14" cy="14" r="2"/>`,vst3:`<rect x="3" y="4" width="22" height="20" rx="4"/><path d="M8 11h12M8 17h12M11 8v12M17 8v12"/>`};
+  return `<span class="insert-setup-icon" aria-hidden="true"><svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${paths[theme]||paths.studio}</svg></span>`;
+}
 function openInsertEditor(isMaster,id,trackId=''){
   const x=insertArray(isMaster,trackId)?.find(p=>p.id===id);if(!x)return;
+  if(x.plugin==='vst3'){openVst3Config(isMaster,id,trackId);return;}
   const schema=pluginInfo.schemas?.[x.plugin]||{},custom=x.preset.startsWith('user:')?pluginInfo.custom?.[x.plugin]?.[x.preset.slice(5)]:null;
   const presets=pluginInfo.inserts?.[x.plugin]||['default'];
   const params=Object.keys(x.params||{}).length?x.params:(custom||presetParamsFor(x.plugin,x.preset));
+  const theme=pluginSetupTheme(x.plugin),pluginTitle=pluginLabel(x.plugin),ownerLabel=isMaster?'Master channel':((trackById(trackId)?.name)||'Track channel');
   const fields=x.plugin==='graphic_eq_32'
     ?graphicEqEditorFields(schema,params,isMaster,id,trackId)
     :Object.entries(schema).map(([k,v])=>{const value=Number(params[k]??v.default);return `<label class="plugin-field plugin-field-knob"><span>${esc(k.replaceAll('_',' '))}</span><div class="plugin-control-pair"><div class="plugin-knob-shell" style="--knob-turn:${-135+((value-Number(v.min))/(Number(v.max)-Number(v.min)||1))*270}deg" title="${esc(k.replaceAll('_',' '))}"><input class="plugin-knob" data-knob-key="${k}" type="range" min="${v.min}" max="${v.max}" step="${v.step}" value="${value}" oninput="livePluginControlChanged('${k}',this.value,'knob',${isMaster},'${id}','${trackId}')"></div><input class="plugin-param plugin-number" id="plugin-param-${k}" data-key="${k}" type="number" min="${v.min}" max="${v.max}" step="${v.step}" value="${value}" oninput="livePluginControlChanged('${k}',this.value,'number',${isMaster},'${id}','${trackId}')" onblur="commitPluginEditorParams(${isMaster},'${id}','${trackId}')" onkeydown="pluginNumberKey(event,${isMaster},'${id}','${trackId}')"></div><small>${v.min} … ${v.max}</small></label>`}).join('');
-  const editorHtml=`<label class="plugin-preset-row"><span>Preset</span><select onchange="editorPresetChanged(${isMaster},'${id}',this.value,'${trackId}')">${presets.map(p=>`<option value="${esc(p)}" ${p===x.preset?'selected':''}>${esc(p)}</option>`).join('')}</select></label><p class="hint">Il preset selezionato viene applicato realmente alla catena audio. I controlli sotto servono per creare una configurazione custom.</p><p class="hint">${x.plugin==='graphic_eq_32'?'Trascina graficamente i 32 fader di banda.':'Custom values are validated server-side.'}</p><div class="${x.plugin==='graphic_eq_32'?'':'plugin-param-grid'}">${fields||'<p class="hint">This processor currently exposes factory presets only.</p>'}</div><label class="preset-save-name"><span>Custom preset name</span><input id="customPresetName" maxlength="80" placeholder="My preset"></label><div class="modal-actions insert-setup-actions"><button onclick="applyInsertConfig(${isMaster},'${id}',false,'${trackId}')">Apply custom</button><button onclick="applyInsertConfig(${isMaster},'${id}',true,'${trackId}')">Save preset & apply</button><button onclick="${trackId||isMaster?`openMixerInsertManager('${trackId||'master'}')`:'closeExportMapping()'}">Cancel</button></div>`;
+  const editorInner=`<div class="insert-setup-hero">${insertSetupIcon(theme)}<div class="insert-setup-overline">Insert FX</div><div class="insert-setup-title">${esc(pluginTitle)}</div><div class="insert-setup-subtitle">${esc(ownerLabel)} · setup</div></div><div class="insert-setup-panel"><label class="plugin-preset-row"><span>Preset</span><select onchange="editorPresetChanged(${isMaster},'${id}',this.value,'${trackId}')">${presets.map(p=>`<option value="${esc(p)}" ${p===x.preset?'selected':''}>${esc(p)}</option>`).join('')}</select></label><p class="hint">Il preset selezionato viene applicato realmente alla catena audio. I controlli sotto servono per creare una configurazione custom.</p><p class="hint">${x.plugin==='graphic_eq_32'?'Trascina graficamente i 32 fader di banda.':'Custom values are validated server-side.'}</p><div class="${x.plugin==='graphic_eq_32'?'':'plugin-param-grid'}">${fields||'<p class="hint">This processor currently exposes factory presets only.</p>'}</div><label class="preset-save-name"><span>Custom preset name</span><input id="customPresetName" maxlength="80" placeholder="My preset"></label><div class="modal-actions insert-setup-actions"><button onclick="applyInsertConfig(${isMaster},'${id}',false,'${trackId}')">Apply custom</button><button onclick="applyInsertConfig(${isMaster},'${id}',true,'${trackId}')">Save preset & apply</button><button onclick="${trackId||isMaster?`openMixerInsertManager('${trackId||'master'}')`:'closeExportMapping()'}">Cancel</button></div></div>`;
+  const editorHtml=`<div class="insert-plugin-setup insert-theme-${theme}">${editorInner}</div>`;
   if(trackId||isMaster){
-    showUtilityModal(`${pluginLabel(x.plugin)} configuration`,editorHtml);
+    showUtilityModal(`${pluginTitle} configuration`,editorHtml);
   }else{
     const m=$('#exportMapModal');if(!m)return;
-    m.innerHTML=`<h3>${esc(pluginLabel(x.plugin))} configuration</h3>${editorHtml}`;m.classList.remove('hidden');
+    m.innerHTML=`<h3>${esc(pluginTitle)} configuration</h3>${editorHtml}`;m.classList.remove('hidden');
   }
 }
 async function applyInsertConfig(isMaster,id,savePreset,trackId=''){
@@ -1685,7 +1787,7 @@ async function applyInsertConfig(isMaster,id,savePreset,trackId=''){
     const name=$('#customPresetName')?.value?.trim();if(!name)return toast('Enter a custom preset name');
     try{const r=await api('/api/presets',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({plugin:x.plugin,name,params})});pluginInfo=await api('/api/plugins');x.preset=r.preset;x.params={};toast('Custom preset saved')}catch(e){return toast(e.message)}
   }else{x.preset='custom';x.params=params}
-  closeExportMapping();markDirty(100);queueLiveFxRefresh(isMaster,trackId);
+  closeExportMapping();markDirty(100);queueLiveFxRefresh(isMaster,trackId);refreshMixerInsertBadges();
   if(!isMaster)queueInsertWaveformRefresh(trackId||selectedTrack()?.id||'');
   if(trackId||isMaster)openMixerInsertManager(trackId||'master');else render();
 }
@@ -2004,13 +2106,13 @@ function channelHtml(t,i){
   const color=t.color||TRACK_COLORS[i%TRACK_COLORS.length],pan=clampPan(t.pan),angle=pan*55;
   const outChannels=effectiveTrackChannels(t),stereoByFx=Number(t.channels)===1&&outChannels===2;
   return `<div class="channel ${inaudible?'audibly-muted':''}" data-channel-track="${t.id}" style="--track-color:${color}">
-    <div class="channel-name">${esc(t.name)}</div>
+    <div class="channel-name" data-track-name="${t.id}" title="Double click to rename track" ondblclick="beginMixerTrackNameEdit('${t.id}')">${esc(t.name)}</div>
     <div class="pan-control">
       <div id="pan-knob-${t.id}" class="pan-knob interactive" style="--pan-angle:${angle}deg" title="Pan ${pan.toFixed(2)} · trascina, doppio click = center" onpointerdown="startPanDrag(event,'${t.id}')" ondblclick="resetTrackPan('${t.id}')" role="slider" tabindex="0" aria-valuemin="-1" aria-valuemax="1" aria-valuenow="${pan.toFixed(2)}"></div>
       <input id="pan-input-${t.id}" class="pan-value-input" type="number" min="-1" max="1" step="0.01" value="${pan.toFixed(2)}" onchange="setTrackPan('${t.id}',this.value)" onkeydown="if(event.key==='Enter')this.blur()" aria-label="Pan ${esc(t.name)}">
       <span id="pan-label-${t.id}" class="pan-label">${panLabel(pan)}</span>
     </div>
-    <div class="channel-buttons"><button data-mute-track="${t.id}" class="${t.mute?'on':''}" onclick="toggleBool(this,'${t.id}','mute')">M</button><button data-solo-track="${t.id}" class="${t.solo?'on':''}" onclick="toggleBool(this,'${t.id}','solo')">S</button><button class="channel-fx channel-insert-action ${t.inserts?.length?'active':''}" onclick="openMixerInsertManager('${t.id}')" title="Manage channel inserts" aria-label="Manage inserts ${esc(t.name)}">Insert${t.inserts?.length?` ${t.inserts.length}`:''}</button></div>
+    <div class="channel-buttons"><button data-mute-track="${t.id}" class="${t.mute?'on':''}" onclick="toggleBool(this,'${t.id}','mute')">M</button><button data-solo-track="${t.id}" class="${t.solo?'on':''}" onclick="toggleBool(this,'${t.id}','solo')">S</button><button class="channel-fx channel-insert-action ${t.inserts?.some(x=>x.enabled!==false)?'active':''} ${t.inserts?.length?'has-inserts':''} ${t.inserts?.length&&!t.inserts.some(x=>x.enabled!==false)?'all-bypassed':''}" onclick="openMixerInsertManager('${t.id}')" title="Manage channel inserts" aria-label="Manage inserts ${esc(t.name)}">Insert${t.inserts?.length?` ${t.inserts.length}`:''}</button></div>
     <div class="channel-mode">${outChannels===1?'MONO':(stereoByFx?'STEREO · FX':'STEREO')}</div>
     <div class="channel-fader-area">
       <div class="fader-column"><input class="v-fader track-volume-range" data-volume-track="${t.id}" type="range" min="-60" max="12" step="0.5" value="${t.volume_db}" oninput="setTrackVolume('${t.id}',this.value)" ondblclick="resetTrackVolumeToUnity('${t.id}',event)" title="Volume · doppio click = 0 dB"></div>
@@ -2022,7 +2124,7 @@ function channelHtml(t,i){
 }
 function masterChannelHtml(){
   const v=current.master_volume_db||0,fx=current.master_inserts||[];
-  return `<div class="channel master" style="--track-color:#644ce5"><div class="channel-name">MASTER</div><div class="pan-knob"></div><div class="channel-buttons"><button class="channel-fx master-fx channel-insert-action ${fx.length?'active':''}" onclick="openMixerInsertManager('master')" title="Manage master inserts" aria-label="Manage master inserts">Insert${fx.length?` ${fx.length}`:''}</button></div><div class="channel-fader-area"><div class="fader-column"><input id="master-volume-range" class="v-fader" type="range" min="-60" max="12" step="0.5" value="${v}" oninput="setMasterVolume(this.value)" ondblclick="resetMasterVolumeToUnity(event)" title="Master volume · doppio click = 0 dB"></div><div class="db-scale" aria-hidden="true"><span>+12</span><span>+6</span><span>0</span><span>-6</span><span>-12</span><span>-24</span><span>-36</span><span>-48</span><span>-60</span></div><div class="meter-stack"><div id="peak-master" class="peak-led ${current.realtime_meter_enabled?'':'hidden'}" title="Master peak 0 dBFS">PEAK</div><div class="meter-pair master-meter-pair"><div class="meter meter-realtime ${current.realtime_meter_enabled?'':'hidden'}" title="Master Left"><span id="vu-master-L" style="height:0%"></span><em>L</em></div><div class="meter meter-realtime ${current.realtime_meter_enabled?'':'hidden'}" title="Master Right"><span id="vu-master-R" style="height:0%"></span><em>R</em></div></div></div></div><input class="channel-value volume-number" id="master-db" type="number" min="-60" max="12" step="0.1" value="${Number(v).toFixed(1)}" onchange="setMasterVolume(this.value)" onkeydown="if(event.key==='Enter')this.blur()" aria-label="Master volume in dB" title="Master volume in dB"></div>`;
+  return `<div class="channel master" style="--track-color:#644ce5"><div class="channel-name">MASTER</div><div class="pan-knob"></div><div class="channel-buttons"><button class="channel-fx master-fx channel-insert-action ${fx.some(x=>x.enabled!==false)?'active':''} ${fx.length?'has-inserts':''} ${fx.length&&!fx.some(x=>x.enabled!==false)?'all-bypassed':''}" onclick="openMixerInsertManager('master')" title="Manage master inserts" aria-label="Manage master inserts">Insert${fx.length?` ${fx.length}`:''}</button></div><div class="channel-fader-area"><div class="fader-column"><input id="master-volume-range" class="v-fader" type="range" min="-60" max="12" step="0.5" value="${v}" oninput="setMasterVolume(this.value)" ondblclick="resetMasterVolumeToUnity(event)" title="Master volume · doppio click = 0 dB"></div><div class="db-scale" aria-hidden="true"><span>+12</span><span>+6</span><span>0</span><span>-6</span><span>-12</span><span>-24</span><span>-36</span><span>-48</span><span>-60</span></div><div class="meter-stack"><div id="peak-master" class="peak-led ${current.realtime_meter_enabled?'':'hidden'}" title="Master peak 0 dBFS">PEAK</div><div class="meter-pair master-meter-pair"><div class="meter meter-realtime ${current.realtime_meter_enabled?'':'hidden'}" title="Master Left"><span id="vu-master-L" style="height:0%"></span><em>L</em></div><div class="meter meter-realtime ${current.realtime_meter_enabled?'':'hidden'}" title="Master Right"><span id="vu-master-R" style="height:0%"></span><em>R</em></div></div></div></div><input class="channel-value volume-number" id="master-db" type="number" min="-60" max="12" step="0.1" value="${Number(v).toFixed(1)}" onchange="setMasterVolume(this.value)" onkeydown="if(event.key==='Enter')this.blur()" aria-label="Master volume in dB" title="Master volume in dB"></div>`;
 }
 async function setAutoMix(enabled){if(!current)return;try{collect();await api('/api/projects/'+current.id,{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify(current)});const style=$('#autoMixStyle')?.value||current.auto_mix_style||'balanced';current=await api(`/api/projects/${current.id}/auto-mix`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({enabled,style})});render();toast(enabled?'Auto Mix applied. Toggle off to restore your previous mix.':'Auto Mix removed; previous mix restored.')}catch(e){toast(e.message);render()}}
 async function changeAutoMixStyle(style){current.auto_mix_style=style;if(current.auto_mix_enabled)await setAutoMix(true)}
@@ -2346,7 +2448,7 @@ function toggleAllPlugins(){
   plugins.forEach(x=>{x.enabled=enable});
   for(const t of current.tracks){if(t.inserts?.length){queueInsertWaveformRefresh(t.id);queueLiveFxRefresh(false,t.id)}}
   if((current.master_inserts||[]).length)queueLiveFxRefresh(true,'');
-  markDirty(100);render();toast(enable?'Tutti i plugin abilitati':'Bypass di tutti i plugin attivato');
+  markDirty(100);refreshMixerInsertBadges();render();toast(enable?'Tutti i plugin abilitati':'Bypass di tutti i plugin attivato');
 }
 function updateMuteSoloVisuals(){
   if(!current)return;const anySolo=current.tracks.some(t=>t.solo);
@@ -4411,6 +4513,15 @@ function showWebSettings(){
 }
 async function rescanSharedMedia(){try{const r=await api('/api/storage/shared/rescan?delete_unreferenced=true',{method:'POST'});toast(`Shared media: ${r.assets||0} asset, ${r.deleted||0} eliminati, ${r.references||0} riferimenti`)}catch(e){toast('Rescan shared media fallito: '+e.message)}}
 function saveWebSettings(){setAppDisplayPreference('useFlacStorage',$('#useFlacStorage')?.checked===true);const enabled=$('#webAutosaveEnabled')?.checked!==false;localStorage.setItem('mtaWebAutosaveEnabled',enabled?'true':'false');setAppDisplayPreference('showPreviousNextChords',$('#showPreviousNextChords')?.checked===true);setAppDisplayPreference('showPreviousNextLyrics',$('#showPreviousNextLyrics')?.checked===true);autosaveEnabled=enabled;if(autosaveEnabled&&projectDirty)markDirty(50);closeUtilityModal();if(playbackActuallyRunning()||playbackPaused)updateTimedPlaybackOverlay(playCursorMs);toast('Settings salvati')}
+async function openNativeVst3Manager(){
+  if(!currentUser?.native_single_user)return;
+  showUtilityModal('VST3 plugins','<p class="hint">Scanning installed VST3 plugins…</p>');
+  try{
+    const result=await api('/api/vst3/plugins');
+    const rows=(result.plugins||[]).map(p=>`<tr><td>${esc(p.name)}</td><td class="hint">${esc(p.path)}</td></tr>`).join('');
+    showUtilityModal('VST3 plugins',`<div class="form-grid"><p><b>Audio host:</b> ${result.available?'Pedalboard (offline render)':'Unavailable · install optional runtime'}</p><p class="hint">VST3 realtime hosting, original plugin windows and MIDI are not yet available. Plug-ins are third-party executables: install only trusted software.</p><div class="table-scroll"><table><thead><tr><th>Plugin</th><th>Path</th></tr></thead><tbody>${rows||'<tr><td colspan="2">No installed plugins detected</td></tr>'}</tbody></table></div><div class="form-actions"><button onclick="openNativeVst3Manager()">Rescan</button><button onclick="showNativeSettings()">Settings</button></div></div>`);
+  }catch(e){showUtilityModal('VST3 plugins',`<p>${esc(e.message)}</p><button onclick="showNativeSettings()">Settings</button>`)}
+}
 async function showNativeSettings(){
   if(!currentUser?.native_single_user){if(currentUser?.role==='admin'){location.href='/settings';return}return}
   showUtilityModal('Settings','<p class="hint">Loading settings…</p>');
@@ -4419,7 +4530,7 @@ async function showNativeSettings(){
   try{
     const cfg=await apiBridge.get_native_settings();
     const showChordNeighbors=appDisplayPreference('showPreviousNextChords',false),showLyricNeighbors=appDisplayPreference('showPreviousNextLyrics',false);
-    showUtilityModal('Settings',`<div class="form-grid native-settings"><label>Maximum import/upload size (MB)<input id="nativeMaxUploadMb" type="number" min="1" max="10240" step="1" value="${Number(cfg.max_upload_mb)||1024}"></label><label class="workflow-check"><input id="nativeAutosaveEnabled" type="checkbox" ${cfg.autosave_enabled!==false?'checked':''}> Auto-save project changes</label><label class="workflow-check"><input id="useFlacStorage" type="checkbox" ${appDisplayPreference('useFlacStorage')?'checked':''}> Use FLAC for new projects; ask before migrating WAV projects</label><label class="workflow-check"><input id="showPreviousNextChords" type="checkbox" ${showChordNeighbors?'checked':''}> Show previous and next chords</label><label class="workflow-check"><input id="showPreviousNextLyrics" type="checkbox" ${showLyricNeighbors?'checked':''}> Show previous and next lyrics</label><label>Language<select id="nativeLanguage"><option value="auto" ${!['it','en'].includes(cfg.language)?'selected':''}>Auto (system) · ${esc(cfg.system_language||'en')}</option><option value="it" ${cfg.language==='it'?'selected':''}>Italiano</option><option value="en" ${cfg.language==='en'?'selected':''}>English</option></select></label><label>Update channel<select id="nativeUpdateChannel"><option value="stable" ${cfg.update_channel!=='early'?'selected':''}>Stable · GitHub tags/releases only</option><option value="early" ${cfg.update_channel==='early'?'selected':''}>Early release · include latest main packages</option></select></label><p>Stable checks only tagged GitHub releases. Early release also checks the rolling <b>early-main</b> package produced from main.</p><p class="hint">Con le opzioni previous/next attive, la vista sopra la timeline scorre mostrando l'evento precedente e successivo attenuati e quello corrente evidenziato.</p><div class="form-actions"><button type="button" onclick="checkNativeAppUpdate(true)">Check for updates</button><button type="button" onclick="openNativeModelManager()">Manage Demucs models</button><button type="button" onclick="openAiModelManager()">Manage Lyrics / Chords models</button><button type="button" onclick="rescanSharedMedia()">Rescan / GC shared media</button><button class="accent" onclick="saveNativeSettings()">Save</button></div></div>`);
+    showUtilityModal('Settings',`<div class="form-grid native-settings"><label>Maximum import/upload size (MB)<input id="nativeMaxUploadMb" type="number" min="1" max="10240" step="1" value="${Number(cfg.max_upload_mb)||1024}"></label><label class="workflow-check"><input id="nativeAutosaveEnabled" type="checkbox" ${cfg.autosave_enabled!==false?'checked':''}> Auto-save project changes</label><label class="workflow-check"><input id="useFlacStorage" type="checkbox" ${appDisplayPreference('useFlacStorage')?'checked':''}> Use FLAC for new projects; ask before migrating WAV projects</label><label class="workflow-check"><input id="showPreviousNextChords" type="checkbox" ${showChordNeighbors?'checked':''}> Show previous and next chords</label><label class="workflow-check"><input id="showPreviousNextLyrics" type="checkbox" ${showLyricNeighbors?'checked':''}> Show previous and next lyrics</label><label>Language<select id="nativeLanguage"><option value="auto" ${!['it','en'].includes(cfg.language)?'selected':''}>Auto (system) · ${esc(cfg.system_language||'en')}</option><option value="it" ${cfg.language==='it'?'selected':''}>Italiano</option><option value="en" ${cfg.language==='en'?'selected':''}>English</option></select></label><label>Update channel<select id="nativeUpdateChannel"><option value="stable" ${cfg.update_channel!=='early'?'selected':''}>Stable · GitHub tags/releases only</option><option value="early" ${cfg.update_channel==='early'?'selected':''}>Early release · include latest main packages</option></select></label><p>Stable checks only tagged GitHub releases. Early release also checks the rolling <b>early-main</b> package produced from main.</p><p class="hint">Con le opzioni previous/next attive, la vista sopra la timeline scorre mostrando l'evento precedente e successivo attenuati e quello corrente evidenziato.</p><div class="form-actions"><button type="button" onclick="checkNativeAppUpdate(true)">Check for updates</button><button type="button" onclick="openNativeVst3Manager()">VST3 plugins / status</button><button type="button" onclick="openNativeModelManager()">Manage Demucs models</button><button type="button" onclick="openAiModelManager()">Manage Lyrics / Chords models</button><button type="button" onclick="rescanSharedMedia()">Rescan / GC shared media</button><button class="accent" onclick="saveNativeSettings()">Save</button></div></div>`);
   }catch(err){toast('Impossibile leggere le impostazioni native: '+err.message)}
 }
 // Settings save never scans the full timeline or rebuilds track DOM.

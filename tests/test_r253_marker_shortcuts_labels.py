@@ -13,4 +13,4 @@ def test_revision_files_synced():
     p=Path('.')
     revision=(p/'REVISION').read_text().strip()
     assert revision.isdecimal()
-    assert f'versionCode = {20000+int(revision)}' in (p/'mobile/android/app/build.gradle.kts').read_text()
+    assert f'versionCode = {30000 + int(revision)}' in (p/'mobile/android/app/build.gradle.kts').read_text()

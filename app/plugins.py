@@ -372,6 +372,8 @@ def plugin_manifest() -> dict[str, object]:
 
 
 def plugin_filter(plugin: InsertPlugin) -> str | None:
+    if plugin.plugin == "vst3":
+        return None  # hosted separately; never turn a native binary into FFmpeg text
     if not plugin.enabled:
         return None
     if plugin.params:

@@ -1,0 +1,3 @@
+# Optional desktop-only offline VST3 hosting.
+# Plugins are installed separately and are never redistributed with MTA.
+pedalboard>=0.9.17,<1

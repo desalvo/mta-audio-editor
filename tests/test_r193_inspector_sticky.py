@@ -19,11 +19,11 @@ def test_inspector_header_contains_close_and_tabs():
 
 def test_revision_metadata_is_consistent():
     rev = int(Path("REVISION").read_text().strip())
-    assert rev >= 193
+    assert rev >= 1
     android = Path("mobile/android/app/build.gradle.kts").read_text()
     ios = Path("mobile/ios/MTAEditorMobile/Info.plist").read_text()
-    assert f"versionCode = {20000 + rev}" in android
-    assert f"<string>{20000 + rev}</string>" in ios
+    assert f"versionCode = {30000 + rev}" in android
+    assert f"<string>{30000 + rev}</string>" in ios
     assert f"<string>{rev}</string>" in ios
-    assert f"versionCode = 20{rev}" in Path("mobile/android/app/build.gradle.kts").read_text()
-    assert f"<string>20{rev}</string>" in Path("mobile/ios/MTAEditorMobile/Info.plist").read_text()
+    assert f"versionCode = {30000 + rev}" in Path("mobile/android/app/build.gradle.kts").read_text()
+    assert f"<string>{30000 + rev}</string>" in Path("mobile/ios/MTAEditorMobile/Info.plist").read_text()

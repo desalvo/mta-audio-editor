@@ -1,3 +1,36 @@
+## 0.3.0-r1 — early development
+
+- Begin version 0.3.0 development; v0.2.0 remains stable.
+- Reserve higher platform build numbers (30001) for mobile upgrades.
+- Improve release channel separation for semantic version tags.
+- Add compiled PCM planar/interleaved conversion primitives for forthcoming native VST3 processing; default audio path unchanged.
+
+## 0.2.0-r302
+
+- Added opt-in compiled PCM accumulation primitive for future native real-time mixer; no changes to current playback engine.
+- Tests cover buffer validation and equivalent portable fallback.
+
+## 0.2.0-r301
+
+- Per-category vector icons for insert setup panels, including VST3.
+- Optional C++ PCM gain routine; existing Python processing remains default.
+
+## 0.2.0-r299
+
+- Mixer Insert shows a strong green indicator for active FX, amber when all inserts are bypassed, and updates without global rerender.
+- VST3 insert additions and parameter changes refresh the rendered playback path when audio is playing.
+- Clarified rendered VST3 playback versus native real-time host limitations.
+
+## 0.2.0-r297
+
+- Experimental desktop VST3 track insert discovery and isolated offline processing via optional pedalboard host.
+- VST3 plugin selection in mixer insert interface, path persistence, explicit unsupported master/live restrictions and setup guide.
+
+## 0.2.0-r296
+
+- mixer: double click on a channel name now allows renaming the track directly from the mixer.
+- insert FX setup: refreshed visual design with artistic/photo background, integrated app mark and plugin-type specific mood.
+
 ## 0.2.0-r294 — Native Settings Save freeze fix
 
 - Avoid synchronous full-page localization during Settings Save.
