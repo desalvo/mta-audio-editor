@@ -723,7 +723,11 @@ jobs:
       - name: Install Linux native dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y ffmpeg rpm libgtk-3-0 libwebkit2gtk-4.1-0 libnotify4 libnss3 libasound2t64
+          sudo apt-get install -y ffmpeg rpm pkg-config libopus-dev libgtk-3-0 libwebkit2gtk-4.1-0 libnotify4 libnss3 libasound2t64
+          # audiopus_sys (sphn) must link the system Opus rather than invoke
+          # an older bundled Opus CMake project incompatible with modern CMake.
+          pkg-config --modversion opus
+          export CMAKE_POLICY_VERSION_MINIMUM=3.5
           python -m pip install --upgrade pip
           pip install -r requirements.txt -r requirements-native.txt -r requirements-lyrics.txt
           pip install -r requirements-chords.txt
