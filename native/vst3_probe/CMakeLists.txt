@@ -26,7 +26,10 @@ if(MTA_VST3_SDK_ROOT)
   target_compile_definitions(mta_vst3_probe PRIVATE MTA_HAS_VST3_SDK=1)
   target_sources(mta_vst3_probe PRIVATE
     "${MTA_VST3_SDK_ROOT}/pluginterfaces/base/coreiids.cpp"
+    "${MTA_VST3_SDK_ROOT}/pluginterfaces/base/funknown.cpp"
     "${MTA_VST3_SDK_ROOT}/public.sdk/source/vst/vstinitiids.cpp"
+    "${MTA_VST3_SDK_ROOT}/public.sdk/source/vst/hosting/eventlist.cpp"
+    "${MTA_VST3_SDK_ROOT}/public.sdk/source/vst/hosting/parameterchanges.cpp"
   )
 endif()
 if(UNIX AND NOT APPLE)

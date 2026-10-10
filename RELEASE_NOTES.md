@@ -1,3 +1,11 @@
+## 0.3.0-r28 — offline VST3 event/parameter queues and latency metadata
+
+- Allocated Steinberg SDK event and parameter queues outside the offline processing loop.
+- Added opt-in note-on/note-off smoke events only when an event input bus exists, and one bounded parameter point when a writable controller parameter is available.
+- Captured processor-reported latency and tail in the offline diagnostic result; **latency compensation is not yet implemented**.
+- SDK helper implementations are compiled only when a complete external MIT-licensed SDK is configured.
+- The diagnostic path remains separate from production playback. **Not realtime-ready**: callbacks, event queue allocation audit, compensation, plugin crash isolation, full cross-platform CI and audio fixture testing remain.
+
 ## 0.3.0-r27 — isolated VST3 musical transport context
 
 - Added a valid Steinberg ProcessContext during all 128 offline audio blocks, with 48 kHz, 120 BPM, 4/4, sample-accurate project position and continuous musical time. The context is confined to the diagnostic process and does not modify playback.

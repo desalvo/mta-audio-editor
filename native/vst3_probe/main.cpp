@@ -14,6 +14,8 @@
 #include "pluginterfaces/vst/ivsteditcontroller.h"
 #include "pluginterfaces/vst/ivsthostapplication.h"
 #include "pluginterfaces/vst/ivstprocesscontext.h"
+#include "public.sdk/source/vst/hosting/eventlist.h"
+#include "public.sdk/source/vst/hosting/parameterchanges.h"
 #include <cstring>
 #include <limits>
 #include <atomic>
@@ -163,6 +165,10 @@ int main(int argc, char** argv) {
   double offlineOutputEnergy = 0.0;
   double offlineOutputPeak = 0.0;
   bool offlineOutputAudible = false;
+  int offlineMidiEventsSent = 0;
+  int offlineAutomationPointsSent = 0;
+  int offlineLatencySamples = -1;
+  int offlineTailSamples = -1;
   int64_t offlineLastProjectSample = -1;
   bool offlineTransportContinuous = true;
   int latencySamples = -1;
@@ -337,6 +343,34 @@ int main(int argc, char** argv) {
                       transport.timeSigNumerator = 4;
                       transport.timeSigDenominator = 4;
                       data.processContext = &transport;
+                      // SDK host-owned event and parameter queues. Construct outside
+                      // the process loop: no allocation is permitted in the callback.
+                      Steinberg::Vst::EventList events(16);
+                      Steinberg::Vst::EventList outputEvents(16);
+                      Steinberg::Vst::ParameterChanges parameterChanges(1);
+                      Steinberg::Vst::ParameterChanges outputParameters(1);
+                      data.inputEvents = &events;
+                      data.outputEvents = &outputEvents;
+                      data.inputParameterChanges = &parameterChanges;
+                      data.outputParameterChanges = &outputParameters;
+                      offlineLatencySamples = latencySamples;
+                      offlineTailSamples = tailSamples;
+                      // MIDI is sent only when the plug-in advertises an event input.
+                      bool hasEventInput = component->getBusCount(Steinberg::Vst::kEvent, Steinberg::Vst::kInput) > 0;
+                      if (hasEventInput)
+                        component->activateBus(Steinberg::Vst::kEvent, Steinberg::Vst::kInput, 0, true);
+                      // Query the controller's first valid parameter for an offline
+                      // automation smoke test. Never automate random parameters live.
+                      Steinberg::Vst::ParamID testParam = 0;
+                      bool hasTestParam = false;
+                      if (controller && controller->getParameterCount() > 0) {
+                        Steinberg::Vst::ParameterInfo info{};
+                        if (controller->getParameterInfo(0, info) == Steinberg::kResultOk &&
+                            !(info.flags & Steinberg::Vst::ParameterInfo::kIsReadOnly)) {
+                          testParam = info.id;
+                          hasTestParam = true;
+                        }
+                      }
                       // Deterministic non-silent stimulus, 128 consecutive blocks. No
                       // file I/O or allocations take place between process calls.
                       // No events, automation or musical transport are supplied yet.
@@ -351,6 +385,42 @@ int main(int argc, char** argv) {
                         transport.projectTimeSamples = projectSample;
                         transport.projectTimeMusic = double(projectSample) * 120.0 / (60.0 * 48000.0);
                         offlineLastProjectSample = projectSample;
+                        events.clear();
+                        outputEvents.clear();
+                        parameterChanges.clearQueue();
+                        outputParameters.clearQueue();
+                        // A sample-offset note-on/note-off pair provides a bounded
+                        // event-path smoke test, not a MIDI sequencer implementation.
+                        if (hasEventInput && block == 0) {
+                          Steinberg::Vst::Event note{};
+                          note.busIndex = 0;
+                          note.sampleOffset = 0;
+                          note.type = Steinberg::Vst::Event::kNoteOnEvent;
+                          note.noteOn.channel = 0;
+                          note.noteOn.pitch = 69;
+                          note.noteOn.velocity = 0.8f;
+                          note.noteOn.noteId = 1;
+                          if (events.addEvent(note) == Steinberg::kResultOk) ++offlineMidiEventsSent;
+                        }
+                        if (hasEventInput && block == 1) {
+                          Steinberg::Vst::Event note{};
+                          note.busIndex = 0;
+                          note.sampleOffset = 32;
+                          note.type = Steinberg::Vst::Event::kNoteOffEvent;
+                          note.noteOff.channel = 0;
+                          note.noteOff.pitch = 69;
+                          note.noteOff.noteId = 1;
+                          if (events.addEvent(note) == Steinberg::kResultOk) ++offlineMidiEventsSent;
+                        }
+                        if (hasTestParam && block == 0) {
+                          Steinberg::int32 queueIndex = -1;
+                          auto* queue = parameterChanges.addParameterData(testParam, queueIndex);
+                          if (queue) {
+                            Steinberg::int32 pointIndex = -1;
+                            if (queue->addPoint(0, 0.5, pointIndex) == Steinberg::kResultOk)
+                              ++offlineAutomationPointsSent;
+                          }
+                        }
                         for (auto& storage : inputStorage) {
                           if (processingSampleSize == 32) {
                             for (auto& channel : storage.samples32) {
@@ -467,6 +537,10 @@ int main(int argc, char** argv) {
             << ",\"offline_output_energy\":" << offlineOutputEnergy
             << ",\"offline_output_peak\":" << offlineOutputPeak
             << ",\"offline_output_audible\":" << (offlineOutputAudible ? "true" : "false")
+            << ",\"offline_midi_events_sent\":" << offlineMidiEventsSent
+            << ",\"offline_automation_points_sent\":" << offlineAutomationPointsSent
+            << ",\"offline_latency_samples\":" << offlineLatencySamples
+            << ",\"offline_tail_samples\":" << offlineTailSamples
             << ",\"offline_transport_continuous\":" << (offline && offlineBlocksProcessed > 0 && offlineTransportContinuous ? "true" : "false")
             << ",\"offline_last_project_sample\":" << offlineLastProjectSample
             << ",\"buses\":" << busDetails.str() << ",\"native_host_ready\":false}\n";

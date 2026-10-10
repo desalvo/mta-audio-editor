@@ -127,6 +127,14 @@ def probe_plugin(path: str, executable: str, timeout: float = 5,
             'offline_deactivated': offline and payload.get('offline_deactivated') is True,
             'offline_output_audible': offline and payload.get('offline_output_audible') is True,
             'offline_transport_continuous': offline and payload.get('offline_transport_continuous') is True,
+            'offline_midi_events_sent': (payload['offline_midi_events_sent'] if offline and
+                type(payload.get('offline_midi_events_sent')) is int and 0 <= payload['offline_midi_events_sent'] <= 2 else None),
+            'offline_automation_points_sent': (payload['offline_automation_points_sent'] if offline and
+                type(payload.get('offline_automation_points_sent')) is int and 0 <= payload['offline_automation_points_sent'] <= 1 else None),
+            'offline_latency_samples': (payload['offline_latency_samples'] if offline and
+                type(payload.get('offline_latency_samples')) is int and -1 <= payload['offline_latency_samples'] <= 10000000 else None),
+            'offline_tail_samples': (payload['offline_tail_samples'] if offline and
+                type(payload.get('offline_tail_samples')) is int and -1 <= payload['offline_tail_samples'] <= 10000000 else None),
             'offline_last_project_sample': (payload.get('offline_last_project_sample') if offline and
                                            type(payload.get('offline_last_project_sample')) is int and
                                            -1 <= payload['offline_last_project_sample'] <= 65024 else None),
