@@ -63,3 +63,6 @@ Python API `native.vst3_probe.native_chain.render_native_wav(source, destination
 ### High-resolution WAV export (r36)
 
 `render_native_wav()` accepts 48 kHz signed integer PCM16, PCM24 and PCM32 mono/stereo WAV input. It preserves the input bit depth and frame count, clamps overshoots safely, rejects non-finite plugin output, and atomically publishes the final file only on success. IEEE floating-point WAV and realtime processing are not enabled.
+
+### Experimental batch render (r38)
+Create a JSON manifest with `{ "schema": 1, "jobs": [{"source":"input.wav", "destination":"output.wav", "plugins":[["/path/plugin.vst3", "32hexCID"]]}] }`, and run `python -m native.vst3_probe.batch_wav_cli batch.json --probe /path/mta_vst3_probe`. Output JSON summarizes successes and failures. Relative WAV paths resolve from manifest directory. Outputs are independently atomic, not a multi-output transaction.

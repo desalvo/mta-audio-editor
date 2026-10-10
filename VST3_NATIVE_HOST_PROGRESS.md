@@ -1,3 +1,9 @@
+## 0.3.0-r38 — Safe batch VST3 offline WAV rendering
+- Added experimental manifest-driven batch CLI (`python -m native.vst3_probe.batch_wav_cli`) for up to 128 WAV exports.
+- Validates all outputs, collisions, CIDs and limits before executing any plugin.
+- Reports per-job outcomes in JSON and optionally stops at first error; each output remains atomically published.
+- Does not claim a persistent native VST3 process; realtime remains disabled.
+
 ## r37 — Standalone WAV command-line interface
 Run `python -m native.vst3_probe.render_wav_cli SOURCE DEST --probe EXE --insert VST3_PATH CID`. Repeat `--insert` for chains. Outputs a JSON summary, exits nonzero on errors. Supports 48 kHz mono/stereo integer PCM16/24/32 within 1,048,576 frames. No realtime integration.
 
