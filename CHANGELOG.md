@@ -1,3 +1,8 @@
+## 0.3.0-r30
+- Add bounded VST3 offline graph helpers for latency compensation, parallel stem alignment, stable mixing bounded tail budgeting, and sample-accurate offline MIDI/parameter event batching.
+- Add deterministic regression coverage for impulse alignment, corrupted/nonfinite audio, and timing limits.
+- Preserve the isolated VST3 probe; realtime integration remains gated.
+
 ## 0.3.0-r29
 - Fix immediate track rename propagation across Tracks and Mixer without rebuilding the DAW UI.
 - Wire mixer name editor Enter/Escape/blur to commit/cancel and prevent duplicate generic handlers.

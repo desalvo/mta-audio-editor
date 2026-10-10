@@ -1,6 +1,6 @@
 """Opt-in VST3 factory probe, always executed out-of-process.
 
-This is not a VST3 host and does not process audio or open plugin editors.
+This is not a realtime VST3 host. Offline processing runs only in an isolated subprocess.
 """
 from __future__ import annotations
 

@@ -1,3 +1,6 @@
+## r30: Offline graph timing helpers
+Implemented native/vst3_probe/offline_graph.py for bounded offline render latency compensation, parallel stem alignment, mixing and tail budgeting and sample-offset MIDI/parameter event batching with regression tests. This is not a plugin host or a realtime-safe callback implementation; no bypass of native_host_ready=false.
+
 ## 0.3.0-r28 — offline VST3 event/parameter queues and latency metadata
 
 - Allocated Steinberg SDK event and parameter queues outside the offline processing loop.

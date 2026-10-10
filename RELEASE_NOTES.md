@@ -1,3 +1,6 @@
+## 0.3.0-r30
+Offline VST3 graph timing toolkit: validated plugin latency and tail budgets; compensation of rendered streams, deterministic parallel-stem alignment and mixing. Not activated in realtime playback.
+
 ## 0.3.0-r29
 - Track names now update instantly in Tracks and Mixer; mixer renaming commits on Enter or blur and cancels on Escape.
 
