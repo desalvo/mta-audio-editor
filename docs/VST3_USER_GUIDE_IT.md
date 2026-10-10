@@ -1,8 +1,8 @@
-# Supporto VST3 — Guida utente
+# Manuale del supporto VST3
 
-Funzioni disponibili, limiti e licenze
+Supporto VST3 per MTA Audio Editor
 
-**MTA Audio Editor 0.3.0-r11 — Early release**
+**MTA Audio Editor 0.3.0-r12 — Early release**
 
 ## Panoramica
 
@@ -32,7 +32,7 @@ Il backend offline elabora gli insert integrati prima dei VST3 attivi. Se un ins
 
 Il probe C++20 controlla l’esportazione GetPluginFactory e, quando è compilato con lo Steinberg SDK, può leggere nomi, classi e categorie. L’operazione viene eseguita in processo separato con timeout. Un VST3 è codice nativo di terze parti: installa soltanto plugin attendibili. Il probe NON attiva una catena realtime.
 
-## Limiti della versione 0.3.0-r11
+## Limiti della versione 0.3.0-r12
 
 Non sono ancora implementati GUI originale VST3, elaborazione low-latency realtime con SDK Steinberg, eventi MIDI, automazioni VST3, compensazione di latenza e VST3 sul Master. Per le funzioni non ancora disponibili utilizza gli insert integrati. Non interpretare il semplice rilevamento di un plugin come garanzia di compatibilità.
 
@@ -42,12 +42,14 @@ Plugin assente: controlla directory e architettura. Errore durante il rendering:
 
 ## Licenze e distribuzione
 
-Lo SDK Steinberg VST3 recente è sotto MIT, ma la licenza dei singoli plugin è indipendente. Pedalboard può comportare obblighi GPLv3 per i bundle redistribuiti. Consultare THIRD_PARTY_NOTICES.md e gli avvisi delle dipendenze; evitare di incorporare plugin di terze parti senza autorizzazione. I controlli automatici non sostituiscono un audit legale.
-
-
+- MTA Audio Editor: EUPL-1.2.
+- Steinberg VST3 SDK (versioni MIT): MIT.
+- Pedalboard (backend VST3 opzionale): GPL-3.0.
 
 ### r10: creazione isolata delle istanze
 Con VST3 SDK installato separatamente, eseguire `mta_vst3_probe /percorso/modulo --instantiate <CID-esadecimale-32-caratteri>` nel processo diagnostico. Il componente viene rilasciato immediatamente; non vengono inizializzati plugin o elaborato audio.
 
 ### r11: diagnostica isolata del ciclo di vita
 `mta_vst3_probe /path/to/module --lifecycle <CID-esadecimale-32-caratteri>` tenta l’inizializzazione con contesto host nullo e la terminazione solo se l’inizializzazione riesce. Alcuni plugin possono rifiutare il contesto. Non attiva audio, GUI, MIDI o playback realtime.
+### r12: diagnostica bus VST3
+Dopo una inizializzazione riuscita, il probe isolato enumera bus audio ed eventi, direzione e numero di canali, senza processare audio o attivare il plugin.

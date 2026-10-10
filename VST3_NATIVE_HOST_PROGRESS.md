@@ -29,3 +29,7 @@ Optional exact-CID IComponent creation diagnostic through IPluginFactory::create
 ## 0.3.0-r11
 
 The `--lifecycle <CID>` opt-in subprocess diagnostic attempts `IComponent::initialize(nullptr)` then calls `terminate()` only if initialization succeeded, and always releases the interface. A null host context is an intentional limitation; production host interfaces, module entry lifecycle, realtime processing and GUI integration are not implemented. `--instantiate` remains unchanged.
+
+## 0.3.0-r12
+- Isolated bus metadata interrogation after successful lifecycle initialization (audio/event buses only).
+- Host context, activation, processing and GUI remain unimplemented; no changes to playback.

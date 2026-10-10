@@ -43,8 +43,6 @@ def probe_plugin(path: str, executable: str, timeout: float = 5,
     probe = Path(executable).resolve()
     if not probe.is_file():
         raise FileNotFoundError(f'VST3 probe executable not found: {probe}')
-    if lifecycle and instantiate_cid is None:
-        raise ValueError('Lifecycle diagnostic requires an explicit class CID')
     if instantiate_cid is not None:
         if not isinstance(instantiate_cid, str) or len(instantiate_cid) != 32 or any(
             char not in '0123456789abcdefABCDEF' for char in instantiate_cid
@@ -82,6 +80,20 @@ def probe_plugin(path: str, executable: str, timeout: float = 5,
         seen.add(cid)
         safe_classes.append({**entry, 'cid': cid})
     classes = safe_classes
+    buses = payload.get('buses', []) if lifecycle else []
+    if not isinstance(buses, list):
+        buses = []
+    safe_buses = []
+    for bus in buses[:1024]:
+        if not isinstance(bus, dict):
+            continue
+        if bus.get('media') not in ('audio', 'event') or bus.get('direction') not in ('input', 'output'):
+            continue
+        if any(not isinstance(bus.get(k), int) or isinstance(bus.get(k), bool) for k in ('index', 'channels', 'bus_type')):
+            continue
+        if not (0 <= bus['index'] <= 255 and 0 <= bus['channels'] <= 1024 and 0 <= bus['bus_type'] <= 16):
+            continue
+        safe_buses.append({k: bus[k] for k in ('media', 'direction', 'index', 'channels', 'bus_type')})
     return {'name': plugin.stem, 'factory_export': True,
             'instance_requested': instantiate_cid is not None,
             'instance_found': payload.get('instance_found') is True if instantiate_cid is not None else False,
@@ -89,7 +101,7 @@ def probe_plugin(path: str, executable: str, timeout: float = 5,
             'lifecycle_requested': lifecycle,
             'instance_initialized': payload.get('instance_initialized') is True if lifecycle else False,
             'instance_terminated': payload.get('instance_terminated') is True if lifecycle else False,
-            'native_host_ready': False, 'binary': str(binary), 'classes': classes,
+            'native_host_ready': False, 'buses': safe_buses, 'binary': str(binary), 'classes': classes,
             **({'factory_classes': payload['factory_classes']}
                if isinstance(payload.get('factory_classes'), int) and not isinstance(payload.get('factory_classes'), bool)
                and 0 <= payload['factory_classes'] <= 10000 else {})}

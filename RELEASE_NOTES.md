@@ -1,3 +1,7 @@
+## 0.3.0-r12
+- Add isolated VST3 bus information diagnostics after successful component initialization; no realtime processing.
+- Update VST3 support manual titles and license-only sections in Italian and English; regenerate PDFs retaining cover artwork.
+
 ## 0.3.0-r11
 
 - Added opt-in isolated VST3 IComponent lifecycle diagnostic (--lifecycle CID): initialize with null host context, terminate only after successful initialization, always release.

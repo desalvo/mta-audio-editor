@@ -1,8 +1,8 @@
-# VST3 Support — User Guide
+# VST3 Support Manual
 
-Features, limitations and licensing
+VST3 support for MTA Audio Editor
 
-**MTA Audio Editor 0.3.0-r11 — Early release**
+**MTA Audio Editor 0.3.0-r12 — Early release**
 
 ## Overview
 
@@ -32,7 +32,7 @@ The offline pipeline runs built-in inserts before enabled VST3 inserts. If a bui
 
 The C++20 factory probe checks GetPluginFactory and, when built against the Steinberg SDK, can inspect class names and categories. It runs out of process with a timeout. Every VST3 executes third-party native code; install only trusted plugins. The probe does NOT provide live audio hosting.
 
-## Limitations in 0.3.0-r11
+## Limitations in 0.3.0-r12
 
 Not yet supported: original VST3 editor windows, SDK-based low-latency realtime processing, MIDI events, VST3 automation, plugin delay compensation, and Master-channel VST3 processing. Use built-in inserts for unsupported scenarios. Discovery alone is not evidence of compatibility.
 
@@ -42,12 +42,14 @@ Plugin missing: verify scan paths and architecture. Render errors: verify plugin
 
 ## Licenses and redistribution
 
-Recent Steinberg VST3 SDK releases use MIT; third-party plugin licenses are separate. Redistributing Pedalboard in a native bundle can trigger GPLv3 compliance obligations. Consult THIRD_PARTY_NOTICES.md and included notices. Do not redistribute third-party plugins without authorization. Static checks do not replace a complete license review.
-
-
+- MTA Audio Editor: EUPL-1.2.
+- Steinberg VST3 SDK (MIT-licensed releases): MIT.
+- Pedalboard (optional VST3 backend): GPL-3.0.
 
 ### r10: isolated instance creation
 With the independently installed VST3 SDK, run `mta_vst3_probe /path/to/module --instantiate <32-hex-CID>` in the diagnostic subprocess. The component is released immediately; this does not initialize the plugin, process audio or enable realtime hosting.
 
 ### r11: isolated lifecycle diagnostic
 `mta_vst3_probe /path/to/module --lifecycle <32-hex-CID>` tries initialization with a null host context and termination only after successful initialization. Some plugins will reject this context. This does not activate audio, GUI, MIDI, or realtime playback.
+### r12: VST3 bus diagnostic
+After successful initialization, the isolated probe enumerates audio and event buses, direction, and channel counts without processing audio or activating the plugin.

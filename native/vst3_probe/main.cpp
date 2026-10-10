@@ -79,6 +79,9 @@ int main(int argc, char** argv) {
   bool found = false;
   bool initialized = false;
   bool terminated = false;
+  std::ostringstream busDetails;
+  busDetails << "[";
+  int reportedBuses = 0;
   if (instantiate) {
     const std::string wanted = argv[3];
     if (wanted.size() != 32 || !std::all_of(wanted.begin(), wanted.end(), [](unsigned char c) {
@@ -107,13 +110,33 @@ int main(int argc, char** argv) {
           // Some plugins require a real IHostApplication and will correctly refuse.
           const auto initResult = component->initialize(nullptr);
           initialized = (initResult == Steinberg::kResultOk);
-          if (initialized) terminated = (component->terminate() == Steinberg::kResultOk);
+          if (initialized) {
+            // Read-only bus inspection in the isolated probe, before terminate().
+            for (const auto media : {Steinberg::Vst::kAudio, Steinberg::Vst::kEvent}) {
+              for (const auto direction : {Steinberg::Vst::kInput, Steinberg::Vst::kOutput}) {
+                const auto count = component->getBusCount(media, direction);
+                if (count < 0 || count > 256) continue;  // Do not trust third-party metadata.
+                for (Steinberg::int32 index = 0; index < count && reportedBuses < 1024; ++index) {
+                  Steinberg::Vst::BusInfo info{};
+                  if (component->getBusInfo(media, direction, index, info) != Steinberg::kResultOk) continue;
+                  if (reportedBuses++) busDetails << ",";
+                  // Avoid logging untrusted UTF-16 bus names until a bounded conversion is available.
+                  busDetails << "{\"media\":\"" << (media == Steinberg::Vst::kAudio ? "audio" : "event")
+                             << "\",\"direction\":\"" << (direction == Steinberg::Vst::kInput ? "input" : "output")
+                             << "\",\"index\":" << index << ",\"channels\":" << info.channelCount
+                             << ",\"bus_type\":" << info.busType << "}";
+                }
+              }
+            }
+            terminated = (component->terminate() == Steinberg::kResultOk);
+          }
         }
       }
       if (component) component->release();
       break;
     }
   }
+  busDetails << "]";
   pluginFactory->release();
   std::cout << "{\"factory_export\":true,\"factory_classes\":" << classCount
             << ",\"classes\":" << classes.str()
@@ -123,7 +146,7 @@ int main(int argc, char** argv) {
             << ",\"lifecycle_requested\":" << (lifecycle ? "true" : "false")
             << ",\"instance_initialized\":" << (initialized ? "true" : "false")
             << ",\"instance_terminated\":" << (terminated ? "true" : "false")
-            << ",\"native_host_ready\":false}\n";
+            << ",\"buses\":" << busDetails.str() << ",\"native_host_ready\":false}\n";
 #else
   if (instantiate) { std::cerr << "Instance creation requires MTA_VST3_SDK_ROOT\n"; return 8; }
   // Without the SDK the export can be checked but no Steinberg interfaces are invoked.
