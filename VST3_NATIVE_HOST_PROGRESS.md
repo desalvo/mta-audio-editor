@@ -1,3 +1,6 @@
+## r37 — Standalone WAV command-line interface
+Run `python -m native.vst3_probe.render_wav_cli SOURCE DEST --probe EXE --insert VST3_PATH CID`. Repeat `--insert` for chains. Outputs a JSON summary, exits nonzero on errors. Supports 48 kHz mono/stereo integer PCM16/24/32 within 1,048,576 frames. No realtime integration.
+
 ## r33 — variable length mono/stereo PCM
 The native `--render-pcm CID input output channels` supports 1 or 2 channel interleaved float32 at 48 kHz, 1..1048576 frames. The isolated Python adapter accepts flat mono or stereo tuples. No realtime use or latency correction.
 

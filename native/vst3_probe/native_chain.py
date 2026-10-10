@@ -34,6 +34,8 @@ def render_native_chain(audio: Sequence[float], plugins: Sequence[tuple[str, str
     Channels may be 1 (flat float samples) or 2 (sequence of stereo frames).
     This diagnostic API rejects MIDI and does not claim latency compensation.
     """
+    if not isinstance(timeout, (int, float)) or isinstance(timeout, bool) or not math.isfinite(timeout) or timeout <= 0:
+        raise ValueError('Timeout must be a positive finite number')
     if not 1 <= len(audio) <= MAX_FRAMES or not 1 <= len(plugins) <= MAX_INSERTS:
         raise ValueError('Expected 1..1048576 frames and 1..8 VST3 inserts')
     channels = 2 if isinstance(audio[0], (tuple, list)) else 1
@@ -123,6 +125,10 @@ def render_native_wav(source: str | Path, destination: str | Path,
     Supports 48 kHz, mono/stereo, integer PCM16/24/32. The WAV standard
     IEEE-float format is intentionally not accepted by Python wave.
     """
+    if not 1 <= len(plugins) <= MAX_INSERTS:
+        raise ValueError('Expected 1..8 VST3 inserts')
+    if not isinstance(timeout, (int, float)) or isinstance(timeout, bool) or not math.isfinite(timeout) or timeout <= 0:
+        raise ValueError('Timeout must be a positive finite number')
     source_path = Path(source).resolve(strict=True)
     destination_path = Path(destination).resolve()
     if source_path == destination_path:

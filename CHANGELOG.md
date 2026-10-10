@@ -1,3 +1,7 @@
+## 0.3.0-r37 — VST3 WAV CLI and input validation
+- Added opt-in WAV CLI for native isolated insert chains with machine-readable JSON results.
+- Reject invalid timeouts and empty chains before launching plugins; preserve atomic exports.
+
 ## 0.3.0-r36 — Ruff CI fix and high-resolution offline VST3 WAV export
 
 - Fix unused `Path` import in `tests/test_r35_native_wav.py`, the GitHub Actions Ruff F401 failure.

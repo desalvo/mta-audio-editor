@@ -1,3 +1,6 @@
+## 0.3.0-r37
+New experimental `python -m native.vst3_probe.render_wav_cli SOURCE DEST --probe EXE --insert VST3_PATH CID` interface for offline VST3 WAV rendering. Invalid timeouts and empty insert chains now fail before execution. Realtime remains disabled.
+
 ## 0.3.0-r36 — Ruff CI fix and high-resolution offline VST3 WAV export
 
 - Fix unused `Path` import in `tests/test_r35_native_wav.py`, the GitHub Actions Ruff F401 failure.
