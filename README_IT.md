@@ -1,3 +1,11 @@
+## r141–r150 — Bounded worker event dispatch (experimental)
+
+Added `native/audio_core/vst3_event_dispatch.hpp`: epoch/sequence gating, bounded MIDI and parameter dispatch, atomic prevalidation, preserved sample offsets, failure counters, lifecycle reset, and deterministic sequence consumption. The worker adapter is not yet wired to Steinberg SDK processing or production playback. `native_host_ready=false`.
+
+r122 experimental native C ABI to real VST3 IPC acceptance is available for tests only. Production playback remains unchanged; `native_host_ready=false`.
+
+Experimental r121 native audio core C ABI available; VST3 realtime host remains disabled (`native_host_ready=false`).
+
 ### r70 — Experimental interactive VST3 offline worker
 
 `native/vst3_probe/stream_worker.py` implements `NativeVST3Worker` (persistent IPC
@@ -459,3 +467,13 @@ Separazione multi-cantante SAM Audio (sperimentale): consultare [SINGER_SEPARATI
 - [Manuale VST3 (italiano, PDF)](app/docs/MTA-Audio-Editor-VST3-Manual-IT.pdf)
 - [VST3 Guide (English, Markdown)](docs/VST3_USER_GUIDE_EN.md)
 - [Guida VST3 (italiano, Markdown)](docs/VST3_USER_GUIDE_IT.md)
+
+
+Revision r127: public experimental VST3 C ABI and strict fixed PCM quantum validation; native_host_ready=false.
+
+
+### 0.3.0-r130: experimental native parallel dry/wet latency alignment
+New native/audio_core/vst3_parallel_mix.hpp aligns dry PCM to plugin-declared latency, supports wet/dry mix and fault-driven latency-aligned dry output; tested in C++20. Experimental isolated primitive, NOT connected to production playback. native_host_ready remains false.
+
+
+VST3 r152: worker event/audio shape mismatches and excessive stale-event backlogs now fail closed; playback native host remains disabled.

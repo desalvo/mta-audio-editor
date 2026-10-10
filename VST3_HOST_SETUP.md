@@ -1,3 +1,7 @@
+r122 experimental native C ABI to real VST3 IPC acceptance is available for tests only. Production playback remains unchanged; `native_host_ready=false`.
+
+Experimental r121 native audio core C ABI available; VST3 realtime host remains disabled (`native_host_ready=false`).
+
 ### r70 — Experimental interactive VST3 offline worker
 
 `native/vst3_probe/stream_worker.py` implements `NativeVST3Worker` (persistent IPC

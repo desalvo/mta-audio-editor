@@ -1,3 +1,71 @@
+## 0.3.0-r152 — safe event/audio dispatch
+
+Reject exact-sequence event packets with mismatched audio frame counts and fail closed on bounded stale-event scan exhaustion. Preserve the r121–r151 cumulative work. `native_host_ready=false`; live SDK and playback integration still pending.
+
+## r151 — Experimental PCM/event worker synchronization
+
+Worker-side `Vst3EventAudioPump` pairs native PCM blocks and bounded MIDI/automation event packets using epoch, sequence and frame count. Empty event blocks remain playable, failed delivery fails closed, and non-finite processor output is rejected. This is a test-only bridge: no Steinberg SDK MIDI queue or production playback connection is claimed; `native_host_ready=false`.
+
+## r141–r150 — Bounded worker event dispatch (experimental)
+
+Added `native/audio_core/vst3_event_dispatch.hpp`: epoch/sequence gating, bounded MIDI and parameter dispatch, atomic prevalidation, preserved sample offsets, failure counters, lifecycle reset, and deterministic sequence consumption. The worker adapter is not yet wired to Steinberg SDK processing or production playback. `native_host_ready=false`.
+
+## 0.3.0-r140 — five native functional cycles (r136–r140)
+
+- r136: worker processor exceptions contained; no worker-thread termination from plugin adapter exceptions.
+- r137: reject non-finite worker PCM before returning a processed block.
+- r138: add allocation-free bounded SPSC transport for prepared MIDI and automation event packets.
+- r139: detect and discard stale transport epochs; preserve future events with bounded scans.
+- r140: stress test 20,000 event packets across producer and consumer threads and dry fallback.
+
+**Experimental only:** events are NOT yet mapped to Steinberg SDK VST3 event/parameter queues; playback integration and multiplaform stress are pending; `native_host_ready=false`.
+
+## 0.3.0-r129 — Native PCM latency alignment reference (experimental)
+
+- Implement preallocated C++ frame-accurate PCM delay-line supporting mono/stereo, irregular block sizes, in-place processing and reset on seek.
+- Add C++20 regression tests for delay alignment and invalid sample rejection.
+- This is an isolated reference component: it is not yet wired into live playback and does not account for reported VST3 plugin latency dynamically.
+- `native_host_ready=false` remains mandatory until end-to-end playback, MIDI/automation and all platform tests pass.
+
+## 0.3.0-r128 — worker stability hardening (experimental)
+
+- Clear worker output buffers before every processing call to avoid stale PCM leaking from incomplete writers.
+- Add deterministic native stress tests for failure, restart isolation, underruns and repeated lifecycle.
+- native_host_ready remains false; production host integration and platform validation are still required.
+
+
+## 0.3.0-r127 — Native public C ABI and exact-quantum enforcement
+
+- Added `native/audio_core/vst3_runtime_api.h`, a usable C/C++ v2 ABI including thread-affinity and lifetime contracts.
+- Native playout rejects mismatched negotiated frame/channel quantum, zeroing the caller-sized output when safe.
+- Regression coverage for C clients, C++ ABI, mismatch and lifecycle.
+- VST3 playback in the production engine and full native host readiness remain disabled.
+
+## r126 native ABI v2
+
+Expose immutable C ABI quantum/lookahead negotiation and callback-affine performance counters. The telemetry method is not safe for concurrent UI/control polling. Production playback remains disconnected; native_host_ready=false.
+
+## 0.3.0-r125 — Native PCM input validation and stopped-runtime isolation
+
+- Reject non-finite PCM on native callback before queuing; clear output deterministically.
+- Do not playout stale queued results from faulted/stopped/unstarted runtime; return explicit native API error and silence.
+- Compiled C++20 regression tests for input validation and native API lifecycle.
+- Experimental only: `native_host_ready=false`; full playback integration, latency compensation, MIDI automation, and multiplatform stress tests remain unverified.
+
+## 0.3.0-r124 — Bounded callback result polling
+
+- Hard limit of eight result-queue pops per callback to protect the deadline from stale IPC responses.
+- Expose poll-budget exhaustion in native playout diagnostics; compiled C++ regression.
+- Experimental only: `native_host_ready=false`, no production callback integration.
+
+## r122: C ABI → persistent Steinberg VST3 IPC acceptance
+
+The experimental native PCM ABI now has a Python control/test harness connecting the C worker thread to the actual isolated VST3 subprocess. CI exercises ADelay mono/stereo via this chain. This is not integrated with the DAW audio callback, and MIDI/automation/latency recovery are not production qualified. `native_host_ready=false`.
+
+## r121: Experimental native runtime C ABI (not ready)
+
+`native/audio_core/vst3_runtime_api.cpp` provides a control-plane create/start/stop/destroy API and a callback-side no-wait PCM exchange. A native shared-library integration test exercises lifecycle and frame safety. This API has **not** been bound to the Steinberg VST3 IPC subprocess or the production playback callback. `native_host_ready=false` remains enforced.
+
 ## 0.3.0-r120 — cumulative r101–r120 native readiness gate
 
 This release includes every uncommitted change from r65 through r100. Twenty distinct control-plane validations (quantum, channel shape, sample rate, queue sizing, lookahead, worker scheduling, quiescence, IPC handshake/version, plugin lifecycle, processing, latency, crash recovery, MIDI, automation, platforms and realtime stress) are explicitly checked in native C++ and exercised by parameterized compiled tests. Existing worker runtime now refuses an unsafe restart that could replay stale queue data. **These are acceptance checks, not proof they are all satisfied by MTA's production engine.** The actual realtime host remains disabled: `native_host_ready=false`. End-to-end IPC binding to the native callback, measured latency compensation and multi-platform tests remain open. No claim of production readiness.
@@ -158,3 +226,16 @@ Expanded the isolated VST3 diagnostic to 128 consecutive 512-sample blocks at 48
 The isolated native probe now passes an end-to-end smoke test using the official Steinberg ADelay sample plugin: 16 consecutive 512-sample offline blocks at 48 kHz, deterministic 440 Hz audio input, successful lifecycle and clean teardown, with no nonfinite output. The sample is built by CI from an external MIT-licensed SDK checkout and is not distributed with the application.
 
 This is **not** the threshold for realtime integration yet. Outstanding gate items: nonzero expected output verification with controlled plugin parameters; MIDI/event-list and parameter-change queues; dynamic bus topology and channel mapping, transport/process context, latency and tail compensation, sustained performance and RT allocation audits, plugin crash recovery, and Windows/macOS/ARM64 end-to-end tests. `native_host_ready=false`; existing audio playback remains unchanged.
+
+
+### 0.3.0-r130: experimental native parallel dry/wet latency alignment
+New native/audio_core/vst3_parallel_mix.hpp aligns dry PCM to plugin-declared latency, supports wet/dry mix and fault-driven latency-aligned dry output; tested in C++20. Experimental isolated primitive, NOT connected to production playback. native_host_ready remains false.
+
+
+### 0.3.0-r131–r135: five native functional preparation cycles
+- r131: optional strict negotiated PCM quantum/channel validation on experimental SPSC playout callback.
+- r132: coverage for deterministic latency-aligned dry fallback during wet timeout.
+- r133: composed IPC lookahead + plugin algorithmic latency budget and per-path alignment decisions.
+- r134: bounded sample-offset MIDI and automation packets with epoch/sequence validation (worker preparation only).
+- r135: bounded exponential restart policy for control thread, with long-run dry callback regression.
+All remain experimental isolated prerequisites; production playback, actual VST3 MIDI/automation forwarding, full fault restart orchestration and platform acceptance are not implemented. native_host_ready=false.

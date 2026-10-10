@@ -7,6 +7,7 @@
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
+#include <cmath>
 #include <memory>
 #include <new>
 #include <optional>
@@ -18,14 +19,17 @@ struct PlayoutStats {
   std::uint64_t processed = 0;
   std::uint64_t bypassed = 0;
   std::uint64_t late = 0;
+  std::uint64_t poll_budget_exhausted = 0;
 };
 
 class Vst3PlayoutBridge final {
 public:
-  Vst3PlayoutBridge(std::size_t queue_blocks, std::size_t lookahead) noexcept
+  Vst3PlayoutBridge(std::size_t queue_blocks, std::size_t lookahead,
+                    std::size_t quantum_frames=0, std::size_t channels=0) noexcept
       : incoming_(queue_blocks), outgoing_(queue_blocks),
         lookahead_(lookahead >= 1 && lookahead < queue_blocks ? lookahead : 0),
-        dry_(lookahead_ ? new (std::nothrow) AudioBlock[lookahead_ + 1] : nullptr) {}
+        dry_(lookahead_ ? new (std::nothrow) AudioBlock[lookahead_ + 1] : nullptr),
+        quantum_frames_(quantum_frames), negotiated_channels_(channels) {}
   bool valid() const noexcept { return incoming_.valid() && outgoing_.valid() && dry_ != nullptr; }
   // Called exclusively by audio callback. Output is delayed by lookahead blocks.
   // Before the pipeline is primed, outputs silence. On underrun use matched dry.
@@ -34,7 +38,20 @@ public:
                 std::size_t channels) noexcept {
     if (!valid() || !input || !output || !frames || frames > kMaxBlockFrames ||
         (channels != 1 && channels != 2)) return false;
+    if ((quantum_frames_ && frames != quantum_frames_) ||
+        (negotiated_channels_ && channels != negotiated_channels_)) {
+      std::fill_n(output, frames * channels, 0.0f);
+      return false;
+    }
     const auto count = frames * channels;
+    // Invalid source samples must never enter the plugin or dry fallback.
+    // Validation performs bounded work (<= 1024 samples), no allocations.
+    for (std::size_t i = 0; i < count; ++i) {
+      if (!std::isfinite(input[i])) {
+        std::fill_n(output, count, 0.0f);
+        return false;
+      }
+    }
     const auto sequence = next_++;
     auto& dry = dry_[sequence % (lookahead_ + 1)];
     dry.sequence = sequence;
@@ -64,8 +81,14 @@ public:
     } else if (future_ && future_->sequence <= wanted) {
       future_.reset(); ++stats_.late;
     }
-    while (!matched && !future_ && outgoing_.pop(result_sequence, scratch_.data(), scratch_.size(),
-                                                result_frames, result_channels)) {
+    // Hard upper bound on queue operations per callback invocation. A stalled
+    // worker can accumulate stale results; never let them extend audio deadline.
+    constexpr std::size_t kMaxResultPollsPerCallback = 8;
+    std::size_t result_polls = 0;
+    while (!matched && !future_ && result_polls < kMaxResultPollsPerCallback &&
+           outgoing_.pop(result_sequence, scratch_.data(), scratch_.size(),
+                         result_frames, result_channels)) {
+      ++result_polls;
       if (result_sequence < wanted) { ++stats_.late; continue; }
       if (result_sequence > wanted) {
         future_.emplace();
@@ -81,6 +104,8 @@ public:
         matched = true;
       }
     }
+    if (!matched && !future_ && result_polls == kMaxResultPollsPerCallback)
+      ++stats_.poll_budget_exhausted;
     // Variable-size callbacks cannot represent a delayed block of a different
     // shape in their output buffer. In that case emit silence instead of
     // writing beyond the caller-provided buffer. The native engine must
@@ -115,6 +140,7 @@ private:
   BlockSpsc outgoing_;
   const std::size_t lookahead_;
   std::unique_ptr<AudioBlock[]> dry_;
+  const std::size_t quantum_frames_, negotiated_channels_;
   std::uint64_t next_ = 0;
   PlayoutStats stats_{};
   std::array<float, kMaxBlockFrames * kMaxBlockChannels> scratch_{};

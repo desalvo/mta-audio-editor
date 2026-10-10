@@ -1,6 +1,7 @@
 // Offline / worker-thread-only adapter. Never call pump_once on the audio callback.
 #pragma once
 #include "vst3_playout_bridge.hpp"
+#include <algorithm>
 #include <array>
 #include <cstddef>
 #include <cstdint>
@@ -12,6 +13,7 @@ struct WorkerPumpStats {
   std::uint64_t handled = 0;
   std::uint64_t processing_failures = 0;
   std::uint64_t output_overruns = 0;
+  std::uint64_t processor_exceptions = 0;
 };
 
 class Vst3WorkerPump final {
@@ -25,10 +27,19 @@ public:
     std::size_t frames = 0, channels = 0;
     if (!bridge_.worker_take(sequence, input_.data(), input_.size(), frames, channels))
       return false;
-    if (!process(input_.data(), output_.data(), frames, channels)) {
+    // Never let unwritten samples from a previous block leak into a new result.
+    // The processor contract requires a complete output block; clearing also
+    // makes a partially writing faulty processor fail safely as silence.
+    std::fill_n(output_.data(), frames * channels, 0.0f);
+    // r136: plugin adapter exceptions must never escape and kill the worker loop.
+    bool success = false;
+    try { success = static_cast<bool>(process(input_.data(), output_.data(), frames, channels)); }
+    catch (...) { ++stats_.processor_exceptions; }
+    if (!success) {
       ++stats_.processing_failures;
       return true; // the audio callback will use its delayed dry fallback
     }
+    // r137: all returned samples must be finite before they enter the output queue.
     for (std::size_t i = 0; i < frames * channels; ++i) {
       if (!std::isfinite(output_[i])) {
         ++stats_.processing_failures;
