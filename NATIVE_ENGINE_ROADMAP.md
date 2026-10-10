@@ -1,3 +1,6 @@
+## r33 variable-length stereo offline rendering
+The opt-in isolated native adapter accepts 1–1,048,576 mono or stereo frames, 48 kHz interleaved float32, retaining VST3 processor state across all 512-sample blocks and processing the final partial block. Each insert executes in a separate subprocess. This is not a realtime playback interface; MIDI and automation routing, plugin latency alignment and extended format negotiation are not yet integrated with this chain.
+
 # Native host status / Stato host nativo
 
 The r300 audio_core is a separate tested C++20 PCM meter, **not a VST3 host**.

@@ -1,3 +1,6 @@
+## r33 variable-length stereo offline rendering
+The opt-in isolated native adapter accepts 1–1,048,576 mono or stereo frames, 48 kHz interleaved float32, retaining VST3 processor state across all 512-sample blocks and processing the final partial block. Each insert executes in a separate subprocess. This is not a realtime playback interface; MIDI and automation routing, plugin latency alignment and extended format negotiation are not yet integrated with this chain.
+
 ## r32: experimental native PCM serial-insert rendering
 
 The separately built C++20 probe can render precisely 65536 mono 32-bit floating-point samples at 48 kHz through a Steinberg-SDK-backed plugin. The Python `native/vst3_probe/native_chain.py` adapter serializes each insert to a separate bounded subprocess and passes its output PCM to the next. Plugin modules must be installed under an allow-listed `MTA_VST3_PATHS` directory; the SDK itself is not bundled.

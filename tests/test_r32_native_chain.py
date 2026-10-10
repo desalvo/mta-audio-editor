@@ -2,25 +2,25 @@
 import math
 from pathlib import Path
 import pytest
-from native.vst3_probe.native_chain import FRAMES, NativeChainError, render_native_chain
+from native.vst3_probe.native_chain import MAX_FRAMES, NativeChainError, render_native_chain
 
 
 def test_chain_rejects_invalid_buffers_before_any_plugin_load(tmp_path):
     exe = tmp_path / 'probe'
     exe.write_bytes(b'fake')
-    with pytest.raises(ValueError, match='65536'):
-        render_native_chain([0.0], [('x.vst3', 'f'*32)], str(exe))
+    with pytest.raises(ValueError, match='1048576'):
+        render_native_chain([], [('x.vst3', 'f'*32)], str(exe))
     with pytest.raises(ValueError, match='PCM'):
-        render_native_chain([0.0]*(FRAMES-1)+[math.nan], [('x.vst3', 'f'*32)], str(exe))
+        render_native_chain([0.0]*(1023)+[math.nan], [('x.vst3', 'f'*32)], str(exe))
     with pytest.raises(ValueError, match='1..8'):
-        render_native_chain([0.0]*FRAMES, [], str(exe))
+        render_native_chain([0.0]*1024, [], str(exe))
     with pytest.raises(ValueError, match='CID'):
-        render_native_chain([0.0]*FRAMES, [('bad.vst3', 'xyz')], str(exe))
+        render_native_chain([0.0]*1024, [('bad.vst3', 'xyz')], str(exe))
 
 
 def test_sdk_pcm_transport_exists_and_fail_closed():
     src = (Path(__file__).parents[1]/'native/vst3_probe/main.cpp').read_text()
-    for marker in ('--render-pcm', 'kPcmFrames * sizeof(float)', 'pcmInput', 'pcmOutput',
+    for marker in ('--render-pcm', 'pcmFrames * pcmChannels * sizeof(float)', 'pcmInput', 'pcmOutput',
                    'offlineProcessSucceeded', 'offlineNonFiniteSamples'):
         assert marker in src
 

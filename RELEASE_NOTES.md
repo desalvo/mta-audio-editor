@@ -1,3 +1,6 @@
+## 0.3.0-r33
+Native offline VST3 PCM multi-block rendering supports variable-length mono/stereo with bounded buffers, partial last blocks and per-insert subprocesses. Not realtime-ready; no full MIDI/automation routing or latency compensation in native chain.
+
 ## 0.3.0-r32
 Real VST3 offline serial PCM adapter, bounded mono 48k/512x128 sample buffers and fail-closed subprocess handling. Does not enable realtime playback, generalized latency compensation or VST3 stereo/MIDI chains.
 

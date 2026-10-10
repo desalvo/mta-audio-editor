@@ -1,3 +1,7 @@
+## 0.3.0-r33
+- Native SDK VST3 offline PCM rendering now accepts bounded variable-length mono/stereo float32 interleaved buffers (up to 1048576 frames), with the same plugin instance across processing blocks.
+- Strict PCM frame/channel validation and partial final-block handling. No realtime use.
+
 ## 0.3.0-r32
 - Added opt-in real VST3 mono float32 offline PCM transport, 65536-frame subprocess processing, and bounded multi-plugin serial adapter.
 - No realtime integration: plugin process isolation per insert; MIDI, stereo and latency-compensated native chains not yet supported.

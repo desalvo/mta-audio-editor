@@ -1,3 +1,6 @@
+## r33 — variable length mono/stereo PCM
+The native `--render-pcm CID input output channels` supports 1 or 2 channel interleaved float32 at 48 kHz, 1..1048576 frames. The isolated Python adapter accepts flat mono or stereo tuples. No realtime use or latency correction.
+
 ## r32 — isolated native PCM chain
 The C++ probe supports `--render-pcm <CID> <input.f32le> <output.f32le>` with exactly 65536 mono float32 frames. `native_chain.render_native_chain` serializes plugin processing in distinct subprocesses. No realtime use; no generalized MIDI, stereo or latency compensation.
 
