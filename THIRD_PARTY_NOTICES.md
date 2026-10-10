@@ -34,3 +34,25 @@ https://github.com/shojha24/ChordFormer-Artificial-Dataset-Benchmarking
 ChordFormer is derived from the MIT-licensed Large-Vocabulary Chord Recognition implementation at:
 https://github.com/music-x-lab/ISMIR2019-Large-Vocabulary-Chord-Recognition
 The ChordFormer repository/checkpoints are not redistributed in the MTA source ZIP; review upstream attribution/license terms before redistribution.
+
+## Steinberg VST3 SDK and external plugins
+The native probe uses standard operating-system module loading and does not
+redistribute the Steinberg SDK. Future Steinberg VST3 SDK (version >=3.8)
+components, if incorporated, must retain their upstream MIT copyright and
+permission notices. Older VST3 SDK releases can have different license terms.
+VST3 plugins from third parties are not part of MTA's redistribution rights:
+users install and license them separately. Any binary shipped with an installer
+requires individual review and inclusion in the binary distribution manifest.
+
+## Pedalboard (optional VST3 offline engine)
+Pedalboard is optional and remains independently licensed under GPL-3.0,
+including relevant JUCE components. Do not assume EUPL-1.2 compatibility for
+all forms of combining binaries: the license and corresponding source obligations
+must be reviewed before bundling into native installers.
+
+## Distribution controls
+The source static gate in `scripts/license_gate.py` is a preventative check,
+not proof of legal compliance. Check resolved Python wheels, OS libraries,
+Android/iOS dependencies, model weights, FFmpeg configure flags and codecs,
+upstream licenses, source-offer obligations and complete notices for **every**
+shipped binary. An unknown license requires review before redistribution.

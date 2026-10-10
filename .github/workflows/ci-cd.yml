@@ -67,6 +67,8 @@ jobs:
           cache: pip
       - run: pip install -r requirements-dev.txt
       - run: pip check
+      - name: License redistribution guard
+        run: python scripts/license_gate.py
       - name: Bandit SAST
         run: bandit -q -r app native scripts/k8s-wizard.py -lll -iii
       - name: Python dependency audit
