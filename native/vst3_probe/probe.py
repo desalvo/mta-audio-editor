@@ -47,4 +47,7 @@ def probe_plugin(path: str, executable: str, timeout: float = 5) -> dict:
     if payload.get('factory_export') is not True:
         raise RuntimeError('VST3 factory export missing')
     return {'name': plugin.stem, 'factory_export': True,
-            'native_host_ready': False, 'binary': str(binary)}
+            'native_host_ready': False, 'binary': str(binary),
+            **({'factory_classes': payload['factory_classes']}
+               if isinstance(payload.get('factory_classes'), int) and not isinstance(payload.get('factory_classes'), bool)
+               and 0 <= payload['factory_classes'] <= 10000 else {})}

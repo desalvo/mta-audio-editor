@@ -1,3 +1,7 @@
+## 0.3.0-r7
+- Optional Steinberg SDK factory class-count probing in isolated native process; no change to default audio engine.
+- VST3 host implementation and licensing progress documentation.
+
 ## 0.3.0-r6
 
 - Compliance: archive scanner for source/release ZIP and TAR; rejects unreviewed bundled VST3/AU/AAX and traversal paths.
