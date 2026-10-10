@@ -1,3 +1,10 @@
+## 0.3.0-r27 — isolated VST3 musical transport context
+
+- Added a valid Steinberg ProcessContext during all 128 offline audio blocks, with 48 kHz, 120 BPM, 4/4, sample-accurate project position and continuous musical time. The context is confined to the diagnostic process and does not modify playback.
+- Added bounded Python validation of reported transport continuity and last project sample.
+- Added regressions for monotonic transport and mobile revision consistency.
+- **NOT realtime ready:** MIDI event queues, sample-accurate parameter automation, delay compensation, fault isolation and realtime allocation audits are still required. No production host switch has been enabled.
+
 ## 0.3.0-r26 — extended offline signal validation
 
 Expanded the isolated VST3 diagnostic to 128 consecutive 512-sample blocks at 48 kHz to exercise the one-second default Steinberg ADelay effect. Reports output energy and a derived non-silent flag. No realtime readiness claim: MIDI, parameter automation, latency alignment, bounded RT callbacks and platform validation remain outstanding.

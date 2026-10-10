@@ -13,6 +13,7 @@
 #include "pluginterfaces/vst/ivstaudioprocessor.h"
 #include "pluginterfaces/vst/ivsteditcontroller.h"
 #include "pluginterfaces/vst/ivsthostapplication.h"
+#include "pluginterfaces/vst/ivstprocesscontext.h"
 #include <cstring>
 #include <limits>
 #include <atomic>
@@ -162,6 +163,8 @@ int main(int argc, char** argv) {
   double offlineOutputEnergy = 0.0;
   double offlineOutputPeak = 0.0;
   bool offlineOutputAudible = false;
+  int64_t offlineLastProjectSample = -1;
+  bool offlineTransportContinuous = true;
   int latencySamples = -1;
   int tailSamples = -1;
   bool editController = false;
@@ -322,6 +325,18 @@ int main(int argc, char** argv) {
                       data.numOutputs = outCount;
                       data.inputs = inBuses.empty() ? nullptr : inBuses.data();
                       data.outputs = outBuses.empty() ? nullptr : outBuses.data();
+                      // A valid, deterministic musical transport is required by
+                      // tempo-synchronised processors. Never expose this to playback.
+                      Steinberg::Vst::ProcessContext transport{};
+                      transport.state = Steinberg::Vst::ProcessContext::kPlaying |
+                                        Steinberg::Vst::ProcessContext::kTempoValid |
+                                        Steinberg::Vst::ProcessContext::kTimeSigValid |
+                                        Steinberg::Vst::ProcessContext::kProjectTimeMusicValid;
+                      transport.sampleRate = 48000.0;
+                      transport.tempo = 120.0;
+                      transport.timeSigNumerator = 4;
+                      transport.timeSigDenominator = 4;
+                      data.processContext = &transport;
                       // Deterministic non-silent stimulus, 128 consecutive blocks. No
                       // file I/O or allocations take place between process calls.
                       // No events, automation or musical transport are supplied yet.
@@ -330,6 +345,12 @@ int main(int argc, char** argv) {
                       constexpr double kAmplitude = 0.125;
                       offlineProcessSucceeded = true;
                       for (int block = 0; block < kBlocks; ++block) {
+                        const auto projectSample = static_cast<Steinberg::int64>(block) * 512;
+                        if (offlineLastProjectSample >= 0 && projectSample != offlineLastProjectSample + 512)
+                          offlineTransportContinuous = false;
+                        transport.projectTimeSamples = projectSample;
+                        transport.projectTimeMusic = double(projectSample) * 120.0 / (60.0 * 48000.0);
+                        offlineLastProjectSample = projectSample;
                         for (auto& storage : inputStorage) {
                           if (processingSampleSize == 32) {
                             for (auto& channel : storage.samples32) {
@@ -446,6 +467,8 @@ int main(int argc, char** argv) {
             << ",\"offline_output_energy\":" << offlineOutputEnergy
             << ",\"offline_output_peak\":" << offlineOutputPeak
             << ",\"offline_output_audible\":" << (offlineOutputAudible ? "true" : "false")
+            << ",\"offline_transport_continuous\":" << (offline && offlineBlocksProcessed > 0 && offlineTransportContinuous ? "true" : "false")
+            << ",\"offline_last_project_sample\":" << offlineLastProjectSample
             << ",\"buses\":" << busDetails.str() << ",\"native_host_ready\":false}\n";
 #else
   if (instantiate) { std::cerr << "Instance creation requires MTA_VST3_SDK_ROOT\n"; return 8; }

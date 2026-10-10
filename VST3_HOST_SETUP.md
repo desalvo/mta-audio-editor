@@ -43,3 +43,6 @@ invariato. Il caricamento di binari esterni esegue codice di terze parti.
 
 ### r22: SDK checkout validation
 GitHub-generated VST3 SDK ZIP archives omit Git submodule sources. Use `git clone --recursive https://github.com/steinbergmedia/vst3sdk.git` and `git submodule update --init --recursive` before configuring `-DMTA_VST3_SDK_ROOT=...`. The CMake configuration now rejects incomplete SDK trees.
+
+### r27 transport context
+The isolated offline diagnostic now supplies deterministic musical transport (120 BPM, 4/4), with sample position and musical time advancing each block. This is diagnostic-only; it does not activate the VST3 host for realtime playback.
