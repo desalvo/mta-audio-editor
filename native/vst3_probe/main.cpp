@@ -81,10 +81,11 @@ static std::string class_cid(const Steinberg::TUID& id) {
 }
 #endif
 int main(int argc, char** argv) {
-  const bool lifecycle = argc == 4 && std::string(argv[2]) == "--lifecycle";
+  const bool configure = argc == 4 && std::string(argv[2]) == "--configure";
+  const bool lifecycle = argc == 4 && (std::string(argv[2]) == "--lifecycle" || configure);
   const bool instantiate = argc == 4 && (std::string(argv[2]) == "--instantiate" || lifecycle);
   if ((argc != 2 && !instantiate) || !std::filesystem::exists(argv[1]) || !std::filesystem::is_regular_file(argv[1])) {
-    std::cerr << "usage: mta_vst3_probe <VST3 module binary> [--instantiate|--lifecycle <32-hex-CID>]\n";return 2;
+    std::cerr << "usage: mta_vst3_probe <VST3 module binary> [--instantiate|--lifecycle|--configure <32-hex-CID>]\n";return 2;
   }
   // Validate user-controlled CID before loading any third-party binary.
   // This applies with and without the optional Steinberg SDK.
@@ -133,7 +134,7 @@ int main(int argc, char** argv) {
             << ",\"category\":" << json_quote(safeCategory) << "}";
   }
   classes << "]";
-  // Both modes are opt-in diagnostics. Never call setupProcessing(), setActive() or process().
+  // Explicit opt-in diagnostics. Only --configure may call setupProcessing().
   bool created = false;
   bool found = false;
   bool initialized = false;
@@ -143,6 +144,9 @@ int main(int argc, char** argv) {
   bool supports32Bit = false;
   bool supports64Bit = false;
   bool sampleSizeQueried = false;
+  bool processingSetupRequested = false;
+  bool processingSetupSucceeded = false;
+  int processingSampleSize = -1;
   int latencySamples = -1;
   int tailSamples = -1;
   bool editController = false;
@@ -203,6 +207,20 @@ int main(int argc, char** argv) {
               const auto reportedTail = processor->getTailSamples();
               // kInfiniteTail is a special SDK value; leave it unknown rather than overflow.
               if (reportedTail <= 10000000U) tailSamples = static_cast<int>(reportedTail);
+              // Explicit opt-in configuration diagnostic only. No audio thread,
+              // setActive(), setProcessing(), or process() is ever invoked here.
+              if (configure) {
+                processingSetupRequested = true;
+                if (supports32Bit || supports64Bit) {
+                  Steinberg::Vst::ProcessSetup setup{};
+                  setup.processMode = Steinberg::Vst::kRealtime;
+                  setup.symbolicSampleSize = supports32Bit ? Steinberg::Vst::kSample32 : Steinberg::Vst::kSample64;
+                  setup.maxSamplesPerBlock = 512;
+                  setup.sampleRate = 48000.0;
+                  processingSampleSize = supports32Bit ? 32 : 64;
+                  processingSetupSucceeded = processor->setupProcessing(setup) == Steinberg::kResultOk;
+                }
+              }
             }
             // Read-only bus inspection in the isolated probe, before terminate().
             for (const auto media : {Steinberg::Vst::kAudio, Steinberg::Vst::kEvent}) {
@@ -251,6 +269,11 @@ int main(int argc, char** argv) {
             << ",\"supports_64_bit\":" << (supports64Bit ? "true" : "false")
             << ",\"latency_samples\":" << latencySamples
             << ",\"tail_samples\":" << tailSamples
+            << ",\"processing_setup_requested\":" << (processingSetupRequested ? "true" : "false")
+            << ",\"processing_setup_succeeded\":" << (processingSetupSucceeded ? "true" : "false")
+            << ",\"processing_sample_rate\":" << (processingSetupRequested ? 48000 : 0)
+            << ",\"processing_block_size\":" << (processingSetupRequested ? 512 : 0)
+            << ",\"processing_sample_size\":" << processingSampleSize
             << ",\"buses\":" << busDetails.str() << ",\"native_host_ready\":false}\n";
 #else
   if (instantiate) { std::cerr << "Instance creation requires MTA_VST3_SDK_ROOT\n"; return 8; }

@@ -1,3 +1,10 @@
+## 0.3.0-r21 (2026-10-10)
+
+- Add explicit isolated VST3 `--configure` diagnostic: test processor setup at 48 kHz / 512 samples using a supported 32/64-bit format, without activation or processing.
+- Return validated processing setup metadata to the Python probe; keep `native_host_ready=false` and production playback unchanged.
+- Add tests for CLI safety, opt-in configuration, and mobile version consistency.
+- The SDK-specific code path still requires compile/runtime validation against the Steinberg VST3 SDK and real plugins.
+
 # VST3 insert hosting / Hosting insert VST3
 
 ## English

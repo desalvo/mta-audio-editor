@@ -34,7 +34,9 @@ def resolve_module_binary(bundle: Path) -> Path:
 
 def probe_plugin(path: str, executable: str, timeout: float = 5,
                  instantiate_cid: str | None = None,
-                 lifecycle: bool = False) -> dict:
+                 lifecycle: bool = False, configure: bool = False) -> dict:
+    if configure:
+        lifecycle = True
     if lifecycle and instantiate_cid is None:
         raise ValueError('Lifecycle diagnostic requires an explicit class CID')
     plugin = validate_plugin_path(path)
@@ -49,7 +51,8 @@ def probe_plugin(path: str, executable: str, timeout: float = 5,
             raise ValueError('Expected a 32-character hexadecimal VST3 class CID')
     command = [str(probe), str(binary)]
     if instantiate_cid is not None:
-        command.extend(['--lifecycle' if lifecycle else '--instantiate', instantiate_cid.lower()])
+        command.extend(['--configure' if configure else '--lifecycle' if lifecycle else '--instantiate',
+                        instantiate_cid.lower()])
     result = subprocess.run(command, text=True, capture_output=True,
                             timeout=min(max(float(timeout), 0.5), 15), check=False)
     if result.returncode:
@@ -107,6 +110,13 @@ def probe_plugin(path: str, executable: str, timeout: float = 5,
             'host_context_provided': payload.get('host_context_provided') is True if lifecycle else False,
             'instance_initialized': payload.get('instance_initialized') is True if lifecycle else False,
             'instance_terminated': payload.get('instance_terminated') is True if lifecycle else False,
+            'processing_setup_requested': payload.get('processing_setup_requested') is True if configure else False,
+            'processing_setup_succeeded': payload.get('processing_setup_succeeded') is True if configure else False,
+            'processing_sample_rate': 48000 if configure and payload.get('processing_sample_rate') == 48000 else None,
+            'processing_block_size': 512 if configure and payload.get('processing_block_size') == 512 else None,
+            'processing_sample_size': (payload.get('processing_sample_size') if configure and
+                                       type(payload.get('processing_sample_size')) is int and
+                                       payload['processing_sample_size'] in (32, 64) else None),
             'native_host_ready': False,
             'audio_processor_queried': payload.get('audio_processor_queried') is True if instantiate_cid else False,
             'audio_processor_available': payload.get('audio_processor_available') is True if instantiate_cid else False,
