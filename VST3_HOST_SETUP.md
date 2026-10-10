@@ -1,3 +1,9 @@
+## 0.3.0-r40 — VST3 batch WAV preflight
+- Add `--dry-run` to the isolated VST3 WAV batch CLI, validating all source WAV formats, sizes, directory targets and collisions before launching plugins.
+- Produce machine-readable `ready` reports with bit depth, channel count and frame count; do not create or overwrite outputs during preflight.
+- Add functional tests for normal batch rendering, invalid sample rates, missing output directories and CLI behavior.
+- Native VST3 worker persistence and realtime audio activation remain explicitly unsupported.
+
 ## r33 variable-length stereo offline rendering
 The opt-in isolated native adapter accepts 1–1,048,576 mono or stereo frames, 48 kHz interleaved float32, retaining VST3 processor state across all 512-sample blocks and processing the final partial block. Each insert executes in a separate subprocess. This is not a realtime playback interface; MIDI and automation routing, plugin latency alignment and extended format negotiation are not yet integrated with this chain.
 

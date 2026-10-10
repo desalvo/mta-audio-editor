@@ -8,14 +8,14 @@ from pathlib import Path
 import sys
 import wave
 
-from .native_chain import MAX_INSERTS, NativeChainError, render_native_wav
+from .native_chain import MAX_FRAMES, MAX_INSERTS, NativeChainError, render_native_wav
 
 MAX_JOBS = 128
 MAX_MANIFEST_BYTES = 256 * 1024
 
 
 def run_batch(manifest: Path, executable: str, *, timeout: float = 15.0,
-              stop_on_error: bool = False) -> dict:
+              stop_on_error: bool = False, dry_run: bool = False) -> dict:
     """Run validated exports. Each destination is atomically published separately."""
     if not isinstance(timeout, (int, float)) or isinstance(timeout, bool) or not math.isfinite(timeout) or timeout <= 0:
         raise ValueError("Timeout must be positive and finite")
@@ -52,6 +52,25 @@ def run_batch(manifest: Path, executable: str, *, timeout: float = 15.0,
         planned.append((src, dest, [(pair[0], pair[1]) for pair in plugins]))
     if any(source in destinations for source, _, _ in planned):
         raise ValueError("A batch output may not overwrite any batch input")
+    if dry_run:
+        checks = []
+        for index, (source, destination, plugins) in enumerate(planned):
+            with wave.open(str(source), 'rb') as wav:
+                channels, frames, width = wav.getnchannels(), wav.getnframes(), wav.getsampwidth()
+                if (wav.getcomptype() != 'NONE' or channels not in (1, 2) or
+                    width not in (2, 3, 4) or wav.getframerate() != 48000 or
+                    not 1 <= frames <= MAX_FRAMES):
+                    raise ValueError(f'Unsupported WAV format in job {index}')
+                if len(wav.readframes(frames)) != frames * channels * width:
+                    raise ValueError(f'Truncated WAV in job {index}')
+            if not destination.parent.is_dir():
+                raise ValueError(f'Output folder does not exist in job {index}')
+            checks.append({'index': index, 'status': 'ready', 'source': str(source),
+                           'destination': str(destination), 'frames': frames,
+                           'channels': channels, 'bit_depth': width * 8,
+                           'inserts': len(plugins)})
+        return {'status': 'ready', 'requested': len(planned), 'processed': 0,
+                'results': checks}
     results = []
     for index, (source, destination, plugins) in enumerate(planned):
         try:
@@ -75,15 +94,16 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument('--probe', required=True)
     parser.add_argument('--timeout', type=float, default=15.0)
     parser.add_argument('--stop-on-error', action='store_true')
+    parser.add_argument('--dry-run', action='store_true', help='Validate WAV inputs and output paths without launching plugins')
     args = parser.parse_args(argv)
     try:
         result = run_batch(args.manifest, args.probe, timeout=args.timeout,
-                           stop_on_error=args.stop_on_error)
+                           stop_on_error=args.stop_on_error, dry_run=args.dry_run)
     except (OSError, ValueError, UnicodeError, json.JSONDecodeError) as exc:
         print(json.dumps({"status": "invalid_manifest", "error": str(exc)[:512]}), file=sys.stderr)
         return 2
     print(json.dumps(result, sort_keys=True))
-    return 0 if result['status'] == 'ok' else 1
+    return 0 if result['status'] in ('ok', 'ready') else 1
 
 
 if __name__ == '__main__':

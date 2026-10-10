@@ -1,3 +1,9 @@
+## 0.3.0-r40 — VST3 batch WAV preflight
+- Add `--dry-run` to the isolated VST3 WAV batch CLI, validating all source WAV formats, sizes, directory targets and collisions before launching plugins.
+- Produce machine-readable `ready` reports with bit depth, channel count and frame count; do not create or overwrite outputs during preflight.
+- Add functional tests for normal batch rendering, invalid sample rates, missing output directories and CLI behavior.
+- Native VST3 worker persistence and realtime audio activation remain explicitly unsupported.
+
 
 ## 0.3.0-r39 — GitHub Actions regressions and VST3 host tests
 - Replace obsolete 128-block-only source assertions with checks for the variable-length PCM path and fixed 128-block diagnostic fallback.
