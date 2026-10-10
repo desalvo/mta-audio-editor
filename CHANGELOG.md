@@ -1,3 +1,15 @@
+## 0.3.0-r23 (2026-10-10)
+- Verified native probe builds and links with the complete Steinberg MIT VST3 SDK.
+- Link official Steinberg VST3 interface IID implementation files; avoids undefined references to IComponent, IAudioProcessor, IEditController and IHostApplication.
+- Keep the SDK external and exclude SDK source and Git metadata from release ZIP.
+- No change to playback, export, or realtime audio processing.
+
+## 0.3.0-r23 (2026-10-10)
+- Verified native probe builds and links with the complete Steinberg MIT VST3 SDK.
+- Link official Steinberg VST3 interface IID implementation files; avoids undefined references to IComponent, IAudioProcessor, IEditController and IHostApplication.
+- Keep the SDK external and exclude SDK source and Git metadata from release ZIP.
+- No change to playback, export, or realtime audio processing.
+
 ## 0.3.0-r22 — External VST3 SDK checkout validation
 
 - Reject incomplete Steinberg VST3 SDK GitHub ZIPs before native compilation.

@@ -13,7 +13,9 @@ if(MTA_VST3_SDK_ROOT)
       "pluginterfaces/vst/ivstcomponent.h"
       "pluginterfaces/vst/ivstaudioprocessor.h"
       "base/source/fobject.h"
-      "public.sdk/source/vst/vstcomponent.h")
+      "public.sdk/source/vst/vstcomponent.h"
+      "pluginterfaces/base/coreiids.cpp"
+      "public.sdk/source/vst/vstinitiids.cpp")
     if(NOT EXISTS "${MTA_VST3_SDK_ROOT}/${required_header}")
       message(FATAL_ERROR
         "Incomplete Steinberg VST3 SDK: missing ${required_header}. "
@@ -22,6 +24,10 @@ if(MTA_VST3_SDK_ROOT)
   endforeach()
   target_include_directories(mta_vst3_probe PRIVATE "${MTA_VST3_SDK_ROOT}")
   target_compile_definitions(mta_vst3_probe PRIVATE MTA_HAS_VST3_SDK=1)
+  target_sources(mta_vst3_probe PRIVATE
+    "${MTA_VST3_SDK_ROOT}/pluginterfaces/base/coreiids.cpp"
+    "${MTA_VST3_SDK_ROOT}/public.sdk/source/vst/vstinitiids.cpp"
+  )
 endif()
 if(UNIX AND NOT APPLE)
   target_link_libraries(mta_vst3_probe PRIVATE ${CMAKE_DL_LIBS})

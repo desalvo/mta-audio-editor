@@ -1,3 +1,11 @@
+## 0.3.0-r23
+- Fixed real-SDK VST3 probe linking using official MIT SDK IID implementation units; build validated locally on Linux x86_64.
+- SDK-enabled plugin processing, GUI and bus activation remain experimental and disabled in the playback engine.
+
+## 0.3.0-r23
+- Fixed real-SDK VST3 probe linking using official MIT SDK IID implementation units; build validated locally on Linux x86_64.
+- SDK-enabled plugin processing, GUI and bus activation remain experimental and disabled in the playback engine.
+
 ## 0.3.0-r22 — External VST3 SDK checkout validation
 
 - Reject incomplete Steinberg VST3 SDK GitHub ZIPs before native compilation.

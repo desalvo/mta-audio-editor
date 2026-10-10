@@ -1,3 +1,9 @@
+## r23: real Steinberg SDK build (validated)
+With an external complete SDK, the diagnostic probe now compiles and links using the official SDK interface IID units. The isolated executable is not a full host and does not activate or process plugins. Linux x86_64 compilation verified; Windows/macOS/ARM64 real-SDK builds remain to be verified.
+
+## r23: real Steinberg SDK build (validated)
+With an external complete SDK, the diagnostic probe now compiles and links using the official SDK interface IID units. The isolated executable is not a full host and does not activate or process plugins. Linux x86_64 compilation verified; Windows/macOS/ARM64 real-SDK builds remain to be verified.
+
 ## 0.3.0-r21 (2026-10-10)
 
 - Add explicit isolated VST3 `--configure` diagnostic: test processor setup at 48 kHz / 512 samples using a supported 32/64-bit format, without activation or processing.

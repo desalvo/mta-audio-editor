@@ -58,6 +58,30 @@ jobs:
           name: coverage
           path: coverage.xml
 
+  vst3-sdk-compile:
+    name: VST3 SDK compile (Linux)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Checkout official Steinberg VST3 SDK with submodules
+        uses: actions/checkout@v7
+        with:
+          repository: steinbergmedia/vst3sdk
+          submodules: recursive
+          path: .external/vst3sdk
+          persist-credentials: false
+      - name: Verify Steinberg SDK license and mandatory submodules
+        run: |
+          test -f .external/vst3sdk/LICENSE.txt
+          grep -q 'MIT License' .external/vst3sdk/LICENSE.txt
+          test -f .external/vst3sdk/pluginterfaces/base/coreiids.cpp
+          test -f .external/vst3sdk/public.sdk/source/vst/vstinitiids.cpp
+      - name: Compile and link VST3 probe with real SDK
+        run: |
+          cmake -S native/vst3_probe -B /tmp/mta-vst3-real-sdk -DCMAKE_BUILD_TYPE=Release -DMTA_VST3_SDK_ROOT="$PWD/.external/vst3sdk"
+          cmake --build /tmp/mta-vst3-real-sdk --parallel 2
+          test -x /tmp/mta-vst3-real-sdk/mta_vst3_probe
+
   security:
     name: SAST and dependency audit
     runs-on: ubuntu-latest
