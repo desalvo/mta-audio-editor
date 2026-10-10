@@ -1,3 +1,7 @@
+### r60 experimental offline session API
+
+`native.vst3_probe.offline_session.render_native_session(requests, plugin, executable, channels=1, sample_rate=48000, timeout=30.0)` processes multiple consecutive flat float32 PCM requests in one VST3 activation. Supported rates: 44.1/48/96 kHz; mono/stereo; maximum 128 jobs and 1,048,576 frames total. Use `render_native_session_chain` for 1–8 serial inserts. Binary protocol `MTASPCM1` uses little-endian u32 header, each request length in frames and interleaved float32 payload. Failed processing invalidates all outputs. This is offline diagnostic functionality and **not** a realtime-safe, interactive worker.
+
 ## 0.3.0-r44 (three integrated internal iterations: r42–r44)
 
 - r42: Consolidated batch input/output preflight for atomic publishing.

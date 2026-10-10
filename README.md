@@ -1,3 +1,7 @@
+### VST3 experimental offline session — r60
+
+The native probe now processes a bounded list of PCM requests with one plug-in activation, preserving the plug-in's state between requests. The Python `render_native_session()` and `render_native_session_chain()` APIs are experimental and must not run on the realtime audio callback. This is not yet an interactive worker daemon. See `VST3_HOST_SETUP.md`.
+
 # MTA Audio Editor 0.2.0
 
 ![MTA Audio Editor](app/static/logo.svg)

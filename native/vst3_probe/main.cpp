@@ -11,6 +11,7 @@
 #include <cmath>
 #include <algorithm>
 #include <cctype>
+#include <cstdint>
 #ifdef MTA_HAS_VST3_SDK
 #include "pluginterfaces/base/ipluginbase.h"
 #include "pluginterfaces/vst/ivstcomponent.h"
@@ -90,7 +91,8 @@ static std::string class_cid(const Steinberg::TUID& id) {
 }
 #endif
 int main(int argc, char** argv) {
-  const bool renderPcm = (argc == 7 || argc == 8) && std::string(argv[2]) == "--render-pcm";
+  const bool renderSession = argc == 6 && std::string(argv[2]) == "--render-session";
+  const bool renderPcm = ((argc == 7 || argc == 8) && std::string(argv[2]) == "--render-pcm") || renderSession;
   const bool offline = (argc == 4 && std::string(argv[2]) == "--offline") || renderPcm;
   const bool configure = renderPcm || (argc == 4 && (std::string(argv[2]) == "--configure" || offline));
   const bool lifecycle = renderPcm || (argc == 4 && (std::string(argv[2]) == "--lifecycle" || configure));
@@ -102,6 +104,8 @@ int main(int argc, char** argv) {
   // File IPC only; never invoke this path on the realtime audio thread.
   constexpr size_t kMaxPcmFrames = 1048576;
   int pcmSampleRate = 48000;
+  std::vector<uint32_t> sessionFrames;
+  const std::string sessionMagic = "MTASPCM1";
   if (renderPcm && argc == 8) {
     const std::string rate = argv[7];
     if (rate != "44100" && rate != "48000" && rate != "96000") {
@@ -113,7 +117,56 @@ int main(int argc, char** argv) {
   size_t pcmFrames = 0;
   std::vector<float> pcmInput;
   std::vector<float> pcmOutput;
-  if (renderPcm) {
+  if (renderSession) {
+    // The bounded binary envelope contains multiple independently-delimited PCM
+    // requests. All requests share one plug-in activation and continuous transport.
+    auto readU32 = [](std::istream& input, uint32_t& value) -> bool {
+      unsigned char data[4]{};
+      input.read(reinterpret_cast<char*>(data), 4);
+      if (!input) return false;
+      value = uint32_t(data[0]) | (uint32_t(data[1]) << 8) |
+              (uint32_t(data[2]) << 16) | (uint32_t(data[3]) << 24);
+      return true;
+    };
+    const std::filesystem::path inputPath(argv[4]);
+    const std::filesystem::path outputPath(argv[5]);
+    if (!std::filesystem::is_regular_file(inputPath) || std::filesystem::exists(outputPath)) {
+      std::cerr << "Invalid session paths\n"; return 8;
+    }
+    std::ifstream input(inputPath, std::ios::binary);
+    char magic[8]{};
+    input.read(magic, sizeof(magic));
+    uint32_t channels = 0, rate = 0, count = 0;
+    if (!input || std::string(magic, 8) != sessionMagic || !readU32(input, channels) ||
+        !readU32(input, rate) || !readU32(input, count) ||
+        (channels != 1 && channels != 2) ||
+        (rate != 44100 && rate != 48000 && rate != 96000) || count == 0 || count > 128) {
+      std::cerr << "Invalid session header\n"; return 8;
+    }
+    pcmChannels = static_cast<int>(channels);
+    pcmSampleRate = static_cast<int>(rate);
+    for (uint32_t index = 0; index < count; ++index) {
+      uint32_t frames = 0;
+      if (!readU32(input, frames) || frames == 0 ||
+          frames > kMaxPcmFrames - pcmFrames) {
+        std::cerr << "Invalid session frame count\n"; return 8;
+      }
+      sessionFrames.push_back(frames);
+      pcmFrames += frames;
+      const auto begin = pcmInput.size();
+      pcmInput.resize(begin + size_t(frames) * pcmChannels);
+      input.read(reinterpret_cast<char*>(pcmInput.data() + begin),
+                 std::streamsize(size_t(frames) * pcmChannels * sizeof(float)));
+      if (!input) { std::cerr << "Truncated session PCM\n"; return 8; }
+    }
+    char trailing;
+    if (input.get(trailing) || !input.eof() ||
+        !std::all_of(pcmInput.begin(), pcmInput.end(), [](float v){return std::isfinite(v) && std::abs(v) <= 16.0f;})) {
+      std::cerr << "Invalid session payload\n"; return 8;
+    }
+    pcmOutput.reserve(pcmInput.size());
+  }
+  if (renderPcm && !renderSession) {
     const std::string channelArg = argv[6];
     if (channelArg != "1" && channelArg != "2") {
       std::cerr << "PCM channels must be 1 or 2\n";return 8;
@@ -569,7 +622,29 @@ int main(int argc, char** argv) {
       return 9;
     }
     std::ofstream output(argv[5], std::ios::binary | std::ios::trunc);
-    output.write(reinterpret_cast<const char*>(pcmOutput.data()), pcmFrames * pcmChannels * sizeof(float));
+    if (renderSession) {
+      auto writeU32 = [&output](uint32_t value) {
+        const unsigned char bytes[4] = {
+            static_cast<unsigned char>(value & 255),
+            static_cast<unsigned char>((value >> 8) & 255),
+            static_cast<unsigned char>((value >> 16) & 255),
+            static_cast<unsigned char>((value >> 24) & 255)};
+        output.write(reinterpret_cast<const char*>(bytes), 4);
+      };
+      output.write(sessionMagic.data(), 8);
+      writeU32(static_cast<uint32_t>(pcmChannels));
+      writeU32(static_cast<uint32_t>(pcmSampleRate));
+      writeU32(static_cast<uint32_t>(sessionFrames.size()));
+      size_t cursor = 0;
+      for (auto frames : sessionFrames) {
+        writeU32(frames);
+        output.write(reinterpret_cast<const char*>(pcmOutput.data() + cursor),
+                     std::streamsize(size_t(frames) * pcmChannels * sizeof(float)));
+        cursor += size_t(frames) * pcmChannels;
+      }
+    } else {
+      output.write(reinterpret_cast<const char*>(pcmOutput.data()), pcmFrames * pcmChannels * sizeof(float));
+    }
     output.flush();
     if (!output) { std::cerr << "PCM output write failed\n"; return 10; }
   }
@@ -595,6 +670,7 @@ int main(int argc, char** argv) {
             << ",\"tail_samples\":" << tailSamples
             << ",\"processing_setup_requested\":" << (processingSetupRequested ? "true" : "false")
             << ",\"processing_setup_succeeded\":" << (processingSetupSucceeded ? "true" : "false")
+            << ",\"session_requests\":" << sessionFrames.size()
             << ",\"processing_sample_rate\":" << (processingSetupRequested ? pcmSampleRate : 0)
             << ",\"processing_block_size\":" << (processingSetupRequested ? 512 : 0)
             << ",\"processing_sample_size\":" << processingSampleSize

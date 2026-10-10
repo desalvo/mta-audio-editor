@@ -1,3 +1,18 @@
+## 0.3.0-r60 — Native VST3 multi-request offline session (r51–r60 cumulative)
+
+- R51–R52: bounded binary MTASPCM1 session envelope and C++ parser, with up to 128 PCM requests.
+- R53–R54: one native VST3 initialization and activation processes successive requests in order, maintaining processing state and continuous musical transport within a session.
+- R55: reject truncated payloads, invalid frame counts, unsupported channel counts and sample rates, oversized input, invalid or non-finite PCM.
+- R56: separate per-request output frames while keeping the original single-request rendering interface.
+- R57: Python adapter handles timeout, exit failures, missing output, invalid envelopes, mismatched dimensions and NaN/Inf.
+- R58: optional serial session chain supports up to eight inserts, with per-plugin process isolation.
+- R59: protocol, bounds, stereo, malformed responses, and chain regression tests.
+- R60: version, cross-platform build metadata and bilingual documentation updated. One release package for all ten increments.
+
+**Scope and limitations:** This implements **multi-request processing in a single offline subprocess session**. It does not yet implement a long-lived interactive daemon or shared-memory realtime IPC, and it does not enable the VST3 host on the realtime audio thread (`native_host_ready=false`). Sessions still have a cumulative limit of 1,048,576 frames, not unlimited WAV streaming. MIDI/event timing and per-job automation are diagnostic-only, not a production sequencer. All external third-party plugins run in an isolated subprocess.
+
+Example API: `render_native_session([[0.0] * 512, [0.25] * 256], (plugin_path, cid), probe_binary)`.
+
 ## 0.3.0-r50 — VST3 multi-rate regression CI fixes
 
 - Update r21 and r27 regression tests to assert the dynamic `pcmSampleRate` used by the C++ probe for processing configuration and musical transport; retain the supported 44.1/48/96 kHz behavior.
