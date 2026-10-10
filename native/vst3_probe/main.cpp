@@ -14,6 +14,7 @@
 #include "pluginterfaces/vst/ivsteditcontroller.h"
 #include "pluginterfaces/vst/ivsthostapplication.h"
 #include <cstring>
+#include <limits>
 #include <atomic>
 #endif
 #if defined(_WIN32)
@@ -33,6 +34,11 @@ static std::string json_quote(const std::string& value) {
   out << '"'; return out.str();
 }
 #ifdef MTA_HAS_VST3_SDK
+// Portable bounded read of fixed-size Steinberg metadata, including malformed
+// non-NUL-terminated arrays (strnlen is not portable across MSVC toolchains).
+template <size_t N> static std::string bounded_class_string(const char (&data)[N]) {
+  return std::string(data, std::find(data, data + N, '\0'));
+}
 // Minimal diagnostic host context. It deliberately does not provide IMessage,
 // attribute lists, GUI callbacks, transport or realtime services.
 class DiagnosticHost final : public Steinberg::Vst::IHostApplication {
@@ -118,9 +124,13 @@ int main(int argc, char** argv) {
     Steinberg::PClassInfo info{};
     if (pluginFactory->getClassInfo(i, &info) != Steinberg::kResultOk) continue;
     if (classes.tellp() > std::streampos(1)) classes << ",";
+    // Steinberg's PClassInfo carries fixed-size character arrays. Bound reads
+    // even when a malformed third-party factory omits NUL termination.
+    const std::string safeName = bounded_class_string(info.name);
+    const std::string safeCategory = bounded_class_string(info.category);
     classes << "{\"cid\":" << json_quote(class_cid(info.cid))
-            << ",\"name\":" << json_quote(info.name)
-            << ",\"category\":" << json_quote(info.category) << "}";
+            << ",\"name\":" << json_quote(safeName)
+            << ",\"category\":" << json_quote(safeCategory) << "}";
   }
   classes << "]";
   // Both modes are opt-in diagnostics. Never call setupProcessing(), setActive() or process().
@@ -152,7 +162,7 @@ int main(int argc, char** argv) {
       if (hex != target) continue;
       found = true;
       // Explicitly require an audio component class; controller-only entries are excluded.
-      if (std::string(info.category) != "Audio Module Class") break;
+      if (bounded_class_string(info.category) != "Audio Module Class") break;
       Steinberg::Vst::IComponent* component = nullptr;
       const auto result = pluginFactory->createInstance(info.cid, Steinberg::Vst::IComponent::iid,
                                                          reinterpret_cast<void**>(&component));
@@ -198,6 +208,7 @@ int main(int argc, char** argv) {
                 for (Steinberg::int32 index = 0; index < count && reportedBuses < 1024; ++index) {
                   Steinberg::Vst::BusInfo info{};
                   if (component->getBusInfo(media, direction, index, info) != Steinberg::kResultOk) continue;
+                  if (info.channelCount < 0 || info.channelCount > 1024) continue;
                   if (reportedBuses++) busDetails << ",";
                   // Avoid logging untrusted UTF-16 bus names until a bounded conversion is available.
                   busDetails << "{\"media\":\"" << (media == Steinberg::Vst::kAudio ? "audio" : "event")

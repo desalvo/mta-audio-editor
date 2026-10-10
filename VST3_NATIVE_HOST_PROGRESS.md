@@ -1,3 +1,11 @@
+## 0.3.0-r17 (2026-10-10)
+
+- Harden VST3 factory class-name and category parsing by bounding reads of Steinberg fixed-size arrays.
+- Reject out-of-range plugin bus channel counts before emitting diagnostics.
+- Add regression guard for C++ metadata bounds; native host remains experimental and offline.
+- Synchronize release identifiers and mobile build metadata.
+- SDK-enabled compilation and GitHub Actions run logs were unavailable for validation.
+
 ## 0.3.0-r16 — VST3 diagnostic hardening
 
 - Validate the requested 32-hex CID in the C++ probe before loading plugin binaries, including in no-SDK builds.

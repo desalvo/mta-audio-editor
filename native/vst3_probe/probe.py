@@ -15,7 +15,7 @@ from app.vst3_host import validate_plugin_path
 def resolve_module_binary(bundle: Path) -> Path:
     """Resolve only architecture-appropriate VST3 module binaries."""
     if bundle.is_file():
-        return bundle
+        return bundle.resolve()
     system = platform.system()
     arch = platform.machine().lower()
     if system == 'Darwin':
