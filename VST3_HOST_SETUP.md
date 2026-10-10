@@ -40,3 +40,6 @@ native code during loading: test unknown plugins only in a restricted environmen
 in processo separato e con timeout. Non è ancora un host VST3 completo:
 non istanzia plugin e non elabora audio live. L'host Pedalboard offline resta
 invariato. Il caricamento di binari esterni esegue codice di terze parti.
+
+### r22: SDK checkout validation
+GitHub-generated VST3 SDK ZIP archives omit Git submodule sources. Use `git clone --recursive https://github.com/steinbergmedia/vst3sdk.git` and `git submodule update --init --recursive` before configuring `-DMTA_VST3_SDK_ROOT=...`. The CMake configuration now rejects incomplete SDK trees.

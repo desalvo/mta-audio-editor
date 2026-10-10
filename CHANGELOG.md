@@ -1,3 +1,9 @@
+## 0.3.0-r22 — External VST3 SDK checkout validation
+
+- Reject incomplete Steinberg VST3 SDK GitHub ZIPs before native compilation.
+- Require recursive SDK checkout for opt-in native VST3 compilation.
+- Preserve the isolated diagnostic host; audio playback remains unchanged.
+
 ## 0.3.0-r21 (2026-10-10)
 
 - Add explicit isolated VST3 `--configure` diagnostic: test processor setup at 48 kHz / 512 samples using a supported 32/64-bit format, without activation or processing.

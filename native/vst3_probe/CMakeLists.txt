@@ -6,9 +6,20 @@ target_compile_features(mta_vst3_probe PRIVATE cxx_std_20)
 # Only use an independently obtained copy covered by the SDK's applicable license.
 set(MTA_VST3_SDK_ROOT "" CACHE PATH "Path to an independently obtained Steinberg VST3 SDK checkout")
 if(MTA_VST3_SDK_ROOT)
-  if(NOT EXISTS "${MTA_VST3_SDK_ROOT}/pluginterfaces/base/ipluginbase.h")
-    message(FATAL_ERROR "MTA_VST3_SDK_ROOT must contain pluginterfaces/base/ipluginbase.h")
-  endif()
+  # GitHub "Download ZIP" does not populate Git submodules. Fail at configure
+  # time rather than silently building the no-SDK diagnostic executable.
+  foreach(required_header IN ITEMS
+      "pluginterfaces/base/ipluginbase.h"
+      "pluginterfaces/vst/ivstcomponent.h"
+      "pluginterfaces/vst/ivstaudioprocessor.h"
+      "base/source/fobject.h"
+      "public.sdk/source/vst/vstcomponent.h")
+    if(NOT EXISTS "${MTA_VST3_SDK_ROOT}/${required_header}")
+      message(FATAL_ERROR
+        "Incomplete Steinberg VST3 SDK: missing ${required_header}. "
+        "Download with git clone --recursive and run git submodule update --init --recursive.")
+    endif()
+  endforeach()
   target_include_directories(mta_vst3_probe PRIVATE "${MTA_VST3_SDK_ROOT}")
   target_compile_definitions(mta_vst3_probe PRIVATE MTA_HAS_VST3_SDK=1)
 endif()
