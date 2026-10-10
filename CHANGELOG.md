@@ -1,3 +1,12 @@
+## 0.3.0-r36 — Ruff CI fix and high-resolution offline VST3 WAV export
+
+- Fix unused `Path` import in `tests/test_r35_native_wav.py`, the GitHub Actions Ruff F401 failure.
+- Extend isolated WAV export to signed PCM24 and PCM32 while retaining PCM16, mono and stereo.
+- Preserve source bit depth, sample rate, channel count and frame count; reject unsupported formats.
+- Add explicit saturated output quantization, NaN/Inf and frame-count guards, preserving atomic publication on failures.
+- Add PCM16/24/32 identity, clipping, malformed output and no-overwrite regression tests.
+- This path remains offline-only, bounded and opt-in; realtime host remains disabled.
+
 ## 0.3.0-r35 — GitHub Actions correction and isolated WAV renderer
 
 - Remove the unused MAX_FRAMES import that caused Ruff F401 in the latest workflow logs.

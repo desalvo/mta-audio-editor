@@ -1,7 +1,6 @@
 """WAV conversion/atomic publish regression tests (no SDK runtime required)."""
 import struct
 import wave
-from pathlib import Path
 from unittest.mock import patch
 import pytest
 from native.vst3_probe.native_chain import NativeWavError, render_native_wav

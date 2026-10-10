@@ -86,15 +86,42 @@ class NativeWavError(NativeChainError):
     """Unsupported WAV input or failed isolated native WAV export."""
 
 
+def _decode_pcm_wav(pcm: bytes, sample_width: int) -> list[float]:
+    """Decode signed little-endian PCM16/24/32 without silently using float WAV."""
+    if len(pcm) % sample_width:
+        raise NativeWavError('Truncated PCM sample')
+    if sample_width == 2:
+        ints = struct.unpack('<' + 'h' * (len(pcm) // 2), pcm)
+    elif sample_width == 3:
+        ints = [int.from_bytes(pcm[i:i + 3], 'little', signed=True)
+                for i in range(0, len(pcm), 3)]
+    elif sample_width == 4:
+        ints = struct.unpack('<' + 'i' * (len(pcm) // 4), pcm)
+    else:
+        raise NativeWavError('Unsupported PCM sample width')
+    scale = float(1 << (sample_width * 8 - 1))
+    return [value / scale for value in ints]
+
+
+def _encode_pcm_wav(samples: Sequence[float], sample_width: int) -> bytes:
+    """Saturating quantizer matching the source signed PCM bit depth."""
+    limit = 1 << (sample_width * 8 - 1)
+    encoded = bytearray()
+    for sample in samples:
+        if not isinstance(sample, (float, int)) or not math.isfinite(sample):
+            raise NativeWavError('Native VST3 output contained NaN/Inf')
+        value = max(-limit, min(limit - 1, round(sample * limit)))
+        encoded.extend(int(value).to_bytes(sample_width, 'little', signed=True))
+    return bytes(encoded)
+
+
 def render_native_wav(source: str | Path, destination: str | Path,
                       plugins: Sequence[tuple[str, str]], executable: str,
                       *, timeout: float = 15.0) -> Path:
-    """Offline WAV->VST3->WAV via the isolated PCM chain.
+    """Bounded isolated WAV->VST3->WAV with atomic publication.
 
-    Intentional constraints: 48 kHz, mono/stereo, 16-bit PCM WAV, <=MAX_FRAMES.
-    Files larger than the bounded input limit are rejected without partial output.
-    Output is written to a temporary file in the destination directory and
-    atomically published only after every insert succeeds.
+    Supports 48 kHz, mono/stereo, integer PCM16/24/32. The WAV standard
+    IEEE-float format is intentionally not accepted by Python wave.
     """
     source_path = Path(source).resolve(strict=True)
     destination_path = Path(destination).resolve()
@@ -103,28 +130,28 @@ def render_native_wav(source: str | Path, destination: str | Path,
     with wave.open(str(source_path), 'rb') as wav:
         channels = wav.getnchannels()
         frames = wav.getnframes()
-        if wav.getcomptype() != 'NONE' or wav.getsampwidth() != 2 or wav.getframerate() != 48000 or channels not in (1, 2):
-            raise NativeWavError('Only 48 kHz mono/stereo uncompressed 16-bit PCM WAV is supported')
+        width = wav.getsampwidth()
+        if wav.getcomptype() != 'NONE' or width not in (2, 3, 4) or wav.getframerate() != 48000 or channels not in (1, 2):
+            raise NativeWavError('Only 48 kHz mono/stereo PCM16/24/32 WAV is supported')
         if not 1 <= frames <= MAX_FRAMES:
             raise NativeWavError('WAV length exceeds the bounded native VST3 limit')
         pcm = wav.readframes(frames)
-        if len(pcm) != frames * channels * 2:
+        if len(pcm) != frames * channels * width:
             raise NativeWavError('Truncated WAV input')
-        decoded = struct.unpack('<' + 'h' * (frames * channels), pcm)
-        values = [sample / 32768.0 for sample in decoded]
+        values = _decode_pcm_wav(pcm, width)
         audio = list(zip(values[::2], values[1::2])) if channels == 2 else values
     rendered = render_native_chain(audio, plugins, executable, timeout=timeout)
     flat = [sample for frame in rendered for sample in frame] if channels == 2 else rendered
-    # Clamp to signed PCM16 after native processing; malformed output is already
-    # rejected by render_native_chain, but avoid struct.pack overflow.
-    output = struct.pack('<' + 'h' * len(flat), *(max(-32768, min(32767, round(sample * 32768))) for sample in flat))
+    if len(flat) != frames * channels:
+        raise NativeWavError('VST3 returned the wrong frame count')
+    output = _encode_pcm_wav(flat, width)
     import tempfile
     fd, temp_name = tempfile.mkstemp(prefix='.mta-vst3-', suffix='.wav', dir=str(destination_path.parent))
     os.close(fd)
     try:
         with wave.open(temp_name, 'wb') as wav:
             wav.setnchannels(channels)
-            wav.setsampwidth(2)
+            wav.setsampwidth(width)
             wav.setframerate(48000)
             wav.writeframes(output)
         os.replace(temp_name, destination_path)

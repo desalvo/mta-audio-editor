@@ -59,3 +59,7 @@ The isolated offline diagnostic now supplies deterministic musical transport (12
 ### Offline WAV export (r35)
 
 Python API `native.vst3_probe.native_chain.render_native_wav(source, destination, plugins, executable)` supports 48 kHz mono/stereo PCM16 files up to 1,048,576 frames. Requires an SDK-enabled probe and VST3 plug-in(s). This is an opt-in test/export path, not the realtime engine. Output replaces the destination only after success.
+
+### High-resolution WAV export (r36)
+
+`render_native_wav()` accepts 48 kHz signed integer PCM16, PCM24 and PCM32 mono/stereo WAV input. It preserves the input bit depth and frame count, clamps overshoots safely, rejects non-finite plugin output, and atomically publishes the final file only on success. IEEE floating-point WAV and realtime processing are not enabled.
