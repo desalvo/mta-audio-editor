@@ -1,7 +1,7 @@
 VSVersionInfo(
   ffi=FixedFileInfo(
-    filevers=(0, 3, 0, 33),
-    prodvers=(0, 3, 0, 33),
+    filevers=(0, 3, 0, 34),
+    prodvers=(0, 3, 0, 34),
     mask=0x3f,
     flags=0x0,
     OS=0x40004,
@@ -16,7 +16,7 @@ VSVersionInfo(
         [
           StringStruct('CompanyName', 'Alessandro De Salvo'),
           StringStruct('FileDescription', 'MTA Audio Editor'),
-          StringStruct('FileVersion', '0.3.0-r33'),
+          StringStruct('FileVersion', '0.3.0-r34'),
           StringStruct('InternalName', 'MTA Audio Editor'),
           StringStruct('LegalCopyright', 'EUPL-1.2'),
           StringStruct('OriginalFilename', 'MTA Audio Editor.exe'),

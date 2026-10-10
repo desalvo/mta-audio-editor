@@ -1,3 +1,9 @@
+## 0.3.0-r34 — GitHub Actions Ruff correction
+
+- Resolve unused-import F401 in the native VST3 PCM chain and its regression tests.
+- Preserve r33 variable-length stereo VST3 processing and previous track-renaming fixes.
+- Synchronize desktop and mobile revision metadata.
+
 ## 0.3.0-r33
 Native offline VST3 PCM multi-block rendering supports variable-length mono/stereo with bounded buffers, partial last blocks and per-insert subprocesses. Not realtime-ready; no full MIDI/automation routing or latency compensation in native chain.
 

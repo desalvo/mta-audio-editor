@@ -1,3 +1,9 @@
+## 0.3.0-r34 — GitHub Actions Ruff correction
+
+- Resolve unused-import F401 in the native VST3 PCM chain and its regression tests.
+- Preserve r33 variable-length stereo VST3 processing and previous track-renaming fixes.
+- Synchronize desktop and mobile revision metadata.
+
 ## 0.3.0-r33
 - Native SDK VST3 offline PCM rendering now accepts bounded variable-length mono/stereo float32 interleaved buffers (up to 1048576 frames), with the same plugin instance across processing blocks.
 - Strict PCM frame/channel validation and partial final-block handling. No realtime use.
