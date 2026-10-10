@@ -1,3 +1,10 @@
+## 0.3.0-r16 — VST3 diagnostic hardening
+
+- Validate the requested 32-hex CID in the C++ probe before loading plugin binaries, including in no-SDK builds.
+- Reject non-object JSON and diagnostic output exceeding 2 MB in the Python adapter.
+- Add targeted tests and retain the isolated, non-realtime host diagnostics from r15.
+- SDK-backed C++ compilation and interoperability with third-party plugins remain unverified; playback is unchanged.
+
 ## 0.3.0-r15 — VST3 processor capability diagnostics and CI build gate
 
 - Isolated lifecycle mode now probes supported 32-bit/64-bit sample formats and reported plugin latency. Values are sanitized in the Python adapter; no audio processing is enabled.

@@ -8,12 +8,15 @@ from native.vst3_probe.probe import probe_plugin
 
 ROOT=Path(__file__).resolve().parents[1]
 
-def test_vst3_pdf_cover_matches_existing_manual():
+def test_vst3_pdf_cover_uses_distinct_vst3_title():
     for lang in ('IT','EN'):
         a=fitz.open(ROOT/'app/docs'/f'MTA-Audio-Editor-User-Manual-{lang}.pdf')
         b=fitz.open(ROOT/'app/docs'/f'MTA-Audio-Editor-VST3-Manual-{lang}.pdf')
         assert len(b)>=2
-        assert a[0].get_pixmap(matrix=fitz.Matrix(.5,.5)).samples == b[0].get_pixmap(matrix=fitz.Matrix(.5,.5)).samples
+        # Since r13 the VST3 cover deliberately uses a VST3-specific title,
+        # while preserving the original manual's layout and page dimensions.
+        assert a[0].rect == b[0].rect
+        assert a[0].get_pixmap(matrix=fitz.Matrix(.5,.5)).samples != b[0].get_pixmap(matrix=fitz.Matrix(.5,.5)).samples
         assert 'VST3' in ''.join(page.get_text() for page in list(b)[1:])
 
 def test_probe_deduplicates_and_scrubs_untrusted_classes(tmp_path):

@@ -80,6 +80,17 @@ int main(int argc, char** argv) {
   if ((argc != 2 && !instantiate) || !std::filesystem::exists(argv[1]) || !std::filesystem::is_regular_file(argv[1])) {
     std::cerr << "usage: mta_vst3_probe <VST3 module binary> [--instantiate|--lifecycle <32-hex-CID>]\n";return 2;
   }
+  // Validate user-controlled CID before loading any third-party binary.
+  // This applies with and without the optional Steinberg SDK.
+  if (instantiate) {
+    const std::string cid = argv[3];
+    if (cid.size() != 32 || !std::all_of(cid.begin(), cid.end(), [](unsigned char c) {
+          return std::isxdigit(c) != 0 && c < 128;
+        })) {
+      std::cerr << "Invalid class CID (expected 32 hexadecimal digits)\n";
+      return 7;
+    }
+  }
 #if defined(_WIN32)
   HMODULE module = LoadLibraryA(argv[1]);
   if (!module) {std::cerr << "LoadLibrary failed\n";return 3;}
@@ -131,11 +142,6 @@ int main(int argc, char** argv) {
   int reportedBuses = 0;
   if (instantiate) {
     const std::string wanted = argv[3];
-    if (wanted.size() != 32 || !std::all_of(wanted.begin(), wanted.end(), [](unsigned char c) {
-          return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
-        })) {
-      pluginFactory->release(); std::cerr << "Invalid class CID (expected 32 hexadecimal digits)\n"; return 7;
-    }
     for (Steinberg::int32 i = 0; i < classCount; ++i) {
       Steinberg::PClassInfo info{};
       if (pluginFactory->getClassInfo(i, &info) != Steinberg::kResultOk) continue;

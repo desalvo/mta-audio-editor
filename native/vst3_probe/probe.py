@@ -54,7 +54,13 @@ def probe_plugin(path: str, executable: str, timeout: float = 5,
                             timeout=min(max(float(timeout), 0.5), 15), check=False)
     if result.returncode:
         raise RuntimeError(f'VST3 probe failed ({result.returncode}): {result.stderr.strip()[:300]}')
+    # The probe runs untrusted plugins; reject oversized diagnostics before parsing.
+    # subprocess.run still bounds execution time; this bounds JSON processing only.
+    if len(result.stdout) > 2_000_000:
+        raise RuntimeError('VST3 probe diagnostic output exceeds 2 MB limit')
     payload = json.loads(result.stdout)
+    if not isinstance(payload, dict):
+        raise RuntimeError('VST3 probe returned a non-object JSON result')
     if payload.get('factory_export') is not True:
         raise RuntimeError('VST3 factory export missing')
     classes = payload.get('classes', [])

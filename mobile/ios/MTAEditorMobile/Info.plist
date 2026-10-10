@@ -10,7 +10,7 @@
     <key>CFBundleName</key><string>$(PRODUCT_NAME)</string>
     <key>CFBundlePackageType</key><string>APPL</string>
     <key>CFBundleShortVersionString</key><string>0.3.0</string>
-    <key>CFBundleVersion</key><string>30015</string>
+    <key>CFBundleVersion</key><string>30016</string>
     <key>MTAEditorRevision</key><string>15</string>
     <key>MTAEditorBuild</key><string>20261010031000</string>
     <key>CFBundleDocumentTypes</key>
