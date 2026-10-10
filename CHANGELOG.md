@@ -1,3 +1,7 @@
+## 0.3.0-r32
+- Added opt-in real VST3 mono float32 offline PCM transport, 65536-frame subprocess processing, and bounded multi-plugin serial adapter.
+- No realtime integration: plugin process isolation per insert; MIDI, stereo and latency-compensated native chains not yet supported.
+
 ## 0.3.0-r31
 - Added fail-closed offline insert graph executor with sequential DSP blocks, sample-offset event dispatch, latency flush, bounded tails, finite-output validation, and deterministic chain tests.
 - Fixed stale Windows version resource metadata. Production realtime VST3 host remains disabled.

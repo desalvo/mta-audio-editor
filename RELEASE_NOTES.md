@@ -1,3 +1,6 @@
+## 0.3.0-r32
+Real VST3 offline serial PCM adapter, bounded mono 48k/512x128 sample buffers and fail-closed subprocess handling. Does not enable realtime playback, generalized latency compensation or VST3 stereo/MIDI chains.
+
 ## 0.3.0-r31
 Offline serial-insert render graph with deterministic multiblock scheduling and latency/tail flush. Tested with fake DSP processors; SDK probe remains separate, and real plugin adapter/realtime callbacks are NOT yet implemented.
 

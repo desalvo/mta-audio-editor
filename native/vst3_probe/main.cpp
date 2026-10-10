@@ -5,6 +5,10 @@
 #include <string>
 #include <iomanip>
 #include <sstream>
+#include <fstream>
+#include <array>
+#include <vector>
+#include <cmath>
 #include <algorithm>
 #include <cctype>
 #ifdef MTA_HAS_VST3_SDK
@@ -86,12 +90,37 @@ static std::string class_cid(const Steinberg::TUID& id) {
 }
 #endif
 int main(int argc, char** argv) {
-  const bool offline = argc == 4 && std::string(argv[2]) == "--offline";
-  const bool configure = argc == 4 && (std::string(argv[2]) == "--configure" || offline);
-  const bool lifecycle = argc == 4 && (std::string(argv[2]) == "--lifecycle" || configure);
-  const bool instantiate = argc == 4 && (std::string(argv[2]) == "--instantiate" || lifecycle);
+  const bool renderPcm = argc == 6 && std::string(argv[2]) == "--render-pcm";
+  const bool offline = (argc == 4 && std::string(argv[2]) == "--offline") || renderPcm;
+  const bool configure = renderPcm || (argc == 4 && (std::string(argv[2]) == "--configure" || offline));
+  const bool lifecycle = renderPcm || (argc == 4 && (std::string(argv[2]) == "--lifecycle" || configure));
+  const bool instantiate = (argc == 4 && (std::string(argv[2]) == "--instantiate" || lifecycle)) || renderPcm;
   if ((argc != 2 && !instantiate) || !std::filesystem::exists(argv[1]) || !std::filesystem::is_regular_file(argv[1])) {
     std::cerr << "usage: mta_vst3_probe <VST3 module binary> [--instantiate|--lifecycle|--configure|--offline <32-hex-CID>]\n";return 2;
+  }
+  // A render request exchanges exactly 128 * 512 little-endian float32 mono samples.
+  // It is an offline IPC format, never an audio-thread protocol.
+  constexpr size_t kPcmFrames = 128 * 512;
+  std::vector<float> pcmInput;
+  std::vector<float> pcmOutput;
+  if (renderPcm) {
+    const auto inputPath = std::filesystem::path(argv[4]);
+    const auto outputPath = std::filesystem::path(argv[5]);
+    if (!std::filesystem::is_regular_file(inputPath) ||
+        std::filesystem::file_size(inputPath) != kPcmFrames * sizeof(float) ||
+        std::filesystem::exists(outputPath)) {
+      std::cerr << "Invalid input PCM or existing output destination\n";
+      return 8;
+    }
+    pcmInput.resize(kPcmFrames);
+    std::ifstream input(inputPath, std::ios::binary);
+    input.read(reinterpret_cast<char*>(pcmInput.data()), kPcmFrames * sizeof(float));
+    if (!input || input.gcount() != static_cast<std::streamsize>(kPcmFrames * sizeof(float)) ||
+        !std::all_of(pcmInput.begin(), pcmInput.end(), [](float v){return std::isfinite(v);})) {
+      std::cerr << "Invalid PCM content\n";
+      return 8;
+    }
+    pcmOutput.reserve(kPcmFrames);
   }
   // Validate user-controlled CID before loading any third-party binary.
   // This applies with and without the optional Steinberg SDK.
@@ -425,8 +454,8 @@ int main(int argc, char** argv) {
                           if (processingSampleSize == 32) {
                             for (auto& channel : storage.samples32) {
                               for (int frame = 0; frame < 512; ++frame) {
-                                const double sample = kAmplitude * std::sin(2.0 * kPi * 440.0 *
-                                    (block * 512 + frame) / 48000.0);
+                                const double sample = renderPcm ? pcmInput[block * 512 + frame] :
+                                    kAmplitude * std::sin(2.0 * kPi * 440.0 * (block * 512 + frame) / 48000.0);
                                 channel[frame] = static_cast<Steinberg::Vst::Sample32>(sample);
                                 offlineInputEnergy += sample * sample;
                               }
@@ -434,8 +463,8 @@ int main(int argc, char** argv) {
                           } else {
                             for (auto& channel : storage.samples64) {
                               for (int frame = 0; frame < 512; ++frame) {
-                                const double sample = kAmplitude * std::sin(2.0 * kPi * 440.0 *
-                                    (block * 512 + frame) / 48000.0);
+                                const double sample = renderPcm ? pcmInput[block * 512 + frame] :
+                                    kAmplitude * std::sin(2.0 * kPi * 440.0 * (block * 512 + frame) / 48000.0);
                                 channel[frame] = sample;
                                 offlineInputEnergy += sample * sample;
                               }
@@ -458,6 +487,16 @@ int main(int argc, char** argv) {
                           break;
                         }
                         ++offlineBlocksProcessed;
+                        if (renderPcm) {
+                          if (outputStorage.empty() || (processingSampleSize == 32 && outputStorage[0].samples32.empty()) ||
+                              (processingSampleSize == 64 && outputStorage[0].samples64.empty())) {
+                            offlineProcessSucceeded = false;
+                            break;
+                          }
+                          if (processingSampleSize == 32)
+                            pcmOutput.insert(pcmOutput.end(), outputStorage[0].samples32[0].begin(), outputStorage[0].samples32[0].end());
+                          else for (auto value : outputStorage[0].samples64[0]) pcmOutput.push_back(static_cast<float>(value));
+                        }
                         for (const auto& storage : outputStorage) {
                           if (processingSampleSize == 32) {
                             for (const auto& channel : storage.samples32) {
@@ -499,6 +538,17 @@ int main(int argc, char** argv) {
       if (component) component->release();
       break;
     }
+  }
+  if (renderPcm) {
+    if (!offlineProcessSucceeded || offlineNonFiniteSamples || pcmOutput.size() != kPcmFrames ||
+        !std::all_of(pcmOutput.begin(), pcmOutput.end(), [](float v){return std::isfinite(v);})) {
+      std::cerr << "Offline PCM rendering did not complete safely: succeeded=" << offlineProcessSucceeded << " blocks=" << offlineBlocksProcessed << " output=" << pcmOutput.size() << " nonfinite=" << offlineNonFiniteSamples << "\n";
+      return 9;
+    }
+    std::ofstream output(argv[5], std::ios::binary | std::ios::trunc);
+    output.write(reinterpret_cast<const char*>(pcmOutput.data()), kPcmFrames * sizeof(float));
+    output.flush();
+    if (!output) { std::cerr << "PCM output write failed\n"; return 10; }
   }
   busDetails << "]";
   pluginFactory->release();

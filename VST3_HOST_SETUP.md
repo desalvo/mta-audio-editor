@@ -1,3 +1,9 @@
+## r32: experimental native PCM serial-insert rendering
+
+The separately built C++20 probe can render precisely 65536 mono 32-bit floating-point samples at 48 kHz through a Steinberg-SDK-backed plugin. The Python `native/vst3_probe/native_chain.py` adapter serializes each insert to a separate bounded subprocess and passes its output PCM to the next. Plugin modules must be installed under an allow-listed `MTA_VST3_PATHS` directory; the SDK itself is not bundled.
+
+This is a restricted **offline diagnostic** path only, with no stereo, MIDI scheduling across insert boundaries, parameter automation from projects, plugin latency compensation, or realtime support. Do not use it for regular project exports yet. Any plugin timeout, failure, invalid PCM or NaN/Inf fails the entire chain. Plugin processes execute arbitrary third-party code with the user's privileges: timeout and memory limits do **not** amount to a security sandbox.
+
 ## 0.3.0-r21 (2026-10-10)
 
 - Add explicit isolated VST3 `--configure` diagnostic: test processor setup at 48 kHz / 512 samples using a supported 32/64-bit format, without activation or processing.

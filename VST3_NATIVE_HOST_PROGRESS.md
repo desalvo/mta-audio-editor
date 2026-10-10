@@ -1,3 +1,6 @@
+## r32 — isolated native PCM chain
+The C++ probe supports `--render-pcm <CID> <input.f32le> <output.f32le>` with exactly 65536 mono float32 frames. `native_chain.render_native_chain` serializes plugin processing in distinct subprocesses. No realtime use; no generalized MIDI, stereo or latency compensation.
+
 ## r31 — offline graph executor
 Deterministic Python offline insert pipeline with block sample offsets, chain latency compensation, tail flush and fail-closed processing. It does **not** invoke plugins directly: real VST3 subprocess adapter, cross-platform runtime isolation and realtime audits are outstanding.
 
