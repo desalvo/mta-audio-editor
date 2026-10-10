@@ -12,7 +12,9 @@
 #include "pluginterfaces/vst/ivstcomponent.h"
 #include "pluginterfaces/vst/ivstaudioprocessor.h"
 #include "pluginterfaces/vst/ivsteditcontroller.h"
+#include "pluginterfaces/vst/ivsthostapplication.h"
 #include <cstring>
+#include <atomic>
 #endif
 #if defined(_WIN32)
 #define NOMINMAX
@@ -31,6 +33,40 @@ static std::string json_quote(const std::string& value) {
   out << '"'; return out.str();
 }
 #ifdef MTA_HAS_VST3_SDK
+// Minimal diagnostic host context. It deliberately does not provide IMessage,
+// attribute lists, GUI callbacks, transport or realtime services.
+class DiagnosticHost final : public Steinberg::Vst::IHostApplication {
+ public:
+  Steinberg::tresult PLUGIN_API queryInterface(const Steinberg::TUID iid, void** obj) override {
+    if (!obj) return Steinberg::kInvalidArgument;
+    *obj = nullptr;
+    if (Steinberg::FUnknownPrivate::iidEqual(iid, Steinberg::Vst::IHostApplication::iid) ||
+        Steinberg::FUnknownPrivate::iidEqual(iid, Steinberg::FUnknown::iid)) {
+      *obj = static_cast<Steinberg::Vst::IHostApplication*>(this);
+      addRef();
+      return Steinberg::kResultOk;
+    }
+    return Steinberg::kNoInterface;
+  }
+  Steinberg::uint32 PLUGIN_API addRef() override { return ++refs_; }
+  Steinberg::uint32 PLUGIN_API release() override {
+    // Stack-owned for the duration of initialize/terminate; never delete this.
+    const auto count = refs_.load();
+    return count > 1 ? --refs_ : count;
+  }
+  Steinberg::tresult PLUGIN_API getName(Steinberg::Vst::String128 name) override {
+    if (!name) return Steinberg::kInvalidArgument;
+    constexpr char16_t hostName[] = u"MTA Audio Editor VST3 Diagnostic";
+    for (size_t i = 0; i < 128; ++i) name[i] = i < sizeof(hostName)/sizeof(hostName[0]) ? hostName[i] : 0;
+    return Steinberg::kResultOk;
+  }
+  Steinberg::tresult PLUGIN_API createInstance(Steinberg::TUID, Steinberg::TUID, void** obj) override {
+    if (obj) *obj = nullptr;
+    return Steinberg::kNotImplemented;
+  }
+ private:
+  std::atomic<Steinberg::uint32> refs_{1};
+};
 static std::string class_cid(const Steinberg::TUID& id) {
   std::ostringstream out;
   out << std::hex << std::setfill('0');
@@ -80,6 +116,7 @@ int main(int argc, char** argv) {
   bool created = false;
   bool found = false;
   bool initialized = false;
+  bool hostContextProvided = false;
   bool terminated = false;
   bool audioProcessor = false;
   bool editController = false;
@@ -128,9 +165,11 @@ int main(int argc, char** argv) {
         }
         if (controller) controller->release();
         if (lifecycle) {
-          // Null host context intentionally does not claim a production host contract.
-          // Some plugins require a real IHostApplication and will correctly refuse.
-          const auto initResult = component->initialize(nullptr);
+          // A minimal IHostApplication may still be rejected by plugins requiring
+          // IMessage, IAttributeList or other optional host capabilities.
+          DiagnosticHost host;
+          hostContextProvided = true;
+          const auto initResult = component->initialize(&host);
           initialized = (initResult == Steinberg::kResultOk);
           if (initialized) {
             // Read-only bus inspection in the isolated probe, before terminate().
@@ -166,6 +205,7 @@ int main(int argc, char** argv) {
             << ",\"instance_found\":" << (found ? "true" : "false")
             << ",\"instance_created\":" << (created ? "true" : "false")
             << ",\"lifecycle_requested\":" << (lifecycle ? "true" : "false")
+            << ",\"host_context_provided\":" << (hostContextProvided ? "true" : "false")
             << ",\"instance_initialized\":" << (initialized ? "true" : "false")
             << ",\"instance_terminated\":" << (terminated ? "true" : "false")
             << ",\"audio_processor_queried\":" << (audioProcessorQueried ? "true" : "false")

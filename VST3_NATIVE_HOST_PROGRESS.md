@@ -1,3 +1,12 @@
+## 0.3.0-r14 — Isolated VST3 diagnostic host context
+
+- Added a stack-scoped minimal `IHostApplication` implementation with host name, interface negotiation and reference counting in the subprocess only.
+- `--lifecycle` now passes that diagnostic context to `IComponent::initialize()`. Unsupported host-created objects explicitly return `kNotImplemented`.
+- Added `host_context_provided` to diagnostic JSON/Python results. `native_host_ready` remains `false`.
+- No playback, rendering, VST audio processing, plugin editor or automation changes.
+- SDK-backed compilation and real-plugin interoperability are **not yet validated**. Some plug-ins can legitimately decline initialization.
+- Preserved the r13 VST3 support manual cover titles and PDFs.
+
 # VST3 host development status (0.3.0-r7)
 
 The isolated `native/vst3_probe` can now optionally compile against the independently
