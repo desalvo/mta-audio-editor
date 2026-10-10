@@ -37,4 +37,5 @@ def test_no_realtime_calls_in_probe():
     assert 'canProcessSampleSize' in code
     assert 'getLatencySamples' in code
     assert 'component->process(' not in code
-    assert 'processor->process(' not in code
+    assert 'processor->process(data)' in code
+    assert 'if (offline && processor && processingSetupSucceeded)' in code

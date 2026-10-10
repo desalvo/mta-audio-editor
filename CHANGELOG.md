@@ -1,3 +1,8 @@
+## 0.3.0-r24
+
+- Experimental offline processing probe for one silent block; diagnostic only.
+- Python API validation and isolated smoke-test regression coverage.
+
 ## 0.3.0-r23 (2026-10-10)
 - Verified native probe builds and links with the complete Steinberg MIT VST3 SDK.
 - Link official Steinberg VST3 interface IID implementation files; avoids undefined references to IComponent, IAudioProcessor, IEditController and IHostApplication.

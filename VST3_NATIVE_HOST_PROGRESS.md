@@ -102,3 +102,8 @@ The `--lifecycle <CID>` opt-in subprocess diagnostic attempts `IComponent::initi
 
 ### r22: SDK checkout validation
 GitHub-generated VST3 SDK ZIP archives omit Git submodule sources. Use `git clone --recursive https://github.com/steinbergmedia/vst3sdk.git` and `git submodule update --init --recursive` before configuring `-DMTA_VST3_SDK_ROOT=...`. The CMake configuration now rejects incomplete SDK trees.
+
+
+## 0.3.0-r24 — isolated offline single-block smoke test
+
+The optional `--offline <CID>` mode (never used in playback) negotiates 48 kHz / 512 frames, allocates bounded silent input/output buses, activates default buses, calls `setActive(true)` / `setProcessing(true)`, processes exactly one offline block and deactivates both. The probe returns process status, finite-value checks and output channel count. This is **not** production hosting: no MIDI, parameter queues, process context, controller GUI, module init/deinit or general transport are implemented. The plugin subprocess can crash/hang and must be bounded by the external caller; `native_host_ready` remains false.

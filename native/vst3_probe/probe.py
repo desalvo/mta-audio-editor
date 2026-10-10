@@ -34,7 +34,9 @@ def resolve_module_binary(bundle: Path) -> Path:
 
 def probe_plugin(path: str, executable: str, timeout: float = 5,
                  instantiate_cid: str | None = None,
-                 lifecycle: bool = False, configure: bool = False) -> dict:
+                 lifecycle: bool = False, configure: bool = False, offline: bool = False) -> dict:
+    if offline:
+        configure = True
     if configure:
         lifecycle = True
     if lifecycle and instantiate_cid is None:
@@ -51,7 +53,7 @@ def probe_plugin(path: str, executable: str, timeout: float = 5,
             raise ValueError('Expected a 32-character hexadecimal VST3 class CID')
     command = [str(probe), str(binary)]
     if instantiate_cid is not None:
-        command.extend(['--configure' if configure else '--lifecycle' if lifecycle else '--instantiate',
+        command.extend(['--offline' if offline else '--configure' if configure else '--lifecycle' if lifecycle else '--instantiate',
                         instantiate_cid.lower()])
     result = subprocess.run(command, text=True, capture_output=True,
                             timeout=min(max(float(timeout), 0.5), 15), check=False)
@@ -117,6 +119,13 @@ def probe_plugin(path: str, executable: str, timeout: float = 5,
             'processing_sample_size': (payload.get('processing_sample_size') if configure and
                                        type(payload.get('processing_sample_size')) is int and
                                        payload['processing_sample_size'] in (32, 64) else None),
+            'offline_requested': offline,
+            'offline_activated': offline and payload.get('offline_activated') is True,
+            'offline_processing_started': offline and payload.get('offline_processing_started') is True,
+            'offline_process_succeeded': offline and payload.get('offline_process_succeeded') is True,
+            'offline_deactivated': offline and payload.get('offline_deactivated') is True,
+            'offline_output_channels': (payload.get('offline_output_channels') if offline and type(payload.get('offline_output_channels')) is int and 0 <= payload['offline_output_channels'] <= 256 else None),
+            'offline_nonfinite_samples': (payload.get('offline_nonfinite_samples') if offline and type(payload.get('offline_nonfinite_samples')) is int and 0 <= payload['offline_nonfinite_samples'] <= 131072 else None),
             'native_host_ready': False,
             'audio_processor_queried': payload.get('audio_processor_queried') is True if instantiate_cid else False,
             'audio_processor_available': payload.get('audio_processor_available') is True if instantiate_cid else False,

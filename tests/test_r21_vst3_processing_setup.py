@@ -21,7 +21,8 @@ def test_configuration_is_explicit_and_safe():
     assert 'setup.maxSamplesPerBlock = 512' in code
     assert 'setup.sampleRate = 48000.0' in code
     assert 'processor->setActive(' not in code
-    assert 'processor->process(' not in code
+    assert 'processor->process(data)' in code
+    assert 'if (offline && processor && processingSetupSucceeded)' in code
     assert 'native_host_ready' in code and 'false' in code
 
 

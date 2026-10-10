@@ -16,6 +16,8 @@
 #include <cstring>
 #include <limits>
 #include <atomic>
+#include <vector>
+#include <cmath>
 #endif
 #if defined(_WIN32)
 #define NOMINMAX
@@ -81,11 +83,12 @@ static std::string class_cid(const Steinberg::TUID& id) {
 }
 #endif
 int main(int argc, char** argv) {
-  const bool configure = argc == 4 && std::string(argv[2]) == "--configure";
+  const bool offline = argc == 4 && std::string(argv[2]) == "--offline";
+  const bool configure = argc == 4 && (std::string(argv[2]) == "--configure" || offline);
   const bool lifecycle = argc == 4 && (std::string(argv[2]) == "--lifecycle" || configure);
   const bool instantiate = argc == 4 && (std::string(argv[2]) == "--instantiate" || lifecycle);
   if ((argc != 2 && !instantiate) || !std::filesystem::exists(argv[1]) || !std::filesystem::is_regular_file(argv[1])) {
-    std::cerr << "usage: mta_vst3_probe <VST3 module binary> [--instantiate|--lifecycle|--configure <32-hex-CID>]\n";return 2;
+    std::cerr << "usage: mta_vst3_probe <VST3 module binary> [--instantiate|--lifecycle|--configure|--offline <32-hex-CID>]\n";return 2;
   }
   // Validate user-controlled CID before loading any third-party binary.
   // This applies with and without the optional Steinberg SDK.
@@ -147,6 +150,13 @@ int main(int argc, char** argv) {
   bool processingSetupRequested = false;
   bool processingSetupSucceeded = false;
   int processingSampleSize = -1;
+  bool offlineRequested = offline;
+  bool offlineActivated = false;
+  bool offlineProcessingStarted = false;
+  bool offlineProcessSucceeded = false;
+  bool offlineDeactivated = false;
+  int offlineOutputChannels = 0;
+  int offlineNonFiniteSamples = 0;
   int latencySamples = -1;
   int tailSamples = -1;
   bool editController = false;
@@ -213,7 +223,7 @@ int main(int argc, char** argv) {
                 processingSetupRequested = true;
                 if (supports32Bit || supports64Bit) {
                   Steinberg::Vst::ProcessSetup setup{};
-                  setup.processMode = Steinberg::Vst::kRealtime;
+                  setup.processMode = offline ? Steinberg::Vst::kOffline : Steinberg::Vst::kRealtime;
                   setup.symbolicSampleSize = supports32Bit ? Steinberg::Vst::kSample32 : Steinberg::Vst::kSample64;
                   setup.maxSamplesPerBlock = 512;
                   setup.sampleRate = 48000.0;
@@ -237,6 +247,96 @@ int main(int argc, char** argv) {
                              << "\",\"direction\":\"" << (direction == Steinberg::Vst::kInput ? "input" : "output")
                              << "\",\"index\":" << index << ",\"channels\":" << info.channelCount
                              << ",\"bus_type\":" << info.busType << "}";
+                }
+              }
+            }
+            // An explicitly requested single-block offline smoke test. This MUST
+            // remain in the separate diagnostic process, never the DAW playback.
+            if (offline && processor && processingSetupSucceeded) {
+              // The offline process mode must match setupProcessing() and ProcessData.
+              const auto inCount = component->getBusCount(Steinberg::Vst::kAudio, Steinberg::Vst::kInput);
+              const auto outCount = component->getBusCount(Steinberg::Vst::kAudio, Steinberg::Vst::kOutput);
+              if (inCount >= 0 && inCount <= 8 && outCount >= 0 && outCount <= 8) {
+                struct Buffers {
+                  std::vector<std::vector<Steinberg::Vst::Sample32>> samples32;
+                  std::vector<std::vector<Steinberg::Vst::Sample64>> samples64;
+                  std::vector<Steinberg::Vst::Sample32*> ptr32;
+                  std::vector<Steinberg::Vst::Sample64*> ptr64;
+                };
+                auto makeBuses = [&](Steinberg::Vst::BusDirection direction, int count,
+                                     std::vector<Steinberg::Vst::AudioBusBuffers>& buses,
+                                     std::vector<Buffers>& storage) -> bool {
+                  buses.resize(count);
+                  storage.resize(count);
+                  for (int i = 0; i < count; ++i) {
+                    Steinberg::Vst::BusInfo info{};
+                    if (component->getBusInfo(Steinberg::Vst::kAudio, direction, i, info) != Steinberg::kResultOk ||
+                        info.channelCount < 0 || info.channelCount > 32) return false;
+                    buses[i].numChannels = info.channelCount;
+                    buses[i].silenceFlags = info.channelCount < 64
+                        ? ((uint64_t{1} << info.channelCount) - 1) : 0;
+                    if (processingSampleSize == 32) {
+                      storage[i].samples32.resize(info.channelCount, std::vector<Steinberg::Vst::Sample32>(512, 0));
+                      for (auto& channel : storage[i].samples32) storage[i].ptr32.push_back(channel.data());
+                      buses[i].channelBuffers32 = storage[i].ptr32.empty() ? nullptr : storage[i].ptr32.data();
+                    } else {
+                      storage[i].samples64.resize(info.channelCount, std::vector<Steinberg::Vst::Sample64>(512, 0));
+                      for (auto& channel : storage[i].samples64) storage[i].ptr64.push_back(channel.data());
+                      buses[i].channelBuffers64 = storage[i].ptr64.empty() ? nullptr : storage[i].ptr64.data();
+                    }
+                  }
+                  return true;
+                };
+                std::vector<Steinberg::Vst::AudioBusBuffers> inBuses, outBuses;
+                std::vector<Buffers> inputStorage, outputStorage;
+                if (makeBuses(Steinberg::Vst::kInput, inCount, inBuses, inputStorage) &&
+                    makeBuses(Steinberg::Vst::kOutput, outCount, outBuses, outputStorage)) {
+                  // A default bus can be activated before component activation.
+                  bool busActivationOk = true;
+                  for (const auto direction : {Steinberg::Vst::kInput, Steinberg::Vst::kOutput}) {
+                    const int count = direction == Steinberg::Vst::kInput ? inCount : outCount;
+                    for (int i = 0; i < count; ++i) {
+                      Steinberg::Vst::BusInfo info{};
+                      if (component->getBusInfo(Steinberg::Vst::kAudio, direction, i, info) == Steinberg::kResultOk &&
+                          (info.flags & Steinberg::Vst::BusInfo::kDefaultActive)) {
+                        if (component->activateBus(Steinberg::Vst::kAudio, direction, i, true) != Steinberg::kResultOk)
+                          busActivationOk = false;
+                      }
+                    }
+                  }
+                  if (busActivationOk && component->setActive(true) == Steinberg::kResultOk) {
+                    offlineActivated = true;
+                    if (processor->setProcessing(true) == Steinberg::kResultOk) {
+                      offlineProcessingStarted = true;
+                      Steinberg::Vst::ProcessData data{};
+                      data.processMode = Steinberg::Vst::kOffline;
+                      data.symbolicSampleSize = processingSampleSize == 32 ? Steinberg::Vst::kSample32 : Steinberg::Vst::kSample64;
+                      data.numSamples = 512;
+                      data.numInputs = inCount;
+                      data.numOutputs = outCount;
+                      data.inputs = inBuses.empty() ? nullptr : inBuses.data();
+                      data.outputs = outBuses.empty() ? nullptr : outBuses.data();
+                      // No events, automation or musical transport are supplied yet.
+                      offlineProcessSucceeded = processor->process(data) == Steinberg::kResultOk;
+                      if (offlineProcessSucceeded) {
+                        for (const auto& b : outputStorage) {
+                          if (processingSampleSize == 32) {
+                            for (const auto& c : b.samples32) {
+                              ++offlineOutputChannels;
+                              for (auto v : c) if (!std::isfinite(v)) ++offlineNonFiniteSamples;
+                            }
+                          } else {
+                            for (const auto& c : b.samples64) {
+                              ++offlineOutputChannels;
+                              for (auto v : c) if (!std::isfinite(v)) ++offlineNonFiniteSamples;
+                            }
+                          }
+                        }
+                      }
+                      processor->setProcessing(false);
+                    }
+                    offlineDeactivated = component->setActive(false) == Steinberg::kResultOk;
+                  }
                 }
               }
             }
@@ -274,6 +374,13 @@ int main(int argc, char** argv) {
             << ",\"processing_sample_rate\":" << (processingSetupRequested ? 48000 : 0)
             << ",\"processing_block_size\":" << (processingSetupRequested ? 512 : 0)
             << ",\"processing_sample_size\":" << processingSampleSize
+            << ",\"offline_requested\":" << (offlineRequested ? "true" : "false")
+            << ",\"offline_activated\":" << (offlineActivated ? "true" : "false")
+            << ",\"offline_processing_started\":" << (offlineProcessingStarted ? "true" : "false")
+            << ",\"offline_process_succeeded\":" << (offlineProcessSucceeded ? "true" : "false")
+            << ",\"offline_deactivated\":" << (offlineDeactivated ? "true" : "false")
+            << ",\"offline_output_channels\":" << offlineOutputChannels
+            << ",\"offline_nonfinite_samples\":" << offlineNonFiniteSamples
             << ",\"buses\":" << busDetails.str() << ",\"native_host_ready\":false}\n";
 #else
   if (instantiate) { std::cerr << "Instance creation requires MTA_VST3_SDK_ROOT\n"; return 8; }

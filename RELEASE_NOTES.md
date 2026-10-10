@@ -1,3 +1,9 @@
+## 0.3.0-r24
+
+- Added SDK-built isolated VST3 single-block offline smoke-test, explicitly opt-in.
+- Bounded silent audio bus buffers, cleanup and finite-output diagnostics.
+- No audio-engine integration or realtime plugin support.
+
 ## 0.3.0-r23
 - Fixed real-SDK VST3 probe linking using official MIT SDK IID implementation units; build validated locally on Linux x86_64.
 - SDK-enabled plugin processing, GUI and bus activation remain experimental and disabled in the playback engine.
