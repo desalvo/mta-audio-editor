@@ -1,3 +1,9 @@
+## 0.3.0-r9
+
+- Added bilingual VST3 manuals (Markdown and PDF) with the exact existing user manual cover page.
+- Hardened untrusted native VST3 class metadata against duplicate CIDs and control characters.
+- Kept existing playback/rendering unchanged.
+
 ## 0.3.0-r8
 
 - VST3 native SDK probe: enumerate class IDs, names, and categories in an isolated process.

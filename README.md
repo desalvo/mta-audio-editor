@@ -190,3 +190,10 @@ Native `.maeproj` files are lightweight JSON manifests backed by the modular wor
 Projects support 44.1/48/96 kHz sample rates (44.1 kHz default), with automatic resampling of imported sources to the project rate. Export includes 24/32-bit WAV at 44.1/48/96 kHz, standard MP3, M-Live/Merish MP3 and MP3+G (ZIP containing an MP3+CDG pair).
 
 Multi-singer SAM Audio setup (experimental): see [SINGER_SEPARATION_SETUP.md](SINGER_SEPARATION_SETUP.md).
+
+### VST3 user manuals / Manuali VST3
+
+- [VST3 User Guide (English, PDF)](app/docs/MTA-Audio-Editor-VST3-Manual-EN.pdf)
+- [Manuale VST3 (italiano, PDF)](app/docs/MTA-Audio-Editor-VST3-Manual-IT.pdf)
+- [VST3 Guide (English, Markdown)](docs/VST3_USER_GUIDE_EN.md)
+- [Guida VST3 (italiano, Markdown)](docs/VST3_USER_GUIDE_IT.md)

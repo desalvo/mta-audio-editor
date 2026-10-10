@@ -58,6 +58,16 @@ def probe_plugin(path: str, executable: str, timeout: float = 5) -> dict:
         and isinstance(entry.get('name'), str) and len(entry['name']) <= 512
         and isinstance(entry.get('category'), str) and len(entry['category']) <= 256
     ]
+    # One unique class per CID; reject control characters from untrusted factories.
+    seen = set()
+    safe_classes = []
+    for entry in classes:
+        cid = entry['cid'].lower()
+        if cid in seen or any(ord(c) < 32 or ord(c) == 127 for c in entry['name'] + entry['category']):
+            continue
+        seen.add(cid)
+        safe_classes.append({**entry, 'cid': cid})
+    classes = safe_classes
     return {'name': plugin.stem, 'factory_export': True,
             'native_host_ready': False, 'binary': str(binary), 'classes': classes,
             **({'factory_classes': payload['factory_classes']}

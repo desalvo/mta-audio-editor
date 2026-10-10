@@ -1,3 +1,9 @@
+## 0.3.0-r9
+
+- Added bilingual VST3 manuals (Markdown and PDF) with the exact existing user manual cover page.
+- Hardened untrusted native VST3 class metadata against duplicate CIDs and control characters.
+- Kept existing playback/rendering unchanged.
+
 ## 0.3.0-r6
 
 - Compliance: archive scanner for source/release ZIP and TAR; rejects unreviewed bundled VST3/AU/AAX and traversal paths.
