@@ -10,7 +10,7 @@ def test_product_version_revision_and_build_are_distinct():
     assert version == "0.3.0"
     assert revision.isdigit() and int(revision) >= 1
     assert build.isdigit() and len(build) == 14
-    assert revision not in version
+    assert (ROOT / "RELEASE").read_text(encoding="utf-8").strip() == f"{version}-r{revision}"
 
 
 def test_release_identity_is_exposed_separately():

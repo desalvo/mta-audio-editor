@@ -1,6 +1,8 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
+#include <atomic>
+#include <new>
 #if defined(_WIN32)
 # define MTA_EXPORT extern "C" __declspec(dllexport)
 #else
@@ -119,4 +121,52 @@ MTA_EXPORT int mta_pcm_mix_mono_stereo(float* stereo_destination,
     stereo_destination[i * 2 + 1] += mono_source[i] * r;
   }
   return 0;
+}
+
+// r3: bounded single-producer / single-consumer realtime audio FIFO.
+// These methods do not allocate or take locks; creation/destruction occur off
+// the audio thread. This is transport infrastructure, NOT a VST3 host.
+struct MtaSpscAudio {
+  std::size_t capacity;
+  float* samples;
+  std::atomic<std::uint64_t> read{0};
+  std::atomic<std::uint64_t> write{0};
+  explicit MtaSpscAudio(std::size_t n) : capacity(n), samples(new (std::nothrow) float[n]) {}
+  ~MtaSpscAudio() { delete[] samples; }
+};
+MTA_EXPORT void* mta_spsc_create(std::size_t sample_capacity) noexcept {
+  if (sample_capacity == 0 || sample_capacity > 1U << 24) return nullptr;
+  auto* fifo = new (std::nothrow) MtaSpscAudio(sample_capacity);
+  if (fifo && !fifo->samples) { delete fifo; return nullptr; }
+  return fifo;
+}
+MTA_EXPORT void mta_spsc_destroy(void* handle) noexcept { delete static_cast<MtaSpscAudio*>(handle); }
+MTA_EXPORT std::size_t mta_spsc_available(const void* handle) noexcept {
+  auto* fifo = static_cast<const MtaSpscAudio*>(handle);
+  if (!fifo) return 0;
+  const auto w=fifo->write.load(std::memory_order_acquire);
+  const auto r=fifo->read.load(std::memory_order_acquire);
+  return static_cast<std::size_t>(w-r);
+}
+MTA_EXPORT std::size_t mta_spsc_write(void* handle, const float* input, std::size_t count) noexcept {
+  auto* fifo = static_cast<MtaSpscAudio*>(handle);
+  if (!fifo || !input || !count) return 0;
+  const auto w=fifo->write.load(std::memory_order_relaxed);
+  const auto r=fifo->read.load(std::memory_order_acquire);
+  const auto room=fifo->capacity-static_cast<std::size_t>(w-r);
+  if (count > room) return 0; // fail atomically: never write a partial audio block
+  for (std::size_t i=0;i<count;++i) if (!std::isfinite(input[i])) return 0;
+  for (std::size_t i=0;i<count;++i) fifo->samples[(w+i)%fifo->capacity]=input[i];
+  fifo->write.store(w+count,std::memory_order_release);
+  return count;
+}
+MTA_EXPORT std::size_t mta_spsc_read(void* handle, float* output, std::size_t count) noexcept {
+  auto* fifo = static_cast<MtaSpscAudio*>(handle);
+  if (!fifo || !output || !count) return 0;
+  const auto r=fifo->read.load(std::memory_order_relaxed);
+  const auto w=fifo->write.load(std::memory_order_acquire);
+  const auto n=(count < w-r)?count:static_cast<std::size_t>(w-r);
+  for (std::size_t i=0;i<n;++i) output[i]=fifo->samples[(r+i)%fifo->capacity];
+  fifo->read.store(r+n,std::memory_order_release);
+  return n;
 }

@@ -1,3 +1,8 @@
+## 0.3.0-r3
+
+- Native audio core: bounded lock-free single-producer/single-consumer float PCM FIFO, fixed-capacity memory and atomic block writes.
+- Existing Python playback and VST3 offline host remain unchanged; realtime host is not yet enabled.
+
 ## 0.3.0-r2
 
 - Added transactional native C++20 mono-to-stereo constant-power pan mixer with input validation.
