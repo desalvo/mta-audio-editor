@@ -1472,11 +1472,6 @@ body:has(#topZoom:active) .wave{image-rendering:auto}
 .track-delay-input{width:76px;min-width:0;height:23px;background:#0b1721;border:1px solid #385570;border-radius:4px;color:#f0f7fd;padding:2px 5px;font-size:11px;font-variant-numeric:tabular-nums}
 .track-delay-unit{font-size:9px;color:#99bad2;white-space:nowrap}
 
-/* r287: non-destructive per-track timeline delay below the volume control. */
-.track-delay-row{display:flex;gap:5px;align-items:center;margin-top:4px;font-size:10px;color:#bcd1e0;min-width:0}
-.track-delay-row label{font-size:9px;white-space:nowrap}
-.track-delay-input{width:76px;min-width:0;height:23px;background:#0b1721;border:1px solid #385570;border-radius:4px;color:#f0f7fd;padding:2px 5px;font-size:11px;font-variant-numeric:tabular-nums}
-.track-delay-unit{font-size:9px;color:#99bad2;white-space:nowrap}
 
 /* r288: compact icon-only tap tempo adjacent to the BPM control. */
 .tap-tempo-icon{display:inline-flex;align-items:center;justify-content:center;min-width:26px;min-height:26px;padding:2px 5px;border:1px solid var(--border,#718096);border-radius:6px;background:transparent;color:inherit;font-size:1.05rem;cursor:pointer;vertical-align:middle}

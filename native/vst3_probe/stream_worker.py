@@ -1,6 +1,8 @@
 """Experimental interactive IPC VST3 worker (offline thread only).
 
 MTAPCM2 framing: uint32le frame count followed by float32 interleaved samples.
+In --stream-events mode only, 0xffffffff/0xfffffffe read/write processor state
+and 0xfffffffd/0xfffffffc read/write controller state; payload is limited to 1 MiB.
 One subprocess owns one plugin until closed. Sending frame count zero ends the stream.
 The API is strictly forbidden inside a realtime audio callback.
 """
@@ -18,6 +20,7 @@ import tempfile
 import threading
 import wave
 from typing import Sequence
+from dataclasses import dataclass
 
 from .native_chain import NativeChainError, NativeWavError, _decode_pcm_wav, _encode_pcm_wav
 from .probe import resolve_module_binary
@@ -54,16 +57,97 @@ def _decode_block(response: bytes, expected_frames: int, channels: int) -> list[
     pcm.frombytes(response[4:])
     if sys.byteorder != 'little':
         pcm.byteswap()
-    if any(not math.isfinite(value) for value in pcm):
-        raise NativeChainError('Streaming worker returned NaN/Inf')
+    if any(not math.isfinite(value) or abs(value) > 16 for value in pcm):
+        raise NativeChainError('Streaming worker returned invalid or out-of-range PCM')
     return list(pcm)
+
+
+
+@dataclass(frozen=True)
+class MidiEvent:
+    kind: str  # "on" or "off"
+    channel: int
+    pitch: int
+    offset: int
+    velocity: float
+    note_id: int = 0
+
+
+@dataclass(frozen=True)
+class ParameterPoint:
+    parameter_id: int
+    offset: int
+    value: float
+
+
+def _encode_events(midi: Sequence[MidiEvent], params: Sequence[ParameterPoint], frames: int) -> bytes:
+    if len(midi) > 32 or len(params) > 32:
+        raise ValueError('Maximum 32 MIDI events and 32 parameter points per block')
+    payload = bytearray(struct.pack('<II', len(midi), len(params)))
+    for event in midi:
+        if not isinstance(event, MidiEvent) or event.kind not in ('on', 'off') or any(
+            type(n) is not int for n in (event.channel, event.pitch, event.offset, event.note_id)
+        ) or not (0 <= event.channel <= 15 and 0 <= event.pitch <= 127 and
+                  0 <= event.offset < frames and 0 <= event.note_id <= 65535) or (
+            isinstance(event.velocity, bool) or not isinstance(event.velocity, (int, float)) or
+            not math.isfinite(event.velocity) or not 0 <= event.velocity <= 1
+        ):
+            raise ValueError('Invalid MIDI event')
+        payload += struct.pack('<BBBBHHf', 1 if event.kind == 'on' else 2,
+                               event.channel, event.pitch, 0, event.offset,
+                               event.note_id, event.velocity)
+    for point in params:
+        if not isinstance(point, ParameterPoint) or any(
+            type(n) is not int for n in (point.parameter_id, point.offset)
+        ) or not (0 <= point.parameter_id <= 0xffffffff and 0 <= point.offset < frames) or (
+            isinstance(point.value, bool) or not isinstance(point.value, (int, float)) or
+            not math.isfinite(point.value) or not 0 <= point.value <= 1
+        ):
+            raise ValueError('Invalid parameter point')
+        payload += struct.pack('<IHHf', point.parameter_id, point.offset, 0, point.value)
+    return bytes(payload)
+
+
+@dataclass(frozen=True)
+class EventBlock:
+    """One PCM quantum and its sample-aligned VST3 events (offline only)."""
+
+    pcm: Sequence[float]
+    midi: Sequence[MidiEvent] = ()
+    parameters: Sequence[ParameterPoint] = ()
+
+
+def prepare_event_batch(blocks: Sequence[EventBlock], channels: int) -> tuple[bytes, ...]:
+    """Validate the ENTIRE bounded batch before performing any VST3 IPC.
+
+    This guarantees invalid later blocks cannot cause a partially processed
+    batch. Runtime/plug-in failures can still leave earlier blocks processed.
+    Never use this helper on the realtime callback thread.
+    """
+    if not isinstance(blocks, (tuple, list)) or not 1 <= len(blocks) <= 128:
+        raise ValueError('Event batch must contain 1..128 blocks')
+    if type(channels) is not int or channels not in (1, 2):
+        raise ValueError('Event batch requires mono or stereo')
+    result = []
+    total_frames = 0
+    for block in blocks:
+        if not isinstance(block, EventBlock):
+            raise ValueError('Expected EventBlock')
+        pcm = _encode_block(block.pcm, channels)
+        frames = len(block.pcm) // channels
+        total_frames += frames
+        if total_frames > 65536:
+            raise ValueError('Event batch exceeds 65536 frames')
+        events = _encode_events(block.midi, block.parameters, frames)
+        result.append(pcm[:4] + events + pcm[4:])
+    return tuple(result)
 
 
 class NativeVST3Worker:
     """One persistent subprocess per plugin, with timeout-controlled IPC thread."""
 
     def __init__(self, plugin: tuple[str, str], executable: str,
-                 *, channels: int = 2, sample_rate: int = 48000, timeout: float = 10.0):
+                 *, channels: int = 2, sample_rate: int = 48000, timeout: float = 10.0, events_enabled: bool = False):
         if type(channels) is not int or channels not in (1, 2):
             raise ValueError('Channels must be 1 or 2')
         if type(sample_rate) is not int or sample_rate not in RATES:
@@ -82,9 +166,10 @@ class NativeVST3Worker:
         self.channels = channels
         self.sample_rate = sample_rate
         self.timeout = min(float(timeout), 600.0)
+        self.events_enabled = bool(events_enabled)
         self._lock = threading.Lock()
         self._closed = False
-        self._proc = subprocess.Popen([str(probe), str(binary), '--stream-pcm', cid.lower(),
+        self._proc = subprocess.Popen([str(probe), str(binary), '--stream-events' if self.events_enabled else '--stream-pcm', cid.lower(),
                                        str(channels), str(sample_rate)],
                                       stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                       stderr=subprocess.DEVNULL, bufsize=0)
@@ -120,20 +205,138 @@ class NativeVST3Worker:
             raise NativeChainError('VST3 IPC worker terminated unexpectedly') from error
         return output
 
-    def process(self, samples: Sequence[float]) -> list[float]:
-        payload = _encode_block(samples, self.channels)
-        frames = len(samples) // self.channels
+    def snapshot_controller_state(self) -> bytes:
+        """Capture optional VST3 edit-controller state (not component state)."""
+        if not self.events_enabled:
+            raise ValueError('VST3 controller snapshots require events_enabled=True')
         with self._lock:
             if self._closed or self._proc.poll() is not None:
                 raise NativeChainError('VST3 IPC worker is closed')
-            result = self._exchange(payload, len(payload))
             try:
+                header = self._exchange(struct.pack('<I', 0xfffffffd), 4)
+                size, = struct.unpack('<I', header)
+                if size == 0xffffffff:
+                    raise NotImplementedError('VST3 controller does not provide getState')
+                if size > 1024 * 1024:
+                    raise NativeChainError('VST3 controller state exceeds limit')
+                return self._exchange(b'', size) if size else b''
+            except (NativeChainError, OSError, BrokenPipeError):
+                self.close(force=True)
+                raise
+
+    def restore_controller_state(self, state: bytes) -> None:
+        """Restore edit-controller state at a non-realtime session boundary."""
+        if not self.events_enabled:
+            raise ValueError('VST3 controller restore requires events_enabled=True')
+        if not isinstance(state, bytes) or len(state) > 1024 * 1024:
+            raise ValueError('Invalid VST3 controller state blob')
+        with self._lock:
+            if self._closed or self._proc.poll() is not None:
+                raise NativeChainError('VST3 IPC worker is closed')
+            try:
+                header = struct.pack('<II', 0xfffffffc, len(state)) + state
+                ack = self._exchange(header, 4)
+                if struct.unpack('<I', ack)[0] != 0:
+                    raise NotImplementedError('VST3 controller does not support setState')
+            except (NativeChainError, OSError, BrokenPipeError):
+                self.close(force=True)
+                raise
+
+    def snapshot_state(self) -> bytes:
+        """Obtain up to 1 MiB of VST3 processor state on the worker thread.
+
+        State snapshots are for the SAME plug-in version/class; they must never
+        be deserialized from untrusted files without independent validation.
+        """
+        if not self.events_enabled:
+            raise ValueError('VST3 snapshots require events_enabled=True')
+        with self._lock:
+            if self._closed or self._proc.poll() is not None:
+                raise NativeChainError('VST3 IPC worker is closed')
+            try:
+                # This command has a variable-length reply; the header is read
+                # first under the same bounded IPC watchdog.
+                header = self._exchange(struct.pack('<I', 0xffffffff), 4)
+                size, = struct.unpack('<I', header)
+                if size == 0xffffffff or size > 1024 * 1024:
+                    raise NativeChainError('VST3 state snapshot rejected')
+                if not size:
+                    return b''
+                # Read remaining state bytes without sending another frame.
+                return self._exchange(b'', size)
+            except (NativeChainError, OSError, BrokenPipeError):
+                self.close(force=True)
+                raise
+
+    def restore_state(self, state: bytes) -> None:
+        """Restore processor state at a safe session boundary (not realtime)."""
+        if not self.events_enabled:
+            raise ValueError('VST3 state restore requires events_enabled=True')
+        if not isinstance(state, bytes) or len(state) > 1024 * 1024:
+            raise ValueError('Invalid VST3 state blob')
+        with self._lock:
+            if self._closed or self._proc.poll() is not None:
+                raise NativeChainError('VST3 IPC worker is closed')
+            try:
+                ack = self._exchange(struct.pack('<II', 0xfffffffe, len(state)) + state, 4)
+                code, = struct.unpack('<I', ack)
+                if code != 0:
+                    raise NativeChainError('VST3 state restore rejected')
+            except (NativeChainError, OSError, BrokenPipeError):
+                self.close(force=True)
+                raise
+
+    def process_event_batch(self, blocks: Sequence[EventBlock]) -> list[list[float]]:
+        """Validate all blocks first, then send in order over one persistent IPC.
+
+        The worker stays stateful across blocks. Call only on a control/worker
+        thread; this method intentionally does not claim atomic DSP rollback.
+        """
+        if not self.events_enabled:
+            raise ValueError('Event batches require events_enabled=True')
+        payloads = prepare_event_batch(blocks, self.channels)
+        with self._lock:
+            if self._closed or self._proc.poll() is not None:
+                raise NativeChainError('VST3 IPC worker is closed')
+            outputs = []
+            for payload in payloads:
+                frames, = struct.unpack_from('<I', payload)
+                try:
+                    response = self._exchange(payload, 4 + frames * self.channels * 4)
+                    outputs.append(_decode_block(response, frames, self.channels))
+                except NativeChainError:
+                    self.close(force=True)
+                    raise
+            return outputs
+
+    def process(self, samples: Sequence[float]) -> list[float]:
+        return self.process_with_events(samples)
+
+    def process_with_events(self, samples: Sequence[float],
+                            midi: Sequence[MidiEvent] = (),
+                            parameters: Sequence[ParameterPoint] = ()) -> list[float]:
+        pcm = _encode_block(samples, self.channels)
+        frames = len(samples) // self.channels
+        if not self.events_enabled and (midi or parameters):
+            raise ValueError('Event transport requires events_enabled=True')
+        payload = (pcm[:4] + _encode_events(midi, parameters, frames) + pcm[4:]
+                   if self.events_enabled else pcm)
+        with self._lock:
+            if self._closed or self._proc.poll() is not None:
+                raise NativeChainError('VST3 IPC worker is closed')
+            try:
+                result = self._exchange(payload, len(pcm))
                 return _decode_block(result, frames, self.channels)
-            except NativeChainError:
+            except (NativeChainError, OSError, BrokenPipeError):
+                # A failed exchange can leave the subprocess mid-frame; it must
+                # never be used for the next audio quantum or session restore.
                 self.close(force=True)
                 raise
 
     def close(self, *, force: bool = False) -> None:
+        # An in-flight timeout may call close(force=True) while another thread
+        # is performing the blocked read. Never wait for _lock here: killing
+        # the child is what releases the reader and avoids self-deadlock.
         if self._closed:
             return
         self._closed = True

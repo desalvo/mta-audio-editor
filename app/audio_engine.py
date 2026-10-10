@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import shutil
 
 import re
 import sys
@@ -496,25 +497,52 @@ def render_track(track: Track, source: Path, out: Path, apply_inserts: bool = Tr
         else f";[mix]aformat=channel_layouts={output_layout}[out]"
     )
     active_vst = [item for item in active if item.plugin == 'vst3']
+    # Preflight the entire graph before invoking ffmpeg or any VST worker. The
+    # output file must not be touched if a later insert is unavailable.
+    from .vst3_host import validate_plugin_path
+    vst_chain = [
+        (validate_plugin_path(str(item.params.get('path', ''))),
+         {key: value for key, value in item.params.items() if key != 'path'})
+        for item in active_vst
+    ]
     with tempfile.TemporaryDirectory(prefix='mta-vst3-') as scratch:
-        intermediate = Path(scratch) / 'pre-vst.wav' if active_vst else out
+        scratch_path = Path(scratch)
+        intermediate = scratch_path / 'pre-vst.wav' if vst_chain else out
         _run([
             "ffmpeg", "-y", "-v", "error", "-i", str(source),
             "-filter_complex", filters, "-map", "[out]", "-ar", str(sample_rate),
             "-c:a", "pcm_s24le", str(intermediate),
         ])
-        for index, item in enumerate(active_vst):
-            from .vst3_host import validate_plugin_path
-            plugin_path = validate_plugin_path(str(item.params.get('path', '')))
-            next_file = out if index == len(active_vst) - 1 else Path(scratch) / f'vst-{index}.wav'
-            proc = subprocess.run([
-                sys.executable, '-m', 'app.vst3_host', '--process',
-                str(intermediate), str(next_file), str(plugin_path),
-                '--parameters-json', json.dumps({k: v for k, v in item.params.items() if k != 'path'}),
-            ], capture_output=True, text=True, timeout=600)
+        for index, (plugin_path, values) in enumerate(vst_chain):
+            # Always render to scratch first; never allow an external plugin
+            # process to overwrite the last good export on failure.
+            next_file = scratch_path / f'vst-{index}.wav'
+            try:
+                proc = subprocess.run([
+                    sys.executable, '-m', 'app.vst3_host', '--process',
+                    str(intermediate), str(next_file), str(plugin_path),
+                    '--parameters-json', json.dumps(values),
+                ], capture_output=True, text=True, timeout=600)
+            except subprocess.TimeoutExpired as exc:
+                raise RuntimeError(f'VST3 insert {index + 1} timed out') from exc
             if proc.returncode:
                 raise RuntimeError('VST3 failed: ' + (proc.stderr.strip()[-1200:] or str(proc.returncode)))
+            if not next_file.is_file() or next_file.stat().st_size == 0:
+                raise RuntimeError(f'VST3 insert {index + 1} produced no audio')
             intermediate = next_file
+        if vst_chain:
+            # Atomic replacement is scoped to the destination filesystem.
+            # A failed worker leaves an existing output unchanged.
+            out.parent.mkdir(parents=True, exist_ok=True)
+            temporary = None
+            try:
+                with tempfile.NamedTemporaryFile(dir=out.parent, prefix=f'.{out.name}.', suffix='.wav', delete=False) as handle:
+                    temporary = Path(handle.name)
+                shutil.copyfile(intermediate, temporary)
+                temporary.replace(out)
+            finally:
+                if temporary is not None:
+                    temporary.unlink(missing_ok=True)
 
 
 def render_mix(

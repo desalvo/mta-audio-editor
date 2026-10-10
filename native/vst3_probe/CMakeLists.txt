@@ -30,6 +30,7 @@ if(MTA_VST3_SDK_ROOT)
     "${MTA_VST3_SDK_ROOT}/public.sdk/source/vst/vstinitiids.cpp"
     "${MTA_VST3_SDK_ROOT}/public.sdk/source/vst/hosting/eventlist.cpp"
     "${MTA_VST3_SDK_ROOT}/public.sdk/source/vst/hosting/parameterchanges.cpp"
+    "${MTA_VST3_SDK_ROOT}/public.sdk/source/common/memorystream.cpp"
   )
 endif()
 if(UNIX AND NOT APPLE)

@@ -21,6 +21,7 @@
 #include "pluginterfaces/vst/ivstprocesscontext.h"
 #include "public.sdk/source/vst/hosting/eventlist.h"
 #include "public.sdk/source/vst/hosting/parameterchanges.h"
+#include "public.sdk/source/common/memorystream.h"
 #include <cstring>
 #include <limits>
 #include <atomic>
@@ -92,7 +93,8 @@ static std::string class_cid(const Steinberg::TUID& id) {
 #endif
 int main(int argc, char** argv) {
   // Interactive offline worker: stdin/stdout PCM frames, never the audio callback.
-  const bool renderStream = argc == 6 && std::string(argv[2]) == "--stream-pcm";
+  const bool renderEvents = argc == 6 && std::string(argv[2]) == "--stream-events";
+  const bool renderStream = argc == 6 && (std::string(argv[2]) == "--stream-pcm" || renderEvents);
   const bool renderSession = argc == 6 && std::string(argv[2]) == "--render-session";
   const bool renderPcm = ((argc == 7 || argc == 8) && std::string(argv[2]) == "--render-pcm") || renderSession || renderStream;
   const bool offline = (argc == 4 && std::string(argv[2]) == "--offline") || renderPcm;
@@ -308,6 +310,8 @@ int main(int argc, char** argv) {
       const auto result = pluginFactory->createInstance(info.cid, Steinberg::Vst::IComponent::iid,
                                                          reinterpret_cast<void**>(&component));
       Steinberg::Vst::IAudioProcessor* processor = nullptr;
+      Steinberg::Vst::IEditController* controller = nullptr;
+      bool separateControllerInitialized = false;
       if (result == Steinberg::kResultOk && component != nullptr) {
         created = true;
         // Discovery only: query interfaces without calling setupProcessing, setActive,
@@ -319,13 +323,11 @@ int main(int argc, char** argv) {
         }
         // Query read-only processor capabilities after component initialization below.
         // Retain the processor interface until the diagnostic cycle is complete.
-        Steinberg::Vst::IEditController* controller = nullptr;
         editControllerQueried = true;
         if (component->queryInterface(Steinberg::Vst::IEditController::iid,
                                       reinterpret_cast<void**>(&controller)) == Steinberg::kResultOk && controller) {
           editController = true;
         }
-        if (controller) controller->release();
         if (lifecycle) {
           // A minimal IHostApplication may still be rejected by plugins requiring
           // IMessage, IAttributeList or other optional host capabilities.
@@ -334,6 +336,23 @@ int main(int argc, char** argv) {
           const auto initResult = component->initialize(&host);
           initialized = (initResult == Steinberg::kResultOk);
           if (initialized) {
+            // A VST3 edit controller may be a separate class (e.g. Steinberg ADelay).
+            // Keep its interface alive through processing; release after terminate.
+            if (!controller && renderEvents) {
+              Steinberg::TUID controllerCid{};
+              if (component->getControllerClassId(controllerCid) == Steinberg::kResultOk) {
+                if (pluginFactory->createInstance(controllerCid, Steinberg::Vst::IEditController::iid,
+                      reinterpret_cast<void**>(&controller)) == Steinberg::kResultOk && controller) {
+                  if (controller->initialize(&host) == Steinberg::kResultOk) {
+                    separateControllerInitialized = true;
+                    editController = true;
+                  } else {
+                    controller->release();
+                    controller = nullptr;
+                  }
+                }
+              }
+            }
             if (processor) {
               sampleSizeQueried = true;
               supports32Bit = processor->canProcessSampleSize(Steinberg::Vst::kSample32) == Steinberg::kResultOk;
@@ -496,6 +515,10 @@ int main(int argc, char** argv) {
                         // Persistent worker protocol: little-endian uint32 frame count,
                         // followed by interleaved float32 PCM. Zero closes the session.
                         int streamFrames = 0;
+                        struct MidiPacket { uint8_t type{}, channel{}, pitch{}; uint16_t offset{}, noteId{}; float velocity{}; };
+                        struct ParamPacket { uint32_t id{}; uint16_t offset{}; float value{}; };
+                        std::vector<MidiPacket> blockMidi;
+                        std::vector<ParamPacket> blockParams;
                         if (renderStream) {
                           unsigned char header[4]{};
                           std::cin.read(reinterpret_cast<char*>(header), 4);
@@ -504,8 +527,135 @@ int main(int argc, char** argv) {
                               (uint32_t(header[1]) << 8) | (uint32_t(header[2]) << 16) |
                               (uint32_t(header[3]) << 24);
                           if (count == 0) break;
+                          // Opt-in control commands for --stream-events only.  Never run
+                          // these on an audio callback; cap state blobs at one MiB.
+                          // Controller state is separate from processor state in VST3.
+                          // Commands: FD read, FC write, each with independent 1 MiB cap.
+                          if (renderEvents && (count == 0xfffffffdU || count == 0xfffffffcU)) {
+                            constexpr uint32_t kControllerLimit = 1024U * 1024U;
+                            const auto sendLength = [](uint32_t size, const char* data) {
+                              unsigned char bytes[4] = {static_cast<unsigned char>(size),
+                                  static_cast<unsigned char>(size >> 8),
+                                  static_cast<unsigned char>(size >> 16),
+                                  static_cast<unsigned char>(size >> 24)};
+                              std::cout.write(reinterpret_cast<const char*>(bytes), 4);
+                              if (data && size <= kControllerLimit) std::cout.write(data, size);
+                              std::cout.flush();
+                            };
+                            if (count == 0xfffffffdU) {
+                              Steinberg::MemoryStream state;
+                              if (!controller || controller->getState(&state) != Steinberg::kResultOk ||
+                                  state.getSize() < 0 || state.getSize() > kControllerLimit) {
+                                sendLength(0xffffffffU, nullptr);
+                              } else {
+                                sendLength(static_cast<uint32_t>(state.getSize()), state.getData());
+                              }
+                            } else {
+                              unsigned char bytes[4]{};
+                              std::cin.read(reinterpret_cast<char*>(bytes), 4);
+                              if (!std::cin) { offlineProcessSucceeded = false; break; }
+                              const uint32_t length = uint32_t(bytes[0]) | uint32_t(bytes[1]) << 8 |
+                                  uint32_t(bytes[2]) << 16 | uint32_t(bytes[3]) << 24;
+                              if (length > kControllerLimit) { offlineProcessSucceeded = false; break; }
+                              std::vector<char> payload(length);
+                              if (length) std::cin.read(payload.data(), length);
+                              if (!std::cin) { offlineProcessSucceeded = false; break; }
+                              Steinberg::MemoryStream state(payload.data(), length);
+                              const bool ok = controller && controller->setState(&state) == Steinberg::kResultOk;
+                              sendLength(ok ? 0U : 0xffffffffU, nullptr);
+                            }
+                            if (!std::cout) { offlineProcessSucceeded = false; break; }
+                            continue;
+                          }
+                          if (renderEvents && (count == 0xffffffffU || count == 0xfffffffeU)) {
+                            constexpr uint32_t kMaxStateBytes = 1024U * 1024U;
+                            auto writeStatus = [](uint32_t length, const char* bytes = nullptr) {
+                              unsigned char hdr[4] = {static_cast<unsigned char>(length),
+                                  static_cast<unsigned char>(length >> 8),
+                                  static_cast<unsigned char>(length >> 16),
+                                  static_cast<unsigned char>(length >> 24)};
+                              std::cout.write(reinterpret_cast<const char*>(hdr), 4);
+                              if (bytes && length <= kMaxStateBytes) std::cout.write(bytes, length);
+                              std::cout.flush();
+                            };
+                            if (count == 0xffffffffU) {
+                              Steinberg::MemoryStream state;
+                              if (component->getState(&state) != Steinberg::kResultOk ||
+                                  state.getSize() > kMaxStateBytes || state.getSize() < 0) {
+                                writeStatus(0xffffffffU);
+                              } else {
+                                writeStatus(static_cast<uint32_t>(state.getSize()), state.getData());
+                              }
+                              if (!std::cout) { offlineProcessSucceeded = false; break; }
+                              continue;
+                            }
+                            unsigned char lenHeader[4]{};
+                            std::cin.read(reinterpret_cast<char*>(lenHeader), 4);
+                            if (!std::cin) { offlineProcessSucceeded = false; break; }
+                            const uint32_t length = uint32_t(lenHeader[0]) | (uint32_t(lenHeader[1]) << 8) |
+                                (uint32_t(lenHeader[2]) << 16) | (uint32_t(lenHeader[3]) << 24);
+                            if (length > kMaxStateBytes) { offlineProcessSucceeded = false; break; }
+                            std::vector<char> bytes(length);
+                            if (length) std::cin.read(bytes.data(), length);
+                            if (!std::cin) { offlineProcessSucceeded = false; break; }
+                            Steinberg::MemoryStream state(bytes.data(), length);
+                            const bool ok = component->setState(&state) == Steinberg::kResultOk;
+                            // The controller is a distinct VST3 object: synchronize its
+                            // component view after the processor state is applied.
+                            if (ok && controller) {
+                              Steinberg::MemoryStream forController(bytes.data(), length);
+                              controller->setComponentState(&forController);
+                            }
+                            writeStatus(ok ? 0U : 0xffffffffU);
+                            if (!std::cout) { offlineProcessSucceeded = false; break; }
+                            continue;
+                          }
                           if (count > 512) { offlineProcessSucceeded = false; break; }
                           streamFrames = static_cast<int>(count);
+                          if (renderEvents) {
+                            // Versioned opt-in transport: counts and fixed-width records precede PCM.
+                            // Bounds are enforced *before* reading untrusted event records.
+                            unsigned char counts[8]{};
+                            std::cin.read(reinterpret_cast<char*>(counts), 8);
+                            if (!std::cin) { offlineProcessSucceeded = false; break; }
+                            const auto read32 = [](const unsigned char* p) -> uint32_t {
+                              return uint32_t(p[0]) | uint32_t(p[1]) << 8 | uint32_t(p[2]) << 16 | uint32_t(p[3]) << 24;
+                            };
+                            const uint32_t midiCount = read32(counts);
+                            const uint32_t paramCount = read32(counts + 4);
+                            if (midiCount > 32 || paramCount > 32) { offlineProcessSucceeded = false; break; }
+                            auto read16 = [](const unsigned char* p) -> uint16_t { return uint16_t(p[0] | uint16_t(p[1]) << 8); };
+                            for (uint32_t i = 0; i < midiCount; ++i) {
+                              unsigned char record[12]{};
+                              std::cin.read(reinterpret_cast<char*>(record), 12);
+                              if (!std::cin) { offlineProcessSucceeded = false; break; }
+                              MidiPacket item{};
+                              item.type = record[0]; item.channel = record[1]; item.pitch = record[2];
+                              item.offset = read16(record + 4); item.noteId = read16(record + 6);
+                              const uint32_t bits = read32(record + 8);
+                              std::memcpy(&item.velocity, &bits, sizeof(bits));
+                              if ((item.type != 1 && item.type != 2) || item.channel > 15 ||
+                                  item.pitch > 127 || item.offset >= count ||
+                                  !std::isfinite(item.velocity) || item.velocity < 0.0f || item.velocity > 1.0f) {
+                                offlineProcessSucceeded = false; break;
+                              }
+                              blockMidi.push_back(item);
+                            }
+                            if (!offlineProcessSucceeded) break;
+                            for (uint32_t i = 0; i < paramCount; ++i) {
+                              unsigned char record[12]{};
+                              std::cin.read(reinterpret_cast<char*>(record), 12);
+                              if (!std::cin) { offlineProcessSucceeded = false; break; }
+                              ParamPacket item{};
+                              item.id = read32(record); item.offset = read16(record + 4);
+                              const uint32_t bits = read32(record + 8);
+                              std::memcpy(&item.value, &bits, sizeof(bits));
+                              if (item.offset >= count || !std::isfinite(item.value) ||
+                                  item.value < 0.0f || item.value > 1.0f) { offlineProcessSucceeded = false; break; }
+                              blockParams.push_back(item);
+                            }
+                            if (!offlineProcessSucceeded) break;
+                          }
                           std::cin.read(reinterpret_cast<char*>(pcmInput.data()),
                               std::streamsize(size_t(count) * pcmChannels * sizeof(float)));
                           if (!std::cin || !std::all_of(pcmInput.begin(),
@@ -529,6 +679,50 @@ int main(int argc, char** argv) {
                         outputEvents.clear();
                         parameterChanges.clearQueue();
                         outputParameters.clearQueue();
+                        if (renderEvents) {
+                          if (!blockMidi.empty() && !hasEventInput) { offlineProcessSucceeded = false; break; }
+                          for (const auto& item : blockMidi) {
+                            Steinberg::Vst::Event event{};
+                            event.busIndex = 0;
+                            event.sampleOffset = item.offset;
+                            if (item.type == 1) {
+                              event.type = Steinberg::Vst::Event::kNoteOnEvent;
+                              event.noteOn.channel = item.channel;
+                              event.noteOn.pitch = item.pitch;
+                              event.noteOn.velocity = item.velocity;
+                              event.noteOn.noteId = item.noteId;
+                            } else {
+                              event.type = Steinberg::Vst::Event::kNoteOffEvent;
+                              event.noteOff.channel = item.channel;
+                              event.noteOff.pitch = item.pitch;
+                              event.noteOff.velocity = item.velocity;
+                              event.noteOff.noteId = item.noteId;
+                            }
+                            if (events.addEvent(event) != Steinberg::kResultOk) {
+                              offlineProcessSucceeded = false; break;
+                            }
+                          }
+                          if (!offlineProcessSucceeded) break;
+                          for (const auto& item : blockParams) {
+                            // Only genuine writable parameter IDs from the controller are accepted.
+                            bool writable = false;
+                            if (controller) for (int index = 0; index < controller->getParameterCount(); ++index) {
+                              Steinberg::Vst::ParameterInfo info{};
+                              if (controller->getParameterInfo(index, info) == Steinberg::kResultOk &&
+                                  info.id == item.id && !(info.flags & Steinberg::Vst::ParameterInfo::kIsReadOnly)) {
+                                writable = true; break;
+                              }
+                            }
+                            if (!writable) { offlineProcessSucceeded = false; break; }
+                            Steinberg::int32 queueIndex = -1;
+                            auto* queue = parameterChanges.addParameterData(item.id, queueIndex);
+                            Steinberg::int32 pointIndex = -1;
+                            if (!queue || queue->addPoint(item.offset, item.value, pointIndex) != Steinberg::kResultOk) {
+                              offlineProcessSucceeded = false; break;
+                            }
+                          }
+                          if (!offlineProcessSucceeded) break;
+                        }
                         // A sample-offset note-on/note-off pair provides a bounded
                         // event-path smoke test, not a MIDI sequencer implementation.
                         if (!renderStream && hasEventInput && block == 0) {
@@ -662,6 +856,8 @@ int main(int argc, char** argv) {
           }
         }
       }
+      if (separateControllerInitialized && controller) controller->terminate();
+      if (controller) controller->release();
       if (processor) processor->release();
       if (component) component->release();
       break;

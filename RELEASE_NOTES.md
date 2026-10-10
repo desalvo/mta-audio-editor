@@ -1,3 +1,97 @@
+## 0.3.0-r170 — Safe concurrent rendered playback previews
+
+- Serialize duplicate preview renders and atomically publish only valid WAV outputs; incomplete results never enter the playback cache.
+- Include enabled insert settings in playback URL identity to prevent stale browser FX preview reuse.
+- Retain experimental native host status (`native_host_ready=false`); browser/WebAudio playback remains separate from native VST3 realtime hosting.
+
+## 0.3.0-r169 — atomic VST3 offline render chain
+
+- Preflight every VST3 insert before processing a track.
+- Keep all intermediate plugin outputs outside the destination path and atomically publish only a complete successful output.
+- Detect worker timeouts and missing/empty audio output with contextual errors.
+- Preserve earlier exports on failed plugin processing.
+- Experimental realtime host remains disabled (`native_host_ready=false`).
+
+## 0.3.0-r168
+
+- Integrate project insert VST3 checkpoint capture/staging with the experimental control-thread supervisor.
+- Protect against plugin switches while capturing and reject stale state on reopen.
+- Native production host remains disabled (`native_host_ready=false`).
+
+## 0.3.0-r168 — Project-scoped VST3 snapshot storage
+
+- Persist bounded component/controller snapshots for a specific track or master insert, bound to its VST3 module identity.
+- Preserve snapshots in portable project archives and reject oversized/malformed snapshot members on import.
+- Prune snapshots for deleted inserts via explicit control-thread cleanup; no realtime I/O.
+- Experimental API; not yet automatically connected to production playback or save hooks. `native_host_ready=false`.
+
+## 0.3.0-r166 — persistent control-thread VST3 snapshots
+
+- Add portable plugin-identity-bound component/controller checkpoint envelopes with SHA-256 integrity checking.
+- Atomically save state pairs with bounded decoding and private temporary files.
+- Add supervisor checkpoint import/export for restoring state across application sessions.
+- Recovery and snapshot APIs are control-thread-only; `native_host_ready=false` remains unchanged.
+
+## 0.3.0-r165 — Atomic optional VST3 component/controller supervisor checkpoints
+
+Support joint component and optional controller snapshots with failure-atomic checkpoint replacement, correct restore ordering, and unsupported-controller handling. Experimental worker-thread only; `native_host_ready=false`.
+
+## 0.3.0-r164 — Independent controller state IPC (experimental)
+
+Separate 1 MiB-bounded opt-in controller `getState`/`setState` on the isolated VST3 worker, separate from component state. Controller support is plugin-dependent. Never invoke state operations in realtime callbacks; `native_host_ready=false`.
+
+## 0.3.0-r163 — VST3 processor state IPC (experimental)
+
+Bounded SDK getState/setState transport via the opt-in stream-events protocol, Python snapshot/restore operations, and fail-closed IPC handling. This is off-callback only; native_host_ready=false.
+
+## 0.3.0-r162 — isolated worker PCM fault containment
+
+Reject nonnumeric, boolean, nonfinite and out-of-range returned PCM from external adapters and IPC. No VST3 state getState/setState yet; native_host_ready=false.
+
+## 0.3.0-r161 — IPC fault containment
+
+The single-quantum persistent IPC path now force-closes an untrustworthy subprocess on transport failure; it cannot silently carry a damaged protocol frame into the next block. Native host activation remains disabled. This does not implement getState/setState.
+
+## 0.3.0-r160 — supervised VST3 worker state initialization
+
+- Add optional `restore_state` control-thread hook invoked for every newly created IPC worker, before processing audio.
+- Fail closed on restore errors: discard worker, return dry and enforce the configured restart budget; add restoration diagnostics.
+- Cover first start, fault recovery and seek/reset with focused tests. This is a state-rehydration hook only, **not** Steinberg `getState`/`setState` serialization.
+- Retain all cumulative r153–r159 changes and keep `native_host_ready=false`.
+
+## 0.3.0-r159 — IPC worker fault containment
+
+- Contain unexpected third-party processor exceptions without replaying partially processed PCM.
+- Reject malformed event-batch responses (wrong count, container type, sample count or non-finite samples), close invalid worker and recover only on a new quantum.
+- Keep `native_host_ready=false`; production callback and native plugin state restore remain unverified.
+
+## 0.3.0-r158 — isolated VST3 fault recovery and seek barrier
+
+- Add bounded, configurable recovery spacing after VST3 IPC faults; emit dry for each skipped block without replay.
+- Add a control-thread-only reset_session seek barrier to close stale plugin state and start a new epoch at the next quantum.
+- Track reset/deferred-block counts and test fault/seek lifecycle. `native_host_ready=false` remains mandatory.
+
+## 0.3.0-r157 — VST3 rejected worker cleanup
+
+- Close any newly opened plugin worker whose channel or event configuration fails recovery validation, preventing orphan VST3 subprocesses across restart cycles.
+- Add regression tests for incompatible workers and cleanup failures; native_host_ready remains false.
+
+## 0.3.0-r156 — track Delay UI deduplication (`native_host_ready=false`)
+
+Remove duplicate Delay input rendered inside every track header and duplicate JavaScript delay control functions and CSS declarations. Retain one working per-track delay and existing delay effect processing, with a regression test against recurrence. No production VST3 host activation.
+
+## 0.3.0-r155 — bounded supervised VST3 IPC recovery (`native_host_ready=false`)
+
+Added control-thread-only supervisor for persistent event-enabled VST3 IPC sessions. No automatic replay after partial DSP failure, bounded restarts, epoch tracking, dry fallback, strict PCM/event preflight and test coverage. This does not integrate with the production playback callback; plugin state after a crash is lost, and host activation remains disabled.
+
+## 0.3.0-r154 — bounded event batch preflight (native_host_ready=false)
+
+Stateful persistent VST3 IPC now supports bounded batch requests (up to 128 blocks and 65536 frames), validates every MIDI/automation event and PCM quantum prior to sending any IPC data, and retains original legacy single-block support. DSP rollback after plugin failure is not guaranteed; production playback remains disabled.
+
+
+### 0.3.0-r153 — Experimental VST3 event IPC (native host remains disabled)
+Persistent offline VST3 IPC optionally accepts bounded MIDI note-on/off and normalized parameter changes per PCM block, with sample offsets. The legacy PCM stream is unchanged. Events are validated and mapped into Steinberg EventList/ParameterChanges on the isolated worker process. This is not an enabled realtime host.
+
 ## 0.3.0-r152 — safe event/audio dispatch
 
 Reject exact-sequence event packets with mismatched audio frame counts and fail closed on bounded stale-event scan exhaustion. Preserve the r121–r151 cumulative work. `native_host_ready=false`; live SDK and playback integration still pending.

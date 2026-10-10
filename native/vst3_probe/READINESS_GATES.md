@@ -1,3 +1,11 @@
+## 0.3.0-r155 — bounded supervised VST3 IPC recovery (`native_host_ready=false`)
+
+Added control-thread-only supervisor for persistent event-enabled VST3 IPC sessions. No automatic replay after partial DSP failure, bounded restarts, epoch tracking, dry fallback, strict PCM/event preflight and test coverage. This does not integrate with the production playback callback; plugin state after a crash is lost, and host activation remains disabled.
+
+## r154 event-batch status
+
+All event-bearing quanta are validated before starting bounded IPC batch execution. No atomic rollback of VST3 plugin state on runtime failure is possible. The API MUST NOT be invoked from realtime audio callbacks. Production playback integration and cross-platform realtime stress tests remain incomplete. `native_host_ready=false`.
+
 # Native VST3 host activation gate (r67)
 
 `native_host_ready=false` remains mandatory. The new real-SDK ADelay CI acceptance

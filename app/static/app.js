@@ -941,11 +941,6 @@ function trackHead(t,i){
         <input id="track-delay-${t.id}" class="track-delay-input" data-delay-track="${t.id}" type="number" step="${current?.transport_time_mode==='musical'?'0.01':'1'}" value="${trackDelayInputValue(t)}" onkeydown="if(event.key==='Enter'){this.blur()}" onchange="setTrackDelayFromInput('${t.id}',this.value)" title="${esc(tr('Track delay (positive or negative)','Ritardo traccia (positivo o negativo)'))}">
         <span class="track-delay-unit">${current?.transport_time_mode==='musical'?'beats':'ms'}</span>
       </div>
-      <div class="track-delay-row" onclick="event.stopPropagation()">
-        <label for="track-delay-${t.id}">${esc(tr('Delay','Ritardo'))}</label>
-        <input id="track-delay-${t.id}" class="track-delay-input" data-delay-track="${t.id}" type="number" step="${current?.transport_time_mode==='musical'?'0.01':'1'}" value="${trackDelayInputValue(t)}" onkeydown="if(event.key==='Enter'){this.blur()}" onchange="setTrackDelayFromInput('${t.id}',this.value)" title="${esc(tr('Track delay (positive or negative)','Ritardo traccia (positivo o negativo)'))}">
-        <span class="track-delay-unit">${current?.transport_time_mode==='musical'?'beats':'ms'}</span>
-      </div>
       ${t.type==='click'?`<div class="track-metronome-kind" title="${esc(metronomeTrackModeLabel(t))}" aria-label="${esc(metronomeTrackModeLabel(t))}">${esc(metronomeTrackModeLabel(t))}</div>`:''}
     </div>
     <div class="track-height-resizer" title="Trascina per modificare l'altezza della traccia" onpointerdown="beginTrackHeightResize(event,'${t.id}')"></div>
@@ -1022,30 +1017,6 @@ function delayValueFromMs(ms,unit){
   if(unit==='bars'){const beats=Math.max(1,Number(String(current?.time_signature||'4/4').split('/')[0])||4);return Number(ms)*bpm/(beats*60000);}
   if(unit==='quarters')return Number(ms)*bpm/60000;
   return Number(ms);
-}
-function trackDelayInputValue(track){
-  const musical=current?.transport_time_mode==='musical';
-  const value=delayValueFromMs(trackDelayMs(track),musical?'quarters':'ms');
-  return musical?String(Math.round(value*1000)/1000):String(Math.round(value));
-}
-async function setTrackDelayFromInput(id,value){
-  const track=trackById(id);if(!track)return;
-  const n=Number(value);
-  if(!String(value).trim()||!Number.isFinite(n)){
-    toast(tr('Invalid track delay','Ritardo traccia non valido'));
-    const input=$(`[data-delay-track="${id}"]`);if(input)input.value=trackDelayInputValue(track);
-    return;
-  }
-  await setTrackDelay(id,n,current?.transport_time_mode==='musical'?'quarters':'ms');
-}
-function updateTrackDelayUnitDisplay(){
-  $$('.track-delay-row').forEach(row=>{
-    const input=row.querySelector('[data-delay-track]');if(!input)return;
-    const track=trackById(input.dataset.delayTrack);if(!track)return;
-    input.step=current?.transport_time_mode==='musical'?'0.01':'1';
-    input.value=trackDelayInputValue(track);
-    const unit=row.querySelector('.track-delay-unit');if(unit)unit.textContent=current?.transport_time_mode==='musical'?'beats':'ms';
-  });
 }
 function trackDelayInputValue(track){
   const musical=current?.transport_time_mode==='musical';
@@ -3462,7 +3433,11 @@ function canDirectPlayTrack(track,renderFilters=true){
 }
 function playbackSourceForTrack(track,renderFilters=false){
   const direct=canDirectPlayTrack(track,renderFilters);
-  return {direct,url:direct?`/api/projects/${current.id}/audio/${encodeURIComponent(track.filename)}`:`/api/projects/${current.id}/preview-track/${track.id}?render=${renderFilters?'true':'false'}`};
+  // Keep local VST3 paths/parameters out of URLs and avoid oversized query strings.
+  const fxSignature=JSON.stringify((track.inserts||[]).map(x=>[x.id,x.plugin,x.enabled,x.params]));
+  let fxHash=2166136261;for(let i=0;i<fxSignature.length;i++){fxHash=Math.imul(fxHash^fxSignature.charCodeAt(i),16777619)}
+  const fxKey=renderFilters?(fxHash>>>0).toString(36):'dry';
+  return {direct,url:direct?`/api/projects/${current.id}/audio/${encodeURIComponent(track.filename)}`:`/api/projects/${current.id}/preview-track/${track.id}?render=${renderFilters?'true':'false'}&fx=${fxKey}`};
 }
 function playbackWarmStateSignature(){
   if(!current)return '';

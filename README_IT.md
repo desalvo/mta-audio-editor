@@ -1,3 +1,11 @@
+### 0.3.0-r154 — Validated bounded batch event IPC (native host disabled)
+
+The event-enabled persistent VST3 worker can now prevalidate entire batches (up to 128 PCM blocks / 65536 frames), including MIDI and parameter offsets, before any IPC is sent. Real ADelay validation covers irregular stereo blocks and automation. This is a control/worker-thread offline API only; native_host_ready remains false.
+
+
+### 0.3.0-r153 — Experimental VST3 event IPC (native host remains disabled)
+Persistent offline VST3 IPC optionally accepts bounded MIDI note-on/off and normalized parameter changes per PCM block, with sample offsets. The legacy PCM stream is unchanged. Events are validated and mapped into Steinberg EventList/ParameterChanges on the isolated worker process. This is not an enabled realtime host.
+
 ## r141–r150 — Bounded worker event dispatch (experimental)
 
 Added `native/audio_core/vst3_event_dispatch.hpp`: epoch/sequence gating, bounded MIDI and parameter dispatch, atomic prevalidation, preserved sample offsets, failure counters, lifecycle reset, and deterministic sequence consumption. The worker adapter is not yet wired to Steinberg SDK processing or production playback. `native_host_ready=false`.
@@ -477,3 +485,13 @@ New native/audio_core/vst3_parallel_mix.hpp aligns dry PCM to plugin-declared la
 
 
 VST3 r152: worker event/audio shape mismatches and excessive stale-event backlogs now fail closed; playback native host remains disabled.
+
+
+0.3.0-r161: single-block VST3 IPC fault containment; native_host_ready=false.
+
+
+0.3.0-r162: hardened worker PCM validation; native_host_ready=false.
+
+
+### r165
+Optional supervisor-level VST3 controller and component checkpoint pairing; no realtime callback activation.

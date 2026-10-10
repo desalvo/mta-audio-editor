@@ -824,6 +824,13 @@ def import_project_archive(archive_path: Path, owner_user_id: int | None) -> Pro
                 rel = Path(info.filename).relative_to("project")
                 if rel.name == GC_QUEUE_NAME:
                     continue
+                if rel.parts and rel.parts[0] == "vst3-checkpoints":
+                    # The isolated worker's state is inert data, but impose
+                    # bounds before decompressing untrusted project archives.
+                    if (len(rel.parts) != 2 or not re.fullmatch(
+                            r"[A-Za-z0-9_-]{1,64}--[A-Za-z0-9_-]{1,64}\.json", rel.name)
+                            or info.file_size > 3 * 1024 * 1024):
+                        raise ValueError("invalid VST3 checkpoint in project archive")
                 if rel.parts and rel.parts[0] == ".preview":
                     continue
                 if rel.name == "preview-master.mp3" or rel.name.startswith(".sample-fx-"):
