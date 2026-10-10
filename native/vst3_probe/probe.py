@@ -46,8 +46,20 @@ def probe_plugin(path: str, executable: str, timeout: float = 5) -> dict:
     payload = json.loads(result.stdout)
     if payload.get('factory_export') is not True:
         raise RuntimeError('VST3 factory export missing')
+    classes = payload.get('classes', [])
+    if not isinstance(classes, list):
+        classes = []
+    classes = [
+        {'cid': entry['cid'], 'name': entry['name'], 'category': entry['category']}
+        for entry in classes[:10000]
+        if isinstance(entry, dict)
+        and isinstance(entry.get('cid'), str) and len(entry['cid']) == 32
+        and all(c in '0123456789abcdefABCDEF' for c in entry['cid'])
+        and isinstance(entry.get('name'), str) and len(entry['name']) <= 512
+        and isinstance(entry.get('category'), str) and len(entry['category']) <= 256
+    ]
     return {'name': plugin.stem, 'factory_export': True,
-            'native_host_ready': False, 'binary': str(binary),
+            'native_host_ready': False, 'binary': str(binary), 'classes': classes,
             **({'factory_classes': payload['factory_classes']}
                if isinstance(payload.get('factory_classes'), int) and not isinstance(payload.get('factory_classes'), bool)
                and 0 <= payload['factory_classes'] <= 10000 else {})}

@@ -1,3 +1,9 @@
+## 0.3.0-r8
+
+- VST3 native SDK probe: enumerate class IDs, names, and categories in an isolated process.
+- Validate factory metadata before consuming it in Python.
+- Keep the default audio path unchanged.
+
 ## 0.3.0-r7
 - Optional Steinberg SDK factory class-count probing in isolated native process; no change to default audio engine.
 - VST3 host implementation and licensing progress documentation.

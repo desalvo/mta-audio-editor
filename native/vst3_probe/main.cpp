@@ -3,6 +3,9 @@
 #include <iostream>
 #include <filesystem>
 #include <string>
+#include <iomanip>
+#include <sstream>
+#include <algorithm>
 #ifdef MTA_HAS_VST3_SDK
 #include "pluginterfaces/base/ipluginbase.h"
 #endif
@@ -11,6 +14,24 @@
 #include <windows.h>
 #else
 #include <dlfcn.h>
+#endif
+// Escape untrusted plugin metadata before emitting a JSON diagnostic record.
+static std::string json_quote(const std::string& value) {
+  std::ostringstream out; out << '"';
+  for (unsigned char c : value) {
+    if (c == '"' || c == '\\') { out << '\\' << char(c); }
+    else if (c < 0x20) { out << "\\u" << std::hex << std::setfill('0') << std::setw(4) << unsigned(c) << std::dec; }
+    else out << char(c);
+  }
+  out << '"'; return out.str();
+}
+#ifdef MTA_HAS_VST3_SDK
+static std::string class_cid(const Steinberg::TUID& id) {
+  std::ostringstream out;
+  out << std::hex << std::setfill('0');
+  for (const auto byte : id) out << std::setw(2) << unsigned(static_cast<unsigned char>(byte));
+  return out.str();
+}
 #endif
 int main(int argc, char** argv) {
   if (argc != 2 || !std::filesystem::exists(argv[1]) || !std::filesystem::is_regular_file(argv[1])) {
@@ -37,8 +58,20 @@ int main(int argc, char** argv) {
   if (classCount < 0 || classCount > 10000) {
     pluginFactory->release();std::cerr << "Invalid class count\n";return 6;
   }
+  std::ostringstream classes;
+  classes << "[";
+  for (Steinberg::int32 i=0; i<classCount; ++i) {
+    Steinberg::PClassInfo info{};
+    if (pluginFactory->getClassInfo(i, &info) != Steinberg::kResultOk) continue;
+    if (classes.tellp() > std::streampos(1)) classes << ",";
+    classes << "{\"cid\":" << json_quote(class_cid(info.cid))
+            << ",\"name\":" << json_quote(info.name)
+            << ",\"category\":" << json_quote(info.category) << "}";
+  }
+  classes << "]";
   pluginFactory->release();
   std::cout << "{\"factory_export\":true,\"factory_classes\":" << classCount
+            << ",\"classes\":" << classes.str()
             << ",\"native_host_ready\":false}\n";
 #else
   // Without the SDK the export can be checked but no Steinberg interfaces are invoked.
