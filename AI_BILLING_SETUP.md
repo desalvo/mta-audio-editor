@@ -425,3 +425,18 @@ as persistent user storage. Do not use shared writable filesystem permissions.
 
 Software checks alone do not certify GPU metering or native installers: complete
 hardware and platform-level acceptance tests before enabling real billing.
+
+### Linux LXC delegated cgroup launcher (r207 update)
+
+The wizard's `mta-audio-editor.service` now sets `Delegate=cpu io` and starts
+`app.ai_cgroup_launcher`. The launcher moves its own systemd-managed web PID
+into a `mta-web-process` leaf of its delegated unit cgroup *before* enabling
+`cpu` and `io` on the parent; it then prepares `mta-ai-accounting`, enables
+both controllers there, and exports `MTA_AI_CGROUP_PARENT` to the web process.
+Each inference runs in a distinct child cgroup via the existing metering agent.
+If any step is blocked by LXC/systemd, the web service still starts, but the
+accounting environment variable is cleared and paid CPU metering fails closed.
+Do not create or chmod the global cgroup hierarchy or run a privileged LXC to
+bypass delegation. Verify `Check readiness` after reboot and with actual jobs;
+preflight success alone does not certify measurement completeness. This setup
+has not been validated inside the user's Proxmox LXC environment.

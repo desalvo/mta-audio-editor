@@ -143,6 +143,7 @@ def init_auth_db() -> None:
           role TEXT NOT NULL DEFAULT 'user',
           active INTEGER NOT NULL DEFAULT 0,
           email_confirmed INTEGER NOT NULL DEFAULT 0,
+          pending_email TEXT NOT NULL DEFAULT '',
           totp_secret_enc TEXT NOT NULL DEFAULT '',
           totp_pending_enc TEXT NOT NULL DEFAULT '',
           totp_enabled INTEGER NOT NULL DEFAULT 0,
@@ -208,6 +209,7 @@ def init_auth_db() -> None:
         # Migration safety for early development DBs.
         for definition in (
             "display_name TEXT NOT NULL DEFAULT ''",
+            "pending_email TEXT NOT NULL DEFAULT ''",
             "totp_secret_enc TEXT NOT NULL DEFAULT ''",
             "totp_pending_enc TEXT NOT NULL DEFAULT ''",
             "updated_at INTEGER NOT NULL DEFAULT 0",
@@ -292,6 +294,7 @@ def public_user(row) -> dict:
         "id": row["id"],
         "username": row["username"],
         "email": row["email"],
+        "pending_email": row["pending_email"] if "pending_email" in row.keys() else "",
         "display_name": row["display_name"] or "",
         "role": row["role"],
         "active": bool(row["active"]),
@@ -356,13 +359,13 @@ def _verification_link(token: str, base_url: str = "") -> str:
     return (base + path) if base else path
 
 
-def _send_verification_email(user_id: int, token: str, base_url: str = "") -> None:
+def _send_verification_email(user_id: int, token: str, base_url: str = "", recipient: str | None = None) -> None:
     row = get_user(user_id)
     if not row:
         return
     link = _verification_link(token, base_url)
     send_mail(
-        [row["email"]],
+        [recipient or row["email"]],
         "Conferma la tua email · MTA Audio Editor",
         f"Conferma la tua email aprendo questo link:\n{link}\n\nIl link scade tra 24 ore.",
         f"<p>Conferma la tua email per <b>MTA Audio Editor</b>.</p><p><a href='{html.escape(link)}'>Conferma email</a></p><p>Il link scade tra 24 ore.</p>",
@@ -414,11 +417,29 @@ def register_user(username: str, email: str, display_name: str, password: str, b
 
 
 def confirm_email(token: str) -> bool:
-    row = _consume_email_token(token)
-    if not row:
-        return False
+    """Promote a pending address atomically; never deactivate an existing user."""
     with db() as con:
-        con.execute("UPDATE users SET email_confirmed=1,updated_at=? WHERE id=?", (now_ts(),row["user_id"]))
+        tok = con.execute(
+            """SELECT * FROM email_tokens WHERE token_hash=? AND purpose IN
+               ('verify-email', 'verify-email-change') AND used_at IS NULL AND expires_at>?""",
+            (_token_hash(token), now_ts()),
+        ).fetchone()
+        if tok is None:
+            return False
+        user = con.execute("SELECT * FROM users WHERE id=?", (tok["user_id"],)).fetchone()
+        if user is None:
+            return False
+        if tok["purpose"] == "verify-email-change":
+            if not user["pending_email"]:
+                return False
+            try:
+                con.execute("UPDATE users SET email=?,pending_email='',email_confirmed=1,updated_at=? WHERE id=?",
+                            (user["pending_email"], now_ts(),user["id"]))
+            except sqlite3.IntegrityError:
+                return False
+        else:
+            con.execute("UPDATE users SET email_confirmed=1,updated_at=? WHERE id=?", (now_ts(),user["id"]))
+        con.execute("UPDATE email_tokens SET used_at=? WHERE id=?", (now_ts(),tok["id"]))
     return True
 
 
@@ -706,30 +727,31 @@ def update_profile(user_id: int, *, display_name: str | None = None, email: str 
     if not row:
         raise ValueError("Utente non trovato.")
     ts = now_ts()
-    email_changed = False
+    changed = False
+    destination = ""
+    if email is not None:
+        destination = email.strip().lower()
+        if not EMAIL_RE.fullmatch(destination):
+            raise ValueError("Indirizzo email non valido.")
     with db() as con:
         if display_name is not None:
             con.execute("UPDATE users SET display_name=?,updated_at=? WHERE id=?", (display_name.strip()[:120],ts,user_id))
-        if email is not None:
-            email = email.strip().lower()
-            if not EMAIL_RE.fullmatch(email):
-                raise ValueError("Indirizzo email non valido.")
-            if email != row["email"].lower():
-                try:
-                    con.execute(
-                        "UPDATE users SET email=?,email_confirmed=0,active=0,updated_at=? WHERE id=?",
-                        (email,ts,user_id),
-                    )
-                except sqlite3.IntegrityError as exc:
-                    raise ValueError("Email già utilizzata.") from exc
-                email_changed = True
+        if destination and destination != row["email"].lower():
+            duplicate = con.execute("SELECT id FROM users WHERE (email=? OR pending_email=?) AND id<>?",
+                                    (destination, destination, user_id)).fetchone()
+            if duplicate:
+                raise ValueError("Email già utilizzata o in attesa di verifica.")
+            con.execute("UPDATE users SET pending_email=?,updated_at=? WHERE id=?", (destination,ts,user_id))
+            changed = True
     token = None
-    if email_changed:
-        token = _create_email_token(user_id)
+    if changed:
+        # Existing account stays active and verified. The destination is committed
+        # only after the new mailbox proves ownership of the confirmation token.
+        token = _create_email_token(user_id, "verify-email-change")
         try:
-            _send_verification_email(user_id,token,base_url)
+            _send_verification_email(user_id, token, base_url, recipient=destination)
         except Exception:
-            LOGGER.exception("Unable to send verification email after profile update for user_id=%s", user_id)
+            LOGGER.warning("Email change pending SMTP configuration for user_id=%s", user_id)
     return public_user(get_user(user_id)), token
 
 

@@ -517,3 +517,9 @@ Consulta [REMOTE_AI_REVERSE_PROXY.md](REMOTE_AI_REVERSE_PROXY.md) per i token as
 AI billing / Tariffe AI: see [AI_BILLING_SETUP.md](AI_BILLING_SETUP.md) for effective dates, open-ended rates, reports and limitations.
 
 HTTPS opzionale per il server web MTA (wizard Linux): vedere [MTA_WEB_HTTPS.md](MTA_WEB_HTTPS.md).
+
+**Cambio indirizzo email (r207):** l'account resta attivo e l'indirizzo email
+precedente continua a essere valido finché il nuovo indirizzo non viene
+confermato. Se SMTP non è configurato, la risposta dell'API profilo segnala
+esplicitamente che la verifica non può essere completata; configurare SMTP e
+richiedere nuovamente la modifica per ricevere un nuovo link di conferma.

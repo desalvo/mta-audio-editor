@@ -597,6 +597,14 @@ def api_account_update(request: Request, body: dict):
     user = require_user(request)
     try:
         updated, _ = update_profile(user["id"], display_name=body.get("display_name"), email=body.get("email"), base_url=str(request.base_url).rstrip("/"))
+        if updated.get("pending_email"):
+            from .auth import _smtp_full
+            smtp = _smtp_full()
+            updated["email_change_message"] = (
+                "Nuova email in attesa di conferma; indirizzo precedente e accesso conservati."
+                if smtp.get("host") and smtp.get("from_email") else
+                "SMTP non configurato: modifica email in attesa, account ancora attivo. Configura SMTP per completare la verifica."
+            )
         return updated
     except ValueError as exc:
         raise HTTPException(400, str(exc)) from exc

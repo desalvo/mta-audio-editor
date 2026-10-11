@@ -273,3 +273,8 @@ See [REMOTE_AI_REVERSE_PROXY.md](REMOTE_AI_REVERSE_PROXY.md) for per-user tokens
 AI billing / Tariffe AI: see [AI_BILLING_SETUP.md](AI_BILLING_SETUP.md) for effective dates, open-ended rates, reports and limitations.
 
 Optional MTA web HTTPS (Linux wizard): see [MTA_WEB_HTTPS.md](MTA_WEB_HTTPS.md).
+
+**Email address changes (r207):** the existing verified address and account
+access remain in place until confirmation of the pending new address. The
+account API reports pending verification, including when SMTP is not configured.
+Configure SMTP and resubmit the email change to request a new confirmation link.

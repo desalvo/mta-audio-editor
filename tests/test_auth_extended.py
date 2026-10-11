@@ -241,10 +241,13 @@ def test_resend_profile_email_and_password_reset_flows(tmp_path, monkeypatch):
     changed, verify_token = auth.update_profile(
         user["id"], email="reset-new@example.test", base_url="https://mta.test"
     )
-    assert changed["email"] == "reset-new@example.test"
-    assert changed["active"] is False
+    assert changed["email"] == "reset@example.test"
+    assert changed["active"] is True
+    assert changed["email_confirmed"] is True
+    assert auth.get_user(user["id"])["pending_email"] == "reset-new@example.test"
     assert verify_token
     assert auth.confirm_email(verify_token)
+    assert auth.get_user(user["id"])["email"] == "reset-new@example.test"
     auth.update_user_admin(user["id"], admin["id"], active=True)
 
     auth.request_password_reset("missing", "https://mta.test")

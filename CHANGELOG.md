@@ -2036,3 +2036,15 @@ All remain experimental isolated prerequisites; production playback, actual VST3
 - Optional TLS for the MTA Linux web server with existing or self-signed X.509 certificates, wizard persistence and secure key permissions; HTTP remains the default.
 - HTTPS installer regression tests, route and worker regression tests, and additional accounting/billing API coverage tests for CI.
 - HTTPS web opzionale nel wizard Linux con certificati esistenti o self-signed, persistenza e permessi sicuri; HTTP resta il default.
+
+### 0.3.0-r207 — LXC cgroup and pending email security refinement
+- The Linux wizard now installs a delegated cgroup v2 launcher, using a web
+  process leaf and per-job accounting subtree with CPU/I/O controller gating.
+  Unsupported environments start the web UI with metering disabled, not a
+  fabricated usage measurement.
+- Updating an account email preserves the verified old address, password and
+  active status until the new mailbox is confirmed; confirmation promotes the
+  pending address atomically. SMTP-unconfigured state is reported in the
+  account-update API, and pending email is exposed to the account owner.
+- Added regression tests. GPU usage remains nonbillable without validated
+  per-job hardware sensors; real Proxmox LXC deployment validation remains pending.

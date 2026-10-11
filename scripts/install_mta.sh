@@ -147,17 +147,56 @@ if (( UNINSTALL )); then
  fi
  echo 'MTA uninstalled. ACE-Step and all AI checkpoints untouched.'; exit 0
 fi
+# Fail before installing packages or replacing the application if another service
+# already owns the requested listener. An existing MTA-owned listener may be
+# reused during a managed reinstall/reconfiguration.
+check_mta_port_owner() {
+ local listener mainpid line found=0
+ command -v ss >/dev/null 2>&1 || { echo 'ss (iproute2) is required to verify the TCP listener' >&2; return 1; }
+ listener=$(ss -H -ltnp "sport = :$PORT") || { echo 'Cannot inspect TCP listeners' >&2; return 1; }
+ [[ -z $listener ]] && return 0
+ mainpid=$(systemctl show -p MainPID --value mta-audio-editor.service 2>/dev/null || :)
+ if [[ ! $mainpid =~ ^[1-9][0-9]*$ ]] || ! systemctl is-active --quiet mta-audio-editor.service; then
+  echo "TCP/$PORT is already occupied; choose another web port or stop the conflicting service." >&2
+  echo "$listener" >&2
+  return 1
+ fi
+ while IFS= read -r line; do
+  [[ -z $line ]] && continue
+  # Only the currently running MTA service's main process may own the port.
+  # Unknown/PID-hidden listeners fail closed, rather than being mistaken for MTA.
+  [[ $line == *"pid=$mainpid,"* ]] || {
+   echo "TCP/$PORT is owned by a process other than MTA (PID $mainpid)." >&2
+   echo "$line" >&2
+   return 1
+  }
+  found=1
+ done <<< "$listener"
+ (( found == 1 ))
+}
+check_mta_port_owner || exit 3
 if [[ $FAMILY == debian ]]; then
  command -v apt-get >/dev/null || { echo 'apt-get missing' >&2; exit 2; }
  DEBIAN_FRONTEND=noninteractive apt-get update
  DEBIAN_FRONTEND=noninteractive apt-get install -y git ca-certificates python3 python3-venv python3-pip ffmpeg curl
 else
  command -v dnf >/dev/null || { echo 'dnf missing' >&2; exit 2; }
- dnf install -y git ca-certificates python3.11 python3.11-pip ffmpeg curl || { echo 'Install ffmpeg from trusted repository and retry; no third-party repository will be added automatically' >&2; exit 3; }
+ dnf install -y git ca-certificates python3.14 python3.14-pip ffmpeg curl || { echo 'Install Python 3.14 and FFmpeg from trusted repositories and retry; no third-party repository will be added automatically' >&2; exit 3; }
 fi
-PY=python3
-if command -v python3.11 >/dev/null; then PY=python3.11; fi
-"$PY" -c 'import sys; assert sys.version_info >= (3,11), "Python >=3.11 required"' || exit 3
+# NumPy 2.5.3 (pinned in requirements.txt) requires Python >=3.12.
+# Never prefer an older interpreter merely because python3.11 is installed.
+PY=""
+for candidate in python3.14 python3.13 python3.12 python3; do
+ if command -v "$candidate" >/dev/null 2>&1 && "$candidate" -c 'import sys; sys.exit(0 if sys.version_info >= (3,12) else 1)' 2>/dev/null; then
+  PY=$candidate
+  break
+ fi
+done
+if [[ -z $PY ]]; then
+ echo 'MTA requires Python >=3.12 (NumPy 2.5.3); install a supported interpreter before running this wizard.' >&2
+ exit 3
+fi
+echo "Using $($PY --version) for MTA environment"
 # Do not destroy existing working code before a replacement is checked out.
 mkdir -p "$(dirname "$APP_DIR")" "$(dirname "$VENV")" /etc/mta "$DATA"
 TEMP=$(mktemp -d "$(dirname "$APP_DIR")/.mta-stage.XXXXXXXX")
@@ -264,7 +303,8 @@ WorkingDirectory=$APP_DIR
 EnvironmentFile=$ENVFILE
 Environment=MTA_HOST=$HOST
 Environment=MTA_PORT=$PORT
-ExecStart=$VENV/bin/python -m app.main
+ExecStart=$VENV/bin/python -m app.ai_cgroup_launcher
+Delegate=cpu io
 Restart=on-failure
 RestartSec=5
 NoNewPrivileges=true
@@ -304,9 +344,25 @@ if [[ $BIND == network && $FIREWALL == yes ]]; then
  else echo "Firewall not managed or inactive. Allow TCP/$PORT in external hypervisor/cloud firewall if required."; fi
 fi
 WEB_SCHEME=http; [[ $HTTPS == yes ]] && WEB_SCHEME=https
+# An unrelated listener must never satisfy the installer's health check.
+# Require the systemd unit to be running and to own the bound TCP socket.
+verify_mta_listener() {
+ systemctl is-active --quiet mta-audio-editor.service || return 1
+ local mainpid listener
+ mainpid=$(systemctl show -p MainPID --value mta-audio-editor.service 2>/dev/null) || return 1
+ [[ $mainpid =~ ^[1-9][0-9]*$ ]] || return 1
+ listener=$(ss -H -ltnp "sport = :$PORT") || return 1
+ [[ -n $listener ]] || return 1
+ while IFS= read -r line; do
+  [[ -z $line ]] && continue
+  [[ $line == *"pid=$mainpid,"* ]] || return 1
+ done <<< "$listener"
+}
 ok=0
 for i in $(seq 1 25); do
- if curl --insecure --fail --silent --max-time 3 "$WEB_SCHEME://127.0.0.1:$PORT/api/health" >/dev/null; then ok=1; break; fi
+ if verify_mta_listener && curl --insecure --fail --silent --max-time 3 \
+  "$WEB_SCHEME://127.0.0.1:$PORT/api/health" | "$VENV/bin/python" -c \
+  'import json,sys; d=json.load(sys.stdin); sys.exit(0 if d.get("status")=="ok" and str(d.get("revision", "")).isdigit() and d.get("version") else 1)'; then ok=1; break; fi
  sleep 1
 done
 if (( ! ok )); then
