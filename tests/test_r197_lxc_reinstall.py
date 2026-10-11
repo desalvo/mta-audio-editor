@@ -23,10 +23,10 @@ def test_script_preserves_models_and_pins_reviewed_commit():
 
 
 def test_mta_lxc_service_script_syntax_and_security():
-    script = ROOT / 'scripts' / 'install_mta_lxc_service.sh'
+    script = ROOT / 'scripts' / 'install_mta.sh'
     subprocess.run(['bash', '-n', str(script)], check=True)
     data = script.read_text()
     assert 'MTA_AI_WORKER_ENABLED=true' in data
-    assert 'MTA_ACE_STEP_URL=http://127.0.0.1:8001' in data
-    assert 'After=network-online.target mta-ace-step.service' in data
-    assert 'rm -rf' not in data
+    assert 'MTA_ACE_STEP_URL=http://127.0.0.1:$ACE_PORT' in data
+    assert 'After=network-online.target' in data
+    assert '--uninstall' in data and 'PURGE' in data

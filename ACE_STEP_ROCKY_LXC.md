@@ -12,7 +12,7 @@ sudo ./scripts/install_ace_step.sh
 sudo ./scripts/install_ace_step.sh --reinstall
 ```
 
-See `ACE_STEP_LXC_WIZARD.md` for port, firewall and persisted settings.
+See `ACE_STEP_INSTALLATION.md` for port, firewall and persisted settings.
 
 ## MTA service in the same LXC
 
@@ -21,7 +21,7 @@ First install MTA source and its own Python runtime, compatible with `requiremen
 ```bash
 sudo MTA_APP_DIR=/opt/mta/application \
   MTA_APP_PYTHON=/opt/mta/venv-mta/bin/python \
-  bash scripts/install_mta_lxc_service.sh
+  sudo ./scripts/install_mta.sh
 journalctl -u mta-audio-editor -f
 ```
 

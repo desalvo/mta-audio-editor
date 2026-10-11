@@ -1,3 +1,9 @@
+Per installare il server web MTA su Linux, usa il [wizard di installazione MTA](MTA_INSTALLATION.md): `scripts/install_mta.sh` installa l’app e verifica l’accesso via browser, senza richiedere il checkout completo.
+
+## Wizard di installazione ACE-Step
+
+Per installare ACE-Step su Linux Debian/RHEL (fisico, VM o LXC) basta scaricare il singolo `scripts/install_ace_step.sh`: **non è necessario** clonare il repository. Consulta la [guida di installazione ACE-Step](ACE_STEP_INSTALLATION.md) per requisiti GPU, firewall, versione, reinstallazione e disinstallazione.
+
 ### 0.3.0-r154 — Validated bounded batch event IPC (native host disabled)
 
 The event-enabled persistent VST3 worker can now prevalidate entire batches (up to 128 PCM blocks / 65536 frames), including MIDI and parameter offsets, before any IPC is sent. Real ADelay validation covers irregular stereo blocks and automation. This is a control/worker-thread offline API only; native_host_ready remains false.

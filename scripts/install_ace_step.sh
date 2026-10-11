@@ -11,7 +11,7 @@ TORCH_VERSION=${MTA_TORCH_VERSION:-2.11.0+rocm7.2}
 INDEX=https://download.pytorch.org/whl/rocm7.2
 AUTO_YES=0; DRY_RUN=0; VERSION=${MTA_ACE_VERSION:-}; INSTALL_SYSTEMD=1
 CONFIG=${MTA_ACE_WIZARD_CONFIG:-/etc/mta/ace-step-wizard.conf}
-PORT_OVERRIDE=''; BIND_OVERRIDE=''; FIREWALL_OVERRIDE=''; REINSTALL=0
+PORT_OVERRIDE=''; BIND_OVERRIDE=''; FIREWALL_OVERRIDE=''; REINSTALL=0; UNINSTALL=0; PURGE_DATA=0
 PORT=8001; BIND=local; FIREWALL=no; SAVED_VERSION=''
 # Read only known, validated keys; never source a root-owned config as shell code.
 if [[ -f "$CONFIG" ]]; then
@@ -26,7 +26,7 @@ if [[ -f "$CONFIG" ]]; then
 fi
 usage() {
  cat <<'HELP'
-Usage: sudo ./scripts/install_ace_step.sh [--yes] [--version v0.1.8|<40-digit-sha>] [--dry-run] [--no-systemd] [--port 8001] [--bind local|network] [--firewall yes|no] [--reinstall]
+Usage: sudo ./install_ace_step.sh [--yes] [--version v0.1.8|<40-digit-sha>] [--dry-run] [--no-systemd] [--port 8001] [--bind local|network] [--firewall yes|no] [--reinstall] [--uninstall] [--purge-data]
 Interactive Debian >=9 / Debian derivatives, Ubuntu >=22.04, or RHEL family >=9 wizard. Requires /dev/kfd and /dev/dri/renderD* accessible on this system.
 Installs Python 3.11, venv, AMD ROCm-enabled PyTorch/torchaudio and ACE-Step dependencies.
 The AMD kernel driver must be operational on the host (physical machine, VM, or container host). This wizard does not install kernel drivers.
@@ -36,6 +36,8 @@ Persistent models in /var/lib/mta/models are never deleted. Existing sources are
 --port N selects HTTP port (default 8001); --bind local|network selects reachability.
 --firewall yes|no controls opening network port (only if --bind network).
 --reinstall forces reinstall of ACE-Step and its Python dependencies.
+--uninstall stops/disables the ACE-Step service and removes only wizard-managed installation files; keeps models/data.
+--purge-data can be used only with --uninstall; also deletes ACE-Step model cache after explicit confirmation.
 HELP
 }
 while (($#)); do
@@ -47,13 +49,16 @@ while (($#)); do
   --bind) shift; [[ $# -gt 0 ]] || exit 2; BIND_OVERRIDE=$1;;
   --firewall) shift; [[ $# -gt 0 ]] || exit 2; FIREWALL_OVERRIDE=$1;;
   --reinstall) REINSTALL=1;;
+  --uninstall) UNINSTALL=1;;
+  --purge-data) PURGE_DATA=1;;
   --version) shift; [[ $# -gt 0 ]] || { usage; exit 2; }; VERSION=$1;;
   --help|-h) usage; exit 0;;
   *) echo "Unknown argument: $1" >&2; usage; exit 2;;
  esac
  shift
 done
-[[ $EUID -eq 0 ]] || { echo 'Run as root on the target Linux system.' >&2; exit 2; }
+# Check OS before privilege guard: --dry-run is deliberately usable without sudo.
+if (( PURGE_DATA && ! UNINSTALL )); then echo '--purge-data requires --uninstall.' >&2; exit 2; fi
 [[ $BASE == /* && $DATA == /* && $BASE != / && $DATA != / ]] || exit 2
 # Validate OS before GPU probing, downloading, package operations or writing files.
 # MTA_OS_RELEASE permits isolated test fixtures; ignored for actual installs unless root.
@@ -96,6 +101,51 @@ case "$OS_FAMILY" in
  *) echo "Unsupported OS: ${PRETTY_NAME:-$OS_ID}; supported Debian family or RHEL family >=9." >&2; exit 2 ;;
 esac
 printf 'Supported OS: %s (family=%s, major=%s)\n' "${PRETTY_NAME:-$OS_ID}" "$OS_FAMILY" "$OS_MAJOR"
+# Uninstall is available even if the GPU is no longer connected.
+if (( UNINSTALL )); then
+ [[ $EUID -eq 0 ]] || { echo 'Run uninstall as root.' >&2; exit 2; }
+ echo "Removing wizard-managed ACE-Step service and application; model cache and user data are preserved by default."
+ if (( PURGE_DATA )); then
+  if (( ! AUTO_YES )); then
+   read -r -p 'Permanently delete ACE-Step cached models and generated temporary audio? Type DELETE: ' confirmation
+   [[ $confirmation == DELETE ]] || { echo 'Cancelled.'; exit 0; }
+  else
+   echo 'Data purge cannot run non-interactively. Remove --yes and confirm interactively.' >&2
+   exit 2
+  fi
+ elif (( ! AUTO_YES )); then
+  read -r -p 'Uninstall ACE-Step (preserve model cache and user data)? [y/N] ' confirmation
+  [[ ${confirmation,,} == y || ${confirmation,,} == yes ]] || { echo 'Cancelled.'; exit 0; }
+ fi
+ if (( DRY_RUN )); then echo 'Dry-run uninstall: no changes.'; exit 0; fi
+ if command -v systemctl >/dev/null 2>&1; then
+  systemctl disable --now mta-ace-step.service 2>/dev/null || true
+ fi
+ unit=/etc/systemd/system/mta-ace-step.service
+ if [[ -f $unit ]] && grep -Fq 'ExecStart=' "$unit" && grep -Fq "$BASE/venv-ace-step/bin/python -m acestep.api_server" "$unit"; then
+  rm -f "$unit"
+  systemctl daemon-reload || true
+ fi
+ state=/etc/mta/ace-step-firewall.state
+ if [[ -f $state ]]; then
+  read -r backend old_port < "$state" || true
+  if [[ $old_port =~ ^[0-9]{1,5}$ ]]; then
+   case "$backend" in
+    firewalld) if command -v firewall-cmd >/dev/null && systemctl is-active --quiet firewalld; then firewall-cmd --permanent --remove-port="${old_port}/tcp" && firewall-cmd --reload; fi ;;
+    ufw) if command -v ufw >/dev/null; then ufw --force delete allow "${old_port}/tcp"; fi ;;
+   esac
+  fi
+  rm -f "$state"
+ fi
+ # Restrict destructive paths to the wizard's expected install directories.
+ [[ $BASE == /* && $BASE != / && $DATA == /* && $DATA != / ]] || exit 2
+ rm -rf -- "$BASE/ace-step" "$BASE/venv-ace-step"
+ rm -f -- /etc/mta/ace-step.env "$CONFIG"
+ if (( PURGE_DATA )); then rm -rf -- "$DATA/models/checkpoints" "$DATA/models/huggingface" "$DATA/models/tmp/api_audio"; fi
+ echo 'ACE-Step uninstalled. All other MTA files and projects were preserved.'
+ exit 0
+fi
+[[ $EUID -eq 0 || $DRY_RUN -eq 1 ]] || { echo 'Run as root on the target Linux system.' >&2; exit 2; }
 render_nodes=(/dev/dri/renderD*)
 [[ -c /dev/kfd && -c ${render_nodes[0]} ]] || {
  echo 'ROCm devices unavailable. On bare metal check AMD drivers; in a VM check GPU passthrough; in LXC pass /dev/kfd and /dev/dri/renderD* from the host with correct cgroup permissions.' >&2

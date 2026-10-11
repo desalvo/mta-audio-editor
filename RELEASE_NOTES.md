@@ -1,3 +1,15 @@
+## 0.3.0-r203
+
+- Standalone Linux MTA web installation wizard with Debian/RHEL-family OS gate, persistent setup, independent venv, systemd, network/firewall configuration, and health verification.
+- Non-destructive uninstall and explicit data purge, plus installation guide and README links.
+- Align desktop/mobile release metadata to r203.
+
+## 0.3.0-r202
+
+- Self-contained ACE-Step installer, documented as a single-file download with explicit uninstall and optional confirmed data purge.
+- Rename general wizard guide and link it in Italian/English READMEs.
+- Align Android, iOS, Windows build metadata and fix dry-run OS detection under unprivileged CI.
+
 ## 0.3.0-r201
 Rename the ACE-Step installer to executable `scripts/install_ace_step.sh`; document Linux bare-metal, VM and LXC usage, retaining device validation and idempotent configuration.
 
