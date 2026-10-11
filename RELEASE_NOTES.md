@@ -1,3 +1,7 @@
+## 0.3.0-r173
+
+Windows metadata now correctly reports Revision 173 alongside its binary file version. The full CI suite must still be confirmed on GitHub Actions.
+
 ## 0.3.0-r172 — Restore independent numeric build identity
 
 - Restore a strict 14-digit Europe/Rome build timestamp in `BUILD_INFO`, separate from `VERSION`, `REVISION` and `RELEASE`.

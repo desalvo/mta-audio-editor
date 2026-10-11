@@ -1,3 +1,9 @@
+## 0.3.0-r173
+
+- Fixed Windows executable metadata revision mismatch that caused CI test_r65_release_safety to fail.
+- Synchronized build identity with Android/iOS native package revisions.
+- Added automated regression checks for consistent version identity.
+
 ## 0.3.0-r172 — Restore independent numeric build identity
 
 - Restore a strict 14-digit Europe/Rome build timestamp in `BUILD_INFO`, separate from `VERSION`, `REVISION` and `RELEASE`.
