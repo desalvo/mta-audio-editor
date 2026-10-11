@@ -1,3 +1,20 @@
+## 0.3.0-r201
+Rename the ACE-Step installer to executable `scripts/install_ace_step.sh`; document Linux bare-metal, VM and LXC usage, retaining device validation and idempotent configuration.
+
+## 0.3.0-r200
+Unified ACE-Step LXC wizard with configurable TCP port/firewall, persisted options, and `--reinstall` instead of a separate reinstall tool.
+
+r199: ACE-Step LXC wizard supports Debian-family and RHEL-family >=9 with early OS rejection and apt/dnf routing.
+
+## 0.3.0-r198 — ACE-Step LXC full-install wizard
+
+- Interactive install/reinstall wizard for Rocky 9 Proxmox LXC AMD GPU; stable version selection, ROCm user-space wheel setup, real GPU check, service and persistent model cache. Does not install Proxmox host kernel drivers; MTA server integration remains separate.
+
+## 0.3.0-r197 — Rocky Linux LXC ACE-Step reinstall
+
+- Add safe, auditable ACE-Step source reinstallation and systemd service for Radeon 8060S ROCm LXC. Preserve persistent checkpoints and projects.
+- Record real upstream inference evidence and limitations of MTA integration.
+
 ## 0.3.0-r196
 - Ruff CI fixes and SHA-pinned ACE-Step container build workflow. The model server runtime image and end-to-end musical inference are not yet validated.
 

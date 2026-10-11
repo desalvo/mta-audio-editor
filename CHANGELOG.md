@@ -1,3 +1,19 @@
+## 0.3.0-r201
+Rename the ACE-Step installer to executable `scripts/install_ace_step.sh`; document Linux bare-metal, VM and LXC usage, retaining device validation and idempotent configuration.
+
+## 0.3.0-r200
+- Consolidate fresh install, reconfiguration, upgrade and forced reinstall into one idempotent ACE-Step LXC wizard.
+- Persist ACE-Step version, TCP port, bind mode and firewall preference, and propose saved settings on rerun.
+- Offer network firewall configuration while keeping localhost/8001 as secure defaults.
+- Remove obsolete standalone ACE-Step reinstall script.
+
+r199: ACE-Step LXC wizard supports Debian-family and RHEL-family >=9 with early OS rejection and apt/dnf routing.
+
+## 0.3.0-r197 — Rocky Linux LXC ACE-Step reinstall
+
+- Add safe, auditable ACE-Step source reinstallation and systemd service for Radeon 8060S ROCm LXC. Preserve persistent checkpoints and projects.
+- Record real upstream inference evidence and limitations of MTA integration.
+
 ## 0.3.0-r196 (2026-10-11)
 - Fix 18 Ruff findings from CI including unused imports, production assert, and validated HTTP request destinations.
 - Add a dedicated pinned ACE-Step runtime-image GitHub Actions workflow; configure container deployments for the pinned image, persistent model caches, and authenticated remote MTA API.
