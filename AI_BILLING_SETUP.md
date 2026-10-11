@@ -440,3 +440,9 @@ Do not create or chmod the global cgroup hierarchy or run a privileged LXC to
 bypass delegation. Verify `Check readiness` after reboot and with actual jobs;
 preflight success alone does not certify measurement completeness. This setup
 has not been validated inside the user's Proxmox LXC environment.
+
+### Diagnostic accounting and Rocky LXC upgrade (r207 maintenance)
+
+The `ai_compute_jobs.billable` SQLite field distinguishes ordinary billable jobs (`1`) from internal diagnostic runs (`0`). Internal smoke tests should call `create_job(..., diagnostic=True)`. On the first schema upgrade, existing `accounting_validation` smoke tests are marked non-billable, retaining all measurements for audit. Diagnostic usage is visible in reports but excluded from monetary totals and billable-job closure prerequisites. Run period closing tests using a disposable data directory, not the production SQLite database.
+
+The Linux wizard resolves the remote Git ref before deciding whether a source update is necessary. It refuses to replace a checkout with locally modified tracked files, checks for the cgroup launcher before activating systemd, stages dependencies and saves previous source/service for rollback on failed HTTP health. After updating, validate your environment-specific worker startup and ingress externally.

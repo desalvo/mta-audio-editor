@@ -2048,3 +2048,5 @@ All remain experimental isolated prerequisites; production playback, actual VST3
   account-update API, and pending email is exposed to the account owner.
 - Added regression tests. GPU usage remains nonbillable without validated
   per-job hardware sensors; real Proxmox LXC deployment validation remains pending.
+
+- Maintenance r207: introduce persistent diagnostic/billable job distinction, exclude diagnostic jobs from charged totals, backfill known historical accounting smoke tests, and strengthen installer remote-commit checking, source preflight, local change protection and health rollback.

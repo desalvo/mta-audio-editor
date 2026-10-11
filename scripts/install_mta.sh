@@ -201,26 +201,47 @@ echo "Using $($PY --version) for MTA environment"
 mkdir -p "$(dirname "$APP_DIR")" "$(dirname "$VENV")" /etc/mta "$DATA"
 TEMP=$(mktemp -d "$(dirname "$APP_DIR")/.mta-stage.XXXXXXXX")
 trap 'rm -rf -- "$TEMP"' EXIT
-if [[ -d $APP_DIR/.git && $REINSTALL == 0 ]] && [[ $(git -C "$APP_DIR" rev-parse HEAD 2>/dev/null || :) == $(cat /etc/mta/mta-installed-sha 2>/dev/null || :) ]] && [[ $(cat /etc/mta/mta-installed-ref 2>/dev/null || :) == "$VERSION" ]] && [[ -x $VENV/bin/python ]]; then
- echo 'MTA application and dependencies already installed; configuring service only.'
+# Resolve the requested ref remotely: a branch name alone cannot identify a release.
+REMOTE_SHA=$(git ls-remote "$REPO" "refs/heads/$VERSION" "refs/tags/$VERSION^{}" "refs/tags/$VERSION" | awk 'NR==1{print $1}')
+if [[ -z $REMOTE_SHA ]]; then
+ REMOTE_SHA=$(git ls-remote "$REPO" HEAD | awk 'NR==1{print $1}')
+ if [[ $VERSION != main && $VERSION != HEAD ]]; then REMOTE_SHA=''; fi
+fi
+LOCAL_SHA=$(git -C "$APP_DIR" rev-parse HEAD 2>/dev/null || :)
+SKIP_SOURCE=0
+if [[ -d $APP_DIR/.git && $REINSTALL == 0 && -n $REMOTE_SHA && $LOCAL_SHA == "$REMOTE_SHA" && -x $VENV/bin/python && -f $APP_DIR/app/ai_cgroup_launcher.py ]]; then
+ SKIP_SOURCE=1
+ echo "MTA source is current at commit $LOCAL_SHA; verifying installed application."
+fi
+if (( SKIP_SOURCE )); then
+ (cd "$APP_DIR" && "$VENV/bin/python" -c 'import app.ai_cgroup_launcher, app.main') || { echo 'MTA preflight failed; refusing to update service.' >&2; exit 3; }
 else
+ # Never discard user-modified tracked files, including legacy local fixes.
+ if [[ -d $APP_DIR/.git ]]; then
+  DIRTY=$(git -C "$APP_DIR" status --porcelain --untracked-files=no)
+  if [[ -n $DIRTY ]]; then
+   printf 'Local source changes detected; back up/reconcile these files before upgrading:\n%s\n' "$DIRTY" >&2
+   exit 3
+  fi
+ fi
  git clone --quiet "$REPO" "$TEMP/source"
  git -C "$TEMP/source" checkout --quiet "$VERSION"
- [[ -f $TEMP/source/app/main.py && -f $TEMP/source/requirements.txt ]] || { echo 'Invalid MTA source' >&2; exit 3; }
+ [[ -f $TEMP/source/app/main.py && -f $TEMP/source/app/ai_cgroup_launcher.py && -f $TEMP/source/requirements.txt ]] || { echo 'Invalid/incomplete MTA source' >&2; exit 3; }
  if [[ -d $APP_DIR && ! -f $APP_DIR/.mta-wizard-managed ]]; then echo "Refusing to replace unmanaged application directory $APP_DIR" >&2; exit 3; fi
  if [[ -d $VENV && ! -f $VENV/.mta-wizard-managed ]]; then echo "Refusing to replace unmanaged Python environment $VENV" >&2; exit 3; fi
- if [[ -d $APP_DIR ]]; then mv "$APP_DIR" "${APP_DIR}.backup.$(date -u +%Y%m%dT%H%M%SZ)"; fi
+ "$PY" -m venv "$TEMP/venv-mta"
+ "$TEMP/venv-mta/bin/python" -m pip install --upgrade pip
+ "$TEMP/venv-mta/bin/python" -m pip install -r "$TEMP/source/requirements.txt"
+ (cd "$TEMP/source" && "$TEMP/venv-mta/bin/python" -c 'import fastapi, uvicorn, numpy; import app.ai_cgroup_launcher, app.main') || { echo 'MTA preflight failed, keeping existing install.' >&2; exit 3; }
+ chmod 755 "$TEMP/source/app/ace_step_http_worker.py"
+ # Keep a rollback copy of both source and interpreter until HTTP health passes.
+ ROLLBACK_SOURCE="$TEMP/rollback-source"
+ ROLLBACK_VENV="$TEMP/rollback-venv"
+ if [[ -d $APP_DIR ]]; then mv "$APP_DIR" "$ROLLBACK_SOURCE"; fi
+ if [[ -d $VENV ]]; then mv "$VENV" "$ROLLBACK_VENV"; fi
  mv "$TEMP/source" "$APP_DIR"
- touch "$APP_DIR/.mta-wizard-managed"
- if [[ -d $VENV ]]; then rm -rf -- "$VENV"; fi
- "$PY" -m venv "$VENV"
- touch "$VENV/.mta-wizard-managed"
- "$VENV/bin/python" -m pip install --upgrade pip
- "$VENV/bin/python" -m pip install -r "$APP_DIR/requirements.txt"
- "$VENV/bin/python" -c 'import fastapi, uvicorn, numpy; from app import main' 2>/dev/null || (cd "$APP_DIR" && "$VENV/bin/python" -c 'import app.main')
- chmod 755 "$APP_DIR/app/ace_step_http_worker.py"
- git -C "$APP_DIR" rev-parse HEAD > /etc/mta/mta-installed-sha
- printf '%s\n' "$VERSION" > /etc/mta/mta-installed-ref
+ mv "$TEMP/venv-mta" "$VENV"
+ touch "$APP_DIR/.mta-wizard-managed" "$VENV/.mta-wizard-managed"
 fi
 if [[ ! -f $ENVFILE ]]; then
  PASS=$("$PY" -c 'import secrets; print(secrets.token_urlsafe(24))')
@@ -292,6 +313,8 @@ TLS_NAME=$TLS_NAME
 EOT
 chmod 600 /etc/mta/mta-wizard.conf.tmp
 mv /etc/mta/mta-wizard.conf.tmp "$CONFIG"
+# Retain previous systemd definition for rollback if deployment health fails.
+if [[ -f $SERVICE ]]; then cp -a "$SERVICE" "$TEMP/previous-mta.service"; fi
 cat > "$SERVICE" <<EOT
 [Unit]
 Description=MTA Audio Editor web server
@@ -365,10 +388,29 @@ for i in $(seq 1 25); do
   'import json,sys; d=json.load(sys.stdin); sys.exit(0 if d.get("status")=="ok" and str(d.get("revision", "")).isdigit() and d.get("version") else 1)'; then ok=1; break; fi
  sleep 1
 done
+if (( ! ok )) && [[ -n ${ROLLBACK_SOURCE:-} && -d $ROLLBACK_SOURCE ]]; then
+ echo 'MTA health failed; restoring previous sources and Python environment.' >&2
+ if [[ -f $TEMP/previous-mta.service ]]; then
+  cp -a "$TEMP/previous-mta.service" "$SERVICE"
+  systemctl daemon-reload
+ fi
+ systemctl stop mta-audio-editor.service || :
+ mv "$APP_DIR" "$TEMP/failed-source"
+ mv "$ROLLBACK_SOURCE" "$APP_DIR"
+ if [[ -d ${ROLLBACK_VENV:-/nonexistent} ]]; then
+  mv "$VENV" "$TEMP/failed-venv"
+  mv "$ROLLBACK_VENV" "$VENV"
+ fi
+ systemctl restart mta-audio-editor.service || :
+fi
 if (( ! ok )); then
  echo 'MTA web health check failed. Inspect: journalctl -u mta-audio-editor -n 100' >&2
  systemctl status --no-pager mta-audio-editor.service || :
  exit 4
+fi
+if [[ -n ${ROLLBACK_SOURCE:-} ]]; then
+ git -C "$APP_DIR" rev-parse HEAD > /etc/mta/mta-installed-sha
+ printf '%s\n' "$VERSION" > /etc/mta/mta-installed-ref
 fi
 IP=$(hostname -I 2>/dev/null | awk '{print $1}')
 echo "MTA web health OK. Local URL: $WEB_SCHEME://127.0.0.1:$PORT/"

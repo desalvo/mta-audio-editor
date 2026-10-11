@@ -11,5 +11,5 @@ def test_rocky_installer_uses_supported_python():
     assert "for candidate in python3.14 python3.13 python3.12 python3; do" in text
     assert "sys.version_info >= (3,12)" in text
     assert "if command -v python3.11" not in text
-    assert "\"$PY\" -m venv \"$VENV\"" in text
+    assert '"$PY" -m venv "$TEMP/venv-mta"' in text
     assert "numpy==2.5.3" in REQUIREMENTS.read_text()

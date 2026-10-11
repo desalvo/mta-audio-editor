@@ -47,6 +47,7 @@ def _init(c):
       kind TEXT NOT NULL, status TEXT NOT NULL, started_at INTEGER NOT NULL,
       finished_at INTEGER, wall_ms INTEGER NOT NULL DEFAULT 0,
       usage_json TEXT NOT NULL DEFAULT '{}', resource_source TEXT NOT NULL DEFAULT 'unmetered',
+      billable INTEGER NOT NULL DEFAULT 1 CHECK(billable IN (0,1)),
       FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE);
     CREATE INDEX IF NOT EXISTS idx_ai_compute_user_time ON ai_compute_jobs(user_id,started_at);
     CREATE TABLE IF NOT EXISTS ai_persistent_storage_samples (
@@ -68,6 +69,13 @@ def _init(c):
       UNIQUE(user_id,start_ts,end_ts,currency),
       FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE);
     ''')
+    # Safe additive upgrade for deployed SQLite ledgers. No record is deleted.
+    columns = {r[1] for r in c.execute('PRAGMA table_info(ai_compute_jobs)')}
+    if 'billable' not in columns:
+        c.execute('ALTER TABLE ai_compute_jobs ADD COLUMN billable INTEGER NOT NULL DEFAULT 1 CHECK(billable IN (0,1))')
+        # Existing test records retain their measured usage but never incur charges.
+        c.execute("UPDATE ai_compute_jobs SET billable=0 WHERE kind='accounting_validation'")
+        c.commit()
 
 
 def _validate_usage(values):
@@ -81,9 +89,11 @@ def _validate_usage(values):
     return clean
 
 
-def create_job(user_id: int, kind: str, token_id=None, *, started_at=None):
+def create_job(user_id: int, kind: str, token_id=None, *, started_at=None, diagnostic=False):
     if not isinstance(kind, str) or not (1 <= len(kind) <= 72) or not all(c.isalnum() or c in '_-.' for c in kind):
         raise ValueError('Invalid job kind')
+    if not isinstance(diagnostic, bool):
+        raise ValueError('diagnostic must be boolean')
     job_id = uuid.uuid4().hex
     with db() as c:
         _init(c)
@@ -94,8 +104,8 @@ def create_job(user_id: int, kind: str, token_id=None, *, started_at=None):
         if c.execute('SELECT 1 FROM ai_billing_periods WHERE user_id=? AND start_ts<=? AND end_ts>? LIMIT 1',
                      (user_id, stamp, stamp)).fetchone():
             raise ValueError('Cannot create a job inside a closed billing interval')
-        c.execute('INSERT INTO ai_compute_jobs(id,user_id,token_id,kind,status,started_at) VALUES(?,?,?,?,?,?)',
-                  (job_id,user_id,token_id,kind,'running',stamp))
+        c.execute('INSERT INTO ai_compute_jobs(id,user_id,token_id,kind,status,started_at,billable) VALUES(?,?,?,?,?,?,?)',
+                  (job_id,user_id,token_id,kind,'running',stamp,int(not diagnostic)))
     return job_id
 
 
@@ -330,6 +340,7 @@ def report(period='month', *, user_id=None, anchor=None, start=None, end=None, _
                 # Failed, running, and unmetered jobs may have diagnostic
                 # counters; they are never recognized as billable amounts.
                 if (r['status']=='done' and r['resource_source']!='unmetered'
+                    and r['billable'] == 1
                     and resource not in NON_BILLABLE_IO and resource != 'disk_gb_hours'):
                     cost+=round(qty*job_rates[r['id']].get(resource,0))
             row['cost_micro']+=cost; kind['cost_micro']+=cost
@@ -342,8 +353,9 @@ def report(period='month', *, user_id=None, anchor=None, start=None, end=None, _
             row['cost_micro']+=round(storage_costs.get((uid,day),0))
         return {'start_ts':a,'end_ts':b,'currency':'EUR','prices_micro':rates,
                 'rows':list(groups.values()),'total_micro':sum(row['cost_micro'] for row in groups.values()),
-                'job_count':len(records),'unmetered_jobs':sum(r['resource_source']=='unmetered' for r in records),
-                'running_jobs':sum(r['status']=='running' for r in records),
+                'job_count':len(records),'diagnostic_jobs':sum(r['billable']==0 for r in records),
+                'unmetered_jobs':sum(r['billable']==1 and r['resource_source']=='unmetered' for r in records),
+                'running_jobs':sum(r['billable']==1 and r['status']=='running' for r in records),
                 'storage_sampling': 'intervals-between-observed-samples-only'}
 
 
@@ -499,6 +511,8 @@ def reconcile_period(user_id, start, end):
             'WHERE micro_per_unit>0 AND valid_from<? AND (valid_until IS NULL OR valid_until>?)',
             (b, a)) if r['resource'] not in NON_BILLABLE_IO and r['resource'] != 'disk_gb_hours'}
         for job in jobs:
+            if job['billable'] == 0:
+                continue
             jid = job['id']
             if job['started_at'] < a or job['finished_at'] is None or job['finished_at'] >= b:
                 if job['started_at'] < a or job['finished_at'] is not None and job['finished_at'] >= b:
@@ -562,12 +576,12 @@ def close_period(user_id, start, end):
         if overlapping:
             raise ValueError('Overlapping billing period already closed')
         spanning = c.execute('SELECT id FROM ai_compute_jobs WHERE user_id=? AND started_at<? '
-                             'AND started_at<? AND (finished_at IS NULL OR finished_at>=?) LIMIT 1',
+                             'AND started_at<? AND (finished_at IS NULL OR finished_at>=?) AND billable=1 LIMIT 1',
                              (user_id,b,a,a)).fetchone()
         if spanning:
             raise ValueError('A job crossing the billing boundary requires explicit allocation')
         incomplete = c.execute("SELECT id FROM ai_compute_jobs WHERE user_id=? AND started_at>=? AND started_at<? "
-                               "AND (status!='done' OR resource_source='unmetered') LIMIT 1",
+                               "AND billable=1 AND (status!='done' OR resource_source='unmetered') LIMIT 1",
                                (user_id,a,b)).fetchone()
         if incomplete:
             raise ValueError('Cannot bill unfinished, failed or unmetered jobs')
@@ -579,7 +593,7 @@ def close_period(user_id, start, end):
                               "AND (valid_until IS NULL OR valid_until>?) LIMIT 1", (b,a)).fetchone()
         if cpu_rates:
             cpu_jobs = c.execute("SELECT id,usage_json,resource_source FROM ai_compute_jobs "
-                                 "WHERE user_id=? AND started_at>=? AND started_at<? AND status='done'",
+                                 "WHERE user_id=? AND started_at>=? AND started_at<? AND status='done' AND billable=1",
                                  (user_id,a,b)).fetchall()
             for job in cpu_jobs:
                 usage = json.loads(job['usage_json'])
@@ -599,7 +613,7 @@ def close_period(user_id, start, end):
             (b,a)).fetchall()]
         if priced_gpu:
             gpu_jobs = c.execute("SELECT id,usage_json,resource_source FROM ai_compute_jobs "
-                                 "WHERE user_id=? AND started_at>=? AND started_at<? AND status='done'",
+                                 "WHERE user_id=? AND started_at>=? AND started_at<? AND status='done' AND billable=1",
                                  (user_id,a,b)).fetchall()
             for job in gpu_jobs:
                 usage = json.loads(job['usage_json'])
