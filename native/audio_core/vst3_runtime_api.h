@@ -46,4 +46,19 @@ MTA_RT_PUBLIC int mta_vst3_rt_configuration(const void*,MtaVst3ConfigV2*) MTA_RT
 #ifdef __cplusplus
 }
 #endif
+
+/* r176: control-thread-only PDC planner; arrays must not overlap.
+   -1 invalid arguments, -2 route latency exceeds supported limit.
+   On failure both outputs remain untouched. */
+typedef struct { uint32_t plugin_frames; uint32_t ipc_frames; uint32_t enabled; } MtaPdcRouteC;
+typedef struct { uint32_t target_frames; uint32_t route_count; } MtaPdcResultC;
+#if defined(__cplusplus)
+extern "C" {
+#endif
+int mta_vst3_plan_latency(const MtaPdcRouteC* inputs, uint32_t count,
+                          uint32_t* alignment_out, MtaPdcResultC* result);
+#if defined(__cplusplus)
+}
+#endif
+
 #endif

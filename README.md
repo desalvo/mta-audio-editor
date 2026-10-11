@@ -251,3 +251,5 @@ VST3 r152: worker event/audio shape mismatches and excessive stale-event backlog
 
 ### r165
 Optional supervisor-level VST3 controller and component checkpoint pairing; no realtime callback activation.
+
+- r183: fail-closed AI worker capability probe and experimental native C++ peak/RMS meter; AI inference remains unverified.

@@ -327,3 +327,7 @@ Optional supervisor-level VST3 controller and component checkpoint pairing; no r
 - Control-thread `capture_insert_checkpoint` captures a coherent processor/controller pair and writes it into the owning insert project directory.
 - `stage_insert_checkpoint` stages a validated persisted checkpoint on a stopped supervisor before the next worker starts; projects without state use plugin defaults.
 - Capture checks plugin identity again after IPC; stale/mismatched checkpoints fail closed. The production playback host is still disconnected: `native_host_ready=false`.
+
+
+### r188
+Experimental allocation-free DC blocker added in `native/audio_core/native_dc_blocker.hpp`; not connected to production VST3 realtime playback. `native_host_ready=false`.

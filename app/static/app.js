@@ -965,6 +965,7 @@ function openTrackContextMenuAt(id,clientX,clientY){
   menu.innerHTML=`
     <button type="button" onclick="closeTrackContextMenu();renameTrack('${id}')">✎ <span>Rinomina</span></button>
     <button type="button" ${disabled} onclick="closeTrackContextMenu();openTrackStemWorkflow('${id}')">▥ <span>Separa</span></button>
+    <button type="button" onclick="closeTrackContextMenu();openAiRemixPanel('${id}')">✧ <span>AI Arranger / Remix · traccia</span></button>
     <button type="button" onclick="closeTrackContextMenu();openSampleEditor('${id}')">⌁ <span>Editor waveform / campioni</span></button>
     <button type="button" onclick="closeTrackContextMenu();recalculateBpmFromTrack('${id}')">♩ <span>Ricalcola BPM da questa traccia</span></button>
 
@@ -5173,4 +5174,81 @@ function commitLyricsInlineUnit(lineIndex,wordIndex,syllableIndex,value){
   const text=String(value??'').replace(/\s+/g,' ').trim(),si=syllableIndex==null?null:Number(syllableIndex),original=si==null?String(word.text||''):String(word.syllables?.[si]?.text||'');if(text===original)return;ensureEventSnapshot(line);
   if(si!=null&&word.syllables?.length){if(text)word.syllables[si].text=text;else{word.syllables.splice(si,1);lcReanchorDeletedUnit(line,wi,si,word.syllables.length,words)}word.text=word.syllables.map(x=>String(x.text||'')).join('');if(!word.syllables.length&&!text){words.splice(wi,1);lcReanchorDeletedUnit(line,wi,null,0,words)}}else if(text){word.text=text;word.syllables=[]}else{words.splice(wi,1);lcReanchorDeletedUnit(line,wi,null,0,words)}
   line.words=words;line.text=words.map(w=>String(w.text||'').trim()).filter(Boolean).join(' ');if(!line.text)line.text='.';lyricsChordsEditorFocus={kind:'lyrics',index:Number(lineIndex)};refreshLyricsChordsEditor()
+}
+
+// r176: AI Arranger / Remix planning UX. This UI never claims that audio has been generated.
+async function openAiRemixPanel(contextTrackId=null){
+  if(!current?.id){toast(tr('Open a project first','Apri prima un progetto'));return;}
+  let catalog;
+  try{catalog=await api('/api/ai-arranger/catalog')}catch(e){toast(e.message);return;}
+  const presets=catalog.presets.map(x=>`<option value="${esc(x.id)}">${esc(uiLanguage==='it'?x.it:x.en)}</option>`).join('');
+  const models=catalog.models.map(x=>`<option value="${esc(x.id)}">${esc(x.name)} · ${x.available?'ready':'not installed'}</option>`).join('');
+  const tracks=(current.tracks||[]).map(x=>`<option value="${esc(x.id)}" ${x.id===contextTrackId?'selected':''}>${esc(x.name)}</option>`).join('');
+  const sourceTrack=contextTrackId&&trackById(contextTrackId)?contextTrackId:null;
+  showUtilityModal('AI Arranger / Remix',`<div class="form-grid">
+    <label>Input audio / Sorgente<select id="aiInputSource" onchange="document.getElementById('aiInputTrackWrap').hidden=this.value!=='track'"><option value="master" ${sourceTrack?'':'selected'}>Master Out (mute / solo / FX)</option><option value="track" ${sourceTrack?'selected':''}>Single track / Traccia singola</option></select></label>
+    <label id="aiInputTrackWrap" ${sourceTrack?'':'hidden'}>Input track / Traccia<select id="aiInputTrack">${(current.tracks||[]).map(x=>`<option value="${esc(x.id)}" ${x.id===sourceTrack?'selected':''}>${esc(x.name)}</option>`).join('')}</select></label>
+    <label>Mode / Modalità<select id="aiRemixMode" onchange="document.getElementById('aiSwapOptions').hidden=this.value!=='instrument_swap'"><option value="rearrange">AI Arranger</option><option value="auto_remix">Auto-Remix</option><option value="instrument_swap">Instrument Swap</option></select></label>
+    <label>AI model / Modello<select id="aiRemixModel">${models}</select></label>
+    <label>Preset<select id="aiRemixPreset">${presets}</select></label>
+    <label>Style description / Descrizione<textarea id="aiRemixPrompt" rows="3" maxlength="3000" placeholder="Describe your target arrangement or remix..."></textarea></label>
+    <div id="aiSwapOptions" hidden><label>Source track / Traccia sorgente<select id="aiSwapTrack">${tracks}</select></label><label>Target instrument / Strumento sostitutivo<input id="aiSwapTarget" type="text" maxlength="100" value="Saxophone"></label></div>
+    <label>Intensity / Intensità<input id="aiRemixStrength" type="range" min="0" max="100" value="60"></label>
+    <label><input id="aiKeepChords" type="checkbox" checked> Preserve chords / Preserva accordi</label>
+    <label><input id="aiKeepStructure" type="checkbox" checked> Preserve sections / Preserva struttura</label>
+    <label><input id="aiKeepTempo" type="checkbox" checked> Preserve tempo / Preserva BPM</label>
+    <label><input id="aiKeepMelody" type="checkbox" checked> Preserve melody / Preserva melodia</label>
+    <label><input id="aiKeepVoice" type="checkbox"> Preserve vocals / Preserva voce</label>
+    <section id="aiAceNativeTools" style="border:1px solid var(--border,#8884);padding:10px;border-radius:8px"><strong>ACE-Step · Native setup / Configurazione</strong><p id="aiAceState" class="hint">Checking...</p><div id="aiAceProgressPanel" hidden role="status" aria-live="polite"><label id="aiAceProgressLabel" for="aiAceProgress">Preparing...</label><progress id="aiAceProgress" style="width:100%"></progress><small id="aiAceProgressDetail"></small></div><div class="form-actions"><button class="utility-btn" onclick="aiAceInstall()">Install ACE-Step / Installa</button><button class="utility-btn" onclick="aiAceStart()">Start local server / Avvia</button><button class="utility-btn" onclick="aiAceStop()">Stop ACE-Step / Ferma</button><button class="utility-btn" onclick="aiAceTest()">Test real generation / Prova generazione</button><button class="utility-btn" onclick="aiAceRefresh()">Refresh</button></div></section>
+    <p class="hint">Generated audio is appended as a NEW track, never replacing the original. A trusted AI worker must be installed and configured.</p>
+    <div class="form-actions"><button class="utility-btn" onclick="planAiRemix()">Plan / Pianifica</button><button class="utility-btn primary" onclick="generateAndAddAiRemix()">Generate + Add track / Genera + aggiungi traccia</button></div>
+    <pre id="aiRemixPlanResult" style="white-space:pre-wrap;max-height:14rem;overflow:auto"></pre></div>`);
+  aiAceRefresh();
+}
+async function planAiRemix(action="plan"){
+  if(!current?.id)return;
+  const val=id=>document.getElementById(id)?.value;
+  const yes=id=>!!document.getElementById(id)?.checked;
+  const mode=val('aiRemixMode');
+  const body={input_source:val('aiInputSource')||'master',...(val('aiInputSource')==='track'?{input_track_id:val('aiInputTrack')}:{}),model_id:val('aiRemixModel'),preset_id:val('aiRemixPreset'),prompt:val('aiRemixPrompt')||'',strength:Number(val('aiRemixStrength')),preserve_chords:yes('aiKeepChords'),preserve_structure:yes('aiKeepStructure'),preserve_tempo:yes('aiKeepTempo'),preserve_melody:yes('aiKeepMelody'),preserve_voice:yes('aiKeepVoice')};
+  if(mode!=='rearrange'){body.mode=mode;body.instrument_swaps=mode==='instrument_swap'?[{track_id:val('aiSwapTrack'),target_instrument:val('aiSwapTarget')}]:[];}
+  const route=(mode==='rearrange'?'ai-arranger/':'remix/')+action;
+  const output=document.getElementById('aiRemixPlanResult');
+  try{const plan=await api(`/api/projects/${encodeURIComponent(current.id)}/${route}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});if(action==='generate-and-add'){current=plan;render();output.textContent='AI output appended as a new track; source tracks preserved.';}else{output.textContent=JSON.stringify({status:plan.status,mode:plan.mode||'rearrange',prompt:plan.prompt,input_source:plan.input_source,input_track_id:plan.input_track_id,constraints:plan.constraints,backend_available:plan.backend_available,warnings:plan.warnings},null,2)}}catch(e){output.textContent=e.message;}
+}
+
+async function generateAndAddAiRemix(){return planAiRemix("generate-and-add")}
+
+// r193: native-only optional ACE-Step setup and real inference verification.
+let aiAcePollTimer=null;
+async function aiAceRefresh(){
+ const el=document.getElementById('aiAceState');if(!el)return;
+ try{const info=await api('/api/ai-arranger/desktop-ace/status');el.textContent=`Install: ${info.desktop.task.state}; installed: ${info.desktop.installed}; server: ${info.desktop.server_running}; auto-start: ${info.desktop.auto_start_enabled}; Git: ${info.desktop.has_git}; uv: ${info.desktop.has_uv}; inference test: ${info.inference_test.state}`;
+ const task=info.desktop.task||{};const panel=document.getElementById('aiAceProgressPanel');const bar=document.getElementById('aiAceProgress');
+ const active=['installing','starting_server'].includes(task.state)||(info.desktop.server_running&&!['passed','failed'].includes(info.inference_test.state));
+ panel.hidden=!active;
+ if(active){const pct=Number.isFinite(task.progress_percent)?task.progress_percent:null;
+ if(pct===null)bar.removeAttribute('value');else{bar.max=100;bar.value=pct;}
+ document.getElementById('aiAceProgressLabel').textContent=task.phase==='clone'?'Downloading ACE-Step / Download server':task.phase==='dependencies'?'Installing dependencies / Installazione dipendenze':'Initializing model / Preparazione modelli';
+ const bytes=task.model_downloaded_bytes_this_session||0;
+ document.getElementById('aiAceProgressDetail').textContent=(pct===null?'In progress (total unknown) / In corso (totale ignoto)':`${pct}%`)+(bytes?` · ${(bytes/1048576).toFixed(1)} MiB cached`: '')+(task.message?` · ${task.message}`:'');}
+ if(active&&!aiAcePollTimer)aiAcePollTimer=setInterval(()=>{if(!document.getElementById('aiAceProgressPanel')){clearInterval(aiAcePollTimer);aiAcePollTimer=null;return;}aiAceRefresh()},1500);
+ if(!active&&aiAcePollTimer){clearInterval(aiAcePollTimer);aiAcePollTimer=null;}}
+ catch(e){document.getElementById('aiAceNativeTools').hidden=true;}
+}
+async function aiAceInstall(){
+ if(!confirm('Install ACE-Step from its official GitHub repository? Third-party code and dependencies will be downloaded. Models are downloaded only on first use. / Installare ACE-Step da GitHub?'))return;
+ try{await api('/api/ai-arranger/desktop-ace/install',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({consent:true})});await aiAceRefresh();}catch(e){toast(e.message)}
+}
+async function aiAceStart(){
+ if(!confirm('Start ACE-Step locally and allow on-demand download of model weights (several GB)? / Avviare ACE-Step e consentire il download dei modelli?'))return;
+ try{await api('/api/ai-arranger/desktop-ace/start',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({consent:true})});await aiAceRefresh();}catch(e){toast(e.message)}
+}
+async function aiAceStop(){
+ if(!confirm('Stop ACE-Step and disable automatic startup? / Fermare ACE-Step e disabilitare l’avvio automatico?'))return;
+ try{await api('/api/ai-arranger/desktop-ace/stop',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({disable_auto_start:true})});await aiAceRefresh();}catch(e){toast(e.message)}
+}
+async function aiAceTest(){
+ if(!confirm('Run a real ACE-Step audio-generation test? It may take several minutes. / Eseguire un test reale di generazione audio?'))return;
+ try{await api('/api/ai-arranger/desktop-ace/test',{method:'POST'});await aiAceRefresh();}catch(e){toast(e.message)}
 }

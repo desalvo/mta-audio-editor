@@ -1,0 +1,6 @@
+{
+  "upstream_repository": "ace-step/ACE-Step-1.5",
+  "release_tag": "v0.1.8",
+  "update_policy": "latest-stable-release-with-review",
+  "note": "Source is pinned to this release tag and resolved to a full immutable commit SHA during the audited CI build; model weights are never included."
+}

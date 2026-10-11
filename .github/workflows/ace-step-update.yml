@@ -1,0 +1,57 @@
+name: Check new ACE-Step stable release
+
+on:
+  schedule:
+    - cron: '12 7 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  check-ace-step-release:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Detect latest upstream stable release
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import json, os, re, urllib.request
+          from pathlib import Path
+          path=Path('ace_step_version.json')
+          current=json.loads(path.read_text())
+          req=urllib.request.Request('https://api.github.com/repos/ace-step/ACE-Step-1.5/releases/latest',
+                                     headers={'Authorization': 'Bearer '+os.environ['GH_TOKEN'],
+                                              'Accept':'application/vnd.github+json', 'User-Agent':'MTA-ACE-Step-release-check'})
+          with urllib.request.urlopen(req, timeout=25) as response:
+              release=json.load(response)
+          tag=release['tag_name']
+          if release.get('draft') or release.get('prerelease') or not re.fullmatch(r'v\d+\.\d+\.\d+', tag):
+              raise RuntimeError('Latest upstream release is not a supported stable version')
+          if tag != current['release_tag']:
+              current['release_tag']=tag
+              path.write_text(json.dumps(current, indent=2, ensure_ascii=False)+'\n')
+              print('Proposing ACE-Step update:',tag)
+          else:
+              print('ACE-Step already at latest stable release:',tag)
+          PY
+      - name: Create reviewed update PR (never silently change release builds)
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ github.token }}
+          branch: automation/ace-step-latest-stable
+          delete-branch: true
+          commit-message: 'chore: propose ACE-Step latest stable release update'
+          title: 'chore: update pinned ACE-Step to latest stable release'
+          body: |
+            Automated proposal for the latest upstream stable ACE-Step release.
+            **Do not merge until source licensing, dependencies, CI bundle checks, and audio inference compatibility have been reviewed.**
+            ACE-Step model weights are not bundled.
+          add-paths: ace_step_version.json

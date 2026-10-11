@@ -3,13 +3,19 @@ services:
     build:
       context: .
       args:
-        APP_VERSION: "0.2.0"
-        APP_REVISION: "153"
+        APP_VERSION: "0.3.0"
+        APP_REVISION: "194"
         BUILD_ID: "${BUILD_ID:-local}"
-    image: desalvo/mta-audio-editor:0.2.0
+    image: desalvo/mta-audio-editor:0.3.0-r195
     ports:
       - "8080:8080"
     environment:
+      MTA_AI_WORKER_ENABLED: "true"
+      MTA_AI_WORKER_EXECUTABLE: /app/app/ace_step_http_worker.py
+      MTA_ACE_STEP_URL: http://ace-step:8001
+      MTA_ACE_STEP_TRUSTED_HOST: ace-step
+      MTA_ACE_MODEL_CACHE: /models/checkpoints
+      HF_HOME: /models/huggingface
       MTA_ADMIN_USERNAME: "${MTA_ADMIN_USERNAME:-admin}"
       MTA_ADMIN_PASSWORD: "${MTA_ADMIN_PASSWORD:?set MTA_ADMIN_PASSWORD}"
       MTA_ADMIN_EMAIL: "${MTA_ADMIN_EMAIL:?set MTA_ADMIN_EMAIL}"
@@ -30,6 +36,8 @@ services:
       MTA_OAUTH_GITHUB_CLIENT_SECRET: "${MTA_OAUTH_GITHUB_CLIENT_SECRET:-}"
     volumes:
       - mta-data:/data/projects
+      - ace-checkpoints:/models/checkpoints:ro
+      - ace-hf-cache:/models/huggingface:ro
     read_only: true
     tmpfs:
       - /tmp:size=256m,noexec,nosuid,nodev
@@ -37,5 +45,30 @@ services:
       - no-new-privileges:true
     cap_drop: ["ALL"]
     restart: unless-stopped
+    networks: [mta-internal, mta-public]
+  ace-step:
+    image: ghcr.io/ace-step/ace-step-1.5:latest
+    environment:
+      ACESTEP_MODE: api
+      ACESTEP_INIT_SERVICE: "false"
+      ACESTEP_LLM_BACKEND: pt
+      ACESTEP_CONFIG_PATH: acestep-v15-turbo
+      ACESTEP_LM_MODEL_PATH: acestep-5Hz-lm-1.7B
+      HF_HOME: /root/.cache/huggingface
+    volumes:
+      - ace-checkpoints:/app/checkpoints
+      - ace-hf-cache:/root/.cache/huggingface
+      - ace-output:/app/output
+    shm_size: 2gb
+    networks: [mta-internal]
+    restart: unless-stopped
+    # GPU support requires a compatible GPU runtime; see ACE_STEP_DEPLOYMENT.md
 volumes:
   mta-data:
+  ace-checkpoints:
+  ace-hf-cache:
+  ace-output:
+networks:
+  mta-internal:
+  mta-public:
+

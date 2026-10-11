@@ -26,6 +26,7 @@
       <button class="primary-icon-action" onclick="save()" title="Save" aria-label="Save"><span class="control-icon" aria-hidden="true">💾</span></button>
       <button class="primary-icon-action" onclick="saveAsProject()" title="Save as" aria-label="Save as"><span class="control-icon" aria-hidden="true">▣</span></button>
       <button class="primary-icon-action" onclick="showProjectSetup()" title="Setup" aria-label="Setup"><span class="control-icon" aria-hidden="true">⚙</span></button>
+      <button class="primary-icon-action" type="button" onclick="openAiRemixPanel()" title="AI Arranger / Remix" aria-label="AI Arranger / Remix"><span class="control-icon" aria-hidden="true">♫</span></button>
       <button id="exportPanelMenuBtn" class="accent primary-icon-action" onclick="openExportPanel()" title="Export" aria-label="Export"><span class="control-icon" aria-hidden="true">⤴</span></button>
       <a class="header-link logout auth-managed" href="/logout" title="Esci" aria-label="Esci"><span class="control-icon" aria-hidden="true">↪</span><span class="control-text">Esci</span></a>
     </div>
@@ -43,6 +44,7 @@
           <div class="sidebar-tools-body" id="projectToolsBody">
             <button class="nav-item" onclick="newProject()">＋ <span>New project</span></button>
             <button class="nav-item" onclick="openExportPanel()">⇧ <span>Export</span></button>
+            <button class="nav-item" onclick="openAiRemixPanel()">♫ <span>AI Arranger / Remix</span></button>
             <button id="saveProjectManualNav" class="nav-item native-project-action" onclick="save()" hidden>💾 <span>Save project</span></button>
             <button id="saveProjectLocalNav" class="nav-item web-project-action" onclick="saveProjectLocal()">⬇ <span>Save project locally</span></button>
             <button class="nav-item" onclick="saveAsProject()">⇩ <span>Save project as…</span></button>

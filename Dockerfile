@@ -1,6 +1,6 @@
 FROM python:3.14-slim-trixie
-ARG APP_VERSION=0.2.0
-ARG APP_REVISION=153
+ARG APP_VERSION=0.3.0
+ARG APP_REVISION=189
 ARG RELEASE_CHANNEL=stable
 ARG BUILD_ID=unknown
 ARG INSTALL_STEMS=true
@@ -49,6 +49,7 @@ RUN apt-get update \
 RUN python -c "import fastapi, uvicorn, numpy, whisper, madmom_infer" \
     && if [ "$INSTALL_STEMS" = "true" ]; then python -c "import torch, demucs"; fi
 COPY app ./app
+RUN chmod 755 /app/app/ace_step_http_worker.py
 COPY LICENSE NOTICE ./
 RUN mkdir -p /data/projects && chown -R 10001:10001 /data /app
 USER 10001:10001

@@ -1,3 +1,121 @@
+## 0.3.0-r195 — Reviewed ACE-Step CI source bundling
+
+Adds ACE-Step v0.1.8 default stable source lock, immutable SHA resolution, weekly upstream release checks with a reviewable update PR, pinned-source CI bundling and artifact integrity tests. Does not yet package a ready-to-run inference runtime or validate generation.
+
+### 0.3.0-r194 — Shared model cache telemetry and reproducible source bundling
+- Add authenticated model-cache telemetry to MTA for remote clients, without exposing checkpoint files or internal model API.
+- Mount cached models read-only in MTA service, with persistent ACE-Step cache in Docker/Kubernetes.
+- Provide opt-in pinned upstream source vendor script (source not embedded in this build because upstream retrieval was unavailable).
+- Keep native C++/VST3 experimental, no real inference certified.
+
+### 0.3.0-r193 — Native ACE-Step progress
+- Native setup shows a polling progress bar for Git clone, dependency installation and first model initialization, reporting model cache growth without invented percentages.
+- Native lifecycle remains opt-in and stops only the MTA-owned server.
+- Added progress regression coverage.
+
+## 0.3.0-r193 — Native ACE-Step guided installation and one-click live inference test
+
+- Native-only opt-in Git/uv source deployment in a private data folder, model cache, local API start.
+- UI Install / Start / Test / Refresh buttons with background installation and live audio inference.
+- Fail closed for multi-user deployments and missing prerequisites; no verified production model inference yet.
+- Trusted internal Python ACE-Step adapter works as a subprocess across platforms.
+- C++ VST3 host status unchanged (`native_host_ready=false`).
+
+- Native single-user ACE-Step server now auto-starts with MTA after recorded download consent; it is terminated on MTA shutdown. Manual Stop disables later auto-start and never kills an unrelated server.
+
+## 0.3.0-r192 — Opt-in live ACE-Step inference smoke test
+
+- Added a real audio-generation smoke test requiring an installed ACE-Step worker and explicitly returning unverified when unavailable.
+- Added `--smoke-input` to the ACE-Step HTTP worker to exercise upload, task polling and audio retrieval from an independently provided WAV.
+- Preserved track/master routing, nondestructive generated-track import, and native DSP/VST3 experimental status; no model weights bundled.
+- The smoke check does not guarantee musical fidelity; production inference and VST3 realtime remain unverified.
+
+## 0.3.0-r191 — ACE-Step transport integrity and native latency tests
+
+- Strict no-proxy loopback HTTP transport and JSON health response validation.
+- End-to-end mock HTTP ACE-Step Cover pipeline coverage; this does not prove actual model inference.
+- Additional compiled C++ latency compensation regression tests.
+- Preserve cumulative track/master routing and non-destructive import.
+
+## 0.3.0-r190
+
+- Added explicit non-overclaiming ACE-Step backend readiness diagnostics and native C++ non-allocating noise gate.
+- Inference readiness remains unverified until an actual generation completes on a model-backed server.
+
+## 0.3.0-r189
+- Deploy ACE-Step alongside MTA in Docker Compose/Kubernetes with persistent on-demand model storage and private API routing.
+- Add desktop local ACE-Step launcher requiring operator-installed upstream executable and explicit download consent.
+- Restrict trusted Docker sidecar endpoint with explicit environment allowlist.
+- Preserve non-destructive Arranger/Remix and experimental native audio/VST3 components.
+
+## 0.3.0-r188
+- Native C++20 DC blocker utility with standalone compiled regression coverage (not enabled in production playback).
+- ACE-Step output WAV validation and optional `--check-server` loopback probe.
+- Model inference is still unverified; `native_host_ready=false`.
+
+## 0.3.0-r187
+
+- Added optional ACE-Step 1.5 HTTP worker adapter using local API audio-conditioned cover generation, task polling and verified WAV output via existing MTA worker contract. No models bundled and not certified without live inference.
+- Kept track/master source routing, non-destructive result insertion, VST3 latency-compensated native DSP foundations and native_host_ready=false.
+- Added adapter protocol tests and setup documentation.
+
+## 0.3.0-r186
+
+- Guard AI worker output duration relative to the selected track or rendered Master Out; preserve fail-closed audio validation and non-destructive track import.
+- Reject source audio exceeding 30 minutes and prevent worker plan from overriding server-generated source manifest.
+- Introduce native C++20 planar/interleaved PCM conversion for the future VST3 audio-buffer bridge, with allocation-free processing and atomic invalid-sample rejection.
+- Align Windows, Android and iOS build revision metadata.
+- AI model inference and realtime native hosting are not yet production validated; native_host_ready=false.
+
+## 0.3.0-r185
+
+- AI Arranger/Remix generated WAV outputs are appended as new project tracks with independent files and non-destructive source retention; generate-and-add endpoints and editor control added.
+
+
+- AI Arranger/Remix input source selector: exact rendered Master Out (mute, solo, track/master inserts, faders and pan) or an isolated rendered track with inserts.
+- Track context menu starts AI Arranger/Remix with that track selected.
+- Worker manifest explicitly identifies master vs track audio.
+- No built-in AI model inference yet; native_host_ready remains false.
+
+## 0.3.0-r184
+
+AI Arranger and Remix can now pass verified source WAV data to trusted external workers through a temporary manifest. Real ACE-Step inference remains unimplemented and unvalidated. Native realtime host remains disabled.
+
+r181: Optional trusted AI worker execution returns validated WAV previews from authenticated Arranger and Remix endpoints. No bundled ACE-Step model or guaranteed musical fidelity. Native C++ soft-clip DSP included; production native host remains disabled.
+
+## 0.3.0-r180 — External worker contract and native PDC mix (development)
+
+- Added explicit opt-in external inference worker protocol, size-limited JSON plans and validated WAV results. No ACE-Step inference is bundled or operational by default.
+- Added experimental preallocated C++20 multiroute PDC mixer with gain/mute for offline testing; realtime production remains disabled.
+- Added regression tests and synchronized platform release metadata.
+
+## 0.3.0-r179 (uncommitted)
+
+- AI Arranger / Remix authenticated preflight diagnostics for missing chord and section context; no fake inference readiness.
+- Native C++20 sample-accurate block gain ramp for click-free mixer automation, with fail-before-write input validation.
+- Preserve all r176-r178 changes and native_host_ready=false until production realtime integration.
+
+## 0.3.0-r178 — AI job isolation and compiled native mixer foundation
+
+- Deep-copy AI plans on submit/read/cancel, preventing user and callback mutation of queued constraints.
+- New compiled C++20 native mix matrix: multi-route PCM sum, gain, mute, nonfinite protection and no allocations in callback.
+- All r177 AI job endpoints and VST3 delay-compensation DSP retained.
+- AI inference remains unavailable without a validated worker; native engine is not connected to realtime production (`native_host_ready=false`).
+
+## 0.3.0-r177 — AI job lifecycle and compiled PDC multi-route processing
+
+- Added bounded authenticated non-destructive AI job planning endpoints with cancellation and ownership isolation. No inference is claimed or started.
+- Added C++20 preallocated, realtime-allocation-free multiroute PDC processor with disabled-route handling and fail-closed nonfinite checks.
+- Added compiled regression coverage; preserved `native_host_ready=false`.
+- No automatic third-party model downloads, no change to .maeproj/.maeprojz semantics.
+
+## 0.3.0-r176
+
+- AI Arranger/Remix modal and authenticated planning routes, covering instrument swaps and auto-remix presets, prompts and preservation constraints. No audio generation until a real AI worker is installed.
+- Native C++20 VST3 delay compensation plan exported as `mta_vst3_plan_latency` for control-thread use; realtime host stays gated (`native_host_ready=false`).
+- Android/iOS/Windows version metadata synchronized.
+- Compiled native C++ shared library; targeted tests passed. Full pytest/coverage inconclusive due local timeout at about 31%; CI must confirm.
+
 ## 0.3.0-r175 — Remix planning foundation
 
 - Add Remix with instrument replacement and user-described auto-remix, reusing optional preservation of structure, chords, tempo, melody, and vocals.
@@ -842,3 +960,10 @@ All remain experimental isolated prerequisites; production playback, actual VST3
 
 ## 0.3.0-r174 — AI Arranger foundation
 Initial read-only AI Arranger planning APIs: `GET /api/ai-arranger/catalog`, `POST /api/projects/{pid}/ai-arranger/plan`. `POST /api/projects/{pid}/ai-arranger/generate` explicitly returns HTTP 503 until inference is implemented. Structure and chord preservation are best-effort instructions, not verified generation constraints. No model weights bundled or downloaded.
+
+
+### r182
+Added AI worker status endpoint (explicitly not a proof of inference readiness), hardened output validation and C++20 stereo pan ramp. Real ACE-Step generation and production realtime validation are still pending.
+
+### r183
+AI worker model-capability handshake with short timeout and no inference-readiness claim; native C++ peak/RMS meter. AI audio generation and VST3 realtime activation remain unverified.

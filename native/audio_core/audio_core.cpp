@@ -170,3 +170,24 @@ MTA_EXPORT std::size_t mta_spsc_read(void* handle, float* output, std::size_t co
   fifo->read.store(r+n,std::memory_order_release);
   return n;
 }
+
+// Control-thread-only VST3 latency compensation C ABI. Compute once per graph
+// update, then publish the immutable result to the realtime engine separately.
+// No heap allocation, exceptions, or SDK dependency. Disabled routes are excluded.
+#include "vst3_pdc_plan.hpp"
+struct MtaPdcRouteC { std::uint32_t plugin_frames; std::uint32_t ipc_frames; std::uint32_t enabled; };
+struct MtaPdcResultC { std::uint32_t target_frames; std::uint32_t route_count; };
+MTA_EXPORT int mta_vst3_plan_latency(const MtaPdcRouteC* inputs, std::uint32_t count,
+                                    std::uint32_t* alignment_out, MtaPdcResultC* result) noexcept {
+  if (!result || count > mta::kPdcMaxRoutes || (count && (!inputs || !alignment_out))) return -1;
+  mta::Vst3PdcRoute routes[mta::kPdcMaxRoutes]{};
+  for (std::uint32_t i=0; i<count; ++i) {
+    if (inputs[i].enabled > 1) return -1;
+    routes[i] = {inputs[i].plugin_frames, inputs[i].ipc_frames, 0, inputs[i].enabled == 1};
+  }
+  const auto plan = mta::make_vst3_pdc_plan(routes, count);
+  if (!plan.valid) return -2;
+  for (std::uint32_t i=0; i<count; ++i) alignment_out[i] = plan.routes[i].alignment_frames;
+  *result = {plan.target_frames, count};
+  return 0;
+}

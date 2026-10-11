@@ -13,6 +13,7 @@ from .models import Project
 AIModelId = Literal['ace-step-1.5', 'diffrhythm-2']
 Scope = Literal['project', 'tracks', 'range']
 RemixMode = Literal['instrument_swap', 'auto_remix']
+InputSource = Literal['master', 'track']
 
 
 PRESETS = {
@@ -39,6 +40,8 @@ class RearrangeRequest(BaseModel):
     preset_id: str = Field(default='jazz-swing', max_length=64)
     prompt: str = Field(default='', max_length=3000)
     scope: Scope = 'project'
+    input_source: InputSource = 'master'
+    input_track_id: str | None = Field(default=None, pattern=r'^[A-Za-z0-9_-]{1,64}$')
     track_ids: list[str] = Field(default_factory=list, max_length=128)
     start_ms: int | None = Field(default=None, ge=0, le=86_400_000)
     end_ms: int | None = Field(default=None, ge=0, le=86_400_000)
@@ -52,6 +55,10 @@ class RearrangeRequest(BaseModel):
 
     @model_validator(mode='after')
     def validate_scope(self):
+        if self.input_source == 'track' and not self.input_track_id:
+            raise ValueError('track input requires input_track_id')
+        if self.input_source == 'master' and self.input_track_id is not None:
+            raise ValueError('master input must not set input_track_id')
         if self.preset_id not in PRESETS:
             raise ValueError('unknown arranger preset')
         if self.scope == 'range' and (self.start_ms is None or self.end_ms is None or self.start_ms >= self.end_ms):
@@ -135,6 +142,8 @@ def catalog() -> dict:
 def prepare_plan(project: Project, request: RearrangeRequest) -> dict:
     """Prepare immutable model input; never mutate project data or claim strict guarantees."""
     selected_tracks = {track.id for track in project.tracks}
+    if request.input_source == 'track' and request.input_track_id not in selected_tracks:
+        raise ValueError('unknown input track id')
     if request.scope == 'tracks' and not set(request.track_ids).issubset(selected_tracks):
         raise ValueError('unknown track id')
     sections = [
@@ -165,6 +174,7 @@ def prepare_plan(project: Project, request: RearrangeRequest) -> dict:
         'model_id': request.model_id, 'preset_id': request.preset_id,
         'prompt': '\n'.join(parts), 'strength': request.strength,
         'scope': request.scope, 'track_ids': request.track_ids,
+        'input_source': request.input_source, 'input_track_id': request.input_track_id,
         'start_ms': request.start_ms, 'end_ms': request.end_ms,
         'constraints': {
             'preserve_voice': request.preserve_voice,
@@ -184,3 +194,21 @@ def prepare_plan(project: Project, request: RearrangeRequest) -> dict:
             'Generated audio must be imported as separate non-destructive tracks after explicit approval.',
         ],
     }
+
+
+def assess_plan(plan: dict) -> dict:
+    """Report actionable limits before generation; never promise exact preservation."""
+    context = plan.get('musical_context', {})
+    constraints = plan.get('constraints', {})
+    issues = []
+    if constraints.get('preserve_chords') and not context.get('chords'):
+        issues.append({'code': 'NO_CHORD_ANNOTATIONS', 'level': 'warning', 'message': 'No enabled chord annotations; run chord extraction first.'})
+    if constraints.get('preserve_structure') and not context.get('sections'):
+        issues.append({'code': 'NO_SECTION_MARKERS', 'level': 'warning', 'message': 'No enabled structural markers; add markers first.'})
+    if plan.get('scope') == 'range':
+        duration = plan['end_ms'] - plan['start_ms']
+        if duration < 1000:
+            issues.append({'code': 'SHORT_SELECTION', 'level': 'warning', 'message': 'Selection under one second may not give useful musical context.'})
+    issues.append({'code': 'MODEL_WORKER_NOT_CONFIGURED', 'level': 'blocker', 'message': 'Install and validate a compatible inference worker before generating audio.'})
+    return {'generation_ready': False, 'preview_ready': False, 'issues': issues,
+            'next_step': 'configure_inference_worker', 'preservation_verified': False}

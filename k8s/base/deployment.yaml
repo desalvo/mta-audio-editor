@@ -25,12 +25,16 @@ spec:
       #   kubernetes.io/hostname: worker-01
       containers:
         - name: mta-audio-editor
-          image: desalvo/mta-audio-editor:0.2.0
+          image: desalvo/mta-audio-editor:0.3.0-r195
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
               name: http
           env:
+            - name: MTA_ACE_MODEL_CACHE
+              value: /models/checkpoints
+            - name: HF_HOME
+              value: /models/huggingface
             - name: MTA_ADMIN_USERNAME
               valueFrom:
                 secretKeyRef:
@@ -47,6 +51,12 @@ spec:
                   name: mta-audio-editor-auth
                   key: email
                   optional: true
+            - name: MTA_AI_WORKER_ENABLED
+              value: "true"
+            - name: MTA_AI_WORKER_EXECUTABLE
+              value: /app/app/ace_step_http_worker.py
+            - name: MTA_ACE_STEP_URL
+              value: http://127.0.0.1:8001
             - name: MTA_MAX_UPLOAD_MB
               value: "1024"
             - name: MTA_DEMUCS_MODEL_AUTO_UPDATE
@@ -93,6 +103,12 @@ spec:
             capabilities:
               drop: ["ALL"]
           volumeMounts:
+            - name: ace-checkpoints
+              mountPath: /models/checkpoints
+              readOnly: true
+            - name: ace-cache
+              mountPath: /models/huggingface
+              readOnly: true
             - name: data
               mountPath: /data/projects
             - name: tmp
@@ -117,7 +133,48 @@ spec:
               port: http
             initialDelaySeconds: 10
             periodSeconds: 30
+        - name: ace-step
+          image: ghcr.io/ace-step/ace-step-1.5:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8001
+              name: ace-api
+          env:
+            - name: ACESTEP_MODE
+              value: api
+            - name: ACESTEP_INIT_SERVICE
+              value: "false"
+            - name: ACESTEP_LLM_BACKEND
+              value: pt
+            - name: ACESTEP_CONFIG_PATH
+              value: acestep-v15-turbo
+            - name: ACESTEP_LM_MODEL_PATH
+              value: acestep-5Hz-lm-1.7B
+            - name: HF_HOME
+              value: /root/.cache/huggingface
+          volumeMounts:
+            - name: ace-checkpoints
+              mountPath: /app/checkpoints
+            - name: ace-cache
+              mountPath: /root/.cache/huggingface
+            - name: ace-output
+              mountPath: /app/output
+          resources:
+            requests:
+              cpu: 500m
+              memory: 2Gi
+            limits:
+              memory: 16Gi
+          # Add nvidia.com/gpu: 1 to limits on GPU-enabled clusters.
       volumes:
+        - name: ace-checkpoints
+          persistentVolumeClaim:
+            claimName: mta-ace-checkpoints
+        - name: ace-cache
+          persistentVolumeClaim:
+            claimName: mta-ace-cache
+        - name: ace-output
+          emptyDir: {}
         - name: data
           persistentVolumeClaim:
             claimName: mta-audio-editor-data

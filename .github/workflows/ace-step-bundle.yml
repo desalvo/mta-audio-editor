@@ -1,0 +1,79 @@
+name: ACE-Step audited source bundle
+
+on:
+  workflow_dispatch:
+    inputs:
+      upstream_commit:
+        description: 'Optional reviewed full 40-character SHA; blank uses the pinned latest stable release'
+        required: false
+        default: ''
+        type: string
+      dependency_probe:
+        description: 'Attempt optional isolated Python 3.12 dependency installation on Ubuntu (slow)'
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  ace-step-source:
+    name: Bundle reviewed ACE-Step source (model weights excluded)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout MTA
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Resolve pinned stable ACE-Step release to immutable SHA
+        id: release
+        env:
+          ACE_OVERRIDE: ${{ inputs.upstream_commit }}
+        shell: bash
+        run: |
+          if [[ -n "$ACE_OVERRIDE" ]]; then
+            [[ "$ACE_OVERRIDE" =~ ^[a-fA-F0-9]{40}$ ]] || { echo 'Invalid 40-character SHA'; exit 2; }
+            ACE_COMMIT="${ACE_OVERRIDE,,}"
+          else
+            ACE_COMMIT="$(python scripts/resolve_ace_step_version.py)"
+          fi
+          echo "commit=$ACE_COMMIT" >> "$GITHUB_OUTPUT"
+          echo "Release source SHA: $ACE_COMMIT"
+      - name: Retrieve and stage exact reviewed ACE-Step revision
+        env:
+          ACE_COMMIT: ${{ steps.release.outputs.commit }}
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq rsync
+          bash scripts/vendor_ace_step.sh "$ACE_COMMIT"
+      - name: Validate license and reject bundled model weights
+        run: |
+          python scripts/verify_ace_step_bundle.py third_party/ace-step-1.5
+      - name: Verify reproducibility manifest and archive source code
+        env:
+          ACE_COMMIT: ${{ steps.release.outputs.commit }}
+        run: |
+          mkdir -p dist-ace-step
+          tar --sort=name --owner=0 --group=0 --numeric-owner --mtime='UTC 2020-01-01' \
+            -czf "dist-ace-step/ace-step-1.5-source-${ACE_COMMIT}.tar.gz" -C third_party ace-step-1.5
+          (cd dist-ace-step && sha256sum *.tar.gz > SHA256SUMS)
+          cp third_party/ace-step-1.5/UPSTREAM_COMMIT dist-ace-step/UPSTREAM_COMMIT
+          cp third_party/ace-step-1.5/LICENSE dist-ace-step/ACE_STEP_LICENSE
+      - name: Publish audited ACE-Step source artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ace-step-source-${{ steps.release.outputs.commit }}
+          path: dist-ace-step/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Optional isolated dependency smoke test
+        if: ${{ inputs.dependency_probe }}
+        run: |
+          python3 -m venv /tmp/mta-ace-step-probe
+          /tmp/mta-ace-step-probe/bin/python -m pip install -U pip
+          /tmp/mta-ace-step-probe/bin/python -m pip install uv
+          cd third_party/ace-step-1.5
+          # The upstream dependency graph can require special GPU wheels; fail visibly.
+          /tmp/mta-ace-step-probe/bin/uv sync --python 3.12 --no-dev

@@ -1,3 +1,17 @@
+## 0.3.0-r179 (uncommitted)
+
+- AI Arranger / Remix authenticated preflight diagnostics for missing chord and section context; no fake inference readiness.
+- Native C++20 sample-accurate block gain ramp for click-free mixer automation, with fail-before-write input validation.
+- Preserve all r176-r178 changes and native_host_ready=false until production realtime integration.
+
+## r178
+
+Added native_mix_matrix.hpp, an experimental C++20 multiroute PCM mixer with gain/mute and fail-closed finite sample checks. Not connected to production realtime playback.
+
+## r177
+
+Added experimental multiroute VST3 delay compensation processor with static scratch and preallocated delay lines. Not yet wired to production realtime callback. `native_host_ready=false`.
+
 ## 0.3.0-r172 — Experimental C++ PDC planning (not realtime-enabled)
 
 The C++20 `vst3_pdc_plan.hpp` computes per-route compensation from plugin plus IPC delay, with a strict 64-route and 1,048,576-frame maximum. Disabled routes do not affect target latency. Inputs are validated before producing a usable plan; the planner is intended for the control thread, and delay lines must be configured away from the realtime callback. It does not connect VST3 processing, MIDI, automation, playback or any production audio path. `native_host_ready=false` remains mandatory. A compiled C++ regression test covers unequal latency, disabled routes and overflow.
@@ -62,3 +76,19 @@ packets, worker fault gating and output validation. These have C++20 tests,
 but must still be wired to native engine transport and a realtime-safe
 VST3 worker scheduler, including real plugin automation/state validation and
 Windows/macOS/Linux stress and failure recovery. Keep `native_host_ready=false`.
+
+
+### r176 native C ABI
+Added `mta_vst3_plan_latency`: precompute per-route VST3/IPC alignment in native C++20, no allocations, no SDK dependency. This is a control-thread API and is **not** an activated realtime plugin host. `native_host_ready=false` remains mandatory. Follow-up: delay-line allocation/graph publication and measured VST3 latency callbacks on production audio graph.
+
+
+- r182: native_stereo_pan.hpp provides an experimental allocation-free stereo pan ramp; not integrated into production realtime routing.
+
+- r183: native_peak_meter.hpp adds allocation-free peak/RMS measurements for mono/stereo PCM (not production connected).
+
+## r186
+Native planar/interleaved PCM conversion is available as an isolated tested building block for VST3 host buffers. It is not wired to production realtime callbacks; native_host_ready remains false.
+
+
+### r188
+Experimental allocation-free DC blocker added in `native/audio_core/native_dc_blocker.hpp`; not connected to production VST3 realtime playback. `native_host_ready=false`.

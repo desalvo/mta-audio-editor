@@ -79,6 +79,10 @@ from .rights_registry import (provider_catalog as rights_provider_catalog, searc
 from . import sample_editor as sample_editor_engine
 from .version import APP_RELEASE, APP_RELEASE_CHANNEL, APP_REVISION, APP_VERSION, BUILD_ID, CREATOR, REPOSITORY
 
+from .ai_arranger import RearrangeRequest, RemixRequest, catalog as arranger_catalog, prepare_plan as arranger_plan, prepare_remix_plan, assess_plan
+from .ai_job_queue import ai_jobs
+from .ai_worker_protocol import configured_worker, run_worker_with_project_audio, worker_capabilities, WorkerUnavailable
+
 app = FastAPI(title="MTA Audio Editor", version=APP_VERSION, docs_url=None, redoc_url=None, openapi_url=None)
 
 
@@ -102,10 +106,16 @@ def _musical_export_project(project: Project) -> Project:
 def _start_background_services():
     start_background_updater()
     resume_pending_gc()
+    if NATIVE_SINGLE_USER:
+        from .ace_step_desktop_manager import auto_start_server
+        auto_start_server()
 
 
 @app.on_event("shutdown")
 def _cleanup_session_previews_on_shutdown():
+    if NATIVE_SINGLE_USER:
+        from .ace_step_desktop_manager import stop_server
+        stop_server()
     cleanup_session_preview_cache()
 LOGGER = logging.getLogger(__name__)
 BASE = Path(__file__).parent
@@ -949,6 +959,209 @@ def remove_custom_preset(plugin: str, name: str):
     if not delete_user_preset(plugin, name):
         raise HTTPException(404, "user preset not found")
     return {"ok": True}
+
+
+
+
+@app.get('/api/ai-arranger/model-cache')
+def ai_arranger_model_cache(request: Request):
+    # Remote applications use MTA's authenticated API; the raw model server
+    # remains on loopback or a private container network.
+    _actor(request)
+    from .ace_model_cache import cache_status
+    return cache_status()
+
+
+@app.get('/api/ai-arranger/worker-status')
+def ai_arranger_worker_status(request: Request):
+    _actor(request)
+    return worker_capabilities()
+
+
+@app.get('/api/ai-arranger/catalog')
+def ai_arranger_catalog(request: Request):
+    _actor(request)
+    return arranger_catalog()
+
+
+@app.post('/api/projects/{pid}/ai-arranger/preflight')
+def ai_arranger_preflight(pid: str, request: Request, body: RearrangeRequest):
+    project = _project_for_actor(request, pid)
+    try:
+        return assess_plan(arranger_plan(project, body))
+    except ValueError as exc:
+        raise HTTPException(422, str(exc)) from exc
+
+
+@app.post('/api/projects/{pid}/remix/preflight')
+def ai_remix_preflight(pid: str, request: Request, body: RemixRequest):
+    project = _project_for_actor(request, pid)
+    try:
+        return assess_plan(prepare_remix_plan(project, body))
+    except ValueError as exc:
+        raise HTTPException(422, str(exc)) from exc
+
+
+@app.post('/api/projects/{pid}/ai-arranger/plan')
+def ai_arranger_project_plan(pid: str, request: Request, body: RearrangeRequest):
+    project = _project_for_actor(request, pid)
+    try:
+        return arranger_plan(project, body)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@app.post('/api/projects/{pid}/remix/plan')
+def ai_remix_project_plan(pid: str, request: Request, body: RemixRequest):
+    project = _project_for_actor(request, pid)
+    try:
+        return prepare_remix_plan(project, body)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@app.post('/api/projects/{pid}/ai-arranger/jobs')
+def create_ai_arranger_job(pid: str, request: Request, body: RearrangeRequest):
+    project = _project_for_actor(request, pid)
+    try:
+        plan = arranger_plan(project, body)
+        return ai_jobs.submit(pid, str(_actor(request)['id']), 'rearrange', plan)
+    except ValueError as exc:
+        raise HTTPException(422, str(exc)) from exc
+
+
+@app.post('/api/projects/{pid}/remix/jobs')
+def create_ai_remix_job(pid: str, request: Request, body: RemixRequest):
+    project = _project_for_actor(request, pid)
+    try:
+        plan = prepare_remix_plan(project, body)
+        return ai_jobs.submit(pid, str(_actor(request)['id']), 'remix', plan)
+    except ValueError as exc:
+        raise HTTPException(422, str(exc)) from exc
+
+
+@app.get('/api/projects/{pid}/ai-jobs/{job_id}')
+def get_ai_job(pid: str, job_id: str, request: Request):
+    _project_for_actor(request, pid)
+    result = ai_jobs.get(job_id, pid, str(_actor(request)['id']))
+    if result is None:
+        raise HTTPException(404, 'AI job not found')
+    return result
+
+
+@app.post('/api/projects/{pid}/ai-jobs/{job_id}/cancel')
+def cancel_ai_job(pid: str, job_id: str, request: Request):
+    _project_for_actor(request, pid)
+    result = ai_jobs.cancel(job_id, pid, str(_actor(request)['id']))
+    if result is None:
+        raise HTTPException(404, 'AI job not found')
+    return result
+
+
+def _generate_ai_preview(plan: dict, project: Project) -> Response:
+    """Explicit opt-in external worker output; never mutate the original project."""
+    if configured_worker() is None:
+        raise HTTPException(503, 'No verified AI inference executable is configured')
+    try:
+        audio, meta = run_worker_with_project_audio(plan, project, audio_path)
+    except WorkerUnavailable as exc:
+        raise HTTPException(503, str(exc)) from exc
+    except (ValueError, OSError) as exc:
+        raise HTTPException(422, f'AI preview validation failed: {exc}') from exc
+    return Response(content=audio, media_type='audio/wav', headers={
+        'X-MTA-AI-Sample-Rate': str(meta['sample_rate']),
+        'X-MTA-AI-Channels': str(meta['channels']),
+        'Cache-Control': 'no-store',
+        'Content-Disposition': 'attachment; filename="ai-preview.wav"',
+    })
+
+
+@app.post('/api/projects/{pid}/ai-arranger/generate')
+def ai_arranger_generate(pid: str, request: Request, body: RearrangeRequest):
+    project = _project_for_actor(request, pid)
+    try:
+        plan = arranger_plan(project, body)
+    except ValueError as exc:
+        raise HTTPException(422, str(exc)) from exc
+    return _generate_ai_preview(plan, project)
+
+
+@app.post('/api/projects/{pid}/remix/generate')
+def ai_remix_generate(pid: str, request: Request, body: RemixRequest):
+    project = _project_for_actor(request, pid)
+    try:
+        plan = prepare_remix_plan(project, body)
+    except ValueError as exc:
+        raise HTTPException(422, str(exc)) from exc
+    return _generate_ai_preview(plan, project)
+
+
+def _append_ai_generated_track(project: Project, audio: bytes, meta: dict, *, mode: str, input_source: str) -> Project:
+    """Append a generated result, preserving every existing track and source file.
+
+    Only successful, validated worker output is published.  A new independent
+    filename and source-clip library entry are used; never replace the input.
+    """
+    from io import BytesIO
+    import wave as _wave
+    with _wave.open(BytesIO(audio), 'rb') as handle:
+        if (handle.getnframes() != meta['frames'] or
+                handle.getframerate() != meta['sample_rate'] or
+                handle.getnchannels() != meta['channels']):
+            raise ValueError('AI output WAV metadata mismatch')
+    filename = 'ai-' + uuid.uuid4().hex + '.wav'
+    target = audio_path(project.id, filename)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    temp = target.with_suffix('.pending')
+    duration = round(meta['frames'] * 1000 / meta['sample_rate'])
+    name = ('AI Remix' if mode == 'remix' else 'AI Arrangement') + (' · Master' if input_source == 'master' else ' · Track')
+    track = Track(id=uuid.uuid4().hex[:12], name=name, filename=filename,
+                  duration_ms=duration, sample_rate=meta['sample_rate'],
+                  channels=meta['channels'],
+                  clips=[Clip(id=uuid.uuid4().hex[:12], source_start_ms=0,
+                              source_end_ms=duration, timeline_start_ms=0)])
+    try:
+        with temp.open('xb') as handle:
+            handle.write(audio)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temp, target)
+        project.tracks.append(track)
+        _register_track_source_in_library(project, track, 'AI generated audio; original tracks preserved')
+        save_project(project)
+        return project
+    except Exception:
+        temp.unlink(missing_ok=True)
+        target.unlink(missing_ok=True)
+        raise
+
+
+@app.post('/api/projects/{pid}/ai-arranger/generate-and-add')
+def ai_arranger_generate_and_add(pid: str, request: Request, body: RearrangeRequest):
+    project = _project_for_actor(request, pid)
+    try:
+        plan = arranger_plan(project, body)
+        audio, meta = run_worker_with_project_audio(plan, project, audio_path)
+        return _append_ai_generated_track(project, audio, meta, mode='arranger',
+                                          input_source=plan['input_source'])
+    except WorkerUnavailable as exc:
+        raise HTTPException(503, str(exc)) from exc
+    except (ValueError, OSError) as exc:
+        raise HTTPException(422, str(exc)) from exc
+
+
+@app.post('/api/projects/{pid}/remix/generate-and-add')
+def ai_remix_generate_and_add(pid: str, request: Request, body: RemixRequest):
+    project = _project_for_actor(request, pid)
+    try:
+        plan = prepare_remix_plan(project, body)
+        audio, meta = run_worker_with_project_audio(plan, project, audio_path)
+        return _append_ai_generated_track(project, audio, meta, mode='remix',
+                                          input_source=plan['input_source'])
+    except WorkerUnavailable as exc:
+        raise HTTPException(503, str(exc)) from exc
+    except (ValueError, OSError) as exc:
+        raise HTTPException(422, str(exc)) from exc
 
 
 @app.get("/api/projects")
@@ -5256,3 +5469,70 @@ if __name__ == "__main__":
     import uvicorn
 
     uvicorn.run("app.main:app", host=os.getenv("MTA_HOST", "0.0.0.0"), port=int(os.getenv("MTA_PORT", "8080")))
+
+# Native-desktop ACE-Step lifecycle. Never expose installer/process controls from
+# multi-user web/Docker deployments.
+from . import ace_step_desktop_manager as _ace_desktop
+from .ace_step_live_smoke import test_live_inference as _ace_live_test
+_ace_test_guard = threading.RLock()
+_ace_test_state: dict = {'state': 'idle'}
+
+
+def _ace_native_only(request: Request) -> None:
+    _actor(request)
+    if not NATIVE_SINGLE_USER:
+        raise HTTPException(403, 'ACE-Step desktop management is only available in native single-user mode')
+
+
+@app.get('/api/ai-arranger/desktop-ace/status')
+def desktop_ace_status(request: Request):
+    _ace_native_only(request)
+    with _ace_test_guard:
+        result = dict(_ace_test_state)
+    return {'desktop':_ace_desktop.status(), 'inference_test':result}
+
+
+@app.post('/api/ai-arranger/desktop-ace/install')
+def desktop_ace_install(request: Request, body: dict):
+    _ace_native_only(request)
+    try:
+        return _ace_desktop.install(confirmed=body.get('consent') is True)
+    except (ValueError,RuntimeError) as exc:
+        raise HTTPException(400,str(exc)) from exc
+
+
+@app.post('/api/ai-arranger/desktop-ace/start')
+def desktop_ace_start(request: Request, body: dict):
+    _ace_native_only(request)
+    try:
+        return _ace_desktop.start_server(confirmed_model_download=body.get('consent') is True)
+    except (ValueError,RuntimeError,OSError) as exc:
+        raise HTTPException(400,str(exc)) from exc
+
+
+def _run_ace_test() -> None:
+    global _ace_test_state
+    try:
+        result=_ace_live_test(seconds=5,timeout_seconds=1200)
+        with _ace_test_guard:
+            _ace_test_state={'state':'passed' if result.get('verified') else 'failed', 'result':result}
+    except Exception as exc:
+        with _ace_test_guard:
+            _ace_test_state={'state':'failed','error':str(exc)[:300]}
+
+
+@app.post('/api/ai-arranger/desktop-ace/stop')
+def desktop_ace_stop(request: Request, body: dict):
+    _ace_native_only(request)
+    return _ace_desktop.stop_server(disable_auto_start=body.get('disable_auto_start') is True)
+
+
+@app.post('/api/ai-arranger/desktop-ace/test')
+def desktop_ace_test(request: Request):
+    global _ace_test_state
+    _ace_native_only(request)
+    with _ace_test_guard:
+        if _ace_test_state.get('state')=='running': return dict(_ace_test_state)
+        _ace_test_state={'state':'running'}
+    threading.Thread(target=_run_ace_test,daemon=True,name='mta-ace-smoke').start()
+    return {'state':'running'}
