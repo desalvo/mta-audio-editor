@@ -1,3 +1,9 @@
+## 0.3.0-r205 — CI regression and coverage repairs
+
+- Update ACE-Step wizard documentation test to renamed ACE_STEP_INSTALLATION.md.
+- Add executable ACE-Step inference smoke protocol branch tests without GPU dependency, raising real application coverage.
+- Align Android, iOS and Windows release metadata with revision 205.
+
 ## 0.3.0-r204 — Windows windowed startup crash fix
 
 - Disable Uvicorn default logging configuration inside the native desktop launcher (`log_config=None`), preventing an `isatty()` exception when frozen Windows executables have no stdout/stderr streams.
