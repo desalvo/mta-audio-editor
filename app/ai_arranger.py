@@ -12,6 +12,8 @@ from .models import Project
 
 AIModelId = Literal['ace-step-1.5', 'diffrhythm-2']
 Scope = Literal['project', 'tracks', 'range']
+RemixMode = Literal['instrument_swap', 'auto_remix']
+
 
 PRESETS = {
     'jazz-swing': {'en': 'Jazz / Swing', 'it': 'Jazz / Swing', 'prompt': 'Piano trio, walking double bass and swinging acoustic drums'},
@@ -65,10 +67,69 @@ class RearrangeRequest(BaseModel):
         return self
 
 
+class InstrumentSwap(BaseModel):
+    """One existing source track replaced by a requested target instrument."""
+    track_id: str = Field(pattern=r'^[A-Za-z0-9_-]{1,64}$')
+    target_instrument: str = Field(min_length=2, max_length=100)
+    instructions: str = Field(default='', max_length=1000)
+    preserve_performance: bool = True
+
+
+class RemixRequest(RearrangeRequest):
+    mode: RemixMode = 'auto_remix'
+    instrument_swaps: list[InstrumentSwap] = Field(default_factory=list, max_length=32)
+    # Preserve the other RearrangeRequest constraints and defaults.
+
+    @model_validator(mode='after')
+    def validate_remix(self):
+        if self.mode == 'instrument_swap' and not self.instrument_swaps:
+            raise ValueError('instrument_swap needs at least one instrument replacement')
+        if self.mode == 'auto_remix' and self.instrument_swaps:
+            raise ValueError('instrument replacements are only valid in instrument_swap mode')
+        ids = [swap.track_id for swap in self.instrument_swaps]
+        if len(ids) != len(set(ids)):
+            raise ValueError('duplicate instrument replacement source')
+        if self.mode == 'auto_remix' and not self.prompt.strip() and self.preset_id not in PRESETS:
+            raise ValueError('auto_remix needs a style')
+        return self
+
+
+def prepare_remix_plan(project: Project, request: RemixRequest) -> dict:
+    """Plan a non-destructive remix; generation is not claimed or simulated."""
+    plan = prepare_plan(project, request)
+    tracks = {track.id: track for track in project.tracks}
+    swaps = []
+    for swap in request.instrument_swaps:
+        track = tracks.get(swap.track_id)
+        if track is None:
+            raise ValueError('unknown instrument source track')
+        if request.scope == 'tracks' and swap.track_id not in request.track_ids:
+            raise ValueError('instrument source is outside the selected tracks')
+        swaps.append({'source_track_id': track.id, 'source_track_name': track.name,
+                      'source_track_type': track.type, 'target_instrument': swap.target_instrument,
+                      'instructions': swap.instructions, 'preserve_performance': swap.preserve_performance})
+    plan['schema'] = 'mta.ai_remix.plan.v1'
+    plan['operation'] = 'remix'
+    plan['mode'] = request.mode
+    plan['instrument_swaps'] = swaps
+    if request.mode == 'instrument_swap':
+        plan['prompt'] += '\nReplace ONLY the requested instruments; keep unrelated tracks unchanged.'
+        for swap in swaps:
+            plan['prompt'] += f"\nReplace {swap['source_track_name']} ({swap['source_track_type']}) with {swap['target_instrument']}."
+            if swap['preserve_performance']:
+                plan['prompt'] += ' Preserve phrasing, timing and performance where feasible.'
+            if swap['instructions']:
+                plan['prompt'] += ' ' + swap['instructions']
+    else:
+        plan['prompt'] += '\nCreate a coherent new remix arrangement in the requested style.'
+    plan['warnings'].append('Instrument identity and musical fidelity require backend generation and post-generation verification.')
+    return plan
+
+
 def catalog() -> dict:
     return {'models': [{'id': key, **value} for key, value in MODELS.items()],
             'presets': [{'id': key, **value} for key, value in PRESETS.items()],
-            'generation_available': False, 'native_host_ready': False}
+            'generation_available': False, 'native_host_ready': False, 'operations': ['rearrange', 'remix'], 'remix_modes': ['instrument_swap', 'auto_remix']}
 
 
 def prepare_plan(project: Project, request: RearrangeRequest) -> dict:

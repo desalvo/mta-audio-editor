@@ -1,3 +1,9 @@
+## 0.3.0-r175 — Remix planning foundation
+
+- Add Remix with instrument replacement and user-described auto-remix, reusing optional preservation of structure, chords, tempo, melody, and vocals.
+- Validate track identities, replacement targets and requests; no artificial or destructive audio output.
+- Keep AI generation disabled until real, licensed backends are integrated.
+
 ## 0.3.0-r173
 
 - Fixed Windows executable metadata revision mismatch that caused CI test_r65_release_safety to fail.
