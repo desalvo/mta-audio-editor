@@ -2023,3 +2023,8 @@ All remain experimental isolated prerequisites; production playback, actual VST3
 ### r207 — Further security refinement (unchanged revision)
 - IT: trasporto HTTPS con blocco downgrade su redirect, loopback come host web predefinito, 6 test di sicurezza aggiuntivi; Bandit con soglia media e Ruff superati. Il problema esterno MoviePy/Pillow nell'ambiente locale resta aperto.
 - EN: HTTPS-only redirect protection, loopback default web bind, six new security tests; medium-threshold Bandit and Ruff checks pass. The unrelated local MoviePy/Pillow environment mismatch remains unresolved.
+
+### r207 — Optional HTTPS web installer refinement (uncommitted follow-up)
+- Optional TLS for the MTA Linux web server with existing or self-signed X.509 certificates, wizard persistence and secure key permissions; HTTP remains the default.
+- HTTPS installer regression tests, route and worker regression tests, and additional accounting/billing API coverage tests for CI.
+- HTTPS web opzionale nel wizard Linux con certificati esistenti o self-signed, persistenza e permessi sicuri; HTTP resta il default.

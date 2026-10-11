@@ -5587,7 +5587,12 @@ def export(pid: str, request: Request, format: str = "mta"):
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run("app.main:app", host=os.getenv("MTA_HOST", "127.0.0.1"), port=int(os.getenv("MTA_PORT", "8080")))
+    tls_cert = os.getenv("MTA_TLS_CERTFILE")
+    tls_key = os.getenv("MTA_TLS_KEYFILE")
+    if bool(tls_cert) != bool(tls_key):
+        raise RuntimeError("Both MTA_TLS_CERTFILE and MTA_TLS_KEYFILE are required for HTTPS")
+    options = {"ssl_certfile": tls_cert, "ssl_keyfile": tls_key} if tls_cert else {}
+    uvicorn.run("app.main:app", host=os.getenv("MTA_HOST", "127.0.0.1"), port=int(os.getenv("MTA_PORT", "8080")), **options)
 
 # Native-desktop ACE-Step lifecycle. Never expose installer/process controls from
 # multi-user web/Docker deployments.

@@ -12,7 +12,7 @@ def test_worker_status_fail_closed(monkeypatch):
     assert worker_capabilities()['inference_verified'] is False
     assert worker_capabilities()['ace_step_ready'] is False
     from app.main import app
-    assert '/api/ai-arranger/worker-status' in {route.path for route in app.routes}
+    assert '/api/ai-arranger/worker-status' in set(app.openapi()["paths"])
 
 def test_native_pan_compiles_and_ramps(tmp_path):
     compiler = shutil.which('g++') or shutil.which('clang++')

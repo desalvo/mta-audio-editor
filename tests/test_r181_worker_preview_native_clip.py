@@ -11,7 +11,7 @@ def test_generation_endpoints_exist_and_gate_unconfigured_worker(monkeypatch):
     from app.main import app
     monkeypatch.delenv('MTA_AI_WORKER_ENABLED', raising=False)
     assert configured_worker() is None
-    paths = {r.path for r in app.routes}
+    paths = set(app.openapi()["paths"])
     assert '/api/projects/{pid}/remix/generate' in paths
     assert '/api/projects/{pid}/ai-arranger/generate' in paths
 

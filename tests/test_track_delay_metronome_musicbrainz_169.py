@@ -22,7 +22,7 @@ def test_musicbrainz_user_agent_uses_release(monkeypatch):
         captured["ua"] = req.headers.get("User-agent")
         return DummyResponse()
 
-    monkeypatch.setattr(rr, "urlopen", fake_urlopen)
+    monkeypatch.setattr(rr, "https_urlopen", fake_urlopen)
     rr._read_json("https://musicbrainz.org/ws/2/recording/", {"fmt": "json"})
     assert rr.APP_RELEASE in captured["ua"]
 

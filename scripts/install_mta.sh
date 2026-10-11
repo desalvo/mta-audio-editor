@@ -8,10 +8,12 @@ APP_DIR=${MTA_APP_DIR:-/opt/mta/application}
 VENV=${MTA_APP_VENV:-/opt/mta/venv-mta}
 DATA=${MTA_APP_DATA:-/var/lib/mta/projects}
 PORT=8080; BIND=network; FIREWALL=no; VERSION=main; ACE_PORT=8001; ACE_URL=
+HTTPS=no; TLS_MODE=self-signed; TLS_CERT=; TLS_KEY=; TLS_NAME=localhost
 YES=0; DRY=0; REINSTALL=0; UNINSTALL=0; PURGE=0
 O_PORT=''; O_BIND=''; O_FIREWALL=''; O_VERSION=''; O_ACE=''; O_ACE_URL=''
+O_HTTPS=''; O_TLS_MODE=''; O_TLS_CERT=''; O_TLS_KEY=''; O_TLS_NAME=''
 usage() { cat <<'HELP'
-Usage: sudo ./install_mta.sh [--dry-run] [--yes] [--version BRANCH|TAG|SHA] [--port N] [--bind local|network] [--firewall yes|no] [--ace-port N] [--ace-url https://host:port] [--reinstall] [--uninstall] [--purge-data]
+Usage: sudo ./install_mta.sh [--dry-run] [--yes] [--version BRANCH|TAG|SHA] [--port N] [--bind local|network] [--firewall yes|no] [--ace-port N] [--ace-url https://host:port] [--https yes|no] [--tls-mode existing|self-signed] [--tls-cert /absolute/path] [--tls-key /absolute/path] [--tls-name DNS-or-IP] [--reinstall] [--uninstall] [--purge-data]
 Standalone Linux installer: no MTA repository checkout required. Supports Debian 12+, Ubuntu 22.04+, RHEL/Rocky/AlmaLinux/CentOS Stream/Oracle Linux 9+.
 Uses /etc/mta/mta-wizard.conf to remember settings; deploys authenticated MTA web app on port 8080 by default.
 --uninstall stops/disables service and removes MTA-owned source and Python environment (preserves projects and ACE-Step).
@@ -23,9 +25,9 @@ while (($#)); do
  --help|-h) usage; exit 0;;
  --yes) YES=1;; --dry-run) DRY=1;; --reinstall) REINSTALL=1;;
  --uninstall) UNINSTALL=1;; --purge-data) PURGE=1;;
- --version|--port|--bind|--firewall|--ace-port|--ace-url)
+ --version|--port|--bind|--firewall|--ace-port|--ace-url|--https|--tls-mode|--tls-cert|--tls-key|--tls-name)
  k=$1; shift; (($#)) || { echo "Missing value for $k" >&2; exit 2; }
- case "$k" in --version) O_VERSION=$1;; --port) O_PORT=$1;; --bind) O_BIND=$1;; --firewall) O_FIREWALL=$1;; --ace-port) O_ACE=$1;; --ace-url) O_ACE_URL=$1;; esac;;
+ case "$k" in --version) O_VERSION=$1;; --port) O_PORT=$1;; --bind) O_BIND=$1;; --firewall) O_FIREWALL=$1;; --ace-port) O_ACE=$1;; --ace-url) O_ACE_URL=$1;; --https) O_HTTPS=$1;; --tls-mode) O_TLS_MODE=$1;; --tls-cert) O_TLS_CERT=$1;; --tls-key) O_TLS_KEY=$1;; --tls-name) O_TLS_NAME=$1;; esac;;
  *) echo "Unknown option: $1" >&2; usage; exit 2;; esac
  shift
 done
@@ -39,10 +41,16 @@ if [[ -f $CONFIG ]]; then
  VERSION) [[ $val =~ ^[[:alnum:]_.\/-]+$ ]] && VERSION=$val;;
  ACE_PORT) [[ $val =~ ^[0-9]{1,5}$ ]] && ACE_PORT=$val;;
  ACE_URL) ACE_URL=$val;;
+ HTTPS) [[ $val == yes || $val == no ]] && HTTPS=$val;;
+ TLS_MODE) [[ $val == existing || $val == self-signed ]] && TLS_MODE=$val;;
+ TLS_CERT) TLS_CERT=$val;;
+ TLS_KEY) TLS_KEY=$val;;
+ TLS_NAME) TLS_NAME=$val;;
  esac
  done < "$CONFIG"
 fi
 PORT=${O_PORT:-$PORT}; BIND=${O_BIND:-$BIND}; FIREWALL=${O_FIREWALL:-$FIREWALL}; VERSION=${O_VERSION:-$VERSION}; ACE_PORT=${O_ACE:-$ACE_PORT}; ACE_URL=${O_ACE_URL:-$ACE_URL}
+HTTPS=${O_HTTPS:-$HTTPS}; TLS_MODE=${O_TLS_MODE:-$TLS_MODE}; TLS_CERT=${O_TLS_CERT:-$TLS_CERT}; TLS_KEY=${O_TLS_KEY:-$TLS_KEY}; TLS_NAME=${O_TLS_NAME:-$TLS_NAME}
 # Refuse unsupported OS before checking root or mutating filesystem.
 OS_RELEASE=${MTA_OS_RELEASE:-/etc/os-release}
 [[ -r $OS_RELEASE ]] || { echo 'Unsupported OS: /etc/os-release not found' >&2; exit 2; }
@@ -79,9 +87,18 @@ if [[ -n $ACE_URL ]]; then
  ACE_REMOTE_HOST=${BASH_REMATCH[1]}; ACE_REMOTE_PORT=${BASH_REMATCH[2]}
  (( 10#$ACE_REMOTE_PORT >= 1 && 10#$ACE_REMOTE_PORT <= 65535 )) || { echo 'Invalid ACE-Step remote port' >&2; exit 2; }
 fi
+[[ $HTTPS == yes || $HTTPS == no ]] && [[ $TLS_MODE == existing || $TLS_MODE == self-signed ]] || { echo 'Invalid HTTPS mode' >&2; exit 2; }
+# Cert and key must be ordinary absolute paths, safe for systemd EnvironmentFile.
+for tls_path in "$TLS_CERT" "$TLS_KEY"; do
+ [[ -z $tls_path || ( $tls_path == /* && $tls_path != *[[:space:]]* && $tls_path != *'..'* && $tls_path != *'\'* ) ]] || { echo 'Invalid TLS path' >&2; exit 2; }
+done
+[[ $TLS_NAME =~ ^[a-zA-Z0-9][a-zA-Z0-9.:-]{0,252}$ ]] || { echo 'Invalid TLS certificate name' >&2; exit 2; }
+if [[ $HTTPS == yes && $TLS_MODE == existing ]]; then
+ [[ -n $TLS_CERT && -n $TLS_KEY ]] || { echo 'Existing TLS mode requires --tls-cert and --tls-key' >&2; exit 2; }
+fi
 [[ $BIND == local || $BIND == network ]] && [[ $FIREWALL == yes || $FIREWALL == no ]] || { echo 'Invalid network settings' >&2; exit 2; }
 [[ $VERSION =~ ^[a-zA-Z0-9][a-zA-Z0-9._/-]{0,120}$ ]] && [[ $VERSION != *'..'* ]] || { echo 'Invalid Git reference' >&2; exit 2; }
-if (( DRY )); then printf 'OS=%s %s; source=%s ref=%s; port=%s bind=%s firewall=%s; ACE port=%s; uninstall=%s\n' "$OS_ID" "$VERSION_ID" "$REPO" "$VERSION" "$PORT" "$BIND" "$FIREWALL" "$ACE_PORT" "$UNINSTALL"; exit 0; fi
+if (( DRY )); then printf 'OS=%s %s; source=%s ref=%s; port=%s bind=%s firewall=%s; ACE port=%s; HTTPS=%s mode=%s; uninstall=%s\n' "$OS_ID" "$VERSION_ID" "$REPO" "$VERSION" "$PORT" "$BIND" "$FIREWALL" "$ACE_PORT" "$HTTPS" "$TLS_MODE" "$UNINSTALL"; exit 0; fi
 (( EUID == 0 )) || { echo 'Run as root: sudo ./install_mta.sh' >&2; exit 2; }
 command -v systemctl >/dev/null || { echo 'systemd is required' >&2; exit 2; }
 ask() { local prompt=$1 current=$2 answer; if (( YES )); then REPLY=$current; else read -r -p "$prompt [$current]: " answer; REPLY=${answer:-$current}; fi; }
@@ -89,10 +106,23 @@ if (( ! UNINSTALL )); then
  ask 'MTA Git tag/branch/commit' "$VERSION"; VERSION=$REPLY
  ask 'Web TCP port' "$PORT"; PORT=$REPLY
  ask 'Web binding (network/local)' "$BIND"; BIND=$REPLY
+ ask 'Enable HTTPS for the MTA web interface (yes/no)' "$HTTPS"; HTTPS=$REPLY
+ if [[ $HTTPS == yes ]]; then
+  ask 'TLS certificate mode (existing/self-signed)' "$TLS_MODE"; TLS_MODE=$REPLY
+  if [[ $TLS_MODE == existing ]]; then
+   ask 'TLS certificate absolute path' "$TLS_CERT"; TLS_CERT=$REPLY
+   ask 'TLS private key absolute path' "$TLS_KEY"; TLS_KEY=$REPLY
+  else
+   ask 'Self-signed certificate DNS name or IP' "$TLS_NAME"; TLS_NAME=$REPLY
+  fi
+ fi
  ask 'Manage host firewall (yes/no)' "$FIREWALL"; FIREWALL=$REPLY
  ask 'ACE-Step port on localhost' "$ACE_PORT"; ACE_PORT=$REPLY
  ask 'Remote ACE-Step HTTPS URL (blank = local ACE-Step)' "$ACE_URL"; ACE_URL=$REPLY
  check_args=(--dry-run --version "$VERSION" --port "$PORT" --bind "$BIND" --firewall "$FIREWALL" --ace-port "$ACE_PORT")
+ check_args+=(--https "$HTTPS" --tls-mode "$TLS_MODE" --tls-name "$TLS_NAME")
+ [[ -z $TLS_CERT ]] || check_args+=(--tls-cert "$TLS_CERT")
+ [[ -z $TLS_KEY ]] || check_args+=(--tls-key "$TLS_KEY")
  [[ -z $ACE_URL ]] || check_args+=(--ace-url "$ACE_URL")
  "$0" "${check_args[@]}" >/dev/null || exit 2
  if [[ -n $ACE_URL ]]; then ACE_REMOTE_HOST=${ACE_URL#https://}; ACE_REMOTE_HOST=${ACE_REMOTE_HOST%:*}; fi
@@ -177,6 +207,37 @@ if [[ -n $ACE_URL ]]; then
 fi
 # Bind to loopback unless network access explicitly selected.
 HOST=127.0.0.1; [[ $BIND == network ]] && HOST=0.0.0.0
+if [[ $HTTPS == yes ]]; then
+ command -v openssl >/dev/null || { echo 'OpenSSL is required for HTTPS' >&2; exit 3; }
+ if [[ $TLS_MODE == self-signed ]]; then
+  mkdir -p /etc/mta/tls
+  chmod 700 /etc/mta/tls
+  TLS_CERT=/etc/mta/tls/server.crt; TLS_KEY=/etc/mta/tls/server.key
+  if [[ ! -f $TLS_CERT || ! -f $TLS_KEY ]]; then
+   temp_tls=$(mktemp -d /etc/mta/tls/.generate.XXXXXXXX)
+   trap 'rm -rf -- "$TEMP" "$temp_tls"' EXIT
+   san_type=DNS; [[ $TLS_NAME =~ ^[0-9.]+$ || $TLS_NAME == *:* ]] && san_type=IP
+   openssl req -x509 -newkey rsa:3072 -sha256 -nodes -days 365 \
+    -subj "/CN=$TLS_NAME" -addext "subjectAltName=$san_type:$TLS_NAME" \
+    -keyout "$temp_tls/key" -out "$temp_tls/cert" >/dev/null 2>&1
+   install -m 600 "$temp_tls/key" "$TLS_KEY"
+   install -m 644 "$temp_tls/cert" "$TLS_CERT"
+   rm -rf -- "$temp_tls"
+  fi
+ fi
+ [[ -f $TLS_CERT && -f $TLS_KEY && ! -L $TLS_CERT && ! -L $TLS_KEY ]] || { echo 'TLS files missing or symlinked' >&2; exit 3; }
+ openssl x509 -in "$TLS_CERT" -noout -checkend 0 >/dev/null || { echo 'TLS certificate expired or invalid' >&2; exit 3; }
+ openssl pkey -in "$TLS_KEY" -noout >/dev/null 2>&1 || { echo 'Invalid TLS private key' >&2; exit 3; }
+ cert_pub=$(openssl x509 -in "$TLS_CERT" -pubkey -noout | openssl pkey -pubin -outform DER | openssl dgst -sha256)
+ key_pub=$(openssl pkey -in "$TLS_KEY" -pubout -outform DER | openssl dgst -sha256)
+ [[ $cert_pub == "$key_pub" ]] || { echo 'TLS certificate/key mismatch' >&2; exit 3; }
+ chmod 600 "$TLS_KEY"
+ # Paths are validated; only add TLS variables when requested.
+ sed -i -E '/^MTA_TLS_CERTFILE=/d; /^MTA_TLS_KEYFILE=/d' "$ENVFILE"
+ printf 'MTA_TLS_CERTFILE=%s\nMTA_TLS_KEYFILE=%s\n' "$TLS_CERT" "$TLS_KEY" >> "$ENVFILE"
+else
+ sed -i -E '/^MTA_TLS_CERTFILE=/d; /^MTA_TLS_KEYFILE=/d' "$ENVFILE"
+fi
 cat >/etc/mta/mta-wizard.conf.tmp <<EOT
 VERSION=$VERSION
 PORT=$PORT
@@ -184,6 +245,11 @@ BIND=$BIND
 FIREWALL=$FIREWALL
 ACE_PORT=$ACE_PORT
 ACE_URL=$ACE_URL
+HTTPS=$HTTPS
+TLS_MODE=$TLS_MODE
+TLS_CERT=$TLS_CERT
+TLS_KEY=$TLS_KEY
+TLS_NAME=$TLS_NAME
 EOT
 chmod 600 /etc/mta/mta-wizard.conf.tmp
 mv /etc/mta/mta-wizard.conf.tmp "$CONFIG"
@@ -237,9 +303,10 @@ if [[ $BIND == network && $FIREWALL == yes ]]; then
   ufw allow "${PORT}/tcp"
  else echo "Firewall not managed or inactive. Allow TCP/$PORT in external hypervisor/cloud firewall if required."; fi
 fi
+WEB_SCHEME=http; [[ $HTTPS == yes ]] && WEB_SCHEME=https
 ok=0
 for i in $(seq 1 25); do
- if curl --fail --silent --max-time 3 "http://127.0.0.1:$PORT/api/health" >/dev/null; then ok=1; break; fi
+ if curl --insecure --fail --silent --max-time 3 "$WEB_SCHEME://127.0.0.1:$PORT/api/health" >/dev/null; then ok=1; break; fi
  sleep 1
 done
 if (( ! ok )); then
@@ -248,6 +315,6 @@ if (( ! ok )); then
  exit 4
 fi
 IP=$(hostname -I 2>/dev/null | awk '{print $1}')
-echo "MTA web health OK. Local URL: http://127.0.0.1:$PORT/"
-[[ $BIND == network && -n $IP ]] && echo "Network URL: http://$IP:$PORT/ (requires reachable network/firewall)"
+echo "MTA web health OK. Local URL: $WEB_SCHEME://127.0.0.1:$PORT/"
+[[ $BIND == network && -n $IP ]] && echo "Network URL: $WEB_SCHEME://$IP:$PORT/ (requires reachable network/firewall)"
 echo "Administrator initial credential is stored in $ENVFILE; protect it and change after login."

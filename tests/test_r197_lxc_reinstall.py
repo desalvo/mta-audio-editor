@@ -27,6 +27,6 @@ def test_mta_lxc_service_script_syntax_and_security():
     subprocess.run(['bash', '-n', str(script)], check=True)
     data = script.read_text()
     assert 'MTA_AI_WORKER_ENABLED=true' in data
-    assert 'MTA_ACE_STEP_URL=http://127.0.0.1:$ACE_PORT' in data
+    assert 'MTA_ACE_STEP_URL=${ACE_URL:-http://127.0.0.1:$ACE_PORT}' in data
     assert 'After=network-online.target' in data
     assert '--uninstall' in data and 'PURGE' in data

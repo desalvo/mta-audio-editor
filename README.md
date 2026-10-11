@@ -271,3 +271,5 @@ See [Native remote AI setup](NATIVE_REMOTE_AI_SETUP.md) for the first-use Local/
 See [REMOTE_AI_REVERSE_PROXY.md](REMOTE_AI_REVERSE_PROXY.md) for per-user tokens, the native app endpoint, and Kubernetes NGINX/HAProxy Ingress or Docker HAProxy deployment examples. Never expose raw ACE-Step directly.
 
 AI billing / Tariffe AI: see [AI_BILLING_SETUP.md](AI_BILLING_SETUP.md) for effective dates, open-ended rates, reports and limitations.
+
+Optional MTA web HTTPS (Linux wizard): see [MTA_WEB_HTTPS.md](MTA_WEB_HTTPS.md).
