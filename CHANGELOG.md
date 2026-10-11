@@ -1650,3 +1650,9 @@ New native/audio_core/vst3_parallel_mix.hpp aligns dry PCM to plugin-declared la
 - r134: bounded sample-offset MIDI and automation packets with epoch/sequence validation (worker preparation only).
 - r135: bounded exponential restart policy for control thread, with long-run dry callback regression.
 All remain experimental isolated prerequisites; production playback, actual VST3 MIDI/automation forwarding, full fault restart orchestration and platform acceptance are not implemented. native_host_ready=false.
+
+## 0.3.0-r174 — AI Arranger foundation
+- Added extensible ACE-Step 1.5 and DiffRhythm 2 model catalog, eight musical style presets, typed request validation, and authenticated project-scoped planning endpoints.
+- Added optional preserve-structure and preserve-chords constraints sourced from existing, active project markers and chord events, with explicit best-effort warnings.
+- Added non-destructive project/selected-track/timeline-range planning; generation fails closed until a verified inference backend is installed.
+- Synchronized Windows/Android/iOS revision metadata and retained `native_host_ready=false`.

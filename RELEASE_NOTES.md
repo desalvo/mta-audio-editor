@@ -833,3 +833,6 @@ New native/audio_core/vst3_parallel_mix.hpp aligns dry PCM to plugin-declared la
 - r134: bounded sample-offset MIDI and automation packets with epoch/sequence validation (worker preparation only).
 - r135: bounded exponential restart policy for control thread, with long-run dry callback regression.
 All remain experimental isolated prerequisites; production playback, actual VST3 MIDI/automation forwarding, full fault restart orchestration and platform acceptance are not implemented. native_host_ready=false.
+
+## 0.3.0-r174 — AI Arranger foundation
+Initial read-only AI Arranger planning APIs: `GET /api/ai-arranger/catalog`, `POST /api/projects/{pid}/ai-arranger/plan`. `POST /api/projects/{pid}/ai-arranger/generate` explicitly returns HTTP 503 until inference is implemented. Structure and chord preservation are best-effort instructions, not verified generation constraints. No model weights bundled or downloaded.
