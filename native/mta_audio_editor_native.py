@@ -128,6 +128,9 @@ def _start_server(port: int):
         host="127.0.0.1",
         port=port,
         log_level="warning",
+        # PyInstaller --windowed on Windows can set sys.stdout/stderr to None.
+        # Avoid Uvicorn's default formatter, which calls stream.isatty().
+        log_config=None,
         access_log=False,
         server_header=False,
     )

@@ -1,3 +1,8 @@
+## 0.3.0-r204 — Windows windowed startup crash fix
+
+- Disable Uvicorn default logging configuration inside the native desktop launcher (`log_config=None`), preventing an `isatty()` exception when frozen Windows executables have no stdout/stderr streams.
+- Add a no-console regression test and synchronize release metadata across desktop and mobile platforms.
+
 ## 0.3.0-r203
 
 - Standalone Linux MTA web installation wizard with Debian/RHEL-family OS gate, persistent setup, independent venv, systemd, network/firewall configuration, and health verification.
