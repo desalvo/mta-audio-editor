@@ -1,7 +1,6 @@
 """AI results must append and must never overwrite a source track."""
 import io
 import wave
-from pathlib import Path
 from unittest.mock import patch
 from app.models import Project, Track
 from app.main import _append_ai_generated_track

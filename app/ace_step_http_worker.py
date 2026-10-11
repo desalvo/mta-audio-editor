@@ -47,7 +47,13 @@ def _request(url: str, data: bytes | None = None, content_type: str | None = Non
     token = os.environ.get('MTA_ACE_STEP_TOKEN')
     if token:
         headers['Authorization'] = 'Bearer ' + token
-    req = Request(url, data=data, headers=headers, method='POST' if data is not None else 'GET')
+    # The worker must never resolve non-HTTP schemes or unapproved hosts.
+    base = endpoint_base()
+    parsed = urlsplit(url)
+    trusted = urlsplit(base)
+    if parsed.scheme != 'http' or parsed.netloc != trusted.netloc or not parsed.path.startswith('/') or parsed.username or parsed.password or parsed.fragment:
+        raise ValueError('Untrusted ACE-Step request URL')
+    req = Request(url, data=data, headers=headers, method='POST' if data is not None else 'GET')  # noqa: S310 -- checked scheme and exact host above
     class NoRedirect(HTTPRedirectHandler):
         def redirect_request(self, request, fp, code, msg, headers, newurl):
             raise ValueError('ACE-Step redirect denied')

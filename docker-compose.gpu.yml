@@ -1,0 +1,10 @@
+# NVIDIA Container Toolkit is required on the host.
+services:
+  ace-step:
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]

@@ -1,6 +1,5 @@
 import json
 import wave
-from pathlib import Path
 import pytest
 from app import ace_step_http_worker as adapter
 

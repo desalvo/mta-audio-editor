@@ -1,3 +1,14 @@
+## 0.3.0-r196 (2026-10-11)
+- Fix 18 Ruff findings from CI including unused imports, production assert, and validated HTTP request destinations.
+- Add a dedicated pinned ACE-Step runtime-image GitHub Actions workflow; configure container deployments for the pinned image, persistent model caches, and authenticated remote MTA API.
+- Confirm the real GPU image build and model inference remain pending execution on supported hardware.
+
+## 0.3.0-r196 — pinned ACE-Step runtime CI
+
+- Added separate GitHub Actions workflow to build and publish a CUDA ACE-Step service image from the audited upstream commit, excluding model weights.
+- Docker Compose requires an explicitly chosen immutable image tag instead of mutable upstream `latest`; on-demand model caches remain persistent.
+- Added optional NVIDIA GPU Compose override and deployment documentation; real inference and native runtime packaging not yet validated.
+
 ## 0.3.0-r195 — Reviewed ACE-Step CI source bundling
 
 Adds ACE-Step source vendoring from a verified stable release (`v0.1.8` default), immutable SHA resolution, a weekly update-proposal pull request, source integrity and license validation, deterministic bundles and SHA256 artifacts, and regression tests. Does not yet package a ready-to-run inference runtime or validate generation.

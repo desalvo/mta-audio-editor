@@ -22,3 +22,6 @@ Arranger and Remix cover generation must pass a real audio-in/audio-out test, pr
 
 ### r190 readiness diagnostics
 `app.ace_step_readiness.readiness(probe=True)` checks worker declarations. Set `MTA_AI_READINESS_PROBE_SERVER=true` for a separate reachability check. Neither probe certifies that the model has generated audio. A real end-to-end track/master generation, preview playback and successful non-destructive import remain the acceptance criteria.
+
+## Pinned ACE-Step GPU container (r196)
+See `ACE_STEP_GPU_RUNTIME.md` for building the immutable CUDA image and model cache. Set `MTA_ACE_STEP_IMAGE` before Docker Compose; the previous mutable upstream `latest` is deliberately rejected.

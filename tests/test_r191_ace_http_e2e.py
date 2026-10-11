@@ -5,7 +5,6 @@ import json
 import threading
 import wave
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from pathlib import Path
 
 from app import ace_step_http_worker as worker
 

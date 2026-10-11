@@ -1,6 +1,5 @@
 """r189: self-contained integration configuration and endpoint hardening."""
 from pathlib import Path
-import os
 import pytest
 from app.ace_step_http_worker import endpoint_base
 

@@ -4,9 +4,9 @@ services:
       context: .
       args:
         APP_VERSION: "0.3.0"
-        APP_REVISION: "194"
+        APP_REVISION: "196"
         BUILD_ID: "${BUILD_ID:-local}"
-    image: desalvo/mta-audio-editor:0.3.0-r195
+    image: desalvo/mta-audio-editor:0.3.0-r196
     ports:
       - "8080:8080"
     environment:
@@ -47,10 +47,10 @@ services:
     restart: unless-stopped
     networks: [mta-internal, mta-public]
   ace-step:
-    image: ghcr.io/ace-step/ace-step-1.5:latest
+    image: ${MTA_ACE_STEP_IMAGE:?Set MTA_ACE_STEP_IMAGE to the immutable GHCR tag produced by ace-step-runtime.yml}
     environment:
       ACESTEP_MODE: api
-      ACESTEP_INIT_SERVICE: "false"
+      ACESTEP_INIT_SERVICE: "true"
       ACESTEP_LLM_BACKEND: pt
       ACESTEP_CONFIG_PATH: acestep-v15-turbo
       ACESTEP_LM_MODEL_PATH: acestep-5Hz-lm-1.7B

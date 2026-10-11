@@ -1,7 +1,6 @@
 """r190: observable ACE-Step readiness and native gate test."""
 from pathlib import Path
 import subprocess
-import pytest
 from app.ace_step_readiness import readiness
 
 ROOT = Path(__file__).resolve().parents[1]

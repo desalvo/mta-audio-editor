@@ -1,3 +1,12 @@
+## 0.3.0-r196
+- Ruff CI fixes and SHA-pinned ACE-Step container build workflow. The model server runtime image and end-to-end musical inference are not yet validated.
+
+## 0.3.0-r196 — pinned ACE-Step runtime CI
+
+- Added separate GitHub Actions workflow to build and publish a CUDA ACE-Step service image from the audited upstream commit, excluding model weights.
+- Docker Compose requires an explicitly chosen immutable image tag instead of mutable upstream `latest`; on-demand model caches remain persistent.
+- Added optional NVIDIA GPU Compose override and deployment documentation; real inference and native runtime packaging not yet validated.
+
 ## 0.3.0-r195 — Reviewed ACE-Step CI source bundling
 
 Adds ACE-Step v0.1.8 default stable source lock, immutable SHA resolution, weekly upstream release checks with a reviewable update PR, pinned-source CI bundling and artifact integrity tests. Does not yet package a ready-to-run inference runtime or validate generation.

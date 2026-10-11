@@ -7,7 +7,6 @@ from __future__ import annotations
 import os
 import json
 import signal
-import sys
 from pathlib import Path
 import shutil
 import subprocess
@@ -68,7 +67,10 @@ def _run_with_progress(command: list[str], *, cwd: Path | None, timeout: int, ph
     _update_progress(phase, 0 if phase == 'clone' else None)
     proc = subprocess.Popen(command, cwd=cwd, stdout=subprocess.DEVNULL,
                             stderr=subprocess.PIPE, text=True, errors='replace', bufsize=1)
-    assert proc.stderr is not None
+    if proc.stderr is None:
+        proc.kill()
+        proc.wait()
+        raise RuntimeError("Could not capture ACE-Step installation progress")
     deadline = time.monotonic() + timeout
     # Git uses CR progress lines; reading one character at a time handles both CR and LF.
     line = ''
