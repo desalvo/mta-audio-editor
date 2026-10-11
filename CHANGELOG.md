@@ -1,3 +1,10 @@
+## 0.3.0-r172 — Restore independent numeric build identity
+
+- Restore a strict 14-digit Europe/Rome build timestamp in `BUILD_INFO`, separate from `VERSION`, `REVISION` and `RELEASE`.
+- Preserve cumulative functionality and experimental native VST3 safety (`native_host_ready=false`).
+- Validate release identity in CI before the full Python test suite.
+- Add a bounded C++20 per-route plugin/IPC latency alignment planner (up to 64 routes, with overflow rejection), compiled regression-tested; experimental control plane only, not connected to production callbacks.
+
 ## 0.3.0-r171 — Quality / Ruff fixes
 
 - Fix six Ruff violations detected by CI on r170, with diagnostic logging for VST3 worker cleanup failures.

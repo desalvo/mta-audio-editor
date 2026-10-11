@@ -1,0 +1,3 @@
+# Stato PDC nativa r172
+
+Il planner C++20 calcola il ritardo di allineamento per ciascun percorso attivo sommando la latenza del plugin e quella del trasporto interprocesso. Rifiuta un numero eccessivo di percorsi e ritardi; supporta fino a 64 percorsi ed è verificato con compilazione ed esecuzione di un test C++ nativo. Non abilita alcun routing realtime effettivo. Il passo successivo è integrare linee di ritardo sincronizzate per blocco nel playback/mixer nativo e validare modifiche di timeline, riconfigurazione dei dispositivi, MIDI, automazioni, bypass e crash dei plugin su tutte le piattaforme. `native_host_ready=false`.

@@ -1,3 +1,7 @@
+## 0.3.0-r172 — Experimental C++ PDC planning (not realtime-enabled)
+
+The C++20 `vst3_pdc_plan.hpp` computes per-route compensation from plugin plus IPC delay, with a strict 64-route and 1,048,576-frame maximum. Disabled routes do not affect target latency. Inputs are validated before producing a usable plan; the planner is intended for the control thread, and delay lines must be configured away from the realtime callback. It does not connect VST3 processing, MIDI, automation, playback or any production audio path. `native_host_ready=false` remains mandatory. A compiled C++ regression test covers unequal latency, disabled routes and overflow.
+
 ## r151 — Experimental PCM/event worker synchronization
 
 Worker-side `Vst3EventAudioPump` pairs native PCM blocks and bounded MIDI/automation event packets using epoch, sequence and frame count. Empty event blocks remain playable, failed delivery fails closed, and non-finite processor output is rejected. This is a test-only bridge: no Steinberg SDK MIDI queue or production playback connection is claimed; `native_host_ready=false`.

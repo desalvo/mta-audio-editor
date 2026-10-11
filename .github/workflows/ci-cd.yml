@@ -51,7 +51,9 @@ jobs:
         env:
           MTA_ALLOW_INSECURE_NO_AUTH: 'true'
           MTA_DATA_DIR: /tmp/mta-projects
-        run: PYTHONPATH=. pytest --cov=app --cov-report=term-missing --cov-report=xml --cov-fail-under=70
+        run: |
+          python -c "from pathlib import Path; import re; b=Path('BUILD_INFO').read_text().strip(); assert re.fullmatch(r'[0-9]{14}', b), f'Invalid BUILD_INFO: {b!r}'"
+          PYTHONPATH=. pytest --cov=app --cov-report=term-missing --cov-report=xml --cov-fail-under=70
       - name: Upload coverage
         uses: actions/upload-artifact@v7
         with:
