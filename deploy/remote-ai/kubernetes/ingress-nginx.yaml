@@ -1,0 +1,28 @@
+# ingress-nginx controller, not F5 NGINX Ingress Controller.
+# Replace DNS, Secret (certificate + private key) and set a trusted TLS certificate.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mta-external
+  namespace: mta-external
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: '1024m'
+    nginx.ingress.kubernetes.io/proxy-read-timeout: '1200'
+    nginx.ingress.kubernetes.io/proxy-send-timeout: '1200'
+    nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts: [mta.example.org]
+      secretName: mta-tls
+  rules:
+    - host: mta.example.org
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: mta-vm
+                port:
+                  name: http

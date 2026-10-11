@@ -1,8 +1,9 @@
 from __future__ import annotations
-import hashlib, json, logging, os, re, ssl, tempfile, threading, time, zipfile
+from app.secure_https import https_urlopen
+import hashlib, json, logging, os, re, tempfile, threading, time, zipfile
 from pathlib import Path
 from urllib.parse import urlparse
-from urllib.request import Request, urlopen
+from urllib.request import Request
 
 LOG=logging.getLogger(__name__)
 ROOT=Path(os.getenv("MTA_DEMUCS_MOBILE_MODEL_DIR","/data/projects/.models")).expanduser()
@@ -36,7 +37,7 @@ def _https(url:str)->bool:return urlparse(url).scheme.lower()=="https"
 def _read_url(url:str)->bytes:
     if not _https(url): raise ValueError("Demucs model updates require HTTPS")
     req=Request(url,headers={"User-Agent":"MTA-Audio-Editor-model-updater/2"})  # noqa: S310 -- URL is validated as HTTPS above.
-    with urlopen(req,timeout=TIMEOUT,context=ssl.create_default_context()) as r:  # noqa: S310 -- validated HTTPS request.
+    with https_urlopen(req, timeout=TIMEOUT) as r:  # noqa: S310 -- validated HTTPS request.
         size=int(r.headers.get("Content-Length") or 0)
         if size and size>MAX_BYTES: raise ValueError("model payload too large")
         data=r.read(MAX_BYTES+1)

@@ -503,3 +503,15 @@ VST3 r152: worker event/audio shape mismatches and excessive stale-event backlog
 Optional supervisor-level VST3 controller and component checkpoint pairing; no realtime callback activation.
 
 - r183: verifica non distruttiva delle capacità dei worker AI e componente sperimentale C++ per misure peak/RMS; generazione AI non ancora operativa.
+
+Remote ACE-Step on a GPU server / ACE-Step remoto: see [REMOTE_AI_SETUP.md](REMOTE_AI_SETUP.md).
+
+## Native remote ACE-Step / ACE-Step remoto nelle app native
+
+See [Native remote AI setup](NATIVE_REMOTE_AI_SETUP.md) for the first-use Local/Remote choice, persistent preferences, HTTPS bearer authentication and GPU host configuration.
+
+### Accesso remoto AI sicuro e proxy esterno per VM/LXC
+
+Consulta [REMOTE_AI_REVERSE_PROXY.md](REMOTE_AI_REVERSE_PROXY.md) per i token associati agli utenti, l'endpoint delle app native e gli esempi Kubernetes Ingress NGINX/HAProxy e Docker HAProxy. Non esporre ACE-Step direttamente.
+
+AI billing / Tariffe AI: see [AI_BILLING_SETUP.md](AI_BILLING_SETUP.md) for effective dates, open-ended rates, reports and limitations.

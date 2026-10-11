@@ -1,0 +1,23 @@
+# HAProxy Technologies Kubernetes Ingress Controller class `haproxy`.
+# For community haproxy-ingress controller confirm annotations/timeouts against installed version.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mta-external
+  namespace: mta-external
+spec:
+  ingressClassName: haproxy
+  tls:
+    - hosts: [mta.example.org]
+      secretName: mta-tls
+  rules:
+    - host: mta.example.org
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: mta-vm
+                port:
+                  name: http

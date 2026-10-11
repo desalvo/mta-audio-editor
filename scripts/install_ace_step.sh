@@ -9,8 +9,10 @@ DATA=${MTA_DATA:-/var/lib/mta}
 PYTHON=${MTA_PYTHON:-python3.11}
 TORCH_VERSION=${MTA_TORCH_VERSION:-2.11.0+rocm7.2}
 INDEX=https://download.pytorch.org/whl/rocm7.2
-AUTO_YES=0; DRY_RUN=0; VERSION=${MTA_ACE_VERSION:-}; INSTALL_SYSTEMD=1
+AUTO_YES=0; DRY_RUN=0; ACE_VERSION=${MTA_ACE_VERSION:-}; INSTALL_SYSTEMD=1
 CONFIG=${MTA_ACE_WIZARD_CONFIG:-/etc/mta/ace-step-wizard.conf}
+BENCHMARK_CONCURRENT=0; BENCHMARK_REMOTE_URL=''; BENCHMARK_TOKENS_FILE=''; BENCHMARK_JOBS_PER_USER=2
+BENCHMARK=0; BENCHMARK_PROBE_ONLY=0; BENCHMARK_CONFIG=''; BENCHMARK_OUTPUT=''; BENCHMARK_INSTALL_TOOLS=1
 PORT_OVERRIDE=''; BIND_OVERRIDE=''; FIREWALL_OVERRIDE=''; REINSTALL=0; UNINSTALL=0; PURGE_DATA=0
 PORT=8001; BIND=local; FIREWALL=no; SAVED_VERSION=''
 # Read only known, validated keys; never source a root-owned config as shell code.
@@ -26,7 +28,7 @@ if [[ -f "$CONFIG" ]]; then
 fi
 usage() {
  cat <<'HELP'
-Usage: sudo ./install_ace_step.sh [--yes] [--version v0.1.8|<40-digit-sha>] [--dry-run] [--no-systemd] [--port 8001] [--bind local|network] [--firewall yes|no] [--reinstall] [--uninstall] [--purge-data]
+Usage: sudo ./install_ace_step.sh [--benchmark [--benchmark-config file.toml] [--benchmark-output dir] [--benchmark-probe-only] [--benchmark-no-install-tools]] [--yes] [--version v0.1.8|<40-digit-sha>] [--dry-run] [--no-systemd] [--port 8001] [--bind local|network] [--firewall yes|no] [--reinstall] [--uninstall] [--purge-data]
 Interactive Debian >=9 / Debian derivatives, Ubuntu >=22.04, or RHEL family >=9 wizard. Requires /dev/kfd and /dev/dri/renderD* accessible on this system.
 Installs Python 3.11, venv, AMD ROCm-enabled PyTorch/torchaudio and ACE-Step dependencies.
 The AMD kernel driver must be operational on the host (physical machine, VM, or container host). This wizard does not install kernel drivers.
@@ -37,11 +39,25 @@ Persistent models in /var/lib/mta/models are never deleted. Existing sources are
 --firewall yes|no controls opening network port (only if --bind network).
 --reinstall forces reinstall of ACE-Step and its Python dependencies.
 --uninstall stops/disables the ACE-Step service and removes only wizard-managed installation files; keeps models/data.
+--benchmark runs a GPU diagnostic ACE-Step CLI generation; AMD uses amdgpu_top and NVIDIA uses nvidia-smi.
+--benchmark-config FILE supplies ACE-Step CLI TOML; otherwise a minimal instrumental generation is used.
+--benchmark-output DIR sets the report directory; --benchmark-probe-only skips inference.
+--benchmark-no-install-tools does not attempt to install vendor monitoring tools.
+--benchmark-concurrent --benchmark-remote-url HTTPS_URL --benchmark-tokens-file FILE (0600) runs concurrent authenticated AI jobs using separate test-user tokens.
 --purge-data can be used only with --uninstall; also deletes ACE-Step model cache after explicit confirmation.
 HELP
 }
 while (($#)); do
  case "$1" in
+  --benchmark-concurrent) BENCHMARK_CONCURRENT=1;;
+  --benchmark-remote-url) shift; [[ $# -gt 0 ]] || exit 2; BENCHMARK_REMOTE_URL=$1;;
+  --benchmark-tokens-file) shift; [[ $# -gt 0 ]] || exit 2; BENCHMARK_TOKENS_FILE=$1;;
+  --benchmark-jobs-per-user) shift; [[ $# -gt 0 ]] || exit 2; BENCHMARK_JOBS_PER_USER=$1;;
+  --benchmark) BENCHMARK=1;;
+  --benchmark-config) shift; [[ $# -gt 0 ]] || exit 2; BENCHMARK_CONFIG=$1;;
+  --benchmark-output) shift; [[ $# -gt 0 ]] || exit 2; BENCHMARK_OUTPUT=$1;;
+  --benchmark-probe-only) BENCHMARK_PROBE_ONLY=1;;
+  --benchmark-no-install-tools) BENCHMARK_INSTALL_TOOLS=0;;
   --yes) AUTO_YES=1;;
   --dry-run) DRY_RUN=1;;
   --no-systemd) INSTALL_SYSTEMD=0;;
@@ -51,12 +67,19 @@ while (($#)); do
   --reinstall) REINSTALL=1;;
   --uninstall) UNINSTALL=1;;
   --purge-data) PURGE_DATA=1;;
-  --version) shift; [[ $# -gt 0 ]] || { usage; exit 2; }; VERSION=$1;;
+  --version) shift; [[ $# -gt 0 ]] || { usage; exit 2; }; ACE_VERSION=$1;;
   --help|-h) usage; exit 0;;
   *) echo "Unknown argument: $1" >&2; usage; exit 2;;
  esac
  shift
 done
+if (( BENCHMARK_CONCURRENT )); then
+  [[ -n $BENCHMARK_REMOTE_URL && -n $BENCHMARK_TOKENS_FILE ]] || { echo 'Missing --benchmark-remote-url or --benchmark-tokens-file' >&2; exit 2; }
+  exec python3 "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/benchmark_ai_concurrency.py" \
+    --url "$BENCHMARK_REMOTE_URL" --tokens-file "$BENCHMARK_TOKENS_FILE" \
+    --jobs-per-user "$BENCHMARK_JOBS_PER_USER" \
+    --output "${BENCHMARK_OUTPUT:-./ai-concurrency-report.json}"
+fi
 # Check OS before privilege guard: --dry-run is deliberately usable without sudo.
 if (( PURGE_DATA && ! UNINSTALL )); then echo '--purge-data requires --uninstall.' >&2; exit 2; fi
 [[ $BASE == /* && $DATA == /* && $BASE != / && $DATA != / ]] || exit 2
@@ -101,6 +124,44 @@ case "$OS_FAMILY" in
  *) echo "Unsupported OS: ${PRETTY_NAME:-$OS_ID}; supported Debian family or RHEL family >=9." >&2; exit 2 ;;
 esac
 printf 'Supported OS: %s (family=%s, major=%s)\n' "${PRETTY_NAME:-$OS_ID}" "$OS_FAMILY" "$OS_MAJOR"
+# Benchmark mode runs independently of the AMD-only ROCm installation path.
+# The script lives alongside this wizard and uses an existing ACE-Step installation.
+if (( BENCHMARK )); then
+ script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+ helper="$script_dir/ace_gpu_benchmark.py"
+ [[ -f "$helper" ]] || { echo 'Missing scripts/ace_gpu_benchmark.py alongside wizard.' >&2; exit 2; }
+ gpu_vendor=unknown
+ if command -v nvidia-smi >/dev/null 2>&1 || [[ -d /proc/driver/nvidia/gpus ]] || grep -qli '0x10de' /sys/class/drm/card*/device/vendor 2>/dev/null; then gpu_vendor=nvidia; fi
+ if [[ -c /dev/kfd ]] || grep -qli '0x1002' /sys/class/drm/card*/device/vendor 2>/dev/null; then gpu_vendor=amd; fi
+ echo "GPU benchmark mode: detected $gpu_vendor"
+ if (( BENCHMARK_INSTALL_TOOLS && ! DRY_RUN )); then
+  if [[ $gpu_vendor == amd ]] && ! command -v amdgpu_top >/dev/null; then
+   if [[ $EUID -ne 0 ]]; then echo 'amdgpu_top missing: rerun with sudo or use --benchmark-no-install-tools.' >&2; exit 2; fi
+   if [[ $OS_FAMILY == debian ]]; then
+    apt-get -q update
+    DEBIAN_FRONTEND=noninteractive apt-get install -y amdgpu-top || echo 'amdgpu_top unavailable in configured APT repos: install from trusted vendor package.' >&2
+   else
+    dnf install -y amdgpu_top || echo 'amdgpu_top unavailable in configured DNF repos: install from trusted vendor package.' >&2
+   fi
+  elif [[ $gpu_vendor == nvidia ]] && ! command -v nvidia-smi >/dev/null; then
+   echo 'nvidia-smi is missing: it must match the installed NVIDIA host driver. Attempting distro-provided utilities.' >&2
+   if [[ $EUID -ne 0 ]]; then echo 'Rerun with sudo or install matching NVIDIA driver utilities on the host.' >&2; exit 2; fi
+   if [[ $OS_FAMILY == debian ]]; then
+    pkg=$(apt-cache search '^nvidia-utils-[0-9]+$' | awk '{print $1}' | sort -V | tail -n1)
+    if [[ -n $pkg ]]; then DEBIAN_FRONTEND=noninteractive apt-get install -y "$pkg" || true; fi
+   else
+    dnf install -y nvidia-driver-cuda || true
+   fi
+   command -v nvidia-smi >/dev/null || echo 'nvidia-smi unavailable: configure driver-matched utilities on the VM/LXC or Proxmox host.' >&2
+  fi
+ fi
+ args=(--ace-root "$BASE/ace-step" --python "$BASE/venv-ace-step/bin/python")
+ [[ -z $BENCHMARK_CONFIG ]] || args+=(--config "$BENCHMARK_CONFIG")
+ [[ -z $BENCHMARK_OUTPUT ]] || args+=(--output-dir "$BENCHMARK_OUTPUT")
+ (( ! BENCHMARK_PROBE_ONLY )) || args+=(--probe-only)
+ if (( DRY_RUN )); then printf 'DRY RUN: %s %s\n' python3 "$helper"; exit 0; fi
+ exec python3 "$helper" "${args[@]}"
+fi
 # Uninstall is available even if the GPU is no longer connected.
 if (( UNINSTALL )); then
  [[ $EUID -eq 0 ]] || { echo 'Run uninstall as root.' >&2; exit 2; }
@@ -154,7 +215,7 @@ render_nodes=(/dev/dri/renderD*)
 printf 'Found ROCm devices: /dev/kfd %s\n' "${render_nodes[*]}"
 # Present existing settings as defaults. A repeated run should be configuration-only
 # if the already installed code and virtualenv are usable.
-VERSION=${VERSION:-$SAVED_VERSION}
+ACE_VERSION=${ACE_VERSION:-$SAVED_VERSION}
 PORT=${PORT_OVERRIDE:-$PORT}
 BIND=${BIND_OVERRIDE:-$BIND}
 FIREWALL=${FIREWALL_OVERRIDE:-$FIREWALL}
@@ -163,14 +224,14 @@ PORT=$((10#$PORT))
 [[ $BIND == local || $BIND == network ]] || { echo 'Invalid bind: local or network.' >&2; exit 2; }
 [[ $FIREWALL == yes || $FIREWALL == no ]] || { echo 'Invalid firewall option: yes or no.' >&2; exit 2; }
 if (( DRY_RUN )); then
- printf 'DRY RUN (no modifications): version=%s, port=%s, bind=%s, firewall=%s, base=%s\n' "${VERSION:-$DEFAULT_TAG}" "$PORT" "$BIND" "$FIREWALL" "$BASE"
+ printf 'DRY RUN (no modifications): version=%s, port=%s, bind=%s, firewall=%s, base=%s\n' "${ACE_VERSION:-$DEFAULT_TAG}" "$PORT" "$BIND" "$FIREWALL" "$BASE"
  exit 0
 fi
 if (( ! AUTO_YES )); then
  echo 'ACE-Step Linux setup: previous settings appear in brackets. Enter to keep.'
  latest=$(git ls-remote --tags --refs "$REPO" 'refs/tags/v*' 2>/dev/null | sed -nE 's#.*refs/tags/(v[0-9]+\.[0-9]+\.[0-9]+)$#\1#p' | sort -V | tail -n1 || true)
  echo "Latest upstream stable: ${latest:-unavailable}; pinned tested: $DEFAULT_TAG"
- read -r -p "ACE-Step version [${VERSION:-$DEFAULT_TAG}]: " choice; VERSION=${choice:-${VERSION:-$DEFAULT_TAG}}
+ read -r -p "ACE-Step version [${ACE_VERSION:-$DEFAULT_TAG}]: " choice; ACE_VERSION=${choice:-${ACE_VERSION:-$DEFAULT_TAG}}
  read -r -p "API port [$PORT]: " choice; PORT=${choice:-$PORT}
  read -r -p "Reachability local/network [$BIND]: " choice; BIND=${choice:-$BIND}
  if [[ $BIND == network ]]; then
@@ -191,13 +252,13 @@ if (( ! AUTO_YES )); then
  [[ ${answer,,} == y || ${answer,,} == yes ]] || exit 0
 fi
 # Early idempotent path: identical selected ref and healthy existing environment.
-if [[ -z $VERSION ]]; then VERSION=$DEFAULT_TAG; fi
+if [[ -z $ACE_VERSION ]]; then ACE_VERSION=$DEFAULT_TAG; fi
 CURRENT_REF=''
 if [[ -f "$BASE/ace-step/.mta-installed-ref" ]]; then
  CURRENT_REF=$(cat "$BASE/ace-step/.mta-installed-ref")
 fi
-if [[ $CURRENT_REF == "$VERSION" && -x "$BASE/venv-ace-step/bin/python" && $REINSTALL == 0 ]]; then
- echo "ACE-Step $VERSION already installed; retaining existing Python environment and checkpoints."
+if [[ $CURRENT_REF == "$ACE_VERSION" && -x "$BASE/venv-ace-step/bin/python" && $REINSTALL == 0 ]]; then
+ echo "ACE-Step $ACE_VERSION already installed; retaining existing Python environment and checkpoints."
  SKIP_INSTALL=1
 else SKIP_INSTALL=0; fi
 if (( ! SKIP_INSTALL )); then
@@ -210,10 +271,10 @@ else
  dnf install -y git ca-certificates "$PYTHON" "${PYTHON}-pip" gcc gcc-c++ make
 fi
 command -v "$PYTHON" >/dev/null || { echo "Python interpreter $PYTHON unavailable on $PRETTY_NAME. Configure a >=3.11 interpreter with MTA_PYTHON." >&2; exit 2; }
-if [[ $VERSION =~ ^[0-9a-f]{40}$ ]]; then
- REF=$VERSION
-elif [[ $VERSION =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
- REF=$VERSION
+if [[ $ACE_VERSION =~ ^[0-9a-f]{40}$ ]]; then
+ REF=$ACE_VERSION
+elif [[ $ACE_VERSION =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+ REF=$ACE_VERSION
 else
  echo 'Invalid version; use vX.Y.Z or full SHA.' >&2; exit 2
 fi
@@ -227,7 +288,7 @@ git clone -q --filter=blob:none "$REPO" "$stage/source"
 git -C "$stage/source" checkout -q --detach "$REF"
 sha=$(git -C "$stage/source" rev-parse HEAD)
 [[ $sha =~ ^[0-9a-f]{40}$ && -s $stage/source/LICENSE && -f $stage/source/requirements-rocm-linux.txt ]] || { echo 'Invalid ACE-Step source layout' >&2; exit 4; }
-if [[ $VERSION == "$DEFAULT_TAG" && $sha != "$PINNED_SHA" ]]; then
+if [[ $ACE_VERSION == "$DEFAULT_TAG" && $sha != "$PINNED_SHA" ]]; then
  echo 'WARNING: pinned release tag no longer matches audited SHA; aborting.' >&2; exit 4
 fi
 # Keep venv at its final absolute path: Python virtualenvs are not relocatable.
@@ -279,7 +340,7 @@ if [[ -d "$BASE/ace-step" ]]; then
 fi
 mv "$stage/source" "$BASE/ace-step"
 printf '%s\n' "$sha" > "$BASE/ace-step/UPSTREAM_COMMIT"
-printf '%s\n' "$VERSION" > "$BASE/ace-step/.mta-installed-ref"
+printf '%s\n' "$ACE_VERSION" > "$BASE/ace-step/.mta-installed-ref"
 [[ -e $BASE/ace-step/checkpoints ]] || ln -s "$DATA/models/checkpoints" "$BASE/ace-step/checkpoints"
 fi # new install / forced reinstall
 mkdir -p /etc/mta
@@ -371,10 +432,10 @@ fi
 # Persist only validated values; atomic update, private root-owned file.
 mkdir -p "$(dirname "$CONFIG")"
 TMP_CONF=$(mktemp "${CONFIG}.XXXXXX")
-printf 'PORT=%s\nBIND=%s\nFIREWALL=%s\nVERSION=%s\n' "$PORT" "$BIND" "$FIREWALL" "$VERSION" > "$TMP_CONF"
+printf 'PORT=%s\nBIND=%s\nFIREWALL=%s\nVERSION=%s\n' "$PORT" "$BIND" "$FIREWALL" "$ACE_VERSION" > "$TMP_CONF"
 chmod 600 "$TMP_CONF"
 mv -f "$TMP_CONF" "$CONFIG"
 
-printf 'ACE-Step %s ready; listening on %s:%s, firewall=%s.\n' "$VERSION" "${HOST:-not configured}" "$PORT" "$FIREWALL"
+printf 'ACE-Step %s ready; listening on %s:%s, firewall=%s.\n' "$ACE_VERSION" "${HOST:-not configured}" "$PORT" "$FIREWALL"
 echo "Settings saved in $CONFIG"
 echo "Check: systemctl status mta-ace-step; curl http://127.0.0.1:$PORT/health"

@@ -3,7 +3,7 @@
 
 Requires a separately installed, operator-controlled ACE-Step server. No model
 weights, copyrighted data or Python packages from ACE-Step are redistributed.
-Only loopback HTTP or an explicitly trusted internal sidecar hostname is permitted.
+Loopback HTTP or explicitly trusted HTTPS endpoints (including /api/ai-gateway) are permitted; arbitrary project URLs are rejected.
 """
 from __future__ import annotations
 import argparse
@@ -18,6 +18,7 @@ from urllib.error import HTTPError, URLError
 import uuid
 import wave
 import tempfile
+import re
 import shutil
 from io import BytesIO
 
@@ -25,18 +26,28 @@ MAX_RESULT = 1024 * 1024 * 1024
 
 
 def endpoint_base() -> str:
+    """Resolve a deployment-controlled endpoint, never user/project-supplied URLs.
+
+    Network targets require TLS, an exact host allowlist and an API bearer token.
+    SSH tunnels remain supported through localhost HTTP.
+    """
     value = os.environ.get('MTA_ACE_STEP_URL', 'http://127.0.0.1:8001').rstrip('/')
     parsed = urlsplit(value)
-    trusted = {'127.0.0.1', 'localhost', '::1'}
-    # The sole additional hostname must be provided by the trusted deployment,
-    # never by project data or client input (Docker internal-only network).
+    local = {'127.0.0.1', 'localhost', '::1'}
     extra = os.environ.get('MTA_ACE_STEP_TRUSTED_HOST', '').strip()
-    if extra and extra.isascii() and all(c.isalnum() or c == '-' for c in extra) and len(extra) <= 63:
-        trusted.add(extra)
-    if parsed.scheme != 'http' or parsed.hostname not in trusted or parsed.username or parsed.password or parsed.path or parsed.query or parsed.fragment:
-        raise ValueError('ACE-Step must be bound to a loopback HTTP endpoint (use an SSH tunnel for remote instances)')
-    if parsed.port is None or not 1 <= parsed.port <= 65535:
-        raise ValueError('ACE-Step URL requires an explicit valid port')
+    if extra:
+        if not re.fullmatch(r'[A-Za-z0-9](?:[A-Za-z0-9.-]{0,251}[A-Za-z0-9])?', extra) or '..' in extra:
+            raise ValueError('Invalid trusted ACE-Step host')
+    accepted = parsed.hostname in local or (extra and parsed.hostname == extra)
+    if (not accepted or parsed.scheme not in ('http', 'https') or parsed.username or parsed.password
+            or parsed.path not in ('', '/api/ai-gateway') or parsed.query or parsed.fragment or parsed.port is None
+            or not 1 <= parsed.port <= 65535):
+        raise ValueError('Invalid or untrusted ACE-Step endpoint')
+    if parsed.hostname not in local:
+        if parsed.scheme != 'https':
+            raise ValueError('Remote ACE-Step requires HTTPS with certificate validation')
+        if not os.environ.get('MTA_ACE_STEP_TOKEN', '').strip():
+            raise ValueError('Remote ACE-Step requires an API bearer token')
     return value
 
 
@@ -51,7 +62,7 @@ def _request(url: str, data: bytes | None = None, content_type: str | None = Non
     base = endpoint_base()
     parsed = urlsplit(url)
     trusted = urlsplit(base)
-    if parsed.scheme != 'http' or parsed.netloc != trusted.netloc or not parsed.path.startswith('/') or parsed.username or parsed.password or parsed.fragment:
+    if parsed.scheme != trusted.scheme or parsed.netloc != trusted.netloc or not parsed.path.startswith('/') or parsed.username or parsed.password or parsed.fragment:
         raise ValueError('Untrusted ACE-Step request URL')
     req = Request(url, data=data, headers=headers, method='POST' if data is not None else 'GET')  # noqa: S310 -- checked scheme and exact host above
     class NoRedirect(HTTPRedirectHandler):

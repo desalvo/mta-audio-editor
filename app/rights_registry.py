@@ -1,11 +1,12 @@
 from __future__ import annotations
+from app.secure_https import https_urlopen
 
 import json
 import os
 from dataclasses import dataclass
 from typing import Any
 from urllib.parse import urlencode, urlparse
-from urllib.request import Request, urlopen
+from urllib.request import Request
 
 from .models import RightsRecord
 from .version import APP_RELEASE
@@ -61,7 +62,7 @@ def _read_json(url: str, params: dict[str, str]) -> Any:
     sep = "&" if "?" in base else "?"
     request_url = f"{base}{sep}{urlencode(params)}"
     req = Request(request_url, headers={"Accept": "application/json", "User-Agent": f"MTA-Audio-Editor/{APP_RELEASE} (https://github.com/desalvo/mta-audio-editor)"})  # noqa: S310
-    with urlopen(req, timeout=20) as response:  # noqa: S310
+    with https_urlopen(req, timeout=20) as response:  # noqa: S310
         payload = response.read(2_000_000)
     return json.loads(payload.decode("utf-8"))
 

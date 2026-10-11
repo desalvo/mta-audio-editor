@@ -1,0 +1,36 @@
+# Apply to the cluster; replace 192.0.2.50 with the VM/LXC PRIVATE routable IP.
+# Port 8080 must be reachable FROM ingress controller pods only. Never expose port 8001.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mta-external
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mta-vm
+  namespace: mta-external
+spec:
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+      protocol: TCP
+---
+apiVersion: discovery.k8s.io/v1
+kind: EndpointSlice
+metadata:
+  name: mta-vm-1
+  namespace: mta-external
+  labels:
+    kubernetes.io/service-name: mta-vm
+    endpointslice.kubernetes.io/managed-by: mta-external-manual
+addressType: IPv4
+ports:
+  - name: http
+    protocol: TCP
+    port: 8080
+endpoints:
+  - addresses: ['192.0.2.50']
+    conditions:
+      ready: true

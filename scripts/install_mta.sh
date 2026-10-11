@@ -7,11 +7,11 @@ CONFIG=${MTA_WIZARD_CONFIG:-/etc/mta/mta-wizard.conf}
 APP_DIR=${MTA_APP_DIR:-/opt/mta/application}
 VENV=${MTA_APP_VENV:-/opt/mta/venv-mta}
 DATA=${MTA_APP_DATA:-/var/lib/mta/projects}
-PORT=8080; BIND=network; FIREWALL=no; VERSION=main; ACE_PORT=8001
+PORT=8080; BIND=network; FIREWALL=no; VERSION=main; ACE_PORT=8001; ACE_URL=
 YES=0; DRY=0; REINSTALL=0; UNINSTALL=0; PURGE=0
-O_PORT=''; O_BIND=''; O_FIREWALL=''; O_VERSION=''; O_ACE=''
+O_PORT=''; O_BIND=''; O_FIREWALL=''; O_VERSION=''; O_ACE=''; O_ACE_URL=''
 usage() { cat <<'HELP'
-Usage: sudo ./install_mta.sh [--dry-run] [--yes] [--version BRANCH|TAG|SHA] [--port N] [--bind local|network] [--firewall yes|no] [--ace-port N] [--reinstall] [--uninstall] [--purge-data]
+Usage: sudo ./install_mta.sh [--dry-run] [--yes] [--version BRANCH|TAG|SHA] [--port N] [--bind local|network] [--firewall yes|no] [--ace-port N] [--ace-url https://host:port] [--reinstall] [--uninstall] [--purge-data]
 Standalone Linux installer: no MTA repository checkout required. Supports Debian 12+, Ubuntu 22.04+, RHEL/Rocky/AlmaLinux/CentOS Stream/Oracle Linux 9+.
 Uses /etc/mta/mta-wizard.conf to remember settings; deploys authenticated MTA web app on port 8080 by default.
 --uninstall stops/disables service and removes MTA-owned source and Python environment (preserves projects and ACE-Step).
@@ -23,9 +23,9 @@ while (($#)); do
  --help|-h) usage; exit 0;;
  --yes) YES=1;; --dry-run) DRY=1;; --reinstall) REINSTALL=1;;
  --uninstall) UNINSTALL=1;; --purge-data) PURGE=1;;
- --version|--port|--bind|--firewall|--ace-port)
+ --version|--port|--bind|--firewall|--ace-port|--ace-url)
  k=$1; shift; (($#)) || { echo "Missing value for $k" >&2; exit 2; }
- case "$k" in --version) O_VERSION=$1;; --port) O_PORT=$1;; --bind) O_BIND=$1;; --firewall) O_FIREWALL=$1;; --ace-port) O_ACE=$1;; esac;;
+ case "$k" in --version) O_VERSION=$1;; --port) O_PORT=$1;; --bind) O_BIND=$1;; --firewall) O_FIREWALL=$1;; --ace-port) O_ACE=$1;; --ace-url) O_ACE_URL=$1;; esac;;
  *) echo "Unknown option: $1" >&2; usage; exit 2;; esac
  shift
 done
@@ -38,10 +38,11 @@ if [[ -f $CONFIG ]]; then
  FIREWALL) [[ $val == yes || $val == no ]] && FIREWALL=$val;;
  VERSION) [[ $val =~ ^[[:alnum:]_.\/-]+$ ]] && VERSION=$val;;
  ACE_PORT) [[ $val =~ ^[0-9]{1,5}$ ]] && ACE_PORT=$val;;
+ ACE_URL) ACE_URL=$val;;
  esac
  done < "$CONFIG"
 fi
-PORT=${O_PORT:-$PORT}; BIND=${O_BIND:-$BIND}; FIREWALL=${O_FIREWALL:-$FIREWALL}; VERSION=${O_VERSION:-$VERSION}; ACE_PORT=${O_ACE:-$ACE_PORT}
+PORT=${O_PORT:-$PORT}; BIND=${O_BIND:-$BIND}; FIREWALL=${O_FIREWALL:-$FIREWALL}; VERSION=${O_VERSION:-$VERSION}; ACE_PORT=${O_ACE:-$ACE_PORT}; ACE_URL=${O_ACE_URL:-$ACE_URL}
 # Refuse unsupported OS before checking root or mutating filesystem.
 OS_RELEASE=${MTA_OS_RELEASE:-/etc/os-release}
 [[ -r $OS_RELEASE ]] || { echo 'Unsupported OS: /etc/os-release not found' >&2; exit 2; }
@@ -70,6 +71,14 @@ else
 fi
 [[ $APP_DIR == /* && $VENV == /* && $DATA == /* && $APP_DIR != / && $VENV != / && $DATA != / ]] || { echo 'Unsafe paths' >&2; exit 2; }
 [[ $PORT =~ ^[0-9]+$ && $ACE_PORT =~ ^[0-9]+$ ]] && (( PORT>=1 && PORT<=65535 && ACE_PORT>=1 && ACE_PORT<=65535 )) || { echo 'Invalid port' >&2; exit 2; }
+# Parse remote HTTPS URL without loading arbitrary shell configuration.
+if [[ -n $ACE_URL ]]; then
+ if [[ ! $ACE_URL =~ ^https://([a-zA-Z0-9][a-zA-Z0-9.-]{0,251}):([0-9]{1,5})$ ]]; then
+  echo 'Invalid remote ACE-Step URL: use https://hostname:port (TLS required).' >&2; exit 2
+ fi
+ ACE_REMOTE_HOST=${BASH_REMATCH[1]}; ACE_REMOTE_PORT=${BASH_REMATCH[2]}
+ (( 10#$ACE_REMOTE_PORT >= 1 && 10#$ACE_REMOTE_PORT <= 65535 )) || { echo 'Invalid ACE-Step remote port' >&2; exit 2; }
+fi
 [[ $BIND == local || $BIND == network ]] && [[ $FIREWALL == yes || $FIREWALL == no ]] || { echo 'Invalid network settings' >&2; exit 2; }
 [[ $VERSION =~ ^[a-zA-Z0-9][a-zA-Z0-9._/-]{0,120}$ ]] && [[ $VERSION != *'..'* ]] || { echo 'Invalid Git reference' >&2; exit 2; }
 if (( DRY )); then printf 'OS=%s %s; source=%s ref=%s; port=%s bind=%s firewall=%s; ACE port=%s; uninstall=%s\n' "$OS_ID" "$VERSION_ID" "$REPO" "$VERSION" "$PORT" "$BIND" "$FIREWALL" "$ACE_PORT" "$UNINSTALL"; exit 0; fi
@@ -82,12 +91,18 @@ if (( ! UNINSTALL )); then
  ask 'Web binding (network/local)' "$BIND"; BIND=$REPLY
  ask 'Manage host firewall (yes/no)' "$FIREWALL"; FIREWALL=$REPLY
  ask 'ACE-Step port on localhost' "$ACE_PORT"; ACE_PORT=$REPLY
- exec "$0" --dry-run --version "$VERSION" --port "$PORT" --bind "$BIND" --firewall "$FIREWALL" --ace-port "$ACE_PORT" >/dev/null || exit 2
+ ask 'Remote ACE-Step HTTPS URL (blank = local ACE-Step)' "$ACE_URL"; ACE_URL=$REPLY
+ check_args=(--dry-run --version "$VERSION" --port "$PORT" --bind "$BIND" --firewall "$FIREWALL" --ace-port "$ACE_PORT")
+ [[ -z $ACE_URL ]] || check_args+=(--ace-url "$ACE_URL")
+ "$0" "${check_args[@]}" >/dev/null || exit 2
+ if [[ -n $ACE_URL ]]; then ACE_REMOTE_HOST=${ACE_URL#https://}; ACE_REMOTE_HOST=${ACE_REMOTE_HOST%:*}; fi
 fi
 SERVICE=/etc/systemd/system/mta-audio-editor.service
 ENVFILE=/etc/mta/mta.env
 if (( UNINSTALL )); then
  echo 'Uninstalling MTA web service; preserving ACE-Step and model cache.'
+ systemctl disable --now mta-ai-billing.timer 2>/dev/null || true
+ rm -f /etc/systemd/system/mta-ai-billing.timer /etc/systemd/system/mta-ai-billing.service
  systemctl disable --now mta-audio-editor.service 2>/dev/null || true
  if [[ -f $SERVICE ]] && grep -q '^Description=MTA Audio Editor' "$SERVICE"; then rm -f "$SERVICE"; fi
  systemctl daemon-reload
@@ -146,14 +161,20 @@ MTA_ADMIN_PASSWORD=$PASS
 MTA_DATA_DIR=$DATA
 MTA_AI_WORKER_ENABLED=true
 MTA_AI_WORKER_EXECUTABLE=$APP_DIR/app/ace_step_http_worker.py
-MTA_ACE_STEP_URL=http://127.0.0.1:$ACE_PORT
+MTA_ACE_STEP_URL=${ACE_URL:-http://127.0.0.1:$ACE_PORT}
+MTA_ACE_STEP_TRUSTED_HOST=${ACE_REMOTE_HOST:-}
 HF_HOME=/var/lib/mta/models/huggingface
 EOT
  echo "Initial admin account: admin; initial password stored in $ENVFILE (root-only)."
 else
- sed -i -E "s#^MTA_ACE_STEP_URL=.*#MTA_ACE_STEP_URL=http://127.0.0.1:$ACE_PORT#" "$ENVFILE"
+ sed -i -E "/^MTA_ACE_STEP_URL=/d; /^MTA_ACE_STEP_TRUSTED_HOST=/d" "$ENVFILE"
+ printf 'MTA_ACE_STEP_URL=%s\nMTA_ACE_STEP_TRUSTED_HOST=%s\n' "${ACE_URL:-http://127.0.0.1:$ACE_PORT}" "${ACE_REMOTE_HOST:-}" >> "$ENVFILE"
 fi
 chmod 600 "$ENVFILE"
+if [[ -n $ACE_URL ]]; then
+ echo 'Remote ACE-Step HTTPS configured. Set MTA_ACE_STEP_TOKEN securely in /etc/mta/mta.env before starting AI jobs.'
+ echo 'Remote endpoint must provide a valid trusted TLS certificate and API key protection.'
+fi
 # Bind to loopback unless network access explicitly selected.
 HOST=127.0.0.1; [[ $BIND == network ]] && HOST=0.0.0.0
 cat >/etc/mta/mta-wizard.conf.tmp <<EOT
@@ -162,6 +183,7 @@ PORT=$PORT
 BIND=$BIND
 FIREWALL=$FIREWALL
 ACE_PORT=$ACE_PORT
+ACE_URL=$ACE_URL
 EOT
 chmod 600 /etc/mta/mta-wizard.conf.tmp
 mv /etc/mta/mta-wizard.conf.tmp "$CONFIG"
@@ -183,7 +205,29 @@ NoNewPrivileges=true
 [Install]
 WantedBy=multi-user.target
 EOT
+cat > /etc/systemd/system/mta-ai-billing.service <<EOT
+[Unit]
+Description=MTA AI billing UTC period closer
+After=mta-audio-editor.service
+[Service]
+Type=oneshot
+WorkingDirectory=$APP_DIR
+EnvironmentFile=$ENVFILE
+ExecStart=$VENV/bin/python -m app.ai_billing_scheduler
+NoNewPrivileges=true
+EOT
+cat > /etc/systemd/system/mta-ai-billing.timer <<'EOT'
+[Unit]
+Description=Run MTA AI billing closure daily (UTC)
+[Timer]
+OnCalendar=*-*-* 02:15:00 UTC
+Persistent=true
+Unit=mta-ai-billing.service
+[Install]
+WantedBy=timers.target
+EOT
 systemctl daemon-reload
+systemctl enable --now mta-ai-billing.timer
 systemctl enable --now mta-audio-editor.service
 systemctl restart mta-audio-editor.service
 if [[ $BIND == network && $FIREWALL == yes ]]; then

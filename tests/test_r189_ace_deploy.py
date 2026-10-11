@@ -11,7 +11,13 @@ def test_sidecar_allowlist(monkeypatch):
     with pytest.raises(ValueError):
         endpoint_base()
     monkeypatch.setenv('MTA_ACE_STEP_TRUSTED_HOST', 'ace-step')
-    assert endpoint_base() == 'http://ace-step:8001'
+    with pytest.raises(ValueError, match='HTTPS'):
+        endpoint_base()
+    monkeypatch.setenv('MTA_ACE_STEP_URL', 'https://ace-step:8001')
+    with pytest.raises(ValueError, match='bearer token'):
+        endpoint_base()
+    monkeypatch.setenv('MTA_ACE_STEP_TOKEN', 'test-token')
+    assert endpoint_base() == 'https://ace-step:8001'
     for bad in ('evil.test', 'ace-step.evil.test', '127.0.0.2'):
         monkeypatch.setenv('MTA_ACE_STEP_URL', f'http://{bad}:8001')
         with pytest.raises(ValueError):

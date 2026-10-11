@@ -8,6 +8,7 @@ import os
 import json
 import signal
 from pathlib import Path
+from urllib.parse import urlsplit
 import shutil
 import subprocess
 import threading
@@ -41,6 +42,85 @@ def status() -> dict:
     return {'task':task,'auto_start_enabled':_consent_file().is_file(),'installed':(folder/'pyproject.toml').is_file() and (folder/'.venv').is_dir(),
             'server_running':running,'has_git':bool(shutil.which('git')),'has_uv':bool(shutil.which('uv')),
             'model_cache':str(home()/'models')}
+
+
+def _connection_file() -> Path:
+    return home() / 'connection.json'
+
+
+def connection() -> dict:
+    """Return public connection preferences; never expose saved credentials."""
+    try:
+        cfg = json.loads(_connection_file().read_text(encoding='utf-8'))
+        if cfg.get('mode') in ('local', 'remote'):
+            return {'configured': True, 'mode': cfg['mode'],
+                    'url': cfg.get('url', '') if cfg['mode'] == 'remote' else '',
+                    'has_token': bool(cfg.get('token'))}
+    except (OSError, ValueError, TypeError, AttributeError):
+        pass
+    return {'configured': False, 'mode': 'local', 'url': '', 'has_token': False}
+
+
+def configure_connection(*, mode: str, url: str = '', token: str = '') -> dict:
+    """Native-only user-selected ACE backend, persisted with private permissions."""
+    if mode not in ('local', 'remote'):
+        raise ValueError('Invalid ACE-Step connection mode')
+    old = connection()
+    existing = {}
+    try:
+        existing = json.loads(_connection_file().read_text(encoding='utf-8'))
+    except (OSError, ValueError):
+        pass
+    if mode == 'remote':
+        from .ace_step_http_worker import endpoint_base
+        # Reuse trusted endpoint validation without depending on project input.
+        parsed = urlsplit(url)
+        if parsed.hostname in ('localhost', '127.0.0.1', '::1'):
+            raise ValueError('Select local mode for a loopback ACE-Step server')
+        if not token and old.get('mode') == 'remote' and old.get('url') == url:
+            token = existing.get('token', '')
+        if not token or '\n' in token or '\r' in token or len(token) > 4096:
+            raise ValueError('An API token is required for remote ACE-Step')
+        # Validate against the worker's HTTPS/allowlist rules.
+        previous = {key: os.environ.get(key) for key in ('MTA_ACE_STEP_URL', 'MTA_ACE_STEP_TRUSTED_HOST', 'MTA_ACE_STEP_TOKEN')}
+        try:
+            os.environ.update({'MTA_ACE_STEP_URL': url, 'MTA_ACE_STEP_TRUSTED_HOST': parsed.hostname or '', 'MTA_ACE_STEP_TOKEN': token})
+            endpoint_base()
+        finally:
+            for key, value in previous.items():
+                if value is None: os.environ.pop(key, None)
+                else: os.environ[key] = value
+    if mode == 'remote':
+        stop_server(disable_auto_start=True)
+    destination = _connection_file()
+    destination.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+    candidate = destination.with_name(destination.name + '.tmp')
+    try:
+        with candidate.open('w', encoding='utf-8') as stream:
+            json.dump({'mode': mode, 'url': url if mode == 'remote' else '',
+                       'token': token if mode == 'remote' else ''}, stream)
+        os.chmod(candidate, 0o600)
+        os.replace(candidate, destination)
+    finally:
+        candidate.unlink(missing_ok=True)
+    apply_connection()
+    return connection()
+
+
+def apply_connection() -> None:
+    cfg = connection()
+    if cfg['mode'] != 'remote':
+        os.environ['MTA_ACE_STEP_URL'] = 'http://127.0.0.1:8001'
+        os.environ.pop('MTA_AI_WORKER_ENABLED', None)
+        for name in ('MTA_ACE_STEP_TRUSTED_HOST', 'MTA_ACE_STEP_TOKEN'):
+            os.environ.pop(name, None)
+        return
+    raw = json.loads(_connection_file().read_text(encoding='utf-8'))
+    os.environ['MTA_AI_WORKER_ENABLED'] = 'true'
+    os.environ['MTA_AI_WORKER_EXECUTABLE'] = str(Path(__file__).with_name('ace_step_http_worker.py').resolve())
+    os.environ['MTA_ACE_STEP_URL'] = raw['url']
+    os.environ['MTA_ACE_STEP_TRUSTED_HOST'] = urlsplit(raw['url']).hostname or ''
+    os.environ['MTA_ACE_STEP_TOKEN'] = raw['token']
 
 
 def _cache_size(root: Path) -> int:
@@ -159,7 +239,8 @@ def _previous_consent() -> bool:
 
 def auto_start_server() -> dict:
     """Start only after prior explicit consent; never install/download silently."""
-    if not _previous_consent():
+    apply_connection()
+    if connection()['mode'] == 'remote' or not _previous_consent():
         return status()
     try:
         return start_server(confirmed_model_download=True, remember_consent=False)
@@ -198,6 +279,7 @@ def stop_server(*, disable_auto_start: bool = False) -> dict:
 
 def start_server(*, confirmed_model_download: bool, remember_consent: bool = True) -> dict:
     global _PROCESS, _CACHE_BASELINE
+    if connection()['mode'] == 'remote': raise RuntimeError('Switch to local ACE-Step mode before starting a local server')
     if not confirmed_model_download: raise ValueError('Model download consent required')
     folder=home()/'source'
     if not (folder/'.venv').is_dir(): raise RuntimeError('Install ACE-Step first')

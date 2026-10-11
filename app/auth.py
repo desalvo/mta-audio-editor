@@ -1,5 +1,6 @@
-
 from __future__ import annotations
+
+from app.secure_https import https_urlopen
 
 import base64
 import hashlib
@@ -20,7 +21,7 @@ from email.message import EmailMessage
 from pathlib import Path
 from typing import Any
 from urllib.parse import quote, urlencode, urlsplit
-from urllib.request import Request as UrlRequest, urlopen
+from urllib.request import Request as UrlRequest
 
 import qrcode
 import qrcode.image.svg
@@ -64,6 +65,10 @@ def db():
     con.execute("PRAGMA foreign_keys=ON")
     try:
         yield con
+    except BaseException:
+        con.rollback()
+        raise
+    else:
         con.commit()
     finally:
         con.close()
@@ -497,7 +502,7 @@ def _oauth_json(url: str, *, data: dict | None = None, headers: dict | None = No
     request_headers.update(headers or {})
     request = UrlRequest(safe_url, data=body, headers=request_headers)  # noqa: S310
     # S310 is intentionally suppressed only after strict HTTPS + provider-host validation above.
-    with urlopen(request, timeout=15) as resp:  # noqa: S310
+    with https_urlopen(request, timeout=15) as resp:  # noqa: S310
         return __import__("json").loads(resp.read().decode())
 
 def oauth_exchange_profile(provider: str, code: str, request: Request) -> dict:

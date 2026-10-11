@@ -1,3 +1,103 @@
+## r207 — Accounting and billing transaction finalization (pre-commit)
+
+- Fix shared SQLite connection context to rollback on exceptions, not commit partial changes.
+- Lock historical tariff modifications and persistent-storage sample insertion with BEGIN IMMEDIATE, coordinating with atomic billing closure.
+- Add concurrent storage-versus-closure, rejected tariff revision, and rollback regression tests.
+- Local verification: 195 r207-specific tests passed; Ruff clean; Bandit medium/high clean; pip check clean.
+- Full pytest attempted but did not finish (stalled near 25%); CI, coverage certification, GPU benchmarks and native/hardware validation remain pending.
+
+## Italiano — Chiusura transazioni accounting/billing r207
+
+- Corretto il contesto SQLite: rollback su eccezione, evitando commit parziali.
+- Serializzati aggiornamenti tariffe e campioni di storage persistente con BEGIN IMMEDIATE rispetto alla chiusura atomica.
+- Aggiunti test di regressione per rollback, tariffe rifiutate e concorrenza campionamento/chiusura.
+- Verifiche locali: 195 test r207 superati, Ruff, Bandit medio/alto e pip check superati.
+- Suite completa non conclusa (arresto ~25%); CI, coverage e collaudi hardware/nativi ancora da eseguire.
+
+## 0.3.0-r207 — Recovery and output-cache refinement (uncommitted cumulative)
+
+- Add read-only replay after uncertain remote POST failures; preserve a single idempotency key and prohibit automatic second inference or local fallback.
+- Extend remote result MIME validation to JSON alongside WAV/ZIP and expose JSON decoding to native routing.
+- Add bounded, throttled expiration cleanup of optional cached AI outputs, with tests and bilingual deployment guidance.
+- No version increment; software and hardware certification remain separately gated.
+
+## 0.3.0-r207 — Native per-model remote inference (cumulative update)
+
+- Verified all seven opt-in native AI inference families through their existing execution paths and added dedicated singer-separation regression tests.
+- Preserved separate choices for multi-stage flows; remote failures do not trigger local AI inference.
+
+## 0.3.0-r207 — Native per-model remote inference
+
+- Added persistent opt-in local/remote routing for native Whisper, chords, Demucs, DrumSep, SAM Audio, singer separation and backing-vocal separation.
+- Native project routes now validate ZIP/JSON/WAV AI results and use no implicit local fallback when remote mode is chosen.
+- Added per-worker settings in the native application and dedicated regression coverage.
+- Remaining: end-to-end native/real-model validation and per-job GPU runtime certification.
+
+## 0.3.0-r207 — AI multi-artifact response protocol (uncommitted cumulative)
+
+- Add validated ZIP output bundles for text/transcription and multi-stem AI workers while preserving legacy WAV responses.
+- Add path traversal, symlink, duplicate filename, JSON/WAV and size validation; regression tests.
+- The specialized native routes still require dedicated adapters and remote-mode wiring.
+
+## 0.3.0-r207 — Central AI worker registry and authenticated WAV transport
+
+- Introduced fixed per-model operator-configured worker registry and authenticated, bounded WAV upload for central metered AI jobs. Existing specialized AI routes and non-WAV/multi-stem output are not yet routed through this contract; see AI_UNIFIED_WORKERS.md.
+
+- r207 pre-commit: atomic AI job completion guards against concurrent overwrites; concurrent multi-user billing tests; documented central-worker coverage gaps.
+- r207 (uncommitted cumulative): GPU energy recorded for diagnostics only; billing charges verified GPU seconds, never joules, including when historic energy tariffs are present.
+- r207: Add administrator-managed per-device idle/full-load GPU power calibrations and non-billable, job-scoped energy estimates with explicit exclusivity and lifecycle guards.
+- r207 cumulative: add ACE-Step wizard `--benchmark` GPU capability test (AMD amdgpu_top / NVIDIA nvidia-smi), automatic test CLI generation, per-process DRM and NVIDIA process telemetry, JSON output and optional distro monitor-tool setup. Results are diagnostic, not certified per-job GPU energy billing.
+- r207 GPU instrumentation: detailed job-cgroup-only DRM engine and VRAM/residency snapshots, deduplicated by client; explicitly diagnostic when process lifetime coverage is not assured.
+
+
+- r207 billing hardening: each positively-priced GPU resource must have explicit per-job telemetry; user-supplied job kind cannot bypass GPU checks. An explicit measured zero remains valid. This does not implement a certified GPU meter.
+- r207 cumulative: added optional per-job cgroup-scoped Linux DRM GPU engine diagnostics, without treating sampled counters as certified billing measurements.
+- r207 cumulative: Reject CPU billing periods containing jobs without explicit per-job CPU telemetry when CPU tariffs are active.
+### Uncommitted r207 — GPU telemetry provenance guard
+- Reject GPU usage submitted as CPU/cgroup process measurements; require the dedicated GPU-agent source and an explicit GPU sample.
+- Add regression coverage for GPU metering provenance; physical GPU telemetry remains unavailable without a per-process GPU sensor.
+
+### r207 accounting corrections (uncommitted cumulative update)
+- Exclude failed, unfinished and unmetered AI job usage from monetary summaries.
+- Split persistent storage GiB-hour prices at UTC tariff effective timestamps, including intraday changes.
+- Accept explicit timezone-aware tariff timestamps alongside existing dates.
+- Add billing regression tests; preserve fail-closed GPU accounting policy.
+
+### r207 (uncommitted) — GPU billing safety guard
+- Reject billing GPU-capable jobs with only CPU/cgroup telemetry when GPU or energy rates are active; add regression tests.
+- Do not infer job GPU load from global host GPU counters.
+
+### r207 (uncommitted) — cgroup v2 worker accounting
+- Add opt-in per-job delegated cgroup v2 CPU and disk I/O metering including all job descendants.
+- Join the cgroup before worker exec, reject incomplete process trees, and exclude temporary I/O from storage charges.
+- Keep GPU and energy unbilled without trusted per-job device telemetry; add regression tests.
+
+### r207 (uncommitted) — Billing closure correctness
+- Reject overlapping historical invoices and jobs spanning billing period boundaries.
+- Refuse to invoice persistent storage without bracketing observations or where telemetry gaps exceed 26 hours.
+- Add regression tests for overlapping periods, cross-boundary jobs and absent storage samples.
+- Do not derive GPU charges from host-level utilization.
+
+- r207 (uncommitted): add per-user scheduled UTC weekly/monthly/annual billing closures, immutable-rate protection, unfinished-job guard, CSV usage export, admin schedule controls and systemd billing timer.
+## r207 — AI billing effective-dated tariffs (uncommitted cumulative update)
+- Add `valid_from` and optional open-ended `valid_until` for each resource tariff, reject overlapping periods, and apply rate by job start time.
+- Expose tariff validity through the admin API and web billing table; document invoice snapshot and measurement limitations.
+
+
+AI gateway reverse proxy addition (r207 consolidated): HTTPS /api/ai-gateway endpoint support in native clients, example Kubernetes NGINX/HAProxy ingress and Docker HAProxy proxy, per-user token and usage administration guidance. No raw ACE-Step internet exposure.
+
+## 0.3.0-r207
+- Native ACE-Step local/remote selection with persisted HTTPS URL and private bearer credentials; prevent local auto-start in remote mode.
+- Added native-only connection settings and first-use prompt, plus documentation and regression tests.
+
+## 0.3.0-r207 — Remote ACE-Step HTTPS groundwork
+Remote ACE-Step HTTPS endpoint allowlisting; MTA Linux wizard remote URL; remote AI setup documentation. Native full-AI offloading remains pending.
+
+## 0.3.0-r206 — 2026-10-11
+
+- Fix ACE-Step wizard version selection overwritten by /etc/os-release VERSION; retain existing VERSION= configuration compatibility.
+- Add regression cases for distro VERSION and saved/CLI version precedence.
+
 ## 0.3.0-r205 — CI regression and coverage repairs
 
 - Update ACE-Step wizard documentation test to renamed ACE_STEP_INSTALLATION.md.
@@ -1835,3 +1935,91 @@ All remain experimental isolated prerequisites; production playback, actual VST3
 - r182: add AI worker readiness endpoint, fail-closed status and native stereo pan ramp; retain native_host_ready=false.
 
 - r183: bounded fail-closed AI worker capability handshake and native peak/RMS PCM metering (experimental).
+
+- r207 (uncommitted update): added Linux direct-child process CPU/disk I/O meter and authenticated JSON-plan executor, with persistent job outcomes. Dedicated process-tree/GPU/retained-storage instrumentation and full remote audio upload support remain pending; do not use for final resource billing.
+
+- r207 (uncommitted refinement): Separate transient process disk I/O from
+  billable persistent storage, support per-user persistent directory snapshots
+  and GiB-hour integration, exclude caches, previews and temporary files,
+  and test prevention of transient I/O charges.
+
+- r207 update: automatic per-user persistent-storage sampling, exclude temporary files and unknown long sampling gaps from billed storage.
+
+- r207 cumulative accounting hardening: require delegated cpu/io controllers and recursively empty job cgroups before accepting CPU/I/O metering; reject missing cgroup.events occupancy signals; add regression coverage. GPU billing still requires per-job hardware telemetry validation.
+
+- AI billing: reject period closure for positive persistent-storage tariffs without a configured sampler; preserve strict sample-gap checks.
+
+- r207 cumulative: Added an administrative billing-readiness endpoint and
+  dashboard preflight for cgroup v2, worker, persistent storage and GPU sensor
+  completeness. Paid GPU billing remains blocked until genuine job-specific
+  hardware telemetry is integrated and verified.
+
+- r207 cumulative hardening: allow bounded, validated per-model metadata with
+  authenticated remote WAV submissions, without client-supplied filesystem or
+  executable paths; add regression tests. Universal native endpoint migration
+  remains pending and must not be marked complete.
+
+- r207 (uncommitted, cumulative): Added opt-in concrete server subprocess adapters for Whisper lyrics, chords, Demucs stems, DrumSep ONNX, SAM Audio and configured vocal separation with validated JSON/WAV artifacts. Added an authenticated concurrent multi-user benchmark mode to the ACE-Step wizard; clarified native remote-route acceptance and remaining legacy routing gaps.
+
+### r207 cumulative — remote native transport contract
+- Added HTTPS-only remote AI transport with per-user bearer authentication,
+  bounded WAV uploads and WAV/multi-artifact ZIP responses carrying job IDs.
+- Fail explicitly on remote network errors; never trigger local AI fallback.
+- Added regression tests for authentication transport, disallowed paths,
+  unsupported workers, missing job IDs and offline servers.
+- Historical desktop AI views still need explicit wiring to remote mode.
+
+### r207 cumulative — billing reconciliation audit
+- Added read-only, admin-authenticated reconciliation API that enumerates per-job accounting gaps, unsafe billing-boundary overlaps, invalid/missing metering, and storage sampling coverage without exposing bearer tokens.
+- Added regression tests for cross-user isolation, priced GPU telemetry absence, failed jobs, boundary crossing, and persistent-storage sampling gaps.
+- Hardware GPU attribution, full-system native acceptance and real concurrent load measurements remain outstanding; do not certify production GPU billing from this audit alone.
+
+### r207 — atomic accounting closure follow-up
+- Protect eligibility checks, pricing reads and snapshot insertion inside one SQLite `BEGIN IMMEDIATE` transaction.
+- Reject retroactive job creation and finalization that intersect immutable billed intervals.
+- Add concurrent four-thread billing-closure and late-insertion regression coverage.
+- Refresh legacy test fixtures to honor the authorized worker allowlist and GPU sensor provenance.
+
+### r207 — closed-invoice integrity and concurrent benchmark reconciliation (cumulative)
+- Add read-only admin audit of saved invoice totals, rows, corrupt snapshots and overlapping closed periods, without retrospective repricing.
+- Allow the concurrent benchmark to verify per-user job ownership, completion and measured CPU usage directly against the server-side SQLite ledger, without including access tokens in results.
+- Add parametrized no-local-fallback tests for all seven native remote AI kinds and ledger audit regression tests.
+- Hardware GPU measurement and native OS end-to-end certification remain pending.
+
+### r207 refinement — immutable invoice audit hardening (2026-10-11)
+- Closed-invoice integrity audit now rejects non-integer, negative, boolean, non-finite and string-encoded micro-unit totals and row charges rather than coercing malformed JSON.
+- Validates snapshot period identity against the immutable invoice record; preserves compatibility with legacy snapshots that omit a user ID.
+- Added regression tests for corrupted monetary values and snapshot identity. The r207 test selection passes (157 tests; 4 FastAPI deprecation warnings).
+- Hardware-dependent GPU metering, multi-user GPU/CPU/storage measurement and native OS end-to-end certification remain pending.
+
+- r207 refinement (uncommitted): add dry-run-first, transaction-safe orphaned AI job recovery for server crashes, retaining fail-closed resource accounting and idempotent finalization; add negative and lifecycle tests.
+
+- r207 cumulative refinement: add durable per-user idempotency claims for JSON and WAV AI execution; native remote transport sends a unique request key and supports explicit reuse for operator-driven retries. Duplicates and concurrent submissions never launch a second inference under the same key. Preserve ambiguous claims after crashes rather than silently retrying or charging twice. Add multi-threaded regression tests.
+
+- r207 refinement (uncommitted): add a per-user authenticated request-status API (`GET /api/ai-jobs/request-status/{request_key}`) allowing clients/operators to inspect admitted, completed, and failed idempotent requests after network timeouts without resubmitting inference or exposing request fingerprints. Extend status lifecycle/isolation tests. 172 r207 tests pass; broader CI run was interrupted by execution limits, and Ruff was not installed in this environment. Result artifact replay remains unavailable; hardware/native E2E tests remain outstanding.
+
+### r207 refinement: secure AI result replay and child-process cleanup
+- Add optional per-user AI result retention and owner-authenticated WAV/ZIP recovery endpoint for responses lost after a timeout, without starting or billing a second inference.
+- Verify cached outputs by SHA256 and TTL; require an operator-specified private storage directory.
+- Kill the worker process group after direct-child completion to limit leaked subprocesses.
+- Add result-cache isolation/tampering tests; maintain r207 version and cumulative changes.
+
+- r207 refinement (uncommitted): add conservative AI result cache expiry cleanup,
+  explicit owner-authenticated native result recovery client, and no-local-fallback
+  regression tests; 180 r207 tests pass in the development environment. Hardware
+  GPU and full CI validation are still outstanding.
+- Align the legacy ACE-Step deployment test with the current mandatory HTTPS
+  and bearer-token policy for remote hosts; do not relax runtime validation.
+- Certification status: targeted r207 and ACE-Step deployment checks green;
+  general test suite did not complete within execution budget, so full CI
+  and end-to-end native validation remain unverified.
+
+### 0.3.0-r207 refinement addendum (no revision increment, 2026-10-11)
+- Passed Ruff and configured CI Bandit checks, and added explicit parameterized SQL branches for per-user accounting/billing queries.
+- Fixed native remote transport's advertised JSON result type; preserved HTTPS and no-local-fallback invariants.
+- Added per-user token/event and invoice/tariff filter regressions; focused r207 suite: 186 passed.
+- Full CI/coverage and medium-severity security triage remain open, as do native hardware/GPU validations.
+
+### r207 — Further security refinement (unchanged revision)
+- IT: trasporto HTTPS con blocco downgrade su redirect, loopback come host web predefinito, 6 test di sicurezza aggiuntivi; Bandit con soglia media e Ruff superati. Il problema esterno MoviePy/Pillow nell'ambiente locale resta aperto.
+- EN: HTTPS-only redirect protection, loopback default web bind, six new security tests; medium-threshold Bandit and Ruff checks pass. The unrelated local MoviePy/Pillow environment mismatch remains unresolved.

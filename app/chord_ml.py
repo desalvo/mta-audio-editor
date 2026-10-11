@@ -1,4 +1,5 @@
 from __future__ import annotations
+from app.secure_https import https_urlopen
 
 import importlib.util
 import json
@@ -83,7 +84,7 @@ def _download_zip(url: str, destination: Path) -> None:
     if parsed.scheme != "https" or not parsed.netloc:
         raise ValueError("model downloads require an HTTPS URL")
     req = urllib.request.Request(url, headers={"User-Agent": "MTA-Audio-Editor/0.2"})  # noqa: S310
-    with urllib.request.urlopen(req, timeout=180) as response, destination.open("wb") as out:  # noqa: S310
+    with https_urlopen(req, timeout=180) as response, destination.open("wb") as out:  # noqa: S310
         shutil.copyfileobj(response, out)
 
 

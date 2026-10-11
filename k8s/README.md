@@ -66,3 +66,7 @@ python3 mta-k8s-wizard.py --image-pull-policy Always
 ## Demucs model catalogue and blacklist
 
 The container periodically synchronizes the configured Demucs model catalogue. Managed artifacts are stored under the persistent project volume in `.models/` (Core ML, ONNX and native/server bundles). Configure `MTA_DEMUCS_MODEL_MANIFEST_URL`, `MTA_DEMUCS_MODEL_UPDATE_INTERVAL_SECONDS`, and `MTA_DEMUCS_MODEL_AUTO_UPDATE` as needed. Administrators can force updates or blacklist/unblacklist individual models from **Administration -> Modelli AI**. Blacklisting removes managed server artifacts and hides the model from web/native/mobile catalogues.
+
+## Reverse proxy to an external MTA VM/LXC + ACE-Step (without deploying MTA as a Pod)
+
+See [REMOTE_AI_REVERSE_PROXY.md](../REMOTE_AI_REVERSE_PROXY.md) and `deploy/remote-ai/kubernetes/`. This uses a selectorless Service and EndpointSlice pointing at the VM private IP and **one** of the NGINX or HAProxy ingress manifests. Native ACE-Step URL: `https://mta.example.org:443/api/ai-gateway`, with a per-user token created in MTA `/admin/ai-tokens`. The Ingress must forward this path to MTA, not to ACE-Step. The legacy in-cluster MTA deployment manifests above are separate and should not be applied for the external-VM scenario.

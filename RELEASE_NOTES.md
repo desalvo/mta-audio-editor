@@ -1,3 +1,24 @@
+## r207 — Native remote AI routes
+
+- Added persistent opt-in local/remote routing for native Whisper, chords, Demucs, DrumSep, SAM Audio, singer separation and backing-vocal separation.
+- Native project routes now validate ZIP/JSON/WAV AI results and use no implicit local fallback when remote mode is chosen.
+- Added per-worker settings in the native application and dedicated regression coverage.
+- Remaining: end-to-end native/real-model validation and per-job GPU runtime certification.
+
+- r207 cumulative GPU benchmarking: run `scripts/install_ace_step.sh --benchmark` for automated ACE-Step CLI inference and AMD/NVIDIA telemetry JSON; see `ACE_STEP_INSTALLATION.md`.
+r207: AI resource tariffs now support a UTC start date and optional end date (open-ended active rate). Historical job pricing follows the tariff effective when a job began. CPU/GPU/disk worker metering and automatic recurring billing remain in progress.
+
+
+AI gateway reverse proxy addition (r207 consolidated): HTTPS /api/ai-gateway endpoint support in native clients, example Kubernetes NGINX/HAProxy ingress and Docker HAProxy proxy, per-user token and usage administration guidance. No raw ACE-Step internet exposure.
+
+## 0.3.0-r207 — Remote ACE-Step HTTPS groundwork
+Remote ACE-Step HTTPS endpoint allowlisting; MTA Linux wizard remote URL; remote AI setup documentation. Native full-AI offloading remains pending.
+
+## 0.3.0-r206 — 2026-10-11
+
+- Fix ACE-Step wizard version selection overwritten by /etc/os-release VERSION; retain existing VERSION= configuration compatibility.
+- Add regression cases for distro VERSION and saved/CLI version precedence.
+
 ## 0.3.0-r205 — CI regression and coverage repairs
 
 - Update ACE-Step wizard documentation test to renamed ACE_STEP_INSTALLATION.md.
@@ -1016,3 +1037,12 @@ Added AI worker status endpoint (explicitly not a proof of inference readiness),
 
 ### r183
 AI worker model-capability handshake with short timeout and no inference-readiness claim; native C++ peak/RMS meter. AI audio generation and VST3 realtime activation remain unverified.
+
+r207 additional validation: metered Linux subprocess executions persist CPU time and best-effort disk I/O per AI job for operator-configured workers. GPU, child processes and durable storage cannot yet be reliably attributed; invoicing remains provisional.
+
+- r207 update: automatic per-user persistent-storage sampling, exclude temporary files and unknown long sampling gaps from billed storage.
+
+
+Remote WAV gateway now supports safe per-model request options via `X-MTA-AI-Options`. Existing native AI feature routes are not yet universally migrated.
+
+- r207 cumulative: Optional trusted inference adapters and multi-user authenticated concurrent smoke benchmark; native legacy AI UI routes still require migration/verification.
