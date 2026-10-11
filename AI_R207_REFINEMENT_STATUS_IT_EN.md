@@ -48,3 +48,9 @@ This update retains **0.3.0-r207**, without incrementing the revision.
 - Verifiche locali: 195 test r207 superati, Ruff, Bandit medio/alto e pip check superati.
 - Suite completa non conclusa (arresto ~25%); CI, coverage e collaudi hardware/nativi ancora da eseguire.
 
+
+## CI coverage follow-up / Correzione coverage CI (2026-10-11)
+
+**IT:** il log GitHub indicava 1707 test passati, 4 skipped e coverage 69,28%, inferiore alla soglia obbligatoria del 70%. Aggiunti 29 test di comportamento per gateway autenticato, adattatori AI e API amministrative di billing; corretto un bug `UnboundLocalError` nella separazione cantanti. I nuovi test e Ruff passano localmente; Bandit con parametri CI passa. Il risultato della suite completa e della coverage aggiornata deve ancora essere verificato in GitHub Actions (non abbassare la soglia).
+
+**EN:** GitHub reported 1707 passing tests, four skips and 69.28% overall coverage against the required 70%. Added 29 behavioral tests for authenticated gateway, AI adapters, and billing administration endpoints; fixed singer-separation `UnboundLocalError`. All new targeted tests and Ruff passed locally; Bandit with CI flags passed. Full-suite results and updated aggregate coverage remain pending GitHub Actions verification; do not lower the threshold.

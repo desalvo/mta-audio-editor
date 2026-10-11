@@ -55,7 +55,7 @@ def infer(plan: dict, output: Path) -> None:
         _artifacts(folder, [(p, 'audio/wav') for p in paths]); return
     if kind == 'sam-audio':
         from app.sam_audio_worker import main as _unused  # noqa: F401
-        import subprocess, sys
+        import subprocess
         model = os.environ.get('MTA_AI_SAM_MODEL', '')
         if not model: raise RuntimeError('Operator must configure MTA_AI_SAM_MODEL')
         runner = Path(__file__).with_name('sam_audio_worker.py')
@@ -64,7 +64,7 @@ def infer(plan: dict, output: Path) -> None:
                         '--model', model, '--prompt', str(plan.get('prompt') or 'vocals')], check=True)
         _artifacts(folder, [(target, 'audio/wav')]); return
     if kind == 'demucs':
-        import subprocess, sys
+        import subprocess
         model = str(plan.get('model') or 'htdemucs')
         if not model.replace('_', '').replace('-', '').isalnum() or len(model) > 64:
             raise ValueError('Invalid Demucs model')

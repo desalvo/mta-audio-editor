@@ -1,3 +1,11 @@
+## 0.3.0-r207 — CI coverage refinement (11 October 2026)
+
+- Added behavioral tests for authenticated AI gateway allowlisting, request limits, credential isolation, HTTPS/private upstream validation, response handling and audit on transport failures.
+- Added isolated-model adapter tests for transcription/chords, DrumSep, SAM Audio, Demucs, singers and backing vocals without downloading GPU models, including output path containment and invalid options.
+- Fixed `UnboundLocalError` in `singer-separation`: function-local `sys` imports in other branches hid the module import.
+- Added administrator billing HTTP tests covering authorization, tariffs, reconciliation, invoice/schedule operations, CSV output and diagnostic-only GPU calibration endpoints.
+- Keep CI `--cov-fail-under=70` unchanged. All 29 new focused tests pass locally, along with Ruff and CI Bandit checks. Full-suite aggregate coverage requires CI confirmation; do not claim certification from the focused run alone.
+
 ## r207 — Accounting and billing transaction finalization (pre-commit)
 
 - Fix shared SQLite connection context to rollback on exceptions, not commit partial changes.
