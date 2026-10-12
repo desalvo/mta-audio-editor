@@ -485,3 +485,17 @@ modules; Proxmox LXC requires its host to provide `/dev/kfd` and `/dev/dri`.
 If a different distro is used and the GPU runtime is absent, configure a
 supported ROCm repository explicitly. Installation does not enable any paid GPU
 metering: PID-specific GFX time must be independently validated first.
+
+### ROCm HIP Events: diagnostic validation (0.3.0-r207)
+
+`hipcc -O2 scripts/hip_event_probe.cpp -o /tmp/mta-hip-event-probe && /tmp/mta-hip-event-probe`
+measures the elapsed duration between HIP events for GPU operations on an
+instrumented stream. The dedicated validator `app.ai_hip_event_meter.parse_hip_event_sample`
+accepts only bounded, synchronized, job-identified sample records, and returns
+**diagnostic-only** evidence. It never emits invoiceable `gpu_seconds` or a
+trusted `gpu-agent` metering source. HIP events measure stream elapsed time,
+not exclusive engine busy time; concurrent clients, multi-stream operations,
+PID namespaces in LXC and uninstrumented frameworks remain unverified. The
+Strix Halo Radeon 8060S was observed to report `GFX: 0 ns` under AMD SMI
+while a HIP event benchmark measured a positive elapsed interval. This does
+not establish a billable per-job GPU counter. Keep GPU tariffs disabled.
