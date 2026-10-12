@@ -9,6 +9,7 @@ EnvironmentFile=/etc/mta/mta.env
 ExecStart=/opt/mta/server-venv/bin/python -m app.ai_cgroup_launcher
 Restart=on-failure
 RestartSec=5
+Delegate=cpu io
 NoNewPrivileges=true
 ProtectSystem=full
 ReadWritePaths=/var/lib/mta /etc/mta

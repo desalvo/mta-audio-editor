@@ -2,5 +2,5 @@
 set -eu
 # Upgrade keeps services and persistent data; removal stops package-owned services.
 if [ "$1" = remove ]; then
-  systemctl stop mta-server.service mta-billing-scheduler.service 2>/dev/null || :
+  systemctl stop mta-server.service mta-billing-scheduler.timer mta-billing-scheduler.service 2>/dev/null || :
 fi

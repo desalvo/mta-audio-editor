@@ -50,3 +50,10 @@ The Rocky CI job needs live GitHub Actions verification before it can be declare
 7. Review third-party licenses, required codecs, package availability on Rocky 9, SBOM, vulnerability scanning and supported-OS contracts. No unreviewed third-party repository should be configured automatically in production.
 
 Improvements in this iteration: RPM release validation now runs under Python 3.12 rather than the potentially different default `python3`; DEB release packages carry a bounded Python 3.12/3.13 dependency range; the promoted venv is revalidated after being moved before deleting rollback; Debian postinst detects both legacy Git and wizard markers.
+
+## Completion gate additions (r208, pending next CI)
+- Native server matrix includes Ubuntu 24.04/Python 3.12 build and DEB install/reinstall, alongside Debian 13.
+- Rocky Linux 9 matrix attempts actual DNF install/reinstall with EPEL `ffmpeg-free` providing `/usr/bin/ffmpeg`; this **must pass in remote CI** before claiming RPM availability. RPM dependency is on the FFmpeg executable.
+- Server installation scripts also import application entrypoints after install and reinstall.
+- Repository tooling has an additional disposable CI job generating an ephemeral GPG key, signing an APT fixture, and verifying it with apt. It does **not** sign/publish actual production releases.
+- Real systemd startup/health under PID 1, interrupted package-manager transaction rollback, RPM repository signature end-to-end, native legacy migration and production private-key provisioning remain unverified; do not label a release production-certified until these are tested and evidenced.

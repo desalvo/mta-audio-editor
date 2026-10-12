@@ -18,6 +18,10 @@ if [ ! -f /etc/mta/mta.env ]; then
 fi
 chmod 600 /etc/mta/mta.env
 python3 "$APP/install_runtime.py" --python python3 --app "$APP" --wheels /usr/share/mta-audio-editor-server/wheelhouse --venv "$VENV"
-systemctl daemon-reload || :
-systemctl try-restart mta-server.service || :
-systemctl try-restart mta-billing-scheduler.service || :
+if command -v systemctl >/dev/null 2>&1; then
+  systemctl daemon-reload || :
+  systemctl enable mta-server.service mta-billing-scheduler.timer || :
+  systemctl try-restart mta-server.service || :
+  systemctl start mta-server.service || :
+  systemctl start mta-billing-scheduler.timer || :
+fi

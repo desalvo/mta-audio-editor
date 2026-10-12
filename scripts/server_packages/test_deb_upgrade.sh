@@ -11,6 +11,8 @@ apt-get install -y "$MTA_SERVER_DEB"
 dpkg-query -W -f='${Status}\n' mta-audio-editor-server | grep -qx 'install ok installed'
 test -x /opt/mta/server-venv/bin/python
 /opt/mta/server-venv/bin/python -m pip check
+(cd /usr/lib/mta-audio-editor-server && /opt/mta/server-venv/bin/python -c 'import app.ai_cgroup_launcher, app.main')
+/opt/mta/server-venv/bin/python scripts/server_packages/http_smoke.py
 mkdir -p /var/lib/mta/projects
 printf '%s\n' 'persistent-project-fixture' > /var/lib/mta/projects/.native-upgrade-fixture
 cp /etc/mta/mta.env /tmp/mta-env-before-upgrade
@@ -18,4 +20,6 @@ apt-get install -y --reinstall "$MTA_SERVER_DEB"
 test "$(cat /var/lib/mta/projects/.native-upgrade-fixture)" = 'persistent-project-fixture'
 cmp /etc/mta/mta.env /tmp/mta-env-before-upgrade
 /opt/mta/server-venv/bin/python -m pip check
+(cd /usr/lib/mta-audio-editor-server && /opt/mta/server-venv/bin/python -c 'import app.ai_cgroup_launcher, app.main')
+/opt/mta/server-venv/bin/python scripts/server_packages/http_smoke.py
 echo 'DEB install/reinstall/state-preservation: OK'

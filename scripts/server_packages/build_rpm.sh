@@ -18,7 +18,7 @@ work=$(mktemp -d); trap 'rm -rf "$work"' EXIT
 mkdir -p "$work"/{SOURCES,SPECS,BUILD,RPMS,SRPMS}
 cp -a "$root/application" "$work/SOURCES/application"
 cp -a "$root/wheelhouse" "$work/SOURCES/wheelhouse"
-cp "$(dirname "$0")"/*.service "$work/SOURCES/"
+cp "$(dirname "$0")"/*.service "$(dirname "$0")"/*.timer "$work/SOURCES/"
 cp "$(dirname "$0")/postinst" "$work/SOURCES/"
 cp "$(dirname "$0")/install_runtime.py" "$work/SOURCES/"
 cat > "$work/SPECS/mta-server.spec" <<'SPEC'
@@ -28,7 +28,7 @@ Release: %{getenv:MTA_RPM_RELEASE}%{?dist}
 Summary: MTA Audio Editor web server and offline runtime dependencies
 License: MIT
 BuildArch: %{_arch}
-Requires: python3.12, python3.12-pip, ffmpeg, ca-certificates
+Requires: python3.12, python3.12-pip, /usr/bin/ffmpeg, ca-certificates
 AutoReqProv: no
 %description
 MTA Audio Editor web server, distinct from the desktop and Proxmox agent.
@@ -37,7 +37,7 @@ mkdir -p %{buildroot}/usr/lib/mta-audio-editor-server %{buildroot}/usr/share/mta
 cp -a %{_sourcedir}/application/. %{buildroot}/usr/lib/mta-audio-editor-server/
 cp %{_sourcedir}/install_runtime.py %{buildroot}/usr/lib/mta-audio-editor-server/install_runtime.py
 cp -a %{_sourcedir}/wheelhouse/. %{buildroot}/usr/share/mta-audio-editor-server/wheelhouse/
-cp %{_sourcedir}/*.service %{buildroot}/usr/lib/systemd/system/
+cp %{_sourcedir}/*.service %{_sourcedir}/*.timer %{buildroot}/usr/lib/systemd/system/
 %pre
 if [ -e /opt/mta/application/.git ] || [ -f /opt/mta/application/.mta-wizard-managed ]; then
   echo 'MTA legacy installation detected. Use explicit migration before installing native RPM.' >&2
@@ -58,15 +58,19 @@ if [ "$1" -ge 1 ]; then
   chmod 600 /etc/mta/mta.env
   /usr/bin/python3.12 /usr/lib/mta-audio-editor-server/install_runtime.py --python /usr/bin/python3.12
   systemctl daemon-reload || :
+  systemctl enable mta-server.service mta-billing-scheduler.timer || :
   systemctl try-restart mta-server.service || :
+  systemctl start mta-server.service || :
+  systemctl start mta-billing-scheduler.timer || :
 fi
 %preun
-if [ "$1" -eq 0 ]; then systemctl stop mta-server.service mta-billing-scheduler.service 2>/dev/null || :; fi
+if [ "$1" -eq 0 ]; then systemctl stop mta-server.service mta-billing-scheduler.timer mta-billing-scheduler.service 2>/dev/null || :; fi
 %files
 /usr/lib/mta-audio-editor-server
 /usr/share/mta-audio-editor-server/wheelhouse
 /usr/lib/systemd/system/mta-server.service
 /usr/lib/systemd/system/mta-billing-scheduler.service
+/usr/lib/systemd/system/mta-billing-scheduler.timer
 SPEC
 export MTA_RPM_VERSION MTA_RPM_RELEASE
 rpmbuild --define "_topdir $work" -bb "$work/SPECS/mta-server.spec"

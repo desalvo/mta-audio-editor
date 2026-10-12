@@ -1,0 +1,10 @@
+[Unit]
+Description=Run MTA AI billing closure periodically
+
+[Timer]
+OnCalendar=hourly
+Persistent=true
+Unit=mta-billing-scheduler.service
+
+[Install]
+WantedBy=timers.target

@@ -35,6 +35,7 @@ cp -a "$stage/wheelhouse/." "$root/usr/share/mta-audio-editor-server/wheelhouse/
 cp "$(dirname "$0")/install_runtime.py" "$root/usr/lib/mta-audio-editor-server/install_runtime.py"
 cp "$(dirname "$0")/mta-server.service" "$root/usr/lib/systemd/system/mta-server.service"
 cp "$(dirname "$0")/mta-billing-scheduler.service" "$root/usr/lib/systemd/system/mta-billing-scheduler.service"
+cp "$(dirname "$0")/mta-billing-scheduler.timer" "$root/usr/lib/systemd/system/mta-billing-scheduler.timer"
 cat > "$root/DEBIAN/control" <<EOF
 Package: mta-audio-editor-server
 Version: $MTA_SERVER_VERSION

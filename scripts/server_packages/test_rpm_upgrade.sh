@@ -12,6 +12,8 @@ dnf -y install "$MTA_SERVER_RPM"
 rpm -q mta-audio-editor-server
 [[ -x /opt/mta/server-venv/bin/python ]]
 /opt/mta/server-venv/bin/python -m pip check
+(cd /usr/lib/mta-audio-editor-server && /opt/mta/server-venv/bin/python -c 'import app.ai_cgroup_launcher, app.main')
+/opt/mta/server-venv/bin/python scripts/server_packages/http_smoke.py
 mkdir -p /var/lib/mta/projects
 printf '%s\n' persistent-rpm-project-fixture > /var/lib/mta/projects/.native-rpm-upgrade-fixture
 cp -p /etc/mta/mta.env /tmp/mta-rpm-env-before-upgrade
@@ -19,4 +21,6 @@ dnf -y reinstall "$MTA_SERVER_RPM"
 [[ $(cat /var/lib/mta/projects/.native-rpm-upgrade-fixture) == persistent-rpm-project-fixture ]]
 cmp /etc/mta/mta.env /tmp/mta-rpm-env-before-upgrade
 /opt/mta/server-venv/bin/python -m pip check
+(cd /usr/lib/mta-audio-editor-server && /opt/mta/server-venv/bin/python -c 'import app.ai_cgroup_launcher, app.main')
+/opt/mta/server-venv/bin/python scripts/server_packages/http_smoke.py
 printf '%s\n' 'RPM install/reinstall/state-preservation: OK'
