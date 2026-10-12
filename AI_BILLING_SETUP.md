@@ -936,3 +936,21 @@ replication jobs are not changed. If a node is unprepared, don't opt in.
 The client degrades to agentless telemetry only when the guest can still start;
 Proxmox may refuse to start a container with a missing mount source. Validate
 shutdown/start and migration separately during the maintenance window.
+
+### Proxmox LXC `/run` tmpfs override (agent 0.3.0-208.9)
+
+CentOS/Rocky-based LXC guests can remount `/run` on boot. A host bind mounted at
+`/run/mta-gpu-agent` inside the guest then becomes invisible. New mounts target
+`/opt/mta-gpu-agent-host` in the guest, while the host path remains
+`/run/mta-gpu-agent`. The optional client auto-discovers the `/opt` path first,
+then the legacy `/run` path, and loads the token from the same directory as the
+selected socket. Explicit overrides: `MTA_AI_GPU_HOST_AGENT_SOCKET` and
+`MTA_AI_GPU_HOST_AGENT_TOKEN_FILE`.
+
+The reconciliation timer flags an existing legacy `/run` mount as
+`manual-review-legacy-run-mount`, and does not change it while the CT is running.
+During an authorized maintenance stop, modify the existing mount with `pct set`
+using `mp=/opt/mta-gpu-agent-host,ro=1,replicate=0,shared=1`. Provision the host
+runtime path on every migration destination. `shared=1` is not file distribution.
+The result remains non-billable telemetry and must not be used for certified GPU
+usage. No container restarts or replication job changes are automated.

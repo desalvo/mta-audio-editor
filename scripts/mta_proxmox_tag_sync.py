@@ -12,7 +12,9 @@ import subprocess
 import shutil
 
 TAG_RE = re.compile(r'^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,62}$')
-ENTRY = 'lxc.mount.entry: /run/mta-gpu-agent run/mta-gpu-agent none bind,create=dir,optional 0 0'
+HOST_DIR = '/run/mta-gpu-agent'
+GUEST_DIR = '/opt/mta-gpu-agent-host'
+ENTRY = 'lxc.mount.entry: /run/mta-gpu-agent opt/mta-gpu-agent-host none bind,create=dir,optional 0 0'
 
 
 def parse_config(content: str) -> dict:
@@ -39,11 +41,12 @@ def plan(configs: dict[str, str]) -> list[dict]:
         privileged = conf.get('unprivileged', '0') == '0'
         default_uid_map = not any(ln.startswith('lxc.idmap:') for ln in content.splitlines())
         entry_present = ENTRY in content.splitlines()
-        other_mount = any('mp=/run/mta-gpu-agent' in ln for ln in content.splitlines())
+        existing_mount = next((ln for ln in content.splitlines() if re.match(r'^mp\d+:', ln) and ln.split(':', 1)[1].strip().split(',', 1)[0] == HOST_DIR), None)
+        other_mount = existing_mount is not None
         free_mount = next((i for i in range(256) if f'mp{i}' not in conf), None)
         result.append({'ctid': int(ctid), 'privileged': privileged,
-                       'configured': entry_present,
-                       'action': 'none' if (entry_present or other_mount) else ('manual-review' if (not privileged and not default_uid_map) or free_mount is None else 'add-mount'),
+                       'configured': entry_present or (other_mount and f'mp={GUEST_DIR}' in existing_mount),
+                       'action': ('manual-review-legacy-run-mount' if other_mount and f'mp={GUEST_DIR}' not in existing_mount else 'none') if (entry_present or other_mount) else ('manual-review' if (not privileged and not default_uid_map) or free_mount is None else 'add-mount'),
                        'mapped_root_uid': 100000 if not privileged and default_uid_map else None,
                        'mount_id': free_mount if not other_mount and not entry_present and (privileged or default_uid_map) else None,
                        'restart_required': not entry_present and not other_mount and (privileged or default_uid_map)})
@@ -113,7 +116,7 @@ def sync(root: pathlib.Path, *, apply=False, allow_shared_mount=False) -> list[d
                 continue
             try:
                 subprocess.run(['pct', 'set', str(rec['ctid']), f'-mp{rec["mount_id"]}',
-                                '/run/mta-gpu-agent,mp=/run/mta-gpu-agent,ro=1,replicate=0,shared=1'],
+                                f'{HOST_DIR},mp={GUEST_DIR},ro=1,replicate=0,shared=1'],
                                check=True, timeout=15, capture_output=True, text=True)
             except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
                 rec['action'] = 'manual-review-pct-failed'

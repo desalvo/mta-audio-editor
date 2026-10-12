@@ -56,13 +56,14 @@ def audit():
             continue
         parsed = parse_config(cfg)
         mounts = [val for key, val in parsed.items() if re.fullmatch(r'mp\d+', key)
-                  and 'mp=/run/mta-gpu-agent' in val]
+                  and val.split(',', 1)[0] == '/run/mta-gpu-agent']
         mount_ok = any('replicate=0' in v and 'shared=1' in v and 'ro=1' in v for v in mounts)
         status = command(['pct', 'status', path.stem])
         results['containers'].append({'ctid': int(path.stem),
                                       'running': status['output'] == 'status: running',
                                       'mount_configured': bool(mounts),
                                       'mount_replication_safe_flags': mount_ok,
+                                      'mount_destination_safe': any('mp=/opt/mta-gpu-agent-host' in v for v in mounts),
                                       'mount_requires_review': bool(mounts) and not mount_ok,
                                       'replication_jobs': [],
                                       'note': 'Mount cannot be verified inside a running LXC from this audit'})

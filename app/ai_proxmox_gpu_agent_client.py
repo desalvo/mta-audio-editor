@@ -14,13 +14,13 @@ def snapshot(*, socket_path: str | None = None, token: str | None = None) -> dic
     path = socket_path if socket_path is not None else os.getenv('MTA_AI_GPU_HOST_AGENT_SOCKET', '')
     token = token if token is not None else os.getenv('MTA_AI_GPU_HOST_AGENT_TOKEN', '')
     if not path:
-        candidate = '/run/mta-gpu-agent/agent.sock'
-        path = candidate if os.path.exists(candidate) else ''
+        candidates = ('/opt/mta-gpu-agent-host/agent.sock', '/run/mta-gpu-agent/agent.sock')
+        path = next((candidate for candidate in candidates if os.path.exists(candidate)), '')
     if not path:
         return {'available': False, 'reason': 'not-configured', 'billing_eligible': False}
     if not token:
         try:
-            token = open('/run/mta-gpu-agent/token', encoding='utf-8').read().strip()
+            token = open(os.getenv('MTA_AI_GPU_HOST_AGENT_TOKEN_FILE') or os.path.join(os.path.dirname(path), 'token'), encoding='utf-8').read().strip()
         except OSError:
             pass
     if not token or len(token) < 24:

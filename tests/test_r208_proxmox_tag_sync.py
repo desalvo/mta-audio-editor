@@ -21,7 +21,7 @@ def test_safe_planning():
 
 def test_existing_mount_idempotent():
     rows = plan({'200': 'tags: mta-audio-editor;mta-gpu-agent\nmp0: /run/mta-gpu-agent,mp=/run/mta-gpu-agent,ro=1\n'})
-    assert rows[0]['action'] == 'none'
+    assert rows[0]['action'] == 'manual-review-legacy-run-mount'
 
 
 def test_custom_idmap_is_manual_review():
@@ -52,7 +52,7 @@ def test_stopped_guest_mount_excludes_replication(tmp_path, monkeypatch):
     monkeypatch.setattr(mod.subprocess, 'run', lambda argv, **kwargs: commands.append(argv))
     rows = mod.sync(tmp_path, apply=True, allow_shared_mount=True)
     assert rows[0]['action'] == 'configured-pending-restart'
-    assert commands == [['pct', 'set', '133', '-mp0', '/run/mta-gpu-agent,mp=/run/mta-gpu-agent,ro=1,replicate=0,shared=1']]
+    assert commands == [['pct', 'set', '133', '-mp0', '/run/mta-gpu-agent,mp=/opt/mta-gpu-agent-host,ro=1,replicate=0,shared=1']]
 
 
 def test_stopped_guest_requires_explicit_shared_path_attestation(tmp_path, monkeypatch):
@@ -64,3 +64,9 @@ def test_stopped_guest_requires_explicit_shared_path_attestation(tmp_path, monke
     rows = mod.sync(tmp_path, apply=True)
     assert rows[0]['action'] == 'ready-needs-shared-mount-approval'
     assert all(x[:2] != ['pct', 'set'] for x in commands)
+
+
+def test_new_destination_idempotent():
+    rows = plan({'204': 'tags: mta-audio-editor;mta-gpu-agent\nmp0: /run/mta-gpu-agent,mp=/opt/mta-gpu-agent-host,ro=1,replicate=0,shared=1\n'})
+    assert rows[0]['configured'] is True
+    assert rows[0]['action'] == 'none'
