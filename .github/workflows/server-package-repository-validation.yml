@@ -4,11 +4,15 @@ on:
     branches: [main]
     paths:
       - 'scripts/repositories/**'
+      - 'scripts/server_packages/**'
+      - 'tests/test_server_native*208.py'
       - 'docs/PACKAGE_REPOSITORIES.md'
       - '.github/workflows/server-package-repository-validation.yml'
   pull_request:
     paths:
       - 'scripts/repositories/**'
+      - 'scripts/server_packages/**'
+      - 'tests/test_server_native*208.py'
       - 'docs/PACKAGE_REPOSITORIES.md'
       - '.github/workflows/server-package-repository-validation.yml'
   workflow_dispatch:

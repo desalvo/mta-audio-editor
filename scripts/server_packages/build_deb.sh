@@ -6,15 +6,26 @@ set -Eeuo pipefail
 : "${MTA_SERVER_OUTPUT:?Output directory required}"
 [[ $MTA_SERVER_VERSION =~ ^[0-9][a-zA-Z0-9.+:~_-]*$ ]] || exit 2
 for cmd in dpkg-deb find; do command -v "$cmd" >/dev/null || exit 2; done
-python3 "$(dirname "$0")/validate_stage.py" "$MTA_SERVER_STAGE"
+"${MTA_SERVER_PYTHON:-python3}" "$(dirname "$0")/validate_stage.py" "$MTA_SERVER_STAGE"
 if [[ ${MTA_SERVER_RELEASE_READY:-0} == 1 ]]; then
-  python3 "$(dirname "$0")/verify_offline_runtime.py" "$MTA_SERVER_STAGE" --check-proof
+  "${MTA_SERVER_PYTHON:-python3}" "$(dirname "$0")/verify_offline_runtime.py" "$MTA_SERVER_STAGE" --check-proof
 fi
 stage=$(realpath "$MTA_SERVER_STAGE"); out=$(realpath -m "$MTA_SERVER_OUTPUT")
 [[ -f "$stage/application/app/main.py" && -f "$stage/application/app/ai_cgroup_launcher.py" && -f "$stage/application/requirements.txt" ]] || { echo 'Incomplete server application staging' >&2; exit 3; }
 [[ -d "$stage/wheelhouse" && -n $(find "$stage/wheelhouse" -name '*.whl' -print -quit) ]] || { echo 'Offline wheelhouse is required; refusing network install at deployment' >&2; exit 3; }
 [[ ! -e "$stage/application/.git" ]] || { echo 'Git metadata forbidden in server package' >&2; exit 3; }
 arch=${MTA_DEB_ARCH:-$(dpkg --print-architecture)}
+# Distribution-specific Python ABI: never deploy a cp313 wheelhouse into cp312.
+if [[ ${MTA_SERVER_RELEASE_READY:-0} == 1 ]]; then
+  pyminor=$("${MTA_SERVER_PYTHON:-python3}" -c 'import sys;print(".".join(map(str,sys.version_info[:2])))')
+  case "$pyminor" in
+    3.12) py_deps='python3 (>= 3.12), python3 (<< 3.13), python3-venv' ;;
+    3.13) py_deps='python3 (>= 3.13), python3 (<< 3.14), python3-venv' ;;
+    *) echo "Unsupported Debian server Python $pyminor" >&2; exit 3 ;;
+  esac
+else
+  py_deps='python3 (>= 3.12), python3-venv'
+fi
 [[ $arch == amd64 || $arch == arm64 ]] || { echo 'Unsupported architecture' >&2; exit 3; }
 work=$(mktemp -d); trap 'rm -rf "$work"' EXIT
 root="$work/root"
@@ -31,7 +42,7 @@ Section: sound
 Priority: optional
 Architecture: $arch
 Maintainer: MTA Audio Editor maintainers
-Depends: python3 (>= 3.12), python3-venv, ffmpeg, ca-certificates
+Depends: $py_deps, ffmpeg, ca-certificates
 Description: MTA Audio Editor web server with offline Python dependencies
  Server application; distinct from the desktop editor and Proxmox GPU agent.
 EOF

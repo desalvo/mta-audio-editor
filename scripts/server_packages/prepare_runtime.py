@@ -32,8 +32,6 @@ def prepare(source: Path, stage: Path, requirements: Path):
     # Only the application and locked runtime requirements belong to the server.
     shutil.copytree(source / 'app', app / 'app', ignore=shutil.ignore_patterns('__pycache__', '*.pyc', '.git'), symlinks=False)
     shutil.copy2(requirements, app / 'requirements.txt')
-    run([sys.executable, '-m', 'pip', 'download', '--only-binary=:all:', '--no-deps', '--no-cache-dir',
-         '--dest', str(wheels), '-r', str(app / 'requirements.txt')]) if False else None
     # Download the full transitive closure. No sdists, no editable/VCS builds.
     run([sys.executable, '-m', 'pip', 'download', '--only-binary=:all:', '--no-cache-dir',
          '--dest', str(wheels), '-r', str(app / 'requirements.txt')])

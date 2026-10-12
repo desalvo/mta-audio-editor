@@ -28,3 +28,25 @@ The Rocky CI job needs live GitHub Actions verification before it can be declare
 - The test refuses to run without the explicit disposable-container CI guard.
 - It is **not yet validated in GitHub Actions**. RPM DNF transaction, rollback, legacy migration, signing keys, repository deployment and external release validation remain outstanding.
 - Public repository publishing remains disabled and must not be described as production-ready.
+
+## CI improvements after successful Quality and repository tooling runs (2026-10-12)
+
+* Native server runtime matrix now runs on pushes to `main` when packaging, application, requirement or relevant test paths change, in addition to pull requests/manual triggers.
+* Repository tooling validation also tracks `scripts/server_packages/**` and packaging regression tests; changing unrelated Proxmox tests does not trigger it.
+* RPM integration test `scripts/server_packages/test_rpm_upgrade.sh` verifies `dnf install`, `dnf reinstall`, preserved `/etc/mta/mta.env` and project fixture, and `pip check`. It **must** be run only with `MTA_CI_DISPOSABLE_CONTAINER=1` in a disposable isolated image with trusted FFmpeg repository configured; current Rocky 9 CI runs a guard test, not the full DNF install.
+* RPM `%post` creates the administrator credential file under a restrictive umask and rejects wizard marker files.
+* APT install/reinstall CI is already present. Neither package publication nor automatic migration of the production CT is enabled.
+
+## Production gate review (2026-10-12, r208; no commit/push)
+
+**NOT CERTIFIED FOR PRODUCTION.** The following are mandatory external sign-offs:
+
+1. GitHub Actions must pass on the exact release commit for Debian 13 native runtime/DEB install and Rocky 9 runtime/RPM build. No successful new run is asserted here.
+2. A disposable Rocky 9 runtime must execute *actual* DNF install/reinstall with trusted FFmpeg packages and check systemd service lifecycle and saved state. The existing Rocky CI verifies only RPM payload and the destructive-test guard.
+3. Ubuntu 24.04 Python 3.12 must build its own ABI-matched wheelhouse/DEB and perform APT lifecycle tests. Debian 12's default Python 3.11 does not meet requirements and is not supported by a generic DEB.
+4. Confirm service start, HTTP health, admin bootstrap, secrets permissions, scheduler, data persistence, upgrade and downgrade/rollback on separate clean test hosts.
+5. Create and secure the release GPG identity; sign RPMs and both repository metadata sets using an isolated, protected publisher; verify signature and provenance from a separate client before any publication.
+6. Approve migration of the existing wizard/Git deployment separately with verified backups and recovery rehearsal. Current native installation refuses to overwrite such deployments. Do not migrate CT 130 yet.
+7. Review third-party licenses, required codecs, package availability on Rocky 9, SBOM, vulnerability scanning and supported-OS contracts. No unreviewed third-party repository should be configured automatically in production.
+
+Improvements in this iteration: RPM release validation now runs under Python 3.12 rather than the potentially different default `python3`; DEB release packages carry a bounded Python 3.12/3.13 dependency range; the promoted venv is revalidated after being moved before deleting rollback; Debian postinst detects both legacy Git and wizard markers.

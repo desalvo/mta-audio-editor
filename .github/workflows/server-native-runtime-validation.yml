@@ -1,13 +1,20 @@
 name: Native server offline runtime matrix
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'requirements.txt'
+      - 'app/**'
+      - 'scripts/server_packages/**'
+      - 'tests/test_server_native*208.py'
+      - '.github/workflows/server-native-runtime-validation.yml'
   workflow_dispatch:
   pull_request:
     paths:
       - 'requirements.txt'
       - 'app/**'
       - 'scripts/server_packages/**'
-      - 'tests/test_server_native_payload_smoke_208.py'
-      - 'scripts/server_packages/test_deb_upgrade.sh'
+      - 'tests/test_server_native*208.py'
       - '.github/workflows/server-native-runtime-validation.yml'
 permissions:
   contents: read
@@ -79,13 +86,21 @@ jobs:
       - name: Build RPM and test extracted payload offline
         run: |
           set -euo pipefail
-          MTA_SERVER_STAGE=/tmp/mta-server-stage MTA_RPM_VERSION=0.3.0 MTA_RPM_RELEASE=0.208.early MTA_SERVER_OUTPUT=/tmp/mta-rpm-out MTA_SERVER_RELEASE_READY=1 bash scripts/server_packages/build_rpm.sh
+          MTA_SERVER_PYTHON=python3.12 MTA_SERVER_STAGE=/tmp/mta-server-stage MTA_RPM_VERSION=0.3.0 MTA_RPM_RELEASE=0.208.early MTA_SERVER_OUTPUT=/tmp/mta-rpm-out MTA_SERVER_RELEASE_READY=1 bash scripts/server_packages/build_rpm.sh
           rpm -qp --qf '%{NAME}\n' /tmp/mta-rpm-out/*.rpm | grep -qx mta-audio-editor-server
           mkdir -p /tmp/mta-rpm-root
           cd /tmp/mta-rpm-root
           rpm2cpio /tmp/mta-rpm-out/*.rpm | cpio -idm --quiet
           cd "$GITHUB_WORKSPACE"
           python3.12 scripts/server_packages/smoke_offline_payload.py --root /tmp/mta-rpm-root
+      - name: Validate guarded RPM install test
+        run: |
+          set -euo pipefail
+          bash -n scripts/server_packages/test_rpm_upgrade.sh
+          if MTA_SERVER_RPM=/tmp/mta-rpm-out/test.rpm bash scripts/server_packages/test_rpm_upgrade.sh; then
+            echo 'ERROR: destructive RPM test escaped its disposable-container guard' >&2
+            exit 1
+          fi
       - name: Upload unreleased RPM for inspection
         uses: actions/upload-artifact@v4
         with:

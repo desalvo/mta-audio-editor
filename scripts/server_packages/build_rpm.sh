@@ -7,9 +7,9 @@ set -Eeuo pipefail
 : "${MTA_SERVER_OUTPUT:?Provide output directory}"
 [[ $MTA_RPM_VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ && $MTA_RPM_RELEASE =~ ^[0-9][a-zA-Z0-9._]*$ ]] || exit 2
 command -v rpmbuild >/dev/null || { echo 'rpmbuild is required on an RPM build runner' >&2; exit 2; }
-python3 "$(dirname "$0")/validate_stage.py" "$MTA_SERVER_STAGE"
+"${MTA_SERVER_PYTHON:-python3.12}" "$(dirname "$0")/validate_stage.py" "$MTA_SERVER_STAGE"
 if [[ ${MTA_SERVER_RELEASE_READY:-0} == 1 ]]; then
-  python3 "$(dirname "$0")/verify_offline_runtime.py" "$MTA_SERVER_STAGE" --check-proof
+  "${MTA_SERVER_PYTHON:-python3.12}" "$(dirname "$0")/verify_offline_runtime.py" "$MTA_SERVER_STAGE" --check-proof
 fi
 root=$(realpath "$MTA_SERVER_STAGE"); out=$(realpath -m "$MTA_SERVER_OUTPUT")
 [[ -f "$root/application/app/main.py" && -f "$root/application/app/ai_cgroup_launcher.py" && -f "$root/application/requirements.txt" ]] || exit 3
@@ -45,7 +45,8 @@ if [ -e /opt/mta/application/.git ] || [ -f /opt/mta/application/.mta-wizard-man
 fi
 %post
 if [ "$1" -ge 1 ]; then
-  if [ -d /opt/mta/application/.git ]; then
+  umask 077
+  if [ -e /opt/mta/application/.git ] || [ -f /opt/mta/application/.mta-wizard-managed ]; then
     echo 'Legacy git-managed MTA detected; migrate explicitly before native installation' >&2
     exit 1
   fi

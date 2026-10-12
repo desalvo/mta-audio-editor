@@ -47,6 +47,10 @@ def install_runtime(python: str, app: Path, wheels: Path, venv: Path) -> None:
                 old = os.fsencode(str(stage))
                 if raw.startswith(b'#!') and old in raw.split(b'\n', 1)[0]:
                     script.write_bytes(raw.replace(old, os.fsencode(str(venv))))
+        # Validate after promotion as well: venvs contain absolute paths.
+        promoted_python = str(venv / 'bin' / 'python')
+        subprocess.run([promoted_python, '-m', 'pip', 'check'], check=True)
+        subprocess.run([promoted_python, '-c', 'import app.ai_cgroup_launcher, app.main'], cwd=app, check=True)
         if moved_old:
             shutil.rmtree(backup)
     except BaseException:
