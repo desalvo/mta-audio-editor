@@ -43,9 +43,15 @@ jobs:
             echo 'ERROR: desktop package published as server package' >&2
             exit 1
           fi
+      - name: Set up Python and packaging test dependencies
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+      - name: Install packaging test dependencies
+        run: python -m pip install 'pytest>=9,<10'
       - name: Validate native server package staging and packaging tools
         run: |
-          python3 -m pytest -q tests/test_server_native_packaging_208.py
+          python -m pytest -q tests/test_server_native_packaging_208.py
           python3 -m py_compile scripts/server_packages/validate_stage.py scripts/server_packages/wheelhouse_lock.py scripts/server_packages/verify_offline_runtime.py
           bash -n scripts/server_packages/build_deb.sh scripts/server_packages/build_rpm.sh scripts/server_packages/postinst scripts/server_packages/prerm
       - name: Smoke-build offline server Debian package (fixture only)

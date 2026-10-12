@@ -1,7 +1,6 @@
 """Regression tests for offline native runtime transitions."""
 import importlib.util
 from pathlib import Path
-import subprocess
 import sys
 
 SCRIPT = Path(__file__).resolve().parents[1] / 'scripts/server_packages/install_runtime.py'
