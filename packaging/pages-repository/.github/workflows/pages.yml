@@ -1,0 +1,39 @@
+name: Deploy MTA package repositories to GitHub Pages
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'manifests/**'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: mta-pages-deployment
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install fetch tools
+        run: sudo apt-get update && sudo apt-get install -y gh jq
+      - name: Assemble signed channel artifacts
+        env:
+          GH_TOKEN: ${{ secrets.MTA_SOURCE_ARTIFACT_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "$GH_TOKEN" || { echo 'Set MTA_SOURCE_ARTIFACT_TOKEN (source repo Actions:read)' >&2; exit 2; }
+          python3 scripts/assemble_pages.py --manifests manifests --output "$RUNNER_TEMP/site"
+          du -sh "$RUNNER_TEMP/site"
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: ${{ runner.temp }}/site
+      - id: deployment
+        uses: actions/deploy-pages@v4

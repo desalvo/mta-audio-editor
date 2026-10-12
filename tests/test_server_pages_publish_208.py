@@ -29,4 +29,7 @@ def test_workflow_is_manual_and_approval_gated():
     assert 'MTA_PAGES_DEPLOY_KEY' in wf
     assert 'MTA_GPG_PRIVATE_KEY' in wf
     assert 'MTA_GPG_PASSPHRASE' in wf
-    assert 'rsync -a --delete' in wf
+    assert 'actions/upload-artifact@v4' in wf
+    assert 'signed-mta-pages-${{ inputs.channel }}' in wf
+    assert 'manifests' in wf
+    assert '100-MiB' not in wf
