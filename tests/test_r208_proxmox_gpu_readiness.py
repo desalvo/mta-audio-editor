@@ -31,3 +31,17 @@ def test_readiness_flags_mount_missing_flags(tmp_path, monkeypatch):
     monkeypatch.setattr(module, 'command', lambda *a, **kw: {'ok': True, 'output': '', 'error': ''})
     row = module.audit()['containers'][0]
     assert row['mount_requires_review'] and not row['mount_replication_safe_flags']
+
+
+def test_readiness_installed_layout(tmp_path, monkeypatch):
+    """Reproduce the .deb layout where tag_sync.py is beside readiness.py."""
+    import shutil, subprocess, sys
+    installed = tmp_path / 'usr' / 'lib' / 'mta-proxmox-gpu-agent'
+    installed.mkdir(parents=True)
+    shutil.copy(module.__file__, installed / 'readiness.py')
+    shutil.copy(module.__file__.replace('mta_proxmox_gpu_readiness.py', 'mta_proxmox_tag_sync.py'), installed / 'tag_sync.py')
+    result = subprocess.run([sys.executable, str(installed / 'readiness.py')],
+                            capture_output=True, text=True, cwd=tmp_path)
+    assert result.returncode == 0, result.stderr
+    import json
+    assert 'containers' in json.loads(result.stdout)

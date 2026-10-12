@@ -6,6 +6,7 @@ this check independently; no host, guest or replication target is hardcoded.
 """
 from __future__ import annotations
 import json
+import importlib.util
 import pathlib
 import re
 import subprocess
@@ -33,10 +34,17 @@ def audit():
     if not CONF.is_dir():
         results['warning'] = 'Local Proxmox LXC config directory unavailable'
         return results
-    try:
-        from mta_proxmox_tag_sync import eligible, parse_config
-    except ModuleNotFoundError:
-        from scripts.mta_proxmox_tag_sync import eligible, parse_config
+    # The Debian package installs tag_sync.py beside readiness.py, whereas
+    # the source checkout calls it mta_proxmox_tag_sync.py. Import by file
+    # location so neither environment depends on PYTHONPATH or cwd.
+    sibling = pathlib.Path(__file__).resolve().with_name('tag_sync.py')
+    source = sibling if sibling.is_file() else pathlib.Path(__file__).resolve().with_name('mta_proxmox_tag_sync.py')
+    spec = importlib.util.spec_from_file_location('mta_proxmox_tag_sync', source)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f'Unable to load tag-sync module: {source}')
+    tag_sync = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(tag_sync)
+    eligible, parse_config = tag_sync.eligible, tag_sync.parse_config
     for path in sorted(CONF.glob('*.conf')):
         if not path.stem.isdecimal():
             continue
