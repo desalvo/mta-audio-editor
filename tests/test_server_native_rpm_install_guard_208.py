@@ -13,7 +13,7 @@ def test_rpm_install_requires_disposable_container():
 
 
 def test_rpm_install_rejects_untrusted_environment():
-    result = subprocess.run(['bash', str(SCRIPT)], env={'PATH': '/usr/bin:/bin', 'MTA_SERVER_RPM': '/tmp/test.rpm'},
+    result = subprocess.run(['bash', str(SCRIPT)], env={'PATH': '/usr/bin:/bin', 'MTA_SERVER_RPM': 'ci-fixture.rpm'},
                             capture_output=True, text=True, check=False)
     assert result.returncode == 2
     assert 'disposable CI container' in result.stderr
