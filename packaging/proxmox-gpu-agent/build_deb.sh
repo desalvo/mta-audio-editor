@@ -2,13 +2,14 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 OUT="${1:-$ROOT/dist}"
-VERSION=0.3.0-208.1
+VERSION=0.3.0-208.4
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 PKG="$TMP/pkg"
 install -d -m 0755 "$PKG/DEBIAN" "$PKG/usr/lib/mta-proxmox-gpu-agent" "$PKG/usr/bin" "$PKG/lib/systemd/system"
 install -m 0755 "$ROOT/scripts/mta_proxmox_gpu_agent.py" "$PKG/usr/lib/mta-proxmox-gpu-agent/agent.py"
 install -m 0755 "$ROOT/scripts/mta_proxmox_tag_sync.py" "$PKG/usr/lib/mta-proxmox-gpu-agent/tag_sync.py"
+install -m 0755 "$ROOT/scripts/mta_proxmox_gpu_preflight.py" "$PKG/usr/lib/mta-proxmox-gpu-agent/preflight.py"
 cat > "$PKG/DEBIAN/control" <<EOF
 Package: mta-proxmox-gpu-agent
 Version: $VERSION
@@ -30,9 +31,15 @@ if [ "$1" = configure ]; then
  fi
  chmod 0600 /etc/mta-gpu-agent/token
  systemctl daemon-reload || true
- systemctl enable --now mta-gpu-agent.service || true
+ systemctl enable mta-gpu-agent.service || true
+ systemctl try-restart mta-gpu-agent.service || true
+ systemctl start mta-gpu-agent.service || true
  systemctl enable --now mta-gpu-agent-tag-sync.timer || true
- systemctl start mta-gpu-agent-tag-sync.service || true
+ if /usr/bin/python3 /usr/lib/mta-proxmox-gpu-agent/preflight.py; then
+  systemctl start mta-gpu-agent-tag-sync.service || true
+ else
+  echo "MTA GPU telemetry unavailable; LXC mounts will not be configured until a supported AMD GPU is available." >&2
+ fi
 fi
 exit 0
 SH2
@@ -53,6 +60,7 @@ After=local-fs.target
 ConditionPathExists=/etc/mta-gpu-agent/token
 [Service]
 Type=simple
+ExecCondition=/usr/bin/python3 /usr/lib/mta-proxmox-gpu-agent/preflight.py
 ExecStartPre=/usr/bin/install -m 0600 /etc/mta-gpu-agent/token /run/mta-gpu-agent/token
 ExecStart=/usr/bin/python3 /usr/lib/mta-proxmox-gpu-agent/agent.py
 EnvironmentFile=-/etc/mta-gpu-agent/agent.env

@@ -54,6 +54,18 @@ def load_local_configs(root: pathlib.Path) -> dict[str, str]:
     return {p.stem: p.read_text() for p in root.glob('*.conf') if p.stem.isdecimal()}
 
 
+def is_running(ctid: int) -> bool:
+    """Consult the local Proxmox runtime state, never a fixed node/CT mapping."""
+    result = subprocess.run(['pct', 'status', str(ctid)], capture_output=True,
+                            text=True, timeout=15, check=True)
+    state = result.stdout.strip().lower()
+    if state == 'status: running':
+        return True
+    if state == 'status: stopped':
+        return False
+    raise ValueError(f'Unexpected pct status for CT {ctid}: {state[:120]}')
+
+
 def sync(root: pathlib.Path, *, apply=False) -> list[dict]:
     planned = plan(load_local_configs(root))
     if apply:
@@ -80,11 +92,27 @@ def sync(root: pathlib.Path, *, apply=False) -> list[dict]:
             original = path.read_text()
             if not eligible(original) or ENTRY in original.splitlines():
                 continue
-            # Proxmox cluster configuration is API-managed. pct set is used rather
-            # than writing directly to /etc/pve, and never starts/stops guests.
-            subprocess.run(['pct', 'set', str(rec['ctid']), f'-mp{rec["mount_id"]}',
-                            '/run/mta-gpu-agent,mp=/run/mta-gpu-agent,ro=1'],
-                           check=True, timeout=15)
+            # `pct set -mpN` hotplugs into running LXCs and may fail even if
+            # replicate=0. Never attempt hotplug, and never edit pmxcfs directly.
+            # The timer can reconcile a stopped CT, or the administrator can run
+            # this command during a planned maintenance stop before starting it.
+            try:
+                if is_running(rec['ctid']):
+                    rec['action'] = 'deferred-until-stopped'
+                    rec['restart_required'] = True
+                    continue
+            except (subprocess.CalledProcessError, subprocess.TimeoutExpired, ValueError) as exc:
+                rec['action'] = 'manual-review-status-failed'
+                rec['error'] = (getattr(exc, 'stderr', '') or str(exc)).strip()[:400]
+                continue
+            try:
+                subprocess.run(['pct', 'set', str(rec['ctid']), f'-mp{rec["mount_id"]}',
+                                '/run/mta-gpu-agent,mp=/run/mta-gpu-agent,ro=1,replicate=0'],
+                               check=True, timeout=15, capture_output=True, text=True)
+            except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
+                rec['action'] = 'manual-review-pct-failed'
+                rec['error'] = (getattr(exc, 'stderr', '') or str(exc)).strip()[:400]
+                continue
             rec['action'] = 'configured-pending-restart'
     return planned
 
@@ -92,7 +120,7 @@ def sync(root: pathlib.Path, *, apply=False) -> list[dict]:
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--config-dir', default='/etc/pve/lxc')
-    p.add_argument('--apply', action='store_true', help='Apply safe privileged LXC changes; never restart')
+    p.add_argument('--apply', action='store_true', help='Apply safe mount configuration only to stopped tagged LXCs; never restart')
     a = p.parse_args()
     print(json.dumps(sync(pathlib.Path(a.config_dir), apply=a.apply), indent=2))
 

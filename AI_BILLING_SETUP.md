@@ -898,3 +898,15 @@ Verify on host with `systemctl status mta-gpu-agent.service` and
 `python3 /usr/lib/mta-proxmox-gpu-agent/tag_sync.py`; verify inside the
 LXC with the application's optional host-agent diagnostic endpoint.
 The agent remains non-billable regardless of its availability.
+
+## Proxmox agent Debian 0.3.0-208.3: tagged LXC with replication
+
+The agent synchronizer discovers only **local** LXC configurations carrying both `mta-audio-editor` and `mta-gpu-agent` tags. It does not hardcode replica target names, query or modify replication jobs, or assign a fixed CTID. Install the Debian agent independently on each eligible Proxmox node; discovery follows the local LXC configurations available there.
+
+For replicated containers, bind mounts use `replicate=0`. Proxmox cannot reliably hotplug this mount into an already running unprivileged LXC. The synchronizer reports `deferred-until-stopped` for running guests and **never restarts or stops them**. During a planned stop, run `python3 /usr/lib/mta-proxmox-gpu-agent/tag_sync.py --apply` before starting the guest. Inspect `pct config <CTID>` for the mount. On other nodes, the agent and socket must already exist; a bind mount is host-local and is not copied as part of replication. Guest startup after a move requires a separately installed, running agent on the destination node. No live migration guarantee is implied.
+
+### Proxmox GPU agent 0.3.0-208.4: automatic AMD SMI preflight
+
+The Debian package declares `Depends: python3, systemd, pve-container, acl, amd-smi`; APT resolves the native AMD SMI runtime through the distribution package dependencies. No AMD upstream repositories or kernel drivers are installed. The preflight script `/usr/lib/mta-proxmox-gpu-agent/preflight.py` verifies both `amd-smi list` (GPU presence) and `amd-smi process --json` (supported telemetry schema), including the empty process list of an idle GPU. The service uses systemd `ExecCondition`, so an absent or unsupported GPU skips host telemetry without restart loops. The post-installation step reports this condition and does not force a tag-sync pass in that case. MTA's GPU-slot accounting remains available without the host agent. The LXC synchronization still defers configuration changes for running containers; replication peers are not hardcoded.
+
+On a new host, install with `apt install ./mta-proxmox-gpu-agent_0.3.0-208.4_all.deb`, then run `python3 /usr/lib/mta-proxmox-gpu-agent/preflight.py` and check `systemctl status mta-gpu-agent.service mta-gpu-agent-tag-sync.timer`. If a GPU becomes available later, restart the service manually or during a planned maintenance activity; `ExecCondition` is re-evaluated on start.
