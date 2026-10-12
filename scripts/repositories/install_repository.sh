@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Repo bootstrap for released SERVER packages; never installs desktop package as server.
 set -Eeuo pipefail
-: "${MTA_PACKAGES_URL:?Provide approved HTTPS URL for published package repository}"
-: "${MTA_REPO_KEY_FINGERPRINT:?Provide 40-character release signing fingerprint}"
+MTA_PACKAGES_URL=${MTA_PACKAGES_URL:-https://desalvo.github.io/mta-audio-editor-packages}
+MTA_REPO_KEY_FINGERPRINT=${MTA_REPO_KEY_FINGERPRINT:-0833A4FCB008ECAC9F98840B4C1D2DD95F5AEDB7}
 CHANNEL=${1:-stable}
 [[ $CHANNEL == stable || $CHANNEL == early ]] || { echo 'Channel must be stable or early' >&2; exit 2; }
 [[ $MTA_PACKAGES_URL == https://* && $MTA_PACKAGES_URL != *' '* ]] || exit 2

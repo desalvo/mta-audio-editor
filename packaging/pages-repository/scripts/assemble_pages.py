@@ -2,6 +2,7 @@
 """Assemble verified Pages site from GitHub Actions release artifacts, not Git blobs."""
 import argparse
 import hashlib
+import html
 import json
 import os
 from pathlib import Path
@@ -72,9 +73,46 @@ def assemble(manifests, output):
     if not any_channel:
         raise ValueError("No signed channel manifests available")
     (output / ".nojekyll").touch()
-    (output / "index.html").write_text(
-        "<!doctype html><html><head><meta charset='utf-8'><title>MTA Server Packages</title></head>"
-        "<body><h1>MTA Audio Editor Server Packages</h1><p>Signed APT and DNF repositories: early / stable.</p></body></html>\n")
+    render_file_indexes(output)
+
+
+def render_file_indexes(output):
+    """Publish browsable static listings; never alter signed package indexes."""
+    from urllib.parse import quote
+
+    def page(title, heading, items, prefix=""):
+        rows = []
+        for label, href, size, is_dir in items:
+            safe_href = html.escape(quote(href, safe="/._-~"), quote=True)
+            rows.append(f"<tr><td><a href=\"{safe_href}\">{html.escape(label)}</a></td>"
+                        f"<td>{'Directory' if is_dir else f'{size:,} bytes'}</td></tr>")
+        return ("<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\">"
+                "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">"
+                f"<title>{html.escape(title)}</title>"
+                "<style>body{font:16px system-ui,sans-serif;max-width:1050px;margin:3rem auto;padding:0 1.2rem}"
+                "table{border-collapse:collapse;width:100%}td,th{border-bottom:1px solid #ddd;padding:.6rem;text-align:left}"
+                "a{color:#1561a5}code{overflow-wrap:anywhere}</style></head><body>"
+                f"<h1>{html.escape(heading)}</h1><p>Signed APT/DNF artifacts. "
+                "Files are provided as-is; verify their signatures with your package manager.</p>"
+                "<p><a href=\"/mta-audio-editor-packages/\">Repository home</a></p>"
+                "<table><thead><tr><th>Name</th><th>Size / type</th></tr></thead><tbody>"
+                + "".join(rows) + "</tbody></table></body></html>\n")
+
+    for directory in sorted([output, *(d for d in output.rglob("*") if d.is_dir())]):
+        items = []
+        for child in sorted(directory.iterdir(), key=lambda x: (not x.is_dir(), x.name)):
+            if child.name == "index.html" or child.name.startswith("."):
+                continue
+            if child.is_symlink():
+                raise ValueError(f"Unexpected symbolic link: {child}")
+            if child.is_file() or child.is_dir():
+                items.append((child.name + ("/" if child.is_dir() else ""),
+                              child.name + ("/" if child.is_dir() else ""),
+                              child.stat().st_size if child.is_file() else 0, child.is_dir()))
+        relative = directory.relative_to(output).as_posix()
+        heading = "MTA Audio Editor Server Packages" if directory == output else f"Files: /{relative}/"
+        (directory / "index.html").write_text(page(heading, heading, items), encoding="utf-8")
+
 
 
 if __name__ == "__main__":
