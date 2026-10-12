@@ -46,4 +46,19 @@ def test_package_preflight_and_dependencies():
     assert 'amd-smi' in text and 'pve-container' in text and 'acl' in text
     assert 'ExecCondition=/usr/bin/python3 /usr/lib/mta-proxmox-gpu-agent/preflight.py' in text
     assert 'MTA GPU telemetry unavailable;' in text
-    assert 'VERSION=0.3.0-208.4' in text
+    assert 'VERSION=0.3.0-208.5' in text
+
+
+def test_amd_smi_2452_idle_literal_is_accepted():
+    def run(cmd, **kw):
+        if cmd[-1] == 'list':
+            return Result('GPU: 0\n')
+        return Result(json.dumps([{'gpu': 0, 'process_info': 'No running processes detected'}]))
+    assert pre.probe(run)[0]
+
+def test_unknown_process_info_string_is_rejected():
+    def run(cmd, **kw):
+        if cmd[-1] == 'list':
+            return Result('GPU: 0\n')
+        return Result(json.dumps([{'gpu': 0, 'process_info': 'unexpected error'}]))
+    assert not pre.probe(run)[0]

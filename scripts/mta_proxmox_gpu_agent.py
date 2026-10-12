@@ -33,7 +33,9 @@ def read_snapshot():
             raise ValueError('invalid GPU ID')
         # AMD SMI 24.5.2 emits one object per process with top-level
         # process_info; newer versions may emit a process_list per GPU.
-        if 'process_info' in device:
+        if device.get('process_info') == 'No running processes detected':
+            process_list = []
+        elif 'process_info' in device:
             process_list = [device]
         else:
             process_list = device.get('process_list', [])

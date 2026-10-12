@@ -35,6 +35,11 @@ def probe(run=subprocess.run):
         gpu = device.get('gpu')
         if isinstance(gpu, bool) or not isinstance(gpu, int) or not 0 <= gpu <= 255:
             return False, 'AMD SMI returned invalid GPU identifier'
+        info = device.get('process_info')
+        # AMD SMI 24.x reports an idle device using a literal status string.
+        # Only this explicit idle sentinel is accepted; other strings fail closed.
+        if info == 'No running processes detected':
+            continue
         records = [device] if 'process_info' in device else device.get('process_list', [])
         if not isinstance(records, list) or len(records) > 1024:
             return False, 'AMD SMI returned invalid process list'

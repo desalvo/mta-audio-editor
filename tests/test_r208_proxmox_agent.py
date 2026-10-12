@@ -77,3 +77,14 @@ def test_debian_245_process_json_and_host_lxc_mapping(monkeypatch, tmp_path):
     assert data['processes'] == [{'host_pid': 21729, 'gpu': 0,
                                   'host_cgroup': '0::/lxc/130/ns/system.slice/ollama.service\n'}]
     assert data['billing_eligible'] is False
+
+
+def test_idle_amd_smi_2452_process_snapshot(monkeypatch):
+    import json
+    from scripts import mta_proxmox_gpu_agent as agent
+    class Result:
+        stdout = json.dumps([{'gpu': 0, 'process_info': 'No running processes detected'}])
+    monkeypatch.setattr(agent.subprocess, 'run', lambda *a, **k: Result())
+    snapshot = agent.read_snapshot()
+    assert snapshot['processes'] == []
+    assert snapshot['billing_eligible'] is False
