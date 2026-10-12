@@ -521,3 +521,35 @@ The method is deterministic and versioned for later controlled calibration;
 production scheduling/telemetry integration, trusted provenance, external
 process detection and customer-facing consent remain future prerequisites
 before any estimated GPU price can be enabled.
+
+### AMD SMI JSON collector and host/LXC correlation (r207)
+
+`app.ai_amd_smi_collector` normalizes `amd-smi process --gpu N --json`
+read-only process snapshots. The process IDs are **host GPU PIDs**, which may
+not exist in an LXC `/proc`; never assume container PID equals host PID.
+`correlate_processes` requires `host_pid_namespace_verified=True` and a
+**trusted host-view** `/proc` to verify exact job cgroup membership. This flag
+must not be set from an ordinary LXC process. If processes cannot be mapped,
+if unrelated processes are present, or if utilization is missing, the shared
+estimator leaves GPU capacity unallocated. This collector does not claim that
+zero GFX nanoseconds reflects zero GPU work, as Strix Halo/ROCm 7.14.1 tests
+show a constant zero despite HIP kernel execution.
+
+For a non-mutating diagnostic snapshot on `ollama-01`:
+
+```bash
+amd-smi process --gpu 0 --json
+```
+
+Collection is diagnostic only. Global utilization must come from a separately
+verified source; neither PID memory nor HIP event elapsed is global GPU
+utilization. No GPU price, billing record, background sampling daemon, or
+host agent is enabled by this module. Before integrating host PID mapping,
+install an authenticated least-privilege host-side agent, with an explicit
+job-to-cgroup registry and test against unrelated GPU processes.
+
+Run the related regression tests:
+
+```bash
+PYTHONPATH=. pytest -q tests/test_r207_amd_smi_collector.py tests/test_r207_gpu_shared_estimator.py
+```
