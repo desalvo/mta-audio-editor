@@ -36,7 +36,9 @@ jobs:
           info=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/$RUN_ID")
           [[ $(jq -r '.name' <<<"$info") == 'Native server offline runtime matrix' ]] || exit 3
           [[ $(jq -r '.conclusion' <<<"$info") == success ]] || { echo 'Source runtime CI is not successful' >&2; exit 3; }
-          [[ $(jq -r '.event' <<<"$info") == push && $(jq -r '.head_branch' <<<"$info") == main ]] || exit 3
+          source_event=$(jq -r '.event' <<<"$info")
+          [[ "$source_event" == push || "$source_event" == workflow_dispatch ]] || { echo "Unsupported runtime matrix trigger: $source_event" >&2; exit 3; }
+          [[ $(jq -r '.head_branch' <<<"$info") == main ]] || { echo 'Source runtime matrix must run on main' >&2; exit 3; }
           [[ $(jq -r '.head_sha' <<<"$info") == "$GITHUB_SHA" ]] || { echo 'Source CI does not match publishing commit' >&2; exit 3; }
       - name: Install signing and repository tools
         run: |

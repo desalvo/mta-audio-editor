@@ -33,3 +33,13 @@ def test_workflow_is_manual_and_approval_gated():
     assert 'signed-mta-pages-${{ inputs.channel }}' in wf
     assert 'manifests' in wf
     assert '100-MiB' not in wf
+
+
+def test_runtime_matrix_manual_dispatch_is_allowed_but_main_sha_required():
+    workflow = (ROOT / '.github/workflows/server-pages-publish.yml').read_text()
+    assert '"$source_event" == push || "$source_event" == workflow_dispatch' in workflow
+    assert "'.head_branch'" in workflow
+    assert "'.head_sha'" in workflow
+    assert '"$GITHUB_SHA"' in workflow
+    assert "'.conclusion'" in workflow
+    assert "'.name'" in workflow
