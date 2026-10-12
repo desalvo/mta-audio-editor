@@ -69,3 +69,31 @@ def snapshot(*, socket_path: str | None = None, token: str | None = None) -> dic
         return {'available': True, 'billing_eligible': False, 'telemetry': payload}
     except (OSError, ValueError, UnicodeError) as exc:
         return {'available': False, 'reason': type(exc).__name__, 'billing_eligible': False}
+
+
+def diagnostics(*, socket_path: str | None = None, token: str | None = None) -> dict:
+    """Privacy-preserving, read-only summary; no host PIDs/cgroups or token leak.
+
+    Host GPU processes are not per-job attribution or billable usage.
+    """
+    result = snapshot(socket_path=socket_path, token=token)
+    report = {
+        'schema': 'mta-gpu-app-diagnostic-v1',
+        'available': result.get('available') is True,
+        'authenticated': result.get('available') is True,
+        'process_count': 0,
+        'gpu_ids': [],
+        'job_attribution_verified': False,
+        'billable_gpu_time_verified': False,
+        'billing_eligible': False,
+    }
+    if not report['available']:
+        report['reason'] = result.get('reason', 'unavailable')
+        return report
+    telemetry = result['telemetry']
+    if telemetry.get('source') != 'host-amd-smi':
+        report.update(available=False, authenticated=False, reason='unexpected-source')
+        return report
+    processes = telemetry['processes']
+    report.update(process_count=len(processes), gpu_ids=sorted({p['gpu'] for p in processes}), reason='ok')
+    return report

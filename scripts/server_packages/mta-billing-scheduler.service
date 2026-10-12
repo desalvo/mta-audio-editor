@@ -1,0 +1,16 @@
+[Unit]
+Description=MTA AI Billing Scheduler (native package)
+After=network-online.target
+Wants=network-online.target
+[Service]
+Type=simple
+WorkingDirectory=/usr/lib/mta-audio-editor-server
+EnvironmentFile=/etc/mta/mta.env
+ExecStart=/opt/mta/server-venv/bin/python -m app.ai_billing_scheduler
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+ProtectSystem=full
+ReadWritePaths=/var/lib/mta /etc/mta
+[Install]
+WantedBy=multi-user.target

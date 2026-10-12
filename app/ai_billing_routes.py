@@ -58,6 +58,14 @@ def gpu_host_agent(request: Request):
     return snapshot()
 
 
+@router.get('/api/admin/ai-billing/gpu-host-agent/diagnostics')
+def gpu_host_agent_diagnostics(request: Request):
+    """Safe status view; telemetry is never a basis for per-job charges."""
+    require_admin(request)
+    from .ai_proxmox_gpu_agent_client import diagnostics
+    return diagnostics()
+
+
 @router.get('/api/admin/ai-billing/suggested-prices')
 def suggested_prices(request: Request, cpu_model: str | None = None, gpu_model: str | None = None):
     require_admin(request)

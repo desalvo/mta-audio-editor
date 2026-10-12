@@ -88,3 +88,35 @@ def test_idle_amd_smi_2452_process_snapshot(monkeypatch):
     snapshot = agent.read_snapshot()
     assert snapshot['processes'] == []
     assert snapshot['billing_eligible'] is False
+
+
+def test_app_agent_diagnostics_redacts_host_identity(monkeypatch):
+    monkeypatch.setattr(client, 'snapshot', lambda **kwargs: {
+        'available': True, 'billing_eligible': False,
+        'telemetry': {'source': 'host-amd-smi', 'processes': [
+            {'host_pid': 123456, 'gpu': 0, 'host_cgroup': '/lxc/130/private'}]}})
+    value = client.diagnostics()
+    assert value['authenticated'] and value['process_count'] == 1
+    assert value['gpu_ids'] == [0]
+    assert not value['job_attribution_verified']
+    assert not value['billable_gpu_time_verified']
+    assert not value['billing_eligible']
+    assert '123456' not in json.dumps(value)
+    assert 'private' not in json.dumps(value)
+
+
+def test_app_agent_diagnostics_unavailable(monkeypatch):
+    monkeypatch.setattr(client, 'snapshot', lambda **kwargs: {
+        'available': False, 'reason': 'agent-token-not-configured', 'billing_eligible': False})
+    value = client.diagnostics()
+    assert value['available'] is False
+    assert value['reason'] == 'agent-token-not-configured'
+    assert value['process_count'] == 0
+
+
+def test_app_agent_diagnostics_rejects_unexpected_source(monkeypatch):
+    monkeypatch.setattr(client, 'snapshot', lambda **kwargs: {
+        'available': True, 'telemetry': {'source': 'untrusted', 'processes': []}})
+    value = client.diagnostics()
+    assert not value['available']
+    assert value['reason'] == 'unexpected-source'

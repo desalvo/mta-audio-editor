@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 # Standalone, idempotent MTA Audio Editor server installer for Debian/RHEL families.
 set -Eeuo pipefail
+# Explicit native mode: no Git checkout and no automatic takeover of legacy setups.
+if [[ ${1:-} == --native-server ]]; then
+ shift
+ exec "$(dirname "${BASH_SOURCE[0]}")/install_mta_native.sh" "$@"
+fi
 umask 027
 REPO=https://github.com/desalvo/mta-audio-editor.git
 CONFIG=${MTA_WIZARD_CONFIG:-/etc/mta/mta-wizard.conf}

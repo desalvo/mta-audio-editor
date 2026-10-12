@@ -1,0 +1,12 @@
+#!/bin/sh
+# Fail before unpacking/replacing existing files when a legacy checkout is active.
+set -eu
+case "$1" in
+ install|upgrade)
+  if [ -e /opt/mta/application/.git ] || [ -f /opt/mta/application/.mta-wizard-managed ]; then
+   echo 'MTA legacy installation detected. Use the explicit migration procedure before installing mta-audio-editor-server.' >&2
+   exit 1
+  fi
+  ;;
+esac
+exit 0

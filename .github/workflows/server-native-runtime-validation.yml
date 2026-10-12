@@ -1,0 +1,94 @@
+name: Native server offline runtime matrix
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'requirements.txt'
+      - 'app/**'
+      - 'scripts/server_packages/**'
+      - 'tests/test_server_native_payload_smoke_208.py'
+      - 'scripts/server_packages/test_deb_upgrade.sh'
+      - '.github/workflows/server-native-runtime-validation.yml'
+permissions:
+  contents: read
+jobs:
+  offline-wheelhouse:
+    name: ${{ matrix.name }} ${{ matrix.arch }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: debian13, os: ubuntu-24.04, arch: amd64, image: 'python:3.13-trixie' }
+          - { name: debian12-python312, os: ubuntu-24.04, arch: amd64, image: 'python:3.12-bookworm' }
+    runs-on: ${{ matrix.os }}
+    container:
+      image: ${{ matrix.image }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare isolated target-runtime wheels and verify offline
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install 'pip>=24,<27' pytest
+          python scripts/server_packages/prepare_runtime.py --source . --stage "$RUNNER_TEMP/server-stage" --requirements requirements.txt
+          python scripts/server_packages/verify_offline_runtime.py "$RUNNER_TEMP/server-stage" --check-proof
+          python -m pytest -q tests/test_server_native_packaging_208.py tests/test_server_native_runtime_prepare_208.py tests/test_server_native_payload_smoke_208.py
+      - name: Build native DEB using release gate
+        if: matrix.name == 'debian13'
+        shell: bash
+        run: |
+          set -euo pipefail
+          apt-get update
+          apt-get install -y dpkg-dev
+          MTA_SERVER_STAGE="$RUNNER_TEMP/server-stage" MTA_SERVER_VERSION='0.3.0~early.208' MTA_SERVER_OUTPUT="$RUNNER_TEMP/out" MTA_SERVER_RELEASE_READY=1 bash scripts/server_packages/build_deb.sh
+          dpkg-deb --field "$RUNNER_TEMP"/out/*.deb Package | grep -qx mta-audio-editor-server
+          mkdir -p "$RUNNER_TEMP/deb-root"
+          dpkg-deb -x "$RUNNER_TEMP"/out/*.deb "$RUNNER_TEMP/deb-root"
+          python scripts/server_packages/smoke_offline_payload.py --root "$RUNNER_TEMP/deb-root"
+      - name: Install and reinstall DEB in disposable CI container
+        if: matrix.name == 'debian13'
+        shell: bash
+        run: |
+          set -euo pipefail
+          MTA_CI_DISPOSABLE_CONTAINER=1 MTA_SERVER_DEB="$(find "$RUNNER_TEMP/out" -maxdepth 1 -name '*.deb' -print -quit)" bash scripts/server_packages/test_deb_upgrade.sh
+      - name: Publish validation artifact (not a release)
+        if: matrix.name == 'debian13'
+        uses: actions/upload-artifact@v4
+        with:
+          name: mta-server-deb-unreleased-test
+          path: ${{ runner.temp }}/out/*.deb
+          retention-days: 2
+
+  rpm-payload:
+    name: Rocky Linux 9 RPM offline payload
+    runs-on: ubuntu-24.04
+    container:
+      image: rockylinux:9
+    steps:
+      - name: Install build and Python 3.12 tools
+        run: |
+          set -euo pipefail
+          dnf -y install git rpm-build rpmdevtools rpm2cpio cpio python3.12 python3.12-pip python3.12-devel
+      - uses: actions/checkout@v4
+      - name: Prepare release-ready offline runtime
+        run: |
+          set -euo pipefail
+          python3.12 -m pip install 'pip>=24,<27'
+          python3.12 scripts/server_packages/prepare_runtime.py --source . --stage /tmp/mta-server-stage --requirements requirements.txt
+          python3.12 scripts/server_packages/verify_offline_runtime.py /tmp/mta-server-stage --check-proof
+      - name: Build RPM and test extracted payload offline
+        run: |
+          set -euo pipefail
+          MTA_SERVER_STAGE=/tmp/mta-server-stage MTA_RPM_VERSION=0.3.0 MTA_RPM_RELEASE=0.208.early MTA_SERVER_OUTPUT=/tmp/mta-rpm-out MTA_SERVER_RELEASE_READY=1 bash scripts/server_packages/build_rpm.sh
+          rpm -qp --qf '%{NAME}\n' /tmp/mta-rpm-out/*.rpm | grep -qx mta-audio-editor-server
+          mkdir -p /tmp/mta-rpm-root
+          cd /tmp/mta-rpm-root
+          rpm2cpio /tmp/mta-rpm-out/*.rpm | cpio -idm --quiet
+          cd "$GITHUB_WORKSPACE"
+          python3.12 scripts/server_packages/smoke_offline_payload.py --root /tmp/mta-rpm-root
+      - name: Upload unreleased RPM for inspection
+        uses: actions/upload-artifact@v4
+        with:
+          name: mta-server-rpm-unreleased-test
+          path: /tmp/mta-rpm-out/*.rpm
+          retention-days: 2
