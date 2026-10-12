@@ -46,7 +46,7 @@ def test_package_preflight_and_dependencies():
     assert 'amd-smi' in text and 'pve-container' in text and 'acl' in text
     assert 'ExecCondition=/usr/bin/python3 /usr/lib/mta-proxmox-gpu-agent/preflight.py' in text
     assert 'MTA GPU telemetry unavailable;' in text
-    assert 'VERSION=0.3.0-208.5' in text
+    assert 'VERSION=0.3.0-208.6' in text
 
 
 def test_amd_smi_2452_idle_literal_is_accepted():

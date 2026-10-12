@@ -66,7 +66,7 @@ def is_running(ctid: int) -> bool:
     raise ValueError(f'Unexpected pct status for CT {ctid}: {state[:120]}')
 
 
-def sync(root: pathlib.Path, *, apply=False) -> list[dict]:
+def sync(root: pathlib.Path, *, apply=False, allow_shared_mount=False) -> list[dict]:
     planned = plan(load_local_configs(root))
     if apply:
         # ACLs authorize the mapped guest root to connect to the UNIX socket
@@ -105,9 +105,15 @@ def sync(root: pathlib.Path, *, apply=False) -> list[dict]:
                 rec['action'] = 'manual-review-status-failed'
                 rec['error'] = (getattr(exc, 'stderr', '') or str(exc)).strip()[:400]
                 continue
+            # shared=1 is valid only when every eligible destination already
+            # provides this local runtime directory; explicit opt-in avoids
+            # falsely promising migration safety on an unprepared cluster.
+            if not allow_shared_mount:
+                rec['action'] = 'ready-needs-shared-mount-approval'
+                continue
             try:
                 subprocess.run(['pct', 'set', str(rec['ctid']), f'-mp{rec["mount_id"]}',
-                                '/run/mta-gpu-agent,mp=/run/mta-gpu-agent,ro=1,replicate=0'],
+                                '/run/mta-gpu-agent,mp=/run/mta-gpu-agent,ro=1,replicate=0,shared=1'],
                                check=True, timeout=15, capture_output=True, text=True)
             except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
                 rec['action'] = 'manual-review-pct-failed'
@@ -121,8 +127,11 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--config-dir', default='/etc/pve/lxc')
     p.add_argument('--apply', action='store_true', help='Apply safe mount configuration only to stopped tagged LXCs; never restart')
+    p.add_argument('--enable-shared-mount', action='store_true',
+                   help='Explicitly attest that the same runtime path is provisioned on all migration destinations')
     a = p.parse_args()
-    print(json.dumps(sync(pathlib.Path(a.config_dir), apply=a.apply), indent=2))
+    print(json.dumps(sync(pathlib.Path(a.config_dir), apply=a.apply,
+                          allow_shared_mount=a.enable_shared_mount), indent=2))
 
 
 if __name__ == '__main__':

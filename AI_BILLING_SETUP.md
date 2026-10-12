@@ -910,3 +910,29 @@ For replicated containers, bind mounts use `replicate=0`. Proxmox cannot reliabl
 The Debian package declares `Depends: python3, systemd, pve-container, acl, amd-smi`; APT resolves the native AMD SMI runtime through the distribution package dependencies. No AMD upstream repositories or kernel drivers are installed. The preflight script `/usr/lib/mta-proxmox-gpu-agent/preflight.py` verifies both `amd-smi list` (GPU presence) and `amd-smi process --json` (supported telemetry schema), including the empty process list of an idle GPU. The service uses systemd `ExecCondition`, so an absent or unsupported GPU skips host telemetry without restart loops. The post-installation step reports this condition and does not force a tag-sync pass in that case. MTA's GPU-slot accounting remains available without the host agent. The LXC synchronization still defers configuration changes for running containers; replication peers are not hardcoded.
 
 On a new host, install with `apt install ./mta-proxmox-gpu-agent_0.3.0-208.4_all.deb`, then run `python3 /usr/lib/mta-proxmox-gpu-agent/preflight.py` and check `systemctl status mta-gpu-agent.service mta-gpu-agent-tag-sync.timer`. If a GPU becomes available later, restart the service manually or during a planned maintenance activity; `ExecCondition` is re-evaluated on start.
+
+### Proxmox replicated LXC mount (agent package 0.3.0-208.6)
+
+Install the same agent package on **each** potential target node. Its local
+`/run/mta-gpu-agent` runtime directory, UNIX socket and token are node-specific;
+never copy tokens between hosts or hardcode node names. The guest client reads
+`/run/mta-gpu-agent/token` on each connection, so host migration automatically
+selects the token of the current host once the bind mount is active.
+
+The automatic five-minute tag reconciliation does **not** hotplug running guests
+and does **not** automatically mark a bind path as shared. First verify the agent
+preflight, runtime directory, socket and token on every eligible node. During an
+approved maintenance window stop the guest and run on its **current** Proxmox host:
+
+```
+python3 /usr/lib/mta-proxmox-gpu-agent/tag_sync.py --apply --enable-shared-mount
+pct config <CTID>
+```
+
+The resulting mount uses `ro=1,replicate=0,shared=1`. The `shared=1` assertion
+is an administrator attestation that the identical local runtime path exists on
+all migration destinations; it does **not** distribute any files. Proxmox
+replication jobs are not changed. If a node is unprepared, don't opt in.
+The client degrades to agentless telemetry only when the guest can still start;
+Proxmox may refuse to start a container with a missing mount source. Validate
+shutdown/start and migration separately during the maintenance window.

@@ -50,6 +50,17 @@ def test_stopped_guest_mount_excludes_replication(tmp_path, monkeypatch):
     monkeypatch.setattr(mod, 'is_running', lambda ctid: False)
     commands = []
     monkeypatch.setattr(mod.subprocess, 'run', lambda argv, **kwargs: commands.append(argv))
-    rows = mod.sync(tmp_path, apply=True)
+    rows = mod.sync(tmp_path, apply=True, allow_shared_mount=True)
     assert rows[0]['action'] == 'configured-pending-restart'
-    assert commands == [['pct', 'set', '133', '-mp0', '/run/mta-gpu-agent,mp=/run/mta-gpu-agent,ro=1,replicate=0']]
+    assert commands == [['pct', 'set', '133', '-mp0', '/run/mta-gpu-agent,mp=/run/mta-gpu-agent,ro=1,replicate=0,shared=1']]
+
+
+def test_stopped_guest_requires_explicit_shared_path_attestation(tmp_path, monkeypatch):
+    from scripts import mta_proxmox_tag_sync as mod
+    (tmp_path / '131.conf').write_text('tags: mta-audio-editor;mta-gpu-agent\n')
+    monkeypatch.setattr(mod, 'is_running', lambda ctid: False)
+    commands = []
+    monkeypatch.setattr(mod.subprocess, 'run', lambda argv, **kwargs: commands.append(argv))
+    rows = mod.sync(tmp_path, apply=True)
+    assert rows[0]['action'] == 'ready-needs-shared-mount-approval'
+    assert all(x[:2] != ['pct', 'set'] for x in commands)
