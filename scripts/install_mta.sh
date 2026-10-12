@@ -9,11 +9,11 @@ VENV=${MTA_APP_VENV:-/opt/mta/venv-mta}
 DATA=${MTA_APP_DATA:-/var/lib/mta/projects}
 PORT=8080; BIND=network; FIREWALL=no; VERSION=main; ACE_PORT=8001; ACE_URL=
 HTTPS=no; TLS_MODE=self-signed; TLS_CERT=; TLS_KEY=; TLS_NAME=localhost
-YES=0; DRY=0; REINSTALL=0; UNINSTALL=0; PURGE=0
+YES=0; DRY=0; REINSTALL=0; UNINSTALL=0; PURGE=0; GPU=auto; O_GPU=''
 O_PORT=''; O_BIND=''; O_FIREWALL=''; O_VERSION=''; O_ACE=''; O_ACE_URL=''
 O_HTTPS=''; O_TLS_MODE=''; O_TLS_CERT=''; O_TLS_KEY=''; O_TLS_NAME=''
 usage() { cat <<'HELP'
-Usage: sudo ./install_mta.sh [--dry-run] [--yes] [--version BRANCH|TAG|SHA] [--port N] [--bind local|network] [--firewall yes|no] [--ace-port N] [--ace-url https://host:port] [--https yes|no] [--tls-mode existing|self-signed] [--tls-cert /absolute/path] [--tls-key /absolute/path] [--tls-name DNS-or-IP] [--reinstall] [--uninstall] [--purge-data]
+Usage: sudo ./install_mta.sh [--dry-run] [--yes] [--version BRANCH|TAG|SHA] [--port N] [--bind local|network] [--firewall yes|no] [--ace-port N] [--ace-url https://host:port] [--https yes|no] [--tls-mode existing|self-signed] [--tls-cert /absolute/path] [--tls-key /absolute/path] [--tls-name DNS-or-IP] [--gpu auto|yes|no] [--reinstall] [--uninstall] [--purge-data]
 Standalone Linux installer: no MTA repository checkout required. Supports Debian 12+, Ubuntu 22.04+, RHEL/Rocky/AlmaLinux/CentOS Stream/Oracle Linux 9+.
 Uses /etc/mta/mta-wizard.conf to remember settings; deploys authenticated MTA web app on port 8080 by default.
 --uninstall stops/disables service and removes MTA-owned source and Python environment (preserves projects and ACE-Step).
@@ -25,9 +25,9 @@ while (($#)); do
  --help|-h) usage; exit 0;;
  --yes) YES=1;; --dry-run) DRY=1;; --reinstall) REINSTALL=1;;
  --uninstall) UNINSTALL=1;; --purge-data) PURGE=1;;
- --version|--port|--bind|--firewall|--ace-port|--ace-url|--https|--tls-mode|--tls-cert|--tls-key|--tls-name)
+ --version|--port|--bind|--firewall|--ace-port|--ace-url|--https|--tls-mode|--tls-cert|--tls-key|--tls-name|--gpu)
  k=$1; shift; (($#)) || { echo "Missing value for $k" >&2; exit 2; }
- case "$k" in --version) O_VERSION=$1;; --port) O_PORT=$1;; --bind) O_BIND=$1;; --firewall) O_FIREWALL=$1;; --ace-port) O_ACE=$1;; --ace-url) O_ACE_URL=$1;; --https) O_HTTPS=$1;; --tls-mode) O_TLS_MODE=$1;; --tls-cert) O_TLS_CERT=$1;; --tls-key) O_TLS_KEY=$1;; --tls-name) O_TLS_NAME=$1;; esac;;
+ case "$k" in --version) O_VERSION=$1;; --port) O_PORT=$1;; --bind) O_BIND=$1;; --firewall) O_FIREWALL=$1;; --ace-port) O_ACE=$1;; --ace-url) O_ACE_URL=$1;; --https) O_HTTPS=$1;; --tls-mode) O_TLS_MODE=$1;; --tls-cert) O_TLS_CERT=$1;; --tls-key) O_TLS_KEY=$1;; --tls-name) O_TLS_NAME=$1;; --gpu) O_GPU=$1;; esac;;
  *) echo "Unknown option: $1" >&2; usage; exit 2;; esac
  shift
 done
@@ -46,11 +46,12 @@ if [[ -f $CONFIG ]]; then
  TLS_CERT) TLS_CERT=$val;;
  TLS_KEY) TLS_KEY=$val;;
  TLS_NAME) TLS_NAME=$val;;
+ GPU) [[ $val == auto || $val == yes || $val == no ]] && GPU=$val;;
  esac
  done < "$CONFIG"
 fi
 PORT=${O_PORT:-$PORT}; BIND=${O_BIND:-$BIND}; FIREWALL=${O_FIREWALL:-$FIREWALL}; VERSION=${O_VERSION:-$VERSION}; ACE_PORT=${O_ACE:-$ACE_PORT}; ACE_URL=${O_ACE_URL:-$ACE_URL}
-HTTPS=${O_HTTPS:-$HTTPS}; TLS_MODE=${O_TLS_MODE:-$TLS_MODE}; TLS_CERT=${O_TLS_CERT:-$TLS_CERT}; TLS_KEY=${O_TLS_KEY:-$TLS_KEY}; TLS_NAME=${O_TLS_NAME:-$TLS_NAME}
+HTTPS=${O_HTTPS:-$HTTPS}; TLS_MODE=${O_TLS_MODE:-$TLS_MODE}; TLS_CERT=${O_TLS_CERT:-$TLS_CERT}; TLS_KEY=${O_TLS_KEY:-$TLS_KEY}; TLS_NAME=${O_TLS_NAME:-$TLS_NAME}; GPU=${O_GPU:-$GPU}
 # Refuse unsupported OS before checking root or mutating filesystem.
 OS_RELEASE=${MTA_OS_RELEASE:-/etc/os-release}
 [[ -r $OS_RELEASE ]] || { echo 'Unsupported OS: /etc/os-release not found' >&2; exit 2; }
@@ -96,6 +97,7 @@ done
 if [[ $HTTPS == yes && $TLS_MODE == existing ]]; then
  [[ -n $TLS_CERT && -n $TLS_KEY ]] || { echo 'Existing TLS mode requires --tls-cert and --tls-key' >&2; exit 2; }
 fi
+[[ $GPU == auto || $GPU == yes || $GPU == no ]] || { echo "Invalid GPU setting" >&2; exit 2; }
 [[ $BIND == local || $BIND == network ]] && [[ $FIREWALL == yes || $FIREWALL == no ]] || { echo 'Invalid network settings' >&2; exit 2; }
 [[ $VERSION =~ ^[a-zA-Z0-9][a-zA-Z0-9._/-]{0,120}$ ]] && [[ $VERSION != *'..'* ]] || { echo 'Invalid Git reference' >&2; exit 2; }
 if (( DRY )); then printf 'OS=%s %s; source=%s ref=%s; port=%s bind=%s firewall=%s; ACE port=%s; HTTPS=%s mode=%s; uninstall=%s\n' "$OS_ID" "$VERSION_ID" "$REPO" "$VERSION" "$PORT" "$BIND" "$FIREWALL" "$ACE_PORT" "$HTTPS" "$TLS_MODE" "$UNINSTALL"; exit 0; fi
@@ -116,11 +118,12 @@ if (( ! UNINSTALL )); then
    ask 'Self-signed certificate DNS name or IP' "$TLS_NAME"; TLS_NAME=$REPLY
   fi
  fi
+ ask 'ROCm/AMD SMI GPU userspace (auto/yes/no)' "$GPU"; GPU=$REPLY
  ask 'Manage host firewall (yes/no)' "$FIREWALL"; FIREWALL=$REPLY
  ask 'ACE-Step port on localhost' "$ACE_PORT"; ACE_PORT=$REPLY
  ask 'Remote ACE-Step HTTPS URL (blank = local ACE-Step)' "$ACE_URL"; ACE_URL=$REPLY
  check_args=(--dry-run --version "$VERSION" --port "$PORT" --bind "$BIND" --firewall "$FIREWALL" --ace-port "$ACE_PORT")
- check_args+=(--https "$HTTPS" --tls-mode "$TLS_MODE" --tls-name "$TLS_NAME")
+ check_args+=(--gpu "$GPU" --https "$HTTPS" --tls-mode "$TLS_MODE" --tls-name "$TLS_NAME")
  [[ -z $TLS_CERT ]] || check_args+=(--tls-cert "$TLS_CERT")
  [[ -z $TLS_KEY ]] || check_args+=(--tls-key "$TLS_KEY")
  [[ -z $ACE_URL ]] || check_args+=(--ace-url "$ACE_URL")
@@ -197,6 +200,67 @@ if [[ -z $PY ]]; then
  exit 3
 fi
 echo "Using $($PY --version) for MTA environment"
+install_rocm_userspace() {
+
+MODE=$GPU
+[[ $MODE == auto || $MODE == yes || $MODE == no ]] || { echo 'Usage: install_rocm_userspace.sh [auto|yes|no]' >&2; exit 2; }
+if [[ $MODE == no ]]; then echo 'ROCm installation disabled.'; exit 0; fi
+if [[ ! -e /dev/kfd || ! -e /dev/dri/renderD128 ]]; then
+ if [[ $MODE == yes ]]; then echo 'ROCm requires accessible /dev/kfd and /dev/dri/renderD*; expose GPU devices from Proxmox host first.' >&2; exit 3; fi
+ echo 'No accessible AMD compute GPU; skipping ROCm.'; return 0
+fi
+# Preserve existing ROCm installations, including installations from other supported distribution channels.
+if command -v rocminfo >/dev/null 2>&1 && rocminfo 2>&1 | grep -q 'HSA Agents'; then
+ echo 'ROCm runtime detected; preserving installed version.'
+else
+ [[ ${EUID:-$(id -u)} == 0 ]] || { echo 'ROCm installation needs root.' >&2; exit 3; }
+ . /etc/os-release
+ if [[ ${ID,,} != rocky && ${ID,,} != rhel && ${ID,,} != almalinux && ${ID,,} != centos && ${ID,,} != ol ]]; then
+  echo 'ROCm bootstrap currently supports Rocky/RHEL-family 9. For this OS configure the official AMD ROCm repository first.' >&2; exit 3
+ fi
+ [[ ${VERSION_ID%%.*} == 9 ]] || { echo 'Automatic ROCm repository bootstrap supports RHEL-family 9 only.' >&2; exit 3; }
+ command -v dnf >/dev/null || exit 3
+ # AMD's EL9 userspace repository; allow an administrator to pin another AMD release.
+ ROCM_RELEASE=${MTA_ROCM_RELEASE:-7.2.4}
+ [[ $ROCM_RELEASE =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]] || { echo 'Invalid MTA_ROCM_RELEASE' >&2; exit 3; }
+ repo_file=/etc/yum.repos.d/mta-rocm-userspace.repo
+ if [[ ! -f $repo_file ]]; then
+  cat > "$repo_file" <<REPO
+[mta-rocm-userspace]
+name=AMD ROCm ${ROCM_RELEASE} (MTA userspace)
+baseurl=https://repo.radeon.com/rocm/el9/${ROCM_RELEASE}/main
+enabled=1
+gpgcheck=1
+gpgkey=https://repo.radeon.com/rocm/rocm.gpg.key
+REPO
+ fi
+ echo 'Installing ROCm userspace; never installing amdgpu-dkms or kernel drivers.'
+ dnf install -y rocm-hip-runtime rocminfo || { echo 'ROCm installation failed. Check AMD support for this distribution version and selected ROCm release.' >&2; exit 3; }
+ command -v rocminfo >/dev/null 2>&1 || { echo 'rocminfo is still unavailable after installation.' >&2; exit 3; }
+fi
+if ! command -v amd-smi >/dev/null 2>&1; then
+ if command -v dnf >/dev/null 2>&1; then
+  dnf install -y amdrocm-amdsmi || { echo 'AMD SMI not installed; configure matching official AMD ROCm repositories.' >&2; exit 3; }
+ else
+  echo 'AMD SMI missing; install amdrocm-amdsmi through your supported system package manager.' >&2; exit 3
+ fi
+fi
+if ! command -v amd-smi >/dev/null 2>&1; then
+ for executable in /opt/rocm/bin/amd-smi /opt/rocm/core-*/bin/amd-smi; do
+  if [[ -x $executable ]]; then ln -sf "$executable" /usr/local/bin/amd-smi; break; fi
+ done
+fi
+command -v amd-smi >/dev/null 2>&1 || { echo 'AMD SMI installed but executable not found.' >&2; exit 3; }
+rocminfo >/dev/null || { echo 'ROCm runtime cannot access AMD GPU.' >&2; exit 3; }
+amd-smi version >/dev/null || { echo 'AMD SMI cannot initialize.' >&2; exit 3; }
+echo 'ROCm/AMD SMI userspace verified. GPU billing is NOT enabled by this installer.'
+
+}
+# ROCm is an optional capability. Auto requires visible GPU devices; no host GPU
+# kernel driver should be installed inside containers.
+if [[ $GPU != no ]]; then
+ install_rocm_userspace
+fi
 # Do not destroy existing working code before a replacement is checked out.
 mkdir -p "$(dirname "$APP_DIR")" "$(dirname "$VENV")" /etc/mta "$DATA"
 TEMP=$(mktemp -d "$(dirname "$APP_DIR")/.mta-stage.XXXXXXXX")
@@ -310,6 +374,7 @@ TLS_MODE=$TLS_MODE
 TLS_CERT=$TLS_CERT
 TLS_KEY=$TLS_KEY
 TLS_NAME=$TLS_NAME
+GPU=$GPU
 EOT
 chmod 600 /etc/mta/mta-wizard.conf.tmp
 mv /etc/mta/mta-wizard.conf.tmp "$CONFIG"

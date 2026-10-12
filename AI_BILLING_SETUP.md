@@ -467,3 +467,21 @@ ledger attribution, request-idempotency, cross-user access rejection,
 unsafe-command rejection and failed-job non-billing. It runs in a temporary
 SQLite database without downloading AI models or using physical GPUs. This is
 not certification of ROCm/GPU hardware or the live production ingress.
+
+### AMD ROCm and AMD SMI on the Linux server
+
+The standalone `scripts/install_mta.sh` wizard accepts `--gpu auto|yes|no`.
+The default `auto` detects `/dev/kfd` and `/dev/dri/renderD128`; if absent,
+GPU userspace installation is skipped. With `yes`, missing device access is an
+installation error; `no` intentionally skips the GPU stack. Existing working
+ROCm installations are preserved rather than upgraded. On supported EL9 hosts,
+when ROCm is missing the wizard configures an AMD-signed userspace-only ROCm
+repository and installs `rocm-hip-runtime`, `rocminfo`, and AMD SMI. The default
+repository release is `7.2.4` and can be selected using `MTA_ROCM_RELEASE`.
+Check AMD's published OS/GPU support for the target distribution before enabling
+it: Rocky Linux 9.8 support must not be assumed merely because EL9 packages
+are available. The installer never installs `amdgpu-dkms` or host kernel
+modules; Proxmox LXC requires its host to provide `/dev/kfd` and `/dev/dri`.
+If a different distro is used and the GPU runtime is absent, configure a
+supported ROCm repository explicitly. Installation does not enable any paid GPU
+metering: PID-specific GFX time must be independently validated first.
