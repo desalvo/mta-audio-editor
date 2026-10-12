@@ -39,3 +39,17 @@ def test_real_systemd_acceptance_is_wired_to_ephemeral_ubuntu_runner():
     assert 'ubuntu-systemd-vm:' in workflow
     assert 'MTA_CI_DISPOSABLE_VM=1' in workflow
     assert 'Reinstall and verify service recovery and persistent state' in workflow
+
+
+def test_service_port_matches_systemd_http_acceptance():
+    unit = (BASE / 'mta-server.service').read_text()
+    acceptance = (BASE / 'check_system_services.sh').read_text()
+    assert 'Environment=MTA_PORT=8000' in unit
+    assert '127.0.0.1:8000/api/health' in acceptance
+    assert 'journalctl -u mta-server.service' in acceptance
+
+def test_ubuntu_unit_verify_occurs_only_after_install():
+    workflow = (ROOT / '.github/workflows/server-native-runtime-validation.yml').read_text()
+    early = workflow.split('      - name: Prepare isolated target-runtime wheels')[0]
+    assert 'systemd-analyze verify scripts/server_packages/' not in early
+    assert 'MTA_CI_DISPOSABLE_VM=1' in workflow

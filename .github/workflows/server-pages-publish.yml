@@ -1,0 +1,126 @@
+name: Publish signed server packages to GitHub Pages
+on:
+  workflow_dispatch:
+    inputs:
+      verified_run_id:
+        description: Successful Native server offline runtime matrix run ID from main
+        required: true
+        type: string
+      channel:
+        description: Signed repository channel
+        required: true
+        type: choice
+        options: [early, stable]
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: mta-server-pages-publisher
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    environment: server-${{ inputs.channel }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify source run is successful and belongs to current main commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ inputs.verified_run_id }}
+        run: |
+          set -euo pipefail
+          [[ $RUN_ID =~ ^[0-9]+$ ]] || exit 2
+          info=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/$RUN_ID")
+          [[ $(jq -r '.name' <<<"$info") == 'Native server offline runtime matrix' ]] || exit 3
+          [[ $(jq -r '.conclusion' <<<"$info") == success ]] || { echo 'Source runtime CI is not successful' >&2; exit 3; }
+          [[ $(jq -r '.event' <<<"$info") == push && $(jq -r '.head_branch' <<<"$info") == main ]] || exit 3
+          [[ $(jq -r '.head_sha' <<<"$info") == "$GITHUB_SHA" ]] || { echo 'Source CI does not match publishing commit' >&2; exit 3; }
+      - name: Install signing and repository tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y rpm rpm2cpio gnupg dpkg-dev apt-utils createrepo-c git jq rsync
+      - name: Download vetted native packages
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ inputs.verified_run_id }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/incoming"
+          gh run download "$RUN_ID" -R "$GITHUB_REPOSITORY" -n mta-server-deb-debian13-unreleased-test -D "$RUNNER_TEMP/incoming"
+          gh run download "$RUN_ID" -R "$GITHUB_REPOSITORY" -n mta-server-rpm-unreleased-test -D "$RUNNER_TEMP/incoming"
+          test "$(find "$RUNNER_TEMP/incoming" -maxdepth 1 -name '*.deb' | wc -l)" -ge 1
+          test "$(find "$RUNNER_TEMP/incoming" -maxdepth 1 -name '*.rpm' | wc -l)" -ge 1
+      - name: Enforce GitHub Git object size limit before signing
+        run: |
+          set -euo pipefail
+          if find "$RUNNER_TEMP/incoming" -maxdepth 1 -type f \( -name "*.deb" -o -name "*.rpm" \) -size +99M | grep -q .; then
+            echo "ERROR: Packages exceed GitHub Git 100-MiB object limit; do not publish to Pages branch." >&2
+            echo "Use an approved large-binary hosting architecture instead of forcing git push." >&2
+            exit 4
+          fi
+      - name: Import approved private key into ephemeral isolated keyring
+        env:
+          PRIVATE_KEY: ${{ secrets.MTA_GPG_PRIVATE_KEY }}
+          PASSPHRASE: ${{ secrets.MTA_GPG_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+          umask 077
+          [[ -n "$PRIVATE_KEY" && -n "$PASSPHRASE" ]] || exit 2
+          mkdir -p "$RUNNER_TEMP/gnupg"
+          chmod 700 "$RUNNER_TEMP/gnupg"
+          printf '%s\n' "$PRIVATE_KEY" | GNUPGHOME="$RUNNER_TEMP/gnupg" gpg --batch --import
+          printf '%s' "$PASSPHRASE" > "$RUNNER_TEMP/gpg-passphrase"
+          actual=$(GNUPGHOME="$RUNNER_TEMP/gnupg" gpg --list-secret-keys --with-colons | awk -F: '$1=="fpr" {print toupper($10); exit}')
+          test "$actual" = '0833A4FCB008ECAC9F98840B4C1D2DD95F5AEDB7'
+      - name: Sign packages and build release indexes
+        env:
+          MTA_GPG_KEY_ID: 0833A4FCB008ECAC9F98840B4C1D2DD95F5AEDB7
+          MTA_REPO_CHANNEL: ${{ inputs.channel }}
+        run: |
+          set -euo pipefail
+          export GNUPGHOME="$RUNNER_TEMP/gnupg"
+          export MTA_GPG_PASSPHRASE_FILE="$RUNNER_TEMP/gpg-passphrase"
+          export MTA_REPO_INPUT="$RUNNER_TEMP/incoming" MTA_REPO_OUTPUT="$RUNNER_TEMP/staging"
+          bash scripts/repositories/prepare_signed_pages_release.sh
+      - name: Install restricted deploy SSH identity
+        env:
+          DEPLOY_KEY: ${{ secrets.MTA_PAGES_DEPLOY_KEY }}
+        run: |
+          set -euo pipefail
+          umask 077
+          test -n "$DEPLOY_KEY"
+          mkdir -p "$HOME/.ssh"
+          printf '%s\n' "$DEPLOY_KEY" > "$HOME/.ssh/mta-pages"
+          chmod 600 "$HOME/.ssh/mta-pages"
+          ssh-keyscan -t ed25519 github.com > "$HOME/.ssh/known_hosts"
+          test "$(ssh-keygen -lf "$HOME/.ssh/known_hosts" | awk '{print $2}')" = 'SHA256:+DiY3wvvV6TuJJhbpZisF/zLDA0zPZ7Mtd8Yg7cU6c'
+          printf 'Host github.com\n  IdentityFile %s/.ssh/mta-pages\n  IdentitiesOnly yes\n' "$HOME" > "$HOME/.ssh/config"
+      - name: Publish only selected channel, preserving the other channel
+        env:
+          CHANNEL: ${{ inputs.channel }}
+        run: |
+          set -euo pipefail
+          git clone --depth 1 git@github.com:desalvo/mta-audio-editor-packages.git "$RUNNER_TEMP/pages"
+          cd "$RUNNER_TEMP/pages"
+          # Never remove artifacts from the opposite channel.
+          mkdir -p "apt/$CHANNEL" "rpm/$CHANNEL"
+          rsync -a --delete "$RUNNER_TEMP/staging/apt/$CHANNEL/" "apt/$CHANNEL/"
+          if [[ -d "$RUNNER_TEMP/staging/rpm/$CHANNEL" ]]; then
+            rsync -a --delete "$RUNNER_TEMP/staging/rpm/$CHANNEL/" "rpm/$CHANNEL/"
+          fi
+          cp "$RUNNER_TEMP/staging/mta-archive-key.asc" mta-archive-key.asc
+          touch .nojekyll
+          git config user.name mta-release-bot
+          git config user.email 41898282+github-actions\[bot\]@users.noreply.github.com
+          git add --all
+          if ! git diff --cached --quiet; then
+            git commit -m "Publish signed MTA server $CHANNEL packages from ${GITHUB_SHA:0:12}"
+            git push
+          fi
+      - name: Destroy temporary signing material
+        if: always()
+        run: |
+          rm -rf "$RUNNER_TEMP/gnupg" "$RUNNER_TEMP/gpg-passphrase" "$HOME/.ssh/mta-pages" || true

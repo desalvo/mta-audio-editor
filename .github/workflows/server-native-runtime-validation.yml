@@ -49,8 +49,10 @@ jobs:
           set -euo pipefail
           apt-get update
           DEBIAN_FRONTEND=noninteractive apt-get install -y systemd
-          systemd-analyze verify scripts/server_packages/mta-server.service scripts/server_packages/mta-billing-scheduler.service scripts/server_packages/mta-billing-scheduler.timer
+          # Executable paths do not exist until the native package is installed.
+          # Static unit assertions run here; full systemd-analyze verification runs on the VM.
           grep -Eq '^Delegate=cpu io$' scripts/server_packages/mta-server.service
+          grep -Eq '^Environment=MTA_PORT=8000$' scripts/server_packages/mta-server.service
       - name: Prepare isolated target-runtime wheels and verify offline
         shell: bash
         run: |

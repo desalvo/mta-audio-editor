@@ -6,6 +6,7 @@ Wants=network-online.target
 Type=simple
 WorkingDirectory=/usr/lib/mta-audio-editor-server
 EnvironmentFile=/etc/mta/mta.env
+Environment=MTA_PORT=8000
 ExecStart=/opt/mta/server-venv/bin/python -m app.ai_cgroup_launcher
 Restart=on-failure
 RestartSec=5
