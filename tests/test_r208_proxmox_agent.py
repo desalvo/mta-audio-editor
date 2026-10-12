@@ -53,3 +53,27 @@ def test_agent_server_requires_strong_token(tmp_path):
     import pytest
     with pytest.raises(ValueError):
         agent.serve(str(tmp_path/'bad.sock'), 'weak')
+
+
+def test_debian_245_process_json_and_host_lxc_mapping(monkeypatch, tmp_path):
+    class Result:
+        stdout = json.dumps([{'gpu': 0, 'process_info': {
+            'name': 'llama-server', 'pid': 21729,
+            'memory_usage': {'vram_mem': {'value': 23610740736, 'unit': 'B'}},
+            'usage': {'gfx': {'value': 0, 'unit': 'ns'}}}}])
+    calls = []
+    def fake_run(argv, **kwargs):
+        calls.append(argv)
+        return Result()
+    monkeypatch.setattr(agent.subprocess, 'run', fake_run)
+    original_read = agent.pathlib.Path.read_text
+    def fake_read(path, *args, **kwargs):
+        if str(path) == '/proc/21729/cgroup':
+            return '0::/lxc/130/ns/system.slice/ollama.service\n'
+        return original_read(path, *args, **kwargs)
+    monkeypatch.setattr(agent.pathlib.Path, 'read_text', fake_read)
+    data = agent.read_snapshot()
+    assert calls == [['amd-smi', 'process', '--json']]
+    assert data['processes'] == [{'host_pid': 21729, 'gpu': 0,
+                                  'host_cgroup': '0::/lxc/130/ns/system.slice/ollama.service\n'}]
+    assert data['billing_eligible'] is False

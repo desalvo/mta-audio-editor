@@ -9,6 +9,7 @@ import json
 import pathlib
 import re
 import subprocess
+import shutil
 
 TAG_RE = re.compile(r'^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,62}$')
 ENTRY = 'lxc.mount.entry: /run/mta-gpu-agent run/mta-gpu-agent none bind,create=dir,optional 0 0'
@@ -36,14 +37,16 @@ def plan(configs: dict[str, str]) -> list[dict]:
         conf = parse_config(content)
         # Proxmox default unprivileged=0; do not grant host socket to id-mapped roots.
         privileged = conf.get('unprivileged', '0') == '0'
+        default_uid_map = not any(ln.startswith('lxc.idmap:') for ln in content.splitlines())
         entry_present = ENTRY in content.splitlines()
         other_mount = any('mp=/run/mta-gpu-agent' in ln for ln in content.splitlines())
         free_mount = next((i for i in range(256) if f'mp{i}' not in conf), None)
         result.append({'ctid': int(ctid), 'privileged': privileged,
                        'configured': entry_present,
-                       'action': 'none' if (entry_present or other_mount) else ('manual-review' if not privileged or free_mount is None else 'add-mount'),
-                       'mount_id': free_mount if not other_mount and not entry_present and privileged else None,
-                       'restart_required': not entry_present and not other_mount and privileged})
+                       'action': 'none' if (entry_present or other_mount) else ('manual-review' if (not privileged and not default_uid_map) or free_mount is None else 'add-mount'),
+                       'mapped_root_uid': 100000 if not privileged and default_uid_map else None,
+                       'mount_id': free_mount if not other_mount and not entry_present and (privileged or default_uid_map) else None,
+                       'restart_required': not entry_present and not other_mount and (privileged or default_uid_map)})
     return result
 
 
@@ -54,6 +57,22 @@ def load_local_configs(root: pathlib.Path) -> dict[str, str]:
 def sync(root: pathlib.Path, *, apply=False) -> list[dict]:
     planned = plan(load_local_configs(root))
     if apply:
+        # ACLs authorize the mapped guest root to connect to the UNIX socket
+        # and read the shared token. This applies only to explicitly tagged
+        # containers with default Proxmox ID maps. Never chmod world-readable.
+        for rec in planned:
+            if rec['mapped_root_uid'] is not None and rec['action'] in ('add-mount', 'none'):
+                if not shutil.which('setfacl'):
+                    rec['action'] = 'manual-review-missing-acl'
+                    continue
+                if not pathlib.Path('/run/mta-gpu-agent/agent.sock').is_socket():
+                    rec['action'] = 'manual-review-agent-not-running'
+                    continue
+                uid = str(rec['mapped_root_uid'])
+                for target, rights in [('/run/mta-gpu-agent', 'rx'),
+                                       ('/run/mta-gpu-agent/agent.sock', 'rw'),
+                                       ('/run/mta-gpu-agent/token', 'r')]:
+                    subprocess.run(['setfacl', '-m', f'u:{uid}:{rights}', target], check=True, timeout=10)
         for rec in planned:
             if rec['action'] != 'add-mount':
                 continue

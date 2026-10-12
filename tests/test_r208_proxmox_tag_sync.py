@@ -15,9 +15,16 @@ def test_safe_planning():
     assert [x['ctid'] for x in rows] == [101, 102]
     assert rows[0]['action'] == 'add-mount'
     assert rows[0]['mount_id'] == 1
-    assert rows[1]['action'] == 'manual-review'
+    assert rows[1]['action'] == 'add-mount'
+    assert rows[1]['mapped_root_uid'] == 100000
 
 
 def test_existing_mount_idempotent():
     rows = plan({'200': 'tags: mta-audio-editor;mta-gpu-agent\nmp0: /run/mta-gpu-agent,mp=/run/mta-gpu-agent,ro=1\n'})
     assert rows[0]['action'] == 'none'
+
+
+def test_custom_idmap_is_manual_review():
+    rows = plan({'130': 'tags: mta-audio-editor;mta-gpu-agent\nunprivileged: 1\nlxc.idmap: u 0 200000 65536\n'})
+    assert rows[0]['action'] == 'manual-review'
+    assert rows[0]['mapped_root_uid'] is None

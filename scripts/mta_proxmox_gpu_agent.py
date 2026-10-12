@@ -19,10 +19,10 @@ MAX_BYTES = 4096
 
 
 def read_snapshot():
-    result = subprocess.run(['amd-smi', 'process', '--gpu', '0', '--json'],
+    result = subprocess.run(['amd-smi', 'process', '--json'],
                             capture_output=True, text=True, check=True, timeout=8)
     payload = json.loads(result.stdout)
-    if not isinstance(payload, list) or len(payload) > 16:
+    if not isinstance(payload, list) or len(payload) > 1024:
         raise ValueError('invalid AMD SMI snapshot')
     processes = []
     for device in payload:
@@ -31,7 +31,12 @@ def read_snapshot():
         gpu = device.get('gpu')
         if isinstance(gpu, bool) or not isinstance(gpu, int) or not 0 <= gpu <= 255:
             raise ValueError('invalid GPU ID')
-        process_list = device.get('process_list', [])
+        # AMD SMI 24.5.2 emits one object per process with top-level
+        # process_info; newer versions may emit a process_list per GPU.
+        if 'process_info' in device:
+            process_list = [device]
+        else:
+            process_list = device.get('process_list', [])
         if not isinstance(process_list, list) or len(process_list) > 1024:
             raise ValueError('invalid process list')
         for p in process_list:
@@ -44,6 +49,8 @@ def read_snapshot():
                 cgroup = pathlib.Path('/proc', str(pid), 'cgroup').read_text()[:8192]
             except OSError:
                 cgroup = None
+            if any(rec['host_pid'] == pid and rec['gpu'] == gpu for rec in processes):
+                raise ValueError('duplicate GPU process')
             processes.append({'host_pid': pid, 'gpu': gpu, 'host_cgroup': cgroup})
     if len(processes) > 1024:
         raise ValueError('too many processes')

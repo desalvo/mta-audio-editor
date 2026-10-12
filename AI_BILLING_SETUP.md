@@ -866,3 +866,35 @@ existing `total_micro` based on the administrator-configured tariff history,
 do not authorize invoice creation, and do not enable billing for any user.
 Remote-worker hardware remains **unverified** by these local advisory snapshots;
 no automatic hardware-dependent monetary tariff is selected from them.
+
+
+### Proxmox Debian 13 host validation update (r208.1 agent package)
+
+The updated optional host agent parses **AMD SMI 24.5.2** `amd-smi process
+--json`, where each array member can carry `process_info` directly, and the
+newer `process_list` shape. It reads `/proc/<host PID>/cgroup` on the Proxmox
+host (for example `/lxc/130/ns/system.slice/ollama.service`). `gfx=0ns`
+is **not** billable GPU runtime. Python `amdsmi` imports, ROCm DKMS and kernel
+driver changes are **not** required on the host.
+
+The Debian package `mta-proxmox-gpu-agent_0.3.0-208.1_all.deb` requires
+`amd-smi` and `acl` on the host. The tag synchronizer selects only LXCs with
+**both** `mta-audio-editor` and `mta-gpu-agent`. For unprivileged containers
+with no explicit `lxc.idmap`, it grants narrow host POSIX ACL access to the
+standard mapped-root UID (100000), and provisions a read-only bind mount.
+A custom `lxc.idmap`, missing ACL command or missing live agent socket causes
+a manual-review result instead of a new mount. **Do not assume the standard
+UID mapping is correct on hosts with customized Proxmox mapping settings.**
+This shared token is diagnostic-only and can be used by other explicitly
+authorized containers with the same mapped UID and mount access. Production
+environments requiring per-container credential isolation should use distinct
+per-container proxies/tokens instead.
+
+A configured mount becomes effective only after the guest is restarted;
+**the package never restarts the LXC**. The timer reapplies ephemeral ACLs
+after service restarts. On host migration the package must be installed
+on the destination, and the tagged mount may require a guest restart.
+Verify on host with `systemctl status mta-gpu-agent.service` and
+`python3 /usr/lib/mta-proxmox-gpu-agent/tag_sync.py`; verify inside the
+LXC with the application's optional host-agent diagnostic endpoint.
+The agent remains non-billable regardless of its availability.

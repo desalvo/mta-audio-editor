@@ -2,7 +2,7 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 OUT="${1:-$ROOT/dist}"
-VERSION=0.3.0-208
+VERSION=0.3.0-208.1
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 PKG="$TMP/pkg"
@@ -14,7 +14,7 @@ Package: mta-proxmox-gpu-agent
 Version: $VERSION
 Architecture: all
 Maintainer: MTA Audio Editor <noreply@example.com>
-Depends: python3, systemd, pve-container
+Depends: python3, systemd, pve-container, acl, amd-smi
 Section: admin
 Priority: optional
 Description: Optional Proxmox AMD GPU telemetry for MTA Audio Editor
@@ -32,6 +32,7 @@ if [ "$1" = configure ]; then
  systemctl daemon-reload || true
  systemctl enable --now mta-gpu-agent.service || true
  systemctl enable --now mta-gpu-agent-tag-sync.timer || true
+ systemctl start mta-gpu-agent-tag-sync.service || true
 fi
 exit 0
 SH2
