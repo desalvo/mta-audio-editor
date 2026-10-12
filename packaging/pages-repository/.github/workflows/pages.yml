@@ -31,6 +31,11 @@ jobs:
           test -n "$GH_TOKEN" || { echo 'Set MTA_SOURCE_ARTIFACT_TOKEN (source repo Actions:read)' >&2; exit 2; }
           python3 scripts/assemble_pages.py --manifests manifests --output "$RUNNER_TEMP/site"
           du -sh "$RUNNER_TEMP/site"
+          bytes=$(du -sb "$RUNNER_TEMP/site" | cut -f1)
+          if (( bytes > 1000000000 )); then
+            echo "GitHub Pages maximum site size exceeded; use the prepared R2 backend." >&2
+            exit 4
+          fi
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:

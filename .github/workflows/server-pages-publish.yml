@@ -41,7 +41,7 @@ jobs:
       - name: Install signing and repository tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y rpm rpm2cpio gnupg dpkg-dev apt-utils createrepo-c git jq rsync
+          sudo apt-get install -y rpm rpm2cpio gnupg dpkg-dev apt-utils createrepo-c git jq rsync python3-rpm
       - name: Download vetted native packages
         env:
           GH_TOKEN: ${{ github.token }}
@@ -51,6 +51,29 @@ jobs:
           mkdir -p "$RUNNER_TEMP/incoming"
           gh run download "$RUN_ID" -R "$GITHUB_REPOSITORY" -n mta-server-deb-debian13-unreleased-test -D "$RUNNER_TEMP/incoming"
           gh run download "$RUN_ID" -R "$GITHUB_REPOSITORY" -n mta-server-rpm-unreleased-test -D "$RUNNER_TEMP/incoming"
+          test "$(find "$RUNNER_TEMP/incoming" -maxdepth 1 -name '*.deb' | wc -l)" -ge 1
+          test "$(find "$RUNNER_TEMP/incoming" -maxdepth 1 -name '*.rpm' | wc -l)" -ge 1
+      - name: Restore previous channel and retain two versions
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CHANNEL: ${{ inputs.channel }}
+        run: |
+          set -euo pipefail
+          # Public manifests carry no secrets. Only download a previously signed snapshot
+          # after confirming its originating workflow and immutable SHA-256 digest.
+          mkdir -p "$RUNNER_TEMP/prior"
+          git clone --depth 1 https://github.com/desalvo/mta-audio-editor-packages.git "$RUNNER_TEMP/prior/pages"
+          manifest="$RUNNER_TEMP/prior/pages/manifests/$CHANNEL.json"
+          if [[ -f "$manifest" ]]; then
+            run_id=$(jq -r '.run_id' "$manifest")
+            [[ $run_id =~ ^[0-9]+$ ]] || exit 3
+            gh run download "$run_id" -R "$GITHUB_REPOSITORY" \
+              -n "signed-mta-pages-$CHANNEL" -D "$RUNNER_TEMP/prior"
+            python3 scripts/repositories/restore_previous_channel.py \
+              --manifest "$manifest" --archive "$RUNNER_TEMP/prior/signed-channel.tar.gz" \
+              --incoming "$RUNNER_TEMP/incoming" --channel "$CHANNEL"
+          fi
+          /usr/bin/python3 scripts/repositories/retain_channel_packages.py "$RUNNER_TEMP/incoming" --limit 2
           test "$(find "$RUNNER_TEMP/incoming" -maxdepth 1 -name '*.deb' | wc -l)" -ge 1
           test "$(find "$RUNNER_TEMP/incoming" -maxdepth 1 -name '*.rpm' | wc -l)" -ge 1
       - name: Import approved private key into ephemeral isolated keyring
