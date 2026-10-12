@@ -1,7 +1,6 @@
 """Real HTTP-token-worker-ledger acceptance without production data or models."""
 import io
 import json
-import os
 import stat
 import textwrap
 import wave
