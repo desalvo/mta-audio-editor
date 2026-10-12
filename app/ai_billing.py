@@ -19,7 +19,7 @@ def _borrow_connection(connection):
     """Keep reads on the caller transaction; never commit or close it."""
     yield connection
 
-UNITS = ('cpu_seconds', 'gpu_seconds', 'gpu_energy_joules', 'disk_gb_hours', 'disk_read_bytes', 'disk_write_bytes', 'request_bytes', 'response_bytes')
+UNITS = ('cpu_seconds', 'gpu_seconds', 'gpu_energy_joules', 'gpu_slot_seconds_estimated', 'disk_gb_hours', 'disk_read_bytes', 'disk_write_bytes', 'request_bytes', 'response_bytes')
 PERIODS = ('day', 'week', 'month', 'year', 'custom')
 # Per-process I/O includes temporary files and is diagnostic ONLY.
 # Billable storage must be based on persistent, user-owned assets.
@@ -69,6 +69,18 @@ def _init(c):
       UNIQUE(user_id,start_ts,end_ts,currency),
       FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE);
     ''')
+    c.execute("""CREATE TABLE IF NOT EXISTS ai_job_hardware_snapshots (
+      job_id TEXT PRIMARY KEY REFERENCES ai_compute_jobs(id) ON DELETE CASCADE,
+      captured_at INTEGER NOT NULL, model_version TEXT NOT NULL,
+      cpu_model TEXT, gpu_model TEXT, cpu_rate_micro INTEGER,
+      gpu_rate_micro INTEGER, storage_rate_micro INTEGER,
+      origin TEXT NOT NULL CHECK(origin IN ('local-advisory','unknown'))
+    )""")
+    c.execute('''CREATE TABLE IF NOT EXISTS ai_user_billing_settings (
+      user_id INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+      enabled INTEGER NOT NULL DEFAULT 0 CHECK(enabled IN (0,1)),
+      changed_at INTEGER NOT NULL
+    )''')
     # Safe additive upgrade for deployed SQLite ledgers. No record is deleted.
     columns = {r[1] for r in c.execute('PRAGMA table_info(ai_compute_jobs)')}
     if 'billable' not in columns:
@@ -78,8 +90,38 @@ def _init(c):
         c.commit()
 
 
+def user_billing_enabled(user_id: int, *, _connection=None) -> bool:
+    with (db() if _connection is None else _borrow_connection(_connection)) as c:
+        if _connection is None:
+            _init(c)
+        row = c.execute('SELECT enabled FROM ai_user_billing_settings WHERE user_id=?', (user_id,)).fetchone()
+        return bool(row and row['enabled'])
+
+
+def set_user_billing_enabled(user_id: int, enabled: bool) -> dict:
+    if isinstance(user_id, bool) or not isinstance(user_id, int) or user_id <= 0:
+        raise ValueError('Invalid user ID')
+    if not isinstance(enabled, bool):
+        raise ValueError('enabled must be boolean')
+    with db() as c:
+        _init(c)
+        c.execute('BEGIN IMMEDIATE')
+        if not c.execute('SELECT 1 FROM users WHERE id=? AND active=1', (user_id,)).fetchone():
+            raise ValueError('Active user required')
+        c.execute('INSERT INTO ai_user_billing_settings(user_id,enabled,changed_at) VALUES(?,?,?) '
+                  'ON CONFLICT(user_id) DO UPDATE SET enabled=excluded.enabled,changed_at=excluded.changed_at',
+                  (user_id,int(enabled),int(time.time())))
+    return {'user_id':user_id,'billing_enabled':enabled}
+
+
+def user_billing_settings() -> list[dict]:
+    with db() as c:
+        _init(c)
+        return [dict(r) for r in c.execute('SELECT user_id,enabled,changed_at FROM ai_user_billing_settings ORDER BY user_id')]
+
+
 def _validate_usage(values):
-    if not isinstance(values, dict) or set(values) - set(UNITS):
+    if not isinstance(values, dict) or set(values) - (set(UNITS) - {'gpu_slot_seconds_estimated'}):
         raise ValueError('Unsupported resource field')
     clean = {}
     for key, value in values.items():
@@ -104,9 +146,33 @@ def create_job(user_id: int, kind: str, token_id=None, *, started_at=None, diagn
         if c.execute('SELECT 1 FROM ai_billing_periods WHERE user_id=? AND start_ts<=? AND end_ts>? LIMIT 1',
                      (user_id, stamp, stamp)).fetchone():
             raise ValueError('Cannot create a job inside a closed billing interval')
+        # Freeze statistical hardware identity at job creation, not at reporting
+        # time: a migrated LXC must never reprice past jobs with the new host.
+        from .ai_billing_profiles import suggested_prices
+        hardware = suggested_prices()
         c.execute('INSERT INTO ai_compute_jobs(id,user_id,token_id,kind,status,started_at,billable) VALUES(?,?,?,?,?,?,?)',
                   (job_id,user_id,token_id,kind,'running',stamp,int(not diagnostic)))
+        suggested = hardware['suggested_micro_per_unit']
+        cpu_model, gpu_model = hardware['cpu_model'], hardware['gpu_model']
+        c.execute('''INSERT INTO ai_job_hardware_snapshots
+          (job_id,captured_at,model_version,cpu_model,gpu_model,cpu_rate_micro,
+           gpu_rate_micro,storage_rate_micro,origin)
+          VALUES(?,?,?,?,?,?,?,?,?)''',
+          (job_id,stamp,hardware['model_version'],cpu_model,gpu_model,
+           suggested['cpu_seconds'],suggested['gpu_slot_seconds_estimated'],
+           suggested['disk_gb_hours'],
+           'local-advisory' if cpu_model or gpu_model else 'unknown'))
+
     return job_id
+
+
+def job_hardware_snapshot(job_id: str) -> dict | None:
+    """Return immutable advisory hardware profile captured at job creation."""
+    with db() as c:
+        _init(c)
+        row = c.execute('SELECT * FROM ai_job_hardware_snapshots WHERE job_id=?',
+                        (job_id,)).fetchone()
+        return dict(row) if row else None
 
 
 def finish_job(job_id, status, usage=None, *, source='unmetered', finished_at=None):
@@ -323,12 +389,19 @@ def report(period='month', *, user_id=None, anchor=None, start=None, end=None, _
             records = c.execute('SELECT * FROM ai_compute_jobs WHERE started_at>=? AND started_at<? ORDER BY started_at,id', (a,b)).fetchall()
         else:
             records = c.execute('SELECT * FROM ai_compute_jobs WHERE started_at>=? AND started_at<? AND user_id=? ORDER BY started_at,id', (a,b,user_id)).fetchall()
+        # Statistics are independent of user opt-in and never authorize charges.
+        hardware_by_job = {}
+        for rec in records:
+            profile = c.execute('SELECT * FROM ai_job_hardware_snapshots WHERE job_id=?',
+                                (rec['id'],)).fetchone()
+            if profile:
+                hardware_by_job[rec['id']] = dict(profile)
         job_rates=_rates_for_jobs(c,records)
         groups={}
         for r in records:
             day=dt.datetime.fromtimestamp(r['started_at'],dt.timezone.utc).strftime('%Y-%m-%d')
             key=(r['user_id'],day)
-            row=groups.setdefault(key,{'user_id':r['user_id'],'day':day,'jobs':0,'metered_jobs':0,'cost_micro':0,'resources':{},'by_type':{}})
+            row=groups.setdefault(key,{'user_id':r['user_id'],'day':day,'jobs':0,'metered_jobs':0,'cost_micro':0,'suggested_cost_micro':0,'resources':{},'by_type':{}})
             row['jobs']+=1
             if r['resource_source']!='unmetered': row['metered_jobs']+=1
             kind=row['by_type'].setdefault(r['kind'],{'jobs':0,'cost_micro':0})
@@ -344,15 +417,46 @@ def report(period='month', *, user_id=None, anchor=None, start=None, end=None, _
                     and resource not in NON_BILLABLE_IO and resource != 'disk_gb_hours'):
                     cost+=round(qty*job_rates[r['id']].get(resource,0))
             row['cost_micro']+=cost; kind['cost_micro']+=cost
+            # Advisory electricity proxy, frozen at job creation. Never an
+            # invoice charge and never inferred for an unsuccessful job.
+            hardware = hardware_by_job.get(r['id'], {})
+            if (r['status'] == 'done' and r['resource_source'] != 'unmetered'
+                    and r['billable'] == 1 and hardware.get('cpu_rate_micro') is not None):
+                row['suggested_cost_micro'] += round(
+                    vals.get('cpu_seconds', 0) * hardware['cpu_rate_micro'])
         # Split storage at *both* UTC midnight and tariff effective-times.
         # A tariff change at 12:00 must not reprice the whole day.
         storage, storage_costs = _priced_storage_usage(c,a,b,user_id)
         for (uid,day), gb_hours in storage.items():
-            row=groups.setdefault((uid,day),{'user_id':uid,'day':day,'jobs':0,'metered_jobs':0,'cost_micro':0,'resources':{},'by_type':{}})
+            row=groups.setdefault((uid,day),{'user_id':uid,'day':day,'jobs':0,'metered_jobs':0,'cost_micro':0,'suggested_cost_micro':0,'resources':{},'by_type':{}})
             row['resources']['disk_gb_hours']=round(gb_hours,10)
+            # Storage electricity proxy is independent of CPU/GPU model.
+            from .ai_billing_profiles import DISK_RATE
+            row['suggested_cost_micro'] += round(gb_hours * DISK_RATE)
             row['cost_micro']+=round(storage_costs.get((uid,day),0))
-        return {'start_ts':a,'end_ts':b,'currency':'EUR','prices_micro':rates,
+        from .ai_gpu_slot_accounting import priced_period
+        slot_service = priced_period(c,a,b,user_id=user_id)
+        for gpu_job in slot_service['jobs']:
+            origin = next((r for r in records if r['id']==gpu_job['job_id']), None)
+            if origin is None:
+                raise ValueError('GPU slot accounting job not in requested period')
+            day=dt.datetime.fromtimestamp(origin['started_at'],dt.timezone.utc).strftime('%Y-%m-%d')
+            key=(gpu_job['user_id'],day)
+            row=groups.setdefault(key,{'user_id':gpu_job['user_id'],'day':day,'jobs':0,
+                'metered_jobs':0,'cost_micro':0,'suggested_cost_micro':0,'resources':{},'by_type':{}})
+            row['cost_micro']+=gpu_job['micro_eur']
+            hardware = hardware_by_job.get(gpu_job['job_id'], {})
+            if gpu_job.get('eligible') and hardware.get('gpu_rate_micro') is not None:
+                row['suggested_cost_micro'] += round(
+                    gpu_job['slot_seconds'] * hardware['gpu_rate_micro'])
+            row['resources']['gpu_slot_seconds_estimated']=round(
+                row['resources'].get('gpu_slot_seconds_estimated',0)+gpu_job['slot_seconds'],9)
+        return {'gpu_slot_service':slot_service, 'hardware_by_job':hardware_by_job,
+'start_ts':a,'end_ts':b,'currency':'EUR','prices_micro':rates,
+                'billing_enabled_users': sorted({r['user_id'] for r in records if user_billing_enabled(r['user_id'],_connection=c)}),
                 'rows':list(groups.values()),'total_micro':sum(row['cost_micro'] for row in groups.values()),
+                'suggested_total_micro':sum(row['suggested_cost_micro'] for row in groups.values()),
+                'suggested_cost_is_advisory':True,
                 'job_count':len(records),'diagnostic_jobs':sum(r['billable']==0 for r in records),
                 'unmetered_jobs':sum(r['billable']==1 and r['resource_source']=='unmetered' for r in records),
                 'running_jobs':sum(r['billable']==1 and r['status']=='running' for r in records),
@@ -509,7 +613,7 @@ def reconcile_period(user_id, start, end):
         rated = {r['resource'] for r in c.execute(
             'SELECT DISTINCT resource FROM ai_resource_price_history '
             'WHERE micro_per_unit>0 AND valid_from<? AND (valid_until IS NULL OR valid_until>?)',
-            (b, a)) if r['resource'] not in NON_BILLABLE_IO and r['resource'] != 'disk_gb_hours'}
+            (b, a)) if r['resource'] not in NON_BILLABLE_IO and r['resource'] not in ('disk_gb_hours', 'gpu_slot_seconds_estimated')}
         for job in jobs:
             if job['billable'] == 0:
                 continue
@@ -549,6 +653,11 @@ def reconcile_period(user_id, start, end):
                 issue('storage_coverage_missing')
             elif any(y['sampled_at']-x['sampled_at'] > 26*3600 for x, y in zip(samples, samples[1:])):
                 issue('storage_sampling_gap')
+        try:
+            from .ai_gpu_slot_accounting import priced_period
+            priced_period(c,a,b,user_id=user_id)
+        except ValueError as exc:
+            issue('gpu_slot_coverage_invalid',detail=str(exc))
     return {'user_id': user_id, 'start_ts': a, 'end_ts': b,
             'job_count': len(jobs), 'ready': not issues, 'issues': issues,
             'warning': 'Ledger-only audit; physical GPU metering must be hardware-validated'}
@@ -569,6 +678,11 @@ def close_period(user_id, start, end):
                            (user_id,a,b,'EUR')).fetchone()
         if existing:
             return {'id':existing['id'],'total_micro':existing['total_micro'],'already_closed':True}
+        mixed_gpu = c.execute("SELECT COUNT(DISTINCT resource) AS n FROM ai_resource_price_history "
+            "WHERE resource IN ('gpu_seconds','gpu_slot_seconds_estimated') AND micro_per_unit>0 "
+            "AND valid_from<? AND (valid_until IS NULL OR valid_until>?)",(b,a)).fetchone()
+        if mixed_gpu['n'] > 1:
+            raise ValueError('Measured and estimated GPU tariffs cannot both be active')
         # Account for ALL jobs intersecting the period, including jobs that began
         # before its start. Never let a job crossing a boundary evade verification.
         overlapping = c.execute('SELECT id FROM ai_billing_periods WHERE user_id=? AND start_ts<? AND end_ts>? LIMIT 1',
@@ -749,7 +863,7 @@ def run_scheduled_closures(*, at=None):
     now = dt.datetime.fromtimestamp(int(time.time() if at is None else at),dt.timezone.utc).date()
     output=[]
     for spec in schedules():
-        if not spec['enabled']:
+        if not spec['enabled'] or not user_billing_enabled(spec['user_id']):
             continue
         cadence=spec['cadence']
         if cadence=='month':

@@ -1,3 +1,9 @@
+## 0.3.0-r208 — Hardware snapshots and billing refinement
+
+- Freeze advisory CPU/GPU hardware and suggested profile rates per AI job; report historical profiles without repricing on LXC migration.
+- Preserve per-user billing opt-in, separate accounting telemetry from invoice tariffs, and update scheduled-closure regression coverage.
+- Explicitly document Proxmox unprivileged guest security review and remaining hardware acceptance tests.
+
 ## 0.3.0-r207 — CI coverage refinement (11 October 2026)
 
 - Added behavioral tests for authenticated AI gateway allowlisting, request limits, credential isolation, HTTPS/private upstream validation, response handling and audit on transport failures.

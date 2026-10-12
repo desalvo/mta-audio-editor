@@ -19,6 +19,7 @@ def stamp(s):
     return int(dt.datetime.fromisoformat(s).replace(tzinfo=dt.timezone.utc).timestamp())
 
 def test_auto_monthly_close_is_repeatable():
+    ai_billing.set_user_billing_enabled(uid(), True)
     ai_billing.configure_schedule(uid(),'month')
     ai_billing.set_price('cpu_seconds',1000000,valid_from='2025-01-01')
     jid=ai_billing.create_job(uid(),'whisper',started_at=stamp('2025-05-05T12:00:00'))

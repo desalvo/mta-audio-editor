@@ -150,6 +150,10 @@ def execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=N
     if len(encoded) > MAX_REQUEST_BYTES:
         raise ValueError('AI plan exceeds size limit')
     job_id = ai_billing.create_job(user_id, kind, token_id)
+    # Only operator-enabled GPU adapters obtain logical slots; neither the
+    # request plan nor the remote user may declare GPU eligibility.
+    from .ai_gpu_slot_accounting import slot_enabled_for_kind
+    gpu_slot_enabled = slot_enabled_for_kind(kind)
     with tempfile.TemporaryDirectory(prefix='mta-meter-') as folder:
         directory = Path(folder)
         request_path = directory / 'request.json'
@@ -166,7 +170,12 @@ def execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=N
         args = ([sys.executable, str(worker)] if worker.suffix == '.py' else [str(worker)])
         args += ['--request', str(request_path), '--output', str(output_path)]
         result = None
+        gpu_slot_acquired = False
         try:
+            if gpu_slot_enabled:
+                from . import ai_gpu_slot_accounting as gpu_slots
+                gpu_slots.acquire(job_id, os.getenv('MTA_AI_GPU_LOGICAL_DEVICE', 'gpu0'))
+                gpu_slot_acquired = True
             if os.getenv('MTA_AI_CGROUP_PARENT'):
                 from .ai_cgroup_metering import run_cgroup_process
                 result = run_cgroup_process(args, cwd=folder, timeout_seconds=timeout_seconds)
@@ -180,12 +189,20 @@ def execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=N
             # Transient worker I/O is diagnostic only, never billable disk use.
             # The output may already be counted in /proc/<pid>/io. Never add
             # its size a second time as if it were extra physical disk I/O.
+            if gpu_slot_acquired:
+                gpu_slots.release(job_id)
+                gpu_slot_acquired = False
             ai_billing.finish_job(job_id, 'done', usage if result.isolated else None,
                                   source=result.source if result.isolated else 'unmetered')
             return payload, {'job_id': job_id, 'audio': info, 'usage': usage,
                              'gpu_metered': False, 'process_tree_metered': result.isolated,
                              'gpu_diagnostics': result.gpu_diagnostics or {}, 'media_type': media_type}
         except BaseException:
+            if gpu_slot_acquired:
+                # Do not silently finalize a job if its lease cannot be
+                # accounted for. Recovery must reconcile it explicitly.
+                gpu_slots.release(job_id, aborted=True)
+                gpu_slot_acquired = False
             if result is None:
                 ai_billing.finish_job(job_id, 'failed', source='unmetered')
             else:

@@ -49,6 +49,7 @@ def test_billing_write_endpoints(monkeypatch, billing_client):
     recorded = []
     monkeypatch.setattr(b, 'set_price', lambda *args, **kwargs: recorded.append(('price', args, kwargs)))
     monkeypatch.setattr(b, 'close_period', lambda *args: {'user_id': args[0]})
+    monkeypatch.setattr(b, 'user_billing_enabled', lambda user_id: True)
     monkeypatch.setattr(b, 'configure_schedule', lambda *args: recorded.append(('schedule', args)))
     assert billing_client.put('/api/admin/ai-billing/prices/cpu_seconds', json={'micro_per_unit': 2, 'valid_from': '2026-10-11'}).json()['ok']
     assert billing_client.post('/api/admin/ai-billing/close', json={'user_id': 2, 'start': '2026-10-01', 'end': '2026-11-01'}).json()['user_id'] == 2

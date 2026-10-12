@@ -553,3 +553,316 @@ Run the related regression tests:
 ```bash
 PYTHONPATH=. pytest -q tests/test_r207_amd_smi_collector.py tests/test_r207_gpu_shared_estimator.py
 ```
+
+## Agentless GPU slot accounting — development stage (0.3.0-r207)
+
+`app.ai_gpu_slot_accounting` implements a conservative **single logical GPU**
+slot-service estimator, independent of ROCm or a Proxmox host agent. Its method
+identifier is `agentless-equal-slot-v1`. Trusted server scheduling code must
+call `acquire(job_id, gpu_key, at_ms=...)` **only when a GPU slot is granted**,
+not while queued, and `release(job_id, at_ms=..., aborted=...)` when the
+allocation ends. `preview(gpu_key, start_ms, end_ms, rate_micro_per_second=0)`
+computes a repeatable *hypothetical* micro-EUR quote. The default rate is zero.
+The API is deliberately **not** exposed to clients: user input cannot create
+leases or choose hardware usage. Quotes are **not invoices**, are not attached
+to immutable billing snapshots, and do not authorize monetary collection.
+
+For overlapping leases on the same logical GPU, a millisecond of available
+slot capacity is shared equally among active MTA allocations. Time spent in
+queue does not count. A failed, aborted, non-billable or diagnostic job cannot
+receive a monetary quote, while its reservation interval remains in the
+capacity split. An active lease or running job in the window prevents a quote.
+The computed total never exceeds the chosen window's slot capacity.
+
+This is a **contractual slot-time estimate**, not actual GPU busy time, GPU
+energy, HIP kernel execution time, or proof that other host processes were
+absent. External GPU usage is explicitly unobserved. Consequently this module
+never writes `gpu_seconds`, bypasses `finish_job`'s trusted GPU gate, sets
+production tariffs, or creates invoices. Before billing is enabled, implement
+trusted, crash-safe integration with the centralized scheduler and worker
+lifecycle; persistent device-identity/migration rules, accurate concurrency
+coordination across MTA instances, administrator opt-in tariff and disclosures,
+ledger/snapshot integration, and full hardware acceptance tests.
+
+Tests: `PYTHONPATH=. pytest tests/test_r207_gpu_slot_accounting.py`.
+
+### Trusted worker slot lifecycle and non-monetary admin report (r207)
+
+The central `execute_registered_worker` now supports an **opt-in** agentless
+slot lease. An operator can enable this on the AI server with:
+
+```bash
+MTA_AI_GPU_SLOT_TRACKING_ENABLED=true
+MTA_AI_GPU_SLOT_KINDS=demucs,whisper,drumsep,sam-audio
+MTA_AI_GPU_LOGICAL_DEVICE=gpu0
+```
+
+Only explicitly listed, administrator-installed adapter kinds are included.
+Select kinds that **actually run on the GPU**; the server cannot prove that a
+worker used the GPU merely because it was assigned a logical slot. The lease
+starts immediately before launching the subprocess (never at admission/queue
+entry), is released on success, and aborted on failure/timeout. Both states
+are persisted in SQLite. The release happens before the job is finalized.
+GPU slot tracking is disabled by default, and leaves `gpu_seconds` unset.
+
+Admin-only, read-only endpoints:
+
+- `GET /api/admin/ai-billing/gpu-slots/preview?gpu_key=gpu0&start_ms=...&end_ms=...`
+  returns a **zero-rate** breakdown, `not_an_invoice=true`; it refuses
+  incomplete leases and still-running jobs.
+- `GET /api/admin/ai-billing/gpu-slots/recovery?older_than_ms=3600000`
+  reports possible stale leases without changing any records.
+
+After a container migration, a killed worker may leave an active lease.
+An operator must first confirm the previous worker is gone and then run
+`app.ai_gpu_slot_accounting.recover_stale_leases(dry_run=False)` separately.
+This recovery deliberately **never** runs automatically and aborts leases;
+it cannot fabricate GPU usage or costs. A recovery of the compute job itself
+is still handled through the separate `ai_billing.recover_stale_jobs` procedure.
+
+**Not yet enabled or certified:** monetary rates, invoice/snapshot inclusion,
+physical GPU utilization, fair sharing across independent MTA installations,
+transactionally durable recovery across container migration, and the
+agent-assisted measurement tier. The preview's hypothetical rate argument is
+not available to end users or as a paid API. Deploying this code does not
+change an existing CPU/storage invoice.
+
+Targeted tests:
+
+```bash
+PYTHONPATH=. pytest -q tests/test_r207_gpu_slot_accounting.py tests/test_r207_authenticated_worker_e2e.py
+```
+
+### Agentless GPU slot-service pricing (r207, opt-in)
+
+The resource `gpu_slot_seconds_estimated` is a **contractual reservation capacity
+unit**, never a measurement of exclusive GPU work, energy or processor time.
+It is independent of `gpu_seconds` (trusted, measured GPU telemetry), and the
+billing engine refuses simultaneous positive tariffs for these two resources.
+The default tariff is **zero**; existing deployments do not incur any GPU slot
+cost unless an administrator deliberately sets a positive tariff.
+
+Administrators can use the existing authenticated tariff endpoint:
+
+```text
+PUT /api/admin/ai-billing/prices/gpu_slot_seconds_estimated
+{"micro_per_unit": 1000, "valid_from": "2026-11-01"}
+```
+
+This is an *illustrative* tariff and should not be applied to a production
+account without first enabling trusted server-side slot tracking, reviewing
+service terms, and validating complete evidence. Positive tariffs are versioned
+in the existing immutable price history, and charges are split whenever the
+rate changes within the reporting period. The normal `report` endpoint includes
+`gpu_slot_service` with provenance and an explicit warning that external GPU
+activity is not observable without a host agent. Successful jobs only are
+eligible; failed, cancelled, aborted and diagnostic jobs are not charged.
+A job waiting for capacity has no lease and contributes no slot seconds.
+
+Pricing allocates the logical GPU's capacity across **all concurrently leased
+jobs**, even when a report is filtered to a single user. Closing a period uses
+the same allocation under the database billing transaction, captures the full
+method and evidence in the immutable invoice snapshot, and fails closed when a
+lease is still active or crosses the billing period boundary. When slot
+tracking is enabled, a configured GPU worker without a lease prevents paid
+billing rather than silently becoming zero use. The accounting does not
+pretend to see external GPU processes; therefore charging constitutes an
+explicit contract for scheduler-assigned capacity, not hardware utilization.
+
+Note: `gpu_slot_service` is absent from older invoice snapshots; old invoices
+remain immutable. The `gpu_slot_seconds_estimated` tariff is not yet a generic
+host-agent-selected GPU price: automated tariff selection based on hardware
+sensor quality remains outside this release.
+
+Regression tests: `tests/test_r207_gpu_slot_paid_invoices.py`.
+
+## Optional electricity-reference price suggestions (0.3.0-r207)
+
+Billing is **off by default for every user**; prices provided here are
+**suggestions for statistics and operator configuration**, not live rates that
+silently create invoices. The Italian electricity benchmark is EUR 0.4343/kWh
+(ARERA, October–December 2026, tax included; not a substitute for an actual
+commercial tariff).
+
+| Resource / model | Accounting unit | Indicative rate | microEUR/unit |
+|---|---|---:|---:|
+| AMD Radeon 8060S | equivalent allocated GPU-slot-second | EUR 0.000010 | 10 |
+| AMD Radeon 8050S | equivalent allocated GPU-slot-second | EUR 0.000008 | 8 |
+| AMD Ryzen AI MAX+ 395 or MAX 390 | CPU core-second | EUR 0.000001 | 1 |
+| Persistent storage (hardware-independent policy) | GiB-hour | EUR 0.000002 | 2 |
+
+The GPU slot unit is **contractually allocated GPU capacity**, divided
+conservatively between overlapping jobs; it is not physical GPU engine time.
+CPU time means accumulated cgroup CPU time, not wall time. On Strix Halo the
+CPU and GPU share an APU power budget, so these model-specific prices are
+illustrative service-cost proxies, **not additive physical power measurements**.
+Persistent-storage pricing is a fixed generic capacity policy, not a measurement
+of the actual underlying storage technology or electricity draw.
+
+API for operators:
+
+- `GET /api/admin/ai-billing/suggested-prices?cpu_model=AMD%20Ryzen%20AI%20MAX%2B%20395&gpu_model=AMD%20Radeon%208060S`
+- `GET /api/admin/ai-billing/user-settings` (users not listed are disabled)
+- `PUT /api/admin/ai-billing/user-settings/{user_id}` JSON `{"enabled":true}`
+- `PUT /api/admin/ai-billing/user-settings/{user_id}` JSON `{"enabled":false}`
+
+Automatic scheduled closings skip all users without explicit opt-in. The admin
+HTTP close endpoint rejects disabled users. Direct library billing functions
+remain available for **isolated diagnostics/testing** and existing historical
+snapshot compatibility. Hardware suggestions are not silently inserted into
+historical rate tables: applying real prices is a distinct, explicit admin
+operation; keep `gpu_seconds` and `gpu_slot_seconds_estimated` mutually exclusive.
+A production deployment that needs different rates for multiple GPU/CPU models
+must record the device/model binding per job and apply hardware-specific price
+history: this full dynamic pricing path is **not yet implemented**. Thus,
+profiles published here are advisory defaults, not automatic per-job rates.
+
+### Radeon 780M and portable profile discovery
+
+The illustrative GPU catalog includes **AMD Radeon 780M** at **4 microEUR per equivalent GPU-slot-second** (assumed GPU power 33.15 W at the 2026-Q4 electricity reference rate). This is a pricing assumption, not a measured power draw. `GET /api/admin/ai-billing/suggested-prices` now tries to identify a GPU agent via `rocminfo` when the `gpu_model` query parameter and `MTA_AI_GPU_MODEL` override are absent. CPU agents are not considered. Missing/ambiguous identification gives no GPU price suggestion. For remote workers the local hardware profile is not proof of the worker's device; per-job hardware bindings and tariff snapshots remain future work. Discovery never installs prices, enables user billing, or creates charges.
+
+### AMD Ryzen 9 7940HS / Radeon 780M indicative rates
+
+The hardware-specific advisory catalog includes **AMD Ryzen 9 7940HS** at **1 microEUR per measured CPU core-second** and **AMD Radeon 780M** at **4 microEUR per equivalent allocated GPU-slot-second**. Persistent storage remains **2 microEUR per GiB-hour**, irrespective of device model. The assumed CPU-core power (8.289 W) and GPU power (33.15 W) are illustrative allocations at the reference electricity price, **not independent measurements of this shared APU**. Avoid interpreting their combined theoretical charges as measured electrical consumption. Device identification is advisory, per-job remote worker identification is not yet proven, and tariff suggestions never enable billing, populate active tariffs, or opt users in.
+
+## 0.3.0-r208 — Billing dashboard and optional Proxmox host agent
+
+The administrative `/admin/ai-billing` page now has a responsive dashboard with
+period filters, projected (statistical) prices, per-user billing opt-in, profile
+suggestions, GPU-slot diagnostics, scheduler controls, reconciliation, immutable
+closure confirmation, invoice audit, and read-only GPU-agent status. No price
+suggestion automatically enables billing. The existing administrative APIs
+remain protected by `require_admin`.
+
+The **optional** host agent reads `amd-smi process --gpu 0 --json` and host
+`/proc/<pid>/cgroup` through a UNIX socket, requiring a random secret stored
+outside the repository. To install on an actual Proxmox host with `amd-smi`
+already installed, copy the repository scripts there and run:
+
+```sh
+sudo bash scripts/install_mta_proxmox_gpu_agent.sh
+```
+
+The service uses `/run/mta-gpu-agent/agent.sock`, no TCP port. Explicitly
+bind-mount that socket directory (not `/proc`!) into the LXC with matching
+permissions. Configure `MTA_AI_GPU_HOST_AGENT_SOCKET` inside the LXC and the
+`MTA_AI_GPU_HOST_AGENT_TOKEN` from `/etc/mta-gpu-agent.env` using a secure
+secret delivery mechanism; never commit secrets. Review permissions, cgroup
+visibility, and Proxmox device passthrough on **each** migration target.
+Without the agent or the mount, agentless slot estimation remains available.
+The agent reports diagnostics only: host process identification and cgroup
+strings must not be treated as certified GPU time or automatic invoice data.
+
+The agent installer deliberately **does not** install AMD host kernel drivers
+or alter Proxmox GPU passthrough; those are host responsibilities. The regular
+MTA installer handles ROCm userspace inside the LXC. First deployment of the
+host agent must be tested on Proxmox before relying on the data; no live host
+installation has been performed by these repository changes.
+
+### r208 pre-commit refinement: Proxmox agent and billing dashboard
+
+- The optional Proxmox host agent still reports **diagnostics only**, never
+  authorizes billable GPU seconds. The LXC client accepts only a fresh snapshot
+  (within 30 seconds), validates every host PID and GPU identifier and rejects
+  malformed or replayed responses. A socket bind-mounted at
+  `/run/mta-gpu-agent/agent.sock` is detected automatically; set
+  `MTA_AI_GPU_HOST_AGENT_SOCKET` to override the path. The authentication token
+  must still be configured separately and protected (`MTA_AI_GPU_HOST_AGENT_TOKEN`).
+- Host and LXC PID namespaces differ. No PID match is inferred from numeric
+  equality alone. Without a trusted host association, GPU slot accounting stays
+  agentless. Deploy the host agent per Proxmox node; migrations must rediscover
+  the *current* socket. The host service and LXC bind mount still require
+  actual operational validation on your Proxmox installation.
+- The Billing dashboard GPU preview now supplies an explicit last-24-hour
+  interval. Its totals are calculated at *configured historical tariffs*, not
+  at advisory hardware-price suggestions. The advisory detected CPU/GPU profile
+  and suggested micro-EUR rates are displayed separately.
+- Important remaining limitation: the detected model is currently a **local
+  advisory profile**, not an immutable hardware identity attached to every AI
+  job. Hardware-specific tariffs are therefore **not yet automatically chosen
+  per job**, especially following LXC migration or off-host worker execution.
+  Do not enable monetary hardware-based billing expecting that behavior until
+  this gap is closed and verified. Per-user opt-in remains disabled by default.
+- Quality/SAST and host deployment checks must be run against the committed
+  package. Regression tests cover protocol validation and the billing UI.
+
+### Proxmox Debian agent (r208, opt-in tags)
+
+Build the standalone host package on Debian/Proxmox with
+`bash packaging/proxmox-gpu-agent/build_deb.sh dist`. Install it **on the Proxmox
+host**, not inside LXC, with `apt install ./mta-proxmox-gpu-agent_0.3.0-208_all.deb`.
+The service requires `amd-smi` on the host; an unavailable AMD SMI leaves the
+agent failing safely and does not stop agentless billing inside MTA.
+
+Only containers marked with **both** `mta-audio-editor` and `mta-gpu-agent`
+are eligible. The opt-in tag is intentional; discover candidates using
+`python3 /usr/lib/mta-proxmox-gpu-agent/tag_sync.py` without `--apply` first.
+The systemd reconciliation timer applies a **read-only** mount from the host
+`/run/mta-gpu-agent` directory to privileged, explicitly tagged CTs using a
+free Proxmox `mpN` mountpoint. It never overwrites existing mounts or restarts
+a container. Mount changes take effect after an operator-approved CT restart.
+Unprivileged CTs require operator review of UID/GID permissions and are not
+auto-modified. Tokens are root-only; never paste them into logs or tickets.
+
+On a tagged LXC, `app.ai_proxmox_gpu_agent_client.snapshot()` discovers the
+mounted socket and reads the token from `/run/mta-gpu-agent/token`, with
+explicit environment overrides available. On hosts without the agent, or after
+a migration to an unprepared host, agentless slot statistics remain available.
+These agent snapshots are **diagnostic** and never directly authorize billed
+hardware GPU seconds. A token is a shared secret: only opt in trusted LXC
+administrators; a privileged LXC with a host bind mount is not a security
+boundary against a hostile container administrator.
+
+The `.deb` does not install DKMS/kernel AMD drivers or restart LXC instances.
+To uninstall: `apt remove mta-proxmox-gpu-agent`; review previously configured
+`mpN` entries explicitly (removal does not rewrite LXC configs).
+
+## r208 hardware snapshots and migration-safe statistical profiles
+
+Every newly created AI job records an immutable, **advisory** local hardware
+snapshot in `ai_job_hardware_snapshots`: canonical CPU/GPU name, model/profile
+revision and suggested micro-EUR rates. The values are captured when the job
+is created, so later host/LXC migrations do not rewrite its historical
+statistical identity. `job_hardware_snapshot(job_id)` reads the record, and
+`report()` includes `hardware_by_job` for its job set.
+
+These snapshots are *not* authoritative remote-worker attestations: local
+`rocminfo`, `/proc/cpuinfo`, and environment overrides can identify the MTA
+server rather than the actual remote execution hardware. Consequently they
+never select a monetary invoice rate automatically. Financial billing still
+uses explicitly configured, historized tariffs and requires explicit opt-in
+per user. Jobs created before this additive schema change have no snapshot
+and must not be backfilled using the current host hardware.
+
+## r208 unprivileged LXC policy
+
+The tagged Proxmox agent installer does not automatically mount a privileged
+host socket into an unprivileged container: UID maps and ownership must be
+reviewed by the host administrator. `mta_proxmox_tag_sync.py` reports
+`manual-review` rather than silently weakening security. The host agent is
+optional and absence of the socket does not interrupt agentless GPU slots.
+Any configured mount requires a container restart to take effect; the package
+never restarts running containers automatically.
+
+## Acceptance criteria still requiring hardware
+
+Verify actual HIP workers and correct CPU/GPU provenance for remote execution,
+privileged/unprivileged Proxmox socket permissions, tagged CT migration to
+another host, stale-job recovery and billing dashboard desktop/mobile layout.
+No hardware validation or automatic per-worker model attestation is claimed
+by the unit tests included with this release.
+
+### r208: statistical energy-cost estimate separate from invoices
+
+The report API now includes `suggested_total_micro` and each daily row includes
+`suggested_cost_micro`. These values are **advisory electricity-cost proxies**:
+CPU cost uses the immutable local hardware snapshot recorded when each successful
+metered job was created; agentless GPU cost uses the job's immutable GPU profile
+and its eligible allocated slot share; storage uses the generic suggested
+GiB-hour price. Unknown hardware yields no CPU/GPU suggested component, rather
+than guessing a model. Diagnostic, failed, and unmetered compute jobs never
+contribute a suggested CPU amount. These estimates do **not** change the
+existing `total_micro` based on the administrator-configured tariff history,
+do not authorize invoice creation, and do not enable billing for any user.
+Remote-worker hardware remains **unverified** by these local advisory snapshots;
+no automatic hardware-dependent monetary tariff is selected from them.

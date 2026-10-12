@@ -1,0 +1,28 @@
+name: Proxmox GPU agent Debian package
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'packaging/proxmox-gpu-agent/**'
+      - 'scripts/mta_proxmox_gpu_agent.py'
+      - 'scripts/mta_proxmox_tag_sync.py'
+      - 'app/ai_proxmox_gpu_agent_client.py'
+      - '.github/workflows/proxmox-gpu-agent-deb.yml'
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Debian artifact
+        run: bash packaging/proxmox-gpu-agent/build_deb.sh dist
+      - name: Validate package
+        run: |
+          dpkg-deb --info dist/*.deb
+          dpkg-deb --contents dist/*.deb
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mta-proxmox-gpu-agent-deb
+          path: dist/*.deb
+          if-no-files-found: error

@@ -100,3 +100,33 @@ def test_worker_failure_is_not_billable(isolated_api, tmp_path, monkeypatch):
         jobs = [dict(r) for r in connection.execute('SELECT status,resource_source FROM ai_compute_jobs')]
     assert len(jobs) == 1 and jobs[0]['status'] == 'failed'
     assert ai_billing.report('month', user_id=1)['total_micro'] == 0
+
+
+def test_gpu_slot_lifecycle_on_success(isolated_api, monkeypatch):
+    monkeypatch.setenv('MTA_AI_GPU_SLOT_TRACKING_ENABLED','true')
+    monkeypatch.setenv('MTA_AI_GPU_SLOT_KINDS','ace-step')
+    client, token, _ = isolated_api
+    response = client.post('/api/ai-jobs/execute', headers={'Authorization':f'Bearer {token}'},
+                           json={'kind':'ace-step','plan':{'test':'slot-success'}})
+    assert response.status_code == 200, response.text
+    with db() as c:
+        lease = c.execute('SELECT state,acquired_ms,released_ms FROM ai_gpu_slot_leases').fetchone()
+        assert lease['state'] == 'released' and lease['released_ms'] >= lease['acquired_ms']
+        usage = json.loads(c.execute('SELECT usage_json FROM ai_compute_jobs').fetchone()[0])
+        assert 'gpu_seconds' not in usage
+
+
+def test_gpu_slot_lifecycle_on_failure(isolated_api, tmp_path, monkeypatch):
+    monkeypatch.setenv('MTA_AI_GPU_SLOT_TRACKING_ENABLED','true')
+    monkeypatch.setenv('MTA_AI_GPU_SLOT_KINDS','ace-step')
+    worker = tmp_path / 'failing_gpu_worker.py'
+    worker.write_text('#!/usr/bin/env python3\nraise SystemExit(1)\n')
+    worker.chmod(worker.stat().st_mode | stat.S_IXUSR)
+    monkeypatch.setenv('MTA_AI_WORKER_ACE_STEP_EXECUTABLE', str(worker))
+    client, token, _ = isolated_api
+    response = client.post('/api/ai-jobs/execute', headers={'Authorization':f'Bearer {token}'},
+                           json={'kind':'ace-step','plan':{'test':'slot-failure'}})
+    assert response.status_code == 503
+    with db() as c:
+        assert c.execute('SELECT state FROM ai_gpu_slot_leases').fetchone()[0] == 'aborted'
+        assert c.execute('SELECT status FROM ai_compute_jobs').fetchone()[0] == 'failed'
