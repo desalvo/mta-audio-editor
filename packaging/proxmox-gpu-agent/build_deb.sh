@@ -2,7 +2,7 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 OUT="${1:-$ROOT/dist}"
-VERSION=0.3.0-208.6
+VERSION=0.3.0-208.7
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 PKG="$TMP/pkg"
@@ -10,6 +10,7 @@ install -d -m 0755 "$PKG/DEBIAN" "$PKG/usr/lib/mta-proxmox-gpu-agent" "$PKG/usr/
 install -m 0755 "$ROOT/scripts/mta_proxmox_gpu_agent.py" "$PKG/usr/lib/mta-proxmox-gpu-agent/agent.py"
 install -m 0755 "$ROOT/scripts/mta_proxmox_tag_sync.py" "$PKG/usr/lib/mta-proxmox-gpu-agent/tag_sync.py"
 install -m 0755 "$ROOT/scripts/mta_proxmox_gpu_preflight.py" "$PKG/usr/lib/mta-proxmox-gpu-agent/preflight.py"
+install -m 0755 "$ROOT/scripts/mta_proxmox_gpu_readiness.py" "$PKG/usr/lib/mta-proxmox-gpu-agent/readiness.py"
 cat > "$PKG/DEBIAN/control" <<EOF
 Package: mta-proxmox-gpu-agent
 Version: $VERSION
