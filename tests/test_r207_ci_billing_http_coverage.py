@@ -25,6 +25,7 @@ def client(monkeypatch):
     monkeypatch.setattr(billing.ai_billing, 'prices', lambda: {'cpu': 10})
     monkeypatch.setattr(billing.ai_billing, 'tariff_history', lambda: [])
     monkeypatch.setattr(billing.ai_billing, 'set_price', lambda *a, **k: None)
+    monkeypatch.setattr(billing.ai_billing, 'user_billing_enabled', lambda user_id: user_id == 7)
     monkeypatch.setattr(billing.ai_billing, 'close_period', lambda *a: {'id': 3, 'total_micro': 31})
     monkeypatch.setattr(billing.ai_billing, 'audit_closed_invoices', lambda *a: {'issues': []})
     monkeypatch.setattr(billing.ai_billing, 'bills', lambda *a: [{'id': 3}])
