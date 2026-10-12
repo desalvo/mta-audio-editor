@@ -112,9 +112,12 @@ jobs:
           mkdir -p "$HOME/.ssh"
           printf '%s\n' "$DEPLOY_KEY" > "$HOME/.ssh/mta-pages"
           chmod 600 "$HOME/.ssh/mta-pages"
-          ssh-keyscan -t ed25519 github.com > "$HOME/.ssh/known_hosts"
-          test "$(ssh-keygen -lf "$HOME/.ssh/known_hosts" | awk '{print $2}')" = 'SHA256:+DiY3wvvV6TuJJhbpZisF/zLDA0zPZ7Mtd8Yg7cU6c'
-          printf 'Host github.com\n  IdentityFile %s/.ssh/mta-pages\n  IdentitiesOnly yes\n' "$HOME" > "$HOME/.ssh/config"
+          # GitHub-published Ed25519 host key. Do not trust an unauthenticated keyscan.
+          # The ssh.github.com:443 endpoint avoids runners where outbound port 22 is blocked.
+          printf '%s\n' '[ssh.github.com]:443 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl' > "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/known_hosts"
+          test "$(ssh-keygen -lf "$HOME/.ssh/known_hosts" | awk '{print $2}')" = 'SHA256:+DiY3wvvV6TuJJhbpZisF/zLDA0zPMSvHdkr4UvCOqU'
+          printf 'Host github.com\n  HostName ssh.github.com\n  Port 443\n  User git\n  IdentityFile %s/.ssh/mta-pages\n  IdentitiesOnly yes\n  StrictHostKeyChecking yes\n' "$HOME" > "$HOME/.ssh/config"
       - name: Create signed-channel archive (binary payload stays outside Git)
         env:
           CHANNEL: ${{ inputs.channel }}
