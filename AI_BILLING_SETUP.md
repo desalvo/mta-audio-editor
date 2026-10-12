@@ -446,3 +446,24 @@ has not been validated inside the user's Proxmox LXC environment.
 The `ai_compute_jobs.billable` SQLite field distinguishes ordinary billable jobs (`1`) from internal diagnostic runs (`0`). Internal smoke tests should call `create_job(..., diagnostic=True)`. On the first schema upgrade, existing `accounting_validation` smoke tests are marked non-billable, retaining all measurements for audit. Diagnostic usage is visible in reports but excluded from monetary totals and billable-job closure prerequisites. Run period closing tests using a disposable data directory, not the production SQLite database.
 
 The Linux wizard resolves the remote Git ref before deciding whether a source update is necessary. It refuses to replace a checkout with locally modified tracked files, checks for the cgroup launcher before activating systemd, stages dependencies and saves previous source/service for rollback on failed HTTP health. After updating, validate your environment-specific worker startup and ingress externally.
+
+### Isolated acceptance validation (r207)
+
+Run without touching the production SQLite ledger, tariffs, or storage:
+
+```bash
+cd /opt/mta/application
+PYTHONPATH="$PWD" /opt/mta/venv-mta/bin/python scripts/mta_billing_isolated_validation.py
+```
+
+The standalone script creates its own temporary MTA_DATA_DIR, user storage,
+synthetic prices and jobs, validates CPU/GB-hour calculations, non-billable
+validation jobs, idempotent closure, immutable snapshots and retrospective
+job rejection. **Never use live production prices for this test.**
+
+The automated regression `tests/test_r207_authenticated_worker_e2e.py` exercises
+Bearer-token HTTP execution with a deterministic lightweight trusted WAV worker,
+ledger attribution, request-idempotency, cross-user access rejection,
+unsafe-command rejection and failed-job non-billing. It runs in a temporary
+SQLite database without downloading AI models or using physical GPUs. This is
+not certification of ROCm/GPU hardware or the live production ingress.
