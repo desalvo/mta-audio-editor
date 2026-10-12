@@ -499,3 +499,25 @@ PID namespaces in LXC and uninstrumented frameworks remain unverified. The
 Strix Halo Radeon 8060S was observed to report `GFX: 0 ns` under AMD SMI
 while a HIP event benchmark measured a positive elapsed interval. This does
 not establish a billable per-job GPU counter. Keep GPU tariffs disabled.
+
+### Concurrent GPU jobs: diagnostic capacity estimation (r207)
+
+`app.ai_gpu_shared_estimator.estimate_shared_capacity()` provides an opt-in,
+**non-billable** GPU-equivalent-capacity calculation (`shared-capacity-proportional-v1`).
+For each non-overlapping, scheduler-attested wall-clock window it multiplies
+externally observed whole-device utilization by the window duration, then
+allocates that capacity among known MTA jobs proportionally to instrumented
+HIP-event *activity weights*. The weights are not exclusive GPU time.
+
+Unavailable utilization, unknown external activity and malformed inputs fail
+closed: capacity is left unallocated rather than charged to users. HIP Events
+alone must not be used to fabricate whole-device utilization. In particular,
+when the AMD SMI global utilization is unreliable or not accessible, the
+estimator cannot provide verified capacity allocations. Neither the existing
+`gpu_seconds` billing metric nor any paid GPU tariff is activated by this
+module. No automatic write into the billing ledger is performed.
+
+The method is deterministic and versioned for later controlled calibration;
+production scheduling/telemetry integration, trusted provenance, external
+process detection and customer-facing consent remain future prerequisites
+before any estimated GPU price can be enabled.
