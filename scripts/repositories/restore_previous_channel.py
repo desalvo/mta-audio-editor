@@ -16,7 +16,22 @@ def restore(manifest, archive, incoming, channel):
     with tarfile.open(archive, 'r:gz') as tar:
         for member in tar:
             name = member.name.removeprefix('./')
-            prefix = f'apt/{channel}/pool/' if name.endswith('.deb') else f'rpm/{channel}/packages/'
+            if name.endswith('.deb'):
+                prefix = f'apt/{channel}/pool/'
+                destination_dir = incoming
+            elif name.endswith('.rpm'):
+                if name.startswith(f'rpm/{channel}/el10/packages/'):
+                    prefix = f'rpm/{channel}/el10/packages/'
+                    destination_dir = incoming / 'rpm' / 'el10'
+                elif name.startswith(f'rpm/{channel}/el9/packages/'):
+                    prefix = f'rpm/{channel}/el9/packages/'
+                    destination_dir = incoming / 'rpm' / 'el9'
+                else:
+                    # Legacy snapshot before EL9/EL10 split.
+                    prefix = f'rpm/{channel}/packages/'
+                    destination_dir = incoming / 'rpm' / 'el9'
+            else:
+                continue
             if not name.startswith(prefix) or '/' in name[len(prefix):]:
                 continue
             if not member.isfile():
@@ -24,7 +39,8 @@ def restore(manifest, archive, incoming, channel):
             filename = Path(name).name
             if not filename or filename.startswith('.'):
                 raise ValueError('Unsafe package name')
-            destination = incoming / filename
+            destination_dir.mkdir(parents=True, exist_ok=True)
+            destination = destination_dir / filename
             if destination.exists():
                 continue  # Current candidate takes precedence; signature is regenerated.
             source = tar.extractfile(member)

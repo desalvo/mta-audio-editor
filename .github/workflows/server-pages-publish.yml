@@ -52,9 +52,12 @@ jobs:
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/incoming"
           gh run download "$RUN_ID" -R "$GITHUB_REPOSITORY" -n mta-server-deb-debian13-unreleased-test -D "$RUNNER_TEMP/incoming"
-          gh run download "$RUN_ID" -R "$GITHUB_REPOSITORY" -n mta-server-rpm-unreleased-test -D "$RUNNER_TEMP/incoming"
+          mkdir -p "$RUNNER_TEMP/incoming/rpm/el9" "$RUNNER_TEMP/incoming/rpm/el10"
+          gh run download "$RUN_ID" -R "$GITHUB_REPOSITORY" -n mta-server-rpm-unreleased-test -D "$RUNNER_TEMP/incoming/rpm/el9"
+          gh run download "$RUN_ID" -R "$GITHUB_REPOSITORY" -n mta-server-rpm-el10-unreleased-test -D "$RUNNER_TEMP/incoming/rpm/el10"
           test "$(find "$RUNNER_TEMP/incoming" -maxdepth 1 -name '*.deb' | wc -l)" -ge 1
-          test "$(find "$RUNNER_TEMP/incoming" -maxdepth 1 -name '*.rpm' | wc -l)" -ge 1
+          test "$(find "$RUNNER_TEMP/incoming/rpm/el9" -name '*.rpm' | wc -l)" -ge 1
+          test "$(find "$RUNNER_TEMP/incoming/rpm/el10" -name '*.rpm' | wc -l)" -ge 1
       - name: Restore previous channel and retain two versions
         env:
           GH_TOKEN: ${{ github.token }}
@@ -77,7 +80,8 @@ jobs:
           fi
           /usr/bin/python3 scripts/repositories/retain_channel_packages.py "$RUNNER_TEMP/incoming" --limit 2
           test "$(find "$RUNNER_TEMP/incoming" -maxdepth 1 -name '*.deb' | wc -l)" -ge 1
-          test "$(find "$RUNNER_TEMP/incoming" -maxdepth 1 -name '*.rpm' | wc -l)" -ge 1
+          test "$(find "$RUNNER_TEMP/incoming/rpm/el9" -name '*.rpm' | wc -l)" -ge 1
+          test "$(find "$RUNNER_TEMP/incoming/rpm/el10" -name '*.rpm' | wc -l)" -ge 1
       - name: Import approved private key into ephemeral isolated keyring
         env:
           PRIVATE_KEY: ${{ secrets.MTA_GPG_PRIVATE_KEY }}

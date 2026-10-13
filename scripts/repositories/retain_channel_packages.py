@@ -66,7 +66,8 @@ def main():
     if args.limit != 2:
         p.error('This release policy requires exactly two versions')
     retain(args.directory, '.deb', deb_info, compare_deb, args.limit, args.dry_run)
-    retain(args.directory, '.rpm', rpm_info, compare_rpm, args.limit, args.dry_run)
+    for target in ('el9', 'el10'):
+        retain(args.directory / 'rpm' / target, '.rpm', rpm_info, compare_rpm, args.limit, args.dry_run)
 
 
 if __name__ == '__main__':

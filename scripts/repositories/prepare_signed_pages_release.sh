@@ -7,7 +7,7 @@ set -Eeuo pipefail
 [[ $MTA_GPG_KEY_ID =~ ^[0-9A-Fa-f]{40}$ ]] || exit 2
 [[ -s $MTA_GPG_PASSPHRASE_FILE ]] || { echo 'Signing passphrase not provided' >&2; exit 2; }
 shopt -s nullglob
-rpms=("$MTA_REPO_INPUT"/*.rpm)
+rpms=("$MTA_REPO_INPUT"/rpm/el9/*.rpm "$MTA_REPO_INPUT"/rpm/el10/*.rpm)
 debs=("$MTA_REPO_INPUT"/*.deb)
 ((${#rpms[@]} > 0 && ${#debs[@]} > 0)) || { echo 'Both real DEB and RPM artifacts required' >&2; exit 3; }
 # Block an accidental stable release of early prerelease packages.
@@ -35,6 +35,8 @@ done
 MTA_REPO_INPUT="$MTA_REPO_INPUT" MTA_REPO_OUTPUT="$MTA_REPO_OUTPUT" MTA_REPO_CHANNEL="$MTA_REPO_CHANNEL" MTA_GPG_KEY_ID="$MTA_GPG_KEY_ID" bash scripts/repositories/build_indexes.sh
 root="$MTA_REPO_OUTPUT"
 gpg --verify "$root/apt/$MTA_REPO_CHANNEL/Release.gpg" "$root/apt/$MTA_REPO_CHANNEL/Release"
-gpg --verify "$root/rpm/$MTA_REPO_CHANNEL/repodata/repomd.xml.asc" "$root/rpm/$MTA_REPO_CHANNEL/repodata/repomd.xml"
+for target in el9 el10; do
+  gpg --verify "$root/rpm/$MTA_REPO_CHANNEL/$target/repodata/repomd.xml.asc" "$root/rpm/$MTA_REPO_CHANNEL/$target/repodata/repomd.xml"
+done
 gpg --batch --show-keys --with-colons "$root/mta-archive-key.asc" | awk -F: '$1=="fpr" {print toupper($10); exit}' | grep -qx "${MTA_GPG_KEY_ID^^}"
 echo 'Signed repository validated locally; not yet published.'

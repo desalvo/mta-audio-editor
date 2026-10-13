@@ -11,15 +11,18 @@ for tool in dpkg-scanpackages apt-ftparchive createrepo_c gpg; do command -v "$t
 src=$(realpath "$MTA_REPO_INPUT")
 out=$(realpath -m "$MTA_REPO_OUTPUT")
 [[ -d $src && $src != "$out" ]] || exit 2
-mkdir -p "$out/apt/$MTA_REPO_CHANNEL/pool" "$out/rpm/$MTA_REPO_CHANNEL/packages"
+mkdir -p "$out/apt/$MTA_REPO_CHANNEL/pool" "$out/rpm/$MTA_REPO_CHANNEL/el9/packages"
 shopt -s nullglob
 for f in "$src"/*.deb; do
   [[ $(dpkg-deb -f "$f" Package) == mta-audio-editor-server ]] || { echo "Not a server package: $f" >&2; exit 3; }
   cp -n "$f" "$out/apt/$MTA_REPO_CHANNEL/pool/"
 done
-for f in "$src"/*.rpm; do
-  [[ $(rpm -qp --qf '%{NAME}' "$f") == mta-audio-editor-server ]] || { echo "Not a server package: $f" >&2; exit 3; }
-  cp -n "$f" "$out/rpm/$MTA_REPO_CHANNEL/packages/"
+for target in el9 el10; do
+  mkdir -p "$out/rpm/$MTA_REPO_CHANNEL/$target/packages"
+  for f in "$src/rpm/$target/"*.rpm; do
+    [[ $(rpm -qp --qf '%{NAME}' "$f") == mta-audio-editor-server ]] || { echo "Not a server package: $f" >&2; exit 3; }
+    cp -n "$f" "$out/rpm/$MTA_REPO_CHANNEL/$target/packages/"
+  done
 done
 aptroot="$out/apt/$MTA_REPO_CHANNEL"
 [[ -n $(find "$aptroot/pool" -maxdepth 1 -name '*.deb' -print -quit) ]] || { echo 'No server DEB packages' >&2; exit 3; }
@@ -36,11 +39,14 @@ EOF
 gpg --batch --yes --local-user "$MTA_GPG_KEY_ID" --armor --detach-sign -o "$aptroot/Release.gpg" "$aptroot/Release"
 gpg --batch --yes --local-user "$MTA_GPG_KEY_ID" --clearsign -o "$aptroot/InRelease" "$aptroot/Release"
 rm "$aptroot/apt-release.conf"
-rpmroot="$out/rpm/$MTA_REPO_CHANNEL"
-if [[ -n $(find "$rpmroot/packages" -maxdepth 1 -name '*.rpm' -print -quit) ]]; then
-  for file in "$rpmroot"/packages/*.rpm; do rpm --checksig "$file" | grep -Eiq '(signatures ok|pgp.*ok|rsa.*ok)' || { echo "RPM not signed: $file" >&2; exit 4; }; done
+for target in el9 el10; do
+  rpmroot="$out/rpm/$MTA_REPO_CHANNEL/$target"
+  [[ -n $(find "$rpmroot/packages" -maxdepth 1 -name '*.rpm' -print -quit) ]] || { echo "No $target RPM packages" >&2; exit 3; }
+  for file in "$rpmroot"/packages/*.rpm; do
+    rpm --checksig "$file" | grep -Eiq '(signatures ok|pgp.*ok|rsa.*ok)' || { echo "RPM not signed: $file" >&2; exit 4; }
+  done
   createrepo_c --update "$rpmroot"
   gpg --batch --yes --local-user "$MTA_GPG_KEY_ID" --armor --detach-sign -o "$rpmroot/repodata/repomd.xml.asc" "$rpmroot/repodata/repomd.xml"
-fi
+done
 gpg --batch --yes --armor --export "$MTA_GPG_KEY_ID" > "$out/mta-archive-key.asc"
 echo "Repository staging generated: $out ($MTA_REPO_CHANNEL)"

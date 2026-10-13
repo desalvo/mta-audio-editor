@@ -14,11 +14,11 @@ def test_browsable_indexes(tmp_path):
     pkg = tmp_path / 'apt/early/pool/mta-audio-editor-server_0.3.0~early.208_amd64.deb'
     pkg.parent.mkdir(parents=True)
     pkg.write_bytes(b'fake-test-data')
-    rpm = tmp_path / 'rpm/early/repodata/repomd.xml'
+    rpm = tmp_path / 'rpm/early/el10/repodata/repomd.xml'
     rpm.parent.mkdir(parents=True)
     rpm.write_text('<repomd/>')
     module.render_file_indexes(tmp_path)
-    for d in ('', 'apt', 'apt/early', 'apt/early/pool', 'rpm', 'rpm/early', 'rpm/early/repodata'):
+    for d in ('', 'apt', 'apt/early', 'apt/early/pool', 'rpm', 'rpm/early', 'rpm/early/el10', 'rpm/early/el10/repodata'):
         assert (tmp_path / d / 'index.html').is_file()
     assert 'mta-audio-editor-server_0.3.0~early.208_amd64.deb' in (pkg.parent / 'index.html').read_text()
     assert '14 bytes' in (pkg.parent / 'index.html').read_text()

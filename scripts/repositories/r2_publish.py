@@ -16,8 +16,9 @@ def publish(root, bucket, endpoint, channel, *, dry_run=True):
         raise ValueError('Invalid repository channel')
     if not (root / 'apt' / channel / 'InRelease').is_file():
         raise ValueError('Missing signed APT metadata')
-    if not (root / 'rpm' / channel / 'repodata' / 'repomd.xml.asc').is_file():
-        raise ValueError('Missing signed RPM metadata')
+    for target in ('el9', 'el10'):
+        if not (root / 'rpm' / channel / target / 'repodata' / 'repomd.xml.asc').is_file():
+            raise ValueError(f'Missing signed {target} RPM metadata')
     files = sorted(p for p in root.rglob('*') if p.is_file() and p.relative_to(root).parts[0] in ('apt', 'rpm'))
     files = [p for p in files if p.relative_to(root).parts[1] == channel]
     if dry_run:

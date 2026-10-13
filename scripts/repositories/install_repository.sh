@@ -29,10 +29,15 @@ case " ${ID:-} ${ID_LIKE:-} " in
    install -d -m 755 /etc/pki/rpm-gpg
    install -m 644 "$tmp/key.asc" /etc/pki/rpm-gpg/RPM-GPG-KEY-MTA
    rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-MTA
+   major=${VERSION_ID%%.*}
+   case "$major" in
+     9|10) target="el$major" ;;
+     *) echo "Unsupported EL major version: $major (expected 9 or 10)" >&2; exit 2 ;;
+   esac
    cat > /etc/yum.repos.d/mta-audio-editor.repo <<EOF
 [mta-audio-editor]
 name=MTA Audio Editor Server ($CHANNEL)
-baseurl=$base/rpm/$CHANNEL
+baseurl=$base/rpm/$CHANNEL/$target
 enabled=1
 gpgcheck=1
 repo_gpgcheck=1

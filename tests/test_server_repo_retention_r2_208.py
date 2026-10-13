@@ -49,7 +49,7 @@ def test_previous_channel_rejects_mismatched_hash(tmp_path):
 def test_previous_channel_only_imports_package_files(tmp_path):
     archive = tmp_path / 'old.tar.gz'
     with tarfile.open(archive, 'w:gz') as tar:
-        for filename in ('apt/early/pool/old.deb', 'rpm/early/packages/old.rpm', 'apt/stable/pool/secret.deb'):
+        for filename in ('apt/early/pool/old.deb', 'rpm/early/packages/old.rpm', 'rpm/early/el10/packages/new.rpm', 'apt/stable/pool/secret.deb'):
             payload = b'content'
             entry = tarfile.TarInfo(filename)
             entry.size = len(payload)
@@ -60,15 +60,19 @@ def test_previous_channel_only_imports_package_files(tmp_path):
     incoming = tmp_path / 'incoming'
     incoming.mkdir()
     PREV.restore(manifest, archive, incoming, 'early')
-    assert sorted(p.name for p in incoming.iterdir()) == ['old.deb', 'old.rpm']
+    assert sorted(p.name for p in incoming.iterdir()) == ['old.deb', 'rpm']
+    assert (incoming / 'rpm/el9/old.rpm').read_bytes() == b'content'
+    assert (incoming / 'rpm/el10/new.rpm').read_bytes() == b'content'
 
 
 def test_r2_disabled_by_default(tmp_path):
     (tmp_path / 'apt/early').mkdir(parents=True)
-    (tmp_path / 'rpm/early/repodata').mkdir(parents=True)
+    (tmp_path / 'rpm/early/el9/repodata').mkdir(parents=True)
+    (tmp_path / 'rpm/early/el10/repodata').mkdir(parents=True)
     (tmp_path / 'apt/early/InRelease').write_text('signed')
-    (tmp_path / 'rpm/early/repodata/repomd.xml.asc').write_text('signed')
-    assert len(R2.publish(tmp_path, '', '', 'early')) == 2
+    (tmp_path / 'rpm/early/el9/repodata/repomd.xml.asc').write_text('signed')
+    (tmp_path / 'rpm/early/el10/repodata/repomd.xml.asc').write_text('signed')
+    assert len(R2.publish(tmp_path, '', '', 'early')) == 3
     with pytest.raises(RuntimeError, match='disabled'):
         R2.publish(tmp_path, 'bucket', 'https://example.test', 'early', dry_run=False)
 

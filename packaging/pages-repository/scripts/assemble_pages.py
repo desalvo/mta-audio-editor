@@ -44,8 +44,9 @@ def safe_extract(archive, target, channel):
         tar.extractall(target, filter="data")
     if not (target / f"apt/{channel}/InRelease").is_file():
         raise ValueError(f"APT signed index missing for {channel}")
-    if not (target / f"rpm/{channel}/repodata/repomd.xml.asc").is_file():
-        raise ValueError(f"RPM signed index missing for {channel}")
+    for el in ("el9", "el10"):
+        if not (target / f"rpm/{channel}/{el}/repodata/repomd.xml.asc").is_file():
+            raise ValueError(f"RPM signed index missing for {channel}/{el}")
     key = target / "mta-archive-key.asc"
     result = subprocess.run(["gpg", "--batch", "--show-keys", "--with-colons", str(key)], capture_output=True, text=True, check=True)
     fingerprints = [line.split(":")[9].upper() for line in result.stdout.splitlines() if line.startswith("fpr:")]
