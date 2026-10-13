@@ -134,9 +134,15 @@ def prepare_remix_plan(project: Project, request: RemixRequest) -> dict:
 
 
 def catalog() -> dict:
-    return {'models': [{'id': key, **value} for key, value in MODELS.items()],
+    from .ai_worker_protocol import configured_worker
+    worker_ready = configured_worker() is not None
+    models = [{'id': key, **value, 'available': worker_ready if key == 'ace-step-1.5' else value['available']}
+              for key, value in MODELS.items()]
+    return {'models': models,
             'presets': [{'id': key, **value} for key, value in PRESETS.items()],
-            'generation_available': False, 'native_host_ready': False, 'operations': ['rearrange', 'remix'], 'remix_modes': ['instrument_swap', 'auto_remix']}
+            'generation_available': worker_ready, 'native_host_ready': False,
+            'operations': ['rearrange', 'remix'], 'remix_modes': ['instrument_swap', 'auto_remix']}
+
 
 
 def prepare_plan(project: Project, request: RearrangeRequest) -> dict:

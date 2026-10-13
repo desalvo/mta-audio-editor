@@ -202,11 +202,18 @@ if [[ $ace_mode == local ]]; then
   set_setting MTA_ACE_STEP_TRUSTED_HOST '127.0.0.1'
   # Local trusted transport does not use the remote secret.
   set_setting MTA_ACE_STEP_TOKEN ''
+  # The native server needs an explicit trusted worker opt-in in addition to the ACE URL.
+  worker=/usr/lib/mta-audio-editor-server/app/ace_step_http_worker.py
+  [[ -f $worker && ! -L $worker ]] || { echo 'Trusted ACE-Step worker missing from signed server RPM/DEB.' >&2; exit 4; }
+  chmod 755 "$worker"
+  set_setting MTA_AI_WORKER_EXECUTABLE "$worker"
+  set_setting MTA_AI_WORKER_ENABLED true
 fi
 if [[ $ace_mode == disabled ]]; then
   # No ACE-Step installation or changes to an existing managed service.
   set_setting MTA_ACE_STEP_URL 'http://127.0.0.1:8001'
   set_setting MTA_ACE_STEP_TRUSTED_HOST '127.0.0.1'
+  set_setting MTA_AI_WORKER_ENABLED false
   echo 'ACE-Step disabled for this setup; existing local service is untouched.'
 fi
 if [[ $ace_mode == remote ]]; then
@@ -225,6 +232,11 @@ else
 fi
 set_setting MTA_ACE_STEP_URL "${remote%/}"
 set_setting MTA_ACE_STEP_TRUSTED_HOST "$remote_host"
+worker=/usr/lib/mta-audio-editor-server/app/ace_step_http_worker.py
+[[ -f $worker && ! -L $worker ]] || { echo 'Trusted ACE-Step worker missing from signed server RPM/DEB.' >&2; exit 4; }
+chmod 755 "$worker"
+set_setting MTA_AI_WORKER_EXECUTABLE "$worker"
+set_setting MTA_AI_WORKER_ENABLED true
 if [[ $mode == --interactive ]]; then
   read -r -p 'Set/change ACE-Step access token? [y/N]: ' yn
   if [[ $yn == y || $yn == Y ]]; then

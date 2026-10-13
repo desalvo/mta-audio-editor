@@ -36,6 +36,7 @@ MTA Audio Editor web server, distinct from the desktop and Proxmox agent.
 %install
 mkdir -p %{buildroot}/usr/lib/mta-audio-editor-server %{buildroot}/usr/share/mta-audio-editor-server/wheelhouse %{buildroot}/usr/lib/systemd/system
 cp -a %{_sourcedir}/application/. %{buildroot}/usr/lib/mta-audio-editor-server/
+chmod 755 %{buildroot}/usr/lib/mta-audio-editor-server/app/ace_step_http_worker.py
 cp %{_sourcedir}/install_runtime.py %{buildroot}/usr/lib/mta-audio-editor-server/install_runtime.py
 mkdir -p %{buildroot}/usr/lib/mta-audio-editor-server/native-installers
 install -m 755 %{_sourcedir}/install_ace_step.sh %{buildroot}/usr/lib/mta-audio-editor-server/native-installers/install_ace_step.sh
