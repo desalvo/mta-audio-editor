@@ -26,6 +26,8 @@ if [[ ${1:-} == --native-server ]]; then
    curl --fail --location --proto '=https' --tlsv1.2 --retry 3 --silent --show-error \
      "$raw/$file" -o "$tmp_native/$file" || { echo "Failed to download trusted installer helper: $file" >&2; exit 3; }
    bash -n "$tmp_native/$file" || { echo "Invalid installer helper: $file" >&2; exit 3; }
+   # curl -o creates mode 0644: the nested native installer execs this helper.
+   chmod 700 "$tmp_native/$file" || { echo "Cannot set executable permissions: $file" >&2; exit 3; }
  done
  bash "$tmp_native/install_mta_native.sh" "$@"
  exit $?
