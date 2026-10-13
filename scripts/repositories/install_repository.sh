@@ -27,17 +27,33 @@ confirm_external() {
   read -r -p "$question [y/N]: " reply
   [[ $reply == [yY] || $reply == [yY][eE][sS] ]]
 }
-# For Enterprise Linux 9/10 ffmpeg-free is provided through EPEL on supported systems.
-# EPEL must come from a configured trusted RPM repository (typically the OS vendor
-# extras repository). Never download an unverified arbitrary rpm URL.
+# Use bounded DNF queries: repository metadata/network issues must never hang setup.
+# A timeout is NOT evidence that a dependency is unavailable.
+dnf_probe() {
+  local what=$1; shift
+  local rc=0
+  timeout --signal=TERM --kill-after=3s 30s \
+    dnf -q --setopt=timeout=8 --setopt=retries=0 "$@" >/dev/null 2>&1 || rc=$?
+  if (( rc == 124 || rc == 137 )); then
+    echo "DNF timed out while checking $what (30s). Check repository connectivity, DNS, subscription-manager and enabled repositories." >&2
+    return 75
+  fi
+  return "$rc"
+}
 prepare_el_dependencies() {
-  local major=$1
-  # `dnf provides` checks enabled repositories, without mutating the system.
-  if dnf -q provides /usr/bin/ffmpeg >/dev/null 2>&1; then
+  local major=$1 rc=0
+  # Prefer local RPM database (no network access or metadata refresh).
+  if rpm -q --whatprovides /usr/bin/ffmpeg >/dev/null 2>&1; then
     return 0
   fi
-  echo 'FFmpeg missing from enabled RPM repositories; an external repository may be necessary.' >&2
-  if ! dnf -q list --available epel-release >/dev/null 2>&1; then
+  dnf_probe ffmpeg provides /usr/bin/ffmpeg || rc=$?
+  if (( rc == 0 )); then return 0; fi
+  if (( rc == 75 )); then return 75; fi
+  echo 'FFmpeg is not provided by currently enabled RPM repositories; EPEL may be necessary.' >&2
+  rc=0
+  dnf_probe epel-release list --available epel-release || rc=$?
+  if (( rc == 75 )); then return 75; fi
+  if (( rc != 0 )); then
     echo 'epel-release is unavailable in trusted enabled repositories. Configure EPEL manually according to your distribution policy.' >&2
     return 4
   fi
@@ -46,8 +62,11 @@ prepare_el_dependencies() {
     return 4
   }
   dnf install -y epel-release || return 4
-  dnf makecache --refresh || return 4
-  if ! dnf -q provides /usr/bin/ffmpeg >/dev/null 2>&1; then
+  # Do not force a full refresh: the next bounded query can fetch required metadata.
+  rc=0
+  dnf_probe ffmpeg provides /usr/bin/ffmpeg || rc=$?
+  if (( rc == 75 )); then return 75; fi
+  if (( rc != 0 )); then
     echo 'FFmpeg still unavailable after EPEL; check CRB/CodeReady Builder or your subscription configuration.' >&2
     return 4
   fi

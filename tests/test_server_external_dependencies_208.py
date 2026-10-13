@@ -20,8 +20,8 @@ def test_external_repo_consent_and_security_guards():
     assert 'read -r -p' in s
     assert '[[ $MODE == --unattended ]]' in s
     assert 'dnf install -y epel-release' in s
-    assert 'dnf -q list --available epel-release' in s
-    assert 'dnf -q provides /usr/bin/ffmpeg' in s
+    assert 'dnf_probe epel-release list --available epel-release' in s
+    assert 'dnf_probe ffmpeg provides /usr/bin/ffmpeg' in s
     assert 'gpgcheck=1' in s and 'repo_gpgcheck=1' in s
     assert 'nogpgcheck' not in s and 'skip-broken' not in s
     assert 'curl' in s and 'fingerprint mismatch' in s.lower()
@@ -33,3 +33,13 @@ def test_single_file_bootstrap_forwards_unattended():
     n = (ROOT / 'scripts/install_mta_native.sh').read_text()
     assert '--unattended|--yes)' in n
     assert '--unattended || echo --interactive' in n
+
+
+def test_dnf_probe_bounded_and_timeout_not_misclassified():
+    s = (ROOT / 'scripts/repositories/install_repository.sh').read_text()
+    assert 'timeout --signal=TERM --kill-after=3s 30s' in s
+    assert '--setopt=timeout=8 --setopt=retries=0' in s
+    assert 'rc == 124 || rc == 137' in s
+    assert 'rc == 75' in s
+    assert 'rpm -q --whatprovides /usr/bin/ffmpeg' in s
+    assert 'dnf makecache --refresh' not in s
