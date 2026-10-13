@@ -31,7 +31,7 @@ usage() {
  cat <<'HELP'
 Usage: sudo ./install_ace_step.sh [--benchmark [--benchmark-config file.toml] [--benchmark-output dir] [--benchmark-probe-only] [--benchmark-no-install-tools]] [--yes] [--version v0.1.8|<40-digit-sha>] [--dry-run] [--no-systemd] [--port 8001] [--bind local|network] [--firewall yes|no] [--reinstall] [--uninstall] [--purge-data]
 Interactive Debian >=9 / Debian derivatives, Ubuntu >=22.04, or RHEL family >=9 wizard. Supports CPU-only operation; ROCm acceleration requires /dev/kfd and /dev/dri/renderD*.
-Installs Python 3.11, venv, AMD ROCm-enabled PyTorch/torchaudio and ACE-Step dependencies.
+Installs a supported Python (3.11; system Python 3.12 on EL10), venv, AMD ROCm-enabled PyTorch/torchaudio and ACE-Step dependencies.
 The AMD kernel driver must be operational on the host (physical machine, VM, or container host). This wizard does not install kernel drivers.
 Persistent models in /var/lib/mta/models are never deleted. Existing sources are backed up.
 --device auto|cpu|rocm chooses inference hardware; auto uses CPU if ROCm devices are unavailable.
@@ -127,6 +127,11 @@ case "$OS_FAMILY" in
   ;;
  *) echo "Unsupported OS: ${PRETTY_NAME:-$OS_ID}; supported Debian family or RHEL family >=9." >&2; exit 2 ;;
 esac
+# EL10 ships Python 3.12 under python3, not python3.11; respect explicit overrides.
+# Never use the system interpreter for pip installations: dependencies live in a venv.
+if [[ $OS_FAMILY == rhel && $OS_MAJOR -ge 10 && -z ${MTA_PYTHON:-} ]]; then
+ PYTHON=python3
+fi
 printf 'Supported OS: %s (family=%s, major=%s)\n' "${PRETTY_NAME:-$OS_ID}" "$OS_FAMILY" "$OS_MAJOR"
 # Benchmark mode runs independently of the AMD-only ROCm installation path.
 # The script lives alongside this wizard and uses an existing ACE-Step installation.
@@ -280,9 +285,16 @@ if [[ $OS_FAMILY == debian ]]; then
  apt-get update
  DEBIAN_FRONTEND=noninteractive apt-get install -y git ca-certificates gcc g++ make "$PYTHON" "${PYTHON}-venv" "${PYTHON}-dev" python3-pip
 else
- dnf install -y git ca-certificates "$PYTHON" "${PYTHON}-pip" gcc gcc-c++ make
+ if [[ $OS_MAJOR -ge 10 && $PYTHON == python3 ]]; then
+  dnf install -y git ca-certificates python3 python3-pip gcc gcc-c++ make
+ else
+  dnf install -y git ca-certificates "$PYTHON" "${PYTHON}-pip" gcc gcc-c++ make
+ fi
 fi
-command -v "$PYTHON" >/dev/null || { echo "Python interpreter $PYTHON unavailable on $PRETTY_NAME. Configure a >=3.11 interpreter with MTA_PYTHON." >&2; exit 2; }
+command -v "$PYTHON" >/dev/null || { echo "Python interpreter $PYTHON unavailable on $PRETTY_NAME. Configure Python 3.11 or 3.12 with MTA_PYTHON." >&2; exit 2; }
+PY_VERSION=$($PYTHON -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')
+[[ $PY_VERSION == 3.11 || $PY_VERSION == 3.12 ]] || { echo "ACE-Step requires Python 3.11 or 3.12; found $PY_VERSION ($PYTHON)." >&2; exit 2; }
+"$PYTHON" -m venv --help >/dev/null 2>&1 || { echo "Python venv unavailable for $PYTHON; install the distribution's matching venv package." >&2; exit 2; }
 if [[ $ACE_VERSION =~ ^[0-9a-f]{40}$ ]]; then
  REF=$ACE_VERSION
 elif [[ $ACE_VERSION =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then

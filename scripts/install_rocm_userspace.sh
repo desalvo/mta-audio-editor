@@ -94,9 +94,24 @@ if ! command -v rocminfo >/dev/null 2>&1; then
 fi
 command -v rocminfo >/dev/null 2>&1 || { echo 'rocminfo is still unavailable after installation. Check /opt/rocm/bin and the package transaction.' >&2; exit 3; }
 fi
-if ! command -v amd-smi >/dev/null 2>&1; then
+# AMD publishes the CLI/library as amd-smi-lib (not amdrocm-amdsmi) for
+# ROCm 7.2.4 on EL10. Install it from the same signed AMD repository used
+# for the runtime; never let a similarly named package from EPEL win.
+if ! command -v amd-smi >/dev/null 2>&1 && [[ ! -x /opt/rocm/bin/amd-smi ]]; then
  if command -v dnf >/dev/null 2>&1; then
-  dnf install -y amdrocm-amdsmi || echo 'AMD SMI is unavailable in enabled repositories; ROCm compute can still work. Consult the official AMD ROCm documentation.' >&2
+  . /etc/os-release
+  if [[ ${VERSION_ID%%.*} == 10 && -f /etc/yum.repos.d/mta-rocm-userspace.repo ]]; then
+   echo 'Installing AMD SMI from official AMD ROCm EL10 repository (amd-smi-lib).'
+   if dnf -q --disablerepo='*' --enablerepo=mta-rocm-userspace repoquery --available amd-smi-lib 2>/dev/null | grep -q amd-smi-lib; then
+    if ! dnf install -y --disablerepo='epel*' --enablerepo=mta-rocm-userspace --exclude='amd-smi-lib-rpath*' amd-smi-lib; then
+     echo 'AMD SMI installation failed from the official signed AMD repository; inspect DNF dependencies.' >&2
+    fi
+   else
+    echo 'AMD SMI package amd-smi-lib is not available from the configured AMD repository.' >&2
+   fi
+  else
+   echo 'AMD SMI: install the vendor-provided amd-smi-lib from the matching ROCm repository if available.' >&2
+  fi
  else
   echo 'AMD SMI missing; install its matching package from the vendor repository if GPU telemetry is required.' >&2
  fi

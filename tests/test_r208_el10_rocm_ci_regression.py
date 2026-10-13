@@ -31,3 +31,12 @@ def test_el10_rocm_disables_epel_and_excludes_conflicting_amd_rpath():
     assert '"${rocm_dnf_options[@]}"' in source
     assert 'dnf install -y --allowerasing' not in source
     assert '--nogpgcheck' not in source.split('if ! dnf install -y')[0]
+
+
+def test_el10_amd_smi_uses_official_amd_package_not_legacy_name():
+    script = (ROOT / 'scripts/install_rocm_userspace.sh').read_text()
+    assert 'amd-smi-lib' in script
+    assert 'dnf install -y amdrocm-amdsmi' not in script
+    assert "--disablerepo='epel*' --enablerepo=mta-rocm-userspace" in script
+    assert "--exclude='amd-smi-lib-rpath*'" in script
+    assert 'gpgcheck=1' in script

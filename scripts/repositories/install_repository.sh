@@ -105,6 +105,17 @@ gpgcheck=1
 repo_gpgcheck=1
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-MTA
 EOF
+   # First-use DNF5/DNF4 repository metadata signing keys have their own trust
+   # cache. `rpm --import` alone does NOT initialize this repo_gpgcheck cache.
+   # Import the already fingerprint-pinned key using DNF non-interactively,
+   # before any short repository probe can hit the first-use GPG prompt.
+   echo "Initializing signed MTA DNF repository metadata and GPG trust..."
+   if ! timeout --signal=TERM --kill-after=5s 180s \
+       dnf -y --refresh --setopt=timeout=20 --setopt=retries=2 \
+       --disablerepo='*' --enablerepo=mta-audio-editor makecache; then
+     echo 'Unable to initialize the signed MTA repository metadata. Check DNS, HTTPS access, and repository signing key; GPG checks were not bypassed.' >&2
+     exit 75
+   fi
    prepare_el_dependencies "$major"
    dnf install -y mta-audio-editor-server
    ;;

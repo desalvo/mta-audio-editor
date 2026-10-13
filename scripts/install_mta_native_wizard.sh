@@ -146,12 +146,11 @@ fi
 # version by the helper INCLUDED in the signed server package. It requires AMD ROCm.
 # The native MTA server itself remains owned and upgraded by RPM/DEB.
 ace_installer=/usr/lib/mta-audio-editor-server/native-installers/install_ace_step.sh
-ace_mode_default=remote
-if systemctl list-unit-files mta-ace-step.service --no-legend 2>/dev/null | grep -q '^mta-ace-step.service'; then
-  ace_mode_default=local
-fi
-ace_mode_default=$(get_setting MTA_WIZARD_ACE_MODE); ace_mode_default=${ace_mode_default:-remote}
-if systemctl list-unit-files mta-ace-step.service --no-legend 2>/dev/null | grep -q '^mta-ace-step.service' && [[ -z $(get_setting MTA_WIZARD_ACE_MODE) ]]; then ace_mode_default=local; fi
+# New native installations default to local ACE-Step. An explicit selection from a
+# root-only wizard checkpoint takes precedence, even after an interrupted setup.
+# Existing installations with a recorded wizard choice retain their setting.
+ace_mode_default=$(get_setting MTA_WIZARD_ACE_MODE)
+ace_mode_default=${ace_mode_default:-local}
 ask 'ACE-Step backend (local/remote/disabled)' "$ace_mode_default"; ace_mode=$REPLY
 [[ $ace_mode == local || $ace_mode == remote || $ace_mode == disabled ]] || { echo 'Invalid ACE-Step mode' >&2; exit 2; }
 checkpoint_answer ACE_MODE "$ace_mode"
