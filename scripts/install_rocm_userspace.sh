@@ -17,7 +17,7 @@ else
  . /etc/os-release
  # First use already configured, trusted distribution/vendor package repositories.
  if command -v dnf >/dev/null 2>&1; then
-  if dnf -q --setopt=timeout=8 --setopt=retries=0 repoquery --available rocm-hip-runtime 2>/dev/null | grep -q rocm-hip-runtime && dnf -q --setopt=timeout=8 --setopt=retries=0 repoquery --available rocminfo 2>/dev/null | grep -q rocminfo; then
+  if [[ ${VERSION_ID:-} != 10* ]] && dnf -q --setopt=timeout=8 --setopt=retries=0 repoquery --available rocm-hip-runtime 2>/dev/null | grep -q rocm-hip-runtime && dnf -q --setopt=timeout=8 --setopt=retries=0 repoquery --available rocminfo 2>/dev/null | grep -q rocminfo; then
    echo 'Trying ROCm userspace from currently enabled DNF repositories.'
    dnf install -y rocm-hip-runtime rocminfo || echo "Existing repositories did not provide a complete ROCm runtime; checking official AMD ROCm repository." >&2
   fi
@@ -55,7 +55,21 @@ gpgkey=https://repo.radeon.com/rocm/rocm.gpg.key
 REPO
  fi
  echo 'Installing ROCm userspace from AMD official EL repository; never installing amdgpu-dkms or kernel drivers.'
- dnf install -y rocm-hip-runtime rocminfo || { echo 'ROCm installation failed. Check AMD support for this distribution version and selected ROCm release.' >&2; exit 3; }
+ # Pin both packages to AMD's configured ROCm repository. EPEL may offer a
+ # different rocminfo (e.g. 7.1.0) which cannot satisfy the exact ROCm 7.2.4
+ # dependency. Exclude only EPEL's rocminfo for this transaction: keep EPEL
+ # available for unrelated dependencies and never permit arbitrary erasures.
+ amd_rocm_repo=mta-rocm-userspace
+ amd_rocminfo_nevra=$(dnf -q --disablerepo='*' --enablerepo="$amd_rocm_repo" repoquery --available --qf '%{name}-%{epoch}:%{version}-%{release}.%{arch}' rocminfo 2>/dev/null | grep -E '^rocminfo-[0-9]+:' | head -n 1) || true
+ if [[ -z $amd_rocminfo_nevra ]]; then
+   echo "Official AMD $amd_rocm_repo does not provide rocminfo for EL${VERSION_ID%%.*}/ROCm $ROCM_RELEASE." >&2
+   exit 3
+ fi
+ echo "Pinning AMD ROCm rocminfo: $amd_rocminfo_nevra (not EPEL's package)."
+ if ! dnf install -y --setopt=epel.excludepkgs=rocminfo --enablerepo="$amd_rocm_repo" rocm-hip-runtime "$amd_rocminfo_nevra"; then
+   echo 'AMD ROCm installation failed. Check installed rocminfo, dependency conflicts and AMD repository metadata; no --allowerasing was used.' >&2
+   exit 3
+ fi
  fi
  # AMD's official EL10 repositories install tools under /opt/rocm on some layouts.
 if ! command -v rocminfo >/dev/null 2>&1; then
