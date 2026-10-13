@@ -1,5 +1,4 @@
 from pathlib import Path
-import os
 import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]

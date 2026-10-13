@@ -114,8 +114,16 @@ def _start_background_services():
     start_background_updater()
     resume_pending_gc()
     if NATIVE_SINGLE_USER:
-        from .ace_step_desktop_manager import auto_start_server
-        auto_start_server()
+        # ACE-Step may initialise large models or contact its local backend.
+        # Never block the native WebView HTTP readiness on optional AI startup.
+        def _launch_optional_ace_step() -> None:
+            try:
+                from .ace_step_desktop_manager import auto_start_server
+                auto_start_server()
+            except Exception:
+                LOGGER.exception("Optional desktop ACE-Step autostart failed")
+        threading.Thread(target=_launch_optional_ace_step, daemon=True,
+                         name="mta-desktop-ace-autostart").start()
 
 
 @app.on_event("shutdown")
