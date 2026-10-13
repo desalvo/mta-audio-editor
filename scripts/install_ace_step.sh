@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# MTA ACE-Step first-install/reinstall wizard for Debian-family or RHEL-family Linux systems with AMD ROCm.
+# MTA ACE-Step first-install/reinstall wizard for Debian-family or RHEL-family Linux systems with AMD ROCm or CPU-only inference.
 set -Eeuo pipefail
 REPO=https://github.com/ace-step/ACE-Step-1.5.git
 PINNED_SHA=dce621408bee8c31b4fcf4811682eb9359e1bc94
@@ -9,6 +9,7 @@ DATA=${MTA_DATA:-/var/lib/mta}
 PYTHON=${MTA_PYTHON:-python3.11}
 TORCH_VERSION=${MTA_TORCH_VERSION:-2.11.0+rocm7.2}
 INDEX=https://download.pytorch.org/whl/rocm7.2
+DEVICE=${MTA_ACE_DEVICE:-auto}
 AUTO_YES=0; DRY_RUN=0; ACE_VERSION=${MTA_ACE_VERSION:-}; INSTALL_SYSTEMD=1
 CONFIG=${MTA_ACE_WIZARD_CONFIG:-/etc/mta/ace-step-wizard.conf}
 BENCHMARK_CONCURRENT=0; BENCHMARK_REMOTE_URL=''; BENCHMARK_TOKENS_FILE=''; BENCHMARK_JOBS_PER_USER=2
@@ -29,10 +30,12 @@ fi
 usage() {
  cat <<'HELP'
 Usage: sudo ./install_ace_step.sh [--benchmark [--benchmark-config file.toml] [--benchmark-output dir] [--benchmark-probe-only] [--benchmark-no-install-tools]] [--yes] [--version v0.1.8|<40-digit-sha>] [--dry-run] [--no-systemd] [--port 8001] [--bind local|network] [--firewall yes|no] [--reinstall] [--uninstall] [--purge-data]
-Interactive Debian >=9 / Debian derivatives, Ubuntu >=22.04, or RHEL family >=9 wizard. Requires /dev/kfd and /dev/dri/renderD* accessible on this system.
+Interactive Debian >=9 / Debian derivatives, Ubuntu >=22.04, or RHEL family >=9 wizard. Supports CPU-only operation; ROCm acceleration requires /dev/kfd and /dev/dri/renderD*.
 Installs Python 3.11, venv, AMD ROCm-enabled PyTorch/torchaudio and ACE-Step dependencies.
 The AMD kernel driver must be operational on the host (physical machine, VM, or container host). This wizard does not install kernel drivers.
 Persistent models in /var/lib/mta/models are never deleted. Existing sources are backed up.
+--device auto|cpu|rocm chooses inference hardware; auto uses CPU if ROCm devices are unavailable.
+CPU-only inference is substantially slower and intended for functional use or small jobs.
 --yes makes no prompt and uses upstream pinned version v0.1.8 unless --version supplied.
 --dry-run checks OS and GPU devices and prints saved settings; no modifications.
 --port N selects HTTP port (default 8001); --bind local|network selects reachability.
@@ -59,6 +62,7 @@ while (($#)); do
   --benchmark-probe-only) BENCHMARK_PROBE_ONLY=1;;
   --benchmark-no-install-tools) BENCHMARK_INSTALL_TOOLS=0;;
   --yes) AUTO_YES=1;;
+  --device) shift; [[ $# -gt 0 ]] || exit 2; DEVICE=$1;;
   --dry-run) DRY_RUN=1;;
   --no-systemd) INSTALL_SYSTEMD=0;;
   --port) shift; [[ $# -gt 0 ]] || exit 2; PORT_OVERRIDE=$1;;
@@ -207,12 +211,20 @@ if (( UNINSTALL )); then
  exit 0
 fi
 [[ $EUID -eq 0 || $DRY_RUN -eq 1 ]] || { echo 'Run as root on the target Linux system.' >&2; exit 2; }
+[[ $DEVICE == auto || $DEVICE == cpu || $DEVICE == rocm ]] || { echo 'Use --device auto|cpu|rocm' >&2; exit 2; }
 render_nodes=(/dev/dri/renderD*)
-[[ -c /dev/kfd && -c ${render_nodes[0]} ]] || {
- echo 'ROCm devices unavailable. On bare metal check AMD drivers; in a VM check GPU passthrough; in LXC pass /dev/kfd and /dev/dri/renderD* from the host with correct cgroup permissions.' >&2
- exit 3
-}
-printf 'Found ROCm devices: /dev/kfd %s\n' "${render_nodes[*]}"
+if [[ $DEVICE == auto ]]; then
+  if [[ -c /dev/kfd && -c ${render_nodes[0]} ]]; then DEVICE=rocm; else DEVICE=cpu; fi
+fi
+if [[ $DEVICE == rocm ]]; then
+  [[ -c /dev/kfd && -c ${render_nodes[0]} ]] || {
+    echo 'ROCm explicitly selected but AMD compute devices are inaccessible. Choose --device cpu or configure host/passthrough devices.' >&2
+    exit 3
+  }
+  printf 'Using ROCm devices: /dev/kfd %s\n' "${render_nodes[*]}"
+else
+  echo 'WARNING: ACE-Step will run CPU-only. Inference can be much slower than on AMD ROCm GPUs; training on CPU is not recommended.'
+fi
 # Present existing settings as defaults. A repeated run should be configuration-only
 # if the already installed code and virtualenv are usable.
 ACE_VERSION=${ACE_VERSION:-$SAVED_VERSION}
@@ -224,7 +236,7 @@ PORT=$((10#$PORT))
 [[ $BIND == local || $BIND == network ]] || { echo 'Invalid bind: local or network.' >&2; exit 2; }
 [[ $FIREWALL == yes || $FIREWALL == no ]] || { echo 'Invalid firewall option: yes or no.' >&2; exit 2; }
 if (( DRY_RUN )); then
- printf 'DRY RUN (no modifications): version=%s, port=%s, bind=%s, firewall=%s, base=%s\n' "${ACE_VERSION:-$DEFAULT_TAG}" "$PORT" "$BIND" "$FIREWALL" "$BASE"
+ printf 'DRY RUN (no modifications): version=%s, port=%s, bind=%s, firewall=%s, device=%s, base=%s\n' "${ACE_VERSION:-$DEFAULT_TAG}" "$PORT" "$BIND" "$FIREWALL" "$DEVICE" "$BASE"
  exit 0
 fi
 if (( ! AUTO_YES )); then
@@ -257,7 +269,7 @@ CURRENT_REF=''
 if [[ -f "$BASE/ace-step/.mta-installed-ref" ]]; then
  CURRENT_REF=$(cat "$BASE/ace-step/.mta-installed-ref")
 fi
-if [[ $CURRENT_REF == "$ACE_VERSION" && -x "$BASE/venv-ace-step/bin/python" && $REINSTALL == 0 ]]; then
+if [[ $CURRENT_REF == "$ACE_VERSION" && -x "$BASE/venv-ace-step/bin/python" && $REINSTALL == 0 && -f "$BASE/ace-step/.mta-installed-device" && $(cat "$BASE/ace-step/.mta-installed-device") == "$DEVICE" ]]; then
  echo "ACE-Step $ACE_VERSION already installed; retaining existing Python environment and checkpoints."
  SKIP_INSTALL=1
 else SKIP_INSTALL=0; fi
@@ -318,20 +330,30 @@ if [[ -d "$VENV" ]]; then
 fi
 "$PYTHON" -m venv "$VENV"
 "$VENV/bin/python" -m pip install -U pip setuptools wheel
-"$VENV/bin/python" -m pip install "torch==$TORCH_VERSION" "torchaudio==$TORCH_VERSION" --index-url "$INDEX"
-"$VENV/bin/python" -m pip install -r "$stage/source/requirements-rocm-linux.txt"
+if [[ $DEVICE == rocm ]]; then
+  "$VENV/bin/python" -m pip install "torch==$TORCH_VERSION" "torchaudio==$TORCH_VERSION" --index-url "$INDEX"
+  "$VENV/bin/python" -m pip install -r "$stage/source/requirements-rocm-linux.txt"
+else
+  # Install official CPU wheels first. The upstream Python project declares the
+  # remaining application dependencies; --no-deps would leave it unusable.
+  "$VENV/bin/python" -m pip install torch torchaudio --index-url https://download.pytorch.org/whl/cpu
+  "$VENV/bin/python" -m pip install -e "$stage/source"
+fi
 "$VENV/bin/python" -m pip check
-"$VENV/bin/python" - <<'PYGPU'
+MTA_EXPECT_ACE_DEVICE="$DEVICE" "$VENV/bin/python" - <<'PYGPU'
+import os
 import torch, torchaudio
-if not torch.__version__.startswith("2.11.0+rocm7.2"):
-    raise RuntimeError(f"ACE-Step dependencies replaced pinned PyTorch: {torch.__version__}")
-if not torch.version.hip or not torch.cuda.is_available():
-    raise RuntimeError('ROCm-enabled PyTorch and GPU access are required')
-x = torch.randn((256, 256), device='cuda')
-y = x @ x
-if not torch.isfinite(y).all().item():
-    raise RuntimeError('ROCm GPU computation returned non-finite values')
-print('Validated:', torch.__version__, torchaudio.__version__, torch.cuda.get_device_name(0))
+mode = os.environ['MTA_EXPECT_ACE_DEVICE']
+if mode == 'rocm':
+    if not torch.version.hip or not torch.cuda.is_available():
+        raise RuntimeError('ROCm-selected ACE-Step cannot access GPU')
+    x = torch.randn((256, 256), device='cuda')
+    assert torch.isfinite(x @ x).all().item()
+else:
+    if torch.version.cuda or torch.version.hip:
+        raise RuntimeError('CPU-only ACE-Step unexpectedly installed a GPU torch build')
+    assert torch.isfinite(torch.randn((32, 32)) @ torch.randn((32, 32))).all().item()
+print('Validated:', mode, torch.__version__, torchaudio.__version__)
 PYGPU
 if systemctl is-active --quiet mta-ace-step.service; then systemctl stop mta-ace-step.service; fi
 if [[ -d "$BASE/ace-step" ]]; then
@@ -341,6 +363,7 @@ fi
 mv "$stage/source" "$BASE/ace-step"
 printf '%s\n' "$sha" > "$BASE/ace-step/UPSTREAM_COMMIT"
 printf '%s\n' "$ACE_VERSION" > "$BASE/ace-step/.mta-installed-ref"
+printf '%s\n' "$DEVICE" > "$BASE/ace-step/.mta-installed-device"
 [[ -e $BASE/ace-step/checkpoints ]] || ln -s "$DATA/models/checkpoints" "$BASE/ace-step/checkpoints"
 fi # new install / forced reinstall
 mkdir -p /etc/mta
@@ -353,6 +376,7 @@ ACESTEP_TMPDIR=$DATA/models/tmp
 ACESTEP_LM_BACKEND=pt
 ACESTEP_USE_FLASH_ATTENTION=false
 ACESTEP_NO_INIT=true
+ACESTEP_INIT_LLM=false
 ENV
  chmod 640 /etc/mta/ace-step.env
 fi
@@ -404,7 +428,7 @@ if (( INSTALL_SYSTEMD )); then
  NEW_UNIT=$(mktemp)
  cat > "$NEW_UNIT" <<UNIT
 [Unit]
-Description=MTA ACE-Step AMD ROCm inference
+Description=MTA ACE-Step inference ($DEVICE)
 After=network-online.target
 Wants=network-online.target
 [Service]

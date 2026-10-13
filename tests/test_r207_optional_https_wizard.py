@@ -9,7 +9,7 @@ MAIN = ROOT / 'app' / 'main.py'
 
 
 def dry_run(*args, env=None):
-    return subprocess.run(['bash', str(SCRIPT), '--dry-run', *args], text=True,
+    return subprocess.run(['bash', str(SCRIPT), '--legacy-source', '--dry-run', *args], text=True,
                           capture_output=True, timeout=10, env=env, check=False)
 
 

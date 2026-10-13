@@ -21,6 +21,7 @@ cp -a "$root/wheelhouse" "$work/SOURCES/wheelhouse"
 cp "$(dirname "$0")"/*.service "$(dirname "$0")"/*.timer "$work/SOURCES/"
 cp "$(dirname "$0")/postinst" "$work/SOURCES/"
 cp "$(dirname "$0")/install_runtime.py" "$work/SOURCES/"
+cp "$(dirname "$0")/../install_ace_step.sh" "$(dirname "$0")/../install_rocm_userspace.sh" "$work/SOURCES/"
 cat > "$work/SPECS/mta-server.spec" <<'SPEC'
 Name: mta-audio-editor-server
 Version: %{getenv:MTA_RPM_VERSION}
@@ -36,6 +37,9 @@ MTA Audio Editor web server, distinct from the desktop and Proxmox agent.
 mkdir -p %{buildroot}/usr/lib/mta-audio-editor-server %{buildroot}/usr/share/mta-audio-editor-server/wheelhouse %{buildroot}/usr/lib/systemd/system
 cp -a %{_sourcedir}/application/. %{buildroot}/usr/lib/mta-audio-editor-server/
 cp %{_sourcedir}/install_runtime.py %{buildroot}/usr/lib/mta-audio-editor-server/install_runtime.py
+mkdir -p %{buildroot}/usr/lib/mta-audio-editor-server/native-installers
+install -m 755 %{_sourcedir}/install_ace_step.sh %{buildroot}/usr/lib/mta-audio-editor-server/native-installers/install_ace_step.sh
+install -m 755 %{_sourcedir}/install_rocm_userspace.sh %{buildroot}/usr/lib/mta-audio-editor-server/native-installers/install_rocm_userspace.sh
 cp -a %{_sourcedir}/wheelhouse/. %{buildroot}/usr/share/mta-audio-editor-server/wheelhouse/
 cp %{_sourcedir}/*.service %{_sourcedir}/*.timer %{buildroot}/usr/lib/systemd/system/
 %pre

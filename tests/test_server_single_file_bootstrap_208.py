@@ -29,6 +29,7 @@ done
 case "$url" in
  */install_mta_native.sh) cp "$MTA_FIXTURE_ROOT/scripts/install_mta_native.sh" "$out";;
  */repositories/install_repository.sh) cp "$MTA_FIXTURE_ROOT/scripts/repositories/install_repository.sh" "$out";;
+ */install_mta_native_wizard.sh) cp "$MTA_FIXTURE_ROOT/scripts/install_mta_native_wizard.sh" "$out";;
  *) exit 7;;
 esac
 ''')
@@ -61,6 +62,7 @@ def test_downloaded_repository_helper_is_executable(tmp_path):
     (fixture / 'repositories/install_repository.sh').write_text(
         '#!/usr/bin/env bash\nprintf "EXECUTED_HELPER %s\\n" "$*"\n'
     )
+    (fixture / 'install_mta_native_wizard.sh').write_text('#!/usr/bin/env bash\nexit 0\n')
     bindir = tmp_path / 'bin'
     bindir.mkdir()
     curl = bindir / 'curl'
@@ -74,6 +76,7 @@ done
 case "$url" in
  */install_mta_native.sh) cp "$MTA_FIXTURE_ROOT/install_mta_native.sh" "$out";;
  */repositories/install_repository.sh) cp "$MTA_FIXTURE_ROOT/repositories/install_repository.sh" "$out";;
+ */install_mta_native_wizard.sh) cp "$MTA_FIXTURE_ROOT/install_mta_native_wizard.sh" "$out";;
  *) exit 7;;
 esac
 """)

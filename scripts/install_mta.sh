@@ -3,10 +3,17 @@
 set -Eeuo pipefail
 # Explicit native mode: one-file bootstrap for signed APT/DNF server packages.
 # If local helpers are absent, fetch both from the *same immutable Git commit*.
-if [[ ${1:-} == --native-server ]]; then
- shift
+# Signed native RPM/DEB installation is the default. Legacy source mode is opt-in.
+legacy_source=0
+if [[ ${1:-} == --legacy-source ]]; then
+  legacy_source=1
+  shift
+elif [[ ${1:-} == --native-server ]]; then
+  shift
+fi
+if (( ! legacy_source )); then
  native_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
- if [[ -f "$native_dir/install_mta_native.sh" && -f "$native_dir/repositories/install_repository.sh" ]]; then
+ if [[ -f "$native_dir/install_mta_native.sh" && -f "$native_dir/repositories/install_repository.sh" && -f "$native_dir/install_mta_native_wizard.sh" ]]; then
    exec bash "$native_dir/install_mta_native.sh" "$@"
  fi
  command -v curl >/dev/null || { echo 'curl is required for the native installer bootstrap' >&2; exit 2; }
@@ -22,7 +29,7 @@ if [[ ${1:-} == --native-server ]]; then
  trap 'rm -rf -- "$tmp_native"' EXIT
  mkdir -p "$tmp_native/repositories"
  raw="https://raw.githubusercontent.com/desalvo/mta-audio-editor/$ref/scripts"
- for file in install_mta_native.sh repositories/install_repository.sh; do
+ for file in install_mta_native.sh repositories/install_repository.sh install_mta_native_wizard.sh; do
    curl --fail --location --proto '=https' --tlsv1.2 --retry 3 --silent --show-error \
      "$raw/$file" -o "$tmp_native/$file" || { echo "Failed to download trusted installer helper: $file" >&2; exit 3; }
    bash -n "$tmp_native/$file" || { echo "Invalid installer helper: $file" >&2; exit 3; }

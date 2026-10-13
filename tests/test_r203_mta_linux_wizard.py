@@ -16,7 +16,7 @@ def test_install_mta_standalone_and_executable():
 
 
 def test_dry_run_preserves_selected_version_and_network_values():
-    result = subprocess.run([str(SCRIPT), "--dry-run", "--version", "v0.3.0", "--port", "8877", "--bind", "local"], capture_output=True, text=True, timeout=10)
+    result = subprocess.run([str(SCRIPT), "--legacy-source", "--dry-run", "--version", "v0.3.0", "--port", "8877", "--bind", "local"], capture_output=True, text=True, timeout=10)
     assert result.returncode == 0, result.stderr
     assert "ref=v0.3.0" in result.stdout
     assert "port=8877 bind=local" in result.stdout
@@ -26,6 +26,6 @@ def test_unsupported_os_rejected_before_root_check(tmp_path):
     os_release = tmp_path / "os-release"
     os_release.write_text('ID=alpine\nVERSION_ID=3.22\nPRETTY_NAME=Alpine\n')
     env = dict(os.environ, MTA_OS_RELEASE=str(os_release))
-    result = subprocess.run([str(SCRIPT), "--dry-run"], env=env, capture_output=True, text=True, timeout=10)
+    result = subprocess.run([str(SCRIPT), "--legacy-source", "--dry-run"], env=env, capture_output=True, text=True, timeout=10)
     assert result.returncode == 2
     assert "Unsupported OS" in result.stderr

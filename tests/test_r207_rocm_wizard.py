@@ -22,7 +22,7 @@ def test_rocm_wizard_shell_syntax():
 
 def test_rocm_wizard_rejects_invalid_gpu_value():
     result = subprocess.run(
-        ['bash', str(WIZARD), '--dry-run', '--gpu', 'broken'],
+        ['bash', str(WIZARD), '--legacy-source', '--dry-run', '--gpu', 'broken'],
         text=True, capture_output=True, check=False,
     )
     assert result.returncode != 0
@@ -31,7 +31,7 @@ def test_rocm_wizard_rejects_invalid_gpu_value():
 
 def test_rocm_wizard_dry_run_has_no_install():
     result = subprocess.run(
-        ['bash', str(WIZARD), '--dry-run', '--gpu', 'auto'],
+        ['bash', str(WIZARD), '--legacy-source', '--dry-run', '--gpu', 'auto'],
         text=True, capture_output=True, check=False,
     )
     assert result.returncode == 0, result.stderr

@@ -4,8 +4,9 @@ set -Eeuo pipefail
 MODE=${1:-auto}
 [[ $MODE == auto || $MODE == yes || $MODE == no ]] || { echo 'Usage: install_rocm_userspace.sh [auto|yes|no]' >&2; exit 2; }
 if [[ $MODE == no ]]; then echo 'ROCm installation disabled.'; exit 0; fi
-if [[ ! -e /dev/kfd || ! -e /dev/dri/renderD128 ]]; then
- if [[ $MODE == yes ]]; then echo 'ROCm requires accessible /dev/kfd and /dev/dri/renderD*; expose GPU devices from Proxmox host first.' >&2; exit 3; fi
+render_nodes=(/dev/dri/renderD*)
+if [[ ! -c /dev/kfd || ! -c ${render_nodes[0]} ]]; then
+ if [[ $MODE == yes ]]; then echo 'ROCm requires /dev/kfd and /dev/dri/renderD*. For a VM configure AMD GPU passthrough and host drivers; for LXC pass those devices and allow cgroup access. Kernel drivers must be installed on the host, never inside a container.' >&2; exit 3; fi
  echo 'No accessible AMD compute GPU; skipping ROCm.'; exit 0
 fi
 # Preserve existing ROCm installations, including installations from other supported distribution channels.
@@ -14,11 +15,28 @@ if command -v rocminfo >/dev/null 2>&1 && rocminfo 2>&1 | grep -q 'HSA Agents'; 
 else
  [[ ${EUID:-$(id -u)} == 0 ]] || { echo 'ROCm installation needs root.' >&2; exit 3; }
  . /etc/os-release
- if [[ ${ID,,} != rocky && ${ID,,} != rhel && ${ID,,} != almalinux && ${ID,,} != centos && ${ID,,} != ol ]]; then
-  echo 'ROCm bootstrap currently supports Rocky/RHEL-family 9. For this OS configure the official AMD ROCm repository first.' >&2; exit 3
+ # First use already configured, trusted distribution/vendor package repositories.
+ if command -v dnf >/dev/null 2>&1; then
+  if dnf -q --setopt=timeout=8 --setopt=retries=0 list --available rocm-hip-runtime rocminfo >/dev/null 2>&1; then
+   echo 'Trying ROCm userspace from currently enabled DNF repositories.'
+   dnf install -y rocm-hip-runtime rocminfo || :
+  fi
+ elif command -v apt-get >/dev/null 2>&1; then
+  if apt-cache show rocminfo >/dev/null 2>&1 && apt-cache show rocm-hip-runtime >/dev/null 2>&1; then
+   echo 'Trying ROCm userspace from currently enabled APT repositories.'
+   DEBIAN_FRONTEND=noninteractive apt-get install -y rocminfo rocm-hip-runtime || :
+  fi
  fi
- [[ ${VERSION_ID%%.*} == 9 ]] || { echo 'Automatic ROCm repository bootstrap supports RHEL-family 9 only.' >&2; exit 3; }
- command -v dnf >/dev/null || exit 3
+ if ! command -v rocminfo >/dev/null 2>&1; then
+  if [[ ${ID,,} != rocky && ${ID,,} != rhel && ${ID,,} != almalinux && ${ID,,} != centos && ${ID,,} != ol ]]; then
+   echo "ROCm packages were unavailable. Use AMD's official ROCm install guide for ${PRETTY_NAME:-$ID}, configure its signed repository, then rerun this wizard: https://rocm.docs.amd.com/projects/install-on-linux/en/latest/" >&2
+   exit 3
+  fi
+  if [[ ${VERSION_ID%%.*} != 9 ]]; then
+   echo "ROCm packages unavailable on EL${VERSION_ID%%.*}. Configure the AMD repository for your exact OS/ROCm combination following https://rocm.docs.amd.com/projects/install-on-linux/en/latest/ and rerun. Do not use EL9 packages on EL10." >&2
+   exit 3
+  fi
+  command -v dnf >/dev/null || exit 3
  # AMD's EL9 userspace repository; allow an administrator to pin another AMD release.
  ROCM_RELEASE=${MTA_ROCM_RELEASE:-7.2.4}
  [[ $ROCM_RELEASE =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]] || { echo 'Invalid MTA_ROCM_RELEASE' >&2; exit 3; }
@@ -35,13 +53,14 @@ REPO
  fi
  echo 'Installing ROCm userspace; never installing amdgpu-dkms or kernel drivers.'
  dnf install -y rocm-hip-runtime rocminfo || { echo 'ROCm installation failed. Check AMD support for this distribution version and selected ROCm release.' >&2; exit 3; }
+ fi
  command -v rocminfo >/dev/null 2>&1 || { echo 'rocminfo is still unavailable after installation.' >&2; exit 3; }
 fi
 if ! command -v amd-smi >/dev/null 2>&1; then
  if command -v dnf >/dev/null 2>&1; then
-  dnf install -y amdrocm-amdsmi || { echo 'AMD SMI not installed; configure matching official AMD ROCm repositories.' >&2; exit 3; }
+  dnf install -y amdrocm-amdsmi || echo 'AMD SMI is unavailable in enabled repositories; ROCm compute can still work. Consult the official AMD ROCm documentation.' >&2
  else
-  echo 'AMD SMI missing; install amdrocm-amdsmi through your supported system package manager.' >&2; exit 3
+  echo 'AMD SMI missing; install its matching package from the vendor repository if GPU telemetry is required.' >&2
  fi
 fi
 if ! command -v amd-smi >/dev/null 2>&1; then
@@ -49,7 +68,7 @@ if ! command -v amd-smi >/dev/null 2>&1; then
   if [[ -x $executable ]]; then ln -sf "$executable" /usr/local/bin/amd-smi; break; fi
  done
 fi
-command -v amd-smi >/dev/null 2>&1 || { echo 'AMD SMI installed but executable not found.' >&2; exit 3; }
+command -v amd-smi >/dev/null 2>&1 || echo 'Warning: AMD SMI unavailable; GPU accounting/telemetry may need additional configuration.' >&2
 rocminfo >/dev/null || { echo 'ROCm runtime cannot access AMD GPU.' >&2; exit 3; }
-amd-smi version >/dev/null || { echo 'AMD SMI cannot initialize.' >&2; exit 3; }
+if command -v amd-smi >/dev/null 2>&1; then amd-smi version >/dev/null || echo 'Warning: AMD SMI failed to initialize.' >&2; fi
 echo 'ROCm/AMD SMI userspace verified. GPU billing is NOT enabled by this installer.'
