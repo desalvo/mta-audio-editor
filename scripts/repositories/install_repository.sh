@@ -32,10 +32,10 @@ confirm_external() {
 dnf_probe() {
   local what=$1; shift
   local rc=0
-  timeout --signal=TERM --kill-after=3s 30s \
+  timeout --signal=TERM --kill-after=5s 120s \
     dnf -q --setopt=timeout=8 --setopt=retries=0 "$@" >/dev/null 2>&1 || rc=$?
   if (( rc == 124 || rc == 137 )); then
-    echo "DNF timed out while checking $what (30s). Check repository connectivity, DNS, subscription-manager and enabled repositories." >&2
+    echo "DNF timed out while checking $what (120s). Check repository connectivity, DNS, subscription-manager and enabled repositories." >&2
     return 75
   fi
   return "$rc"

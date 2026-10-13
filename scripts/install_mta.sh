@@ -20,7 +20,7 @@ if (( ! legacy_source )); then
  command -v python3 >/dev/null || { echo 'python3 is required to resolve the pinned GitHub commit' >&2; exit 2; }
  ref=${MTA_INSTALL_REF:-}
  if [[ -z $ref ]]; then
-   response=$(curl --fail --location --proto '=https' --tlsv1.2 --retry 3 --silent --show-error \
+   response=$(curl --connect-timeout 20 --max-time 120 --fail --location --proto '=https' --tlsv1.2 --retry 3 --silent --show-error \
      'https://api.github.com/repos/desalvo/mta-audio-editor/git/ref/heads/main') || exit 3
    ref=$(python3 -c 'import json,sys; print(json.load(sys.stdin)["object"]["sha"])' <<<"$response") || exit 3
  fi
@@ -30,7 +30,7 @@ if (( ! legacy_source )); then
  mkdir -p "$tmp_native/repositories"
  raw="https://raw.githubusercontent.com/desalvo/mta-audio-editor/$ref/scripts"
  for file in install_mta_native.sh repositories/install_repository.sh install_mta_native_wizard.sh; do
-   curl --fail --location --proto '=https' --tlsv1.2 --retry 3 --silent --show-error \
+   curl --connect-timeout 20 --max-time 120 --fail --location --proto '=https' --tlsv1.2 --retry 3 --silent --show-error \
      "$raw/$file" -o "$tmp_native/$file" || { echo "Failed to download trusted installer helper: $file" >&2; exit 3; }
    bash -n "$tmp_native/$file" || { echo "Invalid installer helper: $file" >&2; exit 3; }
    # curl -o creates mode 0644: the nested native installer execs this helper.

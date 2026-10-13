@@ -283,12 +283,12 @@ if (( ! SKIP_INSTALL )); then
 # Python first, so unsupported repositories fail with an actionable message.
 if [[ $OS_FAMILY == debian ]]; then
  apt-get update
- DEBIAN_FRONTEND=noninteractive apt-get install -y git ca-certificates gcc g++ make "$PYTHON" "${PYTHON}-venv" "${PYTHON}-dev" python3-pip
+ DEBIAN_FRONTEND=noninteractive apt-get install -y git ca-certificates gcc g++ make "$PYTHON" "${PYTHON}-venv" "${PYTHON}-dev" python3-pip python3-argcomplete
 else
  if [[ $OS_MAJOR -ge 10 && $PYTHON == python3 ]]; then
-  dnf install -y git ca-certificates python3 python3-pip gcc gcc-c++ make
+  dnf install -y git ca-certificates python3 python3-pip python3-argcomplete gcc gcc-c++ make
  else
-  dnf install -y git ca-certificates "$PYTHON" "${PYTHON}-pip" gcc gcc-c++ make
+  dnf install -y git ca-certificates "$PYTHON" "${PYTHON}-pip" python3-argcomplete gcc gcc-c++ make
  fi
 fi
 command -v "$PYTHON" >/dev/null || { echo "Python interpreter $PYTHON unavailable on $PRETTY_NAME. Configure Python 3.11 or 3.12 with MTA_PYTHON." >&2; exit 2; }
@@ -341,7 +341,7 @@ if [[ -d "$VENV" ]]; then
  mv "$VENV" "$BACKUP_VENV"
 fi
 "$PYTHON" -m venv "$VENV"
-"$VENV/bin/python" -m pip install -U pip setuptools wheel
+"$VENV/bin/python" -m pip install -U pip setuptools wheel argcomplete
 if [[ $DEVICE == rocm ]]; then
   "$VENV/bin/python" -m pip install "torch==$TORCH_VERSION" "torchaudio==$TORCH_VERSION" --index-url "$INDEX"
   "$VENV/bin/python" -m pip install -r "$stage/source/requirements-rocm-linux.txt"
@@ -378,6 +378,16 @@ printf '%s\n' "$ACE_VERSION" > "$BASE/ace-step/.mta-installed-ref"
 printf '%s\n' "$DEVICE" > "$BASE/ace-step/.mta-installed-device"
 [[ -e $BASE/ace-step/checkpoints ]] || ln -s "$DATA/models/checkpoints" "$BASE/ace-step/checkpoints"
 fi # new install / forced reinstall
+# Existing installations may predate the argcomplete dependency: repair only
+# the isolated ACE-Step environment, never Python's system site-packages.
+if ! "$VENV/bin/python" -c 'import argcomplete' >/dev/null 2>&1; then
+  echo 'Installing missing argcomplete in the ACE-Step virtual environment...'
+  "$VENV/bin/python" -m pip install 'argcomplete>=3,<4'
+fi
+"$VENV/bin/python" -c 'import argcomplete' || {
+  echo 'ACE-Step argcomplete verification failed.' >&2; exit 4;
+}
+
 mkdir -p /etc/mta
 if [[ ! -f /etc/mta/ace-step.env ]]; then
  cat > /etc/mta/ace-step.env <<ENV
