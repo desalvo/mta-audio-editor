@@ -157,6 +157,61 @@ jobs:
           path: /tmp/mta-rpm-out/*.rpm
           retention-days: 2
 
+  el10-rpm-native:
+    name: ${{ matrix.name }} EL10 RPM offline and DNF lifecycle
+    runs-on: ubuntu-24.04
+    container:
+      image: ${{ matrix.image }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: rocky10, image: 'rockylinux/rockylinux:10' }
+          - { name: alma10, image: 'almalinux:10' }
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install EL10 trusted build prerequisites
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat /etc/os-release
+          grep -q '^VERSION_ID="*10' /etc/os-release
+          dnf -y install git rpm rpm-build cpio python3.12 python3.12-pip python3.12-devel ca-certificates
+          dnf -y install epel-release
+          # EPEL 10 ffmpeg-free supplies /usr/bin/ffmpeg. Never silently bypass the RPM dependency.
+          dnf -y install ffmpeg-free
+          test -x /usr/bin/ffmpeg
+          python3.12 --version
+      - name: Build and validate offline runtime on EL10
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3.12 -m pip install 'pip>=24,<27' pytest
+          python3.12 scripts/server_packages/prepare_runtime.py --source . --stage /tmp/el10-stage --requirements requirements.txt
+          python3.12 scripts/server_packages/verify_offline_runtime.py /tmp/el10-stage --check-proof
+          MTA_SERVER_PYTHON=python3.12 MTA_SERVER_STAGE=/tmp/el10-stage MTA_RPM_VERSION=0.3.0 MTA_RPM_RELEASE=0.208.early MTA_SERVER_OUTPUT=/tmp/el10-out MTA_SERVER_RELEASE_READY=1 bash scripts/server_packages/build_rpm.sh
+          test "$(rpm -qp --qf '%{NAME}' /tmp/el10-out/*.rpm)" = mta-audio-editor-server
+          mkdir -p /tmp/el10-payload
+          ( cd /tmp/el10-payload && rpm2cpio /tmp/el10-out/*.rpm | cpio -idm --quiet )
+          python3.12 scripts/server_packages/smoke_offline_payload.py --root /tmp/el10-payload
+      - name: Install reinstall and preserve data on EL10 (disposable container)
+        shell: bash
+        run: |
+          set -euo pipefail
+          MTA_CI_DISPOSABLE_CONTAINER=1 MTA_SERVER_RPM="$(find /tmp/el10-out -name '*.rpm' -print -quit)" bash scripts/server_packages/test_rpm_upgrade.sh
+      - name: DNF upgrade downgrade and re-upgrade on EL10
+        shell: bash
+        run: |
+          set -euo pipefail
+          MTA_SERVER_PYTHON=python3.12 MTA_SERVER_STAGE=/tmp/el10-stage MTA_RPM_VERSION=0.3.0 MTA_RPM_RELEASE=0.207.early MTA_SERVER_OUTPUT=/tmp/el10-old MTA_SERVER_RELEASE_READY=1 bash scripts/server_packages/build_rpm.sh
+          MTA_CI_DISPOSABLE_CONTAINER=1 MTA_SERVER_RPM_OLD="$(find /tmp/el10-old -name '*.rpm' -print -quit)" MTA_SERVER_RPM_NEW="$(find /tmp/el10-out -name '*.rpm' -print -quit)" bash scripts/server_packages/test_rpm_version_cycle.sh
+      - name: Check package repository metadata and signatures on EL10
+        shell: bash
+        run: |
+          set -euo pipefail
+          dnf -y install gnupg2 createrepo_c rpm-sign
+          MTA_CI_DISPOSABLE_CONTAINER=1 MTA_SERVER_RPM="$(find /tmp/el10-out -name '*.rpm' -print -quit)" bash scripts/repositories/test_signed_rpm_repository_ci.sh
+
   ubuntu-systemd-vm:
     name: Ubuntu 24.04 systemd service acceptance (disposable VM)
     runs-on: ubuntu-24.04

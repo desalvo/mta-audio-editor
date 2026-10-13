@@ -4,7 +4,6 @@ import json
 from pathlib import Path
 import tarfile
 import hashlib
-import subprocess
 
 import pytest
 
