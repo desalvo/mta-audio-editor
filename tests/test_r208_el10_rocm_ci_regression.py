@@ -21,3 +21,13 @@ def test_vendor_rocminfo_over_epel_without_allowerasing():
     assert '--setopt=epel.excludepkgs=rocminfo' in script
     assert '"$amd_rocminfo_nevra"' in script
     assert 'dnf install -y --allowerasing' not in script
+
+
+def test_el10_rocm_disables_epel_and_excludes_conflicting_amd_rpath():
+    source = (ROOT / 'scripts/install_rocm_userspace.sh').read_text()
+    assert "[[ ${VERSION_ID%%.*} == 10 ]]" in source
+    assert "--disablerepo='epel*'" in source
+    assert "--exclude='rocm-core-rpath*'" in source
+    assert '"${rocm_dnf_options[@]}"' in source
+    assert 'dnf install -y --allowerasing' not in source
+    assert '--nogpgcheck' not in source.split('if ! dnf install -y')[0]

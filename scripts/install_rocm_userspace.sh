@@ -66,8 +66,19 @@ REPO
    exit 3
  fi
  echo "Pinning AMD ROCm rocminfo: $amd_rocminfo_nevra (not EPEL's package)."
- if ! dnf install -y --setopt=epel.excludepkgs=rocminfo --enablerepo="$amd_rocm_repo" rocm-hip-runtime "$amd_rocminfo_nevra"; then
-   echo 'AMD ROCm installation failed. Check installed rocminfo, dependency conflicts and AMD repository metadata; no --allowerasing was used.' >&2
+ # EL10: exclude EPEL only while resolving this ROCm transaction. The AMD
+ # repository contains both rocm-core and rocm-core-rpath<version>, which
+ # claim the same library path: select the standard rocm-core family to
+ # prevent a DNF transaction file collision. Do not weaken GPG checking.
+ rocm_dnf_options=(--enablerepo="$amd_rocm_repo")
+ if [[ ${VERSION_ID%%.*} == 10 ]]; then
+   echo 'EL10 ROCm: disabling EPEL for this transaction and excluding the conflicting AMD rocm-core-rpath package.'
+   rocm_dnf_options+=(--disablerepo='epel*' --exclude='rocm-core-rpath*')
+ else
+   rocm_dnf_options+=(--setopt=epel.excludepkgs=rocminfo)
+ fi
+ if ! dnf install -y "${rocm_dnf_options[@]}" rocm-hip-runtime "$amd_rocminfo_nevra"; then
+   echo 'AMD ROCm installation failed. Inspect the complete DNF dependency transaction; no --allowerasing, --skip-broken or --nogpgcheck was used.' >&2
    exit 3
  fi
  fi
