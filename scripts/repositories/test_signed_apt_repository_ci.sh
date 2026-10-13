@@ -15,7 +15,7 @@ export GNUPGHOME="$root/gnupg"
 gpg --batch --passphrase '' --quick-generate-key 'MTA CI Ephemeral <ci@example.org>' ed25519 sign 0
 fingerprint=$(gpg --batch --with-colons --list-keys | awk -F: '$1=="fpr" {print $10;exit}')
 [[ $fingerprint =~ ^[A-Fa-f0-9]{40}$ ]] || exit 3
-MTA_REPO_INPUT="$root/incoming" MTA_REPO_OUTPUT="$root/repo" MTA_REPO_CHANNEL=early MTA_GPG_KEY_ID="$fingerprint" bash scripts/repositories/build_indexes.sh
+MTA_REPO_APT_ONLY_CI=1 MTA_REPO_INPUT="$root/incoming" MTA_REPO_OUTPUT="$root/repo" MTA_REPO_CHANNEL=early MTA_GPG_KEY_ID="$fingerprint" bash scripts/repositories/build_indexes.sh
 gpg --batch --dearmor -o /usr/share/keyrings/mta-ci-signed-test.gpg "$root/repo/mta-archive-key.asc"
 gpg --batch --no-default-keyring --keyring /usr/share/keyrings/mta-ci-signed-test.gpg --verify "$root/repo/apt/early/Release.gpg" "$root/repo/apt/early/Release"
 # Signature verification must reject corrupted metadata; never trust the presence

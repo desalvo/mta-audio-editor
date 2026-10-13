@@ -79,3 +79,6 @@ SPEC
 export MTA_RPM_VERSION MTA_RPM_RELEASE
 rpmbuild --define "_topdir $work" -bb "$work/SPECS/mta-server.spec"
 mkdir -p "$out"; find "$work/RPMS" -name '*.rpm' -exec cp {} "$out/" \;
+
+# Fail closed when the actual final artifact lacks native installers.
+"${MTA_SERVER_PYTHON:-python3.12}" "$(dirname "$0")/verify_native_installers.py" "$out"/*.rpm

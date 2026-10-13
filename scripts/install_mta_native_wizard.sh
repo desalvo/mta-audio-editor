@@ -126,7 +126,14 @@ fi
 ask 'ACE-Step backend (local/remote/disabled)' "$ace_mode_default"; ace_mode=$REPLY
 [[ $ace_mode == local || $ace_mode == remote || $ace_mode == disabled ]] || { echo 'Invalid ACE-Step mode' >&2; exit 2; }
 if [[ $ace_mode == local ]]; then
-  [[ -r $ace_installer ]] || { echo 'Signed server package does not include the ACE-Step installer. Upgrade the RPM/DEB before local setup.' >&2; exit 4; }
+  if [[ ! -f $ace_installer || ! -x $ace_installer ]]; then
+    echo 'Installed server package is missing its ACE-Step installer.' >&2
+    echo 'Upgrade mta-audio-editor-server using the configured signed APT/DNF repository, then rerun --configure-only.' >&2
+    echo 'RPM: sudo dnf --refresh upgrade mta-audio-editor-server' >&2
+    echo 'DEB: sudo apt-get update && sudo apt-get install --only-upgrade mta-audio-editor-server' >&2
+    echo 'Do not run a downloaded, unverified replacement installer.' >&2
+    exit 4
+  fi
   ace_device=auto
   ask 'ACE-Step execution device (auto/rocm/cpu)' "$ace_device"; ace_device=$REPLY
   [[ $ace_device == auto || $ace_device == rocm || $ace_device == cpu ]] || { echo 'Invalid ACE-Step device' >&2; exit 2; }

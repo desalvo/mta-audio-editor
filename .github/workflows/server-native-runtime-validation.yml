@@ -121,6 +121,7 @@ jobs:
           rpm2cpio /tmp/mta-rpm-out/*.rpm | cpio -idm --quiet
           cd "$GITHUB_WORKSPACE"
           python3.12 scripts/server_packages/smoke_offline_payload.py --root /tmp/mta-rpm-root
+          python3.12 scripts/server_packages/verify_native_installers.py /tmp/mta-rpm-out/*.rpm
       - name: Install test dependencies from approved Rocky/EPEL sources
         run: |
           set -euo pipefail
@@ -194,6 +195,7 @@ jobs:
           mkdir -p /tmp/el10-payload
           ( cd /tmp/el10-payload && rpm2cpio /tmp/el10-out/*.rpm | cpio -idm --quiet )
           python3.12 scripts/server_packages/smoke_offline_payload.py --root /tmp/el10-payload
+          python3.12 scripts/server_packages/verify_native_installers.py /tmp/el10-out/*.rpm
       - name: Install reinstall and preserve data on EL10 (disposable container)
         shell: bash
         run: |
@@ -238,6 +240,7 @@ jobs:
           "$RUNNER_TEMP/mta-build-python/bin/python" scripts/server_packages/prepare_runtime.py --source . --stage "$RUNNER_TEMP/server-stage" --requirements requirements.txt
           "$RUNNER_TEMP/mta-build-python/bin/python" scripts/server_packages/verify_offline_runtime.py "$RUNNER_TEMP/server-stage" --check-proof
           MTA_SERVER_PYTHON="$RUNNER_TEMP/mta-build-python/bin/python" MTA_SERVER_STAGE="$RUNNER_TEMP/server-stage" MTA_SERVER_VERSION='0.3.0~early.208' MTA_SERVER_OUTPUT="$RUNNER_TEMP/out" MTA_SERVER_RELEASE_READY=1 bash scripts/server_packages/build_deb.sh
+          python3 scripts/server_packages/verify_native_installers.py "$RUNNER_TEMP"/out/*.deb
       - name: Install DEB and verify systemd services on ephemeral runner
         shell: bash
         run: |

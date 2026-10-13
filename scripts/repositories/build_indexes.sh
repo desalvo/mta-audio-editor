@@ -8,6 +8,16 @@ set -Eeuo pipefail
 [[ $MTA_REPO_CHANNEL == early || $MTA_REPO_CHANNEL == stable ]] || exit 2
 [[ $MTA_GPG_KEY_ID =~ ^[A-Fa-f0-9]{40}$ ]] || { echo 'Full 40-hex GPG fingerprint required' >&2; exit 2; }
 for tool in dpkg-scanpackages apt-ftparchive createrepo_c gpg; do command -v "$tool" >/dev/null || { echo "Missing $tool" >&2; exit 2; }; done
+# Only the disposable CI APT signature smoke test may omit RPM trees.
+# Production publishing always requires both EL9 and EL10 signed RPMs.
+apt_only_ci=0
+if [[ ${MTA_REPO_APT_ONLY_CI:-0} == 1 ]]; then
+  [[ ${MTA_CI_DISPOSABLE_CONTAINER:-0} == 1 ]] || {
+    echo 'APT-only repository creation is restricted to disposable CI' >&2
+    exit 2
+  }
+  apt_only_ci=1
+fi
 src=$(realpath "$MTA_REPO_INPUT")
 out=$(realpath -m "$MTA_REPO_OUTPUT")
 [[ -d $src && $src != "$out" ]] || exit 2
@@ -18,6 +28,7 @@ for f in "$src"/*.deb; do
   cp -n "$f" "$out/apt/$MTA_REPO_CHANNEL/pool/"
 done
 for target in el9 el10; do
+  [[ $apt_only_ci == 1 ]] && break
   mkdir -p "$out/rpm/$MTA_REPO_CHANNEL/$target/packages"
   for f in "$src/rpm/$target/"*.rpm; do
     [[ $(rpm -qp --qf '%{NAME}' "$f") == mta-audio-editor-server ]] || { echo "Not a server package: $f" >&2; exit 3; }
@@ -40,6 +51,7 @@ gpg --batch --yes --local-user "$MTA_GPG_KEY_ID" --armor --detach-sign -o "$aptr
 gpg --batch --yes --local-user "$MTA_GPG_KEY_ID" --clearsign -o "$aptroot/InRelease" "$aptroot/Release"
 rm "$aptroot/apt-release.conf"
 for target in el9 el10; do
+  [[ $apt_only_ci == 1 ]] && break
   rpmroot="$out/rpm/$MTA_REPO_CHANNEL/$target"
   [[ -n $(find "$rpmroot/packages" -maxdepth 1 -name '*.rpm' -print -quit) ]] || { echo "No $target RPM packages" >&2; exit 3; }
   for file in "$rpmroot"/packages/*.rpm; do

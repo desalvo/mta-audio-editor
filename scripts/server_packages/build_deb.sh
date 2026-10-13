@@ -57,3 +57,6 @@ chmod 0755 "$root/DEBIAN/preinst" "$root/DEBIAN/postinst" "$root/DEBIAN/prerm"
 find "$root" -exec touch -h -d "@${SOURCE_DATE_EPOCH:-1700000000}" {} +
 mkdir -p "$out"
 dpkg-deb --root-owner-group --build "$root" "$out/mta-audio-editor-server_${MTA_SERVER_VERSION}_${arch}.deb"
+
+# Fail closed when the actual final artifact lacks native installers.
+"${MTA_SERVER_PYTHON:-python3}" "$(dirname "$0")/verify_native_installers.py" "$out"/*.deb
