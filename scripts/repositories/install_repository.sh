@@ -4,12 +4,55 @@ set -Eeuo pipefail
 MTA_PACKAGES_URL=${MTA_PACKAGES_URL:-https://desalvo.github.io/mta-audio-editor-packages}
 MTA_REPO_KEY_FINGERPRINT=${MTA_REPO_KEY_FINGERPRINT:-0833A4FCB008ECAC9F98840B4C1D2DD95F5AEDB7}
 CHANNEL=${1:-stable}
+MODE=${2:---interactive}
+[[ $MODE == --interactive || $MODE == --unattended ]] || { echo "Invalid execution mode" >&2; exit 2; }
 [[ $CHANNEL == stable || $CHANNEL == early ]] || { echo 'Channel must be stable or early' >&2; exit 2; }
 [[ $MTA_PACKAGES_URL == https://* && $MTA_PACKAGES_URL != *' '* ]] || exit 2
 [[ $MTA_REPO_KEY_FINGERPRINT =~ ^[[:xdigit:]]{40}$ ]] || exit 2
 (( EUID == 0 )) || { echo 'Run as root' >&2; exit 2; }
 . /etc/os-release
 base=${MTA_PACKAGES_URL%/}
+# Never enable unrelated repositories silently during interactive installs.
+# In unattended mode opt in only to the documented, system-managed EPEL RPM.
+confirm_external() {
+  local question=$1 reply
+  if [[ $MODE == --unattended ]]; then
+    echo "Unattended mode: approving $question"
+    return 0
+  fi
+  if [[ ! -t 0 ]]; then
+    echo "External dependency requires approval, but stdin is non-interactive. Use --unattended to opt in." >&2
+    return 1
+  fi
+  read -r -p "$question [y/N]: " reply
+  [[ $reply == [yY] || $reply == [yY][eE][sS] ]]
+}
+# For Enterprise Linux 9/10 ffmpeg-free is provided through EPEL on supported systems.
+# EPEL must come from a configured trusted RPM repository (typically the OS vendor
+# extras repository). Never download an unverified arbitrary rpm URL.
+prepare_el_dependencies() {
+  local major=$1
+  # `dnf provides` checks enabled repositories, without mutating the system.
+  if dnf -q provides /usr/bin/ffmpeg >/dev/null 2>&1; then
+    return 0
+  fi
+  echo 'FFmpeg missing from enabled RPM repositories; an external repository may be necessary.' >&2
+  if ! dnf -q list --available epel-release >/dev/null 2>&1; then
+    echo 'epel-release is unavailable in trusted enabled repositories. Configure EPEL manually according to your distribution policy.' >&2
+    return 4
+  fi
+  confirm_external "Install EPEL repository configuration (epel-release) and its dependencies for EL$major?" || {
+    echo 'Declined EPEL installation; leaving the host unchanged for this step.' >&2
+    return 4
+  }
+  dnf install -y epel-release || return 4
+  dnf makecache --refresh || return 4
+  if ! dnf -q provides /usr/bin/ffmpeg >/dev/null 2>&1; then
+    echo 'FFmpeg still unavailable after EPEL; check CRB/CodeReady Builder or your subscription configuration.' >&2
+    return 4
+  fi
+}
+
 tmp=$(mktemp -d); trap 'rm -rf "$tmp"' EXIT
 curl --fail --location --proto '=https' --tlsv1.2 --silent --show-error "$base/mta-archive-key.asc" -o "$tmp/key.asc"
 actual=$(gpg --batch --show-keys --with-colons "$tmp/key.asc" | awk -F: '$1=="fpr" {print toupper($10); exit}')
@@ -43,6 +86,7 @@ gpgcheck=1
 repo_gpgcheck=1
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-MTA
 EOF
+   prepare_el_dependencies "$major"
    dnf install -y mta-audio-editor-server
    ;;
  *) echo 'Unsupported Linux distribution' >&2; exit 2;;

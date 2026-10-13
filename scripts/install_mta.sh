@@ -1,10 +1,34 @@
 #!/usr/bin/env bash
 # Standalone, idempotent MTA Audio Editor server installer for Debian/RHEL families.
 set -Eeuo pipefail
-# Explicit native mode: no Git checkout and no automatic takeover of legacy setups.
+# Explicit native mode: one-file bootstrap for signed APT/DNF server packages.
+# If local helpers are absent, fetch both from the *same immutable Git commit*.
 if [[ ${1:-} == --native-server ]]; then
  shift
- exec "$(dirname "${BASH_SOURCE[0]}")/install_mta_native.sh" "$@"
+ native_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+ if [[ -f "$native_dir/install_mta_native.sh" && -f "$native_dir/repositories/install_repository.sh" ]]; then
+   exec bash "$native_dir/install_mta_native.sh" "$@"
+ fi
+ command -v curl >/dev/null || { echo 'curl is required for the native installer bootstrap' >&2; exit 2; }
+ command -v python3 >/dev/null || { echo 'python3 is required to resolve the pinned GitHub commit' >&2; exit 2; }
+ ref=${MTA_INSTALL_REF:-}
+ if [[ -z $ref ]]; then
+   response=$(curl --fail --location --proto '=https' --tlsv1.2 --retry 3 --silent --show-error \
+     'https://api.github.com/repos/desalvo/mta-audio-editor/git/ref/heads/main') || exit 3
+   ref=$(python3 -c 'import json,sys; print(json.load(sys.stdin)["object"]["sha"])' <<<"$response") || exit 3
+ fi
+ [[ $ref =~ ^[a-fA-F0-9]{40}$ ]] || { echo 'Invalid MTA_INSTALL_REF: expected full 40-character Git commit SHA' >&2; exit 2; }
+ tmp_native=$(mktemp -d) || exit 3
+ trap 'rm -rf -- "$tmp_native"' EXIT
+ mkdir -p "$tmp_native/repositories"
+ raw="https://raw.githubusercontent.com/desalvo/mta-audio-editor/$ref/scripts"
+ for file in install_mta_native.sh repositories/install_repository.sh; do
+   curl --fail --location --proto '=https' --tlsv1.2 --retry 3 --silent --show-error \
+     "$raw/$file" -o "$tmp_native/$file" || { echo "Failed to download trusted installer helper: $file" >&2; exit 3; }
+   bash -n "$tmp_native/$file" || { echo "Invalid installer helper: $file" >&2; exit 3; }
+ done
+ bash "$tmp_native/install_mta_native.sh" "$@"
+ exit $?
 fi
 umask 027
 REPO=https://github.com/desalvo/mta-audio-editor.git

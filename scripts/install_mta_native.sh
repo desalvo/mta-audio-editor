@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # Explicit opt-in: install SERVER from a signed APT/DNF repository.
 set -Eeuo pipefail
-usage() { echo 'Usage: sudo MTA_PACKAGES_URL=https://... install_mta_native.sh [early|stable] [--dry-run]' >&2; }
-channel=stable; dry=0
+usage() { echo 'Usage: sudo install_mta_native.sh [early|stable] [--dry-run] [--unattended]' >&2; }
+channel=stable; dry=0; unattended=0
 for arg in "$@"; do
- case "$arg" in early|stable) channel="$arg";; --dry-run) dry=1;; *) usage; exit 2;; esac
+ case "$arg" in early|stable) channel="$arg";; --dry-run) dry=1;; --unattended|--yes) unattended=1;; *) usage; exit 2;; esac
 done
 export MTA_PACKAGES_URL=${MTA_PACKAGES_URL:-https://desalvo.github.io/mta-audio-editor-packages}
 export MTA_REPO_KEY_FINGERPRINT=${MTA_REPO_KEY_FINGERPRINT:-0833A4FCB008ECAC9F98840B4C1D2DD95F5AEDB7}
@@ -18,4 +18,4 @@ if (( dry )); then
  exit 0
 fi
 (( EUID == 0 )) || { echo 'Root required' >&2; exit 2; }
-exec "$(dirname "${BASH_SOURCE[0]}")/repositories/install_repository.sh" "$channel"
+exec "$(dirname "${BASH_SOURCE[0]}")/repositories/install_repository.sh" "$channel" "$([[ $unattended == 1 ]] && echo --unattended || echo --interactive)"
