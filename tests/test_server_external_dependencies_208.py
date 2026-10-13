@@ -37,7 +37,7 @@ def test_single_file_bootstrap_forwards_unattended():
 
 def test_dnf_probe_bounded_and_timeout_not_misclassified():
     s = (ROOT / 'scripts/repositories/install_repository.sh').read_text()
-    assert 'timeout --signal=TERM --kill-after=3s 30s' in s
+    assert 'timeout --signal=TERM --kill-after=5s 120s' in s
     assert '--setopt=timeout=8 --setopt=retries=0' in s
     assert 'rc == 124 || rc == 137' in s
     assert 'rc == 75' in s
