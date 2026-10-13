@@ -73,7 +73,7 @@ jobs:
           MTA_SERVER_STAGE="$tmp/stage" MTA_SERVER_VERSION='0.3.0~early.208+pkg1' MTA_SERVER_OUTPUT="$tmp/out" bash scripts/server_packages/build_deb.sh
           python3 scripts/server_packages/verify_native_installers.py "$tmp/out"/*.deb
           dpkg-deb -f "$tmp/out"/*.deb Package | grep -qx mta-audio-editor-server
-          dpkg-deb -f "$tmp/out"/*.deb Version | grep -qx '0.3.0~early.208'
+          dpkg-deb -f "$tmp/out"/*.deb Version | grep -qx '0.3.0~early.208+pkg1'
           dpkg-deb --contents "$tmp/out"/*.deb | grep -q 'usr/lib/mta-audio-editor-server/app/main.py'
           if MTA_SERVER_RELEASE_READY=1 MTA_SERVER_STAGE="$tmp/stage" MTA_SERVER_VERSION='0.3.0~early.208+pkg1' MTA_SERVER_OUTPUT="$tmp/out" bash scripts/server_packages/build_deb.sh; then
             echo 'ERROR: CI fixture incorrectly passed release-ready gate' >&2

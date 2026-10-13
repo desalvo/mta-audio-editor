@@ -8,7 +8,24 @@ mode=${1:---interactive}
 command -v systemctl >/dev/null || { echo 'systemd required' >&2; exit 3; }
 # Never source an environment file as shell code; update only recognized assignments.
 config=/etc/mta/mta.env
-get_setting() { sed -n "s/^${1}=//p" "$config" | tail -1; }
+# Staged, root-only checkpoint; never mutate the live environment until the final
+# service health check succeeds. It survives errors, SIGINT and process termination.
+umask 077
+checkpoint=/etc/mta/.mta-wizard.pending
+if [[ -e $checkpoint && ( ! -f $checkpoint || -L $checkpoint ) ]]; then
+  echo 'Unsafe existing wizard checkpoint; refusing to read it.' >&2; exit 4
+fi
+[[ ! -f $checkpoint ]] || chmod 600 "$checkpoint"
+get_setting() { sed -n "s/^${1}=//p" "${work:-$config}" | tail -1; }
+save_checkpoint() {
+  local temp
+  temp=$(mktemp /etc/mta/.mta-wizard.pending.XXXXXXXX)
+  chmod 600 "$temp"
+  cp "$work" "$temp"
+  mv -f "$temp" "$checkpoint"
+}
+checkpoint_answer() { set_setting "MTA_WIZARD_${1}" "$2"; }
+
 ask() {
   local prompt=$1 def=$2 ans
   if [[ $mode == --unattended ]]; then REPLY=$def; return; fi
@@ -27,6 +44,7 @@ set_setting() {
   else
     printf '%s=%s\n' "$key" "$val" >> "$work"
   fi
+  save_checkpoint
 }
 installed() {
   if command -v rpm >/dev/null && rpm -q mta-audio-editor-server >/dev/null 2>&1; then return 0; fi
@@ -37,7 +55,12 @@ installed || { echo 'Install the signed mta-audio-editor-server package first' >
 work=$(mktemp /etc/mta/.mta.env.XXXXXXXX)
 chmod 600 "$work"
 trap 'rm -f "$work"' EXIT
-cp "$config" "$work"
+if [[ -f $checkpoint ]]; then
+  echo 'Resuming previously saved wizard answers (root-only checkpoint).'
+  cp "$checkpoint" "$work"
+else
+  cp "$config" "$work"
+fi
 chmod 600 "$work"
 port=$(get_setting MTA_PORT); port=${port:-8000}
 host=$(get_setting MTA_HOST); host=${host:-127.0.0.1}
@@ -45,15 +68,15 @@ admin=$(get_setting MTA_ADMIN_USERNAME); admin=${admin:-admin}
 data=$(get_setting MTA_DATA_DIR); data=${data:-/var/lib/mta/projects}
 ask 'Server TCP port' "$port"; port=$REPLY
 [[ $port =~ ^[0-9]{1,5}$ ]] && (( 10#$port >= 1 && 10#$port <= 65535 )) || { echo 'Invalid TCP port' >&2; exit 2; }
+set_setting MTA_PORT "$port"
 ask 'Listen address (127.0.0.1/0.0.0.0)' "$host"; host=$REPLY
 [[ $host == 127.0.0.1 || $host == 0.0.0.0 ]] || { echo 'Unsupported listen address' >&2; exit 2; }
+set_setting MTA_HOST "$host"
 ask 'Administrator username' "$admin"; admin=$REPLY
 [[ $admin =~ ^[a-zA-Z0-9_.-]{1,64}$ ]] || { echo 'Invalid administrator username' >&2; exit 2; }
+set_setting MTA_ADMIN_USERNAME "$admin"
 ask 'Projects directory (absolute path)' "$data"; data=$REPLY
 [[ $data == /* && $data != / && $data != *'..'* && $data != *[[:space:]]* ]] || { echo 'Unsafe data directory' >&2; exit 2; }
-set_setting MTA_PORT "$port"
-set_setting MTA_HOST "$host"
-set_setting MTA_ADMIN_USERNAME "$admin"
 set_setting MTA_DATA_DIR "$data"
 # Existing password is preserved. User may explicitly rotate it, never printed on screen.
 if [[ $mode == --interactive ]]; then
@@ -78,18 +101,22 @@ fi
 [[ -z $public ]] || set_setting MTA_PUBLIC_URL "$public"
 # HTTPS: existing certificate or a generated, locally managed self-signed certificate.
 cert=$(get_setting MTA_TLS_CERTFILE); key=$(get_setting MTA_TLS_KEYFILE)
-https_default=no; [[ -n $cert && -n $key ]] && https_default=yes
+https_default=$(get_setting MTA_WIZARD_HTTPS); https_default=${https_default:-no}; [[ -n $cert && -n $key ]] && https_default=yes
 ask 'Enable HTTPS (yes/no)' "$https_default"; https=$REPLY
 [[ $https == yes || $https == no ]] || { echo 'Invalid HTTPS option' >&2; exit 2; }
+checkpoint_answer HTTPS "$https"
 if [[ $https == yes ]]; then
   tls_mode=existing; [[ -z $cert || -z $key ]] && tls_mode=self-signed
   echo 'Self-signed certificates are intended for testing or controlled deployments; use a valid CA-signed certificate and private key for public production.'
+  tls_mode=$(get_setting MTA_WIZARD_TLS_MODE); tls_mode=${tls_mode:-$tls_mode}
   ask 'TLS certificate mode (existing/self-signed)' "$tls_mode"; tls_mode=$REPLY
   [[ $tls_mode == existing || $tls_mode == self-signed ]] || exit 2
+  checkpoint_answer TLS_MODE "$tls_mode"
   if [[ $tls_mode == self-signed ]]; then
-    tls_name=$(hostname -f 2>/dev/null || hostname)
+    tls_name=$(get_setting MTA_WIZARD_TLS_NAME); tls_name=${tls_name:-$(hostname -f 2>/dev/null || hostname)}
     ask 'TLS certificate DNS name or IP' "$tls_name"; tls_name=$REPLY
     [[ $tls_name =~ ^[a-zA-Z0-9][a-zA-Z0-9.:-]{0,252}$ && $tls_name != *..* ]] || { echo 'Invalid TLS name' >&2; exit 2; }
+    checkpoint_answer TLS_NAME "$tls_name"
     # Do not overwrite existing certificate material; deterministic owned location.
     cert=/etc/mta/tls/server.crt; key=/etc/mta/tls/server.key
   else
@@ -123,8 +150,11 @@ ace_mode_default=remote
 if systemctl list-unit-files mta-ace-step.service --no-legend 2>/dev/null | grep -q '^mta-ace-step.service'; then
   ace_mode_default=local
 fi
+ace_mode_default=$(get_setting MTA_WIZARD_ACE_MODE); ace_mode_default=${ace_mode_default:-remote}
+if systemctl list-unit-files mta-ace-step.service --no-legend 2>/dev/null | grep -q '^mta-ace-step.service' && [[ -z $(get_setting MTA_WIZARD_ACE_MODE) ]]; then ace_mode_default=local; fi
 ask 'ACE-Step backend (local/remote/disabled)' "$ace_mode_default"; ace_mode=$REPLY
 [[ $ace_mode == local || $ace_mode == remote || $ace_mode == disabled ]] || { echo 'Invalid ACE-Step mode' >&2; exit 2; }
+checkpoint_answer ACE_MODE "$ace_mode"
 if [[ $ace_mode == local ]]; then
   if [[ ! -f $ace_installer || ! -x $ace_installer ]]; then
     echo 'Installed server package is missing its ACE-Step installer.' >&2
@@ -134,9 +164,10 @@ if [[ $ace_mode == local ]]; then
     echo 'Do not run a downloaded, unverified replacement installer.' >&2
     exit 4
   fi
-  ace_device=auto
+  ace_device=$(get_setting MTA_WIZARD_ACE_DEVICE); ace_device=${ace_device:-auto}
   ask 'ACE-Step execution device (auto/rocm/cpu)' "$ace_device"; ace_device=$REPLY
   [[ $ace_device == auto || $ace_device == rocm || $ace_device == cpu ]] || { echo 'Invalid ACE-Step device' >&2; exit 2; }
+  checkpoint_answer ACE_DEVICE "$ace_device"
   if [[ $ace_device == auto ]]; then
     render_nodes=(/dev/dri/renderD*)
     if [[ -c /dev/kfd && -c ${render_nodes[0]} ]]; then ace_device=rocm; else ace_device=cpu; fi
@@ -160,8 +191,10 @@ if [[ $ace_mode == local ]]; then
   if [[ $ace_device == cpu ]]; then
     echo 'WARNING: CPU-only ACE-Step inference is supported but significantly slower than GPU inference.'
   fi
-  ask 'ACE-Step service TCP port' 8001; ace_port=$REPLY
+  ace_port=$(get_setting MTA_WIZARD_ACE_PORT); ace_port=${ace_port:-8001}
+  ask 'ACE-Step service TCP port' "$ace_port"; ace_port=$REPLY
   [[ $ace_port =~ ^[0-9]{4,5}$ ]] && (( 10#$ace_port >= 1024 && 10#$ace_port <= 65535 )) || { echo 'Invalid ACE-Step port' >&2; exit 2; }
+  checkpoint_answer ACE_PORT "$ace_port"
   # Explicitly keep the inference service loopback-only; never expose its API.
   echo 'Installing locally managed ACE-Step on loopback; models remain persistent.'
   bash "$ace_installer" --yes --device "$ace_device" --port "$ace_port" --bind local --firewall no
@@ -230,8 +263,9 @@ fi
 # Firewall changes are explicitly opted in. Unattended defaults to no change.
 firewall_action=no
 if [[ $host == 0.0.0.0 ]]; then
-  ask 'Open server TCP port in host firewall (yes/no)' no; firewall_action=$REPLY
+  ask 'Open server TCP port in host firewall (yes/no)' "$(get_setting MTA_WIZARD_FIREWALL | sed 's/^$/no/')"; firewall_action=$REPLY
   [[ $firewall_action == yes || $firewall_action == no ]] || exit 2
+  checkpoint_answer FIREWALL "$firewall_action"
 fi
 if [[ $firewall_action == yes ]]; then
   if command -v firewall-cmd >/dev/null 2>&1 && systemctl is-active --quiet firewalld.service; then
@@ -243,11 +277,12 @@ if [[ $firewall_action == yes ]]; then
     exit 4
   fi
 fi
-billing_enabled=yes
+billing_enabled=$(get_setting MTA_WIZARD_BILLING); billing_enabled=${billing_enabled:-yes}
 if [[ $mode == --interactive ]]; then
   ask 'Enable scheduled AI billing closure (yes/no)' "$billing_enabled"; billing_enabled=$REPLY
 fi
 [[ $billing_enabled == yes || $billing_enabled == no ]] || { echo 'Invalid billing option' >&2; exit 2; }
+checkpoint_answer BILLING "$billing_enabled"
 if [[ $https == yes && $tls_mode == self-signed ]]; then
   ensure_system_package openssl
   install -d -m 700 /etc/mta/tls
@@ -271,6 +306,8 @@ install -d -m 755 "$data"
 # Back up configuration and roll back if the service cannot start with new values.
 backup=$(mktemp /etc/mta/.mta.env.backup.XXXXXXXX)
 chmod 600 "$backup"; cp -p "$config" "$backup"
+# Checkpoint metadata is wizard-only and must not enter the service environment.
+sed -i '/^MTA_WIZARD_[A-Z_]*=/d' "$work"
 chown --reference="$config" "$work"
 mv -f "$work" "$config"
 trap - EXIT
@@ -295,4 +332,5 @@ if [[ $firewall_action == yes ]]; then
     ufw allow "${port}/tcp"
   fi
 fi
+rm -f "$checkpoint"
 echo "Native server configured on ${host}:${port} (HTTPS: ${https}); future upgrades are managed by APT/DNF."

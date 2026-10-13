@@ -27,7 +27,9 @@ def test_rocm_never_installs_kernel_drivers():
     src = (ROOT / 'scripts/install_rocm_userspace.sh').read_text()
     assert 'dnf install -y rocm-hip-runtime rocminfo' in src
     assert 'dnf install -y amdgpu-dkms' not in src
-    assert 'Do not use EL9 packages on EL10' in src
+    assert 'rocm/el${VERSION_ID%%.*}/${ROCM_RELEASE}/main' in src
+    assert 'gpgcheck=1' in src
+    assert 'amdgpu-dkms' not in src.split('dnf install -y rocm-hip-runtime')[1].split('fi')[0]
 
 
 def test_rocm_shell_valid():

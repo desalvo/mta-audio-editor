@@ -24,7 +24,8 @@ def test_external_http_forbidden_except_loopback():
 
 
 def test_firewall_opt_in_not_default_and_no_auto_enable():
-    assert "ask 'Open server TCP port in host firewall (yes/no)' no" in WIZARD
+    assert "ask 'Open server TCP port in host firewall (yes/no)'" in WIZARD
+    assert "checkpoint_answer FIREWALL" in WIZARD
     assert 'systemctl enable --now firewalld' not in WIZARD
     assert 'firewall-cmd --permanent --add-port=' in WIZARD
     assert 'ufw allow ' in WIZARD
