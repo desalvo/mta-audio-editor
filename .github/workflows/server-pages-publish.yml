@@ -23,7 +23,7 @@ jobs:
     environment: server-${{ inputs.channel }}
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - name: Verify source run is successful and belongs to current main commit
@@ -134,7 +134,7 @@ jobs:
           touch "$RUNNER_TEMP/site-bundle/.nojekyll"
           tar -C "$RUNNER_TEMP/site-bundle" -czf "$RUNNER_TEMP/signed-channel.tar.gz" .
           sha256sum "$RUNNER_TEMP/signed-channel.tar.gz" | cut -d' ' -f1 > "$RUNNER_TEMP/signed-channel.sha256"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: signed-mta-pages-${{ inputs.channel }}
           path: ${{ runner.temp }}/signed-channel.tar.gz
