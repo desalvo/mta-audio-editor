@@ -113,6 +113,21 @@ def _source_path(request_file: Path, plan: dict) -> Path:
     return path
 
 
+def _progress(phase: str, message: str, percent=None) -> None:
+    """Emit only backend-supplied progress; never infer a percentage from elapsed time."""
+    path = os.environ.get('MTA_AI_PROGRESS_FILE', '')
+    if not path:
+        return
+    try:
+        target = Path(path)
+        info = {'phase': phase, 'message': message[:200], 'progress_percent': percent}
+        temporary = target.with_name(target.name + '.tmp')
+        temporary.write_text(json.dumps(info), encoding='utf-8')
+        os.replace(temporary, target)
+    except OSError:
+        pass
+
+
 def run(plan_path: Path, output: Path) -> None:
     plan = json.loads(plan_path.read_text(encoding='utf-8'))
     if plan.get('model_id') != 'ace-step-1.5':
@@ -128,6 +143,7 @@ def run(plan_path: Path, output: Path) -> None:
         raise ValueError('empty arranger prompt')
     fields = {'prompt': prompt, 'task_type': 'cover', 'audio_format': 'wav',
               'audio_cover_strength': str(1.0 - max(0, min(100, int(plan.get('strength', 60)))) / 100)}
+    _progress('uploading', 'Uploading source audio to ACE-Step')
     body, content_type = _multipart(fields, source.read_bytes())
     base = endpoint_base()
     submitted = json.loads(_request(base + '/release_task', body, content_type, timeout=60))
@@ -135,12 +151,17 @@ def run(plan_path: Path, output: Path) -> None:
     task_id = task.get('task_id') if isinstance(task, dict) else None
     if not isinstance(task_id, str) or not task_id:
         raise RuntimeError('ACE-Step did not return a task ID')
+    _progress('queued', 'ACE-Step accepted job ' + task_id[:12] + '; waiting for inference')
     max_seconds = max(30, min(3500, int(os.environ.get('MTA_ACE_STEP_POLL_SECONDS', '1100'))))
     deadline = time.monotonic() + max_seconds
     while time.monotonic() < deadline:
         status_payload = _json(base + '/query_result', {'task_id_list': [task_id]})
         rows = status_payload.get('data')
         row = next((item for item in rows if isinstance(item, dict) and item.get('task_id') == task_id), None) if isinstance(rows, list) else None
+        if row:
+            supplied = row.get('progress')
+            percent = supplied if isinstance(supplied, (int, float)) and 0 <= supplied <= 100 else None
+            _progress('inference', 'ACE-Step processing task ' + task_id[:12], percent)
         if row and row.get('status') == 2:
             raise RuntimeError('ACE-Step generation failed')
         if row and row.get('status') == 1:
@@ -151,6 +172,7 @@ def run(plan_path: Path, output: Path) -> None:
             audio_url = parsed[0].get('file')
             if not isinstance(audio_url, str) or not audio_url.startswith('/v1/audio?') or '#' in audio_url or '://' in audio_url or '\\' in audio_url or any(ord(c) < 32 for c in audio_url):
                 raise RuntimeError('ACE-Step returned unsafe audio URL')
+            _progress('downloading', 'Retrieving generated audio')
             preview = _request(base + audio_url, timeout=120)
             # Reject HTML error pages, partial payloads and invalid/malicious wave data
             # before the external worker protocol accepts the result.

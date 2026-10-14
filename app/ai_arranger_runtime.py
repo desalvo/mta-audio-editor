@@ -1,0 +1,561 @@
+"""SQLite-coordinated web inference queue (POSIX server).
+
+Cross-process admissions and FIFO ordering are transactional. Pending work is
+persisted and resumable queued requests can be reconstructed by a registered
+adapter. Running work is never automatically replayed after process death,
+because its external side effects may already have happened.
+"""
+from __future__ import annotations
+import json
+import re
+import os
+from pathlib import Path
+import sqlite3
+import tempfile
+import threading
+import time
+import uuid
+
+# Server installations keep the queue under persistent data storage.
+# Native single-user desktop installations retain a user-writable local default.
+_DEFAULT_ROOT = (Path(tempfile.gettempdir()) / 'mta-ai-arranger-runtime'
+                 if os.environ.get('MTA_NATIVE_SINGLE_USER', '').lower() in ('1', 'true', 'yes')
+                 else Path('/var/lib/mta/ai-jobs'))
+_ROOT = Path(os.environ.get('MTA_AI_JOB_STATE_DIR', str(_DEFAULT_ROOT)))
+_MUTEX = threading.RLock()
+_LOCAL: dict[str, threading.Event] = {}
+_CANCELLABLE: set[str] = set()
+_RESTORERS = {}  # operation -> payload-to-executor factory
+_SAFE_JOB_ID = re.compile(r"[A-Za-z0-9_-]{1,160}\Z")
+
+
+def _validate_job_id(job_id):
+    if not isinstance(job_id, str) or not _SAFE_JOB_ID.fullmatch(job_id):
+        raise ValueError("Invalid AI job identifier")
+    return job_id
+
+_SCHEMA = '''CREATE TABLE IF NOT EXISTS jobs (
+ job_id TEXT PRIMARY KEY, project_id TEXT NOT NULL, operation TEXT NOT NULL,
+ state TEXT NOT NULL, rank INTEGER NOT NULL, created_at REAL NOT NULL,
+ started_at REAL, completed_at REAL, phase TEXT NOT NULL, message TEXT NOT NULL,
+ progress_percent REAL, cancel_requested INTEGER NOT NULL DEFAULT 0,
+ cpu_seconds REAL, gpu_seconds REAL, runner_pid INTEGER,
+ runner_identity TEXT
+)'''
+
+
+def _db():
+    _ROOT.mkdir(parents=True, mode=0o700, exist_ok=True)
+    os.chmod(_ROOT, 0o700)
+    con = sqlite3.connect(str(_ROOT / 'jobs.sqlite3'), timeout=30, isolation_level=None)
+    con.row_factory = sqlite3.Row
+    con.execute('PRAGMA busy_timeout=30000')
+    con.execute('PRAGMA journal_mode=WAL')
+    con.execute(_SCHEMA)
+    columns = {row[1] for row in con.execute('PRAGMA table_info(jobs)')}
+    for column, sqltype in (('runner_identity', 'TEXT'), ('payload_json', 'TEXT'), ('idempotency_key', 'TEXT')):
+        if column not in columns:
+            try:
+                con.execute(f'ALTER TABLE jobs ADD COLUMN {column} {sqltype}')
+            except sqlite3.OperationalError as exc:
+                # A concurrent opener may have completed the same migration.
+                # Suppress only that exact harmless race; preserve other errors.
+                if 'duplicate column name' not in str(exc).lower():
+                    raise
+    con.execute('CREATE UNIQUE INDEX IF NOT EXISTS jobs_idempotency_key_unique ON jobs(idempotency_key) WHERE idempotency_key IS NOT NULL')
+    con.execute('CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY,value TEXT NOT NULL)')
+    # Audit/outbox share the same SQLite transaction as the terminal queue state.
+    # Each job has at most one terminal receipt; consumers must use job_id as
+    # their own idempotency key when crossing an external billing database.
+    con.execute('''CREATE TABLE IF NOT EXISTS terminal_receipts (
+        job_id TEXT PRIMARY KEY REFERENCES jobs(job_id),
+        state TEXT NOT NULL CHECK(state IN ('completed','failed','cancelled','interrupted')),
+        committed_at REAL NOT NULL
+    )''')
+    # SQLite creates journal sidecars on demand. Restrict the DB and existing
+    # sidecars without changing process-wide umask or relying on installer ACLs.
+    for suffix in ('', '-wal', '-shm'):
+        candidate = _ROOT / ('jobs.sqlite3' + suffix)
+        if candidate.exists() and not candidate.is_symlink():
+            os.chmod(candidate, 0o600)
+    return con
+
+
+def _limit():
+    with _db() as con:
+        value = con.execute("SELECT value FROM settings WHERE key='max_concurrent_jobs'").fetchone()
+    try:
+        return max(1, min(32, int(value[0] if value else os.environ.get('MTA_AI_MAX_CONCURRENT_JOBS', '1'))))
+    except ValueError:
+        return 1
+
+
+def configure(limit):
+    if isinstance(limit, bool) or str(limit).strip() != str(int(limit)):
+        raise ValueError('Concurrent AI jobs must be an integer')
+    value = int(limit)
+    if not 1 <= value <= 32:
+        raise ValueError('Concurrent AI jobs must be between 1 and 32')
+    with _db() as con:
+        con.execute("INSERT INTO settings(key,value) VALUES('max_concurrent_jobs',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value", (str(value),))
+    return value
+
+
+def _process_identity(pid):
+    """Linux boot ID and process start tick; prevent PID-reuse false positives.
+
+    For non-Linux runtimes return None and rely on the legacy PID check.
+    """
+    try:
+        boot = Path('/proc/sys/kernel/random/boot_id').read_text().strip()
+        stat = Path(f'/proc/{int(pid)}/stat').read_text()
+        # Field 2 (comm) may contain spaces or parentheses.
+        fields = stat.rsplit(')', 1)[1].split()
+        if fields[0] == 'Z':
+            return None
+        return f'{boot}:{fields[19]}'  # field 22 (starttime)
+    except (OSError, ValueError, IndexError):
+        return None
+
+
+def _recover_dead_runners(con):
+    """Mark orphaned jobs interrupted, never replay side-effecting callables.
+
+    A stored PID is not enough: Linux may reuse it between invocations.
+    """
+    rows = con.execute("SELECT job_id,runner_pid,runner_identity,state FROM jobs WHERE state IN ('queued','running')").fetchall()
+    for jid, pid, identity, state in rows:
+        if not pid:
+            continue
+        dead = False
+        if identity:
+            current = _process_identity(pid)
+            dead = current != identity
+        else:
+            try:
+                os.kill(int(pid), 0)
+            except ProcessLookupError:
+                dead = True
+            except PermissionError:
+                pass
+        if dead and state == 'running':
+            stamp = time.time()
+            changed = con.execute("UPDATE jobs SET state='interrupted',phase='interrupted',completed_at=?,message='Execution interrupted; review before retry to avoid duplicate output' WHERE job_id=? AND state='running'", (stamp, jid))
+            if changed.rowcount:
+                con.execute("INSERT OR IGNORE INTO terminal_receipts(job_id,state,committed_at) VALUES(?,?,?)", (jid, 'interrupted', stamp))
+        elif dead and state == 'queued':
+            # Only the scheduler's admission owner has exited; no work ran.
+            con.execute("UPDATE jobs SET runner_pid=NULL,runner_identity=NULL,message='Waiting for scheduler recovery' WHERE job_id=? AND state='queued'", (jid,))
+
+
+def _rows(con):
+    rows = [dict(row) for row in con.execute('SELECT * FROM jobs ORDER BY rank, created_at')]
+    queue = [r for r in rows if r['state'] == 'queued']
+    for idx, job in enumerate(queue):
+        job['queue_position'] = idx + 1
+        job['jobs_ahead'] = idx
+    return rows
+
+
+def _public(con, job):
+    row = dict(job)
+    if row['state'] == 'queued':
+        earlier = con.execute("SELECT COUNT(*) FROM jobs WHERE state='queued' AND (rank < ? OR (rank = ? AND created_at < ?))", (row['rank'], row['rank'], row['created_at'])).fetchone()[0]
+        row.update(queue_position=earlier + 1, jobs_ahead=earlier)
+    else:
+        row.update(queue_position=None, jobs_ahead=0)
+    row['cancel_requested'] = bool(row['cancel_requested'])
+    # Arguments can contain private user content; only a trusted worker reads them.
+    row.pop('payload_json', None)
+    row.pop('idempotency_key', None)
+    now = time.time()
+    row['elapsed_seconds'] = max(0.0, (row['completed_at'] or now) - row['started_at']) if row['started_at'] else 0.0
+    return row
+
+
+def _with_live_progress(row):
+    """Expose trustworthy backend progress on both client and admin endpoints.
+
+    The progress sidecar contains backend measurements, never wall-clock
+    approximations of GPU time or a fabricated percentage.
+    """
+    value = dict(row)
+    if value.get('state') != 'running':
+        return value
+    try:
+        path = _ROOT / (_validate_job_id(value['job_id']) + '.progress.json')
+        payload = json.loads(path.read_text(encoding='utf-8'))
+        if not isinstance(payload, dict):
+            return value
+        for field, maximum in (('phase', 80), ('message', 240)):
+            if isinstance(payload.get(field), str):
+                value[field] = payload[field][:maximum]
+        pct = payload.get('progress_percent')
+        if isinstance(pct, (int, float)) and not isinstance(pct, bool) and 0 <= pct <= 100:
+            value['progress_percent'] = float(pct)
+        for field in ('cpu_seconds', 'gpu_seconds'):
+            amount = payload.get(field)
+            if isinstance(amount, (int, float)) and not isinstance(amount, bool) and 0 <= amount < float('inf'):
+                value[field] = float(amount)
+    except (OSError, ValueError, TypeError):
+        pass
+    return value
+
+
+def list_jobs(limit=100):
+    with _db() as con:
+        _recover_dead_runners(con)
+        return [_with_live_progress(_public(con, row)) for row in con.execute('SELECT * FROM jobs ORDER BY created_at DESC LIMIT ?', (max(1, min(int(limit), 500)),))]
+
+
+def get(job_id):
+    with _db() as con:
+        _recover_dead_runners(con)
+        row = con.execute('SELECT * FROM jobs WHERE job_id=?', (job_id,)).fetchone()
+        return _with_live_progress(_public(con, row)) if row else None
+
+
+def job_operation(job_id):
+    """Read the immutable scheduler operation for admission validation."""
+    _validate_job_id(job_id)
+    with _db() as con:
+        row = con.execute('SELECT operation FROM jobs WHERE job_id=?', (job_id,)).fetchone()
+    return row[0] if row else None
+
+
+def _claim(job_id):
+    # A second web process can recover an admitted-but-not-yet-provisioned
+    # request before the original HTTP handler finishes its ledger transaction.
+    # Never execute a billable durable job without its ledger identity.
+    # Any persisted payload for audio inference is a durable admission attempt.
+    # Malformed JSON/schema must never be mistaken for a legacy in-memory job.
+    if durable_audio_job(job_id):
+        try:
+            payload = read_payload(job_id)
+            if (not isinstance(payload, dict) or payload.get('schema_version') != 1
+                    or ('actor_user_id' in payload and
+                        (type(payload['actor_user_id']) is not int or payload['actor_user_id'] <= 0))
+                    or ('adapter' in payload and payload['adapter'] != job_operation(job_id))):
+                raise ValueError('Invalid durable audio identity or schema')
+        except (ValueError, TypeError, KeyError, json.JSONDecodeError):
+            with _db() as con:
+                con.execute("UPDATE jobs SET state='blocked',phase='blocked',message='Invalid durable audio admission' WHERE job_id=? AND state='queued'", (job_id,))
+            return False
+    else:
+        payload = None
+    if isinstance(payload, dict) and type(payload.get('actor_user_id')) is int:
+        try:
+            from . import ai_metering_bridge, ai_billing
+            user_id, operation = ai_metering_bridge._identity(job_id)
+            if (ai_billing.user_billing_enabled(user_id)
+                    and ai_billing.existing_inference_ledger_job(job_id, user_id, operation) is None):
+                with _db() as con:
+                    con.execute("UPDATE jobs SET state='blocked',phase='blocked',message='Ledger admission needs reconciliation' WHERE job_id=? AND state='queued'", (job_id,))
+                return False
+        except Exception:
+            # DB unavailable or malformed immutable identity: fail closed.
+            with _db() as con:
+                con.execute("UPDATE jobs SET state='blocked',phase='blocked',message='Ledger admission needs reconciliation' WHERE job_id=? AND state='queued'", (job_id,))
+            return False
+    with _db() as con:
+        con.execute('BEGIN IMMEDIATE')
+        _recover_dead_runners(con)
+        row = con.execute('SELECT * FROM jobs WHERE job_id=?', (job_id,)).fetchone()
+        first = con.execute("SELECT job_id FROM jobs WHERE state='queued' ORDER BY rank,created_at LIMIT 1").fetchone()
+        running = con.execute("SELECT COUNT(*) FROM jobs WHERE state='running'").fetchone()[0]
+        if not row or row['state'] != 'queued' or not first or first[0] != job_id or running >= _limit():
+            con.execute('COMMIT')
+            return False
+        con.execute("UPDATE jobs SET state='running', started_at=?, phase='preparing',message='Preparing source audio',runner_pid=?,runner_identity=? WHERE job_id=?", (time.time(), os.getpid(), _process_identity(os.getpid()), job_id))
+        con.execute('COMMIT')
+        return True
+
+
+def register_restorer(operation, factory):
+    """Register a trusted local factory accepting (project_id, payload, job_id).
+
+    Only queued jobs are eligible for automatic restoration, never interrupted
+    executions whose external effects cannot be atomically rolled back.
+    """
+    if not operation or not callable(factory):
+        raise ValueError('Invalid AI restorer')
+    _RESTORERS[operation] = factory
+
+
+def recover_queued():
+    """Resume only durable *unstarted* requests with registered adapters.
+
+    Multiple web server processes may recover the same row; SQLite _claim
+    enforces single execution. Jobs lacking sufficient payload remain queued
+    with an explicit explanation instead of silently losing work.
+    """
+    with _db() as con:
+        con.execute('BEGIN IMMEDIATE')
+        _recover_dead_runners(con)
+        rows = con.execute("SELECT job_id,project_id,operation,payload_json FROM jobs WHERE state IN ('queued','blocked') AND NOT (state='blocked' AND message='Ledger admission needs reconciliation') ORDER BY rank,created_at").fetchall()
+        con.execute('COMMIT')
+    recovered = 0
+    for jid, pid, operation, encoded in rows:
+        if not encoded or operation not in _RESTORERS:
+            # Do not let a request without a restorable adapter occupy the
+            # head of a FIFO queue indefinitely. It remains durable and can
+            # be retried by recovery when an adapter is installed.
+            with _db() as con:
+                con.execute("UPDATE jobs SET state='blocked',phase='blocked',message='Waiting for compatible persistent AI adapter',runner_pid=NULL,runner_identity=NULL WHERE job_id=? AND state IN ('queued','blocked')", (jid,))
+            continue
+        with _MUTEX:
+            if jid in _LOCAL:
+                continue
+        try:
+            payload = json.loads(encoded)
+            fn = _RESTORERS[operation](pid, payload, jid)
+            if not callable(fn):
+                raise TypeError('AI adapter returned no executor')
+        except Exception:
+            with _db() as con:
+                con.execute("UPDATE jobs SET state='blocked',phase='blocked',message='Stored job payload incompatible with adapter; administrator review required',runner_pid=NULL,runner_identity=NULL WHERE job_id=? AND state IN ('queued','blocked')", (jid,))
+            continue
+        with _db() as con:
+            con.execute("UPDATE jobs SET state='queued',phase='queued',message='Restored durable request; waiting for inference slot' WHERE job_id=? AND state='blocked'", (jid,))
+        if _spawn(jid, fn, cancellable=True):
+            recovered += 1
+    return recovered
+
+
+
+def durable_audio_job(job_id):
+    """Apply the finalization gate to durable Arranger/Remix requests only.
+
+    Legacy in-memory jobs remain compatible; they cannot be replayed after a
+    crash and must not be confused with durable audio publishing operations.
+    """
+    _validate_job_id(job_id)
+    with _db() as con:
+        row = con.execute('SELECT operation,payload_json FROM jobs WHERE job_id=?', (job_id,)).fetchone()
+    if not row or row[0] not in ('arranger', 'remix') or not row[1]:
+        return False
+    # Nonempty persisted audio payloads must pass durable finalization gates,
+    # including corrupt entries; only truly in-memory jobs are legacy.
+    return True
+
+
+def _spawn(job_id, fn, *, cancellable=False):
+    _validate_job_id(job_id)
+    with _MUTEX:
+        if job_id in _LOCAL:
+            return False
+        stop = threading.Event()
+        _LOCAL[job_id] = stop
+        if cancellable:
+            _CANCELLABLE.add(job_id)
+
+    def execute():
+        progress = _ROOT / (job_id + '.progress.json')
+        try:
+            while not stop.wait(0.4):
+                current = get(job_id)
+                if not current or current['state'] != 'queued':
+                    return
+                if _claim(job_id):
+                    break
+            else:
+                return
+            try:
+                if cancellable:
+                    fn(progress, stop)
+                else:
+                    fn(progress)
+                state, message = 'completed', 'Generated track added to project'
+                # A normal return is not a durable commit. For audio-generating
+                # adapters require the publication receipt and (when explicitly
+                # associated) the ledger acknowledgement before completion.
+                if durable_audio_job(job_id):
+                    from . import ai_metering_bridge
+                    try:
+                        if (read_payload(job_id) or {}).get('actor_user_id') is not None:
+                            ai_metering_bridge.register_settlement(job_id)
+                    except Exception as exc:
+                        # The audio can be published, but without verified usage
+                        # a billable job must never be announced completed.
+                        state, message = 'interrupted', 'Billing finalization pending verified metering'
+                    from . import ai_finalization
+                    evidence = ai_finalization.readiness(job_id)
+                    if evidence['publication'] == 'published' and evidence['billing'] == 'pending':
+                        try:
+                            from . import ai_billing_outbox
+                            ai_billing_outbox.deliver(job_id=job_id)
+                        except Exception:
+                            pass  # durable pending settlement is retried on recovery
+                        evidence = ai_finalization.readiness(job_id)
+                    if not evidence['ready']:
+                        state, message = 'interrupted', 'Publication or billing awaits durable recovery'
+            except Exception as exc:
+                state, message = ('cancelled', 'Cancelled during inference') if stop.is_set() else ('failed', str(exc)[:500])
+            with _db() as con:
+                con.execute('BEGIN IMMEDIATE')
+                cancelled_row = con.execute('SELECT cancel_requested FROM jobs WHERE job_id=?', (job_id,)).fetchone()
+                if cancelled_row is None:
+                    con.execute('ROLLBACK')
+                    return
+                if cancelled_row[0]:
+                    state, message = 'cancelled', 'Cancellation requested; inference exited'
+                stamp = time.time()
+                changed = con.execute("UPDATE jobs SET state=?,phase=?,message=?,completed_at=?,progress_percent=? WHERE job_id=? AND state='running' AND runner_pid=? AND runner_identity IS ?", (state, state, message, stamp, 100 if state == 'completed' else None, job_id, os.getpid(), _process_identity(os.getpid())))
+                if changed.rowcount:
+                    con.execute("INSERT OR IGNORE INTO terminal_receipts(job_id,state,committed_at) VALUES(?,?,?)", (job_id, state, stamp))
+                con.execute('COMMIT')
+        finally:
+            progress.unlink(missing_ok=True)
+            with _MUTEX:
+                _LOCAL.pop(job_id, None)
+                _CANCELLABLE.discard(job_id)
+
+    threading.Thread(target=execute, daemon=True, name='mta-ai-job-' + job_id[:8]).start()
+    return True
+
+
+def start(pid, operation, fn, *, job_id=None, cancellable=False, payload=None, idempotency_key=None, defer_spawn=False):
+    """Submit a real job. Return (accepted, job). Never silently discard queued work."""
+    job_id = _validate_job_id(job_id if job_id is not None else uuid.uuid4().hex)
+    # Persist only JSON-compatible requests; never serialize closures or credentials.
+    encoded = json.dumps(payload, allow_nan=False, sort_keys=True) if payload is not None else None
+    if encoded is not None and len(encoded.encode('utf-8')) > 1024 * 1024:
+        raise ValueError('AI payload exceeds 1 MiB')
+    if idempotency_key is not None and (not isinstance(idempotency_key, str) or not 1 <= len(idempotency_key) <= 160):
+        raise ValueError('Invalid AI idempotency key')
+    with _db() as con:
+        con.execute('BEGIN IMMEDIATE')
+        existing = con.execute('SELECT job_id,project_id,operation,payload_json FROM jobs WHERE job_id=? OR (idempotency_key IS NOT NULL AND idempotency_key=?)', (job_id, idempotency_key)).fetchone()
+        if existing:
+            if (existing['project_id'], existing['operation'], existing['payload_json']) != (str(pid), operation, encoded):
+                con.execute('ROLLBACK')
+                raise ValueError('Conflicting replay of AI job identifier')
+            con.execute('COMMIT')
+            return False, get(existing['job_id'])
+        rank = con.execute('SELECT COALESCE(MAX(rank),0)+1 FROM jobs').fetchone()[0]
+        con.execute("INSERT INTO jobs(job_id,project_id,operation,state,rank,created_at,phase,message,runner_pid,runner_identity,payload_json,idempotency_key) VALUES(?,?,?,'queued',?,?,'queued','Waiting for inference slot',?,?,?,?)", (job_id, str(pid), operation, rank, time.time(), os.getpid(), _process_identity(os.getpid()), encoded, idempotency_key))
+        con.execute('COMMIT')
+    if not defer_spawn:
+        _spawn(job_id, fn, cancellable=cancellable)
+    return True, get(job_id)
+
+
+def activate(job_id, fn, *, cancellable=True):
+    """Start a previously admitted job after external admission is reconciled."""
+    _validate_job_id(job_id)
+    with _db() as con:
+        row = con.execute('SELECT state,payload_json FROM jobs WHERE job_id=?', (job_id,)).fetchone()
+    if not row or row['state'] != 'queued' or not row['payload_json']:
+        return False
+    return _spawn(job_id, fn, cancellable=cancellable)
+
+
+def cancel(job_id):
+    with _db() as con:
+        con.execute('BEGIN IMMEDIATE')
+        row = con.execute('SELECT state FROM jobs WHERE job_id=?', (job_id,)).fetchone()
+        if not row:
+            con.execute('ROLLBACK')
+            return None
+        if row[0] in ('queued', 'blocked'):
+            stamp = time.time()
+            changed = con.execute("UPDATE jobs SET state='cancelled',phase='cancelled',completed_at=?,message='Cancelled before execution' WHERE job_id=? AND state IN ('queued','blocked')", (stamp, job_id))
+            if changed.rowcount:
+                con.execute("INSERT OR IGNORE INTO terminal_receipts(job_id,state,committed_at) VALUES(?,?,?)", (job_id, 'cancelled', stamp))
+        elif row[0] == 'running':
+            with _MUTEX:
+                event = _LOCAL.get(job_id)
+                cancellable = job_id in _CANCELLABLE
+            if event is None or not cancellable:
+                con.execute('ROLLBACK')
+                raise ValueError('This running worker does not support confirmed cancellation')
+            con.execute("UPDATE jobs SET cancel_requested=1,phase='cancelling',message='Terminating inference subprocess' WHERE job_id=?", (job_id,))
+            event.set()
+        con.execute('COMMIT')
+    with _MUTEX:
+        if job_id in _LOCAL and row[0] in ('queued', 'blocked'):
+            _LOCAL[job_id].set()
+    return get(job_id)
+
+
+def move(job_id, position):
+    with _db() as con:
+        con.execute('BEGIN IMMEDIATE')
+        queued = [r[0] for r in con.execute("SELECT job_id FROM jobs WHERE state='queued' ORDER BY rank,created_at")]
+        if job_id not in queued:
+            con.execute('ROLLBACK')
+            raise ValueError('Only queued jobs can be reordered')
+        queued.remove(job_id)
+        if not 1 <= int(position) <= len(queued) + 1:
+            con.execute('ROLLBACK')
+            raise ValueError('Queue position out of range')
+        queued.insert(int(position) - 1, job_id)
+        for i, jid in enumerate(queued):
+            con.execute('UPDATE jobs SET rank=? WHERE job_id=?', (i + 1, jid))
+        con.execute('COMMIT')
+    return get(job_id)
+
+
+def inspect(pid):
+    # Historical route: show the project's newest active job (including waiting).
+    with _db() as con:
+        _recover_dead_runners(con)
+        row = con.execute("SELECT * FROM jobs WHERE project_id=? AND state IN ('running','queued','blocked') ORDER BY created_at DESC LIMIT 1", (str(pid),)).fetchone()
+        if row is None:
+            row = con.execute('SELECT * FROM jobs WHERE project_id=? ORDER BY created_at DESC LIMIT 1', (str(pid),)).fetchone()
+        if not row:
+            return {'state': 'idle'}
+        value = _public(con, row)
+    return _with_live_progress(value)
+
+
+def read_payload(job_id):
+    """Internal worker-only interface; never expose this through public job APIs."""
+    with _db() as con:
+        row = con.execute('SELECT payload_json FROM jobs WHERE job_id=?', (job_id,)).fetchone()
+        return json.loads(row[0]) if row and row[0] is not None else None
+
+
+
+def terminal_receipt(job_id):
+    """Internal durable terminal outcome for idempotent downstream consumers.
+
+    This is an outbox receipt, not proof that a different DB has committed an
+    accounting charge. Never expose it as a billing settlement certificate.
+    """
+    _validate_job_id(job_id)
+    with _db() as con:
+        row = con.execute('SELECT job_id,state,committed_at FROM terminal_receipts WHERE job_id=?', (job_id,)).fetchone()
+        return dict(row) if row else None
+
+
+def reconcile_published_audio(job_id):
+    """Finish a crash-interrupted inference whose durable audio was published.
+
+    Only the independent publication outbox may call this after verifying the
+    exact staged checksum and project publication. A cancelled job stays cancelled.
+    """
+    _validate_job_id(job_id)
+    # Never recover a billable publication to completed before the ledger
+    # confirms its explicit settlement.  A nonbillable job has no delivery.
+    from . import ai_billing_outbox
+    settlement = ai_billing_outbox.inspect(job_id)
+    from . import ai_metering_bridge
+    if (settlement is None and ai_metering_bridge.billing_required(job_id)) or (settlement is not None and settlement['state'] != 'delivered'):
+        return False
+    with _db() as con:
+        con.execute('BEGIN IMMEDIATE')
+        _recover_dead_runners(con)
+        row = con.execute('SELECT state,cancel_requested FROM jobs WHERE job_id=?', (job_id,)).fetchone()
+        if row is None or row['cancel_requested'] or row['state'] not in ('interrupted', 'completed'):
+            con.execute('COMMIT')
+            return False
+        if row['state'] == 'completed':
+            con.execute('COMMIT')
+            return True
+        stamp = time.time()
+        con.execute("UPDATE jobs SET state='completed',phase='completed',completed_at=?,progress_percent=100,message='Recovered durable audio publication' WHERE job_id=? AND state='interrupted'", (stamp, job_id))
+        con.execute("UPDATE terminal_receipts SET state='completed',committed_at=? WHERE job_id=? AND state='interrupted'", (stamp, job_id))
+        con.execute("INSERT OR IGNORE INTO terminal_receipts(job_id,state,committed_at) VALUES(?, 'completed',?)", (job_id, stamp))
+        con.execute('COMMIT')
+        return True

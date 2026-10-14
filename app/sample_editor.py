@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import hashlib, json, shutil, subprocess, uuid
+import hashlib, json, os, shutil, subprocess, uuid
 from pathlib import Path
 import numpy as np
 
@@ -96,7 +96,64 @@ def effect_graph(src:Path,req:SampleEffectRequest,sr:int,dur:float,preview:bool)
  return ';'.join(parts)+';'+''.join(labels)+f"concat=n={len(labels)}:v=0:a=1[out]"
 
 def commit(project:Project,track:Track,tmp:Path)->Track:
- duration=media_duration_ms(tmp);name=f"sampleedit-{uuid.uuid4().hex[:12]}.wav";dst=storage.audio_path(project.id,name);shutil.move(str(tmp),dst);offset=min((c.timeline_start_ms for c in track.clips),default=0);track.filename=name;track.source_clip_id=None;track.duration_ms=duration;track.clips=[Clip(id=uuid.uuid4().hex[:10],source_start_ms=0,source_end_ms=duration,timeline_start_ms=offset)];track.waveform_peaks=waveform_peaks(dst,4096);track.waveform_revision="";storage.save_project(project);return track
+ """Publish a rendered sample only after analysis, with rollback on failed save.
+
+ The input is a private render temporary; it must not become a project asset
+ until its bytes have been made durable. Never delete an existing track's audio.
+ """
+ from .ai_project_lock import project_publication_lock
+ with project_publication_lock(project.id):
+  name=f"sampleedit-{uuid.uuid4().hex}.wav"
+  dst=storage.audio_path(project.id,name)
+  stage=dst.parent/f".{name}.{uuid.uuid4().hex}.staged"
+  previous=track.model_copy(deep=True)
+  published=False
+  try:
+   if tmp.is_symlink() or not tmp.is_file():
+    raise ValueError("unsafe sample editor render")
+   # Keep the source render intact until the staged destination is durable.
+   with tmp.open('rb') as source, stage.open('xb') as target:
+    shutil.copyfileobj(source,target,1024*1024)
+    target.flush()
+    os.fsync(target.fileno())
+   duration=media_duration_ms(stage)
+   peaks=waveform_peaks(stage,4096)
+   offset=min((c.timeline_start_ms for c in track.clips),default=0)
+   if dst.exists() or dst.is_symlink():
+    raise FileExistsError(dst)
+   os.replace(stage,dst)
+   published=True
+   storage._fsync_directory(dst.parent)
+   track.filename=name
+   track.source_clip_id=None
+   track.duration_ms=duration
+   track.clips=[Clip(id=uuid.uuid4().hex[:10],source_start_ms=0,source_end_ms=duration,timeline_start_ms=offset)]
+   track.waveform_peaks=peaks
+   track.waveform_revision=""
+   storage.save_project(project)
+   return track
+  except Exception:
+   # Save may fail before publication. Restore the in-memory track so callers
+   # can retry with the original source and cannot observe half-mutated state.
+   for field,value in previous.__dict__.items():
+    setattr(track,field,value)
+   if published:
+    # A filesystem error can be raised *after* project.json was atomically
+    # replaced (e.g. a directory fsync failure). Do not discard a file now
+    # referenced by durable metadata: callers may reload and reconcile it.
+    referenced=False
+    try:
+     saved=storage.load_project(project.id)
+     referenced=any(t.filename==name for t in saved.tracks) or any(c.filename==name for c in saved.clip_library)
+    except (OSError, ValueError):
+     # Unknown persistent state: fail closed and preserve the media.
+     referenced=True
+    if not referenced:
+     dst.unlink(missing_ok=True)
+   raise
+  finally:
+   stage.unlink(missing_ok=True)
+   tmp.unlink(missing_ok=True)
 
 def edit(project:Project,track:Track,req:SampleEditRequest)->dict:
  src=rendered_source(project.id,track);sr=sample_rate(src);dur=media_duration_ms(src)/1000;total=round(dur*sr);a=min(req.start_sample,total);b=min(max(a,req.end_sample),total);cursor=min(req.cursor_sample,total);clip=storage.pdir(project.id)/f".sample-clipboard-{track.id}.wav"

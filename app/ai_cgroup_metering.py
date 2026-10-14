@@ -14,6 +14,7 @@ import sys
 import time
 import uuid
 from pathlib import Path
+from threading import Event
 
 from .ai_metering_agent import Measurement
 
@@ -66,7 +67,7 @@ def _pids(path: Path) -> list[int]:
     return [int(x) for x in (path / 'cgroup.procs').read_text().split()]
 
 
-def run_cgroup_process(argv: list[str], *, cwd: str, timeout_seconds: int = 3600, parent: str | None = None) -> Measurement:
+def run_cgroup_process(argv: list[str], *, cwd: str, timeout_seconds: int = 3600, parent: str | None = None, cancel_event: Event | None = None, cancel_check=None, env: dict[str, str] | None = None) -> Measurement:
     """Execute an operator-selected worker in an isolated delegated cgroup.
 
     Raises instead of returning guessed values if group telemetry is missing.
@@ -78,6 +79,9 @@ def run_cgroup_process(argv: list[str], *, cwd: str, timeout_seconds: int = 3600
         raise ValueError('Invalid worker command')
     if not 0 < timeout_seconds <= 86400:
         raise ValueError('Invalid timeout')
+    # An already-cancelled request must not allocate a cgroup or start a child.
+    if (cancel_event is not None and cancel_event.is_set()) or (cancel_check is not None and cancel_check()):
+        raise RuntimeError('AI worker cancelled; metering invalid')
     parent_str = parent or os.getenv('MTA_AI_CGROUP_PARENT', '')
     if not parent_str:
         raise RuntimeError('MTA_AI_CGROUP_PARENT not configured')
@@ -101,9 +105,12 @@ def run_cgroup_process(argv: list[str], *, cwd: str, timeout_seconds: int = 3600
         _cpu(job_group)
         _io(job_group)
         _assert_empty(job_group)
+        # Cancellation can arrive during delegated cgroup setup.
+        if (cancel_event is not None and cancel_event.is_set()) or (cancel_check is not None and cancel_check()):
+            raise RuntimeError('AI worker cancelled; metering invalid')
         proc = subprocess.Popen([sys.executable, '-c', _CHILD, str(job_group), cwd, *argv],
                                 stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
-                                stderr=subprocess.DEVNULL, start_new_session=True)
+                                stderr=subprocess.DEVNULL, start_new_session=True, env=env)
         # Optional best-effort per-job diagnostic snapshots. These are never
         # returned as certified gpu_seconds or used in billing: polling can
         # miss short-lived GPU clients and driver fdinfo support varies.
@@ -115,6 +122,11 @@ def run_cgroup_process(argv: list[str], *, cwd: str, timeout_seconds: int = 3600
         else:
             gpu_diagnostics_enabled = False
         while proc.poll() is None:
+            if (cancel_event is not None and cancel_event.is_set()) or (cancel_check is not None and cancel_check()):
+                try: os.killpg(proc.pid, signal.SIGKILL)
+                except ProcessLookupError: pass
+                proc.wait()
+                raise RuntimeError('AI worker cancelled; metering invalid')
             if time.monotonic() - started >= timeout_seconds:
                 try: os.killpg(proc.pid, signal.SIGKILL)
                 except ProcessLookupError: pass
@@ -137,6 +149,10 @@ def run_cgroup_process(argv: list[str], *, cwd: str, timeout_seconds: int = 3600
                     pass
             time.sleep(0.05)
         proc.wait()
+        # An exit observed between polling iterations must not settle a
+        # cancelled job as successful and billable.
+        if (cancel_event is not None and cancel_event.is_set()) or (cancel_check is not None and cancel_check()):
+            raise RuntimeError('AI worker cancelled; metering invalid')
         # Child processes may continue after the original process exits.
         remaining = _pids(job_group)
         if remaining:
@@ -150,6 +166,8 @@ def run_cgroup_process(argv: list[str], *, cwd: str, timeout_seconds: int = 3600
             raise RuntimeError('AI worker failed; metering invalid')
         cpu = _cpu(job_group)
         read_bytes, write_bytes = _io(job_group)
+        if (cancel_event is not None and cancel_event.is_set()) or (cancel_check is not None and cancel_check()):
+            raise RuntimeError('AI worker cancelled; metering invalid')
         return Measurement(0, max(0, time.monotonic() - started),
                            {'cpu_seconds': cpu, 'disk_read_bytes': read_bytes,
                             'disk_write_bytes': write_bytes}, 'cgroup', True,

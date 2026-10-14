@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import json
 import logging
+import os
+import stat
 import subprocess
 import tempfile
 import uuid
@@ -352,6 +354,9 @@ def export_mta(project: Project, out: Path, slots: list[MtaSlotMapping] | None =
     effective_profile = resolve_mta_device_profile(project, profile)
     slots = validate_slot_mapping(project, slots, effective_profile)
     by_id = {t.id: t for t in project.tracks}
+    out = Path(out)
+    if out.is_symlink() or (out.exists() and not stat.S_ISREG(out.stat().st_mode)):
+        raise ValueError("MTA destination must be a regular non-symlink file")
     with tempfile.TemporaryDirectory() as td_raw:
         td = Path(td_raw)
         rendered: dict[str, Path] = {}
@@ -451,10 +456,33 @@ def export_mta(project: Project, out: Path, slots: list[MtaSlotMapping] | None =
         normalized_info = inspect_cluster_transport(normalized)
         if not normalized_info.get("first_cluster_is_canonical"):
             raise RuntimeError("normalized MTA layout does not expose a canonical first Cluster")
-        obfuscate_media_copy(normalized, out, media_offset)
-
-        written = inspect_cluster_transport(out)
+        # Validate the complete transport before publishing it. Existing output
+        # remains unchanged if generation or validation fails.
+        staged_output = td / "mta-validated-output.tmp"
+        obfuscate_media_copy(normalized, staged_output, media_offset)
+        written = inspect_cluster_transport(staged_output)
         if not written.get("media_xor_validated"):
-            out.unlink(missing_ok=True)
             raise RuntimeError("generated MTA media transport failed XOR validation")
+        with staged_output.open("rb") as handle:
+            os.fsync(handle.fileno())
+        # Copy into a staging file on the destination filesystem before rename.
+        import shutil
+        fd, staging_name = tempfile.mkstemp(prefix=".mta-export-", suffix=".tmp", dir=out.parent)
+        try:
+            with os.fdopen(fd, "wb") as stream, staged_output.open("rb") as source_stream:
+                shutil.copyfileobj(source_stream, stream)
+                stream.flush()
+                os.fsync(stream.fileno())
+            if out.is_symlink():
+                raise ValueError("MTA destination became a symlink")
+            os.replace(staging_name, out)
+            if os.name == "posix":
+                parent_fd = os.open(out.parent, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0))
+                try:
+                    os.fsync(parent_fd)
+                finally:
+                    os.close(parent_fd)
+        finally:
+            if os.path.exists(staging_name):
+                os.unlink(staging_name)
     return out

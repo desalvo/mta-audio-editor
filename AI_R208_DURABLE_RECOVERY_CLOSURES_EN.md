@@ -1,0 +1,11 @@
+# MTA Audio Editor 0.3.0-r208 — Durable upload recovery
+
+Version and revision remain unchanged. No Git operations or production server access.
+
+Five functional closures cover persisted-state-aware rollback after publication failures; durable device/inode guards across ordinary, recovered-stem and asynchronous upload receipts; complete journal validation and rejection of symlink media directories before deletion; media-directory fsync before journal retirement; and asynchronous admission/worker-start failure handling (400 for invalid sync mode, 503 after failed dispatch and cleanup).
+
+Replacement cleanup also preserves media shared by another track. Unreadable project state does not authorize deletion. Re-registering an owned pathname with a different inode is rejected. Old receipts remain compatible through optional identity fields. Executable installer permissions and the unified adapter entry point were repaired. Two historical source checks were updated to verify the current staged inference/publication path.
+
+Validation: 2886 passed, 4 skipped, 11 deselected, 11 warnings in the extended local suite. Ten excluded cases require prohibited Unix sockets; one requires unavailable CMake. Four skipped cases require optional Steinberg SDK/ADelay. The extended run precedes only removal of an unused local variable; the subsequent r208 regression passed 1001 tests, with 10 socket cases deselected and 10 warnings (validation/r208-final.log). New behavioral coverage: 26 passing cases including SIGKILL recovery and two real processes verifying lock serialization and retention of a committed upload. Recovery-module Ruff checks and main/adapter F checks pass.
+
+Remaining limitations: no global filesystem/JSON/queue/ledger ACID transaction; legacy receipts and entries lacking identities retain snapshot/name-based recovery; creation-to-registration crash windows, uncoordinated legacy writers and recovery overlapping live workers in other instances remain to be closed. These tests do not prove power-loss durability or protection against every hostile directory-rename race. Billable GPU metering, real inference and native target-platform acceptance are still pending. AMD SMI diagnostics remain non-billable. No scheduled repository mirroring was added.

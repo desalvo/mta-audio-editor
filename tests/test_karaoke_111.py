@@ -15,8 +15,11 @@ def test_import_separate_exposes_lyrics_chords_options_and_backend_flags():
     assert "extract_chords=${extractChords}" in js
     assert "extract_lyrics: bool = False" in main
     assert "extract_chords: bool = False" in main
-    assert 'project.lyrics = extract_lyrics(lyric_source)' in main
-    assert 'project.chords = extract_chords(source)' in main
+    # Inference is staged outside the lock; publication uses the extracted result.
+    assert 'extracted_lyrics = extract_lyrics(lyric_source, model_name=selected_lyrics_model)' in main
+    assert 'project.lyrics = extracted_lyrics' in main
+    assert 'extracted_chords = extract_chords(source, engine=selected_chords_engine)' in main
+    assert 'project.chords = extracted_chords' in main
 
 
 def test_word_timestamps_are_shifted_with_track_timeline():

@@ -33,7 +33,7 @@ def test_remote_inference_wav_and_json_zip(tmp_path,monkeypatch):
     route.configure('whisper','remote','https://mta.example.org','secret')
     source=tmp_path/'source.wav';source.write_bytes(b'RIFF' + b'\0'*4+b'WAVE'+b'\0'*12)
     from app import ai_remote_client
-    def mock_transport(url,token,kind,wav,options):
+    def mock_transport(url,token,kind,wav,options,**kwargs):
         assert token=='secret' and kind=='whisper' and wav.startswith(b'RIFF')
         z=io.BytesIO()
         with zipfile.ZipFile(z,'w') as archive:
@@ -54,7 +54,11 @@ def test_remote_rejects_unsafe_zip_and_does_not_fallback(tmp_path,monkeypatch):
     monkeypatch.setattr(ai_remote_client,'infer_audio',lambda *a,**kw:(archive.getvalue(),'application/zip','job-1'))
     with pytest.raises(ValueError,match='Unsafe'):route.infer('demucs',source)
     monkeypatch.setattr(ai_remote_client,'infer_audio',lambda *a,**kw: (_ for _ in ()).throw(ai_remote_client.RemoteAIError('offline')))
-    with pytest.raises(ai_remote_client.RemoteAIError,match='offline'):route.infer('demucs',source)
+    # Retrying the same input is read-only after a bad result: no second POST.
+    monkeypatch.setattr(ai_remote_client,'recover_after_lost_response',lambda *a,**kw: (_ for _ in ()).throw(ai_remote_client.RemoteAIError('recovery-only')))
+    with pytest.raises(ai_remote_client.RemoteAIError,match='recovery-only'):route.infer('demucs',source)
+    # A genuinely different request may still be submitted.
+    with pytest.raises(ai_remote_client.RemoteAIError,match='offline'):route.infer('demucs',source,{'separation':'new'})
 
 @pytest.mark.parametrize('kind', ['whisper','chords-ml','demucs','drumsep','sam-audio','singer-separation','backing-vocals'])
 def test_each_remote_kind_never_uses_local_fallback(kind,tmp_path,monkeypatch):

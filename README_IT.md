@@ -523,3 +523,8 @@ precedente continua a essere valido finché il nuovo indirizzo non viene
 confermato. Se SMTP non è configurato, la risposta dell'API profilo segnala
 esplicitamente che la verifica non può essere completata; configurare SMTP e
 richiedere nuovamente la modifica per ricevere un nuovo link di conferma.
+
+
+### Recovery durevole degli upload (0.3.0-r208)
+
+Vedi [Recovery durevole degli upload](AI_R208_DURABLE_RECOVERY_CLOSURES_IT.md) per protezioni implementate, verifiche e limiti ancora aperti.

@@ -5201,9 +5201,11 @@ async function openAiRemixPanel(contextTrackId=null){
     <label><input id="aiKeepVoice" type="checkbox"> Preserve vocals / Preserva voce</label>
     <section id="aiAceNativeTools" style="border:1px solid var(--border,#8884);padding:10px;border-radius:8px"><strong>ACE-Step · Native setup / Configurazione</strong><p id="aiAceState" class="hint">Checking...</p><div class="form-actions"><label>ACE-Step / Motore AI <select id="aiAceMode"><option value="local">Local / Locale</option><option value="remote">Remote / Remoto</option></select></label><label>Remote HTTPS URL <input id="aiAceRemoteUrl" type="url" placeholder="https://ace.example.org:8001" autocomplete="off"></label><label>API token <input id="aiAceRemoteToken" type="password" placeholder="Leave blank to keep saved token" autocomplete="new-password"></label><button class="utility-btn" onclick="aiAceSaveConnection()">Save ACE connection / Salva connessione</button></div><div id="aiAceProgressPanel" hidden role="status" aria-live="polite"><label id="aiAceProgressLabel" for="aiAceProgress">Preparing...</label><progress id="aiAceProgress" style="width:100%"></progress><small id="aiAceProgressDetail"></small></div><div class="form-actions"><button class="utility-btn" id="aiAceInstallButton" onclick="aiAceInstall()">Install ACE-Step / Installa</button><button class="utility-btn" id="aiAceStartButton" onclick="aiAceStart()">Start local server / Avvia</button><button class="utility-btn" id="aiAceStopButton" onclick="aiAceStop()">Stop ACE-Step / Ferma</button><button class="utility-btn" onclick="aiAceTest()">Test real generation / Prova generazione</button><button class="utility-btn" onclick="aiAceRefresh()">Refresh</button></div></section>
     <p class="hint">Generated audio is appended as a NEW track, never replacing the original. A trusted AI worker must be installed and configured.</p>
-    <div class="form-actions"><button class="utility-btn" onclick="planAiRemix()">Plan / Pianifica</button><button class="utility-btn primary" onclick="generateAndAddAiRemix()">Generate + Add track / Genera + aggiungi traccia</button></div>
+    <div class="form-actions"><button class="utility-btn" onclick="testAiArrangerWorker()">Test worker / Verifica worker</button><button class="utility-btn" onclick="planAiRemix()">Plan / Pianifica</button><button id="aiRemixGenerateButton" class="utility-btn primary" onclick="generateAndAddAiRemix()">Generate + Add track / Genera + aggiungi traccia</button></div>
+    <div id="aiRemixJobProgress" hidden role="status" aria-live="polite"><label id="aiRemixJobLabel">Preparing AI job...</label><progress style="display:block;width:100%" aria-label="AI generation in progress"></progress><small id="aiRemixJobElapsed"></small><p class="hint">The request is running. Progress is indeterminate until the server reports actual inference progress. Do not close this window.</p></div>
     <pre id="aiRemixPlanResult" style="white-space:pre-wrap;max-height:14rem;overflow:auto"></pre></div>`);
   aiAceRefresh();
+  aiArrangerWatchActive();
 }
 async function planAiRemix(action="plan"){
   if(!current?.id)return;
@@ -5212,9 +5214,63 @@ async function planAiRemix(action="plan"){
   const mode=val('aiRemixMode');
   const body={input_source:val('aiInputSource')||'master',...(val('aiInputSource')==='track'?{input_track_id:val('aiInputTrack')}:{}),model_id:val('aiRemixModel'),preset_id:val('aiRemixPreset'),prompt:val('aiRemixPrompt')||'',strength:Number(val('aiRemixStrength')),preserve_chords:yes('aiKeepChords'),preserve_structure:yes('aiKeepStructure'),preserve_tempo:yes('aiKeepTempo'),preserve_melody:yes('aiKeepMelody'),preserve_voice:yes('aiKeepVoice')};
   if(mode!=='rearrange'){body.mode=mode;body.instrument_swaps=mode==='instrument_swap'?[{track_id:val('aiSwapTrack'),target_instrument:val('aiSwapTarget')}]:[];}
-  const route=(mode==='rearrange'?'ai-arranger/':'remix/')+action;
+  const route=(mode==='rearrange'?'ai-arranger/':'remix/')+(action==='generate-and-add'?'start-generation':action);
   const output=document.getElementById('aiRemixPlanResult');
-  try{const plan=await api(`/api/projects/${encodeURIComponent(current.id)}/${route}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});if(action==='generate-and-add'){current=plan;render();output.textContent='AI output appended as a new track; source tracks preserved.';}else{output.textContent=JSON.stringify({status:plan.status,mode:plan.mode||'rearrange',prompt:plan.prompt,input_source:plan.input_source,input_track_id:plan.input_track_id,constraints:plan.constraints,backend_available:plan.backend_available,warnings:plan.warnings},null,2)}}catch(e){output.textContent=e.message;}
+  const generating=action==='generate-and-add';
+  const progress=document.getElementById('aiRemixJobProgress');
+  const button=document.getElementById('aiRemixGenerateButton');
+  let elapsedTimer=null;
+  if(generating){
+    if(button?.disabled)return;
+    if(button)button.disabled=true;
+    if(progress)progress.hidden=false;
+    output.textContent='';
+    const since=Date.now();
+    const updateElapsed=()=>{
+      const elapsed=document.getElementById('aiRemixJobElapsed');
+      if(elapsed)elapsed.textContent=`Elapsed / Trascorso: ${Math.floor((Date.now()-since)/1000)} s`;
+    };
+    updateElapsed();
+    elapsedTimer=setInterval(updateElapsed,1000);
+  }
+  try{const plan=await api(`/api/projects/${encodeURIComponent(current.id)}/${route}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});if(action==='generate-and-add'){if(output.isConnected)output.textContent='Job accepted: '+plan.job_id+' · '+plan.state;await aiArrangerWatchActive(true);}else{output.textContent=JSON.stringify({status:plan.status,mode:plan.mode||'rearrange',prompt:plan.prompt,input_source:plan.input_source,input_track_id:plan.input_track_id,constraints:plan.constraints,backend_available:plan.backend_available,warnings:plan.warnings},null,2)}}catch(e){if(output.isConnected)output.textContent=`AI generation failed / Generazione fallita: ${e.message}`; }finally{if(elapsedTimer!==null)clearInterval(elapsedTimer);if(!generating){if(progress?.isConnected)progress.hidden=true;if(button?.isConnected)button.disabled=false;}}
+}
+
+let aiArrangerWatchTimer=null;
+async function aiArrangerWatchActive(waitForFinish=false){
+  const pid=current?.id;
+  if(!pid)return;
+  if(aiArrangerWatchTimer){clearInterval(aiArrangerWatchTimer);aiArrangerWatchTimer=null;}
+  const poll=async()=>{
+    try{
+      const job=await api(`/api/projects/${encodeURIComponent(pid)}/ai-arranger/active-generation`);
+      const panel=document.getElementById('aiRemixJobProgress');
+      const button=document.getElementById('aiRemixGenerateButton');
+      const label=document.getElementById('aiRemixJobLabel');
+      const elapsed=document.getElementById('aiRemixJobElapsed');
+      const bar=panel?.querySelector('progress');
+      const active=job.state==='running'||job.state==='busy'||job.state==='queued';
+      if(button)button.disabled=active;
+      if(panel)panel.hidden=!active;
+      if(label)label.textContent=job.message|| (active?'AI inference in progress':'No running AI job');
+      if(bar){if(Number.isFinite(job.progress_percent)){bar.max=100;bar.value=job.progress_percent;}else bar.removeAttribute('value');}
+      if(elapsed)elapsed.textContent=(job.state==='queued'?`Queued / In coda: ${job.jobs_ahead??0} ahead · Position ${job.queue_position??'?'} · `:`Elapsed / Trascorso: ${job.started_at?Math.floor(Date.now()/1000-job.started_at):0}s · `)+`${job.phase||job.state} · Job ${job.job_id||''} · CPU: ${job.cpu_seconds==null?'N/A':Number(job.cpu_seconds).toFixed(1)+' s'} · GPU: ${job.gpu_seconds==null?'N/A':Number(job.gpu_seconds).toFixed(1)+' s'}`;
+      if(!active){
+        if(aiArrangerWatchTimer){clearInterval(aiArrangerWatchTimer);aiArrangerWatchTimer=null;}
+        if(waitForFinish&&job.state==='completed'){
+          const output=document.getElementById('aiRemixPlanResult');
+          if(output)output.textContent='AI generation complete; new track added.';
+          const updated=await api(`/api/projects/${encodeURIComponent(pid)}`);
+          if(current?.id===pid){current=updated;render();}
+        }else if(waitForFinish&&job.state==='failed'){
+          const output=document.getElementById('aiRemixPlanResult');
+          if(output)output.textContent='AI generation failed: '+(job.message||'Unknown error');
+        }
+      }
+      return active;
+    }catch(e){const output=document.getElementById('aiRemixPlanResult');if(output)output.textContent='Could not read AI job status: '+e.message;return false;}
+  };
+  if(await poll())aiArrangerWatchTimer=setInterval(poll,2000);
 }
 
 async function generateAndAddAiRemix(){return planAiRemix("generate-and-add")}
@@ -5269,12 +5325,284 @@ async function openNativeRemoteWorkers(){
   const data=await api('/api/native/ai-workers/settings');
   const labels={'whisper':'Whisper / Lyrics','chords-ml':'Chord analysis','demucs':'Demucs / stems','drumsep':'DrumSep','sam-audio':'SAM Audio','singer-separation':'Singer separation','backing-vocals':'Backing vocals'};
   const rows=Object.entries(labels).map(([key,label])=>{const cfg=data.workers?.[key]||{};return `<div class="form-grid" style="border-bottom:1px solid var(--border,#8884);padding:8px"><strong>${label}</strong><label>Processing<select id="nativeRemoteMode-${key}"><option value="local" ${cfg.mode!=='remote'?'selected':''}>Local / Locale</option><option value="remote" ${cfg.mode==='remote'?'selected':''}>Remote / Remoto</option></select></label><label>HTTPS MTA server<input id="nativeRemoteUrl-${key}" type="url" value="${esc(cfg.url||'')}" placeholder="https://mta.example.org"></label><label>Personal token<input id="nativeRemoteToken-${key}" type="password" autocomplete="new-password" placeholder="${cfg.has_token?'Saved; leave blank to retain':'Required for remote'}"></label><button type="button" onclick="saveNativeRemoteWorker('${key}')">Save / Salva</button></div>`}).join('');
-  showUtilityModal('Native AI processing / Elaborazioni AI native',`<p>Select the execution location for each model. In remote mode an unavailable server causes an error; models do not run locally as fallback.</p>${rows}`);
+  showUtilityModal('Native AI processing / Elaborazioni AI native',`<p>Select the execution location for each model. In remote mode an unavailable server causes an error; models do not run locally as fallback.</p>${rows}<hr><h3>Pending remote AI requests / Richieste remote pendenti</h3><div id="nativeRemotePending">Loading...</div><button type="button" onclick="refreshNativePending()">Refresh pending / Aggiorna</button><hr><h3>Server request history / Storico richieste sul server</h3><div id="nativeRemoteHistory">Select a worker / Seleziona un worker</div><button type="button" onclick="refreshNativeRemoteHistory()">Discover on server / Cerca sul server</button><hr><h3>Recovered stem orphans / Stem orfani recuperati</h3><p>Review preserved files and quarantine or restore them without deleting data / Esamina i file conservati e gestisci la quarantena senza cancellazioni.</p><button type="button" onclick="refreshNativeStemOrphans()">Review orphan files / Esamina file orfani</button><div id="nativeStemOrphanInventory" role="status" aria-live="polite"></div>`);
+  await refreshNativePending();
  }catch(e){toast(e.message)}
+}
+
+// Explicit operator workflow for preserved remote-stem artifacts. The UI never
+// converts a review into delete authority and binds every action to its project.
+let nativeStemOrphanActionBusy=false;
+async function refreshNativeStemOrphans(){
+ const target=document.getElementById('nativeStemOrphanInventory');
+ if(!target)return;
+ const pid=current?.id;
+ if(!pid){target.textContent='Open a destination project / Apri un progetto';return;}
+ target.textContent='Checking preserved files / Verifica in corso…';
+ try{
+  const [preserved,quarantine]=await Promise.all([
+   api(`/api/projects/${encodeURIComponent(pid)}/recovered-stem-orphans`),
+   api(`/api/projects/${encodeURIComponent(pid)}/recovered-stem-orphans/quarantine`)
+  ]);
+  if(current?.id!==pid){target.textContent='Project changed / Progetto cambiato';return;}
+  const safeRows=Array.isArray(preserved.items)?preserved.items:[];
+  const quarantined=Array.isArray(quarantine.items)?quarantine.items:[];
+  target.replaceChildren();
+  const heading=document.createElement('p');
+  heading.textContent=`Preserved / Conservati: ${safeRows.length} · Quarantine / Quarantena: ${quarantined.length}`;
+  target.appendChild(heading);
+  for(const item of safeRows){
+   const line=document.createElement('div');line.className='form-grid';
+   const label=document.createElement('span');
+   label.textContent=`${item.file} · ${item.reason} · ${item.present?'present / presente':'not present / assente'}`;
+   line.appendChild(label);
+   if(item.present){
+    const button=document.createElement('button');button.type='button';
+    button.textContent='Quarantine / Metti in quarantena';
+    button.onclick=()=>operateNativeStemOrphan(pid,'quarantine',{receipt:item.receipt,file:item.file});
+    line.appendChild(button);
+   }
+   target.appendChild(line);
+  }
+  for(const item of quarantined){
+   const line=document.createElement('div');line.className='form-grid';
+   const label=document.createElement('span');
+   label.textContent=`${item.file} · ${item.status} · ${item.present?'present / presente':'not present / assente'}`;
+   line.appendChild(label);
+   if(item.status==='quarantined'&&item.present){
+    const button=document.createElement('button');button.type='button';
+    button.textContent='Restore / Ripristina';
+    button.onclick=()=>operateNativeStemOrphan(pid,'restore',{quarantine_name:item.quarantine_name});
+    line.appendChild(button);
+   }
+   target.appendChild(line);
+  }
+ }catch(e){if(target.isConnected)target.textContent=e.message;}
+}
+async function operateNativeStemOrphan(pid,action,payload){
+ if(nativeStemOrphanActionBusy||current?.id!==pid)return;
+ if(!confirm(action==='restore'?'Restore this quarantined stem without overwriting existing data? / Ripristinare lo stem senza sovrascrivere dati?':'Move this preserved stem into quarantine? / Spostare lo stem conservato in quarantena?'))return;
+ nativeStemOrphanActionBusy=true;
+ try{
+  await api(`/api/projects/${encodeURIComponent(pid)}/recovered-stem-orphans/${action}`,{
+   method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)
+  });
+  if(current?.id===pid)await refreshNativeStemOrphans();
+  toast('Stem operation completed / Operazione completata');
+ }catch(e){toast(e.message);}
+ finally{nativeStemOrphanActionBusy=false;}
+}
+
+// Server discovery is read-only and separate from local pending receipts.
+// Never display a token. Explicit import independently verifies remote ownership,
+// WAV integrity and the operator-selected destination project.
+// History pagination is per-worker; only immutable, escaped text is displayed.
+// A new discovery invalidates late responses from previous discovery sessions.
+let nativeRemoteHistoryGeneration=0;
+async function appendNativeRemoteHistory(kind,offset,section,generation){
+ if(generation!==nativeRemoteHistoryGeneration)return;
+ const summary=section.querySelector('.remote-history-summary');
+ const control=section.querySelector('.remote-history-more');
+ if(control)control.remove();
+ try{
+  const data=await api(`/api/native/ai-workers/remote-history/${encodeURIComponent(kind)}?limit=50&offset=${offset}`);
+  if(generation!==nativeRemoteHistoryGeneration||!section.isConnected)return;
+  const entries=Array.isArray(data.items)?data.items:[];
+  const total=Number(data.total);
+  if(!Number.isSafeInteger(total)||total<0||entries.length>50)throw Error('Invalid remote request page');
+  summary.textContent=`${total} server requests / Richieste sul server`;
+  for(const item of entries){
+   const line=document.createElement('p');
+   line.textContent=`${item.request_key} · ${item.state} · ${item.job_id||'-'}`;
+   if(item.state==='completed' && /^[A-Za-z0-9][A-Za-z0-9._:-]{15,127}$/.test(item.request_key)){
+    const download=document.createElement('button');download.type='button';
+    download.textContent='Download verified result / Scarica risultato';
+    download.addEventListener('click',()=>downloadNativeDiscoveredArtifact(kind,item.request_key,download));
+    line.appendChild(document.createTextNode(' '));line.appendChild(download);
+    if(/^[0-9a-f]{32}$/.test(item.request_key)){
+     const add=document.createElement('button');add.type='button';
+     add.textContent='Import WAV into open project / Importa WAV nel progetto aperto';
+     add.addEventListener('click',()=>importNativeDiscoveredWav(kind,item.request_key,add));
+     line.appendChild(document.createTextNode(' '));line.appendChild(add);
+     const format=['whisper','chords-ml'].includes(kind)?'json':(['demucs','drumsep','sam-audio','singer-separation','backing-vocals'].includes(kind)?'stems':null);
+     if(format){
+      const apply=document.createElement('button');apply.type='button';
+      apply.textContent=format==='json'?'Apply JSON / Applica JSON':'Import stems / Importa stem';
+      apply.addEventListener('click',()=>importNativeDiscoveredResult(kind,item.request_key,format,apply));
+      line.appendChild(document.createTextNode(' '));line.appendChild(apply);
+     }
+    }
+   }
+   section.appendChild(line);
+  }
+  const next=offset+entries.length;
+  if(entries.length && next<total){
+   const more=document.createElement('button');more.type='button';more.className='remote-history-more';
+   more.textContent=`More / Altri (${next}/${total})`;
+   more.addEventListener('click',()=>{more.disabled=true;appendNativeRemoteHistory(kind,next,section,generation);});
+   section.appendChild(more);
+  }
+ }catch(e){if(generation===nativeRemoteHistoryGeneration&&section.isConnected)summary.textContent=e.message;}
+}
+async function refreshNativeRemoteHistory(){
+ const target=document.getElementById('nativeRemoteHistory');if(!target)return;
+ const generation=++nativeRemoteHistoryGeneration;
+ const kinds=['whisper','chords-ml','demucs','drumsep','sam-audio','singer-separation','backing-vocals'];
+ target.textContent='Discovering / Ricerca in corso...';
+ const active=kinds.filter(kind=>document.getElementById(`nativeRemoteMode-${kind}`)?.value==='remote');
+ if(!active.length){target.textContent='No remote workers selected / Nessun worker remoto selezionato';return;}
+ target.replaceChildren();
+ const pending=[];
+ for(const kind of active){
+  const section=document.createElement('section');
+  const head=document.createElement('strong');head.textContent=kind;section.appendChild(head);
+  const summary=document.createElement('p');summary.className='remote-history-summary';summary.textContent='Loading...';
+  section.appendChild(summary);target.appendChild(section);
+  pending.push(appendNativeRemoteHistory(kind,0,section,generation));
+ }
+ await Promise.all(pending);
+}
+async function downloadNativeDiscoveredArtifact(kind,id,button){
+ if(!/^[a-z0-9-]+$/.test(kind)||!/^[A-Za-z0-9][A-Za-z0-9._:-]{15,127}$/.test(id))return;
+ button.disabled=true;
+ try{
+  const response=await fetch(`/api/native/ai-workers/remote-history/${encodeURIComponent(kind)}/artifact/${encodeURIComponent(id)}`,{credentials:'same-origin',cache:'no-store'});
+  if(!response.ok){let message=`HTTP ${response.status}`;try{message=(await response.json()).detail||message;}catch(_){}throw Error(message);}
+  const mime=(response.headers.get('content-type')||'').split(';')[0].trim();
+  const ext={'application/json':'json','audio/wav':'wav','application/zip':'zip'}[mime];
+  if(!ext)throw Error('Unsupported recovered artifact type');
+  const blob=await response.blob();const url=URL.createObjectURL(blob);
+  try{const link=document.createElement('a');link.href=url;link.download=`mta-discovered-${id}.${ext}`;document.body.appendChild(link);link.click();link.remove();}
+  finally{URL.revokeObjectURL(url);}
+  // Downloads remain read-only; explicit project import is a separate operation.
+ }catch(e){toast(e.message);}
+ finally{button.disabled=false;}
+}
+async function refreshNativePending(){
+ const target=document.getElementById('nativeRemotePending');
+ if(!target)return;
+ try{
+  const data=await api('/api/native/ai-workers/pending');
+  const records=data.pending||[];
+  target.innerHTML=records.length?records.map(item=>{
+   if(item.damaged)return '<p>Damaged request journal / Registro danneggiato: automatic retry disabled</p>';
+   const id=esc(item.request_id||'');
+   const label=esc(item.kind||'Legacy');
+   return `<div class="form-grid"><code>${id}</code><span>${label}</span>${item.recoverable?`<button type="button" onclick="checkNativePendingStatus('${id}')">Check status / Verifica</button><button type="button" onclick="downloadNativePendingArtifact('${id}')">Recover result / Recupera risultato</button><button type="button" onclick="importNativePendingAudio('${id}')">Import recovered WAV / Importa WAV</button>${['demucs','drumsep','sam-audio','singer-separation','backing-vocals'].includes(item.kind)?`<button type="button" onclick="importNativePendingStems('${id}')">Import recovered stems / Importa stem</button>`:''}${['whisper','chords-ml'].includes(item.kind)?`<button type="button" onclick="importNativePendingJson('${id}')">Apply recovered JSON / Applica JSON</button>`:''}`:'<span>Manual recovery required</span>'}<span id="nativePendingStatus-${id}"></span></div>`;
+  }).join(''):'<p>No pending requests / Nessuna richiesta pendente</p>';
+ }catch(e){target.textContent=e.message;}
+}
+async function checkNativePendingStatus(id){
+ const target=document.getElementById(`nativePendingStatus-${id}`);
+ try{const state=await api(`/api/native/ai-workers/pending/${id}/status`);if(target)target.textContent=JSON.stringify(state.remote);}
+ catch(e){if(target)target.textContent=e.message;}
+}
+async function downloadNativePendingArtifact(id){
+ const target=document.getElementById(`nativePendingStatus-${id}`);
+ try{
+  if(!/^[0-9a-f]{32}$/.test(id))throw Error('Invalid pending request identifier');
+  const response=await fetch(`/api/native/ai-workers/pending/${encodeURIComponent(id)}/artifact`,{credentials:'same-origin',cache:'no-store'});
+  if(!response.ok){let message=`HTTP ${response.status}`;try{const data=await response.json();message=data.detail||message;}catch(_){}throw Error(message);}
+  const mime=(response.headers.get('content-type')||'').split(';')[0].trim();
+  const ext={'application/json':'json','audio/wav':'wav','application/zip':'zip'}[mime];
+  if(!ext)throw Error('Unsupported recovered artifact');
+  const blob=await response.blob();
+  const url=URL.createObjectURL(blob);
+  try{const link=document.createElement('a');link.href=url;link.download=`mta-recovered-${id}.${ext}`;document.body.appendChild(link);link.click();link.remove();}
+  finally{URL.revokeObjectURL(url);}
+  if(target)target.textContent='Recovered artifact downloaded; pending journal preserved';
+ }catch(e){if(target)target.textContent=e.message;}
+}
+// Imports recovered WAV through the existing project track pipeline. The pending
+// journal is deliberately retained: a later native retry must remain read-only.
+const nativePendingImportsInFlight=new Set();
+async function importNativePendingAudio(id){
+ const target=document.getElementById(`nativePendingStatus-${id}`);
+ if(!/^[0-9a-f]{32}$/.test(id)){if(target)target.textContent='Invalid pending request';return;}
+ if(nativePendingImportsInFlight.has(id))return;
+ if(!current?.id){if(target)target.textContent='Open a project before importing recovered audio';return;}
+ const projectId=current.id;
+ nativePendingImportsInFlight.add(id);
+ try{
+  const updated=await api(`/api/native/ai-workers/pending/${encodeURIComponent(id)}/import-wav/${encodeURIComponent(projectId)}`,{method:'POST'});
+  if(current?.id!==projectId)throw Error('Active project changed during recovery');
+  current=updated;
+  selectedTrackId=updated.tracks?.find(track=>track.name===`Recovered AI ${id}`)?.id||selectedTrackId;
+  render();await refresh();
+  if(target?.isConnected)target.textContent='Recovered audio imported into project; original pending journal preserved';
+ }catch(e){if(target?.isConnected)target.textContent=e.message;}
+ finally{nativePendingImportsInFlight.delete(id);}
+}
+async function importNativePendingJson(id){
+ const target=document.getElementById(`nativePendingStatus-${id}`);
+ if(!/^[0-9a-f]{32}$/.test(id)||!current?.id){if(target)target.textContent='Open a project / Apri un progetto';return;}
+ if(nativePendingImportsInFlight.has(id))return;
+ const projectId=current.id;
+ nativePendingImportsInFlight.add(id);
+ try{
+  const result=await api(`/api/native/ai-workers/pending/${encodeURIComponent(id)}/import-json/${encodeURIComponent(projectId)}`,{method:'POST'});
+  if(current?.id!==projectId)throw Error('Active project changed during import');
+  await refresh();
+  if(target?.isConnected)target.textContent=`${result.count} ${result.kind} annotations imported. Journal preserved.`;
+ }catch(e){if(target?.isConnected)target.textContent=e.message;}
+ finally{nativePendingImportsInFlight.delete(id);}
+}
+async function importNativePendingStems(id){
+ const target=document.getElementById(`nativePendingStatus-${id}`);
+ if(!/^[0-9a-f]{32}$/.test(id)||!current?.id){if(target)target.textContent='Open a project / Apri un progetto';return;}
+ if(nativePendingImportsInFlight.has(id))return;
+ const projectId=current.id;
+ nativePendingImportsInFlight.add(id);
+ try{
+  const result=await api(`/api/native/ai-workers/pending/${encodeURIComponent(id)}/import-stems/${encodeURIComponent(projectId)}`,{method:'POST'});
+  if(current?.id!==projectId)throw Error('Active project changed during import');
+  await refresh();
+  if(target?.isConnected)target.textContent=`${result.count} recovered stems imported. Journal preserved.`;
+ }catch(e){if(target?.isConnected)target.textContent=e.message;}
+ finally{nativePendingImportsInFlight.delete(id);}
 }
 async function saveNativeRemoteWorker(kind){
  const mode=document.getElementById(`nativeRemoteMode-${kind}`)?.value;
  const url=document.getElementById(`nativeRemoteUrl-${kind}`)?.value.trim()||'';
  const token=document.getElementById(`nativeRemoteToken-${kind}`)?.value||'';
  try{await api('/api/native/ai-workers/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({kind,mode,url,token})});document.getElementById(`nativeRemoteToken-${kind}`).value='';toast('AI worker setting saved / Impostazione salvata');}catch(e){toast(e.message)}
+}
+
+async function importNativeDiscoveredWav(kind,id,button){
+ if(!/^[a-z0-9-]+$/.test(kind)||!/^[0-9a-f]{32}$/.test(id))return;
+ const projectId=current?.id;
+ if(!projectId){toast('Open the destination project first / Apri prima il progetto di destinazione');return;}
+ if(!confirm(`Import the verified remote WAV ${id} into the currently open project?\nImportare il WAV remoto verificato nel progetto aperto?`))return;
+ const key=`discovered:${kind}:${id}:wav`;
+ if(nativePendingImportsInFlight.has(key))return;
+ nativePendingImportsInFlight.add(key);button.disabled=true;
+ try{
+  await api(`/api/native/ai-workers/remote-history/${encodeURIComponent(kind)}/import-wav/${encodeURIComponent(id)}/${encodeURIComponent(projectId)}`,{method:'POST'});
+  if(current?.id===projectId)await refresh();
+  toast('Remote WAV imported / WAV remoto importato');
+ }catch(e){toast(e.message);}
+ finally{nativePendingImportsInFlight.delete(key);button.disabled=false;}
+}
+async function importNativeDiscoveredResult(kind,id,format,button){
+ if(!/^[a-z0-9-]+$/.test(kind)||!/^[0-9a-f]{32}$/.test(id)||!['json','stems'].includes(format))return;
+ const projectId=current?.id;
+ if(!projectId){toast('Open the destination project first / Apri il progetto di destinazione');return;}
+ if(!confirm(`Import the verified remote ${format} result ${id} into this project? Existing lyrics and chords will not be overwritten.\nImportare il risultato remoto ${format} nel progetto aperto?`))return;
+ const key=`discovered:${kind}:${id}:${format}`;
+ if(nativePendingImportsInFlight.has(key))return;
+ nativePendingImportsInFlight.add(key);button.disabled=true;
+ try{
+  const result=await api(`/api/native/ai-workers/remote-history/${encodeURIComponent(kind)}/import-${format}/${encodeURIComponent(id)}/${encodeURIComponent(projectId)}`,{method:'POST'});
+  if(current?.id===projectId)await refresh();
+  toast(`${result.count} ${format} imported / importati`);
+ }catch(e){toast(e.message);}
+ finally{nativePendingImportsInFlight.delete(key);button.disabled=false;}
+}
+async function testAiArrangerWorker(){
+  const result=document.getElementById('aiRemixPlanResult');
+  if(result)result.textContent='Checking trusted AI worker configuration...';
+  try{
+    const state=await api('/api/ai-arranger/worker-status');
+    if(result)result.textContent='Worker configuration test (does not generate audio):\n'+JSON.stringify(state,null,2);
+  }catch(e){if(result)result.textContent='Worker verification failed: '+e.message;}
 }

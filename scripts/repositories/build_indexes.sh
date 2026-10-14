@@ -19,6 +19,10 @@ for tool in dpkg-scanpackages apt-ftparchive gpg; do command -v "$tool" >/dev/nu
 src=$(realpath "$MTA_REPO_INPUT")
 out=$(realpath -m "$MTA_REPO_OUTPUT")
 [[ -d $src && $src != "$out" ]] || exit 2
+# Prune stale package binaries BEFORE copying any of the three OS variants.
+# Retention was performed against incoming artifacts prior to signing.
+python3 "$(dirname "$0")/preflight_package_copy.py" \
+  --input "$src" --output "$out" --channel "$MTA_REPO_CHANNEL"
 mkdir -p "$out/apt/$MTA_REPO_CHANNEL/pool"
 if [[ $apt_only != 1 ]]; then
   command -v createrepo_c >/dev/null || { echo 'Missing createrepo_c' >&2; exit 2; }

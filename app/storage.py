@@ -4,14 +4,21 @@ import os
 import re
 import subprocess
 import shutil
+import stat
 import threading
 import time
 import tempfile
 import uuid
 import zipfile
+from contextlib import contextmanager
 from pathlib import Path
 
 from .models import Project
+
+try:
+    import fcntl
+except ImportError:
+    fcntl = None
 
 ROOT = Path(os.environ.get("MTA_DATA_DIR", "/data/projects")).resolve()
 ROOT.mkdir(parents=True, exist_ok=True)
@@ -76,17 +83,60 @@ def _shared_blob_path(digest: str, suffix: str = "") -> Path:
     return SHARED_AUDIO_ROOT / digest[:2] / f"{digest}{ext}"
 
 
+@contextmanager
+def _shared_process_lock():
+    """Serialize shared blob/index mutations across POSIX server workers."""
+    if fcntl is None:
+        # Refuse uncoordinated mutations on platforms without an OS lock.
+        raise RuntimeError("shared-media mutations require POSIX file locking")
+    if SHARED_MEDIA_ROOT.is_symlink():
+        raise ValueError("unsafe shared media root")
+    SHARED_MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
+    lock = SHARED_MEDIA_ROOT / ".shared-media.lock"
+    if lock.is_symlink():
+        raise ValueError("unsafe shared lock")
+    flags = os.O_CREAT | os.O_RDWR | getattr(os, "O_NOFOLLOW", 0)
+    fd = os.open(lock, flags, 0o600)
+    with os.fdopen(fd, "r+b") as handle:
+        if not stat.S_ISREG(os.fstat(handle.fileno()).st_mode):
+            raise ValueError("unsafe shared lock type")
+        fcntl.flock(handle.fileno(), fcntl.LOCK_EX)
+        try:
+            yield
+        finally:
+            fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+
+
+def _validate_shared_tree():
+    if SHARED_MEDIA_ROOT.is_symlink() or SHARED_AUDIO_ROOT.is_symlink():
+        raise ValueError("unsafe shared directory")
+    if SHARED_AUDIO_ROOT.exists() and not SHARED_AUDIO_ROOT.is_dir():
+        raise ValueError("unsafe shared audio directory")
+
+
+def _validate_blob_parent(blob: Path):
+    _validate_shared_tree()
+    if blob.parent.is_symlink() or (blob.parent.exists() and not blob.parent.is_dir()):
+        raise ValueError("unsafe shared blob directory")
+
+
 def _load_shared_index() -> dict:
+    if SHARED_INDEX_PATH.is_symlink() or (SHARED_INDEX_PATH.exists() and not SHARED_INDEX_PATH.is_file()):
+        raise ValueError("unsafe shared index")
     try:
         raw = json.loads(SHARED_INDEX_PATH.read_text(encoding="utf-8"))
-        if isinstance(raw, dict) and raw.get("version") == 1:
-            return raw
-    except (OSError, ValueError, TypeError):
-        pass
-    return {"version": 1, "assets": {}, "updated_at": 0}
+    except FileNotFoundError:
+        return {"version": 1, "assets": {}, "updated_at": 0}
+    except (OSError, ValueError, UnicodeError) as exc:
+        raise ValueError("invalid shared index") from exc
+    if not isinstance(raw, dict) or raw.get("version") != 1 or not isinstance(raw.get("assets"), dict):
+        raise ValueError("invalid shared index schema")
+    return raw
 
 
 def _write_shared_index(index: dict) -> None:
+    if SHARED_INDEX_PATH.is_symlink() or (SHARED_INDEX_PATH.exists() and not SHARED_INDEX_PATH.is_file()):
+        raise ValueError("unsafe shared index")
     SHARED_MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
     index["version"] = 1
     index["updated_at"] = int(time.time())
@@ -102,6 +152,8 @@ def _link_or_copy_shared(blob: Path, local: Path) -> None:
             pass
     tmp = local.parent / f".{local.name}.{uuid.uuid4().hex}.sharedtmp"
     tmp.unlink(missing_ok=True)
+    if local.is_symlink() or blob.is_symlink() or not blob.is_file():
+        raise ValueError("unsafe shared-media path")
     try:
         os.link(blob, tmp)
     except OSError:
@@ -119,7 +171,8 @@ def promote_project_audio_to_shared(pid: str) -> dict[str, int]:
     project = load_project(pid)
     referenced = referenced_audio_files(project)
     promoted = linked = 0
-    with _SHARED_LOCK:
+    with _SHARED_LOCK, _shared_process_lock():
+        _validate_shared_tree()
         index = _load_shared_index()
         assets = index.setdefault("assets", {})
         for name in sorted(referenced):
@@ -127,15 +180,26 @@ def promote_project_audio_to_shared(pid: str) -> dict[str, int]:
                 local = audio_path(pid, name)
             except ValueError:
                 continue
-            if not local.is_file():
+            if local.is_symlink() or not local.is_file():
                 continue
             digest = _sha256_file(local)
             blob = _shared_blob_path(digest, local.suffix.lower())
+            _validate_blob_parent(blob)
             blob.parent.mkdir(parents=True, exist_ok=True)
+            if blob.is_symlink() or (blob.exists() and not blob.is_file()):
+                raise ValueError("unsafe shared blob")
+            if blob.exists() and _sha256_file(blob) != digest:
+                raise ValueError("shared blob digest mismatch")
             if not blob.exists():
                 tmp = blob.parent / f".{blob.name}.{uuid.uuid4().hex}.tmp"
-                shutil.copy2(local, tmp)
-                os.replace(tmp, blob)
+                try:
+                    shutil.copy2(local, tmp)
+                    if _sha256_file(tmp) != digest:
+                        raise ValueError("shared copy digest mismatch")
+                    os.replace(tmp, blob)
+                    _fsync_directory(blob.parent)
+                finally:
+                    tmp.unlink(missing_ok=True)
                 promoted += 1
             _link_or_copy_shared(blob, local)
             linked += 1
@@ -158,39 +222,71 @@ def rescan_shared_media(*, delete_unreferenced: bool = False) -> dict[str, int]:
     """
     assets: dict[str, dict] = {}
     projects = references = missing = deleted = 0
-    with _SHARED_LOCK:
+    incomplete = False
+    with _SHARED_LOCK, _shared_process_lock():
+        _validate_shared_tree()
+        # Do not overwrite a damaged or future-version index during repair.
+        # An operator must explicitly recover it before any index rebuild.
+        _load_shared_index()
         if ROOT.exists():
             for d in sorted(ROOT.iterdir()):
-                if not d.is_dir() or not PID_RE.fullmatch(d.name) or not (d / "project.json").exists():
+                if not PID_RE.fullmatch(d.name):
+                    continue
+                if d.is_symlink() or not d.is_dir() or not (d / "project.json").is_file() or (d / "project.json").is_symlink():
+                    incomplete = True
                     continue
                 projects += 1
                 try:
                     project = load_project(d.name)
-                except (OSError, ValueError):
+                except (OSError, ValueError, TypeError):
+                    incomplete = True
                     continue
                 for name in sorted(referenced_audio_files(project)):
                     try:
                         local = audio_path(d.name, name)
                     except ValueError:
-                        continue
-                    if not local.is_file():
                         missing += 1
+                        incomplete = True
+                        continue
+                    if local.is_symlink() or not local.is_file():
+                        missing += 1
+                        incomplete = True
                         continue
                     digest = _sha256_file(local)
                     blob = _shared_blob_path(digest, local.suffix.lower())
+                    _validate_blob_parent(blob)
                     blob.parent.mkdir(parents=True, exist_ok=True)
+                    if blob.is_symlink() or (blob.exists() and not blob.is_file()):
+                        raise ValueError("unsafe shared blob")
+                    if blob.exists() and _sha256_file(blob) != digest:
+                        raise ValueError("shared blob digest mismatch")
                     if not blob.exists():
                         tmp = blob.parent / f".{blob.name}.{uuid.uuid4().hex}.tmp"
-                        shutil.copy2(local, tmp)
-                        os.replace(tmp, blob)
+                        try:
+                            shutil.copy2(local, tmp)
+                            if _sha256_file(tmp) != digest:
+                                raise ValueError("shared copy digest mismatch")
+                            os.replace(tmp, blob)
+                            _fsync_directory(blob.parent)
+                        finally:
+                            tmp.unlink(missing_ok=True)
                     _link_or_copy_shared(blob, local)
                     row = assets.setdefault(digest, {"path": str(blob.relative_to(SHARED_MEDIA_ROOT)), "size": blob.stat().st_size, "refs": []})
                     row["refs"].append(f"{d.name}/audio/{name}")
                     references += 1
+        if incomplete:
+            # A partial scan must not publish a reduced index either: doing so
+            # can discard references still owned by an unreadable project.
+            raise ValueError("incomplete shared media scan; index publication and deletion forbidden")
+        if delete_unreferenced and SHARED_AUDIO_ROOT.is_symlink():
+            raise ValueError("unsafe shared audio directory")
         if delete_unreferenced and SHARED_AUDIO_ROOT.exists():
             keep_paths = {(SHARED_MEDIA_ROOT / row["path"]).resolve() for row in assets.values()}
+            for directory in SHARED_AUDIO_ROOT.iterdir():
+                if directory.is_symlink() or (directory.exists() and not directory.is_dir()):
+                    raise ValueError("unsafe shared blob directory")
             for blob in SHARED_AUDIO_ROOT.rglob("*"):
-                if blob.is_file() and blob.resolve() not in keep_paths:
+                if not blob.is_symlink() and blob.is_file() and blob.resolve() not in keep_paths:
                     blob.unlink(missing_ok=True)
                     deleted += 1
             for folder in sorted((p for p in SHARED_AUDIO_ROOT.rglob("*") if p.is_dir()), reverse=True):
@@ -265,16 +361,27 @@ def referenced_audio_files(project: Project) -> set[str]:
 
 
 def _read_gc_queue(pid: str) -> set[str]:
+    """Read the durable queue; never silently discard malformed recovery state."""
     path = _gc_queue_path(pid)
+    if path.is_symlink() or (path.exists() and not path.is_file()):
+        raise ValueError("unsafe GC journal")
     try:
         raw = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, ValueError, TypeError):
+    except FileNotFoundError:
         return set()
-    return {str(x) for x in raw.get("audio", []) if isinstance(x, str) and SAFE_NAME_RE.fullmatch(x)}
+    if (not isinstance(raw, dict) or raw.get("version") != 1 or
+            not isinstance(raw.get("audio"), list) or
+            any(not isinstance(x, str) or not SAFE_NAME_RE.fullmatch(x)
+                for x in raw["audio"]) or
+            len(raw["audio"]) != len(set(raw["audio"]))):
+        raise ValueError("invalid GC journal")
+    return set(raw["audio"])
 
 
 def _write_gc_queue(pid: str, names: set[str]) -> None:
     path = _gc_queue_path(pid)
+    if path.is_symlink() or (path.exists() and not path.is_file()):
+        raise ValueError("unsafe GC journal")
     if not names:
         path.unlink(missing_ok=True)
         _fsync_directory(path.parent)
@@ -294,6 +401,8 @@ def reconcile_project_gc(pid: str, candidates: set[str] | None = None) -> set[st
         referenced = referenced_audio_files(project)
         queued = _read_gc_queue(pid)
         audio_dir = pdir(pid) / "audio"
+        if audio_dir.is_symlink():
+            raise ValueError("unsafe GC audio directory")
         if candidates is None and audio_dir.exists():
             candidates = {f.name for f in audio_dir.iterdir() if f.is_file() and SAFE_NAME_RE.fullmatch(f.name)}
         for name in candidates or set():
@@ -305,44 +414,62 @@ def reconcile_project_gc(pid: str, candidates: set[str] | None = None) -> set[st
 
 
 def run_project_gc(pid: str) -> dict[str, int]:
-    """Process a durable GC queue. Safe to retry after interruption/crash."""
+    """Remove only unreferenced, regular audio files from a safe media root."""
     deleted = skipped = 0
     with _GC_LOCK:
         try:
             project = load_project(pid)
-        except (OSError, ValueError):
+            referenced = referenced_audio_files(project)
+            queued = _read_gc_queue(pid)
+        except (OSError, ValueError, TypeError):
             return {"deleted": 0, "skipped": 0}
-        referenced = referenced_audio_files(project)
-        queued = _read_gc_queue(pid)
+        audio_dir = pdir(pid) / "audio"
+        if audio_dir.is_symlink() or not audio_dir.is_dir():
+            return {"deleted": 0, "skipped": len(queued)}
         remaining: set[str] = set()
         for name in sorted(queued):
             if name in referenced:
                 skipped += 1
                 continue
+            target = audio_dir / name
             try:
-                audio_path(pid, name).unlink(missing_ok=True)
+                metadata = target.lstat()
+                if not stat.S_ISREG(metadata.st_mode):
+                    skipped += 1
+                    remaining.add(name)
+                    continue
+                target.unlink()
                 deleted += 1
+            except FileNotFoundError:
+                continue
             except OSError:
                 remaining.add(name)
         try:
-            _fsync_directory(pdir(pid) / "audio")
+            _fsync_directory(audio_dir)
         finally:
             _write_gc_queue(pid, remaining)
     return {"deleted": deleted, "skipped": skipped}
 
 
 def _gc_worker(pid: str) -> None:
-    # Tiny defer keeps physical cleanup off the request's latency path.
-    time.sleep(0.05)
-    while True:
-        run_project_gc(pid)
+    # Retry only when the durable queue makes progress. Failed deletions are
+    # preserved for the next scheduled pass rather than busy-spun indefinitely.
+    try:
+        time.sleep(0.05)
+        previous = None
+        while True:
+            before = _read_gc_queue(pid)
+            if before == previous:
+                break
+            previous = before
+            run_project_gc(pid)
+            with _GC_LOCK:
+                after = _read_gc_queue(pid)
+                if not after or after == before:
+                    break
+    finally:
         with _GC_LOCK:
-            # If another request queued work while this worker was active, drain it
-            # before releasing the active marker. This closes the enqueue/exit race.
-            if _read_gc_queue(pid):
-                continue
             _GC_ACTIVE.discard(pid)
-            break
 
 
 def schedule_project_gc(pid: str, candidates: set[str] | None = None, *, reconcile_orphans: bool = False) -> None:
@@ -362,7 +489,7 @@ def resume_pending_gc() -> None:
     if not ROOT.exists():
         return
     for d in ROOT.iterdir():
-        if not d.is_dir() or not PID_RE.fullmatch(d.name) or not (d / "project.json").exists():
+        if d.is_symlink() or not d.is_dir() or not PID_RE.fullmatch(d.name) or not (d / "project.json").exists():
             continue
         schedule_project_gc(d.name, reconcile_orphans=True)
 
@@ -462,6 +589,10 @@ def migrate_project_audio_to_flac(project: Project) -> dict:
     validate_project_files(project)
     filenames = {t.filename for t in project.tracks} | {c.filename for c in project.clip_library}
     staged: dict[str, tuple[Path, Path]] = {}
+    original_tracks = [track.filename for track in project.tracks]
+    original_clips = [(clip.filename, clip.current_location) for clip in project.clip_library]
+    original_mode = project.audio_storage_mode
+    committed = False
     skipped: list[str] = []
     try:
         for old_name in sorted(filenames):
@@ -492,6 +623,7 @@ def migrate_project_audio_to_flac(project: Project) -> dict:
         # File publication first; project.json remains authoritative until save.
         for tmp, final in staged.values():
             os.replace(tmp, final)
+        _fsync_directory(pdir(project.id) / "audio")
         old_names = {old: final.name for old, (_, final) in staged.items()}
         for track in project.tracks:
             track.filename = old_names.get(track.filename, track.filename)
@@ -501,12 +633,25 @@ def migrate_project_audio_to_flac(project: Project) -> dict:
                 clip.current_location = f"audio/{clip.filename}"
         project.audio_storage_mode = "flac"
         save_project(project, _skip_flac_conversion=True)
-        for old in old_names:
-            audio_path(project.id, old).unlink(missing_ok=True)
+        committed = True
+        # Old WAVs remain protected until a GC worker re-reads committed project.json.
+        if old_names:
+            reconcile_project_gc(project.id, set(old_names))
+            run_project_gc(project.id)
         return {"converted": len(staged), "skipped": skipped, "audio_storage_mode": "flac"}
     except Exception:
         # No metadata is committed before conversion completes; a failed stage leaves WAV usable.
-        for tmp, final in staged.values():
+        if not committed:
+            for track, original in zip(project.tracks, original_tracks):
+                track.filename = original
+            for clip, (name, location) in zip(project.clip_library, original_clips):
+                clip.filename = name
+                clip.current_location = location
+            project.audio_storage_mode = original_mode
+            # A failed transaction may already have published some new files.
+            # Queue them instead of deleting any potentially referenced media.
+            schedule_project_gc(project.id, {final.name for _, final in staged.values()})
+        for tmp, _ in staged.values():
             tmp.unlink(missing_ok=True)
         raise
 
@@ -636,7 +781,32 @@ def preserve_original(pid: str, source: Path, original_name: str) -> Path:
         return original_path(pid, duplicate["name"])
     name = _unique_original_name(pid, original_name)
     dst = original_path(pid, name)
-    shutil.copy2(source, dst)
+    # Exclusive ownership: never overwrite a concurrent original and never
+    # remove a destination unless this call created it.  Copying directly into
+    # the final pathname is safe under the shared project lock; the journal
+    # handles forced termination before a project commit.
+    owned_identity = None
+    try:
+        with source.open('rb') as src, dst.open('xb') as out:
+            st = os.fstat(out.fileno())
+            owned_identity = (st.st_dev, st.st_ino)
+            shutil.copyfileobj(src, out, length=1024 * 1024)
+            out.flush()
+            os.fsync(out.fileno())
+        directory = os.open(str(dst.parent), os.O_RDONLY)
+        try:
+            os.fsync(directory)
+        finally:
+            os.close(directory)
+    except BaseException:
+        if owned_identity is not None:
+            try:
+                st = dst.lstat()
+                if stat.S_ISREG(st.st_mode) and (st.st_dev, st.st_ino) == owned_identity:
+                    dst.unlink()
+            except FileNotFoundError:
+                pass
+        raise
     return dst
 
 

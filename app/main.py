@@ -1,3 +1,4 @@
+import stat
 from app.secure_https import https_urlopen
 import base64
 import hashlib
@@ -63,6 +64,7 @@ from .storage import (
     migrate_project_audio_to_flac,
     pdir,
     preserve_original,
+    originals_dir,
     project_access,
     project_files,
     save_project,
@@ -82,6 +84,7 @@ from .version import APP_RELEASE, APP_RELEASE_CHANNEL, APP_REVISION, APP_VERSION
 
 from .ai_arranger import RearrangeRequest, RemixRequest, catalog as arranger_catalog, prepare_plan as arranger_plan, prepare_remix_plan, assess_plan
 from .ai_job_queue import ai_jobs
+from . import ai_arranger_runtime
 from .ai_token_routes import router as ai_token_router
 from .ai_gateway import router as ai_gateway_router
 from .ai_billing_routes import router as ai_billing_router
@@ -110,7 +113,48 @@ def _musical_export_project(project: Project) -> Project:
     return export_project
 
 @app.on_event("startup")
+def _start_diagnostic_cleanup():
+    # Cleanup works even with collection disabled; daemon stops on process exit.
+    def loop():
+        import time as _time
+        while True:
+            try:
+                _mta_diagnostics.clean()
+            except (OSError, RuntimeError):
+                LOGGER.warning("Diagnostics cleanup unavailable", exc_info=True)
+            _time.sleep(3600)
+    _mta_diagnostics.install_event_capture()
+    threading.Thread(target=loop, daemon=True, name="mta-diagnostic-retention").start()
+
+
+@app.on_event("startup")
 def _start_background_services():
+    # Repair interrupted stem imports before exposing restored project state.
+    # A damaged journal is left intact and never triggers destructive cleanup.
+    try:
+        from .ai_recovered_stem_transaction import reconcile_on_startup
+        stem_recovery = reconcile_on_startup()
+        LOGGER.info('Recovered stem imports on startup: %s', stem_recovery)
+        if stem_recovery['errors']:
+            LOGGER.error('Unresolved stem import journals: %s', stem_recovery['errors'])
+    except Exception:
+        LOGGER.exception('Recovered stem import startup reconciliation unavailable')
+    try:
+        from .ai_upload_transaction import reconcile_on_startup as recover_uploads
+        upload_recovery = recover_uploads()
+        LOGGER.info('Ordinary upload recovery on startup: %s', upload_recovery)
+        if upload_recovery['errors']:
+            LOGGER.error('Unresolved ordinary uploads: %s', upload_recovery['errors'])
+    except Exception:
+        LOGGER.exception('Ordinary upload startup recovery unavailable')
+    try:
+        from .ai_async_track_transaction import reconcile_on_startup as recover_async_tracks
+        async_track_recovery = recover_async_tracks()
+        LOGGER.info('Async track recovery on startup: %s', async_track_recovery)
+        if async_track_recovery['errors']:
+            LOGGER.error('Unresolved async track receipts: %s', async_track_recovery['errors'])
+    except Exception:
+        LOGGER.exception('Async track startup reconciliation unavailable')
     start_background_updater()
     resume_pending_gc()
     if NATIVE_SINGLE_USER:
@@ -219,8 +263,83 @@ def _stem_job_update(job_id: str, **changes) -> None:
             job["updated_at"] = time.time()
 
 
+def _stem_durable_payload(job: dict, source: Path, keep_original_track: bool) -> dict:
+    """Persist only project-owned source locators and JSON-safe stem options."""
+    pid = job["project_id"]
+    source = Path(source).resolve(strict=True)
+    locator = None
+    for category in ("audio", "original"):
+        try:
+            candidate = file_path(pid, category, source.name)
+            if candidate.resolve(strict=True) == source:
+                locator = category
+                break
+        except (ValueError, OSError):
+            continue
+    if locator is None:
+        raise ValueError("Stem source must belong to the project storage")
+    fields = ("source_track_id", "model", "stem_count", "filename", "estimate_bpm",
+              "stem_name_prefix", "extract_lyrics", "extract_chords", "lyrics_model",
+              "chords_engine", "split_backing_vocals", "backing_vocal_model",
+              "split_percussions", "percussion_method", "stem_targets", "singer_mode",
+              "singers", "singer_model", "singer_target")
+    return {"schema_version": 1, "project_id": pid, "source_category": locator,
+            "source_name": source.name, "keep_original_track": bool(keep_original_track),
+            "options": {name: job.get(name) for name in fields}}
+
+
+def _restore_stem_split_job(pid, payload, job_id):
+    """Restore *only queued* stem work using a validated project-local source."""
+    if not isinstance(payload, dict) or payload.get("schema_version") != 1 or payload.get("project_id") != pid:
+        raise ValueError("Invalid durable stem request")
+    category, name, options = payload.get("source_category"), payload.get("source_name"), payload.get("options")
+    if category not in ("audio", "original") or not isinstance(name, str) or not isinstance(options, dict):
+        raise ValueError("Invalid stem source or options")
+    if type(payload.get("keep_original_track")) is not bool:
+        raise ValueError("Invalid stem track policy")
+    source = file_path(pid, category, name)
+    if not source.is_file() or source.is_symlink() or source.stat().st_nlink != 1:
+        raise ValueError("Missing or unsafe durable stem source")
+    if not isinstance(options.get("model"), str) or not options["model"]:
+        raise ValueError("Invalid stem model")
+    if type(options.get("stem_count")) is not int or options["stem_count"] < 0:
+        raise ValueError("Invalid stem count")
+    targets = options.get("stem_targets")
+    if not isinstance(targets, list) or not targets or any(not isinstance(t, str) for t in targets) or not set(targets) <= _STEM_TARGETS:
+        raise ValueError("Invalid stem targets")
+    for field in ("split_backing_vocals", "split_percussions", "singer_mode", "extract_lyrics", "extract_chords", "estimate_bpm"):
+        if options.get(field) is not None and type(options[field]) is not bool:
+            raise ValueError("Invalid stem flag")
+    if not isinstance(options.get("singers"), list):
+        raise ValueError("Invalid singers")
+    load_project(pid)
+    now = time.time()
+    with STEM_JOB_LOCK:
+        job = STEM_JOBS.setdefault(job_id, {
+            "id": job_id, "project_id": pid, "status": "queued", "progress": 5,
+            "message": "Recovered queued stem separation", "created_at": now,
+            "updated_at": now, "error": None, "cancel_event": threading.Event(),
+            **options,
+        })
+    def execute(_progress_path, stop):
+        job["cancel_event"] = stop
+        if stop.is_set():
+            job["status"] = "cancelled"
+            return
+        _stem_split_worker(job_id, source, payload["keep_original_track"])
+        if job["status"] == "failed":
+            raise RuntimeError(str(job.get("error") or "Stem separation failed")[:300])
+    return execute
+
+
+ai_arranger_runtime.register_restorer("stem-separation", _restore_stem_split_job)
+
+
 def _stem_job_public(job: dict) -> dict:
+    queue_row = _legacy_ai_queue_state(job)
     return {
+        "queue_position": queue_row.get("queue_position") if queue_row else None,
+        "jobs_ahead": queue_row.get("jobs_ahead") if queue_row else 0,
         "id": job["id"],
         "project_id": job["project_id"],
         "source_track_id": job.get("source_track_id"),
@@ -254,9 +373,107 @@ def _media_job_update(job_id: str, **changes) -> None:
             job["updated_at"] = time.time()
 
 
+def _enqueue_existing_ai_job(job: dict, work, *, durable_payload=None):
+    """Admit legacy AI work to the shared SQLite FIFO queue.
+
+    Lyrics/chords requests carry a versioned, reconstructible payload. Other
+    legacy callables remain intentionally non-replayable until their side
+    effects can be made crash-safe.
+    """
+    jid = job["id"]
+    project = job.get("project_id") or "server-models"
+    def run(_progress_path, stop=None):
+        if stop is not None:
+            job["cancel_event"] = stop
+        if job.get("cancel_event") is not None and job["cancel_event"].is_set():
+            job["status"] = "cancelled"
+            return
+        job["status"] = "running"
+        work()
+        if job.get("status") in ("failed", "error"):
+            raise RuntimeError(str(job.get("error") or "AI worker failed")[:300])
+    if durable_payload is not None:
+        operation = "stem-separation" if job["id"] in STEM_JOBS else job.get("kind", "ai")
+        return ai_arranger_runtime.start(project, operation, run,
+            job_id=jid, payload=durable_payload, cancellable=True)
+    return ai_arranger_runtime.start(project, job.get("kind", "ai"), run, job_id=jid)
+
+
+def _restore_text_music_job(pid, payload, job_id):
+    """Restore queued Whisper/chords only; never replay a running job.
+
+    The queue owns crash decisions. Rebuild the legacy API status projection
+    before returning a callable, so web clients can poll restored jobs.
+    """
+    if not isinstance(payload, dict) or payload.get("schema_version") != 1:
+        raise ValueError("Unsupported text AI request schema")
+    kind = payload.get("kind")
+    if kind not in ("lyrics", "chords", "markers") or payload.get("project_id") != pid:
+        raise ValueError("Text AI adapter/payload mismatch")
+    if not isinstance(payload.get("track_id"), str) or not payload["track_id"]:
+        raise ValueError("Invalid text AI track")
+    if payload.get("model_or_engine") is not None and not isinstance(payload["model_or_engine"], str):
+        raise ValueError("Invalid text AI model")
+    if type(payload.get("advanced_alignment", False)) is not bool:
+        raise ValueError("Invalid alignment flag")
+    options = payload.get("chord_options")
+    if options is not None and not isinstance(options, dict):
+        raise ValueError("Invalid chord options")
+    start, end = payload.get("range_start_ms"), payload.get("range_end_ms")
+    if (start is None) != (end is None) or (start is not None and
+        (type(start) is not int or type(end) is not int or start < 0 or end <= start)):
+        raise ValueError("Invalid text AI range")
+    # Validate the project and source before scheduling recovered inference.
+    project = load_project(pid)
+    if not any(item.id == payload["track_id"] for item in project.tracks):
+        raise ValueError("Restored text AI track no longer exists")
+    with MEDIA_JOB_LOCK:
+        if job_id not in MEDIA_JOBS:
+            now = time.time()
+            MEDIA_JOBS[job_id] = {
+                "id": job_id, "kind": "extract-" + kind, "project_id": pid,
+                "status": "queued", "progress": 0, "message": "Recovered queued AI analysis",
+                "created_at": now, "updated_at": now, "result": None,
+                "error": None, "partial": None, "cancel_event": threading.Event(),
+            }
+        job = MEDIA_JOBS[job_id]
+    def execute(_progress_path, stop):
+        job["cancel_event"] = stop
+        if stop.is_set():
+            job["status"] = "cancelled"
+            return
+        job["status"] = "running"
+        _text_music_worker(job_id, pid, payload["track_id"], kind,
+            payload.get("model_or_engine") or "", payload.get("advanced_alignment", False),
+            options, start, end)
+        if job.get("status") in ("failed", "error"):
+            raise RuntimeError(str(job.get("error") or "Text AI job failed")[:300])
+    return execute
+
+
+for _text_ai_kind in ("lyrics", "chords", "markers"):
+    ai_arranger_runtime.register_restorer("extract-" + _text_ai_kind, _restore_text_music_job)
+
+
+def _legacy_ai_queue_state(job: dict):
+    try:
+        row = ai_arranger_runtime.get(job["id"])
+    except (OSError, ValueError):
+        return None
+    if not row:
+        return None
+    if row["state"] in ("queued", "cancelled", "interrupted"):
+        job["status"] = row["state"]
+        job["message"] = row["message"]
+    return row
+
+
 def _media_job_public(job: dict) -> dict:
     cancel_event=job.get("cancel_event")
+    queue_row = _legacy_ai_queue_state(job)
     return {
+        "queue_position": queue_row.get("queue_position") if queue_row else None,
+        "jobs_ahead": queue_row.get("jobs_ahead") if queue_row else 0,
         "id": job["id"],
         "kind": job["kind"],
         "project_id": job.get("project_id"),
@@ -730,6 +947,67 @@ def api_storage_shared_rescan(request: Request, delete_unreferenced: bool = True
     require_admin(request)
     return rescan_shared_media(delete_unreferenced=delete_unreferenced)
 
+
+# Opt-in support bundle endpoints. API access requires an authenticated administrator.
+from . import diagnostic_bundle as _mta_diagnostics
+
+
+@app.get("/api/admin/diagnostics/settings")
+def admin_diagnostics_settings(request: Request):
+    require_admin(request)
+    return {"enabled": _mta_diagnostics.enabled(), "retention_hours": 24,
+            "scope": "redacted structured diagnostics; no project data or raw journals"}
+
+
+@app.put("/api/admin/diagnostics/settings")
+def admin_diagnostics_update(request: Request, body: dict):
+    require_admin(request)
+    try:
+        return {"enabled": _mta_diagnostics.configure(body.get("enabled"))}
+    except (ValueError, PermissionError) as exc:
+        raise HTTPException(400, str(exc)) from exc
+
+
+@app.post("/api/admin/diagnostics/bundles")
+def admin_diagnostics_create(request: Request):
+    require_admin(request)
+    if not _mta_diagnostics.enabled():
+        raise HTTPException(403, "Diagnostics disabled; enable MTA_DIAGNOSTICS_ENABLED in server settings")
+    try:
+        # Never expose model prompts, user inputs, artifacts, or secret environment.
+        recent = ai_arranger_runtime.list_jobs(50)
+        compact = [{"id": j.get("job_id"), "operation": j.get("operation"),
+                    "state": j.get("state"), "phase": j.get("phase"),
+                    "progress_percent": j.get("progress_percent"),
+                    "cpu_seconds": j.get("cpu_seconds"), "gpu_seconds": j.get("gpu_seconds")}
+                   for j in recent]
+        report = {"ai_queue": {"max_concurrent_jobs": ai_arranger_runtime._limit(),
+                                "jobs": compact},
+                  "runtime": {"pid": os.getpid(), "python": __import__("platform").python_version(),
+                              "os": __import__("platform").system()},
+                  "components": {"ace_step_url_configured": bool(os.environ.get("MTA_ACE_STEP_URL")),
+                                 "ai_worker_enabled": os.environ.get("MTA_AI_WORKER_ENABLED", "false").lower() == "true"}}
+        path = _mta_diagnostics.create(report)
+    except Exception:
+        LOGGER.exception("Unable to create sanitized diagnostics")
+        raise HTTPException(500, "Diagnostic bundle creation failed")
+    return {"name": path.name, "url": "/api/admin/diagnostics/bundles/" + path.name,
+            "expires_in_seconds": _mta_diagnostics.RETENTION}
+
+
+@app.get("/api/admin/diagnostics/bundles/{name}")
+def admin_diagnostics_download(name: str, request: Request):
+    require_admin(request)
+    if not _mta_diagnostics.enabled():
+        raise HTTPException(403, "Diagnostics disabled")
+    try:
+        path = _mta_diagnostics.resolve(name)
+    except FileNotFoundError:
+        raise HTTPException(404, "Bundle not found or expired")
+    return FileResponse(path, media_type="application/zip", filename=name,
+                        headers={"Cache-Control": "no-store", "X-Content-Type-Options": "nosniff"})
+
+
 @app.get("/api/admin/web-settings")
 def api_admin_web_settings(request: Request):
     require_admin(request)
@@ -1069,6 +1347,17 @@ def create_ai_remix_job(pid: str, request: Request, body: RemixRequest):
         raise HTTPException(422, str(exc)) from exc
 
 
+@app.get('/api/projects/{pid}/ai-jobs')
+def list_ai_planning_jobs(pid: str, request: Request, limit: int = 20,
+                          offset: int = 0, status: str | None = None):
+    _project_for_actor(request, pid)
+    try:
+        return ai_jobs.list(pid, str(_actor(request)['id']), limit=limit,
+                            offset=offset, status=status)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
 @app.get('/api/projects/{pid}/ai-jobs/{job_id}')
 def get_ai_job(pid: str, job_id: str, request: Request):
     _project_for_actor(request, pid)
@@ -1125,7 +1414,45 @@ def ai_remix_generate(pid: str, request: Request, body: RemixRequest):
     return _generate_ai_preview(plan, project)
 
 
-def _append_ai_generated_track(project: Project, audio: bytes, meta: dict, *, mode: str, input_source: str) -> Project:
+def _publish_durable_generated_audio(job_id, pid, audio, metadata):
+    """Serialize *all* generated tracks targeting one project across processes.
+
+    Per-job outbox locks are insufficient: two independent jobs can otherwise
+    read the same project snapshot and overwrite one another's new track.
+    """
+    import hashlib
+    from .ai_project_lock import project_publication_lock
+    with project_publication_lock(pid):
+        # Load only after acquiring the project lock to avoid stale snapshots.
+        project = load_project(pid)
+        filename = 'ai-' + job_id + '.wav'
+        already = next((track for track in project.tracks if track.filename == filename), None)
+        target = audio_path(pid, filename)
+        expected_hash = hashlib.sha256(audio).hexdigest()
+        if already:
+            if not target.is_file() or hashlib.sha256(target.read_bytes()).hexdigest() != expected_hash:
+                raise RuntimeError('Existing AI publication differs from staged audio')
+            return project
+        if target.exists() and hashlib.sha256(target.read_bytes()).hexdigest() != expected_hash:
+            raise RuntimeError('Existing AI output conflicts with staged audio')
+        return _append_ai_generated_track(project, audio, metadata['wav'],
+            mode=metadata['mode'], input_source=metadata['input_source'], job_id=job_id,
+            allow_matching_existing=True)
+
+
+def _recover_audio_publications():
+    from . import ai_publish_outbox
+    published = ai_publish_outbox.recover(_publish_durable_generated_audio)
+    from . import ai_finalization
+    for receipt in ai_publish_outbox.published_jobs():
+        try:
+            ai_finalization.reconcile(receipt)
+        except Exception:
+            logging.getLogger(__name__).exception('AI finalization recovery remains pending for job %s', receipt)
+    return published
+
+
+def _append_ai_generated_track(project: Project, audio: bytes, meta: dict, *, mode: str, input_source: str, job_id: str | None = None, allow_matching_existing: bool = False) -> Project:
     """Append a generated result, preserving every existing track and source file.
 
     Only successful, validated worker output is published.  A new independent
@@ -1134,14 +1461,38 @@ def _append_ai_generated_track(project: Project, audio: bytes, meta: dict, *, mo
     from io import BytesIO
     import wave as _wave
     with _wave.open(BytesIO(audio), 'rb') as handle:
-        if (handle.getnframes() != meta['frames'] or
-                handle.getframerate() != meta['sample_rate'] or
-                handle.getnchannels() != meta['channels']):
+        frames = handle.getnframes()
+        sample_rate = handle.getframerate()
+        channels = handle.getnchannels()
+        sample_width = handle.getsampwidth()
+        if (frames <= 0 or sample_rate <= 0 or channels <= 0 or
+                sample_width not in (1, 2, 3, 4) or
+                frames != meta['frames'] or sample_rate != meta['sample_rate'] or
+                channels != meta['channels']):
             raise ValueError('AI output WAV metadata mismatch')
-    filename = 'ai-' + uuid.uuid4().hex + '.wav'
+        # wave.open checks the header, not whether a truncated data chunk
+        # actually contains the samples advertised by that header. Never
+        # persist a generated track with a partial PCM payload.
+        pcm = handle.readframes(frames)
+        if len(pcm) != frames * channels * sample_width:
+            raise ValueError('AI output WAV is truncated')
+    filename = 'ai-' + (job_id if job_id is not None else uuid.uuid4().hex) + '.wav'
     target = audio_path(project.id, filename)
+    # A completed publication cannot be repeated by a replay or stale callback.
+    existing_file = target.exists()
+    if target.is_symlink():
+        raise RuntimeError('Unsafe existing AI output')
+    if job_id is not None and (any(t.filename == filename for t in project.tracks) or
+        (existing_file and not allow_matching_existing)):
+        raise RuntimeError('AI result has already been published for this job')
+    if existing_file and (not allow_matching_existing or hashlib.sha256(target.read_bytes()).digest() != hashlib.sha256(audio).digest()):
+        raise RuntimeError('AI generated WAV conflicts with staged bytes')
+    if target.is_symlink() or (existing_file and not target.is_file()):
+        raise RuntimeError('Unsafe existing AI output')
     target.parent.mkdir(parents=True, exist_ok=True)
-    temp = target.with_suffix('.pending')
+    # Every attempt owns a distinct staging pathname; an interrupted older
+    # attempt must never be overwritten or removed by this one.
+    temp = target.parent / ('.' + filename + '.' + uuid.uuid4().hex + '.pending')
     duration = round(meta['frames'] * 1000 / meta['sample_rate'])
     name = ('AI Remix' if mode == 'remix' else 'AI Arrangement') + (' · Master' if input_source == 'master' else ' · Track')
     track = Track(id=uuid.uuid4().hex[:12], name=name, filename=filename,
@@ -1149,20 +1500,258 @@ def _append_ai_generated_track(project: Project, audio: bytes, meta: dict, *, mo
                   channels=meta['channels'],
                   clips=[Clip(id=uuid.uuid4().hex[:12], source_start_ms=0,
                               source_end_ms=duration, timeline_start_ms=0)])
+    old_tracks = list(project.tracks)
+    old_library = list(project.clip_library)
+    published_identity = None
     try:
-        with temp.open('xb') as handle:
-            handle.write(audio)
-            handle.flush()
-            os.fsync(handle.fileno())
-        os.replace(temp, target)
+        if not existing_file:
+            with temp.open('xb') as handle:
+                handle.write(audio)
+                handle.flush()
+                os.fsync(handle.fileno())
+            if target.exists() or target.is_symlink():
+                raise RuntimeError('AI output appeared before publication')
+            os.replace(temp, target)
+            published_identity = (target.stat().st_dev, target.stat().st_ino)
+            from .storage import _fsync_directory
+            _fsync_directory(target.parent)
         project.tracks.append(track)
         _register_track_source_in_library(project, track, 'AI generated audio; original tracks preserved')
         save_project(project)
         return project
     except Exception:
-        temp.unlink(missing_ok=True)
-        target.unlink(missing_ok=True)
+        # save_project can raise *after* its atomic JSON replacement. A replay
+        # must preserve media already referenced by that durable project.
+        committed = False
+        if published_identity is not None:
+            try:
+                persisted = load_project(project.id)
+                committed = any(t.filename == filename for t in persisted.tracks)
+            except FileNotFoundError:
+                committed = False
+            except (OSError, ValueError):
+                # Unknown persistence state: preserve media for reconciliation.
+                committed = True
+        if not committed:
+            project.tracks = old_tracks
+            project.clip_library = old_library
+            if published_identity is not None:
+                try:
+                    identity = (target.stat(follow_symlinks=False).st_dev,
+                                target.stat(follow_symlinks=False).st_ino)
+                    if identity == published_identity and not target.is_symlink():
+                        target.unlink()
+                except FileNotFoundError:
+                    pass
         raise
+    finally:
+        temp.unlink(missing_ok=True)
+
+
+@app.get('/api/admin/ai-execution/jobs')
+def admin_ai_execution_jobs(request: Request):
+    require_admin(request)
+    return {'jobs': ai_arranger_runtime.list_jobs(), 'max_concurrent_jobs': ai_arranger_runtime._limit(), 'scope': 'shared-ai-admission'}
+
+
+@app.get('/api/admin/ai-execution/settings')
+def admin_ai_execution_settings(request: Request):
+    require_admin(request)
+    return {'max_concurrent_jobs': ai_arranger_runtime._limit(), 'scope': 'shared-ai-admission'}
+
+
+@app.put('/api/admin/ai-execution/settings')
+def admin_ai_execution_settings_update(request: Request, body: dict):
+    require_admin(request)
+    try:
+        value = ai_arranger_runtime.configure(body['max_concurrent_jobs'])
+    except (ValueError, KeyError, TypeError) as exc:
+        raise HTTPException(422, 'max_concurrent_jobs must be an integer from 1 to 32') from exc
+    return {'max_concurrent_jobs': value, 'note': 'Setting stored in the AI queue SQLite database'}
+
+
+@app.post('/api/admin/ai-execution/jobs/{job_id}/cancel')
+def admin_ai_execution_cancel(job_id: str, request: Request):
+    require_admin(request)
+    try:
+        job = ai_arranger_runtime.cancel(job_id)
+    except ValueError as exc:
+        raise HTTPException(409, str(exc)) from exc
+    if job is None:
+        raise HTTPException(404, 'AI job not found')
+    return job
+
+
+@app.post('/api/admin/ai-execution/jobs/{job_id}/move')
+def admin_ai_execution_move(job_id: str, request: Request, body: dict):
+    require_admin(request)
+    try:
+        return ai_arranger_runtime.move(job_id, body['position'])
+    except (ValueError, KeyError, TypeError) as exc:
+        raise HTTPException(422, str(exc)) from exc
+
+
+def _durable_generation_executor(pid, payload, job_id):
+    """Rebuild a queued Arranger/Remix request without capturing HTTP state."""
+    if not isinstance(payload, dict) or payload.get('schema_version') != 1:
+        raise ValueError('Unsupported persisted generation payload')
+    operation = payload.get('adapter')
+    if operation == 'arranger':
+        body = RearrangeRequest.model_validate(payload['request'])
+    elif operation == 'remix':
+        body = RemixRequest.model_validate(payload['request'])
+    else:
+        raise ValueError('Unsupported persistent AI adapter')
+
+    def generate(progress_file, cancel_event):
+        project = load_project(pid)
+        plan = arranger_plan(project, body) if operation == 'arranger' else prepare_remix_plan(project, body)
+        from . import ai_durable_remote_executor
+        if ai_durable_remote_executor.configured_remote() is not None:
+            audio, meta = ai_durable_remote_executor.execute(
+                job_id, plan, project, audio_path, cancel_event=cancel_event)
+        else:
+            audio, meta = run_worker_with_project_audio(plan, project, audio_path,
+                progress_file=progress_file, cancel_event=cancel_event)
+        if cancel_event.is_set():
+            raise RuntimeError('Cancelled before publishing generated track')
+        # Persist trusted direct-child CPU evidence *before* the publication
+        # side effect. If accounting is enabled but complete evidence is not
+        # available, the terminal gate remains fail-closed.
+        usage = meta.pop('_trusted_worker_usage', None)
+        source = meta.pop('_trusted_worker_source', None)
+        if usage is not None:
+            from . import ai_metering_bridge
+            if source not in ('worker', 'cgroup'):
+                raise ValueError('Trusted worker usage has no verified source')
+            ai_metering_bridge.capture(job_id, usage, source)
+        # Stable filename provides a publish-once guard for idempotent submissions.
+        from . import ai_publish_outbox
+        ai_publish_outbox.stage(job_id, pid, audio, {
+            'wav': meta, 'mode': operation, 'input_source': plan['input_source']})
+        ai_publish_outbox.recover(_publish_durable_generated_audio, job_id=job_id)
+    return generate
+
+
+ai_arranger_runtime.register_restorer('arranger', _durable_generation_executor)
+ai_arranger_runtime.register_restorer('remix', _durable_generation_executor)
+
+
+@app.on_event('startup')
+def _restore_persisted_ai_queue():
+    try:
+        # Finish already-generated audio before admitting another inference.
+        publications = _recover_audio_publications()
+        LOGGER.info('Recovered %d pending AI audio publications', publications)
+        # Resume only settlements explicitly bound to existing billing jobs.
+        # Failed delivery must not prevent inference recovery.
+        try:
+            from . import ai_billing_outbox
+            settled = ai_billing_outbox.deliver()
+            LOGGER.info('Recovered %d pending AI billing settlements', settled)
+        except Exception:
+            LOGGER.exception('AI billing settlement delivery remains pending')
+        # Reconcile admissions abandoned between scheduler and ledger commits.
+        from . import ai_billing
+        import json as _json
+        with ai_arranger_runtime._db() as con:
+            admission_rows = con.execute("SELECT job_id,operation,payload_json FROM jobs WHERE state IN ('queued','blocked') AND operation IN ('arranger','remix') AND payload_json IS NOT NULL").fetchall()
+        for admission in admission_rows:
+            try:
+                saved = _json.loads(admission['payload_json'])
+                uid = saved.get('actor_user_id')
+                if type(uid) is int and uid > 0:
+                    ai_billing.provision_inference_job(admission['job_id'], uid, admission['operation'])
+                with ai_arranger_runtime._db() as con:
+                    con.execute("UPDATE jobs SET state='queued',phase='queued',message='Admission reconciled' WHERE job_id=? AND state='blocked' AND message='Ledger admission needs reconciliation'", (admission['job_id'],))
+            except Exception:
+                LOGGER.exception('Deferred ledger admission for %s', admission['job_id'])
+                with ai_arranger_runtime._db() as con:
+                    con.execute("UPDATE jobs SET state='blocked',phase='blocked',message='Ledger admission needs reconciliation' WHERE job_id=? AND state IN ('queued','blocked')", (admission['job_id'],))
+        count = ai_arranger_runtime.recover_queued()
+        LOGGER.info('Recovered %d queued AI jobs from persistent storage', count)
+    except (OSError, ValueError):
+        LOGGER.exception('Could not restore queued AI jobs')
+
+
+@app.get('/api/projects/{pid}/ai-arranger/active-generation')
+def ai_arranger_active_generation(pid: str, request: Request):
+    _project_for_actor(request, pid)
+    return ai_arranger_runtime.inspect(pid)
+
+
+@app.post('/api/projects/{pid}/ai-arranger/start-generation', status_code=202)
+def ai_arranger_start_generation(pid: str, request: Request, body: RearrangeRequest):
+    _project_for_actor(request, pid)
+    if configured_worker() is None:
+        raise HTTPException(503, 'No trusted AI inference executable is configured')
+    # Persist the caller's reproducible request separately from the execution closure.
+    # Idempotency keys are namespaced per project and operation.
+    import hashlib
+    replay_header = request.headers.get('Idempotency-Key')
+    if replay_header is not None and not (1 <= len(replay_header) <= 128 and replay_header.isascii()):
+        raise HTTPException(422, 'Invalid Idempotency-Key header')
+    replay_key = hashlib.sha256(f'{pid}:arranger:{replay_header}'.encode()).hexdigest() if replay_header else None
+    payload = {'request': body.model_dump(mode='json'), 'adapter': 'arranger', 'schema_version': 1, 'actor_user_id': int(_actor(request)['id'])}
+    job_id = uuid.uuid4().hex
+    executor = _durable_generation_executor(pid, payload, job_id)
+    try:
+        accepted, job = ai_arranger_runtime.start(pid, 'arranger', executor, job_id=job_id,
+            cancellable=True, payload=payload, idempotency_key=replay_key, defer_spawn=True)
+    except ValueError as exc:
+        # Reusing a key for different parameters is a client conflict, not an
+        # unhandled internal error. The original durable job is unchanged.
+        raise HTTPException(409, str(exc)) from exc
+    if accepted:
+        try:
+            from . import ai_billing
+            uid = payload['actor_user_id']
+            if uid > 0:
+                ai_billing.provision_inference_job(job_id, uid, 'arranger')
+        except Exception:
+            LOGGER.exception('Ledger admission pending for AI job %s', job_id)
+            with ai_arranger_runtime._db() as con:
+                con.execute("UPDATE jobs SET state='blocked',phase='blocked',message='Ledger admission needs reconciliation' WHERE job_id=? AND state='queued'", (job_id,))
+            return ai_arranger_runtime.get(job_id)
+        ai_arranger_runtime.activate(job_id, executor)
+        job = ai_arranger_runtime.get(job_id)
+    # A matching idempotency key returns the original job, without a new run.
+    return job
+
+
+@app.post('/api/projects/{pid}/remix/start-generation', status_code=202)
+def ai_remix_start_generation(pid: str, request: Request, body: RemixRequest):
+    _project_for_actor(request, pid)
+    if configured_worker() is None:
+        raise HTTPException(503, 'No trusted AI inference executable is configured')
+    import hashlib
+    replay_header = request.headers.get('Idempotency-Key')
+    if replay_header is not None and not (1 <= len(replay_header) <= 128 and replay_header.isascii()):
+        raise HTTPException(422, 'Invalid Idempotency-Key header')
+    replay_key = hashlib.sha256(f'{pid}:remix:{replay_header}'.encode()).hexdigest() if replay_header else None
+    payload = {'request': body.model_dump(mode='json'), 'adapter': 'remix', 'schema_version': 1, 'actor_user_id': int(_actor(request)['id'])}
+    job_id = uuid.uuid4().hex
+    executor = _durable_generation_executor(pid, payload, job_id)
+    try:
+        accepted, job = ai_arranger_runtime.start(pid, 'remix', executor, job_id=job_id,
+            cancellable=True, payload=payload, idempotency_key=replay_key, defer_spawn=True)
+    except ValueError as exc:
+        raise HTTPException(409, str(exc)) from exc
+    if accepted:
+        try:
+            from . import ai_billing
+            uid = payload['actor_user_id']
+            if uid > 0:
+                ai_billing.provision_inference_job(job_id, uid, 'remix')
+        except Exception:
+            LOGGER.exception('Ledger admission pending for AI job %s', job_id)
+            with ai_arranger_runtime._db() as con:
+                con.execute("UPDATE jobs SET state='blocked',phase='blocked',message='Ledger admission needs reconciliation' WHERE job_id=? AND state='queued'", (job_id,))
+            return ai_arranger_runtime.get(job_id)
+        ai_arranger_runtime.activate(job_id, executor)
+        job = ai_arranger_runtime.get(job_id)
+    # A matching idempotency key returns the original job, without a new run.
+    return job
 
 
 @app.post('/api/projects/{pid}/ai-arranger/generate-and-add')
@@ -1199,10 +1788,16 @@ def projects(request: Request):
     # Legacy pre-multi-user projects are claimed once by the first persistent
     # administrator that opens the workspace after upgrade.
     if actor["id"] > 0 and actor["role"] == "admin":
+        from .ai_project_lock import project_publication_lock
         for legacy in list_projects():
             if legacy.owner_user_id is None:
-                legacy.owner_user_id = actor["id"]
-                save_project(legacy)
+                with project_publication_lock(legacy.id):
+                    # A different writer may have claimed the project while we
+                    # waited for the cross-process lock; never steal ownership.
+                    current = load_project(legacy.id)
+                    if current.owner_user_id is None:
+                        current.owner_user_id = actor["id"]
+                        save_project(current)
     # Even administrators get their own workspace here; cross-user administration
     # is exposed explicitly through the dump/admin APIs.
     return list_projects(actor["id"] if actor["id"] > 0 else None, include_shared=True, is_admin=False)
@@ -1332,7 +1927,32 @@ def _register_track_source_in_library(project: Project, track: Track, provenance
     return asset
 
 
+def _serialized_project_mutation(handler):
+    """Serialize read/modify/write routes with AI publication and track import.
+
+    Attach below the FastAPI route decorator to preserve endpoint introspection.
+    Acquire before project loading, never inside another project lock.
+    """
+    from functools import wraps
+    import inspect
+
+    if inspect.iscoroutinefunction(handler):
+        @wraps(handler)
+        async def guarded(pid, *args, **kwargs):
+            from .ai_project_lock import project_publication_lock
+            with project_publication_lock(pid):
+                return await handler(pid, *args, **kwargs)
+    else:
+        @wraps(handler)
+        def guarded(pid, *args, **kwargs):
+            from .ai_project_lock import project_publication_lock
+            with project_publication_lock(pid):
+                return handler(pid, *args, **kwargs)
+    return guarded
+
+
 @app.post("/api/projects/{pid}/migrate-flac")
+@_serialized_project_mutation
 def project_migrate_flac(pid: str, request: Request):
     project = _project_for_actor(request, pid)
     if project.audio_storage_mode == "flac":
@@ -1345,6 +1965,7 @@ def project_migrate_flac(pid: str, request: Request):
 
 
 @app.get("/api/projects/{pid}")
+@_serialized_project_mutation
 def project_get(pid: str, request: Request):
     project = _project_for_actor(request, pid)
     # Opening a project is also a safe maintenance boundary: project.json is
@@ -1367,6 +1988,7 @@ def project_get(pid: str, request: Request):
 
 
 @app.put("/api/projects/{pid}")
+@_serialized_project_mutation
 def project_put(pid: str, project: Project, request: Request):
     current = _project_for_actor(request, pid)
     if pid != project.id:
@@ -1393,6 +2015,7 @@ def project_put(pid: str, project: Project, request: Request):
 
 
 @app.delete("/api/projects/{pid}")
+@_serialized_project_mutation
 def project_delete(pid: str, request: Request):
     _project_for_actor(request, pid, owner_only=True)
     try:
@@ -1417,6 +2040,7 @@ def project_shares(pid: str, request: Request):
 
 
 @app.post("/api/projects/{pid}/shares")
+@_serialized_project_mutation
 def project_share_add(pid: str, request: Request, body: dict):
     project = _project_for_actor(request, pid, owner_only=True)
     actor = _actor(request)
@@ -1434,6 +2058,7 @@ def project_share_add(pid: str, request: Request, body: dict):
 
 
 @app.delete("/api/projects/{pid}/shares/{user_id}")
+@_serialized_project_mutation
 def project_share_remove(pid: str, user_id: int, request: Request):
     project = _project_for_actor(request, pid, owner_only=True)
     project.shared_with_user_ids = [x for x in project.shared_with_user_ids if x != user_id]
@@ -1582,6 +2207,7 @@ def sample_editor_audio(pid: str, track_id: str, request: Request):
 
 
 @app.post("/api/projects/{pid}/tracks/{track_id}/sample-editor/edit")
+@_serialized_project_mutation
 def sample_editor_edit(pid: str, track_id: str, req: SampleEditRequest, request: Request):
     project = _project_for_actor(request, pid)
     track = next((x for x in project.tracks if x.id == track_id), None)
@@ -1612,6 +2238,7 @@ def sample_editor_effect_preview(pid: str, track_id: str, req: SampleEffectReque
 
 
 @app.post("/api/projects/{pid}/tracks/{track_id}/sample-editor/effect-apply")
+@_serialized_project_mutation
 def sample_editor_effect_apply(pid: str, track_id: str, req: SampleEffectRequest, request: Request):
     project = _project_for_actor(request, pid)
     track = next((x for x in project.tracks if x.id == track_id), None)
@@ -1627,18 +2254,41 @@ def sample_editor_effect_apply(pid: str, track_id: str, req: SampleEffectRequest
     return {"ok": True, "project": project, "track": track}
 
 def _copy_limited(src, dst: Path):
+    """Copy within the upload limit without ever deleting an existing destination.
+
+    An exclusive-create failure must not unlink the existing file. For a new
+    file, flush both contents and directory entry before returning success.
+    """
     total = 0
-    with dst.open("wb") as out:
-        while True:
-            chunk = src.read(1024 * 1024)
-            if not chunk:
-                break
-            total += len(chunk)
-            if total > MAX_UPLOAD_BYTES:
-                out.close()
-                dst.unlink(missing_ok=True)
-                raise HTTPException(413, "upload exceeds configured limit")
-            out.write(chunk)
+    owned_identity = None
+    try:
+        with dst.open("xb") as out:
+            st = os.fstat(out.fileno())
+            owned_identity = (st.st_dev, st.st_ino)
+            while True:
+                chunk = src.read(1024 * 1024)
+                if not chunk:
+                    break
+                total += len(chunk)
+                if total > MAX_UPLOAD_BYTES:
+                    raise HTTPException(413, "upload exceeds configured limit")
+                out.write(chunk)
+            out.flush()
+            os.fsync(out.fileno())
+        folder_fd = os.open(str(dst.parent), os.O_RDONLY)
+        try:
+            os.fsync(folder_fd)
+        finally:
+            os.close(folder_fd)
+    except BaseException:
+        if owned_identity is not None:
+            try:
+                st = dst.lstat()
+                if stat.S_ISREG(st.st_mode) and (st.st_dev, st.st_ino) == owned_identity:
+                    dst.unlink()
+            except FileNotFoundError:
+                pass
+        raise
 
 
 def _audio_sample_rate(path: Path) -> int:
@@ -1663,48 +2313,127 @@ def _normalize_audio_to_project_rate(pid: str, filename: str, project_rate: int,
     converted_name = f"{Path(filename).stem}-sr{target_rate}.wav"
     converted = audio_path(pid, converted_name)
     tmp = converted.with_name(f".{converted.name}.{uuid.uuid4().hex}.tmp.wav")
-    proc = subprocess.run([
-        "ffmpeg", "-y", "-v", "error", "-i", str(source), "-map", "0:a:0",
-        "-ar", str(target_rate), "-c:a", "pcm_s24le", str(tmp),
-    ], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    try:
+        proc = subprocess.run([
+            "ffmpeg", "-y", "-v", "error", "-i", str(source), "-map", "0:a:0",
+            "-ar", str(target_rate), "-c:a", "pcm_s24le", str(tmp),
+        ], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    except BaseException:
+        tmp.unlink(missing_ok=True)
+        raise
     if proc.returncode or not tmp.is_file():
         tmp.unlink(missing_ok=True)
         raise ValueError(proc.stderr.strip() or "conversione sample rate fallita")
-    os.replace(tmp, converted)
+    # Never replace another import's completed destination, even if a
+    # filename collision or a stale conversion path exists.
+    try:
+        os.link(tmp, converted)
+    except BaseException:
+        tmp.unlink(missing_ok=True)
+        raise
+    tmp.unlink(missing_ok=True)
     source.unlink(missing_ok=True)
     return converted_name, converted, source_rate
 
 
 def _save_upload(pid: str, file: UploadFile, project_rate: int | None = None):
+    """Stage upload safely; roll back media and new originals on failed processing.
+
+    Callers continue to own the final project-commit rollback.  This helper
+    guarantees cleanup for errors occurring *before* it returns a media path.
+    """
     ext = Path(file.filename or "track.wav").suffix.lower() or ".bin"
     if len(ext) > 12 or not ext.replace(".", "").isalnum():
         raise HTTPException(400, "invalid file extension")
     filename = f"{uuid.uuid4().hex[:10]}{ext}"
     dst = audio_path(pid, filename)
-    _copy_limited(file.file, dst)
+    # Capture the identities of pre-existing destinations.  A failed
+    # exclusive conversion must never turn into an unlink of another upload.
+    owned_original = None
+    target_rate = int(project_rate) if project_rate is not None and int(project_rate) in {44100, 48000, 96000} else None
+    owned_audio = {}
     try:
-        ffprobe(dst)
-    except Exception as exc:
-        dst.unlink(missing_ok=True)
-        raise HTTPException(400, "invalid or unsupported audio file") from exc
-    duplicate = find_duplicate_project_file(pid, dst)
-    if duplicate:
-        dst.unlink(missing_ok=True)
-        raise HTTPException(
-            409,
-            f"Il file è già presente nel progetto come {duplicate['category']}/{duplicate['name']}.",
-        )
-    preserve_original(pid, dst, Path(file.filename or filename).name)
-    if project_rate is None:
-        project_rate = int(load_project(pid).sample_rate)
-    try:
-        filename, dst, _ = _normalize_audio_to_project_rate(pid, filename, project_rate)
-    except ValueError as exc:
-        dst.unlink(missing_ok=True)
-        raise HTTPException(400, str(exc)) from exc
-    return filename, dst, media_duration_ms(dst)
+        _copy_limited(file.file, dst)
+        owned_audio[filename] = (dst.stat().st_dev, dst.stat().st_ino)
+        from .ai_media_identity import record_upload
+        record_upload(pid, dst)
+        try:
+            ffprobe(dst)
+        except Exception as exc:
+            raise HTTPException(400, "invalid or unsupported audio file") from exc
+        duplicate = find_duplicate_project_file(pid, dst)
+        if duplicate:
+            raise HTTPException(409, f"Il file è già presente nel progetto come {duplicate['category']}/{duplicate['name']}.")
+        original_before = {(p.stat().st_dev, p.stat().st_ino) for p in originals_dir(pid).iterdir()
+                           if p.is_file() and not p.is_symlink()}
+        copied_original = preserve_original(pid, dst, Path(file.filename or filename).name)
+        if isinstance(copied_original, Path) and copied_original.is_file() and not copied_original.is_symlink():
+            st = copied_original.stat()
+            if (st.st_dev, st.st_ino) not in original_before:
+                owned_original = (copied_original, st.st_dev, st.st_ino)
+                record_upload(pid, copied_original)
+        if project_rate is None:
+            project_rate = int(load_project(pid).sample_rate)
+        target_rate = int(project_rate) if int(project_rate) in {44100, 48000, 96000} else 44100
+        converted_name = f"{Path(filename).stem}-sr{target_rate}.wav"
+        converted_path = audio_path(pid, converted_name)
+        # Do not claim a collision destination: _normalize_audio_to_project_rate
+        # uses an exclusive hard link and raises if it already exists.
+        converted_before = ((converted_path.stat().st_dev, converted_path.stat().st_ino)
+                            if converted_path.exists() else None)
+        try:
+            filename, dst, _ = _normalize_audio_to_project_rate(pid, filename, project_rate)
+        except ValueError as exc:
+            raise HTTPException(400, str(exc)) from exc
+        if filename == converted_name and converted_before is None:
+            owned_audio[filename] = (dst.stat().st_dev, dst.stat().st_ino)
+            record_upload(pid, dst)
+        duration = media_duration_ms(dst)
+        return filename, dst, duration
+    except BaseException:
+        for name, identity in owned_audio.items():
+            path = audio_path(pid, name)
+            try:
+                st = path.lstat()
+                if not stat.S_ISLNK(st.st_mode) and (st.st_dev, st.st_ino) == identity:
+                    path.unlink()
+            except FileNotFoundError:
+                pass
+        # Only delete the exact original created by this operation.  Never
+        # sweep names observed since the initial snapshot: another writer may
+        # have produced them in the meantime.
+        if owned_original is not None:
+            item, device, inode = owned_original
+            try:
+                st = item.lstat()
+                if stat.S_ISREG(st.st_mode) and (st.st_dev, st.st_ino) == (device, inode):
+                    item.unlink()
+            except FileNotFoundError:
+                pass
+        raise
 
 
+
+def _rollback_unpublished_upload(pid, path, identity):
+    """Delete only our inode, and only when persisted state proves it unreferenced.
+
+    A save may raise after atomic replace (e.g. directory fsync failure). Never
+    infer rollback safety from the exception alone. Caller holds project lock.
+    """
+    try:
+        persisted = load_project(pid)
+        referenced = {t.filename for t in persisted.tracks} | {c.filename for c in persisted.clip_library}
+    except Exception:
+        # An unreadable authoritative project is not permission to delete media.
+        return
+    if path.name in referenced:
+        return
+    try:
+        st = path.lstat()
+        if stat.S_ISREG(st.st_mode) and (st.st_dev, st.st_ino) == identity:
+            path.unlink()
+    except FileNotFoundError:
+        pass
 
 
 def _waveform_revision(path: Path) -> str:
@@ -1757,13 +2486,18 @@ def _waveform_worker(job_id: str, pid: str, track_id: str) -> None:
                 peaks = waveform_peaks(rendered, 4096, progress)
         else:
             peaks = waveform_peaks(source, 4096, progress)
-        latest = load_project(pid)
-        latest_track = next((item for item in latest.tracks if item.id == track_id), None)
-        if latest_track is None:
-            raise ValueError("track removed while waveform was updating")
-        latest_track.waveform_peaks = peaks
-        latest_track.waveform_revision = _track_waveform_revision(latest_track, source)
-        save_project(latest)
+        from .ai_project_lock import project_publication_lock
+        source_revision = _track_waveform_revision(track, source)
+        with project_publication_lock(pid):
+            latest = load_project(pid)
+            latest_track = next((item for item in latest.tracks if item.id == track_id), None)
+            if latest_track is None:
+                raise ValueError("track removed while waveform was updating")
+            if _track_waveform_revision(latest_track, source) != source_revision:
+                raise ValueError("Track changed while waveform was updating; retry")
+            latest_track.waveform_peaks = peaks
+            latest_track.waveform_revision = source_revision
+            save_project(latest)
         _media_job_update(
             job_id,
             status="completed",
@@ -1842,21 +2576,26 @@ def _track_import_worker(
     provenance: str = "Import audio",
 ) -> None:
     dst = audio_path(pid, filename)
+    committed = False
+    upload_identity = None
     try:
         _media_job_update(job_id, status="running", progress=58, message="Validazione della traccia")
+        st = dst.lstat()
+        upload_identity = (st.st_dev, st.st_ino)
         ffprobe(dst)
         project = load_project(pid)
         filename, dst, _ = _normalize_audio_to_project_rate(pid, filename, project.sample_rate)
+        st = dst.lstat()
+        upload_identity = (st.st_dev, st.st_ino)
         duration = media_duration_ms(dst)
         channels, channel_layout = _audio_channel_info(dst)
+        estimated_tempo = None
         if estimate_first_bpm and not project.tracks:
             def bpm_progress(value: int, message: str) -> None:
                 _media_job_update(job_id, progress=60 + int(max(0, min(100, value)) * 0.28), message=message)
             try:
-                project.bpm, project.time_signature = estimate_bpm_and_signature(dst, bpm_progress)
-                project.bpm = float(round(project.bpm))
-                project.base_bpm = project.bpm
-                save_project(project)
+                bpm, signature = estimate_bpm_and_signature(dst, bpm_progress)
+                estimated_tempo = (float(round(bpm)), signature)
             except Exception:
                 _media_job_update(job_id, progress=87, message="Stima BPM non conclusiva; mantengo il BPM corrente")
         _media_job_update(job_id, progress=88, message="Generazione waveform")
@@ -1887,12 +2626,30 @@ def _track_import_worker(
         )
         track.waveform_revision = _track_waveform_revision(track, dst) if peaks else ""
         _media_job_update(job_id, progress=91, message="Aggiunta della traccia al progetto")
-        if sync_mode == "auto" and project.tracks:
-            ref = next((item for item in project.tracks if item.id == reference_track_id), project.tracks[0])
-            shift_track(track, auto_align_ms(audio_path(pid, ref.filename), dst))
-        project.tracks.append(track)
-        _register_track_source_in_library(project, track, provenance)
-        save_project(project)
+        # All expensive decoding / waveform / BPM work finishes before this lock.
+        # Load the current project *inside* the lock to avoid lost updates from
+        # concurrent editor requests, imports and AI publishers.
+        from .ai_project_lock import project_publication_lock
+        with project_publication_lock(pid):
+            latest = load_project(pid)
+            from .ai_media_identity import record
+            from .ai_async_track_transaction import _receipt
+            record(_receipt(pid, job_id), dst)
+            if int(latest.sample_rate) != int(project.sample_rate):
+                raise ValueError("Project sample rate changed during import; retry")
+            if any(item.filename == filename for item in latest.tracks):
+                raise ValueError("Track has already been imported")
+            if estimated_tempo is not None and not latest.tracks:
+                latest.bpm, latest.time_signature = estimated_tempo
+                latest.base_bpm = latest.bpm
+            if sync_mode == "auto" and latest.tracks:
+                ref = next((item for item in latest.tracks if item.id == reference_track_id), latest.tracks[0])
+                shift_track(track, auto_align_ms(audio_path(pid, ref.filename), dst))
+            latest.tracks.append(track)
+            _register_track_source_in_library(latest, track, provenance)
+            save_project(latest)
+            committed = True
+            project = latest
         _media_job_update(
             job_id,
             status="completed",
@@ -1901,8 +2658,20 @@ def _track_import_worker(
             result={"project_id": pid, "track_id": track.id, "bpm": project.bpm},
         )
     except Exception as exc:
-        dst.unlink(missing_ok=True)
+        if not committed:
+            if upload_identity is not None:
+                from .ai_project_lock import project_publication_lock
+                with project_publication_lock(pid):
+                    _rollback_unpublished_upload(pid, dst, upload_identity)
         _media_job_update(job_id, status="failed", progress=0, message="Import fallito", error=str(exc)[-1200:])
+    finally:
+        try:
+            from .ai_async_track_transaction import reconcile as finish_async_track
+            from .ai_project_lock import project_publication_lock
+            with project_publication_lock(pid):
+                finish_async_track(pid, job_id)
+        except Exception:
+            LOGGER.exception('Async track receipt could not be finalized for %s', job_id)
 
 
 @app.post("/api/projects/{pid}/track-import-jobs")
@@ -1916,24 +2685,47 @@ async def start_track_import_job(
     sync_mode: str = "manual",
     reference_track_id: str = "",
 ):
+    if sync_mode not in {"manual", "auto"}:
+        raise HTTPException(400, "invalid sync mode")
     project = _project_for_actor(request, pid)
     _ensure_workspace_capacity(project.owner_user_id, int(request.headers.get("content-length") or 0))
     ext = Path(file.filename or "track.wav").suffix.lower() or ".bin"
     if len(ext) > 12 or not ext.replace(".", "").isalnum():
         raise HTTPException(400, "invalid file extension")
     filename = f"{uuid.uuid4().hex[:10]}{ext}"
+    job_id = uuid.uuid4().hex[:16]
+    from .ai_async_track_transaction import begin as begin_async_track, reconcile as finish_async_track
+    from .ai_project_lock import project_publication_lock
+    with project_publication_lock(pid):
+        begin_async_track(pid, job_id, filename)
     dst = audio_path(pid, filename)
-    _copy_limited(file.file, dst)
-    duplicate = find_duplicate_project_file(pid, dst)
+    try:
+        _copy_limited(file.file, dst)
+        from .ai_media_identity import record
+        from .ai_async_track_transaction import _receipt
+        with project_publication_lock(pid):
+            record(_receipt(pid, job_id), dst)
+        duplicate = find_duplicate_project_file(pid, dst)
+    except Exception:
+        with project_publication_lock(pid):
+            finish_async_track(pid, job_id)
+        raise
     if duplicate:
-        dst.unlink(missing_ok=True)
+        with project_publication_lock(pid):
+            finish_async_track(pid, job_id)
         raise HTTPException(
             409,
             f"Il file è già presente nel progetto come {duplicate['category']}/{duplicate['name']}.",
         )
-    preserve_original(pid, dst, Path(file.filename or filename).name)
+    try:
+        from .ai_async_track_transaction import preserve_job_original
+        with project_publication_lock(pid):
+            preserve_job_original(pid, job_id, dst, Path(file.filename or filename).name)
+    except Exception:
+        with project_publication_lock(pid):
+            finish_async_track(pid, job_id)
+        raise
     now = time.time()
-    job_id = uuid.uuid4().hex[:16]
     first_track = len(project.tracks) == 0 and ext == ".mp3"
     job = {
         "id": job_id,
@@ -1949,12 +2741,18 @@ async def start_track_import_job(
     }
     with MEDIA_JOB_LOCK:
         MEDIA_JOBS[job_id] = job
-    threading.Thread(
-        target=_track_import_worker,
-        args=(job_id, pid, filename, Path(file.filename or filename).name, name, type, offset_ms, sync_mode, reference_track_id, first_track),
-        daemon=True,
-        name=f"track-import-{job_id}",
-    ).start()
+    try:
+        threading.Thread(
+            target=_track_import_worker,
+            args=(job_id, pid, filename, Path(file.filename or filename).name, name, type, offset_ms, sync_mode, reference_track_id, first_track),
+            daemon=True,
+            name=f"track-import-{job_id}",
+        ).start()
+    except Exception as exc:
+        with project_publication_lock(pid):
+            finish_async_track(pid, job_id)
+        _media_job_update(job_id, status="failed", progress=0, message="Import fallito", error=str(exc)[-1200:])
+        raise HTTPException(503, "track import worker could not start") from exc
     return _media_job_public(job)
 
 
@@ -1993,6 +2791,7 @@ def _native_remote_infer(kind: str, source: Path, options: dict | None = None):
 def _text_music_worker(job_id: str, pid: str, track_id: str, kind: str, model_or_engine: str = "", advanced_alignment: bool = False, chord_options: dict | None = None, range_start_ms: int | None = None, range_end_ms: int | None = None) -> None:
     range_tmp = None
     try:
+        from .ai_project_lock import project_publication_lock
         project = load_project(pid)
         track = next((item for item in project.tracks if item.id == track_id), None)
         if track is None:
@@ -2042,12 +2841,17 @@ def _text_music_worker(job_id: str, pid: str, track_id: str, kind: str, model_or
                 raise InterruptedError("Lyrics extraction cancelled")
             _media_job_update(job_id, progress=96, message="Sincronizzazione lyrics sulla timeline")
             mapped = _shift_timed_events(events, int(range_start_ms)) if range_mode else map_source_events_to_timeline(track, events)
-            latest = load_project(pid)
-            latest.lyrics = _replace_timed_range(latest.lyrics, mapped, int(range_start_ms), int(range_end_ms)) if range_mode else mapped
-            latest.lyrics_engine = "OpenAI Whisper"
-            latest.lyrics_model = selected_model
-            _media_job_update(job_id, progress=98, message="Salvataggio lyrics nel progetto")
-            save_project(latest)
+            # AI inference stays outside the project lock. Refuse to overwrite
+            # annotations that changed while the expensive job was running.
+            with project_publication_lock(pid):
+                latest = load_project(pid)
+                if latest.lyrics != project.lyrics:
+                    raise RuntimeError("lyrics changed during analysis; result not published")
+                latest.lyrics = _replace_timed_range(latest.lyrics, mapped, int(range_start_ms), int(range_end_ms)) if range_mode else mapped
+                latest.lyrics_engine = "OpenAI Whisper"
+                latest.lyrics_model = selected_model
+                _media_job_update(job_id, progress=98, message="Salvataggio lyrics nel progetto")
+                save_project(latest)
             _media_job_update(
                 job_id, status="completed", progress=100, message="Lyrics estratte e sincronizzate",
                 result={"kind": "lyrics", "count": len(mapped), "engine": "OpenAI Whisper", "model": selected_model, "advanced_alignment": advanced_alignment, "range_start_ms": range_start_ms if range_mode else None, "range_end_ms": range_end_ms if range_mode else None},
@@ -2090,12 +2894,17 @@ def _text_music_worker(job_id: str, pid: str, track_id: str, kind: str, model_or
                 raise InterruptedError("Chord extraction cancelled")
             _media_job_update(job_id, progress=96, message="Sincronizzazione chords sulla timeline")
             mapped = _shift_timed_events(events, int(range_start_ms)) if range_mode else map_source_events_to_timeline(track, events)
-            latest = load_project(pid)
-            latest.chords = _replace_timed_range(latest.chords, mapped, int(range_start_ms), int(range_end_ms)) if range_mode else mapped
-            latest.chords_engine = selected_engine
-            latest.chords_model = selected_model
-            _media_job_update(job_id, progress=98, message="Salvataggio chords nel progetto")
-            save_project(latest)
+            # AI inference stays outside the project lock. Refuse to overwrite
+            # annotations that changed while the expensive job was running.
+            with project_publication_lock(pid):
+                latest = load_project(pid)
+                if latest.chords != project.chords:
+                    raise RuntimeError("chords changed during analysis; result not published")
+                latest.chords = _replace_timed_range(latest.chords, mapped, int(range_start_ms), int(range_end_ms)) if range_mode else mapped
+                latest.chords_engine = selected_engine
+                latest.chords_model = selected_model
+                _media_job_update(job_id, progress=98, message="Salvataggio chords nel progetto")
+                save_project(latest)
             _media_job_update(
                 job_id, status="completed", progress=100, message="Chords estratti e sincronizzati",
                 result={"kind": "chords", "count": len(mapped), "engine": selected_engine, "model": selected_model, "engine_display_name": engine_info["display_name"], "range_start_ms": range_start_ms if range_mode else None, "range_end_ms": range_end_ms if range_mode else None},
@@ -2109,20 +2918,22 @@ def _text_music_worker(job_id: str, pid: str, track_id: str, kind: str, model_or
             if cancel_event and cancel_event.is_set():
                 raise InterruptedError("Marker extraction cancelled")
             mapped=map_source_events_to_timeline(track,events)
-            latest=load_project(pid)
-            # Preserve existing/manual markers and only add structural markers that
-            # are not already represented nearby. This makes repeated extraction
-            # idempotent and avoids destroying user edits.
-            existing=list(latest.markers or [])
-            merged=list(existing)
-            added=0
-            for marker in mapped:
-                near=any(abs(int(item.time_ms)-int(marker.time_ms)) < 2500 for item in merged if not getattr(item,"deleted",False))
-                if near:
-                    continue
-                merged.append(marker); added += 1
-            latest.markers=sorted(merged,key=lambda item:int(item.time_ms))
-            save_project(latest)
+            with project_publication_lock(pid):
+                latest=load_project(pid)
+                # Preserve existing/manual markers and only add structural markers that
+                # are not already represented nearby. This makes repeated extraction
+                # idempotent and avoids destroying user edits.
+                existing=list(latest.markers or [])
+                merged=list(existing)
+                added=0
+                for marker in mapped:
+                    near=any(abs(int(item.time_ms)-int(marker.time_ms)) < 2500 for item in merged if not getattr(item,"deleted",False))
+                    if near:
+                        continue
+                    merged.append(marker); added += 1
+                latest.markers=sorted(merged,key=lambda item:int(item.time_ms))
+                save_project(latest)
+            # In case of concurrent edits, merge against freshly loaded markers.
             _media_job_update(job_id,status="completed",progress=100,message="Marker/sezioni estratti e sincronizzati",result={"kind":"markers","count":len(mapped),"added":added,"total":len(latest.markers),"engine":"MTA structural analysis"})
             return
         raise ValueError("unsupported analysis kind")
@@ -2168,10 +2979,16 @@ def _start_text_music_job(pid: str, track_id: str, request: Request, kind: str, 
     }
     with MEDIA_JOB_LOCK:
         MEDIA_JOBS[job_id] = job
-    threading.Thread(
-        target=_text_music_worker, args=(job_id, pid, track_id, kind, model_or_engine, advanced_alignment, chord_options, range_start_ms, range_end_ms),
-        daemon=True, name=f"mta-{kind}-{job_id}",
-    ).start()
+    payload = {
+        "schema_version": 1, "kind": kind, "project_id": pid,
+        "track_id": track_id, "model_or_engine": model_or_engine,
+        "advanced_alignment": bool(advanced_alignment),
+        "chord_options": chord_options, "range_start_ms": range_start_ms,
+        "range_end_ms": range_end_ms,
+    }
+    _enqueue_existing_ai_job(job, lambda: _text_music_worker(
+        job_id, pid, track_id, kind, model_or_engine, advanced_alignment,
+        chord_options, range_start_ms, range_end_ms), durable_payload=payload)
     return _media_job_public(job)
 
 
@@ -2212,6 +3029,7 @@ def start_marker_extraction(pid: str, track_id: str, request: Request):
 
 
 @app.post("/api/projects/{pid}/lyrics/reset")
+@_serialized_project_mutation
 def reset_project_lyrics(pid: str, request: Request):
     project = _project_for_actor(request, pid)
     project.lyrics = []
@@ -2222,6 +3040,7 @@ def reset_project_lyrics(pid: str, request: Request):
 
 
 @app.post("/api/projects/{pid}/chords/reset")
+@_serialized_project_mutation
 def reset_project_chords(pid: str, request: Request):
     project = _project_for_actor(request, pid)
     project.chords = []
@@ -2404,6 +3223,7 @@ def api_project_rights_search(pid: str, request: Request, body: dict):
 
 
 @app.put("/api/projects/{pid}/rights-records")
+@_serialized_project_mutation
 def api_project_rights_records(pid: str, request: Request, body: dict):
     project = _project_for_actor(request, pid)
     raw_records = body.get("records") or []
@@ -2581,13 +3401,43 @@ def start_youtube_import_job(pid: str, request: Request, body: dict):
     return _media_job_public(job)
 
 
+def _rehydrate_persisted_text_job(job_id: str):
+    """Read-only status recovery for durable text-analysis jobs after restart.
+
+    Never start inference or replay side effects merely by polling a status.
+    """
+    row = ai_arranger_runtime.get(job_id)
+    if not row or row.get("operation") not in ("extract-lyrics", "extract-chords", "extract-markers", "download-lyrics-model", "download-chords-model"):
+        return None
+    payload = ai_arranger_runtime.read_payload(job_id)
+    if not isinstance(payload, dict) or payload.get("schema_version") != 1:
+        return None
+    if row["operation"].startswith("download-"):
+        if row.get("project_id") != "server-models" or payload.get("kind") != row["operation"].removeprefix("download-").removesuffix("-model"):
+            return None
+        if not isinstance(payload.get("model_id"), str):
+            return None
+    elif payload.get("project_id") != row.get("project_id") or payload.get("kind") != row["operation"].removeprefix("extract-"):
+        return None
+    state = row.get("state", "interrupted")
+    now = time.time()
+    return {"id": job_id, "kind": row["operation"],
+        "project_id": None if row["operation"].startswith("download-") else row["project_id"],
+        "status": state, "progress": row.get("progress_percent") or 0,
+        "message": row.get("message") or "Persistent AI job", "created_at": row.get("created_at") or now,
+        "updated_at": row.get("completed_at") or now, "result": None,
+        "error": None, "partial": None, "cancel_event": threading.Event()}
+
+
 @app.get("/api/media-jobs/{job_id}")
 def media_job_status(job_id: str, request: Request):
     with MEDIA_JOB_LOCK:
         job = MEDIA_JOBS.get(job_id)
-        if job is None:
-            raise HTTPException(404, "Job non trovato")
-        snapshot = dict(job)
+        snapshot = dict(job) if job is not None else None
+    if snapshot is None:
+        snapshot = _rehydrate_persisted_text_job(job_id)
+    if snapshot is None:
+        raise HTTPException(404, "Job non trovato")
     if snapshot.get("project_id"):
         _project_for_actor(request, snapshot["project_id"])
     else:
@@ -2597,22 +3447,39 @@ def media_job_status(job_id: str, request: Request):
 
 @app.post("/api/media-jobs/{job_id}/cancel")
 def cancel_media_job(job_id: str, request: Request):
+    # Authorize BEFORE touching the cancellation event or queue state.
     with MEDIA_JOB_LOCK:
-        job=MEDIA_JOBS.get(job_id)
+        job = MEDIA_JOBS.get(job_id)
         if job is None:
-            raise HTTPException(404,"Job non trovato")
-        snapshot=dict(job)
-        event=job.get("cancel_event")
-        if event is None:
-            raise HTTPException(409,"Questo job non supporta l'annullamento")
-        event.set()
-        if job.get("status") in {"queued","running"}:
-            job["message"]="Annullamento richiesto…"
-            job["updated_at"]=time.time()
-    if snapshot.get("project_id"):
-        _project_for_actor(request,snapshot["project_id"])
+            job = _rehydrate_persisted_text_job(job_id)
+        if job is None:
+            raise HTTPException(404, "Job non trovato")
+        project_id = job.get("project_id")
+    if project_id:
+        _project_for_actor(request, project_id)
     else:
         _actor(request)
+    with MEDIA_JOB_LOCK:
+        job = MEDIA_JOBS.get(job_id)
+        if job is None:
+            job = _rehydrate_persisted_text_job(job_id)
+        if job is None:
+            raise HTTPException(404, "Job non trovato")
+        event = job.get("cancel_event")
+        if event is None:
+            raise HTTPException(409, "Questo job non supporta l'annullamento")
+        # A queued job is removed from the transactional queue before it can start.
+        queue_row = ai_arranger_runtime.get(job_id)
+        if queue_row and job_id not in MEDIA_JOBS and queue_row["state"] != "queued":
+            raise HTTPException(409, "Il job non è più in attesa: impossibile annullarlo da questo processo")
+        if queue_row and queue_row["state"] == "queued":
+            ai_arranger_runtime.cancel(job_id)
+            job["status"] = "cancelled"
+            job["message"] = "Annullato prima dell'esecuzione"
+        else:
+            job["message"] = "Annullamento richiesto…"
+        event.set()
+        job["updated_at"] = time.time()
     return _media_job_public(job)
 
 
@@ -2627,8 +3494,24 @@ async def add_track(
     sync_mode: str = "manual",
     reference_track_id: str = "",
 ):
+    from .ai_project_lock import project_publication_lock
+    with project_publication_lock(pid):
+        return await _add_track_under_project_lock(pid, request, file, name=name, type=type, offset_ms=offset_ms, sync_mode=sync_mode, reference_track_id=reference_track_id)
+
+
+async def _add_track_under_project_lock(
+    pid: str, request: Request, file: UploadFile, name: str = "",
+    type: str = "other", offset_ms: int = 0, sync_mode: str = "manual",
+    reference_track_id: str = "", recovery_receipt: str = "",
+):
+    if sync_mode not in {"manual", "auto"}:
+        raise HTTPException(400, "invalid sync mode")
     project = _project_for_actor(request, pid)
+    from .ai_upload_transaction import begin as begin_upload
+    begin_upload(pid)
     filename, dst, duration = _save_upload(pid, file)
+    upload_stat = dst.lstat()
+    upload_identity = (upload_stat.st_dev, upload_stat.st_ino)
     allowed = Track.model_fields["type"].annotation.__args__
     track = Track(
         id=uuid.uuid4().hex[:10],
@@ -2652,15 +3535,26 @@ async def add_track(
             delta = auto_align_ms(audio_path(pid, ref.filename), dst)
             shift_track(track, delta)
         except Exception as exc:
-            dst.unlink(missing_ok=True)
+            _rollback_unpublished_upload(pid, dst, upload_identity)
             raise HTTPException(400, "automatic sync failed") from exc
-    project.tracks.append(track)
-    _register_track_source_in_library(project, track, f"Import file: {Path(file.filename or filename).name}")
-    save_project(project)
+    try:
+        project.tracks.append(track)
+        _register_track_source_in_library(project, track, f"Import file: {Path(file.filename or filename).name}")
+        if recovery_receipt:
+            if recovery_receipt in project.recovered_ai_imports:
+                raise HTTPException(409, "This remote result was already imported")
+            project.recovered_ai_imports.append(recovery_receipt)
+        save_project(project)
+    except BaseException:
+        _rollback_unpublished_upload(pid, dst, upload_identity)
+        raise
+    from .ai_upload_transaction import finish as finish_upload
+    finish_upload(pid)
     return project
 
 
 @app.post("/api/projects/{pid}/tracks/{track_id}/replace")
+@_serialized_project_mutation
 async def replace_track(
     pid: str,
     track_id: str,
@@ -2670,6 +3564,8 @@ async def replace_track(
     offset_ms: int = 0,
     reference_track_id: str = "",
 ):
+    if sync_mode not in {"manual", "auto", "keep"}:
+        raise HTTPException(400, "invalid sync mode")
     project = _project_for_actor(request, pid)
     track = next((item for item in project.tracks if item.id == track_id), None)
     if not track:
@@ -2677,7 +3573,13 @@ async def replace_track(
     ensure_clips(track)
     previous_offset = track.clips[0].timeline_start_ms if track.clips else 0
     old = audio_path(pid, track.filename)
+    old_stat = old.lstat() if old.exists() else None
+    old_identity = (old_stat.st_dev, old_stat.st_ino) if old_stat else None
+    from .ai_upload_transaction import begin as begin_upload
+    begin_upload(pid)
     filename, dst, duration = _save_upload(pid, file)
+    upload_stat = dst.lstat()
+    upload_identity = (upload_stat.st_dev, upload_stat.st_ino)
 
     track.filename = filename
     track.duration_ms = duration
@@ -2700,22 +3602,29 @@ async def replace_track(
         else:
             raise HTTPException(400, "invalid sync mode")
     except HTTPException:
-        dst.unlink(missing_ok=True)
+        _rollback_unpublished_upload(pid, dst, upload_identity)
         raise
     except Exception as exc:
-        dst.unlink(missing_ok=True)
+        _rollback_unpublished_upload(pid, dst, upload_identity)
         raise HTTPException(400, "automatic sync failed") from exc
 
-    _register_track_source_in_library(project, track)
-    save_project(project)
-    library_files = {item.filename for item in project.clip_library}
-    if old.exists() and old.name != filename and old.name not in library_files:
-        old.unlink(missing_ok=True)
+    try:
+        _register_track_source_in_library(project, track)
+        save_project(project)
+    except BaseException:
+        _rollback_unpublished_upload(pid, dst, upload_identity)
+        raise
+    library_files = {item.filename for item in project.clip_library} | {item.filename for item in project.tracks}
+    if old_identity is not None and old.name != filename and old.name not in library_files:
+        _rollback_unpublished_upload(pid, old, old_identity)
+    from .ai_upload_transaction import finish as finish_upload
+    finish_upload(pid)
     return project
 
 
 
 @app.patch("/api/projects/{pid}/clip-library/{clip_id}")
+@_serialized_project_mutation
 def update_project_clip(pid: str, clip_id: str, req: UpdateProjectClipRequest, request: Request):
     project = _project_for_actor(request, pid)
     _ensure_project_clip_library(project)
@@ -2735,59 +3644,79 @@ def update_project_clip(pid: str, clip_id: str, req: UpdateProjectClipRequest, r
 
 
 @app.post("/api/projects/{pid}/clip-library/{clip_id}/instantiate")
+@_serialized_project_mutation
 def instantiate_project_clip(pid: str, clip_id: str, req: InstantiateProjectClipRequest, request: Request):
     project = _project_for_actor(request, pid)
-    _ensure_project_clip_library(project)
+    try:
+        _ensure_project_clip_library(project)
+    except ValueError as exc:
+        raise HTTPException(400, "percorso audio della clip non sicuro") from exc
     asset = next((item for item in project.clip_library if item.id == clip_id), None)
     if asset is None:
         raise HTTPException(404, "clip di libreria non trovata")
     source = audio_path(pid, asset.filename)
-    if not source.is_file():
-        raise HTTPException(404, "file audio della clip non trovato")
+    # A clip asset is immutable. Never instantiate a link or an unsafe inode.
+    source_stat = source.lstat() if source.exists() or source.is_symlink() else None
+    if source_stat is None or not stat.S_ISREG(source_stat.st_mode):
+        raise HTTPException(404, "file audio della clip non disponibile")
     track_filename = asset.filename
     track_source = source
+    owned = []
     try:
-        source_rate = _audio_sample_rate(source)
-    except Exception:
-        source_rate = int(getattr(asset, "sample_rate", 44100) or 44100)
-    if source_rate in {44100, 48000, 96000} and source_rate != int(project.sample_rate):
-        # Keep the reusable library asset untouched. Timeline instances get their own
-        # project-rate working copy so a project-rate change remains non-destructive.
-        working_name = f"{uuid.uuid4().hex[:10]}{source.suffix.lower() or '.wav'}"
-        working = audio_path(pid, working_name)
-        shutil.copyfile(source, working)
         try:
+            source_rate = _audio_sample_rate(source)
+        except Exception:
+            # Some legacy clips carry valid sample-rate metadata but an audio
+            # probe is not possible; retain historic no-conversion behavior.
+            source_rate = int(getattr(asset, "sample_rate", 44100) or 44100)
+            if source_rate != int(project.sample_rate):
+                raise HTTPException(400, "impossibile verificare il sample rate della clip")
+        if source_rate not in {44100, 48000, 96000}:
+            raise HTTPException(400, "sample rate della clip non supportato")
+        if source_rate != int(project.sample_rate):
+            # Unique staging name prevents collision with another conversion.
+            working_name = f"{uuid.uuid4().hex[:16]}{source.suffix.lower() or '.wav'}"
+            working = audio_path(pid, working_name)
+            with source.open("rb") as incoming, working.open("xb") as outgoing:
+                shutil.copyfileobj(incoming, outgoing, 1024 * 1024)
+                outgoing.flush()
+                os.fsync(outgoing.fileno())
+            owned.append((working, (working.stat().st_dev, working.stat().st_ino)))
             track_filename, track_source, _ = _normalize_audio_to_project_rate(
                 pid, working_name, project.sample_rate
             )
-        except Exception:
-            working.unlink(missing_ok=True)
-            raise
-    track = Track(
-        id=uuid.uuid4().hex[:10],
-        name=asset.name[:200],
-        type=asset.type,
-        filename=track_filename,
-        source_clip_id=asset.id,
-        duration_ms=asset.duration_ms,
-        clips=[Clip(
+            owned.append((track_source, (track_source.stat().st_dev, track_source.stat().st_ino)))
+        track = Track(
             id=uuid.uuid4().hex[:10],
-            source_start_ms=0,
-            source_end_ms=asset.duration_ms,
-            timeline_start_ms=req.timeline_start_ms,
-        )],
-        channels=asset.channels,
-        channel_layout=asset.channel_layout,
-        sample_rate=int(project.sample_rate),
-    )
-    try:
-        track.waveform_peaks = waveform_peaks(track_source, 4096)
-        track.waveform_revision = _track_waveform_revision(track, track_source)
-    except Exception:
-        track.waveform_peaks = []
-        track.waveform_revision = ""
-    project.tracks.append(track)
-    save_project(project)
+            name=asset.name[:200],
+            type=asset.type,
+            filename=track_filename,
+            source_clip_id=asset.id,
+            duration_ms=asset.duration_ms,
+            clips=[Clip(
+                id=uuid.uuid4().hex[:10],
+                source_start_ms=0,
+                source_end_ms=asset.duration_ms,
+                timeline_start_ms=req.timeline_start_ms,
+            )],
+            channels=asset.channels,
+            channel_layout=asset.channel_layout,
+            sample_rate=int(project.sample_rate),
+        )
+        try:
+            track.waveform_peaks = waveform_peaks(track_source, 4096)
+            track.waveform_revision = _track_waveform_revision(track, track_source)
+        except Exception:
+            track.waveform_peaks = []
+            track.waveform_revision = ""
+        project.tracks.append(track)
+        save_project(project)
+    except BaseException:
+        # A failed save can occur *after* the project was durably committed.
+        # Only roll back media whose names are absent from persisted metadata.
+        for path, identity in reversed(owned):
+            _rollback_unpublished_upload(pid, path, identity)
+        raise
     return {"project": project, "track": track, "clip": asset}
 
 
@@ -2804,6 +3733,7 @@ def _disposable_generated_track(track: Track) -> bool:
 
 
 @app.post("/api/projects/{pid}/delete-tracks")
+@_serialized_project_mutation
 def delete_tracks(pid: str, req: DeleteTracksRequest | list[str], request: Request):
     persisted = _project_for_actor(request, pid)
     snapshot = req.project if isinstance(req, DeleteTracksRequest) else None
@@ -2856,6 +3786,7 @@ def delete_tracks(pid: str, req: DeleteTracksRequest | list[str], request: Reque
 
 
 @app.post("/api/projects/{pid}/tracks/{track_id}/delay")
+@_serialized_project_mutation
 def set_track_delay(pid: str, track_id: str, req: TrackDelayRequest, request: Request):
     project = _project_for_actor(request, pid)
     track = next((item for item in project.tracks if item.id == track_id), None)
@@ -2867,6 +3798,7 @@ def set_track_delay(pid: str, track_id: str, req: TrackDelayRequest, request: Re
 
 
 @app.post("/api/projects/{pid}/tracks/{track_id}/sync-metronome")
+@_serialized_project_mutation
 def sync_metronome_to_track(pid: str, track_id: str, request: Request):
     project = _project_for_actor(request, pid)
     reference = next((item for item in project.tracks if item.id == track_id), None)
@@ -2885,6 +3817,7 @@ def sync_metronome_to_track(pid: str, track_id: str, request: Request):
 
 
 @app.post("/api/projects/{pid}/tracks/{track_id}/move")
+@_serialized_project_mutation
 def move_track(pid: str, track_id: str, req: MoveTrackRequest, request: Request):
     project = _project_for_actor(request, pid)
     track = next((item for item in project.tracks if item.id == track_id), None)
@@ -2896,6 +3829,7 @@ def move_track(pid: str, track_id: str, req: MoveTrackRequest, request: Request)
 
 
 @app.post("/api/projects/{pid}/tracks/{track_id}/autosync")
+@_serialized_project_mutation
 def autosync_track(pid: str, track_id: str, request: Request, reference_track_id: str = ""):
     project = _project_for_actor(request, pid)
     track = next((item for item in project.tracks if item.id == track_id), None)
@@ -2913,6 +3847,7 @@ def autosync_track(pid: str, track_id: str, request: Request, reference_track_id
 
 
 @app.post("/api/projects/{pid}/auto-mix")
+@_serialized_project_mutation
 def project_auto_mix(pid: str, req: AutoMixRequest, request: Request):
     project = _project_for_actor(request, pid)
     if req.enabled:
@@ -2924,6 +3859,7 @@ def project_auto_mix(pid: str, req: AutoMixRequest, request: Request):
 
 
 @app.post("/api/projects/{pid}/delete-range")
+@_serialized_project_mutation
 def edit_delete_range(pid: str, req: DeleteRangeRequest, request: Request):
     project = _project_for_actor(request, pid)
     if req.end_ms <= req.start_ms:
@@ -2949,10 +3885,14 @@ def _mta_import_worker(job_id: str, pid: str, source_name: str) -> None:
         _media_job_update(job_id, status="running", progress=58, message="Validazione MTA")
         ffprobe(src)
         _media_job_update(job_id, progress=68, message="Analisi contenitore MTA")
-        project = load_project(pid)
-        imported = import_mta(src, project)
-        _media_job_update(job_id, progress=92, message="Salvataggio progetto importato")
-        save_project(imported)
+        # import_mta writes audio, attachments and project.json. Hold the shared
+        # cross-process lock for this whole publication, not just save_project.
+        from .ai_project_lock import project_publication_lock
+        with project_publication_lock(pid):
+            project = load_project(pid)
+            imported = import_mta(src, project)
+            _media_job_update(job_id, progress=92, message="Salvataggio progetto importato")
+            save_project(imported)
         _media_job_update(
             job_id,
             status="completed",
@@ -3020,7 +3960,10 @@ async def import_file(request: Request, file: UploadFile = File(...)):
     _copy_limited(file.file, src)
     preserve_original(project.id, src, Path(file.filename or "source.mta").name)
     try:
-        return import_mta(src, project)
+        from .ai_project_lock import project_publication_lock
+        with project_publication_lock(project.id):
+            # Reload only after acquiring the shared publication lock.
+            return import_mta(src, load_project(project.id))
     except Exception as exc:
         delete_project(project.id)
         raise HTTPException(400, "MTA import failed") from exc
@@ -3329,6 +4272,8 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
 
     added_track_ids: list[str] = []
     added_files: list[Path] = []
+    obsolete_files: list[Path] = []
+    stems_published = False
     try:
         _stem_job_update(job_id, status="running", progress=12, message="Analisi del brano completo")
         ffprobe(source)
@@ -3336,11 +4281,14 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
             def bpm_progress(value: int, message: str) -> None:
                 progress(12 + int(max(0, min(100, value)) * 0.12), message)
             try:
-                project_for_bpm = load_project(project_id)
-                project_for_bpm.bpm, project_for_bpm.time_signature = estimate_bpm_and_signature(source, bpm_progress)
-                project_for_bpm.bpm = float(round(project_for_bpm.bpm))
-                project_for_bpm.base_bpm = project_for_bpm.bpm
-                save_project(project_for_bpm)
+                estimated_bpm, estimated_signature = estimate_bpm_and_signature(source, bpm_progress)
+                from .ai_project_lock import project_publication_lock
+                with project_publication_lock(project_id):
+                    project_for_bpm = load_project(project_id)
+                    project_for_bpm.bpm = float(round(estimated_bpm))
+                    project_for_bpm.time_signature = estimated_signature
+                    project_for_bpm.base_bpm = project_for_bpm.bpm
+                    save_project(project_for_bpm)
             except Exception:
                 progress(24, "Stima BPM non conclusiva; continuo con il BPM corrente")
         if cancel_event.is_set():
@@ -3449,79 +4397,96 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
                 if not stems:
                     raise RuntimeError("The separation model produced none of the requested stems")
             progress(90, "Importazione delle tracce nel progetto")
-            project = load_project(project_id)
-            mapping = {
-                "drums": "drums",
-                "bass": "bass",
-                "guitar": "guitars",
-                "piano": "keyboards",
-                "vocals": "melody",
-                "lead_vocals": "melody",
-                "backing_vocals": "melody",
-                "percussions": "drums",
-                "drums_without_percussions": "drums",
-                "kick": "drums", "snare": "drums", "toms": "drums", "cymbals": "drums",
-                "other": "other",
-            }
-            for index, stem in enumerate(stems, start=1):
+            from .ai_project_lock import project_publication_lock
+            with project_publication_lock(project_id):
+                project = load_project(project_id)
+                mapping = {
+                    "drums": "drums",
+                    "bass": "bass",
+                    "guitar": "guitars",
+                    "piano": "keyboards",
+                    "vocals": "melody",
+                    "lead_vocals": "melody",
+                    "backing_vocals": "melody",
+                    "percussions": "drums",
+                    "drums_without_percussions": "drums",
+                    "kick": "drums", "snare": "drums", "toms": "drums", "cymbals": "drums",
+                    "other": "other",
+                }
+                for index, stem in enumerate(stems, start=1):
+                    if cancel_event.is_set():
+                        raise RuntimeError("stem separation cancelled")
+                    stem_name = stem.stem.lower()
+                    kind = "melody" if stem_name.startswith("singer_") else mapping.get(stem_name, "other")
+                    filename = f"{uuid.uuid4().hex[:10]}.wav"
+                    dst = audio_path(project.id, filename)
+                    # Register the new asset before copying or converting it: a
+                    # failed conversion must not leave an untracked audio orphan.
+                    added_files.append(dst)
+                    shutil.copyfile(stem, dst)
+                    filename, dst, _ = _normalize_audio_to_project_rate(project.id, filename, project.sample_rate, strict=False)
+                    if dst not in added_files:
+                        added_files.append(dst)
+                    duration = media_duration_ms(dst)
+                    channels, channel_layout = _audio_channel_info(dst)
+                    display_name = {"lead_vocals": "Lead Vocals", "backing_vocals": "Backing Vocals", "percussions": "Percussions", "drums_without_percussions": "Drums (no percussions)", "kick": "Kick", "snare": "Snare", "toms": "Toms", "cymbals": "Cymbals"}.get(stem_name, stem.stem.title())
+                    if stem_name.startswith("singer_"):
+                        display_name = next((entry["name"] for entry in singers if entry["id"] == stem_name), display_name)
+                    if stem_name_prefix:
+                        display_name = f"{stem_name_prefix} · {display_name}"[:200]
+                    new_track = Track(
+                            id=uuid.uuid4().hex[:10],
+                            name=display_name,
+                            type=kind,
+                            filename=filename,
+                            duration_ms=duration,
+                            channels=channels,
+                            channel_layout=channel_layout,
+                            sample_rate=int(project.sample_rate),
+                            clips=[
+                                Clip(
+                                    id=uuid.uuid4().hex[:10],
+                                    source_start_ms=0,
+                                    source_end_ms=duration,
+                                    timeline_start_ms=0,
+                                )
+                            ],
+                        )
+                    # Selective repeat runs replace the matching derived stem instead
+                    # of duplicating it. Preserve its identity and mixer settings.
+                    original_track_id = str(job.get("source_track_id") or "")
+                    existing_output = None
+                    if original_track_id and ("all" not in stem_targets or (singer_mode and singer_target != "all")):
+                        existing_output = next((item for item in project.tracks
+                            if item.id != original_track_id and item.name == display_name), None)
+                    if existing_output is not None:
+                        old_filename = existing_output.filename
+                        existing_output.filename = new_track.filename
+                        existing_output.duration_ms = new_track.duration_ms
+                        existing_output.channels = new_track.channels
+                        existing_output.channel_layout = new_track.channel_layout
+                        existing_output.sample_rate = new_track.sample_rate
+                        existing_output.clips = new_track.clips
+                        if old_filename and old_filename != filename:
+                            obsolete_files.append(audio_path(project.id, old_filename))
+                    else:
+                        project.tracks.append(new_track)
+                        added_track_ids.append(new_track.id)
+                    progress(90 + int(index / max(1, len(stems)) * 8), f"Preparata traccia {stem.stem.title()}")
+
+                # All audio assets are prepared before the project references any of
+                # them. One atomic project.json replacement publishes the entire stem
+                # batch, never an observable prefix of the tracks.
                 if cancel_event.is_set():
                     raise RuntimeError("stem separation cancelled")
-                stem_name = stem.stem.lower()
-                kind = "melody" if stem_name.startswith("singer_") else mapping.get(stem_name, "other")
-                filename = f"{uuid.uuid4().hex[:10]}.wav"
-                dst = audio_path(project.id, filename)
-                shutil.copyfile(stem, dst)
-                filename, dst, _ = _normalize_audio_to_project_rate(project.id, filename, project.sample_rate, strict=False)
-                duration = media_duration_ms(dst)
-                channels, channel_layout = _audio_channel_info(dst)
-                display_name = {"lead_vocals": "Lead Vocals", "backing_vocals": "Backing Vocals", "percussions": "Percussions", "drums_without_percussions": "Drums (no percussions)", "kick": "Kick", "snare": "Snare", "toms": "Toms", "cymbals": "Cymbals"}.get(stem_name, stem.stem.title())
-                if stem_name.startswith("singer_"):
-                    display_name = next((entry["name"] for entry in singers if entry["id"] == stem_name), display_name)
-                if stem_name_prefix:
-                    display_name = f"{stem_name_prefix} · {display_name}"[:200]
-                new_track = Track(
-                        id=uuid.uuid4().hex[:10],
-                        name=display_name,
-                        type=kind,
-                        filename=filename,
-                        duration_ms=duration,
-                        channels=channels,
-                        channel_layout=channel_layout,
-                        sample_rate=int(project.sample_rate),
-                        clips=[
-                            Clip(
-                                id=uuid.uuid4().hex[:10],
-                                source_start_ms=0,
-                                source_end_ms=duration,
-                                timeline_start_ms=0,
-                            )
-                        ],
-                    )
-                # Selective repeat runs replace the matching derived stem instead
-                # of duplicating it. Preserve its identity and mixer settings.
-                original_track_id = str(job.get("source_track_id") or "")
-                existing_output = None
-                if original_track_id and ("all" not in stem_targets or (singer_mode and singer_target != "all")):
-                    existing_output = next((item for item in project.tracks
-                        if item.id != original_track_id and item.name == display_name), None)
-                if existing_output is not None:
-                    old_filename = existing_output.filename
-                    existing_output.filename = new_track.filename
-                    existing_output.duration_ms = new_track.duration_ms
-                    existing_output.channels = new_track.channels
-                    existing_output.channel_layout = new_track.channel_layout
-                    existing_output.sample_rate = new_track.sample_rate
-                    existing_output.clips = new_track.clips
-                    # Commit project reference before removing the old audio.
-                    save_project(project)
-                    if old_filename and old_filename != filename:
-                        audio_path(project.id, old_filename).unlink(missing_ok=True)
-                else:
-                    project.tracks.append(new_track)
-                    added_track_ids.append(new_track.id)
-                    save_project(project)
-                added_files.append(dst)
-                progress(90 + int(index / max(1, len(stems)) * 8), f"Importata traccia {stem.stem.title()}")
+                save_project(project)
+                stems_published = True
+            # A completed project.json is authoritative. Enqueue old sources
+            # for durable GC rather than unlinking them in the request thread.
+            # In FLAC mode save_project may also rewrite filenames: GC checks
+            # the final on-disk project before removing any candidate.
+            if obsolete_files:
+                schedule_project_gc(project_id, {path.name for path in obsolete_files})
 
             # Optional musical-text analysis is intentionally non-fatal: a successful
             # stem separation must remain usable even if Whisper/Chordino is unavailable.
@@ -3531,71 +4496,81 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
                 vocal_stem = next((Path(stem) for stem in stems if Path(stem).stem.lower() in {"vocals", "vocal"}), None)
                 lyric_source = vocal_stem or source
                 try:
-                    project = load_project(project_id)
-                    selected_lyrics_model=str(job.get("lyrics_model") or lyrics_catalog(native=NATIVE_SINGLE_USER)["default_model"])
-                    # Legacy equivalent: project.lyrics = extract_lyrics(lyric_source)
+                    selected_lyrics_model = str(job.get("lyrics_model") or lyrics_catalog(native=NATIVE_SINGLE_USER)["default_model"])
+                    # Inference happens outside the project publication lock. The
+                    # commit reloads the latest state and refuses to overwrite
+                    # lyrics modified while the model was running.
+                    from .models import LyricLine
                     if NATIVE_SINGLE_USER and _native_ai.is_remote('whisper'):
-                        remote_result, remote_id = _native_remote_infer('whisper', lyric_source, {'model':selected_lyrics_model})
-                        from .models import LyricLine
-                        remote_doc=remote_result['json'].get('transcript.json',{})
-                        if not isinstance(remote_doc.get('lines'),list):
+                        remote_result, remote_id = _native_remote_infer('whisper', lyric_source, {'model': selected_lyrics_model})
+                        remote_doc = remote_result['json'].get('transcript.json', {})
+                        if not isinstance(remote_doc.get('lines'), list):
                             raise ValueError('Remote transcript not returned')
-                        project.lyrics = [LyricLine.model_validate(item) for item in remote_doc['lines']]
-                        analysis.setdefault('remote_jobs',{})['whisper']=remote_id
+                        extracted_lyrics = [LyricLine.model_validate(item) for item in remote_doc['lines']]
+                        analysis.setdefault('remote_jobs', {})['whisper'] = remote_id
                     else:
-                        project.lyrics = extract_lyrics(lyric_source, model_name=selected_lyrics_model)
-                    project.lyrics_engine="OpenAI Whisper"; project.lyrics_model=selected_lyrics_model
-                    save_project(project)
-                    analysis["lyrics"] = {"ok": True, "count": len(project.lyrics), "source": "vocals" if vocal_stem else "mix", "engine":"OpenAI Whisper", "model":selected_lyrics_model}
+                        extracted_lyrics = extract_lyrics(lyric_source, model_name=selected_lyrics_model)
+                    from .ai_project_lock import project_publication_lock
+                    with project_publication_lock(project_id):
+                        project = load_project(project_id)
+                        if project.lyrics:
+                            raise RuntimeError('Lyrics changed during analysis; existing lyrics preserved')
+                        project.lyrics = extracted_lyrics
+                        project.lyrics_engine = 'OpenAI Whisper'
+                        project.lyrics_model = selected_lyrics_model
+                        save_project(project)
+                    analysis['lyrics'] = {'ok': True, 'count': len(extracted_lyrics), 'source': 'vocals' if vocal_stem else 'mix', 'engine': 'OpenAI Whisper', 'model': selected_lyrics_model}
                 except Exception as analysis_exc:
-                    LOGGER.exception("Lyrics extraction after stem separation failed")
-                    analysis["lyrics"] = {"ok": False, "error": str(analysis_exc)[-500:]}
+                    LOGGER.exception('Lyrics extraction after stem separation failed')
+                    analysis['lyrics'] = {'ok': False, 'error': str(analysis_exc)[-500:]}
                 _stem_job_update(job_id, analysis=dict(analysis))
             if extract_chords_after:
-                progress(99, "Analisi chords ad alta accuratezza")
+                progress(99, 'Analisi chords ad alta accuratezza')
                 try:
-                    project = load_project(project_id)
-                    selected_chords_engine=str(job.get("chords_engine") or chords_catalog(native=NATIVE_SINGLE_USER)["default_engine"])
-                    chord_info=next((x for x in chords_catalog(native=NATIVE_SINGLE_USER)["engines"] if x["id"]==selected_chords_engine),{})
-                    # Legacy equivalent: project.chords = extract_chords(source)
+                    selected_chords_engine = str(job.get('chords_engine') or chords_catalog(native=NATIVE_SINGLE_USER)['default_engine'])
+                    chord_info = next((x for x in chords_catalog(native=NATIVE_SINGLE_USER)['engines'] if x['id'] == selected_chords_engine), {})
+                    from .models import Chord
                     if NATIVE_SINGLE_USER and _native_ai.is_remote('chords-ml'):
-                        remote_result, remote_id = _native_remote_infer('chords-ml', source, {'engine':selected_chords_engine})
-                        from .models import Chord
-                        remote_doc=remote_result['json'].get('chords.json',{})
-                        if not isinstance(remote_doc.get('chords'),list):
+                        remote_result, remote_id = _native_remote_infer('chords-ml', source, {'engine': selected_chords_engine})
+                        remote_doc = remote_result['json'].get('chords.json', {})
+                        if not isinstance(remote_doc.get('chords'), list):
                             raise ValueError('Remote chords not returned')
-                        project.chords = [Chord.model_validate(item) for item in remote_doc['chords']]
-                        analysis.setdefault('remote_jobs',{})['chords-ml']=remote_id
+                        extracted_chords = [Chord.model_validate(item) for item in remote_doc['chords']]
+                        analysis.setdefault('remote_jobs', {})['chords-ml'] = remote_id
                     else:
-                        project.chords = extract_chords(source, engine=selected_chords_engine)
-                    project.chords_engine=selected_chords_engine; project.chords_model=str(chord_info.get("model_id") or "")
-                    save_project(project)
-                    analysis["chords"] = {"ok": True, "count": len(project.chords), "source": "mix", "engine":selected_chords_engine, "model":project.chords_model, "engine_display_name":chord_info.get("display_name",selected_chords_engine)}
+                        extracted_chords = extract_chords(source, engine=selected_chords_engine)
+                    from .ai_project_lock import project_publication_lock
+                    with project_publication_lock(project_id):
+                        project = load_project(project_id)
+                        if project.chords:
+                            raise RuntimeError('Chords changed during analysis; existing chords preserved')
+                        project.chords = extracted_chords
+                        project.chords_engine = selected_chords_engine
+                        project.chords_model = str(chord_info.get('model_id') or '')
+                        save_project(project)
+                    analysis['chords'] = {'ok': True, 'count': len(extracted_chords), 'source': 'mix', 'engine': selected_chords_engine, 'model': str(chord_info.get('model_id') or ''), 'engine_display_name': chord_info.get('display_name', selected_chords_engine)}
                 except Exception as analysis_exc:
-                    LOGGER.exception("Chord extraction after stem separation failed")
-                    analysis["chords"] = {"ok": False, "error": str(analysis_exc)[-500:]}
+                    LOGGER.exception('Chord extraction after stem separation failed')
+                    analysis['chords'] = {'ok': False, 'error': str(analysis_exc)[-500:]}
                 _stem_job_update(job_id, analysis=dict(analysis))
         if not keep_original_track:
             source.unlink(missing_ok=True)
         _stem_job_update(job_id, status="completed", progress=100, message="Separazione completata")
     except Exception as exc:
-        if cancel_event.is_set() or "cancelled" in str(exc).lower():
-            try:
-                project = load_project(project_id)
-                project.tracks = [track for track in project.tracks if track.id not in set(added_track_ids)]
-                save_project(project)
-                for path in added_files:
-                    path.unlink(missing_ok=True)
-            except Exception as cleanup_exc:
-                LOGGER.warning(
-                    "Unable to fully roll back partial stem files for job %s: %s",
-                    job_id,
-                    cleanup_exc,
-                )
+        # Before publication, no track reference has changed. Deleting only
+        # newly staged files preserves existing tracks and their mixer settings.
+        # After publication, never roll back an already-visible batch because
+        # optional enrichment or a late cancellation failed.
+        if not stems_published:
+            # Failed staging can leave both the original WAV and its converted
+            # counterpart. Queue anything we know about for crash-safe GC; the
+            # GC always rechecks live project references before deleting.
+            abandoned = {path.name for path in added_files}
+            if abandoned:
+                schedule_project_gc(project_id, abandoned)
+        if (cancel_event.is_set() or "cancelled" in str(exc).lower()) and not stems_published:
             _stem_job_update(job_id, status="cancelled", progress=0, message="Separazione annullata", error=None)
         else:
-            if not keep_original_track:
-                source.unlink(missing_ok=True)
             LOGGER.exception("Stem separation job %s failed", job_id)
             _stem_job_update(job_id, status="failed", progress=0, message="Separazione fallita", error=str(exc)[-1200:])
 
@@ -3842,12 +4817,49 @@ def _ai_model_download_worker(job_id: str, kind: str, model_id: str) -> None:
         _media_job_update(job_id,status="failed",progress=0,message="Download modello fallito",error=str(exc)[-1200:])
 
 
+def _restore_model_download_job(pid, payload, job_id):
+    """Recover queued catalog downloads without replaying interrupted work."""
+    if not isinstance(payload, dict) or payload.get("schema_version") != 1:
+        raise ValueError("Unsupported model download payload")
+    kind, model_id = payload.get("kind"), payload.get("model_id")
+    if kind not in ("lyrics", "chords") or pid != "server-models":
+        raise ValueError("Invalid model download operation")
+    if not isinstance(model_id, str) or not re.fullmatch(r"[A-Za-z0-9._/-]{1,128}", model_id):
+        raise ValueError("Invalid model download id")
+    operation = "download-" + kind + "-model"
+    catalog = lyrics_catalog if kind == "lyrics" else chords_catalog
+    if not any(item.get("id") == model_id for item in catalog(native=NATIVE_SINGLE_USER).get("models", [])):
+        raise ValueError("Model no longer exists in catalog")
+    now = time.time()
+    with MEDIA_JOB_LOCK:
+        job = MEDIA_JOBS.setdefault(job_id, {
+            "id": job_id, "kind": operation, "project_id": None,
+            "status": "queued", "progress": 3, "message": "Recovered queued model download",
+            "created_at": now, "updated_at": now, "result": None,
+            "error": None, "cancel_event": threading.Event(),
+        })
+    def execute(_progress_path, stop):
+        job["cancel_event"] = stop
+        if stop.is_set():
+            job["status"] = "cancelled"
+            return
+        _ai_model_download_worker(job_id, kind, model_id)
+        if job.get("status") == "failed":
+            raise RuntimeError(str(job.get("error") or "Model download failed")[:300])
+    return execute
+
+
+for _download_kind in ("lyrics", "chords"):
+    ai_arranger_runtime.register_restorer("download-" + _download_kind + "-model", _restore_model_download_job)
+
+
 def _start_ai_model_download_job(kind: str, model_id: str, request: Request):
     _actor(request)
     now=time.time();job_id=uuid.uuid4().hex[:16]
-    job={"id":job_id,"kind":f"download-{kind}-model","project_id":None,"status":"queued","progress":3,"message":"Download modello in coda","created_at":now,"updated_at":now,"result":None,"error":None}
+    job={"id":job_id,"kind":f"download-{kind}-model","project_id":None,"status":"queued","progress":3,"message":"Download modello in coda","created_at":now,"updated_at":now,"result":None,"error":None,"cancel_event":threading.Event()}
     with MEDIA_JOB_LOCK: MEDIA_JOBS[job_id]=job
-    threading.Thread(target=_ai_model_download_worker,args=(job_id,kind,model_id),daemon=True,name=f"model-download-{job_id}").start()
+    _enqueue_existing_ai_job(job, lambda: _ai_model_download_worker(job_id,kind,model_id),
+        durable_payload={"schema_version":1,"kind":kind,"model_id":model_id})
     return _media_job_public(job)
 
 
@@ -4187,13 +5199,8 @@ async def stem_job_start(
     }
     with STEM_JOB_LOCK:
         STEM_JOBS[job_id] = job
-    thread = threading.Thread(
-        target=_stem_split_worker,
-        args=(job_id, source, keep_original_track),
-        daemon=True,
-        name=f"stem-job-{job_id}",
-    )
-    thread.start()
+    _enqueue_existing_ai_job(job, lambda: _stem_split_worker(job_id, source, keep_original_track),
+        durable_payload=_stem_durable_payload(job, source, keep_original_track))
     return {"job": _stem_job_public(job), "project": project}
 
 
@@ -4220,9 +5227,17 @@ def stem_job_cancel(job_id: str, request: Request):
         current_job = STEM_JOBS[job_id]
         if current_job["status"] in {"completed", "failed", "cancelled"}:
             return _stem_job_public(current_job)
+        try:
+            queue_row = ai_arranger_runtime.cancel(job_id)
+        except ValueError as exc:
+            raise HTTPException(409, str(exc)) from exc
+        if queue_row is not None and queue_row["state"] == "cancelled":
+            current_job["status"] = "cancelled"
+            current_job["message"] = "Separazione annullata prima dell'esecuzione"
+        else:
+            current_job["status"] = "cancelling"
+            current_job["message"] = "Annullamento in corso…"
         current_job["cancel_event"].set()
-        current_job["status"] = "cancelling"
-        current_job["message"] = "Annullamento in corso…"
         current_job["updated_at"] = time.time()
         return _stem_job_public(current_job)
 
@@ -4241,47 +5256,51 @@ async def split_stems_compat(
     if not STEM_SPLITTER.available():
         raise HTTPException(503, "Demucs stem plugin is not installed in this runtime")
     actor = _actor(request)
-    if project_id:
-        existing_project=_project_for_actor(request, project_id)
-        _ensure_workspace_capacity(existing_project.owner_user_id, int(request.headers.get("content-length") or 0))
-    else:
-        _ensure_workspace_capacity(actor["id"] if actor["id"] > 0 else None, int(request.headers.get("content-length") or 0))
-    project = existing_project if project_id else create_project(
-        Path(file.filename or "Stems").stem[:200],
-        target if target in {"MTA8", "MTA16", "DAW"} else "MTA8",
-        owner_user_id=actor["id"] if actor["id"] > 0 else None,
-    )
-    with tempfile.TemporaryDirectory() as td_raw:
-        td = Path(td_raw)
-        source = td / "source.mp3"
-        _copy_limited(file.file, source)
-        preserve_original(project.id, source, Path(file.filename or "source.mp3").name)
-        try:
-            ffprobe(source)
-            stems = STEM_SPLITTER.split(source, td / "stems", model=model)
-        except Exception as exc:
-            raise HTTPException(400, "stem separation failed") from exc
-        mapping = {
-            "drums": "drums", "bass": "bass", "guitar": "guitars", "piano": "keyboards",
-            "vocals": "melody", "other": "other",
-        }
-        for stem in stems:
-            filename = f"{uuid.uuid4().hex[:10]}.wav"
-            dst = audio_path(project.id, filename)
-            shutil.copyfile(stem, dst)
-            filename, dst, _ = _normalize_audio_to_project_rate(project.id, filename, project.sample_rate, strict=False)
-            duration = media_duration_ms(dst)
-            project.tracks.append(Track(
-                id=uuid.uuid4().hex[:10],
-                name=stem.stem.title(),
-                type=mapping.get(stem.stem.lower(), "other"),
-                filename=filename,
-                duration_ms=duration,
-                sample_rate=int(project.sample_rate),
-                clips=[Clip(id=uuid.uuid4().hex[:10], source_start_ms=0, source_end_ms=duration, timeline_start_ms=0)],
-            ))
-    save_project(project)
-    return project
+    from .ai_project_lock import project_publication_lock
+    from contextlib import nullcontext
+    # Existing-project writes must coordinate with every other project writer.
+    with project_publication_lock(project_id) if project_id else nullcontext():
+        if project_id:
+            existing_project=_project_for_actor(request, project_id)
+            _ensure_workspace_capacity(existing_project.owner_user_id, int(request.headers.get("content-length") or 0))
+        else:
+            _ensure_workspace_capacity(actor["id"] if actor["id"] > 0 else None, int(request.headers.get("content-length") or 0))
+        project = existing_project if project_id else create_project(
+            Path(file.filename or "Stems").stem[:200],
+            target if target in {"MTA8", "MTA16", "DAW"} else "MTA8",
+            owner_user_id=actor["id"] if actor["id"] > 0 else None,
+        )
+        with tempfile.TemporaryDirectory() as td_raw:
+            td = Path(td_raw)
+            source = td / "source.mp3"
+            _copy_limited(file.file, source)
+            preserve_original(project.id, source, Path(file.filename or "source.mp3").name)
+            try:
+                ffprobe(source)
+                stems = STEM_SPLITTER.split(source, td / "stems", model=model)
+            except Exception as exc:
+                raise HTTPException(400, "stem separation failed") from exc
+            mapping = {
+                "drums": "drums", "bass": "bass", "guitar": "guitars", "piano": "keyboards",
+                "vocals": "melody", "other": "other",
+            }
+            for stem in stems:
+                filename = f"{uuid.uuid4().hex[:10]}.wav"
+                dst = audio_path(project.id, filename)
+                shutil.copyfile(stem, dst)
+                filename, dst, _ = _normalize_audio_to_project_rate(project.id, filename, project.sample_rate, strict=False)
+                duration = media_duration_ms(dst)
+                project.tracks.append(Track(
+                    id=uuid.uuid4().hex[:10],
+                    name=stem.stem.title(),
+                    type=mapping.get(stem.stem.lower(), "other"),
+                    filename=filename,
+                    duration_ms=duration,
+                    sample_rate=int(project.sample_rate),
+                    clips=[Clip(id=uuid.uuid4().hex[:10], source_start_ms=0, source_end_ms=duration, timeline_start_ms=0)],
+                ))
+        save_project(project)
+        return project
 
 
 
@@ -4391,12 +5410,8 @@ def start_track_stem_job(
     }
     with STEM_JOB_LOCK:
         STEM_JOBS[job_id] = job
-    threading.Thread(
-        target=_stem_split_worker,
-        args=(job_id, source, True),
-        daemon=True,
-        name=f"track-stem-{job_id}",
-    ).start()
+    _enqueue_existing_ai_job(job, lambda: _stem_split_worker(job_id, source, True),
+        durable_payload=_stem_durable_payload(job, source, True))
     return _stem_job_public(job)
 
 
@@ -4436,6 +5451,7 @@ def _limit_metronome_wav(path: Path, start_ms: int, stop_ms: int | None) -> None
 
 
 @app.post("/api/projects/{pid}/metronome-track")
+@_serialized_project_mutation
 def create_metronome_track(pid: str, request: Request, mode: str = "fixed", track_id: str = "", sensitivity: float = 0.35):
     with METRONOME_TRACK_LOCK:
         return _create_metronome_track_locked(pid, request, mode=mode, track_id=track_id, sensitivity=sensitivity)
@@ -4744,6 +5760,7 @@ def _update_metronome_zone_locked(pid: str, request: Request, time_ms: int, trac
 
 
 @app.post("/api/projects/{pid}/metronome-zone-bpm")
+@_serialized_project_mutation
 def set_metronome_zone_bpm(pid: str, request: Request, time_ms: int = 0, bpm: float | None = None, automatic: bool = False):
     with METRONOME_TRACK_LOCK:
         project = _project_for_actor(request, pid)
@@ -4768,6 +5785,7 @@ def set_metronome_zone_bpm(pid: str, request: Request, time_ms: int = 0, bpm: fl
 
 
 @app.post("/api/projects/{pid}/metronome-track/refresh")
+@_serialized_project_mutation
 def refresh_metronome_at_playhead(pid: str, request: Request, time_ms: int = 0, track_id: str = ""):
     project = _project_for_actor(request, pid)
     mode = project.metronome_mode
@@ -4786,6 +5804,7 @@ def refresh_metronome_at_playhead(pid: str, request: Request, time_ms: int = 0, 
 
 
 @app.post("/api/projects/{pid}/metronome-shift")
+@_serialized_project_mutation
 def shift_adaptive_metronome(pid: str, request: Request, value: float = 0.0, unit: str = "ms"):
     project = _project_for_actor(request, pid)
     if project.metronome_mode != "adaptive" or not project.adaptive_tempo_map:
@@ -4824,6 +5843,7 @@ def shift_adaptive_metronome(pid: str, request: Request, value: float = 0.0, uni
     return {"project": project, "track": track, "shift_ms": project.metronome_shift_ms}
 
 @app.post("/api/projects/{pid}/transport-time-mode")
+@_serialized_project_mutation
 def set_transport_time_mode(pid: str, request: Request, mode: str = "time"):
     project = _project_for_actor(request, pid)
     mode = str(mode or "time").strip().lower()
@@ -4835,12 +5855,14 @@ def set_transport_time_mode(pid: str, request: Request, mode: str = "time"):
 
 
 @app.post("/api/projects/{pid}/chords-track")
+@_serialized_project_mutation
 def create_chords_track(pid: str, request: Request):
     with CHORDS_TRACK_LOCK:
         return _create_chords_track_locked(pid, request)
 
 
 @app.post("/api/projects/{pid}/chords-track/refresh")
+@_serialized_project_mutation
 def refresh_chords_track(pid: str, request: Request, old_time_ms: int, new_time_ms: int):
     """Refresh an existing generated Chords track after any chord mutation."""
     with CHORDS_TRACK_LOCK:
@@ -4964,22 +5986,28 @@ def _create_chords_track_locked(pid: str, request: Request):
 
 @app.post("/api/projects/{pid}/tracks/{track_id}/estimate-bpm")
 def estimate_track_bpm(pid: str, track_id: str, request: Request, time_signature: str | None = None):
-    project = _project_for_actor(request, pid)
-    track = next((item for item in project.tracks if item.id == track_id), None)
-    if track is None:
-        raise HTTPException(404, "track not found")
+    from .ai_project_lock import project_publication_lock
+    with project_publication_lock(pid):
+        project = _project_for_actor(request, pid)
+        track = next((item for item in project.tracks if item.id == track_id), None)
+        if track is None:
+            raise HTTPException(404, "track not found")
+        track_snapshot = (track.filename, track.sample_rate, track.duration_ms)
+        bpm_snapshot = (project.bpm, project.base_bpm, project.time_signature)
+        source = audio_path(pid, track.filename)
+    # Expensive BPM inference cannot block independent project edits.
     try:
         preferred = str(time_signature or "").strip()
         if preferred and preferred not in {"2/4", "3/4", "4/4", "5/4", "6/8", "7/8", "9/8", "12/8"}:
             raise HTTPException(400, "time signature non valida")
-        bpm, signature = estimate_bpm_and_signature(audio_path(pid, track.filename), preferred_signature=preferred)
+        bpm, signature = estimate_bpm_and_signature(source, preferred_signature=preferred)
         # Tempo estimators are inherently octave-ambiguous (e.g. 72 vs 144 BPM).
         # When the user is only changing the meter, preserve the established
         # musical pulse by selecting the x2/x0.5 equivalent closest to the
         # project's current BPM instead of allowing a signature change to double
         # or halve the perceived metronome speed.
         if preferred:
-            reference_bpm = float(getattr(project, "bpm", 0) or 0)
+            reference_bpm = float(bpm_snapshot[0] or 0)
             if reference_bpm > 0:
                 candidates = {float(bpm)}
                 value = float(bpm)
@@ -4995,10 +6023,17 @@ def estimate_track_bpm(pid: str, track_id: str, request: Request, time_signature
         bpm = float(round(bpm))
     except (ValueError, RuntimeError) as exc:
         raise HTTPException(422, f"Impossibile stimare i BPM: {exc}") from exc
-    project.bpm = bpm
-    project.base_bpm = bpm
-    project.time_signature = signature
-    save_project(project)
+    with project_publication_lock(pid):
+        project = _project_for_actor(request, pid)
+        current = next((item for item in project.tracks if item.id == track_id), None)
+        if current is None or (current.filename, current.sample_rate, current.duration_ms) != track_snapshot:
+            raise HTTPException(409, "Track changed during BPM estimation")
+        if (project.bpm, project.base_bpm, project.time_signature) != bpm_snapshot:
+            raise HTTPException(409, "Project tempo changed during BPM estimation")
+        project.bpm = bpm
+        project.base_bpm = bpm
+        project.time_signature = signature
+        save_project(project)
     return {"ok": True, "track_id": track_id, "bpm": bpm, "time_signature": signature}
 
 
@@ -5639,6 +6674,453 @@ def native_ai_workers_settings(request: Request):
     return public_settings()
 
 
+@app.get('/api/native/ai-workers/pending')
+def native_ai_workers_pending(request: Request):
+    _ace_native_only(request)
+    from .ai_native_remote_journal import list_pending
+    return {'pending': list_pending()}
+
+
+@app.get('/api/native/ai-workers/remote-history/{kind}')
+def native_ai_workers_remote_history(request: Request, kind: str, limit: int = 50,
+                                     offset: int = 0, state: str | None = None):
+    """Read-only rediscovery after native restart; never starts inference.
+
+    Discovery uses only the current saved HTTPS endpoint and its private token.
+    Discovered requests are *not* local pending receipts and cannot be imported
+    until provenance and artifact type have been re-verified separately.
+    """
+    _ace_native_only(request)
+    from .native_ai_routing import _read, KINDS
+    from .ai_remote_client import list_remote_requests, RemoteAIError
+    if kind not in KINDS:
+        raise HTTPException(404, 'Unknown AI worker')
+    config = _read().get('workers', {}).get(kind, {})
+    if (not isinstance(config, dict) or config.get('mode') != 'remote'
+            or not config.get('url') or not config.get('token')):
+        raise HTTPException(409, 'Remote AI worker is not configured')
+    try:
+        result = list_remote_requests(config['url'], config['token'],
+                                      limit=limit, offset=offset, state=state)
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from exc
+    except RemoteAIError as exc:
+        raise HTTPException(502, str(exc)) from exc
+    return {'kind': kind, **result}
+
+
+@app.get('/api/native/ai-workers/remote-history/{kind}/artifact/{request_id}')
+def native_ai_workers_discovered_artifact(request: Request, kind: str, request_id: str):
+    """Read-only download of a server-discovered result, never infer or import.
+
+    Discovery is repeated with the configured worker token to establish ownership
+    independently of any local journal. No discovered result can mutate a project.
+    """
+    _ace_native_only(request)
+    from .native_ai_routing import _read, KINDS
+    from .ai_remote_client import (remote_request_status, recover_after_lost_response,
+                                   RemoteAIError)
+    if kind not in KINDS:
+        raise HTTPException(404, 'Unknown AI worker')
+    from .ai_request_dedup import _KEY
+    if not _KEY.fullmatch(request_id):
+        raise HTTPException(400, 'Invalid remote request identifier')
+    settings = _read().get('workers', {}).get(kind, {})
+    if (not isinstance(settings, dict) or settings.get('mode') != 'remote'
+            or not settings.get('url') or not settings.get('token')):
+        raise HTTPException(409, 'Remote AI worker is not configured')
+    try:
+        # Server verifies ownership against the bearer token for this exact key.
+        # Avoid scanning a bounded history: older retained jobs must remain recoverable.
+        status = remote_request_status(settings['url'], settings['token'], request_id)
+        if status.get('state') != 'completed':
+            raise HTTPException(404, 'Completed request not found for this worker')
+        strict = os.getenv('MTA_REMOTE_AI_REQUIRE_ATTESTATION', '').strip().lower() in ('1', 'true', 'yes', 'on')
+        payload, mime, _ = recover_after_lost_response(
+            settings['url'], settings['token'], request_id, require_attestation=strict)
+        if mime not in ('application/json', 'audio/wav', 'application/zip') or not isinstance(payload, bytes) or not payload:
+            raise ValueError('Unsupported or empty remote result')
+        suffix = {'application/json': 'json', 'audio/wav': 'wav', 'application/zip': 'zip'}[mime]
+        return Response(content=payload, media_type=mime,
+                        headers={'Content-Disposition': f'attachment; filename="mta-discovered-{request_id}.{suffix}"',
+                                 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff'})
+    except RemoteAIError as exc:
+        raise HTTPException(502, str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(409, str(exc)) from exc
+
+
+@app.get('/api/native/ai-workers/pending/{request_id}/status')
+def native_ai_workers_pending_status(request: Request, request_id: str):
+    _ace_native_only(request)
+    from .ai_native_remote_journal import read_owned_pending
+    from .native_ai_routing import _read
+    from .ai_remote_client import remote_request_status, RemoteAIError
+    try:
+        item = read_owned_pending(request_id)
+        kind, url = item.get('kind'), item.get('url')
+        settings = _read().get('workers', {}).get(kind, {}) if isinstance(kind, str) else {}
+        if not kind or settings.get('mode') != 'remote' or settings.get('url') != url or not settings.get('token'):
+            raise ValueError('Original remote worker settings are unavailable; no inference was retried')
+        return {'request_id': request_id, 'kind': kind,
+                'remote': remote_request_status(url, settings['token'], request_id)}
+    except ValueError as exc:
+        raise HTTPException(409, str(exc)) from exc
+    except RemoteAIError as exc:
+        raise HTTPException(502, str(exc)) from exc
+
+
+@app.get('/api/native/ai-workers/pending/{request_id}/artifact')
+def native_ai_workers_pending_artifact(request: Request, request_id: str):
+    """Download an already-completed result read-only, without clearing the journal.
+
+    The original native workflow must still consume and validate the recovered
+    result before its own journal entry may be retired.
+    """
+    _ace_native_only(request)
+    from .ai_native_remote_journal import read_owned_pending
+    from .native_ai_routing import _read
+    from .ai_remote_client import recover_after_lost_response, RemoteAIError
+    try:
+        item = read_owned_pending(request_id)
+        kind, url = item.get('kind'), item.get('url')
+        settings = _read().get('workers', {}).get(kind, {}) if isinstance(kind, str) else {}
+        if not kind or settings.get('mode') != 'remote' or settings.get('url') != url or not settings.get('token'):
+            raise ValueError('Original remote worker settings unavailable; no inference was retried')
+        strict = os.getenv('MTA_REMOTE_AI_REQUIRE_ATTESTATION', '').strip().lower() in ('1', 'true', 'yes', 'on')
+        payload, mime, job_id = recover_after_lost_response(url, settings['token'], request_id,
+                                                              require_attestation=strict)
+        if mime not in ('application/json', 'audio/wav', 'application/zip'):
+            raise ValueError('Unsupported remote result content type')
+        if not isinstance(payload, bytes) or not payload:
+            raise ValueError('Empty remote result')
+        suffix = {'application/json': 'json', 'audio/wav': 'wav', 'application/zip': 'zip'}[mime]
+        return Response(content=payload, media_type=mime,
+                        headers={'Content-Disposition': f'attachment; filename="mta-recovered-{request_id}.{suffix}"',
+                                 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff'})
+    except ValueError as exc:
+        raise HTTPException(409, str(exc)) from exc
+    except RemoteAIError as exc:
+        raise HTTPException(502, str(exc)) from exc
+
+
+@app.post('/api/native/ai-workers/pending/{request_id}/import-wav/{pid}')
+async def native_ai_workers_import_recovered_wav(request: Request, request_id: str, pid: str):
+    """Fetch and import a recovered WAV once per project, across browser windows.
+
+    Never submits a remote inference; the durable pending journal is retained.
+    """
+    import io
+    from .ai_project_lock import project_publication_lock
+    _ace_native_only(request)
+    _project_for_actor(request, pid)
+    if not re.fullmatch(r'[0-9a-f]{32}', request_id):
+        raise HTTPException(400, 'Invalid pending request identifier')
+    track_name = 'Recovered AI ' + request_id
+    # A durable receipt survives later track renames. Historical projects may
+    # not have the field yet, so retain the name check for compatibility.
+    # Share a canonical receipt with server-history discovery. The legacy pending
+    # receipt is still honored for projects created by earlier r208 builds.
+    from .ai_native_remote_journal import read_owned_pending
+    try:
+        owned = read_owned_pending(request_id)
+        kind = owned.get('kind')
+        from .native_ai_routing import KINDS
+        if kind not in KINDS:
+            raise ValueError('Unknown original AI worker')
+    except ValueError as exc:
+        raise HTTPException(409, str(exc)) from exc
+    receipt = f'wav:{kind}:{request_id}'
+    legacy_receipt = f'wav:pending:{request_id}'
+    # Lock before checking the project: independent sessions/processes must
+    # never both pass the duplicate check based on a stale project snapshot.
+    with project_publication_lock(pid):
+        current_project = _project_for_actor(request, pid)
+        if (receipt in getattr(current_project, 'recovered_ai_imports', [])
+                or legacy_receipt in getattr(current_project, 'recovered_ai_imports', [])
+                or any(track.name == track_name for track in current_project.tracks)):
+            raise HTTPException(409, 'This recovered result was already imported')
+        recovered = native_ai_workers_pending_artifact(request, request_id)
+        if recovered.media_type != 'audio/wav':
+            raise HTTPException(415, 'Recovered artifact is not WAV audio')
+        payload = recovered.body
+        if (len(payload) < 44 or payload[:4] != b'RIFF'
+                or payload[8:12] != b'WAVE'):
+            raise HTTPException(422, 'Recovered artifact is not a valid WAV container')
+        uploaded = UploadFile(filename=f'mta-recovered-{request_id}.wav', file=io.BytesIO(payload))
+        return await _add_track_under_project_lock(pid, request, uploaded, name=track_name,
+                                                   recovery_receipt=receipt)
+
+
+@app.post('/api/native/ai-workers/remote-history/{kind}/import-wav/{request_id}/{pid}')
+async def native_ai_workers_import_discovered_wav(request: Request, kind: str, request_id: str, pid: str):
+    """Explicitly associate a verified, server-owned WAV with the selected project.
+
+    This path does not use or forge a local pending journal and never submits
+    inference. The operator chooses the project; the server authenticates the
+    stored request and verifies the recovered artifact before publication.
+    """
+    import io
+    from .native_ai_routing import KINDS
+    from .ai_project_lock import project_publication_lock
+    from .ai_worker_artifacts import _verify_wav_bytes
+    _ace_native_only(request)
+    _project_for_actor(request, pid)
+    if kind not in KINDS:
+        raise HTTPException(404, 'Unknown remote worker')
+    if not re.fullmatch(r'[0-9a-f]{32}', request_id):
+        raise HTTPException(400, 'Invalid remote request identifier')
+    track_name = f'Recovered AI {kind} {request_id}'
+    receipt = f"wav:{kind}:{request_id}"
+    with project_publication_lock(pid):
+        project = _project_for_actor(request, pid)
+        if (receipt in project.recovered_ai_imports
+                or f'wav:pending:{request_id}' in project.recovered_ai_imports
+                or any(track.name == track_name for track in project.tracks)):
+            raise HTTPException(409, 'This remote result was already imported')
+        result = native_ai_workers_discovered_artifact(request, kind, request_id)
+        if result.media_type != 'audio/wav':
+            raise HTTPException(415, 'Discovered result is not WAV audio')
+        try:
+            _verify_wav_bytes(result.body)
+        except (ValueError, TypeError) as exc:
+            raise HTTPException(422, 'Invalid remote WAV audio') from exc
+        uploaded = UploadFile(filename=f'mta-discovered-{request_id}.wav',
+                              file=io.BytesIO(result.body))
+        return await _add_track_under_project_lock(pid, request, uploaded, name=track_name,
+                                                   recovery_receipt=receipt)
+
+
+@app.post('/api/native/ai-workers/pending/{request_id}/import-json/{pid}')
+def native_ai_workers_import_recovered_json(request: Request, request_id: str, pid: str,
+                                            _discovered_kind: str | None = None):
+    """Apply a completed Whisper/Chords JSON result exactly once to a project.
+
+    Provenance and events are saved in the same project transaction, guarded
+    across server processes. No remote POST or speculative metering occurs.
+    """
+    import io, zipfile
+    from .ai_project_lock import project_publication_lock
+    from .ai_native_remote_journal import read_owned_pending
+    from .models import LyricLine, Chord
+    _ace_native_only(request)
+    _project_for_actor(request, pid)
+    if not re.fullmatch(r'[0-9a-f]{32}', request_id):
+        raise HTTPException(400, 'Invalid pending request identifier')
+    if _discovered_kind is None:
+        try:
+            owned = read_owned_pending(request_id)
+        except ValueError as exc:
+            raise HTTPException(409, str(exc)) from exc
+        kind = owned.get('kind')
+    else:
+        kind = _discovered_kind
+    if kind not in ('whisper', 'chords-ml'):
+        raise HTTPException(415, 'Only Whisper and Chords JSON can be applied to the project')
+    with project_publication_lock(pid):
+        project = _project_for_actor(request, pid)
+        receipt = f'{kind}:{request_id}'
+        if receipt in project.recovered_ai_imports:
+            raise HTTPException(409, 'This recovered result was already applied')
+        recovered = (native_ai_workers_discovered_artifact(request, kind, request_id)
+                     if _discovered_kind is not None else native_ai_workers_pending_artifact(request, request_id))
+        if recovered.media_type not in ('application/json', 'application/zip'):
+            raise HTTPException(415, 'Recovered result is not JSON or a JSON artifact archive')
+        if len(recovered.body) > 32 * 1024 * 1024:
+            raise HTTPException(413, 'Recovered artifact is too large')
+        try:
+            document_name = 'transcript.json' if kind == 'whisper' else 'chords.json'
+            field = 'lines' if kind == 'whisper' else 'chords'
+            if recovered.media_type == 'application/zip':
+                with zipfile.ZipFile(io.BytesIO(recovered.body)) as bundle:
+                    entries = bundle.infolist()
+                    # Reject ambiguous/unsafe ZIP metadata before extracting anything.
+                    # Other worker metadata files remain supported, but must be
+                    # bounded, regular files with unique portable names.
+                    from .ai_worker_artifacts import SAFE_NAME
+                    names = [entry.filename for entry in entries]
+                    if (not entries or len(entries) > 32
+                            or len(set(names)) != len(names)
+                            or any(not SAFE_NAME.fullmatch(entry.filename)
+                                   or entry.is_dir()
+                                   or (entry.external_attr >> 16) & 0o170000 == 0o120000
+                                   or entry.file_size > 8 * 1024 * 1024
+                                   for entry in entries)
+                            or sum(entry.file_size for entry in entries) > 32 * 1024 * 1024):
+                        raise ValueError('Unsafe or oversized recovered archive')
+                    matches = [item for item in entries if item.filename == document_name]
+                    if len(matches) != 1:
+                        raise ValueError('Missing recovered annotation')
+                    raw_json = bundle.read(matches[0])
+            else:
+                raw_json = recovered.body
+            if len(raw_json) > 8 * 1024 * 1024:
+                raise ValueError('Oversized annotation')
+            document = json.loads(raw_json)
+            events = document.get(field) if isinstance(document, dict) else None
+            if not isinstance(events, list) or not events or len(events) > 20000:
+                raise ValueError('Expected a nonempty bounded sequence of events')
+            cls = LyricLine if kind == 'whisper' else Chord
+            parsed = [cls.model_validate(event) for event in events]
+        except (ValueError, TypeError, KeyError, OSError, zipfile.BadZipFile) as exc:
+            raise HTTPException(422, 'Invalid recovered music annotations') from exc
+        # Timestamps in recovered JSON refer to the original source; callers
+        # must explicitly choose a timeline-aligned source before applying.
+        # Never silently replace manually edited content.
+        if kind == 'whisper':
+            if project.lyrics:
+                raise HTTPException(409, 'Existing lyrics must be cleared or merged manually')
+            project.lyrics = parsed
+            project.lyrics_engine = 'Recovered remote Whisper'
+        else:
+            if project.chords:
+                raise HTTPException(409, 'Existing chords must be cleared or merged manually')
+            project.chords = parsed
+            project.chords_engine = 'Recovered remote Chords'
+        project.recovered_ai_imports.append(receipt)
+        save_project(project)
+        return {'ok': True, 'kind': kind, 'count': len(parsed), 'request_id': request_id,
+                'project_id': pid, 'journal_preserved': True}
+
+
+@app.post('/api/native/ai-workers/pending/{request_id}/import-stems/{pid}')
+def native_ai_workers_import_recovered_stems(request: Request, request_id: str, pid: str,
+                                             _discovered_kind: str | None = None):
+    """Import a verified multi-WAV worker archive as one durable project update.
+
+    The original pending record is retained: no POST to the remote inference
+    endpoint occurs here. Project locking serializes cross-process retries.
+    """
+    import io, zipfile, hashlib
+    from .ai_project_lock import project_publication_lock
+    from .ai_native_remote_journal import read_owned_pending
+    from .ai_worker_artifacts import _verify_wav_bytes, SAFE_NAME, MAX_ARTIFACT_BYTES
+    from . import ai_recovered_stem_transaction as stem_transaction
+    _ace_native_only(request)
+    _project_for_actor(request, pid)
+    if not re.fullmatch(r'[0-9a-f]{32}', request_id):
+        raise HTTPException(400, 'Invalid pending request identifier')
+    if _discovered_kind is None:
+        try:
+            owned = read_owned_pending(request_id)
+        except ValueError as exc:
+            raise HTTPException(409, str(exc)) from exc
+        kind = owned.get('kind')
+    else:
+        kind = _discovered_kind
+    if kind not in ('demucs', 'drumsep', 'sam-audio', 'singer-separation', 'backing-vocals'):
+        raise HTTPException(415, 'This adapter does not produce importable audio stems')
+    with project_publication_lock(pid):
+        stem_transaction.reconcile(pid)
+        project = _project_for_actor(request, pid)
+        receipt = f'stems:{kind}:{request_id}'
+        if receipt in project.recovered_ai_imports:
+            raise HTTPException(409, 'These recovered stems were already imported')
+        recovered = (native_ai_workers_discovered_artifact(request, kind, request_id)
+                     if _discovered_kind is not None else native_ai_workers_pending_artifact(request, request_id))
+        if recovered.media_type != 'application/zip' or len(recovered.body) > MAX_ARTIFACT_BYTES:
+            raise HTTPException(415, 'Recovered result must be a bounded artifact ZIP')
+        try:
+            with zipfile.ZipFile(io.BytesIO(recovered.body)) as archive:
+                entries = archive.infolist()
+                if not entries or len(entries) > 17:
+                    raise ValueError('Invalid artifact count')
+                if len({entry.filename.casefold() for entry in entries}) != len(entries):
+                    raise ValueError('Duplicate archive entry (including case-insensitive collisions)')
+                if any(not SAFE_NAME.fullmatch(entry.filename) or entry.is_dir() or
+                       (entry.external_attr >> 16) & 0o170000 == 0o120000 for entry in entries):
+                    raise ValueError('Unsafe archive entry')
+                manifest_entries = [entry for entry in entries if entry.filename == 'manifest.json']
+                if len(manifest_entries) != 1 or manifest_entries[0].file_size > 256000:
+                    raise ValueError('Missing output manifest')
+                manifest = json.loads(archive.read('manifest.json'))
+                if not isinstance(manifest, dict) or manifest.get('version') != 1 or not isinstance(manifest.get('files'), list):
+                    raise ValueError('Unsupported output manifest')
+                specs = manifest['files']
+                if not specs or len(specs) > 16 or len(specs) != len(entries) - 1:
+                    raise ValueError('Manifest does not describe archive')
+                # A set comparison alone misses duplicate specifications.  Every
+                # member must have exactly one manifest entry, including metadata.
+                names = [spec.get('name') if isinstance(spec, dict) else None for spec in specs]
+                if (len({name.casefold() for name in names if isinstance(name, str)}) != len(names) or
+                        set(names) != {entry.filename for entry in entries if entry.filename != 'manifest.json'}):
+                    raise ValueError('Manifest entry mismatch')
+                if any(entry.flag_bits & 0x1 for entry in entries):
+                    raise ValueError('Encrypted archive entry')
+                audio = []
+                total = 0
+                for spec in specs:
+                    if not isinstance(spec, dict):
+                        raise ValueError('Invalid artifact entry')
+                    name, media = spec.get('name'), spec.get('type')
+                    if media not in ('audio/wav', 'application/json', 'text/plain'):
+                        raise ValueError('Unsupported manifest media type')
+                    info = archive.getinfo(name)
+                    total += info.file_size
+                    if info.file_size > MAX_ARTIFACT_BYTES or total > MAX_ARTIFACT_BYTES:
+                        raise ValueError('Expanded archive exceeds limit')
+                    payload = archive.read(name)
+                    digest = spec.get('sha256')
+                    if digest is not None and (not isinstance(digest, str) or
+                          hashlib.sha256(payload).hexdigest() != digest):
+                        raise ValueError('Artifact digest mismatch')
+                    if media == 'audio/wav':
+                        if not name.endswith('.wav'):
+                            raise ValueError('Expected WAV extension')
+                        _verify_wav_bytes(payload)
+                        audio.append((name, payload))
+                    elif media == 'application/json':
+                        if not name.endswith('.json'):
+                            raise ValueError('Expected JSON extension')
+                        json.loads(payload)
+                    elif media == 'text/plain' and not name.endswith('.txt'):
+                        raise ValueError('Expected text extension')
+                if not audio or len(audio) > 16:
+                    raise ValueError('No WAV stems in recovered archive')
+        except (ValueError, KeyError, TypeError, OSError, zipfile.BadZipFile, UnicodeDecodeError) as exc:
+            raise HTTPException(422, 'Invalid recovered stem archive') from exc
+        stem_transaction.begin(pid, receipt)
+        created = []
+        try:
+            for name, payload in audio:
+                uploaded = UploadFile(filename=name, file=io.BytesIO(payload))
+                filename, dst, duration = _save_upload(pid, uploaded, int(project.sample_rate))
+                created.append(dst)
+                stem = Path(name).stem.replace('_', ' ').title()
+                track = Track(id=uuid.uuid4().hex[:10], name=f'Recovered {stem}'[:200],
+                              filename=filename, duration_ms=duration,
+                              sample_rate=int(project.sample_rate),
+                              clips=[Clip(id=uuid.uuid4().hex[:10], source_start_ms=0,
+                                          source_end_ms=duration, timeline_start_ms=0)])
+                project.tracks.append(track)
+                _register_track_source_in_library(project, track, f'Recovered AI stem: {name}')
+            project.recovered_ai_imports.append(receipt)
+            save_project(project)
+        except Exception:
+            # Retain journal on failure: on-disk state is reconciled under
+            # the project lock before the next import.
+            raise
+        stem_transaction.reconcile(pid)
+        return {'ok': True, 'kind': kind, 'count': len(audio), 'request_id': request_id,
+                'project_id': pid, 'journal_preserved': True}
+
+
+@app.post('/api/native/ai-workers/remote-history/{kind}/import-json/{request_id}/{pid}')
+def native_ai_workers_import_discovered_json(request: Request, kind: str, request_id: str, pid: str):
+    """Operator-selected project import of authenticated historical annotations.
+
+    No local pending entry is synthesized, and the original worker output is
+    fetched and validated by the same pipeline as durable journal recovery.
+    """
+    return native_ai_workers_import_recovered_json(request, request_id, pid, _discovered_kind=kind)
+
+
+@app.post('/api/native/ai-workers/remote-history/{kind}/import-stems/{request_id}/{pid}')
+def native_ai_workers_import_discovered_stems(request: Request, kind: str, request_id: str, pid: str):
+    """Operator-selected atomic stem import after authenticated rediscovery."""
+    return native_ai_workers_import_recovered_stems(request, request_id, pid, _discovered_kind=kind)
+
+
 @app.post('/api/native/ai-workers/settings')
 def native_ai_workers_configure(request: Request, body: dict):
     _ace_native_only(request)
@@ -5704,3 +7186,51 @@ def desktop_ace_test(request: Request):
         _ace_test_state={'state':'running'}
     threading.Thread(target=_run_ace_test,daemon=True,name='mta-ace-smoke').start()
     return {'state':'running'}
+
+
+@app.get('/api/projects/{pid}/recovered-stem-orphans')
+def recovered_stem_orphans_review(request: Request, pid: str):
+    _project_for_actor(request, pid)
+    from .ai_project_lock import project_publication_lock
+    from .ai_recovered_stem_transaction import review_preserved
+    with project_publication_lock(pid):
+        return review_preserved(pid)
+
+
+@app.get('/api/projects/{pid}/recovered-stem-orphans/quarantine')
+def recovered_stem_quarantine_review(request: Request, pid: str):
+    _project_for_actor(request, pid)
+    from .ai_project_lock import project_publication_lock
+    from .ai_recovered_stem_transaction import review_quarantine
+    with project_publication_lock(pid):
+        return review_quarantine(pid)
+
+
+@app.post('/api/projects/{pid}/recovered-stem-orphans/restore')
+def recovered_stem_quarantine_restore(request: Request, pid: str, body: dict):
+    _project_for_actor(request, pid)
+    name = body.get('quarantine_name')
+    if not isinstance(name, str):
+        raise HTTPException(400, 'Invalid quarantine selection')
+    from .ai_project_lock import project_publication_lock
+    from .ai_recovered_stem_transaction import restore_quarantined
+    with project_publication_lock(pid):
+        try:
+            return restore_quarantined(pid, name)
+        except (ValueError, RuntimeError, OSError) as exc:
+            raise HTTPException(409, str(exc)) from exc
+
+
+@app.post('/api/projects/{pid}/recovered-stem-orphans/quarantine')
+def recovered_stem_orphans_quarantine(request: Request, pid: str, body: dict):
+    _project_for_actor(request, pid)
+    from .ai_project_lock import project_publication_lock
+    from .ai_recovered_stem_transaction import quarantine_preserved
+    receipt, path = body.get('receipt'), body.get('file')
+    if not isinstance(receipt, str) or not isinstance(path, str):
+        raise HTTPException(400, 'Invalid preserved stem selection')
+    with project_publication_lock(pid):
+        try:
+            return quarantine_preserved(pid, receipt, path)
+        except (ValueError, RuntimeError, OSError) as exc:
+            raise HTTPException(409, str(exc)) from exc

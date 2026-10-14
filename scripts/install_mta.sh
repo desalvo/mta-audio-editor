@@ -359,8 +359,16 @@ HF_HOME=/var/lib/mta/models/huggingface
 EOT
  echo "Initial admin account: admin; initial password stored in $ENVFILE (root-only)."
 else
- sed -i -E "/^MTA_ACE_STEP_URL=/d; /^MTA_ACE_STEP_TRUSTED_HOST=/d" "$ENVFILE"
- printf 'MTA_ACE_STEP_URL=%s\nMTA_ACE_STEP_TRUSTED_HOST=%s\n' "${ACE_URL:-http://127.0.0.1:$ACE_PORT}" "${ACE_REMOTE_HOST:-}" >> "$ENVFILE"
+ # Existing installations must be upgraded with the same trusted worker
+ # configuration as first-time installs. Preserve administrator secrets and
+ # unrelated user settings; never source an EnvironmentFile as shell code.
+ sed -i -E '/^(MTA_AI_WORKER_ENABLED|MTA_AI_WORKER_EXECUTABLE|MTA_ACE_STEP_URL|MTA_ACE_STEP_TRUSTED_HOST)=/d' "$ENVFILE"
+ cat >> "$ENVFILE" <<EOT
+MTA_AI_WORKER_ENABLED=true
+MTA_AI_WORKER_EXECUTABLE=$APP_DIR/app/ace_step_http_worker.py
+MTA_ACE_STEP_URL=${ACE_URL:-http://127.0.0.1:$ACE_PORT}
+MTA_ACE_STEP_TRUSTED_HOST=${ACE_REMOTE_HOST:-}
+EOT
 fi
 chmod 600 "$ENVFILE"
 if [[ -n $ACE_URL ]]; then

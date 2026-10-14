@@ -7,6 +7,9 @@ must configure retention and filesystem cleanup separately.
 from __future__ import annotations
 
 import hashlib
+import contextlib
+import fcntl
+import stat
 import json
 import os
 from pathlib import Path
@@ -38,7 +41,37 @@ def _paths(root: Path, user_id: int, key: str) -> tuple[Path, Path]:
     return root / (opaque + '.bin'), root / (opaque + '.json')
 
 
-def save(user_id: int, key: str, payload: bytes, media_type: str, job_id: str) -> bool:
+@contextlib.contextmanager
+def _entry_lock(root: Path, blob: Path):
+    """Serialize writes/readers of a single cached request across API workers."""
+    path = root / (blob.stem + '.lock')
+    fd = os.open(path, os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600)
+    try:
+        if not stat.S_ISREG(os.fstat(fd).st_mode):
+            raise ValueError('Unsafe cache lock')
+        fcntl.flock(fd, fcntl.LOCK_EX)
+        yield
+    finally:
+        fcntl.flock(fd, fcntl.LOCK_UN)
+        os.close(fd)
+
+
+def _read_regular(path: Path, limit: int) -> bytes:
+    fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+    try:
+        metadata = os.fstat(fd)
+        if not stat.S_ISREG(metadata.st_mode) or metadata.st_nlink != 1 or metadata.st_size > limit:
+            raise ValueError('Unsafe cached artifact')
+        with os.fdopen(fd, 'rb', closefd=False) as stream:
+            data = stream.read(limit + 1)
+        if len(data) > limit:
+            raise ValueError('Oversized cached artifact')
+        return data
+    finally:
+        os.close(fd)
+
+
+def save(user_id: int, key: str, payload: bytes, media_type: str, job_id: str, *, metering_envelope: dict | None = None) -> bool:
     root = _root()
     if root is None:
         return False
@@ -51,17 +84,31 @@ def save(user_id: int, key: str, payload: bytes, media_type: str, job_id: str) -
     ttl = max(60, min(604800, int(os.getenv('MTA_AI_RESULT_CACHE_TTL', '86400'))))
     details = {'job_id': job_id, 'media_type': media_type,
                'sha256': hashlib.sha256(payload).hexdigest(), 'expires_at': int(time.time()) + ttl}
-    for path, content in ((blob, payload), (metadata, json.dumps(details).encode())):
-        fd, temp_path = tempfile.mkstemp(prefix='.mta-ai-', dir=root)
+    if metering_envelope is not None:
+        from .ai_remote_metering_attestation import verify_rotating
+        from .ai_remote_keyring import active_keyring
+        worker_id = metering_envelope.get('worker_id') if isinstance(metering_envelope, dict) else None
+        verify_rotating(active_keyring(), metering_envelope, job_id=job_id, request_id=key, worker_id=worker_id)
+        details['metering_envelope'] = metering_envelope
+    # The payload and its signed-by-digest metadata become visible under one
+    # per-key lock. A crash between replacements remains fail-closed on load.
+    with _entry_lock(root, blob):
+        for path, content in ((blob, payload), (metadata, json.dumps(details).encode())):
+            fd, temp_path = tempfile.mkstemp(prefix='.mta-ai-', dir=root)
+            try:
+                with os.fdopen(fd, 'wb') as handle:
+                    handle.write(content)
+                    handle.flush()
+                    os.fsync(handle.fileno())
+                os.replace(temp_path, path)
+            finally:
+                if os.path.exists(temp_path):
+                    os.unlink(temp_path)
+        dirfd = os.open(root, os.O_RDONLY | os.O_DIRECTORY)
         try:
-            with os.fdopen(fd, 'wb') as handle:
-                handle.write(content)
-                handle.flush()
-                os.fsync(handle.fileno())
-            os.replace(temp_path, path)
+            os.fsync(dirfd)
         finally:
-            if os.path.exists(temp_path):
-                os.unlink(temp_path)
+            os.close(dirfd)
     return True
 
 
@@ -70,19 +117,52 @@ def load(user_id: int, key: str, expected_job_id: str) -> tuple[bytes, str] | No
     if root is None:
         return None
     blob, metadata = _paths(root, user_id, key)
-    if not blob.is_file() or not metadata.is_file() or blob.is_symlink() or metadata.is_symlink():
-        return None
     try:
-        details = json.loads(metadata.read_text())
-        if details['job_id'] != expected_job_id or int(details['expires_at']) < time.time():
-            return None
-        if details['media_type'] not in ALLOWED or blob.stat().st_size > MAX_BYTES:
-            return None
-        content = blob.read_bytes()
-        if hashlib.sha256(content).hexdigest() != details['sha256']:
-            return None
-        return content, details['media_type']
-    except (OSError, ValueError, KeyError, TypeError):
+        with _entry_lock(root, blob):
+            details = json.loads(_read_regular(metadata, 4096))
+            if details['job_id'] != expected_job_id or int(details['expires_at']) < time.time():
+                return None
+            if details['media_type'] not in ALLOWED:
+                return None
+            content = _read_regular(blob, MAX_BYTES)
+            if not content or hashlib.sha256(content).hexdigest() != details['sha256']:
+                return None
+            return content, details['media_type']
+    except (OSError, ValueError, KeyError, TypeError, json.JSONDecodeError):
+        return None
+
+
+def load_with_metering(user_id: int, key: str, expected_job_id: str) -> tuple[bytes, str, dict | None] | None:
+    """Replay a result and its authenticated evidence under one per-request lock.
+
+    Revoked signing keys invalidate the evidence; never send an unverified
+    envelope. Unlike ``load``, this method explicitly requires matching
+    persisted metering when metadata contains an envelope.
+    """
+    root = _root()
+    if root is None:
+        return None
+    blob, metadata = _paths(root, user_id, key)
+    try:
+        with _entry_lock(root, blob):
+            details = json.loads(_read_regular(metadata, 8192))
+            if details.get('job_id') != expected_job_id or type(details.get('expires_at')) is not int or details['expires_at'] < time.time():
+                return None
+            if details.get('media_type') not in ALLOWED:
+                return None
+            contents = _read_regular(blob, MAX_BYTES)
+            if not contents or hashlib.sha256(contents).hexdigest() != details.get('sha256'):
+                return None
+            envelope = details.get('metering_envelope')
+            if envelope is not None:
+                from .ai_remote_metering_attestation import verify_rotating
+                from .ai_remote_keyring import active_keyring
+                if not isinstance(envelope, dict):
+                    return None
+                verify_rotating(active_keyring(), envelope, job_id=expected_job_id,
+                                request_id=key, worker_id=envelope.get('worker_id'))
+            return contents, details['media_type'], envelope
+    except (OSError, ValueError, KeyError, TypeError, json.JSONDecodeError):
         return None
 
 
@@ -98,24 +178,30 @@ def purge_expired(*, now: int | None = None, dry_run: bool = True) -> dict:
     instant = int(time.time()) if now is None else int(now)
     examined = expired = removed = 0
     for metadata in root.glob('*.json'):
-        if metadata.is_symlink() or len(metadata.stem) != 64 or any(c not in '0123456789abcdef' for c in metadata.stem):
+        if len(metadata.stem) != 64 or any(ch not in '0123456789abcdef' for ch in metadata.stem):
             continue
         examined += 1
         blob = root / (metadata.stem + '.bin')
-        if blob.is_symlink():
-            continue
+        # The same lock is used by save() and load(). Without it the cleaner
+        # can delete a newly committed result after reading an old expiry.
         try:
-            details = json.loads(metadata.read_text())
-            expiry = details.get('expires_at')
-            if type(expiry) is not int or expiry >= instant:
-                continue
-            expired += 1
-            if not dry_run:
+            with _entry_lock(root, blob):
+                details = json.loads(_read_regular(metadata, 4096))
+                expiry = details.get('expires_at')
+                if type(expiry) is not int or expiry >= instant:
+                    continue
+                expired += 1
+                if dry_run:
+                    continue
+                # Refuse symlinks and multiply-linked inodes before unlinking.
+                # Missing blobs are acceptable after an interrupted write.
+                if blob.exists() or blob.is_symlink():
+                    _read_regular(blob, MAX_BYTES)
                 metadata.unlink()
-                if blob.is_file() and not blob.is_symlink():
+                if blob.exists():
                     blob.unlink()
                 removed += 1
-        except (OSError, ValueError, TypeError):
+        except (OSError, ValueError, TypeError, KeyError, json.JSONDecodeError):
             continue
     return {'examined': examined, 'expired': expired, 'removed': removed}
 
@@ -151,3 +237,42 @@ def cleanup_if_due(*, now: int | None = None) -> dict:
             lock.unlink(missing_ok=True)
     except (OSError, ValueError):
         return {'examined': 0, 'expired': 0, 'removed': 0}
+
+
+def recover_completed_job_id(user_id: int, key: str) -> str | None:
+    """Recover a published result's job identity without executing inference.
+
+    Both metadata and payload must pass the same ownership, expiry, inode and
+    SHA-256 checks as normal GET replay. Never trust metadata alone.
+    """
+    root = _root()
+    if root is None:
+        return None
+    blob, metadata = _paths(root, user_id, key)
+    try:
+        with _entry_lock(root, blob):
+            details = json.loads(_read_regular(metadata, 8192))
+            job_id = details.get('job_id')
+            if not isinstance(job_id, str) or not 1 <= len(job_id) <= 128:
+                return None
+            if details.get('media_type') not in ALLOWED:
+                return None
+            if type(details.get('expires_at')) is not int or details['expires_at'] < time.time():
+                return None
+            contents = _read_regular(blob, MAX_BYTES)
+            if not contents or hashlib.sha256(contents).hexdigest() != details.get('sha256'):
+                return None
+            # Crash recovery is an authoritative completed-state transition.
+            # Never finalize the ledger from a cached payload whose signed
+            # metering evidence cannot pass the same checks as result replay.
+            envelope = details.get('metering_envelope')
+            if envelope is not None:
+                if not isinstance(envelope, dict):
+                    return None
+                from .ai_remote_metering_attestation import verify_rotating
+                from .ai_remote_keyring import active_keyring
+                verify_rotating(active_keyring(), envelope, job_id=job_id,
+                                request_id=key, worker_id=envelope.get('worker_id'))
+            return job_id
+    except (OSError, ValueError, KeyError, TypeError, json.JSONDecodeError):
+        return None

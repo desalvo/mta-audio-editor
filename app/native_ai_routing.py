@@ -65,20 +65,35 @@ def is_remote(kind: str) -> bool:
 
 def infer(kind: str, audio: Path, options: dict | None = None) -> tuple[dict, str]:
     """Infer remotely, returning validated JSON and/or named WAV data. No fallback."""
-    from .ai_remote_client import infer_audio, RemoteAIError
+    from .ai_remote_client import infer_audio, recover_after_lost_response, RemoteAIError
+    from . import ai_native_remote_journal as pending
     from .ai_worker_artifacts import SAFE_NAME, MAX_FILES, MAX_ARTIFACT_BYTES
     cfg = _read().get('workers',{}).get(kind,{})
     if cfg.get('mode') != 'remote': raise ValueError('Remote AI mode not selected')
     with audio.open('rb') as handle:
         wav = handle.read(32*1024*1024+1)
-    payload,mime,job_id = infer_audio(cfg['url'],cfg['token'],kind,wav,options)
+    # Modern servers attest both the exact request and result bytes.
+    # Enable a fail-closed mode for installations requiring this guarantee.
+    strict = os.getenv('MTA_REMOTE_AI_REQUIRE_ATTESTATION', '').strip().lower() in ('1','true','yes','on')
+    request_id, already_pending, fingerprint = pending.begin(cfg['url'], cfg['token'], kind, wav, options)
+    if already_pending:
+        payload,mime,job_id = recover_after_lost_response(
+            cfg['url'], cfg['token'], request_id, require_attestation=strict)
+    else:
+        payload,mime,job_id = infer_audio(
+            cfg['url'],cfg['token'],kind,wav,options,
+            request_id=request_id, require_attestation=strict)
     if mime == 'application/json':
         try:
-            return {'audio': {}, 'json': {'result.json': json.loads(payload.decode('utf-8'))}}, job_id
+            value = {'audio': {}, 'json': {'result.json': json.loads(payload.decode('utf-8'))}}
+            pending.finish(fingerprint, request_id)
+            return value, job_id
         except (UnicodeError, ValueError) as exc:
             raise RemoteAIError('Invalid remote AI JSON result') from exc
     if mime == 'audio/wav':
-        return {'audio':{'result.wav':payload},'json':{}},job_id
+        value = {'audio':{'result.wav':payload},'json':{}}
+        pending.finish(fingerprint, request_id)
+        return value,job_id
     result = {'audio':{},'json':{}}
     try:
         with zipfile.ZipFile(io.BytesIO(payload)) as z:
@@ -103,4 +118,5 @@ def infer(kind: str, audio: Path, options: dict | None = None) -> tuple[dict, st
             if not result['audio'] and not result['json']: raise ValueError('Empty AI results')
     except (OSError,zipfile.BadZipFile,UnicodeError) as exc:
         raise RemoteAIError('Invalid remote AI artifact archive') from exc
+    pending.finish(fingerprint, request_id)
     return result,job_id

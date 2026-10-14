@@ -10,6 +10,9 @@ Cluster bytes are appended unchanged.
 from __future__ import annotations
 
 import mmap
+import os
+import stat
+import tempfile
 from pathlib import Path
 
 from .mta_reverse import _ebml_children, _ebml_vint
@@ -106,6 +109,14 @@ def normalize_matroska_for_mta(source: Path, target: Path) -> int:
     Returns the absolute first-Cluster offset in ``target``. No proprietary XOR
     is applied here.
     """
+    source = Path(source)
+    target = Path(target)
+    if source.resolve(strict=True) == target.resolve(strict=False):
+        raise ValueError("source and destination must differ")
+    if source.is_symlink() or not stat.S_ISREG(source.stat().st_mode):
+        raise ValueError("source must be a regular non-symlink file")
+    if target.is_symlink() or (target.exists() and not stat.S_ISREG(target.stat().st_mode)):
+        raise ValueError("destination must be a regular non-symlink file")
     with source.open("rb") as fh, mmap.mmap(fh.fileno(), 0, access=mmap.ACCESS_READ) as mm:
         if len(mm) < 32 or mm[:4] != b"\x1a\x45\xdf\xa3":
             raise ValueError("source is not EBML/Matroska")
@@ -188,6 +199,24 @@ def normalize_matroska_for_mta(source: Path, target: Path) -> int:
         # Fixed 8-byte Segment-size VINT makes absolute header size deterministic.
         segment_header = b"\x18\x53\x80\x67" + _size_vint(len(segment_payload), 8)
         prefix = bytes(mm[:segment])
-        target.write_bytes(prefix + segment_header + segment_payload)
+        # Never expose a truncated Matroska file if write/fsync fails.
+        fd, staging_name = tempfile.mkstemp(prefix=".mta-layout-", suffix=".tmp", dir=target.parent)
+        try:
+            with os.fdopen(fd, "wb") as staged:
+                staged.write(prefix + segment_header + segment_payload)
+                staged.flush()
+                os.fsync(staged.fileno())
+            if target.is_symlink():
+                raise ValueError("destination became a symlink")
+            os.replace(staging_name, target)
+            if os.name == "posix":
+                directory_fd = os.open(target.parent, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0))
+                try:
+                    os.fsync(directory_fd)
+                finally:
+                    os.close(directory_fd)
+        finally:
+            if os.path.exists(staging_name):
+                os.unlink(staging_name)
 
     return len(prefix) + len(segment_header) + first_cluster_relative

@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import datetime as dt
 import json
+import math
 import os
 import sqlite3
 import time
@@ -121,13 +122,24 @@ def user_billing_settings() -> list[dict]:
 
 
 def _validate_usage(values):
+    """Accept only finite, bounded telemetry without coercing malformed input.
+
+    In particular, an explicit empty list must not become an empty measurement
+    via the legacy ``usage or {}`` fallback in finalization entrypoints.
+    """
     if not isinstance(values, dict) or set(values) - (set(UNITS) - {'gpu_slot_seconds_estimated'}):
         raise ValueError('Unsupported resource field')
     clean = {}
     for key, value in values.items():
-        if isinstance(value, bool) or not isinstance(value, (int, float)) or not (0 <= float(value) < 1e18):
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
             raise ValueError('Resource values must be finite nonnegative numbers')
-        clean[key] = float(value)
+        try:
+            number = float(value)
+        except (OverflowError, ValueError) as exc:
+            raise ValueError('Resource values must be finite nonnegative numbers') from exc
+        if not math.isfinite(number) or not (0 <= number < 1e18):
+            raise ValueError('Resource values must be finite nonnegative numbers')
+        clean[key] = number
     return clean
 
 
@@ -166,6 +178,70 @@ def create_job(user_id: int, kind: str, token_id=None, *, started_at=None, diagn
     return job_id
 
 
+def existing_inference_ledger_job(inference_job_id: str, user_id: int, kind: str) -> str | None:
+    """Find an already provisioned obligation irrespective of current opt-in.
+
+    Turning billing off affects future admissions, not durable jobs already
+    accepted into the ledger. This is read-only and never creates a charge.
+    """
+    if not isinstance(inference_job_id, str) or not (1 <= len(inference_job_id) <= 128) or not all(
+            ch.isascii() and (ch.isalnum() or ch in '-_') for ch in inference_job_id):
+        raise ValueError('Invalid durable inference ID')
+    if type(user_id) is not int or user_id <= 0 or kind not in ('arranger', 'remix'):
+        raise ValueError('Invalid inference billing identity')
+    ledger_id = uuid.uuid5(uuid.NAMESPACE_URL, 'mta-ai-inference:' + inference_job_id).hex
+    with db() as c:
+        _init(c)
+        record = c.execute('SELECT user_id,kind FROM ai_compute_jobs WHERE id=?', (ledger_id,)).fetchone()
+    if record is None:
+        return None
+    if int(record['user_id']) != user_id or record['kind'] != kind:
+        raise ValueError('Conflicting provisioned billing identity')
+    return ledger_id
+
+
+def provision_inference_job(inference_job_id: str, user_id: int, kind: str) -> str | None:
+    """Provision a stable ledger identity only when billing is explicitly enabled.
+
+    Multiple retries resolve to the same row and cannot create duplicate jobs.
+    This does not by itself bind queue admission or make a cross-database commit.
+    """
+    if not isinstance(inference_job_id, str) or not (1 <= len(inference_job_id) <= 128) or not all(
+            ch.isascii() and (ch.isalnum() or ch in '-_') for ch in inference_job_id):
+        raise ValueError('Invalid durable inference ID')
+    if type(user_id) is not int or user_id <= 0:
+        raise ValueError('Authenticated positive user ID required')
+    if kind not in ('arranger', 'remix'):
+        raise ValueError('Unsupported billable inference kind')
+    from .ai_billing_profiles import suggested_prices
+    with db() as c:
+        _init(c)
+        c.execute('BEGIN IMMEDIATE')
+        if not user_billing_enabled(user_id, _connection=c):
+            return None
+        if not c.execute('SELECT 1 FROM users WHERE id=? AND active=1', (user_id,)).fetchone():
+            raise ValueError('Active user required')
+        ledger_id = uuid.uuid5(uuid.NAMESPACE_URL, 'mta-ai-inference:' + inference_job_id).hex
+        row = c.execute('SELECT user_id,kind FROM ai_compute_jobs WHERE id=?', (ledger_id,)).fetchone()
+        if row:
+            if int(row['user_id']) != user_id or row['kind'] != kind:
+                raise ValueError('Conflicting durable inference billing identity')
+            return ledger_id
+        stamp = int(time.time())
+        if c.execute('SELECT 1 FROM ai_billing_periods WHERE user_id=? AND start_ts<=? AND end_ts>? LIMIT 1',
+                     (user_id, stamp, stamp)).fetchone():
+            raise ValueError('Cannot provision within closed billing period')
+        hardware = suggested_prices()
+        rates = hardware['suggested_micro_per_unit']
+        c.execute('INSERT INTO ai_compute_jobs(id,user_id,token_id,kind,status,started_at,billable) VALUES(?,?,NULL,?,?,?,1)',
+                  (ledger_id, user_id, kind, 'running', stamp))
+        c.execute('INSERT INTO ai_job_hardware_snapshots (job_id,captured_at,model_version,cpu_model,gpu_model,cpu_rate_micro,gpu_rate_micro,storage_rate_micro,origin) VALUES(?,?,?,?,?,?,?,?,?)',
+                  (ledger_id, stamp, hardware['model_version'], hardware['cpu_model'], hardware['gpu_model'],
+                   rates['cpu_seconds'], rates['gpu_slot_seconds_estimated'], rates['disk_gb_hours'],
+                   'local-advisory' if hardware['cpu_model'] or hardware['gpu_model'] else 'unknown'))
+        return ledger_id
+
+
 def job_hardware_snapshot(job_id: str) -> dict | None:
     """Return immutable advisory hardware profile captured at job creation."""
     with db() as c:
@@ -178,8 +254,8 @@ def job_hardware_snapshot(job_id: str) -> dict | None:
 def finish_job(job_id, status, usage=None, *, source='unmetered', finished_at=None):
     if status not in ('done','failed','cancelled'):
         raise ValueError('Invalid final job status')
-    values = _validate_usage(usage or {})
-    if source not in ('unmetered','worker','cgroup','gpu-agent'):
+    values = _validate_usage({} if usage is None else usage)
+    if source not in ('unmetered','worker','cgroup','gpu-agent','remote-worker'):
         raise ValueError('Invalid metering source')
     if values and source == 'unmetered':
         raise ValueError('Resources require trusted metering source')
@@ -636,7 +712,7 @@ def reconcile_period(user_id, start, end):
                     issue('missing_priced_metric', job_id=jid, detail=resource)
                 elif resource == 'gpu_seconds' and source != 'gpu-agent':
                     issue('untrusted_gpu_metric', job_id=jid)
-                elif resource == 'cpu_seconds' and source not in ('cgroup', 'worker', 'gpu-agent'):
+                elif resource == 'cpu_seconds' and source not in ('cgroup', 'worker', 'gpu-agent', 'remote-worker'):
                     issue('untrusted_cpu_metric', job_id=jid)
         disk_paid = bool(c.execute(
             "SELECT 1 FROM ai_resource_price_history WHERE resource='disk_gb_hours' "
@@ -711,7 +787,7 @@ def close_period(user_id, start, end):
                                  (user_id,a,b)).fetchall()
             for job in cpu_jobs:
                 usage = json.loads(job['usage_json'])
-                if (job['resource_source'] not in ('cgroup', 'worker', 'gpu-agent') or
+                if (job['resource_source'] not in ('cgroup', 'worker', 'gpu-agent', 'remote-worker') or
                     'cpu_seconds' not in usage):
                     raise ValueError('CPU tariff requires verified per-job CPU telemetry')
         # A CPU-only meter cannot certify that a GPU job consumed no GPU.
@@ -884,3 +960,44 @@ def run_scheduled_closures(*, at=None):
         except ValueError as exc:
             output.append({'user_id':spec['user_id'],'error':str(exc)})
     return output
+
+
+def finish_job_idempotent(job_id, status, usage=None, *, source='unmetered', finished_at=None):
+    """Idempotent retries for durable metering delivery, rejecting conflicts.
+
+    The original finish_job remains a compare-and-set. This wrapper does not
+    claim cross-database atomicity with the inference scheduler.
+    """
+    if finished_at is not None and (isinstance(finished_at, bool) or not isinstance(finished_at, int) or finished_at < 0):
+        raise ValueError('Invalid finalization timestamp')
+    if status not in ('done', 'failed', 'cancelled'):
+        raise ValueError('Invalid final job status')
+    values = _validate_usage({} if usage is None else usage)
+    if source not in ('unmetered', 'worker', 'cgroup', 'gpu-agent', 'remote-worker'):
+        raise ValueError('Invalid metering source')
+    if values and source == 'unmetered':
+        raise ValueError('Resources require trusted metering source')
+    gpu_fields = {'gpu_seconds', 'gpu_energy_joules'}
+    if gpu_fields.intersection(values) and source != 'gpu-agent':
+        raise ValueError('GPU measurements require trusted gpu-agent source')
+    if source == 'gpu-agent' and not gpu_fields.intersection(values):
+        raise ValueError('GPU agent must provide an explicit GPU measurement')
+    with db() as c:
+        _init(c)
+        row = c.execute('SELECT status,finished_at,usage_json,resource_source FROM ai_compute_jobs WHERE id=?', (job_id,)).fetchone()
+    if row is None:
+        raise ValueError('Unknown billing job')
+    if row['status'] == 'running':
+        try:
+            finish_job(job_id, status, values, source=source, finished_at=finished_at)
+            return {'job_id': job_id, 'status': status, 'already_finalized': False}
+        except ValueError as exc:
+            if str(exc) not in ('Job missing or already finalized', 'Job already finalized by another worker'):
+                raise
+        with db() as c:
+            row = c.execute('SELECT status,finished_at,usage_json,resource_source FROM ai_compute_jobs WHERE id=?', (job_id,)).fetchone()
+    if (row['status'] != status or row['resource_source'] != source
+            or json.loads(row['usage_json']) != values
+            or (finished_at is not None and finished_at != row['finished_at'])):
+        raise ValueError('Conflicting job finalization retry')
+    return {'job_id': job_id, 'status': status, 'already_finalized': True}

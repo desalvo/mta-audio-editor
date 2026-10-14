@@ -1,0 +1,5 @@
+# Importazione artifact strutturati riscoperti senza journal — 0.3.0-r208
+
+L'interfaccia dello storico remoto espone ora, oltre al download e all'importazione WAV, l'applicazione JSON per Whisper/Chords e l'importazione di stem ZIP per gli adapter di separazione. Sono richiesti un progetto aperto e una conferma esplicita. La pubblicazione riutilizza i percorsi esistenti dei journal locali (controlli di formato, limiti di dimensione, lock interprocesso, ricevute di idempotenza, aggiornamento persistente e recovery degli stem), ma recupera l'artifact dall'endpoint autenticato dello storico invece di fabbricare un journal locale. Nessuna inferenza viene rilanciata e nessun addebito aggiuntivo viene effettuato.
+
+**Limiti:** la scelta del progetto è esplicita e non dimostra la provenienza storica dei dati; un token condiviso fra tipi di worker non attesta crittograficamente l'adapter originario. L'operatore deve controllare il tipo di artifact e la destinazione. Restano separati i collaudi su GPU e installer reali e la certificazione della regressione completa.

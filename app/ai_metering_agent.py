@@ -12,6 +12,7 @@ import subprocess
 import time
 from pathlib import Path
 from dataclasses import dataclass
+from typing import Callable
 
 
 @dataclass(frozen=True)
@@ -61,7 +62,7 @@ def _descendants(parent_pid: int) -> set[int]:
     return found
 
 
-def run_metered_process(argv: list[str], *, cwd: str, timeout_seconds: int = 3600) -> Measurement:
+def run_metered_process(argv: list[str], *, cwd: str, timeout_seconds: int = 3600, cancel_check: Callable[[], bool] | None = None) -> Measurement:
     """Run a fixed operator-selected executable and attribute direct-child CPU.
 
     No shell or user-provided command strings are accepted by this function's
@@ -80,6 +81,7 @@ def run_metered_process(argv: list[str], *, cwd: str, timeout_seconds: int = 360
                             start_new_session=True)  # noqa: S603 -- operator-controlled executable only
     max_io = _io(proc.pid)
     timed_out = False
+    cancelled = False
     detected_descendants = False
     try:
         while True:
@@ -93,6 +95,14 @@ def run_metered_process(argv: list[str], *, cwd: str, timeout_seconds: int = 360
             current = _io(proc.pid)
             if current:
                 max_io = tuple(max(a, b) for a, b in zip(max_io, current)) if max_io else current
+            if cancel_check is not None and cancel_check():
+                cancelled = True
+                try:
+                    os.killpg(proc.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+                _, status, rusage = os.wait4(proc.pid, 0)
+                break
             if time.monotonic() - started >= timeout_seconds:
                 timed_out = True
                 try:
@@ -117,6 +127,8 @@ def run_metered_process(argv: list[str], *, cwd: str, timeout_seconds: int = 360
             except ChildProcessError:
                 pass
         proc.returncode = os.waitstatus_to_exitcode(status) if 'status' in locals() else None
+    if cancelled:
+        raise RuntimeError('AI worker cancelled during execution; result discarded')
     elapsed = max(0.0, time.monotonic() - started)
     usage = {'cpu_seconds': max(0.0, rusage.ru_utime + rusage.ru_stime)}
     if max_io:
@@ -126,7 +138,8 @@ def run_metered_process(argv: list[str], *, cwd: str, timeout_seconds: int = 360
 
 
 def execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=None,
-                              timeout_seconds: int = 1200, source_wav: bytes | None = None) -> tuple[bytes, dict]:
+                              timeout_seconds: int = 1200, source_wav: bytes | None = None,
+                              cancel_check: Callable[[], bool] | None = None) -> tuple[bytes, dict]:
     """Run the administrator-installed AI worker and persist measured usage.
 
     Unsupported GPU/process-tree telemetry is omitted, not guessed. Output is
@@ -178,12 +191,18 @@ def execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=N
                 gpu_slot_acquired = True
             if os.getenv('MTA_AI_CGROUP_PARENT'):
                 from .ai_cgroup_metering import run_cgroup_process
-                result = run_cgroup_process(args, cwd=folder, timeout_seconds=timeout_seconds)
+                result = run_cgroup_process(args, cwd=folder, timeout_seconds=timeout_seconds, cancel_check=cancel_check)
             else:
-                result = run_metered_process(args, cwd=folder, timeout_seconds=timeout_seconds)
+                result = run_metered_process(args, cwd=folder, timeout_seconds=timeout_seconds, cancel_check=cancel_check)
+            if cancel_check is not None and cancel_check():
+                raise RuntimeError('AI worker cancelled; result discarded')
             if result.exit_code:
                 raise WorkerUnavailable('AI worker failed or timed out')
             payload, media_type = package_artifacts(directory)
+            # Packaging may be expensive for multi-stem adapters. A cancellation
+            # during this phase must not finalize a successful billed job.
+            if cancel_check is not None and cancel_check():
+                raise RuntimeError("AI worker cancelled during artifact packaging")
             info = {"format": "wav" if media_type == "audio/wav" else "artifact-zip"}
             usage = {key: value for key, value in result.usage.items() if key not in ('disk_read_bytes', 'disk_write_bytes')}
             # Transient worker I/O is diagnostic only, never billable disk use.

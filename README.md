@@ -278,3 +278,8 @@ Optional MTA web HTTPS (Linux wizard): see [MTA_WEB_HTTPS.md](MTA_WEB_HTTPS.md).
 access remain in place until confirmation of the pending new address. The
 account API reports pending verification, including when SMTP is not configured.
 Configure SMTP and resubmit the email change to request a new confirmation link.
+
+
+### Durable upload recovery (0.3.0-r208)
+
+See [Durable upload recovery](AI_R208_DURABLE_RECOVERY_CLOSURES_EN.md) for implemented safeguards, validation and outstanding limitations.

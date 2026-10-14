@@ -1,0 +1,19 @@
+{
+  "project": "MTA Audio Editor",
+  "version": "0.3.0-r208",
+  "static_checks": {
+    "queue_receipt_reader": true,
+    "queue_recovery": true,
+    "ledger_idempotent_finish": true,
+    "terminal_receipt_is_not_cross_database_commit": true
+  },
+  "end_to_end_atomicity": "NOT_CERTIFIED",
+  "reason": "SQLite queue receipt, separate billing ledger and audio filesystem do not share an atomic commit protocol",
+  "required_evidence": [
+    "Crash injection at each boundary: audio staging, publication, receipt commit, billing finalization",
+    "Recovery replay across server restart with unique published output and one ledger settlement",
+    "Concurrent worker cancellation and billing retry under database lock contention",
+    "Execution of real adapters on Rocky EL10 ROCm 7.2.4 gfx1151 with measurements and cancellation"
+  ],
+  "hardware_certification": "NOT_CERTIFIED"
+}

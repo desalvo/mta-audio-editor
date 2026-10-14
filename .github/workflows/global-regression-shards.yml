@@ -1,0 +1,53 @@
+name: Global Python regression (bounded shards)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      # Native C++ readiness tests invoke compilers; bound concurrent shards to
+      # avoid exhausting runner CPU/RAM and obscuring real regressions.
+      max-parallel: 2
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.14'
+          cache: pip
+      - run: pip install -r requirements-dev.txt
+      - name: Full test tree, deterministic shard
+        env:
+          MTA_ALLOW_INSECURE_NO_AUTH: 'true'
+          MTA_DATA_DIR: /tmp/mta-projects
+        run: python scripts/run_global_regression_shard.py --shards 8 --shard ${{ matrix.shard }} --timeout 4800
+      - name: Preserve diagnostic reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: regression-shard-${{ matrix.shard }}
+          if-no-files-found: warn
+          path: regression-reports/
+
+  certification:
+    if: always()
+    needs: regression
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.14'
+      - name: Retrieve every regression shard report
+        uses: actions/download-artifact@v7
+        with:
+          pattern: regression-shard-*
+          path: regression-reports
+          merge-multiple: false
+      - name: Verify all regression shards
+        run: python scripts/verify_global_regression.py --reports regression-reports --shards 8

@@ -23,5 +23,65 @@ async function deleteLocalModel(id){if(!confirm('Cancellare solo la copia locale
 async function blacklistModel(id){if(!confirm('Blacklist '+id+'? Il modello gestito verrà eliminato dallo storage server e nascosto ai client.'))return;try{await api('/api/admin/demucs-models/'+encodeURIComponent(id)+'/blacklist',{method:'POST'});await Promise.all([loadModels(),loadStorage()])}catch(e){alert(e.message)}}
 async function unblacklistModel(id){try{await api('/api/admin/demucs-models/'+encodeURIComponent(id)+'/blacklist',{method:'DELETE'});await loadModels()}catch(e){alert(e.message)}}
 
-qa('.settings-tabs button').forEach(b=>b.onclick=()=>{qa('.settings-tabs button').forEach(x=>x.classList.toggle('active',x===b));for(const tab of ['web','storage','users','smtp','models']){const el=q('#'+tab+'Tab');if(el)el.hidden=b.dataset.tab!==tab}if(b.dataset.tab==='web')loadWebSettings();if(b.dataset.tab==='storage')loadStorage();if(b.dataset.tab==='users')loadUsers();if(b.dataset.tab==='smtp')loadSmtp();if(b.dataset.tab==='models')loadModels()});
+qa('.settings-tabs button').forEach(b=>b.onclick=()=>{qa('.settings-tabs button').forEach(x=>x.classList.toggle('active',x===b));for(const tab of ['web','storage','users','smtp','models','aiQueue']){const el=q('#'+tab+'Tab');if(el)el.hidden=b.dataset.tab!==tab}if(b.dataset.tab==='web')loadWebSettings();if(b.dataset.tab==='storage')loadStorage();if(b.dataset.tab==='users')loadUsers();if(b.dataset.tab==='smtp')loadSmtp();if(b.dataset.tab==='models')loadModels();if(b.dataset.tab==='aiQueue')loadAIQueue();if(b.dataset.tab==='diagnostics')loadDiagnosticsSettings()});
 loadWebSettings();
+
+// r208: Queue controls for the web Arranger/Remix jobs only.
+let aiQueueRefreshTimer=null;
+async function loadAIQueue(){
+  try{
+    const d=await api('/api/admin/ai-execution/jobs');
+    q('#aiQueueConcurrency').value=d.max_concurrent_jobs;
+    const fmt=n=>n==null?'N/A':Number(n).toFixed(1)+' s';
+    q('#aiQueueBody').innerHTML=(d.jobs||[]).map(j=>{
+      const id=encodeURIComponent(j.job_id);
+      const waiting=j.state==='queued', running=j.state==='running';
+      const pct=j.progress_percent==null?'—':`${Number(j.progress_percent).toFixed(0)}%`;
+      return `<tr><td><code>${esc(j.job_id.slice(0,12))}</code><br>${esc(j.operation)}</td><td>${esc(j.project_id)}</td><td>${esc(j.state)}<br><small>${esc(j.message||'')}</small></td><td>${waiting?(j.queue_position+' ('+j.jobs_ahead+' davanti)'):'—'}</td><td>${pct}</td><td>CPU ${fmt(j.cpu_seconds)}<br>GPU ${fmt(j.gpu_seconds)}</td><td>${waiting?`<button onclick="moveAIQueueJob('${id}',-1)">↑</button><button onclick="moveAIQueueJob('${id}',1)">↓</button>`:''}${waiting?`<button class="danger" onclick="cancelAIQueueJob('${id}')">Annulla</button>`:''}</td></tr>`;
+    }).join('')||'<tr><td colspan="7">Nessun job registrato</td></tr>';
+  }catch(e){q('#aiQueueBody').innerHTML='<tr><td colspan="7">'+esc(e.message)+'</td></tr>'}
+}
+async function saveAIQueueSettings(){
+  try{await api('/api/admin/ai-execution/settings',{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify({max_concurrent_jobs:Number(q('#aiQueueConcurrency').value)})});await loadAIQueue()}catch(e){alert(e.message)}
+}
+async function cancelAIQueueJob(id){
+  if(!confirm('Annullare il job? Un job GPU in corso potrebbe non fermarsi immediatamente.'))return;
+  try{await api('/api/admin/ai-execution/jobs/'+id+'/cancel',{method:'POST'});await loadAIQueue()}catch(e){alert(e.message)}
+}
+async function moveAIQueueJob(id,delta){
+  try{
+    const d=await api('/api/admin/ai-execution/jobs');const row=d.jobs.find(j=>j.job_id===decodeURIComponent(id));
+    if(!row||row.queue_position==null)return;
+    await api('/api/admin/ai-execution/jobs/'+id+'/move',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({position:row.queue_position+delta})});await loadAIQueue();
+  }catch(e){alert(e.message)}
+}
+
+
+async function loadDiagnosticsSettings(){
+  try {
+    const settings=await api('/api/admin/diagnostics/settings');
+    q('#diagnosticsEnabled').checked=!!settings.enabled;
+    q('#diagnosticsStatus').textContent=settings.enabled?'Diagnostica abilitata':'Diagnostica disabilitata';
+  }catch(e){q('#diagnosticsStatus').textContent=e.message}
+}
+async function saveDiagnosticsSettings(){
+  try{
+    const d=await api('/api/admin/diagnostics/settings',{
+      method:'PUT',headers:{'content-type':'application/json'},
+      body:JSON.stringify({enabled:q('#diagnosticsEnabled').checked})});
+    q('#diagnosticsStatus').textContent=d.enabled?'Diagnostica abilitata':'Diagnostica disabilitata';
+  }catch(e){q('#diagnosticsStatus').textContent=e.message}
+}
+async function downloadDiagnostics(){
+  const status=q('#diagnosticsStatus');
+  try{
+    status.textContent='Preparazione archivio diagnostico...';
+    const data=await api('/api/admin/diagnostics/bundles',{method:'POST'});
+    const response=await fetch(data.url,{credentials:'same-origin'});
+    if(!response.ok)throw new Error('Download failed: '+response.status);
+    const blob=await response.blob(), url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download=data.name;
+    document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+    status.textContent='Archivio scaricato. Verrà eliminato dal server entro 24 ore.';
+  }catch(e){status.textContent=e.message}
+}
