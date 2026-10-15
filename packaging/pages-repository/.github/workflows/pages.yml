@@ -31,9 +31,14 @@ jobs:
           test -n "$GH_TOKEN" || { echo 'Set MTA_SOURCE_ARTIFACT_TOKEN (source repo Actions:read)' >&2; exit 2; }
           python3 scripts/assemble_pages.py --manifests manifests --output "$RUNNER_TEMP/site"
           du -sh "$RUNNER_TEMP/site"
+          du -sh "$RUNNER_TEMP/site"/apt "$RUNNER_TEMP/site"/rpm 2>/dev/null || true
+          if find "$RUNNER_TEMP/site" -type f -name '*.rpm' | grep -q .; then
+            echo 'RPM payload unexpectedly included in Pages site' >&2
+            exit 4
+          fi
           bytes=$(du -sb "$RUNNER_TEMP/site" | cut -f1)
           if (( bytes > 1000000000 )); then
-            echo "GitHub Pages maximum site size exceeded; use the prepared R2 backend." >&2
+            echo "GitHub Pages size limit exceeded: inspect APT payload retention; RPM binaries belong to GitHub Releases." >&2
             exit 4
           fi
       - uses: actions/configure-pages@v5

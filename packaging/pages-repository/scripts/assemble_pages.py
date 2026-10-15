@@ -41,7 +41,16 @@ def safe_extract(archive, target, channel):
             dest = (target / name).resolve()
             if not dest.is_relative_to(target.resolve()):
                 raise ValueError(f"Archive path escape: {name}")
-        tar.extractall(target, filter="data")
+        # Signed-channel artifacts intentionally retain all RPM payloads for
+        # subsequent repository publication/retention.  Those same payloads
+        # are published as GitHub Release assets, NOT GitHub Pages content.
+        # Validate every member above, but do not materialize RPM binaries.
+        members = [entry for entry in tar.getmembers()
+                   if not (entry.name.removeprefix("./").startswith(f"rpm/{channel}/")
+                           and entry.name.lower().endswith(".rpm"))]
+        tar.extractall(target, members=members, filter="data")
+    if list((target / f"rpm/{channel}").rglob("*.rpm")):
+        raise ValueError("RPM binaries must not be deployed through GitHub Pages")
     if not (target / f"apt/{channel}/InRelease").is_file():
         raise ValueError(f"APT signed index missing for {channel}")
     for el in ("el9", "el10"):
