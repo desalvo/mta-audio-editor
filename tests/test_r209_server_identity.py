@@ -1,7 +1,5 @@
 """Regression coverage for native server identity and diagnostic metadata."""
 from pathlib import Path
-import importlib.util
-import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 
