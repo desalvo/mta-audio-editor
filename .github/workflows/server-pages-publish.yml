@@ -12,7 +12,7 @@ on:
         type: choice
         options: [early, stable]
 permissions:
-  contents: read
+  contents: write  # Upload signed RPMs to the server-packages channel release
   actions: read
 concurrency:
   group: mta-server-pages-publisher
@@ -122,6 +122,56 @@ jobs:
           chmod 600 "$HOME/.ssh/known_hosts"
           test "$(ssh-keygen -lf "$HOME/.ssh/known_hosts" | awk '{print $2}')" = 'SHA256:+DiY3wvvV6TuJJhbpZisF/zLDA0zPMSvHdkr4UvCOqU'
           printf 'Host github.com\n  HostName ssh.github.com\n  Port 443\n  User git\n  IdentityFile %s/.ssh/mta-pages\n  IdentitiesOnly yes\n  StrictHostKeyChecking yes\n' "$HOME" > "$HOME/.ssh/config"
+      - name: Publish signed RPM binaries to GitHub Releases (outside Pages)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CHANNEL: ${{ inputs.channel }}
+        run: |
+          set -euo pipefail
+          tag="server-packages-$CHANNEL"
+          if ! gh release view "$tag" -R "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create "$tag" -R "$GITHUB_REPOSITORY" \
+              --target "$GITHUB_SHA" --title "MTA Server $CHANNEL RPM Repository" \
+              --notes 'Signed server RPM binaries; repository metadata is served through GitHub Pages.'
+          fi
+          shopt -s nullglob
+          files=("$RUNNER_TEMP"/staging/rpm/"$CHANNEL"/el9/packages/*.rpm "$RUNNER_TEMP"/staging/rpm/"$CHANNEL"/el10/packages/*.rpm)
+          test "${#files[@]}" -ge 2
+          # Names must be globally unique across both EL families in this release.
+          test "$(printf '%s\n' "${files[@]##*/}" | sort -u | wc -l)" -eq "${#files[@]}"
+          for f in "${files[@]}"; do
+            name=$(basename "$f")
+            remote=$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$tag" \
+              --jq ".assets[] | select(.name == \"$name\") | .size")
+            if [[ -n $remote ]]; then
+              test "$remote" -eq "$(stat -c '%s' "$f")" || {
+                echo "Asset collision with different size: $name" >&2; exit 3;
+              }
+            else
+              gh release upload "$tag" "$f" -R "$GITHUB_REPOSITORY"
+            fi
+          done
+          # Do not publish new indexes unless *every* referenced RPM exists.
+          for f in "${files[@]}"; do
+            name=$(basename "$f")
+            remote=$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$tag" \
+              --jq ".assets[] | select(.name == \"$name\") | .size")
+            test "$remote" -eq "$(stat -c '%s' "$f")" || exit 4
+          done
+      - name: Regenerate and sign RPM indexes with external binary URLs
+        env:
+          CHANNEL: ${{ inputs.channel }}
+        run: |
+          set -euo pipefail
+          export GNUPGHOME="$RUNNER_TEMP/gnupg"
+          url="https://github.com/$GITHUB_REPOSITORY/releases/download/server-packages-$CHANNEL/"
+          for target in el9 el10; do
+            root="$RUNNER_TEMP/staging/rpm/$CHANNEL/$target"
+            createrepo_c --baseurl "$url" "$root"
+            gpg --batch --yes --local-user 0833A4FCB008ECAC9F98840B4C1D2DD95F5AEDB7 \
+              --armor --detach-sign -o "$root/repodata/repomd.xml.asc" "$root/repodata/repomd.xml"
+            gpg --verify "$root/repodata/repomd.xml.asc" "$root/repodata/repomd.xml"
+          done
       - name: Create signed-channel archive (binary payload stays outside Git)
         env:
           CHANNEL: ${{ inputs.channel }}
@@ -161,11 +211,33 @@ jobs:
           touch .nojekyll
           git config user.name mta-release-bot
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add manifests .nojekyll
+          # Ship the tiny signed repository indexes and human-facing RPM links.
+          python3 "$GITHUB_WORKSPACE/scripts/repositories/publish_pages_rpm_indexes.py" \
+            --staging "$RUNNER_TEMP/staging" --pages "$PWD" --channel "$CHANNEL" \
+            --release-url "https://github.com/$GITHUB_REPOSITORY/releases/download/server-packages-$CHANNEL/"
+          git add manifests .nojekyll mta-archive-key.asc "rpm/$CHANNEL"
           if ! git diff --cached --quiet; then
             git commit -m "Update signed MTA server $CHANNEL deployment manifest from ${GITHUB_SHA:0:12}"
             git push
           fi
+      - name: Verify public GitHub Pages RPM indexes and download listing
+        env:
+          CHANNEL: ${{ inputs.channel }}
+        run: |
+          set -euo pipefail
+          base="https://${GITHUB_REPOSITORY_OWNER,,}.github.io/mta-audio-editor-packages/rpm/$CHANNEL"
+          for target in el9 el10; do
+            for path in repodata/repomd.xml repodata/repomd.xml.asc packages/; do
+              ok=0
+              for attempt in {1..15}; do
+                if curl --fail --location --silent --show-error --max-time 20 -o /dev/null "$base/$target/$path"; then
+                  ok=1; break
+                fi
+                sleep 12
+              done
+              test "$ok" -eq 1 || { echo "Pages is missing $base/$target/$path" >&2; exit 1; }
+            done
+          done
       - name: Destroy temporary signing material
         if: always()
         run: |
