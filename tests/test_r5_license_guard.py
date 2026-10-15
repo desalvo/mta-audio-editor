@@ -31,3 +31,16 @@ def test_rejects_android_notice_removal():
         target.parent.mkdir(parents=True)
         target.write_text('resources.excludes += setOf("META-INF/LICENSE*", "META-INF/NOTICE*")')
         assert not audit(root)['ok']
+
+
+def test_license_gate_finds_notices_in_docs(tmp_path):
+    docs = tmp_path / 'docs'
+    docs.mkdir()
+    (docs / 'THIRD_PARTY_NOTICES.md').write_text('EUPL FFmpeg Chordino VST3')
+    assert audit(tmp_path)['ok']
+
+
+def test_license_gate_missing_notices_fails_closed(tmp_path):
+    result = audit(tmp_path)
+    assert not result['ok']
+    assert 'Missing docs/THIRD_PARTY_NOTICES.md' in result['errors']

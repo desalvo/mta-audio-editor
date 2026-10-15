@@ -39,4 +39,4 @@ def test_localhost_by_default_and_no_firewall_opening():
 
 def test_docs_no_longer_mention_deleted_script():
     for name in ('ACE_STEP_ROCKY_LXC.md', 'ACE_STEP_INSTALLATION.md'):
-        assert 'reinstall_ace_step.sh' not in (ROOT / name).read_text()
+        assert 'reinstall_ace_step.sh' not in (ROOT / 'docs' / name).read_text()

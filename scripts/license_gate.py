@@ -21,9 +21,13 @@ REQUIRED_NOTICES = ('EUPL', 'FFmpeg', 'Chordino', 'VST3')
 
 def audit(root: Path) -> dict:
     errors: list[str] = []
-    notices = root / 'THIRD_PARTY_NOTICES.md'
+    # Documentation is stored under docs/; retain the root lookup only for
+    # legacy source layouts and isolated fixture directories.
+    notices = root / 'docs' / 'THIRD_PARTY_NOTICES.md'
     if not notices.is_file():
-        errors.append('Missing THIRD_PARTY_NOTICES.md')
+        notices = root / 'THIRD_PARTY_NOTICES.md'
+    if not notices.is_file():
+        errors.append('Missing docs/THIRD_PARTY_NOTICES.md')
     else:
         contents = notices.read_text(encoding='utf-8')
         for name in REQUIRED_NOTICES:
