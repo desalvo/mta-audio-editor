@@ -11,8 +11,8 @@ from pathlib import Path
 POOLS = (('apt', 'pool', '.deb'), ('rpm/el9', 'packages', '.rpm'), ('rpm/el10', 'packages', '.rpm'))
 
 
-def prepare(input_root: Path, output_root: Path, channel: str, *, limit: int = 2, apt_only: bool = False):
-    if channel not in ('early', 'stable') or limit != 2:
+def prepare(input_root: Path, output_root: Path, channel: str, *, limit: int = 20, apt_only: bool = False):
+    if channel not in ('early', 'stable') or not 1 <= limit <= 100:
         raise ValueError('Invalid channel or retention limit')
     if apt_only and not (os.environ.get("MTA_CI_APT_ONLY") == "1" and
                          os.environ.get("MTA_CI_DISPOSABLE_CONTAINER") == "1" and
@@ -24,7 +24,7 @@ def prepare(input_root: Path, output_root: Path, channel: str, *, limit: int = 2
         target = output_root / part / channel / pool if part == 'apt' else output_root / 'rpm' / channel / part.split('/')[1] / pool
         packages = sorted(source.glob('*' + ext))
         if not 1 <= len(packages) <= limit:
-            raise ValueError(f'Expected one or two retained {part} packages before copying, got {len(packages)}')
+            raise ValueError(f'Expected between 1 and {limit} retained {part} packages before copying, got {len(packages)}')
         planned.append((target, ext))
     # Validate all inputs before mutating any destination.
     for target, ext in planned:

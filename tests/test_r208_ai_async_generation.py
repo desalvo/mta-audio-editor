@@ -48,4 +48,7 @@ def test_frontend_polling_contract():
     assert '/ai-arranger/active-generation' in js
     assert 'start-generation' in js
     assert "job.state==='queued'" in js
-    assert 'aiArrangerWatchTimer=setInterval(poll,2000)' in js
+    # Reconnection-safe polling uses one-shot timers rather than setInterval.
+    assert 'aiArrangerWatchTimer=setTimeout(poll,delay)' in js
+    assert 'aiArrangerPollFailures++' in js
+    assert 'aiArrangerRenderElapsed' in js

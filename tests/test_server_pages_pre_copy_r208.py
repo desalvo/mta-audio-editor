@@ -29,10 +29,10 @@ def test_pre_copy_prunes_each_os(tmp_path):
         assert not list((target / sub).glob('*' + extension))
 
 
-def test_rejects_three_before_mutating_destination(tmp_path):
+def test_rejects_more_than_twenty_before_mutating_destination(tmp_path):
     source, target = tmp_path / 'incoming', tmp_path / 'staging'
-    create(source, target, 3)
-    with pytest.raises(ValueError, match='one or two'):
+    create(source, target, 21)
+    with pytest.raises(ValueError, match='between 1 and 20'):
         mod.prepare(source, target, 'early')
     assert (target / 'apt/early/pool/old0.deb').exists()
 
@@ -40,3 +40,20 @@ def test_rejects_three_before_mutating_destination(tmp_path):
 def test_cleanup_run_before_package_copy():
     script = (ROOT / 'scripts/repositories/build_indexes.sh').read_text()
     assert script.index('preflight_package_copy.py') < script.index('cp -n "$f"')
+
+
+def test_accepts_twenty_retained_builds_per_pool(tmp_path):
+    source, target = tmp_path / 'incoming', tmp_path / 'staging'
+    create(source, target, 20)
+    mod.prepare(source, target, 'early')
+    for sub, extension in (('apt/early/pool', '.deb'), ('rpm/early/el9/packages', '.rpm'), ('rpm/early/el10/packages', '.rpm')):
+        assert not list((target / sub).glob('*' + extension))
+
+
+def test_rejects_invalid_preflight_retention_limit(tmp_path):
+    source, target = tmp_path / 'incoming', tmp_path / 'staging'
+    create(source, target)
+    with pytest.raises(ValueError, match='Invalid channel or retention limit'):
+        mod.prepare(source, target, 'early', limit=0)
+    with pytest.raises(ValueError, match='Invalid channel or retention limit'):
+        mod.prepare(source, target, 'early', limit=101)
