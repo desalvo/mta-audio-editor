@@ -55,7 +55,7 @@ jobs:
           MTA_AI_JOB_STATE_DIR: /tmp/mta-ci-ai-jobs
         run: |
           python -c "from pathlib import Path; import re; b=Path('BUILD_INFO').read_text().strip(); assert re.fullmatch(r'[0-9]{14}', b), f'Invalid BUILD_INFO: {b!r}'"
-          PYTHONPATH=. timeout --signal=TERM --kill-after=120s 140m pytest -o faulthandler_timeout=240 --durations=30 -ra --junitxml=pytest-results.xml --cov=app --cov-report=term-missing --cov-report=xml --cov-fail-under=70
+          PYTHONPATH=. timeout --signal=TERM --kill-after=120s 140m pytest -o faulthandler_timeout=120 --timeout=180 --timeout-method=signal --durations=30 -ra --junitxml=pytest-results.xml --cov=app --cov-report=term-missing --cov-report=xml --cov-fail-under=70
       - name: Upload test diagnostics (including failed runs)
         if: always()
         uses: actions/upload-artifact@v7

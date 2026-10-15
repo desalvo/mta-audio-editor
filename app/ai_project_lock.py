@@ -6,6 +6,7 @@ as a source of authority; project access is checked by the API beforehand.
 from contextlib import contextmanager
 import hashlib
 import os
+import threading
 
 
 from . import ai_arranger_runtime as runtime
@@ -14,6 +15,9 @@ try:
     import fcntl
 except ImportError:  # POSIX server only
     fcntl = None
+
+
+_HELD = threading.local()
 
 
 @contextmanager
@@ -25,6 +29,16 @@ def project_publication_lock(project_id):
     runtime._ROOT.mkdir(parents=True, exist_ok=True, mode=0o700)
     key = hashlib.sha256(project_id.encode('utf-8')).hexdigest()
     path = runtime._ROOT / ('project-publication-' + key + '.lock')
+    # A nested publication from the same thread (e.g. sample-editor commit)
+    # must reuse its existing flock rather than deadlocking on a second FD.
+    held = getattr(_HELD, 'paths', None)
+    if held is None:
+        held = set()
+        _HELD.paths = held
+    identity = str(path)
+    if identity in held:
+        yield
+        return
     if path.is_symlink():
         raise RuntimeError('Unsafe project lock path')
     flags = os.O_RDWR | os.O_CREAT
@@ -34,7 +48,9 @@ def project_publication_lock(project_id):
     with os.fdopen(fd, 'a+b') as handle:
         os.fchmod(handle.fileno(), 0o600)
         fcntl.flock(handle.fileno(), fcntl.LOCK_EX)
+        held.add(identity)
         try:
             yield
         finally:
+            held.remove(identity)
             fcntl.flock(handle.fileno(), fcntl.LOCK_UN)

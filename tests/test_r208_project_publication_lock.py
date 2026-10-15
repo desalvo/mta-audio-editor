@@ -32,3 +32,33 @@ def test_project_lock_rejects_bad_id():
     with pytest.raises(ValueError):
         with ai_project_lock.project_publication_lock(''):
             pass
+
+
+def test_publication_lock_is_reentrant_in_same_thread(tmp_path, monkeypatch):
+    from app import ai_arranger_runtime
+    monkeypatch.setattr(ai_arranger_runtime, '_ROOT', tmp_path)
+    with ai_project_lock.project_publication_lock('nested-project'):
+        with ai_project_lock.project_publication_lock('nested-project'):
+            assert True
+
+
+def test_nested_project_lock_does_not_release_outer_lock(tmp_path, monkeypatch):
+    import threading
+    from app import ai_arranger_runtime
+    monkeypatch.setattr(ai_arranger_runtime, '_ROOT', tmp_path)
+    entered = threading.Event()
+    release = threading.Event()
+
+    def contender():
+        with ai_project_lock.project_publication_lock('nested-project'):
+            entered.set()
+        release.set()
+
+    with ai_project_lock.project_publication_lock('nested-project'):
+        with ai_project_lock.project_publication_lock('nested-project'):
+            pass
+        thread = threading.Thread(target=contender, daemon=True)
+        thread.start()
+        assert not entered.wait(0.15)
+    assert release.wait(2)
+    thread.join(2)
