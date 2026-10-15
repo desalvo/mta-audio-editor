@@ -16,7 +16,7 @@ def validate(stage: Path) -> list[str]:
     # Validate identity when present; release-ready builds require it after
     # proof validation so existing offline-proof failure remains actionable.
     if (app / 'VERSION').is_file() and (app / 'REVISION').is_file():
-        if not __import__('re').fullmatch(r'[0-9]+\\.[0-9]+\\.[0-9]+', (app / 'VERSION').read_text().strip()):
+        if not __import__('re').fullmatch(r'[0-9]+\.[0-9]+\.[0-9]+', (app / 'VERSION').read_text().strip()):
             errors.append('invalid VERSION in native package')
         if not __import__('re').fullmatch(r'[0-9]+', (app / 'REVISION').read_text().strip()):
             errors.append('invalid REVISION in native package')
