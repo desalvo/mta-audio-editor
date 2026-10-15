@@ -5193,6 +5193,8 @@ async function openAiRemixPanel(contextTrackId=null){
     <label>Preset<select id="aiRemixPreset">${presets}</select></label>
     <label>Style description / Descrizione<textarea id="aiRemixPrompt" rows="3" maxlength="3000" placeholder="Describe your target arrangement or remix..."></textarea></label>
     <div id="aiSwapOptions" hidden><label>Source track / Traccia sorgente<select id="aiSwapTrack">${tracks}</select></label><label>Target instrument / Strumento sostitutivo<input id="aiSwapTarget" type="text" maxlength="100" value="Saxophone"></label></div>
+    <label>Processing scope / Intervallo<select id="aiRemixScope" onchange="document.getElementById('aiRemixRangeWrap').hidden=this.value!=='range'"><option value="project">Entire source / Sorgente intera</option><option value="range">Time range / Intervallo temporale</option></select></label>
+    <div id="aiRemixRangeWrap" hidden><label>Start (seconds) / Inizio (secondi)<input id="aiRemixStartSec" type="number" min="0" max="86400" step="0.001" value="0"></label><label>End (seconds) / Fine (secondi)<input id="aiRemixEndSec" type="number" min="0" max="86400" step="0.001" value="10"></label><small>Only the selected source audio is sent to AI / Solo l'intervallo viene inviato all'AI</small></div>
     <label>Intensity / Intensità<input id="aiRemixStrength" type="range" min="0" max="100" value="60"></label>
     <label><input id="aiKeepChords" type="checkbox" checked> Preserve chords / Preserva accordi</label>
     <label><input id="aiKeepStructure" type="checkbox" checked> Preserve sections / Preserva struttura</label>
@@ -5213,6 +5215,16 @@ async function planAiRemix(action="plan"){
   const yes=id=>!!document.getElementById(id)?.checked;
   const mode=val('aiRemixMode');
   const body={input_source:val('aiInputSource')||'master',...(val('aiInputSource')==='track'?{input_track_id:val('aiInputTrack')}:{}),model_id:val('aiRemixModel'),preset_id:val('aiRemixPreset'),prompt:val('aiRemixPrompt')||'',strength:Number(val('aiRemixStrength')),preserve_chords:yes('aiKeepChords'),preserve_structure:yes('aiKeepStructure'),preserve_tempo:yes('aiKeepTempo'),preserve_melody:yes('aiKeepMelody'),preserve_voice:yes('aiKeepVoice')};
+  if(val('aiRemixScope')==='range'){
+    const start=Number(val('aiRemixStartSec')),end=Number(val('aiRemixEndSec'));
+    if(!Number.isFinite(start)||!Number.isFinite(end)||start<0||end<=start||end>86400){
+      const output=document.getElementById('aiRemixPlanResult');
+      if(output)output.textContent=tr('Invalid time interval','Intervallo temporale non valido');
+      return;
+    }
+    body.scope='range';body.start_ms=Math.round(start*1000);body.end_ms=Math.round(end*1000);
+    if(body.end_ms<=body.start_ms)return;
+  }
   if(mode!=='rearrange'){body.mode=mode;body.instrument_swaps=mode==='instrument_swap'?[{track_id:val('aiSwapTrack'),target_instrument:val('aiSwapTarget')}]:[];}
   const route=(mode==='rearrange'?'ai-arranger/':'remix/')+(action==='generate-and-add'?'start-generation':action);
   const output=document.getElementById('aiRemixPlanResult');

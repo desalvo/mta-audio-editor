@@ -161,6 +161,36 @@ MAX_SOURCE_BYTES = 512 * 1024 * 1024
 MAX_SOURCE_DURATION_SECONDS = 1800
 
 
+def _trim_wav_for_ai(path: Path, start_ms: int, end_ms: int) -> None:
+    """Replace a rendered, private PCM WAV with exactly the requested sample range.
+
+    Reject out-of-bounds intervals rather than silently supplying the full track.
+    The caller must invoke this before marking the input read-only.
+    """
+    import wave
+    if not (isinstance(start_ms, int) and isinstance(end_ms, int) and
+            0 <= start_ms < end_ms <= 86_400_000):
+        raise ValueError('Invalid AI selection interval')
+    temp = path.with_name(path.name + '.selection')
+    try:
+        with wave.open(str(path), 'rb') as src:
+            rate, frames = src.getframerate(), src.getnframes()
+            first = start_ms * rate // 1000
+            last = end_ms * rate // 1000
+            if first >= frames or last > frames or last <= first:
+                raise ValueError('AI selection exceeds rendered audio duration')
+            src.setpos(first)
+            data = src.readframes(last - first)
+            if len(data) != (last - first) * src.getnchannels() * src.getsampwidth():
+                raise ValueError('Incomplete AI selection audio')
+            with wave.open(str(temp), 'wb') as dst:
+                dst.setparams(src.getparams())
+                dst.writeframes(data)
+        os.replace(temp, path)
+    finally:
+        temp.unlink(missing_ok=True)
+
+
 def run_worker_with_project_audio(plan: dict, project, resolve_audio, *, timeout_seconds: int = 1200, progress_file=None, cancel_event=None):
     """Run a trusted worker with copied project WAV inputs, not host file paths.
 
@@ -185,6 +215,12 @@ def run_worker_with_project_audio(plan: dict, project, resolve_audio, *, timeout
         raise ValueError('input track required')
     if source_mode == 'master' and input_id is not None:
         raise ValueError('master input cannot select a track')
+    selection = None
+    if plan.get('scope') == 'range':
+        start_ms, end_ms = plan.get('start_ms'), plan.get('end_ms')
+        if type(start_ms) is not int or type(end_ms) is not int or start_ms >= end_ms:
+            raise ValueError('Invalid AI selection interval')
+        selection = (start_ms, end_ms)
     selected = ({input_id} if source_mode == 'track' else
                 set(plan.get('track_ids') or []) if plan.get('scope') == 'tracks' else None)
     tracks = [t for t in project.tracks if selected is None or t.id in selected]
@@ -205,6 +241,8 @@ def run_worker_with_project_audio(plan: dict, project, resolve_audio, *, timeout
             # Never reuse preview-mix, which intentionally neutralizes the master fader.
             master = inputs / 'master.wav'
             render_mix(project, resolve_audio, master, fmt='wav', wav_bit_depth=24)
+            if selection is not None:
+                _trim_wav_for_ai(master, *selection)
             info = verify_preview_wav(master)
             if info['bytes'] > MAX_SOURCE_BYTES:
                 raise ValueError('AI master audio exceeds size limit')
@@ -230,6 +268,8 @@ def run_worker_with_project_audio(plan: dict, project, resolve_audio, *, timeout
                 shutil.copyfile(source, target)
             else:
                 render_track(track, source, target, apply_inserts=True)
+            if selection is not None:
+                _trim_wav_for_ai(target, *selection)
             info = verify_preview_wav(target)
             total += info['bytes']
             if total > MAX_SOURCE_BYTES:
