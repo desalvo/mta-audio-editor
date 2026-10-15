@@ -284,27 +284,15 @@ jobs:
           CHANNEL: ${{ inputs.channel }}
         run: |
           set -euo pipefail
-          base="https://${GITHUB_REPOSITORY_OWNER,,}.github.io/mta-audio-editor-packages/rpm/$CHANNEL"
-          for target in el9 el10; do
-            for path in repodata/repomd.xml repodata/repomd.xml.asc packages/; do
-              ok=0
-              for attempt in {1..15}; do
-                if curl --fail --location --silent --show-error --max-time 20 -o /dev/null "$base/$target/$path"; then
-                  ok=1; break
-                fi
-                sleep 12
-              done
-              test "$ok" -eq 1 || { echo "Pages is missing $base/$target/$path" >&2; exit 1; }
-            done
-            expected=$(sha256sum "$RUNNER_TEMP/staging/rpm/$CHANNEL/$target/repodata/repomd.xml" | cut -d' ' -f1)
-            current=""
-            for attempt in {1..15}; do
-              current=$(curl --fail --location --silent --show-error --max-time 20 "$base/$target/repodata/repomd.xml" | sha256sum | cut -d' ' -f1)
-              [[ "$current" == "$expected" ]] && break
-              sleep 12
-            done
-            [[ "$current" == "$expected" ]] || { echo "Public Pages metadata is stale for $target; refusing asset cleanup" >&2; exit 4; }
-          done
+          # A successful push to the Pages repository is not a completed Pages
+          # deployment. Allow deployment lag, bypass stale CDN caches, compare
+          # both signed repomd.xml hashes and fail closed before RPM cleanup.
+          python3 "$GITHUB_WORKSPACE/scripts/repositories/verify_public_pages.py" \
+            --staging "$RUNNER_TEMP/staging" \
+            --base "https://${GITHUB_REPOSITORY_OWNER,,}.github.io/mta-audio-editor-packages" \
+            --channel "$CHANNEL" \
+            --run-id "$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" \
+            --max-wait 900
       - name: Remove unreferenced RPM Release assets after Pages verification
         env:
           GH_TOKEN: ${{ github.token }}
