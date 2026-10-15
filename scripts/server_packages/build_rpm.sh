@@ -11,6 +11,15 @@ command -v rpmbuild >/dev/null || { echo 'rpmbuild is required on an RPM build r
 if [[ ${MTA_SERVER_RELEASE_READY:-0} == 1 ]]; then
   "${MTA_SERVER_PYTHON:-python3.12}" "$(dirname "$0")/verify_offline_runtime.py" "$MTA_SERVER_STAGE" --check-proof
 fi
+if [[ ${MTA_SERVER_RELEASE_READY:-0} == 1 ]]; then
+  for metadata in VERSION REVISION BUILD_INFO RELEASE_CHANNEL; do
+    [[ -f "$MTA_SERVER_STAGE/application/$metadata" ]] || {
+      echo "Missing native release metadata: $metadata" >&2
+      exit 3
+    }
+  done
+fi
+
 root=$(realpath "$MTA_SERVER_STAGE"); out=$(realpath -m "$MTA_SERVER_OUTPUT")
 [[ -f "$root/application/app/main.py" && -f "$root/application/app/ai_cgroup_launcher.py" && -f "$root/application/requirements.txt" ]] || exit 3
 [[ -n $(find "$root/wheelhouse" -name '*.whl' -print -quit) ]] || { echo 'Wheelhouse missing' >&2; exit 3; }

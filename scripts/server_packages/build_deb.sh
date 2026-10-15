@@ -10,6 +10,15 @@ for cmd in dpkg-deb find; do command -v "$cmd" >/dev/null || exit 2; done
 if [[ ${MTA_SERVER_RELEASE_READY:-0} == 1 ]]; then
   "${MTA_SERVER_PYTHON:-python3}" "$(dirname "$0")/verify_offline_runtime.py" "$MTA_SERVER_STAGE" --check-proof
 fi
+if [[ ${MTA_SERVER_RELEASE_READY:-0} == 1 ]]; then
+  for metadata in VERSION REVISION BUILD_INFO RELEASE_CHANNEL; do
+    [[ -f "$MTA_SERVER_STAGE/application/$metadata" ]] || {
+      echo "Missing native release metadata: $metadata" >&2
+      exit 3
+    }
+  done
+fi
+
 stage=$(realpath "$MTA_SERVER_STAGE"); out=$(realpath -m "$MTA_SERVER_OUTPUT")
 [[ -f "$stage/application/app/main.py" && -f "$stage/application/app/ai_cgroup_launcher.py" && -f "$stage/application/requirements.txt" ]] || { echo 'Incomplete server application staging' >&2; exit 3; }
 [[ -d "$stage/wheelhouse" && -n $(find "$stage/wheelhouse" -name '*.whl' -print -quit) ]] || { echo 'Offline wheelhouse is required; refusing network install at deployment' >&2; exit 3; }
