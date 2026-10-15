@@ -378,6 +378,8 @@ jobs:
           path: native/runtime/chordino-prebuilt
       - name: Provision bundled Chordino runtime
         shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: .\scripts\provision_chordino_windows.ps1
       - name: Generate native build id
         shell: pwsh

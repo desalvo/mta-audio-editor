@@ -11,7 +11,17 @@ Remove-Item -Recurse -Force $tmp -ErrorAction SilentlyContinue
 New-Item -ItemType Directory -Force -Path $tmp | Out-Null
 
 # Sonic Annotator: official current 64-bit Windows host.
-$release = Invoke-RestMethod "https://api.github.com/repos/sonic-visualiser/sonic-annotator/releases/latest"
+# GitHub-hosted runners share anonymous API quotas. The workflow passes its
+# scoped GITHUB_TOKEN for release metadata (never print the token).
+$headers = @{ 'Accept' = 'application/vnd.github+json'; 'User-Agent' = 'mta-audio-editor-ci' }
+if (-not [string]::IsNullOrWhiteSpace($env:GITHUB_TOKEN)) {
+  $headers['Authorization'] = "Bearer $env:GITHUB_TOKEN"
+}
+try {
+  $release = Invoke-RestMethod -Uri "https://api.github.com/repos/sonic-visualiser/sonic-annotator/releases/latest" -Headers $headers -TimeoutSec 45
+} catch {
+  throw "Unable to query Sonic Annotator release metadata. Check GITHUB_TOKEN permissions and GitHub API availability. $($_.Exception.Message)"
+}
 $asset = $release.assets | Where-Object { $_.name -match 'win.*64|64.*win' } | Select-Object -First 1
 if (-not $asset) { throw "No 64-bit Windows Sonic Annotator asset found" }
 $sa = Join-Path $tmp $asset.name
