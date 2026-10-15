@@ -5,16 +5,21 @@ Only operate on known package pool directories. The caller MUST regenerate signe
 APT/RPM metadata after the package pool has been cleaned.
 """
 import argparse
+import os
 from pathlib import Path
 
 POOLS = (('apt', 'pool', '.deb'), ('rpm/el9', 'packages', '.rpm'), ('rpm/el10', 'packages', '.rpm'))
 
 
-def prepare(input_root: Path, output_root: Path, channel: str, *, limit: int = 2):
+def prepare(input_root: Path, output_root: Path, channel: str, *, limit: int = 2, apt_only: bool = False):
     if channel not in ('early', 'stable') or limit != 2:
         raise ValueError('Invalid channel or retention limit')
+    if apt_only and not (os.environ.get("MTA_CI_APT_ONLY") == "1" and
+                         os.environ.get("MTA_CI_DISPOSABLE_CONTAINER") == "1" and
+                         os.environ.get("CI") == "true"):
+        raise ValueError("APT-only preflight requires disposable CI fixture environment")
     planned = []
-    for part, pool, ext in POOLS:
+    for part, pool, ext in (POOLS[:1] if apt_only else POOLS):
         source = input_root if part == 'apt' else input_root / part
         target = output_root / part / channel / pool if part == 'apt' else output_root / 'rpm' / channel / part.split('/')[1] / pool
         packages = sorted(source.glob('*' + ext))
@@ -38,7 +43,8 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--channel', choices=('early', 'stable'), required=True)
     args = parser.parse_args()
-    prepare(args.input.resolve(), args.output.resolve(), args.channel)
+    prepare(args.input.resolve(), args.output.resolve(), args.channel,
+            apt_only=os.environ.get("MTA_CI_APT_ONLY") == "1")
 
 
 if __name__ == '__main__':
