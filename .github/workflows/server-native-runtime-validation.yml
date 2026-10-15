@@ -74,7 +74,7 @@ jobs:
           apt-get update
           apt-get install -y dpkg-dev
           if [[ '${{ matrix.name }}' == 'ubuntu2404-python312' ]]; then PY=/opt/mta-ci-python/bin/python; else PY=python; fi
-          MTA_SERVER_PYTHON="${PY:-python}" MTA_SERVER_STAGE="$RUNNER_TEMP/server-stage" MTA_SERVER_VERSION='0.3.0~early.208+pkg1' MTA_SERVER_OUTPUT="$RUNNER_TEMP/out" MTA_SERVER_RELEASE_READY=1 bash scripts/server_packages/build_deb.sh
+          MTA_SERVER_PYTHON="${PY:-python}" MTA_SERVER_STAGE="$RUNNER_TEMP/server-stage" MTA_SERVER_VERSION="$(cat VERSION)~early.$(cat REVISION)+pkg1" MTA_SERVER_OUTPUT="$RUNNER_TEMP/out" MTA_SERVER_RELEASE_READY=1 bash scripts/server_packages/build_deb.sh
           dpkg-deb --field "$RUNNER_TEMP"/out/*.deb Package | grep -qx mta-audio-editor-server
           mkdir -p "$RUNNER_TEMP/deb-root"
           dpkg-deb -x "$RUNNER_TEMP"/out/*.deb "$RUNNER_TEMP/deb-root"
@@ -114,7 +114,7 @@ jobs:
       - name: Build RPM and test extracted payload offline
         run: |
           set -euo pipefail
-          MTA_SERVER_PYTHON=python3.12 MTA_SERVER_STAGE=/tmp/mta-server-stage MTA_RPM_VERSION=0.3.0 MTA_RPM_RELEASE=0.208.1.early MTA_SERVER_OUTPUT=/tmp/mta-rpm-out MTA_SERVER_RELEASE_READY=1 bash scripts/server_packages/build_rpm.sh
+          MTA_SERVER_PYTHON=python3.12 MTA_SERVER_STAGE=/tmp/mta-server-stage MTA_RPM_VERSION="$(cat VERSION)" MTA_RPM_RELEASE="0.$(cat REVISION).1.early" MTA_SERVER_OUTPUT=/tmp/mta-rpm-out MTA_SERVER_RELEASE_READY=1 bash scripts/server_packages/build_rpm.sh
           rpm -qp --qf '%{NAME}\n' /tmp/mta-rpm-out/*.rpm | grep -qx mta-audio-editor-server
           mkdir -p /tmp/mta-rpm-root
           cd /tmp/mta-rpm-root
@@ -190,7 +190,7 @@ jobs:
           python3.12 -m pip install 'pip>=24,<27' pytest
           python3.12 scripts/server_packages/prepare_runtime.py --source . --stage /tmp/el10-stage --requirements requirements.txt
           python3.12 scripts/server_packages/verify_offline_runtime.py /tmp/el10-stage --check-proof
-          MTA_SERVER_PYTHON=python3.12 MTA_SERVER_STAGE=/tmp/el10-stage MTA_RPM_VERSION=0.3.0 MTA_RPM_RELEASE=0.208.1.early MTA_SERVER_OUTPUT=/tmp/el10-out MTA_SERVER_RELEASE_READY=1 bash scripts/server_packages/build_rpm.sh
+          MTA_SERVER_PYTHON=python3.12 MTA_SERVER_STAGE=/tmp/el10-stage MTA_RPM_VERSION="$(cat VERSION)" MTA_RPM_RELEASE="0.$(cat REVISION).1.early" MTA_SERVER_OUTPUT=/tmp/el10-out MTA_SERVER_RELEASE_READY=1 bash scripts/server_packages/build_rpm.sh
           test "$(rpm -qp --qf '%{NAME}' /tmp/el10-out/*.rpm)" = mta-audio-editor-server
           mkdir -p /tmp/el10-payload
           ( cd /tmp/el10-payload && rpm2cpio /tmp/el10-out/*.rpm | cpio -idm --quiet )
@@ -239,7 +239,7 @@ jobs:
           "$RUNNER_TEMP/mta-build-python/bin/python" -m pip install 'pip>=24,<27'
           "$RUNNER_TEMP/mta-build-python/bin/python" scripts/server_packages/prepare_runtime.py --source . --stage "$RUNNER_TEMP/server-stage" --requirements requirements.txt
           "$RUNNER_TEMP/mta-build-python/bin/python" scripts/server_packages/verify_offline_runtime.py "$RUNNER_TEMP/server-stage" --check-proof
-          MTA_SERVER_PYTHON="$RUNNER_TEMP/mta-build-python/bin/python" MTA_SERVER_STAGE="$RUNNER_TEMP/server-stage" MTA_SERVER_VERSION='0.3.0~early.208+pkg1' MTA_SERVER_OUTPUT="$RUNNER_TEMP/out" MTA_SERVER_RELEASE_READY=1 bash scripts/server_packages/build_deb.sh
+          MTA_SERVER_PYTHON="$RUNNER_TEMP/mta-build-python/bin/python" MTA_SERVER_STAGE="$RUNNER_TEMP/server-stage" MTA_SERVER_VERSION="$(cat VERSION)~early.$(cat REVISION)+pkg1" MTA_SERVER_OUTPUT="$RUNNER_TEMP/out" MTA_SERVER_RELEASE_READY=1 bash scripts/server_packages/build_deb.sh
           python3 scripts/server_packages/verify_native_installers.py "$RUNNER_TEMP"/out/*.deb
       - name: Install DEB and verify systemd services on ephemeral runner
         shell: bash

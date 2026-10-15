@@ -11,7 +11,7 @@ def test_el10_amd_signed_repo_and_os_correctness():
 
 def test_deb_version_gate_matches_built_package():
     workflow = (ROOT / '.github/workflows/server-package-repository-validation.yml').read_text()
-    assert "Version | grep -qx '0.3.0~early.208+pkg1'" in workflow
+    assert 'Version | grep -Fxq "$(cat VERSION)~early.$(cat REVISION)+pkg1"' in workflow
 
 
 def test_vendor_rocminfo_over_epel_without_allowerasing():

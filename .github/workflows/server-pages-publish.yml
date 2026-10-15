@@ -58,6 +58,34 @@ jobs:
           test "$(find "$RUNNER_TEMP/incoming" -maxdepth 1 -name '*.deb' | wc -l)" -ge 1
           test "$(find "$RUNNER_TEMP/incoming/rpm/el9" -name '*.rpm' | wc -l)" -ge 1
           test "$(find "$RUNNER_TEMP/incoming/rpm/el10" -name '*.rpm' | wc -l)" -ge 1
+          # Validate the *new* matrix artifacts before restoring retained older releases.
+          # A successful matrix for r209 must never silently publish only r208.
+          expected_version=$(tr -d '\r\n' < VERSION)
+          expected_revision=$(tr -d '\r\n' < REVISION)
+          [[ "$expected_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || exit 3
+          [[ "$expected_revision" =~ ^[0-9]+$ ]] || exit 3
+          expected_rpm_release="0.$expected_revision.1.early"
+          shopt -s nullglob
+          for target in el9 el10; do
+            rpms=("$RUNNER_TEMP/incoming/rpm/$target/"*.rpm)
+            (( ${#rpms[@]} > 0 )) || exit 3
+            for rpm_file in "${rpms[@]}"; do
+              identity=$(rpm -qp --qf '%{VERSION}|%{RELEASE}' "$rpm_file")
+              [[ "$identity" == "$expected_version|$expected_rpm_release.$target" ]] || {
+                echo "Stale RPM from matrix: $rpm_file ($identity), expected $expected_version|$expected_rpm_release.$target" >&2
+                exit 3
+              }
+            done
+          done
+          debs=("$RUNNER_TEMP/incoming/"*.deb)
+          (( ${#debs[@]} > 0 )) || exit 3
+          for deb_file in "${debs[@]}"; do
+            identity=$(dpkg-deb -f "$deb_file" Version)
+            [[ "$identity" == "$expected_version~early.$expected_revision+pkg1" ]] || {
+              echo "Stale DEB from matrix: $deb_file ($identity)" >&2
+              exit 3
+            }
+          done
       - name: Restore previous channel and retain two versions
         env:
           GH_TOKEN: ${{ github.token }}
