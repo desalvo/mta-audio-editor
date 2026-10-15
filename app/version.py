@@ -10,3 +10,21 @@ APP_RELEASE_CHANNEL = "early" if str(_raw_channel).strip().lower() in {"early", 
 BUILD_ID = os.getenv("MTA_BUILD_ID", (ROOT / "BUILD_INFO").read_text().strip() if (ROOT / "BUILD_INFO").exists() else "unknown")
 CREATOR = "Alessandro De Salvo <braket71@gmail.com>"
 REPOSITORY = "https://github.com/desalvo/mta-audio-editor"
+
+def runtime_installation():
+    if Path('/usr/lib/mta-audio-editor-server/app/main.py').is_file() and str(Path(__file__).resolve()).startswith('/usr/lib/mta-audio-editor-server/'):
+        return 'Native Linux package (RPM/DEB)'
+    if os.getenv('KUBERNETES_SERVICE_HOST'):
+        return 'Kubernetes'
+    if Path('/.dockerenv').exists():
+        return 'Docker'
+    return 'Standalone'
+
+def runtime_acceleration():
+    # Indicates device/runtime visibility, not accounting attribution.
+    import shutil
+    if shutil.which('rocminfo') or Path('/dev/kfd').exists():
+        return 'AMD ROCm available'
+    if shutil.which('nvidia-smi') or Path('/dev/nvidiactl').exists():
+        return 'NVIDIA CUDA available'
+    return 'GPU not detected'

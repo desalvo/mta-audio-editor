@@ -3941,6 +3941,8 @@ async function showAbout(){
             <dt>Revisione</dt><dd>${esc(revisionLabel)}</dd>
             <dt>Release</dt><dd>${esc(releaseLabel)}</dd>
             <dt>Build</dt><dd>${esc(info.build||'')}</dd>
+            <dt>Installazione</dt><dd>${esc(info.installation||'Unknown')}</dd>
+            <dt>GPU</dt><dd>${esc(info.acceleration||'Not detected')}</dd>
             <dt>Creatore</dt><dd>${esc(info.creator||'')}</dd>
             <dt>Licenza</dt><dd>${esc(info.license||'')}</dd>
             <dt>Progetto</dt><dd><a href="${esc(info.repository||'#')}" target="_blank" rel="noopener">${esc(info.repository||'')}</a></dd>
@@ -5193,8 +5195,8 @@ async function openAiRemixPanel(contextTrackId=null){
     <label>Preset<select id="aiRemixPreset">${presets}</select></label>
     <label>Style description / Descrizione<textarea id="aiRemixPrompt" rows="3" maxlength="3000" placeholder="Describe your target arrangement or remix..."></textarea></label>
     <div id="aiSwapOptions" hidden><label>Source track / Traccia sorgente<select id="aiSwapTrack">${tracks}</select></label><label>Target instrument / Strumento sostitutivo<input id="aiSwapTarget" type="text" maxlength="100" value="Saxophone"></label></div>
-    <label>Processing scope / Intervallo<select id="aiRemixScope" onchange="document.getElementById('aiRemixRangeWrap').hidden=this.value!=='range'"><option value="project">Entire source / Sorgente intera</option><option value="range">Time range / Intervallo temporale</option></select></label>
-    <div id="aiRemixRangeWrap" hidden><label>Start (seconds) / Inizio (secondi)<input id="aiRemixStartSec" type="number" min="0" max="86400" step="0.001" value="0"></label><label>End (seconds) / Fine (secondi)<input id="aiRemixEndSec" type="number" min="0" max="86400" step="0.001" value="10"></label><small>Only the selected source audio is sent to AI / Solo l'intervallo viene inviato all'AI</small></div>
+    <label>Processing scope / Intervallo<select id="aiRemixScope" onchange="document.getElementById('aiRemixRangeWrap').hidden=this.value!=='range'"><option value="range" selected>Time range / Intervallo temporale</option><option value="project">Entire source / Sorgente intera</option></select></label>
+    <div id="aiRemixRangeWrap"><label>Start (seconds) / Inizio (secondi)<input id="aiRemixStartSec" type="number" min="0" max="86400" step="0.001" value="0"></label><label>End (seconds) / Fine (secondi)<input id="aiRemixEndSec" type="number" min="0" max="86400" step="0.001" value="10"></label><small>Only the selected source audio is sent to AI / Solo l'intervallo viene inviato all'AI</small></div>
     <label>Intensity / Intensità<input id="aiRemixStrength" type="range" min="0" max="100" value="60"></label>
     <label><input id="aiKeepChords" type="checkbox" checked> Preserve chords / Preserva accordi</label>
     <label><input id="aiKeepStructure" type="checkbox" checked> Preserve sections / Preserva struttura</label>

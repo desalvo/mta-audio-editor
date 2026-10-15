@@ -32,6 +32,12 @@ def prepare(source: Path, stage: Path, requirements: Path):
     # Only the application and locked runtime requirements belong to the server.
     shutil.copytree(source / 'app', app / 'app', ignore=shutil.ignore_patterns('__pycache__', '*.pyc', '.git'), symlinks=False)
     shutil.copy2(requirements, app / 'requirements.txt')
+    # The native RPM/DEB payload must carry the exact application identity.
+    for filename in ('VERSION', 'REVISION', 'BUILD_INFO', 'RELEASE_CHANNEL'):
+        metadata = source / filename
+        if not metadata.is_file():
+            raise ValueError(f'Missing release metadata: {filename}')
+        shutil.copy2(metadata, app / filename)
     # Download the full transitive closure. No sdists, no editable/VCS builds.
     run([sys.executable, '-m', 'pip', 'download', '--only-binary=:all:', '--no-cache-dir',
          '--dest', str(wheels), '-r', str(app / 'requirements.txt')])

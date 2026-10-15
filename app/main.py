@@ -80,7 +80,7 @@ from .storage import (
 )
 from .rights_registry import (provider_catalog as rights_provider_catalog, search_provider as search_rights_provider, search_musicbrainz_metadata, resolve_musicbrainz_metadata)
 from . import sample_editor as sample_editor_engine
-from .version import APP_RELEASE, APP_RELEASE_CHANNEL, APP_REVISION, APP_VERSION, BUILD_ID, CREATOR, REPOSITORY
+from .version import APP_RELEASE, APP_RELEASE_CHANNEL, APP_REVISION, APP_VERSION, BUILD_ID, CREATOR, REPOSITORY, runtime_installation, runtime_acceleration
 
 from .ai_arranger import RearrangeRequest, RemixRequest, catalog as arranger_catalog, prepare_plan as arranger_plan, prepare_remix_plan, assess_plan
 from .ai_job_queue import ai_jobs
@@ -1203,6 +1203,8 @@ def about():
         "repository": REPOSITORY,
         "license": "EUPL-1.2",
         "native_single_user": NATIVE_SINGLE_USER,
+        "installation": runtime_installation(),
+        "acceleration": runtime_acceleration(),
     }
 
 
