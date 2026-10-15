@@ -96,3 +96,11 @@ def test_primary_package_subdirectory_reference_rejected(tmp_path):
     with pytest.raises(ValueError, match='verified Release asset URL'):
         MODULE.populate(st, tmp_path / 'pages', 'early',
                         'https://github.com/desalvo/mta-audio-editor/releases/download/server-packages-early/')
+
+
+def test_release_asset_collision_is_replaced_and_verified_by_digest():
+    workflow = (ROOT / '.github/workflows/server-pages-publish.yml').read_text()
+    assert 'gh release upload "$tag" "$f" -R "$GITHUB_REPOSITORY" --clobber' in workflow
+    assert 'local_sha=$(sha256sum "$f"' in workflow
+    assert workflow.count('"sha256:$local_sha"') >= 2
+    assert 'Asset collision with different size' not in workflow

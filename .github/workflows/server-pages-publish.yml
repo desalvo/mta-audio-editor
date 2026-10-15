@@ -139,24 +139,35 @@ jobs:
           test "${#files[@]}" -ge 2
           # Names must be globally unique across both EL families in this release.
           test "$(printf '%s\n' "${files[@]##*/}" | sort -u | wc -l)" -eq "${#files[@]}"
+          # A previous build can have the same RPM filename but different
+          # bytes (for example, retained r208 after a rebuild). Never treat
+          # matching filenames or file sizes as proof of identical content.
+          # Replacing a conflicting Release asset is intentional and scoped
+          # to this serialized publication workflow, not GitHub Pages.
           for f in "${files[@]}"; do
             name=$(basename "$f")
-            remote=$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$tag" \
-              --jq ".assets[] | select(.name == \"$name\") | .size")
-            if [[ -n $remote ]]; then
-              test "$remote" -eq "$(stat -c '%s' "$f")" || {
-                echo "Asset collision with different size: $name" >&2; exit 3;
-              }
-            else
-              gh release upload "$tag" "$f" -R "$GITHUB_REPOSITORY"
+            local_sha=$(sha256sum "$f" | cut -d' ' -f1)
+            remote_sha=$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$tag" \
+              --jq ".assets[] | select(.name == \"$name\") | .digest // empty")
+            if [[ "$remote_sha" == "sha256:$local_sha" ]]; then
+              echo "Existing asset matches SHA-256: $name"
+              continue
             fi
+            # --clobber replaces only an asset with this exact filename.
+            # The subsequent digest check prevents publishing a stale index.
+            gh release upload "$tag" "$f" -R "$GITHUB_REPOSITORY" --clobber
           done
-          # Do not publish new indexes unless *every* referenced RPM exists.
+          # All indexed RPMs must be present with the exact signed payload,
+          # including byte-identical, previously uploaded assets.
           for f in "${files[@]}"; do
             name=$(basename "$f")
-            remote=$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$tag" \
-              --jq ".assets[] | select(.name == \"$name\") | .size")
-            test "$remote" -eq "$(stat -c '%s' "$f")" || exit 4
+            local_sha=$(sha256sum "$f" | cut -d' ' -f1)
+            remote_sha=$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$tag" \
+              --jq ".assets[] | select(.name == \"$name\") | .digest // empty")
+            [[ "$remote_sha" == "sha256:$local_sha" ]] || {
+              echo "Release asset SHA-256 mismatch for $name: got $remote_sha" >&2
+              exit 4
+            }
           done
       - name: Regenerate and sign RPM indexes with external binary URLs
         env:
