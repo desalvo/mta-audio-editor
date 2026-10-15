@@ -75,3 +75,24 @@ def test_malformed_release_url_rejected(tmp_path):
     import pytest
     with pytest.raises(ValueError, match='GitHub Release'):
         MODULE.populate(_staging(tmp_path), tmp_path / 'pages', 'early', 'http://example.org/releases/')
+
+
+def test_createrepo_indexes_flat_packages_into_pages_repo_root():
+    # Indexing the parent directory would produce href=packages/<file>,
+    # which makes DNF request a non-existent Release asset URL.
+    workflow = (ROOT / '.github/workflows/server-pages-publish.yml').read_text()
+    assert 'createrepo_c --baseurl "$url" --outputdir "$root" "$root/packages"' in workflow
+    assert 'createrepo_c --baseurl "$url" "$root"' not in workflow
+
+
+def test_primary_package_subdirectory_reference_rejected(tmp_path):
+    import pytest
+    st = _staging(tmp_path)
+    root = st / 'rpm/early/el9/repodata/primary.xml.gz'
+    with gzip.open(root, 'rb') as stream:
+        xml = stream.read().replace(b'location href="mta-', b'location href="packages/mta-')
+    with gzip.open(root, 'wb') as stream:
+        stream.write(xml)
+    with pytest.raises(ValueError, match='verified Release asset URL'):
+        MODULE.populate(st, tmp_path / 'pages', 'early',
+                        'https://github.com/desalvo/mta-audio-editor/releases/download/server-packages-early/')

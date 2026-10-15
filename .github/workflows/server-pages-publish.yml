@@ -167,7 +167,10 @@ jobs:
           url="https://github.com/$GITHUB_REPOSITORY/releases/download/server-packages-$CHANNEL/"
           for target in el9 el10; do
             root="$RUNNER_TEMP/staging/rpm/$CHANNEL/$target"
-            createrepo_c --baseurl "$url" "$root"
+            # Index the flat packages directory rather than its parent: the
+            # metadata location must be <rpm-filename>, not packages/<name>.
+            # Keep repodata at the Pages repository root via --outputdir.
+            createrepo_c --baseurl "$url" --outputdir "$root" "$root/packages"
             gpg --batch --yes --local-user 0833A4FCB008ECAC9F98840B4C1D2DD95F5AEDB7 \
               --armor --detach-sign -o "$root/repodata/repomd.xml.asc" "$root/repodata/repomd.xml"
             gpg --verify "$root/repodata/repomd.xml.asc" "$root/repodata/repomd.xml"
