@@ -1,14 +1,13 @@
 """When a newly-created upload pathname is replaced, rollback cannot delete it."""
 import io
 import os
-from types import SimpleNamespace
+
 import pytest
 from app import main, storage
 
 
 def test_upload_failed_fsync_preserves_replaced_destination(tmp_path, monkeypatch):
     dst = tmp_path / 'upload.wav'
-    real_sync = main.os.fsync
     def replace_then_fail(fd):
         if os.fstat(fd).st_mode and dst.exists():
             dst.unlink()

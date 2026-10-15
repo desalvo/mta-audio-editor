@@ -1,4 +1,4 @@
-import copy
+
 from unittest.mock import patch
 import pytest
 from app import ai_remote_metering_attestation as m, ai_metering_bridge as b

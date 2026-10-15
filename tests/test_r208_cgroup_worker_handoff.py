@@ -1,7 +1,7 @@
 """The worker must not silently fall back to direct-child metrics when cgroup is required."""
-import os
+
 from pathlib import Path
-import pytest
+
 from app import ai_worker_protocol
 
 

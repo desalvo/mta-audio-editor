@@ -31,7 +31,15 @@ work=$(mktemp -d); trap 'rm -rf "$work"' EXIT
 root="$work/root"
 mkdir -p "$root/DEBIAN" "$root/usr/lib/mta-audio-editor-server" "$root/usr/share/mta-audio-editor-server/wheelhouse" "$root/usr/lib/systemd/system"
 cp -a "$stage/application/." "$root/usr/lib/mta-audio-editor-server/"
-chmod 755 "$root/usr/lib/mta-audio-editor-server/app/ace_step_http_worker.py"
+# Staging fixtures deliberately omit optional worker entrypoints. Real release
+# staging must include the worker; never let a fixture bypass the release gate.
+worker="$root/usr/lib/mta-audio-editor-server/app/ace_step_http_worker.py"
+if [[ -f "$worker" && ! -L "$worker" ]]; then
+  chmod 755 "$worker"
+elif [[ ${MTA_SERVER_RELEASE_READY:-0} == 1 ]]; then
+  echo 'Release staging is missing the ACE-Step worker' >&2
+  exit 3
+fi
 cp -a "$stage/wheelhouse/." "$root/usr/share/mta-audio-editor-server/wheelhouse/"
 cp "$(dirname "$0")/install_runtime.py" "$root/usr/lib/mta-audio-editor-server/install_runtime.py"
 install -d -m 755 "$root/usr/lib/mta-audio-editor-server/native-installers"

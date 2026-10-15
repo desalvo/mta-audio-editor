@@ -1,6 +1,6 @@
 """Negative contract matrix for remote AI calls; each case must fail before network I/O."""
 import base64
-import json
+
 from unittest.mock import patch
 import pytest
 from app.ai_remote_client import infer_audio, recover_audio, _read_verified_result, RemoteAIError

@@ -1,6 +1,6 @@
 """Durable stem recovery covers Demucs, DrumSep, SAM Audio and backing vocals."""
 import threading
-from pathlib import Path
+
 
 import pytest
 

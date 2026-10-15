@@ -1,7 +1,7 @@
 """Regressions for serialization shared by ordinary and AI project mutations."""
 import inspect
 from contextlib import contextmanager
-from unittest.mock import Mock
+
 
 import pytest
 

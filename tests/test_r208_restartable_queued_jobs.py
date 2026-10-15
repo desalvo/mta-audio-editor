@@ -1,5 +1,5 @@
 """Queued durable work can resume without replaying external running effects."""
-import sqlite3
+
 import threading
 import time
 from app import ai_arranger_runtime as queue
@@ -10,7 +10,7 @@ def test_recover_queued_without_duplicate_work(tmp_path, monkeypatch):
     queue.configure(1)
     started = threading.Event()
     release = threading.Event()
-    first = queue.start('a', 'test-block', lambda _: (started.set(), release.wait(5)))[1]
+    queue.start('a', 'test-block', lambda _: (started.set(), release.wait(5)))
     assert started.wait(4)
     second = queue.start('b', 'test-resumable', lambda _: None,
                          payload={'schema_version': 1, 'request': {'input': 2}})[1]

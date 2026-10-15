@@ -1,5 +1,5 @@
 """Native crash recovery never repeats remote infer or charges after a lost reply."""
-import json
+
 import pytest
 from app import ai_native_remote_journal as journal
 from app import native_ai_routing as routing

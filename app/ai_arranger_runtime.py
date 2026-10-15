@@ -374,7 +374,7 @@ def _spawn(job_id, fn, *, cancellable=False):
                     try:
                         if (read_payload(job_id) or {}).get('actor_user_id') is not None:
                             ai_metering_bridge.register_settlement(job_id)
-                    except Exception as exc:
+                    except Exception:
                         # The audio can be published, but without verified usage
                         # a billable job must never be announced completed.
                         state, message = 'interrupted', 'Billing finalization pending verified metering'
@@ -385,7 +385,9 @@ def _spawn(job_id, fn, *, cancellable=False):
                             from . import ai_billing_outbox
                             ai_billing_outbox.deliver(job_id=job_id)
                         except Exception:
-                            pass  # durable pending settlement is retried on recovery
+                            # The durable outbox keeps the pending settlement for recovery.
+                            # A missing acknowledgement is handled by readiness() below.
+                            state, message = 'interrupted', 'Billing outbox delivery pending recovery'
                         evidence = ai_finalization.readiness(job_id)
                     if not evidence['ready']:
                         state, message = 'interrupted', 'Publication or billing awaits durable recovery'

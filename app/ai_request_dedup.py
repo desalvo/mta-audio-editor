@@ -170,8 +170,8 @@ def list_requests(user_id: int, *, limit: int = 50, offset: int = 0,
         if state is not None:
             where += ' AND state=?'
             params.append(state)
-        total = c.execute('SELECT COUNT(*) FROM ai_request_dedup ' + where, params).fetchone()[0]
-        rows = c.execute('SELECT request_key,state,job_id,created_at FROM ai_request_dedup '
+        total = c.execute('SELECT COUNT(*) FROM ai_request_dedup ' + where, params).fetchone()[0]  # noqa: S608 - fixed SQL fragments; user values bound separately
+        rows = c.execute('SELECT request_key,state,job_id,created_at FROM ai_request_dedup '  # noqa: S608 - fixed clauses and bound values
                          + where + ' ORDER BY created_at DESC,request_key DESC LIMIT ? OFFSET ?',
                          (*params, limit, offset)).fetchall()
     items = []

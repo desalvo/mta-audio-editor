@@ -1,6 +1,6 @@
 """Strict attested-result format checks, independent of the remote server."""
 import io
-import json
+
 import struct
 import zipfile
 import pytest

@@ -1,5 +1,5 @@
 """Planning journal consistency at read/update boundaries (r208 unchanged)."""
-import json
+
 import sqlite3
 import pytest
 from app.ai_planning_sqlite import SQLitePlanningQueue

@@ -1,6 +1,6 @@
 """Regression: reconstructed cumulative ZIPs must retain executable installers."""
-import stat
-import zipfile
+
+
 from pathlib import Path
 
 

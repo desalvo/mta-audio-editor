@@ -145,7 +145,7 @@ def remote_request_status(base_url: str, token: str, request_id: str, *, timeout
             or not math.isfinite(timeout_seconds) or timeout_seconds <= 0):
         raise ValueError('Remote AI timeout must be a positive finite number')
     endpoint = _endpoint(base_url, 'whisper').split('/execute-audio/', 1)[0]
-    req = Request(endpoint + '/request-status/' + request_id,
+    req = Request(endpoint + '/request-status/' + request_id,  # noqa: S310 - validated HTTPS endpoint
                   headers={'Authorization': 'Bearer ' + token, 'Accept': 'application/json'},
                   method='GET')
     try:
@@ -390,7 +390,7 @@ def cancel_remote_request(base_url: str, token: str, request_id: str, *, timeout
     if isinstance(timeout_seconds, bool) or not isinstance(timeout_seconds, (int, float)) or not math.isfinite(timeout_seconds) or timeout_seconds <= 0:
         raise ValueError('Remote AI timeout must be a positive finite number')
     endpoint = _endpoint(base_url, 'whisper').split('/execute-audio/', 1)[0]
-    req = Request(endpoint + '/request-cancel/' + request_id,
+    req = Request(endpoint + '/request-cancel/' + request_id,  # noqa: S310 - validated HTTPS endpoint
                   headers={'Authorization': 'Bearer ' + token, 'Accept': 'application/json'},
                   data=b'', method='POST')
     try:
@@ -426,7 +426,7 @@ def list_remote_requests(base_url: str, token: str, *, limit: int = 50,
     query = {'limit': limit, 'offset': offset}
     if state is not None:
         query['state'] = state
-    req = Request(endpoint + '/requests?' + urlencode(query),
+    req = Request(endpoint + '/requests?' + urlencode(query),  # noqa: S310 - validated HTTPS endpoint
                   headers={'Authorization': 'Bearer ' + token, 'Accept': 'application/json'}, method='GET')
     try:
         with https_urlopen(req, timeout=timeout_seconds) as response:

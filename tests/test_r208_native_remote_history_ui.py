@@ -1,5 +1,5 @@
 """Native server-backed AI history discovery: read-only, authenticated and token-safe."""
-from types import SimpleNamespace
+
 from unittest.mock import Mock
 import pytest
 from fastapi import HTTPException

@@ -1,7 +1,7 @@
 """Remote option tree is bounded identically for direct native and HTTP calls."""
 import base64
 import json
-import math
+
 import pytest
 from app.ai_remote_transport import decode_audio_options, validate_audio_options
 from app.ai_remote_client import infer_audio

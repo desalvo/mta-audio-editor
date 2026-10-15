@@ -1,6 +1,6 @@
 """A durable cancellation claimed before dispatch must not invoke a model."""
 import base64
-from types import SimpleNamespace
+
 from unittest.mock import Mock
 
 import pytest

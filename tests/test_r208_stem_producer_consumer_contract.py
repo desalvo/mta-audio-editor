@@ -1,7 +1,7 @@
 """Validate the real worker ZIP producer against the recovered-stem importer."""
 import hashlib
 import json
-from pathlib import Path
+
 
 from app import main
 from app.ai_worker_artifacts import package_artifacts

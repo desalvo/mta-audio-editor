@@ -3,7 +3,7 @@
 An adapter writes output.wav (legacy) OR output.manifest.json plus named files
 into its private job directory. Never accept paths chosen by an API caller.
 """
-from __future__ import annotations
+
 import io
 import hashlib
 import os
@@ -40,7 +40,7 @@ def _read_private_file(path: Path, limit: int) -> bytes:
 
 def package_artifacts(directory: Path) -> tuple[bytes, str]:
     """Package immutable, bounded snapshots of private worker output files."""
-    from .ai_worker_protocol import verify_preview_wav
+
     manifest_path = directory / 'output.manifest.json'
     if not manifest_path.exists() and not manifest_path.is_symlink():
         wav = directory / 'preview.wav'

@@ -22,7 +22,7 @@ def test_project_open_holds_shared_lock_before_loading(monkeypatch):
     assert events == ['lock', 'load', 'maintain', 'unlock']
 
 
-def test_estimate_bpm_releases_lock_during_inference_then_reloads(monkeypatch):
+def test_estimate_bpm_releases_lock_during_inference_then_reloads(monkeypatch, tmp_path):
     events = []
     @contextmanager
     def lock(pid):
@@ -33,7 +33,7 @@ def test_estimate_bpm_releases_lock_during_inference_then_reloads(monkeypatch):
     project = SimpleNamespace(id='p', tracks=[track], bpm=120, base_bpm=120, time_signature='4/4')
     monkeypatch.setattr(ai_project_lock, 'project_publication_lock', lock)
     monkeypatch.setattr(main, '_project_for_actor', lambda *_: events.append('load') or project)
-    monkeypatch.setattr(main, 'audio_path', lambda *_: '/tmp/not-used.wav')
+    monkeypatch.setattr(main, 'audio_path', lambda *_: str(tmp_path / 'not-used.wav'))
     monkeypatch.setattr(main, 'estimate_bpm_and_signature', lambda *a, **k: (125, '4/4'))
     monkeypatch.setattr(main, 'save_project', lambda *_: events.append('save'))
     result = main.estimate_track_bpm('p', 't', object())

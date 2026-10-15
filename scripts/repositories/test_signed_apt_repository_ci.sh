@@ -2,7 +2,7 @@
 # CI-only end-to-end signature and package-index test; creates an ephemeral signing key.
 set -Eeuo pipefail
 [[ ${MTA_CI_DISPOSABLE_CONTAINER:-0} == 1 && $(id -u) == 0 ]] || { echo 'Disposable root CI environment required' >&2; exit 2; }
-for tool in gpg dpkg-deb dpkg-scanpackages apt-ftparchive createrepo_c rpm; do command -v "$tool" >/dev/null || exit 2; done
+for tool in python3 gpg dpkg-deb dpkg-scanpackages apt-ftparchive createrepo_c rpm; do command -v "$tool" >/dev/null || exit 2; done
 root=$(mktemp -d)
 trap 'rm -rf "$root"; rm -f /etc/apt/sources.list.d/mta-ci-signed-test.list /usr/share/keyrings/mta-ci-signed-test.gpg' EXIT
 mkdir -p "$root/incoming" "$root/pkg/DEBIAN" "$root/repo" "$root/gnupg"

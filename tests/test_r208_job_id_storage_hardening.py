@@ -1,6 +1,6 @@
 """Security regression: durable AI job identifiers cannot escape runtime state."""
 import os
-from pathlib import Path
+
 import pytest
 
 from app import ai_arranger_runtime as queue

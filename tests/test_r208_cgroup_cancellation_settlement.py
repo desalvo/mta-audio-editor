@@ -1,6 +1,6 @@
 """Cancellation must invalidate cgroup metering throughout admission and settlement."""
 import threading
-from pathlib import Path
+
 import pytest
 from app import ai_cgroup_metering as module
 

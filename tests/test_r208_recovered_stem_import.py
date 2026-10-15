@@ -4,7 +4,7 @@ import json
 import wave
 import zipfile
 from contextlib import nullcontext
-from pathlib import Path
+
 from types import SimpleNamespace
 
 import pytest

@@ -1,4 +1,4 @@
-import math
+
 import pytest
 from app.ai_job_queue import AIJobQueue, MAX_JOBS
 

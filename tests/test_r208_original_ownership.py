@@ -1,6 +1,6 @@
 """Original cleanup is scoped to files owned by the failing upload."""
 import io
-from pathlib import Path
+
 from types import SimpleNamespace
 from unittest.mock import Mock
 import pytest
@@ -51,7 +51,6 @@ def test_failed_original_copy_removes_only_its_partial_file(tmp_path, monkeypatc
     monkeypatch.setattr(storage, 'original_path', lambda pid, name: originals / name)
     monkeypatch.setattr(storage, 'find_duplicate_project_file', lambda *args: None)
     monkeypatch.setattr(storage, '_unique_original_name', lambda pid, name: 'new.wav')
-    original_copy = storage.shutil.copyfileobj
     def broken(src, dst, length=0):
         dst.write(b'partial')
         raise OSError('disk error')

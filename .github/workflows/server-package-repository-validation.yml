@@ -91,6 +91,6 @@ jobs:
       - name: Install repository test tools
         run: |
           apt-get update
-          DEBIAN_FRONTEND=noninteractive apt-get install -y dpkg-dev apt-utils createrepo-c rpm gnupg ca-certificates
+          DEBIAN_FRONTEND=noninteractive apt-get install -y python3 dpkg-dev apt-utils createrepo-c rpm gnupg ca-certificates
       - name: Create temporary GPG key and validate signed APT index
         run: MTA_CI_DISPOSABLE_CONTAINER=1 bash scripts/repositories/test_signed_apt_repository_ci.sh

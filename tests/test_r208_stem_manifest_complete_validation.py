@@ -2,11 +2,11 @@
 import io
 import json
 import zipfile
-from types import SimpleNamespace
+
 from fastapi import HTTPException
 import pytest
 from app import main
-from test_r208_recovered_stem_import import archive, configure, wav
+from test_r208_recovered_stem_import import configure, wav
 
 
 def repackage(extra_specs=(), extra_files=(), duplicate_spec=False, encrypted=False):

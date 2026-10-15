@@ -1,4 +1,4 @@
-import sqlite3
+
 import pytest
 from app.ai_planning_sqlite import SQLitePlanningQueue
 from app.ai_job_queue import MAX_JOBS

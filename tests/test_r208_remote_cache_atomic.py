@@ -1,7 +1,7 @@
 """Result replay must remain private, immutable and safe under concurrent writes."""
 from concurrent.futures import ThreadPoolExecutor
 import os
-import pytest
+
 from app import ai_result_cache as cache
 
 

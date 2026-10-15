@@ -1,7 +1,7 @@
 """Fail-closed shared media and garbage collector end-to-end regressions."""
 import hashlib
-import json
-from pathlib import Path
+
+
 from types import SimpleNamespace
 import pytest
 from app import storage

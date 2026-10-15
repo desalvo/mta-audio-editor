@@ -1,6 +1,6 @@
 """Sample editor publication rollback and durability regression."""
 import contextlib
-from pathlib import Path
+
 import pytest
 
 from app import sample_editor, storage
@@ -11,7 +11,7 @@ def _fixture(tmp_path, monkeypatch):
     monkeypatch.setattr(storage, 'ROOT', tmp_path)
     monkeypatch.setattr(sample_editor, 'media_duration_ms', lambda path: 500)
     monkeypatch.setattr(sample_editor, 'waveform_peaks', lambda path, count: [0.1])
-    from app.ai_project_lock import project_publication_lock
+
     import app.ai_project_lock as locks
     monkeypatch.setattr(locks, 'project_publication_lock', lambda pid: contextlib.nullcontext())
     project = storage.create_project('atomic editor')

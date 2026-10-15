@@ -1,6 +1,6 @@
 """Remote worker metering integrity matrix (offline; no ROCm certification)."""
-import copy
-import math
+
+
 
 import pytest
 

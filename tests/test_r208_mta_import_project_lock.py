@@ -1,12 +1,11 @@
 """MTA container import must share project locking with native AI publishers."""
 import inspect
-from pathlib import Path
 from types import SimpleNamespace
 
 from app import main
 
 
-def test_async_mta_import_uses_shared_project_lock_before_load(monkeypatch):
+def test_async_mta_import_uses_shared_project_lock_before_load(monkeypatch, tmp_path):
     events = []
     class Lock:
         def __enter__(self): events.append('lock-enter')
@@ -15,7 +14,7 @@ def test_async_mta_import_uses_shared_project_lock_before_load(monkeypatch):
         assert pid == 'p1'
         return Lock()
     monkeypatch.setattr('app.ai_project_lock.project_publication_lock', fake_lock)
-    monkeypatch.setattr(main, 'pdir', lambda pid: Path('/tmp') / pid)
+    monkeypatch.setattr(main, 'pdir', lambda pid: tmp_path / pid)
     monkeypatch.setattr(main, 'ffprobe', lambda path: events.append('probe'))
     monkeypatch.setattr(main, 'load_project', lambda pid: events.append('load') or object())
     monkeypatch.setattr(main, 'import_mta', lambda src, project: events.append('import') or SimpleNamespace(id='p1', title='Import', tracks=[]))
@@ -26,13 +25,13 @@ def test_async_mta_import_uses_shared_project_lock_before_load(monkeypatch):
     assert events.index('lock-enter') < events.index('load') < events.index('import') < events.index('save') < events.index('lock-exit')
 
 
-def test_mta_import_releases_lock_on_error_and_marks_failed(monkeypatch):
+def test_mta_import_releases_lock_on_error_and_marks_failed(monkeypatch, tmp_path):
     events = []
     class Lock:
         def __enter__(self): events.append('enter')
         def __exit__(self, *exc): events.append('exit')
     monkeypatch.setattr('app.ai_project_lock.project_publication_lock', lambda pid: Lock())
-    monkeypatch.setattr(main, 'pdir', lambda pid: Path('/tmp') / pid)
+    monkeypatch.setattr(main, 'pdir', lambda pid: tmp_path / pid)
     monkeypatch.setattr(main, 'ffprobe', lambda path: None)
     monkeypatch.setattr(main, 'load_project', lambda pid: object())
     monkeypatch.setattr(main, 'import_mta', lambda src, proj: (_ for _ in ()).throw(RuntimeError('broken import')))

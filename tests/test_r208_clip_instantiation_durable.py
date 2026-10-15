@@ -1,7 +1,7 @@
 """End-to-end resilience for reusable clip instantiation (r208)."""
 import shutil
 import wave
-from pathlib import Path
+
 
 import pytest
 from fastapi.testclient import TestClient

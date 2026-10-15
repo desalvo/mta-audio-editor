@@ -3,7 +3,7 @@
 Set MTA_AI_PLANNING_DB to an absolute local SQLite filename to opt in.
 The existing volatile queue remains the default.
 """
-from __future__ import annotations
+
 
 from copy import deepcopy
 from datetime import datetime, timezone
@@ -14,7 +14,7 @@ from pathlib import Path
 import sqlite3
 from uuid import uuid4
 
-from .ai_job_queue import MAX_JOBS, MAX_PLAN_BYTES, TERMINAL, _safe_plan
+from .ai_job_queue import MAX_JOBS, MAX_PLAN_BYTES, _safe_plan
 
 
 class SQLitePlanningQueue:
@@ -208,8 +208,8 @@ class SQLitePlanningQueue:
             db.execute('BEGIN')
             try:
                 self._audit_owner_records(db, project_id, owner_id)
-                total = db.execute('SELECT count(*) FROM planning_jobs WHERE ' + where, params).fetchone()[0]
-                rows = db.execute('SELECT payload, id, status FROM planning_jobs WHERE ' + where + ' ORDER BY seq LIMIT ? OFFSET ?',
+                total = db.execute('SELECT count(*) FROM planning_jobs WHERE ' + where, params).fetchone()[0]  # noqa: S608 - fixed SQL fragments; user values bound separately
+                rows = db.execute('SELECT payload, id, status FROM planning_jobs WHERE ' + where + ' ORDER BY seq LIMIT ? OFFSET ?',  # noqa: S608 - fixed clauses and bound values
                                   params + (limit, offset)).fetchall()
                 items = [self._decode(row, job_id=row[1], project_id=project_id,
                                       owner_id=owner_id, status=row[2]) for row in rows]

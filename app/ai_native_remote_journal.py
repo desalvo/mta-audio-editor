@@ -3,13 +3,13 @@
 A pending request must be recovered read-only rather than resubmitted after a
 network failure. Entries are scoped to endpoint, token, worker and input bytes.
 """
-from __future__ import annotations
+
 
 import hashlib
 import json
 import os
 from pathlib import Path
-import tempfile
+
 import uuid
 import time
 import re

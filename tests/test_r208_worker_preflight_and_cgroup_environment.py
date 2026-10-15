@@ -1,5 +1,5 @@
 """Local worker cancellation must stop preparation; cgroup must inherit job progress configuration."""
-import json
+
 import threading
 import wave
 from pathlib import Path

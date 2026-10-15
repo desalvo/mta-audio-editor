@@ -1,6 +1,6 @@
 """Security regression for the opt-in planning journal (never inference/billing)."""
-from pathlib import Path
-import os
+
+
 import pytest
 from app.ai_planning_sqlite import SQLitePlanningQueue
 

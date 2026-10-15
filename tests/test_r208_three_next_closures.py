@@ -1,7 +1,7 @@
 """Behavioral coverage for FLAC, BPM optimism, synchronous stem compatibility."""
 from contextlib import contextmanager
 from types import SimpleNamespace
-from unittest.mock import Mock
+
 import inspect
 import pytest
 from fastapi import HTTPException

@@ -2,12 +2,12 @@
 import multiprocessing
 import time
 
-from app import ai_arranger_runtime, ai_project_lock
+from app import ai_project_lock
 
 
 def _hold(project, start, finish, root, delay):
     from pathlib import Path
-    from app import ai_arranger_runtime, ai_project_lock
+    from app import ai_arranger_runtime
     ai_arranger_runtime._ROOT = Path(root)
     with ai_project_lock.project_publication_lock(project):
         start.put(time.monotonic())
