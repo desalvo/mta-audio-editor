@@ -28,13 +28,13 @@ def test_debian_versions_use_native_comparator():
     assert RET.compare_deb('0.3.0~early.208', '0.3.0-1') < 0
 
 
-def test_keep_only_two_versions(tmp_path):
-    for n in (207, 208, 209):
+def test_keep_only_twenty_versions(tmp_path):
+    for n in range(200, 222):
         (tmp_path / f'package_{n}.deb').write_bytes(b'a')
     def inspect(p):
         return 'mta-audio-editor-server', 'amd64', p.stem.split('_')[1]
     RET.retain(tmp_path, '.deb', inspect, lambda a, b: (int(a) > int(b)) - (int(a) < int(b)))
-    assert sorted(p.name for p in tmp_path.iterdir()) == ['package_208.deb', 'package_209.deb']
+    assert sorted(p.name for p in tmp_path.iterdir()) == [f'package_{n}.deb' for n in range(202, 222)]
 
 
 def test_previous_channel_rejects_mismatched_hash(tmp_path):
@@ -79,7 +79,7 @@ def test_r2_disabled_by_default(tmp_path):
 
 def test_workflow_retention_and_pages_limit():
     source = (ROOT / '.github/workflows/server-pages-publish.yml').read_text()
-    assert 'retain_channel_packages.py' in source and '--limit 2' in source
+    assert 'retain_channel_packages.py' in source and '--limit 20' in source
     assert 'restore_previous_channel.py' in source
     pages = (ROOT / 'packaging/pages-repository/.github/workflows/pages.yml').read_text()
     assert '1000000000' in pages

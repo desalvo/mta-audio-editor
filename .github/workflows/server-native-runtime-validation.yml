@@ -114,7 +114,7 @@ jobs:
       - name: Build RPM and test extracted payload offline
         run: |
           set -euo pipefail
-          MTA_SERVER_PYTHON=python3.12 MTA_SERVER_STAGE=/tmp/mta-server-stage MTA_RPM_VERSION="$(cat VERSION)" MTA_RPM_RELEASE="0.$(cat REVISION).1.early" MTA_SERVER_OUTPUT=/tmp/mta-rpm-out MTA_SERVER_RELEASE_READY=1 bash scripts/server_packages/build_rpm.sh
+          MTA_SERVER_PYTHON=python3.12 MTA_SERVER_STAGE=/tmp/mta-server-stage MTA_RPM_VERSION="$(cat VERSION)" MTA_RPM_RELEASE="0.$(cat REVISION).1.early.b$(cat BUILD_INFO).r${GITHUB_RUN_ID}.a${GITHUB_RUN_ATTEMPT}" MTA_SERVER_OUTPUT=/tmp/mta-rpm-out MTA_SERVER_RELEASE_READY=1 bash scripts/server_packages/build_rpm.sh
           rpm -qp --qf '%{NAME}\n' /tmp/mta-rpm-out/*.rpm | grep -qx mta-audio-editor-server
           mkdir -p /tmp/mta-rpm-root
           cd /tmp/mta-rpm-root
@@ -190,7 +190,7 @@ jobs:
           python3.12 -m pip install 'pip>=24,<27' pytest
           python3.12 scripts/server_packages/prepare_runtime.py --source . --stage /tmp/el10-stage --requirements requirements.txt
           python3.12 scripts/server_packages/verify_offline_runtime.py /tmp/el10-stage --check-proof
-          MTA_SERVER_PYTHON=python3.12 MTA_SERVER_STAGE=/tmp/el10-stage MTA_RPM_VERSION="$(cat VERSION)" MTA_RPM_RELEASE="0.$(cat REVISION).1.early" MTA_SERVER_OUTPUT=/tmp/el10-out MTA_SERVER_RELEASE_READY=1 bash scripts/server_packages/build_rpm.sh
+          MTA_SERVER_PYTHON=python3.12 MTA_SERVER_STAGE=/tmp/el10-stage MTA_RPM_VERSION="$(cat VERSION)" MTA_RPM_RELEASE="0.$(cat REVISION).1.early.b$(cat BUILD_INFO).r${GITHUB_RUN_ID}.a${GITHUB_RUN_ATTEMPT}" MTA_SERVER_OUTPUT=/tmp/el10-out MTA_SERVER_RELEASE_READY=1 bash scripts/server_packages/build_rpm.sh
           test "$(rpm -qp --qf '%{NAME}' /tmp/el10-out/*.rpm)" = mta-audio-editor-server
           mkdir -p /tmp/el10-payload
           ( cd /tmp/el10-payload && rpm2cpio /tmp/el10-out/*.rpm | cpio -idm --quiet )

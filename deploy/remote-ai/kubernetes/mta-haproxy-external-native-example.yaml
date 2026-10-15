@@ -1,0 +1,84 @@
+# Example: HAProxy Ingress -> MTA native RPM server external to Kubernetes.
+# Replace BACKEND_PRIVATE_IP with a private IPv4 address reachable from ingress pods.
+# Replace mta.example.org with your DNS name. Backend serves plain HTTP on port 8081.
+# Some HAProxy Ingress controllers require BOTH ingressClassName and the legacy
+# kubernetes.io/ingress.class annotation, and still consume v1 Endpoints rather
+# than a manually created EndpointSlice. The legacy Endpoints resource is
+# deprecated; validate this compatibility requirement when upgrading controller.
+# Never expose ACE-Step's internal port (8001) through this Ingress.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mta
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mta-external
+  namespace: mta
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8081
+      targetPort: 8081
+  # No selector: native RPM server runs outside Kubernetes.
+---
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: mta-external
+  namespace: mta
+subsets:
+  - addresses:
+      - ip: BACKEND_PRIVATE_IP
+    ports:
+      - name: http
+        protocol: TCP
+        port: 8081
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mta-web
+  namespace: mta
+  annotations:
+    kubernetes.io/ingress.class: "haproxy"
+    haproxy-ingress.github.io/ssl-redirect: "true"
+spec:
+  ingressClassName: haproxy
+  tls:
+    - hosts:
+        - mta.example.org
+      # Omit secretName to use the default TLS certificate of the controller.
+      # secretName: mta-tls
+  rules:
+    - host: mta.example.org
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: mta-external
+                port:
+                  name: http
+
+# Optional: if you do NOT use the controller's default certificate, uncomment
+# secretName above and create a TLS Secret in the mta namespace. Never commit
+# real private keys to Git or a package; obtain a certificate from a trusted CA.
+# ---
+# apiVersion: v1
+# kind: Secret
+# metadata:
+#   name: mta-tls
+#   namespace: mta
+# type: kubernetes.io/tls
+# data:
+#   tls.crt: BASE64_ENCODED_CERTIFICATE_CHAIN
+#   tls.key: BASE64_ENCODED_PRIVATE_KEY
+#
+# Prefer instead:
+# kubectl -n mta create secret tls mta-tls --cert=fullchain.pem --key=privkey.pem
+# or a cert-manager Certificate resource for automatic renewal.

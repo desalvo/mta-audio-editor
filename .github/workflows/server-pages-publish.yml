@@ -64,7 +64,11 @@ jobs:
           expected_revision=$(tr -d '\r\n' < REVISION)
           [[ "$expected_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || exit 3
           [[ "$expected_revision" =~ ^[0-9]+$ ]] || exit 3
-          expected_rpm_release="0.$expected_revision.1.early"
+          expected_build=$(tr -d '\r\n' < BUILD_INFO)
+          [[ "$expected_build" =~ ^[0-9]{14}$ ]] || { echo 'Invalid BUILD_INFO' >&2; exit 3; }
+          source_attempt=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/$RUN_ID" --jq '.run_attempt')
+          [[ "$source_attempt" =~ ^[0-9]+$ ]] || exit 3
+          expected_rpm_release="0.$expected_revision.1.early.b${expected_build}.r${RUN_ID}.a${source_attempt}"
           shopt -s nullglob
           for target in el9 el10; do
             rpms=("$RUNNER_TEMP/incoming/rpm/$target/"*.rpm)
@@ -86,7 +90,7 @@ jobs:
               exit 3
             }
           done
-      - name: Restore previous channel and retain two versions
+      - name: Restore previous channel and retain twenty versions
         env:
           GH_TOKEN: ${{ github.token }}
           CHANNEL: ${{ inputs.channel }}
@@ -106,7 +110,7 @@ jobs:
               --manifest "$manifest" --archive "$RUNNER_TEMP/prior/signed-channel.tar.gz" \
               --incoming "$RUNNER_TEMP/incoming" --channel "$CHANNEL"
           fi
-          /usr/bin/python3 scripts/repositories/retain_channel_packages.py "$RUNNER_TEMP/incoming" --limit 2
+          /usr/bin/python3 scripts/repositories/retain_channel_packages.py "$RUNNER_TEMP/incoming" --limit 20
           test "$(find "$RUNNER_TEMP/incoming" -maxdepth 1 -name '*.deb' | wc -l)" -ge 1
           test "$(find "$RUNNER_TEMP/incoming/rpm/el9" -name '*.rpm' | wc -l)" -ge 1
           test "$(find "$RUNNER_TEMP/incoming/rpm/el10" -name '*.rpm' | wc -l)" -ge 1
@@ -172,11 +176,12 @@ jobs:
           # matching filenames or file sizes as proof of identical content.
           # Replacing a conflicting Release asset is intentional and scoped
           # to this serialized publication workflow, not GitHub Pages.
+          release_id=$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$tag" --jq '.id')
           for f in "${files[@]}"; do
             name=$(basename "$f")
             local_sha=$(sha256sum "$f" | cut -d' ' -f1)
-            remote_sha=$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$tag" \
-              --jq ".assets[] | select(.name == \"$name\") | .digest // empty")
+            remote_sha=$(gh api --paginate "repos/$GITHUB_REPOSITORY/releases/$release_id/assets?per_page=100" \
+              --jq ".[] | select(.name == \"$name\") | .digest // empty")
             if [[ "$remote_sha" == "sha256:$local_sha" ]]; then
               echo "Existing asset matches SHA-256: $name"
               continue
@@ -190,12 +195,24 @@ jobs:
           for f in "${files[@]}"; do
             name=$(basename "$f")
             local_sha=$(sha256sum "$f" | cut -d' ' -f1)
-            remote_sha=$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$tag" \
-              --jq ".assets[] | select(.name == \"$name\") | .digest // empty")
+            remote_sha=$(gh api --paginate "repos/$GITHUB_REPOSITORY/releases/$release_id/assets?per_page=100" \
+              --jq ".[] | select(.name == \"$name\") | .digest // empty")
             [[ "$remote_sha" == "sha256:$local_sha" ]] || {
               echo "Release asset SHA-256 mismatch for $name: got $remote_sha" >&2
               exit 4
             }
+          done
+      - name: Audit release RPM inventory against retained indexes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CHANNEL: ${{ inputs.channel }}
+        run: |
+          set -euo pipefail
+          # RPM binaries remain on GitHub Releases; Pages contains indexes only.
+          # Do not delete older assets until AFTER signed indexes are live.
+          for target in el9 el10; do
+            count=$(find "$RUNNER_TEMP/staging/rpm/$CHANNEL/$target/packages" -maxdepth 1 -name '*.rpm' | wc -l)
+            echo "$target retained RPMs: $count (maximum 20 versions per architecture)"
           done
       - name: Regenerate and sign RPM indexes with external binary URLs
         env:
@@ -279,6 +296,33 @@ jobs:
               done
               test "$ok" -eq 1 || { echo "Pages is missing $base/$target/$path" >&2; exit 1; }
             done
+            expected=$(sha256sum "$RUNNER_TEMP/staging/rpm/$CHANNEL/$target/repodata/repomd.xml" | cut -d' ' -f1)
+            current=""
+            for attempt in {1..15}; do
+              current=$(curl --fail --location --silent --show-error --max-time 20 "$base/$target/repodata/repomd.xml" | sha256sum | cut -d' ' -f1)
+              [[ "$current" == "$expected" ]] && break
+              sleep 12
+            done
+            [[ "$current" == "$expected" ]] || { echo "Public Pages metadata is stale for $target; refusing asset cleanup" >&2; exit 4; }
+          done
+      - name: Remove unreferenced RPM Release assets after Pages verification
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CHANNEL: ${{ inputs.channel }}
+        run: |
+          set -euo pipefail
+          tag="server-packages-$CHANNEL"
+          inventory="$RUNNER_TEMP/retained-rpm-names.txt"
+          find "$RUNNER_TEMP/staging/rpm/$CHANNEL" -path '*/packages/*.rpm' -printf '%f\n' | sort -u > "$inventory"
+          # Asset removal runs only after the updated indexes are publicly reachable.
+          release_id=$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$tag" --jq '.id')
+          gh api --paginate "repos/$GITHUB_REPOSITORY/releases/$release_id/assets?per_page=100" --jq '.assets[] | [.id,.name] | @tsv' | while IFS=$'\t' read -r asset_id asset_name; do
+            case "$asset_name" in
+              *.rpm) if ! grep -Fqx -- "$asset_name" "$inventory"; then
+                echo "Remove retired RPM asset $asset_name"
+                gh api -X DELETE "repos/$GITHUB_REPOSITORY/releases/assets/$asset_id"
+              fi ;;
+            esac
           done
       - name: Destroy temporary signing material
         if: always()

@@ -49,6 +49,10 @@ def capture(job_id, usage, source):
             raise ValueError('Conflicting immutable metering evidence')
         if not row:
             con.execute('INSERT INTO ai_metering_evidence VALUES(?,?)', (job_id, encoded))
+        # Expose only authenticated usage. Unknown GPU time remains NULL,
+        # never a wall-clock estimate presented as verified consumption.
+        con.execute('UPDATE jobs SET cpu_seconds=COALESCE(?,cpu_seconds), gpu_seconds=COALESCE(?,gpu_seconds) WHERE job_id=?',
+                    (normalized.get('cpu_seconds'), normalized.get('gpu_seconds'), job_id))
         con.execute('COMMIT')
     return not bool(row)
 

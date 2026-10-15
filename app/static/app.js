@@ -5251,40 +5251,87 @@ async function planAiRemix(action="plan"){
 }
 
 let aiArrangerWatchTimer=null;
+let aiArrangerElapsedTimer=null;
+let aiArrangerLastSnapshot=null;
+let aiArrangerPolling=false;
+let aiArrangerWatchEpoch=0;
+let aiArrangerPollFailures=0;
+function aiArrangerRenderElapsed(){
+  const job=aiArrangerLastSnapshot;
+  const elapsed=document.getElementById('aiRemixJobElapsed');
+  if(!elapsed||!job)return;
+  const active=['running','busy','queued','blocked'].includes(job.state);
+  const seconds=job.state==='queued'?0:job.started_at?Math.max(0,Math.floor(Date.now()/1000-Number(job.started_at))):Math.max(0,Math.floor(Number(job.elapsed_seconds)||0));
+  const prefix=job.state==='queued'?`Queued / In coda: ${job.jobs_ahead??0} ahead · Position ${job.queue_position??'?'} · `:`Elapsed / Trascorso: ${seconds}s · `;
+  const connection=aiArrangerPollFailures?` · Reconnecting / Riconnessione (${aiArrangerPollFailures})`:'';
+  elapsed.textContent=prefix+`${job.phase||job.state} · Job ${job.job_id||''} · CPU: ${job.cpu_seconds==null?'N/A':Number(job.cpu_seconds).toFixed(1)+' s'} · GPU: ${job.gpu_seconds==null?'N/A':Number(job.gpu_seconds).toFixed(1)+' s'}${connection}`;
+  if(!active&&aiArrangerElapsedTimer!==null){clearInterval(aiArrangerElapsedTimer);aiArrangerElapsedTimer=null;}
+}
 async function aiArrangerWatchActive(waitForFinish=false){
   const pid=current?.id;
   if(!pid)return;
-  if(aiArrangerWatchTimer){clearInterval(aiArrangerWatchTimer);aiArrangerWatchTimer=null;}
+  if(aiArrangerWatchTimer!==null){clearTimeout(aiArrangerWatchTimer);aiArrangerWatchTimer=null;}
+  if(aiArrangerElapsedTimer!==null){clearInterval(aiArrangerElapsedTimer);aiArrangerElapsedTimer=null;}
+  aiArrangerLastSnapshot=null;
+  aiArrangerPollFailures=0;
+  // Invalidate callbacks from a previous modal/job observer.
+  const watchEpoch=++aiArrangerWatchEpoch;
   const poll=async()=>{
+    if(watchEpoch!==aiArrangerWatchEpoch||current?.id!==pid)return;
+    if(aiArrangerPolling){aiArrangerWatchTimer=setTimeout(poll,2000);return;}
+    aiArrangerPolling=true;
+    let shouldContinue=false;
+    let delay=2000;
     try{
       const job=await api(`/api/projects/${encodeURIComponent(pid)}/ai-arranger/active-generation`);
+      if(watchEpoch!==aiArrangerWatchEpoch)return;
+      aiArrangerPollFailures=0;
+      aiArrangerLastSnapshot=job;
       const panel=document.getElementById('aiRemixJobProgress');
       const button=document.getElementById('aiRemixGenerateButton');
       const label=document.getElementById('aiRemixJobLabel');
-      const elapsed=document.getElementById('aiRemixJobElapsed');
       const bar=panel?.querySelector('progress');
-      const active=job.state==='running'||job.state==='busy'||job.state==='queued';
+      const active=['running','busy','queued','blocked'].includes(job.state);
       if(button)button.disabled=active;
       if(panel)panel.hidden=!active;
-      if(label)label.textContent=job.message|| (active?'AI inference in progress':'No running AI job');
+      if(label)label.textContent=job.message||(active?'AI inference in progress':'No running AI job');
       if(bar){if(Number.isFinite(job.progress_percent)){bar.max=100;bar.value=job.progress_percent;}else bar.removeAttribute('value');}
-      if(elapsed)elapsed.textContent=(job.state==='queued'?`Queued / In coda: ${job.jobs_ahead??0} ahead · Position ${job.queue_position??'?'} · `:`Elapsed / Trascorso: ${job.started_at?Math.floor(Date.now()/1000-job.started_at):0}s · `)+`${job.phase||job.state} · Job ${job.job_id||''} · CPU: ${job.cpu_seconds==null?'N/A':Number(job.cpu_seconds).toFixed(1)+' s'} · GPU: ${job.gpu_seconds==null?'N/A':Number(job.gpu_seconds).toFixed(1)+' s'}`;
-      if(!active){
-        if(aiArrangerWatchTimer){clearInterval(aiArrangerWatchTimer);aiArrangerWatchTimer=null;}
+      if(active){
+        if(aiArrangerElapsedTimer===null)aiArrangerElapsedTimer=setInterval(aiArrangerRenderElapsed,1000);
+        aiArrangerRenderElapsed();
+      }else{
+        aiArrangerRenderElapsed();
+        if(!waitForFinish&&job.state==='completed'){
+          const output=document.getElementById('aiRemixPlanResult');
+          if(output)output.textContent='Latest AI generation completed; generated track is in the project.';
+        }
         if(waitForFinish&&job.state==='completed'){
           const output=document.getElementById('aiRemixPlanResult');
           if(output)output.textContent='AI generation complete; new track added.';
           const updated=await api(`/api/projects/${encodeURIComponent(pid)}`);
           if(current?.id===pid){current=updated;render();}
-        }else if(waitForFinish&&job.state==='failed'){
+        }else if(waitForFinish&&['failed','interrupted','cancelled'].includes(job.state)){
           const output=document.getElementById('aiRemixPlanResult');
-          if(output)output.textContent='AI generation failed: '+(job.message||'Unknown error');
+          if(output)output.textContent='AI generation '+job.state+': '+(job.message||'Unknown error');
         }
       }
-      return active;
-    }catch(e){const output=document.getElementById('aiRemixPlanResult');if(output)output.textContent='Could not read AI job status: '+e.message;return false;}
+      shouldContinue=active;
+    }catch(e){
+      // Network/proxy failures are not terminal job states. Preserve the latest
+      // server snapshot and retry; never claim fabricated CPU/GPU accounting.
+      if(watchEpoch!==aiArrangerWatchEpoch)return;
+      aiArrangerPollFailures++;
+      const output=document.getElementById('aiRemixPlanResult');
+      if(output)output.textContent='Connection interrupted; retrying AI job status automatically: '+e.message;
+      aiArrangerRenderElapsed();
+      shouldContinue=true;
+      delay=Math.min(15000,2000*Math.pow(2,Math.min(aiArrangerPollFailures-1,3)));
+    }finally{
+      aiArrangerPolling=false;
+      if(shouldContinue&&watchEpoch===aiArrangerWatchEpoch&&current?.id===pid){aiArrangerWatchTimer=setTimeout(poll,delay);}
+    }
   };
-  if(await poll())aiArrangerWatchTimer=setInterval(poll,2000);
+  await poll();
 }
 
 async function generateAndAddAiRemix(){return planAiRemix("generate-and-add")}

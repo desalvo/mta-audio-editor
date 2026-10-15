@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Retain the newest two native package versions per format/architecture.
+"""Retain the newest 20 native package versions per format/architecture.
 
 Uses distro-native Debian and RPM version comparison, never lexical ordering.
 """
@@ -39,7 +39,7 @@ def compare_rpm(a, b):
     return rpm.labelCompare(a, b)
 
 
-def retain(directory, extension, inspect, compare, limit=2, dry_run=False):
+def retain(directory, extension, inspect, compare, limit=20, dry_run=False):
     groups = {}
     for file in directory.glob(f'*{extension}'):
         name, arch, version = inspect(file)
@@ -60,11 +60,11 @@ def retain(directory, extension, inspect, compare, limit=2, dry_run=False):
 def main():
     p = argparse.ArgumentParser()
     p.add_argument('directory', type=Path)
-    p.add_argument('--limit', type=int, default=2)
+    p.add_argument('--limit', type=int, default=20)
     p.add_argument('--dry-run', action='store_true')
     args = p.parse_args()
-    if args.limit != 2:
-        p.error('This release policy requires exactly two versions')
+    if not 1 <= args.limit <= 100:
+        p.error('Retention must be between 1 and 100 versions')
     retain(args.directory, '.deb', deb_info, compare_deb, args.limit, args.dry_run)
     for target in ('el9', 'el10'):
         retain(args.directory / 'rpm' / target, '.rpm', rpm_info, compare_rpm, args.limit, args.dry_run)

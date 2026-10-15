@@ -14,5 +14,5 @@ def test_ace_autostart_runs_in_daemon_thread():
 def test_application_revision_preserved_but_package_iteration_bumped():
     assert (ROOT / "REVISION").read_text().strip() == "209"
     workflow = (ROOT / ".github/workflows/server-native-runtime-validation.yml").read_text()
-    assert 'MTA_RPM_RELEASE="0.$(cat REVISION).1.early"' in workflow
+    assert 'MTA_RPM_RELEASE="0.$(cat REVISION).1.early.b$(cat BUILD_INFO).r${GITHUB_RUN_ID}.a${GITHUB_RUN_ATTEMPT}"' in workflow
     assert 'MTA_SERVER_VERSION="$(cat VERSION)~early.$(cat REVISION)+pkg1"' in workflow
