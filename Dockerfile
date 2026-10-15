@@ -14,6 +14,7 @@ LABEL org.opencontainers.image.title="MTA Audio Editor" \
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1 \
     MTA_DATA_DIR=/data/projects MTA_HOST=0.0.0.0 MTA_PORT=8080 \
     MTA_APP_VERSION=$APP_VERSION MTA_APP_REVISION=$APP_REVISION MTA_RELEASE_CHANNEL=$RELEASE_CHANNEL MTA_BUILD_ID=$BUILD_ID \
+    MTA_AI_JOB_STATE_DIR=/data/projects/.ai-jobs MTA_DIAGNOSTIC_DIR=/data/projects/.diagnostics \
     XDG_CACHE_HOME=/data/projects/.cache TORCH_HOME=/data/projects/.cache/torch \
     VAMP_PATH=/opt/mta/vamp MTA_VAMP_PATH=/opt/mta/vamp MTA_CHORDINO_HOST=/usr/bin/vamp-simple-host
 RUN apt-get update \
