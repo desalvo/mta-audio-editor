@@ -1542,3 +1542,49 @@ body:has(#topZoom:active) .wave{image-rendering:auto}
 .editor-content > .editor-toolbar{grid-row:1}
 .editor-content > .clip-browser{grid-row:2}
 .editor-content > .editor-grid{grid-row:3;min-height:0}
+
+/* r210: author display rules must never override the HTML hidden state. */
+[hidden]{display:none!important}
+body:not(.native-single-user) .native-only-action{display:none!important}
+
+/* r210: resize the dock's allocated row, keeping its bottom on the viewport. */
+html,body{overflow:hidden}
+.app-shell{height:100dvh;min-height:0}
+.workspace{min-height:0;overflow:hidden}
+.main-area,body.native-single-user .main-area{grid-template-rows:minmax(120px,1fr) var(--mixer-height,320px)!important;overflow:hidden;min-height:0}
+.mixer-dock,body.native-single-user .mixer-dock,body.mobile-client .mixer-dock{
+  height:100%!important;min-height:0!important;max-height:none;align-self:stretch;padding-top:10px;
+}
+.mixer-dock .mixer-pane,.mixer-dock .meta-pane{height:auto;min-height:0}
+.mixer-dock .channels{flex:1 0 224px;min-height:224px;align-items:stretch;padding:5px 6px 8px}
+.mixer-dock .channel{height:auto;min-height:210px;max-height:none;padding:4px}
+.mixer-dock .channel-name{height:17px}
+.mixer-dock .pan-control{grid-template-columns:26px minmax(0,1fr);grid-template-rows:24px 10px;gap:1px;margin:2px 0}
+.mixer-dock .pan-knob{width:24px;height:24px;margin:3px auto}
+.mixer-dock .pan-knob.interactive{margin:0}
+.mixer-dock .pan-value-input{height:18px;width:34px;padding:1px}
+.mixer-dock .channel-fader-area{height:100px;grid-template-columns:30px 22px minmax(14px,auto);column-gap:2px}
+.mixer-dock .fader-column{width:30px;height:88px}
+.mixer-dock .fader-column .v-fader{width:84px;left:-27px;top:37px;transform-origin:42px 6.5px}
+.mixer-dock .db-scale{height:84px}
+.mixer-dock .meter-stack{height:100px}
+.mixer-dock .meter-stack .meter-pair{height:78px;margin-top:3px}
+.mixer-dock .meter{height:78px}
+.mixer-dock .volume-number{height:20px}
+
+/* Arranger: ordered sections and two columns, collapsing on narrow screens. */
+.ai-arranger{display:grid;gap:12px}
+.ai-arranger fieldset{min-width:0;margin:0;padding:12px;border:1px solid #2d465b;border-radius:8px}
+.ai-arranger legend{padding:0 6px;color:#cce8fa;font-weight:700;font-size:12px}
+.ai-arranger .arranger-grid{display:flex;flex-wrap:wrap;gap:10px}
+.ai-arranger .arranger-grid>*{flex:0 0 calc(50% - 5px);min-width:0}
+.ai-arranger .arranger-grid>.arranger-wide{flex-basis:100%}
+.ai-arranger label{display:flex;flex-direction:column;gap:5px;min-width:0;font-size:12px}
+.ai-arranger input:not([type=checkbox]),.ai-arranger select,.ai-arranger textarea{width:100%;min-width:0;background:#08141f;color:#e8f2fb;border:1px solid #36536a;border-radius:5px;padding:7px}
+.ai-arranger .arranger-wide{grid-column:1/-1}
+.ai-arranger .arranger-checks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.ai-arranger .arranger-checks label{flex-direction:row;align-items:center}
+.ai-arranger .form-actions{display:flex;flex-wrap:wrap;gap:8px}
+.ai-arranger .arranger-status{border:1px solid #325770;border-radius:8px;padding:10px;background:#091823;overflow-wrap:anywhere}
+.ai-arranger .hint{font-size:11px}
+@media(max-width:600px){.ai-arranger .arranger-grid>*{flex-basis:100%}.ai-arranger .arranger-checks{grid-template-columns:1fr}.ai-arranger fieldset{padding:9px}}

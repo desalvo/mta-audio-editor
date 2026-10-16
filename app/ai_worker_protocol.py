@@ -191,7 +191,7 @@ def _trim_wav_for_ai(path: Path, start_ms: int, end_ms: int) -> None:
         temp.unlink(missing_ok=True)
 
 
-def run_worker_with_project_audio(plan: dict, project, resolve_audio, *, timeout_seconds: int = 1200, progress_file=None, cancel_event=None):
+def run_worker_with_project_audio(plan: dict, project, resolve_audio, *, timeout_seconds: int | None = None, progress_file=None, cancel_event=None):
     """Run a trusted worker with copied project WAV inputs, not host file paths.
 
     Source files are discovered from the authenticated project object. The resolver
@@ -202,8 +202,8 @@ def run_worker_with_project_audio(plan: dict, project, resolve_audio, *, timeout
     worker = configured_worker()
     if worker is None:
         raise WorkerUnavailable('No trusted AI inference executable is configured')
-    if not 1 <= timeout_seconds <= 3600:
-        raise ValueError('invalid worker timeout')
+    from .ai_execution_limits import inference_timeout
+    timeout_seconds = inference_timeout(plan, timeout_seconds)
     if cancel_event is not None and cancel_event.is_set():
         raise WorkerUnavailable('AI worker cancelled')
     from .audio_engine import render_mix, render_track

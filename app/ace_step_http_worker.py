@@ -25,9 +25,11 @@ from io import BytesIO
 # isolated temporary cwd. Resolve only its installed sibling, never cwd/PYTHONPATH.
 if __package__:
     from .ace_gpu_process_meter import AceProcessMeter
+    from .ai_execution_limits import inference_timeout
 else:
     sys.path.insert(0, str(Path(__file__).resolve().parent))
     from ace_gpu_process_meter import AceProcessMeter
+    from ai_execution_limits import inference_timeout
 
 MAX_RESULT = 1024 * 1024 * 1024
 
@@ -140,6 +142,8 @@ def run(plan_path: Path, output: Path) -> None:
     plan = json.loads(plan_path.read_text(encoding='utf-8'))
     if plan.get('model_id') != 'ace-step-1.5':
         raise ValueError('This adapter only supports ACE-Step 1.5')
+    budget = inference_timeout(plan)
+    started = time.monotonic()
     source = _source_path(plan_path, plan)
     operation = plan.get('operation', 'rearrange')
     if operation not in ('rearrange', 'remix'):
@@ -162,8 +166,13 @@ def run(plan_path: Path, output: Path) -> None:
     if not isinstance(task_id, str) or not task_id:
         raise RuntimeError('ACE-Step did not return a task ID')
     _progress('queued', 'ACE-Step accepted job ' + task_id[:12] + '; waiting for inference', telemetry=meter.sample())
-    max_seconds = max(30, min(3500, int(os.environ.get('MTA_ACE_STEP_POLL_SECONDS', '1100'))))
-    deadline = time.monotonic() + max_seconds
+    # Keep time for downloading the result before the outer supervisor deadline.
+    # Explicit per-job settings supersede the legacy deployment poll override.
+    reserve = min(120, budget // 10)
+    max_seconds = max(1, budget - reserve)
+    if 'inference_timeout_seconds' not in plan and os.environ.get('MTA_ACE_STEP_POLL_SECONDS'):
+        max_seconds = max(1, min(max_seconds, int(os.environ['MTA_ACE_STEP_POLL_SECONDS'])))
+    deadline = min(started + max(1, budget - reserve), time.monotonic() + max_seconds)
     while time.monotonic() < deadline:
         status_payload = _json(base + '/query_result', {'task_id_list': [task_id]})
         rows = status_payload.get('data')

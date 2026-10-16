@@ -1,6 +1,9 @@
 const q=s=>document.querySelector(s),qa=s=>[...document.querySelectorAll(s)];
 function aiGpuStatusLabel(status){
-  return ({host_agent_not_configured:'agente host non raggiungibile: mount socket assente',
+  return ({host_agent_not_configured:'socket agente host non visibile nel container',
+    host_agent_socket_missing:'socket assente: verificare servizio host e mount',
+    host_agent_socket_missing_in_mount:'socket assente nel mount: agente fermo o mount obsoleto',
+    host_agent_socket_access_denied:'accesso al socket agente host negato',
     host_agent_auth_unavailable:'credenziale agente host non accessibile',
     host_agent_unavailable:'agente host non disponibile',
     host_agent_mapping_unavailable:'agente host: identità processo non correlabile',

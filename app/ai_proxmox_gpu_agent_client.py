@@ -6,8 +6,42 @@ never accepted as per-job certified GPU time or energy.
 from __future__ import annotations
 import json
 import os
+from pathlib import Path
+import stat
 import socket
 import time
+
+
+
+def _mounted_directory(directory):
+    try:
+        for line in Path('/proc/self/mountinfo').read_text().splitlines():
+            fields = line.split()
+            if len(fields) > 4 and fields[4].replace('\\040', ' ').replace('\\134', '\\') == directory:
+                return True
+    except OSError:
+        pass
+    return False
+
+
+def socket_visibility():
+    """Filesystem-only evidence: never infer missing mount from missing socket."""
+    configured = os.getenv('MTA_AI_GPU_HOST_AGENT_SOCKET', '')
+    candidates = (configured,) if configured else (
+        '/opt/mta-gpu-agent-host/agent.sock', '/run/mta-gpu-agent/agent.sock')
+    report = {'configured_path': bool(configured), 'socket_visible': False,
+              'directory_present': False, 'mount_present': False, 'access_denied': False}
+    for path in candidates:
+        directory = os.path.dirname(path)
+        report['mount_present'] |= _mounted_directory(directory)
+        try:
+            report['directory_present'] |= os.path.isdir(directory)
+            report['socket_visible'] |= stat.S_ISSOCK(os.stat(path).st_mode)
+        except PermissionError:
+            report['access_denied'] = True
+        except OSError:
+            pass
+    return report
 
 
 def snapshot(*, socket_path: str | None = None, token: str | None = None) -> dict:
@@ -17,7 +51,11 @@ def snapshot(*, socket_path: str | None = None, token: str | None = None) -> dic
         candidates = ('/opt/mta-gpu-agent-host/agent.sock', '/run/mta-gpu-agent/agent.sock')
         path = next((candidate for candidate in candidates if os.path.exists(candidate)), '')
     if not path:
-        return {'available': False, 'reason': 'not-configured', 'billing_eligible': False}
+        visible = socket_visibility()
+        reason = ('agent-socket-access-denied' if visible['access_denied'] else
+                  'agent-socket-missing-in-mount' if visible['mount_present'] else
+                  'agent-socket-missing' if visible['directory_present'] else 'not-configured')
+        return {'available': False, 'reason': reason, 'billing_eligible': False}
     if not token:
         try:
             token = open(os.getenv('MTA_AI_GPU_HOST_AGENT_TOKEN_FILE') or os.path.join(os.path.dirname(path), 'token'), encoding='utf-8').read().strip()
@@ -95,6 +133,7 @@ def diagnostics(*, socket_path: str | None = None, token: str | None = None) -> 
     result = snapshot(socket_path=socket_path, token=token)
     report = {
         'schema': 'mta-gpu-app-diagnostic-v1',
+        'socket_visibility': socket_visibility(),
         'available': result.get('available') is True,
         'authenticated': result.get('available') is True,
         'process_count': 0,

@@ -3533,6 +3533,51 @@ def cancel_media_job(job_id: str, request: Request):
     return _media_job_public(job)
 
 
+@app.post("/api/projects/{pid}/tracks/{track_id}/duplicate")
+def duplicate_track(pid: str, track_id: str, request: Request):
+    from .ai_project_lock import project_publication_lock
+    from . import ai_upload_transaction, ai_media_identity
+    with project_publication_lock(pid):
+        project = _project_for_actor(request, pid)
+        original = next((track for track in project.tracks if track.id == track_id), None)
+        if original is None:
+            raise HTTPException(404, "Track not found")
+        source = audio_path(pid, original.filename)
+        if source.is_symlink() or not source.is_file():
+            raise HTTPException(409, "Source audio unavailable")
+        _ensure_workspace_capacity(project.owner_user_id, source.stat().st_size)
+        clone = original.model_copy(deep=True)
+        clone.id = uuid.uuid4().hex[:12]
+        clone.name = (original.name[:193] + ' (copy)')[:200]
+        clone.mta_slot = None  # physical export slots must remain unique
+        clone.source_clip_id = None
+        clone.filename = 'duplicate-' + uuid.uuid4().hex + source.suffix
+        clone.waveform_revision = ''
+        for clip in clone.clips: clip.id = uuid.uuid4().hex[:12]
+        for insert in clone.inserts: insert.id = uuid.uuid4().hex[:12]
+        destination = audio_path(pid, clone.filename)
+        ai_upload_transaction.begin(pid)
+        identity = None
+        try:
+            with source.open('rb') as src, destination.open('xb') as dst:
+                st = os.fstat(dst.fileno())
+                identity = (st.st_dev, st.st_ino)
+                ai_media_identity.record_upload(pid, destination)
+                shutil.copyfileobj(src, dst, 1024 * 1024)
+                dst.flush()
+                os.fsync(dst.fileno())
+            from .storage import _fsync_directory
+            _fsync_directory(destination.parent)
+            project.tracks.insert(project.tracks.index(original) + 1, clone)
+            save_project(project)
+        except BaseException:
+            if identity is not None:
+                _rollback_unpublished_upload(pid, destination, identity)
+            raise
+        ai_upload_transaction.finish(pid)
+        return {"project": project, "track_id": clone.id}
+
+
 @app.post("/api/projects/{pid}/tracks")
 async def add_track(
     pid: str,

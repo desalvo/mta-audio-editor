@@ -2,11 +2,12 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 OUT="${1:-$ROOT/dist}"
-VERSION=0.3.0-210.1
+VERSION=0.3.0-210.2
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 PKG="$TMP/pkg"
 install -d -m 0755 "$PKG/DEBIAN" "$PKG/usr/lib/mta-proxmox-gpu-agent" "$PKG/usr/bin" "$PKG/lib/systemd/system"
+install -m 0755 "$ROOT/scripts/check_mta_gpu_agent_mount.py" "$PKG/usr/lib/mta-proxmox-gpu-agent/check_mount.py"
 install -m 0755 "$ROOT/scripts/mta_proxmox_gpu_agent.py" "$PKG/usr/lib/mta-proxmox-gpu-agent/agent.py"
 install -m 0755 "$ROOT/scripts/mta_proxmox_tag_sync.py" "$PKG/usr/lib/mta-proxmox-gpu-agent/tag_sync.py"
 install -m 0755 "$ROOT/scripts/mta_proxmox_gpu_preflight.py" "$PKG/usr/lib/mta-proxmox-gpu-agent/preflight.py"
@@ -69,6 +70,7 @@ Restart=on-failure
 RestartSec=5
 RuntimeDirectory=mta-gpu-agent
 RuntimeDirectoryMode=0750
+RuntimeDirectoryPreserve=yes
 NoNewPrivileges=yes
 ProtectSystem=strict
 ProtectHome=true

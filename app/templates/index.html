@@ -2,10 +2,11 @@
 <html lang="it">
 <head>
   <meta charset="utf-8">
+  <style>[hidden]{display:none!important}</style>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>MTA Audio Editor</title>
   <link rel="icon" href="/static/logo.svg">
-  <link rel="stylesheet" href="/static/app.css?v=r210-lxc-top">
+  <link rel="stylesheet" href="/static/app.css?v=r210-arranger-mixer">
 </head>
 <body class="__BODY_CLASS__">
 <div class="app-shell">
@@ -45,7 +46,7 @@
             <button class="nav-item" onclick="newProject()">＋ <span>New project</span></button>
             <button class="nav-item" onclick="openExportPanel()">⇧ <span>Export</span></button>
             <button class="nav-item" onclick="openAiRemixPanel()">♫ <span>AI Arranger / Remix</span></button>
-            <button id="saveProjectManualNav" class="nav-item native-project-action" onclick="save()" hidden>💾 <span>Save project</span></button>
+            <button id="saveProjectManualNav" class="nav-item native-project-action native-only-action" onclick="save()" hidden>💾 <span>Save project</span></button>
             <button id="saveProjectLocalNav" class="nav-item web-project-action" onclick="saveProjectLocal()">⬇ <span>Save project locally</span></button>
             <button class="nav-item" onclick="saveAsProject()">⇩ <span>Save project as…</span></button>
             <button id="openRecentProjectBtn" class="nav-item native-project-action" onclick="openRecentProjects()" hidden>◷ <span>Open recent</span></button>
@@ -114,6 +115,6 @@
   </div>
 </div>
 <input id="stemFileHidden" type="file" accept=".mp3,audio/mpeg" hidden>
-<script src="/static/app.js?v=0.3.0-r210-lxc-top"></script>
+<script src="/static/app.js?v=0.3.0-r210-arranger-mixer"></script>
 </body>
 </html>

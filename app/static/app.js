@@ -231,7 +231,7 @@ function trackHeightPx(t){return Math.max(78,Math.min(420,Math.round(Number(t?.h
 function linesToText(a,b){return(a||[]).map(x=>`${(x.time_ms/1000).toFixed(3)}\t${x[b]}`).join('\n')}
 function textToLines(v,key){return v.split(/\n/).map(x=>x.trim()).filter(Boolean).map(line=>{const [t,...rest]=line.split(/\t|\s{2,}/);return{time_ms:Math.max(0,Math.round(parseFloat(t)*1000)||0),[key]:rest.join(' ').trim()}})}
 
-async function init(){restoreSidebarPanels();if(isMobileClient())document.body.classList.add('mobile-client');try{currentUser=await api('/api/session');const a=$('#adminNav');if(a)a.hidden=!!currentUser.native_single_user||currentUser.role!=='admin';const sb=$('#nativeSettingsButton');if(sb)sb.hidden=false;const recentBtn=$('#openRecentProjectBtn'),localBtn=$('#openLocalProjectBtn'),manualSave=$('#saveProjectManualNav'),localSave=$('#saveProjectLocalNav');if(currentUser.native_single_user){document.body.classList.add('native-single-user');if(recentBtn)recentBtn.hidden=false;if(localBtn)localBtn.hidden=true;if(manualSave)manualSave.hidden=false;if(localSave)localSave.hidden=true}else{if(recentBtn)recentBtn.hidden=false;if(localBtn)localBtn.hidden=false;if(manualSave)manualSave.hidden=true;if(localSave)localSave.hidden=false}}catch(e){}if(currentUser?.native_single_user)installNativeViewportGuard();if(currentUser&&!currentUser.native_single_user)autosaveEnabled=localStorage.getItem('mtaWebAutosaveEnabled')!=='false';let nativeBridge=null;if(currentUser?.native_single_user){nativeBridge=await waitForNativeApi();if(nativeBridge?.get_native_settings){try{const cfg=await nativeBridge.get_native_settings();autosaveEnabled=cfg.autosave_enabled!==false;nativeRecentProjects=Array.isArray(cfg.recent_projects)?cfg.recent_projects.map(String).filter(Boolean):[];const pref=['it','en'].includes(cfg.language)?cfg.language:'auto';uiLanguage=pref==='auto'?(String(cfg.system_language||'en').toLowerCase().startsWith('it')?'it':'en'):pref;applyInterfaceLanguage();ensureLiveLocalization()}catch(e){}}setTimeout(()=>checkNativeAppUpdate(false),1200)}try{pluginInfo=await api('/api/plugins')}catch(e){}if(nativeBridge?.consume_startup_project){try{const startup=await nativeBridge.consume_startup_project();if(startup?.project?.id){rememberRecentProject(startup.project.id);await openP(startup.project.id);return}if(startup&&!startup.ok&&startup.error)toast('Impossibile aprire il progetto: '+startup.error)}catch(e){toast('Impossibile aprire il progetto: '+e.message)}}await refresh()}
+async function init(){restoreSidebarPanels();if(isMobileClient())document.body.classList.add('mobile-client');try{currentUser=await api('/api/session');const a=$('#adminNav');if(a)a.hidden=!!currentUser.native_single_user||currentUser.role!=='admin';const sb=$('#nativeSettingsButton');if(sb)sb.hidden=false;const recentBtn=$('#openRecentProjectBtn'),localBtn=$('#openLocalProjectBtn'),manualSave=$('#saveProjectManualNav'),localSave=$('#saveProjectLocalNav');if(currentUser.native_single_user){document.body.classList.add('native-single-user');if(recentBtn)recentBtn.hidden=false;if(localBtn)localBtn.hidden=true;if(manualSave)manualSave.hidden=false;if(localSave)localSave.hidden=true}else{if(recentBtn)recentBtn.hidden=false;if(localBtn)localBtn.hidden=false;if(manualSave)manualSave.hidden=true;if(localSave)localSave.hidden=false}}catch(e){}if(currentUser?.native_single_user)installNativeViewportGuard();if(currentUser&&!currentUser.native_single_user)autosaveEnabled=localStorage.getItem('mtaWebAutosaveEnabled')!=='false';let nativeBridge=null;if(currentUser?.native_single_user){nativeBridge=await waitForNativeApi();if(nativeBridge?.get_native_settings){try{const cfg=await nativeBridge.get_native_settings();autosaveEnabled=cfg.autosave_enabled!==false;nativeRecentProjects=Array.isArray(cfg.recent_projects)?cfg.recent_projects.map(String).filter(Boolean):[];const pref=['it','en'].includes(cfg.language)?cfg.language:'auto';uiLanguage=pref==='auto'?(String(cfg.system_language||'en').toLowerCase().startsWith('it')?'it':'en'):pref;applyInterfaceLanguage();ensureLiveLocalization()}catch(e){}}setTimeout(()=>checkNativeAppUpdate(false),1200)}try{pluginInfo=await api('/api/plugins')}catch(e){}if(nativeBridge?.consume_startup_project){try{const startup=await nativeBridge.consume_startup_project();if(startup?.project?.id){rememberRecentProject(startup.project.id);await openP(startup.project.id);return}if(startup&&!startup.ok&&startup.error)toast('Impossibile aprire il progetto: '+startup.error)}catch(e){toast('Impossibile aprire il progetto: '+e.message)}}await refresh();await restoreActiveWebProject()}
 
 // Global sidebar state, not stored in the project. Save every change immediately.
 const SIDEBAR_PREF_KEY='mta.sidebar.collapsed.v1';
@@ -272,6 +272,7 @@ function closeCurrentProject(){
   if(!current)return toast('Nessun progetto aperto');
   if(activeStemJob&&activeStemProjectId===current.id)return toast('Attendi il completamento della separazione prima di chiudere il progetto.');
   const closingProjectId=current.id;
+  forgetActiveWebProject(closingProjectId);
   stopPlayback();
   clearTimedPlaybackOverlay();
   clearTimeout(autosaveTimer);autosaveTimer=null;
@@ -288,6 +289,23 @@ window.addEventListener('pagehide',()=>{
   releaseProjectPreviewCache(pid);
 });
 
+function activeWebProjectKey(){return currentUser&&!currentUser.native_single_user&&currentUser.id!=null?`mta.openProject.${currentUser.id}`:null}
+function rememberActiveWebProject(){
+  const key=activeWebProjectKey();if(!key||!current?.id)return;
+  try{sessionStorage.setItem(key,current.id)}catch(_){}
+}
+function forgetActiveWebProject(id=null){
+  const key=activeWebProjectKey();if(!key)return;
+  try{if(id==null||sessionStorage.getItem(key)===id)sessionStorage.removeItem(key)}catch(_){}
+}
+async function restoreActiveWebProject(){
+  const key=activeWebProjectKey();if(!key)return;
+  let id;try{id=sessionStorage.getItem(key)}catch(_){return}
+  if(!id)return;
+  if(!/^[A-Za-z0-9_-]{1,160}$/.test(id)){forgetActiveWebProject();return}
+  await openP(id);
+}
+
 function recentProjectIds(){
   if(currentUser?.native_single_user)return [...nativeRecentProjects];
   try{return JSON.parse(localStorage.getItem('mtaRecentProjects')||'[]').filter(Boolean)}catch(e){return[]}
@@ -303,6 +321,7 @@ function rememberRecentProject(id){
   else localStorage.setItem('mtaRecentProjects',JSON.stringify(ids));
 }
 function forgetRecentProject(id){
+  forgetActiveWebProject(id);
   const ids=recentProjectIds().filter(x=>String(x)!==String(id));
   if(currentUser?.native_single_user){nativeRecentProjects=ids;void persistNativeRecentProjects()}
   else localStorage.setItem('mtaRecentProjects',JSON.stringify(ids));
@@ -502,6 +521,7 @@ function restoreUiState(){
 let lastMetronomeZoneProjectId=null;
 let previousRenderedTrackState={projectId:null,count:0};
 function render(){
+  rememberActiveWebProject();
   if(current?.id!==lastMetronomeZoneProjectId){lastMetronomeZoneProjectId=current?.id||null;lastMetronomeZoneSignature=metronomeZoneSignature(current)}
   if(current?.chords?.some(ch=>ch?.deleted))current.chords=current.chords.filter(ch=>!ch?.deleted);
   if(current?.markers?.some(marker=>marker?.deleted))current.markers=current.markers.filter(marker=>!marker?.deleted);
@@ -967,6 +987,18 @@ function closeTrackContextMenu(){
   const menu=$('#trackContextMenu');
   if(menu)menu.remove();
 }
+async function duplicateTrack(id){
+  if(!current)return;
+  const pid=current.id;
+  try{
+    await save();
+    if(current?.id!==pid)return;
+    const result=await api(`/api/projects/${encodeURIComponent(pid)}/tracks/${encodeURIComponent(id)}/duplicate`,{method:'POST'});
+    if(current?.id!==pid)return;
+    current=result.project;selectedTrackId=result.track_id;selectedTrackIdSet=new Set([result.track_id]);
+    render();toast('Traccia duplicata');
+  }catch(e){toast('Duplicazione fallita: '+e.message)}
+}
 function openTrackContextMenuAt(id,clientX,clientY){
   closeTrackContextMenu();
   const track=trackById(id);if(!track)return;
@@ -980,6 +1012,7 @@ function openTrackContextMenuAt(id,clientX,clientY){
   menu.className='track-context-menu';
   menu.setAttribute('role','menu');
   menu.innerHTML=`
+    <button type="button" onclick="closeTrackContextMenu();duplicateTrack('${id}')">⧉ <span>Duplica traccia</span></button>
     <button type="button" onclick="closeTrackContextMenu();renameTrack('${id}')">✎ <span>Rinomina</span></button>
     <button type="button" ${disabled} onclick="closeTrackContextMenu();openTrackStemWorkflow('${id}')">▥ <span>Separa</span></button>
     <button type="button" onclick="closeTrackContextMenu();openAiRemixPanel('${id}')">✧ <span>AI Arranger / Remix · traccia</span></button>
@@ -5204,36 +5237,52 @@ async function openAiRemixPanel(contextTrackId=null){
   const models=catalog.models.map(x=>`<option value="${esc(x.id)}">${esc(x.name)} · ${x.available?'ready':'not installed'}</option>`).join('');
   const tracks=(current.tracks||[]).map(x=>`<option value="${esc(x.id)}" ${x.id===contextTrackId?'selected':''}>${esc(x.name)}</option>`).join('');
   const sourceTrack=contextTrackId&&trackById(contextTrackId)?contextTrackId:null;
-  showUtilityModal('AI Arranger / Remix',`<div class="form-grid">
+  showUtilityModal('AI Arranger / Remix',`<div class="ai-arranger">
+    <fieldset><legend>1 · Source / Sorgente e intervallo</legend><div class="arranger-grid">
     <label>Input audio / Sorgente<select id="aiInputSource" onchange="document.getElementById('aiInputTrackWrap').hidden=this.value!=='track'"><option value="master" ${sourceTrack?'':'selected'}>Master Out (mute / solo / FX)</option><option value="track" ${sourceTrack?'selected':''}>Single track / Traccia singola</option></select></label>
     <label id="aiInputTrackWrap" ${sourceTrack?'':'hidden'}>Input track / Traccia<select id="aiInputTrack">${(current.tracks||[]).map(x=>`<option value="${esc(x.id)}" ${x.id===sourceTrack?'selected':''}>${esc(x.name)}</option>`).join('')}</select></label>
+    <label>Processing scope / Intervallo<select id="aiRemixScope" onchange="document.getElementById('aiRemixRangeWrap').hidden=this.value!=='range'"><option value="range" selected>Time range / Intervallo temporale</option><option value="project">Entire source / Sorgente intera</option></select></label>
+    <div id="aiRemixRangeWrap" class="arranger-grid arranger-wide"><label>Start (seconds) / Inizio (secondi)<input id="aiRemixStartSec" type="number" min="0" max="86400" step="0.001" value="0"></label><label>End (seconds) / Fine (secondi)<input id="aiRemixEndSec" type="number" min="0" max="86400" step="0.001" value="10"></label><small class="arranger-wide hint">Only the selected source audio is sent to AI / Solo l'intervallo viene inviato all'AI</small></div>
+    </div></fieldset>
+    <fieldset><legend>2 · Arrangement / Arrangiamento</legend><div class="arranger-grid">
     <label>Mode / Modalità<select id="aiRemixMode" onchange="document.getElementById('aiSwapOptions').hidden=this.value!=='instrument_swap'"><option value="rearrange">AI Arranger</option><option value="auto_remix">Auto-Remix</option><option value="instrument_swap">Instrument Swap</option></select></label>
+    <div id="aiSwapOptions" class="arranger-grid arranger-wide" hidden><label>Source track / Traccia sorgente<select id="aiSwapTrack">${tracks}</select></label><label>Target instrument / Strumento sostitutivo<input id="aiSwapTarget" type="text" maxlength="100" value="Saxophone"></label></div>
     <label>AI model / Modello<select id="aiRemixModel">${models}</select></label>
     <label>Preset<select id="aiRemixPreset">${presets}</select></label>
-    <label>Style description / Descrizione<textarea id="aiRemixPrompt" rows="3" maxlength="3000" placeholder="Describe your target arrangement or remix..."></textarea></label>
-    <div id="aiSwapOptions" hidden><label>Source track / Traccia sorgente<select id="aiSwapTrack">${tracks}</select></label><label>Target instrument / Strumento sostitutivo<input id="aiSwapTarget" type="text" maxlength="100" value="Saxophone"></label></div>
-    <label>Processing scope / Intervallo<select id="aiRemixScope" onchange="document.getElementById('aiRemixRangeWrap').hidden=this.value!=='range'"><option value="range" selected>Time range / Intervallo temporale</option><option value="project">Entire source / Sorgente intera</option></select></label>
-    <div id="aiRemixRangeWrap"><label>Start (seconds) / Inizio (secondi)<input id="aiRemixStartSec" type="number" min="0" max="86400" step="0.001" value="0"></label><label>End (seconds) / Fine (secondi)<input id="aiRemixEndSec" type="number" min="0" max="86400" step="0.001" value="10"></label><small>Only the selected source audio is sent to AI / Solo l'intervallo viene inviato all'AI</small></div>
-    <label>Intensity / Intensità<input id="aiRemixStrength" type="range" min="0" max="100" value="60"></label>
+    <label class="arranger-wide">Style description / Descrizione<textarea id="aiRemixPrompt" rows="3" maxlength="3000" placeholder="Describe your target arrangement or remix..."></textarea></label>
+
+    <label class="arranger-wide">Intensity / Intensità <output id="aiRemixStrengthValue">60%</output><input id="aiRemixStrength" type="range" min="0" max="100" value="60" oninput="document.getElementById('aiRemixStrengthValue').textContent=this.value+'%'"></label>
+    </div></fieldset>
+    <fieldset><legend>3 · Preserve / Elementi da mantenere</legend><div class="arranger-checks">
     <label><input id="aiKeepChords" type="checkbox" checked> Preserve chords / Preserva accordi</label>
     <label><input id="aiKeepStructure" type="checkbox" checked> Preserve sections / Preserva struttura</label>
     <label><input id="aiKeepTempo" type="checkbox" checked> Preserve tempo / Preserva BPM</label>
     <label><input id="aiKeepMelody" type="checkbox" checked> Preserve melody / Preserva melodia</label>
     <label><input id="aiKeepVoice" type="checkbox"> Preserve vocals / Preserva voce</label>
-    <section id="aiAceNativeTools" style="border:1px solid var(--border,#8884);padding:10px;border-radius:8px"><strong>ACE-Step · Native setup / Configurazione</strong><p id="aiAceState" class="hint">Checking...</p><div class="form-actions"><label>ACE-Step / Motore AI <select id="aiAceMode"><option value="local">Local / Locale</option><option value="remote">Remote / Remoto</option></select></label><label>Remote HTTPS URL <input id="aiAceRemoteUrl" type="url" placeholder="https://ace.example.org:8001" autocomplete="off"></label><label>API token <input id="aiAceRemoteToken" type="password" placeholder="Leave blank to keep saved token" autocomplete="new-password"></label><button class="utility-btn" onclick="aiAceSaveConnection()">Save ACE connection / Salva connessione</button></div><div id="aiAceProgressPanel" hidden role="status" aria-live="polite"><label id="aiAceProgressLabel" for="aiAceProgress">Preparing...</label><progress id="aiAceProgress" style="width:100%"></progress><small id="aiAceProgressDetail"></small></div><div class="form-actions"><button class="utility-btn" id="aiAceInstallButton" onclick="aiAceInstall()">Install ACE-Step / Installa</button><button class="utility-btn" id="aiAceStartButton" onclick="aiAceStart()">Start local server / Avvia</button><button class="utility-btn" id="aiAceStopButton" onclick="aiAceStop()">Stop ACE-Step / Ferma</button><button class="utility-btn" onclick="aiAceTest()">Test real generation / Prova generazione</button><button class="utility-btn" onclick="aiAceRefresh()">Refresh</button></div></section>
+    </div><p class="hint">Preservation is best effort / La conservazione degli elementi musicali non è garantita.</p></fieldset>
+    <fieldset><legend>4 · Execution / Esecuzione</legend><div class="arranger-grid">
+    <label>Maximum processing time (minutes) / Tempo massimo (minuti)<input id="aiInferenceTimeoutMinutes" type="number" min="1" max="240" step="1" value="60"></label>
+    <p class="hint">Default: 60 min; adjustable from 1 to 240 min. This is the processing timeout, not the audio duration. / È il limite di elaborazione, non la durata del brano. Eventuali limiti del servizio remoto restano applicabili.</p></div></fieldset>
+    ${currentUser?.native_single_user?`<details><summary>ACE-Step · Native configuration / Configurazione nativa</summary><section id="aiAceNativeTools" style="border:1px solid var(--border,#8884);padding:10px;border-radius:8px"><strong>ACE-Step · Native setup / Configurazione</strong><p id="aiAceState" class="hint">Checking...</p><div class="form-actions"><label>ACE-Step / Motore AI <select id="aiAceMode"><option value="local">Local / Locale</option><option value="remote">Remote / Remoto</option></select></label><label>Remote HTTPS URL <input id="aiAceRemoteUrl" type="url" placeholder="https://ace.example.org:8001" autocomplete="off"></label><label>API token <input id="aiAceRemoteToken" type="password" placeholder="Leave blank to keep saved token" autocomplete="new-password"></label><button class="utility-btn" onclick="aiAceSaveConnection()">Save ACE connection / Salva connessione</button></div><div id="aiAceProgressPanel" hidden role="status" aria-live="polite"><label id="aiAceProgressLabel" for="aiAceProgress">Preparing...</label><progress id="aiAceProgress" style="width:100%"></progress><small id="aiAceProgressDetail"></small></div><div class="form-actions"><button class="utility-btn" id="aiAceInstallButton" onclick="aiAceInstall()">Install ACE-Step / Installa</button><button class="utility-btn" id="aiAceStartButton" onclick="aiAceStart()">Start local server / Avvia</button><button class="utility-btn" id="aiAceStopButton" onclick="aiAceStop()">Stop ACE-Step / Ferma</button><button class="utility-btn" onclick="aiAceTest()">Test real generation / Prova generazione</button><button class="utility-btn" onclick="aiAceRefresh()">Refresh</button></div></section></details>`:''}
     <p class="hint">Generated audio is appended as a NEW track, never replacing the original. A trusted AI worker must be installed and configured.</p>
     <div class="form-actions"><button class="utility-btn" onclick="testAiArrangerWorker()">Test worker / Verifica worker</button><button class="utility-btn" onclick="planAiRemix()">Plan / Pianifica</button><button id="aiRemixGenerateButton" class="utility-btn primary" onclick="generateAndAddAiRemix()">Generate + Add track / Genera + aggiungi traccia</button></div>
-    <div id="aiRemixJobProgress" hidden role="status" aria-live="polite"><label id="aiRemixJobLabel">Preparing AI job...</label><progress style="display:block;width:100%" aria-label="AI generation in progress"></progress><small id="aiRemixJobElapsed"></small><p class="hint">The request is running. Progress is indeterminate until the server reports actual inference progress. Do not close this window.</p></div>
+    <div id="aiRemixJobProgress" class="arranger-status" hidden role="status" aria-live="polite"><label id="aiRemixJobLabel">Preparing AI job...</label><progress style="display:block;width:100%" aria-label="AI generation in progress"></progress><small id="aiRemixJobElapsed"></small><p class="hint">The request is running. Progress is indeterminate until the server reports actual inference progress. Do not close this window.</p></div>
     <pre id="aiRemixPlanResult" style="white-space:pre-wrap;max-height:14rem;overflow:auto"></pre></div>`);
-  aiAceRefresh();
+  if(currentUser?.native_single_user)aiAceRefresh();
   aiArrangerWatchActive();
 }
 async function planAiRemix(action="plan"){
   if(!current?.id)return;
   const val=id=>document.getElementById(id)?.value;
   const yes=id=>!!document.getElementById(id)?.checked;
+  const timeoutMinutes=Number(val('aiInferenceTimeoutMinutes')??60);
+  if(!Number.isInteger(timeoutMinutes)||timeoutMinutes<1||timeoutMinutes>240){
+    const output=document.getElementById('aiRemixPlanResult');
+    if(output)output.textContent='Maximum processing time must be 1–240 minutes / Il tempo massimo deve essere tra 1 e 240 minuti';
+    return;
+  }
   const mode=val('aiRemixMode');
-  const body={input_source:val('aiInputSource')||'master',...(val('aiInputSource')==='track'?{input_track_id:val('aiInputTrack')}:{}),model_id:val('aiRemixModel'),preset_id:val('aiRemixPreset'),prompt:val('aiRemixPrompt')||'',strength:Number(val('aiRemixStrength')),preserve_chords:yes('aiKeepChords'),preserve_structure:yes('aiKeepStructure'),preserve_tempo:yes('aiKeepTempo'),preserve_melody:yes('aiKeepMelody'),preserve_voice:yes('aiKeepVoice')};
+  const body={inference_timeout_seconds:timeoutMinutes*60,input_source:val('aiInputSource')||'master',...(val('aiInputSource')==='track'?{input_track_id:val('aiInputTrack')}:{}),model_id:val('aiRemixModel'),preset_id:val('aiRemixPreset'),prompt:val('aiRemixPrompt')||'',strength:Number(val('aiRemixStrength')),preserve_chords:yes('aiKeepChords'),preserve_structure:yes('aiKeepStructure'),preserve_tempo:yes('aiKeepTempo'),preserve_melody:yes('aiKeepMelody'),preserve_voice:yes('aiKeepVoice')};
   if(val('aiRemixScope')==='range'){
     const start=Number(val('aiRemixStartSec')),end=Number(val('aiRemixEndSec'));
     if(!Number.isFinite(start)||!Number.isFinite(end)||start<0||end<=start||end>86400){
@@ -5264,7 +5313,7 @@ async function planAiRemix(action="plan"){
     updateElapsed();
     elapsedTimer=setInterval(updateElapsed,1000);
   }
-  try{const plan=await api(`/api/projects/${encodeURIComponent(current.id)}/${route}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});if(action==='generate-and-add'){if(output.isConnected)output.textContent='Job accepted: '+plan.job_id+' · '+plan.state;await aiArrangerWatchActive(true);}else{output.textContent=JSON.stringify({status:plan.status,mode:plan.mode||'rearrange',prompt:plan.prompt,input_source:plan.input_source,input_track_id:plan.input_track_id,constraints:plan.constraints,backend_available:plan.backend_available,warnings:plan.warnings},null,2)}}catch(e){if(output.isConnected)output.textContent=`AI generation failed / Generazione fallita: ${e.message}`; }finally{if(elapsedTimer!==null)clearInterval(elapsedTimer);if(!generating){if(progress?.isConnected)progress.hidden=true;if(button?.isConnected)button.disabled=false;}}
+  try{const plan=await api(`/api/projects/${encodeURIComponent(current.id)}/${route}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});if(action==='generate-and-add'){if(output.isConnected)output.textContent='Job accepted: '+plan.job_id+' · Awaiting current server status / In attesa dello stato corrente';await aiArrangerWatchActive(true);}else{output.textContent=JSON.stringify({status:plan.status,mode:plan.mode||'rearrange',prompt:plan.prompt,input_source:plan.input_source,input_track_id:plan.input_track_id,constraints:plan.constraints,backend_available:plan.backend_available,warnings:plan.warnings},null,2)}}catch(e){if(output.isConnected)output.textContent=`AI generation failed / Generazione fallita: ${e.message}`; }finally{if(elapsedTimer!==null)clearInterval(elapsedTimer);if(!generating){if(progress?.isConnected)progress.hidden=true;if(button?.isConnected)button.disabled=false;}}
 }
 
 let aiArrangerWatchTimer=null;
@@ -5274,7 +5323,10 @@ let aiArrangerPolling=false;
 let aiArrangerWatchEpoch=0;
 let aiArrangerPollFailures=0;
 function aiGpuStatusLabel(status){
-  return ({host_agent_not_configured:'agente host non raggiungibile: mount socket assente',
+  return ({host_agent_not_configured:'socket agente host non visibile nel container',
+    host_agent_socket_missing:'socket assente: verificare servizio host e mount',
+    host_agent_socket_missing_in_mount:'socket assente nel mount: agente fermo o mount obsoleto',
+    host_agent_socket_access_denied:'accesso al socket agente host negato',
     host_agent_auth_unavailable:'credenziale agente host non accessibile',
     host_agent_unavailable:'agente host non disponibile',
     host_agent_mapping_unavailable:'agente host: identità processo non correlabile',
@@ -5286,6 +5338,10 @@ function aiGpuStatusLabel(status){
     counter_reset:'contatore GPU azzerato',zero_counter_unverified:'contatore fermo a zero, non verificato'
   })[status]||'telemetria non disponibile';
 }
+function aiGpuSourceLabel(source){
+  return ({'proxmox-host-drm':'host Proxmox / DRM','proxmox-host-amd-smi':'host Proxmox / AMD-SMI',
+    'drm-fdinfo':'processo locale / DRM','amd-smi-process':'processo locale / AMD-SMI'})[source]||'';
+}
 function aiArrangerRenderElapsed(){
   const job=aiArrangerLastSnapshot;
   const elapsed=document.getElementById('aiRemixJobElapsed');
@@ -5294,7 +5350,7 @@ function aiArrangerRenderElapsed(){
   const seconds=job.state==='queued'?0:job.started_at?Math.max(0,Math.floor(Date.now()/1000-Number(job.started_at))):Math.max(0,Math.floor(Number(job.elapsed_seconds)||0));
   const prefix=job.state==='queued'?`Queued / In coda: ${job.jobs_ahead??0} ahead · Position ${job.queue_position??'?'} · `:`Elapsed / Trascorso: ${seconds}s · `;
   const connection=aiArrangerPollFailures?` · Reconnecting / Riconnessione (${aiArrangerPollFailures})`:'';
-  elapsed.textContent=prefix+`${job.phase||job.state} · Job ${job.job_id||''} · CPU: ${job.cpu_seconds!=null?Number(job.cpu_seconds).toFixed(1)+' s':job.cpu_seconds_estimated!=null?'~'+Number(job.cpu_seconds_estimated).toFixed(1)+' s (ACE process)':'N/A'} · GPU: ${job.gpu_seconds!=null?Number(job.gpu_seconds).toFixed(1)+' s':job.gpu_seconds_estimated!=null?'~'+Number(job.gpu_seconds_estimated).toFixed(1)+' s (ACE process; non fatturabile)':`N/A (${aiGpuStatusLabel(job.gpu_metrics_status)})`}${connection}`;
+  elapsed.textContent=prefix+`${job.phase||job.state} · Job ${job.job_id||''} · CPU: ${job.cpu_seconds!=null?Number(job.cpu_seconds).toFixed(1)+' s':job.cpu_seconds_estimated!=null?'~'+Number(job.cpu_seconds_estimated).toFixed(1)+' s (ACE process)':'N/A'} · GPU: ${job.gpu_seconds!=null?Number(job.gpu_seconds).toFixed(1)+' s':job.gpu_seconds_estimated!=null?'~'+Number(job.gpu_seconds_estimated).toFixed(1)+' s (ACE process; non fatturabile)':`N/A (${aiGpuStatusLabel(job.gpu_metrics_status)}${aiGpuSourceLabel(job.gpu_metrics_source)?' · fonte: '+aiGpuSourceLabel(job.gpu_metrics_source):''})`}${connection}`;
   if(!active&&aiArrangerElapsedTimer!==null){clearInterval(aiArrangerElapsedTimer);aiArrangerElapsedTimer=null;}
 }
 async function aiArrangerWatchActive(waitForFinish=false){
@@ -5327,6 +5383,8 @@ async function aiArrangerWatchActive(waitForFinish=false){
       if(label)label.textContent=job.message||(active?'AI inference in progress':'No running AI job');
       if(bar){if(job.state==='completed'){bar.max=100;bar.value=100;}else if(Number.isFinite(job.progress_percent)){bar.max=100;bar.value=job.progress_percent;}else bar.removeAttribute('value');}
       if(active){
+        const output=document.getElementById('aiRemixPlanResult');
+        if(output)output.textContent=`Job ${job.job_id||''} · ${job.state}${job.phase&&job.phase!==job.state?' · '+job.phase:''}${job.message?' · '+job.message:''}`;
         if(aiArrangerElapsedTimer===null)aiArrangerElapsedTimer=setInterval(aiArrangerRenderElapsed,1000);
         aiArrangerRenderElapsed();
       }else{
@@ -5378,6 +5436,7 @@ async function generateAndAddAiRemix(){return planAiRemix("generate-and-add")}
 // r193: native-only optional ACE-Step setup and real inference verification.
 let aiAcePollTimer=null;
 async function aiAceRefresh(){
+ if(!currentUser?.native_single_user)return;
  const el=document.getElementById('aiAceState');if(!el)return;
  try{const info=await api('/api/ai-arranger/desktop-ace/status');el.textContent=`Install: ${info.desktop.task.state}; installed: ${info.desktop.installed}; server: ${info.desktop.server_running}; auto-start: ${info.desktop.auto_start_enabled}; Git: ${info.desktop.has_git}; uv: ${info.desktop.has_uv}; inference test: ${info.inference_test.state}`;
  const conn=info.desktop.connection||{};const mode=document.getElementById('aiAceMode');if(mode&&!mode.dataset.loaded){mode.value=conn.mode||'local';document.getElementById('aiAceRemoteUrl').value=conn.url||'';mode.dataset.loaded='1';}

@@ -61,6 +61,8 @@ def execute(job_id, plan, project, resolve_audio, *, cancel_event=None):
         raise RuntimeError('Remote generation cancelled before submission')
     from . import ai_metering_bridge
     from .ai_worker_protocol import verify_preview_wav
+    from .ai_execution_limits import inference_timeout
+    timeout = inference_timeout(plan)
     url, worker, token = settings
     with tempfile.TemporaryDirectory(prefix='mta-ai-durable-remote-') as folder:
         source = Path(folder) / 'source.wav'
@@ -70,6 +72,7 @@ def execute(job_id, plan, project, resolve_audio, *, cancel_event=None):
         audio, mime, remote_id = ai_metering_bridge.infer_and_register_remote_settlement(
             job_id, base_url=url, token=token, wav=source.read_bytes(),
             worker_id=worker, options={'source': plan.get('input_source', '')},
+            timeout_seconds=timeout,
             **({'cancel_event': cancel_event} if cancel_event is not None else {}))
         target = Path(folder) / 'result.wav'
         target.write_bytes(audio)

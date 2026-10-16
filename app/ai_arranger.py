@@ -52,6 +52,7 @@ class RearrangeRequest(BaseModel):
     preserve_structure: bool = True
     preserve_tempo: bool = True
     separate_stems: bool = False
+    inference_timeout_seconds: int = Field(default=3600, ge=60, le=14400, strict=True)
 
     @model_validator(mode='after')
     def validate_scope(self):
@@ -179,6 +180,7 @@ def prepare_plan(project: Project, request: RearrangeRequest) -> dict:
         'schema': 'mta.ai_arranger.plan.v1', 'project_id': project.id,
         'model_id': request.model_id, 'preset_id': request.preset_id,
         'prompt': '\n'.join(parts), 'strength': request.strength,
+        'inference_timeout_seconds': request.inference_timeout_seconds,
         'scope': request.scope, 'track_ids': request.track_ids,
         'input_source': request.input_source, 'input_track_id': request.input_track_id,
         'start_ms': request.start_ms, 'end_ms': request.end_ms,

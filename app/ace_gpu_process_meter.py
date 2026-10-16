@@ -13,7 +13,8 @@ GPU_STATUSES = frozenset(('remote_endpoint', 'pid_unavailable', 'process_unreada
     'amd_smi_failed', 'amd_smi_timeout', 'amd_smi_invalid_json',
     'counter_unavailable', 'counter_reset', 'zero_counter_unverified',
     'host_agent_not_configured', 'host_agent_auth_unavailable', 'host_agent_unavailable',
-    'host_agent_mapping_unavailable', 'host_agent_counter_unavailable'))
+    'host_agent_mapping_unavailable', 'host_agent_counter_unavailable',
+    'host_agent_socket_missing', 'host_agent_socket_missing_in_mount', 'host_agent_socket_access_denied'))
 GPU_SOURCES = frozenset(('none', 'amd-smi-process', 'drm-fdinfo', 'proxmox-host-drm', 'proxmox-host-amd-smi'))
 
 
@@ -117,7 +118,10 @@ def _host_agent_counter(pid, identity):
         if response.get('available') is not True:
             reason = response.get('reason')
             return None, 'none', {'not-configured':'host_agent_not_configured',
-                'agent-token-not-configured':'host_agent_auth_unavailable'}.get(reason, 'host_agent_unavailable')
+                'agent-token-not-configured':'host_agent_auth_unavailable',
+                'agent-socket-missing':'host_agent_socket_missing',
+                'agent-socket-missing-in-mount':'host_agent_socket_missing_in_mount',
+                'agent-socket-access-denied':'host_agent_socket_access_denied'}.get(reason, 'host_agent_unavailable')
         telemetry = response['telemetry']
         if telemetry.get('source') != 'host-amd-smi': return None, 'none', 'host_agent_unavailable'
         inode = Path(f'/proc/{pid}/ns/pid').stat().st_ino

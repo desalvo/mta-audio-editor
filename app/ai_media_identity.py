@@ -51,9 +51,10 @@ def record(journal, path):
             json.dump(document, out, sort_keys=True)
             out.flush(); os.fsync(out.fileno())
         os.replace(temporary, journal)
-        fd = os.open(str(journal.parent), os.O_RDONLY)
-        try: os.fsync(fd)
-        finally: os.close(fd)
+        if os.name != 'nt':
+            fd = os.open(str(journal.parent), os.O_RDONLY)
+            try: os.fsync(fd)
+            finally: os.close(fd)
     finally:
         temporary.unlink(missing_ok=True)
 

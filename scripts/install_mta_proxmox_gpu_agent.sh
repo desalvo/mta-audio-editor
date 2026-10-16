@@ -26,6 +26,7 @@ Restart=on-failure
 RestartSec=5
 RuntimeDirectory=mta-gpu-agent
 RuntimeDirectoryMode=0750
+RuntimeDirectoryPreserve=yes
 NoNewPrivileges=true
 ProtectSystem=strict
 ProtectHome=true
