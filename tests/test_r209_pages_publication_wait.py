@@ -2,7 +2,7 @@ import importlib.util
 from pathlib import Path
 from urllib.error import HTTPError
 
-p = Path(__file__).parent / 'scripts/repositories/verify_public_pages.py'
+p = Path(__file__).resolve().parent.parent / 'scripts/repositories/verify_public_pages.py'
 spec = importlib.util.spec_from_file_location('verify_pages', p)
 m = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(m)
