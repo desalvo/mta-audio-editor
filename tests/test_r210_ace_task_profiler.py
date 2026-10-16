@@ -120,7 +120,8 @@ def test_opt_in_override_is_reversible_and_preserves_base_unit(tmp_path):
     assert not target.exists() and original.read_text()=='original service'
 
 
-def test_installed_launcher_patches_canonical_api_module(tmp_path):
+@pytest.mark.parametrize('pythonpath', [False, True])
+def test_installed_launcher_patches_canonical_api_module(tmp_path, pythonpath):
     import os
     import subprocess
     import sys
@@ -139,8 +140,13 @@ def main():
     print('instrumented canonical ACE server')
 ''')
     root=Path(__file__).resolve().parents[1]
+    env={**os.environ,'ACESTEP_QUEUE_WORKERS':'1'}
+    for key in ('PYTHONPATH','PYTHONSAFEPATH'):
+        env.pop(key,None)
+    if pythonpath:
+        env['PYTHONPATH']=str(tmp_path)
     result=subprocess.run([sys.executable,str(root/'app/ace_profile_server.py'),'--no-init'],
-        cwd=tmp_path,env={**os.environ,'PYTHONPATH':str(tmp_path),'ACESTEP_QUEUE_WORKERS':'1'},
+        cwd=tmp_path,env=env,
         capture_output=True,text=True,timeout=15)
     assert result.returncode==0,result.stderr
     assert 'instrumented canonical ACE server' in result.stdout

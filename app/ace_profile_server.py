@@ -33,6 +33,12 @@ def install(server, profiler=None):
 
 
 def main():
+    # The installed unit runs from the ACE source checkout. `python -m` adds
+    # that working directory to sys.path, whereas an external script adds only
+    # its own directory. Preserve the original launcher's import semantics for
+    # source-only ACE installs, while respecting Python's safe-path option.
+    if not sys.flags.safe_path:
+        sys.path.insert(0, str(Path.cwd()))
     # Import by its canonical name: upstream's CLI starts uvicorn using this same
     # module/app, preserving the hook in the single server process.
     import acestep.api_server as server

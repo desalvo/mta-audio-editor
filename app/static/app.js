@@ -5266,7 +5266,7 @@ async function openAiRemixPanel(contextTrackId=null){
     ${currentUser?.native_single_user?`<details><summary>ACE-Step · Native configuration / Configurazione nativa</summary><section id="aiAceNativeTools" style="border:1px solid var(--border,#8884);padding:10px;border-radius:8px"><strong>ACE-Step · Native setup / Configurazione</strong><p id="aiAceState" class="hint">Checking...</p><div class="form-actions"><label>ACE-Step / Motore AI <select id="aiAceMode"><option value="local">Local / Locale</option><option value="remote">Remote / Remoto</option></select></label><label>Remote HTTPS URL <input id="aiAceRemoteUrl" type="url" placeholder="https://ace.example.org:8001" autocomplete="off"></label><label>API token <input id="aiAceRemoteToken" type="password" placeholder="Leave blank to keep saved token" autocomplete="new-password"></label><button class="utility-btn" onclick="aiAceSaveConnection()">Save ACE connection / Salva connessione</button></div><div id="aiAceProgressPanel" hidden role="status" aria-live="polite"><label id="aiAceProgressLabel" for="aiAceProgress">Preparing...</label><progress id="aiAceProgress" style="width:100%"></progress><small id="aiAceProgressDetail"></small></div><div class="form-actions"><button class="utility-btn" id="aiAceInstallButton" onclick="aiAceInstall()">Install ACE-Step / Installa</button><button class="utility-btn" id="aiAceStartButton" onclick="aiAceStart()">Start local server / Avvia</button><button class="utility-btn" id="aiAceStopButton" onclick="aiAceStop()">Stop ACE-Step / Ferma</button><button class="utility-btn" onclick="aiAceTest()">Test real generation / Prova generazione</button><button class="utility-btn" onclick="aiAceRefresh()">Refresh</button></div></section></details>`:''}
     <p class="hint">Generated audio is appended as a NEW track, never replacing the original. A trusted AI worker must be installed and configured.</p>
     <div class="form-actions"><button class="utility-btn" onclick="testAiArrangerWorker()">Test worker / Verifica worker</button><button class="utility-btn" onclick="planAiRemix()">Plan / Pianifica</button><button id="aiRemixGenerateButton" class="utility-btn primary" onclick="generateAndAddAiRemix()">Generate + Add track / Genera + aggiungi traccia</button></div>
-    <div id="aiRemixJobProgress" class="arranger-status" hidden role="status" aria-live="polite"><label id="aiRemixJobLabel">Preparing AI job...</label><progress style="display:block;width:100%" aria-label="AI generation in progress"></progress><small id="aiRemixJobElapsed"></small><p class="hint">The request is running. Progress is indeterminate until the server reports actual inference progress. Do not close this window.</p></div>
+    <div id="aiRemixJobProgress" class="arranger-status" hidden role="status" aria-live="polite"><label id="aiRemixJobLabel">Preparing AI job...</label><progress style="display:block;width:100%" aria-label="AI generation in progress"></progress><small id="aiRemixJobElapsed"></small><p id="aiRemixJobHint" class="hint"></p></div>
     <pre id="aiRemixPlanResult" style="white-space:pre-wrap;max-height:14rem;overflow:auto"></pre></div>`);
   if(currentUser?.native_single_user)aiAceRefresh();
   aiArrangerWatchActive();
@@ -5304,6 +5304,7 @@ async function planAiRemix(action="plan"){
     if(button?.disabled)return;
     if(button)button.disabled=true;
     if(progress)progress.hidden=false;
+    aiArrangerRenderProgress({state:'submitting',message:'Submitting AI job / Invio richiesta AI'});
     output.textContent='';
     const since=Date.now();
     const updateElapsed=()=>{
@@ -5313,7 +5314,7 @@ async function planAiRemix(action="plan"){
     updateElapsed();
     elapsedTimer=setInterval(updateElapsed,1000);
   }
-  try{const plan=await api(`/api/projects/${encodeURIComponent(current.id)}/${route}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});if(action==='generate-and-add'){if(output.isConnected)output.textContent='Job accepted: '+plan.job_id+' · Awaiting current server status / In attesa dello stato corrente';await aiArrangerWatchActive(true);}else{output.textContent=JSON.stringify({status:plan.status,mode:plan.mode||'rearrange',prompt:plan.prompt,input_source:plan.input_source,input_track_id:plan.input_track_id,constraints:plan.constraints,backend_available:plan.backend_available,warnings:plan.warnings},null,2)}}catch(e){if(output.isConnected)output.textContent=`AI generation failed / Generazione fallita: ${e.message}`; }finally{if(elapsedTimer!==null)clearInterval(elapsedTimer);if(!generating){if(progress?.isConnected)progress.hidden=true;if(button?.isConnected)button.disabled=false;}}
+  try{const plan=await api(`/api/projects/${encodeURIComponent(current.id)}/${route}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});if(action==='generate-and-add'){if(output.isConnected)output.textContent='Job accepted: '+plan.job_id+' · Awaiting current server status / In attesa dello stato corrente';await aiArrangerWatchActive(true);}else{output.textContent=JSON.stringify({status:plan.status,mode:plan.mode||'rearrange',prompt:plan.prompt,input_source:plan.input_source,input_track_id:plan.input_track_id,constraints:plan.constraints,backend_available:plan.backend_available,warnings:plan.warnings},null,2)}}catch(e){if(output.isConnected)output.textContent=`AI generation failed / Generazione fallita: ${e.message}`;if(generating)aiArrangerRenderProgress({state:'failed',message:e.message},true); }finally{if(elapsedTimer!==null)clearInterval(elapsedTimer);if(!generating){if(progress?.isConnected)progress.hidden=true;if(button?.isConnected)button.disabled=false;}}
 }
 
 let aiArrangerWatchTimer=null;
@@ -5322,6 +5323,32 @@ let aiArrangerLastSnapshot=null;
 let aiArrangerPolling=false;
 let aiArrangerWatchEpoch=0;
 let aiArrangerPollFailures=0;
+function aiArrangerRenderProgress(job,showTerminal=false){
+  const active=['submitting','running','busy','queued','blocked'].includes(job.state);
+  const panel=document.getElementById('aiRemixJobProgress');
+  const button=document.getElementById('aiRemixGenerateButton');
+  const label=document.getElementById('aiRemixJobLabel');
+  const hint=document.getElementById('aiRemixJobHint');
+  const bar=panel?.querySelector('progress');
+  if(button)button.disabled=active;
+  if(panel){panel.hidden=!active&&!showTerminal;panel.setAttribute?.('aria-busy',String(active));}
+  if(label)label.textContent=job.message||(active?'AI inference in progress':`AI generation: ${job.state}`);
+  if(bar){
+    bar.hidden=!active&&job.state!=='completed';
+    if(job.state==='completed'){bar.max=100;bar.value=100;}
+    else if(active&&Number.isFinite(job.progress_percent)){bar.max=100;bar.value=Math.max(0,Math.min(100,job.progress_percent));}
+    else bar.removeAttribute('value');
+  }
+  if(hint)hint.textContent=({
+    submitting:'Submitting the request / Invio della richiesta.',
+    queued:'Waiting in the queue / In attesa in coda.',
+    blocked:'Waiting for an available worker / In attesa di un worker disponibile.',
+    completed:'Generation completed / Generazione completata.',
+    failed:'Generation failed. You can retry / Generazione fallita. Puoi riprovare.',
+    interrupted:'Generation interrupted / Generazione interrotta.',
+    cancelled:'Generation cancelled / Generazione annullata.'
+  })[job.state]||(active?'The request is running. Progress is indeterminate until the server reports actual inference progress. Do not close this window.':'No running AI job / Nessuna generazione in corso.');
+}
 function aiGpuStatusLabel(status){
   return ({profiling:'profilazione kernel in corso',profiled_kernels_diagnostic:'kernel GPU misurati, diagnostica non fatturabile',
     profiler_unavailable:'profiler ROCm non disponibile',profiler_no_gpu_events:'profiler senza eventi kernel GPU',profiler_failed:'raccolta profiler GPU fallita',host_agent_not_configured:'socket agente host non visibile nel container',
@@ -5348,7 +5375,7 @@ function aiArrangerRenderElapsed(){
   const elapsed=document.getElementById('aiRemixJobElapsed');
   if(!elapsed||!job)return;
   const active=['running','busy','queued','blocked'].includes(job.state);
-  const seconds=job.state==='queued'?0:job.started_at?Math.max(0,Math.floor(Date.now()/1000-Number(job.started_at))):Math.max(0,Math.floor(Number(job.elapsed_seconds)||0));
+  const seconds=job.state==='queued'?0:active&&job.started_at?Math.max(0,Math.floor(Date.now()/1000-Number(job.started_at))):Math.max(0,Math.floor(Number(job.elapsed_seconds)||0));
   const prefix=job.state==='queued'?`Queued / In coda: ${job.jobs_ahead??0} ahead · Position ${job.queue_position??'?'} · `:`Elapsed / Trascorso: ${seconds}s · `;
   const connection=aiArrangerPollFailures?` · Reconnecting / Riconnessione (${aiArrangerPollFailures})`:'';
   elapsed.textContent=prefix+`${job.phase||job.state} · Job ${job.job_id||''} · CPU: ${job.cpu_seconds!=null?Number(job.cpu_seconds).toFixed(1)+' s':job.cpu_seconds_estimated!=null?'~'+Number(job.cpu_seconds_estimated).toFixed(1)+' s (ACE process)':'N/A'} · GPU: ${job.gpu_seconds!=null?Number(job.gpu_seconds).toFixed(1)+' s':job.gpu_seconds_estimated!=null?'~'+Number(job.gpu_seconds_estimated).toFixed(1)+(job.gpu_metrics_source==='ace-torch-profiler'?' s (kernel HIP; diagnostica, non fatturabile)':' s (ACE process; non fatturabile)'):`N/A (${aiGpuStatusLabel(job.gpu_metrics_status)}${aiGpuSourceLabel(job.gpu_metrics_source)?' · fonte: '+aiGpuSourceLabel(job.gpu_metrics_source):''})`}${connection}`;
@@ -5374,15 +5401,8 @@ async function aiArrangerWatchActive(waitForFinish=false){
       if(watchEpoch!==aiArrangerWatchEpoch)return;
       aiArrangerPollFailures=0;
       aiArrangerLastSnapshot=job;
-      const panel=document.getElementById('aiRemixJobProgress');
-      const button=document.getElementById('aiRemixGenerateButton');
-      const label=document.getElementById('aiRemixJobLabel');
-      const bar=panel?.querySelector('progress');
       const active=['running','busy','queued','blocked'].includes(job.state);
-      if(button)button.disabled=active;
-      if(panel)panel.hidden=!active && !waitForFinish;
-      if(label)label.textContent=job.message||(active?'AI inference in progress':'No running AI job');
-      if(bar){if(job.state==='completed'){bar.max=100;bar.value=100;}else if(Number.isFinite(job.progress_percent)){bar.max=100;bar.value=job.progress_percent;}else bar.removeAttribute('value');}
+      aiArrangerRenderProgress(job,waitForFinish);
       if(active){
         const output=document.getElementById('aiRemixPlanResult');
         if(output)output.textContent=`Job ${job.job_id||''} · ${job.state}${job.phase&&job.phase!==job.state?' · '+job.phase:''}${job.message?' · '+job.message:''}`;

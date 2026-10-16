@@ -1,6 +1,6 @@
 # r210 — ACE-Step task-scoped ROCm kernel diagnostics
 
-Version stays **0.3.0-r210**. This project archive preserves all previously committed r210 work. The new change since the user's last confirmed commit is opt-in ACE task profiling; no Proxmox plugin update is required.
+Version stays **0.3.0-r210**. This cumulative archive preserves previous r210 work and provides opt-in ACE task profiling with the source-checkout startup correction. No Proxmox plugin update is required for this profiler.
 
 ## Why this collection path exists
 
@@ -26,6 +26,29 @@ The helper prepares `/etc/systemd/system/mta-ace-step.service.d/40-mta-gpu-profi
 It sets ACESTEP_QUEUE_WORKERS=1, matching upstream's recommended single-GPU queue configuration. Port can be changed with `--port`; the default matches the user's existing local service. An installation using a custom network bind or custom ExecStart arguments needs an operator-reviewed equivalent override; this helper deliberately creates a loopback-only command. Existing environment configuration such as API credentials, device, models and ROCm libraries is inherited.
 
 This launcher runs with the **ACE virtualenv**, not the MTA web-server virtualenv. It imports PyTorch lazily and installs no dependencies. It was reviewed against upstream ACE-Step v0.1.8, commit `dce621408bee8c31b4fcf4811682eb9359e1bc94`, specifically `acestep.api_server.run_blocking_generate` and the canonical module reference used by its CLI. No upstream code is copied into this project.
+
+### Source-checkout startup correction
+
+The reported `ModuleNotFoundError: No module named 'acestep'` came from the
+external launcher losing the source working directory that Python includes
+when running `-m acestep.api_server`. The corrected launcher restores that
+directory to the import path, respecting Python's safe-path option. It inherits
+the original service's `WorkingDirectory=/opt/mta/ace-step`; it does not depend
+on adding PYTHONPATH or reinstalling ACE. The regression now starts an actual
+Python subprocess from an ACE source stub with PYTHONPATH absent.
+
+If the profiler was disabled to restore working generation, leave it disabled
+until installing the corrected server RPM. Then repeat the activation commands
+above while ACE is idle. Confirm that the service stays active before submitting
+the short test. If startup still fails, collect the service journal, then use
+the rollback commands below:
+
+```bash
+journalctl -u mta-ace-step.service -b -n 160 --no-pager
+```
+
+The import correction
+does not establish ROCm profiler support or billing eligibility.
 
 ## First functional test
 
