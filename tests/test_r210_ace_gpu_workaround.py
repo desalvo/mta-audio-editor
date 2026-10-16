@@ -1,4 +1,4 @@
-import importlib.util, pathlib, subprocess
+import importlib.util, pathlib
 from unittest.mock import patch
 p=pathlib.Path(__file__).resolve().parents[1]/'app'/'ace_gpu_process_meter.py'
 spec=importlib.util.spec_from_file_location('ace_meter',p)
