@@ -21,7 +21,13 @@ import tempfile
 import re
 import shutil
 from io import BytesIO
-from .ace_gpu_process_meter import AceProcessMeter
+# The packaged worker protocol invokes this file by absolute path from an
+# isolated temporary cwd. Resolve only its installed sibling, never cwd/PYTHONPATH.
+if __package__:
+    from .ace_gpu_process_meter import AceProcessMeter
+else:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from ace_gpu_process_meter import AceProcessMeter
 
 MAX_RESULT = 1024 * 1024 * 1024
 

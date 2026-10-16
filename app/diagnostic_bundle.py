@@ -55,14 +55,24 @@ def directory():
 class SafeEvents(logging.Handler):
     """Persist event metadata, never log messages, traces, prompts, or request bodies."""
     def emit(self, record):
-        if not enabled() or record.levelno < logging.WARNING:
-            return
         try:
+            if not enabled() or record.levelno < logging.WARNING:
+                return
             obj = {"at": datetime.fromtimestamp(record.created, timezone.utc).isoformat(),
                    "level": record.levelname, "logger": str(record.name)[:100],
                    "module": str(record.module)[:100],
                    "line": int(record.lineno),
                    "exception_type": record.exc_info[0].__name__ if record.exc_info else None}
+            failure = getattr(record, 'mta_worker_failure', None)
+            if isinstance(failure, dict) and failure.get('schema') == 'mta-worker-failure-v1':
+                from .ai_cgroup_metering import _worker_failure
+                allowed = {_worker_failure(marker, 1)['category'] for marker in (
+                    '', 'attempted relative import with no known parent package', 'ModuleNotFoundError:',
+                    'AI cgroup launch failed:', 'Connection refused', 'HTTP Error 401',
+                    'HTTP Error 403', 'HTTP Error 404', 'ACE-Step generation timed out', 'ACE-Step adapter error:')}
+                if failure.get('category') in allowed and type(failure.get('exit_code')) is int:
+                    obj['worker_failure'] = {'category': failure['category'],
+                                             'exit_code': failure['exit_code'], 'metering_valid': False}
             serialized = json.dumps(obj, separators=(",", ":")) + "\n"
             with _EVENT_LOCK:
                 path = directory() / "events.jsonl"
@@ -73,7 +83,7 @@ class SafeEvents(logging.Handler):
                 with path.open("a", encoding="utf-8") as fd:
                     os.chmod(path, 0o600)
                     fd.write(serialized)
-        except (OSError, TypeError, ValueError):
+        except (OSError, RuntimeError, TypeError, ValueError):
             pass
 
 

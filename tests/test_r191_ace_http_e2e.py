@@ -4,6 +4,12 @@ import io
 import json
 import threading
 import wave
+import os
+from pathlib import Path
+import subprocess
+import sys
+
+import pytest
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 from app import ace_step_http_worker as worker
@@ -19,7 +25,8 @@ def _wav():
     return data.getvalue()
 
 
-def test_cover_http_roundtrip(monkeypatch, tmp_path):
+@pytest.mark.parametrize('standalone', [False, True])
+def test_cover_http_roundtrip(monkeypatch, tmp_path, standalone):
     audio = _wav()
     seen = []
     class API(BaseHTTPRequestHandler):
@@ -49,7 +56,17 @@ def test_cover_http_roundtrip(monkeypatch, tmp_path):
         plan=tmp_path/'request.json'
         plan.write_text(json.dumps({'model_id':'ace-step-1.5','operation':'remix','prompt':'orchestral transformation','strength':65,'source_audio':[{'filename':'inputs/track.wav'}]}))
         output=tmp_path/'preview.wav'
-        worker.run(plan,output)
+        if standalone:
+            progress = tmp_path / 'progress.json'
+            result = subprocess.run([sys.executable, str(Path(worker.__file__).resolve()),
+                                     '--request', str(plan), '--output', str(output)],
+                                    cwd=tmp_path, env={**os.environ, 'PYTHONPATH': '',
+                                                      'MTA_AI_PROGRESS_FILE': str(progress)},
+                                    capture_output=True, text=True, timeout=20)
+            assert result.returncode == 0, result.stderr
+            assert json.loads(progress.read_text())['progress_percent'] == 100
+        else:
+            worker.run(plan,output)
         assert output.read_bytes()==audio
         assert [route for route,_ in seen]==['/release_task','/query_result']
     finally:

@@ -85,6 +85,27 @@ def _safe_worker_error(stderr: str) -> str:
     return ' | '.join(lines[-3:]) if lines else 'no safe exception detail in stderr'
 
 
+def _worker_failure(stderr: str, exit_code: int) -> dict:
+    """Allowlisted classifications only: never persist user-controlled messages."""
+    category = 'worker_exit'
+    for marker, code in (
+        ('attempted relative import with no known parent package', 'worker_import_context'),
+        ('ModuleNotFoundError:', 'worker_dependency_missing'),
+        ('AI cgroup launch failed:', 'cgroup_launch_failed'),
+        ('Connection refused', 'ace_connection_refused'),
+        ('HTTP Error 401', 'ace_unauthorized'),
+        ('HTTP Error 403', 'ace_forbidden'),
+        ('HTTP Error 404', 'ace_endpoint_missing'),
+        ('ACE-Step generation timed out', 'ace_generation_timeout'),
+        ('ACE-Step adapter error:', 'ace_adapter_failed'),
+    ):
+        if marker in stderr:
+            category = code
+            break
+    return {'schema': 'mta-worker-failure-v1', 'category': category,
+            'exit_code': exit_code, 'metering_valid': False}
+
+
 def _cpu(path: Path) -> float:
     values = dict(line.split()[:2] for line in (path / 'cpu.stat').read_text().splitlines() if len(line.split()) >= 2)
     if 'usage_usec' not in values:
@@ -218,9 +239,13 @@ def run_cgroup_process(argv: list[str], *, cwd: str, timeout_seconds: int = 3600
         _assert_empty(job_group)
         if proc.returncode != 0:
             detail = stderr_reader.finish() if stderr_reader is not None else ''
+            failure = _worker_failure(detail, proc.returncode)
             _LOG.error('AI metered worker exited nonzero (pid=%s, exit_code=%s): %s',
-                       proc.pid, proc.returncode, _safe_worker_error(detail))
-            raise RuntimeError(f'AI worker failed (exit code {proc.returncode}); metering invalid; check server journal')
+                       proc.pid, proc.returncode, _safe_worker_error(detail),
+                       extra={'mta_worker_failure': failure})
+            raise RuntimeError(
+                f'AI worker failed (exit code {proc.returncode}); metering invalid; '
+                f'diagnostic: {failure["category"]}; check server diagnostics and journal')
         cpu = _cpu(job_group)
         read_bytes, write_bytes = _io(job_group)
         if (cancel_event is not None and cancel_event.is_set()) or (cancel_check is not None and cancel_check()):

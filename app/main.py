@@ -980,7 +980,7 @@ def admin_diagnostics_update(request: Request, body: dict):
 def admin_diagnostics_create(request: Request):
     require_admin(request)
     if not _mta_diagnostics.enabled():
-        raise HTTPException(403, "Diagnostics disabled; enable MTA_DIAGNOSTICS_ENABLED in server settings")
+        raise HTTPException(403, "Diagnostics disabled; enable diagnostics in Settings > Diagnostics")
     try:
         # Never expose model prompts, user inputs, artifacts, or secret environment.
         recent = ai_arranger_runtime.list_jobs(50)
