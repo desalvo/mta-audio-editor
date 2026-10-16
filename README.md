@@ -2,6 +2,10 @@ For the MTA web server on Linux, use the standalone [MTA installation wizard](MT
 
 ## ACE-Step installation wizard
 
+Optional ROCm kernel timing diagnostics for ACE-Step 0.1.8: [activation, rollback and accounting limits](ACE_TASK_GPU_PROFILER_R210.md).
+
+Isolated AMD-SMI comparison on Proxmox: [gwads07 side-by-side build and validation](AMD_SMI_SIDECAR_R210.md).
+
 For standalone setup on Debian/RHEL-family Linux (bare metal, VM or LXC), download `scripts/install_ace_step.sh` alone; a full checkout is **not** required. See [ACE-Step Installation](ACE_STEP_INSTALLATION.md) for GPU prerequisites, interactive setup, version selection, firewall, reinstall and uninstall.
 
 ### 0.3.0-r154 — Validated bounded batch event IPC (native host disabled)

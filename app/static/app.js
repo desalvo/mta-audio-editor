@@ -5323,7 +5323,8 @@ let aiArrangerPolling=false;
 let aiArrangerWatchEpoch=0;
 let aiArrangerPollFailures=0;
 function aiGpuStatusLabel(status){
-  return ({host_agent_not_configured:'socket agente host non visibile nel container',
+  return ({profiling:'profilazione kernel in corso',profiled_kernels_diagnostic:'kernel GPU misurati, diagnostica non fatturabile',
+    profiler_unavailable:'profiler ROCm non disponibile',profiler_no_gpu_events:'profiler senza eventi kernel GPU',profiler_failed:'raccolta profiler GPU fallita',host_agent_not_configured:'socket agente host non visibile nel container',
     host_agent_socket_missing:'socket assente: verificare servizio host e mount',
     host_agent_socket_missing_in_mount:'socket assente nel mount: agente fermo o mount obsoleto',
     host_agent_socket_access_denied:'accesso al socket agente host negato',
@@ -5339,7 +5340,7 @@ function aiGpuStatusLabel(status){
   })[status]||'telemetria non disponibile';
 }
 function aiGpuSourceLabel(source){
-  return ({'proxmox-host-drm':'host Proxmox / DRM','proxmox-host-amd-smi':'host Proxmox / AMD-SMI',
+  return ({'ace-torch-profiler':'ACE-Step / profiler kernel HIP','proxmox-host-drm':'host Proxmox / DRM','proxmox-host-amd-smi':'host Proxmox / AMD-SMI',
     'drm-fdinfo':'processo locale / DRM','amd-smi-process':'processo locale / AMD-SMI'})[source]||'';
 }
 function aiArrangerRenderElapsed(){
@@ -5350,7 +5351,7 @@ function aiArrangerRenderElapsed(){
   const seconds=job.state==='queued'?0:job.started_at?Math.max(0,Math.floor(Date.now()/1000-Number(job.started_at))):Math.max(0,Math.floor(Number(job.elapsed_seconds)||0));
   const prefix=job.state==='queued'?`Queued / In coda: ${job.jobs_ahead??0} ahead · Position ${job.queue_position??'?'} · `:`Elapsed / Trascorso: ${seconds}s · `;
   const connection=aiArrangerPollFailures?` · Reconnecting / Riconnessione (${aiArrangerPollFailures})`:'';
-  elapsed.textContent=prefix+`${job.phase||job.state} · Job ${job.job_id||''} · CPU: ${job.cpu_seconds!=null?Number(job.cpu_seconds).toFixed(1)+' s':job.cpu_seconds_estimated!=null?'~'+Number(job.cpu_seconds_estimated).toFixed(1)+' s (ACE process)':'N/A'} · GPU: ${job.gpu_seconds!=null?Number(job.gpu_seconds).toFixed(1)+' s':job.gpu_seconds_estimated!=null?'~'+Number(job.gpu_seconds_estimated).toFixed(1)+' s (ACE process; non fatturabile)':`N/A (${aiGpuStatusLabel(job.gpu_metrics_status)}${aiGpuSourceLabel(job.gpu_metrics_source)?' · fonte: '+aiGpuSourceLabel(job.gpu_metrics_source):''})`}${connection}`;
+  elapsed.textContent=prefix+`${job.phase||job.state} · Job ${job.job_id||''} · CPU: ${job.cpu_seconds!=null?Number(job.cpu_seconds).toFixed(1)+' s':job.cpu_seconds_estimated!=null?'~'+Number(job.cpu_seconds_estimated).toFixed(1)+' s (ACE process)':'N/A'} · GPU: ${job.gpu_seconds!=null?Number(job.gpu_seconds).toFixed(1)+' s':job.gpu_seconds_estimated!=null?'~'+Number(job.gpu_seconds_estimated).toFixed(1)+(job.gpu_metrics_source==='ace-torch-profiler'?' s (kernel HIP; diagnostica, non fatturabile)':' s (ACE process; non fatturabile)'):`N/A (${aiGpuStatusLabel(job.gpu_metrics_status)}${aiGpuSourceLabel(job.gpu_metrics_source)?' · fonte: '+aiGpuSourceLabel(job.gpu_metrics_source):''})`}${connection}`;
   if(!active&&aiArrangerElapsedTimer!==null){clearInterval(aiArrangerElapsedTimer);aiArrangerElapsedTimer=null;}
 }
 async function aiArrangerWatchActive(waitForFinish=false){
@@ -5404,7 +5405,7 @@ async function aiArrangerWatchActive(waitForFinish=false){
                document.getElementById('aiRemixPlanResult') &&
                !document.getElementById('utilityBackdrop')?.classList.contains('hidden')){
               closeUtilityModal();
-              toast('AI generation complete; new track added.');
+              toast('AI generation complete; new track added.'+(job.gpu_metrics_source==='ace-torch-profiler'&&job.gpu_seconds_estimated!=null?' GPU kernel: '+Number(job.gpu_seconds_estimated).toFixed(2)+' s (diagnostica, non fatturabile).':''));
             }
           }
         }else if(waitForFinish&&['failed','interrupted','cancelled'].includes(job.state)){

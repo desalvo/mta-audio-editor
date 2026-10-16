@@ -26,7 +26,8 @@ def _wav():
 
 
 @pytest.mark.parametrize('standalone', [False, True])
-def test_cover_http_roundtrip(monkeypatch, tmp_path, standalone):
+@pytest.mark.parametrize('profiled', [False, True])
+def test_cover_http_roundtrip(monkeypatch, tmp_path, standalone, profiled):
     audio = _wav()
     seen = []
     class API(BaseHTTPRequestHandler):
@@ -46,6 +47,11 @@ def test_cover_http_roundtrip(monkeypatch, tmp_path, standalone):
             payload = json.dumps(data).encode()
             self.send_response(200); self.send_header('Content-Length',str(len(payload))); self.end_headers(); self.wfile.write(payload)
         def do_GET(self):
+            if self.path.startswith('/mta/telemetry/'):
+                if not profiled:
+                    self.send_response(404);self.end_headers();return
+                payload=json.dumps({'task_id':'local-test','source':'ace-torch-profiler','status':'profiled_kernels_diagnostic', 'gpu_active_seconds':.125,'wall_seconds':.5,'kernel_count':3,'device_id':0,'billing_eligible':False}).encode()
+                self.send_response(200);self.send_header('Content-Length',str(len(payload)));self.end_headers();self.wfile.write(payload);return
             assert self.path == '/v1/audio?test=1'
             self.send_response(200); self.send_header('Content-Length',str(len(audio)));self.end_headers();self.wfile.write(audio)
     server=ThreadingHTTPServer(('127.0.0.1',0), API)
@@ -56,6 +62,7 @@ def test_cover_http_roundtrip(monkeypatch, tmp_path, standalone):
         plan=tmp_path/'request.json'
         plan.write_text(json.dumps({'model_id':'ace-step-1.5','operation':'remix','prompt':'orchestral transformation','strength':65,'source_audio':[{'filename':'inputs/track.wav'}]}))
         output=tmp_path/'preview.wav'
+        monkeypatch.setenv('MTA_AI_PROGRESS_FILE',str(tmp_path/'progress.json'))
         if standalone:
             progress = tmp_path / 'progress.json'
             result = subprocess.run([sys.executable, str(Path(worker.__file__).resolve()),
@@ -68,6 +75,11 @@ def test_cover_http_roundtrip(monkeypatch, tmp_path, standalone):
         else:
             worker.run(plan,output)
         assert output.read_bytes()==audio
+        final=json.loads((tmp_path/'progress.json').read_text())
+        assert 'gpu_seconds' not in final
+        if profiled:
+            assert final['gpu_seconds_estimated']==.125
+            assert final['gpu_metrics_source']=='ace-torch-profiler'
         assert [route for route,_ in seen]==['/release_task','/query_result']
     finally:
         server.shutdown();server.server_close();thread.join(timeout=3)

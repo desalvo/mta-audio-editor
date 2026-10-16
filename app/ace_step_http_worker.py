@@ -26,10 +26,12 @@ from io import BytesIO
 if __package__:
     from .ace_gpu_process_meter import AceProcessMeter
     from .ai_execution_limits import inference_timeout
+    from .ace_gpu_profiler import parse_report
 else:
     sys.path.insert(0, str(Path(__file__).resolve().parent))
     from ace_gpu_process_meter import AceProcessMeter
     from ai_execution_limits import inference_timeout
+    from ace_gpu_profiler import parse_report
 
 MAX_RESULT = 1024 * 1024 * 1024
 
@@ -138,6 +140,29 @@ def _progress(phase: str, message: str, percent=None, telemetry=None) -> None:
         pass
 
 
+def _profile_result(base, task_id):
+    if not re.fullmatch(r'[A-Za-z0-9_-]{1,128}', task_id):
+        return {}
+    try:
+        raw = _request(base + '/mta/telemetry/' + task_id, timeout=3)
+        if len(raw) > 8192:
+            return {}
+        return parse_report(json.loads(raw), task_id)
+    except (OSError, ValueError, TypeError, HTTPError, URLError, TimeoutError):
+        return {}
+
+
+def _task_telemetry(meter, base, task_id):
+    telemetry = meter.sample()
+    profile = _profile_result(base, task_id)
+    if profile and (profile.get('gpu_metrics_status') == 'profiled_kernels_diagnostic'
+                    or telemetry.get('gpu_seconds_estimated') is None):
+        # Never relabel an earlier host estimate as a profiler measurement.
+        telemetry.pop('gpu_seconds_estimated', None)
+        telemetry.update(profile)
+    return telemetry
+
+
 def run(plan_path: Path, output: Path) -> None:
     plan = json.loads(plan_path.read_text(encoding='utf-8'))
     if plan.get('model_id') != 'ace-step-1.5':
@@ -207,7 +232,8 @@ def run(plan_path: Path, output: Path) -> None:
             except (wave.Error, EOFError) as exc:
                 raise ValueError('ACE-Step returned invalid WAV audio') from exc
             output.write_bytes(preview)
-            _progress('completed', 'ACE-Step audio saved', 100, meter.sample())
+            telemetry = _task_telemetry(meter, base, task_id)
+            _progress('completed', 'ACE-Step audio saved', 100, telemetry)
             return
         time.sleep(2)
     raise RuntimeError('ACE-Step generation timed out')

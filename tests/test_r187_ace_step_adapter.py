@@ -39,6 +39,9 @@ def test_mock_ace_step_end_to_end(monkeypatch,tmp_path):
             return json.dumps({'data':{'task_id':'mock-1'}}).encode()
         if url.endswith('/query_result'):
             return json.dumps({'data':[{'task_id':'mock-1','status':1,'result':'[{"file":"/v1/audio?path=generated.wav"}]'}]}).encode()
+        if '/mta/telemetry/' in url:
+            from urllib.error import HTTPError
+            raise HTTPError(url,404,'Optional profiler absent',None,None)
         assert url.endswith('/v1/audio?path=generated.wav')
         return buffer.getvalue()
     monkeypatch.setattr(adapter,'_request',fake_request)
@@ -46,4 +49,5 @@ def test_mock_ace_step_end_to_end(monkeypatch,tmp_path):
     output=tmp_path/'output.wav'
     adapter.run(request,output)
     assert output.read_bytes()==buffer.getvalue()
-    assert len(calls)==3
+    assert len(calls)==4
+    assert calls[-1][0].endswith('/mta/telemetry/mock-1')
