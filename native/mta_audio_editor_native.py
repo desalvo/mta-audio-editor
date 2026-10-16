@@ -13,6 +13,9 @@ import threading
 import time
 import http.client
 import multiprocessing
+import logging
+import traceback
+from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
 
@@ -119,6 +122,34 @@ def _free_local_port() -> int:
         return int(sock.getsockname()[1])
 
 
+def _native_startup_log_path() -> Path:
+    """A per-user diagnostic path, available in PyInstaller --windowed mode."""
+    path = _data_root() / "logs" / "native-startup.log"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    return path
+
+
+def _native_startup_logger() -> logging.Logger:
+    logger = logging.getLogger("mta.native.startup")
+    log_path = _native_startup_log_path()
+    for old in list(logger.handlers):
+        if isinstance(old, RotatingFileHandler) and Path(old.baseFilename) != log_path:
+            logger.removeHandler(old)
+            old.close()
+    if not logger.handlers:
+        handler = RotatingFileHandler(
+            log_path, maxBytes=2 * 1024 * 1024,
+            backupCount=2, encoding="utf-8",
+        )
+        handler.setFormatter(logging.Formatter(
+            "%(asctime)s %(levelname)s %(threadName)s %(message)s"
+        ))
+        logger.addHandler(handler)
+        logger.setLevel(logging.INFO)
+        logger.propagate = False
+    return logger
+
+
 def _start_server(port: int):
     import uvicorn
     from app.main import app
@@ -135,29 +166,59 @@ def _start_server(port: int):
         server_header=False,
     )
     server = uvicorn.Server(config)
-    thread = threading.Thread(target=server.run, daemon=True, name="mta-native-server")
+
+    def run_with_diagnostics():
+        try:
+            server.run()
+        except BaseException as exc:
+            # Background exceptions otherwise disappear in Windows --windowed.
+            server._mta_startup_exception = exc
+            _native_startup_logger().error("Native HTTP thread crashed:\n%s", traceback.format_exc())
+        finally:
+            if not getattr(server, "started", False):
+                _native_startup_logger().error(
+                    "Native HTTP server exited before signaling startup; port=%d", port
+                )
+
+    thread = threading.Thread(target=run_with_diagnostics, daemon=True, name="mta-native-server")
     thread.start()
     return server, thread
 
 
-def _wait_ready(url: str, timeout: float = 20.0) -> None:
+def _wait_ready(url: str, timeout: float = 90.0, *, server=None, thread=None) -> None:
     port = int(url.rsplit(":", 1)[1])
     deadline = time.monotonic() + timeout
     last_error: Exception | None = None
     while time.monotonic() < deadline:
+        if thread is not None and not thread.is_alive():
+            exc = getattr(server, "_mta_startup_exception", None)
+            message = f"Native HTTP server exited before readiness: {exc!r}"
+            _native_startup_logger().error(message)
+            raise RuntimeError(f"{message}. Diagnostic log: {_native_startup_log_path()}")
         conn = http.client.HTTPConnection("127.0.0.1", port, timeout=1.0)
         try:
             conn.request("GET", "/api/health")
             response = conn.getresponse()
             response.read()
             if response.status == 200:
+                _native_startup_logger().info("Native HTTP server ready on port %d", port)
                 return
+            last_error = RuntimeError(f"Health endpoint returned HTTP {response.status}")
         except Exception as exc:
             last_error = exc
         finally:
             conn.close()
-        time.sleep(0.1)
-    raise RuntimeError(f"Native server did not become ready: {last_error}")
+        time.sleep(0.2)
+    message = f"Native server did not become ready within {timeout:g}s: {last_error}"
+    _native_startup_logger().error(message)
+    raise RuntimeError(f"{message}. Diagnostic log: {_native_startup_log_path()}")
+
+
+def _startup_timeout_seconds() -> float:
+    try:
+        return max(20.0, min(180.0, float(os.environ.get("MTA_NATIVE_STARTUP_TIMEOUT", "90"))))
+    except (ValueError, OverflowError):
+        return 90.0
 
 
 def _native_smoke(url: str) -> int:
@@ -737,11 +798,17 @@ def main() -> int:
         return _run_demucs_worker()
 
     _prepare_environment()
+    logger = _native_startup_logger()
     port = _free_local_port()
     url = f"http://127.0.0.1:{port}"
-    server, thread = _start_server(port)
+    logger.info("Starting native HTTP server on port %d; frozen=%s", port, bool(getattr(sys, "frozen", False)))
     try:
-        _wait_ready(url)
+        server, thread = _start_server(port)
+    except Exception:
+        logger.exception("Native server initialization failed before thread launch")
+        raise
+    try:
+        _wait_ready(url, timeout=_startup_timeout_seconds(), server=server, thread=thread)
         if "--native-smoke" in sys.argv:
             return _native_smoke(url)
 

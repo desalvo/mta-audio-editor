@@ -6,6 +6,8 @@ PINNED_SHA=dce621408bee8c31b4fcf4811682eb9359e1bc94
 DEFAULT_TAG=v0.1.8
 BASE=${MTA_BASE:-/opt/mta}
 DATA=${MTA_DATA:-/var/lib/mta}
+# Required by both the existing-install fast path and the reinstall path.
+VENV="$BASE/venv-ace-step"
 PYTHON=${MTA_PYTHON:-python3.11}
 TORCH_VERSION=${MTA_TORCH_VERSION:-2.11.0+rocm7.2}
 INDEX=https://download.pytorch.org/whl/rocm7.2
@@ -317,7 +319,6 @@ if [[ $ACE_VERSION == "$DEFAULT_TAG" && $sha != "$PINNED_SHA" ]]; then
 fi
 # Keep venv at its final absolute path: Python virtualenvs are not relocatable.
 stamp=$(date -u +%Y%m%dT%H%M%SZ)
-VENV="$BASE/venv-ace-step"
 BACKUP_VENV=''
 BACKUP_SOURCE=''
 rollback(){

@@ -68,7 +68,7 @@ jobs:
           [[ "$expected_build" =~ ^[0-9]{14}$ ]] || { echo 'Invalid BUILD_INFO' >&2; exit 3; }
           source_attempt=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/$RUN_ID" --jq '.run_attempt')
           [[ "$source_attempt" =~ ^[0-9]+$ ]] || exit 3
-          expected_rpm_release="0.$expected_revision.1.early.b${expected_build}.r${RUN_ID}.a${source_attempt}"
+          expected_rpm_release="0.$expected_revision.2.early.b${expected_build}.r${RUN_ID}.a${source_attempt}"
           shopt -s nullglob
           for target in el9 el10; do
             rpms=("$RUNNER_TEMP/incoming/rpm/$target/"*.rpm)

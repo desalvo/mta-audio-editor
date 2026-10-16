@@ -117,7 +117,15 @@ EOF
      exit 75
    fi
    prepare_el_dependencies "$major"
-   dnf install -y mta-audio-editor-server
+   # `dnf install` can leave an existing early RPM unchanged, even when a
+   # newer build-qualified release is available in the signed repository.
+   # Upgrade only an already installed server; do not reinstall ACE-Step.
+   if rpm -q mta-audio-editor-server >/dev/null 2>&1; then
+     echo 'Upgrading existing MTA server from the signed RPM repository...'
+     dnf upgrade -y --refresh mta-audio-editor-server
+   else
+     dnf install -y --refresh mta-audio-editor-server
+   fi
    ;;
  *) echo 'Unsupported Linux distribution' >&2; exit 2;;
 esac
