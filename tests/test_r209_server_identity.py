@@ -5,7 +5,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def test_release_metadata_r209():
     assert (ROOT / "VERSION").read_text().strip() == "0.3.0"
-    assert (ROOT / "REVISION").read_text().strip() == "209"
+    assert (ROOT / "REVISION").read_text().strip() == "210"
     assert (ROOT / "BUILD_INFO").read_text().strip().isdigit()
 
 def test_server_staging_preserves_identity():
@@ -21,7 +21,7 @@ def test_about_and_ui_include_installation_and_gpu():
     assert "info.installation" in ui and "info.acceleration" in ui
 
 def test_frontend_cache_key_matches_release():
-    assert 'app.js?v=0.3.0-r209' in (ROOT / "app/templates/index.html").read_text()
+    assert 'app.js?v=0.3.0-r210' in (ROOT / "app/templates/index.html").read_text()
 
 def test_ai_arranger_range_inputs_are_present():
     ui = (ROOT / "app/static/app.js").read_text()

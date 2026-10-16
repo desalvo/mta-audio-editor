@@ -27,7 +27,9 @@ def test_arranger_retries_transient_status_with_elapsed_clock():
     assert 'setInterval(aiArrangerRenderElapsed,1000)' in section
     assert 'Math.min(15000,' in section
     assert 'aiArrangerWatchEpoch' in section
-    assert "job.gpu_seconds==null?'N/A'" in section
+    assert "job.gpu_seconds!=null?" in section
+    assert "job.gpu_seconds_estimated!=null?" in section
+    assert "(ACE process)" in section
 
 
 def test_verified_cpu_gpu_usage_reaches_queue_state():

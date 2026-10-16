@@ -53,7 +53,7 @@ def _db():
     con.execute('PRAGMA journal_mode=WAL')
     con.execute(_SCHEMA)
     columns = {row[1] for row in con.execute('PRAGMA table_info(jobs)')}
-    for column, sqltype in (('runner_identity', 'TEXT'), ('payload_json', 'TEXT'), ('idempotency_key', 'TEXT')):
+    for column, sqltype in (('runner_identity', 'TEXT'), ('payload_json', 'TEXT'), ('idempotency_key', 'TEXT'), ('gpu_seconds_estimated', 'REAL'), ('cpu_seconds_estimated', 'REAL')):
         if column not in columns:
             try:
                 con.execute(f'ALTER TABLE jobs ADD COLUMN {column} {sqltype}')
@@ -193,7 +193,7 @@ def _with_live_progress(row):
         pct = payload.get('progress_percent')
         if isinstance(pct, (int, float)) and not isinstance(pct, bool) and 0 <= pct <= 100:
             value['progress_percent'] = float(pct)
-        for field in ('cpu_seconds', 'gpu_seconds'):
+        for field in ('cpu_seconds', 'gpu_seconds', 'cpu_seconds_estimated', 'gpu_seconds_estimated'):
             amount = payload.get(field)
             if isinstance(amount, (int, float)) and not isinstance(amount, bool) and 0 <= amount < float('inf'):
                 value[field] = float(amount)
@@ -393,6 +393,21 @@ def _spawn(job_id, fn, *, cancellable=False):
                         state, message = 'interrupted', 'Publication or billing awaits durable recovery'
             except Exception as exc:
                 state, message = ('cancelled', 'Cancelled during inference') if stop.is_set() else ('failed', str(exc)[:500])
+            # Capture genuine backend counters before deleting the progress
+            # sidecar. These numbers are measurements provided by the trusted
+            # worker, never derived from wall time. Missing metrics remain NULL.
+            final_usage = {}
+            try:
+                import math
+                payload = json.loads(progress.read_text(encoding='utf-8'))
+                if isinstance(payload, dict):
+                    for metric in ('cpu_seconds', 'gpu_seconds', 'cpu_seconds_estimated', 'gpu_seconds_estimated'):
+                        value = payload.get(metric)
+                        if (isinstance(value, (int, float)) and not isinstance(value, bool)
+                                and math.isfinite(value) and value >= 0):
+                            final_usage[metric] = float(value)
+            except (OSError, ValueError, TypeError):
+                pass
             with _db() as con:
                 con.execute('BEGIN IMMEDIATE')
                 cancelled_row = con.execute('SELECT cancel_requested FROM jobs WHERE job_id=?', (job_id,)).fetchone()
@@ -404,6 +419,9 @@ def _spawn(job_id, fn, *, cancellable=False):
                 stamp = time.time()
                 changed = con.execute("UPDATE jobs SET state=?,phase=?,message=?,completed_at=?,progress_percent=? WHERE job_id=? AND state='running' AND runner_pid=? AND runner_identity IS ?", (state, state, message, stamp, 100 if state == 'completed' else None, job_id, os.getpid(), _process_identity(os.getpid())))
                 if changed.rowcount:
+                    if final_usage:
+                        con.execute('UPDATE jobs SET cpu_seconds=COALESCE(cpu_seconds,?), gpu_seconds=COALESCE(gpu_seconds,?), cpu_seconds_estimated=COALESCE(cpu_seconds_estimated,?), gpu_seconds_estimated=COALESCE(gpu_seconds_estimated,?) WHERE job_id=?',
+                                    (final_usage.get('cpu_seconds'), final_usage.get('gpu_seconds'), final_usage.get('cpu_seconds_estimated'), final_usage.get('gpu_seconds_estimated'), job_id))
                     con.execute("INSERT OR IGNORE INTO terminal_receipts(job_id,state,committed_at) VALUES(?,?,?)", (job_id, state, stamp))
                 con.execute('COMMIT')
         finally:

@@ -5,7 +5,7 @@ import unicodedata
 import zipfile
 from pathlib import Path
 
-import fitz
+import pymupdf as fitz
 
 from .models import Project
 

@@ -231,7 +231,7 @@ function trackHeightPx(t){return Math.max(78,Math.min(420,Math.round(Number(t?.h
 function linesToText(a,b){return(a||[]).map(x=>`${(x.time_ms/1000).toFixed(3)}\t${x[b]}`).join('\n')}
 function textToLines(v,key){return v.split(/\n/).map(x=>x.trim()).filter(Boolean).map(line=>{const [t,...rest]=line.split(/\t|\s{2,}/);return{time_ms:Math.max(0,Math.round(parseFloat(t)*1000)||0),[key]:rest.join(' ').trim()}})}
 
-async function init(){restoreSidebarPanels();if(isMobileClient())document.body.classList.add('mobile-client');try{currentUser=await api('/api/session');const a=$('#adminNav');if(a)a.hidden=!!currentUser.native_single_user||currentUser.role!=='admin';const sb=$('#nativeSettingsButton');if(sb)sb.hidden=false;const recentBtn=$('#openRecentProjectBtn'),localBtn=$('#openLocalProjectBtn'),manualSave=$('#saveProjectManualNav'),localSave=$('#saveProjectLocalNav');if(currentUser.native_single_user){document.body.classList.add('native-single-user');if(recentBtn)recentBtn.hidden=false;if(localBtn)localBtn.hidden=true;if(manualSave)manualSave.hidden=false;if(localSave)localSave.hidden=true}else{if(recentBtn)recentBtn.hidden=true;if(localBtn)localBtn.hidden=false;if(manualSave)manualSave.hidden=true;if(localSave)localSave.hidden=false}}catch(e){}if(currentUser?.native_single_user)installNativeViewportGuard();if(currentUser&&!currentUser.native_single_user)autosaveEnabled=localStorage.getItem('mtaWebAutosaveEnabled')!=='false';let nativeBridge=null;if(currentUser?.native_single_user){nativeBridge=await waitForNativeApi();if(nativeBridge?.get_native_settings){try{const cfg=await nativeBridge.get_native_settings();autosaveEnabled=cfg.autosave_enabled!==false;nativeRecentProjects=Array.isArray(cfg.recent_projects)?cfg.recent_projects.map(String).filter(Boolean):[];const pref=['it','en'].includes(cfg.language)?cfg.language:'auto';uiLanguage=pref==='auto'?(String(cfg.system_language||'en').toLowerCase().startsWith('it')?'it':'en'):pref;applyInterfaceLanguage();ensureLiveLocalization()}catch(e){}}setTimeout(()=>checkNativeAppUpdate(false),1200)}try{pluginInfo=await api('/api/plugins')}catch(e){}if(nativeBridge?.consume_startup_project){try{const startup=await nativeBridge.consume_startup_project();if(startup?.project?.id){rememberRecentProject(startup.project.id);await openP(startup.project.id);return}if(startup&&!startup.ok&&startup.error)toast('Impossibile aprire il progetto: '+startup.error)}catch(e){toast('Impossibile aprire il progetto: '+e.message)}}await refresh()}
+async function init(){restoreSidebarPanels();if(isMobileClient())document.body.classList.add('mobile-client');try{currentUser=await api('/api/session');const a=$('#adminNav');if(a)a.hidden=!!currentUser.native_single_user||currentUser.role!=='admin';const sb=$('#nativeSettingsButton');if(sb)sb.hidden=false;const recentBtn=$('#openRecentProjectBtn'),localBtn=$('#openLocalProjectBtn'),manualSave=$('#saveProjectManualNav'),localSave=$('#saveProjectLocalNav');if(currentUser.native_single_user){document.body.classList.add('native-single-user');if(recentBtn)recentBtn.hidden=false;if(localBtn)localBtn.hidden=true;if(manualSave)manualSave.hidden=false;if(localSave)localSave.hidden=true}else{if(recentBtn)recentBtn.hidden=false;if(localBtn)localBtn.hidden=false;if(manualSave)manualSave.hidden=true;if(localSave)localSave.hidden=false}}catch(e){}if(currentUser?.native_single_user)installNativeViewportGuard();if(currentUser&&!currentUser.native_single_user)autosaveEnabled=localStorage.getItem('mtaWebAutosaveEnabled')!=='false';let nativeBridge=null;if(currentUser?.native_single_user){nativeBridge=await waitForNativeApi();if(nativeBridge?.get_native_settings){try{const cfg=await nativeBridge.get_native_settings();autosaveEnabled=cfg.autosave_enabled!==false;nativeRecentProjects=Array.isArray(cfg.recent_projects)?cfg.recent_projects.map(String).filter(Boolean):[];const pref=['it','en'].includes(cfg.language)?cfg.language:'auto';uiLanguage=pref==='auto'?(String(cfg.system_language||'en').toLowerCase().startsWith('it')?'it':'en'):pref;applyInterfaceLanguage();ensureLiveLocalization()}catch(e){}}setTimeout(()=>checkNativeAppUpdate(false),1200)}try{pluginInfo=await api('/api/plugins')}catch(e){}if(nativeBridge?.consume_startup_project){try{const startup=await nativeBridge.consume_startup_project();if(startup?.project?.id){rememberRecentProject(startup.project.id);await openP(startup.project.id);return}if(startup&&!startup.ok&&startup.error)toast('Impossibile aprire il progetto: '+startup.error)}catch(e){toast('Impossibile aprire il progetto: '+e.message)}}await refresh()}
 
 // Global sidebar state, not stored in the project. Save every change immediately.
 const SIDEBAR_PREF_KEY='mta.sidebar.collapsed.v1';
@@ -328,7 +328,15 @@ async function openProjectSelector(){
   showUtilityModal('Open project',`${projectPickerRows(projects,'Nessun progetto attivo sul server.')}<div class="utility-actions"><button class="utility-btn secondary" onclick="closeUtilityModal()">Annulla</button></div>`);
 }
 async function openRecentProjects(){
-  if(!currentUser?.native_single_user)return;
+  if(!currentUser?.native_single_user){
+    try{
+      const available=await refresh();
+      const ids=recentProjectIds();
+      const recent=ids.map(id=>available.find(p=>String(p.id)===String(id))).filter(Boolean);
+      showUtilityModal('Open recent',`${projectPickerRows(recent,'Nessun progetto recente ancora disponibile nel workspace.')}<div class="utility-actions"><button class="utility-btn secondary" onclick="closeUtilityModal()">Annulla</button></div>`);
+    }catch(e){toast('Impossibile leggere i progetti recenti: '+e.message)}
+    return;
+  }
   const bridge=await waitForNativeApi();
   if(!bridge?.list_recent_projects)return toast('Bridge nativo non disponibile. Riprova tra un istante.');
   try{
@@ -433,7 +441,16 @@ async function saveAsProject(){
       return;
     }catch(e){toast('Save as fallito: '+e.message);return}
   }
-  window.location.href=`/api/projects/${current.id}/archive`;
+  const title=window.prompt('Nome della copia nel workspace / Save copy as:',suggested+' copy');
+  if(title===null)return;
+  if(!title.trim()||title.trim().length>200)return toast('Nome progetto non valido');
+  try{
+    const copy=await api(`/api/projects/${encodeURIComponent(current.id)}/save-as?title=${encodeURIComponent(title.trim())}`,{method:'POST'});
+    if(!copy?.id)throw new Error('Il server non ha restituito il nuovo progetto');
+    rememberRecentProject(copy.id);
+    await openP(copy.id);
+    toast('Copia salvata nel workspace / Project copy saved');
+  }catch(e){toast('Save as fallito: '+e.message)}
 }
 
 async function saveProjectLocal(){
@@ -5264,7 +5281,7 @@ function aiArrangerRenderElapsed(){
   const seconds=job.state==='queued'?0:job.started_at?Math.max(0,Math.floor(Date.now()/1000-Number(job.started_at))):Math.max(0,Math.floor(Number(job.elapsed_seconds)||0));
   const prefix=job.state==='queued'?`Queued / In coda: ${job.jobs_ahead??0} ahead · Position ${job.queue_position??'?'} · `:`Elapsed / Trascorso: ${seconds}s · `;
   const connection=aiArrangerPollFailures?` · Reconnecting / Riconnessione (${aiArrangerPollFailures})`:'';
-  elapsed.textContent=prefix+`${job.phase||job.state} · Job ${job.job_id||''} · CPU: ${job.cpu_seconds==null?'N/A':Number(job.cpu_seconds).toFixed(1)+' s'} · GPU: ${job.gpu_seconds==null?'N/A':Number(job.gpu_seconds).toFixed(1)+' s'}${connection}`;
+  elapsed.textContent=prefix+`${job.phase||job.state} · Job ${job.job_id||''} · CPU: ${job.cpu_seconds!=null?Number(job.cpu_seconds).toFixed(1)+' s':job.cpu_seconds_estimated!=null?'~'+Number(job.cpu_seconds_estimated).toFixed(1)+' s (ACE process)':'N/A'} · GPU: ${job.gpu_seconds!=null?Number(job.gpu_seconds).toFixed(1)+' s':job.gpu_seconds_estimated!=null?'~'+Number(job.gpu_seconds_estimated).toFixed(1)+' s (ACE process)':'N/A'}${connection}`;
   if(!active&&aiArrangerElapsedTimer!==null){clearInterval(aiArrangerElapsedTimer);aiArrangerElapsedTimer=null;}
 }
 async function aiArrangerWatchActive(waitForFinish=false){
@@ -5293,9 +5310,9 @@ async function aiArrangerWatchActive(waitForFinish=false){
       const bar=panel?.querySelector('progress');
       const active=['running','busy','queued','blocked'].includes(job.state);
       if(button)button.disabled=active;
-      if(panel)panel.hidden=!active;
+      if(panel)panel.hidden=!active && !waitForFinish;
       if(label)label.textContent=job.message||(active?'AI inference in progress':'No running AI job');
-      if(bar){if(Number.isFinite(job.progress_percent)){bar.max=100;bar.value=job.progress_percent;}else bar.removeAttribute('value');}
+      if(bar){if(job.state==='completed'){bar.max=100;bar.value=100;}else if(Number.isFinite(job.progress_percent)){bar.max=100;bar.value=job.progress_percent;}else bar.removeAttribute('value');}
       if(active){
         if(aiArrangerElapsedTimer===null)aiArrangerElapsedTimer=setInterval(aiArrangerRenderElapsed,1000);
         aiArrangerRenderElapsed();
@@ -5309,7 +5326,16 @@ async function aiArrangerWatchActive(waitForFinish=false){
           const output=document.getElementById('aiRemixPlanResult');
           if(output)output.textContent='AI generation complete; new track added.';
           const updated=await api(`/api/projects/${encodeURIComponent(pid)}`);
-          if(current?.id===pid){current=updated;render();}
+          if(current?.id===pid){
+            current=updated;render();
+            // Close only the still-open AI dialog, never an unrelated modal.
+            if(document.getElementById('aiRemixJobProgress') &&
+               document.getElementById('aiRemixPlanResult') &&
+               !document.getElementById('utilityBackdrop')?.classList.contains('hidden')){
+              closeUtilityModal();
+              toast('AI generation complete; new track added.');
+            }
+          }
         }else if(waitForFinish&&['failed','interrupted','cancelled'].includes(job.state)){
           const output=document.getElementById('aiRemixPlanResult');
           if(output)output.textContent='AI generation '+job.state+': '+(job.message||'Unknown error');

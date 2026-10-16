@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 import stat
 from app.secure_https import https_urlopen
 import base64
@@ -90,7 +91,17 @@ from .ai_gateway import router as ai_gateway_router
 from .ai_billing_routes import router as ai_billing_router
 from .ai_worker_protocol import configured_worker, run_worker_with_project_audio, worker_capabilities, WorkerUnavailable
 
-app = FastAPI(title="MTA Audio Editor", version=APP_VERSION, docs_url=None, redoc_url=None, openapi_url=None)
+@asynccontextmanager
+async def _mta_application_lifespan(_app):
+    _start_diagnostic_cleanup()
+    _start_background_services()
+    _restore_persisted_ai_queue()
+    try:
+        yield
+    finally:
+        _cleanup_session_previews_on_shutdown()
+
+app = FastAPI(title="MTA Audio Editor", version=APP_VERSION, docs_url=None, redoc_url=None, openapi_url=None, lifespan=_mta_application_lifespan)
 app.include_router(ai_token_router)
 app.include_router(ai_gateway_router)
 app.include_router(ai_billing_router)
@@ -112,7 +123,6 @@ def _musical_export_project(project: Project) -> Project:
     export_project.key = transpose_key_name(project.key, project.pitch_semitones)
     return export_project
 
-@app.on_event("startup")
 def _start_diagnostic_cleanup():
     # Cleanup works even with collection disabled; daemon stops on process exit.
     def loop():
@@ -127,7 +137,6 @@ def _start_diagnostic_cleanup():
     threading.Thread(target=loop, daemon=True, name="mta-diagnostic-retention").start()
 
 
-@app.on_event("startup")
 def _start_background_services():
     # Repair interrupted stem imports before exposing restored project state.
     # A damaged journal is left intact and never triggers destructive cleanup.
@@ -170,7 +179,6 @@ def _start_background_services():
                          name="mta-desktop-ace-autostart").start()
 
 
-@app.on_event("shutdown")
 def _cleanup_session_previews_on_shutdown():
     if NATIVE_SINGLE_USER:
         from .ace_step_desktop_manager import stop_server
@@ -494,7 +502,7 @@ def _media_job_public(job: dict) -> dict:
 def _is_public(path: str) -> bool:
     return (
         path.startswith("/static/")
-        or path in {"/api/health", "/api/about", "/login", "/register", "/verify-email", "/resend-verification", "/forgot-password", "/reset-password"}
+        or path in {"/health", "/api/health", "/api/about", "/login", "/register", "/verify-email", "/resend-verification", "/forgot-password", "/reset-password"}
         or path.startswith("/oauth/")
         or path.startswith("/docs/user")
         or path.startswith("/docs/pdf/user")
@@ -1185,6 +1193,7 @@ def admin_pdf_en(request: Request):
     )
 
 
+@app.get("/health")
 @app.get("/api/health")
 def health():
     return {"status": "ok", "version": APP_VERSION, "revision": APP_REVISION, "build": BUILD_ID}
@@ -1639,7 +1648,6 @@ ai_arranger_runtime.register_restorer('arranger', _durable_generation_executor)
 ai_arranger_runtime.register_restorer('remix', _durable_generation_executor)
 
 
-@app.on_event('startup')
 def _restore_persisted_ai_queue():
     try:
         # Finish already-generated audio before admitting another inference.
@@ -2152,6 +2160,39 @@ def project_archive_export(pid: str, request: Request):
         filename=_project_archive_name(project),
         background=BackgroundTask(lambda: tmp.unlink(missing_ok=True)),
     )
+
+
+@app.post("/api/projects/{pid}/save-as")
+@_serialized_project_mutation
+def project_save_as(pid: str, request: Request, title: str):
+    """Copy a project and its archived media into a new workspace project.
+
+    Reuse the validated portable project importer so clips and originals cannot
+    silently become broken references after a save-as operation.
+    """
+    original = _project_for_actor(request, pid)
+    title = title.strip()
+    if not title or len(title) > 200:
+        raise HTTPException(400, "Il nome deve contenere da 1 a 200 caratteri")
+    if not NATIVE_SINGLE_USER and _actor(request)["id"] <= 0:
+        raise HTTPException(403, "Persistent account required")
+    owner = _actor(request)["id"] if _actor(request)["id"] > 0 else None
+    with tempfile.TemporaryDirectory(prefix="mta-save-as-") as td:
+        archive = Path(td) / "source.maeproj"
+        write_project_archive(original.id, archive)
+        _ensure_workspace_capacity(owner, archive.stat().st_size)
+        try:
+            copied = import_project_archive(archive, owner)
+        except (ValueError, zipfile.BadZipFile) as exc:
+            raise HTTPException(400, f"Impossibile duplicare il progetto: {exc}") from exc
+        copied.title = title
+        try:
+            save_project(copied)
+        except Exception:
+            # An incomplete copy must not be presented as successfully saved.
+            LOGGER.exception("Save-as metadata persistence failed for %s", copied.id)
+            raise
+        return copied
 
 
 @app.post("/api/project-archives/import")

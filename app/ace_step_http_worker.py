@@ -21,6 +21,7 @@ import tempfile
 import re
 import shutil
 from io import BytesIO
+from .ace_gpu_process_meter import AceProcessMeter
 
 MAX_RESULT = 1024 * 1024 * 1024
 
@@ -113,7 +114,7 @@ def _source_path(request_file: Path, plan: dict) -> Path:
     return path
 
 
-def _progress(phase: str, message: str, percent=None) -> None:
+def _progress(phase: str, message: str, percent=None, telemetry=None) -> None:
     """Emit only backend-supplied progress; never infer a percentage from elapsed time."""
     path = os.environ.get('MTA_AI_PROGRESS_FILE', '')
     if not path:
@@ -121,6 +122,7 @@ def _progress(phase: str, message: str, percent=None) -> None:
     try:
         target = Path(path)
         info = {'phase': phase, 'message': message[:200], 'progress_percent': percent}
+        if isinstance(telemetry, dict): info.update(telemetry)
         temporary = target.with_name(target.name + '.tmp')
         temporary.write_text(json.dumps(info), encoding='utf-8')
         os.replace(temporary, target)
@@ -151,7 +153,9 @@ def run(plan_path: Path, output: Path) -> None:
     task_id = task.get('task_id') if isinstance(task, dict) else None
     if not isinstance(task_id, str) or not task_id:
         raise RuntimeError('ACE-Step did not return a task ID')
-    _progress('queued', 'ACE-Step accepted job ' + task_id[:12] + '; waiting for inference')
+    meter = AceProcessMeter(base)
+    meter.sample()
+    _progress('queued', 'ACE-Step accepted job ' + task_id[:12] + '; waiting for inference', telemetry=meter.sample())
     max_seconds = max(30, min(3500, int(os.environ.get('MTA_ACE_STEP_POLL_SECONDS', '1100'))))
     deadline = time.monotonic() + max_seconds
     while time.monotonic() < deadline:
@@ -161,7 +165,7 @@ def run(plan_path: Path, output: Path) -> None:
         if row:
             supplied = row.get('progress')
             percent = supplied if isinstance(supplied, (int, float)) and 0 <= supplied <= 100 else None
-            _progress('inference', 'ACE-Step processing task ' + task_id[:12], percent)
+            _progress('inference', 'ACE-Step processing task ' + task_id[:12], percent, meter.sample())
         if row and row.get('status') == 2:
             raise RuntimeError('ACE-Step generation failed')
         if row and row.get('status') == 1:
@@ -172,7 +176,7 @@ def run(plan_path: Path, output: Path) -> None:
             audio_url = parsed[0].get('file')
             if not isinstance(audio_url, str) or not audio_url.startswith('/v1/audio?') or '#' in audio_url or '://' in audio_url or '\\' in audio_url or any(ord(c) < 32 for c in audio_url):
                 raise RuntimeError('ACE-Step returned unsafe audio URL')
-            _progress('downloading', 'Retrieving generated audio')
+            _progress('downloading', 'Retrieving generated audio', telemetry=meter.sample())
             preview = _request(base + audio_url, timeout=120)
             # Reject HTML error pages, partial payloads and invalid/malicious wave data
             # before the external worker protocol accepts the result.
@@ -188,6 +192,7 @@ def run(plan_path: Path, output: Path) -> None:
             except (wave.Error, EOFError) as exc:
                 raise ValueError('ACE-Step returned invalid WAV audio') from exc
             output.write_bytes(preview)
+            _progress('completed', 'ACE-Step audio saved', 100, meter.sample())
             return
         time.sleep(2)
     raise RuntimeError('ACE-Step generation timed out')
