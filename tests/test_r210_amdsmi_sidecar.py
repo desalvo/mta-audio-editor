@@ -1,5 +1,6 @@
 import importlib.util
 import json
+import os
 from pathlib import Path
 import subprocess
 
@@ -11,6 +12,26 @@ spec = importlib.util.spec_from_file_location(
 )
 sidecar = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(sidecar)
+
+
+@pytest.fixture
+def install_parent_metadata(monkeypatch, tmp_path):
+    """Model host parent ownership without requiring root or changing the OS."""
+    real_stat = Path.stat
+
+    def configure(uid=0, mode=0o700):
+        def stat(path, *args, **kwargs):
+            actual = real_stat(path, *args, **kwargs)
+            if path == tmp_path:
+                fields = list(actual)
+                fields[0] = (actual.st_mode & ~0o777) | mode
+                fields[4] = uid
+                return os.stat_result(fields)
+            return actual
+
+        monkeypatch.setattr(Path, "stat", stat)
+
+    return configure
 
 
 @pytest.mark.parametrize("prefix", ["/", "/opt", "/usr/bin", "relative", "/opt/mta-amdsmi/../bad",
@@ -123,7 +144,8 @@ def test_wrong_host_rejected(monkeypatch):
         sidecar.preflight()
 
 
-def test_tag_mismatch_is_not_built_and_cleans_staging(monkeypatch, tmp_path):
+def test_tag_mismatch_is_not_built_and_cleans_staging(monkeypatch, tmp_path, install_parent_metadata):
+    install_parent_metadata()
     prefix = tmp_path / "new"
     calls = []
     monkeypatch.setattr(sidecar, "run", lambda args, **kwargs: calls.append(args))
@@ -136,7 +158,8 @@ def test_tag_mismatch_is_not_built_and_cleans_staging(monkeypatch, tmp_path):
 
 
 @pytest.mark.parametrize("load_fails", [False, True])
-def test_publish_only_after_private_library_verification(monkeypatch, tmp_path, load_fails):
+def test_publish_only_after_private_library_verification(monkeypatch, tmp_path, load_fails, install_parent_metadata):
+    install_parent_metadata()
     prefix = tmp_path / "published"
     monkeypatch.setattr(sidecar.subprocess, "check_output", lambda args, **kwargs:
                         (sidecar.ESMI_COMMIT if "esmi_ib_library" in args[2] else sidecar.COMMIT) + "\n")
@@ -167,3 +190,24 @@ def test_publish_only_after_private_library_verification(monkeypatch, tmp_path, 
         assert json.loads((prefix / "manifest.json").read_text())["commit"] == sidecar.COMMIT
     assert seen[-1][1] == "--mta-library-info"
     assert not list(tmp_path.glob(".build-*"))
+
+
+@pytest.mark.parametrize("uid,mode", [(1000, 0o700), (1000, 0o755), (0, 0o770), (0, 0o707), (0, 0o777)])
+def test_untrusted_parent_is_rejected_before_clone(monkeypatch, tmp_path, install_parent_metadata, uid, mode):
+    install_parent_metadata(uid, mode)
+    calls = []
+    monkeypatch.setattr(sidecar, "run", lambda args, **kwargs: calls.append(args))
+    with pytest.raises(RuntimeError, match="root-owned and not group/world writable"):
+        sidecar.install(tmp_path / "unpublished", 2)
+    assert calls == []
+    assert list(tmp_path.iterdir()) == []
+
+
+def test_non_root_install_requires_privileges_before_mutation(monkeypatch, capsys):
+    calls = []
+    monkeypatch.setattr(sidecar, "preflight", lambda: None)
+    monkeypatch.setattr(sidecar.os, "geteuid", lambda: 1000)
+    monkeypatch.setattr(sidecar, "install", lambda *args: calls.append(args))
+    assert sidecar.main(["--install"]) == 1
+    assert "requires root" in capsys.readouterr().err
+    assert calls == []
