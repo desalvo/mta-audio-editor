@@ -304,7 +304,7 @@ jobs:
           find "$RUNNER_TEMP/staging/rpm/$CHANNEL" -path '*/packages/*.rpm' -printf '%f\n' | sort -u > "$inventory"
           # Asset removal runs only after the updated indexes are publicly reachable.
           release_id=$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$tag" --jq '.id')
-          gh api --paginate "repos/$GITHUB_REPOSITORY/releases/$release_id/assets?per_page=100" --jq '.assets[] | [.id,.name] | @tsv' | while IFS=$'\t' read -r asset_id asset_name; do
+          gh api --paginate "repos/$GITHUB_REPOSITORY/releases/$release_id/assets?per_page=100" --jq '.[] | [.id,.name] | @tsv' | while IFS=$'\t' read -r asset_id asset_name; do
             case "$asset_name" in
               *.rpm) if ! grep -Fqx -- "$asset_name" "$inventory"; then
                 echo "Remove retired RPM asset $asset_name"
