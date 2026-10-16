@@ -1,4 +1,17 @@
 const q=s=>document.querySelector(s),qa=s=>[...document.querySelectorAll(s)];
+function aiGpuStatusLabel(status){
+  return ({host_agent_not_configured:'agente host non raggiungibile: mount socket assente',
+    host_agent_auth_unavailable:'credenziale agente host non accessibile',
+    host_agent_unavailable:'agente host non disponibile',
+    host_agent_mapping_unavailable:'agente host: identità processo non correlabile',
+    host_agent_counter_unavailable:'agente host: contatore processo assente',pid_unavailable:'processo ACE non individuato',remote_endpoint:'backend remoto',
+    process_unreadable:'processo ACE non accessibile',process_changed:'processo ACE riavviato',
+    baseline_only:'raccolta campione iniziale',amd_smi_missing:'amd-smi non disponibile',
+    amd_smi_failed:'lettura amd-smi fallita',amd_smi_timeout:'lettura amd-smi scaduta',
+    amd_smi_invalid_json:'risposta amd-smi non valida',counter_unavailable:'contatore di processo assente',
+    counter_reset:'contatore GPU azzerato',zero_counter_unverified:'contatore fermo a zero, non verificato'
+  })[status]||'telemetria non disponibile';
+}
 async function api(url,opt={}){opt.headers=opt.headers||{};if((opt.method||'GET').toUpperCase()!=='GET')opt.headers['X-MTA-Request']='1';const r=await fetch(url,opt);if(!r.ok)throw new Error(await r.text());return r.headers.get('content-type')?.includes('json')?r.json():r.text()}
 function esc(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 function fmtBytes(n){n=Number(n||0);if(n<1024)return n+' B';const u=['KB','MB','GB','TB'];let i=-1;do{n/=1024;i++}while(n>=1024&&i<u.length-1);return n.toFixed(n>=10?1:2)+' '+u[i]}
@@ -37,7 +50,7 @@ async function loadAIQueue(){
       const id=encodeURIComponent(j.job_id);
       const waiting=j.state==='queued', running=j.state==='running';
       const pct=j.progress_percent==null?'—':`${Number(j.progress_percent).toFixed(0)}%`;
-      return `<tr><td><code>${esc(j.job_id.slice(0,12))}</code><br>${esc(j.operation)}</td><td>${esc(j.project_id)}</td><td>${esc(j.state)}<br><small>${esc(j.message||'')}</small></td><td>${waiting?(j.queue_position+' ('+j.jobs_ahead+' davanti)'):'—'}</td><td>${pct}</td><td>CPU ${fmt(j.cpu_seconds)}<br>GPU ${fmt(j.gpu_seconds)}</td><td>${waiting?`<button onclick="moveAIQueueJob('${id}',-1)">↑</button><button onclick="moveAIQueueJob('${id}',1)">↓</button>`:''}${waiting?`<button class="danger" onclick="cancelAIQueueJob('${id}')">Annulla</button>`:''}</td></tr>`;
+      return `<tr><td><code>${esc(j.job_id.slice(0,12))}</code><br>${esc(j.operation)}</td><td>${esc(j.project_id)}</td><td>${esc(j.state)}<br><small>${esc(j.message||'')}</small></td><td>${waiting?(j.queue_position+' ('+j.jobs_ahead+' davanti)'):'—'}</td><td>${pct}</td><td>CPU ${fmt(j.cpu_seconds)}<br>GPU ${j.gpu_seconds!=null?fmt(j.gpu_seconds):j.gpu_seconds_estimated!=null?'~'+fmt(j.gpu_seconds_estimated)+' (processo ACE, non fatturabile)':'N/A ('+esc(aiGpuStatusLabel(j.gpu_metrics_status))+')'}</td><td>${waiting?`<button onclick="moveAIQueueJob('${id}',-1)">↑</button><button onclick="moveAIQueueJob('${id}',1)">↓</button>`:''}${waiting?`<button class="danger" onclick="cancelAIQueueJob('${id}')">Annulla</button>`:''}</td></tr>`;
     }).join('')||'<tr><td colspan="7">Nessun job registrato</td></tr>';
   }catch(e){q('#aiQueueBody').innerHTML='<tr><td colspan="7">'+esc(e.message)+'</td></tr>'}
 }

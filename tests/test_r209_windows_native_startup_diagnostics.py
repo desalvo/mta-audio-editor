@@ -69,3 +69,48 @@ def test_longer_native_startup_timeout_is_bounded(monkeypatch):
         if setting: monkeypatch.setenv("MTA_NATIVE_STARTUP_TIMEOUT", setting)
         else: monkeypatch.delenv("MTA_NATIVE_STARTUP_TIMEOUT", raising=False)
         assert native._startup_timeout_seconds() == expected
+
+
+def test_native_preserves_actual_lifespan_error_without_console(monkeypatch, tmp_path):
+    """Run real Uvicorn: it swallows lifespan exceptions before SystemExit(3)."""
+    from contextlib import asynccontextmanager
+    from fastapi import FastAPI
+    import logging
+
+    native = launcher()
+    monkeypatch.setenv('MTA_NATIVE_DATA_DIR', str(tmp_path))
+    @asynccontextmanager
+    async def broken_lifespan(app):
+        raise PermissionError('startup storage probe denied')
+        yield  # pragma: no cover -- a lifespan async generator must yield
+    module = types.ModuleType('app.main')
+    module.app = FastAPI(lifespan=broken_lifespan)
+    monkeypatch.setitem(sys.modules, 'app.main', module)
+    target = logging.getLogger('uvicorn.error')
+    before = (list(target.handlers), target.level, target.disabled)
+    monkeypatch.setattr(sys, 'stdout', None)
+    monkeypatch.setattr(sys, 'stderr', None)
+    server, thread = native._start_server(native._free_local_port())
+    thread.join(timeout=10)
+    assert not thread.is_alive()
+    assert isinstance(server._mta_startup_exception, SystemExit)
+    assert server._mta_startup_exception.code == 3
+    report = (tmp_path / 'logs/native-startup.log').read_text()
+    assert 'PermissionError: startup storage probe denied' in report
+    assert 'Application startup failed' in report
+    assert (target.handlers, target.level, target.disabled) == before
+
+
+def test_native_diagnostics_uses_user_directory_and_honors_override(monkeypatch, tmp_path):
+    native = launcher()
+    import os
+    monkeypatch.setattr(os, 'environ', dict(os.environ))
+    monkeypatch.setattr(native, '_configure_native_tls', lambda: None)
+    monkeypatch.setenv('MTA_NATIVE_DATA_DIR', str(tmp_path / 'user data'))
+    monkeypatch.delenv('MTA_DIAGNOSTIC_DIR', raising=False)
+    native._prepare_environment()
+    import os
+    assert Path(os.environ['MTA_DIAGNOSTIC_DIR']) == tmp_path / 'user data/diagnostics'
+    monkeypatch.setenv('MTA_DIAGNOSTIC_DIR', str(tmp_path / 'custom'))
+    native._prepare_environment()
+    assert Path(os.environ['MTA_DIAGNOSTIC_DIR']) == tmp_path / 'custom'

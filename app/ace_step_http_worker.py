@@ -154,13 +154,13 @@ def run(plan_path: Path, output: Path) -> None:
     _progress('uploading', 'Uploading source audio to ACE-Step')
     body, content_type = _multipart(fields, source.read_bytes())
     base = endpoint_base()
+    meter = AceProcessMeter(base)
+    _progress('uploading', 'Submitting audio to ACE-Step', telemetry=meter.sample())
     submitted = json.loads(_request(base + '/release_task', body, content_type, timeout=60))
     task = submitted.get('data') if isinstance(submitted, dict) else None
     task_id = task.get('task_id') if isinstance(task, dict) else None
     if not isinstance(task_id, str) or not task_id:
         raise RuntimeError('ACE-Step did not return a task ID')
-    meter = AceProcessMeter(base)
-    meter.sample()
     _progress('queued', 'ACE-Step accepted job ' + task_id[:12] + '; waiting for inference', telemetry=meter.sample())
     max_seconds = max(30, min(3500, int(os.environ.get('MTA_ACE_STEP_POLL_SECONDS', '1100'))))
     deadline = time.monotonic() + max_seconds

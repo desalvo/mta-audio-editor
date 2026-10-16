@@ -8,6 +8,7 @@ from __future__ import annotations
 import argparse
 import hmac
 import json
+import re
 import os
 import pathlib
 import socket
@@ -16,6 +17,55 @@ import subprocess
 import time
 
 MAX_BYTES = 4096
+
+
+
+def _process_details(pid, *, proc_root=pathlib.Path('/proc')):
+    """Host-observed namespace identity and optional per-process DRM counters."""
+    root = proc_root / str(pid)
+    try:
+        before = root.joinpath('stat').read_text().rsplit(')', 1)[1].split()[19]
+        status = root.joinpath('status').read_text().splitlines()
+        ns = next(line.split(':', 1)[1].split() for line in status if line.startswith('NSpid:'))
+        inode = root.joinpath('ns/pid').stat().st_ino
+        details = {'namespace_pid': int(ns[-1]), 'pid_namespace_inode': inode,
+                   'process_start_ticks': before}
+        # Distinct DRM clients; duplicate file descriptors must not double count.
+        clients = {}
+        try:
+            for fd in root.joinpath('fdinfo').iterdir():
+                try: lines = fd.read_text().splitlines()
+                except OSError: continue
+                props = dict(line.split(':', 1) for line in lines if ':' in line)
+                client = props.get('drm-client-id', '').strip()
+                driver = props.get('drm-driver', '').strip()
+                device = props.get('drm-pdev', '').strip()
+                if not client or not driver: continue
+                counts = clients.setdefault((driver, device, client), {})
+                for line in lines:
+                    match = re.fullmatch(r'drm-engine-([a-zA-Z0-9_-]+):\s*(\d+)\s*ns\s*', line)
+                    if match:
+                        name, count = match[1], int(match[2])
+                        counts[name] = max(counts.get(name, 0), count)
+            if any(clients.values()):
+                details['drm_engine_ns'] = sum(sum(c.values()) for c in clients.values())
+        except OSError:
+            pass
+        after = root.joinpath('stat').read_text().rsplit(')', 1)[1].split()[19]
+        return details if before == after else {}
+    except (OSError, ValueError, IndexError, StopIteration):
+        return {}
+
+
+def _gfx_counter(info):
+    value = info.get('usage', info.get('USAGE', {}))
+    if not isinstance(value, dict): return None
+    value = value.get('gfx', value.get('GFX'))
+    if isinstance(value, dict):
+        if value.get('unit') != 'ns': return None
+        value = value.get('value')
+    if type(value) is int and value >= 0: return value
+    return None
 
 
 def read_snapshot():
@@ -53,12 +103,16 @@ def read_snapshot():
                 cgroup = None
             if any(rec['host_pid'] == pid and rec['gpu'] == gpu for rec in processes):
                 raise ValueError('duplicate GPU process')
-            processes.append({'host_pid': pid, 'gpu': gpu, 'host_cgroup': cgroup})
+            record = {'host_pid': pid, 'gpu': gpu, 'host_cgroup': cgroup}
+            record.update(_process_details(pid))
+            counter = _gfx_counter(p['process_info'])
+            if counter is not None: record['gfx_ns'] = counter
+            processes.append(record)
     if len(processes) > 1024:
         raise ValueError('too many processes')
     return {'schema': 'mta-gpu-host-agent-v1', 'timestamp': int(time.time()),
             'processes': processes, 'source': 'host-amd-smi',
-            'billing_eligible': False}
+            'billing_eligible': False, 'capabilities': ['namespace-process-counters-v1']}
 
 
 def serve(path: str, token: str):

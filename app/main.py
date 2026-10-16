@@ -987,9 +987,16 @@ def admin_diagnostics_create(request: Request):
         compact = [{"id": j.get("job_id"), "operation": j.get("operation"),
                     "state": j.get("state"), "phase": j.get("phase"),
                     "progress_percent": j.get("progress_percent"),
-                    "cpu_seconds": j.get("cpu_seconds"), "gpu_seconds": j.get("gpu_seconds")}
+                    "cpu_seconds": j.get("cpu_seconds"), "gpu_seconds": j.get("gpu_seconds"),
+                    "cpu_seconds_estimated": j.get("cpu_seconds_estimated"),
+                    "gpu_seconds_estimated": j.get("gpu_seconds_estimated"),
+                    "gpu_metrics_status": j.get("gpu_metrics_status"),
+                    "gpu_metrics_source": j.get("gpu_metrics_source")}
                    for j in recent]
-        report = {"ai_queue": {"max_concurrent_jobs": ai_arranger_runtime._limit(),
+        from .ace_gpu_process_meter import execution_environment
+        from .ai_proxmox_gpu_agent_client import diagnostics as host_agent_diagnostics
+        report = {"execution_environment": execution_environment(),
+                  "gpu_host_agent": host_agent_diagnostics(), "ai_queue": {"max_concurrent_jobs": ai_arranger_runtime._limit(),
                                 "jobs": compact},
                   "runtime": {"pid": os.getpid(), "python": __import__("platform").python_version(),
                               "os": __import__("platform").system()},

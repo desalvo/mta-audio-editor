@@ -1536,3 +1536,9 @@ body:has(#topZoom:active) .wave{image-rendering:auto}
 .insert-theme-vst3{--insert-bg:linear-gradient(135deg,rgba(51,65,152,.78),rgba(12,18,40,.94))}
 .insert-theme-vst3 .insert-setup-icon{color:#e7cbff}
 @media(max-width:500px){.insert-setup-icon{width:50px;height:50px;border-radius:13px}.insert-setup-icon svg{width:33px;height:33px}.insert-setup-hero{padding-right:62px}.insert-setup-title{font-size:24px}}
+
+/* r210: toolbar + clip browser + editor are THREE explicit grid rows. */
+.editor-content{grid-template-rows:auto auto minmax(0,1fr);align-content:stretch}
+.editor-content > .editor-toolbar{grid-row:1}
+.editor-content > .clip-browser{grid-row:2}
+.editor-content > .editor-grid{grid-row:3;min-height:0}

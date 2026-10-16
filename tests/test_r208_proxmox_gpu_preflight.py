@@ -47,8 +47,8 @@ def test_package_preflight_and_dependencies():
     assert 'ExecCondition=/usr/bin/python3 /usr/lib/mta-proxmox-gpu-agent/preflight.py' in text
     assert 'MTA GPU telemetry unavailable;' in text
     import re
-    version = re.search(r'^VERSION=(0\.3\.0-208\.\d+)$', text, re.MULTILINE)
-    assert version, 'Expected a valid r208 Proxmox agent package version'
+    version = re.search(r'^VERSION=(0\.3\.0-210\.\d+)$', text, re.MULTILINE)
+    assert version, 'Expected a valid r210 Proxmox agent package version'
 
 
 def test_amd_smi_2452_idle_literal_is_accepted():

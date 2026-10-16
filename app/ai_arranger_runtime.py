@@ -53,7 +53,7 @@ def _db():
     con.execute('PRAGMA journal_mode=WAL')
     con.execute(_SCHEMA)
     columns = {row[1] for row in con.execute('PRAGMA table_info(jobs)')}
-    for column, sqltype in (('runner_identity', 'TEXT'), ('payload_json', 'TEXT'), ('idempotency_key', 'TEXT'), ('gpu_seconds_estimated', 'REAL'), ('cpu_seconds_estimated', 'REAL')):
+    for column, sqltype in (('runner_identity', 'TEXT'), ('payload_json', 'TEXT'), ('idempotency_key', 'TEXT'), ('gpu_seconds_estimated', 'REAL'), ('cpu_seconds_estimated', 'REAL'), ('gpu_metrics_status', 'TEXT'), ('gpu_metrics_source', 'TEXT')):
         if column not in columns:
             try:
                 con.execute(f'ALTER TABLE jobs ADD COLUMN {column} {sqltype}')
@@ -173,6 +173,13 @@ def _public(con, job):
     return row
 
 
+def _gpu_metadata(payload):
+    from .ace_gpu_process_meter import GPU_STATUSES, GPU_SOURCES
+    return {key: payload[key] for key, allowed in (
+        ('gpu_metrics_status', GPU_STATUSES), ('gpu_metrics_source', GPU_SOURCES))
+        if isinstance(payload.get(key), str) and payload[key] in allowed}
+
+
 def _with_live_progress(row):
     """Expose trustworthy backend progress on both client and admin endpoints.
 
@@ -193,6 +200,7 @@ def _with_live_progress(row):
         pct = payload.get('progress_percent')
         if isinstance(pct, (int, float)) and not isinstance(pct, bool) and 0 <= pct <= 100:
             value['progress_percent'] = float(pct)
+        value.update(_gpu_metadata(payload))
         for field in ('cpu_seconds', 'gpu_seconds', 'cpu_seconds_estimated', 'gpu_seconds_estimated'):
             amount = payload.get(field)
             if isinstance(amount, (int, float)) and not isinstance(amount, bool) and 0 <= amount < float('inf'):
@@ -397,10 +405,12 @@ def _spawn(job_id, fn, *, cancellable=False):
             # sidecar. These numbers are measurements provided by the trusted
             # worker, never derived from wall time. Missing metrics remain NULL.
             final_usage = {}
+            gpu_metadata = {}
             try:
                 import math
                 payload = json.loads(progress.read_text(encoding='utf-8'))
                 if isinstance(payload, dict):
+                    gpu_metadata = _gpu_metadata(payload)
                     for metric in ('cpu_seconds', 'gpu_seconds', 'cpu_seconds_estimated', 'gpu_seconds_estimated'):
                         value = payload.get(metric)
                         if (isinstance(value, (int, float)) and not isinstance(value, bool)
@@ -419,6 +429,9 @@ def _spawn(job_id, fn, *, cancellable=False):
                 stamp = time.time()
                 changed = con.execute("UPDATE jobs SET state=?,phase=?,message=?,completed_at=?,progress_percent=? WHERE job_id=? AND state='running' AND runner_pid=? AND runner_identity IS ?", (state, state, message, stamp, 100 if state == 'completed' else None, job_id, os.getpid(), _process_identity(os.getpid())))
                 if changed.rowcount:
+                    if gpu_metadata:
+                        con.execute('UPDATE jobs SET gpu_metrics_status=?,gpu_metrics_source=? WHERE job_id=?',
+                                    (gpu_metadata.get('gpu_metrics_status'), gpu_metadata.get('gpu_metrics_source'), job_id))
                     if final_usage:
                         con.execute('UPDATE jobs SET cpu_seconds=COALESCE(cpu_seconds,?), gpu_seconds=COALESCE(gpu_seconds,?), cpu_seconds_estimated=COALESCE(cpu_seconds_estimated,?), gpu_seconds_estimated=COALESCE(gpu_seconds_estimated,?) WHERE job_id=?',
                                     (final_usage.get('cpu_seconds'), final_usage.get('gpu_seconds'), final_usage.get('cpu_seconds_estimated'), final_usage.get('gpu_seconds_estimated'), job_id))

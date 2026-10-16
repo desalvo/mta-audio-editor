@@ -75,6 +75,8 @@ def _prepare_environment() -> Path:
     if getattr(sys, "frozen", False):
         os.environ["MTA_NATIVE_REQUIRE_BUNDLED_CHORDINO"] = "true"
     os.environ["MTA_DATA_DIR"] = str(root)
+    # Native diagnostics belong to the user, not the Linux server default.
+    os.environ.setdefault("MTA_DIAGNOSTIC_DIR", str(root / "diagnostics"))
     os.environ["XDG_CACHE_HOME"] = str(cache)
     os.environ["TORCH_HOME"] = str(cache / "torch")
     os.environ["MTA_DEMUCS_LOCAL_REPO"] = str(root / "demucs-models" / "repo")
@@ -160,6 +162,8 @@ def _start_server(port: int):
     import uvicorn
     from app.main import app
 
+    uvicorn_logger = logging.getLogger("uvicorn.error")
+    previous = (uvicorn_logger.disabled, uvicorn_logger.level)
     config = uvicorn.Config(
         app,
         host="127.0.0.1",
@@ -174,6 +178,16 @@ def _start_server(port: int):
     server = uvicorn.Server(config)
 
     def run_with_diagnostics():
+        # Uvicorn catches ASGI lifespan exceptions and then raises SystemExit(3).
+        # Capture its error logger directly: --windowed has no stderr, and the
+        # outer exception alone contains none of the original lifespan traceback.
+        startup_logger = _native_startup_logger()
+        attached = [handler for handler in startup_logger.handlers
+                    if handler not in uvicorn_logger.handlers]
+        for handler in attached:
+            uvicorn_logger.addHandler(handler)
+        uvicorn_logger.disabled = False
+        uvicorn_logger.setLevel(logging.WARNING)
         try:
             server.run()
         except BaseException as exc:
@@ -181,6 +195,10 @@ def _start_server(port: int):
             server._mta_startup_exception = exc
             _native_startup_logger().error("Native HTTP thread crashed:\n%s", traceback.format_exc())
         finally:
+            for handler in attached:
+                uvicorn_logger.removeHandler(handler)
+            uvicorn_logger.disabled, previous_level = previous
+            uvicorn_logger.setLevel(previous_level)
             if not getattr(server, "started", False):
                 _native_startup_logger().error(
                     "Native HTTP server exited before signaling startup; port=%d", port

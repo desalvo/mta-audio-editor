@@ -46,6 +46,10 @@ def snapshot(*, socket_path: str | None = None, token: str | None = None) -> dic
         stamp = payload.get('timestamp')
         if isinstance(stamp, bool) or not isinstance(stamp, int) or abs(int(time.time()) - stamp) > 30:
             raise ValueError('stale or invalid agent timestamp')
+        capabilities = payload.get('capabilities', [])
+        if not isinstance(capabilities, list) or len(capabilities) > 16 or any(
+                not isinstance(c, str) or len(c) > 80 for c in capabilities):
+            raise ValueError('invalid capabilities')
         processes = payload.get('processes')
         if not isinstance(processes, list) or len(processes) > 1024:
             raise ValueError('invalid process list')
@@ -63,6 +67,18 @@ def snapshot(*, socket_path: str | None = None, token: str | None = None) -> dic
                 raise ValueError('invalid cgroup')
             if (gpu, pid) in seen:
                 raise ValueError('duplicate process record')
+            identity = ('namespace_pid', 'pid_namespace_inode', 'process_start_ticks')
+            if any(key in entry for key in identity):
+                if (any(type(entry.get(key)) is not int or entry[key] <= 0
+                        for key in identity[:2])
+                        or not isinstance(entry.get('process_start_ticks'), str)
+                        or not entry['process_start_ticks'].isascii()
+                        or not entry['process_start_ticks'].isdigit()
+                        or len(entry['process_start_ticks']) > 32):
+                    raise ValueError('invalid namespace process identity')
+            for counter in ('gfx_ns', 'drm_engine_ns'):
+                if counter in entry and (type(entry[counter]) is not int or entry[counter] < 0):
+                    raise ValueError('invalid process counter')
             seen.add((gpu, pid))
         if payload.get('billing_eligible') is not False:
             raise ValueError('agent must not authorize billing')
@@ -95,5 +111,6 @@ def diagnostics(*, socket_path: str | None = None, token: str | None = None) -> 
         report.update(available=False, authenticated=False, reason='unexpected-source')
         return report
     processes = telemetry['processes']
-    report.update(process_count=len(processes), gpu_ids=sorted({p['gpu'] for p in processes}), reason='ok')
+    report.update(process_count=len(processes), gpu_ids=sorted({p['gpu'] for p in processes}), reason='ok',
+                  namespace_counter_protocol='namespace-process-counters-v1' in telemetry.get('capabilities', []))
     return report

@@ -75,7 +75,7 @@ def test_debian_245_process_json_and_host_lxc_mapping(monkeypatch, tmp_path):
     data = agent.read_snapshot()
     assert calls == [['amd-smi', 'process', '--json']]
     assert data['processes'] == [{'host_pid': 21729, 'gpu': 0,
-                                  'host_cgroup': '0::/lxc/130/ns/system.slice/ollama.service\n'}]
+                                  'host_cgroup': '0::/lxc/130/ns/system.slice/ollama.service\n', 'gfx_ns': 0}]
     assert data['billing_eligible'] is False
 
 

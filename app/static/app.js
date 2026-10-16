@@ -5273,6 +5273,19 @@ let aiArrangerLastSnapshot=null;
 let aiArrangerPolling=false;
 let aiArrangerWatchEpoch=0;
 let aiArrangerPollFailures=0;
+function aiGpuStatusLabel(status){
+  return ({host_agent_not_configured:'agente host non raggiungibile: mount socket assente',
+    host_agent_auth_unavailable:'credenziale agente host non accessibile',
+    host_agent_unavailable:'agente host non disponibile',
+    host_agent_mapping_unavailable:'agente host: identità processo non correlabile',
+    host_agent_counter_unavailable:'agente host: contatore processo assente',pid_unavailable:'processo ACE non individuato',remote_endpoint:'backend remoto',
+    process_unreadable:'processo ACE non accessibile',process_changed:'processo ACE riavviato',
+    baseline_only:'raccolta campione iniziale',amd_smi_missing:'amd-smi non disponibile',
+    amd_smi_failed:'lettura amd-smi fallita',amd_smi_timeout:'lettura amd-smi scaduta',
+    amd_smi_invalid_json:'risposta amd-smi non valida',counter_unavailable:'contatore di processo assente',
+    counter_reset:'contatore GPU azzerato',zero_counter_unverified:'contatore fermo a zero, non verificato'
+  })[status]||'telemetria non disponibile';
+}
 function aiArrangerRenderElapsed(){
   const job=aiArrangerLastSnapshot;
   const elapsed=document.getElementById('aiRemixJobElapsed');
@@ -5281,7 +5294,7 @@ function aiArrangerRenderElapsed(){
   const seconds=job.state==='queued'?0:job.started_at?Math.max(0,Math.floor(Date.now()/1000-Number(job.started_at))):Math.max(0,Math.floor(Number(job.elapsed_seconds)||0));
   const prefix=job.state==='queued'?`Queued / In coda: ${job.jobs_ahead??0} ahead · Position ${job.queue_position??'?'} · `:`Elapsed / Trascorso: ${seconds}s · `;
   const connection=aiArrangerPollFailures?` · Reconnecting / Riconnessione (${aiArrangerPollFailures})`:'';
-  elapsed.textContent=prefix+`${job.phase||job.state} · Job ${job.job_id||''} · CPU: ${job.cpu_seconds!=null?Number(job.cpu_seconds).toFixed(1)+' s':job.cpu_seconds_estimated!=null?'~'+Number(job.cpu_seconds_estimated).toFixed(1)+' s (ACE process)':'N/A'} · GPU: ${job.gpu_seconds!=null?Number(job.gpu_seconds).toFixed(1)+' s':job.gpu_seconds_estimated!=null?'~'+Number(job.gpu_seconds_estimated).toFixed(1)+' s (ACE process)':'N/A'}${connection}`;
+  elapsed.textContent=prefix+`${job.phase||job.state} · Job ${job.job_id||''} · CPU: ${job.cpu_seconds!=null?Number(job.cpu_seconds).toFixed(1)+' s':job.cpu_seconds_estimated!=null?'~'+Number(job.cpu_seconds_estimated).toFixed(1)+' s (ACE process)':'N/A'} · GPU: ${job.gpu_seconds!=null?Number(job.gpu_seconds).toFixed(1)+' s':job.gpu_seconds_estimated!=null?'~'+Number(job.gpu_seconds_estimated).toFixed(1)+' s (ACE process; non fatturabile)':`N/A (${aiGpuStatusLabel(job.gpu_metrics_status)})`}${connection}`;
   if(!active&&aiArrangerElapsedTimer!==null){clearInterval(aiArrangerElapsedTimer);aiArrangerElapsedTimer=null;}
 }
 async function aiArrangerWatchActive(waitForFinish=false){

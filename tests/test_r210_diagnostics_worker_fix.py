@@ -114,3 +114,25 @@ def test_diagnostic_logging_never_breaks_worker_when_directory_unavailable(monke
     from app import diagnostic_bundle as diag
     monkeypatch.setattr(diag, 'enabled', lambda: (_ for _ in ()).throw(PermissionError('denied')))
     diag.SafeEvents().emit(logging.LogRecord('test', logging.ERROR, __file__, 1, 'failure', (), None))
+
+
+def test_bundle_includes_gpu_estimates_and_unavailable_reason(diagnostic_api, monkeypatch):
+    from app import main
+    client, identity = diagnostic_api
+    identity['user'] = {'role': 'admin'}
+    monkeypatch.setattr(main.ai_arranger_runtime, 'list_jobs', lambda *_: [{
+        'job_id':'test-job', 'gpu_seconds':None, 'gpu_seconds_estimated':None,
+        'cpu_seconds_estimated':1.5, 'gpu_metrics_status':'amd_smi_missing',
+        'gpu_metrics_source':'none', 'prompt':'PRIVATE-PROMPT'}])
+    headers = {'x-mta-request':'1'}
+    assert client.put('/api/admin/diagnostics/settings', json={'enabled':True}, headers=headers).status_code == 200
+    response = client.post('/api/admin/diagnostics/bundles', headers=headers)
+    assert response.status_code == 200
+    with zipfile.ZipFile(io.BytesIO(client.get(response.json()['url']).content)) as bundle:
+        raw = bundle.read('diagnostics.json')
+        report = json.loads(raw)['status']['ai_queue']['jobs'][0]
+        assert report['gpu_metrics_status'] == 'amd_smi_missing'
+        assert report['gpu_metrics_source'] == 'none'
+        assert report['gpu_seconds_estimated'] is None
+        assert report['cpu_seconds_estimated'] == 1.5
+        assert b'PRIVATE-PROMPT' not in raw
