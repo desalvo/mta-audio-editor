@@ -7,14 +7,16 @@ from host telemetry. The cgroup must be empty before measurements are valid.
 """
 from __future__ import annotations
 
+import logging
 import os
+import re
 import signal
 import subprocess
 import sys
 import time
 import uuid
 from pathlib import Path
-from threading import Event
+from threading import Event, Thread, Lock
 
 from .ai_metering_agent import Measurement
 
@@ -31,6 +33,56 @@ except BaseException as ex:
     print("AI cgroup launch failed: " + str(ex), file=sys.stderr)
     sys.exit(125)
 '''
+
+
+
+_LOG = logging.getLogger(__name__)
+_ERROR_TAIL_LIMIT = 8192
+
+
+class _BoundedStderr:
+    """Drain worker stderr without blocking, retaining only a bounded tail."""
+
+    def __init__(self, stream):
+        self._stream = stream
+        self._lock = Lock()
+        self._tail = b''
+        self._thread = Thread(target=self._drain, name='mta-ai-worker-stderr', daemon=True)
+        self._thread.start()
+
+    def _drain(self):
+        try:
+            while True:
+                data = self._stream.read(4096)
+                if not data:
+                    break
+                with self._lock:
+                    self._tail = (self._tail + data)[-_ERROR_TAIL_LIMIT:]
+        except OSError:
+            pass
+        finally:
+            self._stream.close()
+
+    def finish(self) -> str:
+        self._thread.join(timeout=2)
+        with self._lock:
+            return self._tail.decode('utf-8', errors='replace')
+
+
+def _safe_worker_error(stderr: str) -> str:
+    """Return a restricted diagnostic; never log arbitrary stderr verbatim."""
+    lines = []
+    for raw in stderr.splitlines()[-15:]:
+        # Keep exception identity and common runtime errors; do not reproduce
+        # user prompts, request bodies, traceback file paths or credential dumps.
+        match = re.match(r'^([\w.]+(?:Error|Exception|Warning)|RuntimeError|OSError|Exception):\s*(.*)$', raw.strip())
+        if match:
+            detail = match.group(2)
+            detail = re.sub(r'(?i)(password|token|secret|api[_-]?key|authorization)\s*[=:]\s*\S+', r'\1=[REDACTED]', detail)
+            detail = re.sub(r'https?://\S+', '[URL]', detail)
+            detail = re.sub(r'\b[A-Za-z0-9_\-]{48,}\b', '[REDACTED]', detail)
+            lines.append((match.group(1) + ': ' + detail)[:300])
+    return ' | '.join(lines[-3:]) if lines else 'no safe exception detail in stderr'
 
 
 def _cpu(path: Path) -> float:
@@ -99,6 +151,7 @@ def run_cgroup_process(argv: list[str], *, cwd: str, timeout_seconds: int = 3600
     job_group = root / ('mta-' + uuid.uuid4().hex)
     job_group.mkdir(mode=0o700)
     proc = None
+    stderr_reader = None
     started = time.monotonic()
     try:
         # Only take before/after measurements from the isolated job group.
@@ -110,7 +163,8 @@ def run_cgroup_process(argv: list[str], *, cwd: str, timeout_seconds: int = 3600
             raise RuntimeError('AI worker cancelled; metering invalid')
         proc = subprocess.Popen([sys.executable, '-c', _CHILD, str(job_group), cwd, *argv],
                                 stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
-                                stderr=subprocess.DEVNULL, start_new_session=True, env=env)
+                                stderr=subprocess.PIPE, start_new_session=True, env=env)
+        stderr_reader = _BoundedStderr(proc.stderr)
         # Optional best-effort per-job diagnostic snapshots. These are never
         # returned as certified gpu_seconds or used in billing: polling can
         # miss short-lived GPU clients and driver fdinfo support varies.
@@ -163,7 +217,10 @@ def run_cgroup_process(argv: list[str], *, cwd: str, timeout_seconds: int = 3600
             raise RuntimeError('AI worker left running descendants; metering invalid')
         _assert_empty(job_group)
         if proc.returncode != 0:
-            raise RuntimeError('AI worker failed; metering invalid')
+            detail = stderr_reader.finish() if stderr_reader is not None else ''
+            _LOG.error('AI metered worker exited nonzero (pid=%s, exit_code=%s): %s',
+                       proc.pid, proc.returncode, _safe_worker_error(detail))
+            raise RuntimeError(f'AI worker failed (exit code {proc.returncode}); metering invalid; check server journal')
         cpu = _cpu(job_group)
         read_bytes, write_bytes = _io(job_group)
         if (cancel_event is not None and cancel_event.is_set()) or (cancel_check is not None and cancel_check()):
@@ -180,6 +237,8 @@ def run_cgroup_process(argv: list[str], *, cwd: str, timeout_seconds: int = 3600
             try: os.killpg(proc.pid, signal.SIGKILL)
             except ProcessLookupError: pass
             proc.wait()
+        if stderr_reader is not None:
+            stderr_reader.finish()
         # A non-empty cgroup cannot be removed. Kill remaining children and
         # refuse to return a metered result when cleanup is incomplete.
         try:
