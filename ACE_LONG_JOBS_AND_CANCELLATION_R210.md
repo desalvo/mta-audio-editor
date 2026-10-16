@@ -1,5 +1,9 @@
 # ACE-Step: brani lunghi e cancellazione — 0.3.0-r210
 
+Aggiornamento: [avvio lento e cancellazione involontaria](ACE_COLD_START_R210.md)
+corregge il timeout HTTP breve introdotto nel controllo del task. Le richieste
+idempotenti di controllo/stato vengono ora ritentate entro il budget totale.
+
 ## Analisi della prova lunga
 
 Il job `5011abc47294421fb153577ba3d6cf76` è fallito dopo 608 secondi,

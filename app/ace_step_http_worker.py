@@ -94,8 +94,8 @@ def _request(url: str, data: bytes | None = None, content_type: str | None = Non
         return payload
 
 
-def _json(url: str, data: dict) -> dict:
-    result = json.loads(_request(url, json.dumps(data).encode(), 'application/json'))
+def _json(url: str, data: dict, *, timeout=30) -> dict:
+    result = json.loads(_request(url, json.dumps(data).encode(), 'application/json', timeout=timeout))
     if not isinstance(result, dict) or result.get('code') not in (None, 200):
         raise RuntimeError('ACE-Step API reported an error')
     return result
@@ -166,7 +166,7 @@ def _task_telemetry(meter, base, task_id):
     return telemetry
 
 
-def _control_task(base, task_id, *, budget=None, cancel=False):
+def _control_task(base, task_id, *, budget=None, cancel=False, timeout=3):
     if not isinstance(task_id, str) or not re.fullmatch(r'[A-Za-z0-9_-]{1,128}', task_id):
         return False
     body = {'cancel': cancel}
@@ -174,15 +174,25 @@ def _control_task(base, task_id, *, budget=None, cancel=False):
         body['timeout_seconds'] = budget
     try:
         data = json.loads(_request(base + '/mta/tasks/' + task_id + '/control',
-                                   json.dumps(body).encode(), 'application/json', timeout=3))
+                                   json.dumps(body).encode(), 'application/json', timeout=timeout))
         return (isinstance(data, dict) and data.get('task_id') == task_id
                 and (not cancel or data.get('cancel_requested') is True or data.get('state') in ('completed', 'failed', 'cancelled')))
     except (ValueError, TypeError):
         return False
     except HTTPError as exc:
+        if exc.code in (429, 502, 503, 504):
+            raise  # Idempotent control may be retried during cold initialization.
         if exc.code not in (404, 405):
             raise RuntimeError('ACE-Step task control request rejected') from exc
         return False
+
+
+def _transient_backend_error(exc):
+    # HTTPError is also a URLError/OSError: authentication and validation
+    # failures must be checked first, never retried as network outages.
+    if isinstance(exc, HTTPError):
+        return exc.code in (429, 502, 503, 504)
+    return isinstance(exc, (OSError, URLError))
 
 
 def run(plan_path: Path, output: Path) -> None:
@@ -230,8 +240,7 @@ def _run(plan_path: Path, output: Path) -> None:
     if not isinstance(task_id, str) or not re.fullmatch(r'[A-Za-z0-9_-]{1,128}', task_id):
         raise RuntimeError('ACE-Step did not return a task ID')
     _ACTIVE_TASK_ID = task_id
-    _progress('queued', 'ACE-Step accepted job ' + task_id[:12] + '; waiting for inference', telemetry=meter.sample())
-    _control_task(base, task_id, budget=budget)
+    _progress('waiting_for_backend', 'ACE-Step accepted task; waiting for backend readiness', telemetry=meter.sample())
     # Keep time for downloading the result before the outer supervisor deadline.
     # Explicit per-job settings supersede the legacy deployment poll override.
     reserve = min(120, budget // 10)
@@ -239,8 +248,28 @@ def _run(plan_path: Path, output: Path) -> None:
     if 'inference_timeout_seconds' not in plan and os.environ.get('MTA_ACE_STEP_POLL_SECONDS'):
         max_seconds = max(1, min(max_seconds, int(os.environ['MTA_ACE_STEP_POLL_SECONDS'])))
     deadline = min(started + max(1, budget - reserve), time.monotonic() + max_seconds)
+    control_done = False
     while time.monotonic() < deadline:
-        status_payload = _json(base + '/query_result', {'task_id_list': [task_id]})
+        try:
+            if not control_done:
+                # Lazy model initialization can block the ACE HTTP event loop.
+                # A short socket timeout is not a failed generation. Retrying
+                # this immutable task control never resubmits the audio/job.
+                _control_task(base, task_id, budget=budget,
+                              timeout=min(30, max(.1, deadline - time.monotonic())))
+                control_done = True  # 404/405 retains the legacy backend path.
+            if time.monotonic() >= deadline:
+                break
+            status_payload = _json(base + '/query_result', {'task_id_list': [task_id]},
+                                   timeout=min(30, max(.1, deadline - time.monotonic())))
+        except (OSError, URLError) as exc:
+            if not _transient_backend_error(exc):
+                raise
+            _progress('waiting_for_backend', 'ACE-Step temporarily unavailable; retaining the accepted task and retrying within its time limit')
+            remaining = deadline - time.monotonic()
+            if remaining > 0:
+                time.sleep(min(2, remaining))
+            continue
         rows = status_payload.get('data')
         row = next((item for item in rows if isinstance(item, dict) and item.get('task_id') == task_id), None) if isinstance(rows, list) else None
         if row:

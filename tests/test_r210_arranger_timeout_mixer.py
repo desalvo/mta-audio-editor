@@ -42,7 +42,7 @@ def test_adapter_polls_past_old_limit_but_stops_at_custom_budget(monkeypatch,tmp
     monkeypatch.setattr(w,'AceProcessMeter',lambda _:SimpleNamespace(sample=lambda:{}))
     monkeypatch.setattr(w,'_progress',lambda *a,**kw:None)
     monkeypatch.setattr(w,'_request',lambda url,*a,**kw:audio.getvalue() if '/v1/audio?' in url else b'{"data":{"task_id":"j"}}')
-    def status(*a):
+    def status(*a, **kwargs):
         polls.append(clock[0])
         return {'data':[{'task_id':'j','status':1,'result':[{'file':'/v1/audio?j'}]}]} if complete[0] and clock[0]>=1600 else {'data':[]}
     monkeypatch.setattr(w,'_json',status)

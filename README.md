@@ -291,3 +291,5 @@ Configure SMTP and resubmit the email change to request a new confirmation link.
 See [Durable upload recovery](AI_R208_DURABLE_RECOVERY_CLOSURES_EN.md) for implemented safeguards, validation and outstanding limitations.
 
 ACE-Step r210: [long jobs, internal timeout and cancellation](ACE_LONG_JOBS_AND_CANCELLATION_R210.md).
+
+ACE-Step r210: [cold-start recovery without cancelling an accepted job](ACE_COLD_START_R210.md).
