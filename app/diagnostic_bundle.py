@@ -69,7 +69,9 @@ class SafeEvents(logging.Handler):
                 allowed = {_worker_failure(marker, 1)['category'] for marker in (
                     '', 'attempted relative import with no known parent package', 'ModuleNotFoundError:',
                     'AI cgroup launch failed:', 'Connection refused', 'HTTP Error 401',
-                    'HTTP Error 403', 'HTTP Error 404', 'ACE-Step generation timed out', 'ACE-Step adapter error:')}
+                    'HTTP Error 403', 'HTTP Error 404', 'ACE-Step generation timed out', 'ACE-Step adapter error:',
+                    'ACE-Step backend generation timeout', 'ACE-Step backend GPU out of memory',
+                    'ACE-Step generation failed', 'ACE-Step task control request rejected')}
                 if failure.get('category') in allowed and type(failure.get('exit_code')) is int:
                     obj['worker_failure'] = {'category': failure['category'],
                                              'exit_code': failure['exit_code'], 'metering_valid': False}

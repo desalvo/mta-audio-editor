@@ -128,13 +128,21 @@ def test_installed_launcher_patches_canonical_api_module(tmp_path, pythonpath):
     package=tmp_path/'acestep';package.mkdir();(package/'__init__.py').write_text('')
     (package/'api_server.py').write_text('''
 from fastapi import FastAPI
-app=FastAPI()
+TASK_TIMEOUT_SECONDS=3600
+def create_app():
+    app=FastAPI()
+    app.state.query_timeout=TASK_TIMEOUT_SECONDS
+    return app
+app=create_app()
 async def verify_api_key():pass
 def run_blocking_generate(*,job_id):return 'original-audio'
 def main():
     import sys
     assert sys.modules['acestep.api_server'].run_blocking_generate is run_blocking_generate
     assert hasattr(run_blocking_generate,'__wrapped__')
+    assert app.state.query_timeout==14520
+    import os
+    assert os.environ['ACESTEP_GENERATION_TIMEOUT']=='14520'
     assert run_blocking_generate(job_id='installed-task')=='original-audio'
     assert '/mta/telemetry/{task_id}' in [route.path for route in app.routes]
     print('instrumented canonical ACE server')

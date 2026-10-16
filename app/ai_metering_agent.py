@@ -178,12 +178,32 @@ def execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=N
             verify_preview_wav(input_path)
             input_path.chmod(0o400)
             encoded = json.dumps({**plan, 'source_audio': str(input_path)}, ensure_ascii=False, allow_nan=False).encode('utf-8')
+        from .ai_torch_diagnostics import enabled as torch_diagnostics_enabled, read_report
+        if torch_diagnostics_enabled():
+            # The server, never the request, assigns diagnostic identity.
+            encoded = json.dumps({**json.loads(encoded), 'gpu_profile_task_id': job_id},
+                                 ensure_ascii=False, allow_nan=False).encode('utf-8')
         request_path.write_bytes(encoded)
         request_path.chmod(0o600)
         args = ([sys.executable, str(worker)] if worker.suffix == '.py' else [str(worker)])
         args += ['--request', str(request_path), '--output', str(output_path)]
         result = None
         gpu_slot_acquired = False
+        observed_at = float('-inf')
+        def diagnostic_checkpoint(*, final=False):
+            nonlocal observed_at
+            if final or time.monotonic() - observed_at >= 2:
+                observed_at = time.monotonic()
+                try:
+                    from .ai_torch_diagnostics import store_report
+                    report = read_report(directory, job_id)
+                    if report:
+                        store_report(job_id, report)
+                except Exception as exc:
+                    import logging
+                    logging.getLogger(__name__).warning('GPU diagnostic update failed: %s', type(exc).__name__)
+            return cancel_check() if not final and cancel_check is not None else False
+        worker_cancel_check = diagnostic_checkpoint if torch_diagnostics_enabled() else cancel_check
         try:
             if gpu_slot_enabled:
                 from . import ai_gpu_slot_accounting as gpu_slots
@@ -191,9 +211,9 @@ def execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=N
                 gpu_slot_acquired = True
             if os.getenv('MTA_AI_CGROUP_PARENT'):
                 from .ai_cgroup_metering import run_cgroup_process
-                result = run_cgroup_process(args, cwd=folder, timeout_seconds=timeout_seconds, cancel_check=cancel_check)
+                result = run_cgroup_process(args, cwd=folder, timeout_seconds=timeout_seconds, cancel_check=worker_cancel_check)
             else:
-                result = run_metered_process(args, cwd=folder, timeout_seconds=timeout_seconds, cancel_check=cancel_check)
+                result = run_metered_process(args, cwd=folder, timeout_seconds=timeout_seconds, cancel_check=worker_cancel_check)
             if cancel_check is not None and cancel_check():
                 raise RuntimeError('AI worker cancelled; result discarded')
             if result.exit_code:
@@ -213,9 +233,14 @@ def execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=N
                 gpu_slot_acquired = False
             ai_billing.finish_job(job_id, 'done', usage if result.isolated else None,
                                   source=result.source if result.isolated else 'unmetered')
+            diagnostics = dict(result.gpu_diagnostics or {})
+            profile_report = read_report(directory, job_id)
+            if profile_report:
+                diagnostics['torch_profile'] = profile_report
+                diagnostic_checkpoint(final=True)
             return payload, {'job_id': job_id, 'audio': info, 'usage': usage,
                              'gpu_metered': False, 'process_tree_metered': result.isolated,
-                             'gpu_diagnostics': result.gpu_diagnostics or {}, 'media_type': media_type}
+                             'gpu_diagnostics': diagnostics, 'media_type': media_type}
         except BaseException:
             if gpu_slot_acquired:
                 # Do not silently finalize a job if its lease cannot be

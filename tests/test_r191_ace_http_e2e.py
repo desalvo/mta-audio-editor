@@ -37,6 +37,8 @@ def test_cover_http_roundtrip(monkeypatch, tmp_path, standalone, profiled):
             length = int(self.headers['Content-Length'])
             body = self.rfile.read(length)
             seen.append((self.path, body))
+            if self.path.startswith('/mta/tasks/'):
+                self.send_response(404);self.end_headers();return
             if self.path == '/release_task':
                 assert b'source.wav' in body and audio in body
                 data = {'data': {'task_id': 'local-test'}}
@@ -80,7 +82,7 @@ def test_cover_http_roundtrip(monkeypatch, tmp_path, standalone, profiled):
         if profiled:
             assert final['gpu_seconds_estimated']==.125
             assert final['gpu_metrics_source']=='ace-torch-profiler'
-        assert [route for route,_ in seen]==['/release_task','/query_result']
+        assert [route for route,_ in seen]==['/release_task','/mta/tasks/local-test/control','/query_result']
     finally:
         server.shutdown();server.server_close();thread.join(timeout=3)
 

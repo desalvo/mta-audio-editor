@@ -995,7 +995,9 @@ def admin_diagnostics_create(request: Request):
                    for j in recent]
         from .ace_gpu_process_meter import execution_environment
         from .ai_proxmox_gpu_agent_client import diagnostics as host_agent_diagnostics
+        from .ai_torch_diagnostics import recent_reports
         report = {"execution_environment": execution_environment(),
+                  "gpu_profiler_workers": recent_reports(),
                   "gpu_host_agent": host_agent_diagnostics(), "ai_queue": {"max_concurrent_jobs": ai_arranger_runtime._limit(),
                                 "jobs": compact},
                   "runtime": {"pid": os.getpid(), "python": __import__("platform").python_version(),
@@ -1695,6 +1697,18 @@ def _restore_persisted_ai_queue():
 def ai_arranger_active_generation(pid: str, request: Request):
     _project_for_actor(request, pid)
     return ai_arranger_runtime.inspect(pid)
+
+
+@app.post('/api/projects/{pid}/ai-arranger/generations/{job_id}/cancel')
+def ai_arranger_cancel_generation(pid: str, job_id: str, request: Request):
+    _project_for_actor(request, pid)
+    job = ai_arranger_runtime.get(job_id)
+    if job is None or str(job.get('project_id')) != str(pid) or job.get('operation') not in ('arranger', 'remix'):
+        raise HTTPException(404, 'AI generation not found in this project')
+    try:
+        return ai_arranger_runtime.cancel(job_id)
+    except ValueError as exc:
+        raise HTTPException(409, str(exc)) from exc
 
 
 @app.post('/api/projects/{pid}/ai-arranger/start-generation', status_code=202)

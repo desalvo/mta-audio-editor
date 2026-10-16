@@ -13,6 +13,13 @@ from . import ai_billing, ai_access
 
 router=APIRouter()
 
+
+@router.get('/api/admin/ai-billing/gpu-profiler')
+def gpu_profiler_reports(request: Request):
+    require_admin(request)
+    from .ai_torch_diagnostics import recent_reports
+    return {'billing_eligible': False, 'reports': recent_reports()}
+
 def _error(call):
     try: return call()
     except (ValueError,TypeError,KeyError,OverflowError) as exc: raise HTTPException(400,str(exc)) from exc

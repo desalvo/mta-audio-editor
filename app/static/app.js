@@ -5323,6 +5323,7 @@ let aiArrangerLastSnapshot=null;
 let aiArrangerPolling=false;
 let aiArrangerWatchEpoch=0;
 let aiArrangerPollFailures=0;
+let aiArrangerCancelPending=false;
 function aiArrangerRenderProgress(job,showTerminal=false){
   const active=['submitting','running','busy','queued','blocked'].includes(job.state);
   const panel=document.getElementById('aiRemixJobProgress');
@@ -5330,7 +5331,14 @@ function aiArrangerRenderProgress(job,showTerminal=false){
   const label=document.getElementById('aiRemixJobLabel');
   const hint=document.getElementById('aiRemixJobHint');
   const bar=panel?.querySelector('progress');
-  if(button)button.disabled=active;
+  if(button){
+    button.dataset ||= {};
+    button.dataset.jobId=active&&job.job_id?job.job_id:'';
+    button.dataset.projectId=current?.id||'';
+    const cancelling=aiArrangerCancelPending||job.cancel_requested||job.phase==='cancelling';
+    button.disabled=active&&(!job.job_id||job.state==='submitting'||cancelling);
+    button.textContent=active?(cancelling?'Cancelling job / Annullamento in corso…':'Cancel job / Annulla job'):'Generate + Add track / Genera + aggiungi traccia';
+  }
   if(panel){panel.hidden=!active&&!showTerminal;panel.setAttribute?.('aria-busy',String(active));}
   if(label)label.textContent=job.message||(active?'AI inference in progress':`AI generation: ${job.state}`);
   if(bar){
@@ -5339,7 +5347,7 @@ function aiArrangerRenderProgress(job,showTerminal=false){
     else if(active&&Number.isFinite(job.progress_percent)){bar.max=100;bar.value=Math.max(0,Math.min(100,job.progress_percent));}
     else bar.removeAttribute('value');
   }
-  if(hint)hint.textContent=({
+  if(hint)hint.textContent=(job.cancel_requested||job.phase==='cancelling')?'Cancellation requested; waiting for worker exit. GPU work stops at a safe checkpoint / Annullamento richiesto; attesa uscita del worker. Arresto GPU al prossimo checkpoint utile.':({
     submitting:'Submitting the request / Invio della richiesta.',
     queued:'Waiting in the queue / In attesa in coda.',
     blocked:'Waiting for an available worker / In attesa di un worker disponibile.',
@@ -5350,7 +5358,7 @@ function aiArrangerRenderProgress(job,showTerminal=false){
   })[job.state]||(active?'The request is running. Progress is indeterminate until the server reports actual inference progress. Do not close this window.':'No running AI job / Nessuna generazione in corso.');
 }
 function aiGpuStatusLabel(status){
-  return ({profiling:'profilazione kernel in corso',profiled_kernels_diagnostic:'kernel GPU misurati, diagnostica non fatturabile',
+  return ({profiling:'profilazione GPU in corso; dato al prossimo checkpoint',profiled_kernels_diagnostic:'kernel GPU misurati, diagnostica non fatturabile',
     profiler_unavailable:'profiler ROCm non disponibile',profiler_no_gpu_events:'profiler senza eventi kernel GPU',profiler_failed:'raccolta profiler GPU fallita',host_agent_not_configured:'socket agente host non visibile nel container',
     host_agent_socket_missing:'socket assente: verificare servizio host e mount',
     host_agent_socket_missing_in_mount:'socket assente nel mount: agente fermo o mount obsoleto',
@@ -5370,6 +5378,9 @@ function aiGpuSourceLabel(source){
   return ({'ace-torch-profiler':'ACE-Step / profiler kernel HIP','proxmox-host-drm':'host Proxmox / DRM','proxmox-host-amd-smi':'host Proxmox / AMD-SMI',
     'drm-fdinfo':'processo locale / DRM','amd-smi-process':'processo locale / AMD-SMI'})[source]||'';
 }
+function aiProfilerTimeLabel(job){
+  return ' s (kernel HIP; '+(job.gpu_metrics_status==='profiling'?'parziali; ':'')+'diagnostica, non fatturabile)';
+}
 function aiArrangerRenderElapsed(){
   const job=aiArrangerLastSnapshot;
   const elapsed=document.getElementById('aiRemixJobElapsed');
@@ -5378,7 +5389,7 @@ function aiArrangerRenderElapsed(){
   const seconds=job.state==='queued'?0:active&&job.started_at?Math.max(0,Math.floor(Date.now()/1000-Number(job.started_at))):Math.max(0,Math.floor(Number(job.elapsed_seconds)||0));
   const prefix=job.state==='queued'?`Queued / In coda: ${job.jobs_ahead??0} ahead · Position ${job.queue_position??'?'} · `:`Elapsed / Trascorso: ${seconds}s · `;
   const connection=aiArrangerPollFailures?` · Reconnecting / Riconnessione (${aiArrangerPollFailures})`:'';
-  elapsed.textContent=prefix+`${job.phase||job.state} · Job ${job.job_id||''} · CPU: ${job.cpu_seconds!=null?Number(job.cpu_seconds).toFixed(1)+' s':job.cpu_seconds_estimated!=null?'~'+Number(job.cpu_seconds_estimated).toFixed(1)+' s (ACE process)':'N/A'} · GPU: ${job.gpu_seconds!=null?Number(job.gpu_seconds).toFixed(1)+' s':job.gpu_seconds_estimated!=null?'~'+Number(job.gpu_seconds_estimated).toFixed(1)+(job.gpu_metrics_source==='ace-torch-profiler'?' s (kernel HIP; diagnostica, non fatturabile)':' s (ACE process; non fatturabile)'):`N/A (${aiGpuStatusLabel(job.gpu_metrics_status)}${aiGpuSourceLabel(job.gpu_metrics_source)?' · fonte: '+aiGpuSourceLabel(job.gpu_metrics_source):''})`}${connection}`;
+  elapsed.textContent=prefix+`${job.phase||job.state} · Job ${job.job_id||''} · CPU: ${job.cpu_seconds!=null?Number(job.cpu_seconds).toFixed(1)+' s':job.cpu_seconds_estimated!=null?'~'+Number(job.cpu_seconds_estimated).toFixed(1)+' s (ACE process)':'N/A'} · GPU: ${job.gpu_seconds!=null?Number(job.gpu_seconds).toFixed(1)+' s':job.gpu_seconds_estimated!=null?'~'+Number(job.gpu_seconds_estimated).toFixed(1)+(job.gpu_metrics_source==='ace-torch-profiler'?aiProfilerTimeLabel(job):' s (ACE process; non fatturabile)'):`N/A (${aiGpuStatusLabel(job.gpu_metrics_status)}${aiGpuSourceLabel(job.gpu_metrics_source)?' · fonte: '+aiGpuSourceLabel(job.gpu_metrics_source):''})`}${connection}`;
   if(!active&&aiArrangerElapsedTimer!==null){clearInterval(aiArrangerElapsedTimer);aiArrangerElapsedTimer=null;}
 }
 async function aiArrangerWatchActive(waitForFinish=false){
@@ -5402,7 +5413,7 @@ async function aiArrangerWatchActive(waitForFinish=false){
       aiArrangerPollFailures=0;
       aiArrangerLastSnapshot=job;
       const active=['running','busy','queued','blocked'].includes(job.state);
-      aiArrangerRenderProgress(job,waitForFinish);
+      aiArrangerRenderProgress(job,waitForFinish||job.gpu_metrics_source==='ace-torch-profiler');
       if(active){
         const output=document.getElementById('aiRemixPlanResult');
         if(output)output.textContent=`Job ${job.job_id||''} · ${job.state}${job.phase&&job.phase!==job.state?' · '+job.phase:''}${job.message?' · '+job.message:''}`;
@@ -5452,7 +5463,27 @@ async function aiArrangerWatchActive(waitForFinish=false){
   await poll();
 }
 
-async function generateAndAddAiRemix(){return planAiRemix("generate-and-add")}
+async function generateAndAddAiRemix(){
+  const button=document.getElementById('aiRemixGenerateButton');
+  if(button?.disabled)return;
+  const jobId=button?.dataset?.jobId,pid=button?.dataset?.projectId;
+  if(jobId&&pid===current?.id){
+    if(aiArrangerCancelPending)return;
+    aiArrangerCancelPending=true;
+    aiArrangerRenderProgress({...aiArrangerLastSnapshot,state:'running',job_id:jobId,phase:'cancelling',message:'Cancellation requested / Annullamento richiesto'},true);
+    try{
+      await api(`/api/projects/${encodeURIComponent(pid)}/ai-arranger/generations/${encodeURIComponent(jobId)}/cancel`,{method:'POST'});
+    }catch(e){
+      const output=document.getElementById('aiRemixPlanResult');
+      if(output)output.textContent='Cancellation failed / Annullamento fallito: '+e.message;
+    }finally{
+      aiArrangerCancelPending=false;
+      if(current?.id===pid)await aiArrangerWatchActive(true);
+    }
+    return;
+  }
+  return planAiRemix('generate-and-add');
+}
 
 // r193: native-only optional ACE-Step setup and real inference verification.
 let aiAcePollTimer=null;

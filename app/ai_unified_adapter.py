@@ -19,13 +19,24 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 SUPPORTED = {'whisper', 'chords-ml', 'demucs', 'drumsep', 'sam-audio', 'singer-separation', 'backing-vocals'}
 
 
+def _backend_command(plan, folder, backend, arguments):
+    from app.ai_torch_diagnostics import enabled
+    if enabled():
+        return [sys.executable, str(Path(__file__).with_name('ai_profiled_backend.py')),
+                '--backend', backend, '--task-id', str(plan.get('gpu_profile_task_id', '')),
+                '--report-dir', str(folder), '--', *arguments]
+    if backend == 'demucs':
+        return [sys.executable, '-m', 'demucs.separate', *arguments]
+    return [sys.executable, str(Path(__file__).with_name('sam_audio_worker.py')), *arguments]
+
+
 def _artifacts(folder: Path, entries: list[tuple[Path, str]]) -> None:
     """Publish a complete manifest only after every output is validated.
 
     Never expose a partial manifest to the packaging consumer; it would make a
     crashed adapter appear to have finished and could lose or misbill outputs.
     """
-    from .ai_worker_artifacts import MAX_FILES, MAX_ARTIFACT_BYTES, SAFE_NAME
+    from app.ai_worker_artifacts import MAX_FILES, MAX_ARTIFACT_BYTES, SAFE_NAME
     if not 1 <= len(entries) <= MAX_FILES:
         raise RuntimeError('Invalid number of worker artifacts')
     folder = folder.resolve(strict=True)
@@ -51,7 +62,7 @@ def _artifacts(folder: Path, entries: list[tuple[Path, str]]) -> None:
         if total > MAX_ARTIFACT_BYTES:
             raise RuntimeError('Worker outputs exceed artifact size limit')
         # Hash the validated inode; packaging verifies the same bytes before delivery.
-        from .ai_worker_artifacts import _read_private_file
+        from app.ai_worker_artifacts import _read_private_file
         snapshot = _read_private_file(path, MAX_ARTIFACT_BYTES - (total - info.st_size))
         seen.add(path.name)
         manifest.append({'name': path.name, 'type': media, 'sha256': hashlib.sha256(snapshot).hexdigest()})
@@ -126,17 +137,16 @@ def infer(plan: dict, output: Path) -> None:
         import subprocess
         model = os.environ.get('MTA_AI_SAM_MODEL', '')
         if not model: raise RuntimeError('Operator must configure MTA_AI_SAM_MODEL')
-        runner = Path(__file__).with_name('sam_audio_worker.py')
         target = folder / 'separated.wav'
-        subprocess.run([sys.executable, str(runner), '--source', str(source), '--output', str(target),
-                        '--model', model, '--prompt', str(plan.get('prompt') or 'vocals')], check=True)
+        subprocess.run(_backend_command(plan, folder, 'sam-audio', ['--source', str(source), '--output', str(target),
+                        '--model', model, '--prompt', str(plan.get('prompt') or 'vocals')]), check=True)
         _artifacts(folder, [(target, 'audio/wav')]); return
     if kind == 'demucs':
         import subprocess
         model = str(plan.get('model') or 'htdemucs')
         if not model.replace('_', '').replace('-', '').isalnum() or len(model) > 64:
             raise ValueError('Invalid Demucs model')
-        subprocess.run([sys.executable, '-m', 'demucs.separate', '--name', model, '--out', str(folder/'demucs'), str(source)], check=True)
+        subprocess.run(_backend_command(plan, folder, 'demucs', ['--name', model, '--out', str(folder/'demucs'), str(source)]), check=True)
         paths = sorted((folder/'demucs'/model/source.stem).glob('*.wav'))
         if not paths: raise RuntimeError('Demucs produced no stems')
         staged=[]
@@ -158,15 +168,14 @@ def infer(plan: dict, output: Path) -> None:
                 raise ValueError('Invalid singer identifier')
             if not all(isinstance(item.get(k),(int,float)) for k in ('start','end')) or not 0<=item['start']<item['end']<=86400:
                 raise ValueError('Invalid singer interval')
-        runner=Path(__file__).with_name('sam_audio_worker.py')
         files=[]
         for singer in singers:
             if selected!='all' and selected!=singer['id']:continue
             anchors=[['+',singer['start'],singer['end']]]+[['-',v['start'],v['end']] for v in singers if v['id']!=singer['id']]
             result=folder/(singer['id']+'.wav')
-            subprocess.run([sys.executable,str(runner),'--source',str(source),'--output',str(result),
+            subprocess.run(_backend_command(plan,folder,'sam-audio',['--source',str(source),'--output',str(result),
                             '--model','facebook/'+model,'--prompt','singing voice',
-                            '--anchors-json',json.dumps(anchors)],check=True)
+                            '--anchors-json',json.dumps(anchors)]),check=True)
             files.append((result,'audio/wav'))
         _artifacts(folder,files)
         return
@@ -197,7 +206,14 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     data = json.loads(args.request.read_text(encoding='utf-8'))
-    infer(data, args.output)
+    from app.ai_torch_diagnostics import profile_call
+    # Child backends must profile themselves. Never profile the idle parent
+    # waiting for Demucs/SAM; one singer report covers only its own invocation.
+    if data.get('kind') in ('demucs', 'sam-audio', 'singer-separation'):
+        infer(data, args.output)
+    else:
+        profile_call(args.output.parent, str(data.get('gpu_profile_task_id', '')),
+                     lambda: infer(data, args.output))
 
 
 if __name__ == '__main__':

@@ -2,6 +2,10 @@
 
 Version stays **0.3.0-r210**. This cumulative archive preserves previous r210 work and provides opt-in ACE task profiling with the source-checkout startup correction. No Proxmox plugin update is required for this profiler.
 
+Current follow-up: [long ACE jobs and cancellation](ACE_LONG_JOBS_AND_CANCELLATION_R210.md)
+adds task budgets, cooperative cancellation and profiling in ACE's real diffusion
+thread. That guide describes the current capture scope and required restart.
+
 ## Why this collection path exists
 
 The user's latest host evidence shows AMD-SMI `gfx_ns=0` in all 56 samples across approximately 60 seconds. Raw amdgpu fdinfo on kernel 7.0.14-19-pve contains memory fields but no `drm-engine-*` time fields, with no access errors. These observations justify trying task activity tracing rather than reclassifying zero as measured GPU time. They do not prove that profiling is supported by the installed GPU/runtime combination.
@@ -52,7 +56,7 @@ does not establish ROCm profiler support or billing eligibility.
 
 ## First functional test
 
-Run a **10-second orchestral inference** in Arranger. The current host counters may remain N/A during execution; GPU profiling is finalized at the end of the task. If supported, the completion notification shows GPU kernel seconds and the queue/diagnostics ZIP records:
+Run a **10-second orchestral inference** in Arranger. The live-window collector publishes partial kernel seconds at model checkpoints when supported, then finalizes at the end of the task. Until the first useful checkpoint the GPU value can remain unavailable. See [live collection and unified workers](LIVE_GPU_AND_AI_WORKERS_R210.md) for overhead, activation and runtime coverage. The completion notification shows final GPU kernel seconds and the queue/diagnostics ZIP records:
 
 ```text
 gpu_metrics_source = ace-torch-profiler
@@ -67,7 +71,7 @@ If the installed PyTorch build cannot collect ROCm activity, the job still runs 
 
 ## Measurement and authorization boundaries
 
-- Capture surrounds the actual blocking execution of a single ACE task, not the HTTP adapter's waiting time and not a synthetic HIP workload.
+- Capture surrounds the actual `service_generate` work of a single ACE task in its GPU thread, not the HTTP adapter waiting time. Other preparation/decoding GPU stages may be outside this capture; the fallback without a compatible handler retains the earlier blocking-task wrapper.
 - Only device kernel events are used; CPU spans, HIP API calls and memory-copy intervals are excluded. Overlapping kernel intervals on the single observed GPU are merged, avoiding double counting concurrent streams. Multi-device, malformed and impossible-duration traces are rejected.
 - These are observed kernel activity intervals from the ACE process. They remain **diagnostic, nonbillable evidence**: the integration does not attest device exclusivity, external work, complete hardware accounting or invoice eligibility. The existing estimated field carries the diagnostic value; verified `gpu_seconds` and billing gates are unchanged.
 - Captures of wrapped generations are serialized. Training or unrelated activity in the same process is not separately certified; do not treat this report as a complete resource accounting proof.

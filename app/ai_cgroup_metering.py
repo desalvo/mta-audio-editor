@@ -96,6 +96,10 @@ def _worker_failure(stderr: str, exit_code: int) -> dict:
         ('HTTP Error 401', 'ace_unauthorized'),
         ('HTTP Error 403', 'ace_forbidden'),
         ('HTTP Error 404', 'ace_endpoint_missing'),
+        ('ACE-Step backend generation timeout', 'ace_backend_timeout'),
+        ('ACE-Step backend GPU out of memory', 'ace_gpu_out_of_memory'),
+        ('ACE-Step generation failed', 'ace_backend_failed'),
+        ('ACE-Step task control request rejected', 'ace_control_rejected'),
         ('ACE-Step generation timed out', 'ace_generation_timeout'),
         ('ACE-Step adapter error:', 'ace_adapter_failed'),
     ):

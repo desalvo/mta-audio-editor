@@ -8,9 +8,11 @@ import sys
 
 if __package__:
     from .ace_gpu_profiler import TaskProfiler
+    from .ace_task_control import TaskControl, SERVICE_GUARD_SECONDS
 else:
     sys.path.insert(0, str(Path(__file__).resolve().parent))
     from ace_gpu_profiler import TaskProfiler
+    from ace_task_control import TaskControl, SERVICE_GUARD_SECONDS
 
 
 def install(server, profiler=None):
@@ -21,7 +23,27 @@ def install(server, profiler=None):
     if 'job_id' not in inspect.signature(target).parameters:
         raise RuntimeError('Unsupported ACE-Step task execution interface')
     profiler = profiler or TaskProfiler()
-    server.run_blocking_generate = profiler.wrap(target)
+    controls = TaskControl()
+    # Upstream v0.1.8 reads this constant on import. main() sets its environment
+    # before import; embedded launchers may already have loaded the module.
+    service_module = sys.modules.get('acestep.core.generation.handler.generate_music_execute')
+    if service_module is not None:
+        service_module._DEFAULT_GENERATION_TIMEOUT = SERVICE_GUARD_SECONDS
+    server.run_blocking_generate = controls.wrap(target, profiler)
+
+    @server.app.get('/mta/runtime', dependencies=[Depends(server.verify_api_key)])
+    def runtime():
+        return {'schema': 'mta-ace-runtime-v1', 'max_timeout_seconds': 14400,
+                'task_control': True, 'cancellation': 'cooperative', 'billing_eligible': False}
+
+    @server.app.post('/mta/tasks/{task_id}/control', dependencies=[Depends(server.verify_api_key)])
+    def control(task_id: str, body: dict):
+        if set(body) - {'timeout_seconds', 'cancel'} or type(body.get('cancel', False)) is not bool:
+            raise HTTPException(422, 'Invalid ACE task control')
+        try:
+            return controls.configure(task_id, timeout_seconds=body.get('timeout_seconds'), cancel=body.get('cancel', False))
+        except ValueError as exc:
+            raise HTTPException(422, str(exc)) from exc
 
     @server.app.get('/mta/telemetry/{task_id}', dependencies=[Depends(server.verify_api_key)])
     def telemetry(task_id: str):
@@ -41,7 +63,13 @@ def main():
         sys.path.insert(0, str(Path.cwd()))
     # Import by its canonical name: upstream's CLI starts uvicorn using this same
     # module/app, preserving the hook in the single server process.
+    os.environ['ACESTEP_GENERATION_TIMEOUT'] = str(SERVICE_GUARD_SECONDS)
     import acestep.api_server as server
+    # The query route captures this ceiling when create_app() builds routes.
+    # Rebuild before lifespan/model initialization, not after service startup.
+    server.TASK_TIMEOUT_SECONDS = SERVICE_GUARD_SECONDS
+    if callable(getattr(server, 'create_app', None)):
+        server.app = server.create_app()
     install(server)
     server.main()
 

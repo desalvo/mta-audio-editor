@@ -207,6 +207,8 @@ def _with_live_progress(row):
                 value[field] = float(amount)
     except (OSError, ValueError, TypeError):
         pass
+    if value.get('cancel_requested'):
+        value.update(phase='cancelling', message='Cancellation requested; discarding output and stopping ACE cooperatively')
     return value
 
 

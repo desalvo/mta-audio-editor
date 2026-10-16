@@ -4,6 +4,8 @@ A trusted administrator installs/configures a worker executable; no user-provide
 commands, shell invocation, URLs, or arbitrary output paths are accepted.
 """
 from __future__ import annotations
+from contextlib import contextmanager
+import logging
 import json
 import os
 from pathlib import Path
@@ -191,6 +193,26 @@ def _trim_wav_for_ai(path: Path, start_ms: int, end_ms: int) -> None:
         temp.unlink(missing_ok=True)
 
 
+@contextmanager
+def _ace_remote_cleanup(plan, progress_path):
+    """The ACE daemon lives outside the killed adapter's process/cgroup tree."""
+    try:
+        yield
+    except BaseException:
+        if plan.get('model_id') == 'ace-step-1.5':
+            try:
+                path = progress_path()
+                if path is not None and Path(path).stat().st_size <= 8192:
+                    payload = json.loads(Path(path).read_text())
+                    from .ace_step_http_worker import _control_task, endpoint_base
+                    confirmed = _control_task(endpoint_base(), payload.get('_ace_task_id'), cancel=True)
+                    logging.getLogger(__name__).info('ACE task cancellation delivery: %s',
+                        'requested' if confirmed else 'unsupported')
+            except (OSError, ValueError, RuntimeError, TypeError):
+                logging.getLogger(__name__).warning('ACE task cancellation delivery unavailable')
+        raise
+
+
 def run_worker_with_project_audio(plan: dict, project, resolve_audio, *, timeout_seconds: int | None = None, progress_file=None, cancel_event=None):
     """Run a trusted worker with copied project WAV inputs, not host file paths.
 
@@ -228,8 +250,10 @@ def run_worker_with_project_audio(plan: dict, project, resolve_audio, *, timeout
         raise ValueError('No source tracks selected')
     if len(tracks) > 64:
         raise ValueError('Too many input audio tracks')
-    with tempfile.TemporaryDirectory(prefix='mta-ai-') as folder:
+    with tempfile.TemporaryDirectory(prefix='mta-ai-') as folder, _ace_remote_cleanup(plan, lambda: progress_file):
         directory = Path(folder)
+        if progress_file is None:
+            progress_file = directory / 'progress.json'
         inputs = directory / 'inputs'
         inputs.mkdir(mode=0o700)
         sources = []

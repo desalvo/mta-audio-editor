@@ -62,7 +62,13 @@ def kernel_activity(trace: dict, wall_seconds: float) -> tuple[float, int, int]:
 
 
 class TaskProfiler:
-    def __init__(self, torch_loader=None, clock=time.monotonic):
+    def __init__(self, torch_loader=None, clock=time.monotonic, *, source='ace-torch-profiler',
+                 on_update=None, live_interval=5):
+        if source not in ('ace-torch-profiler', 'torch-profiler'):
+            raise ValueError('Unsupported profiler source')
+        self.source = source
+        self._on_update = on_update
+        self._live_interval = max(2.0, float(live_interval))
         self._loader = torch_loader or self._torch
         self._clock = clock
         self._capture_lock = threading.Lock()
@@ -76,10 +82,28 @@ class TaskProfiler:
 
     def _save(self, task, record):
         with self._records_lock:
-            self._records[task] = (self._clock(), record)
+            self._records[task] = (self._clock(), dict(record))
             self._records.move_to_end(task)
             while len(self._records) > 128:
                 self._records.popitem(last=False)
+        if self._on_update is not None:
+            try:
+                self._on_update(dict(record))
+            except Exception as exc:
+                LOGGER.warning('MTA diagnostic report unavailable: %s', type(exc).__name__)
+
+    @staticmethod
+    def _trace(profile, wall):
+        fd, name = tempfile.mkstemp(prefix='mta-gpu-profile-', suffix='.json')
+        os.close(fd)
+        try:
+            profile.export_chrome_trace(name)
+            path = Path(name)
+            if path.stat().st_size > 64 * 1024 * 1024:
+                raise ValueError('Profiler trace exceeds diagnostic limit')
+            return kernel_activity(json.loads(path.read_text()), wall)
+        finally:
+            Path(name).unlink(missing_ok=True)
 
     def get(self, task):
         with self._records_lock:
@@ -95,7 +119,7 @@ class TaskProfiler:
             # Serialize profiled generations, so their process-wide capture cannot
             # overlap another wrapped inference. Upstream single-worker is required.
             with self._capture_lock:
-                record = {'task_id': task, 'source': 'ace-torch-profiler',
+                record = {'task_id': task, 'source': self.source,
                           'status': 'profiling', 'billing_eligible': False}
                 self._save(task, record)
                 profile = None
@@ -118,29 +142,76 @@ class TaskProfiler:
                     profile = None
                     record['status'] = 'profiler_unavailable'
                 started = self._clock()
+                segment_started = started
+                seconds_total, count_total, device_seen = 0.0, 0, None
+                owner = threading.get_ident()
+                checkpoint_busy = False
+                hook = None
+                is_compiling = getattr(getattr(torch, 'compiler', None), 'is_compiling', lambda: False) if profile is not None else lambda: False
+
+                def collect_segment():
+                    nonlocal profile, seconds_total, count_total, device_seen
+                    previous, profile = profile, None
+                    try:
+                        torch.cuda.synchronize()
+                        finished = self._clock()
+                    finally:
+                        previous.stop()
+                    seconds, count, device = self._trace(previous, max(0.0, finished - segment_started))
+                    if count and device_seen is not None and device_seen != device:
+                        raise ValueError('GPU device changed between profiling windows')
+                    if count:
+                        device_seen = device
+                    seconds_total += seconds
+                    count_total += count
+                    record.update(gpu_active_seconds=round(seconds_total, 6), kernel_count=count_total,
+                                  device_id=device_seen or 0, wall_seconds=max(0.0, finished - started))
+
+                def checkpoint(*unused):
+                    nonlocal profile, segment_started, checkpoint_busy
+                    if is_compiling():
+                        return  # Do not trace profiler control into a compiled model.
+                    if (profile is None or checkpoint_busy or threading.get_ident() != owner
+                            or self._clock() - segment_started < self._live_interval):
+                        return
+                    checkpoint_busy = True
+                    try:
+                        collect_segment()
+                        self._save(task, record)
+                        profile = torch.profiler.profile(activities=[activity], record_shapes=False,
+                            profile_memory=False, with_stack=False)
+                        profile.start()
+                        segment_started = self._clock()
+                    except Exception as exc:
+                        if profile is not None:
+                            try: profile.stop()
+                            except Exception as cleanup:
+                                LOGGER.debug('MTA checkpoint cleanup: %s', type(cleanup).__name__)
+                        profile = None
+                        record['status'] = 'profiler_failed'
+                        LOGGER.warning('MTA live GPU capture failed: %s', type(exc).__name__)
+                    finally:
+                        checkpoint_busy = False
+
+                if profile is not None:
+                    try:
+                        # Runs on the inference thread at model boundaries. Never
+                        # stop/export an active profiler from the HTTP thread.
+                        hook = torch.nn.modules.module.register_module_forward_pre_hook(checkpoint)
+                    except Exception as exc:
+                        LOGGER.debug('MTA model checkpoints unavailable: %s', type(exc).__name__)
+                        # Runtime without hooks retains end-of-task collection.
                 try:
                     return generate(*args, **kwargs)
                 finally:
+                    if hook is not None:
+                        try: hook.remove()
+                        except Exception as cleanup:
+                            LOGGER.debug('MTA hook cleanup: %s', type(cleanup).__name__)
                     if profile is not None:
                         try:
-                            try:
-                                torch.cuda.synchronize()
-                                wall = max(0.0, self._clock() - started)
-                            finally:
-                                profile.stop()
-                            fd, name = tempfile.mkstemp(prefix='mta-gpu-profile-', suffix='.json')
-                            os.close(fd)
-                            try:
-                                profile.export_chrome_trace(name)
-                                path = Path(name)
-                                if path.stat().st_size > 64 * 1024 * 1024:
-                                    raise ValueError('Profiler trace exceeds diagnostic limit')
-                                seconds, count, device = kernel_activity(json.loads(path.read_text()), wall)
-                            finally:
-                                Path(name).unlink(missing_ok=True)
-                            record.update(status='profiled_kernels_diagnostic' if count else 'profiler_no_gpu_events',
-                                gpu_active_seconds=round(seconds, 6), kernel_count=count,
-                                device_id=device, wall_seconds=wall)
+                            collect_segment()
+                            record['status'] = 'profiled_kernels_diagnostic' if count_total else 'profiler_no_gpu_events'
                         except Exception as exc:
                             LOGGER.warning('MTA GPU profiler capture failed: %s', type(exc).__name__)
                             record['status'] = 'profiler_failed'
@@ -148,16 +219,17 @@ class TaskProfiler:
         return measured
 
 
-def parse_report(payload, expected_task):
+def parse_report(payload, expected_task, *, source='ace-torch-profiler'):
     """Accept a matching backend report only as nonbillable diagnostics."""
     if (not isinstance(expected_task, str) or not _TASK.fullmatch(expected_task)
             or not isinstance(payload, dict) or payload.get('task_id') != expected_task
-            or payload.get('source') != 'ace-torch-profiler' or payload.get('billing_eligible') is not False
+            or source not in ('ace-torch-profiler', 'torch-profiler')
+            or payload.get('source') != source or payload.get('billing_eligible') is not False
             or not isinstance(payload.get('status'), str) or payload['status'] not in STATUSES):
         raise ValueError('Invalid or mismatched GPU profiler report')
     status = payload['status']
-    result = {'gpu_metrics_status': status, 'gpu_metrics_source': 'ace-torch-profiler'}
-    if status == 'profiled_kernels_diagnostic':
+    result = {'gpu_metrics_status': status, 'gpu_metrics_source': source}
+    if status == 'profiled_kernels_diagnostic' or (status == 'profiling' and payload.get('gpu_active_seconds', 0)):
         seconds, wall = payload.get('gpu_active_seconds'), payload.get('wall_seconds')
         if any(isinstance(x, bool) or not isinstance(x, (float, int)) or not math.isfinite(x) or x <= 0 for x in (seconds, wall)):
             raise ValueError('Invalid profiler duration')

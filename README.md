@@ -4,6 +4,8 @@ For the MTA web server on Linux, use the standalone [MTA installation wizard](MT
 
 Optional ROCm kernel timing diagnostics for ACE-Step 0.1.8: [activation, rollback and accounting limits](ACE_TASK_GPU_PROFILER_R210.md).
 
+Live GPU samples and unified AI workers: [activation, coverage and validation limits](LIVE_GPU_AND_AI_WORKERS_R210.md).
+
 Isolated AMD-SMI comparison on Proxmox: [gwads07 side-by-side build and validation](AMD_SMI_SIDECAR_R210.md).
 
 For standalone setup on Debian/RHEL-family Linux (bare metal, VM or LXC), download `scripts/install_ace_step.sh` alone; a full checkout is **not** required. See [ACE-Step Installation](ACE_STEP_INSTALLATION.md) for GPU prerequisites, interactive setup, version selection, firewall, reinstall and uninstall.
@@ -287,3 +289,5 @@ Configure SMTP and resubmit the email change to request a new confirmation link.
 ### Durable upload recovery (0.3.0-r208)
 
 See [Durable upload recovery](AI_R208_DURABLE_RECOVERY_CLOSURES_EN.md) for implemented safeguards, validation and outstanding limitations.
+
+ACE-Step r210: [long jobs, internal timeout and cancellation](ACE_LONG_JOBS_AND_CANCELLATION_R210.md).

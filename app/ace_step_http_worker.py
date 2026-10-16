@@ -34,6 +34,7 @@ else:
     from ace_gpu_profiler import parse_report
 
 MAX_RESULT = 1024 * 1024 * 1024
+_ACTIVE_TASK_ID = None
 
 
 def endpoint_base() -> str:
@@ -132,6 +133,8 @@ def _progress(phase: str, message: str, percent=None, telemetry=None) -> None:
     try:
         target = Path(path)
         info = {'phase': phase, 'message': message[:200], 'progress_percent': percent}
+        if _ACTIVE_TASK_ID is not None:
+            info['_ace_task_id'] = _ACTIVE_TASK_ID
         if isinstance(telemetry, dict): info.update(telemetry)
         temporary = target.with_name(target.name + '.tmp')
         temporary.write_text(json.dumps(info), encoding='utf-8')
@@ -155,7 +158,7 @@ def _profile_result(base, task_id):
 def _task_telemetry(meter, base, task_id):
     telemetry = meter.sample()
     profile = _profile_result(base, task_id)
-    if profile and (profile.get('gpu_metrics_status') == 'profiled_kernels_diagnostic'
+    if profile and (profile.get('gpu_seconds_estimated') is not None
                     or telemetry.get('gpu_seconds_estimated') is None):
         # Never relabel an earlier host estimate as a profiler measurement.
         telemetry.pop('gpu_seconds_estimated', None)
@@ -163,7 +166,43 @@ def _task_telemetry(meter, base, task_id):
     return telemetry
 
 
+def _control_task(base, task_id, *, budget=None, cancel=False):
+    if not isinstance(task_id, str) or not re.fullmatch(r'[A-Za-z0-9_-]{1,128}', task_id):
+        return False
+    body = {'cancel': cancel}
+    if budget is not None:
+        body['timeout_seconds'] = budget
+    try:
+        data = json.loads(_request(base + '/mta/tasks/' + task_id + '/control',
+                                   json.dumps(body).encode(), 'application/json', timeout=3))
+        return (isinstance(data, dict) and data.get('task_id') == task_id
+                and (not cancel or data.get('cancel_requested') is True or data.get('state') in ('completed', 'failed', 'cancelled')))
+    except (ValueError, TypeError):
+        return False
+    except HTTPError as exc:
+        if exc.code not in (404, 405):
+            raise RuntimeError('ACE-Step task control request rejected') from exc
+        return False
+
+
 def run(plan_path: Path, output: Path) -> None:
+    global _ACTIVE_TASK_ID
+    _ACTIVE_TASK_ID = None
+    try:
+        _run(plan_path, output)
+    except BaseException:
+        if _ACTIVE_TASK_ID is not None:
+            try:
+                _control_task(endpoint_base(), _ACTIVE_TASK_ID, cancel=True)
+            except (OSError, ValueError, RuntimeError):
+                pass
+        raise
+    finally:
+        _ACTIVE_TASK_ID = None
+
+
+def _run(plan_path: Path, output: Path) -> None:
+    global _ACTIVE_TASK_ID
     plan = json.loads(plan_path.read_text(encoding='utf-8'))
     if plan.get('model_id') != 'ace-step-1.5':
         raise ValueError('This adapter only supports ACE-Step 1.5')
@@ -188,9 +227,11 @@ def run(plan_path: Path, output: Path) -> None:
     submitted = json.loads(_request(base + '/release_task', body, content_type, timeout=60))
     task = submitted.get('data') if isinstance(submitted, dict) else None
     task_id = task.get('task_id') if isinstance(task, dict) else None
-    if not isinstance(task_id, str) or not task_id:
+    if not isinstance(task_id, str) or not re.fullmatch(r'[A-Za-z0-9_-]{1,128}', task_id):
         raise RuntimeError('ACE-Step did not return a task ID')
+    _ACTIVE_TASK_ID = task_id
     _progress('queued', 'ACE-Step accepted job ' + task_id[:12] + '; waiting for inference', telemetry=meter.sample())
+    _control_task(base, task_id, budget=budget)
     # Keep time for downloading the result before the outer supervisor deadline.
     # Explicit per-job settings supersede the legacy deployment poll override.
     reserve = min(120, budget // 10)
@@ -205,8 +246,14 @@ def run(plan_path: Path, output: Path) -> None:
         if row:
             supplied = row.get('progress')
             percent = supplied if isinstance(supplied, (int, float)) and 0 <= supplied <= 100 else None
-            _progress('inference', 'ACE-Step processing task ' + task_id[:12], percent, meter.sample())
+            _progress('inference', 'ACE-Step processing task ' + task_id[:12], percent, _task_telemetry(meter, base, task_id))
         if row and row.get('status') == 2:
+            # Keep remote error text private; persist only a fixed classification.
+            detail = str(row.get('error', '')) + str(row.get('result', ''))
+            if 'timed out' in detail.lower() or 'timeout' in detail.lower():
+                raise RuntimeError('ACE-Step backend generation timeout (internal service limit)')
+            if 'out of memory' in detail.lower():
+                raise RuntimeError('ACE-Step backend GPU out of memory')
             raise RuntimeError('ACE-Step generation failed')
         if row and row.get('status') == 1:
             result = row.get('result')

@@ -25,7 +25,7 @@ vm.createContext(ctx);vm.runInContext(process.argv[1],ctx);
   for(const state of ['failed','cancelled','interrupted']){
     reply={job_id:'j',state:'running',phase:'inference',started_at:100,elapsed_seconds:10};
     await vm.runInContext('aiArrangerWatchActive(true)',ctx);
-    assert.equal(bar.hidden,false);assert.equal(elements.aiRemixGenerateButton.disabled,true);
+    assert.equal(bar.hidden,false);assert.equal(elements.aiRemixGenerateButton.disabled,false);
     assert.match(elements.aiRemixJobHint.textContent,/request is running/);
     const previous=scheduled;
     now=160000;
