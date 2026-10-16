@@ -45,5 +45,12 @@ def test_early_rpm_naming_and_cleanup_are_run_unique_and_safe():
     assert '.b${expected_build}.r${RUN_ID}.a${source_attempt}' in publish
     assert '--limit 20' in publish
     assert 'Remove unreferenced RPM Release assets after Pages verification' in publish
-    assert 'Public Pages metadata is stale' in publish
+    # The public metadata verifier is an external script; assert the workflow
+    # invokes it and preserves a fail-closed cleanup ordering, rather than
+    # pinning an obsolete inline diagnostic message.
+    assert 'scripts/repositories/verify_public_pages.py' in publish
+    assert '--max-wait 900' in publish
+    verifier = (ROOT / 'scripts/repositories/verify_public_pages.py').read_text()
+    assert 'Public Pages still stale or unavailable; refusing RPM asset cleanup.' in verifier
+    assert 'raise SystemExit(4)' in verifier
     assert publish.index('Verify public GitHub Pages RPM indexes') < publish.index('Remove unreferenced RPM Release assets')
