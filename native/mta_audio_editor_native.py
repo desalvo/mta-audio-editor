@@ -133,10 +133,16 @@ def _native_startup_logger() -> logging.Logger:
     logger = logging.getLogger("mta.native.startup")
     log_path = _native_startup_log_path()
     for old in list(logger.handlers):
+        # This logger is process-wide. A previous run/test may have configured
+        # it against another per-user data directory. Never leave a stale file
+        # handler attached just because some other handler is present.
         if isinstance(old, RotatingFileHandler) and Path(old.baseFilename) != log_path:
             logger.removeHandler(old)
             old.close()
-    if not logger.handlers:
+    if not any(
+        isinstance(handler, RotatingFileHandler) and Path(handler.baseFilename) == log_path
+        for handler in logger.handlers
+    ):
         handler = RotatingFileHandler(
             log_path, maxBytes=2 * 1024 * 1024,
             backupCount=2, encoding="utf-8",

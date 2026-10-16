@@ -8,8 +8,12 @@ def test_first_boot_makecache_precedes_short_probe_and_package_install():
     s = SCRIPT.read_text()
     prewarm = s.index('echo "Initializing signed MTA DNF repository metadata')
     probe = s.index('   prepare_el_dependencies "$major"', prewarm)
-    install = s.index('   dnf install -y mta-audio-editor-server', probe)
-    assert prewarm < probe < install
+    # Existing installations must upgrade; first-time installations install.
+    # Both branches must remain after the repository trust/dependency probe.
+    branch = s.index('   if rpm -q mta-audio-editor-server', probe)
+    upgrade = s.index('     dnf upgrade -y --refresh mta-audio-editor-server', branch)
+    install = s.index('     dnf install -y --refresh mta-audio-editor-server', upgrade)
+    assert prewarm < probe < branch < upgrade < install
     assert "--disablerepo='*' --enablerepo=mta-audio-editor makecache" in s
     assert "dnf -y --refresh" in s
     assert "timeout --signal=TERM --kill-after=5s 180s" in s
