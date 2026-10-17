@@ -214,13 +214,16 @@ def billing_page(request:Request):
     require_admin(request)
     return HTMLResponse((Path(__file__).parent / 'templates' / 'ai_billing.html').read_text(encoding='utf-8'))
 
-def _verified_worker_response(result, meta, *, max_bytes=32 * 1024 * 1024):
+def _verified_worker_response(result, meta, *, max_bytes=None):
     """Validate a billable worker result before caching or acknowledging it.
 
     An already-metered oversized/broken result must never be advertised as a
     completed, recoverable request. No retry may execute the worker again.
     """
     from .ai_remote_client import ALLOWED_TYPES
+    if max_bytes is None:
+        from .ai_payload_limits import MAX_RESULT_BYTES
+        max_bytes = MAX_RESULT_BYTES
     if not isinstance(result, bytes) or not result:
         raise HTTPException(502, 'Worker returned an empty or invalid result')
     if len(result) > max_bytes:
@@ -449,7 +452,8 @@ async def execute_remote_ai_audio_job(kind: str, request: Request):
         raise HTTPException(400, str(exc)) from exc
     if request.headers.get('content-type', '').split(';')[0].strip().lower() not in ('audio/wav', 'audio/x-wav', 'application/octet-stream'):
         raise HTTPException(415, 'WAV content required')
-    max_bytes = 32 * 1024 * 1024
+    from .ai_payload_limits import MAX_SOURCE_BYTES
+    max_bytes = MAX_SOURCE_BYTES
     declared_length = request.headers.get('content-length', '0') or '0'
     if not declared_length.isdecimal():
         raise HTTPException(400, 'Invalid content length')

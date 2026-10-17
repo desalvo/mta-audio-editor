@@ -16,7 +16,7 @@ from pathlib import Path
 import tempfile
 import time
 
-MAX_BYTES = 32 * 1024 * 1024
+from .ai_payload_limits import MAX_RESULT_BYTES as MAX_BYTES
 ALLOWED = {'audio/wav', 'application/zip', 'application/json'}
 
 
@@ -67,8 +67,8 @@ def _read_regular(path: Path, limit: int) -> bytes:
         if path.is_symlink() or not stat.S_ISREG(metadata.st_mode) or metadata.st_nlink != 1 or metadata.st_size > limit:
             raise ValueError('Unsafe cached artifact')
         with os.fdopen(fd, 'rb', closefd=False) as stream:
-            data = stream.read(limit + 1)
-        if len(data) > limit:
+            data = stream.read(metadata.st_size + 1)
+        if len(data) != metadata.st_size or os.fstat(fd).st_size != metadata.st_size:
             raise ValueError('Oversized cached artifact')
         return data
     finally:

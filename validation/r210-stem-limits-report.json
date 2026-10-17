@@ -1,0 +1,33 @@
+{
+  "release": "0.3.0-r210",
+  "baseline": "MTA-r210-stem-journal-recovery-cumulative.zip",
+  "root_cause": "Confirmed server RuntimeError: Worker outputs exceed artifact size limit; aggregate stem output exceeded old 64 MiB budget.",
+  "source_limit_bytes": 536870912,
+  "aggregate_artifact_limit_bytes": 1073741824,
+  "result_limit_bytes": 1075838976,
+  "targeted": {
+    "tests": 33,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 33
+  },
+  "full": {
+    "tests": 3564,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 5,
+    "passed": 3559
+  },
+  "coverage_line_percent": 77.94,
+  "deselected": 10,
+  "test_environment": "CI test mode MTA_ALLOW_INSECURE_NO_AUTH=true; archived executable permissions restored; cmake added to PATH.",
+  "large_fixture": "Six real 70-second 44.1 kHz stereo PCM16 WAVs with deterministic incompressible data; archive >64 MiB verified through publication, packaging, cache replay, remote digest/ZIP validation, web unpack and native import.",
+  "not_executed": [
+    "Real Demucs/ROCm inference on target server",
+    "Production deployment",
+    "10 AF_UNIX socket cases forbidden by runner"
+  ],
+  "git_actions": [],
+  "production_actions": []
+}

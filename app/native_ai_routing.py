@@ -87,8 +87,9 @@ def infer(kind: str, audio: Path, options: dict | None = None) -> tuple[dict, st
     from .ai_worker_artifacts import SAFE_NAME, MAX_FILES, MAX_ARTIFACT_BYTES
     cfg = _read().get('workers',{}).get(kind,{})
     if cfg.get('mode') != 'remote': raise ValueError('Remote AI mode not selected')
-    with audio.open('rb') as handle:
-        wav = handle.read(32*1024*1024+1)
+    from .ai_payload_limits import MAX_SOURCE_BYTES
+    from .ai_worker_artifacts import _read_private_file
+    wav = _read_private_file(audio, MAX_SOURCE_BYTES)
     # Modern servers attest both the exact request and result bytes.
     # Enable a fail-closed mode for installations requiring this guarantee.
     strict = os.getenv('MTA_REMOTE_AI_REQUIRE_ATTESTATION', '').strip().lower() in ('1','true','yes','on')

@@ -38,12 +38,16 @@ def infer(kind,source,options=None,*,cancel_check=None,raw=False):
             info=verify_preview_wav(output)
         return payload,{**meta,**info}
     result={'audio':{},'json':{}}
-    from .ai_worker_artifacts import SAFE_NAME,MAX_FILES,MAX_ARTIFACT_BYTES
+    from .ai_worker_artifacts import SAFE_NAME,MAX_FILES
+    from .ai_payload_limits import MAX_ARTIFACT_BYTES, MAX_MANIFEST_BYTES
     with zipfile.ZipFile(io.BytesIO(payload)) as archive:
         if len(archive.infolist())>MAX_FILES+1:raise ValueError('Too many AI results')
         total=0
         for entry in archive.infolist():
             if not SAFE_NAME.fullmatch(entry.filename):raise ValueError('Unsafe AI artifact')
+            if entry.filename == 'manifest.json':
+                if entry.file_size > MAX_MANIFEST_BYTES:raise ValueError('Oversized AI manifest')
+                continue
             total+=entry.file_size
             if total>MAX_ARTIFACT_BYTES:raise ValueError('Oversized AI result')
             data=archive.read(entry)

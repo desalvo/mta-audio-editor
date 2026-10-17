@@ -14,7 +14,7 @@ import re
 import zipfile
 from pathlib import Path
 
-MAX_ARTIFACT_BYTES = 64 * 1024 * 1024
+from .ai_payload_limits import MAX_ARTIFACT_BYTES, MAX_MANIFEST_BYTES, MAX_RESULT_BYTES
 MAX_FILES = 16
 SAFE_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$")
 
@@ -30,7 +30,7 @@ def _read_private_file(path: Path, limit: int) -> bytes:
         info = os.fstat(stream.fileno())
         if not stat.S_ISREG(info.st_mode) or info.st_nlink != 1 or info.st_size > limit:
             raise ValueError('AI artifact is not a private regular file within limits')
-        data = stream.read(limit + 1)
+        data = stream.read(info.st_size + 1)
         if len(data) > limit or len(data) != info.st_size:
             raise ValueError('AI artifact changed size or exceeded limit')
         if os.fstat(stream.fileno()).st_size != info.st_size:
@@ -47,7 +47,7 @@ def package_artifacts(directory: Path) -> tuple[bytes, str]:
         audio = _read_private_file(wav, MAX_ARTIFACT_BYTES)
         _verify_wav_bytes(audio)
         return audio, 'audio/wav'
-    raw_manifest = _read_private_file(manifest_path, 256_000)
+    raw_manifest = _read_private_file(manifest_path, MAX_MANIFEST_BYTES)
     doc = json.loads(raw_manifest.decode('utf-8'))
     if not isinstance(doc, dict) or doc.get('version') != 1 or not isinstance(doc.get('files'), list):
         raise ValueError('Invalid AI output manifest')
@@ -88,7 +88,7 @@ def package_artifacts(directory: Path) -> tuple[bytes, str]:
                 json.loads(data.decode('utf-8'))
             archive.writestr(name, data)
         archive.writestr('manifest.json', json.dumps(doc, separators=(',', ':'), ensure_ascii=False))
-    if package.tell() > MAX_ARTIFACT_BYTES:
+    if package.tell() > MAX_RESULT_BYTES:
         raise ValueError('AI archive exceeds size limit')
     return package.getvalue(), 'application/zip'
 

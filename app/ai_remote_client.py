@@ -19,8 +19,7 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlsplit, urlunsplit
 from urllib.request import Request
 
-MAX_AUDIO_BYTES = 32 * 1024 * 1024
-MAX_RESULT_BYTES = 32 * 1024 * 1024
+from .ai_payload_limits import MAX_SOURCE_BYTES as MAX_AUDIO_BYTES, MAX_RESULT_BYTES
 ALLOWED_TYPES = {'audio/wav', 'application/zip', 'application/json'}
 
 
@@ -82,7 +81,7 @@ def infer_audio(base_url: str, token: str, kind: str, wav: bytes, options: dict 
     if not isinstance(token, str) or not token or len(token) > 4096 or any(ord(c) < 33 or ord(c) > 126 for c in token):
         raise ValueError('A valid remote AI bearer token is required')
     if not isinstance(wav, bytes) or not 0 < len(wav) <= MAX_AUDIO_BYTES:
-        raise ValueError('Remote AI requires non-empty WAV bytes up to 32 MiB')
+        raise ValueError('Remote AI requires non-empty WAV bytes within the source size limit')
     from .ai_remote_transport import decode_audio_options, validate_audio_options
     if options is not None and not isinstance(options, dict):
         raise ValueError('Remote AI options must be an object')

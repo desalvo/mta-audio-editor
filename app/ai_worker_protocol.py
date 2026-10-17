@@ -173,7 +173,7 @@ def run_external_worker(plan: dict, *, timeout_seconds: int = 1200,
 
 
 _SAFE_AUDIO_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$")
-MAX_SOURCE_BYTES = 512 * 1024 * 1024
+from .ai_payload_limits import MAX_SOURCE_BYTES
 MAX_SOURCE_DURATION_SECONDS = 1800
 
 

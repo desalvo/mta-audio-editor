@@ -94,6 +94,7 @@ _EXCEPTION_TYPES = frozenset({'ImportError', 'ModuleNotFoundError', 'RuntimeErro
 _DEPENDENCIES = frozenset({'torch', 'torchaudio', 'torchcodec', 'demucs', 'soundfile', 'whisper',
     'audio_separator', 'numpy', 'sam_audio'})
 _FAILURE_MARKERS = (
+    ('Worker outputs exceed artifact size limit', 'worker_output_size_limit'),
     ('TorchCodec is required', 'worker_audio_codec_missing'),
     ("No module named 'torchcodec'", 'worker_audio_codec_missing'),
     ('Could not load libtorchcodec', 'worker_audio_codec_unavailable'),
