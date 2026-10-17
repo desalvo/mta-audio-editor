@@ -275,7 +275,7 @@ def delete_chord_model(model_id: str, *, native: bool = False) -> dict:
 
 def _accelerator_info() -> dict:
     forced=os.getenv("MTA_AI_DEVICE","").strip()
-    if forced:
+    if forced and forced.lower() != "auto":
         return {"device":forced,"hardware_accelerated":forced.lower()!="cpu","source":"MTA_AI_DEVICE"}
     try:
         import torch  # type: ignore

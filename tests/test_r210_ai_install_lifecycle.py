@@ -224,7 +224,7 @@ vm.createContext(ctx);vm.runInContext(process.argv[1],ctx);
 const settle=()=>new Promise(resolve=>setImmediate(resolve));
 (async()=>{await settle();const visible=process.argv[2]==='true';const origin={isConnected:true,closest:()=>visible?null:{}};
 for(const cb of callbacks['mta:ai-job-accepted'])cb({detail:{...job,origin}});
-await settle();completed=true;const promise=tick();await settle();
+await settle();if(!visible)ctx.window.mtaAiJobs.closeOrigin(origin);completed=true;const promise=tick();await settle();
 assert.equal((nodes['aj-notices']?.children.length||0),0);assert.equal(acks,0);release();await promise;
 assert.equal(acks,1);assert.equal((nodes['aj-notices']?.children.length||0),visible?0:1);
 })().catch(e=>{console.error(e);process.exitCode=1});

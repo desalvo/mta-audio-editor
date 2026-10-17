@@ -5,7 +5,7 @@ import subprocess
 ROOT=Path(__file__).parents[1]
 
 
-def test_background_monitor_notifies_with_panel_closed_and_acknowledges_once():
+def test_background_monitor_notifies_after_origin_closed_and_acknowledges_once():
     script=r'''
 const vm=require('vm'),assert=require('assert');
 class Element{
@@ -30,6 +30,7 @@ vm.createContext(ctx);vm.runInContext(process.argv[1],ctx);
 const settle=()=>new Promise(resolve=>setImmediate(resolve));
 (async()=>{
 await settle();assert.equal(nodes['aj-panel'].hidden,true);assert.equal(events.length,0);assert.match(nodes['aj-launch'].textContent,/1/);
+const origin={isConnected:true,closest:()=>null};ctx.window.mtaAiJobs.origin('task',origin);ctx.window.mtaAiJobs.closeOrigin(origin);origin.isConnected=false;
 terminal=true;await tick();await settle();
 assert.equal(nodes['aj-panel'].hidden,true);assert.equal(nodes['aj-notices'].children.length,1);
 assert.equal(events[0].type,'mta:ai-terminal');assert.equal(events[0].detail.job_id,'task');

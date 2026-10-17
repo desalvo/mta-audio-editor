@@ -91,6 +91,9 @@ def _worker_failure(stderr: str, exit_code: int) -> dict:
     for marker, code in (
         ('attempted relative import with no known parent package', 'worker_import_context'),
         ('ModuleNotFoundError:', 'worker_dependency_missing'),
+        ('ROCm requested but unavailable', 'worker_rocm_unavailable'),
+        ('Expected one of cpu, cuda', 'worker_invalid_device'),
+        ('torch.OutOfMemoryError:', 'worker_out_of_memory'),
         ('AI cgroup launch failed:', 'cgroup_launch_failed'),
         ('Connection refused', 'ace_connection_refused'),
         ('HTTP Error 401', 'ace_unauthorized'),

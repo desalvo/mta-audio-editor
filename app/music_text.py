@@ -356,7 +356,13 @@ def native_ai_device() -> str:
     whenever the bundled runtime exposes it.
     """
     forced = os.getenv("MTA_AI_DEVICE", "").strip()
-    if forced:
+    if forced.lower() == "rocm":
+        import torch
+        if not torch.cuda.is_available() or not getattr(torch.version, 'hip', None):
+            raise RuntimeError("ROCm requested but unavailable in the configured AI runtime")
+        # PyTorch exposes AMD/HIP devices through its cuda device API.
+        return "cuda"
+    if forced and forced.lower() != "auto":
         return forced
     try:
         import torch  # type: ignore

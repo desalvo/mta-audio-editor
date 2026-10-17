@@ -1,0 +1,27 @@
+{
+  "release": "0.3.0-r210",
+  "baseline": "MTA-r210-stem-dialog-server-runtime-cumulative.zip",
+  "targeted": {
+    "tests": 69,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 69
+  },
+  "full": {
+    "tests": 3540,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 5,
+    "passed": 3535
+  },
+  "coverage_percent": 75.03,
+  "deselected": 10,
+  "not_executed": [
+    "Real server Whisper inference and original worker stderr confirmation",
+    "SAM ROCm validation",
+    "Real EL10 cleanup and stem separation"
+  ],
+  "git_actions": [],
+  "production_actions": []
+}

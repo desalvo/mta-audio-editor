@@ -2865,13 +2865,15 @@ function uploadWithProgress(url,formData,title){
 }
 async function pollMediaJob(jobId,title,onDone,onFinish=null,origin=null){
   origin ||= $('#utilityBody')?.firstElementChild;
+  window.mtaAiJobs?.origin?.(jobId,origin);
   clearTimeout(mediaProgressTimer);
   try{
     const job=await api(`/api/media-jobs/${jobId}`);
+    if(['completed','failed','cancelled'].includes(job.status))window.mtaAiJobs?.terminal?.(jobId);
     const live=mediaPartialText(job);
     const visible=!!(origin?.isConnected&&!origin.closest('.hidden'));
-    if(visible){showMediaProgress(title,job.progress,job.message,live||job.error||'',job.cancel_supported&&['queued','running'].includes(job.status)?jobId:'');origin=$('#utilityBody')?.firstElementChild;}
-    if(job.status==='completed'){setMobileBusy(false);try{await onDone(job);if(visible&&typeof window!=='undefined')window.mtaAiJobs?.handled?.(jobId);}finally{if(onFinish)onFinish(job)}return}
+    if(visible){showMediaProgress(title,job.progress,job.message,live||job.error||'',job.cancel_supported&&['queued','running'].includes(job.status)?jobId:'');origin=$('#utilityBody')?.firstElementChild;window.mtaAiJobs?.origin?.(jobId,origin);}
+    if(job.status==='completed'){setMobileBusy(false);try{await onDone(job,visible);if(visible&&typeof window!=='undefined')window.mtaAiJobs?.handled?.(jobId);}finally{if(onFinish)onFinish(job)}return}
     if(job.status==='failed'||job.status==='cancelled'){setMobileBusy(false);if(visible&&typeof window!=='undefined')window.mtaAiJobs?.handled?.(jobId);if(onFinish)onFinish(job);toast(job.status==='cancelled'?'Estrazione annullata':(job.error||'Operazione fallita'));return}
     mediaProgressTimer=setTimeout(()=>pollMediaJob(jobId,title,onDone,onFinish,origin),500);
   }catch(e){setMobileBusy(false);if(onFinish)onFinish(null);toast(e.message)}
@@ -4577,7 +4579,7 @@ function showUtilityModal(title,html,stemProgress=false){
   resetUtilityModalGeometry();
   $('#utilityTitle').textContent=trDynamic(title);$('#utilityBody').innerHTML=html;$('#utilityBackdrop').classList.remove('hidden');applyInterfaceLanguage($('#utilityBackdrop'));
 }
-function closeUtilityModal(){if(document.querySelector('.utility-modal.lyrics-chords-editor-modal')&&lyricsChordsEditorHasChanges())return closeLyricsChordsEditor();if(activeStemJob){toast('La separazione è in corso: usa Annulla separazione se vuoi interromperla.');return}if(document.querySelector('.utility-modal .export-dialog')&&(playAudio||trackPlaybacks.length||playbackPaused||playbackBuffering))stopPlayback();$('#utilityBackdrop').classList.add('hidden');resetUtilityModalGeometry();sampleEditorState=null;clearTimeout(sampleEditorPreviewTimer);sampleEditorPreviewTimer=null;forceNativeViewportTop()}
+function closeUtilityModal(){if(document.querySelector('.utility-modal.lyrics-chords-editor-modal')&&lyricsChordsEditorHasChanges())return closeLyricsChordsEditor();if(activeStemJob){toast('La separazione è in corso: usa Annulla separazione se vuoi interromperla.');return}if(document.querySelector('.utility-modal .export-dialog')&&(playAudio||trackPlaybacks.length||playbackPaused||playbackBuffering))stopPlayback();window.mtaAiJobs?.closeOrigin?.($('#utilityBody')?.firstElementChild);$('#utilityBackdrop').classList.add('hidden');resetUtilityModalGeometry();sampleEditorState=null;clearTimeout(sampleEditorPreviewTimer);sampleEditorPreviewTimer=null;forceNativeViewportTop()}
 function exportProjectArchive(){if(!current){toast('Apri prima un progetto');return}window.location.href=`/api/projects/${current.id}/archive`}
 async function deleteCurrentProject(){if(!current){toast('Apri prima un progetto');return}await deleteProjectFromWorkspace(current.id,current.title)}
 $('#projectArchiveFile').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;if(!await prepareProjectLeave()){e.target.value='';return}const fd=new FormData();fd.append('file',f);try{current=await api('/api/project-archives/import',{method:'POST',body:fd});rememberRecentProject(current.id);selectedTrackId=current.tracks[0]?.id||null;resetProjectUiForOpen();resetSessionHistory();render();await refresh();toast('Progetto completo importato')}catch(err){toast('Import progetto fallito: '+err.message)}finally{e.target.value=''}})
@@ -4812,14 +4814,14 @@ window.addEventListener('pywebviewready',exposeNativeSettings);
 
 async function openAiModelManager(){try{const d=await api('/api/ai-models'),l=d.lyrics||{},c=d.chords||{};const btn=(kind,id,label,action='download',danger=false)=>`<button class="utility-btn ai-model-action-btn ${danger?'danger-action':'secondary'}" onclick="manageAiModel('${kind}','${esc(id)}','${action}')">${esc(label)}</button>`;const lrows=(l.models||[]).map(m=>`<tr><td>${esc(m.display_name)}</td><td>OpenAI Whisper</td><td>${m.installed?'Installato':'On-demand'}</td><td><div class="ai-model-actions">${btn('lyrics',m.id,m.installed?'Verifica / riscarica':'Scarica')}${m.installed?btn('lyrics',m.id,'Elimina','delete',true):''}</div></td></tr>`).join('');const crows=(c.models||[]).map(m=>`<tr><td>${esc(m.display_name)}</td><td>${esc(m.engine)}</td><td>${m.installed?'Installato':'On-demand'}</td><td><div class="ai-model-actions">${btn('chords',m.id,m.installed?'Verifica / riscarica':'Scarica')}${m.installed?btn('chords',m.id,'Elimina','delete',true):''}</div><small>${esc(m.license||'')}</small></td></tr>`).join('');showUtilityModal(`AI models · ${d.storage==='local'?'locale':'server'}`,`<h3>Lyrics</h3><div class="table-scroll"><table><thead><tr><th>Modello</th><th>Motore</th><th>Stato</th><th>Azioni</th></tr></thead><tbody>${lrows}</tbody></table></div><h3>Chords</h3><div class="table-scroll"><table><thead><tr><th>Modello</th><th>Motore</th><th>Stato</th><th>Azioni</th></tr></thead><tbody>${crows}</tbody></table></div><p class="hint">Nella web app i modelli sono conservati sul server; nelle applicazioni native sono conservati localmente. I profili Fast/Accurate/Maximum scelgono automaticamente i recognizer disponibili. ChordFormer e BTC-HCQT sono scaricabili on-demand; Chordino e MTA Chromagram non richiedono pesi AI.${d.accelerator?.device?`<br>Acceleratore AI: <b>${esc(d.accelerator.device)}</b>${d.accelerator.hardware_accelerated?' · attivo':' · CPU fallback'}`:''}</p>`)}catch(e){toast(e.message)}}
 async function pollModelDownloadJob(jobId,title,onDone){
-  try{const job=await api(`/api/media-jobs/${jobId}`);showMediaProgress(title,job.progress,job.message,job.error||'');if(job.status==='completed'){setMobileBusy(false);await onDone(job);return}if(job.status==='failed'){setMobileBusy(false);toast(job.error||'Download modello fallito');return}setTimeout(()=>pollModelDownloadJob(jobId,title,onDone),500)}catch(e){setMobileBusy(false);toast(e.message)}
+  return pollMediaJob(jobId,title,onDone);
 }
 async function startModelDownload(kind,id,onDone){
   const title=`Download modello ${kind==='lyrics'?'Lyrics':'Chords'}`;
   const job=await api(`/api/ai-models/${kind}/${encodeURIComponent(id)}/download-jobs`,{method:'POST'});
   showMediaProgress(title,job.progress,job.message);pollModelDownloadJob(job.id,title,onDone||(()=>{}));
 }
-async function manageAiModel(kind,id,action){try{if(action==='delete'){await api(`/api/ai-models/${kind}/${encodeURIComponent(id)}`,{method:'DELETE'});pluginInfo=await api('/api/plugins');openAiModelManager();return}await startModelDownload(kind,id,async()=>{pluginInfo=await api('/api/plugins');openAiModelManager();toast('Modello pronto')})}catch(e){toast(e.message)}}
+async function manageAiModel(kind,id,action){try{if(action==='delete'){await api(`/api/ai-models/${kind}/${encodeURIComponent(id)}`,{method:'DELETE'});pluginInfo=await api('/api/plugins');openAiModelManager();return}await startModelDownload(kind,id,async(job,visible)=>{pluginInfo=await api('/api/plugins');if(visible)openAiModelManager();toast('Modello pronto')})}catch(e){toast(e.message)}}
 async function openNativeModelManager(){
  const b=await waitForNativeApi();if(!b?.list_local_models)return toast(tr('Native model manager unavailable','Gestione modelli nativi non disponibile'));
  try{
@@ -5985,6 +5987,6 @@ document.addEventListener('keydown',event=>{
   aiArrangerTab(keys[next]);document.getElementById('aiTab-'+keys[next])?.focus();
 });
 window.mtaPrepareAiTerminal=async job=>{
-  if(job.state!=='completed')return;
+  if(job.state!=='completed'||String(job.operation).startsWith('download-')||!job.project_id)return;
   await reconcileAiProject(job.project_id);
 };
