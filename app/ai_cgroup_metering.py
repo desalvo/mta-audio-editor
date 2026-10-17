@@ -72,7 +72,10 @@ class _BoundedStderr:
 def _safe_worker_error(stderr: str) -> str:
     """Return a restricted diagnostic; never log arbitrary stderr verbatim."""
     lines = []
-    for raw in stderr.splitlines()[-15:]:
+    # Nested Demucs/SAM subprocess tracebacks can put more than 15 frames
+    # between the original exception and CalledProcessError. Scan the bounded
+    # tail, retaining only the same restricted exception summaries below.
+    for raw in stderr[-_ERROR_TAIL_LIMIT:].splitlines():
         # Keep exception identity and common runtime errors; do not reproduce
         # user prompts, request bodies, traceback file paths or credential dumps.
         match = re.match(r'^([\w.]+(?:Error|Exception|Warning)|RuntimeError|OSError|Exception):\s*(.*)$', raw.strip())

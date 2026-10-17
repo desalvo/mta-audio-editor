@@ -1,0 +1,29 @@
+{
+  "release": "0.3.0-r210",
+  "baseline": "MTA-r210-stem-audio-codec-diagnostics-cumulative.zip",
+  "targeted": {
+    "tests": 17,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 17
+  },
+  "full": {
+    "tests": 3555,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 5,
+    "passed": 3550
+  },
+  "deselected": 10,
+  "test_environment": "CI test mode MTA_ALLOW_INSECURE_NO_AUTH=true; local cmake added to PATH. No production configuration changes.",
+  "root_cause_reproduced": "Metadata-only root handler suppresses logging.lastResort; existing worker errors disappear from stderr under default Uvicorn logging.",
+  "stem_inference_root_cause": "Not identified: supplied journal contains HTTP access records only. New target inference required to obtain existing restricted exception summary.",
+  "not_executed": [
+    "Real Demucs/ROCm inference",
+    "Target server deployment",
+    "10 AF_UNIX socket cases forbidden by runner"
+  ],
+  "git_actions": [],
+  "production_actions": []
+}

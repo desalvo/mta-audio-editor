@@ -1,0 +1,8 @@
+{
+  "before": {
+    "worker_error_on_stderr": false
+  },
+  "after": {
+    "worker_error_on_stderr": true
+  }
+}

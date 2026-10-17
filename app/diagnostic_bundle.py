@@ -86,7 +86,17 @@ class SafeEvents(logging.Handler):
 def install_event_capture():
     global _HANDLER_INSTALLED
     if not _HANDLER_INSTALLED:
-        logging.getLogger().addHandler(SafeEvents())
+        root = logging.getLogger()
+        # A metadata-only handler suppresses logging.lastResort even when it
+        # discards the record (including when diagnostics are disabled). Uvicorn
+        # configures its own loggers, not the root logger: preserve the previous
+        # stderr/journal fallback before attaching our diagnostic collector.
+        if not root.handlers:
+            console = logging.StreamHandler()
+            console.setLevel(logging.WARNING)
+            console.setFormatter(logging.Formatter('%(levelname)s: %(name)s: %(message)s'))
+            root.addHandler(console)
+        root.addHandler(SafeEvents())
         _HANDLER_INSTALLED = True
 
 
