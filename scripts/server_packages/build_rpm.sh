@@ -30,7 +30,7 @@ cp -a "$root/wheelhouse" "$work/SOURCES/wheelhouse"
 cp "$(dirname "$0")"/*.service "$(dirname "$0")"/*.timer "$work/SOURCES/"
 cp "$(dirname "$0")/postinst" "$work/SOURCES/"
 cp "$(dirname "$0")/install_runtime.py" "$work/SOURCES/"
-cp "$(dirname "$0")/../install_ace_step.sh" "$(dirname "$0")/../install_rocm_userspace.sh" "$work/SOURCES/"
+cp "$(dirname "$0")/../install_ace_step.sh" "$(dirname "$0")/../install_rocm_userspace.sh" "$(dirname "$0")/../install_demucs.py" "$work/SOURCES/"
 cat > "$work/SPECS/mta-server.spec" <<'SPEC'
 Name: mta-audio-editor-server
 Version: %{getenv:MTA_RPM_VERSION}
@@ -49,6 +49,7 @@ chmod 755 %{buildroot}/usr/lib/mta-audio-editor-server/app/ace_step_http_worker.
 cp %{_sourcedir}/install_runtime.py %{buildroot}/usr/lib/mta-audio-editor-server/install_runtime.py
 mkdir -p %{buildroot}/usr/lib/mta-audio-editor-server/native-installers
 install -m 755 %{_sourcedir}/install_ace_step.sh %{buildroot}/usr/lib/mta-audio-editor-server/native-installers/install_ace_step.sh
+install -m 755 %{_sourcedir}/install_demucs.py %{buildroot}/usr/lib/mta-audio-editor-server/native-installers/install_demucs.py
 install -m 755 %{_sourcedir}/install_rocm_userspace.sh %{buildroot}/usr/lib/mta-audio-editor-server/native-installers/install_rocm_userspace.sh
 cp -a %{_sourcedir}/wheelhouse/. %{buildroot}/usr/share/mta-audio-editor-server/wheelhouse/
 cp %{_sourcedir}/*.service %{_sourcedir}/*.timer %{buildroot}/usr/lib/systemd/system/

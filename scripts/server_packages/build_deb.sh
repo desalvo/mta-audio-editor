@@ -53,6 +53,7 @@ cp -a "$stage/wheelhouse/." "$root/usr/share/mta-audio-editor-server/wheelhouse/
 cp "$(dirname "$0")/install_runtime.py" "$root/usr/lib/mta-audio-editor-server/install_runtime.py"
 install -d -m 755 "$root/usr/lib/mta-audio-editor-server/native-installers"
 install -m 755 "$(dirname "$0")/../install_ace_step.sh" "$root/usr/lib/mta-audio-editor-server/native-installers/install_ace_step.sh"
+install -m 755 "$(dirname "$0")/../install_demucs.py" "$root/usr/lib/mta-audio-editor-server/native-installers/install_demucs.py"
 install -m 755 "$(dirname "$0")/../install_rocm_userspace.sh" "$root/usr/lib/mta-audio-editor-server/native-installers/install_rocm_userspace.sh"
 cp "$(dirname "$0")/mta-server.service" "$root/usr/lib/systemd/system/mta-server.service"
 cp "$(dirname "$0")/mta-billing-scheduler.service" "$root/usr/lib/systemd/system/mta-billing-scheduler.service"

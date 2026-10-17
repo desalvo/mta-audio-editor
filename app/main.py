@@ -317,7 +317,10 @@ def _restore_stem_split_job(pid, payload, job_id):
     if type(payload.get("keep_original_track")) is not bool:
         raise ValueError("Invalid stem track policy")
     source = file_path(pid, category, name)
-    if not source.is_file() or source.is_symlink() or source.stat().st_nlink != 1:
+    from .storage import verified_shared_audio
+    raw_root = pdir(pid) / ('audio' if category == 'audio' else 'originals')
+    if (raw_root.is_symlink() or (raw_root/name).is_symlink() or not source.is_file()
+            or (source.stat().st_nlink != 1 and not (category == 'audio' and verified_shared_audio(source)))):
         raise ValueError("Missing or unsafe durable stem source")
     if not isinstance(options.get("model"), str) or not options["model"]:
         raise ValueError("Invalid stem model")
@@ -1276,6 +1279,15 @@ def vst3_parameters(request: Request, path: str):
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
+def _stem_runtime_status():
+    status = STEM_SPLITTER.status()
+    if NATIVE_SINGLE_USER:
+        from . import native_ai_routing
+        if native_ai_routing.is_remote('demucs'):
+            status = {**status, 'available': True, 'runtime': 'remote', 'execution': 'ai-queue'}
+    return status
+
+
 @app.get("/api/plugins")
 def plugins():
     manifest = plugin_manifest()
@@ -1285,7 +1297,7 @@ def plugins():
         "custom": manifest["custom"],
         "factory_params": manifest["factory_params"],
         "notes": manifest["notes"],
-        "stem_splitter": {**STEM_SPLITTER.status(), "lead_backing": _lead_backing_catalog()},
+        "stem_splitter": {**_stem_runtime_status(), "lead_backing": _lead_backing_catalog()},
         "text_models": ai_catalog(native=NATIVE_SINGLE_USER),
     }
 
@@ -2202,6 +2214,18 @@ def project_file_list(pid: str, request: Request):
     return project_files(pid)
 
 
+@app.post('/api/projects/{pid}/files/cleanup')
+def project_media_cleanup(pid: str, request: Request, body: dict):
+    _project_for_actor(request, pid)
+    if set(body) != {'remove_unused_library'} or type(body['remove_unused_library']) is not bool:
+        raise HTTPException(400, 'Explicit library cleanup policy required')
+    from .project_media_usage import cleanup
+    try:
+        return cleanup(pid, remove_unused_library=body['remove_unused_library'])
+    except ValueError as exc:
+        raise HTTPException(409, str(exc)) from exc
+
+
 @app.post("/api/projects/{pid}/files/upload")
 async def project_file_upload(pid: str, request: Request, file: UploadFile = File(...)):
     project=_project_for_actor(request, pid)
@@ -3112,7 +3136,8 @@ def _text_music_worker(job_id: str, pid: str, track_id: str, kind: str, model_or
 
 def _start_text_music_job(pid: str, track_id: str, request: Request, kind: str, model_or_engine: str = "", advanced_alignment: bool = False, chord_options: dict | None = None, range_start_ms: int | None = None, range_end_ms: int | None = None):
     project = _project_for_actor(request, pid)
-    if not any(item.id == track_id for item in project.tracks):
+    track = next((item for item in project.tracks if item.id == track_id), None)
+    if track is None:
         raise HTTPException(404, "track not found")
     if kind == "lyrics":
         if not (NATIVE_SINGLE_USER and __import__('app.native_ai_routing',fromlist=['is_remote']).is_remote('whisper')) and not lyrics_engine_available():
@@ -3145,6 +3170,7 @@ def _start_text_music_job(pid: str, track_id: str, request: Request, kind: str, 
     payload = {
         "schema_version": 1, "kind": kind, "project_id": pid,
         "track_id": track_id, "model_or_engine": model_or_engine,
+        "source_category": "audio", "source_name": track.filename,
         "advanced_alignment": bool(advanced_alignment),
         "chord_options": chord_options, "range_start_ms": range_start_ms,
         "range_end_ms": range_end_ms,
@@ -3504,10 +3530,19 @@ def _youtube_import_worker(
                 ext = ".m4a"
             filename = f"{uuid.uuid4().hex[:10]}{ext}"
             dst = audio_path(pid, filename)
-            shutil.copy2(source, dst)
+            from .ai_async_track_transaction import begin, preserve_job_original, _receipt
+            from .ai_media_identity import record
+            from .ai_project_lock import project_publication_lock
+            with project_publication_lock(pid):
+                begin(pid, job_id, filename)
+                with source.open('rb') as inp, dst.open('xb') as out:
+                    record(_receipt(pid, job_id), dst)
+                    shutil.copyfileobj(inp, out)
+                    out.flush(); os.fsync(out.fileno())
             title = str(info.get("title") or requested_name or "YouTube audio").strip()[:200]
             safe_title = SAFE_DOWNLOAD_RE.sub("_", title).strip(" ._")[:120] or "youtube-audio"
-            preserve_original(pid, dst, safe_title + ext)
+            with project_publication_lock(pid):
+                preserve_job_original(pid, job_id, dst, safe_title + ext)
         first_track = len(project.tracks) == 0
         _media_job_update(job_id, progress=55, message="Import della traccia nel progetto")
         _track_import_worker(
@@ -3518,6 +3553,14 @@ def _youtube_import_worker(
     except Exception as exc:
         LOGGER.exception("YouTube import job %s failed", job_id)
         _media_job_update(job_id, status="failed", progress=0, message="Import YouTube fallito", error=str(exc)[-1200:])
+    finally:
+        from .ai_async_track_transaction import reconcile
+        from .ai_project_lock import project_publication_lock
+        try:
+            with project_publication_lock(pid):
+                reconcile(pid, job_id)
+        except Exception:
+            LOGGER.exception('YouTube receipt could not be finalized for %s', job_id)
 
 
 @app.post("/api/projects/{pid}/youtube-import-jobs")
@@ -5529,13 +5572,15 @@ def start_track_stem_job(
     singer_target: str = "all",
 ):
     project = _project_for_actor(request, pid)
-    if not STEM_SPLITTER.available():
+    from . import native_ai_routing
+    remote_demucs = NATIVE_SINGLE_USER and native_ai_routing.is_remote('demucs')
+    if not remote_demucs and not STEM_SPLITTER.available():
         raise HTTPException(503, "Demucs stem plugin is not installed in this runtime")
     stem_status = STEM_SPLITTER.status()
     supported_counts = [int(value) for value in stem_status.get("supported_stem_counts", [])]
     if stem_count != 0 and (stem_count < 2 or stem_count > 64):
         raise HTTPException(400, "Unsupported stem count")
-    if stem_count and stem_count not in supported_counts:
+    if stem_count and stem_count not in supported_counts and not remote_demucs:
         raise HTTPException(400, f"No configured model provides {stem_count} stems")
     if stem_count == 2:
         model = "htdemucs" if model not in {"htdemucs", "htdemucs_ft"} else model
@@ -5544,7 +5589,7 @@ def start_track_stem_job(
         if profiles and (model not in stem_status["models"] or next((int(item.get("stem_count", 0)) for item in stem_status.get("model_profiles", []) if item.get("model") == model), -1) != stem_count):
             model = str(profiles[0]["model"])
     status = STEM_SPLITTER.status()
-    if model not in status["models"]:
+    if model not in status["models"] and not remote_demucs:
         raise HTTPException(400, "Modello di separazione non supportato.")
     requested_targets = {item.strip().lower() for item in stem_targets.split(",") if item.strip()}
     if not requested_targets or not requested_targets <= _STEM_TARGETS or ("all" in requested_targets and len(requested_targets) > 1):

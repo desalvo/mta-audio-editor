@@ -7,6 +7,7 @@ from pathlib import Path
 REQUIRED = (
     '/usr/lib/mta-audio-editor-server/native-installers/install_ace_step.sh',
     '/usr/lib/mta-audio-editor-server/native-installers/install_rocm_userspace.sh',
+    '/usr/lib/mta-audio-editor-server/native-installers/install_demucs.py',
 )
 
 

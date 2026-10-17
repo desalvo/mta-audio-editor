@@ -717,7 +717,7 @@ function toolbarHtml(){
     <button class="toolbar-action emphasis" onclick="openStemWorkflow()">▥ Import &amp; Separate</button>
     <button class="toolbar-action" onclick="openYoutubeImport()" title="Importa solo audio da un singolo video YouTube">▶ Import YouTube</button>
     <button class="toolbar-action" onclick="openMetronomeSettings()" title="Configura e crea metronomo">♩ Metronomo</button><button class="toolbar-action" onclick="openAdaptiveMetronomeShift()" title="Sposta il metronomo adattivo in millisecondi o beat">↔ Shift adattivo</button><button class="toolbar-action" onclick="createChordsTrack()" title="Crea o rigenera una sola traccia Chords con piano digitale sincronizzato agli accordi del progetto">♬ Chords</button>
-    <div class="toolbar-group"><input id="newTrackFile" type="file" accept=".mp3,.wav,.flac,.m4a,audio/*" onchange="addTrack()"><select id="newSync"><option value="manual">Manual sync</option><option value="auto">Auto sync</option></select><input id="newOffset" type="number" value="0" title="Offset ms" style="width:72px"><select id="newRef" style="max-width:115px">${refs}</select><button class="toolbar-action" onclick="addTrack()">♫ Import Audio Track</button></div>
+    <div class="toolbar-group"><input id="newTrackFile" type="file" hidden accept=".mp3,.wav,.flac,.m4a,audio/*" onchange="addTrack()"><select id="newSync"><option value="manual">Manual sync</option><option value="auto">Auto sync</option></select><input id="newOffset" type="number" value="0" title="Offset ms" style="width:72px"><select id="newRef" style="max-width:115px">${refs}</select></div>
     <div class="toolbar-sep"></div><button id="undoBtn" class="toolbar-action" onclick="undoEdit()">↶ Undo</button><button id="redoBtn" class="toolbar-action" onclick="redoEdit()">↷ Redo</button><button class="toolbar-action" onclick="cutTimelineSelection()">✂ Cut</button><button class="toolbar-action" onclick="copyTimelineSelection()">⧉ Copy</button><button id="pasteBtn" class="toolbar-action" onclick="pasteTimelineSelection()">▣ Paste</button><button class="toolbar-action danger" onclick="removeTimelineSelection()">⌫ Remove</button><div class="toolbar-grow"></div><span class="selected-track-count" id="selectedTrackCount">${selectedTrackIds().length} selected</span><span class="selection-info" id="selectionInfo">0.000 → 0.000 s</span>
   </div>`
 }
@@ -4535,7 +4535,7 @@ async function manageProjectFiles(){
       const deletable=!f.referenced&&f.category!=='source';
       return `<tr>
         <td>${deletable?`<input class="project-file-check" type="checkbox" data-category="${esc(f.category)}" data-name="${encodeURIComponent(f.name)}">`:''}</td>
-        <td>${esc(f.category)}</td><td>${esc(f.name)}</td><td>${(f.size/1024/1024).toFixed(2)} MB</td><td>${f.referenced?'in uso':''}</td>
+        <td>${esc(f.category)}</td><td>${esc(f.name)}</td><td>${(f.size/1024/1024).toFixed(2)} MB</td><td>${f.pending_job?tr('Pending job / publication','Job o pubblicazione in attesa'):f.timeline?tr('Used on timeline','Usato nella timeline'):f.reusable?tr('Reusable library · removable','Libreria riutilizzabile · eliminabile'):''}</td>
         <td><a class="mini-link" href="/api/projects/${current.id}/files/${encodeURIComponent(f.category)}/${encodeURIComponent(f.name)}">Scarica</a>${deletable?` <button onclick="deleteProjectFile('${esc(f.category)}','${encodeURIComponent(f.name)}')">Elimina</button>`:''}</td>
       </tr>`;
     }).join('');
@@ -4545,9 +4545,10 @@ async function manageProjectFiles(){
         <button class="utility-btn secondary" onclick="toggleAllProjectFiles(true)">Seleziona tutti</button>
         <button class="utility-btn secondary" onclick="toggleAllProjectFiles(false)">Deseleziona</button>
         <button class="utility-btn danger-action" onclick="deleteSelectedProjectFiles()">Elimina selezionati</button>
+        <button class="utility-btn" onclick="cleanupUnusedProjectMedia()">${tr('Clean unused media','Pulisci media inutilizzati')}</button>
       </div>
       <div class="table-scroll"><table class="users-table"><thead><tr><th></th><th>Tipo</th><th>File</th><th>Dimensione</th><th>Stato</th><th>Azioni</th></tr></thead><tbody>${rows||'<tr><td colspan="6">Nessun file.</td></tr>'}</tbody></table></div>
-      <p class="hint">I file in uso e il source MTA non sono selezionabili. I dump completi includono project.json, audio, attachment, source MTA e originali.</p>`);
+      <p class="hint">I media della timeline, dei job e il source MTA non sono selezionabili. Le clip riutilizzabili sono eliminabili insieme al relativo file. La pulizia automatica conserva originali e allegati. I dump completi includono project.json, audio, attachment, source MTA e originali.</p>`);
     $('#extraProjectFile').addEventListener('change',uploadExtraProjectFile);
   }catch(e){toast(e.message)}
 }
@@ -4558,12 +4559,17 @@ async function deleteSelectedProjectFiles(){
   if(!confirm(`Eliminare ${selected.length} file selezionati?`))return;
   try{
     const result=await api(`/api/projects/${current.id}/files/batch-delete`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(selected)});
+    current=await api(`/api/projects/${current.id}`);if(result.deleted?.some(f=>f.category==='audio'))resetSessionHistory();render();await syncNativeProjectFile(current.id);
     await manageProjectFiles();
     toast(result.ok?`${selected.length} file eliminati`:`Eliminati ${result.deleted.length} file; ${result.errors.length} non eliminati`);
   }catch(e){toast(e.message)}
 }
 async function uploadExtraProjectFile(e){const f=e.target.files[0];if(!f)return;const fd=new FormData();fd.append('file',f);try{const r=await api(`/api/projects/${current.id}/files/upload`,{method:'POST',body:fd});await manageProjectFiles();toast(r.duplicate?'File già presente: nessuna copia aggiunta':'File caricato')}catch(err){toast(err.message)}}
-async function deleteProjectFile(category,name){name=decodeURIComponent(name);if(!confirm(`Eliminare ${name}?`))return;try{await api(`/api/projects/${current.id}/files/${encodeURIComponent(category)}/${encodeURIComponent(name)}`,{method:'DELETE'});await manageProjectFiles()}catch(e){toast(e.message)}}
+async function deleteProjectFile(category,name){name=decodeURIComponent(name);if(!confirm(`Eliminare ${name}?`))return;try{await api(`/api/projects/${current.id}/files/${encodeURIComponent(category)}/${encodeURIComponent(name)}`,{method:'DELETE'});current=await api(`/api/projects/${current.id}`);if(category==='audio')resetSessionHistory();render();await syncNativeProjectFile(current.id);await manageProjectFiles()}catch(e){toast(e.message)}}
+async function cleanupUnusedProjectMedia(){
+ if(!current||!confirm(tr('Remove unused library clips, orphan audio and stale temporary files? Timeline and pending-job media, originals and attachments are kept.','Rimuovere clip di libreria inutilizzate, audio orfani e temporanei obsoleti? Media della timeline e dei job, originali e allegati vengono conservati.')))return;
+ try{await save();const r=await api(`/api/projects/${current.id}/files/cleanup`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({remove_unused_library:true})});current=await api(`/api/projects/${current.id}`);if(r.library_removed||r.deleted)resetSessionHistory();render();await syncNativeProjectFile(current.id);await manageProjectFiles();toast(tr('Cleanup complete: ','Pulizia completata: ')+r.deleted+' audio · '+r.library_removed+' clip · '+r.temporary_deleted+' temp');}catch(e){toast(e.message)}
+}
 async function manageProjectSharing(){
   if(!current){toast('Apri prima un progetto');return}
   try{

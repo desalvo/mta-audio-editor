@@ -213,6 +213,22 @@ def promote_project_audio_to_shared(pid: str) -> dict[str, int]:
     return {"promoted": promoted, "linked": linked}
 
 
+def verified_shared_audio(path: Path) -> bool:
+    """Accept hardlinks only to our matching content-addressed regular blob."""
+    try:
+        _validate_shared_tree()
+        before=path.lstat()
+        if not stat.S_ISREG(before.st_mode):return False
+        digest=_sha256_file(path)
+        blob=_shared_blob_path(digest,path.suffix.lower())
+        _validate_blob_parent(blob)
+        if blob.is_symlink() or not blob.is_file() or not os.path.samefile(path,blob):return False
+        after=path.lstat()
+        return ((before.st_dev,before.st_ino,before.st_size,before.st_mtime_ns)==
+                (after.st_dev,after.st_ino,after.st_size,after.st_mtime_ns))
+    except (OSError,ValueError):return False
+
+
 def rescan_shared_media(*, delete_unreferenced: bool = False) -> dict[str, int]:
     """Rebuild the shared-media reference index from every project.
 
@@ -330,8 +346,8 @@ def cleanup_project_preview_cache(pid: str, *, keep_per_track: int = 0) -> dict[
 
 def maintain_project_storage(pid: str) -> dict[str, int]:
     """Opening-time maintenance for project media and rebuildable caches."""
-    reconcile_project_gc(pid, None)
-    gc_result = run_project_gc(pid)
+    from .project_media_usage import cleanup
+    gc_result = cleanup(pid)
     previews = cleanup_project_preview_cache(pid)
     shared = promote_project_audio_to_shared(pid)
     return {**gc_result, **previews, **shared}
@@ -396,9 +412,12 @@ def reconcile_project_gc(pid: str, candidates: set[str] | None = None) -> set[st
     startup, candidates=None additionally discovers orphan files left by a crash
     between the logical-delete commit and journal creation.
     """
-    with _GC_LOCK:
+    from .project_media_usage import lock
+    with lock(pid), _GC_LOCK:
         project = load_project(pid)
         referenced = referenced_audio_files(project)
+        from .project_media_usage import pending_files
+        referenced |= pending_files(pid)[0]['audio']
         queued = _read_gc_queue(pid)
         audio_dir = pdir(pid) / "audio"
         if audio_dir.is_symlink():
@@ -416,10 +435,13 @@ def reconcile_project_gc(pid: str, candidates: set[str] | None = None) -> set[st
 def run_project_gc(pid: str) -> dict[str, int]:
     """Remove only unreferenced, regular audio files from a safe media root."""
     deleted = skipped = 0
-    with _GC_LOCK:
+    from .project_media_usage import lock
+    with lock(pid), _GC_LOCK:
         try:
             project = load_project(pid)
             referenced = referenced_audio_files(project)
+            from .project_media_usage import pending_files
+            referenced |= pending_files(pid)[0]['audio']
             queued = _read_gc_queue(pid)
         except (OSError, ValueError, TypeError):
             return {"deleted": 0, "skipped": 0}
@@ -812,20 +834,27 @@ def preserve_original(pid: str, source: Path, original_name: str) -> Path:
 
 def project_files(pid: str) -> list[dict]:
     project = load_project(pid)
-    referenced_audio = {t.filename for t in project.tracks} | {c.filename for c in project.clip_library}
+    from .project_media_usage import timeline_files,pending_files
+    referenced_audio = timeline_files(project)
+    library = {c.filename for c in project.clip_library}
+    pending,_ = pending_files(pid)
     items: list[dict] = []
     for category, subdir in (("audio","audio"),("attachment","attachments"),("original","originals")):
         base = pdir(pid) / subdir
-        if not base.exists():
+        if base.is_symlink() or not base.exists():
             continue
         for f in sorted(base.iterdir(), key=lambda x: x.name.lower()):
-            if not f.is_file():
+            if f.is_symlink() or not f.is_file() or f.name.startswith('.'):
                 continue
+            busy = f.name in pending.get(category,set())
             items.append({
                 "category": category,
                 "name": f.name,
                 "size": f.stat().st_size,
-                "referenced": category == "audio" and f.name in referenced_audio,
+                "referenced": busy or (category == "audio" and f.name in referenced_audio),
+                "timeline": category == "audio" and f.name in referenced_audio,
+                "reusable": category == "audio" and f.name in library,
+                "pending_job": busy,
             })
     src = pdir(pid) / "source.mta"
     if src.is_file():
@@ -846,15 +875,32 @@ def file_path(pid: str, category: str, filename: str) -> Path:
 
 
 def delete_project_file(pid: str, category: str, filename: str) -> None:
-    project = load_project(pid)
-    if category == "audio" and (any(t.filename == filename for t in project.tracks) or any(c.filename == filename for c in project.clip_library)):
-        raise ValueError("cannot delete an audio file referenced by a track or project clip")
-    if category == "source":
-        raise ValueError("cannot delete the project source file")
-    path = file_path(pid, category, filename)
-    if not path.exists():
-        raise FileNotFoundError(filename)
-    path.unlink()
+    from .project_media_usage import lock,timeline_files,pending_files
+    with lock(pid):
+        project = load_project(pid)
+        path = file_path(pid, category, filename)
+        directory = {'audio':'audio','original':'originals','attachment':'attachments'}.get(category)
+        if directory and ((pdir(pid)/directory).is_symlink() or (pdir(pid)/directory/filename).is_symlink()):
+            raise ValueError('unsafe media link')
+        if category == 'source':
+            raise ValueError('cannot delete the project source file')
+        pending,_ = pending_files(pid)
+        if filename in pending.get(category,set()):
+            raise ValueError('cannot delete media required by a pending job')
+        if category == 'audio' and filename in timeline_files(project):
+            raise ValueError('cannot delete an audio file referenced by a track')
+        if path.is_symlink() or not path.is_file():
+            raise FileNotFoundError(filename)
+        if category == 'audio':
+            # Commit removal from the reusable library before unlinking its media.
+            kept = [clip for clip in project.clip_library if clip.filename != filename]
+            if len(kept) != len(project.clip_library):
+                project.clip_library = kept
+                save_project(project)
+            reconcile_project_gc(pid,{filename})
+            run_project_gc(pid)
+        else:
+            path.unlink()
 
 
 

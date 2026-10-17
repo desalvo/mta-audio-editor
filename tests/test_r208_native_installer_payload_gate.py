@@ -8,11 +8,11 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 CHECK = ROOT / 'scripts/server_packages/verify_native_installers.py'
-INSTALLERS = ('install_ace_step.sh', 'install_rocm_userspace.sh')
+INSTALLERS = ('install_ace_step.sh', 'install_rocm_userspace.sh', 'install_demucs.py')
 
 
 @pytest.mark.skipif(shutil.which('dpkg-deb') is None, reason='dpkg-deb not available')
-@pytest.mark.parametrize('omit', [None, 'install_ace_step.sh', 'install_rocm_userspace.sh'])
+@pytest.mark.parametrize('omit', [None, 'install_ace_step.sh', 'install_rocm_userspace.sh', 'install_demucs.py'])
 def test_deb_payload_gate(tmp_path, omit):
     root = tmp_path / 'package'
     scripts = root / 'usr/lib/mta-audio-editor-server/native-installers'

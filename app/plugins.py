@@ -420,6 +420,9 @@ class DemucsStemSplitter:
 
     @staticmethod
     def available() -> bool:
+        from .demucs_runtime import available
+        if os.getenv('MTA_DEMUCS_PYTHON','').strip():
+            return available()
         return shutil.which("demucs") is not None or importlib.util.find_spec("demucs") is not None
 
     @classmethod
@@ -502,6 +505,9 @@ class DemucsStemSplitter:
         supported_counts = sorted({2, *(int(item["stem_count"]) for item in profiles)})
         return {
             "name": cls.name,
+            "execution": "ai-queue",
+            "device": os.getenv('MTA_DEMUCS_DEVICE','auto'),
+            "runtime": "managed" if os.getenv('MTA_DEMUCS_PYTHON','').strip() else "application",
             "display_name": cls.display_name,
             "available": cls.available(),
             "models": models,
@@ -591,10 +597,15 @@ class DemucsStemSplitter:
                 raise RuntimeError("stem separator produced no WAV files")
             return candidates
 
-        if shutil.which("demucs"):
+        from .demucs_runtime import python_path,device_arguments
+        external_python = python_path()
+        if external_python is not None:
+            cmd = [str(external_python), "-m", "demucs.separate", "-n", model, "--out", str(output_dir)]
+        elif shutil.which("demucs"):
             cmd = ["demucs", "-n", model, "--out", str(output_dir)]
         else:
             cmd = [sys.executable, "-m", "demucs.separate", "-n", model, "--out", str(output_dir)]
+        cmd += device_arguments()
         if local_repo:
             cmd += ["--repo", local_repo]
         if stem_count == 2:

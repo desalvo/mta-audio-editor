@@ -21,6 +21,7 @@ def test_restorer_rebuilds_project_scoped_stem_worker(tmp_path, monkeypatch):
     source = tmp_path / 'original.mp3'
     source.write_bytes(b'fake-mp3')
     monkeypatch.setattr(main, 'file_path', lambda pid, category, name: source)
+    monkeypatch.setattr(main, 'pdir', lambda pid: tmp_path)
     monkeypatch.setattr(main, 'load_project', lambda pid: object())
     job = _request(source)
     payload = main._stem_durable_payload(job, source, True)
@@ -44,6 +45,7 @@ def test_restorer_rejects_wrong_project_missing_source_and_invalid_options(tmp_p
     source = tmp_path / 'original.mp3'
     source.write_bytes(b'fake-mp3')
     monkeypatch.setattr(main, 'file_path', lambda pid, category, name: source)
+    monkeypatch.setattr(main, 'pdir', lambda pid: tmp_path)
     monkeypatch.setattr(main, 'load_project', lambda pid: object())
     payload = main._stem_durable_payload(_request(source), source, True)
     with pytest.raises(ValueError):
@@ -60,6 +62,7 @@ def test_restorer_queued_cancellation_skips_inference(tmp_path, monkeypatch):
     source = tmp_path / 'original.mp3'
     source.write_bytes(b'fake-mp3')
     monkeypatch.setattr(main, 'file_path', lambda pid, category, name: source)
+    monkeypatch.setattr(main, 'pdir', lambda pid: tmp_path)
     monkeypatch.setattr(main, 'load_project', lambda pid: object())
     payload = main._stem_durable_payload(_request(source), source, True)
     called = []

@@ -1,0 +1,30 @@
+Modified baseline files
+app/ai_unified_adapter.py
+app/main.py
+app/plugins.py
+app/static/app.js
+app/storage.py
+app/templates/index.html
+scripts/server_packages/build_deb.sh
+scripts/server_packages/build_rpm.sh
+scripts/server_packages/verify_native_installers.py
+tests/test_r208_native_installer_payload_gate.py
+tests/test_r208_stem_durable_recovery.py
+
+Added files
+app/project_media_usage.py
+app/demucs_runtime.py
+scripts/install_demucs.py
+tests/test_r210_media_stems_cleanup.py
+SERVER_MEDIA_AND_VALIDATION_R210.md
+validation/r210-media-stems-full.log
+validation/r210-media-stems-full.xml
+validation/r210-media-stems-coverage.xml
+validation/r210-media-stems-targeted.log
+validation/r210-media-stems-targeted.xml
+validation/r210-media-stems-integration.log
+validation/r210-media-stems-integration.xml
+validation/r210-media-stems-lint.log
+validation/r210-media-stems-syntax.log
+validation/r210-media-stems-validation.md
+validation/r210-media-stems-changes.txt

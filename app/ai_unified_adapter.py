@@ -21,12 +21,17 @@ SUPPORTED = {'whisper', 'chords-ml', 'demucs', 'drumsep', 'sam-audio', 'singer-s
 
 def _backend_command(plan, folder, backend, arguments):
     from app.ai_torch_diagnostics import enabled
+    python=sys.executable
+    if backend=='demucs':
+        from app.demucs_runtime import python_path
+        configured=python_path()
+        if configured is not None:python=str(configured)
     if enabled():
-        return [sys.executable, str(Path(__file__).with_name('ai_profiled_backend.py')),
+        return [python, str(Path(__file__).with_name('ai_profiled_backend.py')),
                 '--backend', backend, '--task-id', str(plan.get('gpu_profile_task_id', '')),
                 '--report-dir', str(folder), '--', *arguments]
     if backend == 'demucs':
-        return [sys.executable, '-m', 'demucs.separate', *arguments]
+        return [python, '-m', 'demucs.separate', *arguments]
     return [sys.executable, str(Path(__file__).with_name('sam_audio_worker.py')), *arguments]
 
 
@@ -146,7 +151,12 @@ def infer(plan: dict, output: Path) -> None:
         model = str(plan.get('model') or 'htdemucs')
         if not model.replace('_', '').replace('-', '').isalnum() or len(model) > 64:
             raise ValueError('Invalid Demucs model')
-        subprocess.run(_backend_command(plan, folder, 'demucs', ['--name', model, '--out', str(folder/'demucs'), str(source)]), check=True)
+        from app.demucs_runtime import device_arguments
+        count=plan.get('stem_count',0)
+        if type(count) is not int or (count!=0 and not 2<=count<=64):raise ValueError('Invalid stem count')
+        arguments=['--name', model, '--out', str(folder/'demucs'), *device_arguments()]
+        if count==2:arguments+=['--two-stems','vocals']
+        subprocess.run(_backend_command(plan, folder, 'demucs', [*arguments,str(source)]), check=True)
         paths = sorted((folder/'demucs'/model/source.stem).glob('*.wav'))
         if not paths: raise RuntimeError('Demucs produced no stems')
         staged=[]
