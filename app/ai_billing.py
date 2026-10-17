@@ -96,6 +96,24 @@ def _init(c):
         except sqlite3.OperationalError as exc:
             if 'duplicate column' not in str(exc).lower():raise
 
+    columns={r[1] for r in c.execute('PRAGMA table_info(ai_compute_jobs)')}
+    if 'accounting_excluded' not in columns:
+        try:c.execute('ALTER TABLE ai_compute_jobs ADD COLUMN accounting_excluded INTEGER NOT NULL DEFAULT 0 CHECK(accounting_excluded IN (0,1))')
+        except sqlite3.OperationalError as exc:
+            if 'duplicate column' not in str(exc).lower():raise
+
+
+    c.executescript("""CREATE TABLE IF NOT EXISTS ai_job_dispositions(
+      queue_job_id TEXT PRIMARY KEY, disposition TEXT NOT NULL, changed_at INTEGER NOT NULL,
+      actor_id INTEGER NOT NULL, reason TEXT NOT NULL);
+    CREATE TRIGGER IF NOT EXISTS ai_job_exclusion_insert AFTER INSERT ON ai_compute_jobs
+    WHEN EXISTS(SELECT 1 FROM ai_job_dispositions d WHERE d.queue_job_id=NEW.queue_job_id AND d.disposition IN ('disabled','deleted'))
+    BEGIN UPDATE ai_compute_jobs SET accounting_excluded=1 WHERE id=NEW.id; END;
+    CREATE TRIGGER IF NOT EXISTS ai_job_exclusion_link AFTER UPDATE OF queue_job_id ON ai_compute_jobs
+    WHEN EXISTS(SELECT 1 FROM ai_job_dispositions d WHERE d.queue_job_id=NEW.queue_job_id AND d.disposition IN ('disabled','deleted'))
+    BEGIN UPDATE ai_compute_jobs SET accounting_excluded=1 WHERE id=NEW.id; END;
+    """)
+
 
 def user_billing_enabled(user_id: int, *, _connection=None) -> bool:
     with (db() if _connection is None else _borrow_connection(_connection)) as c:
@@ -241,8 +259,8 @@ def provision_inference_job(inference_job_id: str, user_id: int, kind: str) -> s
             raise ValueError('Cannot provision within closed billing period')
         hardware = suggested_prices()
         rates = hardware['suggested_micro_per_unit']
-        c.execute('INSERT INTO ai_compute_jobs(id,user_id,token_id,kind,status,started_at,billable) VALUES(?,?,NULL,?,?,?,1)',
-                  (ledger_id, user_id, kind, 'running', stamp))
+        c.execute('INSERT INTO ai_compute_jobs(id,user_id,token_id,kind,status,started_at,billable,queue_job_id) VALUES(?,?,NULL,?,?,?,1,?)',
+                  (ledger_id, user_id, kind, 'running', stamp,inference_job_id))
         c.execute('INSERT INTO ai_job_hardware_snapshots (job_id,captured_at,model_version,cpu_model,gpu_model,cpu_rate_micro,gpu_rate_micro,storage_rate_micro,origin) VALUES(?,?,?,?,?,?,?,?,?)',
                   (ledger_id, stamp, hardware['model_version'], hardware['cpu_model'], hardware['gpu_model'],
                    rates['cpu_seconds'], rates['gpu_slot_seconds_estimated'], rates['disk_gb_hours'],
@@ -473,9 +491,9 @@ def report(period='month', *, user_id=None, anchor=None, start=None, end=None, _
             _init(c)
         rates = prices(_connection=c)
         if user_id is None:
-            records = c.execute('SELECT * FROM ai_compute_jobs WHERE started_at>=? AND started_at<? ORDER BY started_at,id', (a,b)).fetchall()
+            records = c.execute('SELECT * FROM ai_compute_jobs WHERE accounting_excluded=0 AND started_at>=? AND started_at<? ORDER BY started_at,id', (a,b)).fetchall()
         else:
-            records = c.execute('SELECT * FROM ai_compute_jobs WHERE started_at>=? AND started_at<? AND user_id=? ORDER BY started_at,id', (a,b,user_id)).fetchall()
+            records = c.execute('SELECT * FROM ai_compute_jobs WHERE accounting_excluded=0 AND started_at>=? AND started_at<? AND user_id=? ORDER BY started_at,id', (a,b,user_id)).fetchall()
         # Statistics are independent of user opt-in and never authorize charges.
         hardware_by_job = {}
         for rec in records:
@@ -690,7 +708,7 @@ def reconcile_period(user_id, start, end):
 
     with db() as c:
         _init(c)
-        jobs = c.execute('SELECT * FROM ai_compute_jobs WHERE user_id=? AND started_at<? '
+        jobs = c.execute('SELECT * FROM ai_compute_jobs WHERE accounting_excluded=0 AND user_id=? AND started_at<? '
                          'AND (finished_at IS NULL OR finished_at>=?) ORDER BY started_at,id',
                          (user_id, b, a)).fetchall()
         existing = c.execute('SELECT id FROM ai_billing_periods WHERE user_id=? AND start_ts<? AND end_ts>?',
@@ -780,12 +798,12 @@ def close_period(user_id, start, end):
                                 (user_id,b,a)).fetchone()
         if overlapping:
             raise ValueError('Overlapping billing period already closed')
-        spanning = c.execute('SELECT id FROM ai_compute_jobs WHERE user_id=? AND started_at<? '
+        spanning = c.execute('SELECT id FROM ai_compute_jobs WHERE accounting_excluded=0 AND user_id=? AND started_at<? '
                              'AND started_at<? AND (finished_at IS NULL OR finished_at>=?) AND billable=1 LIMIT 1',
                              (user_id,b,a,a)).fetchone()
         if spanning:
             raise ValueError('A job crossing the billing boundary requires explicit allocation')
-        incomplete = c.execute("SELECT id FROM ai_compute_jobs WHERE user_id=? AND started_at>=? AND started_at<? "
+        incomplete = c.execute("SELECT id FROM ai_compute_jobs WHERE accounting_excluded=0 AND user_id=? AND started_at>=? AND started_at<? "
                                "AND billable=1 AND (status!='done' OR resource_source='unmetered') LIMIT 1",
                                (user_id,a,b)).fetchone()
         if incomplete:
@@ -798,7 +816,7 @@ def close_period(user_id, start, end):
                               "AND (valid_until IS NULL OR valid_until>?) LIMIT 1", (b,a)).fetchone()
         if cpu_rates:
             cpu_jobs = c.execute("SELECT id,usage_json,resource_source FROM ai_compute_jobs "
-                                 "WHERE user_id=? AND started_at>=? AND started_at<? AND status='done' AND billable=1",
+                                 "WHERE accounting_excluded=0 AND user_id=? AND started_at>=? AND started_at<? AND status='done' AND billable=1",
                                  (user_id,a,b)).fetchall()
             for job in cpu_jobs:
                 usage = json.loads(job['usage_json'])
@@ -818,7 +836,7 @@ def close_period(user_id, start, end):
             (b,a)).fetchall()]
         if priced_gpu:
             gpu_jobs = c.execute("SELECT id,usage_json,resource_source FROM ai_compute_jobs "
-                                 "WHERE user_id=? AND started_at>=? AND started_at<? AND status='done' AND billable=1",
+                                 "WHERE accounting_excluded=0 AND user_id=? AND started_at>=? AND started_at<? AND status='done' AND billable=1",
                                  (user_id,a,b)).fetchall()
             for job in gpu_jobs:
                 usage = json.loads(job['usage_json'])

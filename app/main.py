@@ -36,7 +36,7 @@ from .model_updater import (COREML_DIR, ONNX_DIR, start_background_updater, upda
     server_inventory as demucs_server_inventory, blacklist_model as blacklist_demucs_model,
     unblacklist_model as unblacklist_demucs_model, load_blacklist as demucs_blacklist,
     public_catalog as demucs_public_catalog, native_bundle as demucs_native_bundle,
-    delete_local_model as delete_local_demucs_model, model_storage_usage as demucs_model_storage_usage)
+    delete_local_model as delete_local_demucs_model)
 COREML_DEMUCS_MODEL_DIR = Path(os.getenv("MTA_DEMUCS_COREML_MODEL_DIR", str(COREML_DIR))).expanduser()
 ONNX_DEMUCS_MODEL_DIR = Path(os.getenv("MTA_DEMUCS_ONNX_MODEL_DIR", str(ONNX_DIR))).expanduser()
 from .security import auth_failure_response, check_basic_auth
@@ -104,6 +104,8 @@ async def _mta_application_lifespan(_app):
         if not NATIVE_SINGLE_USER:
             from .ai_notifications import stop_service
             stop_service()
+            from .account_lifecycle import stop_service as stop_accounts
+            stop_accounts()
 
 app = FastAPI(title="MTA Audio Editor", version=APP_VERSION, docs_url=None, redoc_url=None, openapi_url=None, lifespan=_mta_application_lifespan)
 from .ai_device_auth import router as ai_device_router
@@ -175,6 +177,8 @@ def _start_background_services():
     if not NATIVE_SINGLE_USER:
         from .ai_notifications import start_service
         start_service()
+        from .account_lifecycle import start_service as start_accounts
+        start_accounts()
     start_background_updater()
     resume_pending_gc()
     if NATIVE_SINGLE_USER:
@@ -272,6 +276,10 @@ NATIVE_BLOCKED_PATH_PREFIXES = (
     "/api/account",
     "/api/admin/",
     "/register",
+    "/registration-availability",
+    "/registration-security",
+    "/login-email-code",
+    "/reactivate-account",
     "/forgot-password",
     "/reset-password",
     "/verify-email",
@@ -534,8 +542,10 @@ def _media_job_public(job: dict) -> dict:
 def _is_public(path: str) -> bool:
     return (
         path.startswith("/static/")
-        or path in {"/health", "/api/health", "/api/about", "/login", "/register", "/verify-email", "/resend-verification", "/forgot-password", "/reset-password"}
+        or path in {"/health", "/api/health", "/api/about", "/oauth-second-factor", "/login", "/register", "/verify-email", "/resend-verification", "/forgot-password", "/reset-password"}
         or path.startswith("/oauth/")
+        or path in {"/registration-availability","/registration-security","/login-email-code","/reactivate-account"}
+        or path.startswith("/account-projects/")
         or path.startswith("/docs/user")
         or path.startswith("/docs/pdf/user")
         or path == "/api/models/catalog"
@@ -695,11 +705,18 @@ def oauth_callback(provider: str, request: Request, code: str="", state: str="",
         return HTMLResponse(_template("message.html",title="Login social non riuscito",message="Richiesta OAuth annullata, scaduta o non valida.",extra=""),status_code=400)
     try:
         profile=oauth_exchange_profile(provider,code,request);user,created=social_login_or_register(provider,profile)
-    except (ValueError,OSError) as exc:
-        LOGGER.warning("OAuth callback failed for %s: %s",provider,exc)
-        return HTMLResponse(_template("message.html",title="Login social non riuscito",message=str(exc),extra=""),status_code=400)
+    except (ValueError,OSError,KeyError,TypeError) as exc:
+        LOGGER.warning("OAuth callback failed for %s: %s",provider,type(exc).__name__)
+        return HTMLResponse(_template("message.html",title="Login social non riuscito",message="Accesso non riuscito. Controlla la configurazione o usa il metodo già associato al tuo account.",extra=""),status_code=400)
+    if not created and user['active'] and user['totp_enabled']:
+        from .social_totp import challenge
+        response=challenge(user['id'],request)
+        response.delete_cookie('mta_oauth_state',path=f'/oauth/{provider}/callback')
+        return response
     if created or not user["active"]:
-        response=HTMLResponse(_template("message.html",title="Registrazione completata",message="La registrazione è stata completata. Il tuo indirizzo email è stato verificato dal provider social, quindi non è richiesta una conferma email separata. Il profilo resta disabilitato finché un amministratore non lo approva; quando verrà approvato riceverai automaticamente un'email di conferma.",extra=""))
+        response=HTMLResponse(_template("message.html",title="Registrazione completata",message="La registrazione è stata completata. Se il provider non certifica l’indirizzo email (Facebook), confermalo tramite il link inviato via email. Il profilo resta disabilitato finché un amministratore non lo approva; quando verrà approvato riceverai automaticamente un'email di conferma.",extra=""))
+    elif not user["email_confirmed"]:
+        response=HTMLResponse(_template("message.html",title="Conferma email",message="Conferma il tuo indirizzo email prima di accedere.",extra=""))
     else:
         token=create_session(user["id"],request);response=RedirectResponse("/",status_code=303);secure=request.url.scheme=="https" or request.headers.get("x-forwarded-proto","").lower()=="https";response.set_cookie("mta_session",token,max_age=12*3600,httponly=True,secure=secure,samesite="lax",path="/")
     response.delete_cookie("mta_oauth_state",path=f"/oauth/{provider}/callback");return response
@@ -761,6 +778,7 @@ async def register_submit(request: Request):
             str(form.get("display_name", "")),
             str(form.get("password", "")),
             base_url=str(request.base_url).rstrip("/"),
+            require_second_factor=True,mfa_method=str(form.get("mfa_method","email")),
         )
     except ValueError as exc:
         return HTMLResponse(_template("register.html", error=_alert(str(exc)), social_buttons=_social_buttons("register")), status_code=400)
@@ -770,7 +788,7 @@ async def register_submit(request: Request):
     return HTMLResponse(_template(
         "message.html",
         title="Registrazione completata - approvazione richiesta",
-        message=f"La registrazione è completata. Abbiamo inviato una mail di conferma a {user['email']}. La conferma dell'email non abilita automaticamente il profilo: l'account resterà disabilitato finché un amministratore non lo approverà. Dopo l'approvazione riceverai automaticamente una mail di conferma dell'abilitazione.",
+        message=f"La registrazione è iniziata. Dopo la verifica email dovrai verificare il secondo fattore scelto. Abbiamo inviato una mail di conferma a {user['email']}. La conferma dell'email non abilita automaticamente il profilo: l'account resterà disabilitato finché un amministratore non lo approverà. Dopo l'approvazione riceverai automaticamente una mail di conferma dell'abilitazione.",
         extra=extra,
     ))
 
@@ -778,6 +796,14 @@ async def register_submit(request: Request):
 @app.get("/verify-email", response_class=HTMLResponse)
 def verify_email_page(token: str = ""):
     ok = bool(token) and confirm_email(token)
+    if ok:
+        from . import account_lifecycle as life
+        with __import__('app.auth',fromlist=['db']).db() as con:
+            row=con.execute('SELECT user_id FROM email_tokens WHERE token_hash=?',(__import__('app.auth',fromlist=['_token_hash'])._token_hash(token),)).fetchone()
+        if row and life.info(row[0])['state']=='enrolling':
+            from .account_routes import enrollment
+            return RedirectResponse(enrollment(row[0]),status_code=303)
+        if row:life.ready(row[0])
     return _template(
         "message.html",
         title="Email confermata" if ok else "Link non valido",
@@ -789,7 +815,13 @@ def verify_email_page(token: str = ""):
 @app.post("/resend-verification", response_class=HTMLResponse)
 async def resend_verification_page(request: Request):
     form = await request.form()
-    resend_verification(str(form.get("identifier", "")), base_url=str(request.base_url).rstrip("/"))
+    from .auth import find_user as lookup_user
+    from .account_lifecycle import info as account_info
+    pending_user=lookup_user(str(form.get('identifier','')))
+    if pending_user and pending_user['email_confirmed'] and account_info(pending_user['id'])['state']=='enrolling':
+        from .account_routes import enrollment
+        enrollment(pending_user['id'])
+    else:resend_verification(str(form.get("identifier", "")), base_url=str(request.base_url).rstrip("/"))
     return _template("message.html", title="Richiesta ricevuta", message="Se l'account esiste e non è ancora confermato, è stato inviato un nuovo messaggio.", extra="")
 
 
@@ -953,7 +985,8 @@ def _workspace_usage_for_user(user_id: int) -> int:
 def _storage_payload(request: Request) -> dict:
     actor = _actor(request)
     disk = shutil.disk_usage(STORAGE_ROOT)
-    model_usage = demucs_model_storage_usage()
+    from .model_storage import usage
+    model_usage = usage()
     users = list_users()
     if actor["role"] != "admin":
         users = [u for u in users if u["id"] == actor["id"]]
@@ -1119,6 +1152,45 @@ def api_admin_smtp_test(request: Request, body: dict):
     except Exception as exc:
         raise HTTPException(400, f"Connessione SMTP fallita: {exc}") from exc
     return {"ok": True}
+
+
+@app.post('/api/admin/smtp/send-test')
+def admin_smtp_send_test(request: Request, body: dict):
+    require_admin(request)
+    from .auth import EMAIL_RE, send_mail
+    recipient=body.get('recipient','')
+    if not isinstance(recipient,str) or len(recipient)>254 or not EMAIL_RE.fullmatch(recipient) or any(c in recipient for c in '\r\n,;'):
+        raise HTTPException(422,'Specifica un solo indirizzo email valido')
+    cfg=body.get('configuration',{})
+    if not isinstance(cfg,dict) or cfg.get('security','starttls') not in ('starttls','smtps','none'):
+        raise HTTPException(422,'Configurazione SMTP non valida')
+    try:
+        from .auth import _smtp_full
+        settings=_smtp_full(cfg)
+        if not 1<=settings['port']<=65535 or not EMAIL_RE.fullmatch(settings['from_email']):raise ValueError('Mittente o porta non validi')
+        server=os.getenv('MTA_PUBLIC_URL') or str(request.base_url).rstrip('/')
+        plain=f'Messaggio di prova SMTP · MTA Audio Editor {APP_RELEASE} · build {BUILD_ID} · {server}'
+        send_mail([recipient],'Test SMTP · MTA Audio Editor',plain,
+            '<html><body style="font-family:Arial;background:#f3f5f8;padding:24px"><main style="max-width:600px;margin:auto;background:white;padding:32px"><img src="cid:mta-logo" width="64" height="64" alt="MTA"><h1>MTA Audio Editor</h1><h2>Prova invio email</h2><p>Il server ha inviato questo messaggio usando la configurazione SMTP indicata.</p><p>'+html.escape(plain)+'</p></main></body></html>',configuration=cfg,inline_image=(Path(__file__).parent/'static/mail-logo.png').read_bytes())
+    except Exception as exc:
+        LOGGER.warning('SMTP test send failed: %s',type(exc).__name__)
+        raise HTTPException(400,'Invio non riuscito: verifica host, sicurezza, credenziali e autorizzazione del mittente') from exc
+    return {'ok':True,'message':'Messaggio accettato dal server SMTP; verifica posta e spam. La consegna finale dipende dal destinatario.'}
+
+
+@app.get('/api/admin/social-login')
+def admin_social_get(request: Request):
+    require_admin(request)
+    from .social_settings import public
+    return public()
+
+
+@app.put('/api/admin/social-login')
+def admin_social_save(request: Request, body: dict):
+    require_admin(request)
+    from .social_settings import save
+    try:return save(body)
+    except (ValueError,TypeError) as exc:raise HTTPException(422,str(exc)) from exc
 
 
 @app.get("/api/admin/projects-dump")
@@ -1713,9 +1785,19 @@ def admin_home(request: Request):
 
 
 @app.get('/api/admin/ai-execution/jobs')
-def admin_ai_execution_jobs(request: Request):
+def admin_ai_execution_jobs(request: Request, search: str='', state: str='', visibility: str='visible', page: int=1, page_size: int=20):
     require_admin(request)
-    return {'jobs': ai_arranger_runtime.list_jobs(), 'max_concurrent_jobs': ai_arranger_runtime._limit(), 'scope': 'shared-ai-admission'}
+    from .ai_queue_admin import query
+    try:return query(search,state,visibility,page=page,page_size=page_size)
+    except ValueError as exc:raise HTTPException(422,str(exc)) from exc
+
+
+@app.post('/api/admin/ai-execution/history')
+def admin_ai_execution_history(request: Request, body: dict):
+    actor=require_admin(request)
+    from .ai_queue_admin import manage
+    try:return manage(actor['id'],body)
+    except ValueError as exc:raise HTTPException(409,str(exc)) from exc
 
 
 @app.get('/api/admin/ai-execution/settings')
@@ -2213,6 +2295,8 @@ def project_put(pid: str, project: Project, request: Request):
             known_clip_files.add(item.filename)
     _ensure_project_clip_library(project)
     try:
+        from .timeline_editing import validate_new_overlaps
+        validate_new_overlaps(current, project)
         validate_project_files(project)
     except ValueError as exc:
         raise HTTPException(400, str(exc)) from exc
@@ -4578,7 +4662,6 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
         project_id = job["project_id"]
         model = job["model"]
         estimate_project_bpm = bool(job.get("estimate_bpm"))
-        stem_name_prefix = str(job.get("stem_name_prefix") or "").strip()
         extract_lyrics_after = bool(job.get("extract_lyrics"))
         extract_chords_after = bool(job.get("extract_chords"))
         split_backing_vocals = bool(job.get("split_backing_vocals"))
@@ -4756,11 +4839,13 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
                     display_name = {"lead_vocals": "Lead Vocals", "backing_vocals": "Backing Vocals", "percussions": "Percussions", "drums_without_percussions": "Drums (no percussions)", "kick": "Kick", "snare": "Snare", "toms": "Toms", "cymbals": "Cymbals"}.get(stem_name, stem.stem.title())
                     if stem_name.startswith("singer_"):
                         display_name = next((entry["name"] for entry in singers if entry["id"] == stem_name), display_name)
-                    if stem_name_prefix:
-                        display_name = f"{stem_name_prefix} · {display_name}"[:200]
+                    from .timeline_editing import unique_track_name
+                    display_name = unique_track_name(project, display_name)
                     new_track = Track(
                             id=uuid.uuid4().hex[:10],
                             name=display_name,
+                            derived_source_track_id=str(job.get("source_track_id") or ""),
+                            derived_stem_key=stem_name,
                             type=kind,
                             filename=filename,
                             duration_ms=duration,
@@ -4782,7 +4867,7 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
                     existing_output = None
                     if original_track_id and ("all" not in stem_targets or (singer_mode and singer_target != "all")):
                         existing_output = next((item for item in project.tracks
-                            if item.id != original_track_id and item.name == display_name), None)
+                            if item.id != original_track_id and item.derived_source_track_id == original_track_id and item.derived_stem_key == stem_name), None)
                     if existing_output is not None:
                         old_filename = existing_output.filename
                         existing_output.filename = new_track.filename
@@ -5782,6 +5867,7 @@ def create_metronome_track(pid: str, request: Request, mode: str = "fixed", trac
 
 def _create_metronome_track_locked(pid: str, request: Request, mode: str = "fixed", track_id: str = "", sensitivity: float = 0.35):
     project = _project_for_actor(request, pid)
+    from .metronome_grid import grid_settings, zone_signature
     duration_ms = project_duration_ms(project)
     if duration_ms <= 0:
         raise HTTPException(400, "Il progetto non ha ancora una durata. Importa almeno una traccia audio prima di creare il metronomo.")
@@ -5806,6 +5892,8 @@ def _create_metronome_track_locked(pid: str, request: Request, mode: str = "fixe
     mode = str(mode or "fixed").strip().lower()
     if mode not in {"fixed", "zones", "adaptive"}:
         raise HTTPException(400, "Tipo metronomo non valido")
+    project.metronome_mode = mode
+    grid_bpm, grid_signature = grid_settings(project)
     filename = track.filename if track and track.filename else f"metronome-{uuid.uuid4().hex[:10]}.wav"
     target_out = audio_path(pid, filename)
     out = target_out.with_name(f".{target_out.stem}.{uuid.uuid4().hex}.tmp.wav")
@@ -5822,7 +5910,7 @@ def _create_metronome_track_locked(pid: str, request: Request, mode: str = "fixe
             raise HTTPException(400, "La traccia di riferimento non contiene audio")
     try:
         beat_times_ms = []
-        if mode == "adaptive" or (reference_track is not None and mode == "fixed"):
+        if mode == "adaptive" or (reference_track is not None and mode == "fixed" and project.metronome_bpm is None):
             # Every adaptive request and every track-referenced request performs a
             # fresh rhythmic analysis. No previous beat/tempo map is reused.
             with tempfile.TemporaryDirectory() as td:
@@ -5841,6 +5929,8 @@ def _create_metronome_track_locked(pid: str, request: Request, mode: str = "fixe
             beat_times_ms = stabilize_adaptive_beats(beat_times_ms, project.metronome_sensitivity)
             # Keep the transport's tempo map aligned to the actual generated clicks.
             tempo_points = [point.model_copy(update={"time_ms": beat_times_ms[i]}) for i, point in enumerate(tempo_points) if i < len(beat_times_ms)]
+            from .timeline_editing import preroll_beats
+            beat_times_ms = preroll_beats(project, beat_times_ms)
             duration_ms = generate_adaptive_metronome_wav(project, out, beat_times_ms)
             project.adaptive_tempo_map = tempo_points
             project.metronome_mode = "adaptive"
@@ -5862,7 +5952,7 @@ def _create_metronome_track_locked(pid: str, request: Request, mode: str = "fixe
                                 zone_bpms[str(start)] = manual_bpm
                                 continue
                             if end-start < 1800:
-                                zone_bpms[str(start)] = float(project.bpm)
+                                zone_bpms[str(start)] = grid_bpm
                                 continue
                             source.setpos(min(source.getnframes(), int(start * rate / 1000)))
                             length = min(source.getnframes()-source.tell(), int((end-start)*rate/1000))
@@ -5874,16 +5964,19 @@ def _create_metronome_track_locked(pid: str, request: Request, mode: str = "fixe
                                 bpm, _ = estimate_bpm_and_signature(excerpt)
                                 zone_bpms[str(start)] = bpm
                             except (ValueError, RuntimeError, OSError):
-                                zone_bpms[str(start)] = float(project.bpm)
-            project.metronome_zone_bpms = {str(start): float(_metronome_manual_for_zone(project, keyed_boundaries[i][1], keyed_boundaries[i+1][1]) or zone_bpms.get(str(start), project.bpm)) for i,start in enumerate(boundaries[:-1])}
+                                zone_bpms[str(start)] = grid_bpm
+            project.metronome_zone_bpms = {str(start): float(_metronome_manual_for_zone(project, keyed_boundaries[i][1], keyed_boundaries[i+1][1]) or zone_bpms.get(str(start), grid_bpm)) for i,start in enumerate(boundaries[:-1])}
+            project.metronome_zone_signatures = {str(start): zone_signature(project, keyed_boundaries[i][1], keyed_boundaries[i+1][1]) for i, start in enumerate(boundaries[:-1])}
             beat_times_ms = zoned_metronome_beats(project, duration_ms, project.metronome_zone_bpms)
             zone_starts = sorted(m.time_ms for m in project.markers if not m.disabled and not m.deleted and 0 < m.time_ms < duration_ms)
-            duration_ms = generate_adaptive_metronome_wav(project, out, beat_times_ms, accent_reset_ms=zone_starts)
+            from .timeline_editing import preroll_beats
+            beat_times_ms = preroll_beats(project, beat_times_ms)
+            duration_ms = generate_adaptive_metronome_wav(project, out, beat_times_ms, accent_reset_ms=zone_starts, zone_signatures=project.metronome_zone_signatures)
             project.metronome_mode = "zones"
             project.metronome_grid_origin_ms = 0
             project.metronome_shift_ms = 0
             project.adaptive_tempo_map = []
-        elif reference_track is not None:
+        elif reference_track is not None and project.metronome_bpm is None:
             # For a fixed metronome referenced to one track, use the freshly
             # detected beat phase and a single robust BPM (median local tempo).
             bpms = sorted(float(point.bpm) for point in tempo_points if float(point.bpm) > 0)
@@ -5907,9 +6000,9 @@ def _create_metronome_track_locked(pid: str, request: Request, mode: str = "fixe
             project.metronome_shift_ms = 0
             project.adaptive_tempo_map = []
         else:
+            project.metronome_grid_origin_ms = project.metronome_start_ms
             duration_ms = generate_metronome_wav(project, out)
             project.metronome_mode = "fixed"
-            project.metronome_grid_origin_ms = 0
             project.metronome_shift_ms = 0
             project.adaptive_tempo_map = []
         project.metronome_reference_track_id = reference_track.id if reference_track is not None else ""
@@ -5952,7 +6045,6 @@ def _create_metronome_track_locked(pid: str, request: Request, mode: str = "fixe
         track.channels = 1
         track.channel_layout = "mono"
         track.sample_rate = int(project.sample_rate)
-        track.volume_db = 0.0
         track.waveform_peaks = peaks
         track.clips = [
             Clip(
@@ -5996,6 +6088,8 @@ def _update_metronome_zone_locked(pid: str, request: Request, time_ms: int, trac
     """Analyze one marker zone, replace only its PCM and envelope bins atomically."""
     import numpy as np
     project = _project_for_actor(request, pid)
+    from .metronome_grid import grid_settings, zone_signature
+    grid_bpm, _ = grid_settings(project)
     if project.metronome_mode != "zones":
         return _create_metronome_track_locked(pid, request, mode=project.metronome_mode,
             track_id=track_id or project.metronome_reference_track_id, sensitivity=project.metronome_sensitivity)
@@ -6017,7 +6111,7 @@ def _update_metronome_zone_locked(pid: str, request: Request, time_ms: int, trac
     reference = next((t for t in project.tracks if t.id == reference_id and t.type != "click" and t.filename), None)
     if track_id and reference is None:
         raise HTTPException(400, "Selezionare una traccia audio di riferimento valida")
-    bpm = float(manual_bpm if manual_bpm is not None else project.bpm)
+    bpm = float(manual_bpm if manual_bpm is not None else grid_bpm)
     if manual_bpm is None and reference is not None and end-start >= 1800:
         try:
             with tempfile.TemporaryDirectory() as td:
@@ -6030,7 +6124,7 @@ def _update_metronome_zone_locked(pid: str, request: Request, time_ms: int, trac
                         segment.setparams(source.getparams()); segment.writeframes(data)
                 bpm,_=estimate_bpm_and_signature(excerpt)
         except (ValueError, RuntimeError, OSError):
-            bpm=float(project.bpm)
+            bpm=grid_bpm
     original=audio_path(pid,click_track.filename)
     if not original.exists():
         raise HTTPException(409,"Audio metronomo non trovato")
@@ -6045,15 +6139,22 @@ def _update_metronome_zone_locked(pid: str, request: Request, time_ms: int, trac
             pcm=np.zeros(length,dtype=np.int16)
             click_len=max(1,round(.045*rate))
             tone_t=np.arange(click_len,dtype=np.float64)/rate
-            tick_num=max(1,int(str(project.time_signature or "4/4").split("/")[0]))
+            signature=zone_signature(project, left_id, right_id)
+            tick_num, tick_den=map(int, signature.split("/"))
             step=60000.0/max(1.0,float(bpm))
             for index in range(max(0,int((end-start)/step)+2)):
                 local=round(index*step*rate/1000)
                 if local>=length:break
-                freq=1320.0 if index%tick_num==0 else 880.0
+                pos=index%tick_num
+                freq=1320.0 if pos==0 else (1100.0 if tick_den==8 and tick_num in {6,9,12} and pos%3==0 else 880.0)
                 tone=np.sin(2*np.pi*freq*tone_t)*np.exp(-tone_t*55.0)
+                peak=float(np.max(np.abs(tone)))
+                if peak: tone/=peak
                 count=min(click_len,length-local)
                 pcm[local:local+count]=np.asarray(np.clip(tone[:count],-1,1)*32767,dtype=np.int16)
+            audible_lo=max(0,min(length,round((project.metronome_start_ms-start)*rate/1000)))
+            audible_hi=length if project.metronome_stop_ms is None else max(0,min(length,round((project.metronome_stop_ms-start)*rate/1000)))
+            pcm[:audible_lo]=0; pcm[audible_hi:]=0
             with wave.open(str(temp),"wb") as output:
                 output.setparams(source.getparams())
                 source.setpos(0)
@@ -6069,6 +6170,7 @@ def _update_metronome_zone_locked(pid: str, request: Request, time_ms: int, trac
         new_peaks=waveform_peaks(temp)
         with temp.open('rb') as fd:os.fsync(fd.fileno())
         os.replace(temp,original)
+        project.metronome_zone_signatures[str(start)] = signature
         project.metronome_zone_bpms[str(start)] = round(float(bpm),1)
         if reference is not None:
             project.metronome_reference_track_id=reference.id
@@ -6079,22 +6181,30 @@ def _update_metronome_zone_locked(pid: str, request: Request, time_ms: int, trac
     finally:
         temp.unlink(missing_ok=True)
     return {"project":project,"track":click_track,"zone_start_ms":start,"zone_end_ms":end,
-        "refresh_scope":"zone_atomic","zone_bpm":bpm}
+        "refresh_scope":"zone_atomic","zone_bpm":bpm,"zone_signature":signature}
 
 
 @app.post("/api/projects/{pid}/metronome-zone-bpm")
 @_serialized_project_mutation
-def set_metronome_zone_bpm(pid: str, request: Request, time_ms: int = 0, bpm: float | None = None, automatic: bool = False):
+def set_metronome_zone_bpm(pid: str, request: Request, time_ms: int = 0, bpm: float | None = None, automatic: bool = False, time_signature: str | None = None):
     with METRONOME_TRACK_LOCK:
         project = _project_for_actor(request, pid)
         if project.metronome_mode != "zones":
             raise HTTPException(400, "Metronome must be in zone mode")
+        from .metronome_grid import SIGNATURES
+        if time_signature is not None and time_signature not in SIGNATURES:
+            raise HTTPException(400, "Invalid time signature")
+        original = project.model_copy(deep=True)
         duration = project_duration_ms(project)
         points = _metronome_zone_boundaries(project, duration)
         zone = next((i for i in range(len(points)-1) if points[i][0] <= time_ms < points[i+1][0]), len(points)-2)
         left, right = points[zone][1], points[zone+1][1]
         key = f"{left}|{right}"
         if automatic:
+            for oldkey in list(project.metronome_manual_zone_signatures):
+                a,b = oldkey.split("|",1)
+                if a == left or b == right:
+                    del project.metronome_manual_zone_signatures[oldkey]
             for oldkey in list(project.metronome_manual_zone_bpms):
                 a,b = oldkey.split("|",1)
                 if a == left or b == right:
@@ -6102,9 +6212,15 @@ def set_metronome_zone_bpm(pid: str, request: Request, time_ms: int = 0, bpm: fl
         else:
             if bpm is None or not 20 <= bpm <= 400:
                 raise HTTPException(400, "BPM must be between 20 and 400")
+            if time_signature is not None:
+                project.metronome_manual_zone_signatures[key] = time_signature
             project.metronome_manual_zone_bpms[key] = round(float(bpm), 2)
         save_project(project)
-        return _update_metronome_zone_locked(pid, request, time_ms, "")
+        try:
+            return _update_metronome_zone_locked(pid, request, time_ms, "")
+        except Exception:
+            save_project(original)
+            raise
 
 
 @app.post("/api/projects/{pid}/metronome-track/refresh")
@@ -7585,3 +7701,82 @@ def native_ai_account_poll(request:Request,body:dict):
         if state['connected'] and body.get('ace') is True:_ace_desktop.configure_mta_remote()
         return state
     except (ValueError,OSError) as exc:raise HTTPException(400,'MTA account authorization unavailable') from exc
+
+
+from . import social_totp as _social_totp
+app.add_api_route('/oauth-second-factor', _social_totp.page, methods=['GET'])
+app.add_api_route('/oauth-second-factor', _social_totp.submit, methods=['POST'])
+
+
+@app.get('/docs/admin/social-login', response_class=HTMLResponse)
+def admin_social_login_docs(request: Request):
+    require_admin(request)
+    return (Path(__file__).parent/'docs/social-login.html').read_text(encoding='utf-8')
+
+
+from .account_routes import register_routes as _account_routes
+_account_routes(app)
+
+
+@app.post("/api/projects/{pid}/timeline-trim")
+@_serialized_project_mutation
+def timeline_trim(pid: str, payload: dict, request: Request):
+    from .timeline_editing import audible_bounds, trim_project
+    project = _project_for_actor(request, pid)
+    side = payload.get("side")
+    if side not in {"left", "right"}:
+        raise HTTPException(400, "Invalid trim side")
+    try:
+        lo, hi = audible_bounds(project, audio_path)
+        end = max(hi, project_duration_ms(project))
+        left, right = (lo, end) if side == "left" else (0, hi)
+        result = trim_project(project, left, right)
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from exc
+    save_project(result)
+    return {"project": result, "removed_start_ms": left, "removed_end_ms": end-right}
+
+
+@app.post("/api/projects/{pid}/metronome-insert")
+@_serialized_project_mutation
+def metronome_insert(pid: str, payload: dict, request: Request):
+    from .timeline_editing import prepare_metronome_insert
+    original = _project_for_actor(request, pid)
+    try:
+        project, extra = prepare_metronome_insert(original, payload.get("start_ms", 0), payload.get("pre_roll_bars", 0))
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from exc
+    save_project(project)
+    try:
+        with METRONOME_TRACK_LOCK:
+            result = _create_metronome_track_locked(pid, request, mode=project.metronome_mode, sensitivity=project.metronome_sensitivity)
+    except Exception:
+        save_project(original)
+        raise
+    return {**result, "project_extended_ms": extra}
+
+
+@app.post("/api/projects/{pid}/metronome-grid")
+@_serialized_project_mutation
+def configure_metronome_grid(pid: str, payload: dict, request: Request):
+    import math
+    from .metronome_grid import SIGNATURES
+    original = _project_for_actor(request, pid)
+    if original.metronome_mode == "adaptive":
+        raise HTTPException(400, "Adaptive metronome grid is determined by audio analysis")
+    bpm, signature = payload.get("bpm"), payload.get("time_signature")
+    if isinstance(bpm, bool) or not isinstance(bpm, (float, int)) or not math.isfinite(bpm) or not 20 <= bpm <= 400 or signature not in SIGNATURES:
+        raise HTTPException(400, "BPM must be 20–400 and time signature must be supported")
+    project = original.model_copy(deep=True)
+    project.metronome_bpm, project.metronome_time_signature = float(bpm), signature
+    project.metronome_zone_bpms = {}
+    save_project(project)
+    if not any(t.type == "click" for t in project.tracks):
+        return {"project": project, "track": None, "grid_only": True}
+    try:
+        with METRONOME_TRACK_LOCK:
+            result = _create_metronome_track_locked(pid, request, mode=project.metronome_mode, sensitivity=project.metronome_sensitivity)
+    except Exception:
+        save_project(original)
+        raise
+    return {**result, "grid_only": True}

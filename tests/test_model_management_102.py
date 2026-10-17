@@ -107,7 +107,8 @@ def test_server_inventory_and_prefetch(monkeypatch,tmp_path):
     monkeypatch.setattr(m,'SERVER_DIR',tmp_path/'server');monkeypatch.setattr(m,'BLACKLIST_FILE',tmp_path/'blacklist.json');monkeypatch.setattr(m,'CATALOG_FILE',tmp_path/'catalog.json')
     monkeypatch.setattr(m,'_registry_server_profiles',lambda:[{'id':'fake','model':'fake','stem_count':4,'stem_labels':['a']*4,'display_name':'Fake'}])
     monkeypatch.setattr(m,'_load_server_model',lambda name: object())
-    monkeypatch.setattr(m,'_server_bundle',lambda name: (m.SERVER_DIR/'bundles/fake.zip'))
+    bundle=m.SERVER_DIR/'bundles/fake.zip';bundle.parent.mkdir(parents=True);bundle.write_bytes(b'installed-model-bundle')
+    monkeypatch.setattr(m,'_server_bundle',lambda name: bundle)
     r={'updated':[],'unchanged':[],'server_ready':[],'skipped_blacklist':[],'errors':[]}
     m._prefetch_server_models(r)
     assert r['server_ready']==['fake']

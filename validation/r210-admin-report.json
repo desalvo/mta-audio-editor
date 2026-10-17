@@ -1,0 +1,44 @@
+{
+  "release": "0.3.0-r210",
+  "baseline": "MTA-r210-early-build-native-zoom-cumulative.zip",
+  "user_commit_boundary": "User confirmed previous Early build / native zoom cumulative package committed in the current request.",
+  "changes": [
+    "Admin AI queue search and pagination 20 default / 10-100; cross-page selection and audited disable/restore/delete",
+    "Accounting and per-token report exclusions, immutable invoice guard, late-ledger exclusion and no GPU share redistribution",
+    "Local AI cache storage inventory and explicit unknown vs installed model sizes",
+    "Admin SMTP multipart HTML test message with logo, draft configuration, safe errors and recipient refusal handling",
+    "Admin-managed Google/Facebook/GitHub social login disabled by default, encrypted secrets, PKCE Google/GitHub, one-use state, Facebook email verification, TOTP and detailed setup help"
+  ],
+  "targeted": {
+    "tests": 113,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 113
+  },
+  "full": {
+    "tests": 3646,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 5,
+    "passed": 3641
+  },
+  "coverage_line_percent": 78.16,
+  "deselected": 10,
+  "static": "Ruff passed; Node admin.js syntax and functional DOM regressions passed.",
+  "not_executed": [
+    "10 AF_UNIX socket cases prohibited by runner",
+    "Optional compiled/native platform checks skipped by suite",
+    "Production provider consent and callbacks with real credentials",
+    "Real SMTP delivery",
+    "Production deployment and GPU hardware recertification"
+  ],
+  "limitations": [
+    "Closed invoices require external explicit accounting correction; this UI refuses retroactive mutation",
+    "Deletion is a permanent logical tombstone; original evidence and project tracks remain",
+    "Model storage covers known accessible local caches, not remote ACE hosts",
+    "Meta live documentation retrieval returned HTTP 429; actual app review/permission requirements must be checked in the provider dashboard"
+  ],
+  "git_actions": [],
+  "production_actions": []
+}

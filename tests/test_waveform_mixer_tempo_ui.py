@@ -12,8 +12,7 @@ WRITE = {"X-MTA-Request": "1"}
 def test_project_time_pitch_filter_has_independent_tempo_and_pitch():
     project = Project(id="p", title="P", bpm=120, base_bpm=120, pitch_semitones=0)
     neutral = project_time_pitch_filter(project)
-    assert "asetrate=44100.000000" in neutral
-    assert "atempo=1.00000000" in neutral
+    assert neutral == "anull"
 
     project.bpm = 90
     slower = project_time_pitch_filter(project)

@@ -7,6 +7,7 @@ allocated explicitly by the trusted server only, never by untrusted workers.
 from __future__ import annotations
 
 import math
+import sqlite3
 import os
 import time
 from .auth import db
@@ -25,6 +26,11 @@ def slot_enabled_for_kind(kind: str) -> bool:
 
 
 def _init(c):
+    columns={r[1] for r in c.execute('PRAGMA table_info(ai_compute_jobs)')}
+    if columns and 'accounting_excluded' not in columns:
+        try:c.execute('ALTER TABLE ai_compute_jobs ADD COLUMN accounting_excluded INTEGER NOT NULL DEFAULT 0')
+        except sqlite3.OperationalError as exc:
+            if 'duplicate column' not in str(exc).lower():raise
     c.executescript('''
     CREATE TABLE IF NOT EXISTS ai_gpu_slot_leases (
       job_id TEXT PRIMARY KEY REFERENCES ai_compute_jobs(id),
@@ -142,7 +148,7 @@ def preview(gpu_key: str = 'gpu0', *, start_ms: int, end_ms: int,
         raise ValueError('Invalid agentless rate')
     with db() as c:
         _init(c)
-        rows = c.execute('''SELECT l.*,j.user_id,j.status,j.billable FROM ai_gpu_slot_leases l
+        rows = c.execute('''SELECT l.*,j.user_id,j.status,j.billable,j.accounting_excluded FROM ai_gpu_slot_leases l
             JOIN ai_compute_jobs j ON j.id=l.job_id
             WHERE l.gpu_key=? AND l.acquired_ms<? AND
                 (l.released_ms>? OR l.released_ms IS NULL)
@@ -154,6 +160,7 @@ def preview(gpu_key: str = 'gpu0', *, start_ms: int, end_ms: int,
     secs = _seconds_by_job(rows,start,end)
     results = []
     for r in rows:
+        if r["accounting_excluded"]:continue
         seconds = secs[r['job_id']]
         # No charge for cancelled/failed jobs in this conservative policy.
         eligible = r['state'] == 'released' and r['status'] == 'done' and bool(r['billable'])
@@ -198,14 +205,14 @@ def priced_period(c, start_ts: int, end_ts: int, *, user_id: int | None = None):
         raise ValueError('Measured and estimated GPU tariffs cannot both be active')
     has_leases = bool(c.execute(
         "SELECT 1 FROM sqlite_master WHERE type='table' AND name='ai_gpu_slot_leases'").fetchone())
-    leases = c.execute("""SELECT l.*,j.user_id,j.status,j.billable,j.started_at,j.finished_at
+    leases = c.execute("""SELECT l.*,j.user_id,j.status,j.billable,j.accounting_excluded,j.started_at,j.finished_at
         FROM ai_gpu_slot_leases l JOIN ai_compute_jobs j ON j.id=l.job_id
         WHERE l.acquired_ms<? AND (l.released_ms>? OR l.released_ms IS NULL)
         ORDER BY l.gpu_key,l.acquired_ms,l.job_id""", (end_ms,start_ms)).fetchall() if has_leases else []
     if os.getenv('MTA_AI_GPU_SLOT_TRACKING_ENABLED', '').lower() == 'true':
         kinds = {k.strip() for k in os.getenv('MTA_AI_GPU_SLOT_KINDS', '').split(',') if k.strip()}
         if kinds:
-            expected = c.execute('SELECT id,kind FROM ai_compute_jobs WHERE started_at>=? '
+            expected = c.execute('SELECT id,kind FROM ai_compute_jobs WHERE accounting_excluded=0 AND started_at>=? '
                                  "AND started_at<? AND billable=1 AND status=\'done\'",
                                  (start_ts,end_ts)).fetchall()
             leased_ids = {r['job_id'] for r in leases}
@@ -213,6 +220,7 @@ def priced_period(c, start_ts: int, end_ts: int, *, user_id: int | None = None):
                 raise ValueError('A configured GPU worker job has no allocated slot evidence')
     # Detect missing, partial, or unfinalized evidence BEFORE calculating any amounts.
     for r in leases:
+        if r["accounting_excluded"]:continue
         if r['released_ms'] is None or r['state'] == 'active' or r['status'] == 'running':
             raise ValueError('Active GPU slot prevents priced billing')
         if r['acquired_ms'] < start_ms or r['released_ms'] > end_ms:
@@ -232,12 +240,12 @@ def priced_period(c, start_ts: int, end_ts: int, *, user_id: int | None = None):
         device = [r for r in leases if r['gpu_key']==gpu]
         bounds = set(cuts)
         for row in device:
-            bounds.update((row['acquired_ms'],row['released_ms']))
+            bounds.update((max(start_ms,row['acquired_ms']),min(end_ms,row['released_ms'] or end_ms)))
         times = sorted(bounds)
         for lo,hi in zip(times,times[1:]):
             if hi <= lo:
                 continue
-            active = [r for r in device if r['acquired_ms'] <= lo and r['released_ms'] >= hi]
+            active = [r for r in device if r['acquired_ms'] <= lo and (r['released_ms'] or end_ms) >= hi]
             if not active:
                 continue
             tariff = next((r['micro_per_unit'] for r in rates
@@ -246,7 +254,7 @@ def priced_period(c, start_ts: int, end_ts: int, *, user_id: int | None = None):
             share = (hi-lo)/1000/len(active)
             for r in active:
                 entry = per_job.setdefault(r['job_id'], {
-                    'job_id':r['job_id'], 'user_id':r['user_id'], 'gpu_key':gpu,
+                    'job_id':r['job_id'], 'user_id':r['user_id'], 'gpu_key':gpu,'accounting_excluded':r['accounting_excluded'],
                     'slot_seconds':0., 'micro_eur_unrounded':0., 'eligible': bool(
                         r['state']=='released' and r['status']=='done' and r['billable'])})
                 entry['slot_seconds'] += share
@@ -254,9 +262,10 @@ def priced_period(c, start_ts: int, end_ts: int, *, user_id: int | None = None):
                     entry['micro_eur_unrounded'] += share*tariff
     jobs = []
     for entry in per_job.values():
+        if entry["accounting_excluded"]:continue
         if user_id is not None and entry['user_id'] != user_id:
             continue
-        jobs.append({key:value for key,value in entry.items() if key!='micro_eur_unrounded'} |
+        jobs.append({key:value for key,value in entry.items() if key not in ('micro_eur_unrounded','accounting_excluded')} |
                     {'slot_seconds':round(entry['slot_seconds'],9),
                      'micro_eur':round(entry['micro_eur_unrounded'])})
     return {'method':METHOD,'enabled':True,'total_micro':sum(j['micro_eur'] for j in jobs),

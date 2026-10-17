@@ -9,14 +9,15 @@ def test_clip_blocks_are_draggable_in_select_mode():
     assert "function beginTimelineClipDrag(event,trackId,clipId)" in JS
     assert "if(timelineTool!=='select'||event.button!==0)return" in JS
     assert 'onpointerdown="beginTimelineClipDrag(event' in JS
-    assert "timeline_start_ms=Math.max(0,item.start+d.delta)" in JS
+    assert "MtaTimelineRules.delta(current,selectedTimelineSegments" in JS
     assert ".clip-block{pointer-events:auto}" in CSS
 
 
-def test_shift_drag_moves_selected_track_groups():
-    assert "const group=!!event.shiftKey" in JS
-    assert "const ids=group?new Set(selectedTrackIds()):new Set([trackId])" in JS
-    assert "Segmenti delle tracce selezionate spostati sulla timeline" in JS
+def test_modifier_selection_moves_selected_segments_instead_of_whole_tracks():
+    assert "event.shiftKey||event.ctrlKey||event.metaKey" in JS
+    assert "selectedSegmentItems()" in JS
+    assert "item.clip.timeline_start_ms+=delta" in JS
+    assert "timingAudioChanged(ids)" in JS
 
 
 def test_timeline_context_menu_exposes_delete_selected_range():

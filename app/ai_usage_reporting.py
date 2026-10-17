@@ -12,7 +12,7 @@ def records(user_id, start, end, *, completed_window=False):
         raise ValueError('Invalid user or reporting interval')
     with auth.db() as con:
         ai_billing._init(con)
-        sql=('SELECT * FROM ai_compute_jobs WHERE user_id=? AND finished_at>=? AND finished_at<? ORDER BY started_at,id' if completed_window else 'SELECT * FROM ai_compute_jobs WHERE user_id=? AND started_at>=? AND started_at<? ORDER BY started_at,id')
+        sql=('SELECT * FROM ai_compute_jobs WHERE accounting_excluded=0 AND user_id=? AND finished_at>=? AND finished_at<? ORDER BY started_at,id' if completed_window else 'SELECT * FROM ai_compute_jobs WHERE accounting_excluded=0 AND user_id=? AND started_at>=? AND started_at<? ORDER BY started_at,id')
         ledger=[dict(r) for r in con.execute(sql,(user_id,start,end))]
         from .ai_compute_diagnostics import read as read_diagnostics
         diagnostics=read_diagnostics(con,user_id)
@@ -27,13 +27,16 @@ def records(user_id, start, end, *, completed_window=False):
             row['amount_micro']=row['cost_micro'] if enabled else 0
             row['origin']='ledger'
         # Do not count a queue Arranger and its ledger settlement twice.
-        queue_links={r[0] for r in con.execute('SELECT queue_job_id FROM ai_compute_jobs WHERE user_id=? AND queue_job_id IS NOT NULL',(user_id,))}
+        queue_links={r[0] for r in con.execute('SELECT queue_job_id FROM ai_compute_jobs WHERE accounting_excluded=0 AND user_id=? AND queue_job_id IS NOT NULL',(user_id,))}
         all_ledger={r[0] for r in con.execute('SELECT id FROM ai_compute_jobs WHERE user_id=?',(user_id,))}
+    from .ai_queue_admin import dispositions
+    excluded=dispositions()
     from . import ai_arranger_runtime as queue
     with queue._db() as con:
         sql='SELECT * FROM jobs WHERE completed_at>=? AND completed_at<?' if completed_window else 'SELECT * FROM jobs WHERE created_at>=? AND created_at<?'
         rows=[dict(r) for r in con.execute(sql,(start,end))]
     for row in rows:
+        if excluded.get(row["job_id"]) in ("disabled","deleted"):continue
         actor_id=row.get('actor_user_id')
         if actor_id is None:
             try:actor_id=json.loads(row.get('payload_json') or '{}').get('actor_user_id')

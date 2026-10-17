@@ -1470,7 +1470,7 @@ body:has(#topZoom:active) .wave{image-rendering:auto}
 .track-delay-row{display:flex;gap:5px;align-items:center;margin-top:4px;font-size:10px;color:#bcd1e0;min-width:0}
 .track-delay-row label{font-size:9px;white-space:nowrap}
 .track-delay-input{width:76px;min-width:0;height:23px;background:#0b1721;border:1px solid #385570;border-radius:4px;color:#f0f7fd;padding:2px 5px;font-size:11px;font-variant-numeric:tabular-nums}
-.track-delay-unit{font-size:9px;color:#99bad2;white-space:nowrap}
+.track-delay-unit{flex:1 1 70px;max-width:110px;min-width:46px;background:var(--panel,#142331);padding:2px;font-size:9px;color:#99bad2;white-space:nowrap}
 
 
 /* r288: compact icon-only tap tempo adjacent to the BPM control. */
@@ -1629,3 +1629,10 @@ html,body{overflow:hidden}
 .native-ui-zoom-buttons {display:flex;align-items:center;gap:5px;margin-top:5px}
 .native-ui-zoom-buttons button {min-width:28px;min-height:28px;padding:3px 6px}
 .native-ui-zoom-buttons output {min-width:40px;text-align:center;font-variant-numeric:tabular-nums}
+
+.clip-block.segment-selected{outline:2px solid #48aaff;background:rgba(72,170,255,.18)}
+.moving-timeline-clip .clip-block{touch-action:none;cursor:grabbing}
+
+body:not(.timeline-select-tool) .clip-block{pointer-events:none;cursor:default}
+.timeline-select-tool .clip-block{touch-action:none}
+

@@ -1,0 +1,53 @@
+{
+  "release": "0.3.0-r210",
+  "baseline": "MTA-r210-ai-queue-social-smtp-model-storage-cumulative.zip",
+  "user_commit_boundary": "Last confirmed commit precedes admin AI queue/social/SMTP/storage package; no subsequent commit confirmed.",
+  "changes": [
+    "Mandatory email verification and email OTP or TOTP before approval of new web local registrations",
+    "SSO remains delegated to providers, separate inactive pending MTA accounts, durable approval and waiting notifications",
+    "Live username/email collision checks and persistent identity reservations",
+    "Self/admin ordinary retirement revokes credentials, retains central accounting and allows verified admin-approved reactivation",
+    "Static secret project archive links with 60-day default grace, admin archive inventory and scheduled project/archive deletion",
+    "Two server-bound confirmation stages before total purge; reject nonprivacy purge when accounting exists",
+    "Encrypted accounting sandbox with 365-day default retention and automatic expiration",
+    "Purged queue/settlement/result-cache cleanup has durable retry; private retention artifacts and administrative documentation"
+  ],
+  "targeted": {
+    "tests": 52,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 52
+  },
+  "full": {
+    "tests": 3662,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 5,
+    "passed": 3657
+  },
+  "coverage_line_percent": 78.29,
+  "static": "Ruff passed; Node syntax checks passed for admin.js and account_lifecycle.js.",
+  "deselected": 10,
+  "not_executed": [
+    "10 AF_UNIX cases prohibited by runner",
+    "5 optional SDK/Win32 cases skipped",
+    "Real provider consent, SMTP delivery and public download through production proxy",
+    "Production deployment",
+    "Native desktop packaging",
+    "GPU hardware recertification"
+  ],
+  "retention": {
+    "sandbox_days_default": 365,
+    "project_days_default": 60,
+    "config_range_days": [
+      1,
+      3650
+    ],
+    "existing_deadlines_unchanged": true,
+    "identity_reservations_retained": true,
+    "external_backups_not_modified": true
+  },
+  "git_actions": [],
+  "production_actions": []
+}

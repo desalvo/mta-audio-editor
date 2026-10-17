@@ -88,6 +88,9 @@ class Track(BaseModel):
     type: TrackType = "other"
     mta_slot: int | None = Field(default=None, ge=1, le=16)
     filename: str = Field(min_length=1, max_length=128)
+    clips_initialized: bool = False
+    derived_source_track_id: str = Field(default="", max_length=64)
+    derived_stem_key: str = Field(default="", max_length=200)
     source_clip_id: str | None = Field(default=None, pattern=r"^[A-Za-z0-9_-]{1,64}$")
     duration_ms: int = Field(default=0, ge=0)
     volume_db: float = Field(default=0.0, ge=-120.0, le=24.0)
@@ -102,6 +105,7 @@ class Track(BaseModel):
     channels: int = Field(default=0, ge=0, le=32)
     channel_layout: str = Field(default="", max_length=64)
     sample_rate: Literal[44100, 48000, 96000] = 44100
+    delay_unit: Literal["ms", "beats", "bars", "bars_beats"] | None = None
     delay_ms: int = Field(default=0, ge=-86_400_000, le=86_400_000)
     height_px: int = Field(default=78, ge=78, le=420)
 
@@ -305,6 +309,14 @@ class AdaptiveTempoPoint(BaseModel):
     beat_index: int = Field(ge=0)
 
 class Project(BaseModel):
+    master_fade_enabled: bool = False
+    master_fade_in_ms: int = Field(default=0, ge=0, le=86400000)
+    master_fade_out_ms: int = Field(default=0, ge=0, le=86400000)
+    timeline_end_ms: int | None = Field(default=None, ge=0, le=86400000)
+    timeline_snap: Literal["off", "beats", "bars"] = "off"
+    timeline_magnetic: bool = False
+    metronome_insertion_ms: int = Field(default=0, ge=0, le=86400000)
+    metronome_pre_roll_bars: int = Field(default=0, ge=0, le=64)
     id: str
     owner_user_id: int | None = Field(default=None, ge=1)
     shared_with_user_ids: list[int] = Field(default_factory=list)
@@ -342,6 +354,10 @@ class Project(BaseModel):
     base_bpm: float | None = Field(default=None, gt=0, le=500)
     original_bpm: float | None = Field(default=None, gt=0, le=500)
     metronome_mode: Literal["fixed", "zones", "adaptive"] = "fixed"
+    metronome_bpm: float | None = Field(default=None, ge=20, le=400)
+    metronome_time_signature: Literal["2/4", "3/4", "4/4", "5/4", "6/8", "7/8", "9/8", "12/8"] | None = None
+    metronome_zone_signatures: dict[str, Literal["2/4", "3/4", "4/4", "5/4", "6/8", "7/8", "9/8", "12/8"]] = Field(default_factory=dict)
+    metronome_manual_zone_signatures: dict[str, Literal["2/4", "3/4", "4/4", "5/4", "6/8", "7/8", "9/8", "12/8"]] = Field(default_factory=dict)
     metronome_sensitivity: float = Field(default=0.35, ge=0.0, le=1.0)
     metronome_start_ms: int = Field(default=0, ge=0, le=86_400_000)
     metronome_stop_ms: int | None = Field(default=None, ge=0, le=86_400_000)
@@ -350,8 +366,8 @@ class Project(BaseModel):
     metronome_reference_track_name: str = Field(default="", max_length=200)
     metronome_zone_bpms: dict[str, float] = Field(default_factory=dict)
     metronome_manual_zone_bpms: dict[str, float] = Field(default_factory=dict)
-    metronome_grid_origin_ms: int = Field(default=0, ge=-3600000, le=3600000)
-    metronome_shift_ms: int = Field(default=0, ge=-3600000, le=3600000)
+    metronome_grid_origin_ms: int = Field(default=0, ge=-86400000, le=86400000)
+    metronome_shift_ms: int = Field(default=0, ge=-86400000, le=86400000)
     transport_time_mode: Literal["time", "musical"] = "time"
     adaptive_tempo_map: list[AdaptiveTempoPoint] = Field(default_factory=list, max_length=20000)
     pitch_semitones: float = Field(default=0.0, ge=-6.0, le=6.0)

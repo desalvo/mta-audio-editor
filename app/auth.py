@@ -382,7 +382,7 @@ def _notify_admins_registration(user, provider: str = "local") -> None:
     send_mail(recipients,"Nuovo utente in attesa · MTA Audio Editor",f"Nuovo utente {user['username']} ({user['email']}) tramite {source}. L'account richiede approvazione amministratore.")
 
 
-def register_user(username: str, email: str, display_name: str, password: str, base_url: str = ""):
+def register_user(username: str, email: str, display_name: str, password: str, base_url: str = "", *, require_second_factor: bool=False, mfa_method: str="email"):
     username = username.strip()
     email = email.strip().lower()
     display_name = display_name.strip()[:120]
@@ -390,6 +390,10 @@ def register_user(username: str, email: str, display_name: str, password: str, b
         raise ValueError("Username non valido: usa 3-64 caratteri, lettere, numeri, '.', '_' o '-'.")
     if not EMAIL_RE.fullmatch(email):
         raise ValueError("Indirizzo email obbligatorio e non valido.")
+    from . import account_lifecycle as lifecycle
+    if mfa_method not in ('email','totp'):raise ValueError('Metodo secondo fattore non valido')
+    available=lifecycle.availability(username,email)
+    if not available['username_available'] or not available['email_available']:raise ValueError('Username o email già utilizzati. Richiedi la riattivazione se sei il titolare.')
     ts = now_ts()
     try:
         with db() as con:
@@ -399,8 +403,10 @@ def register_user(username: str, email: str, display_name: str, password: str, b
                 (username,email,display_name,_password_hash(password),ts,ts),
             )
             user_id = cur.lastrowid
+            lifecycle.reserve(con,user_id,username,email)
     except sqlite3.IntegrityError as exc:
         raise ValueError("Username o email già registrati.") from exc
+    lifecycle.register(user_id,require_second_factor,mfa_method)
     token = _create_email_token(user_id)
     # Registration remains successful even if SMTP is not configured; the admin can
     # configure SMTP and the user can request a resend afterwards.
@@ -410,7 +416,7 @@ def register_user(username: str, email: str, display_name: str, password: str, b
         LOGGER.exception("Unable to send registration verification email for user_id=%s", user_id)
     user=public_user(get_user(user_id))
     try:
-        _notify_admins_registration(user)
+        if not require_second_factor:_notify_admins_registration(user)
     except Exception:
         LOGGER.exception("Unable to notify administrators about registration user_id=%s", user_id)
     return user, token
@@ -470,31 +476,45 @@ OAUTH_PROVIDERS = {
 }
 
 def oauth_enabled(provider: str) -> bool:
-    cfg=OAUTH_PROVIDERS.get(provider)
-    return bool(cfg and os.getenv(cfg["enabled_env"],"false").lower() in {"1","true","yes","on"} and os.getenv(cfg["client_env"],"") and os.getenv(cfg["secret_env"],""))
+    from .social_settings import provider as configuration
+    return bool(configuration(provider))
 
 def oauth_public_providers() -> list[dict]:
     return [{"id":key,"label":cfg["label"]} for key,cfg in OAUTH_PROVIDERS.items() if oauth_enabled(key)]
 
 def oauth_redirect_uri(provider: str, request: Request) -> str:
-    base=(_base_url() or str(request.base_url).rstrip('/')).rstrip('/')
+    from .social_settings import full
+    base=(full()['public_url'] or _base_url() or str(request.base_url).rstrip('/')).rstrip('/')
     return f"{base}/oauth/{provider}/callback"
 
 def oauth_make_state(provider: str) -> tuple[str,str]:
-    nonce=secrets.token_urlsafe(24); payload=f"{provider}|{now_ts()+600}|{nonce}".encode(); raw=base64.urlsafe_b64encode(payload).decode().rstrip('='); sig=hmac.new(_app_key(),raw.encode(),hashlib.sha256).hexdigest(); return f"{raw}.{sig}",nonce
+    init_auth_db()
+    nonce=secrets.token_urlsafe(24); payload=f"{provider}|{now_ts()+600}|{nonce}".encode()
+    raw=base64.urlsafe_b64encode(payload).decode().rstrip('=');sig=hmac.new(_app_key(),raw.encode(),hashlib.sha256).hexdigest()
+    with db() as con:
+        con.execute('CREATE TABLE IF NOT EXISTS oauth_nonces(hash TEXT PRIMARY KEY,expires INTEGER NOT NULL)')
+        con.execute('DELETE FROM oauth_nonces WHERE expires<?',(now_ts(),))
+        con.execute('INSERT INTO oauth_nonces VALUES(?,?)',(_token_hash(nonce),now_ts()+600))
+    return f"{raw}.{sig}",nonce
 
 def oauth_verify_state(provider: str, state: str, cookie_nonce: str) -> bool:
     try:
         raw,sig=state.split('.',1); expected=hmac.new(_app_key(),raw.encode(),hashlib.sha256).hexdigest()
         if not hmac.compare_digest(sig,expected): return False
         payload=base64.urlsafe_b64decode(raw+'='*(-len(raw)%4)).decode(); p,exp,nonce=payload.split('|',2)
-        return p==provider and int(exp)>=now_ts() and bool(cookie_nonce) and hmac.compare_digest(nonce,cookie_nonce)
+        if not (p==provider and now_ts()<=int(exp)<=now_ts()+600 and bool(cookie_nonce) and hmac.compare_digest(nonce,cookie_nonce)):return False
+        with db() as con:
+            return con.execute('DELETE FROM oauth_nonces WHERE hash=? AND expires>=?',(_token_hash(nonce),now_ts())).rowcount==1
     except Exception: return False
 
 def oauth_authorize_url(provider: str, request: Request) -> tuple[str,str]:
     if not oauth_enabled(provider): raise ValueError("Provider social non abilitato.")
+    from .social_settings import provider as credentials
     cfg=OAUTH_PROVIDERS[provider]; state,nonce=oauth_make_state(provider)
-    params={"client_id":os.getenv(cfg["client_env"]),"redirect_uri":oauth_redirect_uri(provider,request),"response_type":"code","scope":cfg["scope"],"state":state}
+    params={"client_id":credentials(provider)["client_id"],"redirect_uri":oauth_redirect_uri(provider,request),"response_type":"code","scope":cfg["scope"],"state":state}
+    if provider in ('google','github'):
+        verifier=oauth_pkce(nonce)
+        params.update(code_challenge=base64.urlsafe_b64encode(hashlib.sha256(verifier.encode()).digest()).decode().rstrip('='),code_challenge_method='S256')
     if provider=="google": params["prompt"]="select_account"
     return cfg["authorize"]+'?'+urlencode(params),nonce
 
@@ -524,18 +544,29 @@ def _oauth_json(url: str, *, data: dict | None = None, headers: dict | None = No
     request = UrlRequest(safe_url, data=body, headers=request_headers)  # noqa: S310
     # S310 is intentionally suppressed only after strict HTTPS + provider-host validation above.
     with https_urlopen(request, timeout=15) as resp:  # noqa: S310
-        return __import__("json").loads(resp.read().decode())
+        payload=resp.read(1024*1024+1)
+        if len(payload)>1024*1024:raise ValueError("Risposta OAuth troppo grande")
+        return __import__("json").loads(payload.decode())
+
+def oauth_pkce(nonce):
+    return base64.urlsafe_b64encode(hmac.new(_app_key(),('pkce:'+nonce).encode(),hashlib.sha256).digest()).decode().rstrip('=')
+
 
 def oauth_exchange_profile(provider: str, code: str, request: Request) -> dict:
     if not oauth_enabled(provider): raise ValueError("Provider social non abilitato.")
+    from .social_settings import provider as credentials
     cfg=OAUTH_PROVIDERS[provider]
-    token=_oauth_json(cfg["token"],data={"client_id":os.getenv(cfg["client_env"]),"client_secret":os.getenv(cfg["secret_env"]),"code":code,"redirect_uri":oauth_redirect_uri(provider,request),"grant_type":"authorization_code"})
+    data={"client_id":credentials(provider)["client_id"],"client_secret":credentials(provider)["client_secret"],"code":code,"redirect_uri":oauth_redirect_uri(provider,request),"grant_type":"authorization_code"}
+    if provider in ('google','github'):data['code_verifier']=oauth_pkce(request.cookies.get('mta_oauth_state',''))
+    token=_oauth_json(cfg['token'],data=data)
     access=token.get("access_token") if isinstance(token,dict) else None
     if not access: raise ValueError("Il provider non ha restituito un access token valido.")
     profile=_oauth_json(cfg["userinfo"],headers={"Authorization":f"Bearer {access}"})
+    if not isinstance(profile,dict):raise ValueError("Profilo OAuth non valido")
     if provider=="github":
         subject=str(profile.get("id",'')); emails=_oauth_json("https://api.github.com/user/emails",headers={"Authorization":f"Bearer {access}"})
-        choices=[e for e in emails if e.get("verified")]; primary=next((e for e in choices if e.get("primary")),choices[0] if choices else None)
+        if not isinstance(emails,list):raise ValueError("Email OAuth non valide")
+        choices=[e for e in emails if isinstance(e,dict) and e.get("verified") is True]; primary=next((e for e in choices if e.get("primary")),choices[0] if choices else None)
         email=str(primary.get("email",'')).lower() if primary else ''; verified=bool(primary)
         name=str(profile.get("name") or profile.get("login") or '')
     elif provider=="google":
@@ -543,7 +574,7 @@ def oauth_exchange_profile(provider: str, code: str, request: Request) -> dict:
     else:
         subject=str(profile.get("id",''));email=str(profile.get("email") or '').lower();verified=bool(email);name=str(profile.get("name") or '')
     if not subject or not EMAIL_RE.fullmatch(email) or not verified: raise ValueError("Il provider non ha fornito un indirizzo email verificato utilizzabile.")
-    return {"subject":subject,"email":email,"name":name[:120]}
+    return {"subject":subject,"email":email,"name":name[:120],"email_verified":provider!="facebook"}
 
 def _social_username(provider: str, email: str) -> str:
     base=re.sub(r"[^A-Za-z0-9._-]","-",email.split('@',1)[0]).strip('-._') or provider
@@ -554,15 +585,26 @@ def _social_username(provider: str, email: str) -> str:
 
 def social_login_or_register(provider: str, profile: dict):
     init_auth_db(); subject=profile["subject"]
+    from . import account_lifecycle as lifecycle
+    with db() as setup:lifecycle.init(setup)
     with db() as con:
+        con.execute('BEGIN IMMEDIATE')
         identity=con.execute("SELECT user_id FROM social_identities WHERE provider=? AND subject=?",(provider,subject)).fetchone()
-        if identity: return public_user(get_user(identity["user_id"])),False
+        if identity:
+            con.commit()  # Release the write reservation before nested public-user lookups.
+            return public_user(get_user(identity["user_id"])),False
         if con.execute("SELECT 1 FROM users WHERE email=? COLLATE NOCASE",(profile["email"],)).fetchone(): raise ValueError("Esiste già un account con questa email. Accedi con il metodo già associato all'account.")
-        ts=now_ts();cur=con.execute("INSERT INTO users(username,email,display_name,password_hash,role,active,email_confirmed,created_at,updated_at) VALUES(?,?,?,?, 'user',0,1,?,?)",(_social_username(provider,profile["email"]),profile["email"],profile["name"],"social$"+provider,ts,ts));uid=cur.lastrowid
+        reserved=con.execute('SELECT user_id FROM account_identity_reservations WHERE kind="email" AND digest=?',(lifecycle.identity("email",profile["email"]),)).fetchone()
+        if reserved:raise ValueError("Email già utilizzata: richiedi la riattivazione dell’account")
+        ts=now_ts();cur=con.execute("INSERT INTO users(username,email,display_name,password_hash,role,active,email_confirmed,created_at,updated_at) VALUES(?,?,?,?, 'user',0,?, ?,?)",(_social_username(provider,profile["email"]),profile["email"],profile["name"],"social$"+provider,int(profile.get("email_verified",True)),ts,ts));uid=cur.lastrowid
+        lifecycle.reserve(con,uid,con.execute("SELECT username FROM users WHERE id=?",(uid,)).fetchone()[0],profile["email"])
         con.execute("INSERT INTO social_identities(user_id,provider,subject,created_at) VALUES(?,?,?,?)",(uid,provider,subject,ts))
+    from .account_lifecycle import register as register_lifecycle
+    register_lifecycle(uid)
     user=public_user(get_user(uid))
-    try: _notify_admins_registration(user,provider)
-    except Exception: LOGGER.exception("Unable to notify administrators about social registration user_id=%s",uid)
+    if not user['email_confirmed']:
+        try:_send_verification_email(uid,_create_email_token(uid))
+        except Exception:LOGGER.warning('Unable to send social email verification user_id=%s',uid)
     return user,True
 
 def authenticate(identifier: str, password: str, code: str = ""):
@@ -574,7 +616,12 @@ def authenticate(identifier: str, password: str, code: str = ""):
         return None, "Conferma prima il tuo indirizzo email."
     if not row["active"]:
         return None, "Account in attesa dell'approvazione di un amministratore."
-    if row["totp_enabled"]:
+    from .account_lifecycle import info
+    life=info(row['id'])
+    if life.get('second_factor_required') and life.get('mfa_method')=='email':
+        from .account_mfa import verify
+        if not verify(row['id'],'login',code):return None,'Codice email richiesto, non valido o scaduto. Usa Invia codice email.'
+    if row["totp_enabled"] and not (life.get("second_factor_required") and life.get("mfa_method")=="email"):
         secret = _open(row["totp_secret_enc"])
         if not _verify_totp(secret, code):
             return None, "Codice TOTP obbligatorio o non valido."
@@ -733,6 +780,8 @@ def update_profile(user_id: int, *, display_name: str | None = None, email: str 
         destination = email.strip().lower()
         if not EMAIL_RE.fullmatch(destination):
             raise ValueError("Indirizzo email non valido.")
+    from . import account_lifecycle as lifecycle
+    with db() as setup:lifecycle.init(setup)
     with db() as con:
         if display_name is not None:
             con.execute("UPDATE users SET display_name=?,updated_at=? WHERE id=?", (display_name.strip()[:120],ts,user_id))
@@ -741,6 +790,8 @@ def update_profile(user_id: int, *, display_name: str | None = None, email: str 
                                     (destination, destination, user_id)).fetchone()
             if duplicate:
                 raise ValueError("Email già utilizzata o in attesa di verifica.")
+            lifecycle.reserve(con,user_id,row["username"],row["email"])
+            lifecycle.reserve(con,user_id,row["username"],destination)
             con.execute("UPDATE users SET pending_email=?,updated_at=? WHERE id=?", (destination,ts,user_id))
             changed = True
     token = None
@@ -826,6 +877,9 @@ def enable_totp(user_id: int, code: str) -> None:
 
 
 def disable_totp(user_id: int, password: str, code: str) -> None:
+    from .account_lifecycle import info
+    life=info(user_id)
+    if life.get('second_factor_required') and life.get('mfa_method')=='totp':raise ValueError('Secondo fattore obbligatorio per questo account')
     row=get_user(user_id)
     if not row or not _verify_password(password,row["password_hash"]):
         raise ValueError("Password non valida.")
@@ -918,8 +972,8 @@ def test_smtp_config(body: dict) -> None:
             LOGGER.debug("SMTP quit failed after connection test", exc_info=True)
 
 
-def send_mail(recipients: list[str], subject: str, plain: str, html_body: str | None = None, *, inline_image: bytes | None = None, message_id: str | None = None) -> None:
-    cfg=_smtp_full()
+def send_mail(recipients: list[str], subject: str, plain: str, html_body: str | None = None, *, inline_image: bytes | None = None, message_id: str | None = None, configuration: dict | None = None) -> None:
+    cfg=_smtp_full() if configuration is None else _smtp_full(configuration)
     if not cfg["host"] or not cfg["from_email"]:
         raise RuntimeError("SMTP non configurato.")
     recipients=[x for x in recipients if x]
@@ -940,7 +994,7 @@ def send_mail(recipients: list[str], subject: str, plain: str, html_body: str | 
     try:
         if cfg["username"]:
             client.login(cfg["username"],cfg["password"])
-        client.send_message(msg)
+        if client.send_message(msg):raise RuntimeError("Destinatario rifiutato dal server SMTP")
     finally:
         try:
             client.quit()
@@ -972,6 +1026,9 @@ def update_user_admin(target_id: int, actor_id: int, *, active: bool | None = No
         raise ValueError("Ruolo non valido.")
     if workspace_quota_bytes is not None and int(workspace_quota_bytes) < 0:
         raise ValueError("La quota workspace non può essere negativa.")
+    if active is True:
+        from .account_lifecycle import approval_guard
+        approval_guard(target_id)
     if active is True and not row["email_confirmed"]:
         raise ValueError("L'utente deve prima confermare il proprio indirizzo email.")
     if target_id == actor_id and active is False:
@@ -999,14 +1056,8 @@ def update_user_admin(target_id: int, actor_id: int, *, active: bool | None = No
             )
     updated = get_user(target_id)
     if became_active:
-        try:
-            send_mail(
-                [updated["email"]],
-                "MTA Audio Editor - account attivato",
-                f"Ciao {updated['display_name'] or updated['username']},\n\nil tuo account è stato approvato ed è ora attivo.\n",
-            )
-        except Exception:
-            LOGGER.exception("Unable to send activation email to user_id=%s", target_id)
+        from .account_lifecycle import approved
+        approved(target_id)
         try:
             _notify_admins_activated(updated)
         except Exception:
@@ -1015,18 +1066,8 @@ def update_user_admin(target_id: int, actor_id: int, *, active: bool | None = No
 
 
 def delete_user_admin(user_id: int, actor_id: int) -> None:
-    if user_id==actor_id:
-        raise ValueError("Non puoi eliminare il tuo stesso account.")
-    row=get_user(user_id)
-    if not row:
-        raise ValueError("Utente non trovato.")
-    if row["role"]=="admin":
-        with db() as con:
-            admins=con.execute("SELECT COUNT(*) FROM users WHERE role='admin' AND active=1").fetchone()[0]
-        if admins<=1:
-            raise ValueError("Non puoi eliminare l'ultimo amministratore attivo.")
-    with db() as con:
-        con.execute("DELETE FROM users WHERE id=?",(user_id,))
+    from .account_lifecycle import retire
+    retire(user_id,actor_id)
 
 
 def request_password_reset(identifier: str, base_url: str = "") -> None:

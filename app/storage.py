@@ -729,6 +729,8 @@ def list_projects(owner_user_id: int | None = None, include_shared: bool = True,
             if is_admin or owner_user_id is None:
                 out.append(p)
                 continue
+            from .account_lifecycle import is_deleted
+            if is_deleted(p.owner_user_id):continue
             if p.owner_user_id == owner_user_id or (include_shared and owner_user_id in p.shared_with_user_ids):
                 out.append(p)
     return sorted(out, key=lambda x: x.title.lower())
@@ -739,6 +741,8 @@ def project_access(project: Project, user_id: int, role: str, *, owner_only: boo
         return True
     if project.owner_user_id is None:
         return False
+    from .account_lifecycle import is_deleted
+    if is_deleted(project.owner_user_id):return False
     if project.owner_user_id == user_id:
         return True
     return (not owner_only) and user_id in project.shared_with_user_ids

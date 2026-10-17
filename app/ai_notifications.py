@@ -92,7 +92,7 @@ def collect():
         since=cfg['since'] if cfg['active'] else now
         users={r['id']:dict(r) for r in con.execute('SELECT id,email FROM users WHERE active=1 AND email_confirmed=1 AND email<>\'\'')}
         seen={r[0] for r in con.execute('SELECT id FROM ai_mail_events')}
-        ledgers=[dict(r) for r in con.execute('SELECT * FROM ai_compute_jobs WHERE started_at>=? OR finished_at>=?',(since,since))]
+        ledgers=[dict(r) for r in con.execute('SELECT * FROM ai_compute_jobs WHERE accounting_excluded=0 AND (started_at>=? OR finished_at>=?)',(since,since))]
     with queue._db() as con:
         queued=[dict(r) for r in con.execute('SELECT * FROM jobs WHERE created_at>=? OR completed_at>=?',(since,since))]
     queue_ids={r['job_id'] for r in queued}
@@ -104,7 +104,10 @@ def collect():
             from .ai_usage_reporting import records
             detail_cache[owner]={r['id']:r for r in records(owner,0,now+1)}
         return detail_cache[owner]
+    from .ai_queue_admin import dispositions
+    excluded=dispositions()
     for row in queued:
+        if excluded.get(row["job_id"]) in ("disabled","deleted"):continue
         event_key='queue:'+row['job_id']
         if (event_key+':terminal:'+row['state'] in seen) or (row['state'] not in ('completed','failed','cancelled','interrupted') and event_key+':started' in seen):continue
         owner=row.get('actor_user_id')

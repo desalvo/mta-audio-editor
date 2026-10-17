@@ -316,7 +316,7 @@ def delete_local_model(model_id: str) -> dict:
 def server_inventory()->dict:
     blacklist=load_blacklist(); entries=cached_catalog(); models=[]
     for item in entries:
-        obj=dict(item);obj['blacklisted']=obj['id'] in blacklist;target=_target_for(obj);obj['installed']=bool(target and target.is_file());obj['size']=target.stat().st_size if target and target.is_file() else 0;models.append(obj)
+        obj=dict(item);obj['blacklisted']=obj['id'] in blacklist;target=_target_for(obj);obj['installed']=bool(target and target.is_file());obj['size']=target.stat().st_size if target and target.is_file() else None;obj['size_known']=bool(target and target.is_file());models.append(obj)
     for p in _registry_server_profiles():
         mid=_safe_id(p.get('id') or p.get('model') or '')
         if any(x.get('id')==mid and x.get('platform')=='server' for x in models):continue
@@ -327,7 +327,18 @@ def server_inventory()->dict:
             try:
                 if candidate and candidate.is_file(): size += candidate.stat().st_size
             except OSError: pass
-        models.append({"id":mid,"model":str(p.get('model') or mid),"platform":"server","engine":"demucs","stem_count":int(p.get('stem_count',0) or 0),"stem_labels":p.get('stem_labels',[]),"display_name":str(p.get('display_name') or mid),"version":"bundled-registry","installed":marker.is_file(),"size":size,"blacklisted":mid in blacklist})
+        models.append({"id":mid,"model":str(p.get('model') or mid),"platform":"server","engine":"demucs","stem_count":int(p.get('stem_count',0) or 0),"stem_labels":p.get('stem_labels',[]),"display_name":str(p.get('display_name') or mid),"version":"bundled-registry","installed":bool(bundle),"size":bundle.stat().st_size if bundle else None,"size_known":bool(bundle),"blacklisted":mid in blacklist})
+    for obj in models:
+        if obj.get('platform')!='server' or obj.get('installed'):continue
+        _,sigs=_demucs_signatures(obj.get('model',obj['id']))
+        dirs=[SERVER_DIR/'torch-hub/checkpoints',Path(os.getenv('TORCH_HOME',str(Path(os.getenv('XDG_CACHE_HOME',str(Path.home()/'.cache')))/'torch')))/'hub/checkpoints']
+        files=[]
+        for sig in sigs:
+            match=next((p for d in dirs for p in d.glob(f'{sig}-*.th') if p.is_file()),None)
+            if match is None:break
+            files.append(match)
+        else:
+            if sigs:obj.update(installed=True,size=sum(p.stat().st_size for p in files),size_known=True)
     return {"models":models,"blacklist":sorted(blacklist),"auto_update":ENABLED,"interval_seconds":INTERVAL,"manifest_url":MANIFEST_URL}
 
 def _loop():

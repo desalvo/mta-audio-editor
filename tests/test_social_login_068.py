@@ -59,6 +59,8 @@ def test_authorize_url_and_provider_profiles(tmp_path,monkeypatch):
     monkeypatch.setenv('MTA_PUBLIC_URL','https://mta.example.test')
     for provider in ('GOOGLE','GITHUB','FACEBOOK'):
         monkeypatch.setenv(f'MTA_OAUTH_{provider}_ENABLED','true');monkeypatch.setenv(f'MTA_OAUTH_{provider}_CLIENT_ID','client');monkeypatch.setenv(f'MTA_OAUTH_{provider}_CLIENT_SECRET','secret')
+    from app.social_settings import save
+    save({'enabled':True})
     url,nonce=auth.oauth_authorize_url('google',req())
     assert 'client_id=client' in url and nonce
 

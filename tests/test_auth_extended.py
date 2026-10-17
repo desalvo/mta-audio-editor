@@ -136,9 +136,9 @@ def test_admin_role_delete_and_last_admin_guards(tmp_path, monkeypatch):
     demoted = auth.update_user_admin(user["id"], admin["id"], role="user")
     assert demoted["role"] == "user"
 
-    # A normal member can be deleted.
+    # Retirement preserves identity and accounting; central purge is a separate action.
     auth.delete_user_admin(user["id"], admin["id"])
-    assert auth.get_user(user["id"]) is None
+    assert not auth.get_user(user["id"])["active"]
 
 
 class _FakeSMTP:

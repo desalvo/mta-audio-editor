@@ -23,7 +23,8 @@ def test_workspace_storage_payload_and_quota_guard(monkeypatch, tmp_path):
     import app.storage as storage
     monkeypatch.setattr(main,'STORAGE_ROOT',tmp_path)
     monkeypatch.setattr(storage,'ROOT',tmp_path)
-    monkeypatch.setattr(main,'demucs_model_storage_usage',lambda:{'total_bytes':12,'coreml_bytes':1,'onnx_bytes':2,'server_bytes':9})
+    from app import model_storage
+    monkeypatch.setattr(model_storage,'usage',lambda:{'total_bytes':12,'coreml_bytes':1,'onnx_bytes':2,'server_bytes':9})
     p=storage.create_project('A','DAW',owner_user_id=7)
     (storage.pdir(p.id)/'audio'/'x.bin').write_bytes(b'x'*25)
     users=[{'id':7,'username':'u','display_name':'User','role':'user','workspace_quota_bytes':10000}]

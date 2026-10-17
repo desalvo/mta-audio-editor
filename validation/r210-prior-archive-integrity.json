@@ -1,0 +1,148 @@
+{
+  "archives": [
+    {
+      "name": "MTA-r210-early-build-native-zoom-cumulative.zip",
+      "size": 63524880,
+      "sha256": "3f364b0b0c1384c28b13eacb1c5d633bb42eae6cd4d8bce33857a29292f9dda5",
+      "published_checksum_matches": true,
+      "crc_ok": true,
+      "files": 1658
+    },
+    {
+      "name": "MTA-r210-ai-queue-social-smtp-model-storage-cumulative.zip",
+      "size": 63717166,
+      "sha256": "317e7358c19b33f8769d5bceec0ffb4f48bd5a501e482ddefb901dd1e3b47067",
+      "published_checksum_matches": true,
+      "crc_ok": true,
+      "files": 1673
+    },
+    {
+      "name": "MTA-r210-account-lifecycle-email-mfa-cumulative.zip",
+      "size": 63909592,
+      "sha256": "eb60b497571237219d757c93f3cbe94874c619e3d1aec399f317c52e54357567",
+      "published_checksum_matches": true,
+      "crc_ok": true,
+      "files": 1687
+    },
+    {
+      "name": "MTA-r210-timeline-stems-metronome-fades-cumulative.zip",
+      "size": 64092205,
+      "sha256": "370ed73280851059b778ee17dc5f78fb5399a92ed63561cb3b2ffb93d9e9c9eb",
+      "published_checksum_matches": true,
+      "crc_ok": true,
+      "files": 1701
+    }
+  ],
+  "transitions": [
+    {
+      "from": "MTA-r210-early-build-native-zoom-cumulative.zip",
+      "to": "MTA-r210-ai-queue-social-smtp-model-storage-cumulative.zip",
+      "missing": [],
+      "changed": [
+        "app/ai_billing.py",
+        "app/ai_gpu_slot_accounting.py",
+        "app/ai_job_views.py",
+        "app/ai_notifications.py",
+        "app/ai_usage_reporting.py",
+        "app/auth.py",
+        "app/main.py",
+        "app/model_updater.py",
+        "app/static/admin.js",
+        "app/templates/admin.html",
+        "docs/SOCIAL_LOGIN.md",
+        "tests/test_model_management_102.py",
+        "tests/test_r210_admin_artifact_size.py",
+        "tests/test_social_login_068.py",
+        "tests/test_web_settings_storage_109.py"
+      ],
+      "added": [
+        "app/ai_queue_admin.py",
+        "app/docs/social-login.html",
+        "app/model_storage.py",
+        "app/social_settings.py",
+        "app/social_totp.py",
+        "app/static/admin_controls.css",
+        "docs/ADMIN_QUEUE_MODELS_SMTP_R210.md",
+        "tests/test_r210_admin_queue_social_smtp.py",
+        "validation/r210-admin-coverage.xml",
+        "validation/r210-admin-full.log",
+        "validation/r210-admin-full.xml",
+        "validation/r210-admin-report.json",
+        "validation/r210-admin-static.log",
+        "validation/r210-admin-targeted.log",
+        "validation/r210-admin-targeted.xml"
+      ]
+    },
+    {
+      "from": "MTA-r210-ai-queue-social-smtp-model-storage-cumulative.zip",
+      "to": "MTA-r210-account-lifecycle-email-mfa-cumulative.zip",
+      "missing": [],
+      "changed": [
+        "app/auth.py",
+        "app/main.py",
+        "app/static/admin.js",
+        "app/static/admin_controls.css",
+        "app/storage.py",
+        "app/templates/account.html",
+        "app/templates/admin.html",
+        "app/templates/login.html",
+        "app/templates/register.html",
+        "docs/SOCIAL_LOGIN.md",
+        "tests/test_auth_extended.py"
+      ],
+      "added": [
+        "app/account_lifecycle.py",
+        "app/account_mfa.py",
+        "app/account_routes.py",
+        "app/docs/account-lifecycle.html",
+        "app/static/account_lifecycle.js",
+        "docs/ACCOUNT_LIFECYCLE_R210.md",
+        "tests/test_r210_account_lifecycle.py",
+        "validation/r210-lifecycle-coverage.xml",
+        "validation/r210-lifecycle-full.log",
+        "validation/r210-lifecycle-full.xml",
+        "validation/r210-lifecycle-report.json",
+        "validation/r210-lifecycle-static.log",
+        "validation/r210-lifecycle-targeted.log",
+        "validation/r210-lifecycle-targeted.xml"
+      ]
+    },
+    {
+      "from": "MTA-r210-account-lifecycle-email-mfa-cumulative.zip",
+      "to": "MTA-r210-timeline-stems-metronome-fades-cumulative.zip",
+      "missing": [],
+      "changed": [
+        "app/audio_engine.py",
+        "app/codec.py",
+        "app/main.py",
+        "app/models.py",
+        "app/static/app.css",
+        "app/static/app.js",
+        "app/templates/index.html",
+        "tests/test_native_filesystem_and_track_context.py",
+        "tests/test_r211_timeline_clip_move_context.py",
+        "tests/test_track_context_split.py",
+        "tests/test_waveform_mixer_tempo_ui.py"
+      ],
+      "added": [
+        "app/static/timeline_rules.js",
+        "app/timeline_editing.py",
+        "docs/TIMELINE_EDITING_R210.md",
+        "tests/test_r210_timeline_editing.py",
+        "validation/r210-timeline-coverage.xml",
+        "validation/r210-timeline-final.log",
+        "validation/r210-timeline-final.xml",
+        "validation/r210-timeline-full.log",
+        "validation/r210-timeline-full.xml",
+        "validation/r210-timeline-permissions.log",
+        "validation/r210-timeline-report.json",
+        "validation/r210-timeline-stems.log",
+        "validation/r210-timeline-targeted.log",
+        "validation/r210-timeline-targeted.xml"
+      ]
+    }
+  ],
+  "removed_named_code_definitions_since_previous": [],
+  "fresh_download_previous_matches_working_baseline": true,
+  "fresh_download_latest_matches_delivered_local": true
+}

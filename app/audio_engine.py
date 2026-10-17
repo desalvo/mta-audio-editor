@@ -35,7 +35,7 @@ def media_duration_ms(path: Path) -> int:
 
 
 def ensure_clips(track: Track) -> None:
-    if not track.clips and track.duration_ms > 0:
+    if not track.clips and not getattr(track, "clips_initialized", False) and track.duration_ms > 0:
         track.clips = [
             Clip(id=uuid.uuid4().hex[:10], source_start_ms=0, source_end_ms=track.duration_ms, timeline_start_ms=0)
         ]
@@ -48,11 +48,11 @@ def project_duration_ms(project: Project) -> int:
         if track.clips:
             end_ms = max(
                 end_ms,
-                max((max(0, clip.timeline_start_ms + int(getattr(track, "delay_ms", 0) or 0)) + clip.duration_ms) for clip in track.clips),
+                max((max(0, clip.timeline_start_ms + int(getattr(track, "delay_ms", 0) or 0) + clip.duration_ms)) for clip in track.clips),
             )
-        else:
+        elif not getattr(track, "clips_initialized", False):
             end_ms = max(end_ms, track.duration_ms)
-    return max(0, int(end_ms))
+    return max(0, int(end_ms), int(project.timeline_end_ms or 0))
 
 
 def _adaptive_global_lag(onset: np.ndarray, hz: float) -> int:
@@ -175,7 +175,7 @@ def estimate_adaptive_tempo_map(path: Path, progress=None) -> tuple[list[int], l
     return beat_ms, tempo_points
 
 
-def generate_adaptive_metronome_wav(project: Project, out: Path, beat_times_ms: list[int], beats_per_bar: int | None = None, accent_reset_ms: list[int] | None = None) -> int:
+def generate_adaptive_metronome_wav(project: Project, out: Path, beat_times_ms: list[int], beats_per_bar: int | None = None, accent_reset_ms: list[int] | None = None, zone_signatures: dict[str, str] | None = None) -> int:
     """Generate a click WAV at the exact beat timestamps of an adaptive tempo map."""
     duration_ms = project_duration_ms(project)
     if duration_ms <= 0 or not beat_times_ms:
@@ -203,11 +203,13 @@ def generate_adaptive_metronome_wav(project: Project, out: Path, beat_times_ms: 
         handle.setnchannels(1); handle.setsampwidth(2); handle.setframerate(sample_rate)
         cursor = 0
         zone_start_index = 0
+        zone_start_ms = 0
         reset_points = sorted(accent_reset_ms or [])
         reset_index = 0
         for beat_index, when_ms in enumerate(beat_times_ms):
             while reset_index < len(reset_points) and when_ms >= reset_points[reset_index]:
                 zone_start_index = beat_index
+                zone_start_ms = reset_points[reset_index]
                 reset_index += 1
             target = max(0, min(total_samples, round(float(when_ms) / 1000.0 * sample_rate)))
             if target < cursor:
@@ -215,8 +217,11 @@ def generate_adaptive_metronome_wav(project: Project, out: Path, beat_times_ms: 
             remaining = target - cursor
             while remaining > 0:
                 count = min(8192, remaining); handle.writeframesraw(silence_chunk[:count * 2]); cursor += count; remaining -= count
-            pos = (beat_index - zone_start_index) % beats_per_bar
-            click = accent if pos == 0 else (secondary if denominator == 8 and numerator in {6,9,12} and pos % 3 == 0 else regular)
+            active_num, active_den = beats_per_bar, denominator
+            if zone_signatures:
+                active_num, active_den = map(int, zone_signatures.get(str(zone_start_ms), project.time_signature).split('/'))
+            pos = (beat_index - zone_start_index) % active_num
+            click = accent if pos == 0 else (secondary if active_den == 8 and active_num in {6,9,12} and pos % 3 == 0 else regular)
             count = min(click_len, total_samples - cursor)
             if count <= 0: break
             handle.writeframesraw(click[:count * 2]); cursor += count
@@ -232,8 +237,10 @@ def zoned_metronome_beats(project: Project, duration_ms: int, zone_bpms: dict[st
     boundaries = [0] + sorted({int(m.time_ms) for m in project.markers if not m.deleted and not m.disabled and 0 < m.time_ms < duration_ms}) + [duration_ms]
     beats = []
     zone_bpms = zone_bpms or {}
+    from .metronome_grid import grid_settings
+    grid_bpm, _ = grid_settings(project)
     for start, end in zip(boundaries, boundaries[1:]):
-        step = 60000.0 / max(1.0, float(zone_bpms.get(str(start), project.bpm)))
+        step = 60000.0 / max(1.0, float(zone_bpms.get(str(start), grid_bpm)))
         i = 0
         while start + round(i * step) < end:
             beats.append(start + round(i * step))
@@ -267,6 +274,9 @@ def generate_metronome_wav(project: Project, out: Path, beats_per_bar: int | Non
     double the click rate. Compound /8 meters receive secondary accents every
     three subdivisions.
     """
+    from .metronome_grid import grid_settings
+    grid_bpm, grid_signature = grid_settings(project)
+    project = project.model_copy(update={"bpm": grid_bpm, "time_signature": grid_signature})
     duration_ms = project_duration_ms(project)
     if duration_ms <= 0:
         raise ValueError("project duration is zero")
@@ -304,7 +314,8 @@ def generate_metronome_wav(project: Project, out: Path, beats_per_bar: int | Non
         handle.setframerate(sample_rate)
         cursor = 0
         beat_index = 0
-        next_beat = 0
+        origin = max(0, round(project.metronome_grid_origin_ms * sample_rate / 1000))
+        next_beat = origin
         while cursor < total_samples:
             if next_beat >= total_samples:
                 remaining = total_samples - cursor
@@ -332,7 +343,7 @@ def generate_metronome_wav(project: Project, out: Path, beats_per_bar: int | Non
             handle.writeframesraw(click[: samples_to_write * 2])
             cursor += samples_to_write
             beat_index += 1
-            next_beat = beat_index * beat_samples
+            next_beat = origin + beat_index * beat_samples
         handle.writeframes(b"")
     return duration_ms
 
@@ -373,6 +384,7 @@ def delete_range(track: Track, start_ms: int, end_ms: int, ripple: bool) -> None
                     timeline_start_ms=start_ms if ripple else end_ms,
                 )
             )
+    track.clips_initialized = True
     track.clips = sorted((item for item in out if item.duration_ms > 0), key=lambda item: item.timeline_start_ms)
 
 
@@ -591,7 +603,7 @@ def render_mix(
         tail = f"volume={project.master_volume_db:.3f}dB"
         if master_chain:
             tail += "," + master_chain
-        tail += "," + project_time_pitch_filter(project)
+        tail += "," + master_fade_filter(project) + "," + project_time_pitch_filter(project)
         filters.append(f"[master0]{tail}[master]")
         sample_rate = int(sample_rate or getattr(project, "sample_rate", 44100) or 44100)
         sample_rate = sample_rate if sample_rate in {44100, 48000, 96000} else 44100
@@ -735,6 +747,8 @@ def project_time_pitch_filter(project: Project) -> str:
     base_bpm = project.base_bpm or project.bpm or 120.0
     tempo_ratio = max(0.25, min(4.0, float(project.bpm) / float(base_bpm)))
     semitones = max(-6.0, min(6.0, float(project.pitch_semitones)))
+    if abs(tempo_ratio - 1) < 1e-9 and abs(semitones) < 1e-9:
+        return "anull"
     pitch_ratio = 2.0 ** (semitones / 12.0)
     # asetrate changes tempo and pitch together; atempo compensates tempo to the
     # desired ratio while preserving the selected pitch shift.
@@ -1207,3 +1221,19 @@ def render_track_export(
             cmd += ["-c:a", "libmp3lame", "-b:a", bitrate, "-id3v2_version", "3", str(out)]
         _run(cmd)
     return out
+
+
+def master_fade_filter(project: Project) -> str:
+    filters = []
+    end = project_duration_ms(project)/1000
+    if project.timeline_end_ms is not None or project.master_fade_enabled:
+        filters.extend(["apad", f"atrim=end={end:.6f}"])
+    if project.master_fade_enabled and end > 0:
+        if project.master_fade_in_ms:
+            filters.append(f"afade=t=in:st=0:d={project.master_fade_in_ms/1000:.6f}")
+        if project.master_fade_out_ms:
+            duration = project.master_fade_out_ms/1000
+            if duration > end:
+                filters.append(f"volume={end/duration:.9f}")
+            filters.append(f"afade=t=out:st={max(0,end-duration):.6f}:d={min(end,duration):.6f}")
+    return ",".join(filters) or "anull"

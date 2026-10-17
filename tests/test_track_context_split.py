@@ -102,6 +102,6 @@ def test_existing_track_can_start_stem_job_and_original_track_is_kept(tmp_path, 
     saved = storage.load_project(project.id)
     names = [track.name for track in saved.tracks]
     assert names[0] == "Piano Guide"
-    assert "Piano Guide · Vocals" in names
-    assert "Piano Guide · Other" in names
+    assert "Vocals" in names
+    assert "Other" in names
     assert source.exists()

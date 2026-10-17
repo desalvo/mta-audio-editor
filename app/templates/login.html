@@ -16,8 +16,8 @@
     <form method="post" action="/login" class="auth-form"><input type="hidden" name="next" value="__NEXT__">
       <label>Email o username<input name="identifier" required autocomplete="username" placeholder="nome@esempio.it"></label>
       <label>Password<div class="password-wrap"><input id="pwd" name="password" type="password" required autocomplete="current-password" placeholder="La tua password"><button type="button" class="eye" onclick="pwd.type=pwd.type==='password'?'text':'password'">◉</button></div></label>
-      <label>Codice autenticatore <span>(se attivo)</span><input name="totp" inputmode="numeric" pattern="[0-9 ]{6,8}" autocomplete="one-time-code" placeholder="Codice a 6 cifre"></label>
-      <div class="form-minor-link"><a href="/forgot-password">Password dimenticata?</a></div>
+      <label>Codice secondo fattore <span>(email o Authenticator)</span><input name="totp" inputmode="numeric" pattern="[0-9 ]{6,8}" autocomplete="one-time-code" placeholder="Codice a 6 cifre"></label>
+      <button type="button" id="loginEmailCode">Invia codice email</button><p id="loginEmailStatus" role="status"></p><div class="form-minor-link"><a href="/reactivate-account">Riattiva account cancellato/scaduto</a> · <a href="/forgot-password">Password dimenticata?</a></div>
       <button class="primary" type="submit">Accedi</button>
     </form>
     __SOCIAL_BUTTONS__
@@ -36,4 +36,4 @@
   </aside>
 </main>
 <footer class="auth-footer"><span><img src="/static/logo.svg"> MTA Audio Editor</span><span>v__VERSION__ · rev __REVISION__ · Python 3.14 · Kubernetes · Standalone</span></footer>
-</body></html>
+<script src="/static/account_lifecycle.js?v=r210-account-lifecycle"></script></body></html>

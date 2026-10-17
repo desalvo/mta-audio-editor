@@ -59,6 +59,9 @@ def select(actor_id, can_access, body=None):
         rows = con.execute('''SELECT j.* FROM jobs j LEFT JOIN job_ui_state u
           ON u.job_id=j.job_id AND u.actor_id=? WHERE COALESCE(u.hidden,0)=0
           ORDER BY j.created_at DESC,j.job_id DESC''', (actor_id,)).fetchall()
+    from .ai_queue_admin import dispositions
+    deleted={jid for jid,state in dispositions().items() if state=="deleted"}
+    rows=[row for row in rows if row["job_id"] not in deleted]
     queue = sorted((dict(row) for row in rows if row['state'] == 'queued'), key=lambda row: (row['rank'], row['created_at'], row['job_id']))
     positions = {row['job_id']: index+1 for index, row in enumerate(queue)}
     access = {}

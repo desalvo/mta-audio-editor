@@ -1,0 +1,21 @@
+/* r210 server administration: compact, accessible bulk and provider controls. */
+#socialProviders{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:18px}
+#socialProviders fieldset{min-width:0;border:1px solid #3a5369;border-radius:10px;padding:16px;display:grid;align-content:start;gap:14px}
+#socialProviders legend{font-weight:750;padding:0 8px}
+#socialProviders p{margin:0;font-size:13px;line-height:1.6;overflow-wrap:anywhere}
+#webTab label:has(>input[type=checkbox]),#queueBulk label:has(>input[type=checkbox]){display:flex;align-items:center;gap:10px}
+#webTab input[type=checkbox],#queueBulk input[type=checkbox],#aiQueueBody input[type=checkbox]{width:19px;height:19px;padding:0;flex:none;accent-color:#249cf5;vertical-align:middle;margin-right:7px}
+.queue-search{grid-template-columns:minmax(230px,2fr) repeat(3,minmax(120px,1fr));align-items:end;margin:20px 0}
+.queue-search>button{justify-self:start}
+#queueBulk{padding:18px;background:#0d1c2d;border:1px solid #3a5369;border-radius:10px;margin:16px 0}
+#aiQueueTab nav{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;margin-top:20px}
+#aiQueueTab nav button{background:#163b5e;border:1px solid #299df6;border-radius:7px;padding:9px 16px;color:#f3f8ff}
+#aiQueueTab nav button:disabled{color:#a6b8c9;background:#172534;border-color:#3a5369;cursor:default}
+#queuePageLabel{font-variant-numeric:tabular-nums}
+#socialStatus,#smtpTestStatus{overflow-wrap:anywhere;line-height:1.6}
+@media(max-width:850px){.queue-search{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.queue-search{grid-template-columns:1fr}}
+#queueBulk[hidden]{display:none!important}
+#accountDeletePanel input[type=checkbox]{width:19px;height:19px;flex:none;accent-color:#249cf5}
+#accountDeletePanel label:has(>input[type=checkbox]){display:flex;align-items:center;gap:10px}
+#accountSandboxes{white-space:pre-wrap;overflow-wrap:anywhere}

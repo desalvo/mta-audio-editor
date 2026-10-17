@@ -201,5 +201,17 @@ def test_contextual_track_stem_job_adds_stems_without_duplicate_source(tmp_path,
     assert status["status"] == "completed"
 
     final = storage.load_project(project.id)
-    assert [track.name for track in final.tracks] == ["Guitar", "Guitar · Vocals"]
+    assert [track.name for track in final.tracks] == ["Guitar", "Vocals"]
     assert final.tracks[0].filename == "track.wav"
+
+    # A second separation adds a suffix rather than reusing the source prefix.
+    again = client.post(f"/api/projects/{project.id}/tracks/t1/stem-jobs?model=htdemucs_6s")
+    assert again.status_code == 200
+    deadline = time.time() + 5
+    while time.time() < deadline:
+        status = client.get(f"/api/stems/jobs/{again.json()['id']}").json()
+        if status["status"] in {"completed", "failed", "cancelled"}:
+            break
+        time.sleep(0.03)
+    assert status["status"] == "completed"
+    assert [track.name for track in storage.load_project(project.id).tracks] == ["Guitar", "Vocals", "Vocals 2"]

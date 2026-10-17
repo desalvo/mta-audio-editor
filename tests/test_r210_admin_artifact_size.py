@@ -86,8 +86,9 @@ const vm=require('vm'),assert=require('assert');const nodes={};let saved;
 const q=s=>nodes[s]||(nodes[s]={value:'',innerHTML:''});
 const api=async(path,options)=>{if(path.includes('/settings')){if(options){saved=JSON.parse(options.body);return saved;}
 return {max_concurrent_jobs:2,max_artifact_mib:2048,artifact_mib_min:64,artifact_mib_max:8192};}
-return {jobs:[],max_concurrent_jobs:2};};
-const ctx={q,api,alert:x=>{throw Error(x)},Number};vm.createContext(ctx);vm.runInContext(process.argv[1],ctx);
+return {jobs:[],page:1,pages:1,total:0};};
+q('#queuePageSize').value='20';
+const ctx={q,qa:()=>[],esc:String,URLSearchParams,api,alert:x=>{throw Error(x)},Number};vm.createContext(ctx);vm.runInContext(process.argv[1],ctx);
 (async()=>{await ctx.loadAIQueue();assert.equal(q('#aiArtifactMaxMiB').value,2048);
 q('#aiArtifactMaxMiB').value='4096';await ctx.loadAIQueue();assert.equal(q('#aiArtifactMaxMiB').value,'4096');
 await ctx.saveAIQueueSettings();assert.deepEqual(saved,{max_concurrent_jobs:2,max_artifact_mib:4096});

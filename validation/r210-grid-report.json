@@ -1,0 +1,55 @@
+{
+  "version": "0.3.0-r210",
+  "baseline": "MTA-r210-timeline-stems-metronome-fades-cumulative.zip",
+  "baseline_sha256": "370ed73280851059b778ee17dc5f78fb5399a92ed63561cb3b2ffb93d9e9c9eb",
+  "all_1701_previous_files_retained": "asserted by package builder",
+  "full_regression": {
+    "tests": 3694,
+    "passed": 3689,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 5,
+    "seconds": 174.613
+  },
+  "targeted_regression": {
+    "tests": 59,
+    "passed": 59,
+    "failures": 0,
+    "seconds": 3.761
+  },
+  "excluded_tests": {
+    "count": 10,
+    "reason": "AF_UNIX host-agent tests unavailable in this runner; same exclusions as preceding cumulative packages"
+  },
+  "coverage_combined_percent": 77,
+  "ruff": "passed",
+  "javascript_syntax": "passed: app.js and timeline_rules.js",
+  "functional_checks": [
+    "byte-identical rendered musical audio before/after metronome grid changes",
+    "preserves non-unity project audio tempo ratio and musical track offsets",
+    "preserves click mixer volume",
+    "independent standard metronome BPM and meter",
+    "per-zone BPM and meter with partial PCM updates",
+    "manual zone overrides survive full regeneration and marker moves",
+    "global grid changes affect non-manual zones only",
+    "adaptive grid rejects manual overrides",
+    "grid configuration rollback and project authorization",
+    "per-track persistent ms/beats/bars/bars:beats display units",
+    "signed compound musical delay and local-zone grid conversion",
+    "pre-roll uses metronome BPM and signature rather than audio speed controls"
+  ],
+  "behavior_notes": [
+    "Transport BPM remains the audio-speed control; use the new Grid button for metronome-only edits",
+    "Canonical delays stay in milliseconds; changing the grid or display unit does not move audio",
+    "Zone musical conversions use the grid at the earliest segment start; compound durations start at 0:0",
+    "Existing metronome pulse-count convention is preserved for compound meters"
+  ],
+  "not_executed": [
+    "Installed Windows/macOS GUI and listening tests",
+    "Deployed server GUI and listening tests",
+    "ROCm/GPU hardware certification"
+  ],
+  "production_changed": false,
+  "commit_push_tag_release_performed": false,
+  "suggested_cumulative_commit": "Add AI administration, SSO/MFA account lifecycle, timeline editing, master fades and independent metronome grids with musical delays"
+}

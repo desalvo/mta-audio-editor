@@ -1,0 +1,48 @@
+{
+  "version": "0.3.0-r210",
+  "baseline": "MTA-r210-account-lifecycle-email-mfa-cumulative.zip",
+  "baseline_sha256": "eb60b497571237219d757c93f3cbe94874c619e3d1aec399f317c52e54357567",
+  "no_commit_push_tag_release": true,
+  "full_regression": {
+    "tests": 3682,
+    "passed": 3676,
+    "failures": 1,
+    "skipped": 5,
+    "seconds": 165.812,
+    "note": "One legacy test still expected the old source prefix for Other. Only that obsolete expectation was corrected after the full run; application code remained unchanged."
+  },
+  "final_targeted_rerun": {
+    "tests": 36,
+    "passed": 36,
+    "failures": 0,
+    "seconds": 4.723,
+    "includes_all_previous_failures": true
+  },
+  "effective_verified_unique_tests": 3677,
+  "excluded_tests": {
+    "count": 10,
+    "reason": "AF_UNIX host-agent tests unavailable in this runner, unchanged from preceding cumulative packages",
+    "filter": "not test_malformed_agent_reply_fail_closed and not test_live_diagnostic_redacts_secrets_and_pid and not test_agent_rejects_untrusted_snapshot and not test_valid_agent_snapshot_is_diagnostic_only"
+  },
+  "coverage_percent": 76,
+  "ruff": "passed",
+  "node_syntax": "passed: app.js and timeline_rules.js",
+  "functional_checks": [
+    "real PCM positive and negative delay",
+    "real master fade amplitudes and silence boundaries",
+    "pre-roll extension and atomic project rollback",
+    "project authorization for new APIs",
+    "persistent empty clips and project fade/snap settings",
+    "actual Node execution of pointer selection, multi-selection, group drag, collision, snap, magnet and cancellation",
+    "master automation during seeks and tempo scaling",
+    "retry decoding when timing changes in flight",
+    "two completed stem jobs produce Vocals and Vocals 2"
+  ],
+  "not_executed": [
+    "Installed Windows/macOS native application tests",
+    "Deployed server browser/audio functional checks",
+    "ROCm inference or certified GPU billing hardware tests"
+  ],
+  "remaining_known_failures": [],
+  "commit_boundary": "Last confirmed commit preceded AI queue/social/SMTP and account lifecycle/MFA packages; suggested commit includes those changes."
+}

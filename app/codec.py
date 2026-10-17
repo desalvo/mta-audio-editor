@@ -10,7 +10,7 @@ import tempfile
 import uuid
 from pathlib import Path
 
-from .audio_engine import media_duration_ms, project_time_pitch_filter, render_track
+from .audio_engine import media_duration_ms, project_time_pitch_filter, render_track, master_fade_filter
 from .models import Chord, Clip, LyricLine, Marker, MtaSlotMapping, Project, RightsRecord, Track
 from .mta_writer import normalize_matroska_for_mta
 from .mta_reverse import (
@@ -199,7 +199,7 @@ def _metadata_attachment(project: Project) -> Path:
     out.write_text(json.dumps({
         "schema": "mta-audio-editor/v3", "title": project.title, "original_title": project.original_title, "artist": project.artist, "authors": project.authors, "bpm": project.bpm, "time_signature": project.time_signature, "key": project.key, "mta_device_profile": project.mta_device_profile,
         "tracks": [{"id": t.id, "name": t.name, "type": t.type, "mta_slot": t.mta_slot, "pan": t.pan, "clips": [c.model_dump() for c in t.clips], "inserts": [x.model_dump() for x in t.inserts]} for t in project.tracks],
-        "master": {"volume_db": project.master_volume_db, "inserts": [x.model_dump() for x in project.master_inserts]},
+        "master": {"fade_enabled": project.master_fade_enabled, "fade_in_ms": project.master_fade_in_ms, "fade_out_ms": project.master_fade_out_ms, "volume_db": project.master_volume_db, "inserts": [x.model_dump() for x in project.master_inserts]},
         "lyrics": [x.model_dump() for x in project.lyrics], "chords": [x.model_dump() for x in project.chords], "markers": [x.model_dump() for x in project.markers],
         "rights_records": [x.model_dump(mode="json") for x in project.rights_records],
         "rights_societies": project.rights_societies,
@@ -411,7 +411,7 @@ def export_mta(project: Project, out: Path, slots: list[MtaSlotMapping] | None =
                 pan = min(1.0, max(-1.0, t.pan))
                 filters.append(f"[{idx}:a]aformat=channel_layouts=stereo,volume={gain:.3f}dB,stereotools=balance_out={pan:.4f}[s{idx}]")
                 labels.append(f"[s{idx}]")
-            transform = project_time_pitch_filter(project)
+            transform = master_fade_filter(project) + "," + project_time_pitch_filter(project)
             if len(labels) == 1:
                 filters.append(f"{labels[0]}{transform}[out]")
             else:
