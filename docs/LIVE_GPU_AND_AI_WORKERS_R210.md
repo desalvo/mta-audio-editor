@@ -2,7 +2,7 @@
 
 ## Aggiornamento successivo: brani lunghi e annullamento
 
-Vedere [ACE_LONG_JOBS_AND_CANCELLATION_R210.md](ACE_LONG_JOBS_AND_CANCELLATION_R210.md)
+Vedere [docs/ACE_LONG_JOBS_AND_CANCELLATION_R210.md](ACE_LONG_JOBS_AND_CANCELLATION_R210.md)
 per il timeout interno ACE di 600 secondi, il budget per task, la cancellazione
 dall’Arranger e la cattura nel vero thread figlio della diffusione. La cattura
 ACE ora riguarda `service_generate`; non comprende necessariamente le altre
@@ -84,7 +84,7 @@ MTA_AI_TORCH_PROFILER=true
 Per i pacchetti server la variabile va aggiunta, senza cancellare le altre, a
 `/etc/mta/mta.env`, quindi va riavviato `mta-server.service` quando non ci sono job.
 Il percorso unificato deve essere già configurato secondo
-[docs/AI_UNIFIED_WORKERS.md](docs/AI_UNIFIED_WORKERS.md); la variabile diagnostica
+[docs/AI_UNIFIED_WORKERS.md](../docs/AI_UNIFIED_WORKERS.md); la variabile diagnostica
 non installa librerie, modelli, token o worker e non reindirizza i job locali.
 Il virtualenv che esegue ciascun worker deve avere il relativo runtime ROCm.
 

@@ -43,7 +43,7 @@ inspect.getsource; il passaggio finale è stato eseguito su sorgenti immutati.
 
 ## Limiti e validazione restante
 
-Leggere SERVER_GLOBAL_AI_GPU_BILLING_R210.md. Billing software integrato per prove
+Leggere docs/SERVER_GLOBAL_AI_GPU_BILLING_R210.md. Billing software integrato per prove
 calibrate valide, con tariffe e policy utente esistenti. Nessuna tariffa inventata
 o attivazione sul server reale. Serve calibrazione nel medesimo ambiente ACE,
 confronto con riferimento hardware e prove brevi/lunghe/cancellazione/concorrenza.

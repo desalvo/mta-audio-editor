@@ -32,7 +32,7 @@ rotazione/revoca e header CSRF. Nessun segreto salvato nel browser dal nuovo cod
 Nessuna promozione del profiler GPU a consumo fatturabile. Nessuna modifica alle
 regole di metering, cgroup, sicurezza, accounting, opt-in o tariffe. La barra non
 è un contatore di consumo. I limiti hardware e le prove mancanti sono descritti
-in AI_JOB_CENTER_R210.md.
+in docs/AI_JOB_CENTER_R210.md.
 
 ## Esiti
 

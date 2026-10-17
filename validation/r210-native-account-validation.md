@@ -65,7 +65,7 @@ worker configurato. Nessun controllo di sicurezza è stato eliminato per i test.
 
 ## Limiti e passaggi necessari
 
-Vedere NATIVE_AI_ACCOUNTS_AND_EMAIL_R210.md per configurazione e collaudo.
+Vedere docs/NATIVE_AI_ACCOUNTS_AND_EMAIL_R210.md per configurazione e collaudo.
 Occorrono nuove build native per includere uv e gli adattatori; aggiornare solo
 il server non modifica le app già installate. Verificare installazione e inferenza
 reali su macOS/Windows e generazione ACE/ROCm sul server aggiornato, inclusi job

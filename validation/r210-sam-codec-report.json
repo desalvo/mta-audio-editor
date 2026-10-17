@@ -1,0 +1,24 @@
+{
+  "version": "0.3.0-r210",
+  "baseline": "MTA-r210-el10-ffmpeg-windows-utf8-cumulative.zip",
+  "full": {
+    "tests": 3504,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 5,
+    "passed": 3499
+  },
+  "targeted": {
+    "tests": 47,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1,
+    "passed": 46
+  },
+  "not_validated": [
+    "Real EL10 installation",
+    "SAM inference on ROCm",
+    "xFormers kernels on ROCm"
+  ],
+  "git_actions": []
+}

@@ -69,7 +69,7 @@ build. Non sono state svolte nuove inferenze AMD/ROCm, download YouTube reali,
 installazioni native macOS/Windows, prove SMTP reali o collaudi browser hardware
 in questo runner. La nuova build va sottoposta alla CI e al collaudo operativo.
 
-SERVER_MEDIA_AND_VALIDATION_R210.md contiene il comando per installare/abilitare
+docs/SERVER_MEDIA_AND_VALIDATION_R210.md contiene il comando per installare/abilitare
 Demucs nel runtime ROCm disponibile e la checklist residua del server. La presenza
 della GPU non abilita da sola una build Torch CPU. La coda AI non certifica il
 metering: profiler, agent Proxmox e DRM restano diagnostici e non fatturabili.

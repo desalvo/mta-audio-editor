@@ -34,7 +34,7 @@
   ],
   "added_files": [
     "tests/test_r210_el10_media_dependencies.py",
-    "EL10_FFMPEG_AND_WINDOWS_CI_R210.md",
+    "docs/EL10_FFMPEG_AND_WINDOWS_CI_R210.md",
     "validation/r210-el10-utf8-targeted.xml",
     "validation/r210-el10-utf8-targeted.log",
     "validation/r210-el10-utf8-full.xml",

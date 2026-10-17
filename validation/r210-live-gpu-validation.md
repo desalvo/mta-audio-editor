@@ -50,4 +50,4 @@ I campioni non sono garantiti ogni cinque secondi: dipendono dai checkpoint
 PyTorch; modelli compilati o runtime diversi possono aggiornarsi solo alla fine.
 Runtime esterni/ONNX e percorsi legacy non sono automaticamente coperti.
 GPU diagnostica non fatturabile: nessuna misura non valida diventa consumo.
-Istruzioni: LIVE_GPU_AND_AI_WORKERS_R210.md.
+Istruzioni: docs/LIVE_GPU_AND_AI_WORKERS_R210.md.

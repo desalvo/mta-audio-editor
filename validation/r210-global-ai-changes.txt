@@ -36,7 +36,7 @@ tests/test_r210_live_gpu_profiles.py
 tests/test_r276_workers_coverage.py
 
 Added files
-SERVER_GLOBAL_AI_GPU_BILLING_R210.md
+docs/SERVER_GLOBAL_AI_GPU_BILLING_R210.md
 app/ai_backend_models.py
 app/ai_global_execution.py
 app/ai_gpu_verified.py

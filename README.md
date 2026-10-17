@@ -1,14 +1,14 @@
-For the MTA web server on Linux, use the standalone [MTA installation wizard](MTA_INSTALLATION.md): `scripts/install_mta.sh` installs the app and exposes a checked web endpoint without requiring a full checkout.
+For the MTA web server on Linux, use the standalone [MTA installation wizard](docs/MTA_INSTALLATION.md): `scripts/install_mta.sh` installs the app and exposes a checked web endpoint without requiring a full checkout.
 
 ## ACE-Step installation wizard
 
-Optional ROCm kernel timing diagnostics for ACE-Step 0.1.8: [activation, rollback and accounting limits](ACE_TASK_GPU_PROFILER_R210.md).
+Optional ROCm kernel timing diagnostics for ACE-Step 0.1.8: [activation, rollback and accounting limits](docs/ACE_TASK_GPU_PROFILER_R210.md).
 
-Live GPU samples and unified AI workers: [activation, coverage and validation limits](LIVE_GPU_AND_AI_WORKERS_R210.md).
+Live GPU samples and unified AI workers: [activation, coverage and validation limits](docs/LIVE_GPU_AND_AI_WORKERS_R210.md).
 
-Isolated AMD-SMI comparison on Proxmox: [gwads07 side-by-side build and validation](AMD_SMI_SIDECAR_R210.md).
+Isolated AMD-SMI comparison on Proxmox: [gwads07 side-by-side build and validation](docs/AMD_SMI_SIDECAR_R210.md).
 
-For standalone setup on Debian/RHEL-family Linux (bare metal, VM or LXC), download `scripts/install_ace_step.sh` alone; a full checkout is **not** required. See [ACE-Step Installation](ACE_STEP_INSTALLATION.md) for GPU prerequisites, interactive setup, version selection, firewall, reinstall and uninstall.
+For standalone setup on Debian/RHEL-family Linux (bare metal, VM or LXC), download `scripts/install_ace_step.sh` alone; a full checkout is **not** required. See [ACE-Step Installation](docs/ACE_STEP_INSTALLATION.md) for GPU prerequisites, interactive setup, version selection, firewall, reinstall and uninstall.
 
 ### 0.3.0-r154 — Validated bounded batch event IPC (native host disabled)
 
@@ -235,7 +235,7 @@ Native `.maeproj` files are lightweight JSON manifests backed by the modular wor
 
 Projects support 44.1/48/96 kHz sample rates (44.1 kHz default), with automatic resampling of imported sources to the project rate. Export includes 24/32-bit WAV at 44.1/48/96 kHz, standard MP3, M-Live/Merish MP3 and MP3+G (ZIP containing an MP3+CDG pair).
 
-Multi-singer SAM Audio setup (experimental): see [SINGER_SEPARATION_SETUP.md](SINGER_SEPARATION_SETUP.md).
+Multi-singer SAM Audio setup (experimental): see [SINGER_SEPARATION_SETUP.md](docs/SINGER_SEPARATION_SETUP.md).
 
 ### VST3 user manuals / Manuali VST3
 
@@ -266,19 +266,19 @@ Optional supervisor-level VST3 controller and component checkpoint pairing; no r
 
 - r183: fail-closed AI worker capability probe and experimental native C++ peak/RMS meter; AI inference remains unverified.
 
-Remote ACE-Step on a GPU server / ACE-Step remoto: see [REMOTE_AI_SETUP.md](REMOTE_AI_SETUP.md).
+Remote ACE-Step on a GPU server / ACE-Step remoto: see [REMOTE_AI_SETUP.md](docs/REMOTE_AI_SETUP.md).
 
 ## Native remote ACE-Step / ACE-Step remoto nelle app native
 
-See [Native remote AI setup](NATIVE_REMOTE_AI_SETUP.md) for the first-use Local/Remote choice, persistent preferences, HTTPS bearer authentication and GPU host configuration.
+See [Native remote AI setup](docs/NATIVE_REMOTE_AI_SETUP.md) for the first-use Local/Remote choice, persistent preferences, HTTPS bearer authentication and GPU host configuration.
 
 ### Secure remote AI access and external VM/LXC reverse proxy
 
-See [REMOTE_AI_REVERSE_PROXY.md](REMOTE_AI_REVERSE_PROXY.md) for per-user tokens, the native app endpoint, and Kubernetes NGINX/HAProxy Ingress or Docker HAProxy deployment examples. Never expose raw ACE-Step directly.
+See [REMOTE_AI_REVERSE_PROXY.md](docs/REMOTE_AI_REVERSE_PROXY.md) for per-user tokens, the native app endpoint, and Kubernetes NGINX/HAProxy Ingress or Docker HAProxy deployment examples. Never expose raw ACE-Step directly.
 
-AI billing / Tariffe AI: see [AI_BILLING_SETUP.md](AI_BILLING_SETUP.md) for effective dates, open-ended rates, reports and limitations.
+AI billing / Tariffe AI: see [AI_BILLING_SETUP.md](docs/AI_BILLING_SETUP.md) for effective dates, open-ended rates, reports and limitations.
 
-Optional MTA web HTTPS (Linux wizard): see [MTA_WEB_HTTPS.md](MTA_WEB_HTTPS.md).
+Optional MTA web HTTPS (Linux wizard): see [MTA_WEB_HTTPS.md](docs/MTA_WEB_HTTPS.md).
 
 **Email address changes (r207):** the existing verified address and account
 access remain in place until confirmation of the pending new address. The
@@ -288,8 +288,8 @@ Configure SMTP and resubmit the email change to request a new confirmation link.
 
 ### Durable upload recovery (0.3.0-r208)
 
-See [Durable upload recovery](AI_R208_DURABLE_RECOVERY_CLOSURES_EN.md) for implemented safeguards, validation and outstanding limitations.
+See [Durable upload recovery](docs/AI_R208_DURABLE_RECOVERY_CLOSURES_EN.md) for implemented safeguards, validation and outstanding limitations.
 
-ACE-Step r210: [long jobs, internal timeout and cancellation](ACE_LONG_JOBS_AND_CANCELLATION_R210.md).
+ACE-Step r210: [long jobs, internal timeout and cancellation](docs/ACE_LONG_JOBS_AND_CANCELLATION_R210.md).
 
-ACE-Step r210: [cold-start recovery without cancelling an accepted job](ACE_COLD_START_R210.md).
+ACE-Step r210: [cold-start recovery without cancelling an accepted job](docs/ACE_COLD_START_R210.md).

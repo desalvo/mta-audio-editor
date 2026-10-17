@@ -59,7 +59,7 @@ count from the start timestamp. The web script cache key is updated within r210.
 
 Keep the profiler disabled until the corrected server RPM has been installed.
 Then, while ACE is idle, use the activation commands in
-`ACE_TASK_GPU_PROFILER_R210.md` inside the Rocky LXC. Verify service startup and
+`docs/ACE_TASK_GPU_PROFILER_R210.md` inside the Rocky LXC. Verify service startup and
 run a 10-second orchestral inference. Download diagnostics immediately after
 completion. Positive task-scoped kernel activity remains diagnostic and
 nonbillable; unsupported collection must preserve successful audio generation.

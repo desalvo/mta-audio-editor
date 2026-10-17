@@ -59,4 +59,4 @@ modello compilato può ritardare l'arresto cooperativo. Backend senza nuove API
 non garantiscono l'arresto remoto. Windows e certificazione completa r210 restano
 separatamente da concludere. Nessuna misura non valida diventa fatturabile.
 
-Istruzioni complete: ACE_LONG_JOBS_AND_CANCELLATION_R210.md.
+Istruzioni complete: docs/ACE_LONG_JOBS_AND_CANCELLATION_R210.md.

@@ -16,7 +16,7 @@ app/project_media_usage.py
 app/demucs_runtime.py
 scripts/install_demucs.py
 tests/test_r210_media_stems_cleanup.py
-SERVER_MEDIA_AND_VALIDATION_R210.md
+docs/SERVER_MEDIA_AND_VALIDATION_R210.md
 validation/r210-media-stems-full.log
 validation/r210-media-stems-full.xml
 validation/r210-media-stems-coverage.xml

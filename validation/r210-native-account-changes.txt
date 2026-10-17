@@ -36,7 +36,7 @@ tests/test_r210_live_gpu_profiles.py
 tests/test_r210_live_status_hidden.py
 
 Added files
-NATIVE_AI_ACCOUNTS_AND_EMAIL_R210.md
+docs/NATIVE_AI_ACCOUNTS_AND_EMAIL_R210.md
 app/ai_device_auth.py
 app/native_ai_account.py
 app/ai_job_context.py

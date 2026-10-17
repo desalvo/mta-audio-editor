@@ -90,6 +90,15 @@ def install_group(python, folder, device, group):
         'import importlib.metadata as m;print("\\n".join(n+"=="+m.version(n) for n in ("torch","torchaudio","torchvision")))'],
         capture_output=True, text=True).stdout
     constraints.write_text(versions)
+    if group == 'sam' and device in ('rocm', 'cpu'):
+        # TorchCodec's default Linux wheels can link NVIDIA libraries even when
+        # torch itself is ROCm. Decode media on CPU; inference keeps its selected
+        # accelerator. Pin the local variant so SAM's resolver cannot replace it.
+        codec = '0.11.1+cpu' if device == 'rocm' else '0.17.0+cpu'
+        run(pip + ['--no-deps', '--only-binary=:all:', '--index-url',
+                   'https://download.pytorch.org/whl/cpu', 'torchcodec==' + codec])
+        with constraints.open('a') as stream:
+            stream.write('\ntorchcodec==' + codec + '\n')
     if group == 'audio':
         # Keep the native requirements as the source of truth. Only the accelerator
         # triplet is selected separately; never replace an existing ACE torch build.
@@ -123,6 +132,15 @@ def verify(binary, group, device=None):
     run([binary, '-c',
          'import importlib,json,sys;[importlib.import_module(n) for n in json.loads(sys.argv[1])]',
          json.dumps(IMPORTS[group])])
+    if group == 'sam':
+        # Import alone does not exercise FFmpeg's shared libraries. Decode a
+        # short PCM fixture before publishing this environment as ready.
+        run([binary, '-c',
+             'import tempfile,wave;from pathlib import Path;from torchcodec.decoders import AudioDecoder;'
+             'd=tempfile.TemporaryDirectory();p=Path(d.name)/"probe.wav";'
+             'w=wave.open(str(p),"wb");w.setnchannels(1);w.setsampwidth(2);w.setframerate(16000);'
+             'w.writeframes(bytes(3200));w.close();'
+             's=AudioDecoder(str(p)).get_all_samples();assert s.data.numel()==1600;d.cleanup()'])
     if device in ('rocm', 'cuda'):
         run([binary, '-c', "import torch;assert torch.cuda.is_available(), 'GPU unavailable to AI runtime';" +
              ("assert torch.version.hip, 'ROCm build required';" if device == 'rocm' else '') +

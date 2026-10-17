@@ -71,7 +71,7 @@ CU occupancy è una misura di occupazione, non un contatore cumulativo di
 secondi GPU attribuibili al job. Un valore zero senza prova del contatore resta
 **non verificato**. Nessun dato di questa prova diventa fatturabile. Il profiler
 ACE già incluso nel pacchetto rimane un'opzione diagnostica distinta e deve
-essere ancora provato sul ROCm reale: vedi [ACE_TASK_GPU_PROFILER_R210.md](ACE_TASK_GPU_PROFILER_R210.md).
+essere ancora provato sul ROCm reale: vedi [docs/ACE_TASK_GPU_PROFILER_R210.md](ACE_TASK_GPU_PROFILER_R210.md).
 
 Per tornare allo stato precedente basta smettere di usare il percorso isolato:
 nessun servizio è stato riconfigurato. L'eventuale rimozione della directory

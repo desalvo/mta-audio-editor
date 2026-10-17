@@ -66,4 +66,4 @@ Non è disponibile ROCm nel runner. Restano da verificare la prima generazione
 a freddo sul server con profiler attivo, i campioni GPU live, annullo volontario,
 il brano lungo oltre dieci minuti e playback/persistenza del risultato.
 Nessuna certificazione completa o abilitazione del billing GPU viene dichiarata.
-Istruzioni: ACE_COLD_START_R210.md e ACE_LONG_JOBS_AND_CANCELLATION_R210.md.
+Istruzioni: docs/ACE_COLD_START_R210.md e docs/ACE_LONG_JOBS_AND_CANCELLATION_R210.md.

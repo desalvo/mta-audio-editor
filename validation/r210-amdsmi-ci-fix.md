@@ -52,5 +52,5 @@ byte-for-byte unchanged from the failed commit.
 
 Apply this cumulative archive, commit and push through the normal workflow.
 The new commit must pass CI before proceeding with Publish/server installation
-and the ACE profiler test documented in `ACE_TASK_GPU_PROFILER_R210.md`.
+and the ACE profiler test documented in `docs/ACE_TASK_GPU_PROFILER_R210.md`.
 Retrying the failed job on the old commit would exercise the same broken tests.

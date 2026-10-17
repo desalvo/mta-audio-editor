@@ -62,7 +62,7 @@
     "app/ai_model_download.py",
     "scripts/install_ai_engines.py",
     "tests/test_r210_ai_install_lifecycle.py",
-    "SERVER_AI_INSTALL_AND_PROJECT_LIFECYCLE_R210.md",
+    "docs/SERVER_AI_INSTALL_AND_PROJECT_LIFECYCLE_R210.md",
     "validation/r210-ai-install-lifecycle-targeted.xml",
     "validation/r210-ai-install-lifecycle-targeted.log",
     "validation/r210-ai-install-lifecycle-full.xml",

@@ -48,7 +48,7 @@
     "app/platform_file_lock.py",
     "app/windows_process_identity.py",
     "tests/test_r210_windows_publication_tabs.py",
-    "WINDOWS_STARTUP_AND_ARRANGER_TABS_R210.md",
+    "docs/WINDOWS_STARTUP_AND_ARRANGER_TABS_R210.md",
     "validation/r210-windows-tabs-targeted.xml",
     "validation/r210-windows-tabs-targeted.log",
     "validation/r210-windows-tabs-full.xml",
