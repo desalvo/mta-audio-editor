@@ -50,16 +50,5 @@ def personal_usage(request: Request):
 @router.get('/admin/ai-tokens',response_class=HTMLResponse)
 def admin_page(request: Request):
     require_admin(request)
-    return HTMLResponse('''<!doctype html><html lang="en"><meta charset="utf-8"><title>AI access tokens</title>
-<style>body{font:16px system-ui;max-width:960px;margin:30px auto;padding:12px}input,button{padding:8px;margin:4px}table{border-collapse:collapse;width:100%}td,th{border-bottom:1px solid #ddd;padding:8px;text-align:left}code{overflow-wrap:anywhere}</style>
-<h1>AI access tokens</h1><p>Create one token per user/device, rotate or revoke independently. Tokens are shown <b>once</b>.</p>
-<label>User ID <input id="uid" type="number" min="1" required></label><label>Label <input id="label" value="AI client"></label>
-<button onclick="create()">Create token</button><p id="message" role="status"></p><table><thead><tr><th>ID</th><th>User</th><th>Label</th><th>Status</th><th>Action</th></tr></thead><tbody id="entries"></tbody></table>
-<h2>Usage (gateway requests)</h2><pre id="usage"></pre><p>Wall time and transfer bytes are measured. Actual attributed GPU/CPU usage requires worker instrumentation, and is not yet available for billing.</p>
-<script>
-const msg=document.getElementById('message');
-async function call(url,method='GET',body){const r=await fetch(url,{method,credentials:'same-origin',headers:{'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined});const d=await r.json();if(!r.ok)throw Error(d.detail||r.status);return d;}
-async function create(){try{let d=await call('/api/admin/ai-tokens','POST',{user_id:+uid.value,label:document.getElementById('label').value});msg.replaceChildren('New token (copy now): ');let c=document.createElement('code');c.textContent=d.token;msg.append(c);await refresh();}catch(e){msg.textContent=e.message}}
-async function act(id,action){if(!confirm(action+' token '+id+'?'))return;try{let d=await call('/api/admin/ai-tokens/'+id+(action==='rotate'?'/rotate':''),action==='rotate'?'POST':'DELETE');msg.textContent=action==='rotate'?'New token (copy now): '+d.token:'Token revoked';await refresh()}catch(e){msg.textContent=e.message}}
-async function refresh(){let arr=await call('/api/admin/ai-tokens');entries.replaceChildren();for(let t of arr){let tr=document.createElement('tr');for(let x of [t.id,t.user_id,t.label,t.revoked_at?'revoked':'active']){let td=document.createElement('td');td.textContent=x;tr.append(td)}let td=document.createElement('td');if(!t.revoked_at){for(let action of ['rotate','revoke']){let b=document.createElement('button');b.textContent=action;b.onclick=()=>act(t.id,action);td.append(b)}}tr.append(td);entries.append(tr)}usage.textContent=JSON.stringify(await call('/api/admin/ai-usage'),null,2)}refresh().catch(e=>msg.textContent=e.message);
-</script></html>''')
+    from pathlib import Path
+    return HTMLResponse((Path(__file__).parent / 'templates' / 'ai_tokens.html').read_text(encoding='utf-8'))

@@ -1,8 +1,19 @@
 """Storage safety regressions for existing r208 GC recovery."""
 import json
+import threading
 
 import pytest
 from app import storage
+
+
+@pytest.fixture(autouse=True)
+def finish_prior_gc_workers():
+    # Other suites schedule daemon GC. Finish them before globally replacing
+    # pdir/load_project, otherwise an unrelated worker consumes this test journal.
+    for worker in threading.enumerate():
+        if worker.name.startswith('mta-gc-'):
+            worker.join(5)
+            assert not worker.is_alive()
 
 
 def test_rejects_corrupt_gc_queue_without_discarding_it(tmp_path, monkeypatch):

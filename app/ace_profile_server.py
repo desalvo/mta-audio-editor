@@ -45,6 +45,14 @@ def install(server, profiler=None):
         except ValueError as exc:
             raise HTTPException(422, str(exc)) from exc
 
+    @server.app.get('/mta/tasks/{task_id}/progress', dependencies=[Depends(server.verify_api_key)])
+    def task_progress(task_id: str):
+        with controls.lock:
+            row = controls.tasks.get(task_id)
+            if row is None or not row.get('progress'):
+                raise HTTPException(404, 'No task progress report')
+            return dict(row['progress'])
+
     @server.app.get('/mta/telemetry/{task_id}', dependencies=[Depends(server.verify_api_key)])
     def telemetry(task_id: str):
         record = profiler.get(task_id)

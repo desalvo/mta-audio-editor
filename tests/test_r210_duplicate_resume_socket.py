@@ -58,7 +58,7 @@ def test_project_resume_uses_account_and_tab_storage_and_actual_init():
     helpers=source[source.index('function activeWebProjectKey'):source.index('function recentProjectIds')]
     init=source[source.index('async function init(){'):source.index('\n',source.index('async function init(){'))]
     js='''const vm=require('vm'),assert=require('assert'),store=new Map();
-const ctx={currentUser:null,current:null,pluginInfo:null,autosaveEnabled:true,
+const ctx={URLSearchParams,location:{search:''},currentUser:null,current:null,pluginInfo:null,autosaveEnabled:true,
 sessionStorage:{getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v),removeItem:k=>store.delete(k)},
 localStorage:{getItem:()=>null},restoreSidebarPanels(){},isMobileClient:()=>false,$:()=>null,
 api:async url=>url==='/api/session'?{id:1,role:'user',native_single_user:false}:{},
@@ -67,6 +67,7 @@ vm.createContext(ctx);vm.runInContext(process.argv[1],ctx);vm.runInContext(proce
 (async()=>{
  ctx.currentUser={id:1};ctx.current={id:'project-1'};vm.runInContext('rememberActiveWebProject()',ctx);
  ctx.current=null;await vm.runInContext('init()',ctx);assert.equal(ctx.current.id,'project-1');
+ ctx.location.search='?ai_project=project-2';ctx.current=null;await vm.runInContext('init()',ctx);assert.equal(ctx.current.id,'project-2');ctx.location.search='';
  ctx.currentUser={id:2};ctx.current=null;await vm.runInContext('restoreActiveWebProject()',ctx);assert.equal(ctx.current,null);
  ctx.currentUser={id:1};vm.runInContext('forgetActiveWebProject()',ctx);await vm.runInContext('restoreActiveWebProject()',ctx);assert.equal(ctx.current,null);
  ctx.currentUser={id:1,native_single_user:true};ctx.current={id:'native'};vm.runInContext('rememberActiveWebProject()',ctx);assert.equal(store.size,0);

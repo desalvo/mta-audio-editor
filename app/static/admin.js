@@ -46,14 +46,14 @@ loadWebSettings();
 let aiQueueRefreshTimer=null;
 async function loadAIQueue(){
   try{
-    const d=await api('/api/admin/ai-execution/jobs');
+    const d=await api('/api/ai-execution/jobs?limit=500');
     q('#aiQueueConcurrency').value=d.max_concurrent_jobs;
     const fmt=n=>n==null?'N/A':Number(n).toFixed(1)+' s';
     q('#aiQueueBody').innerHTML=(d.jobs||[]).map(j=>{
       const id=encodeURIComponent(j.job_id);
       const waiting=j.state==='queued', running=j.state==='running';
       const pct=j.progress_percent==null?'—':`${Number(j.progress_percent).toFixed(0)}%`;
-      return `<tr><td><code>${esc(j.job_id.slice(0,12))}</code><br>${esc(j.operation)}</td><td>${esc(j.project_id)}</td><td>${esc(j.state)}<br><small>${esc(j.message||'')}</small></td><td>${waiting?(j.queue_position+' ('+j.jobs_ahead+' davanti)'):'—'}</td><td>${pct}</td><td>CPU ${fmt(j.cpu_seconds)}<br>GPU ${j.gpu_seconds!=null?fmt(j.gpu_seconds):j.gpu_seconds_estimated!=null?'~'+fmt(j.gpu_seconds_estimated)+' (processo ACE, non fatturabile)':'N/A ('+esc(aiGpuStatusLabel(j.gpu_metrics_status))+')'}</td><td>${waiting?`<button onclick="moveAIQueueJob('${id}',-1)">↑</button><button onclick="moveAIQueueJob('${id}',1)">↓</button>`:''}${waiting?`<button class="danger" onclick="cancelAIQueueJob('${id}')">Annulla</button>`:''}</td></tr>`;
+      return `<tr><td><code>${esc(j.job_id.slice(0,12))}</code><br>${esc(j.operation)}</td><td>${esc(j.project_id)}</td><td>${esc(j.state)}<br><small>${esc(j.message||'')}</small></td><td>${waiting?(j.queue_position+' ('+j.jobs_ahead+' davanti)'):'—'}</td><td>${pct}</td><td>CPU ${fmt(j.cpu_seconds)}<br>GPU ${j.gpu_seconds!=null?fmt(j.gpu_seconds):j.gpu_seconds_estimated!=null?'~'+fmt(j.gpu_seconds_estimated)+' (processo ACE, non fatturabile)':'N/A ('+esc(aiGpuStatusLabel(j.gpu_metrics_status))+')'}</td><td>${waiting?`<button onclick="moveAIQueueJob('${id}',-1)">↑</button><button onclick="moveAIQueueJob('${id}',1)">↓</button>`:''}${['queued','blocked','running'].includes(j.state)?`<button class="danger" onclick="cancelAIQueueJob('${id}')">Annulla</button>`:`<button onclick="window.mtaAiJobs.open()">Gestisci cronologia</button>`}</td></tr>`;
     }).join('')||'<tr><td colspan="7">Nessun job registrato</td></tr>';
   }catch(e){q('#aiQueueBody').innerHTML='<tr><td colspan="7">'+esc(e.message)+'</td></tr>'}
 }

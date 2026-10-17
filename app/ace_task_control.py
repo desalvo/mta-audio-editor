@@ -10,6 +10,11 @@ import sys
 import threading
 import time
 
+if __package__:
+    from .ace_task_progress import observe_decoder, update as update_progress
+else:
+    from ace_task_progress import observe_decoder, update as update_progress
+
 MAX_BUDGET = 14400
 SERVICE_GUARD_SECONDS = MAX_BUDGET + 120
 
@@ -93,6 +98,17 @@ class TaskControl:
             with self.lock:
                 row = self._record(task)
                 row['started'], row['state'] = self.clock(), 'running'
+            generate = kwargs.get('generate_music_fn')
+            if callable(generate):
+                def tracked_generate(*a, **kw):
+                    original_progress = kw.get('progress')
+                    def report(value, *args, **options):
+                        update_progress(self, task, value)
+                        if callable(original_progress):
+                            return original_progress(value, *args, **options)
+                    kw['progress'] = report
+                    return generate(*a, **kw)
+                kwargs = dict(kwargs, generate_music_fn=tracked_generate)
             handler = kwargs.get('selected_handler')
             service = getattr(handler, 'service_generate', None)
             # Upstream actually runs diffusion in a service-generate thread.
@@ -104,7 +120,7 @@ class TaskControl:
                     with self.lock:
                         row['active_services'] = row.get('active_services', 0) + 1
                     def infer(*, job_id):
-                        with self.checkpoints(job_id):
+                        with self.checkpoints(job_id), observe_decoder(self, task, handler, kw):
                             return service(*a, **kw)
                     try:
                         return profiler.wrap(infer)(job_id=task)

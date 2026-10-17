@@ -51,5 +51,5 @@ def test_mock_ace_step_end_to_end(monkeypatch,tmp_path):
     output=tmp_path/'output.wav'
     adapter.run(request,output)
     assert output.read_bytes()==buffer.getvalue()
-    assert len(calls)==6
+    assert len(calls)==7
     assert calls[-1][0].endswith('/mta/telemetry/mock-1')

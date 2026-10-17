@@ -62,6 +62,8 @@ def test_real_http_cold_control_takes_more_than_three_seconds_without_cancel(tmp
                 self.reply(json.dumps({'data': [{'task_id': 'cold-task', 'status': 1,
                     'result': [{'file': '/v1/audio?result=1'}]}]}).encode())
         def do_GET(self):
+            if self.path.endswith('/progress'):
+                self.send_response(404); self.end_headers(); return
             if self.path.startswith('/mta/telemetry/'):
                 self.send_response(404); self.end_headers()
             else:

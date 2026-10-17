@@ -231,7 +231,7 @@ function trackHeightPx(t){return Math.max(78,Math.min(420,Math.round(Number(t?.h
 function linesToText(a,b){return(a||[]).map(x=>`${(x.time_ms/1000).toFixed(3)}\t${x[b]}`).join('\n')}
 function textToLines(v,key){return v.split(/\n/).map(x=>x.trim()).filter(Boolean).map(line=>{const [t,...rest]=line.split(/\t|\s{2,}/);return{time_ms:Math.max(0,Math.round(parseFloat(t)*1000)||0),[key]:rest.join(' ').trim()}})}
 
-async function init(){restoreSidebarPanels();if(isMobileClient())document.body.classList.add('mobile-client');try{currentUser=await api('/api/session');const a=$('#adminNav');if(a)a.hidden=!!currentUser.native_single_user||currentUser.role!=='admin';const sb=$('#nativeSettingsButton');if(sb)sb.hidden=false;const recentBtn=$('#openRecentProjectBtn'),localBtn=$('#openLocalProjectBtn'),manualSave=$('#saveProjectManualNav'),localSave=$('#saveProjectLocalNav');if(currentUser.native_single_user){document.body.classList.add('native-single-user');if(recentBtn)recentBtn.hidden=false;if(localBtn)localBtn.hidden=true;if(manualSave)manualSave.hidden=false;if(localSave)localSave.hidden=true}else{if(recentBtn)recentBtn.hidden=false;if(localBtn)localBtn.hidden=false;if(manualSave)manualSave.hidden=true;if(localSave)localSave.hidden=false}}catch(e){}if(currentUser?.native_single_user)installNativeViewportGuard();if(currentUser&&!currentUser.native_single_user)autosaveEnabled=localStorage.getItem('mtaWebAutosaveEnabled')!=='false';let nativeBridge=null;if(currentUser?.native_single_user){nativeBridge=await waitForNativeApi();if(nativeBridge?.get_native_settings){try{const cfg=await nativeBridge.get_native_settings();autosaveEnabled=cfg.autosave_enabled!==false;nativeRecentProjects=Array.isArray(cfg.recent_projects)?cfg.recent_projects.map(String).filter(Boolean):[];const pref=['it','en'].includes(cfg.language)?cfg.language:'auto';uiLanguage=pref==='auto'?(String(cfg.system_language||'en').toLowerCase().startsWith('it')?'it':'en'):pref;applyInterfaceLanguage();ensureLiveLocalization()}catch(e){}}setTimeout(()=>checkNativeAppUpdate(false),1200)}try{pluginInfo=await api('/api/plugins')}catch(e){}if(nativeBridge?.consume_startup_project){try{const startup=await nativeBridge.consume_startup_project();if(startup?.project?.id){rememberRecentProject(startup.project.id);await openP(startup.project.id);return}if(startup&&!startup.ok&&startup.error)toast('Impossibile aprire il progetto: '+startup.error)}catch(e){toast('Impossibile aprire il progetto: '+e.message)}}await refresh();await restoreActiveWebProject()}
+async function init(){restoreSidebarPanels();if(isMobileClient())document.body.classList.add('mobile-client');try{currentUser=await api('/api/session');const a=$('#adminNav');if(a)a.hidden=!!currentUser.native_single_user||currentUser.role!=='admin';const sb=$('#nativeSettingsButton');if(sb)sb.hidden=false;const recentBtn=$('#openRecentProjectBtn'),localBtn=$('#openLocalProjectBtn'),manualSave=$('#saveProjectManualNav'),localSave=$('#saveProjectLocalNav');if(currentUser.native_single_user){document.body.classList.add('native-single-user');if(recentBtn)recentBtn.hidden=false;if(localBtn)localBtn.hidden=true;if(manualSave)manualSave.hidden=false;if(localSave)localSave.hidden=true}else{if(recentBtn)recentBtn.hidden=false;if(localBtn)localBtn.hidden=false;if(manualSave)manualSave.hidden=true;if(localSave)localSave.hidden=false}}catch(e){}if(currentUser?.native_single_user)installNativeViewportGuard();if(currentUser&&!currentUser.native_single_user)autosaveEnabled=localStorage.getItem('mtaWebAutosaveEnabled')!=='false';let nativeBridge=null;if(currentUser?.native_single_user){nativeBridge=await waitForNativeApi();if(nativeBridge?.get_native_settings){try{const cfg=await nativeBridge.get_native_settings();autosaveEnabled=cfg.autosave_enabled!==false;nativeRecentProjects=Array.isArray(cfg.recent_projects)?cfg.recent_projects.map(String).filter(Boolean):[];const pref=['it','en'].includes(cfg.language)?cfg.language:'auto';uiLanguage=pref==='auto'?(String(cfg.system_language||'en').toLowerCase().startsWith('it')?'it':'en'):pref;applyInterfaceLanguage();ensureLiveLocalization()}catch(e){}}setTimeout(()=>checkNativeAppUpdate(false),1200)}try{pluginInfo=await api('/api/plugins')}catch(e){}if(nativeBridge?.consume_startup_project){try{const startup=await nativeBridge.consume_startup_project();if(startup?.project?.id){rememberRecentProject(startup.project.id);await openP(startup.project.id);return}if(startup&&!startup.ok&&startup.error)toast('Impossibile aprire il progetto: '+startup.error)}catch(e){toast('Impossibile aprire il progetto: '+e.message)}}await refresh();const requestedAiProject=new URLSearchParams(location.search).get('ai_project');if(requestedAiProject)await openP(requestedAiProject);else await restoreActiveWebProject()}
 
 // Global sidebar state, not stored in the project. Save every change immediately.
 const SIDEBAR_PREF_KEY='mta.sidebar.collapsed.v1';
@@ -5237,14 +5237,14 @@ async function openAiRemixPanel(contextTrackId=null){
   const models=catalog.models.map(x=>`<option value="${esc(x.id)}">${esc(x.name)} · ${x.available?'ready':'not installed'}</option>`).join('');
   const tracks=(current.tracks||[]).map(x=>`<option value="${esc(x.id)}" ${x.id===contextTrackId?'selected':''}>${esc(x.name)}</option>`).join('');
   const sourceTrack=contextTrackId&&trackById(contextTrackId)?contextTrackId:null;
-  showUtilityModal('AI Arranger / Remix',`<div class="ai-arranger">
+  showUtilityModal('AI Arranger / Remix',`<div class="ai-arranger"><div class="arranger-tabs" role="tablist" aria-label="Impostazioni Arranger"><button id="aiTab-source" role="tab" aria-selected="true" aria-controls="aiPane-source" onclick="aiArrangerTab('source')">Sorgente</button><button id="aiTab-arrangement" role="tab" aria-selected="false" aria-controls="aiPane-arrangement" onclick="aiArrangerTab('arrangement')">Arrangiamento</button><button id="aiTab-execution" role="tab" aria-selected="false" aria-controls="aiPane-execution" onclick="aiArrangerTab('execution')">Esecuzione</button></div><div class="arranger-options"><section id="aiPane-source" role="tabpanel" aria-labelledby="aiTab-source">
     <fieldset><legend>1 · Source / Sorgente e intervallo</legend><div class="arranger-grid">
     <label>Input audio / Sorgente<select id="aiInputSource" onchange="document.getElementById('aiInputTrackWrap').hidden=this.value!=='track'"><option value="master" ${sourceTrack?'':'selected'}>Master Out (mute / solo / FX)</option><option value="track" ${sourceTrack?'selected':''}>Single track / Traccia singola</option></select></label>
     <label id="aiInputTrackWrap" ${sourceTrack?'':'hidden'}>Input track / Traccia<select id="aiInputTrack">${(current.tracks||[]).map(x=>`<option value="${esc(x.id)}" ${x.id===sourceTrack?'selected':''}>${esc(x.name)}</option>`).join('')}</select></label>
     <label>Processing scope / Intervallo<select id="aiRemixScope" onchange="document.getElementById('aiRemixRangeWrap').hidden=this.value!=='range'"><option value="range" selected>Time range / Intervallo temporale</option><option value="project">Entire source / Sorgente intera</option></select></label>
     <div id="aiRemixRangeWrap" class="arranger-grid arranger-wide"><label>Start (seconds) / Inizio (secondi)<input id="aiRemixStartSec" type="number" min="0" max="86400" step="0.001" value="0"></label><label>End (seconds) / Fine (secondi)<input id="aiRemixEndSec" type="number" min="0" max="86400" step="0.001" value="10"></label><small class="arranger-wide hint">Only the selected source audio is sent to AI / Solo l'intervallo viene inviato all'AI</small></div>
     </div></fieldset>
-    <fieldset><legend>2 · Arrangement / Arrangiamento</legend><div class="arranger-grid">
+    </section><section id="aiPane-arrangement" role="tabpanel" aria-labelledby="aiTab-arrangement" hidden><fieldset><legend>2 · Arrangement / Arrangiamento</legend><div class="arranger-grid">
     <label>Mode / Modalità<select id="aiRemixMode" onchange="document.getElementById('aiSwapOptions').hidden=this.value!=='instrument_swap'"><option value="rearrange">AI Arranger</option><option value="auto_remix">Auto-Remix</option><option value="instrument_swap">Instrument Swap</option></select></label>
     <div id="aiSwapOptions" class="arranger-grid arranger-wide" hidden><label>Source track / Traccia sorgente<select id="aiSwapTrack">${tracks}</select></label><label>Target instrument / Strumento sostitutivo<input id="aiSwapTarget" type="text" maxlength="100" value="Saxophone"></label></div>
     <label>AI model / Modello<select id="aiRemixModel">${models}</select></label>
@@ -5260,16 +5260,24 @@ async function openAiRemixPanel(contextTrackId=null){
     <label><input id="aiKeepMelody" type="checkbox" checked> Preserve melody / Preserva melodia</label>
     <label><input id="aiKeepVoice" type="checkbox"> Preserve vocals / Preserva voce</label>
     </div><p class="hint">Preservation is best effort / La conservazione degli elementi musicali non è garantita.</p></fieldset>
-    <fieldset><legend>4 · Execution / Esecuzione</legend><div class="arranger-grid">
+    </section><section id="aiPane-execution" role="tabpanel" aria-labelledby="aiTab-execution" hidden><fieldset><legend>4 · Execution / Esecuzione</legend><div class="arranger-grid">
     <label>Maximum processing time (minutes) / Tempo massimo (minuti)<input id="aiInferenceTimeoutMinutes" type="number" min="1" max="240" step="1" value="60"></label>
     <p class="hint">Default: 60 min; adjustable from 1 to 240 min. This is the processing timeout, not the audio duration. / È il limite di elaborazione, non la durata del brano. Eventuali limiti del servizio remoto restano applicabili.</p></div></fieldset>
     ${currentUser?.native_single_user?`<details><summary>ACE-Step · Native configuration / Configurazione nativa</summary><section id="aiAceNativeTools" style="border:1px solid var(--border,#8884);padding:10px;border-radius:8px"><strong>ACE-Step · Native setup / Configurazione</strong><p id="aiAceState" class="hint">Checking...</p><div class="form-actions"><label>ACE-Step / Motore AI <select id="aiAceMode"><option value="local">Local / Locale</option><option value="remote">Remote / Remoto</option></select></label><label>Remote HTTPS URL <input id="aiAceRemoteUrl" type="url" placeholder="https://ace.example.org:8001" autocomplete="off"></label><label>API token <input id="aiAceRemoteToken" type="password" placeholder="Leave blank to keep saved token" autocomplete="new-password"></label><button class="utility-btn" onclick="aiAceSaveConnection()">Save ACE connection / Salva connessione</button></div><div id="aiAceProgressPanel" hidden role="status" aria-live="polite"><label id="aiAceProgressLabel" for="aiAceProgress">Preparing...</label><progress id="aiAceProgress" style="width:100%"></progress><small id="aiAceProgressDetail"></small></div><div class="form-actions"><button class="utility-btn" id="aiAceInstallButton" onclick="aiAceInstall()">Install ACE-Step / Installa</button><button class="utility-btn" id="aiAceStartButton" onclick="aiAceStart()">Start local server / Avvia</button><button class="utility-btn" id="aiAceStopButton" onclick="aiAceStop()">Stop ACE-Step / Ferma</button><button class="utility-btn" onclick="aiAceTest()">Test real generation / Prova generazione</button><button class="utility-btn" onclick="aiAceRefresh()">Refresh</button></div></section></details>`:''}
-    <p class="hint">Generated audio is appended as a NEW track, never replacing the original. A trusted AI worker must be installed and configured.</p>
+    </section></div><p class="hint">Generated audio is appended as a NEW track, never replacing the original. A trusted AI worker must be installed and configured.</p>
     <div class="form-actions"><button class="utility-btn" onclick="testAiArrangerWorker()">Test worker / Verifica worker</button><button class="utility-btn" onclick="planAiRemix()">Plan / Pianifica</button><button id="aiRemixGenerateButton" class="utility-btn primary" onclick="generateAndAddAiRemix()">Generate + Add track / Genera + aggiungi traccia</button></div>
-    <div id="aiRemixJobProgress" class="arranger-status" hidden role="status" aria-live="polite"><label id="aiRemixJobLabel">Preparing AI job...</label><progress style="display:block;width:100%" aria-label="AI generation in progress"></progress><small id="aiRemixJobElapsed"></small><p id="aiRemixJobHint" class="hint"></p></div>
-    <pre id="aiRemixPlanResult" style="white-space:pre-wrap;max-height:14rem;overflow:auto"></pre></div>`);
+    <div id="aiRemixJobProgress" class="arranger-status" hidden role="status" aria-live="polite"><label id="aiRemixJobLabel">Preparing AI job...</label><progress style="display:block;width:100%" aria-label="AI generation in progress"></progress><div class="arranger-meters"><div><small>Tempo trascorso</small><strong id="aiMeterElapsed">—</strong></div><div><small>CPU</small><strong id="aiMeterCpu">—</strong><small id="aiMeterCpuNote"></small></div><div><small>GPU</small><strong id="aiMeterGpu">—</strong><small id="aiMeterGpuNote"></small></div></div><small id="aiRemixJobElapsed" class="arranger-detail"></small><p id="aiRemixJobHint" class="hint"></p></div>
+    <div class="form-actions"><button class="utility-btn" onclick="window.mtaAiJobs?.open()">Job AI · elenco e controlli</button><button class="utility-btn" onclick="closeUtilityModal()">Chiudi e continua in background</button></div><pre id="aiRemixPlanResult" style="white-space:pre-wrap;max-height:4rem;overflow:auto"></pre></div>`);
+  aiArrangerTab('source');
   if(currentUser?.native_single_user)aiAceRefresh();
   aiArrangerWatchActive();
+}
+function aiArrangerTab(name){
+  for(const key of ['source','arrangement','execution']){
+    const tab=document.getElementById('aiTab-'+key),pane=document.getElementById('aiPane-'+key);
+    if(tab){tab.setAttribute('aria-selected',String(key===name));tab.tabIndex=key===name?0:-1;}
+    if(pane)pane.hidden=key!==name;
+  }
 }
 async function planAiRemix(action="plan"){
   if(!current?.id)return;
@@ -5314,7 +5322,7 @@ async function planAiRemix(action="plan"){
     updateElapsed();
     elapsedTimer=setInterval(updateElapsed,1000);
   }
-  try{const plan=await api(`/api/projects/${encodeURIComponent(current.id)}/${route}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});if(action==='generate-and-add'){if(output.isConnected)output.textContent='Job accepted: '+plan.job_id+' · Awaiting current server status / In attesa dello stato corrente';await aiArrangerWatchActive(true);}else{output.textContent=JSON.stringify({status:plan.status,mode:plan.mode||'rearrange',prompt:plan.prompt,input_source:plan.input_source,input_track_id:plan.input_track_id,constraints:plan.constraints,backend_available:plan.backend_available,warnings:plan.warnings},null,2)}}catch(e){if(output.isConnected)output.textContent=`AI generation failed / Generazione fallita: ${e.message}`;if(generating)aiArrangerRenderProgress({state:'failed',message:e.message},true); }finally{if(elapsedTimer!==null)clearInterval(elapsedTimer);if(!generating){if(progress?.isConnected)progress.hidden=true;if(button?.isConnected)button.disabled=false;}}
+  try{const plan=await api(`/api/projects/${encodeURIComponent(current.id)}/${route}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});if(action==='generate-and-add'){if(typeof window!=='undefined')window.dispatchEvent(new CustomEvent('mta:ai-job-accepted',{detail:plan}));if(output.isConnected)output.textContent='Job accepted: '+plan.job_id+' · Awaiting current server status / In attesa dello stato corrente';await aiArrangerWatchActive(true);}else{output.textContent=JSON.stringify({status:plan.status,mode:plan.mode||'rearrange',prompt:plan.prompt,input_source:plan.input_source,input_track_id:plan.input_track_id,constraints:plan.constraints,backend_available:plan.backend_available,warnings:plan.warnings},null,2)}}catch(e){if(output.isConnected)output.textContent=`AI generation failed / Generazione fallita: ${e.message}`;if(generating)aiArrangerRenderProgress({state:'failed',message:e.message},true); }finally{if(elapsedTimer!==null)clearInterval(elapsedTimer);if(!generating){if(progress?.isConnected)progress.hidden=true;if(button?.isConnected)button.disabled=false;}}
 }
 
 let aiArrangerWatchTimer=null;
@@ -5340,22 +5348,22 @@ function aiArrangerRenderProgress(job,showTerminal=false){
     button.textContent=active?(cancelling?'Cancelling job / Annullamento in corso…':'Cancel job / Annulla job'):'Generate + Add track / Genera + aggiungi traccia';
   }
   if(panel){panel.hidden=!active&&!showTerminal;panel.setAttribute?.('aria-busy',String(active));}
-  if(label)label.textContent=job.message||(active?'AI inference in progress':`AI generation: ${job.state}`);
+  if(label)label.textContent=(job.state==='cancelled'?'Job annullato':job.message)||(active?'AI inference in progress':`AI generation: ${job.state}`);
   if(bar){
     bar.hidden=!active&&job.state!=='completed';
     if(job.state==='completed'){bar.max=100;bar.value=100;}
     else if(active&&Number.isFinite(job.progress_percent)){bar.max=100;bar.value=Math.max(0,Math.min(100,job.progress_percent));}
     else bar.removeAttribute('value');
   }
-  if(hint)hint.textContent=(job.cancel_requested||job.phase==='cancelling')?'Cancellation requested; waiting for worker exit. GPU work stops at a safe checkpoint / Annullamento richiesto; attesa uscita del worker. Arresto GPU al prossimo checkpoint utile.':({
+  if(hint)hint.textContent=(active&&(job.cancel_requested||job.phase==='cancelling'))?'Cancellation requested; waiting for worker exit. GPU work stops at a safe checkpoint / Annullamento richiesto; attesa uscita del worker. Arresto GPU al prossimo checkpoint utile.':({
     submitting:'Submitting the request / Invio della richiesta.',
     queued:'Waiting in the queue / In attesa in coda.',
     blocked:'Waiting for an available worker / In attesa di un worker disponibile.',
     completed:'Generation completed / Generazione completata.',
     failed:'Generation failed. You can retry / Generazione fallita. Puoi riprovare.',
     interrupted:'Generation interrupted / Generazione interrotta.',
-    cancelled:'Generation cancelled / Generazione annullata.'
-  })[job.state]||(active?'The request is running. Progress is indeterminate until the server reports actual inference progress. Do not close this window.':'No running AI job / Nessuna generazione in corso.');
+    cancelled:'Annullamento completato: worker terminato, nessuna traccia aggiunta.'
+  })[job.state]||(active?'Elaborazione in corso. Puoi chiudere questa finestra e seguire il job da Job AI. La percentuale complessiva, se disponibile, è una stima delle fasi ACE.':'No running AI job / Nessuna generazione in corso.');
 }
 function aiGpuStatusLabel(status){
   return ({profiling:'profilazione GPU in corso; dato al prossimo checkpoint',profiled_kernels_diagnostic:'kernel GPU misurati, diagnostica non fatturabile',
@@ -5390,6 +5398,9 @@ function aiArrangerRenderElapsed(){
   const prefix=job.state==='queued'?`Queued / In coda: ${job.jobs_ahead??0} ahead · Position ${job.queue_position??'?'} · `:`Elapsed / Trascorso: ${seconds}s · `;
   const connection=aiArrangerPollFailures?` · Reconnecting / Riconnessione (${aiArrangerPollFailures})`:'';
   elapsed.textContent=prefix+`${job.phase||job.state} · Job ${job.job_id||''} · CPU: ${job.cpu_seconds!=null?Number(job.cpu_seconds).toFixed(1)+' s':job.cpu_seconds_estimated!=null?'~'+Number(job.cpu_seconds_estimated).toFixed(1)+' s (ACE process)':'N/A'} · GPU: ${job.gpu_seconds!=null?Number(job.gpu_seconds).toFixed(1)+' s':job.gpu_seconds_estimated!=null?'~'+Number(job.gpu_seconds_estimated).toFixed(1)+(job.gpu_metrics_source==='ace-torch-profiler'?aiProfilerTimeLabel(job):' s (ACE process; non fatturabile)'):`N/A (${aiGpuStatusLabel(job.gpu_metrics_status)}${aiGpuSourceLabel(job.gpu_metrics_source)?' · fonte: '+aiGpuSourceLabel(job.gpu_metrics_source):''})`}${connection}`;
+  const values={aiMeterElapsed:seconds+' s',aiMeterCpu:job.cpu_seconds!=null?Number(job.cpu_seconds).toFixed(1)+' s':job.cpu_seconds_estimated!=null?'~'+Number(job.cpu_seconds_estimated).toFixed(1)+' s':'—',aiMeterGpu:job.gpu_seconds!=null?Number(job.gpu_seconds).toFixed(1)+' s':job.gpu_seconds_estimated!=null?'~'+Number(job.gpu_seconds_estimated).toFixed(1)+' s':'—',aiMeterCpuNote:job.cpu_seconds!=null?'Misura verificata':job.cpu_seconds_estimated!=null?'Processo ACE · stima':'Non disponibile',aiMeterGpuNote:job.gpu_metrics_source==='ace-torch-profiler'?'Kernel HIP · '+(active?'raccolta parziale':'diagnostica')+' · non fatturabile':job.gpu_seconds!=null?'Misura verificata':aiGpuStatusLabel(job.gpu_metrics_status)};
+  for(const [id,text] of Object.entries(values)){const node=document.getElementById(id);if(node)node.textContent=text;}
+  if(job.steps_total){const hint=document.getElementById('aiRemixJobHint');if(hint&&active&&!job.cancel_requested)hint.textContent=job.steps_completed+'/'+job.steps_total+' valutazioni DiT osservate · avanzamento complessivo stimato ~'+Math.round(job.progress_percent||0)+'%. Puoi chiudere la finestra: Job AI resta disponibile.';}
   if(!active&&aiArrangerElapsedTimer!==null){clearInterval(aiArrangerElapsedTimer);aiArrangerElapsedTimer=null;}
 }
 async function aiArrangerWatchActive(waitForFinish=false){
@@ -5817,3 +5828,17 @@ async function testAiArrangerWorker(){
     if(result)result.textContent='Worker configuration test (does not generate audio):\n'+JSON.stringify(state,null,2);
   }catch(e){if(result)result.textContent='Worker verification failed: '+e.message;}
 }
+
+// Job monitor stays active after closing the Arranger.
+document.addEventListener('keydown',event=>{
+  if(!event.target?.id?.startsWith('aiTab-'))return;
+  const keys=['source','arrangement','execution'],index=keys.indexOf(event.target.id.slice(6));
+  if(!['ArrowRight','ArrowLeft','Home','End'].includes(event.key))return;
+  event.preventDefault();const next=event.key==='Home'?0:event.key==='End'?2:(index+(event.key==='ArrowLeft'?2:1))%3;
+  aiArrangerTab(keys[next]);document.getElementById('aiTab-'+keys[next])?.focus();
+});
+window.addEventListener('mta:ai-terminal',async event=>{
+  const job=event.detail;if(job.state!=='completed'||current?.id!==job.project_id)return;
+  const before=current;
+  try{const updated=await api('/api/projects/'+encodeURIComponent(job.project_id));if(current===before){current=updated;render();}}catch(_){/* The notification retains an explicit Open project action. */}
+});

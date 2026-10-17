@@ -49,6 +49,8 @@ def test_cover_http_roundtrip(monkeypatch, tmp_path, standalone, profiled):
             payload = json.dumps(data).encode()
             self.send_response(200); self.send_header('Content-Length',str(len(payload))); self.end_headers(); self.wfile.write(payload)
         def do_GET(self):
+            if self.path.endswith('/progress'):
+                self.send_response(404); self.end_headers(); return
             if self.path.startswith('/mta/telemetry/'):
                 if not profiled:
                     self.send_response(404);self.end_headers();return

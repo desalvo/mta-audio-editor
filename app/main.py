@@ -1568,6 +1568,56 @@ def _append_ai_generated_track(project: Project, audio: bytes, meta: dict, *, mo
         temp.unlink(missing_ok=True)
 
 
+def _job_view_access(request):
+    actor = _actor(request)
+    def access(pid):
+        if actor['role'] == 'admin':
+            return True
+        try:
+            project = load_project(pid)
+            return project_access(project, int(actor['id']), actor['role'])
+        except (OSError, ValueError):
+            return False
+    return int(actor['id']), access
+
+
+@app.get('/api/ai-execution/jobs')
+def ai_execution_jobs(request: Request, state: str = 'all', start: float | None = None,
+                      end: float | None = None, limit: int = 100, offset: int = 0):
+    from . import ai_job_views
+    actor, access = _job_view_access(request)
+    try:
+        return ai_job_views.feed(actor, access, {'state': state, 'start': start, 'end': end}, limit=limit, offset=offset)
+    except ValueError as exc:
+        raise HTTPException(422, str(exc)) from exc
+
+
+@app.post('/api/ai-execution/jobs/bulk')
+def ai_execution_bulk(request: Request, body: dict):
+    from . import ai_job_views
+    actor, access = _job_view_access(request)
+    try:
+        return ai_job_views.bulk(actor, access, body)
+    except (ValueError, TypeError) as exc:
+        raise HTTPException(422, str(exc)) from exc
+
+
+@app.post('/api/ai-execution/notifications/ack')
+def ai_execution_ack(request: Request, body: dict):
+    from . import ai_job_views
+    actor, access = _job_view_access(request)
+    try:
+        return ai_job_views.acknowledge(actor, access, body.get('ids', []))
+    except ValueError as exc:
+        raise HTTPException(422, str(exc)) from exc
+
+
+@app.get('/admin')
+def admin_home(request: Request):
+    require_admin(request)
+    return RedirectResponse('/settings', status_code=303)
+
+
 @app.get('/api/admin/ai-execution/jobs')
 def admin_ai_execution_jobs(request: Request):
     require_admin(request)

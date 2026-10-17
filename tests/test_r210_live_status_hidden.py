@@ -65,7 +65,7 @@ def test_modal_never_inserts_native_setup_on_web_even_with_pending_status():
     section = source[source.index('async function openAiRemixPanel('):source.index('async function planAiRemix(')]
     refresh = source[source.index('async function aiAceRefresh(){'):source.index('async function aiAceSaveConnection(){')]
     js = r'''const vm=require('vm'),assert=require('assert');let markup='',desktopRequests=0;
-const ctx={current:{id:'p',tracks:[]},currentUser:{native_single_user:false},uiLanguage:'en',
+const ctx={document:{getElementById:()=>null},current:{id:'p',tracks:[]},currentUser:{native_single_user:false},uiLanguage:'en',
 api:async url=>{if(url.includes('desktop-ace')){desktopRequests++;return new Promise(()=>{});}return {presets:[],models:[]}},
 esc:s=>s,showUtilityModal:(title,html)=>{markup=html},aiAceRefresh:()=>{desktopRequests++},aiArrangerWatchActive(){}};
 vm.createContext(ctx);vm.runInContext(process.argv[1],ctx);

@@ -27,11 +27,13 @@ if __package__:
     from .ace_gpu_process_meter import AceProcessMeter
     from .ai_execution_limits import inference_timeout
     from .ace_gpu_profiler import parse_report
+    from .ace_task_progress import safe_progress, stage
 else:
     sys.path.insert(0, str(Path(__file__).resolve().parent))
     from ace_gpu_process_meter import AceProcessMeter
     from ai_execution_limits import inference_timeout
     from ace_gpu_profiler import parse_report
+    from ace_task_progress import safe_progress, stage
 
 MAX_RESULT = 1024 * 1024 * 1024
 _ACTIVE_TASK_ID = None
@@ -155,6 +157,16 @@ def _profile_result(base, task_id):
         return {}
 
 
+def _task_progress(base, task):
+    if not isinstance(task, str) or not re.fullmatch(r'[A-Za-z0-9_-]{1,128}', task):
+        return {}
+    try:
+        raw = _request(base+'/mta/tasks/'+task+'/progress', timeout=2)
+        return safe_progress(json.loads(raw), task) if len(raw) <= 8192 else {}
+    except (OSError, ValueError, TypeError, URLError):
+        return {}
+
+
 def _task_telemetry(meter, base, task_id):
     telemetry = meter.sample()
     profile = _profile_result(base, task_id)
@@ -274,8 +286,24 @@ def _run(plan_path: Path, output: Path) -> None:
         row = next((item for item in rows if isinstance(item, dict) and item.get('task_id') == task_id), None) if isinstance(rows, list) else None
         if row:
             supplied = row.get('progress')
-            percent = supplied if isinstance(supplied, (int, float)) and 0 <= supplied <= 100 else None
-            _progress('inference', 'ACE-Step processing task ' + task_id[:12], percent, _task_telemetry(meter, base, task_id))
+            percent = supplied if type(supplied) in (int, float) and 0 <= supplied <= 100 else None
+            progress = _task_progress(base, task_id)
+            # Official query_result nests its progress in result[0]. That value
+            # includes upstream time-based estimates; label it accordingly.
+            if not progress:
+                try:
+                    nested = json.loads(row['result']) if isinstance(row.get('result'), str) else row.get('result')
+                    nested_percent = nested[0].get('progress') if isinstance(nested, list) and nested and isinstance(nested[0], dict) else None
+                    if type(nested_percent) in (int, float) and 0 <= nested_percent <= 1:
+                        progress = {'progress_percent': min(99, nested_percent*100), 'progress_estimated': True, 'progress_source': 'ace-stage-estimate'}
+                except (ValueError, TypeError, KeyError):
+                    pass
+            telemetry = _task_telemetry(meter, base, task_id)
+            telemetry.update(progress)
+            percent = progress.get('progress_percent', percent)
+            if percent is not None:
+                percent = min(99, percent)
+            _progress('inference', stage(percent) if percent is not None else 'ACE-Step processing task '+task_id[:12], percent, telemetry)
         if row and row.get('status') == 2:
             # Keep remote error text private; persist only a fixed classification.
             detail = str(row.get('error', '')) + str(row.get('result', ''))

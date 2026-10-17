@@ -53,7 +53,7 @@ def _db():
     con.execute('PRAGMA journal_mode=WAL')
     con.execute(_SCHEMA)
     columns = {row[1] for row in con.execute('PRAGMA table_info(jobs)')}
-    for column, sqltype in (('runner_identity', 'TEXT'), ('payload_json', 'TEXT'), ('idempotency_key', 'TEXT'), ('gpu_seconds_estimated', 'REAL'), ('cpu_seconds_estimated', 'REAL'), ('gpu_metrics_status', 'TEXT'), ('gpu_metrics_source', 'TEXT')):
+    for column, sqltype in (('runner_identity', 'TEXT'), ('payload_json', 'TEXT'), ('idempotency_key', 'TEXT'), ('gpu_seconds_estimated', 'REAL'), ('cpu_seconds_estimated', 'REAL'), ('gpu_metrics_status', 'TEXT'), ('gpu_metrics_source', 'TEXT'), ('progress_source', 'TEXT'), ('progress_estimated', 'INTEGER'), ('steps_completed', 'INTEGER'), ('steps_total', 'INTEGER')):
         if column not in columns:
             try:
                 con.execute(f'ALTER TABLE jobs ADD COLUMN {column} {sqltype}')
@@ -200,6 +200,12 @@ def _with_live_progress(row):
         pct = payload.get('progress_percent')
         if isinstance(pct, (int, float)) and not isinstance(pct, bool) and 0 <= pct <= 100:
             value['progress_percent'] = float(pct)
+        if payload.get('progress_source') in ('ace-stage-estimate', 'ace-dit-evaluations'):
+            value['progress_source'] = payload['progress_source']
+            value['progress_estimated'] = True
+            for key in ('steps_completed', 'steps_total'):
+                if type(payload.get(key)) is int and 0 <= payload[key] <= 1000:
+                    value[key] = payload[key]
         value.update(_gpu_metadata(payload))
         for field in ('cpu_seconds', 'gpu_seconds', 'cpu_seconds_estimated', 'gpu_seconds_estimated'):
             amount = payload.get(field)
@@ -407,6 +413,7 @@ def _spawn(job_id, fn, *, cancellable=False):
             # sidecar. These numbers are measurements provided by the trusted
             # worker, never derived from wall time. Missing metrics remain NULL.
             final_usage = {}
+            progress_metadata = _with_live_progress({'job_id': job_id, 'state': 'running'})
             gpu_metadata = {}
             try:
                 import math
@@ -427,10 +434,11 @@ def _spawn(job_id, fn, *, cancellable=False):
                     con.execute('ROLLBACK')
                     return
                 if cancelled_row[0]:
-                    state, message = 'cancelled', 'Cancellation requested; inference exited'
+                    state, message = 'cancelled', 'Job cancelled; worker exited and output discarded'
                 stamp = time.time()
                 changed = con.execute("UPDATE jobs SET state=?,phase=?,message=?,completed_at=?,progress_percent=? WHERE job_id=? AND state='running' AND runner_pid=? AND runner_identity IS ?", (state, state, message, stamp, 100 if state == 'completed' else None, job_id, os.getpid(), _process_identity(os.getpid())))
                 if changed.rowcount:
+                    con.execute('UPDATE jobs SET progress_source=?,progress_estimated=?,steps_completed=?,steps_total=? WHERE job_id=?', (progress_metadata.get('progress_source'), progress_metadata.get('progress_estimated'), progress_metadata.get('steps_completed'), progress_metadata.get('steps_total'), job_id))
                     if gpu_metadata:
                         con.execute('UPDATE jobs SET gpu_metrics_status=?,gpu_metrics_source=? WHERE job_id=?',
                                     (gpu_metadata.get('gpu_metrics_status'), gpu_metadata.get('gpu_metrics_source'), job_id))

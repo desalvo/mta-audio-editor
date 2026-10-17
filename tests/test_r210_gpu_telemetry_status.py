@@ -81,7 +81,7 @@ def test_gpu_reason_visible_in_actual_renderer():
     text = path.read_text()
     section = text[text.index('let aiArrangerWatchTimer'):text.index('async function aiArrangerWatchActive')]
     script = '''const vm=require('vm'),assert=require('assert');
-const elapsed={};const context={document:{getElementById:()=>elapsed},clearInterval(){}};
+const elapsed={};const context={document:{getElementById:id=>id==='aiRemixJobElapsed'?elapsed:null},clearInterval(){}};
 vm.createContext(context);vm.runInContext(process.argv[1],context);
 vm.runInContext("aiArrangerLastSnapshot={state:'running',gpu_metrics_status:'amd_smi_missing'};aiArrangerRenderElapsed()",context);
 assert(elapsed.textContent.includes('amd-smi non disponibile'));
