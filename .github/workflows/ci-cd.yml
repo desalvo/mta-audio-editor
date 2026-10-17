@@ -425,7 +425,8 @@ jobs:
           }
           $sourceDir=(Resolve-Path ".\dist\MTA Audio Editor").Path
           $outputDir=(Resolve-Path ".\dist-installer").Path
-          & $iscc "/DMyAppVersion=$version" "/DMyAppRevision=$revision" "/DSourceDir=$sourceDir" "/DOutputDir=$outputDir" "native\windows-installer.iss"
+          $buildSuffix = if ((Get-Content RELEASE_CHANNEL -Raw).Trim() -eq "early") { "-b$((Get-Content BUILD_INFO -Raw).Trim())" } else { "" }
+          & $iscc "/DMyAppVersion=$version" "/DMyAppRevision=$revision" "/DMyAppBuildSuffix=$buildSuffix" "/DSourceDir=$sourceDir" "/DOutputDir=$outputDir" "native\windows-installer.iss"
       - name: Checksum Windows installer
         shell: pwsh
         run: |
@@ -547,6 +548,8 @@ jobs:
           set -euxo pipefail
           version="$(tr -d '\r\n' < VERSION)"
           revision="$(tr -d '\r\n' < REVISION)"
+          build_suffix=""
+          if [[ "$(tr -d '\r\n' < RELEASE_CHANNEL)" == early ]]; then build_suffix="-b$(tr -d '\r\n' < BUILD_INFO)"; fi
           rm -rf dist-installer dmg-root
           mkdir -p dist-installer dmg-root
           cp -R "dist/MTA Audio Editor.app" dmg-root/
@@ -555,7 +558,7 @@ jobs:
             -volname "MTA Audio Editor ${version}" \
             -srcfolder dmg-root \
             -ov -format UDZO \
-            "dist-installer/MTA-Audio-Editor-${version}-r${revision}-macOS-${{ matrix.arch }}.dmg"
+            "dist-installer/MTA-Audio-Editor-${version}-r${revision}${build_suffix}-macOS-${{ matrix.arch }}.dmg"
       - name: Checksum macOS installer
         shell: bash
         run: |
@@ -926,9 +929,7 @@ jobs:
           version="$(tr -d '\r\n' < VERSION)"
           revision="$(tr -d '\r\n' < REVISION)"
           git archive --format=zip --output "early-assets/MTA-Audio-Editor-${version}-r${revision}-source.zip" HEAD
-          cat > early-assets/early-update.json <<EOF
-          {"channel":"early","version":"${version}","revision":"${revision}","release":"${version}-r${revision}","commit_sha":"${GITHUB_SHA}","ref":"main","repository":"${GITHUB_REPOSITORY}"}
-          EOF
+          python scripts/build_early_update_manifest.py early-assets
           sha256sum early-assets/* > early-assets/SHA256SUMS-early-main
       - name: Update rolling early-main GitHub prerelease
         env:

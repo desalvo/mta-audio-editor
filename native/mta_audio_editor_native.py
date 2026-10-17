@@ -295,6 +295,7 @@ class NativeApi:
 
     def __init__(self) -> None:
         self.window = None
+        self._ui_zoom_lock = threading.Lock()
         self._update_download_status = {"state": "idle", "received": 0, "total": 0}
         self._update_download_lock = threading.Lock()
         self.project_paths: dict[str, Path] = {}
@@ -580,6 +581,20 @@ class NativeApi:
             return chosen
         return self._write_generated_file_to_path(str(chosen["path"]), data_base64)
 
+    def restore_ui_zoom(self) -> dict:
+        from native.ui_zoom import load_zoom, apply_zoom
+        with self._ui_zoom_lock:
+            value = apply_zoom(self.window, load_zoom(_data_root()))
+        return {'ok': True, 'zoom_percent': value}
+
+    def set_ui_zoom(self, zoom_percent: int) -> dict:
+        from native.ui_zoom import validate_zoom, apply_zoom, save_zoom
+        value = validate_zoom(zoom_percent)
+        with self._ui_zoom_lock:
+            apply_zoom(self.window, value)
+            save_zoom(_data_root(), value)
+        return {'ok': True, 'zoom_percent': value}
+
     def get_native_settings(self) -> dict:
         root = _data_root()
         path = root / "native-settings.json"
@@ -716,11 +731,11 @@ class NativeApi:
         return delete(model_id)
 
     def check_for_updates(self) -> dict:
-        from app.version import APP_RELEASE
+        from app.version import APP_RELEASE, BUILD_ID
         from native.update_manager import check_for_update
         settings = self.get_native_settings()
         try:
-            return check_for_update(APP_RELEASE, settings.get("update_channel", "stable"))
+            return check_for_update(APP_RELEASE, settings.get("update_channel", "stable"), current_build=BUILD_ID)
         except Exception as exc:
             return {"ok": False, "available": False, "error": str(exc)}
 

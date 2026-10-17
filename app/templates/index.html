@@ -84,6 +84,7 @@
             <button class="nav-item" onclick="focusTracks()">☷ <span>Tracks</span></button>
             <button class="nav-item" onclick="focusInspector()">◇ <span>Plugins</span></button>
             <button class="nav-item" onclick="focusMixer()">▥ <span>Mixer</span></button>
+            <div id="nativeUiZoomControls" class="native-ui-zoom" role="group" hidden></div>
           </div>
         </section>
         <div class="nav-sep"></div>
@@ -115,6 +116,7 @@
   </div>
 </div>
 <input id="stemFileHidden" type="file" accept=".mp3,audio/mpeg" hidden>
+<script src="/static/native_ui_zoom.js?v=r210-native-ui-zoom"></script>
 <script src="/static/app.js?v=0.3.0-r210-media-stems"></script>
 <script src="/static/ai_jobs.js?v=r210-media-stems"></script></body>
 </html>

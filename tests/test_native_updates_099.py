@@ -47,7 +47,8 @@ def test_ios_updater_and_default_demucs_bootstrap():
 def test_ci_publishes_rolling_early_main_packages():
     workflow = (ROOT / ".github/workflows/ci-cd.yml").read_text(encoding="utf-8")
     assert "Publish rolling early-main packages" in workflow
-    assert "early-update.json" in workflow
+    assert "scripts/build_early_update_manifest.py early-assets" in workflow
+    assert "early-update.json" in (ROOT / "scripts/build_early_update_manifest.py").read_text()
     assert "gh release upload early-main" in workflow
     assert ":app:assembleRelease" in workflow
 

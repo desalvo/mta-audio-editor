@@ -9,6 +9,7 @@ import re
 import subprocess
 import tempfile
 import urllib.request
+from datetime import datetime
 from pathlib import Path
 
 REPOSITORY = "desalvo/mta-audio-editor"
@@ -48,6 +49,22 @@ def latest_asset_release(assets: list[dict]) -> str:
     if not versions:
         return ""
     return max(versions, key=version_key)
+
+
+def valid_build(value) -> str:
+    value = str(value or '').strip()
+    if not re.fullmatch(r'[0-9]{14}', value):
+        return ''
+    try:
+        datetime.strptime(value, '%Y%m%d%H%M%S')
+    except ValueError:
+        return ''
+    return value
+
+
+def asset_build(name: str) -> str:
+    match = re.search(r'-b([0-9]{14})(?=[-.]|$)', name, re.IGNORECASE)
+    return valid_build(match.group(1)) if match else ''
 
 
 def _get_json(url: str) -> dict:
@@ -97,16 +114,17 @@ def choose_asset(assets: list[dict], release_version: str = "") -> dict | None:
     if not candidates:
         return None
     if wanted:
-        exact = [(asset, name) for asset, name in candidates if wanted in name]
+        exact = [(asset, name) for asset, name in candidates if asset_release_version(name).lower() == wanted]
         if exact:
             candidates = exact
     # Rolling early-main can retain assets from older revisions. Prefer the
     # newest candidate when an exact version match is unavailable.
-    candidates.sort(key=lambda item: (str(item[0].get("created_at") or ""), int(item[0].get("id") or 0)), reverse=True)
+    candidates.sort(key=lambda item: (version_key(asset_release_version(item[1])), asset_build(item[1]),
+                    str(item[0].get("created_at") or ""), int(item[0].get("id") or 0)), reverse=True)
     return candidates[0][0]
 
 
-def check_for_update(current_version: str, channel: str = "stable") -> dict:
+def check_for_update(current_version: str, channel: str = "stable", *, current_build: str = '') -> dict:
     normalized = normalize_channel(channel)
     endpoint = f"{GITHUB_API}/releases/latest" if normalized == "stable" else f"{GITHUB_API}/releases/tags/early-main"
     release = _get_json(endpoint)
@@ -136,12 +154,33 @@ def check_for_update(current_version: str, channel: str = "stable") -> dict:
             except Exception as exc:
                 LOG.warning("Unable to read early-release update manifest: %s", exc)
     asset = choose_asset(assets, remote_version)
+    local_build = valid_build(current_build)
+    remote_build = ''
+    if normalized == 'early' and asset:
+        # The rolling release may contain other platforms/revisions. Compare
+        # against the actual installer this client can download, not a global
+        # publication timestamp or a different architecture's build.
+        remote_version = asset_release_version(str(asset.get('name') or '')) or remote_version
+        remote_build = asset_build(str(asset.get('name') or ''))
+        builds = manifest.get('package_builds', {})
+        if not remote_build and isinstance(builds, dict):
+            remote_build = valid_build(builds.get(str(asset.get('name') or '')))
+    newer_release = bool(remote_version and is_newer(remote_version, current_version))
+    same_release = (not is_newer(remote_version, current_version)
+                    and not is_newer(current_version, remote_version))
+    newer_build = bool(normalized == 'early' and asset and same_release
+                       and local_build and remote_build and remote_build > local_build)
+    available = (newer_release or newer_build) and (normalized != 'early' or bool(asset))
     return {
         "ok": True,
         "channel": normalized,
         "current_version": current_version,
         "latest_version": remote_version,
-        "available": bool(remote_version and is_newer(remote_version, current_version)),
+        "current_build": local_build,
+        "latest_build": remote_build,
+        "current_display": current_version + (f' · build {local_build}' if normalized == 'early' and local_build else ''),
+        "latest_display": remote_version + (f' · build {remote_build}' if normalized == 'early' and remote_build else ''),
+        "available": bool(available),
         "release_url": str(release.get("html_url") or f"https://github.com/{REPOSITORY}/releases"),
         "asset_name": str(asset.get("name")) if asset else "",
         "asset_url": str(asset.get("browser_download_url")) if asset else "",

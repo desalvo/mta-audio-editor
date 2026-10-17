@@ -1623,3 +1623,9 @@ html,body{overflow:hidden}
 .stem-workflow .utility-btn:disabled{color:#b7c5cf!important;-webkit-text-fill-color:#b7c5cf!important;opacity:.65;cursor:not-allowed}
 .stem-workflow .utility-btn:focus-visible{outline:2px solid #72c7ff;outline-offset:2px}
 .stem-workflow .utility-btn.primary{background:#0f5f96!important;border-color:#2aa9ff;color:#fff!important;-webkit-text-fill-color:#fff!important}
+
+/* Full-page native web-engine zoom controls, independent of timeline scaling. */
+.native-ui-zoom {padding:8px 10px;font-size:12px}
+.native-ui-zoom-buttons {display:flex;align-items:center;gap:5px;margin-top:5px}
+.native-ui-zoom-buttons button {min-width:28px;min-height:28px;padding:3px 6px}
+.native-ui-zoom-buttons output {min-width:40px;text-align:center;font-variant-numeric:tabular-nums}
