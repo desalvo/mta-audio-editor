@@ -85,32 +85,70 @@ def _safe_worker_error(stderr: str) -> str:
     return ' | '.join(lines[-3:]) if lines else 'no safe exception detail in stderr'
 
 
+_EXCEPTION_TYPES = frozenset({'ImportError', 'ModuleNotFoundError', 'RuntimeError', 'ValueError',
+    'TypeError', 'AttributeError', 'OSError', 'PermissionError', 'FileNotFoundError',
+    'CalledProcessError', 'OutOfMemoryError', 'NotImplementedError', 'AssertionError'})
+_DEPENDENCIES = frozenset({'torch', 'torchaudio', 'torchcodec', 'demucs', 'soundfile', 'whisper',
+    'audio_separator', 'numpy', 'sam_audio'})
+_FAILURE_MARKERS = (
+    ('TorchCodec is required', 'worker_audio_codec_missing'),
+    ("No module named 'torchcodec'", 'worker_audio_codec_missing'),
+    ('Could not load libtorchcodec', 'worker_audio_codec_unavailable'),
+
+    ('attempted relative import with no known parent package', 'worker_import_context'),
+    ('ModuleNotFoundError:', 'worker_dependency_missing'),
+    ('ROCm requested but unavailable', 'worker_rocm_unavailable'),
+    ('Expected one of cpu, cuda', 'worker_invalid_device'),
+    ('torch.OutOfMemoryError:', 'worker_out_of_memory'),
+    ('AI cgroup launch failed:', 'cgroup_launch_failed'),
+    ('Connection refused', 'ace_connection_refused'),
+    ('HTTP Error 401', 'ace_unauthorized'),
+    ('HTTP Error 403', 'ace_forbidden'),
+    ('HTTP Error 404', 'ace_endpoint_missing'),
+    ('ACE-Step backend generation timeout', 'ace_backend_timeout'),
+    ('ACE-Step backend GPU out of memory', 'ace_gpu_out_of_memory'),
+    ('ACE-Step generation failed', 'ace_backend_failed'),
+    ('ACE-Step task control request rejected', 'ace_control_rejected'),
+    ('ACE-Step generation timed out', 'ace_generation_timeout'),
+    ('ACE-Step adapter error:', 'ace_adapter_failed'),
+)
+FAILURE_CATEGORIES = frozenset({'worker_exit', *(code for _, code in _FAILURE_MARKERS)})
+
+
 def _worker_failure(stderr: str, exit_code: int) -> dict:
-    """Allowlisted classifications only: never persist user-controlled messages."""
-    category = 'worker_exit'
-    for marker, code in (
-        ('attempted relative import with no known parent package', 'worker_import_context'),
-        ('ModuleNotFoundError:', 'worker_dependency_missing'),
-        ('ROCm requested but unavailable', 'worker_rocm_unavailable'),
-        ('Expected one of cpu, cuda', 'worker_invalid_device'),
-        ('torch.OutOfMemoryError:', 'worker_out_of_memory'),
-        ('AI cgroup launch failed:', 'cgroup_launch_failed'),
-        ('Connection refused', 'ace_connection_refused'),
-        ('HTTP Error 401', 'ace_unauthorized'),
-        ('HTTP Error 403', 'ace_forbidden'),
-        ('HTTP Error 404', 'ace_endpoint_missing'),
-        ('ACE-Step backend generation timeout', 'ace_backend_timeout'),
-        ('ACE-Step backend GPU out of memory', 'ace_gpu_out_of_memory'),
-        ('ACE-Step generation failed', 'ace_backend_failed'),
-        ('ACE-Step task control request rejected', 'ace_control_rejected'),
-        ('ACE-Step generation timed out', 'ace_generation_timeout'),
-        ('ACE-Step adapter error:', 'ace_adapter_failed'),
-    ):
-        if marker in stderr:
-            category = code
+    """Only fixed codes/types/dependency names; no arbitrary worker messages."""
+    category = next((code for marker, code in _FAILURE_MARKERS if marker in stderr), 'worker_exit')
+    document = {'schema': 'mta-worker-failure-v1', 'category': category,
+                'exit_code': exit_code, 'metering_valid': False}
+    kinds = []
+    for name in re.findall(r'^([\w.]+):', stderr, flags=re.MULTILINE):
+        name = name.rsplit('.', 1)[-1]
+        if name in _EXCEPTION_TYPES and name not in kinds:
+            kinds.append(name)
+    if kinds:
+        document['exception_types'] = kinds[-3:]
+    for name in re.findall(r"No module named ['\"]([\w.]+)['\"]", stderr):
+        name = name.split('.')[0]
+        if name in _DEPENDENCIES:
+            document['missing_dependency'] = name
             break
-    return {'schema': 'mta-worker-failure-v1', 'category': category,
-            'exit_code': exit_code, 'metering_valid': False}
+    return document
+
+
+def safe_failure_metadata(failure):
+    if (not isinstance(failure, dict) or failure.get('schema') != 'mta-worker-failure-v1'
+            or not isinstance(failure.get('category'), str) or failure.get('category') not in FAILURE_CATEGORIES
+            or type(failure.get('exit_code')) is not int):
+        return None
+    result = {key: failure[key] for key in ('category', 'exit_code')}
+    result['metering_valid'] = False
+    kinds = failure.get('exception_types')
+    if isinstance(kinds, list) and 1 <= len(kinds) <= 3 and all(isinstance(v, str) and v in _EXCEPTION_TYPES for v in kinds):
+        result['exception_types'] = kinds
+    if isinstance(failure.get('missing_dependency'), str) and failure['missing_dependency'] in _DEPENDENCIES:
+        result['missing_dependency'] = failure['missing_dependency']
+    return result
+
 
 
 def _cpu(path: Path) -> float:

@@ -1,0 +1,41 @@
+{
+  "release": "0.3.0-r210",
+  "baseline": "MTA-r210-lyrics-device-notifications-cumulative.zip",
+  "user_commit_boundary": "User confirmed previous cumulative ZIP committed on 2026-10-17 16:08 Europe/Rome",
+  "targeted": {
+    "tests": 62,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 62
+  },
+  "full": {
+    "tests": 3551,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 5,
+    "passed": 3546
+  },
+  "coverage_percent": 75.02,
+  "deselected": 10,
+  "help_commands_verified": 6,
+  "installer_regression": {
+    "tests": 13,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 13
+  },
+  "full_run_before_help_text_change": true,
+  "not_executed": [
+    "Real Demucs ROCm inference",
+    "Exact original stem failure: supplied ZIP has no stderr",
+    "Heavy target installation"
+  ],
+  "user_confirmed": [
+    "Lyrics/chords/markers working",
+    "Popup behavior appears correct"
+  ],
+  "git_actions": [],
+  "production_actions": []
+}

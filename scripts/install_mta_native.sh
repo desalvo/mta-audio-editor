@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # Explicit opt-in: install SERVER from a signed APT/DNF repository.
 set -Eeuo pipefail
-usage() { echo 'Usage: sudo install_mta_native.sh [early|stable] [--dry-run] [--unattended] [--no-wizard] [--configure-only]' >&2; }
+usage() { echo 'Usage: sudo install_mta.sh [early|stable] [--dry-run] [--unattended] [--no-wizard] [--configure-only] [--help]'; }
 channel=early; dry=0; unattended=0; no_wizard=0; configure_only=0
 for arg in "$@"; do
- case "$arg" in early|stable) channel="$arg";; --dry-run) dry=1;; --unattended|--yes) unattended=1;; --no-wizard) no_wizard=1;; --configure-only) configure_only=1;; *) usage; exit 2;; esac
+ case "$arg" in --help|-h) usage; exit 0;; early|stable) channel="$arg";; --dry-run) dry=1;; --unattended|--yes) unattended=1;; --no-wizard) no_wizard=1;; --configure-only) configure_only=1;; *) usage >&2; exit 2;; esac
 done
 export MTA_PACKAGES_URL=${MTA_PACKAGES_URL:-https://desalvo.github.io/mta-audio-editor-packages}
 export MTA_REPO_KEY_FINGERPRINT=${MTA_REPO_KEY_FINGERPRINT:-0833A4FCB008ECAC9F98840B4C1D2DD95F5AEDB7}

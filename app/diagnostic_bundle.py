@@ -64,17 +64,11 @@ class SafeEvents(logging.Handler):
                    "line": int(record.lineno),
                    "exception_type": record.exc_info[0].__name__ if record.exc_info else None}
             failure = getattr(record, 'mta_worker_failure', None)
-            if isinstance(failure, dict) and failure.get('schema') == 'mta-worker-failure-v1':
-                from .ai_cgroup_metering import _worker_failure
-                allowed = {_worker_failure(marker, 1)['category'] for marker in (
-                    '', 'attempted relative import with no known parent package', 'ModuleNotFoundError:',
-                    'AI cgroup launch failed:', 'Connection refused', 'HTTP Error 401',
-                    'HTTP Error 403', 'HTTP Error 404', 'ACE-Step generation timed out', 'ACE-Step adapter error:',
-                    'ACE-Step backend generation timeout', 'ACE-Step backend GPU out of memory',
-                    'ACE-Step generation failed', 'ACE-Step task control request rejected')}
-                if failure.get('category') in allowed and type(failure.get('exit_code')) is int:
-                    obj['worker_failure'] = {'category': failure['category'],
-                                             'exit_code': failure['exit_code'], 'metering_valid': False}
+            if failure is not None:
+                from .ai_cgroup_metering import safe_failure_metadata
+                metadata = safe_failure_metadata(failure)
+                if metadata is not None:
+                    obj['worker_failure'] = metadata
             serialized = json.dumps(obj, separators=(",", ":")) + "\n"
             with _EVENT_LOCK:
                 path = directory() / "events.jsonl"
