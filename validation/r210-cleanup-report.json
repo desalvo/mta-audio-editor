@@ -1,0 +1,26 @@
+{
+  "version": "0.3.0-r210",
+  "baseline": "MTA-r210-sam-rocm-codec-docs-cumulative.zip",
+  "full": {
+    "tests": 3517,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 5,
+    "passed": 3512
+  },
+  "targeted": {
+    "tests": 49,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 49
+  },
+  "coverage_percent": 75.0,
+  "deselected": 10,
+  "remaining": [
+    "Real EL10 setup and cleanup",
+    "SAM ROCm inference"
+  ],
+  "production_actions": [],
+  "git_actions": []
+}

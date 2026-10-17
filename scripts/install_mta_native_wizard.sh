@@ -339,6 +339,8 @@ if ! systemctl restart mta-server.service || ! systemctl is-active --quiet mta-s
   exit 4
 fi
 rm -f "$backup"
+# Only collect after successful restart. Pending checkpoint deliberately protects
+# all runtimes until final setup completion.
 if [[ $billing_enabled == yes ]]; then
   systemctl enable --now mta-billing-scheduler.timer
 else
@@ -352,4 +354,5 @@ if [[ $firewall_action == yes ]]; then
   fi
 fi
 rm -f "$checkpoint"
+/opt/mta/server-venv/bin/python "$ai_installer" --cleanup --env-file "$config" || echo 'AI runtime cleanup deferred; server remains configured.' >&2
 echo "Native server configured on ${host}:${port} (HTTPS: ${https}); future upgrades are managed by APT/DNF."

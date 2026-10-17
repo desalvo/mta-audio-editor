@@ -528,6 +528,7 @@ if [[ -n ${ROLLBACK_SOURCE:-} ]]; then
  git -C "$APP_DIR" rev-parse HEAD > /etc/mta/mta-installed-sha
  printf '%s\n' "$VERSION" > /etc/mta/mta-installed-ref
 fi
+"$VENV/bin/python" "$APP_DIR/scripts/install_ai_engines.py" --cleanup --env-file "$ENVFILE" || echo 'AI runtime cleanup deferred; server remains configured.' >&2
 IP=$(hostname -I 2>/dev/null | awk '{print $1}')
 echo "MTA web health OK. Local URL: $WEB_SCHEME://127.0.0.1:$PORT/"
 [[ $BIND == network && -n $IP ]] && echo "Network URL: $WEB_SCHEME://$IP:$PORT/ (requires reachable network/firewall)"

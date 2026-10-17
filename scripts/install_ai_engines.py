@@ -13,6 +13,8 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
+import re
 
 SOURCE = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(SOURCE))
@@ -224,6 +226,91 @@ def install(args):
     return plan
 
 
+def runtime_references(base, data):
+    """Keep lexical venv paths: resolving bin/python loses the venv identity."""
+    return set(re.findall(re.escape(str(base)) + r'/ai-[0-9a-f]{16}(?=/|[\s\x00\"\']|$)', data))
+
+
+def process_runtime_references(base, proc=Path('/proc')):
+    protected = set()
+    # Unreadable process metadata means absence of use cannot be established.
+    # PID exit races are harmless; any other inspection failure aborts cleanup.
+    for entry in proc.iterdir():
+        if not entry.name.isdigit():
+            continue
+        try:
+            for name in ('cmdline', 'environ', 'maps'):
+                protected.update(runtime_references(base, (entry / name).read_bytes().decode('utf-8', errors='replace')))
+            for name in ('exe', 'cwd'):
+                protected.update(runtime_references(base, os.readlink(entry / name)))
+            for fd in (entry / 'fd').iterdir():
+                try:
+                    protected.update(runtime_references(base, os.readlink(fd)))
+                except FileNotFoundError:
+                    pass
+        except FileNotFoundError:
+            continue
+    return protected
+
+
+def cleanup_runtimes(base, env_file, dry_run=False, proc=Path('/proc'), now=None,
+                     checkpoint=Path('/etc/mta/.mta-wizard.pending')):
+    """Post-success best-effort GC; never remove active or recent environments."""
+    base = Path(base).absolute()
+    report = {'removed': [], 'kept': [], 'dry_run': dry_run}
+    try:
+        if base.is_symlink() or base.resolve() != base or not base.is_dir():
+            raise ValueError('Unsafe AI runtime base')
+        # A failed/resumable setup may reference a not-yet-active environment.
+        if checkpoint.exists() or checkpoint.is_symlink():
+            raise ValueError('Wizard checkpoint present; cleanup deferred')
+        protected = set()
+        for path in {Path(env_file), Path('/etc/mta/mta.env')}:
+            if path.is_symlink():
+                raise ValueError('Symlinked server configuration')
+            if path.exists():
+                protected.update(runtime_references(base, path.read_text()))
+            elif path == Path(env_file):
+                raise ValueError('Server configuration missing')
+        protected.update(process_runtime_references(base, proc))
+        mounts = []
+        for line in (proc / 'self/mountinfo').read_text().splitlines():
+            mount = re.sub(r'\\([0-7]{3})', lambda m: chr(int(m[1], 8)), line.split()[4])
+            mounts.append(Path(mount))
+        now = time.time() if now is None else now
+        for folder in sorted(base.iterdir()):
+            if not re.fullmatch(r'ai-[0-9a-f]{16}', folder.name):
+                continue
+            info = folder.lstat()
+            if (folder.is_symlink() or not folder.is_dir() or str(folder) in protected
+                    or now - info.st_mtime < 86400 or info.st_uid != os.geteuid()
+                    or info.st_mode & 0o022
+                    or any(m == folder or folder in m.parents for m in mounts)):
+                report['kept'].append(folder.name)
+                continue
+            # Never recurse into a bind mount, filesystem boundary, or a
+            # writable foreign directory. rmtree itself does not follow links.
+            def walk_error(error):
+                raise error
+            for root, dirs, files in os.walk(folder, followlinks=False, onerror=walk_error):
+                for path in [Path(root), *(Path(root) / name for name in dirs)]:
+                    if path.is_symlink():
+                        continue
+                    stat = path.stat()
+                    if (os.path.ismount(path) or stat.st_dev != info.st_dev
+                            or stat.st_uid != os.geteuid() or stat.st_mode & 0o022):
+                        raise ValueError('Unsafe contents in ' + folder.name)
+            if not dry_run:
+                if not shutil.rmtree.avoids_symlink_attacks:
+                    raise ValueError('Safe directory deletion unavailable')
+                shutil.rmtree(folder)
+            report['removed'].append(folder.name)
+    except (OSError, ValueError) as exc:
+        report['deferred'] = str(exc)
+    print('AI cleanup: ' + json.dumps(report), flush=True)
+    return report
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--python', default=sys.executable)
@@ -231,8 +318,28 @@ def main():
     parser.add_argument('--env-file', default='/etc/mta/mta.env')
     parser.add_argument('--device', choices=('auto', 'cpu', 'cuda', 'rocm'), default='auto')
     parser.add_argument('--dry-run', action='store_true')
+    parser.add_argument('--cleanup', action='store_true', help='Remove unused runtimes older than 24 hours after successful setup')
     args = parser.parse_args()
-    install(args)
+    import fcntl  # Linux installer; keep module importable by cross-platform tests.
+    # Serialize provisioning and GC so simultaneous installers cannot delete
+    # an environment another installer is preparing.
+    if args.dry_run and not args.cleanup:
+        install(args)
+        return
+    base = Path(args.base).absolute()
+    base.mkdir(parents=True, exist_ok=True)
+    if base.is_symlink() or base.resolve() != base:
+        raise ValueError('Unsafe AI runtime base')
+    info = base.stat()
+    if info.st_uid != os.geteuid() or info.st_mode & 0o022:
+        raise ValueError('AI runtime base must be owned by setup user and not group/world writable')
+    fd = os.open(base / '.mta-ai-setup.lock', os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600)
+    with os.fdopen(fd, 'a') as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        if args.cleanup:
+            cleanup_runtimes(base, args.env_file, args.dry_run)
+        else:
+            install(args)
 
 
 if __name__ == '__main__':
