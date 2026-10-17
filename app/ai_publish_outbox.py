@@ -14,10 +14,7 @@ import stat
 import tempfile
 import time
 
-try:
-    import fcntl
-except ImportError:  # pragma: no cover - Windows must not silently bypass locking
-    fcntl = None
+from . import platform_file_lock as fcntl
 
 from . import ai_arranger_runtime as queue
 
@@ -122,7 +119,7 @@ def stage(job_id, project_id, audio, metadata):
     fd, tmp = tempfile.mkstemp(prefix='.stage-', suffix='.wav', dir=path.parent)
     try:
         with os.fdopen(fd, 'wb') as stream:
-            os.fchmod(stream.fileno(), 0o600)
+            fcntl.private_mode(stream.fileno())
             stream.write(audio)
             stream.flush()
             os.fsync(stream.fileno())
@@ -160,8 +157,6 @@ def recover(publish, *, job_id=None):
     The callback MUST recognize an already-published job; retries are expected.
     Failed callbacks stay pending. Only matching staged SHA-256 is consumed.
     """
-    if fcntl is None:
-        raise RuntimeError('Cross-process publication recovery requires POSIX flock')
     with _open() as con:
         if job_id is not None:
             queue._validate_job_id(job_id)
@@ -178,7 +173,7 @@ def recover(publish, *, job_id=None):
         with os.fdopen(lock_fd, 'a+b') as lock:
             if not stat.S_ISREG(os.fstat(lock.fileno()).st_mode):
                 raise ValueError('Publication lock must be a regular file')
-            os.fchmod(lock.fileno(), 0o600)
+            fcntl.private_mode(lock.fileno())
             fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
             with _open() as con:
                 row = con.execute('SELECT * FROM publications WHERE job_id=?', (jid,)).fetchone()

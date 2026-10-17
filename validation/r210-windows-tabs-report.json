@@ -1,0 +1,65 @@
+{
+  "release": "0.3.0-r210",
+  "baseline": "MTA-r210-global-ai-gpu-billing-cumulative.zip",
+  "baseline_sha256": "ce3a85124209348dc31bad4d48df2638ecf2c71094d9c94ee41168cf7e353b25",
+  "targeted": {
+    "tests": 74,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1,
+    "passed": 73
+  },
+  "full": {
+    "tests": 3467,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 5,
+    "passed": 3462
+  },
+  "line_coverage_percent": 77.89,
+  "coverage_percent": 75.03,
+  "deselected": 10,
+  "deselected_reason": "Runner prohibits AF_UNIX sockets (PermissionError errno 1). Same ten agent/socket cases excluded in preceding validation.",
+  "static_checks": [
+    "ruff app/native/tests and k8s wizard",
+    "compileall app",
+    "node --check app.js",
+    "workflow YAML and Windows regression step"
+  ],
+  "platform_limits": [
+    "Actual Win32 API case skipped on Linux; enabled in Windows CI",
+    "Installer and WebView require Windows verification",
+    "No GPU hardware calibration or production certification performed"
+  ],
+  "git_actions": [],
+  "modified_baseline_files": [
+    ".github/workflows/ci-cd.yml",
+    "app/ai_arranger_runtime.py",
+    "app/ai_billing_outbox.py",
+    "app/ai_project_lock.py",
+    "app/ai_publish_outbox.py",
+    "app/ai_result_cache.py",
+    "app/native_ai_account.py",
+    "app/native_ai_routing.py",
+    "app/static/app.css",
+    "app/storage.py"
+  ],
+  "added_files": [
+    "app/platform_file_lock.py",
+    "app/windows_process_identity.py",
+    "tests/test_r210_windows_publication_tabs.py",
+    "WINDOWS_STARTUP_AND_ARRANGER_TABS_R210.md",
+    "validation/r210-windows-tabs-targeted.xml",
+    "validation/r210-windows-tabs-targeted.log",
+    "validation/r210-windows-tabs-full.xml",
+    "validation/r210-windows-tabs-full.log",
+    "validation/r210-windows-tabs-coverage.xml",
+    "validation/r210-windows-tabs-static.log",
+    "validation/r210-windows-tabs-report.json"
+  ],
+  "archive_validation": {
+    "baseline_files_preserved": 1527,
+    "all_entry_bytes_compared_to_working_project": true,
+    "crc_verified": true
+  }
+}

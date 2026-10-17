@@ -11,6 +11,7 @@ import re
 import os
 from pathlib import Path
 import sqlite3
+import sys
 import tempfile
 import threading
 import time
@@ -104,8 +105,11 @@ def configure(limit):
 def _process_identity(pid):
     """Linux boot ID and process start tick; prevent PID-reuse false positives.
 
-    For non-Linux runtimes return None and rely on the legacy PID check.
+    Windows uses a query-only process creation identity; other OSes use PID checks.
     """
+    if sys.platform == 'win32':
+        from .windows_process_identity import process_identity
+        return process_identity(pid)
     try:
         boot = Path('/proc/sys/kernel/random/boot_id').read_text().strip()
         stat = Path(f'/proc/{int(pid)}/stat').read_text()
@@ -131,7 +135,9 @@ def _recover_dead_runners(con):
         dead = False
         if identity:
             current = _process_identity(pid)
-            dead = current != identity
+            dead = current != '' and current != identity
+        elif sys.platform == 'win32':
+            dead = _process_identity(pid) is None
         else:
             try:
                 os.kill(int(pid), 0)

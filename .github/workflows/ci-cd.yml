@@ -381,6 +381,15 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: .\scripts\provision_chordino_windows.ps1
+      - name: Windows AI publication and lock regressions
+        shell: pwsh
+        env:
+          PYTHONPATH: .
+          MTA_NATIVE_SINGLE_USER: 'true'
+          MTA_ALLOW_INSECURE_NO_AUTH: 'true'
+        run: |
+          python -m pip install "pytest==9.1.1" "httpx==0.28.1"
+          python -m pytest -q tests/test_r210_windows_publication_tabs.py
       - name: Generate native build id
         shell: pwsh
         run: |

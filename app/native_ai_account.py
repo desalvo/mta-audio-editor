@@ -6,6 +6,7 @@ import secrets
 import threading
 import time
 from pathlib import Path
+from .platform_file_lock import private_mode
 from urllib.request import Request,build_opener,HTTPSHandler,HTTPRedirectHandler
 from .ai_remote_client import _endpoint
 
@@ -29,7 +30,7 @@ def _write(data):
     path=_file();path.parent.mkdir(parents=True,exist_ok=True,mode=0o700)
     fd,name=tempfile.mkstemp(dir=path.parent,prefix='.ai-account-')
     try:
-        os.fchmod(fd,0o600)
+        private_mode(fd)
         with os.fdopen(fd,'w') as stream:json.dump(data,stream)
         os.replace(name,path)
     finally:

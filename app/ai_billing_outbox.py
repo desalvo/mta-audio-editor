@@ -17,10 +17,7 @@ import time
 from . import ai_arranger_runtime as queue
 from . import ai_billing
 
-try:
-    import fcntl
-except ImportError:  # pragma: no cover
-    fcntl = None
+from . import platform_file_lock as fcntl
 
 
 def _db():
@@ -134,8 +131,6 @@ def deliver(*, job_id=None, on_applied=None):
     Only an exact same-intent delivery may be retried after a crash between
     ledger commit and local acknowledgement. Failed deliveries stay pending.
     """
-    if fcntl is None:
-        raise RuntimeError('Billing outbox requires POSIX file locking')
     if job_id is not None:
         queue._validate_job_id(job_id)
     with _db() as con:

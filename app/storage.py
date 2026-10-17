@@ -15,10 +15,7 @@ from pathlib import Path
 
 from .models import Project
 
-try:
-    import fcntl
-except ImportError:
-    fcntl = None
+from . import platform_file_lock as fcntl
 
 ROOT = Path(os.environ.get("MTA_DATA_DIR", "/data/projects")).resolve()
 ROOT.mkdir(parents=True, exist_ok=True)
@@ -85,10 +82,7 @@ def _shared_blob_path(digest: str, suffix: str = "") -> Path:
 
 @contextmanager
 def _shared_process_lock():
-    """Serialize shared blob/index mutations across POSIX server workers."""
-    if fcntl is None:
-        # Refuse uncoordinated mutations on platforms without an OS lock.
-        raise RuntimeError("shared-media mutations require POSIX file locking")
+    """Serialize shared blob/index mutations across server and native workers."""
     if SHARED_MEDIA_ROOT.is_symlink():
         raise ValueError("unsafe shared media root")
     SHARED_MEDIA_ROOT.mkdir(parents=True, exist_ok=True)

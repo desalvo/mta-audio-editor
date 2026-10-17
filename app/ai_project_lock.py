@@ -11,10 +11,7 @@ import threading
 
 from . import ai_arranger_runtime as runtime
 
-try:
-    import fcntl
-except ImportError:  # POSIX server only
-    fcntl = None
+from . import platform_file_lock as fcntl
 
 
 _HELD = threading.local()
@@ -22,8 +19,6 @@ _HELD = threading.local()
 
 @contextmanager
 def project_publication_lock(project_id):
-    if fcntl is None:
-        raise RuntimeError('Project publication locking requires POSIX flock')
     if not isinstance(project_id, str) or not project_id or len(project_id) > 256:
         raise ValueError('Invalid project identifier')
     runtime._ROOT.mkdir(parents=True, exist_ok=True, mode=0o700)
@@ -46,7 +41,7 @@ def project_publication_lock(project_id):
         flags |= os.O_NOFOLLOW
     fd = os.open(path, flags, 0o600)
     with os.fdopen(fd, 'a+b') as handle:
-        os.fchmod(handle.fileno(), 0o600)
+        fcntl.private_mode(handle.fileno())
         fcntl.flock(handle.fileno(), fcntl.LOCK_EX)
         held.add(identity)
         try:

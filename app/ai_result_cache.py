@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import hashlib
 import contextlib
-import fcntl
+from . import platform_file_lock as fcntl
 import stat
 import json
 import os
@@ -45,9 +45,11 @@ def _paths(root: Path, user_id: int, key: str) -> tuple[Path, Path]:
 def _entry_lock(root: Path, blob: Path):
     """Serialize writes/readers of a single cached request across API workers."""
     path = root / (blob.stem + '.lock')
-    fd = os.open(path, os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600)
+    if path.is_symlink():
+        raise ValueError('Unsafe cache lock')
+    fd = os.open(path, os.O_CREAT | os.O_RDWR | getattr(os, 'O_NOFOLLOW', 0), 0o600)
     try:
-        if not stat.S_ISREG(os.fstat(fd).st_mode):
+        if path.is_symlink() or not stat.S_ISREG(os.fstat(fd).st_mode):
             raise ValueError('Unsafe cache lock')
         fcntl.flock(fd, fcntl.LOCK_EX)
         yield
@@ -57,10 +59,12 @@ def _entry_lock(root: Path, blob: Path):
 
 
 def _read_regular(path: Path, limit: int) -> bytes:
-    fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+    if path.is_symlink():
+        raise ValueError('Unsafe cached artifact')
+    fd = os.open(path, os.O_RDONLY | getattr(os, 'O_NOFOLLOW', 0) | getattr(os, 'O_NONBLOCK', 0))
     try:
         metadata = os.fstat(fd)
-        if not stat.S_ISREG(metadata.st_mode) or metadata.st_nlink != 1 or metadata.st_size > limit:
+        if path.is_symlink() or not stat.S_ISREG(metadata.st_mode) or metadata.st_nlink != 1 or metadata.st_size > limit:
             raise ValueError('Unsafe cached artifact')
         with os.fdopen(fd, 'rb', closefd=False) as stream:
             data = stream.read(limit + 1)
@@ -104,11 +108,13 @@ def save(user_id: int, key: str, payload: bytes, media_type: str, job_id: str, *
             finally:
                 if os.path.exists(temp_path):
                     os.unlink(temp_path)
-        dirfd = os.open(root, os.O_RDONLY | os.O_DIRECTORY)
-        try:
-            os.fsync(dirfd)
-        finally:
-            os.close(dirfd)
+        if hasattr(os, 'O_DIRECTORY'):
+            dirfd = os.open(root, os.O_RDONLY | os.O_DIRECTORY)
+            try:
+                os.fsync(dirfd)
+            finally:
+                os.close(dirfd)
+        # Windows has no POSIX directory FD; files were fsynced before replace.
     return True
 
 

@@ -8,6 +8,7 @@ import io
 import json
 import os
 from pathlib import Path
+from .platform_file_lock import private_mode
 import tempfile
 import zipfile
 
@@ -66,7 +67,7 @@ def configure(kind: str, mode: str, url: str = '', token: str = '') -> dict:
     destination.parent.mkdir(mode=0o700,parents=True,exist_ok=True)
     fd,tmp = tempfile.mkstemp(dir=destination.parent,prefix='.remote-workers-')
     try:
-        os.fchmod(fd,0o600)
+        private_mode(fd)
         with os.fdopen(fd,'w',encoding='utf-8') as stream:
             json.dump(data,stream)
         os.replace(tmp,destination)
