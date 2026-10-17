@@ -1,0 +1,35 @@
+{
+  "release": "0.3.0-r210",
+  "baseline": "MTA-r210-full-length-stem-artifacts-cumulative.zip",
+  "request": "Administrator-configurable maximum aggregate artifact size in MiB; artifact count stays 16.",
+  "setting": "max_artifact_mib",
+  "default_mib": 1024,
+  "min_mib": 64,
+  "max_mib": 8192,
+  "policy_snapshot": "Frozen before each worker execution; request plan cannot override; packaging receives the same snapshot.",
+  "transport": "Absolute 8192 MiB plus 2 MiB ZIP/manifest headroom; bounded 1 MiB HTTP reads.",
+  "targeted": {
+    "tests": 36,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 36
+  },
+  "full": {
+    "tests": 3583,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 5,
+    "passed": 3578
+  },
+  "coverage_line_percent": 78.02,
+  "deselected": 10,
+  "test_environment": "CI test mode MTA_ALLOW_INSECURE_NO_AUTH=true; cmake on PATH.",
+  "not_executed": [
+    "Production deployment",
+    "Real server GPU inference",
+    "10 AF_UNIX socket cases forbidden by runner"
+  ],
+  "git_actions": [],
+  "production_actions": []
+}

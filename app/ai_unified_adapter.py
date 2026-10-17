@@ -42,6 +42,8 @@ def _artifacts(folder: Path, entries: list[tuple[Path, str]]) -> None:
     crashed adapter appear to have finished and could lose or misbill outputs.
     """
     from app.ai_worker_artifacts import MAX_FILES, MAX_ARTIFACT_BYTES, SAFE_NAME
+    from app.ai_payload_limits import worker_artifact_bytes
+    budget = worker_artifact_bytes(MAX_ARTIFACT_BYTES)
     if not 1 <= len(entries) <= MAX_FILES:
         raise RuntimeError('Invalid number of worker artifacts')
     folder = folder.resolve(strict=True)
@@ -64,11 +66,11 @@ def _artifacts(folder: Path, entries: list[tuple[Path, str]]) -> None:
         if not stat.S_ISREG(info.st_mode) or info.st_nlink != 1:
             raise RuntimeError('Worker output must be an unlinked regular file')
         total += info.st_size
-        if total > MAX_ARTIFACT_BYTES:
+        if total > budget:
             raise RuntimeError('Worker outputs exceed artifact size limit')
         # Hash the validated inode; packaging verifies the same bytes before delivery.
         from app.ai_worker_artifacts import _read_private_file
-        snapshot = _read_private_file(path, MAX_ARTIFACT_BYTES - (total - info.st_size))
+        snapshot = _read_private_file(path, budget - (total - info.st_size))
         seen.add(path.name)
         manifest.append({'name': path.name, 'type': media, 'sha256': hashlib.sha256(snapshot).hexdigest()})
     # Atomic replacement keeps consumer reads all-or-nothing, including when

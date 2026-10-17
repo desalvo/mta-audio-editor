@@ -275,7 +275,20 @@ def _read_verified_result(response, *, expected_request_id: str | None = None,
         raise RemoteAIError('Remote AI result lacks required request binding')
     if bound_request is not None and (not isinstance(bound_request, str) or len(bound_request) > 128 or bound_request != expected_request_id):
         raise RemoteAIError('Remote AI result belongs to a different request')
-    payload = response.read(MAX_RESULT_BYTES + 1)
+    # Read actual chunks rather than asking an unlengthened HTTP stream to
+    # allocate the entire operator-configurable ceiling for a small response.
+    parts = []
+    total = 0
+    while total <= MAX_RESULT_BYTES:
+        requested = min(1024 * 1024, MAX_RESULT_BYTES + 1 - total)
+        chunk = response.read(requested)
+        if not chunk:
+            break
+        parts.append(chunk)
+        total += len(chunk)
+        if len(chunk) < requested:
+            break
+    payload = b''.join(parts)
     if not payload or len(payload) > MAX_RESULT_BYTES:
         raise RemoteAIError('Remote AI result is empty or exceeds the size limit')
     if declared and len(payload) != int(declared):

@@ -84,7 +84,8 @@ def infer(kind: str, audio: Path, options: dict | None = None) -> tuple[dict, st
     """Infer remotely, returning validated JSON and/or named WAV data. No fallback."""
     from .ai_remote_client import infer_audio, recover_after_lost_response, RemoteAIError
     from . import ai_native_remote_journal as pending
-    from .ai_worker_artifacts import SAFE_NAME, MAX_FILES, MAX_ARTIFACT_BYTES
+    from .ai_worker_artifacts import SAFE_NAME, MAX_FILES
+    from .ai_payload_limits import MAX_ARTIFACT_CEILING_BYTES as MAX_ARTIFACT_BYTES
     cfg = _read().get('workers',{}).get(kind,{})
     if cfg.get('mode') != 'remote': raise ValueError('Remote AI mode not selected')
     from .ai_payload_limits import MAX_SOURCE_BYTES

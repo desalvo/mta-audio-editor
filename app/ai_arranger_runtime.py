@@ -102,6 +102,34 @@ def configure(limit):
     return value
 
 
+def artifact_limit_mib():
+    from .ai_payload_limits import validate_artifact_mib
+    with _db() as con:
+        row = con.execute("SELECT value FROM settings WHERE key='max_artifact_mib'").fetchone()
+    # A corrupt persisted policy must fail closed, not silently grant more space.
+    return validate_artifact_mib(int(row[0])) if row else 1024
+
+
+def configure_execution_settings(body):
+    """Validate all fields before one atomic update; old concurrency-only PUTs work."""
+    from .ai_payload_limits import validate_artifact_mib
+    if not isinstance(body, dict) or not body or set(body) - {'max_concurrent_jobs', 'max_artifact_mib'}:
+        raise ValueError('Unsupported AI execution setting')
+    updates = {}
+    if 'max_concurrent_jobs' in body:
+        value = body['max_concurrent_jobs']
+        if type(value) is not int or not 1 <= value <= 32:
+            raise ValueError('Concurrent AI jobs must be an integer from 1 to 32')
+        updates['max_concurrent_jobs'] = value
+    if 'max_artifact_mib' in body:
+        updates['max_artifact_mib'] = validate_artifact_mib(body['max_artifact_mib'])
+    with _db() as con:
+        con.execute('BEGIN IMMEDIATE')
+        con.executemany('INSERT INTO settings(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value',
+                        [(key, str(value)) for key, value in updates.items()])
+    return {'max_concurrent_jobs': _limit(), 'max_artifact_mib': artifact_limit_mib()}
+
+
 def _process_identity(pid):
     """Linux boot ID and process start tick; prevent PID-reuse false positives.
 

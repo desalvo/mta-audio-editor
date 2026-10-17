@@ -82,8 +82,8 @@ def test_cancellation_during_artifact_packaging_cannot_bill_success(operator, mo
     from app import ai_worker_artifacts
     original=ai_worker_artifacts.package_artifacts
     cancelled=[False]
-    def finish_packaging(path):
-        result=original(path)
+    def finish_packaging(path, **kwargs):
+        result=original(path, **kwargs)
         cancelled[0]=True
         return result
     monkeypatch.setattr(ai_worker_artifacts,'package_artifacts',finish_packaging)
@@ -94,3 +94,25 @@ def test_cancellation_during_artifact_packaging_cannot_bill_success(operator, mo
     with db() as con:
         rows=con.execute("SELECT status FROM ai_compute_jobs WHERE kind='whisper'").fetchall()
     assert len(rows)==1 and rows[0]['status']=='cancelled'
+
+
+def test_admin_artifact_policy_is_frozen_and_not_overridden_by_plan(operator, monkeypatch, tmp_path):
+    from app import ai_arranger_runtime as queue, ai_worker_artifacts
+    monkeypatch.setattr(queue, '_ROOT', tmp_path / 'queue')
+    queue.configure_execution_settings({'max_artifact_mib': 2048})
+    monkeypatch.setenv('MTA_AI_JOB_MAX_ARTIFACT_MIB', '8192')
+    runner = ai_metering_agent.run_metered_process
+    packager = ai_worker_artifacts.package_artifacts
+    def run(*args, **kwargs):
+        assert kwargs['env']['MTA_AI_JOB_MAX_ARTIFACT_MIB'] == '2048'
+        result = runner(*args, **kwargs)
+        queue.configure_execution_settings({'max_artifact_mib': 64})
+        return result
+    def package(path, **kwargs):
+        assert kwargs['max_bytes'] == 2 * 1024**3
+        return packager(path, **kwargs)
+    monkeypatch.setattr(ai_metering_agent, 'run_metered_process', run)
+    monkeypatch.setattr(ai_worker_artifacts, 'package_artifacts', package)
+    payload, _ = ai_metering_agent.execute_registered_worker(operator, 'whisper',
+        {'kind': 'whisper', 'max_artifact_mib': 8192}, source_wav=source_audio())
+    assert payload and queue.artifact_limit_mib() == 64

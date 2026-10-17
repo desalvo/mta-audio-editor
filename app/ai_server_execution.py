@@ -39,7 +39,7 @@ def infer(kind,source,options=None,*,cancel_check=None,raw=False):
         return payload,{**meta,**info}
     result={'audio':{},'json':{}}
     from .ai_worker_artifacts import SAFE_NAME,MAX_FILES
-    from .ai_payload_limits import MAX_ARTIFACT_BYTES, MAX_MANIFEST_BYTES
+    from .ai_payload_limits import MAX_ARTIFACT_CEILING_BYTES, MAX_MANIFEST_BYTES
     with zipfile.ZipFile(io.BytesIO(payload)) as archive:
         if len(archive.infolist())>MAX_FILES+1:raise ValueError('Too many AI results')
         total=0
@@ -49,7 +49,7 @@ def infer(kind,source,options=None,*,cancel_check=None,raw=False):
                 if entry.file_size > MAX_MANIFEST_BYTES:raise ValueError('Oversized AI manifest')
                 continue
             total+=entry.file_size
-            if total>MAX_ARTIFACT_BYTES:raise ValueError('Oversized AI result')
+            if total>MAX_ARTIFACT_CEILING_BYTES:raise ValueError('Oversized AI result')
             data=archive.read(entry)
             if entry.filename.endswith('.wav'):result['audio'][entry.filename]=data
             elif entry.filename.endswith('.json') and entry.filename!='manifest.json':result['json'][entry.filename]=json.loads(data)

@@ -44,10 +44,18 @@ loadWebSettings();
 
 // r208: Queue controls for the web Arranger/Remix jobs only.
 let aiQueueRefreshTimer=null;
+let aiQueueSettingsLoaded=false;
 async function loadAIQueue(){
   try{
     const d=await api('/api/ai-execution/jobs?limit=500');
-    q('#aiQueueConcurrency').value=d.max_concurrent_jobs;
+    if(!aiQueueSettingsLoaded){
+      const settings=await api('/api/admin/ai-execution/settings');
+      q('#aiQueueConcurrency').value=settings.max_concurrent_jobs;
+      q('#aiArtifactMaxMiB').value=settings.max_artifact_mib;
+      q('#aiArtifactMaxMiB').min=settings.artifact_mib_min;
+      q('#aiArtifactMaxMiB').max=settings.artifact_mib_max;
+      aiQueueSettingsLoaded=true;
+    }
     const fmt=n=>n==null?'N/A':Number(n).toFixed(1)+' s';
     q('#aiQueueBody').innerHTML=(d.jobs||[]).map(j=>{
       const id=encodeURIComponent(j.job_id);
@@ -58,7 +66,7 @@ async function loadAIQueue(){
   }catch(e){q('#aiQueueBody').innerHTML='<tr><td colspan="7">'+esc(e.message)+'</td></tr>'}
 }
 async function saveAIQueueSettings(){
-  try{await api('/api/admin/ai-execution/settings',{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify({max_concurrent_jobs:Number(q('#aiQueueConcurrency').value)})});await loadAIQueue()}catch(e){alert(e.message)}
+  try{await api('/api/admin/ai-execution/settings',{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify({max_concurrent_jobs:Number(q('#aiQueueConcurrency').value),max_artifact_mib:Number(q('#aiArtifactMaxMiB').value)})});await loadAIQueue()}catch(e){alert(e.message)}
 }
 async function cancelAIQueueJob(id){
   if(!confirm('Annullare il job? Un job GPU in corso potrebbe non fermarsi immediatamente.'))return;

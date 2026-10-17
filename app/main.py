@@ -1721,17 +1721,19 @@ def admin_ai_execution_jobs(request: Request):
 @app.get('/api/admin/ai-execution/settings')
 def admin_ai_execution_settings(request: Request):
     require_admin(request)
-    return {'max_concurrent_jobs': ai_arranger_runtime._limit(), 'scope': 'shared-ai-admission'}
+    return {'max_concurrent_jobs': ai_arranger_runtime._limit(),
+            'max_artifact_mib': ai_arranger_runtime.artifact_limit_mib(),
+            'artifact_mib_min': 64, 'artifact_mib_max': 8192, 'scope': 'shared-ai-admission'}
 
 
 @app.put('/api/admin/ai-execution/settings')
 def admin_ai_execution_settings_update(request: Request, body: dict):
     require_admin(request)
     try:
-        value = ai_arranger_runtime.configure(body['max_concurrent_jobs'])
+        value = ai_arranger_runtime.configure_execution_settings(body)
     except (ValueError, KeyError, TypeError) as exc:
-        raise HTTPException(422, 'max_concurrent_jobs must be an integer from 1 to 32') from exc
-    return {'max_concurrent_jobs': value, 'note': 'Setting stored in the AI queue SQLite database'}
+        raise HTTPException(422, str(exc)) from exc
+    return {**value, 'note': 'Settings stored in the AI queue SQLite database; artifact limit applies to new worker executions'}
 
 
 @app.post('/api/admin/ai-execution/jobs/{job_id}/cancel')

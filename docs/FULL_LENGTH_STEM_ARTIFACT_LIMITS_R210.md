@@ -15,14 +15,16 @@ A shared finite budget now aligns the complete worker/result path:
 | Resource | Ceiling |
 | --- | --- |
 | Source WAV | 512 MiB |
-| Sum of uncompressed output artifacts | 1 GiB |
+| Sum of uncompressed output artifacts | Admin-configurable 64–8192 MiB; default 1 GiB |
 | Output manifest | 256,000 bytes |
-| Packaged/delivered/cached result | 1 GiB + 2 MiB for ZIP/manifest overhead |
+| Packaged result | Job artifact budget + 2 MiB for ZIP/manifest overhead |
+| Transport/cache absolute ceiling | 8 GiB + 2 MiB |
 | Output artifact count | 16, unchanged |
 
 Six stereo 44.1 kHz/16-bit stems from a ten-minute song require approximately
-606 MiB and fit the new budget. Larger output still fails closed. These are
-fixed protocol ceilings, not a promise of unlimited song length or concurrency.
+606 MiB and fit the new budget. Larger output still fails closed. The per-job budget is stored in Settings > AI Queue and frozen before worker
+execution. A finite 8 GiB protocol ceiling remains; these limits do not promise
+unlimited song length or concurrency.
 The operator must size memory, temporary storage and replay-cache storage for
 large jobs; the current API returns results as bounded byte payloads, not a
 fully streaming media pipeline. Model/GPU memory requirements are separate.

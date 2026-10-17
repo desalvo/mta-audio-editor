@@ -170,6 +170,10 @@ def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=
         raise ValueError('AI plan exceeds size limit')
     from .ai_global_execution import current_job
     from . import ai_arranger_runtime as queue
+    # Freeze policy once. Later administrator changes cannot invalidate a
+    # running job between backend publication and server-side packaging.
+    artifact_limit_mib = queue.artifact_limit_mib()
+    artifact_budget = artifact_limit_mib * 1024 * 1024
     queue_id=current_job.get();defer_settlement=False;job_id=None
     if queue_id:
         with queue._db() as con:queued=con.execute('SELECT operation FROM jobs WHERE job_id=?',(queue_id,)).fetchone()
@@ -256,15 +260,15 @@ def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=
                 gpu_slot_acquired = True
             if os.getenv('MTA_AI_CGROUP_PARENT'):
                 from .ai_cgroup_metering import run_cgroup_process
-                result = run_cgroup_process(args, cwd=folder, timeout_seconds=timeout_seconds, cancel_check=worker_cancel_check, env={**os.environ,'MTA_AI_PROGRESS_FILE':str(directory/'progress.json'),'MTA_AI_VERIFIED_REPORT_DIR':str(directory)})
+                result = run_cgroup_process(args, cwd=folder, timeout_seconds=timeout_seconds, cancel_check=worker_cancel_check, env={**os.environ,'MTA_AI_PROGRESS_FILE':str(directory/'progress.json'),'MTA_AI_VERIFIED_REPORT_DIR':str(directory),'MTA_AI_JOB_MAX_ARTIFACT_MIB':str(artifact_limit_mib)})
             else:
-                result = run_metered_process(args, cwd=folder, timeout_seconds=timeout_seconds, cancel_check=worker_cancel_check, env={**os.environ,'MTA_AI_PROGRESS_FILE':str(directory/'progress.json'),'MTA_AI_VERIFIED_REPORT_DIR':str(directory)})
+                result = run_metered_process(args, cwd=folder, timeout_seconds=timeout_seconds, cancel_check=worker_cancel_check, env={**os.environ,'MTA_AI_PROGRESS_FILE':str(directory/'progress.json'),'MTA_AI_VERIFIED_REPORT_DIR':str(directory),'MTA_AI_JOB_MAX_ARTIFACT_MIB':str(artifact_limit_mib)})
             if cancel_check is not None and cancel_check():
                 raise RuntimeError('AI worker cancelled; result discarded')
             diagnostic_checkpoint(final=True)
             if result.exit_code:
                 raise WorkerUnavailable('AI worker failed or timed out')
-            payload, media_type = package_artifacts(directory)
+            payload, media_type = package_artifacts(directory, max_bytes=artifact_budget)
             # Packaging may be expensive for multi-stem adapters. A cancellation
             # during this phase must not finalize a successful billed job.
             if cancel_check is not None and cancel_check():

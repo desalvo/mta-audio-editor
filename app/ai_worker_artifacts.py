@@ -14,7 +14,8 @@ import re
 import zipfile
 from pathlib import Path
 
-from .ai_payload_limits import MAX_ARTIFACT_BYTES, MAX_MANIFEST_BYTES, MAX_RESULT_BYTES
+from .ai_payload_limits import (MAX_ARTIFACT_BYTES, MAX_MANIFEST_BYTES, MAX_RESULT_BYTES,
+                               MAX_ARTIFACT_CEILING_BYTES, RESULT_OVERHEAD_BYTES, worker_artifact_bytes)
 MAX_FILES = 16
 SAFE_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$")
 
@@ -38,13 +39,16 @@ def _read_private_file(path: Path, limit: int) -> bytes:
         return data
 
 
-def package_artifacts(directory: Path) -> tuple[bytes, str]:
+def package_artifacts(directory: Path, *, max_bytes=None) -> tuple[bytes, str]:
     """Package immutable, bounded snapshots of private worker output files."""
 
+    budget = worker_artifact_bytes(MAX_ARTIFACT_BYTES) if max_bytes is None else max_bytes
+    if type(budget) is not int or not 0 < budget <= MAX_ARTIFACT_CEILING_BYTES:
+        raise ValueError('Invalid AI artifact byte budget')
     manifest_path = directory / 'output.manifest.json'
     if not manifest_path.exists() and not manifest_path.is_symlink():
         wav = directory / 'preview.wav'
-        audio = _read_private_file(wav, MAX_ARTIFACT_BYTES)
+        audio = _read_private_file(wav, budget)
         _verify_wav_bytes(audio)
         return audio, 'audio/wav'
     raw_manifest = _read_private_file(manifest_path, MAX_MANIFEST_BYTES)
@@ -74,7 +78,7 @@ def package_artifacts(directory: Path) -> tuple[bytes, str]:
                 raise ValueError('JSON file extension required')
             if media == 'text/plain' and not name.endswith('.txt'):
                 raise ValueError('Text file extension required')
-            remaining = MAX_ARTIFACT_BYTES - total
+            remaining = budget - total
             data = _read_private_file(directory / name, remaining)
             total += len(data)
             digest = entry.get('sha256')
@@ -88,7 +92,7 @@ def package_artifacts(directory: Path) -> tuple[bytes, str]:
                 json.loads(data.decode('utf-8'))
             archive.writestr(name, data)
         archive.writestr('manifest.json', json.dumps(doc, separators=(',', ':'), ensure_ascii=False))
-    if package.tell() > MAX_RESULT_BYTES:
+    if package.tell() > min(MAX_RESULT_BYTES, budget + RESULT_OVERHEAD_BYTES):
         raise ValueError('AI archive exceeds size limit')
     return package.getvalue(), 'application/zip'
 
