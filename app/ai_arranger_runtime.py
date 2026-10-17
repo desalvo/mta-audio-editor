@@ -53,7 +53,7 @@ def _db():
     con.execute('PRAGMA journal_mode=WAL')
     con.execute(_SCHEMA)
     columns = {row[1] for row in con.execute('PRAGMA table_info(jobs)')}
-    for column, sqltype in (('runner_identity', 'TEXT'), ('payload_json', 'TEXT'), ('idempotency_key', 'TEXT'), ('gpu_seconds_estimated', 'REAL'), ('cpu_seconds_estimated', 'REAL'), ('gpu_metrics_status', 'TEXT'), ('gpu_metrics_source', 'TEXT'), ('progress_source', 'TEXT'), ('progress_estimated', 'INTEGER'), ('steps_completed', 'INTEGER'), ('steps_total', 'INTEGER')):
+    for column, sqltype in (('actor_user_id', 'INTEGER'), ('runner_identity', 'TEXT'), ('payload_json', 'TEXT'), ('idempotency_key', 'TEXT'), ('gpu_seconds_estimated', 'REAL'), ('cpu_seconds_estimated', 'REAL'), ('gpu_metrics_status', 'TEXT'), ('gpu_metrics_source', 'TEXT'), ('progress_source', 'TEXT'), ('progress_estimated', 'INTEGER'), ('steps_completed', 'INTEGER'), ('steps_total', 'INTEGER')):
         if column not in columns:
             try:
                 con.execute(f'ALTER TABLE jobs ADD COLUMN {column} {sqltype}')
@@ -477,6 +477,9 @@ def start(pid, operation, fn, *, job_id=None, cancellable=False, payload=None, i
             return False, get(existing['job_id'])
         rank = con.execute('SELECT COALESCE(MAX(rank),0)+1 FROM jobs').fetchone()[0]
         con.execute("INSERT INTO jobs(job_id,project_id,operation,state,rank,created_at,phase,message,runner_pid,runner_identity,payload_json,idempotency_key) VALUES(?,?,?,'queued',?,?,'queued','Waiting for inference slot',?,?,?,?)", (job_id, str(pid), operation, rank, time.time(), os.getpid(), _process_identity(os.getpid()), encoded, idempotency_key))
+        from .ai_job_context import actor
+        owner = payload.get('actor_user_id',actor.get()) if isinstance(payload,dict) else actor.get()
+        if type(owner) is int and owner>0:con.execute('UPDATE jobs SET actor_user_id=? WHERE job_id=?',(owner,job_id))
         con.execute('COMMIT')
     if not defer_spawn:
         _spawn(job_id, fn, cancellable=cancellable)

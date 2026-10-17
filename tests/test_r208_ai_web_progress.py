@@ -17,4 +17,5 @@ def test_arranger_prevents_duplicate_inference_requests_and_reenables_button():
     assert "if(button?.disabled)return;" in source
     assert "if(button)button.disabled=true;" in source
     assert "if(button?.isConnected)button.disabled=false;" in source
-    assert "AI generation failed / Generazione fallita:" in source
+    assert "tr('AI generation failed','Generazione AI fallita')" in source
+    assert "aiFriendlyError(e.message)" in source

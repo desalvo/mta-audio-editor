@@ -25,11 +25,19 @@ datas = [
     (str(project / "REVISION"), "."),
     (str(project / "RELEASE_CHANNEL"), "."),
 ]
+for adapter_file in ('ace_step_http_worker.py','ace_gpu_process_meter.py','ai_gpu_process_meter.py',
+                     'ai_proxmox_gpu_agent_client.py','ace_gpu_profiler.py','ace_task_progress.py','ai_execution_limits.py'):
+    datas.append((str(project / 'app' / adapter_file), 'app'))
+
+# uv supplies a managed Python/runtime for ACE, including on a frozen desktop.
+import uv
+binaries = [(str(uv.find_uv_bin()), 'tools')]
+
 build_file = project / "BUILD_INFO"
 if build_file.exists():
     datas.append((str(build_file), "."))
 
-binaries = []
+binaries = list(binaries)
 for env_name, dest_name in (("MTA_NATIVE_FFMPEG", "ffmpeg"), ("MTA_NATIVE_FFPROBE", "ffprobe")):
     value = os.environ.get(env_name)
     if value:

@@ -93,4 +93,4 @@ def test_cancellation_during_artifact_packaging_cannot_bill_success(operator, mo
             cancel_check=lambda: cancelled[0])
     with db() as con:
         rows=con.execute("SELECT status FROM ai_compute_jobs WHERE kind='whisper'").fetchall()
-    assert len(rows)==1 and rows[0]['status']=='failed'
+    assert len(rows)==1 and rows[0]['status']=='cancelled'

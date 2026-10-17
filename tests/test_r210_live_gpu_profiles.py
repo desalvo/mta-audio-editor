@@ -265,7 +265,7 @@ def test_live_ui_marks_partial_and_retains_final_result_on_reopen():
 const elements={aiRemixJobProgress:{querySelector:()=>null},aiRemixGenerateButton:{},
 aiRemixJobLabel:{},aiRemixJobHint:{},aiRemixJobElapsed:{},aiRemixPlanResult:{}};
 let reply={job_id:'j',state:'running',gpu_metrics_source:'ace-torch-profiler',gpu_metrics_status:'profiling',gpu_seconds_estimated:.2};
-const ctx={current:{id:'p'},document:{getElementById:id=>elements[id]},api:async()=>reply,
+const ctx={tr:(en,it)=>en,current:{id:'p'},document:{getElementById:id=>elements[id]},api:async()=>reply,
 setTimeout:()=>1,clearTimeout(){},setInterval:()=>1,clearInterval(){}};
 vm.createContext(ctx);vm.runInContext(process.argv[1],ctx);
 (async()=>{

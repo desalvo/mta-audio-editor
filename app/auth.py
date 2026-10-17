@@ -918,7 +918,7 @@ def test_smtp_config(body: dict) -> None:
             LOGGER.debug("SMTP quit failed after connection test", exc_info=True)
 
 
-def send_mail(recipients: list[str], subject: str, plain: str, html_body: str | None = None) -> None:
+def send_mail(recipients: list[str], subject: str, plain: str, html_body: str | None = None, *, inline_image: bytes | None = None, message_id: str | None = None) -> None:
     cfg=_smtp_full()
     if not cfg["host"] or not cfg["from_email"]:
         raise RuntimeError("SMTP non configurato.")
@@ -926,12 +926,16 @@ def send_mail(recipients: list[str], subject: str, plain: str, html_body: str | 
     if not recipients:
         return
     msg=EmailMessage()
+    if message_id:
+        msg["Message-ID"]=message_id
     msg["Subject"]=subject
     msg["From"]=f"{cfg['from_name']} <{cfg['from_email']}>"
     msg["To"]=", ".join(recipients)
     msg.set_content(plain)
     if html_body:
         msg.add_alternative(html_body,subtype="html")
+        if inline_image:
+            msg.get_payload()[-1].add_related(inline_image,maintype="image",subtype="png",cid="<mta-logo>",filename="mta-logo.png",disposition="inline")
     client=_smtp_client(cfg)
     try:
         if cfg["username"]:

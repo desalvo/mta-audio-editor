@@ -221,7 +221,7 @@ const vm=require('vm'),assert=require('assert');let next,posts=[],newJobs=0;
 let reply={job_id:'job',state:'running',phase:'inference'};
 const elements={aiRemixGenerateButton:{},aiRemixPlanResult:{},aiRemixJobLabel:{},aiRemixJobHint:{},
 aiRemixJobProgress:{querySelector:()=>null},aiRemixJobElapsed:{}};
-const ctx={current:{id:'p'},document:{getElementById:id=>elements[id]},
+const ctx={tr:(en,it)=>en,current:{id:'p'},document:{getElementById:id=>elements[id]},
 api:async(url,options)=>{if(options){posts.push(url);reply={...reply,cancel_requested:true};return reply}return reply},
 planAiRemix:async()=>{newJobs++},setTimeout:f=>{next=f;return 1},clearTimeout(){},setInterval:()=>1,clearInterval(){}};
 vm.createContext(ctx);vm.runInContext(process.argv[1],ctx);

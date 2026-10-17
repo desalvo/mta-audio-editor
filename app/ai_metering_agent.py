@@ -62,7 +62,7 @@ def _descendants(parent_pid: int) -> set[int]:
     return found
 
 
-def run_metered_process(argv: list[str], *, cwd: str, timeout_seconds: int = 3600, cancel_check: Callable[[], bool] | None = None) -> Measurement:
+def run_metered_process(argv: list[str], *, cwd: str, timeout_seconds: int = 3600, cancel_check: Callable[[], bool] | None = None, env: dict | None = None) -> Measurement:
     """Run a fixed operator-selected executable and attribute direct-child CPU.
 
     No shell or user-provided command strings are accepted by this function's
@@ -78,7 +78,7 @@ def run_metered_process(argv: list[str], *, cwd: str, timeout_seconds: int = 360
     started = time.monotonic()
     proc = subprocess.Popen(argv, cwd=cwd, stdin=subprocess.DEVNULL,
                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                            start_new_session=True)  # noqa: S603 -- operator-controlled executable only
+                            start_new_session=True, env=env)  # noqa: S603 -- operator-controlled executable only
     max_io = _io(proc.pid)
     timed_out = False
     cancelled = False
@@ -154,6 +154,7 @@ def execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=N
     from .ai_worker_registry import resolve_worker
     from .ai_worker_artifacts import package_artifacts
 
+    from .ai_worker_protocol import _ace_remote_cleanup as _ace_cleanup
     worker = resolve_worker(kind)
     if worker is None:
         raise WorkerUnavailable('No trusted AI worker configured')
@@ -167,7 +168,8 @@ def execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=N
     # request plan nor the remote user may declare GPU eligibility.
     from .ai_gpu_slot_accounting import slot_enabled_for_kind
     gpu_slot_enabled = slot_enabled_for_kind(kind)
-    with tempfile.TemporaryDirectory(prefix='mta-meter-') as folder:
+    from contextlib import nullcontext
+    with tempfile.TemporaryDirectory(prefix='mta-meter-') as folder, (_ace_cleanup(plan, lambda: Path(folder)/'progress.json') if kind=='ace-step' else nullcontext()):
         directory = Path(folder)
         request_path = directory / 'request.json'
         output_path = directory / 'preview.wav'
@@ -177,7 +179,12 @@ def execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=N
             input_path.write_bytes(source_wav)
             verify_preview_wav(input_path)
             input_path.chmod(0o400)
-            encoded = json.dumps({**plan, 'source_audio': str(input_path)}, ensure_ascii=False, allow_nan=False).encode('utf-8')
+            staged_source = str(input_path)
+            if kind=='ace-step':
+                (directory/'inputs').mkdir()
+                input_path.replace(directory/'inputs'/'source.wav')
+                staged_source=[{'filename':'inputs/source.wav'}]
+            encoded = json.dumps({**plan, 'source_audio': staged_source}, ensure_ascii=False, allow_nan=False).encode('utf-8')
         from .ai_torch_diagnostics import enabled as torch_diagnostics_enabled, read_report
         if torch_diagnostics_enabled():
             # The server, never the request, assigns diagnostic identity.
@@ -199,6 +206,15 @@ def execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=N
                     report = read_report(directory, job_id)
                     if report:
                         store_report(job_id, report)
+                    if final:
+                        from .ai_compute_diagnostics import store as store_counters
+                        if kind=='ace-step':
+                            try:
+                                raw=json.loads((directory/'progress.json').read_text())
+                                if isinstance(raw,dict):store_counters(job_id,raw)
+                            except (OSError,ValueError):
+                                pass
+                        if report:store_counters(job_id,report)
                 except Exception as exc:
                     import logging
                     logging.getLogger(__name__).warning('GPU diagnostic update failed: %s', type(exc).__name__)
@@ -211,11 +227,12 @@ def execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=N
                 gpu_slot_acquired = True
             if os.getenv('MTA_AI_CGROUP_PARENT'):
                 from .ai_cgroup_metering import run_cgroup_process
-                result = run_cgroup_process(args, cwd=folder, timeout_seconds=timeout_seconds, cancel_check=worker_cancel_check)
+                result = run_cgroup_process(args, cwd=folder, timeout_seconds=timeout_seconds, cancel_check=worker_cancel_check, **({'env':{**os.environ,'MTA_AI_PROGRESS_FILE':str(directory/'progress.json')}} if kind=='ace-step' else {}))
             else:
-                result = run_metered_process(args, cwd=folder, timeout_seconds=timeout_seconds, cancel_check=worker_cancel_check)
+                result = run_metered_process(args, cwd=folder, timeout_seconds=timeout_seconds, cancel_check=worker_cancel_check, **({'env':{**os.environ,'MTA_AI_PROGRESS_FILE':str(directory/'progress.json')}} if kind=='ace-step' else {}))
             if cancel_check is not None and cancel_check():
                 raise RuntimeError('AI worker cancelled; result discarded')
+            diagnostic_checkpoint(final=True)
             if result.exit_code:
                 raise WorkerUnavailable('AI worker failed or timed out')
             payload, media_type = package_artifacts(directory)
@@ -242,14 +259,16 @@ def execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=N
                              'gpu_metered': False, 'process_tree_metered': result.isolated,
                              'gpu_diagnostics': diagnostics, 'media_type': media_type}
         except BaseException:
+            diagnostic_checkpoint(final=True)
+            terminal_status='cancelled' if cancel_check is not None and cancel_check() else 'failed'
             if gpu_slot_acquired:
                 # Do not silently finalize a job if its lease cannot be
                 # accounted for. Recovery must reconcile it explicitly.
                 gpu_slots.release(job_id, aborted=True)
                 gpu_slot_acquired = False
             if result is None:
-                ai_billing.finish_job(job_id, 'failed', source='unmetered')
+                ai_billing.finish_job(job_id, terminal_status, source='unmetered')
             else:
-                ai_billing.finish_job(job_id, 'failed', result.usage if result.isolated else None,
+                ai_billing.finish_job(job_id, terminal_status, result.usage if result.isolated else None,
                                       source=result.source if result.isolated else 'unmetered')
             raise

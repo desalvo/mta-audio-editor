@@ -207,7 +207,7 @@ function mobileSaveRemoteFile(url,filename,mime='application/octet-stream',share
   }catch(e){toast('Filesystem mobile non disponibile: '+e.message);return false}
 }
 
-async function api(url,opt={}){opt.headers=opt.headers||{};if((opt.method||'GET').toUpperCase()!=='GET')opt.headers['X-MTA-Request']='1';const r=await fetch(url,opt);if(!r.ok)throw new Error(await r.text());const ct=r.headers.get('content-type')||'';return ct.includes('json')?r.json():r}
+async function api(url,opt={}){opt.headers=opt.headers||{};if((opt.method||'GET').toUpperCase()!=='GET')opt.headers['X-MTA-Request']='1';const r=await fetch(url,opt);if(!r.ok){let message=await r.text();try{const d=JSON.parse(message);message=typeof d.detail==='string'?d.detail:message}catch(_){}throw new Error(message)}const ct=r.headers.get('content-type')||'';return ct.includes('json')?r.json():r}
 function esc(s){return String(s??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 function toast(s){const t=$('#toast');t.textContent=trDynamic(s);t.style.display='block';clearTimeout(t._timer);t._timer=setTimeout(()=>t.style.display='none',4200)}
 function setRenderPlaybackPreparing(active){const b=$('#playMaster'),t=$('#toast');if(active){if(b){b.dataset.prepareText=b.textContent||'▶';b.textContent='…';b.title='Preparazione render in corso';b.classList.add('preparing')}if(t){clearTimeout(t._timer);t.textContent='Preparazione del render in corso, attendere…';t.style.display='block'}}else{if(b){if(b.classList.contains('preparing'))b.textContent='▶';b.classList.remove('preparing');b.title='Play / Preview'}if(t&&t.textContent==='Preparazione del render in corso, attendere…')t.style.display='none'}}
@@ -231,7 +231,7 @@ function trackHeightPx(t){return Math.max(78,Math.min(420,Math.round(Number(t?.h
 function linesToText(a,b){return(a||[]).map(x=>`${(x.time_ms/1000).toFixed(3)}\t${x[b]}`).join('\n')}
 function textToLines(v,key){return v.split(/\n/).map(x=>x.trim()).filter(Boolean).map(line=>{const [t,...rest]=line.split(/\t|\s{2,}/);return{time_ms:Math.max(0,Math.round(parseFloat(t)*1000)||0),[key]:rest.join(' ').trim()}})}
 
-async function init(){restoreSidebarPanels();if(isMobileClient())document.body.classList.add('mobile-client');try{currentUser=await api('/api/session');const a=$('#adminNav');if(a)a.hidden=!!currentUser.native_single_user||currentUser.role!=='admin';const sb=$('#nativeSettingsButton');if(sb)sb.hidden=false;const recentBtn=$('#openRecentProjectBtn'),localBtn=$('#openLocalProjectBtn'),manualSave=$('#saveProjectManualNav'),localSave=$('#saveProjectLocalNav');if(currentUser.native_single_user){document.body.classList.add('native-single-user');if(recentBtn)recentBtn.hidden=false;if(localBtn)localBtn.hidden=true;if(manualSave)manualSave.hidden=false;if(localSave)localSave.hidden=true}else{if(recentBtn)recentBtn.hidden=false;if(localBtn)localBtn.hidden=false;if(manualSave)manualSave.hidden=true;if(localSave)localSave.hidden=false}}catch(e){}if(currentUser?.native_single_user)installNativeViewportGuard();if(currentUser&&!currentUser.native_single_user)autosaveEnabled=localStorage.getItem('mtaWebAutosaveEnabled')!=='false';let nativeBridge=null;if(currentUser?.native_single_user){nativeBridge=await waitForNativeApi();if(nativeBridge?.get_native_settings){try{const cfg=await nativeBridge.get_native_settings();autosaveEnabled=cfg.autosave_enabled!==false;nativeRecentProjects=Array.isArray(cfg.recent_projects)?cfg.recent_projects.map(String).filter(Boolean):[];const pref=['it','en'].includes(cfg.language)?cfg.language:'auto';uiLanguage=pref==='auto'?(String(cfg.system_language||'en').toLowerCase().startsWith('it')?'it':'en'):pref;applyInterfaceLanguage();ensureLiveLocalization()}catch(e){}}setTimeout(()=>checkNativeAppUpdate(false),1200)}try{pluginInfo=await api('/api/plugins')}catch(e){}if(nativeBridge?.consume_startup_project){try{const startup=await nativeBridge.consume_startup_project();if(startup?.project?.id){rememberRecentProject(startup.project.id);await openP(startup.project.id);return}if(startup&&!startup.ok&&startup.error)toast('Impossibile aprire il progetto: '+startup.error)}catch(e){toast('Impossibile aprire il progetto: '+e.message)}}await refresh();const requestedAiProject=new URLSearchParams(location.search).get('ai_project');if(requestedAiProject)await openP(requestedAiProject);else await restoreActiveWebProject()}
+async function init(){restoreSidebarPanels();if(isMobileClient())document.body.classList.add('mobile-client');try{currentUser=await api('/api/session');const a=$('#adminNav');if(a)a.hidden=!!currentUser.native_single_user||currentUser.role!=='admin';const sb=$('#nativeSettingsButton');if(sb)sb.hidden=false;const recentBtn=$('#openRecentProjectBtn'),localBtn=$('#openLocalProjectBtn'),manualSave=$('#saveProjectManualNav'),localSave=$('#saveProjectLocalNav');if(currentUser.native_single_user){document.body.classList.add('native-single-user');if(recentBtn)recentBtn.hidden=false;if(localBtn)localBtn.hidden=true;if(manualSave)manualSave.hidden=false;if(localSave)localSave.hidden=true}else{if(recentBtn)recentBtn.hidden=false;if(localBtn)localBtn.hidden=false;if(manualSave)manualSave.hidden=true;if(localSave)localSave.hidden=false}}catch(e){}if(currentUser?.native_single_user){installNativeViewportGuard();aiAceRefresh();}if(currentUser&&!currentUser.native_single_user)autosaveEnabled=localStorage.getItem('mtaWebAutosaveEnabled')!=='false';let nativeBridge=null;if(currentUser?.native_single_user){nativeBridge=await waitForNativeApi();if(nativeBridge?.get_native_settings){try{const cfg=await nativeBridge.get_native_settings();autosaveEnabled=cfg.autosave_enabled!==false;nativeRecentProjects=Array.isArray(cfg.recent_projects)?cfg.recent_projects.map(String).filter(Boolean):[];const pref=['it','en'].includes(cfg.language)?cfg.language:'auto';uiLanguage=pref==='auto'?(String(cfg.system_language||'en').toLowerCase().startsWith('it')?'it':'en'):pref;applyInterfaceLanguage();ensureLiveLocalization()}catch(e){}}setTimeout(()=>checkNativeAppUpdate(false),1200)}try{pluginInfo=await api('/api/plugins')}catch(e){}if(nativeBridge?.consume_startup_project){try{const startup=await nativeBridge.consume_startup_project();if(startup?.project?.id){rememberRecentProject(startup.project.id);await openP(startup.project.id);return}if(startup&&!startup.ok&&startup.error)toast('Impossibile aprire il progetto: '+startup.error)}catch(e){toast('Impossibile aprire il progetto: '+e.message)}}await refresh();const requestedAiProject=new URLSearchParams(location.search).get('ai_project');if(requestedAiProject)await openP(requestedAiProject);else await restoreActiveWebProject()}
 
 // Global sidebar state, not stored in the project. Save every change immediately.
 const SIDEBAR_PREF_KEY='mta.sidebar.collapsed.v1';
@@ -5234,40 +5234,47 @@ async function openAiRemixPanel(contextTrackId=null){
   let catalog;
   try{catalog=await api('/api/ai-arranger/catalog')}catch(e){toast(e.message);return;}
   const presets=catalog.presets.map(x=>`<option value="${esc(x.id)}">${esc(uiLanguage==='it'?x.it:x.en)}</option>`).join('');
-  const models=catalog.models.map(x=>`<option value="${esc(x.id)}">${esc(x.name)} · ${x.available?'ready':'not installed'}</option>`).join('');
+  const models=catalog.models.map(x=>`<option value="${esc(x.id)}">${esc(x.name)} · ${x.available?tr('ready','pronto'):tr('not installed','non installato')}</option>`).join('');
   const tracks=(current.tracks||[]).map(x=>`<option value="${esc(x.id)}" ${x.id===contextTrackId?'selected':''}>${esc(x.name)}</option>`).join('');
   const sourceTrack=contextTrackId&&trackById(contextTrackId)?contextTrackId:null;
-  showUtilityModal('AI Arranger / Remix',`<div class="ai-arranger"><div class="arranger-tabs" role="tablist" aria-label="Impostazioni Arranger"><button id="aiTab-source" role="tab" aria-selected="true" aria-controls="aiPane-source" onclick="aiArrangerTab('source')">Sorgente</button><button id="aiTab-arrangement" role="tab" aria-selected="false" aria-controls="aiPane-arrangement" onclick="aiArrangerTab('arrangement')">Arrangiamento</button><button id="aiTab-execution" role="tab" aria-selected="false" aria-controls="aiPane-execution" onclick="aiArrangerTab('execution')">Esecuzione</button></div><div class="arranger-options"><section id="aiPane-source" role="tabpanel" aria-labelledby="aiTab-source">
-    <fieldset><legend>1 · Source / Sorgente e intervallo</legend><div class="arranger-grid">
-    <label>Input audio / Sorgente<select id="aiInputSource" onchange="document.getElementById('aiInputTrackWrap').hidden=this.value!=='track'"><option value="master" ${sourceTrack?'':'selected'}>Master Out (mute / solo / FX)</option><option value="track" ${sourceTrack?'selected':''}>Single track / Traccia singola</option></select></label>
-    <label id="aiInputTrackWrap" ${sourceTrack?'':'hidden'}>Input track / Traccia<select id="aiInputTrack">${(current.tracks||[]).map(x=>`<option value="${esc(x.id)}" ${x.id===sourceTrack?'selected':''}>${esc(x.name)}</option>`).join('')}</select></label>
-    <label>Processing scope / Intervallo<select id="aiRemixScope" onchange="document.getElementById('aiRemixRangeWrap').hidden=this.value!=='range'"><option value="range" selected>Time range / Intervallo temporale</option><option value="project">Entire source / Sorgente intera</option></select></label>
-    <div id="aiRemixRangeWrap" class="arranger-grid arranger-wide"><label>Start (seconds) / Inizio (secondi)<input id="aiRemixStartSec" type="number" min="0" max="86400" step="0.001" value="0"></label><label>End (seconds) / Fine (secondi)<input id="aiRemixEndSec" type="number" min="0" max="86400" step="0.001" value="10"></label><small class="arranger-wide hint">Only the selected source audio is sent to AI / Solo l'intervallo viene inviato all'AI</small></div>
+  showUtilityModal('AI Arranger / Remix',`<div class="ai-arranger"><div class="arranger-tabs" role="tablist" aria-label="Impostazioni Arranger"><button id="aiTab-source" role="tab" aria-selected="true" aria-controls="aiPane-source" onclick="aiArrangerTab('source')">${tr('Source','Sorgente')}</button><button id="aiTab-arrangement" role="tab" aria-selected="false" aria-controls="aiPane-arrangement" onclick="aiArrangerTab('arrangement')">${tr('Arrangement','Arrangiamento')}</button><button id="aiTab-execution" role="tab" aria-selected="false" aria-controls="aiPane-execution" onclick="aiArrangerTab('execution')">${tr('Execution','Esecuzione')}</button></div>${currentUser?.native_single_user?`<div class="ace-summary"><strong id="aiAceSummary">${tr('Checking ACE-Step…','Verifica ACE-Step…')}</strong><progress id="aiAceSummaryProgress" hidden></progress><button onclick="aiArrangerTab('execution')">${tr('Setup','Configura')}</button></div>`:''}<div class="arranger-options"><section id="aiPane-source" role="tabpanel" aria-labelledby="aiTab-source">
+    <fieldset><legend>${tr("1 · Source and interval","1 · Sorgente e intervallo")}</legend><div class="arranger-grid">
+    <label>${tr("Input audio","Sorgente audio")}<select id="aiInputSource" onchange="document.getElementById('aiInputTrackWrap').hidden=this.value!=='track'"><option value="master" ${sourceTrack?'':'selected'}>Master Out (mute / solo / FX)</option><option value="track" ${sourceTrack?'selected':''}>${tr("Single track","Traccia singola")}</option></select></label>
+    <label id="aiInputTrackWrap" ${sourceTrack?'':'hidden'}>${tr("Input track","Traccia sorgente")}<select id="aiInputTrack">${(current.tracks||[]).map(x=>`<option value="${esc(x.id)}" ${x.id===sourceTrack?'selected':''}>${esc(x.name)}</option>`).join('')}</select></label>
+    <label>${tr("Processing scope","Intervallo")}<select id="aiRemixScope" onchange="document.getElementById('aiRemixRangeWrap').hidden=this.value!=='range'"><option value="range" selected>${tr("Time range","Intervallo temporale")}</option><option value="project">${tr("Entire source","Sorgente intera")}</option></select></label>
+    <div id="aiRemixRangeWrap" class="arranger-grid arranger-wide"><label>${tr("Start (seconds)","Inizio (secondi)")}<input id="aiRemixStartSec" type="number" min="0" max="86400" step="0.001" value="0"></label><label>${tr("End (seconds)","Fine (secondi)")}<input id="aiRemixEndSec" type="number" min="0" max="86400" step="0.001" value="10"></label><small class="arranger-wide hint">${tr("Only the selected interval is sent to AI","Solo l’intervallo selezionato viene inviato all’AI")}</small></div>
     </div></fieldset>
-    </section><section id="aiPane-arrangement" role="tabpanel" aria-labelledby="aiTab-arrangement" hidden><fieldset><legend>2 · Arrangement / Arrangiamento</legend><div class="arranger-grid">
-    <label>Mode / Modalità<select id="aiRemixMode" onchange="document.getElementById('aiSwapOptions').hidden=this.value!=='instrument_swap'"><option value="rearrange">AI Arranger</option><option value="auto_remix">Auto-Remix</option><option value="instrument_swap">Instrument Swap</option></select></label>
-    <div id="aiSwapOptions" class="arranger-grid arranger-wide" hidden><label>Source track / Traccia sorgente<select id="aiSwapTrack">${tracks}</select></label><label>Target instrument / Strumento sostitutivo<input id="aiSwapTarget" type="text" maxlength="100" value="Saxophone"></label></div>
-    <label>AI model / Modello<select id="aiRemixModel">${models}</select></label>
+    </section><section id="aiPane-arrangement" role="tabpanel" aria-labelledby="aiTab-arrangement" hidden><fieldset><legend>${tr("2 · Arrangement","2 · Arrangiamento")}</legend><div class="arranger-grid">
+    <label>${tr("Mode","Modalità")}<select id="aiRemixMode" onchange="document.getElementById('aiSwapOptions').hidden=this.value!=='instrument_swap'"><option value="rearrange">AI Arranger</option><option value="auto_remix">Auto-Remix</option><option value="instrument_swap">Instrument Swap</option></select></label>
+    <div id="aiSwapOptions" class="arranger-grid arranger-wide" hidden><label>${tr("Source track","Traccia sorgente")}<select id="aiSwapTrack">${tracks}</select></label><label>${tr("Target instrument","Strumento sostitutivo")}<input id="aiSwapTarget" type="text" maxlength="100" value="Saxophone"></label></div>
+    <label>${tr("AI model","Modello AI")}<select id="aiRemixModel">${models}</select></label>
     <label>Preset<select id="aiRemixPreset">${presets}</select></label>
-    <label class="arranger-wide">Style description / Descrizione<textarea id="aiRemixPrompt" rows="3" maxlength="3000" placeholder="Describe your target arrangement or remix..."></textarea></label>
+    <label class="arranger-wide">${tr("Style description","Descrizione dello stile")}<textarea id="aiRemixPrompt" rows="3" maxlength="3000" placeholder="Describe your target arrangement or remix..."></textarea></label>
 
-    <label class="arranger-wide">Intensity / Intensità <output id="aiRemixStrengthValue">60%</output><input id="aiRemixStrength" type="range" min="0" max="100" value="60" oninput="document.getElementById('aiRemixStrengthValue').textContent=this.value+'%'"></label>
-    </div></fieldset>
-    <fieldset><legend>3 · Preserve / Elementi da mantenere</legend><div class="arranger-checks">
-    <label><input id="aiKeepChords" type="checkbox" checked> Preserve chords / Preserva accordi</label>
-    <label><input id="aiKeepStructure" type="checkbox" checked> Preserve sections / Preserva struttura</label>
-    <label><input id="aiKeepTempo" type="checkbox" checked> Preserve tempo / Preserva BPM</label>
-    <label><input id="aiKeepMelody" type="checkbox" checked> Preserve melody / Preserva melodia</label>
-    <label><input id="aiKeepVoice" type="checkbox"> Preserve vocals / Preserva voce</label>
-    </div><p class="hint">Preservation is best effort / La conservazione degli elementi musicali non è garantita.</p></fieldset>
-    </section><section id="aiPane-execution" role="tabpanel" aria-labelledby="aiTab-execution" hidden><fieldset><legend>4 · Execution / Esecuzione</legend><div class="arranger-grid">
-    <label>Maximum processing time (minutes) / Tempo massimo (minuti)<input id="aiInferenceTimeoutMinutes" type="number" min="1" max="240" step="1" value="60"></label>
-    <p class="hint">Default: 60 min; adjustable from 1 to 240 min. This is the processing timeout, not the audio duration. / È il limite di elaborazione, non la durata del brano. Eventuali limiti del servizio remoto restano applicabili.</p></div></fieldset>
-    ${currentUser?.native_single_user?`<details><summary>ACE-Step · Native configuration / Configurazione nativa</summary><section id="aiAceNativeTools" style="border:1px solid var(--border,#8884);padding:10px;border-radius:8px"><strong>ACE-Step · Native setup / Configurazione</strong><p id="aiAceState" class="hint">Checking...</p><div class="form-actions"><label>ACE-Step / Motore AI <select id="aiAceMode"><option value="local">Local / Locale</option><option value="remote">Remote / Remoto</option></select></label><label>Remote HTTPS URL <input id="aiAceRemoteUrl" type="url" placeholder="https://ace.example.org:8001" autocomplete="off"></label><label>API token <input id="aiAceRemoteToken" type="password" placeholder="Leave blank to keep saved token" autocomplete="new-password"></label><button class="utility-btn" onclick="aiAceSaveConnection()">Save ACE connection / Salva connessione</button></div><div id="aiAceProgressPanel" hidden role="status" aria-live="polite"><label id="aiAceProgressLabel" for="aiAceProgress">Preparing...</label><progress id="aiAceProgress" style="width:100%"></progress><small id="aiAceProgressDetail"></small></div><div class="form-actions"><button class="utility-btn" id="aiAceInstallButton" onclick="aiAceInstall()">Install ACE-Step / Installa</button><button class="utility-btn" id="aiAceStartButton" onclick="aiAceStart()">Start local server / Avvia</button><button class="utility-btn" id="aiAceStopButton" onclick="aiAceStop()">Stop ACE-Step / Ferma</button><button class="utility-btn" onclick="aiAceTest()">Test real generation / Prova generazione</button><button class="utility-btn" onclick="aiAceRefresh()">Refresh</button></div></section></details>`:''}
-    </section></div><p class="hint">Generated audio is appended as a NEW track, never replacing the original. A trusted AI worker must be installed and configured.</p>
-    <div class="form-actions"><button class="utility-btn" onclick="testAiArrangerWorker()">Test worker / Verifica worker</button><button class="utility-btn" onclick="planAiRemix()">Plan / Pianifica</button><button id="aiRemixGenerateButton" class="utility-btn primary" onclick="generateAndAddAiRemix()">Generate + Add track / Genera + aggiungi traccia</button></div>
-    <div id="aiRemixJobProgress" class="arranger-status" hidden role="status" aria-live="polite"><label id="aiRemixJobLabel">Preparing AI job...</label><progress style="display:block;width:100%" aria-label="AI generation in progress"></progress><div class="arranger-meters"><div><small>Tempo trascorso</small><strong id="aiMeterElapsed">—</strong></div><div><small>CPU</small><strong id="aiMeterCpu">—</strong><small id="aiMeterCpuNote"></small></div><div><small>GPU</small><strong id="aiMeterGpu">—</strong><small id="aiMeterGpuNote"></small></div></div><small id="aiRemixJobElapsed" class="arranger-detail"></small><p id="aiRemixJobHint" class="hint"></p></div>
-    <div class="form-actions"><button class="utility-btn" onclick="window.mtaAiJobs?.open()">Job AI · elenco e controlli</button><button class="utility-btn" onclick="closeUtilityModal()">Chiudi e continua in background</button></div><pre id="aiRemixPlanResult" style="white-space:pre-wrap;max-height:4rem;overflow:auto"></pre></div>`);
+    <label class="arranger-wide">${tr('Intensity','Intensità')} <button type="button" class="arranger-info" aria-label="${tr('About intensity','Informazioni sull’intensità')}" aria-controls="aiIntensityHelp" aria-expanded="false" onclick="aiIntensityHelpToggle(this)">i</button><output id="aiRemixStrengthValue">60%</output><input id="aiRemixStrength" type="range" min="0" max="100" value="60" oninput="document.getElementById('aiRemixStrengthValue').textContent=this.value+'%'"></label>
+    <p id="aiIntensityHelp" class="hint arranger-wide" hidden>${tr('Intensity controls how strongly ACE reinterprets the source: lower values stay closer to the original; higher values allow larger changes in style and arrangement. It is not volume or a guarantee of musical preservation.','L’intensità regola quanto ACE reinterpreta la sorgente: valori bassi restano più vicini all’originale; valori alti consentono maggiori cambiamenti di stile e arrangiamento. Non è il volume e non garantisce la conservazione degli elementi musicali.')}</p></div></fieldset>
+    <fieldset><legend>${tr("3 · Preserve","3 · Elementi da mantenere")}</legend><div class="arranger-checks">
+    <label><input id="aiKeepChords" type="checkbox" checked> ${tr("Preserve chords","Preserva accordi")}</label>
+    <label><input id="aiKeepStructure" type="checkbox" checked> ${tr("Preserve sections","Preserva struttura")}</label>
+    <label><input id="aiKeepTempo" type="checkbox" checked> ${tr("Preserve tempo","Preserva BPM")}</label>
+    <label><input id="aiKeepMelody" type="checkbox" checked> ${tr("Preserve melody","Preserva melodia")}</label>
+    <label><input id="aiKeepVoice" type="checkbox"> ${tr("Preserve vocals","Preserva voce")}</label>
+    </div><p class="hint">${tr("Preservation is best effort.","La conservazione degli elementi musicali non è garantita.")}</p></fieldset>
+    </section><section id="aiPane-execution" role="tabpanel" aria-labelledby="aiTab-execution" hidden><fieldset><legend>${tr("4 · Execution","4 · Esecuzione")}</legend><div class="arranger-grid">
+    <label>${tr("Maximum processing time (minutes)","Tempo massimo di elaborazione (minuti)")}<input id="aiInferenceTimeoutMinutes" type="number" min="1" max="240" step="1" value="60"></label>
+    <p class="hint">${tr("Default: 60 min; adjustable from 1 to 240 min. Processing timeout, not audio duration. Remote service limits may apply.","Predefinito: 60 min; modificabile da 1 a 240 min. È il limite di elaborazione, non la durata del brano. Restano applicabili i limiti del servizio remoto.")}</p></div></fieldset>
+    ${currentUser?.native_single_user?`<section id="aiAceNativeTools"><h3>ACE-Step</h3><p id="aiAceState" role="status"></p>
+    <p class="hint">${tr('Choosing Local installs official ACE-Step and its dependencies and starts the server. Model weights may download automatically (several GB).','Selezionando Locale si installano ACE-Step ufficiale e le dipendenze e si avvia il server. I modelli possono essere scaricati automaticamente (diversi GB).')}</p>
+    <div class="arranger-grid"><label>${tr('Execution','Esecuzione')}<select id="aiAceMode" onchange="aiAceModeChanged()"><option value="">${tr('Choose…','Scegli…')}</option><option value="local">${tr('Local','Locale')}</option><option value="remote">${tr('MTA server','Server MTA')}</option></select></label>
+    <label>${tr('MTA server HTTPS URL','URL HTTPS server MTA')}<input id="aiAceRemoteUrl" type="url" placeholder="https://mta.example.org" autocomplete="off"></label></div>
+    <input id="aiAceRemoteToken" type="hidden" value=""><button onclick="aiAceSaveConnection()">${tr('Connect / retry','Collega / riprova')}</button>
+    <div id="aiAceProgressPanel" hidden role="status" aria-live="polite"><label id="aiAceProgressLabel" for="aiAceProgress"></label><progress id="aiAceProgress" style="width:100%"></progress><small id="aiAceProgressDetail"></small></div>
+    <div id="aiAccountApproval" role="status"></div><div class="form-actions"><button id="aiAceInstallButton" onclick="aiAceInstall()">${tr('Install / repair','Installa / ripara')}</button><button id="aiAceStartButton" onclick="aiAceStart()">${tr('Start','Avvia')}</button><button id="aiAceStopButton" onclick="aiAceStop()">${tr('Stop','Ferma')}</button><button onclick="aiAceRefresh()">${tr('Refresh','Aggiorna')}</button><button onclick="aiAceTest()">${tr('Test generation','Prova generazione')}</button></div></section>`:''}
+    </section></div>
+<p class="hint">${tr("Generated audio is added as a new track. The original is preserved.","L’audio generato viene aggiunto come nuova traccia. L’originale resta conservato.")}</p>
+    <div class="form-actions"><button class="utility-btn" onclick="testAiArrangerWorker()">${tr("Test worker","Verifica worker")}</button><button class="utility-btn" onclick="planAiRemix()">${tr("Plan","Pianifica")}</button><button id="aiRemixGenerateButton" class="utility-btn primary" onclick="generateAndAddAiRemix()">${tr("Generate + Add track","Genera + aggiungi traccia")}</button></div>
+    <div id="aiRemixJobProgress" class="arranger-status" hidden role="status" aria-live="polite"><label id="aiRemixJobLabel">${tr("Preparing AI job…","Preparazione del job AI…")}</label><progress style="display:block;width:100%" aria-label="AI generation in progress"></progress><div class="arranger-meters"><div><small>${tr("Elapsed time","Tempo trascorso")}</small><strong id="aiMeterElapsed">—</strong></div><div><small>CPU</small><strong id="aiMeterCpu">—</strong><small id="aiMeterCpuNote"></small></div><div><small>GPU</small><strong id="aiMeterGpu">—</strong><small id="aiMeterGpuNote"></small></div></div><small id="aiRemixJobElapsed" class="arranger-detail"></small><p id="aiRemixJobHint" class="hint"></p></div>
+    <div class="form-actions"><button class="utility-btn" onclick="window.mtaAiJobs?.open()">${tr("AI jobs · status and controls","Job AI · elenco e controlli")}</button><button class="utility-btn" onclick="closeUtilityModal()">${tr("Close and continue in background","Chiudi e continua in background")}</button></div><pre id="aiRemixPlanResult" style="white-space:pre-wrap;max-height:4rem;overflow:auto"></pre></div>`);
   aiArrangerTab('source');
   if(currentUser?.native_single_user)aiAceRefresh();
   aiArrangerWatchActive();
@@ -5322,7 +5329,7 @@ async function planAiRemix(action="plan"){
     updateElapsed();
     elapsedTimer=setInterval(updateElapsed,1000);
   }
-  try{const plan=await api(`/api/projects/${encodeURIComponent(current.id)}/${route}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});if(action==='generate-and-add'){if(typeof window!=='undefined')window.dispatchEvent(new CustomEvent('mta:ai-job-accepted',{detail:plan}));if(output.isConnected)output.textContent='Job accepted: '+plan.job_id+' · Awaiting current server status / In attesa dello stato corrente';await aiArrangerWatchActive(true);}else{output.textContent=JSON.stringify({status:plan.status,mode:plan.mode||'rearrange',prompt:plan.prompt,input_source:plan.input_source,input_track_id:plan.input_track_id,constraints:plan.constraints,backend_available:plan.backend_available,warnings:plan.warnings},null,2)}}catch(e){if(output.isConnected)output.textContent=`AI generation failed / Generazione fallita: ${e.message}`;if(generating)aiArrangerRenderProgress({state:'failed',message:e.message},true); }finally{if(elapsedTimer!==null)clearInterval(elapsedTimer);if(!generating){if(progress?.isConnected)progress.hidden=true;if(button?.isConnected)button.disabled=false;}}
+  try{const plan=await api(`/api/projects/${encodeURIComponent(current.id)}/${route}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});if(action==='generate-and-add'){if(typeof window!=='undefined')window.dispatchEvent(new CustomEvent('mta:ai-job-accepted',{detail:plan}));if(output.isConnected)output.textContent=tr('Job accepted: ','Job accettato: ')+plan.job_id+' · '+tr('Awaiting current server status','In attesa dello stato corrente');await aiArrangerWatchActive(true);}else{output.textContent=JSON.stringify({status:plan.status,mode:plan.mode||'rearrange',prompt:plan.prompt,input_source:plan.input_source,input_track_id:plan.input_track_id,constraints:plan.constraints,backend_available:plan.backend_available,warnings:plan.warnings},null,2)}}catch(e){if(output.isConnected)output.textContent=`${tr('AI generation failed','Generazione AI fallita')}: ${aiFriendlyError(e.message)}`;if(generating)aiArrangerRenderProgress({state:'failed',message:e.message},true); }finally{if(elapsedTimer!==null)clearInterval(elapsedTimer);if(!generating){if(progress?.isConnected)progress.hidden=true;if(button?.isConnected)button.disabled=false;}}
 }
 
 let aiArrangerWatchTimer=null;
@@ -5332,6 +5339,17 @@ let aiArrangerPolling=false;
 let aiArrangerWatchEpoch=0;
 let aiArrangerPollFailures=0;
 let aiArrangerCancelPending=false;
+function aiFriendlyError(message){
+ const value=String(message||'');
+ if(value==='ACE_SETUP_IN_PROGRESS')return tr('ACE-Step is installing or starting. Follow its progress in Execution.','ACE-Step si sta installando o avviando. Segui l’avanzamento in Esecuzione.');
+ if(value==='ACE_SETUP_REQUIRED')return tr('Start or repair local ACE-Step in Execution.','Avvia o ripara ACE-Step locale in Esecuzione.');
+ if(value==='MTA_ACCOUNT_REQUIRED')return tr('Connect your MTA server account first.','Collega prima il tuo account sul server MTA.');
+ if(value.includes('No trusted AI inference executable'))return tr('ACE-Step is not ready. Select Local in Execution to install and start it, or connect an MTA server.','ACE-Step non è pronto. Seleziona Locale in Esecuzione per installarlo e avviarlo, oppure collega un server MTA.');
+ const stages={'Preparing / Preparazione':tr('Preparing','Preparazione'),'Encoding / Codifica':tr('Encoding','Codifica'),'DiT diffusion / Diffusione DiT':tr('DiT diffusion','Diffusione DiT'),'Decoding / Decodifica':tr('Decoding','Decodifica'),'Finalizing / Finalizzazione':tr('Finalizing','Finalizzazione')};
+ if(stages[value])return stages[value];
+ return value.replace(/AI generation failed \/ Generazione fallita:/g,tr('AI generation failed:','Generazione AI fallita:'));
+}
+function aiIntensityHelpToggle(button){const help=document.getElementById('aiIntensityHelp');if(help){help.hidden=!help.hidden;button.setAttribute('aria-expanded',String(!help.hidden));}}
 function aiArrangerRenderProgress(job,showTerminal=false){
   const active=['submitting','running','busy','queued','blocked'].includes(job.state);
   const panel=document.getElementById('aiRemixJobProgress');
@@ -5345,25 +5363,25 @@ function aiArrangerRenderProgress(job,showTerminal=false){
     button.dataset.projectId=current?.id||'';
     const cancelling=aiArrangerCancelPending||job.cancel_requested||job.phase==='cancelling';
     button.disabled=active&&(!job.job_id||job.state==='submitting'||cancelling);
-    button.textContent=active?(cancelling?'Cancelling job / Annullamento in corso…':'Cancel job / Annulla job'):'Generate + Add track / Genera + aggiungi traccia';
+    button.textContent=active?(cancelling?tr('Cancelling job…','Annullamento in corso…'):tr('Cancel job','Annulla job')):tr('Generate + Add track','Genera + aggiungi traccia');
   }
   if(panel){panel.hidden=!active&&!showTerminal;panel.setAttribute?.('aria-busy',String(active));}
-  if(label)label.textContent=(job.state==='cancelled'?'Job annullato':job.message)||(active?'AI inference in progress':`AI generation: ${job.state}`);
+  if(label)label.textContent=(job.state==='cancelled'?tr('Job cancelled','Job annullato'):aiFriendlyError(job.message))||(active?'AI inference in progress':`AI generation: ${job.state}`);
   if(bar){
     bar.hidden=!active&&job.state!=='completed';
     if(job.state==='completed'){bar.max=100;bar.value=100;}
     else if(active&&Number.isFinite(job.progress_percent)){bar.max=100;bar.value=Math.max(0,Math.min(100,job.progress_percent));}
     else bar.removeAttribute('value');
   }
-  if(hint)hint.textContent=(active&&(job.cancel_requested||job.phase==='cancelling'))?'Cancellation requested; waiting for worker exit. GPU work stops at a safe checkpoint / Annullamento richiesto; attesa uscita del worker. Arresto GPU al prossimo checkpoint utile.':({
-    submitting:'Submitting the request / Invio della richiesta.',
-    queued:'Waiting in the queue / In attesa in coda.',
-    blocked:'Waiting for an available worker / In attesa di un worker disponibile.',
-    completed:'Generation completed / Generazione completata.',
-    failed:'Generation failed. You can retry / Generazione fallita. Puoi riprovare.',
-    interrupted:'Generation interrupted / Generazione interrotta.',
-    cancelled:'Annullamento completato: worker terminato, nessuna traccia aggiunta.'
-  })[job.state]||(active?'Elaborazione in corso. Puoi chiudere questa finestra e seguire il job da Job AI. La percentuale complessiva, se disponibile, è una stima delle fasi ACE.':'No running AI job / Nessuna generazione in corso.');
+  if(hint)hint.textContent=(active&&(job.cancel_requested||job.phase==='cancelling'))?tr('Cancellation requested; waiting for worker exit. GPU work stops at a safe checkpoint.','Annullamento richiesto; attesa uscita del worker. Arresto GPU al prossimo checkpoint utile.'):({
+    submitting:tr('Submitting the request.','Invio della richiesta.'),
+    queued:tr('Waiting in the queue.','In attesa in coda.'),
+    blocked:tr('Waiting for an available worker.','In attesa di un worker disponibile.'),
+    completed:tr("Generation completed.","Generazione completata."),
+    failed:tr("Generation failed. You can retry.","Generazione fallita. Puoi riprovare."),
+    interrupted:tr("Generation interrupted.","Generazione interrotta."),
+    cancelled:tr('Cancellation completed: worker exited, no track added.','Annullamento completato: worker terminato, nessuna traccia aggiunta.')
+  })[job.state]||(active?tr('Processing. You can close this window and follow the job in AI jobs. The overall progress is an estimate of ACE stages.','Elaborazione in corso. Puoi chiudere questa finestra e seguire il job da Job AI. La percentuale complessiva, se disponibile, è una stima delle fasi ACE.'):'No running AI job / Nessuna generazione in corso.');
 }
 function aiGpuStatusLabel(status){
   return ({profiling:'profilazione GPU in corso; dato al prossimo checkpoint',profiled_kernels_diagnostic:'kernel GPU misurati, diagnostica non fatturabile',
@@ -5398,7 +5416,7 @@ function aiArrangerRenderElapsed(){
   const prefix=job.state==='queued'?`Queued / In coda: ${job.jobs_ahead??0} ahead · Position ${job.queue_position??'?'} · `:`Elapsed / Trascorso: ${seconds}s · `;
   const connection=aiArrangerPollFailures?` · Reconnecting / Riconnessione (${aiArrangerPollFailures})`:'';
   elapsed.textContent=prefix+`${job.phase||job.state} · Job ${job.job_id||''} · CPU: ${job.cpu_seconds!=null?Number(job.cpu_seconds).toFixed(1)+' s':job.cpu_seconds_estimated!=null?'~'+Number(job.cpu_seconds_estimated).toFixed(1)+' s (ACE process)':'N/A'} · GPU: ${job.gpu_seconds!=null?Number(job.gpu_seconds).toFixed(1)+' s':job.gpu_seconds_estimated!=null?'~'+Number(job.gpu_seconds_estimated).toFixed(1)+(job.gpu_metrics_source==='ace-torch-profiler'?aiProfilerTimeLabel(job):' s (ACE process; non fatturabile)'):`N/A (${aiGpuStatusLabel(job.gpu_metrics_status)}${aiGpuSourceLabel(job.gpu_metrics_source)?' · fonte: '+aiGpuSourceLabel(job.gpu_metrics_source):''})`}${connection}`;
-  const values={aiMeterElapsed:seconds+' s',aiMeterCpu:job.cpu_seconds!=null?Number(job.cpu_seconds).toFixed(1)+' s':job.cpu_seconds_estimated!=null?'~'+Number(job.cpu_seconds_estimated).toFixed(1)+' s':'—',aiMeterGpu:job.gpu_seconds!=null?Number(job.gpu_seconds).toFixed(1)+' s':job.gpu_seconds_estimated!=null?'~'+Number(job.gpu_seconds_estimated).toFixed(1)+' s':'—',aiMeterCpuNote:job.cpu_seconds!=null?'Misura verificata':job.cpu_seconds_estimated!=null?'Processo ACE · stima':'Non disponibile',aiMeterGpuNote:job.gpu_metrics_source==='ace-torch-profiler'?'Kernel HIP · '+(active?'raccolta parziale':'diagnostica')+' · non fatturabile':job.gpu_seconds!=null?'Misura verificata':aiGpuStatusLabel(job.gpu_metrics_status)};
+  const values={aiMeterElapsed:seconds+' s',aiMeterCpu:job.cpu_seconds!=null?Number(job.cpu_seconds).toFixed(1)+' s':job.cpu_seconds_estimated!=null?'~'+Number(job.cpu_seconds_estimated).toFixed(1)+' s':'—',aiMeterGpu:job.gpu_seconds!=null?Number(job.gpu_seconds).toFixed(1)+' s':job.gpu_seconds_estimated!=null?'~'+Number(job.gpu_seconds_estimated).toFixed(1)+' s':'—',aiMeterCpuNote:job.cpu_seconds!=null?tr('Verified measurement','Misura verificata'):job.cpu_seconds_estimated!=null?tr('ACE process · estimate','Processo ACE · stima'):tr('Unavailable','Non disponibile'),aiMeterGpuNote:job.gpu_metrics_source==='ace-torch-profiler'?'Kernel HIP · '+(active?tr('partial collection','raccolta parziale'):tr('diagnostic','diagnostica'))+' · '+tr('non-billable','non fatturabile'):job.gpu_seconds!=null?tr('Verified measurement','Misura verificata'):aiGpuStatusLabel(job.gpu_metrics_status)};
   for(const [id,text] of Object.entries(values)){const node=document.getElementById(id);if(node)node.textContent=text;}
   if(job.steps_total){const hint=document.getElementById('aiRemixJobHint');if(hint&&active&&!job.cancel_requested)hint.textContent=job.steps_completed+'/'+job.steps_total+' valutazioni DiT osservate · avanzamento complessivo stimato ~'+Math.round(job.progress_percent||0)+'%. Puoi chiudere la finestra: Job AI resta disponibile.';}
   if(!active&&aiArrangerElapsedTimer!==null){clearInterval(aiArrangerElapsedTimer);aiArrangerElapsedTimer=null;}
@@ -5496,49 +5514,64 @@ async function generateAndAddAiRemix(){
   return planAiRemix('generate-and-add');
 }
 
-// r193: native-only optional ACE-Step setup and real inference verification.
-let aiAcePollTimer=null;
+// r193: native-only setup; polling continues after the Arranger is closed.
+let aiAcePollTimer=null,aiAceWasReady=false,aiAccountPollTimer=null;
 async function aiAceRefresh(){
  if(!currentUser?.native_single_user)return;
- const el=document.getElementById('aiAceState');if(!el)return;
- try{const info=await api('/api/ai-arranger/desktop-ace/status');el.textContent=`Install: ${info.desktop.task.state}; installed: ${info.desktop.installed}; server: ${info.desktop.server_running}; auto-start: ${info.desktop.auto_start_enabled}; Git: ${info.desktop.has_git}; uv: ${info.desktop.has_uv}; inference test: ${info.inference_test.state}`;
- const conn=info.desktop.connection||{};const mode=document.getElementById('aiAceMode');if(mode&&!mode.dataset.loaded){mode.value=conn.mode||'local';document.getElementById('aiAceRemoteUrl').value=conn.url||'';mode.dataset.loaded='1';}
- if(conn.mode==='remote')el.textContent+=`; remote: ${conn.url}; token configured: ${conn.has_token}`;
- if(!conn.configured&&!window.mtaAceChoiceShown){window.mtaAceChoiceShown=true;setTimeout(()=>{if(confirm('Configure ACE-Step AI engine now? OK = remote server, Cancel = local server. / Configurare il motore AI? OK = server remoto, Annulla = locale.')){mode.value='remote';document.getElementById('aiAceRemoteUrl').focus();}else{mode.value='local';aiAceSaveConnection();}},0);}
- const remote=conn.mode==='remote';['aiAceInstallButton','aiAceStartButton','aiAceStopButton'].forEach(id=>{const b=document.getElementById(id);if(b)b.disabled=remote;});
- const task=info.desktop.task||{};const panel=document.getElementById('aiAceProgressPanel');const bar=document.getElementById('aiAceProgress');
- const active=['installing','starting_server'].includes(task.state)||(info.desktop.server_running&&!['passed','failed'].includes(info.inference_test.state));
- panel.hidden=!active;
- if(active){const pct=Number.isFinite(task.progress_percent)?task.progress_percent:null;
- if(pct===null)bar.removeAttribute('value');else{bar.max=100;bar.value=pct;}
- document.getElementById('aiAceProgressLabel').textContent=task.phase==='clone'?'Downloading ACE-Step / Download server':task.phase==='dependencies'?'Installing dependencies / Installazione dipendenze':'Initializing model / Preparazione modelli';
- const bytes=task.model_downloaded_bytes_this_session||0;
- document.getElementById('aiAceProgressDetail').textContent=(pct===null?'In progress (total unknown) / In corso (totale ignoto)':`${pct}%`)+(bytes?` · ${(bytes/1048576).toFixed(1)} MiB cached`: '')+(task.message?` · ${task.message}`:'');}
- if(active&&!aiAcePollTimer)aiAcePollTimer=setInterval(()=>{if(!document.getElementById('aiAceProgressPanel')){clearInterval(aiAcePollTimer);aiAcePollTimer=null;return;}aiAceRefresh()},1500);
- if(!active&&aiAcePollTimer){clearInterval(aiAcePollTimer);aiAcePollTimer=null;}}
- catch(e){document.getElementById('aiAceNativeTools').hidden=true;}
+ const el=document.getElementById('aiAceState');
+ try{
+ const info=await api('/api/ai-arranger/desktop-ace/status'),desktop=info.desktop,task=desktop.task||{},conn=desktop.connection||{};
+ const mode=document.getElementById('aiAceMode');if(mode&&!mode.dataset.loaded){mode.value=conn.configured?conn.mode:'';document.getElementById('aiAceRemoteUrl').value=conn.url||'';mode.dataset.loaded='1';}
+ const active=['installing','starting_server'].includes(task.state);
+ const labels={checking_prerequisites:tr('Checking runtime','Verifica runtime'),clone:tr('Downloading ACE-Step','Download ACE-Step'),dependencies:tr('Installing dependencies','Installazione dipendenze'),model_initialization:tr('Starting API / preparing models','Avvio API / preparazione modelli')};
+ const state=conn.mode==='remote'?tr('MTA remote server selected','Server MTA remoto selezionato'):desktop.server_ready?tr('ACE-Step server ready','Server ACE-Step pronto'):task.state==='failed'?tr('ACE-Step setup failed','Configurazione ACE-Step fallita'):active?(labels[task.phase]||tr('Preparing ACE-Step','Preparazione ACE-Step')):tr('ACE-Step server stopped','Server ACE-Step fermo');
+ const text=state+' · '+tr('Installed','Installato')+': '+(desktop.installed?tr('yes','sì'):tr('no','no'))+' · '+tr('Running','In esecuzione')+': '+(desktop.server_running?tr('yes','sì'):tr('no','no'))+(task.state==='failed'?' · '+aiSetupError(task.error):'');
+ if(el)el.textContent=text;const summary=document.getElementById('aiAceSummary');if(summary)summary.textContent=text;
+ for(const id of ['aiAceProgressPanel','aiAceSummaryProgress']){const node=document.getElementById(id);if(node)node.hidden=!active;}
+ for(const id of ['aiAceProgress','aiAceSummaryProgress']){const bar=document.getElementById(id);if(bar){if(Number.isFinite(task.progress_percent)){bar.max=100;bar.value=task.progress_percent}else bar.removeAttribute('value');}}
+ const label=document.getElementById('aiAceProgressLabel');if(label)label.textContent=labels[task.phase]||state;
+ const detail=document.getElementById('aiAceProgressDetail');if(detail)detail.textContent=(Number.isFinite(task.progress_percent)?task.progress_percent+'%':tr('Total unknown','Totale non disponibile'))+(task.message?' · '+task.message:'');
+ if(desktop.server_ready&&!aiAceWasReady)toast(tr('ACE-Step is ready. You can generate audio.','ACE-Step è pronto. Puoi generare audio.'));
+ aiAceWasReady=!!desktop.server_ready;
+ for(const id of ['aiAceInstallButton','aiAceStartButton','aiAceStopButton']){const node=document.getElementById(id);if(node)node.disabled=conn.mode==='remote'||(active&&id!=='aiAceStopButton');}
+ if(active&&!aiAcePollTimer)aiAcePollTimer=setInterval(aiAceRefresh,1500);
+ if(!active&&aiAcePollTimer){clearInterval(aiAcePollTimer);aiAcePollTimer=null;}
+ }catch(e){if(el)el.textContent=tr('Unable to read ACE status: ','Impossibile leggere lo stato ACE: ')+aiFriendlyError(e.message);}
+}
+function aiSetupError(code){
+ if(/PREREQUISITES|UV_MISSING/.test(code||''))return tr('The packaged uv runtime is missing. Reinstall the updated native application.','Manca il runtime uv del pacchetto. Reinstalla l’app nativa aggiornata.');
+ if(/EXITED/.test(code||''))return tr('The ACE process exited; check its local server.log.','Il processo ACE è terminato; controlla il file server.log locale.');
+ return code||tr('Unknown setup error','Errore di configurazione sconosciuto');
+}
+async function aiAceModeChanged(){
+ if(document.getElementById('aiAceMode').value==='local')await aiAceSaveConnection();
+ else document.getElementById('aiAceRemoteUrl')?.focus();
 }
 async function aiAceSaveConnection(){
  const mode=document.getElementById('aiAceMode').value;
- const url=document.getElementById('aiAceRemoteUrl').value.trim();
- const token=document.getElementById('aiAceRemoteToken').value;
- try{await api('/api/ai-arranger/desktop-ace/connection',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode,url,token})});document.getElementById('aiAceRemoteToken').value='';delete document.getElementById('aiAceMode').dataset.loaded;await aiAceRefresh();toast('ACE-Step connection saved / Connessione salvata');}catch(e){toast(e.message)}
+ try{
+ if(mode==='remote'){await aiAccountConnect(document.getElementById('aiAceRemoteUrl').value.trim(),true);return;}
+ if(mode!=='local')return;
+ await api('/api/ai-arranger/desktop-ace/connection',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'local',start:true})});
+ aiAceWasReady=false;delete document.getElementById('aiAceMode').dataset.loaded;await aiAceRefresh();
+ }catch(e){toast(aiFriendlyError(e.message));}
 }
-async function aiAceInstall(){
- if(!confirm('Install ACE-Step from its official GitHub repository? Third-party code and dependencies will be downloaded. Models are downloaded only on first use. / Installare ACE-Step da GitHub?'))return;
- try{await api('/api/ai-arranger/desktop-ace/install',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({consent:true})});await aiAceRefresh();}catch(e){toast(e.message)}
-}
-async function aiAceStart(){
- if(!confirm('Start ACE-Step locally and allow on-demand download of model weights (several GB)? / Avviare ACE-Step e consentire il download dei modelli?'))return;
- try{await api('/api/ai-arranger/desktop-ace/start',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({consent:true})});await aiAceRefresh();}catch(e){toast(e.message)}
-}
-async function aiAceStop(){
- if(!confirm('Stop ACE-Step and disable automatic startup? / Fermare ACE-Step e disabilitare l’avvio automatico?'))return;
- try{await api('/api/ai-arranger/desktop-ace/stop',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({disable_auto_start:true})});await aiAceRefresh();}catch(e){toast(e.message)}
-}
-async function aiAceTest(){
- if(!confirm('Run a real ACE-Step audio-generation test? It may take several minutes. / Eseguire un test reale di generazione audio?'))return;
- try{await api('/api/ai-arranger/desktop-ace/test',{method:'POST'});await aiAceRefresh();}catch(e){toast(e.message)}
+async function aiAceInstall(){return aiAceSaveConnection();}
+async function aiAceStart(){return aiAceSaveConnection();}
+async function aiAceStop(){try{await api('/api/ai-arranger/desktop-ace/stop',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({disable_auto_start:true})});await aiAceRefresh();}catch(e){toast(aiFriendlyError(e.message));}}
+async function aiAceTest(){try{await api('/api/ai-arranger/desktop-ace/test',{method:'POST'});toast(tr('Generation test started','Test di generazione avviato'));await aiAceRefresh();}catch(e){toast(aiFriendlyError(e.message));}}
+async function aiAccountConnect(server,ace=false){
+ const state=await api('/api/native/ai-account/connect',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({server,label:'MTA '+(navigator.platform||'native')})});
+ const area=document.getElementById('aiAccountApproval')||document.getElementById('nativeSharedAccountStatus');
+ if(area){area.replaceChildren();const text=document.createElement('p');text.textContent=tr('Authorize this code in your browser: ','Autorizza questo codice nel browser: ')+state.user_code;const link=document.createElement('a');link.href=state.verification_uri;link.textContent=tr('Sign in / register and authorize','Accedi / registrati e autorizza');link.target='_blank';link.rel='noopener';area.append(text,link);}
+ if(window.pywebview?.api?.open_external_url)window.pywebview.api.open_external_url(state.verification_uri);
+ else window.open(state.verification_uri,'_blank','noopener');
+ if(aiAccountPollTimer)clearInterval(aiAccountPollTimer);
+ aiAccountPollTimer=setInterval(async()=>{try{
+ const current=await api('/api/native/ai-account/poll',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ace})});
+ if(current.connected){clearInterval(aiAccountPollTimer);aiAccountPollTimer=null;if(area?.isConnected)area.textContent=tr('Connected. One token for all AI engines.','Collegato. Un token per tutti i motori AI.');toast(tr('MTA account connected','Account MTA collegato'));await aiAceRefresh();}
+ else if(['expired','denied'].includes(current.state)){clearInterval(aiAccountPollTimer);aiAccountPollTimer=null;if(area?.isConnected)area.textContent=tr('Request expired or denied. Connect again.','Richiesta scaduta o rifiutata. Ripeti il collegamento.');}
+ }catch(e){if(area?.isConnected)area.textContent=tr('Retrying authorization…','Nuovo tentativo di autorizzazione…');}},5000);
 }
 
 // Per-worker optional native remote routing. Never reveal saved tokens to the UI.
@@ -5546,8 +5579,8 @@ async function openNativeRemoteWorkers(){
  try{
   const data=await api('/api/native/ai-workers/settings');
   const labels={'whisper':'Whisper / Lyrics','chords-ml':'Chord analysis','demucs':'Demucs / stems','drumsep':'DrumSep','sam-audio':'SAM Audio','singer-separation':'Singer separation','backing-vocals':'Backing vocals'};
-  const rows=Object.entries(labels).map(([key,label])=>{const cfg=data.workers?.[key]||{};return `<div class="form-grid" style="border-bottom:1px solid var(--border,#8884);padding:8px"><strong>${label}</strong><label>Processing<select id="nativeRemoteMode-${key}"><option value="local" ${cfg.mode!=='remote'?'selected':''}>Local / Locale</option><option value="remote" ${cfg.mode==='remote'?'selected':''}>Remote / Remoto</option></select></label><label>HTTPS MTA server<input id="nativeRemoteUrl-${key}" type="url" value="${esc(cfg.url||'')}" placeholder="https://mta.example.org"></label><label>Personal token<input id="nativeRemoteToken-${key}" type="password" autocomplete="new-password" placeholder="${cfg.has_token?'Saved; leave blank to retain':'Required for remote'}"></label><button type="button" onclick="saveNativeRemoteWorker('${key}')">Save / Salva</button></div>`}).join('');
-  showUtilityModal('Native AI processing / Elaborazioni AI native',`<p>Select the execution location for each model. In remote mode an unavailable server causes an error; models do not run locally as fallback.</p>${rows}<hr><h3>Pending remote AI requests / Richieste remote pendenti</h3><div id="nativeRemotePending">Loading...</div><button type="button" onclick="refreshNativePending()">Refresh pending / Aggiorna</button><hr><h3>Server request history / Storico richieste sul server</h3><div id="nativeRemoteHistory">Select a worker / Seleziona un worker</div><button type="button" onclick="refreshNativeRemoteHistory()">Discover on server / Cerca sul server</button><hr><h3>Recovered stem orphans / Stem orfani recuperati</h3><p>Review preserved files and quarantine or restore them without deleting data / Esamina i file conservati e gestisci la quarantena senza cancellazioni.</p><button type="button" onclick="refreshNativeStemOrphans()">Review orphan files / Esamina file orfani</button><div id="nativeStemOrphanInventory" role="status" aria-live="polite"></div>`);
+  const rows=Object.entries(labels).map(([key,label])=>{const cfg=data.workers?.[key]||{};return `<div class="form-grid" style="border-bottom:1px solid var(--border,#8884);padding:8px"><strong>${label}</strong><label>Processing<select id="nativeRemoteMode-${key}"><option value="local" ${cfg.mode!=='remote'?'selected':''}>Local / Locale</option><option value="remote" ${cfg.mode==='remote'?'selected':''}>Remote / Remoto</option></select></label><input id="nativeRemoteUrl-${key}" type="hidden" value="${esc(cfg.url||'')}"><input id="nativeRemoteToken-${key}" type="hidden" value=""><button type="button" onclick="saveNativeRemoteWorker('${key}')">Save / Salva</button></div>`}).join('');
+  showUtilityModal(tr('Native AI processing','Elaborazioni AI native'),`<div class="settings-form"><label>${tr('MTA server for all remote AI engines','Server MTA per tutti i motori AI remoti')}<input id="nativeSharedServer" type="url" placeholder="https://mta.example.org"></label><button onclick="aiAccountConnect(document.getElementById('nativeSharedServer').value.trim()).catch(e=>toast(e.message))">${tr('Connect account','Collega account')}</button><div id="nativeSharedAccountStatus"></div></div><p>Select the execution location for each model. In remote mode an unavailable server causes an error; models do not run locally as fallback.</p>${rows}<hr><h3>Pending remote AI requests / Richieste remote pendenti</h3><div id="nativeRemotePending">Loading...</div><button type="button" onclick="refreshNativePending()">Refresh pending / Aggiorna</button><hr><h3>Server request history / Storico richieste sul server</h3><div id="nativeRemoteHistory">Select a worker / Seleziona un worker</div><button type="button" onclick="refreshNativeRemoteHistory()">Discover on server / Cerca sul server</button><hr><h3>Recovered stem orphans / Stem orfani recuperati</h3><p>Review preserved files and quarantine or restore them without deleting data / Esamina i file conservati e gestisci la quarantena senza cancellazioni.</p><button type="button" onclick="refreshNativeStemOrphans()">Review orphan files / Esamina file orfani</button><div id="nativeStemOrphanInventory" role="status" aria-live="polite"></div>`);
   await refreshNativePending();
  }catch(e){toast(e.message)}
 }

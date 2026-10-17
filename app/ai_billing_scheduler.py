@@ -8,6 +8,9 @@ from .ai_billing import run_scheduled_closures
 def main():
     from .ai_storage_sampler import sample_all
     print(json.dumps({'storage': sample_all()}, sort_keys=True))
+    from .ai_notifications import tick
+    try:print(json.dumps({'notifications':tick()},sort_keys=True))
+    except Exception:logging.exception('AI email notifications deferred')
     results = run_scheduled_closures()
     for result in results:
         print(json.dumps(result, sort_keys=True))

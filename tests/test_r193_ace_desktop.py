@@ -34,9 +34,9 @@ def test_autostart_reuses_previous_permission(monkeypatch, tmp_path):
     monkeypatch.setenv('MTA_ACE_STEP_DESKTOP_DIR', str(tmp_path))
     manager._remember_consent()
     calls = []
-    monkeypatch.setattr(manager, 'start_server', lambda **kwargs: calls.append(kwargs) or {'server_running':True})
+    monkeypatch.setattr(manager, 'ensure_local', lambda **kwargs: calls.append(kwargs) or {'server_running':True})
     assert manager.auto_start_server()['server_running'] is True
-    assert calls == [{'confirmed_model_download':True, 'remember_consent':False}]
+    assert calls == [{'confirmed':True}]
     manager.stop_server(disable_auto_start=True)
     assert not manager._consent_file().exists()
 

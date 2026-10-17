@@ -36,6 +36,7 @@ def client(monkeypatch):
         {'id': 4, 'user_id': 7, 'label': 'client', 'revoked_at': None}])
     monkeypatch.setattr(tokens.ai_access, 'issue', lambda *a: {'id': 5, 'token': 'only-once'})
     monkeypatch.setattr(tokens.ai_access, 'revoke', lambda *a: True)
+    monkeypatch.setattr(tokens.ai_access, 'rotate', lambda *a: {'id': 5, 'token': 'only-once'})
     monkeypatch.setattr(tokens.ai_access, 'summary', lambda *a: [{'user_id': 7}])
     return TestClient(api)
 

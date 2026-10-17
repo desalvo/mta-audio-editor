@@ -485,8 +485,10 @@ async def execute_remote_ai_audio_job(kind: str, request: Request):
     if key and dedup.is_cancelled(identity['user_id'], key):
         raise HTTPException(409, 'AI request cancelled before worker dispatch')
     try:
-        result, meta = execute_registered_worker(identity['user_id'], kind, {'kind': kind, **options},
+        from starlette.concurrency import run_in_threadpool
+        result, meta = await run_in_threadpool(execute_registered_worker, identity['user_id'], kind, {'kind': kind, **options},
             token_id=identity['id'], source_wav=bytes(data),
+            **({'timeout_seconds': __import__('app.ai_execution_limits',fromlist=['inference_timeout']).inference_timeout(options)} if kind=='ace-step' else {}),
             cancel_check=(lambda: dedup.is_cancelled(identity['user_id'], key)) if key else None)
     except WorkerUnavailable as exc:
         if key and not dedup.is_cancelled(identity['user_id'], key): dedup.finalize(identity['user_id'], key, state='failed')

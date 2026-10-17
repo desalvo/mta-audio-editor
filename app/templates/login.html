@@ -13,7 +13,7 @@
     <h2>Bentornato</h2>
     <p class="lead">Gestisci i tuoi progetti MTA con un editor multitraccia professionale: editing, plugin, mastering ed export MTA/WAV/MP3/FLAC.</p>
     __ERROR__
-    <form method="post" action="/login" class="auth-form">
+    <form method="post" action="/login" class="auth-form"><input type="hidden" name="next" value="__NEXT__">
       <label>Email o username<input name="identifier" required autocomplete="username" placeholder="nome@esempio.it"></label>
       <label>Password<div class="password-wrap"><input id="pwd" name="password" type="password" required autocomplete="current-password" placeholder="La tua password"><button type="button" class="eye" onclick="pwd.type=pwd.type==='password'?'text':'password'">◉</button></div></label>
       <label>Codice autenticatore <span>(se attivo)</span><input name="totp" inputmode="numeric" pattern="[0-9 ]{6,8}" autocomplete="one-time-code" placeholder="Codice a 6 cifre"></label>

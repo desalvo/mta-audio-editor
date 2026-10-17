@@ -33,9 +33,10 @@ def rotate(token_id: int,request: Request):
     found = next((t for t in ai_access.list_tokens() if t['id']==token_id and not t['revoked_at']),None)
     if not found:
         raise HTTPException(404,'Active token not found')
-    created = ai_access.issue(found['user_id'],found['label'])
-    ai_access.revoke(token_id)
-    return created
+    try:
+        return ai_access.rotate(token_id)
+    except ValueError as exc:
+        raise HTTPException(404, 'Active token not found') from exc
 
 @router.get('/api/admin/ai-usage')
 def all_usage(request: Request):

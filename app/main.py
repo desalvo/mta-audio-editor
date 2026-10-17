@@ -3,6 +3,7 @@ import stat
 from app.secure_https import https_urlopen
 import base64
 import hashlib
+import html
 import json
 import logging
 import os
@@ -100,8 +101,15 @@ async def _mta_application_lifespan(_app):
         yield
     finally:
         _cleanup_session_previews_on_shutdown()
+        if not NATIVE_SINGLE_USER:
+            from .ai_notifications import stop_service
+            stop_service()
 
 app = FastAPI(title="MTA Audio Editor", version=APP_VERSION, docs_url=None, redoc_url=None, openapi_url=None, lifespan=_mta_application_lifespan)
+from .ai_device_auth import router as ai_device_router
+from .ai_notification_routes import router as ai_notification_router
+app.include_router(ai_device_router)
+app.include_router(ai_notification_router)
 app.include_router(ai_token_router)
 app.include_router(ai_gateway_router)
 app.include_router(ai_billing_router)
@@ -164,6 +172,9 @@ def _start_background_services():
             LOGGER.error('Unresolved async track receipts: %s', async_track_recovery['errors'])
     except Exception:
         LOGGER.exception('Async track startup reconciliation unavailable')
+    if not NATIVE_SINGLE_USER:
+        from .ai_notifications import start_service
+        start_service()
     start_background_updater()
     resume_pending_gc()
     if NATIVE_SINGLE_USER:
@@ -507,6 +518,7 @@ def _is_public(path: str) -> bool:
         or path.startswith("/docs/user")
         or path.startswith("/docs/pdf/user")
         or path == "/api/models/catalog"
+        or path in {"/ai-device", "/api/ai-device/start", "/api/ai-device/poll"}
     )
 
 
@@ -547,6 +559,11 @@ async def security_middleware(request: Request, call_next):
     if request.url.path.startswith("/api/") and request.method not in {"GET", "HEAD", "OPTIONS"} and request.headers.get("x-mta-request") != "1" and not ai_gateway_token_ok:
         return HTMLResponse("Missing request integrity header", status_code=403)
 
+    from .ai_job_context import actor as ai_actor_context
+    authenticated_ai = None
+    if user is not None and dict(user).get('id') is not None:
+        authenticated_ai = int(user['id'])
+    ai_actor_context.set(authenticated_ai)
     content_length = request.headers.get("content-length")
     if content_length:
         try:
@@ -669,9 +686,10 @@ def oauth_callback(provider: str, request: Request, code: str="", state: str="",
 
 @app.get("/login", response_class=HTMLResponse)
 def login_page(request: Request):
-    if session_user(request):
-        return RedirectResponse("/", status_code=303)
-    return _template("login.html", error="", social_buttons=_social_buttons("login"))
+    target=request.query_params.get('next','/')
+    if not target.startswith('/ai-device?code=') or any(c in target for c in '\r\n'):target='/'
+    if session_user(request):return RedirectResponse(target,status_code=303)
+    return _template("login.html",error="",social_buttons=_social_buttons("login")).replace('__NEXT__',html.escape(target,quote=True))
 
 
 @app.post("/login", response_class=HTMLResponse)
@@ -682,9 +700,11 @@ async def login_submit(request: Request):
     totp = str(form.get("totp", "")).strip()
     user, error = authenticate(identifier, password, totp)
     if not user:
-        return HTMLResponse(_template("login.html", error=_alert(error), social_buttons=_social_buttons("login")), status_code=401)
+        return HTMLResponse(_template("login.html", error=_alert(error), social_buttons=_social_buttons("login")).replace('__NEXT__',html.escape(str(form.get('next','/')),quote=True)), status_code=401)
     token = create_session(user["id"], request)
-    response = RedirectResponse("/", status_code=303)
+    target=str(form.get('next','/'))
+    if not target.startswith('/ai-device?code=') or any(c in target for c in '\r\n'):target='/'
+    response = RedirectResponse(target, status_code=303)
     secure = request.url.scheme == "https" or request.headers.get("x-forwarded-proto", "").lower() == "https"
     response.set_cookie(
         "mta_session", token, max_age=12 * 3600, httponly=True, secure=secure,
@@ -1308,7 +1328,14 @@ def ai_arranger_worker_status(request: Request):
 @app.get('/api/ai-arranger/catalog')
 def ai_arranger_catalog(request: Request):
     _actor(request)
-    return arranger_catalog()
+    result=arranger_catalog()
+    if NATIVE_SINGLE_USER and _ace_desktop.uses_mta_account():
+        from .native_ai_account import public_status
+        if public_status()['connected']:
+            result['generation_available']=True
+            for model in result['models']:
+                if model['id']=='ace-step-1.5':model['available']=True
+    return result
 
 
 @app.post('/api/projects/{pid}/ai-arranger/preflight')
@@ -1396,12 +1423,29 @@ def cancel_ai_job(pid: str, job_id: str, request: Request):
     return result
 
 
+def _check_native_ace_ready():
+    if not NATIVE_SINGLE_USER:return
+    if _ace_desktop.uses_mta_account():
+        from .native_ai_account import credentials
+        try:credentials()
+        except ValueError as exc:raise HTTPException(409,'MTA_ACCOUNT_REQUIRED') from exc
+    elif _ace_desktop.connection()['configured'] and _ace_desktop._previous_consent():
+        state=_ace_desktop.status()
+        if not state.get('server_ready'):
+            raise HTTPException(409,'ACE_SETUP_IN_PROGRESS' if state['task'].get('state') in ('installing','starting_server') else 'ACE_SETUP_REQUIRED')
+
+
 def _generate_ai_preview(plan: dict, project: Project) -> Response:
     """Explicit opt-in external worker output; never mutate the original project."""
-    if configured_worker() is None:
+    _check_native_ace_ready()
+    if configured_worker() is None and not (NATIVE_SINGLE_USER and _ace_desktop.uses_mta_account()):
         raise HTTPException(503, 'No verified AI inference executable is configured')
     try:
-        audio, meta = run_worker_with_project_audio(plan, project, audio_path)
+        if NATIVE_SINGLE_USER and _ace_desktop.uses_mta_account():
+            from .native_ai_account import execute_arranger
+            audio,meta=execute_arranger(plan,project,audio_path)
+        else:
+            audio, meta = run_worker_with_project_audio(plan, project, audio_path)
     except WorkerUnavailable as exc:
         raise HTTPException(503, str(exc)) from exc
     except (ValueError, OSError) as exc:
@@ -1677,7 +1721,10 @@ def _durable_generation_executor(pid, payload, job_id):
         project = load_project(pid)
         plan = arranger_plan(project, body) if operation == 'arranger' else prepare_remix_plan(project, body)
         from . import ai_durable_remote_executor
-        if ai_durable_remote_executor.configured_remote() is not None:
+        if NATIVE_SINGLE_USER and _ace_desktop.uses_mta_account():
+            from .native_ai_account import execute_arranger
+            audio,meta=execute_arranger(plan,project,audio_path,cancel_event=cancel_event)
+        elif ai_durable_remote_executor.configured_remote() is not None:
             audio, meta = ai_durable_remote_executor.execute(
                 job_id, plan, project, audio_path, cancel_event=cancel_event)
         else:
@@ -1764,7 +1811,8 @@ def ai_arranger_cancel_generation(pid: str, job_id: str, request: Request):
 @app.post('/api/projects/{pid}/ai-arranger/start-generation', status_code=202)
 def ai_arranger_start_generation(pid: str, request: Request, body: RearrangeRequest):
     _project_for_actor(request, pid)
-    if configured_worker() is None:
+    _check_native_ace_ready()
+    if configured_worker() is None and not (NATIVE_SINGLE_USER and _ace_desktop.uses_mta_account()):
         raise HTTPException(503, 'No trusted AI inference executable is configured')
     # Persist the caller's reproducible request separately from the execution closure.
     # Idempotency keys are namespaced per project and operation.
@@ -1803,7 +1851,8 @@ def ai_arranger_start_generation(pid: str, request: Request, body: RearrangeRequ
 @app.post('/api/projects/{pid}/remix/start-generation', status_code=202)
 def ai_remix_start_generation(pid: str, request: Request, body: RemixRequest):
     _project_for_actor(request, pid)
-    if configured_worker() is None:
+    _check_native_ace_ready()
+    if configured_worker() is None and not (NATIVE_SINGLE_USER and _ace_desktop.uses_mta_account()):
         raise HTTPException(503, 'No trusted AI inference executable is configured')
     import hashlib
     replay_header = request.headers.get('Idempotency-Key')
@@ -7295,8 +7344,10 @@ def native_ai_workers_configure(request: Request, body: dict):
 def desktop_ace_connection(request: Request, body: dict):
     _ace_native_only(request)
     try:
-        return _ace_desktop.configure_connection(mode=body.get('mode', ''),
-                                                 url=body.get('url', ''), token=body.get('token', ''))
+        connection=_ace_desktop.configure_connection(mode=body.get('mode', ''),url=body.get('url', ''),token=body.get('token', ''))
+        if body.get('mode')=='local' and body.get('start') is True:
+            _ace_desktop.ensure_local(confirmed=True)
+        return connection
     except (ValueError, OSError, RuntimeError) as exc:
         raise HTTPException(400, str(exc)) from exc
 
@@ -7393,3 +7444,29 @@ def recovered_stem_orphans_quarantine(request: Request, pid: str, body: dict):
             return quarantine_preserved(pid, receipt, path)
         except (ValueError, RuntimeError, OSError) as exc:
             raise HTTPException(409, str(exc)) from exc
+
+
+@app.get('/api/native/ai-account')
+def native_ai_account_status(request:Request):
+    _ace_native_only(request)
+    from .native_ai_account import public_status
+    return public_status()
+
+
+@app.post('/api/native/ai-account/connect')
+def native_ai_account_connect(request:Request,body:dict):
+    _ace_native_only(request)
+    from .native_ai_account import begin
+    try:return begin(body.get('server',''),body.get('label','MTA native application'))
+    except (ValueError,OSError) as exc:raise HTTPException(400,'Unable to contact the MTA authorization server') from exc
+
+
+@app.post('/api/native/ai-account/poll')
+def native_ai_account_poll(request:Request,body:dict):
+    _ace_native_only(request)
+    from .native_ai_account import poll
+    try:
+        state=poll()
+        if state['connected'] and body.get('ace') is True:_ace_desktop.configure_mta_remote()
+        return state
+    except (ValueError,OSError) as exc:raise HTTPException(400,'MTA account authorization unavailable') from exc

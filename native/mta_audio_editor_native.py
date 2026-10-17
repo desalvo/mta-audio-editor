@@ -283,6 +283,16 @@ def _native_smoke(url: str) -> int:
 class NativeApi:
     """Filesystem bridge exposed only by the desktop pywebview build."""
 
+    def open_external_url(self, url: str) -> dict:
+        """Only open the exact pending account approval URL in the system browser."""
+        from app.native_ai_account import public_status
+        from urllib.parse import urlsplit
+        expected=public_status().get('verification_uri')
+        if not expected or url!=expected or urlsplit(url).scheme!='https':
+            return {'ok':False,'error':'Unrecognized account approval URL'}
+        import webbrowser
+        return {'ok':bool(webbrowser.open(url,new=2))}
+
     def __init__(self) -> None:
         self.window = None
         self._update_download_status = {"state": "idle", "received": 0, "total": 0}

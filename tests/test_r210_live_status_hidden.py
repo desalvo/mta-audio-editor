@@ -35,7 +35,7 @@ def test_actual_watcher_replaces_queued_and_reconnect_message():
 const elements={aiRemixPlanResult:{textContent:'Job accepted: j · queued'},
 aiRemixJobProgress:{querySelector:()=>null},aiRemixGenerateButton:{},aiRemixJobLabel:{},aiRemixJobElapsed:{}};
 let next,reply={job_id:'j',state:'queued',phase:'queued'},fail=false;
-const ctx={current:{id:'p'},document:{getElementById:id=>elements[id]},
+const ctx={tr:(en,it)=>en,current:{id:'p'},document:{getElementById:id=>elements[id]},
 api:async()=>{if(fail)throw Error('offline');return reply},
 setTimeout:f=>{next=f;return 1},clearTimeout(){},setInterval:()=>1,clearInterval(){}};
 vm.createContext(ctx);vm.runInContext(process.argv[1],ctx);
@@ -65,7 +65,7 @@ def test_modal_never_inserts_native_setup_on_web_even_with_pending_status():
     section = source[source.index('async function openAiRemixPanel('):source.index('async function planAiRemix(')]
     refresh = source[source.index('async function aiAceRefresh(){'):source.index('async function aiAceSaveConnection(){')]
     js = r'''const vm=require('vm'),assert=require('assert');let markup='',desktopRequests=0;
-const ctx={document:{getElementById:()=>null},current:{id:'p',tracks:[]},currentUser:{native_single_user:false},uiLanguage:'en',
+const ctx={tr:(en,it)=>en,document:{getElementById:()=>null},current:{id:'p',tracks:[]},currentUser:{native_single_user:false},uiLanguage:'en',
 api:async url=>{if(url.includes('desktop-ace')){desktopRequests++;return new Promise(()=>{});}return {presets:[],models:[]}},
 esc:s=>s,showUtilityModal:(title,html)=>{markup=html},aiAceRefresh:()=>{desktopRequests++},aiArrangerWatchActive(){}};
 vm.createContext(ctx);vm.runInContext(process.argv[1],ctx);

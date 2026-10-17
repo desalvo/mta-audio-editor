@@ -39,6 +39,21 @@ def configured_worker() -> Path | None:
     return path
 
 
+def worker_command(worker: Path) -> list[str]:
+    """Only the bundled ACE adapter may use its managed native Python runtime."""
+    if worker.suffix != '.py':
+        return [str(worker)]
+    python = sys.executable
+    if os.getenv('MTA_NATIVE_SINGLE_USER', '').lower() in ('1','true','yes','on'):
+        from .ace_step_desktop_manager import adapter_python
+        managed = adapter_python(worker)
+        if managed is not None:
+            python = str(managed)
+        elif getattr(sys, 'frozen', False):
+            raise WorkerUnavailable('Native Python worker runtime is not installed')
+    return [python, str(worker)]
+
+
 def _snapshot_preview_wav(path: Path) -> tuple[bytes, dict]:
     """Validate and return the same bounded, regular-file inode snapshot.
 
@@ -148,8 +163,7 @@ def run_external_worker(plan: dict, *, timeout_seconds: int = 1200,
         output = directory / 'preview.wav'
         request.write_bytes(raw)
         request.chmod(0o600)
-        command = ([sys.executable, str(worker)] if worker.suffix == '.py'
-                   else [str(worker)]) + ['--request', str(request), '--output', str(output)]
+        command = worker_command(worker) + ['--request', str(request), '--output', str(output)]
         _run_supervised_legacy_worker(command, directory, timeout_seconds, cancel_event)
         if cancel_event is not None and cancel_event.is_set():
             raise WorkerUnavailable('AI worker cancelled')
@@ -316,7 +330,7 @@ def run_worker_with_project_audio(plan: dict, project, resolve_audio, *, timeout
         output = directory / 'preview.wav'
         request.write_bytes(raw)
         request.chmod(0o600)
-        command = ([sys.executable, str(worker)] if worker.suffix == '.py' else [str(worker)]) + ['--request', str(request), '--output', str(output)]
+        command = worker_command(worker) + ['--request', str(request), '--output', str(output)]
         environment = {**os.environ, **({'MTA_AI_PROGRESS_FILE': str(progress_file)} if progress_file else {})}
         # The trusted local process is reaped with wait4, so billed CPU time
         # is observed rather than inferred from elapsed wall time. A worker
@@ -346,7 +360,7 @@ def run_worker_with_project_audio(plan: dict, project, resolve_audio, *, timeout
                                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
                                   env=environment, start_new_session=True) as proc:
                 deadline = time.monotonic() + timeout_seconds
-                had_descendants = False
+                had_descendants = sys.platform != 'linux'
                 try:
                     while True:
                         child, status, stats = os.wait4(proc.pid, os.WNOHANG)
@@ -356,7 +370,7 @@ def run_worker_with_project_audio(plan: dict, project, resolve_audio, *, timeout
                                 metered_usage = {'cpu_seconds': max(0.0, stats.ru_utime + stats.ru_stime)}
                                 metered_source = 'worker'
                             break
-                        had_descendants |= bool(_descendants(proc.pid))
+                        if sys.platform == 'linux':had_descendants |= bool(_descendants(proc.pid))
                         if (cancel_event is not None and cancel_event.is_set()) or time.monotonic() >= deadline:
                             timed_out = not (cancel_event is not None and cancel_event.is_set())
                             os.killpg(proc.pid, signal.SIGTERM)
@@ -432,7 +446,7 @@ def probe_worker(*, timeout_seconds: float = 2.0) -> dict:
     if path is None:
         return result
     try:
-        completed = subprocess.run(([sys.executable, str(path)] if path.suffix == '.py' else [str(path)]) + ['--capabilities'], shell=False,
+        completed = subprocess.run(worker_command(path) + ['--capabilities'], shell=False,
             capture_output=True, timeout=timeout_seconds, check=False)
         if completed.returncode or len(completed.stdout) > 16_384:
             return result

@@ -15,7 +15,7 @@ def _init(con):
     CREATE TABLE IF NOT EXISTS ai_access_tokens (
       id INTEGER PRIMARY KEY, user_id INTEGER NOT NULL, label TEXT NOT NULL,
       token_hash TEXT NOT NULL UNIQUE, created_at INTEGER NOT NULL,
-      revoked_at INTEGER, last_used_at INTEGER,
+      revoked_at INTEGER, last_used_at INTEGER, client_id TEXT,
       FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE);
     CREATE TABLE IF NOT EXISTS ai_usage_events (
       id INTEGER PRIMARY KEY, user_id INTEGER NOT NULL, token_id INTEGER,
@@ -26,6 +26,11 @@ def _init(con):
       FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE);
     CREATE INDEX IF NOT EXISTS idx_ai_usage_user_date ON ai_usage_events(user_id, started_at);
     ''')
+
+    if 'client_id' not in {r[1] for r in con.execute('PRAGMA table_info(ai_access_tokens)')}:
+        try:con.execute('ALTER TABLE ai_access_tokens ADD COLUMN client_id TEXT')
+        except __import__('sqlite3').OperationalError as exc:
+            if 'duplicate column' not in str(exc).lower():raise
 
 
 def issue(user_id: int, label: str) -> dict:
@@ -45,9 +50,9 @@ def list_tokens(user_id: int | None = None) -> list[dict]:
     with db() as con:
         _init(con)
         if user_id is None:
-            rows = con.execute('SELECT id,user_id,label,created_at,revoked_at,last_used_at FROM ai_access_tokens ORDER BY id DESC').fetchall()
+            rows = con.execute('SELECT id,user_id,label,created_at,revoked_at,last_used_at,client_id FROM ai_access_tokens ORDER BY id DESC').fetchall()
         else:
-            rows = con.execute('SELECT id,user_id,label,created_at,revoked_at,last_used_at FROM ai_access_tokens WHERE user_id=? ORDER BY id DESC', (user_id,)).fetchall()
+            rows = con.execute('SELECT id,user_id,label,created_at,revoked_at,last_used_at,client_id FROM ai_access_tokens WHERE user_id=? ORDER BY id DESC', (user_id,)).fetchall()
         return [dict(row) for row in rows]
 
 
@@ -65,7 +70,7 @@ def authenticate(token: str) -> dict | None:
     digest = hashlib.sha256(token.encode()).hexdigest()
     with db() as con:
         _init(con)
-        row = con.execute('''SELECT t.id,t.user_id,t.label FROM ai_access_tokens t
+        row = con.execute('''SELECT t.id,t.user_id,t.label,t.client_id FROM ai_access_tokens t
           JOIN users u ON u.id=t.user_id WHERE t.token_hash=? AND t.revoked_at IS NULL
           AND u.active=1''', (digest,)).fetchone()
         if row:
@@ -94,3 +99,16 @@ def summary(user_id: int | None = None) -> list[dict]:
         else:
             rows = con.execute(sql + ' WHERE user_id=? GROUP BY user_id ORDER BY user_id', (user_id,)).fetchall()
         return [dict(row) for row in rows]
+
+
+def rotate(token_id):
+    with db() as con:
+        _init(con);con.execute('BEGIN IMMEDIATE')
+        row=con.execute('SELECT * FROM ai_access_tokens WHERE id=? AND revoked_at IS NULL',(token_id,)).fetchone()
+        if not row:raise ValueError('Active token not found')
+        if not con.execute('SELECT 1 FROM users WHERE id=? AND active=1',(row['user_id'],)).fetchone():raise ValueError('User inactive')
+        raw='mta_ai_'+secrets.token_urlsafe(32)
+        con.execute('UPDATE ai_access_tokens SET revoked_at=? WHERE id=?',(int(time.time()),token_id))
+        cur=con.execute('INSERT INTO ai_access_tokens(user_id,label,token_hash,created_at,client_id) VALUES(?,?,?,?,?)',
+          (row['user_id'],row['label'],hashlib.sha256(raw.encode()).hexdigest(),int(time.time()),row['client_id']))
+    return {'id':cur.lastrowid,'token':raw,'user_id':row['user_id'],'label':row['label']}

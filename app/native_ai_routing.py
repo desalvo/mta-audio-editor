@@ -21,7 +21,15 @@ def _file() -> Path:
 def _read() -> dict:
     try:
         data = json.loads(_file().read_text(encoding='utf-8'))
-        return data if isinstance(data,dict) else {}
+        if not isinstance(data,dict):return {}
+        from .native_ai_account import credentials
+        try:
+            shared=credentials()
+            for worker in data.get('workers',{}).values():
+                if worker.get('mode')=='remote':worker.update(shared)
+        except ValueError:
+            pass
+        return data
     except (OSError, ValueError):
         return {}
 
@@ -40,6 +48,14 @@ def configure(kind: str, mode: str, url: str = '', token: str = '') -> dict:
     data = _read()
     workers = data.setdefault('workers',{})
     old = workers.get(kind,{})
+    if mode == 'remote' and not token:
+        from .native_ai_account import credentials
+        try:
+            shared=credentials()
+            if not url or url.rstrip('/')==shared['url']:
+                url,token=shared['url'],shared['token']
+        except ValueError:
+            pass
     if mode == 'remote':
         _endpoint(url,kind)
         token = token or (old.get('token','') if old.get('url')==url else '')

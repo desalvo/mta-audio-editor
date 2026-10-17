@@ -38,6 +38,8 @@ async def ai_gateway(path: str, request: Request):
     identity = ai_access.authenticate(token)
     if not identity:
         raise HTTPException(401, 'Valid AI user token required')
+    if identity.get('client_id') and request.method=='POST':
+        raise HTTPException(403,'Native application tokens must use the accounted /api/ai-jobs endpoints')
     if path not in ALLOWED:
         raise HTTPException(404, 'ACE-Step operation not permitted')
     if request.method == 'GET' and path not in {'health','v1/models','v1/health','v1/audio'}:

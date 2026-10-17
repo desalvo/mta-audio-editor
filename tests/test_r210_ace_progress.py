@@ -108,7 +108,7 @@ def test_real_ui_terminal_cancel_has_no_waiting_hint_and_visible_metrics():
 const ids=['aiRemixJobProgress','aiRemixGenerateButton','aiRemixJobLabel','aiRemixJobHint','aiRemixJobElapsed','aiMeterCpu','aiMeterGpu','aiMeterElapsed','aiMeterCpuNote','aiMeterGpuNote'];
 const elements=Object.fromEntries(ids.map(id=>[id,{}]));elements.aiRemixJobProgress.querySelector=()=>null;
 const job={state:'cancelled',cancel_requested:true,phase:'cancelled',job_id:'j',elapsed_seconds:10,cpu_seconds_estimated:8.6,gpu_seconds_estimated:7,gpu_metrics_source:'ace-torch-profiler'};
-const ctx={current:{id:'p'},document:{getElementById:id=>elements[id]},setInterval(){},clearInterval(){}};
+const ctx={tr:(en,it)=>it,current:{id:'p'},document:{getElementById:id=>elements[id]},setInterval(){},clearInterval(){}};
 vm.createContext(ctx);vm.runInContext(process.argv[1],ctx);ctx.aiArrangerRenderProgress(job,true);
 vm.runInContext('aiArrangerLastSnapshot='+JSON.stringify(job),ctx);ctx.aiArrangerRenderElapsed();
 assert.match(elements.aiRemixJobHint.textContent,/Annullamento completato/);assert.doesNotMatch(elements.aiRemixJobHint.textContent,/waiting|attesa/);

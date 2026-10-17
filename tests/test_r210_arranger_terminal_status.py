@@ -17,7 +17,7 @@ const elements={aiRemixJobProgress:panel,aiRemixJobHint:{},aiRemixJobLabel:{},
   aiRemixGenerateButton:{},aiRemixPlanResult:{},aiRemixJobElapsed:{}};
 let next,scheduled=0,cleared=0,now=110000;
 let reply={job_id:'j',state:'running',phase:'inference',started_at:100,elapsed_seconds:10};
-const ctx={current:{id:'p'},document:{getElementById:id=>elements[id]},Date:{now:()=>now},
+const ctx={tr:(en,it)=>en,current:{id:'p'},document:{getElementById:id=>elements[id]},Date:{now:()=>now},
   api:async()=>reply,setTimeout(f){next=f;scheduled++;return 1},clearTimeout(){},
   setInterval:()=>2,clearInterval(){cleared++}};
 vm.createContext(ctx);vm.runInContext(process.argv[1],ctx);
@@ -26,7 +26,7 @@ vm.createContext(ctx);vm.runInContext(process.argv[1],ctx);
     reply={job_id:'j',state:'running',phase:'inference',started_at:100,elapsed_seconds:10};
     await vm.runInContext('aiArrangerWatchActive(true)',ctx);
     assert.equal(bar.hidden,false);assert.equal(elements.aiRemixGenerateButton.disabled,false);
-    assert.match(elements.aiRemixJobHint.textContent,/Elaborazione in corso/);
+    assert.match(elements.aiRemixJobHint.textContent,/Processing\./);
     const previous=scheduled;
     now=160000;
     reply={job_id:'j',state,phase:state,message:'ace_connection_refused',started_at:100,elapsed_seconds:11};
@@ -34,7 +34,7 @@ vm.createContext(ctx);vm.runInContext(process.argv[1],ctx);
     assert.equal(panel.hidden,false);assert.equal(bar.hidden,true);
     assert.equal(panel['aria-busy'],'false');
     assert.equal(elements.aiRemixGenerateButton.disabled,false);
-    assert.doesNotMatch(elements.aiRemixJobHint.textContent,/Elaborazione in corso|Do not close/);
+    assert.doesNotMatch(elements.aiRemixJobHint.textContent,/Processing\.|Do not close/);
     assert.match(elements.aiRemixJobElapsed.textContent,/Trascorso: 11s/);
     assert.equal(scheduled,previous);
     now=500000;vm.runInContext('aiArrangerRenderElapsed()',ctx);
@@ -46,7 +46,7 @@ vm.createContext(ctx);vm.runInContext(process.argv[1],ctx);
   vm.runInContext("aiArrangerRenderProgress({state:'running'})",ctx);
   assert.equal(bar.hidden,false);assert.equal(bar.value,undefined);
   assert.equal(elements.aiRemixGenerateButton.disabled,true);
-  assert.match(elements.aiRemixJobHint.textContent,/Elaborazione in corso/);
+  assert.match(elements.aiRemixJobHint.textContent,/Processing\./);
 })().catch(e=>{console.error(e);process.exitCode=1});
 '''
     result = subprocess.run(['node', '-e', js, section], capture_output=True, text=True, timeout=10)
@@ -63,7 +63,7 @@ const elements={aiRemixJobProgress:{isConnected:true,querySelector:()=>bar},
   aiRemixGenerateButton:{isConnected:true},aiRemixPlanResult:{isConnected:true},
   aiRemixJobHint:{},aiRemixJobElapsed:{},aiRemixJobLabel:{},
   aiInferenceTimeoutMinutes:{value:'60'},aiRemixMode:{value:'rearrange'}};
-const ctx={current:{id:'p'},document:{getElementById:id=>elements[id]},
+const ctx={tr:(en,it)=>en,current:{id:'p'},document:{getElementById:id=>elements[id]},
   api:async()=>{throw Error('submission rejected')},setInterval:()=>1,clearInterval(){cleared++}};
 vm.createContext(ctx);vm.runInContext(process.argv[1],ctx);
 (async()=>{
@@ -71,7 +71,7 @@ vm.createContext(ctx);vm.runInContext(process.argv[1],ctx);
   assert.equal(elements.aiRemixGenerateButton.disabled,false);
   assert.equal(bar.hidden,true);assert.equal(cleared,1);
   assert.match(elements.aiRemixPlanResult.textContent,/submission rejected/);
-  assert.doesNotMatch(elements.aiRemixJobHint.textContent,/Elaborazione in corso|Do not close/);
+  assert.doesNotMatch(elements.aiRemixJobHint.textContent,/Processing\.|Do not close/);
 })().catch(e=>{console.error(e);process.exitCode=1});
 '''
     result = subprocess.run(['node', '-e', js, section], capture_output=True, text=True, timeout=10)

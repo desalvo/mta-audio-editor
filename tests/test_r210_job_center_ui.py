@@ -50,7 +50,7 @@ const ctx={current:{id:'p',tracks:[{id:'t',name:'Test'}]},currentUser:{native_si
 api:async()=>({presets:[],models:[]}),showUtilityModal:(title,body)=>html=body,aiArrangerTab(){},aiArrangerWatchActive(){},aiAceRefresh:()=>native=true};
 vm.createContext(ctx);vm.runInContext(process.argv[1],ctx);
 (async()=>{await ctx.openAiRemixPanel();for(const id of ['aiPane-source','aiPane-arrangement','aiPane-execution','aiRemixModel','aiRemixPrompt','aiKeepChords','aiInferenceTimeoutMinutes','aiMeterCpu','aiMeterGpu'])assert.ok(html.includes('id="'+id+'"'),id);
-assert.equal((html.match(/role="tab"/g)||[]).length,3);assert.ok(!html.includes('id="aiAceNativeTools"'));assert.ok(html.includes('Chiudi e continua'));
+assert.equal((html.match(/role="tab"/g)||[]).length,3);assert.ok(!html.includes('id="aiAceNativeTools"'));assert.ok(html.includes('Close and continue'));
 ctx.currentUser.native_single_user=true;await ctx.openAiRemixPanel();assert.ok(html.includes('id="aiAceNativeTools"'));assert.equal(native,true);
 })().catch(e=>{console.error(e);process.exitCode=1});
 '''

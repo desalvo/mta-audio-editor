@@ -1608,3 +1608,5 @@ html,body{overflow:hidden}
 @media(max-width:600px){.arranger-meters{gap:5px}.arranger-meters>div{padding:7px}.arranger-meters strong{font-size:22px}.arranger-options{max-height:30dvh}.ai-arranger .arranger-grid{grid-template-columns:1fr}}
 .ai-arranger .arranger-detail{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 .ai-arranger:has(.arranger-status:not([hidden])) .arranger-options{max-height:20dvh;min-height:80px}
+.arranger-info{display:inline-flex!important;align-items:center;justify-content:center;width:22px;height:22px;padding:0!important;border-radius:50%;font-weight:bold;cursor:help;align-self:flex-start}
+.ace-summary{display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:#15384a;padding:8px;border-radius:8px;color:#e5f6ff;font-size:12px}.ace-summary strong{flex:1}.ace-summary progress{width:100%}

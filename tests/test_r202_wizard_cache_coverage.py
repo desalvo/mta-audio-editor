@@ -159,6 +159,6 @@ def test_desktop_manager_cache_status_consent_and_install_guards(tmp_path, monke
     assert result['auto_start_enabled'] is True
     mgr.stop_server(disable_auto_start=True)
     assert not mgr._consent_file().exists()
-    monkeypatch.setattr(mgr, 'start_server', lambda **kwargs: (_ for _ in ()).throw(RuntimeError('fail')))
+    monkeypatch.setattr(mgr, 'ensure_local', lambda **kwargs: (_ for _ in ()).throw(RuntimeError('fail')))
     mgr._remember_consent()
     assert mgr.auto_start_server()['task']['startup_error'] == 'fail'
