@@ -687,6 +687,11 @@ def save_project(project: Project, *, _skip_flac_conversion: bool = False):
     (d / "originals").mkdir(exist_ok=True)
     target = d / "project.json"
     tmp = d / f".project.json.{uuid.uuid4().hex}.tmp"
+    # A queued AI result is a server-side mutation unknown to an older editor.
+    # Persist the token in the same atomic JSON write as tracks/annotations.
+    from .ai_global_execution import current_job
+    if current_job.get() is not None:
+        project.ai_publication_token = uuid.uuid4().hex
     payload = project.model_dump_json(indent=2).encode("utf-8")
     try:
         with tmp.open("wb") as handle:

@@ -1,0 +1,79 @@
+{
+  "release": "0.3.0-r210",
+  "baseline": "MTA-r210-windows-startup-arranger-tabs-cumulative.zip",
+  "baseline_sha256": "888bcf66881322ce3f7fbb2529c89739b540000bc72d839e00e701db0bebf1b7",
+  "full": {
+    "tests": 3490,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 5,
+    "passed": 3485
+  },
+  "targeted_final_tree": {
+    "tests": 114,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1,
+    "passed": 113
+  },
+  "coverage_percent": 75.0,
+  "deselected": 10,
+  "deselected_reason": "AF_UNIX socket creation prohibited by this runner (same existing exclusions)",
+  "native_close_validation": "Final native close dispatch adjustment validated by the final targeted native regression; app code and app coverage unchanged from full run.",
+  "validation_limits": [
+    "No actual heavy AI environment provision performed",
+    "No production installation or hardware inference/calibration performed",
+    "Win32 API test requires Windows CI",
+    "Four optional Steinberg SDK tests skipped"
+  ],
+  "static_checks": [
+    "ruff app/native/tests/installer",
+    "compileall",
+    "node --check app.js and ai_jobs.js",
+    "bash -n installer and package scripts"
+  ],
+  "git_actions": [],
+  "production_changes": [],
+  "modified_baseline_files": [
+    "app/ai_models.py",
+    "app/ai_unified_adapter.py",
+    "app/main.py",
+    "app/models.py",
+    "app/static/ai_jobs.js",
+    "app/static/app.css",
+    "app/static/app.js",
+    "app/storage.py",
+    "native/mta_audio_editor_native.py",
+    "scripts/install_mta.sh",
+    "scripts/install_mta_native_wizard.sh",
+    "scripts/server_packages/build_deb.sh",
+    "scripts/server_packages/build_rpm.sh",
+    "scripts/server_packages/verify_native_installers.py",
+    "tests/test_native_new_stem_save_and_single_instance.py",
+    "tests/test_persistence_progress_145.py",
+    "tests/test_r198_modular_shared_storage.py",
+    "tests/test_r207_gateway_adapter_coverage.py",
+    "tests/test_r208_native_installer_payload_gate.py",
+    "tests/test_r217_portable_chord_inspector.py",
+    "tests/test_ui_native_settings_clip_scroll_139.py"
+  ],
+  "added_files": [
+    "app/ai_install_catalog.py",
+    "app/ai_model_download.py",
+    "scripts/install_ai_engines.py",
+    "tests/test_r210_ai_install_lifecycle.py",
+    "SERVER_AI_INSTALL_AND_PROJECT_LIFECYCLE_R210.md",
+    "validation/r210-ai-install-lifecycle-targeted.xml",
+    "validation/r210-ai-install-lifecycle-targeted.log",
+    "validation/r210-ai-install-lifecycle-full.xml",
+    "validation/r210-ai-install-lifecycle-full.log",
+    "validation/r210-ai-install-lifecycle-coverage.xml",
+    "validation/r210-ai-install-lifecycle-static.log",
+    "validation/r210-ai-install-lifecycle-report.json"
+  ],
+  "archive_validation": {
+    "all_baseline_entries_preserved": 1538,
+    "crc_verified": true,
+    "all_entry_bytes_compared_to_final_tree": true
+  }
+}

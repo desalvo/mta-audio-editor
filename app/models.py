@@ -324,6 +324,7 @@ class Project(BaseModel):
     markers: list[Marker] = Field(default_factory=list)
     lyrics: list[LyricLine] = Field(default_factory=list)
     chords: list[Chord] = Field(default_factory=list)
+    ai_publication_token: str = Field(default="", max_length=64)
     recovered_ai_imports: list[str] = Field(default_factory=list, max_length=2048)
     lyrics_pdf_style: LyricsPdfStyle = Field(default_factory=LyricsPdfStyle)
     lyrics_engine: str = Field(default="", max_length=80)

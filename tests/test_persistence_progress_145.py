@@ -35,9 +35,9 @@ def test_lyrics_and_chords_are_synced_to_bound_native_archive_after_extraction()
     end = js.index("\nfunction openTrackStemWorkflow", start)
     block = js[start:end]
     assert "await flushAutosave()" in block
-    assert "current=await api(`/api/projects/${current.id}`)" in block
+    assert "await reconcileAiProject(job.project_id)" in block
     assert "await persistCurrentProject(false)" in block
-    assert "await syncNativeProjectFile(current.id)" in block
+    assert "await syncNativeProjectFile(current.id,true)" in block
 
 
 def test_timed_text_round_trips_through_project_json(tmp_path, monkeypatch):

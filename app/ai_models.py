@@ -81,7 +81,36 @@ def lyrics_model_dir() -> Path:
     return Path(os.getenv("MTA_LYRICS_MODEL_DIR", str(_data_root() / ".cache" / "lyrics-models"))).expanduser().resolve()
 
 
+def _isolated_model_python(kind):
+    """Use the same trusted runtime as inference, never a path from the API."""
+    import sys
+    if os.getenv('MTA_AI_UNIFIED_WORKERS_ENABLED') != 'true':
+        return None
+    value = os.getenv('MTA_AI_WORKER_' + kind.upper().replace('-', '_') + '_PYTHON') or os.getenv('MTA_AI_DEFAULT_PYTHON')
+    if not value or os.path.abspath(value) == os.path.abspath(sys.executable):
+        return None
+    path = Path(value)
+    if not path.is_absolute() or not path.is_file() or not os.access(path, os.X_OK):
+        raise ValueError('Invalid installed AI model runtime')
+    return str(path)
+
+
+def _isolated_model_download(python, kind, model_id):
+    import subprocess
+    result = subprocess.run([python, str(Path(__file__).with_name('ai_model_download.py')),
+                             '--kind', kind, '--model', model_id],
+                            capture_output=True, text=True, check=True, timeout=3600)
+    if len(result.stdout) > 1048576:
+        raise ValueError('Oversized model installation response')
+    document = json.loads(result.stdout)
+    if not isinstance(document, dict) or document.get('id') != model_id:
+        raise ValueError('Invalid model installation response')
+    return document
+
+
 def _whisper_filename(model_id: str) -> str | None:
+    if _isolated_model_python('whisper') and any(item['id'] == model_id for item in LYRICS_MODELS):
+        return ('large-v3-turbo' if model_id == 'turbo' else model_id) + '.pt'
     try:
         import whisper  # type: ignore
         url = getattr(whisper, "_MODELS", {}).get(model_id)
@@ -108,6 +137,9 @@ def lyrics_catalog(*, native: bool = False) -> dict:
 def download_lyrics_model(model_id: str, *, native: bool = False) -> dict:
     if not any(x["id"]==model_id for x in LYRICS_MODELS):
         raise ValueError("unsupported lyrics model")
+    python = None if native else _isolated_model_python('whisper')
+    if python:
+        return _isolated_model_download(python, 'whisper', model_id)
     if not importlib.util.find_spec("whisper"):
         raise RuntimeError("OpenAI Whisper is not installed in this runtime")
     import whisper  # type: ignore
@@ -193,6 +225,9 @@ def _cache_snapshot() -> set[str]:
 def download_chord_model(model_id: str, *, native: bool = False) -> dict:
     spec=next((x for x in CHORD_MODELS if x["id"]==model_id),None)
     if not spec: raise ValueError("unsupported chord model")
+    python = None if native else _isolated_model_python('chords-ml')
+    if python:
+        return _isolated_model_download(python, 'chords-ml', model_id)
     if model_id in {"btc-hcqt", "chordformer"}:
         from .chord_ml import download_model
         download_model(model_id)

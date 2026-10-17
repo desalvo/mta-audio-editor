@@ -21,7 +21,7 @@ def test_web_settings_are_available_to_admin_from_sidebar():
     assert "currentUser=await api('/api/session')" in APP_JS
     assert "if(currentUser?.native_single_user)return showNativeSettings();" in APP_JS
     assert 'return showWebSettings();' in APP_JS
-    assert "currentUser?.role==='admin'?`<button type=\"button\" onclick=\"location.href='/settings'\">Server administration</button>`:''" in APP_JS
+    assert "currentUser?.role==='admin'?`<button type=\"button\" onclick=\"navigateAway('/settings')\">Server administration</button>`:''" in APP_JS
     assert 'Settings non disponibile' not in APP_JS
 
 

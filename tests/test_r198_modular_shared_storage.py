@@ -53,7 +53,7 @@ def test_native_autosave_no_longer_rewrites_maeproj():
     block=js[start:js.index('\n', start)+800]
     assert 'syncNativeProjectFile' not in block
     save_start=js.index('async function save(){')
-    assert 'syncNativeProjectFile(current.id)' in js[save_start:save_start+800]
+    assert 'syncNativeProjectFile(current.id,true)' in js[save_start:save_start+800]
 
 
 def test_revision_metadata_alignment():

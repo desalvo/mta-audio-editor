@@ -214,6 +214,7 @@ if [[ $ace_mode == disabled ]]; then
   set_setting MTA_ACE_STEP_URL 'http://127.0.0.1:8001'
   set_setting MTA_ACE_STEP_TRUSTED_HOST '127.0.0.1'
   set_setting MTA_AI_WORKER_ENABLED false
+  set_setting MTA_AI_WORKER_EXECUTABLE ''
   echo 'ACE-Step disabled for this setup; existing local service is untouched.'
 fi
 if [[ $ace_mode == remote ]]; then
@@ -313,6 +314,13 @@ if [[ $https == yes && $tls_mode == self-signed ]]; then
     rm -rf "$tls_tmp"
   fi
 fi
+# Every signed-package wizard path (including --no-wizard) provisions all AI engines.
+# Keep heavy inference dependencies out of package-manager maintainer scripts.
+ai_installer=/usr/lib/mta-audio-editor-server/native-installers/install_ai_engines.py
+[[ -f $ai_installer && ! -L $ai_installer ]] || { echo 'All-engine installer missing: upgrade the signed MTA package.' >&2; exit 4; }
+/opt/mta/server-venv/bin/python "$ai_installer" --python /opt/mta/server-venv/bin/python --env-file "$work" --device "${ace_device:-$ai}"
+# Retain complete AI bindings if a later step fails and the wizard is resumed.
+save_checkpoint
 install -d -m 755 "$data"
 # Back up configuration and roll back if the service cannot start with new values.
 backup=$(mktemp /etc/mta/.mta.env.backup.XXXXXXXX)

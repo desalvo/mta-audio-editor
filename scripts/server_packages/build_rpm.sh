@@ -31,6 +31,10 @@ cp "$(dirname "$0")"/*.service "$(dirname "$0")"/*.timer "$work/SOURCES/"
 cp "$(dirname "$0")/postinst" "$work/SOURCES/"
 cp "$(dirname "$0")/install_runtime.py" "$work/SOURCES/"
 cp "$(dirname "$0")/../install_ace_step.sh" "$(dirname "$0")/../install_rocm_userspace.sh" "$(dirname "$0")/../install_demucs.py" "$(dirname "$0")/../gpu_verified_billing.py" "$(dirname "$0")/../configure_ai_workers.py" "$work/SOURCES/"
+cp "$(dirname "$0")/../install_ai_engines.py" "$work/SOURCES/"
+for requirement in requirements-stems.txt requirements-lyrics.txt requirements-chords.txt requirements-roformer-compat.txt; do
+ cp "$(dirname "$0")/../../$requirement" "$work/SOURCES/application/$requirement"
+done
 cat > "$work/SPECS/mta-server.spec" <<'SPEC'
 Name: mta-audio-editor-server
 Version: %{getenv:MTA_RPM_VERSION}
@@ -48,6 +52,7 @@ cp -a %{_sourcedir}/application/. %{buildroot}/usr/lib/mta-audio-editor-server/
 chmod 755 %{buildroot}/usr/lib/mta-audio-editor-server/app/ace_step_http_worker.py
 cp %{_sourcedir}/install_runtime.py %{buildroot}/usr/lib/mta-audio-editor-server/install_runtime.py
 mkdir -p %{buildroot}/usr/lib/mta-audio-editor-server/native-installers
+install -m 755 %{_sourcedir}/install_ai_engines.py %{buildroot}/usr/lib/mta-audio-editor-server/native-installers/install_ai_engines.py
 install -m 755 %{_sourcedir}/install_ace_step.sh %{buildroot}/usr/lib/mta-audio-editor-server/native-installers/install_ace_step.sh
 install -m 755 %{_sourcedir}/configure_ai_workers.py %{buildroot}/usr/lib/mta-audio-editor-server/native-installers/configure_ai_workers.py
 install -m 755 %{_sourcedir}/gpu_verified_billing.py %{buildroot}/usr/lib/mta-audio-editor-server/native-installers/gpu_verified_billing.py

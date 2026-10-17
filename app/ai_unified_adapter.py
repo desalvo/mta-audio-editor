@@ -138,9 +138,17 @@ def infer(plan: dict, output: Path) -> None:
         _artifacts(folder,[(result,'application/json')]);return
     if kind == 'drumsep':
         from app.drumsep_onnx_worker import infer as drumsep_infer
-        model = Path(os.environ.get('MTA_AI_DRUMSEP_MODEL', ''))
+        configured = os.environ.get('MTA_AI_DRUMSEP_MODEL', '')
+        if configured:
+            model = Path(configured)
+        else:
+            # Same upstream URL and SHA-256 validation as the native model manager.
+            from app.main import _DRUMSEP_PATH, _download_drumsep_model
+            model = _DRUMSEP_PATH
+            if not model.is_file():
+                _download_drumsep_model()
         if not model.is_file():
-            raise RuntimeError('Operator must configure MTA_AI_DRUMSEP_MODEL')
+            raise RuntimeError('Configured DrumSep checkpoint is unavailable')
         paths = drumsep_infer(source, model, folder)
         _artifacts(folder, [(p, 'audio/wav') for p in paths]); return
     if kind == 'sam-audio':

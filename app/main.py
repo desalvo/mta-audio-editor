@@ -1608,6 +1608,7 @@ def _append_ai_generated_track(project: Project, audio: bytes, meta: dict, *, mo
             from .storage import _fsync_directory
             _fsync_directory(target.parent)
         project.tracks.append(track)
+        project.ai_publication_token = uuid.uuid4().hex
         _register_track_source_in_library(project, track, 'AI generated audio; original tracks preserved')
         save_project(project)
         return project
@@ -2172,6 +2173,9 @@ def project_put(pid: str, project: Project, request: Request):
     current = _project_for_actor(request, pid)
     if pid != project.id:
         raise HTTPException(400, "project id mismatch")
+    if project.ai_publication_token != current.ai_publication_token:
+        # Never let a stale browser autosave remove a newly published AI result.
+        raise HTTPException(409, "PROJECT_AI_RESULTS_CHANGED")
     if int(project.sample_rate) != int(current.sample_rate) and current.tracks:
         raise HTTPException(409, "Il sample rate del progetto può essere modificato solo quando non ci sono tracce attive")
     project.audio_storage_mode = current.audio_storage_mode

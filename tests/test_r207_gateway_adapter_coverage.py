@@ -124,8 +124,8 @@ def test_unified_transcripts_and_chords(tmp_path, monkeypatch):
 
 def test_unified_drumsep_and_missing_model(tmp_path, monkeypatch):
     source, output = _staged(tmp_path)
-    monkeypatch.delenv('MTA_AI_DRUMSEP_MODEL', raising=False)
-    with pytest.raises(RuntimeError, match='configure'):
+    monkeypatch.setenv('MTA_AI_DRUMSEP_MODEL', str(tmp_path/'missing.onnx'))
+    with pytest.raises(RuntimeError, match='checkpoint'):
         unified.infer({'kind': 'drumsep', 'source_audio': source}, output)
     model = tmp_path/'model.onnx'
     model.write_bytes(b'model')

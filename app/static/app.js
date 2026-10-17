@@ -46,6 +46,7 @@ let zoomPreviewState=null;
 let sel={a:0,b:0}, dragging=false, audioCtx=null, playAudio=null, selectedTrackId=null, exportFormat='mta';
 let selectedTrackIdSet=new Set(), timelineTool='range', rippleEnabled=false, timelineClipDrag=null;
 let projectMutationSerial=0;
+let persistedProjectSnapshot=null, projectLeavePending=null, projectNavigationApproved=false;
 let autosaveTimer=null, autosaveBusy=false, autosaveQueued=false, autosaveEnabled=true, projectDirty=false, stemPollTimer=null, activeStemJob=null, activeStemProjectId=null;
 let lyricsPdfPreviewObjectUrl=null;
 let nativeRecentProjects=[];
@@ -207,7 +208,7 @@ function mobileSaveRemoteFile(url,filename,mime='application/octet-stream',share
   }catch(e){toast('Filesystem mobile non disponibile: '+e.message);return false}
 }
 
-async function api(url,opt={}){opt.headers=opt.headers||{};if((opt.method||'GET').toUpperCase()!=='GET')opt.headers['X-MTA-Request']='1';const r=await fetch(url,opt);if(!r.ok){let message=await r.text();try{const d=JSON.parse(message);message=typeof d.detail==='string'?d.detail:message}catch(_){}throw new Error(message)}const ct=r.headers.get('content-type')||'';return ct.includes('json')?r.json():r}
+async function api(url,opt={}){const origin=document.querySelector('#utilityBody')?.firstElementChild;opt.headers=opt.headers||{};if((opt.method||'GET').toUpperCase()!=='GET')opt.headers['X-MTA-Request']='1';const r=await fetch(url,opt);if(!r.ok){let message=await r.text();try{const d=JSON.parse(message);message=typeof d.detail==='string'?d.detail:message}catch(_){}throw new Error(message)}const ct=r.headers.get('content-type')||'';if(!ct.includes('json'))return r;const data=await r.json();if((opt.method||'GET').toUpperCase()==='PUT'&&current?.id===data?.id&&url==='/api/projects/'+data.id)persistedProjectSnapshot=JSON.parse(JSON.stringify(data));const accepted=data?.job_id?data:data?.job?.id?{...data.job,job_id:data.job.id}:data?.id&&data.project_id&&data.status?{...data,job_id:data.id}:null;if((opt.method||'GET').toUpperCase()==='POST'&&accepted){const origins=window.mtaAiJobOrigins||=new Map();if(!origins.has(accepted.job_id))origins.set(accepted.job_id,origin);window.dispatchEvent(new CustomEvent('mta:ai-job-accepted',{detail:{...accepted,origin}}));}return data}
 function esc(s){return String(s??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 function toast(s){const t=$('#toast');t.textContent=trDynamic(s);t.style.display='block';clearTimeout(t._timer);t._timer=setTimeout(()=>t.style.display='none',4200)}
 function setRenderPlaybackPreparing(active){const b=$('#playMaster'),t=$('#toast');if(active){if(b){b.dataset.prepareText=b.textContent||'▶';b.textContent='…';b.title='Preparazione render in corso';b.classList.add('preparing')}if(t){clearTimeout(t._timer);t.textContent='Preparazione del render in corso, attendere…';t.style.display='block'}}else{if(b){if(b.classList.contains('preparing'))b.textContent='▶';b.classList.remove('preparing');b.title='Play / Preview'}if(t&&t.textContent==='Preparazione del render in corso, attendere…')t.style.display='none'}}
@@ -268,9 +269,94 @@ function releaseProjectPreviewCache(projectId){
   fetch(`/api/projects/${projectId}/preview-cache`,{method:'DELETE',credentials:'same-origin',keepalive:true}).catch(()=>{});
 }
 
-function closeCurrentProject(){
+// Reconcile only server AI additions; conflicting annotation edits remain unsaved.
+function mergeAiProjectResults(local,remote,base){
+  const merged=JSON.parse(JSON.stringify(local));
+  const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
+  for(const key of ['tracks','clip_library']){
+    const ids=new Set((merged[key]||[]).map(item=>item.id));
+    const known=new Set((base?.[key]||[]).map(item=>item.id));
+    for(const item of remote[key]||[])if(!ids.has(item.id)&&!known.has(item.id)){(merged[key]||=[]).push(item);ids.add(item.id);}
+  }
+  for(const key of ['lyrics','chords','markers','lyrics_engine','lyrics_model','chords_engine','chords_model']){
+    if(same(local[key],remote[key]))continue;
+    if(base&&same(local[key],base[key]))merged[key]=remote[key];
+    else if(!base||!same(remote[key],base[key]))throw Error(tr('AI results conflict with unsaved annotations. Save a project copy before reconciling.','I risultati AI sono in conflitto con annotazioni non salvate. Salva una copia prima di riconciliare.'));
+  }
+  merged.recovered_ai_imports=[...new Set([...(local.recovered_ai_imports||[]),...(remote.recovered_ai_imports||[])])];
+  merged.ai_publication_token=remote.ai_publication_token;
+  return merged;
+}
+let aiReconcilePending=null;
+async function reconcileAiProject(projectId){
+  if(current?.id!==projectId){await syncNativeProjectFile(projectId,true);return;}
+  if(aiReconcilePending){await aiReconcilePending;if(current?.id!==projectId)return;}
+  const work=(async()=>{
+    const remote=await api('/api/projects/'+encodeURIComponent(projectId));
+    if(current?.id!==projectId)return;
+    projectDirty=hasUnsavedProjectChanges();
+    if(!projectDirty){current=remote;persistedProjectSnapshot=projectSnapshot();}
+    else{collect();current=mergeAiProjectResults(current,remote,persistedProjectSnapshot);persistedProjectSnapshot=JSON.parse(JSON.stringify(remote));}
+    projectMutationSerial++;
+    render();
+    await syncNativeProjectFile(projectId,true);
+  })();
+  aiReconcilePending=work;
+  try{await work;}finally{if(aiReconcilePending===work)aiReconcilePending=null;}
+}
+function askProjectSave(){
+  return new Promise(resolve=>{
+    const overlay=document.createElement('div');overlay.className='mta-project-leave';overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');
+    const card=document.createElement('div');const title=document.createElement('h3');title.textContent=tr('Unsaved project changes','Modifiche del progetto non salvate');card.append(title);
+    const text=document.createElement('p');text.textContent=tr('Save your changes before closing this project?','Vuoi salvare le modifiche prima di chiudere questo progetto?');card.append(text);
+    for(const [value,en,it] of [['save','Save','Salva'],['discard','Discard changes','Scarta modifiche'],['cancel','Cancel','Annulla']]){
+      const button=document.createElement('button');button.textContent=tr(en,it);button.onclick=()=>{overlay.remove();resolve(value)};card.append(button);
+    }
+    overlay.onkeydown=event=>{if(event.key==='Escape'){event.preventDefault();overlay.remove();resolve('cancel')}};
+    overlay.append(card);document.body.append(overlay);card.querySelector('button').focus();
+  });
+}
+function hasUnsavedProjectChanges(){
+  return !!current&&(projectDirty||!!(persistedProjectSnapshot?.id===current.id&&JSON.stringify(current)!==JSON.stringify(persistedProjectSnapshot))||(typeof lyricsChordsEditorHasChanges==='function'&&lyricsChordsEditorHasChanges()));
+}
+async function prepareProjectLeave(){
+  if(projectLeavePending)return projectLeavePending;
+  projectLeavePending=(async()=>{
+    if(!current)return true;
+    const pid=current.id;
+    while(autosaveBusy)await new Promise(r=>setTimeout(r,25));
+    if(!hasUnsavedProjectChanges())return true;
+    projectDirty=true;
+    const answer=autosaveEnabled?'save':await askProjectSave();
+    if(answer==='cancel')return false;
+    if(answer==='discard'){clearTimeout(autosaveTimer);autosaveTimer=null;if(typeof lyricsChordsEditorOriginalDraft!=='undefined')lyricsChordsEditorOriginalDraft=null;return current?.id===pid;}
+    try{
+      // Commit an open annotation editor before saving/closing the whole project.
+      if(typeof lyricsChordsEditorHasChanges==='function'&&lyricsChordsEditorHasChanges()){await saveLyricsChordsEditor();if(lyricsChordsEditorHasChanges())return false;}
+      // Strict save: failures keep the current project open, unlike best-effort autosave.
+      await save();
+      return current?.id===pid&&!projectDirty;
+    }catch(_){return false;}
+  })();
+  try{return await projectLeavePending;}finally{projectLeavePending=null;}
+}
+window.mtaRequestNativeClose=async()=>{if(await prepareProjectLeave()){projectNavigationApproved=true;await window.pywebview?.api?.confirm_project_close?.();}};
+async function navigateAway(url){if(await prepareProjectLeave()){projectNavigationApproved=true;location.href=url;}}
+document.addEventListener('click',event=>{
+  const link=event.target?.closest?.('a[href]');
+  if(!link||link.target==='_blank'||link.download||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;
+  const url=new URL(link.href,location.href);
+  if(url.origin!==location.origin||url.pathname.startsWith('/api/')||url.hash||!hasUnsavedProjectChanges())return;
+  event.preventDefault();navigateAway(url.href);
+},true);
+window.addEventListener('beforeunload',event=>{
+  if(!projectNavigationApproved&&hasUnsavedProjectChanges()){if(autosaveEnabled&&!autosaveBusy)save().catch(()=>{});event.preventDefault();event.returnValue='';}
+});
+
+async function closeCurrentProject(){
   if(!current)return toast('Nessun progetto aperto');
   if(activeStemJob&&activeStemProjectId===current.id)return toast('Attendi il completamento della separazione prima di chiudere il progetto.');
+  if(!await prepareProjectLeave())return;
   const closingProjectId=current.id;
   forgetActiveWebProject(closingProjectId);
   stopPlayback();
@@ -420,6 +506,7 @@ async function createProjectFromDialog(){
     }
   }
   try{
+    if(!await prepareProjectLeave())return;
     const created=await api('/api/projects?title='+encodeURIComponent(title)+'&target='+encodeURIComponent(target)+'&sample_rate='+encodeURIComponent(sampleRate)+'&audio_storage_mode='+(appDisplayPreference('useFlacStorage')?'flac':'wav'),{method:'POST'});
     if(currentUser?.native_single_user&&pendingNewProjectPath&&window.pywebview?.api?.bind_project_path){
       await window.pywebview.api.bind_project_path(created.id,pendingNewProjectPath);
@@ -445,8 +532,9 @@ async function offerFlacMigrationOnOpen(){
 }
 async function openP(id){
   if(activeStemJob&&activeStemProjectId&&id!==activeStemProjectId)return toast('La separazione è in corso: resta nel progetto corrente fino al completamento.');
+  if(!await prepareProjectLeave())return false;
   showProjectOpenProgress(5,'Preparazione apertura…');
-  try{await flushAutosave();stopPlayback();showProjectOpenProgress(18,'Caricamento progetto…');current=await api('/api/projects/'+id);await offerFlacMigrationOnOpen();showProjectOpenProgress(42,'Inizializzazione tracce e metadata…');rememberRecentProject(current.id);selectedTrackId=current.tracks[0]?.id||null;resetProjectUiForOpen();resetSessionHistory();render();showProjectOpenProgress(68,'Caricamento waveform e interfaccia…');await refresh();showProjectOpenProgress(86,'Preparazione motore audio…');schedulePlaybackPrewarm(40);focusProjectWorkspace();showProjectOpenProgress(100,'Progetto pronto');finishProjectOpenProgress()}catch(e){finishProjectOpenProgress();toast('Impossibile aprire il progetto: '+e.message)}
+  try{stopPlayback();showProjectOpenProgress(18,'Caricamento progetto…');current=await api('/api/projects/'+id);await offerFlacMigrationOnOpen();showProjectOpenProgress(42,'Inizializzazione tracce e metadata…');rememberRecentProject(current.id);selectedTrackId=current.tracks[0]?.id||null;resetProjectUiForOpen();resetSessionHistory();render();showProjectOpenProgress(68,'Caricamento waveform e interfaccia…');await refresh();showProjectOpenProgress(86,'Preparazione motore audio…');schedulePlaybackPrewarm(40);focusProjectWorkspace();showProjectOpenProgress(100,'Progetto pronto');finishProjectOpenProgress()}catch(e){finishProjectOpenProgress();toast('Impossibile aprire il progetto: '+e.message)}
 }
 function downloadProjectArchive(id){window.location.href=`/api/projects/${id}/archive`}
 async function saveAsProject(){
@@ -487,7 +575,7 @@ async function saveProjectLocal(){
 async function openProjectArchive(){
   if(currentUser?.native_single_user&&window.pywebview?.api?.open_project){
     showProjectOpenProgress(5,'Selezione e lettura file progetto…');
-    try{const result=await window.pywebview.api.open_project();if(!result?.ok){finishProjectOpenProgress();return}showProjectOpenProgress(42,'Inizializzazione tracce e metadata…');current=result.project;await offerFlacMigrationOnOpen();rememberRecentProject(current.id);selectedTrackId=current.tracks[0]?.id||null;resetProjectUiForOpen();resetSessionHistory();render();showProjectOpenProgress(70,'Caricamento waveform e interfaccia…');await refresh();showProjectOpenProgress(88,'Preparazione motore audio…');schedulePlaybackPrewarm(40);focusProjectWorkspace();showProjectOpenProgress(100,'Progetto pronto');finishProjectOpenProgress();toast('Progetto aperto dal filesystem');return}catch(e){finishProjectOpenProgress();toast('Apertura progetto fallita: '+e.message);return}
+    try{if(!await prepareProjectLeave()){finishProjectOpenProgress();return}const result=await window.pywebview.api.open_project();if(!result?.ok){finishProjectOpenProgress();return}showProjectOpenProgress(42,'Inizializzazione tracce e metadata…');current=result.project;await offerFlacMigrationOnOpen();rememberRecentProject(current.id);selectedTrackId=current.tracks[0]?.id||null;resetProjectUiForOpen();resetSessionHistory();render();showProjectOpenProgress(70,'Caricamento waveform e interfaccia…');await refresh();showProjectOpenProgress(88,'Preparazione motore audio…');schedulePlaybackPrewarm(40);focusProjectWorkspace();showProjectOpenProgress(100,'Progetto pronto');finishProjectOpenProgress();toast('Progetto aperto dal filesystem');return}catch(e){finishProjectOpenProgress();toast('Apertura progetto fallita: '+e.message);return}
   }
   $('#projectArchiveFile')?.click();
 }
@@ -1187,14 +1275,15 @@ async function startTrackTextAnalysis(id,kind,choice=''){
     // Only now replace the chooser: the progress dialog is already backed by a real job.
     showMediaProgress(`Estrazione ${label}`,job.progress,job.message||'Job avviato','',job.id);
     pollMediaJob(job.id,`Estrazione ${label}`,async()=>{
-      current=await api(`/api/projects/${current.id}`);
+      await reconcileAiProject(job.project_id);
+      if(current?.id!==job.project_id)return;
       mixerMetaTab=kind;current.mixer_meta_tab=kind;
       // Render the freshly loaded timed-text state before persisting UI metadata.
       // collect() reads the hidden lyrics/chords fields; persisting before render
       // would overwrite newly extracted events with the stale pre-job DOM values.
       render();
       await persistCurrentProject(false);
-      await syncNativeProjectFile(current.id);
+      await syncNativeProjectFile(current.id,true);
       render();if(chordsBeforeExtraction)await refreshGeneratedChordsTrackForMutation(chordsBeforeExtraction,current.chords,'estrazione chords');toast(`${label} estratti e sincronizzati nel progetto`);
     });
   }catch(e){
@@ -2182,7 +2271,7 @@ function showAutoMixInfo(){alert('Auto Mix is reversible. It snapshots the curre
 function bindModelInputs(){$$('.model-input').forEach(el=>el.addEventListener('change',()=>{if(el.dataset.k==='name')return;const t=current.tracks[+el.dataset.i];if(t){t[el.dataset.k]=el.value;markDirty()}}));refreshPresetSelect(false);refreshPresetSelect(true)}
 function collect(){if(!current)return;$$('.model-input').forEach(el=>{const t=current.tracks[+el.dataset.i];if(t&&el.dataset.k!=='name')t[el.dataset.k]=el.value});/* Timed lyrics/chords/markers are structured project events. Hidden legacy textareas are display mirrors only and must never overwrite word timing, manual anchors, disabled/deleted flags, snapshots or MTA overrides. */}
 function projectSnapshot(){return current?JSON.parse(JSON.stringify(current)):null}
-function resetSessionHistory(){undoStack=[];redoStack=[];historyProjectId=current?.id||null;lastHistoryState=projectSnapshot();timelineClipboard=null;updateEditActionState()}
+function resetSessionHistory(){persistedProjectSnapshot=projectSnapshot();projectDirty=false;undoStack=[];redoStack=[];historyProjectId=current?.id||null;lastHistoryState=projectSnapshot();timelineClipboard=null;updateEditActionState()}
 function ensureSessionHistory(){if((current?.id||null)!==historyProjectId)resetSessionHistory();else if(!lastHistoryState&&current)lastHistoryState=projectSnapshot()}
 function checkpointHistory(){if(!current)return;ensureSessionHistory();if(JSON.stringify(current)!==JSON.stringify(lastHistoryState)){undoStack.push(lastHistoryState);if(undoStack.length>100)undoStack.shift();redoStack=[];lastHistoryState=projectSnapshot();updateEditActionState()}}
 async function persistCurrentProject(showToast=false){
@@ -2190,7 +2279,14 @@ async function persistCurrentProject(showToast=false){
   collect();
   const projectId=current.id,mutationAtStart=projectMutationSerial;
   const payload=JSON.stringify(current);
-  const saved=await api('/api/projects/'+projectId,{method:'PUT',headers:{'content-type':'application/json'},body:payload});
+  let saved;
+  try{saved=await api('/api/projects/'+projectId,{method:'PUT',headers:{'content-type':'application/json'},body:payload});}
+  catch(error){
+    if(error.message!=='PROJECT_AI_RESULTS_CHANGED')throw error;
+    await reconcileAiProject(projectId);
+    // Recollect after merging; a newer edit must never be replaced by the old payload.
+    return persistCurrentProject(showToast);
+  }
   if(!current||current.id!==projectId)return;
   if(projectMutationSerial!==mutationAtStart){
     // A newer user edit happened in flight: never overwrite it with old server data.
@@ -2200,6 +2296,7 @@ async function persistCurrentProject(showToast=false){
   }
   current=saved;
   projectDirty=false;
+  persistedProjectSnapshot=JSON.parse(JSON.stringify(saved));
   lastHistoryState=projectSnapshot();
   $('#headerProjectName').textContent=current?.title||'—';
   if(showToast)toast('Progetto salvato');
@@ -2332,9 +2429,15 @@ function updateEditActionState(){const set=(id,v)=>{const e=$(id);if(e)e.disable
 function markDirty(delay=650){
   if(!current)return;projectMutationSerial++;ensureSessionHistory();checkpointHistory();projectDirty=true;clearTimeout(autosaveTimer);if(!autosaveEnabled){updateEditActionState();return}autosaveTimer=setTimeout(()=>flushAutosave(false),delay);
 }
-async function syncNativeProjectFile(projectId){
-  if(!projectId||!currentUser?.native_single_user||!window.pywebview?.api?.sync_project)return;
-  try{await window.pywebview.api.sync_project(projectId)}catch(e){console.warn('Native project sync failed',e)}
+async function syncNativeProjectFile(projectId,strict=false){
+  if(!projectId||!currentUser?.native_single_user)return;
+  try{
+    const bridge=window.pywebview?.api||await waitForNativeApi();
+    if(!bridge?.sync_project){if(strict)throw Error(tr('Native save bridge unavailable. Retry before closing.','Salvataggio nativo non disponibile. Riprova prima di chiudere.'));return;}
+    const result=await bridge.sync_project(projectId);
+    // Unbound native projects are durably stored in the workspace already.
+    if(strict&&result?.ok===false&&result.bound!==false)throw Error(result.error||'Native project sync failed');
+  }catch(e){if(strict){if(current?.id===projectId)projectDirty=true;throw e;}console.warn('Native project sync failed',e)}
 }
 async function flushAutosave(showToast=false){
   clearTimeout(autosaveTimer);autosaveTimer=null;
@@ -2343,8 +2446,8 @@ async function flushAutosave(showToast=false){
   autosaveBusy=true;
   try{
     await persistCurrentProject(showToast);
-    await syncNativeProjectFile(current?.id);
-  }catch(e){if(showToast)toast(e.message);else toast('Autosave fallito: '+e.message)}
+    await syncNativeProjectFile(current?.id,true);
+  }catch(e){projectDirty=true;if(showToast)toast(e.message);else toast('Autosave fallito: '+e.message)}
   finally{
     autosaveBusy=false;
     if(autosaveQueued){autosaveQueued=false;markDirty(50)}
@@ -2358,10 +2461,10 @@ async function save(){
   autosaveBusy=true;
   try{
     await persistCurrentProject(false);
-    await syncNativeProjectFile(current.id);
+    await syncNativeProjectFile(current.id,true);
     await refresh();
     toast('Progetto salvato manualmente');
-  }catch(e){toast('Salvataggio fallito: '+e.message);throw e}
+  }catch(e){projectDirty=true;toast('Salvataggio fallito: '+e.message);throw e}
   finally{autosaveBusy=false}
 }
 function selectTrack(id,event=null){
@@ -2740,6 +2843,7 @@ function showMediaProgress(title,pct,message,detail='',cancelJobId=''){
   const cancel=cancelJobId?`<div class="utility-actions"><button class="utility-btn danger-action ai-model-action-btn" onclick="cancelMediaJob('${esc(cancelJobId)}')">Annulla estrazione</button></div>`:'';
   const partial=detail?`<div class="workflow-note media-live-output">${esc(detail)}</div>`:'';
   showUtilityModal(title,`<div class="stem-progress-card"><div class="stem-progress-head"><b>${esc(title)}</b><span>${indeterminate?'…':p+'%'}</span></div><div class="stem-progress ${indeterminate?'indeterminate':''}"><div class="stem-progress-fill" style="width:${p}%"></div></div><div class="stem-progress-message">${esc(message||'')}</div>${partial}${cancel}</div>`);
+  if(cancelJobId&&typeof window!=='undefined')window.mtaAiJobs?.origin?.(cancelJobId,$('#utilityBody')?.firstElementChild);
 }
 function mediaPartialText(job){
   const p=job?.partial;if(!p?.items?.length)return '';
@@ -2759,15 +2863,17 @@ function uploadWithProgress(url,formData,title){
     xhr.send(formData);
   });
 }
-async function pollMediaJob(jobId,title,onDone,onFinish=null){
+async function pollMediaJob(jobId,title,onDone,onFinish=null,origin=null){
+  origin ||= $('#utilityBody')?.firstElementChild;
   clearTimeout(mediaProgressTimer);
   try{
     const job=await api(`/api/media-jobs/${jobId}`);
     const live=mediaPartialText(job);
-    showMediaProgress(title,job.progress,job.message,live||job.error||'',job.cancel_supported&&['queued','running'].includes(job.status)?jobId:'');
-    if(job.status==='completed'){setMobileBusy(false);try{await onDone(job)}finally{if(onFinish)onFinish(job)}return}
-    if(job.status==='failed'||job.status==='cancelled'){setMobileBusy(false);if(onFinish)onFinish(job);toast(job.status==='cancelled'?'Estrazione annullata':(job.error||'Operazione fallita'));return}
-    mediaProgressTimer=setTimeout(()=>pollMediaJob(jobId,title,onDone),500);
+    const visible=!!(origin?.isConnected&&!origin.closest('.hidden'));
+    if(visible){showMediaProgress(title,job.progress,job.message,live||job.error||'',job.cancel_supported&&['queued','running'].includes(job.status)?jobId:'');origin=$('#utilityBody')?.firstElementChild;}
+    if(job.status==='completed'){setMobileBusy(false);try{await onDone(job);if(visible&&typeof window!=='undefined')window.mtaAiJobs?.handled?.(jobId);}finally{if(onFinish)onFinish(job)}return}
+    if(job.status==='failed'||job.status==='cancelled'){setMobileBusy(false);if(visible&&typeof window!=='undefined')window.mtaAiJobs?.handled?.(jobId);if(onFinish)onFinish(job);toast(job.status==='cancelled'?'Estrazione annullata':(job.error||'Operazione fallita'));return}
+    mediaProgressTimer=setTimeout(()=>pollMediaJob(jobId,title,onDone,onFinish,origin),500);
   }catch(e){setMobileBusy(false);if(onFinish)onFinish(null);toast(e.message)}
 }
 async function blobToDataUrl(blob){return await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result||''));reader.onerror=()=>reject(reader.error||new Error('Impossibile leggere il file generato'));reader.readAsDataURL(blob)})}
@@ -3037,6 +3143,7 @@ function showStemProgress(job){
         ${done?`<button onclick="closeUtilityModal()">Chiudi</button>`:''}
       </div>
     </div>`,true);
+  if(typeof window!=='undefined')window.mtaAiJobs?.origin?.(job.id,$('#utilityBody')?.firstElementChild);
 }
 async function pollStemJob(jobId){
   clearTimeout(stemPollTimer);
@@ -3049,11 +3156,11 @@ async function pollStemJob(jobId){
     }
     showStemProgress(job);
     if(job.status==='completed'){
-      current=await api(`/api/projects/${job.project_id}`);
+      await reconcileAiProject(job.project_id);
       const preferred=job.source_track_id&&current.tracks.some(t=>t.id===job.source_track_id)?job.source_track_id:null;
       selectedTrackId=preferred||selectedTrackId||current.tracks[0]?.id||null;
       render();await refresh();
-      await syncNativeProjectFile(job.project_id);
+      await syncNativeProjectFile(job.project_id,true);
       showStemProgress(job);
       activeStemJob=null;
       activeStemProjectId=null;setMobileBusy(false);
@@ -4473,7 +4580,7 @@ function showUtilityModal(title,html,stemProgress=false){
 function closeUtilityModal(){if(document.querySelector('.utility-modal.lyrics-chords-editor-modal')&&lyricsChordsEditorHasChanges())return closeLyricsChordsEditor();if(activeStemJob){toast('La separazione è in corso: usa Annulla separazione se vuoi interromperla.');return}if(document.querySelector('.utility-modal .export-dialog')&&(playAudio||trackPlaybacks.length||playbackPaused||playbackBuffering))stopPlayback();$('#utilityBackdrop').classList.add('hidden');resetUtilityModalGeometry();sampleEditorState=null;clearTimeout(sampleEditorPreviewTimer);sampleEditorPreviewTimer=null;forceNativeViewportTop()}
 function exportProjectArchive(){if(!current){toast('Apri prima un progetto');return}window.location.href=`/api/projects/${current.id}/archive`}
 async function deleteCurrentProject(){if(!current){toast('Apri prima un progetto');return}await deleteProjectFromWorkspace(current.id,current.title)}
-$('#projectArchiveFile').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;const fd=new FormData();fd.append('file',f);try{current=await api('/api/project-archives/import',{method:'POST',body:fd});rememberRecentProject(current.id);selectedTrackId=current.tracks[0]?.id||null;resetProjectUiForOpen();render();await refresh();toast('Progetto completo importato')}catch(err){toast('Import progetto fallito: '+err.message)}finally{e.target.value=''}})
+$('#projectArchiveFile').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;if(!await prepareProjectLeave()){e.target.value='';return}const fd=new FormData();fd.append('file',f);try{current=await api('/api/project-archives/import',{method:'POST',body:fd});rememberRecentProject(current.id);selectedTrackId=current.tracks[0]?.id||null;resetProjectUiForOpen();resetSessionHistory();render();await refresh();toast('Progetto completo importato')}catch(err){toast('Import progetto fallito: '+err.message)}finally{e.target.value=''}})
 function projectDurationMs(){
   if(!current)return 0;
   let end=0;
@@ -4588,7 +4695,7 @@ async function showSettings(){
 function showWebSettings(){
   const enabled=localStorage.getItem('mtaWebAutosaveEnabled')!=='false';
   const showChordNeighbors=appDisplayPreference('showPreviousNextChords',false),showLyricNeighbors=appDisplayPreference('showPreviousNextLyrics',false);
-  showUtilityModal('Settings',`<div class="form-grid web-settings"><label class="workflow-check"><input id="webAutosaveEnabled" type="checkbox" ${enabled?'checked':''}> Auto-save project changes</label><label class="workflow-check"><input id="useFlacStorage" type="checkbox" ${appDisplayPreference('useFlacStorage')?'checked':''}> Use FLAC for new projects; ask before migrating WAV projects</label><label class="workflow-check"><input id="showPreviousNextChords" type="checkbox" ${showChordNeighbors?'checked':''}> Show previous and next chords</label><label class="workflow-check"><input id="showPreviousNextLyrics" type="checkbox" ${showLyricNeighbors?'checked':''}> Show previous and next lyrics</label><p class="hint">Quando abilitate, le viste Lyrics/Chords sopra la timeline mostrano precedente, corrente e successivo; l'evento corrente resta evidenziato. Le preferenze dell'editor sono salvate in questa app/browser.</p><div class="form-actions"><button type="button" onclick="openAiModelManager()">Manage Lyrics / Chords models</button><button type="button" onclick="rescanSharedMedia()">Rescan / GC shared media</button><button type="button" onclick="location.href='/account'">Account / Profile</button>${currentUser?.role==='admin'?`<button type="button" onclick="location.href='/settings'">Server administration</button>`:''}<button class="accent" onclick="saveWebSettings()">Save</button></div></div>`);
+  showUtilityModal('Settings',`<div class="form-grid web-settings"><label class="workflow-check"><input id="webAutosaveEnabled" type="checkbox" ${enabled?'checked':''}> Auto-save project changes</label><label class="workflow-check"><input id="useFlacStorage" type="checkbox" ${appDisplayPreference('useFlacStorage')?'checked':''}> Use FLAC for new projects; ask before migrating WAV projects</label><label class="workflow-check"><input id="showPreviousNextChords" type="checkbox" ${showChordNeighbors?'checked':''}> Show previous and next chords</label><label class="workflow-check"><input id="showPreviousNextLyrics" type="checkbox" ${showLyricNeighbors?'checked':''}> Show previous and next lyrics</label><p class="hint">Quando abilitate, le viste Lyrics/Chords sopra la timeline mostrano precedente, corrente e successivo; l'evento corrente resta evidenziato. Le preferenze dell'editor sono salvate in questa app/browser.</p><div class="form-actions"><button type="button" onclick="openAiModelManager()">Manage Lyrics / Chords models</button><button type="button" onclick="rescanSharedMedia()">Rescan / GC shared media</button><button type="button" onclick="navigateAway('/account')">Account / Profile</button>${currentUser?.role==='admin'?`<button type="button" onclick="navigateAway('/settings')">Server administration</button>`:''}<button class="accent" onclick="saveWebSettings()">Save</button></div></div>`);
 }
 async function rescanSharedMedia(){try{const r=await api('/api/storage/shared/rescan?delete_unreferenced=true',{method:'POST'});toast(`Shared media: ${r.assets||0} asset, ${r.deleted||0} eliminati, ${r.references||0} riferimenti`)}catch(e){toast('Rescan shared media fallito: '+e.message)}}
 function saveWebSettings(){setAppDisplayPreference('useFlacStorage',$('#useFlacStorage')?.checked===true);const enabled=$('#webAutosaveEnabled')?.checked!==false;localStorage.setItem('mtaWebAutosaveEnabled',enabled?'true':'false');setAppDisplayPreference('showPreviousNextChords',$('#showPreviousNextChords')?.checked===true);setAppDisplayPreference('showPreviousNextLyrics',$('#showPreviousNextLyrics')?.checked===true);autosaveEnabled=enabled;if(autosaveEnabled&&projectDirty)markDirty(50);closeUtilityModal();if(playbackActuallyRunning()||playbackPaused)updateTimedPlaybackOverlay(playCursorMs);toast('Settings salvati')}
@@ -4602,7 +4709,7 @@ async function openNativeVst3Manager(){
   }catch(e){showUtilityModal('VST3 plugins',`<p>${esc(e.message)}</p><button onclick="showNativeSettings()">Settings</button>`)}
 }
 async function showNativeSettings(){
-  if(!currentUser?.native_single_user){if(currentUser?.role==='admin'){location.href='/settings';return}return}
+  if(!currentUser?.native_single_user){if(currentUser?.role==='admin'){await navigateAway('/settings');return}return}
   showUtilityModal('Settings','<p class="hint">Loading settings…</p>');
   const apiBridge=await waitForNativeApi();
   if(!apiBridge?.get_native_settings){toast('Bridge nativo non disponibile. Riprova tra un istante.');return}
@@ -5463,13 +5570,13 @@ async function aiArrangerWatchActive(waitForFinish=false){
         if(waitForFinish&&job.state==='completed'){
           const output=document.getElementById('aiRemixPlanResult');
           if(output)output.textContent='AI generation complete; new track added.';
-          const updated=await api(`/api/projects/${encodeURIComponent(pid)}`);
+          await reconcileAiProject(pid);
           if(current?.id===pid){
-            current=updated;render();
             // Close only the still-open AI dialog, never an unrelated modal.
             if(document.getElementById('aiRemixJobProgress') &&
                document.getElementById('aiRemixPlanResult') &&
                !document.getElementById('utilityBackdrop')?.classList.contains('hidden')){
+              window.mtaAiJobs?.handled?.(job.job_id);
               closeUtilityModal();
               toast('AI generation complete; new track added.'+(job.gpu_metrics_source==='ace-torch-profiler'&&job.gpu_seconds_estimated!=null?' GPU kernel: '+Number(job.gpu_seconds_estimated).toFixed(2)+' s (diagnostica, non fatturabile).':''));
             }
@@ -5877,8 +5984,7 @@ document.addEventListener('keydown',event=>{
   event.preventDefault();const next=event.key==='Home'?0:event.key==='End'?2:(index+(event.key==='ArrowLeft'?2:1))%3;
   aiArrangerTab(keys[next]);document.getElementById('aiTab-'+keys[next])?.focus();
 });
-window.addEventListener('mta:ai-terminal',async event=>{
-  const job=event.detail;if(job.state!=='completed'||current?.id!==job.project_id)return;
-  const before=current;
-  try{const updated=await api('/api/projects/'+encodeURIComponent(job.project_id));if(current===before){current=updated;render();}}catch(_){/* The notification retains an explicit Open project action. */}
-});
+window.mtaPrepareAiTerminal=async job=>{
+  if(job.state!=='completed')return;
+  await reconcileAiProject(job.project_id);
+};

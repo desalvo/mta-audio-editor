@@ -422,6 +422,37 @@ class NativeApi:
         project_format = self._write_bound_project(project_id, target)
         return {"ok": True, "path": str(target), "format": project_format, "portable": project_format == "portable"}
 
+    def confirm_project_close(self) -> dict:
+        self._allow_project_close = True
+        if self.window is not None:
+            self.window.destroy()
+        return {"ok": True}
+
+    def _guard_project_close(self):
+        if getattr(self, '_allow_project_close', False):
+            return True
+        if getattr(self, '_project_close_check_pending', False):
+            return False
+        self._project_close_check_pending = True
+
+        def check():
+            # Return from the synchronous OS closing callback before asking the
+            # WebView to execute JS, so its UI thread remains free to answer.
+            try:
+                ready = self.window.evaluate_js("typeof window.mtaRequestNativeClose === 'function'")
+                if ready:
+                    self.window.evaluate_js("window.mtaRequestNativeClose(); void 0")
+                else:
+                    # Before the editor is loaded there are no edits to lose.
+                    self.confirm_project_close()
+            except Exception:
+                _native_startup_logger().exception("Cannot verify unsaved project state; keeping window open")
+            finally:
+                self._project_close_check_pending = False
+
+        threading.Thread(target=check, name='mta-project-close', daemon=True).start()
+        return False
+
     def sync_project(self, project_id: str) -> dict:
         target = self.project_paths.get(project_id)
         if target is None:
@@ -860,6 +891,7 @@ def main() -> int:
             js_api=native_api,
         )
         native_api.window = window
+        window.events.closing += native_api._guard_project_close
         webview.start(debug=False)
         return 0
     finally:

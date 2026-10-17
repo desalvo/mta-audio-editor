@@ -375,6 +375,11 @@ if [[ -n $ACE_URL ]]; then
  echo 'Remote ACE-Step HTTPS configured. Set MTA_ACE_STEP_TOKEN securely in /etc/mta/mta.env before starting AI jobs.'
  echo 'Remote endpoint must provide a valid trusted TLS certificate and API key protection.'
 fi
+# Match native-package installation: all AI engines are installed by default.
+if [[ -z $ACE_URL ]]; then
+ bash "$APP_DIR/scripts/install_ace_step.sh" --yes --device "$([[ $GPU == no ]] && echo cpu || echo auto)" --port "$ACE_PORT" --bind local --firewall no
+fi
+"$VENV/bin/python" "$APP_DIR/scripts/install_ai_engines.py" --python "$VENV/bin/python" --env-file "$ENVFILE" --device "$([[ $GPU == no ]] && echo cpu || echo auto)"
 # Bind to loopback unless network access explicitly selected.
 HOST=127.0.0.1; [[ $BIND == network ]] && HOST=0.0.0.0
 if [[ $HTTPS == yes ]]; then

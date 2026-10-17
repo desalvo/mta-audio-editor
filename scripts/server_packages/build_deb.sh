@@ -52,6 +52,10 @@ fi
 cp -a "$stage/wheelhouse/." "$root/usr/share/mta-audio-editor-server/wheelhouse/"
 cp "$(dirname "$0")/install_runtime.py" "$root/usr/lib/mta-audio-editor-server/install_runtime.py"
 install -d -m 755 "$root/usr/lib/mta-audio-editor-server/native-installers"
+install -m 755 "$(dirname "$0")/../install_ai_engines.py" "$root/usr/lib/mta-audio-editor-server/native-installers/install_ai_engines.py"
+for requirement in requirements-stems.txt requirements-lyrics.txt requirements-chords.txt requirements-roformer-compat.txt; do
+ install -m 644 "$(dirname "$0")/../../$requirement" "$root/usr/lib/mta-audio-editor-server/$requirement"
+done
 install -m 755 "$(dirname "$0")/../install_ace_step.sh" "$root/usr/lib/mta-audio-editor-server/native-installers/install_ace_step.sh"
 install -m 755 "$(dirname "$0")/../configure_ai_workers.py" "$root/usr/lib/mta-audio-editor-server/native-installers/configure_ai_workers.py"
 install -m 755 "$(dirname "$0")/../gpu_verified_billing.py" "$root/usr/lib/mta-audio-editor-server/native-installers/gpu_verified_billing.py"

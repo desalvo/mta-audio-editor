@@ -18,16 +18,16 @@ def test_opened_portable_project_remains_bound_for_save_and_autosave():
     assert 'if is_portable_project_archive(resolved):' in NATIVE
     assert 'self.project_paths[project.id] = resolved' in NATIVE
     assert 'self._persist_project_paths()' in NATIVE
-    assert 'await syncNativeProjectFile(current?.id);' in JS
-    assert 'await syncNativeProjectFile(current.id);' in JS
+    assert 'await syncNativeProjectFile(current?.id,true);' in JS
+    assert 'await syncNativeProjectFile(current.id,true);' in JS
 
 
 def test_chord_extraction_renders_new_state_before_persisting_it():
-    needle = "current=await api(`/api/projects/${current.id}`);"
+    needle = "await reconcileAiProject(job.project_id);"
     start = JS.index(needle)
     block = JS[start:start + 1000]
     assert block.index('render();') < block.index('await persistCurrentProject(false);')
-    assert 'await syncNativeProjectFile(current.id);' in block
+    assert 'await syncNativeProjectFile(current.id,true);' in block
 
 
 def test_inspector_reserves_horizontal_timeline_viewport_without_changing_track_geometry():

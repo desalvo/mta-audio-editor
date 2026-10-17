@@ -23,10 +23,10 @@ def test_native_external_project_file_is_resynced_after_autosave_and_stem_comple
     root = Path(__file__).resolve().parents[1]
     js = (root / "app/static/app.js").read_text(encoding="utf-8")
 
-    assert "async function syncNativeProjectFile(projectId)" in js
+    assert "async function syncNativeProjectFile(projectId,strict=false)" in js
     assert "await syncNativeProjectFile(saved.id)" in js
-    assert "await syncNativeProjectFile(current.id)" in js
-    assert "await syncNativeProjectFile(job.project_id)" in js
+    assert "await syncNativeProjectFile(current.id,true)" in js
+    assert "await syncNativeProjectFile(job.project_id,true)" in js
 
 
 def test_frozen_launcher_calls_multiprocessing_freeze_support_before_main():
