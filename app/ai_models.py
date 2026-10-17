@@ -95,10 +95,11 @@ def _isolated_model_python(kind):
     return str(path)
 
 
-def _isolated_model_download(python, kind, model_id):
+def _isolated_model_download(python, kind, model_id, model_dir=None):
     import subprocess
     result = subprocess.run([python, str(Path(__file__).with_name('ai_model_download.py')),
-                             '--kind', kind, '--model', model_id],
+                             '--kind', kind, '--model', model_id,
+                             *(['--model-dir', str(model_dir)] if model_dir is not None else [])],
                             capture_output=True, text=True, check=True, timeout=3600)
     if len(result.stdout) > 1048576:
         raise ValueError('Oversized model installation response')

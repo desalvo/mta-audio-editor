@@ -1616,3 +1616,10 @@ html,body{overflow:hidden}
 .mta-project-leave{position:fixed;inset:0;z-index:100000;background:#000a;display:grid;place-items:center;padding:20px}
 .mta-project-leave>div{background:#183247;color:#f1f8fd;border:1px solid #68b8ff;border-radius:10px;padding:24px;max-width:480px}
 .mta-project-leave button{margin:8px 8px 0 0;padding:10px 16px;background:#2563a6;color:white;border:1px solid #68b8ff;border-radius:6px}
+
+/* Stem workflow controls also live outside the footer action bar. */
+.stem-workflow .utility-btn{display:inline-flex;align-items:center;justify-content:center;min-height:36px;height:auto;padding:8px 12px;border:1px solid #52738a;border-radius:7px;background:#183247!important;color:#f4fbff!important;-webkit-text-fill-color:#f4fbff!important;font-weight:650;line-height:1.25;white-space:normal;opacity:1;visibility:visible}
+.stem-workflow .utility-btn *{color:inherit!important;-webkit-text-fill-color:inherit!important}
+.stem-workflow .utility-btn:disabled{color:#b7c5cf!important;-webkit-text-fill-color:#b7c5cf!important;opacity:.65;cursor:not-allowed}
+.stem-workflow .utility-btn:focus-visible{outline:2px solid #72c7ff;outline-offset:2px}
+.stem-workflow .utility-btn.primary{background:#0f5f96!important;border-color:#2aa9ff;color:#fff!important;-webkit-text-fill-color:#fff!important}

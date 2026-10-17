@@ -1,0 +1,27 @@
+{
+  "release": "0.3.0-r210",
+  "baseline": "MTA-r210-ai-runtime-cleanup-cumulative.zip",
+  "targeted": {
+    "tests": 41,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 41
+  },
+  "full": {
+    "tests": 3526,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 5,
+    "passed": 3521
+  },
+  "coverage_percent": 78.03,
+  "deselected": 10,
+  "not_executed": [
+    "Browser rendering: browser download returned truncated ZIP",
+    "Real server lead/backing inference",
+    "SAM ROCm validation"
+  ],
+  "git_actions": [],
+  "production_actions": []
+}

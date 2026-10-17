@@ -204,7 +204,7 @@ NATIVE_SINGLE_USER = os.getenv("MTA_NATIVE_SINGLE_USER", "").lower() in {"1", "t
 from .ai_backend_models import LEAD_BACKING_MODELS
 
 LEAD_BACKING_DEFAULT_MODEL = os.getenv("MTA_LEAD_BACKING_DEFAULT_MODEL", "uvr_mdxnet_kara_2").strip() or "uvr_mdxnet_kara_2"
-LEAD_BACKING_MODEL_DIR = Path(os.getenv("MTA_LEAD_BACKING_MODEL_DIR", str(STORAGE_ROOT / ".cache" / "lead-backing-models"))).expanduser().resolve()
+LEAD_BACKING_MODEL_DIR = Path(os.getenv("MTA_LEAD_BACKING_MODEL_DIR", os.getenv("MTA_AI_VOCAL_MODELS_DIR", str(STORAGE_ROOT / ".cache" / "lead-backing-models")))).expanduser().resolve()
 
 def _lead_backing_model_info(model_id: str) -> dict:
     model = next((dict(item) for item in LEAD_BACKING_MODELS if item["id"] == model_id), None)
@@ -216,6 +216,17 @@ def _lead_backing_model_info(model_id: str) -> dict:
     return model
 
 def _lead_backing_engine_available() -> bool:
+    # Probe the same isolated runtime used by server inference, without loading ML.
+    if not NATIVE_SINGLE_USER:
+        from .ai_models import _isolated_model_python
+        try:
+            python = _isolated_model_python('backing-vocals')
+            if python:
+                result = subprocess.run([python, '-c', 'import importlib.util;print(importlib.util.find_spec("audio_separator") is not None)'],
+                                        capture_output=True, text=True, timeout=10, check=False)
+                return result.returncode == 0 and result.stdout.strip() == 'True'
+        except (ValueError, OSError, subprocess.SubprocessError):
+            return False
     # Do not import the heavy ML stack to render a settings dialog.
     import importlib.util
     try:
@@ -236,6 +247,16 @@ def _lead_backing_catalog() -> dict:
 
 def _download_lead_backing_model(model_id: str) -> dict:
     info = _lead_backing_model_info(model_id)
+    if not NATIVE_SINGLE_USER:
+        from .ai_models import _isolated_model_python, _isolated_model_download
+        try:
+            python = _isolated_model_python('backing-vocals')
+            if python:
+                _isolated_model_download(python, 'backing-vocals', model_id, model_dir=LEAD_BACKING_MODEL_DIR)
+                return _lead_backing_model_info(model_id)
+        except (ValueError, OSError, subprocess.SubprocessError) as exc:
+            LOGGER.warning('Lead/backing model installation failed in configured AI runtime', exc_info=True)
+            raise RuntimeError('Lead/backing model download failed in configured AI runtime') from exc
     LEAD_BACKING_MODEL_DIR.mkdir(parents=True, exist_ok=True)
     try:
         from audio_separator.separator import Separator
