@@ -165,7 +165,7 @@ def test_windows_creation_identity_is_stable():
 
 
 def test_unselected_arranger_tabs_have_readable_text_and_focus():
-    css = (Path(__file__).parents[1] / 'app/static/app.css').read_text()
+    css = (Path(__file__).parents[1] / 'app/static/app.css').read_text(encoding='utf-8')
     def luminance(hexcolor):
         channels = [int(hexcolor[i:i+2], 16) / 255 for i in (0, 2, 4)]
         linear = [c / 12.92 if c <= .04045 else ((c + .055) / 1.055) ** 2.4 for c in channels]

@@ -46,14 +46,33 @@ def torch_arguments(device):
     return ['torch==2.14.1', 'torchaudio==2.14.1', 'torchvision==0.29.1']
 
 
+def ensure_media_tools(manager):
+    # EL/EPEL provides these executables through ffmpeg-free. A working binary
+    # is the dependency; do not require a distribution-specific package name.
+    missing = [name for name in ('ffmpeg', 'ffprobe') if not shutil.which(name)]
+    if missing:
+        if manager == 'dnf':
+            run(['dnf', 'install', '-y', *('/usr/bin/' + name for name in missing)])
+        else:
+            run(['apt-get', 'install', '-y', 'ffmpeg'])
+    for name in ('ffmpeg', 'ffprobe'):
+        binary = shutil.which(name)
+        if not binary:
+            raise RuntimeError(f'{name} unavailable after dependency installation')
+        # Fail clearly for a broken executable rather than reporting setup ready.
+        run([binary, '-version'], stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+
+
 def system_dependencies():
     if shutil.which('dnf'):
         run(['dnf', 'install', '-y', 'git', 'gcc', 'gcc-c++', 'make', 'cmake', 'pkgconf-pkg-config',
-             'python3.12-devel', 'libsndfile', 'ffmpeg'])
+             'python3.12-devel', 'libsndfile'])
+        ensure_media_tools('dnf')
     elif shutil.which('apt-get'):
         run(['apt-get', 'update'])
         run(['apt-get', 'install', '-y', 'git', 'build-essential', 'cmake', 'pkg-config',
-             'python3-dev', 'python3-venv', 'libsndfile1', 'ffmpeg'])
+             'python3-dev', 'python3-venv', 'libsndfile1'])
+        ensure_media_tools('apt-get')
     else:
         raise RuntimeError('Unsupported package manager')
 

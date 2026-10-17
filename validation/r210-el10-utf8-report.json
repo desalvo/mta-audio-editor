@@ -1,0 +1,51 @@
+{
+  "release": "0.3.0-r210",
+  "baseline": "MTA-r210-server-ai-install-project-lifecycle-cumulative.zip",
+  "baseline_sha256": "58f0c3c40fd48186980f595e0bfbcae69c82346446b0e6b9874f107d316e1abe",
+  "targeted": {
+    "tests": 43,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1,
+    "passed": 42
+  },
+  "full": {
+    "tests": 3500,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 5,
+    "passed": 3495
+  },
+  "coverage_percent": 75.01,
+  "deselected": 10,
+  "reason": "Existing agent Unix-socket tests: AF_UNIX socket creation is prohibited (PermissionError 1)",
+  "remaining_checks": [
+    "Real EL10 provisioning",
+    "Windows CI rerun",
+    "Heavy AI installation/inference on target hardware"
+  ],
+  "source_user_commit_observed_in_attached_log": "9e5f0722a0a174b0c4c420cba3bffa65e82711ba",
+  "git_actions": [],
+  "production_changes": [],
+  "modified_files": [
+    "scripts/install_mta.sh",
+    "tests/test_r210_windows_publication_tabs.py",
+    "scripts/install_ai_engines.py"
+  ],
+  "added_files": [
+    "tests/test_r210_el10_media_dependencies.py",
+    "EL10_FFMPEG_AND_WINDOWS_CI_R210.md",
+    "validation/r210-el10-utf8-targeted.xml",
+    "validation/r210-el10-utf8-targeted.log",
+    "validation/r210-el10-utf8-full.xml",
+    "validation/r210-el10-utf8-full.log",
+    "validation/r210-el10-utf8-coverage.xml",
+    "validation/r210-el10-utf8-static.log",
+    "validation/r210-el10-utf8-report.json"
+  ],
+  "archive_validation": {
+    "crc_verified": true,
+    "all_baseline_entries_preserved": 1550,
+    "every_file_compared_to_final_tree": true
+  }
+}

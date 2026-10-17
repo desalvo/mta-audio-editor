@@ -222,7 +222,7 @@ if [[ $FAMILY == debian ]]; then
  DEBIAN_FRONTEND=noninteractive apt-get install -y git ca-certificates python3 python3-venv python3-pip ffmpeg curl
 else
  command -v dnf >/dev/null || { echo 'dnf missing' >&2; exit 2; }
- dnf install -y git ca-certificates python3.14 python3.14-pip ffmpeg curl || { echo 'Install Python 3.14 and FFmpeg from trusted repositories and retry; no third-party repository will be added automatically' >&2; exit 3; }
+ dnf install -y git ca-certificates python3.14 python3.14-pip /usr/bin/ffmpeg /usr/bin/ffprobe curl || { echo 'Install Python 3.14 and FFmpeg from trusted repositories and retry; no third-party repository will be added automatically' >&2; exit 3; }
 fi
 # NumPy 2.5.3 (pinned in requirements.txt) requires Python >=3.12.
 # Never prefer an older interpreter merely because python3.11 is installed.
