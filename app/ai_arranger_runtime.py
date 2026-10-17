@@ -123,6 +123,7 @@ def _recover_dead_runners(con):
 
     A stored PID is not enough: Linux may reuse it between invocations.
     """
+    con.execute("UPDATE jobs SET state='interrupted',phase='interrupted',completed_at=?,message='Remote admission cannot be replayed' WHERE state='queued' AND runner_pid IS NULL AND operation LIKE 'worker:%'",(time.time(),))
     rows = con.execute("SELECT job_id,runner_pid,runner_identity,state FROM jobs WHERE state IN ('queued','running')").fetchall()
     for jid, pid, identity, state in rows:
         if not pid:
@@ -144,6 +145,12 @@ def _recover_dead_runners(con):
             if changed.rowcount:
                 con.execute("INSERT OR IGNORE INTO terminal_receipts(job_id,state,committed_at) VALUES(?,?,?)", (jid, 'interrupted', stamp))
         elif dead and state == 'queued':
+            operation=con.execute('SELECT operation FROM jobs WHERE job_id=?',(jid,)).fetchone()[0]
+            if operation.startswith('worker:'):
+                stamp=time.time()
+                con.execute("UPDATE jobs SET state='interrupted',phase='interrupted',completed_at=?,message='Remote admission owner exited; request will not be replayed' WHERE job_id=?",(stamp,jid))
+                con.execute("INSERT OR IGNORE INTO terminal_receipts VALUES(?,?,?)",(jid,'interrupted',stamp))
+                continue
             # Only the scheduler's admission owner has exited; no work ran.
             con.execute("UPDATE jobs SET runner_pid=NULL,runner_identity=NULL,message='Waiting for scheduler recovery' WHERE job_id=? AND state='queued'", (jid,))
 
@@ -377,11 +384,18 @@ def _spawn(job_id, fn, *, cancellable=False):
             else:
                 return
             try:
-                if cancellable:
-                    fn(progress, stop)
-                else:
-                    fn(progress)
-                state, message = 'completed', 'Generated track added to project'
+                from .ai_global_execution import current_job,current_cancel
+                context_token=current_job.set(job_id)
+                cancel_token=current_cancel.set(stop)
+                try:
+                    if cancellable:
+                        fn(progress, stop)
+                    else:
+                        fn(progress)
+                finally:
+                    current_job.reset(context_token)
+                    current_cancel.reset(cancel_token)
+                state, message = 'completed', ('AI processing complete; remote result ready' if current['operation'].startswith('worker:') else 'Generated track added to project')
                 # A normal return is not a durable commit. For audio-generating
                 # adapters require the publication receipt and (when explicitly
                 # associated) the ledger acknowledgement before completion.

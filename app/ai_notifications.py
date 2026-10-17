@@ -95,7 +95,9 @@ def collect():
         ledgers=[dict(r) for r in con.execute('SELECT * FROM ai_compute_jobs WHERE started_at>=? OR finished_at>=?',(since,since))]
     with queue._db() as con:
         queued=[dict(r) for r in con.execute('SELECT * FROM jobs WHERE created_at>=? OR completed_at>=?',(since,since))]
+    queue_ids={r['job_id'] for r in queued}
     queue_ledgers={uuid.uuid5(uuid.NAMESPACE_URL,'mta-ai-inference:'+r['job_id']).hex for r in queued}
+    queue_ledgers.update(r['id'] for r in ledgers if r.get('queue_job_id') in queue_ids)
     events=[];detail_cache={}
     def details_for(owner):
         if owner not in detail_cache:
@@ -118,10 +120,17 @@ def collect():
           'amount_micro':0,'cost_pending':False,'origin':'queue'}
         # Billing only comes from the ledger, never from progress sidecars.
         linked=uuid.uuid5(uuid.NAMESPACE_URL,'mta-ai-inference:'+row['job_id']).hex
-        ledger=next((r for r in ledgers if r['id']==linked),None)
-        if ledger:
-            details=details_for(owner).get(linked)
-            if details:payload.update(amount_micro=details['amount_micro'],cost_pending=ledger['status']=='running')
+        linked_rows=[r for r in ledgers if r['id']==linked or r.get('queue_job_id')==row['job_id']]
+        if linked_rows:
+            payload.update(usage={},amount_micro=0,cost_pending=False)
+            for ledger in linked_rows:
+                details=details_for(owner).get(ledger['id'])
+                for key,quantity in json.loads(ledger['usage_json']).items():
+                    payload['usage'][key]=payload['usage'].get(key,0)+quantity
+                if details:payload['amount_micro']+=details['amount_micro']
+                payload['cost_pending']|=ledger['status']=='running'
+            tokens={r['token_id'] for r in linked_rows}
+            payload['token_id']=next(iter(tokens)) if len(tokens)==1 else None
         events.append((owner,payload))
     for row in ledgers:
         event_key='ledger:'+row['id']

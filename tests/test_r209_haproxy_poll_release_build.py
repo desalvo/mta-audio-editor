@@ -37,7 +37,7 @@ def test_verified_cpu_gpu_usage_reaches_queue_state():
     assert "normalized.get('cpu_seconds')" in source
     assert "normalized.get('gpu_seconds')" in source
     assert 'gpu_seconds=COALESCE(?,gpu_seconds)' in source
-    assert "if any(k.startswith('gpu_') for k in normalized) and source != 'gpu-agent'" in source
+    assert "if any(k.startswith('gpu_') for k in normalized) and source not in ('gpu-agent','gpu-kernel-verified')" in source
 
 
 def test_early_rpm_naming_and_cleanup_are_run_unique_and_safe():

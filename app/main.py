@@ -201,11 +201,8 @@ MAX_UPLOAD_BYTES = int(os.getenv("MTA_MAX_UPLOAD_MB", "1024")) * 1024 * 1024
 NATIVE_SINGLE_USER = os.getenv("MTA_NATIVE_SINGLE_USER", "").lower() in {"1", "true", "yes", "on"}
 
 
-LEAD_BACKING_MODELS = [
-    {"id": "uvr_mdxnet_kara_2", "filename": "UVR_MDXNET_KARA_2.onnx", "display_name": "UVR-MDX-NET Karaoke 2", "engine": "MDX", "quality": "balanced", "recommended": True},
-    {"id": "mel_roformer_karaoke_aufr33", "filename": "mel_band_roformer_karaoke_aufr33_viperx_sdr_10.1956.ckpt", "display_name": "Mel-RoFormer Karaoke Aufr33/Viperx", "engine": "RoFormer", "quality": "high", "recommended": False},
-    {"id": "mel_roformer_karaoke_gabox_v2", "filename": "mel_band_roformer_karaoke_gabox_v2.ckpt", "display_name": "MelBand RoFormer Karaoke Gabox V2", "engine": "RoFormer", "quality": "high", "recommended": False},
-]
+from .ai_backend_models import LEAD_BACKING_MODELS
+
 LEAD_BACKING_DEFAULT_MODEL = os.getenv("MTA_LEAD_BACKING_DEFAULT_MODEL", "uvr_mdxnet_kara_2").strip() or "uvr_mdxnet_kara_2"
 LEAD_BACKING_MODEL_DIR = Path(os.getenv("MTA_LEAD_BACKING_MODEL_DIR", str(STORAGE_ROOT / ".cache" / "lead-backing-models"))).expanduser().resolve()
 
@@ -1281,11 +1278,22 @@ def vst3_parameters(request: Request, path: str):
 
 def _stem_runtime_status():
     status = STEM_SPLITTER.status()
-    if NATIVE_SINGLE_USER:
-        from . import native_ai_routing
-        if native_ai_routing.is_remote('demucs'):
-            status = {**status, 'available': True, 'runtime': 'remote', 'execution': 'ai-queue'}
+    if _ai_external_engine('demucs'):
+        from .ai_worker_registry import resolve_worker
+        status = {**status, 'available': NATIVE_SINGLE_USER or resolve_worker('demucs') is not None,
+                  'runtime': 'remote' if NATIVE_SINGLE_USER else 'server-worker', 'execution': 'ai-queue'}
     return status
+
+
+def _execution_ai_catalog():
+    catalog=ai_catalog(native=NATIVE_SINGLE_USER)
+    if _ai_external_engine('chords-ml'):
+        from .ai_worker_registry import resolve_worker
+        configured=NATIVE_SINGLE_USER or resolve_worker('chords-ml') is not None
+        catalog['chords']['execution']='ai-queue'
+        catalog['chords']['availability_basis']='trusted-worker-configuration'
+        for engine in catalog['chords']['engines']:engine['available']=configured
+    return catalog
 
 
 @app.get("/api/plugins")
@@ -1298,7 +1306,7 @@ def plugins():
         "factory_params": manifest["factory_params"],
         "notes": manifest["notes"],
         "stem_splitter": {**_stem_runtime_status(), "lead_backing": _lead_backing_catalog()},
-        "text_models": ai_catalog(native=NATIVE_SINGLE_USER),
+        "text_models": _execution_ai_catalog(),
     }
 
 
@@ -1472,6 +1480,10 @@ def _generate_ai_preview(plan: dict, project: Project) -> Response:
 
 @app.post('/api/projects/{pid}/ai-arranger/generate')
 def ai_arranger_generate(pid: str, request: Request, body: RearrangeRequest):
+    from .ai_server_execution import enabled
+    if enabled(NATIVE_SINGLE_USER):
+        _project_for_actor(request,pid)
+        raise HTTPException(409,'Use the asynchronous generate-jobs endpoint for authenticated server inference')
     project = _project_for_actor(request, pid)
     try:
         plan = arranger_plan(project, body)
@@ -1482,6 +1494,10 @@ def ai_arranger_generate(pid: str, request: Request, body: RearrangeRequest):
 
 @app.post('/api/projects/{pid}/remix/generate')
 def ai_remix_generate(pid: str, request: Request, body: RemixRequest):
+    from .ai_server_execution import enabled
+    if enabled(NATIVE_SINGLE_USER):
+        _project_for_actor(request,pid)
+        raise HTTPException(409,'Use the asynchronous generate-jobs endpoint for authenticated server inference')
     project = _project_for_actor(request, pid)
     try:
         plan = prepare_remix_plan(project, body)
@@ -1736,6 +1752,16 @@ def _durable_generation_executor(pid, payload, job_id):
         if NATIVE_SINGLE_USER and _ace_desktop.uses_mta_account():
             from .native_ai_account import execute_arranger
             audio,meta=execute_arranger(plan,project,audio_path,cancel_event=cancel_event)
+        elif __import__('app.ai_server_execution',fromlist=['enabled']).enabled(NATIVE_SINGLE_USER):
+            from .ai_durable_remote_executor import render_source
+            from .ai_server_execution import infer
+            with tempfile.TemporaryDirectory(prefix='mta-arranger-source-') as folder:
+                source=Path(folder)/'source.wav';render_source(plan,project,audio_path,source)
+                if plan.get('scope')=='range':
+                    from .ai_worker_protocol import _trim_wav_for_ai
+                    _trim_wav_for_ai(source,plan.get('start_ms'),plan.get('end_ms'))
+                audio,meta=infer('ace-step',source,plan,cancel_check=cancel_event.is_set,raw=True)
+                meta.update(_trusted_worker_usage=meta.get('usage',{}),_trusted_worker_source=meta.get('metering_source','unmetered'))
         elif ai_durable_remote_executor.configured_remote() is not None:
             audio, meta = ai_durable_remote_executor.execute(
                 job_id, plan, project, audio_path, cancel_event=cancel_event)
@@ -1751,9 +1777,12 @@ def _durable_generation_executor(pid, payload, job_id):
         source = meta.pop('_trusted_worker_source', None)
         if usage is not None:
             from . import ai_metering_bridge
-            if source not in ('worker', 'cgroup'):
-                raise ValueError('Trusted worker usage has no verified source')
-            ai_metering_bridge.capture(job_id, usage, source)
+            if source=='unmetered' and not ai_metering_bridge.billing_required(job_id):
+                pass
+            else:
+                if source not in ('worker', 'cgroup', 'gpu-kernel-verified'):
+                    raise ValueError('Trusted worker usage has no verified source')
+                ai_metering_bridge.capture(job_id, usage, source)
         # Stable filename provides a publish-once guard for idempotent submissions.
         from . import ai_publish_outbox
         ai_publish_outbox.stage(job_id, pid, audio, {
@@ -1898,6 +1927,10 @@ def ai_remix_start_generation(pid: str, request: Request, body: RemixRequest):
 
 @app.post('/api/projects/{pid}/ai-arranger/generate-and-add')
 def ai_arranger_generate_and_add(pid: str, request: Request, body: RearrangeRequest):
+    from .ai_server_execution import enabled
+    if enabled(NATIVE_SINGLE_USER):
+        _project_for_actor(request,pid)
+        raise HTTPException(409,'Use the asynchronous generate-jobs endpoint for authenticated server inference')
     project = _project_for_actor(request, pid)
     try:
         plan = arranger_plan(project, body)
@@ -1912,6 +1945,10 @@ def ai_arranger_generate_and_add(pid: str, request: Request, body: RearrangeRequ
 
 @app.post('/api/projects/{pid}/remix/generate-and-add')
 def ai_remix_generate_and_add(pid: str, request: Request, body: RemixRequest):
+    from .ai_server_execution import enabled
+    if enabled(NATIVE_SINGLE_USER):
+        _project_for_actor(request,pid)
+        raise HTTPException(409,'Use the asynchronous generate-jobs endpoint for authenticated server inference')
     project = _project_for_actor(request, pid)
     try:
         plan = prepare_remix_plan(project, body)
@@ -2966,9 +3003,16 @@ def _replace_timed_range(existing, replacement, start_ms: int, end_ms: int):
     return sorted([*kept, *replacement], key=lambda item:int(getattr(item,"time_ms",0) or 0))
 
 
+def _ai_external_engine(kind):
+    from . import ai_server_execution,native_ai_routing
+    return ai_server_execution.enabled(NATIVE_SINGLE_USER) or (NATIVE_SINGLE_USER and native_ai_routing.is_remote(kind))
+
+
 def _native_remote_infer(kind: str, source: Path, options: dict | None = None):
     """Convert project audio to WAV only for explicit remote inference."""
-    from . import native_ai_routing
+    from . import native_ai_routing,ai_server_execution
+    if ai_server_execution.enabled(NATIVE_SINGLE_USER):
+        return ai_server_execution.infer(kind,source,options)
     with tempfile.TemporaryDirectory(prefix='mta-native-ai-upload-') as td:
         wav = Path(td) / 'input.wav'
         subprocess.run(['ffmpeg','-y','-v','error','-i',str(source),'-acodec','pcm_s16le',wav.as_posix()],check=True)
@@ -3005,8 +3049,7 @@ def _text_music_worker(job_id: str, pid: str, track_id: str, kind: str, model_or
                 # Do not expose incremental transcript text while Whisper is running:
                 # it may encourage chunk stitching artefacts (repeated/missing phrases).
                 _media_job_update(job_id,progress=pct,message=message,partial={"kind":"lyrics","items":[]})
-            from . import native_ai_routing as _native_ai
-            if NATIVE_SINGLE_USER and _native_ai.is_remote('whisper'):
+            if _ai_external_engine('whisper'):
                 payload, remote_id = _native_remote_infer('whisper', source, {'model':selected_model,'advanced_alignment':advanced_alignment})
                 from .models import LyricLine
                 doc = payload['json'].get('transcript.json')
@@ -3057,9 +3100,8 @@ def _text_music_worker(job_id: str, pid: str, track_id: str, kind: str, model_or
                 # Chunk/partial labels are unstable and can create many transient
                 # intermediate chords that disappear in the final full-pass result.
                 _media_job_update(job_id,progress=pct,message=message,partial={"kind":"chords","items":[]})
-            from . import native_ai_routing as _native_ai
-            if NATIVE_SINGLE_USER and _native_ai.is_remote('chords-ml'):
-                payload,remote_id = _native_remote_infer('chords-ml',source,{'engine':selected_engine, **(chord_options or {})})
+            if _ai_external_engine('chords-ml'):
+                payload,remote_id = _native_remote_infer('chords-ml',source,{'engine':selected_engine, 'options':chord_options or {}, 'bpm':project.bpm, 'beat_origin_ms':getattr(project,'beat_origin_ms',0)})
                 from .models import Chord
                 doc = payload['json'].get('chords.json')
                 if not isinstance(doc,dict) or not isinstance(doc.get('chords'),list):
@@ -3101,7 +3143,15 @@ def _text_music_worker(job_id: str, pid: str, track_id: str, kind: str, model_or
             cancel_event=MEDIA_JOBS[job_id].get("cancel_event")
             def markers_progress(pct, items, message):
                 _media_job_update(job_id,progress=pct,message=message,partial={"kind":"markers","items":[]})
-            events=extract_markers(source,progress=markers_progress,cancelled=(lambda: bool(cancel_event and cancel_event.is_set())))
+            if _ai_external_engine('markers'):
+                payload,remote_id=_native_remote_infer('markers',source,{})
+                from .models import Marker
+                document=payload['json'].get('markers.json')
+                if not isinstance(document,dict) or not isinstance(document.get('markers'),list):raise ValueError('Missing markers output')
+                events=[Marker.model_validate(item) for item in document['markers']]
+                _media_job_update(job_id,remote_job_id=remote_id)
+            else:
+                events=extract_markers(source,progress=markers_progress,cancelled=(lambda: bool(cancel_event and cancel_event.is_set())))
             if cancel_event and cancel_event.is_set():
                 raise InterruptedError("Marker extraction cancelled")
             mapped=map_source_events_to_timeline(track,events)
@@ -3140,7 +3190,7 @@ def _start_text_music_job(pid: str, track_id: str, request: Request, kind: str, 
     if track is None:
         raise HTTPException(404, "track not found")
     if kind == "lyrics":
-        if not (NATIVE_SINGLE_USER and __import__('app.native_ai_routing',fromlist=['is_remote']).is_remote('whisper')) and not lyrics_engine_available():
+        if not _ai_external_engine('whisper') and not lyrics_engine_available():
             raise HTTPException(409, "Motore lyrics Whisper non disponibile in questo runtime")
         allowed={x["id"] for x in lyrics_catalog(native=NATIVE_SINGLE_USER)["models"]}
         if model_or_engine and model_or_engine not in allowed:
@@ -3150,7 +3200,7 @@ def _start_text_music_job(pid: str, track_id: str, request: Request, kind: str, 
         engines={x["id"]:x for x in chords_catalog(native=NATIVE_SINGLE_USER)["engines"]}
         if selected not in engines:
             raise HTTPException(400, "Motore chords non supportato")
-        if not (NATIVE_SINGLE_USER and __import__('app.native_ai_routing',fromlist=['is_remote']).is_remote('chords-ml')) and not chord_engine_available(selected):
+        if not _ai_external_engine('chords-ml') and not chord_engine_available(selected):
             raise HTTPException(409, f"Motore chords {engines[selected]['display_name']} non disponibile in questo runtime")
     if (range_start_ms is None) != (range_end_ms is None):
         raise HTTPException(400, "Specificare entrambi i limiti dell’intervallo")
@@ -4226,8 +4276,7 @@ def _download_name(title: str, ext: str) -> str:
 
 
 def _split_lead_backing_vocals(vocal_stem: Path, output_dir: Path, *, model_id: str | None = None, cancel_event=None) -> tuple[Path, Path, str]:
-    from . import native_ai_routing as _remote
-    if NATIVE_SINGLE_USER and _remote.is_remote('backing-vocals'):
+    if _ai_external_engine('backing-vocals'):
         result, remote_id = _native_remote_infer('backing-vocals', vocal_stem, {'model':model_id or LEAD_BACKING_DEFAULT_MODEL})
         files=list(result['audio'].values())
         if len(files)!=2: raise ValueError('Remote backing vocal split must return exactly two stems')
@@ -4384,8 +4433,7 @@ _SAM_PROMPTS = {
 
 
 def _sam_audio_extract(source: Path, output_dir: Path, model_id: str, target: str, anchors: list | None = None) -> Path:
-    from . import native_ai_routing as _remote
-    if NATIVE_SINGLE_USER and _remote.is_remote('sam-audio'):
+    if _ai_external_engine('sam-audio'):
         result, _ = _native_remote_infer('sam-audio',source,{'model':model_id,'prompt':_SAM_PROMPTS.get(target,'singing voice'),'anchors':anchors or []})
         if len(result['audio'])!=1: raise ValueError('Remote SAM Audio must return one WAV')
         output_dir.mkdir(parents=True,exist_ok=True)
@@ -4471,8 +4519,7 @@ def _extract_singer_stems(source: Path, output_dir: Path, model: str, singers: l
     This is experimental prompt-based separation, not the distinct Singer-Informed
     embedding model; independent targets can bleed into one another.
     """
-    from . import native_ai_routing as _remote
-    if NATIVE_SINGLE_USER and _remote.is_remote('singer-separation'):
+    if _ai_external_engine('singer-separation'):
         result,remote_id=_native_remote_infer('singer-separation',source,{'model':model,'singers':singers,'selected':selected})
         requested={person['id'] for person in singers if selected in ('all',person['id'])}
         output_dir.mkdir(parents=True,exist_ok=True)
@@ -4546,8 +4593,7 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
             raise RuntimeError("stem separation cancelled")
         with tempfile.TemporaryDirectory(prefix=f"mta-stems-{job_id}-") as td_raw:
             td = Path(td_raw)
-            from . import native_ai_routing as _native_ai
-            if NATIVE_SINGLE_USER and _native_ai.is_remote('demucs'):
+            if _ai_external_engine('demucs'):
                 result, remote_id = _native_remote_infer('demucs',source,{'model':model,'stem_count':stem_count})
                 if not result['audio']:
                     raise ValueError('Remote Demucs returned no WAV stems')
@@ -4752,7 +4798,7 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
                     # commit reloads the latest state and refuses to overwrite
                     # lyrics modified while the model was running.
                     from .models import LyricLine
-                    if NATIVE_SINGLE_USER and _native_ai.is_remote('whisper'):
+                    if _ai_external_engine('whisper'):
                         remote_result, remote_id = _native_remote_infer('whisper', lyric_source, {'model': selected_lyrics_model})
                         remote_doc = remote_result['json'].get('transcript.json', {})
                         if not isinstance(remote_doc.get('lines'), list):
@@ -4781,8 +4827,8 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
                     selected_chords_engine = str(job.get('chords_engine') or chords_catalog(native=NATIVE_SINGLE_USER)['default_engine'])
                     chord_info = next((x for x in chords_catalog(native=NATIVE_SINGLE_USER)['engines'] if x['id'] == selected_chords_engine), {})
                     from .models import Chord
-                    if NATIVE_SINGLE_USER and _native_ai.is_remote('chords-ml'):
-                        remote_result, remote_id = _native_remote_infer('chords-ml', source, {'engine': selected_chords_engine})
+                    if _ai_external_engine('chords-ml'):
+                        remote_result, remote_id = _native_remote_infer('chords-ml', source, {'engine': selected_chords_engine,'bpm':load_project(project_id).bpm,'beat_origin_ms':getattr(load_project(project_id),'beat_origin_ms',0)})
                         remote_doc = remote_result['json'].get('chords.json', {})
                         if not isinstance(remote_doc.get('chords'), list):
                             raise ValueError('Remote chords not returned')
@@ -5041,7 +5087,7 @@ def admin_demucs_model_delete_local(model_id: str, request: Request):
 @app.get("/api/ai-models")
 def managed_ai_models(request: Request):
     _actor(request)
-    return ai_catalog(native=NATIVE_SINGLE_USER)
+    return _execution_ai_catalog()
 
 @app.post("/api/ai-models/lyrics/{model_id}/download")
 def managed_lyrics_model_download(model_id: str, request: Request):
@@ -5190,8 +5236,7 @@ def _download_drumsep_model() -> dict:
 
 
 def _drumsep_extract(source: Path, output_dir: Path, targets: set[str]) -> list[Path]:
-    from . import native_ai_routing as _remote
-    if NATIVE_SINGLE_USER and _remote.is_remote('drumsep'):
+    if _ai_external_engine('drumsep'):
         result, _ = _native_remote_infer('drumsep',source,{'targets':sorted(targets)})
         if not result['audio']: raise ValueError('Remote DrumSep returned no WAV stems')
         output_dir.mkdir(parents=True,exist_ok=True)
@@ -5306,8 +5351,7 @@ async def stem_job_start(
         raise HTTPException(400, "Unknown percussion model")
     if Path(file.filename or "").suffix.lower() != ".mp3":
         raise HTTPException(400, "La separazione strumenti accetta attualmente file MP3.")
-    from . import native_ai_routing as _native_ai
-    remote_demucs = NATIVE_SINGLE_USER and _native_ai.is_remote('demucs')
+    remote_demucs = _ai_external_engine('demucs')
     if not remote_demucs and not STEM_SPLITTER.available():
         raise HTTPException(503, "Il plugin Demucs non è installato in questo runtime.")
     status = STEM_SPLITTER.status()
@@ -5572,8 +5616,7 @@ def start_track_stem_job(
     singer_target: str = "all",
 ):
     project = _project_for_actor(request, pid)
-    from . import native_ai_routing
-    remote_demucs = NATIVE_SINGLE_USER and native_ai_routing.is_remote('demucs')
+    remote_demucs = _ai_external_engine('demucs')
     if not remote_demucs and not STEM_SPLITTER.available():
         raise HTTPException(503, "Demucs stem plugin is not installed in this runtime")
     stem_status = STEM_SPLITTER.status()

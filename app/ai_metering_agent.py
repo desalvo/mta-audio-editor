@@ -137,7 +137,7 @@ def run_metered_process(argv: list[str], *, cwd: str, timeout_seconds: int = 360
     return Measurement(-1 if timed_out else proc.returncode, elapsed, usage, 'worker', not detected_descendants)
 
 
-def execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=None,
+def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=None,
                               timeout_seconds: int = 1200, source_wav: bytes | None = None,
                               cancel_check: Callable[[], bool] | None = None) -> tuple[bytes, dict]:
     """Run the administrator-installed AI worker and persist measured usage.
@@ -147,7 +147,6 @@ def execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=N
     by multiple users.
     """
     import json
-    import sys
     import tempfile
     from . import ai_billing
     from .ai_worker_protocol import verify_preview_wav, WorkerUnavailable, MAX_REQUEST_BYTES
@@ -156,6 +155,8 @@ def execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=N
 
     from .ai_worker_protocol import _ace_remote_cleanup as _ace_cleanup
     worker = resolve_worker(kind)
+    if plan.get('kind',kind)!=kind:raise ValueError('AI plan cannot override the registered engine')
+    plan={**plan,'kind':kind}
     if worker is None:
         raise WorkerUnavailable('No trusted AI worker configured')
     if source_wav is not None and ('source_audio' in plan or 'input_path' in plan):
@@ -163,7 +164,18 @@ def execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=N
     encoded = json.dumps(plan, ensure_ascii=False, allow_nan=False).encode('utf-8')
     if len(encoded) > MAX_REQUEST_BYTES:
         raise ValueError('AI plan exceeds size limit')
-    job_id = ai_billing.create_job(user_id, kind, token_id)
+    from .ai_global_execution import current_job
+    from . import ai_arranger_runtime as queue
+    queue_id=current_job.get();defer_settlement=False;job_id=None
+    if queue_id:
+        with queue._db() as con:queued=con.execute('SELECT operation FROM jobs WHERE job_id=?',(queue_id,)).fetchone()
+        if queued and queued[0] in ('arranger','remix'):
+            job_id=ai_billing.existing_inference_ledger_job(queue_id,user_id,queued[0])
+            defer_settlement=job_id is not None
+    job_id=job_id or ai_billing.create_job(user_id,kind,token_id)
+    if queue_id:
+        with ai_billing.db() as con:
+            ai_billing._init(con);con.execute('UPDATE ai_compute_jobs SET queue_job_id=? WHERE id=?',(queue_id,job_id))
     # Only operator-enabled GPU adapters obtain logical slots; neither the
     # request plan nor the remote user may declare GPU eligibility.
     from .ai_gpu_slot_accounting import slot_enabled_for_kind
@@ -186,13 +198,18 @@ def execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=N
                 staged_source=[{'filename':'inputs/source.wav'}]
             encoded = json.dumps({**plan, 'source_audio': staged_source}, ensure_ascii=False, allow_nan=False).encode('utf-8')
         from .ai_torch_diagnostics import enabled as torch_diagnostics_enabled, read_report
-        if torch_diagnostics_enabled():
+        from .ai_gpu_verified import readiness as gpu_readiness, VERIFIED_KINDS
+        from .ai_worker_registry import extensions
+        verified_kind=kind in VERIFIED_KINDS or extensions().get(kind,{}).get('metering_method')=='gpu-kernel-union-v1'
+        verified_enabled=verified_kind and gpu_readiness()['ready']
+        if torch_diagnostics_enabled() or verified_enabled:
             # The server, never the request, assigns diagnostic identity.
             encoded = json.dumps({**json.loads(encoded), 'gpu_profile_task_id': job_id},
                                  ensure_ascii=False, allow_nan=False).encode('utf-8')
         request_path.write_bytes(encoded)
         request_path.chmod(0o600)
-        args = ([sys.executable, str(worker)] if worker.suffix == '.py' else [str(worker)])
+        from .ai_worker_registry import worker_python
+        args = ([worker_python(kind), str(worker)] if worker.suffix == '.py' else [str(worker)])
         args += ['--request', str(request_path), '--output', str(output_path)]
         result = None
         gpu_slot_acquired = False
@@ -206,6 +223,14 @@ def execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=N
                     report = read_report(directory, job_id)
                     if report:
                         store_report(job_id, report)
+                    if queue_id:
+                        try:
+                            from .storage import _atomic_json_write
+                            raw_progress=json.loads((directory/'progress.json').read_text())
+                            if isinstance(raw_progress,dict):
+                                allowed={'phase','message','progress_percent','progress_source','progress_estimated','steps_completed','steps_total','cpu_seconds_estimated','gpu_seconds_estimated','gpu_metrics_status','gpu_metrics_source'}
+                                _atomic_json_write(queue._ROOT/(queue_id+'.progress.json'),{k:v for k,v in raw_progress.items() if k in allowed})
+                        except (OSError,ValueError):pass
                     if final:
                         from .ai_compute_diagnostics import store as store_counters
                         if kind=='ace-step':
@@ -219,7 +244,7 @@ def execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=N
                     import logging
                     logging.getLogger(__name__).warning('GPU diagnostic update failed: %s', type(exc).__name__)
             return cancel_check() if not final and cancel_check is not None else False
-        worker_cancel_check = diagnostic_checkpoint if torch_diagnostics_enabled() else cancel_check
+        worker_cancel_check = diagnostic_checkpoint
         try:
             if gpu_slot_enabled:
                 from . import ai_gpu_slot_accounting as gpu_slots
@@ -227,9 +252,9 @@ def execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=N
                 gpu_slot_acquired = True
             if os.getenv('MTA_AI_CGROUP_PARENT'):
                 from .ai_cgroup_metering import run_cgroup_process
-                result = run_cgroup_process(args, cwd=folder, timeout_seconds=timeout_seconds, cancel_check=worker_cancel_check, **({'env':{**os.environ,'MTA_AI_PROGRESS_FILE':str(directory/'progress.json')}} if kind=='ace-step' else {}))
+                result = run_cgroup_process(args, cwd=folder, timeout_seconds=timeout_seconds, cancel_check=worker_cancel_check, env={**os.environ,'MTA_AI_PROGRESS_FILE':str(directory/'progress.json'),'MTA_AI_VERIFIED_REPORT_DIR':str(directory)})
             else:
-                result = run_metered_process(args, cwd=folder, timeout_seconds=timeout_seconds, cancel_check=worker_cancel_check, **({'env':{**os.environ,'MTA_AI_PROGRESS_FILE':str(directory/'progress.json')}} if kind=='ace-step' else {}))
+                result = run_metered_process(args, cwd=folder, timeout_seconds=timeout_seconds, cancel_check=worker_cancel_check, env={**os.environ,'MTA_AI_PROGRESS_FILE':str(directory/'progress.json'),'MTA_AI_VERIFIED_REPORT_DIR':str(directory)})
             if cancel_check is not None and cancel_check():
                 raise RuntimeError('AI worker cancelled; result discarded')
             diagnostic_checkpoint(final=True)
@@ -248,15 +273,24 @@ def execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=N
             if gpu_slot_acquired:
                 gpu_slots.release(job_id)
                 gpu_slot_acquired = False
-            ai_billing.finish_job(job_id, 'done', usage if result.isolated else None,
-                                  source=result.source if result.isolated else 'unmetered')
+            metered_source=result.source if result.isolated else 'unmetered'
+            usage=usage if result.isolated else {}
+            if verified_enabled:
+                try:
+                    from .ai_gpu_verified import consume_report
+                    segments=(len(plan.get('singers',[])) if plan.get('selected','all')=='all' else 1) if kind=='singer-separation' else (None if kind=='ace-step' else 1)
+                    usage['gpu_seconds']=consume_report(job_id,directory,ace=kind=='ace-step',expected_segments=segments)
+                    metered_source='gpu-kernel-verified'
+                except (OSError,ValueError,TypeError,KeyError):
+                    pass  # Missing/incomplete evidence can never create a GPU charge.
+            if not defer_settlement:ai_billing.finish_job(job_id, 'done', usage or None,source=metered_source)
             diagnostics = dict(result.gpu_diagnostics or {})
             profile_report = read_report(directory, job_id)
             if profile_report:
                 diagnostics['torch_profile'] = profile_report
                 diagnostic_checkpoint(final=True)
             return payload, {'job_id': job_id, 'audio': info, 'usage': usage,
-                             'gpu_metered': False, 'process_tree_metered': result.isolated,
+                             'gpu_metered': 'gpu_seconds' in usage, 'metering_source':metered_source,'process_tree_metered': result.isolated,
                              'gpu_diagnostics': diagnostics, 'media_type': media_type}
         except BaseException:
             diagnostic_checkpoint(final=True)
@@ -272,3 +306,9 @@ def execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=N
                 ai_billing.finish_job(job_id, terminal_status, result.usage if result.isolated else None,
                                       source=result.source if result.isolated else 'unmetered')
             raise
+
+
+def execute_registered_worker(user_id,kind,plan,*,token_id=None,timeout_seconds=1200,source_wav=None,cancel_check=None):
+    from .ai_global_execution import execute
+    return execute(user_id,kind,lambda cancelled:_execute_registered_worker(user_id,kind,plan,
+        token_id=token_id,timeout_seconds=timeout_seconds,source_wav=source_wav,cancel_check=cancelled),cancel_check=cancel_check)

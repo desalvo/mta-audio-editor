@@ -71,7 +71,9 @@ def select(actor_id, can_access, body=None):
         pid = row['project_id']
         if pid not in access:
             access[pid] = bool(can_access(pid))
-        if not access[pid]:
+        own_remote=(pid=='remote-user-'+str(actor_id) and row.get('actor_user_id')==actor_id
+                    and row['operation'].startswith('worker:'))
+        if not access[pid] and not own_remote:
             continue
         if row['job_id'] in excluded:
             continue

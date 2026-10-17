@@ -115,7 +115,7 @@ def test_unified_transcripts_and_chords(tmp_path, monkeypatch):
             assert kwargs['mode'] == 'json'
             return {'text': 'test'}
     monkeypatch.setattr(music_text, 'extract_lyrics', lambda *args, **kwargs: [Dummy()])
-    monkeypatch.setattr(music_text, 'extract_chords', lambda *args, **kwargs: [Dummy()])
+    monkeypatch.setattr(music_text, 'extract_chords_progressive', lambda *args, **kwargs: [Dummy()])
     unified.infer({'kind': 'whisper', 'source_audio': source, 'language': 'it', 'advanced_alignment': True}, output)
     assert json.loads((tmp_path/'transcript.json').read_text())['lines'] == [{'text': 'test'}]
     unified.infer({'kind': 'chords-ml', 'source_audio': source}, output)

@@ -8,6 +8,8 @@ REQUIRED = (
     '/usr/lib/mta-audio-editor-server/native-installers/install_ace_step.sh',
     '/usr/lib/mta-audio-editor-server/native-installers/install_rocm_userspace.sh',
     '/usr/lib/mta-audio-editor-server/native-installers/install_demucs.py',
+    '/usr/lib/mta-audio-editor-server/native-installers/configure_ai_workers.py',
+    '/usr/lib/mta-audio-editor-server/native-installers/gpu_verified_billing.py',
 )
 
 

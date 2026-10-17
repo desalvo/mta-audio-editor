@@ -32,12 +32,21 @@ def capture(job_id, usage, source):
     """
     _identity(job_id)
     normalized = ai_billing._validate_usage(usage)
-    if source not in ('worker', 'cgroup', 'gpu-agent', 'remote-worker') or not normalized:
+    if source not in ('worker', 'cgroup', 'gpu-agent','gpu-kernel-verified', 'remote-worker') or not normalized:
         raise ValueError('Nonempty trusted measurement required')
-    if any(k.startswith('gpu_') for k in normalized) and source != 'gpu-agent':
+    if any(k.startswith('gpu_') for k in normalized) and source not in ('gpu-agent','gpu-kernel-verified'):
         raise ValueError('GPU accounting requires authenticated GPU agent')
     if source == 'gpu-agent' and not any(k.startswith('gpu_') for k in normalized):
         raise ValueError('GPU agent measurement missing')
+    if source=='gpu-kernel-verified':
+        import uuid
+        from .ai_gpu_verified import require_evidence
+        ledger_id=uuid.uuid5(uuid.NAMESPACE_URL,'mta-ai-inference:'+job_id).hex
+        with ai_billing.db() as con:
+            ai_billing._init(con)
+            rows=con.execute('SELECT id FROM ai_compute_jobs WHERE queue_job_id=? AND user_id=?',(job_id,_identity(job_id)[0])).fetchall()
+        if len(rows)==1:ledger_id=rows[0][0]
+        require_evidence(ledger_id,normalized)
     encoded = json.dumps({'usage': normalized, 'source': source}, sort_keys=True, allow_nan=False)
     with queue._db() as con:
         con.execute('''CREATE TABLE IF NOT EXISTS ai_metering_evidence

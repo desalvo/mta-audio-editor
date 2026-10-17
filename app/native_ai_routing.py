@@ -11,7 +11,7 @@ from pathlib import Path
 import tempfile
 import zipfile
 
-KINDS = ('whisper','chords-ml','demucs','drumsep','sam-audio','singer-separation','backing-vocals')
+KINDS = ('whisper','chords-ml','demucs','drumsep','sam-audio','singer-separation','backing-vocals','markers')
 
 
 def _file() -> Path:
@@ -38,11 +38,11 @@ def public_settings() -> dict:
     return {'workers': {kind: {'mode': _read().get('workers', {}).get(kind, {}).get('mode','local'),
                                'url': _read().get('workers', {}).get(kind, {}).get('url',''),
                                'has_token': bool(_read().get('workers', {}).get(kind, {}).get('token'))}
-                        for kind in KINDS}}
+                        for kind in sorted(set(KINDS)|set(_read().get('workers',{})))}}
 
 
 def configure(kind: str, mode: str, url: str = '', token: str = '') -> dict:
-    if kind not in KINDS or mode not in ('local','remote'):
+    if (not isinstance(kind,str) or not __import__('re').fullmatch(r'[a-z][a-z0-9-]{0,63}',kind) or mode not in ('local','remote')):
         raise ValueError('Invalid worker or execution mode')
     from .ai_remote_client import _endpoint
     data = _read()

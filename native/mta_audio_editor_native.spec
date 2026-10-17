@@ -26,7 +26,7 @@ datas = [
     (str(project / "RELEASE_CHANNEL"), "."),
 ]
 for adapter_file in ('ace_step_http_worker.py','ace_gpu_process_meter.py','ai_gpu_process_meter.py',
-                     'ai_proxmox_gpu_agent_client.py','ace_gpu_profiler.py','ace_task_progress.py','ai_execution_limits.py'):
+                     'ai_proxmox_gpu_agent_client.py','ace_gpu_profiler.py','ai_gpu_verified.py','ace_task_progress.py','ai_execution_limits.py'):
     datas.append((str(project / 'app' / adapter_file), 'app'))
 
 # uv supplies a managed Python/runtime for ACE, including on a frozen desktop.

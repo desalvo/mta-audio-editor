@@ -29,8 +29,8 @@ class RemoteAIError(RuntimeError):
 
 
 def _endpoint(base_url: str, kind: str) -> str:
-    from .ai_worker_registry import WORKER_KINDS
-    if kind not in WORKER_KINDS:
+    import re
+    if not isinstance(kind,str) or not re.fullmatch(r'[a-z][a-z0-9-]{0,63}',kind):
         raise ValueError('Unsupported remote AI worker kind')
     parts = urlsplit(base_url)
     if parts.scheme != 'https' or not parts.netloc or parts.username or parts.password or parts.query or parts.fragment:

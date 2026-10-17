@@ -335,7 +335,7 @@ def start_server(*, confirmed_model_download: bool, remember_consent: bool = Tru
 
 
 _ADAPTER_FILES = ('ace_step_http_worker.py', 'ace_gpu_process_meter.py', 'ai_gpu_process_meter.py',
-    'ai_proxmox_gpu_agent_client.py', 'ace_gpu_profiler.py', 'ace_task_progress.py', 'ai_execution_limits.py')
+    'ai_proxmox_gpu_agent_client.py', 'ace_gpu_profiler.py', 'ai_gpu_verified.py', 'ace_task_progress.py', 'ai_execution_limits.py')
 
 
 def adapter_python(worker):

@@ -13,5 +13,5 @@ def test_local_metering_sources_are_labeled_at_collection():
 def test_generation_handoff_rejects_missing_provenance():
     source = Path(main.__file__).read_text()
     assert "source = meta.pop('_trusted_worker_source', None)" in source
-    assert "if source not in ('worker', 'cgroup'):" in source
+    assert "if source not in ('worker', 'cgroup', 'gpu-kernel-verified'):" in source
     assert 'ai_metering_bridge.capture(job_id, usage, source)' in source

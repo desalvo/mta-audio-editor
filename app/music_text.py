@@ -457,7 +457,7 @@ def extract_lyrics_progressive(
     return _normalize_lyric_items(result)
 
 
-def extract_lyrics(path: Path, *, model_name: str | None = None, language: str | None = None, advanced_alignment: bool = False) -> list[LyricLine]:
+def extract_lyrics(path: Path, *, model_name: str | None = None, language: str | None = None, advanced_alignment: bool = False, require_inprocess: bool = False) -> list[LyricLine]:
     """Transcribe a track with upstream OpenAI Whisper and preserve segment timing.
 
     The model is intentionally resolved by Whisper itself so native/server runtimes
@@ -485,6 +485,8 @@ def extract_lyrics(path: Path, *, model_name: str | None = None, language: str |
         lines = _normalize_lyric_items(_whisper_result_to_lines(result))
         return forced_align_lyrics(path, lines) if advanced_alignment else lines
 
+    if require_inprocess:
+        raise RuntimeError("Queued server Whisper requires its in-process Python runtime; an external CLI cannot supply complete GPU evidence")
     cli = shutil.which("whisper")
     if not cli:
         raise RuntimeError(

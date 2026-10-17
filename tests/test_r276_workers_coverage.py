@@ -47,7 +47,7 @@ def test_drumsep_worker_end_to_end_small_onnx(monkeypatch, tmp_path):
             assert feeds["mag"].shape == (1, 4, 8, 17)
             return [np.ones((1, 4, 2, 64), dtype="float32") * 0.1,
                     np.zeros((1, 4, 4, 8, 17), dtype="float32")]
-    monkeypatch.setitem(sys.modules, "onnxruntime", types.SimpleNamespace(InferenceSession=Session))
+    monkeypatch.setitem(sys.modules, "onnxruntime", types.SimpleNamespace(InferenceSession=Session,get_available_providers=lambda:["CPUExecutionProvider"]))
     wav = tmp_path / "input.wav"
     sf.write(wav, np.zeros((90, 1), dtype="float32"), 8000)
     outputs = dw.infer(wav, tmp_path / "mock.onnx", tmp_path / "out")
@@ -68,7 +68,7 @@ def test_drumsep_worker_resample_and_validation(monkeypatch, tmp_path):
         def __init__(self, *args, **kwargs): pass
         def get_inputs(self): return [Named("wrong")]
         def get_outputs(self): return [Named("time_out")]
-    monkeypatch.setitem(sys.modules, "onnxruntime", types.SimpleNamespace(InferenceSession=InvalidSession))
+    monkeypatch.setitem(sys.modules, "onnxruntime", types.SimpleNamespace(InferenceSession=InvalidSession,get_available_providers=lambda:["CPUExecutionProvider"]))
     src = tmp_path / "input.wav"
     sf.write(src, np.zeros((32, 3), dtype="float32"), 16000)
     with pytest.raises(RuntimeError, match="signature"):

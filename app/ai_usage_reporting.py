@@ -27,6 +27,7 @@ def records(user_id, start, end, *, completed_window=False):
             row['amount_micro']=row['cost_micro'] if enabled else 0
             row['origin']='ledger'
         # Do not count a queue Arranger and its ledger settlement twice.
+        queue_links={r[0] for r in con.execute('SELECT queue_job_id FROM ai_compute_jobs WHERE user_id=? AND queue_job_id IS NOT NULL',(user_id,))}
         all_ledger={r[0] for r in con.execute('SELECT id FROM ai_compute_jobs WHERE user_id=?',(user_id,))}
     from . import ai_arranger_runtime as queue
     with queue._db() as con:
@@ -39,7 +40,7 @@ def records(user_id, start, end, *, completed_window=False):
             except ValueError:continue
         if actor_id!=user_id:continue
         linked=uuid.uuid5(uuid.NAMESPACE_URL,'mta-ai-inference:'+row['job_id']).hex
-        if linked in all_ledger:
+        if linked in all_ledger or row['job_id'] in queue_links:
             target=next((r for r in ledger if r['id']==linked),None)
             if target is not None:
                 value=queue._with_live_progress(row)

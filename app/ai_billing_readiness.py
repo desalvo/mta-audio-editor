@@ -45,16 +45,18 @@ def check() -> dict:
     component('worker', worker is not None,
               'No trusted AI worker is configured' if worker is None else 'An operator-configured AI worker is available')
 
-    # This application does NOT currently supply an attested per-job GPU sensor.
-    # A configured key or a device-wide driver utility must never pass this check.
+    # Readiness requires calibration; individual jobs additionally require evidence.
     gpu_paid = any(rates.get(key, 0) > 0 for key in ('gpu_seconds', 'gpu_energy_joules'))
     components['gpu_per_job'] = {
-        'ready': False,
-        'description': 'No validated per-job GPU time/energy sensor is integrated; host-wide GPU counters are forbidden',
+        'ready': __import__('app.ai_gpu_verified',fromlist=['readiness']).readiness()['ready'],
+        'description': 'Calibrated continuous HIP kernel capture required; host GPU counters and diagnostic estimates cannot be billed',
         'paid_tariff_active': gpu_paid,
     }
-    if gpu_paid:
+    if gpu_paid and not components['gpu_per_job']['ready']:
         issues.append({'component': 'gpu_per_job', 'reason': components['gpu_per_job']['description']})
+
+    if rates.get('gpu_energy_joules',0)>0:
+        component('gpu_energy',False,'Per-task GPU energy is unsupported; disable this tariff')
 
     disk_paid = rates.get('disk_gb_hours', 0) > 0
     storage_root = os.getenv('MTA_AI_USER_STORAGE_ROOT', '')

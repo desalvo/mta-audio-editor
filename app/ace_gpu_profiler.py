@@ -119,6 +119,21 @@ class TaskProfiler:
             # Serialize profiled generations, so their process-wide capture cannot
             # overlap another wrapped inference. Upstream single-worker is required.
             with self._capture_lock:
+                try:
+                    from . import ai_gpu_verified as verified
+                except ImportError:
+                    import ai_gpu_verified as verified
+                if verified.readiness()['ready']:
+                    initial={'task_id':task,'source':self.source,'status':'profiling','billing_eligible':False}
+                    self._save(task,initial)
+                    def publish(evidence):
+                        value=evidence['payload']
+                        self._save(task,{**initial,'status':'profiled_kernels_diagnostic' if value['kernel_count'] else 'profiler_no_gpu_events',
+                            'gpu_active_seconds':value['gpu_seconds'],'wall_seconds':value['wall_seconds'],
+                            'kernel_count':value['kernel_count'],'device_id':value['device_id'],'billing_evidence':evidence})
+                    try:return verified.measured(task,lambda:generate(*args,**kwargs),publish=publish)
+                    finally:
+                        if self.get(task).get('status')=='profiling':self._save(task,{**initial,'status':'profiler_failed'})
                 record = {'task_id': task, 'source': self.source,
                           'status': 'profiling', 'billing_eligible': False}
                 self._save(task, record)

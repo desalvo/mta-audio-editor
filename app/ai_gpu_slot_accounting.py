@@ -19,8 +19,8 @@ def slot_enabled_for_kind(kind: str) -> bool:
     if os.getenv('MTA_AI_GPU_SLOT_TRACKING_ENABLED', '').lower() != 'true':
         return False
     configured = {item.strip() for item in os.getenv('MTA_AI_GPU_SLOT_KINDS', '').split(',') if item.strip()}
-    from .ai_worker_registry import WORKER_KINDS
-    return kind in WORKER_KINDS and kind in configured
+    from .ai_worker_registry import registered_kinds
+    return kind in registered_kinds() and kind in configured
 
 
 

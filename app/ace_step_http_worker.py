@@ -152,7 +152,12 @@ def _profile_result(base, task_id):
         raw = _request(base + '/mta/telemetry/' + task_id, timeout=3)
         if len(raw) > 8192:
             return {}
-        return parse_report(json.loads(raw), task_id)
+        document=json.loads(raw)
+        if isinstance(document,dict) and document.get('billing_evidence') and os.getenv('MTA_AI_VERIFIED_REPORT_DIR'):
+            try:from .ai_gpu_verified import append_report
+            except ImportError:from ai_gpu_verified import append_report
+            append_report(Path(os.environ['MTA_AI_VERIFIED_REPORT_DIR']),document['billing_evidence'],task_id)
+        return parse_report(document, task_id)
     except (OSError, ValueError, TypeError, HTTPError, URLError, TimeoutError):
         return {}
 

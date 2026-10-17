@@ -16,7 +16,7 @@ import sys
 # Subprocess starts in the isolated job workspace, not the repository.
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-SUPPORTED = {'whisper', 'chords-ml', 'demucs', 'drumsep', 'sam-audio', 'singer-separation', 'backing-vocals'}
+SUPPORTED = {'whisper', 'chords-ml', 'demucs', 'drumsep', 'sam-audio', 'singer-separation', 'backing-vocals', 'markers'}
 
 
 def _backend_command(plan, folder, backend, arguments):
@@ -26,7 +26,7 @@ def _backend_command(plan, folder, backend, arguments):
         from app.demucs_runtime import python_path
         configured=python_path()
         if configured is not None:python=str(configured)
-    if enabled():
+    if enabled() or __import__('app.ai_gpu_verified',fromlist=['readiness']).readiness()['ready']:
         return [python, str(Path(__file__).with_name('ai_profiled_backend.py')),
                 '--backend', backend, '--task-id', str(plan.get('gpu_profile_task_id', '')),
                 '--report-dir', str(folder), '--', *arguments]
@@ -120,16 +120,22 @@ def infer(plan: dict, output: Path) -> None:
         from app.music_text import extract_lyrics
         lines = extract_lyrics(source, model_name=str(plan.get('model') or 'turbo'),
                               language=plan.get('language') or None,
-                              advanced_alignment=bool(plan.get('advanced_alignment', False)))
+                              advanced_alignment=bool(plan.get('advanced_alignment', False)),require_inprocess=True)
         result = folder / 'transcript.json'
         result.write_text(json.dumps({'lines': [v.model_dump(mode='json') for v in lines]}, ensure_ascii=False), encoding='utf-8')
         _artifacts(folder, [(result, 'application/json')]); return
     if kind == 'chords-ml':
-        from app.music_text import extract_chords
-        chords = extract_chords(source)
+        from app.music_text import extract_chords_progressive
+        chords = extract_chords_progressive(source,engine=plan.get('engine') or __import__('app.ai_models',fromlist=['chords_catalog']).chords_catalog(native=False)['default_engine'],options=plan.get('options'),bpm=float(plan.get('bpm',120)),beat_origin_ms=int(plan.get('beat_origin_ms',0)))
         result = folder / 'chords.json'
         result.write_text(json.dumps({'chords': [v.model_dump(mode='json') for v in chords]}, ensure_ascii=False), encoding='utf-8')
         _artifacts(folder, [(result, 'application/json')]); return
+    if kind == 'markers':
+        from app.music_text import extract_markers
+        result=folder/'markers.json'
+        events=extract_markers(source)
+        result.write_text(json.dumps({'markers':[v.model_dump(mode='json') for v in events]}))
+        _artifacts(folder,[(result,'application/json')]);return
     if kind == 'drumsep':
         from app.drumsep_onnx_worker import infer as drumsep_infer
         model = Path(os.environ.get('MTA_AI_DRUMSEP_MODEL', ''))
@@ -140,11 +146,14 @@ def infer(plan: dict, output: Path) -> None:
     if kind == 'sam-audio':
         from app.sam_audio_worker import main as _unused  # noqa: F401
         import subprocess
-        model = os.environ.get('MTA_AI_SAM_MODEL', '')
+        model = str(plan.get('model') or os.environ.get('MTA_AI_SAM_MODEL', ''))
+        if model in {'sam-audio-small','sam-audio-base','sam-audio-large'}:model='facebook/'+model
         if not model: raise RuntimeError('Operator must configure MTA_AI_SAM_MODEL')
+        if plan.get('model') and model not in {'facebook/sam-audio-small','facebook/sam-audio-base','facebook/sam-audio-large'}:raise ValueError('Unsupported SAM model')
         target = folder / 'separated.wav'
-        subprocess.run(_backend_command(plan, folder, 'sam-audio', ['--source', str(source), '--output', str(target),
-                        '--model', model, '--prompt', str(plan.get('prompt') or 'vocals')]), check=True)
+        arguments=['--source',str(source),'--output',str(target),'--model',model,'--prompt',str(plan.get('prompt') or 'vocals')]
+        if plan.get('anchors'):arguments+=['--anchors-json',json.dumps(plan['anchors'])]
+        subprocess.run(_backend_command(plan,folder,'sam-audio',arguments),check=True)
         _artifacts(folder, [(target, 'audio/wav')]); return
     if kind == 'demucs':
         import subprocess
@@ -192,7 +201,11 @@ def infer(plan: dict, output: Path) -> None:
     if kind == 'backing-vocals':
         # A configured audio-separator model is mandatory; no DSP fallback is silently billed as AI.
         from audio_separator.separator import Separator
-        model = os.environ.get('MTA_AI_VOCAL_MODEL', '')
+        from app.ai_backend_models import LEAD_BACKING_MODELS
+        chosen=plan.get('model')
+        known={m['id']:m['filename'] for m in LEAD_BACKING_MODELS}
+        if chosen and chosen not in known:raise ValueError('Unsupported backing-vocal model')
+        model = known[chosen] if chosen else os.environ.get('MTA_AI_VOCAL_MODEL', '')
         if not model or '/' in model or '\\' in model:
             raise RuntimeError('Operator must configure a safe MTA_AI_VOCAL_MODEL filename')
         separator = Separator(output_dir=str(folder), output_format='WAV', model_file_dir=os.environ.get('MTA_AI_VOCAL_MODELS_DIR', ''))
@@ -204,7 +217,8 @@ def infer(plan: dict, output: Path) -> None:
             if not source_path.is_absolute(): source_path = folder/source_path
             if source_path.resolve().parent != folder or not source_path.is_file():
                 raise RuntimeError('Unexpected output path from separator')
-            dest=folder/f'voice_{index}.wav'
+            label='backing' if any(v in source_path.name.lower() for v in ('instrumental','karaoke','backing')) else ('lead' if 'vocal' in source_path.name.lower() else 'voice')
+            dest=folder/f'{label}_{index}.wav'
             source_path.replace(dest); paths.append((dest, 'audio/wav'))
         if not paths: raise RuntimeError('Separator produced no audio')
         _artifacts(folder, paths)

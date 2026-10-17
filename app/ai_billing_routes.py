@@ -426,7 +426,9 @@ def ai_worker_capabilities(request: Request):
     if not ai_access.authenticate(token):
         raise HTTPException(401, 'Valid AI token required')
     from .ai_worker_registry import available_workers
-    return {'workers': available_workers(), 'audio_transport': 'wav', 'output': ['wav', 'artifact-zip-v1']}
+    from .ai_gpu_verified import readiness,VERIFIED_KINDS
+    return {'workers': available_workers(), 'audio_transport': 'wav', 'output': ['wav', 'artifact-zip-v1'],
+            'admission':'global-ai-queue','gpu_billing':readiness(),'gpu_evidence_kinds':sorted(VERIFIED_KINDS)}
 
 
 @router.post('/api/ai-jobs/execute-audio/{kind}')
@@ -536,3 +538,27 @@ def remote_metering_key_status(request: Request):
     require_admin(request)
     from .ai_remote_keyring import public_status
     return public_status()
+
+
+@router.get('/api/ai-jobs/resources/{job_id}')
+def remote_job_resources(job_id: str,request: Request):
+    """Owner-bound resource receipt; never treat diagnostic estimates as billed use."""
+    header=request.headers.get('authorization','')
+    identity=ai_access.authenticate(header[7:] if header.lower().startswith('bearer ') else '')
+    if not identity:raise HTTPException(401,'Valid AI token required')
+    import json
+    with ai_billing.db() as con:
+        ai_billing._init(con)
+        row=con.execute('SELECT * FROM ai_compute_jobs WHERE id=? AND user_id=? AND token_id=?',
+                        (job_id,identity['user_id'],identity['id'])).fetchone()
+        if not row:raise HTTPException(404,'AI job not found')
+        row=dict(row)
+        exists=con.execute("SELECT 1 FROM sqlite_master WHERE name='ai_verified_gpu_evidence'").fetchone()
+        proof=con.execute('SELECT envelope FROM ai_verified_gpu_evidence WHERE job_id=?',(job_id,)).fetchone() if exists else None
+    result={'job_id':job_id,'queue_job_id':row['queue_job_id'],'status':row['status'],
+            'usage':json.loads(row['usage_json']),'metering_source':row['resource_source'],
+            'gpu_verified':bool(proof),'billing_enabled':ai_billing.user_billing_enabled(identity['user_id'])}
+    if proof:
+        value=json.loads(proof[0])['payload']
+        result['gpu_evidence']={key:value[key] for key in ('id','method','calibration_id','trace_sha256')}
+    return result

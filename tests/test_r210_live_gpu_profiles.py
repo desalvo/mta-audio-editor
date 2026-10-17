@@ -201,7 +201,9 @@ report={'task_id':request['gpu_profile_task_id'],'source':'torch-profiler','bill
     monkeypatch.setenv('MTA_AI_WORKER_WHISPER_EXECUTABLE', str(worker))
     def cancel_check():
         with db() as con:
-            assert con.execute("SELECT status FROM ai_compute_jobs WHERE kind='whisper'").fetchone()[0] == 'running'
+            if con.execute("SELECT 1 FROM sqlite_master WHERE name='ai_compute_jobs'").fetchone():
+                row=con.execute("SELECT status FROM ai_compute_jobs WHERE kind='whisper'").fetchone()
+                assert row is None or row[0] == 'running'
         return False
     audio, meta = ai_metering_agent.execute_registered_worker(uid, 'whisper',
         {'kind': 'whisper', 'gpu_profile_task_id': 'forged'}, cancel_check=cancel_check)

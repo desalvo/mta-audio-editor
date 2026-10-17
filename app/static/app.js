@@ -5584,7 +5584,8 @@ async function aiAccountConnect(server,ace=false){
 async function openNativeRemoteWorkers(){
  try{
   const data=await api('/api/native/ai-workers/settings');
-  const labels={'whisper':'Whisper / Lyrics','chords-ml':'Chord analysis','demucs':'Demucs / stems','drumsep':'DrumSep','sam-audio':'SAM Audio','singer-separation':'Singer separation','backing-vocals':'Backing vocals'};
+  const labels={'whisper':'Whisper / Lyrics','chords-ml':'Chord analysis','demucs':'Demucs / stems','drumsep':'DrumSep','sam-audio':'SAM Audio','singer-separation':'Singer separation','backing-vocals':'Backing vocals','markers':'Structural markers'};
+  Object.keys(data.workers||{}).forEach(key=>{if(!labels[key]&&/^[a-z][a-z0-9-]{0,63}$/.test(key))labels[key]=key;});
   const rows=Object.entries(labels).map(([key,label])=>{const cfg=data.workers?.[key]||{};return `<div class="form-grid" style="border-bottom:1px solid var(--border,#8884);padding:8px"><strong>${label}</strong><label>Processing<select id="nativeRemoteMode-${key}"><option value="local" ${cfg.mode!=='remote'?'selected':''}>Local / Locale</option><option value="remote" ${cfg.mode==='remote'?'selected':''}>Remote / Remoto</option></select></label><input id="nativeRemoteUrl-${key}" type="hidden" value="${esc(cfg.url||'')}"><input id="nativeRemoteToken-${key}" type="hidden" value=""><button type="button" onclick="saveNativeRemoteWorker('${key}')">Save / Salva</button></div>`}).join('');
   showUtilityModal(tr('Native AI processing','Elaborazioni AI native'),`<div class="settings-form"><label>${tr('MTA server for all remote AI engines','Server MTA per tutti i motori AI remoti')}<input id="nativeSharedServer" type="url" placeholder="https://mta.example.org"></label><button onclick="aiAccountConnect(document.getElementById('nativeSharedServer').value.trim()).catch(e=>toast(e.message))">${tr('Connect account','Collega account')}</button><div id="nativeSharedAccountStatus"></div></div><p>Select the execution location for each model. In remote mode an unavailable server causes an error; models do not run locally as fallback.</p>${rows}<hr><h3>Pending remote AI requests / Richieste remote pendenti</h3><div id="nativeRemotePending">Loading...</div><button type="button" onclick="refreshNativePending()">Refresh pending / Aggiorna</button><hr><h3>Server request history / Storico richieste sul server</h3><div id="nativeRemoteHistory">Select a worker / Seleziona un worker</div><button type="button" onclick="refreshNativeRemoteHistory()">Discover on server / Cerca sul server</button><hr><h3>Recovered stem orphans / Stem orfani recuperati</h3><p>Review preserved files and quarantine or restore them without deleting data / Esamina i file conservati e gestisci la quarantena senza cancellazioni.</p><button type="button" onclick="refreshNativeStemOrphans()">Review orphan files / Esamina file orfani</button><div id="nativeStemOrphanInventory" role="status" aria-live="polite"></div>`);
   await refreshNativePending();
@@ -5708,7 +5709,7 @@ async function appendNativeRemoteHistory(kind,offset,section,generation){
 async function refreshNativeRemoteHistory(){
  const target=document.getElementById('nativeRemoteHistory');if(!target)return;
  const generation=++nativeRemoteHistoryGeneration;
- const kinds=['whisper','chords-ml','demucs','drumsep','sam-audio','singer-separation','backing-vocals'];
+ const kinds=['whisper','chords-ml','demucs','drumsep','sam-audio','singer-separation','backing-vocals','markers'];
  target.textContent='Discovering / Ricerca in corso...';
  const active=kinds.filter(kind=>document.getElementById(`nativeRemoteMode-${kind}`)?.value==='remote');
  if(!active.length){target.textContent='No remote workers selected / Nessun worker remoto selezionato';return;}

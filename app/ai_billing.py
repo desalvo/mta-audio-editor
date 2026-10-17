@@ -90,6 +90,12 @@ def _init(c):
         c.execute("UPDATE ai_compute_jobs SET billable=0 WHERE kind='accounting_validation'")
         c.commit()
 
+    columns={r[1] for r in c.execute('PRAGMA table_info(ai_compute_jobs)')}
+    if 'queue_job_id' not in columns:
+        try:c.execute('ALTER TABLE ai_compute_jobs ADD COLUMN queue_job_id TEXT')
+        except sqlite3.OperationalError as exc:
+            if 'duplicate column' not in str(exc).lower():raise
+
 
 def user_billing_enabled(user_id: int, *, _connection=None) -> bool:
     with (db() if _connection is None else _borrow_connection(_connection)) as c:
@@ -164,6 +170,8 @@ def create_job(user_id: int, kind: str, token_id=None, *, started_at=None, diagn
         hardware = suggested_prices()
         c.execute('INSERT INTO ai_compute_jobs(id,user_id,token_id,kind,status,started_at,billable) VALUES(?,?,?,?,?,?,?)',
                   (job_id,user_id,token_id,kind,'running',stamp,int(not diagnostic)))
+        from .ai_global_execution import current_job
+        c.execute('UPDATE ai_compute_jobs SET queue_job_id=? WHERE id=?',(current_job.get(),job_id))
         suggested = hardware['suggested_micro_per_unit']
         cpu_model, gpu_model = hardware['cpu_model'], hardware['gpu_model']
         c.execute('''INSERT INTO ai_job_hardware_snapshots
@@ -255,7 +263,7 @@ def finish_job(job_id, status, usage=None, *, source='unmetered', finished_at=No
     if status not in ('done','failed','cancelled'):
         raise ValueError('Invalid final job status')
     values = _validate_usage({} if usage is None else usage)
-    if source not in ('unmetered','worker','cgroup','gpu-agent','remote-worker'):
+    if source not in ('unmetered','worker','cgroup','gpu-agent','gpu-kernel-verified','remote-worker'):
         raise ValueError('Invalid metering source')
     if values and source == 'unmetered':
         raise ValueError('Resources require trusted metering source')
@@ -263,8 +271,11 @@ def finish_job(job_id, status, usage=None, *, source='unmetered', finished_at=No
     # fields are reserved for a separately authenticated GPU sensor; never
     # accept GPU-looking numbers from the ordinary subprocess collector.
     gpu_fields = {'gpu_seconds', 'gpu_energy_joules'}
-    if gpu_fields.intersection(values) and source != 'gpu-agent':
+    if gpu_fields.intersection(values) and source not in ('gpu-agent','gpu-kernel-verified'):
         raise ValueError('GPU measurements require trusted gpu-agent source')
+    if source=='gpu-kernel-verified':
+        from .ai_gpu_verified import require_evidence
+        require_evidence(job_id,values)
     if source == 'gpu-agent' and not gpu_fields.intersection(values):
         raise ValueError('GPU agent must provide an explicit GPU measurement')
     with db() as c:
@@ -707,12 +718,16 @@ def reconcile_period(user_id, start, end):
                 issue('invalid_usage', job_id=jid)
                 continue
             source = job['resource_source']
+            if source=='gpu-kernel-verified':
+                from .ai_gpu_verified import require_evidence
+                try:require_evidence(jid,usage)
+                except ValueError:issue('missing_gpu_evidence',job_id=jid)
             for resource in sorted(rated):
                 if resource not in usage:
                     issue('missing_priced_metric', job_id=jid, detail=resource)
-                elif resource == 'gpu_seconds' and source != 'gpu-agent':
+                elif resource == 'gpu_seconds' and source not in ('gpu-agent','gpu-kernel-verified'):
                     issue('untrusted_gpu_metric', job_id=jid)
-                elif resource == 'cpu_seconds' and source not in ('cgroup', 'worker', 'gpu-agent', 'remote-worker'):
+                elif resource == 'cpu_seconds' and source not in ('cgroup', 'worker', 'gpu-agent', 'gpu-kernel-verified', 'remote-worker'):
                     issue('untrusted_cpu_metric', job_id=jid)
         disk_paid = bool(c.execute(
             "SELECT 1 FROM ai_resource_price_history WHERE resource='disk_gb_hours' "
@@ -787,7 +802,7 @@ def close_period(user_id, start, end):
                                  (user_id,a,b)).fetchall()
             for job in cpu_jobs:
                 usage = json.loads(job['usage_json'])
-                if (job['resource_source'] not in ('cgroup', 'worker', 'gpu-agent', 'remote-worker') or
+                if (job['resource_source'] not in ('cgroup', 'worker', 'gpu-agent', 'gpu-kernel-verified', 'remote-worker') or
                     'cpu_seconds' not in usage):
                     raise ValueError('CPU tariff requires verified per-job CPU telemetry')
         # A CPU-only meter cannot certify that a GPU job consumed no GPU.
@@ -807,7 +822,10 @@ def close_period(user_id, start, end):
                                  (user_id,a,b)).fetchall()
             for job in gpu_jobs:
                 usage = json.loads(job['usage_json'])
-                if job['resource_source'] != 'gpu-agent' or any(resource not in usage for resource in priced_gpu):
+                if job['resource_source']=='gpu-kernel-verified':
+                    from .ai_gpu_verified import require_evidence
+                    require_evidence(job['id'],usage)
+                if job['resource_source'] not in ('gpu-agent','gpu-kernel-verified') or any(resource not in usage for resource in priced_gpu):
                     raise ValueError('GPU tariff requires verified per-job telemetry for every priced resource')
         # Storage is metered only where it has two bracketing observations.
         # Disabled sampling must never silently become a zero-cost invoice.
@@ -973,13 +991,16 @@ def finish_job_idempotent(job_id, status, usage=None, *, source='unmetered', fin
     if status not in ('done', 'failed', 'cancelled'):
         raise ValueError('Invalid final job status')
     values = _validate_usage({} if usage is None else usage)
-    if source not in ('unmetered', 'worker', 'cgroup', 'gpu-agent', 'remote-worker'):
+    if source not in ('unmetered', 'worker', 'cgroup', 'gpu-agent', 'gpu-kernel-verified', 'remote-worker'):
         raise ValueError('Invalid metering source')
     if values and source == 'unmetered':
         raise ValueError('Resources require trusted metering source')
     gpu_fields = {'gpu_seconds', 'gpu_energy_joules'}
-    if gpu_fields.intersection(values) and source != 'gpu-agent':
+    if gpu_fields.intersection(values) and source not in ('gpu-agent','gpu-kernel-verified'):
         raise ValueError('GPU measurements require trusted gpu-agent source')
+    if source=='gpu-kernel-verified':
+        from .ai_gpu_verified import require_evidence
+        require_evidence(job_id,values)
     if source == 'gpu-agent' and not gpu_fields.intersection(values):
         raise ValueError('GPU agent must provide an explicit GPU measurement')
     with db() as c:

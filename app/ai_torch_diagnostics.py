@@ -19,7 +19,8 @@ def enabled():
 
 
 def profile_call(folder: Path, task: str, call):
-    if not enabled():
+    from .ai_gpu_verified import readiness
+    if not enabled() and not readiness()['ready']:
         return call()
 
     previous = None
@@ -31,6 +32,10 @@ def profile_call(folder: Path, task: str, call):
         previous = None
 
     def publish(record):
+        evidence=record.pop('billing_evidence',None)
+        if evidence is not None:
+            from .ai_gpu_verified import append_report
+            append_report(folder,evidence,task)
         if previous is not None:
             # SAM singer invocations run sequentially in separate processes.
             # Sum their disjoint capture windows, never just report the last singer.

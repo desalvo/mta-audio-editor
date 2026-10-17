@@ -85,7 +85,8 @@ def infer(source: Path, model: Path, output: Path) -> list[Path]:
         data = resample_poly(data, SAMPLE_RATE//div, int(rate)//div, axis=0).astype('float32')
     original_length = len(data)
     if not original_length: raise ValueError('Empty drums WAV')
-    session = ort.InferenceSession(str(model), providers=['CPUExecutionProvider'])
+    providers=[p for p in ('MIGraphXExecutionProvider','ROCMExecutionProvider','CUDAExecutionProvider','CPUExecutionProvider') if p in ort.get_available_providers()]
+    session = ort.InferenceSession(str(model), providers=providers)
     input_names = {i.name for i in session.get_inputs()}
     output_names = {o.name for o in session.get_outputs()}
     if input_names != {'mix','mag'} or not {'time_out','freq_out'} <= output_names:
