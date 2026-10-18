@@ -448,8 +448,11 @@ def send_pending():
             row=dict(row);con.execute("UPDATE account_mail_outbox SET state='sending',lease=? WHERE id=?",(now,row['id']))
         try:
             from .version import APP_RELEASE
-            body='<html><body style="font:16px Arial;background:#edf2f8;padding:24px"><main style="background:white;max-width:640px;margin:auto;padding:28px"><img src="cid:mta-logo" width="64" height="64" alt="MTA"><h1>'+html.escape(row['subject'])+'</h1><p style="white-space:pre-wrap">'+html.escape(row['body'])+'</p><hr>MTA Audio Editor '+APP_RELEASE+'<br>'+html.escape(auth._base_url())+'</main></body></html>'
-            auth.send_mail([row['recipient']],row['subject'],row['body'],body,inline_image=(Path(__file__).parent/'static/mail-logo.png').read_bytes(),message_id='<mta-account-'+hashlib.sha256(row['id'].encode()).hexdigest()+'@mta.local>')
+            from .admin_navigation import action, outbox_action
+            target=outbox_action(row['id'],row.get('user_id'))
+            plain,link=action(row['body'],*target) if target else (row['body'],'')
+            body='<html><body style="font:16px Arial;background:#edf2f8;padding:24px"><main style="background:white;max-width:640px;margin:auto;padding:28px"><img src="cid:mta-logo" width="64" height="64" alt="MTA"><h1>'+html.escape(row['subject'])+'</h1><p style="white-space:pre-wrap">'+html.escape(row['body'])+'</p>'+link+'<hr>MTA Audio Editor '+APP_RELEASE+'<br>'+html.escape(auth._base_url())+'</main></body></html>'
+            auth.send_mail([row['recipient']],row['subject'],plain,body,inline_image=(Path(__file__).parent/'static/mail-logo.png').read_bytes(),message_id='<mta-account-'+hashlib.sha256(row['id'].encode()).hexdigest()+'@mta.local>')
             with auth.db() as con:con.execute("UPDATE account_mail_outbox SET state='sent',lease=NULL,body='' WHERE id=?",(row['id'],))
         except Exception:
             with auth.db() as con:con.execute("UPDATE account_mail_outbox SET state='pending',lease=?,attempts=attempts+1 WHERE id=?",(now+180,row['id']))

@@ -19,3 +19,5 @@
 #accountDeletePanel input[type=checkbox]{width:19px;height:19px;flex:none;accent-color:#249cf5}
 #accountDeletePanel label:has(>input[type=checkbox]){display:flex;align-items:center;gap:10px}
 #accountSandboxes{white-space:pre-wrap;overflow-wrap:anywhere}
+
+.admin-mail-target{outline:3px solid #f7bf65;outline-offset:-3px;background:#25384a}.admin-mail-target:focus{outline:3px solid #f7bf65}

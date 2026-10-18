@@ -379,7 +379,10 @@ def _notify_admins_registration(user, provider: str = "local") -> None:
     if not recipients:
         return
     source = provider if provider != "local" else "registrazione locale"
-    send_mail(recipients,"Nuovo utente in attesa · MTA Audio Editor",f"Nuovo utente {user['username']} ({user['email']}) tramite {source}. L'account richiede approvazione amministratore.")
+    from .admin_navigation import action, settings_target
+    plain=f"Nuovo utente {user['username']} ({user['email']}) tramite {source}. L'account richiede approvazione amministratore."
+    plain,link=action(plain,settings_target('pending',user['id']),'Apri richiesta di approvazione')
+    send_mail(recipients,"Nuovo utente in attesa · MTA Audio Editor",plain,'<p>'+html.escape(plain.split('\n\n',1)[0])+'</p>'+link)
 
 
 def register_user(username: str, email: str, display_name: str, password: str, base_url: str = "", *, require_second_factor: bool=False, mfa_method: str="email"):
@@ -1010,12 +1013,11 @@ def _notify_admins_activated(user) -> None:
     recipients=[x["email"] for x in admins]
     if not recipients:
         return
-    send_mail(
-        recipients,
-        "Utente attivato · MTA Audio Editor",
-        f"L'utente {user['username']} ({user['email']}) è stato attivato.",
-        f"<p>L'utente <b>{html.escape(user['username'])}</b> ({html.escape(user['email'])}) è stato attivato.</p>",
-    )
+    from .admin_navigation import action, settings_target
+    text=f"L'utente {user['username']} ({user['email']}) è stato attivato."
+    plain,link=action(text,settings_target('users',user['id']),'Apri gestione utente')
+    send_mail(recipients,"Utente attivato · MTA Audio Editor",plain,'<p>'+html.escape(text)+'</p>'+link)
+
 
 
 def update_user_admin(target_id: int, actor_id: int, *, active: bool | None = None, role: str | None = None, workspace_quota_bytes: int | None = None) -> dict[str, Any]:

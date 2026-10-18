@@ -37,6 +37,8 @@ async def submit(request: Request):
         if not user or not user['active'] or not user['email_confirmed'] or not user['totp_enabled'] or not auth._verify_totp(auth._open(user['totp_secret_enc']),code):
             return HTMLResponse('Codice non valido. <a href="/oauth-second-factor">Riprova</a>',status_code=401)
         con.execute('DELETE FROM social_totp_challenges WHERE hash=?',(key,))
-    session=auth.create_session(user['id'],request);response=RedirectResponse('/',303,headers={'Cache-Control':'no-store'})
+    from .admin_navigation import safe_next
+    session=auth.create_session(user['id'],request);response=RedirectResponse(safe_next(request.cookies.get('mta_login_next','/')),303,headers={'Cache-Control':'no-store'})
     response.set_cookie('mta_session',session,max_age=12*3600,httponly=True,secure=request.url.scheme=='https' or request.headers.get('x-forwarded-proto','').lower()=='https',samesite='lax',path='/')
+    response.delete_cookie('mta_login_next',path='/')
     response.delete_cookie('mta_social_totp',path='/oauth-second-factor');return response

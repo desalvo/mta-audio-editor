@@ -4,3 +4,9 @@ Repository: https://github.com/desalvo/mta-audio-editor
 
 Licensed under the European Union Public Licence (EUPL), version 1.2 only.
 SPDX-License-Identifier: EUPL-1.2
+
+Authentication provider marks
+Google, Facebook and GitHub marks in app/static/social identify their respective
+sign-in providers. They remain the property of their respective owners and are
+not relicensed under the application's EUPL licence. Source and branding links
+are recorded in docs/SSO_BRANDING_ADMIN_EMAIL_LINKS_R210.md.

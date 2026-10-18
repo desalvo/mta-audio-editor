@@ -541,7 +541,8 @@ def _media_job_public(job: dict) -> dict:
 
 def _is_public(path: str) -> bool:
     return (
-        path.startswith("/static/")
+        path in {"/privacy", "/privacy/it", "/privacy/en", "/terms", "/terms/it", "/terms/en"}
+        or path.startswith("/static/")
         or path in {"/health", "/api/health", "/api/about", "/oauth-second-factor", "/login", "/register", "/verify-email", "/resend-verification", "/forgot-password", "/reset-password"}
         or path.startswith("/oauth/")
         or path in {"/registration-availability","/registration-security","/login-email-code","/reactivate-account"}
@@ -584,7 +585,13 @@ async def security_middleware(request: Request, call_next):
     if not _is_public(request.url.path) and user is None and not model_bearer_ok and not ai_gateway_token_ok and not check_basic_auth(request):
         if request.url.path.startswith("/api/"):
             return auth_failure_response()
-        return RedirectResponse(url="/login", status_code=303)
+        from .admin_navigation import safe_next
+        from urllib.parse import quote
+        target=safe_next(request.url.path+('?' + request.url.query if request.url.query else ''))
+        response=RedirectResponse(url="/login"+('?next='+quote(target,safe='') if target!='/' else ''), status_code=303)
+        if target!='/':
+            response.set_cookie('mta_login_next',target,max_age=600,httponly=True,secure=request.url.scheme=='https' or request.headers.get('x-forwarded-proto','').lower()=='https',samesite='lax',path='/')
+        return response
 
     # API mutations must carry an explicit same-origin request marker.
     if request.url.path.startswith("/api/") and request.method not in {"GET", "HEAD", "OPTIONS"} and request.headers.get("x-mta-request") != "1" and not ai_gateway_token_ok:
@@ -684,10 +691,8 @@ def _project_archive_name(project: Project) -> str:
 
 
 def _social_buttons(mode: str) -> str:
-    providers=oauth_public_providers()
-    if not providers: return ""
-    links="".join(f'<a class="social-login social-{p["id"]}" href="/oauth/{p["id"]}/start">Continua con {p["label"]}</a>' for p in providers)
-    return f'<div class="social-auth"><div class="auth-divider"><span>oppure</span></div>{links}</div>'
+    from .social_ui import buttons
+    return buttons(oauth_public_providers())
 
 
 @app.get("/oauth/{provider}/start")
@@ -714,20 +719,26 @@ def oauth_callback(provider: str, request: Request, code: str="", state: str="",
         response.delete_cookie('mta_oauth_state',path=f'/oauth/{provider}/callback')
         return response
     if created or not user["active"]:
-        response=HTMLResponse(_template("message.html",title="Registrazione completata",message="La registrazione è stata completata. Se il provider non certifica l’indirizzo email (Facebook), confermalo tramite il link inviato via email. Il profilo resta disabilitato finché un amministratore non lo approva; quando verrà approvato riceverai automaticamente un'email di conferma.",extra=""))
+        from .social_ui import registration_notice
+        response=HTMLResponse(_template("message.html",**registration_notice(provider,user,created)))
     elif not user["email_confirmed"]:
         response=HTMLResponse(_template("message.html",title="Conferma email",message="Conferma il tuo indirizzo email prima di accedere.",extra=""))
     else:
-        token=create_session(user["id"],request);response=RedirectResponse("/",status_code=303);secure=request.url.scheme=="https" or request.headers.get("x-forwarded-proto","").lower()=="https";response.set_cookie("mta_session",token,max_age=12*3600,httponly=True,secure=secure,samesite="lax",path="/")
+        from .admin_navigation import safe_next
+        target=safe_next(request.cookies.get('mta_login_next','/'))
+        token=create_session(user["id"],request);response=RedirectResponse(target,status_code=303);secure=request.url.scheme=="https" or request.headers.get("x-forwarded-proto","").lower()=="https";response.set_cookie("mta_session",token,max_age=12*3600,httponly=True,secure=secure,samesite="lax",path="/")
+    response.delete_cookie('mta_login_next',path='/')
     response.delete_cookie("mta_oauth_state",path=f"/oauth/{provider}/callback");return response
 
 
 @app.get("/login", response_class=HTMLResponse)
 def login_page(request: Request):
-    target=request.query_params.get('next','/')
-    if not target.startswith('/ai-device?code=') or any(c in target for c in '\r\n'):target='/'
+    from .admin_navigation import safe_next
+    target=safe_next(request.query_params.get('next',request.cookies.get('mta_login_next','/')))
     if session_user(request):return RedirectResponse(target,status_code=303)
-    return _template("login.html",error="",social_buttons=_social_buttons("login")).replace('__NEXT__',html.escape(target,quote=True))
+    response=HTMLResponse(_template("login.html",error="",social_buttons=_social_buttons("login")).replace('__NEXT__',html.escape(target,quote=True)))
+    if target!='/':response.set_cookie('mta_login_next',target,max_age=600,httponly=True,secure=request.url.scheme=='https' or request.headers.get('x-forwarded-proto','').lower()=='https',samesite='lax',path='/')
+    return response
 
 
 @app.post("/login", response_class=HTMLResponse)
@@ -740,14 +751,15 @@ async def login_submit(request: Request):
     if not user:
         return HTMLResponse(_template("login.html", error=_alert(error), social_buttons=_social_buttons("login")).replace('__NEXT__',html.escape(str(form.get('next','/')),quote=True)), status_code=401)
     token = create_session(user["id"], request)
-    target=str(form.get('next','/'))
-    if not target.startswith('/ai-device?code=') or any(c in target for c in '\r\n'):target='/'
+    from .admin_navigation import safe_next
+    target=safe_next(str(form.get('next','/')))
     response = RedirectResponse(target, status_code=303)
     secure = request.url.scheme == "https" or request.headers.get("x-forwarded-proto", "").lower() == "https"
     response.set_cookie(
         "mta_session", token, max_age=12 * 3600, httponly=True, secure=secure,
         samesite="lax", path="/"
     )
+    response.delete_cookie('mta_login_next',path='/')
     return response
 
 
@@ -7780,3 +7792,7 @@ def configure_metronome_grid(pid: str, payload: dict, request: Request):
         save_project(original)
         raise
     return {**result, "grid_only": True}
+
+
+from .legal import register_routes as _legal_routes
+_legal_routes(app)

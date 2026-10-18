@@ -10,7 +10,9 @@ def test_regular_database_replacement_rejected(tmp_path):
     path = tmp_path / 'plans.db'
     q = SQLitePlanningQueue(path)
     q.submit('p', 'o', 'remix', {})
-    path.unlink()
+    # Retain the old inode so filesystems cannot immediately recycle its
+    # number for the replacement and accidentally make this test a no-op.
+    path.rename(tmp_path / 'original-plans.db')
     SQLitePlanningQueue(path)  # an otherwise valid replacement journal
     with pytest.raises(ValueError, match='replaced'):
         q.submit('p', 'o', 'remix', {})

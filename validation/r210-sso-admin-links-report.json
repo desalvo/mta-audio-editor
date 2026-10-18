@@ -1,0 +1,36 @@
+{
+  "release": "0.3.0-r210",
+  "tests": {
+    "full": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "5",
+      "tests": "3784",
+      "time": "287.099",
+      "timestamp": "2026-10-18T03:12:42.612374+02:00",
+      "hostname": "32da5d57e07d"
+    },
+    "targeted": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "97",
+      "time": "12.282",
+      "timestamp": "2026-10-18T03:12:22.081024+02:00",
+      "hostname": "32da5d57e07d"
+    }
+  },
+  "ruff": "passed",
+  "javascript_syntax": "passed",
+  "render": "branded buttons rendered with WeasyPrint and visually inspected",
+  "real_provider_test": "requires updated server; OAuth network calls mocked in regression",
+  "server_deployment": "not performed",
+  "no_git_actions": true,
+  "uncommitted_since_user_confirmation": [
+    "bilingual legal pages",
+    "SSO branding and provider-aware notice",
+    "safe contextual administrative email links"
+  ]
+}

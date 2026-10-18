@@ -1,0 +1,44 @@
+{
+  "release": "0.3.0-r210",
+  "baseline_files_retained": 1721,
+  "tests": {
+    "full": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "5",
+      "tests": "3743",
+      "time": "266.932",
+      "timestamp": "2026-10-18T02:57:15.680728+02:00",
+      "hostname": "32da5d57e07d"
+    },
+    "targeted": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "22",
+      "time": "4.033",
+      "timestamp": "2026-10-18T02:54:51.962202+02:00",
+      "hostname": "32da5d57e07d"
+    }
+  },
+  "coverage": {
+    "version": "7.16.2",
+    "timestamp": "1792285298427",
+    "lines-valid": "23845",
+    "lines-covered": "18847",
+    "line-rate": "0.7904",
+    "branches-valid": "8848",
+    "branches-covered": "6042",
+    "branch-rate": "0.6829",
+    "complexity": "0"
+  },
+  "ruff": "passed",
+  "javascript_syntax": "passed",
+  "print_qa": "passed",
+  "browser_visual_qa": "not run: Chromium unavailable",
+  "hardware_or_public_server_deployment": "not performed",
+  "legal_instance_review": "required: controller, locations, recipients, transfers and retention not supplied",
+  "first_full_attempt": "one intermittent pre-existing inode-reuse test failure, passed alone; test now retains original inode while exercising replacement. Planning application code unchanged."
+}

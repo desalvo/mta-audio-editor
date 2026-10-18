@@ -1,0 +1,37 @@
+{
+  "baseline": "MTA-r210-universal-ai-queue-resource-metrics-cumulative.zip",
+  "baseline_sha256": "6db34755cfb5cfda330fa1b34141f52f870643823fa2d578d8f80dea12471c73",
+  "baseline_files": 1721,
+  "missing": [],
+  "changed": [
+    {
+      "path": "app/main.py",
+      "sha256": "37f593ba23200449e9ff86579ca449c8a5f95b2e5536e810f51031e2b1df3142"
+    },
+    {
+      "path": "app/static/admin.js",
+      "sha256": "b8c847569c0e45ff7dbc612e27341a2cf03c2257f5fcb6a45c400350eeca07d3"
+    },
+    {
+      "path": "app/static/auth.css",
+      "sha256": "8177112d39709c5be6a0f541cad8a9f8d721aa472c4eefe4a6ecc00b4d76c4ee"
+    },
+    {
+      "path": "app/templates/admin.html",
+      "sha256": "a18587f3c588cc42a35094051932a8f607942e5df7a4e700661338c24190aa38"
+    },
+    {
+      "path": "app/templates/login.html",
+      "sha256": "59073168cc3f4658e7f3fb44f5606bbff476bad9cfc5af5a6fa0cc6c90fceab1"
+    },
+    {
+      "path": "app/templates/register.html",
+      "sha256": "1c8db81c26097c6ab3feafc511b2880df4a1e146818bf9626e91371e2bde7a6c"
+    },
+    {
+      "path": "tests/test_r208_planning_full_capacity_audit.py",
+      "sha256": "24b76bcd98ae523c4073f84ce2c5b07dc6b3c4eb3adb2cd51d94c4c530007638"
+    }
+  ],
+  "regression_note": "The existing inode replacement test retains the original inode during replacement to prevent filesystem inode-number recycling. Application planning code is unchanged."
+}

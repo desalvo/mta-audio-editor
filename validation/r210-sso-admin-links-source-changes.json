@@ -1,0 +1,64 @@
+{
+  "baseline": "MTA-r210-privacy-terms-cumulative.zip",
+  "baseline_sha256": "afdb3a89884127ea9e34015431bf5ffaa9ab149fee2e3d04ac45637f35738113",
+  "retained_files": 1738,
+  "removed": [],
+  "changed": [
+    {
+      "path": "NOTICE",
+      "sha256": "245c949b58a9e28d69334982dcc75312b7385c3669ee7a2b29aa0271477eca42"
+    },
+    {
+      "path": "app/account_lifecycle.py",
+      "sha256": "f0647bbb05bef126741e78d69bdf3557da585da0782dcff1dda7df4c537aadf4"
+    },
+    {
+      "path": "app/auth.py",
+      "sha256": "7c44ac21177dbd8def00a0ab44e9c52d360eb2148e6684f73ba5beab9e78485e"
+    },
+    {
+      "path": "app/docs/legal/privacy-en.html",
+      "sha256": "e48341e142e3d0a0b01a85d810d0aa08bcc461ddad529cc779c7727d292a1e59"
+    },
+    {
+      "path": "app/docs/legal/privacy-it.html",
+      "sha256": "05515b31e7112a118431cd32078f6ebcdf8b548367a2437926aa0d386515da62"
+    },
+    {
+      "path": "app/main.py",
+      "sha256": "3fa692dbdb2bb46a64bec567f55ce8999c5177096817b8aafbd495e665142ac6"
+    },
+    {
+      "path": "app/social_totp.py",
+      "sha256": "35c23d4b3b880e627bb2c10d29e8c37c5db8ae3d9ff7f7a06804f523ee7e651e"
+    },
+    {
+      "path": "app/static/account_lifecycle.js",
+      "sha256": "bb5fbb3b5e7bc6d6d3ed0b4fc04c48b832df56e497b3dbc6daa0e717447e194e"
+    },
+    {
+      "path": "app/static/admin.js",
+      "sha256": "9f6da289f355dc968cb862e4c75fedc33a5c2ab02aa81ef1242536f3dbf32195"
+    },
+    {
+      "path": "app/static/admin_controls.css",
+      "sha256": "3ef66fdbff9bbea4aeca24d200ddd6ac900997386d8a777b786f457813b73e6a"
+    },
+    {
+      "path": "app/static/auth.css",
+      "sha256": "9ea1ffe7ee26ad95599f05117652b62cfaabd45a0f0666281b4c077663d8cfe0"
+    },
+    {
+      "path": "app/templates/admin.html",
+      "sha256": "25a7cc5bb8023b08379d2d31c8d0262a6cef45ccd914ff43a95cf35ba2d8a4a9"
+    },
+    {
+      "path": "app/templates/login.html",
+      "sha256": "8b56aefdeaecc9ac42294fa11815c22cf3feeeeb8ad570714f27d97dc204ed43"
+    },
+    {
+      "path": "app/templates/register.html",
+      "sha256": "01ceb2b32e9f9b46c3ea3aa9eda0a19b4234c5b717b0720f88470c29547b1f76"
+    }
+  ]
+}

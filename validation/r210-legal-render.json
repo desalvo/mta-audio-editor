@@ -1,0 +1,22 @@
+{
+  "documents": [
+    "privacy-it",
+    "privacy-en",
+    "terms-it",
+    "terms-en"
+  ],
+  "render_engine": "WeasyPrint 70.0",
+  "print_pages": {
+    "privacy-it": 8,
+    "privacy-en": 7,
+    "terms-it": 6,
+    "terms-en": 6
+  },
+  "text_overflow": false,
+  "browser_visual_test": "not run: Chromium unavailable",
+  "manual_inspection": [
+    "privacy-it first page",
+    "terms-en first page"
+  ],
+  "external_fonts_or_assets_added": false
+}
