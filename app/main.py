@@ -421,13 +421,18 @@ def _media_job_update(job_id: str, **changes) -> None:
             job["updated_at"] = time.time()
 
 
-def _enqueue_existing_ai_job(job: dict, work, *, durable_payload=None):
+def _enqueue_existing_ai_job(job: dict, work, *, durable_payload=None, actor_user_id=None):
     """Admit legacy AI work to the shared SQLite FIFO queue.
 
     Lyrics/chords requests carry a versioned, reconstructible payload. Other
     legacy callables remain intentionally non-replayable until their side
     effects can be made crash-safe.
     """
+    if actor_user_id is None:
+        from .ai_job_context import actor
+        actor_user_id = actor.get()
+    if type(actor_user_id) is int and actor_user_id > 0:
+        durable_payload = {**(durable_payload or {}), 'actor_user_id': actor_user_id}
     jid = job["id"]
     project = job.get("project_id") or "server-models"
     def run(_progress_path, stop=None):
@@ -605,12 +610,25 @@ async def security_middleware(request: Request, call_next):
     content_length = request.headers.get("content-length")
     if content_length:
         try:
-            if int(content_length) > MAX_UPLOAD_BYTES + 1024 * 1024:
+            upload_limit = MAX_UPLOAD_BYTES + 1024 * 1024
+            if request.url.path == '/api/admin/application-dump/restore-preview' and user is not None and dict(user).get('role') == 'admin':
+                from .admin_dump import limit as dump_limit
+                upload_limit = dump_limit() + 1024 * 1024
+            if int(content_length) > upload_limit:
                 return HTMLResponse("Request too large", status_code=413)
         except ValueError:
             return HTMLResponse("Invalid Content-Length", status_code=400)
 
-    response = await call_next(request)
+    from . import admin_dump
+    dump_health_probe = request.url.path in ('/health','/api/health')
+    if not dump_health_probe and not admin_dump.enter_request():
+        return HTMLResponse('Snapshot amministrativo in corso; riprova tra poco.', status_code=503, headers={'Retry-After':'5'})
+    try:
+        response = await call_next(request)
+    finally:
+        if not dump_health_probe:
+            admin_dump.leave_request()
+
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["Referrer-Policy"] = "no-referrer"
@@ -2942,7 +2960,7 @@ def _track_import_worker(
                 _media_job_update(job_id, progress=60 + int(max(0, min(100, value)) * 0.28), message=message)
             try:
                 bpm, signature = estimate_bpm_and_signature(dst, bpm_progress)
-                estimated_tempo = (float(round(bpm)), signature)
+                estimated_tempo = (float(round(bpm, 2)), signature)
             except Exception:
                 _media_job_update(job_id, progress=87, message="Stima BPM non conclusiva; mantengo il BPM corrente")
         _media_job_update(job_id, progress=88, message="Generazione waveform")
@@ -3350,7 +3368,7 @@ def _start_text_music_job(pid: str, track_id: str, request: Request, kind: str, 
     }
     _enqueue_existing_ai_job(job, lambda: _text_music_worker(
         job_id, pid, track_id, kind, model_or_engine, advanced_alignment,
-        chord_options, range_start_ms, range_end_ms), durable_payload=payload)
+        chord_options, range_start_ms, range_end_ms), durable_payload=payload, actor_user_id=int(_actor(request)["id"]))
     return _media_job_public(job)
 
 
@@ -4705,7 +4723,7 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
                 from .ai_project_lock import project_publication_lock
                 with project_publication_lock(project_id):
                     project_for_bpm = load_project(project_id)
-                    project_for_bpm.bpm = float(round(estimated_bpm))
+                    project_for_bpm.bpm = float(round(estimated_bpm, 2))
                     project_for_bpm.time_signature = estimated_signature
                     project_for_bpm.base_bpm = project_for_bpm.bpm
                     save_project(project_for_bpm)
@@ -5275,12 +5293,12 @@ for _download_kind in ("lyrics", "chords"):
 
 
 def _start_ai_model_download_job(kind: str, model_id: str, request: Request):
-    _actor(request)
+    actor = _actor(request)
     now=time.time();job_id=uuid.uuid4().hex[:16]
     job={"id":job_id,"kind":f"download-{kind}-model","project_id":None,"status":"queued","progress":3,"message":"Download modello in coda","created_at":now,"updated_at":now,"result":None,"error":None,"cancel_event":threading.Event()}
     with MEDIA_JOB_LOCK: MEDIA_JOBS[job_id]=job
     _enqueue_existing_ai_job(job, lambda: _ai_model_download_worker(job_id,kind,model_id),
-        durable_payload={"schema_version":1,"kind":kind,"model_id":model_id})
+        durable_payload={"schema_version":1,"kind":kind,"model_id":model_id}, actor_user_id=actor.get("id"))
     return _media_job_public(job)
 
 
@@ -5619,7 +5637,7 @@ async def stem_job_start(
     with STEM_JOB_LOCK:
         STEM_JOBS[job_id] = job
     _enqueue_existing_ai_job(job, lambda: _stem_split_worker(job_id, source, keep_original_track),
-        durable_payload=_stem_durable_payload(job, source, keep_original_track))
+        durable_payload=_stem_durable_payload(job, source, keep_original_track), actor_user_id=int(_actor(request)["id"]))
     return {"job": _stem_job_public(job), "project": project}
 
 
@@ -5831,7 +5849,7 @@ def start_track_stem_job(
     with STEM_JOB_LOCK:
         STEM_JOBS[job_id] = job
     _enqueue_existing_ai_job(job, lambda: _stem_split_worker(job_id, source, True),
-        durable_payload=_stem_durable_payload(job, source, True))
+        durable_payload=_stem_durable_payload(job, source, True), actor_user_id=int(_actor(request)["id"]))
     return _stem_job_public(job)
 
 
@@ -5952,7 +5970,7 @@ def _create_metronome_track_locked(pid: str, request: Request, mode: str = "fixe
             boundaries = [0] + sorted({int(m.time_ms) for m in project.markers if not m.disabled and not m.deleted and 0 < m.time_ms < duration_ms}) + [duration_ms]
             zone_bpms = dict(project.metronome_zone_bpms or {})
             keyed_boundaries = _metronome_zone_boundaries(project, duration_ms)
-            if reference_track is not None:
+            if reference_track is not None and project.metronome_bpm is None:
                 with tempfile.TemporaryDirectory() as td:
                     rendered = Path(td) / "reference.wav"
                     render_track(reference_track, audio_path(pid, reference_track.filename), rendered, sample_rate=int(project.sample_rate))
@@ -5995,7 +6013,7 @@ def _create_metronome_track_locked(pid: str, request: Request, mode: str = "fixe
             if not bpms or not beat_times_ms:
                 raise ValueError("tempo non rilevabile dalla traccia di riferimento")
             ref_bpm = bpms[len(bpms)//2]
-            project.bpm = round(ref_bpm, 1)
+            project.bpm = round(ref_bpm, 2)
             project.base_bpm = project.bpm
             interval_ms = 60000.0 / max(1.0, project.bpm)
             seed = float(beat_times_ms[0])
@@ -6124,7 +6142,7 @@ def _update_metronome_zone_locked(pid: str, request: Request, time_ms: int, trac
     if track_id and reference is None:
         raise HTTPException(400, "Selezionare una traccia audio di riferimento valida")
     bpm = float(manual_bpm if manual_bpm is not None else grid_bpm)
-    if manual_bpm is None and reference is not None and end-start >= 1800:
+    if manual_bpm is None and project.metronome_bpm is None and reference is not None and end-start >= 1800:
         try:
             with tempfile.TemporaryDirectory() as td:
                 rendered=Path(td)/"source.wav"; excerpt=Path(td)/"zone.wav"
@@ -6183,7 +6201,7 @@ def _update_metronome_zone_locked(pid: str, request: Request, time_ms: int, trac
         with temp.open('rb') as fd:os.fsync(fd.fileno())
         os.replace(temp,original)
         project.metronome_zone_signatures[str(start)] = signature
-        project.metronome_zone_bpms[str(start)] = round(float(bpm),1)
+        project.metronome_zone_bpms[str(start)] = round(float(bpm),2)
         if reference is not None:
             project.metronome_reference_track_id=reference.id
             project.metronome_reference_track_name=reference.name
@@ -6471,7 +6489,7 @@ def estimate_track_bpm(pid: str, track_id: str, request: Request, time_signature
                     candidates.add(value)
                 bpm = min(candidates, key=lambda candidate: abs(candidate - reference_bpm))
             signature = preferred
-        bpm = float(round(bpm))
+        bpm = float(round(bpm, 2))
     except (ValueError, RuntimeError) as exc:
         raise HTTPException(422, f"Impossibile stimare i BPM: {exc}") from exc
     with project_publication_lock(pid):
@@ -7796,3 +7814,7 @@ def configure_metronome_grid(pid: str, payload: dict, request: Request):
 
 from .legal import register_routes as _legal_routes
 _legal_routes(app)
+
+
+from .admin_dump_routes import register_routes as _register_dump_routes
+_register_dump_routes(app)

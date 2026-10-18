@@ -1037,16 +1037,17 @@ def update_user_admin(target_id: int, actor_id: int, *, active: bool | None = No
         raise ValueError("Non puoi disattivare il tuo account amministratore.")
     if target_id == actor_id and role == "user":
         raise ValueError("Non puoi rimuovere il ruolo admin dal tuo stesso account.")
-    if (active is False or role == "user") and row["role"] == "admin" and row["active"]:
-        with db() as con:
-            active_admins = con.execute(
-                "SELECT COUNT(*) FROM users WHERE role='admin' AND active=1 AND email_confirmed=1"
-            ).fetchone()[0]
-        if active_admins <= 1:
-            raise ValueError("Deve rimanere almeno un amministratore attivo.")
     ts = now_ts()
     became_active = active is True and not bool(row["active"])
     with db() as con:
+        con.execute('BEGIN IMMEDIATE')
+        current = con.execute('SELECT role FROM users WHERE id=?', (target_id,)).fetchone()
+        if current and current['role'] == 'admin' and (active is False or role == 'user'):
+            raise ValueError('Gli amministratori non possono essere disabilitati o privati del ruolo admin.')
+        if current and (role == 'admin' or active is True) and con.execute("SELECT 1 FROM sqlite_master WHERE name='account_lifecycle'").fetchone():
+            state = con.execute('SELECT state FROM account_lifecycle WHERE user_id=?', (target_id,)).fetchone()
+            if state and state[0] in ('erasing', 'deleting', 'deleted', 'expired'):
+                raise ValueError('Riattivare prima l’account')
         if role is not None:
             con.execute("UPDATE users SET role=?, updated_at=? WHERE id=?", (role, ts, target_id))
         if workspace_quota_bytes is not None:

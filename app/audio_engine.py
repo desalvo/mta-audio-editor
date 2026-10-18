@@ -291,8 +291,8 @@ def generate_metronome_wav(project: Project, out: Path, beats_per_bar: int | Non
     # BPM is the audible pulse/subdivision rate. A meter change must never
     # multiply the playback speed merely because the denominator changes.
     beat_seconds = 60.0 / float(project.bpm)
-    beat_samples = max(1, round(beat_seconds * sample_rate))
-    click_len = min(max(1, round(0.045 * sample_rate)), beat_samples)
+    beat_samples = max(1.0, beat_seconds * sample_rate)
+    click_len = min(max(1, round(0.045 * sample_rate)), int(beat_samples))
     silence_chunk = b"\x00\x00" * 8192
 
     def click_bytes(freq: float) -> bytes:
@@ -343,7 +343,7 @@ def generate_metronome_wav(project: Project, out: Path, beats_per_bar: int | Non
             handle.writeframesraw(click[: samples_to_write * 2])
             cursor += samples_to_write
             beat_index += 1
-            next_beat = origin + beat_index * beat_samples
+            next_beat = origin + round(beat_index * beat_samples)
         handle.writeframes(b"")
     return duration_ms
 
@@ -842,8 +842,8 @@ def estimate_bpm_and_signature(path: Path, progress=None, preferred_signature: s
         lag = max(1, int(round(hz * 60.0 / bpm)))
     signature = _estimate_meter(onset, hz, lag, preferred_signature or "")
     if progress:
-        progress(90, f"BPM stimati: {bpm:.1f} · tempo {signature}")
-    return round(float(bpm), 1), signature
+        progress(90, f"BPM stimati: {bpm:.2f} · tempo {signature}")
+    return round(float(bpm), 2), signature
 
 
 def estimate_bpm(path: Path, progress=None, preferred_signature: str = "4/4") -> float:

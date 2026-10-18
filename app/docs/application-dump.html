@@ -1,0 +1,64 @@
+<!doctype html><html lang="it"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>MTA · Dump e ripristino</title><style>body{font:16px/1.6 system-ui;max-width:960px;margin:2em auto;padding:1em;color:#17304b}pre{font:inherit;white-space:pre-wrap;overflow-wrap:anywhere}</style><a href="/settings?tab=web">Torna alle impostazioni</a><pre># Dump globale e ripristino — 0.3.0-r210
+
+## Creazione dal server
+
+Da **Impostazioni → Web App → Dump globale e ripristino**, scegli tutti gli utenti/progetti oppure cerca e seleziona singole voci. La selezione rimane cambiando la ricerca. Un utente selezionato include automaticamente tutti i suoi progetti; un progetto selezionato include il proprietario, senza aggiungere automaticamente gli altri suoi progetti. Gli account amministratori sono sempre inclusi per consentire l’accesso dopo un ripristino. Le condivisioni verso utenti non inclusi vengono rimosse dalla copia esportata.
+
+Senza utenti o progetti selezionati il dump comprende configurazione applicativa e amministratori, non i dati degli altri utenti. Le scelte sono ricontrollate dal backend, non soltanto dall’interfaccia. Durante la creazione il server attende la fine delle richieste in corso e restituisce temporaneamente HTTP 503 alle nuove richieste; nessun job AI può essere attivo o in coda. Dopo il download riprende automaticamente il servizio normale.
+
+Il dump comprende database centrale (account, password hash, MFA, token AI, prezzi, report, fatture/accounting e impostazioni), chiave applicativa, cronologia dei soli utenti inclusi, relativi outbox di billing/pubblicazione, progetti con media originali, archivi utenti e sandbox pertinenti, risultati AI non scaduti identificabili e chiave/policy della misura GPU, flag diagnostica e catalogo/blacklist dei modelli quando presenti. Sessioni e challenge di autenticazione sono eliminati dalla copia: occorre accedere nuovamente dopo il ripristino. I trigger applicativi dell’accounting sono ricreati dallo schema installato al primo utilizzo, evitando l’importazione di SQL eseguibile dall’archivio.
+
+I modelli AI installati, ambienti Python, pacchetti software e cache ricreabili non sono inclusi: si reinstallano con gli installer dell’applicazione. Il sistema operativo e la configurazione di systemd/proxy/SMTP esterna ai dati applicativi richiedono un backup a parte. I valori `MTA_*` del processo sono inclusi come riferimento riservato, mai eseguiti automaticamente. Il manifest specifica release, selezioni, dimensioni e SHA-256 per ogni file.
+
+**Il file contiene credenziali e dati personali.** È accessibile solo agli admin, non è pubblicato su un URL persistente e la copia temporanea server viene eliminata al termine del trasferimento. Il browser può richiedere RAM per scaricare file grandi. Conservare e proteggere i backup scaricati separatamente; la cancellazione definitiva nell’app non può eliminare copie già esportate.
+
+Limite predefinito: 100 GiB non compressi / 200.000 file; `MTA_ADMIN_DUMP_MAX_BYTES` consente di impostare il budget fino a 1 TiB. Servono spazio libero per gli snapshot SQLite, ZIP e staging. I dump selettivi sono snapshot autonomi del sottoinsieme, non pacchetti da fondere in un database esistente.
+
+## Verifica e ripristino
+
+Nella stessa pagina, **Verifica archivio per ripristino** controlla ZIP, percorsi, selezione, dimensioni, release e SHA-256 senza modificare alcun dato operativo. Il ripristino effettivo aggiunge controlli d’integrità SQLite, chiave, account admin attivo e identità dei progetti.
+
+Il ripristino avviene **a servizio fermo, su directory vuote e separate**. Questa modalità impedisce di sovrascrivere, disabilitare o cancellare admin esistenti. Non esiste un ripristino distruttivo dal browser né una fusione automatica di ID/utenti di due server. Per una migrazione, installare prima lo stesso software 0.3.0-r210; poi fermarlo prima di introdurre dati.
+
+Esempio per il pacchetto RPM/DEB server, adattando i percorsi e il proprietario al proprio servizio:
+
+```bash
+sudo systemctl stop mta-server.service
+cd /usr/lib/mta-audio-editor-server
+sudo /opt/mta/server-venv/bin/python -m app.restore_dump /percorso/backup.zip \
+  --data-dir /var/lib/mta/restored/projects \
+  --queue-dir /var/lib/mta/restored/ai-jobs \
+  --gpu-dir /var/lib/mta/restored/gpu-billing \
+  --service-stopped
+```
+
+Nel checkout sorgente è disponibile anche `python scripts/restore_application_dump.py` con gli stessi argomenti. `--service-stopped` è un’attestazione dell’operatore: non arresta il servizio. Non avviare più istanze che scrivano sui dati durante il ripristino.
+
+Prima della pubblicazione, il comando estrae in staging privato, verifica ogni file e tutti i database e rifiuta percorsi non sicuri, link, entry duplicate anche per maiuscole/minuscole, ZIP incompleti o alterati, schema SQLite eseguibile non supportato, assenza di admin attivi e directory di destinazione occupate/sovrapposte. Un errore ordinario durante la pubblicazione rimuove le destinazioni già pubblicate dal comando; un’interruzione di alimentazione richiede di controllare e ripulire le nuove directory prima di riprovare. I dati operativi precedenti non vengono toccati.
+
+Dopo il successo, imposta in `/etc/mta/mta.env`:
+
+```text
+MTA_DATA_DIR=/var/lib/mta/restored/projects
+MTA_AI_JOB_STATE_DIR=/var/lib/mta/restored/ai-jobs
+MTA_GPU_BILLING_ROOT=/var/lib/mta/restored/gpu-billing
+MTA_AI_RESULT_CACHE_DIR=/var/lib/mta/restored/projects/.ai-result-cache
+MTA_DIAGNOSTIC_DIR=/var/lib/mta/restored/projects/.diagnostics
+MTA_DEMUCS_MODEL_BLACKLIST_FILE=/var/lib/mta/restored/projects/.model-settings/blacklist.json
+MTA_DEMUCS_MODEL_CATALOG_FILE=/var/lib/mta/restored/projects/.model-settings/catalog.json
+```
+
+Consulta `projects/.restore-reference/operator-environment.json` per riportare **manualmente e dopo verifica** gli altri parametri, percorsi di runtime/modelli e segreti eventualmente esterni. Non eseguire il JSON e non ripristinare ciecamente percorsi del vecchio host. Controlla proprietà e permessi per l’utente effettivo del servizio, poi avvialo. La calibrazione GPU è riutilizzabile solo se supera ancora tutte le verifiche previste per hardware, stack, scadenza e implementazione: il ripristino non certifica nuove misure.
+
+```bash
+sudo systemctl start mta-server.service
+```
+
+Verificare login admin e MFA, impostazioni SMTP/SSO, report e prezzi, apertura/riproduzione e salvataggio dei progetti, download degli archivi e una nuova inferenza misurata. Su LXC rimangono necessarie le autorizzazioni GPU, la delega cgroup e l’eventuale socket agente host: non sono contenuti nel dump.
+
+## Cancellazione definitiva e backup
+
+Il pulsante rosso in **Utenti → Archivi utenti cancellati** elimina immediatamente anche prima del grace period, con una sola conferma, archivi, sandbox, progetti e record collegati di billing/accounting. Non crea nuove sandbox. Tutti gli admin sono protetti da disabilitazione, declassamento ed eliminazione.
+
+Le copie già scaricate, i log esterni e le email già consegnate restano responsabilità del gestore. Per vecchie versioni che avevano già reso anonima l’associazione di alias storici, i digest non riconducibili all’utente non possono essere identificati automaticamente; i digest delle identità note dell’archivio vengono invece rimossi.
+</pre></html>

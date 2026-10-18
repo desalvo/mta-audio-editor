@@ -31,27 +31,34 @@ def query(search='', state='', visibility='visible', *, page=1, page_size=20, id
     if type(page) is not int or page<1 or type(page_size) is not int or not 10<=page_size<=100:
         raise ValueError('Pagina non valida; da 10 a 100 righe per pagina')
     states=dispositions()
+    with auth.db() as users_db:
+        users = [tuple(r) for r in users_db.execute('SELECT id,username,display_name,email FROM users')]
+        attributed = [tuple(r) for r in users_db.execute('SELECT queue_job_id,min(user_id) FROM ai_compute_jobs WHERE queue_job_id IS NOT NULL GROUP BY queue_job_id HAVING count(DISTINCT user_id)=1')]
     with queue._db() as con:
         queue._recover_dead_runners(con)
         con.execute('CREATE TEMP TABLE dispositions(job_id TEXT PRIMARY KEY, disposition TEXT)')
         con.executemany('INSERT INTO dispositions VALUES(?,?)', states.items())
+        con.execute('CREATE TEMP TABLE actors(id INTEGER PRIMARY KEY, username TEXT, display_name TEXT, email TEXT)')
+        con.executemany('INSERT INTO actors VALUES(?,?,?,?)', users)
+        con.execute('CREATE TEMP TABLE attribution(job_id TEXT PRIMARY KEY,user_id INTEGER)')
+        con.executemany('INSERT INTO attribution VALUES(?,?)', attributed)
         where=['1=1']; args=[]
         if visibility=='visible':where.append("coalesce(d.disposition,'')!='deleted'")
         elif visibility!='all':where.append('d.disposition=?');args.append(visibility)
         if state:where.append('j.state=?');args.append(state)
         if search:
-            where.append("(j.job_id LIKE ? ESCAPE '\\' OR j.project_id LIKE ? ESCAPE '\\' OR j.operation LIKE ? ESCAPE '\\' OR j.state LIKE ? ESCAPE '\\' OR cast(j.actor_user_id AS TEXT) LIKE ? ESCAPE '\\')")
-            term='%'+search.replace('\\','\\\\').replace('%','\\%').replace('_','\\_')+'%';args.extend([term]*5)
+            where.append("(j.job_id LIKE ? ESCAPE '\\' OR j.project_id LIKE ? ESCAPE '\\' OR j.operation LIKE ? ESCAPE '\\' OR j.state LIKE ? ESCAPE '\\' OR cast(coalesce(j.actor_user_id,t.user_id) AS TEXT) LIKE ? ESCAPE '\\' OR a.username LIKE ? ESCAPE '\\' OR a.display_name LIKE ? ESCAPE '\\' OR a.email LIKE ? ESCAPE '\\')")
+            term='%'+search.replace('\\','\\\\').replace('%','\\%').replace('_','\\_')+'%';args.extend([term]*8)
         if ids is not None:
             if not ids:return {'jobs':[], 'total':0,'page':1,'page_size':page_size,'pages':1}
             where.append('j.job_id IN ('+','.join('?' for _ in ids)+')');args.extend(ids)
-        sql=' FROM jobs j LEFT JOIN dispositions d ON j.job_id=d.job_id WHERE '+' AND '.join(where)
+        sql=' FROM jobs j LEFT JOIN attribution t ON t.job_id=j.job_id LEFT JOIN actors a ON a.id=coalesce(j.actor_user_id,t.user_id) LEFT JOIN dispositions d ON j.job_id=d.job_id WHERE '+' AND '.join(where)
         total=con.execute('SELECT count(*)'+sql,args).fetchone()[0]
         pages=max(1,(total+page_size-1)//page_size);page=min(page,pages)
         rows=con.execute("SELECT j.*,coalesce(d.disposition,'enabled') disposition"+sql+' ORDER BY j.created_at DESC,j.job_id LIMIT ? OFFSET ?',(*args,page_size,(page-1)*page_size)).fetchall()
         jobs=[]
         for row in rows:
-            value=queue._with_live_progress(queue._public(con,row));value['disposition']=row['disposition'];value['actor_user_id']=row['actor_user_id'];jobs.append(value)
+            value=queue._with_live_progress(queue._public(con,row));value['disposition']=row['disposition'];jobs.append(value)
         return {'jobs':jobs,'total':total,'page':page,'page_size':page_size,'pages':pages}
 
 

@@ -89,37 +89,29 @@ def test_reactivation_requires_email_then_admin_and_does_not_restore_old_tokens(
     assert life.listings()['archives'][0]['url'] is None
 
 
-def test_total_privacy_delete_requires_two_bound_confirmations_and_expires_sandbox(env):
+def test_total_delete_one_confirmation_removes_account_and_accounting(env):
     admin,uid=env
     with auth.db() as con:
         billing._init(con);con.execute("INSERT INTO ai_compute_jobs(id,user_id,kind,status,started_at) VALUES('ledger',?,'stems','done',1)",(uid,))
         con.execute('CREATE TABLE future_meter(id INTEGER PRIMARY KEY,job_id TEXT,secret TEXT)')
         con.execute("INSERT INTO future_meter(job_id,secret) VALUES('ledger','private')")
     life.retire(uid,uid)
-    body={'username':'person','privacy':True}
-    first=life.confirmation(admin,uid,body);assert first['stage']==1 and auth.get_user(uid)
-    with pytest.raises(ValueError):life.confirmation(admin+1,uid,{**body,'confirmation':first['confirmation']})
-    second=life.confirmation(admin,uid,{**body,'confirmation':first['confirmation']});assert second['stage']==2 and auth.get_user(uid)
-    assert life.confirmation(admin,uid,{**body,'confirmation':second['confirmation']})['done']
-    assert auth.get_user(uid) is None and not life.availability('person','person@example.test')['username_available']
-    boxes=life.listings()['sandboxes'];assert len(boxes)==1
-    payload=json.loads(auth._open((life.root()/(boxes[0]['id']+'.sandbox')).read_text()))
-    assert payload['rows']['ai_compute_jobs'][0]['id']=='ledger'
-    assert payload['rows']['future_meter'][0]['secret']=='private'
+    with pytest.raises(ValueError):life.confirmation(admin,uid,{'confirm':False})
+    assert auth.get_user(uid)
+    assert life.confirmation(admin,uid,{'confirm':True})['done']
+    assert auth.get_user(uid) is None and life.availability('person','person@example.test')['username_available']
+    assert not life.listings()['sandboxes'] and not life.listings()['archives']
     with auth.db() as con:
         assert not con.execute('SELECT * FROM ai_compute_jobs').fetchone()
         assert not con.execute('SELECT * FROM future_meter').fetchone()
-    life.cleanup(boxes[0]['expires_at']+1)
-    assert not list(life.root().glob('*.sandbox'))
 
 
-def test_non_privacy_total_delete_refuses_billing_and_admin_self_delete(env):
+def test_total_delete_admin_protected_and_explicit_confirmation_required(env):
     admin,uid=env
     with pytest.raises(ValueError):life.retire(admin,admin)
     life.retire(uid,uid)
-    with auth.db() as con:
-        billing._init(con);con.execute("INSERT INTO ai_compute_jobs(id,user_id,kind,status,started_at) VALUES('ledger',?,'stems','done',1)",(uid,))
-    with pytest.raises(ValueError,match='contabili'):life.confirmation(admin,uid,{'username':'person','privacy':False})
+    with pytest.raises(ValueError):life.confirmation(admin,uid,{'username':'person','privacy':True})
+    assert auth.get_user(uid)
 
 
 @pytest.mark.parametrize('settings',[{'project_days':0},{'sandbox_days':True},{'sandbox_days':3651},{'extra':1}])

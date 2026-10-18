@@ -107,7 +107,7 @@ def is_deleted(uid):
         with auth.db() as con:
             init(con)
             if con.execute("SELECT 1 FROM account_archives WHERE user_id=? AND state NOT IN ('revoked','expired')",(uid,)).fetchone():return True
-    return bool(uid and info(uid)['state'] in ('deleting','deleted','expired','reactivation_pending','purged'))
+    return bool(uid and info(uid)['state'] in ('deleting','deleted','expired','reactivation_pending','purged','erasing'))
 
 
 def enqueue(con,key,recipient,subject,body,*,uid=None):
@@ -140,7 +140,7 @@ def register(uid,required=False,method='totp'):
 
 def approval_guard(uid):
     life=info(uid);user=auth.get_user(uid)
-    if life['state'] in ('deleting','deleted','expired','purged'):raise ValueError('Richiedere prima la riattivazione dell’account')
+    if life['state'] in ('deleting','deleted','expired','purged','erasing'):raise ValueError('Richiedere prima la riattivazione dell’account')
     if life['state']=='enrolling':raise ValueError('Completa prima la verifica del secondo fattore')
     if life['second_factor_required'] and not (user['totp_enabled'] if life['mfa_method']=='totp' else life['mfa_method']=='email'):raise ValueError('Il secondo fattore deve essere verificato prima dell’approvazione')
 
@@ -181,6 +181,8 @@ def retire(uid,actor_id,*,privacy_request=False):
     config=settings();now=int(time.time())
     with auth.db() as con:
         init(con);con.execute('BEGIN IMMEDIATE')
+        protected=con.execute('SELECT role FROM users WHERE id=?',(uid,)).fetchone()
+        if not protected or protected[0]=='admin':raise ValueError('Gli amministratori non possono essere cancellati')
         old=con.execute('SELECT state FROM account_lifecycle WHERE user_id=?',(uid,)).fetchone()
         if old and old[0] in ('deleting','deleted','expired','reactivation_pending'):return {'state':old[0]}
         reserve(con,uid,user['username'],user['email'])
@@ -280,29 +282,11 @@ def has_accounting(con,uid):
 
 
 def confirmation(actor,uid,body):
-    user=auth.get_user(uid)
-    if not user or user['role']=='admin' or info(uid)['state'] not in ('deleted','expired'):raise ValueError('Prima disattiva/cancella l’account e attendi la preparazione dell’archivio')
-    if body.get('username')!=user['username']:raise ValueError('Digita lo username esatto')
-    privacy=body.get('privacy',False)
-    if type(privacy) is not bool:raise ValueError('privacy deve essere booleano')
-    now=int(time.time());raw=secrets.token_urlsafe(32)
-    with auth.db() as con:
-        init(con);con.execute('BEGIN IMMEDIATE')
-        if has_accounting(con,uid) and not privacy:raise ValueError('Esistono dati contabili: serve la cancellazione privacy con quarantena')
-        prior=body.get('confirmation')
-        stage=1
-        if prior:
-            row=con.execute('SELECT * FROM account_action_confirmations WHERE digest=?',(auth._token_hash(str(prior)),)).fetchone()
-            if not row or row['actor_id']!=actor or row['user_id']!=uid or row['expires']<now or bool(row['privacy'])!=privacy:raise ValueError('Conferma scaduta o non valida')
-            stage=row['stage']+1;con.execute('DELETE FROM account_action_confirmations WHERE digest=?',(row['digest'],))
-        if stage<=2:con.execute('INSERT INTO account_action_confirmations VALUES(?,?,?,?,?,?)',(auth._token_hash(raw),actor,uid,stage,now+600,int(privacy)))
-    if stage==3:
-        purge(uid,actor,privacy)
-        return {'done':True}
-    return {'done':False,'stage':stage,'confirmation':raw,'message':'Conferma definitiva '+str(stage)+'/2: account rimosso; dati contabili in quarantena per '+str(settings()['sandbox_days'])+' giorni' if privacy else 'Conferma cancellazione totale senza dati contabili'}
+    from .account_erasure import erase
+    return erase(uid,actor,confirmed=body.get('confirm'))
 
 
-def _rows_for_user(con,uid):
+def _rows_for_user(con,uid,*,linked_jobs=()):
     """Discover user rows and FK descendants, including future ledger tables."""
     names=[r[0] for r in con.execute("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")]
     selected={};meta={}
@@ -314,7 +298,7 @@ def _rows_for_user(con,uid):
         if name=='users':clauses=['id=?']
         if name in ('account_archives','account_identity_reservations','account_sandboxes','account_audit'):continue
         if clauses:selected[name]={r['rowid']:dict(r) for r in con.execute('SELECT rowid AS rowid,* FROM '+quoted+' WHERE '+' OR '.join(clauses),[uid]*len(clauses))}  # noqa: S608 -- identifiers from fixed allowlists or quoted SQLite schema only
-    linked={r.get('id') for r in selected.get('ai_compute_jobs',{}).values()}|{j['job_id'] for j in jobs(uid)}
+    linked={r.get('id') for r in selected.get('ai_compute_jobs',{}).values()}|{j['job_id'] for j in jobs(uid)}|set(linked_jobs)
     for name,(quoted,columns) in meta.items():
         for col in ('job_id','queue_job_id'):
             if col in columns:
@@ -381,7 +365,9 @@ def purge(uid,actor,privacy):
 
 def _purge_queue(uid,job_ids):
     from . import ai_arranger_runtime as queue
+    for jid in job_ids:queue._validate_job_id(jid)
     with queue._db() as con:
+        con.execute('PRAGMA secure_delete=ON')
         # Terminal receipts are audit of identifiable job IDs; retire them with the job.
         ids=job_ids
         tables=[r[0] for r in con.execute("SELECT name FROM sqlite_master WHERE type='table'")]
@@ -393,9 +379,16 @@ def _purge_queue(uid,job_ids):
             con.execute('DELETE FROM jobs WHERE job_id=?',(jid,))
             for path in queue._ROOT.glob(jid+'.*'):
                 if path.is_file() and not path.is_symlink():path.unlink()
-    from . import ai_billing_outbox,ai_result_cache
+    from . import ai_billing_outbox,ai_result_cache,ai_publish_outbox
     with ai_billing_outbox._db() as con:
+        con.execute('PRAGMA secure_delete=ON')
         for jid in job_ids:con.execute('DELETE FROM deliveries WHERE job_id=? OR billing_job_id=?',(jid,jid))
+    with ai_publish_outbox._open() as con:
+        con.execute('PRAGMA secure_delete=ON')
+        for jid in job_ids:
+            con.execute('DELETE FROM publications WHERE job_id=?',(jid,))
+            for suffix in ('.wav','.lock'):
+                (queue._ROOT/'publication'/(jid+suffix)).unlink(missing_ok=True)
     cache=ai_result_cache._root()
     if cache:
         for metadata in cache.glob('*.json'):
@@ -411,6 +404,8 @@ def _purge_queue(uid,job_ids):
 
 
 def cleanup(now=None):
+    from .account_erasure import resume
+    resume()
     from . import storage
     now=int(time.time() if now is None else now)
     with _LOCK:

@@ -132,9 +132,13 @@ def test_admin_role_delete_and_last_admin_guards(tmp_path, monkeypatch):
 
     promoted = auth.update_user_admin(user["id"], admin["id"], role="admin")
     assert promoted["role"] == "admin"
-    # With two admins, the promoted account can be demoted by the other admin.
-    demoted = auth.update_user_admin(user["id"], admin["id"], role="user")
-    assert demoted["role"] == "user"
+    # Every admin is protected, even when another active admin exists.
+    with pytest.raises(ValueError):
+        auth.update_user_admin(user["id"], admin["id"], role="user")
+    with pytest.raises(ValueError):
+        auth.update_user_admin(user["id"], admin["id"], active=False)
+    # A separate ordinary account is used for the retirement coverage below.
+    user = _active_user(auth, admin, "ordinary", "ordinary@example.test")
 
     # Retirement preserves identity and accounting; central purge is a separate action.
     auth.delete_user_admin(user["id"], admin["id"])

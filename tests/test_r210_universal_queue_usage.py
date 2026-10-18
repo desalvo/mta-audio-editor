@@ -56,7 +56,7 @@ def test_zero_distinct_from_missing_and_owner_isolation(ledger):
     result = queue.get('job')
     assert result['cpu_seconds'] == 0 and result['gpu_seconds'] is None
     assert enrich({'actor_user_id':ledger+1,'job_id':'job'}) == {'actor_user_id':ledger+1,'job_id':'job'}
-    assert enrich({'actor_user_id':ledger,'job_id':'different'}) == {'actor_user_id':ledger,'job_id':'different'}
+    assert enrich({'actor_user_id':ledger,'job_id':'different'})['actor_username'] == 'admin'
 
 
 def test_multiple_components_and_running_diagnostics(ledger):

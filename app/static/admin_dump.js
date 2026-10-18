@@ -1,0 +1,19 @@
+(()=>{
+'use strict';
+const q=s=>document.querySelector(s),host=q('#applicationDump');if(!host)return;
+const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let catalog={users:[],projects:[]};const users=new Set(),projects=new Set();
+async function api(url,body){const r=await fetch(url,{method:body?'POST':'GET',headers:body?{'Content-Type':'application/json','X-MTA-Request':'1'}:{},body:body?JSON.stringify(body):undefined});if(!r.ok)throw Error(await r.text());return r.json()}
+function render(){const ut=q('#dumpUserSearch').value.toLocaleLowerCase(),pt=q('#dumpProjectSearch').value.toLocaleLowerCase();const allUsers=q('#dumpAllUsers').checked,allProjects=q('#dumpAllProjects').checked;
+q('#dumpUsers').innerHTML=catalog.users.filter(u=>`${u.username} ${u.display_name} ${u.id}`.toLocaleLowerCase().includes(ut)).map(u=>`<label><input type="checkbox" data-user="${u.id}" ${allUsers||u.role==='admin'||users.has(u.id)?'checked':''} ${allUsers||u.role==='admin'?'disabled':''}> ${esc(u.username)} ${u.role==='admin'?'· admin incluso':''}</label>`).join('')||'<p>Nessun utente trovato</p>';
+q('#dumpProjects').innerHTML=catalog.projects.filter(p=>`${p.title} ${p.id}`.toLocaleLowerCase().includes(pt)).map(p=>{const automatic=allUsers||allProjects||users.has(p.owner_user_id);return `<label><input type="checkbox" data-project="${esc(p.id)}" ${automatic||projects.has(p.id)?'checked':''} ${automatic?'disabled':''}> ${esc(p.title)} · ${esc(p.id)} ${automatic?'· incluso automaticamente':''}</label>`}).join('')||'<p>Nessun progetto trovato</p>';
+}
+async function load(){try{catalog=await api('/api/admin/application-dump/catalog');render()}catch(e){q('#dumpStatus').textContent=e.message}}
+for(const id of ['dumpUserSearch','dumpProjectSearch'])q('#'+id).oninput=render;
+for(const id of ['dumpAllUsers','dumpAllProjects'])q('#'+id).onchange=render;
+host.addEventListener('change',e=>{const b=e.target;if(b.dataset.user){const id=Number(b.dataset.user);b.checked?users.add(id):users.delete(id);render()}if(b.dataset.project){b.checked?projects.add(b.dataset.project):projects.delete(b.dataset.project)}});
+q('#dumpRefresh').onclick=load;
+q('#dumpDownload').onclick=async()=>{const b=q('#dumpDownload');b.disabled=true;try{const body={all_users:q('#dumpAllUsers').checked,all_projects:q('#dumpAllProjects').checked,user_ids:[...users],project_ids:[...projects]};const selection=await api('/api/admin/application-dump/preview',body);q('#dumpStatus').textContent=`Creazione dump: ${selection.users} utenti, ${selection.projects} progetti. Attendi il download; la pagina può rispondere temporaneamente con manutenzione.`;const r=await fetch('/api/admin/application-dump',{method:'POST',headers:{'Content-Type':'application/json','X-MTA-Request':'1'},body:JSON.stringify(body)});if(!r.ok)throw Error(await r.text());const url=URL.createObjectURL(await r.blob()),a=document.createElement('a');a.href=url;a.download='MTA-0.3.0-r210-application-dump.zip';a.click();setTimeout(()=>URL.revokeObjectURL(url),60000);q('#dumpStatus').textContent='Dump creato e verificato. Download avviato.'}catch(e){q('#dumpStatus').textContent=e.message}finally{b.disabled=false}};
+q('#dumpVerify').onclick=async()=>{const b=q('#dumpVerify');b.disabled=true;try{const file=q('#dumpRestoreFile').files[0];if(!file)throw Error('Seleziona un archivio ZIP.');const body=new FormData();body.append('file',file);q('#dumpRestoreStatus').textContent='Verifica in corso…';const r=await fetch('/api/admin/application-dump/restore-preview',{method:'POST',headers:{'X-MTA-Request':'1'},body});const d=await r.json();if(!r.ok)throw Error(d.detail||'Verifica fallita');q('#dumpRestoreStatus').textContent=`${d.users} utenti, ${d.projects} progetti · ${d.message}`}catch(e){q('#dumpRestoreStatus').textContent=e.message}finally{b.disabled=false}};
+load();
+})();

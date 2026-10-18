@@ -625,8 +625,8 @@ function render(){
   if(!current){$('#emptyState').classList.remove('hidden');$('#editor').hidden=true;$('#mixerDock').hidden=true;return}
   $('#emptyState').classList.add('hidden');$('#editor').hidden=false;$('#mixerDock').hidden=false;
   $('#headerProjectName').textContent=current.title;
-  $('#transportBpm').textContent=String(Math.round(Number(current.bpm||120)));
-  if($('#transportBpmInput'))$('#transportBpmInput').value=String(Math.round(Number(current.bpm||120)));
+  $('#transportBpm').textContent=formatProjectBpm(current.bpm||120);
+  if($('#transportBpmInput'))$('#transportBpmInput').value=formatProjectBpm(current.bpm||120);
   if($('#transportTimeSignature'))$('#transportTimeSignature').value=current.time_signature||'4/4';
   if($('#transportDisplayMode'))$('#transportDisplayMode').value=current.transport_time_mode||'time';
   updateTransportPositionDisplay();
@@ -732,22 +732,31 @@ async function applyMetronomeSettings(){
   current.metronome_start_ms=start;current.metronome_stop_ms=stop;
   current.metronome_mode=mode;current.metronome_sensitivity=sensitivity;
   const bars=Number($('#metronomePreRollBars')?.value||0);if(!Number.isInteger(bars)||bars<0||bars>64)return toast(tr('Invalid pre-roll','Pre-roll non valido'));
-  try{markDirty();await flushAutosave();showMediaProgress(tr('Metronome','Metronomo'),-1,tr('Generating…','Generazione…'));
+  try{markDirty();await persistMetronomeSettings();showMediaProgress(tr('Metronome','Metronomo'),-1,tr('Generating…','Generazione…'));
     const result=await api(`/api/projects/${current.id}/metronome-insert`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({start_ms:start,pre_roll_bars:bars})});
-    current=result.project;selectedTrackId=result.track.id;invalidateTrackAudioCache(result.track.id);clearPlaybackWarmCache();render();closeUtilityModal();
+    current=result.project;await syncNativeProjectFile(current.id,true);selectedTrackId=result.track.id;invalidateTrackAudioCache(result.track.id);clearPlaybackWarmCache();render();closeUtilityModal();
     timingAudioChanged(current.tracks.map(t=>t.id));
   }catch(e){closeUtilityModal();toast(e.message)}
+}
+async function persistMetronomeSettings(){
+  const projectId=current?.id;
+  while(autosaveBusy)await new Promise(resolve=>setTimeout(resolve,25));
+  if(!projectId||current?.id!==projectId)throw Error(tr('Project changed','Progetto cambiato'));
+  clearTimeout(autosaveTimer);autosaveTimer=null;autosaveBusy=true;
+  try{await persistCurrentProject(false);await syncNativeProjectFile(projectId,true)}
+  finally{autosaveBusy=false;if(autosaveQueued){autosaveQueued=false;markDirty(50)}}
+  if(current?.id!==projectId||projectDirty)throw Error(tr('Save the tempo before regenerating','Salva il tempo prima di rigenerare'));
 }
 async function refreshGeneratedTrackFromContext(id){
   if(!current)return;
   const t=trackById(id);if(!t)return;
   try{
     if(t.type==='click'||String(t.name||'').toLowerCase().includes('metronom')){
-      await flushAutosave();
+      await persistMetronomeSettings();
       const result=await api(`/api/projects/${current.id}/metronome-track/refresh?time_ms=${Math.max(0,Math.round(playCursorMs||0))}`,{method:'POST'});
-      current=result.project;invalidateTrackAudioCache(result.track.id);render();timingAudioChanged([result.track.id]);toast(tr('Metronome regenerated','Metronomo rigenerato'));
+      current=result.project;invalidateTrackAudioCache(result.track.id);render();timingAudioChanged([result.track.id]);await syncNativeProjectFile(current.id,true);toast(tr('Metronome regenerated','Metronomo rigenerato'));
     }else if(isGeneratedChordsTrack(t)){
-      await flushAutosave();await enqueueChordsRefresh(0,Math.round((current?.tracks||[]).reduce((m,t)=>Math.max(m,Number(t.duration_ms||0)),0)),'refresh manuale');
+      await persistMetronomeSettings();await enqueueChordsRefresh(0,Math.round((current?.tracks||[]).reduce((m,t)=>Math.max(m,Number(t.duration_ms||0)),0)),'refresh manuale');await syncNativeProjectFile(current.id,true);
     }
   }catch(e){toast('Refresh fallito: '+e.message)}
 }
@@ -783,14 +792,15 @@ async function createMetronomeTrack(mode='fixed',referenceTrackId=''){
   const adaptive=mode==='adaptive';
   try{
     metronomeCreatePending=true;
-    await flushAutosave();
-    current=await api('/api/projects/'+current.id,{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify(current)});
+    await persistMetronomeSettings();
     if(adaptive)showUtilityModal('Metronomo adattivo',`<div class="stem-progress-card"><div class="stem-progress-head"><b>Analisi completa delle variazioni di tempo…</b><span>…</span></div><div class="stem-progress indeterminate"><div class="stem-progress-fill"></div></div><div class="stem-progress-message">La tempo map precedente non viene riutilizzata: tutti i beat e tutte le variazioni vengono ricalcolati sul brano corrente.</div></div>`);
     const reference=referenceTrackId?trackById(referenceTrackId):null;
     const query=`mode=${encodeURIComponent(mode)}&sensitivity=${encodeURIComponent(current.metronome_sensitivity??0.35)}${referenceTrackId?`&track_id=${encodeURIComponent(referenceTrackId)}`:''}`;
     const result=await api(`/api/projects/${current.id}/metronome-track?${query}`,{method:'POST'});
     current=result.project;
+    await syncNativeProjectFile(current.id,true);
     selectedTrackId=result.track.id;
+    invalidateTrackAudioCache(result.track.id);clearPlaybackWarmCache();timingAudioChanged([result.track.id]);
     if(adaptive)closeUtilityModal();
     render();
     await refresh();
@@ -799,7 +809,7 @@ async function createMetronomeTrack(mode='fixed',referenceTrackId=''){
       const range=values.length?` · ${Math.min(...values).toFixed(1)}–${Math.max(...values).toFixed(1)} BPM`:'';
       const ref=result.reference_track_name?` · riferimento: ${result.reference_track_name}`:'';
       toast(`${result.reused?'Metronomo adattivo aggiornato':'Metronomo adattivo creato'} · ${values.length} beat ricalcolati${range}${ref}`);
-    }else{const ref=result.reference_track_name?` · sincronizzato a ${result.reference_track_name}`:'';toast(`${result.reused?'Traccia metronomo aggiornata':'Traccia metronomo creata'} a ${Number(current.bpm).toFixed(1)} BPM${ref}`);}
+    }else{const ref=result.reference_track_name?` · sincronizzato a ${result.reference_track_name}`:'';toast(`${result.reused?'Traccia metronomo aggiornata':'Traccia metronomo creata'} a ${formatProjectBpm(current.metronome_bpm??current.bpm)} BPM${ref}`);}
   }catch(e){if(adaptive)closeUtilityModal();toast(e.message)}finally{metronomeCreatePending=false}
 }
 
@@ -1112,6 +1122,7 @@ function openTrackContextMenuAt(id,clientX,clientY){
   menu.id='trackContextMenu';
   menu.className='track-context-menu';
   menu.setAttribute('role','menu');
+  menu.tabIndex=-1;
   menu.innerHTML=`
     <button type="button" onclick="closeTrackContextMenu();duplicateTrack('${id}')">⧉ <span>Duplica traccia</span></button>
     <button type="button" onclick="closeTrackContextMenu();renameTrack('${id}')">✎ <span>Rinomina</span></button>
@@ -1125,7 +1136,7 @@ function openTrackContextMenuAt(id,clientX,clientY){
     <button type="button" onclick="closeTrackContextMenu();openTextAnalysisChooser('${id}','chords')">♬ <span>Estrai chords</span></button>
     <button type="button" onclick="closeTrackContextMenu();extractMarkersFromTrack('${id}')">⚑ <span>Estrai marker</span></button>
     <button type="button" onclick="closeTrackContextMenu();openMetronomeSettings(playCursorMs)">♩ <span>${tr('Insert metronome at transport position','Inserisci metronomo dalla posizione del transport')}</span></button>
-    ${(track.type==='click'||isGeneratedChordsTrack(track))?`<button type="button" onclick="closeTrackContextMenu();refreshGeneratedTrackFromContext('${id}')">⟳ <span>${tr('Regenerate track','Rigenera traccia')}</span><kbd>R</kbd></button>`:''}
+    ${(track.type==='click'||isGeneratedChordsTrack(track))?`<button type="button" aria-keyshortcuts="r" onclick="closeTrackContextMenu();refreshGeneratedTrackFromContext('${id}')">⟳ <span class="context-menu-label">${tr('Regenerate track','Rigenera traccia')}</span><kbd class="context-shortcut">R</kbd></button>`:''}
     ${!(track.type==='click'||isGeneratedChordsTrack(track))&&(current.tracks||[]).some(t=>t.type==='click')?`<button type="button" onclick="closeTrackContextMenu();updateMetronomeFromAudioTrack('${id}')">♩ <span>Aggiorna metronomo</span></button>`:''}
     <button type="button" onclick="closeTrackContextMenu();openTrackDelayDialog('${id}')">↔ <span>Delay / anticipo traccia…</span></button>
     <button type="button" onclick="closeTrackContextMenu();addTimelineChordAtPlayhead()">♬ <span class="context-menu-label">Aggiungi chord</span><kbd class="context-shortcut">C</kbd></button>
@@ -1134,6 +1145,7 @@ function openTrackContextMenuAt(id,clientX,clientY){
     <button type="button" class="danger" onclick="closeTrackContextMenu();deleteTracksByIds(['${id}'])">× <span>Rimuovi</span></button>
   `;
   document.body.appendChild(menu);
+  menu.focus({preventScroll:true});
   const pad=8,r=menu.getBoundingClientRect();
   const x=Number.isFinite(Number(clientX))?Number(clientX):window.innerWidth/2;
   const y=Number.isFinite(Number(clientY))?Number(clientY):window.innerHeight/2;
@@ -1478,7 +1490,7 @@ function openMetronomeBpmContext(event,start){
   document.body.appendChild(menu);menu.style.left=Math.min(event.clientX,window.innerWidth-220)+'px';menu.style.top=Math.min(event.clientY,window.innerHeight-80)+'px';
 }
 function metronomeZoneLabelsHtml(t){if(t.type!=='click'||current.metronome_mode!=='zones')return '';
-  return metronomeZoneDescriptors().map(z=>`<div class="metronome-zone-label" style="left:${z.start/1000*pxPerSec+6}px" ondblclick="event.stopPropagation();editMetronomeZoneBpm(${z.start})" oncontextmenu="openMetronomeBpmContext(event,${z.start})" title="${z.manual?'Manual · '+tr('Right-click for Auto','Tasto destro per Auto'):'Auto'} · ${tr('Double-click to edit BPM and time signature','Doppio click per modificare BPM e misura')}">${Number(z.bpm).toFixed(1)} BPM · ${z.signature} <small>${z.manual?'Manual':'Auto'}</small></div>`).join('');
+  return metronomeZoneDescriptors().map(z=>`<div class="metronome-zone-label" style="left:${z.start/1000*pxPerSec+6}px" ondblclick="event.stopPropagation();editMetronomeZoneBpm(${z.start})" oncontextmenu="openMetronomeBpmContext(event,${z.start})" title="${z.manual?'Manual · '+tr('Right-click for Auto','Tasto destro per Auto'):'Auto'} · ${tr('Double-click to edit BPM and time signature','Doppio click per modificare BPM e misura')}">${formatProjectBpm(z.bpm)} BPM · ${z.signature} <small>${z.manual?'Manual':'Auto'}</small></div>`).join('');
 }
 function lane(t,W,i){
   const color=t.color||TRACK_COLORS[i%TRACK_COLORS.length];
@@ -2389,7 +2401,7 @@ function beginTimelineClipDrag(event,trackId,clipId){
   const key=MtaTimelineRules.key(track,clip),multiple=event.shiftKey||event.ctrlKey||event.metaKey;
   if(multiple&&selectedTimelineSegments.has(key)){selectedTimelineSegments.delete(key);paintSegmentSelection();return}
   if(!multiple&&!selectedTimelineSegments.has(key))selectedTimelineSegments.clear();
-  selectedTimelineSegments.add(key);selectedTrackId=trackId;selectedTrackIdSet=new Set(selectedSegmentItems().map(x=>x.track.id));sel={a:0,b:0};updateSel();paintSegmentSelection();
+  selectedTimelineSegments.add(key);selectedTrackId=trackId;selectedTrackIdSet=new Set(selectedSegmentItems().map(x=>x.track.id));sel={a:0,b:0};updateSel();paintSegmentSelection();focusTrackShortcuts(trackId);
   const items=selectedSegmentItems().map(x=>({...x,el:document.querySelector(`.clip-block[data-track-id="${CSS.escape(x.track.id)}"][data-clip-id="${CSS.escape(x.clip.id)}"]`)}));
   const pid=event.pointerId,startX=event.clientX;let delta=0,moved=false;
   timelineClipDrag={pointerId:pid};document.body.classList.add('moving-timeline-clip');
@@ -2481,6 +2493,20 @@ async function save(){
   }catch(e){projectDirty=true;toast('Salvataggio fallito: '+e.message);throw e}
   finally{autosaveBusy=false}
 }
+function focusTrackShortcuts(id,event=null){
+  const target=event?.target;
+  if(target?.closest?.('input,textarea,select,[contenteditable="true"]'))return;
+  const head=document.getElementById('head-'+id);if(!head)return;
+  head.tabIndex=-1;head.focus({preventScroll:true});
+}
+function handleGeneratedTrackShortcut(event){
+  if(!current||event.defaultPrevented||event.repeat||event.ctrlKey||event.metaKey||event.altKey||String(event.key).toLowerCase()!=='r')return false;
+  const target=event.target,tag=String(target?.tagName||'').toLowerCase();
+  const control=tag==='input'&&!['range','checkbox','radio','button','submit','reset','color'].includes(String(target.type).toLowerCase());
+  if(control||tag==='textarea'||tag==='select'||target?.isContentEditable||target?.closest?.('[role="dialog"],dialog,.utility-modal'))return false;
+  const track=trackById(selectedTrackId);if(!track||!(track.type==='click'||isGeneratedChordsTrack(track)))return false;
+  event.preventDefault();closeTrackContextMenu();void refreshGeneratedTrackFromContext(track.id);return true;
+}
 function selectTrack(id,event=null){
   if(!trackById(id))return;
   const multi=!!(event&&(event.ctrlKey||event.metaKey));
@@ -2499,6 +2525,7 @@ function selectTrack(id,event=null){
   });
   $$('.lane').forEach(el=>el.classList.toggle('edit-selected',selectedTrackIdSet.has(el.dataset.track)));
   updateSel();
+  focusTrackShortcuts(selectedTrackId,event);
 }
 function trackAudibleNow(track){
   if(!track||track.mute)return false;
@@ -3335,13 +3362,13 @@ function tapProjectTempo(){
   if(!gaps.length)return;
   const mid=Math.floor(gaps.length/2);
   const period=gaps.length%2?gaps[mid]:(gaps[mid-1]+gaps[mid])/2;
-  const bpm=Math.max(30,Math.min(300,Math.round(60000/period)));
+  const bpm=Math.max(30,Math.min(300,Math.round(60000/period*100)/100));
   setManualProjectBpm(bpm);
 }
 let metronomeTempoRegenerationTimer=null;
 function scheduleMetronomeTempoRegeneration(){
   if(metronomeTempoRegenerationTimer!==null)clearTimeout(metronomeTempoRegenerationTimer);
-  if(!current?.tracks?.some(t=>t.type==='click'&&!t.mute))return;
+  if(!current?.tracks?.some(t=>t.type==='click'))return;
   const projectId=current.id;
   metronomeTempoRegenerationTimer=setTimeout(async()=>{
     metronomeTempoRegenerationTimer=null;
@@ -3350,16 +3377,26 @@ function scheduleMetronomeTempoRegeneration(){
     catch(e){toast(tr('Metronome regeneration failed','Rigenerazione metronomo fallita')+': '+e.message)}
   },450);
 }
+function parseProjectBpm(value){
+  const text=String(value??'').trim().replace(',','.');
+  if(!/^(?:\d+(?:\.\d*)?|\.\d+)$/.test(text))return null;
+  const number=Number(text);
+  return Number.isFinite(number)&&number>=30&&number<=300?Math.round(number*100)/100:null;
+}
+function formatProjectBpm(value){const number=Number(value);return Number.isFinite(number)?String(Math.round(number*100)/100):'120'}
+function setMetronomeManualTempo(bpm){current.metronome_bpm=bpm;current.metronome_zone_bpms={};}
 function projectOriginalBpm(){
   return Number(current?.original_bpm||current?.base_bpm||current?.bpm||120);
 }
 function setManualProjectBpm(value){
   if(!current)return;
-  const bpm=Math.round(Math.max(30,Math.min(300,Number(value)||Number(current.bpm)||120)));
+  const bpm=parseProjectBpm(value);
+  if(bpm===null)return toast(tr('BPM must be between 30 and 300; decimals are allowed','BPM tra 30 e 300; sono ammessi decimali'));
   if(!current.original_bpm)current.original_bpm=projectOriginalBpm();
   // The reference tempo and displayed tempo move together: audio playback stays at 1x.
   current.base_bpm=bpm;
   current.bpm=bpm;
+  setMetronomeManualTempo(bpm);
   const input=$('#transportBpmInput');if(input)input.value=String(bpm);
   const label=$('#transportBpm');if(label)label.textContent=String(bpm);
   markDirty();stopPlayback();scheduleMetronomeTempoRegeneration();
@@ -3369,8 +3406,9 @@ function resetProjectBpm(){
   const original=projectOriginalBpm();
   current.base_bpm=original;
   current.bpm=original;
-  const input=$('#transportBpmInput');if(input)input.value=String(Math.round(original));
-  const label=$('#transportBpm');if(label)label.textContent=String(Math.round(original));
+  setMetronomeManualTempo(original);
+  const input=$('#transportBpmInput');if(input)input.value=formatProjectBpm(original);
+  const label=$('#transportBpm');if(label)label.textContent=formatProjectBpm(original);
   markDirty();stopPlayback();scheduleMetronomeTempoRegeneration();
 }
 function closeBpmContextMenu(){document.querySelector('#bpmContextMenu')?.remove()}
@@ -3384,7 +3422,7 @@ function openBpmContextMenu(event){
     closeBpmContextMenu();const entry=$('#transportBpmInput');
     const proposal=entry?.value||String(current?.bpm||120);
     const answer=window.prompt(tr('Manual BPM (audio speed unchanged)','BPM manuali (velocità audio invariata)'),proposal);
-    if(answer!==null&&answer.trim()!==''&&Number.isFinite(Number(answer))&&Number(answer)>0)setManualProjectBpm(answer);
+    if(answer!==null&&answer.trim()!=='')setManualProjectBpm(answer);
   });
   reset.addEventListener('click',()=>{closeBpmContextMenu();resetProjectBpm()});
   menu.append(manual,reset);document.body.appendChild(menu);
@@ -3395,9 +3433,9 @@ function openBpmContextMenu(event){
   return false;
 }
 function setProjectBpm(v){
-  if(!current)return;const n=Math.round(Math.max(30,Math.min(300,Number(v)||current.bpm)));
+  if(!current)return;const n=parseProjectBpm(v);if(n===null){render();return toast(tr('Invalid BPM','BPM non validi'))}
   if(!current.base_bpm)current.base_bpm=current.bpm||n;
-  current.bpm=n;$('#transportBpm').textContent=String(n);if($('#transportBpmInput'))$('#transportBpmInput').value=String(n);markDirty();stopPlayback();scheduleMetronomeTempoRegeneration();
+  current.bpm=n;setMetronomeManualTempo(n);$('#transportBpm').textContent=String(n);if($('#transportBpmInput'))$('#transportBpmInput').value=String(n);markDirty();stopPlayback();scheduleMetronomeTempoRegeneration();
 }
 async function setProjectTimeSignature(value,recalculate=true){
   if(!current)return;const allowed=['2/4','3/4','4/4','5/4','6/8','7/8','9/8','12/8'];const sig=allowed.includes(String(value))?String(value):'4/4';
@@ -3406,7 +3444,7 @@ async function setProjectTimeSignature(value,recalculate=true){
   const track=(current.tracks||[]).find(t=>t.type!=='metronome')||(current.tracks||[])[0];
   if(!track){render();scheduleMetronomeTempoRegeneration();return}
   showMediaProgress('Ricalcolo BPM',10,`Tempo impostato a ${sig}. Ricalcolo BPM…`);
-  try{const result=await api(`/api/projects/${current.id}/tracks/${track.id}/estimate-bpm?time_signature=${encodeURIComponent(sig)}`,{method:'POST'});current.bpm=Number(result.bpm);current.base_bpm=Number(result.bpm);current.original_bpm=Number(result.bpm);current.time_signature=sig;render();markDirty(20);scheduleMetronomeTempoRegeneration();$('#utilityBackdrop')?.classList.add('hidden');toast(`Tempo ${sig} · BPM ${Math.round(current.bpm)}`)}catch(e){$('#utilityBackdrop')?.classList.add('hidden');render();scheduleMetronomeTempoRegeneration();toast('Tempo aggiornato; ricalcolo BPM non riuscito: '+e.message)}
+  try{const result=await api(`/api/projects/${current.id}/tracks/${track.id}/estimate-bpm?time_signature=${encodeURIComponent(sig)}`,{method:'POST'});current.bpm=Number(result.bpm);current.base_bpm=Number(result.bpm);current.original_bpm=Number(result.bpm);current.time_signature=sig;render();markDirty(20);scheduleMetronomeTempoRegeneration();$('#utilityBackdrop')?.classList.add('hidden');toast(`Tempo ${sig} · BPM ${formatProjectBpm(current.bpm)}`)}catch(e){$('#utilityBackdrop')?.classList.add('hidden');render();scheduleMetronomeTempoRegeneration();toast('Tempo aggiornato; ricalcolo BPM non riuscito: '+e.message)}
 }
 function setProjectPitch(v){
   if(!current)return;const n=Math.max(-6,Math.min(6,Number(v)||0));current.pitch_semitones=n;if($('#transportPitchInput'))$('#transportPitchInput').value=n.toFixed(1);markDirty();stopPlayback();
@@ -4222,7 +4260,7 @@ function editProjectMeta(){
     row('Autori / compositori',input('projectMetaAuthors',(current.authors||[]).join(', '),1000)),
     row('Artista / interprete',input('projectMetaArtist',current.artist||'',200)),
     row('Tonalità / Key',input('projectMetaKey',current.key||'',40)),
-    row('BPM',`<input id="projectMetaBpm" type="number" min="30" max="300" step="1" value="${esc(String(Math.round(Number(current.bpm)||120)))}" class="project-meta-input">`),
+    row('BPM',`<input id="projectMetaBpm" type="number" min="30" max="300" step="0.01" value="${esc(formatProjectBpm(current.bpm||120))}" class="project-meta-input">`),
     row('Time signature',select('projectMetaTimeSignature',current.time_signature||'4/4',signatures.map(x=>[x,x]))),
     row('Sample rate progetto',`<select id="projectMetaSampleRate" class="project-meta-input" ${(current.tracks||[]).length?'disabled':''}><option value="44100" ${Number(current.sample_rate||44100)===44100?'selected':''}>44.1 kHz</option><option value="48000" ${Number(current.sample_rate||44100)===48000?'selected':''}>48 kHz</option><option value="96000" ${Number(current.sample_rate||44100)===96000?'selected':''}>96 kHz</option></select>${(current.tracks||[]).length?'<small>Modificabile solo quando il progetto non contiene tracce attive.</small>':''}`),
     row('Tipo progetto',select('projectMetaTarget',current.target||'MTA8',targets.map(x=>[x,x]))),
@@ -4241,7 +4279,7 @@ async function saveProjectMetaEditor(){
   current.artist=($('#projectMetaArtist')?.value||'').trim().slice(0,200);
   current.key=($('#projectMetaKey')?.value||'').trim().slice(0,40);
   const bpm=Math.max(30,Math.min(300,Number($('#projectMetaBpm')?.value)||Number(current.bpm)||120));
-  current.bpm=Math.round(bpm);if(!current.base_bpm)current.base_bpm=current.bpm;
+  current.bpm=bpm;if(!current.base_bpm)current.base_bpm=current.bpm;
   if(!(current.tracks||[]).length)current.sample_rate=Number($('#projectMetaSampleRate')?.value||current.sample_rate||44100);
   current.target=$('#projectMetaTarget')?.value||current.target||'MTA8';
   current.mta_device_profile=$('#projectMetaDeviceProfile')?.value||'auto';
@@ -4449,7 +4487,7 @@ async function startKaraokeExport(){
 async function recalculateBpmFromTrack(trackId){
   if(!current)return;const track=trackById(trackId);if(!track)return;
   showMediaProgress('Ricalcolo BPM',10,`Analisi ritmica di ${track.name}…`);
-  try{const result=await api(`/api/projects/${current.id}/tracks/${trackId}/estimate-bpm`,{method:'POST'});current.bpm=Number(result.bpm);current.base_bpm=Number(result.bpm);current.original_bpm=Number(result.bpm);render();markDirty(50);$('#utilityBackdrop')?.classList.add('hidden');if(result.time_signature)current.time_signature=result.time_signature;toast(`BPM ricalcolati da ${track.name}: ${Math.round(Number(result.bpm))} · ${current.time_signature||'4/4'}`)}catch(e){$('#utilityBackdrop')?.classList.add('hidden');toast('Ricalcolo BPM: '+e.message)}
+  try{const result=await api(`/api/projects/${current.id}/tracks/${trackId}/estimate-bpm`,{method:'POST'});current.bpm=Number(result.bpm);current.base_bpm=Number(result.bpm);current.original_bpm=Number(result.bpm);render();markDirty(50);$('#utilityBackdrop')?.classList.add('hidden');if(result.time_signature)current.time_signature=result.time_signature;toast(`BPM ricalcolati da ${track.name}: ${formatProjectBpm(result.bpm)} · ${current.time_signature||'4/4'}`)}catch(e){$('#utilityBackdrop')?.classList.add('hidden');toast('Ricalcolo BPM: '+e.message)}
 }
 function timedEditorConfig(kind){return {lyrics:{key:'text',label:'Lyrics',end:true,valueLabel:'Testo'},chords:{key:'chord',label:'Chords',end:true,valueLabel:'Accordo'},markers:{key:'label',label:'Markers',end:true,valueLabel:'Etichetta'}}[kind]||null}
 function timedEditorTime(ms){const n=Math.max(0,Number(ms)||0),m=Math.floor(n/60000),s=(n%60000)/1000;return `${m}:${s.toFixed(3).padStart(6,'0')}`}
@@ -4507,6 +4545,7 @@ window.addEventListener('pointerdown',e=>{
   if(menu&&!menu.contains(e.target))closeTrackContextMenu();
 });
 window.addEventListener('keydown',e=>{
+  if(handleGeneratedTrackShortcut(e))return;
   const target=e.target;
   const editable=target instanceof HTMLInputElement||target instanceof HTMLTextAreaElement||target instanceof HTMLSelectElement||target?.isContentEditable;
   if((e.ctrlKey||e.metaKey)&&!e.altKey){
@@ -4516,7 +4555,6 @@ window.addEventListener('keydown',e=>{
     const key=e.key.toLowerCase();if(key==='z'){e.preventDefault();if(e.shiftKey)redoEdit();else undoEdit();return}if(key==='y'){e.preventDefault();redoEdit();return}if(key==='x'){e.preventDefault();cutTimelineSelection();return}if(key==='c'){e.preventDefault();copyTimelineSelection();return}if(key==='v'){e.preventDefault();pasteTimelineSelection();return}if(key==='s'){e.preventDefault();save();return}
   }
   if(!editable&&current&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&timelineTool==='select'&&selectedSegmentItems().length&&(e.key==='ArrowLeft'||e.key==='ArrowRight')){e.preventDefault();moveSelectedSegments((e.key==='ArrowRight'?1:-1)*(current.timeline_snap&&current.timeline_snap!=='off'?MtaTimelineRules.step(current,Math.max(0,MtaTimelineRules.start(selectedSegmentItems()[0].track,selectedSegmentItems()[0].clip))):10));return}
-  if(!editable&&current&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&!e.repeat&&e.key.toLowerCase()==='r'){const track=trackById(selectedTrackId);if(track&&(track.type==='click'||isGeneratedChordsTrack(track))){e.preventDefault();void refreshGeneratedTrackFromContext(track.id);return}}
   if(!editable&&current&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&(e.key==='ArrowLeft'||e.key==='ArrowRight')&&(document.activeElement?.closest?.('#timeline')||document.activeElement?.closest?.('.timeline')||document.activeElement===document.body)){e.preventDefault();const increment=Math.max(1,Math.round(4/Math.max(0.01,pxPerSec)*1000));goToTimestamp(playCursorMs+(e.key==='ArrowRight'?increment:-increment));return}
   if(e.key==='Escape'){closeTrackContextMenu();return}
   if(!editable&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&!e.repeat&&(e.key==='Backspace'||e.key==='Delete')&&timelineChordSelectedIndices.size){e.preventDefault();e.stopPropagation();deleteSelectedTimelineChords();return}

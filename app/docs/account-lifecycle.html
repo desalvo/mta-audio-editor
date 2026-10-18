@@ -1,4 +1,4 @@
-<!doctype html><html lang="it"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>MTA · Account e conservazione</title><style>body{font:16px/1.65 system-ui;color:#172a42;max-width:960px;margin:2em auto;padding:1em}pre{font:inherit;white-space:pre-wrap;overflow-wrap:anywhere}a{color:#075ea5}</style><body><a href="/settings">Torna alle impostazioni</a><pre># Account, SSO, secondo fattore e conservazione — 0.3.0-r210
+<!doctype html><html lang="it"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>MTA · Account e conservazione</title><style>body{font:16px/1.65 system-ui;color:#172a42;max-width:960px;margin:2em auto;padding:1em}pre{font:inherit;white-space:pre-wrap;overflow-wrap:anywhere}a{color:#075ea5}</style><body><a href="/settings?tab=users">Torna agli utenti</a><pre># Account, SSO, secondo fattore e conservazione — 0.3.0-r210
 
 ## Registrazione e approvazione
 
@@ -21,7 +21,7 @@ Se il link di enrollment è scaduto o è stato perso, usare **Reinvia conferma e
 
 ## Identità riservate
 
-Username ed email sono univoci, compresi gli account cancellati/disattivati. Non viene creato automaticamente un altro account con la stessa identità. Le identità storiche sono riservate con HMAC legati alla chiave del server, anche dopo la rimozione totale del record utente: non vengono riutilizzate da un nuovo account. Questi digest non sono credenziali e non consentono di scaricare dati o accedere al servizio.
+Username ed email sono univoci, compresi gli account cancellati/disattivati. Non viene creato automaticamente un altro account con la stessa identità. Le identità storiche sono riservate con HMAC legati alla chiave del server, durante la conservazione ordinaria e nelle vecchie procedure con quarantena. La nuova cancellazione definitiva rimuove le riserve associate e quelle storiche riconoscibili; dopo questa operazione le identità liberate tornano disponibili. Questi digest non sono credenziali e non consentono di scaricare dati o accedere al servizio.
 
 Anche la modifica email riserva il vecchio indirizzo e quello in verifica; gli altri utenti non possono registrarsi con una delle identità riservate. Le conferme e i link vengono inviati al titolare, senza esporli nella risposta pubblica. Le verifiche pubbliche di disponibilità sono intenzionali e richieste dal modulo di registrazione.
 
@@ -48,19 +48,15 @@ L’approvazione riattiva lo stesso account e lo stesso storico. Non riabilita i
 
 La riattivazione riguarda gli account conservati dalla cancellazione ordinaria. La cancellazione totale confermata è distinta e non ha un ripristino automatico dalla sandbox.
 
-## Cancellazione totale e sandbox privacy
+## Cancellazione definitiva immediata
 
-L’azione è amministrativa e separata dalla cancellazione ordinaria. Prima cancellare/disattivare l’account e attendere che l’archivio sia pronto. L’interfaccia richiede lo username esatto e **due conferme successive**. Il server impone conferme monouso, con scadenza e legate a admin, account e modalità: non basta inviare un booleano nel primo POST.
+In **Impostazioni → Utenti → Archivi utenti cancellati**, il pulsante rosso **Elimina definitivamente tutti i dati** richiede una sola conferma. Funziona anche prima del grace period e per archivi storici il cui account è già stato rimosso.
 
-- **Totale senza dati contabili**: consentita soltanto se non esistono record di utilizzo, compute, fatture o campioni storage associati. In caso contrario viene rifiutata.
-- **Privacy con quarantena**: rimuove il record account e i dati contabili dal database centrale attivo, comprese le fatture associate richieste esplicitamente dall’operazione. I report correnti non vedono più tali dati. Questa azione non va confusa con l’esclusione di singoli job nella Coda AI, che protegge le fatture già chiuse.
-- Prima della rimozione, i dati contabili, le relative prove e gli intenti di settlement vengono salvati in un file privato cifrato. I dati di autenticazione, le sessioni, i token e i secret MFA non vengono conservati come materiale di recupero dell’account.
-- Le righe collegate vengono individuate tramite ownership, collegamenti job e chiavi esterne, per comprendere anche estensioni delle tabelle contabili. Nessun altro account viene eliminato a causa di un collegamento amministrativo di approvazione.
-- La pulizia dei database della coda, degli intenti contabili e delle cache dei risultati ha una consegna durevole da riprendere dopo un’interruzione. Un errore durante la transazione centrale non lascia un file sandbox non committato.
-- Il grace period dei progetti resta separato: archivio e dati di consegna rimangono disponibili fino alla loro data limite, anche se il record account è già rimosso. Non vengono cancellati anticipatamente dalla quarantena contabile.
-- La sandbox scade dopo **N giorni**, predefinito **365**. I progetti scadono dopo **X giorni**, predefinito **60**. Entrambi sono configurabili in Impostazioni → Utenti, con valori interi tra 1 e 3650. Le nuove impostazioni si applicano alle cancellazioni future: non cambiano silenziosamente le date già comunicate.
+L’operazione elimina account e credenziali, progetti posseduti, riferimenti di condivisione, ZIP di recupero, sandbox riconducibili all’utente, consumi, fatture e altre righe contabili collegate, ricevute di coda/pubblicazione/consegna, cache risultati e prenotazioni di identità associate. Non crea nuove sandbox. Gli identificatori riconoscibili degli account già rimossi dalle vecchie versioni vengono eliminati anche dalle riserve storiche anonime; vecchi alias scollegati irreversibilmente dalle versioni precedenti non sono ricostruibili dal solo digest.
 
-La cancellazione automatica riguarda i dati gestiti dall’applicazione. Le copie eventualmente create da backup esterni del database o del filesystem hanno una propria gestione e non vengono modificate da MTA. Questa funzione descrive il comportamento tecnico e non dichiara una conformità legale automatica.
+Un journal privato rende ripetibile la pulizia dopo un errore di filesystem; l’account non può essere riattivato durante la cancellazione. Il journal viene rimosso solo a operazione completata. Job ancora attivi impediscono la cancellazione. Nessun amministratore può essere disabilitato, declassato o eliminato, anche se esistono altri admin.
+
+Le scadenze configurate continuano a valere per chiusura ordinaria e sandbox storiche non eliminate manualmente. La cancellazione nell’app non elimina email già consegnate, log esterni o backup già scaricati: il gestore deve trattare queste copie e le proprie eventuali obbligazioni di legge separatamente. I dump vengono consegnati all’admin senza mantenerne una copia nell’applicazione.
 
 ## Esecuzione periodica e sicurezza operativa
 

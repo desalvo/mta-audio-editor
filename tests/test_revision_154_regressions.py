@@ -23,11 +23,11 @@ def test_sidebar_project_file_precedes_edit_import_mix():
     assert html.index("PROJECT / FILE") < html.index("EDIT / IMPORT / MIX")
 
 
-def test_bpm_is_integer_in_transport_ui():
+def test_bpm_preserves_decimals_in_transport_ui():
     html = (ROOT / "app/templates/index.html").read_text(encoding="utf-8")
     source = (ROOT / "app/static/app.js").read_text(encoding="utf-8")
-    assert 'id="transportBpmInput"' in html and 'step="1" value="120"' in html
-    assert "Math.round(Number(current.bpm||120))" in source
+    assert 'id="transportBpmInput"' in html and 'step="0.01" value="120"' in html
+    assert "formatProjectBpm(current.bpm||120)" in source
 
 
 def test_whisper_mps_float64_failure_retries_on_cpu():

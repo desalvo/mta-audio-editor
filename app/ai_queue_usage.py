@@ -19,7 +19,7 @@ def number(value):
 def enrich(value):
     from .auth import db_path
     owner, job_id = value.get('actor_user_id'), value.get('job_id')
-    if type(owner) is not int or owner <= 0 or not isinstance(job_id, str):
+    if not isinstance(job_id, str):
         return value
     path = db_path()
     if not path.is_file():
@@ -29,11 +29,23 @@ def enrich(value):
         with closing(sqlite3.connect(path.as_uri()+'?mode=ro', uri=True, timeout=.2)) as con:
             con.row_factory = sqlite3.Row
             tables = {r[0] for r in con.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+            if type(owner) is not int or owner <= 0:
+                if 'ai_compute_jobs' not in tables:
+                    return value
+                owners = con.execute('SELECT DISTINCT user_id FROM ai_compute_jobs WHERE queue_job_id=?', (job_id,)).fetchall()
+                if len(owners) != 1 or type(owners[0][0]) is not int or owners[0][0] <= 0:
+                    return value
+                owner = owners[0][0]
+                result['actor_user_id'] = owner
+            if 'users' in tables:
+                user = con.execute('SELECT username,display_name FROM users WHERE id=?', (owner,)).fetchone()
+                if user:
+                    result.update(actor_username=user['username'], actor_display_name=user['display_name'])
             if 'ai_compute_jobs' not in tables:
-                return value
+                return result
             rows = con.execute('SELECT id,status,usage_json,resource_source FROM ai_compute_jobs WHERE queue_job_id=? AND user_id=?', (job_id, owner)).fetchall()
             if not rows:
-                return value
+                return result
             diagnostics = {}
             if 'ai_compute_job_diagnostics' in tables:
                 diagnostics = {r['job_id']: r['payload'] for r in con.execute('''SELECT d.job_id,d.payload FROM ai_compute_job_diagnostics d

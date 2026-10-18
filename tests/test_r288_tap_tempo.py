@@ -11,7 +11,7 @@ def test_tap_tempo_icon_and_debounced_metronome_regeneration():
     assert 'function tapProjectTempo()' in js
     assert 'performance.now()' in js
     assert 'scheduleMetronomeTempoRegeneration();' in js
-    assert "t.type==='click'&&!t.mute" in js
+    assert "current?.tracks?.some(t=>t.type==='click')" in js
     assert 'metronomeTempoRegenerationTimer=setTimeout' in js
 
 

@@ -1636,3 +1636,6 @@ html,body{overflow:hidden}
 body:not(.timeline-select-tool) .clip-block{pointer-events:none;cursor:default}
 .timeline-select-tool .clip-block{touch-action:none}
 
+
+/* r210: retain room for decimal BPM and native number steppers. */
+#transportBpmInput{width:84px;min-width:84px}
