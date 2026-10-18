@@ -31,7 +31,7 @@ def test_new_accounts_quota_and_profile_locale(env):
     finally:i18n.current_language.reset(token)
     for uid in (env,local['id'],social['id']):
         user=auth.public_user(auth.get_user(uid))
-        assert user['workspace_quota_bytes']==5*1024**3 and user['language']=='auto'
+        assert user['workspace_quota_bytes']==(0 if uid==env else 5*1024**3) and user['language']=='auto'
     assert i18n.user_language(local['id'])=='it'
     for choice in ('en','it','auto'):
         auth.update_profile(local['id'],language=choice)

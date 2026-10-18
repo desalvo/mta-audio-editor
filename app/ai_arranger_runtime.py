@@ -580,6 +580,8 @@ def cancel(job_id):
     with _MUTEX:
         if job_id in _LOCAL and row[0] in ('queued', 'blocked'):
             _LOCAL[job_id].set()
+    from .resource_accounts import reconcile_cancelled_reservations
+    reconcile_cancelled_reservations(job_id)
     return get(job_id)
 
 

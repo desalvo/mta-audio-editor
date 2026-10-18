@@ -251,6 +251,10 @@ def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=
                 except Exception as exc:
                     import logging
                     logging.getLogger(__name__).warning('GPU diagnostic update failed: %s', type(exc).__name__)
+            if not final:
+                from .resource_accounts import has_limits,checkpoint
+                if has_limits(user_id) and checkpoint(user_id,job_id,counters if 'counters' in locals() else {}):
+                    return True
             return cancel_check() if not final and cancel_check is not None else False
         worker_cancel_check = diagnostic_checkpoint
         try:

@@ -43,7 +43,7 @@ def test_public_document_without_login_and_no_writes(env,kind,lang):
     assert f'<html lang="{lang}">' in response.text
     assert '{{' not in response.text
     assert '2026-10-18-r210' in response.headers['x-mta-legal-version']
-    assert 'legal-warning' in response.text
+    assert 'legal-warning' not in response.text
     assert auth.db_path().read_bytes()==before
     assert response.headers['cache-control']=='no-store'
 
@@ -81,7 +81,7 @@ def test_review_requires_instance_facts_and_new_edits_invalidate_it(env):
     assert cfg['ready'] and cfg['revision']==1
     assert 'legal-warning' not in client.get('/privacy/en').text
     legal.save({'operator_name':'Updated operator'},uid)
-    assert 'legal-warning' in client.get('/privacy/en').text
+    assert 'legal-warning' not in client.get('/privacy/en').text
     with auth.db() as con:
         rows=con.execute('SELECT revision,actor_id,config_json FROM legal_instance_history ORDER BY revision').fetchall()
     assert len(rows)==2 and rows[0]['actor_id']==uid
@@ -94,7 +94,7 @@ def test_runtime_retention_and_review_invalidation(env):
     life.settings({'project_days':17,'sandbox_days':90})
     for lang,days in (('en','days'),('it','giorni')):
         page=client.get('/privacy/'+lang).text
-        assert '17 '+days in page and '90 '+days in page and 'legal-warning' in page
+        assert '17 '+days in page and '90 '+days in page and 'legal-warning' not in page
     cfg=legal.save(complete(),uid)
     assert cfg['ready']
     assert 'legal-warning' not in client.get('/privacy/en').text

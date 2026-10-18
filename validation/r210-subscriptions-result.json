@@ -1,0 +1,23 @@
+{
+  "version": "0.3.0-r210",
+  "suite": {
+    "passed": 3973,
+    "skipped": 5,
+    "deselected": 10,
+    "warnings": 6,
+    "coverage_percent": 77.17,
+    "duration_seconds": 213.88
+  },
+  "targeted_passed": 125,
+  "static_checks": "passed",
+  "excluded_reason": "10 AF_UNIX agent tests require Unix socket creation denied by this environment",
+  "skipped_reason": "4 optional Steinberg SDK integration tests and 1 real Win32 API test",
+  "pdf_visual_review": "IT/EN privacy and terms rendered and visually checked",
+  "live_validation": {
+    "rocm": false,
+    "native_gui": false,
+    "real_smtp": false
+  },
+  "previous_package_ci_failures": "Updated two stale GPU diagnostic estimate expectations; CI source logs retained externally",
+  "development_failure": "Initial fake-user storage fixture updated to use a real account; final complete permitted suite passed"
+}

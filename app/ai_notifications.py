@@ -120,7 +120,7 @@ def collect():
         estimated={k:value[k] for k in ('cpu_seconds_estimated','gpu_seconds_estimated') if value.get(k) is not None}
         payload={'job_id':row['job_id'],'operation':row['operation'],'status':row['state'],
           'started_at':row['started_at'],'finished_at':row['completed_at'],'usage':usage,'diagnostic':estimated,'token_id':None,
-          'amount_micro':0,'cost_pending':False,'origin':'queue'}
+          'amount_micro':0,'credits_debited_micro':0,'cost_pending':False,'origin':'queue'}
         # Billing only comes from the ledger, never from progress sidecars.
         linked=uuid.uuid5(uuid.NAMESPACE_URL,'mta-ai-inference:'+row['job_id']).hex
         linked_rows=[r for r in ledgers if r['id']==linked or r.get('queue_job_id')==row['job_id']]
@@ -130,7 +130,9 @@ def collect():
                 details=details_for(owner).get(ledger['id'])
                 for key,quantity in json.loads(ledger['usage_json']).items():
                     payload['usage'][key]=payload['usage'].get(key,0)+quantity
-                if details:payload['amount_micro']+=details['amount_micro']
+                if details:
+                    payload['amount_micro']+=details['amount_micro']
+                    payload['credits_debited_micro']+=details.get('credits_debited_micro',0)
                 payload['cost_pending']|=ledger['status']=='running'
             tokens={r['token_id'] for r in linked_rows}
             payload['token_id']=next(iter(tokens)) if len(tokens)==1 else None
@@ -143,14 +145,14 @@ def collect():
         events.append((row['user_id'],{'job_id':row['id'],'operation':row['kind'],'status':row['status'],
           'started_at':row['started_at'],'finished_at':row['finished_at'],'usage':json.loads(row['usage_json']),
           'diagnostic':details['estimated'] if details else {},'token_id':row['token_id'],'amount_micro':details['amount_micro'] if details else 0,
-          'cost_pending':row['status']=='running','origin':'ledger'}))
+          'credits_debited_micro':details.get('credits_debited_micro',0) if details else 0,'cost_pending':row['status']=='running','origin':'ledger'}))
     with auth.db() as con:
         _init(con)
         before=con.total_changes
         for owner,value in events:
             key=value['origin']+':'+value['job_id']
             if value['started_at'] is not None:
-                start={**value,'event':'started','status':'running','finished_at':None,'usage':{},'diagnostic':{},'amount_micro':0,'cost_pending':True}
+                start={**value,'event':'started','status':'running','finished_at':None,'usage':{},'diagnostic':{},'amount_micro':0,'credits_debited_micro':0,'cost_pending':True}
                 _queue_event(con,key+':started',owner,start)
             if value['status'] in ('completed','done','failed','cancelled','interrupted'):
                 _queue_event(con,key+':terminal:'+value['status'],owner,{**value,'event':'terminal'})
@@ -209,6 +211,8 @@ def render(payload,language):
           (tr('Raw diagnostic estimates','Stime diagnostiche grezze'),metric('',payload['diagnostic'])),
           (tr('Estimated amount (not an invoice)','Importo stimato (non è una fattura)'),f"€ {payload['amount_micro']/1e6:.6f}"+(' · '+tr('pending','provvisorio') if payload.get('cost_pending') else ''))]
         extra=''
+    credits=payload['report'].get('credits_debited_micro',0) if payload['event']=='summary' else payload.get('credits_debited_micro',0)
+    fields.append((tr('CPU/GPU credits used','Crediti CPU/GPU utilizzati'),f'€ {credits/1e6:.6f}'))
     plain=title+'\n'+APP_RELEASE+' · '+_server()+'\n'+'\n'.join(str(k)+': '+str(v) for k,v in fields)
     body=f'''<!doctype html><html><body style="margin:0;background:#edf2f8;font:15px Arial,sans-serif;color:#172a42"><table role="presentation" width="100%"><tr><td align="center" style="padding:28px 12px"><table role="presentation" width="620" style="width:100%;max-width:620px;background:white;border-radius:14px"><tr><td style="background:#153753;color:white;padding:24px;border-radius:14px 14px 0 0"><img src="cid:mta-logo" width="64" height="64" alt="MTA"><h1 style="font-size:24px;margin:12px 0">{esc(title)}</h1><p>MTA Audio Editor · {esc(APP_RELEASE)}</p></td></tr><tr><td style="padding:24px">{table(fields)}{extra}<p style="font-size:13px;color:#54667e">{esc(tr('Server','Server'))}: {esc(_server())}</p><p style="font-size:12px;color:#54667e">{esc(tr('Per-job diagnostic estimates accepted by the server are eligible for accounting and billing and remain labelled as estimates. Raw diagnostics alone do not authorize charges. This email is not an invoice.','Le stime diagnostiche per job accettate dal server sono utilizzabili per accounting e billing e restano indicate come stime. La sola diagnostica grezza non autorizza addebiti. Questa email non è una fattura.'))}</p></td></tr></table></td></tr></table></body></html>'''
     return title+' · MTA',plain,body
@@ -248,6 +252,8 @@ def tick():
     with auth.db() as con:
         if con.execute("SELECT 1 FROM sqlite_master WHERE name='ai_device_requests'").fetchone():
             con.execute('DELETE FROM ai_device_requests WHERE expires_at<?',(int(time.time()),))
+    from .resource_accounts import periodic_tick
+    periodic_tick()
     collect();return deliver()
 
 

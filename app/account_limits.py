@@ -33,7 +33,10 @@ def summary(user_id, storage, *, at=None):
     now=time.time() if at is None else at
     user=auth.get_user(user_id)
     if not user:raise ValueError('User not found')
-    quota=int(user['workspace_quota_bytes'] or 0)
+    from .resource_accounts import state,history
+    resource_state=state(user_id,storage['used_bytes'],at=now)
+    quota_value=resource_state['limits']['storage_bytes']
+    quota=quota_value or 0
     rows=ai_usage_reporting.records(user_id,0,max(1,now+1))
     report={**ai_usage_reporting.aggregate(rows),'billing_enabled':ai_billing.user_billing_enabled(user_id)}
     with auth.db() as con:
@@ -58,9 +61,9 @@ def summary(user_id, storage, *, at=None):
           'other_accounted_seconds':max(0,(accounted or 0)-total(closed,key)-total(pending,key))}
         for value in resources[name].values():
             if value is not None and (not math.isfinite(value) or value<0):raise ValueError('Invalid resource summary')
-    return {'user_id':user_id,'as_of':now,'storage':{**storage,'quota_bytes':quota or None,'unlimited':not quota,
-      'remaining_bytes':max(0,quota-storage['used_bytes']) if quota else None,
-      'percent':storage['used_bytes']/quota*100 if quota else None},
+    return {'user_id':user_id,'as_of':now,'resource_quotas':resource_state,'usage_history':history(user_id,at=now),'storage':{**storage,'quota_bytes':quota_value,'unlimited':quota_value is None,
+      'remaining_bytes':max(0,quota-storage['used_bytes']) if quota_value is not None else None,
+      'percent':storage['used_bytes']/quota*100 if quota else (100 if storage['used_bytes'] else 0) if quota_value is not None else None},
       'resources':resources,'jobs':report['jobs'],'unmetered_jobs':report['unmetered_jobs'],
       'billing':{'enabled':report['billing_enabled'],'currency':'EUR',
         'pending_estimate_micro':sum(r['amount_micro'] for r in pending),

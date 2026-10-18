@@ -190,6 +190,9 @@ def create_job(user_id: int, kind: str, token_id=None, *, started_at=None, diagn
                   (job_id,user_id,token_id,kind,'running',stamp,int(not diagnostic)))
         from .ai_global_execution import current_job
         c.execute('UPDATE ai_compute_jobs SET queue_job_id=? WHERE id=?',(current_job.get(),job_id))
+        if not diagnostic:
+            from .resource_accounts import admit
+            admit(c,user_id,job_id,stamp)
         suggested = hardware['suggested_micro_per_unit']
         cpu_model, gpu_model = hardware['cpu_model'], hardware['gpu_model']
         c.execute('''INSERT INTO ai_job_hardware_snapshots
@@ -243,7 +246,8 @@ def provision_inference_job(inference_job_id: str, user_id: int, kind: str) -> s
     with db() as c:
         _init(c)
         c.execute('BEGIN IMMEDIATE')
-        if not user_billing_enabled(user_id, _connection=c):
+        from .resource_accounts import has_limits
+        if not user_billing_enabled(user_id, _connection=c) and not has_limits(user_id,c):
             return None
         if not c.execute('SELECT 1 FROM users WHERE id=? AND active=1', (user_id,)).fetchone():
             raise ValueError('Active user required')
@@ -261,6 +265,8 @@ def provision_inference_job(inference_job_id: str, user_id: int, kind: str) -> s
         rates = hardware['suggested_micro_per_unit']
         c.execute('INSERT INTO ai_compute_jobs(id,user_id,token_id,kind,status,started_at,billable,queue_job_id) VALUES(?,?,NULL,?,?,?,1,?)',
                   (ledger_id, user_id, kind, 'running', stamp,inference_job_id))
+        from .resource_accounts import admit
+        admit(c,user_id,ledger_id,stamp)
         c.execute('INSERT INTO ai_job_hardware_snapshots (job_id,captured_at,model_version,cpu_model,gpu_model,cpu_rate_micro,gpu_rate_micro,storage_rate_micro,origin) VALUES(?,?,?,?,?,?,?,?,?)',
                   (ledger_id, stamp, hardware['model_version'], hardware['cpu_model'], hardware['gpu_model'],
                    rates['cpu_seconds'], rates['gpu_slot_seconds_estimated'], rates['disk_gb_hours'],
@@ -319,6 +325,8 @@ def finish_job(job_id, status, usage=None, *, source='unmetered', finished_at=No
             (status,end,(end-row['started_at'])*1000,json.dumps(values,sort_keys=True),source,job_id))
         if updated.rowcount != 1:
             raise ValueError('Job already finalized by another worker')
+        from .resource_accounts import settle
+        settle(c,job_id,values)
 
 
 
@@ -462,6 +470,9 @@ def _rates_for_jobs(c, jobs):
         for r in history:
             if r['resource'] not in selected and r['valid_from']<=job['started_at'] and (r['valid_until'] is None or job['started_at']<r['valid_until']):
                 selected[r['resource']] = r['micro_per_unit']
+        from .resource_accounts import covered_job
+        if covered_job(c,job['id']):
+            selected.update(cpu_seconds=0,gpu_seconds=0)
         rates[job['id']] = selected
     return rates
 
@@ -562,7 +573,12 @@ def report(period='month', *, user_id=None, anchor=None, start=None, end=None, _
                     gpu_job['slot_seconds'] * hardware['gpu_rate_micro'])
             row['resources']['gpu_slot_seconds_estimated']=round(
                 row['resources'].get('gpu_slot_seconds_estimated',0)+gpu_job['slot_seconds'],9)
-        return {'gpu_slot_service':slot_service, 'hardware_by_job':hardware_by_job,
+        from .resource_entitlements import storage_segments
+        storage_overusage=[]
+        if c.execute("SELECT 1 FROM sqlite_master WHERE name='resource_quota_events'").fetchone():
+            ids=[user_id] if user_id is not None else [r[0] for r in c.execute('SELECT DISTINCT user_id FROM resource_quota_events')]
+            storage_overusage=[dict(user_id=uid,**s) for uid in ids for s in storage_segments(c,uid,a,b)]
+        return {'storage_overusage':storage_overusage,'gpu_slot_service':slot_service, 'hardware_by_job':hardware_by_job,
 'start_ts':a,'end_ts':b,'currency':'EUR','prices_micro':rates,
                 'billing_enabled_users': sorted({r['user_id'] for r in records if user_billing_enabled(r['user_id'],_connection=c)}),
                 'rows':list(groups.values()),'total_micro':sum(row['cost_micro'] for row in groups.values()),
@@ -655,14 +671,34 @@ def _priced_storage_usage(c, start: int, end: int, user_id=None):
                         boundaries.append(rate['valid_from'])
                     if rate['valid_until'] is not None and x<rate['valid_until']<finish:
                         boundaries.append(rate['valid_until'])
+                from .resource_accounts import storage_boundaries
+                boundaries+=storage_boundaries(c,uid,x,finish)
+                if c.execute("SELECT 1 FROM sqlite_master WHERE name='resource_policy_events'").fetchone():
+                    boundaries += [r[0] for r in c.execute('SELECT effective_at FROM resource_policy_events WHERE user_id=? AND effective_at>? AND effective_at<?',(uid,x,finish))]
                 nxt=min(boundaries)
                 key=(uid,day.isoformat())
                 quantity=gib*(nxt-x)/3600
                 rate=next((r['micro_per_unit'] for r in reversed(history)
                            if r['valid_from']<=x and (r['valid_until'] is None or x<r['valid_until'])),0)
                 quantities[key]=quantities.get(key,0)+quantity
-                costs[key]=costs.get(key,0)+quantity*rate
+                from .resource_accounts import covered_storage
+                paid_rate=rate*(max(0,left['bytes_used']-covered_storage(c,uid,x))/left['bytes_used']) if left['bytes_used'] else 0
+                if c.execute("SELECT 1 FROM sqlite_master WHERE name='resource_user_policy'").fetchone():
+                    active=c.execute("SELECT 1 FROM resource_periods WHERE user_id=? AND start<=? AND end>? AND plan IS NOT NULL",(uid,x,x)).fetchone()
+                    managed=c.execute('SELECT 1 FROM resource_memberships WHERE user_id=?',(uid,)).fetchone()
+                    entry=c.execute('SELECT credit_billing FROM resource_policy_events WHERE user_id=? AND effective_at<=? ORDER BY effective_at DESC,id DESC LIMIT 1',(uid,x)).fetchone()
+                    explicit=c.execute('SELECT 1 FROM resource_user_policy WHERE user_id=?',(uid,)).fetchone()
+                    if active or ((managed or explicit) and not (entry and entry[0])):paid_rate=0
+                costs[key]=costs.get(key,0)+quantity*paid_rate
                 x=nxt
+    if c.execute("SELECT 1 FROM sqlite_master WHERE name='resource_quota_events'").fetchone():
+        from .resource_entitlements import storage_segments
+        quota_users=[user_id] if user_id is not None else [r[0] for r in c.execute('SELECT DISTINCT user_id FROM resource_quota_events')]
+        for uid in quota_users:
+            for seg in storage_segments(c,uid,start,end):
+                key=(uid,dt.datetime.fromtimestamp(seg['start_ts'],dt.timezone.utc).date().isoformat())
+                quantities.setdefault(key,0)
+                costs[key]=costs.get(key,0)+seg['cost_micro']
     return quantities,costs
 
 

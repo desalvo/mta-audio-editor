@@ -1,0 +1,126 @@
+/* Owner-scoped quotas and searchable operator controls; no payment data in browser storage. */
+(()=>{'use strict';
+const tr=(en,it)=>window.MtaLocale?.language==='it'?it:en;
+const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money=x=>new Intl.NumberFormat(window.MtaLocale?.language,{style:'currency',currency:'EUR',maximumFractionDigits:6}).format(x/1e6);
+const qty=(x,k)=>x==null?'—':Number(x/(k==='storage_bytes'?1024**3:3600)).toLocaleString(window.MtaLocale?.language,{maximumFractionDigits:3})+(k==='storage_bytes'?' GiB':' h');
+const plans={trial:()=>tr('7-day free trial','Prova gratuita di 7 giorni'),day:()=>tr('Daily','Giornaliero'),week:()=>tr('Weekly','Settimanale'),month:()=>tr('Monthly','Mensile'),quarter:()=>tr('Quarterly','Trimestrale'),year:()=>tr('Yearly','Annuale')};
+const label=k=>k==='cpu_seconds'?'CPU':k==='gpu_seconds'?'GPU':tr('Storage','Storage');
+async function api(url,method='GET',body){const r=await fetch(url,{method,headers:{'content-type':'application/json','X-MTA-Request':'1'},body:body===undefined?undefined:JSON.stringify(body)});const d=await r.json();if(!r.ok)throw Error(typeof d.detail==='string'?d.detail:tr('Request failed','Richiesta fallita'));return d}
+function input(name,value,type='number'){return '<input data-field="'+name+'" type="'+type+'" value="'+esc(value)+'" '+(type==='number'?'min="0" step="any"':'')+'>'}
+function historyQty(r,k){const missing=r[k.split('_')[0]+'_missing_jobs']||0;return missing?(r[k]===0?'—':'~'+qty(r[k],k))+' ('+missing+' '+tr('unmeasured jobs','job senza misura')+')':qty(r[k],k)}
+function history(rows){
+ let out='<h3>'+tr('Last 30 days · UTC','Ultimi 30 giorni · UTC')+'</h3><p>'+tr('CPU/GPU include trusted estimates. Storage is the observed daily peak; missing history is not zero.','CPU/GPU includono stime attendibili. Lo storage è il picco giornaliero osservato; uno storico assente non equivale a zero.')+'</p>';
+ for(const k of ['cpu_seconds','gpu_seconds','storage_bytes']){
+  const max=Math.max(1,...rows.map(r=>Number(r[k]||0)));
+  out+='<div class="history-card"><b>'+label(k)+'</b><svg viewBox="0 0 600 120" role="img" aria-label="'+label(k)+'">'+rows.map((r,i)=>r[k]==null?'':'<rect x="'+(i*20+1)+'" y="'+(115-r[k]/max*105)+'" width="17" height="'+Math.max(1,r[k]/max*105)+'" fill="#47b8ff"><title>'+r.day+' · '+qty(r[k],k)+'</title></rect>').join('')+'</svg></div>';
+ }
+ return out+'<div class="table-scroll"><table><thead><tr><th>'+tr('Date','Data')+'</th><th>CPU</th><th>GPU</th><th>Storage</th></tr></thead><tbody>'+rows.map(r=>'<tr><td>'+r.day+'</td>'+['cpu_seconds','gpu_seconds','storage_bytes'].map(k=>'<td>'+historyQty(r,k)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';
+}
+function details(d){
+ let s='<p>'+tr('Subscription','Abbonamento')+': <b>'+esc(d.subscription?plans[d.subscription]():tr('None','Nessuno'))+'</b> '+esc(d.promo)+'</p>';
+ if(d.period)s+='<p>'+new Date(d.period.start*1000).toLocaleString()+' → '+new Date(d.period.end*1000).toLocaleString()+'</p>';
+ if(d.renewal_stops_at)s+='<p>'+tr('Renewal stops on','Il rinnovo si interrompe il')+' '+new Date(d.renewal_stops_at*1000).toLocaleString()+'</p>';
+ if(!d.funded)s+='<p role="alert">'+tr('Renewal requires credits; new jobs and storage growth are blocked.','Il rinnovo richiede crediti; nuovi job e crescita dello storage sono bloccati.')+'</p>';
+ s+='<p class="credits-total">'+tr('Credits','Crediti')+': '+money(d.credits_micro)+'</p><div class="resource-cards">';
+ for(const k of ['cpu_seconds','gpu_seconds','storage_bytes']){
+  const used=d.used[k],limit=d.limits[k],percent=limit?used/limit*100:null;
+  s+='<article><b>'+label(k)+'</b><p>'+qty(used,k)+' / '+(limit==null?tr('Unlimited','Illimitato'):qty(limit,k))+'</p>'+(percent==null?'':'<meter min="0" max="100" value="'+Math.min(100,percent)+'"></meter><small>'+percent.toFixed(1)+'%</small>')+'</article>';
+ }
+ s+='</div><p>'+tr('AI jobs share quotas across all application tokens. Included subscription compute is not billed again. Over-quota compute uses credits at ordinary tariffs; an in-flight job can overshoot the last available measurement. Final consumption can make the balance negative; further jobs stop until it is topped up.','Le quote AI sono condivise da tutti i token applicazione. Il calcolo incluso non viene fatturato di nuovo. L’extra quota usa crediti alle tariffe ordinarie; un job in corso può superare l’ultima misura disponibile. Il consumo finale può rendere negativo il saldo; i job successivi si fermano fino alla ricarica.')+'</p>';
+ s+='<details><summary>'+tr('Credit transactions and overages','Movimenti crediti ed extra quota')+'</summary><div class="table-scroll"><table><tbody>';
+ for(const r of d.transactions.credits)s+='<tr><td>'+new Date(r.created_at*1000).toLocaleString()+'</td><td>'+esc(r.reason)+'</td><td>'+money(r.delta_micro)+'</td></tr>';
+ for(const r of d.transactions.overages)s+='<tr><td>'+esc(r.job_id)+'</td><td>'+tr('Metered overage','Extra quota contabilizzato')+'</td><td>−'+money(r.charge_micro)+'</td></tr>';
+ return s+'</tbody></table></div></details>'+history(d.history);
+}
+function storageReport(r){
+ if(!r)return '';
+ return '<h3>'+tr('Storage overusage','Extra quota storage')+'</h3><p>'+tr('Assigned capacity beyond the plan allowance, charged only for its allocation time. Administrative free extensions cost zero.','Capienza assegnata oltre la quota del piano, addebitata per il tempo di assegnazione. Le estensioni gratuite dell’admin non hanno costi.')+'</p><p><b>'+Number(r.gb_hours).toFixed(4)+' GiB·h · '+(r.duration_seconds/3600).toFixed(3)+' h · '+money(r.cost_micro)+'</b></p><div class="table-scroll"><table><thead><tr><th>'+tr('From → to','Da → a')+'</th><th>'+tr('Paid / free','A pagamento / gratuito')+'</th><th>'+tr('Duration','Durata')+'</th><th>EUR/GiB·h</th><th>EUR</th></tr></thead><tbody>'+r.segments.map(x=>'<tr><td>'+new Date(x.start_ts*1000).toLocaleString()+' → '+new Date(x.end_ts*1000).toLocaleString()+'</td><td>'+qty(x.paid_bytes,'storage_bytes')+' / '+qty(x.free_bytes,'storage_bytes')+'</td><td>'+((x.end_ts-x.start_ts)/3600).toFixed(3)+' h</td><td>'+money(x.rate_micro_per_gb_hour)+'</td><td>'+money(x.cost_micro)+'</td></tr>').join('')+'</tbody></table></div>';
+}
+function planCards(d){
+ return '<div class="plan-grid">'+d.plans.filter(p=>p.code!=='trial'||d.trial_available).map(p=>'<article class="plan-card '+(p.code==='trial'?'trial-plan':'')+'"><div class="plan-kicker">'+tr(p.code==='trial'?'START HERE':'MTA MEMBERSHIP',p.code==='trial'?'INIZIA QUI':'ABBONAMENTO MTA')+'</div><h3>'+plans[p.code]()+'</h3><div class="plan-price">'+money(p.price_micro)+'</div><ul><li><b>'+qty(p.cpu_seconds,'cpu_seconds')+'</b> CPU</li><li><b>'+qty(p.gpu_seconds,'gpu_seconds')+'</b> GPU</li><li><b>'+qty(p.storage_bytes,'storage_bytes')+'</b> '+tr('included storage','storage incluso')+'</li></ul>'+(p.code==='trial'?'<label>'+tr('After 7 days, renew as','Dopo 7 giorni, rinnova con')+'<select data-trial-next>'+d.plans.filter(x=>x.code!=='trial').map(x=>'<option value="'+x.code+'" '+(x.code==='week'?'selected':'')+'>'+plans[x.code]()+' · '+money(x.price_micro)+'</option>').join('')+'</select></label><p>'+tr('One trial per account. Change the next plan or stop renewal before expiry. Renewal uses credits; insufficient credit pauses access to the plan.','Una prova per account. Il piano successivo è modificabile e il rinnovo si può interrompere prima della scadenza. Il rinnovo usa crediti; un saldo insufficiente sospende l’accesso al piano.')+'</p>':'')+'<button data-activate="'+p.code+'">'+tr(p.code==='trial'?'Start free trial':'Choose plan',p.code==='trial'?'Inizia la prova gratuita':'Scegli piano')+'</button></article>').join('')+'</div>';
+}
+async function owner(root){
+ root.innerHTML='<h2>'+tr('Subscriptions, quotas and credits','Abbonamenti, quote e crediti')+'</h2><button data-refresh>'+tr('Refresh','Aggiorna')+'</button><p role="status"></p><div data-content></div>';
+ const status=root.querySelector('[role=status]'),content=root.querySelector('[data-content]');
+ async function load(){
+  try{
+   const d=await api('/api/account/subscription');content.innerHTML=details(d);
+   if(d.enabled&&d.self_service&&d.policy.subscriptions_allowed&&!d.subscription){
+    content.insertAdjacentHTML('afterbegin','<section class="plan-selector"><h3>'+tr('Choose the space for your creativity','Scegli lo spazio per la tua creatività')+'</h3><p>'+tr('CPU, GPU and storage in one plan. All prices and included resources are shown before activation.','CPU, GPU e storage in un unico piano. Prezzi e risorse incluse sono visibili prima dell’attivazione.')+'</p>'+planCards(d)+'</section>');
+    content.querySelectorAll('[data-activate]').forEach(button=>button.onclick=async()=>{button.disabled=true;try{
+     const code=button.dataset.activate,p=d.plans.find(x=>x.code===code),body={plan:code,expected_price_micro:p.price_micro};
+     let message=plans[code]()+' · '+money(p.price_micro);
+     if(code==='trial'){const next=d.plans.find(x=>x.code===content.querySelector('[data-trial-next]').value);body.next_plan=next.code;body.next_price_micro=next.price_micro;message+=' → '+plans[next.code]()+' · '+money(next.price_micro)}
+     if(!confirm(message+'?'))return;await api('/api/account/subscription','POST',body);await load()
+    }catch(e){status.textContent=e.message}finally{button.disabled=false}});
+   }
+   if(!d.subscription)content.insertAdjacentHTML('beforeend','<p class="billing-mode">'+(d.policy.credit_billing?tr('Pay-as-you-go billing is enabled by your administrator. Measured usage is paid from credits.','Il billing a consumo è abilitato dall’amministratore. I consumi misurati sono addebitati ai crediti.'):tr('No active subscription: configured quotas apply and usage is recorded without charges.','Nessun abbonamento attivo: valgono le quote configurate e i consumi sono registrati senza addebiti.'))+'</p>');
+   if(d.subscription){
+    let storageId=crypto.randomUUID();
+    content.insertAdjacentHTML('beforeend','<h3>'+tr('Manage subscription','Gestione abbonamento')+'</h3><label><input type="checkbox" data-overage '+(d.overage?'checked':'')+'> '+tr('Allow compute overages using credits','Consenti extra quota CPU/GPU tramite crediti')+'</label><p>'+tr('Ordinary rates','Tariffe ordinarie')+': CPU '+money((d.ordinary_tariffs.cpu_seconds||0)*3600)+'/h · GPU '+money((d.ordinary_tariffs.gpu_seconds||0)*3600)+'/h · Storage '+money(d.ordinary_tariffs.disk_gb_hours||0)+'/GiB·h</p><p>'+tr('Included / free / paid capacity','Capienza inclusa / gratuita / a pagamento')+': '+[d.storage_extension.included_bytes,d.storage_extension.free_bytes,d.storage_extension.paid_bytes].map(x=>qty(x,'storage_bytes')).join(' / ')+'</p><div class="settings-form"><label>'+tr('Assigned storage quota (GiB)','Quota storage assegnata (GiB)')+input('storage',d.limits.storage_bytes/1024**3)+'</label><button data-storage>'+tr('Update storage capacity','Aggiorna capienza storage')+'</button></div><p>'+tr('Extra capacity accrues charges until it is reduced or the subscription ends, including when empty. No future hours are prepaid. Files are never deleted automatically when capacity or credits run out.','La capienza extra matura costi fino alla sua riduzione o alla fine dell’abbonamento, anche se vuota. Non si prepagano ore future. L’esaurimento di capienza o crediti non elimina automaticamente i file.')+'</p>');
+    content.querySelector('[data-overage]').onchange=async e=>{try{await api('/api/account/subscription','PATCH',{overage:e.target.checked});await load()}catch(err){status.textContent=err.message;e.target.checked=!e.target.checked}};
+    content.querySelector('[data-storage]').onclick=async()=>{try{
+     const quota_bytes=Math.round(Number(content.querySelector('[data-field=storage]').value)*1024**3),rate=d.ordinary_tariffs.disk_gb_hours||0,extra=Math.max(0,quota_bytes-d.storage_extension.included_bytes-d.storage_extension.free_bytes-(d.storage_extension.prepaid_bytes||0));
+     if(!confirm(tr('Storage extension rate: ','Costo orario estensione storage: ')+money(extra/1024**3*rate)+'/h?'))return;
+     await api('/api/account/subscription/storage','PUT',{quota_bytes,request_id:storageId,max_rate_micro:rate});storageId=crypto.randomUUID();await load()
+    }catch(err){status.textContent=err.message}};
+    if(d.next_plan)content.insertAdjacentHTML('beforeend','<p class="renewal-note">'+tr('Next plan','Prossimo piano')+': <b>'+plans[d.next_plan.plan]()+'</b> · '+money(d.next_plan.limits.price_micro)+' · '+new Date(d.next_plan.effective_at*1000).toLocaleString()+'</p>');
+    if(d.enabled&&d.self_service&&d.policy.subscriptions_allowed){
+     content.insertAdjacentHTML('beforeend','<label>'+tr('Plan at next renewal','Piano al prossimo rinnovo')+'<select data-renew-plan>'+d.plans.filter(p=>p.code!=='trial').map(p=>'<option value="'+p.code+'" '+((d.next_plan?.plan||d.subscription)===p.code?'selected':'')+'>'+plans[p.code]()+' · '+money(p.price_micro)+'</option>').join('')+'</select></label><button data-renew-plan-save>'+tr('Change next plan','Cambia prossimo piano')+'</button>');
+     content.querySelector('[data-renew-plan-save]').onclick=async()=>{try{const p=d.plans.find(x=>x.code===content.querySelector('[data-renew-plan]').value);if(!confirm(plans[p.code]()+' · '+money(p.price_micro)+'?'))return;await api('/api/account/subscription/renewal','POST',{plan:p.code,expected_price_micro:p.price_micro});await load()}catch(e){status.textContent=e.message}};
+    }
+    content.insertAdjacentHTML('beforeend','<button data-cancel>'+tr('Stop renewal at period end','Interrompi rinnovo a fine periodo')+'</button>');content.querySelector('[data-cancel]').onclick=async()=>{try{if(!confirm(tr('Stop automatic renewal?','Interrompere il rinnovo automatico?')))return;await api('/api/account/subscription/cancel','POST',{});await load()}catch(err){status.textContent=err.message}};
+   }
+   content.insertAdjacentHTML('beforeend',storageReport(d.storage_overusage)+'<details><summary>'+tr('Custom storage report','Riepilogo storage personalizzato')+'</summary><div class="settings-form"><label>'+tr('Start','Inizio')+'<input type="datetime-local" data-report-start></label><label>'+tr('End','Fine')+'<input type="datetime-local" data-report-end></label><button data-report>'+tr('Show report','Mostra riepilogo')+'</button></div><div data-report-result></div></details>');
+   content.querySelector('[data-report]').onclick=async()=>{try{const start=Math.floor(new Date(content.querySelector('[data-report-start]').value).getTime()/1000),end=Math.floor(new Date(content.querySelector('[data-report-end]').value).getTime()/1000);content.querySelector('[data-report-result]').innerHTML=storageReport(await api('/api/account/subscription/storage-report?start='+start+'&end='+end))}catch(e){status.textContent=e.message}};
+   if(['#subscriptions','#accountLimits'].includes(location.hash))root.closest('details').open=true;
+  }catch(e){status.textContent=e.message}
+ }
+ root.querySelector('[data-refresh]').onclick=load;await load();
+}
+
+async function admin(root){
+ if(root.dataset.loaded)return;root.dataset.loaded='1';
+ root.innerHTML='<h1>'+tr('Subscriptions and credits','Abbonamenti e crediti')+'</h1><p role="status"></p><div data-config></div><h2>'+tr('User quotas and promotions','Quote utente e promozioni')+'</h2><label>'+tr('Search users','Cerca utenti')+'<input type="search" data-search></label><select data-user></select><div data-user-controls></div><div data-detail></div>';
+ const q=s=>root.querySelector(s),status=q('[role=status]');
+ try{
+  const cfg=await api('/api/admin/subscriptions'),users=await api('/api/admin/users');
+  q('[data-config]').innerHTML='<label><input type="checkbox" data-enabled '+(cfg.enabled?'checked':'')+'> '+tr('Enable subscriptions','Abilita abbonamenti')+'</label><label><input type="checkbox" data-self '+(cfg.self_service?'checked':'')+'> '+tr('Allow self-service activation','Consenti attivazione autonoma')+'</label><p>'+tr('Plan changes apply from the next period; current allowances are retained. Plan prices default to zero.','Le modifiche ai piani valgono dal periodo successivo; le quote correnti restano valide. I prezzi dei piani sono inizialmente zero.')+'</p><div class="table-scroll"><table><thead><tr><th>'+tr('Plan','Piano')+'</th><th>CPU h</th><th>GPU h</th><th>Storage GiB</th><th>EUR</th></tr></thead><tbody>'+cfg.plans.map(p=>'<tr data-code="'+p.code+'"><td>'+plans[p.code]()+'</td><td>'+input('cpu_seconds',p.cpu_seconds/3600)+'</td><td>'+input('gpu_seconds',p.gpu_seconds/3600)+'</td><td>'+input('storage_bytes',p.storage_bytes/1024**3)+'</td><td>'+input('price_micro',p.price_micro/1e6)+'</td></tr>').join('')+'</tbody></table></div><button data-save-config>'+tr('Save plans','Salva piani')+'</button><p><a href="/ai-billing">'+tr('Configure ordinary category tariffs','Configura tariffe ordinarie per categoria')+'</a></p>';
+  q('[data-save-config]').onclick=async()=>{try{
+   const plans=[...root.querySelectorAll('[data-code]')].map(row=>({code:row.dataset.code,...Object.fromEntries([...row.querySelectorAll('input')].map(el=>[el.dataset.field,(el.dataset.field==='storage_bytes'||el.dataset.field==='price_micro'?Math.round(Number(el.value)*(el.dataset.field==='storage_bytes'?1024**3:1e6)):Number(el.value)*3600)]))}));
+   await api('/api/admin/subscriptions','PUT',{enabled:q('[data-enabled]').checked,self_service:q('[data-self]').checked,plans});status.textContent=tr('Saved','Salvato')
+  }catch(e){status.textContent=e.message}};
+  function filter(){const prev=q('[data-user]').value,needle=q('[data-search]').value.toLowerCase();q('[data-user]').innerHTML=users.filter(u=>(u.username+' '+u.email+' '+u.id).toLowerCase().includes(needle)).map(u=>'<option value="'+u.id+'">'+esc(u.username)+' · '+esc(u.email)+'</option>').join('');if([...q('[data-user]').options].some(o=>o.value===prev))q('[data-user]').value=prev;loadUser()}
+  async function loadUser(){
+   const uid=q('[data-user]').value;if(!uid){q('[data-detail]').textContent='';return}
+   try{
+    const d=await api('/api/admin/subscriptions/users/'+uid);if(q('[data-user]').value!==uid)return;
+    q('[data-detail]').innerHTML=details(d)+storageReport(d.storage_overusage);
+    q('[data-user-controls]').innerHTML='<div class="settings-form"><label>'+tr('Plan (none = manual daily quotas)','Piano (nessuno = quote giornaliere manuali)')+'<select data-assign-plan><option value="">'+tr('None','Nessuno')+'</option>'+Object.keys(plans).map(k=>'<option value="'+k+'">'+plans[k]()+'</option>').join('')+'</select></label><label>CPU h '+tr('(blank = unlimited)','(vuoto = illimitato)')+input('cpu',d.limits.cpu_seconds==null?'':d.limits.cpu_seconds/3600)+'</label><label>GPU h '+tr('(blank = unlimited)','(vuoto = illimitato)')+input('gpu',d.limits.gpu_seconds==null?'':d.limits.gpu_seconds/3600)+'</label><label>Storage GiB '+tr('(blank = unlimited)','(vuoto = illimitato)')+input('disk',d.limits.storage_bytes==null?'':d.limits.storage_bytes/1024**3)+'</label><label>'+tr('Free/promo reason (blank = ordinary plan)','Motivo promo/gratuito (vuoto = piano ordinario)')+input('promo',d.promo,'text')+'</label><button data-assign>'+tr('Assign new contract','Assegna nuovo contratto')+'</button></div><div class="settings-form"><label>'+tr('Add credits (EUR)','Aggiungi crediti (EUR)')+input('credits',0)+'</label><label>'+tr('Audit reason','Motivazione audit')+input('reason','','text')+'</label><button data-credit>'+tr('Grant credits','Assegna crediti')+'</button></div>';
+    q('[data-user-controls]').insertAdjacentHTML('afterbegin','<fieldset class="user-billing-policy"><legend>'+tr('User billing permissions','Permessi billing utente')+'</legend><label><input type="checkbox" data-allowed '+(d.policy.subscriptions_allowed?'checked':'')+'> '+tr('User may subscribe (default for new users)','L’utente può sottoscrivere abbonamenti (default nuovi utenti)')+'</label><label><input type="checkbox" data-credit-billing '+(d.policy.credit_billing?'checked':'')+'> '+tr('Charge usage to credits without a subscription','Addebita i consumi a crediti senza abbonamento')+'</label><button data-save-policy>'+tr('Save permissions','Salva permessi')+'</button></fieldset>');
+    q('[data-save-policy]').onclick=async()=>{try{await api('/api/admin/subscriptions/users/'+uid+'/policy','PATCH',{subscriptions_allowed:q('[data-allowed]').checked,credit_billing:q('[data-credit-billing]').checked});await loadUser()}catch(e){status.textContent=e.message}};
+    if(d.subscription){
+     q('[data-user-controls]').insertAdjacentHTML('beforeend','<fieldset><legend>'+tr('Storage allocation (current contract)','Assegnazione storage (contratto corrente)')+'</legend><label>GiB '+input('quota-storage',d.limits.storage_bytes/1024**3)+'</label><label><input type="checkbox" data-free-storage> '+tr('Grant all extra storage free of charge','Concedi gratuitamente tutto lo storage extra')+'</label><label>'+tr('Reason','Motivo')+input('storage-reason','','text')+'</label><button data-save-storage>'+tr('Update quota without restarting the plan','Aggiorna quota senza riavviare il piano')+'</button></fieldset>');
+     q('[data-save-storage]').onclick=async()=>{try{if(!confirm(tr('Apply this quota and billing choice?','Applicare questa quota e la scelta di addebito?')))return;await api('/api/admin/subscriptions/users/'+uid+'/storage','PUT',{quota_bytes:Math.round(Number(q('[data-field=quota-storage]').value)*1024**3),free:q('[data-free-storage]').checked,reason:q('[data-field=storage-reason]').value});await loadUser()}catch(e){status.textContent=e.message}};
+    }
+    q('[data-assign-plan]').value=d.subscription||'';
+    function manualFields(){for(const k of ['cpu','gpu','disk'])q('[data-field='+k+']').disabled=!!q('[data-assign-plan]').value}
+    q('[data-assign-plan]').onchange=manualFields;manualFields();
+    q('[data-assign]').onclick=async()=>{try{
+     if(!confirm(tr('Start a new quota period for this user?','Avviare un nuovo periodo di quota per questo utente?')))return;
+     const value=(f,scale)=>q('[data-field='+f+']').disabled||q('[data-field='+f+']').value===''?null:Number(q('[data-field='+f+']').value)*scale;
+     const code=q('[data-assign-plan]').value||null,body={plan:code,promo:q('[data-field=promo]').value};if(!code)Object.assign(body,{cpu_seconds:value('cpu',3600),gpu_seconds:value('gpu',3600),storage_bytes:value('disk',1024**3)});await api('/api/admin/subscriptions/users/'+uid,'PUT',body);await loadUser()
+    }catch(e){status.textContent=e.message}};
+    let creditId=crypto.randomUUID();
+    q('[data-credit]').onclick=async()=>{const button=q('[data-credit]');button.disabled=true;try{await api('/api/admin/subscriptions/users/'+uid+'/credits','POST',{amount_micro:Math.round(Number(q('[data-field=credits]').value)*1e6),reason:q('[data-field=reason]').value,request_id:creditId});creditId=crypto.randomUUID();await loadUser()}catch(e){status.textContent=e.message}finally{button.disabled=false}};
+   }catch(e){status.textContent=e.message}
+  }
+  q('[data-user]').onchange=loadUser;q('[data-search]').oninput=filter;filter();
+ }catch(e){status.textContent=e.message}
+}
+const personal=document.querySelector('[data-resource-account]');if(personal)owner(personal);
+const panel=document.querySelector('[data-resource-admin]');if(panel){const btn=document.querySelector('[data-tab=subscriptions]');btn?.addEventListener('click',()=>admin(panel));if(!panel.hidden)admin(panel)}
+window.addEventListener('hashchange',()=>{if(['#subscriptions','#accountLimits'].includes(location.hash)&&personal)personal.closest('details').open=true});
+window.addEventListener('mta:language',()=>{if(personal)owner(personal);if(panel&&!panel.hidden){delete panel.dataset.loaded;admin(panel)}});
+})();

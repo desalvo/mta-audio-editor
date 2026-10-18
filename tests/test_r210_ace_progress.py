@@ -112,7 +112,7 @@ const ctx={tr:(en,it)=>it,current:{id:'p'},document:{getElementById:id=>elements
 vm.createContext(ctx);vm.runInContext(process.argv[1],ctx);ctx.aiArrangerRenderProgress(job,true);
 vm.runInContext('aiArrangerLastSnapshot='+JSON.stringify(job),ctx);ctx.aiArrangerRenderElapsed();
 assert.match(elements.aiRemixJobHint.textContent,/Annullamento completato/);assert.doesNotMatch(elements.aiRemixJobHint.textContent,/waiting|attesa/);
-assert.equal(elements.aiRemixGenerateButton.disabled,false);assert.equal(elements.aiMeterCpu.textContent,'~8.6 s');assert.equal(elements.aiMeterGpu.textContent,'~7.0 s');assert.match(elements.aiMeterGpuNote.textContent,/non fatturabile/);
+assert.equal(elements.aiRemixGenerateButton.disabled,false);assert.equal(elements.aiMeterCpu.textContent,'~8.6 s');assert.equal(elements.aiMeterGpu.textContent,'~7.0 s');assert.match(elements.aiMeterGpuNote.textContent,/Stima diagnostica attendibile/);
 '''
     result=subprocess.run(['node','-e',script,section],capture_output=True,text=True,timeout=10)
     assert result.returncode==0,result.stderr

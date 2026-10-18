@@ -1,6 +1,6 @@
 /* Administrative email links select a page; actions still require UI confirmation. */
 (()=>{'use strict';
-const params=new URLSearchParams(location.search),tabs=new Set(['web','storage','users','smtp','models','aiQueue','diagnostics','legal']);
+const params=new URLSearchParams(location.search),tabs=new Set(['web','storage','users','smtp','models','aiQueue','diagnostics','legal','subscriptions']);
 const section=params.get('section'),uid=params.get('user'),job=params.get('job');
 function focus(){
  if(!['pending','archives','users'].includes(section))return;

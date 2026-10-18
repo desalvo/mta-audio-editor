@@ -30,7 +30,11 @@ def test_workspace_storage_payload_and_quota_guard(monkeypatch, tmp_path):
     users=[{'id':7,'username':'u','display_name':'User','role':'user','workspace_quota_bytes':10000}]
     monkeypatch.setattr(main,'list_users',lambda:users)
     monkeypatch.setattr(main,'_actor',lambda request:{'id':7,'role':'user'})
-    monkeypatch.setattr(main,'get_user',lambda uid:{'workspace_quota_bytes':10000})
+    import app.auth as auth
+    monkeypatch.setattr(auth,'DATA_ROOT',tmp_path/'auth');auth.init_auth_db()
+    with auth.db() as con:
+        con.execute("INSERT INTO users(id,username,email,password_hash,role,active,created_at,updated_at,workspace_quota_bytes) VALUES(7,'quota-unit','quota-unit@example.test','unused','user',1,1,1,10000)")
+    monkeypatch.setattr(main,'get_user',auth.get_user)
     payload=main._storage_payload(object())
     assert len(payload['workspaces'])==1 and payload['workspaces'][0]['used_bytes'] >= 25
     assert payload['models']['total_bytes']==12

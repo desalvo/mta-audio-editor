@@ -1062,12 +1062,9 @@ def _ensure_workspace_capacity(owner_user_id: int | None, additional_bytes: int)
     row=get_user(owner_user_id)
     if not row:
         return
-    quota=int(row["workspace_quota_bytes"] or 0)
-    if not quota:
-        return
-    used=_workspace_usage_for_user(owner_user_id)
-    if used + additional_bytes > quota:
-        raise HTTPException(413, f"Quota workspace superata: {used} byte usati su {quota} byte disponibili.")
+    from .resource_accounts import storage_check
+    try:storage_check(owner_user_id,_workspace_usage_for_user(owner_user_id),additional_bytes)
+    except ValueError as exc:raise HTTPException(413,str(exc)) from exc
 
 @app.get("/api/storage")
 def api_storage(request: Request):
@@ -7897,3 +7894,6 @@ _legal_routes(app)
 
 from .admin_dump_routes import register_routes as _register_dump_routes
 _register_dump_routes(app)
+
+from .resource_routes import router as _resource_router
+app.include_router(_resource_router)

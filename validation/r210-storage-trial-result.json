@@ -1,0 +1,20 @@
+{
+  "version": "0.3.0-r210",
+  "passed": 3988,
+  "skipped": 5,
+  "deselected": 10,
+  "coverage_percent": 77.3,
+  "duration_seconds": 223.182,
+  "warnings": 6,
+  "targeted_passed": 45,
+  "static_checks": "Ruff and JavaScript syntax passed",
+  "ui_checks": "Actual plan-card and storage-report markup exercised in IT and EN via Node",
+  "environment_exclusions": "10 AF_UNIX tests excluded because socket creation is denied; 4 optional Steinberg SDK and 1 real Win32 API tests skipped",
+  "live_validation": {
+    "real_server": false,
+    "rocm": false,
+    "native_gui": false,
+    "smtp": false
+  },
+  "migration": "Old prepaid storage retains original coverage; prior package files preserved"
+}

@@ -60,7 +60,16 @@ def settings(body=None):
             if not isinstance(body,dict) or set(body)-{'sandbox_days','project_days'}:raise ValueError('Impostazioni non valide')
             for key,value in body.items():
                 if type(value) is not int or not 1<=value<=3650:raise ValueError('Giorni ammessi: 1–3650')
+            from .resource_accounts import init as init_resources,notice
+            init_resources(con)
+            previous=dict(con.execute('SELECT sandbox_days,project_days FROM account_retention_config').fetchone())
             for key,value in body.items():con.execute('UPDATE account_retention_config SET '+key+'=? WHERE id=1',(value,))  # noqa: S608 -- identifiers from fixed allowlists or quoted SQLite schema only
+            changed=[key for key in body if body[key]!=previous[key]]
+            if changed:
+                revision=uuid.uuid4().hex
+                for user in con.execute('SELECT id FROM users'):
+                    notice(con,'retention:'+revision+':'+str(user[0]),user[0],{'kind':'legal','fields':changed})
+
         return dict(con.execute('SELECT sandbox_days,project_days FROM account_retention_config').fetchone())
 
 
@@ -276,7 +285,7 @@ def listings():
 
 
 def has_accounting(con,uid):
-    for table in ('ai_compute_jobs','ai_usage_events','ai_billing_periods','ai_persistent_storage_samples'):
+    for table in ('ai_compute_jobs','ai_usage_events','ai_billing_periods','ai_persistent_storage_samples','resource_credits','resource_job_contracts','resource_periods','resource_storage_unlocks','resource_storage_debits','resource_quota_events'):
         if con.execute('SELECT 1 FROM sqlite_master WHERE type="table" AND name=?',(table,)).fetchone() and con.execute('SELECT 1 FROM '+table+' WHERE user_id=? LIMIT 1',(uid,)).fetchone():return True  # noqa: S608 -- identifiers from fixed allowlists or quoted SQLite schema only
     return False
 

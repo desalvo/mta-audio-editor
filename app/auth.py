@@ -129,6 +129,8 @@ def _add_column(con: sqlite3.Connection, table: str, definition: str) -> None:
     cols = {row[1] for row in con.execute(f"PRAGMA table_info({table})")}
     if name not in cols:
         con.execute(f"ALTER TABLE {table} ADD COLUMN {definition}")
+        if table=='users' and name=='workspace_quota_explicit':
+            con.execute("UPDATE users SET workspace_quota_explicit=1 WHERE role='admin' AND workspace_quota_bytes NOT IN (0,5368709120)")
 
 
 def init_auth_db() -> None:
@@ -217,6 +219,7 @@ def init_auth_db() -> None:
             "totp_pending_enc TEXT NOT NULL DEFAULT ''",
             "updated_at INTEGER NOT NULL DEFAULT 0",
             "workspace_quota_bytes INTEGER NOT NULL DEFAULT 0",
+            "workspace_quota_explicit INTEGER NOT NULL DEFAULT 0",
             "language TEXT NOT NULL DEFAULT 'auto'",
             "browser_language TEXT NOT NULL DEFAULT 'en'",
             "limits_expanded INTEGER NOT NULL DEFAULT 0",
@@ -267,7 +270,7 @@ def _bootstrap_admin() -> None:
         ts = now_ts()
         con.execute(
             """INSERT INTO users(username,email,display_name,password_hash,role,active,email_confirmed,created_at,updated_at,approved_at,workspace_quota_bytes)
-               VALUES(?,?,?,?, 'admin',1,1,?,?,?,5368709120)""",
+               VALUES(?,?,?,?, 'admin',1,1,?,?,?,0)""",
             (username, email, "Administrator", _password_hash_unchecked(password), ts, ts, ts),
         )
 
@@ -311,7 +314,7 @@ def public_user(row) -> dict:
         "updated_at": row["updated_at"],
         "approved_at": row["approved_at"],
         "last_login_at": row["last_login_at"],
-        "workspace_quota_bytes": int(row["workspace_quota_bytes"] or 0) if "workspace_quota_bytes" in row.keys() else 0,
+        "workspace_quota_bytes": (int(row["workspace_quota_bytes"] or 0) if row["role"]!="admin" or ("workspace_quota_explicit" in row.keys() and row["workspace_quota_explicit"]) else 0) if "workspace_quota_bytes" in row.keys() else 0,
         "limits_expanded": bool(row["limits_expanded"]) if "limits_expanded" in row.keys() else False,
         "language": row["language"] if "language" in row.keys() else "auto",
         "browser_language": row["browser_language"] if "browser_language" in row.keys() else "en",
@@ -1079,7 +1082,7 @@ def update_user_admin(target_id: int, actor_id: int, *, active: bool | None = No
         if role is not None:
             con.execute("UPDATE users SET role=?, updated_at=? WHERE id=?", (role, ts, target_id))
         if workspace_quota_bytes is not None:
-            con.execute("UPDATE users SET workspace_quota_bytes=?, updated_at=? WHERE id=?", (int(workspace_quota_bytes), ts, target_id))
+            con.execute("UPDATE users SET workspace_quota_bytes=?, workspace_quota_explicit=1, updated_at=? WHERE id=?", (int(workspace_quota_bytes), ts, target_id))
         if active is not None:
             con.execute(
                 "UPDATE users SET active=?, approved_at=?, approved_by=?, updated_at=? WHERE id=?",

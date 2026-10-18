@@ -55,7 +55,7 @@ def status(cfg, retention=None):
 def save(body, actor):
     if not isinstance(body,dict) or set(body)-set(FIELDS)-{'reviewed','effective_date'}:
         raise ValueError('Campi legali non validi')
-    cfg,retention=snapshot()
+    cfg,retention=snapshot();previous=dict(cfg)
     for key,value in body.items():
         if key=='reviewed':
             if type(value) is not bool:raise ValueError('reviewed deve essere booleano')
@@ -79,6 +79,8 @@ def save(body, actor):
         raise ValueError('Completa i dati obbligatori IT/EN prima di dichiarare la revisione')
     cfg['retention_review']=retention if cfg['reviewed'] else {}
     with auth.db() as con:
+        from .resource_accounts import init,notice
+        init(con)
         con.execute('''CREATE TABLE IF NOT EXISTS legal_instance_config
             (id INTEGER PRIMARY KEY CHECK(id=1),config_json TEXT NOT NULL)''')
         con.execute('''CREATE TABLE IF NOT EXISTS legal_instance_history
@@ -89,6 +91,10 @@ def save(body, actor):
         encoded=json.dumps(cfg,ensure_ascii=False,allow_nan=False)
         con.execute('INSERT INTO legal_instance_history VALUES(?,?,unixepoch(),?)',(cfg['revision'],actor,encoded))
         con.execute('INSERT INTO legal_instance_config VALUES(1,?) ON CONFLICT(id) DO UPDATE SET config_json=excluded.config_json',(encoded,))
+        changed=[k for k in (*FIELDS,'effective_date') if cfg.get(k)!=previous.get(k)]
+        if changed:
+            for user in con.execute('SELECT id FROM users'):
+                notice(con,f"legal:{cfg['revision']}:{user[0]}",user[0],{'kind':'legal','revision':cfg['revision'],'fields':changed})
     return {**cfg,**status(cfg,retention)}
 
 
@@ -105,7 +111,7 @@ def document_html(kind,language):
         document_navigation='Navigazione documenti' if it else 'Document navigation',
         back='Torna al login' if it else 'Back to sign in',print_label='Scarica PDF' if it else 'Download PDF',
         other_kind='terms' if kind=='privacy' else 'privacy',other_label=('Termini di servizio' if it else 'Terms of service') if kind=='privacy' else ('Informativa privacy' if it else 'Privacy notice'),
-        warning='' if status(cfg,retention)['ready'] else '<aside class="legal-warning" role="note">'+('Documento di istanza da completare e verificare: il gestore non ha ancora confermato tutti i dati obbligatori. Non è una dichiarazione di conformità.' if it else 'Instance document awaiting completion and review: the operator has not confirmed all required disclosures. This is not a statement of compliance.')+'</aside>')
+        warning='')
     body=(BASE/'docs/legal'/f'{kind}-{language}.html').read_text(encoding='utf-8')
     body=body.replace('{{operator_address}} · {{operator_country}}','{{operator_location}}')
     if not cfg.get('operator_address') or not cfg.get('operator_country'):
@@ -172,6 +178,7 @@ def pdf_document(kind,language):
     body=re.search(r'<article>(.*?)</article>',template,re.S)[1]
     body=re.sub(r'<nav\b.*?</nav>','',body,flags=re.S)
     body=re.sub(r'<dt>(.*?)</dt>\s*<dd>(.*?)</dd>',r'<p><b>\1:</b> \2</p>',body,flags=re.S)
+    body=re.sub(r'<tr>\s*<td>(.*?)</td>\s*<td>(.*?)</td>\s*</tr>',r'<p><b>\1:</b> \2</p>',body,flags=re.S)
     styles=getSampleStyleSheet()
     styles.add(ParagraphStyle(name='LegalText',parent=styles['BodyText'],fontName='Helvetica',fontSize=9,leading=13,spaceAfter=7))
     output=BytesIO();doc=SimpleDocTemplate(output,pagesize=(210*mm,297*mm),leftMargin=19*mm,rightMargin=19*mm,topMargin=18*mm,bottomMargin=20*mm,title=values['title'],author='MTA Audio Editor')

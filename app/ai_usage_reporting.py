@@ -18,7 +18,11 @@ def records(user_id, start, end, *, completed_window=False):
         diagnostics=read_diagnostics(con,user_id)
         rates=ai_billing._rates_for_jobs(con,ledger)
         enabled=ai_billing.user_billing_enabled(user_id,_connection=con)
+        credits={}
+        if con.execute("SELECT 1 FROM sqlite_master WHERE name='resource_job_contracts'").fetchone():
+            credits={r[0]:r[1] for r in con.execute('SELECT job_id,charge_micro FROM resource_job_contracts WHERE user_id=?',(user_id,))}
         for row in ledger:
+            row['credits_debited_micro']=credits.get(row['id'],0)
             row['usage']=json.loads(row['usage_json'])
             row['estimated']=diagnostics.get(row['id'],{})
             row['cost_micro']=sum(round(qty*rates[row['id']].get(key,0)) for key,qty in row['usage'].items()
@@ -60,9 +64,10 @@ def records(user_id, start, end, *, completed_window=False):
 
 
 def aggregate(items):
-    total={'jobs':0,'trusted_estimated_usage':{},'usage':{},'diagnostic':{},'cost_micro':0,'amount_micro':0,'unmetered_jobs':0}
+    total={'jobs':0,'credits_debited_micro':0,'trusted_estimated_usage':{},'usage':{},'diagnostic':{},'cost_micro':0,'amount_micro':0,'unmetered_jobs':0}
     for row in items:
         total['jobs']+=1
+        total['credits_debited_micro']+=row.get('credits_debited_micro',0)
         if row.get('resource_source')=='diagnostic-estimate':
             for key,value in row['usage'].items():
                 total['trusted_estimated_usage'][key]=total['trusted_estimated_usage'].get(key,0)+value
