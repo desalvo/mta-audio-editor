@@ -117,7 +117,7 @@ def translate_html(text,language=None):
 def inject_runtime(text,language,choice='auto'):
     if '/static/localization.js' in text:return text
     setup=json.dumps({'language':language,'choice':choice},separators=(',',':'))
-    scripts='<script>window.MTA_LOCALE='+setup+'</script><script src="/static/i18n_catalog.js?v=0.3.0-r210-native-first-start"></script><script src="/static/localization.js?v=0.3.0-r210-native-first-start"></script>'
+    scripts='<script>window.MTA_LOCALE='+setup+'</script><script src="/static/i18n_catalog.js?v=0.3.0-r210-master-bounce"></script><script src="/static/localization.js?v=0.3.0-r210-master-bounce"></script>'
     return text.replace('</head>',scripts+'</head>',1) if '</head>' in text else scripts+text
 
 

@@ -47,11 +47,15 @@ def summary(user_id, storage, *, at=None):
     def total(items,key):return sum(float(r['usage'].get(key,0)) for r in items)
     resources={}
     for name in ('cpu','gpu'):
-        key=name+'_seconds';known=key in report['usage'];verified=report['usage'].get(key)
-        resources[name]={'verified_seconds':verified if known else None,
+        key=name+'_seconds';known=key in report['usage'];accounted=report['usage'].get(key)
+        verified_rows=[r for r in rows if r.get('resource_source')!='diagnostic-estimate' and key in r['usage']]
+        verified=total(verified_rows,key) if verified_rows else None
+        resources[name]={'verified_seconds':verified,'accounted_seconds':accounted if known else None,
+          'trusted_estimated_seconds':report['trusted_estimated_usage'].get(key),
           'diagnostic_seconds':report['diagnostic'].get(key+'_estimated'),
           'closed_seconds':total(closed,key),'pending_seconds':total(pending,key),
-          'other_verified_seconds':max(0,(verified or 0)-total(closed,key)-total(pending,key))}
+          'other_verified_seconds':max(0,(verified or 0)-total([r for r in closed+pending if r in verified_rows],key)),
+          'other_accounted_seconds':max(0,(accounted or 0)-total(closed,key)-total(pending,key))}
         for value in resources[name].values():
             if value is not None and (not math.isfinite(value) or value<0):raise ValueError('Invalid resource summary')
     return {'user_id':user_id,'as_of':now,'storage':{**storage,'quota_bytes':quota or None,'unlimited':not quota,

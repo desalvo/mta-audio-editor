@@ -467,56 +467,79 @@ function openLocalProject(){
 }
 async function newProject(){
   if(activeStemJob)return toast('Attendi il completamento della separazione prima di creare un altro progetto.');
-  pendingNewProjectPath=null;
+  pendingNewProjectPath=null;pendingNativeProjectCreation=null;
   showUtilityModal('Nuovo progetto',`
     <div class="stem-workflow">
       <label class="workflow-field"><span>Nome progetto</span><input id="newProjectTitle" maxlength="200" value="Nuovo progetto" autofocus></label>
       <label class="workflow-field"><span>Tipo progetto</span><select id="newProjectTarget"><option value="DAW">Multitrack DAW</option><option value="MTA8">MTA8</option><option value="MTA16">MTA16</option></select></label>
       <label class="workflow-field"><span>Sample rate progetto</span><select id="newProjectSampleRate"><option value="44100" selected>44.1 kHz</option><option value="48000">48 kHz</option><option value="96000">96 kHz</option></select><small>Impostazione fissa dopo l'aggiunta della prima traccia.</small></label>
+      <p id="newProjectStatus" class="hint" role="status" aria-live="polite" hidden></p>
       <div class="utility-actions">
         <button id="createProjectButton" class="utility-btn primary" type="button" onclick="createProjectFromDialog()">Crea progetto</button>
         <button class="utility-btn secondary" type="button" onclick="closeUtilityModal()">Annulla</button>
       </div>
     </div>`);
 }
-let projectCreationPending=false;
+let projectCreationPending=false,pendingNativeProjectCreation=null;
+function setNewProjectStatus(message,failed=false){
+  const status=$('#newProjectStatus');if(!status)return;
+  status.hidden=!message;status.textContent=message;
+  status.setAttribute('role',failed?'alert':'status');
+}
 async function createProjectFromDialog(){
   if(projectCreationPending)return;
   const title=$('#newProjectTitle')?.value?.trim()||'';
   const target=$('#newProjectTarget')?.value||'DAW';
   const sampleRate=Number($('#newProjectSampleRate')?.value||44100);
   if(!title)return toast('Inserisci un nome per il progetto');
+  const storageMode=appDisplayPreference('useFlacStorage')?'flac':'wav';
+  const signature=JSON.stringify([title,target,sampleRate,storageMode]);
   projectCreationPending=true;
   const button=$('#createProjectButton');if(button)button.disabled=true;
-  let bridge=null;
+  let bridge=null,draft=null;
   try{
     if(!await prepareProjectLeave())return;
     if(currentUser?.native_single_user){
       bridge=await waitForNativeApi();
       if(!bridge?.choose_project_save_path||!bridge?.bind_project_path)throw Error(tr('Native save dialog is unavailable. Please try again.','La finestra di salvataggio nativa non è disponibile. Riprova.'));
-      pendingNewProjectPath=null;
-      const chosen=await bridge.choose_project_save_path(title);
-      if(!chosen?.ok)return;
-      pendingNewProjectPath=chosen.path;
-      if(!pendingNewProjectPath)throw Error(tr('No save destination was selected','Nessuna destinazione di salvataggio selezionata'));
+      draft=pendingNativeProjectCreation?.signature===signature?pendingNativeProjectCreation:null;
+      if(!draft){
+        setNewProjectStatus(tr('Choose the project destination…','Scegli la destinazione del progetto…'));
+        const chosen=await bridge.choose_project_save_path(title);
+        if(chosen?.cancelled===true){setNewProjectStatus('');return;}
+        if(!chosen?.ok)throw Error(chosen?.error||tr('No save destination was selected','Nessuna destinazione di salvataggio selezionata'));
+        if(typeof chosen.path!=='string'||!chosen.path.trim())throw Error(tr('No save destination was selected','Nessuna destinazione di salvataggio selezionata'));
+        draft=pendingNativeProjectCreation={signature,path:chosen.path,id:null,bound:false};
+      }
+      pendingNewProjectPath=draft.path;
     }
-    const created=await api('/api/projects?title='+encodeURIComponent(title)+'&target='+encodeURIComponent(target)+'&sample_rate='+encodeURIComponent(sampleRate)+'&audio_storage_mode='+(appDisplayPreference('useFlacStorage')?'flac':'wav'),{method:'POST'});
+    setNewProjectStatus(tr('Creating the project…','Creazione del progetto…'));
+    const created=draft?.id?draft:await api('/api/projects?title='+encodeURIComponent(title)+'&target='+encodeURIComponent(target)+'&sample_rate='+encodeURIComponent(sampleRate)+'&audio_storage_mode='+storageMode,{method:'POST'});
     if(currentUser?.native_single_user){
-      const bound=await bridge.bind_project_path(created.id,pendingNewProjectPath);
-      if(!bound?.ok)throw Error(tr('Project could not be saved to the selected destination','Impossibile salvare il progetto nella destinazione selezionata'));
+      draft.id=created.id;
+      if(!draft.bound){
+        setNewProjectStatus(tr('Saving the project file…','Salvataggio del file progetto…'));
+        const bound=await bridge.bind_project_path(created.id,pendingNewProjectPath);
+        if(!bound?.ok)throw Error(bound?.error||tr('Project could not be saved to the selected destination','Impossibile salvare il progetto nella destinazione selezionata'));
+        draft.bound=true;
+      }
     }
     const createdId=created.id;
-    closeUtilityModal();
-    // Load the newly-created project explicitly before refreshing the native workspace.
-    // This avoids the historical native flow where the archive was created but the editor stayed empty.
+    setNewProjectStatus(tr('Opening the project…','Apertura del progetto…'));
+    // Keep the dialog and retry state until the saved project can be loaded.
     current=await api('/api/projects/'+createdId);
+    closeUtilityModal();
     rememberRecentProject(current.id);
     selectedTrackId=current.tracks?.[0]?.id||null;
     resetProjectUiForOpen();resetSessionHistory();render();
+    pendingNativeProjectCreation=null;
     await refresh();schedulePlaybackPrewarm(40);focusProjectWorkspace();
     toast(currentUser?.native_single_user?`Progetto ${target} creato in ${pendingNewProjectPath}`:`Progetto ${target} creato e salvato nel workspace`);
     pendingNewProjectPath=null;
-  }catch(e){toast(e.message)}finally{projectCreationPending=false;pendingNewProjectPath=null;if(button?.isConnected)button.disabled=false}
+  }catch(e){
+    const message=tr('Project creation failed','Creazione del progetto fallita')+': '+(e.message||String(e));
+    setNewProjectStatus(trDynamic(message),true);toast(message);
+  }finally{projectCreationPending=false;if(!pendingNativeProjectCreation)pendingNewProjectPath=null;if(button?.isConnected)button.disabled=false;}
 }
 async function offerFlacMigrationOnOpen(){
   if(!current || current.audio_storage_mode==='flac' || !appDisplayPreference('useFlacStorage'))return;
@@ -822,6 +845,7 @@ function toolbarHtml(){
     <button class="toolbar-action" onclick="openYoutubeImport()" title="Importa solo audio da un singolo video YouTube">▶ Import YouTube</button>
     <button class="toolbar-action" onclick="openMetronomeSettings()" title="Configura e crea metronomo">♩ Metronomo</button><button class="toolbar-action" onclick="openMetronomeGridSettings()" ${current.metronome_mode==='adaptive'?'disabled':''} title="${tr('Set BPM and time signature without changing audio speed','Imposta BPM e misura senza cambiare velocità audio')}">♩ ${tr('Grid','Griglia')}</button><button class="toolbar-action" onclick="openAdaptiveMetronomeShift()" title="Sposta il metronomo adattivo in millisecondi o beat">↔ Shift adattivo</button><button class="toolbar-action" onclick="createChordsTrack()" title="Crea o rigenera una sola traccia Chords con piano digitale sincronizzato agli accordi del progetto">♬ Chords</button>
     <div class="toolbar-group"><input id="newTrackFile" type="file" hidden accept=".mp3,.wav,.flac,.m4a,audio/*" onchange="addTrack()"><select id="newSync"><option value="manual">Manual sync</option><option value="auto">Auto sync</option></select><input id="newOffset" type="number" value="0" title="Offset ms" style="width:72px"><select id="newRef" style="max-width:115px">${refs}</select></div>
+    <button type="button" id="bounceProjectButton" class="toolbar-action" onclick="bounceToTrack()" title="${tr('Bounce project to track','Bounce progetto su traccia')}" aria-label="${tr('Bounce project to track','Bounce progetto su traccia')}"><span aria-hidden="true">⇥</span></button>
     <div class="toolbar-sep"></div><button id="undoBtn" class="toolbar-action" onclick="undoEdit()">↶ Undo</button><button id="redoBtn" class="toolbar-action" onclick="redoEdit()">↷ Redo</button><button class="toolbar-action" onclick="cutTimelineSelection()">✂ Cut</button><button class="toolbar-action" onclick="copyTimelineSelection()">⧉ Copy</button><button id="pasteBtn" class="toolbar-action" onclick="pasteTimelineSelection()">▣ Paste</button><button class="toolbar-action danger" onclick="removeTimelineSelection()">⌫ Remove</button><div class="toolbar-grow"></div><span class="selected-track-count" id="selectedTrackCount">${selectedTrackIds().length} selected</span><span class="selection-info" id="selectionInfo">0.000 → 0.000 s</span>
   </div>`
 }
@@ -1103,6 +1127,34 @@ async function duplicateTrack(id){
     render();toast('Traccia duplicata');
   }catch(e){toast('Duplicazione fallita: '+e.message)}
 }
+let bouncePending=false;
+async function bounceToTrack(id=null){
+  if(!current||bouncePending)return;
+  const pid=current.id;bouncePending=true;
+  try{
+    await save();if(current?.id!==pid)return;
+    const route=id?`/api/projects/${pid}/tracks/${id}/bounce`:`/api/projects/${pid}/bounce`;
+    showUtilityModal(tr('Bounce to track','Bounce su traccia'),`<p role="status">${tr('Rendering audio…','Rendering audio…')}</p>`);
+    const accepted=await api(route,{method:'POST'});
+    let job;
+    do{
+      await new Promise(resolve=>setTimeout(resolve,600));
+      job=await api('/api/media-jobs/'+accepted.bounce_job_id);
+    }while(['queued','running'].includes(job.status));
+    if(job.status!=='completed')throw Error(job.error||tr('Bounce failed','Bounce fallito'));
+    await syncNativeProjectFile(pid,true);
+    if(current?.id===pid){current=await api('/api/projects/'+pid);selectedTrackId=job.result.track_id;selectedTrackIdSet=new Set([selectedTrackId]);render();await refresh();}
+    closeUtilityModal();toast(tr('Bounce added as a muted track','Bounce aggiunto come traccia muta'));
+  }catch(e){closeUtilityModal();toast(tr('Bounce failed','Bounce fallito')+': '+e.message)}
+  finally{bouncePending=false;}
+}
+function handleBounceShortcut(event){
+  const el=event.target;
+  if(event.defaultPrevented||event.repeat||event.ctrlKey||event.metaKey||event.altKey||event.shiftKey||event.key.toLowerCase()!=='b'||!current)return false;
+  if(el?.closest?.('input,textarea,select,[contenteditable="true"],[role="textbox"]')||document.querySelector('.utility-backdrop:not(.hidden)'))return false;
+  const track=trackById(selectedTrackId);if(!track)return false;
+  event.preventDefault();event.stopPropagation();closeTrackContextMenu();void bounceToTrack(track.id);return true;
+}
 function openTrackContextMenuAt(id,clientX,clientY){
   closeTrackContextMenu();
   const track=trackById(id);if(!track)return;
@@ -1116,9 +1168,11 @@ function openTrackContextMenuAt(id,clientX,clientY){
   menu.className='track-context-menu';
   menu.setAttribute('role','menu');
   menu.tabIndex=-1;
-  menu.innerHTML=`
+  menu.innerHTML=`<details class="context-category" open><summary>${tr('Track','Traccia')}</summary><div role="group">
     <button type="button" onclick="closeTrackContextMenu();duplicateTrack('${id}')">⧉ <span>Duplica traccia</span></button>
     <button type="button" onclick="closeTrackContextMenu();renameTrack('${id}')">✎ <span>Rinomina</span></button>
+    <button type="button" aria-keyshortcuts="B" onclick="closeTrackContextMenu();bounceToTrack('${id}')">⇥ <span class="context-menu-label">${tr('Bounce to track','Bounce su traccia')}</span><kbd class="context-shortcut">B</kbd></button>
+    </div></details><details class="context-category"><summary>${tr('Audio and AI','Audio e AI')}</summary><div role="group">
     <button type="button" ${disabled} onclick="closeTrackContextMenu();openTrackStemWorkflow('${id}')">▥ <span>Separa</span></button>
     <button type="button" onclick="closeTrackContextMenu();openAiRemixPanel('${id}')">✧ <span>AI Arranger / Remix · traccia</span></button>
     <button type="button" onclick="closeTrackContextMenu();openSampleEditor('${id}')">⌁ <span>Editor waveform / campioni</span></button>
@@ -1128,15 +1182,25 @@ function openTrackContextMenuAt(id,clientX,clientY){
     <button type="button" onclick="closeTrackContextMenu();openTextAnalysisChooser('${id}','lyrics')">≡ <span>Estrai lyrics</span></button>
     <button type="button" onclick="closeTrackContextMenu();openTextAnalysisChooser('${id}','chords')">♬ <span>Estrai chords</span></button>
     <button type="button" onclick="closeTrackContextMenu();extractMarkersFromTrack('${id}')">⚑ <span>Estrai marker</span></button>
+    </div></details><details class="context-category"><summary>${tr('Tempo and annotations','Tempo e annotazioni')}</summary><div role="group">
     <button type="button" onclick="closeTrackContextMenu();openMetronomeSettings(playCursorMs)">♩ <span>${tr('Insert metronome at transport position','Inserisci metronomo dalla posizione del transport')}</span></button>
     ${(track.type==='click'||isGeneratedChordsTrack(track))?`<button type="button" aria-keyshortcuts="r" onclick="closeTrackContextMenu();refreshGeneratedTrackFromContext('${id}')">⟳ <span class="context-menu-label">${tr('Regenerate track','Rigenera traccia')}</span><kbd class="context-shortcut">R</kbd></button>`:''}
     ${!(track.type==='click'||isGeneratedChordsTrack(track))&&(current.tracks||[]).some(t=>t.type==='click')?`<button type="button" onclick="closeTrackContextMenu();updateMetronomeFromAudioTrack('${id}')">♩ <span>Aggiorna metronomo</span></button>`:''}
     <button type="button" onclick="closeTrackContextMenu();openTrackDelayDialog('${id}')">↔ <span>Delay / anticipo traccia…</span></button>
     <button type="button" onclick="closeTrackContextMenu();addTimelineChordAtPlayhead()">♬ <span class="context-menu-label">Aggiungi chord</span><kbd class="context-shortcut">C</kbd></button>
     <button type="button" onclick="closeTrackContextMenu();addTimelineMarkerAtPlayhead()">⚑ <span class="context-menu-label">Aggiungi marker</span><kbd class="context-shortcut">M</kbd></button>
+    </div></details><details class="context-category"><summary>${tr('Delete','Elimina')}</summary><div role="group">
     <button type="button" class="danger" onclick="closeTrackContextMenu();deleteSelection(true)">⌫ <span>Delete selected range</span></button>
     <button type="button" class="danger" onclick="closeTrackContextMenu();deleteTracksByIds(['${id}'])">× <span>Rimuovi</span></button>
+    </div></details>
   `;
+  menu.addEventListener('keydown',event=>{
+    if(['Enter',' ','ArrowLeft','ArrowRight'].includes(event.key)){
+      event.stopPropagation();
+      const category=event.target.closest?.('details.context-category');
+      if(category&&['ArrowLeft','ArrowRight'].includes(event.key)){event.preventDefault();category.open=event.key==='ArrowRight';}
+    }
+  });
   document.body.appendChild(menu);
   menu.focus({preventScroll:true});
   const pad=8,r=menu.getBoundingClientRect();
@@ -2653,6 +2717,7 @@ async function refreshDynamicTrackPlayback(trackId){
   }catch(e){console.warn('Aggiornamento live FX traccia fallito',trackId,e)}
 }
 function queueLiveFxRefresh(isMaster,trackId='',delay=70){
+  if(waPlaybackActive&&(isMaster||waMasterMixMode)){queueWebAudioMasterRefresh();return;}
   if(!playAudio&&!trackPlaybacks.length)return;
   if(renderedMasterPlayback){queueRenderedMasterRefresh(delay);return}
   if(isMaster){
@@ -2730,7 +2795,8 @@ function setMasterVolume(v){
   if($('#master-volume-range')&&Number($('#master-volume-range').value)!==n)$('#master-volume-range').value=n;
   if($('#master-db')&&document.activeElement!==$('#master-db'))$('#master-db').value=n.toFixed(1);
   updatePlaybackGains();
-  if(waPlaybackActive){scheduleMasterFades(waProjectCursorMs(),audioCtx.currentTime)}
+  if(waPlaybackActive&&waMasterMixMode){queueWebAudioMasterRefresh();}
+  else if(waPlaybackActive){scheduleMasterFades(waProjectCursorMs(),audioCtx.currentTime)}
   else if(masterPlaybackGainNode){
     const liveDb=renderedMasterPlayback?n-renderedMasterBaseVolumeDb:n;
     masterPlaybackGainNode.gain.setValueAtTime(dbToGain(liveDb),audioCtx?.currentTime||0);
@@ -2738,6 +2804,7 @@ function setMasterVolume(v){
   markDirty();
 }
 function setTrackPan(id,v){
+  if(waPlaybackActive&&waMasterMixMode)queueWebAudioMasterRefresh();
   const t=trackById(id);if(!t)return;
   const n=clampPan(v);t.pan=n;updatePanUi(id,n);
   const item=trackPlaybacks.find(x=>x.trackId===id);
@@ -4582,7 +4649,7 @@ window.addEventListener('pointerdown',e=>{
   if(menu&&!menu.contains(e.target))closeTrackContextMenu();
 });
 window.addEventListener('keydown',e=>{
-  if(handleGeneratedTrackShortcut(e))return;
+  if(handleBounceShortcut(e)||handleGeneratedTrackShortcut(e))return;
   if(e.target?.closest?.('.gain-knob')&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Home','End','0'].includes(e.key))return;
   const target=e.target;
   const editable=target instanceof HTMLInputElement||target instanceof HTMLTextAreaElement||target instanceof HTMLSelectElement||target?.isContentEditable;
@@ -5323,7 +5390,7 @@ function metaPanelBodyHtml(expanded=false){
 }
 
 /* r189 deterministic WebAudio transport: one AudioContext clock, one scheduled source per track. */
-let waPlaybackActive=false,waPlaybackPaused=false,waRenderFilters=false,waStartCtxTime=0,waStartCursorMs=0,waMasterBus=null,waDecodedBuffers=new Map();
+let waPlaybackActive=false,waPlaybackPaused=false,waRenderFilters=false,waStartCtxTime=0,waStartCursorMs=0,waMasterBus=null,waDecodedBuffers=new Map(),waMasterMixMode=false,waMasterRefreshTimer=null;
 function waProjectCursorMs(){
   if(!waPlaybackActive||!audioCtx)return playCursorMs;
   if(waPlaybackPaused)return waStartCursorMs;
@@ -5359,8 +5426,44 @@ async function waDecodeTrack(track,renderFilters,cacheBust=false){
   const ab=await resp.arrayBuffer();const buffer=await audioCtx.decodeAudioData(ab.slice(0));
   waDecodedBuffers.set(key,buffer);return buffer;
 }
+let waMasterRefreshBusy=false,waMasterRefreshQueued=false;
+function queueWebAudioMasterRefresh(){
+  if(!waPlaybackActive)return;
+  clearTimeout(waMasterRefreshTimer);
+  waMasterRefreshTimer=setTimeout(()=>{waMasterRefreshTimer=null;void refreshWebAudioMasterMix();},180);
+}
+async function refreshWebAudioMasterMix(){
+  if(!waPlaybackActive)return;
+  if(waPlaybackPaused){timelineAudioDirty=true;return;}
+  if(waMasterRefreshBusy){waMasterRefreshQueued=true;return;}
+  if(!waMasterMixMode||(!(current.master_inserts||[]).some(x=>x.enabled)&&!(current.tracks||[]).some(t=>t.master_bypass))){
+    await rebuildTimelinePlayback();return;
+  }
+  waMasterRefreshBusy=true;
+  const previous=trackPlaybacks[0],pid=current.id;
+  try{
+    const buffer=await waDecodeMasterMix(waRenderFilters);
+    if(!waPlaybackActive||waPlaybackPaused||current?.id!==pid||!trackPlaybacks.includes(previous)){timelineAudioDirty=true;return;}
+    const item=waCreateTrackGraph({id:'__master_mix__',channels:2,volume_db:0,pan:0},buffer,false);
+    item.masterMix=true;
+    const startAt=audioCtx.currentTime+.025,cursor=waProjectCursorMs()+25*tempoRatio();
+    waScheduleItem(item,startAt,cursor,true);
+    previous.gainNode.gain.cancelScheduledValues(startAt);previous.gainNode.gain.setValueAtTime(previous.gainNode.gain.value,startAt);
+    previous.gainNode.gain.linearRampToValueAtTime(0,startAt+.012);trackPlaybacks=[item];
+    setTimeout(()=>waDisconnectItem(previous,true),45);
+  }catch(error){toast(tr('Master processing failed','Processing master fallito')+': '+error.message);}
+  finally{waMasterRefreshBusy=false;if(waMasterRefreshQueued){waMasterRefreshQueued=false;queueWebAudioMasterRefresh();}}
+}
+async function waDecodeMasterMix(renderFilters){
+  const pid=current.id;await persistCurrentProject(false);
+  const response=await fetch(`/api/projects/${pid}/preview-mix?format=wav&full_master=true&render_tracks=${renderFilters?'true':'false'}`);
+  if(!response.ok)throw Error(tr('Master processing failed','Processing master fallito'));
+  const buffer=await audioCtx.decodeAudioData(await response.arrayBuffer());
+  if(current?.id!==pid)throw Error(tr('Project changed during audio preparation','Progetto cambiato durante la preparazione audio'));
+  return buffer;
+}
 function waBuildMasterGraph(){
-  waMasterBus=audioCtx.createGain();masterPlaybackGainNode=audioCtx.createGain();masterPlaybackGainNode.gain.value=dbToGain(Number(current?.master_volume_db||0));
+  waMasterBus=audioCtx.createGain();masterPlaybackGainNode=audioCtx.createGain();masterPlaybackGainNode.gain.value=waMasterMixMode?1:dbToGain(Number(current?.master_volume_db||0));
   waMasterBus.connect(masterPlaybackGainNode);masterPlaybackGainNode.connect(audioCtx.destination);
   masterMeterAnalysers=null;
   if(current?.realtime_meter_enabled){const split=audioCtx.createChannelSplitter(2),l=audioCtx.createAnalyser(),r=audioCtx.createAnalyser();l.fftSize=r.fftSize=1024;masterPlaybackGainNode.connect(split);split.connect(l,0);split.connect(r,1);masterMeterAnalysers=[l,r];masterMeterAnalysers.meterData={};masterMeterAnalysers.splitter=split}
@@ -5368,14 +5471,14 @@ function waBuildMasterGraph(){
 function waScheduleItem(item,startAt,cursorMs,fadeIn=false){
   const source=audioCtx.createBufferSource();source.buffer=item.buffer;source.connect(item.gainNode);item.sourceNode=source;
   const offset=waMediaOffsetSeconds(cursorMs);if(offset>=item.buffer.duration)return;
-  const target=waTrackGain(trackById(item.trackId),item);
+  const target=item.masterMix?1:waTrackGain(trackById(item.trackId),item);
   if(fadeIn){item.gainNode.gain.cancelScheduledValues(startAt);item.gainNode.gain.setValueAtTime(0,startAt);item.gainNode.gain.linearRampToValueAtTime(target,startAt+.012)}
   else item.gainNode.gain.setValueAtTime(target,startAt);
   source.start(startAt,offset);
 }
 function waScheduleAll(cursorMs){
   const startAt=audioCtx.currentTime+.035;waStartCursorMs=Number(cursorMs||0);waStartCtxTime=startAt;waPlaybackPaused=false;
-  scheduleMasterFades(cursorMs,startAt);
+  if(!waMasterMixMode)scheduleMasterFades(cursorMs,startAt);
   for(const item of trackPlaybacks)if(item.wa)waScheduleItem(item,startAt,cursorMs,false);
 }
 async function prepareTimelinePlaybackBuffers(renderFilters){
@@ -5391,10 +5494,17 @@ async function prepareTimelinePlaybackBuffers(renderFilters){
 async function startWebAudioProjectPlayback(renderFilters=false,cursorMs=playCursorMs){
   audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();await audioCtx.resume();
   waStopSources();for(const item of trackPlaybacks)if(item.wa)for(const n of [item.gainNode,item.panner,item.splitter,...(item.analysers||[])])try{n?.disconnect()}catch(e){}
-  trackPlaybacks=[];try{waMasterBus?.disconnect()}catch(e){};try{masterPlaybackGainNode?.disconnect()}catch(e){};waBuildMasterGraph();
+  trackPlaybacks=[];waMasterMixMode=(current.master_inserts||[]).some(x=>x.enabled)||(current.tracks||[]).some(t=>t.master_bypass);
+  try{waMasterBus?.disconnect()}catch(e){};try{masterPlaybackGainNode?.disconnect()}catch(e){};waBuildMasterGraph();
   playbackBuffering=true;showMediaProgress('Preparazione audio',18,'Decodifica tracce…');
-  const {tracks,buffers}=await prepareTimelinePlaybackBuffers(renderFilters);
-  trackPlaybacks=tracks.map((t,i)=>waCreateTrackGraph(t,buffers[i],renderFilters));
+  if(waMasterMixMode){
+    const buffer=await waDecodeMasterMix(renderFilters);
+    const item=waCreateTrackGraph({id:'__master_mix__',channels:2,volume_db:0,pan:0},buffer,false);
+    item.masterMix=true;item.gainNode.gain.value=1;trackPlaybacks=[item];
+  }else{
+    const {tracks,buffers}=await prepareTimelinePlaybackBuffers(renderFilters);
+    trackPlaybacks=tracks.map((t,i)=>waCreateTrackGraph(t,buffers[i],renderFilters));
+  }
   waPlaybackActive=true;waPlaybackPaused=false;waRenderFilters=!!renderFilters;renderedStemPlayback=!!renderFilters;renderedMasterPlayback=false;playAudio={waClock:true,paused:false,ended:false};
   waScheduleAll(cursorMs);playbackBuffering=false;$('#utilityBackdrop')?.classList.add('hidden');
   if(current?.realtime_meter_enabled)startVuMeterLoop();
@@ -5403,16 +5513,19 @@ async function startWebAudioProjectPlayback(renderFilters=false,cursorMs=playCur
   return playAudio;
 }
 function updatePlaybackGains(){
+  if(waPlaybackActive&&waMasterMixMode){queueWebAudioMasterRefresh();return;}
   if(waPlaybackActive){const now=audioCtx?.currentTime||0;for(const item of trackPlaybacks){if(!item.wa)continue;const t=trackById(item.trackId);item.gainNode?.gain.cancelScheduledValues(now);item.gainNode?.gain.setTargetAtTime(waTrackGain(t,item),now,.006)}return}
   const now=audioCtx?.currentTime||0;for(const item of trackPlaybacks){const track=trackById(item.trackId);if(!track||!item.gainNode)continue;item.gainNode.gain.cancelScheduledValues(now);item.gainNode.gain.setValueAtTime(playbackGainForTrack(track,item),now)}
 }
 async function refreshDynamicTrackPlayback(trackId){
+  if(waPlaybackActive&&waMasterMixMode){queueWebAudioMasterRefresh();return;}
   if(!waPlaybackActive||waPlaybackPaused){return}
   const track=trackById(trackId),idx=trackPlaybacks.findIndex(x=>x.trackId===trackId&&x.wa);if(!track||idx<0)return;
   try{collect();await persistCurrentProject(false);const buffer=await waDecodeTrack(track,true,true);if(!waPlaybackActive)return;const old=trackPlaybacks[idx],replacement=waCreateTrackGraph(track,buffer,true),cursor=waProjectCursorMs(),startAt=audioCtx.currentTime+.025;waScheduleItem(replacement,startAt,cursor,true);const now=startAt,targetOld=old.gainNode?.gain.value||0;if(old.gainNode){old.gainNode.gain.cancelScheduledValues(now);old.gainNode.gain.setValueAtTime(targetOld,now);old.gainNode.gain.linearRampToValueAtTime(0,now+.012)}trackPlaybacks.splice(idx,1,replacement);setTimeout(()=>waDisconnectItem(old,true),45)}catch(e){console.warn('Aggiornamento live FX traccia fallito',trackId,e)}
 }
 function playbackActuallyRunning(){if(waPlaybackActive)return !waPlaybackPaused;const masterRunning=!!(playAudio&&!playAudio.paused&&!playAudio.ended);return masterRunning||trackPlaybacks.some(item=>item.audio&&!item.audio.paused&&!item.audio.ended)}
 function stopPlayback(){
+  clearTimeout(waMasterRefreshTimer);waMasterRefreshTimer=null;
   if(waPlaybackActive){playCursorMs=waProjectCursorMs();waStopSources();for(const item of trackPlaybacks)for(const n of [item.gainNode,item.panner,item.splitter,...(item.analysers||[])])try{n?.disconnect()}catch(e){};trackPlaybacks=[];try{waMasterBus?.disconnect()}catch(e){};try{masterPlaybackGainNode?.disconnect()}catch(e){};waMasterBus=null;masterPlaybackGainNode=null;masterMeterAnalysers=null;waPlaybackActive=false;waPlaybackPaused=false;playAudio=null;meterRunToken++;if(playRaf){cancelAnimationFrame(playRaf);playRaf=null}if(meterRaf){cancelAnimationFrame(meterRaf);meterRaf=null}resetVuMeters();if($('#playMaster')){$('#playMaster').textContent='▶';$('#playMaster').title='Play / Preview'};clearTimedPlaybackOverlay();return}
   ++playbackToken;playbackBuffering=false;playbackPaused=false;transportClockRunning=false;transportClockCursorMs=playCursorMs;meterRunToken++;if(playRaf){cancelAnimationFrame(playRaf);playRaf=null}if(meterRaf){cancelAnimationFrame(meterRaf);meterRaf=null}if(playAudio){playAudio.pause();playAudio.currentTime=0;playAudio=null}for(const item of trackPlaybacks){try{item.audio.pause();item.audio.currentTime=0;item.audio.removeAttribute('src');item.audio.load()}catch(e){}}trackPlaybacks=[];masterMeterAnalysers=null;masterPlaybackGainNode=null;renderedMasterPlayback=false;renderedStemPlayback=false;resetVuMeters();clearTimedPlaybackOverlay()
 }
@@ -5610,7 +5723,7 @@ function aiArrangerRenderProgress(job,showTerminal=false){
   })[job.state]||(active?tr('Processing. You can close this window and follow the job in AI jobs. The overall progress is an estimate of ACE stages.','Elaborazione in corso. Puoi chiudere questa finestra e seguire il job da Job AI. La percentuale complessiva, se disponibile, è una stima delle fasi ACE.'):'No running AI job / Nessuna generazione in corso.');
 }
 function aiGpuStatusLabel(status){
-  return ({profiling:'profilazione GPU in corso; dato al prossimo checkpoint',profiled_kernels_diagnostic:'kernel GPU misurati, diagnostica non fatturabile',
+  return ({profiling:'profilazione GPU in corso; dato al prossimo checkpoint',profiled_kernels_diagnostic:'stima diagnostica GPU attendibile',diagnostic_estimate_trusted:'stima diagnostica attendibile',
     profiler_unavailable:'profiler ROCm non disponibile',profiler_no_gpu_events:'profiler senza eventi kernel GPU',profiler_failed:'raccolta profiler GPU fallita',host_agent_not_configured:'socket agente host non visibile nel container',
     host_agent_socket_missing:'socket assente: verificare servizio host e mount',
     host_agent_socket_missing_in_mount:'socket assente nel mount: agente fermo o mount obsoleto',
@@ -5628,10 +5741,10 @@ function aiGpuStatusLabel(status){
 }
 function aiGpuSourceLabel(source){
   return ({'ace-torch-profiler':'ACE-Step / profiler kernel HIP','proxmox-host-drm':'host Proxmox / DRM','proxmox-host-amd-smi':'host Proxmox / AMD-SMI',
-    'drm-fdinfo':'processo locale / DRM','amd-smi-process':'processo locale / AMD-SMI'})[source]||'';
+    'diagnostic-estimate':'stima diagnostica attendibile','drm-fdinfo':'processo locale / DRM','amd-smi-process':'processo locale / AMD-SMI'})[source]||'';
 }
 function aiProfilerTimeLabel(job){
-  return ' s (kernel HIP; '+(job.gpu_metrics_status==='profiling'?'parziali; ':'')+'diagnostica, non fatturabile)';
+  return job.gpu_metrics_status==='profiling'?tr(' s (partial trusted diagnostic estimate)',' s (stima diagnostica attendibile parziale)'):tr(' s (trusted diagnostic estimate)',' s (stima diagnostica attendibile)');
 }
 function aiArrangerRenderElapsed(){
   const job=aiArrangerLastSnapshot;
@@ -5641,8 +5754,8 @@ function aiArrangerRenderElapsed(){
   const seconds=job.state==='queued'?0:active&&job.started_at?Math.max(0,Math.floor(Date.now()/1000-Number(job.started_at))):Math.max(0,Math.floor(Number(job.elapsed_seconds)||0));
   const prefix=job.state==='queued'?`Queued / In coda: ${job.jobs_ahead??0} ahead · Position ${job.queue_position??'?'} · `:`Elapsed / Trascorso: ${seconds}s · `;
   const connection=aiArrangerPollFailures?` · Reconnecting / Riconnessione (${aiArrangerPollFailures})`:'';
-  elapsed.textContent=prefix+`${job.phase||job.state} · Job ${job.job_id||''} · CPU: ${job.cpu_seconds!=null?Number(job.cpu_seconds).toFixed(1)+' s':job.cpu_seconds_estimated!=null?'~'+Number(job.cpu_seconds_estimated).toFixed(1)+' s (ACE process)':'N/A'} · GPU: ${job.gpu_seconds!=null?Number(job.gpu_seconds).toFixed(1)+' s':job.gpu_seconds_estimated!=null?'~'+Number(job.gpu_seconds_estimated).toFixed(1)+(job.gpu_metrics_source==='ace-torch-profiler'?aiProfilerTimeLabel(job):' s (ACE process; non fatturabile)'):`N/A (${aiGpuStatusLabel(job.gpu_metrics_status)}${aiGpuSourceLabel(job.gpu_metrics_source)?' · fonte: '+aiGpuSourceLabel(job.gpu_metrics_source):''})`}${connection}`;
-  const values={aiMeterElapsed:seconds+' s',aiMeterCpu:job.cpu_seconds!=null?Number(job.cpu_seconds).toFixed(1)+' s':job.cpu_seconds_estimated!=null?'~'+Number(job.cpu_seconds_estimated).toFixed(1)+' s':'—',aiMeterGpu:job.gpu_seconds!=null?Number(job.gpu_seconds).toFixed(1)+' s':job.gpu_seconds_estimated!=null?'~'+Number(job.gpu_seconds_estimated).toFixed(1)+' s':'—',aiMeterCpuNote:job.cpu_seconds!=null?tr('Verified measurement','Misura verificata'):job.cpu_seconds_estimated!=null?tr('ACE process · estimate','Processo ACE · stima'):tr('Unavailable','Non disponibile'),aiMeterGpuNote:job.gpu_metrics_source==='ace-torch-profiler'?'Kernel HIP · '+(active?tr('partial collection','raccolta parziale'):tr('diagnostic','diagnostica'))+' · '+tr('non-billable','non fatturabile'):job.gpu_seconds!=null?tr('Verified measurement','Misura verificata'):aiGpuStatusLabel(job.gpu_metrics_status)};
+  elapsed.textContent=prefix+`${job.phase||job.state} · Job ${job.job_id||''} · CPU: ${job.cpu_seconds!=null?Number(job.cpu_seconds).toFixed(1)+' s':job.cpu_seconds_estimated!=null?'~'+Number(job.cpu_seconds_estimated).toFixed(1)+' s (ACE process)':'N/A'} · GPU: ${job.gpu_seconds!=null?Number(job.gpu_seconds).toFixed(1)+' s':job.gpu_seconds_estimated!=null?'~'+Number(job.gpu_seconds_estimated).toFixed(1)+aiProfilerTimeLabel(job):`N/A (${aiGpuStatusLabel(job.gpu_metrics_status)}${aiGpuSourceLabel(job.gpu_metrics_source)?' · fonte: '+aiGpuSourceLabel(job.gpu_metrics_source):''})`}${connection}`;
+  const values={aiMeterElapsed:seconds+' s',aiMeterCpu:job.cpu_seconds!=null?Number(job.cpu_seconds).toFixed(1)+' s':job.cpu_seconds_estimated!=null?'~'+Number(job.cpu_seconds_estimated).toFixed(1)+' s':'—',aiMeterGpu:job.gpu_seconds!=null?Number(job.gpu_seconds).toFixed(1)+' s':job.gpu_seconds_estimated!=null?'~'+Number(job.gpu_seconds_estimated).toFixed(1)+' s':'—',aiMeterCpuNote:job.cpu_seconds!=null?tr('Verified measurement','Misura verificata'):job.cpu_seconds_estimated!=null?tr('ACE process · estimate','Processo ACE · stima'):tr('Unavailable','Non disponibile'),aiMeterGpuNote:job.gpu_seconds!=null?tr('Verified measurement','Misura verificata'):job.gpu_seconds_estimated!=null?tr('Trusted diagnostic estimate','Stima diagnostica attendibile')+(active?' · '+tr('partial collection','raccolta parziale'):''):aiGpuStatusLabel(job.gpu_metrics_status)};
   for(const [id,text] of Object.entries(values)){const node=document.getElementById(id);if(node)node.textContent=text;}
   if(job.steps_total){const hint=document.getElementById('aiRemixJobHint');if(hint&&active&&!job.cancel_requested)hint.textContent=job.steps_completed+'/'+job.steps_total+' valutazioni DiT osservate · avanzamento complessivo stimato ~'+Math.round(job.progress_percent||0)+'%. Puoi chiudere la finestra: Job AI resta disponibile.';}
   if(!active&&aiArrangerElapsedTimer!==null){clearInterval(aiArrangerElapsedTimer);aiArrangerElapsedTimer=null;}
@@ -5691,7 +5804,7 @@ async function aiArrangerWatchActive(waitForFinish=false){
                !document.getElementById('utilityBackdrop')?.classList.contains('hidden')){
               window.mtaAiJobs?.handled?.(job.job_id);
               closeUtilityModal();
-              toast('AI generation complete; new track added.'+(job.gpu_metrics_source==='ace-torch-profiler'&&job.gpu_seconds_estimated!=null?' GPU kernel: '+Number(job.gpu_seconds_estimated).toFixed(2)+' s (diagnostica, non fatturabile).':''));
+              toast('AI generation complete; new track added.'+(job.gpu_metrics_source==='ace-torch-profiler'&&job.gpu_seconds_estimated!=null?' GPU kernel: '+Number(job.gpu_seconds_estimated).toFixed(2)+' s (stima diagnostica attendibile).':''));
             }
           }
         }else if(waitForFinish&&['failed','interrupted','cancelled'].includes(job.state)){
@@ -6112,7 +6225,7 @@ function scheduleMasterFades(cursorMs,startAt){
 function openProjectFade(){
   showUtilityModal(tr('Project master fades','Fade del master del progetto'),`<div class="form-grid"><label><input id="projectFadeEnabled" type="checkbox" ${current.master_fade_enabled?'checked':''}> ${tr('Enable master fade automation','Abilita automazione fade del master')}</label><label>Fade-in (ms)<input id="projectFadeIn" type="number" min="0" max="86400000" step="1" value="${current.master_fade_in_ms||0}"></label><label>Fade-out (ms)<input id="projectFadeOut" type="number" min="0" max="86400000" step="1" value="${current.master_fade_out_ms||0}"></label><p>${tr('Applied during playback and export. Set zero to disable one side.','Applicato durante ascolto ed esportazione. Imposta zero per disabilitare un lato.')}</p><button onclick="applyProjectFade()">${tr('Apply','Applica')}</button></div>`);
 }
-function applyProjectFade(){const a=Number($('#projectFadeIn').value),b=Number($('#projectFadeOut').value);if(![a,b].every(x=>Number.isInteger(x)&&x>=0&&x<=86400000))return toast(tr('Invalid fade duration','Durata fade non valida'));checkpointHistory();current.master_fade_enabled=$('#projectFadeEnabled').checked;current.master_fade_in_ms=a;current.master_fade_out_ms=b;markDirty();if(waPlaybackActive)scheduleMasterFades(waProjectCursorMs(),audioCtx.currentTime);closeUtilityModal();render()}
+function applyProjectFade(){const a=Number($('#projectFadeIn').value),b=Number($('#projectFadeOut').value);if(![a,b].every(x=>Number.isInteger(x)&&x>=0&&x<=86400000))return toast(tr('Invalid fade duration','Durata fade non valida'));checkpointHistory();current.master_fade_enabled=$('#projectFadeEnabled').checked;current.master_fade_in_ms=a;current.master_fade_out_ms=b;markDirty();if(waPlaybackActive&&waMasterMixMode)queueWebAudioMasterRefresh();else if(waPlaybackActive)scheduleMasterFades(waProjectCursorMs(),audioCtx.currentTime);closeUtilityModal();render()}
 async function trimProjectTimeline(side){
  if(!current)return;try{await flushAutosave();checkpointHistory();showMediaProgress(tr('Trim silence','Rimozione silenzio'),-1,tr('Analyzing audio…','Analisi audio…'));const response=await api(`/api/projects/${current.id}/timeline-trim`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({side})});stopPlayback();current=response.project;playCursorMs=Math.max(0,playCursorMs-response.removed_start_ms);selectedTimelineSegments.clear();waDecodedBuffers.clear();clearPlaybackWarmCache();render();closeUtilityModal();markDirty();toast(tr('Project trimmed','Progetto ritagliato'))}catch(e){closeUtilityModal();toast(e.message)}
 }

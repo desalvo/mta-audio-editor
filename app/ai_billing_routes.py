@@ -546,7 +546,7 @@ def remote_metering_key_status(request: Request):
 
 @router.get('/api/ai-jobs/resources/{job_id}')
 def remote_job_resources(job_id: str,request: Request):
-    """Owner-bound resource receipt; never treat diagnostic estimates as billed use."""
+    """Owner-bound resource receipt; distinguish accepted estimates from verified use."""
     header=request.headers.get('authorization','')
     identity=ai_access.authenticate(header[7:] if header.lower().startswith('bearer ') else '')
     if not identity:raise HTTPException(401,'Valid AI token required')
@@ -562,6 +562,8 @@ def remote_job_resources(job_id: str,request: Request):
     result={'job_id':job_id,'queue_job_id':row['queue_job_id'],'status':row['status'],
             'usage':json.loads(row['usage_json']),'metering_source':row['resource_source'],
             'gpu_verified':bool(proof),'billing_enabled':ai_billing.user_billing_enabled(identity['user_id'])}
+    result['diagnostic_estimates_trusted']=row['resource_source']=='diagnostic-estimate'
+    result['resource_quality']='trusted-estimate' if result['diagnostic_estimates_trusted'] else ('verified' if proof else 'process-meter')
     if proof:
         value=json.loads(proof[0])['payload']
         result['gpu_evidence']={key:value[key] for key in ('id','method','calibration_id','trace_sha256')}

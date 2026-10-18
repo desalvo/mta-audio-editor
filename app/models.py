@@ -96,6 +96,7 @@ class Track(BaseModel):
     gain_db: float = Field(default=0.0, ge=-24.0, le=24.0, allow_inf_nan=False)
     volume_db: float = Field(default=0.0, ge=-120.0, le=24.0)
     pan: float = Field(default=0.0, ge=-1.0, le=1.0)
+    master_bypass: bool = False  # master bounce already includes the master processing
     mute: bool = False
     solo: bool = False
     color: str = Field(default="#2f81f7", pattern=r"^#[0-9A-Fa-f]{6}$")

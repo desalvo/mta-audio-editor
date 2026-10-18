@@ -11,7 +11,8 @@ def test_native_new_project_requires_save_destination_before_creation():
 
     assert "pendingNewProjectPath" in block
     assert "await bridge.choose_project_save_path(title)" in block
-    assert "if(!chosen?.ok)return" in block
+    assert "if(chosen?.cancelled===true)" in block
+    assert "if(!chosen?.ok)throw Error" in block
     assert "bind_project_path(created.id,pendingNewProjectPath)" in block
 
     choose = block.index("await bridge.choose_project_save_path(title)")

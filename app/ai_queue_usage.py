@@ -61,6 +61,12 @@ def enrich(value):
                         raise ValueError('Invalid resource record')
                 except (ValueError, TypeError):
                     usage, diag = {}, {}
+                if row['resource_source']=='diagnostic-estimate':
+                    for metric in ('cpu_seconds','gpu_seconds'):
+                        if metric in usage:diag[metric+'_estimated']=usage[metric]
+                    result['diagnostic_estimates_trusted']=True
+                    result['gpu_metrics_source']='diagnostic-estimate'
+                    result['gpu_metrics_status']='diagnostic_estimate_trusted'
                 c = number(usage.get('cpu_seconds')) if row['status'] in ('done', 'failed', 'cancelled') and row['resource_source'] in TRUSTED_CPU else None
                 g = number(usage.get('gpu_seconds')) if row['status'] in ('done', 'failed', 'cancelled') and row['resource_source'] in ('gpu-agent', 'gpu-kernel-verified') else None
                 if g is not None and row['resource_source'] == 'gpu-kernel-verified':

@@ -1937,7 +1937,7 @@ def _durable_generation_executor(pid, payload, job_id):
             if source=='unmetered' and not ai_metering_bridge.billing_required(job_id):
                 pass
             else:
-                if source not in ('worker', 'cgroup', 'gpu-kernel-verified'):
+                if source not in ('worker', 'cgroup', 'gpu-kernel-verified','diagnostic-estimate'):
                     raise ValueError('Trusted worker usage has no verified source')
                 ai_metering_bridge.capture(job_id, usage, source)
         # Stable filename provides a publish-once guard for idempotent submissions.
@@ -3915,6 +3915,37 @@ def cancel_media_job(job_id: str, request: Request):
         event.set()
         job["updated_at"] = time.time()
     return _media_job_public(job)
+
+
+def _bounce_worker(job_id,pid,track_id):
+    try:
+        from .bounce import bounce
+        _media_job_update(job_id,status='running',progress=15,message='Rendering bounce')
+        result=bounce(pid,track_id,capacity_check=_ensure_workspace_capacity)
+        _media_job_update(job_id,status='completed',progress=100,message='Bounce ready',result=result)
+    except Exception as exc:
+        LOGGER.exception('Bounce failed')
+        _media_job_update(job_id,status='failed',progress=0,message='Bounce failed',error=str(exc)[-1200:])
+
+
+def _start_bounce(pid,request,track_id=None):
+    project=_project_for_actor(request,pid)
+    if not project.tracks:raise HTTPException(400,'Project has no audio tracks')
+    if track_id and not any(t.id==track_id for t in project.tracks):raise HTTPException(404,'Track not found')
+    jid=uuid.uuid4().hex[:16];now=time.time()
+    with MEDIA_JOB_LOCK:
+        MEDIA_JOBS[jid]={'id':jid,'kind':'bounce','project_id':pid,'status':'queued',
+            'progress':0,'message':'Bounce queued','created_at':now,'updated_at':now,'result':None,'error':None}
+    threading.Thread(target=_bounce_worker,args=(jid,pid,track_id),daemon=True,name='bounce-'+jid).start()
+    return {'bounce_job_id':jid}
+
+
+@app.post('/api/projects/{pid}/bounce')
+def bounce_project_job(pid:str,request:Request):return _start_bounce(pid,request)
+
+
+@app.post('/api/projects/{pid}/tracks/{track_id}/bounce')
+def bounce_track_job(pid:str,track_id:str,request:Request):return _start_bounce(pid,request,track_id)
 
 
 @app.post("/api/projects/{pid}/tracks/{track_id}/duplicate")
@@ -6124,7 +6155,7 @@ def _create_metronome_track_locked(pid: str, request: Request, mode: str = "fixe
         ]
     # Never overwrite the previously valid WAV with a partial render.
     try:
-        with out.open("rb") as handle:
+        with out.open("r+b") as handle:
             os.fsync(handle.fileno())
         os.replace(out, target_out)
         track.waveform_revision = _track_waveform_revision(track, target_out) if peaks else ""
@@ -6236,7 +6267,7 @@ def _update_metronome_zone_locked(pid: str, request: Request, time_ms: int, trac
                 output.writeframes(b"")
         # Build metadata before atomic replacement; preserve old WAV on any failure.
         new_peaks=waveform_peaks(temp)
-        with temp.open('rb') as fd:os.fsync(fd.fileno())
+        with temp.open('r+b') as fd:os.fsync(fd.fileno())
         os.replace(temp,original)
         project.metronome_zone_signatures[str(start)] = signature
         project.metronome_zone_bpms[str(start)] = round(float(bpm),2)
@@ -6409,7 +6440,7 @@ def refresh_chords_track(pid: str, request: Request, old_time_ms: int, new_time_
             else:
                 track.waveform_peaks = waveform_peaks(staged)
             # A crash during any earlier step leaves the previously valid WAV intact.
-            with staged.open("rb") as handle:
+            with staged.open("r+b") as handle:
                 os.fsync(handle.fileno())
             os.replace(staged, target)
             track.waveform_revision = _track_waveform_revision(track, target) if track.waveform_peaks else ""
@@ -6587,19 +6618,25 @@ def preview_track(pid: str, track_id: str, request: Request, render: bool = Fals
 
 
 @app.get("/api/projects/{pid}/preview-mix")
-def preview_mix(pid: str, request: Request):
+def preview_mix(pid: str, request: Request, format: str = "mp3", render_tracks: bool = True, full_master: bool = False):
     project = _project_for_actor(request, pid)
-    out = session_preview_dir(pid) / "preview-master.mp3"
+    if format not in {"mp3","wav"}:raise HTTPException(400,"Invalid preview format")
+    out = session_preview_dir(pid) / ("preview-master-"+uuid.uuid4().hex+"."+format)
     try:
         validate_project_files(project)
         preview_project = project.model_copy(deep=True)
         # Master inserts are rendered server-side, while the master fader is kept
         # neutral here so the browser can apply master volume live during playback.
-        preview_project.master_volume_db = 0.0
-        render_mix(preview_project, audio_path, out, fmt="mp3", bitrate="192k", sample_rate=int(preview_project.sample_rate))
+        if not full_master:preview_project.master_volume_db = 0.0
+        if not render_tracks:
+            for track in preview_project.tracks:track.inserts=[]
+        render_mix(preview_project, audio_path, out, fmt=format, bitrate="192k", sample_rate=int(preview_project.sample_rate),wav_bit_depth=32)
+        from starlette.background import BackgroundTask
+
     except Exception as exc:
+        out.unlink(missing_ok=True)
         raise HTTPException(400, "preview mix failed") from exc
-    return FileResponse(out, media_type="audio/mpeg", filename="preview-master.mp3")
+    return FileResponse(out, media_type="audio/wav" if format=="wav" else "audio/mpeg", filename="preview-master."+format,background=BackgroundTask(out.unlink,missing_ok=True))
 
 
 @app.delete("/api/projects/{pid}/preview-cache")
@@ -6966,7 +7003,7 @@ def configured_project_export(pid: str, req: ProjectExportRequest, request: Requ
             temp_destination = destination.with_name(f".{destination.name}.export-{uuid.uuid4().hex}.tmp")
             try:
                 shutil.copyfile(out, temp_destination)
-                with temp_destination.open("rb") as handle:
+                with temp_destination.open("r+b") as handle:
                     os.fsync(handle.fileno())
                 os.replace(temp_destination, destination)
                 try:

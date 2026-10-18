@@ -338,11 +338,9 @@ class NativeApi:
                 self.project_paths = {}
 
     def _persist_project_paths(self) -> None:
-        self._project_paths_file.parent.mkdir(parents=True, exist_ok=True)
-        self._project_paths_file.write_text(
-            json.dumps({key: str(value) for key, value in self.project_paths.items()}, indent=2) + "\n",
-            encoding="utf-8",
-        )
+        from app.storage import _atomic_json_write
+        _atomic_json_write(self._project_paths_file,
+                           {key: str(value) for key, value in self.project_paths.items()})
 
     def read_clipboard(self) -> dict:
         """Return text from the operating-system clipboard for native WebViews."""
@@ -443,9 +441,19 @@ class NativeApi:
     def bind_project_path(self, project_id: str, path: str) -> dict:
         target = Path(path).expanduser().resolve()
         target.parent.mkdir(parents=True, exist_ok=True)
-        self.project_paths[project_id] = target
-        self._persist_project_paths()
+        # A chosen destination becomes a binding only after a durable archive exists.
         project_format = self._write_bound_project(project_id, target)
+        previous = self.project_paths.get(project_id)
+        self.project_paths[project_id] = target
+        try:
+            self._persist_project_paths()
+        except Exception:
+            if previous is None:
+                self.project_paths.pop(project_id, None)
+            else:
+                self.project_paths[project_id] = previous
+            raise
+        _native_startup_logger().info('Native project bound and saved; format=%s', project_format)
         return {"ok": True, "path": str(target), "format": project_format, "portable": project_format == "portable"}
 
     def confirm_project_close(self) -> dict:

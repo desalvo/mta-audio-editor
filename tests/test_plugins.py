@@ -51,14 +51,21 @@ def test_render_mix_builds_master_chain(tmp_path, monkeypatch):
     project.master_inserts = [InsertPlugin(id="l1", plugin="limiter", preset="brickwall-1")]
     seen = []
 
-    monkeypatch.setattr(engine, "render_track", lambda track, source, out, apply_inserts=True: Path(out).write_bytes(b"wav"))
+    rendered = []
+    def render(track, source, out, **kwargs):
+        rendered.append(track)
+        return Path(out).write_bytes(b"wav")
+    monkeypatch.setattr(engine, "render_track", render)
+    monkeypatch.setattr(engine, "media_duration_ms", lambda path: 1000)
     monkeypatch.setattr(engine, "_run", lambda cmd: seen.append(cmd) or "")
     out = tmp_path / "mix.mp3"
     engine.render_mix(project, lambda pid, name: source, out, fmt="mp3")
     command = seen[-1]
-    filters = command[command.index("-filter_complex") + 1]
+    filters = seen[0][seen[0].index("-filter_complex") + 1]
     assert "stereotools=balance_out=0.2500" in filters
-    assert "alimiter=" in filters
+    assert len(rendered) == 2 and rendered[-1].id == "master-render"
+    assert "alimiter=" in chain_filter(rendered[-1].inserts)
+    assert "master-processed.wav" in command[command.index("-i") + 1]
     assert "libmp3lame" in command
 
 

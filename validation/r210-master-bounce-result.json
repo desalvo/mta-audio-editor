@@ -1,0 +1,28 @@
+{
+  "release": "0.3.0-r210",
+  "combined_unique_results": {
+    "tests": 3948,
+    "passed": 3943,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 5
+  },
+  "method": "Full regression plus focused reruns after adapting 8 legacy expectations and final UI/report changes; not a second monolithic full run.",
+  "initial_full": {
+    "passed": 3933,
+    "failed": 8,
+    "skipped": 5,
+    "deselected": 10,
+    "coverage_percent": 76.96
+  },
+  "final_targeted_passed": 128,
+  "final_mail_ui_passed": 85,
+  "blocked_socket_tests": 10,
+  "blocked_reason": "Environment denies creation of AF_UNIX sockets: PermissionError [Errno 1]. Separate attempts are retained.",
+  "static_checks": "Ruff and Node syntax checks passed",
+  "limitations": [
+    "No live Windows/macOS GUI session",
+    "No live ROCm inference or server certification",
+    "VST dispatch tested with simulated host; actual Steinberg SDK cases unavailable"
+  ]
+}

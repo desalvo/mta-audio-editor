@@ -389,7 +389,7 @@ jobs:
           MTA_ALLOW_INSECURE_NO_AUTH: 'true'
         run: |
           python -m pip install "pytest==9.1.1" "httpx==0.28.1"
-          python -m pytest -q tests/test_r210_windows_publication_tabs.py
+          python -m pytest -q tests/test_r210_windows_publication_tabs.py tests/test_r210_native_project_commit.py
       - name: Generate native build id
         shell: pwsh
         run: |
@@ -520,6 +520,15 @@ jobs:
           bash ./scripts/build_chordino_unix.sh native/runtime/chordino
           echo "MTA_NATIVE_CHORDINO_BIN_DIR=$PWD/native/runtime/chordino/bin" >> "$GITHUB_ENV"
           echo "MTA_NATIVE_CHORDINO_VAMP_DIR=$PWD/native/runtime/chordino/vamp" >> "$GITHUB_ENV"
+      - name: macOS native project save regressions
+        shell: bash
+        env:
+          PYTHONPATH: .
+          MTA_NATIVE_SINGLE_USER: 'true'
+          MTA_ALLOW_INSECURE_NO_AUTH: 'true'
+        run: |
+          python -m pip install "pytest==9.1.1" "httpx==0.28.1"
+          python -m pytest -q tests/test_r210_native_project_commit.py
       - name: Generate native build id
         shell: bash
         run: TZ=Europe/Rome date '+%Y%m%d%H%M%S' > BUILD_INFO

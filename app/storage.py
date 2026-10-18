@@ -991,7 +991,9 @@ def write_project_archive(pid: str, archive_path: Path) -> Path:
                 if path.parent == (base / "audio") and path.name in pending_gc:
                     continue
                 z.write(path, Path("project") / path.relative_to(base))
-        with tmp.open("rb") as handle:
+        # Windows FlushFileBuffers requires write access to the file handle.
+        # Keep the durability check; do not suppress a failed archive flush.
+        with tmp.open("r+b") as handle:
             os.fsync(handle.fileno())
         # Refuse to replace a valid existing archive with an incomplete/corrupt one.
         with zipfile.ZipFile(tmp, "r") as z:

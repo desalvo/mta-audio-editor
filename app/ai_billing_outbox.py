@@ -46,12 +46,15 @@ def register(job_id, billing_job_id, status, usage=None, *, source='unmetered', 
     if status not in ('done', 'failed', 'cancelled'):
         raise ValueError('Invalid settlement status')
     normalized = ai_billing._validate_usage(usage or {})
-    if source not in ('unmetered', 'worker', 'cgroup', 'gpu-agent', 'gpu-kernel-verified', 'remote-worker'):
+    if source not in ('unmetered', 'worker', 'cgroup', 'gpu-agent', 'gpu-kernel-verified','diagnostic-estimate', 'remote-worker'):
         raise ValueError('Invalid metering source')
     if normalized and source == 'unmetered':
         raise ValueError('Measured resources need a trusted source')
-    if {'gpu_seconds', 'gpu_energy_joules'} & normalized.keys() and source not in ('gpu-agent','gpu-kernel-verified'):
+    if {'gpu_seconds', 'gpu_energy_joules'} & normalized.keys() and source not in ('gpu-agent','gpu-kernel-verified','diagnostic-estimate'):
         raise ValueError('GPU usage needs trusted GPU agent')
+    if source == 'diagnostic-estimate':
+        from .ai_trusted_estimates import require_evidence
+        require_evidence(billing_job_id,normalized)
     if source == 'gpu-agent' and not {'gpu_seconds', 'gpu_energy_joules'} & normalized.keys():
         raise ValueError('GPU agent must supply measurements')
     if finished_at is not None and (type(finished_at) is not int or finished_at < 0):

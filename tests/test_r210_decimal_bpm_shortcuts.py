@@ -160,7 +160,7 @@ def test_pdf_rounds_only_the_displayed_bpm(tmp_path):
 
 def test_r_shortcut_through_registered_capture_handler_for_click_and_chords():
     helper=function('handleGeneratedTrackShortcut')
-    begin=JS.index("window.addEventListener('keydown',e=>{\n  if(handleGeneratedTrackShortcut(e))")
+    begin=JS.index("window.addEventListener('keydown',e=>{\n  if(handleBounceShortcut(e)||handleGeneratedTrackShortcut(e))")
     end=JS.index('\n},true);',begin)+len('\n},true);')
     node('''const assert=require('assert/strict');class Input{};class Area{};class Select{};
 const HTMLInputElement=Input,HTMLTextAreaElement=Area,HTMLSelectElement=Select;
@@ -168,7 +168,7 @@ let current={},selectedTrackId='click',timelineTool='select',timelineChordSelect
 const tracks={click:{id:'click',type:'click'},chords:{id:'chords',type:'keyboards',name:'Chords'},music:{id:'music',type:'audio'}};
 function trackById(id){return tracks[id]}function isGeneratedChordsTrack(t){return t.id==='chords'}
 function closeTrackContextMenu(){closed++}async function refreshGeneratedTrackFromContext(id){calls.push(id)}
-function selectedSegmentItems(){return []}const window={addEventListener(name,fn,capture){assert.equal(capture,true);handler=fn}};
+function handleBounceShortcut(){return false}function selectedSegmentItems(){return []}const window={addEventListener(name,fn,capture){assert.equal(capture,true);handler=fn}};
 const document={activeElement:null,body:{}};
 '''+helper+'\n'+JS[begin:end]+'''
 const event=(target,extra={})=>({key:'r',target,repeat:false,ctrlKey:false,metaKey:false,altKey:false,preventDefault(){this.prevented=true},...extra});

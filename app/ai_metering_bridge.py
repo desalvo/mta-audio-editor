@@ -32,15 +32,16 @@ def capture(job_id, usage, source):
     """
     _identity(job_id)
     normalized = ai_billing._validate_usage(usage)
-    if source not in ('worker', 'cgroup', 'gpu-agent','gpu-kernel-verified', 'remote-worker') or not normalized:
+    if source not in ('worker', 'cgroup', 'gpu-agent','gpu-kernel-verified','diagnostic-estimate', 'remote-worker') or not normalized:
         raise ValueError('Nonempty trusted measurement required')
-    if any(k.startswith('gpu_') for k in normalized) and source not in ('gpu-agent','gpu-kernel-verified'):
+    if any(k.startswith('gpu_') for k in normalized) and source not in ('gpu-agent','gpu-kernel-verified','diagnostic-estimate'):
         raise ValueError('GPU accounting requires authenticated GPU agent')
     if source == 'gpu-agent' and not any(k.startswith('gpu_') for k in normalized):
         raise ValueError('GPU agent measurement missing')
-    if source=='gpu-kernel-verified':
+    if source in ('gpu-kernel-verified','diagnostic-estimate'):
         import uuid
-        from .ai_gpu_verified import require_evidence
+        if source=='diagnostic-estimate':from .ai_trusted_estimates import require_evidence
+        else:from .ai_gpu_verified import require_evidence
         ledger_id=uuid.uuid5(uuid.NAMESPACE_URL,'mta-ai-inference:'+job_id).hex
         with ai_billing.db() as con:
             ai_billing._init(con)
@@ -60,8 +61,12 @@ def capture(job_id, usage, source):
             con.execute('INSERT INTO ai_metering_evidence VALUES(?,?)', (job_id, encoded))
         # Expose only authenticated usage. Unknown GPU time remains NULL,
         # never a wall-clock estimate presented as verified consumption.
-        con.execute('UPDATE jobs SET cpu_seconds=COALESCE(?,cpu_seconds), gpu_seconds=COALESCE(?,gpu_seconds) WHERE job_id=?',
-                    (normalized.get('cpu_seconds'), normalized.get('gpu_seconds'), job_id))
+        if source=='diagnostic-estimate':
+            con.execute('UPDATE jobs SET cpu_seconds_estimated=?,gpu_seconds_estimated=?,gpu_metrics_source=?,gpu_metrics_status=? WHERE job_id=?',
+                (normalized.get('cpu_seconds'),normalized.get('gpu_seconds'),source,'diagnostic_estimate_trusted',job_id))
+        else:
+            con.execute('UPDATE jobs SET cpu_seconds=COALESCE(?,cpu_seconds), gpu_seconds=COALESCE(?,gpu_seconds) WHERE job_id=?',
+                        (normalized.get('cpu_seconds'), normalized.get('gpu_seconds'), job_id))
         con.execute('COMMIT')
     return not bool(row)
 

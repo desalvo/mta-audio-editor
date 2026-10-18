@@ -175,7 +175,9 @@ def test_compiler_capture_skips_live_control_but_retains_final_result():
     assert profiles == ['start', 'stop'] and not hooks
 
 
-def test_actual_worker_diagnostic_identity_and_gpu_billing_gate(tmp_path, monkeypatch):
+@pytest.mark.parametrize('trusted',[False,True])
+def test_actual_worker_diagnostic_identity_and_gpu_billing_gate(tmp_path, monkeypatch,trusted):
+    monkeypatch.setenv('MTA_TRUST_AI_DIAGNOSTIC_ESTIMATES','true' if trusted else 'false')
     from app import ai_metering_agent, ai_torch_diagnostics
     from app.auth import init_auth_db, db
     monkeypatch.setenv('MTA_DATA_DIR', str(tmp_path / 'data'))
@@ -209,13 +211,16 @@ report={'task_id':request['gpu_profile_task_id'],'source':'torch-profiler','bill
         {'kind': 'whisper', 'gpu_profile_task_id': 'forged'}, cancel_check=cancel_check)
     assert audio[:4] == b'RIFF'
     assert meta['gpu_diagnostics']['torch_profile']['gpu_seconds_estimated'] == .2
-    assert meta['gpu_metered'] is False and 'gpu_seconds' not in meta['usage']
+    assert meta['gpu_metered'] is trusted
+    if trusted:
+        assert meta['usage']['gpu_seconds'] == .2 and meta['metering_source']=='diagnostic-estimate'
+    else:assert 'gpu_seconds' not in meta['usage']
     reports = ai_torch_diagnostics.recent_reports()
     assert reports[0]['job_id'] == meta['job_id'] and reports[0]['job_status'] == 'done'
     with db() as con:
         usage = json.loads(con.execute('SELECT usage_json FROM ai_compute_jobs WHERE id=?',
                                       (meta['job_id'],)).fetchone()[0])
-    assert 'gpu_seconds' not in usage
+    assert usage.get('gpu_seconds') == (.2 if trusted else None)
 
 
 def test_live_adapter_delivers_partial_before_completion(tmp_path, monkeypatch):
@@ -272,12 +277,12 @@ setTimeout:()=>1,clearTimeout(){},setInterval:()=>1,clearInterval(){}};
 vm.createContext(ctx);vm.runInContext(process.argv[1],ctx);
 (async()=>{
 await vm.runInContext('aiArrangerWatchActive()',ctx);
-assert.match(elements.aiRemixJobElapsed.textContent,/GPU: ~0.2.*parziali.*non fatturabile/);
+assert.match(elements.aiRemixJobElapsed.textContent,/GPU: ~0.2.*partial.*estimate/);
 reply={...reply,state:'completed',gpu_metrics_status:'profiled_kernels_diagnostic',gpu_seconds_estimated:.4};
 await vm.runInContext('aiArrangerWatchActive()',ctx);
 assert.equal(elements.aiRemixJobProgress.hidden,false);
 assert.match(elements.aiRemixJobElapsed.textContent,/GPU: ~0.4/);
-assert.doesNotMatch(elements.aiRemixJobElapsed.textContent,/parziali/);
+assert.doesNotMatch(elements.aiRemixJobElapsed.textContent,/partial.*estimate/);
 })().catch(e=>{console.error(e);process.exitCode=1});'''
     result = subprocess.run(['node', '-e', script, section], capture_output=True, text=True, timeout=10)
     assert result.returncode == 0, result.stderr

@@ -1,0 +1,29 @@
+# Master, bounce e stime diagnostiche — 0.3.0-r210
+
+## Italiano
+
+Gli insert master erano omessi dal percorso WebAudio attivo; il renderer di mix applicava solo gli effetti interni, senza passare dal percorso VST3. Ora il master elabora il segnale sommato, con effetti prima del fader master, nel preview, nell'esportazione e nel bounce. Durante il playback, le modifiche preparano il nuovo mix mentre quello precedente continua, quindi effettuano un breve crossfade. Attivare o disattivare questa modalità può richiedere una breve ricostruzione del playback. Il rendering richiede tempo proporzionale alla durata e al processing.
+
+Il menu traccia/timeline è suddiviso in Traccia, Audio e AI, Tempo e annotazioni, Elimina. “Bounce su traccia” (B, fuori dai campi di testo) applica gain, insert, volume, pan, delay e montaggio della traccia selezionata. Mute e solo non impediscono il bounce isolato. Il pulsante con icona e tooltip “Bounce progetto su traccia” applica il mix completo, rispettando mute/solo, effetti, fader e fade master.
+
+Il risultato è un WAV float32 alla frequenza del progetto, con nome univoco e parametri neutri. La nuova traccia nasce muta per evitare di raddoppiare il mix. Il bounce progetto conserva il routing post-master, evitando una seconda applicazione degli effetti master. Tempo e pitch globali restano applicati una sola volta. Le sorgenti non vengono modificate. Il rendering usa uno snapshot, verifica modifiche audio concorrenti e quota disponibile, quindi pubblica e salva con il journal dei media. Non è un job AI e non addebita risorse AI.
+
+Per i nuovi job AI conclusi con successo, le stime diagnostiche CPU/GPU per job sono accettate per accounting e billing con sorgente diagnostic-estimate. Rimangono indicate come stime attendibili, distinte dalla telemetria verificata, che ha precedenza. L'evidenza delle quantità accettate viene sigillata sul server e deve coincidere con settlement e fatturazione. La sola diagnostica grezza non autorizza addebiti. Input GPU arbitrari del worker, dati mancanti, negativi, non finiti, GPU ferma a zero e job falliti non diventano consumi validi. L'energia GPU non viene stimata. Risorse tariffate prive di misure idonee continuano a bloccare la chiusura contabile.
+
+Tariffe esistenti e job storici non vengono modificati. MTA_TRUST_AI_DIAGNOSTIC_ESTIMATES=false disattiva l'accettazione futura senza invalidare evidenze già sigillate. Questa politica sostituisce le precedenti indicazioni “stime diagnostiche non fatturabili” solo per le stime per job accettate tramite questo percorso. L'utilizzo aggregato anonimo dell'host resta escluso.
+
+Test: PCM reale per master e bounce, limiter sul segnale sommato, routing post-master, gain/pan/delay, salvataggio, quota, modifiche concorrenti, API asincrone, menu, shortcut, evidenze e chiusura contabile. Il percorso VST è verificato con host simulato, non con un plugin reale. Non sono state eseguite prove GUI Windows/macOS o inferenze sul server ROCm durante questo intervento; non costituisce certificazione hardware. I risultati della regressione sono nella cartella validation.
+
+## English
+
+The active WebAudio path omitted master inserts; mix rendering applied built-in effects but bypassed VST3 processing. The master now processes the summed signal before the master fader in preview, export and bounce. During playback, updates prepare replacement audio while the previous mix continues, followed by a short crossfade. Entering or leaving this mode can briefly rebuild playback. Render time depends on duration and processing.
+
+Track/timeline context menus now have Track, Audio and AI, Tempo and annotations, and Delete categories. “Bounce to track” (B outside editable fields) applies the selected track's gain, inserts, fader, pan, delay and edits. Mute/solo does not suppress an isolated bounce. The icon-only “Bounce project to track” toolbar button processes the complete mix, including mute/solo rules, master effects, fader and fades.
+
+The result is float32 WAV at the project sample rate, with a unique name and neutral controls. New bounce tracks start muted to prevent mix doubling. Project bounces retain post-master routing to avoid processing the master twice. Global tempo and pitch remain applied once. Sources remain unchanged. Rendering uses a snapshot, checks concurrent audio edits and capacity, then publishes and saves through the media journal. It is not an AI job and incurs no AI resource charges.
+
+Successful new AI jobs may use per-job CPU/GPU diagnostic estimates for accounting and billing under source diagnostic-estimate. They remain labelled trusted estimates, distinct from verified telemetry, which takes precedence. Server-sealed evidence must match settlement and billing. Raw diagnostics alone do not authorize charges. Arbitrary worker GPU values, missing, negative, non-finite or stalled zero GPU data and failed jobs cannot become eligible usage. GPU energy is not estimated. Missing eligible measurements for priced resources still block period closure.
+
+Existing tariffs and historical jobs are unchanged. MTA_TRUST_AI_DIAGNOSTIC_ESTIMATES=false disables future acceptance without invalidating sealed evidence. This supersedes older blanket “diagnostic estimates are not billable” statements only for per-job estimates accepted through this path. Anonymous host utilization remains ineligible.
+
+Tests cover real PCM processing, summed-signal limiting, post-master routing, gain/pan/delay, durable publication, capacity and concurrent-edit rejection, background APIs, menus, shortcuts, evidence and billing closure. VST dispatch uses a simulated host, not a real plugin. No Windows/macOS GUI sessions or live ROCm inference were performed during this change; this is not hardware certification. Regression results are included in validation.

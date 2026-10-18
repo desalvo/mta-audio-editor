@@ -83,7 +83,7 @@ def test_resource_totals_pending_closed_and_disabled_account(accounts,monkeypatc
     with auth.db() as con:
         con.execute("INSERT INTO ai_billing_periods(user_id,start_ts,end_ts,currency,total_micro,snapshot_json,created_at) VALUES(?,0,100,'EUR',8000,'{}',100)",(uid,))
     d=account_limits.summary(uid,{'used_bytes':0,'audio_bytes':0,'other_bytes':0,'project_count':0,'track_count':0},at=200)
-    assert d['resources']['cpu']=={'verified_seconds':18,'diagnostic_seconds':None,'closed_seconds':2,'pending_seconds':5,'other_verified_seconds':11}
+    assert d['resources']['cpu']=={'verified_seconds':18,'diagnostic_seconds':None,'closed_seconds':2,'pending_seconds':5,'other_verified_seconds':11,'accounted_seconds':18,'other_accounted_seconds':11,'trusted_estimated_seconds':None}
     assert d['resources']['gpu']['verified_seconds']==23 and d['resources']['gpu']['pending_seconds']==7
     assert d['billing']['pending_estimate_micro']==19000 and d['billing']['closed_total_micro']==8000
     assert d['billing']['outstanding_micro'] is None

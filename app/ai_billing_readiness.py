@@ -47,9 +47,17 @@ def check() -> dict:
 
     # Readiness requires calibration; individual jobs additionally require evidence.
     gpu_paid = any(rates.get(key, 0) > 0 for key in ('gpu_seconds', 'gpu_energy_joules'))
+    from .ai_trusted_estimates import enabled as trusted_estimates
+    collector_enabled=os.getenv('MTA_AI_TORCH_PROFILER','').lower() in ('1','true','yes') or os.getenv('MTA_ACE_GPU_PROFILER','').lower() in ('1','true','yes')
+    with ai_billing.db() as con:
+        evidence_table=con.execute("SELECT 1 FROM sqlite_master WHERE name='ai_trusted_estimate_evidence'").fetchone()
+        have_estimates=bool(con.execute('SELECT 1 FROM ai_trusted_estimate_evidence LIMIT 1').fetchone()) if evidence_table else False
     components['gpu_per_job'] = {
-        'ready': __import__('app.ai_gpu_verified',fromlist=['readiness']).readiness()['ready'],
-        'description': 'Calibrated continuous HIP kernel capture required; host GPU counters and diagnostic estimates cannot be billed',
+        'ready': (trusted_estimates() and (collector_enabled or have_estimates)) or __import__('app.ai_gpu_verified',fromlist=['readiness']).readiness()['ready'],
+        'description': 'Job-scoped diagnostic estimates are accepted and labelled as estimates; verified kernel telemetry takes precedence' if trusted_estimates() else 'Calibrated continuous HIP kernel capture required',
+        'trusted_estimates': trusted_estimates(),
+        'estimate_collector_enabled': collector_enabled,
+        'accepted_estimate_evidence_available': have_estimates,
         'paid_tariff_active': gpu_paid,
     }
     if gpu_paid and not components['gpu_per_job']['ready']:

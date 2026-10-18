@@ -561,6 +561,33 @@ def render_track(track: Track, source: Path, out: Path, apply_inserts: bool = Tr
                     temporary.unlink(missing_ok=True)
 
 
+def _render_bypass_mix(project,audio_resolver,out,**options):
+    # Imported master bounces are post-master; never apply the master twice.
+    with tempfile.TemporaryDirectory(prefix='mta-post-master-') as folder:
+        folder=Path(folder);composite=project.model_copy(deep=True);composite.tracks=[]
+        any_solo=any(t.solo for t in project.tracks)
+        normal=project.model_copy(deep=True)
+        normal.tracks=[t for t in normal.tracks if not t.master_bypass]
+        normal.base_bpm=normal.bpm;normal.pitch_semitones=0
+        for t in normal.tracks:
+            if any_solo and not t.solo:t.mute=True
+        paths={}
+        if normal.tracks:
+            path=folder/'master.wav'
+            render_mix(normal,audio_resolver,path,fmt='wav',sample_rate=project.sample_rate,wav_bit_depth=32)
+            duration=media_duration_ms(path)
+            composite.tracks.append(Track(id='normal-master',name='Master',filename=path.name,channels=2,
+                duration_ms=duration,clips=[Clip(id='normal-master-clip',source_end_ms=duration)]))
+            paths[path.name]=path
+        for item in project.tracks:
+            if not item.master_bypass:continue
+            t=item.model_copy(deep=True);t.master_bypass=False;t.solo=False
+            if any_solo and not item.solo:t.mute=True
+            composite.tracks.append(t);paths[t.filename]=audio_resolver(project.id,t.filename)
+        composite.master_inserts=[];composite.master_volume_db=0;composite.master_fade_enabled=False
+        return render_mix(composite,lambda pid,name:paths[name],out,**options)
+
+
 def render_mix(
     project: Project,
     audio_resolver,
@@ -576,6 +603,10 @@ def render_mix(
     """Render stereo master for preview/WAV/MP3/FLAC export."""
     if not project.tracks:
         raise ValueError("project has no audio tracks")
+    if any(t.master_bypass for t in project.tracks):
+        return _render_bypass_mix(project,audio_resolver,out,fmt=fmt,bitrate=bitrate,
+            sample_rate=sample_rate,wav_bit_depth=wav_bit_depth,flac_compression=flac_compression,
+            normalize_peak_db=normalize_peak_db)
     fmt = fmt.lower()
     if fmt not in {"wav", "mp3", "flac"}:
         raise ValueError("unsupported mix format")
@@ -603,10 +634,22 @@ def render_mix(
             )
             labels.append(f"[{label}]")
         filters.append("".join(labels) + f"amix=inputs={len(labels)}:duration=longest:normalize=0[master0]")
-        master_chain = chain_filter(project.master_inserts)
+        active_master = [item for item in project.master_inserts if item.enabled]
+        if active_master:
+            # Master effects must process the SUM, including VST3. Reuse the
+            # validated insert renderer rather than silently dropping VSTs.
+            summed = td / "master-input.wav"
+            _run(cmd + ["-filter_complex", ";".join(filters), "-map", "[master0]",
+                        "-ar", str(project.sample_rate), "-c:a", "pcm_f32le", str(summed)])
+            processed = td / "master-processed.wav"
+            duration = media_duration_ms(summed)
+            master_track = Track(id="master-render", name="Master", filename=summed.name,
+                channels=2, sample_rate=project.sample_rate, duration_ms=duration,
+                clips=[Clip(id="master-clip",source_end_ms=duration)], inserts=active_master)
+            render_track(master_track, summed, processed, sample_rate=project.sample_rate)
+            cmd = ["ffmpeg", "-y", "-v", "error", "-i", str(processed)]
+            filters = ["[0:a]anull[master0]"]
         tail = f"volume={project.master_volume_db:.3f}dB"
-        if master_chain:
-            tail += "," + master_chain
         tail += "," + master_fade_filter(project) + "," + project_time_pitch_filter(project)
         filters.append(f"[master0]{tail}[master]")
         sample_rate = int(sample_rate or getattr(project, "sample_rate", 44100) or 44100)

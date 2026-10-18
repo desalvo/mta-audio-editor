@@ -463,7 +463,7 @@ def export_mta(project: Project, out: Path, slots: list[MtaSlotMapping] | None =
         written = inspect_cluster_transport(staged_output)
         if not written.get("media_xor_validated"):
             raise RuntimeError("generated MTA media transport failed XOR validation")
-        with staged_output.open("rb") as handle:
+        with staged_output.open("r+b") as handle:
             os.fsync(handle.fileno())
         # Copy into a staging file on the destination filesystem before rename.
         import shutil

@@ -60,9 +60,12 @@ def records(user_id, start, end, *, completed_window=False):
 
 
 def aggregate(items):
-    total={'jobs':0,'usage':{},'diagnostic':{},'cost_micro':0,'amount_micro':0,'unmetered_jobs':0}
+    total={'jobs':0,'trusted_estimated_usage':{},'usage':{},'diagnostic':{},'cost_micro':0,'amount_micro':0,'unmetered_jobs':0}
     for row in items:
         total['jobs']+=1
+        if row.get('resource_source')=='diagnostic-estimate':
+            for key,value in row['usage'].items():
+                total['trusted_estimated_usage'][key]=total['trusted_estimated_usage'].get(key,0)+value
         total['cost_micro']+=row['cost_micro'];total['amount_micro']+=row['amount_micro']
         if not row['usage']:total['unmetered_jobs']+=1
         for source,target in [('usage','usage'),('estimated','diagnostic')]:
@@ -80,4 +83,4 @@ def snapshot(user_id,start,end,*,token_id=None,completed_window=False):
       **aggregate([r for r in items if r['token_id']==tid])} for tid in sorted(ids,key=lambda x:-1 if x is None else x)]
     return {'user_id':user_id,'start_ts':start,'end_ts':end,'currency':'EUR','by_token':groups,**aggregate(items),
       'billing_enabled':ai_billing.user_billing_enabled(user_id),'amount_is_estimate':True,'interval_basis':'completion' if completed_window else 'start',
-      'note':'Importi stimati a tariffe storicizzate, non fatture. Storage condiviso per utente escluso dal dettaglio token. Diagnostica GPU non fatturabile.'}
+      'note':'Importi stimati a tariffe storicizzate, non fatture. Storage condiviso per utente escluso dal dettaglio token. Stime diagnostiche attendibili utilizzabili per accounting e billing, indicate come stime.'}

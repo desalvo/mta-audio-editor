@@ -85,7 +85,7 @@ def test_legacy_import_ignores_preview_payloads(tmp_path, monkeypatch):
 
 def test_preview_endpoints_and_sample_editor_use_session_cache():
     assert 'cache = session_preview_dir(pid) / "tracks"' in MAIN
-    assert 'out = session_preview_dir(pid) / "preview-master.mp3"' in MAIN
+    assert 'out = session_preview_dir(pid) / ("preview-master-"+uuid.uuid4().hex+"."+format)' in MAIN
     assert 'storage.session_preview_dir(project.id) if preview else storage.pdir(project.id)' in SAMPLE
     assert '@app.delete("/api/projects/{pid}/preview-cache")' in MAIN
     assert '_cleanup_session_previews_on_shutdown' in MAIN

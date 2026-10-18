@@ -196,8 +196,8 @@ def render(payload,language):
         report=payload['report'];title=tr('Your AI resource summary','Riepilogo delle tue risorse AI')
         utc=lambda stamp:dt.datetime.fromtimestamp(stamp,dt.timezone.utc).strftime('%Y-%m-%d %H:%M UTC')
         fields=[(tr('Period','Periodo'),utc(report['start_ts'])+' → '+utc(report['end_ts'])),('Job',report['jobs']),
-          (tr('Verified resources','Risorse verificate'),metric('',report['usage'])),
-          (tr('Diagnostic estimates (not billable)','Stime diagnostiche (non fatturabili)'),metric('',report['diagnostic'])),
+          (tr('Accounted resources','Risorse contabilizzate'),metric('',report['usage'])),
+          (tr('Raw diagnostic estimates','Stime diagnostiche grezze'),metric('',report['diagnostic'])),
           (tr('Estimated amount (not an invoice)','Importo stimato (non è una fattura)'),f"€ {report['amount_micro']/1e6:.6f}")]
         extra='<h3>'+tr('By application token','Dettaglio per token applicazione')+'</h3>'+table([(str(row['token_id'])+' · '+row['label'],f"{row['jobs']} job · € {row['amount_micro']/1e6:.6f} · "+metric('',row['usage'])) for row in report['by_token']])
     else:
@@ -205,12 +205,12 @@ def render(payload,language):
         utc=lambda stamp:dt.datetime.fromtimestamp(stamp,dt.timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC') if stamp is not None else '—'
         fields=[(tr('Start','Inizio'),utc(payload.get('started_at'))),(tr('End','Fine'),utc(payload.get('finished_at'))),('Job',payload['job_id']),(tr('Operation','Operazione'),payload['operation']),
           (tr('Status','Stato'),status.get(payload['status'],payload['status'])),('Token',payload.get('token_id') or tr('Web / no token','Web / senza token')),
-          (tr('Verified resources','Risorse verificate'),metric('',payload['usage'])),
-          (tr('Diagnostic estimates (not billable)','Stime diagnostiche (non fatturabili)'),metric('',payload['diagnostic'])),
+          (tr('Accounted resources','Risorse contabilizzate'),metric('',payload['usage'])),
+          (tr('Raw diagnostic estimates','Stime diagnostiche grezze'),metric('',payload['diagnostic'])),
           (tr('Estimated amount (not an invoice)','Importo stimato (non è una fattura)'),f"€ {payload['amount_micro']/1e6:.6f}"+(' · '+tr('pending','provvisorio') if payload.get('cost_pending') else ''))]
         extra=''
     plain=title+'\n'+APP_RELEASE+' · '+_server()+'\n'+'\n'.join(str(k)+': '+str(v) for k,v in fields)
-    body=f'''<!doctype html><html><body style="margin:0;background:#edf2f8;font:15px Arial,sans-serif;color:#172a42"><table role="presentation" width="100%"><tr><td align="center" style="padding:28px 12px"><table role="presentation" width="620" style="width:100%;max-width:620px;background:white;border-radius:14px"><tr><td style="background:#153753;color:white;padding:24px;border-radius:14px 14px 0 0"><img src="cid:mta-logo" width="64" height="64" alt="MTA"><h1 style="font-size:24px;margin:12px 0">{esc(title)}</h1><p>MTA Audio Editor · {esc(APP_RELEASE)}</p></td></tr><tr><td style="padding:24px">{table(fields)}{extra}<p style="font-size:13px;color:#54667e">{esc(tr('Server','Server'))}: {esc(_server())}</p><p style="font-size:12px;color:#54667e">{esc(tr('Diagnostic estimates never authorize GPU billing. This email is not an invoice.','Le stime diagnostiche non autorizzano il billing GPU. Questa email non è una fattura.'))}</p></td></tr></table></td></tr></table></body></html>'''
+    body=f'''<!doctype html><html><body style="margin:0;background:#edf2f8;font:15px Arial,sans-serif;color:#172a42"><table role="presentation" width="100%"><tr><td align="center" style="padding:28px 12px"><table role="presentation" width="620" style="width:100%;max-width:620px;background:white;border-radius:14px"><tr><td style="background:#153753;color:white;padding:24px;border-radius:14px 14px 0 0"><img src="cid:mta-logo" width="64" height="64" alt="MTA"><h1 style="font-size:24px;margin:12px 0">{esc(title)}</h1><p>MTA Audio Editor · {esc(APP_RELEASE)}</p></td></tr><tr><td style="padding:24px">{table(fields)}{extra}<p style="font-size:13px;color:#54667e">{esc(tr('Server','Server'))}: {esc(_server())}</p><p style="font-size:12px;color:#54667e">{esc(tr('Per-job diagnostic estimates accepted by the server are eligible for accounting and billing and remain labelled as estimates. Raw diagnostics alone do not authorize charges. This email is not an invoice.','Le stime diagnostiche per job accettate dal server sono utilizzabili per accounting e billing e restano indicate come stime. La sola diagnostica grezza non autorizza addebiti. Questa email non è una fattura.'))}</p></td></tr></table></td></tr></table></body></html>'''
     return title+' · MTA',plain,body
 
 

@@ -1,0 +1,28 @@
+{
+  "version": "0.3.0-r210",
+  "overall": "passed after environment repairs and focused rerun",
+  "unique_passed": 3916,
+  "skipped": 5,
+  "deselected": 10,
+  "unresolved_failures": 0,
+  "targeted_passed": 92,
+  "targeted_skipped": 1,
+  "full_initial": {
+    "passed": 3907,
+    "failed": 9,
+    "skipped": 5
+  },
+  "focused_retry": {
+    "passed": 9,
+    "failed": 0
+  },
+  "repairs": [
+    "Restore executable entry-point bits missing from baseline ZIP",
+    "Install CMake in the test environment"
+  ],
+  "coverage_percent": 76.87,
+  "ruff": "passed",
+  "javascript_syntax": "passed",
+  "platform_limit": "Local Linux execution; native selector return formats and Windows writable-fsync constraint simulated. Actual Windows/macOS GUI validation remains pending.",
+  "ci": "Added real filesystem regression tests to Windows/macOS build jobs; not triggered here"
+}

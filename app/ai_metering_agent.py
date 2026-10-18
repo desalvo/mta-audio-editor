@@ -291,6 +291,9 @@ def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=
                     metered_source='gpu-kernel-verified'
                 except (OSError,ValueError,TypeError,KeyError):
                     pass  # Missing/incomplete evidence can never create a GPU charge.
+            diagnostic_checkpoint(final=True)
+            from .ai_trusted_estimates import promote
+            usage,metered_source=promote(job_id,usage,metered_source)
             if not defer_settlement:ai_billing.finish_job(job_id, 'done', usage or None,source=metered_source)
             diagnostics = dict(result.gpu_diagnostics or {})
             profile_report = read_report(directory, job_id)
