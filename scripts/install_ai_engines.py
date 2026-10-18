@@ -138,6 +138,12 @@ def verify(binary, group, device=None):
     run([binary, '-c',
          'import importlib,json,sys;[importlib.import_module(n) for n in json.loads(sys.argv[1])]',
          json.dumps(IMPORTS[group])])
+    if group == 'sam':
+        # Imports alone miss the Hub 1.x / legacy SAM loader TypeError.
+        run([binary, '-c',
+             'import sys;sys.path.insert(0,sys.argv[1]);'
+             'from sam_audio_compat import verify_sam_hub_compatibility;'
+             'verify_sam_hub_compatibility()', str(SOURCE / 'app')])
     if group in ('sam', 'audio'):
         # Import alone does not exercise FFmpeg's shared libraries. Decode a
         # short PCM fixture before publishing this environment as ready.

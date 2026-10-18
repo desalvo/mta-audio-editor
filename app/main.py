@@ -4486,7 +4486,8 @@ def _split_lead_backing_vocals(vocal_stem: Path, output_dir: Path, *, model_id: 
         ) from exc
     separator = Separator(model_file_dir=str(LEAD_BACKING_MODEL_DIR), output_dir=str(output_dir), output_format="WAV")
     try:
-        separator.load_model(model_filename=info["filename"])
+        from .backing_vocals_runtime import load_backing_model
+        load_backing_model(separator, info["filename"])
     except Exception as exc:
         if "beartype" in str(exc).lower() and ("callable" in str(exc).lower() or "pep" in str(exc).lower()):
             raise RuntimeError(

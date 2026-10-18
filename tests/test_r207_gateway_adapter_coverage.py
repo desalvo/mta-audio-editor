@@ -207,6 +207,7 @@ def test_backing_vocals_artifact_security(tmp_path, monkeypatch):
     sub.Separator = Separator
     monkeypatch.setitem(sys.modules, 'audio_separator', package)
     monkeypatch.setitem(sys.modules, 'audio_separator.separator', sub)
+    monkeypatch.setitem(sys.modules, 'torch', types.SimpleNamespace(version=types.SimpleNamespace(hip=None)))
     with pytest.raises(RuntimeError, match='configure'):
         unified.infer({'kind': 'backing-vocals', 'source_audio': source}, output)
     monkeypatch.setenv('MTA_AI_VOCAL_MODEL', 'safe_model.onnx')

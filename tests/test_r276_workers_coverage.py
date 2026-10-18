@@ -99,7 +99,8 @@ def test_sam_audio_adapter_validation_and_subprocess(monkeypatch, tmp_path):
 
 def test_sam_audio_worker_temporal_anchor_cli(monkeypatch, tmp_path):
     """Use mocked checkpoint APIs but execute the actual SAM command-line adapter."""
-    from app import sam_audio_worker as sw
+    from app import sam_audio_worker as sw, sam_audio_compat
+    monkeypatch.setattr(sam_audio_compat, "sam_hub_compat", lambda: nullcontext())
     from contextlib import nullcontext
     saved = []
     processed = []

@@ -20,6 +20,7 @@ datas = [
     (str(project / "app" / "static"), "app/static"),
     (str(project / "app" / "docs"), "app/docs"),
     (str(project / "app" / "sam_audio_worker.py"), "app"),
+    (str(project / "app" / "sam_audio_compat.py"), "app"),
     (str(project / "app" / "drumsep_onnx_worker.py"), "app"),
     (str(project / "VERSION"), "."),
     (str(project / "REVISION"), "."),

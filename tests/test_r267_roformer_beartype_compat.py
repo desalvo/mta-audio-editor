@@ -10,6 +10,7 @@ def test_native_build_validates_roformer_pep604_hints():
 
 def test_roformer_type_checker_reports_actionable_error():
     source = Path('app/main.py').read_text()
-    assert 'separator.load_model(model_filename=info["filename"])' in source
+    assert 'load_backing_model(separator, info["filename"])' in source
+    assert 'separator.load_model(model_filename=model_filename)' in Path('app/backing_vocals_runtime.py').read_text()
     assert 'RoFormer model cannot be loaded with the installed beartype validator' in source
     assert 'Original error: {exc}' in source

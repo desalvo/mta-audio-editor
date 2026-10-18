@@ -219,7 +219,8 @@ def infer(plan: dict, output: Path) -> None:
         if not model or '/' in model or '\\' in model:
             raise RuntimeError('Operator must configure a safe MTA_AI_VOCAL_MODEL filename')
         separator = Separator(output_dir=str(folder), output_format='WAV', model_file_dir=os.environ.get('MTA_LEAD_BACKING_MODEL_DIR', os.environ.get('MTA_AI_VOCAL_MODELS_DIR', '')))
-        separator.load_model(model_filename=model)
+        from app.backing_vocals_runtime import load_backing_model
+        load_backing_model(separator, model)
         names = separator.separate(str(source))
         paths=[]
         for index, name in enumerate(names):
