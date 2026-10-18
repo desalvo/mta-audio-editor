@@ -12,7 +12,7 @@ def test_native_bridge_waits_for_pywebview_event_and_slow_macos_injection():
 
 
 def test_new_project_buttons_are_not_implicit_submit_buttons():
-    assert 'type="button" onclick="chooseNewProjectPath()"' in JS
+    assert 'id="newProjectPath"' not in JS
     assert 'type="button" onclick="createProjectFromDialog()"' in JS
 
 

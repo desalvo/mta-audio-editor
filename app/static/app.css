@@ -1639,3 +1639,35 @@ body:not(.timeline-select-tool) .clip-block{pointer-events:none;cursor:default}
 
 /* r210: retain room for decimal BPM and native number steppers. */
 #transportBpmInput{width:84px;min-width:84px}
+
+/* r210 input gain: independent trim before track inserts and fader. */
+.mixer-dock .gain-control{display:flex;flex-wrap:nowrap;justify-content:space-between;align-items:center;gap:2px;min-height:26px;margin:1px 0}
+.gain-readout{display:flex;flex-direction:column;align-items:center;gap:0}
+.mixer-dock .gain-value-input{width:40px;appearance:textfield;-moz-appearance:textfield}
+.gain-value-input::-webkit-inner-spin-button,.gain-value-input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.gain-knob:after{background:#8ff0c1}
+.gain-knob:focus-visible{outline:2px solid #8ff0c1;outline-offset:2px}
+.gain-label{color:#a7d8c5;font:7px ui-monospace,monospace;line-height:8px;white-space:nowrap}
+.gain-control-spacer{height:38px}
+.mixer-dock .channel{min-height:230px}
+.mixer-dock .channels{min-height:244px;flex-basis:244px}
+.mixer-dock .channel-fader-area,.mixer-dock .meter-stack{height:88px}
+.mixer-dock .fader-column{height:76px}
+.mixer-dock .fader-column .v-fader{width:72px;left:-21px;top:31px;transform-origin:36px 6.5px}
+.mixer-dock .db-scale{height:72px}
+.mixer-dock .meter-stack .meter-pair,.mixer-dock .meter{height:66px}
+
+/* r210: number controls allocate a separate scalable column for their steppers. */
+.mixer-number{display:flex;align-items:stretch;min-width:0;max-width:100%;width:46px;height:22px;overflow:hidden;border:1px solid #31495d;border-radius:4px;background:#09141d}
+.mixer-dock .mixer-number{width:100%;max-width:48px;height:20px}
+.mixer-number .pan-value-input,.mixer-dock .mixer-number .pan-value-input{flex:1 1 0;width:0;min-width:0;max-width:100%;height:100%;padding:0 1px;border:0;appearance:textfield;-moz-appearance:textfield;font-size:clamp(7px,.65vw,9px)}
+.mixer-number input::-webkit-inner-spin-button,.mixer-number input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.mixer-stepper{display:grid;grid-template-rows:1fr 1fr;flex:0 0 clamp(8px,.8vw,11px);min-width:0;border-left:1px solid #31495d}
+.mixer-stepper button{display:flex;align-items:center;justify-content:center;min-width:0;min-height:0;width:100%;height:100%;padding:0;border:0;border-radius:0;background:#173044;color:#b4cee0;font-size:clamp(6px,.6vw,8px);line-height:1;cursor:pointer;overflow:hidden}
+.mixer-stepper button:hover{background:#31516b}
+.gain-readout{min-width:0;flex:1 1 0;max-width:48px}
+
+.mixer-dock .pan-control:not(.gain-control){display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;column-gap:2px;row-gap:1px}
+.mixer-dock .pan-control:not(.gain-control)>.mixer-number{flex:1 1 0;width:0}
+.mixer-dock .pan-control:not(.gain-control)>.pan-knob{flex:0 0 24px}
+.mixer-dock .pan-control:not(.gain-control)>.pan-label{flex:0 0 100%;text-align:center;height:10px}

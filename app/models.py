@@ -93,6 +93,7 @@ class Track(BaseModel):
     derived_stem_key: str = Field(default="", max_length=200)
     source_clip_id: str | None = Field(default=None, pattern=r"^[A-Za-z0-9_-]{1,64}$")
     duration_ms: int = Field(default=0, ge=0)
+    gain_db: float = Field(default=0.0, ge=-24.0, le=24.0, allow_inf_nan=False)
     volume_db: float = Field(default=0.0, ge=-120.0, le=24.0)
     pan: float = Field(default=0.0, ge=-1.0, le=1.0)
     mute: bool = False

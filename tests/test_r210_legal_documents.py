@@ -133,7 +133,8 @@ def test_login_register_links_and_public_allowlist_end_to_end(env,monkeypatch):
     for entry in ('/login','/register'):
         response=client.get(entry);assert response.status_code==200
         links=Links();links.feed(response.text)
-        for path in ('/privacy/it','/privacy/en','/terms/it','/terms/en'):
+        assert '/privacy/it' not in links.links and '/terms/it' not in links.links
+        for path in ('/privacy/en','/terms/en'):
             assert path in links.links
             result=client.get(path,follow_redirects=False)
             assert result.status_code==200 and result.headers['x-frame-options']=='DENY'

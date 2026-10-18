@@ -152,7 +152,10 @@ def init_auth_db() -> None:
           approved_at INTEGER,
           approved_by INTEGER,
           last_login_at INTEGER,
-          workspace_quota_bytes INTEGER NOT NULL DEFAULT 0,
+          workspace_quota_bytes INTEGER NOT NULL DEFAULT 5368709120,
+          language TEXT NOT NULL DEFAULT 'auto',
+          browser_language TEXT NOT NULL DEFAULT 'en',
+          limits_expanded INTEGER NOT NULL DEFAULT 0,
           FOREIGN KEY(approved_by) REFERENCES users(id)
         );
         CREATE TABLE IF NOT EXISTS email_tokens(
@@ -214,6 +217,9 @@ def init_auth_db() -> None:
             "totp_pending_enc TEXT NOT NULL DEFAULT ''",
             "updated_at INTEGER NOT NULL DEFAULT 0",
             "workspace_quota_bytes INTEGER NOT NULL DEFAULT 0",
+            "language TEXT NOT NULL DEFAULT 'auto'",
+            "browser_language TEXT NOT NULL DEFAULT 'en'",
+            "limits_expanded INTEGER NOT NULL DEFAULT 0",
         ):
             _add_column(con, "users", definition)
 
@@ -260,8 +266,8 @@ def _bootstrap_admin() -> None:
             return
         ts = now_ts()
         con.execute(
-            """INSERT INTO users(username,email,display_name,password_hash,role,active,email_confirmed,created_at,updated_at,approved_at)
-               VALUES(?,?,?,?, 'admin',1,1,?,?,?)""",
+            """INSERT INTO users(username,email,display_name,password_hash,role,active,email_confirmed,created_at,updated_at,approved_at,workspace_quota_bytes)
+               VALUES(?,?,?,?, 'admin',1,1,?,?,?,5368709120)""",
             (username, email, "Administrator", _password_hash_unchecked(password), ts, ts, ts),
         )
 
@@ -306,6 +312,9 @@ def public_user(row) -> dict:
         "approved_at": row["approved_at"],
         "last_login_at": row["last_login_at"],
         "workspace_quota_bytes": int(row["workspace_quota_bytes"] or 0) if "workspace_quota_bytes" in row.keys() else 0,
+        "limits_expanded": bool(row["limits_expanded"]) if "limits_expanded" in row.keys() else False,
+        "language": row["language"] if "language" in row.keys() else "auto",
+        "browser_language": row["browser_language"] if "browser_language" in row.keys() else "en",
         "social_providers": social_providers_for_user(row["id"]),
     }
 
@@ -401,11 +410,13 @@ def register_user(username: str, email: str, display_name: str, password: str, b
     try:
         with db() as con:
             cur = con.execute(
-                """INSERT INTO users(username,email,display_name,password_hash,role,active,email_confirmed,created_at,updated_at)
-                   VALUES(?,?,?,?, 'user',0,0,?,?)""",
+                """INSERT INTO users(username,email,display_name,password_hash,role,active,email_confirmed,created_at,updated_at,workspace_quota_bytes)
+                   VALUES(?,?,?,?, 'user',0,0,?,?,5368709120)""",
                 (username,email,display_name,_password_hash(password),ts,ts),
             )
             user_id = cur.lastrowid
+            from .i18n import current_language
+            con.execute("UPDATE users SET browser_language=? WHERE id=?",(current_language.get(),user_id))
             lifecycle.reserve(con,user_id,username,email)
     except sqlite3.IntegrityError as exc:
         raise ValueError("Username o email già registrati.") from exc
@@ -599,7 +610,9 @@ def social_login_or_register(provider: str, profile: dict):
         if con.execute("SELECT 1 FROM users WHERE email=? COLLATE NOCASE",(profile["email"],)).fetchone(): raise ValueError("Esiste già un account con questa email. Accedi con il metodo già associato all'account.")
         reserved=con.execute('SELECT user_id FROM account_identity_reservations WHERE kind="email" AND digest=?',(lifecycle.identity("email",profile["email"]),)).fetchone()
         if reserved:raise ValueError("Email già utilizzata: richiedi la riattivazione dell’account")
-        ts=now_ts();cur=con.execute("INSERT INTO users(username,email,display_name,password_hash,role,active,email_confirmed,created_at,updated_at) VALUES(?,?,?,?, 'user',0,?, ?,?)",(_social_username(provider,profile["email"]),profile["email"],profile["name"],"social$"+provider,int(profile.get("email_verified",True)),ts,ts));uid=cur.lastrowid
+        ts=now_ts();cur=con.execute("INSERT INTO users(username,email,display_name,password_hash,role,active,email_confirmed,created_at,updated_at,workspace_quota_bytes) VALUES(?,?,?,?, 'user',0,?, ?,?,5368709120)",(_social_username(provider,profile["email"]),profile["email"],profile["name"],"social$"+provider,int(profile.get("email_verified",True)),ts,ts));uid=cur.lastrowid
+        from .i18n import current_language
+        con.execute("UPDATE users SET browser_language=? WHERE id=?",(current_language.get(),uid))
         lifecycle.reserve(con,uid,con.execute("SELECT username FROM users WHERE id=?",(uid,)).fetchone()[0],profile["email"])
         con.execute("INSERT INTO social_identities(user_id,provider,subject,created_at) VALUES(?,?,?,?)",(uid,provider,subject,ts))
     from .account_lifecycle import register as register_lifecycle
@@ -772,7 +785,11 @@ def require_admin(request: Request):
     return row
 
 
-def update_profile(user_id: int, *, display_name: str | None = None, email: str | None = None, base_url: str = ""):
+def update_profile(user_id: int, *, display_name: str | None = None, email: str | None = None, base_url: str = "", language: str | None = None, limits_expanded: bool | None = None):
+    if limits_expanded is not None and type(limits_expanded) is not bool:
+        raise ValueError("Invalid limits panel preference")
+    if language is not None and language not in ("auto","it","en"):
+        raise ValueError("Invalid interface language")
     row = get_user(user_id)
     if not row:
         raise ValueError("Utente non trovato.")
@@ -786,6 +803,10 @@ def update_profile(user_id: int, *, display_name: str | None = None, email: str 
     from . import account_lifecycle as lifecycle
     with db() as setup:lifecycle.init(setup)
     with db() as con:
+        if limits_expanded is not None:
+            con.execute("UPDATE users SET limits_expanded=?,updated_at=? WHERE id=?",(int(limits_expanded),ts,user_id))
+        if language is not None:
+            con.execute("UPDATE users SET language=?,updated_at=? WHERE id=?", (language,ts,user_id))
         if display_name is not None:
             con.execute("UPDATE users SET display_name=?,updated_at=? WHERE id=?", (display_name.strip()[:120],ts,user_id))
         if destination and destination != row["email"].lower():
@@ -976,6 +997,13 @@ def test_smtp_config(body: dict) -> None:
 
 
 def send_mail(recipients: list[str], subject: str, plain: str, html_body: str | None = None, *, inline_image: bytes | None = None, message_id: str | None = None, configuration: dict | None = None) -> None:
+    from .i18n import recipient_language, translate, translate_html
+    for recipient in dict.fromkeys(x for x in recipients if x):
+        language=recipient_language(recipient)
+        _send_mail_one([recipient],translate(subject,language),translate(plain,language),translate_html(html_body,language) if html_body else None,inline_image=inline_image,message_id=message_id,configuration=configuration)
+
+
+def _send_mail_one(recipients: list[str], subject: str, plain: str, html_body: str | None = None, *, inline_image: bytes | None = None, message_id: str | None = None, configuration: dict | None = None) -> None:
     cfg=_smtp_full() if configuration is None else _smtp_full(configuration)
     if not cfg["host"] or not cfg["from_email"]:
         raise RuntimeError("SMTP non configurato.")

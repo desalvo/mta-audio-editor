@@ -8,13 +8,15 @@ function controlName(el){
   const explicit=el.getAttribute('aria-label')||el.dataset.tooltip||el.getAttribute('data-label');
   if(explicit)return explicit.trim();
   if(el.matches('input[type="file"]'))return '';
-  const text=(el.innerText||el.textContent||'').replace(/\s+/g,' ').trim();
+  const text=(el.textContent||'').replace(/\s+/g,' ').trim();
   if(text)return text.replace(/^[^\p{L}\p{N}]+/u,'').trim()||text;
   const value=(el.value||'').trim();
   return value;
 }
 function ensureControlTooltips(root=document){
-  root.querySelectorAll('button,a.nav-item,a.header-link,label.nav-item,.new-project,.tool,.toolbar-action,.tiny-btn,.dock-tab,.format-option,.analysis-btn,.preview-master').forEach(el=>{
+  const selector='button,a.nav-item,a.header-link,label.nav-item,.new-project,.tool,.toolbar-action,.tiny-btn,.dock-tab,.format-option,.analysis-btn,.preview-master';
+  const controls=[...(root.matches?.(selector)?[root]:[]),...root.querySelectorAll(selector)];
+  controls.forEach(el=>{
     if(!el.getAttribute('title')){
       const name=controlName(el);
       if(name)el.setAttribute('title',name);
@@ -29,8 +31,7 @@ const tooltipObserver=new MutationObserver(records=>{
   for(const record of records){
     for(const node of record.addedNodes){
       if(node.nodeType===1){
-        if(node.matches?.('button,a,label'))ensureControlTooltips(node.parentElement||document);
-        else ensureControlTooltips(node);
+        ensureControlTooltips(node);
       }
     }
   }
@@ -67,6 +68,7 @@ let playbackWarmCache=new Map(), playbackWarmProjectId=null, playbackWarmSignatu
 const liveFxRefreshTimers={};
 let lastSelectedAudioFile=null, playbackPaused=false, mixerMetaTab='lyrics', pendingExportConfig=null, pendingNewProjectPath=null;
 const metaMultiSelection={lyrics:new Set(),chords:new Set()};
+let sampleEditorRangeHint=null;
 let sampleEditor=null,sampleEditorPreviewAbort=null,sampleEditorPreviewTimer=null,serverProjects=[];
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const TRACK_COLORS=['#2f81f7','#28b463','#f0a52b','#8a58db','#e9506c','#8395a7','#24b8d4','#b26ff2','#e67e22','#16a085','#d35400','#7f8c8d'];
@@ -74,7 +76,8 @@ const TRACK_COLORS=['#2f81f7','#28b463','#f0a52b','#8a58db','#e9506c','#8395a7',
 const UI_TEXT_PAIRS=[
 ['Project','Progetto'],['No project loaded','Nessun progetto caricato'],['New project','Nuovo progetto'],['Open project','Apri progetto'],['Open recent','Apri recenti'],['Close project','Chiudi progetto'],['Delete project','Elimina progetto'],['Project files','File progetto'],['Share project','Condividi progetto'],['Info progetto','Info progetto'],['Save','Salva'],['Save as','Salva con nome'],['Save project','Salva progetto'],['Save project as…','Salva progetto con nome…'],['Save project locally','Salva progetto localmente'],['Open local project','Apri progetto locale'],['Open recent','Apri recenti'],['Export','Esporta'],['Settings','Impostazioni'],['About','Informazioni'],['Docs & Help','Documentazione e aiuto'],['Account','Account'],['Esci','Esci'],['View','Vista'],['VIEW','VISTA'],['Tracks','Tracce'],['Mixer','Mixer'],['Piano / Chord Lab','Piano / Chord Lab'],['Mostra/nascondi Piano / Chord Lab','Show/hide Piano / Chord Lab'],['Plugins','Plugin'],['Lyrics','Testo'],['Chords','Accordi'],['Markers','Marker'],['Select','Seleziona'],['Split','Dividi'],['Range','Intervallo'],['Ripple','Ripple'],['Bars','Battute'],['Beats','Quarti'],['Off','Disattivato'],['Import Audio Track','Importa traccia audio'],['Import Audio','Importa audio'],['Copia e incolla l’URL del video. Prima di importare, apri il video nel browser e avviane la riproduzione audio: senza questo passaggio l’importazione potrebbe fallire.','Copy and paste the video URL. Before importing, open the video in your browser and start audio playback: otherwise the import may fail.'],['Import YouTube','Importa YouTube'],['Import & Separate','Importa e separa'],['Metronomo','Metronomo'],['Adattivo','Adaptive'],['Metronomo adattivo','Adaptive metronome'],['Undo','Annulla'],['Redo','Ripristina'],['Cut','Taglia'],['Copy','Copia'],['Paste','Incolla'],['Remove','Rimuovi'],['Delete tracks','Elimina tracce'],['Delete selected range','Elimina intervallo selezionato'],['Show Lyrics','Mostra testo'],['Show Chords','Mostra accordi'],['Follow','Segui'],['Render','Render'],['Setup','Impostazioni progetto'],['Maximum import/upload size (MB)','Dimensione massima import/upload (MB)'],['Auto-save project changes','Salvataggio automatico modifiche progetto'],['Show previous and next chords','Mostra accordo precedente e successivo'],['Show previous and next lyrics','Mostra testo precedente e successivo'],['Update channel','Canale aggiornamenti'],['Stable · GitHub tags/releases only','Stabile · solo tag/release GitHub'],['Early release · include latest main packages','Early release · include gli ultimi pacchetti main'],['Check for updates','Controlla aggiornamenti'],['Manage Demucs models','Gestisci modelli Demucs'],['Manage Lyrics / Chords models','Gestisci modelli Lyrics / Chords'],['Cancel','Annulla'],['Annulla','Annulla'],['Apply','Applica'],['Applica','Applica'],['Reset','Ripristina'],['Ripristina','Ripristina'],['Normal','Normale'],['Bold','Grassetto'],['Italic','Corsivo'],['Title','Titolo'],['Subtitle','Sottotitolo'],['Tap tempo · press repeatedly to set BPM','Tap tempo · premi ripetutamente per impostare i BPM'],['BPM','BPM'],['Time signature','Metrica'],['Artist / performer','Artista / interprete'],['Original title','Titolo originale'],['Authors / composers','Autori / compositori'],['Key','Tonalità'],['Project type','Tipo progetto'],['MTA profile','Profilo MTA'],['Rights societies','Società repertorio'],['Edit project metadata','Modifica metadata progetto'],['Save project manually','Salva progetto manualmente'],['Check for updates','Controlla aggiornamenti'],['Language','Lingua'],['Auto (system)','Auto (sistema)'],['Italian','Italiano'],['English','Inglese'],['selected','selezionate'],['TRACKS','TRACCE'],['Inspector','Inspector'],['Stems','Stem'],['Metadata','Metadata'],['Volume','Volume'],['Pan','Pan'],['Type','Tipo'],['Replace','Sostituisci'],['Track export','Export traccia'],['Advanced','Avanzate'],['Send','Send'],['Track Automation','Automazione traccia'],['Rinomina','Rinomina'],['Separa','Separa'],['Estrai lyrics','Estrai testo'],['Estrai chords','Estrai accordi'],['Sincronizza metronomo','Sincronizza metronomo'],['Delay / anticipo traccia…','Ritardo / anticipo traccia…'],['Modifica metadata progetto','Modifica metadata progetto'],['Titolo','Titolo'],['Titolo originale','Titolo originale'],['Autori / compositori','Autori / compositori'],['Artista / interprete','Artista / interprete'],['Tonalità / Key','Tonalità'],['Tipo progetto','Tipo progetto'],['Profilo MTA','Profilo MTA'],['Società repertorio','Società repertorio'],['Salva','Salva'],['Version','Versione'],['Revision','Revisione'],['Release','Release'],['Build','Build'],['Creator','Creatore'],['License','Licenza'],['Repository','Progetto'],['Early Access','Accesso anticipato'],['Close','Chiudi'],['Chiudi menu','Chiudi menu'],['Menu','Menu']
 ];
-let uiLanguage=null;
+let uiLanguage=window.MtaLocale?.language||null;
+window.addEventListener('mta:language',event=>{uiLanguage=event.detail.language});
 const UI_EN_IT=new Map(UI_TEXT_PAIRS),UI_IT_EN=new Map(UI_TEXT_PAIRS.map(([en,it])=>[it,en]));
 const UI_IT_EN_PHRASES=[
 ['Separa traccia','Separate track'],['Scarica modello','Download model'],['Avvia separazione','Start separation'],['Separa anche voce principale e backing vocals','Also separate lead and backing vocals'],['Separa anche voce principale e backing vocals (secondo passaggio AI)','Also separate lead and backing vocals (second AI pass)'],['Modello Lead / Backing Vocals','Lead / Backing Vocals model'],['Modello AI','AI model'],['Numero stem','Number of stems'],['Annulla','Cancel'],['Sorgente:','Source:'],['La separazione partirà solo dopo la conferma dei parametri.','Separation starts only after confirming the settings.'],['Modello scaricato localmente','Model downloaded locally'],['Modello scaricato sul server','Model downloaded on server'],['Download modello in corso…','Downloading model…'],['Il fallback DSP non richiede modelli','The DSP fallback does not require a model'],
@@ -109,16 +112,18 @@ for(const [it,en] of UI_LATE_TRANSLATIONS){UI_IT_EN.set(it,en);if(!UI_EN_IT.has(
 
 
 function tr(en,it){if(uiLanguage==='it')return it;if(uiLanguage==='en')return en;return en}
-function trDynamic(value){const raw=String(value??'');if(!uiLanguage)return raw;const lead=(raw.match(/^\s*/)||[''])[0],trail=(raw.match(/\s*$/)||[''])[0],core=raw.trim();if(!core)return raw;const map=uiLanguage==='it'?UI_EN_IT:UI_IT_EN;if(map.has(core))return lead+map.get(core)+trail;
+function trDynamic(value){if(window.MtaLocale)return window.MtaLocale.translate(value);const raw=String(value??'');if(!uiLanguage)return raw;const lead=(raw.match(/^\s*/)||[''])[0],trail=(raw.match(/\s*$/)||[''])[0],core=raw.trim();if(!core)return raw;const map=uiLanguage==='it'?UI_EN_IT:UI_IT_EN;if(map.has(core))return lead+map.get(core)+trail;
   const prefixes=uiLanguage==='en'?[['Sorgente:','Source:'],['Impossibile aprire il progetto:','Cannot open project:']]:[['Source:','Sorgente:'],['Cannot open project:','Impossibile aprire il progetto:']];
   for(const [a,b] of prefixes)if(core.startsWith(a+' '))return lead+b+core.slice(a.length)+trail;
   const patterns=uiLanguage==='it'?[[/^(\d+) selected$/,'$1 selezionate'],[/^Settings saved$/,'Impostazioni salvate'],[/^Project saved$/,'Progetto salvato'],[/^No project open$/,'Nessun progetto aperto'],[/^Open a project first$/,'Apri prima un progetto']]:[[/^(\d+) selezionat[ae]$/,'$1 selected'],[/^Impostazioni salvate$/,'Settings saved'],[/^Progetto salvato(?: manualmente)?$/,'Project saved'],[/^Nessun progetto aperto$/,'No project open'],[/^Apri prima un progetto$/,'Open a project first']];
   for(const [re,repl] of patterns)if(re.test(core))return lead+core.replace(re,repl)+trail;return raw}
-function applyInterfaceLanguage(root=document){if(!uiLanguage||!root)return;document.documentElement.lang=uiLanguage;const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);for(const n of nodes){if(n.parentElement?.matches('script,style,textarea,input'))continue;const x=trDynamic(n.nodeValue);if(x!==n.nodeValue)n.nodeValue=x}root.querySelectorAll?.('[title],[aria-label],[placeholder]').forEach(el=>{for(const a of ['title','aria-label','placeholder']){if(el.hasAttribute(a)){const original=el.getAttribute(a),translated=trDynamic(original);if(translated!==original)el.setAttribute(a,translated)}}});ensureControlTooltips(root)}
+function applyInterfaceLanguage(root=document){if(window.MtaLocale&&window.MtaLocale.language!==uiLanguage)window.MtaLocale.setChoice(uiLanguage);if(!uiLanguage||!root)return;if(window.MtaLocale){window.MtaLocale.localize(root);ensureControlTooltips(root);return}document.documentElement.lang=uiLanguage;const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);for(const n of nodes){if(n.parentElement?.closest('script,style,textarea,input,pre,code,[translate="no"],[data-i18n-preserve],[data-track-name],.channel-name,.track-name,.meta-value,.lyric-word'))continue;const x=trDynamic(n.nodeValue);if(x!==n.nodeValue)n.nodeValue=x}root.querySelectorAll?.('[title],[aria-label],[placeholder]').forEach(el=>{for(const a of ['title','aria-label','placeholder']){if(el.hasAttribute(a)){const original=el.getAttribute(a),translated=trDynamic(original);if(translated!==original)el.setAttribute(a,translated)}}});ensureControlTooltips(root)}
 // Localize only the inserted nodes. A document-wide translation on every
 // mutation makes settings and tool dialogs stall in large multitrack projects.
 let localizationObserver=null,localizationScheduled=false,localizationPending=new Set();
 function ensureLiveLocalization(){
+  // The shared runtime already observes every page; avoid a second translator.
+  if(window.MtaLocale)return;
   if(localizationObserver||typeof MutationObserver==='undefined'||!document.body)return;
   localizationObserver=new MutationObserver(changes=>{
     if(!uiLanguage)return;
@@ -144,7 +149,7 @@ function ensureLiveLocalization(){
       for(const node of pending){
         if(!node.isConnected)continue;
         if(node.nodeType===Node.TEXT_NODE){
-          if(node.parentElement?.matches('script,style,textarea,input'))continue;
+          if(node.parentElement?.closest('script,style,textarea,input,pre,code,[translate="no"],[data-i18n-preserve],[data-track-name],.channel-name,.track-name,.meta-value,.lyric-word'))continue;
           const translated=trDynamic(node.nodeValue);
           if(translated!==node.nodeValue)node.nodeValue=translated;
         }else if(node.nodeType===Node.ELEMENT_NODE){
@@ -233,7 +238,7 @@ function trackHeightPx(t){return Math.max(78,Math.min(420,Math.round(Number(t?.h
 function linesToText(a,b){return(a||[]).map(x=>`${(x.time_ms/1000).toFixed(3)}\t${x[b]}`).join('\n')}
 function textToLines(v,key){return v.split(/\n/).map(x=>x.trim()).filter(Boolean).map(line=>{const [t,...rest]=line.split(/\t|\s{2,}/);return{time_ms:Math.max(0,Math.round(parseFloat(t)*1000)||0),[key]:rest.join(' ').trim()}})}
 
-async function init(){restoreSidebarPanels();if(isMobileClient())document.body.classList.add('mobile-client');try{currentUser=await api('/api/session');const a=$('#adminNav');if(a)a.hidden=!!currentUser.native_single_user||currentUser.role!=='admin';const sb=$('#nativeSettingsButton');if(sb)sb.hidden=false;const recentBtn=$('#openRecentProjectBtn'),localBtn=$('#openLocalProjectBtn'),manualSave=$('#saveProjectManualNav'),localSave=$('#saveProjectLocalNav');if(currentUser.native_single_user){document.body.classList.add('native-single-user');if(recentBtn)recentBtn.hidden=false;if(localBtn)localBtn.hidden=true;if(manualSave)manualSave.hidden=false;if(localSave)localSave.hidden=true}else{if(recentBtn)recentBtn.hidden=false;if(localBtn)localBtn.hidden=false;if(manualSave)manualSave.hidden=true;if(localSave)localSave.hidden=false}}catch(e){}if(currentUser?.native_single_user){installNativeViewportGuard();aiAceRefresh();}if(currentUser&&!currentUser.native_single_user)autosaveEnabled=localStorage.getItem('mtaWebAutosaveEnabled')!=='false';let nativeBridge=null;if(currentUser?.native_single_user){nativeBridge=await waitForNativeApi();if(nativeBridge?.get_native_settings){try{const cfg=await nativeBridge.get_native_settings();autosaveEnabled=cfg.autosave_enabled!==false;nativeRecentProjects=Array.isArray(cfg.recent_projects)?cfg.recent_projects.map(String).filter(Boolean):[];const pref=['it','en'].includes(cfg.language)?cfg.language:'auto';uiLanguage=pref==='auto'?(String(cfg.system_language||'en').toLowerCase().startsWith('it')?'it':'en'):pref;applyInterfaceLanguage();ensureLiveLocalization()}catch(e){}}if(window.mtaNativeZoom)await window.mtaNativeZoom.init(nativeBridge,{language:()=>uiLanguage,notify:toast});setTimeout(()=>checkNativeAppUpdate(false),1200)}try{pluginInfo=await api('/api/plugins')}catch(e){}if(nativeBridge?.consume_startup_project){try{const startup=await nativeBridge.consume_startup_project();if(startup?.project?.id){rememberRecentProject(startup.project.id);await openP(startup.project.id);return}if(startup&&!startup.ok&&startup.error)toast('Impossibile aprire il progetto: '+startup.error)}catch(e){toast('Impossibile aprire il progetto: '+e.message)}}await refresh();const requestedAiProject=new URLSearchParams(location.search).get('ai_project');if(requestedAiProject)await openP(requestedAiProject);else await restoreActiveWebProject()}
+async function init(){restoreSidebarPanels();if(isMobileClient())document.body.classList.add('mobile-client');try{currentUser=await api('/api/session');const a=$('#adminNav');if(a)a.hidden=!!currentUser.native_single_user||currentUser.role!=='admin';const sb=$('#nativeSettingsButton');if(sb)sb.hidden=false;const recentBtn=$('#openRecentProjectBtn'),localBtn=$('#openLocalProjectBtn'),manualSave=$('#saveProjectManualNav'),localSave=$('#saveProjectLocalNav');if(currentUser.native_single_user){document.body.classList.add('native-single-user');if(recentBtn)recentBtn.hidden=false;if(localBtn)localBtn.hidden=true;if(manualSave)manualSave.hidden=false;if(localSave)localSave.hidden=true}else{if(recentBtn)recentBtn.hidden=false;if(localBtn)localBtn.hidden=false;if(manualSave)manualSave.hidden=true;if(localSave)localSave.hidden=false}}catch(e){}if(currentUser?.native_single_user){installNativeViewportGuard();aiAceRefresh();}if(currentUser&&!currentUser.native_single_user)autosaveEnabled=localStorage.getItem('mtaWebAutosaveEnabled')!=='false';let nativeBridge=null;if(currentUser?.native_single_user){nativeBridge=await waitForNativeApi();if(nativeBridge?.get_native_settings){try{const cfg=await nativeBridge.get_native_settings();autosaveEnabled=cfg.autosave_enabled!==false;nativeRecentProjects=Array.isArray(cfg.recent_projects)?cfg.recent_projects.map(String).filter(Boolean):[];const pref=['it','en'].includes(cfg.language)?cfg.language:'auto';uiLanguage=pref==='auto'?(String(navigator.language||'en').toLowerCase().startsWith('it')?'it':'en'):pref;applyInterfaceLanguage();ensureLiveLocalization()}catch(e){}}if(window.mtaNativeZoom)void window.mtaNativeZoom.init(nativeBridge,{language:()=>uiLanguage,notify:toast});setTimeout(()=>checkNativeAppUpdate(false),1200)}try{pluginInfo=await api('/api/plugins')}catch(e){}if(nativeBridge?.consume_startup_project){try{const startup=await nativeBridge.consume_startup_project();if(startup?.project?.id){rememberRecentProject(startup.project.id);await openP(startup.project.id);return}if(startup&&!startup.ok&&startup.error)toast('Impossibile aprire il progetto: '+startup.error)}catch(e){toast('Impossibile aprire il progetto: '+e.message)}}await refresh();const requestedAiProject=new URLSearchParams(location.search).get('ai_project');if(requestedAiProject)await openP(requestedAiProject);else await restoreActiveWebProject()}
 
 // Global sidebar state, not stored in the project. Save every change immediately.
 const SIDEBAR_PREF_KEY='mta.sidebar.collapsed.v1';
@@ -463,54 +468,42 @@ function openLocalProject(){
 async function newProject(){
   if(activeStemJob)return toast('Attendi il completamento della separazione prima di creare un altro progetto.');
   pendingNewProjectPath=null;
-  const nativePathRow=currentUser?.native_single_user?`
-      <div class="workflow-field">
-        <span>Percorso di salvataggio</span>
-        <div class="native-path-row">
-          <input id="newProjectPath" value="" placeholder="Scegli dove salvare il progetto…" readonly>
-          <button class="utility-btn secondary" type="button" onclick="chooseNewProjectPath()">Scegli…</button>
-        </div>
-      </div>`:'';
   showUtilityModal('Nuovo progetto',`
     <div class="stem-workflow">
       <label class="workflow-field"><span>Nome progetto</span><input id="newProjectTitle" maxlength="200" value="Nuovo progetto" autofocus></label>
       <label class="workflow-field"><span>Tipo progetto</span><select id="newProjectTarget"><option value="DAW">Multitrack DAW</option><option value="MTA8">MTA8</option><option value="MTA16">MTA16</option></select></label>
       <label class="workflow-field"><span>Sample rate progetto</span><select id="newProjectSampleRate"><option value="44100" selected>44.1 kHz</option><option value="48000">48 kHz</option><option value="96000">96 kHz</option></select><small>Impostazione fissa dopo l'aggiunta della prima traccia.</small></label>
-      ${nativePathRow}
       <div class="utility-actions">
-        <button class="utility-btn primary" type="button" onclick="createProjectFromDialog()">Crea progetto</button>
+        <button id="createProjectButton" class="utility-btn primary" type="button" onclick="createProjectFromDialog()">Crea progetto</button>
         <button class="utility-btn secondary" type="button" onclick="closeUtilityModal()">Annulla</button>
       </div>
     </div>`);
 }
-async function chooseNewProjectPath(){
-  if(!currentUser?.native_single_user)return toast('La scelta del percorso è disponibile nell’app desktop nativa');
-  const apiBridge=await waitForNativeApi();
-  if(!apiBridge?.choose_project_save_path)return toast('Bridge nativo non ancora disponibile. Riprova tra un istante.');
-  const title=$('#newProjectTitle')?.value?.trim()||'Nuovo progetto';
-  try{
-    const chosen=await apiBridge.choose_project_save_path(title);
-    if(!chosen?.ok)return;
-    pendingNewProjectPath=chosen.path;
-    if($('#newProjectPath'))$('#newProjectPath').value=chosen.path;
-  }catch(e){toast('Scelta destinazione progetto fallita: '+e.message)}
-}
+let projectCreationPending=false;
 async function createProjectFromDialog(){
+  if(projectCreationPending)return;
   const title=$('#newProjectTitle')?.value?.trim()||'';
   const target=$('#newProjectTarget')?.value||'DAW';
   const sampleRate=Number($('#newProjectSampleRate')?.value||44100);
   if(!title)return toast('Inserisci un nome per il progetto');
-  if(currentUser?.native_single_user){
-    if(!pendingNewProjectPath){
-      await chooseNewProjectPath();
-      if(!pendingNewProjectPath)return;
-    }
-  }
+  projectCreationPending=true;
+  const button=$('#createProjectButton');if(button)button.disabled=true;
+  let bridge=null;
   try{
     if(!await prepareProjectLeave())return;
+    if(currentUser?.native_single_user){
+      bridge=await waitForNativeApi();
+      if(!bridge?.choose_project_save_path||!bridge?.bind_project_path)throw Error(tr('Native save dialog is unavailable. Please try again.','La finestra di salvataggio nativa non è disponibile. Riprova.'));
+      pendingNewProjectPath=null;
+      const chosen=await bridge.choose_project_save_path(title);
+      if(!chosen?.ok)return;
+      pendingNewProjectPath=chosen.path;
+      if(!pendingNewProjectPath)throw Error(tr('No save destination was selected','Nessuna destinazione di salvataggio selezionata'));
+    }
     const created=await api('/api/projects?title='+encodeURIComponent(title)+'&target='+encodeURIComponent(target)+'&sample_rate='+encodeURIComponent(sampleRate)+'&audio_storage_mode='+(appDisplayPreference('useFlacStorage')?'flac':'wav'),{method:'POST'});
-    if(currentUser?.native_single_user&&pendingNewProjectPath&&window.pywebview?.api?.bind_project_path){
-      await window.pywebview.api.bind_project_path(created.id,pendingNewProjectPath);
+    if(currentUser?.native_single_user){
+      const bound=await bridge.bind_project_path(created.id,pendingNewProjectPath);
+      if(!bound?.ok)throw Error(tr('Project could not be saved to the selected destination','Impossibile salvare il progetto nella destinazione selezionata'));
     }
     const createdId=created.id;
     closeUtilityModal();
@@ -523,7 +516,7 @@ async function createProjectFromDialog(){
     await refresh();schedulePlaybackPrewarm(40);focusProjectWorkspace();
     toast(currentUser?.native_single_user?`Progetto ${target} creato in ${pendingNewProjectPath}`:`Progetto ${target} creato e salvato nel workspace`);
     pendingNewProjectPath=null;
-  }catch(e){toast(e.message)}
+  }catch(e){toast(e.message)}finally{projectCreationPending=false;pendingNewProjectPath=null;if(button?.isConnected)button.disabled=false}
 }
 async function offerFlacMigrationOnOpen(){
   if(!current || current.audio_storage_mode==='flac' || !appDisplayPreference('useFlacStorage'))return;
@@ -1495,7 +1488,7 @@ function metronomeZoneLabelsHtml(t){if(t.type!=='click'||current.metronome_mode!
 function lane(t,W,i){
   const color=t.color||TRACK_COLORS[i%TRACK_COLORS.length];
   const anySolo=current.tracks.some(x=>x.solo),inaudible=t.mute||(anySolo&&!t.solo),height=trackHeightPx(t);
-  return `<div class="lane ${inaudible?'audibly-muted':''} ${selectedTrackIdSet.has(t.id)?'edit-selected':''}" id="lane-${t.id}" data-track="${t.id}" data-track-context-id="${t.id}" style="width:${W}px;--track-color:${color};height:${height}px" oncontextmenu="openTrackContextMenu(event,'${t.id}')"><canvas class="wave" id="wave-${t.id}" width="${W}" height="${height}" ondblclick="event.stopPropagation();openSampleEditor('${t.id}')" title="Doppio click: editor waveform/campioni"></canvas><div class="waveform-progress ${t.waveform_peaks?.length?'hidden':''}" id="wave-progress-${t.id}"><div class="waveform-progress-bar" id="wave-progress-bar-${t.id}" style="width:2%"></div><span id="wave-progress-label-${t.id}">Waveform…</span></div><div class="selection lane-selection" data-selection-track="${t.id}" style="display:none"></div>${(t.clips||[]).map((c,j)=>{const effective=effectiveClipStartMs(t,c),l=Math.max(0,effective)/1000*pxPerSec,w=Math.max(0,c.source_end_ms-c.source_start_ms+Math.min(0,effective))/1000*pxPerSec;if(w<=0)return '';return `<div class="clip-block ${selectedTimelineSegments.has(MtaTimelineRules.key(t,c))?'segment-selected':''}" data-track-id="${t.id}" data-clip-id="${c.id}" style="left:${l}px;width:${Math.max(2,w)}px" onpointerdown="beginTimelineClipDrag(event,'${t.id}','${c.id}')" ondblclick="event.stopPropagation();openSampleEditor('${t.id}')" title="${tr('Select: click / drag · Ctrl, Cmd or Shift: multiple selection · arrows: move','Select: click / trascina · Ctrl, Cmd o Shift: selezione multipla · frecce: sposta')}"><span class="clip-label">${esc(t.name)}_${String(j+1).padStart(2,'0')}</span></div>`}).join('')}${metronomeZoneLabelsHtml(t)}</div>`
+  return `<div class="lane ${inaudible?'audibly-muted':''} ${selectedTrackIdSet.has(t.id)?'edit-selected':''}" id="lane-${t.id}" data-track="${t.id}" data-track-context-id="${t.id}" style="width:${W}px;--track-color:${color};height:${height}px" oncontextmenu="openTrackContextMenu(event,'${t.id}')"><canvas class="wave" id="wave-${t.id}" width="${W}" height="${height}" ondblclick="event.stopPropagation();openSampleEditor('${t.id}',false,true)" title="Doppio click: editor waveform/campioni"></canvas><div class="waveform-progress ${t.waveform_peaks?.length?'hidden':''}" id="wave-progress-${t.id}"><div class="waveform-progress-bar" id="wave-progress-bar-${t.id}" style="width:2%"></div><span id="wave-progress-label-${t.id}">Waveform…</span></div><div class="selection lane-selection" data-selection-track="${t.id}" style="display:none"></div>${(t.clips||[]).map((c,j)=>{const effective=effectiveClipStartMs(t,c),l=Math.max(0,effective)/1000*pxPerSec,w=Math.max(0,c.source_end_ms-c.source_start_ms+Math.min(0,effective))/1000*pxPerSec;if(w<=0)return '';return `<div class="clip-block ${selectedTimelineSegments.has(MtaTimelineRules.key(t,c))?'segment-selected':''}" data-track-id="${t.id}" data-clip-id="${c.id}" style="left:${l}px;width:${Math.max(2,w)}px" onpointerdown="beginTimelineClipDrag(event,'${t.id}','${c.id}')" ondblclick="event.stopPropagation();openSampleEditor('${t.id}',false,true)" title="${tr('Select: click / drag · Ctrl, Cmd or Shift: multiple selection · arrows: move','Select: click / trascina · Ctrl, Cmd o Shift: selezione multipla · frecce: sposta')}"><span class="clip-label">${esc(t.name)}_${String(j+1).padStart(2,'0')}</span></div>`}).join('')}${metronomeZoneLabelsHtml(t)}</div>`
 }
 
 
@@ -2265,15 +2258,57 @@ function startPanDrag(event,id){
 }
 function resetTrackPan(id){setTrackPan(id,0)}
 
+function normalizeTrackGain(value){
+  const text=String(value??'').trim().replace(',','.');if(!text)return null;
+  const n=Number(text);return Number.isFinite(n)?Math.round(Math.max(-24,Math.min(24,n))*10)/10:null;
+}
+function trackGainDb(track){return normalizeTrackGain(track?.gain_db)??0}
+function trackGainBaked(track,renderFilters){return !!renderFilters&&(track?.inserts||[]).some(x=>x.enabled)}
+function updateTrackGainUi(id,value){
+  const n=normalizeTrackGain(value)??0,knob=$(`#gain-knob-${id}`),input=$(`#gain-input-${id}`);
+  if(knob){knob.style.setProperty('--pan-angle',`${n/24*135}deg`);knob.setAttribute('aria-valuenow',n.toFixed(1));knob.setAttribute('aria-valuetext',`${n.toFixed(1)} dB`)}
+  if(input)input.value=n.toFixed(1);
+}
+function setTrackGain(id,value){
+  const track=trackById(id),n=normalizeTrackGain(value);if(!track)return;
+  if(n===null){updateTrackGainUi(id,trackGainDb(track));return}
+  track.gain_db=n;updateTrackGainUi(id,n);markDirty(120);
+  invalidateTrackAudioCache(id);clearPlaybackWarmCache();updatePlaybackGains();
+  if(renderedMasterPlayback)queueRenderedMasterRefresh();
+  else if(trackPlaybacks.some(item=>item.trackId===id&&item.gainBaked))queueLiveFxRefresh(false,id);
+}
+function resetTrackGain(id){setTrackGain(id,0)}
+function trackGainKey(event,id){
+  const track=trackById(id);if(!track||event.ctrlKey||event.metaKey||event.altKey)return;
+  const step=event.shiftKey?1:0.1,delta={ArrowUp:step,ArrowRight:step,ArrowDown:-step,ArrowLeft:-step};
+  if(event.key in delta){event.preventDefault();event.stopPropagation();setTrackGain(id,trackGainDb(track)+delta[event.key])}
+  else if(['Home','End','0'].includes(event.key)){event.preventDefault();event.stopPropagation();setTrackGain(id,event.key==='End'?24:event.key==='Home'?-24:0)}
+}
+function startTrackGainDrag(event,id){
+  if(event.button!==0&&event.pointerType!=='touch')return;
+  const track=trackById(id);if(!track)return;
+  event.preventDefault();event.stopPropagation();event.currentTarget?.focus?.({preventScroll:true});
+  const x=event.clientX,y=event.clientY,start=trackGainDb(track),projectId=current.id,pointerId=event.pointerId;
+  const move=ev=>{if(ev.pointerId!==pointerId)return;if(current?.id!==projectId){up();return}setTrackGain(id,start+(ev.clientX-x+y-ev.clientY)/5)};
+  const up=()=>{window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',up);window.removeEventListener('pointercancel',up)};
+  window.addEventListener('pointermove',move);window.addEventListener('pointerup',up);window.addEventListener('pointercancel',up);
+}
+function stepMixerNumber(kind,id,step){const input=$(`#${kind}-input-${id}`);if(!input)return;const value=Number(input.value)+step;if(kind==='gain')setTrackGain(id,value);else setTrackPan(id,value);input.focus({preventScroll:true})}
+function trackGainControlHtml(t){
+  const gain=trackGainDb(t),help=tr('Input gain before inserts · drag; double click = 0 dB','Gain di ingresso prima degli insert · trascina; doppio click = 0 dB');
+  return `<div class="pan-control gain-control"><div id="gain-knob-${t.id}" class="pan-knob interactive gain-knob" style="--pan-angle:${gain/24*135}deg" role="slider" tabindex="0" aria-label="Gain ${esc(t.name)}" aria-valuemin="-24" aria-valuemax="24" aria-valuenow="${gain.toFixed(1)}" aria-valuetext="${gain.toFixed(1)} dB" title="${help}" onpointerdown="startTrackGainDrag(event,'${t.id}')" onkeydown="trackGainKey(event,'${t.id}')" ondblclick="resetTrackGain('${t.id}')"></div><div class="gain-readout"><span class="gain-label">Gain · dB</span><span class="mixer-number"><input id="gain-input-${t.id}" class="pan-value-input gain-value-input" type="number" min="-24" max="24" step="0.1" value="${gain.toFixed(1)}" onchange="setTrackGain('${t.id}',this.value)" onkeydown="if(event.key==='Enter')this.blur()" aria-label="Gain ${esc(t.name)} in dB" title="${help}"><span class="mixer-stepper"><button type="button" tabindex="-1" aria-label="Gain +" onclick="stepMixerNumber('gain','${t.id}',0.1)">▴</button><button type="button" tabindex="-1" aria-label="Gain −" onclick="stepMixerNumber('gain','${t.id}',-0.1)">▾</button></span></span></div></div>`;
+}
+
 function channelHtml(t,i){
   const anySolo=current.tracks.some(x=>x.solo),inaudible=t.mute||(anySolo&&!t.solo);
   const color=t.color||TRACK_COLORS[i%TRACK_COLORS.length],pan=clampPan(t.pan),angle=pan*55;
   const outChannels=effectiveTrackChannels(t),stereoByFx=Number(t.channels)===1&&outChannels===2;
   return `<div class="channel ${inaudible?'audibly-muted':''}" data-channel-track="${t.id}" style="--track-color:${color}">
     <div class="channel-name" data-track-name="${t.id}" title="Double click to rename track" ondblclick="beginMixerTrackNameEdit('${t.id}')">${esc(t.name)}</div>
+    ${trackGainControlHtml(t)}
     <div class="pan-control">
       <div id="pan-knob-${t.id}" class="pan-knob interactive" style="--pan-angle:${angle}deg" title="Pan ${pan.toFixed(2)} · trascina, doppio click = center" onpointerdown="startPanDrag(event,'${t.id}')" ondblclick="resetTrackPan('${t.id}')" role="slider" tabindex="0" aria-valuemin="-1" aria-valuemax="1" aria-valuenow="${pan.toFixed(2)}"></div>
-      <input id="pan-input-${t.id}" class="pan-value-input" type="number" min="-1" max="1" step="0.01" value="${pan.toFixed(2)}" onchange="setTrackPan('${t.id}',this.value)" onkeydown="if(event.key==='Enter')this.blur()" aria-label="Pan ${esc(t.name)}">
+      <span class="mixer-number"><input id="pan-input-${t.id}" class="pan-value-input" type="number" min="-1" max="1" step="0.01" value="${pan.toFixed(2)}" onchange="setTrackPan('${t.id}',this.value)" onkeydown="if(event.key==='Enter')this.blur()" aria-label="Pan ${esc(t.name)}"><span class="mixer-stepper"><button type="button" tabindex="-1" aria-label="Pan +" onclick="stepMixerNumber('pan','${t.id}',0.01)">▴</button><button type="button" tabindex="-1" aria-label="Pan −" onclick="stepMixerNumber('pan','${t.id}',-0.01)">▾</button></span></span>
       <span id="pan-label-${t.id}" class="pan-label">${panLabel(pan)}</span>
     </div>
     <div class="channel-buttons"><button data-mute-track="${t.id}" class="${t.mute?'on':''}" onclick="toggleBool(this,'${t.id}','mute')">M</button><button data-solo-track="${t.id}" class="${t.solo?'on':''}" onclick="toggleBool(this,'${t.id}','solo')">S</button><button class="channel-fx channel-insert-action ${t.inserts?.some(x=>x.enabled!==false)?'active':''} ${t.inserts?.length?'has-inserts':''} ${t.inserts?.length&&!t.inserts.some(x=>x.enabled!==false)?'all-bypassed':''}" onclick="openMixerInsertManager('${t.id}')" title="Manage channel inserts" aria-label="Manage inserts ${esc(t.name)}">Insert${t.inserts?.length?` ${t.inserts.length}`:''}</button></div>
@@ -2288,7 +2323,7 @@ function channelHtml(t,i){
 }
 function masterChannelHtml(){
   const v=current.master_volume_db||0,fx=current.master_inserts||[];
-  return `<div class="channel master" style="--track-color:#644ce5"><div class="channel-name">MASTER</div><div class="pan-knob"></div><div class="channel-buttons"><button class="channel-fx master-fx channel-insert-action ${fx.some(x=>x.enabled!==false)?'active':''} ${fx.length?'has-inserts':''} ${fx.length&&!fx.some(x=>x.enabled!==false)?'all-bypassed':''}" onclick="openMixerInsertManager('master')" title="Manage master inserts" aria-label="Manage master inserts">Insert${fx.length?` ${fx.length}`:''}</button></div><div class="channel-fader-area"><div class="fader-column"><input id="master-volume-range" class="v-fader" type="range" min="-60" max="12" step="0.5" value="${v}" oninput="setMasterVolume(this.value)" ondblclick="resetMasterVolumeToUnity(event)" title="Master volume · doppio click = 0 dB"></div><div class="db-scale" aria-hidden="true"><span>+12</span><span>+6</span><span>0</span><span>-6</span><span>-12</span><span>-24</span><span>-36</span><span>-48</span><span>-60</span></div><div class="meter-stack"><div id="peak-master" class="peak-led ${current.realtime_meter_enabled?'':'hidden'}" title="Master peak 0 dBFS">PEAK</div><div class="meter-pair master-meter-pair"><div class="meter meter-realtime ${current.realtime_meter_enabled?'':'hidden'}" title="Master Left"><span id="vu-master-L" style="height:0%"></span><em>L</em></div><div class="meter meter-realtime ${current.realtime_meter_enabled?'':'hidden'}" title="Master Right"><span id="vu-master-R" style="height:0%"></span><em>R</em></div></div></div></div><input class="channel-value volume-number" id="master-db" type="number" min="-60" max="12" step="0.1" value="${Number(v).toFixed(1)}" onchange="setMasterVolume(this.value)" onkeydown="if(event.key==='Enter')this.blur()" aria-label="Master volume in dB" title="Master volume in dB"></div>`;
+  return `<div class="channel master" style="--track-color:#644ce5"><div class="channel-name">MASTER</div><div class="gain-control-spacer" aria-hidden="true"></div><div class="pan-knob"></div><div class="channel-buttons"><button class="channel-fx master-fx channel-insert-action ${fx.some(x=>x.enabled!==false)?'active':''} ${fx.length?'has-inserts':''} ${fx.length&&!fx.some(x=>x.enabled!==false)?'all-bypassed':''}" onclick="openMixerInsertManager('master')" title="Manage master inserts" aria-label="Manage master inserts">Insert${fx.length?` ${fx.length}`:''}</button></div><div class="channel-fader-area"><div class="fader-column"><input id="master-volume-range" class="v-fader" type="range" min="-60" max="12" step="0.5" value="${v}" oninput="setMasterVolume(this.value)" ondblclick="resetMasterVolumeToUnity(event)" title="Master volume · doppio click = 0 dB"></div><div class="db-scale" aria-hidden="true"><span>+12</span><span>+6</span><span>0</span><span>-6</span><span>-12</span><span>-24</span><span>-36</span><span>-48</span><span>-60</span></div><div class="meter-stack"><div id="peak-master" class="peak-led ${current.realtime_meter_enabled?'':'hidden'}" title="Master peak 0 dBFS">PEAK</div><div class="meter-pair master-meter-pair"><div class="meter meter-realtime ${current.realtime_meter_enabled?'':'hidden'}" title="Master Left"><span id="vu-master-L" style="height:0%"></span><em>L</em></div><div class="meter meter-realtime ${current.realtime_meter_enabled?'':'hidden'}" title="Master Right"><span id="vu-master-R" style="height:0%"></span><em>R</em></div></div></div></div><input class="channel-value volume-number" id="master-db" type="number" min="-60" max="12" step="0.1" value="${Number(v).toFixed(1)}" onchange="setMasterVolume(this.value)" onkeydown="if(event.key==='Enter')this.blur()" aria-label="Master volume in dB" title="Master volume in dB"></div>`;
 }
 async function setAutoMix(enabled){if(!current)return;try{collect();await api('/api/projects/'+current.id,{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify(current)});const style=$('#autoMixStyle')?.value||current.auto_mix_style||'balanced';current=await api(`/api/projects/${current.id}/auto-mix`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({enabled,style})});render();toast(enabled?'Auto Mix applied. Toggle off to restore your previous mix.':'Auto Mix removed; previous mix restored.')}catch(e){toast(e.message);render()}}
 async function changeAutoMixStyle(style){current.auto_mix_style=style;if(current.auto_mix_enabled)await setAutoMix(true)}
@@ -2535,7 +2570,7 @@ function trackAudibleNow(track){
 function playbackGainForTrack(track,item=null){
   if(!track)return 0;
   if(item?.respectMuteSolo!==false&&!trackAudibleNow(track))return 0;
-  return dbToGain(Number(track.volume_db||0)+Number(current?.master_volume_db||0));
+  return dbToGain(Number(track.volume_db||0)+(item?.gainBaked?0:trackGainDb(track))+Number(current?.master_volume_db||0));
 }
 function updatePlaybackGains(){
   const now=audioCtx?.currentTime||0;
@@ -2800,6 +2835,7 @@ function transportTimeKeydown(event){if(event.key==='Enter'){event.preventDefaul
 function bindTimeline(){
   const el=$('#lanes'),pane=$('#timelinePane'),ruler=$('#ruler');
   if(!el||!pane)return;
+  el.addEventListener('pointerdown',rememberSampleRange,true);
   let downX=0,downMs=0,moved=false;
   el.onpointerdown=e=>{
     if(timelineTool!=='select'||e.button!==0||e.target.closest?.('.clip-block'))return;
@@ -3611,7 +3647,7 @@ function updateVuMeters(token=meterRunToken){
     if(token===meterRunToken)updateVuMeters(token);
   });
 }
-async function attachPlaybackGraph(audio,track,channels=2,silent=false,masterRendered=false,respectMuteSolo=true){
+async function attachPlaybackGraph(audio,track,channels=2,silent=false,masterRendered=false,respectMuteSolo=true,gainBaked=false){
   audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();
   await audioCtx.resume();
   const source=audioCtx.createMediaElementSource(audio);
@@ -3619,7 +3655,7 @@ async function attachPlaybackGraph(audio,track,channels=2,silent=false,masterRen
   const panner=audioCtx.createStereoPanner();
   const db=masterRendered
     ? Number(current?.master_volume_db||0)
-    : Number(track?.volume_db||0)+Number(current?.master_volume_db||0);
+    : Number(track?.volume_db||0)+(gainBaked?0:trackGainDb(track))+Number(current?.master_volume_db||0);
   const audible=masterRendered||!respectMuteSolo||trackAudibleNow(track);
   // Meter-only playback keeps the real level up to the analysers and is
   // silenced only at the destination sink below.
@@ -3654,7 +3690,7 @@ function canDirectPlayTrack(track,renderFilters=true){
 function playbackSourceForTrack(track,renderFilters=false){
   const direct=canDirectPlayTrack(track,renderFilters);
   // Keep local VST3 paths/parameters out of URLs and avoid oversized query strings.
-  const fxSignature=JSON.stringify([track.delay_ms,track.clips,track.clips_initialized,renderFilters?(track.inserts||[]).map(x=>[x.id,x.plugin,x.enabled,x.params]):[]]);
+  const fxSignature=JSON.stringify([trackGainBaked(track,renderFilters)?trackGainDb(track):0,track.delay_ms,track.clips,track.clips_initialized,renderFilters?(track.inserts||[]).map(x=>[x.id,x.plugin,x.enabled,x.params]):[]]);
   let fxHash=2166136261;for(let i=0;i<fxSignature.length;i++){fxHash=Math.imul(fxHash^fxSignature.charCodeAt(i),16777619)}
   const fxKey=(fxHash>>>0).toString(36);
   return {direct,url:direct?`/api/projects/${current.id}/audio/${encodeURIComponent(track.filename)}`:`/api/projects/${current.id}/preview-track/${track.id}?render=${renderFilters?'true':'false'}&fx=${fxKey}`};
@@ -3701,13 +3737,14 @@ function reanchorTransportClock(cursorMs=playCursorMs){transportClockCursorMs=cu
 async function makeTrackPlayback(track,renderFilters,silent=false,respectMuteSolo=true,startupMuted=false){
   const warm=takeWarmPlaybackAudio(track,renderFilters),audio=warm.audio,direct=warm.direct;
   const channels=direct?(Number(track.channels)===1?1:2):(renderFilters?effectiveTrackChannels(track):(Number(track.channels)===1?1:2));
-  const graph=await attachPlaybackGraph(audio,track,channels,silent,false,respectMuteSolo);
-  const targetGain=playbackGainForTrack(track,{respectMuteSolo});
+  const gainBaked=trackGainBaked(track,renderFilters);
+  const graph=await attachPlaybackGraph(audio,track,channels,silent,false,respectMuteSolo,gainBaked);
+  const targetGain=playbackGainForTrack(track,{respectMuteSolo,gainBaked});
   if(startupMuted)graph.gainNode.gain.setValueAtTime(0,audioCtx?.currentTime||0);
   await new Promise((resolve,reject)=>{const ready=()=>resolve();audio.addEventListener('loadedmetadata',ready,{once:true});audio.addEventListener('error',()=>reject(new Error(`Preview non disponibile: ${track.name}`)),{once:true});audio.load();if(audio.readyState>=1)resolve()});
   audio.currentTime=Math.min(playCursorMs/1000/tempoRatio(),Math.max(0,(audio.duration||0)-0.01));
   audio.addEventListener('ended',()=>requestAnimationFrame(()=>{if(!playbackActuallyRunning())resetVuMeters()}));
-  return {trackId:track.id,audio,analysers:graph.analysers,channels,silent,respectMuteSolo,meterData:{},gainNode:graph.gainNode,panner:graph.panner,direct,targetGain,startupMuted};
+  return {trackId:track.id,audio,gainBaked,analysers:graph.analysers,channels,silent,respectMuteSolo,meterData:{},gainNode:graph.gainNode,panner:graph.panner,direct,targetGain,startupMuted};
 }
 function waitForMediaBuffer(audio,label='traccia',timeoutMs=2600){
   // Low-latency transport only waits for a decodable frame near the cursor.
@@ -4546,6 +4583,7 @@ window.addEventListener('pointerdown',e=>{
 });
 window.addEventListener('keydown',e=>{
   if(handleGeneratedTrackShortcut(e))return;
+  if(e.target?.closest?.('.gain-knob')&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Home','End','0'].includes(e.key))return;
   const target=e.target;
   const editable=target instanceof HTMLInputElement||target instanceof HTMLTextAreaElement||target instanceof HTMLSelectElement||target?.isContentEditable;
   if((e.ctrlKey||e.metaKey)&&!e.altKey){
@@ -4612,7 +4650,13 @@ init();
 
 
 
-function seSel(){if(!sampleEditor)return[0,0];let a=Math.round(Math.min(sampleEditor.a,sampleEditor.b)),b=Math.round(Math.max(sampleEditor.a,sampleEditor.b));if(b<=a){a=sampleEditor.viewStart;b=sampleEditor.viewEnd}return[a,b]}
+function seSel(){if(!sampleEditor)return[0,0];const s=sampleEditor;let a=seClamp(Math.min(s.a,s.b)),b=seClamp(Math.max(s.a,s.b));if(b<=a){a=s.viewStart;b=s.viewEnd}return[a,b]}
+function rememberSampleRange(event){if(event.button!==0||Math.abs(sel.b-sel.a)<=2)return;const lane=event.target.closest?.('.lane[data-track]'),id=lane?.dataset.track,pane=$('#timelinePane');if(!id||!pane||!selectedTrackIds().includes(id))return;const rect=pane.getBoundingClientRect(),time=(event.clientX-rect.left+pane.scrollLeft)/pxPerSec*1000;if(time>=Math.min(sel.a,sel.b)&&time<=Math.max(sel.a,sel.b))sampleEditorRangeHint={trackId:id,range:{...sel},at:performance.now()};else sampleEditorRangeHint=null}
+function seScope(info,range){const rate=info.sample_rate,total=info.total_samples,offset=Number(info.timeline_offset_ms)||0;if(!range)return{start:0,end:total,restricted:false};const start=Math.max(0,Math.min(total,Math.round((Math.min(range.a,range.b)-offset)/1000*rate))),end=Math.max(0,Math.min(total,Math.round((Math.max(range.a,range.b)-offset)/1000*rate)));if(end<=start)throw Error(tr('The selected range contains no track audio','Il range selezionato non contiene audio della traccia'));return{start,end,restricted:true}}
+function seInitialWindow(info,scope,width,zoom,leftMs){const span=Math.max(1,Math.min(scope.end-scope.start,Math.round(Math.max(1,width-64)/Math.max(1,zoom)*info.sample_rate))),wanted=scope.restricted?scope.start:Math.round((leftMs-(Number(info.timeline_offset_ms)||0))/1000*info.sample_rate),start=Math.max(scope.start,Math.min(scope.end-span,wanted));return{start,end:start+span}}
+function seZoomValue(s){const max=s.scope.end-s.scope.start,min=Math.min(max,Math.max(1,Math.round(s.info.sample_rate*.004))),span=s.viewEnd-s.viewStart;return max<=min?100:Math.max(0,Math.min(100,100*(1-Math.log(span/min)/Math.log(max/min))))}
+function seClamp(value,s=sampleEditor){return Math.max(s.scope.start,Math.min(s.scope.end,Math.round(Number(value)||0)))}
+function seExtrema(s,a,b){a=Math.max(s.scope.start,Math.floor(a));b=Math.min(s.scope.end,Math.ceil(b));let lo=Infinity,hi=-Infinity;const e=s.env,spp=b-a;for(let channel=0;channel<s.buffer.numberOfChannels;channel++){const data=s.buffer.getChannelData(channel),scan=(start,end)=>{for(let i=start;i<end&&i<data.length;i++){lo=Math.min(lo,data[i]);hi=Math.max(hi,data[i])}};if(spp>=e.block*.75){const first=Math.ceil(a/e.block),last=Math.floor(b/e.block);if(first>=last)scan(a,b);else{scan(a,first*e.block);for(let i=first;i<last&&i<e.channels[channel].mn.length;i++){lo=Math.min(lo,e.channels[channel].mn[i]);hi=Math.max(hi,e.channels[channel].mx[i])}scan(last*e.block,b)}}else scan(a,b)}return Number.isFinite(lo)?{lo,hi}:{lo:0,hi:0}}
 function seDefaults(effect,preset){if(effect==='pitch')return{semitones:0,cents:0};if(effect==='autotune')return{key:(current?.key||'C').split(/\s+/)[0]||'C',scale:/min/i.test(current?.key||'')?'minor':'major',strength:preset==='hard'?1:preset==='gentle'?.45:.75};if(effect==='normalizer'){const x={streaming:[-14,-1],broadcast:[-23,-2],music:[-12,-1],gentle:[-16,-1.5]}[preset]||[-14,-1];return{target_lufs:x[0],true_peak_db:x[1]}}if(effect==='maximizer'){const x={gentle:[1.5,-1],balanced:[3,-1],loud:[6,-.8],live:[2,-1.5]}[preset]||[3,-1];return{drive_db:x[0],ceiling_db:x[1]}}if(effect==='eq32')return{gains:Array(32).fill(0)};return{}}
 function seEffectHtml(){const e=sampleEditor.effect,p=sampleEditor.preset,q=sampleEditor.params||seDefaults(e,p),presets=sampleEditor.info.presets[e]||[];let f='';if(e==='pitch')f=`<div class="sample-param-grid"><label>Semitoni<input id="seSemi" type="number" min="-12" max="12" step="0.01" value="${q.semitones||0}" oninput="seParam()"></label><label>Centesimi<input id="seCents" type="number" min="-100" max="100" step="1" value="${q.cents||0}" oninput="seParam()"></label></div>`;if(e==='autotune')f=`<div class="sample-param-grid"><label>Tonalità<select id="seKey" onchange="seParam()">${['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'].map(x=>`<option ${x===q.key?'selected':''}>${x}</option>`).join('')}</select></label><label>Scala<select id="seScale" onchange="seParam()"><option value="major" ${q.scale==='major'?'selected':''}>Major</option><option value="minor" ${q.scale==='minor'?'selected':''}>Minor</option></select></label><label>Strength<input id="seStrength" type="range" min="0" max="1" step="0.05" value="${q.strength??.75}" oninput="seParam()"></label></div>`;if(e==='normalizer')f=`<div class="sample-param-grid"><label>Target LUFS<input id="seLufs" type="number" min="-30" max="-5" step="0.5" value="${q.target_lufs??-14}" oninput="seParam()"></label><label>True Peak dB<input id="sePeak" type="number" min="-6" max="-.1" step=".1" value="${q.true_peak_db??-1}" oninput="seParam()"></label></div>`;if(e==='maximizer')f=`<div class="sample-param-grid"><label>Drive dB<input id="seDrive" type="number" min="0" max="12" step=".1" value="${q.drive_db??3}" oninput="seParam()"></label><label>Ceiling dB<input id="seCeil" type="number" min="-6" max="-.1" step=".1" value="${q.ceiling_db??-1}" oninput="seParam()"></label></div>`;if(e==='eq32'){const bands=sampleEditor.info.eq_bands,g=q.gains||Array(32).fill(0);f=`<div class="sample-eq32">${bands.map((x,i)=>`<label><span>${x>=1000?(x/1000)+'k':x}</span><input class="seEq" type="range" min="-18" max="18" step=".5" value="${g[i]||0}" oninput="seParam()"><em>${Number(g[i]||0).toFixed(1)}</em></label>`).join('')}</div>`}return `<div class="sample-effect-head"><label>Processore<select id="seEffect" onchange="seEffectChange(this.value)"><option value="pitch" ${e==='pitch'?'selected':''}>Pitch correction</option><option value="autotune" ${e==='autotune'?'selected':''}>Auto-Tune</option><option value="normalizer" ${e==='normalizer'?'selected':''}>Normalizer</option><option value="maximizer" ${e==='maximizer'?'selected':''}>Maximizer</option><option value="eq32" ${e==='eq32'?'selected':''}>EQ grafico 32 bande</option></select></label><label>Preset<select id="sePreset" onchange="sePresetChange(this.value)">${presets.map(x=>`<option ${x===p?'selected':''}>${x}</option>`).join('')}</select></label></div>${f}<div class="sample-effect-actions"><button onclick="sePlayOriginal()">A · Originale</button><button onclick="sePreview(false)">B · Preview</button><button class="accent" onclick="seApply()">Applica in-place</button><span id="seStatus" class="hint"></span></div>`}
 function seEffectChange(v){sampleEditor.effect=v;sampleEditor.preset=(sampleEditor.info.presets[v]||[])[0]||'default';sampleEditor.params=seDefaults(v,sampleEditor.preset);$('#sampleFx').innerHTML=seEffectHtml();seSchedule()}
@@ -4620,17 +4664,17 @@ function sePresetChange(v){sampleEditor.preset=v;sampleEditor.params=seDefaults(
 function seParam(){const e=sampleEditor.effect,p={};if(e==='pitch'){p.semitones=Number($('#seSemi')?.value||0);p.cents=Number($('#seCents')?.value||0)}if(e==='autotune'){p.key=$('#seKey')?.value||'C';p.scale=$('#seScale')?.value||'major';p.strength=Number($('#seStrength')?.value||.75)}if(e==='normalizer'){p.target_lufs=Number($('#seLufs')?.value||-14);p.true_peak_db=Number($('#sePeak')?.value||-1)}if(e==='maximizer'){p.drive_db=Number($('#seDrive')?.value||3);p.ceiling_db=Number($('#seCeil')?.value||-1)}if(e==='eq32')p.gains=$$('.seEq').map(x=>{const v=Number(x.value);x.parentElement.querySelector('em').textContent=v.toFixed(1);return v});sampleEditor.params=p;seSchedule()}
 function seReq(){const[a,b]=seSel();return{effect:sampleEditor.effect,start_sample:a,end_sample:b,preset:sampleEditor.preset,params:sampleEditor.params||{}}}
 function seSchedule(){clearTimeout(sampleEditorPreviewTimer);sampleEditorPreviewTimer=setTimeout(()=>sePreview(true),350)}
-async function sePreview(auto=false){if(sampleEditorPreviewAbort)sampleEditorPreviewAbort.abort();sampleEditorPreviewAbort=new AbortController();const st=$('#seStatus');if(st)st.textContent='Rendering…';try{const r=await fetch(`/api/projects/${current.id}/tracks/${sampleEditor.trackId}/sample-editor/effect-preview`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(seReq()),signal:sampleEditorPreviewAbort.signal});if(!r.ok)throw new Error(await r.text());const b=await r.blob();if(sampleEditor.preview)URL.revokeObjectURL(sampleEditor.preview);sampleEditor.preview=URL.createObjectURL(b);const a=$('#sampleAudio');if(a){a.src=sampleEditor.preview;if(!auto)await a.play().catch(()=>{})}if(st)st.textContent='Preview aggiornata'}catch(e){if(e.name!=='AbortError'&&st)st.textContent=e.message}}
-function sePlayOriginal(){const a=$('#sampleAudio');if(a){a.src=sampleEditor.audioUrl;a.currentTime=seSel()[0]/sampleEditor.info.sample_rate;a.play().catch(()=>{})}}
+async function sePreview(auto=false){const source=sampleEditor;if(sampleEditorPreviewAbort)sampleEditorPreviewAbort.abort();sampleEditorPreviewAbort=new AbortController();const st=$('#seStatus');if(st)st.textContent='Rendering…';try{const r=await fetch(`/api/projects/${current.id}/tracks/${sampleEditor.trackId}/sample-editor/effect-preview`,{method:'POST',headers:{'content-type':'application/json','X-MTA-Request':'1'},body:JSON.stringify(seReq()),signal:sampleEditorPreviewAbort.signal});if(!r.ok)throw new Error(await r.text());const b=await r.blob();if(sampleEditor!==source)return;if(sampleEditor.preview)URL.revokeObjectURL(sampleEditor.preview);sampleEditor.preview=URL.createObjectURL(b);const a=$('#sampleAudio');if(a){a.src=sampleEditor.preview;if(!auto)await a.play().catch(()=>{})}if(st)st.textContent='Preview aggiornata'}catch(e){if(e.name!=='AbortError'&&st)st.textContent=e.message}}
+function sePlayOriginal(){const a=$('#sampleAudio');if(a){const[start,end]=seSel();a.src=sampleEditor.info.audio_url+'?start_sample='+start+'&end_sample='+end+'&v='+Date.now();a.currentTime=0;a.play().catch(()=>{})}}
 async function seApply(){if(!confirm('Applicare il processing in-place alla selezione?'))return;const r=await api(`/api/projects/${current.id}/tracks/${sampleEditor.trackId}/sample-editor/effect-apply`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(seReq())});current=r.project;toast('Processing applicato');await openSampleEditor(sampleEditor.trackId,true)}
-async function seEdit(action){const[a,b]=seSel();if(['cut','delete'].includes(action)&&!confirm(action==='cut'?'Tagliare la selezione?':'Rimuovere la selezione?'))return;const r=await api(`/api/projects/${current.id}/tracks/${sampleEditor.trackId}/sample-editor/edit`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action,start_sample:a,end_sample:b,cursor_sample:sampleEditor.cursor||a})});if(action==='copy')return toast('Campioni copiati');current=r.project;toast('Traccia aggiornata');await openSampleEditor(sampleEditor.trackId,true)}
+async function seEdit(action){const[a,b]=seSel();if(['cut','delete'].includes(action)&&!confirm(action==='cut'?'Tagliare la selezione?':'Rimuovere la selezione?'))return;const r=await api(`/api/projects/${current.id}/tracks/${sampleEditor.trackId}/sample-editor/edit`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action,start_sample:a,end_sample:b,cursor_sample:seClamp(sampleEditor.cursor??a)})});if(action==='copy')return toast('Campioni copiati');current=r.project;toast('Traccia aggiornata');await openSampleEditor(sampleEditor.trackId,true)}
 function seEnvelope(buf,block=256){const out=[];for(let ch=0;ch<buf.numberOfChannels;ch++){const d=buf.getChannelData(ch),n=Math.ceil(d.length/block),mn=new Float32Array(n),mx=new Float32Array(n);for(let i=0;i<n;i++){let lo=1,hi=-1;for(let j=i*block;j<Math.min(d.length,(i+1)*block);j++){const v=d[j];if(v<lo)lo=v;if(v>hi)hi=v}mn[i]=lo;mx[i]=hi}out.push({mn,mx})}return{block,channels:out}}
-function seDraw(){const s=sampleEditor,c=$('#sampleCanvas');if(!s||!c)return;const w=Math.max(300,c.clientWidth),h=Math.max(180,c.clientHeight),dpr=devicePixelRatio||1;c.width=Math.round(w*dpr);c.height=Math.round(h*dpr);const x=c.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);x.fillStyle='#07131d';x.fillRect(0,0,w,h);const span=s.viewEnd-s.viewStart,spp=span/w,e=s.env;x.strokeStyle='#47b8ff';x.beginPath();for(let px=0;px<w;px++){const a=Math.floor(s.viewStart+px*spp),b=Math.ceil(s.viewStart+(px+1)*spp);let lo=1,hi=-1;if(spp>=e.block*.75){for(const ch of e.channels)for(let i=Math.floor(a/e.block);i<Math.ceil(b/e.block)&&i<ch.mn.length;i++){lo=Math.min(lo,ch.mn[i]);hi=Math.max(hi,ch.mx[i])}}else{for(let ch=0;ch<s.buffer.numberOfChannels;ch++){const d=s.buffer.getChannelData(ch);for(let i=a;i<b&&i<d.length;i++){lo=Math.min(lo,d[i]);hi=Math.max(hi,d[i])}}}if(hi<lo)lo=hi=0;x.moveTo(px+.5,h/2-hi*h*.46);x.lineTo(px+.5,h/2-lo*h*.46)}x.stroke();const[a,b]=seSel(),sx=(a-s.viewStart)/span*w,ex=(b-s.viewStart)/span*w;x.fillStyle='rgba(68,170,255,.2)';x.fillRect(Math.max(0,sx),0,Math.max(1,Math.min(w,ex)-Math.max(0,sx)),h);$('#seStart').value=a;$('#seEnd').value=b;$('#seRead').textContent=`${(a/s.info.sample_rate).toFixed(6)}s → ${(b/s.info.sample_rate).toFixed(6)}s · ${(b-a).toLocaleString()} campioni`;$('#sePos').value=Math.round(s.viewStart)}
-function seBind(){const c=$('#sampleCanvas'),at=e=>{const r=c.getBoundingClientRect();return Math.round(sampleEditor.viewStart+(e.clientX-r.left)/r.width*(sampleEditor.viewEnd-sampleEditor.viewStart))};let down=false;c.onpointerdown=e=>{down=true;c.setPointerCapture(e.pointerId);sampleEditor.a=sampleEditor.b=sampleEditor.cursor=at(e);seDraw()};c.onpointermove=e=>{if(down){sampleEditor.b=sampleEditor.cursor=at(e);seDraw()}};c.onpointerup=e=>{down=false;sampleEditor.b=sampleEditor.cursor=at(e);seDraw();seSchedule()};c.onwheel=e=>{e.preventDefault();const z=$('#seZoom');z.value=Math.max(0,Math.min(100,Number(z.value)+(e.deltaY<0?5:-5)));seZoom(z.value)}}
-function seZoom(v){const s=sampleEditor,min=Math.max(128,Math.round(s.info.sample_rate*.004)),max=s.info.total_samples,span=Math.round(min*Math.pow(max/min,1-Number(v)/100)),center=(s.viewStart+s.viewEnd)/2;s.viewStart=Math.max(0,Math.min(max-span,Math.round(center-span/2)));s.viewEnd=s.viewStart+span;$('#sePos').max=Math.max(0,max-span);seDraw()}
-function sePosition(v){const s=sampleEditor,span=s.viewEnd-s.viewStart;s.viewStart=Math.max(0,Math.min(s.info.total_samples-span,Number(v)||0));s.viewEnd=s.viewStart+span;seDraw()}
-function seInputs(){sampleEditor.a=Math.max(0,Math.min(sampleEditor.info.total_samples,Number($('#seStart').value)||0));sampleEditor.b=Math.max(0,Math.min(sampleEditor.info.total_samples,Number($('#seEnd').value)||0));sampleEditor.cursor=sampleEditor.a;seDraw();seSchedule()}
-async function openSampleEditor(trackId,reopen=false){try{if(!reopen)showUtilityModal('Editor waveform / campioni','<p class="hint">Preparazione audio…</p>');const info=await api(`/api/projects/${current.id}/tracks/${trackId}/sample-editor`),audioUrl=info.audio_url+'?v='+Date.now(),r=await fetch(audioUrl),ab=await r.arrayBuffer(),ctx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();audioCtx=ctx;const buf=await ctx.decodeAudioData(ab.slice(0)),seconds=Math.max(.25,Math.min(buf.duration,Math.max(2,1100/Math.max(25,pxPerSec)))),span=Math.min(info.total_samples,Math.round(seconds*info.sample_rate));sampleEditor={trackId,info,buffer:buf,env:seEnvelope(buf),audioUrl,preview:null,viewStart:0,viewEnd:span,a:0,b:Math.min(span,info.sample_rate),cursor:0,effect:'pitch',preset:'subtle',params:seDefaults('pitch','subtle')};showUtilityModal(`Editor waveform / campioni · ${esc(info.name)}`,`<div class="sample-editor"><div class="sample-toolbar"><button onclick="seEdit('cut')">✂ Taglia</button><button onclick="seEdit('copy')">⧉ Copia</button><button onclick="seEdit('paste')">▣ Incolla</button><button class="danger" onclick="seEdit('delete')">⌫ Rimuovi</button><span class="sample-rate">${info.sample_rate.toLocaleString()} Hz · ${info.total_samples.toLocaleString()} campioni</span></div><canvas id="sampleCanvas" class="sample-editor-wave"></canvas><div class="sample-nav"><label>Zoom<input id="seZoom" type="range" min="0" max="100" value="42" oninput="seZoom(this.value)"></label><label>Posizione<input id="sePos" type="range" min="0" max="${Math.max(0,info.total_samples-span)}" value="0" oninput="sePosition(this.value)"></label></div><div class="sample-selection"><label>Campione iniziale<input id="seStart" type="number" onchange="seInputs()"></label><label>Campione finale<input id="seEnd" type="number" onchange="seInputs()"></label><strong id="seRead"></strong></div><audio id="sampleAudio" controls src="${audioUrl}"></audio><section id="sampleFx" class="sample-effect-panel">${seEffectHtml()}</section><p class="hint">La vista iniziale segue lo zoom della timeline; usa rotella/Zoom per arrivare al dettaglio dei campioni. Il processing è pre-insert e il commit crea una nuova sorgente solo per questa traccia.</p></div>`);seBind();seDraw()}catch(e){toast('Editor waveform: '+e.message)}}
+function seDraw(){const s=sampleEditor,c=$('#sampleCanvas');if(!s||!c)return;const w=Math.max(100,c.clientWidth),h=Math.max(180,c.clientHeight),dpr=devicePixelRatio||1;c.width=Math.round(w*dpr);c.height=Math.round(h*dpr);const x=c.getContext('2d'),left=56,right=w-8,plot=right-left,mid=(h-20)/2,scale=(h-44)/2/1.12,span=s.viewEnd-s.viewStart,spp=span/plot;x.setTransform(dpr,0,0,dpr,0,0);x.fillStyle='#07131d';x.fillRect(0,0,w,h);x.font='10px ui-monospace,monospace';x.textAlign='right';for(const db of [0,-6,-12,-24]){const amplitude=Math.pow(10,db/20);for(const sign of [-1,1]){const y=mid-sign*amplitude*scale;x.strokeStyle=db===0?'#ffb04a':'#2b465b';x.lineWidth=db===0?1.5:1;x.beginPath();x.moveTo(left,y);x.lineTo(right,y);x.stroke();x.fillStyle=db===0?'#ffb04a':'#8aa8bd';x.fillText(db===0?'0 dBFS':db+' dB',left-5,y+3)}}x.fillStyle='#8aa8bd';x.fillText('−∞',left-5,mid+3);x.strokeStyle='#34536a';x.beginPath();x.moveTo(left,mid);x.lineTo(right,mid);x.stroke();let peak=0;for(let px=0;px<plot;px++){const{lo,hi}=seExtrema(s,s.viewStart+px*spp,s.viewStart+(px+1)*spp);peak=Math.max(peak,Math.abs(lo),Math.abs(hi));x.strokeStyle=Math.max(Math.abs(lo),Math.abs(hi))>=1-1/8388608?'#ff6969':'#47b8ff';x.beginPath();x.moveTo(left+px+.5,Math.max(4,mid-hi*scale));x.lineTo(left+px+.5,Math.min(h-24,mid-lo*scale));x.stroke()}const[a,b]=seSel(),sx=left+(a-s.viewStart)/span*plot,ex=left+(b-s.viewStart)/span*plot;x.fillStyle='rgba(68,170,255,.16)';x.fillRect(Math.max(left,sx),4,Math.max(0,Math.min(right,ex)-Math.max(left,sx)),h-28);x.fillStyle='#a9c0d2';for(let i=0;i<=4;i++){const time=(s.viewStart+span*i/4)/s.info.sample_rate+(Number(s.info.timeline_offset_ms)||0)/1000;x.textAlign=i===0?'left':i===4?'right':'center';x.fillText(time.toFixed(3)+' s',left+plot*i/4,h-5)}$('#seStart').value=a;$('#seEnd').value=b;$('#seRead').textContent=`${(a/s.info.sample_rate).toFixed(6)}s → ${(b/s.info.sample_rate).toFixed(6)}s · ${(b-a).toLocaleString(window.MtaLocale?.language)} campioni`;$('#sePos').value=s.viewStart;$('#sePos').min=s.scope.start;$('#sePos').max=Math.max(s.scope.start,s.scope.end-span);$('#seZoom').value=seZoomValue(s);if($('#sePeakRead'))$('#sePeakRead').textContent=tr('Visible peak','Picco visibile')+': '+(peak? (20*Math.log10(peak)).toFixed(2):'−∞')+' dBFS'+(peak>=1-1/8388608?' · '+tr('Full scale reached: possible clipping','Fondo scala raggiunto: possibile clipping'):'')}
+function seBind(){const c=$('#sampleCanvas'),at=e=>{const r=c.getBoundingClientRect(),width=c.clientWidth,plot=Math.max(1,width-64),pixel=(e.clientX-r.left)/r.width*width;return seClamp(sampleEditor.viewStart+Math.max(0,Math.min(plot,pixel-56))/plot*(sampleEditor.viewEnd-sampleEditor.viewStart))};let down=false;c.onpointerdown=e=>{if(e.button!==0)return;down=true;c.setPointerCapture(e.pointerId);sampleEditor.a=sampleEditor.b=sampleEditor.cursor=at(e);seDraw()};c.onpointermove=e=>{if(down){sampleEditor.b=sampleEditor.cursor=at(e);seDraw()}};c.onpointerup=e=>{if(!down)return;down=false;sampleEditor.b=sampleEditor.cursor=at(e);seDraw();seSchedule()};c.onpointercancel=()=>{down=false};c.onwheel=e=>{e.preventDefault();const value=seZoomValue(sampleEditor)+(e.deltaY<0?5:-5);seZoom(Math.max(0,Math.min(100,value)))}}
+function seZoom(v){const s=sampleEditor,max=s.scope.end-s.scope.start,min=Math.min(max,Math.max(1,Math.round(s.info.sample_rate*.004))),span=Math.max(1,Math.min(max,Math.round(min*Math.pow(max/min,1-Number(v)/100)))),center=(s.viewStart+s.viewEnd)/2;s.viewStart=Math.max(s.scope.start,Math.min(s.scope.end-span,Math.round(center-span/2)));s.viewEnd=s.viewStart+span;seDraw()}
+function sePosition(v){const s=sampleEditor,span=s.viewEnd-s.viewStart;s.viewStart=Math.max(s.scope.start,Math.min(s.scope.end-span,Math.round(Number(v)||0)));s.viewEnd=s.viewStart+span;seDraw()}
+function seInputs(){sampleEditor.a=seClamp($('#seStart').value);sampleEditor.b=seClamp($('#seEnd').value);sampleEditor.cursor=sampleEditor.a;seDraw();seSchedule()}
+async function openSampleEditor(trackId,reopen=false,fromDoubleClick=false){try{sampleEditorPreviewAbort?.abort();sampleEditor?.resizeObserver?.disconnect();if(sampleEditor?.preview)URL.revokeObjectURL(sampleEditor.preview);const previous=reopen&&sampleEditor?.trackId===trackId?sampleEditor:null,range=!reopen&&selectedTrackIds().includes(trackId)&&Math.abs(sel.b-sel.a)>2?{...sel}:fromDoubleClick&&sampleEditorRangeHint?.trackId===trackId&&performance.now()-sampleEditorRangeHint.at<700?sampleEditorRangeHint.range:null,pane=$('#timelinePane'),leftMs=(pane?.scrollLeft||0)/pxPerSec*1000;sampleEditorRangeHint=null;if(!reopen)showUtilityModal('Editor waveform / campioni','<p class="hint">Preparazione audio…</p>');const info=await api(`/api/projects/${current.id}/tracks/${trackId}/sample-editor`),audioUrl=info.audio_url+'?v='+Date.now(),r=await fetch(audioUrl);if(!r.ok)throw Error(await r.text());const ab=await r.arrayBuffer(),ctx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();audioCtx=ctx;const buf=await ctx.decodeAudioData(ab.slice(0));info.total_samples=Math.min(info.total_samples,buf.length);let scope=seScope(info,range);if(previous){const delta=info.total_samples-previous.info.total_samples;scope={...previous.scope,start:Math.min(previous.scope.start,Math.max(0,info.total_samples-1)),end:Math.min(info.total_samples,Math.max(previous.scope.start+1,previous.scope.end+delta))}}sampleEditor={trackId,info,scope,buffer:buf,env:seEnvelope(buf),audioUrl,preview:null,viewStart:scope.start,viewEnd:scope.end,a:scope.start,b:scope.end,cursor:scope.start,effect:previous?.effect||'pitch',preset:previous?.preset||'subtle',params:previous?.params||seDefaults('pitch','subtle')};showUtilityModal(`Editor waveform / campioni · ${esc(info.name)}`,`<div class="sample-editor"><div class="sample-toolbar"><button onclick="seEdit('cut')">✂ Taglia</button><button onclick="seEdit('copy')">⧉ Copia</button><button onclick="seEdit('paste')">▣ Incolla</button><button class="danger" onclick="seEdit('delete')">⌫ Rimuovi</button><span class="sample-rate">${info.sample_rate.toLocaleString(window.MtaLocale?.language)} Hz · ${info.total_samples.toLocaleString(window.MtaLocale?.language)} campioni</span></div><p id="sePeakRead" class="hint" role="status"></p><p class="hint">${scope.restricted?tr('Editing selected range only','Editing limitato al range selezionato'):tr('Entire track','Traccia intera')} · ${tr('Pre-gain / pre-insert samples; orange lines: 0 dBFS','Campioni pre-gain / pre-insert; linee arancioni: 0 dBFS')}</p><canvas id="sampleCanvas" class="sample-editor-wave"></canvas><div class="sample-nav"><label>Zoom<input id="seZoom" type="range" min="0" max="100" value="42" oninput="seZoom(this.value)"></label><label>Posizione<input id="sePos" type="range" min="0" max="${scope.end}" value="0" oninput="sePosition(this.value)"></label></div><div class="sample-selection"><label>Campione iniziale<input id="seStart" type="number" min="${scope.start}" max="${scope.end}" step="1" onchange="seInputs()"></label><label>Campione finale<input id="seEnd" type="number" min="${scope.start}" max="${scope.end}" step="1" onchange="seInputs()"></label><strong id="seRead"></strong></div><audio id="sampleAudio" controls ></audio><section id="sampleFx" class="sample-effect-panel">${seEffectHtml()}</section><p class="hint">La vista iniziale segue lo zoom della timeline; usa rotella/Zoom per arrivare al dettaglio dei campioni. Il processing è pre-insert e il commit crea una nuova sorgente solo per questa traccia.</p></div>`);const canvas=$('#sampleCanvas'),view=seInitialWindow(info,scope,canvas.clientWidth,pxPerSec,leftMs);sampleEditor.viewStart=view.start;sampleEditor.viewEnd=view.end;seBind();seDraw();const original=$('#sampleAudio');if(original)original.src=info.audio_url+'?start_sample='+scope.start+'&end_sample='+scope.end;sampleEditor.resizeObserver?.disconnect();if(typeof ResizeObserver!=='undefined'){sampleEditor.resizeObserver=new ResizeObserver(()=>{if(sampleEditor?.trackId===trackId)seDraw()});sampleEditor.resizeObserver.observe(canvas)}}catch(e){toast('Editor waveform: '+e.message)}}
 
 const UTILITY_MODAL_TRANSIENT_CLASSES=['sample-editor-modal','meta-expanded-modal','pdf-html-preview-modal','pdf-real-preview-modal','timed-editor-modal','youtube-import-modal','lyrics-chords-editor-modal','chords-refresh-progress-modal'];
 function resetUtilityModalGeometry(){const modal=document.querySelector('.utility-modal');if(!modal)return;modal.classList.remove(...UTILITY_MODAL_TRANSIENT_CLASSES);for(const prop of ['width','height','minWidth','minHeight','maxWidth','maxHeight','resize','overflow'])modal.style[prop]='';}
@@ -4642,7 +4686,7 @@ function showUtilityModal(title,html,stemProgress=false){
   resetUtilityModalGeometry();
   $('#utilityTitle').textContent=trDynamic(title);$('#utilityBody').innerHTML=html;$('#utilityBackdrop').classList.remove('hidden');applyInterfaceLanguage($('#utilityBackdrop'));
 }
-function closeUtilityModal(){if(document.querySelector('.utility-modal.lyrics-chords-editor-modal')&&lyricsChordsEditorHasChanges())return closeLyricsChordsEditor();if(activeStemJob){toast('La separazione è in corso: usa Annulla separazione se vuoi interromperla.');return}if(document.querySelector('.utility-modal .export-dialog')&&(playAudio||trackPlaybacks.length||playbackPaused||playbackBuffering))stopPlayback();window.mtaAiJobs?.closeOrigin?.($('#utilityBody')?.firstElementChild);$('#utilityBackdrop').classList.add('hidden');resetUtilityModalGeometry();sampleEditorState=null;clearTimeout(sampleEditorPreviewTimer);sampleEditorPreviewTimer=null;forceNativeViewportTop()}
+function closeUtilityModal(){if(document.querySelector('.utility-modal.lyrics-chords-editor-modal')&&lyricsChordsEditorHasChanges())return closeLyricsChordsEditor();if(activeStemJob){toast('La separazione è in corso: usa Annulla separazione se vuoi interromperla.');return}if(document.querySelector('.utility-modal .export-dialog')&&(playAudio||trackPlaybacks.length||playbackPaused||playbackBuffering))stopPlayback();window.mtaAiJobs?.closeOrigin?.($('#utilityBody')?.firstElementChild);$('#utilityBackdrop').classList.add('hidden');resetUtilityModalGeometry();sampleEditor?.resizeObserver?.disconnect();sampleEditorPreviewAbort?.abort();if(sampleEditor?.preview)URL.revokeObjectURL(sampleEditor.preview);sampleEditor=null;sampleEditorState=null;clearTimeout(sampleEditorPreviewTimer);sampleEditorPreviewTimer=null;forceNativeViewportTop()}
 function exportProjectArchive(){if(!current){toast('Apri prima un progetto');return}window.location.href=`/api/projects/${current.id}/archive`}
 async function deleteCurrentProject(){if(!current){toast('Apri prima un progetto');return}await deleteProjectFromWorkspace(current.id,current.title)}
 $('#projectArchiveFile').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;if(!await prepareProjectLeave()){e.target.value='';return}const fd=new FormData();fd.append('file',f);try{current=await api('/api/project-archives/import',{method:'POST',body:fd});rememberRecentProject(current.id);selectedTrackId=current.tracks[0]?.id||null;resetProjectUiForOpen();resetSessionHistory();render();await refresh();toast('Progetto completo importato')}catch(err){toast('Import progetto fallito: '+err.message)}finally{e.target.value=''}})
@@ -4773,7 +4817,7 @@ async function showNativeSettings(){
   try{
     const cfg=await apiBridge.get_native_settings();
     const showChordNeighbors=appDisplayPreference('showPreviousNextChords',false),showLyricNeighbors=appDisplayPreference('showPreviousNextLyrics',false);
-    showUtilityModal('Settings',`<div class="form-grid native-settings"><label>Maximum import/upload size (MB)<input id="nativeMaxUploadMb" type="number" min="1" max="10240" step="1" value="${Number(cfg.max_upload_mb)||1024}"></label><label class="workflow-check"><input id="nativeAutosaveEnabled" type="checkbox" ${cfg.autosave_enabled!==false?'checked':''}> Auto-save project changes</label><label class="workflow-check"><input id="useFlacStorage" type="checkbox" ${appDisplayPreference('useFlacStorage')?'checked':''}> Use FLAC for new projects; ask before migrating WAV projects</label><label class="workflow-check"><input id="showPreviousNextChords" type="checkbox" ${showChordNeighbors?'checked':''}> Show previous and next chords</label><label class="workflow-check"><input id="showPreviousNextLyrics" type="checkbox" ${showLyricNeighbors?'checked':''}> Show previous and next lyrics</label><label>Language<select id="nativeLanguage"><option value="auto" ${!['it','en'].includes(cfg.language)?'selected':''}>Auto (system) · ${esc(cfg.system_language||'en')}</option><option value="it" ${cfg.language==='it'?'selected':''}>Italiano</option><option value="en" ${cfg.language==='en'?'selected':''}>English</option></select></label><label>Update channel<select id="nativeUpdateChannel"><option value="stable" ${cfg.update_channel!=='early'?'selected':''}>Stable · GitHub tags/releases only</option><option value="early" ${cfg.update_channel==='early'?'selected':''}>Early release · include latest main packages</option></select></label><p>Stable checks only tagged GitHub releases. Early release also checks the rolling <b>early-main</b> package produced from main.</p><p class="hint">Con le opzioni previous/next attive, la vista sopra la timeline scorre mostrando l'evento precedente e successivo attenuati e quello corrente evidenziato.</p><div class="form-actions"><button type="button" onclick="checkNativeAppUpdate(true)">Check for updates</button><button type="button" onclick="openNativeVst3Manager()">VST3 plugins / status</button><button type="button" onclick="openNativeModelManager()">Manage Demucs models</button><button type="button" onclick="openNativeRemoteWorkers()">AI local / remote workers</button><button type="button" onclick="openAiModelManager()">Manage Lyrics / Chords models</button><button type="button" onclick="rescanSharedMedia()">Rescan / GC shared media</button><button class="accent" onclick="saveNativeSettings()">Save</button></div></div>`);
+    showUtilityModal('Settings',`<div class="form-grid native-settings"><label>Maximum import/upload size (MB)<input id="nativeMaxUploadMb" type="number" min="1" max="10240" step="1" value="${Number(cfg.max_upload_mb)||1024}"></label><label class="workflow-check"><input id="nativeAutosaveEnabled" type="checkbox" ${cfg.autosave_enabled!==false?'checked':''}> Auto-save project changes</label><label class="workflow-check"><input id="useFlacStorage" type="checkbox" ${appDisplayPreference('useFlacStorage')?'checked':''}> Use FLAC for new projects; ask before migrating WAV projects</label><label class="workflow-check"><input id="showPreviousNextChords" type="checkbox" ${showChordNeighbors?'checked':''}> Show previous and next chords</label><label class="workflow-check"><input id="showPreviousNextLyrics" type="checkbox" ${showLyricNeighbors?'checked':''}> Show previous and next lyrics</label><label>Language<select id="nativeLanguage"><option value="auto" ${!['it','en'].includes(cfg.language)?'selected':''}>Auto (browser) · ${esc(navigator.language||'en')}</option><option value="it" ${cfg.language==='it'?'selected':''}>Italiano</option><option value="en" ${cfg.language==='en'?'selected':''}>English</option></select></label><label>Update channel<select id="nativeUpdateChannel"><option value="stable" ${cfg.update_channel!=='early'?'selected':''}>Stable · GitHub tags/releases only</option><option value="early" ${cfg.update_channel==='early'?'selected':''}>Early release · include latest main packages</option></select></label><p>Stable checks only tagged GitHub releases. Early release also checks the rolling <b>early-main</b> package produced from main.</p><p class="hint">Con le opzioni previous/next attive, la vista sopra la timeline scorre mostrando l'evento precedente e successivo attenuati e quello corrente evidenziato.</p><div class="form-actions"><button type="button" onclick="checkNativeAppUpdate(true)">Check for updates</button><button type="button" onclick="openNativeVst3Manager()">VST3 plugins / status</button><button type="button" onclick="openNativeModelManager()">Manage Demucs models</button><button type="button" onclick="openNativeRemoteWorkers()">AI local / remote workers</button><button type="button" onclick="openAiModelManager()">Manage Lyrics / Chords models</button><button type="button" onclick="rescanSharedMedia()">Rescan / GC shared media</button><button class="accent" onclick="saveNativeSettings()">Save</button></div></div>`);
   }catch(err){toast('Impossibile leggere le impostazioni native: '+err.message)}
 }
 // Settings save never scans the full timeline or rebuilds track DOM.
@@ -4807,7 +4851,7 @@ async function saveNativeSettings(){
     setAppDisplayPreference('showPreviousNextChords',preferences.chords);
     setAppDisplayPreference('showPreviousNextLyrics',preferences.lyrics);
     autosaveEnabled=result.autosave_enabled!==false;
-    const nextLanguage=result.language==='auto'?(String(result.system_language||'en').toLowerCase().startsWith('it')?'it':'en'):result.language;
+    const nextLanguage=result.language==='auto'?(String(navigator.language||'en').toLowerCase().startsWith('it')?'it':'en'):result.language;
     const languageChanged=nextLanguage!==uiLanguage;
     uiLanguage=nextLanguage;
     closeUtilityModal();
@@ -5286,7 +5330,7 @@ function waProjectCursorMs(){
   return Math.max(0,waStartCursorMs+(audioCtx.currentTime-waStartCtxTime)*1000*tempoRatio());
 }
 function waMediaOffsetSeconds(cursorMs){return Math.max(0,Number(cursorMs||0)/1000/Math.max(.0001,tempoRatio()))}
-function waTrackGain(track){return trackAudibleNow(track)?dbToGain(Number(track?.volume_db||0)):0}
+function waTrackGain(track,item=null){return trackAudibleNow(track)?dbToGain(Number(track?.volume_db||0)+(item?.gainBaked?0:trackGainDb(track))):0}
 function waDisconnectItem(item,stop=true){
   if(!item)return;
   try{if(stop)item.sourceNode?.stop()}catch(e){}
@@ -5294,16 +5338,17 @@ function waDisconnectItem(item,stop=true){
   item.sourceNode=null;
 }
 function waStopSources(){for(const item of trackPlaybacks)if(item.wa)waDisconnectItem(item,true)}
-function waCreateTrackGraph(track,buffer){
+function waCreateTrackGraph(track,buffer,renderFilters=false){
+  const gainBaked=trackGainBaked(track,renderFilters);
   const gainNode=audioCtx.createGain(),panner=audioCtx.createStereoPanner();
-  gainNode.gain.value=waTrackGain(track);panner.pan.value=clampPan(track?.pan||0);
+  gainNode.gain.value=waTrackGain(track,{gainBaked});panner.pan.value=clampPan(track?.pan||0);
   gainNode.connect(panner);panner.connect(waMasterBus);
   const analysers=[];let splitter=null;
   if(current?.realtime_meter_enabled){
     if(Number(track?.channels||buffer?.numberOfChannels||2)===1){const a=audioCtx.createAnalyser();a.fftSize=1024;panner.connect(a);analysers.push(a)}
     else{splitter=audioCtx.createChannelSplitter(2);const l=audioCtx.createAnalyser(),r=audioCtx.createAnalyser();l.fftSize=r.fftSize=1024;panner.connect(splitter);splitter.connect(l,0);splitter.connect(r,1);analysers.push(l,r)}
   }
-  return {trackId:track.id,wa:true,buffer,gainNode,panner,analysers,splitter,channels:Number(track?.channels||buffer?.numberOfChannels||2),respectMuteSolo:true,meterData:{}};
+  return {trackId:track.id,wa:true,gainBaked,buffer,gainNode,panner,analysers,splitter,channels:Number(track?.channels||buffer?.numberOfChannels||2),respectMuteSolo:true,meterData:{}};
 }
 function invalidateTrackAudioCache(trackId){const needle=`:${trackId}:`;for(const key of [...waDecodedBuffers.keys()])if(String(key).includes(needle))waDecodedBuffers.delete(key)}
 async function waDecodeTrack(track,renderFilters,cacheBust=false){
@@ -5323,7 +5368,7 @@ function waBuildMasterGraph(){
 function waScheduleItem(item,startAt,cursorMs,fadeIn=false){
   const source=audioCtx.createBufferSource();source.buffer=item.buffer;source.connect(item.gainNode);item.sourceNode=source;
   const offset=waMediaOffsetSeconds(cursorMs);if(offset>=item.buffer.duration)return;
-  const target=waTrackGain(trackById(item.trackId));
+  const target=waTrackGain(trackById(item.trackId),item);
   if(fadeIn){item.gainNode.gain.cancelScheduledValues(startAt);item.gainNode.gain.setValueAtTime(0,startAt);item.gainNode.gain.linearRampToValueAtTime(target,startAt+.012)}
   else item.gainNode.gain.setValueAtTime(target,startAt);
   source.start(startAt,offset);
@@ -5349,7 +5394,7 @@ async function startWebAudioProjectPlayback(renderFilters=false,cursorMs=playCur
   trackPlaybacks=[];try{waMasterBus?.disconnect()}catch(e){};try{masterPlaybackGainNode?.disconnect()}catch(e){};waBuildMasterGraph();
   playbackBuffering=true;showMediaProgress('Preparazione audio',18,'Decodifica tracce…');
   const {tracks,buffers}=await prepareTimelinePlaybackBuffers(renderFilters);
-  trackPlaybacks=tracks.map((t,i)=>waCreateTrackGraph(t,buffers[i]));
+  trackPlaybacks=tracks.map((t,i)=>waCreateTrackGraph(t,buffers[i],renderFilters));
   waPlaybackActive=true;waPlaybackPaused=false;waRenderFilters=!!renderFilters;renderedStemPlayback=!!renderFilters;renderedMasterPlayback=false;playAudio={waClock:true,paused:false,ended:false};
   waScheduleAll(cursorMs);playbackBuffering=false;$('#utilityBackdrop')?.classList.add('hidden');
   if(current?.realtime_meter_enabled)startVuMeterLoop();
@@ -5358,13 +5403,13 @@ async function startWebAudioProjectPlayback(renderFilters=false,cursorMs=playCur
   return playAudio;
 }
 function updatePlaybackGains(){
-  if(waPlaybackActive){const now=audioCtx?.currentTime||0;for(const item of trackPlaybacks){if(!item.wa)continue;const t=trackById(item.trackId);item.gainNode?.gain.cancelScheduledValues(now);item.gainNode?.gain.setTargetAtTime(waTrackGain(t),now,.006)}return}
+  if(waPlaybackActive){const now=audioCtx?.currentTime||0;for(const item of trackPlaybacks){if(!item.wa)continue;const t=trackById(item.trackId);item.gainNode?.gain.cancelScheduledValues(now);item.gainNode?.gain.setTargetAtTime(waTrackGain(t,item),now,.006)}return}
   const now=audioCtx?.currentTime||0;for(const item of trackPlaybacks){const track=trackById(item.trackId);if(!track||!item.gainNode)continue;item.gainNode.gain.cancelScheduledValues(now);item.gainNode.gain.setValueAtTime(playbackGainForTrack(track,item),now)}
 }
 async function refreshDynamicTrackPlayback(trackId){
   if(!waPlaybackActive||waPlaybackPaused){return}
   const track=trackById(trackId),idx=trackPlaybacks.findIndex(x=>x.trackId===trackId&&x.wa);if(!track||idx<0)return;
-  try{collect();await persistCurrentProject(false);const buffer=await waDecodeTrack(track,true,true);if(!waPlaybackActive)return;const old=trackPlaybacks[idx],replacement=waCreateTrackGraph(track,buffer),cursor=waProjectCursorMs(),startAt=audioCtx.currentTime+.025;waScheduleItem(replacement,startAt,cursor,true);const now=startAt,targetOld=old.gainNode?.gain.value||0;if(old.gainNode){old.gainNode.gain.cancelScheduledValues(now);old.gainNode.gain.setValueAtTime(targetOld,now);old.gainNode.gain.linearRampToValueAtTime(0,now+.012)}trackPlaybacks.splice(idx,1,replacement);setTimeout(()=>waDisconnectItem(old,true),45)}catch(e){console.warn('Aggiornamento live FX traccia fallito',trackId,e)}
+  try{collect();await persistCurrentProject(false);const buffer=await waDecodeTrack(track,true,true);if(!waPlaybackActive)return;const old=trackPlaybacks[idx],replacement=waCreateTrackGraph(track,buffer,true),cursor=waProjectCursorMs(),startAt=audioCtx.currentTime+.025;waScheduleItem(replacement,startAt,cursor,true);const now=startAt,targetOld=old.gainNode?.gain.value||0;if(old.gainNode){old.gainNode.gain.cancelScheduledValues(now);old.gainNode.gain.setValueAtTime(targetOld,now);old.gainNode.gain.linearRampToValueAtTime(0,now+.012)}trackPlaybacks.splice(idx,1,replacement);setTimeout(()=>waDisconnectItem(old,true),45)}catch(e){console.warn('Aggiornamento live FX traccia fallito',trackId,e)}
 }
 function playbackActuallyRunning(){if(waPlaybackActive)return !waPlaybackPaused;const masterRunning=!!(playAudio&&!playAudio.paused&&!playAudio.ended);return masterRunning||trackPlaybacks.some(item=>item.audio&&!item.audio.paused&&!item.audio.ended)}
 function stopPlayback(){

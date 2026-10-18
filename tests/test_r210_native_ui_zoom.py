@@ -56,7 +56,7 @@ def test_windows_zoom_runs_through_ui_dispatch(monkeypatch):
         try:callback()
         finally:state['gui']=False
     monkeypatch.setitem(sys.modules, 'System', SimpleNamespace(Action=lambda callback:callback))
-    window=SimpleNamespace(native=SimpleNamespace(webview=Engine(),InvokeRequired=True,Invoke=invoke))
+    window=SimpleNamespace(native=SimpleNamespace(webview=Engine(),InvokeRequired=True,BeginInvoke=invoke))
     assert ui_zoom.apply_zoom(window,80)==80 and seen==[0.8]
     assert window.native.webview.CoreWebView2.Settings.IsZoomControlEnabled is False
 

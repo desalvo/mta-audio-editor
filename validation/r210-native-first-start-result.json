@@ -1,0 +1,17 @@
+{
+  "version": "0.3.0-r210",
+  "passed": 3891,
+  "skipped": 5,
+  "deselected": 10,
+  "errors": 0,
+  "failures": 0,
+  "targeted_passed": 69,
+  "ruff": "passed",
+  "javascript_syntax": "passed",
+  "environment": "Linux; Windows GUI dispatch mocked, no real Windows/WebView2 execution",
+  "limitations": [
+    "Real Windows cold start and responsiveness still require validation",
+    "10 host-agent AF_UNIX tests excluded due to environment socket limitations",
+    "No server GPU/ROCm functional validation in this cycle"
+  ]
+}

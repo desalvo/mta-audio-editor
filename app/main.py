@@ -20,7 +20,7 @@ import wave
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
-from fastapi import FastAPI, File, HTTPException, Request, UploadFile
+from fastapi import Query, FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse, Response
 from starlette.background import BackgroundTask
 from fastapi.staticfiles import StaticFiles
@@ -546,7 +546,7 @@ def _media_job_public(job: dict) -> dict:
 
 def _is_public(path: str) -> bool:
     return (
-        path in {"/privacy", "/privacy/it", "/privacy/en", "/terms", "/terms/it", "/terms/en"}
+        path in {"/privacy/it.pdf", "/privacy/en.pdf", "/terms/it.pdf", "/terms/en.pdf", "/privacy/it/pdf", "/privacy/en/pdf", "/terms/it/pdf", "/terms/en/pdf", "/privacy", "/privacy/it", "/privacy/en", "/terms", "/terms/it", "/terms/en"}
         or path.startswith("/static/")
         or path in {"/health", "/api/health", "/api/about", "/oauth-second-factor", "/login", "/register", "/verify-email", "/resend-verification", "/forgot-password", "/reset-password"}
         or path.startswith("/oauth/")
@@ -572,6 +572,13 @@ async def security_middleware(request: Request, call_next):
         return RedirectResponse(url="/", status_code=303)
 
     user = session_user(request)
+    from . import i18n
+    browser_lang=i18n.browser_language(request.headers.get("accept-language",dict(user).get("browser_language","en") if user else "en"))
+    preference=dict(user).get("language","auto") if user else "auto"
+    i18n.current_language.set(i18n.effective(preference,browser_lang))
+    if user and dict(user).get("id",0)>0 and "language" in user.keys() and not NATIVE_SINGLE_USER and preference=="auto" and browser_lang!=dict(user).get("browser_language","en"):
+        from .auth import db as locale_db
+        with locale_db() as con:con.execute("UPDATE users SET browser_language=? WHERE id=?",(browser_lang,user["id"]))
     model_bearer_ok = (
         request.method in {"GET", "HEAD"}
         and (
@@ -629,6 +636,8 @@ async def security_middleware(request: Request, call_next):
         if not dump_health_probe:
             admin_dump.leave_request()
 
+    if not request.url.path.startswith(("/privacy","/terms","/static/","/docs/")):
+        response=await i18n.localize_response(response,i18n.current_language.get(),preference)
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["Referrer-Policy"] = "no-referrer"
@@ -651,6 +660,11 @@ async def security_middleware(request: Request, call_next):
 def _template(name: str, **replacements) -> str:
     text = (BASE / "templates" / name).read_text(encoding="utf-8")
     text = text.replace("__VERSION__", APP_VERSION).replace("__REVISION__", APP_REVISION).replace("__BUILD__", BUILD_ID)
+    if name in ("login.html","register.html"):
+        from .i18n import current_language
+        lang=current_language.get()
+        legal_links=f'<a href="/privacy/{lang}" lang="{lang}">Privacy</a> · <a href="/terms/{lang}" lang="{lang}">{"Termini di servizio" if lang=="it" else "Terms of service"}</a>'
+        text=text.replace("__LEGAL_LINKS__",legal_links)
     for key, value in replacements.items():
         text = text.replace(f"__{key.upper()}__", str(value))
     return text
@@ -919,6 +933,8 @@ def settings_page(request: Request):
 @app.get("/api/session")
 def api_session(request: Request):
     user = public_user(require_user(request))
+    from . import i18n
+    user["effective_language"] = i18n.effective(user.get("language","auto"),request.headers.get("accept-language","en"))
     user["native_single_user"] = NATIVE_SINGLE_USER
     return user
 
@@ -932,7 +948,7 @@ def api_account(request: Request):
 def api_account_update(request: Request, body: dict):
     user = require_user(request)
     try:
-        updated, _ = update_profile(user["id"], display_name=body.get("display_name"), email=body.get("email"), base_url=str(request.base_url).rstrip("/"))
+        updated, _ = update_profile(user["id"], display_name=body.get("display_name"), email=body.get("email"), base_url=str(request.base_url).rstrip("/"), language=body.get("language"), limits_expanded=body.get("limits_expanded"))
         if updated.get("pending_email"):
             from .auth import _smtp_full
             smtp = _smtp_full()
@@ -1006,11 +1022,16 @@ def _tree_size(path: Path) -> int:
     return total
 
 def _workspace_usage_for_user(user_id: int) -> int:
-    total = 0
-    for project in list_projects():
-        if project.owner_user_id == user_id:
-            total += _tree_size(pdir(project.id))
-    return total
+    from .account_limits import project_storage
+    return project_storage(user_id,list_projects(),pdir)['used_bytes']
+
+
+@app.get("/api/account/limits")
+def api_account_limits(request: Request):
+    user=require_user(request)
+    from .account_limits import project_storage, summary
+    return summary(user['id'],project_storage(user['id'],list_projects(),pdir))
+
 
 def _storage_payload(request: Request) -> dict:
     actor = _actor(request)
@@ -2554,20 +2575,36 @@ def sample_editor_info(pid: str, track_id: str, request: Request):
         raise HTTPException(404, "traccia non trovata")
     src = sample_editor_engine.rendered_source(pid, track)
     rate = sample_editor_engine.sample_rate(src)
-    duration = media_duration_ms(src)
+    import soundfile as sf
+    metadata=sf.info(src)
+    rate=metadata.samplerate
+    duration=round(metadata.frames/rate*1000)
     return {"track_id": track.id, "name": track.name, "sample_rate": rate, "duration_ms": duration,
-            "total_samples": round(duration / 1000 * rate),
+            "total_samples":metadata.frames,"timeline_offset_ms":track.delay_ms,
             "audio_url": f"/api/projects/{pid}/tracks/{track_id}/sample-editor/audio",
             "eq_bands": sample_editor_engine.EQ_BANDS, "presets": sample_editor_engine.PRESETS}
 
 
 @app.get("/api/projects/{pid}/tracks/{track_id}/sample-editor/audio")
-def sample_editor_audio(pid: str, track_id: str, request: Request):
+def sample_editor_audio(pid: str, track_id: str, request: Request, start_sample: int | None = Query(None,ge=0), end_sample: int | None = Query(None,ge=0)):
     project = _project_for_actor(request, pid)
     track = next((x for x in project.tracks if x.id == track_id), None)
     if track is None:
         raise HTTPException(404, "traccia non trovata")
     src = sample_editor_engine.rendered_source(pid, track)
+    if start_sample is not None or end_sample is not None:
+        import soundfile as sf
+        import uuid
+        total=sf.info(src).frames
+        start=min(total,start_sample or 0);end=min(total,end_sample if end_sample is not None else total)
+        if end<=start:raise HTTPException(400,"Empty sample range")
+        if start==0 and end==total:return FileResponse(src,media_type="audio/wav")
+        target=sample_editor_engine.storage.session_preview_dir(pid)/f"sample-range-{uuid.uuid4().hex}.wav"
+        try:sample_editor_engine.run(['ffmpeg','-y','-v','error','-i',str(src),'-af',f'atrim=start_sample={start}:end_sample={end},asetpts=PTS-STARTPTS','-c:a','pcm_s24le',str(target)])
+        except Exception:
+            target.unlink(missing_ok=True)
+            raise
+        return FileResponse(target,media_type="audio/wav",background=BackgroundTask(lambda:target.unlink(missing_ok=True)))
     return FileResponse(src, media_type="audio/wav", filename=f"{track.name}-sample-editor.wav")
 
 
@@ -6518,6 +6555,10 @@ def preview_track(pid: str, track_id: str, request: Request, render: bool = Fals
     # faders react immediately without re-rendering/restarting playback.
     preview_track_model = track.model_copy(deep=True)
     preview_track_model.volume_db = 0.0
+    # Dry/no-insert previews apply input trim live in WebAudio. With inserts
+    # it must be rendered before their nonlinear processing, exactly once.
+    if not (render and any(item.enabled for item in track.inserts)):
+        preview_track_model.gain_db = 0.0
     preview_track_model.pan = 0.0
     preview_track_model.mute = False
     signature = hashlib.sha256(

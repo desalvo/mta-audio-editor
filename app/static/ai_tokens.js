@@ -1,5 +1,5 @@
 (()=>{'use strict';const $=id=>document.getElementById(id);let tokens=[],users=[];
-const date=n=>n?new Date(n*1000).toLocaleString():'Mai';
+const date=n=>n?new Date(n*1000).toLocaleString(window.MtaLocale?.language):'Mai';
 function message(text,error=false){$('message').textContent=text;$('message').classList.toggle('error',error)}
 async function call(url,method='GET',body){const r=await fetch(url,{method,credentials:'same-origin',headers:{'Content-Type':'application/json','x-mta-request':'1'},body:body===undefined?undefined:JSON.stringify(body)});const data=await r.json();if(!r.ok)throw Error(typeof data.detail==='string'?data.detail:'Richiesta non riuscita ('+r.status+')');return data}
 function reveal(data){$('secret').textContent=data.token;$('secretBox').hidden=false;$('secretBox').scrollIntoView({block:'nearest',behavior:'smooth'});message('Token creato. Copialo: non sarà più recuperabile.')}

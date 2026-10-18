@@ -75,10 +75,10 @@ def _set_engine_zoom(engine, factor):
 
 def _dispatch(window, engine, callback):
     native = window.native
-    if hasattr(native, 'Invoke'):
+    if hasattr(native, 'BeginInvoke'):
         if native.InvokeRequired:
             from System import Action
-            native.Invoke(Action(callback))
+            native.BeginInvoke(Action(callback))
         else:
             callback()
     elif sys.platform == 'darwin':
@@ -110,17 +110,19 @@ def _dispatch(window, engine, callback):
         raise RuntimeError('Interface zoom is unavailable in this native web engine')
 
 
-def apply_zoom(window, value):
+def apply_zoom(window, value, *, timeout=5):
     value = validate_zoom(value)
-    engine = _engine(window)
-    done = threading.Event(); errors = []
+    engine = None if window is not None and hasattr(window.native,'BeginInvoke') else _engine(window)
+    done = threading.Event(); expired = threading.Event(); errors = []
     def change():
-        try: _set_engine_zoom(engine, value / 100)
+        if expired.is_set():return False
+        try: _set_engine_zoom(_engine(window) if engine is None else engine, value / 100)
         except Exception as exc: errors.append(exc)
         finally: done.set()
         return False  # GLib idle callbacks are one-shot.
     _dispatch(window, engine, change)
-    if not done.wait(5):
+    if not done.wait(timeout):
+        expired.set()
         raise RuntimeError('Native interface zoom timed out')
     if errors:
         raise RuntimeError('Native interface zoom failed') from errors[0]

@@ -16,6 +16,7 @@ mac_icon = icon_dir / "mta-audio-editor.icns"
 version_file = project / "native" / "windows-version-info.txt"
 
 datas = [
+    (str(project / "app" / "i18n_catalog.json"), "app"),
     (str(project / "app" / "templates"), "app/templates"),
     (str(project / "app" / "static"), "app/static"),
     (str(project / "app" / "docs"), "app/docs"),

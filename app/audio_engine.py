@@ -433,6 +433,7 @@ def delete_song_range(project: Project, start_ms: int, end_ms: int) -> None:
 def render_track(track: Track, source: Path, out: Path, apply_inserts: bool = True, sample_rate: int | None = None) -> None:
     """Render DAW clips for one track and apply its insert chain.
 
+    Input gain is applied before inserts.
     Track fader/pan/mute/solo are intentionally not baked here; they are handled
     by the container exporter or final mix stage.
     """
@@ -501,6 +502,9 @@ def render_track(track: Track, source: Path, out: Path, apply_inserts: bool = Tr
         elif vst_started:
             raise ValueError('VST3 inserts must be placed after built-in inserts in this revision')
     inserts = chain_filter(active)
+    input_gain = float(track.gain_db)
+    if input_gain:
+        inserts = f"volume={input_gain:.4f}dB" + ("," + inserts if inserts else "")
     output_channels = effective_output_channels(track.channels, track.inserts if apply_inserts else [])
     output_layout = "mono" if output_channels == 1 else "stereo"
     filters = base + (

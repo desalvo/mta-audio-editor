@@ -54,5 +54,6 @@ def test_native_generated_pdf_uses_os_save_dialog():
     native = Path("native/mta_audio_editor_native.py").read_text(encoding="utf-8")
     assert '"pdf": "PDF Document (*.pdf)"' in native
     assert "def save_generated_file" in native
-    assert "create_file_dialog" in native
+    assert "self._file_dialog(" in native
+    assert "window.create_file_dialog" in Path("native/gui_dialogs.py").read_text(encoding="utf-8")
     assert "os.replace(temp, target)" in native

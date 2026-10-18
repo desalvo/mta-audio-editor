@@ -22,6 +22,7 @@ def env(tmp_path,monkeypatch):
     with auth.db() as con:
         for name in ('first','second'):
             con.execute('INSERT INTO users(username,email,password_hash,active,email_confirmed,role,created_at,updated_at) VALUES(?,?,?,1,1,\'user\',1,1)',(name,name+'@example.com','unused'))
+        con.execute("UPDATE users SET language='it' WHERE username IN ('first','second')")
         users=[dict(r) for r in con.execute("SELECT * FROM users WHERE username IN ('first','second') ORDER BY username")]
     monkeypatch.setattr(auth,'get_smtp_config',lambda:{'host':'smtp.example.com','from_email':'mta@example.com'})
     from app import ai_billing_profiles

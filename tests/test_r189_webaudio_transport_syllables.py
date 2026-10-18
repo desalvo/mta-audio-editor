@@ -12,7 +12,7 @@ def test_webaudio_transport_uses_shared_audio_context_clock():
 
 
 def test_webaudio_live_controls_and_real_analysers():
-    assert "waTrackGain(track)" in JS
+    assert "waTrackGain(track,{gainBaked})" in JS
     assert "item.gainNode?.gain.setTargetAtTime" in JS
     assert "item.panner.pan.setValueAtTime" in JS
     assert "waMasterBus.connect(masterPlaybackGainNode)" in JS

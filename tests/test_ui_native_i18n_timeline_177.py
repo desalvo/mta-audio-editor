@@ -31,6 +31,6 @@ def test_native_language_auto_and_manual_override_are_persisted():
     assert 'system_language' in NATIVE
     assert 'language must be auto, it or en' in NATIVE
     assert 'id="nativeLanguage"' in JS
-    assert 'Auto (system)' in JS
-    assert "String(cfg.system_language||'en').toLowerCase().startsWith('it')" in JS
+    assert 'Auto (browser)' in JS
+    assert "String(navigator.language||'en').toLowerCase().startsWith('it')" in JS
     assert 'applyInterfaceLanguage' in JS

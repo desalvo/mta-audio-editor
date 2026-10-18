@@ -36,4 +36,4 @@ $('closebill').onclick=()=>guarded(async()=>{const id=Number($('billuser').value
 async function gpuDiagnostics(){const data=await api('/api/admin/ai-billing/gpu-profiler');$('gpuDiagResults').textContent=JSON.stringify(data.reports,null,2)}
 $('gpuDiagRefresh').onclick=()=>gpuDiagnostics().catch(e=>notify(e.message,true));
 Promise.allSettled([load(),users(),prices(),status(),bills(),sched(),gpuDiagnostics()]).then(results=>{const errors=results.filter(r=>r.status==='rejected');if(errors.length)notify('Alcuni dati non sono disponibili: '+errors.map(r=>r.reason.message).join(' · '),true)});
-</script><script src="/static/ai_jobs.js?v=r210-universal-queue-usage"></script><script src="/static/ai_usage_panel.js?v=r210-native-account-mail"></script></body></html>
+</script><script src="/static/ai_jobs.js?v=r210-user-locale"></script><script src="/static/ai_usage_panel.js?v=r210-user-locale"></script></body></html>

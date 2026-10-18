@@ -15,7 +15,7 @@ import threading
 import uuid
 from pathlib import Path
 from urllib.parse import urlsplit
-from . import auth
+from . import auth, i18n
 
 LOG=logging.getLogger(__name__)
 CADENCES={'day':86400,'week':604800,'month':2592000,'off':0}
@@ -46,7 +46,7 @@ def preferences(user_id):
         config=con.execute('SELECT * FROM ai_mail_config WHERE id=1').fetchone()
         row=con.execute('SELECT * FROM ai_mail_preferences WHERE user_id=?',(user_id,)).fetchone()
     return {'cadence':row['cadence'] if row else None,'effective_cadence':(row['cadence'] if row and row['cadence'] else config['cadence']),
-      'default_cadence':config['cadence'],'language':row['language'] if row else 'it','smtp_configured':smtp_configured(),
+      'default_cadence':config['cadence'],'language':i18n.user_language(user_id),'smtp_configured':smtp_configured(),
       'job_notifications':'always-when-smtp-configured'}
 
 
@@ -228,7 +228,8 @@ def deliver(limit=25):
         try:
             if not user or not user['active'] or not user['email_confirmed']:
                 raise RuntimeError('Recipient not eligible')
-            language=preferences(row['user_id'])['language']
+            from .i18n import user_language
+            language=user_language(row['user_id'])
             subject,plain,body=render(json.loads(row['payload']),language)
             auth.send_mail([user['email']],subject,plain,body,
               inline_image=(Path(__file__).parent/'static'/'mail-logo.png').read_bytes(),

@@ -140,6 +140,7 @@ def _native_startup_logger() -> logging.Logger:
         # handler attached just because some other handler is present.
         if isinstance(old, RotatingFileHandler) and Path(old.baseFilename) != log_path:
             logger.removeHandler(old)
+            logging.getLogger("pywebview").removeHandler(old)
             old.close()
     if not any(
         isinstance(handler, RotatingFileHandler) and Path(handler.baseFilename) == log_path
@@ -155,6 +156,9 @@ def _native_startup_logger() -> logging.Logger:
         logger.addHandler(handler)
         logger.setLevel(logging.INFO)
         logger.propagate = False
+    backend=logging.getLogger("pywebview")
+    for handler in logger.handlers:
+        if isinstance(handler,RotatingFileHandler) and handler not in backend.handlers:backend.addHandler(handler)
     return logger
 
 
@@ -283,6 +287,27 @@ def _native_smoke(url: str) -> int:
 class NativeApi:
     """Filesystem bridge exposed only by the desktop pywebview build."""
 
+    def __dir__(self):
+        # pywebview recursively walks public attributes while exposing js_api.
+        # Never let that walk enter Window / WinForms / COM or filesystem state.
+        members={}
+        for cls in reversed(type(self).__mro__):members.update(vars(cls))
+        return sorted(name for name,value in members.items()
+                      if not name.startswith('_') and (callable(value) or isinstance(value,staticmethod)))
+
+    def _file_dialog(self, dialog_type, **options):
+        from native.gui_dialogs import file_dialog
+        options.setdefault('directory',str(Path.home()))
+        logger=_native_startup_logger()
+        logger.info('Opening native file dialog; kind=%s',dialog_type)
+        try:
+            result=file_dialog(self.window,dialog_type,**options)
+            logger.info('Native file dialog closed; selected=%s',bool(result))
+            return result
+        except Exception:
+            logger.exception('Native file dialog failed')
+            raise
+
     def open_external_url(self, url: str) -> dict:
         """Only open the exact pending account approval URL in the system browser."""
         from app.native_ai_account import public_status
@@ -387,7 +412,7 @@ class NativeApi:
             safe_name = safe_name[:-len(PROJECT_EXTENSION)]
         if not safe_name.lower().endswith(PORTABLE_PROJECT_EXTENSION):
             safe_name += PORTABLE_PROJECT_EXTENSION
-        chosen = self.window.create_file_dialog(
+        chosen = self._file_dialog(
             webview.FileDialog.SAVE,
             save_filename=safe_name,
             file_types=("Portable MTA Audio Editor Project (*.maeprojz)",),
@@ -487,7 +512,7 @@ class NativeApi:
             safe_name = safe_name[:-len(PROJECT_EXTENSION)]
         if not safe_name.lower().endswith(PORTABLE_PROJECT_EXTENSION):
             safe_name += PORTABLE_PROJECT_EXTENSION
-        chosen = self.window.create_file_dialog(
+        chosen = self._file_dialog(
             webview.FileDialog.SAVE,
             save_filename=safe_name,
             file_types=("MTA Audio Editor Portable Project (*.maeprojz)",),
@@ -528,7 +553,7 @@ class NativeApi:
             "txt": "Text File (*.txt)",
             "cho": "ChordPro (*.cho)",
         }
-        chosen = self.window.create_file_dialog(
+        chosen = self._file_dialog(
             webview.FileDialog.SAVE,
             save_filename=safe_name,
             file_types=(labels[ext],),
@@ -584,7 +609,8 @@ class NativeApi:
     def restore_ui_zoom(self) -> dict:
         from native.ui_zoom import load_zoom, apply_zoom
         with self._ui_zoom_lock:
-            value = apply_zoom(self.window, load_zoom(_data_root()))
+            value = load_zoom(_data_root())
+            if value!=100:value=apply_zoom(self.window,value)
         return {'ok': True, 'zoom_percent': value}
 
     def set_ui_zoom(self, zoom_percent: int) -> dict:
@@ -798,7 +824,7 @@ class NativeApi:
             raise RuntimeError("native window is not ready")
         import webview
 
-        chosen = self.window.create_file_dialog(
+        chosen = self._file_dialog(
             webview.FileDialog.OPEN,
             allow_multiple=False,
             file_types=(
@@ -906,6 +932,8 @@ def main() -> int:
             js_api=native_api,
         )
         native_api.window = window
+        logger.info("Native window created; exposing %d bridge methods",len(dir(native_api)))
+        window.events.loaded += lambda: logger.info("Native page load event received")
         window.events.closing += native_api._guard_project_close
         webview.start(debug=False)
         return 0

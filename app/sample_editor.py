@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib, json, os, shutil, subprocess, uuid
 from pathlib import Path
 import numpy as np
+import soundfile as sf
 
 from . import storage
 from .audio_engine import media_duration_ms, render_track, waveform_peaks
@@ -31,11 +32,11 @@ def sample_rate(path:Path)->int:
 def rendered_source(pid:str,track:Track)->Path:
  src=storage.audio_path(pid,track.filename)
  cache=storage.pdir(pid)/f".sample-editor-{track.id}.wav"; stamp=cache.with_suffix(".json")
- sig=hashlib.sha256(json.dumps({"f":track.filename,"d":track.duration_ms,"c":[x.model_dump() for x in track.clips],"m":src.stat().st_mtime_ns},sort_keys=True).encode()).hexdigest()
+ sig=hashlib.sha256(json.dumps({"render_version":2,"f":track.filename,"d":track.duration_ms,"c":[x.model_dump() for x in track.clips],"m":src.stat().st_mtime_ns},sort_keys=True).encode()).hexdigest()
  try:
   if cache.exists() and stamp.exists() and json.loads(stamp.read_text()).get("signature")==sig:return cache
  except (OSError,ValueError,json.JSONDecodeError):pass
- render_track(track,src,cache,apply_inserts=False);stamp.write_text(json.dumps({"signature":sig}))
+ render_track(track.model_copy(update={"gain_db":0,"delay_ms":0}),src,cache,apply_inserts=False);stamp.write_text(json.dumps({"signature":sig}))
  return cache
 
 def pitch_filter(sr:int,semitones:float)->str:
@@ -118,7 +119,7 @@ def commit(project:Project,track:Track,tmp:Path)->Track:
     os.fsync(target.fileno())
    duration=media_duration_ms(stage)
    peaks=waveform_peaks(stage,4096)
-   offset=min((c.timeline_start_ms for c in track.clips),default=0)
+   offset=0  # The rendered sample already contains clip timeline placement.
    if dst.exists() or dst.is_symlink():
     raise FileExistsError(dst)
    os.replace(stage,dst)
@@ -156,7 +157,7 @@ def commit(project:Project,track:Track,tmp:Path)->Track:
    tmp.unlink(missing_ok=True)
 
 def edit(project:Project,track:Track,req:SampleEditRequest)->dict:
- src=rendered_source(project.id,track);sr=sample_rate(src);dur=media_duration_ms(src)/1000;total=round(dur*sr);a=min(req.start_sample,total);b=min(max(a,req.end_sample),total);cursor=min(req.cursor_sample,total);clip=storage.pdir(project.id)/f".sample-clipboard-{track.id}.wav"
+ src=rendered_source(project.id,track);sr=sample_rate(src);dur=sf.info(src).frames/sr;total=round(dur*sr);a=min(req.start_sample,total);b=min(max(a,req.end_sample),total);cursor=min(req.cursor_sample,total);clip=storage.pdir(project.id)/f".sample-clipboard-{track.id}.wav"
  if req.action in {'copy','cut'}:
   if b<=a:raise ValueError('seleziona prima un intervallo')
   run(["ffmpeg","-y","-v","error","-i",str(src),"-ss",f"{a/sr:.9f}","-to",f"{b/sr:.9f}","-c:a","pcm_s24le",str(clip)])
@@ -178,4 +179,4 @@ def edit(project:Project,track:Track,req:SampleEditRequest)->dict:
  raise ValueError('operazione non valida')
 
 def apply_effect(project:Project,track:Track,req:SampleEffectRequest,preview:bool)->Path:
- src=rendered_source(project.id,track);sr=sample_rate(src);dur=media_duration_ms(src)/1000;graph=effect_graph(src,req,sr,dur,preview);suffix='.mp3' if preview else '.wav';base=storage.session_preview_dir(project.id) if preview else storage.pdir(project.id);out=base/f".sample-fx-{uuid.uuid4().hex}{suffix}";cmd=["ffmpeg","-y","-v","error","-i",str(src),"-filter_complex",graph,"-map","[out]"]+(["-c:a","libmp3lame","-b:a","192k"] if preview else ["-c:a","pcm_s24le"])+[str(out)];run(cmd);return out
+ src=rendered_source(project.id,track);sr=sample_rate(src);dur=sf.info(src).frames/sr;graph=effect_graph(src,req,sr,dur,preview);suffix='.mp3' if preview else '.wav';base=storage.session_preview_dir(project.id) if preview else storage.pdir(project.id);out=base/f".sample-fx-{uuid.uuid4().hex}{suffix}";cmd=["ffmpeg","-y","-v","error","-i",str(src),"-filter_complex",graph,"-map","[out]"]+(["-c:a","libmp3lame","-b:a","192k"] if preview else ["-c:a","pcm_s24le"])+[str(out)];run(cmd);return out

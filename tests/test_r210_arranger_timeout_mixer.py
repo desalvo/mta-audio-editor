@@ -112,9 +112,9 @@ def test_custom_budget_reaches_cgroup_supervisor_without_changing_metering(monke
 def test_compact_actual_channel_controls_fit_normal_dock_height():
     wp=pytest.importorskip('weasyprint')
     source=(ROOT/'app/static/app.js').read_text()
-    section=source[source.index('function channelHtml(t,i){'):source.index('async function setAutoMix(')]
+    section=source[source.index('function normalizeTrackGain(value){'):source.index('async function setAutoMix(')]
     js='''const vm=require('vm');const t={id:'t',name:'Track',volume_db:0,pan:0,channels:2,inserts:[]};
-const ctx={current:{tracks:[t],realtime_meter_enabled:true},TRACK_COLORS:['blue'],clampPan:x=>x,panLabel:()=> 'Center',effectiveTrackChannels:()=>2,esc:s=>s};
+const ctx={current:{tracks:[t],realtime_meter_enabled:true},TRACK_COLORS:['blue'],clampPan:x=>x,panLabel:()=> 'Center',effectiveTrackChannels:()=>2,esc:s=>s,tr:en=>en};
 vm.createContext(ctx);vm.runInContext(process.argv[1],ctx);process.stdout.write(ctx.channelHtml(t,0));'''
     run=subprocess.run(['node','-e',js,section],capture_output=True,text=True,timeout=10)
     assert run.returncode==0,run.stderr
