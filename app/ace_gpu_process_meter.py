@@ -16,7 +16,7 @@ GPU_STATUSES = frozenset(('remote_endpoint', 'pid_unavailable', 'process_unreada
     'host_agent_mapping_unavailable', 'host_agent_counter_unavailable',
     'host_agent_socket_missing', 'host_agent_socket_missing_in_mount', 'host_agent_socket_access_denied',
     'profiling', 'profiled_kernels_diagnostic', 'profiler_unavailable', 'profiler_no_gpu_events', 'profiler_failed'))
-GPU_SOURCES = frozenset(('none', 'amd-smi-process', 'drm-fdinfo', 'proxmox-host-drm', 'proxmox-host-amd-smi', 'ace-torch-profiler'))
+GPU_SOURCES = frozenset(('torch-profiler', 'none', 'amd-smi-process', 'drm-fdinfo', 'proxmox-host-drm', 'proxmox-host-amd-smi', 'ace-torch-profiler'))
 
 
 def _number_ns(value):

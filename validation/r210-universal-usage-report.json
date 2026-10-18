@@ -1,0 +1,42 @@
+{
+  "version": "0.3.0-r210",
+  "tests": {
+    "full": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "5",
+      "tests": "3721",
+      "time": "179.524",
+      "timestamp": "2026-10-18T00:38:02.626798+02:00",
+      "hostname": "c24628276454"
+    },
+    "targeted": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "73",
+      "time": "9.529",
+      "timestamp": "2026-10-18T00:38:17.818513+02:00",
+      "hostname": "c24628276454"
+    }
+  },
+  "coverage": {
+    "version": "7.16.2",
+    "timestamp": "1792276858766",
+    "lines-valid": "23733",
+    "lines-covered": "18734",
+    "line-rate": "0.7894",
+    "branches-valid": "8810",
+    "branches-covered": "6000",
+    "branch-rate": "0.681",
+    "complexity": "0"
+  },
+  "ruff": "passed",
+  "javascript_syntax": "passed",
+  "server_hardware_validation": "pending",
+  "excluded_tests": 10,
+  "baseline_retained_files": 1711,
+  "no_git_operations": true
+}

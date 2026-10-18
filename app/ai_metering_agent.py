@@ -79,6 +79,8 @@ def run_metered_process(argv: list[str], *, cwd: str, timeout_seconds: int = 360
     proc = subprocess.Popen(argv, cwd=cwd, stdin=subprocess.DEVNULL,
                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
                             start_new_session=True, env=env)  # noqa: S603 -- operator-controlled executable only
+    from .ai_queue_usage import CpuProgress, process_cpu
+    live_cpu = CpuProgress(env)
     max_io = _io(proc.pid)
     timed_out = False
     cancelled = False
@@ -92,6 +94,7 @@ def run_metered_process(argv: list[str], *, cwd: str, timeout_seconds: int = 360
             # creates other processes, do not pretend the account is complete.
             if _descendants(proc.pid):
                 detected_descendants = True
+            live_cpu.publish(lambda: process_cpu(proc.pid))
             current = _io(proc.pid)
             if current:
                 max_io = tuple(max(a, b) for a, b in zip(max_io, current)) if max_io else current
@@ -231,23 +234,20 @@ def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=
                     report = read_report(directory, job_id)
                     if report:
                         store_report(job_id, report)
-                    if queue_id:
-                        try:
-                            from .storage import _atomic_json_write
-                            raw_progress=json.loads((directory/'progress.json').read_text())
-                            if isinstance(raw_progress,dict):
-                                allowed={'phase','message','progress_percent','progress_source','progress_estimated','steps_completed','steps_total','cpu_seconds_estimated','gpu_seconds_estimated','gpu_metrics_status','gpu_metrics_source'}
-                                _atomic_json_write(queue._ROOT/(queue_id+'.progress.json'),{k:v for k,v in raw_progress.items() if k in allowed})
-                        except (OSError,ValueError):pass
-                    if final:
-                        from .ai_compute_diagnostics import store as store_counters
-                        if kind=='ace-step':
-                            try:
-                                raw=json.loads((directory/'progress.json').read_text())
-                                if isinstance(raw,dict):store_counters(job_id,raw)
-                            except (OSError,ValueError):
-                                pass
-                        if report:store_counters(job_id,report)
+                    from .ai_compute_diagnostics import store as store_live_counters
+                    counters = dict(report or {})
+                    try:
+                        raw_progress = json.loads((directory/'progress.json').read_text())
+                    except (OSError, ValueError):
+                        raw_progress = {}
+                    if isinstance(raw_progress, dict):
+                        counters = {**raw_progress, **counters}
+                    store_live_counters(job_id, counters)
+                    if queue_id and counters:
+                        from .storage import _atomic_json_write
+                        allowed={'phase','message','progress_percent','progress_source','progress_estimated','steps_completed','steps_total','cpu_seconds_estimated','gpu_seconds_estimated','gpu_metrics_status','gpu_metrics_source'}
+                        published={k:v for k,v in counters.items() if k in allowed}
+                        _atomic_json_write(queue._ROOT/(queue_id+'.progress.json'),published)
                 except Exception as exc:
                     import logging
                     logging.getLogger(__name__).warning('GPU diagnostic update failed: %s', type(exc).__name__)
@@ -260,9 +260,9 @@ def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=
                 gpu_slot_acquired = True
             if os.getenv('MTA_AI_CGROUP_PARENT'):
                 from .ai_cgroup_metering import run_cgroup_process
-                result = run_cgroup_process(args, cwd=folder, timeout_seconds=timeout_seconds, cancel_check=worker_cancel_check, env={**os.environ,'MTA_AI_PROGRESS_FILE':str(directory/'progress.json'),'MTA_AI_VERIFIED_REPORT_DIR':str(directory),'MTA_AI_JOB_MAX_ARTIFACT_MIB':str(artifact_limit_mib)})
+                result = run_cgroup_process(args, cwd=folder, timeout_seconds=timeout_seconds, cancel_check=worker_cancel_check, env={**os.environ,'MTA_AI_PROGRESS_FILE':str(directory/'progress.json'),'MTA_AI_SUPERVISOR_CPU_PROGRESS':'0' if kind=='ace-step' else '1','MTA_AI_VERIFIED_REPORT_DIR':str(directory),'MTA_AI_JOB_MAX_ARTIFACT_MIB':str(artifact_limit_mib)})
             else:
-                result = run_metered_process(args, cwd=folder, timeout_seconds=timeout_seconds, cancel_check=worker_cancel_check, env={**os.environ,'MTA_AI_PROGRESS_FILE':str(directory/'progress.json'),'MTA_AI_VERIFIED_REPORT_DIR':str(directory),'MTA_AI_JOB_MAX_ARTIFACT_MIB':str(artifact_limit_mib)})
+                result = run_metered_process(args, cwd=folder, timeout_seconds=timeout_seconds, cancel_check=worker_cancel_check, env={**os.environ,'MTA_AI_PROGRESS_FILE':str(directory/'progress.json'),'MTA_AI_SUPERVISOR_CPU_PROGRESS':'0' if kind=='ace-step' else '1','MTA_AI_VERIFIED_REPORT_DIR':str(directory),'MTA_AI_JOB_MAX_ARTIFACT_MIB':str(artifact_limit_mib)})
             if cancel_check is not None and cancel_check():
                 raise RuntimeError('AI worker cancelled; result discarded')
             diagnostic_checkpoint(final=True)

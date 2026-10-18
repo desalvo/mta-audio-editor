@@ -207,11 +207,17 @@ def _public(con, job):
         row.update(queue_position=None, jobs_ahead=0)
     row['cancel_requested'] = bool(row['cancel_requested'])
     # Arguments can contain private user content; only a trusted worker reads them.
+    if row.get('actor_user_id') is None:
+        try:
+            row['actor_user_id'] = json.loads(row.get('payload_json') or '{}').get('actor_user_id')
+        except (ValueError, AttributeError):
+            pass
     row.pop('payload_json', None)
     row.pop('idempotency_key', None)
     now = time.time()
     row['elapsed_seconds'] = max(0.0, (row['completed_at'] or now) - row['started_at']) if row['started_at'] else 0.0
-    return row
+    from .ai_queue_usage import enrich
+    return enrich(row)
 
 
 def _gpu_metadata(payload):
@@ -249,6 +255,11 @@ def _with_live_progress(row):
                     value[key] = payload[key]
         value.update(_gpu_metadata(payload))
         for field in ('cpu_seconds', 'gpu_seconds', 'cpu_seconds_estimated', 'gpu_seconds_estimated'):
+            # The ledger projection can include earlier stages of this job.
+            # A sidecar describes only the current worker, so must not replace
+            # an already aggregated partial estimate.
+            if field.endswith('_estimated') and value.get('resource_metrics_partial') and value.get(field) is not None:
+                continue
             amount = payload.get(field)
             if isinstance(amount, (int, float)) and not isinstance(amount, bool) and 0 <= amount < float('inf'):
                 value[field] = float(amount)

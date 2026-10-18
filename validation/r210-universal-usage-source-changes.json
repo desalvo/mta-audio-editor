@@ -1,0 +1,47 @@
+{
+  "baseline": "MTA-r210-independent-metronome-musical-delay-cumulative.zip",
+  "revision": "0.3.0-r210",
+  "removed_files": [],
+  "changed_files": [
+    {
+      "path": "app/ace_gpu_process_meter.py",
+      "sha256": "48be281bf714cfe2d8414ed03d759a43e81f7ce2315b8febd6d9172d6c746c04"
+    },
+    {
+      "path": "app/ai_arranger_runtime.py",
+      "sha256": "9b6a7509ba77b550271b984de7d6f177aa5b8a1ae26c499feaf6e15820ba2c08"
+    },
+    {
+      "path": "app/ai_cgroup_metering.py",
+      "sha256": "db715a725a528c2cbb7bc76d60499d8819caedf499bec924948d3143f51caa20"
+    },
+    {
+      "path": "app/ai_metering_agent.py",
+      "sha256": "ca9f09f29d935405e34cbbc39f30084d92c9ac38e3be54245e7b460253ec95ea"
+    },
+    {
+      "path": "app/static/admin.js",
+      "sha256": "78eeaef198fcf60a30e70a21867a871427b8c735b891861b69d6c983e9cc5541"
+    },
+    {
+      "path": "app/static/ai_jobs.js",
+      "sha256": "7dd97b4ea59a30d1548992de120552d896ed31b50d4e07e13c33893d1450030b"
+    },
+    {
+      "path": "app/templates/admin.html",
+      "sha256": "f431675860c88afac1378518499e55498a86486e91c5ded976f7d9cf30810fd3"
+    },
+    {
+      "path": "app/templates/ai_billing.html",
+      "sha256": "56e5064faba4f04fd43d57f0c473f345f0642e0d2d84349621868fe67fcb2a2f"
+    },
+    {
+      "path": "app/templates/ai_tokens.html",
+      "sha256": "7f951c115a58dbb93b10e55b8fbf292dfeddb5a1396c05680a92604abf3920c6"
+    },
+    {
+      "path": "app/templates/index.html",
+      "sha256": "50ae049aa3865ea1c69cfc577996055fb6b7773c7f15495c79c033779837cb45"
+    }
+  ]
+}

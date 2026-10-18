@@ -245,7 +245,10 @@ def run_cgroup_process(argv: list[str], *, cwd: str, timeout_seconds: int = 3600
             gpu_diagnostics_enabled = True
         else:
             gpu_diagnostics_enabled = False
+        from .ai_queue_usage import CpuProgress
+        live_cpu = CpuProgress(env)
         while proc.poll() is None:
+            live_cpu.publish(lambda: _cpu(job_group))
             if (cancel_event is not None and cancel_event.is_set()) or (cancel_check is not None and cancel_check()):
                 try: os.killpg(proc.pid, signal.SIGKILL)
                 except ProcessLookupError: pass
