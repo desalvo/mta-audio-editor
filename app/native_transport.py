@@ -186,10 +186,13 @@ def snapshot():
     finally:_LOCK.release()
 
 
-def live_update(pid):
+def live_update(pid,mixer=None):
     from .storage import load_project
     with _LOCK:
         if pid!=_PROJECT or not hasattr(_DEVICE,'update'):return {'requires_prepare':True}
+        if mixer is not None:
+            from .live_mixer import apply
+            return _DEVICE.update(apply(_DEVICE.project,mixer))
         return _DEVICE.update(load_project(pid))
 
 

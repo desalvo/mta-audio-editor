@@ -1,0 +1,82 @@
+{
+  "version": "0.3.0-r210",
+  "baseline": "MTA-0.3.0-r210-ci-sdk-midi-progress-cumulative.zip",
+  "baseline_sha256": "cb86ddbcc58996f8990e2df7f4c1e295c170a12a1dc81a4042549e781ffed8fb",
+  "baseline_files_preserved": 2173,
+  "targeted_real_chow": {
+    "passed": 57,
+    "skipped": 1,
+    "reason": "Original editor requires a graphical display"
+  },
+  "new_regressions": {
+    "passed": 9,
+    "failed": 0
+  },
+  "legacy_regressions": {
+    "passed": 44,
+    "failed": 0
+  },
+  "browser_cpp": {
+    "engine": "cpp",
+    "tracks": 8,
+    "start_seconds": 0.902,
+    "fader_to_audible_meter_seconds": 0.235,
+    "initial_track_meter_percent": 35.3339,
+    "space_pause_resume": true,
+    "pause_holds_cursor": true,
+    "pause_clears_meters": true,
+    "continuous_gesture_updates": true,
+    "pan_updated": true,
+    "live_mixer_requests": 12,
+    "errors": []
+  },
+  "browser_current_engine": {
+    "active": true,
+    "tracks": 8,
+    "raw": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    "cacheBytes": 84671936,
+    "first_start_seconds": 1.598,
+    "cached_restart_seconds": 0.185,
+    "backend_preview_requests": [],
+    "errors": [],
+    "plugin_editor_preserved": true
+  },
+  "checks": {
+    "ruff": "passed",
+    "bandit_high_severity_high_confidence": "passed",
+    "license_guard": "passed",
+    "pip_check": "passed",
+    "javascript_syntax": "passed",
+    "node_server_adapter": "passed"
+  },
+  "first_full_run": {
+    "failed_legacy_tests_without_ci_test_environment": 12,
+    "obsolete_space_stop_assertion": 1,
+    "resolution": "Repeat with CI MTA_ALLOW_INSECURE_NO_AUTH=true and update assertion to shared Play/Pause; no production authentication code changed"
+  },
+  "final_full_regression": {
+    "passed": 4173,
+    "failed": 0,
+    "skipped": 35,
+    "deselected": 10,
+    "seconds": 487.349,
+    "test_environment": "MTA_ALLOW_INSECURE_NO_AUTH=true, as CI; authenticated server/browser tests explicitly use secure mode"
+  },
+  "limitations": [
+    "Production Rocky/HAProxy and physical Windows/macOS audio device acceptance remains open",
+    "Ten host-agent Unix-socket tests excluded as in baseline; no CI tests disabled",
+    "External CHOW test binary verified from pinned CI fixture and kept outside the project; no plugin binaries shipped",
+    "Indeterminate build activity reflects real phases, not fabricated percentages"
+  ],
+  "git_actions": [],
+  "production_changes": false
+}

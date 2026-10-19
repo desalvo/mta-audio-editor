@@ -1,6 +1,19 @@
 # MTA Audio Editor — Development status
 
-Versione obbligatoria: **0.3.0-r210**. Ultimo ciclo: regressioni CI SDK e browser MIDI, 19 ottobre 2026.
+Versione obbligatoria: **0.3.0-r210**. Ultimo ciclo completato: avanzamento VST3 e controlli live C++, 19 ottobre 2026.
+
+## Ciclo completato — installazione VST3 e trasporto C++
+
+- Baseline: `MTA-0.3.0-r210-ci-sdk-midi-progress-cumulative.zip`; tutti gli sviluppi precedenti vengono conservati.
+- Richieste: barra per plugin/stato installazione; VU meter C++, controlli mixer tempestivi e pausa con Spazio.
+- Cause individuate: shortcut legata ai vecchi stati; assenza di livelli nel flusso browser; coda PCM fino a oltre un secondo e salvataggio prima di ogni modifica live; pan privo di aggiornamento live.
+- Implementati stato/barra per plugin con esiti persistenti; metering DSP stereo e aggiornamenti mixer live senza salvataggio; coda PCM breve e adattiva; shortcut Play/Pausa condivisa.
+- Verificati 57 test mirati con CHOW Tape reale (1 escluso senza display), nove nuove regressioni e 44 regressioni legacy. Probe ASGI/Chromium/C++ a otto tracce: volume udibile dopo circa 235 ms; motore corrente e cache verificati. Regressione finale: **4,173 passati, 35 saltati, 10 esclusi per socket/agente non disponibili**, zero fallimenti (487s), con configurazione CI. Nessuna certificazione hardware o produzione implicita.
+
+- Prima regressione locale: 12 test legacy richiedevano la variabile CI `MTA_ALLOW_INSECURE_NO_AUTH=true`; aggiornate inoltre due vecchie asserzioni che pretendevano Spazio=Stop. Tutti nuovamente passati; nessun controllo di autenticazione del prodotto rimosso. I nuovi probe server/browser usano autenticazione reale, con modalità insicura esplicitamente disabilitata.
+- Ruff, Bandit alle soglie CI, license guard, pip check, sintassi JS e adapter Node passati. Report in `validation/r210-live-mixer-*`; dettagli IT/EN in `docs/VST3_PROGRESS_CPP_LIVE_CONTROLS_R210.md`.
+- Consegna cumulativa `MTA-0.3.0-r210-vst3-progress-cpp-live-controls-cumulative.zip`, intero progetto; tutti i 2.173 file della baseline preservati, con verifiche CRC, byte per byte, permessi e SHA-256 durante packaging. Restano le prove sul server reale/HAProxy e sui dispositivi fisici Windows/macOS.
+- Versione **0.3.0-r210** invariata. Nessun commit/push/tag/release o modifica a produzione.
 
 ## Ciclo completato — regressioni CI SDK e browser MIDI (19 ottobre 2026)
 

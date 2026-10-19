@@ -94,3 +94,7 @@ registro. Anche un solo testo alterato invalida l'integrità del catalogo.
 Prove effettive di questo ciclo: compilazione Linux MVerb e dei quattro Dragonfly da sorgente, caricamento
 VST3 ed elaborazione stereo. Le build complete CHOW/Surge e le
 build native Windows/macOS restano da verificare sui relativi sistemi.
+
+## Stato e avanzamento per plugin (r210)
+
+Durante l'installazione ciascuna scheda mostra il proprio stato e il plugin attivo presenta una barra di attività con fase di download/compilazione/installazione. La barra scompare appena termina quel plugin; gli esiti compaiono subito, senza attendere l'intero lotto. Le percentuali complessive non vengono inventate: la barra rimane indeterminata quando i tool non espongono un totale affidabile. Errori finali e installazioni riuscite rimangono identificabili riaprendo il catalogo; il monitoraggio di un job ancora attivo riprende nello stesso processo server. Dettagli e verifiche in `VST3_PROGRESS_CPP_LIVE_CONTROLS_R210.md`.

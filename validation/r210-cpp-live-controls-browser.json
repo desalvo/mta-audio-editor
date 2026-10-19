@@ -1,0 +1,14 @@
+{
+  "engine": "cpp",
+  "tracks": 8,
+  "start_seconds": 0.902,
+  "fader_to_audible_meter_seconds": 0.235,
+  "initial_track_meter_percent": 35.3339,
+  "space_pause_resume": true,
+  "pause_holds_cursor": true,
+  "pause_clears_meters": true,
+  "continuous_gesture_updates": true,
+  "pan_updated": true,
+  "live_mixer_requests": 12,
+  "errors": []
+}

@@ -29,5 +29,15 @@ function showProgress(owner,title,pct,message,detail=''){
  progressOwner=owner;const [heading,bar,phase,info]=progressView.children;heading.textContent=title;phase.textContent=message||'';info.textContent=detail;
  if(Number.isFinite(pct)&&pct>=0)bar.value=Math.min(100,pct);else bar.removeAttribute('value');
 }
-root.MtaPlaybackPrep={mapLimit,clipPlan,BufferCache,showProgress,hideProgress};
+function mixerControls(project){return {master_volume_db:project.master_volume_db||0,tracks:project.tracks.map(t=>({id:t.id,gain_db:t.gain_db||0,volume_db:t.volume_db||0,pan:t.pan||0,mute:!!t.mute,solo:!!t.solo}))}}
+function paintMeters(project,meters,silent=false){
+ const level=v=>Math.max(0,Math.min(100,(20*Math.log10(Math.max(1e-9,Number(v)||0))+60)/60*100));
+ function route(id,values){
+  values=silent?[0,0,0,0]:(values||[0,0,0,0]);
+  for(const [channel,value] of [['L',values[0]],['R',values[1]],['M',Math.max(values[0],values[1])]]){const el=root.document.getElementById('vu-'+id+'-'+channel);if(el)el.style.height=level(value)+'%'}
+  if(!silent&&Math.max(values[2],values[3])>=1)root.document.getElementById('peak-'+id)?.classList.add('active');
+ }
+ route('master',meters?.master);project?.tracks?.forEach((t,i)=>route(t.id,meters?.tracks?.[i]));
+}
+root.MtaPlaybackPrep={mixerControls,paintMeters,mapLimit,clipPlan,BufferCache,showProgress,hideProgress};
 })(typeof window==='undefined'?globalThis:window);

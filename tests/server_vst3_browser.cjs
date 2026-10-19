@@ -5,7 +5,7 @@ let fallbacks=0,persisted=0,position=0,sequence=0,engine='cpp',corrupt=false,del
 const calls=[],nodes=[],messages=[];
 const names=['previewMaster','stopPlayback','pausePlayback','resumePlayback','togglePlayback','playbackActuallyRunning','goToTimestamp','seekTransport','goTransportStart','timingAudioChanged','updatePlaybackGains','queueLiveFxRefresh'];
 const window=Object.fromEntries(names.map(n=>[n,()=>{if(n==='previewMaster')fallbacks++}]));
-window.addEventListener=()=>{};
+window.addEventListener=()=>{};window.setTrackPan=(id,pan)=>{context.current.tracks[0].pan=pan};
 class AudioContext{
  constructor(){this.currentTime=0;this.destination={}}
  async resume(){this.unlocked=true}
@@ -15,7 +15,7 @@ class AudioContext{
 window.AudioContext=AudioContext;
 const button={classList:{add(){}}};const context={window,console,setTimeout,clearTimeout,setInterval,clearInterval,performance,Promise,crypto:{randomUUID:()=> 'browser-client-0000001'},
  currentUser:{native_single_user:false},current:{id:'project',tracks:[{inserts:[{plugin:'vst3',enabled:true}]}],master_inserts:[]},audioCtx:null,playCursorMs:0,playbackPaused:false,timelineAudioDirty:false,projectDirty:true,
- tr:(en,it)=>en,toast:s=>messages.push(s),collect(){},async persistCurrentProject(){persisted++},$:selector=>{if(selector==='#utilityBackdrop')throw Error('Audio transport must preserve open editors');return button},tempoRatio:()=>1,setPlayCursor(){},updateTimedPlaybackOverlay(){},setRenderPlaybackPreparing(){},MtaPlaybackPrep:{showProgress(){},hideProgress(){}},requestAnimationFrame:()=>1,cancelAnimationFrame(){},
+ tr:(en,it)=>en,toast:s=>messages.push(s),collect(){},async persistCurrentProject(){persisted++},$:selector=>{if(selector==='#utilityBackdrop')throw Error('Audio transport must preserve open editors');return button},tempoRatio:()=>1,setPlayCursor(){},updateTimedPlaybackOverlay(){},setRenderPlaybackPreparing(){},MtaPlaybackPrep:{showProgress(){},hideProgress(){},paintMeters(){},mixerControls:project=>({master_volume_db:project.master_volume_db||0,tracks:project.tracks.map(t=>({id:t.id,pan:t.pan||0,volume_db:t.volume_db||0,gain_db:t.gain_db||0,mute:!!t.mute,solo:!!t.solo}))})},requestAnimationFrame:()=>1,cancelAnimationFrame(){},
  api:async url=>{if(url==='/api/vst3/plugins'){assert(context.audioCtx?.unlocked,'Unlock WebAudio before awaiting server requests');return{engine,live_available:true,failed:false}}return{state:preparation?'preparing':'ready',failed:false}},
  fetch:async(url,options={})=>{
   const body=options.body?JSON.parse(options.body):{};calls.push([url,body,options.method]);
@@ -34,15 +34,17 @@ vm.createContext(context);vm.runInContext(fs.readFileSync('app/static/server_vst
 (async()=>{
  await window.previewMaster();await wait(30);
  assert.equal(fallbacks,0);assert.equal(nodes.length,1);assert.equal(nodes[0].buffer.data[0][1],.125);assert(window.playbackActuallyRunning());
- context.audioCtx.currentTime=nodes[0].at+.1;
+ context.audioCtx.currentTime=nodes[0].at+.04;
  await window.pausePlayback();
  assert(!window.playbackActuallyRunning());
- assert(Math.abs(calls.filter(c=>c[1].action==='seek').at(-1)[1].cursor_ms-100)<1e-8);
+ assert(Math.abs(calls.filter(c=>c[1].action==='seek').at(-1)[1].cursor_ms-40)<1e-8);
  const pullsBefore=calls.filter(c=>c[0].endsWith('/pcm')).length;await wait(40);
  assert.equal(calls.filter(c=>c[0].endsWith('/pcm')).length,pullsBefore);
  await window.resumePlayback();await wait(25);assert(window.playbackActuallyRunning());
  window.updatePlaybackGains();await wait(110);
- assert(calls.some(c=>c[1].action==='update'));assert(persisted>=2);
+ assert(calls.some(c=>c[1].action==='mixer'));assert.equal(persisted,1,'Faders must not wait for a project save');
+ window.setTrackPan('track',.5);await wait(70);assert.equal(calls.filter(c=>c[1].action==='mixer').at(-1)[1].mixer.tracks[0].pan,.5);
+ window.queueLiveFxRefresh();await wait(100);assert(calls.some(c=>c[1].action==='update'));assert(persisted>=2);
  // Pause while a pull is in flight: reset must wait for it before seeking.
  let release;delayRead=new Promise(r=>release=r);context.audioCtx.currentTime+=1;
  await wait(35);const paused=window.pausePlayback();await wait(10);

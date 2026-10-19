@@ -178,7 +178,7 @@ def run(config):
                 pcm=graph.read()
                 if len(pcm):device.push(pcm)
         if not cfg.get('paused'):device.control('play')
-        def snapshot():return {**device.status(),'active':True,'live_vst3':True,'buffered_frames':device.buffered(),'plugin_count':len(graph.plugins),'midi_error':midi_output.error if midi_output else '','host_sync':all(hasattr(n.plugin,'_mta_set_transport') for n in graph.plugins.values())}
+        def snapshot():return {**device.status(),'active':True,'live_vst3':True,'buffered_frames':device.buffered(),'meters':graph.meters,'plugin_count':len(graph.plugins),'midi_error':midi_output.error if midi_output else '','host_sync':all(hasattr(n.plugin,'_mta_set_transport') for n in graph.plugins.values())}
         atomic(root/'status.json',snapshot());atomic(root/'ready.json',{'ok':True})
         def rebuild(new,position):
             wanted={(route,i.id):i.params.get('path') for route,items in [(t.id,t.inserts) for t in new.tracks]+[('master',new.master_inserts)] for i in items if i.enabled and i.plugin=='vst3'}

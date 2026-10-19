@@ -37,7 +37,8 @@ def test_fast_playback_and_spacebar_regressions():
     assert "canDirectPlayTrack" in js
     assert "/audio/${encodeURIComponent(track.filename)}" in js
     assert "e.key==='Spacebar'" in js
-    assert "playbackBuffering)stopPlayback()" in js
+    assert "if(playbackBuffering)window.stopPlayback()" in js
+    assert "else void window.togglePlayback()" in js
     assert "renderedMasterRefreshQueued" in js
 
 

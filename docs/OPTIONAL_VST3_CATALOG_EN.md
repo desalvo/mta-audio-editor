@@ -79,3 +79,7 @@ overview and machine-readable catalog.
 Actual validation this cycle: Linux MVerb and four Dragonfly source builds, VST3 loading and stereo
 processing. Full CHOW/Surge builds and Windows/macOS native builds
 still require validation on their respective systems.
+
+## Per-plugin installation activity (r210)
+
+Each card exposes its installation state. Only the plugin currently being built displays a progress bar, with actual download/build/install activity. Its bar disappears immediately on completion or failure, even while the rest of the batch is running. Progress remains indeterminate when build tools do not expose a reliable total. Final outcomes survive reopening the catalog; monitoring of an active job resumes in the same server process. See `VST3_PROGRESS_CPP_LIVE_CONTROLS_R210.md` for implementation and validation details.

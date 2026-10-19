@@ -21,6 +21,7 @@ function cursor(s){
 function display(s){
  if(live!==s)return;
  if(!s.paused){s.cursor=cursor(s);playCursorMs=s.cursor*tempoRatio();setPlayCursor(playCursorMs);updateTimedPlaybackOverlay(playCursorMs)}
+ if(current?.realtime_meter_enabled){const audible=s.sources.find(item=>audioCtx.currentTime>=item.at&&audioCtx.currentTime<item.at+item.frames/s.rate);MtaPlaybackPrep.paintMeters(current,audible?.meters,s.paused||!audible)}
  if(s.done&&audioCtx.currentTime>=s.nextAt&&!s.paused){window.stopPlayback();return}
  s.raf=requestAnimationFrame(()=>display(s));
 }
@@ -32,10 +33,16 @@ async function pump(s,token){
  if(s.pumping)return;s.pumping=true;
  try{
   while(live===s&&!s.paused&&!s.done&&token===s.generation){
-   if(s.nextAt-audioCtx.currentTime>.7){await new Promise(r=>setTimeout(r,20));continue}
-   const response=await fetch(url(s)+'/pcm',{method:'POST',headers:{'Content-Type':'application/json','X-MTA-Request':'1'},body:JSON.stringify({sequence:s.sequence,frames:32768}),cache:'no-store'});
+   if(s.nextAt-audioCtx.currentTime>(s.lookahead||.12)){await new Promise(r=>setTimeout(r,20));continue}
+   const requestedAt=performance.now();
+   const response=await fetch(url(s)+'/pcm',{method:'POST',headers:{'Content-Type':'application/json','X-MTA-Request':'1'},body:JSON.stringify({sequence:s.sequence,frames:s.chunkFrames||4096}),cache:'no-store'});
    if(!response.ok){let message;try{message=(await response.json()).detail}catch{message=response.statusText}throw Error(message||'VST3 stream failed')}
-   const bytes=await response.arrayBuffer();if(live!==s||s.paused||token!==s.generation)return;
+   const bytes=await response.arrayBuffer();
+   // Keep a small queue on a fast LAN, but allow longer chunks on slow links
+   // so HTTP round trips do not cause a gap for every audio block.
+   const elapsed=(performance.now()-requestedAt)/1000;s.roundTrip=s.roundTrip===undefined?elapsed:s.roundTrip*.8+elapsed*.2;
+   s.lookahead=Math.max(.12,Math.min(.5,s.roundTrip*2));s.chunkFrames=Math.max(4096,Math.min(16384,2**Math.ceil(Math.log2(Math.max(1,s.roundTrip*s.rate*2)))));
+   if(live!==s||s.paused||token!==s.generation)return;
    const count=Number(response.headers.get('X-MTA-Frames')),rate=Number(response.headers.get('X-MTA-Rate')),frame=Number(response.headers.get('X-MTA-Start-Frame'));
    const sequence=Number(response.headers.get('X-MTA-Sequence'));
    if(!Number.isInteger(count)||count<0||count>32768||bytes.byteLength!==count*8||rate!==s.rate||sequence!==s.sequence+1||frame!==s.expectedFrame)throw Error(tr('Invalid server audio stream','Flusso audio del server non valido'));
@@ -45,7 +52,7 @@ async function pump(s,token){
    for(let ch=0;ch<2;ch++){const channel=buffer.getChannelData(ch);for(let i=0;i<count;i++){const value=values.getFloat32((i*2+ch)*4,true);if(!Number.isFinite(value))throw Error('Non-finite VST3 audio');channel[i]=value}}
    const node=audioCtx.createBufferSource();node.buffer=buffer;node.connect(audioCtx.destination);
    const late=s.nextAt<audioCtx.currentTime;
-   const at=Math.max(s.nextAt,audioCtx.currentTime+.08),item={node,at,frame,frames:count};s.nextAt=at+count/rate;s.sources.push(item);
+   const at=Math.max(s.nextAt,audioCtx.currentTime+.025),item={node,at,frame,frames:count,meters:JSON.parse(response.headers.get('X-MTA-Meters')||'{}')};s.nextAt=at+count/rate;s.sources.push(item);
    node.onended=()=>{s.cursor=Math.max(s.cursor,(frame+count)*1000/rate);s.sources=s.sources.filter(x=>x!==item);node.disconnect()};node.start(at);
    if(late&&!s.warned){s.warned=true;toast(tr('Server VST3: buffering on this connection. Playback may pause while waiting for audio.','VST3 server: buffering su questa connessione. La riproduzione può fermarsi in attesa dell’audio.'))}
   }
@@ -77,7 +84,7 @@ window.previewMaster=async function(){
    const p=result.preparation||{};MtaPlaybackPrep.showProgress(preparation,tr('Preparing audio','Preparazione audio'),-1,(p.stage==='sources'?tr('Checking sources / converting incompatible formats','Verifica sorgenti / conversione formati incompatibili'):tr('Starting live DSP and inserts','Avvio DSP live e insert'))+(p.track?' · '+p.track:''),p.total?`${p.done}/${p.total}`:'');
   }
   if(result.failed)throw Error(result.error||tr('Server VST3 preparation failed','Preparazione VST3 server fallita'));
-  const s={id:result.session_id,pid,rate:result.rate,expectedFrame:result.position,sequence:0,cursor:result.position_ms,paused:false,cancelled:false,generation:0,sources:[],nextAt:audioCtx.currentTime+.2,done:false,controls:Promise.resolve(),pumpTask:null};
+  const s={id:result.session_id,pid,rate:result.rate,expectedFrame:result.position,sequence:0,cursor:result.position_ms,paused:false,cancelled:false,generation:0,sources:[],nextAt:audioCtx.currentTime+.06,done:false,controls:Promise.resolve(),pumpTask:null};
   if(token!==epoch||current?.id!==pid)return;
   live=s;pending=null;playbackPaused=false;timelineAudioDirty=false;if($('#playMaster'))$('#playMaster').textContent='❚❚';
   s.heartbeat=setInterval(async()=>{try{const status=await api(url(s));if(live===s&&status.failed)throw Error(status.error||'VST3 worker failed')}catch(e){if(live===s){window.stopPlayback();toast(e.message)}}},3000);
@@ -86,7 +93,7 @@ window.previewMaster=async function(){
  finally{if(pending)discard(pending);preparing=false;setRenderPlaybackPreparing(false);MtaPlaybackPrep.hideProgress(preparation)}
 };
 window.stopPlayback=function(){
- ++epoch;clearTimeout(refreshTimer);const s=live;live=null;
+ ++epoch;clearTimeout(refreshTimer);refreshTimer=null;pendingFx=false;const s=live;live=null;
  if(s){playCursorMs=cursor(s)*tempoRatio();discard(s)}
  return old.stopPlayback();
 };
@@ -99,7 +106,7 @@ async function seek(s,position,resume){
  const job=s.controls.catch(()=>{}).then(()=>jsonRequest(url(s)+'/control',{action:'seek',cursor_ms:position,playing:!!resume}));s.controls=job;
  const r=await job;
  if(live!==s||generation!==s.generation)return;
- s.sequence=0;s.expectedFrame=r.status.position;s.cursor=r.status.position_ms;s.done=r.status.ended;s.nextAt=audioCtx.currentTime+.2;s.paused=!resume;playbackPaused=!resume;
+ s.sequence=0;s.expectedFrame=r.status.position;s.cursor=r.status.position_ms;s.done=r.status.ended;s.nextAt=audioCtx.currentTime+.06;s.paused=!resume;playbackPaused=!resume;
  if($('#playMaster'))$('#playMaster').textContent=resume?'❚❚':'▶';
  if(resume){await audioCtx.resume();launchPump(s)}
 }
@@ -110,13 +117,18 @@ window.playbackActuallyRunning=()=>live?!live.paused:old.playbackActuallyRunning
 window.goToTimestamp=function(ms){if(!live)return old.goToTimestamp(ms);const s=live;setPlayCursor(ms);void seek(s,Math.max(0,ms)/tempoRatio(),!s.paused).catch(e=>{window.stopPlayback();toast(e.message)})};
 window.seekTransport=delta=>live?window.goToTimestamp(Math.max(0,playCursorMs+delta)):old.seekTransport(delta);
 window.goTransportStart=()=>live?window.goToTimestamp(0):old.goTransportStart();
-let updating=false,again=false;
+let updating=false,again=false,pendingFx=false;
 async function updateLive(){
  if(!live)return;if(updating){again=true;return}updating=true;const s=live;
- try{collect();await persistCurrentProject(false);if(live!==s)return;const r=await jsonRequest(url(s)+'/control',{action:'update'});if(live!==s)return;if(r.requires_prepare){const paused=s.paused;await window.previewMaster();if(paused&&live)await window.pausePlayback()}else timelineAudioDirty=false}
+ try{const fx=pendingFx;pendingFx=false;let body;
+  if(fx){collect();await persistCurrentProject(false);body={action:'update'}}
+  else body={action:'mixer',mixer:MtaPlaybackPrep.mixerControls(current)};
+  if(live!==s)return;const r=await jsonRequest(url(s)+'/control',body);if(live!==s)return;if(r.requires_prepare){const paused=s.paused;await window.previewMaster();if(paused&&live)await window.pausePlayback()}else timelineAudioDirty=false}
  catch(e){if(live===s){window.stopPlayback();toast(e.message)}}finally{updating=false;if(again){again=false;void updateLive()}}
 }
-for(const name of ['updatePlaybackGains','queueLiveFxRefresh'])window[name]=function(...args){if(!live)return old[name](...args);clearTimeout(refreshTimer);refreshTimer=setTimeout(updateLive,80)};
+function scheduleMixer(){if(!refreshTimer)refreshTimer=setTimeout(()=>{refreshTimer=null;void updateLive()},40)}
+for(const name of ['updatePlaybackGains','queueLiveFxRefresh'])window[name]=function(...args){if(!live)return old[name](...args);if(name==='queueLiveFxRefresh')pendingFx=true;scheduleMixer()};
+const oldPan=window.setTrackPan;window.setTrackPan=function(...args){const result=oldPan(...args);if(live)scheduleMixer();return result};
 window.timingAudioChanged=function(...args){if(!live)return old.timingAudioChanged(...args);timelineAudioDirty=true;clearTimeout(refreshTimer);if(!live.paused)refreshTimer=setTimeout(()=>window.previewMaster(),100)};
 window.mtaServerVst3={session:()=>live?{pid:live.pid,id:live.id}:null};
 window.addEventListener('beforeunload',()=>{if(live)discard(live)});

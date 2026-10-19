@@ -137,7 +137,7 @@ class Graph:
     def __init__(self,project,paths,start_frame=0,*,tail_seconds=2,reuse=None,raw_sources=()):
         from .audio_engine import project_duration_ms,project_time_pitch_filter
         if not 1<=len(project.tracks)<=64:raise ValueError('Live mixing supports 1–64 tracks')
-        self.reuse=reuse or {};self.project=project;self.rate=int(project.sample_rate);self.core=runtime();self.readers=[];self.plugins={};self.offset=0;self.raw_sources=set(raw_sources)
+        self.reuse=reuse or {};self.project=project;self.rate=int(project.sample_rate);self.core=runtime();self.readers=[];self.plugins={};self.offset=0;self.meters={};self._meter_tracks={};self.raw_sources=set(raw_sources)
         from .vst3_transport import HostClock
         self.host=HostClock(project,self.rate)
         self.input_total=round(project_duration_ms(project)*self.rate/1000)
@@ -237,6 +237,11 @@ class Graph:
                 data=pull.read(n) if bool(t.master_bypass)==bypass_mode else np.zeros((n,2),dtype=np.float32)
                 if data.shape[1]==1:data=np.ascontiguousarray(np.repeat(data,2,axis=1)*np.float32(2**-.5))
                 arrays.append(data);enabled=not (t.mute or (solo and not t.solo));normal.append(enabled and not t.master_bypass);bypass.append(enabled and t.master_bypass)
+                if bool(t.master_bypass)==bypass_mode:
+                    gains=np.array([1-max(0,t.pan),1+min(0,t.pan)])*(10**(t.volume_db/20) if enabled else 0)
+                    measured=data*gains
+                    energy,peak,count=self._meter_tracks.get(t.id,(np.zeros(2),np.zeros(2),0))
+                    self._meter_tracks[t.id]=(energy+np.sum(measured*measured,axis=0),np.maximum(peak,np.max(np.abs(measured),axis=0)),count+n)
             out=self.core.mix(arrays,[10**(t.volume_db/20) for t in self.project.tracks],[t.pan for t in self.project.tracks],bypass if bypass_mode else normal)
             # Master fader/envelope belong after master inserts. Applied in read()
             # to the compensated project clock, after all inserted processing.
@@ -256,7 +261,16 @@ class Graph:
     def read(self,n=BLOCK):
         n=min(n,max(0,self.total-self.position))
         if not n:return np.empty((0,2),dtype=np.float32)
-        out=self.output.read(n);self.position+=n;return out
+        self._meter_tracks={}
+        out=self.output.read(n);self.position+=n
+        def values(energy,peak,count):return [*np.sqrt(energy/max(1,count)).tolist(),*peak.tolist()]
+        tracks=[]
+        for track in self.project.tracks:
+            stats=self._meter_tracks.get(track.id)
+            tracks.append(values(*stats) if stats else [0.,0.,0.,0.])
+        self.meters={'tracks':tracks,'master':values(np.sum(out.astype(np.float64)**2,axis=0),np.max(np.abs(out),axis=0),n)}
+        self.meters={key:[[round(min(16.,v),6) for v in row] for row in val] if key=='tracks' else [round(min(16.,v),6) for v in val] for key,val in self.meters.items()}
+        return out
 
     def update(self,project):
         from .vst3_transport import settings

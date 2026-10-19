@@ -32,7 +32,7 @@ def test_ui_regressions_for_import_split_tracks_and_transport():
     assert "function resumePlayback()" in js
     assert "e.code==='Space'" in js
     assert "e.key==='Spacebar'" in js
-    assert "stopPlayback();else previewMaster()" in js
+    assert "else void window.togglePlayback()" in js
     assert 'class="nav-item import-action"' in html
     assert ".nav-item.import-action span" in css
 

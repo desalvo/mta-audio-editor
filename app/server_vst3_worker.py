@@ -51,7 +51,7 @@ def run(config, root):
         def snapshot():
             return {'active':True,'position_ms':graph.position*1000/graph.rate,'position':graph.position,
                     'rate':graph.rate,'total':graph.total,'physical':False,'playing':False,
-                    'ended':graph.position>=graph.total,'failed':False,'plugin_count':len(graph.plugins),
+                    'ended':graph.position>=graph.total,'failed':False,'meters':graph.meters,'plugin_count':len(graph.plugins),
                     'server_live_vst3':True,'host_bpm':graph.host.context(round(graph.position*graph.ratio))[0],'original_editor_available':desktop is not None,'sequence':sequence,'host_playing':graph.host.context(round(graph.position*graph.ratio))[5]}
         atomic(root/'status.json',snapshot());atomic(root/'ready.json',{'ok':True})
         def work():
@@ -71,7 +71,7 @@ def run(config, root):
                                 if not np.isfinite(pcm).all():raise RuntimeError('VST3 produced non-finite samples')
                                 target=root/('pcm-'+token+'.bin');target.write_bytes(pcm.astype('<f4',copy=False).tobytes())
                                 sequence+=1
-                                result={'chunk':target.name,'frames':len(pcm),'rate':graph.rate,'channels':2,'start_frame':start,'sequence':sequence,'ended':graph.position>=graph.total}
+                                result={'chunk':target.name,'frames':len(pcm),'rate':graph.rate,'channels':2,'start_frame':start,'sequence':sequence,'ended':graph.position>=graph.total,'meters':graph.meters}
                             elif action=='editor':
                                 if desktop is None:raise ValueError(display_error)
                                 if editor_active.is_set():raise ValueError('Close the current original plugin editor first')

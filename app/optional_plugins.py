@@ -3,6 +3,7 @@
 Catalog entries are code-reviewed, never provided by an HTTP caller. Source and
 transitive notices remain alongside the build for local use/repackaging review.
 """
+import copy
 import datetime as dt
 import hashlib
 import json
@@ -38,8 +39,14 @@ def catalog():
         license_path=LICENSES/p['license_file']
         if not license_path.resolve().is_relative_to(LICENSES.resolve()) or hashlib.sha256(license_path.read_bytes()).hexdigest()!=p['license_sha256']:raise ValueError('Plugin catalog license integrity error')
         p['installed']=(plugin_root()/p['id']/p['revision']/'installation.json').is_file()
+        state_file=auth.data_root()/'optional-plugin-builds'/p['id']/p['revision']/'status.json'
+        try:previous=json.loads(state_file.read_text())
+        except (OSError,ValueError):previous={}
+        p['state']='installed' if p['installed'] else ('failed' if previous.get('error') else 'not_installed')
+        p['error']=previous.get('error','')
         p['supported']=sys.platform in p['platforms']
         p['available']=bool(p['enabled'] and p['supported'] and not data['review_due'])
+    data['active_job']=next((j['id'] for j in list(_JOBS.values()) if j['state']=='running'),None)
     data['plugins'].sort(key=lambda p:(p['category'],p['name']))
     return data
 
@@ -115,13 +122,17 @@ def install_one(spec,notify=lambda *_:None):
     return {'id':spec['id'],'revision':spec['revision'],'bundles':sorted(bundles)}
 
 
-def install(ids,notify=lambda *_:None):
+def install(ids,notify=lambda *_:None,on_result=lambda *_:None):
     selected=select(ids)
     results=[]
-    for n,spec in enumerate(selected):
-        notify('plugin',f'{n+1}/{len(selected)} · {spec["name"]}')
-        try:results.append(install_one(spec,notify))
-        except (OSError,ValueError,RuntimeError,subprocess.SubprocessError,TimeoutError) as exc:results.append({'id':spec['id'],'error':str(exc)[:500]})
+    for spec in selected:
+        notify('plugin',spec['id'])
+        try:result=install_one(spec,notify)
+        except (OSError,ValueError,RuntimeError,subprocess.SubprocessError,TimeoutError) as exc:result={'id':spec['id'],'error':str(exc)[:500]}
+        results.append(result)
+        work=auth.data_root()/'optional-plugin-builds'/spec['id']/spec['revision'];work.mkdir(parents=True,exist_ok=True)
+        temporary=work/'status.tmp';temporary.write_text(json.dumps(result));os.replace(temporary,work/'status.json')
+        on_result(result)
     return results
 
 
@@ -129,21 +140,31 @@ def start(ids):
     select(ids)
     if not _LOCK.acquire(blocking=False):raise ValueError('A plugin installation is already running')
     identifier=uuid.uuid4().hex
-    job={'id':identifier,'state':'running','stage':'starting','message':'','started_at':time.time(),'results':[]};_JOBS[identifier]=job
+    job={'id':identifier,'state':'running','stage':'starting','message':'','started_at':time.time(),'results':[],'current_plugin':None,'plugins':{p:{'state':'queued','stage':'starting','message':''} for p in ids}};_JOBS[identifier]=job
     def execute():
         try:
-            def update(stage,message):job.update(stage=stage,message=message)
-            job['results']=install(ids,update)
+            def update(stage,message):
+                if stage=='plugin':job['current_plugin']=message
+                job.update(stage=stage,message=message)
+                current=job['current_plugin']
+                if current:job['plugins'][current].update(state='installing',stage=stage,message=message)
+            def complete(result):
+                job['plugins'][result['id']].update(state='failed' if 'error' in result else 'installed',error=result.get('error',''))
+                job['results'].append(result)
+            install(ids,update,complete)
             job['state']='completed_with_errors' if any('error' in x for x in job['results']) else 'completed'
-        except Exception as exc:job.update(state='failed',message=type(exc).__name__)
+        except Exception as exc:
+            job.update(state='failed',message=type(exc).__name__)
+            for state in job['plugins'].values():
+                if state['state'] in ('queued','installing'):state.update(state='failed',error=type(exc).__name__)
         finally:job['finished_at']=time.time();_LOCK.release()
     threading.Thread(target=execute,daemon=True,name='mta-optional-vst3').start()
-    return dict(job)
+    return copy.deepcopy(job)
 
 
 def status(identifier):
     if identifier not in _JOBS:raise ValueError('Plugin installation not found (server may have restarted)')
-    return dict(_JOBS[identifier])
+    return copy.deepcopy(_JOBS[identifier])
 
 
 if __name__=='__main__':

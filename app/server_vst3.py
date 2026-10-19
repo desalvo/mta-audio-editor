@@ -5,6 +5,7 @@ and dry preparation run in a disposable worker process group, never ASGI.
 """
 import atexit
 from dataclasses import dataclass,field
+import json
 import math
 import os
 import re
@@ -165,7 +166,8 @@ def register_routes(app,project_for_actor,actor):
             return Response(data,media_type='application/octet-stream',headers={
                 'Cache-Control':'no-store','X-MTA-Frames':str(result['frames']),'X-MTA-Rate':str(result['rate']),
                 'X-MTA-Start-Frame':str(result['start_frame']),'X-MTA-Sequence':str(result['sequence']),
-                'X-MTA-Ended':'1' if result['ended'] else '0'})
+                'X-MTA-Ended':'1' if result['ended'] else '0',
+                'X-MTA-Meters':json.dumps(result.get('meters',{}),separators=(',',':'))})
         except (ValueError,RuntimeError,OSError) as exc:
             # A lost/invalid chunk cannot be retried as if it had never advanced DSP.
             sessions.close(token);raise HTTPException(409,str(exc)) from exc
@@ -174,6 +176,13 @@ def register_routes(app,project_for_actor,actor):
     def control(pid:str,token:str,body:dict,request:Request):
         entry,project=entry_for(request,pid,token)
         try:
+            if body.get('action')=='mixer':
+                from .live_mixer import apply
+                # Ownership is checked above. Only bounded faders/pan/mute/solo
+                # can be changed without saving; sources/inserts stay trusted.
+                try:updated=apply(entry.session.project,body.get('mixer'))
+                except ValueError as exc:raise HTTPException(422,str(exc)) from exc
+                return entry.session.update(updated)
             if body.get('action')=='update':return entry.session.update(project)
             if body.get('action') in ('play','pause'):return entry.session.request(body['action'])
             if body.get('action')=='seek':

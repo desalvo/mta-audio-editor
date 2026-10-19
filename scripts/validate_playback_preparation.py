@@ -27,6 +27,9 @@ def serve(port):
     for i in range(8):
         name=f'track-{i}.wav';sf.write(audio/name,np.column_stack((samples,samples)),48000,subtype='PCM_16')
         project.tracks.append(Track(id=f'track{i}',name=f'Track {i+1}',filename=name,channels=2,sample_rate=48000,duration_ms=30000,delay_ms=500,clips=[Clip(id=f'clip{i}',source_start_ms=1000,source_end_ms=29000,timeline_start_ms=1000)]))
+    if os.getenv('MTA_PLAYBACK_PROBE_CPP')=='1':
+        from app import audio_backend
+        audio_backend.select('cpp');project.realtime_meter_enabled=True
     storage.save_project(project)
     request=Request({'type':'http','headers':[(b'user-agent',b'testclient')]})
     Path(os.environ['MTA_PLAYBACK_PROBE_CONFIG']).write_text(json.dumps({'project':project.id,'cookie':auth.create_session(admin['id'],request)}))

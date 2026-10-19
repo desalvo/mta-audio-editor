@@ -4696,7 +4696,7 @@ window.addEventListener('keydown',e=>{
   if(!(e.code==='Space'||e.key===' '||e.key==='Spacebar'))return;
   if(editable)return;
   if(e.repeat)return;e.preventDefault();e.stopPropagation();
-  if(playAudio||trackPlaybacks.length||playbackPaused||playbackBuffering)stopPlayback();else previewMaster();
+  if(playbackBuffering)window.stopPlayback();else void window.togglePlayback();
 },true);
 
 $('#mtafile').addEventListener('change',async e=>{

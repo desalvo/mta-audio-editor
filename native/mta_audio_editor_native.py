@@ -705,9 +705,9 @@ class NativeApi:
         from app.native_transport import control
         return control(action,value)
 
-    def transport_update_live(self, project_id: str) -> dict:
+    def transport_update_live(self, project_id: str, mixer=None) -> dict:
         from app.native_transport import live_update
-        return live_update(project_id)
+        return live_update(project_id,mixer)
 
     def open_vst3_editor(self, params: dict, project_id=None, route=None, insert_id=None) -> dict:
         if project_id and route and insert_id:
