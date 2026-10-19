@@ -2425,6 +2425,19 @@ def project_put(pid: str, project: Project, request: Request):
     except ValueError as exc:
         raise HTTPException(400, str(exc)) from exc
     save_project(project)
+    # Marker edits must publish regenerated audio with their metadata, including
+    # autosaves and clients other than the main editor. Never return new peaks
+    # while keeping the old WAV. Keep marker-identity-based manual overrides.
+    def marker_grid(value):
+        return sorted((m.id, m.time_ms) for m in value.markers if not m.deleted and not m.disabled)
+    if project.metronome_mode == "zones" and any(t.type == "click" for t in project.tracks) and marker_grid(current) != marker_grid(project):
+        try:
+            with METRONOME_TRACK_LOCK:
+                result = _create_metronome_track_locked(pid, request, mode="zones", track_id=project.metronome_reference_track_id if any(t.id == project.metronome_reference_track_id and t.type != "click" and t.filename for t in project.tracks) else "", sensitivity=project.metronome_sensitivity)
+            return result["project"]
+        except Exception:
+            save_project(current)
+            raise
     return project
 
 
@@ -6146,7 +6159,7 @@ def _create_metronome_track_locked(pid: str, request: Request, mode: str = "fixe
             beat_times_ms = preroll_beats(project, beat_times_ms)
             duration_ms = generate_adaptive_metronome_wav(project, out, beat_times_ms, accent_reset_ms=zone_starts, zone_signatures=project.metronome_zone_signatures)
             project.metronome_mode = "zones"
-            project.metronome_grid_origin_ms = 0
+            project.metronome_grid_origin_ms = project.metronome_start_ms
             project.metronome_shift_ms = 0
             project.adaptive_tempo_map = []
         elif reference_track is not None and project.metronome_bpm is None:
@@ -6183,8 +6196,7 @@ def _create_metronome_track_locked(pid: str, request: Request, mode: str = "fixe
         _limit_metronome_wav(out, project.metronome_start_ms, project.metronome_stop_ms)
         peaks = waveform_peaks(out)
     except Exception as exc:
-        if not reused:
-            out.unlink(missing_ok=True)
+        out.unlink(missing_ok=True)
         raise HTTPException(400, f"Creazione metronomo fallita: {str(exc)[:300]}") from exc
 
     if track is None:
@@ -6314,9 +6326,11 @@ def _update_metronome_zone_locked(pid: str, request: Request, time_ms: int, trac
             tone_t=np.arange(click_len,dtype=np.float64)/rate
             signature=zone_signature(project, left_id, right_id)
             tick_num, tick_den=map(int, signature.split("/"))
-            step=60000.0/max(1.0,float(bpm))
-            for index in range(max(0,int((end-start)/step)+2)):
-                local=round(index*step*rate/1000)
+            from .timeline_editing import preroll_beats
+            zone_tempos = {**project.metronome_zone_bpms, str(start): bpm}
+            beats = preroll_beats(project, zoned_metronome_beats(project, duration, zone_tempos))
+            for index, beat in enumerate(b for b in beats if start <= b < end):
+                local=round((beat-start)*rate/1000)
                 if local>=length:break
                 pos=index%tick_num
                 freq=1320.0 if pos==0 else (1100.0 if tick_den==8 and tick_num in {6,9,12} and pos%3==0 else 880.0)
@@ -7997,3 +8011,15 @@ _midi_monitor_routes(app,_project_for_actor,_actor)
 
 from .audio_capture import register_routes as _audio_capture_routes
 _audio_capture_routes(app,_project_for_actor,_actor)
+
+from .editor_layout import register_routes as _editor_layout_routes
+_editor_layout_routes(app)
+
+@app.get('/docs/user/vst3', response_class=HTMLResponse)
+def vst3_docs_it():
+    return _render_doc('vst3-it.html')
+
+
+@app.get('/docs/user/vst3/en', response_class=HTMLResponse)
+def vst3_docs_en():
+    return _render_doc('vst3-en.html')

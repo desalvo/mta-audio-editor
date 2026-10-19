@@ -1,0 +1,50 @@
+{
+  "manuals": [
+    {
+      "file": "app/docs/MTA-Audio-Editor-User-Manual-IT.pdf",
+      "pages": 26,
+      "sha256": "26212afe9167d8b755e6f951c3c3615402b73a9570cc054cf288cc4288b6c3ad",
+      "cover_version_current": true,
+      "text_inside_page": true
+    },
+    {
+      "file": "app/docs/MTA-Audio-Editor-User-Manual-EN.pdf",
+      "pages": 26,
+      "sha256": "b9a20316b5dadb18dd089243dcf668fc44f9b06e9efedd30f09069c24c46f76f",
+      "cover_version_current": true,
+      "text_inside_page": true
+    },
+    {
+      "file": "app/docs/MTA-Audio-Editor-Administrator-Manual-IT.pdf",
+      "pages": 15,
+      "sha256": "f0c62410851e2db7c4230642f7d0cd357f22431bf7522b5e5077d074fbe88914",
+      "cover_version_current": true,
+      "text_inside_page": true
+    },
+    {
+      "file": "app/docs/MTA-Audio-Editor-Administrator-Manual-EN.pdf",
+      "pages": 15,
+      "sha256": "0b3605f6307cd4818224892a08f455cf51e7e586c34c20174aa099e0e7887ecf",
+      "cover_version_current": true,
+      "text_inside_page": true
+    },
+    {
+      "file": "app/docs/MTA-Audio-Editor-VST3-Manual-IT.pdf",
+      "pages": 8,
+      "sha256": "0b82c27978bee8b6ee504e617ff40d6ddae59d22cfbf330f8a34aecd39672f73",
+      "cover_version_current": true,
+      "text_inside_page": true
+    },
+    {
+      "file": "app/docs/MTA-Audio-Editor-VST3-Manual-EN.pdf",
+      "pages": 8,
+      "sha256": "9b56f622f8e583fceb743075d9bca4a847937631f8f4edda5a5f00176b87ea30",
+      "cover_version_current": true,
+      "text_inside_page": true
+    }
+  ],
+  "screenshots": 15,
+  "generated_graphics": 4,
+  "online_chapters_inside_wrap": true,
+  "sizing_is_estimated": true
+}

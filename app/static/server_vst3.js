@@ -125,7 +125,7 @@ window.stopPlayback=function(){
  const result=old.stopPlayback();MtaPlaybackPrep.transportButton?.('stopped');return result;
 };
 async function seek(s,position,resume){
- s.paused=true;++s.generation;cleanupSources(s);s.cursor=position;playbackPaused=true;
+ s.paused=true;++s.generation;cleanupSources(s);s.cursor=position;playbackPaused=true;MtaPlaybackPrep.transportButton?.('paused');
  const generation=s.generation;
  if(s.node){s.startRequested=null;s.reported=null;s.node.port.postMessage({type:'reset',generation,frame:Math.round(position*s.rate/1000),rate:s.rate,paused:true})}
  // Finish an outstanding pull before resetting sequence/position. HTTP requests

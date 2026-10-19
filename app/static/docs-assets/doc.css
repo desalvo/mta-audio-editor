@@ -15,3 +15,42 @@ table{width:100%;border-collapse:collapse;margin:14px 0;break-inside:avoid}th,td
 .cover-hero-logo{position:absolute;left:17mm;top:15mm;width:112mm;max-height:36mm;object-fit:contain;object-position:left center;filter:drop-shadow(0 5px 14px rgba(0,0,0,.85));z-index:1}
 
 .cover-version-current{position:absolute;left:11mm;top:84mm;width:101mm;height:16mm;background:#38465d;color:white;z-index:5;padding:1.5mm 0 0 0;font-size:11.5pt;line-height:1.5;font-weight:700}.cover-version-current b{display:block}
+
+/* r210: one typography for the complete document, including late chapters. */
+.wrap>section:not(.cover){font:inherit;color:inherit;max-width:100%}
+.wrap h2{font-size:25px;line-height:1.25}.wrap h3{font-size:19px;line-height:1.3}
+.wrap figure{margin:18px 0}.wrap figcaption{font-size:12px;color:#526b80;margin-top:9px;line-height:1.45}
+.wrap table{table-layout:fixed;overflow-wrap:anywhere}.wrap th,.wrap td{line-height:1.42}
+.technical-appendix{border-top:3px solid #1978b3;margin-top:36px;padding-top:10px}
+.technical-table{font-size:12px}.technical-table th{background:#e4f1fc}
+.wrap a{overflow-wrap:anywhere}
+@media print{
+ body{font-size:9.6pt!important;line-height:1.45}
+ .wrap h2{font-size:16pt;line-height:1.25;margin-top:7mm}.wrap h3{font-size:12pt;margin-top:5mm}
+ .wrap p,.wrap li{line-height:1.45;orphans:3;widows:3}
+ .wrap .technical-table{font-size:8pt;break-inside:auto;page-break-inside:auto}
+ .wrap table{break-inside:auto;page-break-inside:auto}.wrap thead{display:table-header-group}.wrap tr{break-inside:avoid;page-break-inside:avoid}
+ .wrap th,.wrap td{padding:5pt;line-height:1.35}
+ .wrap .figure{padding:6pt;break-inside:avoid}.wrap .figure img{max-height:155mm;object-fit:contain}
+ .wrap figcaption,.wrap .caption{font-size:8.2pt}
+ .technical-appendix{break-before:page;page-break-before:always}
+ .wrap code{font-size:.9em;white-space:normal;overflow-wrap:anywhere}
+}
+/* Live version plate masks only the obsolete metadata printed in cover artwork. */
+.manual-cover-metadata{position:absolute;left:2.7%;top:47.65%;width:58.4%;height:18.9%;box-sizing:border-box;padding:5mm 4mm;background:#102235;color:#eff8ff;border:1px solid #91c8e3;border-radius:3mm;font:10.5pt/1.65 "DejaVu Sans",sans-serif;z-index:5;overflow:hidden}
+.manual-cover-metadata b{font-size:12pt}.manual-cover-metadata br{line-height:1.65}
+@media print{html,body,.wrap{background:#fff!important}.wrap .technical-table:last-of-type{break-inside:avoid-page;page-break-inside:avoid}.toc .cols a{font-size:9pt;margin:3pt 0}}
+
+.cover-fullpage,.pdf-cover{background-color:#040918!important}
+
+.cover{background-color:#040918}
+
+@media screen{
+ .cover-fullpage,.cover{max-width:100%!important;width:100%!important;height:auto!important;min-height:0!important;aspect-ratio:210/297;margin:0 0 24px!important;padding:0!important;background-size:100% 100%!important}
+ .cover-fullpage:after{content:none!important}
+ .cover-full-img{width:100%!important;height:100%!important}
+ .manual-cover-metadata{padding:clamp(4px,1vw,14px);font-size:clamp(8px,1.1vw,14px);line-height:1.45}
+ .manual-cover-metadata b{font-size:clamp(9px,1.25vw,16px)}
+ .cover-meta{padding:clamp(4px,1vw,14px)!important;font-size:clamp(8px,1.1vw,14px)!important}
+ .cover-title{font-size:clamp(14px,2vw,24px)!important}
+}

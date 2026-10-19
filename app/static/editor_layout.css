@@ -1,0 +1,41 @@
+/* Responsive rows without a fixed header height or clipped toolbar controls. */
+.editor-layout-ready .app-shell{display:flex;flex-direction:column;min-height:0}
+.editor-layout-ready .topbar{height:auto!important;min-height:72px;flex:none;flex-wrap:wrap;align-content:center;gap:5px 8px;padding:8px 12px;overflow:visible}
+.editor-layout-ready .topbar:after{pointer-events:none;z-index:-1}
+.editor-layout-ready .workspace{height:auto!important;flex:1 1 0;min-height:0}
+.editor-layout-ready .transport-stack,.editor-layout-ready .topbar .transport,.editor-layout-ready .header-actions,.editor-layout-ready .toolbar-destructive-group{display:contents!important}
+.editor-layout-ready .top-spacer,.editor-layout-ready .toolbar-sep,.editor-layout-ready .toolbar-grow{display:none}
+.editor-layout-ready .editor-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:5px;overflow:visible;height:auto;max-height:40vh;overflow-y:auto;flex-shrink:0}
+.editor-layout-ready .topbar .timebox{min-width:0;max-width:100%}
+.editor-layout-ready .topbar .zoom-top{min-width:140px;max-width:100%}
+.editor-layout-ready .topbar .transport-project-name{max-width:180px;flex:0 1 auto}
+.layout-row-break{flex:0 0 100%;height:0!important;margin:0!important;padding:0!important;border:0!important}
+.topbar .layout-icon-only,.editor-toolbar .layout-icon-only,.layout-config-button{display:inline-flex!important;align-items:center;justify-content:center;flex:0 0 31px;min-width:31px!important;width:31px;height:31px!important;padding:5px!important;gap:0;line-height:1}
+.layout-icon-only svg,.layout-config-button svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
+.topbar .control-text{display:none!important}
+.topbar .layout-icon-only .control-icon{font-size:17px}
+.layout-icon-only:focus-visible,.layout-config-button:focus-visible,.aj-drag:focus-visible{outline:2px solid #6fd4ff;outline-offset:2px}
+.layout-config{min-width:0}.layout-edit-item{display:flex;align-items:center;gap:8px;padding:7px;border-bottom:1px solid #335367;cursor:grab}
+.layout-edit-item>span:nth-child(2){flex:1;min-width:0;overflow-wrap:anywhere}.layout-edit-item button{padding:4px 8px;min-width:28px}.layout-edit-item label{display:flex;align-items:center;gap:4px;white-space:nowrap}.layout-drag-mark{color:#8fc9e4}
+#layout-items{max-height:52vh;overflow:auto;margin:12px 0;border:1px solid #335367;border-radius:8px}
+.track-context-menu,.lc-context-menu,.meta-context-menu{overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;max-height:calc(100dvh - 16px);scrollbar-gutter:stable}
+.track-context-menu summary{scroll-margin:6px}.track-context-menu button{overflow-wrap:anywhere}
+/* Separate narrow stepper column: arrows never cover numeric text. */
+.compact-number{display:inline-flex!important;align-items:stretch!important;gap:2px!important;vertical-align:middle;max-width:100%;min-width:0;margin:0!important;flex:0 1 auto}
+.compact-number input[type=number]{appearance:textfield!important;-moz-appearance:textfield!important;width:100%;min-width:38px;max-width:100%;padding:3px 4px!important;margin:0;flex:1 1 auto;box-sizing:border-box}
+.compact-number input::-webkit-inner-spin-button,.compact-number input::-webkit-outer-spin-button{appearance:none!important;-webkit-appearance:none!important;margin:0!important;display:none!important}
+.compact-number .compact-number-steps{display:grid!important;grid-template-rows:1fr 1fr;gap:1px!important;flex:0 0 14px;width:14px;margin:0!important}
+.compact-number-steps button{font:10px/1 system-ui!important;padding:0!important;min-width:14px!important;width:14px!important;min-height:12px!important;height:auto!important;display:flex!important;align-items:center;justify-content:center;border-radius:3px!important}
+#transportBpmInput{width:64px!important}#transportPitchInput{width:44px!important}#newOffset{width:64px!important}
+.mixer-dock .mixer-pan-title{display:block;flex:0 0 100%;text-align:center;font-size:9px;line-height:12px;color:#bed4e3}
+.mta-jobs .aj-drag{position:fixed;z-index:18001;padding:5px 3px;width:23px;height:37px;border:1px solid #68c6ff;background:#163f59;color:#e2f5ff;border-radius:7px;cursor:grab;touch-action:none}
+.mta-jobs .aj-launch{min-width:100px;max-width:calc(100vw - 50px);white-space:nowrap;font-size:12px;padding:8px 9px;height:37px}
+@media(pointer:coarse){.compact-number .compact-number-steps{flex-basis:22px;width:22px}.compact-number-steps button{min-width:22px!important;width:22px!important;min-height:17px!important}.layout-edit-item{flex-wrap:wrap}.layout-edit-item>span:nth-child(2){flex-basis:60%}}
+/* Explicit contrast also on WebViews with light native form-control defaults. */
+.layout-config button,.layout-config select,.layout-config-button,.compact-number-steps button{background:#183448!important;color:#e7f6ff!important;-webkit-text-fill-color:#e7f6ff!important;border:1px solid #52768e!important}
+.layout-config button:hover,.compact-number-steps button:hover{background:#285b7a!important}
+.layout-config button:disabled{opacity:.4}
+.compact-number-steps button{font-size:10px!important}
+.layout-config-button{border-radius:6px}
+/* Icon styling must never reveal server/native controls hidden by capabilities. */
+.topbar .layout-icon-only[hidden],.editor-toolbar .layout-icon-only[hidden],body.native-single-user .topbar .auth-managed{display:none!important}

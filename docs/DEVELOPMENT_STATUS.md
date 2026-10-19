@@ -1,3 +1,18 @@
+## Ciclo completato: metronomo a zone, zoom, layout personale e manuali (r210)
+
+Baseline verificata: `0f295c2201bff0a2af5334049b91aeb1af2607b79396633bff79fcb8b9f96aa0`, 2.201 elementi, preservati nel nuovo cumulativo. Versione 0.3.0-r210 invariata.
+
+- Primo beat a zone allineato all’inserimento; pre-roll conservato nel refresh. Il salvataggio dei marker rigenera il WAV e invalida le riproduzioni preparate. Protetti i risultati del metronomo dagli autosave accodati; rollback e pulizia temporanei in caso di errore.
+- Zoom: stesso centro temporale durante preview, rilascio, pulsanti, preset e autosave, con clamp ai bordi del progetto e valori persistiti compatibili con il modello.
+- Menu sempre raggiungibili, steppers compatti, barre a icone riordinabili su sei righe, monitor Job AI flottante e preferenze persistenti per utente/native. Pan sopra il valore e pulsanti FX. Gli elementi nascosti per piattaforma/permessi restano nascosti.
+- Sei manuali IT/EN, online e PDF, uniformati e aggiornati; 15 schermate reali con dati sintetici, appendici condivise, tabelle e quattro grafici. PDF: utente 26+26 pagine, amministratore 15+15, VST3 8+8. Controllati copertine, font, contenuti finali, asset e limiti pagina; online fruibili anche a 390px.
+- Suite estesa: **4.215 passati, 35 saltati, 10 esclusi** per test con socket agente host non disponibile; due prove C++ di latenza/stress fallite nel run concorrente, poi **entrambe passate nella verifica finale isolata**, senza allentare le soglie. Migliorato anche il feedback immediato dell’icona Pausa e il cleanup dei processi dei probe.
+- **68 test mirati finali passati**, oltre agli 87 controlli dei contratti precedenti. Browser reale sui motori corrente e C++: generazione sotto autosave accodato, refresh marker durante playback, zoom ancorato, layout/monitor persistenti, menu, mobile e controlli nascosti: passati, zero errori JS.
+- C++ reale: avvio 1,233s, fader 0,530s; stress rete/stalli UI: fader 0,737s, zero underrun. Misure locali, non garanzie di produzione. Compilazione C++ ABI 1, Ruff scope CI e nuovi script, Bandit alle soglie CI, sintassi JS, pip check e guardia licenze passati. Rapporti in `validation/r210-zones-layout-*`.
+- Restano prove sui dispositivi fisici Windows/macOS e sul server installato/ROCm/proxy reali. Nessun commit, push, tag, release o aggiornamento di produzione eseguito.
+
+Dettagli IT/EN: `docs/R210_ZONES_LAYOUT_MANUALS.md`.
+
 # MTA Audio Editor — Development status
 
 Versione obbligatoria: **0.3.0-r210**. Ultimo ciclo completato: continuità audio C++ e disinstallazione VST3, 19 ottobre 2026.

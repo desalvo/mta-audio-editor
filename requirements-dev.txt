@@ -9,3 +9,7 @@ bandit==1.9.4
 pip-audit==2.10.1
 
 weasyprint==70.0
+
+# Documentation maintenance and bilingual manual rendering
+beautifulsoup4==4.15.0
+markdown-it-py==4.2.0

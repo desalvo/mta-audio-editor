@@ -242,6 +242,9 @@ def zoned_metronome_beats(project: Project, duration_ms: int, zone_bpms: dict[st
     grid_bpm, _ = grid_settings(project)
     for start, end in zip(boundaries, boundaries[1:]):
         step = 60000.0 / max(1.0, float(zone_bpms.get(str(start), grid_bpm)))
+        # The first audible zone is phased at insertion, not at project zero.
+        # Subsequent active markers still restart their own musical grid.
+        start = max(start, int(project.metronome_insertion_ms or project.metronome_start_ms))
         i = 0
         while start + round(i * step) < end:
             beats.append(start + round(i * step))

@@ -1,0 +1,148 @@
+{
+  "version": "0.3.0-r210",
+  "created_utc": "2026-10-19T22:08:26.118995+00:00",
+  "baseline_sha256": "0f295c2201bff0a2af5334049b91aeb1af2607b79396633bff79fcb8b9f96aa0",
+  "baseline_entries": 2201,
+  "full_regression": {
+    "cases": 4252,
+    "passed": 4215,
+    "failed": 2,
+    "skipped": 35
+  },
+  "full_run_deselected_host_agent_socket_tests": 10,
+  "performance_final": {
+    "cases": 2,
+    "passed": 2,
+    "failed": 0,
+    "skipped": 0
+  },
+  "targeted_final": {
+    "cases": 68,
+    "passed": 68,
+    "failed": 0,
+    "skipped": 0
+  },
+  "earlier_contracts": {
+    "cases": 87,
+    "passed": 87,
+    "failed": 0,
+    "skipped": 0
+  },
+  "full_regression_note": "The broad run had two C++ timing/stress failures while other validation was running. Both passed in isolated final reruns without relaxing fader or underrun thresholds. Pause icon feedback is now immediate; the probe waits for the actual pause UI and cleans up its disposable process group. See the raw full report and final two-case performance report. No remote CI or production certification is claimed.",
+  "cpp_core_abi": 1,
+  "cpp_build_passed": true,
+  "ruff_ci_scopes_and_new_scripts_passed": true,
+  "bandit_high_high_passed": true,
+  "javascript_syntax_passed": true,
+  "pip_check_passed": true,
+  "source_license_guard_passed": true,
+  "manuals": {
+    "manuals": [
+      {
+        "file": "app/docs/MTA-Audio-Editor-User-Manual-IT.pdf",
+        "pages": 26,
+        "sha256": "26212afe9167d8b755e6f951c3c3615402b73a9570cc054cf288cc4288b6c3ad",
+        "cover_version_current": true,
+        "text_inside_page": true
+      },
+      {
+        "file": "app/docs/MTA-Audio-Editor-User-Manual-EN.pdf",
+        "pages": 26,
+        "sha256": "b9a20316b5dadb18dd089243dcf668fc44f9b06e9efedd30f09069c24c46f76f",
+        "cover_version_current": true,
+        "text_inside_page": true
+      },
+      {
+        "file": "app/docs/MTA-Audio-Editor-Administrator-Manual-IT.pdf",
+        "pages": 15,
+        "sha256": "f0c62410851e2db7c4230642f7d0cd357f22431bf7522b5e5077d074fbe88914",
+        "cover_version_current": true,
+        "text_inside_page": true
+      },
+      {
+        "file": "app/docs/MTA-Audio-Editor-Administrator-Manual-EN.pdf",
+        "pages": 15,
+        "sha256": "0b3605f6307cd4818224892a08f455cf51e7e586c34c20174aa099e0e7887ecf",
+        "cover_version_current": true,
+        "text_inside_page": true
+      },
+      {
+        "file": "app/docs/MTA-Audio-Editor-VST3-Manual-IT.pdf",
+        "pages": 8,
+        "sha256": "0b82c27978bee8b6ee504e617ff40d6ddae59d22cfbf330f8a34aecd39672f73",
+        "cover_version_current": true,
+        "text_inside_page": true
+      },
+      {
+        "file": "app/docs/MTA-Audio-Editor-VST3-Manual-EN.pdf",
+        "pages": 8,
+        "sha256": "9b56f622f8e583fceb743075d9bca4a847937631f8f4edda5a5f00176b87ea30",
+        "cover_version_current": true,
+        "text_inside_page": true
+      }
+    ],
+    "screenshots": 15,
+    "generated_graphics": 4,
+    "online_chapters_inside_wrap": true,
+    "sizing_is_estimated": true
+  },
+  "browser_current": {
+    "screenshots": [
+      "app/static/docs-assets/r210/workspace-en.png",
+      "app/static/docs-assets/r210/metronome-en.png",
+      "app/static/docs-assets/r210/toolbar-en.png",
+      "app/static/docs-assets/r210/context-en.png",
+      "app/static/docs-assets/r210/mixer-en.png",
+      "app/static/docs-assets/r210/jobs-en.png",
+      "app/static/docs-assets/r210/workspace-it.png",
+      "app/static/docs-assets/r210/metronome-it.png",
+      "app/static/docs-assets/r210/toolbar-it.png",
+      "app/static/docs-assets/r210/context-it.png",
+      "app/static/docs-assets/r210/mixer-it.png",
+      "app/static/docs-assets/r210/jobs-it.png",
+      "app/static/docs-assets/r210/admin-settings.png",
+      "app/static/docs-assets/r210/admin-billing.png",
+      "app/static/docs-assets/r210/user-account.png"
+    ],
+    "zoom_anchor_retained": true,
+    "icon_buttons": 23,
+    "generation_survives_queued_autosave": true,
+    "live_audio_refresh_engine": "current",
+    "marker_audio_revision_changed": true,
+    "menu_in_viewport": true,
+    "toolbar_reload_persisted": true,
+    "monitor_reload_persisted": true,
+    "mobile_and_capability_visibility": true,
+    "mixer_labels": 5,
+    "online_manual_mobile_layout": true,
+    "errors": []
+  },
+  "browser_cpp": {
+    "screenshots": [],
+    "zoom_anchor_retained": true,
+    "icon_buttons": 23,
+    "generation_survives_queued_autosave": true,
+    "live_audio_refresh_engine": "cpp",
+    "marker_audio_revision_changed": true,
+    "menu_in_viewport": true,
+    "toolbar_reload_persisted": true,
+    "monitor_reload_persisted": true,
+    "mobile_and_capability_visibility": true,
+    "mixer_labels": 5,
+    "online_manual_mobile_layout": true,
+    "errors": []
+  },
+  "remaining_acceptance": [
+    "Physical Windows/macOS audio and MIDI devices",
+    "Actual installed production server and proxy"
+  ],
+  "source_sha256": {
+    "app/main.py": "913cc5c33c90e2783148a0fd3af693400514121624d0903e0b215493d8e65943",
+    "app/audio_engine.py": "6e4dd96a82bc837c146b05171c023d228e5e4e9e3c4f7a348a9d4f0cefe730f3",
+    "app/editor_layout.py": "ebab4f9c61dfde7f105c8ba9a30025029a4ef96af772137b0a32ca4d1ff1e5a6",
+    "app/static/app.js": "6f5ec356c0579eb571d7268693f96f53f3d52146cb11ff7dce2bdf26caafeb47",
+    "app/static/editor_layout.js": "4640b16cd758c0100001cb67ee4d3deddd652873e5f23f8c61be3fb4ce1bdf05",
+    "app/static/editor_layout.css": "49000af1920a2b6eef0c564ae4b127ace8962506445270ca6b0bda116c3627d9",
+    "app/static/server_vst3.js": "c0a44f9b9997b38c2c73b14e00792396bb0eace8f83324fee4684cb620b926cd"
+  }
+}

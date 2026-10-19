@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 from pathlib import Path
+import re
+import sys
 from weasyprint import HTML
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -15,14 +17,14 @@ EXTRA = r"""
 <style>
 @page { size: A4; margin: 17mm 15mm 18mm 15mm; @bottom-center { content: "MTA Audio Editor - " counter(page) " / " counter(pages); color:#657487; font-size:8.5pt; } }
 @page cover { size: A4; margin: 0; @bottom-center { content: none; } }
-body { background:white; }
+html,body,.wrap { background:white!important; }
 .wrap { box-shadow:none; max-width:none; padding:0; min-height:0; }
 .cover { height:297mm; min-height:297mm; margin:0; padding:19mm 17mm; }
 .cover-card { width:78%; }
 .langbar { display:none; }
 h1,h2,h3,h4 { break-after:avoid-page; page-break-after:avoid; }
 h1 + p,h2 + p,h2 + .note,h2 + .figure,h2 + table,h3 + p,h3 + .note,h3 + .figure,h3 + table,h4 + p { break-before:avoid-page; page-break-before:avoid; }
-table,.figure,pre,.note,.good,.warn,.danger,.example,.step { break-inside:avoid; page-break-inside:avoid; }
+ .figure,pre,.note,.good,.warn,.danger,.example,.step { break-inside:avoid; page-break-inside:avoid; }
 .toc { break-inside:avoid; }
 </style>
 """
@@ -74,8 +76,8 @@ cover_for_source = {
 
 for src_name, out_name in outputs:
     text = (DOCS / src_name).read_text(encoding="utf-8")
-    for token, path in assets.items():
-        text = text.replace(token, path.as_uri())
+    # Resolve all current and future manual assets, stripping web cache keys.
+    text = re.sub(r'(["\'])/static/([^"\'?]+)(?:\?[^"\']*)?\1', lambda m: m[1] + (STATIC / m[2]).as_uri() + m[1], text)
     text = text.replace("__VERSION__", VERSION).replace("__REVISION__", REVISION).replace("__BUILD__", BUILD).replace("__CREATOR__", CREATOR).replace("__REPOSITORY__", REPO)
     cover_uri = cover_for_source[src_name].as_uri()
     # The web manual keeps its interactive cover section. For PDF output replace
@@ -83,7 +85,7 @@ for src_name, out_name in outputs:
     # can resize, shift, or fragment the approved raster cover.
     import re
     text = re.sub(r'<section class="cover cover-fullpage">.*?</section>', '', text, count=1, flags=re.S)
-    text = text.replace('<body><div class="wrap">', '<body><div class="pdf-cover"></div><div class="wrap">', 1)
+    text = text.replace('<body><div class="wrap">', '<body><div class="pdf-cover"><div class="manual-cover-metadata"><b>MTA Audio Editor '+VERSION+'-r'+REVISION+'</b><br>Build: '+BUILD+'<br>Alessandro De Salvo<br>braket71@gmail.com<br>https://github.com/desalvo/mta-audio-editor<br>EUPL-1.2</div></div><div class="wrap">', 1)
     pdf_cover_css = (
         '<style>'
         '@page cover { size:A4; margin:0; @bottom-center { content:none; } }'
@@ -99,4 +101,4 @@ for src_name, out_name in outputs:
 
 # Build the M-Live/Merish MP3 interoperability specification alongside the manuals.
 import subprocess as _subprocess
-_subprocess.run(["python", str(ROOT / "scripts" / "build_mlive_mp3_spec.py")], check=True)
+_subprocess.run([sys.executable, str(ROOT / "scripts" / "build_mlive_mp3_spec.py")], check=True)

@@ -13,6 +13,7 @@
    const i=Math.max(0,points.findIndex((x,i)=>i<points.length-1&&ms>=x.time_ms&&ms<points[i+1].time_ms));origin=points[i].time_ms;end=points[i+1].time_ms;left=points[i].id;right=points[i+1].id;
    bpm=Number(manual(p.metronome_manual_zone_bpms,left,right)??p.metronome_zone_bpms?.[String(origin)]??bpm);
    signature=manual(p.metronome_manual_zone_signatures,left,right)??p.metronome_zone_signatures?.[String(origin)]??signature;
+   origin=ms<Number(p.metronome_insertion_ms||0)&&p.metronome_pre_roll_bars?Number(p.metronome_start_ms||0):Math.max(origin,Number(p.metronome_insertion_ms||p.metronome_start_ms||0));
   }
   return {bpm,signature,origin,end,left,right,beats:Number(signature.split('/')[0])||4};
  }

@@ -204,8 +204,8 @@ def test_context_shortcut_presentation_and_decimal_transport_contract():
 
 
 def test_generation_uses_persisted_decimal_and_invalidates_audio_cache():
-    node("const assert=require('assert/strict');let current={id:'p',bpm:123.45,metronome_bpm:123.45,tracks:[{id:'music',type:'audio'},{id:'click',type:'click',mute:true}]},metronomeCreatePending=false,selectedTrackId=null,events=[];"+
+    node("const assert=require('assert/strict');let current={id:'p',bpm:123.45,metronome_bpm:123.45,tracks:[{id:'music',type:'audio'},{id:'click',type:'click',mute:true}]},metronomeCreatePending=false,selectedTrackId=null,events=[],autosaveTimer=null,autosaveBusy=false,autosaveQueued=false;"+
          "async function persistMetronomeSettings(){events.push('save')}async function api(url){assert.ok(url.includes('/metronome-track?'));assert.equal(current.metronome_bpm,123.45);events.push('generate');return {project:current,track:{id:'click'}}}"+
          "async function syncNativeProjectFile(id,strict){assert.equal(id,'p');assert.equal(strict,true);events.push('native-save')}function invalidateTrackAudioCache(id){events.push('invalidate:'+id)}function clearPlaybackWarmCache(){events.push('clear-warm')}function timingAudioChanged(ids){events.push('timing:'+ids[0])}function render(){}async function refresh(){}function toast(){}function trackById(){}"+
-         function('formatProjectBpm')+'\n'+function('createMetronomeTrack')+
-         "createMetronomeTrack().then(()=>{assert.deepEqual(events,['save','generate','native-save','invalidate:click','clear-warm','timing:click']);assert.equal(metronomeCreatePending,false)})")
+         function('formatProjectBpm')+'\n'+function('metronomeProjectRequest')+'\n'+function('createMetronomeTrack')+
+         "createMetronomeTrack().then(()=>{assert.deepEqual(events,['save','generate','native-save','invalidate:click','clear-warm','timing:click']);assert.equal(metronomeCreatePending,false);assert.equal(autosaveBusy,false)})")

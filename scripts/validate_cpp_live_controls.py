@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 import secrets
+import signal
 import socket
 import subprocess
 import sys
@@ -35,7 +36,7 @@ def probe(core,report,*,stress=False):
         base=Path(folder);config=base/'config.json';url=f'http://127.0.0.1:{port}'
         env={**os.environ,'MTA_DATA_DIR':str(base/'data'),'MTA_AI_JOB_STATE_DIR':str(base/'jobs'),'MTA_ADMIN_PASSWORD':secrets.token_urlsafe(32),'MTA_PLAYBACK_PROBE_CONFIG':str(config),'MTA_PLAYBACK_PROBE_CPP':'1','MTA_AUDIO_CORE_PATH':str(core),'PYTHONPATH':str(ROOT),'OPENBLAS_NUM_THREADS':'1','MTA_NATIVE_SINGLE_USER':'false','MTA_ALLOW_INSECURE_NO_AUTH':'false','MTA_PLAYBACK_PROBE_JITTER':'1' if stress else '0'}
         with (base/'server.log').open('wb') as log:
-            server=subprocess.Popen([sys.executable,str(ROOT/'scripts/validate_playback_preparation.py'),'--serve',str(port)],cwd=ROOT,env=env,stdout=log,stderr=log)
+            server=subprocess.Popen([sys.executable,str(ROOT/'scripts/validate_playback_preparation.py'),'--serve',str(port)],cwd=ROOT,env=env,stdout=log,stderr=log,start_new_session=os.name=='posix')
             try:
                 deadline=time.monotonic()+30
                 while time.monotonic()<deadline:
@@ -56,7 +57,7 @@ def probe(core,report,*,stress=False):
                     require(page.locator('#playMaster svg rect').count()==2,'Running transport must show two pause bars')
                     wait(page,"()=>parseFloat(document.getElementById('vu-track0-L').style.height)>0",timeout=12000)
                     initial=page.locator('#vu-track0-L').evaluate('(el)=>parseFloat(el.style.height)')
-                    page.keyboard.press('Space');wait(page,'()=>playbackPaused===true');at=page.evaluate('playCursorMs');page.wait_for_timeout(250)
+                    page.keyboard.press('Space');wait(page,'()=>playbackPaused===true && !document.querySelector("#playMaster svg rect")');at=page.evaluate('playCursorMs');page.wait_for_timeout(250)
                     require(page.locator('#playMaster svg rect').count()==0,'Paused transport must show Play/Resume')
                     require(abs(page.evaluate('playCursorMs')-at)<2,'Pause did not hold the cursor')
                     require(page.locator('#vu-master-L').evaluate('(el)=>parseFloat(el.style.height)')==0,'Paused master meter is not zero')
@@ -86,7 +87,10 @@ def probe(core,report,*,stress=False):
                     browser.close()
                 report.parent.mkdir(parents=True,exist_ok=True);report.write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result,indent=2));return result
             finally:
-                server.terminate()
+                if os.name=='posix':
+                    try:os.killpg(server.pid,signal.SIGTERM)
+                    except ProcessLookupError:pass
+                else:server.terminate()
                 try:server.wait(timeout=5)
                 except subprocess.TimeoutExpired:server.kill();server.wait()
 

@@ -39,7 +39,7 @@ def test_user_manual_is_comprehensive_and_visual():
         text = (ROOT / rel).read_text(encoding="utf-8")
         assert text.count("<h2") >= 23
         for asset in (
-            "daw-overview.png", "transport.png", "timeline.png", "mixer.png",
+            "workspace-", "transport.png", "timeline.png", "r210/mixer-",
             "export-panel.png", "project-lifecycle.png", "playback-sync.png",
             "mobile-connection.png", "mta-profiles.png",
         ):
