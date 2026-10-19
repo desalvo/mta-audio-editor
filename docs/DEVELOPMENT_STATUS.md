@@ -1,6 +1,20 @@
 # MTA Audio Editor — Development status
 
-Versione obbligatoria: **0.3.0-r210**. Ultimo ciclo completato: avanzamento VST3 e controlli live C++, 19 ottobre 2026.
+Versione obbligatoria: **0.3.0-r210**. Ultimo ciclo completato: continuità audio C++ e disinstallazione VST3, 19 ottobre 2026.
+
+## Ciclo completato — continuità audio C++ e disinstallazione VST3 (19 ottobre 2026)
+
+- Baseline recuperata dalla Library e verificata CRC/SHA-256: `MTA-0.3.0-r210-vst3-progress-cpp-live-controls-cumulative.zip`, `42fe3889ec2b1affce9de31e2f678716991efa451bee157112c95f9c8e4b21c6` (2.186 file).
+- Utente conferma mixer, VU e avvio immediato; segnala microinterruzioni C++, Play/Pausa errato e assenza di disinstallazione VST3.
+- Flusso PCM spostato in Worker/AudioWorklet con FIFO limitata, buffering adattivo e clock da campioni consumati. Handshake per reset/generazioni e gestione pausa/seek/Stop; controlli sequenza/finitezza invariati. Ricampionatore sinc/Blackman 64 tap e 1.024 fasi per frequenze diverse, bypass bit-exact alla stessa frequenza. Fallback browser precedenti mantenuto con scheduling contiguo e margine maggiore.
+- Evitati seek ridondanti durante letture consecutive dei decoder. Test MP3: 2.813 seek eliminati, campioni identici; nessun vantaggio di velocità dimostrato dal microbenchmark.
+- Stato Play/Pausa riallineato dopo la preparazione, icona SVG esplicita, etichette/tooltip e bridge nativi verificati.
+- Disinstallazione VST3 opzionali da scheda con conferma singola, pulizia cache opzionale, avviso progetti dipendenti e dati progetto conservati. Autorizzazioni admin, ID allowlist, protezioni traversal/symlink e lock installazione/sessioni/editor; distacco atomico sullo stesso volume e namespace transitorio non eseguibile/discoverable.
+- **4.187 passati, 35 saltati, 10 esclusi per socket/agente non disponibili**, zero fallimenti (circa 580s). **16 nuove regressioni finali passate**, compresi gli ultimi controlli aggiunti dopo l'avvio della suite estesa; 23 preparazione/continuità passati e 42 passati con CHOW Tape reale (uno escluso senza display). Nessun test CI disabilitato o soglia ridotta.
+- Prove ASGI/Chromium/WebAudio/C++ a otto tracce: zero underrun con ritardi di rete fino a 180 ms e cinque blocchi UI da 450 ms; avvio sessione 1,239 s, risposta volume 0,538 s (0,701 s con rete rallentata). Motore corrente/editor/bozze preservati e zero errori JS. Più buffering rispetto al ciclo precedente in cambio della continuità sotto carico; nessuna garanzia di latenza universale.
+- Ruff, Bandit alle soglie CI, license guard, sintassi JS, pip check passati. Tutti i 2.186 file precedenti conservati. Report in `validation/r210-continuity-*`, `r210-continuous-pcm-*`, dettagli IT/EN in `docs/CPP_CONTINUITY_VST3_UNINSTALL_R210.md`.
+- Consegna: `MTA-0.3.0-r210-continuous-cpp-audio-vst3-uninstall-cumulative.zip`, intero progetto con CRC/confronto byte per byte/permessi/SHA-256 verificati durante packaging. Restano ascolto e accettazione sul server reale Rocky/HAProxy e sui dispositivi Windows/macOS.
+- Versione 0.3.0-r210 invariata; nessuna modifica a produzione o azione Git.
 
 ## Ciclo completato — installazione VST3 e trasporto C++
 

@@ -1,0 +1,124 @@
+{
+  "version": "0.3.0-r210",
+  "baseline": "MTA-0.3.0-r210-vst3-progress-cpp-live-controls-cumulative.zip",
+  "baseline_sha256": "42fe3889ec2b1affce9de31e2f678716991efa451bee157112c95f9c8e4b21c6",
+  "baseline_files_preserved": 2186,
+  "python": "3.12.3",
+  "extended_regression": {
+    "passed": 4187,
+    "failed": 0,
+    "skipped": 35,
+    "seconds": 579.674,
+    "deselected": 10
+  },
+  "final_new_regressions": {
+    "passed": 16,
+    "failed": 0,
+    "skipped": 0,
+    "seconds": 34.705
+  },
+  "real_vst3": {
+    "passed": 42,
+    "failed": 0,
+    "skipped": 1,
+    "seconds": 95.224
+  },
+  "final_preparation_controls": {
+    "passed": 23,
+    "failed": 0,
+    "skipped": 0,
+    "seconds": 58.667
+  },
+  "normal_cpp": {
+    "engine": "cpp",
+    "tracks": 8,
+    "start_seconds": 1.239,
+    "fader_to_audible_meter_seconds": 0.538,
+    "initial_track_meter_percent": 40.4603,
+    "space_pause_resume": true,
+    "pause_holds_cursor": true,
+    "pause_clears_meters": true,
+    "continuous_gesture_updates": true,
+    "pan_updated": true,
+    "live_mixer_requests": 12,
+    "errors": [],
+    "stream": {
+      "mode": "worklet",
+      "underruns": 0
+    },
+    "network_jitter": false,
+    "gui_stalls_ms": []
+  },
+  "stress_cpp": {
+    "engine": "cpp",
+    "tracks": 8,
+    "start_seconds": 1.206,
+    "fader_to_audible_meter_seconds": 0.701,
+    "initial_track_meter_percent": 40.4603,
+    "space_pause_resume": true,
+    "pause_holds_cursor": true,
+    "pause_clears_meters": true,
+    "continuous_gesture_updates": true,
+    "pan_updated": true,
+    "live_mixer_requests": 11,
+    "errors": [],
+    "stream": {
+      "mode": "worklet",
+      "underruns": 0
+    },
+    "network_jitter": true,
+    "gui_stalls_ms": [
+      450,
+      450,
+      450,
+      450,
+      450
+    ]
+  },
+  "current_engine": {
+    "active": true,
+    "tracks": 8,
+    "raw": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    "cacheBytes": 84671936,
+    "first_start_seconds": 2.198,
+    "cached_restart_seconds": 0.265,
+    "backend_preview_requests": [],
+    "errors": [],
+    "plugin_editor_preserved": true
+  },
+  "decoder": {
+    "per_block_seek": {
+      "seconds": 0.1569,
+      "seeks": 2813
+    },
+    "sequential": {
+      "seconds": 0.163,
+      "seeks": 0
+    },
+    "max_sample_difference": 0.0,
+    "format": "30-second stereo MP3, 48 kHz, 512-frame blocks"
+  },
+  "checks": {
+    "ruff": "passed",
+    "bandit_ci_thresholds": "passed",
+    "license_guard": "passed",
+    "javascript_syntax": "passed",
+    "pip_check": "passed",
+    "sample_continuity_and_resampling": "passed"
+  },
+  "remaining_acceptance": [
+    "Real Rocky/HAProxy network and physical audio devices",
+    "Windows/macOS hardware and actual browser audio output"
+  ],
+  "production_changes": false,
+  "git_actions": []
+}

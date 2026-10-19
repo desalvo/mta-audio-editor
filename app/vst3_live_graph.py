@@ -220,7 +220,8 @@ class Graph:
                 if right<=left:continue
                 offset=source+left-start
                 if offset>=reader.frames:continue
-                reader.seek(max(0,offset))
+                # Preserve the decoder cursor for adjacent blocks (especially MP3/FLAC).
+                if reader.tell()!=max(0,offset):reader.seek(max(0,offset))
                 part=reader.read(min(right-left,reader.frames-offset),dtype='float32',always_2d=True)
                 data[left-at:left-at+len(part)]+=part
             self.core.gain(data,10**(float(track.gain_db)/20));yield data

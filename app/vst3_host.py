@@ -45,6 +45,7 @@ def discover_plugins() -> list[dict[str, str]]:
                 if len(found) >= 250:
                     return found
                 absolute = path.resolve()
+                if any(part.startswith('.mta-vst3-remove-') for part in absolute.parts):continue
                 if not absolute.is_relative_to(root) or not absolute.exists():
                     continue
                 key = str(absolute)
@@ -60,6 +61,7 @@ def validate_plugin_path(path: str) -> Path:
     if not path or not path.lower().endswith('.vst3'):
         raise ValueError('VST3 path missing or invalid')
     resolved = Path(path).expanduser().resolve()
+    if any(part.startswith('.mta-vst3-remove-') for part in resolved.parts):raise ValueError('VST3 package is being uninstalled')
     if not resolved.exists():
         raise FileNotFoundError(f'VST3 not installed: {resolved.name}')
     if not any(resolved.is_relative_to(root) for root in vst3_roots()):

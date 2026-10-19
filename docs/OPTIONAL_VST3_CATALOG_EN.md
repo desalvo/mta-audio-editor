@@ -83,3 +83,12 @@ still require validation on their respective systems.
 ## Per-plugin installation activity (r210)
 
 Each card exposes its installation state. Only the plugin currently being built displays a progress bar, with actual download/build/install activity. Its bar disappears immediately on completion or failure, even while the rest of the batch is running. Progress remains indeterminate when build tools do not expose a reliable total. Final outcomes survive reopening the catalog; monitoring of an active job resumes in the same server process. See `VST3_PROGRESS_CPP_LIVE_CONTROLS_R210.md` for implementation and validation details.
+
+
+## Uninstall optional packages
+
+Open the same catalog from **Settings → Web App → Optional open-source VST3**, or from native settings. Installed cards offer **Uninstall**, with **Also remove downloaded sources and build cache** selected by default. One confirmation is required.
+
+Removal covers the complete package, including all four Dragonfly reverbs. The confirmation reports how many saved projects reference it. Such projects will need the plugin reinstalled or their affected inserts removed; project data is retained. Stop live playback, editors and monitoring using that package first. Concurrent installation blocks removal.
+
+Only allowlisted packages in MTA's managed directory can be removed. Internal DSP effects and independently installed operating-system VST3 packages are outside this action. Detached uninstall directories cannot be discovered or executed, including on separately mounted plugin volumes.

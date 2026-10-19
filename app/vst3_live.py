@@ -13,6 +13,10 @@ import tempfile
 import threading
 import time
 import uuid
+import weakref
+
+SESSION_LOCK=threading.RLock()
+SESSIONS=weakref.WeakSet()
 
 
 def available():
@@ -46,6 +50,7 @@ class Session:
         if output not in ('device','browser'):raise ValueError('Invalid live output')
         self.process_group=output=='browser' and os.name=='posix'
         self.log=(self.path/'worker.log').open('wb');self.closed=False;self.last={};self.edited=False
+        with SESSION_LOCK:SESSIONS.add(self)
         config=self.path/'config.json'
         atomic(config,{'project':project.model_dump(mode='json'),'paths':[str(p) for p in paths],'cursor_ms':cursor_ms,'test_null':_test_null,'paused':paused,'output':output,'monitor':monitor,'midi_options':midi_options or {},'original_editor':original_editor,'host_transport':host_transport,'raw_sources':list(raw_sources)})
         try:
@@ -152,6 +157,7 @@ class Session:
             try:os.killpg(self.proc.pid,signal.SIGKILL)
             except ProcessLookupError:pass
         self.log.close();self.root.cleanup()
+        with SESSION_LOCK:SESSIONS.discard(self)
 
 
 def run(config):

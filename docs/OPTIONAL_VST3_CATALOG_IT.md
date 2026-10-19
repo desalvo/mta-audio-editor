@@ -98,3 +98,12 @@ build native Windows/macOS restano da verificare sui relativi sistemi.
 ## Stato e avanzamento per plugin (r210)
 
 Durante l'installazione ciascuna scheda mostra il proprio stato e il plugin attivo presenta una barra di attività con fase di download/compilazione/installazione. La barra scompare appena termina quel plugin; gli esiti compaiono subito, senza attendere l'intero lotto. Le percentuali complessive non vengono inventate: la barra rimane indeterminata quando i tool non espongono un totale affidabile. Errori finali e installazioni riuscite rimangono identificabili riaprendo il catalogo; il monitoraggio di un job ancora attivo riprende nello stesso processo server. Dettagli e verifiche in `VST3_PROGRESS_CPP_LIVE_CONTROLS_R210.md`.
+
+
+## Disinstallazione dei pacchetti opzionali
+
+Aprire lo stesso catalogo da **Impostazioni → Web App → VST3 open-source opzionali** (oppure dalle impostazioni native). La scheda di un pacchetto installato presenta **Disinstalla** e l'opzione, inizialmente selezionata, **Rimuovi anche sorgenti scaricati e cache di compilazione**. È richiesta una sola conferma.
+
+La rimozione riguarda l'intero pacchetto, quindi tutti i quattro riverberi nel caso di Dragonfly. Il sistema elenca il numero di progetti che lo utilizzano: quei progetti richiederanno una reinstallazione o la rimozione degli insert interessati. I dati dei progetti vengono conservati. Prima di procedere occorre fermare le sessioni live che usano il plugin e chiuderne editor e monitoring. Un'installazione già in corso impedisce la disinstallazione concorrente.
+
+Il pulsante opera esclusivamente sui pacchetti del catalogo nella directory gestita da MTA. Non rimuove gli effetti DSP interni né pacchetti VST3 installati autonomamente dal sistema operativo. Le directory temporaneamente staccate durante la rimozione sono escluse dalla discovery e dall'esecuzione, anche quando il catalogo risiede su un volume separato.

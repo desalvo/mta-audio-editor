@@ -34,6 +34,16 @@ def serve(port):
     request=Request({'type':'http','headers':[(b'user-agent',b'testclient')]})
     Path(os.environ['MTA_PLAYBACK_PROBE_CONFIG']).write_text(json.dumps({'project':project.id,'cookie':auth.create_session(admin['id'],request)}))
     from app.main import app
+    if os.getenv('MTA_PLAYBACK_PROBE_JITTER')=='1':
+        import asyncio
+        pulls=0
+        @app.middleware('http')
+        async def network_jitter(request,call_next):
+            nonlocal pulls
+            if request.url.path.endswith('/pcm'):
+                pulls+=1
+                await asyncio.sleep([0,.02,.04,.12,.18,.08][pulls%6])
+            return await call_next(request)
     import uvicorn
     uvicorn.run(app,host='127.0.0.1',port=port,log_level='warning',lifespan='off')
 

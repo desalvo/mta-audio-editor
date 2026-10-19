@@ -1,0 +1,26 @@
+{
+  "engine": "cpp",
+  "tracks": 8,
+  "start_seconds": 1.206,
+  "fader_to_audible_meter_seconds": 0.701,
+  "initial_track_meter_percent": 40.4603,
+  "space_pause_resume": true,
+  "pause_holds_cursor": true,
+  "pause_clears_meters": true,
+  "continuous_gesture_updates": true,
+  "pan_updated": true,
+  "live_mixer_requests": 11,
+  "errors": [],
+  "stream": {
+    "mode": "worklet",
+    "underruns": 0
+  },
+  "network_jitter": true,
+  "gui_stalls_ms": [
+    450,
+    450,
+    450,
+    450,
+    450
+  ]
+}

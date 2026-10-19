@@ -8,6 +8,7 @@ import datetime as dt
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import shutil
 import subprocess
@@ -165,6 +166,59 @@ def start(ids):
 def status(identifier):
     if identifier not in _JOBS:raise ValueError('Plugin installation not found (server may have restarted)')
     return copy.deepcopy(_JOBS[identifier])
+
+
+def _managed_package(identifier):
+    if not isinstance(identifier,str) or not re.fullmatch(r'[a-z0-9-]+',identifier):raise ValueError('Invalid catalog plugin')
+    spec=next((p for p in catalog()['plugins'] if p['id']==identifier),None)
+    if spec is None:raise ValueError('Unknown catalog plugin')
+    root=plugin_root().resolve();target=plugin_root()/identifier
+    if target.is_symlink() or target.resolve().parent!=root:raise ValueError('Unsafe managed plugin path')
+    return spec,target
+
+
+def _uses(project,target):
+    routes=[project.master_inserts]+[t.inserts for t in project.tracks]+[[t.instrument] for t in project.tracks if t.instrument]
+    return any(i.plugin=='vst3' and Path(str(i.params.get('path',''))).resolve().is_relative_to(target.resolve()) for items in routes for i in items)
+
+
+def uninstall_info(identifier):
+    from .vst3_live import SESSIONS,SESSION_LOCK
+    from . import vst3_editor
+    from .storage import list_projects
+    spec,target=_managed_package(identifier)
+    with SESSION_LOCK,vst3_editor._LOCK:
+        busy=any(not s.closed and _uses(s.project,target) for s in list(SESSIONS)) or any(proc.poll() is None for proc,_,_ in vst3_editor._JOBS.values())
+    projects=[{'id':p.id,'title':p.title} for p in list_projects(is_admin=True) if _uses(p,target)]
+    return {'id':identifier,'name':spec['name'],'installed':target.is_dir(),'in_use':busy,'projects':projects}
+
+
+def uninstall(identifier,*,remove_build_cache=False):
+    # Only allowlisted packages inside MTA's managed root can be removed.
+    # The same process lock prevents a live host from starting while detaching.
+    from .vst3_live import SESSIONS,SESSION_LOCK
+    from . import vst3_editor
+    if not _LOCK.acquire(blocking=False):raise ValueError('Wait for the current plugin installation to finish')
+    detached=None
+    try:
+        spec,target=_managed_package(identifier)
+        work=auth.data_root()/'optional-plugin-builds'/identifier
+        if work.parent.is_symlink() or work.is_symlink() or work.resolve().parent!=(auth.data_root()/'optional-plugin-builds').resolve():raise ValueError('Unsafe plugin build cache path')
+        with SESSION_LOCK,vst3_editor._LOCK:
+            if any(proc.poll() is None for proc,_,_ in vst3_editor._JOBS.values()):raise ValueError('Close the desktop plugin editor before uninstalling plugins')
+            if any(not s.closed and _uses(s.project,target) for s in list(SESSIONS)):raise ValueError('Stop playback and close live plugin editors/monitoring before uninstalling this plugin')
+            if target.exists():
+                detached=target.parent/('.mta-vst3-remove-'+uuid.uuid4().hex)
+                os.replace(target,detached)
+        # rmtree does not follow directory symlinks; roots above are checked.
+        if detached:shutil.rmtree(detached)
+        if remove_build_cache and work.exists():shutil.rmtree(work)
+        elif work.is_dir():
+            for status_file in work.glob('*/status.json'):
+                if status_file.parent.is_symlink() or status_file.is_symlink():continue
+                status_file.write_text(json.dumps({'id':identifier,'uninstalled_at':int(time.time())})+'\n')
+        return {'id':identifier,'state':'not_installed','build_cache_removed':remove_build_cache,'name':spec['name']}
+    finally:_LOCK.release()
 
 
 if __name__=='__main__':

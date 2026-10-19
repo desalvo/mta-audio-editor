@@ -33,7 +33,7 @@ const button={classList:{add(){}}};const context={window,console,setTimeout,clea
 vm.createContext(context);vm.runInContext(fs.readFileSync('app/static/server_vst3.js','utf8'),context);
 (async()=>{
  await window.previewMaster();await wait(30);
- assert.equal(fallbacks,0);assert.equal(nodes.length,1);assert.equal(nodes[0].buffer.data[0][1],.125);assert(window.playbackActuallyRunning());
+ assert.equal(fallbacks,0);assert(nodes.length>=1&&nodes.length<=6,'Bounded audio lookahead');assert.equal(nodes[0].buffer.data[0][1],.125);assert(window.playbackActuallyRunning());
  context.audioCtx.currentTime=nodes[0].at+.04;
  await window.pausePlayback();
  assert(!window.playbackActuallyRunning());

@@ -1,0 +1,12 @@
+{
+  "per_block_seek": {
+    "seconds": 0.1569,
+    "seeks": 2813
+  },
+  "sequential": {
+    "seconds": 0.163,
+    "seeks": 0
+  },
+  "max_sample_difference": 0.0,
+  "format": "30-second stereo MP3, 48 kHz, 512-frame blocks"
+}

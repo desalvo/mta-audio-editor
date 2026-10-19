@@ -39,5 +39,14 @@ function paintMeters(project,meters,silent=false){
  }
  route('master',meters?.master);project?.tracks?.forEach((t,i)=>route(t.id,meters?.tracks?.[i]));
 }
-root.MtaPlaybackPrep={mixerControls,paintMeters,mapLimit,clipPlan,BufferCache,showProgress,hideProgress};
+function transportButton(state){
+ const button=root.document?.getElementById('playMaster');if(!button)return;
+ const playing=state==='playing',label=typeof root.tr==='function'?root.tr(playing?'Pause':state==='paused'?'Resume':'Play',playing?'Pausa':state==='paused'?'Riprendi':'Riproduci'):(playing?'Pause':'Play');
+ button.dataset.playbackState=state;button.title=label;button.setAttribute('aria-label',label);button.replaceChildren();
+ const svg=root.document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('width','20');svg.setAttribute('height','20');svg.setAttribute('aria-hidden','true');
+ if(playing){for(const x of [6,14]){const bar=root.document.createElementNS(svg.namespaceURI,'rect');for(const [k,v] of Object.entries({x,y:4,width:4,height:16,rx:1,fill:'currentColor'}))bar.setAttribute(k,String(v));svg.append(bar)}}
+ else{const path=root.document.createElementNS(svg.namespaceURI,'path');path.setAttribute('d','M7 4v16l14-8z');path.setAttribute('fill','currentColor');svg.append(path)}
+ button.append(svg);
+}
+root.MtaPlaybackPrep={transportButton,mixerControls,paintMeters,mapLimit,clipPlan,BufferCache,showProgress,hideProgress};
 })(typeof window==='undefined'?globalThis:window);
