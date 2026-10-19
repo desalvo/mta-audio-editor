@@ -61,3 +61,8 @@ shipped binary. An unknown license requires review before redistribution.
 ## Private X.Org display build source
 
 The source-only archive `native/server_display/vendor/xorg-server-21.1.24.tar.xz` is an unmodified upstream X.Org release, SHA-256 `1a4eb36ca65cc3b1b936566d677a9786e13c11cd5806e951ac55f3f5ce3984af`, originally retrieved from https://xorg.freedesktop.org/releases/individual/xserver/xorg-server-21.1.24.tar.xz. It is retained to remove the external DNS dependency during RPM/DEB builds. The complete upstream licence notices remain in the archive and in the adjacent `XSERVER-COPYING`; compiled server packages carry those notices. No precompiled X server or third-party VST plugin is included in this source archive.
+
+
+## miniaudio
+
+The C++ audio device transport uses miniaudio 0.11.23, copyright David Reid, under its MIT No Attribution option. The unmodified header and full upstream licensing text are retained at `native/third_party/miniaudio/miniaudio.h`; the adjacent README records its version and SHA-256. Docker's isolated audio-core build copies this directory alongside the core sources.

@@ -53,7 +53,7 @@ void callback(ma_device* device,void* output,const void*,ma_uint32 frames) noexc
     const auto n=std::min<uint64_t>(frames,w-r);const float gain=t->gain.load(std::memory_order_relaxed);float left=0,right=0;
     for(uint64_t i=0;i<n;++i){const auto at=((r+i)&(mta_transport::capacity-1))*2;
         out[i*2]=std::clamp(t->ring[at]*gain,-1.0f,1.0f);out[i*2+1]=std::clamp(t->ring[at+1]*gain,-1.0f,1.0f);
-        left=std::max(left,std::fabs(out[i*2]));right=std::max(right,std::fabs(out[i*2+1]));}
+        left=(std::max)(left,std::fabs(out[i*2]));right=(std::max)(right,std::fabs(out[i*2+1]));}
     t->read.store(r+n,std::memory_order_release);t->position.fetch_add(n,std::memory_order_relaxed);
     t->left.store(left,std::memory_order_relaxed);t->right.store(right,std::memory_order_relaxed);
     if(n<frames){if(t->eof.load(std::memory_order_acquire)&&r+n==t->write.load(std::memory_order_acquire))t->ended.store(true);else t->underruns.fetch_add(1,std::memory_order_relaxed);}

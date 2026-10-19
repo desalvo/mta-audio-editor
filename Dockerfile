@@ -1,6 +1,7 @@
 FROM debian:trixie-slim AS audio-core-build
 RUN apt-get update && apt-get install -y --no-install-recommends cmake g++ make && rm -rf /var/lib/apt/lists/*
 COPY native/audio_core /src/audio_core
+COPY native/third_party/miniaudio /src/third_party/miniaudio
 RUN cmake -S /src/audio_core -B /build -DCMAKE_BUILD_TYPE=Release && cmake --build /build --parallel 2
 
 FROM python:3.14-slim-trixie AS vst3-host-build

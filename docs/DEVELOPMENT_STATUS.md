@@ -1,8 +1,19 @@
 # MTA Audio Editor — Development status
 
-Versione obbligatoria: **0.3.0-r210**. Ultimo ciclo: correzione gate Quality e repository RPM firmato, 19 ottobre 2026 ore 15:16–15:22 Europe/Rome.
+Versione obbligatoria: **0.3.0-r210**. Ultimo ciclo: correzione build Docker e Windows del core audio C++, 19 ottobre 2026 ore 15:55 Europe/Rome.
 
-## Stato corrente verificato
+## Stato corrente — build Docker e Windows
+
+- Baseline: `MTA-0.3.0-r210-ci-license-signed-rpm-cumulative.zip`, SHA-256 `6f1ad7b58a8fb67f898090e76c67a8adf86f900837eab48c5744036678d63930`. Tutti i suoi 2.112 file conservati.
+- Docker: il primo stage copia anche `native/third_party/miniaudio` nella directory sorella del core.
+- Windows: `NOMINMAX` sul target CMake e chiamate `std::max` resistenti alle macro nel callback audio; nessun warning soppresso.
+- **60 test mirati passati**: 39 build/DSP/server più 21 trasporto/cattura/gate CI. Compilazioni isolate con i soli COPY Docker, sia normale sia con macro Win32 iniettate, riuscite; ABI core/trasporto e simboli cattura verificati.
+- Ruff, Bandit alle soglie CI e controllo licenze: passati. Aggiornate le note miniaudio.
+- L’immagine Docker completa e MSVC reale non sono eseguibili in questo ambiente: conferma richiesta ai runner CI. Non è stata ripetuta l’intera suite in questo ciclo.
+- Consegna: `MTA-0.3.0-r210-docker-windows-core-build-cumulative.zip`; rapporti in `validation/r210-container-windows-result.json` e JUnit/log adiacenti. CRC, confronto byte per byte e SHA-256 fanno parte della creazione del cumulativo.
+- Versione 0.3.0-r210 invariata; nessun commit/push/tag/release o intervento sui server reali.
+
+## Checkpoint CI precedente (15:16)
 
 - Corrette la collocazione del plugin di prova Quality e la rimozione automatica delle dipendenze nel test RPM firmato. Nessuna modifica al runtime applicativo o ai requisiti RPM.
 - **35 test mirati passati**, incluso il license guard che falliva nella CI; Ruff, Bandit e sintassi shell passati. Download reale del plugin bloccato a checksum, elaborazione audio e audit sorgenti passati con fixture esterno. Guard del test distruttivo eseguito e rifiutato correttamente fuori da CI.
@@ -80,3 +91,11 @@ Correzioni implementate: fixture Quality spostato sotto `RUNNER_TEMP`, con perco
 ## Prossima verifica richiesta
 
 Dopo l’applicazione e il commit dell’utente: rilanciare Quality e i tre job RPM. Verificare la conclusione del test repository firmato mantenendo attivi `gpgcheck=1`, `repo_gpgcheck=1` e il test dei metadata alterati. Il controllo licenze deve continuare a rifiutare plugin nel checkout, anche sotto `.external`.
+
+
+## Ciclo Docker — 19 ottobre 2026 ore 15:55 Europe/Rome
+
+Baseline: `MTA-0.3.0-r210-ci-license-signed-rpm-cumulative.zip`, SHA-256 `6f1ad7b58a8fb67f898090e76c67a8adf86f900837eab48c5744036678d63930`. Log allegato: fallisce lo stage `audio-core-build`, `device_transport.cpp` non trova `../third_party/miniaudio/miniaudio.h`. Il Dockerfile copia solo `native/audio_core` e omette il fratello `native/third_party/miniaudio`. Corretto il COPY Docker; entrambe le compilazioni su contesto isolato, normale e con macro Win32 iniettate, sono passate. Revisione invariata.
+
+
+Aggiornamento nello stesso ciclo: ricevuto anche il fallimento MSVC C2589 sulle chiamate `std::max` del callback. Causa: macro Win32 `max` introdotta attraverso miniaudio. Applicati `NOMINMAX` al target Windows e chiamate resistenti alle macro. 60 test passati (39 build/DSP/server, 21 trasporto/cattura/gate CI). MSVC reale non disponibile localmente. I warning C4324/C4244/C4456/C4245 e la nota `CMAKE_BUILD_TYPE` non sono l’errore fatale segnalato e non vengono soppressi.

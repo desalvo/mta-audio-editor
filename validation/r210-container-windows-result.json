@@ -1,0 +1,31 @@
+{
+  "version": "0.3.0-r210",
+  "base_archive": "MTA-0.3.0-r210-ci-license-signed-rpm-cumulative.zip",
+  "base_sha256": "6f1ad7b58a8fb67f898090e76c67a8adf86f900837eab48c5744036678d63930",
+  "previous_files_preserved": 2112,
+  "changes": [
+    "Copy miniaudio into the sibling directory expected by the Docker audio-core build.",
+    "Define NOMINMAX on the Windows CMake target; prevent Win32 max macro expansion at callback peak computation.",
+    "Add real isolated Docker COPY compilation and Win32 min/max fault-injection regressions; update development status and notices."
+  ],
+  "tests": {
+    "build_dsp_server": 39,
+    "transport_capture_ci_guards": 21,
+    "passed": 60,
+    "failed": 0,
+    "skipped": 0
+  },
+  "ruff": "passed (CI scope)",
+  "bandit": "passed (CI thresholds)",
+  "license_guard": "passed",
+  "full_suite_rerun": false,
+  "real_docker_image_build": false,
+  "real_msvc_build": false,
+  "not_certified": [
+    "Full Docker image assembly on Debian/Python 3.14 runner",
+    "MSVC Windows build and physical devices"
+  ],
+  "revision_changed": false,
+  "commit_push_tag_release": false,
+  "production_modified": false
+}

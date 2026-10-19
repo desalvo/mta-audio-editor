@@ -26,5 +26,6 @@ if(APPLE)
 endif()
 
 if(WIN32)
+  target_compile_definitions(mta_audio_core PRIVATE NOMINMAX)
   target_link_libraries(mta_audio_core PRIVATE ole32 winmm uuid)
 endif()
