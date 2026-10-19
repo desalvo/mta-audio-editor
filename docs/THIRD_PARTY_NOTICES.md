@@ -56,3 +56,8 @@ not proof of legal compliance. Check resolved Python wheels, OS libraries,
 Android/iOS dependencies, model weights, FFmpeg configure flags and codecs,
 upstream licenses, source-offer obligations and complete notices for **every**
 shipped binary. An unknown license requires review before redistribution.
+
+
+## Private X.Org display build source
+
+The source-only archive `native/server_display/vendor/xorg-server-21.1.24.tar.xz` is an unmodified upstream X.Org release, SHA-256 `1a4eb36ca65cc3b1b936566d677a9786e13c11cd5806e951ac55f3f5ce3984af`, originally retrieved from https://xorg.freedesktop.org/releases/individual/xserver/xorg-server-21.1.24.tar.xz. It is retained to remove the external DNS dependency during RPM/DEB builds. The complete upstream licence notices remain in the archive and in the adjacent `XSERVER-COPYING`; compiled server packages carry those notices. No precompiled X server or third-party VST plugin is included in this source archive.

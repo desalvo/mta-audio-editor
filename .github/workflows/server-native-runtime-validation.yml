@@ -10,6 +10,7 @@ on:
       - 'scripts/build_vst3_runtime.py'
       - 'scripts/patch_vst3_runtime.py'
       - 'scripts/build_server_display.py'
+      - 'native/server_display/**'
       - 'native/host_transport/**'
       - 'requirements-vst3.txt'
       - 'scripts/server_packages/**'
@@ -25,6 +26,7 @@ on:
       - 'scripts/build_vst3_runtime.py'
       - 'scripts/patch_vst3_runtime.py'
       - 'scripts/build_server_display.py'
+      - 'native/server_display/**'
       - 'native/host_transport/**'
       - 'requirements-vst3.txt'
       - 'scripts/server_packages/**'
@@ -118,7 +120,7 @@ jobs:
       - name: Install build and Python 3.12 tools
         run: |
           set -euo pipefail
-          dnf -y install git cmake gcc-c++ make pkgconf-pkg-config freetype-devel alsa-lib-devel libX11-devel libXext-devel libXrender-devel libXcomposite-devel libXrandr-devel libXinerama-devel libXcursor-devel mesa-libGL-devel rpm rpm-build rpmdevtools cpio python3.12 python3.12-pip python3.12-devel
+          dnf -y install git cmake gcc-c++ libatomic make pkgconf-pkg-config freetype-devel alsa-lib-devel libX11-devel libXext-devel libXrender-devel libXcomposite-devel libXrandr-devel libXinerama-devel libXcursor-devel mesa-libGL-devel rpm rpm-build rpmdevtools cpio python3.12 python3.12-pip python3.12-devel
           dnf -y install dnf-plugins-core
           dnf config-manager --set-enabled crb
           dnf -y install 'pkgconfig(pixman-1)' 'pkgconfig(xfont2)' 'pkgconfig(xau)' 'pkgconfig(xdmcp)' 'pkgconfig(xkbfile)' 'pkgconfig(xproto)' 'pkgconfig(xtrans)' 'pkgconfig(libcrypto)' 'pkgconfig(dri)'
@@ -196,7 +198,7 @@ jobs:
           set -euo pipefail
           cat /etc/os-release
           grep -q '^VERSION_ID="*10' /etc/os-release
-          dnf -y install git cmake gcc-c++ make pkgconf-pkg-config freetype-devel alsa-lib-devel libX11-devel libXext-devel libXrender-devel libXcomposite-devel libXrandr-devel libXinerama-devel libXcursor-devel mesa-libGL-devel rpm rpm-build cpio python3.12 python3.12-pip python3.12-devel ca-certificates
+          dnf -y install git cmake gcc-c++ libatomic make pkgconf-pkg-config freetype-devel alsa-lib-devel libX11-devel libXext-devel libXrender-devel libXcomposite-devel libXrandr-devel libXinerama-devel libXcursor-devel mesa-libGL-devel rpm rpm-build cpio python3.12 python3.12-pip python3.12-devel ca-certificates
           dnf -y install dnf-plugins-core
           dnf config-manager --set-enabled crb
           dnf -y install 'pkgconfig(pixman-1)' 'pkgconfig(xfont2)' 'pkgconfig(xau)' 'pkgconfig(xdmcp)' 'pkgconfig(xkbfile)' 'pkgconfig(xproto)' 'pkgconfig(xtrans)' 'pkgconfig(libcrypto)' 'pkgconfig(dri)'

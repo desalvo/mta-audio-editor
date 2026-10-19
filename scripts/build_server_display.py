@@ -13,20 +13,22 @@ import subprocess
 import sys
 import tarfile
 import tempfile
-import urllib.request
 
 VERSION='21.1.24'
 URL=f'https://xorg.freedesktop.org/releases/individual/xserver/xorg-server-{VERSION}.tar.xz'
 SHA256='1a4eb36ca65cc3b1b936566d677a9786e13c11cd5806e951ac55f3f5ce3984af'
+SOURCE_ARCHIVE=Path(__file__).resolve().parents[1]/'native/server_display/vendor'/f'xorg-server-{VERSION}.tar.xz'
 
 
-def build(destination):
+def build(destination,source_archive=None):
     destination=Path(destination).resolve();destination.mkdir(parents=True,exist_ok=True)
+    # Source only, with its complete upstream licence notices. Packaging cannot
+    # depend on external DNS availability inside Rocky's CI container.
+    archive=Path(source_archive or os.environ.get('MTA_XSERVER_SOURCE_ARCHIVE') or SOURCE_ARCHIVE).resolve()
+    if not archive.is_file():raise ValueError('Missing pinned X.Org source archive: '+str(archive))
+    if hashlib.sha256(archive.read_bytes()).hexdigest()!=SHA256:raise ValueError('X server source checksum mismatch')
     with tempfile.TemporaryDirectory(prefix='mta-display-build-') as temp:
-        root=Path(temp);archive=root/'xserver.tar.xz'
-        with urllib.request.urlopen(URL,timeout=90) as source,archive.open('wb') as target:  # noqa: S310 -- pinned official HTTPS URL and verified digest
-            shutil.copyfileobj(source,target)
-        if hashlib.sha256(archive.read_bytes()).hexdigest()!=SHA256:raise ValueError('X server source checksum mismatch')
+        root=Path(temp)
         with tarfile.open(archive) as source:source.extractall(root,filter='data')
         source=root/f'xorg-server-{VERSION}';output=root/'build'
         # Build only the framebuffer X server. No privileged Xorg driver, login
@@ -49,4 +51,6 @@ def build(destination):
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser();parser.add_argument('--output',required=True,type=Path)
-    print(build(parser.parse_args().output))
+    parser.add_argument('--source-archive',type=Path)
+    args=parser.parse_args()
+    print(build(args.output,args.source_archive))

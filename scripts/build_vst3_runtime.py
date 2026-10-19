@@ -17,6 +17,14 @@ from patch_vst3_runtime import patch,UPSTREAM
 ROOT=Path(__file__).resolve().parents[1]
 
 
+def install_wheel(wheel):
+    # The wheel is built with --no-deps, but importing it requires NumPy.
+    # Preserve existing NumPy 1.x installations on Intel macOS.
+    subprocess.run([sys.executable,'-m','pip','install','numpy'],check=True)
+    subprocess.run([sys.executable,'-m','pip','install','--no-deps','--force-reinstall',str(wheel)],check=True)
+    subprocess.run([sys.executable,'-c','from pedalboard import VST3Plugin; assert all(hasattr(VST3Plugin,n) for n in ("_mta_set_transport","_mta_set_musical_position","_mta_process_sidechain")), "Missing compiled MTA transport ABI"'],check=True)
+
+
 def build(destination,source=None,*,install=False):
     destination=Path(destination).resolve();destination.mkdir(parents=True,exist_ok=True)
     identity=hashlib.sha256(b''.join((ROOT/name).read_bytes() for name in ('native/host_transport/MtaHostTransport.h','native/host_transport/MtaSidechainMethods.h','native/host_transport/MtaUmpEvents.inc','scripts/patch_vst3_runtime.py'))+json.dumps([UPSTREAM,sys.implementation.cache_tag,platform.system(),platform.machine(),os.getenv('ARCHFLAGS',''),os.getenv('MACOSX_DEPLOYMENT_TARGET','')]).encode()).hexdigest()
@@ -52,8 +60,7 @@ def build(destination,source=None,*,install=False):
         if len(wheels)!=1:raise ValueError('Expected one platform-specific MTA VST host wheel')
         record.write_text(json.dumps({'identity':identity,'upstream':UPSTREAM,'transport_abi':2,'wheel':wheels[0].name,'sha256':hashlib.sha256(wheels[0].read_bytes()).hexdigest()},indent=2)+'\n')
     if install:
-        subprocess.run([sys.executable,'-m','pip','install','--no-deps','--force-reinstall',str(wheels[0])],check=True)
-        subprocess.run([sys.executable,'-c','from pedalboard import VST3Plugin; assert all(hasattr(VST3Plugin,n) for n in ("_mta_set_transport","_mta_set_musical_position","_mta_process_sidechain")), "Missing compiled MTA transport ABI"'],check=True)
+        install_wheel(wheels[0])
     return wheels[0]
 
 

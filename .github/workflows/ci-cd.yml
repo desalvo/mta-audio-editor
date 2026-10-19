@@ -167,6 +167,11 @@ jobs:
       - name: Python dependency audit
         shell: bash
         run: |
+          # Python 3.14 may resolve python-rtmidi from source even for pip's
+          # metadata-only dry run. Audit the full dependency tree with its
+          # actual ALSA/JACK build prerequisites; never skip native packages.
+          sudo apt-get update
+          sudo apt-get install -y g++ pkg-config libasound2-dev libjack-jackd2-dev
           pip-audit -r requirements.txt --strict
           pip-audit -r requirements-native.txt --strict
           pip-audit -r requirements-lyrics.txt --strict

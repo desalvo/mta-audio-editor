@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "errors": [],
+  "prebuilt_artifacts": [],
+  "message": "Static source guard only: review compiled bundles, transitive dependencies and media codecs before distribution.",
+  "archives": {
+    "native/server_display/vendor/xorg-server-21.1.24.tar.xz": {
+      "ok": true,
+      "errors": [],
+      "members_checked": 1661,
+      "message": "Archive contents static scan; external runtime and binary license audit still required."
+    }
+  }
+}

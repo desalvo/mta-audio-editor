@@ -1,0 +1,16 @@
+{
+  "private_display": {
+    "version": "21.1.24",
+    "source": "https://xorg.freedesktop.org/releases/individual/xserver/xorg-server-21.1.24.tar.xz",
+    "source_sha256": "1a4eb36ca65cc3b1b936566d677a9786e13c11cd5806e951ac55f3f5ce3984af",
+    "binary_sha256": "d8c63249f6a09172464f8a7d25dd5e226cd97b9524efd000212ecf0ec8d4d2e2"
+  },
+  "source_files_byte_verified": 293,
+  "build_rpath": false,
+  "display_frame": "passed (authenticated TCP test display; production Landlock not certified)",
+  "fresh_venv_vst3_import": "passed after resolving NumPy",
+  "python_rtmidi_sdist_build": "passed on Python 3.12 with ALSA headers",
+  "native_dependency_audit": "strict, 12 resolved packages, no known vulnerabilities",
+  "offline_deb": "passed; pip --no-index, pip check, C++ and VST3 ABI smoke",
+  "el_rpm_execution": "not locally available; requires GitHub CI Rocky9/Rocky10/Alma10"
+}

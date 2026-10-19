@@ -42,7 +42,7 @@ Release: %{getenv:MTA_RPM_RELEASE}%{?dist}
 Summary: MTA Audio Editor web server and offline runtime dependencies
 License: MIT
 BuildArch: %{_arch}
-Requires: python3.12, python3.12-pip, /usr/bin/ffmpeg, ca-certificates, libstdc++, alsa-lib, freetype, libX11, libXext, libXrandr, libXinerama, libXcursor, mesa-libGL, libXtst, libXfont2, mesa-dri-drivers, pixman, libXau, libXdmcp, xkeyboard-config, /usr/bin/xkbcomp
+Requires: python3.12, python3.12-pip, /usr/bin/ffmpeg, ca-certificates, libstdc++, libatomic, alsa-lib, freetype, libX11, libXext, libXrandr, libXinerama, libXcursor, mesa-libGL, libXtst, libXfont2, mesa-dri-drivers, pixman, libXau, libXdmcp, xkeyboard-config, /usr/bin/xkbcomp
 AutoReqProv: no
 %description
 MTA Audio Editor web server, distinct from the desktop and Proxmox agent.

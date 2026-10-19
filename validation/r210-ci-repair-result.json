@@ -1,0 +1,68 @@
+{
+  "version": "0.3.0-r210",
+  "date": "2026-10-19T12:55:37.871700+00:00",
+  "base_archive": "MTA-0.3.0-r210-vst3-server-editor-cumulative.zip",
+  "base_sha256": "a40f80f9ee7e4a94975407ed20d2b31e2192b1139fc602dc5cfedf7f2727e96a",
+  "previous_files_preserved": 2084,
+  "changed_previous_files": [
+    ".github/workflows/ci-cd.yml",
+    ".github/workflows/server-native-runtime-validation.yml",
+    "docs/RELEASE_NOTES_R210_VST3_COMPLETION.md",
+    "docs/THIRD_PARTY_NOTICES.md",
+    "docs/VST3_COMPLETION_R210.md",
+    "scripts/build_server_display.py",
+    "scripts/build_vst3_runtime.py",
+    "scripts/server_packages/build_deb.sh",
+    "scripts/server_packages/build_rpm.sh"
+  ],
+  "full_regression": {
+    "tests": 4141,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 6,
+    "passed": 4135
+  },
+  "environment_deselected": 10,
+  "combined_coverage": 0.7613792072547896,
+  "targeted_regression": {
+    "tests": 18,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 18
+  },
+  "bandit": "passed at CI severity/confidence thresholds; app/native and modified build scripts",
+  "ruff": "passed at CI scope plus modified build scripts",
+  "native_audit_packages": 12,
+  "native_audit_known_vulnerabilities": 0,
+  "runtime": {
+    "private_display": {
+      "version": "21.1.24",
+      "source": "https://xorg.freedesktop.org/releases/individual/xserver/xorg-server-21.1.24.tar.xz",
+      "source_sha256": "1a4eb36ca65cc3b1b936566d677a9786e13c11cd5806e951ac55f3f5ce3984af",
+      "binary_sha256": "d8c63249f6a09172464f8a7d25dd5e226cd97b9524efd000212ecf0ec8d4d2e2"
+    },
+    "source_files_byte_verified": 293,
+    "build_rpath": false,
+    "display_frame": "passed (authenticated TCP test display; production Landlock not certified)",
+    "fresh_venv_vst3_import": "passed after resolving NumPy",
+    "python_rtmidi_sdist_build": "passed on Python 3.12 with ALSA headers",
+    "native_dependency_audit": "strict, 12 resolved packages, no known vulnerabilities",
+    "offline_deb": "passed; pip --no-index, pip check, C++ and VST3 ABI smoke",
+    "el_rpm_execution": "not locally available; requires GitHub CI Rocky9/Rocky10/Alma10"
+  },
+  "not_executed": [
+    "GitHub-hosted Python 3.14 Quality/SAST jobs",
+    "Real Rocky9/Rocky10/Alma10 container RPM builds and lifecycle",
+    "Production Landlock and physical audio/MIDI devices"
+  ],
+  "changes": [
+    "Ensure NumPy before compiled host ABI import; preserve existing NumPy versions.",
+    "Keep strict native dependency audit and provision ALSA/JACK build headers.",
+    "Ship unmodified SHA-pinned X.Org source archive and complete licence notices; no DNS/download in private display build.",
+    "Require libatomic explicitly for EL build and runtime, plus Debian runtime dependency.",
+    "Create and maintain docs/DEVELOPMENT_STATUS.md."
+  ],
+  "commit_push_tag_release": false,
+  "production_modified": false
+}
