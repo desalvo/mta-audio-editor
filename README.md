@@ -293,3 +293,5 @@ See [Durable upload recovery](docs/AI_R208_DURABLE_RECOVERY_CLOSURES_EN.md) for 
 ACE-Step r210: [long jobs, internal timeout and cancellation](docs/ACE_LONG_JOBS_AND_CANCELLATION_R210.md).
 
 ACE-Step r210: [cold-start recovery without cancelling an accepted job](docs/ACE_COLD_START_R210.md).
+
+VST3/MIDI r210: [original server plugin editors, tempo maps, sidechains, UMP/MPE/SysEx and external audio capture](docs/VST3_COMPLETION_R210.md).

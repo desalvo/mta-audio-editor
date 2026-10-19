@@ -23,23 +23,42 @@ def init(c):
     CREATE TABLE IF NOT EXISTS resource_storage_debits(user_id INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,through_ts INTEGER NOT NULL,cost_micro INTEGER NOT NULL DEFAULT 0);
     CREATE TABLE IF NOT EXISTS resource_job_modes(job_id TEXT PRIMARY KEY REFERENCES ai_compute_jobs(id) ON DELETE CASCADE,mode TEXT NOT NULL);
     ''')
+    cols={r[1] for r in c.execute('PRAGMA table_info(resource_user_policy)')}
+    if 'access_required' not in cols:
+        c.execute('ALTER TABLE resource_user_policy ADD COLUMN access_required INTEGER NOT NULL DEFAULT 0')
 
 
 def policy(c,uid):
     row=c.execute('SELECT * FROM resource_user_policy WHERE user_id=?',(uid,)).fetchone()
-    return dict(row) if row else {'user_id':uid,'subscriptions_allowed':True,'credit_billing':False}
+    return dict(row) if row else {'user_id':uid,'subscriptions_allowed':True,'credit_billing':False,'access_required':False}
 
 
 def set_policy(uid,body,actor):
     from . import resource_accounts as r
-    if not body or set(body)-{'subscriptions_allowed','credit_billing'} or any(type(v) is not bool for v in body.values()):raise ValueError('Invalid user billing policy')
+    if not body or set(body)-{'subscriptions_allowed','credit_billing','access_required'} or any(type(v) is not bool for v in body.values()):raise ValueError('Invalid user billing policy')
     with auth.db() as c:
         r.init(c);c.execute('BEGIN IMMEDIATE')
         if not c.execute('SELECT 1 FROM users WHERE id=?',(uid,)).fetchone():raise ValueError('Unknown user')
         current=policy(c,uid);current.update(body)
+        role=c.execute('SELECT role FROM users WHERE id=?',(uid,)).fetchone()[0]
+        if role=='admin' and (current['access_required'] or current['credit_billing']):raise ValueError('Administrators cannot require paid access')
+        current['credit_billing']=False
+        if 'credit_billing' in body:body['credit_billing']=False
+        if not current['subscriptions_allowed']:current['access_required']=False
+        if current['access_required'] or current['credit_billing']:
+            from .resource_access import ensure_tariffs
+            ensure_tariffs(c)
+        if current['credit_billing']!=policy(c,uid)['credit_billing']:body['credit_billing']=bool(current['credit_billing'])
         if 'credit_billing' in body:
             c.execute('INSERT INTO resource_policy_events(user_id,effective_at,credit_billing) VALUES(?,?,?)',(uid,int(time.time()),int(body['credit_billing'])))
-        c.execute('INSERT INTO resource_user_policy VALUES(?,?,?) ON CONFLICT(user_id) DO UPDATE SET subscriptions_allowed=excluded.subscriptions_allowed,credit_billing=excluded.credit_billing',(uid,int(current['subscriptions_allowed']),int(current['credit_billing'])))
+        if not current['subscriptions_allowed']:
+            stamp=int(time.time())
+            c.execute('UPDATE resource_periods SET end=? WHERE user_id=? AND end>?',(stamp,uid,stamp))
+            c.execute("UPDATE resource_memberships SET plan=NULL,anchor=?,promo='' WHERE user_id=?",(stamp,uid))
+            c.execute('DELETE FROM resource_next_plans WHERE user_id=?',(uid,))
+            c.execute('DELETE FROM resource_cancellations WHERE user_id=?',(uid,))
+            c.execute('UPDATE resource_job_contracts SET overage=0 WHERE user_id=? AND settled=0',(uid,))
+        c.execute('INSERT INTO resource_user_policy(user_id,subscriptions_allowed,credit_billing,access_required) VALUES(?,?,?,?) ON CONFLICT(user_id) DO UPDATE SET subscriptions_allowed=excluded.subscriptions_allowed,credit_billing=excluded.credit_billing,access_required=excluded.access_required',(uid,int(current['subscriptions_allowed']),int(current['credit_billing']),int(current['access_required'])))
         c.execute('INSERT INTO resource_credits VALUES(?,?,?,?,?,?)',(uuid.uuid4().hex,uid,0,actor,'Billing policy: '+json.dumps(body),int(time.time())))
     return r.state(uid)
 
@@ -110,7 +129,9 @@ def storage_segments(c,uid,start,end):
     if start>=end or not c.execute("SELECT 1 FROM sqlite_master WHERE name='resource_quota_events'").fetchone():return []
     periods=[dict(x) for x in c.execute("SELECT * FROM resource_periods WHERE user_id=? AND plan IS NOT NULL AND end>? AND start<? AND json_extract(limits,'$._funded')=1 ORDER BY start",(uid,start,end))]
     tariffs=[dict(x) for x in c.execute("SELECT * FROM ai_resource_price_history WHERE resource='disk_gb_hours' ORDER BY valid_from")]
+    services=[dict(row) for row in c.execute('SELECT * FROM resource_credit_service_events ORDER BY effective_at,id')]
     cuts={start,end}
+    cuts.update(row['effective_at'] for row in services if start<row['effective_at']<end)
     for p in periods:
         p['start']=max(p['start'],json.loads(p['limits']).get('_funded_at',p['start']))
         cuts.update((max(start,p['start']),min(end,p['end'])))
@@ -128,6 +149,8 @@ def storage_segments(c,uid,start,end):
         ext=_extension(c,uid,p,a)
         if not ext['paid_bytes'] and not ext['free_bytes']:continue
         rate=next((x['micro_per_unit'] for x in reversed(tariffs) if x['valid_from']<=a and (x['valid_until'] is None or a<x['valid_until'])),0)
+        active=next((bool(row['enabled']) for row in reversed(services) if row['effective_at']<=a),True)
+        if not active:rate=0
         gh=ext['paid_bytes']/GIB*(b-a)/3600
         out.append({'start_ts':a,'end_ts':b,'duration_seconds':b-a,'plan':p['plan'],**ext,'gb_hours':gh,'rate_micro_per_gb_hour':rate,'cost_micro':gh*rate})
     return out
@@ -151,6 +174,11 @@ def enrich_state(c,uid,s,stamp):
     if s['subscription']:s['limits']['storage_bytes']=ext['quota_bytes']
     s['storage_extension']=ext;s['credits_micro']=r._balance(c,uid)
     s['policy']=policy(c,uid)
+    cfg=dict(c.execute('SELECT * FROM resource_config WHERE id=1').fetchone())
+    s['credits_enabled']=bool(cfg['enabled'] and cfg['credits_enabled'] and s['policy']['subscriptions_allowed'] and s['subscription'] and s['funded'])
+    s['policy']['credit_billing']=s['credits_enabled']
+    s['credit_denominations']=json.loads(cfg['credit_denominations'])
+    if not s['policy']['subscriptions_allowed']:s['policy']['access_required']=False
     trial=c.execute('SELECT * FROM resource_trial_uses WHERE user_id=?',(uid,)).fetchone()
     s['trial_available']=not bool(trial)
     nxt=c.execute('SELECT * FROM resource_next_plans WHERE user_id=?',(uid,)).fetchone()
@@ -168,6 +196,7 @@ def set_storage(uid,quota_bytes,*,actor,free=False,reason='Storage quota changed
     with auth.db() as c:
         r.init(c);c.execute('BEGIN IMMEDIATE');stamp=int(time.time());s=r._state(c,uid,0,stamp)
         if not s['subscription'] or not s['funded']:raise ValueError('An active funded subscription is required')
+        if not s['credits_enabled'] and not free and amount>s['limits']['storage_bytes']:raise ValueError('Enable subscription credits or grant the storage extension free of charge')
         ext=s['storage_extension'];floor=ext['included_bytes']+ext['prepaid_bytes']
         if owner:floor+=ext['free_bytes']
         if amount<floor:raise ValueError('Storage quota cannot be below included and free capacity')
@@ -201,7 +230,7 @@ def extend_storage(uid,gb,key,max_cost=None):
 
 def admit_credit(c,uid,jid,stamp):
     from . import resource_accounts as r
-    if r._balance(c,uid)<=0:raise ValueError('Resource credits exhausted')
+    if r._balance(c,uid)<=0 and not r.continuing_pool(c,uid,jid):raise ValueError('Resource credits exhausted')
     if c.execute("SELECT 1 FROM resource_job_contracts r JOIN ai_compute_jobs j ON j.id=r.job_id WHERE r.user_id=? AND j.status='running' AND j.id!=? AND (j.queue_job_id IS NULL OR j.queue_job_id IS NOT (SELECT queue_job_id FROM ai_compute_jobs WHERE id=?))",(uid,jid,jid)).fetchone():raise ValueError('Another quota-controlled AI job is running')
     p=r._period(c,uid,stamp)
     if not p:

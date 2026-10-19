@@ -4,7 +4,6 @@ import json
 import shutil
 
 import re
-import sys
 import subprocess
 import tempfile
 import uuid
@@ -13,8 +12,10 @@ from pathlib import Path
 
 import numpy as np
 
+from .audio_backend import render_scope, selected as selected_audio_backend
 from .models import AdaptiveTempoPoint, Clip, Project, Track
 from .plugins import chain_filter, effective_output_channels
+from .vst3_transport import project_scope,track_scope,render_settings
 
 
 def _run(cmd: list[str]) -> str:
@@ -430,6 +431,8 @@ def delete_song_range(project: Project, start_ms: int, end_ms: int) -> None:
     project.chords = _shift_timed(project.chords, start_ms, end_ms)
 
 
+@track_scope
+@render_scope
 def render_track(track: Track, source: Path, out: Path, apply_inserts: bool = True, sample_rate: int | None = None) -> None:
     """Render DAW clips for one track and apply its insert chain.
 
@@ -438,6 +441,23 @@ def render_track(track: Track, source: Path, out: Path, apply_inserts: bool = Tr
     by the container exporter or final mix stage.
     """
     sample_rate = int(sample_rate or getattr(track, "sample_rate", 44100) or 44100)
+    if apply_inserts and any(i.enabled and i.plugin=='vst3' and i.sidechain_track_id for i in track.inserts):
+        from .vst3_transport import render_project
+        from .vst3_sidechain import render as sidechain_render
+        project=render_project()
+        if project is None:raise ValueError('External sidechain rendering requires the project context')
+        from .storage import audio_path
+        resolver=lambda pid,name:source if name==track.filename else audio_path(pid,name)
+        return sidechain_render(project,resolver,out,track_id=track.id,prefader=True)
+    if track.kind=='midi':
+        from .midi_render import render_source
+        with tempfile.TemporaryDirectory(prefix='mta-midi-source-') as directory:
+            generated=Path(directory)/'instrument.wav'
+            duration=render_source(track,generated,sample_rate)
+            audio=track.model_copy(deep=True);audio.kind='audio';audio.channels=2
+            audio.duration_ms=duration;audio.delay_ms=0;audio.clips_initialized=True
+            audio.clips=[Clip(id='midi-render',source_end_ms=duration)]
+            return render_track(audio,generated,out,apply_inserts=apply_inserts,sample_rate=sample_rate)
     if sample_rate not in {44100, 48000, 96000}:
         sample_rate = 44100
     ensure_clips(track)
@@ -495,15 +515,14 @@ def render_track(track: Track, source: Path, out: Path, apply_inserts: bool = Tr
     else:
         base = ";".join(parts) + ";" + "".join(labels) + f"amix=inputs={len(labels)}:duration=longest:normalize=0[mix]"
     active = [item for item in track.inserts if item.enabled] if apply_inserts else []
-    vst_started = False
+    builtin_groups=[[]]
     for item in active:
-        if item.plugin == 'vst3':
-            vst_started = True
-        elif vst_started:
-            raise ValueError('VST3 inserts must be placed after built-in inserts in this revision')
-    inserts = chain_filter(active)
+        if item.plugin=='vst3':builtin_groups.append([])
+        else:builtin_groups[-1].append(item)
+    inserts = chain_filter(builtin_groups[0])
     input_gain = float(track.gain_db)
-    if input_gain:
+    cpp = selected_audio_backend() == 'cpp'
+    if input_gain and not cpp:
         inserts = f"volume={input_gain:.4f}dB" + ("," + inserts if inserts else "")
     output_channels = effective_output_channels(track.channels, track.inserts if apply_inserts else [])
     output_layout = "mono" if output_channels == 1 else "stereo"
@@ -523,22 +542,35 @@ def render_track(track: Track, source: Path, out: Path, apply_inserts: bool = Tr
     ]
     with tempfile.TemporaryDirectory(prefix='mta-vst3-') as scratch:
         scratch_path = Path(scratch)
-        intermediate = scratch_path / 'pre-vst.wav' if vst_chain else out
+        intermediate = scratch_path / 'pre-vst.wav' if vst_chain or cpp else out
+        render_source = source
+        if cpp:
+            from .cpp_audio import gain_file
+            # Decode/edit clips with the existing proven timeline, then execute
+            # input trim in C++ BEFORE nonlinear inserts. Never apply it twice.
+            prepared = scratch_path/'clips-float.wav'
+            _run(['ffmpeg','-y','-v','error','-i',str(source),'-filter_complex',base,
+                  '-map','[mix]','-ar',str(sample_rate),'-c:a','pcm_f32le',str(prepared)])
+            render_source = scratch_path/'gain-float.wav'
+            gain_file(prepared,render_source,round(input_gain,4))
+            filters = f'[0:a]{inserts+"," if inserts else ""}aformat=channel_layouts={output_layout}[out]'
         _run([
-            "ffmpeg", "-y", "-v", "error", "-i", str(source),
+            "ffmpeg", "-y", "-v", "error", "-i", str(render_source),
             "-filter_complex", filters, "-map", "[out]", "-ar", str(sample_rate),
-            "-c:a", "pcm_s24le", str(intermediate),
+            "-c:a", "pcm_f32le" if vst_chain or cpp else "pcm_s24le", str(intermediate),
         ])
         for index, (plugin_path, values) in enumerate(vst_chain):
             # Always render to scratch first; never allow an external plugin
             # process to overwrite the last good export on failure.
             next_file = scratch_path / f'vst-{index}.wav'
             try:
-                proc = subprocess.run([
-                    sys.executable, '-m', 'app.vst3_host', '--process',
-                    str(intermediate), str(next_file), str(plugin_path),
-                    '--parameters-json', json.dumps(values),
-                ], capture_output=True, text=True, timeout=600)
+                from .vst3_host import worker_command
+                parameters=scratch_path/f'vst-{index}-parameters.json'
+                parameters.write_text(json.dumps(values),encoding='utf-8')
+                transport=scratch_path/f'vst-{index}-transport.json'
+                transport.write_text(json.dumps(render_settings() or {}),encoding='utf-8')
+                proc = subprocess.run(worker_command('--process',intermediate,next_file,plugin_path,
+                    '--parameters-file',parameters,'--transport-file',transport),capture_output=True,text=True,timeout=600)
             except subprocess.TimeoutExpired as exc:
                 raise RuntimeError(f'VST3 insert {index + 1} timed out') from exc
             if proc.returncode:
@@ -546,7 +578,12 @@ def render_track(track: Track, source: Path, out: Path, apply_inserts: bool = Tr
             if not next_file.is_file() or next_file.stat().st_size == 0:
                 raise RuntimeError(f'VST3 insert {index + 1} produced no audio')
             intermediate = next_file
-        if vst_chain:
+            following=chain_filter(builtin_groups[index+1])
+            if following:
+                ordered=scratch_path/f'after-vst-{index}.wav'
+                _run(['ffmpeg','-y','-v','error','-i',str(intermediate),'-af',following,'-c:a','pcm_f32le',str(ordered)])
+                intermediate=ordered
+        if vst_chain or cpp:
             # Atomic replacement is scoped to the destination filesystem.
             # A failed worker leaves an existing output unchanged.
             out.parent.mkdir(parents=True, exist_ok=True)
@@ -588,6 +625,8 @@ def _render_bypass_mix(project,audio_resolver,out,**options):
         return render_mix(composite,lambda pid,name:paths[name],out,**options)
 
 
+@project_scope
+@render_scope
 def render_mix(
     project: Project,
     audio_resolver,
@@ -601,6 +640,14 @@ def render_mix(
     normalize_peak_db: float | None = None,
 ) -> Path:
     """Render stereo master for preview/WAV/MP3/FLAC export."""
+    from .vst3_sidechain import enabled as has_sidechains,render as sidechain_render
+    if has_sidechains(project):
+        with tempfile.TemporaryDirectory(prefix='mta-sidechain-master-') as directory:
+            rendered=Path(directory)/'master.wav';sidechain_render(project,audio_resolver,rendered)
+            duration=media_duration_ms(rendered);copy=project.model_copy(deep=True)
+            copy.tracks=[Track(id='sidechain-master',name='Master',filename=rendered.name,duration_ms=duration,channels=2,sample_rate=project.sample_rate,clips=[Clip(id='rendered',source_end_ms=duration)])]
+            copy.master_inserts=[];copy.master_volume_db=0;copy.master_fade_enabled=False;copy.base_bpm=copy.bpm;copy.pitch_semitones=0
+            return render_mix(copy,lambda _pid,_name:rendered,out,fmt=fmt,bitrate=bitrate,sample_rate=sample_rate,wav_bit_depth=wav_bit_depth,flac_compression=flac_compression,normalize_peak_db=normalize_peak_db)
     if not project.tracks:
         raise ValueError("project has no audio tracks")
     if any(t.master_bypass for t in project.tracks):
@@ -634,6 +681,19 @@ def render_mix(
             )
             labels.append(f"[{label}]")
         filters.append("".join(labels) + f"amix=inputs={len(labels)}:duration=longest:normalize=0[master0]")
+        cpp = selected_audio_backend() == 'cpp'
+        if cpp:
+            from .cpp_audio import mix_files
+            stereo=[]
+            for index,path in enumerate(rendered):
+                prepared=td/f'stereo-{index}.wav'
+                _run(['ffmpeg','-y','-v','error','-i',str(path),'-ar',str(project.sample_rate),
+                      '-ac','2','-c:a','pcm_f32le',str(prepared)])
+                stereo.append(prepared)
+            mixed=td/'cpp-sum.wav'
+            mix_files(stereo,mixed,project.tracks,int(project.sample_rate))
+            cmd=['ffmpeg','-y','-v','error','-i',str(mixed)]
+            filters=['[0:a]anull[master0]']
         active_master = [item for item in project.master_inserts if item.enabled]
         if active_master:
             # Master effects must process the SUM, including VST3. Reuse the
@@ -649,8 +709,19 @@ def render_mix(
             render_track(master_track, summed, processed, sample_rate=project.sample_rate)
             cmd = ["ffmpeg", "-y", "-v", "error", "-i", str(processed)]
             filters = ["[0:a]anull[master0]"]
-        tail = f"volume={project.master_volume_db:.3f}dB"
-        tail += "," + master_fade_filter(project) + "," + project_time_pitch_filter(project)
+        if cpp:
+            from .cpp_audio import master_file
+            before=td/'cpp-master-before.wav'
+            _run(cmd+['-filter_complex',';'.join(filters),'-map','[master0]',
+                      '-ar',str(project.sample_rate),'-c:a','pcm_f32le',str(before)])
+            after=td/'cpp-master-after.wav'
+            master_file(before,after,project,project_duration_ms(project))
+            cmd=['ffmpeg','-y','-v','error','-i',str(after)]
+            filters=['[0:a]anull[master0]']
+            tail=project_time_pitch_filter(project)
+        else:
+            tail = f"volume={project.master_volume_db:.3f}dB"
+            tail += "," + master_fade_filter(project) + "," + project_time_pitch_filter(project)
         filters.append(f"[master0]{tail}[master]")
         sample_rate = int(sample_rate or getattr(project, "sample_rate", 44100) or 44100)
         sample_rate = sample_rate if sample_rate in {44100, 48000, 96000} else 44100
@@ -1221,6 +1292,8 @@ def auto_align_ms(reference: Path, candidate: Path, max_shift_ms: int = 30000) -
 
 
 
+@track_scope
+@render_scope
 def render_track_export(
     track: Track,
     source: Path,
@@ -1242,7 +1315,8 @@ def render_track_export(
     with tempfile.TemporaryDirectory() as td_raw:
         td = Path(td_raw)
         rendered = td / "track.wav"
-        render_track(track, source, rendered, apply_inserts=apply_inserts)
+        transport={'host_project':project} if project is not None else {}
+        render_track(track, source, rendered, apply_inserts=apply_inserts,**transport)
         gain = -120.0 if track.mute else track.volume_db
         pan = min(1.0, max(-1.0, track.pan))
         filters = [f"volume={gain:.3f}dB", f"stereotools=balance_out={pan:.4f}"]

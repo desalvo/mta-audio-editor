@@ -1,3 +1,7 @@
+## r210 — Optional C++ render DSP checkpoint
+
+Native Settings now select the current engine (default) or verified experimental C++ DSP. Input gain, stereo track mix/balance and master gain/fades run through compiled C++ when selected. Device playback transport is still current; `native_transport_ready=false` and `native_host_ready=false`. Shared FFmpeg/Pedalboard stages remain. See [CPP_AUDIO_ENGINE_CHECKPOINT_R210.md](CPP_AUDIO_ENGINE_CHECKPOINT_R210.md) for scope, limits, tests and continuation steps. The current master renderer supports offline VST3 inserts; older notes below describe historical limitations.
+
 ## 0.3.0-r179 (uncommitted)
 
 - AI Arranger / Remix authenticated preflight diagnostics for missing chord and section context; no fake inference readiness.

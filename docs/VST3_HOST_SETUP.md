@@ -1,3 +1,5 @@
+> Aggiornamento / Update: [LIVE_VST3_HOST_R210.md](LIVE_VST3_HOST_R210.md). Le limitazioni live descritte nei checkpoint precedenti sono storiche.
+
 r122 experimental native C ABI to real VST3 IPC acceptance is available for tests only. Production playback remains unchanged; `native_host_ready=false`.
 
 Experimental r121 native audio core C ABI available; VST3 realtime host remains disabled (`native_host_ready=false`).

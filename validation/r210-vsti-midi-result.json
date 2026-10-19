@@ -1,0 +1,110 @@
+{
+  "version": "0.3.0-r210",
+  "date": "2026-10-19",
+  "base_archive": "MTA-0.3.0-r210-server-vst3-live-cumulative.zip",
+  "base_sha256": "7ac7e545e135c0da287aade00349ab93d1a81fe9a5a870d930a73d8f2e0af19e",
+  "base_files_preserved": 1994,
+  "changed_base_files": [
+    "Dockerfile",
+    "app/audio_engine.py",
+    "app/docs/MTA-Audio-Editor-VST3-Manual-EN.pdf",
+    "app/docs/MTA-Audio-Editor-VST3-Manual-IT.pdf",
+    "app/main.py",
+    "app/models.py",
+    "app/native_transport.py",
+    "app/server_vst3_worker.py",
+    "app/static/app.js",
+    "app/static/native_transport.js",
+    "app/static/server_vst3.js",
+    "app/templates/index.html",
+    "app/vst3_host.py",
+    "app/vst3_live.py",
+    "app/vst3_live_graph.py",
+    "docs/SERVER_VST3_R210.md",
+    "docs/VST3_USER_GUIDE_EN.md",
+    "docs/VST3_USER_GUIDE_IT.md",
+    "native/mta_audio_editor_native.spec",
+    "requirements-vst3.txt",
+    "scripts/server_packages/install_runtime.py",
+    "scripts/server_packages/smoke_offline_payload.py",
+    "tests/test_r210_sample_doubleclick.py",
+    "tests/test_r210_server_vst3_browser.py",
+    "tests/test_r210_vst3_device_integration.py",
+    "tests/test_r39_vst3_host.py"
+  ],
+  "full_regression": {
+    "tests": 4103,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 6,
+    "passed": 4097
+  },
+  "deselected": 10,
+  "targeted": {
+    "tests": 22,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 22
+  },
+  "final_midi_and_waveform_checks": {
+    "tests": 14,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 14
+  },
+  "browser_and_legacy_cli_checks": {
+    "tests": 14,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 14
+  },
+  "final_real_browser_ui": {
+    "tests": 1,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 1
+  },
+  "coverage_line_rate": 0.8022,
+  "offline_payload": "Release-gated Ubuntu amd64 DEB built, extracted, installed in a temporary venv with --no-index, pip check and imports of C++ DSP/Pedalboard/PyAV/Mido passed. No OS package installed.",
+  "real_instrument": {
+    "name": "Surge XT",
+    "platform": "Linux x86_64",
+    "upstream": "surge-synthesizer/surge",
+    "asset": "surge-xt-linux-NIGHTLY-2026-10-17-4f0da4e-pluginsonly.tar.gz",
+    "archive_sha256": "1352ed61157e31bbd20345b1f5ddcfeb148edb670adccea5f0e2e5dfce202f36",
+    "redistributed": false
+  },
+  "real_effect": "Hash-pinned upstream CHOWTapeModel; not redistributed.",
+  "verified": [
+    "SMF type 0/1 tempo-map timing, controls and export",
+    "Source clips, delays, MIDI note chase and sustain",
+    "Real VSTi continuous graph, offline track/master render, native null transport",
+    "Authenticated server PCM, seek, mixer updates, cancellation and ownership",
+    "Actual Chromium HTTP/WebAudio, piano roll editing, save/reopen, VSTi playback",
+    "Virtual Web MIDI input recording and handler cleanup",
+    "IT/EN manuals regenerated and all pages visually reviewed",
+    "Root markdown policy and original executable modes preserved"
+  ],
+  "environment_limits": [
+    "10 AF_UNIX tests deselected because socket creation is denied in this executor",
+    "6 skips: 4 optional Steinberg SDK tests, 1 original GUI display test, 1 real Win32 API test"
+  ],
+  "pending_acceptance": [
+    "Physical native audio/MIDI devices on Windows/macOS/Linux",
+    "Production Rocky Linux 10/LXC/HAProxy deployment and user plugins"
+  ],
+  "scope_limits": [
+    "Web MIDI hardware input depends on browser/WebView support and permission",
+    "No live keyboard monitoring, hardware MIDI output or synchronized overdubbing",
+    "No SysEx, dedicated MIDI 2.0/MPE or SMF type 2/SMPTE",
+    "No VST host tempo/transport callbacks for synchronized arpeggiators; no external sidechains",
+    "Third party plugin binaries must be installed separately",
+    "VST DSP does not fabricate AI billing/accounting entries"
+  ],
+  "initial_run": "Superseded: archive extraction mode loss and isolated test stubs were corrected before the final full run.",
+  "no_commit_push_tag_release_or_production_changes": true
+}

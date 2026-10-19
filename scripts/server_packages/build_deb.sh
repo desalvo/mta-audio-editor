@@ -71,7 +71,7 @@ Section: sound
 Priority: optional
 Architecture: $arch
 Maintainer: MTA Audio Editor maintainers
-Depends: $py_deps, ffmpeg, ca-certificates
+Depends: $py_deps, ffmpeg, ca-certificates, libstdc++6, libasound2t64 | libasound2, libfreetype6, libx11-6, libxext6, libxrandr2, libxinerama1, libxcursor1, libgl1, libgl1-mesa-dri, xvfb, libxtst6
 Description: MTA Audio Editor web server with offline Python dependencies
  Server application; distinct from the desktop editor and Proxmox GPU agent.
 EOF

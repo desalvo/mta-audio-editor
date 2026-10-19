@@ -1,3 +1,7 @@
+> Stato aggiornato / Updated state: [SUBSCRIPTION_ONLY_CREDITS_DEVICE_R210.md](SUBSCRIPTION_ONLY_CREDITS_DEVICE_R210.md). Le descrizioni precedenti sono storiche.
+
+> Aggiornamento / Update: per le regole correnti di accesso, crediti nominali, tetti di spesa CPU/GPU e tariffe iniziali vedere [CREDIT_ACCESS_NATIVE_TIMELINE_R210.md](CREDIT_ACCESS_NATIVE_TIMELINE_R210.md). Le indicazioni precedenti di arresto per crediti esauriti e saldo CPU/GPU negativo sono superate. / Previous credit-exhaustion cancellation and negative compute-balance rules are superseded.
+
 # Quote, abbonamenti, crediti e documenti legali / Quotas, subscriptions, credits and legal documents
 
 Release: **0.3.0-r210**. Nessun commit, push, tag, release o aggiornamento dei server reali eseguito da questo intervento.

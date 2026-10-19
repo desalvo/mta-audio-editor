@@ -4,6 +4,7 @@ set -eu
 APP=/usr/lib/mta-audio-editor-server
 VENV=/opt/mta/server-venv
 mkdir -p /etc/mta /var/lib/mta/projects /var/lib/mta/models /opt/mta
+if [ ! -d /opt/mta/vst3 ]; then install -d -m 755 /opt/mta/vst3; fi
 chmod 700 /etc/mta
 # Refuse to replace a legacy git-managed install. Explicit migration is separate.
 if [ -e /opt/mta/application/.git ] || [ -f /opt/mta/application/.mta-wizard-managed ]; then

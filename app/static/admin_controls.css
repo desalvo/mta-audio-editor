@@ -26,3 +26,5 @@
 .dump-options{max-height:220px;overflow:auto;padding:12px;border:1px solid #65758b;border-radius:8px;display:grid;gap:8px}.dump-options label{display:flex;gap:8px;align-items:center}.erase-account{background:#b91c1c!important;color:#fff!important;border:2px solid #ef4444!important;font-weight:700;padding:10px 14px!important}
 
 #applicationDump input[type="checkbox"]{width:18px;height:18px;min-height:18px;padding:0;flex:0 0 18px;accent-color:#299df6}#applicationDump label:has(input[type="checkbox"]){display:flex;flex-direction:row;gap:10px;align-items:center}#applicationDump button{min-height:42px;line-height:1.35;border:1px solid #248fe4;border-radius:8px;background:#087bd4;color:#fff;padding:10px 16px;cursor:pointer}#applicationDump button:disabled{background:#23394e;color:#c1ceda;border-color:#60738a;cursor:wait}
+
+.legal-required{border-left:3px solid #50b8ff;padding-left:10px}.legal-required input{border-color:#50b8ff}

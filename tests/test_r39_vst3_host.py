@@ -50,7 +50,7 @@ def test_inspect_parameters_with_mock_plugin(monkeypatch):
 def test_cli_inspection_and_missing_arguments(capsys):
     with patch("sys.argv", ["vst3_host", "--inspect-plugin", "fake.vst3"]), \
          patch.object(vst3_host, "validate_plugin_path", return_value=Path("fake.vst3")), \
-         patch.object(vst3_host, "inspect_parameters", return_value=[{"name": "gain", "value": 0.2}]):
+         patch.object(vst3_host, "inspect_parameters", return_value={"parameters":[{"name": "gain", "value": 0.2}],"is_instrument":False}):
         assert vst3_host.main() == 0
     assert json.loads(capsys.readouterr().out)["parameters"][0]["name"] == "gain"
     with patch("sys.argv", ["vst3_host"]), pytest.raises(SystemExit) as err:

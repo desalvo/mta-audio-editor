@@ -1,3 +1,9 @@
+> Aggiornamento / Update: [LIVE_VST3_HOST_R210.md](LIVE_VST3_HOST_R210.md). Le limitazioni live descritte nei checkpoint precedenti sono storiche.
+
+## r210 — Optional C++ render DSP checkpoint
+
+Native Settings now select the current engine (default) or verified experimental C++ DSP. Input gain, stereo track mix/balance and master gain/fades run through compiled C++ when selected. Device playback transport is still current; `native_transport_ready=false` and `native_host_ready=false`. Shared FFmpeg/Pedalboard stages remain. See [CPP_AUDIO_ENGINE_CHECKPOINT_R210.md](CPP_AUDIO_ENGINE_CHECKPOINT_R210.md) for scope, limits, tests and continuation steps. The current master renderer supports offline VST3 inserts; older notes below describe historical limitations.
+
 ## 0.3.0-r170 — Safe concurrent rendered playback previews
 
 - Serialize duplicate preview renders and atomically publish only valid WAV outputs; incomplete results never enter the playback cache.

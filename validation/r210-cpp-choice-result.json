@@ -1,0 +1,29 @@
+{
+  "version": "0.3.0-r210",
+  "stage": "optional compiled render DSP",
+  "default_engine": "current",
+  "native_transport_ready": false,
+  "native_host_ready": false,
+  "full_suite": {
+    "passed": 4021,
+    "skipped": 5,
+    "deselected": 10,
+    "coverage_percent": 77.46,
+    "seconds": 232.484
+  },
+  "targeted_passed": 48,
+  "native_prelaunch_without_MTA_DATA_DIR_passed": 13,
+  "preview_regression_passed": 5,
+  "static_checks": "Ruff, JavaScript syntax and workflow YAML passed",
+  "native_runtime_build": "CMake/C++20 build and ABI self-test passed on Linux",
+  "limitations": [
+    "AF_UNIX agent tests excluded because socket creation is denied",
+    "4 optional Steinberg SDK tests and 1 Win32 API test skipped",
+    "No real macOS or Windows build/device validation performed",
+    "Native transport and live VST3 remain disabled",
+    "Up to 64 tracks; FFmpeg/Pedalboard stages remain"
+  ],
+  "checkpoint": "docs/CPP_AUDIO_ENGINE_CHECKPOINT_R210.md",
+  "last_confirmed_committed_package": "MTA-0.3.0-r210-storage-quota-trial-billing-cumulative.zip",
+  "automatic_resume_on_usage_reset": false
+}

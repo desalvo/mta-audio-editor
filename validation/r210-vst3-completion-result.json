@@ -1,0 +1,178 @@
+{
+  "version": "0.3.0-r210",
+  "date": "2026-10-19T11:59:11.028971+00:00",
+  "base_archive": "MTA-0.3.0-r210-midi-live-hardware-host-sync-cumulative.zip",
+  "base_sha256": "6bf9b52fecdf39b7283c6d4e822cee6a5972b1faf4efef2f9215c08efdcb5c94",
+  "base_files_preserved": 2044,
+  "changed_base_files": [
+    ".github/workflows/server-native-runtime-validation.yml",
+    "Dockerfile",
+    "README.md",
+    "app/audio_engine.py",
+    "app/bounce.py",
+    "app/docs/MTA-Audio-Editor-VST3-Manual-EN.pdf",
+    "app/docs/MTA-Audio-Editor-VST3-Manual-IT.pdf",
+    "app/i18n_catalog.json",
+    "app/main.py",
+    "app/midi.py",
+    "app/midi_devices.py",
+    "app/midi_monitor.py",
+    "app/midi_render.py",
+    "app/midi_routes.py",
+    "app/models.py",
+    "app/native_midi.py",
+    "app/server_vst3.py",
+    "app/server_vst3_worker.py",
+    "app/static/app.css",
+    "app/static/app.js",
+    "app/static/i18n_catalog.js",
+    "app/static/midi.js",
+    "app/static/midi_live.js",
+    "app/static/midi_rules.js",
+    "app/static/server_vst3.js",
+    "app/templates/index.html",
+    "app/vst3_host.py",
+    "app/vst3_live.py",
+    "app/vst3_live_graph.py",
+    "app/vst3_transport.py",
+    "docs/MIDI_LIVE_HOST_R210.md",
+    "docs/SERVER_VST3_R210.md",
+    "docs/VST3_USER_GUIDE_EN.md",
+    "docs/VST3_USER_GUIDE_IT.md",
+    "docs/VSTI_MIDI_R210.md",
+    "native/audio_core/device_transport.cpp",
+    "native/audio_core/device_transport.h",
+    "native/host_transport/MtaHostTransport.h",
+    "native/mta_audio_editor_native.py",
+    "native/mta_audio_editor_native.spec",
+    "requirements-native.txt",
+    "scripts/build_vst3_manuals.py",
+    "scripts/build_vst3_runtime.py",
+    "scripts/patch_vst3_runtime.py",
+    "scripts/server_packages/build_deb.sh",
+    "scripts/server_packages/build_rpm.sh",
+    "scripts/server_packages/install_runtime.py",
+    "scripts/server_packages/prepare_runtime.py",
+    "scripts/server_packages/smoke_offline_payload.py",
+    "scripts/server_packages/verify_offline_runtime.py",
+    "tests/test_insert_waveform_recalculation.py",
+    "tests/test_native_filesystem_and_track_context.py",
+    "tests/test_r210_server_vst3.py",
+    "tests/test_r210_server_vst3_browser.py"
+  ],
+  "full_regression": {
+    "tests": 4134,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 6,
+    "passed": 4128
+  },
+  "environment_deselected": 10,
+  "line_coverage": 0.7951,
+  "branch_coverage": 0.673,
+  "combined_coverage": 0.76142903410648,
+  "targeted_regression": {
+    "tests": 102,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 102
+  },
+  "final_runtime_checks": {
+    "tests": 42,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 42
+  },
+  "native_packaging_and_localization": {
+    "tests": 21,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 21
+  },
+  "localization_sidechain_and_bounce_checks": {
+    "tests": 47,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 47
+  },
+  "real_chromium_original_gui_midi_and_audio_capture": {
+    "tests": 1,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 1
+  },
+  "offline_payload": {
+    "source_files_byte_verified": 293,
+    "private_display": {
+      "version": "21.1.24",
+      "source": "https://xorg.freedesktop.org/releases/individual/xserver/xorg-server-21.1.24.tar.xz",
+      "source_sha256": "1a4eb36ca65cc3b1b936566d677a9786e13c11cd5806e951ac55f3f5ce3984af",
+      "binary_sha256": "d8c63249f6a09172464f8a7d25dd5e226cd97b9524efd000212ecf0ec8d4d2e2"
+    },
+    "display_build_rpath": false,
+    "offline_install": "pip --no-index, pip check and C++/VST3 ABI imports passed",
+    "target": "Ubuntu amd64, Python 3.12",
+    "not_tested": "RPM/EL10 installation, kernel Landlock and physical devices"
+  },
+  "runtime": {
+    "pedalboard_upstream": "05e8f0b3c4851e77485d7e842dc0355b44106471",
+    "runtime_version": "0.9.26+mta2",
+    "host_abi": 2,
+    "wheel": "pedalboard-0.9.26+mta2-cp312-cp312-linux_x86_64.whl",
+    "wheel_sha256": "57494b49faf2e8e09995b95a9d5dacf292b37727a9262f7736160a5c9d0f46bf",
+    "patches": {
+      "native/host_transport/MtaSidechainMethods.h": "e72663230014fc1acab6cadb389a086b121a0d723255af16ce173f847f8dcacc",
+      "native/host_transport/MtaUmpEvents.inc": "af59642447c518151856ad6b90f6ab353f7adfd9cfcd57fbe061e182540bf421",
+      "native/host_transport/MtaHostTransport.h": "c7c806d5869a28403ed342e551939e6e5053939b144005b62889e8bacef2b815",
+      "scripts/patch_vst3_runtime.py": "cb70a261f00abc4b9435c8d1e9845aabfc972a37d09ccd62f9179e549764eb01"
+    },
+    "app_version": "0.3.0-r210",
+    "private_display": {
+      "version": "21.1.24",
+      "source": "https://xorg.freedesktop.org/releases/individual/xserver/xorg-server-21.1.24.tar.xz",
+      "source_sha256": "1a4eb36ca65cc3b1b936566d677a9786e13c11cd5806e951ac55f3f5ce3984af",
+      "binary_sha256": "d8c63249f6a09172464f8a7d25dd5e226cd97b9524efd000212ecf0ec8d4d2e2"
+    },
+    "private_display_builder_sha256": "e7753de744be3cc2f019bdc8c770dbebcfae8af14b508e3d90f94d7524cd7bf7",
+    "cpp_core_sha256": "1804b04a33a65ad5445cd0249982a31a86d96477f1ed6b1173e026bfd0fbe529"
+  },
+  "implementation": [
+    "Authentic server VST3 GUI on the active playback/monitoring instance, owner/CSRF/conflict checks and durable state.",
+    "Worker-private authenticated display; filesystem confinement required for GUI, credentials scrubbed before exec.",
+    "Target-built private Xvfb for EL10 RPM/DEB with pinned official source, licence and no build RPATH.",
+    "Continuous zoned/adaptive PPQ and tempo-boundary splitting; matching MIDI Clock.",
+    "External auxiliary sidechains shared by live and offline graph.",
+    "Bounded SysEx/SMF, MPE zones/RPN/channel allocation, native libremidi UMP and mapped full-resolution VST3 events.",
+    "Native C++ capture ring and browser AudioWorklet, sequenced/quota-bound PCM upload and durable track publication.",
+    "Mac microphone purpose strings and IT/EN localization; updated PDF manuals."
+  ],
+  "not_certified": [
+    "EL10 RPM installation and actual Proxmox/LXC Landlock policy.",
+    "Physical Windows/macOS/Linux MIDI/audio devices, UMP endpoints/drivers and round-trip latency.",
+    "Third-party plugin compatibility and production HAProxy/network acceptance."
+  ],
+  "environment_notes": [
+    "AF_UNIX unavailable: 10 host-agent socket tests excluded.",
+    "Landlock syscall unavailable in this environment. Original GUI integration used an explicit authenticated TCP test display with confinement bypass; this does not certify production confinement.",
+    "Optional Steinberg SDK, Win32 and native-desktop GUI checks skip where unsupported."
+  ],
+  "scope_limits": [
+    "Browser Web MIDI exposes MIDI 1; native UMP requires actual OS/driver support.",
+    "Raw UMP archive/transport remains lossless; VST3 only accepts supported mapped message types and plugin-supported note expressions.",
+    "Dedicated ASIO selection and asynchronous SMF2/SMPTE remain outside this cycle."
+  ],
+  "static_checks": {
+    "changed_new_python_files": 38,
+    "changed_new_python_result": "passed",
+    "javascript_syntax": "passed",
+    "broader_existing_tree_findings": 32,
+    "baseline_log": "validation/r210-vst3-completion-static-baseline.log"
+  },
+  "commit_push_tag_release": false,
+  "production_modified": false
+}

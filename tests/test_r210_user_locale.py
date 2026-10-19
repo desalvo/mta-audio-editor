@@ -68,7 +68,7 @@ def test_browser_login_and_profile_override(env,monkeypatch):
 def test_dynamic_pdf_omits_empty_fields(env,kind,lang):
     from fastapi import FastAPI
     app=FastAPI();legal.register_routes(app);client=TestClient(app)
-    legal.save({'operator_name':'INSTANCE ONE','operator_address':'','operator_country':'','privacy_email':'','public_url':''},env)
+    legal.save({'operator_name':'INSTANCE ONE','operator_address':'','operator_country':'Italy','support_email':'support@example.test','privacy_email':'','public_url':'https://mta.example.test'},env)
     response=client.get(f'/{kind}/{lang}.pdf')
     assert response.status_code==200 and response.headers['content-type']=='application/pdf'
     assert response.headers['cache-control']=='no-store' and response.headers['content-language']==lang

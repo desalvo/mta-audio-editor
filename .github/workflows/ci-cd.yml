@@ -31,14 +31,25 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
-      - run: pip install -r requirements-dev.txt
+      - name: Build sample-accurate VST3 host runtime
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git cmake g++ make pkg-config libfreetype6-dev libasound2-dev libx11-dev libxext-dev libxrender-dev libxcomposite-dev libxrandr-dev libxinerama-dev libxcursor-dev libgl1-mesa-dev
+          python scripts/build_vst3_runtime.py --wheel-dir "$RUNNER_TEMP/mta-host-wheels" --install
+      - run: pip install -r requirements-dev.txt -r requirements-vst3.txt
       - run: pip check
       - name: Compile
         run: python -m compileall -q app native scripts/k8s-wizard.py
       - name: Build documentation PDFs
-        run: python scripts/build_docs.py
+        run: |
+          python scripts/build_docs.py
+          python scripts/build_vst3_manuals.py
       - name: Install FFmpeg for DSP preset validation
-        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg xvfb xauth openbox
+      - name: Prepare real browser server VST3 regression
+        run: |
+          python -m pip install playwright==1.51.0
+          python -m playwright install --with-deps chromium
       - name: Validate audio presets against FFmpeg
         run: PYTHONPATH=. python scripts/validate_audio_presets.py
       - name: Compile isolated C++20 VST3 probe without SDK
@@ -48,14 +59,18 @@ jobs:
           test -x /tmp/mta-vst3-probe-build/mta_vst3_probe
       - name: Ruff
         run: ruff check app native tests scripts/k8s-wizard.py
+      - name: Fetch hash-pinned live VST3 test effect
+        run: python scripts/fetch_live_vst3_test_plugin.py .external/live-vst3
       - name: Unit tests and coverage gate
         env:
+          MTA_TEST_LIVE_VST3: ${{ github.workspace }}/.external/live-vst3/CHOWTapeModel.vst3
+          MTA_TEST_BROWSER_VST3: '1'
           MTA_ALLOW_INSECURE_NO_AUTH: 'true'
           MTA_DATA_DIR: /tmp/mta-projects
           MTA_AI_JOB_STATE_DIR: /tmp/mta-ci-ai-jobs
         run: |
           python -c "from pathlib import Path; import re; b=Path('BUILD_INFO').read_text().strip(); assert re.fullmatch(r'[0-9]{14}', b), f'Invalid BUILD_INFO: {b!r}'"
-          PYTHONPATH=. timeout --signal=TERM --kill-after=120s 140m pytest -o faulthandler_timeout=120 --timeout=180 --timeout-method=signal --durations=30 -ra --junitxml=pytest-results.xml --cov=app --cov-report=term-missing --cov-report=xml --cov-fail-under=70
+          PYTHONPATH=. xvfb-run -a sh -c 'openbox --sm-disable >/tmp/mta-openbox.log 2>&1 & exec timeout --signal=TERM --kill-after=120s 140m pytest -o faulthandler_timeout=120 --timeout=180 --timeout-method=signal --durations=30 -ra --junitxml=pytest-results.xml --cov=app --cov-report=term-missing --cov-report=xml --cov-fail-under=70'
       - name: Upload test diagnostics (including failed runs)
         if: always()
         uses: actions/upload-artifact@v7
@@ -346,6 +361,8 @@ jobs:
           # Keep the validated stem stack; install the separator wheel separately.
           pip install -r requirements-stems-windows.txt
           pip install -r requirements-native.txt
+          pip install -r requirements-vst3.txt
+          python scripts/build_vst3_runtime.py --wheel-dir .mta-build-cache/host-wheels --install
           pip install -r requirements-lyrics.txt
           pip install -r requirements-chords.txt
           pip check
@@ -387,6 +404,9 @@ jobs:
           PYTHONPATH: .
           MTA_NATIVE_SINGLE_USER: 'true'
           MTA_ALLOW_INSECURE_NO_AUTH: 'true'
+          MTA_DATA_DIR: ${{ runner.temp }}/mta-native-project-tests
+          MTA_NATIVE_DATA_DIR: ${{ runner.temp }}/mta-native-project-tests
+          MTA_AI_JOB_STATE_DIR: ${{ runner.temp }}/mta-native-project-tests/ai-jobs
         run: |
           python -m pip install "pytest==9.1.1" "httpx==0.28.1"
           python -m pytest -q tests/test_r210_windows_publication_tabs.py tests/test_r210_native_project_commit.py
@@ -403,6 +423,9 @@ jobs:
       - name: Generate native application metadata
         shell: pwsh
         run: python native/generate_native_metadata.py
+      - name: Build and verify Windows C++ audio DSP
+        shell: pwsh
+        run: python scripts/build_audio_core.py
       - name: Build Windows native application
         shell: pwsh
         run: pyinstaller --noconfirm --clean native/mta_audio_editor_native.spec
@@ -494,6 +517,8 @@ jobs:
             pip install -r /tmp/requirements-native-stems.txt
           fi
           pip install -r requirements-native.txt
+          pip install -r requirements-vst3.txt
+          python scripts/build_vst3_runtime.py --wheel-dir .mta-build-cache/host-wheels --install
           pip install -r requirements-lyrics.txt
           pip install -r requirements-chords.txt
           # The arm64 audio-separator wheel omits audioread from its published dependencies.
@@ -526,6 +551,9 @@ jobs:
           PYTHONPATH: .
           MTA_NATIVE_SINGLE_USER: 'true'
           MTA_ALLOW_INSECURE_NO_AUTH: 'true'
+          MTA_DATA_DIR: ${{ runner.temp }}/mta-native-project-tests
+          MTA_NATIVE_DATA_DIR: ${{ runner.temp }}/mta-native-project-tests
+          MTA_AI_JOB_STATE_DIR: ${{ runner.temp }}/mta-native-project-tests/ai-jobs
         run: |
           python -m pip install "pytest==9.1.1" "httpx==0.28.1"
           python -m pytest -q tests/test_r210_native_project_commit.py
@@ -538,6 +566,9 @@ jobs:
       - name: Generate native application metadata
         shell: bash
         run: python native/generate_native_metadata.py
+      - name: Build and verify macOS C++ audio DSP
+        shell: bash
+        run: python scripts/build_audio_core.py
       - name: Build macOS native application
         shell: bash
         run: pyinstaller --noconfirm --clean native/mta_audio_editor_native.spec
@@ -833,7 +864,7 @@ jobs:
       - name: Install Linux native dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y ffmpeg rpm pkg-config libopus-dev libgtk-3-0 libwebkit2gtk-4.1-0 libnotify4 libnss3 libasound2t64
+          sudo apt-get install -y ffmpeg rpm pkg-config libopus-dev libgtk-3-0 libwebkit2gtk-4.1-0 libnotify4 libnss3 libasound2t64 libfreetype6-dev libasound2-dev libx11-dev libxext-dev libxrender-dev libxcomposite-dev libxrandr-dev libxinerama-dev libxcursor-dev libgl1-mesa-dev
           # audiopus_sys (sphn) must link the system Opus rather than invoke
           # an older bundled Opus CMake project incompatible with modern CMake.
           pkg-config --modversion opus
@@ -843,6 +874,7 @@ jobs:
           pip install -r requirements-chords.txt
           pip install -r requirements-stems.txt
           pip install -r requirements-vst3.txt
+          python scripts/build_vst3_runtime.py --wheel-dir .mta-build-cache/host-wheels --install
       - name: Compile portable native audio meter
         run: |
           cmake -S native/audio_core -B build/audio_core -DCMAKE_BUILD_TYPE=Release

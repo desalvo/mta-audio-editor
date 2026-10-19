@@ -1,0 +1,66 @@
+{
+  "version": "0.3.0-r210",
+  "baseline": "MTA-0.3.0-r210-subscription-credits-native-device-cumulative.zip",
+  "baseline_sha256": "ea5887cfb49ecb04bc5b826006eb7c70967b8f5490e9e1b05692237286dfa34c",
+  "full": {
+    "passed": 4073,
+    "skipped": 5,
+    "seconds": 328.244
+  },
+  "targeted": {
+    "passed": 55,
+    "skipped": 0,
+    "seconds": 66.982
+  },
+  "server_dsp": {
+    "tests": {
+      "passed": 46,
+      "skipped": 0,
+      "seconds": 63.133
+    },
+    "selection": "Admin Settings > Web App; separate server preference; default current",
+    "scope": "Real compiled gain, mix, timeline, master envelope in previews/bounce/exports; browser playback",
+    "delivery": "Target-OS RPM/DEB staging and multi-stage Docker compile; ABI validation; proof hash and extracted runtime smoke",
+    "deployment_acceptance": "Server package matrix and real server installation not executed locally"
+  },
+  "real_plugin_gui": {
+    "passed": 1,
+    "skipped": 0,
+    "seconds": 17.124
+  },
+  "deselected": 10,
+  "coverage_percent": 77.07,
+  "static": "Ruff app/native/tests/new build helpers, Node syntax and all workflow YAML passed",
+  "backend": "Persistent isolated Pedalboard/JUCE audio effects; PyAV built-in filters; C++ summing and streaming device callback",
+  "realtime_scope": "Live mono/stereo audio-effect processing, track and master inserts, parameters and same-instance editor",
+  "current_engine_preserved": true,
+  "device_test_backend": "Explicit null backend; production refuses null fallback",
+  "real_test_plugin": {
+    "name": "CHOWTapeModel",
+    "upstream": "spotify/pedalboard",
+    "commit": "05e8f0b3c4851e77485d7e842dc0355b44106471",
+    "linux_module_sha256": "7f875a6922ca9e49c7a742a27f26152c685bed2991460781640cc23cfb16d319",
+    "binary_bundled": false
+  },
+  "real_gui": "Passed under local Xvfb/Openbox, including idle opening, playback, seek, parameters, state and close",
+  "manuals": "IT/EN PDF manuals rebuilt and all pages visually checked; original r13 Markdown retained under docs/history",
+  "limits": {
+    "tracks": 64,
+    "channels": "mono/stereo",
+    "output_queue_frames": 1536,
+    "lookahead_without_output_samples": 960000,
+    "playback_tail_seconds": 2,
+    "excluded_features": [
+      "VST instruments/MIDI",
+      "external sidechains",
+      "dedicated ASIO input monitoring/recording"
+    ]
+  },
+  "remaining_acceptance": [
+    "Physical Windows/macOS device listening and user plugin acceptance",
+    "10 AF_UNIX host agent cases excluded because socket creation is unavailable",
+    "Four optional Steinberg SDK and one real Win32 API case skipped"
+  ],
+  "last_confirmed_committed_package": "MTA-0.3.0-r210-storage-quota-trial-billing-cumulative.zip",
+  "commit_push_tag_release_performed": false
+}

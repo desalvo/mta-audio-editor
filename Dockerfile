@@ -1,6 +1,17 @@
+FROM debian:trixie-slim AS audio-core-build
+RUN apt-get update && apt-get install -y --no-install-recommends cmake g++ make && rm -rf /var/lib/apt/lists/*
+COPY native/audio_core /src/audio_core
+RUN cmake -S /src/audio_core -B /build -DCMAKE_BUILD_TYPE=Release && cmake --build /build --parallel 2
+
+FROM python:3.14-slim-trixie AS vst3-host-build
+RUN apt-get update && apt-get install -y --no-install-recommends git cmake g++ make pkg-config libfreetype6-dev libasound2-dev libx11-dev libxext-dev libxrender-dev libxcomposite-dev libxrandr-dev libxinerama-dev libxcursor-dev libgl1-mesa-dev libpixman-1-dev libxfont-dev libxkbfile-dev x11proto-dev xtrans-dev && rm -rf /var/lib/apt/lists/*
+COPY scripts/build_vst3_runtime.py scripts/patch_vst3_runtime.py /src/scripts/
+COPY native/host_transport /src/native/host_transport
+RUN python /src/scripts/build_vst3_runtime.py --wheel-dir /wheels
+
 FROM python:3.14-slim-trixie
 ARG APP_VERSION=0.3.0
-ARG APP_REVISION=189
+ARG APP_REVISION=210
 ARG RELEASE_CHANNEL=stable
 ARG BUILD_ID=unknown
 ARG INSTALL_STEMS=true
@@ -19,18 +30,19 @@ ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1 \
     VAMP_PATH=/opt/mta/vamp MTA_VAMP_PATH=/opt/mta/vamp MTA_CHORDINO_HOST=/usr/bin/vamp-simple-host
 RUN apt-get update \
     && apt-get upgrade -y \
-    && apt-get install -y --no-install-recommends ffmpeg ca-certificates tini fonts-dejavu-core vamp-examples \
+    && apt-get install -y --no-install-recommends ffmpeg ca-certificates tini fonts-dejavu-core xvfb libxtst6 vamp-examples libasound2t64 libfreetype6 libx11-6 libxext6 libxrandr2 libxinerama1 libxcursor1 libgl1 libgl1-mesa-dri \
     && rm -rf /var/lib/apt/lists/* \
     && groupadd --system --gid 10001 mtaeditor \
     && useradd --system --uid 10001 --gid 10001 --home /nonexistent --shell /usr/sbin/nologin mtaeditor
+COPY --from=vst3-host-build /wheels/*.whl /opt/mta/vst3-wheels/
 WORKDIR /app
-COPY requirements.txt requirements-stems.txt requirements-lyrics.txt requirements-chords.txt VERSION REVISION RELEASE_CHANNEL BUILD_INFO ./
+COPY requirements.txt requirements-vst3.txt requirements-stems.txt requirements-lyrics.txt requirements-chords.txt VERSION REVISION RELEASE_CHANNEL BUILD_INFO ./
 # sphn has no CPython 3.14/aarch64 Linux wheel. Its Opus source build also requires
 # CMake 3.x (CMake 4 removed compatibility with the project's old policy baseline).
 # Use Debian Trixie's system CMake explicitly, and remove all native build tools afterwards.
 RUN apt-get update \
     && apt-get install -y --no-install-recommends build-essential cmake curl libboost-all-dev vamp-plugin-sdk \
-    && python -m pip install --no-cache-dir -r requirements.txt \
+    && python -m pip install --no-cache-dir --find-links=/opt/mta/vst3-wheels -r requirements.txt \
     && if [ "$INSTALL_STEMS" = "true" ]; then CMAKE=/usr/bin/cmake python -m pip install --no-cache-dir -r requirements-stems.txt; fi \
     && python -m pip install --no-cache-dir -r requirements-lyrics.txt \
     && python -m pip install --no-cache-dir -r requirements-chords.txt \
@@ -47,12 +59,13 @@ RUN apt-get update \
     && python -c "from importlib.metadata import version; expected={'setuptools':'84.0.0','wheel':'0.48.0','urllib3':'2.8.0','msgpack':'1.2.3'}; actual={p:version(p) for p in expected}; print(actual); assert actual == expected, (actual, expected)" \
     && apt-get purge -y --auto-remove build-essential cmake curl libboost-all-dev vamp-plugin-sdk \
     && rm -rf /var/lib/apt/lists/*
-RUN python -c "import fastapi, uvicorn, numpy, whisper, madmom_infer" \
+RUN python -c "import fastapi, uvicorn, numpy, whisper, madmom_infer, pedalboard, av, mido; assert hasattr(pedalboard.VST3Plugin,'_mta_set_transport')" \
     && if [ "$INSTALL_STEMS" = "true" ]; then python -c "import torch, demucs"; fi
 COPY app ./app
+COPY --from=audio-core-build /build/libmta_audio_core.so /app/bin/libmta_audio_core.so
 RUN chmod 755 /app/app/ace_step_http_worker.py
 COPY LICENSE NOTICE ./
-RUN mkdir -p /data/projects && chown -R 10001:10001 /data /app
+RUN mkdir -p /data/projects /opt/mta/vst3 && chown -R 10001:10001 /data /app
 USER 10001:10001
 EXPOSE 8080
 VOLUME ["/data/projects"]

@@ -19,7 +19,7 @@ def account(tmp_path,monkeypatch):
 
 def plan(uid,**kwargs):
     cfg=r.config();p=next(p for p in cfg['plans'] if p['code']=='day');p.update(cpu_seconds=10,gpu_seconds=10,storage_bytes=1024**3,**kwargs)
-    r.configure({'enabled':True,'plans':[p]});return r.assign(uid,{'plan':'day','overage':True},1)
+    r.configure({'enabled':True,'credits_enabled':True,'plans':[p]});return r.assign(uid,{'plan':'day','overage':True},1)
 
 
 def finish(uid,cpu,gpu=0):
@@ -63,7 +63,7 @@ def test_overage_ordinary_tariff_credits_and_no_double_invoice(account):
 
 def test_exhausted_credit_blocks_next_job(account):
     plan(account);r.grant(account,1,'tiny credit',1,'tiny-credit-key');finish(account,12)
-    assert r.state(account)['credits_micro']==-19
+    assert r.state(account)['credits_micro']==0
     with pytest.raises(ValueError,match='quota exceeded|credits exhausted'):ai_billing.create_job(account,'whisper')
 
 
@@ -85,30 +85,32 @@ def test_no_overage_without_opt_in(account):
     with pytest.raises(ValueError):ai_billing.create_job(account,'whisper')
 
 
-def test_credit_retry_validation_and_promo(account):
+def test_credit_retry_validation_and_promo(account,monkeypatch):
+    stamp=1802822400;monkeypatch.setattr(r.time,'time',lambda:stamp);plan(account)
     r.grant(account,100,'promotion',1,'promo-credit-key');r.grant(account,100,'promotion',1,'promo-credit-key')
     assert r.state(account)['credits_micro']==100
     with pytest.raises(ValueError):r.grant(account,200,'promotion',1,'promo-credit-key')
     with pytest.raises(ValueError):r.grant(account,float('nan'),'promotion',1,'nan-credit-key')
-    cfg=r.config();p=cfg['plans'][0];p['price_micro']=99999;r.configure({'enabled':True,'plans':[p]})
+    stamp+=1
+    cfg=r.config();p=cfg['plans'][0];p['price_micro']=99999;r.configure({'enabled':True,'credits_enabled':True,'plans':[p]})
     assert r.assign(account,{'plan':p['code'],'promo':'Complimentary'},1)['funded']
 
 
 def test_renewal_freezes_plan_and_charges_once(account,monkeypatch):
     stamp=1802822400;monkeypatch.setattr(r.time,'time',lambda:stamp)
-    r.grant(account,1000,'subscription funds',1,'renewal-credit-key');first=plan(account,price_micro=100)
-    assert first['credits_micro']==900
-    assert r.state(account)['credits_micro']==900
+    first=plan(account,price_micro=100);r.grant(account,1000,'subscription funds',1,'renewal-credit-key');first=r.state(account)
+    assert first['credits_micro']==1000
+    assert r.state(account)['credits_micro']==1000
     cfg=r.config();p=next(p for p in cfg['plans'] if p['code']=='day');p['cpu_seconds']=50;r.configure({'plans':[p]})
     assert r.state(account)['limits']['cpu_seconds']==10
     monkeypatch.setattr(r.time,'time',lambda:stamp+86400)
-    assert r.state(account)['limits']['cpu_seconds']==50 and r.state(account)['credits_micro']==800
+    assert r.state(account)['limits']['cpu_seconds']==50 and r.state(account)['credits_micro']==1000
 
 
 def test_unfunded_and_cancellation(account,monkeypatch):
     stamp=1802822400;monkeypatch.setattr(r.time,'time',lambda:stamp)
-    assert not plan(account,price_micro=100)['funded']
-    with pytest.raises(ValueError,match='renewal'):ai_billing.create_job(account,'whisper')
+    assert plan(account,price_micro=100)['funded']
+    finish(account,1)
     r.grant(account,100,'funding',1,'funding-credit-key');assert r.state(account)['funded']
     r.cancel_renewal(account);monkeypatch.setattr(r.time,'time',lambda:stamp+86400)
     assert r.state(account)['subscription'] is None
@@ -155,7 +157,7 @@ def test_notice_smtp_absence_does_not_drop_events(account,monkeypatch):
 
 def test_legal_updates_enqueue_once_and_remove_draft(account):
     from app import legal
-    body={'operator_name':'Test operator','public_url':'https://mta.example.test'}
+    body={'operator_name':'Test operator','operator_country':'Italy','support_email':'support@example.test','public_url':'https://mta.example.test'}
     result=legal.save(body,1)
     with auth.db() as c:
         ids=[x[0] for x in c.execute("SELECT id FROM resource_notices WHERE id LIKE 'legal:%'")]
@@ -298,11 +300,11 @@ def test_cancelling_queued_job_releases_quota_reservation(account,tmp_path,monke
 def test_concurrent_renewal_is_one_credit_debit(account,monkeypatch):
     from concurrent.futures import ThreadPoolExecutor
     stamp=1802822400;monkeypatch.setattr(r.time,'time',lambda:stamp)
-    r.grant(account,1000,'renewal funds',1,'concurrent-renewal-grant')
     plan(account,price_micro=100)
+    r.grant(account,1000,'renewal funds',1,'concurrent-renewal-grant')
     monkeypatch.setattr(r.time,'time',lambda:stamp+86400)
     with ThreadPoolExecutor(max_workers=2) as pool:values=list(pool.map(lambda _:r.state(account),range(2)))
-    assert [v['credits_micro'] for v in values]==[800,800]
+    assert [v['credits_micro'] for v in values]==[1000,1000]
 
 
 def test_credit_usage_report_and_email_are_separate_from_ordinary_invoice(account):

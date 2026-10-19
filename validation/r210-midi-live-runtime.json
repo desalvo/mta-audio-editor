@@ -1,0 +1,14 @@
+{
+  "upstream_commit": "05e8f0b3c4851e77485d7e842dc0355b44106471",
+  "wheel": "pedalboard-0.9.26+mta1-cp312-cp312-linux_x86_64.whl",
+  "wheel_sha256": "19785e637ffdc4e6c2884a91719ebe99f66b2d891c5d45662f3129743002c341",
+  "compiled_locally": true,
+  "local_compiler": "GCC 13.3; Release -O1; one build job",
+  "host_transport_abi": 1,
+  "header_sha256": "d0f45fac9fd34c8d4959ee56d56d23c0210c8c02b92dd2851deba121c49183e3",
+  "patch_sha256": "d9a380bdabd1b1a89cfecf8c3a11d7e43fc22a56305bf9c18b2065464f75ddb3",
+  "target": "CPython 3.12, Linux x86_64",
+  "other_targets": "Build integration added; Windows/macOS/EL10 release builds and physical devices not certified locally.",
+  "browser": "Real Chromium/WebAudio/WebSocket; actual Surge XT; virtual MIDI input/output for deterministic routing and clock tests.",
+  "native_bridge": "Serialized and bounded output with Panic cancelling pending notes; tests/midi_native_output.cjs."
+}

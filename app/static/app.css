@@ -1679,3 +1679,12 @@ body:not(.timeline-select-tool) .clip-block{pointer-events:none;cursor:default}
 .track-context-menu .context-category>summary:focus-visible{outline:2px solid #60bfff;}
 .track-context-menu .context-category button{width:100%;}
 #bounceProjectButton{min-width:32px;font-size:19px;}
+
+/* Optional DSP engine is a complete settings group, including on narrow screens. */
+.native-settings .native-audio-engine{grid-column:1/-1;min-width:0;border:1px solid #52738a;border-radius:10px;padding:14px;margin:0}
+.native-settings .native-audio-engine legend{font-weight:650;padding:0 6px}
+.native-settings .native-audio-engine select{width:100%;max-width:100%;box-sizing:border-box}
+.native-settings .native-audio-engine p{line-height:1.5;overflow-wrap:anywhere}
+.remote-vst-backdrop{position:fixed;inset:0;z-index:100000;background:#000b;display:grid;place-items:center;padding:1vh 1vw}.remote-vst-window{background:var(--panel,#17212c);color:var(--text,#eee);border:1px solid #597084;border-radius:10px;width:min(96vw,1620px);max-height:98vh;display:flex;flex-direction:column;padding:10px;gap:6px}.remote-vst-window header{display:flex;align-items:center;justify-content:space-between;gap:10px}.remote-vst-window p{margin:0;font-size:.85rem}.remote-vst-viewport{overflow:auto;min-height:100px}.remote-vst-viewport canvas{display:block;max-width:100%;height:auto;touch-action:none;outline:2px solid transparent}.remote-vst-viewport canvas:focus{outline-color:#4aa3ff}
+
+.recording-button{color:#ff595e!important}

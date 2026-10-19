@@ -119,6 +119,9 @@ def user_billing_enabled(user_id: int, *, _connection=None) -> bool:
     with (db() if _connection is None else _borrow_connection(_connection)) as c:
         if _connection is None:
             _init(c)
+        if c.execute("SELECT 1 FROM sqlite_master WHERE name='resource_user_policy'").fetchone():
+            policy=c.execute('SELECT subscriptions_allowed FROM resource_user_policy WHERE user_id=?',(user_id,)).fetchone()
+            if policy and not policy[0]:return False
         row = c.execute('SELECT enabled FROM ai_user_billing_settings WHERE user_id=?', (user_id,)).fetchone()
         return bool(row and row['enabled'])
 
@@ -175,6 +178,8 @@ def create_job(user_id: int, kind: str, token_id=None, *, started_at=None, diagn
     job_id = uuid.uuid4().hex
     with db() as c:
         _init(c)
+        from .resource_accounts import prepare_upgrade
+        prepare_upgrade(c)
         if not c.execute('SELECT 1 FROM users WHERE id=? AND active=1', (user_id,)).fetchone():
             raise ValueError('User missing or inactive')
         stamp = int(time.time() if started_at is None else started_at)
@@ -245,6 +250,8 @@ def provision_inference_job(inference_job_id: str, user_id: int, kind: str) -> s
     from .ai_billing_profiles import suggested_prices
     with db() as c:
         _init(c)
+        from .resource_accounts import prepare_upgrade
+        prepare_upgrade(c)
         c.execute('BEGIN IMMEDIATE')
         from .resource_accounts import has_limits
         if not user_billing_enabled(user_id, _connection=c) and not has_limits(user_id,c):
@@ -307,6 +314,8 @@ def finish_job(job_id, status, usage=None, *, source='unmetered', finished_at=No
         raise ValueError('GPU agent must provide an explicit GPU measurement')
     with db() as c:
         _init(c)
+        from .resource_accounts import prepare_upgrade
+        prepare_upgrade(c)
         c.execute('BEGIN IMMEDIATE')
         row = c.execute('SELECT user_id,started_at,status FROM ai_compute_jobs WHERE id=?',(job_id,)).fetchone()
         if not row or row['status'] != 'running':
@@ -392,7 +401,7 @@ def _parse_effective(value, *, default_now=False):
     raise ValueError('Invalid tariff validity date')
 
 
-def set_price(resource, micro_per_unit, currency='EUR', *, valid_from=None, valid_until=None):
+def set_price(resource, micro_per_unit, currency='EUR', *, valid_from=None, valid_until=None, _connection=None):
     if resource not in UNITS or not isinstance(micro_per_unit,int) or isinstance(micro_per_unit,bool) or micro_per_unit < 0:
         raise ValueError('Invalid price or resource')
     if currency != 'EUR':
@@ -401,9 +410,10 @@ def set_price(resource, micro_per_unit, currency='EUR', *, valid_from=None, vali
     end = _parse_effective(valid_until)
     if end is not None and end <= start:
         raise ValueError('Tariff end must follow start')
-    with db() as c:
-        _init(c)
-        c.execute('BEGIN IMMEDIATE')
+    with (db() if _connection is None else _borrow_connection(_connection)) as c:
+        if _connection is None:
+            _init(c)
+            c.execute('BEGIN IMMEDIATE')
         # Closed billing periods cannot be silently repriced retroactively.
         if c.execute('SELECT 1 FROM ai_billing_periods WHERE end_ts>? AND start_ts<? LIMIT 1',
                      (start, end if end is not None else 253402300799)).fetchone():

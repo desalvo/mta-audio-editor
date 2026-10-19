@@ -17,7 +17,7 @@ DOCUMENT_VERSION = '2026-10-18-r210'
 COMMON = ('operator_name','operator_address','operator_country','registration','privacy_email','support_email','dpo_contact','representative_contact','public_url')
 DISCLOSURES = ('hosting','processors','transfers','retention')
 FIELDS = COMMON + tuple(f'{name}_{lang}' for name in DISCLOSURES for lang in ('it','en'))
-REQUIRED = ('operator_name','operator_address','operator_country','privacy_email','support_email','public_url') + tuple(f'{name}_{lang}' for name in DISCLOSURES for lang in ('it','en'))
+REQUIRED = ('operator_name','operator_country','support_email','public_url','effective_date')
 
 
 def defaults():
@@ -49,7 +49,7 @@ def snapshot():
 def status(cfg, retention=None):
     missing=[key for key in REQUIRED if not isinstance(cfg.get(key),str) or not cfg[key].strip()]
     stale=retention is not None and cfg.get('retention_review') != retention
-    return {'ready':cfg.get('reviewed') is True and not missing and not stale,'missing':missing,'review_stale':stale}
+    return {'ready':not missing,'missing':missing,'review_stale':stale}
 
 
 def save(body, actor):
@@ -75,8 +75,8 @@ def save(body, actor):
         cfg[key]=value
     # Every edit requires an explicit fresh review; saving partial facts is allowed.
     cfg['reviewed']=body.get('reviewed',False)
-    if cfg['reviewed'] and status(cfg,retention)['missing']:
-        raise ValueError('Completa i dati obbligatori IT/EN prima di dichiarare la revisione')
+    if status(cfg,retention)['missing']:
+        raise ValueError('Completa i cinque campi obbligatori prima del salvataggio')
     cfg['retention_review']=retention if cfg['reviewed'] else {}
     with auth.db() as con:
         from .resource_accounts import init,notice

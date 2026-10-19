@@ -1,0 +1,99 @@
+{
+  "version": "0.3.0-r210",
+  "date": "2026-10-19",
+  "base_archive": "MTA-0.3.0-r210-vsti-midi-cumulative.zip",
+  "base_sha256": "1682972e3d962cbdbe8235989a137e699b7a3d182abec10eb979c977b50b7368",
+  "base_files_preserved": 2018,
+  "changed_base_files": [
+    ".github/workflows/ci-cd.yml",
+    ".github/workflows/server-native-runtime-validation.yml",
+    "Dockerfile",
+    "app/audio_engine.py",
+    "app/bounce.py",
+    "app/codec.py",
+    "app/docs/MTA-Audio-Editor-VST3-Manual-EN.pdf",
+    "app/docs/MTA-Audio-Editor-VST3-Manual-IT.pdf",
+    "app/main.py",
+    "app/midi_render.py",
+    "app/midi_routes.py",
+    "app/models.py",
+    "app/native_transport.py",
+    "app/server_vst3.py",
+    "app/server_vst3_worker.py",
+    "app/static/midi.css",
+    "app/static/midi.js",
+    "app/static/native_transport.js",
+    "app/static/server_vst3.js",
+    "app/templates/index.html",
+    "app/vst3_host.py",
+    "app/vst3_live.py",
+    "app/vst3_live_graph.py",
+    "docs/LIVE_VST3_HOST_R210.md",
+    "docs/SERVER_VST3_R210.md",
+    "docs/VST3_USER_GUIDE_EN.md",
+    "docs/VST3_USER_GUIDE_IT.md",
+    "docs/VSTI_MIDI_R210.md",
+    "native/mta_audio_editor_native.py",
+    "native/mta_audio_editor_native.spec",
+    "requirements-native.txt",
+    "requirements-vst3.txt",
+    "requirements.txt",
+    "scripts/build_vst3_manuals.py",
+    "scripts/server_packages/build_deb.sh",
+    "scripts/server_packages/build_rpm.sh",
+    "scripts/server_packages/install_runtime.py",
+    "scripts/server_packages/prepare_runtime.py",
+    "scripts/server_packages/smoke_offline_payload.py",
+    "tests/test_insert_waveform_recalculation.py",
+    "tests/test_r210_server_vst3_browser.py"
+  ],
+  "full_regression": {
+    "tests": 4116,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 6,
+    "passed": 4110
+  },
+  "environment_deselected": 10,
+  "line_coverage": 0.7996,
+  "branch_coverage": 0.6806,
+  "targeted_and_bounce_export_checks": {
+    "tests": 47,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 47
+  },
+  "final_midi_checks": {
+    "tests": 14,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 14
+  },
+  "real_browser_monitoring_hardware_clock": {
+    "tests": 1,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 1
+  },
+  "native_bridge_node_test": "Ordering, pending-note cancellation, Panic and bounded queue passed.",
+  "offline_payload": "Ubuntu amd64 DEB built and extracted; isolated --no-index install, pip check and compiled DSP/VST host ABI imports passed. Final rebuilt/extracted payload matches all 280 application source/assets byte for byte.",
+  "runtime": "Pinned Pedalboard 0.9.26+mta1; native header/patch/wheel hashes in r210-midi-live-runtime.json.",
+  "validation_notes": [
+    "An initial regression source assertion required updating for the new project host context.",
+    "An intermediate concurrent validation run reported one AI queue interruption; the isolated unchanged GPU profile module passed 20/20. The final full regression is recorded above.",
+    "AF_UNIX restrictions exclude 10 host-agent socket tests; optional Steinberg SDK, real GUI and Win32 checks remain skipped where unavailable."
+  ],
+  "not_certified": [
+    "Physical Windows/macOS/Linux MIDI/audio devices, round-trip latency and third-party plugin compatibility.",
+    "Production EL10/LXC/HAProxy WebSocket and listening acceptance."
+  ],
+  "limits": [
+    "Static project/metronome BPM and time signature; adaptive/zoned tempo maps are not synthesized.",
+    "External MIDI sound is not included in audio exports without separate recording.",
+    "Network, software bridge and device buffering prevent a hard-real-time guarantee."
+  ],
+  "commit_push_tag_release": false
+}

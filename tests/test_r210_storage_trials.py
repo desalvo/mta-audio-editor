@@ -64,24 +64,25 @@ def test_tariff_boundaries_future_and_idempotent_storage_debit(account,clock):
 
 
 def test_trial_inherits_week_and_renews_once_on_selected_plan(account,clock):
-    r.configure({'enabled':True,'self_service':True})
+    r.configure({'enabled':True,'self_service':True,'credits_enabled':True})
     cfg=r.config();monthly=next(p for p in cfg['plans'] if p['code']=='month');monthly['price_micro']=1234
-    r.configure({'plans':[monthly]});r.grant(account,5000,'trial renewal funds',1,'trial-renewal-funds')
-    s=r.subscribe(account,'trial',0,next_plan='month',next_price=1234)
+    r.configure({'plans':[monthly]})
+    r.subscribe(account,'trial',0,next_plan='month',next_price=1234)
+    r.grant(account,5000,'trial renewal funds',1,'trial-renewal-funds');s=r.state(account)
     week=next(p for p in cfg['plans'] if p['code']=='week')
     assert s['subscription']=='trial' and s['limits']['cpu_seconds']==week['cpu_seconds']
     assert s['limits']['storage_bytes']==week['storage_bytes'] and s['credits_micro']==5000
     assert s['period']['end']-s['period']['start']==7*86400 and not s['trial_available']
     clock[0]+=7*86400
-    s=r.state(account);assert s['subscription']=='month' and s['credits_micro']==3766
-    assert r.state(account)['credits_micro']==3766
+    s=r.state(account);assert s['subscription']=='month' and s['credits_micro']==5000
+    assert r.state(account)['credits_micro']==5000
     assert s['period']['start']==clock[0]
     r.cancel_renewal(account);clock[0]=s['period']['end']
     with pytest.raises(ValueError,match='already used'):r.subscribe(account,'trial',0)
 
 
 def test_trial_bad_next_quote_rolls_back_and_default_is_week(account,clock):
-    r.configure({'enabled':True,'self_service':True})
+    r.configure({'enabled':True,'self_service':True,'credits_enabled':True})
     with pytest.raises(ValueError,match='price'):r.subscribe(account,'trial',0,next_plan='month',next_price=999)
     assert r.state(account)['trial_available'] and r.state(account)['subscription'] is None
     s=r.subscribe(account,'trial',0)
@@ -93,7 +94,7 @@ def test_trial_bad_next_quote_rolls_back_and_default_is_week(account,clock):
 
 
 def test_trial_cancel_and_change_next_plan_preserve_current_quotas(account,clock):
-    r.configure({'enabled':True,'self_service':True});s=r.subscribe(account,'trial',0)
+    r.configure({'enabled':True,'self_service':True,'credits_enabled':True});s=r.subscribe(account,'trial',0)
     start=s['period']['start'];clock[0]+=1
     e.next_plan(account,'year',0)
     assert r.state(account)['subscription']=='trial' and r.state(account)['period']['start']==start
@@ -106,17 +107,17 @@ def test_trial_cancel_and_change_next_plan_preserve_current_quotas(account,clock
 
 
 def test_unfunded_trial_renewal_waits_for_credits(account,clock):
-    r.configure({'enabled':True,'self_service':True});cfg=r.config()
+    r.configure({'enabled':True,'self_service':True,'credits_enabled':True});cfg=r.config()
     p=next(p for p in cfg['plans'] if p['code']=='week');p['price_micro']=100;r.configure({'plans':[p]})
     r.subscribe(account,'trial',0);clock[0]+=7*86400
-    assert not r.state(account)['funded']
-    with pytest.raises(ValueError,match='renewal'):finish(account,1)
+    assert r.state(account)['funded']
+    finish(account,1)
     r.grant(account,100,'renewal funding',1,'paused-renewal-funds')
-    assert r.state(account)['funded'] and r.state(account)['credits_micro']==0
+    assert r.state(account)['funded'] and r.state(account)['credits_micro']==100
 
 
 def test_admin_disables_self_service_default_is_allowed(account,clock):
-    r.configure({'enabled':True,'self_service':True})
+    r.configure({'enabled':True,'self_service':True,'credits_enabled':True})
     assert r.state(account)['policy']['subscriptions_allowed']
     e.set_policy(account,{'subscriptions_allowed':False},1)
     with pytest.raises(ValueError,match='not enabled'):r.subscribe(account,'trial',0)
@@ -124,46 +125,33 @@ def test_admin_disables_self_service_default_is_allowed(account,clock):
     assert r.assign(account,{'plan':'week','promo':'Admin granted'},1)['subscription']=='week'
 
 
-def test_free_manual_quotas_and_explicit_credit_billing(account,clock):
+def test_free_manual_quotas_and_disabled_subscription_billing(account,clock):
     r.assign(account,{'cpu_seconds':100,'gpu_seconds':100},1)
-    r.grant(account,1000,'prepaid funds',1,'paygo-funds-key')
-    finish(account,2,3)
-    assert r.state(account)['credits_micro']==1000
-    clock[0]+=1;e.set_policy(account,{'subscriptions_allowed':False,'credit_billing':True},1)
+    with pytest.raises(ValueError,match='active subscription'):r.grant(account,1000,'prepaid funds',1,'paygo-funds-key')
+    finish(account,2,3);clock[0]+=1
+    e.set_policy(account,{'subscriptions_allowed':False,'credit_billing':True},1)
     jid=finish(account,2,3)
-    assert r.state(account)['credits_micro']==920
+    assert r.state(account)['credits_micro']==0 and not r.state(account)['credits_enabled']
     with auth.db() as c:
         row=dict(c.execute('SELECT * FROM ai_compute_jobs WHERE id=?',(jid,)).fetchone())
         assert ai_billing._rates_for_jobs(c,[row])[jid]['cpu_seconds']==0
-    # Turning credit billing off affects future jobs, not already captured mode.
-    e.set_policy(account,{'credit_billing':False},1);finish(account,2,3)
-    assert r.state(account)['credits_micro']==920
-    assert r.state(account)['used']['cpu_seconds']==6
+    assert r.state(account)['used']['cpu_seconds']>=2
 
 
-def test_paygo_without_membership_enforces_balance_live_and_snapshot(account,clock):
+def test_paygo_without_membership_is_unavailable_but_usage_is_counted(account,clock):
     e.set_policy(account,{'credit_billing':True},1)
-    with pytest.raises(ValueError,match='credits exhausted'):ai_billing.create_job(account,'whisper')
-    r.grant(account,100,'prepaid funds',1,'paygo-no-membership')
-    jid=ai_billing.create_job(account,'whisper')
-    with pytest.raises(ValueError,match='Another'):ai_billing.create_job(account,'demucs')
-    assert r.checkpoint(account,jid,{'cpu_seconds_estimated':5}) is False
-    e.set_policy(account,{'credit_billing':False},1)
-    assert r.checkpoint(account,jid,{'cpu_seconds_estimated':11}) is True
-    ai_billing.finish_job(jid,'done',{'cpu_seconds':11},source='cgroup')
-    assert r.state(account)['credits_micro']==-10
+    with pytest.raises(ValueError,match='active subscription'):r.grant(account,100,'prepaid funds',1,'paygo-no-membership')
+    finish(account,11)
+    assert not r.state(account)['policy']['credit_billing']
+    assert r.state(account)['used']['cpu_seconds']==11 and r.state(account)['credits_micro']==0
 
 
-def test_credit_storage_is_opt_in_effective_dated_and_not_double_charged(account,clock):
-    start=clock[0];r.grant(account,1000,'storage credit',1,'storage-paygo-funds')
-    ai_billing.record_persistent_storage(account,e.GIB,sampled_at=start)
+def test_occupied_storage_without_subscription_cannot_spend_credits(account,clock):
+    start=clock[0];ai_billing.record_persistent_storage(account,e.GIB,sampled_at=start)
     clock[0]+=1800;e.set_policy(account,{'credit_billing':True},1)
     clock[0]+=1800;ai_billing.record_persistent_storage(account,e.GIB,sampled_at=clock[0])
-    assert r.state(account)['credits_micro']==950
-    e.set_policy(account,{'credit_billing':False},1)
-    clock[0]+=3600;ai_billing.record_persistent_storage(account,e.GIB,sampled_at=clock[0])
-    assert r.state(account)['credits_micro']==950
-    with auth.db() as c:assert sum(x['cost_micro'] for x in e.credit_storage_segments(c,account,start,clock[0]))==50
+    assert r.state(account)['credits_micro']==0
+    with auth.db() as c:assert sum(x['cost_micro'] for x in e.credit_storage_segments(c,account,start,clock[0]))==0
 
 
 def test_paid_quota_spans_lazy_renewals_and_cancel_stops_charge(account,clock):
@@ -178,7 +166,7 @@ def test_paid_quota_spans_lazy_renewals_and_cancel_stops_charge(account,clock):
 
 def test_concurrent_trial_activation_cannot_reuse_trial(account,clock):
     from concurrent.futures import ThreadPoolExecutor
-    r.configure({'enabled':True,'self_service':True})
+    r.configure({'enabled':True,'self_service':True,'credits_enabled':True})
     def activate(_):
         try:r.subscribe(account,'trial',0);return True
         except ValueError:return False

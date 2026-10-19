@@ -30,7 +30,7 @@ def install_runtime(python: str, app: Path, wheels: Path, venv: Path) -> None:
         subprocess.run([interpreter, '-m', 'pip', '--version'], check=True, stdout=subprocess.DEVNULL)
         subprocess.run([interpreter, '-m', 'pip', 'install', '--no-index', f'--find-links={wheels}', '-r', str(app / 'requirements.txt')], check=True)
         subprocess.run([interpreter, '-m', 'pip', 'check'], check=True)
-        subprocess.run([interpreter, '-c', 'import app.ai_cgroup_launcher, app.main'], cwd=app, check=True)
+        subprocess.run([interpreter, '-c', 'import app.ai_cgroup_launcher, app.main; import pedalboard,av,mido; assert all(hasattr(pedalboard.VST3Plugin,n) for n in ("_mta_set_transport","_mta_set_musical_position","_mta_process_sidechain"))'], cwd=app, check=True)
         if venv.exists():
             venv.rename(backup)
             moved_old = True

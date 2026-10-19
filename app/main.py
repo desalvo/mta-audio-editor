@@ -1,3 +1,4 @@
+from .vst3_transport import runtime_available as vst_host_runtime
 from contextlib import asynccontextmanager
 import stat
 from app.secure_https import https_urlopen
@@ -101,6 +102,8 @@ async def _mta_application_lifespan(_app):
         yield
     finally:
         _cleanup_session_previews_on_shutdown()
+        from .server_vst3 import sessions as _live_vst3_sessions
+        _live_vst3_sessions.shutdown()
         if not NATIVE_SINGLE_USER:
             from .ai_notifications import stop_service
             stop_service()
@@ -546,7 +549,7 @@ def _media_job_public(job: dict) -> dict:
 
 def _is_public(path: str) -> bool:
     return (
-        path in {"/privacy/it.pdf", "/privacy/en.pdf", "/terms/it.pdf", "/terms/en.pdf", "/privacy/it/pdf", "/privacy/en/pdf", "/terms/it/pdf", "/terms/en/pdf", "/privacy", "/privacy/it", "/privacy/en", "/terms", "/terms/it", "/terms/en"}
+        path in {"/api/billing/credits/stripe-webhook", "/privacy/it.pdf", "/privacy/en.pdf", "/terms/it.pdf", "/terms/en.pdf", "/privacy/it/pdf", "/privacy/en/pdf", "/terms/it/pdf", "/terms/en/pdf", "/privacy", "/privacy/it", "/privacy/en", "/terms", "/terms/it", "/terms/en"}
         or path.startswith("/static/")
         or path in {"/health", "/api/health", "/api/about", "/oauth-second-factor", "/login", "/register", "/verify-email", "/resend-verification", "/forgot-password", "/reset-password"}
         or path.startswith("/oauth/")
@@ -606,8 +609,30 @@ async def security_middleware(request: Request, call_next):
         return response
 
     # API mutations must carry an explicit same-origin request marker.
-    if request.url.path.startswith("/api/") and request.method not in {"GET", "HEAD", "OPTIONS"} and request.headers.get("x-mta-request") != "1" and not ai_gateway_token_ok:
+    if request.url.path.startswith("/api/") and request.method not in {"GET", "HEAD", "OPTIONS"} and request.headers.get("x-mta-request") != "1" and not ai_gateway_token_ok and request.url.path!="/api/billing/credits/stripe-webhook":
         return HTMLResponse("Missing request integrity header", status_code=403)
+
+    # Existing job polling, cancellation and saving results remain available after
+    # credit exhaustion. Only admission of new work is gated here and in the ledger.
+    if not NATIVE_SINGLE_USER and user is not None and user['role']!='admin':
+        path=request.url.path
+        new_work=request.method=='POST' and (path in ('/api/projects','/api/import-jobs') or path.endswith(('/import','/upload','/separate','/lyrics','/chords','/markers','/audio-capture')))
+        if new_work or (request.method=='GET' and path=='/'):
+            from .resource_access import quick_required,status as resource_access_status
+            if quick_required(user['id']) and resource_access_status(user['id'])['blocked']:
+                if path=='/':return RedirectResponse('/account#subscriptions',status_code=303)
+                from fastapi.responses import JSONResponse
+                return JSONResponse({'detail':('È necessario un abbonamento attivo' if i18n.current_language.get()=='it' else 'An active subscription is required'),'code':'subscription_required','url':'/account#subscriptions'},status_code=402)
+
+    if not NATIVE_SINGLE_USER and user is not None and request.method=='POST':
+        path=request.url.path
+        ai_start=path.endswith('/stem-jobs') or ('/extract-' in path and path.endswith('-jobs')) or ('/ai-arranger/' in path and path.endswith(('/start-generation','/generate-and-add','/generate','/jobs'))) or ('/ai-remix/' in path and path.endswith(('/start-generation','/generate-and-add')))
+        if ai_start:
+            from .resource_access import preflight,CreditAdmissionError
+            try:preflight(int(user['id']))
+            except CreditAdmissionError as exc:
+                from fastapi.responses import JSONResponse
+                return JSONResponse({'detail':str(exc),'code':exc.code,'url':'/account#subscriptions'},status_code=402)
 
     from .ai_job_context import actor as ai_actor_context
     authenticated_ai = None
@@ -641,7 +666,8 @@ async def security_middleware(request: Request, call_next):
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["Referrer-Policy"] = "no-referrer"
-    response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+    microphone="(self)" if request.url.path=="/" else "()"
+    response.headers["Permissions-Policy"] = f"camera=(), microphone={microphone}, geolocation=()"
     script_policy = "script-src 'self' 'unsafe-inline'"
     if NATIVE_SINGLE_USER:
         # pywebview 6.x creates js_api proxy methods with JavaScript's Function
@@ -930,6 +956,35 @@ def settings_page(request: Request):
     return _template("admin.html")
 
 
+@app.get('/api/admin/audio-engine')
+def server_audio_engine_status(request: Request):
+    require_admin(request)
+    from .audio_backend import status
+    return status()
+
+
+@app.put('/api/admin/audio-engine')
+def server_audio_engine_select(request: Request, body: dict):
+    require_admin(request)
+    if NATIVE_SINGLE_USER:
+        raise HTTPException(409, 'Use application audio settings in native mode')
+    from .audio_backend import select
+    try:
+        return select(body.get('engine'))
+    except ValueError as exc:
+        raise HTTPException(422, str(exc)) from exc
+    except RuntimeError as exc:
+        raise HTTPException(409, str(exc)) from exc
+
+
+@app.get('/api/native/audio-engine')
+def native_audio_engine_status(request: Request):
+    if not NATIVE_SINGLE_USER:raise HTTPException(404,'Native audio settings are unavailable')
+    require_user(request)
+    from .audio_backend import status
+    return status()
+
+
 @app.get("/api/session")
 def api_session(request: Request):
     user = public_user(require_user(request))
@@ -937,6 +992,12 @@ def api_session(request: Request):
     user["effective_language"] = i18n.effective(user.get("language","auto"),request.headers.get("accept-language","en"))
     user["native_single_user"] = NATIVE_SINGLE_USER
     return user
+
+
+@app.get('/account/credits')
+def credit_purchase_page(request: Request):
+    require_user(request)
+    return _template('credits.html')
 
 
 @app.get("/api/account")
@@ -1352,6 +1413,14 @@ def user_pdf_en():
     return FileResponse(BASE / "docs" / "MTA-Audio-Editor-User-Manual-EN.pdf", filename="MTA-Audio-Editor-User-Manual-EN.pdf")
 
 
+@app.get('/docs/pdf/vst3/{language}')
+def vst3_manual(language: str, request: Request):
+    _actor(request)
+    if language not in ('it','en'):raise HTTPException(404,'Manual language not found')
+    name='MTA-Audio-Editor-VST3-Manual-'+language.upper()+'.pdf'
+    return FileResponse(BASE/'docs'/name,filename=name)
+
+
 @app.get("/docs/pdf/admin/en")
 def admin_pdf_en(request: Request):
     user = session_user(request)
@@ -1392,27 +1461,31 @@ def about():
 @app.get("/api/vst3/plugins")
 def vst3_plugin_list(request: Request):
     from .vst3_host import discover_plugins, runtime_available
-    # Only the locally installed desktop host can access external plugin binaries.
-    if not NATIVE_SINGLE_USER:
-        return {"available": False, "plugins": [], "reason": "Desktop application required"}
-    return {"available": runtime_available(), "plugins": discover_plugins()}
+    _actor(request)
+    from .audio_backend import requested
+    from .vst3_live import available
+    return {"available": runtime_available(), "plugins": discover_plugins(),
+            "scope":"native" if NATIVE_SINGLE_USER else "server", "engine":requested(),
+            "live_available":available() and requested()=='cpp',"original_editor":NATIVE_SINGLE_USER or __import__('app.server_vst3_display',fromlist=['available']).available(),
+            "host_transport":vst_host_runtime()}
 
 
 @app.get("/api/vst3/parameters")
 def vst3_parameters(request: Request, path: str):
     import subprocess
-    import sys
     import json
-    from .vst3_host import validate_plugin_path, runtime_available
-    if not NATIVE_SINGLE_USER or not runtime_available():
-        raise HTTPException(status_code=403, detail="Desktop VST3 host required")
+    from .vst3_host import validate_plugin_path, runtime_available,worker_command
+    _actor(request)
+    if not runtime_available():
+        raise HTTPException(status_code=409, detail="VST3 runtime is not installed on this host")
     try:
         plugin = validate_plugin_path(path)
-        proc = subprocess.run([sys.executable, '-m', 'app.vst3_host', '--inspect-plugin', str(plugin)],
-                              capture_output=True, text=True, timeout=15)
-        if proc.returncode:
-            raise ValueError(proc.stderr[-500:] or 'VST3 inspection failed')
-        return json.loads(proc.stdout)
+        with tempfile.TemporaryDirectory(prefix='mta-vst3-inspect-') as root:
+            result=Path(root)/'result.json'
+            proc = subprocess.run(worker_command('--inspect-plugin',plugin,'--inspect-result',result),
+                                  capture_output=True,text=True,timeout=15)
+            if proc.returncode:raise ValueError(proc.stderr[-500:] or 'VST3 inspection failed')
+            return json.loads(result.read_text(encoding='utf-8') if result.is_file() else proc.stdout)
     except (ValueError, FileNotFoundError, subprocess.TimeoutExpired) as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
@@ -2207,6 +2280,7 @@ def _ensure_project_clip_library(project: Project) -> bool:
     by_id = {item.id: item for item in project.clip_library}
     by_filename = {item.filename: item for item in project.clip_library}
     for track in project.tracks:
+        if track.kind=='midi':continue
         asset = by_id.get(track.source_clip_id or "")
         if asset is None:
             asset = by_filename.get(track.filename)
@@ -2846,6 +2920,7 @@ def _track_waveform_revision(track: Track, source: Path) -> str:
         "source": _waveform_revision(source),
         "waveform_format": "signed-minmax-v2-4096",
         "inserts": [item.model_dump(mode="json") for item in track.inserts],
+        "midi": {"notes":[n.model_dump() for n in track.midi_notes],"controls":[c.model_dump() for c in track.midi_controls],"instrument":track.instrument.model_dump() if track.instrument else None} if track.kind=='midi' else None,
     }
     return hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()[:24]
 
@@ -2881,7 +2956,7 @@ def _waveform_worker(job_id: str, pid: str, track_id: str) -> None:
             with tempfile.TemporaryDirectory(prefix="mta-waveform-") as td_raw:
                 rendered = Path(td_raw) / "processed.wav"
                 progress(10, "Rendering insert per waveform")
-                render_track(track, source, rendered, apply_inserts=True)
+                render_track(track, source, rendered, apply_inserts=True,host_project=project)
                 peaks = waveform_peaks(rendered, 4096, progress)
         else:
             peaks = waveform_peaks(source, 4096, progress)
@@ -3209,7 +3284,7 @@ def _text_music_worker(job_id: str, pid: str, track_id: str, kind: str, model_or
             tmp_dir = Path(tempfile.mkdtemp(prefix=f"mta-{kind}-range-"))
             rendered = tmp_dir / "track.wav"
             clipped = tmp_dir / "range.wav"
-            render_track(track, source, rendered, apply_inserts=True, sample_rate=int(getattr(project,"sample_rate",44100) or 44100))
+            render_track(track, source, rendered, apply_inserts=True, sample_rate=int(getattr(project,"sample_rate",44100) or 44100),host_project=project)
             start_s=max(0,int(range_start_ms))/1000.0
             duration_s=max(0.001,(int(range_end_ms)-int(range_start_ms))/1000.0)
             subprocess.run(["ffmpeg","-y","-v","error","-ss",f"{start_s:.6f}","-t",f"{duration_s:.6f}","-i",str(rendered),"-vn","-acodec","pcm_s16le",str(clipped)],check=True)
@@ -6574,44 +6649,47 @@ def estimate_track_bpm(pid: str, track_id: str, request: Request, time_signature
 
 @app.get("/api/projects/{pid}/preview-track/{track_id}")
 def preview_track(pid: str, track_id: str, request: Request, render: bool = False):
-    project = _project_for_actor(request, pid)
-    track = next((item for item in project.tracks if item.id == track_id), None)
-    if track is None:
-        raise HTTPException(404, "track not found")
-    # Preview stems deliberately keep mixer controls neutral. Volume, pan,
-    # mute and solo are applied downstream in the browser WebAudio graph so
-    # faders react immediately without re-rendering/restarting playback.
-    preview_track_model = track.model_copy(deep=True)
-    preview_track_model.volume_db = 0.0
-    # Dry/no-insert previews apply input trim live in WebAudio. With inserts
-    # it must be rendered before their nonlinear processing, exactly once.
-    if not (render and any(item.enabled for item in track.inserts)):
-        preview_track_model.gain_db = 0.0
-    preview_track_model.pan = 0.0
-    preview_track_model.mute = False
-    signature = hashlib.sha256(
-        (
-            preview_track_model.model_dump_json()
-            + f"|{project.bpm}|{project.base_bpm}|{project.pitch_semitones}|{int(render)}"
-        ).encode("utf-8")
-    ).hexdigest()[:20]
-    cache = session_preview_dir(pid) / "tracks"
-    cache.mkdir(parents=True, exist_ok=True)
-    out = cache / f"{track.id}-{signature}.wav"
-    if not out.is_file():
-        render_track_export(
-            preview_track_model,
-            audio_path(pid, track.filename),
-            out,
-            fmt="wav",
-            project=project,
-            apply_inserts=bool(render),
-        )
-        # Keep only the latest few previews per track.
-        stale = sorted(cache.glob(f"{track.id}-*.wav"), key=lambda item: item.stat().st_mtime, reverse=True)[4:]
-        for path in stale:
-            path.unlink(missing_ok=True)
-    return FileResponse(out, media_type="audio/wav", filename=f"{track.name}-preview.wav")
+    from .audio_backend import snapshot_context
+    with snapshot_context():
+        project = _project_for_actor(request, pid)
+        track = next((item for item in project.tracks if item.id == track_id), None)
+        if track is None:
+            raise HTTPException(404, "track not found")
+        # Preview stems deliberately keep mixer controls neutral. Volume, pan,
+        # mute and solo are applied downstream in the browser WebAudio graph so
+        # faders react immediately without re-rendering/restarting playback.
+        preview_track_model = track.model_copy(deep=True)
+        preview_track_model.volume_db = 0.0
+        # Dry/no-insert previews apply input trim live in WebAudio. With inserts
+        # it must be rendered before their nonlinear processing, exactly once.
+        if not (render and any(item.enabled for item in track.inserts)):
+            preview_track_model.gain_db = 0.0
+        preview_track_model.pan = 0.0
+        preview_track_model.mute = False
+        signature = hashlib.sha256(
+            (
+                preview_track_model.model_dump_json()
+                + f"|{project.bpm}|{project.base_bpm}|{project.pitch_semitones}|{int(render)}"
+                + __import__("app.audio_backend",fromlist=["identity"]).identity()
+            ).encode("utf-8")
+        ).hexdigest()[:20]
+        cache = session_preview_dir(pid) / "tracks"
+        cache.mkdir(parents=True, exist_ok=True)
+        out = cache / f"{track.id}-{signature}.wav"
+        if not out.is_file():
+            render_track_export(
+                preview_track_model,
+                audio_path(pid, track.filename),
+                out,
+                fmt="wav",
+                project=project,
+                apply_inserts=bool(render),
+            )
+            # Keep only the latest few previews per track.
+            stale = sorted(cache.glob(f"{track.id}-*.wav"), key=lambda item: item.stat().st_mtime, reverse=True)[4:]
+            for path in stale:
+                path.unlink(missing_ok=True)
+        return FileResponse(out, media_type="audio/wav", filename=f"{track.name}-preview.wav")
 
 
 @app.get("/api/projects/{pid}/preview-mix")
@@ -7897,3 +7975,14 @@ _register_dump_routes(app)
 
 from .resource_routes import router as _resource_router
 app.include_router(_resource_router)
+
+from .server_vst3 import register_routes as _server_vst3_routes
+_server_vst3_routes(app,_project_for_actor,_actor)
+
+from .midi_routes import register_routes as _midi_routes
+_midi_routes(app,_project_for_actor,_serialized_project_mutation,_ensure_workspace_capacity)
+from .midi_monitor import register_routes as _midi_monitor_routes
+_midi_monitor_routes(app,_project_for_actor,_actor)
+
+from .audio_capture import register_routes as _audio_capture_routes
+_audio_capture_routes(app,_project_for_actor,_actor)

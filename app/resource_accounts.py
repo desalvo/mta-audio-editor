@@ -34,8 +34,30 @@ def init(c):
     ''')
     for key,(days,months,factor) in PLANS.items():
         c.execute('INSERT OR IGNORE INTO resource_plans(code,cpu_seconds,gpu_seconds,storage_bytes) VALUES(?,?,?,?)',(key,4*3600*days*factor,4*3600*days*factor,int(5*1024**3*factor)))
+    c.execute('CREATE TABLE IF NOT EXISTS resource_job_budgets(job_id TEXT PRIMARY KEY REFERENCES ai_compute_jobs(id) ON DELETE CASCADE,budget_micro INTEGER NOT NULL,gross_micro INTEGER NOT NULL DEFAULT 0,waived_micro INTEGER NOT NULL DEFAULT 0,rates_json TEXT)')
+    c.execute('CREATE TABLE IF NOT EXISTS resource_spending_pools(id TEXT PRIMARY KEY,user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,ceiling_micro INTEGER NOT NULL,spent_micro INTEGER NOT NULL DEFAULT 0)')
+    if 'pool_id' not in {r[1] for r in c.execute('PRAGMA table_info(resource_job_budgets)')}:
+        c.execute('ALTER TABLE resource_job_budgets ADD COLUMN pool_id TEXT')
+    if 'rates_json' not in {r[1] for r in c.execute('PRAGMA table_info(resource_job_budgets)')}:
+        c.execute('ALTER TABLE resource_job_budgets ADD COLUMN rates_json TEXT')
+    if 'credit_value_micro' not in {r[1] for r in c.execute('PRAGMA table_info(resource_config)')}:
+        c.execute('ALTER TABLE resource_config ADD COLUMN credit_value_micro INTEGER NOT NULL DEFAULT 100000')
+    cols={row[1] for row in c.execute('PRAGMA table_info(resource_config)')}
+    credits_migration='credits_enabled' not in cols
+    if credits_migration:c.execute('ALTER TABLE resource_config ADD COLUMN credits_enabled INTEGER NOT NULL DEFAULT 0')
+    if 'credit_denominations' not in cols:c.execute("ALTER TABLE resource_config ADD COLUMN credit_denominations TEXT NOT NULL DEFAULT '[500,1000,2000,5000]'")
+    c.execute('CREATE TABLE IF NOT EXISTS resource_credit_service_events(id INTEGER PRIMARY KEY AUTOINCREMENT,effective_at INTEGER NOT NULL,enabled INTEGER NOT NULL)')
+    if not c.execute('SELECT 1 FROM resource_credit_service_events').fetchone():c.execute('INSERT INTO resource_credit_service_events(effective_at,enabled) VALUES(?,?)',(int(time.time()),int(c.execute('SELECT credits_enabled FROM resource_config WHERE id=1').fetchone()[0])))
     from .resource_entitlements import init as init_entitlements
     init_entitlements(c)
+    if credits_migration:
+        c.execute('INSERT INTO resource_policy_events(user_id,effective_at,credit_billing) SELECT user_id,?,0 FROM resource_user_policy WHERE credit_billing=1',(int(time.time()),))
+        c.execute('UPDATE resource_user_policy SET credit_billing=0')
+    c.execute("CREATE TABLE IF NOT EXISTS resource_plan_charges(user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,period_start INTEGER NOT NULL,amount_micro INTEGER NOT NULL,status TEXT NOT NULL DEFAULT 'due',PRIMARY KEY(user_id,period_start))")
+    # Jobs admitted before this upgrade receive a conservative remaining-wallet
+    # ceiling. Already settled historical charges are never rewritten.
+    for row in c.execute('SELECT r.job_id,r.user_id FROM resource_job_contracts r LEFT JOIN resource_job_budgets b ON b.job_id=r.job_id WHERE r.settled=0 AND b.job_id IS NULL').fetchall():
+        reserve_budget(c,row['user_id'],row['job_id'])
     c.commit()
 
 
@@ -46,7 +68,9 @@ def number(v,*,integer=False):
 
 def config():
     with auth.db() as c:
-        init(c);return {**dict(c.execute('SELECT * FROM resource_config WHERE id=1').fetchone()),'plans':[dict(r) for r in c.execute('SELECT * FROM resource_plans')]}
+        init(c)
+        from .resource_access import tariff_view
+        return {**dict(c.execute('SELECT * FROM resource_config WHERE id=1').fetchone()),'plans':[dict(r) for r in c.execute('SELECT * FROM resource_plans')],'tariffs':tariff_view(c)}
 
 
 def _boundary(anchor,code,n):
@@ -82,6 +106,8 @@ def _period(c,uid,at):
         return p
     limits=dict(c.execute('SELECT * FROM resource_plans WHERE code=?',('week' if code=='trial' else code,)).fetchone()) if code else dict(member)
     price=limits.get('price_micro',0) if code and code!='trial' and not member['promo'] else 0
+    from .resource_entitlements import policy
+    if not policy(c,uid)['subscriptions_allowed']:price=0
     limits={**{k:limits.get(k) for k in RESOURCES},'_price_micro':price,'_funded':not price}
     c.execute('INSERT INTO resource_periods VALUES(?,?,?,?,?)',(uid,start,end,json.dumps(limits),code))
     p={'user_id':uid,'start':start,'end':end,'limits':json.dumps(limits),'plan':code}
@@ -126,7 +152,12 @@ def _state(c,uid,used_storage,at):
     used['storage_bytes']=used_storage
     from .resource_entitlements import enrich_state
     result={'enabled':bool(c.execute('SELECT enabled FROM resource_config').fetchone()[0]),'period':p,'limits':limits,'used':used,'credits_micro':_balance(c,uid),'overage':bool(member and member['overage']),'promo':member['promo'] if member else '', 'subscription':p['plan'] if p else None,'funded':raw.get('_funded',True),'renewal_stops_at':(c.execute('SELECT until_ts FROM resource_cancellations WHERE user_id=?',(uid,)).fetchone() or [None])[0]}
-    return enrich_state(c,uid,result,at)
+    result=enrich_state(c,uid,result,at)
+    from .resource_access import access_state
+    result['access']=access_state(result,user['role'])
+    result['credit_value_micro']=c.execute('SELECT credit_value_micro FROM resource_config WHERE id=1').fetchone()[0]
+    result['credits']=result['credits_micro']/result['credit_value_micro']
+    return result
 
 
 def state(uid,used_storage=0,*,at=None):
@@ -135,13 +166,27 @@ def state(uid,used_storage=0,*,at=None):
 
 
 def configure(body):
-    if set(body)-{'enabled','self_service','plans'}:raise ValueError('Invalid subscription setting')
+    if set(body)-{'enabled','self_service','plans','credit_value_micro','credits_enabled','credit_denominations'}:raise ValueError('Invalid subscription setting')
     with auth.db() as c:
         init(c);c.execute('BEGIN IMMEDIATE')
-        for key in ('enabled','self_service'):
+        for key in ('enabled','self_service','credits_enabled'):
             if key in body:
                 if type(body[key]) is not bool:raise ValueError('Boolean required')
-                c.execute({'enabled':'UPDATE resource_config SET enabled=?','self_service':'UPDATE resource_config SET self_service=?'}[key],(int(body[key]),))
+                c.execute({'enabled':'UPDATE resource_config SET enabled=?','self_service':'UPDATE resource_config SET self_service=?','credits_enabled':'UPDATE resource_config SET credits_enabled=?'}[key],(int(body[key]),))
+        if {'enabled','credits_enabled'}&set(body):
+            cfg=c.execute('SELECT enabled,credits_enabled FROM resource_config WHERE id=1').fetchone()
+            c.execute('INSERT INTO resource_credit_service_events(effective_at,enabled) VALUES(?,?)',(int(time.time()),int(bool(cfg[0] and cfg[1]))))
+        if 'credit_denominations' in body:
+            denominations=body['credit_denominations']
+            if not isinstance(denominations,list) or not 1<=len(denominations)<=20 or any(type(v) is not int or not 100<=v<=100000 for v in denominations) or len(set(denominations))!=len(denominations):raise ValueError('Credit denominations must be unique EUR cent amounts between 100 and 100000')
+            c.execute('UPDATE resource_config SET credit_denominations=? WHERE id=1',(json.dumps(sorted(denominations)),))
+        if 'credit_value_micro' in body:
+            value=number(body['credit_value_micro'],integer=True)
+            if not value:raise ValueError('Credit value must be positive')
+            c.execute('UPDATE resource_config SET credit_value_micro=? WHERE id=1',(value,))
+        if body.get('enabled'):
+            from .resource_access import ensure_tariffs
+            ensure_tariffs(c)
         for p in body.get('plans',[]):
             if set(p)!={'code','cpu_seconds','gpu_seconds','storage_bytes','price_micro'} or p['code'] not in PLANS:raise ValueError('Invalid plan')
             c.execute('UPDATE resource_plans SET cpu_seconds=?,gpu_seconds=?,storage_bytes=?,price_micro=? WHERE code=?',(number(p['cpu_seconds']),number(p['gpu_seconds']),number(p['storage_bytes'],integer=True),number(p['price_micro'],integer=True),p['code']))
@@ -192,6 +237,7 @@ def grant(uid,amount,reason,actor,key):
     key='grant:'+key
     with auth.db() as c:
         init(c);c.execute('BEGIN IMMEDIATE')
+        if not _state(c,uid,0,int(time.time()))['credits_enabled']:raise ValueError('Credits require an enabled credit service and an active subscription for this user')
         prior=c.execute('SELECT * FROM resource_credits WHERE id=?',(key,)).fetchone()
         if prior:
             if (prior['user_id'],prior['delta_micro'],prior['reason'])!=(uid,amount,reason):raise ValueError('Conflicting credit retry')
@@ -205,24 +251,31 @@ def admit(c,uid,jid,stamp):
     from .resource_entitlements import policy,admit_credit
     mode=policy(c,uid)
     s=_state(c,uid,0,stamp);p=s['period']
+    mode=s['policy']
+    continuation=continuing_pool(c,uid,jid)
+    if s['access']['blocked'] and not continuation:raise ValueError('SUBSCRIPTION_REQUIRED: An active subscription is required; open /account#subscriptions or contact the administrator')
     if not p:
         if mode['credit_billing']:
-            admit_credit(c,uid,jid,stamp);return
+            admit_credit(c,uid,jid,stamp);reserve_budget(c,uid,jid);return
         from .resource_entitlements import admit_free
-        admit_free(c,uid,jid,stamp);return
-    if not s['funded']:raise ValueError('Subscription renewal requires credits')
+        admit_free(c,uid,jid,stamp);reserve_budget(c,uid,jid);return
+    if not s['funded']:raise ValueError('Subscription is not active; contact the administrator')
     if c.execute('SELECT 1 FROM resource_job_contracts r JOIN ai_compute_jobs j ON j.id=r.job_id WHERE r.user_id=? AND j.status=\'running\' AND j.id!=? AND (j.queue_job_id IS NULL OR j.queue_job_id IS NOT (SELECT queue_job_id FROM ai_compute_jobs WHERE id=?))',(uid,jid,jid)).fetchone():raise ValueError('Another quota-controlled AI job is running')
     from .ai_billing import prices
     rates=prices(_connection=c)
     for key in ('cpu_seconds','gpu_seconds'):
         limit=s['limits'][key]
         if limit is not None and s['used'][key]>=limit:
-            if not s['subscription'] or not s['overage'] or s['credits_micro']<=0 or rates.get(key,0)<=0:raise ValueError('Resource quota exceeded: '+key)
-    if s['credits_micro']<0:raise ValueError('Resource credits exhausted')
+            if not (continuation and s['subscription'] and s['overage']) and (not s['subscription'] or not s['overage'] or not mode['credit_billing'] or s['credits_micro']<=0 or rates.get(key,0)<=0):raise ValueError('Resource quota exceeded: '+key)
     if not s['subscription'] and mode['credit_billing']:
-        admit_credit(c,uid,jid,stamp);return
+        admit_credit(c,uid,jid,stamp);reserve_budget(c,uid,jid);return
     c.execute('INSERT INTO resource_job_modes VALUES(?,?)',(jid,'subscription' if s['subscription'] else 'free'))
-    c.execute('INSERT INTO resource_job_contracts(job_id,user_id,period_start,subscription,overage) VALUES(?,?,?,?,?)',(jid,uid,p['start'],int(bool(p['plan'])),int(s['overage'])))
+    c.execute('INSERT INTO resource_job_contracts(job_id,user_id,period_start,subscription,overage) VALUES(?,?,?,?,?)',(jid,uid,p['start'],int(bool(p['plan'])),int(s['overage'] and mode['credit_billing'])))
+    reserve_budget(c,uid,jid)
+    # Starting with no credits does not buy unlimited free overages. A queue job
+    # that initially had credits keeps its authorization across all worker steps.
+    if not continuing_pool(c,uid,jid):
+        c.execute('UPDATE resource_job_contracts SET overage=0 WHERE job_id=?',(jid,))
 
 
 def settle(c,jid,values):
@@ -233,6 +286,8 @@ def settle(c,jid,values):
     used=_used(c,contract['user_id'],p['start'],p['end']);cost=0
     from .ai_billing import prices
     job=c.execute('SELECT started_at FROM ai_compute_jobs WHERE id=?',(jid,)).fetchone();rates=prices(at=job['started_at'],_connection=c)
+    quote=c.execute('SELECT rates_json FROM resource_job_budgets WHERE job_id=?',(jid,)).fetchone()
+    if quote and quote[0]:rates=json.loads(quote[0])
     mode=c.execute('SELECT mode FROM resource_job_modes WHERE job_id=?',(jid,)).fetchone() if c.execute("SELECT 1 FROM sqlite_master WHERE name='resource_job_modes'").fetchone() else None
     if mode and mode[0]=='credit':
         cost=sum(round(values.get(key,0)*rates.get(key,0)) for key in ('cpu_seconds','gpu_seconds'))
@@ -241,6 +296,17 @@ def settle(c,jid,values):
             if limits[key] is None:continue
             qty=values.get(key,0);over=max(0,used[key]-limits[key])-max(0,used[key]-qty-limits[key])
             cost+=round(over*rates.get(key,0))
+    budget=c.execute('SELECT budget_micro,pool_id FROM resource_job_budgets WHERE job_id=?',(jid,)).fetchone()
+    if budget is not None:
+        gross=cost;cost=min(cost,budget[0],max(0,_balance(c,contract['user_id'])))
+        cfg=c.execute('SELECT credits_enabled FROM resource_config WHERE id=1').fetchone()
+        allowed=c.execute('SELECT subscriptions_allowed FROM resource_user_policy WHERE user_id=?',(contract['user_id'],)).fetchone()
+        if not cfg[0] or (allowed and not allowed[0]):cost=0
+        if budget['pool_id']:
+            pool=c.execute('SELECT ceiling_micro,spent_micro FROM resource_spending_pools WHERE id=?',(budget['pool_id'],)).fetchone()
+            cost=min(cost,max(0,pool['ceiling_micro']-pool['spent_micro']))
+            c.execute('UPDATE resource_spending_pools SET spent_micro=spent_micro+? WHERE id=?',(cost,budget['pool_id']))
+        c.execute('UPDATE resource_job_budgets SET gross_micro=?,waived_micro=? WHERE job_id=?',(gross,gross-cost,jid))
     c.execute('UPDATE resource_job_contracts SET settled=1,charge_micro=? WHERE job_id=?',(cost,jid))
 
 
@@ -265,21 +331,20 @@ def checkpoint(uid,jid,counters):
         mode=c.execute('SELECT mode FROM resource_job_modes WHERE job_id=?',(jid,)).fetchone()
         credit_mode=bool(mode and mode[0]=='credit')
     if not p and not credit_mode:return False
-    from .ai_billing import prices
-    rates=prices();excess_cost=0
     for key in ('cpu_seconds','gpu_seconds'):
         limit=s['limits'][key];live=counters.get(key+'_estimated',0)
         if type(live) not in (int,float) or not math.isfinite(live) or live<0:continue
         if credit_mode:
-            if limit is not None and s['used'][key]+live>=limit:return True
-            excess_cost+=live*rates.get(key,0)
+            # An unfunded plan is not an included allowance: this admission pays
+            # full usage from credits. Manual (non-plan) quotas still apply.
+            if not p.get('plan') and limit is not None and s['used'][key]+live>=limit:return True
             continue
         if limit is not None and s['used'][key]+live>=limit:
             if not credit_mode and (not s['subscription'] or not s['overage']):return True
-            if rates.get(key,0)<=0:return True
-            excess_cost+=max(0,s['used'][key]+live-limit)*rates[key]
     if s['period'] and p and s['period']['start']==p['start']:sample(uid,0)
-    return excess_cost>s['credits_micro']
+    # Credit exhaustion never cancels an admitted job. Manual/included quotas
+    # above remain enforced unless credit overage was explicitly authorized.
+    return False
 
 
 def storage_check(uid,used,additional):
@@ -387,7 +452,7 @@ def tick():
 def has_limits(uid,c=None):
     def check(con):
         if not con.execute("SELECT 1 FROM sqlite_master WHERE name='resource_memberships'").fetchone():return False
-        if con.execute("SELECT 1 FROM sqlite_master WHERE name='resource_user_policy'").fetchone() and con.execute('SELECT 1 FROM resource_user_policy WHERE user_id=? AND credit_billing=1',(uid,)).fetchone():return True
+        if con.execute("SELECT 1 FROM sqlite_master WHERE name='resource_user_policy'").fetchone() and con.execute('SELECT 1 FROM resource_user_policy WHERE user_id=? AND (credit_billing=1 OR access_required=1)',(uid,)).fetchone():return True
         return bool(con.execute('SELECT 1 FROM resource_memberships m WHERE m.user_id=?',(uid,)).fetchone())
     if c is not None:return check(c)
     with auth.db() as con:return check(con)
@@ -437,18 +502,17 @@ def options(uid,body):
 def transactions(uid):
     with auth.db() as c:
         init(c)
-        return {'credits':[dict(r) for r in c.execute('SELECT * FROM resource_credits WHERE user_id=? ORDER BY created_at DESC LIMIT 200',(uid,))],
-                'overages':[dict(r) for r in c.execute('SELECT r.job_id,r.period_start,r.charge_micro FROM resource_job_contracts r JOIN ai_compute_jobs j ON j.id=r.job_id WHERE r.user_id=? AND r.charge_micro>0 AND j.accounting_excluded=0 ORDER BY r.period_start DESC LIMIT 200',(uid,))]}
+        return {'subscription_fees':[dict(row) for row in c.execute('SELECT * FROM resource_plan_charges WHERE user_id=? ORDER BY period_start DESC LIMIT 200',(uid,))],'credits':[dict(r) for r in c.execute('SELECT * FROM resource_credits WHERE user_id=? ORDER BY created_at DESC LIMIT 200',(uid,))],
+                'overages':[dict(r) for r in c.execute('SELECT r.job_id,r.period_start,r.charge_micro,b.gross_micro,b.waived_micro FROM resource_job_contracts r JOIN ai_compute_jobs j ON j.id=r.job_id LEFT JOIN resource_job_budgets b ON b.job_id=r.job_id WHERE r.user_id=? AND (r.charge_micro>0 OR b.waived_micro>0) AND j.accounting_excluded=0 ORDER BY r.period_start DESC LIMIT 200',(uid,))]}
 
 
 def _fund(c,p,member):
     limits=json.loads(p['limits']);price=limits.get('_price_micro',0)
     if limits.get('_funded',True) or not price:return
-    if _balance(c,p['user_id'])>=price:
-        key=f"subscription:{p['user_id']}:{p['start']}"
-        c.execute('INSERT OR IGNORE INTO resource_credits VALUES(?,?,?,?,?,?)',(key,p['user_id'],-price,p['user_id'],'Subscription renewal: '+str(p['plan']),int(time.time())))
-        limits['_funded']=True;limits['_funded_at']=int(time.time());p['limits']=json.dumps(limits)
-        c.execute('UPDATE resource_periods SET limits=? WHERE user_id=? AND start=?',(p['limits'],p['user_id'],p['start']))
+    # Subscription fees are separate operator receivables, never credit spending.
+    c.execute('INSERT OR IGNORE INTO resource_plan_charges(user_id,period_start,amount_micro) VALUES(?,?,?)',(p['user_id'],p['start'],price))
+    limits['_funded']=True;limits['_funded_at']=int(time.time());p['limits']=json.dumps(limits)
+    c.execute('UPDATE resource_periods SET limits=? WHERE user_id=? AND start=?',(p['limits'],p['user_id'],p['start']))
 
 
 def subscribe(uid,code,expected_price,*,next_plan=None,next_price=None):
@@ -502,3 +566,31 @@ def reconcile_cancelled_reservations(queue_job_id=None):
         except Exception as exc:
             import logging
             logging.getLogger(__name__).warning('Pre-execution cancellation accounting deferred: %s',type(exc).__name__)
+
+
+def reserve_budget(c,uid,jid):
+    """Freeze a shared ceiling for every ledger step of the same queued job."""
+    from .ai_billing import prices
+    job=c.execute('SELECT started_at,queue_job_id FROM ai_compute_jobs WHERE id=?',(jid,)).fetchone()
+    pool_id=str(uid)+':'+('queue:'+job['queue_job_id'] if job['queue_job_id'] else 'job:'+jid)
+    pool=c.execute('SELECT * FROM resource_spending_pools WHERE id=?',(pool_id,)).fetchone()
+    if pool is None:
+        reserved=c.execute("SELECT coalesce(sum(p.ceiling_micro-p.spent_micro),0) FROM resource_spending_pools p WHERE p.user_id=? AND EXISTS(SELECT 1 FROM resource_job_budgets b JOIN resource_job_contracts r ON r.job_id=b.job_id JOIN ai_compute_jobs j ON j.id=r.job_id WHERE b.pool_id=p.id AND r.settled=0 AND j.accounting_excluded=0)",(uid,)).fetchone()[0]
+        ceiling=max(0,_balance(c,uid)-reserved)
+        c.execute('INSERT INTO resource_spending_pools(id,user_id,ceiling_micro) VALUES(?,?,?)',(pool_id,uid,ceiling))
+    else:ceiling=max(0,pool['ceiling_micro']-pool['spent_micro'])
+    c.execute('INSERT INTO resource_job_budgets(job_id,budget_micro,rates_json,pool_id) VALUES(?,?,?,?)',(jid,ceiling,json.dumps(prices(at=job['started_at'],_connection=c)),pool_id))
+
+
+def prepare_upgrade(c):
+    """Migrate deployed quota schemas before, never inside, ledger transactions."""
+    if not c.execute("SELECT 1 FROM sqlite_master WHERE name='resource_memberships'").fetchone():return
+    if not c.execute("SELECT 1 FROM sqlite_master WHERE name='resource_job_budgets'").fetchone() or not {'credit_value_micro','credits_enabled'}.issubset({r[1] for r in c.execute('PRAGMA table_info(resource_config)')}):
+        init(c)
+
+
+def continuing_pool(c,uid,jid):
+    job=c.execute('SELECT queue_job_id FROM ai_compute_jobs WHERE id=?',(jid,)).fetchone()
+    if not job:return False
+    pool_id=str(uid)+':'+('queue:'+job['queue_job_id'] if job['queue_job_id'] else 'job:'+jid)
+    return bool(c.execute('SELECT 1 FROM resource_spending_pools WHERE id=? AND user_id=? AND ceiling_micro>0',(pool_id,uid)).fetchone())

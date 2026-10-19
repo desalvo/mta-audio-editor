@@ -29,7 +29,7 @@ def smoke(root: Path) -> None:
                        env=env, check=True)
         subprocess.run([str(python), '-m', 'pip', 'check'], env=env, check=True)
         subprocess.run([str(python), '-c',
-                        'import app.main; import app.ai_cgroup_launcher; print("OFFLINE_PAYLOAD_OK")'],
+                        'import app.main; import app.ai_cgroup_launcher; import pedalboard,av,mido; assert all(hasattr(pedalboard.VST3Plugin,n) for n in ("_mta_set_transport","_mta_set_musical_position","_mta_process_sidechain")); from app.cpp_audio import runtime; runtime(); print("OFFLINE_PAYLOAD_OK: C++ DSP ABI 1 and VST3/MIDI runtime")'],
                        cwd=app, env=env, check=True)
 
 

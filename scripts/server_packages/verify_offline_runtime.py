@@ -24,6 +24,10 @@ def sha256(path: Path) -> str:
 def metadata(stage: Path) -> dict:
     return {
         'schema': SCHEMA,
+        'audio_core_sha256': sha256(stage / 'application/bin/libmta_audio_core.so') if (stage / 'application/bin/libmta_audio_core.so').is_file() else None,
+        'server_display_sha256':sha256(stage/'application/bin/Xvfb') if (stage/'application/bin/Xvfb').is_file() else None,
+        'server_display_manifest_sha256':sha256(stage/'application/bin/display-build.json') if (stage/'application/bin/display-build.json').is_file() else None,
+        'vst3_requirements_sha256': sha256(stage / 'application/requirements-vst3.txt') if (stage / 'application/requirements-vst3.txt').is_file() else None,
         'wheelhouse_lock_sha256': sha256(stage / 'wheelhouse.lock.json'),
         'requirements_sha256': sha256(stage / 'application/requirements.txt'),
         'python': '.'.join(map(str, sys.version_info[:3])),

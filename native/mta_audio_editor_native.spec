@@ -31,6 +31,10 @@ for adapter_file in ('ace_step_http_worker.py','ace_gpu_process_meter.py','ai_gp
                      'ai_proxmox_gpu_agent_client.py','ace_gpu_profiler.py','ai_gpu_verified.py','ace_task_progress.py','ai_execution_limits.py'):
     datas.append((str(project / 'app' / adapter_file), 'app'))
 
+if sys.platform == 'darwin':
+    for language in ('it','en'):
+        datas.append((str(project/'native/macos-localizations'/f'{language}.lproj/InfoPlist.strings'),f'{language}.lproj'))
+
 # uv supplies a managed Python/runtime for ACE, including on a frozen desktop.
 import uv
 binaries = [(str(uv.find_uv_bin()), 'tools')]
@@ -47,7 +51,7 @@ for env_name, dest_name in (("MTA_NATIVE_FFMPEG", "ffmpeg"), ("MTA_NATIVE_FFPROB
         binaries.append((value, "bin"))
 
 
-# Optional portable C++ DSP metering component; Python remains the fallback.
+# Portable C++ render DSP; selected explicitly in Settings. Current engine is default.
 audio_core_path = os.environ.get("MTA_NATIVE_AUDIO_CORE", "")
 if audio_core_path and Path(audio_core_path).is_file():
     binaries.append((audio_core_path, "bin"))
@@ -71,7 +75,7 @@ if chordino_vamp and Path(chordino_vamp).is_dir():
                 datas.append((str(child), "vamp"))
 
 hiddenimports = []
-for package in ("webview", "demucs", "torch", "torchaudio", "torchvision", "audio_separator", "onnxruntime", "librosa", "soundfile", "whisper", "madmom_infer", "truststore", "certifi", "six"):
+for package in ("pylibremidi", "rtmidi", "mido", "pedalboard", "av", "webview", "demucs", "torch", "torchaudio", "torchvision", "audio_separator", "onnxruntime", "librosa", "soundfile", "whisper", "madmom_infer", "truststore", "certifi", "six"):
     package_datas, package_binaries, package_hidden = collect_all(package)
     datas += package_datas
     binaries += package_binaries
@@ -152,6 +156,8 @@ if sys.platform == "darwin":
             "MTAEditorCreator": "Alessandro De Salvo",
             "MTAEditorRepository": "https://github.com/desalvo/mta-audio-editor",
             "NSHighResolutionCapable": True,
+            "CFBundleLocalizations": ["en", "it"],
+            "NSMicrophoneUsageDescription": "MTA Audio Editor records the selected microphone or audio input into the current project only when recording is requested.",
             "CFBundleDocumentTypes": [
                 {
                     "CFBundleTypeName": "Portable MTA Audio Editor Project",

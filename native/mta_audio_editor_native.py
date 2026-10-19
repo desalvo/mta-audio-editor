@@ -51,16 +51,8 @@ def _bundle_root() -> Path:
 
 
 def _data_root() -> Path:
-    override = os.getenv("MTA_NATIVE_DATA_DIR", "").strip()
-    if override:
-        return Path(override).expanduser().resolve()
-    if sys.platform == "darwin":
-        base = Path.home() / "Library" / "Application Support"
-    elif os.name == "nt":
-        base = Path(os.getenv("LOCALAPPDATA") or (Path.home() / "AppData" / "Local"))
-    else:
-        base = Path(os.getenv("XDG_DATA_HOME") or (Path.home() / ".local" / "share"))
-    return base / APP_NAME
+    from app.runtime_paths import native_data_root
+    return native_data_root()
 
 
 def _prepare_environment() -> Path:
@@ -629,6 +621,116 @@ class NativeApi:
             save_zoom(_data_root(), value)
         return {'ok': True, 'zoom_percent': value}
 
+    def transport_prepare_play(self, project_id: str, cursor_ms=0, midi_options=None) -> dict:
+        from app.native_transport import prepare_play
+        return prepare_play(project_id,cursor_ms,midi_options=midi_options)
+
+    def midi_ports(self):
+        from app.native_midi import list_ports
+        return list_ports()
+
+    def midi_monitor_start(self,pid,tid,options=None):
+        from app.native_midi import start
+        return start(pid,tid,options)
+
+    def midi_monitor_control(self,action,value=None):
+        from app.native_midi import control
+        return control(action,value)
+
+    def midi_monitor_stop(self):
+        from app.native_midi import stop
+        return stop()
+
+    def midi2_ports(self):
+        from app.midi_ump import ports
+        return ports()
+
+    def midi2_input_start(self,identity):
+        from app.midi_ump import input_start
+        return input_start(identity)
+
+    def midi2_input_read(self):
+        from app.midi_ump import input_read
+        return input_read()
+
+    def midi2_output_send(self,identity,words):
+        from app.midi_ump import output_send
+        return output_send(identity,words)
+
+    def midi2_close(self):
+        from app.midi_ump import close
+        return close()
+
+    def audio_capture_ports(self):
+        from app.native_capture import ports
+        return ports()
+
+    def audio_capture_start(self,name,rate):
+        from app.native_capture import start
+        return start(name,rate)
+
+    def audio_capture_read(self):
+        from app.native_capture import read
+        return read()
+
+    def audio_capture_stop(self):
+        from app.native_capture import stop
+        return stop()
+
+    def midi_capture_start(self,name,sysex=False):
+        from app.native_midi import capture_start
+        return capture_start(name,sysex=sysex)
+
+    def midi_capture_poll(self):
+        from app.native_midi import capture_poll
+        return capture_poll()
+
+    def midi_capture_stop(self):
+        from app.native_midi import capture_stop
+        return capture_stop()
+
+    def midi_send(self,name,data,delay_ms=0):
+        from app.native_midi import send
+        return send(name,data,delay_ms)
+
+    def midi_panic(self,name=None):
+        from app.native_midi import panic
+        return panic(name)
+
+    def transport_control(self, action: str, value=0) -> dict:
+        from app.native_transport import control
+        return control(action,value)
+
+    def transport_update_live(self, project_id: str) -> dict:
+        from app.native_transport import live_update
+        return live_update(project_id)
+
+    def open_vst3_editor(self, params: dict, project_id=None, route=None, insert_id=None) -> dict:
+        if project_id and route and insert_id:
+            from app.native_transport import live_editor
+            result=live_editor(project_id,route,insert_id)
+            if result is not None:return result
+        from app.vst3_editor import start
+        return start(params)
+
+    def poll_vst3_editor(self, editor_id: str) -> dict:
+        if editor_id.startswith('live:'):
+            from app.native_transport import live_editor_poll
+            return live_editor_poll(editor_id[5:])
+        from app.vst3_editor import poll
+        return poll(editor_id)
+
+    def get_audio_engine(self) -> dict:
+        from app.audio_backend import status
+        return status(_data_root())
+
+    def set_audio_engine(self, engine: str) -> dict:
+        from app.audio_backend import select
+        if engine=='current':
+            from app.native_transport import stop
+            stop()
+        return {"ok": True, **select(engine, _data_root())}
+
     def get_native_settings(self) -> dict:
         root = _data_root()
         path = root / "native-settings.json"
@@ -666,6 +768,7 @@ class NativeApi:
             except (OSError, ValueError, TypeError, json.JSONDecodeError):
                 recent_projects = []
         return {
+            "audio_engine": self.get_audio_engine(),
             "max_upload_mb": min(10240, max(1, value)),
             "autosave_enabled": autosave_enabled,
             "update_channel": update_channel,
@@ -908,6 +1011,13 @@ def _startup_project_path(argv: list[str] | None = None) -> Path | None:
 
 
 def main() -> int:
+    if "--vst3-worker" in sys.argv:
+        marker=sys.argv.index('--vst3-worker')
+        sys.argv=['mta-vst3-worker',*sys.argv[marker+1:]]
+        from app.vst3_host import main as vst_worker
+        try:return vst_worker()
+        except Exception:
+            return 1
     if "--demucs-worker" in sys.argv:
         return _run_demucs_worker()
 
@@ -946,6 +1056,12 @@ def main() -> int:
         webview.start(debug=False)
         return 0
     finally:
+        from app.native_midi import shutdown as shutdown_midi
+        shutdown_midi()
+        from app.native_transport import stop as stop_native_audio
+        stop_native_audio()
+        from app.vst3_editor import close as close_plugin_windows
+        close_plugin_windows()
         server.should_exit = True
         thread.join(timeout=5)
 
@@ -955,7 +1071,8 @@ def _hide_background_worker_dock_icon() -> None:
     if sys.platform != "darwin":
         return
     args = " ".join(sys.argv[1:])
-    if not ("--multiprocessing-fork" in args or "--demucs-worker" in args or "resource_tracker" in args):
+    if "--editor-plugin" in args or "--live-config" in args:return
+    if not ("--multiprocessing-fork" in args or "--demucs-worker" in args or "--vst3-worker" in args or "resource_tracker" in args):
         return
     try:
         from AppKit import NSApplication, NSApplicationActivationPolicyProhibited

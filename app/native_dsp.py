@@ -16,7 +16,8 @@ def _candidate_paths() -> list[Path]:
     root = Path(__file__).resolve().parents[1]
     import sys
     frozen = Path(getattr(sys, '_MEIPASS', root))
-    return ([Path(configured)] if configured else []) + [frozen / 'bin' / f'libmta_audio_core{suffix}', root / 'native' / 'audio_core' / f'libmta_audio_core{suffix}']
+    names=[f'libmta_audio_core{suffix}',f'mta_audio_core{suffix}']
+    return ([Path(configured)] if configured else []) + [folder/name for folder in (frozen/'bin',root/'native'/'audio_core') for name in names]
 
 
 def _load():

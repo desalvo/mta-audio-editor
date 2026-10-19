@@ -32,15 +32,32 @@ def prepare(source: Path, stage: Path, requirements: Path):
     # Only the application and locked runtime requirements belong to the server.
     shutil.copytree(source / 'app', app / 'app', ignore=shutil.ignore_patterns('__pycache__', '*.pyc', '.git'), symlinks=False)
     shutil.copy2(requirements, app / 'requirements.txt')
+    shutil.copy2(source / 'requirements-vst3.txt', app / 'requirements-vst3.txt')
     # The native RPM/DEB payload must carry the exact application identity.
     for filename in ('VERSION', 'REVISION', 'BUILD_INFO', 'RELEASE_CHANNEL'):
         metadata = source / filename
         if not metadata.is_file():
             raise ValueError(f'Missing release metadata: {filename}')
         shutil.copy2(metadata, app / filename)
+    import importlib.util
+    spec = importlib.util.spec_from_file_location('mta_build_audio_core', source / 'scripts/build_audio_core.py')
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    build = module.build
+    import tempfile
+    with tempfile.TemporaryDirectory(prefix='mta-server-dsp-') as work:
+        binary = build(source, Path(work))
+        (app / 'bin').mkdir()
+        shutil.copy2(binary, app / 'bin' / binary.name)
+    # A private, target-built display also supports EL10 without Xorg/Xvfb RPMs.
+    run([sys.executable,str(source/'scripts/build_server_display.py'),'--output',str(app/'bin')])
+    # Compile the pinned host ABI before resolving the offline dependency set.
+    with tempfile.TemporaryDirectory(prefix='mta-vst3-host-') as work:
+        run([sys.executable,str(source/'scripts/build_vst3_runtime.py'),'--wheel-dir',str(Path(work)/'wheels')])
+        for wheel in (Path(work)/'wheels').glob('*.whl'):shutil.copy2(wheel,wheels/wheel.name)
     # Download the full transitive closure. No sdists, no editable/VCS builds.
     run([sys.executable, '-m', 'pip', 'download', '--only-binary=:all:', '--no-cache-dir',
-         '--dest', str(wheels), '-r', str(app / 'requirements.txt')])
+         '--dest', str(wheels), '--find-links',str(wheels), '-r', str(app / 'requirements.txt')])
     scripts = Path(__file__).resolve().parent
     run([sys.executable, str(scripts / 'wheelhouse_lock.py'), 'create', str(stage)])
     run([sys.executable, str(scripts / 'verify_offline_runtime.py'), str(stage), '--write-proof'])

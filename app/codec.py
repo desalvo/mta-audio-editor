@@ -1,5 +1,6 @@
 """MTA container adapter with non-destructive DAW rendering and export-slot merging."""
 from __future__ import annotations
+from .vst3_transport import project_scope
 
 import json
 import logging
@@ -350,6 +351,7 @@ def validate_slot_mapping(project: Project, slots: list[MtaSlotMapping] | None, 
     return sorted(slots, key=lambda x: x.slot)
 
 
+@project_scope
 def export_mta(project: Project, out: Path, slots: list[MtaSlotMapping] | None = None, profile: str | None = None) -> Path:
     effective_profile = resolve_mta_device_profile(project, profile)
     slots = validate_slot_mapping(project, slots, effective_profile)

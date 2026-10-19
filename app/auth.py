@@ -41,7 +41,8 @@ DATA_ROOT: Path | None = None
 def data_root() -> Path:
     if DATA_ROOT is not None:
         return Path(DATA_ROOT).resolve()
-    return Path(os.getenv("MTA_DATA_DIR", "/data/projects")).resolve()
+    from .runtime_paths import application_data_root
+    return application_data_root()
 
 
 def db_path() -> Path:

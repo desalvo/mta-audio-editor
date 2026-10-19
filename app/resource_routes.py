@@ -62,6 +62,9 @@ def assign(request:Request,uid:int,body:dict):
 @router.post('/api/admin/subscriptions/users/{uid}/credits')
 def credit(request:Request,uid:int,body:dict):
     actor=auth.require_admin(request)
+    if set(body)=={'credits','credit_value_micro','reason','request_id'}:
+        from .resource_access import grant_credits
+        return call(lambda:grant_credits(uid,body['credits'],body['credit_value_micro'],body['reason'],actor['id'],body['request_id']))
     if set(body)!={'amount_micro','reason','request_id'}:raise HTTPException(422,'Invalid credit request')
     return call(lambda:resources.grant(uid,body['amount_micro'],body['reason'],actor['id'],body['request_id']))
 
@@ -116,3 +119,73 @@ def renewal(request:Request,body:dict):
     uid=auth.require_user(request)['id']
     if set(body)!={'plan','expected_price_micro'}:raise HTTPException(422,'Invalid renewal request')
     return call(lambda:entitlements.next_plan(uid,body['plan'],body['expected_price_micro']))
+
+
+@router.get('/api/account/access')
+def access(request:Request):
+    from .resource_access import status
+    return call(lambda:status(auth.require_user(request)['id']))
+
+
+@router.get('/api/admin/subscription-users')
+def search_users(request:Request,q:str='',limit:int=20):
+    auth.require_admin(request)
+    if len(q)>160 or not 1<=limit<=100:raise HTTPException(422,'Invalid search')
+    # instr uses literal substring matching; %, _ and SQL syntax are not wildcards.
+    with auth.db() as c:
+        rows=c.execute("SELECT id,username,email,display_name,role FROM users WHERE instr(lower(username||' '||email||' '||coalesce(display_name,'')),lower(?))>0 ORDER BY username COLLATE NOCASE,id LIMIT ?",(q,limit)).fetchall()
+    return [dict(row) for row in rows]
+
+
+@router.put('/api/admin/subscriptions/tariffs')
+def tariffs(request:Request,body:dict):
+    auth.require_admin(request)
+    from .resource_access import DEFAULT_TARIFFS
+    from .ai_billing import set_price
+    if set(body)!=set(DEFAULT_TARIFFS):raise HTTPException(422,'CPU, GPU and storage tariffs required')
+    # Validate all fields before changing any tariff; historical API owns overlap checks.
+    values=call(lambda:{key:resources.number(value,integer=True) for key,value in body.items()})
+    def save():
+        with auth.db() as c:
+            resources.init(c);c.execute('BEGIN IMMEDIATE')
+            for key,value in values.items():set_price(key,value,_connection=c)
+    call(save)
+    return resources.config()
+
+
+@router.get('/api/account/credits')
+def credit_catalog(request:Request):
+    from .credit_purchases import catalog
+    return call(lambda:catalog(auth.require_user(request)['id']))
+
+
+@router.post('/api/account/credits/checkout')
+def credit_checkout(request:Request,body:dict):
+    from .credit_purchases import checkout
+    if set(body)!={'amount_cents','request_id'}:raise HTTPException(422,'Invalid purchase')
+    return call(lambda:checkout(auth.require_user(request)['id'],body['amount_cents'],body['request_id']))
+
+
+@router.get('/api/admin/credit-payments')
+def payment_config(request:Request):
+    auth.require_admin(request)
+    from .credit_purchases import settings
+    return settings()
+
+
+@router.put('/api/admin/credit-payments')
+def payment_save(request:Request,body:dict):
+    auth.require_admin(request)
+    from .credit_purchases import settings
+    return call(lambda:settings(body))
+
+
+@router.post('/api/billing/credits/stripe-webhook')
+async def stripe_webhook(request:Request):
+    from .credit_purchases import event
+    raw=bytearray()
+    async for chunk in request.stream():
+        raw.extend(chunk)
+        if len(raw)>1024*1024:raise HTTPException(413,'Payment event too large')
+    try:return event(bytes(raw),request.headers.get('stripe-signature',''))
+    except (ValueError,TypeError,KeyError):raise HTTPException(400,'Invalid payment event') from None

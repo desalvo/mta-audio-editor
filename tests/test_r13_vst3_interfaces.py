@@ -22,4 +22,5 @@ def test_r13_cover_title_and_revision():
         with fitz.open(p) as doc:
             assert len(doc)>1
             text=doc[0].get_text()
-            assert 'VST3' in text and '0.3.0-r13' in text
+            release=Path('VERSION').read_text().strip()+'-r'+Path('REVISION').read_text().strip()
+            assert 'VST3' in text and release in text

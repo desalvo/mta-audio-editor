@@ -3,3 +3,7 @@ pywebview==6.2.1
 truststore==0.10.4
 certifi==2026.7.22
 uv==0.12.23
+python-rtmidi>=1.5.8,<2
+
+# Native MIDI 2 Universal MIDI Packets; no MIDI 1 down-conversion.
+pylibremidi==5.4.3

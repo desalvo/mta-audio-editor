@@ -17,7 +17,9 @@ from .models import Project
 
 from . import platform_file_lock as fcntl
 
-ROOT = Path(os.environ.get("MTA_DATA_DIR", "/data/projects")).resolve()
+from .runtime_paths import application_data_root
+
+ROOT = application_data_root()
 ROOT.mkdir(parents=True, exist_ok=True)
 PID_RE = re.compile(r"^[a-f0-9]{12}$")
 SAFE_NAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._ -]{0,127}$")

@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.22)
+project(MtaVst3Probe VERSION 1.0.0 LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 17)
+add_subdirectory("${MTA_TEST_JUCE}" juce EXCLUDE_FROM_ALL)
+juce_add_plugin(MtaProbe COMPANY_NAME MTA PLUGIN_MANUFACTURER_CODE Mtaa PLUGIN_CODE Mtfx FORMATS VST3 PRODUCT_NAME "MTA Sidechain Probe")
+target_sources(MtaProbe PRIVATE Probe.cpp)
+target_compile_definitions(MtaProbe PRIVATE JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0 JUCE_VST3_CAN_REPLACE_VST2=0)
+target_link_libraries(MtaProbe PRIVATE juce::juce_audio_utils)

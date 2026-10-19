@@ -534,6 +534,10 @@ def start(pid, operation, fn, *, job_id=None, cancellable=False, payload=None, i
                 raise ValueError('Conflicting replay of AI job identifier')
             con.execute('COMMIT')
             return False, get(existing['job_id'])
+        from .ai_job_context import actor
+        owner=payload.get('actor_user_id',actor.get()) if isinstance(payload,dict) else actor.get()
+        from .resource_access import preflight
+        preflight(owner)
         rank = con.execute('SELECT COALESCE(MAX(rank),0)+1 FROM jobs').fetchone()[0]
         con.execute("INSERT INTO jobs(job_id,project_id,operation,state,rank,created_at,phase,message,runner_pid,runner_identity,payload_json,idempotency_key) VALUES(?,?,?,'queued',?,?,'queued','Waiting for inference slot',?,?,?,?)", (job_id, str(pid), operation, rank, time.time(), os.getpid(), _process_identity(os.getpid()), encoded, idempotency_key))
         from .ai_job_context import actor

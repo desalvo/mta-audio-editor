@@ -403,7 +403,7 @@ def chain_filter(inserts: list[InsertPlugin]) -> str:
 
 def insert_expands_to_stereo(plugin: InsertPlugin) -> bool:
     """Return True when an enabled insert turns mono input into stereo output."""
-    return bool(plugin.enabled and plugin.plugin == "stereo_imager")
+    return bool(plugin.enabled and plugin.plugin in ("stereo_imager","vst3"))
 
 
 def effective_output_channels(source_channels: int, inserts: list[InsertPlugin]) -> int:

@@ -1,0 +1,40 @@
+{
+  "version": "0.3.0-r210",
+  "baseline": "MTA-0.3.0-r210-credit-access-cpp-timeline-cumulative.zip",
+  "baseline_sha256": "7f5630f31cc60f23832d0305469bea6dac3c38ea0e7f6562174b9be46c0c54b1",
+  "full": {
+    "passed": 4056,
+    "skipped": 5,
+    "seconds": 274.82
+  },
+  "targeted": {
+    "passed": 149,
+    "skipped": 0,
+    "seconds": 60.009
+  },
+  "deselected": 10,
+  "coverage_percent": 77.36,
+  "static": "Ruff, Node syntax and workflow YAML passed",
+  "credits": "Active subscription/promo overages only; global opt-in defaults off; no billing/credits for users disallowed subscriptions",
+  "checkout": "Stripe EUR denominations 5/10/20/50 configurable; signed paid webhook fulfillment; idempotent refunds; mocked tests only",
+  "legal_required": [
+    "operator_name",
+    "operator_country",
+    "support_email",
+    "public_url",
+    "effective_date"
+  ],
+  "device": "Compiled C++ miniaudio default-output transport; effects prepared before playback",
+  "vst3": "Frozen worker dispatch, original GUI and state persistence, mixed insert order and master support",
+  "native_host_ready": false,
+  "remaining": [
+    "Real-time C++ VST3 callback hosting and live/MIDI monitoring unfinished",
+    "No physical Windows/macOS device or commercial VST3 acceptance in this environment",
+    "10 AF_UNIX host agent cases excluded because socket creation returns PermissionError(1)",
+    "4 optional Steinberg SDK and 1 real Win32 API cases skipped",
+    "No real Stripe payment; recurring base subscription collection and automatic dispute handling not implemented",
+    "Production Rocky/ROCm acceptance remains user-run"
+  ],
+  "last_confirmed_committed_package": "MTA-0.3.0-r210-storage-quota-trial-billing-cumulative.zip",
+  "commit_push_tag_release_performed": false
+}

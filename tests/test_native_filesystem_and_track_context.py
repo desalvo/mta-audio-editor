@@ -144,6 +144,18 @@ def test_contextual_track_stem_job_adds_stems_without_duplicate_source(tmp_path,
     import app.storage as storage
     from app.models import Clip, Track
 
+    def await_queue_receipt(job_id):
+        # The stem UI publishes completion before the outer queue commits its
+        # terminal receipt. Keep storage/splitter fixtures alive until both end.
+        deadline = time.monotonic() + 10
+        while time.monotonic() < deadline:
+            row = main.ai_arranger_runtime.get(job_id)
+            if row and row['state'] in {'completed', 'failed', 'cancelled', 'interrupted'}:
+                assert row['state'] == 'completed', row
+                return
+            time.sleep(0.02)
+        pytest.fail('Stem worker did not commit its terminal queue receipt')
+
     monkeypatch.setattr(storage, "ROOT", tmp_path.resolve())
     monkeypatch.setenv("MTA_ALLOW_INSECURE_NO_AUTH", "true")
 
@@ -200,6 +212,8 @@ def test_contextual_track_stem_job_adds_stems_without_duplicate_source(tmp_path,
         time.sleep(0.03)
     assert status["status"] == "completed"
 
+    await_queue_receipt(job_id)
+
     final = storage.load_project(project.id)
     assert [track.name for track in final.tracks] == ["Guitar", "Vocals"]
     assert final.tracks[0].filename == "track.wav"
@@ -214,4 +228,5 @@ def test_contextual_track_stem_job_adds_stems_without_duplicate_source(tmp_path,
             break
         time.sleep(0.03)
     assert status["status"] == "completed"
+    await_queue_receipt(again.json()['id'])
     assert [track.name for track in storage.load_project(project.id).tracks] == ["Guitar", "Vocals", "Vocals 2"]

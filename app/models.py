@@ -57,6 +57,9 @@ class InsertPlugin(BaseModel):
     preset: str = Field(default="default", max_length=80)
     enabled: bool = True
     params: dict[str, float | int | str | bool] = Field(default_factory=dict)
+    sidechain_track_id: str | None = Field(default=None,pattern=r"^[A-Za-z0-9_-]{1,64}$")
+    sidechain_bus: int = Field(default=1,ge=1,le=16)
+    sidechain_gain_db: float = Field(default=0,ge=-120,le=24,allow_inf_nan=False)
 
 
 class CustomPresetRequest(BaseModel):
@@ -82,12 +85,67 @@ class AutoMixSnapshot(BaseModel):
     master_inserts: list[InsertPlugin] = Field(default_factory=list)
 
 
+class MidiNote(BaseModel):
+    id: str = Field(default_factory=lambda: uuid.uuid4().hex[:12], pattern=r"^[A-Za-z0-9_-]{1,64}$")
+    start_ms: float = Field(default=0, ge=0, le=86400000, allow_inf_nan=False)
+    duration_ms: float = Field(default=500, gt=0, le=86400000, allow_inf_nan=False)
+    pitch: int = Field(default=60, ge=0, le=127)
+    velocity: int = Field(default=100, ge=1, le=127)
+    channel: int = Field(default=0, ge=0, le=15)
+
+
+class MidiControl(BaseModel):
+    time_ms: float = Field(default=0, ge=0, le=86400000, allow_inf_nan=False)
+    # Channel voice messages only; no SysEx, system messages or executable data.
+    data: list[int] = Field(min_length=2, max_length=3)
+
+    @field_validator('data')
+    @classmethod
+    def channel_message(cls, value):
+        status=value[0] & 0xF0
+        if status not in (0xA0,0xB0,0xC0,0xD0,0xE0) or len(value)!=(2 if status in (0xC0,0xD0) else 3) or any(not 0<=x<=127 for x in value[1:]) or not 0x80<=value[0]<=0xEF:
+            raise ValueError('Invalid MIDI channel control')
+        return value
+
+
+class MidiUmp(BaseModel):
+    time_ms: float = Field(default=0,ge=0,le=86400000,allow_inf_nan=False)
+    words: list[int] = Field(min_length=1,max_length=4)
+
+    @field_validator('words')
+    @classmethod
+    def ump_packet(cls,value):
+        from .midi_ump import packet
+        return packet(value)
+
+
+class MidiSysEx(BaseModel):
+    time_ms: float = Field(default=0,ge=0,le=86400000,allow_inf_nan=False)
+    data: list[int] = Field(min_length=2,max_length=65536)
+
+    @field_validator('data')
+    @classmethod
+    def packet(cls,value):
+        if value[0]!=0xF0 or value[-1]!=0xF7 or any(not 0<=n<=127 for n in value[1:-1]):raise ValueError('Invalid complete MIDI SysEx packet')
+        return value
+
+
 class Track(BaseModel):
     id: str = Field(pattern=r"^[A-Za-z0-9_-]{1,64}$")
     name: str = Field(max_length=200)
     type: TrackType = "other"
     mta_slot: int | None = Field(default=None, ge=1, le=16)
     filename: str = Field(min_length=1, max_length=128)
+    kind: Literal['audio', 'midi'] = 'audio'
+    midi_notes: list[MidiNote] = Field(default_factory=list, max_length=50000)
+    midi_ump: list[MidiUmp] = Field(default_factory=list,max_length=100000)
+    mpe_zone: Literal['off','lower','upper'] = 'off'
+    mpe_members: int = Field(default=15,ge=1,le=15)
+    mpe_pitch_bend: int = Field(default=48,ge=1,le=96)
+    midi_sysex: list[MidiSysEx] = Field(default_factory=list,max_length=1024)
+    midi_controls: list[MidiControl] = Field(default_factory=list, max_length=100000)
+    instrument: InsertPlugin | None = None
+    midi_route: Literal['instrument','hardware','both'] = 'instrument'
     clips_initialized: bool = False
     derived_source_track_id: str = Field(default="", max_length=64)
     derived_stem_key: str = Field(default="", max_length=200)
@@ -110,6 +168,12 @@ class Track(BaseModel):
     delay_unit: Literal["ms", "beats", "bars", "bars_beats"] | None = None
     delay_ms: int = Field(default=0, ge=-86_400_000, le=86_400_000)
     height_px: int = Field(default=78, ge=78, le=420)
+
+    @field_validator('instrument')
+    @classmethod
+    def midi_instrument(cls,value):
+        if value is not None and value.plugin!='vst3':raise ValueError('MIDI instruments must use VST3')
+        return value
 
 
 class Marker(BaseModel):
@@ -356,6 +420,10 @@ class Project(BaseModel):
     base_bpm: float | None = Field(default=None, gt=0, le=500)
     original_bpm: float | None = Field(default=None, gt=0, le=500)
     metronome_mode: Literal["fixed", "zones", "adaptive"] = "fixed"
+    vst_host_sync: bool = True
+    vst_loop_enabled: bool = False
+    vst_loop_start_ms: int = Field(default=0,ge=0,le=86400000)
+    vst_loop_end_ms: int = Field(default=0,ge=0,le=86400000)
     metronome_bpm: float | None = Field(default=None, ge=20, le=400)
     metronome_time_signature: Literal["2/4", "3/4", "4/4", "5/4", "6/8", "7/8", "9/8", "12/8"] | None = None
     metronome_zone_signatures: dict[str, Literal["2/4", "3/4", "4/4", "5/4", "6/8", "7/8", "9/8", "12/8"]] = Field(default_factory=dict)

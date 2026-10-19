@@ -1,0 +1,79 @@
+{
+  "version": "0.3.0-r210",
+  "baseline": "MTA-0.3.0-r210-live-vst3-server-dsp-cumulative.zip",
+  "baseline_sha256": "f948ea50cadcc121b8f8e5639ba39ccc7597e00f84aad5986b7f90d60451ff95",
+  "full": {
+    "passed": 4084,
+    "skipped": 6,
+    "seconds": 381.126
+  },
+  "targeted": {
+    "passed": 25,
+    "skipped": 0,
+    "seconds": 88.627
+  },
+  "coverage_percent": 76.96,
+  "deselected": 10,
+  "real_browser": {
+    "passed": true,
+    "seconds": 21.796,
+    "browser": "Chromium 134 / Playwright 1.51.0",
+    "layers": "Actual HTTP server, authenticated session, shipped page/JS, WebAudio and real CHOWTapeModel worker; no HTTP/audio mocks",
+    "checks": [
+      "playback clock",
+      "pause/resume/seek",
+      "web parameter editor",
+      "live parameter update and saved project",
+      "master gain",
+      "stop"
+    ]
+  },
+  "plugin": {
+    "name": "CHOWTapeModel",
+    "module_sha256": "7f875a6922ca9e49c7a742a27f26152c685bed2991460781640cc23cfb16d319",
+    "binary_bundled": false
+  },
+  "server": [
+    "authenticated catalog/inspection",
+    "offline preview/bounce/export",
+    "asynchronous HTTP 202 preparation/status/cancellation",
+    "persistent per-user headless live graph",
+    "bounded sequenced stereo PCM",
+    "web parameter controls",
+    "owner/project/CSRF checks",
+    "capacity and idle cleanup",
+    "process-group termination",
+    "concurrent-user fault isolation"
+  ],
+  "delivery": {
+    "default_runtime": [
+      "Pedalboard",
+      "PyAV"
+    ],
+    "dsp": "Target-OS compiled ABI 1",
+    "rpm_deb": "Nested VST3 requirements included in staged offline closure and bound into proof",
+    "docker": "Dependencies included with base requirements; plugin root created",
+    "local_deb": "Ubuntu 24.04 amd64 release-gated DEB built/extracted; offline install, pip check, app import, DSP load and VST3/PyAV imports passed. No OS package installed."
+  },
+  "manuals": "IT/EN PDFs rebuilt; all eight pages visually checked; server setup guide under docs; PDF link in admin Web App settings",
+  "scope": "Mono/stereo audio effects; 64 tracks; no VSTi/MIDI, external sidechains or native plugin GUI streamed to a browser",
+  "limits": {
+    "sessions": 8,
+    "per_user": 2,
+    "idle_seconds": 60,
+    "startup_seconds": 120,
+    "pcm_frames": 32768,
+    "tail_seconds": 2,
+    "lookahead_samples": 960000,
+    "dry_limit_bytes": 4294967296
+  },
+  "remaining": [
+    "Real EL10/RPM and Docker build/deployment acceptance",
+    "Production proxy/network and user plugin compatibility",
+    "Physical audio listening on the target devices",
+    "10 AF_UNIX host-agent cases excluded because Unix socket creation is denied; optional native SDK/Win32/display cases skipped"
+  ],
+  "last_confirmed_committed_package": "MTA-0.3.0-r210-storage-quota-trial-billing-cumulative.zip",
+  "commit_push_tag_release_performed": false,
+  "python": "3.12.14"
+}

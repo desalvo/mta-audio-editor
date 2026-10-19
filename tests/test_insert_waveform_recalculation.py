@@ -38,5 +38,5 @@ def test_backend_waveform_worker_renders_enabled_inserts():
     root = Path(__file__).resolve().parents[1]
     main = (root / "app/main.py").read_text(encoding="utf-8")
     assert "enabled_inserts = any(item.enabled for item in track.inserts)" in main
-    assert "render_track(track, source, rendered, apply_inserts=True)" in main
+    assert "render_track(track, source, rendered, apply_inserts=True,host_project=project)" in main
     assert "_track_waveform_revision(latest_track, source)" in main

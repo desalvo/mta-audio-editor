@@ -6,6 +6,7 @@ import shutil
 import tempfile
 import uuid
 from . import storage
+from .vst3_transport import settings as vst_host_settings
 from .audio_engine import render_mix, render_track_export,media_duration_ms,waveform_peaks
 from .ai_project_lock import project_publication_lock
 from .models import Track,Clip,ProjectClip
@@ -13,11 +14,13 @@ from .timeline_editing import unique_track_name
 
 
 def _signature(project,track_id):
-    keys={'id','filename','channels','sample_rate','gain_db','volume_db','pan','mute','solo','delay_ms','clips','inserts','master_bypass'}
-    tracks=[t.model_dump(mode='json',include=keys) for t in project.tracks if track_id is None or t.id==track_id]
+    keys={'id','filename','channels','sample_rate','gain_db','volume_db','pan','mute','solo','delay_ms','clips','inserts','master_bypass','kind','instrument','midi_notes','midi_controls','midi_sysex','midi_ump','mpe_zone','mpe_members','mpe_pitch_bend','midi_route'}
+    from .vst3_sidechain import enabled
+    tracks=[t.model_dump(mode='json',include=keys) for t in project.tracks if track_id is None or t.id==track_id or enabled(project)]
     if not tracks:raise ValueError('Track not found')
     # Ignore editorial/UI changes; audio-affecting concurrent edits reject publication.
     return json.dumps({'tracks':tracks,'rate':project.sample_rate,
+        'transport':vst_host_settings(project),
         'master':None if track_id else [i.model_dump(mode='json') for i in project.master_inserts],
         'volume':None if track_id else project.master_volume_db,
         'end':None if track_id else project.timeline_end_ms,
@@ -31,7 +34,8 @@ def bounce(pid,track_id=None,*,capacity_check=lambda owner,size:None):
             snapshot=storage.load_project(pid).model_copy(deep=True)
             signature=_signature(snapshot,track_id)
             selected=[t for t in snapshot.tracks if track_id is None or t.id==track_id]
-            for t in selected:
+            from .vst3_sidechain import enabled
+            for t in (snapshot.tracks if enabled(snapshot) else selected):
                 source=storage.audio_path(pid,t.filename)
                 if source.is_symlink() or not source.is_file():raise ValueError('Source audio unavailable')
                 stat=source.stat()
@@ -39,17 +43,23 @@ def bounce(pid,track_id=None,*,capacity_check=lambda owner,size:None):
                 destination=folder/t.filename
                 if not destination.exists():shutil.copyfile(source,destination)
         output=folder/('bounce-'+uuid.uuid4().hex+'.wav')
+        host_transport=vst_host_settings(snapshot)
         if track_id:
             original=selected[0].model_copy(deep=True)
             original.mute=False;original.solo=False
-            render_track_export(original,folder/original.filename,output,fmt='wav',
-                sample_rate=snapshot.sample_rate,wav_bit_depth=32)
+            from .vst3_sidechain import enabled,render as sidechain_render
+            if enabled(snapshot):
+                # Bake only the target track output, with its sidechain sources.
+                snapshot.base_bpm=snapshot.bpm;snapshot.pitch_semitones=0
+                sidechain_render(snapshot,lambda _pid,name:folder/name,output,track_id=track_id,host_transport=host_transport)
+            else:render_track_export(original,folder/original.filename,output,fmt='wav',
+                sample_rate=snapshot.sample_rate,wav_bit_depth=32,host_transport=vst_host_settings(snapshot))
             label=original.name+' Bounce'
         else:
             # Project tempo/pitch is applied by playback once, not baked twice.
             snapshot.base_bpm=snapshot.bpm;snapshot.pitch_semitones=0
             render_mix(snapshot,lambda _pid,name:folder/name,output,fmt='wav',
-                       sample_rate=snapshot.sample_rate,wav_bit_depth=32)
+                       sample_rate=snapshot.sample_rate,wav_bit_depth=32,host_transport=host_transport)
             label='Project Bounce'
         duration=media_duration_ms(output);peaks=waveform_peaks(output)
         with project_publication_lock(pid):

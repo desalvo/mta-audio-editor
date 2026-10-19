@@ -42,7 +42,7 @@ Release: %{getenv:MTA_RPM_RELEASE}%{?dist}
 Summary: MTA Audio Editor web server and offline runtime dependencies
 License: MIT
 BuildArch: %{_arch}
-Requires: python3.12, python3.12-pip, /usr/bin/ffmpeg, ca-certificates
+Requires: python3.12, python3.12-pip, /usr/bin/ffmpeg, ca-certificates, libstdc++, alsa-lib, freetype, libX11, libXext, libXrandr, libXinerama, libXcursor, mesa-libGL, libXtst, libXfont2, mesa-dri-drivers, pixman, libXau, libXdmcp, xkeyboard-config, /usr/bin/xkbcomp
 AutoReqProv: no
 %description
 MTA Audio Editor web server, distinct from the desktop and Proxmox agent.
@@ -73,6 +73,7 @@ if [ "$1" -ge 1 ]; then
     exit 1
   fi
   mkdir -p /etc/mta /var/lib/mta/projects /var/lib/mta/models /opt/mta
+  if [ ! -d /opt/mta/vst3 ]; then install -d -m 755 /opt/mta/vst3; fi
   chmod 700 /etc/mta
   if [ ! -f /etc/mta/mta.env ]; then
     printf 'MTA_ADMIN_USERNAME=admin\nMTA_ADMIN_PASSWORD=%s\nMTA_DATA_DIR=/var/lib/mta/projects\n' "$(/usr/bin/python3.12 -c 'import secrets; print(secrets.token_urlsafe(24))')" > /etc/mta/mta.env

@@ -1,4 +1,5 @@
 from pathlib import Path
+import re
 
 JS = Path('app/static/app.js').read_text(encoding='utf-8')
 MAIN = Path('app/main.py').read_text(encoding='utf-8')
@@ -24,7 +25,7 @@ def test_preview_stems_keep_mixer_controls_neutral_server_side():
     assert 'preview_track_model.volume_db = 0.0' in block
     assert 'preview_track_model.pan = 0.0' in block
     assert 'preview_track_model.mute = False' in block
-    assert 'render_track_export(\n            preview_track_model,' in block
+    assert re.search(r'render_track_export\(\s+preview_track_model,',block)
 
 
 def test_plugin_parameter_controls_schedule_live_updates():
