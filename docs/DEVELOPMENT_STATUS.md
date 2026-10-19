@@ -1,8 +1,17 @@
 # MTA Audio Editor — Development status
 
-Versione obbligatoria: **0.3.0-r210**. Ciclo iniziato il 19 ottobre 2026 dopo il commit del cumulativo VST3 server editor.
+Versione obbligatoria: **0.3.0-r210**. Ultimo ciclo: correzione gate Quality e repository RPM firmato, 19 ottobre 2026 ore 15:16–15:22 Europe/Rome.
 
-## Stato iniziale verificato
+## Stato corrente verificato
+
+- Corrette la collocazione del plugin di prova Quality e la rimozione automatica delle dipendenze nel test RPM firmato. Nessuna modifica al runtime applicativo o ai requisiti RPM.
+- **35 test mirati passati**, incluso il license guard che falliva nella CI; Ruff, Bandit e sintassi shell passati. Download reale del plugin bloccato a checksum, elaborazione audio e audit sorgenti passati con fixture esterno. Guard del test distruttivo eseguito e rifiutato correttamente fuori da CI.
+- I log allegati confermano per Rocky9, Rocky10 e Alma10: compilazione/payload offline, installazione/reinstallazione e ciclo DNF riusciti. Nuova conferma del test firmato ancora richiesta sulla CI reale.
+- Non è stata ripetuta l’intera suite audio in questo ciclo: nessun codice runtime è cambiato; i log Quality ricevuti riportano 4.137 passati e un solo fallimento, quello corretto. Le 4.135 prove locali del ciclo precedente restano una verifica storica, non un nuovo esito di questo ciclo.
+- Baseline corrente: `MTA-0.3.0-r210-ci-quality-sast-rpm-fixes-cumulative.zip`, SHA-256 `277524484124d8c473217cb19372c813dcc8473c34a65a6866ad05e695b3566c`; tutti i suoi 2.104 file conservati.
+- Consegna: `MTA-0.3.0-r210-ci-license-signed-rpm-cumulative.zip`, verifica CRC e byte per byte e SHA-256. Risultati: `validation/r210-ci-gates-result.json`.
+
+## Checkpoint precedente
 
 - Baseline: MTA-0.3.0-r210-vst3-server-editor-cumulative.zip, SHA-256 a40f80f9ee7e4a94975407ed20d2b31e2192b1139fc602dc5cfedf7f2727e96a.
 - Ciclo precedente: 4.128 test passati, 6 saltati, 10 esclusi per l’ambiente. GUI originale VST3, mappe tempo, sidechain, MIDI e acquisizione integrati.
@@ -56,3 +65,18 @@ Versione obbligatoria: **0.3.0-r210**. Ciclo iniziato il 19 ottobre 2026 dopo il
 ## Prossimi passi
 
 L’utente applica il cumulativo e rilancia CI e packaging. Confermare prima Quality/SAST su Python 3.14 e i tre target RPM Rocky9/Rocky10/Alma10; poi build native. Dopo CI verde procedere all’accettazione EL10/LXC e dispositivi fisici. Nessuna certificazione del server è dedotta dalla sola regressione locale.
+
+
+## Ciclo successivo — CI del 19 ottobre, ore 15:16 Europe/Rome
+
+Nuovi log ricevuti: Quality fallisce solo nel license guard perché il plugin di test CHOW è scaricato nel checkout; le tre build RPM ora compilano, installano e aggiornano, ma il test del repository firmato non risolve alcune dipendenze X11 dopo la rimozione dell’applicazione. Cause confermate nei log:
+
+- Quality: 4.137 passati, 13 saltati, un solo fallimento, `test_source_license_gate`, dovuto al plugin di prova dentro `.external` del checkout. SAST non riporta nuovi errori.
+- Tutti e tre gli RPM: compilazione, installazione/reinstallazione e version cycle superati; il test firmato rimuove `xkbcomp` (anche `libXtst`/`xkeyboard-config` su EL9) tramite l’autoremove implicito, poi disabilita i repository che potrebbero reinstallarli.
+
+Correzioni implementate: fixture Quality spostato sotto `RUNNER_TEMP`, con percorso di test corrispondente; disattivazione del solo cleanup automatico nella rimozione preparatoria del test firmato. Controllo licenze, dipendenze RPM, firme e isolamento del repository rimangono attivi. Verifiche mirate concluse: 35 passati; r210 invariata. Nessun commit/push/tag/release o intervento sui server reali. Baseline: MTA-0.3.0-r210-ci-quality-sast-rpm-fixes-cumulative.zip (SHA-256 277524484124d8c473217cb19372c813dcc8473c34a65a6866ad05e695b3566c).
+
+
+## Prossima verifica richiesta
+
+Dopo l’applicazione e il commit dell’utente: rilanciare Quality e i tre job RPM. Verificare la conclusione del test repository firmato mantenendo attivi `gpgcheck=1`, `repo_gpgcheck=1` e il test dei metadata alterati. Il controllo licenze deve continuare a rifiutare plugin nel checkout, anche sotto `.external`.

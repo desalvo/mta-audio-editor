@@ -60,10 +60,10 @@ jobs:
       - name: Ruff
         run: ruff check app native tests scripts/k8s-wizard.py
       - name: Fetch hash-pinned live VST3 test effect
-        run: python scripts/fetch_live_vst3_test_plugin.py .external/live-vst3
+        run: python scripts/fetch_live_vst3_test_plugin.py "$RUNNER_TEMP/mta-live-vst3"
       - name: Unit tests and coverage gate
         env:
-          MTA_TEST_LIVE_VST3: ${{ github.workspace }}/.external/live-vst3/CHOWTapeModel.vst3
+          MTA_TEST_LIVE_VST3: ${{ runner.temp }}/mta-live-vst3/CHOWTapeModel.vst3
           MTA_TEST_BROWSER_VST3: '1'
           MTA_ALLOW_INSECURE_NO_AUTH: 'true'
           MTA_DATA_DIR: /tmp/mta-projects

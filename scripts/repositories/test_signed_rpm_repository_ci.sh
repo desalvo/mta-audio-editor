@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Rocky 9 disposable CI only. Sign an actual server RPM, validate signed repomd,
+# EL9/EL10 disposable CI only. Sign an actual server RPM, validate signed repomd,
 # verify DNF rejects tampered metadata and installs from a GPG-verified repo.
 set -Eeuo pipefail
 : "${MTA_SERVER_RPM:?Provide real built server RPM}"
@@ -47,7 +47,10 @@ gpgkey=file://$root/key.asc
 REPO
 # Root must be traversable by dnf and metadata must remain signed.
 dnf -y --disablerepo='*' --enablerepo=mta-signed-ci makecache
-dnf -y remove mta-audio-editor-server
+# Keep the OS dependencies provisioned by the preceding install/version tests.
+# With every distribution repository disabled below, DNF cannot restore e.g.
+# xkbcomp/libXtst after its default automatic dependency cleanup.
+dnf -y --setopt=clean_requirements_on_remove=False remove mta-audio-editor-server
 dnf -y --disablerepo='*' --enablerepo=mta-signed-ci --setopt=install_weak_deps=False install mta-audio-editor-server || {
   echo 'DNF signed repository install failed (dependencies must be preinstalled)' >&2; exit 6;
 }

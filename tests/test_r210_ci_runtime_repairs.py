@@ -3,6 +3,8 @@ import hashlib
 import importlib.util
 import json
 from pathlib import Path
+import shlex
+import shutil
 import socket
 import sys
 
@@ -84,3 +86,28 @@ def test_strict_native_audit_keeps_alsa_jack_metadata_prerequisites():
     script=next(s['run'] for s in steps if s.get('name')=='Python dependency audit')
     assert script.index('libasound2-dev libjack-jackd2-dev')<script.index('pip-audit -r requirements-native.txt --strict')
     assert '--ignore-vuln' not in script and '--disable-pip' not in script
+
+
+def test_quality_plugin_fixture_does_not_enter_source_archive(tmp_path):
+    from scripts.license_gate import audit
+    workflow=yaml.safe_load((ROOT/'.github/workflows/ci-cd.yml').read_text())
+    steps=workflow['jobs']['quality']['steps']
+    workspace=tmp_path/'checkout';workspace.mkdir()
+    (workspace/'docs').mkdir()
+    shutil.copy2(ROOT/'docs/THIRD_PARTY_NOTICES.md',workspace/'docs/THIRD_PARTY_NOTICES.md')
+    runner=tmp_path/'runner-temp';runner.mkdir()
+    fetch=next(s for s in steps if s.get('name')=='Fetch hash-pinned live VST3 test effect')
+    destination=Path(shlex.split(fetch['run'])[-1].replace('$RUNNER_TEMP',str(runner)))
+    if not destination.is_absolute():destination=workspace/destination
+    plugin=destination/'CHOWTapeModel.vst3'
+    binary=plugin/'Contents/x86_64-linux/CHOWTapeModel.so'
+    binary.parent.mkdir(parents=True);binary.write_bytes(b'ci-fixture-only')
+    env=next(s for s in steps if s.get('name')=='Unit tests and coverage gate')['env']
+    configured=env['MTA_TEST_LIVE_VST3'].replace('${{ runner.temp }}',str(runner)).replace('${{ github.workspace }}',str(workspace))
+    assert Path(configured).resolve()==plugin.resolve()
+    # This is the actual source audit that failed on the CI fixture. The old
+    # checkout-relative workflow makes it fail, without weakening the guard.
+    result=audit(workspace)
+    assert result['ok'],result['errors']
+    shutil.copytree(plugin,workspace/'.external/unreviewed.vst3')
+    assert not audit(workspace)['ok']
