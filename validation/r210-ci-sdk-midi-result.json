@@ -1,0 +1,132 @@
+{
+  "version": "0.3.0-r210",
+  "baseline": "MTA-0.3.0-r210-playback-vst3-paypal-subscriptions-cumulative.zip",
+  "baseline_sha256": "3c357e5c62eecdb04dcd32597fbda2b625ccf5d7646ae4ca11f58e3d80494bb4",
+  "baseline_files_preserved": 2158,
+  "changed_baseline_files": [
+    "app/optional_plugins.py",
+    "app/runtime_paths.py",
+    "app/static/app.css",
+    "app/static/app.js",
+    "app/static/native_transport.js",
+    "app/static/playback_prep.js",
+    "app/static/server_vst3.js",
+    "app/templates/index.html",
+    "app/vst3_host.py",
+    "docs/DEVELOPMENT_STATUS.md",
+    "scripts/validate_playback_preparation.py",
+    "tests/server_vst3_browser.cjs",
+    "tests/test_r210_server_vst3_browser.py"
+  ],
+  "python_test_runtime": "3.12.14",
+  "received_ci": {
+    "sdk": "ADelay compiles; chain fails through optional_plugins -> auth -> missing qrcode",
+    "quality": "4190 passed, 13 skipped, one MIDI browser timeout; coverage 75.43%",
+    "security_audits": "Bandit, dependency audit, Gitleaks and Trivy passed in supplied logs"
+  },
+  "fixes": [
+    "Shared stdlib-only managed VST3 path resolver",
+    "Independent audio progress, request ownership and Stop cleanup across three transports",
+    "Preserve MIDI/plugin editor controls and drafts during playback",
+    "Version-prefixed cache keys and stronger live browser assertions"
+  ],
+  "final_full_regression": {
+    "passed": 4164,
+    "failed": 0,
+    "skipped": 35,
+    "deselected": 10,
+    "seconds": 454.944
+  },
+  "targeted": {
+    "passed": 56,
+    "skipped": 10
+  },
+  "new_regressions": {
+    "passed": 5,
+    "sdk_without_site_packages": 2,
+    "chromium": 3
+  },
+  "final_metadata_and_ui": {
+    "passed": 10
+  },
+  "real_sdk": {
+    "sdk_commit": "3cdf9ca5d1f5b1b21e0a86832aa4abe55607bd96",
+    "submodules": [
+      " fcf9da0bd27a16f7f03773a3a39822f28f5c8477 base (v3.8.1_build_84)",
+      " 054c9143cbb8d47fc4694e473f2ee3b4d951a8f5 cmake (v3.8.1_build_84)",
+      " 8bfca19d3b76a61d093951ba9297047f544caea1 doc (v3.8.1_build_84)",
+      " 4f547e8e102b47de4a8b8aaf343c73b700786372 pluginterfaces (v3.8.1_build_84)",
+      " 586dc5e6c8012c3e4b01c79389375cbe96bdb1da public.sdk (v3.8.1_build_84)",
+      " 33b73dfbb87f3fde3bce8c0a10cae934dc66ad34 tutorials (heads/main)",
+      " 5db272256172557818b6158cf0bb2c4410bddb25 vstgui4 (5db2722)"
+    ],
+    "site_packages_disabled": true,
+    "real_sdk_probe_build": "passed",
+    "real_adelay_build": "passed",
+    "acceptances_passed": [
+      "offline",
+      "chain",
+      "variable",
+      "session",
+      "stream",
+      "events",
+      "native_bridge"
+    ]
+  },
+  "real_http_webaudio": {
+    "active": true,
+    "tracks": 8,
+    "raw": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    "cacheBytes": 84671936,
+    "first_start_seconds": 1.598,
+    "cached_restart_seconds": 0.224,
+    "backend_preview_requests": [],
+    "errors": [],
+    "plugin_editor_preserved": true
+  },
+  "real_midi_window_probe": {
+    "active": true,
+    "tracks": 8,
+    "raw": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    "cacheBytes": 84671936,
+    "first_start_seconds": 0.969,
+    "cached_restart_seconds": 0.018,
+    "backend_preview_requests": [],
+    "errors": [],
+    "midi_editor_preserved": true
+  },
+  "checks": {
+    "ruff": "passed",
+    "bandit_high_high": "passed",
+    "license_guard": "passed",
+    "pip_check": "passed",
+    "compileall": "passed",
+    "js_syntax": "passed",
+    "node_server_transport_regression": "passed"
+  },
+  "limitations": [
+    "Full server live Chromium/worker/plugin integration still requires the CI custom host runtime and fixture",
+    "35 skips require external plugin/SDK/VSTi/Win32/browser fixtures",
+    "10 tests deselected because host agent/Unix sockets are unavailable",
+    "No production server or physical Windows/macOS device exercised"
+  ],
+  "no_commit_push_tag_release": true
+}

@@ -70,6 +70,10 @@ def probe(report):
                     page.evaluate("()=>{current.tracks[0].inserts=[{id:'rv',plugin:'reverb_lexicon',enabled:true,preset:'default',params:{}}];openInsertEditor(false,'rv',current.tracks[0].id)}")
                     if page.locator('.insert-setup-title').inner_text()!='Lexicon-style reverb' or page.locator('.fx-artwork svg').count()!=1:raise RuntimeError('Internal plugin artwork/name regression')
                     if not page.locator('.plugin-field-knob').evaluate_all('(fields)=>fields.every(f=>f.querySelector(".plugin-number").getBoundingClientRect().right<=f.getBoundingClientRect().right)'):raise RuntimeError('Internal plugin controls overflow')
+                    page.locator('.plugin-number').first.fill('0.6')
+                    page.evaluate('()=>startWebAudioProjectPlayback(false,0)');page.evaluate('()=>stopPlayback()')
+                    if not page.locator('.insert-setup-title').is_visible() or page.locator('.plugin-number').first.input_value()!='0.6':raise RuntimeError('Playback replaced the plugin editor or discarded its draft')
+                    result['plugin_editor_preserved']=True
                     browser.close()
                 report.parent.mkdir(parents=True,exist_ok=True);report.write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result,indent=2))
             finally:

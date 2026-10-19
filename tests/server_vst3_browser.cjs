@@ -15,7 +15,7 @@ class AudioContext{
 window.AudioContext=AudioContext;
 const button={classList:{add(){}}};const context={window,console,setTimeout,clearTimeout,setInterval,clearInterval,performance,Promise,crypto:{randomUUID:()=> 'browser-client-0000001'},
  currentUser:{native_single_user:false},current:{id:'project',tracks:[{inserts:[{plugin:'vst3',enabled:true}]}],master_inserts:[]},audioCtx:null,playCursorMs:0,playbackPaused:false,timelineAudioDirty:false,projectDirty:true,
- tr:(en,it)=>en,toast:s=>messages.push(s),collect(){},async persistCurrentProject(){persisted++},$:()=>button,tempoRatio:()=>1,setPlayCursor(){},updateTimedPlaybackOverlay(){},setRenderPlaybackPreparing(){},showMediaProgress(){},requestAnimationFrame:()=>1,cancelAnimationFrame(){},
+ tr:(en,it)=>en,toast:s=>messages.push(s),collect(){},async persistCurrentProject(){persisted++},$:selector=>{if(selector==='#utilityBackdrop')throw Error('Audio transport must preserve open editors');return button},tempoRatio:()=>1,setPlayCursor(){},updateTimedPlaybackOverlay(){},setRenderPlaybackPreparing(){},MtaPlaybackPrep:{showProgress(){},hideProgress(){}},requestAnimationFrame:()=>1,cancelAnimationFrame(){},
  api:async url=>{if(url==='/api/vst3/plugins'){assert(context.audioCtx?.unlocked,'Unlock WebAudio before awaiting server requests');return{engine,live_available:true,failed:false}}return{state:preparation?'preparing':'ready',failed:false}},
  fetch:async(url,options={})=>{
   const body=options.body?JSON.parse(options.body):{};calls.push([url,body,options.method]);

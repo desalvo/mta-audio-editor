@@ -1,6 +1,21 @@
 # MTA Audio Editor — Development status
 
-Versione obbligatoria: **0.3.0-r210**. Ultimo ciclo: playback, plugin opzionali e abbonamenti, 19 ottobre 2026.
+Versione obbligatoria: **0.3.0-r210**. Ultimo ciclo: regressioni CI SDK e browser MIDI, 19 ottobre 2026.
+
+## Ciclo completato — regressioni CI SDK e browser MIDI (19 ottobre 2026)
+
+- Commit del cumulativo precedente confermato dall'utente; baseline `MTA-0.3.0-r210-playback-vst3-paypal-subscriptions-cumulative.zip`, SHA-256 `3c357e5c62eecdb04dcd32597fbda2b625ccf5d7646ae4ca11f58e3d80494bb4`. Tutti i **2.158 file conservati**, inclusi playback, plugin opzionali, abbonamenti e PayPal.
+- Log ricevuti: SDK compila probe/ADelay e supera 128 blocchi, poi importa erroneamente `auth/qrcode` dal nuovo catalogo; Quality riporta 4.190 passati e un timeout su `#midiRoute`, copertura 75,43%. Bandit, audit dipendenze Python, Gitleaks e Trivy risultano passati nei log.
+- Discovery VST3: percorso dei plugin opzionali spostato nel helper condiviso `runtime_paths.optional_vst3_root`, con sola libreria standard. Installer e discovery condividono il calcolo senza inizializzare autenticazione nel job SDK. Controlli percorsi/permessi e ruoli amministrativi invariati.
+- Causa browser: `showMediaProgress` sostituiva il contenuto della finestra MIDI. Creato indicatore audio indipendente con proprietà per richiesta, senza sostituire/nascondere gli editor aperti. Applicato a WebAudio, nativo C++ e server C++; Stop evita riaperture dell'indicatore da risposte tardive. Cache frontend aggiornata con prefisso versione conservato.
+- **Cinque nuove regressioni passate**: due processi Python `-I -S` senza site-packages e con import auth/qrcode/catalogo/FastAPI vietati; tre prove Chromium per bozze/lingue/proprietà/Stop e trasporto nativo con bridge controllato. Suite mirata: **56 mirati passati, 10 saltati**; 10 controlli finali metadati/UI passati.
+- **SDK Steinberg reale compilato e sette accettazioni ADelay passate con `python -S`**: offline, chain, variable, session, stream, events, native_bridge. Commit SDK `3cdf9ca5d1f5b1b21e0a86832aa4abe55607bd96`; submodule e log nel rapporto dedicato. Nessun SDK/binario esterno aggiunto al package.
+- Server HTTP locale + Chromium + WebAudio reali: otto tracce, zero rendering backend e zero errori JS; pannello effetto e valore non applicato preservati dopo playback/Stop. Ulteriore probe con finestra MIDI reale preservata. Nessun dato o pagamento di produzione usato.
+- **Regressione finale: 4.164 passati, 35 saltati, 10 esclusi per socket/agente non disponibili**, nessun fallimento (455s). Il controllo del prefisso cache rilevato nel primo passaggio locale è corretto e passato nuovamente; l'ultima regressione usa la correzione. Ruff, Bandit alle soglie CI, license guard, pip check, compilazione Python e sintassi JS passati.
+- Test browser live completo del runner conservato e rafforzato con assert sull'editor MIDI durante playback e dopo Stop; resta da riconfermare nella CI con host MTA compilato/plugin esterno. Nessun test CI disabilitato e nessuna soglia ridotta. Hardware Windows/macOS e server ROCm reale non certificati da queste prove.
+- Dettagli: `docs/CI_SDK_MIDI_PROGRESS_R210.md`; esiti/JUnit in `validation/r210-ci-*`. Consegna `MTA-0.3.0-r210-ci-sdk-midi-progress-cumulative.zip`, intero progetto, CRC/confronto byte per byte/permessi e SHA-256 verificati nel packaging.
+- Versione **0.3.0-r210** invariata. Nessun commit/push/tag/release, modifica a server reali o pagamento effettuato.
+
 
 ## Ciclo completato — playback, plugin opzionali e abbonamenti (19 ottobre 2026)
 

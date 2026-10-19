@@ -26,8 +26,8 @@ _JOBS={}
 
 def plugin_root():
     # This directory is not under /data/projects and is never part of a project.
-    default=auth.data_root().parent/'mta-optional-vst3'
-    return Path(os.getenv('MTA_OPTIONAL_VST3_DIR',str(default))).expanduser().resolve()
+    from .runtime_paths import optional_vst3_root
+    return optional_vst3_root(auth.data_root())
 
 
 def catalog():

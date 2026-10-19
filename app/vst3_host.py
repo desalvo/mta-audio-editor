@@ -26,8 +26,8 @@ def vst3_roots() -> list[Path]:
         roots = [Path('/usr/lib/vst3'), Path('/usr/local/lib/vst3'),Path('/opt/mta/vst3')]
         if os.getenv('MTA_NATIVE_SINGLE_USER','').lower()=='true':
             roots += [Path.home() / '.vst3', Path.home() / '.local/lib/vst3']
-    from .optional_plugins import plugin_root
-    roots.append(plugin_root())
+    from .runtime_paths import optional_vst3_root
+    roots.append(optional_vst3_root())
     roots += [Path(x).expanduser() for x in os.getenv('MTA_VST3_PATHS', '').split(os.pathsep) if x.strip()]
     resolved=[p.resolve() for p in roots if p.is_dir()]
     if os.getenv('MTA_NATIVE_SINGLE_USER','').lower()!='true':

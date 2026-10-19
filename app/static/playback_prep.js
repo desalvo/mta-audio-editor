@@ -12,5 +12,22 @@ class BufferCache{
  clear(){this.ready.clear();this.bytes=0}
  keys(){return this.ready.keys()}
 }
-root.MtaPlaybackPrep={mapLimit,clipPlan,BufferCache};
+// Audio preparation owns a separate surface: never replace an open editor.
+let progressOwner=null,progressView=null;
+function hideProgress(owner){
+ if(owner!==undefined&&owner!==progressOwner)return;
+ progressView?.remove();progressView=null;progressOwner=null;
+}
+function showProgress(owner,title,pct,message,detail=''){
+ if(!root.document)return;
+ if(!progressView){
+  const view=root.document.createElement('section');view.id='audioPreparation';view.className='audio-preparation';
+  const heading=root.document.createElement('strong'),bar=root.document.createElement('progress'),phase=root.document.createElement('p'),info=root.document.createElement('small'),stop=root.document.createElement('button');
+  heading.id='audioPreparationTitle';view.setAttribute('aria-labelledby',heading.id);view.setAttribute('role','region');phase.setAttribute('role','status');bar.max=100;stop.type='button';stop.textContent=typeof root.tr==='function'?root.tr('Stop','Interrompi'):'Stop';
+  stop.onclick=()=>{hideProgress();root.stopPlayback?.()};view.append(heading,bar,phase,info,stop);root.document.body.append(view);progressView=view;
+ }
+ progressOwner=owner;const [heading,bar,phase,info]=progressView.children;heading.textContent=title;phase.textContent=message||'';info.textContent=detail;
+ if(Number.isFinite(pct)&&pct>=0)bar.value=Math.min(100,pct);else bar.removeAttribute('value');
+}
+root.MtaPlaybackPrep={mapLimit,clipPlan,BufferCache,showProgress,hideProgress};
 })(typeof window==='undefined'?globalThis:window);

@@ -1,0 +1,20 @@
+{
+  "active": true,
+  "tracks": 8,
+  "raw": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+  ],
+  "cacheBytes": 84671936,
+  "first_start_seconds": 0.969,
+  "cached_restart_seconds": 0.018,
+  "backend_preview_requests": [],
+  "errors": [],
+  "midi_editor_preserved": true
+}

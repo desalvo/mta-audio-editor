@@ -56,7 +56,7 @@ function launchPump(s){s.pumpTask=pump(s,s.generation)}
 window.previewMaster=async function(){
  if(!isServer()||!current?.tracks?.length)return old.previewMaster();
  if(preparing){window.stopPlayback();return}preparing=true;
- let token,pending=null;
+ const preparation={};let token,pending=null;
  try{
   // Unlock on the original Play gesture, before waiting for server requests
   // (required by browsers with stricter audio activation policies).
@@ -67,22 +67,23 @@ window.previewMaster=async function(){
   if(capability.engine!=='cpp')return old.previewMaster();
   if(!capability.live_available)throw Error(tr('Ask the administrator to install the server VST3 runtime.','Chiedere all’amministratore di installare il runtime VST3 sul server.'));
   const position=playCursorMs;window.stopPlayback();token=++epoch;setRenderPlaybackPreparing(true);
-  collect();showMediaProgress(tr('Preparing audio','Preparazione audio'),-1,tr('Starting server audio session','Avvio sessione audio sul server'));if(projectDirty)await persistCurrentProject(false);if(token!==epoch)return;
+  collect();MtaPlaybackPrep.showProgress(preparation,tr('Preparing audio','Preparazione audio'),-1,tr('Starting server audio session','Avvio sessione audio sul server'));if(projectDirty)await persistCurrentProject(false);if(token!==epoch)return;
   const pid=current.id;let result=await jsonRequest(`/api/projects/${encodeURIComponent(pid)}/vst3-live`,{client_id:clientId,cursor_ms:position/tempoRatio()});
   pending={id:result.session_id,pid,sources:[]};
   while(result.state==='preparing'){
    if(token!==epoch||current?.id!==pid)return;
    await new Promise(r=>setTimeout(r,300));result=await api(url(pending));
-   const p=result.preparation||{};showMediaProgress(tr('Preparing audio','Preparazione audio'),-1,(p.stage==='sources'?tr('Checking sources / converting incompatible formats','Verifica sorgenti / conversione formati incompatibili'):tr('Starting live DSP and inserts','Avvio DSP live e insert'))+(p.track?' · '+p.track:''),p.total?`${p.done}/${p.total}`:'');
+   if(token!==epoch||current?.id!==pid)return;
+   const p=result.preparation||{};MtaPlaybackPrep.showProgress(preparation,tr('Preparing audio','Preparazione audio'),-1,(p.stage==='sources'?tr('Checking sources / converting incompatible formats','Verifica sorgenti / conversione formati incompatibili'):tr('Starting live DSP and inserts','Avvio DSP live e insert'))+(p.track?' · '+p.track:''),p.total?`${p.done}/${p.total}`:'');
   }
   if(result.failed)throw Error(result.error||tr('Server VST3 preparation failed','Preparazione VST3 server fallita'));
   const s={id:result.session_id,pid,rate:result.rate,expectedFrame:result.position,sequence:0,cursor:result.position_ms,paused:false,cancelled:false,generation:0,sources:[],nextAt:audioCtx.currentTime+.2,done:false,controls:Promise.resolve(),pumpTask:null};
   if(token!==epoch||current?.id!==pid)return;
   live=s;pending=null;playbackPaused=false;timelineAudioDirty=false;if($('#playMaster'))$('#playMaster').textContent='❚❚';
   s.heartbeat=setInterval(async()=>{try{const status=await api(url(s));if(live===s&&status.failed)throw Error(status.error||'VST3 worker failed')}catch(e){if(live===s){window.stopPlayback();toast(e.message)}}},3000);
-  display(s);launchPump(s);$('#utilityBackdrop')?.classList.add('hidden');toast(hasVst()?tr('Server VST3 live playback','Riproduzione VST3 live dal server'):tr('Server C++ live playback','Riproduzione C++ live dal server'));
+  display(s);launchPump(s);MtaPlaybackPrep.hideProgress(preparation);toast(hasVst()?tr('Server VST3 live playback','Riproduzione VST3 live dal server'):tr('Server C++ live playback','Riproduzione C++ live dal server'));
  }catch(e){if(token===undefined||token===epoch){window.stopPlayback();toast(e.message)}}
- finally{if(pending)discard(pending);preparing=false;setRenderPlaybackPreparing(false);$('#utilityBackdrop')?.classList.add('hidden')}
+ finally{if(pending)discard(pending);preparing=false;setRenderPlaybackPreparing(false);MtaPlaybackPrep.hideProgress(preparation)}
 };
 window.stopPlayback=function(){
  ++epoch;clearTimeout(refreshTimer);const s=live;live=null;

@@ -154,12 +154,15 @@ def test_real_browser_live_play_pause_seek_parameter_update_and_stop(request,tmp
                 page.evaluate('() => window.previewMaster()')
                 wait_for('() => window.hardwareMidi.some(m=>m[0]===144&&m[1]===64)')
                 wait_for('() => window.hardwareMidi.some(m=>m[0]===248)')
+                assert page.locator('#midiRoute').is_visible(), 'Audio preparation replaced or hid the open MIDI editor'
+                assert page.locator('#midiRoute').input_value()=='hardware'
                 page.evaluate('() => window.pausePlayback()')
                 wait_for('() => window.hardwareMidi.some(m=>m[0]===252)')
                 page.evaluate('() => window.resumePlayback()')
                 wait_for('() => window.hardwareMidi.some(m=>m[0]===251||m[0]===250)')
                 page.evaluate('() => window.stopPlayback()')
                 assert page.evaluate('() => window.hardwareMidi.some(m=>(m[0]&240)===176&&m[1]===123)')
+                assert page.locator('#midiRoute').is_visible(), 'Stopping playback must preserve the MIDI editor'
                 page.locator('#midiRoute').select_option('instrument')
                 page.locator('#midiSave').click()
                 wait_for('() => current.tracks.some(t=>t.kind==="midi"&&t.midi_route==="instrument")')

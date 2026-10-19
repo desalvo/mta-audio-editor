@@ -18,3 +18,9 @@ def application_data_root():
     if override:return Path(override).expanduser().resolve()
     if os.getenv('MTA_NATIVE_SINGLE_USER','').lower()=='true':return native_data_root()
     return Path('/data/projects').resolve()
+
+
+def optional_vst3_root(data_root=None):
+    """Managed plugin directory; stdlib only, also used by standalone SDK tools."""
+    default=Path(data_root if data_root is not None else application_data_root()).parent/'mta-optional-vst3'
+    return Path(os.getenv('MTA_OPTIONAL_VST3_DIR',str(default))).expanduser().resolve()
