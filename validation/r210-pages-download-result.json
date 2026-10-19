@@ -1,0 +1,39 @@
+{
+  "version": "0.3.0-r210",
+  "baseline": "MTA-0.3.0-r210-docker-windows-core-build-cumulative.zip",
+  "baseline_sha256": "a5983f5aeef21bc9d3d73e5bed26dc3f2d1bdd06fdfbc29566a2baed3e4e88dc",
+  "evidence": {
+    "run": 39267934184,
+    "step": "Assemble signed channel artifacts",
+    "previous_cancelled_run": 39265035765,
+    "previous_step_seconds": 1130,
+    "source_run": 39263926838,
+    "source_artifact": 12192119228,
+    "artifact_size_bytes": 5873100542,
+    "network_root_cause": "not established; gh download still active at cancellation"
+  },
+  "tests": {
+    "passed": 42,
+    "failed": 0,
+    "scope": "Pages publisher/assembler, subprocess timeout/heartbeat, tar exclusion, manifest compatibility/integrity, repository regression"
+  },
+  "ruff": "passed at CI scope and modified files",
+  "bandit": "passed at CI severity/confidence thresholds and assembler",
+  "license_gate": "passed",
+  "full_regression_repeated": false,
+  "remote_deploy_executed": false,
+  "commit_push_tag_release": false,
+  "remaining": [
+    "Update two files in packages repository; source-only update does not change target workflow",
+    "New publisher/matrix on same commit, followed by real Pages deployment and APT/DNF public acceptance",
+    "Legacy other-channel artifact retention still limited to 90 days"
+  ],
+  "previous_files_preserved": 2121,
+  "changed_previous_files": [
+    ".github/workflows/server-pages-publish.yml",
+    "docs/DEVELOPMENT_STATUS.md",
+    "docs/NATIVE_SERVER_PAGES_ARTIFACT_DEPLOY_IT.md",
+    "packaging/pages-repository/.github/workflows/pages.yml",
+    "packaging/pages-repository/scripts/assemble_pages.py"
+  ]
+}

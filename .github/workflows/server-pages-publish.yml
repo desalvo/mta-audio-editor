@@ -250,6 +250,23 @@ jobs:
           if-no-files-found: error
           retention-days: 90
           compression-level: 0
+      - name: Create Pages-only bundle without retained RPM payloads
+        env:
+          CHANNEL: ${{ inputs.channel }}
+        run: |
+          set -euo pipefail
+          # Keep the full signed-channel artifact for publisher retention.
+          # Pages must never download gigabytes of RPMs that it then discards.
+          tar --exclude='*.rpm' -C "$RUNNER_TEMP/site-bundle" -czf "$RUNNER_TEMP/pages-site.tar.gz" .
+          sha256sum "$RUNNER_TEMP/pages-site.tar.gz" | cut -d' ' -f1 > "$RUNNER_TEMP/pages-site.sha256"
+          du -h "$RUNNER_TEMP/pages-site.tar.gz"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: signed-mta-pages-site-${{ inputs.channel }}
+          path: ${{ runner.temp }}/pages-site.tar.gz
+          if-no-files-found: error
+          retention-days: 90
+          compression-level: 0
       - name: Publish verified channel manifest (not package binaries)
         env:
           CHANNEL: ${{ inputs.channel }}
@@ -258,12 +275,13 @@ jobs:
           git clone --depth 1 git@github.com:desalvo/mta-audio-editor-packages.git "$RUNNER_TEMP/pages"
           cd "$RUNNER_TEMP/pages"
           mkdir -p manifests
-          python3 - "$CHANNEL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" "$GITHUB_SHA" "$RUNNER_TEMP/signed-channel.sha256" <<'PYMANIFEST'
+          python3 - "$CHANNEL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" "$GITHUB_SHA" "$RUNNER_TEMP/signed-channel.sha256" "$RUNNER_TEMP/pages-site.sha256" <<'PYMANIFEST'
           import json, pathlib, sys
-          channel, repo, run_id, commit, checksum = sys.argv[1:]
+          channel, repo, run_id, commit, checksum, pages_checksum = sys.argv[1:]
           data = {'schema': 1, 'channel': channel, 'repository': repo,
                   'run_id': int(run_id), 'commit': commit,
-                  'sha256': pathlib.Path(checksum).read_text().strip()}
+                  'sha256': pathlib.Path(checksum).read_text().strip(),
+                  'pages_sha256': pathlib.Path(pages_checksum).read_text().strip()}
           pathlib.Path('manifests', channel + '.json').write_text(
               json.dumps(data, sort_keys=True, indent=2) + '\n')
           PYMANIFEST

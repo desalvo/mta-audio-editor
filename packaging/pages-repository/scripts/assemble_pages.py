@@ -4,12 +4,12 @@ import argparse
 import hashlib
 import html
 import json
-import os
 from pathlib import Path
 import re
 import subprocess
 import tarfile
 import tempfile
+import time
 
 SOURCE = "desalvo/mta-audio-editor"
 FPR = "0833A4FCB008ECAC9F98840B4C1D2DD95F5AEDB7"
@@ -24,6 +24,8 @@ def load_manifest(path, channel):
             or not re.fullmatch(r"[a-f0-9]{40}", data.get("commit", ""))
             or not re.fullmatch(r"[a-f0-9]{64}", data.get("sha256", ""))):
         raise ValueError(f"Invalid {channel} manifest")
+    if "pages_sha256" in data and not re.fullmatch(r"[a-f0-9]{64}", str(data["pages_sha256"])):
+        raise ValueError(f"Invalid {channel} Pages checksum")
     return data
 
 
@@ -63,6 +65,39 @@ def safe_extract(archive, target, channel):
         raise ValueError("Public signing fingerprint mismatch")
 
 
+def sha256_file(path):
+    with path.open("rb") as stream:
+        return hashlib.file_digest(stream, "sha256").hexdigest()
+
+
+def download_artifact(run_id, artifact, destination, *, timeout=1200, heartbeat=30):
+    """Bound silent gh downloads and report activity without exposing auth/URLs."""
+    print(f"Download {artifact}: source run {run_id}, limit {timeout}s", flush=True)
+    started = time.monotonic()
+    with subprocess.Popen(["gh", "run", "download", str(run_id), "-R", SOURCE,
+                           "-n", artifact, "-D", str(destination)]) as process:
+        try:
+            while True:
+                remaining = timeout - (time.monotonic() - started)
+                if remaining <= 0:
+                    raise TimeoutError(f"Download {artifact} timed out after {timeout}s; "
+                                       "check source Actions token permissions and artifact connectivity")
+                try:
+                    code = process.wait(timeout=min(heartbeat, remaining))
+                    break
+                except subprocess.TimeoutExpired:
+                    elapsed = int(time.monotonic() - started)
+                    print(f"Download {artifact} still active: {elapsed}s elapsed", flush=True)
+            if code:
+                raise RuntimeError(f"Download {artifact} failed (exit {code}); "
+                                   "check token Actions:read permission and artifact retention")
+        finally:
+            if process.poll() is None:
+                process.kill()
+                process.wait()
+    print(f"Download {artifact} completed in {int(time.monotonic() - started)}s", flush=True)
+
+
 def assemble(manifests, output):
     output.mkdir(parents=True, exist_ok=True)
     any_channel = False
@@ -73,13 +108,22 @@ def assemble(manifests, output):
                 continue
             any_channel = True
             data = load_manifest(path, channel)
-            subprocess.run(["gh", "run", "download", str(data["run_id"]), "-R", SOURCE,
-                            "-n", f"signed-mta-pages-{channel}", "-D", tmp], check=True)
-            archive = Path(tmp) / "signed-channel.tar.gz"
-            if hashlib.sha256(archive.read_bytes()).hexdigest() != data["sha256"]:
+            pages_only = "pages_sha256" in data
+            artifact = f"signed-mta-pages-{'site-' if pages_only else ''}{channel}"
+            if not pages_only:
+                print(f"Legacy manifest {channel}: full retained package download required; "
+                      "republish with Pages-only bundle to reduce download size", flush=True)
+            destination = Path(tmp) / channel
+            destination.mkdir()
+            download_artifact(data["run_id"], artifact, destination)
+            archive = destination / ("pages-site.tar.gz" if pages_only else "signed-channel.tar.gz")
+            print(f"Verify {channel}: {archive.stat().st_size:,} bytes", flush=True)
+            if sha256_file(archive) != data["pages_sha256" if pages_only else "sha256"]:
                 raise ValueError(f"Signed artifact checksum mismatch: {channel}")
+            print(f"Extract and validate {channel}", flush=True)
             safe_extract(archive, output, channel)
             archive.unlink()
+            print(f"Channel {channel} ready", flush=True)
     if not any_channel:
         raise ValueError("No signed channel manifests available")
     (output / ".nojekyll").touch()

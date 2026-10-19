@@ -1,6 +1,20 @@
 # MTA Audio Editor — Development status
 
-Versione obbligatoria: **0.3.0-r210**. Ultimo ciclo: correzione build Docker e Windows del core audio C++, 19 ottobre 2026 ore 15:55 Europe/Rome.
+Versione obbligatoria: **0.3.0-r210**. Ultimo ciclo: download artifact e deploy Pages, 19 ottobre 2026.
+
+## Stato corrente — pubblicazione Pages (19 ottobre 2026)
+
+- Baseline: `MTA-0.3.0-r210-docker-windows-core-build-cumulative.zip`, SHA-256 `a5983f5aeef21bc9d3d73e5bed26dc3f2d1bdd06fdfbc29566a2baed3e4e88dc`.
+- Run packages `39267934184`: fermo nello step di assemblaggio, prima di configure/upload/deploy Pages.
+- Run precedente `39265035765`: annullato dopo 18m50s nello stesso step; processo `gh run download` ancora attivo alla chiusura.
+- Artifact sorgente `12192119228`: 5.873.100.542 byte. Il deploy scarica anche tutti gli RPM trattenuti, poi li scarta. Download privo di heartbeat e timeout; causa di rete specifica non dimostrata.
+- Obiettivo: bundle Pages separato senza RPM, compatibilità manifest precedenti, avanzamento e timeout espliciti, hashing a memoria limitata. Nessuna pubblicazione remota in questo ciclo.
+- Implementati bundle Pages separato e manifest con digest aggiuntivo, senza modificare quello completo per retention. Compatibilità legacy esplicita; errori sul nuovo digest/artifact non causano downgrade.
+- Heartbeat ogni 30s, limite download 1.200s per canale e terminazione/attesa subprocess. Hashing incrementale; directory indipendenti per i canali. Workflow packages attivato anche per modifiche agli script, step limitato a 45m e job a 60m.
+- **42 test mirati passati**, inclusi tar reale dalla shell del publisher, manifest generato dal codice effettivo del workflow, selezione nuovo/legacy, checksum errato, subprocess riuscito/fallito/bloccato e cleanup. Ruff, Bandit alle soglie CI e controllo licenze passati. L'intera suite non è stata ripetuta: nessuna modifica runtime/audio.
+- Consegna: `MTA-0.3.0-r210-pages-download-cumulative.zip`; report in `validation/r210-pages-download-result.json` e JUnit adiacente. Tutti i 2.121 file della baseline conservati; CRC, confronto byte per byte e SHA-256 verificati durante packaging.
+- **Accettazione remota ancora aperta**: integrare anche workflow e assembler nel repository packages, poi ripubblicare dal nuovo commit verificato dalla matrice. Non basta rilanciare il vecchio manifest: contiene ancora il bundle da 5,9 GB. Istruzioni in `docs/NATIVE_SERVER_PAGES_ARTIFACT_DEPLOY_IT.md`.
+- Versione 0.3.0-r210 invariata; nessun commit/push/tag/release, annullamento job o deploy remoto effettuato.
 
 ## Stato corrente — build Docker e Windows
 
