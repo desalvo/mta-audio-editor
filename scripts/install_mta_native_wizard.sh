@@ -319,6 +319,15 @@ fi
 ai_installer=/usr/lib/mta-audio-editor-server/native-installers/install_ai_engines.py
 [[ -f $ai_installer && ! -L $ai_installer ]] || { echo 'All-engine installer missing: upgrade the signed MTA package.' >&2; exit 4; }
 /opt/mta/server-venv/bin/python "$ai_installer" --python /opt/mta/server-venv/bin/python --env-file "$work" --device "${ace_device:-$ai}"
+# Optional source builds are explicit; core/server updates never install plugins silently.
+if [[ -n ${MTA_INSTALL_OPTIONAL_VST3:-} ]]; then
+ if command -v apt-get >/dev/null; then
+  apt-get install -y git build-essential cmake pkg-config libx11-dev libxext-dev libgl1-mesa-dev libxrandr-dev libxinerama-dev libxcursor-dev libfreetype-dev libasound2-dev libjack-jackd2-dev lv2-dev
+ elif command -v dnf >/dev/null; then
+  dnf install -y git gcc gcc-c++ make cmake pkgconf-pkg-config libX11-devel libXext-devel mesa-libGL-devel libXrandr-devel libXinerama-devel libXcursor-devel freetype-devel alsa-lib-devel jack-audio-connection-kit-devel lv2-devel
+ fi
+ MTA_DATA_DIR="$data" PYTHONPATH=/usr/lib/mta-audio-editor-server /opt/mta/server-venv/bin/python -m app.optional_plugins --plugins "$MTA_INSTALL_OPTIONAL_VST3" --accept-licenses
+fi
 # Retain complete AI bindings if a later step fails and the wizard is resumed.
 save_checkpoint
 install -d -m 755 "$data"

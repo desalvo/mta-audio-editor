@@ -114,11 +114,16 @@ def _quota_at(c,uid,stamp):
 
 def _extension(c,uid,p,stamp):
     if not p or not p['plan']:return {'included_bytes':None,'quota_bytes':None,'paid_bytes':0,'free_bytes':0}
+    # Storage base remains the original included allowance; quota events record
+    # prospective increases/decreases and free capacity without backdating costs.
     base=json.loads(p['limits']).get('storage_bytes') or 0
     ev=_quota_at(c,uid,stamp)
+    if ev and str(ev['id']).startswith('amend:'):
+        amendment=c.execute('SELECT period_start FROM resource_contract_amendments WHERE id=?',(str(ev['id'])[6:],)).fetchone()
+        if not amendment or amendment[0]!=p['start']:ev=None
     # Existing prepaid purchases remain covered until their original expiry.
     prepaid=c.execute('SELECT coalesce(sum(bytes),0) FROM resource_storage_unlocks WHERE user_id=? AND period_start=? AND created_at<=?',(uid,p['start'],stamp)).fetchone()[0]
-    target=max(base+prepaid,ev['quota_bytes']) if ev else base+prepaid
+    target=(ev['quota_bytes'] if str(ev['id']).startswith('amend:') else max(base+prepaid,ev['quota_bytes'])) if ev else base+prepaid
     extra=max(0,target-base-prepaid);free=min(extra,ev['free_extra_bytes']) if ev else 0
     return {'included_bytes':base,'quota_bytes':target,'paid_bytes':extra-free,'free_bytes':free,'prepaid_bytes':prepaid}
 

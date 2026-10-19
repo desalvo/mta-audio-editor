@@ -113,6 +113,8 @@ async def _mta_application_lifespan(_app):
 app = FastAPI(title="MTA Audio Editor", version=APP_VERSION, docs_url=None, redoc_url=None, openapi_url=None, lifespan=_mta_application_lifespan)
 from .ai_device_auth import router as ai_device_router
 from .ai_notification_routes import router as ai_notification_router
+from .optional_plugin_routes import router as optional_plugin_router
+app.include_router(optional_plugin_router)
 app.include_router(ai_device_router)
 app.include_router(ai_notification_router)
 app.include_router(ai_token_router)
@@ -549,7 +551,7 @@ def _media_job_public(job: dict) -> dict:
 
 def _is_public(path: str) -> bool:
     return (
-        path in {"/api/billing/credits/stripe-webhook", "/privacy/it.pdf", "/privacy/en.pdf", "/terms/it.pdf", "/terms/en.pdf", "/privacy/it/pdf", "/privacy/en/pdf", "/terms/it/pdf", "/terms/en/pdf", "/privacy", "/privacy/it", "/privacy/en", "/terms", "/terms/it", "/terms/en"}
+        path in {"/api/billing/paypal/webhook", "/api/billing/credits/stripe-webhook", "/privacy/it.pdf", "/privacy/en.pdf", "/terms/it.pdf", "/terms/en.pdf", "/privacy/it/pdf", "/privacy/en/pdf", "/terms/it/pdf", "/terms/en/pdf", "/privacy", "/privacy/it", "/privacy/en", "/terms", "/terms/it", "/terms/en"}
         or path.startswith("/static/")
         or path in {"/health", "/api/health", "/api/about", "/oauth-second-factor", "/login", "/register", "/verify-email", "/resend-verification", "/forgot-password", "/reset-password"}
         or path.startswith("/oauth/")
@@ -609,7 +611,7 @@ async def security_middleware(request: Request, call_next):
         return response
 
     # API mutations must carry an explicit same-origin request marker.
-    if request.url.path.startswith("/api/") and request.method not in {"GET", "HEAD", "OPTIONS"} and request.headers.get("x-mta-request") != "1" and not ai_gateway_token_ok and request.url.path!="/api/billing/credits/stripe-webhook":
+    if request.url.path.startswith("/api/") and request.method not in {"GET", "HEAD", "OPTIONS"} and request.headers.get("x-mta-request") != "1" and not ai_gateway_token_ok and request.url.path not in ("/api/billing/credits/stripe-webhook", "/api/billing/paypal/webhook"):
         return HTMLResponse("Missing request integrity header", status_code=403)
 
     # Existing job polling, cancellation and saving results remain available after
@@ -6671,20 +6673,17 @@ def preview_track(pid: str, track_id: str, request: Request, render: bool = Fals
                 preview_track_model.model_dump_json()
                 + f"|{project.bpm}|{project.base_bpm}|{project.pitch_semitones}|{int(render)}"
                 + __import__("app.audio_backend",fromlist=["identity"]).identity()
+                + str(__import__("app.preview_publish",fromlist=["source_identity"]).source_identity(audio_path(pid, track.filename)))
             ).encode("utf-8")
         ).hexdigest()[:20]
         cache = session_preview_dir(pid) / "tracks"
         cache.mkdir(parents=True, exist_ok=True)
         out = cache / f"{track.id}-{signature}.wav"
-        if not out.is_file():
-            render_track_export(
-                preview_track_model,
-                audio_path(pid, track.filename),
-                out,
-                fmt="wav",
-                project=project,
-                apply_inserts=bool(render),
-            )
+        from .preview_publish import publish_wav_preview
+        publish_wav_preview(out, lambda target: render_track_export(
+            preview_track_model, audio_path(pid, track.filename), target,
+            fmt="wav", project=project, apply_inserts=bool(render)))
+        if out.is_file():
             # Keep only the latest few previews per track.
             stale = sorted(cache.glob(f"{track.id}-*.wav"), key=lambda item: item.stat().st_mtime, reverse=True)[4:]
             for path in stale:
@@ -6694,24 +6693,36 @@ def preview_track(pid: str, track_id: str, request: Request, render: bool = Fals
 
 @app.get("/api/projects/{pid}/preview-mix")
 def preview_mix(pid: str, request: Request, format: str = "mp3", render_tracks: bool = True, full_master: bool = False):
-    project = _project_for_actor(request, pid)
-    if format not in {"mp3","wav"}:raise HTTPException(400,"Invalid preview format")
-    out = session_preview_dir(pid) / ("preview-master-"+uuid.uuid4().hex+"."+format)
-    try:
-        validate_project_files(project)
-        preview_project = project.model_copy(deep=True)
-        # Master inserts are rendered server-side, while the master fader is kept
-        # neutral here so the browser can apply master volume live during playback.
-        if not full_master:preview_project.master_volume_db = 0.0
-        if not render_tracks:
-            for track in preview_project.tracks:track.inserts=[]
-        render_mix(preview_project, audio_path, out, fmt=format, bitrate="192k", sample_rate=int(preview_project.sample_rate),wav_bit_depth=32)
-        from starlette.background import BackgroundTask
-
-    except Exception as exc:
-        out.unlink(missing_ok=True)
-        raise HTTPException(400, "preview mix failed") from exc
-    return FileResponse(out, media_type="audio/wav" if format=="wav" else "audio/mpeg", filename="preview-master."+format,background=BackgroundTask(out.unlink,missing_ok=True))
+    from .audio_backend import snapshot_context, identity
+    from .preview_publish import publish_wav_preview, source_identity
+    with snapshot_context():
+        project = _project_for_actor(request, pid)
+        if format not in {"mp3", "wav"}:raise HTTPException(400, "Invalid preview format")
+        try:
+            validate_project_files(project)
+            preview_project = project.model_copy(deep=True)
+            if not full_master:preview_project.master_volume_db = 0.0
+            if not render_tracks:
+                for track in preview_project.tracks:track.inserts = []
+            # Deterministic process-local cache, outside user workspaces/exports.
+            # Source identity and engine participate; do not hash entire media.
+            sources = [source_identity(audio_path(pid, t.filename)) for t in project.tracks]
+            signature = hashlib.sha256((preview_project.model_dump_json() + identity() + str(sources)).encode()).hexdigest()[:24]
+            out = session_preview_dir(pid) / ("preview-master-" + signature + "." + format)
+            def render_target(target):
+                render_mix(preview_project, audio_path, target, fmt=format, bitrate="192k", sample_rate=int(preview_project.sample_rate), wav_bit_depth=32)
+            if format == 'wav':
+                publish_wav_preview(out, render_target)
+                stale=sorted(session_preview_dir(pid).glob('preview-master-*.wav'),key=lambda p:p.stat().st_mtime,reverse=True)[2:]
+                for path in stale:
+                    if path != out:
+                        try:path.unlink(missing_ok=True)
+                        except OSError:pass  # A Windows decoder may still hold it open.
+            else:
+                render_target(out)
+        except Exception as exc:
+            raise HTTPException(400, "preview mix failed") from exc
+        return FileResponse(out, media_type="audio/wav" if format == "wav" else "audio/mpeg", filename="preview-master." + format)
 
 
 @app.delete("/api/projects/{pid}/preview-cache")

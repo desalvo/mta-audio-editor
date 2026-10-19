@@ -177,7 +177,7 @@ const audioCtx={createGain(){return {gain:{value:0},connect(){}}},destination:{}
 waMasterMixMode=false;waBuildMasterGraph();assert.ok(Math.abs(masterPlaybackGainNode.gain.value-Math.pow(10,-12/20))<1e-8);"""
     subprocess.run(['node','-e',setup+'\nfunction dbToGain(v){return Math.pow(10,v/20)}\n'+graph+check],check=True)
     decode=function('waDecodeMasterMix')
-    setup="""const assert=require('assert');let url,waRenderFilters=false,current={id:'p'};
+    setup="""const assert=require('assert');let url,projectDirty=false,waRenderFilters=false,current={id:'p'};
 async function persistCurrentProject(){}function tr(en){return en}
 const audioCtx={async decodeAudioData(){return 'buffer'}};
 async function fetch(value){url=value;return {ok:true,async arrayBuffer(){return new ArrayBuffer(1)}}}

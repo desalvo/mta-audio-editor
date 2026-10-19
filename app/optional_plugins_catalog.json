@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "reviewed_at": "2026-10-19",
+  "review_interval_days": 90,
+  "plugins": [
+    {
+      "repo": "DISTRHO/MVerb",
+      "id": "mverb",
+      "name": "MVerb",
+      "category": "Reverb",
+      "builder": "dpf",
+      "targets": [
+        "plugins/MVerb"
+      ],
+      "revision": "5ae9f571642822bbc6b9d2e113e3fb0aada36f93",
+      "license": "GPL-3.0-or-later",
+      "license_file": "mverb.txt",
+      "enabled": true,
+      "platforms": [
+        "linux",
+        "darwin",
+        "win32"
+      ],
+      "distribution": "local-source-build",
+      "license_sha256": "c61f12da7cdad526bdcbed47a4c0a603e60dbbfdaf8b66933cd088e9132c303f"
+    },
+    {
+      "repo": "michaelwillis/dragonfly-reverb",
+      "id": "dragonfly",
+      "name": "Dragonfly Reverb suite",
+      "category": "Reverb",
+      "builder": "dpf",
+      "targets": [
+        "plugins/dragonfly-hall-reverb",
+        "plugins/dragonfly-room-reverb",
+        "plugins/dragonfly-plate-reverb",
+        "plugins/dragonfly-early-reflections"
+      ],
+      "revision": "440ec7b3b3db2fec34b9f80cf4890102ca14d1c3",
+      "license": "GPL-3.0",
+      "license_file": "dragonfly.txt",
+      "enabled": true,
+      "platforms": [
+        "linux",
+        "darwin",
+        "win32"
+      ],
+      "distribution": "local-source-build",
+      "license_sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    {
+      "repo": "jatinchowdhury18/AnalogTapeModel",
+      "id": "chow-tape",
+      "name": "CHOW Tape Model",
+      "category": "Saturation / Tape",
+      "builder": "cmake",
+      "targets": [
+        "CHOWTapeModel_VST3"
+      ],
+      "revision": "604372e4ffd9690c3e283362e4598cb43edbb475",
+      "license": "GPL-3.0",
+      "license_file": "chow-tape.txt",
+      "enabled": true,
+      "platforms": [
+        "linux",
+        "darwin",
+        "win32"
+      ],
+      "distribution": "local-source-build",
+      "license_sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "source_subdir": "Plugin"
+    },
+    {
+      "repo": "surge-synthesizer/surge",
+      "id": "surge-xt",
+      "name": "Surge XT",
+      "category": "Instruments / Synthesizers",
+      "builder": "cmake",
+      "targets": [
+        "surge-xt_VST3",
+        "surge-fx_VST3"
+      ],
+      "revision": "4f0da4e423a675cb9c2c3e34ca3d381b43875324",
+      "license": "GPL-3.0",
+      "license_file": "surge-xt.txt",
+      "enabled": true,
+      "platforms": [
+        "linux",
+        "darwin",
+        "win32"
+      ],
+      "distribution": "local-source-build",
+      "license_sha256": "d4c0fe570b3750d909691ce5f494c9cd11ee047bbbedda9a5d75cc548e4df06b"
+    }
+  ]
+}

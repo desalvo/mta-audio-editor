@@ -134,10 +134,10 @@ class SharedSource:
 
 
 class Graph:
-    def __init__(self,project,paths,start_frame=0,*,tail_seconds=2,reuse=None):
+    def __init__(self,project,paths,start_frame=0,*,tail_seconds=2,reuse=None,raw_sources=()):
         from .audio_engine import project_duration_ms,project_time_pitch_filter
         if not 1<=len(project.tracks)<=64:raise ValueError('Live mixing supports 1–64 tracks')
-        self.reuse=reuse or {};self.project=project;self.rate=int(project.sample_rate);self.core=runtime();self.readers=[];self.plugins={};self.offset=0
+        self.reuse=reuse or {};self.project=project;self.rate=int(project.sample_rate);self.core=runtime();self.readers=[];self.plugins={};self.offset=0;self.raw_sources=set(raw_sources)
         from .vst3_transport import HostClock
         self.host=HostClock(project,self.rate)
         self.input_total=round(project_duration_ms(project)*self.rate/1000)
@@ -156,7 +156,7 @@ class Graph:
                     continue
                 reader=sf.SoundFile(str(path));self.readers.append(reader);reader.seek(min(reader.frames,self.source_start))
                 if reader.samplerate!=self.rate or reader.channels not in (1,2):raise ValueError('Live source format mismatch')
-                self.sources[t.id]=SharedSource(self.source(reader,t))
+                self.sources[t.id]=SharedSource(self.raw_source(reader,t) if t.id in self.raw_sources else self.source(reader,t))
                 nodes=self.nodes(t.inserts,t.id,reader.channels)
                 self.route_pulls.append(Pull(pipeline(self.sources[t.id].subscribe(),nodes),2 if any(isinstance(x,Vst) for x in nodes) else reader.channels))
             master=self.nodes(project.master_inserts,'master',2)
@@ -197,6 +197,32 @@ class Graph:
         for at in range(self.source_start,total,BLOCK):
             data=np.zeros((min(BLOCK,total-at),reader.channels),dtype=np.float32)
             part=reader.read(len(data),dtype='float32',always_2d=True);data[:len(part)]=part
+            self.core.gain(data,10**(float(track.gain_db)/20));yield data
+
+    def raw_source(self,reader,track):
+        # Read only intersecting source frames, with bounded block memory. Clip
+        # placement and negative delay are applied here, before gain and inserts.
+        clips=sorted(track.clips,key=lambda c:c.timeline_start_ms)
+        spans=[]
+        for clip in clips:
+            start=round((clip.timeline_start_ms+track.delay_ms)*self.rate/1000)
+            source=round(clip.source_start_ms*self.rate/1000)
+            length=round((clip.source_end_ms-clip.source_start_ms)*self.rate/1000)
+            spans.append((start,start+length,source))
+        index=0
+        for at in range(self.source_start,self.input_total+self.rate*12,BLOCK):
+            data=np.zeros((BLOCK,reader.channels),dtype=np.float32)
+            while index<len(spans) and spans[index][1]<=at:index+=1
+            for n in range(index,len(spans)):
+                start,end,source=spans[n]
+                if start>=at+BLOCK:break
+                left=max(at,start);right=min(at+BLOCK,end)
+                if right<=left:continue
+                offset=source+left-start
+                if offset>=reader.frames:continue
+                reader.seek(max(0,offset))
+                part=reader.read(min(right-left,reader.frames-offset),dtype='float32',always_2d=True)
+                data[left-at:left-at+len(part)]+=part
             self.core.gain(data,10**(float(track.gain_db)/20));yield data
 
     def midi_source(self,node,track):

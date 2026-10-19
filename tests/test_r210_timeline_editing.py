@@ -225,7 +225,7 @@ c.togglePlayback();assert.equal(c.resumed,1);c.waPlaybackPaused=false;c.togglePl
 
 def test_loading_audio_retries_if_a_segment_moves_during_decode():
     code = r'''const fs=require('fs'),vm=require('vm'),assert=require('assert'),s=fs.readFileSync('app/static/app.js','utf8');
-const c={current:{id:'p',tracks:[{id:'t',delay_ms:1}]},timelineAudioRevision:0,calls:0,saves:0,tr:x=>x,async persistCurrentProject(){c.saves++},async waDecodeTrack(t){const value=t.delay_ms;c.calls++;if(c.calls===1){c.current.tracks[0].delay_ms=2;c.timelineAudioRevision++}return value}};vm.createContext(c);
+const c={current:{id:'p',tracks:[{id:'t',delay_ms:1}]},timelineAudioRevision:0,projectDirty:true,calls:0,saves:0,tr:x=>x,waPrepUpdate(){},async persistCurrentProject(){c.saves++;c.projectDirty=false},async waDecodeTrack(t){const value=t.delay_ms;c.calls++;if(c.calls===1){c.current.tracks[0].delay_ms=2;c.timelineAudioRevision++;c.projectDirty=true}return value}};vm.createContext(c);vm.runInContext(fs.readFileSync('app/static/playback_prep.js','utf8'),c);
 vm.runInContext(s.slice(s.indexOf('async function prepareTimelinePlaybackBuffers('),s.indexOf('async function startWebAudioProjectPlayback(')),c);
 (async()=>{const result=await c.prepareTimelinePlaybackBuffers(false);assert.equal(c.calls,2);assert.equal(c.saves,2);assert.equal(result.buffers[0],2)})().catch(e=>{console.error(e);process.exitCode=1});
 '''

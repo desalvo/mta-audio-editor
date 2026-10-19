@@ -40,14 +40,14 @@ def command(config):
 
 
 class Session:
-    def __init__(self,project,paths,cursor_ms,cancelled=lambda:False,*,_test_null=False,paused=False,output='device',startup_timeout=60,monitor=False,midi_options=None,original_editor=True,host_transport=None):
+    def __init__(self,project,paths,cursor_ms,cancelled=lambda:False,*,_test_null=False,paused=False,output='device',startup_timeout=60,monitor=False,midi_options=None,original_editor=True,host_transport=None,raw_sources=(),on_progress=None):
         if not available():raise RuntimeError('Live VST3 requires the native Pedalboard/PyAV runtime. Update this application.')
         self.project=project.model_copy(deep=True);self.lock=threading.RLock();self.root=tempfile.TemporaryDirectory(prefix='mta-vst3-live-');self.path=Path(self.root.name);self.proc=None;self.midi_output=None;self.midi_options=midi_options or {}
         if output not in ('device','browser'):raise ValueError('Invalid live output')
         self.process_group=output=='browser' and os.name=='posix'
         self.log=(self.path/'worker.log').open('wb');self.closed=False;self.last={};self.edited=False
         config=self.path/'config.json'
-        atomic(config,{'project':project.model_dump(mode='json'),'paths':[str(p) for p in paths],'cursor_ms':cursor_ms,'test_null':_test_null,'paused':paused,'output':output,'monitor':monitor,'midi_options':midi_options or {},'original_editor':original_editor,'host_transport':host_transport})
+        atomic(config,{'project':project.model_dump(mode='json'),'paths':[str(p) for p in paths],'cursor_ms':cursor_ms,'test_null':_test_null,'paused':paused,'output':output,'monitor':monitor,'midi_options':midi_options or {},'original_editor':original_editor,'host_transport':host_transport,'raw_sources':list(raw_sources)})
         try:
             worker_env=None
             if output=='browser':
@@ -57,6 +57,10 @@ class Session:
             self.proc=subprocess.Popen(command(config),env=worker_env,stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=self.log,start_new_session=self.process_group)
             deadline=time.monotonic()+startup_timeout
             while not (self.path/'ready.json').exists():
+                progress=self.path/'preparation.json'
+                if on_progress and progress.is_file() and progress.stat().st_size<16384:
+                    try:on_progress(json.loads(progress.read_text()))
+                    except (OSError,ValueError):pass
                 if cancelled():raise RuntimeError('Native playback preparation cancelled')
                 if self.proc.poll() is not None:raise RuntimeError('Live VST3 worker failed to start: '+self.error())
                 if time.monotonic()>deadline:raise RuntimeError('Live VST3 initialization timed out')
@@ -162,7 +166,7 @@ def run(config):
     from .vst3_live_graph import Graph,BLOCK
     project=Project.model_validate(cfg['project']);paths=cfg['paths'];lock=threading.RLock();quit=threading.Event();editor_close=threading.Event();editors=Queue();builds=Queue();editor_active=threading.Event();graph=None;device=None;midi_input=None;midi_output=None
     try:
-        graph=Graph(project,paths,round(cfg['cursor_ms']*project.sample_rate/1000))
+        graph=Graph(project,paths,round(cfg['cursor_ms']*project.sample_rate/1000),raw_sources=cfg.get('raw_sources',()))
         device=StreamDevice(graph.rate,graph.total,_test_null=cfg.get('test_null') is True)
         from .midi_devices import Input
         options=cfg.get('midi_options',{})
@@ -180,7 +184,7 @@ def run(config):
             wanted={(route,i.id):i.params.get('path') for route,items in [(t.id,t.inserts) for t in new.tracks]+[('master',new.master_inserts)] for i in items if i.enabled and i.plugin=='vst3'}
             wanted.update({(t.id,'instrument'):t.instrument.params.get('path') for t in new.tracks if t.kind=='midi' and t.instrument and t.instrument.enabled})
             existing={key:node.item.params.get('path') for key,node in graph.plugins.items()}
-            if wanted==existing:return Graph(new,paths,position,reuse=graph.plugins)
+            if wanted==existing:return Graph(new,paths,position,reuse=graph.plugins,raw_sources=cfg.get('raw_sources',()))
             if editor_active.is_set():raise RuntimeError('Close the live plugin editor before changing the effect chain')
             task={'project':new,'position':position,'done':threading.Event()};builds.put(task)
             if not task['done'].wait(30):raise RuntimeError('Live graph initialization timed out')
@@ -251,7 +255,7 @@ def run(config):
         while not quit.is_set():
             try:
                 task=builds.get_nowait()
-                try:task['graph']=Graph(task['project'],paths,task['position'])
+                try:task['graph']=Graph(task['project'],paths,task['position'],raw_sources=cfg.get('raw_sources',()))
                 except Exception as e:task['error']=str(e)
                 finally:task['done'].set()
             except Empty:pass

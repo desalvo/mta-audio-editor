@@ -1782,7 +1782,7 @@ function inspectorHtml(){
 function closeInspectorPanel(){if(!current)return;current.inspector_visible=false;render();markDirty(80)}
 
 function insertPanelHtml(owner,isMaster,trackId=''){const inserts=owner.inserts||owner.master_inserts||[];return `<div class="panel-section"><div class="panel-section-title"><span>⌄ Inserts</span><span>${inserts.length}/16</span></div><div class="insert-list">${inserts.map((x,n)=>insertHtml(x,n,isMaster,trackId)).join('')||'<div class="hint" style="padding:7px">No inserts configured.</div>'}</div>${insertAddHtml(isMaster,trackId)}</div>`}
-function pluginLabel(x){return x==='vst3'?(currentUser?.native_single_user?'VST3':tr('VST3 (server)','VST3 (server)')):x.replaceAll('_',' ').replace(/\b\w/g,c=>c.toUpperCase())}
+function pluginLabel(x){if(x==='reverb_lexicon')return 'Lexicon-style reverb';return x==='vst3'?(currentUser?.native_single_user?'VST3':tr('VST3 (server)','VST3 (server)')):x.replaceAll('_',' ').replace(/\b\w/g,c=>c.toUpperCase())}
 function insertHtml(x,n,isMaster,trackId=''){
   const presets=pluginInfo.inserts?.[x.plugin]||['default'];
   const all=x.plugin==='vst3'?['Installed plugin']:(x.params&&Object.keys(x.params).length&&!presets.includes(x.preset))?[...presets,x.preset]:presets;
@@ -1992,6 +1992,18 @@ function insertSetupIcon(theme){
   const paths={eq:`<path d="M4 18V8M10 18V4M16 18v-9M22 18v-5"/><path d="M2 18h24"/>`,dynamics:`<path d="M3 19h22M3 19V3"/><path d="m5 16 5-6 4-2 4-1 6-1"/><circle cx="14" cy="8" r="2"/>`,space:`<circle cx="14" cy="12" r="3"/><path d="M7 5a11 11 0 0 0 0 14M21 5a11 11 0 0 1 0 14M3 1a17 17 0 0 0 0 22M25 1a17 17 0 0 1 0 22"/>`,delay:`<path d="M3 7h13a7 7 0 1 1-7 7"/><path d="m12 11-3 3 3 3"/><circle cx="20" cy="7" r="2"/>`,saturation:`<path d="M3 14c3-16 5 16 9 0s6-12 12 0"/><path d="M3 3v22M3 14h22"/>`,modulation:`<path d="M2 16q3-12 6 0t6 0t6 0t6 0"/><path d="M2 23q3-12 6 0t6 0t6 0t6 0"/>`,studio:`<rect x="4" y="4" width="20" height="20" rx="4"/><circle cx="14" cy="14" r="6"/><circle cx="14" cy="14" r="2"/>`,vst3:`<rect x="3" y="4" width="22" height="20" rx="4"/><path d="M8 11h12M8 17h12M11 8v12M17 8v12"/>`};
   return `<span class="insert-setup-icon" aria-hidden="true"><svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${paths[theme]||paths.studio}</svg></span>`;
 }
+function insertSetupArtwork(theme){
+  const curves={
+    space:Array.from({length:9},(_,i)=>`<ellipse cx="360" cy="88" rx="${35+i*31}" ry="${12+i*7}" opacity="${.85-i*.07}" transform="rotate(${i*9-35} 360 88)"/>`).join(''),
+    delay:Array.from({length:12},(_,i)=>`<path d="M${35+i*58} 132v-${100*Math.exp(-i/5)}" opacity="${1-i*.06}" stroke-width="${7-i*.3}"/>`).join(''),
+    eq:'<path d="M15 112C100 115 105 60 155 73S240 141 300 97S390 24 440 63S520 117 565 87S653 40 705 58"/>',
+    dynamics:'<path d="M30 140L260 87Q330 66 405 56L695 23"/><path d="M30 140L695 10" opacity=".16" stroke-dasharray="4 8"/>',
+    saturation:'<path d="M10 90C50-35 65-35 100 90S150 215 190 90S240-35 280 90S330 215 370 90S420-35 460 90S510 215 550 90S600-35 640 90S690 215 730 90"/>',
+    modulation:'<path d="M0 85Q45 10 90 85T270 85T450 85T630 85T810 85"/><path d="M0 105Q45 30 90 105T270 105T450 105T630 105T810 105" opacity=".3"/>',
+    studio:'<circle cx="360" cy="88" r="65"/><circle cx="360" cy="88" r="40"/><path d="M60 88H265M455 88H660"/>'
+  };
+  return `<div class="fx-artwork" aria-hidden="true"><svg viewBox="0 0 720 176" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path class="fx-art-grid" d="M0 44H720M0 88H720M0 132H720M120 0V176M240 0V176M360 0V176M480 0V176M600 0V176"/>${curves[theme]||curves.studio}</svg></div>`;
+}
 function openInsertEditor(isMaster,id,trackId=''){
   const x=insertArray(isMaster,trackId)?.find(p=>p.id===id);if(!x)return;
   if(x.plugin==='vst3'){openVst3Config(isMaster,id,trackId);return;}
@@ -2002,7 +2014,7 @@ function openInsertEditor(isMaster,id,trackId=''){
   const fields=x.plugin==='graphic_eq_32'
     ?graphicEqEditorFields(schema,params,isMaster,id,trackId)
     :Object.entries(schema).map(([k,v])=>{const value=Number(params[k]??v.default);return `<label class="plugin-field plugin-field-knob"><span>${esc(k.replaceAll('_',' '))}</span><div class="plugin-control-pair"><div class="plugin-knob-shell" style="--knob-turn:${-135+((value-Number(v.min))/(Number(v.max)-Number(v.min)||1))*270}deg" title="${esc(k.replaceAll('_',' '))}"><input class="plugin-knob" data-knob-key="${k}" type="range" min="${v.min}" max="${v.max}" step="${v.step}" value="${value}" oninput="livePluginControlChanged('${k}',this.value,'knob',${isMaster},'${id}','${trackId}')"></div><input class="plugin-param plugin-number" id="plugin-param-${k}" data-key="${k}" type="number" min="${v.min}" max="${v.max}" step="${v.step}" value="${value}" oninput="livePluginControlChanged('${k}',this.value,'number',${isMaster},'${id}','${trackId}')" onblur="commitPluginEditorParams(${isMaster},'${id}','${trackId}')" onkeydown="pluginNumberKey(event,${isMaster},'${id}','${trackId}')"></div><small>${v.min} … ${v.max}</small></label>`}).join('');
-  const editorInner=`<div class="insert-setup-hero">${insertSetupIcon(theme)}<div class="insert-setup-overline">Insert FX</div><div class="insert-setup-title">${esc(pluginTitle)}</div><div class="insert-setup-subtitle">${esc(ownerLabel)} · setup</div></div><div class="insert-setup-panel"><label class="plugin-preset-row"><span>Preset</span><select onchange="editorPresetChanged(${isMaster},'${id}',this.value,'${trackId}')">${presets.map(p=>`<option value="${esc(p)}" ${p===x.preset?'selected':''}>${esc(p)}</option>`).join('')}</select></label><p class="hint">Il preset selezionato viene applicato realmente alla catena audio. I controlli sotto servono per creare una configurazione custom.</p><p class="hint">${x.plugin==='graphic_eq_32'?'Trascina graficamente i 32 fader di banda.':'Custom values are validated server-side.'}</p><div class="${x.plugin==='graphic_eq_32'?'':'plugin-param-grid'}">${fields||'<p class="hint">This processor currently exposes factory presets only.</p>'}</div><label class="preset-save-name"><span>Custom preset name</span><input id="customPresetName" maxlength="80" placeholder="My preset"></label><div class="modal-actions insert-setup-actions"><button onclick="applyInsertConfig(${isMaster},'${id}',false,'${trackId}')">Apply custom</button><button onclick="applyInsertConfig(${isMaster},'${id}',true,'${trackId}')">Save preset & apply</button><button onclick="${trackId||isMaster?`openMixerInsertManager('${trackId||'master'}')`:'closeExportMapping()'}">Cancel</button></div></div>`;
+  const editorInner=`${insertSetupArtwork(theme)}<div class="insert-setup-hero">${insertSetupIcon(theme)}<div class="insert-setup-overline">Insert FX</div><div class="insert-setup-title">${esc(pluginTitle)}</div><div class="insert-setup-subtitle">${esc(ownerLabel)} · setup</div></div><div class="insert-setup-panel"><label class="plugin-preset-row"><span>Preset</span><select onchange="editorPresetChanged(${isMaster},'${id}',this.value,'${trackId}')">${presets.map(p=>`<option value="${esc(p)}" ${p===x.preset?'selected':''}>${esc(p)}</option>`).join('')}</select></label><p class="hint">Il preset selezionato viene applicato realmente alla catena audio. I controlli sotto servono per creare una configurazione custom.</p><p class="hint">${x.plugin==='graphic_eq_32'?'Trascina graficamente i 32 fader di banda.':'Custom values are validated server-side.'}</p><div class="${x.plugin==='graphic_eq_32'?'':'plugin-param-grid'}">${fields||'<p class="hint">This processor currently exposes factory presets only.</p>'}</div><label class="preset-save-name"><span>Custom preset name</span><input id="customPresetName" maxlength="80" placeholder="My preset"></label><div class="modal-actions insert-setup-actions"><button onclick="applyInsertConfig(${isMaster},'${id}',false,'${trackId}')">Apply custom</button><button onclick="applyInsertConfig(${isMaster},'${id}',true,'${trackId}')">Save preset & apply</button><button onclick="${trackId||isMaster?`openMixerInsertManager('${trackId||'master'}')`:'closeExportMapping()'}">Cancel</button></div></div>`;
   const editorHtml=`<div class="insert-plugin-setup insert-theme-${theme}">${editorInner}</div>`;
   if(trackId||isMaster){
     showUtilityModal(`${pluginTitle} configuration`,editorHtml);
@@ -3789,6 +3801,9 @@ function schedulePlaybackPrewarm(delay=120){
   playbackWarmTimer=setTimeout(()=>{playbackWarmTimer=null;void prewarmPlaybackSources()},delay);
 }
 async function prewarmPlaybackSources(){
+  // WebAudio uses decoded buffers, not these HTMLAudioElements. Do not start
+  // competing full downloads/render requests at project open.
+  if(typeof MtaPlaybackPrep!=='undefined')return;
   if(!current||playAudio||trackPlaybacks.length||playbackBuffering)return;
   const sig=playbackWarmStateSignature();
   if(playbackWarmProjectId===current.id&&playbackWarmSignature===sig&&playbackWarmCache.size===(current.tracks||[]).length)return;
@@ -4885,7 +4900,7 @@ async function openNativeVst3Manager(){
   try{
     const result=await api('/api/vst3/plugins');
     const rows=(result.plugins||[]).map(p=>`<tr><td>${esc(p.name)}</td><td class="hint">${esc(p.path)}</td></tr>`).join('');
-    showUtilityModal('VST3 plugins',`<div class="form-grid"><p><b>Audio host:</b> ${result.available?'Pedalboard (offline render)':'Unavailable · install optional runtime'}</p><p class="hint">Original plugin windows and saved plugin state are supported. VST3 processing uses prepared audio; live low-latency hosting and MIDI instruments are not yet available. Plug-ins are third-party executables: install only trusted software.</p><div class="table-scroll"><table><thead><tr><th>Plugin</th><th>Path</th></tr></thead><tbody>${rows||'<tr><td colspan="2">No installed plugins detected</td></tr>'}</tbody></table></div><div class="form-actions"><button onclick="openNativeVst3Manager()">Rescan</button><button onclick="showNativeSettings()">Settings</button></div></div>`);
+    showUtilityModal('VST3 plugins',`<div class="form-grid"><p><b>Audio host:</b> ${result.available?(result.engine==='cpp'?tr('C++ live / offline','C++ live / offline'):tr('Prepared audio / offline','Audio preparato / offline')):tr('Unavailable · install optional runtime','Non disponibile · installare runtime opzionale')}</p><p class="hint">Original editors, live hosting and MIDI instruments are supported by the C++ engine. The current engine uses prepared audio. Plug-ins are third-party executables: install only trusted software.</p><div class="table-scroll"><table><thead><tr><th>Plugin</th><th>Path</th></tr></thead><tbody>${rows||'<tr><td colspan="2">No installed plugins detected</td></tr>'}</tbody></table></div><div class="form-actions"><button onclick="openNativeVst3Manager()">Rescan</button><button onclick="openOptionalVst3()">${tr('Install optional open-source plugins','Installa plugin open-source opzionali')}</button><button onclick="showNativeSettings()">Settings</button></div></div>`);
   }catch(e){showUtilityModal('VST3 plugins',`<p>${esc(e.message)}</p><button onclick="showNativeSettings()">Settings</button>`)}
 }
 async function showNativeSettings(){
@@ -5414,7 +5429,7 @@ function metaPanelBodyHtml(expanded=false){
 }
 
 /* r189 deterministic WebAudio transport: one AudioContext clock, one scheduled source per track. */
-let waPlaybackActive=false,waPlaybackPaused=false,waRenderFilters=false,waStartCtxTime=0,waStartCursorMs=0,waMasterBus=null,waDecodedBuffers=new Map(),waMasterMixMode=false,waMasterRefreshTimer=null;
+let waPlaybackActive=false,waPlaybackPaused=false,waRenderFilters=false,waStartCtxTime=0,waStartCursorMs=0,waMasterBus=null,waDecodedBuffers=new MtaPlaybackPrep.BufferCache(),waMasterMixMode=false,waMasterRefreshTimer=null;
 function waProjectCursorMs(){
   if(!waPlaybackActive||!audioCtx)return playCursorMs;
   if(waPlaybackPaused)return waStartCursorMs;
@@ -5424,11 +5439,11 @@ function waMediaOffsetSeconds(cursorMs){return Math.max(0,Number(cursorMs||0)/10
 function waTrackGain(track,item=null){return trackAudibleNow(track)?dbToGain(Number(track?.volume_db||0)+(item?.gainBaked?0:trackGainDb(track))):0}
 function waDisconnectItem(item,stop=true){
   if(!item)return;
-  try{if(stop)item.sourceNode?.stop()}catch(e){}
+  for(const source of item.sourceNodes||[item.sourceNode]){try{if(stop)source?.stop();source?.disconnect()}catch(e){}}
   for(const node of [item.sourceNode,item.gainNode,item.panner,item.splitter,...(item.analysers||[])])try{node?.disconnect()}catch(e){}
   item.sourceNode=null;
 }
-function waStopSources(){for(const item of trackPlaybacks)if(item.wa)waDisconnectItem(item,true)}
+function waStopSources(){for(const item of trackPlaybacks)if(item.wa){for(const node of item.sourceNodes||[item.sourceNode])try{node?.stop();node?.disconnect()}catch(e){}item.sourceNodes=[];item.sourceNode=null}}
 function waCreateTrackGraph(track,buffer,renderFilters=false){
   const gainBaked=trackGainBaked(track,renderFilters);
   const gainNode=audioCtx.createGain(),panner=audioCtx.createStereoPanner();
@@ -5439,16 +5454,35 @@ function waCreateTrackGraph(track,buffer,renderFilters=false){
     if(Number(track?.channels||buffer?.numberOfChannels||2)===1){const a=audioCtx.createAnalyser();a.fftSize=1024;panner.connect(a);analysers.push(a)}
     else{splitter=audioCtx.createChannelSplitter(2);const l=audioCtx.createAnalyser(),r=audioCtx.createAnalyser();l.fftSize=r.fftSize=1024;panner.connect(splitter);splitter.connect(l,0);splitter.connect(r,1);analysers.push(l,r)}
   }
-  return {trackId:track.id,wa:true,gainBaked,buffer,gainNode,panner,analysers,splitter,channels:Number(track?.channels||buffer?.numberOfChannels||2),respectMuteSolo:true,meterData:{}};
+  return {trackId:track.id,wa:true,rawTimeline:waRawTimelineBuffers.has(buffer),gainBaked,buffer,gainNode,panner,analysers,splitter,channels:Number(track?.channels||buffer?.numberOfChannels||2),respectMuteSolo:true,meterData:{}};
 }
-function invalidateTrackAudioCache(trackId){const needle=`:${trackId}:`;for(const key of [...waDecodedBuffers.keys()])if(String(key).includes(needle))waDecodedBuffers.delete(key)}
+function invalidateTrackAudioCache(trackId){const needle=`:${trackId}:`;for(const key of [...waDecodedBuffers.keys()])if(String(key).includes(needle)&&!String(key).includes(':raw:'))waDecodedBuffers.delete(key)}
+function waSourceForTrack(track,renderFilters){
+  const dry=track.kind!=='midi'&&track.filename&&!(renderFilters&&(track.inserts||[]).some(x=>x.enabled))&&Math.abs(Number(current?.pitch_semitones||0))<.001&&Math.abs(tempoRatio()-1)<.000001;
+  return dry?{direct:true,rawTimeline:true,url:`/api/projects/${current.id}/audio/${encodeURIComponent(track.filename)}`}:{...playbackSourceForTrack(track,renderFilters),rawTimeline:false};
+}
+const waRawTimelineBuffers=new WeakSet();
+let waPreparation=null;
+function waPrepUpdate(phase,track='',done=null,total=null){
+  const p=waPreparation;if(!p)return;
+  if(done!==null)p.done=done;if(total!==null)p.total=total;
+  p.phase=phase;p.track=track;
+  const elapsed=Math.round((performance.now()-p.started)/1000),count=p.total?`${p.done}/${p.total}`:'';
+  showMediaProgress(tr('Preparing audio','Preparazione audio'),p.total?Math.min(95,5+p.done/p.total*88):-1,phase+(track?' · '+track:''),`${count} · ${elapsed}s`);
+}
 async function waDecodeTrack(track,renderFilters,cacheBust=false){
-  const info=playbackSourceForTrack(track,renderFilters),revision=String(track?.waveform_revision||'0'),key=`${current.id}:${track.id}:${renderFilters?1:0}:${revision}:${info.url}`;
-  if(!cacheBust&&waDecodedBuffers.has(key))return waDecodedBuffers.get(key);
-  const url=info.url+(info.url.includes('?')?'&':'?')+`wa=${encodeURIComponent(cacheBust?Date.now():revision)}`;
-  const resp=await fetch(url);if(!resp.ok)throw new Error(`Audio ${track.name}: ${resp.status}`);
-  const ab=await resp.arrayBuffer();const buffer=await audioCtx.decodeAudioData(ab.slice(0));
-  waDecodedBuffers.set(key,buffer);return buffer;
+  const info=waSourceForTrack(track,renderFilters),revision=String(track?.waveform_revision||'0'),key=`${current.id}:${track.id}:${info.rawTimeline?'raw':renderFilters?1:0}:${revision}:${info.url}`;
+  if(cacheBust)waDecodedBuffers.delete(key);
+  const buffer=await waDecodedBuffers.get(key,async()=>{
+    const url=info.url+(info.url.includes('?')?'&':'?')+`wa=${encodeURIComponent(cacheBust?Date.now():revision)}`;
+    waPrepUpdate(info.rawTimeline?tr('Loading source audio','Caricamento sorgente audio'):tr('Rendering timeline / inserts on server','Rendering timeline / insert sul server'),track.name);
+    const resp=await fetch(url);if(!resp.ok)throw new Error(`Audio ${track.name}: ${resp.status}`);
+    const ab=await resp.arrayBuffer();waPrepUpdate(tr('Decoding audio','Decodifica audio'),track.name);
+    // decodeAudioData takes ownership: cloning large PCM payloads doubles RAM.
+    return audioCtx.decodeAudioData(ab);
+  });
+  if(info.rawTimeline)waRawTimelineBuffers.add(buffer);
+  return buffer;
 }
 let waMasterRefreshBusy=false,waMasterRefreshQueued=false;
 function queueWebAudioMasterRefresh(){
@@ -5479,7 +5513,7 @@ async function refreshWebAudioMasterMix(){
   finally{waMasterRefreshBusy=false;if(waMasterRefreshQueued){waMasterRefreshQueued=false;queueWebAudioMasterRefresh();}}
 }
 async function waDecodeMasterMix(renderFilters){
-  const pid=current.id;await persistCurrentProject(false);
+  const pid=current.id;if(projectDirty)await persistCurrentProject(false);
   const response=await fetch(`/api/projects/${pid}/preview-mix?format=wav&full_master=true&render_tracks=${renderFilters?'true':'false'}`);
   if(!response.ok)throw Error(tr('Master processing failed','Processing master fallito'));
   const buffer=await audioCtx.decodeAudioData(await response.arrayBuffer());
@@ -5493,12 +5527,14 @@ function waBuildMasterGraph(){
   if(current?.realtime_meter_enabled){const split=audioCtx.createChannelSplitter(2),l=audioCtx.createAnalyser(),r=audioCtx.createAnalyser();l.fftSize=r.fftSize=1024;masterPlaybackGainNode.connect(split);split.connect(l,0);split.connect(r,1);masterMeterAnalysers=[l,r];masterMeterAnalysers.meterData={};masterMeterAnalysers.splitter=split}
 }
 function waScheduleItem(item,startAt,cursorMs,fadeIn=false){
-  const source=audioCtx.createBufferSource();source.buffer=item.buffer;source.connect(item.gainNode);item.sourceNode=source;
-  const offset=waMediaOffsetSeconds(cursorMs);if(offset>=item.buffer.duration)return;
+  const raw=!item.masterMix&&item.rawTimeline;
+  const segments=raw?MtaPlaybackPrep.clipPlan(trackById(item.trackId),item.buffer.duration,waMediaOffsetSeconds(cursorMs)):[{when:0,offset:waMediaOffsetSeconds(cursorMs),duration:item.buffer.duration-waMediaOffsetSeconds(cursorMs)}];
+  item.sourceNodes=[];
+  const offset=waMediaOffsetSeconds(cursorMs);if(!raw&&offset>=item.buffer.duration)return;
   const target=item.masterMix?1:waTrackGain(trackById(item.trackId),item);
   if(fadeIn){item.gainNode.gain.cancelScheduledValues(startAt);item.gainNode.gain.setValueAtTime(0,startAt);item.gainNode.gain.linearRampToValueAtTime(target,startAt+.012)}
   else item.gainNode.gain.setValueAtTime(target,startAt);
-  source.start(startAt,offset);
+  for(const segment of segments){if(segment.duration<=0)continue;const source=audioCtx.createBufferSource();source.buffer=item.buffer;source.connect(item.gainNode);item.sourceNode=source;item.sourceNodes.push(source);source.start(startAt+segment.when,segment.offset,segment.duration)}
 }
 function waScheduleAll(cursorMs){
   const startAt=audioCtx.currentTime+.035;waStartCursorMs=Number(cursorMs||0);waStartCtxTime=startAt;waPlaybackPaused=false;
@@ -5508,20 +5544,26 @@ function waScheduleAll(cursorMs){
 async function prepareTimelinePlaybackBuffers(renderFilters){
   const projectId=current.id;let revision,tracks,buffers;
   do{
-    revision=timelineAudioRevision;await persistCurrentProject(false);
+    revision=timelineAudioRevision;waPrepUpdate(tr('Saving project changes','Salvataggio modifiche progetto'));if(projectDirty)await persistCurrentProject(false);
     if(current?.id!==projectId)throw Error(tr('Project changed during audio preparation','Progetto cambiato durante la preparazione audio'));
-    tracks=current.tracks||[];buffers=await Promise.all(tracks.map(t=>waDecodeTrack(t,renderFilters,false)));
+    tracks=current.tracks||[];let done=0;waPrepUpdate(tr('Preparing tracks','Preparazione tracce'),'',0,tracks.length);
+    buffers=await MtaPlaybackPrep.mapLimit(tracks,2,async t=>{const buffer=await waDecodeTrack(t,renderFilters,false);waPrepUpdate(tr('Track ready','Traccia pronta'),t.name,++done,tracks.length);return buffer});
     if(current?.id!==projectId)throw Error(tr('Project changed during audio preparation','Progetto cambiato durante la preparazione audio'));
   }while(revision!==timelineAudioRevision);
   return {tracks,buffers};
 }
 async function startWebAudioProjectPlayback(renderFilters=false,cursorMs=playCursorMs){
+  const requestToken=++playbackToken;
   audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();await audioCtx.resume();
   waStopSources();for(const item of trackPlaybacks)if(item.wa)for(const n of [item.gainNode,item.panner,item.splitter,...(item.analysers||[])])try{n?.disconnect()}catch(e){}
   trackPlaybacks=[];waMasterMixMode=(current.master_inserts||[]).some(x=>x.enabled)||(current.tracks||[]).some(t=>t.master_bypass);
   try{waMasterBus?.disconnect()}catch(e){};try{masterPlaybackGainNode?.disconnect()}catch(e){};waBuildMasterGraph();
-  playbackBuffering=true;showMediaProgress('Preparazione audio',18,'Decodifica tracce…');
+  playbackBuffering=true;waPreparation={started:performance.now(),done:0,total:0,phase:'',track:''};
+  const prepTimer=setInterval(()=>{if(waPreparation)waPrepUpdate(waPreparation.phase,waPreparation.track)},1000);
+  waPrepUpdate(tr('Preparing playback','Preparazione riproduzione'));
+  try{
   if(waMasterMixMode){
+    waPrepUpdate(tr('Rendering master inserts and mix on server','Rendering insert master e mix sul server'));
     const buffer=await waDecodeMasterMix(renderFilters);
     const item=waCreateTrackGraph({id:'__master_mix__',channels:2,volume_db:0,pan:0},buffer,false);
     item.masterMix=true;item.gainNode.gain.value=1;trackPlaybacks=[item];
@@ -5529,12 +5571,14 @@ async function startWebAudioProjectPlayback(renderFilters=false,cursorMs=playCur
     const {tracks,buffers}=await prepareTimelinePlaybackBuffers(renderFilters);
     trackPlaybacks=tracks.map((t,i)=>waCreateTrackGraph(t,buffers[i],renderFilters));
   }
+  if(requestToken!==playbackToken)throw Error(tr('Audio preparation cancelled','Preparazione audio annullata'));
   waPlaybackActive=true;waPlaybackPaused=false;waRenderFilters=!!renderFilters;renderedStemPlayback=!!renderFilters;renderedMasterPlayback=false;playAudio={waClock:true,paused:false,ended:false};
   waScheduleAll(cursorMs);playbackBuffering=false;$('#utilityBackdrop')?.classList.add('hidden');
   if(current?.realtime_meter_enabled)startVuMeterLoop();
   if($('#playMaster')){$('#playMaster').textContent='❚❚';$('#playMaster').title='Pausa'}
   if(playRaf)cancelAnimationFrame(playRaf);playRaf=requestAnimationFrame(movePlayhead);
   return playAudio;
+  }finally{clearInterval(prepTimer);waPreparation=null;playbackBuffering=false}
 }
 function updatePlaybackGains(){
   if(waPlaybackActive&&waMasterMixMode){queueWebAudioMasterRefresh();return;}

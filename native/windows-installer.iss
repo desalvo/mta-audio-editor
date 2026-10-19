@@ -47,6 +47,7 @@ Name: "{autoprograms}\MTA Audio Editor"; Filename: "{app}\{#MyAppExeName}"
 Name: "{autodesktop}\MTA Audio Editor"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Tasks]
+Name: "optionalplugins"; Description: "Choose optional open-source VST3 plugins after installation"; Flags: unchecked
 Name: "desktopicon"; Description: "Crea un collegamento sul desktop"; GroupDescription: "Collegamenti aggiuntivi:"
 
 [Registry]
@@ -64,4 +65,6 @@ Root: HKCU; Subkey: "Software\Classes\MTA.AudioEditor.Project\shell\open\command
 Root: HKCU; Subkey: "Software\Classes\MTA.AudioEditor.Project"; ValueType: string; ValueName: "Content Type"; ValueData: "application/vnd.mta-audio-editor.project"
 
 [Run]
-Filename: "{app}\{#MyAppExeName}"; Description: "Avvia MTA Audio Editor"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\{#MyAppExeName}"; Description: "Avvia MTA Audio Editor"; Check: not WizardIsTaskSelected('optionalplugins'); Flags: nowait postinstall skipifsilent
+
+Filename: "{app}\{#MyAppExeName}"; Parameters: "--optional-plugins"; Description: "Choose optional VST3 plugins"; Tasks: optionalplugins; Flags: nowait postinstall skipifsilent

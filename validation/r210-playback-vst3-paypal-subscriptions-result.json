@@ -1,0 +1,151 @@
+{
+  "version": "0.3.0-r210",
+  "baseline": "MTA-0.3.0-r210-pages-download-cumulative.zip",
+  "baseline_sha256": "86c93ca9a9989d2c9dd30c901b0b1f4a3fbd76010cdf27a7373017c2a3a8130e",
+  "baseline_files_preserved": 2124,
+  "changed_baseline_files": [
+    "app/credit_purchases.py",
+    "app/main.py",
+    "app/native_transport.py",
+    "app/preview_publish.py",
+    "app/resource_access.py",
+    "app/resource_accounts.py",
+    "app/resource_entitlements.py",
+    "app/resource_routes.py",
+    "app/server_vst3.py",
+    "app/server_vst3_worker.py",
+    "app/static/app.css",
+    "app/static/app.js",
+    "app/static/credit_shop.js",
+    "app/static/native_transport.js",
+    "app/static/server_vst3.js",
+    "app/static/subscriptions.css",
+    "app/static/subscriptions.js",
+    "app/templates/account.html",
+    "app/templates/admin.html",
+    "app/templates/credits.html",
+    "app/templates/index.html",
+    "app/vst3_host.py",
+    "app/vst3_live.py",
+    "app/vst3_live_graph.py",
+    "docs/DEVELOPMENT_STATUS.md",
+    "docs/THIRD_PARTY_NOTICES.md",
+    "native/mta_audio_editor_native.py",
+    "native/mta_audio_editor_native.spec",
+    "native/windows-installer.iss",
+    "scripts/install_mta_native.sh",
+    "scripts/install_mta_native_wizard.sh",
+    "tests/server_vst3_browser.cjs",
+    "tests/test_r210_bounce_master.py",
+    "tests/test_r210_session_preview_overlay.py",
+    "tests/test_r210_timeline_editing.py"
+  ],
+  "full_regression": {
+    "passed": 4157,
+    "failed": 0,
+    "skipped": 35,
+    "deselected": 10,
+    "environment_exclusions": [
+      "test_agent_rejects_untrusted_snapshot (7 cases)",
+      "test_valid_agent_snapshot_is_diagnostic_only",
+      "test_live_diagnostic_redacts_secrets_and_pid",
+      "test_malformed_agent_reply_fail_closed"
+    ]
+  },
+  "final_targeted": {
+    "passed": 40,
+    "failed": 0,
+    "skipped": 0
+  },
+  "integration_followup": {
+    "passed": 67,
+    "skipped": 10
+  },
+  "browser": {
+    "active": true,
+    "tracks": 8,
+    "raw": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    "cacheBytes": 84671936,
+    "first_start_seconds": 1.653,
+    "cached_restart_seconds": 0.227,
+    "backend_preview_requests": [],
+    "errors": []
+  },
+  "optional_vst3": {
+    "platform": "Linux x86_64",
+    "mode": "pinned-source-build",
+    "tested": [
+      {
+        "bundle": "DragonflyPlateReverb.vst3",
+        "rate": 48000,
+        "input_frames": 48000,
+        "channels": 2,
+        "finite": true,
+        "output_peak": 0.20000000298023224
+      },
+      {
+        "bundle": "DragonflyEarlyReflections.vst3",
+        "rate": 48000,
+        "input_frames": 48000,
+        "channels": 2,
+        "finite": true,
+        "output_peak": 0.20000000298023224
+      },
+      {
+        "bundle": "DragonflyRoomReverb.vst3",
+        "rate": 48000,
+        "input_frames": 48000,
+        "channels": 2,
+        "finite": true,
+        "output_peak": 0.20000000298023224
+      },
+      {
+        "bundle": "DragonflyHallReverb.vst3",
+        "rate": 48000,
+        "input_frames": 48000,
+        "channels": 2,
+        "finite": true,
+        "output_peak": 0.20000000298023224
+      },
+      {
+        "bundle": "MVerb.vst3",
+        "rate": 48000,
+        "input_frames": 48000,
+        "channels": 2,
+        "finite": true,
+        "output_peak": 0.13120856881141663
+      }
+    ],
+    "unverified": [
+      "CHOW Tape Model build",
+      "Surge XT build",
+      "Windows/macOS builds",
+      "original GUI and physical audio device"
+    ]
+  },
+  "checks": {
+    "ruff_ci_scope_and_new_helpers": "passed",
+    "bandit_high_high_ci_scope_and_new_helpers": "passed",
+    "license_gate": "passed",
+    "js_shell_syntax": "passed",
+    "cpp_build_abi_1": "passed"
+  },
+  "limitations": [
+    "Real Windows/macOS builds and physical devices not exercised",
+    "Production ROCm server not accessed or certified",
+    "CHOW Tape and Surge source build recipes not built here",
+    "PayPal provider tests use controlled responses; real Sandbox and ingress acceptance required",
+    "PayPal is one-off checkout; recurring automatic debit not implemented",
+    "Prepaid termination differences are recorded; operator must settle monetary refunds"
+  ],
+  "no_commit_push_tag_release": true
+}

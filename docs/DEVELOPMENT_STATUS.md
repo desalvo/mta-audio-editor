@@ -1,8 +1,25 @@
 # MTA Audio Editor — Development status
 
-Versione obbligatoria: **0.3.0-r210**. Ultimo ciclo: download artifact e deploy Pages, 19 ottobre 2026.
+Versione obbligatoria: **0.3.0-r210**. Ultimo ciclo: playback, plugin opzionali e abbonamenti, 19 ottobre 2026.
 
-## Stato corrente — pubblicazione Pages (19 ottobre 2026)
+## Ciclo completato — playback, plugin opzionali e abbonamenti (19 ottobre 2026)
+
+- Baseline: `MTA-0.3.0-r210-pages-download-cumulative.zip`, SHA-256 `86c93ca9a9989d2c9dd30c901b0b1f4a3fbd76010cdf27a7373017c2a3a8130e`. Tutti i 2.124 file conservati, incluse le precedenti correzioni CI/Pages. I permessi eseguibili POSIX della baseline vengono preservati nel cumulativo.
+- Playback: eliminate conversioni integrali inutili per clip/delay; lettura diretta, cache 256 MiB e due decodifiche contemporanee in WebAudio. Anteprime float WAV riconosciute, pubblicazione atomica e cache master basata su identità sorgenti senza rileggere file interi. Rimossi i preload HTMLAudio non riutilizzati.
+- C++: grafo a blocchi anche senza VST3/MIDI, sorgenti compatibili lette direttamente; conversione solo dei formati incompatibili. Confronto campione per campione con il render precedente e worker reale isolato con uscita nulla passati. Motore precedente mantenuto; fallback al mix completo solo senza runtime live.
+- Preparazione: fasi distinte, nome traccia, conteggio e tempo trascorso, annullamento rispettato. Prova Chromium su otto tracce stereo di 30s: 1,653s al primo avvio, 0,227s al riavvio, zero rendering traccia/master e zero errori JS. Prova ripetibile con `scripts/validate_playback_preparation.py`.
+- Catalogo opzionale MVerb, Dragonfly, CHOW Tape e Surge XT con categorie/selezione, consenso licenze, revisioni sorgenti/checksum bloccati, pubblicazione atomica e log di compilazione. Nessun binario dei plugin redistribuito nel package: build locale. Overview IT/EN e licenze incluse; verifica mensile e blocco nuove installazioni dopo 90 giorni senza revisione. Compilati e caricati realmente MVerb e i quattro Dragonfly Linux, con elaborazione stereo non silenziosa. CHOW/Surge e Windows/macOS richiedono ancora prove reali.
+- Effetti interni: nome visibile **Lexicon-style reverb**, ID/preset invariati; nuovi pannelli grafici vettoriali, controlli e layout responsive. Nessun misuratore simulato.
+- Contratti: modifica CPU/GPU/storage nel periodo corrente senza reset dei consumi; scelta esplicita gratuito/a pagamento. Conservati budget dei job già ammessi e storico dello storage; una modifica successiva non trasforma in pagamento le estensioni gratuite esistenti. Retry con condizioni diverse rifiutati.
+- Cessazione immediata: canone proporzionale al tempo trascorso solo con servizio/billing utente abilitati; conservati accounting/extra quota. Differenze prepagate registrate come rimborsi da regolare dal gestore, senza conversione automatica in crediti.
+- PayPal Sandbox/Live configurabile, Orders v2 per crediti e saldo canoni (anche dopo cessazione), segreti sigillati, verifica server di identità/importi/catture e webhook, idempotenza e storno crediti rimborsati. Pagamenti singoli: nessun addebito PayPal ricorrente automatico. Nessuna transazione reale effettuata.
+- UI abbonamenti: sezioni collassabili, campi su griglia adattabile, permessi spiegati, ricerca incrementale e selezione utenti senza lista statica; eliminata l'opzione crediti disabilitata/ambigua. Asset aggiornati per invalidare le vecchie copie in cache.
+- **Regressione estesa: 4.157 passati, 35 saltati, 10 esclusi per socket/agente non disponibili nell'ambiente**. Nessun fallimento. Dopo le ultime rifiniture: **40 test mirati passati**, inclusi browser desktop/mobile, PayPal, quote e playback. Ulteriori 67 passati/10 saltati per integrazione dei contratti di caricamento e script browser del server. Ruff alle stesse scope CI più nuovi helper, Bandit alle soglie CI, licenze, sintassi JS/shell e build C++ ABI 1 passati. Rapporti in `validation/r210-playback-plugins-subscriptions-*`.
+- Accettazione ancora aperta: build Windows/macOS e dispositivi fisici, server reale/ROCm, plugin CHOW/Surge, PayPal Sandbox attraverso HAProxy e regolazione rimborsi monetari. Non certificato il server di produzione.
+- Consegna: `MTA-0.3.0-r210-playback-vst3-paypal-subscriptions-cumulative.zip`, intero progetto. Verifiche CRC, contenuti byte per byte, file precedenti e SHA-256 eseguite durante il packaging.
+- Versione **0.3.0-r210** invariata. Nessun commit/push/tag/release, pagamento o modifica ai server reali.
+
+## Stato precedente — pubblicazione Pages (19 ottobre 2026)
 
 - Baseline: `MTA-0.3.0-r210-docker-windows-core-build-cumulative.zip`, SHA-256 `a5983f5aeef21bc9d3d73e5bed26dc3f2d1bdd06fdfbc29566a2baed3e4e88dc`.
 - Run packages `39267934184`: fermo nello step di assemblaggio, prima di configure/upload/deploy Pages.
@@ -52,7 +69,8 @@ Versione obbligatoria: **0.3.0-r210**. Ultimo ciclo: download artifact e deploy 
 | Packaging server RPM/DEB | Correzioni implementate | Display sorgente locale e DEB offline passati; RPM EL9/EL10 da riconfermare in CI |
 | Build e installazione native multipiattaforma | Pipeline conservata | Build Windows/macOS/Linux effettive da confermare dopo lo sblocco dei gate |
 | ASIO dedicato e SMF2/SMPTE | Non implementati nel ciclo precedente | Lavoro futuro distinto dal ripristino CI corrente |
-| Plugin open-source opzionali, AI Vocal Studio, AI Multi-Track Audio-to-MIDI | Backlog futuro, non avviato | Avvio solo su richiesta futura |
+| Plugin open-source opzionali | Catalogo e installazione sorgente implementati in questo ciclo | MVerb/Dragonfly Linux provati; CHOW/Surge e native da validare |
+| AI Vocal Studio, AI Multi-Track Audio-to-MIDI | Backlog futuro, non avviato | Avvio solo su richiesta futura |
 
 ## Correzioni implementate
 

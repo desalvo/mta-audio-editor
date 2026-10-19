@@ -54,5 +54,19 @@ def _valid_wav(path: Path) -> bool:
             return (stream.getnchannels() in (1, 2)
                     and stream.getframerate() > 0
                     and stream.getnframes() > 0)
-    except (OSError, ValueError, EOFError, wave.Error):
+    except wave.Error:
+        # FFmpeg/C++ previews use IEEE float WAV, which stdlib wave cannot read.
+        try:
+            import soundfile
+            info = soundfile.info(str(path))
+            return info.format in ('WAV', 'WAVEX') and info.channels in (1, 2) and info.frames > 0 and info.samplerate > 0
+        except (OSError, ValueError, RuntimeError):
+            return False
+    except (OSError, ValueError, EOFError):
         return False
+
+
+def source_identity(path: Path) -> tuple:
+    """Stat identity without atime: reads must not invalidate their own cache."""
+    stat=Path(path).stat()
+    return stat.st_dev,stat.st_ino,stat.st_size,stat.st_mtime_ns,stat.st_ctime_ns

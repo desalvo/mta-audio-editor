@@ -66,3 +66,16 @@ The source-only archive `native/server_display/vendor/xorg-server-21.1.24.tar.xz
 ## miniaudio
 
 The C++ audio device transport uses miniaudio 0.11.23, copyright David Reid, under its MIT No Attribution option. The unmodified header and full upstream licensing text are retained at `native/third_party/miniaudio/miniaudio.h`; the adjacent README records its version and SHA-256. Docker's isolated audio-core build copies this directory alongside the core sources.
+
+## Optional open-source VST3 catalog (r210, 2026-10-19)
+
+MTA ships a reviewed catalog, license texts and source-build recipes for MVerb,
+Dragonfly Reverb, CHOW Tape Model and Surge XT, not their binaries. Installations
+are opt-in and separate from MTA/project files. Full main-project license texts
+are in `app/optional_plugin_licenses/`; pinned revisions, SHA-256 digests,
+submodule/source retention and redistribution considerations are documented in
+`docs/OPTIONAL_VST3_CATALOG_IT.md` and `docs/OPTIONAL_VST3_CATALOG_EN.md`.
+MVerb is GPLv3-or-later; the other projects declare GPLv3. DPF VST3 implementation
+uses ISC and requires attribution. JUCE, bundled libraries and content retain
+individual terms. These recipe/notice additions do not authorize redistribution
+of unrelated VST2 binaries or omit corresponding-source obligations.

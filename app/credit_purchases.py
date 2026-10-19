@@ -35,7 +35,8 @@ def catalog(uid):
     with auth.db() as c:
         init(c)
         orders=[dict(x) for x in c.execute('SELECT id,amount_cents,created_at,status,paid_at,refunded_cents FROM credit_purchase_orders WHERE user_id=? ORDER BY created_at DESC LIMIT 100',(uid,))]
-    return {'eligible':s['credits_enabled'],'enabled':bool(cfg['credits_enabled']),'subscription':s['subscription'],'denominations_cents':json.loads(cfg['credit_denominations']),'credit_value_micro':s['credit_value_micro'],'credits_micro':s['credits_micro'],'provider':settings(),'orders':orders}
+    from .paypal_payments import settings as paypal_settings
+    return {'paypal':paypal_settings(),'eligible':s['credits_enabled'],'enabled':bool(cfg['credits_enabled']),'subscription':s['subscription'],'denominations_cents':json.loads(cfg['credit_denominations']),'credit_value_micro':s['credit_value_micro'],'credits_micro':s['credits_micro'],'provider':settings(),'orders':orders}
 
 
 def _stripe(data,key,order):

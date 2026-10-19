@@ -1,0 +1,52 @@
+{
+  "platform": "Linux x86_64",
+  "mode": "pinned-source-build",
+  "tested": [
+    {
+      "bundle": "DragonflyPlateReverb.vst3",
+      "rate": 48000,
+      "input_frames": 48000,
+      "channels": 2,
+      "finite": true,
+      "output_peak": 0.20000000298023224
+    },
+    {
+      "bundle": "DragonflyEarlyReflections.vst3",
+      "rate": 48000,
+      "input_frames": 48000,
+      "channels": 2,
+      "finite": true,
+      "output_peak": 0.20000000298023224
+    },
+    {
+      "bundle": "DragonflyRoomReverb.vst3",
+      "rate": 48000,
+      "input_frames": 48000,
+      "channels": 2,
+      "finite": true,
+      "output_peak": 0.20000000298023224
+    },
+    {
+      "bundle": "DragonflyHallReverb.vst3",
+      "rate": 48000,
+      "input_frames": 48000,
+      "channels": 2,
+      "finite": true,
+      "output_peak": 0.20000000298023224
+    },
+    {
+      "bundle": "MVerb.vst3",
+      "rate": 48000,
+      "input_frames": 48000,
+      "channels": 2,
+      "finite": true,
+      "output_peak": 0.13120856881141663
+    }
+  ],
+  "unverified": [
+    "CHOW Tape Model build",
+    "Surge XT build",
+    "Windows/macOS builds",
+    "original GUI and physical audio device"
+  ]
+}

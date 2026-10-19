@@ -625,6 +625,10 @@ class NativeApi:
         from app.native_transport import prepare_play
         return prepare_play(project_id,cursor_ms,midi_options=midi_options)
 
+    def transport_preparation_status(self):
+        from app.native_transport import preparation_status
+        return preparation_status()
+
     def midi_ports(self):
         from app.native_midi import list_ports
         return list_ports()
@@ -1042,7 +1046,7 @@ def main() -> int:
         native_api.startup_project_path = _startup_project_path()
         window = webview.create_window(
             APP_NAME,
-            url=url,
+            url=url+("/#optional-vst3" if "--optional-plugins" in sys.argv else ""),
             width=1500,
             height=960,
             min_size=(1050, 700),

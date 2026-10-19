@@ -16,7 +16,6 @@ from .vst3_live import atomic
 def run(config, root):
     import numpy as np
     from .models import Project
-    from .audio_engine import render_track
     from .vst3_live_graph import Graph
     from .audio_backend import _SCOPE
     _SCOPE.set('cpp')  # Immutable worker choice; never read server settings after confinement.
@@ -40,16 +39,13 @@ def run(config, root):
             try:confine(root,config['paths'],vst3_roots()+[Path(os.getenv('MTA_AUDIO_CORE_PATH','/nonexistent'))])
             except (OSError,RuntimeError) as exc:
                 desktop.close();desktop=None;display_error=str(exc)
-        used=0
-        for index,(track,source) in enumerate(zip(project.tracks,config['paths'],strict=True)):
-            if track.kind=='midi':paths.append(Path(source));continue
-            dry=track.model_copy(deep=True);dry.inserts=[];dry.gain_db=0
-            path=root/f'dry-{index}.wav'
-            render_track(dry,Path(source),path,apply_inserts=False,sample_rate=project.sample_rate)
-            used+=path.stat().st_size
-            if used>limit:raise RuntimeError('VST3 prepared audio exceeds the server session disk limit')
-            paths.append(path)
-        graph=Graph(project,paths,round(config['cursor_ms']*project.sample_rate/1000))
+        from .live_sources import prepare
+        def progress(done,total,track):atomic(root/'preparation.json',{'stage':'sources','done':done,'total':total,'track':track})
+        paths,raw_sources=prepare(project,config['paths'],root,progress)
+        atomic(root/'preparation.json',{'stage':'graph','done':len(paths),'total':len(paths),'track':''})
+        used=sum(path.stat().st_size for path in paths if path.parent==root)
+        if used>limit:raise RuntimeError('VST3 prepared audio exceeds the server session disk limit')
+        graph=Graph(project,paths,round(config['cursor_ms']*project.sample_rate/1000),raw_sources=raw_sources)
         if config.get('host_transport') is not None:graph.host.data=config['host_transport']
         if config.get('monitor'):graph.host.override(0,False,0)
         def snapshot():
@@ -93,7 +89,7 @@ def run(config, root):
                             elif action=='seek':
                                 if type(value) not in (float,int) or not math.isfinite(value) or value<0:raise ValueError('Invalid seek')
                                 position=min(graph.total,round(value*graph.rate/1000));reuse=graph.plugins
-                                was=graph.host.playing;graph.close();graph=Graph(project,paths,position,reuse=reuse);graph.set_playing(was);sequence=0
+                                was=graph.host.playing;graph.close();graph=Graph(project,paths,position,reuse=reuse,raw_sources=raw_sources);graph.set_playing(was);sequence=0
                                 result={'status':snapshot()}
                             elif action=='update':
                                 new=Project.model_validate(value)
@@ -102,7 +98,7 @@ def run(config, root):
                                     previous=[(t.id,t.instrument,t.inserts) for t in project.tracks]+[('master',None,project.master_inserts)]
                                     if wanted!=previous:raise ValueError('Close the original plugin editor before changing the effect chain')
                                 if not graph.update(new):
-                                    position=graph.position;reuse=graph.plugins;was=graph.host.playing;graph.close();graph=Graph(new,paths,position,reuse=reuse);graph.set_playing(was)
+                                    position=graph.position;reuse=graph.plugins;was=graph.host.playing;graph.close();graph=Graph(new,paths,position,reuse=reuse,raw_sources=raw_sources);graph.set_playing(was)
                                 project=new;result={'status':snapshot()}
                             elif action in ('play','pause'):
                                 graph.set_playing(action=='play');result={'status':snapshot()}

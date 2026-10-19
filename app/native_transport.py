@@ -88,6 +88,7 @@ class StreamDevice(Device):
 
 
 _LOCK=threading.RLock();_DEVICE=None;_SCRATCH=None;_PROJECT=None;_CANCEL_EPOCH=0
+_PREPARATION={"stage":"idle","done":0,"total":0,"track":""}
 
 
 def _guard():
@@ -123,7 +124,8 @@ def stop():
 
 
 def prepare_play(pid,cursor_ms=0,*,start_playing=True,midi_options=None):
-    global _DEVICE,_SCRATCH,_PROJECT
+    global _DEVICE,_SCRATCH,_PROJECT,_PREPARATION
+    _PREPARATION={"stage":"loading","done":0,"total":0,"track":""}
     _guard()
     if type(cursor_ms) not in (int,float) or not math.isfinite(cursor_ms) or cursor_ms<0:raise ValueError('Invalid native seek')
     from .storage import load_project,audio_path
@@ -139,21 +141,23 @@ def prepare_play(pid,cursor_ms=0,*,start_playing=True,midi_options=None):
                 return {'ok':True,'active':True,'project_id':pid,**_DEVICE.status()}
         stop();epoch=_CANCEL_EPOCH;scratch=tempfile.TemporaryDirectory(prefix='mta-native-device-')
         try:
-            if any(t.kind=='midi' for t in project.tracks) or any(i.enabled and i.plugin=='vst3' for items in [project.master_inserts,*[t.inserts for t in project.tracks]] for i in items):
+            from .vst3_live import available
+            if available() or any(t.kind=='midi' for t in project.tracks) or any(i.enabled and i.plugin=='vst3' for items in [project.master_inserts,*[t.inserts for t in project.tracks]] for i in items):
                 from .vst3_live import Session
-                from .audio_engine import render_track
-                paths=[]
-                for index,track in enumerate(project.tracks):
-                    if track.kind=='midi':paths.append(audio_path(project.id,track.filename));continue
-                    dry=track.model_copy(deep=True);dry.gain_db=0;dry.inserts=[]
-                    target=Path(scratch.name)/('dry-'+str(index)+'.wav')
-                    render_track(dry,audio_path(project.id,track.filename),target,apply_inserts=False,sample_rate=project.sample_rate)
-                    paths.append(target)
+                from .live_sources import prepare
+                def progress(done,total,track):
+                    global _PREPARATION
+                    _PREPARATION={'stage':'sources','done':done,'total':total,'track':track}
                     if epoch!=_CANCEL_EPOCH:raise RuntimeError('Native playback preparation cancelled')
-                device=Session(project,paths,cursor_ms,cancelled=lambda:epoch!=_CANCEL_EPOCH,paused=not start_playing,**({'midi_options':midi_options} if midi_options else {}))
+                sources=[audio_path(project.id,t.filename) for t in project.tracks]
+                paths,raw_sources=prepare(project,sources,scratch.name,progress)
+                _PREPARATION={'stage':'graph','done':len(paths),'total':len(paths),'track':''}
+                device=Session(project,paths,cursor_ms,cancelled=lambda:epoch!=_CANCEL_EPOCH,paused=not start_playing,raw_sources=raw_sources,**({'midi_options':midi_options} if midi_options else {}))
+                _PREPARATION={'stage':'ready','done':len(paths),'total':len(paths),'track':''}
                 _DEVICE=device;_SCRATCH=scratch;_PROJECT=pid
                 return {'ok':True,'active':True,'project_id':pid,**device.status()}
             target=Path(scratch.name)/'prepared.wav' 
+            _PREPARATION={'stage':'mix','done':0,'total':len(project.tracks),'track':''}
             render_mix(project,audio_path,target,fmt='wav',sample_rate=int(project.sample_rate),wav_bit_depth=32)
             if epoch!=_CANCEL_EPOCH:raise RuntimeError('Native playback preparation cancelled')
             device=Device(target)
@@ -203,3 +207,7 @@ def live_editor_poll(token):
     with _LOCK:
         if not hasattr(_DEVICE,'editor_poll'):raise RuntimeError('The live VST3 session has ended')
         return _DEVICE.editor_poll(token)
+
+
+def preparation_status():
+    return dict(_PREPARATION)

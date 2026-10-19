@@ -27,6 +27,7 @@ class Entry:
     error: str=''
     initializer: object=None
     editor: object=None
+    preparation: dict=field(default_factory=dict)
 
 
 class Sessions:
@@ -77,7 +78,7 @@ class Sessions:
                 def cancelled():
                     entry.touched=time.monotonic()
                     return entry.cancelled.is_set()
-                session=Session(project,paths,cursor,cancelled=cancelled,output='browser',startup_timeout=timeout,**({'monitor':True} if monitor else {}))
+                session=Session(project,paths,cursor,cancelled=cancelled,output='browser',startup_timeout=timeout,on_progress=lambda progress:setattr(entry,'preparation',progress),**({'monitor':True} if monitor else {}))
                 with self.lock:
                     if entry.cancelled.is_set():session.close();raise RuntimeError('Live VST3 session cancelled')
                     entry.session=session;entry.touched=time.monotonic()
@@ -151,7 +152,7 @@ def register_routes(app,project_for_actor,actor):
         entry,_=entry_for(request,pid,token,allow_preparing=True)
         response.headers['Cache-Control']='no-store'
         if entry.error:return {'session_id':token,'state':'failed','failed':True,'error':entry.error}
-        if entry.session is None:return {'session_id':token,'state':'preparing','failed':False}
+        if entry.session is None:return {'session_id':token,'state':'preparing','failed':False,'preparation':entry.preparation}
         return {'session_id':token,'state':'ready',**entry.session.status()}
 
     @app.post('/api/projects/{pid}/vst3-live/{token}/pcm')

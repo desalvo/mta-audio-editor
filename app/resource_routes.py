@@ -189,3 +189,54 @@ async def stripe_webhook(request:Request):
         if len(raw)>1024*1024:raise HTTPException(413,'Payment event too large')
     try:return event(bytes(raw),request.headers.get('stripe-signature',''))
     except (ValueError,TypeError,KeyError):raise HTTPException(400,'Invalid payment event') from None
+
+
+@router.patch('/api/admin/subscriptions/users/{uid}/limits')
+def amend_limits(request:Request,uid:int,body:dict):
+    actor=auth.require_admin(request)
+    from .resource_contracts import amend
+    return call(lambda:amend(uid,body,actor['id']))
+
+
+@router.post('/api/admin/subscriptions/users/{uid}/terminate')
+def terminate_contract(request:Request,uid:int,body:dict):
+    actor=auth.require_admin(request)
+    from .resource_contracts import terminate
+    return call(lambda:terminate(uid,body,actor['id']))
+
+
+@router.get('/api/admin/paypal')
+def paypal_config(request:Request):
+    auth.require_admin(request)
+    from .paypal_payments import settings
+    return settings()
+
+
+@router.put('/api/admin/paypal')
+def paypal_save(request:Request,body:dict):
+    auth.require_admin(request)
+    from .paypal_payments import settings
+    return call(lambda:settings(body))
+
+
+@router.post('/api/account/paypal/checkout')
+def paypal_checkout(request:Request,body:dict):
+    from .paypal_payments import checkout
+    return call(lambda:checkout(auth.require_user(request)['id'],body))
+
+
+@router.post('/api/account/paypal/{order_id}/capture')
+def paypal_capture(request:Request,order_id:str):
+    from .paypal_payments import capture
+    return call(lambda:capture(auth.require_user(request)['id'],order_id))
+
+
+@router.post('/api/billing/paypal/webhook')
+async def paypal_webhook(request:Request):
+    from .paypal_payments import webhook
+    raw=bytearray()
+    async for chunk in request.stream():
+        raw.extend(chunk)
+        if len(raw)>1024*1024:raise HTTPException(413,'Payment event too large')
+    try:return webhook(bytes(raw),request.headers)
+    except (ValueError,TypeError,KeyError,sqlite3.IntegrityError):raise HTTPException(400,'Invalid PayPal event') from None

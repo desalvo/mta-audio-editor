@@ -75,5 +75,5 @@ def preflight(uid):
     paid=bool(s['subscription'] and s['funded'])
     if s['access']['blocked']:
         raise CreditAdmissionError('SUBSCRIPTION_REQUIRED: An active subscription is required. Choose a subscription or contact the server administrator.')
-    if paid and s['credits_micro']<=0 and any(s['limits'][k] is not None and s['used'][k]>=s['limits'][k] for k in ('cpu_seconds','gpu_seconds')):
+    if paid and s['credits_micro']<=0 and any(s.get('included_compute',s['limits']).get(k) is not None and s['used'][k]>=s.get('included_compute',s['limits'])[k] for k in ('cpu_seconds','gpu_seconds')):
         raise CreditAdmissionError('CREDIT_REQUIRED: Included compute quota is exhausted and no credits are available. Top up credits, wait for renewal, or contact the server administrator.')

@@ -54,6 +54,8 @@ def init(c):
         c.execute('INSERT INTO resource_policy_events(user_id,effective_at,credit_billing) SELECT user_id,?,0 FROM resource_user_policy WHERE credit_billing=1',(int(time.time()),))
         c.execute('UPDATE resource_user_policy SET credit_billing=0')
     c.execute("CREATE TABLE IF NOT EXISTS resource_plan_charges(user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,period_start INTEGER NOT NULL,amount_micro INTEGER NOT NULL,status TEXT NOT NULL DEFAULT 'due',PRIMARY KEY(user_id,period_start))")
+    from .resource_contracts import init as init_contracts
+    init_contracts(c)
     # Jobs admitted before this upgrade receive a conservative remaining-wallet
     # ceiling. Already settled historical charges are never rewritten.
     for row in c.execute('SELECT r.job_id,r.user_id FROM resource_job_contracts r LEFT JOIN resource_job_budgets b ON b.job_id=r.job_id WHERE r.settled=0 AND b.job_id IS NULL').fetchall():
@@ -142,7 +144,8 @@ def _state(c,uid,used_storage,at):
     p=_period(c,uid,at);user=c.execute('SELECT role,workspace_quota_bytes,workspace_quota_explicit FROM users WHERE id=?',(uid,)).fetchone()
     if not user:raise ValueError('Unknown user')
     member=c.execute('SELECT * FROM resource_memberships WHERE user_id=?',(uid,)).fetchone()
-    raw=json.loads(p['limits']) if p else {}
+    from .resource_contracts import effective
+    raw,included=effective(c,uid,p,at) if p else ({},{})
     limits={k:raw.get(k) for k in RESOURCES}
     if not p:limits['storage_bytes']=(int(user['workspace_quota_bytes'] or 0) or None) if user['role']!='admin' or user['workspace_quota_explicit'] else None
     if p:
@@ -151,7 +154,7 @@ def _state(c,uid,used_storage,at):
     used=_used(c,uid,p['start'],p['end']) if p else _used(c,uid,max(0,at-30*86400),at+1)
     used['storage_bytes']=used_storage
     from .resource_entitlements import enrich_state
-    result={'enabled':bool(c.execute('SELECT enabled FROM resource_config').fetchone()[0]),'period':p,'limits':limits,'used':used,'credits_micro':_balance(c,uid),'overage':bool(member and member['overage']),'promo':member['promo'] if member else '', 'subscription':p['plan'] if p else None,'funded':raw.get('_funded',True),'renewal_stops_at':(c.execute('SELECT until_ts FROM resource_cancellations WHERE user_id=?',(uid,)).fetchone() or [None])[0]}
+    result={'enabled':bool(c.execute('SELECT enabled FROM resource_config').fetchone()[0]),'period':p,'limits':limits,'used':used,'credits_micro':_balance(c,uid),'overage':bool(member and member['overage']),'promo':member['promo'] if member else '', 'subscription':p['plan'] if p else None,'included_compute':included,'funded':raw.get('_funded',True),'renewal_stops_at':(c.execute('SELECT until_ts FROM resource_cancellations WHERE user_id=?',(uid,)).fetchone() or [None])[0]}
     result=enrich_state(c,uid,result,at)
     from .resource_access import access_state
     result['access']=access_state(result,user['role'])
@@ -265,6 +268,7 @@ def admit(c,uid,jid,stamp):
     rates=prices(_connection=c)
     for key in ('cpu_seconds','gpu_seconds'):
         limit=s['limits'][key]
+        if s['subscription'] and s['included_compute'].get(key) is not None:limit=min(limit,s['included_compute'][key]) if limit is not None else s['included_compute'][key]
         if limit is not None and s['used'][key]>=limit:
             if not (continuation and s['subscription'] and s['overage']) and (not s['subscription'] or not s['overage'] or not mode['credit_billing'] or s['credits_micro']<=0 or rates.get(key,0)<=0):raise ValueError('Resource quota exceeded: '+key)
     if not s['subscription'] and mode['credit_billing']:
@@ -288,6 +292,8 @@ def settle(c,jid,values):
     job=c.execute('SELECT started_at FROM ai_compute_jobs WHERE id=?',(jid,)).fetchone();rates=prices(at=job['started_at'],_connection=c)
     quote=c.execute('SELECT rates_json FROM resource_job_budgets WHERE job_id=?',(jid,)).fetchone()
     if quote and quote[0]:rates=json.loads(quote[0])
+    included=c.execute('SELECT included_json FROM resource_job_budgets WHERE job_id=?',(jid,)).fetchone()
+    if included and included[0]:limits.update(json.loads(included[0]))
     mode=c.execute('SELECT mode FROM resource_job_modes WHERE job_id=?',(jid,)).fetchone() if c.execute("SELECT 1 FROM sqlite_master WHERE name='resource_job_modes'").fetchone() else None
     if mode and mode[0]=='credit':
         cost=sum(round(values.get(key,0)*rates.get(key,0)) for key in ('cpu_seconds','gpu_seconds'))
@@ -502,7 +508,7 @@ def options(uid,body):
 def transactions(uid):
     with auth.db() as c:
         init(c)
-        return {'subscription_fees':[dict(row) for row in c.execute('SELECT * FROM resource_plan_charges WHERE user_id=? ORDER BY period_start DESC LIMIT 200',(uid,))],'credits':[dict(r) for r in c.execute('SELECT * FROM resource_credits WHERE user_id=? ORDER BY created_at DESC LIMIT 200',(uid,))],
+        return {'terminations':[dict(row) for row in c.execute('SELECT * FROM resource_contract_terminations WHERE user_id=? ORDER BY terminated_at DESC LIMIT 200',(uid,))],'subscription_fees':[dict(row) for row in c.execute('SELECT * FROM resource_plan_charges WHERE user_id=? ORDER BY period_start DESC LIMIT 200',(uid,))],'credits':[dict(r) for r in c.execute('SELECT * FROM resource_credits WHERE user_id=? ORDER BY created_at DESC LIMIT 200',(uid,))],
                 'overages':[dict(r) for r in c.execute('SELECT r.job_id,r.period_start,r.charge_micro,b.gross_micro,b.waived_micro FROM resource_job_contracts r JOIN ai_compute_jobs j ON j.id=r.job_id LEFT JOIN resource_job_budgets b ON b.job_id=r.job_id WHERE r.user_id=? AND (r.charge_micro>0 OR b.waived_micro>0) AND j.accounting_excluded=0 ORDER BY r.period_start DESC LIMIT 200',(uid,))]}
 
 
@@ -580,12 +586,19 @@ def reserve_budget(c,uid,jid):
         c.execute('INSERT INTO resource_spending_pools(id,user_id,ceiling_micro) VALUES(?,?,?)',(pool_id,uid,ceiling))
     else:ceiling=max(0,pool['ceiling_micro']-pool['spent_micro'])
     c.execute('INSERT INTO resource_job_budgets(job_id,budget_micro,rates_json,pool_id) VALUES(?,?,?,?)',(jid,ceiling,json.dumps(prices(at=job['started_at'],_connection=c)),pool_id))
+    contract=c.execute('SELECT period_start FROM resource_job_contracts WHERE job_id=?',(jid,)).fetchone()
+    if contract:
+        p=c.execute('SELECT * FROM resource_periods WHERE user_id=? AND start=?',(uid,contract[0])).fetchone()
+        if p:
+            from .resource_contracts import effective
+            _,included=effective(c,uid,p,job['started_at'])
+            c.execute('UPDATE resource_job_budgets SET included_json=? WHERE job_id=?',(json.dumps(included),jid))
 
 
 def prepare_upgrade(c):
     """Migrate deployed quota schemas before, never inside, ledger transactions."""
     if not c.execute("SELECT 1 FROM sqlite_master WHERE name='resource_memberships'").fetchone():return
-    if not c.execute("SELECT 1 FROM sqlite_master WHERE name='resource_job_budgets'").fetchone() or not {'credit_value_micro','credits_enabled'}.issubset({r[1] for r in c.execute('PRAGMA table_info(resource_config)')}):
+    if not c.execute("SELECT 1 FROM sqlite_master WHERE name='resource_contract_amendments'").fetchone() or 'request_json' not in {r[1] for r in c.execute('PRAGMA table_info(resource_contract_amendments)')} or 'included_json' not in {r[1] for r in c.execute('PRAGMA table_info(resource_job_budgets)')} or not c.execute("SELECT 1 FROM sqlite_master WHERE name='resource_job_budgets'").fetchone() or not {'credit_value_micro','credits_enabled'}.issubset({r[1] for r in c.execute('PRAGMA table_info(resource_config)')}):
         init(c)
 
 
