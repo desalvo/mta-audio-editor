@@ -99,7 +99,7 @@ window.previewMaster=async function(){
   if(attempt!==epoch)return;
   if(capability.engine!=='cpp')return old.previewMaster();
   if(!capability.live_available)throw Error(tr('Ask the administrator to install the server VST3 runtime.','Chiedere all’amministratore di installare il runtime VST3 sul server.'));
-  const position=playCursorMs;window.stopPlayback();token=++epoch;setRenderPlaybackPreparing(true);
+  const position=playCursorMs,positionRevision=transportPositionRevision;window.stopPlayback();token=++epoch;setRenderPlaybackPreparing(true);
   collect();MtaPlaybackPrep.showProgress(preparation,tr('Preparing audio','Preparazione audio'),-1,tr('Starting server audio session','Avvio sessione audio sul server'));if(projectDirty)await persistCurrentProject(false);if(token!==epoch)return;
   const pid=current.id;let result=await jsonRequest(`/api/projects/${encodeURIComponent(pid)}/vst3-live`,{client_id:clientId,cursor_ms:position/tempoRatio()});
   pending={id:result.session_id,pid,sources:[]};
@@ -110,12 +110,13 @@ window.previewMaster=async function(){
    const p=result.preparation||{};MtaPlaybackPrep.showProgress(preparation,tr('Preparing audio','Preparazione audio'),-1,(p.stage==='sources'?tr('Checking sources / converting incompatible formats','Verifica sorgenti / conversione formati incompatibili'):tr('Starting live DSP and inserts','Avvio DSP live e insert'))+(p.track?' · '+p.track:''),p.total?`${p.done}/${p.total}`:'');
   }
   if(result.failed)throw Error(result.error||tr('Server VST3 preparation failed','Preparazione VST3 server fallita'));
-  const s={id:result.session_id,pid,rate:result.rate,expectedFrame:result.position,sequence:0,cursor:result.position_ms,paused:false,cancelled:false,generation:0,sources:[],nextAt:audioCtx.currentTime+.15,done:false,controls:Promise.resolve(),pumpTask:null};
+  const s={id:result.session_id,pid,rate:result.rate,expectedFrame:result.position,sequence:0,cursor:result.position_ms,paused:false,playingIntent:true,cancelled:false,generation:0,sources:[],nextAt:audioCtx.currentTime+.15,done:false,controls:Promise.resolve(),pumpTask:null};
   pending=s;await setupContinuous(s);
   if(token!==epoch||current?.id!==pid){discard(s);pending=null;return}
   live=s;pending=null;playbackPaused=false;timelineAudioDirty=false;if($('#playMaster'))$('#playMaster').textContent='❚❚';MtaPlaybackPrep.transportButton?.('playing');
   s.heartbeat=setInterval(async()=>{try{const status=await api(url(s));if(live===s&&status.failed)throw Error(status.error||'VST3 worker failed')}catch(e){if(live===s){window.stopPlayback();toast(e.message)}}},3000);
-  display(s);launchPump(s);MtaPlaybackPrep.hideProgress(preparation);toast(hasVst()?tr('Server VST3 live playback','Riproduzione VST3 live dal server'):tr('Server C++ live playback','Riproduzione C++ live dal server'));
+  if(positionRevision!==transportPositionRevision)await seek(s,playCursorMs/tempoRatio(),true);else launchPump(s);
+  if(live!==s)return;display(s);MtaPlaybackPrep.hideProgress(preparation);toast(hasVst()?tr('Server VST3 live playback','Riproduzione VST3 live dal server'):tr('Server C++ live playback','Riproduzione C++ live dal server'));
  }catch(e){if(token===undefined||token===epoch){window.stopPlayback();toast(e.message)}}
  finally{if(pending)discard(pending);preparing=false;setRenderPlaybackPreparing(false);MtaPlaybackPrep.hideProgress(preparation)}
 };
@@ -125,8 +126,9 @@ window.stopPlayback=function(){
  const result=old.stopPlayback();MtaPlaybackPrep.transportButton?.('stopped');return result;
 };
 async function seek(s,position,resume){
- s.paused=true;++s.generation;cleanupSources(s);s.cursor=position;playbackPaused=true;MtaPlaybackPrep.transportButton?.('paused');
+ s.playingIntent=!!resume;s.paused=true;++s.generation;cleanupSources(s);s.cursor=position;playbackPaused=!resume;MtaPlaybackPrep.transportButton?.(resume?'playing':'paused');
  const generation=s.generation;
+ try{
  if(s.node){s.startRequested=null;s.reported=null;s.node.port.postMessage({type:'reset',generation,frame:Math.round(position*s.rate/1000),rate:s.rate,paused:true})}
  // Finish an outstanding pull before resetting sequence/position. HTTP requests
  // may otherwise reach different server threads in an unexpected order.
@@ -136,13 +138,14 @@ async function seek(s,position,resume){
  if(live!==s||generation!==s.generation)return;
  s.sequence=0;s.expectedFrame=r.status.position;s.cursor=r.status.position_ms;s.done=r.status.ended;s.nextAt=audioCtx.currentTime+.15;s.paused=!resume;playbackPaused=!resume;
  if($('#playMaster'))$('#playMaster').textContent=resume?'❚❚':'▶';MtaPlaybackPrep.transportButton?.(resume?'playing':'paused');
- if(resume){await audioCtx.resume();launchPump(s)}
+ if(resume){await audioCtx.resume();if(live===s&&generation===s.generation)launchPump(s)}
+ }catch(e){if(live===s&&generation===s.generation)throw e}
 }
 window.pausePlayback=async function(){if(!live)return old.pausePlayback();const s=live;try{await seek(s,cursor(s),false)}catch(e){window.stopPlayback();toast(e.message)}};
 window.resumePlayback=async function(){if(!live)return old.resumePlayback();if(timelineAudioDirty)return window.previewMaster();const s=live;try{await seek(s,s.cursor,true)}catch(e){window.stopPlayback();toast(e.message)}};
-window.togglePlayback=()=>live?(live.paused?window.resumePlayback():window.pausePlayback()):old.togglePlayback();
+window.togglePlayback=()=>live?(live.playingIntent?window.pausePlayback():window.resumePlayback()):old.togglePlayback();
 window.playbackActuallyRunning=()=>live?!live.paused:old.playbackActuallyRunning();
-window.goToTimestamp=function(ms){if(!live)return old.goToTimestamp(ms);const s=live;setPlayCursor(ms);void seek(s,Math.max(0,ms)/tempoRatio(),!s.paused).catch(e=>{window.stopPlayback();toast(e.message)})};
+window.goToTimestamp=function(ms){if(!live)return old.goToTimestamp(ms);const s=live,target=requestTransportPosition(ms);updateTimedPlaybackOverlay(target);return seek(s,target/tempoRatio(),s.playingIntent).catch(e=>{if(live===s){window.stopPlayback();toast(e.message)}})};
 window.seekTransport=delta=>live?window.goToTimestamp(Math.max(0,playCursorMs+delta)):old.seekTransport(delta);
 window.goTransportStart=()=>live?window.goToTimestamp(0):old.goTransportStart();
 let updating=false,again=false,pendingFx=false;

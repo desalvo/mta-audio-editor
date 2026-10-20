@@ -621,9 +621,9 @@ class NativeApi:
             save_zoom(_data_root(), value)
         return {'ok': True, 'zoom_percent': value}
 
-    def transport_prepare_play(self, project_id: str, cursor_ms=0, midi_options=None) -> dict:
+    def transport_prepare_play(self, project_id: str, cursor_ms=0, midi_options=None, start_playing=True) -> dict:
         from app.native_transport import prepare_play
-        return prepare_play(project_id,cursor_ms,midi_options=midi_options)
+        return prepare_play(project_id,cursor_ms,midi_options=midi_options,start_playing=start_playing)
 
     def transport_preparation_status(self):
         from app.native_transport import preparation_status

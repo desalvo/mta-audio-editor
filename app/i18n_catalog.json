@@ -1623,5 +1623,19 @@
   "Cannot open audio input. Check the selected device and microphone permission.": "Impossibile aprire l’ingresso audio. Controllare il dispositivo selezionato e il permesso per il microfono.",
   "Cannot enumerate audio inputs": "Impossibile elencare gli ingressi audio",
   "Audio capture is already running": "La registrazione audio è già in corso",
-  "Audio capture is not running": "La registrazione audio non è in corso"
+  "Audio capture is not running": "La registrazione audio non è in corso",
+  "accounted": "contabilizzato",
+  "measured": "misurato",
+  "processing": "in elaborazione",
+  "unavailable": "non disponibile",
+  "Of which accepted consumption": "Di cui consumi accettati",
+  "Unsettled counters": "Contatori non contabilizzati",
+  "Unaccounted data": "Dati non contabilizzati",
+  "CPU/GPU consumption accepted by the server is accounted for quotas and billing.": "I consumi CPU/GPU accettati dal server sono contabilizzati per quote e billing.",
+  "kernel GPU collected": "kernel GPU raccolti",
+  "accepted consumption": "consumo accettato",
+  "accounted consumption": "consumo contabilizzato",
+  "collected GPU consumption": "consumo GPU raccolto",
+  "consumption accepted by the server": "consumo accettato dal server",
+  "The job emails are sent when SMTP/SMTPS is configured; per-job consumption accepted by the server is accounted for quotas and billing. This summary covers compute; storage and other components remain in the official Billing reports. Amounts shown are estimates, not invoices.": "Le email dei job partono quando SMTP/SMTPS è configurato; i consumi per job accettati dal server sono contabilizzati per quote e billing. Questo riepilogo riguarda il calcolo; storage e altre componenti restano nei report Billing ufficiali. Gli importi mostrati sono stime, non fatture."
 }

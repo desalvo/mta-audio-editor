@@ -1,3 +1,31 @@
+## Ciclo completato — priorità transport e pulsanti griglia metronomo (20 ottobre 2026)
+
+- Baseline cumulativa: decimal-zoom-accounted-usage, SHA-256 `40f8e187a4673c01643fec97eb332b622358d468037ae32edcd22d35aa9e0423`, 2.254 elementi conservati. Versione 0.3.0-r210 e BUILD_INFO invariati.
+- Click su righello/timeline/segmento ora inviano il seek al motore; frecce, slider, inizio e immissione numerica condividono il percorso. Il drag dei segmenti resta un’operazione di editing.
+- L’ultimo posizionamento esplicito prevale anche durante la preparazione WebAudio/C++ server/native. Bridge nativo serializzato, risposte di stato/controllo obsolete scartate; preparazione nativa in pausa, ultimo seek applicato prima del Play. Il fallback di rendering rispetta ora start_playing=False. Guardia server dopo audio unlock e intento Play/Pausa conservato durante seek ripetuti.
+- Pulsanti «Applica e rigenera zona» / «Riporta in Auto»: stile azioni con sfondo e testo coordinati, layout adattivo, accento sull’azione principale. Verificati IT/EN, preferenza OS chiara/scura, contrasto almeno 4,5:1 e azioni corrette.
+- Allegato CI: medesimo commit `11e7d366`, confronto testuale zoom già corretto nella baseline; regressione rieseguita e passata. Non è una nuova esecuzione del cumulativo decimal-zoom-accounted.
+- **232 test mirati distinti passati, zero fallimenti e zero skip nella verifica finale** (210 + 22), inclusi persistenza zoom, metronomo, editing, bridge nativo, dispositivo null e consumi contabilizzati. I mock legacy sono stati completati per il nuovo stato del transport, mantenendo e rafforzando le verifiche su drag/storico/assenza di seek durante il drag.
+- **Browser reale autenticato con HTTP e audio corrente/C++ server**: 6 scenari per motore, avanzamento del clock dal punto richiesto dopo preparazione ritardata/Pausa/Stop, click/frecce/input numerico; zero errori JS. **17 scenari deterministici** di concorrenza del codice transport in Node, incluse risposte/fallimenti obsoleti e Play dopo seek pendente.
+- Ruff scope CI + nuovo probe, Bandit alle soglie CI, sintassi JS, pip check, guardia licenze e build C++ ABI 1 passati. Nessun test CI disabilitato o soglia ridotta. Non rieseguita l’intera suite da oltre 4.000 casi in questo ciclo.
+- Restano CI remota dopo il commit e accettazione su dispositivi fisici Windows/macOS e server reale/ROCm. Nessun commit/push/tag/release né intervento sul server.
+- Report finali: `validation/r210-transport-priority-*`, `validation/r210-transport-browser-*`. Dettagli IT/EN: `docs/R210_TRANSPORT_POSITION_PRIORITY.md`.
+
+## Ciclo completato — zoom decimale, Quality e consumi contabilizzati (20 ottobre 2026)
+
+- Baseline: cumulativo zones-zoom-layout-manuals, SHA-256 7f063c80fc8bb41b6bd0cbd3fafd165dc1fb3129e0810b12b8093e9399330647.
+- Il log di checkout CI identifica main al commit `11e7d3666e4e2b75150e45a8d5ef63e62781efca`, dopo il cumulativo precedente.
+- Log Quality utente: 4.249 passati, 13 saltati, un fallimento su un confronto testuale obsoleto dello zoom.
+- Riproduzione segnalata: PUT progetto rifiuta uno zoom frazionario con int_from_float.
+- Completati zoom decimale persistente (25–1200 px/s, finito), cache aggiornata e test comportamentali JavaScript/API/riapertura. Risolto il rifiuto int_from_float anche dei valori dei client precedenti.
+- Consumi CPU/GPU accettati esposti come contabilizzati in coda/quote/billing; proiezione subordinata all’evidenza immutabile, nessuna duplicazione con i contatori in raccolta nei report/email. Solo CPU non implica GPU contabilizzata; contatori assenti/invalidi non sono promossi. Origine tecnica mantenuta in audit/API, senza dichiarare una verifica hardware inesistente.
+- Aggiornati testi IT/EN, chiavi cache e manuali online/PDF; 6 manuali, 99 pagine totali, pagine modificate verificate visivamente e testo entro i margini.
+- Regressione estesa iniziale: **4.219 passati, 35 saltati, 10 esclusi localmente** per socket Unix negati; **11 fallimenti iniziali** (7 permessi persi nella copia locale, 2 assert sulle vecchie etichette, 2 prove temporali C++ sotto carico). Rapporto originale conservato. Nessun test CI disabilitato e nessuna soglia ridotta.
+- Riesecuzione finale sul codice aggiornato: **190 passati, zero fallimenti**, inclusi tutti i 9 casi non prestazionali inizialmente falliti e il caso aggiuntivo CPU-only. Prove C++ isolate normale/stress passate, zero underrun; fader 0.88 s / 0.954 s, entro i limiti originali 1 s / 2,5 s.
+- Copertura complessiva **75,08%** (soglia CI 70%); linee **78,43%**. Browser reale corrente/C++ passati con salvataggio dei valori frazionari, ancoraggio entro un pixel, riordino, menu, metronomo e autosave; zero errori JS. Ruff, Bandit alle soglie CI, sintassi JS, pip check e guardia licenze passati; C++ ABI 1 compilata.
+- Restano la CI remota dopo il commit e le verifiche su dispositivi fisici/server ROCm installato: non sono certificati da queste prove locali. Versione e BUILD_INFO invariati; nessun commit/push/tag/release o intervento di produzione.
+- Report: `validation/r210-decimal-zoom-accounted-*`. Dettagli IT/EN: `docs/R210_DECIMAL_ZOOM_ACCOUNTED_USAGE.md`.
+
 ## Ciclo completato: metronomo a zone, zoom, layout personale e manuali (r210)
 
 Baseline verificata: `0f295c2201bff0a2af5334049b91aeb1af2607b79396633bff79fcb8b9f96aa0`, 2.201 elementi, preservati nel nuovo cumulativo. Versione 0.3.0-r210 invariata.

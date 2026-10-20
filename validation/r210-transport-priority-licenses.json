@@ -1,0 +1,7 @@
+{
+  "ok": true,
+  "errors": [],
+  "prebuilt_artifacts": [],
+  "message": "Static source guard only: review compiled bundles, transitive dependencies and media codecs before distribution.",
+  "archives": {}
+}

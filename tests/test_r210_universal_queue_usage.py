@@ -147,8 +147,8 @@ def test_worker_checkpoint_keeps_cpu_and_gpu_together(ledger, tmp_path, monkeypa
         diagnostics=list(read(con,ledger).values())
     assert diagnostics == [{'cpu_seconds_estimated':2,'gpu_seconds_estimated':3}]
     value=queue.get('job')
-    assert value['cpu_seconds_estimated']==2.5 and value['diagnostic_estimates_trusted']
-    assert value['gpu_seconds'] is None and value['gpu_seconds_estimated']==3
+    assert value['cpu_seconds']==2.5 and value['resources_accounted']
+    assert value['gpu_seconds']==3 and value['gpu_metrics_status']=='accounted'
 
 
 def test_queue_ui_labels_missing_zero_and_diagnostic():
@@ -162,10 +162,11 @@ def test_queue_ui_labels_missing_zero_and_diagnostic():
     code="const esc=String;const seconds=v=>v+'s';"+metrics+'''
     const assert=require('assert');
     assert(metrics({cpu_seconds:0}).includes('CPU 0s'));
-    assert(metrics({}).includes('misura non disponibile'));
-    assert(metrics({cpu_seconds_estimated:2,gpu_seconds_estimated:3}).includes('stima diagnostica'));
-    assert(metrics({cpu_seconds_estimated:2,gpu_seconds_estimated:3,diagnostic_estimates_trusted:true}).includes('stima attendibile'));
-    assert(metrics({cpu_seconds:2,resource_metrics_partial:true}).includes('verificata finora'));
+    assert(metrics({}).includes('non disponibile'));
+    assert(metrics({cpu_seconds_estimated:2,gpu_seconds_estimated:3}).includes('in elaborazione'));
+    assert(metrics({cpu_seconds:2,gpu_seconds:3,resources_accounted:true}).includes('contabilizzato'));
+    assert(!metrics({cpu_seconds:2,gpu_seconds:3,resources_accounted:true}).includes('verificata'));
+    assert(metrics({cpu_seconds:2,resource_metrics_partial:true}).includes('in corso'));
     '''
     subprocess.run(['node','-e',code],check=True)
 

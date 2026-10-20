@@ -1,0 +1,12 @@
+{
+  "engine": "current",
+  "positions": {
+    "during_preparation": 6107.222222222223,
+    "ruler_click_after_pause": 9104.319727891156,
+    "numeric_input_after_pause": 14104.319727891156,
+    "keyboard_arrow_after_pause": 14380.319727891156,
+    "clip_click_after_pause": 21115.929705215418,
+    "click_after_stop": 4115.92970521542
+  },
+  "javascript_errors": []
+}

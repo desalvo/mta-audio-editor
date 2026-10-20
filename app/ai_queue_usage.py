@@ -1,7 +1,7 @@
-"""Read-only queue resource view over authenticated worker accounting.
+"""Read-only queue view of measured and server-accepted accounted resources.
 
-This projection never settles billing, invents idle GPU time or promotes live
-samples/profiler diagnostics to verified ledger consumption.
+Accepted values require immutable job evidence. Live counters remain separate;
+this projection never settles billing or labels them as verified telemetry.
 """
 import json
 import math
@@ -61,14 +61,22 @@ def enrich(value):
                         raise ValueError('Invalid resource record')
                 except (ValueError, TypeError):
                     usage, diag = {}, {}
-                if row['resource_source']=='diagnostic-estimate':
-                    for metric in ('cpu_seconds','gpu_seconds'):
-                        if metric in usage:diag[metric+'_estimated']=usage[metric]
-                    result['diagnostic_estimates_trusted']=True
-                    result['gpu_metrics_source']='diagnostic-estimate'
-                    result['gpu_metrics_status']='diagnostic_estimate_trusted'
-                c = number(usage.get('cpu_seconds')) if row['status'] in ('done', 'failed', 'cancelled') and row['resource_source'] in TRUSTED_CPU else None
-                g = number(usage.get('gpu_seconds')) if row['status'] in ('done', 'failed', 'cancelled') and row['resource_source'] in ('gpu-agent', 'gpu-kernel-verified') else None
+                accepted = False
+                if row['resource_source']=='diagnostic-estimate' and row['status']=='done':
+                    evidence = con.execute('SELECT envelope FROM ai_trusted_estimate_evidence WHERE job_id=?', (row['id'],)).fetchone() if 'ai_trusted_estimate_evidence' in tables else None
+                    try:
+                        envelope = json.loads(evidence[0]) if evidence else {}
+                        accepted = bool(usage) and envelope.get('usage') == usage and all(number(v) is not None for v in usage.values())
+                    except (ValueError, TypeError, AttributeError):
+                        accepted = False
+                    if accepted:
+                        result['diagnostic_estimates_trusted']=True  # compatibility for older clients
+                        result['resources_accounted']=True
+                        if number(usage.get('gpu_seconds')) is not None:
+                            result['gpu_metrics_source']='diagnostic-estimate'
+                            result['gpu_metrics_status']='accounted'
+                c = number(usage.get('cpu_seconds')) if row['status'] in ('done', 'failed', 'cancelled') and (row['resource_source'] in TRUSTED_CPU or accepted) else None
+                g = number(usage.get('gpu_seconds')) if row['status'] in ('done', 'failed', 'cancelled') and (row['resource_source'] in ('gpu-agent', 'gpu-kernel-verified') or accepted) else None
                 if g is not None and row['resource_source'] == 'gpu-kernel-verified':
                     evidence = con.execute('SELECT seconds FROM ai_verified_gpu_evidence WHERE job_id=?', (row['id'],)).fetchone() if 'ai_verified_gpu_evidence' in tables else None
                     if evidence is None or number(evidence[0]) != g:

@@ -1,0 +1,16 @@
+{
+  "screenshots": [],
+  "fractional_zoom_persisted": true,
+  "zoom_anchor_retained": true,
+  "icon_buttons": 23,
+  "generation_survives_queued_autosave": true,
+  "live_audio_refresh_engine": "current",
+  "marker_audio_revision_changed": true,
+  "menu_in_viewport": true,
+  "toolbar_reload_persisted": true,
+  "monitor_reload_persisted": true,
+  "mobile_and_capability_visibility": true,
+  "mixer_labels": 5,
+  "online_manual_mobile_layout": true,
+  "errors": []
+}

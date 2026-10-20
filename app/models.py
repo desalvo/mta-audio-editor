@@ -453,7 +453,7 @@ class Project(BaseModel):
     piano_panel_visible: bool = False
     piano_panel_width_px: int = Field(default=360, ge=250, le=620)
     inspector_visible: bool = True
-    timeline_zoom_px_per_sec: int = Field(default=70, ge=25, le=1200)
+    timeline_zoom_px_per_sec: float = Field(default=70, ge=25, le=1200, allow_inf_nan=False)
     mixer_height_px: int = Field(default=320, ge=180, le=900)
     mixer_meta_tab: Literal["lyrics", "chords", "markers"] = "lyrics"
     export_format: Literal["mta", "wav", "mp3", "mlive_mp3", "mp3g", "flac", "mp4"] = "mta"

@@ -33,9 +33,11 @@ def test_musical_zoom_presets_follow_bpm_and_time_signature():
 
 
 def test_zoom_range_supports_deep_musical_zoom():
-    model = Path("app/models.py").read_text()
+    from app.models import Project
+    schema = Project.model_json_schema()["properties"]["timeline_zoom_px_per_sec"]
     html = Path("app/templates/index.html").read_text()
-    assert "timeline_zoom_px_per_sec: int = Field(default=70, ge=25, le=1200)" in model
+    assert schema["minimum"] == 25 and schema["maximum"] == 1200
+    assert Project(id="zoom", title="Zoom", timeline_zoom_px_per_sec=175.616).timeline_zoom_px_per_sec == 175.616
     assert 'id="topZoom" type="range" min="25" max="1200"' in html
 
 

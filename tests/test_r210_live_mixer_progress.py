@@ -199,7 +199,7 @@ def test_native_live_mixer_uses_bridge_without_saving_and_updates_meters():
         page.set_content('<button id="playMaster"></button><span id="vu-tone-L"></span><span id="vu-tone-R"></span><span id="vu-master-L"></span><span id="vu-master-R"></span>')
         page.add_script_tag(content=(ROOT/'app/static/playback_prep.js').read_text())
         page.evaluate('''()=>{
- window.currentUser={native_single_user:true};window.nativeAudioEngineIdentity='cpp';window.current={id:'native-mixer',realtime_meter_enabled:true,tracks:[{id:'tone',volume_db:0,pan:0,gain_db:0}]};window.playCursorMs=0;window.playbackPaused=false;window.timelineAudioDirty=false;window.projectDirty=false;
+ window.currentUser={native_single_user:true};window.nativeAudioEngineIdentity='cpp';window.current={id:'native-mixer',realtime_meter_enabled:true,tracks:[{id:'tone',volume_db:0,pan:0,gain_db:0}]};window.playCursorMs=0;window.transportPositionRevision=0;window.playbackPaused=false;window.timelineAudioDirty=false;window.projectDirty=false;
  for(const name of ['previewMaster','stopPlayback','pausePlayback','resumePlayback','togglePlayback','goToTimestamp','seekTransport','goTransportStart','timingAudioChanged','updatePlaybackGains','queueLiveFxRefresh','setPlayCursor','updateTimedPlaybackOverlay','setRenderPlaybackPreparing','collect'])window[name]=()=>{};
  window.setTrackPan=(id,value)=>{current.tracks[0].pan=value};window.playbackActuallyRunning=()=>false;window.$=s=>document.querySelector(s);window.tempoRatio=()=>1;window.tr=en=>en;window.toast=message=>{throw Error(message)};
  window.saves=0;window.persistCurrentProject=async()=>{saves++;throw Error('Live faders must not save')};window.liveCalls=[];

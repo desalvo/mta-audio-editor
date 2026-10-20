@@ -86,7 +86,7 @@ vm.createContext(context);vm.runInContext(process.argv[1],context);
 vm.runInContext("aiArrangerLastSnapshot={state:'running',gpu_metrics_status:'amd_smi_missing'};aiArrangerRenderElapsed()",context);
 assert(elapsed.textContent.includes('amd-smi non disponibile'));
 vm.runInContext("aiArrangerLastSnapshot.gpu_seconds_estimated=2.5;aiArrangerRenderElapsed()",context);
-assert(elapsed.textContent.includes('~2.5 s (trusted diagnostic estimate)'));
+assert(elapsed.textContent.includes('~2.5 s (collected consumption)'));
 '''
     result = subprocess.run(['node','-e',script,section],capture_output=True,text=True,timeout=10)
     assert result.returncode == 0, result.stderr

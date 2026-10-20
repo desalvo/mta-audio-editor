@@ -1,0 +1,95 @@
+{
+  "version": "0.3.0-r210",
+  "baseline_sha256": "7f063c80fc8bb41b6bd0cbd3fafd165dc1fb3129e0810b12b8093e9399330647",
+  "provided_ci_commit": "11e7d3666e4e2b75150e45a8d5ef63e62781efca",
+  "provided_ci_result": "4249 passed, 13 skipped, 1 stale source assertion failed",
+  "initial_extended_suite": {
+    "tests": 4265.0,
+    "failures": 11.0,
+    "errors": 0.0,
+    "skipped": 35.0,
+    "time": 2111.562,
+    "passed": 4219.0
+  },
+  "extended_deselected_unix_socket_cases": 10,
+  "extended_total_coverage_percent": 75.08,
+  "extended_line_coverage_percent": 78.43,
+  "final_targeted_and_nonperformance_reruns": {
+    "tests": 190.0,
+    "failures": 0.0,
+    "errors": 0.0,
+    "skipped": 0.0,
+    "time": 49.031,
+    "passed": 190.0
+  },
+  "initial_failures_explained": {
+    "local_executable_permissions": 7,
+    "old_consumption_label_assertions": 2,
+    "playback_timing_under_full_suite_load": 2
+  },
+  "performance_normal": {
+    "engine": "cpp",
+    "tracks": 8,
+    "start_seconds": 3.353,
+    "fader_to_audible_meter_seconds": 0.88,
+    "initial_track_meter_percent": 34.0919,
+    "space_pause_resume": true,
+    "pause_holds_cursor": true,
+    "pause_clears_meters": true,
+    "continuous_gesture_updates": true,
+    "pan_updated": true,
+    "live_mixer_requests": 6,
+    "errors": [],
+    "stream": {
+      "mode": "worklet",
+      "underruns": 0
+    },
+    "network_jitter": false,
+    "gui_stalls_ms": []
+  },
+  "performance_stress": {
+    "engine": "cpp",
+    "tracks": 8,
+    "start_seconds": 6.357,
+    "fader_to_audible_meter_seconds": 0.954,
+    "initial_track_meter_percent": 40.4603,
+    "space_pause_resume": true,
+    "pause_holds_cursor": true,
+    "pause_clears_meters": true,
+    "continuous_gesture_updates": true,
+    "pan_updated": true,
+    "live_mixer_requests": 7,
+    "errors": [],
+    "stream": {
+      "mode": "worklet",
+      "underruns": 0
+    },
+    "network_jitter": true,
+    "gui_stalls_ms": [
+      450,
+      450,
+      450,
+      450,
+      450
+    ]
+  },
+  "browser_current_and_cpp": "passed; zero JavaScript errors; fractional zoom persistence and pixel-accurate temporal anchoring",
+  "static_checks": {
+    "ruff_ci_and_modified_scripts": "passed",
+    "bandit_ci_high_high": "passed",
+    "javascript_syntax": "passed",
+    "pip_check": "passed",
+    "source_license_guard": "passed",
+    "cpp_build_abi": 1
+  },
+  "resource_policy": "Server-accepted job-scoped CPU/GPU consumption is accounted for quotas and billing; immutable source evidence remains in audit. Missing, invalid and unsealed counters do not become billable consumption. Verified telemetry retains precedence.",
+  "physical_hardware_and_production_server_validated": false,
+  "git_mutations_performed": false,
+  "source_hashes": {
+    "app/static/app.js": "b33916dfe2fed739b3b54a371943acd5ef9ee0ceb1ef62e36ce2f3801c095fc4",
+    "app/models.py": "289bbd9afd9a40c1716b2afb79fadb7d9b68ba66915d93f8031d3c2046bae929",
+    "app/ai_queue_usage.py": "bf4af734d8e364d4d3d77e6083486f9f64a820f9d48ab8dff9b99d2dc286e6d4",
+    "app/ai_usage_reporting.py": "6e923d652d894a132075dec2262c20ca8def518ac56df0c8b13721f105b2675f",
+    "app/ai_notifications.py": "32f083afd92dfb9db8360c9e08e391ca05c90543f4e89fcfeb195d20d7f3dea4"
+  }
+}

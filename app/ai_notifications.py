@@ -134,6 +134,9 @@ def collect():
                     payload['amount_micro']+=details['amount_micro']
                     payload['credits_debited_micro']+=details.get('credits_debited_micro',0)
                 payload['cost_pending']|=ledger['status']=='running'
+            for metric in payload['usage']:
+                if any(r['resource_source']=='diagnostic-estimate' and metric in json.loads(r['usage_json']) for r in linked_rows):
+                    payload['diagnostic'].pop(metric+'_estimated',None)
             tokens={r['token_id'] for r in linked_rows}
             payload['token_id']=next(iter(tokens)) if len(tokens)==1 else None
         events.append((owner,payload))
@@ -199,7 +202,7 @@ def render(payload,language):
         utc=lambda stamp:dt.datetime.fromtimestamp(stamp,dt.timezone.utc).strftime('%Y-%m-%d %H:%M UTC')
         fields=[(tr('Period','Periodo'),utc(report['start_ts'])+' → '+utc(report['end_ts'])),('Job',report['jobs']),
           (tr('Accounted resources','Risorse contabilizzate'),metric('',report['usage'])),
-          (tr('Raw diagnostic estimates','Stime diagnostiche grezze'),metric('',report['diagnostic'])),
+          (tr('Unsettled counters','Contatori non contabilizzati'),metric('',report['diagnostic'])),
           (tr('Estimated amount (not an invoice)','Importo stimato (non è una fattura)'),f"€ {report['amount_micro']/1e6:.6f}")]
         extra='<h3>'+tr('By application token','Dettaglio per token applicazione')+'</h3>'+table([(str(row['token_id'])+' · '+row['label'],f"{row['jobs']} job · € {row['amount_micro']/1e6:.6f} · "+metric('',row['usage'])) for row in report['by_token']])
     else:
@@ -208,13 +211,13 @@ def render(payload,language):
         fields=[(tr('Start','Inizio'),utc(payload.get('started_at'))),(tr('End','Fine'),utc(payload.get('finished_at'))),('Job',payload['job_id']),(tr('Operation','Operazione'),payload['operation']),
           (tr('Status','Stato'),status.get(payload['status'],payload['status'])),('Token',payload.get('token_id') or tr('Web / no token','Web / senza token')),
           (tr('Accounted resources','Risorse contabilizzate'),metric('',payload['usage'])),
-          (tr('Raw diagnostic estimates','Stime diagnostiche grezze'),metric('',payload['diagnostic'])),
+          (tr('Unsettled counters','Contatori non contabilizzati'),metric('',payload['diagnostic'])),
           (tr('Estimated amount (not an invoice)','Importo stimato (non è una fattura)'),f"€ {payload['amount_micro']/1e6:.6f}"+(' · '+tr('pending','provvisorio') if payload.get('cost_pending') else ''))]
         extra=''
     credits=payload['report'].get('credits_debited_micro',0) if payload['event']=='summary' else payload.get('credits_debited_micro',0)
     fields.append((tr('CPU/GPU credits used','Crediti CPU/GPU utilizzati'),f'€ {credits/1e6:.6f}'))
     plain=title+'\n'+APP_RELEASE+' · '+_server()+'\n'+'\n'.join(str(k)+': '+str(v) for k,v in fields)
-    body=f'''<!doctype html><html><body style="margin:0;background:#edf2f8;font:15px Arial,sans-serif;color:#172a42"><table role="presentation" width="100%"><tr><td align="center" style="padding:28px 12px"><table role="presentation" width="620" style="width:100%;max-width:620px;background:white;border-radius:14px"><tr><td style="background:#153753;color:white;padding:24px;border-radius:14px 14px 0 0"><img src="cid:mta-logo" width="64" height="64" alt="MTA"><h1 style="font-size:24px;margin:12px 0">{esc(title)}</h1><p>MTA Audio Editor · {esc(APP_RELEASE)}</p></td></tr><tr><td style="padding:24px">{table(fields)}{extra}<p style="font-size:13px;color:#54667e">{esc(tr('Server','Server'))}: {esc(_server())}</p><p style="font-size:12px;color:#54667e">{esc(tr('Per-job diagnostic estimates accepted by the server are eligible for accounting and billing and remain labelled as estimates. Raw diagnostics alone do not authorize charges. This email is not an invoice.','Le stime diagnostiche per job accettate dal server sono utilizzabili per accounting e billing e restano indicate come stime. La sola diagnostica grezza non autorizza addebiti. Questa email non è una fattura.'))}</p></td></tr></table></td></tr></table></body></html>'''
+    body=f'''<!doctype html><html><body style="margin:0;background:#edf2f8;font:15px Arial,sans-serif;color:#172a42"><table role="presentation" width="100%"><tr><td align="center" style="padding:28px 12px"><table role="presentation" width="620" style="width:100%;max-width:620px;background:white;border-radius:14px"><tr><td style="background:#153753;color:white;padding:24px;border-radius:14px 14px 0 0"><img src="cid:mta-logo" width="64" height="64" alt="MTA"><h1 style="font-size:24px;margin:12px 0">{esc(title)}</h1><p>MTA Audio Editor · {esc(APP_RELEASE)}</p></td></tr><tr><td style="padding:24px">{table(fields)}{extra}<p style="font-size:13px;color:#54667e">{esc(tr('Server','Server'))}: {esc(_server())}</p><p style="font-size:12px;color:#54667e">{esc(tr('Per-job consumption accepted by the server is accounted for quotas and billing. Unsettled counters do not authorize charges. This email is not an invoice.','I consumi per job accettati dal server sono contabilizzati per quote e billing. I contatori non contabilizzati non autorizzano addebiti. Questa email non è una fattura.'))}</p></td></tr></table></td></tr></table></body></html>'''
     return title+' · MTA',plain,body
 
 

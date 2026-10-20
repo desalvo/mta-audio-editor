@@ -1,0 +1,20 @@
+{
+  "version": "0.3.0-r210",
+  "baseline_sha256": "40f8e187a4673c01643fec97eb332b622358d468037ae32edcd22d35aa9e0423",
+  "pytest_passed": 232,
+  "pytest_failed": 0,
+  "pytest_skipped": 0,
+  "scope": "Targeted transport/audio/editor/persistence/usage regressions; not a new full-suite run",
+  "browser_engines": [
+    "current",
+    "cpp/server AudioWorklet"
+  ],
+  "browser_cases_per_engine": 6,
+  "javascript_errors": 0,
+  "race_scenarios": 17,
+  "zone_button_cases": "IT/EN x light/dark OS preference; contrast >=4.5:1, actions and mobile width checked",
+  "cpp_abi": 1,
+  "native_device_validation": "clocked null backend and bridge only; physical Windows/macOS acceptance pending",
+  "ci_attachment": "Old run at commit 11e7d366; zoom source assertion already fixed in baseline, regression passed again",
+  "remote_ci": "Pending user commit and run; no Git mutations performed"
+}

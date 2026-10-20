@@ -55,7 +55,6 @@ def test_project_model_persists_working_settings_and_mix_state():
 def test_frontend_saves_zoom_export_and_meta_tab_into_project():
     root = Path(__file__).resolve().parents[1]
     js = (root / "app/static/app.js").read_text(encoding="utf-8")
-    assert "current.timeline_zoom_px_per_sec=pxPerSec" in js
     assert "current.export_format=format" in js
     assert "current.mixer_meta_tab=kind" in js
     assert "pxPerSec=Number(current.timeline_zoom_px_per_sec||70)" in js

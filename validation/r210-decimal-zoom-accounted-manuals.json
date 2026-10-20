@@ -1,0 +1,46 @@
+[
+  {
+    "file": "MTA-Audio-Editor-Administrator-Manual-EN.pdf",
+    "pages": 15,
+    "changed_pages": [
+      15
+    ]
+  },
+  {
+    "file": "MTA-Audio-Editor-Administrator-Manual-IT.pdf",
+    "pages": 15,
+    "changed_pages": [
+      15
+    ]
+  },
+  {
+    "file": "MTA-Audio-Editor-User-Manual-EN.pdf",
+    "pages": 26,
+    "changed_pages": [
+      22,
+      26
+    ]
+  },
+  {
+    "file": "MTA-Audio-Editor-User-Manual-IT.pdf",
+    "pages": 27,
+    "changed_pages": [
+      23,
+      27
+    ]
+  },
+  {
+    "file": "MTA-Audio-Editor-VST3-Manual-EN.pdf",
+    "pages": 8,
+    "changed_pages": [
+      8
+    ]
+  },
+  {
+    "file": "MTA-Audio-Editor-VST3-Manual-IT.pdf",
+    "pages": 8,
+    "changed_pages": [
+      8
+    ]
+  }
+]

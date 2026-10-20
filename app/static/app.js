@@ -1535,7 +1535,7 @@ function metronomeZoneDescriptors(){
 async function editMetronomeZoneBpm(start,reset=false){
  const zone=metronomeZoneDescriptors().find(z=>z.start===start);if(!zone)return;
  if(reset)return applyMetronomeZoneGrid(start,true);
- showUtilityModal(tr('Zone metronome grid','Griglia metronomo della zona'),`<div class="form-grid"><p>${fmtTime(zone.start/1000)} – ${fmtTime(zone.end/1000)} · ${tr('Audio speed stays unchanged.','La velocità dell’audio resta invariata.')}</p><label>BPM<input id="zoneGridBpm" type="number" min="20" max="400" step="0.01" value="${zone.bpm}"></label><label>${tr('Time signature','Misura')}<select id="zoneGridSignature">${metronomeSignatureOptions(zone.signature)}</select></label><button onclick="applyMetronomeZoneGrid(${start},false)">${tr('Apply and regenerate zone','Applica e rigenera zona')}</button><button onclick="applyMetronomeZoneGrid(${start},true)">${tr('Return to Auto','Riporta in Auto')}</button></div>`);
+ showUtilityModal(tr('Zone metronome grid','Griglia metronomo della zona'),`<div class="form-grid"><p>${fmtTime(zone.start/1000)} – ${fmtTime(zone.end/1000)} · ${tr('Audio speed stays unchanged.','La velocità dell’audio resta invariata.')}</p><label>BPM<input id="zoneGridBpm" type="number" min="20" max="400" step="0.01" value="${zone.bpm}"></label><label>${tr('Time signature','Misura')}<select id="zoneGridSignature">${metronomeSignatureOptions(zone.signature)}</select></label><div class="form-actions zone-grid-actions"><button class="accent" onclick="applyMetronomeZoneGrid(${start},false)">${tr('Apply and regenerate zone','Applica e rigenera zona')}</button><button onclick="applyMetronomeZoneGrid(${start},true)">${tr('Return to Auto','Riporta in Auto')}</button></div></div>`);
 }
 async function applyMetronomeZoneGrid(start,reset=false){
  const bpm=Number($('#zoneGridBpm')?.value),signature=$('#zoneGridSignature')?.value;
@@ -2532,14 +2532,14 @@ function beginTimelineClipDrag(event,trackId,clipId){
   if(!multiple&&!selectedTimelineSegments.has(key))selectedTimelineSegments.clear();
   selectedTimelineSegments.add(key);selectedTrackId=trackId;selectedTrackIdSet=new Set(selectedSegmentItems().map(x=>x.track.id));sel={a:0,b:0};updateSel();paintSegmentSelection();focusTrackShortcuts(trackId);
   const items=selectedSegmentItems().map(x=>({...x,el:document.querySelector(`.clip-block[data-track-id="${CSS.escape(x.track.id)}"][data-clip-id="${CSS.escape(x.clip.id)}"]`)}));
-  const pid=event.pointerId,startX=event.clientX;let delta=0,moved=false;
+  const pid=event.pointerId,startX=event.clientX,pane=$('#timelinePane'),clickMs=pane?Math.max(0,(startX-pane.getBoundingClientRect().left+pane.scrollLeft)/pxPerSec*1000):playCursorMs;let delta=0,moved=false;
   timelineClipDrag={pointerId:pid};document.body.classList.add('moving-timeline-clip');
   const move=ev=>{if(ev.pointerId!==pid)return;ev.preventDefault();if(Math.abs(ev.clientX-startX)<3&&!moved)return;moved=true;delta=MtaTimelineRules.delta(current,selectedTimelineSegments,(ev.clientX-startX)/pxPerSec*1000,pxPerSec,key);
     for(const x of items)if(x.el)x.el.style.transform=`translateX(${delta/1000*pxPerSec}px)`;
     for(const t of current.tracks||[]){const copy={...t,clips:(t.clips||[]).map(c=>selectedTimelineSegments.has(MtaTimelineRules.key(t,c))?{...c,timeline_start_ms:c.timeline_start_ms+delta}:c)};drawWave(copy)}
   };
   const cleanup=()=>{window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',finish);window.removeEventListener('pointercancel',cancel);timelineClipDrag=null;document.body.classList.remove('moving-timeline-clip');for(const x of items)if(x.el)x.el.style.transform='';};
-  const finish=ev=>{if(ev.pointerId!==pid)return;cleanup();if(moved&&delta)moveSelectedSegments(delta,key);else for(const t of current.tracks||[])drawWave(t)};
+  const finish=ev=>{if(ev.pointerId!==pid)return;cleanup();if(!moved)goToTimestamp(clickMs);if(moved&&delta)moveSelectedSegments(delta,key);else for(const t of current.tracks||[])drawWave(t)};
   const cancel=ev=>{if(ev.pointerId!==pid)return;cleanup();for(const t of current.tracks||[])drawWave(t)};
   window.addEventListener('pointermove',move,{passive:false});window.addEventListener('pointerup',finish);window.addEventListener('pointercancel',cancel);
 }
@@ -2927,7 +2927,10 @@ function setPlayCursor(ms){
   if($('#playhead'))$('#playhead').style.left=playheadX+'px';
   followPlayhead(playheadX); updateTransportPositionDisplay();
 }
-function goToTimestamp(ms){const target=Math.max(0,Math.round(Number(ms)||0));setPlayCursor(target);if(waPlaybackActive){const wasRunning=!waPlaybackPaused;waStopSources();waStartCursorMs=target;playCursorMs=target;if(wasRunning)waScheduleAll(target)}else{reanchorTransportClock(target);alignDynamicTracks(true)}updateTimedPlaybackOverlay(target)}
+// Only explicit positioning increments this revision; clock painting never does.
+let transportPositionRevision=0;
+function requestTransportPosition(ms){const value=Number(ms),target=Number.isFinite(value)?Math.max(0,Math.round(value)):0;++transportPositionRevision;setPlayCursor(target);return target}
+function goToTimestamp(ms){const target=requestTransportPosition(ms);if(waPlaybackActive){const wasRunning=!waPlaybackPaused;waStopSources();waStartCursorMs=target;playCursorMs=target;if(wasRunning)waScheduleAll(target)}else{reanchorTransportClock(target);alignDynamicTracks(true)}updateTimedPlaybackOverlay(target)}
 function setTransportTime(value){const ms=current?.transport_time_mode==='musical'?parseMusicalPosition(value):parseLyricsChordsEditorPosition(String(value||''));if(!Number.isFinite(ms)){toast(current?.transport_time_mode==='musical'?'Posizione non valida: usa misura:beat':'Timestamp non valido: usa m:ss.mmm o mm:ss.mmm');updateTransportPositionDisplay();return false}goToTimestamp(ms);return true}
 function transportTimeKeydown(event){if(event.key==='Enter'){event.preventDefault();setTransportTime(event.currentTarget.value);event.currentTarget.blur()}else if(event.key==='Escape'){event.preventDefault();updateTransportPositionDisplay();event.currentTarget.blur()}}
 function bindTimeline(){
@@ -2947,8 +2950,8 @@ function bindTimeline(){
     const r=pane.getBoundingClientRect();
     downX=e.clientX; moved=false;
     downMs=Math.max(0,(e.clientX-r.left+pane.scrollLeft)/pxPerSec*1000);
-    if(timelineTool==='split'){e.preventDefault();splitSelectedTracksAt(downMs);setPlayCursor(downMs);return}
-    if(timelineTool==='select'){if(!e.ctrlKey&&!e.metaKey&&!e.shiftKey)selectedTimelineSegments.clear();paintSegmentSelection();sel={a:0,b:0};updateSel();setPlayCursor(downMs);return}
+    if(timelineTool==='split'){e.preventDefault();splitSelectedTracksAt(downMs);goToTimestamp(downMs);return}
+    if(timelineTool==='select'){if(!e.ctrlKey&&!e.metaKey&&!e.shiftKey)selectedTimelineSegments.clear();paintSegmentSelection();sel={a:0,b:0};updateSel();goToTimestamp(downMs);return}
     dragging=true;sel.a=sel.b=downMs;updateSel();
   };
   window.onmousemove=e=>{
@@ -2960,11 +2963,11 @@ function bindTimeline(){
   window.onmouseup=e=>{
     if(!dragging)return;
     dragging=false;
-    if(!moved){sel={a:0,b:0};updateSel();setPlayCursor(downMs)}
+    if(!moved){sel={a:0,b:0};updateSel();goToTimestamp(downMs)}
   };
   if(ruler)ruler.onclick=e=>{
     const r=pane.getBoundingClientRect();
-    setPlayCursor(Math.max(0,(e.clientX-r.left+pane.scrollLeft)/pxPerSec*1000));
+    goToTimestamp(Math.max(0,(e.clientX-r.left+pane.scrollLeft)/pxPerSec*1000));
   };
 }
 function updateSel(){const a=Math.min(sel.a,sel.b),b=Math.max(sel.a,sel.b),ids=new Set(selectedTrackIds()),visible=Math.abs(b-a)>2;$$('.lane-selection').forEach(s=>{const active=visible&&ids.has(s.dataset.selectionTrack);s.style.display=active?'block':'none';s.style.left=`${a/1000*pxPerSec}px`;s.style.width=`${Math.max(1,(b-a)/1000*pxPerSec)}px`});if($('#selectionInfo'))$('#selectionInfo').textContent=`${(a/1000).toFixed(3)} → ${(b/1000).toFixed(3)} s`;if($('#selectedTrackCount'))$('#selectedTrackCount').textContent=tr(`${ids.size} selected`,`${ids.size} selezionat${ids.size===1?'a':'e'}`)}
@@ -3464,7 +3467,7 @@ function commitZoom(v,presetValue=null){
   if(!current)return;
   const pane=$('#timelinePane'),projectId=current.id,serial=++zoomCommitSerial;
   const anchorSeconds=zoomPreviewState?.projectId===projectId?zoomPreviewState.anchorSeconds:((pane?.scrollLeft||0)+(pane?.clientWidth||0)/2)/pxPerSec;
-  const next=Math.round(clampZoom(v));pxPerSec=next;current.timeline_zoom_px_per_sec=next;zoomPreviewState=null;
+  const next=clampZoom(v);pxPerSec=next;current.timeline_zoom_px_per_sec=pxPerSec;zoomPreviewState=null;
   render();syncZoomControls(next,presetValue);
   // Rendering rebuilds the pane and schedules scroll restoration. Reapply the
   // captured time anchor after that callback; never read the new pane at zero.
@@ -5566,8 +5569,9 @@ async function prepareTimelinePlaybackBuffers(renderFilters){
   return {tracks,buffers};
 }
 async function startWebAudioProjectPlayback(renderFilters=false,cursorMs=playCursorMs){
-  const requestToken=++playbackToken;
+  const requestToken=++playbackToken,positionRevision=transportPositionRevision,projectId=current.id;
   audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();await audioCtx.resume();
+  if(requestToken!==playbackToken||current?.id!==projectId)return;
   waStopSources();for(const item of trackPlaybacks)if(item.wa)for(const n of [item.gainNode,item.panner,item.splitter,...(item.analysers||[])])try{n?.disconnect()}catch(e){}
   trackPlaybacks=[];waMasterMixMode=(current.master_inserts||[]).some(x=>x.enabled)||(current.tracks||[]).some(t=>t.master_bypass);
   try{waMasterBus?.disconnect()}catch(e){};try{masterPlaybackGainNode?.disconnect()}catch(e){};waBuildMasterGraph();
@@ -5586,7 +5590,7 @@ async function startWebAudioProjectPlayback(renderFilters=false,cursorMs=playCur
   }
   if(requestToken!==playbackToken)throw Error(tr('Audio preparation cancelled','Preparazione audio annullata'));
   waPlaybackActive=true;waPlaybackPaused=false;waRenderFilters=!!renderFilters;renderedStemPlayback=!!renderFilters;renderedMasterPlayback=false;playAudio={waClock:true,paused:false,ended:false};
-  waScheduleAll(cursorMs);playbackBuffering=false;MtaPlaybackPrep.hideProgress(preparation);
+  waScheduleAll(positionRevision===transportPositionRevision?cursorMs:playCursorMs);playbackBuffering=false;MtaPlaybackPrep.hideProgress(preparation);
   if(current?.realtime_meter_enabled)startVuMeterLoop();
   if($('#playMaster')){$('#playMaster').textContent='❚❚';$('#playMaster').title='Pausa'}
   if(playRaf)cancelAnimationFrame(playRaf);playRaf=requestAnimationFrame(movePlayhead);
@@ -5613,8 +5617,8 @@ function stopPlayback(){
 }
 function pausePlayback(){if(waPlaybackActive){playCursorMs=waProjectCursorMs();waStartCursorMs=playCursorMs;waPlaybackPaused=true;waStopSources();if(playRaf){cancelAnimationFrame(playRaf);playRaf=null}if($('#playMaster')){$('#playMaster').textContent='▶';$('#playMaster').title='Riprendi'};return}if(!playAudio&&!trackPlaybacks.length)return;pauseTransportClock();if(playAudio)playAudio.pause();for(const item of trackPlaybacks)try{item.audio.pause()}catch(e){};playbackPaused=true}
 async function resumePlayback(){if(waPlaybackActive&&timelineAudioDirty){await rebuildTimelinePlayback();return}if(waPlaybackActive){await audioCtx.resume();waScheduleAll(playCursorMs);if($('#playMaster')){$('#playMaster').textContent='❚❚';$('#playMaster').title='Pausa'};if(!playRaf)playRaf=requestAnimationFrame(movePlayhead);if(current?.realtime_meter_enabled&&!meterRaf)startVuMeterLoop();return}return previewMaster()}
-function seekTransport(deltaMs){const target=Math.max(0,playCursorMs+deltaMs);setPlayCursor(target);if(waPlaybackActive){const wasRunning=!waPlaybackPaused;waStopSources();waStartCursorMs=target;playCursorMs=target;if(wasRunning)waScheduleAll(target);updateTimedPlaybackOverlay(playCursorMs);return}reanchorTransportClock(playCursorMs);alignDynamicTracks(true)}
-function goTransportStart(){setPlayCursor(0);if(waPlaybackActive){const wasRunning=!waPlaybackPaused;waStopSources();waStartCursorMs=0;if(wasRunning)waScheduleAll(0);return}reanchorTransportClock(0);alignDynamicTracks(true)}
+function seekTransport(deltaMs){return goToTimestamp(playCursorMs+deltaMs)}
+function goTransportStart(){return goToTimestamp(0)}
 async function previewMaster(){if(!current||!current.tracks.length)return;try{collect();if(waPlaybackActive)stopPlayback();else if(playAudio||trackPlaybacks.length)stopPlayback();const render=!!current.render_preview_enabled;setRenderPlaybackPreparing(render);await startWebAudioProjectPlayback(render,playCursorMs);setRenderPlaybackPreparing(false);toast(render?'Playback WebAudio sincronizzato · FX renderizzati per traccia':'Playback WebAudio sincronizzato')}catch(e){setRenderPlaybackPreparing(false);stopPlayback();toast(e.message)}}
 function movePlayhead(){if(waPlaybackActive){if(waPlaybackPaused)return;playCursorMs=waProjectCursorMs();const x=playCursorMs/1000*pxPerSec;if($('#playhead'))$('#playhead').style.left=x+'px';followPlayhead(x);updateTransportPositionDisplay();updateTimedPlaybackOverlay(playCursorMs);playRaf=requestAnimationFrame(movePlayhead);return}const clock=dynamicClockAudio();if(!clock||clock.paused)return;playCursorMs=(renderedMasterPlayback?clock.currentTime:transportMediaSeconds())*1000*tempoRatio();playRaf=requestAnimationFrame(movePlayhead)}
 function updateVuMeters(token=meterRunToken){
@@ -5805,7 +5809,7 @@ function aiArrangerRenderProgress(job,showTerminal=false){
   })[job.state]||(active?tr('Processing. You can close this window and follow the job in AI jobs. The overall progress is an estimate of ACE stages.','Elaborazione in corso. Puoi chiudere questa finestra e seguire il job da Job AI. La percentuale complessiva, se disponibile, è una stima delle fasi ACE.'):'No running AI job / Nessuna generazione in corso.');
 }
 function aiGpuStatusLabel(status){
-  return ({profiling:'profilazione GPU in corso; dato al prossimo checkpoint',profiled_kernels_diagnostic:'stima diagnostica GPU attendibile',diagnostic_estimate_trusted:'stima diagnostica attendibile',
+  return ({profiling:'profilazione GPU in corso; dato al prossimo checkpoint',profiled_kernels_diagnostic:'consumo GPU raccolto',diagnostic_estimate_trusted:'consumo accettato',accounted:'consumo contabilizzato',
     profiler_unavailable:'profiler ROCm non disponibile',profiler_no_gpu_events:'profiler senza eventi kernel GPU',profiler_failed:'raccolta profiler GPU fallita',host_agent_not_configured:'socket agente host non visibile nel container',
     host_agent_socket_missing:'socket assente: verificare servizio host e mount',
     host_agent_socket_missing_in_mount:'socket assente nel mount: agente fermo o mount obsoleto',
@@ -5823,10 +5827,10 @@ function aiGpuStatusLabel(status){
 }
 function aiGpuSourceLabel(source){
   return ({'ace-torch-profiler':'ACE-Step / profiler kernel HIP','proxmox-host-drm':'host Proxmox / DRM','proxmox-host-amd-smi':'host Proxmox / AMD-SMI',
-    'diagnostic-estimate':'stima diagnostica attendibile','drm-fdinfo':'processo locale / DRM','amd-smi-process':'processo locale / AMD-SMI'})[source]||'';
+    'diagnostic-estimate':'consumo accettato dal server','drm-fdinfo':'processo locale / DRM','amd-smi-process':'processo locale / AMD-SMI'})[source]||'';
 }
 function aiProfilerTimeLabel(job){
-  return job.gpu_metrics_status==='profiling'?tr(' s (partial trusted diagnostic estimate)',' s (stima diagnostica attendibile parziale)'):tr(' s (trusted diagnostic estimate)',' s (stima diagnostica attendibile)');
+  return job.gpu_metrics_status==='profiling'?tr(' s (collection in progress)',' s (raccolta in corso)'):tr(' s (collected consumption)',' s (consumo raccolto)');
 }
 function aiArrangerRenderElapsed(){
   const job=aiArrangerLastSnapshot;
@@ -5837,7 +5841,7 @@ function aiArrangerRenderElapsed(){
   const prefix=job.state==='queued'?`Queued / In coda: ${job.jobs_ahead??0} ahead · Position ${job.queue_position??'?'} · `:`Elapsed / Trascorso: ${seconds}s · `;
   const connection=aiArrangerPollFailures?` · Reconnecting / Riconnessione (${aiArrangerPollFailures})`:'';
   elapsed.textContent=prefix+`${job.phase||job.state} · Job ${job.job_id||''} · CPU: ${job.cpu_seconds!=null?Number(job.cpu_seconds).toFixed(1)+' s':job.cpu_seconds_estimated!=null?'~'+Number(job.cpu_seconds_estimated).toFixed(1)+' s (ACE process)':'N/A'} · GPU: ${job.gpu_seconds!=null?Number(job.gpu_seconds).toFixed(1)+' s':job.gpu_seconds_estimated!=null?'~'+Number(job.gpu_seconds_estimated).toFixed(1)+aiProfilerTimeLabel(job):`N/A (${aiGpuStatusLabel(job.gpu_metrics_status)}${aiGpuSourceLabel(job.gpu_metrics_source)?' · fonte: '+aiGpuSourceLabel(job.gpu_metrics_source):''})`}${connection}`;
-  const values={aiMeterElapsed:seconds+' s',aiMeterCpu:job.cpu_seconds!=null?Number(job.cpu_seconds).toFixed(1)+' s':job.cpu_seconds_estimated!=null?'~'+Number(job.cpu_seconds_estimated).toFixed(1)+' s':'—',aiMeterGpu:job.gpu_seconds!=null?Number(job.gpu_seconds).toFixed(1)+' s':job.gpu_seconds_estimated!=null?'~'+Number(job.gpu_seconds_estimated).toFixed(1)+' s':'—',aiMeterCpuNote:job.cpu_seconds!=null?tr('Verified measurement','Misura verificata'):job.cpu_seconds_estimated!=null?tr('ACE process · estimate','Processo ACE · stima'):tr('Unavailable','Non disponibile'),aiMeterGpuNote:job.gpu_seconds!=null?tr('Verified measurement','Misura verificata'):job.gpu_seconds_estimated!=null?tr('Trusted diagnostic estimate','Stima diagnostica attendibile')+(active?' · '+tr('partial collection','raccolta parziale'):''):aiGpuStatusLabel(job.gpu_metrics_status)};
+  const values={aiMeterElapsed:seconds+' s',aiMeterCpu:job.cpu_seconds!=null?Number(job.cpu_seconds).toFixed(1)+' s':job.cpu_seconds_estimated!=null?'~'+Number(job.cpu_seconds_estimated).toFixed(1)+' s':'—',aiMeterGpu:job.gpu_seconds!=null?Number(job.gpu_seconds).toFixed(1)+' s':job.gpu_seconds_estimated!=null?'~'+Number(job.gpu_seconds_estimated).toFixed(1)+' s':'—',aiMeterCpuNote:job.cpu_seconds!=null?(job.resources_accounted?tr('Accounted consumption','Consumo contabilizzato'):tr('Measured consumption','Consumo misurato')):job.cpu_seconds_estimated!=null?tr('ACE process · collection in progress','Processo ACE · raccolta in corso'):tr('Unavailable','Non disponibile'),aiMeterGpuNote:job.gpu_seconds!=null?(job.resources_accounted?tr('Accounted consumption','Consumo contabilizzato'):tr('Measured consumption','Consumo misurato')):job.gpu_seconds_estimated!=null?tr('Collected consumption','Consumo raccolto')+(active?' · '+tr('partial collection','raccolta parziale'):''):aiGpuStatusLabel(job.gpu_metrics_status)};
   for(const [id,text] of Object.entries(values)){const node=document.getElementById(id);if(node)node.textContent=text;}
   if(job.steps_total){const hint=document.getElementById('aiRemixJobHint');if(hint&&active&&!job.cancel_requested)hint.textContent=job.steps_completed+'/'+job.steps_total+' valutazioni DiT osservate · avanzamento complessivo stimato ~'+Math.round(job.progress_percent||0)+'%. Puoi chiudere la finestra: Job AI resta disponibile.';}
   if(!active&&aiArrangerElapsedTimer!==null){clearInterval(aiArrangerElapsedTimer);aiArrangerElapsedTimer=null;}
@@ -5886,7 +5890,7 @@ async function aiArrangerWatchActive(waitForFinish=false){
                !document.getElementById('utilityBackdrop')?.classList.contains('hidden')){
               window.mtaAiJobs?.handled?.(job.job_id);
               closeUtilityModal();
-              toast('AI generation complete; new track added.'+(job.gpu_metrics_source==='ace-torch-profiler'&&job.gpu_seconds_estimated!=null?' GPU kernel: '+Number(job.gpu_seconds_estimated).toFixed(2)+' s (stima diagnostica attendibile).':''));
+              toast('AI generation complete; new track added.'+(job.gpu_metrics_source==='ace-torch-profiler'&&job.gpu_seconds_estimated!=null?' GPU kernel: '+Number(job.gpu_seconds_estimated).toFixed(2)+' s (consumo raccolto).':''));
             }
           }
         }else if(waitForFinish&&['failed','interrupted','cancelled'].includes(job.state)){

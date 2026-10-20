@@ -100,3 +100,41 @@ def test_account_limits_distinguish_accounted_and_verified(job):
     gpu=result['resources']['gpu']
     assert gpu['accounted_seconds']==3.5 and gpu['trusted_estimated_seconds']==3.5
     assert gpu['verified_seconds'] is None
+
+
+def test_accepted_consumption_exposed_in_queue_and_report(job, tmp_path, monkeypatch):
+    from app.ai_queue_usage import enrich
+    from app import ai_usage_reporting, ai_arranger_runtime as queue
+    monkeypatch.setattr(queue, '_ROOT', tmp_path/'queue')
+    uid,jid=job
+    with db() as con:
+        con.execute('UPDATE ai_compute_jobs SET queue_job_id=? WHERE id=?',('accepted-job',jid))
+    ai_compute_diagnostics.store(jid,{'cpu_seconds_estimated':2.5,'gpu_seconds_estimated':3.5})
+    usage,source=promote(jid,{},'unmetered')
+    ai_billing.finish_job(jid,'done',usage,source=source,finished_at=1760140810)
+    projected=enrich({'job_id':'accepted-job','actor_user_id':uid,'state':'completed'})
+    assert projected['cpu_seconds']==2.5 and projected['gpu_seconds']==3.5
+    assert projected['resources_accounted'] and projected['gpu_metrics_status']=='accounted'
+    report=ai_usage_reporting.snapshot(uid,1760140800,1760140820)
+    assert report['usage']['cpu_seconds']==2.5 and report['usage']['gpu_seconds']==3.5
+    assert 'gpu_seconds_estimated' not in report['diagnostic']
+    # Mutable progress cannot overwrite already sealed consumption.
+    ai_compute_diagnostics.store(jid,{'gpu_seconds_estimated':999})
+    assert enrich({'job_id':'accepted-job','actor_user_id':uid})['gpu_seconds']==3.5
+    # Missing evidence never upgrades the queue to accounted usage.
+    with db() as con:con.execute('DELETE FROM ai_trusted_estimate_evidence WHERE job_id=?',(jid,))
+    projected=enrich({'job_id':'accepted-job','actor_user_id':uid})
+    assert projected.get('gpu_seconds') is None and not projected.get('resources_accounted')
+
+
+def test_cpu_only_acceptance_does_not_claim_accounted_gpu(job):
+    from app.ai_queue_usage import enrich
+    uid,jid=job
+    with db() as con:con.execute('UPDATE ai_compute_jobs SET queue_job_id=? WHERE id=?',('cpu-only',jid))
+    ai_compute_diagnostics.store(jid,{'cpu_seconds_estimated':1.25})
+    usage,source=promote(jid,{},'unmetered')
+    ai_billing.finish_job(jid,'done',usage,source=source)
+    projected=enrich({'job_id':'cpu-only','actor_user_id':uid})
+    assert projected['cpu_seconds']==1.25 and projected['resources_accounted']
+    assert projected.get('gpu_seconds') is None
+    assert projected.get('gpu_metrics_status')!='accounted'

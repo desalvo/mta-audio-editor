@@ -54,7 +54,7 @@ def check() -> dict:
         have_estimates=bool(con.execute('SELECT 1 FROM ai_trusted_estimate_evidence LIMIT 1').fetchone()) if evidence_table else False
     components['gpu_per_job'] = {
         'ready': (trusted_estimates() and (collector_enabled or have_estimates)) or __import__('app.ai_gpu_verified',fromlist=['readiness']).readiness()['ready'],
-        'description': 'Job-scoped diagnostic estimates are accepted and labelled as estimates; verified kernel telemetry takes precedence' if trusted_estimates() else 'Calibrated continuous HIP kernel capture required',
+        'description': 'Server-accepted per-job consumption is accounted for quotas and billing; verified kernel telemetry takes precedence' if trusted_estimates() else 'Calibrated continuous HIP kernel capture required',
         'trusted_estimates': trusted_estimates(),
         'estimate_collector_enabled': collector_enabled,
         'accepted_estimate_evidence_available': have_estimates,

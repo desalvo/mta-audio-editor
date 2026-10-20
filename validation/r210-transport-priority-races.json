@@ -1,0 +1,34 @@
+[
+  {
+    "mode": "web",
+    "cases": [
+      "WebAudio paused seek updates clock anchor",
+      "WebAudio running seek schedules requested offset",
+      "timeline Select, Range and ruler clicks seek the audio engine",
+      "arrow and start commands use the same manual-position path",
+      "clip clicks seek while clip drags keep editing behavior",
+      "manual position during WebAudio decode wins over captured start"
+    ]
+  },
+  {
+    "mode": "native",
+    "cases": [
+      "native stale status cannot overwrite manual seek",
+      "native repeated seeks preserve latest command",
+      "native seek completes before subsequent Play with tempo conversion",
+      "native obsolete control failure cannot stop newer positioning",
+      "native positioning during device preparation wins",
+      "native stopped session cannot repaint cursor"
+    ]
+  },
+  {
+    "mode": "server",
+    "cases": [
+      "server latest seek wins while paused",
+      "server repeated running seeks keep playback intent",
+      "server session preparation honors latest manual position",
+      "server pending seek followed by Play uses requested position",
+      "server late audio unlock cannot restart a paused generation"
+    ]
+  }
+]

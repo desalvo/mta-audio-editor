@@ -28,7 +28,10 @@ def records(user_id, start, end, *, completed_window=False):
             row['credits_waived_micro']=waived.get(row['id'],0)
             row['credits_debited_micro']=credits.get(row['id'],0)
             row['usage']=json.loads(row['usage_json'])
-            row['estimated']=diagnostics.get(row['id'],{})
+            row['estimated']=dict(diagnostics.get(row['id'],{}))
+            if row['resource_source']=='diagnostic-estimate':
+                for metric in row['usage']:
+                    row['estimated'].pop(metric+'_estimated',None)
             row['cost_micro']=sum(round(qty*rates[row['id']].get(key,0)) for key,qty in row['usage'].items()
               if row['status']=='done' and row['resource_source']!='unmetered' and row['billable']==1
               and key not in ai_billing.NON_BILLABLE_IO and key!='disk_gb_hours')
@@ -53,7 +56,7 @@ def records(user_id, start, end, *, completed_window=False):
         linked=uuid.uuid5(uuid.NAMESPACE_URL,'mta-ai-inference:'+row['job_id']).hex
         if linked in all_ledger or row['job_id'] in queue_links:
             target=next((r for r in ledger if r['id']==linked),None)
-            if target is not None:
+            if target is not None and target.get('resource_source')!='diagnostic-estimate':
                 value=queue._with_live_progress(row)
                 target['estimated'].update({key:value[key] for key in ('cpu_seconds_estimated','gpu_seconds_estimated') if value.get(key) is not None})
             continue
@@ -93,4 +96,4 @@ def snapshot(user_id,start,end,*,token_id=None,completed_window=False):
       **aggregate([r for r in items if r['token_id']==tid])} for tid in sorted(ids,key=lambda x:-1 if x is None else x)]
     return {'user_id':user_id,'start_ts':start,'end_ts':end,'currency':'EUR','by_token':groups,**aggregate(items),
       'billing_enabled':ai_billing.user_billing_enabled(user_id),'amount_is_estimate':True,'interval_basis':'completion' if completed_window else 'start',
-      'note':'Importi stimati a tariffe storicizzate, non fatture. Storage condiviso per utente escluso dal dettaglio token. Stime diagnostiche attendibili utilizzabili per accounting e billing, indicate come stime.'}
+      'note':'Importi stimati a tariffe storicizzate, non fatture. Storage condiviso per utente escluso dal dettaglio token. I consumi accettati dal server sono contabilizzati per quote e billing.'}

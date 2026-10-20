@@ -82,6 +82,18 @@ def probe(report,screenshots=False):
                     assert page.evaluate('document.getElementById("timelinePane").scrollLeft')>0
                     page.evaluate('flushAutosave()');page.wait_for_timeout(100)
                     assert abs(timeline_center()-center)<.03
+                    for value in [175.61600000000007, 52.5, 123.456789]:
+                        fractional_center=timeline_center()
+                        page.evaluate('(v)=>{beginZoomPreview();previewZoom(v);commitZoom(v)}',value)
+                        page.wait_for_timeout(100)
+                        # Browser scrollLeft is quantized to CSS pixels. Compare
+                        # each operation with its own pre-zoom temporal anchor.
+                        assert abs(timeline_center()-fractional_center)<=1/value
+                        page.evaluate('()=>flushAutosave(true)')
+                        persisted=httpx.get(url+'/api/projects/'+fixture['project'],cookies={'mta_session':fixture['cookie']},trust_env=False).json()
+                        assert persisted['timeline_zoom_px_per_sec']==value
+                        assert page.evaluate('pxPerSec')==value
+                    result['fractional_zoom_persisted']=True
                     result['zoom_anchor_retained']=True
                     page.evaluate('()=>{setZoom(70);document.getElementById("timelinePane").scrollLeft=0}');page.wait_for_timeout(100)
                     page.evaluate('document.getElementById("timelinePane").scrollLeft=0')

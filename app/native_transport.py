@@ -127,6 +127,7 @@ def prepare_play(pid,cursor_ms=0,*,start_playing=True,midi_options=None):
     global _DEVICE,_SCRATCH,_PROJECT,_PREPARATION
     _PREPARATION={"stage":"loading","done":0,"total":0,"track":""}
     _guard()
+    if type(start_playing) is not bool:raise ValueError('Invalid native playback state')
     if type(cursor_ms) not in (int,float) or not math.isfinite(cursor_ms) or cursor_ms<0:raise ValueError('Invalid native seek')
     from .storage import load_project,audio_path
     from .main import validate_project_files
@@ -136,6 +137,7 @@ def prepare_play(pid,cursor_ms=0,*,start_playing=True,midi_options=None):
         if pid==_PROJECT and hasattr(_DEVICE,'update'):
             updated=_DEVICE.update(project)
             if not updated.get('requires_prepare'):
+                if not start_playing:_DEVICE.control('pause')
                 _DEVICE.control('seek',cursor_ms)
                 if start_playing:_DEVICE.control('play')
                 return {'ok':True,'active':True,'project_id':pid,**_DEVICE.status()}
@@ -161,7 +163,9 @@ def prepare_play(pid,cursor_ms=0,*,start_playing=True,midi_options=None):
             render_mix(project,audio_path,target,fmt='wav',sample_rate=int(project.sample_rate),wav_bit_depth=32)
             if epoch!=_CANCEL_EPOCH:raise RuntimeError('Native playback preparation cancelled')
             device=Device(target)
-            try:device.control('seek',cursor_ms);device.control('play')
+            try:
+                device.control('seek',cursor_ms)
+                if start_playing:device.control('play')
             except BaseException:device.close();raise
             _DEVICE=device;_SCRATCH=scratch;_PROJECT=pid
             return {'ok':True,'active':True,'project_id':pid,**device.status()}

@@ -73,7 +73,7 @@ def test_native_transport_preparation_preserves_midi_editor():
         page.set_content('<div id="utilityBackdrop"><div id="utilityBody"><input id="midiDraft" value="unsaved notes"></div></div><button id="playMaster">Play</button>')
         page.add_script_tag(content=(ROOT/'app/static/playback_prep.js').read_text())
         page.evaluate('''()=>{
- window.currentUser={native_single_user:true};window.nativeAudioEngineIdentity='cpp';window.current={id:'test',tracks:[{}]};window.playCursorMs=0;window.playbackPaused=false;window.timelineAudioDirty=false;window.projectDirty=false;
+ window.currentUser={native_single_user:true};window.nativeAudioEngineIdentity='cpp';window.current={id:'test',tracks:[{}]};window.playCursorMs=0;window.transportPositionRevision=0;window.playbackPaused=false;window.timelineAudioDirty=false;window.projectDirty=false;
  for(const name of ['previewMaster','stopPlayback','pausePlayback','resumePlayback','togglePlayback','goToTimestamp','seekTransport','goTransportStart','timingAudioChanged','updatePlaybackGains','queueLiveFxRefresh','setPlayCursor','updateTimedPlaybackOverlay','setRenderPlaybackPreparing','collect'])window[name]=()=>{};
  window.playbackActuallyRunning=()=>false;window.$=s=>document.querySelector(s);window.tempoRatio=()=>1;window.tr=en=>en;window.toast=()=>{};
  window.waitForNativeApi=async()=>({transport_control:async()=>({active:true,position_ms:0}),transport_preparation_status:async()=>({stage:'sources',done:1,total:2,track:'Track 1'}),transport_prepare_play:()=>new Promise(r=>window.finishNativePreparation=r)});

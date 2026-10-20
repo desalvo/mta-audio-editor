@@ -277,12 +277,12 @@ setTimeout:()=>1,clearTimeout(){},setInterval:()=>1,clearInterval(){}};
 vm.createContext(ctx);vm.runInContext(process.argv[1],ctx);
 (async()=>{
 await vm.runInContext('aiArrangerWatchActive()',ctx);
-assert.match(elements.aiRemixJobElapsed.textContent,/GPU: ~0.2.*partial.*estimate/);
+assert.match(elements.aiRemixJobElapsed.textContent,/GPU: ~0.2.*collection in progress/);
 reply={...reply,state:'completed',gpu_metrics_status:'profiled_kernels_diagnostic',gpu_seconds_estimated:.4};
 await vm.runInContext('aiArrangerWatchActive()',ctx);
 assert.equal(elements.aiRemixJobProgress.hidden,false);
 assert.match(elements.aiRemixJobElapsed.textContent,/GPU: ~0.4/);
-assert.doesNotMatch(elements.aiRemixJobElapsed.textContent,/partial.*estimate/);
+assert.doesNotMatch(elements.aiRemixJobElapsed.textContent,/collection in progress/);
 })().catch(e=>{console.error(e);process.exitCode=1});'''
     result = subprocess.run(['node', '-e', script, section], capture_output=True, text=True, timeout=10)
     assert result.returncode == 0, result.stderr
