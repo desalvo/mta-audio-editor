@@ -470,3 +470,10 @@ Work runtime validation: real Transkun CPU inference completed (synthetic input,
 [Detailed bilingual report](docs/R210_WORK_NEURAL_RUNTIME_VALIDATION_IT_EN.md).
 
 Post-commit r210 Audio-to-MIDI benchmark error diagnostics (non-scoring) and archived real-output replay: see [report](docs/R210_POSTCOMMIT_MIDI_DIAGNOSTICS_IT_EN.md). The 10–16-instrument target remains open.
+
+### 2026-10-21: Merish5 paired benchmark input audit
+Added `scripts/audit_paired_midi.py` to inspect real paired audio/MIDI provenance, note/program usage and strict MIDI parser anomalies without changing ground truth or claiming neural quality. Verified 43 focused tests; 10–16-instrument transcription accuracy remains open. See `docs/R210_MERISH5_PAIRED_AUDIT_IT_EN.md`.
+
+
+### CI regression note (r210)
+The October 21 quality-job VST host meter expectation and nested licenses browser disclosure test have been corrected; local regression is 26 passed and 5 skipped. Full CI and 10–16 instrument neural accuracy remain open. Details: [bilingual report](docs/R210_CI_CLOCK_LICENSE_BROWSER_FIX_IT_EN.md).

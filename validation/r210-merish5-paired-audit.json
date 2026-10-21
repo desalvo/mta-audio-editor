@@ -1,0 +1,417 @@
+{
+  "schema": "mta-paired-audio-midi-audit-1",
+  "midi": {
+    "sha256": "5725c8b3cfc46e63684c7d242f5195a7b4caba0d8cf994210c129fc8fb726416",
+    "bytes": 130408,
+    "type": 0,
+    "tracks": 1,
+    "ticks_per_beat": 480,
+    "duration_seconds": 245.011329,
+    "strict_parser_error": "data byte must be in range 0..127",
+    "tolerant_parse_used": true,
+    "note_on_count": 10632,
+    "channels_with_notes": 15,
+    "distinct_melodic_channel_program_pairs": 24,
+    "distinct_melodic_programs": 21,
+    "programs_with_notes": [
+      {
+        "channel_1based": 2,
+        "program_0based": 33,
+        "notes": 448
+      },
+      {
+        "channel_1based": 3,
+        "program_0based": 26,
+        "notes": 86
+      },
+      {
+        "channel_1based": 3,
+        "program_0based": 27,
+        "notes": 661
+      },
+      {
+        "channel_1based": 4,
+        "program_0based": 73,
+        "notes": 334
+      },
+      {
+        "channel_1based": 5,
+        "program_0based": 52,
+        "notes": 199
+      },
+      {
+        "channel_1based": 6,
+        "program_0based": 4,
+        "notes": 17
+      },
+      {
+        "channel_1based": 6,
+        "program_0based": 57,
+        "notes": 113
+      },
+      {
+        "channel_1based": 6,
+        "program_0based": 89,
+        "notes": 5
+      },
+      {
+        "channel_1based": 7,
+        "program_0based": 56,
+        "notes": 353
+      },
+      {
+        "channel_1based": 8,
+        "program_0based": 48,
+        "notes": 126
+      },
+      {
+        "channel_1based": 8,
+        "program_0based": 49,
+        "notes": 96
+      },
+      {
+        "channel_1based": 9,
+        "program_0based": 60,
+        "notes": 156
+      },
+      {
+        "channel_1based": 9,
+        "program_0based": 62,
+        "notes": 176
+      },
+      {
+        "channel_1based": 9,
+        "program_0based": 91,
+        "notes": 24
+      },
+      {
+        "channel_1based": 9,
+        "program_0based": 93,
+        "notes": 10
+      },
+      {
+        "channel_1based": 10,
+        "program_0based": 0,
+        "notes": 3731
+      },
+      {
+        "channel_1based": 11,
+        "program_0based": 12,
+        "notes": 167
+      },
+      {
+        "channel_1based": 11,
+        "program_0based": 25,
+        "notes": 837
+      },
+      {
+        "channel_1based": 11,
+        "program_0based": 29,
+        "notes": 40
+      },
+      {
+        "channel_1based": 12,
+        "program_0based": 52,
+        "notes": 465
+      },
+      {
+        "channel_1based": 13,
+        "program_0based": 27,
+        "notes": 58
+      },
+      {
+        "channel_1based": 13,
+        "program_0based": 28,
+        "notes": 476
+      },
+      {
+        "channel_1based": 14,
+        "program_0based": 108,
+        "notes": 528
+      },
+      {
+        "channel_1based": 15,
+        "program_0based": 115,
+        "notes": 775
+      },
+      {
+        "channel_1based": 16,
+        "program_0based": 4,
+        "notes": 751
+      }
+    ],
+    "program_changes": {
+      "2": [
+        {
+          "tick": 566,
+          "program": 33
+        }
+      ],
+      "3": [
+        {
+          "tick": 608,
+          "program": 26
+        },
+        {
+          "tick": 142920,
+          "program": 27
+        }
+      ],
+      "4": [
+        {
+          "tick": 644,
+          "program": 73
+        }
+      ],
+      "5": [
+        {
+          "tick": 691,
+          "program": 52
+        }
+      ],
+      "6": [
+        {
+          "tick": 737,
+          "program": 89
+        },
+        {
+          "tick": 56295,
+          "program": 4
+        },
+        {
+          "tick": 94695,
+          "program": 57
+        },
+        {
+          "tick": 158055,
+          "program": 57
+        },
+        {
+          "tick": 203297,
+          "program": 89
+        }
+      ],
+      "7": [
+        {
+          "tick": 779,
+          "program": 52
+        },
+        {
+          "tick": 94279,
+          "program": 56
+        },
+        {
+          "tick": 173612,
+          "program": 56
+        }
+      ],
+      "8": [
+        {
+          "tick": 825,
+          "program": 48
+        },
+        {
+          "tick": 46449,
+          "program": 49
+        },
+        {
+          "tick": 47980,
+          "program": 48
+        },
+        {
+          "tick": 55575,
+          "program": 48
+        },
+        {
+          "tick": 63260,
+          "program": 49
+        },
+        {
+          "tick": 74936,
+          "program": 48
+        },
+        {
+          "tick": 84415,
+          "program": 49
+        },
+        {
+          "tick": 88376,
+          "program": 48
+        },
+        {
+          "tick": 126615,
+          "program": 48
+        },
+        {
+          "tick": 134300,
+          "program": 49
+        },
+        {
+          "tick": 149660,
+          "program": 49
+        }
+      ],
+      "9": [
+        {
+          "tick": 866,
+          "program": 91
+        },
+        {
+          "tick": 40330,
+          "program": 93
+        },
+        {
+          "tick": 57125,
+          "program": 62
+        },
+        {
+          "tick": 72866,
+          "program": 60
+        },
+        {
+          "tick": 94514,
+          "program": 62
+        },
+        {
+          "tick": 127839,
+          "program": 62
+        },
+        {
+          "tick": 178465,
+          "program": 91
+        }
+      ],
+      "10": [
+        {
+          "tick": 891,
+          "program": 0
+        }
+      ],
+      "11": [
+        {
+          "tick": 933,
+          "program": 12
+        },
+        {
+          "tick": 72933,
+          "program": 29
+        },
+        {
+          "tick": 142053,
+          "program": 25
+        }
+      ],
+      "12": [
+        {
+          "tick": 984,
+          "program": 52
+        }
+      ],
+      "13": [
+        {
+          "tick": 1025,
+          "program": 28
+        },
+        {
+          "tick": 167088,
+          "program": 27
+        },
+        {
+          "tick": 167974,
+          "program": 28
+        },
+        {
+          "tick": 172651,
+          "program": 27
+        },
+        {
+          "tick": 173725,
+          "program": 28
+        },
+        {
+          "tick": 178649,
+          "program": 27
+        },
+        {
+          "tick": 179840,
+          "program": 28
+        },
+        {
+          "tick": 186345,
+          "program": 27
+        },
+        {
+          "tick": 187187,
+          "program": 28
+        },
+        {
+          "tick": 188126,
+          "program": 27
+        },
+        {
+          "tick": 191872,
+          "program": 28
+        },
+        {
+          "tick": 194001,
+          "program": 27
+        },
+        {
+          "tick": 195176,
+          "program": 28
+        },
+        {
+          "tick": 201705,
+          "program": 27
+        },
+        {
+          "tick": 202547,
+          "program": 28
+        },
+        {
+          "tick": 203486,
+          "program": 27
+        }
+      ],
+      "14": [
+        {
+          "tick": 1069,
+          "program": 108
+        }
+      ],
+      "15": [
+        {
+          "tick": 1115,
+          "program": 115
+        }
+      ],
+      "16": [
+        {
+          "tick": 1151,
+          "program": 4
+        }
+      ]
+    },
+    "unmatched_note_ends": 0,
+    "dangling_note_starts": 0
+  },
+  "audio": {
+    "sha256": "a706139ef2b6eb9852ead82ee401bfe00cc006db15bb4f5f6ba1f0ca40232f69",
+    "bytes": 7950386,
+    "duration_seconds": 248.136,
+    "streams": [
+      {
+        "codec_name": "mp3",
+        "sample_rate": "48000",
+        "channels": 2
+      }
+    ]
+  },
+  "duration_difference_seconds": 3.124671,
+  "limitations": [
+    "MIDI events are symbolic ground truth, not verified audible instrument stems.",
+    "Duration difference is not a measured temporal alignment offset.",
+    "Tolerant MIDI parsing changes invalid data bytes; preserve original.",
+    "No inference or accuracy measurements performed."
+  ]
+}

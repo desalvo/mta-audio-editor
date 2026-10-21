@@ -703,3 +703,10 @@ Verifica runtime Work: vera inferenza CPU Transkun eseguita (ingresso sintetico,
 [Detailed bilingual report](docs/R210_WORK_NEURAL_RUNTIME_VALIDATION_IT_EN.md).
 
 Diagnostica non valutativa degli errori Audio-to-MIDI r210 e riesame di output neurale reale archiviato: [resoconto](docs/R210_POSTCOMMIT_MIDI_DIAGNOSTICS_IT_EN.md). L’obiettivo di accuratezza 10–16 strumenti resta aperto.
+
+### 2026-10-21: Verifica di coppia Merish5 audio/MIDI
+Aggiunto `scripts/audit_paired_midi.py` per verificare provenienza, programmi, note e anomalie MIDI senza alterare i file o dichiarare superata la qualità neurale. Superati 43 test mirati; l’accuratezza 10–16 strumenti resta aperta. Vedere `docs/R210_MERISH5_PAIRED_AUDIT_IT_EN.md`.
+
+
+### Nota regressioni CI (r210)
+Corretti i test CI della metrica VST3 7/8 e dell’espansione del pannello licenze browser. Regressione locale: 26 superati e 5 saltati; CI completa e accuratezza neurale 10–16 strumenti ancora aperte. Vedi [rapporto bilingue](docs/R210_CI_CLOCK_LICENSE_BROWSER_FIX_IT_EN.md).

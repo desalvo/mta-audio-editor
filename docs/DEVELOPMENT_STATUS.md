@@ -1,3 +1,18 @@
+## 2026-10-21 — CI clock and licenses browser fixes (post-commit cycle)
+
+- **Implemented:** corrected 7/8 VST host-clock test expectation to quarter-note BPM and PPQ; browser test now expands the owning licenses details before its nested madmom card. Production code, global lint and license policy unchanged.
+- **Verified:** explicit host context 61.725 quarter-BPM and PPQ 1.02875 at one second; 26 passed/5 skipped in related local regression. Both targeted CI test modules collected; 1 clock and 4 browser tests skipped locally because av and Chromium are absent. Full CI remains pending; do not claim green.
+- **Still open:** new actual MR-MT3 inference and 10–16-instrument accuracy benchmark, original failing CI tests on Actions with full prerequisites, other target acceptance.
+- **Version:** 0.3.0-r210 unchanged, no Git operations or remote actions. See `R210_CI_CLOCK_LICENSE_BROWSER_FIX_IT_EN.md`.
+
+## 2026-10-21 — Merish5 paired audio/MIDI ground-truth audit (current cycle)
+
+- **Completed:** added read-only `scripts/audit_paired_midi.py` and regression tests. It records SHA-256, duration, MIDI track/channel/program counts, program changes, note pairing errors, strict-parser failure and tolerant fallback. Audit inputs remain external; no copyrighted audio embedded in distribution.
+- **Verified:** supplied `All Night Long.MID` and `All Night Long_rec1.MP3` audited with ffprobe and mido: stereo MP3 48 kHz, 248.136 seconds; type-0 MIDI 480 PPQN, 245.011329 seconds, 15 channels with notes, 10632 note-on events, 21 distinct melodic programs across 24 channel/program combinations, no dangling starts/unmatched ends. Duration difference 3.124671 s is **not** a validated alignment offset. Original strict MIDI parser fails on invalid data byte; tolerant parse used without modifying original. Input hashes in `validation/r210-merish5-paired-audit.json`.
+- **Tests:** 43 focused tests passed, including MR-MT3 integration/runtime and MIDI benchmark; no full-suite re-run or CI platform certification in this cycle.
+- **Still pending:** actual real inference on paired Merish5 mix and 10–16 instrument F1 acceptance. Although the genuine SHA-verified 183672643-byte MR-MT3 checkpoint is available outside the ZIP, the isolated reviewed runtime dependencies and compatible upstream source are absent in this environment. Do not interpret presence of weights as proof of executable inference or accuracy. Future authorized installation must preserve provenance and licenses; no threshold relaxation.
+- **Governance:** 0.3.0-r210 unchanged, no Git operations, remote server changes or neural weights embedded in ZIP.
+
 ## 2026-10-21 — CI lint repair and multitrack accuracy development (in progress)
 
 - **Starting state:** uploaded CI logs show 15 Ruff findings, 4 unused imports and 11 test-only S108/S311 findings; quality job failed. All 10–16 instrument accuracy gates remain open; model weights and representative ground truth are not available in the ZIP.

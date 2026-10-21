@@ -43,8 +43,11 @@ def test_music_assets_consent_policy_and_singing_request(language,native):
         page.locator('[data-assets-consent]').check();page.locator('[data-asset="gm-pack"]').click()
         page.wait_for_function("document.querySelector('.studio-asset progress').value===25")
         assert requests[-2][0].startswith(prefix)
-        page.locator('summary').first.click()
-        card=page.locator('[data-license="madmom"]');card.locator('summary').click()
+        # Open the owning licenses disclosure explicitly; another details section precedes it.
+        card=page.locator('[data-license="madmom"]')
+        # The matched outer disclosure must be open before interacting with its child.
+        page.locator('details').filter(has=card).first.locator('summary').first.click()
+        card.locator('summary').click()
         card.locator('[data-mode]').select_option('free_only');card.locator('[data-reason]').fill('Verified noncommercial permission and free API access')
         card.locator('[data-responsibility]').check();card.locator('[data-free]').check();card.locator('[data-license-save]').click()
         page.wait_for_function("document.querySelector('[data-license] pre').textContent.length>0")

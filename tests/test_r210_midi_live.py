@@ -33,8 +33,9 @@ def test_compiled_host_clock_decimal_meter_seek_pause_and_loop(real_plugin):
     p=Project(id='clock',title='clock',bpm=123.45,base_bpm=123.45,time_signature='7/8')
     host=HostClock(p,48000);host.apply(plugin,48000)
     before=plugin._mta_transport
-    assert before['bpm']==123.45 and (before['numerator'],before['denominator'])==(7,8)
-    assert before['ppq']==pytest.approx(123.45/60)
+    # The project BPM counts eighth-note pulses in 7/8; VST host tempo is quarter-note BPM.
+    assert before['bpm']==pytest.approx(123.45*4/8) and (before['numerator'],before['denominator'])==(7,8)
+    assert before['ppq']==pytest.approx((123.45*4/8)/60)
     plugin.process(np.zeros((2,512),np.float32),48000,buffer_size=512,reset=False)
     assert plugin._mta_transport['sample']==48512
     host.playing=False;host.apply(plugin,12000)
