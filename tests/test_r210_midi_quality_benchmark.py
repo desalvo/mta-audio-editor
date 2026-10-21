@@ -174,3 +174,17 @@ def test_cli_instrument_target_cannot_be_met_with_spurious_parts(tmp_path,capsys
     report=json.loads(capsys.readouterr().out)
     assert report['predicted_instruments']==2
     assert report['correctly_matched_instruments']==(2 if correct else 0)
+
+
+def test_diagnostics_do_not_relax_strict_instrument_duration_gate():
+    reference = score([(0, False, [(60, 100)])])
+    wrong_program = score([(24, False, [(60, 100)])])
+    report = evaluate(reference, wrong_program)
+    assert report['matched_notes'] == 0 and report['f1'] == 0
+    assert report['error_diagnostics']['predictions_with_pitch_and_onset_any_program'] == 1
+    assert report['error_diagnostics']['predictions_with_program_pitch_and_onset'] == 0
+    same_program_wrong_duration = score([(0, False, [(60, 100)])])
+    same_program_wrong_duration.parts[0].notes[0].duration_ms = 1000
+    report = evaluate(reference, same_program_wrong_duration)
+    assert report['matched_notes'] == 0 and report['f1'] == 0
+    assert report['error_diagnostics']['predictions_with_program_pitch_and_onset'] == 1

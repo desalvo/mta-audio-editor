@@ -86,7 +86,6 @@ def test_stem_buttons_have_explicit_readable_colors():
 def test_real_bridge_downloads_without_importing_separator_in_web_runtime(tmp_path,monkeypatch):
     import os
     import sys
-    import json
     package=tmp_path/'fake/audio_separator';package.mkdir(parents=True)
     (package/'__init__.py').write_text('')
     (package/'separator.py').write_text('from pathlib import Path\nclass Separator:\n def __init__(self,model_file_dir,**kw):self.folder=Path(model_file_dir)\n def download_model_files(self,name):(self.folder/name).write_bytes(b"model")\n')

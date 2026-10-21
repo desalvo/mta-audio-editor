@@ -97,6 +97,45 @@ def _match(reference, prediction, onset_ms, offset_ms):
     return len(assigned)
 
 
+def _diagnose_errors(ref, pred, onset_ms):
+    """Relaxed *diagnostics only*: never influence the strict quality metrics.
+
+    Each count is an independent upper-bound signal, not a matched-note score.
+    Pitch matches require equal GM identity; program-agnostic onset matches
+    indicate possible instrument-label confusion, never a passing prediction.
+    """
+    ref_notes = [(key, pitch, start, end) for key, notes in ref.items()
+                 for pitch, start, end in notes]
+    pred_notes = [(key, pitch, start, end) for key, notes in pred.items()
+                  for pitch, start, end in notes]
+    ref_identity = {(key, pitch) for key, pitch, _, _ in ref_notes}
+    ref_pitches = {pitch for _, pitch, _, _ in ref_notes}
+    # Use a bounded linear-ish indexed search instead of a full O(N^2) scan.
+    by_pitch = defaultdict(list)
+    for key, pitch, start, _ in ref_notes:
+        by_pitch[pitch].append((start, key))
+    for v in by_pitch.values():
+        v.sort()
+    starts = {p: [x[0] for x in v] for p, v in by_pitch.items()}
+    identity_pitch = sum((key, pitch) in ref_identity for key, pitch, _, _ in pred_notes)
+    pitch_any = sum(pitch in ref_pitches for _, pitch, _, _ in pred_notes)
+    onset_any = onset_same_identity = 0
+    for key, pitch, start, _ in pred_notes:
+        arr = by_pitch.get(pitch, ())
+        positions = starts.get(pitch, ())
+        lo = bisect_left(positions, start-onset_ms)
+        hi = bisect_right(positions, start+onset_ms)
+        if hi > lo:
+            onset_any += 1
+            if any(rkey == key for _, rkey in arr[lo:hi]):
+                onset_same_identity += 1
+    return {'predictions_with_pitch_in_reference': pitch_any,
+            'predictions_with_program_and_pitch_in_reference': identity_pitch,
+            'predictions_with_pitch_and_onset_any_program': onset_any,
+            'predictions_with_program_pitch_and_onset': onset_same_identity,
+            'note': 'Non-exclusive diagnostic overlaps; no duration matching or one-to-one assignment. Not accuracy, recall, or evidence of instrument separation.'}
+
+
 def evaluate(reference: MusicResult, prediction: MusicResult, *, onset_ms: float = 50,
              offset_ms: float = 100):
     if (type(onset_ms) not in (int, float) or not math.isfinite(onset_ms)
@@ -127,6 +166,7 @@ def evaluate(reference: MusicResult, prediction: MusicResult, *, onset_ms: float
             'reference_notes': total_ref, 'predicted_notes': total_pred,
             'precision': precision, 'recall': recall, 'f1': f1,
             'by_instrument': instrument_rows,
+            'error_diagnostics': _diagnose_errors(ref, pred, onset_ms),
             'limits': ['Matching uses pitch, onset, offset and GM program; it does not measure timbre quality.',
                        'Two performers with the same GM program are not distinguishable by this metric.',
                        'Drum notes are grouped by percussion flag; calibrated confidence is not inferred.',

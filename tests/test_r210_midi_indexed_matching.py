@@ -42,7 +42,7 @@ def _brute_match(reference, prediction, onset, offset):
 
 
 def test_indexed_matching_agrees_with_exhaustive_for_random_polyphony():
-    rng = random.Random(20261020)
+    rng = random.Random(20261020)  # noqa: S311 -- deterministic test inputs, not security randomness
     for _ in range(100):
         reference = [(rng.randrange(48, 56), rng.randrange(0, 1200), rng.randrange(1200, 2100))
                      for _ in range(rng.randrange(0, 35))]

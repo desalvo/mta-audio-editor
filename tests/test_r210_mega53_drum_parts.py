@@ -6,8 +6,8 @@ from app import mega53_runtime as m
 
 
 def test_drums_use_same_authorized_inference_pipeline():
-    with patch.object(m, 'infer', return_value=[Path('/tmp/kick.wav')]) as run:
-        assert m.infer_drums('/tmp/source.wav', '/tmp/output', {'kick'}) == [Path('/tmp/kick.wav')]
+    with patch.object(m, 'infer', return_value=[Path('/tmp/kick.wav')]) as run:  # noqa: S108 -- inert mocked paths; no filesystem access
+        assert m.infer_drums('/tmp/source.wav', '/tmp/output', {'kick'}) == [Path('/tmp/kick.wav')]  # noqa: S108 -- inert mocked paths; no filesystem access
     assert run.call_args.kwargs['drum_targets'] == {'kick'}
 
 

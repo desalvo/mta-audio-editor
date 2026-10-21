@@ -1,5 +1,3 @@
-import os
-from pathlib import Path
 import pytest
 from app.neural_vocal_adapter import checked_assets
 from app.vocal_synthesis import Settings

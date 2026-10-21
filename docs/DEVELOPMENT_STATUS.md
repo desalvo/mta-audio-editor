@@ -1,3 +1,19 @@
+## 2026-10-21 — CI lint repair and multitrack accuracy development (in progress)
+
+- **Starting state:** uploaded CI logs show 15 Ruff findings, 4 unused imports and 11 test-only S108/S311 findings; quality job failed. All 10–16 instrument accuracy gates remain open; model weights and representative ground truth are not available in the ZIP.
+- **Completed:** removed four unused imports; added narrow test-line Ruff comments for fixed mocked /tmp paths and predictable non-cryptographic seeded random generator. No production code or global lint configuration weakened.
+- **Verified:** 47 targeted pytest cases passed, Python compile of six modified test modules passed. CI static Ruff rerun blocked by unavailable executable / network resolution. Full CI rerun is still pending.
+- **Pending:** full CI and independent end-to-end neural quality runs; avoid asserting 10–16-instrument accuracy from archived negative results.
+- **Blocked:** no authorized 10–16 instrument model checkpoints and representative paired ground-truth mix/MIDI provided; past MR-MT3 F1=0 gate remains unsatisfied.
+
+## 2026-10-21 — Post-commit diagnostic cycle / Ciclo diagnostico Audio-to-MIDI
+
+- **Completed/Completato:** verified source ZIP size/SHA and CRC for 3,080 entries; inspected state documents and code; added explicit non-scoring instrument/onset error diagnostics and regression test; README IT/EN and cycle report updated.
+- **Verified/Verificato:** 32/32 focused pytest passed (includes 19 benchmark cases); Python compile passed; replay of archived real MR-MT3 output still fails unchanged 10-instrument quality gate (F1=0, exit 2). Diagnostic data: 13 pitch/onset overlaps across programs, 1 program/pitch/onset overlap; neither is a strict note match.
+- **Pending/Pendente:** real new neural inference and software/model optimization toward accurate 10–16 instrument separation; full-suite all-green regression; Qixuan IT/FR artistic listening.
+- **Blocked/Bloccato:** no model checkpoint present in source ZIP for fresh inference; separate Qixuan IT/FR bundle not locally present. No target hardware claims. Historical failures and lint findings remain disclosed, not silently resolved.
+- **Policy:** version 0.3.0-r210, no Git operations, deployment or loosened accuracy gates. See `docs/R210_POSTCOMMIT_MIDI_DIAGNOSTICS_IT_EN.md`.
+
 ## 2026-10-21 — Qixuan IT/FR and native/MIDI workflow verified
 
 - Complete general regression: **4717 passed, 18 failed, 0 errors, 98 skipped, 6 warnings**, 1935.07s. All 18 failed cases passed the final retry; **4735 distinct cases verified**. No single all-green full invocation is claimed. Late source changes have focused verification; detailed skips and overlapping focused counts in `validation/r210-qixuan-midi-native-summary.json`.

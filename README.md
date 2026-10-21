@@ -1,3 +1,5 @@
+> **2026-10-21 CI maintenance / Manutenzione CI:** Fixed 15 reported Ruff findings in isolated tests (unused imports, mocked path literals and deterministic random input), without suppressing project lint rules. Focused verification: 47 passed. Multi-instrument 10–16 quality remains **unverified and open**, awaiting authorized model weights and labeled representative audio/MIDI.
+
 **Current r210 verification,21October2026:** 4,735 distinct cases verified across the complete regression and final failed-case retry; 98 skipped. Qixuan existing-bank IT/FR software, native UI zoom, audio/MIDI project modes, musical transport/metronome and quantization verified. Twelve real Qixuan CPU cases passed; IT/FR remain disclosed cross-language projections. [Current bilingual report](docs/R210_QIXUAN_MIDI_NATIVE_IT_EN.md). Physical target/listening acceptance and the historical10–16-instrument accuracy gate remain distinct. All earlier status entries below are historical.
 
 **Current r210 verification, 21 October 2026:** 4,680 passed, zero failures/errors, 98 skipped. Fixed tariff navigation and added engine-grouped per-file AI administration. Qixuan IT/FR profiles passed eight actual CPU ONNX cases; these are disclosed cross-language projections. **10–16-instrument accuracy remains unmet, beyond hardware acceptance.** [Current bilingual report](docs/R210_ADMIN_QIXUAN_ACCURACY_IT_EN.md). All earlier status entries below are historical.
@@ -466,3 +468,5 @@ Offline Vocal Studio PCM verification and completion blockers: `docs/R210_20_PAS
 Work runtime validation: real Transkun CPU inference completed (synthetic input, zero notes; not a musical benchmark); Seed-VC singing config guard and offline asset audit added. General regression interrupted by automatic approval review of unexpected GitHub egress, without bypass. The three macroareas are not certified complete; remaining work is not limited to hardware acceptance.
 
 [Detailed bilingual report](docs/R210_WORK_NEURAL_RUNTIME_VALIDATION_IT_EN.md).
+
+Post-commit r210 Audio-to-MIDI benchmark error diagnostics (non-scoring) and archived real-output replay: see [report](docs/R210_POSTCOMMIT_MIDI_DIAGNOSTICS_IT_EN.md). The 10–16-instrument target remains open.

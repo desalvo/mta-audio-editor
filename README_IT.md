@@ -1,3 +1,5 @@
+> **2026-10-21 CI maintenance / Manutenzione CI:** Fixed 15 reported Ruff findings in isolated tests (unused imports, mocked path literals and deterministic random input), without suppressing project lint rules. Focused verification: 47 passed. Multi-instrument 10–16 quality remains **unverified and open**, awaiting authorized model weights and labeled representative audio/MIDI.
+
 **Verifica corrente r210, 21 ottobre 2026:** 4,735 casi distinti verificati tra regressione completa e riesame finale dei casi falliti; 98 saltati. Verificati Qixuan IT/FR sulla banca esistente, zoom UI nativo, progetti audio/MIDI, transport/metronomo musicale e quantizzazione. Dodici inferenze CPU Qixuan riuscite; IT/FR restano proiezioni tra lingue. [Resoconto bilingue corrente](docs/R210_QIXUAN_MIDI_NATIVE_IT_EN.md). Restano distinti i collaudi reali/d’ascolto e il precedente obiettivo di accuratezza su 10–16 strumenti. Le verifiche precedenti riportate sotto sono storiche.
 
 **Verifica corrente r210, 21 ottobre 2026:** 4.680 test superati, zero errori, 98 saltati. Corretti il link alle tariffe e la gestione dei singoli file AI per motore. Otto inferenze CPU ONNX riuscite con i profili Qixuan IT/FR, dichiarati come proiezioni tra lingue. **L’accuratezza su 10–16 strumenti resta irrisolta: non mancano soltanto collaudi hardware.** [Resoconto bilingue corrente](docs/R210_ADMIN_QIXUAN_ACCURACY_IT_EN.md). Le precedenti verifiche riportate sotto sono storiche.
@@ -699,3 +701,5 @@ Validazione offline PCM del Vocal Studio e blocchi ancora aperti: `docs/R210_20_
 Verifica runtime Work: vera inferenza CPU Transkun eseguita (ingresso sintetico, zero note; non benchmark musicale); guardia configurazione canto Seed-VC e audit asset offline aggiunti. Regressione generale interrotta da revisione automatica per egress GitHub inatteso, non aggirata. Le tre macroaree non sono certificate complete e non restano soltanto collaudi hardware.
 
 [Detailed bilingual report](docs/R210_WORK_NEURAL_RUNTIME_VALIDATION_IT_EN.md).
+
+Diagnostica non valutativa degli errori Audio-to-MIDI r210 e riesame di output neurale reale archiviato: [resoconto](docs/R210_POSTCOMMIT_MIDI_DIAGNOSTICS_IT_EN.md). L’obiettivo di accuratezza 10–16 strumenti resta aperto.

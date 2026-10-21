@@ -1,4 +1,3 @@
-import math
 import pytest
 from app.gm_instruments import validate_midi_packet, schedule_gm_events
 
