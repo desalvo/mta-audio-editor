@@ -51,6 +51,25 @@ def verified_runtime():
     return path
 
 
+def select_inference_device(torch, requested):
+    """Resolve an explicit backend; never silently fall back for a GPU request."""
+    if requested == 'cpu':
+        return 'cpu'
+    if requested not in ('rocm', 'cuda', 'gpu'):
+        raise ValueError('MTA_STUDIO_YOURMT3_DEVICE must be cpu, rocm, cuda or gpu')
+    if not torch.cuda.is_available():
+        raise RuntimeError('YourMT3 GPU requested but PyTorch reports no usable accelerator')
+    hip = getattr(torch.version, 'hip', None)
+    cuda = getattr(torch.version, 'cuda', None)
+    if requested == 'rocm' and not hip:
+        raise RuntimeError('YourMT3 ROCm requested but PyTorch is not a HIP build')
+    if requested == 'cuda' and (not cuda or hip):
+        raise RuntimeError('YourMT3 NVIDIA CUDA requested but PyTorch is not a CUDA build')
+    if not (hip or cuda):
+        raise RuntimeError('YourMT3 GPU backend identity could not be verified')
+    return 'cuda'  # HIP uses the torch.cuda device namespace too.
+
+
 def transcribe(source,options):
     previous=Path.cwd()
     try:return _transcribe(source,options)
@@ -79,7 +98,9 @@ def _transcribe(source,options):
     from model_helper import load_model_checkpoint,slice_padded_array,merge_zipped_note_events_and_ties_to_notes,mix_notes
     progress('loading-model','Loading verified YourMT3 tensors on CPU')
     arguments=list(ARGS);arguments[0]=experiment+'@model.safetensors'
-    model=load_model_checkpoint(args=arguments,device='cpu')
+    device=select_inference_device(torch,os.environ.get('MTA_STUDIO_YOURMT3_DEVICE','cpu'))
+    progress('loading-model',f'YourMT3 device: {device}')
+    model=load_model_checkpoint(args=arguments,device=device)
     rate=model.audio_cfg['sample_rate'];size=model.audio_cfg['input_frames']
     wave,sr=sf.read(str(source),always_2d=True,dtype='float32')
     audio=torchaudio.functional.resample(torch.from_numpy(wave.mean(axis=1)).reshape(1,-1),sr,rate)
@@ -88,7 +109,8 @@ def _transcribe(source,options):
     with torch.inference_mode():
         for index in range(len(segments)):
             progress('transcribing',f'YourMT3 audio window {index+1}/{len(segments)}; decoding time varies')
-            tokens,_=model.inference_file(bsz=1,audio_segments=segments[index:index+1]);batches.extend(tokens)
+            inputs=segments[index:index+1].to(device)
+            tokens,_=model.inference_file(bsz=1,audio_segments=inputs);batches.extend(tokens)
     starts=[size*i/rate for i in range(len(segments))];voices=[]
     for channel in range(model.task_manager.num_decoding_channels):
         sequence=[arr[:,channel,:] for arr in batches]
@@ -129,4 +151,4 @@ def _transcribe(source,options):
         'Programs are model-class representatives. Singing classes 100/101 use generated GM playback programs 53/52, not inferred FX timbres.',
         'Calibrated confidence, pitch bend, controllers and independent players of the same instrument are unavailable.',
         'More than 15 melodic parts share MIDI channels; use per-track instruments or remap channels before hardware/SMF playback.' if melodic>15 else 'Melodic parts use distinct MIDI channels; percussion uses channel 10.',
-        'CPU verified on a short piano fixture only; broad mixed-instrument accuracy and ROCm/CUDA are not certified.'])
+        'GPU execution requires independent hardware validation; broad mixed-instrument accuracy is not certified.'])

@@ -160,7 +160,26 @@ def evaluate(reference: MusicResult, prediction: MusicResult, *, onset_ms: float
     precision = total_tp / total_pred if total_pred else 0.0
     recall = total_tp / total_ref if total_ref else 0.0
     f1 = 2*precision*recall/(precision+recall) if precision+recall else 0.0
-    return {'protocol': 'mta-midi-benchmark-1', 'onset_tolerance_ms': onset_ms,
+    # Score v1: strict note fidelity times verified instrument coverage.
+    # A model cannot score 100 by emitting empty or duplicated tracks.
+    reference_active = {k for k, notes in ref.items() if notes}
+    matched_active = {row['instrument'] for row in instrument_rows
+                      if row['reference_notes'] and row['matched_notes']}
+    coverage = len(matched_active) / len(reference_active) if reference_active else 0.0
+    fidelity = 100.0 * f1 * coverage
+    fidelity = round(min(100.0, max(0.0, fidelity)), 4)
+    score_status = 'measured' if total_ref else 'not_evaluable'
+    return {'protocol': 'mta-midi-benchmark-1', 'fidelity_score_0_100': fidelity,
+            'fidelity_score_status': score_status,
+            'score_method': 'strict-note-f1-times-matched-reference-instrument-coverage-v1',
+            'matched_reference_instruments': len(matched_active),
+            'reference_active_instruments': len(reference_active),
+            'instrument_coverage': coverage,
+            'at_least_10_instruments_verified': len(matched_active) >= 10,
+            'all_reference_instruments_verified': bool(reference_active) and matched_active == reference_active,
+            'certified_10_to_16_instruments': False,
+            'score_note': '100 requires perfect note matching across all reference instruments; independent validation and unchanged acceptance thresholds are required for certification.',
+            'onset_tolerance_ms': onset_ms,
             'offset_tolerance_ms': offset_ms, 'reference_instruments': len(ref),
             'predicted_instruments': len(pred), 'matched_notes': total_tp,
             'reference_notes': total_ref, 'predicted_notes': total_pred,

@@ -31,7 +31,19 @@ def convert(source,output,variant='nops'):
     from safetensors.torch import save_file
     names=('utils.task_manager.TaskManager','utils.event_codec.FastCodec','utils.tokenizer.NoteEventTokenizer',
            'utils.note_event_dataclasses.EventRange','utils.note_event_dataclasses.Event')
-    allowed=[(DiscardedMetadata,name) for name in names]+[np.core.multiarray.scalar,np.core.multiarray._reconstruct,np.dtype,np.ndarray]
+    # NumPy 2 exposes these functions as numpy._core, while the pinned
+    # original-author checkpoint was serialized with numpy.core. PyTorch's
+    # weights-only unpickler compares the *serialized global name*, so allow
+    # precisely the historical spelling as well as the current one.
+    # This is deliberately not a blanket pickle allowlist.
+    reconstruct=np._core.multiarray._reconstruct if hasattr(np,"_core") else np.core.multiarray._reconstruct
+    scalar=np._core.multiarray.scalar if hasattr(np,"_core") else np.core.multiarray.scalar
+    allowed=[(DiscardedMetadata,name) for name in names]
+    allowed += [(reconstruct,'numpy.core.multiarray._reconstruct'),
+                (reconstruct,'numpy._core.multiarray._reconstruct'),
+                (scalar,'numpy.core.multiarray.scalar'),
+                (scalar,'numpy._core.multiarray.scalar'),
+                np.dtype,np.ndarray]
     allowed += [type(np.dtype(t)) for t in ('float32','float64','int32','int64','uint8','bool','U1')]
     with torch.serialization.safe_globals(allowed):checkpoint=torch.load(source,map_location='cpu',weights_only=True)
     state=checkpoint.get('state_dict')

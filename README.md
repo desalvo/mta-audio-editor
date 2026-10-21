@@ -1,3 +1,13 @@
+**Multitrack accuracy (r210):** The full real MR-MT3 benchmark remains unaccepted (F1 9.49%, only 2 melodic programs with a strict match). See `docs/R210_MULTITRACK_FINAL_ACCEPTANCE_IT_EN.md` for the new fail-closed acceptance audit.
+
+**CI 2026-10-21 (deferred commit):** Restore Docker build visibility for required reviewed docs and preserve binary-exact optional plugin license notices across Windows checkouts; full cross-platform rerun pending. YourMT3+ GPU inference and 10–16-instrument accuracy remain unverified.
+
+Full-track MR-MT3 ROCm alignment sensitivity: see `docs/R210_MRMT3_OFFSET_STUDY_IT_EN.md` (post-hoc offset scores are **not** acceptance scores).
+
+MR-MT3 CPU progress: resumable runner supports `--time-budget-seconds` (cooperative limit between saved windows). The real 45s Merish5 run reached 8/22 windows; 10–16 instrument accuracy remains open.
+
+**MR-MT3 post-commit:** Added a resumable offline real-inference runner (`scripts/run_mrmt3_resumable.py`) with SHA-256 input identity and atomic per-window tokens. Reproduced 165 notes over six actual Merish5 windows across three invocations; 27 focused tests pass. 10–16 instrument accuracy remains open. See [report](docs/R210_MRMT3_RESUMABLE_INFERENCE_IT_EN.md).
+
 **Native CI security (2026-10-21):** `requirements-native.txt` upgrades `certifi` to `2026.10.19` and `uv` to `0.13.4` following pip-audit PYSEC-2026-4320/4321; strict security auditing stays enabled. Pending fresh CI validation.
 
 > **2026-10-21 CI maintenance / Manutenzione CI:** Fixed 15 reported Ruff findings in isolated tests (unused imports, mocked path literals and deterministic random input), without suppressing project lint rules. Focused verification: 47 passed. Multi-instrument 10–16 quality remains **unverified and open**, awaiting authorized model weights and labeled representative audio/MIDI.
@@ -482,3 +492,25 @@ The October 21 quality-job VST host meter expectation and nested licenses browse
 
 
 CI follow-up (r210): `docs/R210_CI_JOB_119323161900_IT_EN.md` records the corrected browser-test capabilities URL handling and improved MIDI-save response diagnostics. Full GitHub browser regression remains pending.
+
+GPU benchmarking: run `scripts/run_mrmt3_gpu_benchmark.py` on a separately provisioned CUDA machine with explicit opt-in; see `docs/R210_GPU_AUDIO_MIDI_BENCHMARK_IT_EN.md`. GPU quality is not yet certified.
+
+
+MR-MT3 GPU benchmark: standalone Linux or server co-located in an isolated venv; AMD ROCm supported through explicit `--backend rocm` selection (requires ROCm PyTorch). See `docs/R210_GPU_AUDIO_MIDI_BENCHMARK_IT_EN.md`. Real GPU/accuracy validation pending.
+
+MR-MT3 ROCm: fixed serialization of model-returned NumPy tokens; real GPU retry and 10–16-instrument accuracy remain pending.
+
+### r210 multi-model Audio-to-MIDI evaluation (commit deferred)
+
+Run `python scripts/compare_multitrack_models.py --midi reference.mid --prediction MR-MT3=mrmt3/prediction.json --prediction YourMT3+=yourmt3/prediction.json --output comparison.json` after **real independent** inferences. Scoring is zero-offset, exact program/pitch, 50 ms onset/100 ms offset. Reference-derived offset fitting cannot certify quality. See `docs/R210_MULTIMODEL_FIXED_BENCHMARK_IT_EN.md`. MR-MT3 ROCm baseline is 9.49% strict F1; 10–16 instrument accuracy remains open.
+
+### YourMT3+ GPU opt-in (r210, experimental)
+
+The reviewed YourMT3+ runtime continues to run on CPU by default. When **a verified runtime with a compatible GPU build of PyTorch** is installed in an isolated environment, explicitly set `MTA_STUDIO_YOURMT3_DEVICE=rocm` (AMD ROCm), `cuda` (NVIDIA), or `gpu` (either). No CPU fallback occurs for an explicit GPU request. The current installer `scripts/install_studio_yourmt3.py` remains CPU-specific and must not be used to install a GPU build over an existing ROCm environment. Running tests alone does not certify GPU inference or the 10–16-instrument accuracy target; see `docs/R210_YOURMT3_GPU_PREPARATION_IT_EN.md`.
+
+Verified YourMT3+ ROCm standalone setup and strict benchmark: `docs/R210_YOURMT3_VERIFIED_ROCM_BENCHMARK_IT_EN.md`.
+
+
+YourMT3 legacy NumPy checkpoint compatibility / Compatibilità checkpoint NumPy legacy YourMT3: pinned verified checkpoint conversion now allowlists historical NumPy serialization names while keeping weights-only loading enabled. Run the installer again on the isolated ROCm host; a complete GPU inference and accuracy certification have not yet been verified.
+
+**Experimental Audio-to-MIDI (web/native):** MR-MT3 and YourMT3+ are displayed when the local/server runtime is available, with license/status controls; a managed model bundle does not itself install a runtime. See `docs/R210_EXPERIMENTAL_AUDIO_MIDI_NATIVE_IT_EN.md`.

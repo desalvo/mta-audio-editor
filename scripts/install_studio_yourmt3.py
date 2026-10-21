@@ -51,7 +51,7 @@ def download(relative,target,size,sha,cache=None):
     finally:part.unlink(missing_ok=True)
 
 
-def install(root,test_audio,cache=None):
+def install(root,test_audio,cache=None,use_current_gpu_python=False):
     if sys.platform!='linux':raise ValueError('This pinned CPU installation recipe currently supports Linux only')
     if sys.version_info[:2] not in ((3,11),(3,12)):raise ValueError('Use Python 3.11 or 3.12 for this isolated runtime')
     root=root.absolute()
@@ -59,7 +59,7 @@ def install(root,test_audio,cache=None):
     if not test_audio.is_file():raise ValueError('Supply a short authorized musical WAV fixture, not silence')
     root.mkdir(parents=True,mode=0o700)
     identity=root.stat().st_ino
-    try:return install_created(root,test_audio,cache)
+    try:return install_created(root,test_audio,cache,use_current_gpu_python)
     except BaseException:
         # This invocation owns this new directory; never remove a replacement
         # directory, an existing runtime or a symlink supplied by another actor.
@@ -67,13 +67,20 @@ def install(root,test_audio,cache=None):
         raise
 
 
-def install_created(root,test_audio,cache):
-    python=root/('Scripts/python.exe' if os.name=='nt' else 'bin/python')
+def install_created(root,test_audio,cache,use_current_gpu_python=False):
+    python=Path(sys.executable) if use_current_gpu_python else root/('Scripts/python.exe' if os.name=='nt' else 'bin/python')
     def run(args,**kw):subprocess.run(list(map(str,args)),check=True,**kw)
-    run([sys.executable,'-m','venv',root])
-    run([python,'-m','pip','install','--disable-pip-version-check','torch==2.11.0+cpu','torchaudio==2.11.0+cpu',
-         '--index-url','https://download.pytorch.org/whl/cpu'])
-    run([python,'-m','pip','install','--disable-pip-version-check','-r',PROJECT/'requirements-studio-yourmt3.txt'])
+    if use_current_gpu_python:
+        import torch
+        from app.yourmt3_adapter import select_inference_device
+        select_inference_device(torch,'rocm')
+        # Do not install dependencies into or mutate the tested operator GPU venv.
+        run([python,'-m','pip','check'])
+    else:
+        run([sys.executable,'-m','venv',root])
+        run([python,'-m','pip','install','--disable-pip-version-check','torch==2.11.0+cpu','torchaudio==2.11.0+cpu',
+             '--index-url','https://download.pytorch.org/whl/cpu'])
+        run([python,'-m','pip','install','--disable-pip-version-check','-r',PROJECT/'requirements-studio-yourmt3.txt'])
     manifest=json.loads((PROJECT/'app/studio_assets/yourmt3_sources.json').read_text())
     for i,item in enumerate(manifest['files']):
         print(f"Source {i+1}/{len(manifest['files'])}: {item['path']}",flush=True)
@@ -100,7 +107,8 @@ def install_created(root,test_audio,cache):
     receipt={'model':MODEL,'commit':COMMIT,'license':'Apache-2.0','tested':False,
              'files':{str(path.relative_to(root)):digest(path) for path in files}}
     (root/'mta-runtime.json').write_text(json.dumps(receipt,indent=2)+'\n')
-    env={**os.environ,'MTA_STUDIO_YOURMT3_RUNTIME':str(root),'OPENBLAS_NUM_THREADS':'1','OMP_NUM_THREADS':'1'}
+    env={**os.environ,'MTA_STUDIO_YOURMT3_RUNTIME':str(root),'OPENBLAS_NUM_THREADS':'1','OMP_NUM_THREADS':'1',
+         'MTA_STUDIO_YOURMT3_DEVICE':'rocm' if use_current_gpu_python else 'cpu'}
     run([python,'-c','from app.yourmt3_adapter import transcribe;import sys;print(transcribe(sys.argv[1],{}).model_dump_json())',test_audio.resolve()],cwd=PROJECT,env=env)
     receipt['tested']=True;(root/'mta-runtime.json').write_text(json.dumps(receipt,indent=2)+'\n')
     print('Inference passed. Operator configuration (restart the application after applying):')
@@ -115,6 +123,8 @@ if __name__=='__main__':
     parser.add_argument('--test-audio',type=Path,required=True)
     parser.add_argument('--source-cache',type=Path,help='Offline source/model cache; every pinned file must be present and verified, no source download fallback')
     parser.add_argument('--accept-apache-2-license',action='store_true',help='Confirm review of the original-author Space/model and dependency licenses')
+    parser.add_argument('--use-current-rocm-python',action='store_true',
+        help='Use the already validated ROCm Python venv without installing or replacing torch; checks GPU and pip state')
     args=parser.parse_args()
     if not args.accept_apache_2_license:parser.error('Review docs/YOURMT3_RUNTIME_R210.md and explicitly accept the linked licenses')
-    install(args.runtime,args.test_audio,args.source_cache)
+    install(args.runtime,args.test_audio,args.source_cache,args.use_current_rocm_python)

@@ -11,6 +11,10 @@ htmlcov
 venv
 data/projects/*
 tests
-docs
+docs/*
+!docs/YOURMT3_RUNTIME_R210.md
+!docs/YOURMT3_RUNTIME_R210_EN.md
+!docs/MUSIC_ASSETS_AND_LICENSES_R210.md
+!docs/MUSIC_ASSETS_AND_LICENSES_R210_EN.md
 *.zip
 .env

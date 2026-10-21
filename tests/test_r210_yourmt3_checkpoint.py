@@ -86,3 +86,32 @@ def test_readonly_bundled_adapter_keeps_external_executable_boundary(tmp_path,mo
     external=tmp_path/'external.py';external.write_text('raise RuntimeError("not a trusted executable")')
     monkeypatch.setenv('MTA_AI_WORKER_AUDIO_TO_MIDI_EXECUTABLE',str(external))
     assert registry.resolve_worker('audio-to-midi') is None
+
+
+def test_checkpoint_allowlists_legacy_numpy_globals_without_unsafe_pickle(tmp_path,monkeypatch):
+    """Reviewed pinned files can contain NumPy 1.x globals on NumPy 2.x."""
+    import contextlib
+    import hashlib
+    import numpy as np
+    import torch
+    from app import studio_checkpoint as checkpoint
+    source=tmp_path/'reviewed.ckpt';source.write_bytes(b'reviewed')
+    monkeypatch.setattr(checkpoint,'SIZE',source.stat().st_size)
+    monkeypatch.setattr(checkpoint,'SHA256',hashlib.sha256(source.read_bytes()).hexdigest())
+    names=[]
+    @contextlib.contextmanager
+    def checked_globals(allowed):
+        names.extend(item[1] for item in allowed if isinstance(item,tuple))
+        yield
+    def checked_load(*args,**kwargs):
+        assert kwargs['weights_only'] is True
+        assert kwargs['map_location']=='cpu'
+        assert 'numpy.core.multiarray._reconstruct' in names
+        assert 'numpy.core.multiarray.scalar' in names
+        assert 'numpy._core.multiarray._reconstruct' in names
+        raise RuntimeError('safe-loading inspection completed')
+    monkeypatch.setattr(torch.serialization,'safe_globals',checked_globals)
+    monkeypatch.setattr(torch,'load',checked_load)
+    with pytest.raises(RuntimeError,match='inspection completed'):
+        checkpoint.convert(source,tmp_path/'out.safetensors')
+    assert not (tmp_path/'out.safetensors').exists()

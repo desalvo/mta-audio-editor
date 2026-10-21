@@ -1,0 +1,283 @@
+{
+  "models": {
+    "MR-MT3": {
+      "overall": {
+        "f1": 0.0949448293559148,
+        "matched": 925,
+        "matched_ignoring_program_diagnostic": 1410,
+        "precision": 0.10448435558567717,
+        "predicted_notes": 8853,
+        "recall": 0.0870015048908954,
+        "reference_notes": 10632
+      },
+      "per_program": {
+        "0": {
+          "f1": 0.0,
+          "matched": 0,
+          "matched_ignoring_program_diagnostic": 0,
+          "precision": 0.0,
+          "predicted_notes": 172,
+          "recall": 0.0,
+          "reference_notes": 0
+        },
+        "108": {
+          "f1": 0.0,
+          "matched": 0,
+          "matched_ignoring_program_diagnostic": 0,
+          "precision": 0.0,
+          "predicted_notes": 0,
+          "recall": 0.0,
+          "reference_notes": 528
+        },
+        "115": {
+          "f1": 0.0,
+          "matched": 0,
+          "matched_ignoring_program_diagnostic": 0,
+          "precision": 0.0,
+          "predicted_notes": 0,
+          "recall": 0.0,
+          "reference_notes": 775
+        },
+        "12": {
+          "f1": 0.0,
+          "matched": 0,
+          "matched_ignoring_program_diagnostic": 0,
+          "precision": 0.0,
+          "predicted_notes": 0,
+          "recall": 0.0,
+          "reference_notes": 167
+        },
+        "24": {
+          "f1": 0.0,
+          "matched": 0,
+          "matched_ignoring_program_diagnostic": 0,
+          "precision": 0.0,
+          "predicted_notes": 1293,
+          "recall": 0.0,
+          "reference_notes": 0
+        },
+        "25": {
+          "f1": 0.0,
+          "matched": 0,
+          "matched_ignoring_program_diagnostic": 0,
+          "precision": 0.0,
+          "predicted_notes": 0,
+          "recall": 0.0,
+          "reference_notes": 837
+        },
+        "26": {
+          "f1": 0.0,
+          "matched": 0,
+          "matched_ignoring_program_diagnostic": 0,
+          "precision": 0.0,
+          "predicted_notes": 166,
+          "recall": 0.0,
+          "reference_notes": 86
+        },
+        "27": {
+          "f1": 0.0,
+          "matched": 0,
+          "matched_ignoring_program_diagnostic": 0,
+          "precision": 0.0,
+          "predicted_notes": 0,
+          "recall": 0.0,
+          "reference_notes": 719
+        },
+        "28": {
+          "f1": 0.0,
+          "matched": 0,
+          "matched_ignoring_program_diagnostic": 0,
+          "precision": 0.0,
+          "predicted_notes": 0,
+          "recall": 0.0,
+          "reference_notes": 476
+        },
+        "29": {
+          "f1": 0.0,
+          "matched": 0,
+          "matched_ignoring_program_diagnostic": 0,
+          "precision": 0.0,
+          "predicted_notes": 136,
+          "recall": 0.0,
+          "reference_notes": 40
+        },
+        "33": {
+          "f1": 0.0,
+          "matched": 0,
+          "matched_ignoring_program_diagnostic": 0,
+          "precision": 0.0,
+          "predicted_notes": 421,
+          "recall": 0.0,
+          "reference_notes": 448
+        },
+        "4": {
+          "f1": 0.0,
+          "matched": 0,
+          "matched_ignoring_program_diagnostic": 0,
+          "precision": 0.0,
+          "predicted_notes": 513,
+          "recall": 0.0,
+          "reference_notes": 768
+        },
+        "48": {
+          "f1": 0.0,
+          "matched": 0,
+          "matched_ignoring_program_diagnostic": 0,
+          "precision": 0.0,
+          "predicted_notes": 131,
+          "recall": 0.0,
+          "reference_notes": 126
+        },
+        "49": {
+          "f1": 0.0,
+          "matched": 0,
+          "matched_ignoring_program_diagnostic": 0,
+          "precision": 0.0,
+          "predicted_notes": 0,
+          "recall": 0.0,
+          "reference_notes": 96
+        },
+        "50": {
+          "f1": 0.0,
+          "matched": 0,
+          "matched_ignoring_program_diagnostic": 0,
+          "precision": 0.0,
+          "predicted_notes": 81,
+          "recall": 0.0,
+          "reference_notes": 0
+        },
+        "52": {
+          "f1": 0.006578947368421051,
+          "matched": 3,
+          "matched_ignoring_program_diagnostic": 3,
+          "precision": 0.012096774193548387,
+          "predicted_notes": 248,
+          "recall": 0.004518072289156626,
+          "reference_notes": 664
+        },
+        "56": {
+          "f1": 0.10660980810234542,
+          "matched": 25,
+          "matched_ignoring_program_diagnostic": 25,
+          "precision": 0.21551724137931033,
+          "predicted_notes": 116,
+          "recall": 0.0708215297450425,
+          "reference_notes": 353
+        },
+        "57": {
+          "f1": 0.0,
+          "matched": 0,
+          "matched_ignoring_program_diagnostic": 0,
+          "precision": 0.0,
+          "predicted_notes": 0,
+          "recall": 0.0,
+          "reference_notes": 113
+        },
+        "60": {
+          "f1": 0.0,
+          "matched": 0,
+          "matched_ignoring_program_diagnostic": 0,
+          "precision": 0.0,
+          "predicted_notes": 0,
+          "recall": 0.0,
+          "reference_notes": 156
+        },
+        "61": {
+          "f1": 0.0,
+          "matched": 0,
+          "matched_ignoring_program_diagnostic": 0,
+          "precision": 0.0,
+          "predicted_notes": 96,
+          "recall": 0.0,
+          "reference_notes": 0
+        },
+        "62": {
+          "f1": 0.0,
+          "matched": 0,
+          "matched_ignoring_program_diagnostic": 0,
+          "precision": 0.0,
+          "predicted_notes": 0,
+          "recall": 0.0,
+          "reference_notes": 176
+        },
+        "64": {
+          "f1": 0.0,
+          "matched": 0,
+          "matched_ignoring_program_diagnostic": 0,
+          "precision": 0.0,
+          "predicted_notes": 54,
+          "recall": 0.0,
+          "reference_notes": 0
+        },
+        "73": {
+          "f1": 0.0,
+          "matched": 0,
+          "matched_ignoring_program_diagnostic": 0,
+          "precision": 0.0,
+          "predicted_notes": 0,
+          "recall": 0.0,
+          "reference_notes": 334
+        },
+        "8": {
+          "f1": 0.0,
+          "matched": 0,
+          "matched_ignoring_program_diagnostic": 0,
+          "precision": 0.0,
+          "predicted_notes": 692,
+          "recall": 0.0,
+          "reference_notes": 0
+        },
+        "80": {
+          "f1": 0.0,
+          "matched": 0,
+          "matched_ignoring_program_diagnostic": 0,
+          "precision": 0.0,
+          "predicted_notes": 679,
+          "recall": 0.0,
+          "reference_notes": 0
+        },
+        "89": {
+          "f1": 0.0,
+          "matched": 0,
+          "matched_ignoring_program_diagnostic": 0,
+          "precision": 0.0,
+          "predicted_notes": 0,
+          "recall": 0.0,
+          "reference_notes": 5
+        },
+        "91": {
+          "f1": 0.0,
+          "matched": 0,
+          "matched_ignoring_program_diagnostic": 0,
+          "precision": 0.0,
+          "predicted_notes": 0,
+          "recall": 0.0,
+          "reference_notes": 24
+        },
+        "93": {
+          "f1": 0.0,
+          "matched": 0,
+          "matched_ignoring_program_diagnostic": 0,
+          "precision": 0.0,
+          "predicted_notes": 0,
+          "recall": 0.0,
+          "reference_notes": 10
+        },
+        "drums": {
+          "f1": 0.23041356280503467,
+          "matched": 897,
+          "matched_ignoring_program_diagnostic": 897,
+          "precision": 0.22120838471023427,
+          "predicted_notes": 4055,
+          "recall": 0.24041811846689895,
+          "reference_notes": 3731
+        }
+      },
+      "predicted_programs": 15
+    }
+  },
+  "note": "No calibration on the reference MIDI; zero offset is fixed. Program-agnostic matches are diagnostic only.",
+  "protocol": "fixed-zero-offset-50ms-onset-100ms-offset",
+  "reference_notes": 10632,
+  "reference_programs": 22
+}
