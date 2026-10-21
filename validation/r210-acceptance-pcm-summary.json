@@ -1,0 +1,98 @@
+{
+  "r210-acceptance-seed-strict.wav": {
+    "sample_rate": 44100,
+    "channels": 1,
+    "frames": 132096,
+    "seconds": 2.995374149659864,
+    "finite": true,
+    "peak": 1.0,
+    "rms": 0.5171854568291476,
+    "bytes": 264270,
+    "sha256": "04024db5684665424213a962b712d52b0661fe16b59670a22818d3d4340705b8",
+    "accepted_technical_output": false
+  },
+  "r210-acceptance-vowel.wav": {
+    "sample_rate": 48000,
+    "channels": 1,
+    "frames": 144000,
+    "seconds": 3.0,
+    "finite": true,
+    "peak": 0.998389720916748,
+    "rms": 0.22124156307280826,
+    "bytes": 432044,
+    "sha256": "f80da4572e567e4f4547d7a163825d61290aeeda74eb64cd28e09df6521b4eef",
+    "accepted_technical_output": true
+  },
+  "r210-acceptance-seed-final.wav": {
+    "sample_rate": 44100,
+    "channels": 1,
+    "frames": 132096,
+    "seconds": 2.995374149659864,
+    "finite": true,
+    "peak": 0.9620361328125,
+    "rms": 0.506824431708887,
+    "bytes": 264270,
+    "sha256": "57a90eb8ca867a2d8ac7bf70d8689dc0ab8d061e06cb48ffa348e0a8ca91e73e",
+    "accepted_technical_output": true
+  },
+  "r210-acceptance-ten-programs.wav": {
+    "sample_rate": 48000,
+    "channels": 2,
+    "frames": 168000,
+    "seconds": 3.5,
+    "finite": true,
+    "peak": 1.0,
+    "rms": 0.23230412009186524,
+    "bytes": 1008044,
+    "sha256": "b80511442b31ea9c2011705bdb3fad273eac56c5c7d7e0735ded29ed22cbb7d7",
+    "accepted_technical_output": true
+  },
+  "r210-acceptance-piano.wav": {
+    "sample_rate": 48000,
+    "channels": 1,
+    "frames": 144000,
+    "seconds": 3.0,
+    "finite": true,
+    "peak": 0.6860947608947754,
+    "rms": 0.07950388731058192,
+    "bytes": 432044,
+    "sha256": "002d7002e5be8c2d71f3a3775beb403d2dab43439b206e6d00d9ca25e4b389a5",
+    "accepted_technical_output": true
+  },
+  "r210-acceptance-rvc-locked.wav": {
+    "sample_rate": 48000,
+    "channels": 1,
+    "frames": 143040,
+    "seconds": 2.98,
+    "finite": true,
+    "peak": 0.5931396484375,
+    "rms": 0.13812568122427382,
+    "bytes": 286124,
+    "sha256": "72fc338db50b1c429d38f4b950c17796945dfb276ea8cd1f221ec857b2134742",
+    "accepted_technical_output": true
+  },
+  "r210-acceptance-seed-headroom.wav": {
+    "sample_rate": 44100,
+    "channels": 1,
+    "frames": 132096,
+    "seconds": 2.995374149659864,
+    "finite": true,
+    "peak": 0.980010986328125,
+    "rms": 0.49733408472193263,
+    "bytes": 264270,
+    "sha256": "2a91a630b419011dc34d888cb54a2e0883d735bd2dfd7dc7a8bc1a7f7bff3c08",
+    "accepted_technical_output": false
+  },
+  "r210-acceptance-rvc.wav": {
+    "sample_rate": 48000,
+    "channels": 1,
+    "frames": 143040,
+    "seconds": 2.98,
+    "finite": true,
+    "peak": 0.586578369140625,
+    "rms": 0.14218920782194516,
+    "bytes": 286124,
+    "sha256": "8e0c26bdca93e55872283ed8df33abb60cd6746a04596ea6e3172c1461cf5102",
+    "accepted_technical_output": true
+  }
+}

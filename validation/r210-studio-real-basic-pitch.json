@@ -1,0 +1,83 @@
+{
+  "fixture": "5-second synthetic harmonic melody; not a real-song accuracy benchmark",
+  "model": "basic-pitch-0.4.0-onnx",
+  "device": "CPU only",
+  "expected_pitches": [
+    60,
+    64,
+    67,
+    72
+  ],
+  "predicted_notes": [
+    {
+      "id": "bp-0",
+      "start_ms": 3228.857596371882,
+      "duration_ms": 744.3224489795916,
+      "pitch": 72,
+      "velocity": 95,
+      "channel": 0,
+      "origin": "predicted",
+      "source_model": "basic-pitch-0.4.0-onnx",
+      "confidence": null,
+      "confidence_metric": ""
+    },
+    {
+      "id": "bp-1",
+      "start_ms": 2242.0095238095237,
+      "duration_ms": 336.68934240362836,
+      "pitch": 79,
+      "velocity": 42,
+      "channel": 0,
+      "origin": "predicted",
+      "source_model": "basic-pitch-0.4.0-onnx",
+      "confidence": null,
+      "confidence_metric": ""
+    },
+    {
+      "id": "bp-2",
+      "start_ms": 2242.0095238095237,
+      "duration_ms": 731.4285714285713,
+      "pitch": 67,
+      "velocity": 95,
+      "channel": 0,
+      "origin": "predicted",
+      "source_model": "basic-pitch-0.4.0-onnx",
+      "confidence": null,
+      "confidence_metric": ""
+    },
+    {
+      "id": "bp-3",
+      "start_ms": 1253.8775510204082,
+      "duration_ms": 719.8185941043084,
+      "pitch": 64,
+      "velocity": 95,
+      "channel": 0,
+      "origin": "predicted",
+      "source_model": "basic-pitch-0.4.0-onnx",
+      "confidence": null,
+      "confidence_metric": ""
+    },
+    {
+      "id": "bp-4",
+      "start_ms": 243.8095238095238,
+      "duration_ms": 719.8185941043083,
+      "pitch": 60,
+      "velocity": 95,
+      "channel": 0,
+      "origin": "predicted",
+      "source_model": "basic-pitch-0.4.0-onnx",
+      "confidence": null,
+      "confidence_metric": ""
+    }
+  ],
+  "matched_onsets_50ms": 4,
+  "precision_on_fixture": 0.8,
+  "recall_on_fixture": 1.0,
+  "f1_on_fixture": 0.888888888888889,
+  "usage": {
+    "cpu_seconds": 3.6834789999999997
+  },
+  "queue_state": "completed",
+  "ledger_status": "done",
+  "resource_source": "worker"
+}

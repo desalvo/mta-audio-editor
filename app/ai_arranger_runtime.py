@@ -247,9 +247,9 @@ def _with_live_progress(row):
         pct = payload.get('progress_percent')
         if isinstance(pct, (int, float)) and not isinstance(pct, bool) and 0 <= pct <= 100:
             value['progress_percent'] = float(pct)
-        if payload.get('progress_source') in ('ace-stage-estimate', 'ace-dit-evaluations'):
+        if payload.get('progress_source') in ('ace-stage-estimate', 'ace-dit-evaluations','studio-sources'):
             value['progress_source'] = payload['progress_source']
-            value['progress_estimated'] = True
+            value['progress_estimated'] = payload.get('progress_source')!='studio-sources'
             for key in ('steps_completed', 'steps_total'):
                 if type(payload.get(key)) is int and 0 <= payload[key] <= 1000:
                     value[key] = payload[key]
@@ -537,7 +537,8 @@ def start(pid, operation, fn, *, job_id=None, cancellable=False, payload=None, i
         from .ai_job_context import actor
         owner=payload.get('actor_user_id',actor.get()) if isinstance(payload,dict) else actor.get()
         from .resource_access import preflight
-        preflight(owner)
+        from .model_license_policy import FREE_ADMISSION
+        if not FREE_ADMISSION.get():preflight(owner)
         rank = con.execute('SELECT COALESCE(MAX(rank),0)+1 FROM jobs').fetchone()[0]
         con.execute("INSERT INTO jobs(job_id,project_id,operation,state,rank,created_at,phase,message,runner_pid,runner_identity,payload_json,idempotency_key) VALUES(?,?,?,'queued',?,?,'queued','Waiting for inference slot',?,?,?,?)", (job_id, str(pid), operation, rank, time.time(), os.getpid(), _process_identity(os.getpid()), encoded, idempotency_key))
         from .ai_job_context import actor
@@ -562,7 +563,7 @@ def activate(job_id, fn, *, cancellable=True):
 def cancel(job_id):
     with _db() as con:
         con.execute('BEGIN IMMEDIATE')
-        row = con.execute('SELECT state FROM jobs WHERE job_id=?', (job_id,)).fetchone()
+        row = con.execute('SELECT state,phase FROM jobs WHERE job_id=?', (job_id,)).fetchone()
         if not row:
             con.execute('ROLLBACK')
             return None
@@ -572,6 +573,8 @@ def cancel(job_id):
             if changed.rowcount:
                 con.execute("INSERT OR IGNORE INTO terminal_receipts(job_id,state,committed_at) VALUES(?,?,?)", (job_id, 'cancelled', stamp))
         elif row[0] == 'running':
+            if row[1]=='studio-committing':
+                con.execute('ROLLBACK');raise ValueError('Atomic result publication has started; wait for completion')
             with _MUTEX:
                 event = _LOCAL.get(job_id)
                 cancellable = job_id in _CANCELLABLE

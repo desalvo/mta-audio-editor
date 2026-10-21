@@ -15,19 +15,23 @@ const shapes={
  youtube:'M3 5h18v14H3zm7 3 6 4-6 4z',metronome:'m6 20 4-16h4l4 16zm6-7 6-9M4 20h16',
  grid:'M4 4h16v16H4zM4 10h16M10 4v16',chords:'M3 6h18v13H3zM7 6v8m5-8v8m5-8v8',
  magnet:'M5 4v10a7 7 0 0 0 14 0V4h-4v10a3 3 0 0 1-6 0V4z',
+ deleteTracks:'M3 5h12M3 10h12M3 15h7M17 15l5 5m0-5-5 5',
+ deleteRange:'M4 3v18M20 3v18M4 7h16M4 17h16M9 10l6 4m0-4-6 4',
+ remove:'m3 14 9-10 9 8-8 9H9zM7 10l10 8M13 21h9',
  delete:'M4 6h16M9 6V3h6v3M6 6l1 15h10l1-15M10 9v9m4-9v9',
  cut:'M8 8 20 20M8 16 20 4M3 5h5v5H3zM3 15h5v5H3z',copy:'M8 8h12v13H8zM16 8V3H3v13h5',paste:'M8 4H5v17h14V4h-3M8 3h8v4H8z',
  undo:'m9 4-6 5 6 5M3 9h10a7 7 0 0 1 7 7v4',redo:'m15 4 6 5-6 5m6-5H11a7 7 0 0 0-7 7v4',
  bounce:'M3 4h12v9H3zM9 13v7m-4-4 4 4 4-4M17 4h4v16h-4',
  settings:'M4 6h16M4 12h16M4 18h16M8 3v6m8 0v6m-6 0v6',
  save:'M4 3h13l4 4v14H3V3h1m3 0v6h10V3M7 21v-8h10v8',
+ saveAs:'M3 3h12v14H3zM6 3v5h6V3M7 17v-5h4v5M18 13v8m-4-4h8',
  folder:'M3 7h7l2-3h8v16H3z',new:'M12 4v16M4 12h16',account:'M4 21v-3a8 8 0 0 1 16 0v3M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8',
  logout:'M9 3H3v18h6m4-14 5 5-5 5m-6-5h12',shift:'M3 12h18m-5-5 5 5-5 5M3 4v16',tap:'M9 19V4l10-2v13M3 19h6m4-4h6'
 };
 function pathFor(node){
  const action=node.getAttribute('onclick')||'';
  if(shapes[node.id])return shapes[node.id];
- const map=[['trimProjectTimeline(\'left', 'trimLeft'],['trimProjectTimeline(\'right','trimRight'],['Fade','fade'],['Stem','separate'],['Youtube','youtube'],['MetronomeGrid','grid'],['MetronomeShift','shift'],['Metronome','metronome'],['ChordsTrack','chords'],['timeline_magnetic','magnet'],['deleteSelection','delete'],['removeTimeline','delete'],['cutTimeline','cut'],['copyTimeline','copy'],['pasteTimeline','paste'],['undoEdit','undo'],['redoEdit','redo'],['bounceToTrack','bounce'],['tapProject','tap'],['showProjectSetup','settings'],['openAiRemix','chords'],['openExport','bounce'],['saveAs','save'],['save()','save'],['newProject','new'],['openProject','folder']];
+ const map=[['trimProjectTimeline(\'left', 'trimLeft'],['trimProjectTimeline(\'right','trimRight'],['Fade','fade'],['Stem','separate'],['Youtube','youtube'],['MetronomeGrid','grid'],['MetronomeShift','shift'],['Metronome','metronome'],['ChordsTrack','chords'],['timeline_magnetic','magnet'],['deleteSelection(true)','deleteRange'],['deleteSelection(false)','deleteTracks'],['deleteSelection','deleteTracks'],['removeTimeline','remove'],['cutTimeline','cut'],['copyTimeline','copy'],['pasteTimeline','paste'],['undoEdit','undo'],['redoEdit','redo'],['bounceToTrack','bounce'],['tapProject','tap'],['showProjectSetup','settings'],['openAiRemix','chords'],['openExport','bounce'],['saveAs','saveAs'],['save()','save'],['newProject','new'],['openProject','folder']];
  for(const [needle,name] of map)if(action.includes(needle))return shapes[name];
  if(node.matches('a[href="/account"]'))return shapes.account;
  if(node.matches('a[href="/settings"]'))return shapes.settings;

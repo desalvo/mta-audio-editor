@@ -36,7 +36,9 @@ def run(config, root):
             resource.setrlimit(resource.RLIMIT_FSIZE,(limit,limit))
         if desktop and os.getenv('MTA_VST3_DISPLAY_TEST_TCP')!='1':
             from .vst3_host import vst3_roots
-            try:confine(root,config['paths'],vst3_roots()+[Path(os.getenv('MTA_AUDIO_CORE_PATH','/nonexistent'))])
+            try:
+                from .gm_instruments import worker_resources
+                confine(root,config['paths'],vst3_roots()+[Path(os.getenv('MTA_AUDIO_CORE_PATH','/nonexistent'))]+worker_resources(project))
             except (OSError,RuntimeError) as exc:
                 desktop.close();desktop=None;display_error=str(exc)
         from .live_sources import prepare

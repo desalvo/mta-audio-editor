@@ -1,0 +1,21 @@
+{
+  "version": "0.3.0-r210",
+  "delivery": "partial-development-checkpoint",
+  "baseline_sha256": "ad2258e805405b70b83b8fa6b5222ff0aacc6a8b3233f066f3c4a7b281587e1a",
+  "full_regression": {
+    "passed": 4281,
+    "skipped": 36,
+    "deselected": 12,
+    "failed": 0,
+    "later_passed_deselected": 2,
+    "unix_socket_cases_unavailable": 10
+  },
+  "final_targeted_passed": 38,
+  "real_gm_passed": 10,
+  "real_basic_pitch_passed": 1,
+  "javascript_behavioral_passed": 3,
+  "production_gpu_certified": false,
+  "complete_studio_modules": false,
+  "manual_pdf_visual_review": "six updated section pages reviewed; no bounds violations",
+  "git_mutations": false
+}

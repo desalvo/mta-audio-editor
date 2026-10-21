@@ -1,0 +1,13 @@
+{
+  "version": "0.3.0-r210",
+  "focused_pytest": {
+    "passed": 123,
+    "failed": 0,
+    "skipped": 10
+  },
+  "full_regression": "not executed",
+  "real_neural_inference": "not executed",
+  "browser_native_acceptance": "not executed",
+  "real_gm_audition": "not executed",
+  "preservation": "pending zip verification"
+}

@@ -14,7 +14,10 @@ def test_current_project_type_is_reflected_in_import_split_ui():
     js = (root / "app/static/app.js").read_text(encoding="utf-8")
     assert "mode==='existing'&&current?.target" in js
     assert "target.value=current.target" in js
-    assert "['DAW','MTA8','MTA16'].includes(current.target)" in js
+    assert "['DAW','DAW_MIDI','MTA8','MTA16'].includes(current.target)" in js
+    # Audio stem imports also retain the explicit mixed mode; MIDI-only mode
+    # cannot receive audio stems and remains excluded from this selector.
+    assert '<option value="DAW_MIDI">Multitrack DAW + MIDI</option>' in js
 
 
 def test_native_demucs_split_uses_upstream_resolver_not_model_server():

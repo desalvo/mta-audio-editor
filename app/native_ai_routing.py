@@ -12,7 +12,7 @@ from .platform_file_lock import private_mode
 import tempfile
 import zipfile
 
-KINDS = ('whisper','chords-ml','demucs','drumsep','sam-audio','singer-separation','backing-vocals','markers')
+KINDS = ('audio-to-midi','vocal-harmony','vocal-synthesis','whisper','chords-ml','demucs','drumsep','sam-audio','singer-separation','backing-vocals','markers')
 
 
 def _file() -> Path:

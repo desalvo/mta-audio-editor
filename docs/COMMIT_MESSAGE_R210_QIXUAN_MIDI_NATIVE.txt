@@ -1,0 +1,1 @@
+feat(r210): integra AI/GM, Qixuan IT/FR e asset per motore; aggiunge zoom UI, progetti MIDI e transport musicale; corregge MIDI e tariffe

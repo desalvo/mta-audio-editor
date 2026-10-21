@@ -55,6 +55,13 @@ else:
     for kind in ADAPTERS:
         env_name='MTA_AI_WORKER_'+kind.upper().replace('-','_')+'_EXECUTABLE'
         monkeypatch.setenv(env_name, str(worker))
+    # These fixture adapters use no external checkpoint; explicitly authorize
+    # their synthetic test artifacts without weakening the production default.
+    from app.model_license_policy import configure
+    for model in ('audio-separator-weights','drumsep-weights'):
+        configure(model,{'mode':'cost_recovery','acknowledge_responsibility':True,
+            'evidence_url':'https://example.org/fixture-license','reason':'Generated test audio without third-party weights',
+            'free_access_confirmed':False,'authorization_basis':'written_permission','confirm_risk_twice':True},uid)
     return uid
 
 
@@ -76,6 +83,25 @@ def test_each_real_adapter_job_is_metered_billed_and_packaged(operator, kind):
     usage=json.loads(row['usage_json'])
     assert usage['cpu_seconds']==metadata['usage']['cpu_seconds']
     assert not any(key.startswith('gpu_') for key in usage)
+
+
+def test_free_only_real_worker_bypasses_paid_admission_without_losing_accounting(operator,monkeypatch):
+    from app.model_license_policy import configure
+    configure('whisper',{'mode':'free_only','acknowledge_responsibility':True,
+        'evidence_url':'https://example.org/fixture-license','reason':'Free fixture inference with no subscription or storage charge',
+        'free_access_confirmed':True},operator)
+    from app import resource_access
+    def paid_gate(uid):raise AssertionError('A free-only worker reached the paid gate')
+    monkeypatch.setattr(resource_access,'preflight',paid_gate)
+    payload,metadata=ai_metering_agent.execute_registered_worker(operator,'whisper',{'kind':'whisper'},source_wav=source_audio())
+    assert payload and metadata['billable'] is False and metadata['usage']['cpu_seconds']>0
+    with db() as con:
+        row=con.execute('SELECT billable FROM ai_compute_jobs WHERE id=?',(metadata['job_id'],)).fetchone()
+        assert row['billable']==0
+        if con.execute("SELECT 1 FROM sqlite_master WHERE name='resource_job_contracts'").fetchone():
+            assert not con.execute('SELECT 1 FROM resource_job_contracts WHERE job_id=?',(metadata['job_id'],)).fetchone()
+    report=ai_billing.report(user_id=operator)
+    assert report['total_micro']==0 and report['license_exempt_jobs']==1 and report['diagnostic_jobs']==0
 
 
 def test_cancellation_during_artifact_packaging_cannot_bill_success(operator, monkeypatch):

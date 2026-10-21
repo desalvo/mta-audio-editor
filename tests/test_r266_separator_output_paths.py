@@ -4,13 +4,15 @@ import types
 import app.main as main
 
 
-def test_audio_separator_relative_output_filenames(monkeypatch, tmp_path):
+def test_audio_separator_relative_output_filenames(monkeypatch, tmp_path,local_native_ai):
+    from model_rights_fixtures import authorize_fixture
+    authorize_fixture(monkeypatch,tmp_path,'audio-separator-weights')
     source = tmp_path / "vocals.wav"
     source.write_bytes(b"input")
     output = tmp_path / "job" / "stems"
     output.mkdir(parents=True)
     monkeypatch.delenv("MTA_LEAD_BACKING_COMMAND", raising=False)
-    monkeypatch.setattr(main, "_lead_backing_model_info", lambda name: {"installed": True, "filename": "UVR_MDXNET_KARA_2.onnx"})
+    monkeypatch.setattr(main, "_lead_backing_model_info", lambda name: {"installed": True, "filename": "fixture.ckpt"})
     torch = types.ModuleType("torch")
     torch.empty = lambda *args: None
     ops = types.ModuleType("torchvision.ops")
@@ -34,7 +36,7 @@ def test_audio_separator_relative_output_filenames(monkeypatch, tmp_path):
     module.Separator = Separator
     monkeypatch.setitem(sys.modules, "audio_separator", types.ModuleType("audio_separator"))
     monkeypatch.setitem(sys.modules, "audio_separator.separator", module)
-    lead, backing, method = main._split_lead_backing_vocals(source, output)
+    lead, backing, method = main._split_lead_backing_vocals(source, output,model_id='mel_roformer_karaoke_aufr33')
     assert lead.read_bytes() == b"lead"
     assert backing.read_bytes() == b"backing"
     assert method.startswith("audio-separator:")

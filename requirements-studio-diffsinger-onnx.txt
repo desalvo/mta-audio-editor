@@ -1,0 +1,9 @@
+# Isolated DiffSinger exported acoustic/vocoder graphs; CPU recipe.
+numpy==1.26.4
+scipy==1.17.1
+onnxruntime==1.31.0
+soundfile==0.14.0
+PyYAML==6.0.3
+pydantic==2.12.5
+# Optional lyric-to-phone path used by the supplied English profile (GPL runtime).
+espeakng-loader==0.2.4

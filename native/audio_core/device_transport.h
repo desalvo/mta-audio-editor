@@ -35,3 +35,36 @@ MTA_DSP_API void mta_capture_close(mta_capture*) MTA_DSP_NOEXCEPT;
 #ifdef __cplusplus
 }
 #endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+// Non-device ring for PortAudio/ASIO. Matrix is hardware channels x [L,R],
+// immutable during callbacks. Open/close/start/stop the external stream on a
+// control thread; stop it before closing this ring. Maximum 64 output channels.
+MTA_DSP_API mta_transport* mta_transport_open_external(uint32_t rate,uint64_t total,uint32_t channels,const float* matrix) MTA_DSP_NOEXCEPT;
+MTA_DSP_API void* mta_transport_external_callback(void) MTA_DSP_NOEXCEPT;
+MTA_DSP_API int mta_transport_external_attached(mta_transport*) MTA_DSP_NOEXCEPT;
+#ifdef __cplusplus
+}
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+// Physical inputs -> stereo capture matrix (2 x channels), up to 64 inputs.
+MTA_DSP_API mta_capture* mta_capture_open_external(uint32_t channels,const float* matrix) MTA_DSP_NOEXCEPT;
+MTA_DSP_API void* mta_capture_external_callback(void) MTA_DSP_NOEXCEPT;
+#ifdef __cplusplus
+}
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+// Attach only while the external PortAudio stream is stopped. Its duplex
+// callback owns input and output on the same ASIO stream. Detach before free.
+MTA_DSP_API int mta_transport_capture_attach(mta_transport*,mta_capture*) MTA_DSP_NOEXCEPT;
+#ifdef __cplusplus
+}
+#endif

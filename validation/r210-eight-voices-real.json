@@ -1,0 +1,51 @@
+{
+  "actual_synthesis": true,
+  "voices": 8,
+  "backend": "oddvoices-concatenative",
+  "bank": "air",
+  "outputs": [
+    {
+      "part": "part-0",
+      "frames": 38400,
+      "peak": 0.1496875286102295
+    },
+    {
+      "part": "part-1",
+      "frames": 38400,
+      "peak": 0.1496875286102295
+    },
+    {
+      "part": "part-2",
+      "frames": 38400,
+      "peak": 0.1496875286102295
+    },
+    {
+      "part": "part-3",
+      "frames": 38400,
+      "peak": 0.1496875286102295
+    },
+    {
+      "part": "part-4",
+      "frames": 38400,
+      "peak": 0.15288352966308594
+    },
+    {
+      "part": "part-5",
+      "frames": 38400,
+      "peak": 0.1404193639755249
+    },
+    {
+      "part": "part-6",
+      "frames": 38400,
+      "peak": 0.16033506393432617
+    },
+    {
+      "part": "part-7",
+      "frames": 38400,
+      "peak": 0.1343975067138672
+    }
+  ],
+  "usage": {
+    "cpu_seconds": 9.10973
+  }
+}

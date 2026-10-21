@@ -1,0 +1,38 @@
+[
+  {
+    "binary": "/tmp/pytest-of-root/pytest-34/test_native_api_exact_quantum_0/quantum",
+    "repeat": 0,
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "binary": "/tmp/pytest-of-root/pytest-34/test_native_api_exact_quantum_0/quantum",
+    "repeat": 1,
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "binary": "/tmp/pytest-of-root/pytest-34/test_native_api_exact_quantum_0/quantum",
+    "repeat": 2,
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "binary": "/tmp/pytest-of-root/pytest-35/test_native_api_exact_quantum_0/quantum",
+    "repeat": 0,
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "binary": "/tmp/pytest-of-root/pytest-35/test_native_api_exact_quantum_0/quantum",
+    "repeat": 1,
+    "returncode": 0,
+    "stderr": ""
+  },
+  {
+    "binary": "/tmp/pytest-of-root/pytest-35/test_native_api_exact_quantum_0/quantum",
+    "repeat": 2,
+    "returncode": 0,
+    "stderr": ""
+  }
+]

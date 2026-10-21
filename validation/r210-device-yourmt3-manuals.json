@@ -1,0 +1,22 @@
+{
+  "MTA-Audio-Editor-User-Manual-IT.pdf": {
+    "pages": 28,
+    "reviewed_page": 24,
+    "png": "/tmp/mta-manual-review-oct20/User-IT.png"
+  },
+  "MTA-Audio-Editor-User-Manual-EN.pdf": {
+    "pages": 27,
+    "reviewed_page": 24,
+    "png": "/tmp/mta-manual-review-oct20/User-EN.png"
+  },
+  "MTA-Audio-Editor-Administrator-Manual-IT.pdf": {
+    "pages": 16,
+    "reviewed_page": 12,
+    "png": "/tmp/mta-manual-review-oct20/Administrator-IT.png"
+  },
+  "MTA-Audio-Editor-Administrator-Manual-EN.pdf": {
+    "pages": 16,
+    "reviewed_page": 12,
+    "png": "/tmp/mta-manual-review-oct20/Administrator-EN.png"
+  }
+}

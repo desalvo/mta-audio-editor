@@ -1,0 +1,13 @@
+{
+  "version": "0.3.0-r210",
+  "scope": "selected offline tests across AI Vocal Studio, multi-track Audio-to-MIDI and General MIDI",
+  "passed": 113,
+  "failed": 0,
+  "skipped": 2,
+  "interrupted": 0,
+  "full_repository_regression": false,
+  "real_neural_inference": false,
+  "hardware_acceptance": false,
+  "fully_complete": false,
+  "change": "Validate freshly computed music against the MusicResult schema before writing a recoverable checkpoint or acknowledging the worker."
+}

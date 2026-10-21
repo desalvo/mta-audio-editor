@@ -1,0 +1,53 @@
+{
+  "version": "0.3.0-r210",
+  "full_first": {
+    "passed": 4309,
+    "skipped": 41,
+    "deselected_unix_socket_environment": 10,
+    "failed": 1,
+    "failure": "silent native preparation fixture; corrected; 17 focused passed"
+  },
+  "full_second": {
+    "passed": 4311,
+    "skipped": 41,
+    "deselected_unix_socket_environment": 10,
+    "failed": 1,
+    "failure": "frontend release cache prefix; corrected; 18 release/Studio passed"
+  },
+  "third_full_after_metadata_fix": false,
+  "final_studio_packaging_security": {
+    "passed": 22,
+    "deselected_real_model": 1
+  },
+  "native_portaudio_real_virtual_stream": {
+    "passed": 8
+  },
+  "real_yourmt3_cpu": {
+    "pytest_passed": 1,
+    "registered_worker": true,
+    "project_queue_persistence": true,
+    "fresh_runtime_browser_job": true,
+    "fresh_cpu_seconds": 30.694352
+  },
+  "fresh_install": {
+    "source_cache": "passed",
+    "source_network": "environment 403; failed runtime removed",
+    "runtime_bytes": 1810689063
+  },
+  "browser_javascript_errors": [],
+  "cpp_build": "ABI 1 passed",
+  "ruff_ci": "passed",
+  "bandit_ci": "passed",
+  "pip_check": "passed",
+  "license_gate": "static guard passed; platform/transitive redistribution review remains",
+  "full_specification_complete": false,
+  "production_server_certified": false,
+  "commit_push_tag_release": false,
+  "server_stage_final": {
+    "passed": 11,
+    "real_cpp_build": true,
+    "network_wheel_download_in_test": false
+  },
+  "frozen_worker_source_layout": "real external Python worker passed",
+  "full_native_rpm_deb_builds_executed": false
+}

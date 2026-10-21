@@ -238,10 +238,10 @@ def zoned_metronome_beats(project: Project, duration_ms: int, zone_bpms: dict[st
     boundaries = [0] + sorted({int(m.time_ms) for m in project.markers if not m.deleted and not m.disabled and 0 < m.time_ms < duration_ms}) + [duration_ms]
     beats = []
     zone_bpms = zone_bpms or {}
-    from .metronome_grid import grid_settings
-    grid_bpm, _ = grid_settings(project)
+    from .metronome_grid import source_grid_settings, playback_ratio
+    grid_bpm, _ = source_grid_settings(project)
     for start, end in zip(boundaries, boundaries[1:]):
-        step = 60000.0 / max(1.0, float(zone_bpms.get(str(start), grid_bpm)))
+        step = 60000.0 / max(1.0, float(zone_bpms[str(start)])/playback_ratio(project) if str(start) in zone_bpms else grid_bpm)
         # The first audible zone is phased at insertion, not at project zero.
         # Subsequent active markers still restart their own musical grid.
         start = max(start, int(project.metronome_insertion_ms or project.metronome_start_ms))
@@ -278,8 +278,8 @@ def generate_metronome_wav(project: Project, out: Path, beats_per_bar: int | Non
     double the click rate. Compound /8 meters receive secondary accents every
     three subdivisions.
     """
-    from .metronome_grid import grid_settings
-    grid_bpm, grid_signature = grid_settings(project)
+    from .metronome_grid import source_grid_settings
+    grid_bpm, grid_signature = source_grid_settings(project)
     project = project.model_copy(update={"bpm": grid_bpm, "time_signature": grid_signature})
     duration_ms = project_duration_ms(project)
     if duration_ms <= 0:

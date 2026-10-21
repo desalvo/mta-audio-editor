@@ -89,6 +89,8 @@ def _download_zip(url: str, destination: Path) -> None:
 
 
 def download_model(model_id: str) -> dict:
+    from .model_license_policy import evaluate_model
+    evaluate_model(model_id)
     spec = MODEL_SPECS.get(model_id)
     if not spec:
         raise ValueError("unsupported chord ML model")
@@ -224,6 +226,8 @@ def _run(command: list[str], *, cwd: Path, timeout: int = 1800) -> None:
 
 
 def extract_btc_hcqt(audio: Path) -> list[Chord]:
+    from .model_license_policy import evaluate_model
+    evaluate_model('btc-hcqt')
     root = model_dir("btc-hcqt")
     if not engine_available("btc-hcqt"):
         raise RuntimeError("BTC-HCQT model/runtime not installed")
@@ -248,6 +252,8 @@ def extract_btc_hcqt(audio: Path) -> list[Chord]:
 
 
 def extract_chordformer(audio: Path) -> list[Chord]:
+    from .model_license_policy import evaluate_model
+    evaluate_model('chordformer')
     root = model_dir("chordformer")
     if not engine_available("chordformer"):
         raise RuntimeError("ChordFormer model/runtime not installed")

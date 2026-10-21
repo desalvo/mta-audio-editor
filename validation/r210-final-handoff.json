@@ -1,0 +1,29 @@
+{
+  "version": "0.3.0-r210",
+  "date": "2026-10-21",
+  "status": "NOT_FULLY_CERTIFIED",
+  "archive_base_sha256": "d085ae939ed24ed699e44d7d5bfa7b0324f4d074e1d00434fcb2b2afef029049",
+  "offline_regression": {
+    "selected_studio_midi_gm": {
+      "passed": 143,
+      "failed": 0,
+      "skipped": 15
+    },
+    "subgroup_overlapping": {
+      "passed": 96,
+      "failed": 0,
+      "skipped": 2
+    }
+  },
+  "not_verified": [
+    "full project regression",
+    "actual authorized DiffSinger/RVC/Seed-VC/Transkun checkpoint inference",
+    "model and code asset licensing per component",
+    "10-16 instrument real music precision/recall",
+    "native and browser acceptance",
+    "GM playback and hardware listening"
+  ],
+  "server_changes": "none",
+  "git_changes": "none",
+  "note": "Offline test passes do not prove genuine inference nor final sign-off; general regression was not run due to pre-existing network safety blocker."
+}

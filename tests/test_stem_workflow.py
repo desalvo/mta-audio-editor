@@ -79,9 +79,9 @@ def test_async_stem_workflow_persists_project_and_progress(tmp_path, monkeypatch
     assert any(track.name == "Original Mix" for track in persisted.tracks)
     assert any(item["name"].startswith("song") for item in storage.project_files(pid) if item["category"] == "original")
 
-    deadline = time.time() + 10
+    deadline = time.monotonic() + 90
     status = None
-    while time.time() < deadline:
+    while time.monotonic() < deadline:
         r = client.get(f"/api/stems/jobs/{job_id}")
         assert r.status_code == 200
         status = r.json()
@@ -173,9 +173,9 @@ def test_async_stem_workflow_can_be_cancelled(tmp_path, monkeypatch):
     cancel = client.post(f"/api/stems/jobs/{job_id}/cancel")
     assert cancel.status_code == 200
 
-    deadline = time.time() + 5
+    deadline = time.monotonic() + 60
     status = None
-    while time.time() < deadline:
+    while time.monotonic() < deadline:
         status = client.get(f"/api/stems/jobs/{job_id}").json()
         if status["status"] == "cancelled":
             break

@@ -1,0 +1,79 @@
+{
+  "version": "0.3.0-r210",
+  "git_operations": false,
+  "production_changes": false,
+  "environment": {
+    "python": "3.12.14",
+    "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+    "dependency_note": "Temporary validation environment; not an installation of the complete production requirements lockfile",
+    "compiled_core": "CMake release build of native/audio_core; g++ 13.3.0; test binary and assets excluded from source ZIP"
+  },
+  "focused_final": {
+    "tests": 155,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 10,
+    "passed": 145
+  },
+  "full_project": {
+    "tests": 4563,
+    "failures": 29,
+    "errors": 0,
+    "skipped": 133,
+    "passed": 4401
+  },
+  "actual_gm_suite": {
+    "tests": 17,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 17
+  },
+  "gm_actual_audio": {
+    "backend": "portable-cpp",
+    "bank_sha256": "74594e8f4250680adf590507a306655a299935343583256f3b722c48a1bc1cb0",
+    "melodic_programs_passed": 128,
+    "drums_passed": 47,
+    "listening_certified": false
+  },
+  "baseline_comparison": {
+    "same_failure_set": true,
+    "reproduced_failures": 29,
+    "report": "validation/r210-baseline-comparison.xml"
+  },
+  "source_snapshot_note": "Focused final regression includes all final changes. Broad regression predates the last isolated preset/UI/singer-metadata fixes and added JS/publication tests; affected paths were rerun in the final focused suite.",
+  "checks": {
+    "python_compileall": true,
+    "changed_file_ruff": true,
+    "javascript_syntax": true,
+    "multilingual_js_submission_contracts": 3,
+    "original_files_preserved": true
+  },
+  "not_executed": [
+    "Real DiffSinger acoustic/vocoder inference",
+    "Real YourMT3/Basic Pitch/Demucs separated mix inference",
+    "10-16 instrument ground-truth quality evaluation",
+    "FluidSynth parity",
+    "Target native/web UI E2E and ROCm",
+    "Real OddVoices voicebank inference"
+  ],
+  "browser_blocker": "Chromium download returned invalid/truncated ZIP; optional Playwright installation removed after failed browser setup",
+  "macroareas": {
+    "vocal_studio": "incomplete software; added tested multilingual G2P/expression/bridge/publication paths",
+    "audio_to_midi": "incomplete software; added tested separated-source orchestration; accuracy unverified",
+    "general_midi": "core and bank/controller paths implemented; real portable-bank audit passed; cross-client acceptance incomplete"
+  },
+  "remaining_software": [
+    "RVC/Seed-VC conversion",
+    "Managed neural voicebank/vocoder registry and per-singer neural banks",
+    "Full text-to-note alignment and advanced expression UI",
+    "Specialist transcribers beyond YourMT3/Basic Pitch",
+    "Silent/no-note stem handling and within-source retry recovery",
+    "Independent performers within one source"
+  ],
+  "operator_actions": [
+    "Install and separately authorize exact DiffSinger singer and vocoder; configure pinned flattened config and optional G2P profile",
+    "Enable installed Demucs htdemucs, YourMT3 and Basic Pitch workers/routes to try Deep mode",
+    "Run real musical benchmarks, native/web playback/export/reopen and FluidSynth acceptance"
+  ]
+}

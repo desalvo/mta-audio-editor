@@ -60,7 +60,7 @@ def test_project_resume_uses_account_and_tab_storage_and_actual_init():
     js='''const vm=require('vm'),assert=require('assert'),store=new Map();
 const ctx={URLSearchParams,location:{search:''},currentUser:null,current:null,pluginInfo:null,autosaveEnabled:true,
 sessionStorage:{getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v),removeItem:k=>store.delete(k)},
-localStorage:{getItem:()=>null},restoreSidebarPanels(){},isMobileClient:()=>false,$:()=>null,
+MtaPreferences:{getItem:()=>null},restoreSidebarPanels(){},isMobileClient:()=>false,$:()=>null,
 api:async url=>url==='/api/session'?{id:1,role:'user',native_single_user:false}:{},
 refresh:async()=>{},openP:async id=>{ctx.current={id}},document:{body:{classList:{add(){}}}}};
 vm.createContext(ctx);vm.runInContext(process.argv[1],ctx);vm.runInContext(process.argv[2],ctx);

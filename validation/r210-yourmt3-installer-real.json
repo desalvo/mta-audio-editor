@@ -1,0 +1,11 @@
+{
+  "model": "yourmt3-nops-5e66c1e",
+  "commit": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+  "source_cache_install": "passed",
+  "source_network_install": "blocked by environment network 403",
+  "failed_runtime_cleanup": "passed",
+  "cpu_inference": "passed",
+  "runtime_bytes": 1810689063,
+  "pip_check": "No broken requirements found.",
+  "hardware": "Linux CPU; no ROCm/CUDA/ASIO certification"
+}

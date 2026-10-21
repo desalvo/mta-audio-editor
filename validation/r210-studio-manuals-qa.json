@@ -1,0 +1,54 @@
+[
+  {
+    "file": "MTA-Audio-Editor-User-Manual-IT.pdf",
+    "page_count": 27,
+    "new_section_pages": [
+      2,
+      24
+    ],
+    "bounds_violations": []
+  },
+  {
+    "file": "MTA-Audio-Editor-User-Manual-EN.pdf",
+    "page_count": 26,
+    "new_section_pages": [
+      2,
+      23
+    ],
+    "bounds_violations": []
+  },
+  {
+    "file": "MTA-Audio-Editor-Administrator-Manual-IT.pdf",
+    "page_count": 15,
+    "new_section_pages": [
+      2,
+      12
+    ],
+    "bounds_violations": []
+  },
+  {
+    "file": "MTA-Audio-Editor-Administrator-Manual-EN.pdf",
+    "page_count": 15,
+    "new_section_pages": [
+      2,
+      12
+    ],
+    "bounds_violations": []
+  },
+  {
+    "file": "MTA-Audio-Editor-VST3-Manual-IT.pdf",
+    "page_count": 8,
+    "new_section_pages": [
+      5
+    ],
+    "bounds_violations": []
+  },
+  {
+    "file": "MTA-Audio-Editor-VST3-Manual-EN.pdf",
+    "page_count": 8,
+    "new_section_pages": [
+      5
+    ],
+    "bounds_violations": []
+  }
+]

@@ -1,5 +1,6 @@
 from .vst3_transport import runtime_available as vst_host_runtime
 from contextlib import asynccontextmanager
+from .fs_durability import sync_directory
 import stat
 from app.secure_https import https_urlopen
 import base64
@@ -22,7 +23,7 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
 from fastapi import Query, FastAPI, File, HTTPException, Request, UploadFile
-from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse, Response
+from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse, Response, JSONResponse
 from starlette.background import BackgroundTask
 from fastapi.staticfiles import StaticFiles
 
@@ -98,6 +99,7 @@ async def _mta_application_lifespan(_app):
     _start_diagnostic_cleanup()
     _start_background_services()
     _restore_persisted_ai_queue()
+    _start_kara_checkpoint_repair()
     try:
         yield
     finally:
@@ -147,6 +149,13 @@ def _start_diagnostic_cleanup():
                 _mta_diagnostics.clean()
             except (OSError, RuntimeError):
                 LOGGER.warning("Diagnostics cleanup unavailable", exc_info=True)
+            try:
+                from .studio_jobs import cleanup_expired
+                from .ai_result_cache import cleanup_if_due
+                cleanup_expired()
+                cleanup_if_due()
+            except (OSError,ValueError,RuntimeError):
+                LOGGER.warning("Studio result retention unavailable",exc_info=True)
             _time.sleep(3600)
     _mta_diagnostics.install_event_capture()
     threading.Thread(target=loop, daemon=True, name="mta-diagnostic-retention").start()
@@ -212,14 +221,14 @@ NATIVE_SINGLE_USER = os.getenv("MTA_NATIVE_SINGLE_USER", "").lower() in {"1", "t
 
 from .ai_backend_models import LEAD_BACKING_MODELS
 
-LEAD_BACKING_DEFAULT_MODEL = os.getenv("MTA_LEAD_BACKING_DEFAULT_MODEL", "uvr_mdxnet_kara_2").strip() or "uvr_mdxnet_kara_2"
+LEAD_BACKING_DEFAULT_MODEL = os.getenv("MTA_LEAD_BACKING_DEFAULT_MODEL", "uvr_mdxnet_kara_2").strip() or "mvsep-mega53"
 LEAD_BACKING_MODEL_DIR = Path(os.getenv("MTA_LEAD_BACKING_MODEL_DIR", os.getenv("MTA_AI_VOCAL_MODELS_DIR", str(STORAGE_ROOT / ".cache" / "lead-backing-models")))).expanduser().resolve()
 
 def _lead_backing_model_info(model_id: str) -> dict:
     model = next((dict(item) for item in LEAD_BACKING_MODELS if item["id"] == model_id), None)
     if model is None:
         raise ValueError("unsupported lead/backing vocal model")
-    model["installed"] = (LEAD_BACKING_MODEL_DIR / model["filename"]).exists()
+    model["installed"] = (__import__("app.mega53_runtime", fromlist=["configured"]).configured() if model_id == "mvsep-mega53" else (LEAD_BACKING_MODEL_DIR / model["filename"]).exists())
     model["location"] = "local" if NATIVE_SINGLE_USER else "server"
     model["path"] = str(LEAD_BACKING_MODEL_DIR / model["filename"])
     return model
@@ -254,8 +263,40 @@ def _lead_backing_catalog() -> dict:
         "model_directory": str(LEAD_BACKING_MODEL_DIR),
     }
 
+def _start_kara_checkpoint_repair() -> None:
+    """Optional, licensed and non-blocking checkpoint integrity repair at startup."""
+    if os.getenv('MTA_UVR_KARA2_AUTO_REPAIR', '1').lower() in {'0', 'false', 'no', 'off'}:
+        return
+    def repair() -> None:
+        try:
+            from .model_license_policy import evaluate_model
+            evaluate_model('uvr-kara-2')  # Never fetch restricted weights before authorization.
+            from .uvr_kara_integrity import ensure_kara_2
+            def download(directory: Path) -> None:
+                if not NATIVE_SINGLE_USER:
+                    from .ai_models import _isolated_model_python, _isolated_model_download
+                    python = _isolated_model_python('backing-vocals')
+                    if not python:
+                        raise RuntimeError('Backing vocal runtime unavailable')
+                    _isolated_model_download(python, 'backing-vocals', 'uvr_mdxnet_kara_2', model_dir=directory)
+                else:
+                    from audio_separator.separator import Separator
+                    separator = Separator(model_file_dir=str(directory), output_dir=str(directory), info_only=True)
+                    separator.download_model_files('UVR_MDXNET_KARA_2.onnx')
+            ensure_kara_2(LEAD_BACKING_MODEL_DIR / 'UVR_MDXNET_KARA_2.onnx', download)
+        except Exception as exc:
+            LOGGER.warning('UVR KARA 2 optional checkpoint repair skipped or failed: %s', exc)
+    threading.Thread(target=repair, daemon=True, name='mta-uvr-kara2-checkpoint-repair').start()
+
+
 def _download_lead_backing_model(model_id: str) -> dict:
+    from .model_license_policy import evaluate_model
+    evaluate_model('mvsep-mega53' if model_id == 'mvsep-mega53' else ('uvr-kara-2' if model_id == 'uvr_mdxnet_kara_2' else 'audio-separator-weights'))
     info = _lead_backing_model_info(model_id)
+    if model_id == 'mvsep-mega53':
+        if not info["installed"]:
+            raise RuntimeError("Mega 53 requires operator-installed upstream runtime/config/checkpoint")
+        return info
     if not NATIVE_SINGLE_USER:
         from .ai_models import _isolated_model_python, _isolated_model_download
         try:
@@ -273,6 +314,9 @@ def _download_lead_backing_model(model_id: str) -> dict:
         raise RuntimeError("Il motore audio-separator non è installato in questo runtime. Installare le dipendenze di separazione (requirements-stems.txt) e riavviare l’app, oppure selezionare il metodo DSP FFmpeg center/side.") from exc
     separator = Separator(model_file_dir=str(LEAD_BACKING_MODEL_DIR), output_dir=str(LEAD_BACKING_MODEL_DIR), info_only=True)
     separator.download_model_files(info["filename"])
+    if model_id == "uvr_mdxnet_kara_2":
+        from .uvr_kara_integrity import verify_kara_2
+        verify_kara_2(LEAD_BACKING_MODEL_DIR / info["filename"])
     return _lead_backing_model_info(model_id)
 
 NATIVE_BLOCKED_PATH_PREFIXES = (
@@ -573,7 +617,7 @@ async def security_middleware(request: Request, call_next):
         or (request.url.path.startswith("/api/projects/") and "/shares" in request.url.path)
     ):
         if request.url.path.startswith("/api/"):
-            return HTMLResponse("Not available in native single-user mode", status_code=404)
+            return JSONResponse({"detail":"Not available in native single-user mode"}, status_code=404)
         return RedirectResponse(url="/", status_code=303)
 
     user = session_user(request)
@@ -623,7 +667,6 @@ async def security_middleware(request: Request, call_next):
             from .resource_access import quick_required,status as resource_access_status
             if quick_required(user['id']) and resource_access_status(user['id'])['blocked']:
                 if path=='/':return RedirectResponse('/account#subscriptions',status_code=303)
-                from fastapi.responses import JSONResponse
                 return JSONResponse({'detail':('È necessario un abbonamento attivo' if i18n.current_language.get()=='it' else 'An active subscription is required'),'code':'subscription_required','url':'/account#subscriptions'},status_code=402)
 
     if not NATIVE_SINGLE_USER and user is not None and request.method=='POST':
@@ -633,7 +676,6 @@ async def security_middleware(request: Request, call_next):
             from .resource_access import preflight,CreditAdmissionError
             try:preflight(int(user['id']))
             except CreditAdmissionError as exc:
-                from fastapi.responses import JSONResponse
                 return JSONResponse({'detail':str(exc),'code':exc.code,'url':'/account#subscriptions'},status_code=402)
 
     from .ai_job_context import actor as ai_actor_context
@@ -1346,6 +1388,7 @@ def api_admin_projects_dump(request: Request):
 
 @app.get("/", response_class=HTMLResponse)
 def home(request: Request):
+    from .user_preferences import bootstrap
     return (
         (BASE / "templates" / "index.html")
         .read_text(encoding="utf-8")
@@ -1353,6 +1396,7 @@ def home(request: Request):
         .replace("__REVISION__", APP_REVISION)
         .replace("__BUILD__", BUILD_ID)
         .replace("__BODY_CLASS__", "native-single-user" if NATIVE_SINGLE_USER else "")
+        .replace("__PREFERENCES__", bootstrap(request))
     )
 
 
@@ -1701,6 +1745,8 @@ def ai_arranger_generate(pid: str, request: Request, body: RearrangeRequest):
         _project_for_actor(request,pid)
         raise HTTPException(409,'Use the asynchronous generate-jobs endpoint for authenticated server inference')
     project = _project_for_actor(request, pid)
+    from .project_kinds import require_kind
+    require_kind(project, "audio")
     try:
         plan = arranger_plan(project, body)
     except ValueError as exc:
@@ -1715,6 +1761,8 @@ def ai_remix_generate(pid: str, request: Request, body: RemixRequest):
         _project_for_actor(request,pid)
         raise HTTPException(409,'Use the asynchronous generate-jobs endpoint for authenticated server inference')
     project = _project_for_actor(request, pid)
+    from .project_kinds import require_kind
+    require_kind(project, "audio")
     try:
         plan = prepare_remix_plan(project, body)
     except ValueError as exc:
@@ -1766,6 +1814,8 @@ def _append_ai_generated_track(project: Project, audio: bytes, meta: dict, *, mo
     Only successful, validated worker output is published.  A new independent
     filename and source-clip library entry are used; never replace the input.
     """
+    from .project_kinds import require_kind
+    require_kind(project, "audio")
     from io import BytesIO
     import wave as _wave
     with _wave.open(BytesIO(audio), 'rb') as handle:
@@ -2080,7 +2130,9 @@ def ai_arranger_cancel_generation(pid: str, job_id: str, request: Request):
 
 @app.post('/api/projects/{pid}/ai-arranger/start-generation', status_code=202)
 def ai_arranger_start_generation(pid: str, request: Request, body: RearrangeRequest):
-    _project_for_actor(request, pid)
+    project = _project_for_actor(request, pid)
+    from .project_kinds import require_kind
+    require_kind(project, "audio")
     _check_native_ace_ready()
     if configured_worker() is None and not (NATIVE_SINGLE_USER and _ace_desktop.uses_mta_account()):
         raise HTTPException(503, 'No trusted AI inference executable is configured')
@@ -2120,7 +2172,9 @@ def ai_arranger_start_generation(pid: str, request: Request, body: RearrangeRequ
 
 @app.post('/api/projects/{pid}/remix/start-generation', status_code=202)
 def ai_remix_start_generation(pid: str, request: Request, body: RemixRequest):
-    _project_for_actor(request, pid)
+    project = _project_for_actor(request, pid)
+    from .project_kinds import require_kind
+    require_kind(project, "audio")
     _check_native_ace_ready()
     if configured_worker() is None and not (NATIVE_SINGLE_USER and _ace_desktop.uses_mta_account()):
         raise HTTPException(503, 'No trusted AI inference executable is configured')
@@ -2161,6 +2215,8 @@ def ai_arranger_generate_and_add(pid: str, request: Request, body: RearrangeRequ
         _project_for_actor(request,pid)
         raise HTTPException(409,'Use the asynchronous generate-jobs endpoint for authenticated server inference')
     project = _project_for_actor(request, pid)
+    from .project_kinds import require_kind
+    require_kind(project, "audio")
     try:
         plan = arranger_plan(project, body)
         audio, meta = run_worker_with_project_audio(plan, project, audio_path)
@@ -2179,6 +2235,8 @@ def ai_remix_generate_and_add(pid: str, request: Request, body: RemixRequest):
         _project_for_actor(request,pid)
         raise HTTPException(409,'Use the asynchronous generate-jobs endpoint for authenticated server inference')
     project = _project_for_actor(request, pid)
+    from .project_kinds import require_kind
+    require_kind(project, "audio")
     try:
         plan = prepare_remix_plan(project, body)
         audio, meta = run_worker_with_project_audio(plan, project, audio_path)
@@ -2216,7 +2274,7 @@ def project_new(request: Request, title: str = "Untitled", target: str = "MTA8",
     actor = _actor(request)
     owner = actor["id"] if actor["id"] > 0 else None
     rate = int(sample_rate) if int(sample_rate) in {44100, 48000, 96000} else 44100
-    return create_project(title, target if target in {"MTA8", "MTA16", "DAW"} else "MTA8", owner_user_id=owner, sample_rate=rate, audio_storage_mode=audio_storage_mode)
+    return create_project(title, target if target in {"MTA8", "MTA16", "DAW", "DAW_MIDI", "MIDI"} else "MTA8", owner_user_id=owner, sample_rate=rate, audio_storage_mode=audio_storage_mode)
 
 
 def _refresh_project_clip_metadata(project: Project, asset: ProjectClip, *, force: bool = False) -> bool:
@@ -2381,7 +2439,7 @@ def project_get(pid: str, request: Request):
     # authoritative, so stale local audio can be removed before the editor uses it.
     maintain_project_storage(pid)
     changed = _ensure_project_clip_library(project)
-    if project.base_bpm is None:
+    if project.base_bpm is None and project.tempo_known is not False:
         project.base_bpm = project.bpm
         changed = True
     for track in project.tracks:
@@ -2405,9 +2463,20 @@ def project_put(pid: str, project: Project, request: Request):
     if project.ai_publication_token != current.ai_publication_token:
         # Never let a stale browser autosave remove a newly published AI result.
         raise HTTPException(409, "PROJECT_AI_RESULTS_CHANGED")
-    if int(project.sample_rate) != int(current.sample_rate) and current.tracks:
-        raise HTTPException(409, "Il sample rate del progetto può essere modificato solo quando non ci sono tracce attive")
+    if int(project.sample_rate) != int(current.sample_rate) and (current.tracks or current.archived_tracks):
+        raise HTTPException(409, "Il sample rate del progetto può essere modificato solo quando non ci sono tracce attive o conservate")
     project.audio_storage_mode = current.audio_storage_mode
+    if project.project_kind_version == 0 and project.target != current.target:
+        raise HTTPException(409, "Project type changed; reload the project before converting")
+    # Preserved tracks are managed by type conversion, never by client autosave.
+    project.archived_tracks = current.archived_tracks
+    project.project_kind_version = 1
+    if project.target != current.target:
+        from .project_kinds import convert
+        # Type changes preserve the authoritative content, including tracks absent
+        # in an older UI/history snapshot. Explicit track deletion is separate.
+        project.tracks = current.tracks
+        convert(project, project.target)
     # Ownership/shares and reusable audio assets are managed conservatively.
     project.owner_user_id = current.owner_user_id
     project.shared_with_user_ids = current.shared_with_user_ids
@@ -2763,11 +2832,7 @@ def _copy_limited(src, dst: Path):
                 out.write(chunk)
             out.flush()
             os.fsync(out.fileno())
-        folder_fd = os.open(str(dst.parent), os.O_RDONLY)
-        try:
-            os.fsync(folder_fd)
-        finally:
-            os.close(folder_fd)
+        sync_directory(dst.parent)
     except BaseException:
         if owned_identity is not None:
             try:
@@ -3131,6 +3196,7 @@ def _track_import_worker(
             if estimated_tempo is not None and not latest.tracks:
                 latest.bpm, latest.time_signature = estimated_tempo
                 latest.base_bpm = latest.bpm
+                latest.tempo_known = True
             if sync_mode == "auto" and latest.tracks:
                 ref = next((item for item in latest.tracks if item.id == reference_track_id), latest.tracks[0])
                 shift_track(track, auto_align_ms(audio_path(pid, ref.filename), dst))
@@ -3177,6 +3243,8 @@ async def start_track_import_job(
     if sync_mode not in {"manual", "auto"}:
         raise HTTPException(400, "invalid sync mode")
     project = _project_for_actor(request, pid)
+    from .project_kinds import require_kind
+    require_kind(project, "audio")
     _ensure_workspace_capacity(project.owner_user_id, int(request.headers.get("content-length") or 0))
     ext = Path(file.filename or "track.wav").suffix.lower() or ".bin"
     if len(ext) > 12 or not ext.replace(".", "").isalnum():
@@ -3880,7 +3948,9 @@ def _youtube_import_worker(
 
 @app.post("/api/projects/{pid}/youtube-import-jobs")
 def start_youtube_import_job(pid: str, request: Request, body: dict):
-    _project_for_actor(request, pid)
+    project = _project_for_actor(request, pid)
+    from .project_kinds import require_kind
+    require_kind(project, "audio")
     if body.get("confirm_rights") is not True:
         raise HTTPException(400, "Conferma di disporre dei diritti necessari per importare questo contenuto")
     try:
@@ -4017,6 +4087,8 @@ def _bounce_worker(job_id,pid,track_id):
 
 def _start_bounce(pid,request,track_id=None):
     project=_project_for_actor(request,pid)
+    from .project_kinds import require_kind
+    require_kind(project, "audio")
     if not project.tracks:raise HTTPException(400,'Project has no audio tracks')
     if track_id and not any(t.id==track_id for t in project.tracks):raise HTTPException(404,'Track not found')
     jid=uuid.uuid4().hex[:16];now=time.time()
@@ -4104,6 +4176,8 @@ async def _add_track_under_project_lock(
     if sync_mode not in {"manual", "auto"}:
         raise HTTPException(400, "invalid sync mode")
     project = _project_for_actor(request, pid)
+    from .project_kinds import require_kind
+    require_kind(project, "audio")
     from .ai_upload_transaction import begin as begin_upload
     begin_upload(pid)
     filename, dst, duration = _save_upload(pid, file)
@@ -4574,13 +4648,21 @@ def _download_name(title: str, ext: str) -> str:
 def _split_lead_backing_vocals(vocal_stem: Path, output_dir: Path, *, model_id: str | None = None, cancel_event=None) -> tuple[Path, Path, str]:
     if _ai_external_engine('backing-vocals'):
         result, remote_id = _native_remote_infer('backing-vocals', vocal_stem, {'model':model_id or LEAD_BACKING_DEFAULT_MODEL})
-        files=list(result['audio'].values())
+        files=list(result['audio'].items())
         if len(files)!=2: raise ValueError('Remote backing vocal split must return exactly two stems')
         output_dir.mkdir(parents=True,exist_ok=True)
-        lead_data=next((data for name,data in result['audio'].items() if 'lead' in name.lower() or 'vocal' in name.lower()),files[0])
-        backing_data=next((data for name,data in result['audio'].items() if 'back' in name.lower() or 'instrument' in name.lower()),None)
-        if backing_data is None: backing_data=next((x for x in files if x is not lead_data),None)
-        if backing_data is None: raise ValueError('Missing backing-vocal stem')
+        # "backing_vocals" also contains "vocal". Select distinct artifacts
+        # by index, never by byte identity or dictionary iteration order.
+        backing_index=next((i for i,(name,_) in enumerate(files)
+                            if 'back' in name.lower() or 'instrument' in name.lower()),None)
+        lead_index=next((i for i,(name,_) in enumerate(files)
+                         if i!=backing_index and 'lead' in name.lower()),None)
+        if lead_index is None:
+            lead_index=next((i for i,(name,_) in enumerate(files)
+                             if i!=backing_index and 'vocal' in name.lower()),None)
+        if lead_index is None:lead_index=next(i for i in range(2) if i!=backing_index)
+        if backing_index is None:backing_index=1-lead_index
+        lead_data=files[lead_index][1];backing_data=files[backing_index][1]
         lead=output_dir/'lead_vocals.wav';backing=output_dir/'backing_vocals.wav'
         lead.write_bytes(lead_data);backing.write_bytes(backing_data)
         return lead,backing,'remote:'+remote_id
@@ -4608,6 +4690,15 @@ def _split_lead_backing_vocals(vocal_stem: Path, output_dir: Path, *, model_id: 
             raise RuntimeError((output or "lead/backing vocal separator failed")[-3000:])
         return lead, backing, os.getenv("MTA_LEAD_BACKING_MODEL", "configured-ai").strip() or "configured-ai"
     selected = (model_id or LEAD_BACKING_DEFAULT_MODEL).strip()
+    if selected == "mvsep-mega53":
+        from .mega53_runtime import infer
+        return infer(vocal_stem, output_dir, cancel_event=cancel_event)
+    if selected!='ffmpeg-center-side':
+        from .model_license_policy import evaluate_model
+        evaluate_model('uvr-kara-2' if selected == 'uvr_mdxnet_kara_2' else 'audio-separator-weights')
+        if selected == 'uvr_mdxnet_kara_2':
+            from .uvr_kara_integrity import verify_kara_2
+            verify_kara_2(LEAD_BACKING_MODEL_DIR / 'UVR_MDXNET_KARA_2.onnx')
     if selected == "ffmpeg-center-side":
         if shutil.which("ffmpeg") is None:
             raise RuntimeError("FFmpeg is required for lead/backing vocal fallback separation")
@@ -4719,7 +4810,7 @@ def _split_drums_percussions(drums_stem: Path, output_dir: Path) -> tuple[Path, 
 # Optional gated SAM Audio backend. It is intentionally isolated from the DAW's
 # PyTorch runtime because SAM checkpoints and dependencies have separate constraints.
 _SAM_AUDIO_MODELS = {"sam-audio-small", "sam-audio-base", "sam-audio-large"}
-_PERCUSSION_METHODS = {"dsp", "drumsep-onnx", "sam-audio-small", "sam-audio-base", "sam-audio-large"}
+_PERCUSSION_METHODS = {"dsp", "drumsep-onnx", "mvsep-mega53", "sam-audio-small", "sam-audio-base", "sam-audio-large"}
 _SAM_PROMPTS = {
     "percussions": "congas bongos shakers tambourines maracas cowbells claves hand percussion",
     "kick": "kick drum",
@@ -4882,6 +4973,7 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
                     project_for_bpm.bpm = float(round(estimated_bpm, 2))
                     project_for_bpm.time_signature = estimated_signature
                     project_for_bpm.base_bpm = project_for_bpm.bpm
+                    project_for_bpm.tempo_known = True
                     save_project(project_for_bpm)
             except Exception:
                 progress(24, "Stima BPM non conclusiva; continuo con il BPM corrente")
@@ -4951,6 +5043,30 @@ def _stem_split_worker(job_id: str, source: Path, keep_original_track: bool) -> 
                         raise RuntimeError("Individual kit elements need SAM Audio; DSP only supports drums/percussions")
                     drum_body, percussion = _split_drums_percussions(drums_stem, td / "drums-percussions")
                     stems = [stem for stem in stems if Path(stem) != drums_stem] + [drum_body, percussion]
+                elif percussion_method == "mvsep-mega53":
+                    from .mega53_runtime import infer_drums
+                    # Distinguish a true DRUM KIT vs OTHER PERCUSSION split from
+                    # the older kick/snare/toms part extraction. Both native model
+                    # classes must run on the original mix, not a pre-filtered drum stem.
+                    if "all" in stem_targets or "drums_without_percussions" in stem_targets or "percussions" in stem_targets:
+                        from .mega53_runtime import infer_drums_vs_percussion
+                        kit, nonkit = infer_drums_vs_percussion(source, td / "mega53-drums-percussion", cancel_event=cancel_event)
+                        requested_files = ([kit, nonkit] if "all" in stem_targets else
+                                           ([kit] if "drums_without_percussions" in stem_targets else []) +
+                                           ([nonkit] if "percussions" in stem_targets else []))
+                        stems = [stem for stem in stems if Path(stem) != drums_stem] + requested_files
+                        _stem_job_update(job_id, percussion_method="mvsep-mega53", percussion_source="original_mix",
+                                         percussion_outputs=[path.name for path in requested_files])
+                        requested = set()
+                    else:
+                        requested = (stem_targets & {"kick", "snare", "toms"})
+                    if "percussions" in stem_targets:
+                        requested.add("percussion")
+                    if "cymbals" in stem_targets:
+                        raise RuntimeError("Mega 53 exposes hi-hat, not an equivalent complete cymbals stem; use SAM Audio")
+                    if requested:
+                        results = infer_drums(drums_stem, td / "mega53-drums", requested, cancel_event=cancel_event)
+                        stems = [stem for stem in stems if Path(stem) != drums_stem] + results
                 elif percussion_method == "drumsep-onnx":
                     # DrumSep only separates the kit. Non-kit percussions need SAM Audio.
                     if "percussions" in stem_targets or "all" in stem_targets:
@@ -5512,6 +5628,8 @@ def _drumsep_catalog() -> dict:
 
 
 def _download_drumsep_model() -> dict:
+    from .model_license_policy import evaluate_model
+    evaluate_model('drumsep-weights')
     _DRUMSEP_DIR.mkdir(parents=True, exist_ok=True)
     import tempfile as _tmp
     fd, name = _tmp.mkstemp(prefix=".drumsep-", suffix=".onnx", dir=str(_DRUMSEP_DIR))
@@ -5534,6 +5652,8 @@ def _download_drumsep_model() -> dict:
 
 
 def _drumsep_extract(source: Path, output_dir: Path, targets: set[str]) -> list[Path]:
+    from .model_license_policy import evaluate_model
+    evaluate_model('drumsep-weights')
     if _ai_external_engine('drumsep'):
         result, _ = _native_remote_infer('drumsep',source,{'targets':sorted(targets)})
         if not result['audio']: raise ValueError('Remote DrumSep returned no WAV stems')
@@ -5546,6 +5666,8 @@ def _drumsep_extract(source: Path, output_dir: Path, targets: set[str]) -> list[
         if not files: raise ValueError('No requested DrumSep stems returned')
         return files
     """Execute validated DrumSep ONNX adapter in a worker; input is Demucs drums."""
+    from .model_license_policy import evaluate_model
+    evaluate_model('drumsep-weights')
     import sys
     output_dir.mkdir(parents=True, exist_ok=True)
     if not _DRUMSEP_PATH.is_file():
@@ -5629,6 +5751,9 @@ async def stem_job_start(
     singer_model: str = "sam-audio-small",
     singer_target: str = "all",
 ):
+    from .project_kinds import require_kind, ProjectKindError
+    if project_id:require_kind(_project_for_actor(request, project_id), "audio")
+    elif target == "MIDI":raise ProjectKindError("MIDI projects cannot receive audio stems; choose an audio or mixed project type")
     requested_targets = {value.strip().lower() for value in stem_targets.split(",") if value.strip()}
     if not requested_targets or not requested_targets <= _STEM_TARGETS or ("all" in requested_targets and len(requested_targets) > 1):
         raise HTTPException(400, "Invalid stem selection")
@@ -5681,7 +5806,7 @@ async def stem_job_start(
         title = (project_title.strip() or Path(file.filename or "Nuovo progetto").stem)[:200]
         project = create_project(
             title,
-            target if target in {"MTA8", "MTA16", "DAW"} else "MTA8",
+            target if target in {"MTA8", "MTA16", "DAW", "DAW_MIDI"} else "MTA8",
             owner_user_id=actor["id"] if actor["id"] > 0 else None,
         )
 
@@ -5844,6 +5969,9 @@ async def split_stems_compat(
     target: str = "MTA8",
     model: str = "htdemucs_6s",
 ):
+    from .project_kinds import require_kind, ProjectKindError
+    if project_id:require_kind(_project_for_actor(request, project_id), "audio")
+    elif target == "MIDI":raise ProjectKindError("MIDI projects cannot receive audio stems; choose an audio or mixed project type")
     if Path(file.filename or "").suffix.lower() != ".mp3":
         raise HTTPException(400, "stem separation currently accepts MP3 input")
     if not STEM_SPLITTER.available():
@@ -5860,7 +5988,7 @@ async def split_stems_compat(
             _ensure_workspace_capacity(actor["id"] if actor["id"] > 0 else None, int(request.headers.get("content-length") or 0))
         project = existing_project if project_id else create_project(
             Path(file.filename or "Stems").stem[:200],
-            target if target in {"MTA8", "MTA16", "DAW"} else "MTA8",
+            target if target in {"MTA8", "MTA16", "DAW", "DAW_MIDI"} else "MTA8",
             owner_user_id=actor["id"] if actor["id"] > 0 else None,
         )
         with tempfile.TemporaryDirectory() as td_raw:
@@ -5914,6 +6042,8 @@ def start_track_stem_job(
     singer_target: str = "all",
 ):
     project = _project_for_actor(request, pid)
+    from .project_kinds import require_kind
+    require_kind(project, "audio")
     remote_demucs = _ai_external_engine('demucs')
     if not remote_demucs and not STEM_SPLITTER.available():
         raise HTTPException(503, "Demucs stem plugin is not installed in this runtime")
@@ -6053,6 +6183,8 @@ def create_metronome_track(pid: str, request: Request, mode: str = "fixed", trac
 
 def _create_metronome_track_locked(pid: str, request: Request, mode: str = "fixed", track_id: str = "", sensitivity: float = 0.35):
     project = _project_for_actor(request, pid)
+    from .project_kinds import require_kind
+    require_kind(project, "audio")
     from .metronome_grid import grid_settings, zone_signature
     duration_ms = project_duration_ms(project)
     if duration_ms <= 0:
@@ -6118,7 +6250,14 @@ def _create_metronome_track_locked(pid: str, request: Request, mode: str = "fixe
             from .timeline_editing import preroll_beats
             beat_times_ms = preroll_beats(project, beat_times_ms)
             duration_ms = generate_adaptive_metronome_wav(project, out, beat_times_ms)
-            project.adaptive_tempo_map = tempo_points
+            from .models import AdaptiveTempoPoint
+            # Persist the audible grid including pre-roll; every consumer uses
+            # these actual click times rather than the pre-insertion analysis.
+            project.adaptive_tempo_map = [AdaptiveTempoPoint(
+                time_ms=int(at), beat_index=i,
+                bpm=min(500., 60000./max(1, beat_times_ms[i+1]-at)) if i+1 < len(beat_times_ms)
+                    else (tempo_points[-1].bpm if tempo_points else project.bpm))
+                for i, at in enumerate(beat_times_ms)]
             project.metronome_mode = "adaptive"
             project.metronome_shift_ms = 0
             project.metronome_grid_origin_ms = int(beat_times_ms[0]) if beat_times_ms else 0
@@ -6148,7 +6287,8 @@ def _create_metronome_track_locked(pid: str, request: Request, mode: str = "fixe
                                 segment.writeframes(source.readframes(max(0,length)))
                             try:
                                 bpm, _ = estimate_bpm_and_signature(excerpt)
-                                zone_bpms[str(start)] = bpm
+                                from .metronome_grid import playback_ratio
+                                zone_bpms[str(start)] = bpm * playback_ratio(project)
                             except (ValueError, RuntimeError, OSError):
                                 zone_bpms[str(start)] = grid_bpm
             project.metronome_zone_bpms = {str(start): float(_metronome_manual_for_zone(project, keyed_boundaries[i][1], keyed_boundaries[i+1][1]) or zone_bpms.get(str(start), grid_bpm)) for i,start in enumerate(boundaries[:-1])}
@@ -6191,6 +6331,8 @@ def _create_metronome_track_locked(pid: str, request: Request, mode: str = "fixe
             project.metronome_mode = "fixed"
             project.metronome_shift_ms = 0
             project.adaptive_tempo_map = []
+        project.tempo_known = True
+        project.musical_origin_ms = int(project.metronome_grid_origin_ms)
         project.metronome_reference_track_id = reference_track.id if reference_track is not None else ""
         project.metronome_reference_track_name = reference_track.name if reference_track is not None else ""
         _limit_metronome_wav(out, project.metronome_start_ms, project.metronome_stop_ms)
@@ -6248,7 +6390,7 @@ def _create_metronome_track_locked(pid: str, request: Request, mode: str = "fixe
         save_project(project)
     finally:
         out.unlink(missing_ok=True)
-    return {"project": project, "track": track, "reused": reused, "mode": mode, "tempo_map": tempo_points if mode == "adaptive" else [], "reference_track_id": project.metronome_reference_track_id, "reference_track_name": project.metronome_reference_track_name}
+    return {"project": project, "track": track, "reused": reused, "mode": mode, "tempo_map": project.adaptive_tempo_map if mode == "adaptive" else [], "reference_track_id": project.metronome_reference_track_id, "reference_track_name": project.metronome_reference_track_name}
 
 
 def _metronome_zone_boundaries(project: Project, duration: int):
@@ -6308,6 +6450,8 @@ def _update_metronome_zone_locked(pid: str, request: Request, time_ms: int, trac
                     with wave.open(str(excerpt), "wb") as segment:
                         segment.setparams(source.getparams()); segment.writeframes(data)
                 bpm,_=estimate_bpm_and_signature(excerpt)
+                from .metronome_grid import playback_ratio
+                bpm *= playback_ratio(project)
         except (ValueError, RuntimeError, OSError):
             bpm=grid_bpm
     original=audio_path(pid,click_track.filename)
@@ -6403,6 +6547,8 @@ def set_metronome_zone_bpm(pid: str, request: Request, time_ms: int = 0, bpm: fl
                 project.metronome_manual_zone_signatures[key] = time_signature
             project.metronome_manual_zone_bpms[key] = round(float(bpm), 2)
         save_project(project)
+        if not any(t.type=='click' and t.kind=='audio' for t in project.tracks):
+            return {'project':project,'track':None,'grid_only':True}
         try:
             return _update_metronome_zone_locked(pid, request, time_ms, "")
         except Exception:
@@ -6470,10 +6616,10 @@ def shift_adaptive_metronome(pid: str, request: Request, value: float = 0.0, uni
 
 @app.post("/api/projects/{pid}/transport-time-mode")
 @_serialized_project_mutation
-def set_transport_time_mode(pid: str, request: Request, mode: str = "time"):
+def set_transport_time_mode(pid: str, request: Request, mode: str = "auto"):
     project = _project_for_actor(request, pid)
-    mode = str(mode or "time").strip().lower()
-    if mode not in {"time", "musical"}:
+    mode = str(mode or "auto").strip().lower()
+    if mode not in {"auto", "time", "musical"}:
         raise HTTPException(400, "Modalità transport non valida")
     project.transport_time_mode = mode
     save_project(project)
@@ -6658,6 +6804,7 @@ def estimate_track_bpm(pid: str, track_id: str, request: Request, time_signature
             raise HTTPException(409, "Project tempo changed during BPM estimation")
         project.bpm = bpm
         project.base_bpm = bpm
+        project.tempo_known = True
         project.time_signature = signature
         save_project(project)
     return {"ok": True, "track_id": track_id, "bpm": bpm, "time_signature": signature}
@@ -6752,7 +6899,7 @@ def export_plan(pid: str, request: Request, profile: str | None = None, target: 
         project = _audible_export_project(source_project)
     except ValueError as exc:
         raise HTTPException(400, str(exc)) from exc
-    if project.target == "DAW":
+    if project.target not in {"MTA8", "MTA16"}:
         project.target = target if target in {"MTA8", "MTA16"} else "MTA16"
     limit = 8 if project.target == "MTA8" else 16
     selected = resolve_mta_device_profile(project, profile)
@@ -7018,7 +7165,7 @@ def _render_configured_project_export(pid: str, req: ProjectExportRequest) -> tu
     safe_stem = SAFE_DOWNLOAD_RE.sub("_", Path(req.filename).stem).strip(" ._")[:180] or "project"
     if fmt == "mta":
         export_project = _musical_export_project(source_project)
-        if export_project.target == "DAW":
+        if export_project.target not in {"MTA8", "MTA16"}:
             export_project.target = req.mta_target or "MTA16"
         ext = "mta8" if export_project.target == "MTA8" else "mta16"
         out = pdir(pid) / f"configured-export.{ext}"
@@ -7253,7 +7400,7 @@ def export(pid: str, request: Request, format: str = "mta"):
         validate_project_files(project)
         export_project = _audible_export_project(project)
         if format == "mta":
-            if export_project.target == "DAW":
+            if export_project.target not in {"MTA8", "MTA16"}:
                 raise HTTPException(409, "DAW projects require choosing MTA8 or MTA16 in configured export")
             if len(export_project.tracks) > (8 if export_project.target == "MTA8" else 16):
                 raise HTTPException(409, "MTA export mapping required; use /export-plan and /export-mta")
@@ -8005,7 +8152,7 @@ from .server_vst3 import register_routes as _server_vst3_routes
 _server_vst3_routes(app,_project_for_actor,_actor)
 
 from .midi_routes import register_routes as _midi_routes
-_midi_routes(app,_project_for_actor,_serialized_project_mutation,_ensure_workspace_capacity)
+_midi_music_publish=_midi_routes(app,_project_for_actor,_serialized_project_mutation,_ensure_workspace_capacity)
 from .midi_monitor import register_routes as _midi_monitor_routes
 _midi_monitor_routes(app,_project_for_actor,_actor)
 
@@ -8023,3 +8170,23 @@ def vst3_docs_it():
 @app.get('/docs/user/vst3/en', response_class=HTMLResponse)
 def vst3_docs_en():
     return _render_doc('vst3-en.html')
+
+from .user_preferences import register_routes as _user_preferences_routes
+_user_preferences_routes(app)
+
+from .studio_jobs import register_routes as _studio_routes
+_studio_routes(app,_project_for_actor,_actor,_midi_music_publish)
+from .studio_admin import register_routes as _studio_admin_routes
+_studio_admin_routes(app,_actor)
+from .model_asset_admin_routes import register_routes as _model_asset_admin_routes
+_model_asset_admin_routes(app,_actor)
+
+from .native_device_io import register_routes as _native_device_io_routes
+_native_device_io_routes(app,_actor)
+
+
+from .project_kinds import ProjectKindError as _ProjectKindError
+
+@app.exception_handler(_ProjectKindError)
+async def _project_kind_conflict(request, exc):
+    return JSONResponse({"detail": str(exc), "code": "project_type_conflict"}, status_code=409)

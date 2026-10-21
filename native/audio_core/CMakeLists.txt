@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.18)
 project(mta_audio_core LANGUAGES CXX)
-add_library(mta_audio_core SHARED audio_core.cpp vst3_runtime_api.cpp render_dsp.cpp timeline_plan.cpp device_transport.cpp)
+add_library(mta_audio_core SHARED audio_core.cpp vst3_runtime_api.cpp render_dsp.cpp timeline_plan.cpp device_transport.cpp gm_synth.cpp vocal_synth.cpp
+  ../third_party/oddvoices/cpp/src/liboddvoices.cpp ../third_party/oddvoices/cpp/src/g2p.cpp ../third_party/oddvoices/cpp/src/pitch.cpp)
 target_compile_features(mta_audio_core PRIVATE cxx_std_20)
 set_target_properties(mta_audio_core PROPERTIES CXX_VISIBILITY_PRESET hidden VISIBILITY_INLINES_HIDDEN YES)
 target_compile_definitions(mta_audio_core PRIVATE MTA_AUDIO_CORE_EXPORTS)

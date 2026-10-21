@@ -1,0 +1,931 @@
+[
+  {
+    "case": "it-text",
+    "language": "it",
+    "lyric_text": "ciao amore",
+    "notes": 4,
+    "seconds": 2.4032708333333335,
+    "frames": 115357,
+    "sample_rate": 48000,
+    "peak": 0.6620595455169678,
+    "rms": 0.20817279815673828,
+    "wall_seconds": 81.40742636000004,
+    "sha256": "c9d71f88a64c1fd76fc2bf9e1113a8baa92811cae912b536f3acff1923252d2b",
+    "profile_sha256": "0cea576a68d02623d13ad5b5aca965d1b97f03504850ba6bf2de9c8fae860544",
+    "pronunciation_mode": "cross-language",
+    "phones": [
+      [
+        "en/ch",
+        "ja/a",
+        "en/w"
+      ],
+      [
+        "ja/a"
+      ],
+      [
+        "en/m",
+        "ja/o"
+      ],
+      [
+        "ja/r",
+        "ja/e"
+      ]
+    ],
+    "projection_disclosure": {
+      "lyric_language": "it",
+      "mode": "cross-language",
+      "acoustic_languages": [
+        "en",
+        "ja",
+        "zh"
+      ],
+      "approximations": {
+        "r": "Japanese tap substitutes for Italian trill; no learned Italian trill is asserted.",
+        "ɲ": "Japanese palatalized nasal approximates the Italian palatal nasal.",
+        "ʎ": "English l+y sequence approximates the Italian palatal lateral.",
+        "dz": "English d+z sequence approximates the voiced alveolar affricate.",
+        "ɱ": "English m approximates the labiodental nasal."
+      },
+      "ipa_rewrites": {
+        "iˈa": "jˈa",
+        "iˈɑ": "jˈɑ",
+        "iˈe": "jˈe",
+        "iˈɛ": "jˈɛ",
+        "iˈo": "jˈo",
+        "iˈɔ": "jˈɔ",
+        "ɪˈa": "jˈa",
+        "ɪˈɑ": "jˈɑ",
+        "ɪˈe": "jˈe",
+        "ɪˈɛ": "jˈɛ",
+        "ɪˈo": "jˈo",
+        "ɪˈɔ": "jˈɔ",
+        "uˈa": "wˈa",
+        "uˈɑ": "wˈɑ",
+        "uˈe": "wˈe",
+        "uˈɛ": "wˈɛ",
+        "uˈo": "wˈo",
+        "uˈɔ": "wˈɔ",
+        "ʊˈa": "wˈa",
+        "ʊˈɑ": "wˈɑ",
+        "ʊˈe": "wˈe",
+        "ʊˈɛ": "wˈɛ",
+        "ʊˈo": "wˈo",
+        "ʊˈɔ": "wˈɔ",
+        "tʃˈao": "tʃˈaw",
+        "aˈiu": "ajˈu"
+      },
+      "unstressed_glides": {
+        "i": "j",
+        "ɪ": "j",
+        "u": "w",
+        "ʊ": "w"
+      },
+      "glide_following_vowels": "aɑeɛoɔ",
+      "contextual_g2p": true,
+      "note": "Italian/French lyrics use existing English, Japanese and Mandarin bank phones. Rhotics, palatals, rounded mid/front and nasal vowels are approximated. This is cross-language synthesis, not native IT/FR pronunciation certification."
+    },
+    "actual_neural_inference": true,
+    "main_interpreter": "/workspace/scratch/37b1f5ad4c83/mta_work/../mta_env/bin/python",
+    "g2p_runtime_interpreter": "/workspace/scratch/37b1f5ad4c83/mta_work/../qixuan_env/bin/python",
+    "fixture_substitution": false,
+    "target_listening_certified": false
+  },
+  {
+    "case": "it-palatals",
+    "language": "it",
+    "lyric_text": "gli gnocchi",
+    "notes": 3,
+    "seconds": 1.8111666666666666,
+    "frames": 86936,
+    "sample_rate": 48000,
+    "peak": 0.5428946018218994,
+    "rms": 0.22476644814014435,
+    "wall_seconds": 24.901399858000104,
+    "sha256": "875a0a84672fb605d2cc1d45104a5c46fa8ee3a1b3fe19db547607bc5e00e98d",
+    "profile_sha256": "0cea576a68d02623d13ad5b5aca965d1b97f03504850ba6bf2de9c8fae860544",
+    "pronunciation_mode": "cross-language",
+    "phones": [
+      [
+        "en/l",
+        "en/y",
+        "en/ih"
+      ],
+      [
+        "ja/ny",
+        "ja/o"
+      ],
+      [
+        "en/k",
+        "en/k",
+        "en/ih"
+      ]
+    ],
+    "projection_disclosure": {
+      "lyric_language": "it",
+      "mode": "cross-language",
+      "acoustic_languages": [
+        "en",
+        "ja",
+        "zh"
+      ],
+      "approximations": {
+        "r": "Japanese tap substitutes for Italian trill; no learned Italian trill is asserted.",
+        "ɲ": "Japanese palatalized nasal approximates the Italian palatal nasal.",
+        "ʎ": "English l+y sequence approximates the Italian palatal lateral.",
+        "dz": "English d+z sequence approximates the voiced alveolar affricate.",
+        "ɱ": "English m approximates the labiodental nasal."
+      },
+      "ipa_rewrites": {
+        "iˈa": "jˈa",
+        "iˈɑ": "jˈɑ",
+        "iˈe": "jˈe",
+        "iˈɛ": "jˈɛ",
+        "iˈo": "jˈo",
+        "iˈɔ": "jˈɔ",
+        "ɪˈa": "jˈa",
+        "ɪˈɑ": "jˈɑ",
+        "ɪˈe": "jˈe",
+        "ɪˈɛ": "jˈɛ",
+        "ɪˈo": "jˈo",
+        "ɪˈɔ": "jˈɔ",
+        "uˈa": "wˈa",
+        "uˈɑ": "wˈɑ",
+        "uˈe": "wˈe",
+        "uˈɛ": "wˈɛ",
+        "uˈo": "wˈo",
+        "uˈɔ": "wˈɔ",
+        "ʊˈa": "wˈa",
+        "ʊˈɑ": "wˈɑ",
+        "ʊˈe": "wˈe",
+        "ʊˈɛ": "wˈɛ",
+        "ʊˈo": "wˈo",
+        "ʊˈɔ": "wˈɔ",
+        "tʃˈao": "tʃˈaw",
+        "aˈiu": "ajˈu"
+      },
+      "unstressed_glides": {
+        "i": "j",
+        "ɪ": "j",
+        "u": "w",
+        "ʊ": "w"
+      },
+      "glide_following_vowels": "aɑeɛoɔ",
+      "contextual_g2p": true,
+      "note": "Italian/French lyrics use existing English, Japanese and Mandarin bank phones. Rhotics, palatals, rounded mid/front and nasal vowels are approximated. This is cross-language synthesis, not native IT/FR pronunciation certification."
+    },
+    "actual_neural_inference": true,
+    "main_interpreter": "/workspace/scratch/37b1f5ad4c83/mta_work/../mta_env/bin/python",
+    "g2p_runtime_interpreter": "/workspace/scratch/37b1f5ad4c83/mta_work/../qixuan_env/bin/python",
+    "fixture_substitution": false,
+    "target_listening_certified": false
+  },
+  {
+    "case": "it-melisma",
+    "language": "it",
+    "lyric_text": "ciao amore",
+    "notes": 5,
+    "seconds": 3.007,
+    "frames": 144336,
+    "sample_rate": 48000,
+    "peak": 0.6601483821868896,
+    "rms": 0.21445100009441376,
+    "wall_seconds": 32.20513537800002,
+    "sha256": "bdbd14878ec6f684623e3c122f872e1984899a189d872f551c7d3903378b3d20",
+    "profile_sha256": "0cea576a68d02623d13ad5b5aca965d1b97f03504850ba6bf2de9c8fae860544",
+    "pronunciation_mode": "cross-language",
+    "phones": [
+      [
+        "en/ch",
+        "ja/a",
+        "en/w"
+      ],
+      [
+        "ja/a"
+      ],
+      [
+        "ja/a"
+      ],
+      [
+        "en/m",
+        "ja/o"
+      ],
+      [
+        "ja/r",
+        "ja/e"
+      ]
+    ],
+    "projection_disclosure": {
+      "lyric_language": "it",
+      "mode": "cross-language",
+      "acoustic_languages": [
+        "en",
+        "ja",
+        "zh"
+      ],
+      "approximations": {
+        "r": "Japanese tap substitutes for Italian trill; no learned Italian trill is asserted.",
+        "ɲ": "Japanese palatalized nasal approximates the Italian palatal nasal.",
+        "ʎ": "English l+y sequence approximates the Italian palatal lateral.",
+        "dz": "English d+z sequence approximates the voiced alveolar affricate.",
+        "ɱ": "English m approximates the labiodental nasal."
+      },
+      "ipa_rewrites": {
+        "iˈa": "jˈa",
+        "iˈɑ": "jˈɑ",
+        "iˈe": "jˈe",
+        "iˈɛ": "jˈɛ",
+        "iˈo": "jˈo",
+        "iˈɔ": "jˈɔ",
+        "ɪˈa": "jˈa",
+        "ɪˈɑ": "jˈɑ",
+        "ɪˈe": "jˈe",
+        "ɪˈɛ": "jˈɛ",
+        "ɪˈo": "jˈo",
+        "ɪˈɔ": "jˈɔ",
+        "uˈa": "wˈa",
+        "uˈɑ": "wˈɑ",
+        "uˈe": "wˈe",
+        "uˈɛ": "wˈɛ",
+        "uˈo": "wˈo",
+        "uˈɔ": "wˈɔ",
+        "ʊˈa": "wˈa",
+        "ʊˈɑ": "wˈɑ",
+        "ʊˈe": "wˈe",
+        "ʊˈɛ": "wˈɛ",
+        "ʊˈo": "wˈo",
+        "ʊˈɔ": "wˈɔ",
+        "tʃˈao": "tʃˈaw",
+        "aˈiu": "ajˈu"
+      },
+      "unstressed_glides": {
+        "i": "j",
+        "ɪ": "j",
+        "u": "w",
+        "ʊ": "w"
+      },
+      "glide_following_vowels": "aɑeɛoɔ",
+      "contextual_g2p": true,
+      "note": "Italian/French lyrics use existing English, Japanese and Mandarin bank phones. Rhotics, palatals, rounded mid/front and nasal vowels are approximated. This is cross-language synthesis, not native IT/FR pronunciation certification."
+    },
+    "actual_neural_inference": true,
+    "main_interpreter": "/workspace/scratch/37b1f5ad4c83/mta_work/../mta_env/bin/python",
+    "g2p_runtime_interpreter": "/workspace/scratch/37b1f5ad4c83/mta_work/../qixuan_env/bin/python",
+    "fixture_substitution": false,
+    "target_listening_certified": false
+  },
+  {
+    "case": "fr-text",
+    "language": "fr",
+    "lyric_text": "bonjour lune",
+    "notes": 3,
+    "seconds": 1.8111666666666666,
+    "frames": 86936,
+    "sample_rate": 48000,
+    "peak": 0.5631016492843628,
+    "rms": 0.22166329622268677,
+    "wall_seconds": 24.464698580999993,
+    "sha256": "1a9a9bb3479b376acad297eb67f34e697200af6a9af7cf0ac50af76f6063aed9",
+    "profile_sha256": "fada666f56449145f2fa49f39e6732da519f97c0f0b876ac473f9ece618f18c7",
+    "pronunciation_mode": "cross-language",
+    "phones": [
+      [
+        "en/b",
+        "zh/ong"
+      ],
+      [
+        "en/zh",
+        "zh/u",
+        "en/r"
+      ],
+      [
+        "en/l",
+        "zh/v",
+        "en/n"
+      ]
+    ],
+    "projection_disclosure": {
+      "lyric_language": "fr",
+      "mode": "cross-language",
+      "acoustic_languages": [
+        "en",
+        "ja",
+        "zh"
+      ],
+      "approximations": {
+        "ʁ": "English r substitutes for the French uvular rhotic.",
+        "ɲ": "Japanese palatalized nasal approximates the French palatal nasal.",
+        "ɥ": "English y+w sequence approximates the French rounded palatal glide.",
+        "ø/œ": "Mandarin ve approximates rounded front mid vowels; the contrast is not modeled natively.",
+        "ɑ̃/ɔ̃/ɛ̃/œ̃": "Mandarin nasal rimes approximate French nasal vowels, including a possible audible nasal coda."
+      },
+      "ipa_rewrites": {
+        "yˈa": "ɥˈa",
+        "ˈya": "ɥˈa",
+        "ya": "ɥa",
+        "yˈɑ": "ɥˈɑ",
+        "ˈyɑ": "ɥˈɑ",
+        "yɑ": "ɥɑ",
+        "yˈe": "ɥˈe",
+        "ˈye": "ɥˈe",
+        "ye": "ɥe",
+        "yˈɛ": "ɥˈɛ",
+        "ˈyɛ": "ɥˈɛ",
+        "yɛ": "ɥɛ",
+        "yˈi": "ɥˈi",
+        "ˈyi": "ɥˈi",
+        "yi": "ɥi",
+        "yˈo": "ɥˈo",
+        "ˈyo": "ɥˈo",
+        "yo": "ɥo",
+        "yˈɔ": "ɥˈɔ",
+        "ˈyɔ": "ɥˈɔ",
+        "yɔ": "ɥɔ",
+        "-": ""
+      },
+      "unstressed_glides": {},
+      "glide_following_vowels": "",
+      "contextual_g2p": true,
+      "note": "Italian/French lyrics use existing English, Japanese and Mandarin bank phones. Rhotics, palatals, rounded mid/front and nasal vowels are approximated. This is cross-language synthesis, not native IT/FR pronunciation certification."
+    },
+    "actual_neural_inference": true,
+    "main_interpreter": "/workspace/scratch/37b1f5ad4c83/mta_work/../mta_env/bin/python",
+    "g2p_runtime_interpreter": "/workspace/scratch/37b1f5ad4c83/mta_work/../qixuan_env/bin/python",
+    "fixture_substitution": false,
+    "target_listening_certified": false
+  },
+  {
+    "case": "fr-nasal-rounded",
+    "language": "fr",
+    "lyric_text": "pain cœur nuit",
+    "notes": 3,
+    "seconds": 1.8111666666666666,
+    "frames": 86936,
+    "sample_rate": 48000,
+    "peak": 0.5064094066619873,
+    "rms": 0.2184571474790573,
+    "wall_seconds": 14.91651065300016,
+    "sha256": "620f166733ce1af718f87709c406cab93c5478e88887a198cf49d96be764a1eb",
+    "profile_sha256": "fada666f56449145f2fa49f39e6732da519f97c0f0b876ac473f9ece618f18c7",
+    "pronunciation_mode": "cross-language",
+    "phones": [
+      [
+        "en/p",
+        "zh/eng"
+      ],
+      [
+        "en/k",
+        "zh/ve",
+        "en/r"
+      ],
+      [
+        "en/n",
+        "en/y",
+        "en/w",
+        "en/iy"
+      ]
+    ],
+    "projection_disclosure": {
+      "lyric_language": "fr",
+      "mode": "cross-language",
+      "acoustic_languages": [
+        "en",
+        "ja",
+        "zh"
+      ],
+      "approximations": {
+        "ʁ": "English r substitutes for the French uvular rhotic.",
+        "ɲ": "Japanese palatalized nasal approximates the French palatal nasal.",
+        "ɥ": "English y+w sequence approximates the French rounded palatal glide.",
+        "ø/œ": "Mandarin ve approximates rounded front mid vowels; the contrast is not modeled natively.",
+        "ɑ̃/ɔ̃/ɛ̃/œ̃": "Mandarin nasal rimes approximate French nasal vowels, including a possible audible nasal coda."
+      },
+      "ipa_rewrites": {
+        "yˈa": "ɥˈa",
+        "ˈya": "ɥˈa",
+        "ya": "ɥa",
+        "yˈɑ": "ɥˈɑ",
+        "ˈyɑ": "ɥˈɑ",
+        "yɑ": "ɥɑ",
+        "yˈe": "ɥˈe",
+        "ˈye": "ɥˈe",
+        "ye": "ɥe",
+        "yˈɛ": "ɥˈɛ",
+        "ˈyɛ": "ɥˈɛ",
+        "yɛ": "ɥɛ",
+        "yˈi": "ɥˈi",
+        "ˈyi": "ɥˈi",
+        "yi": "ɥi",
+        "yˈo": "ɥˈo",
+        "ˈyo": "ɥˈo",
+        "yo": "ɥo",
+        "yˈɔ": "ɥˈɔ",
+        "ˈyɔ": "ɥˈɔ",
+        "yɔ": "ɥɔ",
+        "-": ""
+      },
+      "unstressed_glides": {},
+      "glide_following_vowels": "",
+      "contextual_g2p": true,
+      "note": "Italian/French lyrics use existing English, Japanese and Mandarin bank phones. Rhotics, palatals, rounded mid/front and nasal vowels are approximated. This is cross-language synthesis, not native IT/FR pronunciation certification."
+    },
+    "actual_neural_inference": true,
+    "main_interpreter": "/workspace/scratch/37b1f5ad4c83/mta_work/../mta_env/bin/python",
+    "g2p_runtime_interpreter": "/workspace/scratch/37b1f5ad4c83/mta_work/../qixuan_env/bin/python",
+    "fixture_substitution": false,
+    "target_listening_certified": false
+  },
+  {
+    "case": "fr-melisma",
+    "language": "fr",
+    "lyric_text": "bonjour lune",
+    "notes": 4,
+    "seconds": 2.4032708333333335,
+    "frames": 115357,
+    "sample_rate": 48000,
+    "peak": 0.5901293754577637,
+    "rms": 0.22036992013454437,
+    "wall_seconds": 59.19947228199999,
+    "sha256": "da52c75d2c3b960e7b6082e788c4f3cbe9ba876d366597df01004b96eb20c4d3",
+    "profile_sha256": "fada666f56449145f2fa49f39e6732da519f97c0f0b876ac473f9ece618f18c7",
+    "pronunciation_mode": "cross-language",
+    "phones": [
+      [
+        "en/b",
+        "zh/ong"
+      ],
+      [
+        "en/zh",
+        "zh/u",
+        "en/r"
+      ],
+      [
+        "zh/u"
+      ],
+      [
+        "en/l",
+        "zh/v",
+        "en/n"
+      ]
+    ],
+    "projection_disclosure": {
+      "lyric_language": "fr",
+      "mode": "cross-language",
+      "acoustic_languages": [
+        "en",
+        "ja",
+        "zh"
+      ],
+      "approximations": {
+        "ʁ": "English r substitutes for the French uvular rhotic.",
+        "ɲ": "Japanese palatalized nasal approximates the French palatal nasal.",
+        "ɥ": "English y+w sequence approximates the French rounded palatal glide.",
+        "ø/œ": "Mandarin ve approximates rounded front mid vowels; the contrast is not modeled natively.",
+        "ɑ̃/ɔ̃/ɛ̃/œ̃": "Mandarin nasal rimes approximate French nasal vowels, including a possible audible nasal coda."
+      },
+      "ipa_rewrites": {
+        "yˈa": "ɥˈa",
+        "ˈya": "ɥˈa",
+        "ya": "ɥa",
+        "yˈɑ": "ɥˈɑ",
+        "ˈyɑ": "ɥˈɑ",
+        "yɑ": "ɥɑ",
+        "yˈe": "ɥˈe",
+        "ˈye": "ɥˈe",
+        "ye": "ɥe",
+        "yˈɛ": "ɥˈɛ",
+        "ˈyɛ": "ɥˈɛ",
+        "yɛ": "ɥɛ",
+        "yˈi": "ɥˈi",
+        "ˈyi": "ɥˈi",
+        "yi": "ɥi",
+        "yˈo": "ɥˈo",
+        "ˈyo": "ɥˈo",
+        "yo": "ɥo",
+        "yˈɔ": "ɥˈɔ",
+        "ˈyɔ": "ɥˈɔ",
+        "yɔ": "ɥɔ",
+        "-": ""
+      },
+      "unstressed_glides": {},
+      "glide_following_vowels": "",
+      "contextual_g2p": true,
+      "note": "Italian/French lyrics use existing English, Japanese and Mandarin bank phones. Rhotics, palatals, rounded mid/front and nasal vowels are approximated. This is cross-language synthesis, not native IT/FR pronunciation certification."
+    },
+    "actual_neural_inference": true,
+    "main_interpreter": "/workspace/scratch/37b1f5ad4c83/mta_work/../mta_env/bin/python",
+    "g2p_runtime_interpreter": "/workspace/scratch/37b1f5ad4c83/mta_work/../qixuan_env/bin/python",
+    "fixture_substitution": false,
+    "target_listening_certified": false
+  },
+  {
+    "case": "fr-liaison-les-amis",
+    "language": "fr",
+    "lyric_text": "les amis",
+    "notes": 3,
+    "seconds": 1.8111666666666666,
+    "frames": 86936,
+    "sample_rate": 48000,
+    "peak": 0.5590829849243164,
+    "rms": 0.20542286336421967,
+    "wall_seconds": 46.637559638000084,
+    "sha256": "c739b3b6ebd97e3f5067a0758af70e54fca3b27e7b5dc637da6dfcdec7ff7d22",
+    "profile_sha256": "fada666f56449145f2fa49f39e6732da519f97c0f0b876ac473f9ece618f18c7",
+    "pronunciation_mode": "cross-language",
+    "phones": [
+      [
+        "en/l",
+        "ja/e",
+        "en/z"
+      ],
+      [
+        "ja/a"
+      ],
+      [
+        "en/m",
+        "en/iy"
+      ]
+    ],
+    "projection_disclosure": {
+      "lyric_language": "fr",
+      "mode": "cross-language",
+      "acoustic_languages": [
+        "en",
+        "ja",
+        "zh"
+      ],
+      "approximations": {
+        "ʁ": "English r substitutes for the French uvular rhotic.",
+        "ɲ": "Japanese palatalized nasal approximates the French palatal nasal.",
+        "ɥ": "English y+w sequence approximates the French rounded palatal glide.",
+        "ø/œ": "Mandarin ve approximates rounded front mid vowels; the contrast is not modeled natively.",
+        "ɑ̃/ɔ̃/ɛ̃/œ̃": "Mandarin nasal rimes approximate French nasal vowels, including a possible audible nasal coda."
+      },
+      "ipa_rewrites": {
+        "yˈa": "ɥˈa",
+        "ˈya": "ɥˈa",
+        "ya": "ɥa",
+        "yˈɑ": "ɥˈɑ",
+        "ˈyɑ": "ɥˈɑ",
+        "yɑ": "ɥɑ",
+        "yˈe": "ɥˈe",
+        "ˈye": "ɥˈe",
+        "ye": "ɥe",
+        "yˈɛ": "ɥˈɛ",
+        "ˈyɛ": "ɥˈɛ",
+        "yɛ": "ɥɛ",
+        "yˈi": "ɥˈi",
+        "ˈyi": "ɥˈi",
+        "yi": "ɥi",
+        "yˈo": "ɥˈo",
+        "ˈyo": "ɥˈo",
+        "yo": "ɥo",
+        "yˈɔ": "ɥˈɔ",
+        "ˈyɔ": "ɥˈɔ",
+        "yɔ": "ɥɔ",
+        "-": ""
+      },
+      "unstressed_glides": {},
+      "glide_following_vowels": "",
+      "contextual_g2p": true,
+      "note": "Italian/French lyrics use existing English, Japanese and Mandarin bank phones. Rhotics, palatals, rounded mid/front and nasal vowels are approximated. This is cross-language synthesis, not native IT/FR pronunciation certification."
+    },
+    "actual_neural_inference": true,
+    "main_interpreter": "/workspace/scratch/37b1f5ad4c83/mta_work/../mta_env/bin/python",
+    "g2p_runtime_interpreter": "/workspace/scratch/37b1f5ad4c83/mta_work/../qixuan_env/bin/python",
+    "fixture_substitution": false,
+    "target_listening_certified": false
+  },
+  {
+    "case": "fr-no-liaison-aspirated-h",
+    "language": "fr",
+    "lyric_text": "les haricots",
+    "notes": 4,
+    "seconds": 2.4032708333333335,
+    "frames": 115357,
+    "sample_rate": 48000,
+    "peak": 0.5146315097808838,
+    "rms": 0.20968280732631683,
+    "wall_seconds": 21.853036257999975,
+    "sha256": "9098c8ed5ba3f1760152411cd8335f8ea6d55ed4635070ac07453596cea9c400",
+    "profile_sha256": "fada666f56449145f2fa49f39e6732da519f97c0f0b876ac473f9ece618f18c7",
+    "pronunciation_mode": "cross-language",
+    "phones": [
+      [
+        "en/l",
+        "ja/e"
+      ],
+      [
+        "ja/a"
+      ],
+      [
+        "en/r",
+        "en/iy"
+      ],
+      [
+        "en/k",
+        "ja/o"
+      ]
+    ],
+    "projection_disclosure": {
+      "lyric_language": "fr",
+      "mode": "cross-language",
+      "acoustic_languages": [
+        "en",
+        "ja",
+        "zh"
+      ],
+      "approximations": {
+        "ʁ": "English r substitutes for the French uvular rhotic.",
+        "ɲ": "Japanese palatalized nasal approximates the French palatal nasal.",
+        "ɥ": "English y+w sequence approximates the French rounded palatal glide.",
+        "ø/œ": "Mandarin ve approximates rounded front mid vowels; the contrast is not modeled natively.",
+        "ɑ̃/ɔ̃/ɛ̃/œ̃": "Mandarin nasal rimes approximate French nasal vowels, including a possible audible nasal coda."
+      },
+      "ipa_rewrites": {
+        "yˈa": "ɥˈa",
+        "ˈya": "ɥˈa",
+        "ya": "ɥa",
+        "yˈɑ": "ɥˈɑ",
+        "ˈyɑ": "ɥˈɑ",
+        "yɑ": "ɥɑ",
+        "yˈe": "ɥˈe",
+        "ˈye": "ɥˈe",
+        "ye": "ɥe",
+        "yˈɛ": "ɥˈɛ",
+        "ˈyɛ": "ɥˈɛ",
+        "yɛ": "ɥɛ",
+        "yˈi": "ɥˈi",
+        "ˈyi": "ɥˈi",
+        "yi": "ɥi",
+        "yˈo": "ɥˈo",
+        "ˈyo": "ɥˈo",
+        "yo": "ɥo",
+        "yˈɔ": "ɥˈɔ",
+        "ˈyɔ": "ɥˈɔ",
+        "yɔ": "ɥɔ",
+        "-": ""
+      },
+      "unstressed_glides": {},
+      "glide_following_vowels": "",
+      "contextual_g2p": true,
+      "note": "Italian/French lyrics use existing English, Japanese and Mandarin bank phones. Rhotics, palatals, rounded mid/front and nasal vowels are approximated. This is cross-language synthesis, not native IT/FR pronunciation certification."
+    },
+    "actual_neural_inference": true,
+    "main_interpreter": "/workspace/scratch/37b1f5ad4c83/mta_work/../mta_env/bin/python",
+    "g2p_runtime_interpreter": "/workspace/scratch/37b1f5ad4c83/mta_work/../qixuan_env/bin/python",
+    "fixture_substitution": false,
+    "target_listening_certified": false
+  },
+  {
+    "case": "fr-liaison-un-ami",
+    "language": "fr",
+    "lyric_text": "un ami",
+    "notes": 3,
+    "seconds": 1.8111666666666666,
+    "frames": 86936,
+    "sample_rate": 48000,
+    "peak": 0.5892136096954346,
+    "rms": 0.20719261467456818,
+    "wall_seconds": 21.552142802999924,
+    "sha256": "1dd3dbbdfd29dd86f353f7c1ea5cf7f68142bf2fd3af2a86501f0e6c5362224c",
+    "profile_sha256": "fada666f56449145f2fa49f39e6732da519f97c0f0b876ac473f9ece618f18c7",
+    "pronunciation_mode": "cross-language",
+    "phones": [
+      [
+        "zh/eng",
+        "en/n"
+      ],
+      [
+        "ja/a"
+      ],
+      [
+        "en/m",
+        "en/iy"
+      ]
+    ],
+    "projection_disclosure": {
+      "lyric_language": "fr",
+      "mode": "cross-language",
+      "acoustic_languages": [
+        "en",
+        "ja",
+        "zh"
+      ],
+      "approximations": {
+        "ʁ": "English r substitutes for the French uvular rhotic.",
+        "ɲ": "Japanese palatalized nasal approximates the French palatal nasal.",
+        "ɥ": "English y+w sequence approximates the French rounded palatal glide.",
+        "ø/œ": "Mandarin ve approximates rounded front mid vowels; the contrast is not modeled natively.",
+        "ɑ̃/ɔ̃/ɛ̃/œ̃": "Mandarin nasal rimes approximate French nasal vowels, including a possible audible nasal coda."
+      },
+      "ipa_rewrites": {
+        "yˈa": "ɥˈa",
+        "ˈya": "ɥˈa",
+        "ya": "ɥa",
+        "yˈɑ": "ɥˈɑ",
+        "ˈyɑ": "ɥˈɑ",
+        "yɑ": "ɥɑ",
+        "yˈe": "ɥˈe",
+        "ˈye": "ɥˈe",
+        "ye": "ɥe",
+        "yˈɛ": "ɥˈɛ",
+        "ˈyɛ": "ɥˈɛ",
+        "yɛ": "ɥɛ",
+        "yˈi": "ɥˈi",
+        "ˈyi": "ɥˈi",
+        "yi": "ɥi",
+        "yˈo": "ɥˈo",
+        "ˈyo": "ɥˈo",
+        "yo": "ɥo",
+        "yˈɔ": "ɥˈɔ",
+        "ˈyɔ": "ɥˈɔ",
+        "yɔ": "ɥɔ",
+        "-": ""
+      },
+      "unstressed_glides": {},
+      "glide_following_vowels": "",
+      "contextual_g2p": true,
+      "note": "Italian/French lyrics use existing English, Japanese and Mandarin bank phones. Rhotics, palatals, rounded mid/front and nasal vowels are approximated. This is cross-language synthesis, not native IT/FR pronunciation certification."
+    },
+    "actual_neural_inference": true,
+    "main_interpreter": "/workspace/scratch/37b1f5ad4c83/mta_work/../mta_env/bin/python",
+    "g2p_runtime_interpreter": "/workspace/scratch/37b1f5ad4c83/mta_work/../qixuan_env/bin/python",
+    "fixture_substitution": false,
+    "target_listening_certified": false
+  },
+  {
+    "case": "fr-liaison-vous-avez",
+    "language": "fr",
+    "lyric_text": "vous avez",
+    "notes": 3,
+    "seconds": 1.8111666666666666,
+    "frames": 86936,
+    "sample_rate": 48000,
+    "peak": 0.5534791946411133,
+    "rms": 0.21198540925979614,
+    "wall_seconds": 58.777763722000145,
+    "sha256": "b2ea0950da183ff4183f294343fe43bdb50f9156a7be7a0d244819e60e033a73",
+    "profile_sha256": "fada666f56449145f2fa49f39e6732da519f97c0f0b876ac473f9ece618f18c7",
+    "pronunciation_mode": "cross-language",
+    "phones": [
+      [
+        "en/v",
+        "zh/u",
+        "en/z"
+      ],
+      [
+        "ja/a"
+      ],
+      [
+        "en/v",
+        "ja/e"
+      ]
+    ],
+    "projection_disclosure": {
+      "lyric_language": "fr",
+      "mode": "cross-language",
+      "acoustic_languages": [
+        "en",
+        "ja",
+        "zh"
+      ],
+      "approximations": {
+        "ʁ": "English r substitutes for the French uvular rhotic.",
+        "ɲ": "Japanese palatalized nasal approximates the French palatal nasal.",
+        "ɥ": "English y+w sequence approximates the French rounded palatal glide.",
+        "ø/œ": "Mandarin ve approximates rounded front mid vowels; the contrast is not modeled natively.",
+        "ɑ̃/ɔ̃/ɛ̃/œ̃": "Mandarin nasal rimes approximate French nasal vowels, including a possible audible nasal coda."
+      },
+      "ipa_rewrites": {
+        "yˈa": "ɥˈa",
+        "ˈya": "ɥˈa",
+        "ya": "ɥa",
+        "yˈɑ": "ɥˈɑ",
+        "ˈyɑ": "ɥˈɑ",
+        "yɑ": "ɥɑ",
+        "yˈe": "ɥˈe",
+        "ˈye": "ɥˈe",
+        "ye": "ɥe",
+        "yˈɛ": "ɥˈɛ",
+        "ˈyɛ": "ɥˈɛ",
+        "yɛ": "ɥɛ",
+        "yˈi": "ɥˈi",
+        "ˈyi": "ɥˈi",
+        "yi": "ɥi",
+        "yˈo": "ɥˈo",
+        "ˈyo": "ɥˈo",
+        "yo": "ɥo",
+        "yˈɔ": "ɥˈɔ",
+        "ˈyɔ": "ɥˈɔ",
+        "yɔ": "ɥɔ",
+        "-": ""
+      },
+      "unstressed_glides": {},
+      "glide_following_vowels": "",
+      "contextual_g2p": true,
+      "note": "Italian/French lyrics use existing English, Japanese and Mandarin bank phones. Rhotics, palatals, rounded mid/front and nasal vowels are approximated. This is cross-language synthesis, not native IT/FR pronunciation certification."
+    },
+    "actual_neural_inference": true,
+    "main_interpreter": "/workspace/scratch/37b1f5ad4c83/mta_work/../mta_env/bin/python",
+    "g2p_runtime_interpreter": "/workspace/scratch/37b1f5ad4c83/mta_work/../qixuan_env/bin/python",
+    "fixture_substitution": false,
+    "target_listening_certified": false
+  },
+  {
+    "case": "en-regression",
+    "language": "en",
+    "lyric_text": "hello world",
+    "notes": 3,
+    "seconds": 1.8111666666666666,
+    "frames": 86936,
+    "sample_rate": 48000,
+    "peak": 0.5671364068984985,
+    "rms": 0.2127464860677719,
+    "wall_seconds": 22.731694394999977,
+    "sha256": "f50da08cd6fc4c5885bd7b278430ab2ef6ccaffd5cb95bdcce5d1bc21b58e473",
+    "profile_sha256": "1c09923a8bf8b601e5d0e37f5b9f4894ae0d2a61074dc7005c195a47da253147",
+    "pronunciation_mode": "native-inventory",
+    "phones": [
+      [
+        "en/hh",
+        "en/ax"
+      ],
+      [
+        "en/l",
+        "en/ow"
+      ],
+      [
+        "en/w",
+        "en/er",
+        "en/l",
+        "en/d"
+      ]
+    ],
+    "projection_disclosure": {
+      "lyric_language": "en",
+      "mode": "native-inventory",
+      "acoustic_languages": [
+        "en",
+        "ja",
+        "zh"
+      ],
+      "approximations": {},
+      "ipa_rewrites": {},
+      "unstressed_glides": {},
+      "glide_following_vowels": "",
+      "contextual_g2p": false,
+      "note": "English phoneme mapping; score durations and F0. Musical pronunciation review required."
+    },
+    "actual_neural_inference": true,
+    "main_interpreter": "/workspace/scratch/37b1f5ad4c83/mta_work/../mta_env/bin/python",
+    "g2p_runtime_interpreter": "/workspace/scratch/37b1f5ad4c83/mta_work/../qixuan_env/bin/python",
+    "fixture_substitution": false,
+    "target_listening_certified": false
+  },
+  {
+    "case": "vocalise-default",
+    "language": "vocalise",
+    "lyric_text": "",
+    "notes": 3,
+    "seconds": 1.8111666666666666,
+    "frames": 86936,
+    "sample_rate": 48000,
+    "peak": 0.5978013277053833,
+    "rms": 0.21163003146648407,
+    "wall_seconds": 17.811170190999974,
+    "sha256": "e4dc00cf5d2d02161641cb78678cc38b4be736ca82eb03cd0b7cf6dfa2a7ec17",
+    "profile_sha256": "1c09923a8bf8b601e5d0e37f5b9f4894ae0d2a61074dc7005c195a47da253147",
+    "pronunciation_mode": "native-inventory",
+    "phones": [
+      [
+        "en/aa"
+      ],
+      [
+        "en/aa"
+      ],
+      [
+        "en/aa"
+      ]
+    ],
+    "projection_disclosure": {
+      "lyric_language": "vocalise",
+      "mode": "native-inventory",
+      "acoustic_languages": [
+        "en",
+        "ja",
+        "zh"
+      ],
+      "approximations": {},
+      "ipa_rewrites": {},
+      "unstressed_glides": {},
+      "glide_following_vowels": "",
+      "contextual_g2p": false,
+      "note": "English phoneme mapping; score durations and F0. Musical pronunciation review required."
+    },
+    "actual_neural_inference": true,
+    "main_interpreter": "/workspace/scratch/37b1f5ad4c83/mta_work/../mta_env/bin/python",
+    "g2p_runtime_interpreter": "/workspace/scratch/37b1f5ad4c83/mta_work/../qixuan_env/bin/python",
+    "fixture_substitution": false,
+    "target_listening_certified": false
+  }
+]

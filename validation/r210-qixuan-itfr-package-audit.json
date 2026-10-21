@@ -1,0 +1,13 @@
+{
+  "bytes": 474463067,
+  "sha256": "61aeb2c70a32b56ee337dd846dda1c56f6143d15dd783f3945feb5a141e13562",
+  "full_crc": true,
+  "original_members_byte_identical": 37,
+  "file_hash_inventory_verified": true,
+  "enabled": false,
+  "pronunciation_modes": {
+    "en": "native-inventory",
+    "it": "cross-language",
+    "fr": "cross-language"
+  }
+}

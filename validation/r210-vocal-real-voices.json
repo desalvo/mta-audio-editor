@@ -1,0 +1,23 @@
+[
+  {
+    "voice": "air",
+    "english_word": "love",
+    "frames": 33600,
+    "peak": 0.274484246969223,
+    "multisyllabic_group_rejected": true
+  },
+  {
+    "voice": "cicada",
+    "english_word": "love",
+    "frames": 33600,
+    "peak": 0.171966552734375,
+    "multisyllabic_group_rejected": true
+  },
+  {
+    "voice": "quake",
+    "english_word": "love",
+    "frames": 33600,
+    "peak": 0.2340240478515625,
+    "multisyllabic_group_rejected": true
+  }
+]

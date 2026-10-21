@@ -1,0 +1,34 @@
+{
+  "verified": true,
+  "source": "Authorized three-note FluidR3 piano fixture, not a mixed-instrument benchmark",
+  "actual_models": [
+    "YourMT3 noPS 5e66c1ea",
+    "Basic Pitch 0.4.0 ONNX CPU"
+  ],
+  "parts": 1,
+  "notes": 3,
+  "alternatives": 2,
+  "cpu_seconds": 35.366271,
+  "reconciliation": {
+    "calibrated_confidence": false,
+    "comparisons": [
+      {
+        "ambiguous_events": 0,
+        "instrument_conflicts": 0,
+        "matched_events": 3,
+        "model": "basic-pitch",
+        "unmatched_events": 0
+      }
+    ],
+    "models": [
+      "yourmt3",
+      "basic-pitch"
+    ],
+    "policy": "primary-timing; one-to-one matches; retain originals and unmatched events",
+    "protocol": "mta-reconciliation-1"
+  },
+  "reopen_verified": true,
+  "alternative_import_idempotent": true,
+  "rocm_verified": false,
+  "quality_comparison_claimed": false
+}

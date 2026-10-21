@@ -15,7 +15,7 @@ def fixture_paths(monkeypatch, tmp_path):
     monkeypatch.setattr(storage, 'SHARED_MEDIA_ROOT', shared)
     monkeypatch.setattr(storage, 'SHARED_AUDIO_ROOT', shared / 'audio')
     monkeypatch.setattr(storage, 'SHARED_INDEX_PATH', shared / 'index.json')
-    monkeypatch.setattr(storage, 'load_project', lambda pid: SimpleNamespace(tracks=[SimpleNamespace(filename='good.wav')], clip_library=[]))
+    monkeypatch.setattr(storage, 'load_project', lambda pid: SimpleNamespace(tracks=[SimpleNamespace(filename='good.wav')], archived_tracks=[], clip_library=[]))
     (project_dir / 'project.json').write_text('{}')
     (project_dir / 'audio' / 'good.wav').write_bytes(b'valid media')
     return project_dir, shared

@@ -4,14 +4,14 @@
  function duration(p){return Math.max(0,Number(p.timeline_end_ms||0),...(p.tracks||[]).map(t=>(t.clips?.length?Math.max(...t.clips.map(c=>start(t,c)+length(c))):t.clips_initialized?0:Number(t.duration_ms||0))))}
  function manual(values,left,right){const k=`${left}|${right}`;if(values?.[k]!=null)return values[k];const hits=Object.entries(values||{}).filter(([k])=>k.split('|')[0]===left||k.split('|').at(-1)===right);return hits.length===1?hits[0][1]:null}
  function gridAt(p,ms=0){
-  let bpm=Number(p.metronome_bpm||p.bpm||120),signature=p.metronome_time_signature||p.time_signature||'4/4',origin=Number(p.metronome_grid_origin_ms||0)+Number(p.metronome_shift_ms||0),end=Infinity,left='START',right='END';
+  const ratio=Math.max(.25,Math.min(4,Number(p.bpm||120)/Number(p.base_bpm||p.bpm||120)));let bpm=Number(p.metronome_bpm||p.bpm||120)/ratio,signature=p.metronome_time_signature||p.time_signature||'4/4',origin=Number(p.metronome_grid_origin_ms||0)+Number(p.metronome_shift_ms||0),end=Infinity,left='START',right='END';
   if(p.metronome_mode==='adaptive'){
    const points=(p.adaptive_tempo_map||[]).filter(x=>Number(x.time_ms)+Number(p.metronome_shift_ms||0)<=ms);bpm=Number(points.at(-1)?.bpm||p.bpm||120);signature=p.time_signature||'4/4';
   }else if(p.metronome_mode==='zones'){
    const marks=(p.markers||[]).filter(m=>!m.deleted&&!m.disabled&&m.time_ms>0&&m.time_ms<duration(p)).sort((a,b)=>a.time_ms-b.time_ms);
    const points=[{id:'START',time_ms:0},...marks,{id:'END',time_ms:Math.max(duration(p),ms+1)}];
    const i=Math.max(0,points.findIndex((x,i)=>i<points.length-1&&ms>=x.time_ms&&ms<points[i+1].time_ms));origin=points[i].time_ms;end=points[i+1].time_ms;left=points[i].id;right=points[i+1].id;
-   bpm=Number(manual(p.metronome_manual_zone_bpms,left,right)??p.metronome_zone_bpms?.[String(origin)]??bpm);
+   bpm=Number(manual(p.metronome_manual_zone_bpms,left,right)??p.metronome_zone_bpms?.[String(origin)]??bpm*ratio)/ratio;
    signature=manual(p.metronome_manual_zone_signatures,left,right)??p.metronome_zone_signatures?.[String(origin)]??signature;
    origin=ms<Number(p.metronome_insertion_ms||0)&&p.metronome_pre_roll_bars?Number(p.metronome_start_ms||0):Math.max(origin,Number(p.metronome_insertion_ms||p.metronome_start_ms||0));
   }

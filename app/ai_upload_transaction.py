@@ -16,12 +16,8 @@ def _names(path):
     return {p.name for p in path.iterdir() if p.is_file() and not p.is_symlink()} if path.is_dir() else set()
 
 def _sync_dir(path):
-    # Windows cannot open directories with the POSIX os.open API. File fsync
-    # and atomic replacement remain mandatory; Linux directory fsync is unchanged.
-    if os.name == 'nt': return
-    fd = os.open(str(path), os.O_RDONLY)
-    try: os.fsync(fd)
-    finally: os.close(fd)
+    from .fs_durability import sync_directory
+    sync_directory(path)
 
 def begin(pid):
     folder = pdir(pid)

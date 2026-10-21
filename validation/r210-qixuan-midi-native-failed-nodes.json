@@ -1,0 +1,20 @@
+[
+  "tests/test_r127_public_native_abi.py::test_native_api_exact_quantum_and_bounded_silence",
+  "tests/test_r210_manuals_layout.py::test_manual_structure_and_assets[user]",
+  "tests/test_r210_manuals_layout.py::test_manual_structure_and_assets[user-en]",
+  "tests/test_r210_mrmt3_integration.py::test_explicit_request_reaches_own_policy_and_queue",
+  "tests/test_r210_mrmt3_integration.py::test_classifier_rejects_basic_pitch_overrides_before_queue[overrides0]",
+  "tests/test_r210_mrmt3_integration.py::test_classifier_rejects_basic_pitch_overrides_before_queue[overrides1]",
+  "tests/test_r210_mrmt3_integration.py::test_fast_selector_does_not_replace_ensemble_dependencies[accurate]",
+  "tests/test_r210_mrmt3_integration.py::test_fast_selector_does_not_replace_ensemble_dependencies[maximum]",
+  "tests/test_r210_music_results.py::test_sixteen_real_parts_publish_once_and_survive_reopening",
+  "tests/test_r210_music_results.py::test_storage_failure_leaves_no_partial_project_or_media",
+  "tests/test_r210_music_results.py::test_error_after_atomic_replace_does_not_remove_committed_media",
+  "tests/test_r210_studio_multitrack_deep.py::test_deep_admission_propagates_free_only_component",
+  "tests/test_r210_transport_position_priority.py::test_manual_transport_position_priority[web]",
+  "tests/test_r210_vocal_multisinger_lyrics.py::test_independent_generation_metadata_survives_audio_midi_publication_and_reopen",
+  "tests/test_r235_adaptive_metronome.py::test_project_persists_adaptive_tempo_map_and_frontend_exposes_mode",
+  "tests/test_r235_adaptive_metronome.py::test_adaptive_endpoint_recalculates_map_every_request",
+  "tests/test_stem_workflow.py::test_async_stem_workflow_persists_project_and_progress",
+  "tests/test_track_import_bpm_jobs.py::test_only_first_mp3_import_estimates_and_sets_bpm"
+]

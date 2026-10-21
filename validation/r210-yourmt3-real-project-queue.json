@@ -1,0 +1,45 @@
+{
+  "project_id": "893747f9c6ca",
+  "job": {
+    "job": {
+      "job_id": "ad455d7645964bc79c53b9a6e779a6a2",
+      "project_id": "893747f9c6ca",
+      "operation": "worker:studio-music",
+      "state": "completed",
+      "rank": 1,
+      "created_at": 1792494770.2314126,
+      "started_at": 1792494770.6343117,
+      "completed_at": 1792494780.3558433,
+      "phase": "completed",
+      "message": "AI processing complete; remote result ready",
+      "progress_percent": 100.0,
+      "cancel_requested": false,
+      "cpu_seconds": 17.01435,
+      "gpu_seconds": null,
+      "runner_pid": 5,
+      "runner_identity": "2a29d643-44ee-4d4e-b009-6886e175ac51:146",
+      "actor_user_id": 0,
+      "gpu_seconds_estimated": null,
+      "cpu_seconds_estimated": null,
+      "gpu_metrics_status": null,
+      "gpu_metrics_source": null,
+      "progress_source": "studio-sources",
+      "progress_estimated": 0,
+      "steps_completed": 1,
+      "steps_total": 1,
+      "queue_position": null,
+      "jobs_ahead": 0,
+      "elapsed_seconds": 9.721531629562378
+    },
+    "result_available": true,
+    "created_at": 1792494780.353578,
+    "imported": true,
+    "reason": "Musical results saved in the project"
+  },
+  "persisted_midi_parts": 1,
+  "pitches": [
+    60,
+    64,
+    67
+  ]
+}

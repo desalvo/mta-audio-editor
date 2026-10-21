@@ -49,7 +49,7 @@ def test_fixed_grid_configuration_does_not_change_audio_or_source(setup):
     assert (root/'before.wav').read_bytes() == (root/'after.wav').read_bytes()
     generate_metronome_wav(saved, root/'click.wav')
     pcm, rate = sf.read(root/'click.wav')
-    assert np.max(abs(pcm[int(.66*rate):int(.71*rate)])) > .5
+    assert np.max(abs(pcm[int(.99*rate):int(1.04*rate)])) > .5
     assert np.max(abs(pcm[int(.49*rate):int(.53*rate)])) == 0
 
 
@@ -122,7 +122,7 @@ def test_invalid_grid_settings_are_rejected_without_changes(setup, payload):
 def test_preroll_uses_metronome_grid_instead_of_audio_tempo():
     p = Project(id='p', title='P', bpm=180, base_bpm=120, metronome_bpm=60, metronome_time_signature='3/4', tracks=[Track(id='t', name='T', filename='t.wav', duration_ms=1000)])
     q, extension = prepare_metronome_insert(p, 0, 2)
-    assert extension == 6000 and q.metronome_insertion_ms == 6000
+    assert extension == 9000 and q.metronome_insertion_ms == 9000
     assert (q.bpm, q.base_bpm) == (180, 120)
 
 
@@ -130,8 +130,8 @@ def test_compound_delay_units_and_zone_grid_math_in_browser_code():
     code = r'''const fs=require('fs'),vm=require('vm'),assert=require('assert'),R=require('./app/static/timeline_rules.js');
 const s=fs.readFileSync('app/static/app.js','utf8');const p={bpm:180,base_bpm:120,time_signature:'4/4',metronome_bpm:60,metronome_time_signature:'3/4',metronome_mode:'fixed',tracks:[{id:'t',delay_ms:0,clips:[{id:'c',timeline_start_ms:0,source_start_ms:0,source_end_ms:10000}]}]};
 const c={current:p,MtaTimelineRules:R,playCursorMs:0};vm.createContext(c);vm.runInContext(s.slice(s.indexOf('function trackDelayUnit('),s.indexOf('function delayUnitOptions(')),c);
-assert.equal(c.delayMsFromUnit('1:2','bars_beats'),5000);assert.equal(c.delayMsFromUnit('-1:2.5','bars_beats'),-5500);assert.equal(c.delayMsFromUnit('-0:2','bars_beats'),-2000);assert(Number.isNaN(c.delayMsFromUnit('1:3','bars_beats')));assert.equal(c.delayValueFromMs(-5500,'bars_beats'),'-1:2.5');assert.equal(c.delayMsFromUnit(.5,'bars'),1500);assert.equal(c.delayMsFromUnit(2,'beats'),2000);
-p.metronome_mode='zones';p.markers=[{id:'m',time_ms:4000}];p.metronome_manual_zone_bpms={'m|END':120};p.metronome_manual_zone_signatures={'m|END':'5/4'};const t={clips:[{timeline_start_ms:5000}]};assert.equal(c.delayMsFromUnit('1:2','bars_beats',t),3500);assert.equal(R.gridAt(p,5000).signature,'5/4');p.timeline_snap='bars';assert.equal(R.step(p,5000),2500);
+assert.equal(c.delayMsFromUnit('1:2','bars_beats'),7500);assert.equal(c.delayMsFromUnit('-1:2.5','bars_beats'),-8250);assert.equal(c.delayMsFromUnit('-0:2','bars_beats'),-3000);assert(Number.isNaN(c.delayMsFromUnit('1:3','bars_beats')));assert.equal(c.delayValueFromMs(-8250,'bars_beats'),'-1:2.5');assert.equal(c.delayMsFromUnit(.5,'bars'),2250);assert.equal(c.delayMsFromUnit(2,'beats'),3000);
+p.metronome_mode='zones';p.markers=[{id:'m',time_ms:4000}];p.metronome_manual_zone_bpms={'m|END':120};p.metronome_manual_zone_signatures={'m|END':'5/4'};const t={clips:[{timeline_start_ms:5000}]};assert.equal(c.delayMsFromUnit('1:2','bars_beats',t),5250);assert.equal(R.gridAt(p,5000).signature,'5/4');p.timeline_snap='bars';assert.equal(R.step(p,5000),3750);
 assert.equal(p.bpm/p.base_bpm,1.5);
 '''
     subprocess.run(['node', '-e', code], check=True, capture_output=True, text=True)

@@ -1,0 +1,608 @@
+{
+  "original_archive_sha256": "d65d5e196b3f0dcf4253e50b58208e68648234a1f20ca894cb27bdf747827bec",
+  "original_entries": 2533,
+  "missing_original_entries": [],
+  "changed_existing_content": [
+    "README.md",
+    "README_IT.md",
+    "app/diffsinger_bridge.py",
+    "app/gm_instruments.py",
+    "app/gm_portable.py",
+    "app/midi_routes.py",
+    "app/model_license_policy.py",
+    "app/music_publication.py",
+    "app/neural_vocal_adapter.py",
+    "app/static/ai_studio.js",
+    "app/static/midi.js",
+    "app/studio_catalog.py",
+    "app/studio_compute.py",
+    "app/studio_jobs.py",
+    "app/vocal_synthesis.py",
+    "docs/CHANGELOG.md",
+    "docs/COMMIT_MESSAGE_R210.txt",
+    "docs/DEVELOPMENT_STATUS.md",
+    "docs/RELEASE_NOTES.md",
+    "native/audio_core/gm_synth.cpp",
+    "scripts/check_diffsinger_ready.py",
+    "scripts/check_gm_soundfont.py",
+    "tests/test_r210_vocal_multisinger_lyrics.py"
+  ],
+  "mode_changes": [
+    {
+      "path": "app/ace_profile_server.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "app/ace_step_http_worker.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "app/ace_step_local.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "app/ai_profiled_backend.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "app/ai_studio_adapter.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "app/ai_unified_adapter.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "app/configure_ace_gpu_profiler.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "app/restore_dump.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "packaging/pages-repository/scripts/assemble_pages.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "packaging/proxmox-gpu-agent/build_deb.sh",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/ace_gpu_benchmark.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/benchmark_ai_concurrency.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/build_chordino_unix.sh",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/build_docs.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/build_early_update_manifest.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/build_mlive_mp3_spec.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/certify_ai_r208.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/check_audio_midi_quality.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/check_diffsinger_ready.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/check_gm_soundfont.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/check_mta_gpu_agent_mount.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/cleanup_ai_results.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/configure_ai_workers.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/crash_inject_ai_outbox_r208.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/diagnose_linux_r208.sh",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/diagnose_macos_r208.sh",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/diagnose_server_r208.sh",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/export_demucs_coreml.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/gpu_accounting_probe.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/gpu_verified_billing.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/install_ace_step.sh",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/install_ai_engines.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/install_amdsmi_sidecar.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/install_demucs.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/install_mta.sh",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/install_mta_native.sh",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/install_mta_native_wizard.sh",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/install_mta_proxmox_gpu_agent.sh",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/install_music_assets.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/install_optional_vst3.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/install_rocm_userspace.sh",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/install_studio_yourmt3.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/installed_diagnostics_r208.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/k8s-wizard.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/license_gate.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/mta_billing_isolated_validation.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/mta_billing_recovery_isolated_validation.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/mta_gpu_agent_ct_diagnostic.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/mta_proxmox_gpu_agent.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/mta_proxmox_gpu_preflight.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/mta_proxmox_gpu_readiness.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/mta_proxmox_tag_sync.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/package.sh",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/package_native_linux.sh",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/production_gate.sh",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/render_gm_midi.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/repositories/build_indexes.sh",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/repositories/install_repository.sh",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/repositories/preflight_package_copy.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/repositories/prepare_signed_pages_release.sh",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/repositories/publish_pages_rpm_indexes.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/repositories/r2_publish.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/repositories/restore_previous_channel.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/repositories/retain_channel_packages.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/repositories/test_signed_apt_repository_ci.sh",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/repositories/test_signed_rpm_repository_ci.sh",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/repositories/verify_public_pages.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/resolve_ace_step_version.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/restore_application_dump.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/review_optional_vst3.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/run_global_regression_shard.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/server_packages/build_deb.sh",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/server_packages/build_rpm.sh",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/server_packages/check_system_services.sh",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/server_packages/el10_preflight.sh",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/server_packages/http_smoke.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/server_packages/install_runtime.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/server_packages/prepare_runtime.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/server_packages/smoke_offline_payload.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/server_packages/test_deb_upgrade.sh",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/server_packages/test_deb_version_cycle.sh",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/server_packages/test_rpm_upgrade.sh",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/server_packages/test_rpm_version_cycle.sh",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/server_packages/validate_stage.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/server_packages/verify_native_installers.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/server_packages/verify_offline_runtime.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/server_packages/wheelhouse_lock.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/test_vst3_adelay_chain.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/test_vst3_adelay_events.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/test_vst3_adelay_native_bridge.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/test_vst3_adelay_offline.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/test_vst3_adelay_session.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/test_vst3_adelay_stream.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/test_vst3_adelay_variable.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/unattended_certification_r208.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/update_manuals_r210.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/update_studio_manuals.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/validate_audio_presets.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/validate_cpp_live_controls.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/validate_editor_layout.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/validate_midi_studio.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/validate_playback_preparation.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/validate_transport_position.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/vendor_ace_step.sh",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/verify_ace_step_bundle.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/verify_global_regression.py",
+      "before": "0o644",
+      "after": "0o755"
+    },
+    {
+      "path": "scripts/verify_music_hardware.py",
+      "before": "0o644",
+      "after": "0o755"
+    }
+  ],
+  "added_files": [
+    "app/gm_banks.py",
+    "app/studio_multitrack.py",
+    "app/vocal_expression.py",
+    "app/vocal_phonemizer.py",
+    "docs/THREE_AREA_IMPLEMENTATION_R210_IT_EN.md",
+    "requirements-studio-diffsinger.txt",
+    "requirements-studio-phonemizer.txt",
+    "scripts/install_gm_soundfont.py",
+    "tests/studio_vocal_submission.cjs",
+    "tests/test_r210_gm_real_controllers.py",
+    "tests/test_r210_gm_reviewed_banks.py",
+    "tests/test_r210_studio_multitrack_deep.py",
+    "tests/test_r210_vocal_expression_phonemizer.py",
+    "tests/test_r210_vocal_submission_js.py",
+    "validation/r210-baseline-comparison.log",
+    "validation/r210-baseline-comparison.xml",
+    "validation/r210-baseline-failures.json",
+    "validation/r210-browser-install-blocker.log",
+    "validation/r210-cycle-summary.json",
+    "validation/r210-focused-files.txt",
+    "validation/r210-focused-final.log",
+    "validation/r210-focused-final.xml",
+    "validation/r210-full-regression.log",
+    "validation/r210-full-regression.xml",
+    "validation/r210-gm-real-controllers.log",
+    "validation/r210-gm-real-controllers.xml",
+    "validation/r210-gm-real-current.json",
+    "validation/r210-new-components.xml",
+    "validation/r210-regression.xml",
+    "validation/r210-three-area-targeted.xml",
+    "validation/r210-package-inventory.json"
+  ],
+  "unchanged_entries_content_verified": 2510,
+  "sdk_and_vendored_sources": "All original native/third_party entries byte-for-byte preserved; only native/audio_core/gm_synth.cpp changed in native sources",
+  "excluded_generated_content": [
+    "Python/pytest/ruff caches",
+    "compiled test binaries",
+    "downloaded soundfont/eSpeak assets",
+    "temporary workspace helpers"
+  ]
+}

@@ -544,21 +544,24 @@ def _chord_templates() -> list[tuple[str, np.ndarray]]:
     """
     out: list[tuple[str, np.ndarray]] = []
     qualities = (
-        ("", (0, 4, 7), (1.00, 0.90, 0.80)),
-        ("m", (0, 3, 7), (1.00, 0.90, 0.80)),
-        ("7", (0, 4, 7, 10), (1.00, 0.86, 0.76, 0.64)),
-        ("maj7", (0, 4, 7, 11), (1.00, 0.86, 0.76, 0.64)),
-        ("m7", (0, 3, 7, 10), (1.00, 0.86, 0.76, 0.64)),
-        ("dim", (0, 3, 6), (1.00, 0.88, 0.80)),
-        ("aug", (0, 4, 8), (1.00, 0.88, 0.80)),
-        ("sus2", (0, 2, 7), (1.00, 0.84, 0.78)),
-        ("sus4", (0, 5, 7), (1.00, 0.84, 0.78)),
+        ("", (0, 4, 7)), ("m", (0, 3, 7)), ("5", (0, 7)),
+        ("6", (0, 4, 7, 9)), ("m6", (0, 3, 7, 9)),
+        ("7", (0, 4, 7, 10)), ("maj7", (0, 4, 7, 11)),
+        ("m7", (0, 3, 7, 10)), ("mMaj7", (0, 3, 7, 11)),
+        ("dim", (0, 3, 6)), ("dim7", (0, 3, 6, 9)),
+        ("m7b5", (0, 3, 6, 10)), ("aug", (0, 4, 8)),
+        ("sus2", (0, 2, 7)), ("sus4", (0, 5, 7)),
+        ("add9", (0, 2, 4, 7)), ("9", (0, 2, 4, 7, 10)),
+        ("maj9", (0, 2, 4, 7, 11)), ("m9", (0, 2, 3, 7, 10)),
+        ("7sus4", (0, 5, 7, 10)), ("7b5", (0, 4, 6, 10)),
+        ("7#5", (0, 4, 8, 10)), ("7b9", (0, 1, 4, 7, 10)),
+        ("7#9", (0, 3, 4, 7, 10)),
     )
     for root in range(12):
-        for suffix, intervals, weights in qualities:
+        for suffix, intervals in qualities:
             v = np.zeros(12, dtype=np.float64)
-            for interval, weight in zip(intervals, weights):
-                v[(root + interval) % 12] = weight
+            for interval in intervals:
+                v[(root + interval) % 12] = 1.0 if interval == 0 else (0.90 if interval in (3, 4) else 0.78)
             v /= np.linalg.norm(v)
             out.append((NOTE_NAMES[root] + suffix, v))
     return out
@@ -655,7 +658,7 @@ def _copy_chord_with_label(item: Chord, label: str) -> Chord:
 
 
 def _simplify_chord_label(label: str) -> str:
-    """Collapse extended/altered labels to a conservative live-performance vocabulary."""
+    """Collapse extended/altered labels for the opt-in Songbook vocabulary."""
     value = str(label or "").strip()
     if not value or value in {"N", "N.C.", "no_chord"}:
         return "N"
@@ -703,8 +706,8 @@ def _normalize_chord_options(options: dict | None = None) -> dict:
 
 
 def _limit_chord_vocabulary(label: str, options: dict) -> str:
-    value = _simplify_chord_label(label)
-    if value == "N":
+    value = _simplify_chord_label(label) if options.get("preset") == "stable" else str(label or "").strip()
+    if value in ("N", "N.C.", "no_chord", ""):
         return value
     bass = ""
     if "/" in value:
@@ -713,11 +716,11 @@ def _limit_chord_vocabulary(label: str, options: dict) -> str:
     if not match:
         return value
     root, suffix = match.groups()
-    if suffix in {"7", "maj7", "m7"} and not options.get("detect_sevenths"):
+    if (suffix in {"7", "maj7", "m7", "mMaj7", "9", "maj9", "m9", "7sus4", "7b5", "7#5", "7b9", "7#9"} and not options.get("detect_sevenths")):
         suffix = "m" if suffix == "m7" else ""
-    if suffix in {"sus2", "sus4"} and not options.get("detect_sus"):
+    if suffix in {"sus2", "sus4", "7sus4"} and not options.get("detect_sus"):
         suffix = ""
-    if suffix in {"dim", "aug"} and not options.get("detect_dim_aug"):
+    if suffix in {"dim", "dim7", "m7b5", "aug"} and not options.get("detect_dim_aug"):
         suffix = "m" if suffix == "dim" else ""
     result = root + suffix
     if options.get("detect_slash_bass") and bass and bass != root:
@@ -832,9 +835,9 @@ def _refine_extended_harmony(
     templates = _chord_templates()
     def allowed(name: str) -> bool:
         suffix = re.sub(r"^[A-G](?:#|b)?", "", name)
-        if suffix in {"7", "maj7", "m7"} and not opts.get("detect_sevenths"): return False
-        if suffix in {"sus2", "sus4"} and not opts.get("detect_sus"): return False
-        if suffix in {"dim", "aug"} and not opts.get("detect_dim_aug"): return False
+        if suffix in {"7", "maj7", "m7", "mMaj7", "9", "maj9", "m9", "7sus4", "7b5", "7#5", "7b9", "7#9"} and not opts.get("detect_sevenths"): return False
+        if suffix in {"sus2", "sus4", "7sus4"} and not opts.get("detect_sus"): return False
+        if suffix in {"dim", "dim7", "m7b5", "aug"} and not opts.get("detect_dim_aug"): return False
         return True
     templates = [item for item in templates if allowed(item[0])]
     names = [name for name, _ in templates]
@@ -844,14 +847,14 @@ def _refine_extended_harmony(
     # over-labelling ordinary triads as altered/extended chords.
     complexity = np.asarray([
         0.000 if re.match(r"^[A-G](?:#|b)?m?$", n) else
-        0.014 if any(n.endswith(x) for x in ("7", "maj7", "m7", "sus2", "sus4", "dim", "aug")) else 0.030
+        0.014 if any(n.endswith(x) for x in ("7", "maj7", "m7", "sus2", "sus4", "dim", "aug")) else 0.045
         for n in names
     ], dtype=np.float64)
     labels: list[str] = []
     confidences: list[float] = []
     median_energy = max(1e-9, float(np.median(energy)))
     if progress:
-        progress(68, [], "Classificazione armonica semplificata: triadi, 7e, sus, dim e aug")
+        progress(68, [], "Classificazione armonica estesa: settime, none, alterazioni e sospensioni")
     for i, time_ms in enumerate(times):
         if cancelled and cancelled():
             raise InterruptedError("Chord extraction cancelled")
@@ -867,7 +870,7 @@ def _refine_extended_harmony(
         order = np.argsort(score)[::-1]
         best, second = int(order[0]), int(order[1])
         margin = float(score[best] - score[second])
-        label = names[best] if float(score[best]) >= 0.49 and margin >= 0.012 else (_simplify_chord_label(_base_label_at(base_events, time_ms)) or "N")
+        label = names[best] if float(score[best]) >= 0.49 and margin >= 0.012 else (_limit_chord_vocabulary(_base_label_at(base_events, time_ms), opts) or "N")
         labels.append(label)
         confidences.append(max(0.0, margin))
     if progress:
@@ -990,6 +993,8 @@ def _normalize_madmom_chord(label: str) -> str:
 
 
 def _madmom_processor(engine: str):
+    from .model_license_policy import evaluate_model
+    evaluate_model('madmom')
     device=native_ai_device()
     use_torch=device != "cpu"
     if engine == "madmom-deep-chroma":
@@ -1042,14 +1047,25 @@ def _extract_chords_madmom(path: Path, engine: str) -> list[Chord]:
 def _profile_engine_candidates(profile: str) -> list[str]:
     from .ai_models import chord_engine_available
     if profile == "stable":
-        ordered = ["madmom-deep-chroma", "madmom-cnn-crf", "chordino", "mta-chromagram"]
+        ordered = ["btc-hcqt", "chordino", "mta-chromagram"]
     elif profile == "fast":
         ordered = ["chordino", "mta-chromagram"]
     elif profile == "accurate":
-        ordered = ["chordformer", "btc-hcqt", "madmom-deep-chroma", "chordino", "mta-chromagram"]
+        ordered = ["btc-hcqt", "chordino", "mta-chromagram"]
     else:
-        ordered = ["chordformer", "btc-hcqt", "chordino", "madmom-deep-chroma", "mta-chromagram"]
-    return [engine for engine in ordered if chord_engine_available(engine)]
+        ordered = ["btc-hcqt", "chordino", "mta-chromagram"]
+    from .model_license_policy import LicenseDenied, evaluate_model
+    allowed = []
+    for engine in ordered:
+        if not chord_engine_available(engine):
+            continue
+        model_id = "btc-hcqt" if engine == "btc-hcqt" else "mta-analysis"
+        try:
+            evaluate_model(model_id)
+        except LicenseDenied:
+            continue
+        allowed.append(engine)
+    return allowed
 
 
 def _label_at(events: list[Chord], time_ms: int) -> str | None:

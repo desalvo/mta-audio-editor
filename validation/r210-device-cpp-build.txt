@@ -1,0 +1,8 @@
+-- Configuring done (0.0s)
+-- Generating done (0.0s)
+-- Build files have been written to: /workspace/scratch/a0232c23144c/studio-completion/project/build/audio_core
+[ 16%] Building CXX object CMakeFiles/mta_audio_core.dir/device_transport.cpp.o
+[ 33%] Linking CXX shared library libmta_audio_core.so
+[100%] Built target mta_audio_core
+C++ render DSP ABI 1: ready
+/workspace/scratch/a0232c23144c/studio-completion/project/build/audio_core/libmta_audio_core.so

@@ -12,7 +12,7 @@ from .models import Clip
 
 def monitor_project(project,tid):
     track=next((t for t in project.tracks if t.id==tid and t.kind=='midi'),None)
-    if not track or track.midi_route=='hardware' or not track.instrument or not track.instrument.enabled:raise ValueError('Select an enabled VST instrument for monitoring')
+    if not track or track.midi_route in ('hardware','none') or not track.instrument or not track.instrument.enabled:raise ValueError('Select an enabled VST instrument for monitoring')
     result=project.model_copy(deep=True);track=track.model_copy(deep=True)
     track.midi_notes=[];track.midi_controls=[];track.midi_sysex=[];track.midi_ump=[];track.delay_ms=0;track.midi_route='instrument';track.master_bypass=False
     track.mute=False;track.solo=False;track.duration_ms=86400000;track.clips_initialized=True
@@ -40,7 +40,9 @@ def register_routes(app,project_for_actor,actor):
                 await websocket.close(code=1008);return
             request=Request({**websocket.scope,'type':'http','method':'GET'})
             project=project_for_actor(request,pid);owner=actor(request)['id']
-            if selected()!='cpp' or not runtime_available():raise ValueError('Monitoring requires the updated C++ VST transport runtime')
+            track=next((t for t in project.tracks if t.id==tid),None)
+            gm=bool(track and track.instrument and track.instrument.plugin=='gm_soundfont')
+            if not gm and (selected()!='cpp' or not runtime_available()):raise ValueError('Monitoring requires the updated C++ VST transport runtime')
             validate_project_files(project);project=monitor_project(project,tid)
             await websocket.accept()
             accepted=True

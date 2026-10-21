@@ -1,0 +1,6 @@
+AI-generated technical validation audio. Singer: 绮萱 / Qixuan 2.7.0. Engine: DiffSinger. Vocoder: OpenVPI PC-NSF-HiFiGAN 2025.02 (CC BY-NC-SA 4.0). Original complete bank/vocoder licenses and notices are included in the separate complete managed bundle.
+Qixuan source and terms: https://github.com/yqzhishen/qixuan-diffsinger/releases/tag/v2.7.0 and https://github.com/yqzhishen/qixuan-diffsinger/blob/main/terms_of_use/Terms_of_Use.zh-CN.md
+Vocoder source: https://openvpi.github.io/vocoders/
+Italian/French examples use explicitly disclosed cross-language phoneme projections onto original English/Japanese/Mandarin phones. They are real CPU neural synthesis outputs, not native IT/FR training, naturalness or pronunciation-quality certificates. No commercial-use right or operator admission is granted by these validation files.
+
+This cycle additionally validates contextual French liaison and the Studio parent-to-pinned-runtime G2P path. Notes, score timings, phone mappings and output hashes are recorded in the adjacent audit; no production model activation or license review is simulated.

@@ -7,7 +7,7 @@ current_job=ContextVar('mta_global_ai_job',default=None)
 current_cancel=ContextVar('mta_global_ai_cancel',default=None)
 
 
-def execute(user_id,kind,call,*,cancel_check=None):
+def execute(user_id,kind,call,*,cancel_check=None,license_decision=None):
     from . import ai_arranger_runtime as queue
     if current_job.get() is not None:
         event=current_cancel.get()
@@ -22,8 +22,10 @@ def execute(user_id,kind,call,*,cancel_check=None):
             result['error']=exc
             raise
         finally:done.set()
-    queue.start('remote-user-'+str(user_id),'worker:'+kind,run,job_id=jid,cancellable=True,
-        payload={'schema_version':1,'actor_user_id':user_id,'kind':kind,'remote_inference':True})
+    from .model_license_policy import admission
+    with admission(license_decision):
+        queue.start('remote-user-'+str(user_id),'worker:'+kind,run,job_id=jid,cancellable=True,
+            payload={'schema_version':1,'actor_user_id':user_id,'kind':kind,'remote_inference':True})
     try:
         while True:
             state=queue.get(jid)

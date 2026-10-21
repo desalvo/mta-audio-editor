@@ -2,6 +2,8 @@ FROM debian:trixie-slim AS audio-core-build
 RUN apt-get update && apt-get install -y --no-install-recommends cmake g++ make && rm -rf /var/lib/apt/lists/*
 COPY native/audio_core /src/audio_core
 COPY native/third_party/miniaudio /src/third_party/miniaudio
+COPY native/third_party/tinysoundfont /src/third_party/tinysoundfont
+COPY native/third_party/oddvoices /src/third_party/oddvoices
 RUN cmake -S /src/audio_core -B /build -DCMAKE_BUILD_TYPE=Release && cmake --build /build --parallel 2
 
 FROM python:3.14-slim-trixie AS vst3-host-build
@@ -62,7 +64,14 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 RUN python -c "import fastapi, uvicorn, numpy, whisper, madmom_infer, pedalboard, av, mido; assert hasattr(pedalboard.VST3Plugin,'_mta_set_transport')" \
     && if [ "$INSTALL_STEMS" = "true" ]; then python -c "import torch, demucs"; fi
+COPY requirements-studio-basic-pitch.txt requirements-studio-yourmt3.txt ./
+COPY scripts/install_studio_yourmt3.py ./scripts/install_studio_yourmt3.py
+COPY docs/YOURMT3_RUNTIME_R210.md docs/YOURMT3_RUNTIME_R210_EN.md ./docs/
 COPY app ./app
+COPY native/third_party/oddvoices /app/native/third_party/oddvoices
+COPY native/third_party/tinysoundfont/LICENSE /app/native/third_party/tinysoundfont/LICENSE
+COPY scripts/install_music_assets.py scripts/verify_music_hardware.py /app/scripts/
+COPY docs/MUSIC_ASSETS_AND_LICENSES_R210.md docs/MUSIC_ASSETS_AND_LICENSES_R210_EN.md /app/docs/
 COPY --from=audio-core-build /build/libmta_audio_core.so /app/bin/libmta_audio_core.so
 RUN chmod 755 /app/app/ace_step_http_worker.py
 COPY LICENSE NOTICE ./

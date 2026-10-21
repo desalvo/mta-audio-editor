@@ -1,0 +1,10 @@
+{
+  "date": "2026-10-20",
+  "version": "0.3.0-r210",
+  "base": "MTA-0.3.0-r210-singing-gm-reconciliation-licenses-cumulative(1).zip",
+  "implemented": ["download policy gates for chordformer/UVR/DrumSep", "remote DrumSep policy gate", "review history preserving prior operator attestations", "bilingual documentation and third-party notices"],
+  "not_activated": ["madmom", "chordformer", "audio-separator-weights", "drumsep-weights"],
+  "testing": {"targeted_initial_passed": 77, "extended_passed": 112, "python_compile": "passed", "full_regression": "not run", "commercial_end_to_end": "not run", "ruff": "not installed"},
+  "production_modified": false,
+  "git_actions_performed": false
+}

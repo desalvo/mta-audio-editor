@@ -1,0 +1,19 @@
+{
+  "file": "qixuan_itfr_assets/MTA-Qixuan-2.7.0-onnx-IT-EN-FR-validated-bundle.zip",
+  "bytes": 474463728,
+  "sha256": "ce1b83480fa2fc8eb855b7eab9cab5e3958bb2562b5cbb664245534e1e32514d",
+  "enabled": false,
+  "rights_granted": false,
+  "original_members_preserved": 37,
+  "languages": [
+    "en",
+    "it",
+    "fr",
+    "vocalise"
+  ],
+  "pronunciation_modes": {
+    "en": "native-inventory",
+    "it": "cross-language",
+    "fr": "cross-language"
+  }
+}

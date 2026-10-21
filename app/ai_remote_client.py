@@ -73,35 +73,44 @@ def _cancel_admitted_if_requested(base_url, token, request_id, cancel_event):
 def infer_audio(base_url: str, token: str, kind: str, wav: bytes, options: dict | None = None,
                 *, timeout_seconds: float = 900, request_id: str | None = None,
                 recover_on_failure: bool = True, require_attestation: bool = False,
-                metering_sink=None, metering_keyring=None, cancel_event=None) -> tuple[bytes, str, str]:
+                metering_sink=None, metering_keyring=None, cancel_event=None, source_format='wav') -> tuple[bytes, str, str]:
     """Return (payload, MIME, job_id) or fail explicitly; never run local AI."""
     if cancel_event is not None and cancel_event.is_set():
         raise RemoteAIError("Remote AI cancelled before submission")
     endpoint = _endpoint(base_url, kind)
     if not isinstance(token, str) or not token or len(token) > 4096 or any(ord(c) < 33 or ord(c) > 126 for c in token):
         raise ValueError('A valid remote AI bearer token is required')
-    if not isinstance(wav, bytes) or not 0 < len(wav) <= MAX_AUDIO_BYTES:
+    if source_format not in ('wav','score') or (source_format=='score' and kind not in ('vocal-harmony','vocal-synthesis')):raise ValueError('Unsupported remote source format')
+    if source_format=='score':
+        from .studio_score import validate
+        validate(wav)
+    if not isinstance(wav, bytes) or not 0 < len(wav) <= (8*1024*1024 if source_format=='score' else MAX_AUDIO_BYTES):
         raise ValueError('Remote AI requires non-empty WAV bytes within the source size limit')
     from .ai_remote_transport import decode_audio_options, validate_audio_options
     if options is not None and not isinstance(options, dict):
         raise ValueError('Remote AI options must be an object')
-    validate_audio_options(options if options is not None else {})
+    request_body=wav;studio_envelope=False
     try:
+        validate_audio_options(options if options is not None else {})
         raw_options = json.dumps(options if options is not None else {}, separators=(',', ':'), allow_nan=False).encode('utf-8')
+        if source_format=='score' and len(raw_options)>4096:raise ValueError('Use structured body for large score options')
+        encoded = base64.urlsafe_b64encode(raw_options).decode().rstrip('=')
+        decode_audio_options(encoded)
     except (TypeError, ValueError, OverflowError) as exc:
-        raise ValueError('Remote AI options must be finite JSON values') from exc
-    encoded = base64.urlsafe_b64encode(raw_options).decode().rstrip('=')
-    decode_audio_options(encoded)
+        if source_format!='score':raise ValueError('Remote AI options must be bounded finite JSON values') from exc
+        from .studio_score import pack_request
+        request_body=pack_request(wav,kind,options if options is not None else {})
+        encoded='e30';studio_envelope=True
     from .ai_request_dedup import _KEY
     key = uuid.uuid4().hex if request_id is None else request_id
     if not isinstance(key, str) or not _KEY.fullmatch(key):
         raise ValueError('Invalid remote AI request id')
     if isinstance(timeout_seconds, bool) or not isinstance(timeout_seconds, (int, float)) or not math.isfinite(timeout_seconds) or timeout_seconds <= 0:
         raise ValueError('Remote AI timeout must be a positive finite number')
-    headers = {'Authorization': 'Bearer ' + token, 'Content-Type': 'audio/wav',
+    headers = {'Authorization': 'Bearer ' + token, 'Content-Type': 'application/vnd.mta.studio-request+json' if studio_envelope else 'application/vnd.mta.score+json' if source_format=='score' else 'audio/wav',
                'Accept': 'audio/wav, application/zip, application/json', 'X-MTA-AI-Options': encoded,
                'X-MTA-AI-Idempotency-Key': key}
-    req = Request(endpoint, data=wav, headers=headers, method='POST')  # noqa: S310 - HTTPS-only endpoint
+    req = Request(endpoint, data=request_body, headers=headers, method='POST')  # noqa: S310 - HTTPS-only endpoint
     try:
         with https_urlopen(req, timeout=timeout_seconds) as response:  # noqa: S310 - HTTPS endpoint
             return _read_verified_result(response, expected_request_id=key, require_attestation=require_attestation,
@@ -466,3 +475,38 @@ def list_remote_requests(base_url: str, token: str, *, limit: int = 50,
         if type(item.get('created_at')) is not int or item['created_at'] <= 0:
             raise RemoteAIError('Invalid remote AI history timestamp')
     return result
+
+
+def remote_resources(base_url,token,job_id,*,timeout_seconds=10):
+    """Owner/token-bound HTTPS ledger counters for display; no local settlement."""
+    if not isinstance(job_id,str) or not re.fullmatch(r'[A-Za-z0-9_-]{1,128}',job_id):raise ValueError('Invalid remote job identifier')
+    if not isinstance(token,str) or not token or any(ord(c)<33 or ord(c)>126 for c in token):raise ValueError('Invalid remote token')
+    endpoint=_endpoint(base_url,'whisper').split('/execute-audio/',1)[0]+'/resources/'+job_id
+    request=Request(endpoint,headers={'Authorization':'Bearer '+token,'Accept':'application/json'})  # noqa: S310 - _endpoint enforces HTTPS  # noqa: S310 -- validated HTTPS endpoint
+    try:
+        with https_urlopen(request,timeout=timeout_seconds) as response:raw=response.read(65537)
+        if len(raw)>65536:raise ValueError('Oversized ledger receipt')
+        value=json.loads(raw)
+        if value.get('job_id')!=job_id or not isinstance(value.get('usage'),dict):raise ValueError('Mismatched ledger receipt')
+        usage=value['usage']
+        for key in ('cpu_seconds','gpu_seconds'):
+            if key in usage and (type(usage[key]) not in (int,float) or not math.isfinite(usage[key]) or usage[key]<0):raise ValueError('Invalid resource counter')
+        return value
+    except (HTTPError,URLError,TimeoutError,OSError,ValueError,TypeError) as exc:
+        raise RemoteAIError('Server resource receipt unavailable; result is retained for recovery') from exc
+
+
+def studio_capabilities(base_url,token):
+    """Read token-scoped Studio asset IDs; never expose or copy credentials."""
+    if not isinstance(token,str) or not token or len(token)>4096 or any(ord(c)<33 or ord(c)>126 for c in token):
+        raise ValueError('A valid remote AI bearer token is required')
+    endpoint=_endpoint(base_url,'vocal-synthesis').split('/execute-audio/')[0]+'/worker-capabilities'
+    request=Request(endpoint,headers={'Authorization':'Bearer '+token,'Accept':'application/json'})  # noqa: S310 - _endpoint enforces HTTPS
+    try:
+        with https_urlopen(request,timeout=15) as response:raw=response.read(2*1024*1024+1)
+        if len(raw)>2*1024*1024:raise RemoteAIError('Remote Studio capability response too large')
+        result=json.loads(raw)
+        if not isinstance(result,dict) or not isinstance(result.get('studio'),dict):raise RemoteAIError('Remote server does not expose Studio asset capabilities; update the server')
+        return result['studio']
+    except (OSError,ValueError) as exc:
+        raise RemoteAIError('Remote Studio capabilities unavailable; no local fallback was selected') from exc

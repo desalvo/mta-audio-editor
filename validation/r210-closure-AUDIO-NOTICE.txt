@@ -1,0 +1,1 @@
+AI-generated technical audio: 绮萱 / Qixuan, DiffSinger. Qixuan 2.7.0: https://github.com/yqzhishen/qixuan-diffsinger/releases/tag/v2.7.0 . OpenVPI PC-NSF-HiFiGAN vocoder: CC BY-NC-SA 4.0, original notices and terms included in the complete model bundle. These files are validation outputs, not quality certification.

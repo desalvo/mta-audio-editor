@@ -32,7 +32,7 @@ def server(tmp_path,monkeypatch,compiled_core,real_plugin):
     with auth.db() as con:
         user=con.execute("INSERT INTO users(username,email,password_hash,active,email_confirmed,role,created_at,updated_at) VALUES('vstuser','vst@example.test','x',1,1,'user',1,1)").lastrowid
         other=con.execute("INSERT INTO users(username,email,password_hash,active,email_confirmed,role,created_at,updated_at) VALUES('vstother','other-vst@example.test','x',1,1,'user',1,1)").lastrowid
-    project=storage.create_project('VST3 server',owner_user_id=user,sample_rate=48000)
+    project=storage.create_project('VST3 server',target='DAW_MIDI',owner_user_id=user,sample_rate=48000)
     project.tracks=[Track(id='tone',name='Tone',filename='tone.wav',duration_ms=1000,channels=2,sample_rate=48000,
                           inserts=[InsertPlugin(id='tape',plugin='vst3',params={'path':str(real_plugin)})])]
     project.master_inserts=[InsertPlugin(id='master-tape',plugin='vst3',params={'path':str(real_plugin)})]

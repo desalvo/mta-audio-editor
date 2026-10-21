@@ -6,8 +6,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>MTA Audio Editor</title>
   <link rel="icon" href="/static/logo.svg">
-  <link rel="stylesheet" href="/static/app.css?v=0.3.0-r210-transport-position">
-<link rel="stylesheet" href="/static/ai_jobs.css?v=r210-media-stems"><link rel="stylesheet" href="/static/optional_plugins.css?v=r210-vst3-uninstall"><link rel="stylesheet" href="/static/editor_layout.css?v=0.3.0-r210-transport-position"></head>
+  <link rel="stylesheet" href="/static/app.css?v=0.3.0-r210-music-assets-licenses">
+<link rel="stylesheet" href="/static/ai_jobs.css?v=r210-media-stems"><link rel="stylesheet" href="/static/optional_plugins.css?v=r210-vst3-uninstall"><link rel="stylesheet" href="/static/editor_layout.css?v=0.3.0-r210-studio-midi-workflows"><link rel="stylesheet" href="/static/ai_studio.css?v=0.3.0-r210-studio-workflows"></head>
 <body class="__BODY_CLASS__">
 <div class="app-shell">
   <header class="topbar">
@@ -15,7 +15,8 @@
     <div class="transport-stack"><div class="transport">
       <button class="transport-btn" onclick="stopPlayback()" title="Stop" aria-label="Stop">■</button><button class="transport-btn" onclick="goTransportStart()" title="Torna all'inizio" aria-label="Torna all'inizio">|◀</button><button class="transport-btn" onclick="seekTransport(-5000)" title="Riavvolgi 5 secondi" aria-label="Riavvolgi 5 secondi">◀◀</button><button id="playMaster" class="transport-btn play" onclick="togglePlayback()" title="Play / Preview" aria-label="Play / Preview">▶</button><button class="transport-btn" onclick="seekTransport(5000)" title="Avanti 5 secondi" aria-label="Avanti 5 secondi">▶▶</button><button id="renderBtn" class="transport-btn render-mode" onclick="toggleRenderPreview()" title="Render: include filtri e master nella preview" aria-label="Render preview">Render</button><button id="followBtn" class="transport-btn follow-mode" onclick="toggleFollowPlayback()" title="Follow: mantieni il playhead visibile" aria-label="Follow playback">Follow</button><button id="showLyricsBtn" class="transport-btn timed-display-mode" aria-label="Show Lyrics durante il play" onclick="togglePlaybackLyrics()" title="Show Lyrics durante il play"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M4 10h16M4 15h10M4 20h7"/></svg></button><button id="showMarkersBtn" class="transport-btn timed-display-mode" onclick="togglePlaybackMarkers()" title="Show Markers" aria-label="Show Markers"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 22V2m0 2h14l-4 5 4 5H5"/></svg></button><button id="showChordsBtn" class="transport-btn timed-display-mode" aria-label="Show Chords durante il play" onclick="togglePlaybackChords()" title="Show Chords durante il play"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 18V4l12-2v14M8 7l12-2"/><ellipse cx="5" cy="18" rx="3" ry="2"/><ellipse cx="17" cy="16" rx="3" ry="2"/></svg></button>
     </div><span id="headerProjectName" class="transport-project-name" title="Current project" aria-live="polite">No project loaded</span></div>
-    <div class="timebox"><input id="transportTime" class="transport-time-input" type="text" value="00:00.000" inputmode="decimal" aria-label="Posizione transport" title="Digita m:ss.mmm oppure misura:beat e premi Invio" onchange="setTransportTime(this.value)" onkeydown="transportTimeKeydown(event)"><select id="transportDisplayMode" class="transport-display-mode" onchange="setTransportDisplayMode(this.value)" title="Formato posizione transport"><option value="time">mm:ss.ms</option><option value="musical">Misure:Beat</option></select><span><input id="transportBpmInput" class="tempo-input" oncontextmenu="return openBpmContextMenu(event)" type="number" min="30" max="300" step="0.01" value="120" onchange="setProjectBpm(this.value)" title="BPM audio · modifica la velocità del progetto"><b id="transportBpm" hidden>120</b> BPM <button type="button" class="tap-tempo-icon" onclick="tapProjectTempo()" title="Tap tempo · press repeatedly to set BPM" aria-label="Tap tempo · press repeatedly to set BPM">♩</button> &nbsp; <select id="transportTimeSignature" class="signature-input" onchange="setProjectTimeSignature(this.value,true)" title="Time signature progetto" aria-label="Time signature"><option>2/4</option><option>3/4</option><option selected>4/4</option><option>5/4</option><option>6/8</option><option>7/8</option><option>9/8</option><option>12/8</option></select> &nbsp; <input id="transportPitchInput" class="pitch-input" type="number" min="-6" max="6" step="0.1" value="0" onchange="setProjectPitch(this.value)" title="Trasposizione semitoni"> st</span></div>
+    <div id="nativeUiZoomControls" class="native-ui-zoom" role="group" hidden></div>
+    <div class="timebox"><input id="transportTime" class="transport-time-input" type="text" value="00:00.000" inputmode="decimal" aria-label="Posizione transport" title="mm:ss.mmm oppure Bar:Beats:Division:Ticks (960 PPQ)" onchange="setTransportTime(this.value)" onkeydown="transportTimeKeydown(event)"><select id="transportDisplayMode" class="transport-display-mode" onchange="setTransportDisplayMode(this.value)" title="Formato posizione transport"><option value="auto">Auto · BPM</option><option value="time">mm:ss.ms</option><option value="musical">Bar:Beats:Division:Ticks</option></select><span><input id="transportBpmInput" class="tempo-input" oncontextmenu="return openBpmContextMenu(event)" type="number" min="30" max="300" step="0.01" value="120" onchange="setProjectBpm(this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();setProjectBpm(this.value);this.blur()}" title="BPM audio · modifica la velocità del progetto"><b id="transportBpm" hidden>120</b> BPM <button type="button" class="tap-tempo-icon" onclick="tapProjectTempo()" title="Tap tempo · press repeatedly to set BPM" aria-label="Tap tempo · press repeatedly to set BPM">♩</button> &nbsp; <select id="transportTimeSignature" class="signature-input" onchange="setProjectTimeSignature(this.value,true)" title="Time signature progetto" aria-label="Time signature"><option>2/4</option><option>3/4</option><option selected>4/4</option><option>5/4</option><option>6/8</option><option>7/8</option><option>9/8</option><option>12/8</option></select> &nbsp; <input id="transportPitchInput" class="pitch-input" type="number" min="-6" max="6" step="0.1" value="0" onchange="setProjectPitch(this.value)" title="Trasposizione semitoni"> st</span></div>
     <div class="transport-seek-box" role="group" aria-label="Project position"><label for="transportSeek">Position <b id="transportSeekLabel">0%</b></label><input id="transportSeek" type="range" min="0" max="1000" step="1" value="0" oninput="seekProjectFromSlider(this.value)" title="Seek through entire project" aria-label="Seek through entire project" aria-valuetext="0%"></div>
     <div class="top-spacer"></div>
     <div class="zoom-top"><span>Zoom <b id="zoomDisplay">100%</b></span><div class="zoom-controls"><button type="button" class="zoom-step" onclick="stepZoom(-1)" title="Riduci zoom" aria-label="Riduci zoom">−</button><input id="topZoom" type="range" min="25" max="1200" value="70" onpointerdown="beginZoomPreview()" oninput="previewZoom(this.value)" onchange="commitZoom(this.value)" ondblclick="resetZoomDefault(event)" title="Zoom timeline · doppio click per ripristinare il default"><button type="button" class="zoom-step" onclick="stepZoom(1)" title="Aumenta zoom" aria-label="Aumenta zoom">+</button><select id="zoomPreset" onchange="applyZoomPreset(this.value)" title="Preset zoom timeline" aria-label="Preset zoom timeline"><option value="custom">Custom</option><optgroup label="Percentuale"><option value="pct:25">25%</option><option value="pct:50">50%</option><option value="pct:75">75%</option><option value="pct:100" selected>100%</option><option value="pct:150">150%</option><option value="pct:200">200%</option><option value="pct:400">400%</option></optgroup><optgroup label="Tempo"><option value="seconds:1">1 s</option><option value="seconds:5">5 s</option><option value="seconds:10">10 s</option><option value="fit">Fit</option></optgroup><optgroup label="Beat / misure"><option value="beats:1">1 beat</option><option value="beats:2">2 beat</option><option value="bars:1">1 misura</option><option value="bars:2">2 misure</option><option value="bars:4">4 misure</option><option value="bars:8">8 misure</option></optgroup></select></div></div>
@@ -67,10 +68,21 @@
           <div class="sidebar-tools-body" id="editingToolsBody">
             <label class="nav-item">⇩ <span>Import MTA</span><input id="mtafile" type="file" accept=".mta,.mta8,.mta16" hidden></label>
             <button class="nav-item import-action import-audio-action" onclick="focusImport()"><span class="nav-icon" aria-hidden="true">♫</span><span class="nav-label">Import Audio</span></button>
-            <button class="nav-item import-action" onclick="createMidiTrack()">♬ <span>MIDI / VSTi</span></button>
-            <label class="nav-item import-action">⇩ <span>Import MIDI</span><input type="file" accept=".mid,.midi" hidden onchange="importMidiFile(this.files[0]);this.value='' "></label>
             <button class="nav-item import-action" onclick="openYoutubeImport()">▶ <span>Import YouTube</span></button>
             <button class="nav-item import-action" onclick="openStemWorkflow()">▥ <span>Import &amp; Separate</span></button>
+          </div>
+        </section>
+        <div class="nav-sep"></div>
+        <section class="sidebar-tools collapsed" id="midiToolsPanel">
+          <button class="sidebar-tools-toggle" type="button" onclick="toggleMidiToolsPanel()" aria-expanded="false" aria-controls="midiToolsBody"><span class="sidebar-tools-title">MIDI</span><span id="midiToolsChevron" aria-hidden="true">▸</span></button>
+          <div class="sidebar-tools-body" id="midiToolsBody">
+            <button class="nav-item" onclick="openAiStudio('vocal-harmony')">♫ <span>AI Vocal Studio</span></button>
+            <button class="nav-item" onclick="openAiStudio('audio-to-midi')">♬ <span>AI Audio-to-MIDI</span></button>
+            <button class="nav-item" onclick="openMidiMetronome()">♩ <span>MIDI metronome</span></button>
+            <button class="nav-item" onclick="openMetronomeGraph()">〰 <span>Metronome tempo graph</span></button>
+            <button class="nav-item import-action" onclick="createMidiTrack()">♬ <span>MIDI / VSTi</span></button>
+            <label class="nav-item import-action">⇩ <span>Import MIDI</span><input type="file" accept=".mid,.midi" hidden onchange="importMidiFile(this.files[0]);this.value='' "></label>
+            <button class="nav-item" onclick="openMidiProjectExport()">⇧ <span>Export multitrack MIDI</span></button>
           </div>
         </section>
         <div class="nav-sep"></div>
@@ -86,7 +98,6 @@
             <button class="nav-item" onclick="focusTracks()">☷ <span>Tracks</span></button>
             <button class="nav-item" onclick="focusInspector()">◇ <span>Plugins</span></button>
             <button class="nav-item" onclick="focusMixer()">▥ <span>Mixer</span></button>
-            <div id="nativeUiZoomControls" class="native-ui-zoom" role="group" hidden></div>
           </div>
         </section>
         <div class="nav-sep"></div>
@@ -119,14 +130,20 @@
 </div>
 <input id="stemFileHidden" type="file" accept=".mp3,audio/mpeg" hidden>
 <script src="/static/native_ui_zoom.js?v=r210-native-ui-zoom"></script>
+<script src="/static/musical_clock.js?v=r210-musical-origin"></script>
 <script src="/static/timeline_rules.js?v=r210-metronome-grid"></script>
-<link rel="stylesheet" href="/static/midi.css?v=r210-midi-live">
-<script src="/static/playback_prep.js?v=0.3.0-r210-transport-position"></script>
-<script src="/static/app.js?v=0.3.0-r210-transport-position"></script>
-<script src="/static/midi.js?v=r210-midi-live"></script>
-<script src="/static/ai_jobs.js?v=r210-decimal-zoom-accounted"></script><script src="/static/resource_access.js?v=r210-credit-access"></script><script src="/static/credit_notice.js?v=r210-credit-refusal"></script><script src="/static/native_transport.js?v=0.3.0-r210-transport-position"></script><script src="/static/server_vst3.js?v=0.3.0-r210-transport-position"></script>
-<script src="/static/audio_capture.js?v=r210"></script>
-<script src="/static/server_vst3_editor.js?v=r210"></script><script src="/static/midi_rules.js?v=r210-midi-live"></script><script src="/static/midi_native_output.js?v=r210-midi-live"></script><script src="/static/midi_protocols.js?v=r210"></script>
+<link rel="stylesheet" href="/static/midi.css?v=r210-studio-midi-workflows">
+<script src="/static/playback_prep.js?v=0.3.0-r210-studio-midi-workflows"></script>
+<script id="mtaPreferenceSeed" type="application/json">__PREFERENCES__</script>
+<script src="/static/user_preferences.js?v=r210-studio-midi-workflows"></script>
+<script src="/static/app.js?v=0.3.0-r210-music-assets-licenses"></script>
+<script src="/static/midi_editing.js?v=r210-studio-midi-workflows"></script>
+<script src="/static/midi.js?v=r210-studio-midi-workflows"></script><script src="/static/midi_advanced.js?v=r210-studio-midi-workflows"></script>
+<script src="/static/ai_jobs.js?v=r210-decimal-zoom-accounted-studio"></script><script src="/static/resource_access.js?v=r210-credit-access"></script><script src="/static/credit_notice.js?v=r210-credit-refusal"></script><script src="/static/native_transport.js?v=0.3.0-r210-device-yourmt3"></script><script src="/static/server_vst3.js?v=0.3.0-r210-studio-midi-workflows"></script>
+<script src="/static/audio_capture.js?v=0.3.0-r210-device-yourmt3"></script>
+<script src="/static/server_vst3_editor.js?v=r210"></script><script src="/static/midi_rules.js?v=r210-studio-midi-workflows-live"></script><script src="/static/midi_native_output.js?v=r210-studio-midi-workflows-live"></script><script src="/static/midi_protocols.js?v=r210"></script>
 <script src="/static/midi_tempo.js?v=r210"></script>
-<script src="/static/midi_live.js?v=r210-midi-live"></script><script src="/static/optional_plugins.js?v=r210-vst3-uninstall"></script><script src="/static/editor_layout.js?v=0.3.0-r210-transport-position"></script></body>
+<script src="/static/midi_live.js?v=r210-studio-midi-workflows-live"></script><script src="/static/optional_plugins.js?v=0.3.0-r210-native-vst3-media"></script><script src="/static/editor_layout.js?v=0.3.0-r210-studio-midi-workflows"></script><script src="/static/metronome_graph.js?v=r210-studio-midi-workflows"></script><script src="/static/studio_extended.js?v=0.3.0-r210-managed-studio"></script><script src="/static/ai_studio.js?v=0.3.0-r210-music-assets-licenses"></script><script src="/static/midi_controllers.js?v=r210-studio-workflows"></script>
+<script src="/static/native_audio_io.js?v=0.3.0-r210-device-yourmt3"></script>
+</body>
 </html>

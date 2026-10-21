@@ -1,0 +1,66 @@
+{
+  "version": "0.3.0-r210",
+  "completion_certified": false,
+  "environment_execution": "passed",
+  "assets_sha256": "7e2803bb0e8bd1b92815eb8ca1a147ed2c59c66889e4f04b878f4dbb6590fe15",
+  "asset_bytes": 991830047,
+  "crossarea": {
+    "passed": 123,
+    "failed": 0,
+    "skipped": 1
+  },
+  "native_final": {
+    "passed": 114,
+    "failed": 0,
+    "skipped": 7
+  },
+  "disjoint_final_suites_total": {
+    "passed": 237,
+    "failed": 0,
+    "skipped": 8
+  },
+  "legacy_failure_analysis": {
+    "passed": 4,
+    "failed": 4
+  },
+  "general_regression": {
+    "status": "interrupted_by_automatic_approval_review",
+    "reason": "unexpected GitHub egress",
+    "collected": 4646,
+    "completed": false,
+    "progress_markers_only": {
+      "pass": 2866,
+      "fail": 26,
+      "skip": 56
+    }
+  },
+  "transkun_real_inference": {
+    "runtime": "transkun 2.0.1",
+    "source_revision": "c5cb8370e17b4a1650b5971ba87ee4b0d208e5b6",
+    "device": "cpu",
+    "torch": "2.14.1+cpu",
+    "torchaudio": "2.11.0+cpu",
+    "inference_executed": true,
+    "input": "2-second synthetic decaying C-major sine chord; not recorded piano",
+    "notes_detected": 0,
+    "quality_validated": false,
+    "license_basis": "MIT license in supplied Transkun source tree; no registry rights override or redistribution of model weights",
+    "network": "Python network audit hook active",
+    "files": {
+      "r210-transkun-input.wav": "47d15bb97dc4c020db19cf2c9c91dbf3ed4171ca7fb67714bd70906ca7e9b035",
+      "r210-transkun-output.mid": "3d85be3d1666f5985aa8736496693abe8bd5cb124159aede7d1db469562caff5"
+    },
+    "checkpoint_sha256": "50a80010effc2a59ffcd068a95cd2b29bd7f23a27a3515bc3ccd209c89a3d44c",
+    "config_sha256": "d3d989214eb148230ee5df476d994dcde6af595904d3f968f1221d2e3bea5ac6"
+  },
+  "blockers": [
+    "full general regression unavailable after unexpected GitHub request",
+    "four independently reproduced inherited legacy test failures",
+    "DiffSinger voicebank, vocoder, config and language assets absent",
+    "RVC acoustic voice model and authorization absent",
+    "Seed-VC singing checkpoint and auxiliary cache absent",
+    "10-16 instrument ground truth benchmark absent",
+    "reviewed GM SoundFont and VST assets absent",
+    "target OS and audio hardware acceptance pending"
+  ]
+}

@@ -1,15 +1,16 @@
 /* Same opt-in catalog in native settings and server administration. */
 (()=>{'use strict';
 const tr=(en,it)=>window.MtaLocale?.language==='it'?it:en;
-async function api(path,body){const response=await fetch(path,{method:body?'POST':'GET',headers:{'Content-Type':'application/json','X-MTA-Request':'1'},body:body?JSON.stringify(body):undefined,cache:'no-store'});const data=await response.json();if(!response.ok)throw Error(data.detail||response.statusText);return data}
+async function api(path,body){const response=await fetch(path,{method:body?'POST':'GET',headers:{'Content-Type':'application/json','X-MTA-Request':'1'},body:body?JSON.stringify(body):undefined,cache:'no-store'});const text=await response.text();let data;try{data=JSON.parse(text)}catch{throw Error(tr('Unexpected server response','Risposta inattesa del server')+' (HTTP '+response.status+'). '+(response.ok?'':text.replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').slice(0,240)))}if(!response.ok)throw Error(typeof data.detail==='string'?data.detail:tr('Request failed','Richiesta fallita')+' (HTTP '+response.status+')');return data}
 const stateLabel=state=>({installed:tr('Installed','Installato'),not_installed:tr('Not installed','Non installato'),queued:tr('Waiting for installation','In attesa di installazione'),installing:tr('Installing','Installazione in corso'),failed:tr('Installation failed','Installazione fallita')})[state]||state;
 const phaseLabel=stage=>({starting:tr('Starting','Avvio'),plugin:tr('Preparing plugin','Preparazione plugin'),download:tr('Downloading source','Download sorgente'),compile:tr('Compilation','Compilazione'),building:tr('Building','Compilazione'),command:tr('Running build tool','Esecuzione tool di compilazione'),install:tr('Installing files','Installazione file')})[stage]||stage;
 window.openOptionalVst3=async function(host){
  if(!host){showUtilityModal(tr('Optional open-source VST3','VST3 open-source opzionali'),'<div id="optionalVst3Catalog"></div>');host=document.getElementById('optionalVst3Catalog')}
+ const prefix=document.body.classList.contains('native-single-user')?'/api/native/optional-vst3':'/api/admin/optional-vst3';
  host.replaceChildren();const view={};host._optionalVst3View=view;
  const status=document.createElement('p');status.setAttribute('role','status');host.append(status);
  try{
-  const data=await api('/api/admin/optional-vst3');if(host._optionalVst3View!==view)return;
+  const data=await api(prefix);if(host._optionalVst3View!==view)return;
   const intro=document.createElement('p');intro.textContent=tr('Select plugins to compile and install. Builds require a C++ toolchain and may take several minutes. Progress shows actual build activity; the total duration cannot be predicted.','Selezionare i plugin da compilare e installare. Servono un toolchain C++ e diversi minuti. L’avanzamento mostra l’attività effettiva: la durata totale non è prevedibile.');host.prepend(intro);
   const reviewed=document.createElement('p');reviewed.textContent=tr('License review: ','Verifica licenze: ')+data.reviewed_at+(data.review_due?' · '+tr('Review overdue: new installations disabled','Revisione scaduta: nuove installazioni disabilitate'):'');host.append(reviewed);
   const all=document.createElement('button');all.textContent=tr('Select all available','Seleziona tutti i disponibili');host.append(all);const checks=[],cards=new Map();
@@ -29,15 +30,15 @@ window.openOptionalVst3=async function(host){
     const info=document.createElement('p');info.textContent=plugin.license+' · '+plugin.revision.slice(0,12);
     const badge=document.createElement('p');badge.className='optional-plugin-state';badge.setAttribute('role','status');
     const activity=document.createElement('p'),error=document.createElement('p');error.className='optional-plugin-error';
-    const link=document.createElement('a');link.href='/api/admin/optional-vst3/'+plugin.id+'/license';link.target='_blank';link.rel='noopener';link.textContent=tr('Read license','Leggi licenza');
+    const link=document.createElement('a');link.href=prefix+'/'+plugin.id+'/license';link.target='_blank';link.rel='noopener';link.textContent=tr('Read license','Leggi licenza');
     const source=document.createElement('a');source.href='https://github.com/'+plugin.repo+'/tree/'+plugin.revision;source.target='_blank';source.rel='noopener';source.textContent=tr('Source / build instructions','Sorgente / istruzioni compilazione');
     const remove=document.createElement('button');remove.type='button';remove.className='optional-plugin-uninstall';remove.textContent=tr('Uninstall','Disinstalla');
     remove.onclick=async()=>{remove.disabled=true;try{
-     const plan=await api('/api/admin/optional-vst3/'+plugin.id+'/uninstall');
+     const plan=await api(prefix+'/'+plugin.id+'/uninstall');
      if(plan.in_use)throw Error(tr('Stop playback and close live plugin editors or monitoring before uninstalling.','Fermare la riproduzione e chiudere editor live o monitoring prima di disinstallare.'));
      const warning=plan.projects.length?'\n'+tr('Projects referencing this package: ','Progetti che utilizzano questo pacchetto: ')+plan.projects.length+'. '+tr('They will require reinstalling it or removing the affected inserts.','Richiederanno la reinstallazione o la rimozione degli insert interessati.'):'';
      if(!confirm(tr('Uninstall the complete package ','Disinstallare il pacchetto completo ')+plugin.name+'?'+warning))return;
-     const result=await api('/api/admin/optional-vst3/'+plugin.id+'/uninstall',{confirm:true,remove_build_cache:cleanup.checked});
+     const result=await api(prefix+'/'+plugin.id+'/uninstall',{confirm:true,remove_build_cache:cleanup.checked});
      paint(plugin.id,{state:result.state});status.textContent=plugin.name+' · '+tr('Uninstalled','Disinstallato');
     }catch(e){error.textContent=e.message}finally{remove.disabled=false}};
     const cleanupLabel=document.createElement('label'),cleanup=document.createElement('input');cleanup.type='checkbox';cleanup.checked=true;cleanupLabel.className='optional-plugin-cleanup';cleanupLabel.append(cleanup,document.createTextNode(tr('Also remove downloaded sources and build cache','Rimuovi anche sorgenti scaricati e cache di compilazione')));
@@ -57,11 +58,11 @@ window.openOptionalVst3=async function(host){
     }
     status.textContent=tr('Installation in progress','Installazione in corso')+' · '+Math.round(Date.now()/1000-job.started_at)+'s';
     await new Promise(resolve=>setTimeout(resolve,1000));
-    try{job=await api('/api/admin/optional-vst3/jobs/'+job.id)}catch(e){status.textContent=tr('Connection interrupted; retrying: ','Connessione interrotta; nuovo tentativo: ')+e.message}
+    try{job=await api(prefix+'/jobs/'+job.id)}catch(e){status.textContent=tr('Connection interrupted; retrying: ','Connessione interrotta; nuovo tentativo: ')+e.message}
    }
   }
-  start.onclick=async()=>{start.disabled=true;try{if(!accept.checked)throw Error(tr('Review and accept the licenses first','Consultare e accettare prima le licenze'));const selected=checks.filter(c=>c.checked&&!c.disabled).map(c=>c.value);await watch(await api('/api/admin/optional-vst3/install',{plugins:selected,accept_licenses:true}))}catch(e){status.textContent=e.message;start.disabled=false}};
-  if(data.active_job)await watch(await api('/api/admin/optional-vst3/jobs/'+data.active_job));
+  start.onclick=async()=>{start.disabled=true;try{if(!accept.checked)throw Error(tr('Review and accept the licenses first','Consultare e accettare prima le licenze'));const selected=checks.filter(c=>c.checked&&!c.disabled).map(c=>c.value);await watch(await api(prefix+'/install',{plugins:selected,accept_licenses:true}))}catch(e){status.textContent=e.message;start.disabled=false}};
+  if(data.active_job)await watch(await api(prefix+'/jobs/'+data.active_job));
  }catch(e){status.textContent=e.message}
 };
 window.addEventListener('DOMContentLoaded',()=>{const host=document.querySelector('[data-optional-vst3]');if(host){const button=host.querySelector('button');button?.addEventListener('click',()=>openOptionalVst3(host.querySelector('[data-catalog]')))}if(location.hash==='#optional-vst3')void openOptionalVst3()});

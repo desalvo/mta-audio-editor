@@ -104,7 +104,7 @@ def test_cpp_real_graph_metering_and_immediate_fader_pan_gain(tmp_path,monkeypat
     finally:graph.close()
 
 
-def test_real_browser_worker_meters_and_live_controls(tmp_path,monkeypatch,compiled_core):
+def test_real_browser_worker_meters_and_live_controls(tmp_path,monkeypatch,compiled_core,chromium_capability):
     pytest.importorskip('pedalboard');pytest.importorskip('av')
     from app.vst3_live import Session
     monkeypatch.setenv('MTA_AUDIO_CORE_PATH',str(compiled_core));cpp_audio._load.cache_clear()
@@ -149,20 +149,24 @@ def test_authenticated_session_mixer_route_rejects_foreign_or_unsafe_controls(mo
     manager.entries.clear()
 
 
+@pytest.mark.parametrize('native',[False,True])
 @pytest.mark.parametrize('locale',['en','it'])
-def test_browser_per_plugin_progress_and_terminal_states(locale):
+def test_browser_per_plugin_progress_and_terminal_states(locale,native,chromium_capability):
     api=pytest.importorskip('playwright.sync_api')
     with api.sync_playwright() as pw:
         browser=pw.chromium.launch(headless=True,args=['--no-sandbox']);page=browser.new_page()
         page.route('http://mta.test/',lambda r:r.fulfill(body='<div id="catalog"></div>',content_type='text/html'));page.goto('http://mta.test/');page.evaluate('(locale)=>{window.MtaLocale={language:locale}}',locale)
+        if native:page.evaluate("document.body.classList.add('native-single-user')")
+        prefix='/api/native/optional-vst3' if native else '/api/admin/optional-vst3'
         catalog=optional_plugins.catalog();catalog['active_job']=None
         for plugin in catalog['plugins']:plugin.update(installed=False,state='not_installed',error='')
         states={'id':'job','state':'running','started_at':time.time(),'plugins':{'mverb':{'state':'installing','stage':'compile','message':'MVerb'},'dragonfly':{'state':'queued'}},'results':[]}
-        page.route('**/api/admin/optional-vst3',lambda r:r.fulfill(json=catalog))
-        page.route('**/api/admin/optional-vst3/install',lambda r:r.fulfill(json=states))
-        page.route('**/api/admin/optional-vst3/jobs/job',lambda r:r.fulfill(json=states))
+        page.route('**'+prefix,lambda r:r.fulfill(json=catalog))
+        page.route('**'+prefix+'/install',lambda r:r.fulfill(json=states))
+        page.route('**'+prefix+'/jobs/job',lambda r:r.fulfill(json=states))
         page.add_script_tag(content=(ROOT/'app/static/optional_plugins.js').read_text())
         page.evaluate("()=>{void openOptionalVst3(document.getElementById('catalog'))}")
+        assert page.locator('[data-plugin=mverb] a').first.get_attribute('href')==prefix+'/mverb/license'
         page.locator('input[value="mverb"]').check();page.locator('input[value="dragonfly"]').check()
         page.locator('#catalog > label input').check()
         page.get_by_role('button',name='Installa VST3 selezionati' if locale=='it' else 'Install selected VST3',exact=True).click()
@@ -184,7 +188,7 @@ def test_browser_per_plugin_progress_and_terminal_states(locale):
         browser.close()
 
 
-def test_real_server_browser_cpp_space_meters_and_mixer(compiled_core,tmp_path):
+def test_real_server_browser_cpp_space_meters_and_mixer(compiled_core,tmp_path,chromium_capability):
     pytest.importorskip('playwright.sync_api');pytest.importorskip('pedalboard');pytest.importorskip('av')
     from scripts.validate_cpp_live_controls import probe
     result=probe(compiled_core,tmp_path/'browser.json')
@@ -192,7 +196,7 @@ def test_real_server_browser_cpp_space_meters_and_mixer(compiled_core,tmp_path):
     assert result['fader_to_audible_meter_seconds']<1
 
 
-def test_native_live_mixer_uses_bridge_without_saving_and_updates_meters():
+def test_native_live_mixer_uses_bridge_without_saving_and_updates_meters(chromium_capability):
     api=pytest.importorskip('playwright.sync_api')
     with api.sync_playwright() as pw:
         browser=pw.chromium.launch(headless=True,args=['--no-sandbox']);page=browser.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))

@@ -1,0 +1,125 @@
+{
+  "protocol": "mta-music-1",
+  "parts": [
+    {
+      "id": "part-0",
+      "name": "GM 1",
+      "instrument": "gm-0",
+      "program": 0,
+      "percussion": false,
+      "notes": [
+        {
+          "id": "ym-0",
+          "start_ms": 100.0,
+          "duration_ms": 2400.0,
+          "pitch": 42,
+          "velocity": 96,
+          "channel": 0,
+          "origin": "predicted",
+          "source_model": "yourmt3-ps-e45ebd70",
+          "confidence": null,
+          "confidence_metric": ""
+        },
+        {
+          "id": "ym-1",
+          "start_ms": 100.0,
+          "duration_ms": 1947.9375,
+          "pitch": 48,
+          "velocity": 96,
+          "channel": 0,
+          "origin": "predicted",
+          "source_model": "yourmt3-ps-e45ebd70",
+          "confidence": null,
+          "confidence_metric": ""
+        },
+        {
+          "id": "ym-2",
+          "start_ms": 100.0,
+          "duration_ms": 1947.9375,
+          "pitch": 51,
+          "velocity": 96,
+          "channel": 0,
+          "origin": "predicted",
+          "source_model": "yourmt3-ps-e45ebd70",
+          "confidence": null,
+          "confidence_metric": ""
+        },
+        {
+          "id": "ym-3",
+          "start_ms": 100.0,
+          "duration_ms": 1947.9375,
+          "pitch": 57,
+          "velocity": 96,
+          "channel": 0,
+          "origin": "predicted",
+          "source_model": "yourmt3-ps-e45ebd70",
+          "confidence": null,
+          "confidence_metric": ""
+        }
+      ],
+      "controls": [],
+      "source_model": "yourmt3-ps-e45ebd70",
+      "source_result_id": "",
+      "review": "unreviewed"
+    },
+    {
+      "id": "part-1",
+      "name": "GM 17",
+      "instrument": "gm-16",
+      "program": 16,
+      "percussion": false,
+      "notes": [
+        {
+          "id": "ym-4",
+          "start_ms": 100.0,
+          "duration_ms": 1947.9375,
+          "pitch": 63,
+          "velocity": 96,
+          "channel": 1,
+          "origin": "predicted",
+          "source_model": "yourmt3-ps-e45ebd70",
+          "confidence": null,
+          "confidence_metric": ""
+        }
+      ],
+      "controls": [],
+      "source_model": "yourmt3-ps-e45ebd70",
+      "source_result_id": "",
+      "review": "unreviewed"
+    },
+    {
+      "id": "part-2",
+      "name": "GM 41",
+      "instrument": "gm-40",
+      "program": 40,
+      "percussion": false,
+      "notes": [
+        {
+          "id": "ym-5",
+          "start_ms": 100.0,
+          "duration_ms": 2400.0,
+          "pitch": 63,
+          "velocity": 96,
+          "channel": 2,
+          "origin": "predicted",
+          "source_model": "yourmt3-ps-e45ebd70",
+          "confidence": null,
+          "confidence_metric": ""
+        }
+      ],
+      "controls": [],
+      "source_model": "yourmt3-ps-e45ebd70",
+      "source_result_id": "",
+      "review": "unreviewed"
+    }
+  ],
+  "alternatives": [],
+  "offset_ms": 0.0,
+  "warnings": [
+    "Instrument labels, pitch and timing are model predictions and require review.",
+    "Velocity 96 is generated; this model checkpoint does not estimate playing dynamics.",
+    "Calibrated confidence, pitch bend, controllers and independent players of the same instrument are unavailable.",
+    "Melodic parts use distinct MIDI channels; percussion uses channel 10.",
+    "CPU verified on a short piano fixture only; broad mixed-instrument accuracy and ROCm/CUDA are not certified."
+  ]
+}

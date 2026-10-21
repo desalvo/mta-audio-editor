@@ -1,0 +1,58 @@
+[
+  {
+    "file": "MTA-Audio-Editor-Administrator-Manual-IT.pdf",
+    "pages": 15,
+    "review_pages": [
+      12
+    ],
+    "rendered": true,
+    "visually_reviewed": true
+  },
+  {
+    "file": "MTA-Audio-Editor-User-Manual-EN.pdf",
+    "pages": 27,
+    "review_pages": [
+      23,
+      24
+    ],
+    "rendered": true,
+    "visually_reviewed": true
+  },
+  {
+    "file": "MTA-Audio-Editor-VST3-Manual-IT.pdf",
+    "pages": 8,
+    "review_pages": [
+      5
+    ],
+    "rendered": true,
+    "visually_reviewed": true
+  },
+  {
+    "file": "MTA-Audio-Editor-Administrator-Manual-EN.pdf",
+    "pages": 15,
+    "review_pages": [
+      12
+    ],
+    "rendered": true,
+    "visually_reviewed": true
+  },
+  {
+    "file": "MTA-Audio-Editor-User-Manual-IT.pdf",
+    "pages": 28,
+    "review_pages": [
+      24,
+      25
+    ],
+    "rendered": true,
+    "visually_reviewed": true
+  },
+  {
+    "file": "MTA-Audio-Editor-VST3-Manual-EN.pdf",
+    "pages": 8,
+    "review_pages": [
+      5
+    ],
+    "rendered": true,
+    "visually_reviewed": true
+  }
+]

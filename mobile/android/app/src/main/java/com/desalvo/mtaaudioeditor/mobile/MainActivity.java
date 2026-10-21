@@ -36,6 +36,9 @@ public final class MainActivity extends Activity {
     private static final int REQUEST_OPEN_FILE = 1001;
     private static final int REQUEST_SAVE_FILE = 1002;
     private static final String PREFS = "mta_mobile";
+    private static final String PREF_INTERFACE_ZOOM = "interface_zoom_percent";
+    private static final int MENU_INTERFACE_ZOOM = 3101;
+    private static final int[] INTERFACE_ZOOM_LEVELS = {50,67,75,80,90,100,110,125,150,175,200};
     private static final String PREF_SERVER_URL = "server_url";
     private static final String PREF_UPDATE_CHANNEL = "update_channel";
     private static final String PREF_DEMUCS_WIFI_ONLY = DemucsModelManager.WIFI_ONLY;
@@ -43,6 +46,7 @@ public final class MainActivity extends Activity {
 
     private final ExecutorService ioExecutor = Executors.newSingleThreadExecutor();
     private WebView webView;
+    private int zoomChangeGeneration = 0;
     private ValueCallback<Uri[]> uploadCallback;
     private PendingDownload pendingDownload;
 
@@ -89,7 +93,9 @@ public final class MainActivity extends Activity {
         settings.setAllowFileAccess(false);
         settings.setAllowContentAccess(true);
         settings.setMediaPlaybackRequiresUserGesture(false);
-        settings.setBuiltInZoomControls(false);
+        settings.setSupportZoom(true);
+        settings.setBuiltInZoomControls(true);
+        settings.setUseWideViewPort(true);
         settings.setDisplayZoomControls(false);
         settings.setUserAgentString(settings.getUserAgentString() + " MTAEditorMobile/0.2.0-113 Android");
 
@@ -98,6 +104,17 @@ public final class MainActivity extends Activity {
         webView.addJavascriptInterface(new MobileBridge(), "MtaMobile");
 
         webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                // Permit full-page scale below 100%, rather than text-only zoom.
+                // The initial viewport remains responsive at device width.
+                String viewport = "(()=>{let m=document.querySelector('meta[name=viewport]');if(!m){m=document.createElement('meta');m.name='viewport';document.head.appendChild(m)}m.content=m.content.replace(/(?:^|,)\\s*(initial-scale|minimum-scale|maximum-scale|user-scalable)\\s*=[^,]*/g,'')+',initial-scale=1,minimum-scale=0.5,maximum-scale=2,user-scalable=yes'})()";
+                int generation = zoomChangeGeneration;
+                view.evaluateJavascript(viewport, ignored -> view.postDelayed(() -> {
+                    if (generation == zoomChangeGeneration) applyInterfaceZoom(interfaceZoomPercent(), false);
+                }, 100));
+            }
+
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, android.webkit.WebResourceRequest request) {
                 Uri target = request.getUrl();
@@ -211,6 +228,7 @@ public final class MainActivity extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add(Menu.NONE, MENU_INTERFACE_ZOOM, Menu.NONE, isItalian() ? "Zoom interfaccia…" : "Interface zoom…").setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
         menu.add("Impostazioni server").setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
         menu.add("Canale aggiornamenti").setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
         menu.add("Controlla aggiornamenti").setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
@@ -222,6 +240,7 @@ public final class MainActivity extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == MENU_INTERFACE_ZOOM) { showInterfaceZoom(); return true; }
         String title = String.valueOf(item.getTitle());
         if ("Impostazioni server".equals(title)) {
             promptServerUrl(false);
@@ -249,6 +268,49 @@ public final class MainActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+
+    private boolean isItalian() { return java.util.Locale.getDefault().getLanguage().equals("it"); }
+
+    private int interfaceZoomPercent() {
+        int value = getPreferencesStore().getInt(PREF_INTERFACE_ZOOM, 100);
+        return value >= 50 && value <= 200 ? value : 100;
+    }
+
+    private void showInterfaceZoom() {
+        String[] labels = new String[INTERFACE_ZOOM_LEVELS.length];
+        int selected = -1;
+        for (int i=0; i<labels.length; i++) {
+            int value = INTERFACE_ZOOM_LEVELS[i];
+            labels[i] = value + "%" + (value == 100 ? (isItalian() ? " · Ripristina" : " · Reset") : "");
+            if (value == interfaceZoomPercent()) selected = i;
+        }
+        new AlertDialog.Builder(this)
+            .setTitle((isItalian() ? "Zoom interfaccia" : "Interface zoom") + " · " + interfaceZoomPercent() + "%")
+            .setSingleChoiceItems(labels, selected, (dialog, which) -> {
+                applyInterfaceZoom(INTERFACE_ZOOM_LEVELS[which], true);
+                dialog.dismiss();
+            }).setNegativeButton(isItalian() ? "Annulla" : "Cancel", null).show();
+    }
+
+    @SuppressWarnings("deprecation") // getScale includes display density; zoomBy is page zoom.
+    private void applyInterfaceZoom(int percent, boolean persist) {
+        if (percent < 50 || percent > 200) return;
+        float current = webView.getScale() / getResources().getDisplayMetrics().density;
+        if (!Float.isFinite(current) || current <= 0) return;
+        int generation = ++zoomChangeGeneration;
+        webView.zoomBy((percent / 100f) / current);
+        // Read the effective engine scale after layout: do not save a value
+        // the installed WebView clamped or refused.
+        webView.postDelayed(() -> {
+            if (generation != zoomChangeGeneration) return;
+            int applied = Math.round(webView.getScale() / getResources().getDisplayMetrics().density * 100);
+            if (persist && Math.abs(applied-percent) <= 2) {
+                getPreferencesStore().edit().putInt(PREF_INTERFACE_ZOOM, percent).apply();
+            } else if (persist) {
+                Toast.makeText(this, isItalian() ? "Zoom non disponibile a questo livello nel WebView installato" : "This zoom level is unavailable in the installed WebView", Toast.LENGTH_LONG).show();
+            }
+        }, 250);
+    }
 
     private void showDemucsModelManager() {
         String configured=getPreferencesStore().getString(PREF_SERVER_URL,""); String base=(configured==null||configured.trim().isEmpty())?DEFAULT_SERVER_URL:configured;

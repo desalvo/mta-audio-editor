@@ -1,0 +1,264 @@
+{
+  "schema": "mta-studio-bundle-1",
+  "id": "qixuan-2-7-onnx-r210",
+  "name": "Qixuan 2.7.0 / OpenUtau ONNX",
+  "kind": "diffsinger",
+  "format": "openutau-onnx",
+  "languages": [
+    "en",
+    "vocalise"
+  ],
+  "bindings": {
+    "runtime_root": "runtime",
+    "acoustic": "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/0101_qixuan_muon1_acoustic.qixuan.onnx",
+    "config": "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dsconfig.yaml",
+    "vocoder": "runtime/vocoder/pc_nsf_hifigan_44.1k_hop512_128bin_2025.02.onnx",
+    "vocoder_config": "runtime/vocoder/vocoder.yaml",
+    "phonemes": "profiles/qixuan-en.json"
+  },
+  "policies": {
+    "singer": "diffsinger-qixuan",
+    "vocoder": "diffsinger-vocoder"
+  },
+  "expression_defaults": {
+    "breathiness_db": -48.0,
+    "voicing_db": -12.0
+  },
+  "components": {
+    "engine": "mta-analysis",
+    "acoustic": "diffsinger-qixuan",
+    "vocoder": "diffsinger-vocoder"
+  },
+  "component_files": {
+    "engine": [
+      "engine/LICENSE",
+      "engine/diffsinger_onnx.py"
+    ],
+    "acoustic": [
+      "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/0101_qixuan_muon1_acoustic.languages.json",
+      "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/0101_qixuan_muon1_acoustic.phonemes.json",
+      "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/0101_qixuan_muon1_acoustic.qixuan.onnx",
+      "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/character.txt",
+      "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/character.yaml",
+      "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dsconfig.yaml",
+      "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dsdur/0102_qixuan_newdict_dur.languages.json",
+      "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dsdur/0102_qixuan_newdict_dur.phonemes.json",
+      "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dsdur/0102_qixuan_newdict_dur.qixuan.dur.onnx",
+      "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dsdur/0102_qixuan_newdict_dur.qixuan.linguistic.onnx",
+      "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dsdur/dsconfig.yaml",
+      "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dsdur/dsdict-en.yaml",
+      "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dsdur/dsdict-ja.yaml",
+      "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dsdur/dsdict-zh.yaml",
+      "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dsdur/dsdict.yaml",
+      "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dspitch/0102_qixuan_muon1_pitch.languages.json",
+      "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dspitch/0102_qixuan_muon1_pitch.phonemes.json",
+      "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dspitch/0102_qixuan_muon1_pitch.qixuan.linguistic.onnx",
+      "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dspitch/0102_qixuan_muon1_pitch.qixuan.pitch.onnx",
+      "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dspitch/dsconfig.yaml",
+      "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dspitch/dsdict.yaml",
+      "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dsvariance/0102_qixuan_muon1_multivar.languages.json",
+      "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dsvariance/0102_qixuan_muon1_multivar.phonemes.json",
+      "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dsvariance/0102_qixuan_muon1_multivar.qixuan.linguistic.onnx",
+      "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dsvariance/0102_qixuan_muon1_multivar.qixuan.variance.onnx",
+      "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dsvariance/dsconfig.yaml",
+      "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dsvariance/dsdict.yaml",
+      "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/qixuan.png",
+      "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/qixuan1000x1000.png",
+      "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/qixuan256x256.png",
+      "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/Terms_of_Use.zh-CN.pdf",
+      "profiles/qixuan-en.json"
+    ],
+    "vocoder": [
+      "runtime/vocoder/NOTICE.txt",
+      "runtime/vocoder/NOTICE.zh-CN.txt",
+      "runtime/vocoder/oudep.yaml",
+      "runtime/vocoder/pc_nsf_hifigan_44.1k_hop512_128bin_2025.02.onnx",
+      "runtime/vocoder/STATEMENTS.txt",
+      "runtime/vocoder/vocoder.yaml"
+    ]
+  },
+  "files": {
+    "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/0101_qixuan_muon1_acoustic.languages.json": {
+      "bytes": 39,
+      "sha256": "3266061fc2eec2796dca72ca49e9a88c66b932c57ab8ba19cbf17cd366c2f00c"
+    },
+    "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/0101_qixuan_muon1_acoustic.phonemes.json": {
+      "bytes": 2339,
+      "sha256": "a2de0d2027f0f7eaf6566b0df02b1b1264c010b03fd3ac1ab09e9a0ed88b80e4"
+    },
+    "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/0101_qixuan_muon1_acoustic.qixuan.onnx": {
+      "bytes": 279965524,
+      "sha256": "86c21d6b3a2e60e653af3cd6aa117d68523ea3eefe471a790e85b662bdc9220b"
+    },
+    "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/character.txt": {
+      "bytes": 147,
+      "sha256": "3ccf857d209e1a3c3260cb45fe18aabba916bbc8131a92f6f1f9aba591027dc3"
+    },
+    "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/character.yaml": {
+      "bytes": 175,
+      "sha256": "bb55546c256665c768ac9ab25caa7b4ae10c94c49edf7bcdab43d77589208b4e"
+    },
+    "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dsconfig.yaml": {
+      "bytes": 708,
+      "sha256": "94dba50da20964c04224dc351dba16feceeada18a755981f90c3bac315951127"
+    },
+    "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dsdur/0102_qixuan_newdict_dur.languages.json": {
+      "bytes": 39,
+      "sha256": "3266061fc2eec2796dca72ca49e9a88c66b932c57ab8ba19cbf17cd366c2f00c"
+    },
+    "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dsdur/0102_qixuan_newdict_dur.phonemes.json": {
+      "bytes": 2306,
+      "sha256": "0fd294a2d994ddd4b02dae705ba6b2f03501f44a51645b2827a6f91f21c44902"
+    },
+    "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dsdur/0102_qixuan_newdict_dur.qixuan.dur.onnx": {
+      "bytes": 14341523,
+      "sha256": "4666ffc57d9405da18c4cb504a9c3470a6baceeefa896836e9b6f6a998ff5478"
+    },
+    "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dsdur/0102_qixuan_newdict_dur.qixuan.linguistic.onnx": {
+      "bytes": 25409976,
+      "sha256": "c58f4af2eab551eab6448bbdd9fe0300543c197000c856ab831e6dadf81aa953"
+    },
+    "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dsdur/dsconfig.yaml": {
+      "bytes": 485,
+      "sha256": "29621ac6e7c3f00786ae1c60a4f37e247a5f057760ad8d652e9ef6f93cee49dc"
+    },
+    "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dsdur/dsdict-en.yaml": {
+      "bytes": 27603157,
+      "sha256": "e30e38a7795dadc8ec81153a237feba65b2204c9d5294119b4f21219bcaf2850"
+    },
+    "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dsdur/dsdict-ja.yaml": {
+      "bytes": 14034528,
+      "sha256": "e9fcd8eaa2525cd86cb650a2958e361396c23c6540b015028ec1ca657a1a2d5a"
+    },
+    "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dsdur/dsdict-zh.yaml": {
+      "bytes": 14056685,
+      "sha256": "416de8864293396775fbaa3f009b96485a32afceb5f93e3248107272bf2586b8"
+    },
+    "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dsdur/dsdict.yaml": {
+      "bytes": 27603157,
+      "sha256": "e30e38a7795dadc8ec81153a237feba65b2204c9d5294119b4f21219bcaf2850"
+    },
+    "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dspitch/0102_qixuan_muon1_pitch.languages.json": {
+      "bytes": 39,
+      "sha256": "3266061fc2eec2796dca72ca49e9a88c66b932c57ab8ba19cbf17cd366c2f00c"
+    },
+    "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dspitch/0102_qixuan_muon1_pitch.phonemes.json": {
+      "bytes": 2300,
+      "sha256": "fc4843be18367a6406e3357c9987c70617310f7a1b6ad25a5e3c7ddbdf4bc39b"
+    },
+    "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dspitch/0102_qixuan_muon1_pitch.qixuan.linguistic.onnx": {
+      "bytes": 25397794,
+      "sha256": "4d16079f1cbff83df7f03327e0fd1b4654f00ec9debf5c605969f7eda00a02df"
+    },
+    "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dspitch/0102_qixuan_muon1_pitch.qixuan.pitch.onnx": {
+      "bytes": 59525074,
+      "sha256": "b4e33ff60f43e1959c9e9e5c0e2a2e8cc394b73b39f4fdb5590a98fdd67dcfc3"
+    },
+    "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dspitch/dsconfig.yaml": {
+      "bytes": 374,
+      "sha256": "62c3fe37c0729ca7a91bf04ae0fd5f78bdddf3f085e197881fb3c94bba9a27c6"
+    },
+    "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dspitch/dsdict.yaml": {
+      "bytes": 4958,
+      "sha256": "f6bcb5e02cc596b5fb277218e7fd695d6d3a2de1fc1b844535d156945d2e55c1"
+    },
+    "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dsvariance/0102_qixuan_muon1_multivar.languages.json": {
+      "bytes": 39,
+      "sha256": "3266061fc2eec2796dca72ca49e9a88c66b932c57ab8ba19cbf17cd366c2f00c"
+    },
+    "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dsvariance/0102_qixuan_muon1_multivar.phonemes.json": {
+      "bytes": 2339,
+      "sha256": "946f7188705017660319a377e8c3c65a8d4db5aea2669b502d615aa289d57d28"
+    },
+    "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dsvariance/0102_qixuan_muon1_multivar.qixuan.linguistic.onnx": {
+      "bytes": 25443762,
+      "sha256": "d6e28df87dbcede6cea1fd4ce45a6e54e030cd7e0c0795e99500408ee0935686"
+    },
+    "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dsvariance/0102_qixuan_muon1_multivar.qixuan.variance.onnx": {
+      "bytes": 23504232,
+      "sha256": "535a36e3b443bdc0b2531620024f1bb9fc9a26b5ec2f1bd310da340259b74c0f"
+    },
+    "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dsvariance/dsconfig.yaml": {
+      "bytes": 452,
+      "sha256": "6bd91504b3aed842e710a8873fead47c16ba41a1ee3744a1d4f5a3a725f30973"
+    },
+    "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/dsvariance/dsdict.yaml": {
+      "bytes": 4958,
+      "sha256": "f6bcb5e02cc596b5fb277218e7fd695d6d3a2de1fc1b844535d156945d2e55c1"
+    },
+    "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/qixuan.png": {
+      "bytes": 2347581,
+      "sha256": "7f15b00cc1f89fed0c98f44659ec8ec8052213de5999cd1b86b0730cf5232a99"
+    },
+    "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/qixuan1000x1000.png": {
+      "bytes": 1116555,
+      "sha256": "5009cedd98ac9f7b74c9aba8b4f319650be584cff634409db42b52322ebaf37d"
+    },
+    "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/qixuan256x256.png": {
+      "bytes": 120844,
+      "sha256": "64199fb3b511eeae73b31c511c70b0c7fd2367d92ac91f9641c221e1f184606d"
+    },
+    "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/Terms_of_Use.zh-CN.pdf": {
+      "bytes": 325563,
+      "sha256": "092973bd06414c97593e642bf14e2fbf03d0308f7b2d8ad43d59f7ba03a1f313"
+    },
+    "runtime/vocoder/NOTICE.txt": {
+      "bytes": 4103,
+      "sha256": "fcfca845812eb462e82f4c19985fce2abc772af979226b9297287c97e9a97f65"
+    },
+    "runtime/vocoder/NOTICE.zh-CN.txt": {
+      "bytes": 4031,
+      "sha256": "8983f1ac07a0b240b9d4c970c8081007b0f932e5e223d88f8f8aef0e6570ed81"
+    },
+    "runtime/vocoder/oudep.yaml": {
+      "bytes": 201,
+      "sha256": "19fbb04590e4608c422488afa8fe639c76792ab8ece010d81491a247e96164fb"
+    },
+    "runtime/vocoder/pc_nsf_hifigan_44.1k_hop512_128bin_2025.02.onnx": {
+      "bytes": 56616643,
+      "sha256": "b297c0c790dbcfe6b2123d87cc20bf8718969f91ffa3170a198c8fb53686155d"
+    },
+    "runtime/vocoder/STATEMENTS.txt": {
+      "bytes": 1762,
+      "sha256": "fe208abd522fd9e77ee16063ca2b3d6466fe3a35db70578f615d28543dd62d85"
+    },
+    "runtime/vocoder/vocoder.yaml": {
+      "bytes": 306,
+      "sha256": "860070499fe420bf2da9657ad7164eaedf31e7d7432f4ea0fc4eb1cea5ee5e08"
+    },
+    "profiles/qixuan-en.json": {
+      "bytes": 4671,
+      "sha256": "220de9179b1fd1ec89d33e8989a5ac01eb46acbe3cabed8f6d7c1a39c17c2aea"
+    },
+    "engine/LICENSE": {
+      "bytes": 13751,
+      "sha256": "af564aa77a53a4ee714a5e034a4ce12473b5faff3ef14eef1d189c5ca598ecab"
+    },
+    "engine/diffsinger_onnx.py": {
+      "bytes": 10126,
+      "sha256": "cdadad81261ff08fe17e9c92bc196acd2a0c41bd28e40c69e1ab0656a0b394eb"
+    }
+  },
+  "licenses": [
+    {
+      "policy_model": "mta-analysis",
+      "notice": "engine/LICENSE",
+      "evidence_url": "https://github.com/desalvo/mta-audio-editor"
+    },
+    {
+      "policy_model": "diffsinger-qixuan",
+      "notice": "runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/Terms_of_Use.zh-CN.pdf",
+      "evidence_url": "https://github.com/yqzhishen/qixuan-diffsinger/blob/main/terms_of_use/Terms_of_Use.zh-CN.md"
+    },
+    {
+      "policy_model": "diffsinger-vocoder",
+      "notice": "runtime/vocoder/NOTICE.txt",
+      "evidence_url": "https://openvpi.github.io/vocoders/"
+    }
+  ],
+  "original_releases": {
+    "bank_sha256": "fe8ee7c95883d327a2b7facbbe832a7a53e1344918dc791ca83fc23b08034110",
+    "vocoder_sha256": "ba7d43142d41f6900c8264b5662ca7125a50feb8760bb8b9615c61a8f5e6902e"
+  },
+  "changes": "Original bank/vocoder bytes unmodified and complete; added MTA runner evidence and English phone profile. Score F0/durations; explicit variance defaults, no predicted variance."
+}

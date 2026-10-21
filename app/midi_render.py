@@ -14,7 +14,10 @@ class Instrument(Vst):
         from .vst3_transport import HostClock
         self.pending=[];self.rate=rate;self.host=host or HostClock(rate=rate)
         self.clock=Clock(track,rate,start_frame,timeline=timeline)
-        if track.midi_route=='hardware':self.plugin=None;return
+        if track.midi_route in ('hardware','none'):self.plugin=None;return
+        if track.instrument and track.instrument.enabled and track.instrument.plugin=='gm_soundfont':
+            from .gm_instruments import Synth
+            self.item=track.instrument;self.plugin=Synth(track.instrument.params,rate);return
         if not track.instrument or not track.instrument.enabled or track.instrument.plugin!='vst3':
             raise ValueError('MIDI: select and enable a VST3 instrument before playback or export')
         if reuse and reuse.item.params.get('path')==track.instrument.params.get('path'):
@@ -22,6 +25,16 @@ class Instrument(Vst):
             self.plugin=reuse.plugin;self.plugin.reset();self.item=track.instrument;self.rate=rate
             apply_parameters(self.plugin,{k:v for k,v in self.item.params.items() if k!='path' and v!=reuse.item.params.get(k)})
         else:super().__init__(track.instrument,rate,instrument=True,host=self.host,start_frame=start_frame)
+
+    def values(self):
+        if self.item.plugin=='gm_soundfont':return dict(self.plugin.params)
+        return super().values()
+
+    def set_parameters(self, values):
+        if self.item.plugin=='gm_soundfont':self.plugin.configure(values)
+        else:
+            from .vst3_host import apply_parameters
+            apply_parameters(self.plugin,values)
 
     def enqueue_ump(self,messages):
         from .midi_ump import vst_message
@@ -58,9 +71,12 @@ def render_source(track,target,rate):
     from .audio_engine import ensure_clips
     ensure_clips(track)
     duration=max(50,max((clip.timeline_start_ms+track.delay_ms+clip.duration_ms for clip in track.clips),default=0))
-    if track.midi_route!='hardware':
+    if track.midi_route not in ('hardware','none'):
         if not track.instrument:raise ValueError('MIDI: select a VST3 instrument')
-        validate_plugin_path(str(track.instrument.params.get('path','')))
+        if track.instrument.plugin=='gm_soundfont':
+            from .gm_instruments import validate,bank_path
+            bank_path(validate(track.instrument.params)['bank_id'])
+        else:validate_plugin_path(str(track.instrument.params.get('path','')))
     with tempfile.TemporaryDirectory(prefix='mta-midi-render-') as directory:
         config=Path(directory)/'midi.json'
         from .vst3_transport import render_settings
@@ -75,12 +91,35 @@ def run(config):
     from .models import Track
     data=json.loads(Path(config).read_text());track=Track.model_validate(data['track']);rate=int(data['rate'])
     if rate not in (44100,48000,96000):raise ValueError('Invalid MIDI sample rate')
+    import math
+    duration_ms = data.get('duration_ms', track.duration_ms)
+    if type(duration_ms) not in (int, float) or not math.isfinite(duration_ms) or duration_ms <= 0:
+        raise ValueError('Invalid MIDI render duration')
+    total=max(1,round(duration_ms*rate/1000))
+    limit=max(16*1024**2,min(64*1024**3,int(os.getenv('MTA_SERVER_VST3_DRY_LIMIT_BYTES',str(4*1024**3)))))
+    if total*8+4096>limit:raise ValueError('MIDI rendering exceeds the configured prepared-audio size limit')
     from .vst3_transport import HostClock
     host=HostClock(rate=rate);host.data=data.get('transport') or {}
     instrument=Instrument(track,rate,timeline=True,host=host)
-    total=max(1,round(data.get('duration_ms',track.duration_ms)*rate/1000))
-    limit=max(16*1024**2,min(64*1024**3,int(os.getenv('MTA_SERVER_VST3_DRY_LIMIT_BYTES',str(4*1024**3)))))
-    if total*8+4096>limit:raise ValueError('MIDI rendering exceeds the configured prepared-audio size limit')
-    with sf.SoundFile(data['target'],'w',samplerate=rate,channels=2,subtype='FLOAT') as writer:
-        for start in range(0,total,BLOCK):writer.write(instrument.read(min(BLOCK,total-start)))
+    # Publish only fully rendered audio. A failed plug-in or exhausted disk must
+    # never destroy a previously successful render at the requested destination.
+    target = Path(data['target'])
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(prefix='.mta-midi-', suffix='.wav',
+                                         dir=target.parent, delete=False) as staged:
+            temporary = Path(staged.name)
+        with sf.SoundFile(str(temporary), 'w', samplerate=rate, channels=2, subtype='FLOAT') as writer:
+            for start in range(0, total, BLOCK):
+                block = instrument.read(min(BLOCK, total-start))
+                import numpy as np
+                if (not isinstance(block, np.ndarray) or block.shape != (min(BLOCK, total-start), 2)
+                        or not np.isfinite(block).all()):
+                    raise RuntimeError('MIDI worker received invalid audio')
+                writer.write(block)
+        os.replace(temporary, target)
+        temporary = None
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
     return 0

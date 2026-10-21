@@ -1,0 +1,1191 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="29" skipped="7" tests="37" time="24.367" timestamp="2026-10-20T23:28:20.938075+02:00" hostname="8b43cef6b5a2"><testcase classname="tests.test_backing_vocals_123" name="test_configured_ai_separator_uses_no_shell" time="0.004"><failure message="ValueError: Authenticated global AI job required">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f3004fbc350&gt;
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-16/test_configured_ai_separator_u0')
+
+    def test_configured_ai_separator_uses_no_shell(monkeypatch, tmp_path):
+        src = tmp_path / "vocals.wav"
+        src.write_bytes(b"RIFF")
+        monkeypatch.setenv("MTA_LEAD_BACKING_COMMAND", "fake-separator --input {input} --lead {lead} --backing {backing}")
+        monkeypatch.setenv("MTA_LEAD_BACKING_MODEL", "karaoke-ai")
+    
+        class Proc:
+            returncode = 0
+            stdout = None
+            def poll(self):
+                return 0
+    
+        def fake_popen(command, **kwargs):
+            assert isinstance(command, list)
+            assert kwargs.get("stdout") is not None
+            lead = Path(command[command.index("--lead") + 1])
+            backing = Path(command[command.index("--backing") + 1])
+            lead.write_bytes(b"lead")
+            backing.write_bytes(b"backing")
+            return Proc()
+    
+        monkeypatch.setattr(main.subprocess, "Popen", fake_popen)
+&gt;       lead, backing, method = main._split_lead_backing_vocals(src, tmp_path / "out")
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_backing_vocals_123.py:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/main.py:4616: in _split_lead_backing_vocals
+    result, remote_id = _native_remote_infer('backing-vocals', vocal_stem, {'model':model_id or LEAD_BACKING_DEFAULT_MODEL})
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/main.py:3320: in _native_remote_infer
+    return ai_server_execution.infer(kind,source,options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/ai_server_execution.py:27: in infer
+    user_id=identity()
+            ^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def identity():
+        from .ai_global_execution import current_job
+        from . import ai_arranger_runtime as queue
+        jid=current_job.get()
+        if jid:
+            with queue._db() as con:row=con.execute('SELECT actor_user_id FROM jobs WHERE job_id=?',(jid,)).fetchone()
+            if row and type(row[0]) is int and row[0]&gt;0:return row[0]
+&gt;       raise ValueError('Authenticated global AI job required')
+E       ValueError: Authenticated global AI job required
+
+app/ai_server_execution.py:22: ValueError</failure></testcase><testcase classname="tests.test_backing_vocals_123" name="test_ffmpeg_fallback_builds_center_side_outputs" time="0.001"><failure message="ValueError: Authenticated global AI job required">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f2fe5848c20&gt;
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-16/test_ffmpeg_fallback_builds_ce0')
+
+    def test_ffmpeg_fallback_builds_center_side_outputs(monkeypatch, tmp_path):
+        src = tmp_path / "vocals.wav"
+        src.write_bytes(b"RIFF")
+        monkeypatch.delenv("MTA_LEAD_BACKING_COMMAND", raising=False)
+        monkeypatch.setattr(main.shutil, "which", lambda name: "/usr/bin/ffmpeg" if name == "ffmpeg" else None)
+    
+        class Result:
+            returncode = 0
+            stderr = ""
+    
+        def fake_run(command, **kwargs):
+            assert "-filter_complex" in command
+            Path(next(x for x in command if str(x).endswith("lead_vocals.wav"))).write_bytes(b"lead")
+            Path(next(x for x in command if str(x).endswith("backing_vocals.wav"))).write_bytes(b"backing")
+            return Result()
+    
+        monkeypatch.setattr(main.subprocess, "run", fake_run)
+&gt;       lead, backing, method = main._split_lead_backing_vocals(src, tmp_path / "out", model_id="ffmpeg-center-side")
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_backing_vocals_123.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/main.py:4616: in _split_lead_backing_vocals
+    result, remote_id = _native_remote_infer('backing-vocals', vocal_stem, {'model':model_id or LEAD_BACKING_DEFAULT_MODEL})
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/main.py:3320: in _native_remote_infer
+    return ai_server_execution.infer(kind,source,options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/ai_server_execution.py:27: in infer
+    user_id=identity()
+            ^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def identity():
+        from .ai_global_execution import current_job
+        from . import ai_arranger_runtime as queue
+        jid=current_job.get()
+        if jid:
+            with queue._db() as con:row=con.execute('SELECT actor_user_id FROM jobs WHERE job_id=?',(jid,)).fetchone()
+            if row and type(row[0]) is int and row[0]&gt;0:return row[0]
+&gt;       raise ValueError('Authenticated global AI job required')
+E       ValueError: Authenticated global AI job required
+
+app/ai_server_execution.py:22: ValueError</failure></testcase><testcase classname="tests.test_lyrics_chords_110" name="test_text_music_worker_updates_project_for_lyrics_and_chords" time="0.004"><failure message="AssertionError: assert 'failed' == 'completed'&#10;  &#10;  - completed&#10;  + failed">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f2fe584aed0&gt;
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-16/test_text_music_worker_updates0')
+
+    def test_text_music_worker_updates_project_for_lyrics_and_chords(monkeypatch, tmp_path):
+        import app.main as main
+        from app.models import Chord, LyricLine, Project, Track
+    
+        source = tmp_path / "voice.wav"; source.write_bytes(b"x")
+        project = Project(id="p1", title="Song", target="DAW", tracks=[Track(id="t1", name="Voice", filename="voice.wav", duration_ms=1000)])
+        saved = []
+        monkeypatch.setattr(main, "load_project", lambda pid: project)
+        monkeypatch.setattr(main, "save_project", lambda p: saved.append(p.model_copy(deep=True)))
+        monkeypatch.setattr(main, "audio_path", lambda pid, filename: source)
+        monkeypatch.setattr(main, "extract_lyrics", lambda path: [LyricLine(time_ms=100, text="hello")])
+        monkeypatch.setattr(main, "extract_chords", lambda path: [Chord(time_ms=120, chord="C")])
+        monkeypatch.setattr(main, "map_source_events_to_timeline", lambda track, events: events)
+    
+        for kind in ("lyrics", "chords"):
+            jid = f"job-{kind}"
+            with main.MEDIA_JOB_LOCK:
+                main.MEDIA_JOBS[jid] = {"id": jid, "kind": kind, "project_id": "p1", "status": "queued", "progress": 0, "message": "", "created_at": 0, "updated_at": 0, "result": None, "error": None}
+            main._text_music_worker(jid, "p1", "t1", kind)
+            with main.MEDIA_JOB_LOCK:
+                job = dict(main.MEDIA_JOBS[jid])
+&gt;           assert job["status"] == "completed"
+E           AssertionError: assert 'failed' == 'completed'
+E             
+E             - completed
+E             + failed
+
+tests/test_lyrics_chords_110.py:107: AssertionError</failure></testcase><testcase classname="tests.test_lyrics_chords_110" name="test_text_music_worker_failure_is_reported" time="0.003"><failure message="AssertionError: assert 'boom' in 'Authenticated global AI job required'">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f2fe5859af0&gt;
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-16/test_text_music_worker_failure0')
+
+    def test_text_music_worker_failure_is_reported(monkeypatch, tmp_path):
+        import app.main as main
+        from app.models import Project, Track
+        project = Project(id="p2", title="Song", target="DAW", tracks=[Track(id="t2", name="Voice", filename="x.wav", duration_ms=100)])
+        monkeypatch.setattr(main, "load_project", lambda pid: project)
+        monkeypatch.setattr(main, "audio_path", lambda pid, filename: tmp_path / filename)
+        monkeypatch.setattr(main, "extract_lyrics", lambda path: (_ for _ in ()).throw(RuntimeError("boom")))
+        jid = "job-fail"
+        with main.MEDIA_JOB_LOCK:
+            main.MEDIA_JOBS[jid] = {"id": jid, "kind": "lyrics", "project_id": "p2", "status": "queued", "progress": 0, "message": "", "created_at": 0, "updated_at": 0, "result": None, "error": None}
+        main._text_music_worker(jid, "p2", "t2", "lyrics")
+        with main.MEDIA_JOB_LOCK:
+            job = dict(main.MEDIA_JOBS[jid])
+        assert job["status"] == "failed"
+&gt;       assert "boom" in job["error"]
+E       AssertionError: assert 'boom' in 'Authenticated global AI job required'
+
+tests/test_lyrics_chords_110.py:128: AssertionError</failure></testcase><testcase classname="tests.test_mega53_adapter_r210" name="test_catalog_and_policy_identity" time="0.001"><failure message="AssertionError: assert 'mvsep-mega53' == 'uvr-kara-2'&#10;  &#10;  - uvr-kara-2&#10;  + mvsep-mega53">def test_catalog_and_policy_identity():
+        assert any(m['id'] == 'mvsep-mega53' for m in LEAD_BACKING_MODELS)
+        assert selected('backing-vocals', {'model':'mvsep-mega53'}) == 'mvsep-mega53'
+&gt;       assert selected('backing-vocals', {}) == 'uvr-kara-2'
+E       AssertionError: assert 'mvsep-mega53' == 'uvr-kara-2'
+E         
+E         - uvr-kara-2
+E         + mvsep-mega53
+
+tests/test_mega53_adapter_r210.py:13: AssertionError</failure></testcase><testcase classname="tests.test_mega53_adapter_r210" name="test_adapter_with_synthetic_stub" time="0.001"><failure message="RuntimeError: Mega 53 requires a regular absolute Python interpreter file">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-16/test_adapter_with_synthetic_st0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f2fe5826750&gt;
+
+    def test_adapter_with_synthetic_stub(tmp_path, monkeypatch):
+        """Contract-only test; no real checkpoint or quality measurement."""
+        monkeypatch.setattr('app.model_license_policy.evaluate_model', lambda x: None)
+        root=tmp_path/'upstream';root.mkdir()
+        (root/'inference.py').write_text('''import argparse\nfrom pathlib import Path\np=argparse.ArgumentParser()\nfor k in ("model_type", "config_path", "start_check_point", "input_folder", "store_dir"):p.add_argument("--"+k)\na=p.parse_args()\nout=Path(a.store_dir);out.mkdir(parents=True,exist_ok=True)\n(out/"mta_input_lead-vocal.wav").write_bytes(b"RIFFlead")\n(out/"mta_input_back-vocal.wav").write_bytes(b"RIFFback")\n''')
+        config=tmp_path/'config.yaml'; config.write_text('config')
+        ckpt=tmp_path/'weight.ckpt'; ckpt.write_bytes(b'checkpoint')
+        source=tmp_path/'song.wav';source.write_bytes(b'RIFFsong')
+        for key,value in [('MTA_MEGA53_ROOT',root),('MTA_MEGA53_CONFIG',config),('MTA_MEGA53_CHECKPOINT',ckpt),('MTA_MEGA53_PYTHON',sys.executable)]:monkeypatch.setenv(key,str(value))
+        monkeypatch.setattr(mega53_runtime, 'verify_mega53_checkpoint', lambda value: Path(value))
+&gt;       lead,backing,engine=mega53_runtime.infer(source,tmp_path/'output')
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_mega53_adapter_r210.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/mega53_runtime.py:55: in infer
+    python = _verified_file(os.getenv('MTA_MEGA53_PYTHON', sys.executable), 'Python interpreter')
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+value = '/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python'
+label = 'Python interpreter'
+
+    def _verified_file(value, label):
+        path = Path(value).expanduser()
+        if not path.is_absolute() or not path.is_file() or path.is_symlink():
+&gt;           raise RuntimeError(f'Mega 53 requires a regular absolute {label} file')
+E           RuntimeError: Mega 53 requires a regular absolute Python interpreter file
+
+app/mega53_runtime.py:31: RuntimeError</failure></testcase><testcase classname="tests.test_r195_chord_ml_runtime" name="test_download_btc_and_chordformer_with_fake_archives" time="0.004"><failure message="app.model_license_policy.LicenseDenied: Model disabled pending license review: chordformer. Contact the administrator; cost recovery alone does not grant permission.">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f2fe57eee40&gt;
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-16/test_download_btc_and_chordfor0')
+
+    def test_download_btc_and_chordformer_with_fake_archives(monkeypatch, tmp_path):
+        monkeypatch.setenv("MTA_CHORD_ML_MODEL_DIR", str(tmp_path / "models"))
+        btc = _zip_bytes({"btc-hcqt-main/btc_hcqt_beatlesft.pt": b"pt", "btc-hcqt-main/hcqt_eval.py": "print('x')"})
+        body = _zip_bytes({"BTC-ISMIR19-master/btc_model.py": "# body"})
+        cf = _zip_bytes({**{f"ChordFormer-main/cache_data/fold{i}.sdict": b"x" for i in range(5)}, "ChordFormer-main/chord_recognition.py": "# infer"})
+        def fake_download(url, dest):
+            if "btc-hcqt" in url: data = btc
+            elif "BTC-ISMIR19" in url: data = body
+            else: data = cf
+            dest.write_bytes(data)
+        monkeypatch.setattr(chord_ml, "_download_zip", fake_download)
+        info = chord_ml.download_model("btc-hcqt")
+        assert info["id"] == "btc-hcqt" and chord_ml.installed("btc-hcqt")
+        assert (chord_ml.model_dir("btc-hcqt") / "BTC-ISMIR19" / "btc_model.py").is_file()
+&gt;       info = chord_ml.download_model("chordformer")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_r195_chord_ml_runtime.py:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/chord_ml.py:93: in download_model
+    evaluate_model(model_id)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model_id = 'chordformer'
+
+    def evaluate_model(model_id):
+        known=CATALOG.get(model_id,('Unreviewed model/weights','disabled',''))
+        custom=overrides().get(model_id,{})
+        mode=custom.get('mode',known[1])
+        if mode not in ('disabled','free_only','cost_recovery'):raise LicenseDenied('Invalid model licensing mode')
+        if mode=='cost_recovery' and not commercial_service_enabled():
+            raise LicenseDenied('Commercial service is globally disabled; this model must have a reviewed free-only authorization')
+&gt;       if mode=='disabled':raise LicenseDenied('Model disabled pending license review: '+model_id+'. Contact the administrator; cost recovery alone does not grant permission.')
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       app.model_license_policy.LicenseDenied: Model disabled pending license review: chordformer. Contact the administrator; cost recovery alone does not grant permission.
+
+app/model_license_policy.py:162: LicenseDenied</failure></testcase><testcase classname="tests.test_r195_chord_ml_runtime" name="test_download_validates_missing_checkpoints" time="0.001"><failure message="app.model_license_policy.LicenseDenied: Model disabled pending license review: chordformer. Contact the administrator; cost recovery alone does not grant permission.">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f2fe57effb0&gt;
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-16/test_download_validates_missin0')
+
+    def test_download_validates_missing_checkpoints(monkeypatch, tmp_path):
+        monkeypatch.setenv("MTA_CHORD_ML_MODEL_DIR", str(tmp_path / "models"))
+        weak = _zip_bytes({"repo/chord_recognition.py": "# no checkpoints"})
+        monkeypatch.setattr(chord_ml, "_download_zip", lambda url, dest: dest.write_bytes(weak))
+        with pytest.raises(RuntimeError, match="checkpoints"):
+&gt;           chord_ml.download_model("chordformer")
+
+tests/test_r195_chord_ml_runtime.py:71: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/chord_ml.py:93: in download_model
+    evaluate_model(model_id)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model_id = 'chordformer'
+
+    def evaluate_model(model_id):
+        known=CATALOG.get(model_id,('Unreviewed model/weights','disabled',''))
+        custom=overrides().get(model_id,{})
+        mode=custom.get('mode',known[1])
+        if mode not in ('disabled','free_only','cost_recovery'):raise LicenseDenied('Invalid model licensing mode')
+        if mode=='cost_recovery' and not commercial_service_enabled():
+            raise LicenseDenied('Commercial service is globally disabled; this model must have a reviewed free-only authorization')
+&gt;       if mode=='disabled':raise LicenseDenied('Model disabled pending license review: '+model_id+'. Contact the administrator; cost recovery alone does not grant permission.')
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       app.model_license_policy.LicenseDenied: Model disabled pending license review: chordformer. Contact the administrator; cost recovery alone does not grant permission.
+
+app/model_license_policy.py:162: LicenseDenied</failure></testcase><testcase classname="tests.test_r207_gateway_adapter_coverage" name="test_backing_vocals_artifact_security" time="0.007"><failure message="AssertionError: Regex pattern did not match.&#10;  Expected regex: 'configure'&#10;  Actual message: 'Mega 53 requires a local absolute upstream directory'">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-16/test_backing_vocals_artifact_s0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f2fe57ef0e0&gt;
+
+    def test_backing_vocals_artifact_security(tmp_path, monkeypatch):
+        from model_rights_fixtures import authorize_fixture
+        authorize_fixture(monkeypatch,tmp_path,'audio-separator-weights')
+        source, output = _staged(tmp_path)
+        class Separator:
+            outputs = []
+            def __init__(self, **kwargs):
+                pass
+            def load_model(self, **kwargs):
+                pass
+            def separate(self, source):
+                return self.outputs
+        package = types.ModuleType('audio_separator')
+        sub = types.ModuleType('audio_separator.separator')
+        sub.Separator = Separator
+        monkeypatch.setitem(sys.modules, 'audio_separator', package)
+        monkeypatch.setitem(sys.modules, 'audio_separator.separator', sub)
+        monkeypatch.setitem(sys.modules, 'torch', types.SimpleNamespace(version=types.SimpleNamespace(hip=None)))
+&gt;       with pytest.raises(RuntimeError, match='configure'):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'configure'
+E         Actual message: 'Mega 53 requires a local absolute upstream directory'
+
+tests/test_r207_gateway_adapter_coverage.py:215: AssertionError</failure></testcase><testcase classname="tests.test_r208_agent_refinement" name="test_agent_rejects_untrusted_snapshot[change0]" time="2.002"><failure message="assert False&#10; +  where False = wait(2)&#10; +    where wait = &lt;threading.Event at 0x7f2fe5826720: unset&gt;.wait">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-16/test_agent_rejects_untrusted_s0')
+change = {'timestamp': 0}
+
+    @pytest.mark.parametrize('change', [
+        {'timestamp': 0}, {'timestamp': 'now'},
+        {'processes': None}, {'processes': [{'host_pid': True, 'gpu': 0}]},
+        {'processes': [{'host_pid': 22, 'gpu': '0'}]},
+        {'processes': [{'host_pid': 22, 'gpu': 0, 'host_cgroup': []}]},
+        {'billing_eligible': True},
+    ])
+    def test_agent_rejects_untrusted_snapshot(tmp_path, change):
+        path = tmp_path / 'agent.sock'
+&gt;       thread = _serve_once(path, _payload(**change))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_r208_agent_refinement.py:50: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/pytest-of-root/pytest-16/test_agent_rejects_untrusted_s0/agent.sock')
+payload = {'schema': 'mta-gpu-host-agent-v1', 'timestamp': 0, 'processes': [{'host_pid': 124, 'gpu': 0, 'host_cgroup': '0::/lxc.scope'}], 'billing_eligible': False}
+
+    def _serve_once(path, payload):
+        ready = threading.Event()
+    
+        def serve():
+            with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as sock:
+                sock.bind(str(path))
+                sock.listen(1)
+                ready.set()
+                connection, _ = sock.accept()
+                with connection:
+                    connection.recv(4096)
+                    connection.sendall((json.dumps(payload) + '\n').encode())
+    
+        thread = threading.Thread(target=serve, daemon=True)
+        thread.start()
+&gt;       assert ready.wait(2)
+E       assert False
+E        +  where False = wait(2)
+E        +    where wait = &lt;threading.Event at 0x7f2fe5826720: unset&gt;.wait
+
+tests/test_r208_agent_refinement.py:29: AssertionError</failure></testcase><testcase classname="tests.test_r208_agent_refinement" name="test_agent_rejects_untrusted_snapshot[change1]" time="2.001"><failure message="assert False&#10; +  where False = wait(2)&#10; +    where wait = &lt;threading.Event at 0x7f2fe5b260c0: unset&gt;.wait">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-16/test_agent_rejects_untrusted_s1')
+change = {'timestamp': 'now'}
+
+    @pytest.mark.parametrize('change', [
+        {'timestamp': 0}, {'timestamp': 'now'},
+        {'processes': None}, {'processes': [{'host_pid': True, 'gpu': 0}]},
+        {'processes': [{'host_pid': 22, 'gpu': '0'}]},
+        {'processes': [{'host_pid': 22, 'gpu': 0, 'host_cgroup': []}]},
+        {'billing_eligible': True},
+    ])
+    def test_agent_rejects_untrusted_snapshot(tmp_path, change):
+        path = tmp_path / 'agent.sock'
+&gt;       thread = _serve_once(path, _payload(**change))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_r208_agent_refinement.py:50: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/pytest-of-root/pytest-16/test_agent_rejects_untrusted_s1/agent.sock')
+payload = {'schema': 'mta-gpu-host-agent-v1', 'timestamp': 'now', 'processes': [{'host_pid': 124, 'gpu': 0, 'host_cgroup': '0::/lxc.scope'}], 'billing_eligible': False}
+
+    def _serve_once(path, payload):
+        ready = threading.Event()
+    
+        def serve():
+            with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as sock:
+                sock.bind(str(path))
+                sock.listen(1)
+                ready.set()
+                connection, _ = sock.accept()
+                with connection:
+                    connection.recv(4096)
+                    connection.sendall((json.dumps(payload) + '\n').encode())
+    
+        thread = threading.Thread(target=serve, daemon=True)
+        thread.start()
+&gt;       assert ready.wait(2)
+E       assert False
+E        +  where False = wait(2)
+E        +    where wait = &lt;threading.Event at 0x7f2fe5b260c0: unset&gt;.wait
+
+tests/test_r208_agent_refinement.py:29: AssertionError</failure></testcase><testcase classname="tests.test_r208_agent_refinement" name="test_agent_rejects_untrusted_snapshot[change2]" time="2.002"><failure message="assert False&#10; +  where False = wait(2)&#10; +    where wait = &lt;threading.Event at 0x7f3004e119d0: unset&gt;.wait">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-16/test_agent_rejects_untrusted_s2')
+change = {'processes': None}
+
+    @pytest.mark.parametrize('change', [
+        {'timestamp': 0}, {'timestamp': 'now'},
+        {'processes': None}, {'processes': [{'host_pid': True, 'gpu': 0}]},
+        {'processes': [{'host_pid': 22, 'gpu': '0'}]},
+        {'processes': [{'host_pid': 22, 'gpu': 0, 'host_cgroup': []}]},
+        {'billing_eligible': True},
+    ])
+    def test_agent_rejects_untrusted_snapshot(tmp_path, change):
+        path = tmp_path / 'agent.sock'
+&gt;       thread = _serve_once(path, _payload(**change))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_r208_agent_refinement.py:50: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/pytest-of-root/pytest-16/test_agent_rejects_untrusted_s2/agent.sock')
+payload = {'schema': 'mta-gpu-host-agent-v1', 'timestamp': 1792531706, 'processes': None, 'billing_eligible': False}
+
+    def _serve_once(path, payload):
+        ready = threading.Event()
+    
+        def serve():
+            with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as sock:
+                sock.bind(str(path))
+                sock.listen(1)
+                ready.set()
+                connection, _ = sock.accept()
+                with connection:
+                    connection.recv(4096)
+                    connection.sendall((json.dumps(payload) + '\n').encode())
+    
+        thread = threading.Thread(target=serve, daemon=True)
+        thread.start()
+&gt;       assert ready.wait(2)
+E       assert False
+E        +  where False = wait(2)
+E        +    where wait = &lt;threading.Event at 0x7f3004e119d0: unset&gt;.wait
+
+tests/test_r208_agent_refinement.py:29: AssertionError</failure></testcase><testcase classname="tests.test_r208_agent_refinement" name="test_agent_rejects_untrusted_snapshot[change3]" time="2.001"><failure message="assert False&#10; +  where False = wait(2)&#10; +    where wait = &lt;threading.Event at 0x7f3004e11010: unset&gt;.wait">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-16/test_agent_rejects_untrusted_s3')
+change = {'processes': [{'host_pid': True, 'gpu': 0}]}
+
+    @pytest.mark.parametrize('change', [
+        {'timestamp': 0}, {'timestamp': 'now'},
+        {'processes': None}, {'processes': [{'host_pid': True, 'gpu': 0}]},
+        {'processes': [{'host_pid': 22, 'gpu': '0'}]},
+        {'processes': [{'host_pid': 22, 'gpu': 0, 'host_cgroup': []}]},
+        {'billing_eligible': True},
+    ])
+    def test_agent_rejects_untrusted_snapshot(tmp_path, change):
+        path = tmp_path / 'agent.sock'
+&gt;       thread = _serve_once(path, _payload(**change))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_r208_agent_refinement.py:50: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/pytest-of-root/pytest-16/test_agent_rejects_untrusted_s3/agent.sock')
+payload = {'schema': 'mta-gpu-host-agent-v1', 'timestamp': 1792531708, 'processes': [{'host_pid': True, 'gpu': 0}], 'billing_eligible': False}
+
+    def _serve_once(path, payload):
+        ready = threading.Event()
+    
+        def serve():
+            with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as sock:
+                sock.bind(str(path))
+                sock.listen(1)
+                ready.set()
+                connection, _ = sock.accept()
+                with connection:
+                    connection.recv(4096)
+                    connection.sendall((json.dumps(payload) + '\n').encode())
+    
+        thread = threading.Thread(target=serve, daemon=True)
+        thread.start()
+&gt;       assert ready.wait(2)
+E       assert False
+E        +  where False = wait(2)
+E        +    where wait = &lt;threading.Event at 0x7f3004e11010: unset&gt;.wait
+
+tests/test_r208_agent_refinement.py:29: AssertionError</failure></testcase><testcase classname="tests.test_r208_agent_refinement" name="test_agent_rejects_untrusted_snapshot[change4]" time="2.002"><failure message="assert False&#10; +  where False = wait(2)&#10; +    where wait = &lt;threading.Event at 0x7f30050757c0: unset&gt;.wait">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-16/test_agent_rejects_untrusted_s4')
+change = {'processes': [{'host_pid': 22, 'gpu': '0'}]}
+
+    @pytest.mark.parametrize('change', [
+        {'timestamp': 0}, {'timestamp': 'now'},
+        {'processes': None}, {'processes': [{'host_pid': True, 'gpu': 0}]},
+        {'processes': [{'host_pid': 22, 'gpu': '0'}]},
+        {'processes': [{'host_pid': 22, 'gpu': 0, 'host_cgroup': []}]},
+        {'billing_eligible': True},
+    ])
+    def test_agent_rejects_untrusted_snapshot(tmp_path, change):
+        path = tmp_path / 'agent.sock'
+&gt;       thread = _serve_once(path, _payload(**change))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_r208_agent_refinement.py:50: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/pytest-of-root/pytest-16/test_agent_rejects_untrusted_s4/agent.sock')
+payload = {'schema': 'mta-gpu-host-agent-v1', 'timestamp': 1792531710, 'processes': [{'host_pid': 22, 'gpu': '0'}], 'billing_eligible': False}
+
+    def _serve_once(path, payload):
+        ready = threading.Event()
+    
+        def serve():
+            with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as sock:
+                sock.bind(str(path))
+                sock.listen(1)
+                ready.set()
+                connection, _ = sock.accept()
+                with connection:
+                    connection.recv(4096)
+                    connection.sendall((json.dumps(payload) + '\n').encode())
+    
+        thread = threading.Thread(target=serve, daemon=True)
+        thread.start()
+&gt;       assert ready.wait(2)
+E       assert False
+E        +  where False = wait(2)
+E        +    where wait = &lt;threading.Event at 0x7f30050757c0: unset&gt;.wait
+
+tests/test_r208_agent_refinement.py:29: AssertionError</failure></testcase><testcase classname="tests.test_r208_agent_refinement" name="test_agent_rejects_untrusted_snapshot[change5]" time="2.002"><failure message="assert False&#10; +  where False = wait(2)&#10; +    where wait = &lt;threading.Event at 0x7f30050774a0: unset&gt;.wait">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-16/test_agent_rejects_untrusted_s5')
+change = {'processes': [{'host_pid': 22, 'gpu': 0, 'host_cgroup': []}]}
+
+    @pytest.mark.parametrize('change', [
+        {'timestamp': 0}, {'timestamp': 'now'},
+        {'processes': None}, {'processes': [{'host_pid': True, 'gpu': 0}]},
+        {'processes': [{'host_pid': 22, 'gpu': '0'}]},
+        {'processes': [{'host_pid': 22, 'gpu': 0, 'host_cgroup': []}]},
+        {'billing_eligible': True},
+    ])
+    def test_agent_rejects_untrusted_snapshot(tmp_path, change):
+        path = tmp_path / 'agent.sock'
+&gt;       thread = _serve_once(path, _payload(**change))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_r208_agent_refinement.py:50: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/pytest-of-root/pytest-16/test_agent_rejects_untrusted_s5/agent.sock')
+payload = {'schema': 'mta-gpu-host-agent-v1', 'timestamp': 1792531712, 'processes': [{'host_pid': 22, 'gpu': 0, 'host_cgroup': []}], 'billing_eligible': False}
+
+    def _serve_once(path, payload):
+        ready = threading.Event()
+    
+        def serve():
+            with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as sock:
+                sock.bind(str(path))
+                sock.listen(1)
+                ready.set()
+                connection, _ = sock.accept()
+                with connection:
+                    connection.recv(4096)
+                    connection.sendall((json.dumps(payload) + '\n').encode())
+    
+        thread = threading.Thread(target=serve, daemon=True)
+        thread.start()
+&gt;       assert ready.wait(2)
+E       assert False
+E        +  where False = wait(2)
+E        +    where wait = &lt;threading.Event at 0x7f30050774a0: unset&gt;.wait
+
+tests/test_r208_agent_refinement.py:29: AssertionError</failure></testcase><testcase classname="tests.test_r208_agent_refinement" name="test_agent_rejects_untrusted_snapshot[change6]" time="2.002"><failure message="assert False&#10; +  where False = wait(2)&#10; +    where wait = &lt;threading.Event at 0x7f3005076150: unset&gt;.wait">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-16/test_agent_rejects_untrusted_s6')
+change = {'billing_eligible': True}
+
+    @pytest.mark.parametrize('change', [
+        {'timestamp': 0}, {'timestamp': 'now'},
+        {'processes': None}, {'processes': [{'host_pid': True, 'gpu': 0}]},
+        {'processes': [{'host_pid': 22, 'gpu': '0'}]},
+        {'processes': [{'host_pid': 22, 'gpu': 0, 'host_cgroup': []}]},
+        {'billing_eligible': True},
+    ])
+    def test_agent_rejects_untrusted_snapshot(tmp_path, change):
+        path = tmp_path / 'agent.sock'
+&gt;       thread = _serve_once(path, _payload(**change))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_r208_agent_refinement.py:50: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/pytest-of-root/pytest-16/test_agent_rejects_untrusted_s6/agent.sock')
+payload = {'schema': 'mta-gpu-host-agent-v1', 'timestamp': 1792531714, 'processes': [{'host_pid': 124, 'gpu': 0, 'host_cgroup': '0::/lxc.scope'}], 'billing_eligible': True}
+
+    def _serve_once(path, payload):
+        ready = threading.Event()
+    
+        def serve():
+            with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as sock:
+                sock.bind(str(path))
+                sock.listen(1)
+                ready.set()
+                connection, _ = sock.accept()
+                with connection:
+                    connection.recv(4096)
+                    connection.sendall((json.dumps(payload) + '\n').encode())
+    
+        thread = threading.Thread(target=serve, daemon=True)
+        thread.start()
+&gt;       assert ready.wait(2)
+E       assert False
+E        +  where False = wait(2)
+E        +    where wait = &lt;threading.Event at 0x7f3005076150: unset&gt;.wait
+
+tests/test_r208_agent_refinement.py:29: AssertionError</failure></testcase><testcase classname="tests.test_r208_agent_refinement" name="test_valid_agent_snapshot_is_diagnostic_only" time="2.002"><failure message="assert False&#10; +  where False = wait(2)&#10; +    where wait = &lt;threading.Event at 0x7f300506e6f0: unset&gt;.wait">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-16/test_valid_agent_snapshot_is_d0')
+
+    def test_valid_agent_snapshot_is_diagnostic_only(tmp_path):
+        path = tmp_path / 'agent.sock'
+&gt;       thread = _serve_once(path, _payload())
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_r208_agent_refinement.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/pytest-of-root/pytest-16/test_valid_agent_snapshot_is_d0/agent.sock')
+payload = {'schema': 'mta-gpu-host-agent-v1', 'timestamp': 1792531716, 'processes': [{'host_pid': 124, 'gpu': 0, 'host_cgroup': '0::/lxc.scope'}], 'billing_eligible': False}
+
+    def _serve_once(path, payload):
+        ready = threading.Event()
+    
+        def serve():
+            with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as sock:
+                sock.bind(str(path))
+                sock.listen(1)
+                ready.set()
+                connection, _ = sock.accept()
+                with connection:
+                    connection.recv(4096)
+                    connection.sendall((json.dumps(payload) + '\n').encode())
+    
+        thread = threading.Thread(target=serve, daemon=True)
+        thread.start()
+&gt;       assert ready.wait(2)
+E       assert False
+E        +  where False = wait(2)
+E        +    where wait = &lt;threading.Event at 0x7f300506e6f0: unset&gt;.wait
+
+tests/test_r208_agent_refinement.py:29: AssertionError</failure></testcase><testcase classname="tests.test_r208_lxc_gpu_diagnostic" name="test_live_diagnostic_redacts_secrets_and_pid" time="2.002"><failure message="assert False&#10; +  where False = wait(2)&#10; +    where wait = &lt;threading.Event at 0x7f300506fb00: unset&gt;.wait">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-16/test_live_diagnostic_redacts_s0')
+
+    def test_live_diagnostic_redacts_secrets_and_pid(tmp_path):
+        secret = 'a' * 48
+        (tmp_path / 'token').write_text(secret)
+        target = tmp_path / 'agent.sock'
+        ready = threading.Event()
+        def serve():
+            with socket.socket(socket.AF_UNIX) as listener:
+                listener.bind(str(target))
+                listener.listen(1)
+                ready.set()
+                with listener.accept()[0] as conn:
+                    request = json.loads(conn.recv(4096))
+                    assert request['token'] == secret
+                    payload = {'schema': 'mta-gpu-host-agent-v1', 'source': 'host-amd-smi',
+                               'timestamp': int(time.time()), 'billing_eligible': False,
+                               'processes': [{'gpu': 0, 'host_pid': 12345, 'host_cgroup': '/sensitive'}]}
+                    conn.sendall((json.dumps(payload) + '\n').encode())
+        thread = threading.Thread(target=serve, daemon=True)
+        thread.start()
+&gt;       assert ready.wait(2)
+E       assert False
+E        +  where False = wait(2)
+E        +    where wait = &lt;threading.Event at 0x7f300506fb00: unset&gt;.wait
+
+tests/test_r208_lxc_gpu_diagnostic.py:34: AssertionError</failure></testcase><testcase classname="tests.test_r208_proxmox_agent" name="test_malformed_agent_reply_fail_closed" time="3.002"><failure message="assert False&#10; +  where False = wait(3)&#10; +    where wait = &lt;threading.Event at 0x7f30050743b0: unset&gt;.wait">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-16/test_malformed_agent_reply_fai0')
+
+    def test_malformed_agent_reply_fail_closed(tmp_path):
+        target = str(tmp_path / 'gpu.sock')
+        ready = threading.Event()
+        def responder():
+            with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as sock:
+                sock.bind(target)
+                sock.listen(1)
+                ready.set()
+                conn, _ = sock.accept()
+                with conn:
+                    conn.recv(4096)
+                    conn.sendall(b'{"schema":"wrong"}\n')
+        t = threading.Thread(target=responder, daemon=True)
+        t.start()
+&gt;       assert ready.wait(3)
+E       assert False
+E        +  where False = wait(3)
+E        +    where wait = &lt;threading.Event at 0x7f30050743b0: unset&gt;.wait
+
+tests/test_r208_proxmox_agent.py:35: AssertionError</failure></testcase><testcase classname="tests.test_r209_windows_native_startup_diagnostics" name="test_native_preserves_actual_lifespan_error_without_console" time="0.078" /><testcase classname="tests.test_r210_live_mixer_progress" name="test_browser_per_plugin_progress_and_terminal_states[en-False]" time="0.001"><skipped type="pytest.skip" message="could not import 'playwright.sync_api': No module named 'playwright'">/workspace/scratch/8a88b26d57cf/baseline/tests/test_r210_live_mixer_progress.py:155: could not import 'playwright.sync_api': No module named 'playwright'</skipped></testcase><testcase classname="tests.test_r210_live_mixer_progress" name="test_browser_per_plugin_progress_and_terminal_states[en-True]" time="0.000"><skipped type="pytest.skip" message="could not import 'playwright.sync_api': No module named 'playwright'">/workspace/scratch/8a88b26d57cf/baseline/tests/test_r210_live_mixer_progress.py:155: could not import 'playwright.sync_api': No module named 'playwright'</skipped></testcase><testcase classname="tests.test_r210_live_mixer_progress" name="test_browser_per_plugin_progress_and_terminal_states[it-False]" time="0.000"><skipped type="pytest.skip" message="could not import 'playwright.sync_api': No module named 'playwright'">/workspace/scratch/8a88b26d57cf/baseline/tests/test_r210_live_mixer_progress.py:155: could not import 'playwright.sync_api': No module named 'playwright'</skipped></testcase><testcase classname="tests.test_r210_live_mixer_progress" name="test_browser_per_plugin_progress_and_terminal_states[it-True]" time="0.000"><skipped type="pytest.skip" message="could not import 'playwright.sync_api': No module named 'playwright'">/workspace/scratch/8a88b26d57cf/baseline/tests/test_r210_live_mixer_progress.py:155: could not import 'playwright.sync_api': No module named 'playwright'</skipped></testcase><testcase classname="tests.test_r210_live_mixer_progress" name="test_native_live_mixer_uses_bridge_without_saving_and_updates_meters" time="0.001"><skipped type="pytest.skip" message="could not import 'playwright.sync_api': No module named 'playwright'">/workspace/scratch/8a88b26d57cf/baseline/tests/test_r210_live_mixer_progress.py:200: could not import 'playwright.sync_api': No module named 'playwright'</skipped></testcase><testcase classname="tests.test_r210_native_vst3_media" name="test_server_keeps_admin_role_and_native_alias_boundary" time="0.023"><failure message="AssertionError: assert 401 == 404&#10; +  where 401 = &lt;Response [401 Unauthorized]&gt;.status_code&#10; +    where &lt;Response [401 Unauthorized]&gt; = get('/api/native/optional-vst3')&#10; +      where get = &lt;starlette.testclient.TestClient object at 0x7f2fe55e5fd0&gt;.get">native = &lt;starlette.testclient.TestClient object at 0x7f2fe55e5fd0&gt;
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f2fe55e7fb0&gt;
+
+    def test_server_keeps_admin_role_and_native_alias_boundary(native,monkeypatch):
+        monkeypatch.setattr(main,'NATIVE_SINGLE_USER',False)
+        monkeypatch.setenv('MTA_NATIVE_SINGLE_USER','false')
+&gt;       assert native.get('/api/native/optional-vst3').status_code==404
+E       AssertionError: assert 401 == 404
+E        +  where 401 = &lt;Response [401 Unauthorized]&gt;.status_code
+E        +    where &lt;Response [401 Unauthorized]&gt; = get('/api/native/optional-vst3')
+E        +      where get = &lt;starlette.testclient.TestClient object at 0x7f2fe55e5fd0&gt;.get
+
+tests/test_r210_native_vst3_media.py:61: AssertionError</failure></testcase><testcase classname="tests.test_r210_native_vst3_media" name="test_plugin_plain_text_error_is_readable_and_not_json_exception[en]" time="0.001"><skipped type="pytest.skip" message="could not import 'playwright.sync_api': No module named 'playwright'">/workspace/scratch/8a88b26d57cf/baseline/tests/test_r210_native_vst3_media.py:147: could not import 'playwright.sync_api': No module named 'playwright'</skipped></testcase><testcase classname="tests.test_r210_native_vst3_media" name="test_plugin_plain_text_error_is_readable_and_not_json_exception[it]" time="0.001"><skipped type="pytest.skip" message="could not import 'playwright.sync_api': No module named 'playwright'">/workspace/scratch/8a88b26d57cf/baseline/tests/test_r210_native_vst3_media.py:147: could not import 'playwright.sync_api': No module named 'playwright'</skipped></testcase><testcase classname="tests.test_r22_sdk_checkout" name="test_sdk_cmake_rejects_incomplete_checkout" time="0.002"><failure message="FileNotFoundError: [Errno 2] No such file or directory: 'cmake'">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-16/test_sdk_cmake_rejects_incompl0')
+
+    def test_sdk_cmake_rejects_incomplete_checkout(tmp_path):
+        root = Path(__file__).resolve().parents[1]
+        sdk = tmp_path / "sdk"
+        sdk.mkdir()
+        (sdk / "LICENSE.txt").write_text("MIT\n", encoding="utf-8")
+&gt;       result = subprocess.run(
+            ["cmake", "-S", str(root / "native/vst3_probe"),
+             "-B", str(tmp_path / "build"), f"-DMTA_VST3_SDK_ROOT={sdk}"],
+            capture_output=True, text=True, check=False, timeout=40,
+        )
+
+tests/test_r22_sdk_checkout.py:11: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py:548: in run
+    with Popen(*popenargs, **kwargs) as process:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py:1026: in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;Popen: returncode: 255 args: ['cmake', '-S', '/workspace/scratch/8a88b26d57...&gt;
+args = ['cmake', '-S', '/workspace/scratch/8a88b26d57cf/baseline/native/vst3_probe', '-B', '/tmp/pytest-of-root/pytest-16/tes...cmake_rejects_incompl0/build', '-DMTA_VST3_SDK_ROOT=/tmp/pytest-of-root/pytest-16/test_sdk_cmake_rejects_incompl0/sdk']
+executable = b'cmake', preexec_fn = None, close_fds = True, pass_fds = ()
+cwd = None, env = None, startupinfo = None, creationflags = 0, shell = False
+p2cread = -1, p2cwrite = -1, c2pread = 12, c2pwrite = 13, errread = 14
+errwrite = 15, restore_signals = True, gid = None, gids = None, uid = None
+umask = -1, start_new_session = False, process_group = -1
+
+    def _execute_child(self, args, executable, preexec_fn, close_fds,
+                       pass_fds, cwd, env,
+                       startupinfo, creationflags, shell,
+                       p2cread, p2cwrite,
+                       c2pread, c2pwrite,
+                       errread, errwrite,
+                       restore_signals,
+                       gid, gids, uid, umask,
+                       start_new_session, process_group):
+        """Execute program (POSIX version)"""
+    
+        if isinstance(args, (str, bytes)):
+            args = [args]
+        elif isinstance(args, os.PathLike):
+            if shell:
+                raise TypeError('path-like args is not allowed when '
+                                'shell is true')
+            args = [args]
+        else:
+            args = list(args)
+    
+        if shell:
+            # On Android the default shell is at '/system/bin/sh'.
+            unix_shell = ('/system/bin/sh' if
+                      hasattr(sys, 'getandroidapilevel') else '/bin/sh')
+            args = [unix_shell, "-c"] + args
+            if executable:
+                args[0] = executable
+    
+        if executable is None:
+            executable = args[0]
+    
+        sys.audit("subprocess.Popen", executable, args, cwd, env)
+    
+        if (_USE_POSIX_SPAWN
+                and os.path.dirname(executable)
+                and preexec_fn is None
+                and not close_fds
+                and not pass_fds
+                and cwd is None
+                and (p2cread == -1 or p2cread &gt; 2)
+                and (c2pwrite == -1 or c2pwrite &gt; 2)
+                and (errwrite == -1 or errwrite &gt; 2)
+                and not start_new_session
+                and process_group == -1
+                and gid is None
+                and gids is None
+                and uid is None
+                and umask &lt; 0):
+            self._posix_spawn(args, executable, env, restore_signals,
+                              p2cread, p2cwrite,
+                              c2pread, c2pwrite,
+                              errread, errwrite)
+            return
+    
+        orig_executable = executable
+    
+        # For transferring possible exec failure from child to parent.
+        # Data format: "exception name:hex errno:description"
+        # Pickle is not used; it is complex and involves memory allocation.
+        errpipe_read, errpipe_write = os.pipe()
+        # errpipe_write must not be in the standard io 0, 1, or 2 fd range.
+        low_fds_to_close = []
+        while errpipe_write &lt; 3:
+            low_fds_to_close.append(errpipe_write)
+            errpipe_write = os.dup(errpipe_write)
+        for low_fd in low_fds_to_close:
+            os.close(low_fd)
+        try:
+            try:
+                # We must avoid complex work that could involve
+                # malloc or free in the child process to avoid
+                # potential deadlocks, thus we do all this here.
+                # and pass it to fork_exec()
+    
+                if env is not None:
+                    env_list = []
+                    for k, v in env.items():
+                        k = os.fsencode(k)
+                        if b'=' in k:
+                            raise ValueError("illegal environment variable name")
+                        env_list.append(k + b'=' + os.fsencode(v))
+                else:
+                    env_list = None  # Use execv instead of execve.
+                executable = os.fsencode(executable)
+                if os.path.dirname(executable):
+                    executable_list = (executable,)
+                else:
+                    # This matches the behavior of os._execvpe().
+                    executable_list = tuple(
+                        os.path.join(os.fsencode(dir), executable)
+                        for dir in os.get_exec_path(env))
+                fds_to_keep = set(pass_fds)
+                fds_to_keep.add(errpipe_write)
+                self.pid = _fork_exec(
+                        args, executable_list,
+                        close_fds, tuple(sorted(map(int, fds_to_keep))),
+                        cwd, env_list,
+                        p2cread, p2cwrite, c2pread, c2pwrite,
+                        errread, errwrite,
+                        errpipe_read, errpipe_write,
+                        restore_signals, start_new_session,
+                        process_group, gid, gids, uid, umask,
+                        preexec_fn, _USE_VFORK)
+                self._child_created = True
+            finally:
+                # be sure the FD is closed no matter what
+                os.close(errpipe_write)
+    
+            self._close_pipe_fds(p2cread, p2cwrite,
+                                 c2pread, c2pwrite,
+                                 errread, errwrite)
+    
+            # Wait for exec to fail or succeed; possibly raising an
+            # exception (limited in size)
+            errpipe_data = bytearray()
+            while True:
+                part = os.read(errpipe_read, 50000)
+                errpipe_data += part
+                if not part or len(errpipe_data) &gt; 50000:
+                    break
+        finally:
+            # be sure the FD is closed no matter what
+            os.close(errpipe_read)
+    
+        if errpipe_data:
+            try:
+                pid, sts = os.waitpid(self.pid, 0)
+                if pid == self.pid:
+                    self._handle_exitstatus(sts)
+                else:
+                    self.returncode = sys.maxsize
+            except ChildProcessError:
+                pass
+    
+            try:
+                exception_name, hex_errno, err_msg = (
+                        errpipe_data.split(b':', 2))
+                # The encoding here should match the encoding
+                # written in by the subprocess implementations
+                # like _posixsubprocess
+                err_msg = err_msg.decode()
+            except ValueError:
+                exception_name = b'SubprocessError'
+                hex_errno = b'0'
+                err_msg = 'Bad exception data from child: {!r}'.format(
+                              bytes(errpipe_data))
+            child_exception_type = getattr(
+                    builtins, exception_name.decode('ascii'),
+                    SubprocessError)
+            if issubclass(child_exception_type, OSError) and hex_errno:
+                errno_num = int(hex_errno, 16)
+                if err_msg == "noexec:chdir":
+                    err_msg = ""
+                    # The error must be from chdir(cwd).
+                    err_filename = cwd
+                elif err_msg == "noexec":
+                    err_msg = ""
+                    err_filename = None
+                else:
+                    err_filename = orig_executable
+                if errno_num != 0:
+                    err_msg = os.strerror(errno_num)
+                if err_filename is not None:
+&gt;                   raise child_exception_type(errno_num, err_msg, err_filename)
+E                   FileNotFoundError: [Errno 2] No such file or directory: 'cmake'
+
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py:1955: FileNotFoundError</failure></testcase><testcase classname="tests.test_r266_separator_output_paths" name="test_audio_separator_relative_output_filenames" time="0.004"><failure message="ValueError: Authenticated global AI job required">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f2fe4fd4230&gt;
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-16/test_audio_separator_relative_0')
+
+    def test_audio_separator_relative_output_filenames(monkeypatch, tmp_path):
+        from model_rights_fixtures import authorize_fixture
+        authorize_fixture(monkeypatch,tmp_path,'audio-separator-weights')
+        source = tmp_path / "vocals.wav"
+        source.write_bytes(b"input")
+        output = tmp_path / "job" / "stems"
+        output.mkdir(parents=True)
+        monkeypatch.delenv("MTA_LEAD_BACKING_COMMAND", raising=False)
+        monkeypatch.setattr(main, "_lead_backing_model_info", lambda name: {"installed": True, "filename": "UVR_MDXNET_KARA_2.onnx"})
+        torch = types.ModuleType("torch")
+        torch.empty = lambda *args: None
+        ops = types.ModuleType("torchvision.ops")
+        ops.nms = lambda *args: None
+        tv = types.ModuleType("torchvision")
+        tv.ops = ops
+        monkeypatch.setitem(sys.modules, "torch", torch)
+        monkeypatch.setitem(sys.modules, "torchvision", tv)
+        monkeypatch.setitem(sys.modules, "torchvision.ops", ops)
+    
+        class Separator:
+            def __init__(self, **kwargs):
+                assert Path(kwargs["output_dir"]) == output
+            def load_model(self, **kwargs):
+                pass
+            def separate(self, path):
+                (output / "vocals_(Vocals)_UVR_MDXNET_KARA_2.WAV").write_bytes(b"lead")
+                (output / "vocals_(Instrumental)_UVR_MDXNET_KARA_2.WAV").write_bytes(b"backing")
+                return ["vocals_(Vocals)_UVR_MDXNET_KARA_2.WAV", "vocals_(Instrumental)_UVR_MDXNET_KARA_2.WAV"]
+        module = types.ModuleType("audio_separator.separator")
+        module.Separator = Separator
+        monkeypatch.setitem(sys.modules, "audio_separator", types.ModuleType("audio_separator"))
+        monkeypatch.setitem(sys.modules, "audio_separator.separator", module)
+&gt;       lead, backing, method = main._split_lead_backing_vocals(source, output)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_r266_separator_output_paths.py:39: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/main.py:4616: in _split_lead_backing_vocals
+    result, remote_id = _native_remote_infer('backing-vocals', vocal_stem, {'model':model_id or LEAD_BACKING_DEFAULT_MODEL})
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/main.py:3320: in _native_remote_infer
+    return ai_server_execution.infer(kind,source,options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/ai_server_execution.py:27: in infer
+    user_id=identity()
+            ^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def identity():
+        from .ai_global_execution import current_job
+        from . import ai_arranger_runtime as queue
+        jid=current_job.get()
+        if jid:
+            with queue._db() as con:row=con.execute('SELECT actor_user_id FROM jobs WHERE job_id=?',(jid,)).fetchone()
+            if row and type(row[0]) is int and row[0]&gt;0:return row[0]
+&gt;       raise ValueError('Authenticated global AI job required')
+E       ValueError: Authenticated global AI job required
+
+app/ai_server_execution.py:22: ValueError</failure></testcase><testcase classname="tests.test_r270_sam_percussion" name="test_sam_requires_separate_configured_runtime" time="0.001"><failure message="ValueError: Authenticated global AI job required">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-16/test_sam_requires_separate_con0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f2fe4fd5070&gt;
+
+    def test_sam_requires_separate_configured_runtime(tmp_path, monkeypatch):
+        monkeypatch.delenv('MTA_SAM_AUDIO_PYTHON', raising=False)
+        with pytest.raises(RuntimeError, match='MTA_SAM_AUDIO_PYTHON'):
+&gt;           main._sam_audio_extract(tmp_path / 'in.wav', tmp_path, 'sam-audio-small', 'percussions')
+
+tests/test_r270_sam_percussion.py:17: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/main.py:4783: in _sam_audio_extract
+    result, _ = _native_remote_infer('sam-audio',source,{'model':model_id,'prompt':_SAM_PROMPTS.get(target,'singing voice'),'anchors':anchors or []})
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/main.py:3320: in _native_remote_infer
+    return ai_server_execution.infer(kind,source,options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/ai_server_execution.py:27: in infer
+    user_id=identity()
+            ^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def identity():
+        from .ai_global_execution import current_job
+        from . import ai_arranger_runtime as queue
+        jid=current_job.get()
+        if jid:
+            with queue._db() as con:row=con.execute('SELECT actor_user_id FROM jobs WHERE job_id=?',(jid,)).fetchone()
+            if row and type(row[0]) is int and row[0]&gt;0:return row[0]
+&gt;       raise ValueError('Authenticated global AI job required')
+E       ValueError: Authenticated global AI job required
+
+app/ai_server_execution.py:22: ValueError</failure></testcase><testcase classname="tests.test_r270_sam_percussion" name="test_sam_worker_invokes_requested_instrument" time="0.001"><failure message="ValueError: Authenticated global AI job required">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-16/test_sam_worker_invokes_reques0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f2fe54bd370&gt;
+
+    def test_sam_worker_invokes_requested_instrument(tmp_path, monkeypatch):
+        monkeypatch.setenv('MTA_SAM_AUDIO_PYTHON', '/optional/python')
+        def fake_run(args, **kwargs):
+            assert args[0] == '/optional/python'
+            assert args[args.index('--prompt') + 1] == main._SAM_PROMPTS['cymbals']
+            Path(args[args.index('--output') + 1]).write_bytes(b'RIFF' + b'0'*60)
+            return type('Process', (), {'returncode': 0, 'stderr': '', 'stdout': ''})()
+        with patch.object(main.subprocess if hasattr(main, 'subprocess') else __import__('subprocess'), 'run', side_effect=fake_run):
+&gt;           output = main._sam_audio_extract(tmp_path / 'drums.wav', tmp_path / 'output', 'sam-audio-base', 'cymbals')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_r270_sam_percussion.py:28: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/main.py:4783: in _sam_audio_extract
+    result, _ = _native_remote_infer('sam-audio',source,{'model':model_id,'prompt':_SAM_PROMPTS.get(target,'singing voice'),'anchors':anchors or []})
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/main.py:3320: in _native_remote_infer
+    return ai_server_execution.infer(kind,source,options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/ai_server_execution.py:27: in infer
+    user_id=identity()
+            ^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def identity():
+        from .ai_global_execution import current_job
+        from . import ai_arranger_runtime as queue
+        jid=current_job.get()
+        if jid:
+            with queue._db() as con:row=con.execute('SELECT actor_user_id FROM jobs WHERE job_id=?',(jid,)).fetchone()
+            if row and type(row[0]) is int and row[0]&gt;0:return row[0]
+&gt;       raise ValueError('Authenticated global AI job required')
+E       ValueError: Authenticated global AI job required
+
+app/ai_server_execution.py:22: ValueError</failure></testcase><testcase classname="tests.test_r271_drumsep_adapter" name="test_drumsep_requires_model_file" time="0.004"><failure message="ValueError: Authenticated global AI job required">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-16/test_drumsep_requires_model_fi0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f2fe4fd7920&gt;
+
+    def test_drumsep_requires_model_file(tmp_path, monkeypatch):
+        from model_rights_fixtures import authorize_fixture
+        authorize_fixture(monkeypatch,tmp_path,'drumsep-weights')
+        monkeypatch.setattr(main, '_DRUMSEP_PATH', tmp_path / 'missing.onnx')
+        with pytest.raises(RuntimeError, match='not installed'):
+&gt;           main._drumsep_extract(tmp_path / 'source.wav', tmp_path / 'out', {'snare'})
+
+tests/test_r271_drumsep_adapter.py:20: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/main.py:5615: in _drumsep_extract
+    result, _ = _native_remote_infer('drumsep',source,{'targets':sorted(targets)})
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/main.py:3320: in _native_remote_infer
+    return ai_server_execution.infer(kind,source,options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/ai_server_execution.py:27: in infer
+    user_id=identity()
+            ^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def identity():
+        from .ai_global_execution import current_job
+        from . import ai_arranger_runtime as queue
+        jid=current_job.get()
+        if jid:
+            with queue._db() as con:row=con.execute('SELECT actor_user_id FROM jobs WHERE job_id=?',(jid,)).fetchone()
+            if row and type(row[0]) is int and row[0]&gt;0:return row[0]
+&gt;       raise ValueError('Authenticated global AI job required')
+E       ValueError: Authenticated global AI job required
+
+app/ai_server_execution.py:22: ValueError</failure></testcase><testcase classname="tests.test_r271_drumsep_adapter" name="test_drumsep_selective_output" time="0.005"><failure message="ValueError: Authenticated global AI job required">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-16/test_drumsep_selective_output0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f2fe4fd6ab0&gt;
+
+    def test_drumsep_selective_output(tmp_path, monkeypatch):
+        from model_rights_fixtures import authorize_fixture
+        authorize_fixture(monkeypatch,tmp_path,'drumsep-weights')
+        model = tmp_path / 'model.onnx'; model.write_bytes(b'test')
+        monkeypatch.setattr(main, '_DRUMSEP_PATH', model)
+        def fake_run(args, **kwargs):
+            dest=Path(args[args.index('--output')+1]); dest.mkdir(parents=True, exist_ok=True)
+            for n in ('kick','snare','toms','cymbals'):
+                (dest / f'{n}.wav').write_bytes(b'RIFF'+b'0'*100)
+            return type('Completed',(),{'returncode':0,'stderr':'','stdout':''})()
+        with patch.object(main.subprocess,'run',side_effect=fake_run):
+&gt;           paths=main._drumsep_extract(tmp_path/'source.wav',tmp_path/'output',{'snare'})
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_r271_drumsep_adapter.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/main.py:5615: in _drumsep_extract
+    result, _ = _native_remote_infer('drumsep',source,{'targets':sorted(targets)})
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/main.py:3320: in _native_remote_infer
+    return ai_server_execution.infer(kind,source,options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/ai_server_execution.py:27: in infer
+    user_id=identity()
+            ^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def identity():
+        from .ai_global_execution import current_job
+        from . import ai_arranger_runtime as queue
+        jid=current_job.get()
+        if jid:
+            with queue._db() as con:row=con.execute('SELECT actor_user_id FROM jobs WHERE job_id=?',(jid,)).fetchone()
+            if row and type(row[0]) is int and row[0]&gt;0:return row[0]
+&gt;       raise ValueError('Authenticated global AI job required')
+E       ValueError: Authenticated global AI job required
+
+app/ai_server_execution.py:22: ValueError</failure></testcase><testcase classname="tests.test_r276_multi_singer" name="test_sam_temporal_anchors_separate_every_or_one_singer" time="0.001"><failure message="ValueError: Authenticated global AI job required">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-16/test_sam_temporal_anchors_sepa0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f2fe4fd7aa0&gt;
+
+    def test_sam_temporal_anchors_separate_every_or_one_singer(tmp_path, monkeypatch):
+        parsed, _ = main._parse_singers_json(json.dumps(SINGERS), 'sam-audio-large')
+        seen = []
+        def fake_infer(source, directory, model, target, anchors=None):
+            seen.append((Path(source), model, target, anchors))
+            directory.mkdir(parents=True, exist_ok=True)
+            result = directory / f'{target}.wav'
+            result.write_bytes(b'RIFF' + b'0'*90)
+            return result
+        monkeypatch.setattr(main, '_sam_audio_extract', fake_infer)
+        source = tmp_path / 'vocals.wav'
+&gt;       all_outputs = main._extract_singer_stems(source, tmp_path / 'all', 'sam-audio-large', parsed)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_r276_multi_singer.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/main.py:4869: in _extract_singer_stems
+    result,remote_id=_native_remote_infer('singer-separation',source,{'model':model,'singers':singers,'selected':selected})
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/main.py:3320: in _native_remote_infer
+    return ai_server_execution.infer(kind,source,options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/ai_server_execution.py:27: in infer
+    user_id=identity()
+            ^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def identity():
+        from .ai_global_execution import current_job
+        from . import ai_arranger_runtime as queue
+        jid=current_job.get()
+        if jid:
+            with queue._db() as con:row=con.execute('SELECT actor_user_id FROM jobs WHERE job_id=?',(jid,)).fetchone()
+            if row and type(row[0]) is int and row[0]&gt;0:return row[0]
+&gt;       raise ValueError('Authenticated global AI job required')
+E       ValueError: Authenticated global AI job required
+
+app/ai_server_execution.py:22: ValueError</failure></testcase><testcase classname="tests.test_r276_multi_singer" name="test_multi_singer_job_keeps_synchronized_tracks_and_selective_replacement" time="0.002"><failure message="AssertionError: Authenticated global AI job required&#10;assert 'failed' == 'completed'&#10;  &#10;  - completed&#10;  + failed">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-16/test_multi_singer_job_keeps_sy0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f2fe54bc920&gt;
+
+    def test_multi_singer_job_keeps_synchronized_tracks_and_selective_replacement(tmp_path, monkeypatch):
+        """Run the production job path with Demucs/SAM mocked, not the timeline/storage."""
+        import threading
+        import time
+        from app.models import Project, Track, Clip
+        project = Project(id='singertest', title='Duet test', tracks=[
+            Track(id='original', name='Original Mix', type='other', filename='original.wav',
+                  duration_ms=150000, clips=[Clip(id='originalclip', source_start_ms=0,
+                                                  source_end_ms=150000, timeline_start_ms=0)])
+        ])
+        monkeypatch.setattr(main, 'load_project', lambda pid: project)
+        monkeypatch.setattr(main, 'save_project', lambda current: None)
+        monkeypatch.setattr(main, 'audio_path', lambda pid, name: tmp_path / name)
+        monkeypatch.setattr(main, 'ffprobe', lambda src: {'duration':150.0})
+        monkeypatch.setattr(main, 'media_duration_ms', lambda dst: 150000)
+        monkeypatch.setattr(main, '_audio_channel_info', lambda dst: (2,'stereo'))
+        monkeypatch.setattr(main, '_normalize_audio_to_project_rate', lambda pid, name, rate, strict=False:(name,tmp_path/name,False))
+        def fake_demucs(src, output, **kwargs):
+            output.mkdir(parents=True, exist_ok=True)
+            results=[]
+            for name in ('vocals', 'bass'):
+                path=output/f'{name}.wav';path.write_bytes(b'RIFF'+b'0'*100);results.append(path)
+            return results
+        monkeypatch.setattr(main.STEM_SPLITTER, 'split', fake_demucs)
+        chosen=[]
+        def fake_singers(src, output, model, specs, selected):
+            chosen.append((src.name,model,selected))
+            output.mkdir(parents=True, exist_ok=True)
+            paths=[]
+            for singer in specs:
+                if selected=='all' or selected==singer['id']:
+                    path=output/f"{singer['id']}.wav";path.write_bytes(b'RIFF'+b'0'*100);paths.append(path)
+            return paths
+        monkeypatch.setattr(main, '_extract_singer_stems', fake_singers)
+        singers, _ = main._parse_singers_json(json.dumps(SINGERS), 'sam-audio-small')
+        def start(target):
+            job_id='r276'+target
+            main.STEM_JOBS[job_id]={
+                'id':job_id,'project_id':project.id,'status':'queued','progress':1,
+                'message':'queued','created_at':time.time(),'updated_at':time.time(),
+                'cancel_event':threading.Event(),'model':'htdemucs','stem_count':4,
+                'filename':'original.wav','source_track_id':'original','stem_targets':['all'],
+                'singer_mode':True,'singers':singers,'singer_target':target,
+                'singer_model':'sam-audio-small','estimate_bpm':False,
+            }
+            input_file=tmp_path/'original.wav';input_file.write_bytes(b'RIFF'+b'0'*100)
+            main._stem_split_worker(job_id,input_file,True)
+            job=main.STEM_JOBS.pop(job_id)
+            assert job['status']=='completed',job.get('error')
+&gt;       start('all')
+
+tests/test_r276_multi_singer.py:120: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+target = 'all'
+
+    def start(target):
+        job_id='r276'+target
+        main.STEM_JOBS[job_id]={
+            'id':job_id,'project_id':project.id,'status':'queued','progress':1,
+            'message':'queued','created_at':time.time(),'updated_at':time.time(),
+            'cancel_event':threading.Event(),'model':'htdemucs','stem_count':4,
+            'filename':'original.wav','source_track_id':'original','stem_targets':['all'],
+            'singer_mode':True,'singers':singers,'singer_target':target,
+            'singer_model':'sam-audio-small','estimate_bpm':False,
+        }
+        input_file=tmp_path/'original.wav';input_file.write_bytes(b'RIFF'+b'0'*100)
+        main._stem_split_worker(job_id,input_file,True)
+        job=main.STEM_JOBS.pop(job_id)
+&gt;       assert job['status']=='completed',job.get('error')
+E       AssertionError: Authenticated global AI job required
+E       assert 'failed' == 'completed'
+E         
+E         - completed
+E         + failed
+
+tests/test_r276_multi_singer.py:119: AssertionError</failure></testcase><testcase classname="tests.test_r276_workers_coverage" name="test_sam_audio_adapter_validation_and_subprocess" time="0.001"><failure message="AssertionError: Regex pattern did not match.&#10;  Expected regex: 'Unsupported'&#10;  Actual message: 'Authenticated global AI job required'">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f2fe54be360&gt;
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-16/test_sam_audio_adapter_validat0')
+
+    def test_sam_audio_adapter_validation_and_subprocess(monkeypatch, tmp_path):
+&gt;       with pytest.raises(ValueError, match="Unsupported"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'Unsupported'
+E         Actual message: 'Authenticated global AI job required'
+
+tests/test_r276_workers_coverage.py:82: AssertionError</failure></testcase></testsuite></testsuites>

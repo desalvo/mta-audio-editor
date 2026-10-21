@@ -3,12 +3,12 @@ from app.chordino_runtime import _discover_bundled_runtime, configure_chordino_e
 from app.music_text import _chord_templates, _simplify_chord_label
 
 
-def test_automatic_chord_vocabulary_is_conservative():
+def test_automatic_chord_vocabulary_is_extended():
     labels = {name for name, _ in _chord_templates()}
     assert 'C' in labels and 'Cm' in labels and 'C7' in labels and 'Cmaj7' in labels and 'Cm7' in labels
     assert 'Csus2' in labels and 'Csus4' in labels and 'Cdim' in labels and 'Caug' in labels
     for unwanted in ('C9', 'Cmaj9', 'Cm9', 'C7b9', 'C7#9', 'C7b5', 'C7#5', 'CmMaj7', 'Cm7b5', 'Cdim7', 'Cadd9'):
-        assert unwanted not in labels
+        assert unwanted in labels
 
 
 def test_complex_recognizer_labels_are_simplified_but_manual_vocabulary_can_remain_supported():

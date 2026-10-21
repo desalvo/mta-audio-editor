@@ -1,0 +1,2388 @@
+{
+  "schema": "mta-admin-model-sources-1",
+  "generated_on": "2026-10-21",
+  "license_approval_granted": false,
+  "sources": [
+    {
+      "id": "rvc-a5a4fa3c0de0d36a2bbaf07c",
+      "engine": "rvc",
+      "consumers": [
+        "rvc"
+      ],
+      "repo_id": "Saisho-Utane/Saisho-Model-RVC",
+      "revision": "7a61b17e4f014fc5013a489f2b5cd3a7ee9e2b1a",
+      "filename": "README.md",
+      "bytes": 1613,
+      "sha256": "a5a4fa3c0de0d36a2bbaf07c378ccffa79a819631c35d66cfbc8538a92a44f5a",
+      "url": "https://huggingface.co/Saisho-Utane/Saisho-Model-RVC/resolve/7a61b17e4f014fc5013a489f2b5cd3a7ee9e2b1a/README.md",
+      "source_url": "https://huggingface.co/Saisho-Utane/Saisho-Model-RVC/tree/7a61b17e4f014fc5013a489f2b5cd3a7ee9e2b1a",
+      "source_kind": "huggingface-model",
+      "license": "CC-BY-4.0",
+      "license_review_required": true,
+      "role": "voice-metadata",
+      "attribution": "Voice model created by Saisho Utane (https://huggingface.co/Saisho-Utane), used under CC BY 4.0."
+    },
+    {
+      "id": "rvc-fc9315b0587c910615497785",
+      "engine": "rvc",
+      "consumers": [
+        "rvc"
+      ],
+      "repo_id": "Saisho-Utane/Saisho-Model-RVC",
+      "revision": "7a61b17e4f014fc5013a489f2b5cd3a7ee9e2b1a",
+      "filename": "metadata.json",
+      "bytes": 1302,
+      "sha256": "fc9315b0587c910615497785bf05f7f7a54bfd04ff7b9a69ece26c2c5beea1fd",
+      "url": "https://huggingface.co/Saisho-Utane/Saisho-Model-RVC/resolve/7a61b17e4f014fc5013a489f2b5cd3a7ee9e2b1a/metadata.json",
+      "source_url": "https://huggingface.co/Saisho-Utane/Saisho-Model-RVC/tree/7a61b17e4f014fc5013a489f2b5cd3a7ee9e2b1a",
+      "source_kind": "huggingface-model",
+      "license": "CC-BY-4.0",
+      "license_review_required": true,
+      "role": "voice-metadata",
+      "attribution": "Voice model created by Saisho Utane (https://huggingface.co/Saisho-Utane), used under CC BY 4.0."
+    },
+    {
+      "id": "rvc-82312a29a3996a451aaa3d37",
+      "engine": "rvc",
+      "consumers": [
+        "rvc"
+      ],
+      "repo_id": "Saisho-Utane/Saisho-Model-RVC",
+      "revision": "7a61b17e4f014fc5013a489f2b5cd3a7ee9e2b1a",
+      "filename": "model.pth",
+      "bytes": 57577658,
+      "sha256": "82312a29a3996a451aaa3d3776566cec85b47b5414fce53da82b2d66b04f3d35",
+      "url": "https://huggingface.co/Saisho-Utane/Saisho-Model-RVC/resolve/7a61b17e4f014fc5013a489f2b5cd3a7ee9e2b1a/model.pth",
+      "source_url": "https://huggingface.co/Saisho-Utane/Saisho-Model-RVC/tree/7a61b17e4f014fc5013a489f2b5cd3a7ee9e2b1a",
+      "source_kind": "huggingface-model",
+      "license": "CC-BY-4.0",
+      "license_review_required": true,
+      "role": "voice-checkpoint",
+      "attribution": "Voice model created by Saisho Utane (https://huggingface.co/Saisho-Utane), used under CC BY 4.0."
+    },
+    {
+      "id": "seed-vc-42aef93ffe65857c840d2702",
+      "engine": "seed-vc",
+      "consumers": [
+        "seed-vc"
+      ],
+      "repo_id": "Plachta/Seed-VC",
+      "revision": "257283f9f41585055e8f858fba4fd044e5caed6e",
+      "filename": "DiT_seed_v2_uvit_whisper_base_f0_44k_bigvgan_pruned_ft_ema_v2.pth",
+      "bytes": 820865494,
+      "sha256": "42aef93ffe65857c840d270252fa040f7ba04514945ec460f3ac1ac2a96de684",
+      "url": "https://huggingface.co/Plachta/Seed-VC/resolve/257283f9f41585055e8f858fba4fd044e5caed6e/DiT_seed_v2_uvit_whisper_base_f0_44k_bigvgan_pruned_ft_ema_v2.pth",
+      "source_url": "https://huggingface.co/Plachta/Seed-VC/tree/257283f9f41585055e8f858fba4fd044e5caed6e",
+      "source_kind": "huggingface-model",
+      "license": "gpl-3.0",
+      "license_review_required": true,
+      "role": "singing-checkpoint"
+    },
+    {
+      "id": "seed-vc-d9fe7ec6bd0b44ed9d66973d",
+      "engine": "seed-vc",
+      "consumers": [
+        "seed-vc"
+      ],
+      "repo_id": "nvidia/bigvgan_v2_44khz_128band_512x",
+      "revision": "95a9d1dcb12906c03edd938d77b9333d6ded7dfb",
+      "filename": "bigvgan_generator.pt",
+      "bytes": 489041291,
+      "sha256": "d9fe7ec6bd0b44ed9d66973d5012d8181c1570b01e5c72df51973e241dccd357",
+      "url": "https://huggingface.co/nvidia/bigvgan_v2_44khz_128band_512x/resolve/95a9d1dcb12906c03edd938d77b9333d6ded7dfb/bigvgan_generator.pt",
+      "source_url": "https://huggingface.co/nvidia/bigvgan_v2_44khz_128band_512x/tree/95a9d1dcb12906c03edd938d77b9333d6ded7dfb",
+      "source_kind": "huggingface-model",
+      "license": "mit",
+      "license_review_required": true,
+      "role": "vocoder"
+    },
+    {
+      "id": "seed-vc-65b7f487bfaf15256056a75f",
+      "engine": "seed-vc",
+      "consumers": [
+        "seed-vc"
+      ],
+      "repo_id": "nvidia/bigvgan_v2_44khz_128band_512x",
+      "revision": "95a9d1dcb12906c03edd938d77b9333d6ded7dfb",
+      "filename": "config.json",
+      "bytes": 1403,
+      "sha256": "65b7f487bfaf15256056a75f6667ef5f640214c981922a111927873705ea4ddb",
+      "url": "https://huggingface.co/nvidia/bigvgan_v2_44khz_128band_512x/resolve/95a9d1dcb12906c03edd938d77b9333d6ded7dfb/config.json",
+      "source_url": "https://huggingface.co/nvidia/bigvgan_v2_44khz_128band_512x/tree/95a9d1dcb12906c03edd938d77b9333d6ded7dfb",
+      "source_kind": "huggingface-model",
+      "license": "mit",
+      "license_review_required": true,
+      "role": "vocoder"
+    },
+    {
+      "id": "seed-vc-209c68252dd23468b4f95991",
+      "engine": "seed-vc",
+      "consumers": [
+        "seed-vc"
+      ],
+      "repo_id": "nvidia/bigvgan_v2_44khz_128band_512x",
+      "revision": "95a9d1dcb12906c03edd938d77b9333d6ded7dfb",
+      "filename": "README.md",
+      "bytes": 8041,
+      "sha256": "209c68252dd23468b4f95991a1fb535b35f8fb603ac3937ed5d5eb2b1d993439",
+      "url": "https://huggingface.co/nvidia/bigvgan_v2_44khz_128band_512x/resolve/95a9d1dcb12906c03edd938d77b9333d6ded7dfb/README.md",
+      "source_url": "https://huggingface.co/nvidia/bigvgan_v2_44khz_128band_512x/tree/95a9d1dcb12906c03edd938d77b9333d6ded7dfb",
+      "source_kind": "huggingface-model",
+      "license": "mit",
+      "license_review_required": true,
+      "role": "vocoder"
+    },
+    {
+      "id": "seed-vc-1d7734884874f1a1513ed9aa",
+      "engine": "seed-vc",
+      "consumers": [
+        "seed-vc"
+      ],
+      "repo_id": "openai/whisper-small",
+      "revision": "973afd24965f72e36ca33b3055d56a652f456b4d",
+      "filename": "model.safetensors",
+      "bytes": 966995080,
+      "sha256": "1d7734884874f1a1513ed9aa760a4f8e97aaa02fd6d93a3a85d27b2ae9ca596b",
+      "url": "https://huggingface.co/openai/whisper-small/resolve/973afd24965f72e36ca33b3055d56a652f456b4d/model.safetensors",
+      "source_url": "https://huggingface.co/openai/whisper-small/tree/973afd24965f72e36ca33b3055d56a652f456b4d",
+      "source_kind": "huggingface-model",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "semantic-encoder"
+    },
+    {
+      "id": "seed-vc-e6a2b489da1b5aed65a8eb8d",
+      "engine": "seed-vc",
+      "consumers": [
+        "seed-vc"
+      ],
+      "repo_id": "openai/whisper-small",
+      "revision": "973afd24965f72e36ca33b3055d56a652f456b4d",
+      "filename": "config.json",
+      "bytes": 1967,
+      "sha256": "e6a2b489da1b5aed65a8eb8d1e7466fa867ad5643a8bc138ba708bd56b2875c4",
+      "url": "https://huggingface.co/openai/whisper-small/resolve/973afd24965f72e36ca33b3055d56a652f456b4d/config.json",
+      "source_url": "https://huggingface.co/openai/whisper-small/tree/973afd24965f72e36ca33b3055d56a652f456b4d",
+      "source_kind": "huggingface-model",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "semantic-encoder"
+    },
+    {
+      "id": "seed-vc-9b5cd03a36fbb8a627c64d98",
+      "engine": "seed-vc",
+      "consumers": [
+        "seed-vc"
+      ],
+      "repo_id": "openai/whisper-small",
+      "revision": "973afd24965f72e36ca33b3055d56a652f456b4d",
+      "filename": "preprocessor_config.json",
+      "bytes": 184990,
+      "sha256": "9b5cd03a36fbb8a627c64d98a5b5b126ead95a77720723944487311f0110b666",
+      "url": "https://huggingface.co/openai/whisper-small/resolve/973afd24965f72e36ca33b3055d56a652f456b4d/preprocessor_config.json",
+      "source_url": "https://huggingface.co/openai/whisper-small/tree/973afd24965f72e36ca33b3055d56a652f456b4d",
+      "source_kind": "huggingface-model",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "semantic-encoder"
+    },
+    {
+      "id": "seed-vc-967fa44eefe5d3436e040b0f",
+      "engine": "seed-vc",
+      "consumers": [
+        "seed-vc"
+      ],
+      "repo_id": "openai/whisper-small",
+      "revision": "973afd24965f72e36ca33b3055d56a652f456b4d",
+      "filename": "README.md",
+      "bytes": 20153,
+      "sha256": "967fa44eefe5d3436e040b0f171fc54da67aad96923bae10af37dac9be5bb6b0",
+      "url": "https://huggingface.co/openai/whisper-small/resolve/973afd24965f72e36ca33b3055d56a652f456b4d/README.md",
+      "source_url": "https://huggingface.co/openai/whisper-small/tree/973afd24965f72e36ca33b3055d56a652f456b4d",
+      "source_kind": "huggingface-model",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "semantic-encoder"
+    },
+    {
+      "id": "seed-vc-ff86f343b08c2def405f0750",
+      "engine": "seed-vc",
+      "consumers": [
+        "seed-vc"
+      ],
+      "repo_id": "Plachta/Seed-VC",
+      "revision": "257283f9f41585055e8f858fba4fd044e5caed6e",
+      "filename": "config_dit_mel_seed_uvit_whisper_base_f0_44k.yml",
+      "bytes": 2408,
+      "sha256": "ff86f343b08c2def405f075022eeb10dafba23c4eda36d151010f4ca6d7a1a0a",
+      "url": "https://huggingface.co/Plachta/Seed-VC/resolve/257283f9f41585055e8f858fba4fd044e5caed6e/config_dit_mel_seed_uvit_whisper_base_f0_44k.yml",
+      "source_url": "https://huggingface.co/Plachta/Seed-VC/tree/257283f9f41585055e8f858fba4fd044e5caed6e",
+      "source_kind": "huggingface-model",
+      "license": "gpl-3.0",
+      "license_review_required": true,
+      "role": "singing-config"
+    },
+    {
+      "id": "demucs-12540373de858920b60002eb",
+      "engine": "demucs",
+      "consumers": [
+        "demucs"
+      ],
+      "repo_id": "adefossez/HTDemucs",
+      "revision": "cbc8a9b1a87023b7fd74e7b3412e6321c0eab003",
+      "filename": "955717e8.json",
+      "bytes": 12087,
+      "sha256": "12540373de858920b60002ebfbe17738860dbf2e89df625dc3b7875af2d28491",
+      "url": "https://huggingface.co/adefossez/HTDemucs/resolve/cbc8a9b1a87023b7fd74e7b3412e6321c0eab003/955717e8.json",
+      "source_url": "https://huggingface.co/adefossez/HTDemucs/tree/cbc8a9b1a87023b7fd74e7b3412e6321c0eab003",
+      "source_kind": "huggingface-model",
+      "license": "mit",
+      "license_review_required": true,
+      "role": "separation-metadata"
+    },
+    {
+      "id": "demucs-d9fa14133cfcc034a6758923",
+      "engine": "demucs",
+      "consumers": [
+        "demucs"
+      ],
+      "repo_id": "adefossez/HTDemucs",
+      "revision": "cbc8a9b1a87023b7fd74e7b3412e6321c0eab003",
+      "filename": "955717e8.safetensors",
+      "bytes": 84025440,
+      "sha256": "d9fa14133cfcc034a6758923bb3a8ca9f8dfd0b582134643bbf83f72c17576dd",
+      "url": "https://huggingface.co/adefossez/HTDemucs/resolve/cbc8a9b1a87023b7fd74e7b3412e6321c0eab003/955717e8.safetensors",
+      "source_url": "https://huggingface.co/adefossez/HTDemucs/tree/cbc8a9b1a87023b7fd74e7b3412e6321c0eab003",
+      "source_kind": "huggingface-model",
+      "license": "mit",
+      "license_review_required": true,
+      "role": "separation-checkpoint"
+    },
+    {
+      "id": "demucs-b34c13f1b6c3473bf44978f7",
+      "engine": "demucs",
+      "consumers": [
+        "demucs"
+      ],
+      "repo_id": "adefossez/HTDemucs",
+      "revision": "cbc8a9b1a87023b7fd74e7b3412e6321c0eab003",
+      "filename": "README.md",
+      "bytes": 647,
+      "sha256": "b34c13f1b6c3473bf44978f70b5c62666ee309514d6d50b34cf44827f9a38104",
+      "url": "https://huggingface.co/adefossez/HTDemucs/resolve/cbc8a9b1a87023b7fd74e7b3412e6321c0eab003/README.md",
+      "source_url": "https://huggingface.co/adefossez/HTDemucs/tree/cbc8a9b1a87023b7fd74e7b3412e6321c0eab003",
+      "source_kind": "huggingface-model",
+      "license": "mit",
+      "license_review_required": true,
+      "role": "separation-metadata"
+    },
+    {
+      "id": "demucs-239c445d0b14454d541ad8bd",
+      "engine": "demucs",
+      "consumers": [
+        "demucs"
+      ],
+      "repo_id": "adefossez/HTDemucs",
+      "revision": "cbc8a9b1a87023b7fd74e7b3412e6321c0eab003",
+      "filename": "htdemucs.yaml",
+      "bytes": 21,
+      "sha256": "239c445d0b14454d541ad8bd9bb271c9e536d267e8a4625208744cbb2e7bb66c",
+      "url": "https://huggingface.co/adefossez/HTDemucs/resolve/cbc8a9b1a87023b7fd74e7b3412e6321c0eab003/htdemucs.yaml",
+      "source_url": "https://huggingface.co/adefossez/HTDemucs/tree/cbc8a9b1a87023b7fd74e7b3412e6321c0eab003",
+      "source_kind": "huggingface-model",
+      "license": "mit",
+      "license_review_required": true,
+      "role": "separation-metadata"
+    },
+    {
+      "id": "rvc-0346950779dfb7f9316fa74e",
+      "engine": "rvc",
+      "consumers": [
+        "rvc"
+      ],
+      "repo_id": "lj1995/VoiceConversionWebUI",
+      "revision": "e6d0c1a17da07c33557852f9dfa2bd44cc75737d",
+      "filename": "hubert_base/config.json",
+      "bytes": 1492,
+      "sha256": "0346950779dfb7f9316fa74ed846e2b8a22a08eedfdc5387b73f327cb1a4a7cf",
+      "url": "https://huggingface.co/lj1995/VoiceConversionWebUI/resolve/e6d0c1a17da07c33557852f9dfa2bd44cc75737d/hubert_base/config.json",
+      "source_url": "https://huggingface.co/lj1995/VoiceConversionWebUI/tree/e6d0c1a17da07c33557852f9dfa2bd44cc75737d",
+      "source_kind": "huggingface-model",
+      "license": "mit",
+      "license_review_required": true,
+      "role": "content-encoder",
+      "runtime_paths": {
+        "rvc": [
+          "assets/hubert_base/config.json"
+        ]
+      },
+      "license_note": "Repository model card declares MIT; this is provenance, not an individual-component deployment approval."
+    },
+    {
+      "id": "rvc-7c1976a680fb7acc757cd36f",
+      "engine": "rvc",
+      "consumers": [
+        "rvc"
+      ],
+      "repo_id": "lj1995/VoiceConversionWebUI",
+      "revision": "e6d0c1a17da07c33557852f9dfa2bd44cc75737d",
+      "filename": "hubert_base/preprocessor_config.json",
+      "bytes": 225,
+      "sha256": "7c1976a680fb7acc757cd36fb08eef878fa36c70b4c9d2d595df9c608bbbbf0e",
+      "url": "https://huggingface.co/lj1995/VoiceConversionWebUI/resolve/e6d0c1a17da07c33557852f9dfa2bd44cc75737d/hubert_base/preprocessor_config.json",
+      "source_url": "https://huggingface.co/lj1995/VoiceConversionWebUI/tree/e6d0c1a17da07c33557852f9dfa2bd44cc75737d",
+      "source_kind": "huggingface-model",
+      "license": "mit",
+      "license_review_required": true,
+      "role": "content-encoder",
+      "runtime_paths": {
+        "rvc": [
+          "assets/hubert_base/preprocessor_config.json"
+        ]
+      },
+      "license_note": "Repository model card declares MIT; this is provenance, not an individual-component deployment approval."
+    },
+    {
+      "id": "rvc-cc8c20f4b90a520757260197",
+      "engine": "rvc",
+      "consumers": [
+        "rvc"
+      ],
+      "repo_id": "lj1995/VoiceConversionWebUI",
+      "revision": "e6d0c1a17da07c33557852f9dfa2bd44cc75737d",
+      "filename": "hubert_base/pytorch_model.bin",
+      "bytes": 189206711,
+      "sha256": "cc8c20f4b90a520757260197a3ff2505705a7adbd20ad9eeaa4e1a9b38442ef5",
+      "url": "https://huggingface.co/lj1995/VoiceConversionWebUI/resolve/e6d0c1a17da07c33557852f9dfa2bd44cc75737d/hubert_base/pytorch_model.bin",
+      "source_url": "https://huggingface.co/lj1995/VoiceConversionWebUI/tree/e6d0c1a17da07c33557852f9dfa2bd44cc75737d",
+      "source_kind": "huggingface-model",
+      "license": "mit",
+      "license_review_required": true,
+      "role": "content-encoder",
+      "runtime_paths": {
+        "rvc": [
+          "assets/hubert_base/pytorch_model.bin"
+        ]
+      },
+      "license_note": "Repository model card declares MIT; this is provenance, not an individual-component deployment approval."
+    },
+    {
+      "id": "rvc-6d62215f4306e3ca27824618",
+      "engine": "rvc",
+      "consumers": [
+        "rvc",
+        "seed-vc"
+      ],
+      "repo_id": "lj1995/VoiceConversionWebUI",
+      "revision": "e6d0c1a17da07c33557852f9dfa2bd44cc75737d",
+      "filename": "rmvpe.pt",
+      "bytes": 181184272,
+      "sha256": "6d62215f4306e3ca278246188607209f09af3dc77ed4232efdd069798c4ec193",
+      "url": "https://huggingface.co/lj1995/VoiceConversionWebUI/resolve/e6d0c1a17da07c33557852f9dfa2bd44cc75737d/rmvpe.pt",
+      "source_url": "https://huggingface.co/lj1995/VoiceConversionWebUI/tree/e6d0c1a17da07c33557852f9dfa2bd44cc75737d",
+      "source_kind": "huggingface-model",
+      "license": "mit",
+      "license_review_required": true,
+      "role": "pitch-extractor",
+      "runtime_paths": {
+        "rvc": [
+          "assets/rmvpe/rmvpe.pt"
+        ]
+      },
+      "license_note": "Repository model card declares MIT; this is provenance, not an individual-component deployment approval."
+    },
+    {
+      "id": "seed-vc-3388cf5fd3493c9ac9c69851",
+      "engine": "seed-vc",
+      "consumers": [
+        "seed-vc"
+      ],
+      "repo_id": "funasr/campplus",
+      "revision": "e4b6ede7ce16997aff4ae69fbca1f0175e2afede",
+      "filename": "campplus_cn_common.bin",
+      "bytes": 28036335,
+      "sha256": "3388cf5fd3493c9ac9c69851d8e7a8badcfb4f3dc631020c4961371646d5ada8",
+      "url": "https://huggingface.co/funasr/campplus/resolve/e4b6ede7ce16997aff4ae69fbca1f0175e2afede/campplus_cn_common.bin",
+      "source_url": "https://huggingface.co/funasr/campplus/tree/e4b6ede7ce16997aff4ae69fbca1f0175e2afede",
+      "source_kind": "huggingface-model",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "speaker-encoder"
+    },
+    {
+      "id": "seed-vc-8ec8841b20bb46df9f7e8e57",
+      "engine": "seed-vc",
+      "consumers": [
+        "seed-vc"
+      ],
+      "repo_id": "Plachta/Seed-VC",
+      "revision": "257283f9f41585055e8f858fba4fd044e5caed6e",
+      "filename": "DiT_seed_v2_uvit_whisper_small_wavenet_bigvgan_pruned.pth",
+      "bytes": 440312082,
+      "sha256": "8ec8841b20bb46df9f7e8e570a6946a4b87b940133c7f0e778487ff33841f720",
+      "url": "https://huggingface.co/Plachta/Seed-VC/resolve/257283f9f41585055e8f858fba4fd044e5caed6e/DiT_seed_v2_uvit_whisper_small_wavenet_bigvgan_pruned.pth",
+      "source_url": "https://huggingface.co/Plachta/Seed-VC/tree/257283f9f41585055e8f858fba4fd044e5caed6e",
+      "source_kind": "huggingface-model",
+      "license": "gpl-3.0",
+      "license_review_required": true,
+      "role": "speech-option-not-singing",
+      "required_for_active_singing": false
+    },
+    {
+      "id": "seed-vc-27a91ac41bdb41d0b6951c63",
+      "engine": "seed-vc",
+      "consumers": [
+        "seed-vc"
+      ],
+      "repo_id": "Plachta/Seed-VC",
+      "revision": "257283f9f41585055e8f858fba4fd044e5caed6e",
+      "filename": "config_dit_mel_seed_uvit_whisper_small_wavenet.yml",
+      "bytes": 2289,
+      "sha256": "27a91ac41bdb41d0b6951c63642d791b4a70d60b9fc5550eb645f9ddcb3c94da",
+      "url": "https://huggingface.co/Plachta/Seed-VC/resolve/257283f9f41585055e8f858fba4fd044e5caed6e/config_dit_mel_seed_uvit_whisper_small_wavenet.yml",
+      "source_url": "https://huggingface.co/Plachta/Seed-VC/tree/257283f9f41585055e8f858fba4fd044e5caed6e",
+      "source_kind": "huggingface-model",
+      "license": "gpl-3.0",
+      "license_review_required": true,
+      "role": "speech-option-not-singing",
+      "required_for_active_singing": false
+    },
+    {
+      "id": "yourmt3-9a8468bd685eb0e9084566c5",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "README.md",
+      "bytes": 301,
+      "sha256": "9a8468bd685eb0e9084566c5b6cca230481ea4e1c0a6212b4388c4b4618400b4",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/README.md",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-6803e1479c77a9c5f5ddec14",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/config/config.py",
+      "bytes": 13602,
+      "sha256": "6803e1479c77a9c5f5ddec145291ee9b17cd9a15fbcd5f1bcf7ba39297218838",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/config/config.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-0b47f4b711d63a355f3214a8",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/config/data_presets.py",
+      "bytes": 37710,
+      "sha256": "0b47f4b711d63a355f3214a87a16750d82ff791a087e58f8e64a2dbac7494bb3",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/config/data_presets.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-b04b75554de2771c9787e9d7",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/config/task.py",
+      "bytes": 5706,
+      "sha256": "b04b75554de2771c9787e9d74b2d8b7d93707117c16be8814a18c7abf590b93c",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/config/task.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-9d693c320d6d912f4e756b90",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/config/vocabulary.py",
+      "bytes": 11942,
+      "sha256": "9d693c320d6d912f4e756b90c132a0999aa1aaf8a75fcb627a69935cf63aea36",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/config/vocabulary.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-d1b113b50e1f3c335e8c190b",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/extras/auth2/token_data.json",
+      "bytes": 477,
+      "sha256": "d1b113b50e1f3c335e8c190ba614a45f4eaae05c26ea0cc52714886ffacb155e",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/extras/auth2/token_data.json",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-018c509e15fecefbbc6cef8a",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/extras/auth2/youtube-nsig/43bc9526.json",
+      "bytes": 5555,
+      "sha256": "018c509e15fecefbbc6cef8a15fc5e6bf23ea154e0329068e04a9cd8ffe64d03",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/extras/auth2/youtube-nsig/43bc9526.json",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-9ac195de9ed1dfa2af781ed8",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/extras/auth2/youtube-sigfuncs/js_43bc9526_106.json",
+      "bytes": 454,
+      "sha256": "9ac195de9ed1dfa2af781ed870bd403f4b76d64748d3a37a3e2382b577e6d610",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/extras/auth2/youtube-sigfuncs/js_43bc9526_106.json",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-e46a0eca56561905c21cbc36",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/extras/check_drum_channel_slakh.py",
+      "bytes": 938,
+      "sha256": "e46a0eca56561905c21cbc36cce3161c84adeaa89aa4ce1526989c8f4a140054",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/extras/check_drum_channel_slakh.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-1228e3473399c6960aa6afe5",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/extras/dataset_mutable_var_sanity_check.py",
+      "bytes": 3875,
+      "sha256": "1228e3473399c6960aa6afe5ed5a032799a31903f9f04bc62b5994d54530c203",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/extras/dataset_mutable_var_sanity_check.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-0d4fc8f1076cb874fc6028a4",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/extras/datasets_eval_testing.py",
+      "bytes": 922,
+      "sha256": "0d4fc8f1076cb874fc6028a4e90e8e334b13e3c1f76c9d58629e2068861379b5",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/extras/datasets_eval_testing.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-eb7913f17f39759870fc8948",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/extras/demo_cross_augmentation.py",
+      "bytes": 2327,
+      "sha256": "eb7913f17f39759870fc894829f4da51c670ffc2af130809e6b786c969c86072",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/extras/demo_cross_augmentation.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-218bd5881ba98b01beb1e09a",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/extras/demo_intra_augmentation.py",
+      "bytes": 1694,
+      "sha256": "218bd5881ba98b01beb1e09a093819753e61afbe1f3f9abf6f6bcfc3d781dae7",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/extras/demo_intra_augmentation.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-e32f8394564ea7c42cff3ea0",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/extras/download_mirst500.py",
+      "bytes": 1563,
+      "sha256": "e32f8394564ea7c42cff3ea061fb6d069da3f8c7556eaf48618ee7468572dc3d",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/extras/download_mirst500.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-560a2aedc92e5251fe0377d8",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/extras/inspecting_slakh_bass.py",
+      "bytes": 1242,
+      "sha256": "560a2aedc92e5251fe0377d8bbfb351992e12a4610fa984425df30154e50e0f6",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/extras/inspecting_slakh_bass.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-a81b228481fada9947586f42",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/extras/label_smoothing.py",
+      "bytes": 1739,
+      "sha256": "a81b228481fada9947586f42d35db3d1e5c392935d1e8c87042c9dc21149120b",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/extras/label_smoothing.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-703e8124ee47d8b37cf9dd54",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/extras/multi_channel_seqlen_stats.py",
+      "bytes": 5406,
+      "sha256": "703e8124ee47d8b37cf9dd546232727bd6be16b85b0cd228f8e7a4fa39323843",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/extras/multi_channel_seqlen_stats.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-760e15400c6e48c392b3d39c",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/extras/npy_speed_benchmark.py",
+      "bytes": 5356,
+      "sha256": "760e15400c6e48c392b3d39ca2f2e85c5b317836050c4ac988e14621565bca7e",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/extras/npy_speed_benchmark.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-fbece7a84557e80bca1dc23e",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/extras/perceivertf_inspect.py",
+      "bytes": 21001,
+      "sha256": "fbece7a84557e80bca1dc23ef29a2a484c5c627d2350614d9e5b2eee61d0e5b1",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/extras/perceivertf_inspect.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-dfdf422eeada9bec1849de3b",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/extras/perceivertf_multi_inspect.py",
+      "bytes": 26291,
+      "sha256": "dfdf422eeada9bec1849de3bc31637ec20d5b8a2fd129b2ffbe8ebbb6108347d",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/extras/perceivertf_multi_inspect.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-ea36415031b6c5468b9fde02",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/extras/pitch_shift_benchmark.py",
+      "bytes": 5843,
+      "sha256": "ea36415031b6c5468b9fde02dbfb73a2dc40e8321023209cd7164d9e6abc74c7",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/extras/pitch_shift_benchmark.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-c27a273dc129b3d4b6d6f54a",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/extras/remove_silence_musicnet_midi.py",
+      "bytes": 1116,
+      "sha256": "c27a273dc129b3d4b6d6f54a0f77803eed3e03bd921c36343fbad3d1092fe62d",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/extras/remove_silence_musicnet_midi.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-28a96cee77be4d47f8b0d8de",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/extras/rotary_positional_embedding.py",
+      "bytes": 6938,
+      "sha256": "28a96cee77be4d47f8b0d8ded522a0aa2164f0e1ca006a1b3645ae9677cf5fff",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/extras/rotary_positional_embedding.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-f03d3747374e32c653d7016b",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/extras/swap_channel.py",
+      "bytes": 3823,
+      "sha256": "f03d3747374e32c653d7016b93ee575d62d64419c816869450f355ac91a7ff2c",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/extras/swap_channel.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-c88e50fc80473b4680ac739e",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/extras/t5_dev.py",
+      "bytes": 1342,
+      "sha256": "c88e50fc80473b4680ac739ecafb2c01c93308d0935fe5541fe7507401e7c228",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/extras/t5_dev.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-c94f10dea2defa8c9014e22d",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/extras/t5perceiver.py",
+      "bytes": 19888,
+      "sha256": "c94f10dea2defa8c9014e22de3ae35b473e737ed9f50f951d4c7b10944de3d79",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/extras/t5perceiver.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-94a05272a8481bacdf60d5b0",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/extras/unimax_sampler/demo.py",
+      "bytes": 681,
+      "sha256": "94a05272a8481bacdf60d5b02946a29002dfad791af13c87f357ca67223f7a93",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/extras/unimax_sampler/demo.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-a3a65e027724de6bbe590ee4",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/extras/unimax_sampler/unimax_sampler.py",
+      "bytes": 5761,
+      "sha256": "a3a65e027724de6bbe590ee496c559ea5502e250fbb4791c006d7c2d85aa67c5",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/extras/unimax_sampler/unimax_sampler.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-6478c22021c9af2a8b2eb9be",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/install_dataset.py",
+      "bytes": 13234,
+      "sha256": "6478c22021c9af2a8b2eb9be29fc7b5543e0db77afca2694f4c3618572a3e6e5",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/install_dataset.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-b8046efd8f898b1c3cc15781",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/model/RoPE/RoPE.py",
+      "bytes": 10401,
+      "sha256": "b8046efd8f898b1c3cc157819b0371e7823d447cf506bc68d7692bc9a7ce008a",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/model/RoPE/RoPE.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-ee1ecd79a1115bd8de114412",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/model/conformer_helper.py",
+      "bytes": 8455,
+      "sha256": "ee1ecd79a1115bd8de114412261295f10d63984e4d4898d5fdf32ca983da6491",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/model/conformer_helper.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-c15da582b655ac099bddfc11",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/model/conformer_mod.py",
+      "bytes": 18482,
+      "sha256": "c15da582b655ac099bddfc114c246e570300fecaa142995145c210efedf18de7",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/model/conformer_mod.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-f99cb054e1772c5c8ad88228",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/model/conv_block.py",
+      "bytes": 9295,
+      "sha256": "f99cb054e1772c5c8ad882284c60ebdbdd196314f45129d496e277c9606ad0c4",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/model/conv_block.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-b098073babb815634f36587a",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/model/ff_layer.py",
+      "bytes": 10376,
+      "sha256": "b098073babb815634f36587a7a944edf6b755c2b3bac11ba574a172cc09643e0",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/model/ff_layer.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-3affcde16839445bb95c0498",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/model/init_train.py",
+      "bytes": 14240,
+      "sha256": "3affcde16839445bb95c04988e2e177a657adfd3b0329e51983b56f1493833d1",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/model/init_train.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-458891fcc0620c4b2b6aea1e",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/model/lm_head.py",
+      "bytes": 1498,
+      "sha256": "458891fcc0620c4b2b6aea1ed91d9dbb020f5dcb53aa09cbefa7a10cabb651f0",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/model/lm_head.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-8d38d649004e7f07e1ca6c80",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/model/lr_scheduler.py",
+      "bytes": 2990,
+      "sha256": "8d38d649004e7f07e1ca6c807e84f8c45fb3a4da94e046004c4cf39094111162",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/model/lr_scheduler.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-c169ce23fcd0251354786313",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/model/ops.py",
+      "bytes": 3556,
+      "sha256": "c169ce23fcd0251354786313ba8409aaba918fcecf15cec8a94f7889916e6cc3",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/model/ops.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-95b8bf82a1b0ef834a7ad492",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/model/optimizers.py",
+      "bytes": 8679,
+      "sha256": "95b8bf82a1b0ef834a7ad492c96e120f78689395e0b148e71bbb5dfdef42d106",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/model/optimizers.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-c23aa7ec1fa368a0a17ed318",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/model/perceiver_helper.py",
+      "bytes": 16384,
+      "sha256": "c23aa7ec1fa368a0a17ed318891ae3967d798fcde9d210bd10fe864b1af17d4f",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/model/perceiver_helper.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-68e899abc3d620d5913b0f0d",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/model/perceiver_mod.py",
+      "bytes": 40849,
+      "sha256": "68e899abc3d620d5913b0f0d336a8494b8211d0577e432386799b072ad5f1e2e",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/model/perceiver_mod.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-38a5be7559bfa18f0e90985e",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/model/pitchshift_layer.py",
+      "bytes": 24312,
+      "sha256": "38a5be7559bfa18f0e90985e416ab6c9830050d68f35b854472f406d953360aa",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/model/pitchshift_layer.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-f2edca87fdc418bc48bad110",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/model/positional_encoding.py",
+      "bytes": 11684,
+      "sha256": "f2edca87fdc418bc48bad1105733a56dea5d940f064d074db0b5fa19544b87fe",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/model/positional_encoding.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-cedc45baec4e112fc6f64d08",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/model/projection_layer.py",
+      "bytes": 13549,
+      "sha256": "cedc45baec4e112fc6f64d081aaf8cfe8764a5d767eaa07defc9c988dba1da1a",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/model/projection_layer.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-772c8e32855ce9bc5990dec3",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/model/spectrogram.py",
+      "bytes": 8182,
+      "sha256": "772c8e32855ce9bc5990dec310cfdc35505629ce4f91da4d4276a1bed01216f6",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/model/spectrogram.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-2cedcbdc4d0abef869f99bff",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/model/t5mod.py",
+      "bytes": 29365,
+      "sha256": "2cedcbdc4d0abef869f99bff624508ca7e90a20f585f59f418af5ff19e25f147",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/model/t5mod.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-118d9aff99511d0e706d55ee",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/model/t5mod_helper.py",
+      "bytes": 6720,
+      "sha256": "118d9aff99511d0e706d55eec27795c5fdaa84c6e62587377d4c982097e47dea",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/model/t5mod_helper.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-a7c83aa71ddfa0ac3b51fc7e",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/model/ymt3.py",
+      "bytes": 50131,
+      "sha256": "a7c83aa71ddfa0ac3b51fc7e98606a7416715a053f02c118a6c957dff4079c61",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/model/ymt3.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-1b3eb38392cf065db1472abf",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/requirements.txt",
+      "bytes": 238,
+      "sha256": "1b3eb38392cf065db1472abf378cdfe6a2c5f214c3b906208f4da3c730ee9ac5",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/requirements.txt",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-3c75d9eac01a8c527cac79c0",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/test.py",
+      "bytes": 14989,
+      "sha256": "3c75d9eac01a8c527cac79c09e47159feed8d66b0232efe39365c972c57b73ea",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/test.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-fae43c713964cb0041efcf71",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/tests/assert_fns.py",
+      "bytes": 2642,
+      "sha256": "fae43c713964cb0041efcf713315f229032ed76bb54d6d059168f4788ba498af",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/tests/assert_fns.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-b9183c51489dee62853d3e74",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/tests/audio_test.py",
+      "bytes": 5136,
+      "sha256": "b9183c51489dee62853d3e74d6731180a13a8bec411b814bb42ce8d50712b813",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/tests/audio_test.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-f74b4794e4aba37d8001db41",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/tests/event2note_test.py",
+      "bytes": 9704,
+      "sha256": "f74b4794e4aba37d8001db4189bb9698eea98df2fb05c3ffda4de08e1a4705d3",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/tests/event2note_test.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-6ffdaf204d19bf56b41bf06c",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/tests/event_codec_test.py",
+      "bytes": 5886,
+      "sha256": "6ffdaf204d19bf56b41bf06c9ef8e9c221c370992e5bea52a88082566e1ecdc6",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/tests/event_codec_test.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-4429b496eb5e5c1eaeff9027",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/tests/metrics_test.py",
+      "bytes": 4690,
+      "sha256": "4429b496eb5e5c1eaeff9027ca6effecb4a32220aa24b1a29e134d8c14e95c84",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/tests/metrics_test.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-33c29b7230b7fcfb0a3facac",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/tests/midi_test.py",
+      "bytes": 3062,
+      "sha256": "33c29b7230b7fcfb0a3facac6015029407d4d044624eff6eaf7c3239bb9a63ea",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/tests/midi_test.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-572ab462183ec0c9cac22d42",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/tests/model/ops_test.py",
+      "bytes": 491,
+      "sha256": "572ab462183ec0c9cac22d42e0e5cd2661f9f8ab4cd9903a6516714f9c7746ab",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/tests/model/ops_test.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-e8a031199b4709e707693375",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/tests/model/spectrogram_test.py",
+      "bytes": 774,
+      "sha256": "e8a031199b4709e707693375725ef88a0fe09e7a169ef589bb68787f2729d565",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/tests/model/spectrogram_test.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-c8ff95f5ecd2e72992fef3a7",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/tests/note2event_test.py",
+      "bytes": 30148,
+      "sha256": "c8ff95f5ecd2e72992fef3a7339a37582706d5798e8462f123ee4040348ef13a",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/tests/note2event_test.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-3037ab1e9bdde5c82aecdb34",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/tests/note_event_roundtrip_test.py",
+      "bytes": 12471,
+      "sha256": "3037ab1e9bdde5c82aecdb34b7d9996f2abe6b13d9022daabc904a8ed4545079",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/tests/note_event_roundtrip_test.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-d7f15686eb42ad9b36b5153d",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/tests/tokenizer_test.py",
+      "bytes": 4576,
+      "sha256": "d7f15686eb42ad9b36b5153dea426751114faab3a7672c8ff837df0cd72545ac",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/tests/tokenizer_test.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-b0f60eed95f5aba8f7643376",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/tests/utils_test.py",
+      "bytes": 4170,
+      "sha256": "b0f60eed95f5aba8f7643376a5334e11682213c11700157da0c0574546ddc4d0",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/tests/utils_test.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-9dd8442f96bc0d1fcd4d8abb",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/train.py",
+      "bytes": 17081,
+      "sha256": "9dd8442f96bc0d1fcd4d8abbc16673880cfd5af1cbd4921af85342dc07fe21fe",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/train.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-ac08d1a6509e7f5c5b473cae",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/utils/audio.py",
+      "bytes": 11279,
+      "sha256": "ac08d1a6509e7f5c5b473cae0e86b6851a60c5dcd44e50c4a4463494d1a76258",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/utils/audio.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-05bed9e28f29a5ece00045b2",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/utils/augment.py",
+      "bytes": 39133,
+      "sha256": "05bed9e28f29a5ece00045b206b9b60bcb4b9e64243daa50d119837e549f2852",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/utils/augment.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-782f9382092733eec76863a3",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/utils/data_modules.py",
+      "bytes": 9538,
+      "sha256": "782f9382092733eec76863a3fc62a87e482dcf65e29abd6bbe3baa39ba9e86e6",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/utils/data_modules.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-8992adc5a1a32cc1c77cff23",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/utils/datasets_eval.py",
+      "bytes": 8932,
+      "sha256": "8992adc5a1a32cc1c77cff23c342fc0c0e211d549cb49d2323d4bf6ed71351c0",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/utils/datasets_eval.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-366818b6fc270ba19b9a0f58",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/utils/datasets_helper.py",
+      "bytes": 11583,
+      "sha256": "366818b6fc270ba19b9a0f58d366fc9021e9ca9d6747b289250cac0795ad7d90",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/utils/datasets_helper.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-ba99402358d22465085d02bb",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/utils/datasets_train.py",
+      "bytes": 33275,
+      "sha256": "ba99402358d22465085d02bb6324593a82aa4cd58c78bd94f43d2fb17bf6710b",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/utils/datasets_train.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-039ff94e2b7cd022a1ac09dc",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/utils/event2note.py",
+      "bytes": 11968,
+      "sha256": "039ff94e2b7cd022a1ac09dc215fccf6280cf656c1bce0fd16fbd63db187efea",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/utils/event2note.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-c487e6c7ac855146dc81a919",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/utils/event_codec.py",
+      "bytes": 12636,
+      "sha256": "c487e6c7ac855146dc81a9192efb35a4d45fc8cd42ddaa24a958c4675acbfe48",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/utils/event_codec.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-244f2be91a51023081fa41f0",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/utils/metrics.py",
+      "bytes": 21758,
+      "sha256": "244f2be91a51023081fa41f0537233b68df308e29daca5fc9a2d3e5f70c8076a",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/utils/metrics.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-d7a83f42aff34f82f58e4f46",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/utils/metrics_helper.py",
+      "bytes": 13742,
+      "sha256": "d7a83f42aff34f82f58e4f464be3e1c95e5145ad715c54742a06244c28897eff",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/utils/metrics_helper.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-5b8cb566bb47a2c94c171d50",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/utils/midi.py",
+      "bytes": 17245,
+      "sha256": "5b8cb566bb47a2c94c171d507a071057a5434f944f8a2f4f05f4ab3b1245992f",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/utils/midi.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-42492c6dcadf3f3c4251600c",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/utils/mirdata_dev/datasets/slakh16k.py",
+      "bytes": 17079,
+      "sha256": "42492c6dcadf3f3c4251600c9b8641b03644b2894ecb5efbc6568b10ddc1bd6b",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/utils/mirdata_dev/datasets/slakh16k.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-6a1d0e7ebecc6c8b3b1f6c5b",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/utils/mirdata_dev/scripts/make_slakh_index.py",
+      "bytes": 4299,
+      "sha256": "6a1d0e7ebecc6c8b3b1f6c5b6c26712a2a409ad93f82dda1a54e389b1f11b9ec",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/utils/mirdata_dev/scripts/make_slakh_index.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-7aea803c628f98a26b248f8c",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/utils/note2event.py",
+      "bytes": 33109,
+      "sha256": "7aea803c628f98a26b248f8c6b886db48717aa8b0e68c89293b6bd6dfb94c7ed",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/utils/note2event.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-6ce49b909191178255fffcf5",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/utils/note_event_dataclasses.py",
+      "bytes": 2528,
+      "sha256": "6ce49b909191178255fffcf539c01f1c8ec0e4f1adcb207cfd0c811a52bc1f40",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/utils/note_event_dataclasses.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-08d9acd44a82ace6c44993e7",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/utils/preprocess/dataset_stats.py",
+      "bytes": 1449,
+      "sha256": "08d9acd44a82ace6c44993e7c956193c402b9fee079653b84aa2e10946e26ff6",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/utils/preprocess/dataset_stats.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-faef71c46bc54e2a22c30ae0",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/utils/preprocess/generate_dataset_stats.py",
+      "bytes": 2139,
+      "sha256": "faef71c46bc54e2a22c30ae037866f9a00e18300894b659af1a6a4e5d05f7b86",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/utils/preprocess/generate_dataset_stats.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-e24d5388a57931fa07cbd071",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/utils/preprocess/preprocess_cmedia.py",
+      "bytes": 11094,
+      "sha256": "e24d5388a57931fa07cbd071eaba22d9853427dbf51dc99718221474add9c7ce",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/utils/preprocess/preprocess_cmedia.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-cd6c7f9b73a79e3cb0f64a0f",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/utils/preprocess/preprocess_egmd.py",
+      "bytes": 6905,
+      "sha256": "cd6c7f9b73a79e3cb0f64a0fdbb647f7102fe096e02a62c07cca3747cb39aa4e",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/utils/preprocess/preprocess_egmd.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-634eac84f50e2bc50cd9dd61",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/utils/preprocess/preprocess_enstdrums.py",
+      "bytes": 19617,
+      "sha256": "634eac84f50e2bc50cd9dd6177ee9c4e8dc9af713184529e01f292bc120b03c6",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/utils/preprocess/preprocess_enstdrums.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-031d98aa39cf81a93dbfbec3",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/utils/preprocess/preprocess_geerdes.py",
+      "bytes": 20549,
+      "sha256": "031d98aa39cf81a93dbfbec3ae5c6a670c1454247b84245908363d5bba066b5a",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/utils/preprocess/preprocess_geerdes.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-0ee687f3b5c5072462c79ea9",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/utils/preprocess/preprocess_guitarset.py",
+      "bytes": 17257,
+      "sha256": "0ee687f3b5c5072462c79ea9925da3f4a527aecd09bf8ac85e1cf049c66091c2",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/utils/preprocess/preprocess_guitarset.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-8591bfcff9b28d654d09067a",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/utils/preprocess/preprocess_idmt_smt_bass.py",
+      "bytes": 10263,
+      "sha256": "8591bfcff9b28d654d09067aa239aea7975354d695dc9705f034af958df66b34",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/utils/preprocess/preprocess_idmt_smt_bass.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-09d7334c9853708f2c49882c",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/utils/preprocess/preprocess_maestro.py",
+      "bytes": 6362,
+      "sha256": "09d7334c9853708f2c49882c41d63d40b59234ce9adcab86a764f88d8a6f717b",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/utils/preprocess/preprocess_maestro.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-b4ca18c337f4636c6b0898bf",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/utils/preprocess/preprocess_maps.py",
+      "bytes": 6869,
+      "sha256": "b4ca18c337f4636c6b0898bfa4669719ab6bfdb60dc0f29c67005a82082bacc2",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/utils/preprocess/preprocess_maps.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-442f35be292ee35600c669ac",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/utils/preprocess/preprocess_mir1k.py",
+      "bytes": 4106,
+      "sha256": "442f35be292ee35600c669ac784a53fa9cd303f3bf1ec04d89e844f71b36bdba",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/utils/preprocess/preprocess_mir1k.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-7fd6c15995fed9190c9a670f",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/utils/preprocess/preprocess_mir_st500.py",
+      "bytes": 10342,
+      "sha256": "7fd6c15995fed9190c9a670f412a964d03ab05a5d0b333a2894c342fd51e98eb",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/utils/preprocess/preprocess_mir_st500.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-22783e68aa0e18defa8b9696",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/utils/preprocess/preprocess_musicnet.py",
+      "bytes": 23483,
+      "sha256": "22783e68aa0e18defa8b96965c931a679fc731acc4e782945db36179a235aed3",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/utils/preprocess/preprocess_musicnet.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-8156918d90d61b5c84b60511",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/utils/preprocess/preprocess_rnsynth.py",
+      "bytes": 13593,
+      "sha256": "8156918d90d61b5c84b60511d8472e4d3788875f2c247cd6fc62ff323becec75",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/utils/preprocess/preprocess_rnsynth.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-4796d3647ea4f5d7dcf4c172",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/utils/preprocess/preprocess_rwc_pop.py",
+      "bytes": 5443,
+      "sha256": "4796d3647ea4f5d7dcf4c1723033fb1ff895327236067ecc3df07ccc32f778fc",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/utils/preprocess/preprocess_rwc_pop.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-10deeb5dfc3bf64b6785ce96",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/utils/preprocess/preprocess_rwc_pop_full.py",
+      "bytes": 12849,
+      "sha256": "10deeb5dfc3bf64b6785ce967f2ad28dcbf507babac474f34573ad5687898e0a",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/utils/preprocess/preprocess_rwc_pop_full.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-f9dace6bdc22a5104260b1f7",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/utils/preprocess/preprocess_slakh.py",
+      "bytes": 9796,
+      "sha256": "f9dace6bdc22a5104260b1f79b1e32445d6ac99688830de60bca8650c5d2f46b",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/utils/preprocess/preprocess_slakh.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-461485b2662fc25a8ffa1e5b",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/utils/preprocess/preprocess_urmp.py",
+      "bytes": 9195,
+      "sha256": "461485b2662fc25a8ffa1e5be16c5717bebefb4293420f0eec4bdf2705485d76",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/utils/preprocess/preprocess_urmp.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-5e480366febd0250e92eb25c",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/utils/task_manager.py",
+      "bytes": 20055,
+      "sha256": "5e480366febd0250e92eb25ca78f906cc0d61144814adce18ecce642412e5669",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/utils/task_manager.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-81c691cdc49084b3e65f5a72",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/utils/tokenizer.py",
+      "bytes": 17948,
+      "sha256": "81c691cdc49084b3e65f5a722686a61b769a2d3169830cf04c1fe6bbc97fa8a8",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/utils/tokenizer.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-eb9412923ea9a7a194ab38d4",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/src/utils/utils.py",
+      "bytes": 21763,
+      "sha256": "eb9412923ea9a7a194ab38d433f2f00b017daf1ac1181b3162a8d3bfe8c18872",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/src/utils/utils.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-47706291e10a0d25aef768ef",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "model_helper.py",
+      "bytes": 14446,
+      "sha256": "47706291e10a0d25aef768ef276de3bfcdf98175141d57802b571917c6de4d3a",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/model_helper.py",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "runtime-source"
+    },
+    {
+      "id": "yourmt3-ae38e415c79efd5592dcb9b6",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "filename": "amt/logs/2024/mc13_256_g4_all_v7_mt3f_sqr_rms_moe_wf4_n8k2_silu_rope_rp_b36_nops/checkpoints/last.ckpt",
+      "bytes": 561544628,
+      "sha256": "ae38e415c79efd5592dcb9b658cdb99ddb11d4c4e1eaa364cab04a052473fc25",
+      "url": "https://huggingface.co/spaces/mimbres/YourMT3/resolve/5e66c1ea173a8186e0d20432b841d3180cc015b5/amt/logs/2024/mc13_256_g4_all_v7_mt3f_sqr_rms_moe_wf4_n8k2_silu_rope_rp_b36_nops/checkpoints/last.ckpt",
+      "source_url": "https://huggingface.co/spaces/mimbres/YourMT3/tree/5e66c1ea173a8186e0d20432b841d3180cc015b5",
+      "source_kind": "huggingface-space",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "nops-original-checkpoint",
+      "requires_tensor_only_conversion": true
+    },
+    {
+      "id": "yourmt3-7427055b51c3c8c86f6a3549",
+      "engine": "yourmt3",
+      "consumers": [
+        "yourmt3"
+      ],
+      "repo_id": "mimbres/YourMT3",
+      "revision": "e45ebd70398682d54b7bb1901a5216e18f3b1824",
+      "filename": "logs/2024/mc13_256_g4_all_v7_mt3f_sqr_rms_moe_wf4_n8k2_silu_rope_rp_b80_ps2/checkpoints/model.ckpt",
+      "bytes": 758957292,
+      "sha256": "7427055b51c3c8c86f6a35493cf0741d8db29186052055b59193590a82e6ec01",
+      "url": "https://huggingface.co/mimbres/YourMT3/resolve/e45ebd70398682d54b7bb1901a5216e18f3b1824/logs/2024/mc13_256_g4_all_v7_mt3f_sqr_rms_moe_wf4_n8k2_silu_rope_rp_b80_ps2/checkpoints/model.ckpt",
+      "source_url": "https://huggingface.co/mimbres/YourMT3/tree/e45ebd70398682d54b7bb1901a5216e18f3b1824",
+      "source_kind": "huggingface-model",
+      "license": "apache-2.0",
+      "license_review_required": true,
+      "role": "ps-original-checkpoint",
+      "requires_tensor_only_conversion": true
+    },
+    {
+      "id": "transkun-7d7f5bf88b0d21f7da0415b0",
+      "engine": "transkun",
+      "consumers": [
+        "transkun"
+      ],
+      "repo_id": "transkun",
+      "revision": "2.0.1",
+      "filename": "transkun-2.0.1-py3-none-any.whl",
+      "bytes": 50758783,
+      "sha256": "7d7f5bf88b0d21f7da0415b089cff3bcbcbdda04e1a3c9719964947942c859fe",
+      "url": "https://files.pythonhosted.org/packages/a2/1f/1e04ac0f04583d593ecca935270401404ad45e88c9db7b249b67bde20a1b/transkun-2.0.1-py3-none-any.whl",
+      "source_url": "https://pypi.org/project/transkun/2.0.1/",
+      "source_kind": "pypi-wheel",
+      "license": "mit",
+      "license_review_required": true,
+      "role": "complete-runtime-wheel-with-pretrained-files",
+      "staging_is_not_runtime_installation": true
+    },
+    {
+      "id": "diffsinger-fe8ee7c95883d327a2b7facb",
+      "engine": "diffsinger",
+      "consumers": [
+        "diffsinger"
+      ],
+      "repo_id": "yqzhishen/qixuan-diffsinger",
+      "revision": "v2.7.0",
+      "filename": "Qixuan_v2.7.0_DiffSinger_OpenUtau.zip",
+      "bytes": 420707627,
+      "sha256": "fe8ee7c95883d327a2b7facbbe832a7a53e1344918dc791ca83fc23b08034110",
+      "url": "https://github.com/yqzhishen/qixuan-diffsinger/releases/download/v2.7.0/Qixuan_v2.7.0_DiffSinger_OpenUtau.zip",
+      "source_url": "https://github.com/yqzhishen/qixuan-diffsinger/releases/tag/v2.7.0",
+      "source_kind": "release-archive",
+      "license": "Qixuan Terms of Use (original Chinese document)",
+      "license_url": "https://github.com/yqzhishen/qixuan-diffsinger/releases/download/v2.7.0/Terms_of_Use.zh-CN.pdf",
+      "license_review_required": true,
+      "role": "complete-voicebank-package",
+      "complete_package_required": true,
+      "staging_is_not_runtime_installation": true,
+      "upstream_asset_id": 335569199
+    },
+    {
+      "id": "vocoder-ba7d43142d41f6900c8264b5",
+      "engine": "vocoder",
+      "consumers": [
+        "vocoder",
+        "diffsinger"
+      ],
+      "repo_id": "openvpi/vocoders",
+      "revision": "pc-nsf-hifigan-44.1k-hop512-128bin-2025.02",
+      "filename": "pc_nsf_hifigan_44.1k_hop512_128bin_2025.02.oudep",
+      "bytes": 52760610,
+      "sha256": "ba7d43142d41f6900c8264b5662ca7125a50feb8760bb8b9615c61a8f5e6902e",
+      "url": "https://github.com/openvpi/vocoders/releases/download/pc-nsf-hifigan-44.1k-hop512-128bin-2025.02/pc_nsf_hifigan_44.1k_hop512_128bin_2025.02.oudep",
+      "source_url": "https://github.com/openvpi/vocoders/releases/tag/pc-nsf-hifigan-44.1k-hop512-128bin-2025.02",
+      "source_kind": "release-archive",
+      "license": "CC-BY-NC-SA-4.0",
+      "license_url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+      "license_review_required": true,
+      "role": "complete-onnx-vocoder-package",
+      "complete_package_required": true,
+      "staging_is_not_runtime_installation": true,
+      "upstream_asset_id": 383522173
+    },
+    {
+      "id": "mr-mt3-original-b8a3807e",
+      "engine": "mr-mt3",
+      "consumers": [
+        "mr-mt3"
+      ],
+      "source_kind": "huggingface-model",
+      "repo_id": "gudgud1014/MR-MT3",
+      "revision": "7bd24c3e1dc26468a6a9354c0a4f174405c9bad8",
+      "filename": "mt3.pth",
+      "bytes": 183672643,
+      "sha256": "b8a3807ed265059abd25ad7f68142c06c35e8f6144dcaa45bd55946a3745398f",
+      "url": "https://huggingface.co/gudgud1014/MR-MT3/resolve/7bd24c3e1dc26468a6a9354c0a4f174405c9bad8/mt3.pth",
+      "source_url": "https://huggingface.co/gudgud1014/MR-MT3",
+      "license": "MIT (original-author model card)",
+      "license_review_required": true,
+      "installation_note": "Raw original weights; use the reviewed tensor-only converter and isolated runtime recipe. Download does not enable the engine."
+    }
+  ],
+  "notes": [
+    "All sources are fixed official upstream artifact URLs and exact size/SHA-256 pins; no deployment license, model enablement or inference certification is granted by this inventory.",
+    "Source discovery downloaded only metadata/text/config files, never model weights. Previously verified model pins come from the preserved validation receipts and source recipes.",
+    "The inspected Seed-VC singing source commit 51383efd921027683c89e5348211d93ff12ac2a8 uses F0, BigVGAN 44k, Whisper small, CAMPPlus and RMVPE. Its config sets DiT.target=mel; the DAC configuration stanza does not activate a separate pretrained codec checkpoint. No irrelevant codec weights are declared mandatory.",
+    "Other Seed configurations can select different vocoders/semantic encoders. Their concrete managed manifest must declare those files; this list does not authorize substitutes.",
+    "The original YourMT3 .ckpt files require the existing strict tensor-only conversion recipe. Downloading/staging an original checkpoint does not make it an admitted safetensors runtime.",
+    "Transkun wheel is preserved as a complete pinned artifact. Its download is not asserted to install an environment or execute its pretrained model.",
+    "The original complete Qixuan bank and OpenVPI vocoder release packages are pinned by GitHub API asset metadata (name, size, browser_download_url and SHA-256 digest). Downloads preserve the entire upstream package; staging does not activate a voicebank or grant redistribution/commercial rights."
+  ],
+  "active_seed_config_evidence": {
+    "source_commit": "51383efd921027683c89e5348211d93ff12ac2a8",
+    "inference_source_url": "https://github.com/Plachtaa/seed-vc/blob/51383efd921027683c89e5348211d93ff12ac2a8/inference.py",
+    "inference_source_sha256": "58f97976804a8eb8bb4d33e73beeab792f86a5ab2ca83c1319a23da1e71e80a6",
+    "config_sha256": "ff86f343b08c2def405f075022eeb10dafba23c4eda36d151010f4ca6d7a1a0a",
+    "target": "mel",
+    "separate_codec_checkpoint_required": false
+  }
+}

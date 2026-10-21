@@ -1,0 +1,433 @@
+[
+  {
+    "language": "it",
+    "word": "gioia",
+    "ipa": "dʒˈɔia",
+    "phones": [
+      "en/jh",
+      "en/ao",
+      "en/y",
+      "ja/a"
+    ],
+    "nuclei": 2
+  },
+  {
+    "language": "it",
+    "word": "aereo",
+    "ipa": "aˈɛːreo",
+    "phones": [
+      "ja/a",
+      "en/eh",
+      "ja/r",
+      "ja/e",
+      "ja/o"
+    ],
+    "nuclei": 4
+  },
+  {
+    "language": "it",
+    "word": "io",
+    "ipa": "ˈio",
+    "phones": [
+      "en/iy",
+      "ja/o"
+    ],
+    "nuclei": 2
+  },
+  {
+    "language": "it",
+    "word": "mio",
+    "ipa": "mˈio",
+    "phones": [
+      "en/m",
+      "en/iy",
+      "ja/o"
+    ],
+    "nuclei": 2
+  },
+  {
+    "language": "it",
+    "word": "tuo",
+    "ipa": "tˈuo",
+    "phones": [
+      "en/t",
+      "zh/u",
+      "ja/o"
+    ],
+    "nuclei": 2
+  },
+  {
+    "language": "it",
+    "word": "suo",
+    "ipa": "sˈuo",
+    "phones": [
+      "en/s",
+      "zh/u",
+      "ja/o"
+    ],
+    "nuclei": 2
+  },
+  {
+    "language": "it",
+    "word": "siamo",
+    "ipa": "sjˈamo",
+    "phones": [
+      "en/s",
+      "en/y",
+      "ja/a",
+      "en/m",
+      "ja/o"
+    ],
+    "nuclei": 2
+  },
+  {
+    "language": "it",
+    "word": "piano",
+    "ipa": "pjˈano",
+    "phones": [
+      "en/p",
+      "en/y",
+      "ja/a",
+      "en/n",
+      "ja/o"
+    ],
+    "nuclei": 2
+  },
+  {
+    "language": "it",
+    "word": "zio",
+    "ipa": "dzˈio",
+    "phones": [
+      "en/d",
+      "en/z",
+      "en/iy",
+      "ja/o"
+    ],
+    "nuclei": 2
+  },
+  {
+    "language": "it",
+    "word": "fiori",
+    "ipa": "fjˈorɪ",
+    "phones": [
+      "en/f",
+      "en/y",
+      "ja/o",
+      "ja/r",
+      "en/ih"
+    ],
+    "nuclei": 2
+  },
+  {
+    "language": "it",
+    "word": "fiore",
+    "ipa": "fjˈore",
+    "phones": [
+      "en/f",
+      "en/y",
+      "ja/o",
+      "ja/r",
+      "ja/e"
+    ],
+    "nuclei": 2
+  },
+  {
+    "language": "it",
+    "word": "buono",
+    "ipa": "bʊˈɔno",
+    "phones": [
+      "en/b",
+      "en/w",
+      "en/ao",
+      "en/n",
+      "ja/o"
+    ],
+    "nuclei": 2
+  },
+  {
+    "language": "it",
+    "word": "buio",
+    "ipa": "bˈuːjo",
+    "phones": [
+      "en/b",
+      "zh/u",
+      "en/y",
+      "ja/o"
+    ],
+    "nuclei": 2
+  },
+  {
+    "language": "it",
+    "word": "aiuto",
+    "ipa": "ajˈuto",
+    "phones": [
+      "ja/a",
+      "en/y",
+      "zh/u",
+      "en/t",
+      "ja/o"
+    ],
+    "nuclei": 3
+  },
+  {
+    "language": "it",
+    "word": "italiano",
+    "ipa": "italiˈano",
+    "phones": [
+      "en/iy",
+      "en/t",
+      "ja/a",
+      "en/l",
+      "en/y",
+      "ja/a",
+      "en/n",
+      "ja/o"
+    ],
+    "nuclei": 4
+  },
+  {
+    "language": "it",
+    "word": "arrivederci",
+    "ipa": "arɾivedˈɛrtʃɪ",
+    "phones": [
+      "ja/a",
+      "ja/r",
+      "ja/r",
+      "en/iy",
+      "en/v",
+      "ja/e",
+      "en/d",
+      "en/eh",
+      "ja/r",
+      "en/ch",
+      "en/ih"
+    ],
+    "nuclei": 5
+  },
+  {
+    "language": "it",
+    "word": "buongiorno",
+    "ipa": "bʊondʒˈɔrno",
+    "phones": [
+      "en/b",
+      "en/w",
+      "ja/o",
+      "en/n",
+      "en/jh",
+      "en/ao",
+      "ja/r",
+      "en/n",
+      "ja/o"
+    ],
+    "nuclei": 3
+  },
+  {
+    "language": "fr",
+    "word": "lui",
+    "ipa": "lyˈi",
+    "phones": [
+      "en/l",
+      "en/y",
+      "en/w",
+      "en/iy"
+    ],
+    "nuclei": 1
+  },
+  {
+    "language": "fr",
+    "word": "tuile",
+    "ipa": "tyˈil",
+    "phones": [
+      "en/t",
+      "en/y",
+      "en/w",
+      "en/iy",
+      "en/l"
+    ],
+    "nuclei": 1
+  },
+  {
+    "language": "fr",
+    "word": "nuage",
+    "ipa": "nyˈaʒ",
+    "phones": [
+      "en/n",
+      "en/y",
+      "en/w",
+      "ja/a",
+      "en/zh"
+    ],
+    "nuclei": 1
+  },
+  {
+    "language": "fr",
+    "word": "tuer",
+    "ipa": "tyˈe",
+    "phones": [
+      "en/t",
+      "en/y",
+      "en/w",
+      "ja/e"
+    ],
+    "nuclei": 1
+  },
+  {
+    "language": "fr",
+    "word": "fluide",
+    "ipa": "flyˈid",
+    "phones": [
+      "en/f",
+      "en/l",
+      "en/y",
+      "en/w",
+      "en/iy",
+      "en/d"
+    ],
+    "nuclei": 1
+  },
+  {
+    "language": "fr",
+    "word": "joie",
+    "ipa": "ʒwˈa",
+    "phones": [
+      "en/zh",
+      "en/w",
+      "ja/a"
+    ],
+    "nuclei": 1
+  },
+  {
+    "language": "fr",
+    "word": "chanter",
+    "ipa": "ʃɑ̃tˈe",
+    "phones": [
+      "en/sh",
+      "zh/ang",
+      "en/t",
+      "ja/e"
+    ],
+    "nuclei": 2
+  },
+  {
+    "language": "fr",
+    "word": "voilà",
+    "ipa": "vwalˈa",
+    "phones": [
+      "en/v",
+      "en/w",
+      "ja/a",
+      "en/l",
+      "ja/a"
+    ],
+    "nuclei": 2
+  },
+  {
+    "language": "fr",
+    "word": "poésie",
+    "ipa": "pɔezˈi",
+    "phones": [
+      "en/p",
+      "en/ao",
+      "ja/e",
+      "en/z",
+      "en/iy"
+    ],
+    "nuclei": 3
+  },
+  {
+    "language": "fr",
+    "word": "ambiguïté",
+    "ipa": "ɑ̃biɡyitˈe",
+    "phones": [
+      "zh/ang",
+      "en/b",
+      "en/iy",
+      "en/g",
+      "en/y",
+      "en/w",
+      "en/iy",
+      "en/t",
+      "ja/e"
+    ],
+    "nuclei": 4
+  },
+  {
+    "language": "fr",
+    "word": "accueillir",
+    "ipa": "akœjˈiʁ",
+    "phones": [
+      "ja/a",
+      "en/k",
+      "zh/ve",
+      "en/y",
+      "en/iy",
+      "en/r"
+    ],
+    "nuclei": 3
+  },
+  {
+    "language": "fr",
+    "word": "travailler",
+    "ipa": "tʁavajˈe",
+    "phones": [
+      "en/t",
+      "en/r",
+      "ja/a",
+      "en/v",
+      "ja/a",
+      "en/y",
+      "ja/e"
+    ],
+    "nuclei": 3
+  },
+  {
+    "language": "fr",
+    "word": "aujourd’hui",
+    "ipa": "oʒuʁdyˈi",
+    "phones": [
+      "ja/o",
+      "en/zh",
+      "zh/u",
+      "en/r",
+      "en/d",
+      "en/y",
+      "en/w",
+      "en/iy"
+    ],
+    "nuclei": 3
+  },
+  {
+    "language": "fr",
+    "word": "petit",
+    "ipa": "pətˈi",
+    "phones": [
+      "en/p",
+      "en/ax",
+      "en/t",
+      "en/iy"
+    ],
+    "nuclei": 2
+  },
+  {
+    "language": "fr",
+    "word": "grand",
+    "ipa": "ɡʁˈɑ̃",
+    "phones": [
+      "en/g",
+      "en/r",
+      "zh/ang"
+    ],
+    "nuclei": 1
+  },
+  {
+    "language": "fr",
+    "word": "heureux",
+    "ipa": "øʁˈø",
+    "phones": [
+      "zh/ve",
+      "en/r",
+      "zh/ve"
+    ],
+    "nuclei": 2
+  }
+]

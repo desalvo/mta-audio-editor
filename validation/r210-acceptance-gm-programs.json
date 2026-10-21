@@ -1,0 +1,1490 @@
+{
+  "schema": "mta-gm-audit-1",
+  "status": {
+    "id": "gm_soundfont",
+    "name": "TinySoundFont / FluidR3 General MIDI",
+    "engine_license": "MIT",
+    "bank_license": "MIT",
+    "programs": 128,
+    "available": true,
+    "size_bytes": 148398306,
+    "backend": "portable-cpp",
+    "aftertouch": false,
+    "bank_id": "fluidr3-gm",
+    "sha256": "74594e8f4250680adf590507a306655a299935343583256f3b722c48a1bc1cb0"
+  },
+  "programs": [
+    {
+      "program": 0,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.6037361025810242,
+      "frames": 10560
+    },
+    {
+      "program": 1,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.6289457678794861,
+      "frames": 10560
+    },
+    {
+      "program": 2,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.48806920647621155,
+      "frames": 10560
+    },
+    {
+      "program": 3,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 1.1179324388504028,
+      "frames": 10560
+    },
+    {
+      "program": 4,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.5247737169265747,
+      "frames": 10560
+    },
+    {
+      "program": 5,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.5758054256439209,
+      "frames": 10560
+    },
+    {
+      "program": 6,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.46109339594841003,
+      "frames": 10560
+    },
+    {
+      "program": 7,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.4855198562145233,
+      "frames": 10560
+    },
+    {
+      "program": 8,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.5534077286720276,
+      "frames": 10560
+    },
+    {
+      "program": 9,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.4166141152381897,
+      "frames": 10560
+    },
+    {
+      "program": 10,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.46978044509887695,
+      "frames": 10560
+    },
+    {
+      "program": 11,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.6420506834983826,
+      "frames": 10560
+    },
+    {
+      "program": 12,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.505355715751648,
+      "frames": 10560
+    },
+    {
+      "program": 13,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.6161964535713196,
+      "frames": 10560
+    },
+    {
+      "program": 14,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.5420717000961304,
+      "frames": 10560
+    },
+    {
+      "program": 15,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.5789555907249451,
+      "frames": 10560
+    },
+    {
+      "program": 16,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.3189302980899811,
+      "frames": 10560
+    },
+    {
+      "program": 17,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.47343572974205017,
+      "frames": 10560
+    },
+    {
+      "program": 18,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.37411734461784363,
+      "frames": 10560
+    },
+    {
+      "program": 19,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.28771519660949707,
+      "frames": 10560
+    },
+    {
+      "program": 20,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.5612694025039673,
+      "frames": 10560
+    },
+    {
+      "program": 21,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.5337399840354919,
+      "frames": 10560
+    },
+    {
+      "program": 22,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.6043210029602051,
+      "frames": 10560
+    },
+    {
+      "program": 23,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.7269418239593506,
+      "frames": 10560
+    },
+    {
+      "program": 24,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.4890603721141815,
+      "frames": 10560
+    },
+    {
+      "program": 25,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.4840427339076996,
+      "frames": 10560
+    },
+    {
+      "program": 26,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.7006128430366516,
+      "frames": 10560
+    },
+    {
+      "program": 27,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.47438836097717285,
+      "frames": 10560
+    },
+    {
+      "program": 28,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.46944504976272583,
+      "frames": 10560
+    },
+    {
+      "program": 29,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.33649227023124695,
+      "frames": 10560
+    },
+    {
+      "program": 30,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.5963892340660095,
+      "frames": 10560
+    },
+    {
+      "program": 31,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.45633062720298767,
+      "frames": 10560
+    },
+    {
+      "program": 32,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.4902019500732422,
+      "frames": 10560
+    },
+    {
+      "program": 33,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.48888054490089417,
+      "frames": 10560
+    },
+    {
+      "program": 34,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.4831624925136566,
+      "frames": 10560
+    },
+    {
+      "program": 35,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.5910863280296326,
+      "frames": 10560
+    },
+    {
+      "program": 36,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.47692909836769104,
+      "frames": 10560
+    },
+    {
+      "program": 37,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.4946307837963104,
+      "frames": 10560
+    },
+    {
+      "program": 38,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.7114061713218689,
+      "frames": 10560
+    },
+    {
+      "program": 39,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.8927570581436157,
+      "frames": 10560
+    },
+    {
+      "program": 40,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.3597782850265503,
+      "frames": 10560
+    },
+    {
+      "program": 41,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.3383254408836365,
+      "frames": 10560
+    },
+    {
+      "program": 42,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.1971084177494049,
+      "frames": 10560
+    },
+    {
+      "program": 43,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.07677099108695984,
+      "frames": 10560
+    },
+    {
+      "program": 44,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.34582415223121643,
+      "frames": 10560
+    },
+    {
+      "program": 45,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.6540201902389526,
+      "frames": 10560
+    },
+    {
+      "program": 46,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.6024250984191895,
+      "frames": 10560
+    },
+    {
+      "program": 47,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.46628472208976746,
+      "frames": 10560
+    },
+    {
+      "program": 48,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.34966298937797546,
+      "frames": 10560
+    },
+    {
+      "program": 49,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.13744492828845978,
+      "frames": 10560
+    },
+    {
+      "program": 50,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.5586744546890259,
+      "frames": 10560
+    },
+    {
+      "program": 51,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 1.1306605339050293,
+      "frames": 10560
+    },
+    {
+      "program": 52,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.6230272650718689,
+      "frames": 10560
+    },
+    {
+      "program": 53,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.5554667711257935,
+      "frames": 10560
+    },
+    {
+      "program": 54,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.3825722634792328,
+      "frames": 10560
+    },
+    {
+      "program": 55,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.629448652267456,
+      "frames": 10560
+    },
+    {
+      "program": 56,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.4924682676792145,
+      "frames": 10560
+    },
+    {
+      "program": 57,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.4955601692199707,
+      "frames": 10560
+    },
+    {
+      "program": 58,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.4892049729824066,
+      "frames": 10560
+    },
+    {
+      "program": 59,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.4543052613735199,
+      "frames": 10560
+    },
+    {
+      "program": 60,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.3786425292491913,
+      "frames": 10560
+    },
+    {
+      "program": 61,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.34955427050590515,
+      "frames": 10560
+    },
+    {
+      "program": 62,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.6210359930992126,
+      "frames": 10560
+    },
+    {
+      "program": 63,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.49989601969718933,
+      "frames": 10560
+    },
+    {
+      "program": 64,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.6272329688072205,
+      "frames": 10560
+    },
+    {
+      "program": 65,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.5116528868675232,
+      "frames": 10560
+    },
+    {
+      "program": 66,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.5093333125114441,
+      "frames": 10560
+    },
+    {
+      "program": 67,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.5617706775665283,
+      "frames": 10560
+    },
+    {
+      "program": 68,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.37681934237480164,
+      "frames": 10560
+    },
+    {
+      "program": 69,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.42285069823265076,
+      "frames": 10560
+    },
+    {
+      "program": 70,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.4758776128292084,
+      "frames": 10560
+    },
+    {
+      "program": 71,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.3900690972805023,
+      "frames": 10560
+    },
+    {
+      "program": 72,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.16077367961406708,
+      "frames": 10560
+    },
+    {
+      "program": 73,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.30591389536857605,
+      "frames": 10560
+    },
+    {
+      "program": 74,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.5473191738128662,
+      "frames": 10560
+    },
+    {
+      "program": 75,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.2379349023103714,
+      "frames": 10560
+    },
+    {
+      "program": 76,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.4020867943763733,
+      "frames": 10560
+    },
+    {
+      "program": 77,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.38145849108695984,
+      "frames": 10560
+    },
+    {
+      "program": 78,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.19763115048408508,
+      "frames": 10560
+    },
+    {
+      "program": 79,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.4420672357082367,
+      "frames": 10560
+    },
+    {
+      "program": 80,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.7697466015815735,
+      "frames": 10560
+    },
+    {
+      "program": 81,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.6470353007316589,
+      "frames": 10560
+    },
+    {
+      "program": 82,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.4208773076534271,
+      "frames": 10560
+    },
+    {
+      "program": 83,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.49195846915245056,
+      "frames": 10560
+    },
+    {
+      "program": 84,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 1.016485571861267,
+      "frames": 10560
+    },
+    {
+      "program": 85,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.30483049154281616,
+      "frames": 10560
+    },
+    {
+      "program": 86,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.6774841547012329,
+      "frames": 10560
+    },
+    {
+      "program": 87,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.6373254060745239,
+      "frames": 10560
+    },
+    {
+      "program": 88,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.5579986572265625,
+      "frames": 10560
+    },
+    {
+      "program": 89,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.3058183193206787,
+      "frames": 10560
+    },
+    {
+      "program": 90,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.7088195085525513,
+      "frames": 10560
+    },
+    {
+      "program": 91,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.4361429810523987,
+      "frames": 10560
+    },
+    {
+      "program": 92,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.43643197417259216,
+      "frames": 10560
+    },
+    {
+      "program": 93,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.35267624258995056,
+      "frames": 10560
+    },
+    {
+      "program": 94,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.23378275334835052,
+      "frames": 10560
+    },
+    {
+      "program": 95,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.2041887789964676,
+      "frames": 10560
+    },
+    {
+      "program": 96,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.6298077702522278,
+      "frames": 10560
+    },
+    {
+      "program": 97,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.35209330916404724,
+      "frames": 10560
+    },
+    {
+      "program": 98,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.4722650647163391,
+      "frames": 10560
+    },
+    {
+      "program": 99,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.4566052556037903,
+      "frames": 10560
+    },
+    {
+      "program": 100,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.3981783092021942,
+      "frames": 10560
+    },
+    {
+      "program": 101,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.25833654403686523,
+      "frames": 10560
+    },
+    {
+      "program": 102,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.453688383102417,
+      "frames": 10560
+    },
+    {
+      "program": 103,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.4703647792339325,
+      "frames": 10560
+    },
+    {
+      "program": 104,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.6887125968933105,
+      "frames": 10560
+    },
+    {
+      "program": 105,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.4834762513637543,
+      "frames": 10560
+    },
+    {
+      "program": 106,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.5595404505729675,
+      "frames": 10560
+    },
+    {
+      "program": 107,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.48638206720352173,
+      "frames": 10560
+    },
+    {
+      "program": 108,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.43414756655693054,
+      "frames": 10560
+    },
+    {
+      "program": 109,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.2999320924282074,
+      "frames": 10560
+    },
+    {
+      "program": 110,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.399667888879776,
+      "frames": 10560
+    },
+    {
+      "program": 111,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.38257676362991333,
+      "frames": 10560
+    },
+    {
+      "program": 112,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.45547017455101013,
+      "frames": 10560
+    },
+    {
+      "program": 113,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.5656323432922363,
+      "frames": 10560
+    },
+    {
+      "program": 114,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.6896211504936218,
+      "frames": 10560
+    },
+    {
+      "program": 115,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.6017827391624451,
+      "frames": 10560
+    },
+    {
+      "program": 116,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.6300274729728699,
+      "frames": 10560
+    },
+    {
+      "program": 117,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.8428244590759277,
+      "frames": 10560
+    },
+    {
+      "program": 118,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.7183775305747986,
+      "frames": 10560
+    },
+    {
+      "program": 119,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.05063498020172119,
+      "frames": 10560
+    },
+    {
+      "program": 120,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.34845131635665894,
+      "frames": 10560
+    },
+    {
+      "program": 121,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.4733652174472809,
+      "frames": 10560
+    },
+    {
+      "program": 122,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.19687537848949432,
+      "frames": 10560
+    },
+    {
+      "program": 123,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.2944113612174988,
+      "frames": 10560
+    },
+    {
+      "program": 124,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.340457022190094,
+      "frames": 10560
+    },
+    {
+      "program": 125,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.07430537790060043,
+      "frames": 10560
+    },
+    {
+      "program": 126,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.11442959308624268,
+      "frames": 10560
+    },
+    {
+      "program": 127,
+      "tested_pitches": [
+        60
+      ],
+      "ok": true,
+      "finite": true,
+      "peak": 0.49495482444763184,
+      "frames": 10560
+    }
+  ],
+  "drums": {
+    "35": {
+      "ok": true,
+      "peak": 0.6741439700126648
+    },
+    "36": {
+      "ok": true,
+      "peak": 0.6697575449943542
+    },
+    "37": {
+      "ok": true,
+      "peak": 0.6490339636802673
+    },
+    "38": {
+      "ok": true,
+      "peak": 0.7666481137275696
+    },
+    "39": {
+      "ok": true,
+      "peak": 0.7575406432151794
+    },
+    "40": {
+      "ok": true,
+      "peak": 0.7928711771965027
+    },
+    "41": {
+      "ok": true,
+      "peak": 0.6835625171661377
+    },
+    "42": {
+      "ok": true,
+      "peak": 0.6190599203109741
+    },
+    "43": {
+      "ok": true,
+      "peak": 0.7135393023490906
+    },
+    "44": {
+      "ok": true,
+      "peak": 0.6959455013275146
+    },
+    "45": {
+      "ok": true,
+      "peak": 0.7442646026611328
+    },
+    "46": {
+      "ok": true,
+      "peak": 0.6740222573280334
+    },
+    "47": {
+      "ok": true,
+      "peak": 0.757274329662323
+    },
+    "48": {
+      "ok": true,
+      "peak": 0.7609925866127014
+    },
+    "49": {
+      "ok": true,
+      "peak": 0.597730815410614
+    },
+    "50": {
+      "ok": true,
+      "peak": 0.5960527658462524
+    },
+    "51": {
+      "ok": true,
+      "peak": 0.5538145303726196
+    },
+    "52": {
+      "ok": true,
+      "peak": 0.5371739864349365
+    },
+    "53": {
+      "ok": true,
+      "peak": 0.5473301410675049
+    },
+    "54": {
+      "ok": true,
+      "peak": 0.5364599227905273
+    },
+    "55": {
+      "ok": true,
+      "peak": 0.6068757176399231
+    },
+    "56": {
+      "ok": true,
+      "peak": 0.7231860756874084
+    },
+    "57": {
+      "ok": true,
+      "peak": 0.6000471115112305
+    },
+    "58": {
+      "ok": true,
+      "peak": 0.5220381617546082
+    },
+    "59": {
+      "ok": true,
+      "peak": 0.45618030428886414
+    },
+    "60": {
+      "ok": true,
+      "peak": 0.6754619479179382
+    },
+    "61": {
+      "ok": true,
+      "peak": 0.6744310259819031
+    },
+    "62": {
+      "ok": true,
+      "peak": 0.6134434938430786
+    },
+    "63": {
+      "ok": true,
+      "peak": 0.6566344499588013
+    },
+    "64": {
+      "ok": true,
+      "peak": 0.6747050285339355
+    },
+    "65": {
+      "ok": true,
+      "peak": 0.7128410339355469
+    },
+    "66": {
+      "ok": true,
+      "peak": 0.6924260258674622
+    },
+    "67": {
+      "ok": true,
+      "peak": 0.5669533610343933
+    },
+    "68": {
+      "ok": true,
+      "peak": 0.5626387000083923
+    },
+    "69": {
+      "ok": true,
+      "peak": 0.5781987905502319
+    },
+    "70": {
+      "ok": true,
+      "peak": 0.7258502840995789
+    },
+    "71": {
+      "ok": true,
+      "peak": 0.4954817295074463
+    },
+    "72": {
+      "ok": true,
+      "peak": 0.4946363568305969
+    },
+    "73": {
+      "ok": true,
+      "peak": 0.6479546427726746
+    },
+    "74": {
+      "ok": true,
+      "peak": 0.682153582572937
+    },
+    "75": {
+      "ok": true,
+      "peak": 0.7508442997932434
+    },
+    "76": {
+      "ok": true,
+      "peak": 0.7365941405296326
+    },
+    "77": {
+      "ok": true,
+      "peak": 0.7142577767372131
+    },
+    "78": {
+      "ok": true,
+      "peak": 0.713672935962677
+    },
+    "79": {
+      "ok": true,
+      "peak": 0.663948118686676
+    },
+    "80": {
+      "ok": true,
+      "peak": 0.4814022481441498
+    },
+    "81": {
+      "ok": true,
+      "peak": 0.4892139434814453
+    }
+  },
+  "certified": false,
+  "software_smoke_pass": true
+}

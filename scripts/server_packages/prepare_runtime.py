@@ -33,6 +33,20 @@ def prepare(source: Path, stage: Path, requirements: Path):
     shutil.copytree(source / 'app', app / 'app', ignore=shutil.ignore_patterns('__pycache__', '*.pyc', '.git'), symlinks=False)
     shutil.copy2(requirements, app / 'requirements.txt')
     shutil.copy2(source / 'requirements-vst3.txt', app / 'requirements-vst3.txt')
+    # Optional Studio runtimes are installed explicitly after deployment; their
+    # recipes must survive RPM/DEB staging without merging ML dependencies.
+    for recipe in ('requirements-studio-basic-pitch.txt','requirements-studio-yourmt3.txt'):
+        shutil.copy2(source / recipe, app / recipe)
+    (app / 'scripts').mkdir(exist_ok=True)
+    shutil.copy2(source / 'scripts/install_studio_yourmt3.py', app / 'scripts/install_studio_yourmt3.py')
+    for helper in ('install_music_assets.py','verify_music_hardware.py'):
+        shutil.copy2(source/'scripts'/helper,app/'scripts'/helper)
+    shutil.copytree(source/'native/third_party/oddvoices',app/'native/third_party/oddvoices',ignore=shutil.ignore_patterns('__pycache__','*.pyc'))
+    (app/'native/third_party/tinysoundfont').mkdir(parents=True)
+    shutil.copy2(source/'native/third_party/tinysoundfont/LICENSE',app/'native/third_party/tinysoundfont/LICENSE')
+    (app / 'docs').mkdir(exist_ok=True)
+    for guide in ('YOURMT3_RUNTIME_R210.md','YOURMT3_RUNTIME_R210_EN.md','MUSIC_ASSETS_AND_LICENSES_R210.md','MUSIC_ASSETS_AND_LICENSES_R210_EN.md'):
+        shutil.copy2(source / 'docs' / guide, app / 'docs' / guide)
     # The native RPM/DEB payload must carry the exact application identity.
     for filename in ('VERSION', 'REVISION', 'BUILD_INFO', 'RELEASE_CHANNEL'):
         metadata = source / filename

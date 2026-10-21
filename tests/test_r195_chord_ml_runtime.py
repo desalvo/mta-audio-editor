@@ -45,6 +45,10 @@ def test_flatten_single_directory(tmp_path):
 
 
 def test_download_btc_and_chordformer_with_fake_archives(monkeypatch, tmp_path):
+    # Archive extraction unit test; all bytes below are synthetic. License
+    # admission is covered independently and stays enabled in production.
+    from model_rights_fixtures import authorize_fixture
+    authorize_fixture(monkeypatch,tmp_path,'chordformer')
     monkeypatch.setenv("MTA_CHORD_ML_MODEL_DIR", str(tmp_path / "models"))
     btc = _zip_bytes({"btc-hcqt-main/btc_hcqt_beatlesft.pt": b"pt", "btc-hcqt-main/hcqt_eval.py": "print('x')"})
     body = _zip_bytes({"BTC-ISMIR19-master/btc_model.py": "# body"})
@@ -64,6 +68,8 @@ def test_download_btc_and_chordformer_with_fake_archives(monkeypatch, tmp_path):
 
 
 def test_download_validates_missing_checkpoints(monkeypatch, tmp_path):
+    from model_rights_fixtures import authorize_fixture
+    authorize_fixture(monkeypatch,tmp_path,'chordformer')
     monkeypatch.setenv("MTA_CHORD_ML_MODEL_DIR", str(tmp_path / "models"))
     weak = _zip_bytes({"repo/chord_recognition.py": "# no checkpoints"})
     monkeypatch.setattr(chord_ml, "_download_zip", lambda url, dest: dest.write_bytes(weak))
@@ -92,6 +98,8 @@ def test_run_success_and_failure(monkeypatch, tmp_path):
 
 
 def test_extract_adapters_with_mocked_runner(monkeypatch, tmp_path):
+    from model_rights_fixtures import authorize_fixture
+    authorize_fixture(monkeypatch,tmp_path,'chordformer')
     monkeypatch.setenv("MTA_CHORD_ML_MODEL_DIR", str(tmp_path / "models"))
     for model in ("btc-hcqt","chordformer"):
         root=chord_ml.model_dir(model);root.mkdir(parents=True);(root/".mta-installed.json").write_text("{}")

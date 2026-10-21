@@ -1,0 +1,35 @@
+{
+  "cfm": {
+    "missing": [
+      "estimator.t_embedder.freqs"
+    ],
+    "extra": [
+      "estimator.conv1.bias",
+      "estimator.conv1.weight",
+      "estimator.conv2.bias",
+      "estimator.conv2.weight",
+      "estimator.res_projection.bias",
+      "estimator.res_projection.weight",
+      "estimator.t_embedder2.mlp.0.bias",
+      "estimator.t_embedder2.mlp.0.weight",
+      "estimator.t_embedder2.mlp.2.bias",
+      "estimator.t_embedder2.mlp.2.weight"
+    ],
+    "mismatch": [
+      [
+        "estimator.input_pos",
+        [
+          16384
+        ],
+        [
+          8192
+        ]
+      ]
+    ]
+  },
+  "length_regulator": {
+    "missing": [],
+    "extra": [],
+    "mismatch": []
+  }
+}

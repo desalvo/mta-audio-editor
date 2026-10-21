@@ -385,6 +385,8 @@ def _purge_queue(uid,job_ids):
                 quoted='"'+name.replace('"','""')+'"'
                 cols={r[1] for r in con.execute('PRAGMA table_info('+quoted+')')}
                 if name!='jobs' and 'job_id' in cols:con.execute('DELETE FROM '+quoted+' WHERE job_id=?',(jid,))  # noqa: S608 -- identifiers from fixed allowlists or quoted SQLite schema only
+            from .studio_jobs import purge as purge_studio_result
+            if __import__('re').fullmatch('[a-f0-9]{32}',jid):purge_studio_result(jid)
             con.execute('DELETE FROM jobs WHERE job_id=?',(jid,))
             for path in queue._ROOT.glob(jid+'.*'):
                 if path.is_file() and not path.is_symlink():path.unlink()

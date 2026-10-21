@@ -1,0 +1,258 @@
+{
+  "protocol": "mta-music-1",
+  "parts": [
+    {
+      "id": "gm-0",
+      "name": "GM 1",
+      "instrument": "gm-0",
+      "program": 0,
+      "percussion": false,
+      "notes": [
+        {
+          "id": "n-0",
+          "start_ms": 100.0,
+          "duration_ms": 2400.0,
+          "pitch": 48,
+          "velocity": 45,
+          "channel": 0,
+          "origin": "manual",
+          "source_model": "",
+          "confidence": null,
+          "confidence_metric": ""
+        }
+      ],
+      "controls": [],
+      "source_model": "",
+      "source_result_id": "",
+      "review": "unreviewed"
+    },
+    {
+      "id": "gm-4",
+      "name": "GM 5",
+      "instrument": "gm-4",
+      "program": 4,
+      "percussion": false,
+      "notes": [
+        {
+          "id": "n-1",
+          "start_ms": 100.0,
+          "duration_ms": 2400.0,
+          "pitch": 51,
+          "velocity": 45,
+          "channel": 1,
+          "origin": "manual",
+          "source_model": "",
+          "confidence": null,
+          "confidence_metric": ""
+        }
+      ],
+      "controls": [],
+      "source_model": "",
+      "source_result_id": "",
+      "review": "unreviewed"
+    },
+    {
+      "id": "gm-16",
+      "name": "GM 17",
+      "instrument": "gm-16",
+      "program": 16,
+      "percussion": false,
+      "notes": [
+        {
+          "id": "n-2",
+          "start_ms": 100.0,
+          "duration_ms": 2400.0,
+          "pitch": 54,
+          "velocity": 45,
+          "channel": 2,
+          "origin": "manual",
+          "source_model": "",
+          "confidence": null,
+          "confidence_metric": ""
+        }
+      ],
+      "controls": [],
+      "source_model": "",
+      "source_result_id": "",
+      "review": "unreviewed"
+    },
+    {
+      "id": "gm-24",
+      "name": "GM 25",
+      "instrument": "gm-24",
+      "program": 24,
+      "percussion": false,
+      "notes": [
+        {
+          "id": "n-3",
+          "start_ms": 100.0,
+          "duration_ms": 2400.0,
+          "pitch": 57,
+          "velocity": 45,
+          "channel": 3,
+          "origin": "manual",
+          "source_model": "",
+          "confidence": null,
+          "confidence_metric": ""
+        }
+      ],
+      "controls": [],
+      "source_model": "",
+      "source_result_id": "",
+      "review": "unreviewed"
+    },
+    {
+      "id": "gm-32",
+      "name": "GM 33",
+      "instrument": "gm-32",
+      "program": 32,
+      "percussion": false,
+      "notes": [
+        {
+          "id": "n-4",
+          "start_ms": 100.0,
+          "duration_ms": 2400.0,
+          "pitch": 60,
+          "velocity": 45,
+          "channel": 4,
+          "origin": "manual",
+          "source_model": "",
+          "confidence": null,
+          "confidence_metric": ""
+        }
+      ],
+      "controls": [],
+      "source_model": "",
+      "source_result_id": "",
+      "review": "unreviewed"
+    },
+    {
+      "id": "gm-40",
+      "name": "GM 41",
+      "instrument": "gm-40",
+      "program": 40,
+      "percussion": false,
+      "notes": [
+        {
+          "id": "n-5",
+          "start_ms": 100.0,
+          "duration_ms": 2400.0,
+          "pitch": 63,
+          "velocity": 45,
+          "channel": 5,
+          "origin": "manual",
+          "source_model": "",
+          "confidence": null,
+          "confidence_metric": ""
+        }
+      ],
+      "controls": [],
+      "source_model": "",
+      "source_result_id": "",
+      "review": "unreviewed"
+    },
+    {
+      "id": "gm-56",
+      "name": "GM 57",
+      "instrument": "gm-56",
+      "program": 56,
+      "percussion": false,
+      "notes": [
+        {
+          "id": "n-6",
+          "start_ms": 100.0,
+          "duration_ms": 2400.0,
+          "pitch": 66,
+          "velocity": 45,
+          "channel": 6,
+          "origin": "manual",
+          "source_model": "",
+          "confidence": null,
+          "confidence_metric": ""
+        }
+      ],
+      "controls": [],
+      "source_model": "",
+      "source_result_id": "",
+      "review": "unreviewed"
+    },
+    {
+      "id": "gm-64",
+      "name": "GM 65",
+      "instrument": "gm-64",
+      "program": 64,
+      "percussion": false,
+      "notes": [
+        {
+          "id": "n-7",
+          "start_ms": 100.0,
+          "duration_ms": 2400.0,
+          "pitch": 69,
+          "velocity": 45,
+          "channel": 7,
+          "origin": "manual",
+          "source_model": "",
+          "confidence": null,
+          "confidence_metric": ""
+        }
+      ],
+      "controls": [],
+      "source_model": "",
+      "source_result_id": "",
+      "review": "unreviewed"
+    },
+    {
+      "id": "gm-73",
+      "name": "GM 74",
+      "instrument": "gm-73",
+      "program": 73,
+      "percussion": false,
+      "notes": [
+        {
+          "id": "n-8",
+          "start_ms": 100.0,
+          "duration_ms": 2400.0,
+          "pitch": 72,
+          "velocity": 45,
+          "channel": 8,
+          "origin": "manual",
+          "source_model": "",
+          "confidence": null,
+          "confidence_metric": ""
+        }
+      ],
+      "controls": [],
+      "source_model": "",
+      "source_result_id": "",
+      "review": "unreviewed"
+    },
+    {
+      "id": "gm-80",
+      "name": "GM 81",
+      "instrument": "gm-80",
+      "program": 80,
+      "percussion": false,
+      "notes": [
+        {
+          "id": "n-9",
+          "start_ms": 100.0,
+          "duration_ms": 2400.0,
+          "pitch": 75,
+          "velocity": 45,
+          "channel": 10,
+          "origin": "manual",
+          "source_model": "",
+          "confidence": null,
+          "confidence_metric": ""
+        }
+      ],
+      "controls": [],
+      "source_model": "",
+      "source_result_id": "",
+      "review": "unreviewed"
+    }
+  ],
+  "alternatives": [],
+  "offset_ms": 0.0,
+  "warnings": []
+}

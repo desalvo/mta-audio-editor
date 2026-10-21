@@ -10,3 +10,19 @@ Google, Facebook and GitHub marks in app/static/social identify their respective
 sign-in providers. They remain the property of their respective owners and are
 not relicensed under the application's EUPL licence. Source and branding links
 are recorded in docs/SSO_BRANDING_ADMIN_EMAIL_LINKS_R210.md.
+
+T5 mathematical-layer compatibility (r210 Studio integration)
+Source: Hugging Face Transformers v4.45.1, modeling_t5.py.
+Copyright 2018 The Mesh TensorFlow authors, T5 Authors and HuggingFace Inc.
+License: Apache License 2.0; text retained at app/studio_assets/Apache-2.0.txt.
+MTA modifications: extracted mathematical layer classes only, compatibility
+imports, no old pretrained/download/checkpoint-loading code.
+YourMT3 original-author source/model is downloaded only by explicit operator
+action, pinned and verified. Source/weight provenance and separate dependency
+notices are documented in docs/YOURMT3_RUNTIME_R210.md and its EN edition.
+
+Native device backend: sounddevice 0.5.5, MIT (Matthias Geier and contributors),
+and standard PortAudio, MIT (Ross Bencina, Phil Burk and contributors).
+Notices retained in app/studio_assets/sounddevice-LICENSE.txt and
+app/studio_assets/PortAudio-LICENSE.txt. ASIO-enabled wheel DLLs are excluded
+from automatic packaging pending their verified source/notice bundle.

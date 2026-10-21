@@ -1,0 +1,49 @@
+{
+  "profile_languages": [
+    "en",
+    "it",
+    "fr",
+    "vocalise"
+  ],
+  "acoustic_languages": [
+    "en",
+    "ja",
+    "zh"
+  ],
+  "it_fr_mode": "explicit cross-language projection; not native trained IT/FR",
+  "real_g2p_words": 78,
+  "real_g2p_unknown_phone_errors": 0,
+  "actual_cpu_onnx_bridge_cases": 8,
+  "diffusion_steps": 32,
+  "real_audio_total_wall_seconds": 46.537830682000276,
+  "all_waveforms_finite_non_silent": true,
+  "sample_rate": 48000,
+  "channels": 1,
+  "pcm_subtype": "PCM_24",
+  "duration_tolerance_ms": 25,
+  "focused_tests": {
+    "passed": 82,
+    "skipped": 3,
+    "warnings": 1,
+    "note": "Three optional real-G2P tests skipped in shared mta_env; actual G2P78words and8realinferences executed separately in isolated approved runtime."
+  },
+  "bundle": {
+    "file": "MTA-Qixuan-2.7.0-onnx-IT-EN-FR-release-v2-bundle.zip",
+    "bytes": 474464355,
+    "sha256": "f02ee089e85d58ca7ca7caff4d1e3d5ab508375d315ddcc0f0f5db8d19f1c4ac",
+    "full_crc": true,
+    "original_members_byte_identical": 37,
+    "file_hash_inventory_verified": true,
+    "engine_evidence_matches_final_sources": true,
+    "enabled": false,
+    "pronunciation_modes": {
+      "en": "native-inventory",
+      "it": "cross-language",
+      "fr": "cross-language"
+    }
+  },
+  "target_listening_certified": false,
+  "policy_changes": false,
+  "assets_auto_enabled": false,
+  "original_bank_members_byte_identical": 37
+}

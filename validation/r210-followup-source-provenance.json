@@ -1,0 +1,25 @@
+{
+  "version": "0.3.0-r210",
+  "cycle": "benchmark-source-provenance",
+  "implemented": [
+    "SHA-256 and exact byte length for both externally supplied benchmark inputs; fingerprints do not assert model inference"
+  ],
+  "focused": {
+    "passed": 22,
+    "failed": 0,
+    "skipped": 7
+  },
+  "extended": {
+    "passed": 73,
+    "failed": 0,
+    "skipped": 9
+  },
+  "full_regression": "not run; prior network governance blocker remains unresolved",
+  "neural_inference": "not run; authorized checkpoint/runtimes absent",
+  "server_changes": "none",
+  "macroarea_signoff": {
+    "vocal_studio": false,
+    "audio_to_midi": false,
+    "general_midi": false
+  }
+}

@@ -5,6 +5,7 @@ written BEFORE calling upload helpers, so a crash between file creation and
 registration is recoverable. Only files absent from the initial snapshot and
 still unreferenced in the saved project are eligible for cleanup.
 """
+from .fs_durability import sync_directory
 import json
 import os
 import uuid
@@ -26,11 +27,7 @@ def _atomic_write(path: Path, document: dict):
             handle.flush()
             os.fsync(handle.fileno())
         os.replace(tmp, path)
-        directory = os.open(str(path.parent), os.O_RDONLY)
-        try:
-            os.fsync(directory)
-        finally:
-            os.close(directory)
+        sync_directory(path.parent)
     finally:
         tmp.unlink(missing_ok=True)
 
@@ -108,11 +105,7 @@ def reconcile(project_id: str):
     # Flush media deletions before durably retiring the journal.
     for directory in (folder / 'audio', folder / 'originals'):
         if directory.is_dir():
-            fd = os.open(str(directory), os.O_RDONLY)
-            try:
-                os.fsync(fd)
-            finally:
-                os.close(fd)
+            sync_directory(directory)
     # Preserve an operator-readable, durable audit before retiring the journal.
     # A crash after writing this report but before journal retirement can replay
     # safely: the report is rewritten idempotently with the same survivors.
@@ -138,11 +131,7 @@ def reconcile(project_id: str):
                 existing.add(key)
         _atomic_write(report_path, {'version': 1, 'items': history})
     path.unlink()
-    fd = os.open(str(folder), os.O_RDONLY)
-    try:
-        os.fsync(fd)
-    finally:
-        os.close(fd)
+    sync_directory(folder)
     return {'recovered': True, 'committed': committed, 'removed': removed,
             'preserved_unowned': preserved_unowned, 'preserved_replaced': preserved_replaced}
 
@@ -278,9 +267,7 @@ def restore_quarantined(project_id: str, quarantine_name: str):
         raise RuntimeError('Unsafe quarantine restore target')
     # Hard-link with exclusive creation, then unlink source: existing targets are never overwritten.
     os.link(src, target, follow_symlinks=False)
-    fd = os.open(str(target.parent), os.O_RDONLY)
-    try: os.fsync(fd)
-    finally: os.close(fd)
+    sync_directory(target.parent)
     updated = [dict(r, status='restored') if r is row else r for r in records]
     try:
         _atomic_write(folder / _QUARANTINE, {'version': 1, 'items': updated})
@@ -288,9 +275,7 @@ def restore_quarantined(project_id: str, quarantine_name: str):
         target.unlink(missing_ok=True)
         raise
     src.unlink()
-    fd = os.open(str(vault), os.O_RDONLY)
-    try: os.fsync(fd)
-    finally: os.close(fd)
+    sync_directory(vault)
     return {'restored': True, 'receipt': row['receipt'], 'file': row['file']}
 
 
@@ -331,11 +316,7 @@ def quarantine_preserved(project_id: str, receipt: str, relative_path: str):
         raise RuntimeError('Preserved stem media changed before quarantine')
     os.rename(src, destination)
     for directory in (src.parent, quarantine):
-        fd = os.open(str(directory), os.O_RDONLY)
-        try:
-            os.fsync(fd)
-        finally:
-            os.close(fd)
+        sync_directory(directory)
     # Durable quarantine ledger, preserving provenance across process restarts.
     records.append({'receipt': receipt, 'file': relative_path,
                     'quarantine_name': destination.name, 'status': 'quarantined'})

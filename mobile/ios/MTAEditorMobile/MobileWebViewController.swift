@@ -5,6 +5,7 @@ import Network
 
 final class MobileWebViewController: UIViewController, WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler, UIDocumentPickerDelegate {
     private enum Defaults {
+        static let interfaceZoom = "mta.interface.zoomPercent"
         static let serverURL = "mta.server.url"
         static let defaultServerURL = "https://mta-audio-editor.apps.desalvo.eu"
         static let localStemMode = "mta.local.stems.mode"
@@ -94,6 +95,7 @@ final class MobileWebViewController: UIViewController, WKNavigationDelegate, WKU
         webView = WKWebView(frame: .zero, configuration: configuration)
         webView.navigationDelegate = self
         webView.uiDelegate = self
+        webView.pageZoom = Double(interfaceZoomPercent) / 100
         webView.customUserAgent = "MTAEditorMobile/0.2.0-r161 iOS"
         webView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(webView)
@@ -105,11 +107,41 @@ final class MobileWebViewController: UIViewController, WKNavigationDelegate, WKU
         ])
     }
 
+    private var interfaceZoomPercent: Int {
+        let value = UserDefaults.standard.integer(forKey: Defaults.interfaceZoom)
+        return (50...200).contains(value) ? value : 100
+    }
+
+    private func setInterfaceZoom(_ value: Int) {
+        guard (50...200).contains(value) else { return }
+        webView.pageZoom = Double(value) / 100
+        UserDefaults.standard.set(value, forKey: Defaults.interfaceZoom)
+    }
+
+    private func showInterfaceZoom() {
+        let italian = Locale.current.languageCode?.lowercased() == "it"
+        let title = italian ? "Zoom interfaccia" : "Interface zoom"
+        let alert = UIAlertController(title: "\(title) · \(interfaceZoomPercent)%", message: nil, preferredStyle: .actionSheet)
+        for value in [50, 67, 75, 80, 90, 100, 110, 125, 150, 175, 200] {
+            let label = "\(value)%" + (value == 100 ? (italian ? " · Ripristina" : " · Reset") : "")
+            alert.addAction(UIAlertAction(title: label, style: .default) { [weak self] _ in self?.setInterfaceZoom(value) })
+        }
+        alert.addAction(UIAlertAction(title: italian ? "Annulla" : "Cancel", style: .cancel))
+        if let popover = alert.popoverPresentationController { popover.barButtonItem = navigationItem.rightBarButtonItems?.first }
+        present(alert, animated: true)
+    }
+
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        webView.pageZoom = Double(interfaceZoomPercent) / 100
+    }
+
     @objc private func reloadPage() { webView.reload() }
     @objc private func changeServer() { promptServerURL(required: false) }
 
     @objc private func showOptions() {
         let alert = UIAlertController(title: "Options", message: "Update channel: \(NativeUpdateManager.shared.channel == "early" ? "Early release" : "Stable")", preferredStyle: .actionSheet)
+        let italian = Locale.current.languageCode?.lowercased() == "it"
+        alert.addAction(UIAlertAction(title: italian ? "Zoom interfaccia…" : "Interface zoom…", style: .default) { _ in self.showInterfaceZoom() })
         alert.addAction(UIAlertAction(title: "Stable · tags/releases", style: .default) { _ in
             NativeUpdateManager.shared.channel = "stable"
             self.checkForAppUpdate(manual: true)

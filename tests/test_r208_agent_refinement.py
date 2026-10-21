@@ -45,7 +45,7 @@ def _payload(**changes):
     {'processes': [{'host_pid': 22, 'gpu': 0, 'host_cgroup': []}]},
     {'billing_eligible': True},
 ])
-def test_agent_rejects_untrusted_snapshot(tmp_path, change):
+def test_agent_rejects_untrusted_snapshot(tmp_path, change, unix_socket_capability):
     path = tmp_path / 'agent.sock'
     thread = _serve_once(path, _payload(**change))
     result = client.snapshot(socket_path=str(path), token='x' * 32)
@@ -54,7 +54,7 @@ def test_agent_rejects_untrusted_snapshot(tmp_path, change):
     assert result['billing_eligible'] is False
 
 
-def test_valid_agent_snapshot_is_diagnostic_only(tmp_path):
+def test_valid_agent_snapshot_is_diagnostic_only(tmp_path, unix_socket_capability):
     path = tmp_path / 'agent.sock'
     thread = _serve_once(path, _payload())
     result = client.snapshot(socket_path=str(path), token='x' * 32)

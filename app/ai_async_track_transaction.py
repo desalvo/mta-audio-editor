@@ -4,6 +4,7 @@ The caller holds project_publication_lock while creating/finishing receipts.
 Only exact predeclared, newly created audio paths can be deleted; unrelated
 files from concurrent project writers are never swept.
 """
+from .fs_durability import sync_directory
 import json
 import os
 import re
@@ -42,9 +43,7 @@ def begin(pid, job, filename):
 
 
 def _fsync(directory):
-    fd = os.open(str(directory), os.O_RDONLY)
-    try: os.fsync(fd)
-    finally: os.close(fd)
+    sync_directory(directory)
 
 
 

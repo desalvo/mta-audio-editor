@@ -20,6 +20,9 @@ def test_backend_accepts_and_tracks_backing_vocals_option():
 
 
 def test_configured_ai_separator_uses_no_shell(monkeypatch, tmp_path):
+    # Exercise the local desktop branch. Server calls require a global job.
+    monkeypatch.setattr(main,'NATIVE_SINGLE_USER',True)
+    monkeypatch.setattr('app.native_ai_routing.is_remote',lambda kind:False)
     src = tmp_path / "vocals.wav"
     src.write_bytes(b"RIFF")
     monkeypatch.setenv("MTA_LEAD_BACKING_COMMAND", "fake-separator --input {input} --lead {lead} --backing {backing}")
@@ -47,6 +50,8 @@ def test_configured_ai_separator_uses_no_shell(monkeypatch, tmp_path):
 
 
 def test_ffmpeg_fallback_builds_center_side_outputs(monkeypatch, tmp_path):
+    monkeypatch.setattr(main,'NATIVE_SINGLE_USER',True)
+    monkeypatch.setattr('app.native_ai_routing.is_remote',lambda kind:False)
     src = tmp_path / "vocals.wav"
     src.write_bytes(b"RIFF")
     monkeypatch.delenv("MTA_LEAD_BACKING_COMMAND", raising=False)

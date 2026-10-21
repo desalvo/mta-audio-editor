@@ -1,0 +1,26 @@
+{
+  "baseline": "MTA-0.3.0-r210-device-routing-yourmt3-cumulative.zip",
+  "baseline_sha256": "860abe53d2297a2459740163d559d0b449bac6cb95bca0e5dfe8df32f9a69c7c",
+  "baseline_entries": 2380,
+  "baseline_crc_valid": true,
+  "baseline_missing": [],
+  "baseline_changed": [
+    ".github/workflows/ci-cd.yml",
+    "app/ai_async_track_transaction.py",
+    "app/ai_media_identity.py",
+    "app/ai_recovered_stem_transaction.py",
+    "app/ai_upload_transaction.py",
+    "app/main.py",
+    "app/optional_plugin_routes.py",
+    "app/static/optional_plugins.js",
+    "app/storage.py",
+    "app/templates/admin.html",
+    "app/templates/index.html",
+    "docs/DEVELOPMENT_STATUS.md",
+    "tests/test_r210_live_mixer_progress.py"
+  ],
+  "baseline_unchanged_file_count": 2367,
+  "version": "0.3.0",
+  "revision": "210",
+  "build_info": "20261015171900"
+}

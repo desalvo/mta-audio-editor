@@ -4,8 +4,8 @@ let access=null,provider='web',monitor=null,starting=null,hardware=null,sequence
 const padListeners=new Set();let padHandler=null;
 const pad={id:'mta-keyboard',name:tr('On-screen keyboard','Tastiera sullo schermo'),addEventListener:(_,fn)=>padListeners.add(fn),removeEventListener:(_,fn)=>padListeners.delete(fn),get onmidimessage(){return padHandler},set onmidimessage(fn){padHandler=fn},emit(data){const e={data,timeStamp:performance.now(),native_direct:false};padHandler?.(e);for(const fn of padListeners)fn(e)}};
 const key=()=>`mta.midi.devices.${currentUser?.id||'local'}.${current?.id||''}`;
-function preferences(){try{return JSON.parse(localStorage.getItem(key())||'{}')}catch{return {}}}
-function remember(value){try{localStorage.setItem(key(),JSON.stringify({...preferences(),...value}))}catch{}}
+function preferences(){try{return JSON.parse(MtaPreferences.getItem(key())||'{}')}catch{return {}}}
+function remember(value){try{MtaPreferences.setItem(key(),JSON.stringify({...preferences(),...value}))}catch{}}
 const editor=()=>window.mtaMidiEditor?.getDraft();
 const status=text=>{const node=document.getElementById('midiLiveStatus');if(node)node.textContent=text};
 async function bridge(){const b=await waitForNativeApi();if(!b?.midi_ports)throw Error(tr('Update the native application for MIDI hardware support','Aggiornare l’app nativa per il supporto hardware MIDI'));return b}
@@ -38,7 +38,7 @@ function send(port,data,when){try{port?.send(data,when)}catch(e){status(e.messag
 function panicPort(port){if(!port)return;try{port.clear?.();if(port.native)return;for(let ch=0;ch<16;ch++)for(const cc of [64,120,123])port.send([176|ch,cc,0])}catch{}}
 async function panic(){for(const id of new Set(Object.values(preferences().outputs||{})))panicPort(access?.outputs.get(id));if(monitor?.native)try{await(await bridge()).midi_monitor_control('panic')}catch{}else if(monitor?.socket?.readyState===1)monitor.socket.send(JSON.stringify({op:'panic'}));}
 function handleInput(e){const m=[...e.data];if(m[0]<128||(m[0]>239&&!(preferences().sysex&&m[0]===240&&m.at(-1)===247)))return;const draft=editor();if(!draft||!monitor)return;
- if(draft.midi_route!=='instrument')send(outputFor(draft.id),m);
+ if(['hardware','both'].includes(draft.midi_route))send(outputFor(draft.id),m);
  if(monitor.native){if(!e.native_direct)void bridge().then(b=>b.midi_monitor_control('midi',[m])).catch(e=>status(e.message))}
  else if(monitor.socket?.readyState===1)monitor.socket.send(JSON.stringify({op:'midi',messages:[m]}));
 }
@@ -48,13 +48,13 @@ async function stopMonitor(){if(starting)starting.cancelled=true;const s=monitor
  await panic();const button=document.getElementById('midiMonitorToggle');if(button)button.textContent=tr('Start monitoring','Avvia monitoring');status(tr('Monitoring stopped','Monitoring fermato'));
 }
 function contextForMonitor(){return {sample:Math.max(0,Math.round((playCursorMs||0)/tempoRatio()*Number(current?.sample_rate||44100)/1000)),playing:!!window.playbackActuallyRunning()}}
-async function startMonitor(task){if(monitor)return stopMonitor();const d=editor();if(!d)return;
+async function startMonitor(task){if(monitor)return stopMonitor();const d=editor();if(!d)return;if(d.midi_route==='none')throw Error(tr('Choose a MIDI destination before monitoring','Scegliere una destinazione MIDI prima del monitoring'));
  // Browser activation must occur on this click, before HTTP preparation.
  if(!currentUser?.native_single_user){audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();void audioCtx.resume()}
  status(tr('Preparing monitoring…','Preparazione monitoring…'));document.getElementById('midiMonitorToggle').textContent=tr('Cancel preparation','Annulla preparazione');await window.mtaMidiEditor.save();if(task.cancelled)return;
  const a=(!access&&(!preferences().input||preferences().input===pad.id))?{inputs:new Map([[pad.id,pad]])}:await window.mtaRequestMidiAccess(),p=preferences(),input=[...a.inputs.values()].find(x=>x.id!=='mta-keyboard')||pad;
  if(task.cancelled)return;
- if(editor().midi_route!=='instrument'&&!outputFor(d.id))throw Error(tr('Connect and select a MIDI output','Collegare e selezionare un’uscita MIDI'));
+ if(['hardware','both'].includes(editor().midi_route)&&!outputFor(d.id))throw Error(tr('Connect and select a MIDI output','Collegare e selezionare un’uscita MIDI'));
  const s={pid:current.id,tid:d.id,input,sources:new Set(),native:false,nextAt:0,sequence:0};monitor=s;
  try{
   if(editor().midi_route!=='hardware'){
@@ -78,7 +78,7 @@ async function startMonitor(task){if(monitor)return stopMonitor();const d=editor
   document.getElementById('midiMonitorToggle').textContent=tr('Stop monitoring','Ferma monitoring');if(s.native)status(tr('Native monitoring · device buffer + DSP latency','Monitoring nativo · buffer dispositivo + latenza DSP'));
  }catch(e){if(monitor===s)await stopMonitor();throw e}
 }
-function mount(){const host=document.querySelector('.midi-editor');if(!host)return;const d=editor(),p=preferences();const panel=document.createElement('section');panel.id='midiLivePanel';panel.className='midi-live-panel';panel.innerHTML=`<div class="midi-toolbar"><label>${tr('MIDI destination','Destinazione MIDI')}<select id="midiRoute"><option value="instrument">VSTi</option><option value="hardware">MIDI hardware</option><option value="both">VSTi + MIDI hardware</option></select></label><button id="midiConnect" class="utility-btn">${tr('Connect MIDI devices','Collega dispositivi MIDI')}</button><label>${tr('Input','Ingresso')}<select id="midiLiveInput"></select></label><label>${tr('Output','Uscita')}<select id="midiLiveOutput"></select></label><label><input id="midiSendClock" type="checkbox" ${p.clock?'checked':''}> MIDI Clock / Start / Stop (24 PPQ)</label></div><div class="midi-toolbar"><button id="midiMonitorToggle" class="primary">${tr('Start monitoring','Avvia monitoring')}</button><button id="midiPanic" class="danger">Panic</button><span id="midiLiveStatus" role="status"></span></div><div id="midiPad" class="midi-toolbar" aria-label="MIDI keyboard"></div><p class="hint">${tr('Monitoring uses a separate audition bus. Server monitoring includes network latency. Hardware MIDI produces external sound, which is not captured in audio exports. Host tempo and time signature follow the project grid.','Il monitoring usa un bus di ascolto separato. Sul server comprende la latenza della rete. Il MIDI hardware produce audio esterno, che non viene acquisito negli export audio. Tempo e misura host seguono la griglia del progetto.')}</p>`;
+function mount(){const host=document.querySelector('.midi-editor');if(!host)return;const d=editor(),p=preferences();const panel=document.createElement('section');panel.id='midiLivePanel';panel.className='midi-live-panel';panel.innerHTML=`<div class="midi-toolbar"><label>${tr('MIDI destination','Destinazione MIDI')}<select id="midiRoute"><option value="none">${tr('None (editable guide)','Nessuna (guida modificabile)')}</option><option value="instrument">VSTi / GM</option><option value="hardware">MIDI hardware</option><option value="both">VSTi + MIDI hardware</option></select></label><button id="midiConnect" class="utility-btn">${tr('Connect MIDI devices','Collega dispositivi MIDI')}</button><label>${tr('Input','Ingresso')}<select id="midiLiveInput"></select></label><label>${tr('Output','Uscita')}<select id="midiLiveOutput"></select></label><label><input id="midiSendClock" type="checkbox" ${p.clock?'checked':''}> MIDI Clock / Start / Stop (24 PPQ)</label></div><div class="midi-toolbar"><button id="midiMonitorToggle" class="primary">${tr('Start monitoring','Avvia monitoring')}</button><button id="midiPanic" class="danger">Panic</button><span id="midiLiveStatus" role="status"></span></div><div id="midiPad" class="midi-toolbar" aria-label="MIDI keyboard"></div><p class="hint">${tr('Monitoring uses a separate audition bus. Server monitoring includes network latency. Hardware MIDI produces external sound, which is not captured in audio exports. Host tempo and time signature follow the project grid.','Il monitoring usa un bus di ascolto separato. Sul server comprende la latenza della rete. Il MIDI hardware produce audio esterno, che non viene acquisito negli export audio. Tempo e misura host seguono la griglia del progetto.')}</p>`;
  host.insertBefore(panel,host.firstChild);document.getElementById('midiRoute').value=d.midi_route||'instrument';refreshSelectors();
  document.getElementById('midiRoute').onchange=e=>{editor().midi_route=e.target.value;void stopMonitor()};
  document.getElementById('midiConnect').onclick=async()=>{try{access=null;await connect();refreshSelectors();status(tr('MIDI devices connected','Dispositivi MIDI collegati'))}catch(e){status(e.message)}};
@@ -91,7 +91,7 @@ function mount(){const host=document.querySelector('.midi-editor');if(!host)retu
 const open=window.openMidiEditor;window.openMidiEditor=async function(...args){if(monitor)await stopMonitor();await open(...args);mount()};
 const close=window.closeUtilityModal;window.closeUtilityModal=function(...args){void stopMonitor();return close.apply(this,args)};
 window.mtaMidiLive={stop:stopMonitor,panic,parameter(params){if(monitor?.native)void bridge().then(b=>b.midi_monitor_control('midi-parameters',params)).catch(e=>status(e.message));else if(monitor?.socket?.readyState===1)monitor.socket.send(JSON.stringify({op:'parameters',params}))}};
-function hardwareRoutes(){return (current?.tracks||[]).filter(t=>t.kind==='midi'&&t.midi_route!=='instrument'&&!t.mute&&(!(current.tracks.some(x=>x.solo))||t.solo))}
+function hardwareRoutes(){return (current?.tracks||[]).filter(t=>t.kind==='midi'&&['hardware','both'].includes(t.midi_route)&&!t.mute&&(!(current.tracks.some(x=>x.solo))||t.solo))}
 function stopHardware(){if(hardware)for(const route of hardware.routes)panicPort(route.port);hardware=null;lastPlaying=false}
 function scheduleHardware(){if(!current)return;const nativeCpp=!!(currentUser?.native_single_user&&(provider==='native'||Object.values(preferences().ump_outputs||{}).some(Boolean))&&nativeAudioEngineIdentity==='cpp');if(nativeCpp){stopHardware();return}const playing=!!window.playbackActuallyRunning(),position=Number(playCursorMs||0),now=performance.now(),ratio=tempoRatio();if(!playing){if(lastPlaying)stopHardware();return}
  const routes=hardwareRoutes();if(hardwareProject!==current){hardwareProject=current;hardwareRevision++}const signature=[current.id,hardwareRevision,current.bpm,current.base_bpm,routes.map(t=>t.id).join(',')].join(':');const jumped=lastPlaying&&Math.abs(position-lastPosition-(now-lastAt)*ratio)>100;

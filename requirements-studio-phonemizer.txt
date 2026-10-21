@@ -1,0 +1,4 @@
+# Optional external GPL eSpeak NG runtime + dictionaries, dynamically loaded.
+# No eSpeak binaries/data are included in MTA packages. Preserve upstream notices
+# and source-offer obligations when redistributing this optional dependency.
+espeakng-loader==0.2.4

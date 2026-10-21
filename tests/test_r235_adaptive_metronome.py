@@ -43,7 +43,8 @@ def test_project_persists_adaptive_tempo_map_and_frontend_exposes_mode():
     assert restored.adaptive_tempo_map[0].bpm == 120
     assert "openMetronomeSettings()" in JS
     assert "Sensibilità adattiva" in JS
-    assert "project.adaptive_tempo_map = tempo_points" in MAIN
+    assert "project.adaptive_tempo_map = [AdaptiveTempoPoint(" in MAIN
+    assert "time_ms=int(at), beat_index=i" in MAIN
 
 
 def test_adaptive_endpoint_recalculates_map_every_request(monkeypatch, tmp_path):
@@ -62,7 +63,8 @@ def test_adaptive_endpoint_recalculates_map_every_request(monkeypatch, tmp_path)
     def fake_estimate(path):
         calls["analysis"] += 1
         base = calls["analysis"]
-        return [0, 500, 980, 1440], [
+        # Each fresh analysis changes actual click times, not just contradictory BPM metadata.
+        return [0, 500 + base*10, 980 + base*20, 1440 + base*30], [
             AdaptiveTempoPoint(time_ms=0, bpm=120 + base, beat_index=0),
             AdaptiveTempoPoint(time_ms=500, bpm=125 + base, beat_index=1),
         ]
@@ -81,8 +83,10 @@ def test_adaptive_endpoint_recalculates_map_every_request(monkeypatch, tmp_path)
 
     assert calls == {"analysis": 2, "render": 2}
     assert first["mode"] == second["mode"] == "adaptive"
-    assert second["tempo_map"][0].bpm == 122
-    assert project.adaptive_tempo_map[0].bpm == 122
+    assert [p.time_ms for p in first["tempo_map"]] != [p.time_ms for p in second["tempo_map"]]
+    actual = project.adaptive_tempo_map
+    assert actual[0].bpm == 60000 / (actual[1].time_ms - actual[0].time_ms)
+    assert second["tempo_map"][0].bpm == actual[0].bpm
     assert len([t for t in project.tracks if t.type == "click"]) == 1
     assert project.tracks[-1].name == "Metronomo adattivo"
 

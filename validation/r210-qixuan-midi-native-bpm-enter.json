@@ -1,0 +1,5 @@
+{
+  "manual_default_120_explicit_enter_commits": true,
+  "headless_handler_check": true,
+  "physical_ui_acceptance": false
+}

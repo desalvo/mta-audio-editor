@@ -1,0 +1,34 @@
+{
+  "lyric_profile_probes": [
+    {
+      "language": "en",
+      "phones": [
+        "en/l",
+        "en/ae"
+      ],
+      "profile_sha256": "1c09923a8bf8b601e5d0e37f5b9f4894ae0d2a61074dc7005c195a47da253147",
+      "mode": "native-inventory"
+    },
+    {
+      "language": "it",
+      "phones": [
+        "en/l",
+        "ja/a"
+      ],
+      "profile_sha256": "0cea576a68d02623d13ad5b5aca965d1b97f03504850ba6bf2de9c8fae860544",
+      "mode": "cross-language"
+    },
+    {
+      "language": "fr",
+      "phones": [
+        "en/l",
+        "ja/a"
+      ],
+      "profile_sha256": "fada666f56449145f2fa49f39e6732da519f97c0f0b876ac473f9ece618f18c7",
+      "mode": "cross-language"
+    }
+  ],
+  "success": true,
+  "acoustic_inference_in_this_probe": false,
+  "model_admission_evaluated": false
+}

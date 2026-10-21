@@ -54,23 +54,25 @@ class Device:
 
     def __exit__(self,*args):self.close()
 
+def bind_stream(lib):
+    lib.mta_transport_open_stream.argtypes=[ct.c_uint32,ct.c_uint64,ct.c_uint]
+    lib.mta_transport_open_stream.restype=ct.c_void_p
+    for name in ('play','pause'):
+        fn=getattr(lib,'mta_transport_'+name);fn.argtypes=[ct.c_void_p];fn.restype=ct.c_int
+    lib.mta_transport_seek.argtypes=[ct.c_void_p,ct.c_uint64];lib.mta_transport_seek.restype=ct.c_int
+    lib.mta_transport_gain.argtypes=[ct.c_void_p,ct.c_float];lib.mta_transport_gain.restype=ct.c_int
+    lib.mta_transport_status.argtypes=[ct.c_void_p,ct.POINTER(State)];lib.mta_transport_status.restype=ct.c_int
+    lib.mta_transport_close.argtypes=[ct.c_void_p];lib.mta_transport_close.restype=None
+    lib.mta_transport_push.argtypes=[ct.c_void_p,ct.POINTER(ct.c_float),ct.c_uint];lib.mta_transport_push.restype=ct.c_int
+    lib.mta_transport_buffered.argtypes=[ct.c_void_p];lib.mta_transport_buffered.restype=ct.c_uint64
+    lib.mta_transport_finish.argtypes=[ct.c_void_p];lib.mta_transport_finish.restype=ct.c_int
+
 
 class StreamDevice(Device):
     """Only the producer calls push; device callback stays entirely in C++."""
     def __init__(self,rate,total,*,_test_null=False):
         self.handle=None;self.lib=runtime().lib
-        # Configure shared ABI signatures without opening a file or device twice.
-        self.lib.mta_transport_open_stream.argtypes=[ct.c_uint32,ct.c_uint64,ct.c_uint]
-        self.lib.mta_transport_open_stream.restype=ct.c_void_p
-        for name in ('play','pause'):
-            fn=getattr(self.lib,'mta_transport_'+name);fn.argtypes=[ct.c_void_p];fn.restype=ct.c_int
-        self.lib.mta_transport_seek.argtypes=[ct.c_void_p,ct.c_uint64];self.lib.mta_transport_seek.restype=ct.c_int
-        self.lib.mta_transport_gain.argtypes=[ct.c_void_p,ct.c_float];self.lib.mta_transport_gain.restype=ct.c_int
-        self.lib.mta_transport_status.argtypes=[ct.c_void_p,ct.POINTER(State)];self.lib.mta_transport_status.restype=ct.c_int
-        self.lib.mta_transport_close.argtypes=[ct.c_void_p];self.lib.mta_transport_close.restype=None
-        self.lib.mta_transport_push.argtypes=[ct.c_void_p,ct.POINTER(ct.c_float),ct.c_uint];self.lib.mta_transport_push.restype=ct.c_int
-        self.lib.mta_transport_buffered.argtypes=[ct.c_void_p];self.lib.mta_transport_buffered.restype=ct.c_uint64
-        self.lib.mta_transport_finish.argtypes=[ct.c_void_p];self.lib.mta_transport_finish.restype=ct.c_int
+        bind_stream(self.lib)
         self.handle=self.lib.mta_transport_open_stream(rate,total,int(_test_null))
         if not self.handle:raise RuntimeError('Native live output device is unavailable')
 
@@ -144,7 +146,8 @@ def prepare_play(pid,cursor_ms=0,*,start_playing=True,midi_options=None):
         stop();epoch=_CANCEL_EPOCH;scratch=tempfile.TemporaryDirectory(prefix='mta-native-device-')
         try:
             from .vst3_live import available
-            if available() or any(t.kind=='midi' for t in project.tracks) or any(i.enabled and i.plugin=='vst3' for items in [project.master_inserts,*[t.inserts for t in project.tracks]] for i in items):
+            from .native_device_io import load as device_settings
+            if available() or (os.getenv('MTA_NATIVE_SINGLE_USER','').lower()=='true' and device_settings().backend=='portaudio') or any(t.kind=='midi' for t in project.tracks) or any(i.enabled and i.plugin=='vst3' for items in [project.master_inserts,*[t.inserts for t in project.tracks]] for i in items):
                 from .vst3_live import Session
                 from .live_sources import prepare
                 def progress(done,total,track):

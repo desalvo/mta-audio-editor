@@ -1,3 +1,59 @@
+**Current r210 verification,21October2026:** 4,735 distinct cases verified across the complete regression and final failed-case retry; 98 skipped. Qixuan existing-bank IT/FR software, native UI zoom, audio/MIDI project modes, musical transport/metronome and quantization verified. Twelve real Qixuan CPU cases passed; IT/FR remain disclosed cross-language projections. [Current bilingual report](docs/R210_QIXUAN_MIDI_NATIVE_IT_EN.md). Physical target/listening acceptance and the historical10–16-instrument accuracy gate remain distinct. All earlier status entries below are historical.
+
+**Current r210 verification, 21 October 2026:** 4,680 passed, zero failures/errors, 98 skipped. Fixed tariff navigation and added engine-grouped per-file AI administration. Qixuan IT/FR profiles passed eight actual CPU ONNX cases; these are disclosed cross-language projections. **10–16-instrument accuracy remains unmet, beyond hardware acceptance.** [Current bilingual report](docs/R210_ADMIN_QIXUAN_ACCURACY_IT_EN.md). All earlier status entries below are historical.
+
+**Current r210 verification, 21 October 2026:** 4598 passed, 0 failures/errors, 98 skipped. Fixed combined Deep channel/controller routing, empty-score handling, source-duration note bounds and final cancellation. [Current bilingual report](docs/R210_COMBINED_RESULTS_IT_EN.md) · [Runtime/target acceptance guide](docs/R210_DIFFSINGER_DEEP_ACCEPTANCE_IT_EN.md). Multi-instrument accuracy and Qixuan IT/FR remain open; this is not full three-area certification. Earlier checkpoints below are historical.
+
+**21 October 2026 — current r210 verification:** 4,608 passed, 0 failed, 80 skipped, 6 warnings (524.10 s). Final changed-area checks: 68 passed; the last vocal identity adjustment also passed real Qixuan→YourMT3 PS inference. Real DiffSinger ONNX singing and the metered Deep pipeline/replay now work. The ten–sixteen instrument accuracy gate remains unmet and is not a hardware-only limitation. See [current bilingual report](docs/R210_DIFFSINGER_DEEP_CLOSURE_IT_EN.md) and [acceptance guide](docs/R210_DIFFSINGER_DEEP_ACCEPTANCE_IT_EN.md). Version remains 0.3.0-r210.
+
+**Final general regression / Regressione generale finale: 4.596 passed, 0 failed, 80 skipped, 6 warnings.**
+
+**Current runtime validation, 21 October 2026 — 0.3.0-r210:** real offline CPU inference completed with RVC, strict Seed-VC, Transkun and YourMT3; actual FluidR3/TinySoundFont covered 128 GM programs and 47 drums. Seed import/checkpoint/export compatibility and RVC namespace shadowing were corrected. The ten-program YourMT3 mixture **failed its target** (5 predicted parts); a complete authorized DiffSinger bank and browser/target acceptance are still missing. This is **not** a hardware-only completion claim.
+
+[Current bilingual runtime report](docs/R210_REAL_RUNTIME_HANDOFF_IT_EN.md) · [Target acceptance steps and remaining gates](docs/R210_TARGET_ACCEPTANCE_IT_EN.md) · [Cumulative suggested commit](docs/COMMIT_MESSAGE_R210.txt).
+
+Earlier validation checkpoints below are historical; use the current report for repeated checks.
+
+---
+
+**Current status, 21 October 2026 — 0.3.0-r210:** complete general offline regression: **4,579 passed, 0 failed, 85 skipped, 6 warnings**. Fixed remote lead/backing artifact selection, reconciled legacy harnesses and added offline isolation without weakening authentication or license policy. Complete authorized neural bundles, musical benchmarks and asset/browser/target acceptance remain; the three macroareas are not certified fully complete.
+
+[Final bilingual report](docs/R210_OFFLINE_FINALIZATION_IT_EN.md) · [Cumulative suggested commit](docs/COMMIT_MESSAGE_R210.txt).
+
+---
+
+
+### r210 single-cycle engineering gate (21 October 2026)
+Recovery from an invalid-schema Audio-to-MIDI stage checkpoint now recomputes the real stage rather than aborting; 108 offline cross-area tests passed. Real licensed neural inference, full repository regression, native/browser and GM hardware acceptance remain **unverified**, so the three areas are **not certified complete**. See `docs/DEVELOPMENT_STATUS.md`.
+
+**r210 three-area verification (2026-10-21):** GM atomic WAV export and validated MIDI benchmark instrument target; 101 passed, 0 failed, 5 skipped in an offline subset. The three macroareas are **not yet end-to-end certified**. See `docs/R210_THREE_AREAS_CLOSURE_GATE_20261021_IT_EN.md`.
+
+Additional finalization check: 106 passed, 0 failed, 5 skipped (focused offline tests; not a full regression). The three areas remain conditional on authorized real model inference and target acceptance; see `validation/r210-finalization-current.json`. 
+
+
+> Offline r210 accelerated hardening: bounded MIDI benchmark augmenting-path work and closed portable GM configuration; 123 focused tests passed, 10 asset/DOM skips. Neural inference, full regression and target acceptance are not certified.
+
+
+## r210 benchmark provenance follow-up — 21 October 2026
+
+Implemented: Audio-to-MIDI benchmark file reports now record SHA-256 hashes and exact byte lengths of both local MusicResult inputs. This supports reproducibility but does not certify real neural inference or reviewed reference labels. Offline regression: **73 passed, 0 failed, 9 skipped** (requires externally reviewed GM assets/core). The controlled full suite has not been rerun and prior GitHub-request governance blocker is unresolved. No real checkpoint inference, native/browser acceptance or musical listening was performed. No production server changes and no Git operations. **The three macroareas are not signed off; software completion cannot be certified yet.**
+
+## r210 follow-up: local stage recovery safety
+
+The same stage-cache instance now invalidates previous results after runtime/model/policy fingerprint changes. Local checks: 28 passed, 0 failed, 0 skipped; expanded r210 regression interrupted before final counts. Neural checkpoint inference and browser/native testing are not certified. See `docs/DEVELOPMENT_STATUS.md`.
+
+## Three-area cumulative development checkpoint (0.3.0-r210, uncommitted)
+
+## r210 — Managed neural assets, conversion and transcription recovery (uncommitted)
+
+Per-component license/SHA-256 registry, independent DiffSinger singers, full IT/EN/FR text and melismas, expression curves and word/syllable/phrase takes, actual RVC/Seed-VC CLIs, Transkun piano and durable Deep-stage recovery without duplicate billing. Authorized checkpoint inference and musical acceptance remain explicit gates. Real GM runtime audits and exact test outcomes are recorded in [development status](docs/DEVELOPMENT_STATUS.md) and the [IT/EN operator guide](docs/STUDIO_MANAGED_ASSETS_R210_IT_EN.md).
+
+Substantial additions: IT/EN/FR lyrics now reach DiffSinger; optional real eSpeak NG G2P with a hash-pinned bank-specific IPA/inventory profile; multi-phone durations, required score F0, vibrato and expression presets; exact acoustic checkpoint/config/vocoder selection and separate vocoder license admission. Region singing creates aligned alternative takes and retains each singer's generation metadata.
+
+Deep Audio-to-MIDI now performs real Demucs separation followed by per-source YourMT3 and Basic Pitch reconciliation. Separated sources retain identity even with the same GM program; they are not extra independent confidence votes. No fixed 10–16-instrument accuracy is promised. Extra reviewed local SF2 banks can be installed with pinned bank/license hashes and selected in the MIDI editor. The native TinySoundFont backend has produced real PCM for all 128 GM programs and all 47 standard drum notes, with controller and SMF tempo tests.
+
+**The three areas are not yet software-complete.** Voice conversion, managed independent neural banks, further specialist transcribers, silent-stem handling and complete advanced UI/real-client acceptance remain open. Real DiffSinger/YourMT3 inference was not executed here. Existing legacy engines, VST SDK and all original files remain. Version unchanged; no Git or production operations. See [implementation and server setup](docs/THREE_AREA_IMPLEMENTATION_R210_IT_EN.md), [current development status](docs/DEVELOPMENT_STATUS.md), and the included validation reports. New DiffSinger deployments require a flattened pinned config and separately authorized vocoder.
+
 For the MTA web server on Linux, use the standalone [MTA installation wizard](docs/MTA_INSTALLATION.md): `scripts/install_mta.sh` installs the app and exposes a checked web endpoint without requiring a full checkout.
 
 ## ACE-Step installation wizard
@@ -295,3 +351,118 @@ ACE-Step r210: [long jobs, internal timeout and cancellation](docs/ACE_LONG_JOBS
 ACE-Step r210: [cold-start recovery without cancelling an accepted job](docs/ACE_COLD_START_R210.md).
 
 VST3/MIDI r210: [original server plugin editors, tempo maps, sidechains, UMP/MPE/SysEx and external audio capture](docs/VST3_COMPLETION_R210.md).
+
+### r210 chord engine migration
+Automatic chord profiles use license-admitted BTC-HCQT, Chordino and MTA Chromagram instead of Madmom NC checkpoints; complex chord labels are retained in Balanced/Detailed modes. See `docs/MADMOM_CHORD_MIGRATION_R210_EN.md` for limitations and verification status.
+
+
+Restricted AI checkpoint activation policy / Policy di attivazione checkpoint AI: see `docs/LICENSE_ACTIVATION_R210_IT_EN.md` (EN).
+
+Detailed checkpoint licensing update: `docs/AI_CHECKPOINT_RIGHTS_20261020_EN.md`.
+
+### Mega 53 Lead/Backing (experimental, opt-in)
+See `docs/MVSEP_MEGA53_LEAD_BACKING_R210_IT_EN.md` for the external checkpoint installation, rights check, and unverified real-audio benchmark status. It is registered but license-blocked until explicitly reviewed.
+
+UVR KARA 2 rights and guarded enablement: `docs/UVR_KARA2_RIGHTS_R210_EN.md`.
+
+**AI model rights registry (r210):** Studio model-license administration now displays curated upstream evidence and outstanding rights gaps for UVR, DrumSep, ChordFormer, Madmom, SAM Audio and selected DiffSinger banks. Evidence does not grant rights or automatically unblock unknown checkpoints. See `docs/MODEL_RIGHTS_DOSSIERS_R210_IT_EN.md`.
+
+### Licensed fallback selection (r210)
+If KARA 2 is not admitted, new lead/backing jobs with no explicitly selected engine use Mega 53 when permitted by its own policy. DrumSep offers an explicit `dsp` mode producing broad drums/percussion stems, not individual kit pieces. Restricted original weights remain blocked. Mega 53 still requires an installed runtime and checkpoint.
+
+Mega 53 can also provide separately extracted kick, snare, toms, hi-hat and percussion via the percussion method selector. This is not equivalent to full cymbals separation or guaranteed kit reconstruction; SAM Audio and DSP remain available. Model checkpoint and MSST installation are required.
+
+DrumSep checkpoint-rights deep review and licensed remote Mega 53 drum-parts routing: see `docs/DRUMSEP_RIGHTS_REVIEW_20261020.md`. Original DrumSep weights remain disabled where license evidence is insufficient.
+
+### r210 drums vs percussion AI grouping
+Mega 53 can now estimate **drums (kit)** vs **non-kit percussion** from the original mix as two separate stems; this is distinct from its kick/snare/toms extraction and the simpler transient-based DSP fallback. Requires an authorized and installed Mega 53 checkpoint. See `docs/DRUMS_VS_PERCUSSION_R210_IT_EN.md` for limitations and blocked legacy checkpoints.
+
+
+Studio r210 checkpoint (2026-10-20): stable MIDI note-to-lyric alignment and early singer-part validation; 26 targeted tests passed, one bank-dependent skip. Vocal Studio and full-mix multi-instrument Audio-to-MIDI remain incomplete. See docs/VOCAL_MIDI_COMPLETION_GATE_R210_IT_EN.md.
+
+
+## Latest r210 Vocal Studio validation
+Reject invalid vocal note timing, pitch and velocity before asset loading. 22 targeted tests passed, 5 skipped; neural singing and full multi-instrument transcription remain open.
+
+
+Vocal Studio: per-singer English lyric input now available in AI Studio; other neural vocal features and 10–16 instrument automatic transcription are still experimental/not certified.
+
+
+**r210 accelerated Vocal Studio:** per-singer CC0 OddVoices bank selection available in backend (`voice_banks`); GUI control and neural vocals pending. 25 tests passed, 5 skipped. See docs/R210_ACCELERATED_VOCAL_BANKS_IT_EN.md.
+
+
+Vocal Studio now exposes per-singer installed voicebank selection in the native/web Studio UI, with per-source worker routing.
+
+### Neural Studio integration (r210)
+An optional administrator-installed neural singing adapter contract (`neural-external`) is now available, guarded by checkpoint SHA-256, model-rights policy and output validation. It does not bundle or install a neural checkpoint and has not been validated with a real neural inference model. See `docs/NEURAL_SINGER_EXTERNAL_R210_IT_EN.md`.
+
+DiffSinger direct CLI support (r210): see `docs/DIFFSINGER_R210_IT_EN.md`. Requires separately installed, individually licensed acoustic checkpoint, voicebank and vocoder. Not certified by an end-to-end checkpoint test.
+
+**DiffSinger r210 (additional checks):** the bridge now verifies that the acoustic checkpoint belongs to the selected experiment and validates the output length/sample rate. Inference with real licensed voicebanks and vocoders remains to be certified (see `docs/DEVELOPMENT_STATUS.md`).
+
+DiffSinger deployment readiness (r210): run `python scripts/check_diffsinger_ready.py --json` with the operator-installed licensed assets; see `docs/DIFFSINGER_DEPLOYMENT_HANDOFF_R210_IT_EN.md`. This is a preflight check, not a successful neural inference or completed Vocal Studio certification.
+
+**Audio-to-MIDI r210 — conservative reconciliation:** when multiple primary events could match one secondary-model note, none is assigned arbitrarily. The `primary_audit` report counts independent observations supporting primary events; it is not a probability of correctness. Reliable 10–16-instrument transcription from a full stereo mix remains uncertified.
+
+Audio-to-MIDI now includes an offline GM-aware benchmark (`scripts/check_audio_midi_quality.py`); see `docs/AUDIO_TO_MIDI_QUALITY_GATE_R210_IT_EN.md`. Real 10–16 instrument accuracy remains unverified.
+
+
+MTA r210 combined studio cycle: see `docs/THREE_STUDIOS_HANDOFF_R210_IT_EN.md` for GM offline audit and remaining real-world validation.
+
+### r210 Audio-to-MIDI and GM reliability checkpoint
+Instrument-aware benchmarking now uses iterative note matching, emits instrument-specific precision/recall/F1, and bounds benchmark size. GM event scheduling rejects invalid sample rates. The complete neural singing, 10–16-instrument transcription and cross-client GM acceptance goals remain open; see `docs/DEVELOPMENT_STATUS.md`.
+
+### GM MIDI file to WAV (r210)
+With `mido`, `soundfile`, a reviewed FluidR3 soundbank and a supported GM runtime installed, run `python scripts/render_gm_midi.py input.mid output.wav`. It supports format-0/1 SMF, track merging, tempo map, program changes, GM drums and CC messages, and exports 24-bit stereo WAV with bounded block rendering. Type-2 SMF and unsupported SysEx are rejected rather than guessed. Actual listening tests on a target workstation remain pending; see `docs/DEVELOPMENT_STATUS.md`.
+
+
+DiffSinger: added SHA-256-pinned bank-specific syllable lexicons (Italian/French, opt-in English); see docs/DIFFSINGER_REVIEWED_LEXICON_R210_IT_EN.md. The three studios are not yet fully complete.
+
+
+English DiffSinger reviewed lexicons now accept pinned `en` dictionaries when `use_reviewed_lexicon=true`; legacy English bank-native phonemes remain valid.
+
+### Audio-to-MIDI benchmark r210 (2026-10-20)
+Instrument note matching now uses a pitch/onset index while preserving one-to-one maximum-cardinality semantics. Non-finite matching tolerances are rejected. Focused regression: 61 passed, 1 skipped (real voicebank unavailable). Real 10–16 instrument transcription, neural vocal synthesis and GM audio rendering still require real-asset validation; some software features also remain unfinished. See `docs/DEVELOPMENT_STATUS.md`.
+
+### 0.3.0-r210 follow-up (21 October 2026)
+
+Improved offline MIDI benchmark input limits and tolerance validation, StageCache directory safety, and GM portable synthesizer closed-handle errors. Offline verification: 70 passed, 7 skipped, 0 failed; hardware/core GM controller tests skipped in this environment. Neural asset inference, full regression, browser/native acceptance and musical benchmarks remain outstanding. No Git operations or production changes.
+
+### r210 MIDI benchmark bounded matching (21 October 2026)
+Dense matching graphs above 1,000,000 candidate note pairs now fail explicitly instead of risking unbounded CPU/memory use. Local targeted validation: 72 passed, 0 failed, 12 skipped. Neural/hardware acceptance and full offline regression are still open.
+
+### r210 finalization readiness (21 October 2026)
+The three Studio/Vocal, multitrack transcription and GM workstreams are implemented in substantial part but **not yet certified complete**. The offline MIDI benchmark now uses bounded, inode-validated input opening, rejecting non-regular paths and symlink redirection. Local focused verification: 121 passed / 0 failed / 9 skipped in two disjoint batches. Real licensed model inference, project-wide regression, cross-client playback and musical quality acceptance remain open; see `docs/DEVELOPMENT_STATUS.md`. No deployment or Git operation was performed.
+
+### r210 accelerated finalization checkpoint (2026-10-21)
+Offline benchmark input consistency now detects concurrent file changes. Nine focused cross-area test modules: 96 passed, 0 failed, 5 skipped (missing phonemizer or reviewed GM assets). General regression and real neural/native/audio acceptance remain open; no three-area completion claim.
+
+### r210 final verification note (21 October 2026)
+Offline Studio/MIDI/GM regression: 143 passed, 0 failed, 15 skipped. This is not full project regression or neural/hardware certification; see `docs/DEVELOPMENT_STATUS.md` and `validation/r210-final-handoff.json`.
+
+## 2026-10-21 — Single-cycle three-area development review (r210)
+
+- **Software fixed:** isolated GM/MIDI worker (`app/midi_render.py`) now stages WAV output in the destination directory, atomically publishes on success, and removes staged files after failure. Previous renders remain intact if playback processing fails. Two new tests cover successful PCM export and a mid-render fault.
+- **Cross-area offline verification:** 112 passed, 0 failed, 7 skipped across thirteen focused modules covering multilingual DiffSinger contracts, managed assets, multitrack reconstruction, checkpoint recovery, score benchmarking, GM MIDI rendering and worker atomicity. Skips: approved GM/compiled core assets (2), PyAV (2), optional VSTi (2), real YourMT3 model (1). No unapproved network activity or fake neural inference. This is **not** the full repository regression.
+- **Software not fully certified:** DiffSinger/RVC/Seed-VC/Transkun genuine licensed inference, 10–16 instrument quality/independent performer separation, browser/native GM playback, and complete safe project-wide regression remain unverified. No claim of full macroarea completion or operator-only handoff.
+- Version **0.3.0-r210** unchanged; no Git operations or production changes.
+
+
+**r210 checkpoint validation (21 October 2026):** Freshly computed Audio-to-MIDI scores must pass the shared music schema before their recovery checkpoint is committed or a worker is acknowledged. Selected offline checks: 113 passed, 0 failed, 2 skipped. Real neural models, full regression and target-device acceptance are not certified.
+
+
+### Cross-area offline verification (r210, 21 October 2026)
+See `docs/R210_SINGLE_CYCLE_PCM_CLOSURE_IT_EN.md`: Vocal Studio post-resampling PCM guard, 86 passed / 0 failed / 4 skipped; full neural inference and acceptance remain unverified.
+
+### r210 ten-pass offline verification
+The latest cumulative r210 engineering pass validates worker render durations and output PCM before publication, and enforces normalized PCM bounds after vocal conversion. Cross-area offline tests: **214 passed, 0 failed, 14 skipped** (not a complete project-wide regression). External licensed neural checkpoints, reviewed GM assets and native/browser listening tests remain prerequisites before final certification. See `docs/DEVELOPMENT_STATUS.md`.
+
+
+Offline Vocal Studio PCM verification and completion blockers: `docs/R210_20_PASS_CLOSURE_IT_EN.md`.
+
+
+### 0.3.0-r210 — Work runtime validation (2026-10-21)
+
+Work runtime validation: real Transkun CPU inference completed (synthetic input, zero notes; not a musical benchmark); Seed-VC singing config guard and offline asset audit added. General regression interrupted by automatic approval review of unexpected GitHub egress, without bypass. The three macroareas are not certified complete; remaining work is not limited to hardware acceptance.
+
+[Detailed bilingual report](docs/R210_WORK_NEURAL_RUNTIME_VALIDATION_IT_EN.md).

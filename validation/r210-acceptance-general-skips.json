@@ -1,0 +1,322 @@
+[
+  {
+    "test": "tests.test_r153_vst3_event_ipc::test_real_adelay_offline_event_transport",
+    "reason": "Optional locally compiled Steinberg SDK and ADelay"
+  },
+  {
+    "test": "tests.test_r154_event_batches::test_real_adelay_batch_transport",
+    "reason": "Steinberg SDK probe and ADelay not present locally"
+  },
+  {
+    "test": "tests.test_r163_state_ipc::test_real_adelay_state_roundtrip",
+    "reason": "Optional locally built SDK and ADelay"
+  },
+  {
+    "test": "tests.test_r164_controller_state::test_real_adelay_controller_snapshot",
+    "reason": "Optional locally built Steinberg SDK and ADelay"
+  },
+  {
+    "test": "tests.test_r208_agent_refinement::test_agent_rejects_untrusted_snapshot[change0]",
+    "reason": "Environment does not permit local Unix socket transport: [Errno 1] Operation not permitted"
+  },
+  {
+    "test": "tests.test_r208_agent_refinement::test_agent_rejects_untrusted_snapshot[change1]",
+    "reason": "Environment does not permit local Unix socket transport: [Errno 1] Operation not permitted"
+  },
+  {
+    "test": "tests.test_r208_agent_refinement::test_agent_rejects_untrusted_snapshot[change2]",
+    "reason": "Environment does not permit local Unix socket transport: [Errno 1] Operation not permitted"
+  },
+  {
+    "test": "tests.test_r208_agent_refinement::test_agent_rejects_untrusted_snapshot[change3]",
+    "reason": "Environment does not permit local Unix socket transport: [Errno 1] Operation not permitted"
+  },
+  {
+    "test": "tests.test_r208_agent_refinement::test_agent_rejects_untrusted_snapshot[change4]",
+    "reason": "Environment does not permit local Unix socket transport: [Errno 1] Operation not permitted"
+  },
+  {
+    "test": "tests.test_r208_agent_refinement::test_agent_rejects_untrusted_snapshot[change5]",
+    "reason": "Environment does not permit local Unix socket transport: [Errno 1] Operation not permitted"
+  },
+  {
+    "test": "tests.test_r208_agent_refinement::test_agent_rejects_untrusted_snapshot[change6]",
+    "reason": "Environment does not permit local Unix socket transport: [Errno 1] Operation not permitted"
+  },
+  {
+    "test": "tests.test_r208_agent_refinement::test_valid_agent_snapshot_is_diagnostic_only",
+    "reason": "Environment does not permit local Unix socket transport: [Errno 1] Operation not permitted"
+  },
+  {
+    "test": "tests.test_r208_lxc_gpu_diagnostic::test_live_diagnostic_redacts_secrets_and_pid",
+    "reason": "Environment does not permit local Unix socket transport: [Errno 1] Operation not permitted"
+  },
+  {
+    "test": "tests.test_r208_proxmox_agent::test_malformed_agent_reply_fail_closed",
+    "reason": "Environment does not permit local Unix socket transport: [Errno 1] Operation not permitted"
+  },
+  {
+    "test": "tests.test_r210_accurate_real_models::test_real_models_reconcile_publish_alternatives_and_reopen",
+    "reason": "Requires explicitly installed YourMT3 and Basic Pitch plus an authorized WAV fixture"
+  },
+  {
+    "test": "tests.test_r210_basic_pitch_real_backend::test_real_basic_pitch_global_queue_cpu_and_artifacts",
+    "reason": "Requires the separate reviewed Basic Pitch ONNX runtime"
+  },
+  {
+    "test": "tests.test_r210_basic_pitch_real_backend::test_real_project_two_sources_then_vocal_harmony",
+    "reason": "Requires the reviewed Basic Pitch ONNX runtime"
+  },
+  {
+    "test": "tests.test_r210_ci_playback_isolation::test_audio_progress_preserves_open_midi_editor_and_drafts[en]",
+    "reason": "Chromium unavailable: BrowserType.launch: Executable doesn't exist at /workspace/scratch/37b1f5ad4c83/browser_engines/chromium_headless_shell-1248/chrome-headless-shell-linux64/chrom"
+  },
+  {
+    "test": "tests.test_r210_ci_playback_isolation::test_audio_progress_preserves_open_midi_editor_and_drafts[it]",
+    "reason": "Chromium unavailable: BrowserType.launch: Executable doesn't exist at /workspace/scratch/37b1f5ad4c83/browser_engines/chromium_headless_shell-1248/chrome-headless-shell-linux64/chrom"
+  },
+  {
+    "test": "tests.test_r210_ci_playback_isolation::test_native_transport_preparation_preserves_midi_editor",
+    "reason": "Chromium unavailable: BrowserType.launch: Executable doesn't exist at /workspace/scratch/37b1f5ad4c83/browser_engines/chromium_headless_shell-1248/chrome-headless-shell-linux64/chrom"
+  },
+  {
+    "test": "tests.test_r210_continuity_uninstall::test_cpp_browser_survives_jitter_and_gui_stalls",
+    "reason": "Chromium executable is not installed; real browser acceptance requires the target environment"
+  },
+  {
+    "test": "tests.test_r210_continuity_uninstall::test_uninstall_button_confirmation_and_state[en]",
+    "reason": "Chromium executable is not installed; real browser acceptance requires the target environment"
+  },
+  {
+    "test": "tests.test_r210_continuity_uninstall::test_uninstall_button_confirmation_and_state[it]",
+    "reason": "Chromium executable is not installed; real browser acceptance requires the target environment"
+  },
+  {
+    "test": "tests.test_r210_fluidsynth_real_controllers::test_volume_expression_mute_real_sustained_audio[7]",
+    "reason": "Requires reviewed FluidSynth shared library and FluidR3"
+  },
+  {
+    "test": "tests.test_r210_fluidsynth_real_controllers::test_volume_expression_mute_real_sustained_audio[11]",
+    "reason": "Requires reviewed FluidSynth shared library and FluidR3"
+  },
+  {
+    "test": "tests.test_r210_fluidsynth_real_controllers::test_velocity_and_pitch_bend_have_measurable_effect",
+    "reason": "Requires reviewed FluidSynth shared library and FluidR3"
+  },
+  {
+    "test": "tests.test_r210_fluidsynth_real_controllers::test_pan_sustain_polyphony_and_reset",
+    "reason": "Requires reviewed FluidSynth shared library and FluidR3"
+  },
+  {
+    "test": "tests.test_r210_live_mixer_progress::test_real_browser_worker_meters_and_live_controls",
+    "reason": "Chromium executable is not installed; real browser acceptance requires the target environment"
+  },
+  {
+    "test": "tests.test_r210_live_mixer_progress::test_browser_per_plugin_progress_and_terminal_states[en-False]",
+    "reason": "Chromium executable is not installed; real browser acceptance requires the target environment"
+  },
+  {
+    "test": "tests.test_r210_live_mixer_progress::test_browser_per_plugin_progress_and_terminal_states[en-True]",
+    "reason": "Chromium executable is not installed; real browser acceptance requires the target environment"
+  },
+  {
+    "test": "tests.test_r210_live_mixer_progress::test_browser_per_plugin_progress_and_terminal_states[it-False]",
+    "reason": "Chromium executable is not installed; real browser acceptance requires the target environment"
+  },
+  {
+    "test": "tests.test_r210_live_mixer_progress::test_browser_per_plugin_progress_and_terminal_states[it-True]",
+    "reason": "Chromium executable is not installed; real browser acceptance requires the target environment"
+  },
+  {
+    "test": "tests.test_r210_live_mixer_progress::test_real_server_browser_cpp_space_meters_and_mixer",
+    "reason": "Chromium executable is not installed; real browser acceptance requires the target environment"
+  },
+  {
+    "test": "tests.test_r210_live_mixer_progress::test_native_live_mixer_uses_bridge_without_saving_and_updates_meters",
+    "reason": "Chromium executable is not installed; real browser acceptance requires the target environment"
+  },
+  {
+    "test": "tests.test_r210_live_vst3::test_real_vst_persistent_instance_state_and_live_parameter_change",
+    "reason": "Set MTA_TEST_LIVE_VST3 to an independently installed audio effect"
+  },
+  {
+    "test": "tests.test_r210_live_vst3::test_real_live_worker_pause_seek_update_shutdown",
+    "reason": "Set MTA_TEST_LIVE_VST3 to an independently installed audio effect"
+  },
+  {
+    "test": "tests.test_r210_live_vst3::test_bad_command_does_not_terminate_healthy_worker",
+    "reason": "Set MTA_TEST_LIVE_VST3 to an independently installed audio effect"
+  },
+  {
+    "test": "tests.test_r210_live_vst3::test_real_master_state_snapshot_and_headless_editor_failure",
+    "reason": "Set MTA_TEST_LIVE_VST3 to an independently installed audio effect"
+  },
+  {
+    "test": "tests.test_r210_live_vst3::test_original_editor_controls_same_live_instance_while_audio_runs",
+    "reason": "Set MTA_TEST_LIVE_VST3 to an independently installed audio effect"
+  },
+  {
+    "test": "tests.test_r210_midi::test_midi_api_persistence_ownership_csrf_and_export",
+    "reason": "Set MTA_TEST_LIVE_VST3 to an independently installed audio effect"
+  },
+  {
+    "test": "tests.test_r210_midi::test_real_instrument_live_seek_parameters_and_offline",
+    "reason": "Set MTA_TEST_VSTI to an independently installed Linux VSTi"
+  },
+  {
+    "test": "tests.test_r210_midi::test_real_vsti_server_session_pcm_seek_update_and_cancel",
+    "reason": "Set MTA_TEST_LIVE_VST3 to an independently installed audio effect"
+  },
+  {
+    "test": "tests.test_r210_midi::test_real_vsti_native_null_transport_pause_seek_and_stop",
+    "reason": "Set MTA_TEST_VSTI to an independently installed Linux VSTi"
+  },
+  {
+    "test": "tests.test_r210_midi_live::test_compiled_host_clock_decimal_meter_seek_pause_and_loop",
+    "reason": "Set MTA_TEST_LIVE_VST3 to an independently installed audio effect"
+  },
+  {
+    "test": "tests.test_r210_midi_live::test_real_websocket_monitor_notes_panic_transport_and_cleanup",
+    "reason": "Set MTA_TEST_LIVE_VST3 to an independently installed audio effect"
+  },
+  {
+    "test": "tests.test_r210_midi_live::test_websocket_monitor_origin_and_project_ownership",
+    "reason": "Set MTA_TEST_LIVE_VST3 to an independently installed audio effect"
+  },
+  {
+    "test": "tests.test_r210_midi_live::test_server_transport_host_pause_resume_and_seek",
+    "reason": "Set MTA_TEST_LIVE_VST3 to an independently installed audio effect"
+  },
+  {
+    "test": "tests.test_r210_midi_live::test_native_monitor_null_device_live_input_and_shutdown",
+    "reason": "Set MTA_TEST_VSTI to an independently installed Linux VSTi"
+  },
+  {
+    "test": "tests.test_r210_music_assets_browser::test_music_assets_consent_policy_and_singing_request[False-it]",
+    "reason": "Chromium unavailable: BrowserType.launch: Executable doesn't exist at /workspace/scratch/37b1f5ad4c83/browser_engines/chromium_headless_shell-1248/chrome-headless-shell-linux64/chrom"
+  },
+  {
+    "test": "tests.test_r210_music_assets_browser::test_music_assets_consent_policy_and_singing_request[False-en]",
+    "reason": "Chromium unavailable: BrowserType.launch: Executable doesn't exist at /workspace/scratch/37b1f5ad4c83/browser_engines/chromium_headless_shell-1248/chrome-headless-shell-linux64/chrom"
+  },
+  {
+    "test": "tests.test_r210_music_assets_browser::test_music_assets_consent_policy_and_singing_request[True-it]",
+    "reason": "Chromium unavailable: BrowserType.launch: Executable doesn't exist at /workspace/scratch/37b1f5ad4c83/browser_engines/chromium_headless_shell-1248/chrome-headless-shell-linux64/chrom"
+  },
+  {
+    "test": "tests.test_r210_music_assets_browser::test_music_assets_consent_policy_and_singing_request[True-en]",
+    "reason": "Chromium unavailable: BrowserType.launch: Executable doesn't exist at /workspace/scratch/37b1f5ad4c83/browser_engines/chromium_headless_shell-1248/chrome-headless-shell-linux64/chrom"
+  },
+  {
+    "test": "tests.test_r210_native_device_io::test_real_portaudio_cpp_callback_stream",
+    "reason": "Opt-in real PortAudio stream on configured virtual ALSA device"
+  },
+  {
+    "test": "tests.test_r210_native_vst3_media::test_plugin_plain_text_error_is_readable_and_not_json_exception[en]",
+    "reason": "Chromium executable is not installed; real browser acceptance requires the target environment"
+  },
+  {
+    "test": "tests.test_r210_native_vst3_media::test_plugin_plain_text_error_is_readable_and_not_json_exception[it]",
+    "reason": "Chromium executable is not installed; real browser acceptance requires the target environment"
+  },
+  {
+    "test": "tests.test_r210_server_vst3::test_server_catalog_inspection_pcm_update_seek_and_eof",
+    "reason": "Set MTA_TEST_LIVE_VST3 to an independently installed audio effect"
+  },
+  {
+    "test": "tests.test_r210_server_vst3::test_session_access_and_csrf_are_enforced",
+    "reason": "Set MTA_TEST_LIVE_VST3 to an independently installed audio effect"
+  },
+  {
+    "test": "tests.test_r210_server_vst3::test_capacity_replacement_expiry_and_cleanup",
+    "reason": "Set MTA_TEST_LIVE_VST3 to an independently installed audio effect"
+  },
+  {
+    "test": "tests.test_r210_server_vst3::test_bad_sequence_is_not_replayed_or_silently_rendered_dry",
+    "reason": "Set MTA_TEST_LIVE_VST3 to an independently installed audio effect"
+  },
+  {
+    "test": "tests.test_r210_server_vst3::test_preparation_is_nonblocking_and_can_be_cancelled",
+    "reason": "Set MTA_TEST_LIVE_VST3 to an independently installed audio effect"
+  },
+  {
+    "test": "tests.test_r210_server_vst3::test_preparation_failure_is_reported_and_released",
+    "reason": "Set MTA_TEST_LIVE_VST3 to an independently installed audio effect"
+  },
+  {
+    "test": "tests.test_r210_server_vst3::test_missing_current_engine_and_unsafe_plugin_are_explicit",
+    "reason": "Set MTA_TEST_LIVE_VST3 to an independently installed audio effect"
+  },
+  {
+    "test": "tests.test_r210_server_vst3::test_headless_worker_stall_is_killed_as_a_group",
+    "reason": "Set MTA_TEST_LIVE_VST3 to an independently installed audio effect"
+  },
+  {
+    "test": "tests.test_r210_server_vst3::test_one_failed_user_worker_does_not_stop_another_user",
+    "reason": "Set MTA_TEST_LIVE_VST3 to an independently installed audio effect"
+  },
+  {
+    "test": "tests.test_r210_server_vst3::test_server_plugin_render_export_reopens_saved_parameters",
+    "reason": "Set MTA_TEST_LIVE_VST3 to an independently installed audio effect"
+  },
+  {
+    "test": "tests.test_r210_server_vst3_browser::test_real_browser_live_play_pause_seek_parameter_update_and_stop",
+    "reason": "Set MTA_TEST_BROWSER_VST3=1 with Playwright/Chromium installed"
+  },
+  {
+    "test": "tests.test_r210_subscription_browser::test_incremental_user_picker_amendment_and_paypal_configuration[1280]",
+    "reason": "Chromium unavailable: BrowserType.launch: Executable doesn't exist at /workspace/scratch/37b1f5ad4c83/browser_engines/chromium_headless_shell-1248/chrome-headless-shell-linux64/chrom"
+  },
+  {
+    "test": "tests.test_r210_subscription_browser::test_incremental_user_picker_amendment_and_paypal_configuration[480]",
+    "reason": "Chromium unavailable: BrowserType.launch: Executable doesn't exist at /workspace/scratch/37b1f5ad4c83/browser_engines/chromium_headless_shell-1248/chrome-headless-shell-linux64/chrom"
+  },
+  {
+    "test": "tests.test_r210_transport_position_priority::test_zone_grid_buttons_are_readable_and_dispatch_actions[light-it]",
+    "reason": "Chromium unavailable: BrowserType.launch: Executable doesn't exist at /workspace/scratch/37b1f5ad4c83/browser_engines/chromium_headless_shell-1248/chrome-headless-shell-linux64/chrom"
+  },
+  {
+    "test": "tests.test_r210_transport_position_priority::test_zone_grid_buttons_are_readable_and_dispatch_actions[light-en]",
+    "reason": "Chromium unavailable: BrowserType.launch: Executable doesn't exist at /workspace/scratch/37b1f5ad4c83/browser_engines/chromium_headless_shell-1248/chrome-headless-shell-linux64/chrom"
+  },
+  {
+    "test": "tests.test_r210_transport_position_priority::test_zone_grid_buttons_are_readable_and_dispatch_actions[dark-it]",
+    "reason": "Chromium unavailable: BrowserType.launch: Executable doesn't exist at /workspace/scratch/37b1f5ad4c83/browser_engines/chromium_headless_shell-1248/chrome-headless-shell-linux64/chrom"
+  },
+  {
+    "test": "tests.test_r210_transport_position_priority::test_zone_grid_buttons_are_readable_and_dispatch_actions[dark-en]",
+    "reason": "Chromium unavailable: BrowserType.launch: Executable doesn't exist at /workspace/scratch/37b1f5ad4c83/browser_engines/chromium_headless_shell-1248/chrome-headless-shell-linux64/chrom"
+  },
+  {
+    "test": "tests.test_r210_vocal_synthesis::test_real_singing_queue_atomic_midi_audio_reopen",
+    "reason": "Requires explicitly installed, hash-verified CC0 voicebank and compiled core"
+  },
+  {
+    "test": "tests.test_r210_vst3_completion::test_compiled_clock_preserves_ppq_on_tempo_change",
+    "reason": "Set MTA_TEST_LIVE_VST3 to an independently installed audio effect"
+  },
+  {
+    "test": "tests.test_r210_vst3_completion::test_real_ump_vsti_velocity_precision",
+    "reason": "Set MTA_TEST_VSTI to an independently installed Linux VSTi"
+  },
+  {
+    "test": "tests.test_r210_vst3_completion::test_capture_upload_durable_publish_permissions_and_sequence",
+    "reason": "Set MTA_TEST_LIVE_VST3 to an independently installed audio effect"
+  },
+  {
+    "test": "tests.test_r210_vst3_completion::test_original_server_editor_live_pcm_authorization_and_persistence",
+    "reason": "Set MTA_TEST_LIVE_VST3 to an independently installed audio effect"
+  },
+  {
+    "test": "tests.test_r210_vst3_completion::test_sidechain_live_offline_same_graph",
+    "reason": "Build tests/vst3_probe and set MTA_TEST_SIDECHAIN_PLUGIN"
+  },
+  {
+    "test": "tests.test_r210_windows_publication_tabs::test_windows_creation_identity_is_stable",
+    "reason": "Requires real Win32 process APIs"
+  },
+  {
+    "test": "tests.test_r210_yourmt3_checkpoint::test_real_yourmt3_piano_prediction",
+    "reason": "Opt-in real model/runtime and authorized musical fixture"
+  }
+]

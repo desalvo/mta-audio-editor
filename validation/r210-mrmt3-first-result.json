@@ -1,0 +1,229 @@
+{
+  "protocol": "mta-music-1",
+  "parts": [
+    {
+      "id": "p0",
+      "name": "Predicted GM 5",
+      "instrument": "unknown",
+      "program": 4,
+      "percussion": false,
+      "notes": [
+        {
+          "id": "n0",
+          "start_ms": 90.0,
+          "duration_ms": 2408.0000000000005,
+          "pitch": 66,
+          "velocity": 127,
+          "channel": 0,
+          "origin": "predicted",
+          "source_model": "mr-mt3",
+          "confidence": null,
+          "confidence_metric": ""
+        },
+        {
+          "id": "n1",
+          "start_ms": 120.0,
+          "duration_ms": 2378.0,
+          "pitch": 69,
+          "velocity": 127,
+          "channel": 0,
+          "origin": "predicted",
+          "source_model": "mr-mt3",
+          "confidence": null,
+          "confidence_metric": ""
+        },
+        {
+          "id": "n2",
+          "start_ms": 90.0,
+          "duration_ms": 2408.0000000000005,
+          "pitch": 75,
+          "velocity": 127,
+          "channel": 0,
+          "origin": "predicted",
+          "source_model": "mr-mt3",
+          "confidence": null,
+          "confidence_metric": ""
+        }
+      ],
+      "controls": [],
+      "source_model": "",
+      "source_result_id": "",
+      "review": "unreviewed"
+    },
+    {
+      "id": "p1",
+      "name": "Predicted GM 25",
+      "instrument": "unknown",
+      "program": 24,
+      "percussion": false,
+      "notes": [
+        {
+          "id": "n0",
+          "start_ms": 90.0,
+          "duration_ms": 1958.0,
+          "pitch": 48,
+          "velocity": 127,
+          "channel": 0,
+          "origin": "predicted",
+          "source_model": "mr-mt3",
+          "confidence": null,
+          "confidence_metric": ""
+        },
+        {
+          "id": "n1",
+          "start_ms": 90.0,
+          "duration_ms": 1958.0,
+          "pitch": 51,
+          "velocity": 127,
+          "channel": 0,
+          "origin": "predicted",
+          "source_model": "mr-mt3",
+          "confidence": null,
+          "confidence_metric": ""
+        },
+        {
+          "id": "n2",
+          "start_ms": 90.0,
+          "duration_ms": 1958.0,
+          "pitch": 54,
+          "velocity": 127,
+          "channel": 0,
+          "origin": "predicted",
+          "source_model": "mr-mt3",
+          "confidence": null,
+          "confidence_metric": ""
+        },
+        {
+          "id": "n3",
+          "start_ms": 90.0,
+          "duration_ms": 1958.0,
+          "pitch": 57,
+          "velocity": 127,
+          "channel": 0,
+          "origin": "predicted",
+          "source_model": "mr-mt3",
+          "confidence": null,
+          "confidence_metric": ""
+        }
+      ],
+      "controls": [],
+      "source_model": "",
+      "source_result_id": "",
+      "review": "unreviewed"
+    },
+    {
+      "id": "p2",
+      "name": "Predicted GM 27",
+      "instrument": "unknown",
+      "program": 26,
+      "percussion": false,
+      "notes": [
+        {
+          "id": "n0",
+          "start_ms": 90.0,
+          "duration_ms": 1958.0,
+          "pitch": 66,
+          "velocity": 127,
+          "channel": 0,
+          "origin": "predicted",
+          "source_model": "mr-mt3",
+          "confidence": null,
+          "confidence_metric": ""
+        },
+        {
+          "id": "n1",
+          "start_ms": 90.0,
+          "duration_ms": 1958.0,
+          "pitch": 69,
+          "velocity": 127,
+          "channel": 0,
+          "origin": "predicted",
+          "source_model": "mr-mt3",
+          "confidence": null,
+          "confidence_metric": ""
+        }
+      ],
+      "controls": [],
+      "source_model": "",
+      "source_result_id": "",
+      "review": "unreviewed"
+    },
+    {
+      "id": "p3",
+      "name": "Predicted GM 43",
+      "instrument": "unknown",
+      "program": 42,
+      "percussion": false,
+      "notes": [
+        {
+          "id": "n0",
+          "start_ms": 90.0,
+          "duration_ms": 1958.0,
+          "pitch": 63,
+          "velocity": 127,
+          "channel": 0,
+          "origin": "predicted",
+          "source_model": "mr-mt3",
+          "confidence": null,
+          "confidence_metric": ""
+        }
+      ],
+      "controls": [],
+      "source_model": "",
+      "source_result_id": "",
+      "review": "unreviewed"
+    },
+    {
+      "id": "p4",
+      "name": "Predicted GM 49",
+      "instrument": "unknown",
+      "program": 48,
+      "percussion": false,
+      "notes": [
+        {
+          "id": "n0",
+          "start_ms": 90.0,
+          "duration_ms": 2408.0000000000005,
+          "pitch": 63,
+          "velocity": 127,
+          "channel": 0,
+          "origin": "predicted",
+          "source_model": "mr-mt3",
+          "confidence": null,
+          "confidence_metric": ""
+        },
+        {
+          "id": "n1",
+          "start_ms": 90.0,
+          "duration_ms": 2408.0000000000005,
+          "pitch": 69,
+          "velocity": 127,
+          "channel": 0,
+          "origin": "predicted",
+          "source_model": "mr-mt3",
+          "confidence": null,
+          "confidence_metric": ""
+        },
+        {
+          "id": "n2",
+          "start_ms": 90.0,
+          "duration_ms": 2408.0000000000005,
+          "pitch": 72,
+          "velocity": 127,
+          "channel": 0,
+          "origin": "predicted",
+          "source_model": "mr-mt3",
+          "confidence": null,
+          "confidence_metric": ""
+        }
+      ],
+      "controls": [],
+      "source_model": "",
+      "source_result_id": "",
+      "review": "unreviewed"
+    }
+  ],
+  "alternatives": [],
+  "offset_ms": 0.0,
+  "warnings": []
+}

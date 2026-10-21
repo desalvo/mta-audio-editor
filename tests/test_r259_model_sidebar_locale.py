@@ -7,7 +7,7 @@ def test_sidebar_preferences_saved_globally():
     js = (ROOT / 'app/static/app.js').read_text(encoding='utf-8')
     assert "mta.sidebar.collapsed.v1" in js
     assert 'restoreSidebarPanels();' in js
-    assert "localStorage.setItem(SIDEBAR_PREF_KEY,JSON.stringify(state))" in js
+    assert "MtaPreferences.setItem(SIDEBAR_PREF_KEY,JSON.stringify(state))" in js
     assert "toggleSidebarPanel('view'" in js
 
 

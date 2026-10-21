@@ -168,12 +168,12 @@ def run(config):
         return browser_run(cfg,root)
     from queue import Queue,Empty
     from .models import Project
-    from .native_transport import StreamDevice
+    from .native_device_io import output as device_output
     from .vst3_live_graph import Graph,BLOCK
     project=Project.model_validate(cfg['project']);paths=cfg['paths'];lock=threading.RLock();quit=threading.Event();editor_close=threading.Event();editors=Queue();builds=Queue();editor_active=threading.Event();graph=None;device=None;midi_input=None;midi_output=None
     try:
         graph=Graph(project,paths,round(cfg['cursor_ms']*project.sample_rate/1000),raw_sources=cfg.get('raw_sources',()))
-        device=StreamDevice(graph.rate,graph.total,_test_null=cfg.get('test_null') is True)
+        device=device_output(graph.rate,graph.total,test_null=cfg.get('test_null') is True)
         from .midi_devices import Input
         options=cfg.get('midi_options',{})
         if cfg.get('monitor') and options.get('input'):midi_input=Input(options['input'],sysex=bool(options.get('sysex',False)))
@@ -226,6 +226,10 @@ def run(config):
                                 elif action=='midi':graph.live_midi(project.tracks[0].id,value)
                                 elif action=='panic':graph.panic()
                                 elif action=='midi-parameters':graph.live_parameters(value)
+                                elif action in ('audio-capture-start','audio-capture-read','audio-capture-stop'):
+                                    if not hasattr(device,'capture_start'):raise ValueError('Configure PortAudio audio I/O for duplex capture')
+                                    result=device.capture_start(value['name'],value['rate']) if action=='audio-capture-start' else device.capture_read() if action=='audio-capture-read' else device.capture_stop()
+                                    atomic(root/('reply-'+token+'.json'),{'ok':True,**result});continue
                                 elif action=='midi-input':
                                     capture=midi_input.capture() if midi_input else {'events':[],'connected':False}
                                     atomic(root/('reply-'+token+'.json'),{'ok':True,**capture});continue

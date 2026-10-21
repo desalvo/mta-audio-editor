@@ -1,5 +1,7 @@
 # MTA Audio Editor for iOS/iPadOS
 
+Whole-page UI zoom (50–200%, persisted) is available under Options → Interface zoom; 100% resets it. This uses WKWebView.pageZoom on iPhone/iPad. See [r210 zoom and target checks](../../docs/NATIVE_UI_ZOOM_R210.md).
+
 Native WKWebView client for the MTA Audio Editor Docker/Kubernetes backend. The app stores the chosen backend URL, keeps the authenticated server session in WKWebView, supports Files document-picker uploads, and downloads exports with the same authenticated cookies before presenting the iOS Files save picker or Share sheet.
 
 FFmpeg rendering and MTA generation remain server-side, while Demucs stem separation can now run either **on-device through Core ML** or on the server. Stem count is model-driven: Auto plus every compatible count advertised by the server or installed locally (for example 2, 4, 6, 8, 10, 12, 16 or more). Auto prefers an installed local Core ML model when the device and requested profile are suitable, otherwise it falls back to server-side Demucs. The same controls are available on iPhone and iPad, with more conservative Auto recommendations on iPhone.

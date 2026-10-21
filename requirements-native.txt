@@ -7,3 +7,6 @@ python-rtmidi>=1.5.8,<2
 
 # Native MIDI 2 Universal MIDI Packets; no MIDI 1 down-conversion.
 pylibremidi==5.4.3
+
+# PortAudio/ASIO device selection; raw C++ callback, no Python audio callback.
+sounddevice==0.5.5

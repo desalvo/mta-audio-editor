@@ -85,6 +85,8 @@ def test_mta_export_sync_attachments_are_lossless(tmp_path, monkeypatch):
 
 def test_text_music_worker_updates_project_for_lyrics_and_chords(monkeypatch, tmp_path):
     import app.main as main
+    monkeypatch.setattr(main,'NATIVE_SINGLE_USER',True)
+    monkeypatch.setattr('app.native_ai_routing.is_remote',lambda kind:False)
     from app.models import Chord, LyricLine, Project, Track
 
     source = tmp_path / "voice.wav"; source.write_bytes(b"x")
@@ -113,6 +115,8 @@ def test_text_music_worker_updates_project_for_lyrics_and_chords(monkeypatch, tm
 
 def test_text_music_worker_failure_is_reported(monkeypatch, tmp_path):
     import app.main as main
+    monkeypatch.setattr(main,'NATIVE_SINGLE_USER',True)
+    monkeypatch.setattr('app.native_ai_routing.is_remote',lambda kind:False)
     from app.models import Project, Track
     project = Project(id="p2", title="Song", target="DAW", tracks=[Track(id="t2", name="Voice", filename="x.wav", duration_ms=100)])
     monkeypatch.setattr(main, "load_project", lambda pid: project)

@@ -1,0 +1,23 @@
+{
+  "repository": "Saisho-Utane/Saisho-Model-RVC",
+  "revision": "7a61b17e4f014fc5013a489f2b5cd3a7ee9e2b1a",
+  "license": "CC-BY-4.0",
+  "attribution": "Voice model created by Saisho Utane (https://huggingface.co/Saisho-Utane), used under CC BY 4.0.",
+  "files": [
+    {
+      "file": "README.md",
+      "bytes": 1613,
+      "sha256": "a5a4fa3c0de0d36a2bbaf07c378ccffa79a819631c35d66cfbc8538a92a44f5a"
+    },
+    {
+      "file": "metadata.json",
+      "bytes": 1302,
+      "sha256": "fc9315b0587c910615497785bf05f7f7a54bfd04ff7b9a69ece26c2c5beea1fd"
+    },
+    {
+      "file": "model.pth",
+      "bytes": 57577658,
+      "sha256": "82312a29a3996a451aaa3d3776566cec85b47b5414fce53da82b2d66b04f3d35"
+    }
+  ]
+}

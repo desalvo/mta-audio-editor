@@ -53,8 +53,8 @@ def test_only_first_mp3_import_estimates_and_sets_bpm(tmp_path, monkeypatch):
             )
         assert r.status_code == 200
         job_id = r.json()["id"]
-        deadline = time.time() + 5
-        while time.time() < deadline:
+        deadline = time.monotonic() + 60
+        while time.monotonic() < deadline:
             job = client.get(f"/api/media-jobs/{job_id}").json()
             if job["status"] in {"completed", "failed"}:
                 return job

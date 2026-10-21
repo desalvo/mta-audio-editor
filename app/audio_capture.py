@@ -56,6 +56,8 @@ def register_routes(app,project_for_actor,actor):
     def start(pid:str,body:dict,request:Request):
         global _REAPER
         project=project_for_actor(request,pid);owner=actor(request)['id']
+        from .project_kinds import require_kind
+        require_kind(project, "audio")
         rate=body.get('rate');offset=body.get('offset_ms',0)
         if type(rate) is not int or not 8000<=rate<=192000 or type(offset) is not int or not 0<=offset<=86400000:raise HTTPException(422,'Invalid audio capture format or position')
         from .main import _ensure_workspace_capacity

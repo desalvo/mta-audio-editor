@@ -1,0 +1,89 @@
+{
+  "version": "0.3.0-r210",
+  "date": "2026-10-21",
+  "git_operations": false,
+  "production_changes": false,
+  "targeted": {
+    "passed": 149,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 1,
+    "junit": "validation/r210-completion-targeted.xml",
+    "skip_reason": "External authorized OddVoices bank and built core required; no voice assets bundled"
+  },
+  "real_gm": {
+    "passed": 25,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "junit": "validation/r210-completion-gm-real.xml",
+    "engines": [
+      "FluidSynth 2.3.1",
+      "compiled TinySoundFont core"
+    ],
+    "bank": "Reviewed FluidR3 GM",
+    "bank_sha256": "74594e8f4250680adf590507a306655a299935343583256f3b722c48a1bc1cb0",
+    "audits": {
+      "fluidsynth": {
+        "programs": 128,
+        "drums": 47,
+        "pass": true
+      },
+      "tinysoundfont": {
+        "programs": 128,
+        "drums": 47,
+        "pass": true
+      }
+    }
+  },
+  "dom": {
+    "implementation": "Happy DOM 21.0.4 MIT, Node 24.19.0",
+    "workflows": 5,
+    "passed": true,
+    "real_browser": false,
+    "real_neural_inference": false
+  },
+  "static": {
+    "python_compileall": "passed",
+    "javascript_syntax": "passed",
+    "changed_file_ruff": "passed"
+  },
+  "full_regression": {
+    "status": "interrupted",
+    "completed_totals": null,
+    "junit": null,
+    "log": "validation/r210-completion-full.log",
+    "reason": "Automatic approval review rejected an indirect outbound github.com request in the broad suite: data/credentials sent by that request were unknown. The broad process ended without final JUnit/totals; partial output includes failures and fatal library error. It was not retried or bypassed. Local targeted tests were run independently.",
+    "historical_baseline": {
+      "passed": 4401,
+      "failed": 29,
+      "skipped": 133,
+      "all_29_reproduced_on_original_archive_in_previous_cycle": true,
+      "comparison": "validation/r210-baseline-failures.json",
+      "applies_to_current_full_run": false
+    }
+  },
+  "implemented": [
+    "managed disabled-by-default neural/vocoder ZIP installation with exact file SHA-256 and per-component rights",
+    "independent DiffSinger banks and reviewed IT/EN/FR profiles per singer",
+    "full-text deterministic score alignment and explicit melismas",
+    "expression point curves and bank-checked phoneme syllable/word/phrase new takes",
+    "real Seed-VC/RVC CLI adapters with local authorized dependencies",
+    "real Transkun piano API adapter with pinned dedicated interpreter",
+    "no-note results without fictitious tracks",
+    "content/model/policy hashed stage recovery in Fast/Accurate/Deep without duplicate recovered usage",
+    "token-authenticated remote asset catalog and bounded large score/options body transport",
+    "idempotent FluidSynth note-off and stale voice-buffer reset handling"
+  ],
+  "not_validated": [
+    "real authorized DiffSinger/Seed-VC/RVC/Transkun checkpoint inference in this environment",
+    "per-bank pronunciation/musical quality and upstream runtime/dependency compatibility",
+    "target server GPU/ROCm/native playback and browser/native end-to-end acceptance",
+    "10\u201316-instrument transcription accuracy",
+    "same-program independent performers within one mixed source",
+    "new complete full-project regression"
+  ],
+  "assets_bundled": false,
+  "neural_contract_fixtures_are_not_inference": true,
+  "all_three_areas_certified_complete": false
+}

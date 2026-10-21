@@ -49,14 +49,14 @@ def retime(value, delta, upper=None):
 
 def shift_project(project, delta):
     project = project.model_copy(deep=True)
-    for track in project.tracks:
+    for track in [*project.tracks, *project.archived_tracks]:
         ensure_clips(track)
         for clip in track.clips:
             clip.timeline_start_ms += delta
     data = project.model_dump()
     for field in ('lyrics', 'chords', 'markers', 'adaptive_tempo_map'):
         data[field] = retime(data.get(field, []), delta)
-    for field in ('metronome_start_ms', 'metronome_stop_ms', 'metronome_insertion_ms', 'metronome_grid_origin_ms', 'timeline_end_ms'):
+    for field in ('metronome_start_ms', 'metronome_stop_ms', 'metronome_insertion_ms', 'metronome_grid_origin_ms', 'musical_origin_ms', 'timeline_end_ms'):
         if data.get(field) is not None:
             data[field] += delta
     data['metronome_zone_bpms'] = {str(int(k)+delta) if str(k).isdigit() else k: v for k, v in data.get('metronome_zone_bpms', {}).items()}
@@ -69,8 +69,8 @@ def prepare_metronome_insert(project, start, bars):
         raise ValueError('Invalid insertion time')
     if isinstance(bars, bool) or not isinstance(bars, int) or not 0 <= bars <= 64:
         raise ValueError('Pre-roll must be between 0 and 64 bars')
-    from .metronome_grid import grid_settings
-    bpm, signature = grid_settings(project)
+    from .metronome_grid import source_grid_settings
+    bpm, signature = source_grid_settings(project)
     beats = int(signature.split('/')[0])
     pre = round(bars * beats * 60000 / bpm)
     extra = max(0, pre-start)
@@ -83,6 +83,7 @@ def prepare_metronome_insert(project, start, bars):
     project.metronome_insertion_ms = start+extra
     project.metronome_pre_roll_bars = bars
     project.metronome_grid_origin_ms = project.metronome_start_ms
+    project.musical_origin_ms = project.metronome_start_ms
     for t in project.tracks:
         if t.type == 'click':
             t.delay_ms = 0
@@ -92,8 +93,8 @@ def prepare_metronome_insert(project, start, bars):
 def preroll_beats(project, beats):
     if not project.metronome_pre_roll_bars:
         return beats
-    from .metronome_grid import grid_settings
-    bpm, signature = grid_settings(project)
+    from .metronome_grid import source_grid_settings
+    bpm, signature = source_grid_settings(project)
     count = project.metronome_pre_roll_bars * int(signature.split('/')[0])
     interval = 60000/bpm
     return [round(project.metronome_insertion_ms-(count-i)*interval) for i in range(count)] + [b for b in beats if b >= project.metronome_insertion_ms]
@@ -102,7 +103,7 @@ def preroll_beats(project, beats):
 def trim_project(project, left, right):
     if left < 0 or right <= left:
         raise ValueError('Invalid trim interval')
-    for track in project.tracks:
+    for track in [*project.tracks, *project.archived_tracks]:
         ensure_clips(track)
         kept = []
         for clip in track.clips:
@@ -117,7 +118,7 @@ def trim_project(project, left, right):
     for field in ('lyrics', 'chords', 'markers', 'adaptive_tempo_map'):
         events = [e for e in data.get(field, []) if (e.get('end_ms') if e.get('end_ms') is not None else e.get('time_ms', 0)) >= left and e.get('time_ms', 0) <= right]
         data[field] = retime(events, -left, right-left)
-    for field in ('metronome_start_ms', 'metronome_stop_ms', 'metronome_insertion_ms', 'metronome_grid_origin_ms'):
+    for field in ('metronome_start_ms', 'metronome_stop_ms', 'metronome_insertion_ms', 'metronome_grid_origin_ms', 'musical_origin_ms'):
         if data.get(field) is not None:
             data[field] = max(0, min(right-left, data[field]-left))
     data['metronome_zone_bpms'] = {str(max(0, int(k)-left)) if str(k).isdigit() else k: v for k, v in data.get('metronome_zone_bpms', {}).items()}

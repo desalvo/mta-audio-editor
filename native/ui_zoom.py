@@ -42,22 +42,44 @@ def save_zoom(root, value):
 
 
 def _engine(window):
+    """Find the engine behind the backend wrapper without treating it as a view.
+
+    Windows may embed EdgeChromium under BrowserView.browser.webview; GTK and
+    Cocoa expose webview directly. Backend/native layout can differ across
+    pywebview versions, so inspect only a bounded set of known wrapper fields.
+    This lookup is dispatched to the WinForms UI thread by apply_zoom.
+    """
     if window is None or getattr(window, 'native', None) is None:
         raise RuntimeError('Native window is not ready for interface zoom')
-    engine = getattr(window.native, 'webview', None)
-    if engine is None:
-        # pywebview 6.2.1 Cocoa/GTK expose the engine through the backend
-        # instance; newer releases also expose window.native.webview.
-        view = window.gui.BrowserView.instances.get(window.uid)
-        engine = getattr(view, 'webview', None)
-    if engine is None:
-        raise RuntimeError('Native web engine is not ready for interface zoom')
-    return engine
+    roots = [window.native]
+    backend = getattr(getattr(window, 'gui', None), 'BrowserView', None)
+    instances = getattr(backend, 'instances', {})
+    if hasattr(instances, 'get'):
+        roots.append(instances.get(getattr(window, 'uid', None)))
+    seen = set()
+    for _ in range(4):
+        following = []
+        for view in roots:
+            if view is None or id(view) in seen:
+                continue
+            seen.add(id(view))
+            if (hasattr(view, 'ZoomFactor') or any(callable(getattr(view, name, None))
+                    for name in ('setPageZoom_', 'set_zoom_level', 'setZoomFactor'))):
+                return view
+            for name in ('webview', 'browser', 'web_view', 'view'):
+                candidate = getattr(view, name, None)
+                if candidate is not None:
+                    following.append(candidate)
+        roots = following
+    raise RuntimeError('Native web engine is not ready for interface zoom')
 
 
 def _set_engine_zoom(engine, factor):
     if hasattr(engine, 'ZoomFactor'):
-        settings = getattr(getattr(engine, 'CoreWebView2', None), 'Settings', None)
+        core = getattr(engine, 'CoreWebView2', None)
+        settings = getattr(core, 'Settings', None)
+        if hasattr(engine, 'CoreWebView2') and settings is None:
+            raise RuntimeError('Native WebView2 core is not ready for interface zoom')
         if settings is not None:
             # Host-driven zoom remains available. Disable unmanaged user zoom
             # so WebView2 accelerators cannot bypass/double our persisted keys.

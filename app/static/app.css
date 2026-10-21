@@ -1696,3 +1696,23 @@ body:not(.timeline-select-tool) .clip-block{pointer-events:none;cursor:default}
 
 /* Independent playback progress preserves MIDI, waveform and plugin editor state. */
 .audio-preparation{position:fixed;right:20px;bottom:24px;z-index:15000;width:min(420px,calc(100vw - 32px));max-height:60vh;overflow:auto;display:grid;gap:10px;padding:20px;border:1px solid #537e99;border-radius:16px;background:linear-gradient(135deg,#142c40,#0c1827);color:#eff7ff;box-shadow:0 12px 36px #0008}.audio-preparation progress{width:100%;height:18px;accent-color:#5cceee}.audio-preparation p{margin:0;overflow-wrap:anywhere}.audio-preparation small{color:#bed2e1}.audio-preparation button{justify-self:end;padding:8px 18px;border:1px solid #6da3c3;border-radius:8px;background:#234862;color:#fff;cursor:pointer}
+
+/* Optional music assets and licence review: readable on desktop and small screens. */
+.studio-models a,.studio-alternatives a{color:#82d3ff;overflow-wrap:anywhere}
+.studio-asset{padding:12px;margin:12px 0;border:1px solid #355367;border-radius:10px;background:#102434}
+.studio-asset p{margin:7px 0}.studio-asset progress{display:block;width:100%;height:9px;margin-top:10px;accent-color:#65d6c5}
+.studio-asset progress[hidden]{display:none}.studio-asset pre{white-space:pre-wrap;overflow-wrap:anywhere}
+.studio-models details{padding:10px;margin:10px 0;border:1px solid #355367;border-radius:9px}
+.studio-models summary{cursor:pointer;font-weight:600}.studio-models [data-license] label{display:block;margin:10px 0}
+.studio-models [data-license] textarea,.studio-models [data-license] input[type=url],.ai-studio #studioSyllables{box-sizing:border-box;width:100%;min-width:0}
+.studio-models [data-license] textarea{min-height:80px}.studio-alternatives article{padding:10px;border-bottom:1px solid #355367;overflow-wrap:anywhere}
+
+/* Desktop UI scale is visible independently of collapsed sidebar groups. */
+.topbar .native-ui-zoom{flex:0 0 auto;padding:2px 4px;border:1px solid #36536c;border-radius:5px;position:relative;z-index:2}
+.topbar .native-ui-zoom>span{display:block;font-size:10px;color:#a4c0d6;white-space:nowrap}
+.topbar .native-ui-zoom-buttons{gap:3px;margin-top:2px}
+.topbar .native-ui-zoom-buttons button{min-width:24px;min-height:23px;padding:1px 4px;font-size:11px}
+.topbar .native-ui-zoom-buttons output{min-width:35px;font-size:11px}
+
+/* Four-field musical position must remain readable at every UI scale. */
+.topbar .transport-time-input{width:17ch;min-width:15ch;max-width:42vw;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-variant-numeric:tabular-nums}

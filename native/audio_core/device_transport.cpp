@@ -15,10 +15,14 @@
 #include <string>
 static_assert(std::atomic<uint64_t>::is_always_lock_free);
 static_assert(std::atomic<float>::is_always_lock_free);
+struct mta_capture;
+namespace {void capture_consume(mta_capture*,const void*,uint32_t) noexcept;void capture_overflow(mta_capture*) noexcept;}
 struct mta_transport {
     static constexpr uint64_t capacity=65536;
     ma_context context{};ma_device device{};ma_decoder decoder{};
-    bool has_context=false,has_device=false,has_decoder=false,physical=false,external=false;
+    bool has_context=false,has_device=false,has_decoder=false,physical=false,external=false,external_output=false;
+    uint32_t output_channels=2;std::array<float,128> output_matrix{};
+    mta_capture* capture=nullptr;std::atomic<bool> recording{false};
     uint64_t total=0;uint32_t rate=0;
     std::array<float,capacity*2> ring{};
     std::atomic<uint64_t> read{0},write{0},position{0},underruns{0};
@@ -45,19 +49,34 @@ void notification(const ma_device_notification* n) noexcept {
     auto* t=static_cast<mta_transport*>(n->pDevice->pUserData);
     if(n->type==ma_device_notification_type_stopped&&t->playing.exchange(false)){t->failed.store(true);}
 }
-void callback(ma_device* device,void* output,const void*,ma_uint32 frames) noexcept {
-    auto* t=static_cast<mta_transport*>(device->pUserData);auto* out=static_cast<float*>(output);
-    std::memset(out,0,static_cast<size_t>(frames)*2*sizeof(float));
+void consume(mta_transport* t,float* out,uint32_t frames,uint32_t channels) noexcept {
+    std::memset(out,0,static_cast<size_t>(frames)*channels*sizeof(float));
     if(!t->playing.load(std::memory_order_acquire)||t->failed.load())return;
     const auto r=t->read.load(std::memory_order_relaxed),w=t->write.load(std::memory_order_acquire);
-    const auto n=std::min<uint64_t>(frames,w-r);const float gain=t->gain.load(std::memory_order_relaxed);float left=0,right=0;
+    const auto n=(std::min<uint64_t>)(frames,w-r);const float gain=t->gain.load(std::memory_order_relaxed);float left=0,right=0;
     for(uint64_t i=0;i<n;++i){const auto at=((r+i)&(mta_transport::capacity-1))*2;
-        out[i*2]=std::clamp(t->ring[at]*gain,-1.0f,1.0f);out[i*2+1]=std::clamp(t->ring[at+1]*gain,-1.0f,1.0f);
-        left=(std::max)(left,std::fabs(out[i*2]));right=(std::max)(right,std::fabs(out[i*2+1]));}
+        const float l=std::clamp(t->ring[at]*gain,-1.0f,1.0f),rvalue=std::clamp(t->ring[at+1]*gain,-1.0f,1.0f);
+        if(t->external_output){for(uint32_t channel=0;channel<channels;++channel)
+            out[i*channels+channel]=std::clamp(l*t->output_matrix[channel*2]+rvalue*t->output_matrix[channel*2+1],-1.0f,1.0f);
+        }else{out[i*2]=l;out[i*2+1]=rvalue;}
+        left=(std::max)(left,std::fabs(l));right=(std::max)(right,std::fabs(rvalue));}
     t->read.store(r+n,std::memory_order_release);t->position.fetch_add(n,std::memory_order_relaxed);
     t->left.store(left,std::memory_order_relaxed);t->right.store(right,std::memory_order_relaxed);
     if(n<frames){if(t->eof.load(std::memory_order_acquire)&&r+n==t->write.load(std::memory_order_acquire))t->ended.store(true);else t->underruns.fetch_add(1,std::memory_order_relaxed);}
 }
+void callback(ma_device* device,void* output,const void*,ma_uint32 frames) noexcept {
+    consume(static_cast<mta_transport*>(device->pUserData),static_cast<float*>(output),frames,2);
+}
+// PortAudio calls this C++ function directly: no CFFI/Python callback or GIL.
+int portaudio_output(const void* input,void* output,unsigned long frames,const void*,unsigned long flags,void* user) noexcept {
+    auto* t=static_cast<mta_transport*>(user);
+    if(!t||!output||!frames||frames>32768)return 2;
+    if(t->capture&&t->recording.load(std::memory_order_acquire)){if(flags&2)capture_overflow(t->capture);else capture_consume(t->capture,input,static_cast<uint32_t>(frames));}
+    if(flags&4)t->underruns.fetch_add(1,std::memory_order_relaxed);
+    consume(t,static_cast<float*>(output),static_cast<uint32_t>(frames),t->output_channels);
+    return t->failed.load()?2:0;
+}
+
 void fill(mta_transport* t){
     t->quit.store(false);t->producer=std::thread(produce,t);
     for(unsigned i=0;i<300&&t->write.load()<4096&&!t->eof.load();++i)std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -93,12 +112,12 @@ mta_transport* mta_transport_open(const char* path,unsigned test_null) noexcept 
 int mta_transport_play(mta_transport* t) noexcept {
     if(!t||t->failed.load()||t->ended.load())return -1;
     if(t->playing.exchange(true))return 0;
-    if(ma_device_start(&t->device)!=MA_SUCCESS){t->playing.store(false);return -2;}return 0;
+    if(!t->external_output&&ma_device_start(&t->device)!=MA_SUCCESS){t->playing.store(false);return -2;}return 0;
 }
 int mta_transport_pause(mta_transport* t) noexcept {
     if(!t)return -1;
     t->playing.store(false);
-    if(ma_device_stop(&t->device)!=MA_SUCCESS)return -2;
+    if(!t->external_output&&ma_device_stop(&t->device)!=MA_SUCCESS)return -2;
     return 0;
 }
 int mta_transport_seek(mta_transport* t,uint64_t frame) noexcept {
@@ -159,7 +178,8 @@ int mta_transport_finish(mta_transport* t) noexcept {
 }
 
 struct mta_capture {
-    ma_context context{};ma_device device{};bool context_ready=false,device_ready=false;
+    ma_context context{};ma_device device{};bool context_ready=false,device_ready=false,external=false;
+    uint32_t input_channels=2;std::array<float,128> input_matrix{};
     static constexpr uint64_t capacity=131072;
     std::array<float,capacity*2> ring{};
     std::atomic<uint64_t> read{0},write{0};std::atomic<bool> failed{false};
@@ -168,18 +188,32 @@ namespace {
 void capture_notification(const ma_device_notification* n) noexcept {
     if(n->type==ma_device_notification_type_stopped)static_cast<mta_capture*>(n->pDevice->pUserData)->failed.store(true);
 }
-void capture_callback(ma_device* d,void*,const void* input,ma_uint32 count) noexcept {
-    auto* c=static_cast<mta_capture*>(d->pUserData);
+void capture_overflow(mta_capture* c) noexcept {c->failed.store(true);}
+void capture_consume(mta_capture* c,const void* input,uint32_t count) noexcept {
     const auto w=c->write.load(std::memory_order_relaxed),r=c->read.load(std::memory_order_acquire);
     if(!input || count>mta_capture::capacity-(w-r)){c->failed.store(true);return;}
-    const auto* data=static_cast<const float*>(input);
+    const auto* data=static_cast<const float*>(input);const uint32_t channels=c->input_channels;
     for(uint64_t i=0;i<count;i++) {
         const auto at=((w+i)&(mta_capture::capacity-1))*2;
-        if(!std::isfinite(data[i*2])||!std::isfinite(data[i*2+1])){c->failed.store(true);return;}
-        c->ring[at]=data[i*2];c->ring[at+1]=data[i*2+1];
+        float left=0,right=0;
+        if(c->external){for(uint32_t channel=0;channel<channels;++channel){
+            const float value=data[i*channels+channel];if(!std::isfinite(value)){c->failed.store(true);return;}
+            left+=value*c->input_matrix[channel];right+=value*c->input_matrix[channels+channel];}
+        }else{left=data[i*2];right=data[i*2+1];}
+        if(!std::isfinite(left)||!std::isfinite(right)){c->failed.store(true);return;}
+        c->ring[at]=left;c->ring[at+1]=right;
     }
     c->write.store(w+count,std::memory_order_release);
 }
+void capture_callback(ma_device* d,void*,const void* input,ma_uint32 count) noexcept {
+    capture_consume(static_cast<mta_capture*>(d->pUserData),input,count);
+}
+int portaudio_input(const void* input,void*,unsigned long frames,const void*,unsigned long flags,void* user) noexcept {
+    auto* c=static_cast<mta_capture*>(user);if(!c||!frames||frames>32768)return 2;
+    if(flags&2){c->failed.store(true);return 2;}
+    capture_consume(c,input,static_cast<uint32_t>(frames));return c->failed.load()?2:0;
+}
+
 }
 int mta_capture_devices(char* output,uint32_t capacity) noexcept {
     if(!output || capacity<4)return -1;
@@ -244,4 +278,29 @@ void mta_capture_close(mta_capture* c) noexcept {
     if(c->device_ready)ma_device_uninit(&c->device);
     if(c->context_ready)ma_context_uninit(&c->context);
     delete c;
+}
+
+
+mta_transport* mta_transport_open_external(uint32_t rate,uint64_t total,uint32_t channels,const float* matrix) noexcept {
+    if((rate!=44100&&rate!=48000&&rate!=96000)||!total||total>INT64_MAX||!channels||channels>64||!matrix)return nullptr;
+    for(uint32_t i=0;i<channels*2;++i)if(!std::isfinite(matrix[i])||std::fabs(matrix[i])>4)return nullptr;
+    try{auto* t=new mta_transport;t->external=true;t->external_output=true;t->rate=rate;t->total=total;t->output_channels=channels;
+        std::copy(matrix,matrix+channels*2,t->output_matrix.begin());return t;
+    }catch(...){return nullptr;}
+}
+void* mta_transport_external_callback(void) noexcept {return reinterpret_cast<void*>(&portaudio_output);}
+int mta_transport_external_attached(mta_transport* t) noexcept {if(!t||!t->external_output)return -1;t->physical=true;return 0;}
+
+mta_capture* mta_capture_open_external(uint32_t channels,const float* matrix) noexcept {
+    if(!channels||channels>64||!matrix)return nullptr;
+    for(uint32_t i=0;i<channels*2;++i)if(!std::isfinite(matrix[i])||std::fabs(matrix[i])>4)return nullptr;
+    try{auto* c=new mta_capture;c->external=true;c->input_channels=channels;
+        std::copy(matrix,matrix+channels*2,c->input_matrix.begin());return c;
+    }catch(...){return nullptr;}
+}
+void* mta_capture_external_callback(void) noexcept {return reinterpret_cast<void*>(&portaudio_input);}
+
+int mta_transport_capture_attach(mta_transport* t,mta_capture* c) noexcept {
+    if(!t||!t->external_output||t->playing.load())return -1;
+    t->capture=c;t->recording.store(c!=nullptr,std::memory_order_release);return 0;
 }

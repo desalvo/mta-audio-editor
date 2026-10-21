@@ -1,0 +1,69 @@
+{
+  "version": "0.3.0-r210",
+  "general": {
+    "passed": 4598,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 98,
+    "seconds": 546.635,
+    "summary": "4598 passed, 98 skipped, 6 warnings in 546.69s (0:09:06)",
+    "skip_reasons": {
+      "collection skipped": 4,
+      "Optional locally compiled Steinberg SDK and ADelay": 1,
+      "Steinberg SDK probe and ADelay not present locally": 1,
+      "Optional locally built SDK and ADelay": 1,
+      "Optional locally built Steinberg SDK and ADelay": 1,
+      "Environment does not permit local Unix socket transport: [Errno 1] Operation not permitted": 10,
+      "Requires explicitly installed YourMT3 and Basic Pitch plus an authorized WAV fixture": 1,
+      "could not import 'weasyprint': No module named 'weasyprint'": 7,
+      "Requires the separate reviewed Basic Pitch ONNX runtime": 1,
+      "Requires the reviewed Basic Pitch ONNX runtime": 1,
+      "could not import 'playwright.sync_api': No module named 'playwright'": 19,
+      "Requires reviewed FluidSynth shared library and FluidR3": 4,
+      "Set MTA_TEST_GM_RUNTIME with reviewed FluidSynth and FluidR3 assets": 1,
+      "Requires reviewed GM assets and the compiled audio core": 1,
+      "Requires built core and reviewed FluidR3 GM": 7,
+      "Set MTA_TEST_LIVE_VST3 to an independently installed audio effect": 24,
+      "Set MTA_TEST_VSTI to an independently installed Linux VSTi": 4,
+      "Opt-in real PortAudio stream on configured virtual ALSA device": 1,
+      "Set MTA_TEST_BROWSER_VST3=1 with Playwright/Chromium installed": 1,
+      "Install optional happy-dom and set MTA_TEST_DOM_MODULE to its lib/index.js": 1,
+      "could not import 'espeakng_loader': No module named 'espeakng_loader'": 3,
+      "Requires explicitly installed, hash-verified CC0 voicebank and compiled core": 1,
+      "Build tests/vst3_probe and set MTA_TEST_SIDECHAIN_PLUGIN": 1,
+      "Requires real Win32 process APIs": 1,
+      "Opt-in real model/runtime and authorized musical fixture": 1
+    }
+  },
+  "area_regression": {
+    "passed": 1369,
+    "skipped": 138,
+    "failed": 0,
+    "seconds": 129.49
+  },
+  "focused": {
+    "passed": 53,
+    "failed": 0,
+    "note": "Overlaps area/general suites; do not sum counts"
+  },
+  "native_core_build": "CMake Release GCC successful",
+  "new_neural_inference": false,
+  "historical_output_reprocessing": {
+    "parts": 10,
+    "notes": 55,
+    "alternatives": 8,
+    "SMF_types": [
+      0,
+      1
+    ],
+    "timing_tolerance_ms": 1,
+    "musical_metrics_unchanged": true
+  },
+  "complete_three_area_acceptance": false,
+  "open_gates": [
+    "10–16 instrument accuracy not achieved; requires model/strategy evaluation and independent musical references",
+    "Qixuan IT/FR profiles/review not certified",
+    "Physical audio/MIDI, GPU, native OS/plugins and real browser acceptance"
+  ],
+  "initial_area_attempt": "3 failures: two new-test assertions did not allow controller-only parts; executable flags not yet restored after ZIP extraction. Fixed tests and restored original ZIP flags; rerun passed. Original log retained."
+}

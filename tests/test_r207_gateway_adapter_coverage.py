@@ -123,6 +123,8 @@ def test_unified_transcripts_and_chords(tmp_path, monkeypatch):
 
 
 def test_unified_drumsep_and_missing_model(tmp_path, monkeypatch):
+    from model_rights_fixtures import authorize_fixture
+    authorize_fixture(monkeypatch,tmp_path,'drumsep-weights')
     source, output = _staged(tmp_path)
     monkeypatch.setenv('MTA_AI_DRUMSEP_MODEL', str(tmp_path/'missing.onnx'))
     with pytest.raises(RuntimeError, match='checkpoint'):
@@ -193,6 +195,10 @@ def test_singer_separation_selected_and_all(tmp_path, monkeypatch):
 
 
 def test_backing_vocals_artifact_security(tmp_path, monkeypatch):
+    # Select the operator-filename branch; the default is now Mega53.
+    monkeypatch.setattr('app.model_license_policy.effective_backing_model',lambda plan:'')
+    from model_rights_fixtures import authorize_fixture
+    authorize_fixture(monkeypatch,tmp_path,'audio-separator-weights')
     source, output = _staged(tmp_path)
     class Separator:
         outputs = []

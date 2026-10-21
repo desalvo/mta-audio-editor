@@ -7,7 +7,7 @@ import hashlib
 import secrets
 from pathlib import Path
 from fastapi import APIRouter, HTTPException, Request
-from fastapi.responses import HTMLResponse, Response
+from fastapi.responses import HTMLResponse, Response, RedirectResponse
 from .auth import require_admin
 from . import ai_billing, ai_access
 
@@ -208,6 +208,14 @@ def submit_metering(job_id:str,request:Request,body:dict):
     if not expected or not secrets.compare_digest(provided,expected):
         raise HTTPException(403,'Metering agent authentication required')
     return _error(lambda:(ai_billing.finish_job(job_id,body['status'],body.get('usage'),source=body.get('source','worker')),{'ok':True})[1])
+
+@router.get('/ai-billing',include_in_schema=False)
+def legacy_billing_page(request:Request):
+    # Cached subscription pages and operator bookmarks used this old URL.
+    # Keep the same administrator boundary as the canonical billing page.
+    require_admin(request)
+    return RedirectResponse('/admin/ai-billing#tariffs',status_code=307)
+
 
 @router.get('/admin/ai-billing',response_class=HTMLResponse)
 def billing_page(request:Request):
@@ -431,7 +439,8 @@ def ai_worker_capabilities(request: Request):
     from .ai_worker_registry import available_workers
     from .ai_gpu_verified import readiness,VERIFIED_KINDS
     return {'workers': available_workers(), 'audio_transport': 'wav', 'output': ['wav', 'artifact-zip-v1'],
-            'admission':'global-ai-queue','gpu_billing':readiness(),'gpu_evidence_kinds':sorted(VERIFIED_KINDS)}
+            'admission':'global-ai-queue','gpu_billing':readiness(),'gpu_evidence_kinds':sorted(VERIFIED_KINDS),
+            'studio':__import__('app.studio_catalog',fromlist=['capabilities']).capabilities()}
 
 
 @router.post('/api/ai-jobs/execute-audio/{kind}')
@@ -450,10 +459,14 @@ async def execute_remote_ai_audio_job(kind: str, request: Request):
             raise HTTPException(503, 'This AI model adapter is not installed or enabled')
     except ValueError as exc:
         raise HTTPException(400, str(exc)) from exc
-    if request.headers.get('content-type', '').split(';')[0].strip().lower() not in ('audio/wav', 'audio/x-wav', 'application/octet-stream'):
-        raise HTTPException(415, 'WAV content required')
+    media=request.headers.get('content-type','').split(';')[0].strip().lower()
+    studio_envelope=kind in ('vocal-harmony','vocal-synthesis') and media=='application/vnd.mta.studio-request+json'
+    structured=studio_envelope or (kind in ('vocal-harmony','vocal-synthesis') and media=='application/vnd.mta.score+json')
+    if not structured and media not in ('audio/wav','audio/x-wav','application/octet-stream'):
+        raise HTTPException(415,'WAV or supported MTA score content required')
+    if kind in ('vocal-harmony','vocal-synthesis') and not structured:raise HTTPException(415,'MTA score content required for MIDI harmony')
     from .ai_payload_limits import MAX_SOURCE_BYTES
-    max_bytes = MAX_SOURCE_BYTES
+    max_bytes = 8*1024*1024 if structured else MAX_SOURCE_BYTES
     declared_length = request.headers.get('content-length', '0') or '0'
     if not declared_length.isdecimal():
         raise HTTPException(400, 'Invalid content length')
@@ -473,6 +486,15 @@ async def execute_remote_ai_audio_job(kind: str, request: Request):
         raise HTTPException(400, 'Empty audio input')
     if request.headers.get('content-length') is not None and len(data) != int(declared_length):
         raise HTTPException(400, 'Audio body length differs from Content-Length')
+    if structured:
+        from .studio_score import validate
+        try:
+            if studio_envelope:
+                if options:raise ValueError('Studio body options cannot be overridden by headers')
+                from .studio_score import unpack_request
+                score,options=unpack_request(bytes(data),kind);data=bytearray(score)
+            else:validate(bytes(data))
+        except ValueError as exc:raise HTTPException(422,'Invalid structured MTA score or options') from exc
     if 'kind' in options and options['kind'] != kind:
         raise HTTPException(400, 'AI options cannot override worker kind')
     from . import ai_request_dedup as dedup
@@ -493,8 +515,8 @@ async def execute_remote_ai_audio_job(kind: str, request: Request):
     try:
         from starlette.concurrency import run_in_threadpool
         result, meta = await run_in_threadpool(execute_registered_worker, identity['user_id'], kind, {'kind': kind, **options},
-            token_id=identity['id'], source_wav=bytes(data),
-            **({'timeout_seconds': __import__('app.ai_execution_limits',fromlist=['inference_timeout']).inference_timeout(options)} if kind=='ace-step' else {}),
+            token_id=identity['id'], **({'source_json':bytes(data)} if structured else {'source_wav':bytes(data)}),
+            **({'timeout_seconds': __import__('app.ai_execution_limits',fromlist=['inference_timeout']).inference_timeout(options)} if kind=='ace-step' else {'timeout_seconds':__import__('app.studio_jobs',fromlist=['studio_policy']).studio_policy()['timeout_seconds']} if kind in ('audio-to-midi','audio-to-midi-basic-pitch','audio-to-midi-yourmt3','audio-to-midi-mr-mt3','audio-to-midi-transkun','vocal-harmony','vocal-synthesis') else {}),
             cancel_check=(lambda: dedup.is_cancelled(identity['user_id'], key)) if key else None)
     except WorkerUnavailable as exc:
         if key and not dedup.is_cancelled(identity['user_id'], key): dedup.finalize(identity['user_id'], key, state='failed')
@@ -525,7 +547,7 @@ async def execute_remote_ai_audio_job(kind: str, request: Request):
         # replay artifact is durable. A failed cache write never authorizes
         # executing the billed inference a second time with the same key.
         try:
-            save_result(identity['user_id'], key, result, worker_media_type, worker_job_id, **({'metering_envelope': __import__('json').loads(metering_headers['X-MTA-AI-Metering-V2'])} if metering_headers else {}))
+            save_result(identity['user_id'], key, result, worker_media_type, worker_job_id, studio_default=kind in ('audio-to-midi','audio-to-midi-basic-pitch','audio-to-midi-yourmt3','audio-to-midi-mr-mt3','audio-to-midi-transkun','vocal-harmony','vocal-synthesis'), **({'metering_envelope': __import__('json').loads(metering_headers['X-MTA-AI-Metering-V2'])} if metering_headers else {}))
         except (OSError, ValueError) as exc:
             dedup.finalize(identity['user_id'], key, state='failed')
             raise HTTPException(503, 'Remote AI result could not be durably published; request cannot be retried') from exc

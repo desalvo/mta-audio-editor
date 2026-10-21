@@ -1,0 +1,39 @@
+{
+  "release": "0.3.0-r210",
+  "baseline": "MTA-0.3.0-r210-device-routing-yourmt3-cumulative.zip",
+  "focused": {
+    "passed": 76,
+    "skipped": 1,
+    "skip_reason": "Real Win32 process APIs unavailable on Linux"
+  },
+  "native_environment": {
+    "passed": 21
+  },
+  "platform": "Linux Python 3.12, Chromium 141; Windows directory descriptor restrictions simulated",
+  "ci_changes": [
+    "Windows native publication step includes new API/media tests",
+    "macOS native save step includes new API/media tests"
+  ],
+  "security": [
+    "Server native aliases return 404",
+    "Server administrator authorization retained",
+    "Mutation CSRF protection retained",
+    "Explicit plugin-license acceptance retained",
+    "File fsync and atomic journal replacement retained",
+    "POSIX mandatory directory flush errors propagate",
+    "Exclusive creation and inode-based owned cleanup retained"
+  ],
+  "not_verified": [
+    "Windows/macOS installed binary and actual plugin compilation",
+    "Live YouTube network download",
+    "Rocky/LXC/ROCm production hardware",
+    "Previously open Studio/hardware macroareas remain open"
+  ],
+  "no_commit_push_tag_or_release": true,
+  "full_suite": {
+    "passed": 4325,
+    "skipped": 41,
+    "deselected": 10,
+    "deselection_reason": "10 existing host-agent Unix-socket cases require sockets unavailable in this sandbox; source/CI skips unchanged"
+  }
+}

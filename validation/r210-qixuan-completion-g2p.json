@@ -1,0 +1,916 @@
+[
+  {
+    "language": "it",
+    "word": "ciao",
+    "ipa": "tʃˈao",
+    "phones": [
+      "en/ch",
+      "ja/a",
+      "en/w"
+    ]
+  },
+  {
+    "language": "it",
+    "word": "amore",
+    "ipa": "amˈore",
+    "phones": [
+      "ja/a",
+      "en/m",
+      "ja/o",
+      "ja/r",
+      "ja/e"
+    ]
+  },
+  {
+    "language": "it",
+    "word": "perché",
+    "ipa": "perkˈe",
+    "phones": [
+      "en/p",
+      "ja/e",
+      "ja/r",
+      "en/k",
+      "ja/e"
+    ]
+  },
+  {
+    "language": "it",
+    "word": "canzone",
+    "ipa": "kantsˈone",
+    "phones": [
+      "en/k",
+      "ja/a",
+      "en/n",
+      "ja/ts",
+      "ja/o",
+      "en/n",
+      "ja/e"
+    ]
+  },
+  {
+    "language": "it",
+    "word": "gli",
+    "ipa": "ʎɪ",
+    "phones": [
+      "en/l",
+      "en/y",
+      "en/ih"
+    ]
+  },
+  {
+    "language": "it",
+    "word": "gnocchi",
+    "ipa": "ɲˈokːɪ",
+    "phones": [
+      "ja/ny",
+      "ja/o",
+      "en/k",
+      "en/k",
+      "en/ih"
+    ]
+  },
+  {
+    "language": "it",
+    "word": "rosso",
+    "ipa": "rˈosso",
+    "phones": [
+      "ja/r",
+      "ja/o",
+      "en/s",
+      "en/s",
+      "ja/o"
+    ]
+  },
+  {
+    "language": "it",
+    "word": "tutto",
+    "ipa": "tˈutːo",
+    "phones": [
+      "en/t",
+      "zh/u",
+      "en/t",
+      "en/t",
+      "ja/o"
+    ]
+  },
+  {
+    "language": "it",
+    "word": "acqua",
+    "ipa": "ˈakːwa",
+    "phones": [
+      "ja/a",
+      "en/k",
+      "en/k",
+      "en/w",
+      "ja/a"
+    ]
+  },
+  {
+    "language": "it",
+    "word": "più",
+    "ipa": "pjˈu",
+    "phones": [
+      "en/p",
+      "en/y",
+      "zh/u"
+    ]
+  },
+  {
+    "language": "it",
+    "word": "cielo",
+    "ipa": "tʃˈɛlo",
+    "phones": [
+      "en/ch",
+      "en/eh",
+      "en/l",
+      "ja/o"
+    ]
+  },
+  {
+    "language": "it",
+    "word": "stelle",
+    "ipa": "stˈelle",
+    "phones": [
+      "en/s",
+      "en/t",
+      "ja/e",
+      "en/l",
+      "en/l",
+      "ja/e"
+    ]
+  },
+  {
+    "language": "it",
+    "word": "luna",
+    "ipa": "lˈuna",
+    "phones": [
+      "en/l",
+      "zh/u",
+      "en/n",
+      "ja/a"
+    ]
+  },
+  {
+    "language": "it",
+    "word": "sogno",
+    "ipa": "sˈoɲɲo",
+    "phones": [
+      "en/s",
+      "ja/o",
+      "ja/ny",
+      "ja/ny",
+      "ja/o"
+    ]
+  },
+  {
+    "language": "it",
+    "word": "cuore",
+    "ipa": "kʊˈɔre",
+    "phones": [
+      "en/k",
+      "en/w",
+      "en/ao",
+      "ja/r",
+      "ja/e"
+    ]
+  },
+  {
+    "language": "it",
+    "word": "paese",
+    "ipa": "paˈeze",
+    "phones": [
+      "en/p",
+      "ja/a",
+      "ja/e",
+      "en/z",
+      "ja/e"
+    ]
+  },
+  {
+    "language": "it",
+    "word": "paura",
+    "ipa": "paˈʊra",
+    "phones": [
+      "en/p",
+      "ja/a",
+      "en/uh",
+      "ja/r",
+      "ja/a"
+    ]
+  },
+  {
+    "language": "it",
+    "word": "azzurro",
+    "ipa": "adzːˈurɾo",
+    "phones": [
+      "ja/a",
+      "en/d",
+      "en/z",
+      "en/d",
+      "en/z",
+      "zh/u",
+      "ja/r",
+      "ja/r",
+      "ja/o"
+    ]
+  },
+  {
+    "language": "it",
+    "word": "zucchero",
+    "ipa": "dzˈukːeɾo",
+    "phones": [
+      "en/d",
+      "en/z",
+      "zh/u",
+      "en/k",
+      "en/k",
+      "ja/e",
+      "ja/r",
+      "ja/o"
+    ]
+  },
+  {
+    "language": "it",
+    "word": "ghiaccio",
+    "ipa": "ɡjˈatʃːo",
+    "phones": [
+      "en/g",
+      "en/y",
+      "ja/a",
+      "en/ch",
+      "en/ch",
+      "ja/o"
+    ]
+  },
+  {
+    "language": "it",
+    "word": "città",
+    "ipa": "tʃitːˈa",
+    "phones": [
+      "en/ch",
+      "en/iy",
+      "en/t",
+      "en/t",
+      "ja/a"
+    ]
+  },
+  {
+    "language": "it",
+    "word": "ragazzo",
+    "ipa": "raɡˈatsːo",
+    "phones": [
+      "ja/r",
+      "ja/a",
+      "en/g",
+      "ja/a",
+      "ja/ts",
+      "ja/ts",
+      "ja/o"
+    ]
+  },
+  {
+    "language": "it",
+    "word": "figlio",
+    "ipa": "fˈiʎo",
+    "phones": [
+      "en/f",
+      "en/iy",
+      "en/l",
+      "en/y",
+      "ja/o"
+    ]
+  },
+  {
+    "language": "it",
+    "word": "giocare",
+    "ipa": "dʒokˈare",
+    "phones": [
+      "en/jh",
+      "ja/o",
+      "en/k",
+      "ja/a",
+      "ja/r",
+      "ja/e"
+    ]
+  },
+  {
+    "language": "fr",
+    "word": "bonjour",
+    "ipa": "bɔ̃ʒˈuʁ",
+    "phones": [
+      "en/b",
+      "zh/ong",
+      "en/zh",
+      "zh/u",
+      "en/r"
+    ]
+  },
+  {
+    "language": "fr",
+    "word": "amour",
+    "ipa": "amˈuʁ",
+    "phones": [
+      "ja/a",
+      "en/m",
+      "zh/u",
+      "en/r"
+    ]
+  },
+  {
+    "language": "fr",
+    "word": "lune",
+    "ipa": "lˈyn",
+    "phones": [
+      "en/l",
+      "zh/v",
+      "en/n"
+    ]
+  },
+  {
+    "language": "fr",
+    "word": "cœur",
+    "ipa": "kˈœʁ",
+    "phones": [
+      "en/k",
+      "zh/ve",
+      "en/r"
+    ]
+  },
+  {
+    "language": "fr",
+    "word": "deux",
+    "ipa": "dˈø",
+    "phones": [
+      "en/d",
+      "zh/ve"
+    ]
+  },
+  {
+    "language": "fr",
+    "word": "pain",
+    "ipa": "pˈɛ̃",
+    "phones": [
+      "en/p",
+      "zh/eng"
+    ]
+  },
+  {
+    "language": "fr",
+    "word": "bon",
+    "ipa": "bˈɔ̃",
+    "phones": [
+      "en/b",
+      "zh/ong"
+    ]
+  },
+  {
+    "language": "fr",
+    "word": "blanc",
+    "ipa": "blˈɑ̃",
+    "phones": [
+      "en/b",
+      "en/l",
+      "zh/ang"
+    ]
+  },
+  {
+    "language": "fr",
+    "word": "un",
+    "ipa": "ˈœ̃",
+    "phones": [
+      "zh/eng"
+    ]
+  },
+  {
+    "language": "fr",
+    "word": "chanson",
+    "ipa": "ʃɑ̃sˈɔ̃",
+    "phones": [
+      "en/sh",
+      "zh/ang",
+      "en/s",
+      "zh/ong"
+    ]
+  },
+  {
+    "language": "fr",
+    "word": "fille",
+    "ipa": "fˈij",
+    "phones": [
+      "en/f",
+      "en/iy",
+      "en/y"
+    ]
+  },
+  {
+    "language": "fr",
+    "word": "nuit",
+    "ipa": "nyˈi",
+    "phones": [
+      "en/n",
+      "en/y",
+      "en/w",
+      "en/iy"
+    ]
+  },
+  {
+    "language": "fr",
+    "word": "oiseau",
+    "ipa": "wazˈo",
+    "phones": [
+      "en/w",
+      "ja/a",
+      "en/z",
+      "ja/o"
+    ]
+  },
+  {
+    "language": "fr",
+    "word": "étoile",
+    "ipa": "etwˈal",
+    "phones": [
+      "ja/e",
+      "en/t",
+      "en/w",
+      "ja/a",
+      "en/l"
+    ]
+  },
+  {
+    "language": "fr",
+    "word": "rêve",
+    "ipa": "ʁˈɛv",
+    "phones": [
+      "en/r",
+      "en/eh",
+      "en/v"
+    ]
+  },
+  {
+    "language": "fr",
+    "word": "musique",
+    "ipa": "myzˈik",
+    "phones": [
+      "en/m",
+      "zh/v",
+      "en/z",
+      "en/iy",
+      "en/k"
+    ]
+  },
+  {
+    "language": "fr",
+    "word": "soleil",
+    "ipa": "solˈɛj",
+    "phones": [
+      "en/s",
+      "ja/o",
+      "en/l",
+      "en/eh",
+      "en/y"
+    ]
+  },
+  {
+    "language": "fr",
+    "word": "demain",
+    "ipa": "dəmˈɛ̃",
+    "phones": [
+      "en/d",
+      "en/ax",
+      "en/m",
+      "zh/eng"
+    ]
+  },
+  {
+    "language": "fr",
+    "word": "français",
+    "ipa": "fʁɑ̃sˈɛ",
+    "phones": [
+      "en/f",
+      "en/r",
+      "zh/ang",
+      "en/s",
+      "en/eh"
+    ]
+  },
+  {
+    "language": "fr",
+    "word": "jeunesse",
+    "ipa": "ʒønˈɛs",
+    "phones": [
+      "en/zh",
+      "zh/ve",
+      "en/n",
+      "en/eh",
+      "en/s"
+    ]
+  },
+  {
+    "language": "fr",
+    "word": "enfants",
+    "ipa": "ɑ̃fˈɑ̃",
+    "phones": [
+      "zh/ang",
+      "en/f",
+      "zh/ang"
+    ]
+  },
+  {
+    "language": "it",
+    "word": "gioia",
+    "ipa": "dʒˈɔia",
+    "phones": [
+      "en/jh",
+      "en/ao",
+      "en/y",
+      "ja/a"
+    ]
+  },
+  {
+    "language": "it",
+    "word": "aereo",
+    "ipa": "aˈɛːreo",
+    "phones": [
+      "ja/a",
+      "en/eh",
+      "ja/r",
+      "ja/e",
+      "ja/o"
+    ]
+  },
+  {
+    "language": "it",
+    "word": "io",
+    "ipa": "ˈio",
+    "phones": [
+      "en/iy",
+      "ja/o"
+    ]
+  },
+  {
+    "language": "it",
+    "word": "mio",
+    "ipa": "mˈio",
+    "phones": [
+      "en/m",
+      "en/iy",
+      "ja/o"
+    ]
+  },
+  {
+    "language": "it",
+    "word": "tuo",
+    "ipa": "tˈuo",
+    "phones": [
+      "en/t",
+      "zh/u",
+      "ja/o"
+    ]
+  },
+  {
+    "language": "it",
+    "word": "suo",
+    "ipa": "sˈuo",
+    "phones": [
+      "en/s",
+      "zh/u",
+      "ja/o"
+    ]
+  },
+  {
+    "language": "it",
+    "word": "siamo",
+    "ipa": "sjˈamo",
+    "phones": [
+      "en/s",
+      "en/y",
+      "ja/a",
+      "en/m",
+      "ja/o"
+    ]
+  },
+  {
+    "language": "it",
+    "word": "piano",
+    "ipa": "pjˈano",
+    "phones": [
+      "en/p",
+      "en/y",
+      "ja/a",
+      "en/n",
+      "ja/o"
+    ]
+  },
+  {
+    "language": "it",
+    "word": "zio",
+    "ipa": "dzˈio",
+    "phones": [
+      "en/d",
+      "en/z",
+      "en/iy",
+      "ja/o"
+    ]
+  },
+  {
+    "language": "it",
+    "word": "fiori",
+    "ipa": "fjˈorɪ",
+    "phones": [
+      "en/f",
+      "en/y",
+      "ja/o",
+      "ja/r",
+      "en/ih"
+    ]
+  },
+  {
+    "language": "it",
+    "word": "fiore",
+    "ipa": "fjˈore",
+    "phones": [
+      "en/f",
+      "en/y",
+      "ja/o",
+      "ja/r",
+      "ja/e"
+    ]
+  },
+  {
+    "language": "it",
+    "word": "buono",
+    "ipa": "bʊˈɔno",
+    "phones": [
+      "en/b",
+      "en/w",
+      "en/ao",
+      "en/n",
+      "ja/o"
+    ]
+  },
+  {
+    "language": "it",
+    "word": "buio",
+    "ipa": "bˈuːjo",
+    "phones": [
+      "en/b",
+      "zh/u",
+      "en/y",
+      "ja/o"
+    ]
+  },
+  {
+    "language": "it",
+    "word": "aiuto",
+    "ipa": "ajˈuto",
+    "phones": [
+      "ja/a",
+      "en/y",
+      "zh/u",
+      "en/t",
+      "ja/o"
+    ]
+  },
+  {
+    "language": "it",
+    "word": "italiano",
+    "ipa": "italiˈano",
+    "phones": [
+      "en/iy",
+      "en/t",
+      "ja/a",
+      "en/l",
+      "en/y",
+      "ja/a",
+      "en/n",
+      "ja/o"
+    ]
+  },
+  {
+    "language": "it",
+    "word": "arrivederci",
+    "ipa": "arɾivedˈɛrtʃɪ",
+    "phones": [
+      "ja/a",
+      "ja/r",
+      "ja/r",
+      "en/iy",
+      "en/v",
+      "ja/e",
+      "en/d",
+      "en/eh",
+      "ja/r",
+      "en/ch",
+      "en/ih"
+    ]
+  },
+  {
+    "language": "it",
+    "word": "buongiorno",
+    "ipa": "bʊondʒˈɔrno",
+    "phones": [
+      "en/b",
+      "en/w",
+      "ja/o",
+      "en/n",
+      "en/jh",
+      "en/ao",
+      "ja/r",
+      "en/n",
+      "ja/o"
+    ]
+  },
+  {
+    "language": "fr",
+    "word": "lui",
+    "ipa": "lyˈi",
+    "phones": [
+      "en/l",
+      "en/y",
+      "en/w",
+      "en/iy"
+    ]
+  },
+  {
+    "language": "fr",
+    "word": "tuile",
+    "ipa": "tyˈil",
+    "phones": [
+      "en/t",
+      "en/y",
+      "en/w",
+      "en/iy",
+      "en/l"
+    ]
+  },
+  {
+    "language": "fr",
+    "word": "nuage",
+    "ipa": "nyˈaʒ",
+    "phones": [
+      "en/n",
+      "en/y",
+      "en/w",
+      "ja/a",
+      "en/zh"
+    ]
+  },
+  {
+    "language": "fr",
+    "word": "tuer",
+    "ipa": "tyˈe",
+    "phones": [
+      "en/t",
+      "en/y",
+      "en/w",
+      "ja/e"
+    ]
+  },
+  {
+    "language": "fr",
+    "word": "fluide",
+    "ipa": "flyˈid",
+    "phones": [
+      "en/f",
+      "en/l",
+      "en/y",
+      "en/w",
+      "en/iy",
+      "en/d"
+    ]
+  },
+  {
+    "language": "fr",
+    "word": "joie",
+    "ipa": "ʒwˈa",
+    "phones": [
+      "en/zh",
+      "en/w",
+      "ja/a"
+    ]
+  },
+  {
+    "language": "fr",
+    "word": "chanter",
+    "ipa": "ʃɑ̃tˈe",
+    "phones": [
+      "en/sh",
+      "zh/ang",
+      "en/t",
+      "ja/e"
+    ]
+  },
+  {
+    "language": "fr",
+    "word": "voilà",
+    "ipa": "vwalˈa",
+    "phones": [
+      "en/v",
+      "en/w",
+      "ja/a",
+      "en/l",
+      "ja/a"
+    ]
+  },
+  {
+    "language": "fr",
+    "word": "poésie",
+    "ipa": "pɔezˈi",
+    "phones": [
+      "en/p",
+      "en/ao",
+      "ja/e",
+      "en/z",
+      "en/iy"
+    ]
+  },
+  {
+    "language": "fr",
+    "word": "ambiguïté",
+    "ipa": "ɑ̃biɡyitˈe",
+    "phones": [
+      "zh/ang",
+      "en/b",
+      "en/iy",
+      "en/g",
+      "en/y",
+      "en/w",
+      "en/iy",
+      "en/t",
+      "ja/e"
+    ]
+  },
+  {
+    "language": "fr",
+    "word": "accueillir",
+    "ipa": "akœjˈiʁ",
+    "phones": [
+      "ja/a",
+      "en/k",
+      "zh/ve",
+      "en/y",
+      "en/iy",
+      "en/r"
+    ]
+  },
+  {
+    "language": "fr",
+    "word": "travailler",
+    "ipa": "tʁavajˈe",
+    "phones": [
+      "en/t",
+      "en/r",
+      "ja/a",
+      "en/v",
+      "ja/a",
+      "en/y",
+      "ja/e"
+    ]
+  },
+  {
+    "language": "fr",
+    "word": "aujourd’hui",
+    "ipa": "oʒuʁdyˈi",
+    "phones": [
+      "ja/o",
+      "en/zh",
+      "zh/u",
+      "en/r",
+      "en/d",
+      "en/y",
+      "en/w",
+      "en/iy"
+    ]
+  },
+  {
+    "language": "fr",
+    "word": "petit",
+    "ipa": "pətˈi",
+    "phones": [
+      "en/p",
+      "en/ax",
+      "en/t",
+      "en/iy"
+    ]
+  },
+  {
+    "language": "fr",
+    "word": "grand",
+    "ipa": "ɡʁˈɑ̃",
+    "phones": [
+      "en/g",
+      "en/r",
+      "zh/ang"
+    ]
+  },
+  {
+    "language": "fr",
+    "word": "heureux",
+    "ipa": "øʁˈø",
+    "phones": [
+      "zh/ve",
+      "en/r",
+      "zh/ve"
+    ]
+  }
+]

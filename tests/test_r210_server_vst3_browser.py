@@ -18,7 +18,7 @@ from test_r210_live_vst3 import real_plugin  # noqa: F401
 
 
 @pytest.mark.skipif(os.getenv('MTA_TEST_BROWSER_VST3')!='1',reason='Set MTA_TEST_BROWSER_VST3=1 with Playwright/Chromium installed')
-def test_real_browser_live_play_pause_seek_parameter_update_and_stop(request,tmp_path):
+def test_real_browser_live_play_pause_seek_parameter_update_and_stop(request,tmp_path,chromium_capability):
     api=pytest.importorskip('playwright.sync_api')
     import httpx
     _,project,source,_,_,user,_=request.getfixturevalue('server')

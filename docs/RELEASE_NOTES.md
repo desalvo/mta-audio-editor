@@ -1,3 +1,37 @@
+## 0.3.0-r210 — Stage recovery key invalidation (uncommitted follow-up)
+
+- Recompute inference dependency fingerprint at each recovery boundary even when the same StageCache object is reused; do not reuse stale model/runtime/policy stage results after environment changes.
+- 28 local tests passed, no failures or skips; broader r210 test suite interrupted by execution limit, no final counts. Previously audited GM and unverified actual neural checkpoint inference remain as documented. No Git or production operations.
+
+## 0.3.0-r210 — Managed voices, real conversion adapters, piano specialist and recovery (21 October 2026; uncommitted)
+
+- Add atomic disabled-by-default neural bundle installation, complete SHA-256 inventories, independent engine/checkpoint/vocoder/auxiliary/reference policies and shared web/native management.
+- Select independent DiffSinger banks and IT/EN/FR profiles per singer; align full lyrics with explicit melismas; persist stable word/syllable note identities and create partial new takes with verified editable bank phones.
+- Add bounded expression point curves reaching real score F0/OpenVPI controls; preserve legacy dictionaries and distinguish DSP dynamics from neural inference.
+- Launch actual Seed-VC/RVC conversion CLIs and Transkun piano model API with dedicated pinned interpreters and offline dependencies. Missing assets fail explicitly; model-contract fixtures do not certify real checkpoint inference.
+- Handle empty transcription without placeholder tracks; recover completed Fast/Accurate/Deep stages with content/model/policy hashes and no duplicate usage charges; expose authenticated remote asset catalogs to native clients.
+- Fix FluidSynth note-off rejection after a one-shot/stolen voice finishes and drain stale voice output after reset; actual 128-program/47-drum audit passes for FluidR3 on FluidSynth as well as the previous TinySoundFont validation.
+- Version remains 0.3.0-r210. No Git or production changes. See DEVELOPMENT_STATUS.md for current tests, known failures and hardware/asset acceptance gates. All previous notes below are retained as historical cycle records.
+
+## 0.3.0-r210 — Multilingual expressive singing, separated transcription and reviewed GM banks (uncommitted)
+
+- Connect IT/EN/FR lyrics end-to-end; preserve all legacy reviewed lexicons; add optional real eSpeak NG bank-profile G2P, multi-phone durations, required DiffSinger F0, score vibrato, presets and explicit DSP dynamics.
+- Load the exact hash-verified acoustic checkpoint and matching pinned config/vocoder; require independent vocoder authorization and propagate the strictest free-only admission.
+- Implement Deep transcription with existing metered Demucs separation and per-source YourMT3/Basic Pitch reconciliation, preserving source identity and repeated GM programs. No invented tracks or extra confidence votes.
+- Add reviewed local SoundFont installation, bank/license integrity checks, shared MIDI editor selection and persisted bank IDs; correct portable 14-bit bank/controller state. Actual TinySoundFont audit: 128 melodic programs and 47 percussion notes produce finite audible PCM.
+- Preserve per-singer generation metadata and correct neural audio provenance; inherit selected editor regions for aligned alternative takes. Restore executable modes on shebang entry points lost in the source archive.
+- Full source, tests, VST SDK, manuals, version and legacy AI are preserved. No commit/push/tag/release or production changes.
+- Remaining software work includes voice conversion, managed neural banks, further specialist adapters and silent-stem handling. Full regression is not all green; consult `validation/r210-cycle-summary.json` and `docs/DEVELOPMENT_STATUS.md` for actual outcomes, baseline failures and environmental limits.
+
+## 0.3.0-r210 — License-checkpoint hardening (20 October 2026; uncommitted)
+
+- Preserve the complete prior cumulative project, version and revision.
+- Add admission checks before model downloads for ChordFormer, lead/backing and DrumSep; fail closed for DrumSep remote inference.
+- Preserve prior administrator licensing attestations and evidence across policy changes.
+- Update Italian/English model rights guidance, checkpoint provenance blockers and development status.
+- No unverified/noncommercial model was newly enabled by default. Free-only is not a substitute for rights or approval; billing exemption remains separate from metering.
+- End-to-end commercial paths, real production hardware and exact checkpoint rights remain acceptance blockers. No commit, push, tag or release performed.
+
 ## r207 — Native remote AI routes
 
 - Added persistent opt-in local/remote routing for native Whisper, chords, Demucs, DrumSep, SAM Audio, singer separation and backing-vocal separation.
@@ -1046,3 +1080,12 @@ r207 additional validation: metered Linux subprocess executions persist CPU time
 Remote WAV gateway now supports safe per-model request options via `X-MTA-AI-Options`. Existing native AI feature routes are not yet universally migrated.
 
 - r207 cumulative: Optional trusted inference adapters and multi-user authenticated concurrent smoke benchmark; native legacy AI UI routes still require migration/verification.
+
+### r210 — UVR KARA 2 startup integrity auto-repair (20 October 2026)
+- Added nonblocking startup repair with license admission, pinned SHA-256, temp-dir download, symlink guard, and atomic replacement for an invalid/missing KARA 2 checkpoint. Toggle `MTA_UVR_KARA2_AUTO_REPAIR=0` to disable.
+- The upstream model license/permissions remain unresolved for the exact weights; neither free operation nor the repair mechanism grants any rights. No change to the model's default blocked license state.
+- 18 focused tests passed; real provider download, full regression and ROCm inference not run.
+
+### 0.3.0-r210 follow-up (21 October 2026)
+
+Improved offline MIDI benchmark input limits and tolerance validation, StageCache directory safety, and GM portable synthesizer closed-handle errors. Offline verification: 70 passed, 7 skipped, 0 failed; hardware/core GM controller tests skipped in this environment. Neural asset inference, full regression, browser/native acceptance and musical benchmarks remain outstanding. No Git operations or production changes.

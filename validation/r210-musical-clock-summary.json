@@ -1,0 +1,28 @@
+{
+  "version": "0.3.0-r210",
+  "new_musical_origin_tests": {
+    "passed": 14,
+    "failed": 0,
+    "warnings": 1,
+    "seconds": 6.44
+  },
+  "focused_including_existing_contracts": {
+    "passed": 46,
+    "skipped": 2,
+    "deselected": 5,
+    "warnings": 1,
+    "counts_overlap": true
+  },
+  "actual_audio_click_generated": [
+    "fixed",
+    "adaptive"
+  ],
+  "audio_speed_ratio_2x_verified": true,
+  "python_javascript_clock_parity": true,
+  "external_mido_playback_matches_stretched_time": true,
+  "source_roundtrip_retained": true,
+  "test_reexport_tolerance_ms": 0.01,
+  "test_reexport_tolerance_reason": "SMF tempo integer microseconds gives2us error at3x;10us bound",
+  "physical_midi_vst_os_certified": false,
+  "source_functional_changes_frozen": true
+}

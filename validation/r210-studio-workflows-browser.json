@@ -1,0 +1,11 @@
+{
+  "controller_cc_bend_keyboard_undo_delete": true,
+  "group_edit_undo_redo_and_large_canvas": true,
+  "persisted_midi_notes_after_reopen": true,
+  "lazy_db_preferences_and_sidebar_reload": true,
+  "tempo_graph_repeated_keys_applied": true,
+  "tempo_overlay_keeps_track_geometry": true,
+  "tempo_graph_opened": true,
+  "studio_tabs_models_and_close_without_job": true,
+  "javascript_errors": []
+}

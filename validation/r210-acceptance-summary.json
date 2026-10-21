@@ -1,0 +1,96 @@
+{
+  "version": "0.3.0-r210",
+  "general_regression": {
+    "tests": 4676,
+    "passed": 4596,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 80,
+    "warnings": 6,
+    "seconds_pytest": 543.3,
+    "exit_code": 0
+  },
+  "focused_checkpoint_tests": {
+    "passed": 22,
+    "overlaps_general_suite": true
+  },
+  "dedicated_real_gm_tests": {
+    "passed": 23,
+    "overlaps_general_suite": true
+  },
+  "real_runtime_inference": [
+    "RVC RMVPE/HuBERT CPU",
+    "Seed-VC F0 44k/Whisper small/BigVGAN CPU, strict active tensors and resampling headroom",
+    "Transkun 2.0 CPU",
+    "YourMT3 noPS CPU with tensor-only safetensors"
+  ],
+  "gm": {
+    "backend": "portable-cpp",
+    "programs": 128,
+    "standard_drum_notes": 47,
+    "software_smoke_pass": true,
+    "portable_aftertouch": false
+  },
+  "seed_resampling": {
+    "source_rate": 44100,
+    "source_peak": 0.9620361328125,
+    "resampled_rate": 48000,
+    "resampled_frames": 143778,
+    "resampled_peak": 0.9800027012825012,
+    "mta_pcm_guard_passed": true,
+    "quality_certified": false,
+    "upstream_vocoder_output_clamp_unchanged": true,
+    "linear_export_gain": 0.9620346063197609,
+    "peak_ceiling_tolerance": "PCM quantization adds a few units in the last decimal places"
+  },
+  "ten_program_benchmark": {
+    "reference_instruments": 10,
+    "predicted_instruments": 5,
+    "reference_notes": 10,
+    "predicted_notes": 7,
+    "exact_matches": 1,
+    "f1": 0.11764705882352941,
+    "target_met": false,
+    "input_kind": "Generated licensed GM mixture, not recorded music"
+  },
+  "all_three_areas_complete": false,
+  "only_hardware_acceptance_remaining": false,
+  "remaining_gates": [
+    "Authorized complete native DiffSinger acoustic bank/config/vocoder/phonetic profile",
+    "Multitrack model/strategy quality: actual ten-program target failed; representative recorded benchmark and Deep validation remain",
+    "Chromium unavailable from official CDN in this environment",
+    "Local Unix sockets forbidden by environment",
+    "FluidSynth shared library, Basic Pitch/Deep runtimes and external native VST/SDK acceptance",
+    "Physical audio devices, native target operating systems and supported GPU backends"
+  ],
+  "skip_breakdown": {
+    "vst_sdk_plugins": 33,
+    "browser": 26,
+    "unix_transport": 10,
+    "fluidsynth": 4,
+    "basic_pitch_deep": 3,
+    "voicebank": 1,
+    "yourmt3_optin_not_enabled_in_general_env_real_inference_run_separately": 1,
+    "physical_audio": 1,
+    "win32": 1
+  },
+  "warnings": [
+    "Starlette/httpx deprecation",
+    "3 duplicate legacy OpenAPI operation IDs",
+    "2 deliberately duplicated ZIP entry test warnings"
+  ],
+  "prior_extended_run": {
+    "passed": 4595,
+    "failed": 11,
+    "skipped": 68,
+    "warnings": 6,
+    "failures": "Missing Chromium executable in eleven browser cases; corrected prerequisite detection, not claimed as browser passes"
+  },
+  "git_operations": false,
+  "production_changes": false,
+  "asset_archive": {
+    "bytes": 991830047,
+    "sha256": "7e2803bb0e8bd1b92815eb8ca1a147ed2c59c66889e4f04b878f4dbb6590fe15",
+    "segment_hashes_and_full_crc_verified": true
+  }
+}

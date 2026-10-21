@@ -1,0 +1,14 @@
+{
+  "version": "0.3.0-r210",
+  "scope": "offline selected 9 test modules",
+  "passed": 104,
+  "failed": 0,
+  "skipped": 4,
+  "interrupted": 0,
+  "real_neural_inference": false,
+  "full_regression": false,
+  "three_macroareas_fully_complete": false,
+  "original_entries_preserved": 2635,
+  "git_operations": false,
+  "server_changes": false
+}

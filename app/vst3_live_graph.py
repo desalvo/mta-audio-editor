@@ -284,10 +284,10 @@ class Graph:
         for old,new in zip(self.project.tracks,project.tracks):
             if (old.kind,old.midi_route,old.midi_notes,old.midi_controls,old.clips,old.delay_ms)!=(new.kind,new.midi_route,new.midi_notes,new.midi_controls,new.clips,new.delay_ms):return False
             if old.instrument!=new.instrument:
-                if not old.instrument or not new.instrument or old.instrument.params.get('path')!=new.instrument.params.get('path'):return False
+                if not old.instrument or not new.instrument or old.instrument.plugin!=new.instrument.plugin or old.instrument.params.get('path')!=new.instrument.params.get('path'):return False
                 node=self.plugins.get((old.id,'instrument'))
                 if node:
-                    apply_parameters(node.plugin,{k:v for k,v in new.instrument.params.items() if k!='path' and v!=old.instrument.params.get(k)})
+                    node.set_parameters({k:v for k,v in new.instrument.params.items() if k!='path' and v!=old.instrument.params.get(k)})
                     node.item=new.instrument
         for t in [*project.tracks,None]:
             route=t.id if t else 'master';items=t.inserts if t else project.master_inserts
@@ -333,4 +333,4 @@ class Graph:
         if not isinstance(params,dict) or len(params)>64 or 'path' in params or '__mta_state_b64' in params:raise ValueError('Invalid live MIDI parameters')
         node=self.plugins.get((self.project.tracks[0].id,'instrument'))
         if node is None:raise ValueError('Monitoring instrument unavailable')
-        apply_parameters(node.plugin,params)
+        node.set_parameters(params)

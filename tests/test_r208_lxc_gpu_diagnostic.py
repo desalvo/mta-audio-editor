@@ -12,7 +12,7 @@ def test_missing_mount_is_not_billable(tmp_path):
     assert result['billable_gpu_time_verified'] is False
 
 
-def test_live_diagnostic_redacts_secrets_and_pid(tmp_path):
+def test_live_diagnostic_redacts_secrets_and_pid(tmp_path, unix_socket_capability):
     secret = 'a' * 48
     (tmp_path / 'token').write_text(secret)
     target = tmp_path / 'agent.sock'

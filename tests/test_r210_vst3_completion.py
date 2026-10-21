@@ -34,10 +34,10 @@ def test_zoned_ppq_continuity_bar_rephase_and_loop():
 def test_adaptive_map_and_browser_agree():
     data={'bpm':120,'base_bpm':120,'time_signature':'7/8','metronome_mode':'adaptive',
           'adaptive_tempo_map':[{'time_ms':0,'beat_index':0,'bpm':120},{'time_ms':500,'beat_index':1,'bpm':120},{'time_ms':1500,'beat_index':2,'bpm':60}]}
-    tempo=TempoMap(data);assert tempo.position(1000)[3]==1.5
-    script='global.window=global;require("./app/static/midi_tempo.js");const m=new MtaTempoMap(JSON.parse(process.argv[1]));console.log(JSON.stringify([m.ppq(1000),m.time(1.5)]))'
+    tempo=TempoMap(data);assert tempo.position(1000)[3]==.75
+    script='global.window=global;require("./app/static/midi_tempo.js");const m=new MtaTempoMap(JSON.parse(process.argv[1]));console.log(JSON.stringify([m.ppq(1000),m.time(.75)]))'
     values=json.loads(subprocess.check_output(['node','-e',script,json.dumps(data)],text=True))
-    assert values==[1.5,1000]
+    assert values==[.75,1000]
 
 
 def test_compiled_clock_preserves_ppq_on_tempo_change(real_plugin):

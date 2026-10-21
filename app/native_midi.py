@@ -31,9 +31,11 @@ def start(pid,tid,options=None):
     from .midi_monitor import monitor_project
     from .vst3_live import Session
     from .vst3_transport import runtime_available
-    if requested()!='cpp' or not runtime_available():raise ValueError('Select C++ and install the updated VST host runtime')
+    project=load_project(pid);track=next((t for t in project.tracks if t.id==tid),None)
+    gm=bool(track and track.instrument and track.instrument.plugin=='gm_soundfont')
+    if not gm and (requested()!='cpp' or not runtime_available()):raise ValueError('Select C++ and install the updated VST host runtime')
     with _LOCK:
-        stop();project=load_project(pid);validate_project_files(project);project=monitor_project(project,tid)
+        stop();validate_project_files(project);project=monitor_project(project,tid)
         options=options or {};_MONITOR_INPUT=options.get('input','')
         _MONITOR=Session(project,[audio_path(pid,t.filename) for t in project.tracks],0,monitor=True,midi_options=options)
         _PROJECT=pid

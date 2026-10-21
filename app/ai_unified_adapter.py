@@ -81,18 +81,14 @@ def _artifacts(folder: Path, entries: list[tuple[Path, str]]) -> None:
         with tempfile.NamedTemporaryFile(mode='wb', prefix='.manifest-', suffix='.tmp',
                                          dir=folder, delete=False) as handle:
             temp_name = handle.name
-            os.fchmod(handle.fileno(), 0o600)
+            if hasattr(os,'fchmod'):os.fchmod(handle.fileno(),0o600)
             handle.write(data)
             handle.flush()
             os.fsync(handle.fileno())
         os.replace(temp_name, folder / 'output.manifest.json')
         temp_name = None
-        if hasattr(os, 'O_DIRECTORY'):
-            fd = os.open(folder, os.O_RDONLY | os.O_DIRECTORY)
-            try:
-                os.fsync(fd)
-            finally:
-                os.close(fd)
+        from app.fs_durability import sync_directory
+        sync_directory(folder)
     finally:
         if temp_name is not None:
             try:
@@ -105,6 +101,8 @@ def infer(plan: dict, output: Path) -> None:
     kind = plan.get('kind')
     if kind not in SUPPORTED:
         raise ValueError('Unsupported unified inference backend')
+    from app.model_license_policy import evaluate
+    evaluate(kind,plan)
     # Resolve only the trusted job directory. Never follow a caller-controlled
     # source symlink out of that directory, even when it points back inside.
     folder = output.parent.resolve(strict=True)
@@ -139,6 +137,29 @@ def infer(plan: dict, output: Path) -> None:
         result.write_text(json.dumps({'markers':[v.model_dump(mode='json') for v in events]}))
         _artifacts(folder,[(result,'application/json')]);return
     if kind == 'drumsep':
+        # Explicit DSP-only fallback: no blocked neural checkpoint is loaded.
+        # This produces two broad stems, NOT kick/snare/toms/cymbals.
+        if plan.get('model') == 'dsp':
+            from app.main import _split_drums_percussions
+            body, percussion = _split_drums_percussions(source, folder)
+            _artifacts(folder, [(body, 'audio/wav'), (percussion, 'audio/wav')])
+            return
+        if plan.get('model') == 'mvsep-mega53':
+            from app.mega53_runtime import infer_drums
+            requested = plan.get('targets', ['kick', 'snare', 'toms', 'hi-hat', 'percussion'])
+            allowed = {'kick', 'snare', 'toms', 'hi-hat', 'drums', 'percussion'}
+            if (not isinstance(requested, list) or not requested
+                    or len(requested) != len(set(requested))
+                    or any(not isinstance(v, str) or v not in allowed for v in requested)):
+                raise ValueError('Unsupported Mega 53 drum targets')
+            if set(requested) == {'drums', 'percussion'}:
+                from app.mega53_runtime import infer_drums_vs_percussion
+                paths = infer_drums_vs_percussion(source, folder)
+            else:
+                if 'drums' in requested:
+                    raise ValueError('Group drum/percussion separation requires both classes')
+                paths = infer_drums(source, folder, set(requested))
+            _artifacts(folder, [(p, 'audio/wav') for p in paths]); return
         from app.drumsep_onnx_worker import infer as drumsep_infer
         configured = os.environ.get('MTA_AI_DRUMSEP_MODEL', '')
         if configured:
@@ -209,10 +230,17 @@ def infer(plan: dict, output: Path) -> None:
         _artifacts(folder,files)
         return
     if kind == 'backing-vocals':
+        from app.model_license_policy import effective_backing_model
+        effective_model = effective_backing_model(plan)
+        if effective_model == 'mvsep-mega53':
+            from app.mega53_runtime import infer
+            lead, backing, _ = infer(source, folder)
+            _artifacts(folder, [(lead, 'audio/wav'), (backing, 'audio/wav')])
+            return
         # A configured audio-separator model is mandatory; no DSP fallback is silently billed as AI.
         from audio_separator.separator import Separator
         from app.ai_backend_models import LEAD_BACKING_MODELS
-        chosen=plan.get('model')
+        chosen=effective_model
         known={m['id']:m['filename'] for m in LEAD_BACKING_MODELS}
         if chosen and chosen not in known:raise ValueError('Unsupported backing-vocal model')
         model = known[chosen] if chosen else os.environ.get('MTA_AI_VOCAL_MODEL', '')

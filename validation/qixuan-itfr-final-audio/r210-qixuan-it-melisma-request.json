@@ -1,0 +1,57 @@
+{
+  "schema": "mta-neural-singing-1",
+  "language": "it",
+  "pronunciation": "espeak",
+  "model": "diffsinger-qixuan",
+  "checkpoint": "/workspace/scratch/37b1f5ad4c83/qixuan_itfr_assets/runtime-final/runtime/Qixuan_v2.7.0_DiffSinger_OpenUtau/0101_qixuan_muon1_acoustic.qixuan.onnx",
+  "lyric_text": "ciao amore",
+  "melisma_counts": [
+    1,
+    2,
+    1,
+    1
+  ],
+  "notes": [
+    {
+      "id": "n0",
+      "pitch": 60,
+      "start_ms": 0,
+      "duration_ms": 600,
+      "velocity": 96,
+      "syllable": "la"
+    },
+    {
+      "id": "n1",
+      "pitch": 64,
+      "start_ms": 600,
+      "duration_ms": 600,
+      "velocity": 96,
+      "syllable": "la"
+    },
+    {
+      "id": "n2",
+      "pitch": 67,
+      "start_ms": 1200,
+      "duration_ms": 600,
+      "velocity": 96,
+      "syllable": "la"
+    },
+    {
+      "id": "n3",
+      "pitch": 65,
+      "start_ms": 1800,
+      "duration_ms": 600,
+      "velocity": 96,
+      "syllable": "la"
+    },
+    {
+      "id": "n4",
+      "pitch": 69,
+      "start_ms": 2400,
+      "duration_ms": 600,
+      "velocity": 96,
+      "syllable": "la"
+    }
+  ],
+  "expression": {}
+}

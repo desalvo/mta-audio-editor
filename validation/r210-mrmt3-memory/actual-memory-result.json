@@ -1,0 +1,21 @@
+{
+  "mta_notes": 7,
+  "mta_audit": {
+    "invalid_events": 5,
+    "dropped_events": 0,
+    "unclosed_notes": 0
+  },
+  "strict_state": true,
+  "tensor_count": 206,
+  "elements": 49831168,
+  "notes": 7,
+  "programs": [
+    0,
+    33,
+    80,
+    88
+  ],
+  "invalid_events": 5,
+  "dropped_events": 0,
+  "seconds": 1.7863115019999896
+}

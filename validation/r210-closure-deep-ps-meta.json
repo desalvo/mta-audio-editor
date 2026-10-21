@@ -1,0 +1,75 @@
+{
+  "usage": {
+    "cpu_seconds": 94.85627000000001
+  },
+  "separation_report": {
+    "bass": {
+      "protocol": "mta-reconciliation-1",
+      "models": [
+        "yourmt3",
+        "basic-pitch"
+      ],
+      "comparisons": [
+        {
+          "model": "basic-pitch",
+          "matched_events": 0,
+          "unmatched_events": 2,
+          "instrument_conflicts": 0,
+          "ambiguous_events": 0
+        }
+      ],
+      "policy": "primary-timing; primary-only reference votes; one-to-one matches; retain originals and unmatched events",
+      "calibrated_confidence": false,
+      "primary_audit": {
+        "primary_note_count": 1,
+        "notes_supported_by_other_model": 0,
+        "notes_without_other_model_support": 1,
+        "support_distribution": {
+          "1": 0
+        },
+        "meaning": "Observed cross-model matches only; not a correctness score or calibrated confidence"
+      }
+    },
+    "other": {
+      "protocol": "mta-reconciliation-1",
+      "models": [
+        "yourmt3",
+        "basic-pitch"
+      ],
+      "comparisons": [
+        {
+          "model": "basic-pitch",
+          "matched_events": 0,
+          "unmatched_events": 16,
+          "instrument_conflicts": 0,
+          "ambiguous_events": 0
+        }
+      ],
+      "policy": "primary-timing; primary-only reference votes; one-to-one matches; retain originals and unmatched events",
+      "calibrated_confidence": false,
+      "primary_audit": {
+        "primary_note_count": 6,
+        "notes_supported_by_other_model": 0,
+        "notes_without_other_model_support": 6,
+        "support_distribution": {
+          "1": 0
+        },
+        "meaning": "Observed cross-model matches only; not a correctness score or calibrated confidence"
+      }
+    },
+    "vocals": {
+      "protocol": "mta-reconciliation-1",
+      "models": [
+        "yourmt3",
+        "basic-pitch"
+      ],
+      "comparisons": [],
+      "empty_models": [
+        "yourmt3"
+      ],
+      "calibrated_confidence": false,
+      "policy": "retain the nonempty hypothesis; no inferred agreement"
+    }
+  },
+  "seconds": 54.947784054000294
+}

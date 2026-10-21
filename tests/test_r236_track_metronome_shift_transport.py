@@ -41,10 +41,10 @@ def test_adaptive_shift_reuses_saved_tempo_map_without_analysis():
 
 def test_transport_supports_time_and_musical_views():
     assert 'id="transportDisplayMode"' in INDEX
-    assert '<option value="musical">Misure:Beat</option>' in INDEX
+    assert '<option value="musical">Bar:Beats:Division:Ticks</option>' in INDEX
     assert "function transportMusicalPosition" in JS
     assert "function parseMusicalPosition" in JS
-    assert "current?.metronome_mode==='adaptive'" in JS
+    assert "new MtaMusicalClock.Clock" in JS
     assert "shiftedAdaptiveBeatTimes" in JS
 
 

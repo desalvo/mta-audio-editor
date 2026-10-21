@@ -39,7 +39,7 @@ Section: sound
 Priority: optional
 Architecture: $deb_arch
 Maintainer: MTA Audio Editor <noreply@github.com>
-Depends: libgtk-3-0 | libgtk-3-0t64, libwebkit2gtk-4.1-0 | libwebkit2gtk-4.1-0t64
+Depends: libgtk-3-0 | libgtk-3-0t64, libwebkit2gtk-4.1-0 | libwebkit2gtk-4.1-0t64, libportaudio2
 Description: MTA Audio Editor native desktop client
  Local single-user audio editor. VST3 plugins are installed separately.
 EOF
@@ -54,7 +54,7 @@ Summary: MTA Audio Editor native desktop client
 License: EUPL-1.2
 BuildArch: $rpm_arch
 Source0: %{name}.tar.gz
-Requires: gtk3, webkit2gtk4.1
+Requires: gtk3, webkit2gtk4.1, portaudio
 AutoReqProv: no
 %description
 Local single-user audio editor with optional VST3 effects.

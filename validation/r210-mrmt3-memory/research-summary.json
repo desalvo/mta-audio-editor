@@ -1,0 +1,78 @@
+{
+  "scope": "Isolated real CPU inference of original memory-retaining MR-MT3, not the mt3.pth baseline; no production integration/default changes",
+  "source_commit": "826ea84a933f93cd707d11e91af711f1d19c8d79",
+  "checkpoint": {
+    "repo": "gudgud1014/MR-MT3",
+    "revision": "7bd24c3e1dc26468a6a9354c0a4f174405c9bad8",
+    "file": "scratch/exp_segmemV2_prev_context=64_prevaug_frame=3.ckpt",
+    "bytes": 582522347,
+    "sha256": "d477dfb1f8bb7eecee54d996f68c7b9008d6ee2e84f62312d1826c60c8992f18",
+    "download_seconds": 22.240372145000038
+  },
+  "load": {
+    "weights_only": true,
+    "unsafe_globals": [],
+    "allowlisted_globals": [],
+    "strict_state": true,
+    "tensor_count": 206,
+    "elements": 49831168
+  },
+  "runtime": {
+    "torch": "2.8.0+cpu",
+    "transformers": "5.13.1",
+    "memory_context": 64,
+    "memory_layers": 1,
+    "input_windows": 2,
+    "contiguous_memory_generation": true,
+    "tensorflow_used": false,
+    "cuda_used": false,
+    "new_dependencies_installed": false,
+    "inference_seconds": 1.7863115019999896
+  },
+  "compatibility": "Original memory-model files with checkpoint import relocated to torch.utils.checkpoint; reviewed modern T5 base from MT3-Infer d8cbd287470291dee335f84315c5a9b9ff6e6c8a. No tensor edits, ignored keys, strict=False or unsafe pickle loading. Original source copies retained.",
+  "preprocessing": "Same torch MelSpectrogram parameters as original; [-12,5] normalization then zero padded frames; original final 128-sample frame padding; original fixture/reference unmodified.",
+  "musical_result": {
+    "parts": 4,
+    "notes": 7,
+    "melodic_programs": [
+      33,
+      80,
+      88
+    ],
+    "percussion_part": true,
+    "decoder_audit": {
+      "invalid_events": 5,
+      "dropped_events": 0,
+      "unclosed_notes": 0
+    }
+  },
+  "quality": {
+    "correctly_matched_instruments": 0,
+    "f1": 0.0,
+    "instrument_target_met": false,
+    "matched_notes": 0,
+    "offset_tolerance_ms": 100,
+    "onset_tolerance_ms": 50,
+    "precision": 0.0,
+    "predicted_instruments": 4,
+    "predicted_notes": 7,
+    "protocol": "mta-midi-benchmark-1",
+    "recall": 0.0,
+    "reference_instruments": 10,
+    "reference_notes": 10,
+    "target_instruments": 10
+  },
+  "conclusion": "Runtime feasibility demonstrated. Existing exact-GM 10-program technical mix still fails: zero correct instrument/pitch/onset/offset matches. This is not evidence of universal model incapability, and not 10–16 accuracy closure.",
+  "input_integrity": {
+    "validation/r210-acceptance-ten-programs.wav": {
+      "sha256": "b80511442b31ea9c2011705bdb3fad273eac56c5c7d7e0735ded29ed22cbb7d7",
+      "bytes": 1008044,
+      "unchanged_from_starting_cumulative": true
+    },
+    "validation/r210-acceptance-ten-programs-reference.json": {
+      "sha256": "d252454a878b7625a9519cd54c08114d837072093c02810289fa40434fcbd2c6",
+      "bytes": 5791,
+      "unchanged_from_starting_cumulative": true
+    }
+  }
+}

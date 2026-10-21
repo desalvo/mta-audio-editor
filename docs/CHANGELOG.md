@@ -1,3 +1,15 @@
+## 0.3.0-r210 — uncommitted stage-cache follow-up
+
+- Harden in-process runtime/model/policy invalidation of persisted Audio-to-MIDI stages. Added regression coverage and retained all prior files, integrations and licenses. See `docs/DEVELOPMENT_STATUS.md` for precise verification limits.
+
+## 0.3.0-r210 — 21 October 2026 (uncommitted cumulative Studio cycle)
+
+Managed per-component licensed neural assets and independent multilingual singers; full-text/melisma alignment, expression curves and syllable/word/phrase takes; real RVC/Seed-VC CLI and Transkun API adapters; empty-result handling and hashed stage recovery in all transcription modes; authenticated remote catalog and large typed score-options body. FluidSynth note-off/reset fixes, actual dual-engine 128-program/47-drum audit, 149 targeted and 25 real-GM tests passed. Full regression interrupted by outbound-request approval review; no all-green/full neural acceptance claim. See DEVELOPMENT_STATUS.md and STUDIO_MANAGED_ASSETS_R210_IT_EN.md.
+
+## Uncommitted 0.3.0-r210 cumulative three-area cycle
+
+Multilingual DiffSinger routing, real optional bank-aware eSpeak G2P, F0/vibrato/expression and exact checkpoint/config/vocoder admission; Deep separated-source transcription; reviewed SF2 registration and editor selection; portable bank/controller corrections and real 128-program/47-drum audio audit. See `THREE_AREA_IMPLEMENTATION_R210_IT_EN.md`. Software remains incomplete in the explicitly listed areas; no version increment or Git operations.
+
 ## 0.3.0-r208 — Hardware snapshots and billing refinement
 
 - Freeze advisory CPU/GPU hardware and suggested profile rates per AI job; report historical profiles without repricing on LXC migration.

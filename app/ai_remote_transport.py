@@ -9,7 +9,7 @@ import json
 import math
 
 MAX_OPTIONS_BYTES = 8192
-FORBIDDEN = frozenset({'source_audio', 'input_path', 'output_path', 'command', 'executable', 'cwd', 'shell'})
+FORBIDDEN = frozenset({'source_audio', 'source_score', 'input_path', 'output_path', 'command', 'executable', 'cwd', 'shell'})
 
 
 MAX_NESTING = 8

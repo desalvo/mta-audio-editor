@@ -1,5 +1,7 @@
 # Native desktop builds
 
+Desktop interface zoom (50–200%) is visible in the top bar; Ctrl/Cmd +/−/0 and 100% reset are supported independently of timeline zoom. See [r210 interface zoom](../docs/NATIVE_UI_ZOOM_R210.md).
+
 The Windows and macOS editions run the same editor engine locally, inside a native
 `pywebview` window. They are deliberately **single-user**:
 

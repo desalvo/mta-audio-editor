@@ -31,6 +31,9 @@ def main():
             separator.download_model_files(model['filename'])
             if not (folder / model['filename']).is_file():
                 raise RuntimeError('Downloaded model is missing')
+            if args.model == 'uvr_mdxnet_kara_2':
+                from app.uvr_kara_integrity import verify_kara_2
+                verify_kara_2(folder / model['filename'])
             document = {'id': args.model, 'installed': True}
         else:
             call = download_lyrics_model if args.kind == 'whisper' else download_chord_model

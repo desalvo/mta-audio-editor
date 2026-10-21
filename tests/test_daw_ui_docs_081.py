@@ -7,8 +7,11 @@ USER=(ROOT/"app/docs/user.html").read_text()
 USER_EN=(ROOT/"app/docs/user-en.html").read_text()
 
 def test_multitrack_daw_project_format_is_supported():
-    assert 'Literal["MTA8", "MTA16", "DAW"]' in MODELS
-    assert '>Multitrack DAW</option>' in JS
+    from app.models import Project
+    for target in ('MTA8', 'MTA16', 'DAW', 'DAW_MIDI', 'MIDI'):
+        assert Project(id='mode', title='Mode', target=target).target == target
+    assert '>Multitrack DAW (audio)</option>' in JS
+    assert '>Multitrack DAW + MIDI</option>' in JS
     assert 'mta_target:' in MODELS
 
 def test_track_selection_does_not_revalidate_existing_waveforms():

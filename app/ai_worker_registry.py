@@ -37,13 +37,18 @@ def extensions():
     return result
 
 
-def registered_kinds():return WORKER_KINDS|extensions().keys()
+def registered_kinds():
+    from .studio_catalog import KINDS
+    return WORKER_KINDS|extensions().keys()|KINDS
 
 
 def worker_python(kind):
     import sys
     item=extensions().get(kind,{})
-    value=item.get('python') or os.getenv('MTA_AI_WORKER_'+kind.upper().replace('-','_')+'_PYTHON') or os.getenv('MTA_AI_DEFAULT_PYTHON') or sys.executable
+    from .studio_catalog import KINDS,python_for
+    configured=os.getenv('MTA_AI_WORKER_'+kind.upper().replace('-','_')+'_PYTHON')
+    studio_python=python_for(kind) if kind in KINDS and not item.get('python') and not configured else None
+    value=item.get('python') or configured or studio_python or os.getenv('MTA_AI_DEFAULT_PYTHON') or sys.executable
     path=Path(value)
     if not path.is_absolute() or not path.is_file() or not os.access(path,os.X_OK):raise ValueError('Invalid operator-selected AI Python')
     return str(path)
@@ -53,19 +58,27 @@ def resolve_worker(kind: str) -> Path | None:
     """Resolve a fixed administrator-configured adapter from a known allowlist."""
     from .ai_worker_protocol import configured_worker
     extra=extensions()
-    if not isinstance(kind, str) or kind not in WORKER_KINDS|extra.keys():
+    from .studio_catalog import KINDS,available
+    if not isinstance(kind, str) or kind not in WORKER_KINDS|extra.keys()|KINDS:
         raise ValueError('Unsupported AI worker kind')
     env_name = 'MTA_AI_WORKER_' + re.sub(r'[^A-Z0-9]', '_', kind.upper()) + '_EXECUTABLE'
     value = os.environ.get(env_name, '') or extra.get(kind,{}).get('executable','')
     if not value and kind in {'whisper', 'chords-ml', 'demucs', 'drumsep', 'sam-audio', 'singer-separation', 'backing-vocals','markers'} and os.environ.get('MTA_AI_UNIFIED_WORKERS_ENABLED') == 'true':
         value = str(Path(__file__).with_name('ai_unified_adapter.py').resolve())
+    if not value and kind in KINDS and available(kind):
+        value=str(Path(__file__).with_name('ai_studio_adapter.py').resolve())
     if not value:
         # Backward compatibility for existing ACE-Step installations only.
         return configured_worker() if kind == 'ace-step' else None
-    if os.environ.get('MTA_AI_WORKER_ENABLED', '').lower() != 'true':
+    native_studio=kind in KINDS and os.getenv('MTA_NATIVE_SINGLE_USER','').lower()=='true'
+    if os.environ.get('MTA_AI_WORKER_ENABLED', '').lower() != 'true' and not native_studio:
         return None
     path = Path(value)
-    if not path.is_absolute() or path.is_symlink() or not path.is_file() or not os.access(path, os.X_OK):
+    # Frozen bundles may extract data .py files without Unix execute bits.
+    # Only our fixed internal Studio adapter is launched through the validated
+    # Python interpreter; external configured executables keep the X_OK check.
+    internal_studio=kind in KINDS and path==Path(__file__).with_name('ai_studio_adapter.py').resolve()
+    if not path.is_absolute() or path.is_symlink() or not path.is_file() or (not internal_studio and not os.access(path, os.X_OK)):
         return None
     return path
 

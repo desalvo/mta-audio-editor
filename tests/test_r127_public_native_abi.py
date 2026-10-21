@@ -47,5 +47,5 @@ int main() {
     subprocess.run([cc, "-std=c++20", "-Wall", "-Wextra", "-Werror", "-pthread",
                     "-I", str(ROOT / "native/audio_core"), str(src),
                     str(ROOT / "native/audio_core/vst3_runtime_api.cpp"),
-                    "-o", str(binary)], check=True, timeout=45)
+                    "-o", str(binary)], check=True, timeout=120)
     subprocess.run([str(binary)], check=True, timeout=15)

@@ -17,7 +17,7 @@ def runtime_available():
 
 
 def settings(project):
-    return {key:getattr(project,key) for key in ('bpm','base_bpm','time_signature','metronome_bpm','metronome_time_signature','vst_host_sync','vst_loop_enabled','vst_loop_start_ms','vst_loop_end_ms','metronome_mode','metronome_zone_bpms','metronome_zone_signatures','metronome_manual_zone_bpms','metronome_manual_zone_signatures','metronome_grid_origin_ms','metronome_shift_ms')} | {'markers':[m.model_dump() for m in project.markers],'adaptive_tempo_map':[p.model_dump() for p in project.adaptive_tempo_map]}
+    return {key:getattr(project,key) for key in ('bpm','base_bpm','time_signature','metronome_bpm','metronome_time_signature','vst_host_sync','vst_loop_enabled','vst_loop_start_ms','vst_loop_end_ms','metronome_mode','metronome_zone_bpms','metronome_zone_signatures','metronome_manual_zone_bpms','metronome_manual_zone_signatures','metronome_grid_origin_ms','metronome_shift_ms','musical_origin_ms','metronome_start_ms','metronome_pre_roll_bars')} | {'markers':[m.model_dump() for m in project.markers],'adaptive_tempo_map':[p.model_dump() for p in project.adaptive_tempo_map]}
 
 
 def render_settings():return _RENDER.get()

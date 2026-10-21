@@ -78,7 +78,7 @@ def test_drumsep_worker_resample_and_validation(monkeypatch, tmp_path):
         dw.infer(src, tmp_path / "mock.onnx", tmp_path / "out")
 
 
-def test_sam_audio_adapter_validation_and_subprocess(monkeypatch, tmp_path):
+def test_sam_audio_adapter_validation_and_subprocess(monkeypatch, tmp_path,local_native_ai):
     with pytest.raises(ValueError, match="Unsupported"):
         main._sam_audio_extract(tmp_path / "input.wav", tmp_path / "out", "bogus", "kick")
     monkeypatch.delenv("MTA_SAM_AUDIO_PYTHON", raising=False)

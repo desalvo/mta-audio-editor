@@ -1,0 +1,4 @@
+# MTA bridge-side config validation. Install into the MTA singing worker.
+# OpenVPI, acoustic checkpoints and vocoder runtimes remain separate,
+# administrator-owned deployments with independently reviewed licenses.
+PyYAML==6.0.3

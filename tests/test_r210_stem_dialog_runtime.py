@@ -43,6 +43,9 @@ def test_model_download_uses_worker_and_shared_cache(monkeypatch,tmp_path):
         (model_dir/'UVR_MDXNET_KARA_2.onnx').write_bytes(b'model')
         return {'id':model_id,'installed':True}
     monkeypatch.setattr(ai_models,'_isolated_model_download',download)
+    # Mock a separately authorized weight solely for the transport fixture.
+    from app import model_license_policy
+    monkeypatch.setattr(model_license_policy,'evaluate_model',lambda model_id: True)
     result=main._download_lead_backing_model('uvr_mdxnet_kara_2')
     assert result['installed']
     assert calls==[('/trusted/python','backing-vocals','uvr_mdxnet_kara_2',tmp_path)]
@@ -90,8 +93,8 @@ def test_real_bridge_downloads_without_importing_separator_in_web_runtime(tmp_pa
     env=dict(os.environ,PYTHONPATH=str(tmp_path/'fake'))
     folder=tmp_path/'models'
     command=[sys.executable,str(ROOT/'app/ai_model_download.py'),'--kind','backing-vocals','--model','uvr_mdxnet_kara_2','--model-dir',str(folder)]
-    result=subprocess.run(command,env=env,capture_output=True,text=True,check=True,timeout=30)
-    assert json.loads(result.stdout)=={'id':'uvr_mdxnet_kara_2','installed':True}
+    result=subprocess.run(command,env=env,capture_output=True,text=True,timeout=30)
+    assert result.returncode != 0 and 'SHA-256' in result.stderr
     assert (folder/'UVR_MDXNET_KARA_2.onnx').read_bytes()==b'model'
     command[command.index('uvr_mdxnet_kara_2')]='../../unsafe'
     result=subprocess.run(command,env=env,capture_output=True,text=True,timeout=30)

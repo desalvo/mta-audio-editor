@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="0" skipped="0" tests="1" time="10.227" timestamp="2026-10-20T13:22:28.886291+02:00" hostname="fe69e4f1c913"><testcase classname="tests.test_r210_yourmt3_checkpoint" name="test_real_yourmt3_piano_prediction" time="10.136" /></testsuite></testsuites>

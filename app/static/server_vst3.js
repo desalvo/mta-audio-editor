@@ -147,7 +147,7 @@ window.togglePlayback=()=>live?(live.playingIntent?window.pausePlayback():window
 window.playbackActuallyRunning=()=>live?!live.paused:old.playbackActuallyRunning();
 window.goToTimestamp=function(ms){if(!live)return old.goToTimestamp(ms);const s=live,target=requestTransportPosition(ms);updateTimedPlaybackOverlay(target);return seek(s,target/tempoRatio(),s.playingIntent).catch(e=>{if(live===s){window.stopPlayback();toast(e.message)}})};
 window.seekTransport=delta=>live?window.goToTimestamp(Math.max(0,playCursorMs+delta)):old.seekTransport(delta);
-window.goTransportStart=()=>live?window.goToTimestamp(0):old.goTransportStart();
+window.goTransportStart=()=>live?window.goToTimestamp(Math.max(0,MtaMusicalClock.origin(current||{}))):old.goTransportStart();
 let updating=false,again=false,pendingFx=false;
 async function updateLive(){
  if(!live)return;if(updating){again=true;return}updating=true;const s=live;

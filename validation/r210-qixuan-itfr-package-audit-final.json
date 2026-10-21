@@ -1,0 +1,15 @@
+{
+  "file": "MTA-Qixuan-2.7.0-onnx-IT-EN-FR-release-v2-bundle.zip",
+  "bytes": 474464355,
+  "sha256": "f02ee089e85d58ca7ca7caff4d1e3d5ab508375d315ddcc0f0f5db8d19f1c4ac",
+  "full_crc": true,
+  "original_members_byte_identical": 37,
+  "file_hash_inventory_verified": true,
+  "engine_evidence_matches_final_sources": true,
+  "enabled": false,
+  "pronunciation_modes": {
+    "en": "native-inventory",
+    "it": "cross-language",
+    "fr": "cross-language"
+  }
+}

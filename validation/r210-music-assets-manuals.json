@@ -1,0 +1,38 @@
+[
+  {
+    "file": "MTA-Audio-Editor-User-Manual-EN.pdf",
+    "pages": 28,
+    "new_section_pages_1based": [
+      27
+    ],
+    "final_screenshot_page": 28,
+    "out_of_bounds_blocks": 0
+  },
+  {
+    "file": "MTA-Audio-Editor-Administrator-Manual-IT.pdf",
+    "pages": 17,
+    "new_section_pages_1based": [
+      16
+    ],
+    "final_screenshot_page": 17,
+    "out_of_bounds_blocks": 0
+  },
+  {
+    "file": "MTA-Audio-Editor-Administrator-Manual-EN.pdf",
+    "pages": 17,
+    "new_section_pages_1based": [
+      16
+    ],
+    "final_screenshot_page": 17,
+    "out_of_bounds_blocks": 0
+  },
+  {
+    "file": "MTA-Audio-Editor-User-Manual-IT.pdf",
+    "pages": 29,
+    "new_section_pages_1based": [
+      28
+    ],
+    "final_screenshot_page": 29,
+    "out_of_bounds_blocks": 0
+  }
+]

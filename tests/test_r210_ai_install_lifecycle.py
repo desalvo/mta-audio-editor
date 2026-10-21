@@ -257,6 +257,8 @@ ctx.window.pywebview.api.sync_project=async()=>({ok:false,bound:false});await ct
 
 
 def test_default_drumsep_uses_verified_native_checkpoint_download(tmp_path, monkeypatch):
+    from model_rights_fixtures import authorize_fixture
+    authorize_fixture(monkeypatch,tmp_path,'drumsep-weights')
     from app import main, ai_unified_adapter as adapter, drumsep_onnx_worker
     source = tmp_path / 'source.wav';source.write_bytes(b'source')
     model = tmp_path / 'drumsep.onnx'

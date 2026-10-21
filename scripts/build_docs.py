@@ -101,4 +101,5 @@ for src_name, out_name in outputs:
 
 # Build the M-Live/Merish MP3 interoperability specification alongside the manuals.
 import subprocess as _subprocess
-_subprocess.run([sys.executable, str(ROOT / "scripts" / "build_mlive_mp3_spec.py")], check=True)
+if "--manuals-only" not in sys.argv:
+    _subprocess.run([sys.executable, str(ROOT / "scripts" / "build_mlive_mp3_spec.py")], check=True)

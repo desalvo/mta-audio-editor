@@ -37,7 +37,7 @@ def test_invalid_singer_references(value, model, target, match):
         main._parse_singers_json(value, model, target)
 
 
-def test_sam_temporal_anchors_separate_every_or_one_singer(tmp_path, monkeypatch):
+def test_sam_temporal_anchors_separate_every_or_one_singer(tmp_path, monkeypatch,local_native_ai):
     parsed, _ = main._parse_singers_json(json.dumps(SINGERS), 'sam-audio-large')
     seen = []
     def fake_infer(source, directory, model, target, anchors=None):
@@ -68,7 +68,7 @@ def test_multi_singer_ui_and_sam_worker_contract():
     assert 'singers_json: str = ""' in Path('app/main.py').read_text()
 
 
-def test_multi_singer_job_keeps_synchronized_tracks_and_selective_replacement(tmp_path, monkeypatch):
+def test_multi_singer_job_keeps_synchronized_tracks_and_selective_replacement(tmp_path, monkeypatch,local_native_ai):
     """Run the production job path with Demucs/SAM mocked, not the timeline/storage."""
     import threading
     import time

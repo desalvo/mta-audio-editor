@@ -1,0 +1,58 @@
+[
+  {
+    "pitch": 63,
+    "start_time": 0.04,
+    "end_time": 0.05,
+    "velocity": 127,
+    "program": 88,
+    "is_drum": false
+  },
+  {
+    "pitch": 51,
+    "start_time": 0.04,
+    "end_time": 0.48,
+    "velocity": 127,
+    "program": 0,
+    "is_drum": true
+  },
+  {
+    "pitch": 69,
+    "start_time": 0.04,
+    "end_time": 2.048,
+    "velocity": 127,
+    "program": 0,
+    "is_drum": true
+  },
+  {
+    "pitch": 54,
+    "start_time": 0.04,
+    "end_time": 2.048,
+    "velocity": 127,
+    "program": 33,
+    "is_drum": false
+  },
+  {
+    "pitch": 51,
+    "start_time": 0.48,
+    "end_time": 2.048,
+    "velocity": 127,
+    "program": 0,
+    "is_drum": true
+  },
+  {
+    "pitch": 54,
+    "start_time": 0.04,
+    "end_time": 2.428,
+    "velocity": 127,
+    "program": 80,
+    "is_drum": false
+  },
+  {
+    "pitch": 63,
+    "start_time": 0.04,
+    "end_time": 2.428,
+    "velocity": 127,
+    "program": 80,
+    "is_drum": false
+  }
+]

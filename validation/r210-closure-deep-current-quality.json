@@ -1,0 +1,189 @@
+{
+  "by_instrument": [
+    {
+      "f1": 0.0,
+      "false_negatives": 1,
+      "false_positives": 3,
+      "instrument": "gm:0",
+      "matched_notes": 0,
+      "precision": 0.0,
+      "predicted_notes": 3,
+      "recall": 0.0,
+      "reference_notes": 1
+    },
+    {
+      "f1": 0.0,
+      "false_negatives": 1,
+      "false_positives": 5,
+      "instrument": "gm:16",
+      "matched_notes": 0,
+      "precision": 0.0,
+      "predicted_notes": 5,
+      "recall": 0.0,
+      "reference_notes": 1
+    },
+    {
+      "f1": 0.0,
+      "false_negatives": 1,
+      "false_positives": 0,
+      "instrument": "gm:24",
+      "matched_notes": 0,
+      "precision": 0.0,
+      "predicted_notes": 0,
+      "recall": 0.0,
+      "reference_notes": 1
+    },
+    {
+      "f1": 0.0,
+      "false_negatives": 1,
+      "false_positives": 0,
+      "instrument": "gm:32",
+      "matched_notes": 0,
+      "precision": 0.0,
+      "predicted_notes": 0,
+      "recall": 0.0,
+      "reference_notes": 1
+    },
+    {
+      "f1": 0.0,
+      "false_negatives": 0,
+      "false_positives": 1,
+      "instrument": "gm:33",
+      "matched_notes": 0,
+      "precision": 0.0,
+      "predicted_notes": 1,
+      "recall": 0.0,
+      "reference_notes": 0
+    },
+    {
+      "f1": 0.0,
+      "false_negatives": 1,
+      "false_positives": 0,
+      "instrument": "gm:4",
+      "matched_notes": 0,
+      "precision": 0.0,
+      "predicted_notes": 0,
+      "recall": 0.0,
+      "reference_notes": 1
+    },
+    {
+      "f1": 1.0,
+      "false_negatives": 0,
+      "false_positives": 0,
+      "instrument": "gm:40",
+      "matched_notes": 1,
+      "precision": 1.0,
+      "predicted_notes": 1,
+      "recall": 1.0,
+      "reference_notes": 1
+    },
+    {
+      "f1": 0.0,
+      "false_negatives": 0,
+      "false_positives": 2,
+      "instrument": "gm:48",
+      "matched_notes": 0,
+      "precision": 0.0,
+      "predicted_notes": 2,
+      "recall": 0.0,
+      "reference_notes": 0
+    },
+    {
+      "f1": 0.0,
+      "false_negatives": 0,
+      "false_positives": 9,
+      "instrument": "gm:52",
+      "matched_notes": 0,
+      "precision": 0.0,
+      "predicted_notes": 9,
+      "recall": 0.0,
+      "reference_notes": 0
+    },
+    {
+      "f1": 0.0,
+      "false_negatives": 1,
+      "false_positives": 0,
+      "instrument": "gm:56",
+      "matched_notes": 0,
+      "precision": 0.0,
+      "predicted_notes": 0,
+      "recall": 0.0,
+      "reference_notes": 1
+    },
+    {
+      "f1": 0.0,
+      "false_negatives": 1,
+      "false_positives": 0,
+      "instrument": "gm:64",
+      "matched_notes": 0,
+      "precision": 0.0,
+      "predicted_notes": 0,
+      "recall": 0.0,
+      "reference_notes": 1
+    },
+    {
+      "f1": 0.0,
+      "false_negatives": 1,
+      "false_positives": 0,
+      "instrument": "gm:73",
+      "matched_notes": 0,
+      "precision": 0.0,
+      "predicted_notes": 0,
+      "recall": 0.0,
+      "reference_notes": 1
+    },
+    {
+      "f1": 0.0,
+      "false_negatives": 1,
+      "false_positives": 0,
+      "instrument": "gm:80",
+      "matched_notes": 0,
+      "precision": 0.0,
+      "predicted_notes": 0,
+      "recall": 0.0,
+      "reference_notes": 1
+    },
+    {
+      "f1": 0.0,
+      "false_negatives": 0,
+      "false_positives": 34,
+      "instrument": "unknown",
+      "matched_notes": 0,
+      "precision": 0.0,
+      "predicted_notes": 34,
+      "recall": 0.0,
+      "reference_notes": 0
+    }
+  ],
+  "correctly_matched_instruments": 1,
+  "f1": 0.030769230769230767,
+  "input_provenance": {
+    "prediction": {
+      "bytes": 43832,
+      "sha256": "567cd5ec14b59f2d07905a01abe47a6e6b4bbf76cf79fcb065784844973eb733"
+    },
+    "reference": {
+      "bytes": 5791,
+      "sha256": "d252454a878b7625a9519cd54c08114d837072093c02810289fa40434fcbd2c6"
+    },
+    "statement": "File hashes only; model inference and reference review are not certified."
+  },
+  "instrument_target_met": false,
+  "instrument_target_policy": "At least one one-to-one pitch/onset/offset match per identified instrument; counts alone and unassigned parts cannot pass. Overall accuracy still requires review of precision, recall and F1.",
+  "limits": [
+    "Matching uses pitch, onset, offset and GM program; it does not measure timbre quality.",
+    "Two performers with the same GM program are not distinguishable by this metric.",
+    "Drum notes are grouped by percussion flag; calibrated confidence is not inferred."
+  ],
+  "matched_notes": 1,
+  "offset_tolerance_ms": 100,
+  "onset_tolerance_ms": 50,
+  "precision": 0.01818181818181818,
+  "predicted_instruments": 7,
+  "predicted_notes": 55,
+  "protocol": "mta-midi-benchmark-1",
+  "recall": 0.1,
+  "reference_instruments": 10,
+  "reference_notes": 10,
+  "target_instruments": 10
+}

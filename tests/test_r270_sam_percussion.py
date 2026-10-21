@@ -4,20 +4,20 @@ import pytest
 from app import main
 
 
-def test_sam_rejects_unknown_model_or_instrument(tmp_path):
+def test_sam_rejects_unknown_model_or_instrument(tmp_path,local_native_ai):
     with pytest.raises(ValueError):
         main._sam_audio_extract(tmp_path / 'in.wav', tmp_path, 'invalid', 'kick')
     with pytest.raises(ValueError):
         main._sam_audio_extract(tmp_path / 'in.wav', tmp_path, 'sam-audio-small', 'invalid')
 
 
-def test_sam_requires_separate_configured_runtime(tmp_path, monkeypatch):
+def test_sam_requires_separate_configured_runtime(tmp_path, monkeypatch,local_native_ai):
     monkeypatch.delenv('MTA_SAM_AUDIO_PYTHON', raising=False)
     with pytest.raises(RuntimeError, match='MTA_SAM_AUDIO_PYTHON'):
         main._sam_audio_extract(tmp_path / 'in.wav', tmp_path, 'sam-audio-small', 'percussions')
 
 
-def test_sam_worker_invokes_requested_instrument(tmp_path, monkeypatch):
+def test_sam_worker_invokes_requested_instrument(tmp_path, monkeypatch,local_native_ai):
     monkeypatch.setenv('MTA_SAM_AUDIO_PYTHON', '/optional/python')
     def fake_run(args, **kwargs):
         assert args[0] == '/optional/python'

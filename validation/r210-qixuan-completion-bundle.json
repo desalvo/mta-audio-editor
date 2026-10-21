@@ -1,0 +1,19 @@
+{
+  "file": "../qixuan_assets/MTA-Qixuan-2.7.0-IT-EN-FR-context-r210-bundle.zip",
+  "bytes": 474466419,
+  "sha256": "ab8dcb1d8bfd2b737481ef266671aa55d65e182ebc8bdbb680070643b70adeeb",
+  "enabled": false,
+  "rights_granted": false,
+  "original_members_preserved": 37,
+  "languages": [
+    "en",
+    "it",
+    "fr",
+    "vocalise"
+  ],
+  "pronunciation_modes": {
+    "en": "native-inventory",
+    "it": "cross-language",
+    "fr": "cross-language"
+  }
+}

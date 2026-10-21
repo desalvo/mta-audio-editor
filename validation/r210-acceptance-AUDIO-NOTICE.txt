@@ -1,0 +1,13 @@
+Technical audio examples, 0.3.0-r210
+
+Piano, vowel and ten-program inputs: synthesized from the MIT-licensed FluidR3 GM SoundFont through MTA's TinySoundFont backend. Copyright (c) 2000-2002, 2008 Frank Wen. See r210-acceptance-FluidR3-COPYING.txt. They are generated test scores, not recorded music datasets or human voice recordings.
+
+RVC derived WAV examples:
+Voice model created by Saisho Utane (https://huggingface.co/Saisho-Utane), used under CC BY 4.0.
+License: https://creativecommons.org/licenses/by/4.0/
+Model source: https://huggingface.co/Saisho-Utane/Saisho-Model-RVC
+Changes: neural voice conversion of the authorized synthetic GM vowel input, using RMVPE and HuBERT, without retrieval index. No endorsement is implied.
+
+Seed derived WAV example: actual offline F0-conditioned diffusion conversion of the same authorized synthetic vowel as source and reference. Linear export gain accounts for subsequent 48 kHz resampling. BigVGAN's own output clamp remains unchanged. No named person's voice is imitated by the Seed reference. Audio is technical runtime evidence, not a musical-quality certification.
+
+Checkpoint weights, training recordings, SoundFont samples and external runtime environments are not included in this source archive. Individual model/code/dependency license conditions and original notices are described in docs/R210_REAL_RUNTIME_HANDOFF_IT_EN.md and the hash receipts.

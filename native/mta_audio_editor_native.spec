@@ -19,6 +19,9 @@ datas = [
     (str(project / "app" / "optional_plugins_catalog.json"), "app"),
     (str(project / "app" / "optional_plugin_licenses"), "app/optional_plugin_licenses"),
     (str(project / "app" / "i18n_catalog.json"), "app"),
+    (str(project / 'app' / 'studio_assets'), 'app/studio_assets'),
+    (str(project / 'native' / 'third_party' / 'oddvoices'), 'native/third_party/oddvoices'),
+    (str(project / 'native' / 'third_party' / 'tinysoundfont' / 'LICENSE'), 'native/third_party/tinysoundfont'),
     (str(project / "app" / "templates"), "app/templates"),
     (str(project / "app" / "static"), "app/static"),
     (str(project / "app" / "docs"), "app/docs"),
@@ -29,6 +32,13 @@ datas = [
     (str(project / "REVISION"), "."),
     (str(project / "RELEASE_CHANNEL"), "."),
 ]
+# Isolated AI interpreters need real Python source files beside the frozen
+# application. PYZ bytecode cannot be imported by that separate interpreter.
+for worker_source in (project / 'app').glob('*.py'):
+    datas.append((str(worker_source), 'app'))
+for runtime_recipe in ('requirements-studio-basic-pitch.txt','requirements-studio-yourmt3.txt'):
+    datas.append((str(project / runtime_recipe), '.'))
+
 for adapter_file in ('ace_step_http_worker.py','ace_gpu_process_meter.py','ai_gpu_process_meter.py',
                      'ai_proxmox_gpu_agent_client.py','ace_gpu_profiler.py','ai_gpu_verified.py','ace_task_progress.py','ai_execution_limits.py'):
     datas.append((str(project / 'app' / adapter_file), 'app'))
@@ -77,10 +87,13 @@ if chordino_vamp and Path(chordino_vamp).is_dir():
                 datas.append((str(child), "vamp"))
 
 hiddenimports = []
-for package in ("pylibremidi", "rtmidi", "mido", "pedalboard", "av", "webview", "demucs", "torch", "torchaudio", "torchvision", "audio_separator", "onnxruntime", "librosa", "soundfile", "whisper", "madmom_infer", "truststore", "certifi", "six"):
+for package in ("sounddevice", "_sounddevice_data", "pylibremidi", "rtmidi", "mido", "pedalboard", "av", "webview", "demucs", "torch", "torchaudio", "torchvision", "audio_separator", "onnxruntime", "librosa", "soundfile", "whisper", "madmom_infer", "truststore", "certifi", "six"):
     package_datas, package_binaries, package_hidden = collect_all(package)
-    datas += package_datas
-    binaries += package_binaries
+    # ASIO DLL redistribution awaits its corresponding-source/license bundle.
+    # Standard PortAudio remains bundled; an operator-provided ASIO build can
+    # still be discovered by sounddevice through its documented loader.
+    datas += [item for item in package_datas if '-asio.dll' not in str(item[0]).lower()]
+    binaries += [item for item in package_binaries if '-asio.dll' not in str(item[0]).lower()]
     hiddenimports += package_hidden
 
 # madmom-infer loads the chord processors lazily at runtime.  Keep these
@@ -112,6 +125,11 @@ a = Analysis(
     excludes=[],
     noarchive=False,
 )
+
+# Hooks may discover additional DLLs after collect_all; enforce the same
+# redistribution boundary on the final analysis, not only the input lists.
+a.binaries = [entry for entry in a.binaries if not any('-asio.dll' in str(value).lower() for value in entry[:2])]
+a.datas = [entry for entry in a.datas if not any('-asio.dll' in str(value).lower() for value in entry[:2])]
 
 pyz = PYZ(a.pure)
 

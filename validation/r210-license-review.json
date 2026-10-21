@@ -1,0 +1,23 @@
+{
+  "review_date": "2026-10-20",
+  "purpose": "No-profit CPU/GPU/storage expense recovery on server only; native local use free",
+  "not_an_automatic_nc_exception": true,
+  "sources": [
+    {
+      "url": "https://raw.githubusercontent.com/marcusfkelley/btc-hcqt/main/LICENSE",
+      "sha256": "da72a271e83d1bc1eea85ec5927a61b5295c3c7302f7971827428b486b3bf944",
+      "bytes": 1079
+    },
+    {
+      "url": "https://raw.githubusercontent.com/marcusfkelley/btc-hcqt/main/README.md",
+      "sha256": "facba845d87d42d7cf97fb8a2ccd8ad262a59c89f52891f65a3ff0032ed7f3a7",
+      "bytes": 3817
+    },
+    {
+      "url": "https://raw.githubusercontent.com/ace-step/ACE-Step/main/LICENSE",
+      "sha256": "1402dd74e3b2fecdfc7cd4427a924b93cbd134eb96f09d0df80dcd01fc29102a",
+      "bytes": 11359
+    }
+  ],
+  "rights_vs_runtime": "Allowed licence does not establish installed backend, verified compatibility or benchmark quality"
+}

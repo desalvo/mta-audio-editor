@@ -20,10 +20,13 @@ from .ai_payload_limits import MAX_RESULT_BYTES as MAX_BYTES
 ALLOWED = {'audio/wav', 'application/zip', 'application/json'}
 
 
-def _root() -> Path | None:
+def _root(*,studio=False,existing=False) -> Path | None:
     configured = os.environ.get('MTA_AI_RESULT_CACHE_DIR', '').strip()
     if not configured:
-        return None
+        from .auth import data_root
+        default=data_root()/'.studio-remote-results'
+        if not studio and not (existing and default.is_dir()):return None
+        configured=str(default)
     root = Path(configured).expanduser().resolve()
     root.mkdir(mode=0o700, parents=True, exist_ok=True)
     if Path(configured).expanduser().is_symlink():
@@ -75,8 +78,8 @@ def _read_regular(path: Path, limit: int) -> bytes:
         os.close(fd)
 
 
-def save(user_id: int, key: str, payload: bytes, media_type: str, job_id: str, *, metering_envelope: dict | None = None) -> bool:
-    root = _root()
+def save(user_id: int, key: str, payload: bytes, media_type: str, job_id: str, *, metering_envelope: dict | None = None,studio_default=False) -> bool:
+    root = _root(studio=studio_default)
     if root is None:
         return False
     if media_type not in ALLOWED or not 0 < len(payload) <= MAX_BYTES:
@@ -119,7 +122,7 @@ def save(user_id: int, key: str, payload: bytes, media_type: str, job_id: str, *
 
 
 def load(user_id: int, key: str, expected_job_id: str) -> tuple[bytes, str] | None:
-    root = _root()
+    root = _root(existing=True)
     if root is None:
         return None
     blob, metadata = _paths(root, user_id, key)
@@ -145,7 +148,7 @@ def load_with_metering(user_id: int, key: str, expected_job_id: str) -> tuple[by
     envelope. Unlike ``load``, this method explicitly requires matching
     persisted metering when metadata contains an envelope.
     """
-    root = _root()
+    root = _root(existing=True)
     if root is None:
         return None
     blob, metadata = _paths(root, user_id, key)
@@ -178,7 +181,7 @@ def purge_expired(*, now: int | None = None, dry_run: bool = True) -> dict:
     Run periodically from a systemd timer/cron. Fresh or unreadable entries
     are retained conservatively for operator investigation.
     """
-    root = _root()
+    root = _root(existing=True)
     if root is None:
         return {'examined': 0, 'expired': 0, 'removed': 0}
     instant = int(time.time()) if now is None else int(now)
@@ -217,7 +220,7 @@ def cleanup_if_due(*, now: int | None = None) -> dict:
 
     A separate timer remains recommended when requests are infrequent.
     """
-    root = _root()
+    root = _root(existing=True)
     if root is None:
         return {'examined': 0, 'expired': 0, 'removed': 0}
     interval = max(60, min(86400, int(os.getenv('MTA_AI_RESULT_CACHE_CLEANUP_INTERVAL', '3600'))))
@@ -251,7 +254,7 @@ def recover_completed_job_id(user_id: int, key: str) -> str | None:
     Both metadata and payload must pass the same ownership, expiry, inode and
     SHA-256 checks as normal GET replay. Never trust metadata alone.
     """
-    root = _root()
+    root = _root(existing=True)
     if root is None:
         return None
     blob, metadata = _paths(root, user_id, key)

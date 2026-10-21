@@ -1,0 +1,31 @@
+{
+  "javascript_files": [
+    "app/static/app.js",
+    "app/static/editor_layout.js",
+    "app/static/midi_advanced.js",
+    "app/static/midi_editing.js",
+    "app/static/midi_tempo.js",
+    "app/static/musical_clock.js",
+    "app/static/native_ui_zoom.js",
+    "app/static/timeline_rules.js",
+    "app/static/metronome_graph.js",
+    "app/static/native_transport.js",
+    "app/static/server_vst3.js"
+  ],
+  "syntax_passed": true,
+  "python_compile_passed": true,
+  "final_changed_js_syntax_passed": true,
+  "final_sha256": {
+    "app/static/app.js": "220f8b3f5164556b7117dfd84a0dfd8b31bb66df26992307c0764db36bb2d8a2",
+    "app/static/editor_layout.js": "31ec9f71e21727018df44c31c0e532e5ab55f6ad763947bea7437fcc9411d281",
+    "app/static/midi_advanced.js": "f93a0180772f47ab254efa4ade55c0b04ac9cb5ac6f3b8b942fdd58382f06715",
+    "app/static/midi_editing.js": "3aec2f5919dd11a359761263cea45ec7a1ea89043efce50980a007f3c2559640",
+    "app/static/midi_tempo.js": "33c51eaca3cbae0c30361b8699e991d8bb6fb203060f6d24333f167064a31551",
+    "app/static/musical_clock.js": "f793c06f779340121eb0990e0fc310a0d67d17e3b5a65cb1c74f71b00832e171",
+    "app/static/native_ui_zoom.js": "fac4db20488304e7670b3441d7f25ec68281e237d40723782cdc325d9f3920b0",
+    "app/static/timeline_rules.js": "a28080b2d310a171e26a1f30161b38e35ba1a9a0947481b5242efeda51863594",
+    "app/static/metronome_graph.js": "e1c4bbb1592c4314b83f8b06f9b4fa7c820663d59361035eda6d25b6e468e6bf",
+    "app/static/native_transport.js": "d4c19976dc128fac4d46178c420defd9d81f61a95b7cf3e67ffdf29cc0d0db7e",
+    "app/static/server_vst3.js": "eb17aad7e43a6723c241ed131469ebcfdef4e6230562bc0d76c07cad7514efa7"
+  }
+}

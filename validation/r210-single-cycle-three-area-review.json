@@ -1,0 +1,13 @@
+{
+  "version": "0.3.0-r210",
+  "date": "2026-10-21",
+  "scope": "selected offline cross-area suites",
+  "passed": 112,
+  "failed": 0,
+  "skipped": 7,
+  "interrupted": 0,
+  "full_repository_regression": false,
+  "real_neural_inference": false,
+  "fully_complete": false,
+  "change": "atomic MIDI worker WAV publishing"
+}

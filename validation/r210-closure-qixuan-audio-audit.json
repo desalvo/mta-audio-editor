@@ -1,0 +1,42 @@
+{
+  "r210-closure-qixuan-final.wav": {
+    "frames": 91394,
+    "rate": 48000,
+    "channels": 1,
+    "seconds": 1.9040416666666666,
+    "peak": 0.5678651332855225,
+    "rms": 0.2119263161571838,
+    "finite": true,
+    "sha256": "585578a9dfd523e609a755f7af4ecaa66e35e8880714e3181966bb0fa9dbfb4a"
+  },
+  "r210-closure-qixuan-probe.wav": {
+    "frames": 74240,
+    "rate": 44100,
+    "channels": 1,
+    "seconds": 1.6834467120181407,
+    "peak": 0.6039186120033264,
+    "rms": 0.19493145389037744,
+    "finite": true,
+    "sha256": "5b2bf4951653ccd03ed98e31023fe13366e2c65ab5b734e163f6884f41918d33"
+  },
+  "r210-closure-qixuan-lyrics-final.wav": {
+    "frames": 91394,
+    "rate": 48000,
+    "channels": 1,
+    "seconds": 1.9040416666666666,
+    "peak": 0.5863484144210815,
+    "rms": 0.21561839437105543,
+    "finite": true,
+    "sha256": "ddb7c8134b1b9cc1b83fa89ded93e0f4549c5bed66d0daaba114565c205e5f45"
+  },
+  "r210-closure-qixuan-melisma.wav": {
+    "frames": 120373,
+    "rate": 48000,
+    "channels": 1,
+    "seconds": 2.5077708333333333,
+    "peak": 0.6120620965957642,
+    "rms": 0.22183621502496584,
+    "finite": true,
+    "sha256": "087b6b902f6a5a2864b84dbe6124a2ebeb6fe7d8ffa0289d2249468d0690b648"
+  }
+}

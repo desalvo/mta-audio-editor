@@ -79,3 +79,27 @@ MVerb is GPLv3-or-later; the other projects declare GPLv3. DPF VST3 implementati
 uses ISC and requires attribution. JUCE, bundled libraries and content retain
 individual terms. These recipe/notice additions do not authorize redistribution
 of unrelated VST2 binaries or omit corresponding-source obligations.
+
+## Optional AI Studio / MIDI additions (r210, 20 October 2026)
+
+The source archive contains MTA adapter code and fixed optional installation instructions, **not** third-party model weights, Python environments, FluidSynth binaries or voicebanks.
+
+- Basic Pitch 0.4.0: Spotify, Apache-2.0; upstream code and included ONNX model. https://github.com/spotify/basic-pitch/blob/main/LICENSE . Reviewed model SHA-256: `2c3c1d144bfa61ad236e92e169c13535c880469a12a047d4e73451f2c059a0ec`.
+- ONNX Runtime: Microsoft, MIT. https://github.com/microsoft/onnxruntime/blob/main/LICENSE . The Studio adapter disables telemetry before initialization and through the runtime API. Preserve the wheel's dependency notices for any separately distributed runtime.
+- FluidSynth: LGPL-2.1-or-later, dynamically loaded optional library. https://github.com/FluidSynth/fluidsynth/blob/master/LICENSE . FluidR3 GM soundbank has a separate MIT license; Debian packaging uses separate terms: https://sources.debian.org/src/fluid-soundfont/3.1-6/debian/copyright . Bank checksum/size and operational restrictions are recorded in the Studio implementation documents.
+- NumPy, SciPy, librosa, soundfile, resampy, pretty-midi, ONNX Runtime and transitive dependencies retain their respective distribution notices in the separately installed environment. This notice is not a complete binary-runtime license audit or dependency lock.
+- DiffSinger, Amphion, RVC, Seed-VC, MT3, MR-MT3, Transkun and MT3-Infer are **not distributed or enabled** by appearing in the candidate catalog. Code, checkpoint, voicebank, dataset and dependency rights must be checked separately. In particular, noncommercial vocoder/voicebank releases are not authorized by this project for billed services.
+
+Current review and limitations: `docs/STUDIO_WORKFLOWS_R210.md` and `docs/STUDIO_WORKFLOWS_R210_EN.md`. Recheck official sources and all separately distributed runtime contents when updating versions. Process isolation does not automatically resolve copyleft obligations.
+
+
+## Portable GM and optional singing (r210, 20 October 2026)
+
+- TinySoundFont: MIT; unchanged header at `native/third_party/tinysoundfont/tsf.h`, pinned upstream commit `853a0a171759f1ddba0de1442133a75912bbeffa`; full MIT notice adjacent. https://github.com/schellingb/TinySoundFont .
+- FluidR3 GM 3.1: Frank Wen, MIT. Optional source archive SHA-256 `2621acaa1c78e4abdb24bdd163230cc577e61276936d6aa6e3180582142f0343`; soundbank SHA-256 `74594e8f4250680adf590507a306655a299935343583256f3b722c48a1bc1cb0`. Installer retains original COPYING and README. No bank samples are shipped in this source ZIP.
+- OddVoices: Nathan Ho, Apache-2.0 engine; Air Navier, Cicada Lumen and Quake Chesnokov vocal recordings are explicitly CC0-1.0. Source pinned at `33a248af8df88edf5166593bf36b7e24e7bc1f94`, with original license texts and original-file digests in `native/third_party/oddvoices/`. Recording download hashes are in `app/studio_assets/oddvoices_assets.json`. The optional installer compiles recordings into a managed bank; no recordings or compiled banks are distributed in this source archive.
+- CMUdict 0.7b: Carnegie Mellon University, BSD-style two-clause terms. The complete copyright and disclaimer remain in the pinned downloaded dictionary and in `app/studio_assets/CMUDICT-LICENSE.txt`.
+- OddVoices changes, 20 October 2026: UTF-8 filesystem path opening for Windows in g2p.cpp and liboddvoices.cpp; inline missing Synth::isErrored definition; optional audio_source argument in CorpusAnalyzer to stream bounded windows. Original digests are provenance, not hashes of these patched files. All other vendored source files are retained unchanged.
+- YourMT3 noPS runtime is operator-installed under its pinned author's Apache-2.0 declaration; it is not enabled merely by appearing in the model catalog. See YOURMT3_RUNTIME_R210 documentation and dependency notices.
+
+Local native software use is free. Server payment is intended only to reimburse CPU, GPU and storage infrastructure costs, without profit. This does not itself remove noncommercial, hosted-inference, subscription, redistribution, voice-consent or other license restrictions. Default restrictions and manual operator review are documented in MUSIC_ASSETS_AND_LICENSES_R210. Process boundaries do not waive license obligations.

@@ -46,7 +46,7 @@ def test_rejects_gc_queue_symlink(tmp_path, monkeypatch):
 
 def test_gc_does_not_unlink_symlink_or_touch_target(tmp_path, monkeypatch):
     monkeypatch.setattr(storage, 'pdir', lambda pid: tmp_path)
-    monkeypatch.setattr(storage, 'load_project', lambda pid: type('P', (), {'tracks': [], 'clip_library': []})())
+    monkeypatch.setattr(storage, 'load_project', lambda pid: type('P', (), {'tracks': [], 'archived_tracks': [], 'clip_library': []})())
     (tmp_path / 'audio').mkdir()
     outside = tmp_path / 'outside.wav'
     outside.write_bytes(b'preserve')
@@ -61,7 +61,7 @@ def test_gc_does_not_unlink_symlink_or_touch_target(tmp_path, monkeypatch):
 
 def test_gc_rejects_symlink_audio_directory(tmp_path, monkeypatch):
     monkeypatch.setattr(storage, 'pdir', lambda pid: tmp_path)
-    monkeypatch.setattr(storage, 'load_project', lambda pid: type('P', (), {'tracks': [], 'clip_library': []})())
+    monkeypatch.setattr(storage, 'load_project', lambda pid: type('P', (), {'tracks': [], 'archived_tracks': [], 'clip_library': []})())
     external = tmp_path / 'other'
     external.mkdir()
     (external / 'orphan.wav').write_bytes(b'preserve')

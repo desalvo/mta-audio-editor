@@ -12,13 +12,17 @@ def test_drumsep_model_metadata_and_layout(tmp_path):
     assert worker.WINDOW == 1764000
 
 
-def test_drumsep_requires_model_file(tmp_path, monkeypatch):
+def test_drumsep_requires_model_file(tmp_path, monkeypatch,local_native_ai):
+    from model_rights_fixtures import authorize_fixture
+    authorize_fixture(monkeypatch,tmp_path,'drumsep-weights')
     monkeypatch.setattr(main, '_DRUMSEP_PATH', tmp_path / 'missing.onnx')
     with pytest.raises(RuntimeError, match='not installed'):
         main._drumsep_extract(tmp_path / 'source.wav', tmp_path / 'out', {'snare'})
 
 
-def test_drumsep_selective_output(tmp_path, monkeypatch):
+def test_drumsep_selective_output(tmp_path, monkeypatch,local_native_ai):
+    from model_rights_fixtures import authorize_fixture
+    authorize_fixture(monkeypatch,tmp_path,'drumsep-weights')
     model = tmp_path / 'model.onnx'; model.write_bytes(b'test')
     monkeypatch.setattr(main, '_DRUMSEP_PATH', model)
     def fake_run(args, **kwargs):

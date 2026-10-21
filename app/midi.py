@@ -4,48 +4,19 @@ Project notes use source milliseconds, preserving imported tempo maps without
 changing existing audio. Clip edits and track delay map those events to transport.
 """
 import bisect
-import io
-import math
-from collections import defaultdict, deque
 
-from .models import MidiNote, MidiControl, MidiSysEx
 
 MAX_EVENTS = 150000
 MAX_MS = 86400000
 
 
 def read_smf(data,*,extended=False):
-    import mido
-    if len(data)>8*1024*1024 or not data.startswith(b'MThd'):
-        raise ValueError('MIDI: expected an SMF file of at most 8 MiB')
-    midi=mido.MidiFile(file=io.BytesIO(data))
-    if midi.type==2 or midi.ticks_per_beat<=0:
-        raise ValueError('MIDI: asynchronous type 2 and SMPTE files are unsupported')
-    notes=[];controls=[];sysex=[];sysex_bytes=0;active=defaultdict(deque);tempo=500000;now=0;count=0
-    for msg in mido.merge_tracks(midi.tracks):
-        count+=1
-        if count>MAX_EVENTS:raise ValueError('MIDI: too many events')
-        now+=mido.tick2second(msg.time,midi.ticks_per_beat,tempo)*1000
-        if now>MAX_MS:raise ValueError('MIDI: duration exceeds 24 hours')
-        if msg.type=='set_tempo':tempo=msg.tempo
-        elif msg.type=='note_on' and msg.velocity:
-            active[(msg.channel,msg.note)].append((now,msg.velocity))
-        elif msg.type=='note_off' or (msg.type=='note_on' and not msg.velocity):
-            pending=active[(msg.channel,msg.note)]
-            if pending:
-                start,velocity=pending.popleft()
-                notes.append(MidiNote(start_ms=start,duration_ms=max(.01,now-start),pitch=msg.note,velocity=velocity,channel=msg.channel))
-        elif msg.type=='sysex':
-            packet=msg.bytes();sysex_bytes+=len(packet)
-            if len(packet)>65536 or len(sysex)>=1024 or sysex_bytes>8*1024**2:raise ValueError('MIDI SysEx exceeds project limits')
-            sysex.append(MidiSysEx(time_ms=now,data=packet))
-        elif not msg.is_meta and msg.type in ('control_change','program_change','pitchwheel','aftertouch','polytouch'):
-            controls.append(MidiControl(time_ms=now,data=msg.bytes()))
-    for (channel,pitch),pending in active.items():
-        for start,velocity in pending:
-            notes.append(MidiNote(start_ms=start,duration_ms=max(1,now-start),pitch=pitch,velocity=velocity,channel=channel))
-    if len(notes)>50000 or len(controls)>100000:raise ValueError('MIDI: event limit exceeded')
-    result=(notes,controls,max(1000,math.ceil(now),math.ceil(max((n.start_ms+n.duration_ms for n in notes),default=0))))
+    from .midi_smf import read_parts
+    parts=read_parts(data)
+    notes=[note for part in parts for note in part['notes']]
+    controls=[event for part in parts for event in part['controls']]
+    sysex=[event for part in parts for event in part['sysex']]
+    result=(notes,controls,max(part['duration_ms'] for part in parts))
     return (*result,sysex) if extended else result
 
 
@@ -67,7 +38,7 @@ def events(track, *, timeline=True,ump=True):
         if n.start_ms+n.duration_ms>MAX_MS:raise ValueError('MIDI: note exceeds 24 hours')
         raw.extend([(n.start_ms,[0x90|channels[n.id],n.pitch,n.velocity]),(n.start_ms+n.duration_ms,[0x80|channels[n.id],n.pitch,0])])
     raw.extend((c.time_ms,list(c.data)) for c in track.midi_controls)
-    if ump and track.midi_route!='hardware' and not timeline:raw.extend((c.time_ms,list(vst_message(c.words))) for c in track.midi_ump)
+    if ump and track.midi_route in ('instrument','both') and not timeline:raw.extend((c.time_ms,list(vst_message(c.words))) for c in track.midi_ump)
     if sum(len(e.data) for e in track.midi_sysex)>8*1024**2:raise ValueError('MIDI SysEx exceeds project size limit')
     raw.extend((e.time_ms,list(e.data)) for e in track.midi_sysex)
     if len(raw)>MAX_EVENTS:raise ValueError('MIDI: event limit exceeded')
@@ -86,7 +57,7 @@ def events(track, *, timeline=True,ump=True):
         for channel in sorted(channels):
             result.extend([(offset+end-start,[0xB0|channel,64,0]),(offset+end-start,[0xB0|channel,123,0])])
         if len(result)>MAX_EVENTS:raise ValueError('MIDI: expanded clip event limit exceeded')
-    if ump and track.midi_route!='hardware':
+    if ump and track.midi_route in ('instrument','both'):
         from .midi_ump import timeline_events
         result.extend((at,list(vst_message(words))) for at,words in timeline_events(track))
     return sorted(result,key=lambda x:(x[0],0 if x[1][0]&0xF0==0x80 else 1))
@@ -137,16 +108,5 @@ class Clock:
 
 
 def write_smf(track,bpm=120,time_signature='4/4'):
-    import mido
-    midi=mido.MidiFile(type=0,ticks_per_beat=960);part=mido.MidiTrack();midi.tracks.append(part)
-    tempo=mido.bpm2tempo(bpm);part.append(mido.MetaMessage('set_tempo',tempo=tempo,time=0));last=0
-    numerator,denominator=map(int,time_signature.split('/'))
-    part.append(mido.MetaMessage('time_signature',numerator=numerator,denominator=denominator,time=0))
-    if track.midi_ump:raise ValueError('MIDI 2 events require lossless UMP JSON export')
-    sequence=events(track,timeline=True,ump=False)
-    sequence=[(0,msg) for msg in chase(sequence,0)]+[(at,msg) for at,msg in sequence if at>=0]
-    for ms,msg in sequence:
-        if ms<0:continue
-        tick=round(mido.second2tick(ms/1000,960,tempo))
-        part.append(mido.Message.from_bytes(msg).copy(time=max(0,tick-last)));last=tick
-    part.append(mido.MetaMessage('end_of_track',time=0));output=io.BytesIO();midi.save(file=output);return output.getvalue()
+    from .midi_smf import write_parts
+    return write_parts([track],file_type=0,bpm=bpm,time_signature=time_signature)

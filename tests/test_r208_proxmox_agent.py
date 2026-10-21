@@ -18,7 +18,7 @@ def test_missing_agent_token_rejected():
     }
 
 
-def test_malformed_agent_reply_fail_closed(tmp_path):
+def test_malformed_agent_reply_fail_closed(tmp_path, unix_socket_capability):
     target = str(tmp_path / 'gpu.sock')
     ready = threading.Event()
     def responder():

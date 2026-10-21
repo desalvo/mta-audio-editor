@@ -1,0 +1,73 @@
+{
+  "schema": "mta-neural-assets-audit-1",
+  "verified": [
+    {
+      "path": "runtime_packages/transkun-2.0.1-py3-none-any.whl",
+      "bytes": 50758783,
+      "sha256": "7d7f5bf88b0d21f7da0415b089cff3bcbcbdda04e1a3c9719964947942c859fe"
+    },
+    {
+      "path": "runtime_sources/diffsinger.zip",
+      "bytes": 1611261,
+      "sha256": "2839d6241dab0e715d4c301720b026d630a44dc99f30c44b7f003a0fdc78d7d3"
+    },
+    {
+      "path": "runtime_sources/rvc.zip",
+      "bytes": 821646,
+      "sha256": "c0427564fbeb584d1a4805a5e71b5897132a41b9029a0fa9f417497a6df13e43"
+    },
+    {
+      "path": "runtime_sources/seed-vc.zip",
+      "bytes": 49003480,
+      "sha256": "72a27a1d20efec1489041eac2854e3e1c9c23d650ac15900821ad3ab367f0290"
+    },
+    {
+      "path": "runtime_sources/transkun.zip",
+      "bytes": 50879723,
+      "sha256": "9f6aeae99507fcbdd421c286faeede749fdb66453fa47319939c63671117bb2f"
+    },
+    {
+      "path": "weights/rvc-auxiliary/hubert_base/config.json",
+      "bytes": 1492,
+      "sha256": "0346950779dfb7f9316fa74ed846e2b8a22a08eedfdc5387b73f327cb1a4a7cf"
+    },
+    {
+      "path": "weights/rvc-auxiliary/hubert_base/preprocessor_config.json",
+      "bytes": 225,
+      "sha256": "7c1976a680fb7acc757cd36fb08eef878fa36c70b4c9d2d595df9c608bbbbf0e"
+    },
+    {
+      "path": "weights/rvc-auxiliary/hubert_base/pytorch_model.bin",
+      "bytes": 189206711,
+      "sha256": "cc8c20f4b90a520757260197a3ff2505705a7adbd20ad9eeaa4e1a9b38442ef5"
+    },
+    {
+      "path": "weights/rvc-auxiliary/rmvpe.pt",
+      "bytes": 181184272,
+      "sha256": "6d62215f4306e3ca278246188607209f09af3dc77ed4232efdd069798c4ec193"
+    },
+    {
+      "path": "weights/seed-vc-campplus/campplus_cn_common.bin",
+      "bytes": 28036335,
+      "sha256": "3388cf5fd3493c9ac9c69851d8e7a8badcfb4f3dc631020c4961371646d5ada8"
+    },
+    {
+      "path": "weights/seed-vc-weights/DiT_seed_v2_uvit_whisper_small_wavenet_bigvgan_pruned.pth",
+      "bytes": 440312082,
+      "sha256": "8ec8841b20bb46df9f7e8e570a6946a4b87b940133c7f0e778487ff33841f720"
+    },
+    {
+      "path": "weights/seed-vc-weights/config_dit_mel_seed_uvit_whisper_base_f0_44k.yml",
+      "bytes": 2408,
+      "sha256": "ff86f343b08c2def405f075022eeb10dafba23c4eda36d151010f4ca6d7a1a0a"
+    },
+    {
+      "path": "weights/seed-vc-weights/config_dit_mel_seed_uvit_whisper_small_wavenet.yml",
+      "bytes": 2289,
+      "sha256": "27a91ac41bdb41d0b6951c63642d791b4a70d60b9fc5550eb645f9ddcb3c94da"
+    }
+  ],
+  "inference_executed": false,
+  "licenses_approved": false,
+  "note": "Source/weight inventory only. Verify runtime, matching configuration, all auxiliary assets and rights separately."
+}

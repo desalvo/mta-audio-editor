@@ -1,6 +1,6 @@
 from pathlib import Path
 import uuid
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -8,7 +8,7 @@ TrackType = Literal["drums", "bass", "guitars", "keyboards", "orchestra", "winds
 PluginType = Literal[
     "eq", "normalizer", "compressor", "limiter", "delay", "reverb_lexicon",
     "room_ambience", "graphic_eq_32", "amplify", "stereo_imager",
-    "maximizer_loudness", "mastering_wizard", "denoise", "crackle_cleaner", "vst3"
+    "maximizer_loudness", "mastering_wizard", "denoise", "crackle_cleaner", "vst3", "gm_soundfont"
 ]
 
 
@@ -92,6 +92,11 @@ class MidiNote(BaseModel):
     pitch: int = Field(default=60, ge=0, le=127)
     velocity: int = Field(default=100, ge=1, le=127)
     channel: int = Field(default=0, ge=0, le=15)
+    origin: Literal['manual', 'predicted', 'generated'] = 'manual'
+    source_model: str = Field(default='', max_length=160)
+    # A model activation is not a calibrated probability of note correctness.
+    confidence: float | None = Field(default=None, ge=0, le=1, allow_inf_nan=False)
+    confidence_metric: str = Field(default='', max_length=160)
 
 
 class MidiControl(BaseModel):
@@ -106,6 +111,19 @@ class MidiControl(BaseModel):
         if status not in (0xA0,0xB0,0xC0,0xD0,0xE0) or len(value)!=(2 if status in (0xC0,0xD0) else 3) or any(not 0<=x<=127 for x in value[1:]) or not 0x80<=value[0]<=0xEF:
             raise ValueError('Invalid MIDI channel control')
         return value
+
+
+class MusicPart(BaseModel):
+    id: str = Field(pattern=r'^[A-Za-z0-9_-]{1,64}$')
+    name: str = Field(min_length=1, max_length=200)
+    instrument: str = Field(default='unknown', max_length=80)
+    program: int | None = Field(default=None, ge=0, le=127)
+    percussion: bool = False
+    notes: list[MidiNote] = Field(default_factory=list, max_length=50000)
+    controls: list[MidiControl] = Field(default_factory=list, max_length=100000)
+    source_model: str = Field(default='', max_length=160)
+    source_result_id: str = Field(default='', max_length=64)
+    review: Literal['unreviewed', 'accepted', 'edited'] = 'unreviewed'
 
 
 class MidiUmp(BaseModel):
@@ -130,6 +148,37 @@ class MidiSysEx(BaseModel):
         return value
 
 
+class MidiMetronome(BaseModel):
+    channel: int = Field(default=9, ge=0, le=15)
+    accent_note: int = Field(default=76, ge=0, le=127)
+    secondary_note: int = Field(default=77, ge=0, le=127)
+    beat_note: int = Field(default=77, ge=0, le=127)
+    accent_velocity: int = Field(default=120, ge=1, le=127)
+    secondary_velocity: int = Field(default=100, ge=1, le=127)
+    beat_velocity: int = Field(default=85, ge=1, le=127)
+    gate_ms: float = Field(default=40, gt=0, le=1000, allow_inf_nan=False)
+
+
+class MidiMeta(BaseModel):
+    time_ms: float = Field(default=0, ge=0, le=86400000, allow_inf_nan=False)
+    message: dict = Field(max_length=16)
+
+    @field_validator('message')
+    @classmethod
+    def meta_event(cls, value):
+        import json
+        from .midi_smf import meta_message
+        if len(json.dumps(value, allow_nan=False)) > 8192 or 'time' in value:
+            raise ValueError('MIDI metadata exceeds limits')
+        try:
+            message = meta_message(value)
+        except (KeyError, ValueError, TypeError, AttributeError) as exc:
+            raise ValueError('Invalid MIDI metadata') from exc
+        if message.type == 'end_of_track':
+            raise ValueError('End-of-track is managed by the SMF writer')
+        return value
+
+
 class Track(BaseModel):
     id: str = Field(pattern=r"^[A-Za-z0-9_-]{1,64}$")
     name: str = Field(max_length=200)
@@ -137,6 +186,15 @@ class Track(BaseModel):
     mta_slot: int | None = Field(default=None, ge=1, le=16)
     filename: str = Field(min_length=1, max_length=128)
     kind: Literal['audio', 'midi'] = 'audio'
+    music_result_id: str = Field(default='', max_length=64)
+    music_part_id: str = Field(default='', max_length=64)
+    music_source_model: str = Field(default='', max_length=160)
+    music_generation: dict = Field(default_factory=dict, max_length=32)
+    midi_metronome: MidiMetronome | None = None
+    midi_metronome_revision: str = Field(default="", max_length=64)
+    midi_smf_type: Literal[0, 1, 2] = 1
+    midi_division: int = Field(default=960, ge=-32768, le=32767)
+    midi_meta: list[MidiMeta] = Field(default_factory=list, max_length=10000)
     midi_notes: list[MidiNote] = Field(default_factory=list, max_length=50000)
     midi_ump: list[MidiUmp] = Field(default_factory=list,max_length=100000)
     mpe_zone: Literal['off','lower','upper'] = 'off'
@@ -145,7 +203,7 @@ class Track(BaseModel):
     midi_sysex: list[MidiSysEx] = Field(default_factory=list,max_length=1024)
     midi_controls: list[MidiControl] = Field(default_factory=list, max_length=100000)
     instrument: InsertPlugin | None = None
-    midi_route: Literal['instrument','hardware','both'] = 'instrument'
+    midi_route: Literal['instrument','hardware','both','none'] = 'instrument'
     clips_initialized: bool = False
     derived_source_track_id: str = Field(default="", max_length=64)
     derived_stem_key: str = Field(default="", max_length=200)
@@ -169,10 +227,20 @@ class Track(BaseModel):
     delay_ms: int = Field(default=0, ge=-86_400_000, le=86_400_000)
     height_px: int = Field(default=78, ge=78, le=420)
 
+    @field_validator('midi_division')
+    @classmethod
+    def smf_timebase(cls, value):
+        from .midi_smf import division_rate
+        division_rate(value)
+        return value
+
     @field_validator('instrument')
     @classmethod
     def midi_instrument(cls,value):
-        if value is not None and value.plugin!='vst3':raise ValueError('MIDI instruments must use VST3')
+        if value is not None and value.plugin not in ('vst3','gm_soundfont'):raise ValueError('MIDI instruments must use VST3 or General MIDI')
+        if value is not None and value.plugin=='gm_soundfont':
+            from .gm_instruments import validate
+            value.params=validate(value.params)
         return value
 
 
@@ -309,7 +377,7 @@ class ReorderInsertRequest(BaseModel):
 
 
 class StemSplitRequest(BaseModel):
-    target: Literal["MTA8", "MTA16", "DAW", "existing"] = "existing"
+    target: Literal["MTA8", "MTA16", "DAW", "DAW_MIDI", "existing"] = "existing"
     project_id: str | None = None
     model: str = Field(default="htdemucs", max_length=80)
 
@@ -393,16 +461,20 @@ class Project(BaseModel):
     bpm: float = Field(default=120.0, gt=0, le=500)
     time_signature: str = Field(default="4/4", pattern=r"^(?:2/4|3/4|4/4|5/4|6/8|7/8|9/8|12/8)$")
     key: str = Field(default="", max_length=40)
-    target: Literal["MTA8", "MTA16", "DAW"] = "MTA8"
+    target: Literal["MTA8", "MTA16", "DAW", "DAW_MIDI", "MIDI"] = "MTA8"
+    project_kind_version: Literal[0, 1] = 0
     sample_rate: Literal[44100, 48000, 96000] = 44100
     audio_storage_mode: Literal["wav", "flac"] = "wav"
     mta_device_profile: Literal["auto", "merish5_xynthia2", "bbeat_divo", "mlive_mta16_default", "merish5_plus_mta16", "generic"] = "auto"
     tracks: list[Track] = Field(default_factory=list)
+    archived_tracks: list[Track] = Field(default_factory=list, max_length=1024)
     clip_library: list[ProjectClip] = Field(default_factory=list, max_length=512)
     markers: list[Marker] = Field(default_factory=list)
     lyrics: list[LyricLine] = Field(default_factory=list)
     chords: list[Chord] = Field(default_factory=list)
     ai_publication_token: str = Field(default="", max_length=64)
+    music_imports: dict[Annotated[str, Field(pattern=r'^[a-f0-9]{32}$')], Annotated[str, Field(pattern=r'^[a-f0-9]{64}$')]] = Field(default_factory=dict, max_length=1024)
+    music_alternatives: list[MusicPart] = Field(default_factory=list, max_length=128)
     recovered_ai_imports: list[str] = Field(default_factory=list, max_length=2048)
     lyrics_pdf_style: LyricsPdfStyle = Field(default_factory=LyricsPdfStyle)
     lyrics_engine: str = Field(default="", max_length=80)
@@ -438,7 +510,9 @@ class Project(BaseModel):
     metronome_manual_zone_bpms: dict[str, float] = Field(default_factory=dict)
     metronome_grid_origin_ms: int = Field(default=0, ge=-86400000, le=86400000)
     metronome_shift_ms: int = Field(default=0, ge=-86400000, le=86400000)
-    transport_time_mode: Literal["time", "musical"] = "time"
+    tempo_known: bool | None = None
+    musical_origin_ms: int | None = Field(default=None, ge=-86400000, le=86400000)
+    transport_time_mode: Literal["auto", "time", "musical"] = "auto"
     adaptive_tempo_map: list[AdaptiveTempoPoint] = Field(default_factory=list, max_length=20000)
     pitch_semitones: float = Field(default=0.0, ge=-6.0, le=6.0)
     track_panel_width_px: int = Field(default=225, ge=160, le=520)

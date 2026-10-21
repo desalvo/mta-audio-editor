@@ -34,11 +34,11 @@ window.openAudioCapture=async function(){
   try{
    const name=document.getElementById('captureName').value,input=document.getElementById('captureInput').value,latency=Math.max(0,Math.min(10000,Number(document.getElementById('captureLatency').value)||0)),play=document.getElementById('capturePlay').checked;
    s={pid,native,name,stop,rate:Number(current.sample_rate||48000),sequence:0,frames:0,queued:0,pending:Promise.resolve(),stopping:false};state=recording=s;
-   if(native)await b.audio_capture_start(input,s.rate);
+   if(native){if(play&&nativeAudioEngineIdentity==='cpp'){const ready=await window.previewMaster({start_playing:false});if(!ready?.prepared)throw Error(tr('Playback preparation was interrupted','Preparazione riproduzione interrotta'));s.preparedDuplex=true}await b.audio_capture_start(input,s.rate);}
    else{s.stream=await navigator.mediaDevices.getUserMedia({audio:{deviceId:input?{exact:input}:undefined,echoCancellation:false,noiseSuppression:false,autoGainControl:false}});s.context=new AudioContext({sampleRate:s.rate});s.rate=s.context.sampleRate;await s.context.audioWorklet.addModule('/static/audio_capture_worklet.js?v=r210');s.source=s.context.createMediaStreamSource(s.stream);s.node=new AudioWorkletNode(s.context,'mta-audio-capture',{numberOfOutputs:0});s.node.port.onmessage=e=>{if(e.data==='flushed')s.flushed?.();else enqueue(s,e.data)};await s.context.resume()}
    const created=await json(`/api/projects/${encodeURIComponent(pid)}/audio-capture`,{rate:s.rate,offset_ms:Math.max(0,Math.round(playCursorMs-latency))});s.url=`/api/projects/${encodeURIComponent(pid)}/audio-capture/${created.capture_id}`;
    if(native){let busy=false;s.timer=setInterval(async()=>{if(busy||s.stopping)return;busy=true;try{const part=await b.audio_capture_read();if(part.frames)enqueue(s,decode(part.pcm))}catch(e){s.error=e.message;status(e.message);await b.audio_capture_stop()}finally{busy=false}},20)}else s.source.connect(s.node);
-   document.getElementById('captureStart').disabled=true;document.getElementById('captureStop').disabled=false;if(play)await window.previewMaster();status(tr('Recording…','Registrazione…'));
+   document.getElementById('captureStart').disabled=true;document.getElementById('captureStop').disabled=false;if(play){if(s.preparedDuplex)await window.resumePlayback();else await window.previewMaster()}status(tr('Recording…','Registrazione…'));
   }catch(e){status(e.message);if(s){s.stream?.getTracks().forEach(t=>t.stop());if(native)try{await b.audio_capture_stop()}catch{}if(s.url)await json(s.url,undefined,'DELETE').catch(()=>{});}state=recording=null}
  };
  }catch(e){toast(e.message)}

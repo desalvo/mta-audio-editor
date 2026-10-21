@@ -1,0 +1,563 @@
+[
+  {
+    "language": "it",
+    "word": "ciao",
+    "ipa": "tʃˈao",
+    "phones": [
+      "en/ch",
+      "ja/a",
+      "en/w"
+    ],
+    "nuclei": 1
+  },
+  {
+    "language": "it",
+    "word": "amore",
+    "ipa": "amˈore",
+    "phones": [
+      "ja/a",
+      "en/m",
+      "ja/o",
+      "ja/r",
+      "ja/e"
+    ],
+    "nuclei": 3
+  },
+  {
+    "language": "it",
+    "word": "perché",
+    "ipa": "perkˈe",
+    "phones": [
+      "en/p",
+      "ja/e",
+      "ja/r",
+      "en/k",
+      "ja/e"
+    ],
+    "nuclei": 2
+  },
+  {
+    "language": "it",
+    "word": "canzone",
+    "ipa": "kantsˈone",
+    "phones": [
+      "en/k",
+      "ja/a",
+      "en/n",
+      "ja/ts",
+      "ja/o",
+      "en/n",
+      "ja/e"
+    ],
+    "nuclei": 3
+  },
+  {
+    "language": "it",
+    "word": "gli",
+    "ipa": "ʎɪ",
+    "phones": [
+      "en/l",
+      "en/y",
+      "en/ih"
+    ],
+    "nuclei": 1
+  },
+  {
+    "language": "it",
+    "word": "gnocchi",
+    "ipa": "ɲˈokːɪ",
+    "phones": [
+      "ja/ny",
+      "ja/o",
+      "en/k",
+      "en/k",
+      "en/ih"
+    ],
+    "nuclei": 2
+  },
+  {
+    "language": "it",
+    "word": "rosso",
+    "ipa": "rˈosso",
+    "phones": [
+      "ja/r",
+      "ja/o",
+      "en/s",
+      "en/s",
+      "ja/o"
+    ],
+    "nuclei": 2
+  },
+  {
+    "language": "it",
+    "word": "tutto",
+    "ipa": "tˈutːo",
+    "phones": [
+      "en/t",
+      "zh/u",
+      "en/t",
+      "en/t",
+      "ja/o"
+    ],
+    "nuclei": 2
+  },
+  {
+    "language": "it",
+    "word": "acqua",
+    "ipa": "ˈakːwa",
+    "phones": [
+      "ja/a",
+      "en/k",
+      "en/k",
+      "en/w",
+      "ja/a"
+    ],
+    "nuclei": 2
+  },
+  {
+    "language": "it",
+    "word": "più",
+    "ipa": "pjˈu",
+    "phones": [
+      "en/p",
+      "en/y",
+      "zh/u"
+    ],
+    "nuclei": 1
+  },
+  {
+    "language": "it",
+    "word": "cielo",
+    "ipa": "tʃˈɛlo",
+    "phones": [
+      "en/ch",
+      "en/eh",
+      "en/l",
+      "ja/o"
+    ],
+    "nuclei": 2
+  },
+  {
+    "language": "it",
+    "word": "stelle",
+    "ipa": "stˈelle",
+    "phones": [
+      "en/s",
+      "en/t",
+      "ja/e",
+      "en/l",
+      "en/l",
+      "ja/e"
+    ],
+    "nuclei": 2
+  },
+  {
+    "language": "it",
+    "word": "luna",
+    "ipa": "lˈuna",
+    "phones": [
+      "en/l",
+      "zh/u",
+      "en/n",
+      "ja/a"
+    ],
+    "nuclei": 2
+  },
+  {
+    "language": "it",
+    "word": "sogno",
+    "ipa": "sˈoɲɲo",
+    "phones": [
+      "en/s",
+      "ja/o",
+      "ja/ny",
+      "ja/ny",
+      "ja/o"
+    ],
+    "nuclei": 2
+  },
+  {
+    "language": "it",
+    "word": "cuore",
+    "ipa": "kʊˈɔre",
+    "phones": [
+      "en/k",
+      "en/w",
+      "en/ao",
+      "ja/r",
+      "ja/e"
+    ],
+    "nuclei": 2
+  },
+  {
+    "language": "it",
+    "word": "paese",
+    "ipa": "paˈeze",
+    "phones": [
+      "en/p",
+      "ja/a",
+      "ja/e",
+      "en/z",
+      "ja/e"
+    ],
+    "nuclei": 3
+  },
+  {
+    "language": "it",
+    "word": "paura",
+    "ipa": "paˈʊra",
+    "phones": [
+      "en/p",
+      "ja/a",
+      "en/uh",
+      "ja/r",
+      "ja/a"
+    ],
+    "nuclei": 3
+  },
+  {
+    "language": "it",
+    "word": "azzurro",
+    "ipa": "adzːˈurɾo",
+    "phones": [
+      "ja/a",
+      "en/d",
+      "en/z",
+      "en/d",
+      "en/z",
+      "zh/u",
+      "ja/r",
+      "ja/r",
+      "ja/o"
+    ],
+    "nuclei": 3
+  },
+  {
+    "language": "it",
+    "word": "zucchero",
+    "ipa": "dzˈukːeɾo",
+    "phones": [
+      "en/d",
+      "en/z",
+      "zh/u",
+      "en/k",
+      "en/k",
+      "ja/e",
+      "ja/r",
+      "ja/o"
+    ],
+    "nuclei": 3
+  },
+  {
+    "language": "it",
+    "word": "ghiaccio",
+    "ipa": "ɡjˈatʃːo",
+    "phones": [
+      "en/g",
+      "en/y",
+      "ja/a",
+      "en/ch",
+      "en/ch",
+      "ja/o"
+    ],
+    "nuclei": 2
+  },
+  {
+    "language": "it",
+    "word": "città",
+    "ipa": "tʃitːˈa",
+    "phones": [
+      "en/ch",
+      "en/iy",
+      "en/t",
+      "en/t",
+      "ja/a"
+    ],
+    "nuclei": 2
+  },
+  {
+    "language": "it",
+    "word": "ragazzo",
+    "ipa": "raɡˈatsːo",
+    "phones": [
+      "ja/r",
+      "ja/a",
+      "en/g",
+      "ja/a",
+      "ja/ts",
+      "ja/ts",
+      "ja/o"
+    ],
+    "nuclei": 3
+  },
+  {
+    "language": "it",
+    "word": "figlio",
+    "ipa": "fˈiʎo",
+    "phones": [
+      "en/f",
+      "en/iy",
+      "en/l",
+      "en/y",
+      "ja/o"
+    ],
+    "nuclei": 2
+  },
+  {
+    "language": "it",
+    "word": "giocare",
+    "ipa": "dʒokˈare",
+    "phones": [
+      "en/jh",
+      "ja/o",
+      "en/k",
+      "ja/a",
+      "ja/r",
+      "ja/e"
+    ],
+    "nuclei": 3
+  },
+  {
+    "language": "fr",
+    "word": "bonjour",
+    "ipa": "bɔ̃ʒˈuʁ",
+    "phones": [
+      "en/b",
+      "zh/ong",
+      "en/zh",
+      "zh/u",
+      "en/r"
+    ],
+    "nuclei": 2
+  },
+  {
+    "language": "fr",
+    "word": "amour",
+    "ipa": "amˈuʁ",
+    "phones": [
+      "ja/a",
+      "en/m",
+      "zh/u",
+      "en/r"
+    ],
+    "nuclei": 2
+  },
+  {
+    "language": "fr",
+    "word": "lune",
+    "ipa": "lˈyn",
+    "phones": [
+      "en/l",
+      "zh/v",
+      "en/n"
+    ],
+    "nuclei": 1
+  },
+  {
+    "language": "fr",
+    "word": "cœur",
+    "ipa": "kˈœʁ",
+    "phones": [
+      "en/k",
+      "zh/ve",
+      "en/r"
+    ],
+    "nuclei": 1
+  },
+  {
+    "language": "fr",
+    "word": "deux",
+    "ipa": "dˈø",
+    "phones": [
+      "en/d",
+      "zh/ve"
+    ],
+    "nuclei": 1
+  },
+  {
+    "language": "fr",
+    "word": "pain",
+    "ipa": "pˈɛ̃",
+    "phones": [
+      "en/p",
+      "zh/eng"
+    ],
+    "nuclei": 1
+  },
+  {
+    "language": "fr",
+    "word": "bon",
+    "ipa": "bˈɔ̃",
+    "phones": [
+      "en/b",
+      "zh/ong"
+    ],
+    "nuclei": 1
+  },
+  {
+    "language": "fr",
+    "word": "blanc",
+    "ipa": "blˈɑ̃",
+    "phones": [
+      "en/b",
+      "en/l",
+      "zh/ang"
+    ],
+    "nuclei": 1
+  },
+  {
+    "language": "fr",
+    "word": "un",
+    "ipa": "ˈœ̃",
+    "phones": [
+      "zh/eng"
+    ],
+    "nuclei": 1
+  },
+  {
+    "language": "fr",
+    "word": "chanson",
+    "ipa": "ʃɑ̃sˈɔ̃",
+    "phones": [
+      "en/sh",
+      "zh/ang",
+      "en/s",
+      "zh/ong"
+    ],
+    "nuclei": 2
+  },
+  {
+    "language": "fr",
+    "word": "fille",
+    "ipa": "fˈij",
+    "phones": [
+      "en/f",
+      "en/iy",
+      "en/y"
+    ],
+    "nuclei": 1
+  },
+  {
+    "language": "fr",
+    "word": "nuit",
+    "ipa": "nyˈi",
+    "phones": [
+      "en/n",
+      "en/y",
+      "en/w",
+      "en/iy"
+    ],
+    "nuclei": 1
+  },
+  {
+    "language": "fr",
+    "word": "oiseau",
+    "ipa": "wazˈo",
+    "phones": [
+      "en/w",
+      "ja/a",
+      "en/z",
+      "ja/o"
+    ],
+    "nuclei": 2
+  },
+  {
+    "language": "fr",
+    "word": "étoile",
+    "ipa": "etwˈal",
+    "phones": [
+      "ja/e",
+      "en/t",
+      "en/w",
+      "ja/a",
+      "en/l"
+    ],
+    "nuclei": 2
+  },
+  {
+    "language": "fr",
+    "word": "rêve",
+    "ipa": "ʁˈɛv",
+    "phones": [
+      "en/r",
+      "en/eh",
+      "en/v"
+    ],
+    "nuclei": 1
+  },
+  {
+    "language": "fr",
+    "word": "musique",
+    "ipa": "myzˈik",
+    "phones": [
+      "en/m",
+      "zh/v",
+      "en/z",
+      "en/iy",
+      "en/k"
+    ],
+    "nuclei": 2
+  },
+  {
+    "language": "fr",
+    "word": "soleil",
+    "ipa": "solˈɛj",
+    "phones": [
+      "en/s",
+      "ja/o",
+      "en/l",
+      "en/eh",
+      "en/y"
+    ],
+    "nuclei": 2
+  },
+  {
+    "language": "fr",
+    "word": "demain",
+    "ipa": "dəmˈɛ̃",
+    "phones": [
+      "en/d",
+      "en/ax",
+      "en/m",
+      "zh/eng"
+    ],
+    "nuclei": 2
+  },
+  {
+    "language": "fr",
+    "word": "français",
+    "ipa": "fʁɑ̃sˈɛ",
+    "phones": [
+      "en/f",
+      "en/r",
+      "zh/ang",
+      "en/s",
+      "en/eh"
+    ],
+    "nuclei": 2
+  },
+  {
+    "language": "fr",
+    "word": "jeunesse",
+    "ipa": "ʒønˈɛs",
+    "phones": [
+      "en/zh",
+      "zh/ve",
+      "en/n",
+      "en/eh",
+      "en/s"
+    ],
+    "nuclei": 2
+  },
+  {
+    "language": "fr",
+    "word": "enfants",
+    "ipa": "ɑ̃fˈɑ̃",
+    "phones": [
+      "zh/ang",
+      "en/f",
+      "zh/ang"
+    ],
+    "nuclei": 2
+  }
+]

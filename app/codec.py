@@ -254,7 +254,7 @@ def _synchronized_text_attachments(project: Project) -> list[Path]:
 
 
 def suggested_slots(project: Project, profile: str | None = None) -> list[dict]:
-    if project.target == "DAW":
+    if project.target not in {"MTA8", "MTA16"}:
         raise ValueError("DAW project requires an explicit MTA8/MTA16 export target")
     limit = 8 if project.target == "MTA8" else 16
     effective = resolve_mta_device_profile(project, profile)
@@ -325,7 +325,7 @@ def suggested_slots(project: Project, profile: str | None = None) -> list[dict]:
 
 
 def validate_slot_mapping(project: Project, slots: list[MtaSlotMapping] | None, profile: str | None = None) -> list[MtaSlotMapping]:
-    if project.target == "DAW":
+    if project.target not in {"MTA8", "MTA16"}:
         raise ValueError("DAW project requires an explicit MTA8/MTA16 export target")
     limit = 8 if project.target == "MTA8" else 16
     if not slots:

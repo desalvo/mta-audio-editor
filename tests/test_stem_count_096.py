@@ -23,7 +23,7 @@ def test_ui_uses_dynamic_stem_counts():
     assert 'stem.supported_stem_counts' in JS
     assert 'model_profiles' in JS
     assert 'Auto · model-driven' in JS
-    assert "localStorage.setItem('mtaStemCount'" in JS
+    assert "MtaPreferences.setItem('mtaStemCount'" in JS
 
 def test_mobile_docs_describe_model_driven_counts():
     assert 'model-driven' in IOS.lower()

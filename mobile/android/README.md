@@ -1,5 +1,7 @@
 # MTA Audio Editor for Android
 
+Whole-page UI zoom (50–200%, persisted) is available under the app overflow menu → Interface zoom; 100% resets it. This uses WebView page zoom, not text-only scaling. See [r210 zoom and target checks](../../docs/NATIVE_UI_ZOOM_R210.md).
+
 Native Android client for the MTA Audio Editor server. The app embeds the existing responsive web UI in a hardened WebView and adds Android Storage Access Framework integration for file uploads and export/download destinations.
 
 On first launch the user configures the HTTPS URL of the Docker/Kubernetes backend. Login and project authorization remain server-side. Long-running work (Demucs, rendering, MTA export) runs on the server so the mobile device stays responsive.

@@ -1,0 +1,14 @@
+{
+  "ready_for_inference_attempt": false,
+  "real_audio_validated": false,
+  "problems": [
+    "MTA_NEURAL_SINGER_POLICY_MODEL is unset",
+    "Vocoder license/admission refused execution: Model disabled pending license review: diffsinger-vocoder. Contact the administrator; cost recovery alone does not grant permission.",
+    "MTA_DIFFSINGER_ROOT must name an installed absolute directory",
+    "Acoustic checkpoint must use exact OpenVPI model_ckpt_steps_<step>.ckpt filename",
+    "python: Unsafe or missing DiffSinger asset",
+    "acoustic checkpoint: Unsafe or missing DiffSinger asset",
+    "vocoder: Unsafe or missing DiffSinger asset"
+  ],
+  "next_step": "Install and authorize the missing assets, then rerun this check"
+}

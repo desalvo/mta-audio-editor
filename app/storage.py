@@ -1,4 +1,5 @@
 import hashlib
+from .fs_durability import sync_directory
 import json
 import os
 import re
@@ -369,7 +370,7 @@ def _atomic_json_write(path: Path, payload: dict) -> None:
 
 
 def referenced_audio_files(project: Project) -> set[str]:
-    return {t.filename for t in project.tracks} | {c.filename for c in project.clip_library}
+    return {t.filename for t in [*project.tracks, *project.archived_tracks]} | {c.filename for c in project.clip_library}
 
 
 def _read_gc_queue(pid: str) -> set[str]:
@@ -556,14 +557,14 @@ def create_project(title: str = "Untitled", target: str = "MTA8", owner_user_id:
     (d / "attachments").mkdir()
     (d / "originals").mkdir()
     rate = int(sample_rate) if int(sample_rate) in {44100, 48000, 96000} else 44100
-    p = Project(id=pid, owner_user_id=owner_user_id, title=title[:200], target=target, sample_rate=rate, audio_storage_mode="flac" if audio_storage_mode == "flac" else "wav")
+    p = Project(id=pid, owner_user_id=owner_user_id, title=title[:200], target=target, project_kind_version=1, tempo_known=False, sample_rate=rate, audio_storage_mode="flac" if audio_storage_mode == "flac" else "wav")
     save_project(p)
     return p
 
 
 def validate_project_files(project: Project) -> None:
     seen_track_ids: set[str] = set()
-    for track in project.tracks:
+    for track in [*project.tracks, *project.archived_tracks]:
         if track.id in seen_track_ids:
             raise ValueError("duplicate track id")
         seen_track_ids.add(track.id)
@@ -585,17 +586,11 @@ def validate_project_files(project: Project) -> None:
 
 
 def _fsync_directory(path: Path) -> None:
-    """Best-effort directory fsync so atomic renames survive abrupt shutdowns."""
+    """Best-effort directory flush; mandatory call sites use sync_directory."""
     try:
-        fd = os.open(path, os.O_RDONLY)
-    except OSError:
-        return
-    try:
-        os.fsync(fd)
+        sync_directory(path)
     except OSError:
         pass
-    finally:
-        os.close(fd)
 
 
 def migrate_project_audio_to_flac(project: Project) -> dict:
@@ -605,9 +600,10 @@ def migrate_project_audio_to_flac(project: Project) -> dict:
     PCM is deliberately left untouched: integer FLAC cannot represent it exactly.
     """
     validate_project_files(project)
-    filenames = {t.filename for t in project.tracks} | {c.filename for c in project.clip_library}
+    filenames = {t.filename for t in [*project.tracks, *project.archived_tracks]} | {c.filename for c in project.clip_library}
     staged: dict[str, tuple[Path, Path]] = {}
-    original_tracks = [track.filename for track in project.tracks]
+    all_tracks = [*project.tracks, *project.archived_tracks]
+    original_tracks = [track.filename for track in all_tracks]
     original_clips = [(clip.filename, clip.current_location) for clip in project.clip_library]
     original_mode = project.audio_storage_mode
     committed = False
@@ -643,7 +639,7 @@ def migrate_project_audio_to_flac(project: Project) -> dict:
             os.replace(tmp, final)
         _fsync_directory(pdir(project.id) / "audio")
         old_names = {old: final.name for old, (_, final) in staged.items()}
-        for track in project.tracks:
+        for track in all_tracks:
             track.filename = old_names.get(track.filename, track.filename)
         for clip in project.clip_library:
             if clip.filename in old_names:
@@ -660,7 +656,7 @@ def migrate_project_audio_to_flac(project: Project) -> dict:
     except Exception:
         # No metadata is committed before conversion completes; a failed stage leaves WAV usable.
         if not committed:
-            for track, original in zip(project.tracks, original_tracks):
+            for track, original in zip(all_tracks, original_tracks):
                 track.filename = original
             for clip, (name, location) in zip(project.clip_library, original_clips):
                 clip.filename = name
@@ -675,10 +671,15 @@ def migrate_project_audio_to_flac(project: Project) -> dict:
 
 
 def save_project(project: Project, *, _skip_flac_conversion: bool = False):
+    from .project_kinds import migrate_legacy, validate
+    migrate_legacy(project)
+    validate(project)
+    from .midi_metronome import refresh as refresh_midi_metronomes
+    refresh_midi_metronomes(project)
     # FLAC is a project storage policy, not a global rewrite of WAV projects.
     # Persist newly rendered integer-PCM sources as FLAC only for opted-in projects.
     if not _skip_flac_conversion and project.audio_storage_mode == "flac":
-        names = {t.filename for t in project.tracks} | {c.filename for c in project.clip_library}
+        names = {t.filename for t in [*project.tracks, *project.archived_tracks]} | {c.filename for c in project.clip_library}
         if any(Path(name).suffix.lower() == ".wav" for name in names):
             migrate_project_audio_to_flac(project)
             return
@@ -711,6 +712,11 @@ def save_project(project: Project, *, _skip_flac_conversion: bool = False):
 def load_project(pid: str) -> Project:
     raw = (pdir(pid) / "project.json").read_text(encoding="utf-8")
     project = Project.model_validate_json(raw)
+    from .project_kinds import migrate_legacy
+    old_kind_version = project.project_kind_version
+    migrate_legacy(project)
+    if old_kind_version == 0:
+        save_project(project)
     # One-time migration: old marker entries predate persistent IDs. The IDs
     # must be saved before the next request, or each load would assign new IDs.
     if any(not marker.get("id") for marker in json.loads(raw).get("markers", [])):
@@ -820,11 +826,7 @@ def preserve_original(pid: str, source: Path, original_name: str) -> Path:
             shutil.copyfileobj(src, out, length=1024 * 1024)
             out.flush()
             os.fsync(out.fileno())
-        directory = os.open(str(dst.parent), os.O_RDONLY)
-        try:
-            os.fsync(directory)
-        finally:
-            os.close(directory)
+        sync_directory(dst.parent)
     except BaseException:
         if owned_identity is not None:
             try:
@@ -977,7 +979,7 @@ def write_project_archive(pid: str, archive_path: Path) -> Path:
     }
     tmp = archive_path.parent / f".{archive_path.name}.{uuid.uuid4().hex}.tmp"
     try:
-        pending_gc = _read_gc_queue(pid)
+        pending_gc = _read_gc_queue(pid) - referenced_audio_files(project)
         with zipfile.ZipFile(tmp, "w", zipfile.ZIP_DEFLATED, allowZip64=True) as z:
             z.writestr("archive-manifest.json", json.dumps(manifest, indent=2))
             for path in sorted(base.rglob("*")):

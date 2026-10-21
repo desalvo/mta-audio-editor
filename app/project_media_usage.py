@@ -12,8 +12,9 @@ def lock(pid):
 
 
 def timeline_files(project):
-    source_ids={getattr(track,'source_clip_id',None) for track in project.tracks if getattr(track,'source_clip_id',None)}
-    return {track.filename for track in project.tracks} | {
+    tracks=[*project.tracks, *project.archived_tracks]
+    source_ids={getattr(track,'source_clip_id',None) for track in tracks if getattr(track,'source_clip_id',None)}
+    return {track.filename for track in tracks} | {
         clip.filename for clip in project.clip_library if clip.id in source_ids}
 
 

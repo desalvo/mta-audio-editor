@@ -1,0 +1,58 @@
+{
+  "input_origin": "Authorized MIT FluidR3 GM synthesis through the real MTA TinySoundFont backend; not recorded music",
+  "reference_origin": "Known generated MIDI score, independent of model prediction; not an independently annotated recording",
+  "ten_programs_zero_based": [
+    0,
+    4,
+    16,
+    24,
+    32,
+    40,
+    56,
+    64,
+    73,
+    80
+  ],
+  "ten_programs_note_pitches": [
+    48,
+    51,
+    54,
+    57,
+    60,
+    63,
+    66,
+    69,
+    72,
+    75
+  ],
+  "note_on_ms": 100,
+  "note_off_ms": 2500,
+  "velocity_input": 45,
+  "soundfont_sha256": "74594e8f4250680adf590507a306655a299935343583256f3b722c48a1bc1cb0",
+  "files": {
+    "r210-acceptance-piano.wav": {
+      "bytes": 432044,
+      "sha256": "002d7002e5be8c2d71f3a3775beb403d2dab43439b206e6d00d9ca25e4b389a5"
+    },
+    "r210-acceptance-vowel.wav": {
+      "bytes": 432044,
+      "sha256": "f80da4572e567e4f4547d7a163825d61290aeeda74eb64cd28e09df6521b4eef"
+    },
+    "r210-acceptance-ten-programs.mid": {
+      "bytes": 254,
+      "sha256": "6a14a99c162c6edf9305ffe970a37e1d2a44a76c6258e9724fccc57cd5676d32"
+    },
+    "r210-acceptance-ten-programs.wav": {
+      "bytes": 1008044,
+      "sha256": "b80511442b31ea9c2011705bdb3fad273eac56c5c7d7e0735ded29ed22cbb7d7"
+    },
+    "r210-acceptance-ten-programs-reference.json": {
+      "bytes": 5791,
+      "sha256": "d252454a878b7625a9519cd54c08114d837072093c02810289fa40434fcbd2c6"
+    },
+    "r210-acceptance-yourmt3-ten-programs.json": {
+      "bytes": 4333,
+      "sha256": "8ceb442f807c00608b002aea674bff97219391ad3f5de9417904eed58b8cf45e"
+    }
+  }
+}

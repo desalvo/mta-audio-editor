@@ -1,0 +1,3 @@
+# Bridge-side Seed-VC architecture validation, not the upstream model runtime.
+# Keep Seed-VC/RVC runtime environments isolated from the MTA server.
+PyYAML==6.0.3

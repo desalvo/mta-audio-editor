@@ -19,3 +19,13 @@ def manual_signature(project, left, right):
 
 def zone_signature(project, left, right):
     return manual_signature(project, left, right) or grid_settings(project)[1]
+
+
+def playback_ratio(project):
+    return max(.25, min(4., float(project.bpm)/float(project.base_bpm or project.bpm)))
+
+
+def source_grid_settings(project):
+    """Audible fixed/zonal BPM expressed on the unstretched source timeline."""
+    bpm, signature = grid_settings(project)
+    return bpm/playback_ratio(project), signature

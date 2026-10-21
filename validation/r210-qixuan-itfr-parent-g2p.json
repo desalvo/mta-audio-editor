@@ -1,0 +1,143 @@
+{
+  "outer_interpreter": "/workspace/scratch/37b1f5ad4c83/mta_work/../mta_env/bin/python",
+  "test": "actual Studio parent-process G2P path with installed shared eSpeak library; no policy/admission override or new acoustic inference",
+  "success": true,
+  "results": [
+    {
+      "language": "it",
+      "notes": 4,
+      "phonemes": [
+        [
+          "en/ch",
+          "ja/a",
+          "en/w"
+        ],
+        [
+          "ja/a"
+        ],
+        [
+          "en/m",
+          "ja/o"
+        ],
+        [
+          "ja/r",
+          "ja/e"
+        ]
+      ],
+      "profile": {
+        "lyric_language": "it",
+        "mode": "cross-language",
+        "acoustic_languages": [
+          "en",
+          "ja",
+          "zh"
+        ],
+        "approximations": {
+          "r": "Japanese tap substitutes for Italian trill; no learned Italian trill is asserted.",
+          "ɲ": "Japanese palatalized nasal approximates the Italian palatal nasal.",
+          "ʎ": "English l+y sequence approximates the Italian palatal lateral.",
+          "dz": "English d+z sequence approximates the voiced alveolar affricate.",
+          "ɱ": "English m approximates the labiodental nasal."
+        },
+        "ipa_rewrites": {
+          "iˈa": "jˈa",
+          "iˈɑ": "jˈɑ",
+          "iˈe": "jˈe",
+          "iˈɛ": "jˈɛ",
+          "iˈo": "jˈo",
+          "iˈɔ": "jˈɔ",
+          "ɪˈa": "jˈa",
+          "ɪˈɑ": "jˈɑ",
+          "ɪˈe": "jˈe",
+          "ɪˈɛ": "jˈɛ",
+          "ɪˈo": "jˈo",
+          "ɪˈɔ": "jˈɔ",
+          "uˈa": "wˈa",
+          "uˈɑ": "wˈɑ",
+          "uˈe": "wˈe",
+          "uˈɛ": "wˈɛ",
+          "uˈo": "wˈo",
+          "uˈɔ": "wˈɔ",
+          "ʊˈa": "wˈa",
+          "ʊˈɑ": "wˈɑ",
+          "ʊˈe": "wˈe",
+          "ʊˈɛ": "wˈɛ",
+          "ʊˈo": "wˈo",
+          "ʊˈɔ": "wˈɔ",
+          "tʃˈao": "tʃˈaw",
+          "aˈiu": "ajˈu"
+        },
+        "unstressed_glides": {
+          "i": "j",
+          "ɪ": "j",
+          "u": "w",
+          "ʊ": "w"
+        },
+        "glide_following_vowels": "aɑeɛoɔ",
+        "note": "Italian/French lyrics use existing English, Japanese and Mandarin bank phones. Rhotics, palatals, rounded mid/front and nasal vowels are approximated. This is cross-language synthesis, not native IT/FR pronunciation certification."
+      }
+    },
+    {
+      "language": "fr",
+      "notes": 3,
+      "phonemes": [
+        [
+          "en/b",
+          "zh/ong"
+        ],
+        [
+          "en/zh",
+          "zh/u",
+          "en/r"
+        ],
+        [
+          "en/l",
+          "zh/v",
+          "en/n"
+        ]
+      ],
+      "profile": {
+        "lyric_language": "fr",
+        "mode": "cross-language",
+        "acoustic_languages": [
+          "en",
+          "ja",
+          "zh"
+        ],
+        "approximations": {
+          "ʁ": "English r substitutes for the French uvular rhotic.",
+          "ɲ": "Japanese palatalized nasal approximates the French palatal nasal.",
+          "ɥ": "English y+w sequence approximates the French rounded palatal glide.",
+          "ø/œ": "Mandarin ve approximates rounded front mid vowels; the contrast is not modeled natively.",
+          "ɑ̃/ɔ̃/ɛ̃/œ̃": "Mandarin nasal rimes approximate French nasal vowels, including a possible audible nasal coda."
+        },
+        "ipa_rewrites": {
+          "yˈa": "ɥˈa",
+          "ˈya": "ɥˈa",
+          "ya": "ɥa",
+          "yˈɑ": "ɥˈɑ",
+          "ˈyɑ": "ɥˈɑ",
+          "yɑ": "ɥɑ",
+          "yˈe": "ɥˈe",
+          "ˈye": "ɥˈe",
+          "ye": "ɥe",
+          "yˈɛ": "ɥˈɛ",
+          "ˈyɛ": "ɥˈɛ",
+          "yɛ": "ɥɛ",
+          "yˈi": "ɥˈi",
+          "ˈyi": "ɥˈi",
+          "yi": "ɥi",
+          "yˈo": "ɥˈo",
+          "ˈyo": "ɥˈo",
+          "yo": "ɥo",
+          "yˈɔ": "ɥˈɔ",
+          "ˈyɔ": "ɥˈɔ",
+          "yɔ": "ɥɔ"
+        },
+        "unstressed_glides": {},
+        "glide_following_vowels": "",
+        "note": "Italian/French lyrics use existing English, Japanese and Mandarin bank phones. Rhotics, palatals, rounded mid/front and nasal vowels are approximated. This is cross-language synthesis, not native IT/FR pronunciation certification."
+      }
+    }
+  ]
+}

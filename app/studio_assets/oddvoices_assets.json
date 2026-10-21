@@ -1,0 +1,45 @@
+{
+  "commit": "33a248af8df88edf5166593bf36b7e24e7bc1f94",
+  "files": {
+    "cmudict-0.7b": {
+      "sha256": "209a8b4cd265013e96f4658632a9878103b0c5abf62b50d4ef3ae1be226b29e4",
+      "bytes": 3716714
+    },
+    "voices/air/audio.wav": {
+      "sha256": "afa939eaf490a53aafcb458405a8ac091e209c0f7cf4d045f423bf8b06e63bcc",
+      "bytes": 295743644
+    },
+    "voices/air/labels.txt": {
+      "sha256": "3d12f8a71d1a4ede5a41068431fa6f02b22b7642195571fdab68ced52a5efdbc",
+      "bytes": 18754
+    },
+    "voices/air/database.json": {
+      "sha256": "a5dcc227daa4e2c9186b6f8f27ca1cfe6186c4dbcc35fde089aff8a00388876c",
+      "bytes": 27
+    },
+    "voices/cicada/audio.wav": {
+      "sha256": "dde506dcfda687b38677881eb6e26d0369abe0b05c84592d5e0490633b480b4e",
+      "bytes": 177105644
+    },
+    "voices/cicada/labels.txt": {
+      "sha256": "f8063625b39617488a92fc9533859624c3399290ebca6c65de00464cf16dd49c",
+      "bytes": 18321
+    },
+    "voices/cicada/database.json": {
+      "sha256": "f525df447bc7e0ab7c6180a888c667fa752014bae411fddb16b49cc846300c35",
+      "bytes": 27
+    },
+    "voices/quake/audio.wav": {
+      "sha256": "5926e1f2f930ae1188537efdf2d829f2699a1e32ce3f761d6e5f71fc597463da",
+      "bytes": 265241830
+    },
+    "voices/quake/labels.txt": {
+      "sha256": "06a341ea240213071aab0cdd8b2432bfe41ac6ddcd3ad3caed71f771d4645b53",
+      "bytes": 18484
+    },
+    "voices/quake/database.json": {
+      "sha256": "fe3a6e05df4f6769b9a7813123ed9c2a43cc1fc8c123f57449aebb45f0fde7aa",
+      "bytes": 27
+    }
+  }
+}

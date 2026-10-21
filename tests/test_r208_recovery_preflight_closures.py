@@ -14,7 +14,7 @@ from app import ai_async_track_transaction as async_tx
 
 
 def project():
-    return SimpleNamespace(tracks=[], clip_library=[], recovered_ai_imports=[])
+    return SimpleNamespace(target='DAW', tracks=[], archived_tracks=[], clip_library=[], recovered_ai_imports=[])
 
 
 @pytest.fixture
@@ -78,7 +78,7 @@ def test_rollback_requires_identity_and_authoritative_state(monkeypatch, tmp_pat
 
 def test_add_track_error_after_publication_preserves_media(monkeypatch, tmp_path):
     dst = tmp_path / 'new.wav'; dst.write_bytes(b'audio')
-    editing = SimpleNamespace(sample_rate=44100, tracks=[], clip_library=[])
+    editing = SimpleNamespace(target='DAW', sample_rate=44100, tracks=[], archived_tracks=[], clip_library=[])
     persisted = project()
     monkeypatch.setattr(ordinary, 'begin', lambda pid: None)
     monkeypatch.setattr(main, '_project_for_actor', lambda *a: editing)
@@ -106,7 +106,7 @@ def test_async_thread_start_failure_finalizes_receipt(monkeypatch, media):
     import app.ai_project_lock as locks
     import io
     monkeypatch.setattr(locks, 'project_publication_lock', lambda pid: nullcontext())
-    monkeypatch.setattr(main, '_project_for_actor', lambda *a: SimpleNamespace(owner_user_id=1, tracks=[]))
+    monkeypatch.setattr(main, '_project_for_actor', lambda *a: SimpleNamespace(target='DAW', owner_user_id=1, tracks=[], archived_tracks=[]))
     monkeypatch.setattr(main, '_ensure_workspace_capacity', lambda *a: None)
     monkeypatch.setattr(main, 'audio_path', lambda pid, name: media / 'audio' / name)
     monkeypatch.setattr(main, 'find_duplicate_project_file', lambda *a: None)

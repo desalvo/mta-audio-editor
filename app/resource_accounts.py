@@ -121,7 +121,7 @@ def _used(c,uid,start,end,exclude_job=None):
     exists=c.execute("SELECT 1 FROM sqlite_master WHERE name='ai_compute_jobs'").fetchone()
     result={'cpu_seconds':0.,'gpu_seconds':0.}
     if exists:
-        for r in c.execute("SELECT id,usage_json,resource_source FROM ai_compute_jobs WHERE user_id=? AND started_at>=? AND started_at<? AND accounting_excluded=0",(uid,start,end)):
+        for r in c.execute("SELECT id,usage_json,resource_source FROM ai_compute_jobs WHERE user_id=? AND started_at>=? AND started_at<? AND accounting_excluded=0 AND billable=1",(uid,start,end)):
             if r['id']==exclude_job:continue
             values=_counters(c,r)
             for key in result:result[key]+=values.get(key,0)

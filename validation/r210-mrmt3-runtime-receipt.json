@@ -1,0 +1,36 @@
+{
+  "schema": "mta-mrmt3-runtime-1",
+  "model": "mr-mt3-b8a3807e",
+  "source_commit": "d8cbd287470291dee335f84315c5a9b9ff6e6c8a",
+  "files": {
+    "source/LICENSE-MT3-INFER": "8faf55f87429551c7c7897d06c32b75d202b5d17e076edc9797055cfa4a3af5e",
+    "source/LICENSE-APACHE-2.0": "c036f0b62651bad9a6740e93af2f57455d2de3b97c4148cfbf05ad85516031cf",
+    "source/mt3_infer/base.py": "0802a915bf1d1cca9a3307ca952cf7347e20b68280665a43eb9efc3613d07464",
+    "source/mt3_infer/__init__.py": "6a133175a5cfffd2721749459c45794cb2b7e82da203ae88ab76ed4d18cdedf0",
+    "source/mt3_infer/exceptions.py": "d71ab89e66e13212b5730d2fb0be0560d3ddda8c9624451750b1c12235d366b7",
+    "source/mt3_infer/adapters/__init__.py": "6a133175a5cfffd2721749459c45794cb2b7e82da203ae88ab76ed4d18cdedf0",
+    "source/mt3_infer/adapters/mr_mt3.py": "5b376389c1f1794862b2704237cd01e20b1c2c32f474a429cf52afd20b2122ef",
+    "source/mt3_infer/adapters/vocab_utils.py": "2e7bb077c4ca40b61e6de71c42d46cabc779a70fe09ca83c01700e04fb3c1a5d",
+    "source/mt3_infer/models/__init__.py": "6a133175a5cfffd2721749459c45794cb2b7e82da203ae88ab76ed4d18cdedf0",
+    "source/mt3_infer/models/mr_mt3/t5.py": "6b1d9346a5f214d692a74a21b7e3321380deb4492e3346a964f286429c4658e2",
+    "source/mt3_infer/models/mr_mt3/__init__.py": "6a133175a5cfffd2721749459c45794cb2b7e82da203ae88ab76ed4d18cdedf0",
+    "weights/model.safetensors": "39bdc19eb84c0062293b33a9a87a306bf42c87c792f56c35a324227e98743a2c"
+  },
+  "python_sha256": "fa67443527ed9647f760d807e2a38f26340757123e643c4639cf273ed15d5ea7",
+  "tested": true,
+  "conversion": {
+    "source_sha256": "b8a3807ed265059abd25ad7f68142c06c35e8f6144dcaa45bd55946a3745398f",
+    "tensors": 193,
+    "elements": 46945792,
+    "sha256": "39bdc19eb84c0062293b33a9a87a306bf42c87c792f56c35a324227e98743a2c",
+    "bytes": 187805792
+  },
+  "licenses": [
+    "MIT (MR-MT3 and selected wrapper)",
+    "Apache-2.0 (T5 architecture and codec)"
+  ],
+  "source_archive_sha256": "cfd8ae28ef0affcb6f52c9eaa91503031720e63b6ff51dd3fd4622fe7a8180f6",
+  "model_license_url": "https://huggingface.co/gudgud1014/MR-MT3",
+  "excluded": "Other mt3-infer backends are not installed or imported.",
+  "selftest_result_sha256": "b9e9143ffad6da19d3f5a415a6b6a3630d44ce5b8fe8a3d41b5d225cc89cc460"
+}

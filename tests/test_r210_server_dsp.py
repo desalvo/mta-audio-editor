@@ -88,6 +88,8 @@ def test_server_staging_builds_and_ships_target_core(server,monkeypatch,compiled
     module.prepare(root,server/'stage',root/'requirements.txt')
     target=server/'stage/application/bin/libmta_audio_core.so'
     assert target.is_file()
+    for name in ('requirements-studio-basic-pitch.txt','requirements-studio-yourmt3.txt','scripts/install_studio_yourmt3.py','docs/YOURMT3_RUNTIME_R210.md','app/studio_assets/yourmt3_sources.json'):
+        assert (server/'stage/application'/name).is_file(),name
     import ctypes
     lib=ctypes.CDLL(str(target));lib.mta_audio_core_abi.restype=ctypes.c_uint
     assert lib.mta_audio_core_abi()==1

@@ -51,6 +51,9 @@ def _init(c):
       billable INTEGER NOT NULL DEFAULT 1 CHECK(billable IN (0,1)),
       FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE);
     CREATE INDEX IF NOT EXISTS idx_ai_compute_user_time ON ai_compute_jobs(user_id,started_at);
+    CREATE TABLE IF NOT EXISTS ai_job_billing_exemptions (
+      job_id TEXT PRIMARY KEY REFERENCES ai_compute_jobs(id) ON DELETE CASCADE,
+      reason TEXT NOT NULL);
     CREATE TABLE IF NOT EXISTS ai_persistent_storage_samples (
       id INTEGER PRIMARY KEY, user_id INTEGER NOT NULL, sampled_at INTEGER NOT NULL,
       bytes_used INTEGER NOT NULL CHECK(bytes_used>=0),
@@ -170,11 +173,12 @@ def _validate_usage(values):
     return clean
 
 
-def create_job(user_id: int, kind: str, token_id=None, *, started_at=None, diagnostic=False):
+def create_job(user_id: int, kind: str, token_id=None, *, started_at=None, diagnostic=False, billing_exemption_reason=""):
     if not isinstance(kind, str) or not (1 <= len(kind) <= 72) or not all(c.isalnum() or c in '_-.' for c in kind):
         raise ValueError('Invalid job kind')
     if not isinstance(diagnostic, bool):
         raise ValueError('diagnostic must be boolean')
+    if not isinstance(billing_exemption_reason,str) or len(billing_exemption_reason)>512:raise ValueError('Invalid billing exemption')
     job_id = uuid.uuid4().hex
     with db() as c:
         _init(c)
@@ -192,10 +196,12 @@ def create_job(user_id: int, kind: str, token_id=None, *, started_at=None, diagn
         from .ai_billing_profiles import suggested_prices
         hardware = suggested_prices()
         c.execute('INSERT INTO ai_compute_jobs(id,user_id,token_id,kind,status,started_at,billable) VALUES(?,?,?,?,?,?,?)',
-                  (job_id,user_id,token_id,kind,'running',stamp,int(not diagnostic)))
+                  (job_id,user_id,token_id,kind,'running',stamp,int(not diagnostic and not billing_exemption_reason)))
+        c.execute('CREATE TABLE IF NOT EXISTS ai_job_billing_exemptions(job_id TEXT PRIMARY KEY REFERENCES ai_compute_jobs(id) ON DELETE CASCADE,reason TEXT NOT NULL)')
+        if billing_exemption_reason:c.execute('INSERT INTO ai_job_billing_exemptions VALUES(?,?)',(job_id,billing_exemption_reason))
         from .ai_global_execution import current_job
         c.execute('UPDATE ai_compute_jobs SET queue_job_id=? WHERE id=?',(current_job.get(),job_id))
-        if not diagnostic:
+        if not diagnostic and not billing_exemption_reason:
             from .resource_accounts import admit
             admit(c,user_id,job_id,stamp)
         suggested = hardware['suggested_micro_per_unit']
@@ -594,7 +600,9 @@ def report(period='month', *, user_id=None, anchor=None, start=None, end=None, _
                 'rows':list(groups.values()),'total_micro':sum(row['cost_micro'] for row in groups.values()),
                 'suggested_total_micro':sum(row['suggested_cost_micro'] for row in groups.values()),
                 'suggested_cost_is_advisory':True,
-                'job_count':len(records),'diagnostic_jobs':sum(r['billable']==0 for r in records),
+                'job_count':len(records),
+                'license_exempt_jobs':sum(r['billable']==0 and bool(c.execute('SELECT 1 FROM ai_job_billing_exemptions WHERE job_id=?',(r['id'],)).fetchone()) for r in records),
+                'diagnostic_jobs':sum(r['billable']==0 and not c.execute('SELECT 1 FROM ai_job_billing_exemptions WHERE job_id=?',(r['id'],)).fetchone() for r in records),
                 'unmetered_jobs':sum(r['billable']==1 and r['resource_source']=='unmetered' for r in records),
                 'running_jobs':sum(r['billable']==1 and r['status']=='running' for r in records),
                 'storage_sampling': 'intervals-between-observed-samples-only'}

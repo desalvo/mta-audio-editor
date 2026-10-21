@@ -43,7 +43,7 @@ CHORD_MODELS = [
     {"id": "chordformer", "display_name": "ChordFormer 5-fold ensemble", "engine": "chordformer", "quality": "very-high", "license": "Research implementation; upstream checkpoints downloaded on demand"},
 ]
 CHORD_ENGINES = [
-    {"id": "profile-stable", "display_name": "Songbook / Stable · Madmom CRF / Chordino · fewer changes", "model_id": None, "ai": True, "profile": "stable", "recommended": True},
+    {"id": "profile-stable", "display_name": "Songbook / Stable · BTC-HCQT / Chordino · fewer changes", "model_id": None, "ai": True, "profile": "stable", "recommended": True},
     {"id": "profile-fast", "display_name": "Fast · Chordino/Chromagram + harmonic refinement", "model_id": None, "ai": False, "profile": "fast"},
     {"id": "profile-accurate", "display_name": "Accurate · ChordFormer/BTC + harmonic refinement", "model_id": None, "ai": True, "profile": "accurate"},
     {"id": "profile-maximum", "display_name": "Maximum accuracy · Ensemble multi-engine", "model_id": None, "ai": True, "profile": "maximum"},
@@ -54,7 +54,7 @@ CHORD_ENGINES = [
     {"id": "chordino", "display_name": "Chordino / NNLS-Chroma", "model_id": None, "ai": False},
     {"id": "mta-chromagram", "display_name": "MTA Chromagram", "model_id": None, "ai": False},
 ]
-CHORD_DEFAULT_ENGINE = os.getenv("MTA_CHORDS_ENGINE", "madmom-deep-chroma").strip() or "madmom-deep-chroma"
+CHORD_DEFAULT_ENGINE = os.getenv("MTA_CHORDS_ENGINE", "mta-chromagram").strip() or "mta-chromagram"
 
 CHORD_PIPELINE_PRESETS = [
     {"id":"stable","display_name":"Songbook / Stabile","description":"Pochi cambi, accordi leggibili; privilegia major/minor e stabilità temporale.","sensitivity":25,"harmonic_refinement":False,"detect_sevenths":False,"detect_sus":False,"detect_dim_aug":False,"detect_slash_bass":False,"temporal_smoothing":True,"beat_sync":False,"min_chord_ms":1800,"max_changes_per_minute":24},
@@ -209,11 +209,17 @@ def chords_catalog(*, native: bool = False) -> dict:
     engines=[]
     for raw in CHORD_ENGINES:
         item=dict(raw);item["available"]=chord_engine_available(item["id"])
+        from .model_license_policy import evaluate,LicenseDenied
+        try:
+            decision=evaluate('chords-ml',{'engine':item['id']})
+            item['license_mode']=decision.mode
+        except LicenseDenied as exc:
+            item['available']=False;item['license_mode']='disabled';item['license_error']=str(exc)
         if item["id"] == "chordino":
             from .chordino_runtime import chordino_status
             item["runtime"] = chordino_status()
         engines.append(item)
-    default=CHORD_DEFAULT_ENGINE if any(x["id"]==CHORD_DEFAULT_ENGINE for x in CHORD_ENGINES) else "madmom-deep-chroma"
+    default=CHORD_DEFAULT_ENGINE if any(x["id"]==CHORD_DEFAULT_ENGINE for x in CHORD_ENGINES) else "mta-chromagram"
     return {"default_engine":default,"engines":engines,"models":models,"presets":CHORD_PIPELINE_PRESETS,"pipeline_stages":CHORD_PIPELINE_STAGES,"storage":"local" if native else "server","on_demand":True,"model_dir":str(_chord_cache_root())}
 
 

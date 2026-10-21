@@ -111,7 +111,7 @@ def test_pcm_sample_continuity_and_resampling():
     assert result.returncode==0,result.stdout+result.stderr
 
 
-def test_cpp_browser_survives_jitter_and_gui_stalls(compiled_core,tmp_path):
+def test_cpp_browser_survives_jitter_and_gui_stalls(compiled_core,tmp_path,chromium_capability):
     pytest.importorskip('playwright.sync_api');pytest.importorskip('pedalboard');pytest.importorskip('av')
     from scripts.validate_cpp_live_controls import probe
     result=probe(compiled_core,tmp_path/'continuity.json',stress=True)
@@ -119,7 +119,7 @@ def test_cpp_browser_survives_jitter_and_gui_stalls(compiled_core,tmp_path):
 
 
 @pytest.mark.parametrize('locale',['en','it'])
-def test_uninstall_button_confirmation_and_state(locale):
+def test_uninstall_button_confirmation_and_state(locale,chromium_capability):
     api=pytest.importorskip('playwright.sync_api')
     with api.sync_playwright() as pw:
         browser=pw.chromium.launch(headless=True,args=['--no-sandbox']);page=browser.new_page();requests=[]

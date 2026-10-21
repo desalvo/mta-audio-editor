@@ -1,0 +1,35 @@
+{
+  "version": "0.3.0-r210",
+  "base_sha256": "928516f04878b05bca31fc2eb8550156c3f69d54e39bf473828a0de904f7112e",
+  "local_tests": {
+    "passed": 28,
+    "failed": 0,
+    "skipped": 0,
+    "junit": "validation/r210-followup-local.xml"
+  },
+  "extended_tests": {
+    "status": "interrupted",
+    "reason": "execution timeout with no final report",
+    "partial_log": "validation/r210-followup-targeted.log",
+    "passed": null,
+    "failed": null,
+    "skipped": null
+  },
+  "old_full_suite": {
+    "status": "interrupted",
+    "reason": "prior outbound GitHub approval blocker; not retried"
+  },
+  "new_real_inferences": 0,
+  "production_changes": false,
+  "git_operations": false,
+  "modified": [
+    "app/studio_stage_cache.py",
+    "tests/test_r210_studio_completion_contracts.py",
+    "docs/DEVELOPMENT_STATUS.md",
+    "README.md",
+    "README_IT.md",
+    "docs/RELEASE_NOTES.md",
+    "docs/CHANGELOG.md",
+    "docs/COMMIT_MESSAGE_R210.txt"
+  ]
+}

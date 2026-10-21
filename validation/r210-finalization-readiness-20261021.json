@@ -1,0 +1,15 @@
+{
+  "version": "0.3.0-r210",
+  "date": "2026-10-21",
+  "status": "software_end_to_end_not_certified",
+  "change": "benchmark regular-file inode validation and nonblocking FIFO rejection",
+  "focused_test_batches": [
+    {"passed": 74, "failed": 0, "skipped": 2},
+    {"passed": 47, "failed": 0, "skipped": 7}
+  ],
+  "combined": {"passed": 121, "failed": 0, "skipped": 9},
+  "full_regression": "not_run_due_to_previous_unresolved_egress_block",
+  "real_neural_inference": "not_run",
+  "real_gm_hardware_acceptance": "not_run",
+  "commit_push_tag_release": false
+}

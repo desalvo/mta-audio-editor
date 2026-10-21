@@ -143,7 +143,7 @@ class Sequencer:
                 if track.mute or (any(t.solo for t in project.tracks) and not track.solo):continue
                 name=options.get('ump_outputs',{}).get(track.id) or options.get('outputs',{}).get(track.id)
                 ump=bool(options.get('ump_outputs',{}).get(track.id))
-                if track.kind!='midi' or track.midi_route=='instrument' or not name:continue
+                if track.kind!='midi' or track.midi_route not in ('hardware','both') or not name:continue
                 route=self.routes.setdefault(name,{'events':[],'port':None,'clock':bool(options.get('clock',False)),'ump':ump})
                 route['events'].extend((at,msg) for at,msg in events(track,ump=False) if msg[0]!=0xf0 or options.get('sysex'))
                 if ump:

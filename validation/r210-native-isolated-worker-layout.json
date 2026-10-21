@@ -1,0 +1,6 @@
+{
+  "isolated_worker_source_layout": "passed",
+  "external_python": "passed",
+  "parts": 4,
+  "original_checkout_imports_required": false
+}

@@ -1,0 +1,27 @@
+{
+  "findings": 51,
+  "files": [
+    "patch_stem.py",
+    "scripts/installed_diagnostics_r208.py",
+    "scripts/mta_billing_isolated_validation.py",
+    "scripts/mta_billing_recovery_isolated_validation.py",
+    "scripts/mta_gpu_agent_ct_diagnostic.py",
+    "scripts/render_gm_midi.py",
+    "scripts/repositories/publish_pages_rpm_indexes.py",
+    "scripts/repositories/r2_publish.py",
+    "scripts/repositories/verify_public_pages.py",
+    "scripts/run_global_regression_shard.py",
+    "scripts/server_packages/verify_native_installers.py",
+    "scripts/unattended_certification_r208.py",
+    "tests/test_r210_gm_event_validation.py",
+    "tests/test_r210_mega53_drum_parts.py",
+    "tests/test_r210_mega53_drums_percussion_groups.py",
+    "tests/test_r210_midi_indexed_matching.py",
+    "tests/test_r210_neural_external_adapter.py",
+    "tests/test_r210_stem_dialog_runtime.py",
+    "validation/r210-mrmt3-memory/probe_memory.py"
+  ],
+  "all_affected_files_byte_identical_to_baseline": true,
+  "new_findings_in_changed_sources": 0,
+  "changed_sources_ruff_exit_code": 0
+}

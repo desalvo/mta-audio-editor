@@ -1,0 +1,21 @@
+{
+  "base_t5": "Reviewed MT3-Infer d8cbd287470291dee335f84315c5a9b9ff6e6c8a modern T5 compatibility file",
+  "memory_models": "Original MR-MT3 826ea84a933f93cd707d11e91af711f1d19c8d79",
+  "changes": {
+    "t5_segmem.py": {
+      "original_sha256": "3e334d5dd7c3144f2bc72d44a5b8da81e7a33d7e28ca2612e4ffe0d2958767c7",
+      "compat_sha256": "a2c5c06240b9c15aff1c5c1fe2fbe04e1f9b1ae8ed57228e531bee5d07a7b115",
+      "change": "Move checkpoint import to torch.utils.checkpoint, no model/math change"
+    },
+    "t5_segmem_v2.py": {
+      "original_sha256": "69535b8b74c0d463780eddac321863cc9d2a5e44c1ee9293a50e83425acdc259",
+      "compat_sha256": "6e017804153fd20ac50b1a5b05f330e7384112dcd325850c49a4d3de542249f7",
+      "change": "Move checkpoint import to torch.utils.checkpoint, no model/math change"
+    },
+    "t5_segmem_v2_with_prev.py": {
+      "original_sha256": "d0385dc5f63e166e4ea855d374c31576ebb8488daa4b91e273fed7a71e56f44a",
+      "compat_sha256": "4262e7b2e52b1ed1529dd855b8e9c9af8bd73dcb5b325369e867b02ae9614337",
+      "change": "Move checkpoint import to torch.utils.checkpoint, no model/math change"
+    }
+  }
+}

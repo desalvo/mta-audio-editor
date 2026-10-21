@@ -1,0 +1,12 @@
+{
+  "source_rate": 44100,
+  "source_peak": 0.9620361328125,
+  "resampled_rate": 48000,
+  "resampled_frames": 143778,
+  "resampled_peak": 0.9800027012825012,
+  "mta_pcm_guard_passed": true,
+  "quality_certified": false,
+  "upstream_vocoder_output_clamp_unchanged": true,
+  "linear_export_gain": 0.9620346063197609,
+  "peak_ceiling_tolerance": "PCM quantization adds a few units in the last decimal places"
+}

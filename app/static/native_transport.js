@@ -17,7 +17,7 @@ async function poll(token){
  try{const s=await(await bridge()).transport_control('status',0);if(token!==epoch||serial!==commandSerial||pendingControls)return;if(s.preparing)return;if(!s.active||s.failed)throw Error(s.error||tr('Native output stopped unexpectedly. Check the system audio device.','Uscita nativa interrotta. Verificare il dispositivo audio di sistema.'));paint(s);if(s.ended)window.stopPlayback()}
  catch(e){if(token===epoch&&serial===commandSerial){window.stopPlayback();toast(e.message)}}finally{busy=false}
 }
-window.previewMaster=async function(){
+window.previewMaster=async function(options){
  if(!enabled())return old.previewMaster();if(!current?.tracks?.length)return;
  const cursor=playCursorMs,positionRevision=transportPositionRevision,pid=current.id;if(active)window.stopPlayback();else old.stopPlayback();const token=++epoch;setRenderPlaybackPreparing(true);let progressTimer=null;
  const preparation={},started=performance.now();
@@ -25,14 +25,14 @@ window.previewMaster=async function(){
   if(b.transport_preparation_status)progressTimer=setInterval(async()=>{try{const p=await b.transport_preparation_status();if(token!==epoch)return;const phases={loading:tr('Loading project','Caricamento progetto'),sources:tr('Checking sources / converting incompatible formats','Verifica sorgenti / conversione formati incompatibili'),graph:tr('Starting live DSP and inserts','Avvio DSP live e insert'),mix:tr('Rendering fallback mix','Rendering mix di compatibilità'),ready:tr('Starting output device','Avvio dispositivo di uscita')};MtaPlaybackPrep.showProgress(preparation,tr('Preparing audio','Preparazione audio'),-1,(phases[p.stage]||p.stage)+(p.track?' · '+p.track:''),`${p.done}/${p.total} · ${Math.round((performance.now()-started)/1000)}s`)}catch{}},400);
   const prepared=await queueControl(b=>b.transport_prepare_play(pid,cursor/tempoRatio(),window.mtaMidiOptions?window.mtaMidiOptions():null,false),token);
   if(token!==epoch||current?.id!==pid)return;
-  active=true;paused=false;playbackPaused=false;timelineAudioDirty=false;
+  active=true;paused=options?.start_playing===false;playbackPaused=paused;timelineAudioDirty=false;
   let reply=prepared;
   if(positionRevision!==transportPositionRevision){const position=playCursorMs;reply=await queueControl(b=>b.transport_control('seek',position/tempoRatio()),token)}
   if(token!==epoch)return;if(!paused)reply=await queueControl(b=>b.transport_control('play',0),token);
   if(token!==epoch)return;if(currentReply(reply))paint(reply.s);
-  MtaPlaybackPrep.transportButton?.(paused?'paused':'playing');timer=setInterval(()=>poll(token),80)
+  MtaPlaybackPrep.transportButton?.(paused?'paused':'playing');timer=setInterval(()=>poll(token),80);return {prepared:true,project_id:pid}
 
- }catch(e){if(token===epoch){window.stopPlayback();toast(e.message)}}finally{clearInterval(progressTimer);if(token===epoch)setRenderPlaybackPreparing(false);MtaPlaybackPrep.hideProgress(preparation)}
+ }catch(e){if(token===epoch){window.stopPlayback();toast(e.message)}if(options?.start_playing===false)throw e}finally{clearInterval(progressTimer);if(token===epoch)setRenderPlaybackPreparing(false);MtaPlaybackPrep.hideProgress(preparation)}
 };
 window.stopPlayback=function(){++epoch;clearInterval(timer);clearTimeout(refreshTimer);timer=null;refreshTimer=null;pendingFx=false;const was=active;active=false;paused=false;playbackPaused=false;++commandSerial;if(was||enabled()){stopPromise=controls.catch(()=>{}).then(async()=>{const b=await bridge();const r=await b.transport_control('stop',0);if(current?.id===r.project_id){for(const item of r.states||[]){const list=item.route==='master'?current.master_inserts:trackById(item.route)?.inserts;const insert=item.insert==='instrument'?trackById(item.route)?.instrument:list?.find(i=>i.id===item.insert);if(insert?.params?.path===item.params.path)insert.params=item.params}}}).catch(e=>console.warn(e.message));controls=stopPromise}const result=old.stopPlayback();setRenderPlaybackPreparing(false);MtaPlaybackPrep.transportButton?.('stopped');return result};
 async function playbackCommand(action){
@@ -50,7 +50,7 @@ window.goToTimestamp=function(ms){
  return queueControl(b=>b.transport_control('seek',target/tempoRatio()),token).then(reply=>{if(currentReply(reply))paint(reply.s)}).catch(e=>{if(token===epoch){window.stopPlayback();toast(e.message)}})
 };
 window.seekTransport=function(delta){return active?window.goToTimestamp(playCursorMs+delta):old.seekTransport(delta)};
-window.goTransportStart=function(){return active?window.goToTimestamp(0):old.goTransportStart()};
+window.goTransportStart=function(){return active?window.goToTimestamp(Math.max(0,MtaMusicalClock.origin(current||{}))):old.goTransportStart()};
 let liveUpdating=false,liveAgain=false,pendingFx=false;
 async function updateLive(){if(!active)return;if(liveUpdating){liveAgain=true;return}liveUpdating=true;const token=epoch,pid=current?.id;try{const fx=pendingFx;pendingFx=false;if(fx){collect();await persistCurrentProject(false)}if(token!==epoch)return;const b=await bridge();const r=fx?await b.transport_update_live(pid):await b.transport_update_live(pid,MtaPlaybackPrep.mixerControls(current));if(token!==epoch)return;if(r.requires_prepare){if(!paused)await window.previewMaster()}else timelineAudioDirty=false}catch(e){if(token===epoch)toast(e.message)}finally{liveUpdating=false;if(liveAgain){liveAgain=false;void updateLive()}}}
 function refresh(timing){if(!active)return;if(timing||pendingFx)timelineAudioDirty=true;if(timing){clearTimeout(refreshTimer);refreshTimer=null;if(paused)return}if(!refreshTimer)refreshTimer=setTimeout(()=>{refreshTimer=null;void(timing?window.previewMaster():updateLive())},40)}

@@ -1,0 +1,147 @@
+{
+  "protocol": "mta-music-1",
+  "parts": [
+    {
+      "id": "memory-0",
+      "name": "MR-MT3 memory 33",
+      "instrument": "gm-33",
+      "program": 33,
+      "percussion": false,
+      "notes": [
+        {
+          "id": "n-0-0",
+          "start_ms": 40.0,
+          "duration_ms": 2008.0,
+          "pitch": 54,
+          "velocity": 127,
+          "channel": 0,
+          "origin": "predicted",
+          "source_model": "mr-mt3-memory-d477dfb1",
+          "confidence": null,
+          "confidence_metric": ""
+        }
+      ],
+      "controls": [],
+      "source_model": "mr-mt3-memory-d477dfb1",
+      "source_result_id": "",
+      "review": "unreviewed"
+    },
+    {
+      "id": "memory-1",
+      "name": "MR-MT3 memory 80",
+      "instrument": "gm-80",
+      "program": 80,
+      "percussion": false,
+      "notes": [
+        {
+          "id": "n-1-0",
+          "start_ms": 40.0,
+          "duration_ms": 2388.0,
+          "pitch": 54,
+          "velocity": 127,
+          "channel": 1,
+          "origin": "predicted",
+          "source_model": "mr-mt3-memory-d477dfb1",
+          "confidence": null,
+          "confidence_metric": ""
+        },
+        {
+          "id": "n-1-1",
+          "start_ms": 40.0,
+          "duration_ms": 2388.0,
+          "pitch": 63,
+          "velocity": 127,
+          "channel": 1,
+          "origin": "predicted",
+          "source_model": "mr-mt3-memory-d477dfb1",
+          "confidence": null,
+          "confidence_metric": ""
+        }
+      ],
+      "controls": [],
+      "source_model": "mr-mt3-memory-d477dfb1",
+      "source_result_id": "",
+      "review": "unreviewed"
+    },
+    {
+      "id": "memory-2",
+      "name": "MR-MT3 memory 88",
+      "instrument": "gm-88",
+      "program": 88,
+      "percussion": false,
+      "notes": [
+        {
+          "id": "n-2-0",
+          "start_ms": 40.0,
+          "duration_ms": 10.000000000000002,
+          "pitch": 63,
+          "velocity": 127,
+          "channel": 2,
+          "origin": "predicted",
+          "source_model": "mr-mt3-memory-d477dfb1",
+          "confidence": null,
+          "confidence_metric": ""
+        }
+      ],
+      "controls": [],
+      "source_model": "mr-mt3-memory-d477dfb1",
+      "source_result_id": "",
+      "review": "unreviewed"
+    },
+    {
+      "id": "memory-3",
+      "name": "MR-MT3 memory Drums",
+      "instrument": "drums",
+      "program": null,
+      "percussion": true,
+      "notes": [
+        {
+          "id": "n-3-0",
+          "start_ms": 40.0,
+          "duration_ms": 10.000000000000002,
+          "pitch": 69,
+          "velocity": 127,
+          "channel": 9,
+          "origin": "predicted",
+          "source_model": "mr-mt3-memory-d477dfb1",
+          "confidence": null,
+          "confidence_metric": ""
+        },
+        {
+          "id": "n-3-1",
+          "start_ms": 40.0,
+          "duration_ms": 10.000000000000002,
+          "pitch": 51,
+          "velocity": 127,
+          "channel": 9,
+          "origin": "predicted",
+          "source_model": "mr-mt3-memory-d477dfb1",
+          "confidence": null,
+          "confidence_metric": ""
+        },
+        {
+          "id": "n-3-2",
+          "start_ms": 480.0,
+          "duration_ms": 10.000000000000009,
+          "pitch": 51,
+          "velocity": 127,
+          "channel": 9,
+          "origin": "predicted",
+          "source_model": "mr-mt3-memory-d477dfb1",
+          "confidence": null,
+          "confidence_metric": ""
+        }
+      ],
+      "controls": [],
+      "source_model": "mr-mt3-memory-d477dfb1",
+      "source_result_id": "",
+      "review": "unreviewed"
+    }
+  ],
+  "alternatives": [],
+  "offset_ms": 0.0,
+  "warnings": [
+    "Isolated actual memory-model CPU research inference; not a production-installed model or a quality certificate.",
+    "One velocity bin; velocity 127 is generated from nonzero velocity events, not estimated playing dynamics."
+  ]
+}

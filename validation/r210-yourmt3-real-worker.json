@@ -1,0 +1,62 @@
+{
+  "protocol": "mta-music-1",
+  "parts": [
+    {
+      "id": "part-0",
+      "name": "GM 1",
+      "instrument": "gm-0",
+      "program": 0,
+      "percussion": false,
+      "notes": [
+        {
+          "id": "ym-0",
+          "start_ms": 0.0,
+          "duration_ms": 700.0,
+          "pitch": 60,
+          "velocity": 96,
+          "channel": 0,
+          "origin": "predicted",
+          "source_model": "yourmt3-nops-5e66c1e",
+          "confidence": null,
+          "confidence_metric": ""
+        },
+        {
+          "id": "ym-1",
+          "start_ms": 1000.0,
+          "duration_ms": 700.0,
+          "pitch": 64,
+          "velocity": 96,
+          "channel": 0,
+          "origin": "predicted",
+          "source_model": "yourmt3-nops-5e66c1e",
+          "confidence": null,
+          "confidence_metric": ""
+        },
+        {
+          "id": "ym-2",
+          "start_ms": 2000.0,
+          "duration_ms": 700.0000000000002,
+          "pitch": 67,
+          "velocity": 96,
+          "channel": 0,
+          "origin": "predicted",
+          "source_model": "yourmt3-nops-5e66c1e",
+          "confidence": null,
+          "confidence_metric": ""
+        }
+      ],
+      "controls": [],
+      "source_model": "yourmt3-nops-5e66c1e",
+      "source_result_id": "",
+      "review": "unreviewed"
+    }
+  ],
+  "alternatives": [],
+  "offset_ms": 0.0,
+  "warnings": [
+    "Instrument labels, pitch and timing are model predictions and require review.",
+    "Velocity 96 is generated; this model checkpoint does not estimate playing dynamics.",
+    "Calibrated confidence, pitch bend, controllers and independent players of the same instrument are unavailable.",
+    "CPU verified on a short piano fixture only; broad mixed-instrument accuracy and ROCm/CUDA are not certified."
+  ]
+}

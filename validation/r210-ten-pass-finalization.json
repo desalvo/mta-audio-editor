@@ -1,0 +1,19 @@
+{
+  "version": "0.3.0-r210",
+  "internal_passes": 10,
+  "focused": {
+    "passed": 64,
+    "failed": 0,
+    "skipped": 0
+  },
+  "cross_area": {
+    "passed": 214,
+    "failed": 0,
+    "skipped": 14
+  },
+  "scope": "offline selected tests, not full repository",
+  "neural_inference_executed": false,
+  "all_macroareas_certified": false,
+  "server_modified": false,
+  "git_operations": false
+}

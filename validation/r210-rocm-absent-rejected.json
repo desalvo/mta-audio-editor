@@ -1,0 +1,31 @@
+{
+  "schema": "mta-hardware-acceptance-1",
+  "version": "0.3.0-r210",
+  "system": "Linux",
+  "machine": "x86_64",
+  "kernel": "6.18.55",
+  "container": "docker",
+  "checks": {
+    "drm_fdinfo": {
+      "available": false,
+      "verified": false,
+      "note": "Empty fdinfo does not establish GPU inactivity or driver incompatibility."
+    },
+    "audio_inventory": {
+      "available": false,
+      "verified": false,
+      "error": "ModuleNotFoundError: No module named 'sounddevice'"
+    },
+    "rocm_compute": {
+      "verified": false,
+      "status": "failed",
+      "error": "This interpreter has no available ROCm GPU; use the installed engine ROCm interpreter"
+    },
+    "physical_audio": {
+      "verified": false,
+      "status": "not_run"
+    }
+  },
+  "certified": false,
+  "physical_tests_run": true
+}

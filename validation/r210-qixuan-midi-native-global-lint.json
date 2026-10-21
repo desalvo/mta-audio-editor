@@ -1,0 +1,1147 @@
+[
+  {
+    "cell": null,
+    "code": "S101",
+    "end_location": {
+      "column": 7,
+      "row": 5
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/patch_stem.py",
+    "fix": null,
+    "location": {
+      "column": 1,
+      "row": 5
+    },
+    "message": "Use of `assert` detected",
+    "name": "assert",
+    "noqa_row": 5,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/assert"
+  },
+  {
+    "cell": null,
+    "code": "S101",
+    "end_location": {
+      "column": 7,
+      "row": 112
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/patch_stem.py",
+    "fix": null,
+    "location": {
+      "column": 1,
+      "row": 112
+    },
+    "message": "Use of `assert` detected",
+    "name": "assert",
+    "noqa_row": 112,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/assert"
+  },
+  {
+    "cell": null,
+    "code": "F401",
+    "end_location": {
+      "column": 15,
+      "row": 10
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/scripts/installed_diagnostics_r208.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "",
+          "end_location": {
+            "column": 1,
+            "row": 11
+          },
+          "location": {
+            "column": 1,
+            "row": 10
+          }
+        }
+      ],
+      "message": "Remove unused import: `hashlib`"
+    },
+    "location": {
+      "column": 8,
+      "row": 10
+    },
+    "message": "`hashlib` imported but unused",
+    "name": "unused-import",
+    "noqa_row": 10,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/unused-import"
+  },
+  {
+    "cell": null,
+    "code": "S310",
+    "end_location": {
+      "column": 139,
+      "row": 123
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/scripts/installed_diagnostics_r208.py",
+    "fix": null,
+    "location": {
+      "column": 17,
+      "row": 123
+    },
+    "message": "Audit URL open for permitted schemes. Allowing use of `file:` or custom schemes is often unexpected.",
+    "name": "suspicious-url-open-usage",
+    "noqa_row": 123,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/suspicious-url-open-usage"
+  },
+  {
+    "cell": null,
+    "code": "S310",
+    "end_location": {
+      "column": 40,
+      "row": 124
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/scripts/installed_diagnostics_r208.py",
+    "fix": null,
+    "location": {
+      "column": 18,
+      "row": 124
+    },
+    "message": "Audit URL open for permitted schemes. Allowing use of `file:` or custom schemes is often unexpected.",
+    "name": "suspicious-url-open-usage",
+    "noqa_row": 124,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/suspicious-url-open-usage"
+  },
+  {
+    "cell": null,
+    "code": "F401",
+    "end_location": {
+      "column": 15,
+      "row": 6
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/scripts/mta_billing_isolated_validation.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "",
+          "end_location": {
+            "column": 1,
+            "row": 7
+          },
+          "location": {
+            "column": 1,
+            "row": 6
+          }
+        }
+      ],
+      "message": "Remove unused import: `sqlite3`"
+    },
+    "location": {
+      "column": 8,
+      "row": 6
+    },
+    "message": "`sqlite3` imported but unused",
+    "name": "unused-import",
+    "noqa_row": 6,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/unused-import"
+  },
+  {
+    "cell": null,
+    "code": "S101",
+    "end_location": {
+      "column": 15,
+      "row": 37
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/scripts/mta_billing_isolated_validation.py",
+    "fix": null,
+    "location": {
+      "column": 9,
+      "row": 37
+    },
+    "message": "Use of `assert` detected",
+    "name": "assert",
+    "noqa_row": 37,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/assert"
+  },
+  {
+    "cell": null,
+    "code": "S101",
+    "end_location": {
+      "column": 15,
+      "row": 38
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/scripts/mta_billing_isolated_validation.py",
+    "fix": null,
+    "location": {
+      "column": 9,
+      "row": 38
+    },
+    "message": "Use of `assert` detected",
+    "name": "assert",
+    "noqa_row": 38,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/assert"
+  },
+  {
+    "cell": null,
+    "code": "S101",
+    "end_location": {
+      "column": 15,
+      "row": 41
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/scripts/mta_billing_isolated_validation.py",
+    "fix": null,
+    "location": {
+      "column": 9,
+      "row": 41
+    },
+    "message": "Use of `assert` detected",
+    "name": "assert",
+    "noqa_row": 41,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/assert"
+  },
+  {
+    "cell": null,
+    "code": "S101",
+    "end_location": {
+      "column": 15,
+      "row": 42
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/scripts/mta_billing_isolated_validation.py",
+    "fix": null,
+    "location": {
+      "column": 9,
+      "row": 42
+    },
+    "message": "Use of `assert` detected",
+    "name": "assert",
+    "noqa_row": 42,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/assert"
+  },
+  {
+    "cell": null,
+    "code": "S101",
+    "end_location": {
+      "column": 15,
+      "row": 44
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/scripts/mta_billing_isolated_validation.py",
+    "fix": null,
+    "location": {
+      "column": 9,
+      "row": 44
+    },
+    "message": "Use of `assert` detected",
+    "name": "assert",
+    "noqa_row": 44,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/assert"
+  },
+  {
+    "cell": null,
+    "code": "S101",
+    "end_location": {
+      "column": 15,
+      "row": 43
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/scripts/mta_billing_recovery_isolated_validation.py",
+    "fix": null,
+    "location": {
+      "column": 9,
+      "row": 43
+    },
+    "message": "Use of `assert` detected",
+    "name": "assert",
+    "noqa_row": 43,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/assert"
+  },
+  {
+    "cell": null,
+    "code": "S101",
+    "end_location": {
+      "column": 15,
+      "row": 44
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/scripts/mta_billing_recovery_isolated_validation.py",
+    "fix": null,
+    "location": {
+      "column": 9,
+      "row": 44
+    },
+    "message": "Use of `assert` detected",
+    "name": "assert",
+    "noqa_row": 44,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/assert"
+  },
+  {
+    "cell": null,
+    "code": "S101",
+    "end_location": {
+      "column": 15,
+      "row": 45
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/scripts/mta_billing_recovery_isolated_validation.py",
+    "fix": null,
+    "location": {
+      "column": 9,
+      "row": 45
+    },
+    "message": "Use of `assert` detected",
+    "name": "assert",
+    "noqa_row": 45,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/assert"
+  },
+  {
+    "cell": null,
+    "code": "S101",
+    "end_location": {
+      "column": 15,
+      "row": 47
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/scripts/mta_billing_recovery_isolated_validation.py",
+    "fix": null,
+    "location": {
+      "column": 9,
+      "row": 47
+    },
+    "message": "Use of `assert` detected",
+    "name": "assert",
+    "noqa_row": 47,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/assert"
+  },
+  {
+    "cell": null,
+    "code": "S101",
+    "end_location": {
+      "column": 15,
+      "row": 49
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/scripts/mta_billing_recovery_isolated_validation.py",
+    "fix": null,
+    "location": {
+      "column": 9,
+      "row": 49
+    },
+    "message": "Use of `assert` detected",
+    "name": "assert",
+    "noqa_row": 49,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/assert"
+  },
+  {
+    "cell": null,
+    "code": "S101",
+    "end_location": {
+      "column": 15,
+      "row": 50
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/scripts/mta_billing_recovery_isolated_validation.py",
+    "fix": null,
+    "location": {
+      "column": 9,
+      "row": 50
+    },
+    "message": "Use of `assert` detected",
+    "name": "assert",
+    "noqa_row": 50,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/assert"
+  },
+  {
+    "cell": null,
+    "code": "S101",
+    "end_location": {
+      "column": 15,
+      "row": 51
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/scripts/mta_billing_recovery_isolated_validation.py",
+    "fix": null,
+    "location": {
+      "column": 9,
+      "row": 51
+    },
+    "message": "Use of `assert` detected",
+    "name": "assert",
+    "noqa_row": 51,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/assert"
+  },
+  {
+    "cell": null,
+    "code": "S101",
+    "end_location": {
+      "column": 15,
+      "row": 52
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/scripts/mta_billing_recovery_isolated_validation.py",
+    "fix": null,
+    "location": {
+      "column": 9,
+      "row": 52
+    },
+    "message": "Use of `assert` detected",
+    "name": "assert",
+    "noqa_row": 52,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/assert"
+  },
+  {
+    "cell": null,
+    "code": "S101",
+    "end_location": {
+      "column": 15,
+      "row": 53
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/scripts/mta_billing_recovery_isolated_validation.py",
+    "fix": null,
+    "location": {
+      "column": 9,
+      "row": 53
+    },
+    "message": "Use of `assert` detected",
+    "name": "assert",
+    "noqa_row": 53,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/assert"
+  },
+  {
+    "cell": null,
+    "code": "S101",
+    "end_location": {
+      "column": 15,
+      "row": 55
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/scripts/mta_billing_recovery_isolated_validation.py",
+    "fix": null,
+    "location": {
+      "column": 9,
+      "row": 55
+    },
+    "message": "Use of `assert` detected",
+    "name": "assert",
+    "noqa_row": 55,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/assert"
+  },
+  {
+    "cell": null,
+    "code": "S101",
+    "end_location": {
+      "column": 15,
+      "row": 61
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/scripts/mta_billing_recovery_isolated_validation.py",
+    "fix": null,
+    "location": {
+      "column": 9,
+      "row": 61
+    },
+    "message": "Use of `assert` detected",
+    "name": "assert",
+    "noqa_row": 61,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/assert"
+  },
+  {
+    "cell": null,
+    "code": "S101",
+    "end_location": {
+      "column": 15,
+      "row": 64
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/scripts/mta_billing_recovery_isolated_validation.py",
+    "fix": null,
+    "location": {
+      "column": 9,
+      "row": 64
+    },
+    "message": "Use of `assert` detected",
+    "name": "assert",
+    "noqa_row": 64,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/assert"
+  },
+  {
+    "cell": null,
+    "code": "F401",
+    "end_location": {
+      "column": 11,
+      "row": 12
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/scripts/mta_gpu_agent_ct_diagnostic.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "",
+          "end_location": {
+            "column": 1,
+            "row": 13
+          },
+          "location": {
+            "column": 1,
+            "row": 12
+          }
+        }
+      ],
+      "message": "Remove unused import: `pwd`"
+    },
+    "location": {
+      "column": 8,
+      "row": 12
+    },
+    "message": "`pwd` imported but unused",
+    "name": "unused-import",
+    "noqa_row": 12,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/unused-import"
+  },
+  {
+    "cell": null,
+    "code": "F841",
+    "end_location": {
+      "column": 17,
+      "row": 26
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/scripts/render_gm_midi.py",
+    "fix": {
+      "applicability": "unsafe",
+      "edits": [
+        {
+          "content": "_ticks",
+          "end_location": {
+            "column": 17,
+            "row": 26
+          },
+          "location": {
+            "column": 12,
+            "row": 26
+          }
+        }
+      ],
+      "message": "Remove assignment to unused variable `ticks`"
+    },
+    "location": {
+      "column": 12,
+      "row": 26
+    },
+    "message": "Local variable `ticks` is assigned to but never used",
+    "name": "unused-variable",
+    "noqa_row": 26,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/unused-variable"
+  },
+  {
+    "cell": null,
+    "code": "S314",
+    "end_location": {
+      "column": 32,
+      "row": 49
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/scripts/repositories/publish_pages_rpm_indexes.py",
+    "fix": null,
+    "location": {
+      "column": 16,
+      "row": 49
+    },
+    "message": "Using `xml` to parse untrusted data is known to be vulnerable to XML attacks; use `defusedxml` equivalents",
+    "name": "suspicious-xml-element-tree-usage",
+    "noqa_row": 49,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/suspicious-xml-element-tree-usage"
+  },
+  {
+    "cell": null,
+    "code": "S314",
+    "end_location": {
+      "column": 43,
+      "row": 69
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/scripts/repositories/publish_pages_rpm_indexes.py",
+    "fix": null,
+    "location": {
+      "column": 27,
+      "row": 69
+    },
+    "message": "Using `xml` to parse untrusted data is known to be vulnerable to XML attacks; use `defusedxml` equivalents",
+    "name": "suspicious-xml-element-tree-usage",
+    "noqa_row": 69,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/suspicious-xml-element-tree-usage"
+  },
+  {
+    "cell": null,
+    "code": "S314",
+    "end_location": {
+      "column": 45,
+      "row": 71
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/scripts/repositories/publish_pages_rpm_indexes.py",
+    "fix": null,
+    "location": {
+      "column": 23,
+      "row": 71
+    },
+    "message": "Using `xml` to parse untrusted data is known to be vulnerable to XML attacks; use `defusedxml` equivalents",
+    "name": "suspicious-xml-element-tree-usage",
+    "noqa_row": 71,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/suspicious-xml-element-tree-usage"
+  },
+  {
+    "cell": null,
+    "code": "F401",
+    "end_location": {
+      "column": 15,
+      "row": 9
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/scripts/repositories/r2_publish.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "",
+          "end_location": {
+            "column": 1,
+            "row": 10
+          },
+          "location": {
+            "column": 1,
+            "row": 9
+          }
+        }
+      ],
+      "message": "Remove unused import: `hashlib`"
+    },
+    "location": {
+      "column": 8,
+      "row": 9
+    },
+    "message": "`hashlib` imported but unused",
+    "name": "unused-import",
+    "noqa_row": 9,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/unused-import"
+  },
+  {
+    "cell": null,
+    "code": "S310",
+    "end_location": {
+      "column": 6,
+      "row": 28
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/scripts/repositories/verify_public_pages.py",
+    "fix": null,
+    "location": {
+      "column": 15,
+      "row": 25
+    },
+    "message": "Audit URL open for permitted schemes. Allowing use of `file:` or custom schemes is often unexpected.",
+    "name": "suspicious-url-open-usage",
+    "noqa_row": 25,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/suspicious-url-open-usage"
+  },
+  {
+    "cell": null,
+    "code": "S310",
+    "end_location": {
+      "column": 43,
+      "row": 29
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/scripts/repositories/verify_public_pages.py",
+    "fix": null,
+    "location": {
+      "column": 10,
+      "row": 29
+    },
+    "message": "Audit URL open for permitted schemes. Allowing use of `file:` or custom schemes is often unexpected.",
+    "name": "suspicious-url-open-usage",
+    "noqa_row": 29,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/suspicious-url-open-usage"
+  },
+  {
+    "cell": null,
+    "code": "S314",
+    "end_location": {
+      "column": 34,
+      "row": 73
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/scripts/run_global_regression_shard.py",
+    "fix": null,
+    "location": {
+      "column": 19,
+      "row": 73
+    },
+    "message": "Using `xml` to parse untrusted data is known to be vulnerable to XML attacks; use `defusedxml` equivalents",
+    "name": "suspicious-xml-element-tree-usage",
+    "noqa_row": 73,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/suspicious-xml-element-tree-usage"
+  },
+  {
+    "cell": null,
+    "code": "S101",
+    "end_location": {
+      "column": 19,
+      "row": 27
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/scripts/server_packages/verify_native_installers.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 27
+    },
+    "message": "Use of `assert` detected",
+    "name": "assert",
+    "noqa_row": 27,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/assert"
+  },
+  {
+    "cell": null,
+    "code": "F401",
+    "end_location": {
+      "column": 10,
+      "row": 14
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/scripts/unattended_certification_r208.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "",
+          "end_location": {
+            "column": 1,
+            "row": 15
+          },
+          "location": {
+            "column": 1,
+            "row": 14
+          }
+        }
+      ],
+      "message": "Remove unused import: `os`"
+    },
+    "location": {
+      "column": 8,
+      "row": 14
+    },
+    "message": "`os` imported but unused",
+    "name": "unused-import",
+    "noqa_row": 14,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/unused-import"
+  },
+  {
+    "cell": null,
+    "code": "F401",
+    "end_location": {
+      "column": 14,
+      "row": 17
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/scripts/unattended_certification_r208.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "",
+          "end_location": {
+            "column": 1,
+            "row": 18
+          },
+          "location": {
+            "column": 1,
+            "row": 17
+          }
+        }
+      ],
+      "message": "Remove unused import: `shutil`"
+    },
+    "location": {
+      "column": 8,
+      "row": 17
+    },
+    "message": "`shutil` imported but unused",
+    "name": "unused-import",
+    "noqa_row": 17,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/unused-import"
+  },
+  {
+    "cell": null,
+    "code": "F401",
+    "end_location": {
+      "column": 12,
+      "row": 1
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/tests/test_r210_gm_event_validation.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "",
+          "end_location": {
+            "column": 1,
+            "row": 2
+          },
+          "location": {
+            "column": 1,
+            "row": 1
+          }
+        }
+      ],
+      "message": "Remove unused import: `math`"
+    },
+    "location": {
+      "column": 8,
+      "row": 1
+    },
+    "message": "`math` imported but unused",
+    "name": "unused-import",
+    "noqa_row": 1,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/unused-import"
+  },
+  {
+    "cell": null,
+    "code": "S108",
+    "end_location": {
+      "column": 69,
+      "row": 9
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/tests/test_r210_mega53_drum_parts.py",
+    "fix": null,
+    "location": {
+      "column": 54,
+      "row": 9
+    },
+    "message": "Probable insecure usage of temporary file or directory: \"/tmp/kick.wav\"",
+    "name": "hardcoded-temp-file",
+    "noqa_row": 9,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/hardcoded-temp-file"
+  },
+  {
+    "cell": null,
+    "code": "S108",
+    "end_location": {
+      "column": 47,
+      "row": 10
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/tests/test_r210_mega53_drum_parts.py",
+    "fix": null,
+    "location": {
+      "column": 30,
+      "row": 10
+    },
+    "message": "Probable insecure usage of temporary file or directory: \"/tmp/source.wav\"",
+    "name": "hardcoded-temp-file",
+    "noqa_row": 10,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/hardcoded-temp-file"
+  },
+  {
+    "cell": null,
+    "code": "S108",
+    "end_location": {
+      "column": 62,
+      "row": 10
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/tests/test_r210_mega53_drum_parts.py",
+    "fix": null,
+    "location": {
+      "column": 49,
+      "row": 10
+    },
+    "message": "Probable insecure usage of temporary file or directory: \"/tmp/output\"",
+    "name": "hardcoded-temp-file",
+    "noqa_row": 10,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/hardcoded-temp-file"
+  },
+  {
+    "cell": null,
+    "code": "S108",
+    "end_location": {
+      "column": 98,
+      "row": 10
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/tests/test_r210_mega53_drum_parts.py",
+    "fix": null,
+    "location": {
+      "column": 83,
+      "row": 10
+    },
+    "message": "Probable insecure usage of temporary file or directory: \"/tmp/kick.wav\"",
+    "name": "hardcoded-temp-file",
+    "noqa_row": 10,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/hardcoded-temp-file"
+  },
+  {
+    "cell": null,
+    "code": "S108",
+    "end_location": {
+      "column": 55,
+      "row": 6
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/tests/test_r210_mega53_drums_percussion_groups.py",
+    "fix": null,
+    "location": {
+      "column": 19,
+      "row": 6
+    },
+    "message": "Probable insecure usage of temporary file or directory: \"/tmp/drums_without_percussions.wav\"",
+    "name": "hardcoded-temp-file",
+    "noqa_row": 6,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/hardcoded-temp-file"
+  },
+  {
+    "cell": null,
+    "code": "S108",
+    "end_location": {
+      "column": 85,
+      "row": 6
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/tests/test_r210_mega53_drums_percussion_groups.py",
+    "fix": null,
+    "location": {
+      "column": 63,
+      "row": 6
+    },
+    "message": "Probable insecure usage of temporary file or directory: \"/tmp/percussions.wav\"",
+    "name": "hardcoded-temp-file",
+    "noqa_row": 6,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/hardcoded-temp-file"
+  },
+  {
+    "cell": null,
+    "code": "S108",
+    "end_location": {
+      "column": 67,
+      "row": 8
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/tests/test_r210_mega53_drums_percussion_groups.py",
+    "fix": null,
+    "location": {
+      "column": 44,
+      "row": 8
+    },
+    "message": "Probable insecure usage of temporary file or directory: \"/tmp/original_mix.wav\"",
+    "name": "hardcoded-temp-file",
+    "noqa_row": 8,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/hardcoded-temp-file"
+  },
+  {
+    "cell": null,
+    "code": "S108",
+    "end_location": {
+      "column": 82,
+      "row": 8
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/tests/test_r210_mega53_drums_percussion_groups.py",
+    "fix": null,
+    "location": {
+      "column": 69,
+      "row": 8
+    },
+    "message": "Probable insecure usage of temporary file or directory: \"/tmp/output\"",
+    "name": "hardcoded-temp-file",
+    "noqa_row": 8,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/hardcoded-temp-file"
+  },
+  {
+    "cell": null,
+    "code": "S108",
+    "end_location": {
+      "column": 60,
+      "row": 9
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/tests/test_r210_mega53_drums_percussion_groups.py",
+    "fix": null,
+    "location": {
+      "column": 37,
+      "row": 9
+    },
+    "message": "Probable insecure usage of temporary file or directory: \"/tmp/original_mix.wav\"",
+    "name": "hardcoded-temp-file",
+    "noqa_row": 9,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/hardcoded-temp-file"
+  },
+  {
+    "cell": null,
+    "code": "S108",
+    "end_location": {
+      "column": 74,
+      "row": 14
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/tests/test_r210_mega53_drums_percussion_groups.py",
+    "fix": null,
+    "location": {
+      "column": 52,
+      "row": 14
+    },
+    "message": "Probable insecure usage of temporary file or directory: \"/tmp/percussions.wav\"",
+    "name": "hardcoded-temp-file",
+    "noqa_row": 14,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/hardcoded-temp-file"
+  },
+  {
+    "cell": null,
+    "code": "S311",
+    "end_location": {
+      "column": 34,
+      "row": 45
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/tests/test_r210_midi_indexed_matching.py",
+    "fix": null,
+    "location": {
+      "column": 11,
+      "row": 45
+    },
+    "message": "Standard pseudo-random generators are not suitable for cryptographic purposes",
+    "name": "suspicious-non-cryptographic-random-usage",
+    "noqa_row": 45,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/suspicious-non-cryptographic-random-usage"
+  },
+  {
+    "cell": null,
+    "code": "F401",
+    "end_location": {
+      "column": 10,
+      "row": 1
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/tests/test_r210_neural_external_adapter.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "",
+          "end_location": {
+            "column": 1,
+            "row": 2
+          },
+          "location": {
+            "column": 1,
+            "row": 1
+          }
+        }
+      ],
+      "message": "Remove unused import: `os`"
+    },
+    "location": {
+      "column": 8,
+      "row": 1
+    },
+    "message": "`os` imported but unused",
+    "name": "unused-import",
+    "noqa_row": 1,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/unused-import"
+  },
+  {
+    "cell": null,
+    "code": "F401",
+    "end_location": {
+      "column": 25,
+      "row": 2
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/tests/test_r210_neural_external_adapter.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "",
+          "end_location": {
+            "column": 1,
+            "row": 3
+          },
+          "location": {
+            "column": 1,
+            "row": 2
+          }
+        }
+      ],
+      "message": "Remove unused import: `pathlib.Path`"
+    },
+    "location": {
+      "column": 21,
+      "row": 2
+    },
+    "message": "`pathlib.Path` imported but unused",
+    "name": "unused-import",
+    "noqa_row": 2,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/unused-import"
+  },
+  {
+    "cell": null,
+    "code": "F401",
+    "end_location": {
+      "column": 16,
+      "row": 89
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/tests/test_r210_stem_dialog_runtime.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "",
+          "end_location": {
+            "column": 1,
+            "row": 90
+          },
+          "location": {
+            "column": 1,
+            "row": 89
+          }
+        }
+      ],
+      "message": "Remove unused import: `json`"
+    },
+    "location": {
+      "column": 12,
+      "row": 89
+    },
+    "message": "`json` imported but unused",
+    "name": "unused-import",
+    "noqa_row": 89,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/unused-import"
+  },
+  {
+    "cell": null,
+    "code": "S101",
+    "end_location": {
+      "column": 7,
+      "row": 15
+    },
+    "filename": "/workspace/scratch/37b1f5ad4c83/mta_work/validation/r210-mrmt3-memory/probe_memory.py",
+    "fix": null,
+    "location": {
+      "column": 1,
+      "row": 15
+    },
+    "message": "Use of `assert` detected",
+    "name": "assert",
+    "noqa_row": 15,
+    "severity": "error",
+    "url": "https://docs.astral.sh/ruff/rules/assert"
+  }
+]

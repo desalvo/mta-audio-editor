@@ -15,10 +15,11 @@ from app.models import Project,Track,Clip,InsertPlugin
 
 
 @pytest.fixture(scope='module')
-def compiled_core(tmp_path_factory):
-    if not shutil.which('cmake') or not (shutil.which('g++') or shutil.which('clang++') or shutil.which('cl')):pytest.skip('A native C++20 compiler and CMake are required')
-    from scripts.build_audio_core import build
-    return build(Path(__file__).resolve().parents[1],tmp_path_factory.mktemp('cpp-build'))
+def compiled_core(tmp_path_factory, compiled_audio_core_build):
+    # A unique library path retains per-module C++ globals and DLL isolation.
+    target = tmp_path_factory.mktemp('cpp-build') / compiled_audio_core_build.name
+    shutil.copy2(compiled_audio_core_build, target)
+    return target
 
 
 @pytest.fixture

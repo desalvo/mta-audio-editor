@@ -1,0 +1,51 @@
+{
+  "version": "0.3.0-r210",
+  "software_implementation_complete_for_existing_bank": true,
+  "native_it_fr_acoustic_training_claimed": false,
+  "target_listening_certified": false,
+  "actual_g2p_words": 78,
+  "actual_contextual_cases_assertions_passed": true,
+  "actual_parent_to_pinned_runtime_onnx_cases": 12,
+  "diffusion_steps": 32,
+  "wall_seconds": 426.4580101190004,
+  "main_espeak_dependency_absent_during_actual_test": true,
+  "all_waveforms_finite_non_silent": true,
+  "sample_rate": 48000,
+  "channels": 1,
+  "pcm_subtype": "PCM_24",
+  "duration_tolerance_ms": 25,
+  "focused_tests": {
+    "passed": 74,
+    "skipped": 3,
+    "note": "Three optional local-G2P tests skip in main venv; actual isolated G2P and the parent-to-runtime bridge run separately. Focused/general counts overlap."
+  },
+  "readiness_language_probes": [
+    "en",
+    "it",
+    "fr"
+  ],
+  "bundle": {
+    "file": "MTA-Qixuan-2.7.0-IT-EN-FR-context-r210-final-bundle.zip",
+    "bytes": 474466435,
+    "sha256": "9ddc578cc4df3997d9a6725cdfeef6966ff51eeb9ca657d42ec78d22c85ee64f",
+    "full_crc": true,
+    "file_hash_inventory_verified": true,
+    "original_members_byte_identical": 37,
+    "all_previous_members_preserved": true,
+    "engine_evidence_matches_final_sources": true,
+    "distinct_asset_id": "qixuan-2-7-onnx-it-en-fr-context-r210",
+    "enabled": false,
+    "rights_granted": false,
+    "pronunciation_modes": {
+      "en": "native-inventory",
+      "it": "cross-language",
+      "fr": "cross-language"
+    },
+    "contextual_g2p_languages": [
+      "it",
+      "fr"
+    ]
+  },
+  "model_policies_changed": false,
+  "models_auto_enabled": false
+}
