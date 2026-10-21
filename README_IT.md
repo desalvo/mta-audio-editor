@@ -1,3 +1,5 @@
+**Sicurezza CI native (21/10/2026):** `requirements-native.txt` aggiorna `certifi` a `2026.10.19` e `uv` a `0.13.4` per PYSEC-2026-4320/4321; il controllo rigoroso resta attivo. In attesa della prossima CI.
+
 > **2026-10-21 CI maintenance / Manutenzione CI:** Fixed 15 reported Ruff findings in isolated tests (unused imports, mocked path literals and deterministic random input), without suppressing project lint rules. Focused verification: 47 passed. Multi-instrument 10–16 quality remains **unverified and open**, awaiting authorized model weights and labeled representative audio/MIDI.
 
 **Verifica corrente r210, 21 ottobre 2026:** 4,735 casi distinti verificati tra regressione completa e riesame finale dei casi falliti; 98 saltati. Verificati Qixuan IT/FR sulla banca esistente, zoom UI nativo, progetti audio/MIDI, transport/metronomo musicale e quantizzazione. Dodici inferenze CPU Qixuan riuscite; IT/FR restano proiezioni tra lingue. [Resoconto bilingue corrente](docs/R210_QIXUAN_MIDI_NATIVE_IT_EN.md). Restano distinti i collaudi reali/d’ascolto e il precedente obiettivo di accuratezza su 10–16 strumenti. Le verifiche precedenti riportate sotto sono storiche.

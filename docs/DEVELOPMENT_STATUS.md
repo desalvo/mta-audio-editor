@@ -1,3 +1,9 @@
+## 2026-10-21 — Native dependency vulnerability remediation (post-commit)
+
+- **Completed:** updated native requirement pins certifi 2026.7.22 → 2026.10.19 and uv 0.12.23 → 0.13.4 in response to PYSEC-2026-4320 and PYSEC-2026-4321 from CI. Kept `pip-audit --strict` and all dependency coverage.
+- **Verified:** exact pins and offline regression checked; upstream release availability verified. Full dependency `pip-audit` and CI **not yet run successfully in this environment**; next Actions run must confirm no further findings.
+- **Unchanged:** MTA 0.3.0-r210, no commit/tag/deployment. Audio-to-MIDI 10–16 instrument accuracy remains open.
+
 ## 2026-10-21 — CI clock and licenses browser fixes (post-commit cycle)
 
 - **Implemented:** corrected 7/8 VST host-clock test expectation to quarter-note BPM and PPQ; browser test now expands the owning licenses details before its nested madmom card. Production code, global lint and license policy unchanged.
