@@ -1,6 +1,6 @@
 # Isolated DiffSinger exported acoustic/vocoder graphs; CPU recipe.
 numpy==1.26.4
-scipy==1.17.1
+scipy==1.18.1
 onnxruntime==1.31.0
 soundfile==0.14.0
 PyYAML==6.0.3
