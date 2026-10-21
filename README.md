@@ -479,3 +479,6 @@ Added `scripts/audit_paired_midi.py` to inspect real paired audio/MIDI provenanc
 
 ### CI regression note (r210)
 The October 21 quality-job VST host meter expectation and nested licenses browser disclosure test have been corrected; local regression is 26 passed and 5 skipped. Full CI and 10–16 instrument neural accuracy remain open. Details: [bilingual report](docs/R210_CI_CLOCK_LICENSE_BROWSER_FIX_IT_EN.md).
+
+
+CI follow-up (r210): `docs/R210_CI_JOB_119323161900_IT_EN.md` records the corrected browser-test capabilities URL handling and improved MIDI-save response diagnostics. Full GitHub browser regression remains pending.

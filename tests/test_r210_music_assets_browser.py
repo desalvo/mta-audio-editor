@@ -1,6 +1,7 @@
 """Chromium UI regression; backend execution is covered separately with real PCM."""
 import json
 from pathlib import Path
+from urllib.parse import urlsplit, parse_qs
 import pytest
 
 playwright=pytest.importorskip('playwright.sync_api')
@@ -22,7 +23,10 @@ def test_music_assets_consent_policy_and_singing_request(language,native):
         except playwright.Error as exc:pytest.skip('Chromium unavailable: '+str(exc)[:160])
         page=browser.new_page(viewport={'width':800,'height':900});errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
         def serve(route):
-            path=route.request.url.split('https://mta.test',1)[-1]
+            parsed=urlsplit(route.request.url)
+            path=parsed.path
+            if path=='/api/ai/studio/capabilities':
+                assert parse_qs(parsed.query).get('operation')==['vocal-synthesis']
             if path=='/':route.fulfill(content_type='text/html',body='<div id="modal"></div>');return
             requests.append((path,route.request.method,route.request.post_data_json if route.request.method in ('POST','PUT') else None))
             if path==prefix+'/models':result=data

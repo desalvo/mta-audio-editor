@@ -712,3 +712,6 @@ Aggiunto `scripts/audit_paired_midi.py` per verificare provenienza, programmi, n
 
 ### Nota regressioni CI (r210)
 Corretti i test CI della metrica VST3 7/8 e dell’espansione del pannello licenze browser. Regressione locale: 26 superati e 5 saltati; CI completa e accuratezza neurale 10–16 strumenti ancora aperte. Vedi [rapporto bilingue](docs/R210_CI_CLOCK_LICENSE_BROWSER_FIX_IT_EN.md).
+
+
+Aggiornamento CI (r210): `docs/R210_CI_JOB_119323161900_IT_EN.md` descrive la correzione dell'URL del mock browser per le capabilities e la diagnostica dei salvataggi MIDI. Conferma dei test browser GitHub ancora pendente.

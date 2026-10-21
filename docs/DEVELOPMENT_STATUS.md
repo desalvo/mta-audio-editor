@@ -921,3 +921,10 @@ Ten sequential passes: (1) incoming ZIP checksum/CRC; (2) extraction and status 
 - **Verified:** focused subset **64 passed, 0 failed, 0 skipped**; larger cross-area run **214 passed, 0 failed, 14 skipped** (the focused tests are included in the larger selection; do not add totals). Fourteen skips require `espeakng_loader`, reviewed GM assets/compiled core, approved voicebank and Happy DOM. No real neural inference or external network calls were made.
 - **Not complete/certified:** general repository regression, authorized real DiffSinger/Seed-VC/RVC/Transkun inference, genuine 10–16 stem/performer accuracy benchmarks, GM listening and native/browser acceptance. These gates may reveal software fixes, so do not claim that only user testing remains.
 - **Release:** r210 unchanged; no Git, server deployment, release or tag.
+
+## 2026-10-21 — CI job 119323161900 follow-up
+- Confirmed: Ruff and 73.79% coverage passed; 4800 tests passed, 5 failed, 37 skipped in GitHub job.
+- Fixed in test harness: normalized mocked URL path/query for vocal-synthesis capability requests; four 180-second timeout variants should no longer hang on an unhandled query string. Must confirm in GitHub CI.
+- Still open: real MIDI save/browser regression; added HTTP PUT response assertions to expose whether failure occurs server-side or while updating UI. No unverified production fix claimed.
+- Locally verified: 8 MIDI tests passed, 4 skipped; browser test modules compile. Chromium navigation denied by local sandbox.
+- Version 0.3.0-r210 unchanged. No Git operations, no server changes.

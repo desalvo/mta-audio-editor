@@ -108,7 +108,9 @@ def test_real_browser_live_play_pause_seek_parameter_update_and_stop(request,tmp
                     page.locator('#midiInstrument').select_option(label=Path(env['MTA_TEST_VSTI']).stem)
                     page.locator('#midiLoad').click()
                     wait_for('() => document.querySelectorAll("#midiParameters input").length>0',timeout=30)
-                page.locator('#midiSave').click()
+                with page.expect_response(lambda r: '/midi/' in r.url and r.request.method=='PUT') as saved_response:
+                    page.locator('#midiSave').click()
+                assert saved_response.value.status==200, saved_response.value.text()
                 wait_for('() => current.tracks.some(t=>t.kind==="midi"&&t.midi_notes?.some(n=>n.pitch===64&&n.duration_ms===1500))')
                 saved=storage.load_project(project.id);midi_track=saved.tracks[-1]
                 assert midi_track.kind=='midi' and midi_track.midi_notes[0].pitch==64
@@ -122,7 +124,9 @@ def test_real_browser_live_play_pause_seek_parameter_update_and_stop(request,tmp
                 page.evaluate('() => window.testMidiPort.onmidimessage({data:[128,67,0]})')
                 page.locator('#midiInput').click()
                 assert page.evaluate('() => window.testMidiPort.onmidimessage===null')
-                page.locator('#midiSave').click()
+                with page.expect_response(lambda r: '/midi/' in r.url and r.request.method=='PUT') as second_save:
+                    page.locator('#midiSave').click()
+                assert second_save.value.status==200, second_save.value.text()
                 wait_for('() => current.tracks.some(t=>t.kind==="midi"&&t.midi_notes?.length===2)')
                 assert storage.load_project(project.id).tracks[-1].midi_controls[0].data==[176,64,127]
                 page.evaluate('(id) => openMidiEditor(id)',midi_track.id)
