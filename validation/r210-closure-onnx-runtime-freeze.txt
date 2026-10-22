@@ -28,12 +28,12 @@ pretty_midi==0.2.11.post0
 protobuf==7.36.2
 pycparser==3.11
 pydantic==2.12.5
-pydantic_core==2.41.5
+pydantic_core==2.50.1
 PyYAML==6.0.3
 requests==2.34.2
-resampy==0.4.2
+resampy==0.4.3
 scikit-learn==1.9.1
-scipy==1.17.1
+scipy==1.18.1
 setuptools==80.10.2
 six==1.17.0
 soundfile==0.14.0

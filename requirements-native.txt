@@ -1,6 +1,6 @@
 pyinstaller==6.22.3
 pywebview==6.2.1
-truststore==0.10.4
+truststore==0.10.5
 certifi==2026.10.19
 uv==0.13.4
 python-rtmidi>=1.5.8,<2
@@ -9,4 +9,4 @@ python-rtmidi>=1.5.8,<2
 pylibremidi==5.4.3
 
 # PortAudio/ASIO device selection; raw C++ callback, no Python audio callback.
-sounddevice==0.5.5
+sounddevice==0.5.6

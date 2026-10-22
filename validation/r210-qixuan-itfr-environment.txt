@@ -8,9 +8,9 @@ packaging==26.3
 protobuf==7.36.2
 pycparser==3.11
 pydantic==2.12.5
-pydantic_core==2.41.5
+pydantic_core==2.50.1
 PyYAML==6.0.3
-scipy==1.17.1
+scipy==1.18.1
 soundfile==0.14.0
 typing-inspection==0.4.4
 typing_extensions==4.16.0
