@@ -22,6 +22,7 @@ def test_incremental_user_picker_amendment_and_paypal_configuration(width):
             if path=='/':route.fulfill(content_type='text/html',body='<style>'+ (ROOT/'app/static/auth.css').read_text()+(ROOT/'app/static/admin_controls.css').read_text()+(ROOT/'app/static/subscriptions.css').read_text()+'</style><section class="resource-panel" data-resource-admin></section>');return
             if path.startswith('/api/admin/subscription-users?'):
                 data=[{'id':2,'username':'alessandro','email':'alex@example.test','display_name':'Alessandro'}]
+            elif path=='/api/service-regime':data={'regime':'COMMERCIAL'}
             elif path=='/api/admin/subscriptions':data=cfg
             elif path=='/api/admin/subscriptions/users/2':data=state
             elif path=='/api/admin/paypal':

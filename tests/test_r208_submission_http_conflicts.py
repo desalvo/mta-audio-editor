@@ -15,6 +15,7 @@ def test_conflicting_replay_is_http_409(monkeypatch, endpoint, adapter):
     monkeypatch.setattr(main, '_project_for_actor', lambda *args: Project(id='p', title='Replay', target='DAW'))
     monkeypatch.setattr(main, '_actor', lambda *args: {'id': 12})
     monkeypatch.setattr(main, 'configured_worker', lambda: object())
+    monkeypatch.setattr(main, '_ace_execution_available', lambda: True)
     monkeypatch.setattr(main, '_durable_generation_executor', lambda *args: lambda *args: None)
     def reject(*args, **kwargs):
         assert kwargs['defer_spawn'] is True

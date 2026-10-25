@@ -31,3 +31,4 @@ def test_ci_quality_job_has_extended_timeout():
     quality = source.split('  quality:', 1)[1].split('  vst3-sdk-compile:', 1)[0]
     assert 'timeout-minutes: 150' in quality
     assert '--cov-fail-under=70' in quality
+    assert 'scripts/run_quality_tests.py' in quality

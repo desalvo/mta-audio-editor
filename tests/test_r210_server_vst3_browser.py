@@ -103,6 +103,8 @@ def test_real_browser_live_play_pause_seek_parameter_update_and_stop(request,tmp
                 page.locator('#midiNoteFields input[data-key="start_ms"]').dispatch_event('change')
                 page.locator('#midiNoteFields input[data-key="duration_ms"]').fill('1500')
                 page.locator('#midiNoteFields input[data-key="duration_ms"]').dispatch_event('change')
+                draft_notes=page.evaluate('mtaMidiEditor.getDraft().midi_notes')
+                assert any(n['pitch']==64 and n['duration_ms']==1500 for n in draft_notes),draft_notes
                 page.screenshot(path=str(tmp_path/'midi-editor.png'))
                 if env.get('MTA_TEST_VSTI'):
                     page.locator('#midiInstrument').select_option(label=Path(env['MTA_TEST_VSTI']).stem)
@@ -111,6 +113,8 @@ def test_real_browser_live_play_pause_seek_parameter_update_and_stop(request,tmp
                 with page.expect_response(lambda r: '/midi/' in r.url and r.request.method=='PUT') as saved_response:
                     page.locator('#midiSave').click()
                 assert saved_response.value.status==200, saved_response.value.text()
+                saved_notes=[n for t in saved_response.value.json()['tracks'] if t['kind']=='midi' for n in t['midi_notes']]
+                assert any(n['pitch']==64 and n['duration_ms']==1500 for n in saved_notes),saved_notes
                 wait_for('() => current.tracks.some(t=>t.kind==="midi"&&t.midi_notes?.some(n=>n.pitch===64&&n.duration_ms===1500))')
                 saved=storage.load_project(project.id);midi_track=saved.tracks[-1]
                 assert midi_track.kind=='midi' and midi_track.midi_notes[0].pitch==64

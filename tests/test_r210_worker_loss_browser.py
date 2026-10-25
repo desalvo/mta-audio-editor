@@ -57,7 +57,9 @@ def test_explicit_operator_loss_and_private_owner_history(stopped,account,nc_bro
 
 def test_actual_templates_mount_both_operator_and_owner_flows():
     root=Path(__file__).resolve().parents[1]
-    assert '/static/worker_loss_admin.js?v=r210-worker-loss' in (root/'app/templates/admin.html').read_text()
+    from bs4 import BeautifulSoup
+    scripts=BeautifulSoup((root/'app/templates/admin.html').read_text(),'html.parser').find_all('script',src=True)
+    assert any(urlsplit(script['src']).path=='/static/worker_loss_admin.js' for script in scripts)
     assert 'data-worker-loss-history' in (root/'app/templates/account.html').read_text()
     assert '/static/worker_loss_history.js?v=r210-worker-loss' in (root/'app/templates/account.html').read_text()
 
@@ -92,6 +94,11 @@ def test_nc_period_form_cannot_reallocate_operator_losses_without_cost_review(nc
         page.once('dialog',lambda dialog:dialog.accept());form.locator('button').click()
         page.get_by_text('Period cannot be safely closed',exact=False).wait_for()
         with auth.db() as c:assert c.execute('SELECT count(*) FROM nc_period_statements').fetchone()[0]==1
+        # The rejection refreshes and replaces the form. Wait for the new form
+        # before editing it; otherwise refresh can discard the second submit.
+        page.wait_for_function("document.querySelectorAll('[data-nc-close] button:not([disabled])').length===1")
+        form.locator('[name=start]').fill('1970-01-01T00:05');form.locator('[name=end]').fill('1970-01-01T00:08:20')
+        form.locator('[name=cost]').fill('1.00')
         form.locator('[name=excludeLosses]').check();page.once('dialog',lambda dialog:dialog.accept());form.locator('button').click()
         try:
             page.wait_for_function("document.querySelectorAll('[data-nc-statement-csv]').length===2",timeout=5000)

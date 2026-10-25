@@ -48,4 +48,6 @@ def test_operator_confirmation_recovery_and_financial_hold(owned,monkeypatch,nc_
 
 def test_worker_recovery_script_is_mounted_in_actual_admin_template():
     html=(Path(__file__).resolve().parents[1]/'app/templates/admin.html').read_text()
-    assert '/static/worker_recovery_admin.js?v=r210-worker-recovery' in html
+    from bs4 import BeautifulSoup
+    assert any(urlsplit(script['src']).path=='/static/worker_recovery_admin.js'
+               for script in BeautifulSoup(html,'html.parser').find_all('script',src=True))

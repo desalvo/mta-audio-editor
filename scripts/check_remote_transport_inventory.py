@@ -10,6 +10,19 @@ import json
 from pathlib import Path
 
 
+def call_shape(node):
+    """Hash AST fields independently of ast.dump presentation across Python versions."""
+    def value(item):
+        if isinstance(item,ast.AST):
+            return [type(item).__name__,[[key,value(child)] for key,child in ast.iter_fields(item)]]
+        if isinstance(item,list):return [value(child) for child in item]
+        if isinstance(item,bytes):return {'bytes':item.hex()}
+        if isinstance(item,complex):return {'complex':repr(item)}
+        if item is Ellipsis:return {'ellipsis':True}
+        return item
+    return json.dumps(value(node),ensure_ascii=True,separators=(',',':'))
+
+
 def discover(root):
     sites=[]
     for path in sorted((root/'app').rglob('*.py')):
@@ -42,7 +55,7 @@ def discover(root):
                          or (isinstance(node.func,ast.Attribute) and node.func.attr=='open'
                              and (dotted(node.func.value).endswith('build_opener()') or dotted(node.func.value) in openers)))
                 if network:
-                    shape=ast.dump(node,include_attributes=False)
+                    shape=call_shape(node)
                     sites.append({'path':path.relative_to(root).as_posix(),'function':function,'line':node.lineno,
                                   'call':name,'call_sha256':hashlib.sha256(shape.encode()).hexdigest(),
                                   'source_sha256':hashlib.sha256(text.encode()).hexdigest()})

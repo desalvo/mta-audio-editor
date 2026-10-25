@@ -1,0 +1,67 @@
+{
+  "baseline_commit": "2f7f8ead0dd5b331f8c0b142d13ca06e132b9011",
+  "failed_ci_run": 40188363093,
+  "failed_ci_job": 121153872431,
+  "original_ci": {
+    "passed": 6400,
+    "failed": 41,
+    "skipped": 104,
+    "seconds": 1547.55,
+    "coverage_percent": 75.8
+  },
+  "local_initial_unit": {
+    "passed": 6093,
+    "failed": 1,
+    "skipped": 126,
+    "seconds": 603.15,
+    "coverage_percent": 73.71,
+    "failure": "missing cmake executable"
+  },
+  "local_resolution": {
+    "only_failed_case_rerun": true,
+    "passed": 1,
+    "failed": 0
+  },
+  "targeted_checks": {
+    "passed": 43,
+    "overlaps_unit": true,
+    "final_profile_and_golden_hash_checks": 5
+  },
+  "browser_checks": {
+    "affected_cases_passed": 34,
+    "seconds": 39.63,
+    "new_real_page_midi_case_passed": 1
+  },
+  "profile_modules": {
+    "ordinary": 923,
+    "deferred_browser": 32
+  },
+  "previous_ci_case_seconds_by_scope": {
+    "ordinary": 426.216,
+    "browser": 1090.21
+  },
+  "unchanged_coverage_threshold_percent": 70,
+  "ruff": "passed",
+  "compileall_modified_python": "passed",
+  "unverified": [
+    "first new Python3.14 GitHub Quality run",
+    "full live VST3/HTTP/MIDI test with patched native runtime and real test plugin",
+    "prerequisite skips do not establish target acceptance"
+  ],
+  "release_candidate": false,
+  "criteria_complete": 23,
+  "criteria_total": 42,
+  "transition_authorized": false,
+  "remote_mutations": false,
+  "workflow_and_ci_contract_checks": {
+    "passed": 43,
+    "failed": 0,
+    "overlaps_other_checks": true
+  },
+  "publishing_requires_successful_full_validation": true,
+  "full_scope_triggers": [
+    "workflow_dispatch full_validation=true",
+    "release tag",
+    "push message contains [full-ci]"
+  ]
+}

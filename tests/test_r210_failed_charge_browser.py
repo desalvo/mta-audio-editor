@@ -53,7 +53,7 @@ def test_failed_checkout_actual_page_closure_or_preserved_hold(account,monkeypat
             button=page.locator('[data-credit-content]').get_by_role('button',name='Acquista con Stripe' if language=='it' else 'Buy with Stripe').first
             button.wait_for();assert not panel.get_by_role('button',name='Riprendi checkout esistente' if language=='it' else 'Resume existing checkout').count()
             assert not errors and page.evaluate('document.documentElement.scrollWidth<=innerWidth')
-            button.click();page.wait_for_url('https://checkout.stripe.com/**')
+            page.once('dialog',lambda dialog:dialog.accept());button.click();page.wait_for_url('https://checkout.stripe.com/**')
             assert len(redirects)==1
             with auth.db() as c:assert c.execute('SELECT count(*) FROM credit_purchase_orders').fetchone()[0]==2
         assert not errors and not any('/capture' in path for _,path,_ in calls)

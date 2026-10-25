@@ -3,6 +3,7 @@ import copy
 import importlib.util
 import json
 import hashlib
+import ast
 from pathlib import Path
 
 import pytest
@@ -25,6 +26,15 @@ def test_current_inventory_matches_review():
     result=inventory.validate(ROOT,review)
     assert result['inventory_passed'] and result['remote_model_attestation_complete'] is False
     assert result['reviewed_sites']>=27
+
+
+def test_call_fingerprint_does_not_depend_on_python_ast_dump(monkeypatch):
+    call=ast.parse('client.get("https://example.test", headers={})').body[0].value
+    expected=inventory.call_shape(call)
+    assert hashlib.sha256(expected.encode()).hexdigest()=='7fc1835222c8e8523db04ff987ba3bbbbe239d087d735724df77c985a1c2e37d'
+    monkeypatch.setattr(ast,'dump',lambda *a,**k:pytest.fail('Version-dependent AST presentation used'))
+    assert inventory.call_shape(call)==expected
+    assert inventory.call_shape(ast.parse('client.post("https://example.test", headers={})').body[0].value)!=expected
 
 
 @pytest.mark.parametrize('source',[

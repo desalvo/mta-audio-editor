@@ -31,7 +31,7 @@ const fs=require('fs'), vm=require('vm'), assert=require('assert');
 const tabs=['web','storage','users','smtp','models','aiQueue','diagnostics'];
 const buttons=tabs.map(tab=>({dataset:{tab},classList:{toggle(){}}}));
 const elements=Object.fromEntries(tabs.map(tab=>['#'+tab+'Tab',{hidden:tab!=='web'}]));
-for(const id of ['diagnosticsEnabled','diagnosticsStatus','smtpForm','webSettingsSummary'])elements['#'+id]={};
+for(const id of ['diagnosticsEnabled','diagnosticsStatus','smtpForm','webSettingsSummary'])elements['#'+id]={setAttribute(){}};
 let fail=false;
 const context={console,document:{querySelector:s=>elements[s],querySelectorAll:()=>buttons},
 fetch:async url=>({ok:!fail,headers:{get:()=> 'application/json'},json:async()=>url.includes('diagnostics')?{enabled:true}:{disk:{},models:{}},text:async()=> 'Access denied'}),alert(){}};
