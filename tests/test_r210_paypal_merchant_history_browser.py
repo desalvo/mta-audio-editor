@@ -8,17 +8,28 @@ from test_r210_paypal import provider as provider  # noqa: F401
 from test_r210_paypal_merchant_history import reporting as reporting  # noqa: F401
 
 
-@pytest.mark.parametrize('language',['it','en'])
-@pytest.mark.parametrize('width',[390,1280])
-def test_actual_admin_history_confirmation_readback_and_reload(reporting,monkeypatch,chromium_capability,language,width):
-    from playwright.sync_api import sync_playwright, expect
+@pytest.fixture
+def merchant_panel_client(reporting,monkeypatch):
+    """Real isolated admin API, including the lazily created empty outbox."""
     from fastapi.testclient import TestClient
     from app import main
+    from app.regime_payment_outbox import SCHEMA
     from test_r210_legal_documents import cookie
     monkeypatch.setattr(main,'NATIVE_SINGLE_USER',False)
     monkeypatch.setattr(main,'check_basic_auth',lambda _:False)
     monkeypatch.delenv('MTA_ALLOW_INSECURE_NO_AUTH',raising=False)
-    client=TestClient(main.app);client.cookies.update(cookie(reporting[0]))
+    with auth.db() as connection:
+        connection.execute(SCHEMA)
+    with TestClient(main.app) as client:
+        client.cookies.update(cookie(reporting[0]))
+        yield client
+
+
+@pytest.mark.parametrize('language',['it','en'])
+@pytest.mark.parametrize('width',[390,1280])
+def test_actual_admin_history_confirmation_readback_and_reload(reporting,merchant_panel_client,chromium_capability,language,width):
+    from playwright.sync_api import sync_playwright, expect
+    client=merchant_panel_client
     requests=[];errors=[]
     def serve(route):
         url=urlsplit(route.request.url)
@@ -36,13 +47,17 @@ def test_actual_admin_history_confirmation_readback_and_reload(reporting,monkeyp
         page=browser.new_page(viewport={'width':width,'height':900});page.on('pageerror',lambda e:errors.append(str(e)))
         page.route('https://mta.test/**',serve);page.goto('https://mta.test/');page.add_script_tag(content=script)
         box=page.locator('[data-merchant-history]')
-        box.locator('[name=start_date]').fill('2026-09-01T00:00:00')
-        box.locator('[name=end_date]').fill('2026-09-02T00:00:00')
+        # Chromium normalizes zero seconds away; Playwright 1.51 compares the
+        # value verbatim, so fill the canonical datetime-local minute form.
+        box.locator('[name=start_date]').fill('2026-09-01T00:00')
+        box.locator('[name=end_date]').fill('2026-09-02T00:00')
         button=box.get_by_role('button',name='Leggi storico PayPal' if language=='it' else 'Read PayPal history')
         page.once('dialog',lambda d:d.dismiss());button.click();assert not reporting[1]
         page.once('dialog',lambda d:d.accept());button.click()
         page.wait_for_function("document.querySelector('[data-merchant-history] [role=status]').textContent.includes("+repr('Osservazioni salvate' if language=='it' else 'Observations saved')+")")
         assert len(reporting[1])==2
+        assert all(q['start_date']==['2026-09-01T00:00:00Z'] and
+                   q['end_date']==['2026-09-02T00:00:00Z'] for q in reporting[1])
         box.locator('summary').click()
         box.get_by_role('button',name='Carica osservazioni' if language=='it' else 'Load observations').click()
         expect(box.locator('pre')).to_contain_text('UNBOUND123')

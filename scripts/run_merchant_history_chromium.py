@@ -51,16 +51,25 @@ def main(argv=None):
     report=output/'pytest.xml'
     report.unlink(missing_ok=True)  # A stale passing file can never satisfy this run.
     env={**os.environ,'MTA_TEST_OFFLINE':'1','PYTHONPATH':str(project)}
-    with (output/'pytest.log').open('w') as log:
-        result=subprocess.run([sys.executable,'-m','pytest','--timeout=90','-q','-ra',
-            'tests/test_r210_paypal_merchant_history_browser.py','--junitxml='+str(report)],
-            cwd=project,env=env,stdout=log,stderr=subprocess.STDOUT,check=False,timeout=600)
     try:
+        with (output/'pytest.log').open('w') as log:
+            result=subprocess.run([sys.executable,'-m','pytest','--timeout=90','-q','-ra',
+                'tests/test_r210_paypal_merchant_history_browser.py','--junitxml='+str(report)],
+                cwd=project,env=env,stdout=log,stderr=subprocess.STDOUT,check=False,timeout=600)
         if result.returncode:
             raise ValueError('Pytest did not succeed; inspect pytest.log and pytest.xml')
         acceptance=validate_report(report)
-    except (OSError,ValueError,ET.ParseError,DefusedXmlException) as exc:
+    except (OSError,ValueError,ET.ParseError,DefusedXmlException,subprocess.TimeoutExpired) as exc:
         (output/'acceptance.json').write_text(json.dumps({'accepted':False,'reason':str(exc)},indent=2)+'\n')
+        # Keep the complete artifact and expose a bounded failure tail in the
+        # job log so diagnosis does not depend on downloading the artifact.
+        try:
+            with (output/'pytest.log').open('rb') as log:
+                log.seek(0,2)
+                log.seek(max(0,log.tell()-20_000))
+                print(log.read().decode('utf-8',errors='replace'),file=sys.stderr)
+        except OSError:
+            pass
         print('Chromium acceptance blocked: '+str(exc),file=sys.stderr)
         return 1
     (output/'acceptance.json').write_text(json.dumps({'accepted':True,**acceptance},indent=2)+'\n')
