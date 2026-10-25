@@ -1,0 +1,47 @@
+# Reviewed historical non-secrets only. Each exception binds commit, path,
+# detector rule and line; new commits and new findings remain blocking.
+# Rationale and verification: docs/security/GITLEAKS_REVIEW_R210.json
+3e194a7023876d421e09482795dc2ec27bfa9eb8:REMOTE_AI_REVERSE_PROXY.md:curl-auth-header:53
+a2e975b4d003bed3f41c0dd0d769519d500c9a54:docs/security/APP_SECURITY_REVIEW_R210.json:generic-api-key:102
+a2e975b4d003bed3f41c0dd0d769519d500c9a54:docs/security/APP_SECURITY_REVIEW_R210.json:generic-api-key:221
+a2e975b4d003bed3f41c0dd0d769519d500c9a54:docs/security/APP_SECURITY_REVIEW_R210.json:generic-api-key:27
+a2e975b4d003bed3f41c0dd0d769519d500c9a54:docs/security/APP_SECURITY_REVIEW_R210.json:generic-api-key:42
+a2e975b4d003bed3f41c0dd0d769519d500c9a54:docs/security/APP_SECURITY_REVIEW_R210.json:generic-api-key:90
+a2e975b4d003bed3f41c0dd0d769519d500c9a54:docs/validation/r210/ten-cycle-test-summary.json:generic-api-key:3747
+a2e975b4d003bed3f41c0dd0d769519d500c9a54:docs/validation/r210/ten-cycle-test-summary.json:generic-api-key:3762
+a2e975b4d003bed3f41c0dd0d769519d500c9a54:docs/validation/r210/ten-cycle-test-summary.json:generic-api-key:3810
+a2e975b4d003bed3f41c0dd0d769519d500c9a54:docs/validation/r210/ten-cycle-test-summary.json:generic-api-key:3822
+a2e975b4d003bed3f41c0dd0d769519d500c9a54:docs/validation/r210/ten-cycle-test-summary.json:generic-api-key:3940
+a2e975b4d003bed3f41c0dd0d769519d500c9a54:docs/validation/r210/twenty-cycle-acceptance.xml:generic-api-key:1
+a2e975b4d003bed3f41c0dd0d769519d500c9a54:tests/test_r210_noncommercial_collection_e2e.py:generic-api-key:160
+a2e975b4d003bed3f41c0dd0d769519d500c9a54:tests/test_r210_noncommercial_collection_e2e.py:generic-api-key:161
+a2e975b4d003bed3f41c0dd0d769519d500c9a54:tests/test_r210_noncommercial_collection_e2e.py:generic-api-key:228
+a2e975b4d003bed3f41c0dd0d769519d500c9a54:tests/test_r210_noncommercial_collection_e2e.py:generic-api-key:282
+a2e975b4d003bed3f41c0dd0d769519d500c9a54:tests/test_r210_noncommercial_collection_e2e.py:generic-api-key:42
+a2e975b4d003bed3f41c0dd0d769519d500c9a54:tests/test_r210_noncommercial_collection_e2e.py:generic-api-key:60
+a2e975b4d003bed3f41c0dd0d769519d500c9a54:tests/test_r210_noncommercial_collection_e2e.py:generic-api-key:62
+a2e975b4d003bed3f41c0dd0d769519d500c9a54:tests/test_r210_noncommercial_collection_e2e.py:generic-api-key:64
+a2e975b4d003bed3f41c0dd0d769519d500c9a54:tests/test_r210_noncommercial_collection_e2e.py:generic-api-key:66
+a2e975b4d003bed3f41c0dd0d769519d500c9a54:tests/test_r210_noncommercial_collection_e2e.py:generic-api-key:79
+a2e975b4d003bed3f41c0dd0d769519d500c9a54:tests/test_r210_noncommercial_collection_e2e.py:generic-api-key:94
+a2e975b4d003bed3f41c0dd0d769519d500c9a54:tests/test_r210_payment_reconciliation_e2e.py:generic-api-key:12
+dfa6c39712eda54128a3408dbec0a8a5bb07ad36:.github/workflows/ci-cd.yml:curl-auth-user:115
+e8baefe8c962b1ae720574395aec1cf7fd73c0bc:validation/r210-acceptance-yourmt3-receipt.json:generic-api-key:104
+e8baefe8c962b1ae720574395aec1cf7fd73c0bc:validation/r210-acceptance-yourmt3-receipt.json:generic-api-key:12
+e8baefe8c962b1ae720574395aec1cf7fd73c0bc:validation/r210-acceptance-yourmt3-receipt.json:generic-api-key:67
+e8baefe8c962b1ae720574395aec1cf7fd73c0bc:validation/r210-closure-ps-receipt.json:generic-api-key:104
+e8baefe8c962b1ae720574395aec1cf7fd73c0bc:validation/r210-closure-ps-receipt.json:generic-api-key:12
+e8baefe8c962b1ae720574395aec1cf7fd73c0bc:validation/r210-closure-ps-receipt.json:generic-api-key:67
+e8baefe8c962b1ae720574395aec1cf7fd73c0bc:validation/r210-qixuan-midi-native-source-freeze.json:generic-api-key:178
+e8baefe8c962b1ae720574395aec1cf7fd73c0bc:validation/r210-qixuan-midi-native-source-freeze.json:generic-api-key:206
+e8baefe8c962b1ae720574395aec1cf7fd73c0bc:validation/r210-qixuan-midi-native-source-freeze.json:generic-api-key:221
+e8baefe8c962b1ae720574395aec1cf7fd73c0bc:validation/r210-qixuan-midi-native-source-freeze.json:generic-api-key:231
+e8baefe8c962b1ae720574395aec1cf7fd73c0bc:validation/r210-qixuan-midi-native-source-freeze.json:generic-api-key:263
+e8baefe8c962b1ae720574395aec1cf7fd73c0bc:validation/r210-qixuan-midi-native-source-freeze.json:generic-api-key:271
+e8baefe8c962b1ae720574395aec1cf7fd73c0bc:validation/r210-qixuan-midi-native-source-freeze.json:generic-api-key:299
+e8baefe8c962b1ae720574395aec1cf7fd73c0bc:validation/r210-qixuan-midi-native-source-freeze.json:generic-api-key:306
+e8baefe8c962b1ae720574395aec1cf7fd73c0bc:validation/r210-qixuan-midi-native-source-freeze.json:generic-api-key:308
+e8baefe8c962b1ae720574395aec1cf7fd73c0bc:validation/r210-qixuan-midi-native-source-freeze.json:generic-api-key:338
+e8baefe8c962b1ae720574395aec1cf7fd73c0bc:validation/r210-qixuan-midi-native-source-freeze.json:generic-api-key:341
+e8baefe8c962b1ae720574395aec1cf7fd73c0bc:validation/r210-qixuan-midi-native-source-freeze.json:generic-api-key:81
+e8baefe8c962b1ae720574395aec1cf7fd73c0bc:validation/r210-qixuan-midi-native-source-freeze.json:generic-api-key:91

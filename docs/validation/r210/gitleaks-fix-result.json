@@ -1,0 +1,43 @@
+{
+  "schema": "mta-gitleaks-fix-validation-1",
+  "date": "2026-10-25",
+  "baseline_commit": "37821a8f4089341023af8ba858ab5ae8c5648467",
+  "engine_version": "8.24.3",
+  "engine_binary_sha256": "e18325d568268b6efb6cd0cc721f8bea5667f4cd1c8d03618ab61987f41269ad",
+  "official_release_checksum_verified": true,
+  "original_sarif_sha256": "bceb313f6df5187a608e2b4cf417ccedf6771b487c95a836838d3e6cee0b0102",
+  "reported_findings_reviewed": 46,
+  "historical_fingerprint_exceptions": 44,
+  "exact_public_digest_allowlist": 1,
+  "negative_control": {
+    "same_test_and_review_paths": true,
+    "new_synthetic_credentials_detected": 2,
+    "exit_code": 2
+  },
+  "default_rules_enabled": true,
+  "whole_commit_or_path_exclusions": false,
+  "unit_browser_tests_repeated": false,
+  "remote_mutations": false,
+  "release_candidate": false,
+  "criteria_complete": 23,
+  "criteria_total": 42,
+  "history_scans": {
+    "before": {
+      "findings": 46,
+      "exit_code": 2,
+      "commits": 329,
+      "bytes": 232893629
+    },
+    "after": {
+      "findings": 0,
+      "exit_code": 0,
+      "commits": 329,
+      "bytes": 232893629
+    }
+  },
+  "exact_original_findings_reproduced": true,
+  "delivery_scan": {
+    "findings": 0,
+    "exit_code": 0
+  }
+}

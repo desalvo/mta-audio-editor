@@ -1,9 +1,10 @@
 [extend]
 useDefault = true
 
-[[allowlists]]
+[allowlist]
 description = "Public SHA-256 fingerprint of the reverse-engineered MTA XOR transport table"
-regexTarget = "match"
+# Global allowlist syntax supported by the CI-pinned Gitleaks 8.24.3.
+# Default regexTarget is the extracted secret; allow only this exact public hash.
 regexes = [
-  """bcb30443707bdc8b651c1a58aa4152438ce5a6632cc98b294501eb08adbb3547"""
+  """^bcb30443707bdc8b651c1a58aa4152438ce5a6632cc98b294501eb08adbb3547$"""
 ]
