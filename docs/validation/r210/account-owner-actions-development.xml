@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="3" time="60.929" timestamp="2026-10-24T14:57:20.424912+02:00" hostname="3a349086255d"><testcase classname="tests.test_r210_account_acceptance" name="test_actual_trial_contract_renewal_storage_overage_and_cancel[390-it]" time="9.796" /><testcase classname="tests.test_r210_account_acceptance" name="test_actual_trial_contract_renewal_storage_overage_and_cancel[390-en]" time="11.490" /><testcase classname="tests.test_r210_account_acceptance" name="test_actual_trial_contract_renewal_storage_overage_and_cancel[1280-it]" time="38.016"><failure message="playwright._impl._errors.TimeoutError: Locator.fill: Timeout 30000ms exceeded.&#10;Call log:&#10;  - waiting for locator(&quot;[data-report-start]&quot;)&#10;    - locator resolved to &lt;input data-report-start=&quot;&quot; type=&quot;datetime-local&quot;/&gt;&#10;    - fill(&quot;2026-10-24T11:57&quot;)&#10;  - attempting fill action&#10;    2 × waiting for element to be visible, enabled and editable&#10;      - element is not visible&#10;    - retrying fill action&#10;    - waiting 20ms&#10;    2 × waiting for element to be visible, enabled and editable&#10;      - element is not visible&#10;    - retrying fill action&#10;      - waiting 100ms&#10;    59 × waiting for element to be visible, enabled and editable&#10;       - element is not visible&#10;     - retrying fill action&#10;       - waiting 500ms">account = 2
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f48fd085010&gt;
+nc_browser_config = {'executable_path': '/workspace/scratch/06e635791464/nc-browser-runtime/unpacked/chromium', 'headless': True, 'args': ...dbox', '--disable-dev-shm-usage', '--no-zygote', '--single-process', '--use-gl=angle', '--use-angle=swiftshader', ...]}
+language = 'it', width = 1280
+
+    @pytest.mark.parametrize('language',['it','en'])
+    @pytest.mark.parametrize('width',[390,1280])
+    def test_actual_trial_contract_renewal_storage_overage_and_cancel(account,monkeypatch,nc_browser_config,language,width):
+        from playwright.sync_api import sync_playwright
+        configure(account,'no_plan',language);web=client(account,monkeypatch);calls=[];errors=[]
+        with sync_playwright() as pw:
+            browser=pw.chromium.launch(**nc_browser_config);page=browser.new_page(viewport={'width':width,'height':1000},timezone_id='UTC')
+            page.on('pageerror',lambda e:errors.append(str(e)));page.route('**/*',serve(web,calls));page.goto('https://mta.test/account#subscriptions')
+            trial=page.locator('[data-activate=trial]');trial.wait_for();page.locator('[data-trial-next]').select_option('month')
+            page.once('dialog',lambda d:d.dismiss());trial.click();assert resources.state(account)['subscription'] is None
+            page.once('dialog',lambda d:d.accept());trial.click();page.locator('[data-cancel]').wait_for()
+            initial=resources.state(account);assert initial['subscription']=='trial' and initial['next_plan']['plan']=='month'
+            resources.grant(account,5_000_000,'storage funds',1,'full-page-storage-grant')
+            page.locator('[data-resource-account] [data-refresh]').click();page.locator('[data-overage]').wait_for()
+            page.locator('[data-overage]').uncheck();page.wait_for_function("!document.querySelector('[data-overage]')?.checked")
+            assert resources.state(account)['overage'] is False
+            page.locator('[data-renew-plan]').select_option('year');page.once('dialog',lambda d:d.accept());page.locator('[data-renew-plan-save]').click()
+            page.wait_for_function("document.querySelector('[data-renew-plan]')?.value==='year'")
+            assert resources.state(account)['next_plan']['plan']=='year' and resources.state(account)['period']['start']==initial['period']['start']
+            before=resources.state(account);gib=before['limits']['storage_bytes']//(1024**3)+1
+            page.locator('[data-field=storage]').fill(str(gib));page.once('dialog',lambda d:d.accept());page.locator('[data-storage]').click()
+            page.wait_for_function("document.querySelector('[data-field=storage]')?.value==="+repr(str(gib)))
+            assert resources.state(account)['limits']['storage_bytes']==gib*1024**3
+            stamp=__import__('time').time();fmt=lambda ts:datetime.fromtimestamp(ts,timezone.utc).strftime('%Y-%m-%dT%H:%M')
+            page.locator('[data-report]').locator('..').locator('..').evaluate('e=&gt;e.open=true')
+&gt;           page.locator('[data-report-start]').fill(fmt(stamp-3600));page.locator('[data-report-end]').fill(fmt(stamp))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_r210_account_acceptance.py:122: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/root/.local/lib/python3.12/site-packages/playwright/sync_api/_generated.py:15983: in fill
+    self._sync(
+/root/.local/lib/python3.12/site-packages/playwright/_impl/_locator.py:215: in fill
+    return await self._frame.fill(self._selector, strict=True, **params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/root/.local/lib/python3.12/site-packages/playwright/_impl/_frame.py:607: in fill
+    await self._fill(**locals_to_params(locals()))
+/root/.local/lib/python3.12/site-packages/playwright/_impl/_frame.py:619: in _fill
+    await self._channel.send("fill", self._timeout, locals_to_params(locals()))
+/root/.local/lib/python3.12/site-packages/playwright/_impl/_connection.py:69: in send
+    return await self._connection.wrap_api_call(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;playwright._impl._connection.Connection object at 0x7f48fd146e70&gt;
+cb = &lt;function Channel.send.&lt;locals&gt;.&lt;lambda&gt; at 0x7f48fd247420&gt;
+is_internal = False, title = None
+
+    async def wrap_api_call(
+        self, cb: Callable[[], Any], is_internal: bool = False, title: str = None
+    ) -&gt; Any:
+        if self._api_zone.get():
+            return await cb()
+        task = asyncio.current_task(self._loop)
+        st: List[inspect.FrameInfo] = getattr(
+            task, "__pw_stack__", None
+        ) or inspect.stack(0)
+    
+        parsed_st = _extract_stack_trace_information_from_stack(st, is_internal, title)
+        self._api_zone.set(parsed_st)
+        try:
+            return await cb()
+        except Exception as error:
+&gt;           raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+E           playwright._impl._errors.TimeoutError: Locator.fill: Timeout 30000ms exceeded.
+E           Call log:
+E             - waiting for locator("[data-report-start]")
+E               - locator resolved to &lt;input data-report-start="" type="datetime-local"/&gt;
+E               - fill("2026-10-24T11:57")
+E             - attempting fill action
+E               2 × waiting for element to be visible, enabled and editable
+E                 - element is not visible
+E               - retrying fill action
+E               - waiting 20ms
+E               2 × waiting for element to be visible, enabled and editable
+E                 - element is not visible
+E               - retrying fill action
+E                 - waiting 100ms
+E               59 × waiting for element to be visible, enabled and editable
+E                  - element is not visible
+E                - retrying fill action
+E                  - waiting 500ms
+
+/root/.local/lib/python3.12/site-packages/playwright/_impl/_connection.py:559: TimeoutError</failure></testcase></testsuite></testsuites>

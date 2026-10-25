@@ -15,6 +15,10 @@ import subprocess
 import sys
 import time
 import xml.etree.ElementTree as ET
+try:
+    from scripts.repositories._safe_xml import parse as safe_parse_xml
+except ModuleNotFoundError:
+    from repositories._safe_xml import parse as safe_parse_xml
 
 
 def partition(files, shard_count):
@@ -70,7 +74,7 @@ def main(argv=None):
     counts = None
     if junit.is_file():
         try:
-            xml = ET.parse(junit).getroot()
+            xml = safe_parse_xml(junit).getroot()
             suites = [xml] if xml.tag == 'testsuite' else xml.findall('.//testsuite')
             counts = {key: sum(int(s.get(key, 0)) for s in suites)
                       for key in ('tests', 'failures', 'errors', 'skipped')}

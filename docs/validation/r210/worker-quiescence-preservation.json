@@ -1,0 +1,56 @@
+{
+  "original_files": 3267,
+  "preceding_checkpoint_files": 3421,
+  "missing_original": [],
+  "missing_preceding": [],
+  "protected_files_checked": 183,
+  "protected_changes": [],
+  "changed_paths_since_preceding": [
+    "app/ai_arranger_runtime.py",
+    "app/ai_cgroup_metering.py",
+    "app/deferred_execution_owner.py",
+    "docs/COMMIT_MESSAGE_R210_CUMULATIVE.txt",
+    "docs/DEVELOPMENT_COMPONENTS_R210.json",
+    "docs/DEVELOPMENT_HANDOFF_R210.md",
+    "docs/DEVELOPMENT_STATUS.md",
+    "docs/KNOWN_BLOCKERS_R210.md",
+    "docs/RC_ACCEPTANCE_REPORT.md",
+    "docs/TEST_MATRIX_R210.md"
+  ],
+  "new_paths_since_preceding": [
+    "docs/WORKER_QUIESCENCE_HANDOFF_R210.md",
+    "docs/validation/r210/worker-quiescence-api.log",
+    "docs/validation/r210/worker-quiescence-api.xml",
+    "docs/validation/r210/worker-quiescence-final.log",
+    "docs/validation/r210/worker-quiescence-final.xml",
+    "docs/validation/r210/worker-quiescence-integration.log",
+    "docs/validation/r210/worker-quiescence-integration.xml",
+    "docs/validation/r210/worker-quiescence-ruff.log",
+    "docs/validation/r210/worker-quiescence-summary.json",
+    "docs/validation/r210/worker-quiescence-targeted.log",
+    "docs/validation/r210/worker-quiescence-targeted.xml",
+    "tests/test_r210_real_cgroup_supervisor_loss.py",
+    "tests/test_r210_worker_quiescence_safety.py"
+  ],
+  "executable_modes": {
+    "scripts/install_ace_step.sh": "0o755",
+    "scripts/install_mta.sh": "0o755",
+    "app/ai_unified_adapter.py": "0o755"
+  },
+  "restored_prior_documentation_paths": [
+    "docs/COMMIT_MESSAGE_R210_CUMULATIVE.txt",
+    "docs/DEVELOPMENT_COMPONENTS_R210.json",
+    "docs/DEVELOPMENT_HANDOFF_R210.md",
+    "docs/DEVELOPMENT_STATUS.md",
+    "docs/KNOWN_BLOCKERS_R210.md",
+    "docs/NC_COLLECTION_HANDOFF_R210.md",
+    "docs/NC_COLLECTION_IT_EN_R210.md",
+    "docs/RC_ACCEPTANCE_REPORT.md",
+    "docs/TEST_MATRIX_R210.md",
+    "docs/validation/r210/nc-collection-bandit-review.json",
+    "docs/validation/r210/nc-collection-preservation.json",
+    "docs/validation/r210/work-git-comparison.json",
+    "docs/validation/r210/work-source-manifest.json"
+  ],
+  "source_restoration": "Source code identical to saved NC checkpoint; only 13 documentation/evidence paths restored; local previous versions retained outside project"
+}

@@ -1,0 +1,1145 @@
+{
+  "date": "2026-10-25",
+  "unique_passed": 219,
+  "new_passed": 43,
+  "skipped": 1,
+  "unresolved_failures": 0,
+  "reports_in_supersession_order": [
+    {
+      "report": "twenty-cycle-acceptance.xml",
+      "passed": 181,
+      "failed": 1,
+      "skipped": 1
+    },
+    {
+      "report": "twenty-cycle-worker-correction.xml",
+      "passed": 17,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "report": "twenty-cycle-gates.xml",
+      "passed": 36,
+      "failed": 0,
+      "skipped": 0
+    }
+  ],
+  "supersession": "Initial acceptance exposed worker state mkdir TOCTOU; exact failed case passes after exist_ok plus unchanged strict owner/mode checks. Deterministic race regression added. Initial exploratory WAV metadata, stage conflict and migration failures superseded by final reports.",
+  "runtime": {
+    "python": "3.12.14",
+    "pytest": "9.1.1",
+    "fastapi": "0.142.2",
+    "pydantic": "2.14.1",
+    "httpx": "0.28.1",
+    "starlette": "1.10.0",
+    "ruff": "0.17.2",
+    "bandit": "1.9.4"
+  },
+  "app_sha256": {
+    "work/app/ai_pull_coordinator.py": "8866771d0f354ef5d1cbb379206875174d65f8e250065ae362fc258d9397ea51",
+    "work/app/ai_pull_routes.py": "f9bf4e9e1f0e3e92097399b4239a0f70ddfb14a4e17423a09e8d9c9965ca8452",
+    "work/app/ai_pull_worker.py": "4d9fb383e025374a07ce234a14f50962b983b55c686e74183126f19c67f41fd3"
+  },
+  "cases": [
+    {
+      "class": "tests.test_r208_audio_publication_outbox",
+      "name": "test_competing_consumers",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r208_audio_publication_outbox",
+      "name": "test_conflicting_stage",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r208_audio_publication_outbox",
+      "name": "test_crash_after_callback_recovery",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r208_audio_publication_outbox",
+      "name": "test_publish_and_replay",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r208_audio_publication_outbox",
+      "name": "test_tampered_audio",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r208_billing_delivery_outbox",
+      "name": "test_failed_delivery_remains_pending",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r208_billing_delivery_outbox",
+      "name": "test_invalid_measurements",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r208_billing_delivery_outbox",
+      "name": "test_recovery_after_ledger_commit",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r208_billing_delivery_outbox",
+      "name": "test_replay_and_conflict",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r208_outbox_queue_reconciliation",
+      "name": "test_interrupted_job_reconciles_after_durable_publication",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r208_outbox_replay_integrity",
+      "name": "test_pending_replay_rejects_missing_wav",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r208_outbox_replay_integrity",
+      "name": "test_pending_replay_rejects_symlink",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r208_outbox_replay_integrity",
+      "name": "test_pending_replay_rejects_tampering",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r208_outbox_replay_integrity",
+      "name": "test_published_replay_does_not_require_deleted_stage",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r208_outbox_stage_inode_guard",
+      "name": "test_replacement_during_callback_fails_closed",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r208_outbox_stage_inode_guard",
+      "name": "test_symlink_lock_rejected",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r208_outbox_stage_inode_guard",
+      "name": "test_symlink_staging_rejected",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_deferred_owner_e2e",
+      "name": "test_claimed_inference_rejects_missing_or_forged_owner[arranger]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_deferred_owner_e2e",
+      "name": "test_claimed_inference_rejects_missing_or_forged_owner[remix]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_deferred_owner_e2e",
+      "name": "test_crash_after_metering_or_publication_recovers_without_reexecution[arranger-False]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_deferred_owner_e2e",
+      "name": "test_crash_after_metering_or_publication_recovers_without_reexecution[arranger-True]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_deferred_owner_e2e",
+      "name": "test_crash_after_metering_or_publication_recovers_without_reexecution[remix-False]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_deferred_owner_e2e",
+      "name": "test_crash_after_metering_or_publication_recovers_without_reexecution[remix-True]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_deferred_owner_e2e",
+      "name": "test_ledger_commit_before_ack_retries_with_original_owner[arranger]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_deferred_owner_e2e",
+      "name": "test_ledger_commit_before_ack_retries_with_original_owner[remix]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_deferred_owner_e2e",
+      "name": "test_lost_heartbeat_cancels_and_prevents_new_evidence_or_staging[arranger]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_deferred_owner_e2e",
+      "name": "test_lost_heartbeat_cancels_and_prevents_new_evidence_or_staging[remix]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_deferred_owner_e2e",
+      "name": "test_real_scheduler_deferred_completion_has_one_owner_and_charge[arranger]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_deferred_owner_e2e",
+      "name": "test_real_scheduler_deferred_completion_has_one_owner_and_charge[remix]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_deferred_owner_e2e",
+      "name": "test_removed_publication_owner_cannot_downgrade_to_legacy[arranger]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_deferred_owner_e2e",
+      "name": "test_removed_publication_owner_cannot_downgrade_to_legacy[remix]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_deferred_owner_e2e",
+      "name": "test_unknown_or_changed_owner_blocks_publication_and_settlement[arranger]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_deferred_owner_e2e",
+      "name": "test_unknown_or_changed_owner_blocks_publication_and_settlement[remix]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_coordinator",
+      "name": "test_actual_executor_waits_for_worker_and_settles_real_ledger_once",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_coordinator",
+      "name": "test_atomic_capacity_rejection_leaves_no_ledger_fence_or_license_or_claim",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_coordinator",
+      "name": "test_authority_drain_rejects_new_admission_but_finishes_existing_queue",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_coordinator",
+      "name": "test_claim_lost_response_recovers_same_attempt_but_not_new_instance",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_coordinator",
+      "name": "test_copied_authority_database_cannot_become_second_active_coordinator",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_coordinator",
+      "name": "test_current_epoch_corruption_blocks_pull_readiness",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_coordinator",
+      "name": "test_deferred_generation_admission_is_atomic_with_authority_drain",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_coordinator",
+      "name": "test_forged_assignment_and_frozen_sql_overwrite_are_rejected",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_coordinator",
+      "name": "test_frozen_result_survives_accounting_failure_without_inference_replay",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_coordinator",
+      "name": "test_invalid_completion_cannot_mutate_economic_state[cpu_seconds--1]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_coordinator",
+      "name": "test_invalid_completion_cannot_mutate_economic_state[cpu_seconds-True]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_coordinator",
+      "name": "test_invalid_completion_cannot_mutate_economic_state[cpu_seconds-nan]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_coordinator",
+      "name": "test_invalid_completion_cannot_mutate_economic_state[media_type-text/plain]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_coordinator",
+      "name": "test_invalid_completion_cannot_mutate_economic_state[result_b64-bad!]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_coordinator",
+      "name": "test_pause_resume_revoke_do_not_claim_worker_quiescence",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_coordinator",
+      "name": "test_planned_offline_rebind_requires_closed_work_revoked_nodes_and_operator",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_coordinator",
+      "name": "test_prune_preserves_unknown_execution_and_opaque_acknowledges_closed_result",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_coordinator",
+      "name": "test_queued_cancel_settles_no_cpu_and_never_grants_source",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_coordinator",
+      "name": "test_running_cancel_remains_held_until_authenticated_completion",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_coordinator",
+      "name": "test_stale_epoch_receipt_and_policy_never_dispatch[claim]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_coordinator",
+      "name": "test_stale_epoch_receipt_and_policy_never_dispatch[epoch]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_coordinator",
+      "name": "test_stale_epoch_receipt_and_policy_never_dispatch[policy]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_coordinator",
+      "name": "test_two_independent_connections_never_assign_same_operation",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_lifecycle",
+      "name": "test_actual_ai_token_submission_uses_pull_without_local_authority_adapter[audio]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_lifecycle",
+      "name": "test_actual_ai_token_submission_uses_pull_without_local_authority_adapter[json]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_lifecycle",
+      "name": "test_actual_erasure_rejects_active_remote_task_before_writing_journal",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_lifecycle",
+      "name": "test_actual_middleware_hides_worker_api_in_native_mode",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_lifecycle",
+      "name": "test_actual_retired_account_confirmation_erases_pull_payload_and_recovers_lost_node_ack",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_lifecycle",
+      "name": "test_admin_drain_requires_confirmation_generation_and_durable_audit",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_lifecycle",
+      "name": "test_admin_register_pause_revoke_role_csrf_and_no_key_readback",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_lifecycle",
+      "name": "test_commercial_remote_and_path_injection_are_denied_before_admission",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_lifecycle",
+      "name": "test_completed_erasure_receipt_drops_private_artifacts_and_acknowledges_lost_reply",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_lifecycle",
+      "name": "test_full_middleware_worker_token_is_exactly_scoped",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_lifecycle",
+      "name": "test_known_failed_deferred_completion_settles_original_owner_without_publication[cancelled]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_lifecycle",
+      "name": "test_known_failed_deferred_completion_settles_original_owner_without_publication[failed]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_lifecycle",
+      "name": "test_owner_result_is_private_settled_and_not_executable",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_lifecycle",
+      "name": "test_pending_error_is_localized_and_never_claims_stop",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_lifecycle",
+      "name": "test_pull_executor_preserves_original_deferred_owner_until_publication[False-False-arranger]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_lifecycle",
+      "name": "test_pull_executor_preserves_original_deferred_owner_until_publication[False-False-remix]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_lifecycle",
+      "name": "test_pull_executor_preserves_original_deferred_owner_until_publication[False-True-arranger]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_lifecycle",
+      "name": "test_pull_executor_preserves_original_deferred_owner_until_publication[False-True-remix]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_lifecycle",
+      "name": "test_pull_executor_preserves_original_deferred_owner_until_publication[True-False-arranger]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_lifecycle",
+      "name": "test_pull_executor_preserves_original_deferred_owner_until_publication[True-False-remix]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_lifecycle",
+      "name": "test_pull_executor_preserves_original_deferred_owner_until_publication[True-True-arranger]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_lifecycle",
+      "name": "test_pull_executor_preserves_original_deferred_owner_until_publication[True-True-remix]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_lifecycle",
+      "name": "test_retired_queued_owner_never_transfers_source_and_maintenance_closes_only_undispatched",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_publication_recovery",
+      "name": "test_actual_generation_factory_accepts_pull_cpu_source[arranger]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_publication_recovery",
+      "name": "test_actual_generation_factory_accepts_pull_cpu_source[remix]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_publication_recovery",
+      "name": "test_admin_recovery_api_requires_session_role_csrf_confirmation[arranger]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_publication_recovery",
+      "name": "test_admin_recovery_api_requires_session_role_csrf_confirmation[remix]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_publication_recovery",
+      "name": "test_concurrent_worker_state_creation_keeps_strict_permissions",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_publication_recovery",
+      "name": "test_conflicting_stage_is_not_overwritten[arranger]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_publication_recovery",
+      "name": "test_conflicting_stage_is_not_overwritten[remix]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_publication_recovery",
+      "name": "test_crash_boundaries[arranger-after_charge]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_publication_recovery",
+      "name": "test_crash_boundaries[arranger-before_publish]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_publication_recovery",
+      "name": "test_crash_boundaries[arranger-before_settlement]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_publication_recovery",
+      "name": "test_crash_boundaries[remix-after_charge]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_publication_recovery",
+      "name": "test_crash_boundaries[remix-before_publish]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_publication_recovery",
+      "name": "test_crash_boundaries[remix-before_settlement]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_publication_recovery",
+      "name": "test_dead_parent_recovers_once[arranger]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_publication_recovery",
+      "name": "test_dead_parent_recovers_once[remix]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_publication_recovery",
+      "name": "test_ineligible_recovery_stays_held[arranger-actor]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_publication_recovery",
+      "name": "test_ineligible_recovery_stays_held[arranger-alive]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_publication_recovery",
+      "name": "test_ineligible_recovery_stays_held[arranger-cancelled]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_publication_recovery",
+      "name": "test_ineligible_recovery_stays_held[arranger-claim]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_publication_recovery",
+      "name": "test_ineligible_recovery_stays_held[arranger-epoch]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_publication_recovery",
+      "name": "test_ineligible_recovery_stays_held[arranger-hidden]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_publication_recovery",
+      "name": "test_ineligible_recovery_stays_held[arranger-media]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_publication_recovery",
+      "name": "test_ineligible_recovery_stays_held[arranger-project]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_publication_recovery",
+      "name": "test_ineligible_recovery_stays_held[arranger-retired]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_publication_recovery",
+      "name": "test_ineligible_recovery_stays_held[arranger-unmeasured]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_publication_recovery",
+      "name": "test_ineligible_recovery_stays_held[remix-actor]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_publication_recovery",
+      "name": "test_ineligible_recovery_stays_held[remix-alive]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_publication_recovery",
+      "name": "test_ineligible_recovery_stays_held[remix-cancelled]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_publication_recovery",
+      "name": "test_ineligible_recovery_stays_held[remix-claim]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_publication_recovery",
+      "name": "test_ineligible_recovery_stays_held[remix-epoch]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_publication_recovery",
+      "name": "test_ineligible_recovery_stays_held[remix-hidden]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_publication_recovery",
+      "name": "test_ineligible_recovery_stays_held[remix-media]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_publication_recovery",
+      "name": "test_ineligible_recovery_stays_held[remix-project]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_publication_recovery",
+      "name": "test_ineligible_recovery_stays_held[remix-retired]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_publication_recovery",
+      "name": "test_ineligible_recovery_stays_held[remix-unmeasured]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_publication_recovery",
+      "name": "test_parallel_recovery_is_idempotent[arranger]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_publication_recovery",
+      "name": "test_parallel_recovery_is_idempotent[remix]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_publication_recovery",
+      "name": "test_real_project_write_and_reopen[arranger-False]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_publication_recovery",
+      "name": "test_real_project_write_and_reopen[arranger-True]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_publication_recovery",
+      "name": "test_real_project_write_and_reopen[remix-False]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_publication_recovery",
+      "name": "test_real_project_write_and_reopen[remix-True]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_publication_recovery",
+      "name": "test_write_boundary_rechecks_retirement_cancel_and_project[arranger]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_publication_recovery",
+      "name": "test_write_boundary_rechecks_retirement_cancel_and_project[remix]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_request_recovery",
+      "name": "test_all_common_registered_artifact_adapters_cross_authority_storage[backing-vocals]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_request_recovery",
+      "name": "test_all_common_registered_artifact_adapters_cross_authority_storage[chords-ml]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_request_recovery",
+      "name": "test_all_common_registered_artifact_adapters_cross_authority_storage[demucs]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_request_recovery",
+      "name": "test_all_common_registered_artifact_adapters_cross_authority_storage[drumsep]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_request_recovery",
+      "name": "test_all_common_registered_artifact_adapters_cross_authority_storage[sam-audio]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_request_recovery",
+      "name": "test_all_common_registered_artifact_adapters_cross_authority_storage[singer-separation]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_request_recovery",
+      "name": "test_all_common_registered_artifact_adapters_cross_authority_storage[whisper]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_request_recovery",
+      "name": "test_cancel_original_request_reaches_worker_without_living_http_parent",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_request_recovery",
+      "name": "test_corrupted_original_request_never_dispatches_and_blocks_readiness[fingerprint-0000000000000000000000000000000000000000000000000000000000000000]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_request_recovery",
+      "name": "test_corrupted_original_request_never_dispatches_and_blocks_readiness[state-unknown]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_request_recovery",
+      "name": "test_delivery_signature_is_frozen_across_key_rotation_and_revocation_blocks_replay",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_request_recovery",
+      "name": "test_original_client_gets_durable_result_after_http_parent_was_lost",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_request_recovery",
+      "name": "test_structured_score_is_staged_only_on_worker",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_request_recovery",
+      "name": "test_untrusted_result_archive_cannot_escape_or_expand_storage[../escape.json]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_request_recovery",
+      "name": "test_untrusted_result_archive_cannot_escape_or_expand_storage[bomb.json]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_request_recovery",
+      "name": "test_untrusted_result_archive_cannot_escape_or_expand_storage[output.manifest.json]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_transport",
+      "name": "test_actual_authority_sigkill_after_frozen_result_recovers_without_new_inference",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_transport",
+      "name": "test_dispatched_journal_never_reexecutes_after_actual_supervisor_sigkill",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_transport",
+      "name": "test_journal_rejects_authority_key_and_trust_drift_before_network[credential]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_transport",
+      "name": "test_journal_rejects_authority_key_and_trust_drift_before_network[trust]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_transport",
+      "name": "test_partition_after_committed_claim_or_completion_never_reexecutes[claim]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_transport",
+      "name": "test_partition_after_committed_claim_or_completion_never_reexecutes[complete]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_transport",
+      "name": "test_redirect_cannot_forward_credential",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_transport",
+      "name": "test_shared_worker_state_lock_serializes_two_processes",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_transport",
+      "name": "test_two_separate_worker_processes_share_only_https_not_sqlite",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_transport",
+      "name": "test_untrusted_tls_never_transmits_worker_credential",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_worker_safety",
+      "name": "test_bad_success_ack_cannot_erase_frozen_result",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_worker_safety",
+      "name": "test_completed_task_erasure_ack_clears_local_private_result_without_rerun",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_worker_safety",
+      "name": "test_failed_payload_reports_known_cpu_without_publishing_invalid_media",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_worker_safety",
+      "name": "test_lost_completion_reply_retains_frozen_result_and_clears_after_exact_ack",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_worker_safety",
+      "name": "test_nonprivate_state_or_configuration_is_rejected[config]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_worker_safety",
+      "name": "test_nonprivate_state_or_configuration_is_rejected[journal]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_worker_safety",
+      "name": "test_nonprivate_state_or_configuration_is_rejected[state]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_worker_safety",
+      "name": "test_policy_drift_on_node_fails_without_launch_or_fabricated_zero_cpu",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_worker_safety",
+      "name": "test_uncertain_phase_never_launches_or_claims[dispatched]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_worker_safety",
+      "name": "test_uncertain_phase_never_launches_or_claims[unknown]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_worker_safety",
+      "name": "test_unverified_descendants_never_freeze_publish_or_release_assignment",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_worker_safety",
+      "name": "test_worker_authority_url_cannot_select_untrusted_transport_or_paths[http://example.test]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_worker_safety",
+      "name": "test_worker_authority_url_cannot_select_untrusted_transport_or_paths[https://example.test/?query=1]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_worker_safety",
+      "name": "test_worker_authority_url_cannot_select_untrusted_transport_or_paths[https://example.test/other]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_pull_worker_safety",
+      "name": "test_worker_authority_url_cannot_select_untrusted_transport_or_paths[https://user:secret@example.test]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_remote_transport_inventory",
+      "name": "test_current_inventory_matches_review",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[category]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[checker]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[hash]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[missing]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[rationale]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[reorder]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[source]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_remote_transport_inventory",
+      "name": "test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-device/start?x=1]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_remote_transport_inventory",
+      "name": "test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-gateway/v1/generate]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_remote_transport_inventory",
+      "name": "test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-jobs/execute-audio/whisper]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[from httpx import AsyncClient as hidden\\nhidden()]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[from urllib.request import build_opener as hidden\\nx=hidden()\\nx.open(\"https://example.test\")]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[from urllib.request import urlopen as hidden\\nhidden(\"https://example.test\")]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[import aiohttp as hidden\\nhidden.ClientSession()]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[import httpx as hidden\\nhidden.Client()]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[import socket as hidden\\nhidden.create_connection((\"example.test\",443))]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_remote_transport_inventory",
+      "name": "test_supported_device_authorization_still_uses_exact_post[/api/ai-device/poll]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_remote_transport_inventory",
+      "name": "test_supported_device_authorization_still_uses_exact_post[/api/ai-device/start]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_security_review_gate",
+      "name": "test_complete_source_bound_review_is_accepted",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_security_review_gate",
+      "name": "test_current_scan_and_complete_review_ledger_agree",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[blanket_approval]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[changed_finding]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[changed_source]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[deleted_source]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[duplicate_review]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[duplicate_scan]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[empty_reason]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[high]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[missing_file]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[missing_review]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[new_finding]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[new_source]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[scan_error]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[suppression]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[wrong_totals]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_windows_publication_tabs",
+      "name": "test_absent_backend_fails_closed",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_windows_publication_tabs",
+      "name": "test_generated_audio_publication_survives_reopen_and_replay",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_windows_publication_tabs",
+      "name": "test_msvcrt_fixed_offset_contention_retry_and_unlock",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_windows_publication_tabs",
+      "name": "test_native_lifespan_recovers_empty_outboxes_and_serves_health",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_windows_publication_tabs",
+      "name": "test_native_private_settings_without_unix_fchmod",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_windows_publication_tabs",
+      "name": "test_project_lock_reentrant_and_released_after_error",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_windows_publication_tabs",
+      "name": "test_real_os_lock_excludes_another_process_and_releases",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_windows_publication_tabs",
+      "name": "test_result_cache_without_unix_directory_flags",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_windows_publication_tabs",
+      "name": "test_unselected_arranger_tabs_have_readable_text_and_focus",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_windows_publication_tabs",
+      "name": "test_windows_creation_identity_is_stable",
+      "status": "skipped"
+    },
+    {
+      "class": "tests.test_r210_windows_publication_tabs",
+      "name": "test_windows_queue_liveness_never_sends_a_signal",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_worker_epoch_publication",
+      "name": "test_original_outbox_ack_after_new_epoch_never_recharges[arranger]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_worker_epoch_publication",
+      "name": "test_original_outbox_ack_after_new_epoch_never_recharges[remix]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_worker_epoch_publication",
+      "name": "test_stale_staged_result_cannot_publish_or_charge[arranger-claim_revision]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_worker_epoch_publication",
+      "name": "test_stale_staged_result_cannot_publish_or_charge[arranger-regime]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_worker_epoch_publication",
+      "name": "test_stale_staged_result_cannot_publish_or_charge[arranger-revision]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_worker_epoch_publication",
+      "name": "test_stale_staged_result_cannot_publish_or_charge[arranger-transitioning]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_worker_epoch_publication",
+      "name": "test_stale_staged_result_cannot_publish_or_charge[remix-claim_revision]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_worker_epoch_publication",
+      "name": "test_stale_staged_result_cannot_publish_or_charge[remix-regime]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_worker_epoch_publication",
+      "name": "test_stale_staged_result_cannot_publish_or_charge[remix-revision]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_worker_epoch_publication",
+      "name": "test_stale_staged_result_cannot_publish_or_charge[remix-transitioning]",
+      "status": "passed"
+    }
+  ]
+}

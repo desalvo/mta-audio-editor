@@ -1,0 +1,1957 @@
+{
+  "scope": "Latest-result distinct union of affected tests; not complete source-tree CI",
+  "xml_in_order": [
+    "terminal-final-regression.xml",
+    "terminal-owner-final.xml",
+    "terminal-proof-final.xml",
+    "terminal-closure-final.xml"
+  ],
+  "distinct_cases": 323,
+  "passed": 323,
+  "failed": 0,
+  "skipped": 0,
+  "full_baseline_repeated": false,
+  "coverage_recollected": false,
+  "real_provider_requests": 0,
+  "superseded_test_fixture_failures": "Initial new privacy fixture used credits_micro/currency instead of credit_value_micro; wallet guard fixture incorrectly used grant() which prefixes the source ID. Corrected fixtures exercise actual schema/source IDs; final guards pass. Historical failed logs retained.",
+  "cases": [
+    {
+      "classname": "tests.test_r210_account_lifecycle",
+      "name": "test_email_change_reserves_old_and_pending_email",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_account_lifecycle",
+      "name": "test_email_mfa_onboarding_precedes_admin_approval_and_blocks_login_without_otp",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_account_lifecycle",
+      "name": "test_email_otp_attempt_limits_cooldown_and_expiry",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_account_lifecycle",
+      "name": "test_failed_purge_removes_uncommitted_sandbox",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_account_lifecycle",
+      "name": "test_quarantine_removes_settlement_outbox_and_credentials",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_account_lifecycle",
+      "name": "test_reactivation_requires_email_then_admin_and_does_not_restore_old_tokens",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_account_lifecycle",
+      "name": "test_repeated_retirement_reactivation_revokes_each_archive_without_token_collision",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_account_lifecycle",
+      "name": "test_retention_api_admin_only_and_self_deletion_forbidden_to_admin",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_account_lifecycle",
+      "name": "test_retention_configuration_validation[settings0]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_account_lifecycle",
+      "name": "test_retention_configuration_validation[settings1]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_account_lifecycle",
+      "name": "test_retention_configuration_validation[settings2]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_account_lifecycle",
+      "name": "test_retention_configuration_validation[settings3]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_account_lifecycle",
+      "name": "test_retirement_preserves_identity_accounting_revokes_tokens_and_exports_projects",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_account_lifecycle",
+      "name": "test_total_delete_admin_protected_and_explicit_confirmation_required",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_account_lifecycle",
+      "name": "test_total_delete_one_confirmation_removes_account_and_accounting",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_account_lifecycle",
+      "name": "test_totp_onboarding_guard_and_notification_outbox",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_authenticated_ledger_service",
+      "name": "test_authenticated_snapshot_journal_and_ledger_commit_together",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_authenticated_ledger_service",
+      "name": "test_incomplete_or_changed_authenticated_history_never_credits[changed_order]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_authenticated_ledger_service",
+      "name": "test_incomplete_or_changed_authenticated_history_never_credits[currency]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_authenticated_ledger_service",
+      "name": "test_incomplete_or_changed_authenticated_history_never_credits[network]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_authenticated_ledger_service",
+      "name": "test_incomplete_or_changed_authenticated_history_never_credits[refund_identity]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_authenticated_ledger_service",
+      "name": "test_incomplete_or_changed_authenticated_history_never_credits[truncated]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_authenticated_ledger_service",
+      "name": "test_refunded_legacy_ledger_without_matching_credit_is_blocked",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_checkout_reference_recovery",
+      "name": "test_concurrent_reference_binding_never_reposts_or_claims_payment",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_checkout_reference_recovery",
+      "name": "test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[amount]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_checkout_reference_recovery",
+      "name": "test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[config]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_checkout_reference_recovery",
+      "name": "test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[currency]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_checkout_reference_recovery",
+      "name": "test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[drain]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_checkout_reference_recovery",
+      "name": "test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[epoch]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_checkout_reference_recovery",
+      "name": "test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[local]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_checkout_reference_recovery",
+      "name": "test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[mirror]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_checkout_reference_recovery",
+      "name": "test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[mode]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_checkout_reference_recovery",
+      "name": "test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[network]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_checkout_reference_recovery",
+      "name": "test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[not_found]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_checkout_reference_recovery",
+      "name": "test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[owner]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_checkout_reference_recovery",
+      "name": "test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[reference]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_checkout_reference_recovery",
+      "name": "test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[url]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_checkout_reference_recovery",
+      "name": "test_legacy_provider_reference_cannot_be_bound_to_second_local_order",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_checkout_reference_recovery",
+      "name": "test_lost_paypal_creation_binds_and_owner_capture_funds_once",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_checkout_reference_recovery",
+      "name": "test_lost_stripe_create_response_binds_then_terminal_readback_closes",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_checkout_reference_recovery",
+      "name": "test_reference_recovery_endpoint_roles_csrf_and_shape",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_credit_checkout",
+      "name": "test_checkout_is_quoted_and_only_signed_paid_event_adds_money",
+      "status": "passed",
+      "source": "terminal-owner-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_credit_checkout",
+      "name": "test_eligibility_and_global_switch_are_enforced_on_backend",
+      "status": "passed",
+      "source": "terminal-owner-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_credit_checkout",
+      "name": "test_legacy_schema_migrates_before_first_job",
+      "status": "passed",
+      "source": "terminal-owner-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_credit_checkout",
+      "name": "test_legal_minimum_exactly_five_fields_and_pdf_omits_optional",
+      "status": "passed",
+      "source": "terminal-owner-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_credit_checkout",
+      "name": "test_paid_plan_fees_do_not_consume_overage_credits",
+      "status": "passed",
+      "source": "terminal-owner-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_credit_checkout",
+      "name": "test_provider_secrets_are_masked_and_sealed_at_rest",
+      "status": "passed",
+      "source": "terminal-owner-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_credit_checkout",
+      "name": "test_stripe_dispatch_outbox_records_verified_session",
+      "status": "passed",
+      "source": "terminal-owner-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_credit_checkout",
+      "name": "test_stripe_uncertain_response_never_retries_automatically",
+      "status": "passed",
+      "source": "terminal-owner-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_credit_checkout",
+      "name": "test_subscription_refusal_never_offers_credits_as_replacement",
+      "status": "passed",
+      "source": "terminal-owner-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_credit_checkout",
+      "name": "test_wrong_amount_unpaid_forged_and_refunded_events",
+      "status": "passed",
+      "source": "terminal-owner-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_credit_checkout",
+      "name": "test_zero_credit_overage_refuses_before_queue_entry",
+      "status": "passed",
+      "source": "terminal-owner-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_financial_admin_browser",
+      "name": "test_admin_diagnostics_remain_readable_during_drain",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_financial_admin_browser",
+      "name": "test_admin_finance_roles_csrf_and_request_shape",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_financial_admin_browser",
+      "name": "test_browser_reads_actual_financial_api_and_never_enables_switch[en]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_financial_admin_browser",
+      "name": "test_browser_reads_actual_financial_api_and_never_enables_switch[it]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_financial_evidence_journal",
+      "name": "test_bad_evidence_rejected[mutation0]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_financial_evidence_journal",
+      "name": "test_bad_evidence_rejected[mutation1]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_financial_evidence_journal",
+      "name": "test_bad_evidence_rejected[mutation2]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_financial_evidence_journal",
+      "name": "test_bad_evidence_rejected[mutation3]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_financial_evidence_journal",
+      "name": "test_bad_evidence_rejected[mutation4]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_financial_evidence_journal",
+      "name": "test_bad_evidence_rejected[mutation5]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_financial_evidence_journal",
+      "name": "test_bad_evidence_rejected[mutation6]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_financial_evidence_journal",
+      "name": "test_conflicting_replay_and_tamper_detection",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_financial_evidence_journal",
+      "name": "test_journal_idempotence_and_never_settles",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_financial_evidence_journal",
+      "name": "test_reject_missing_transaction",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_payment_reconciliation_e2e",
+      "name": "test_concurrent_delivery_only_one_credit_and_refund",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_payment_reconciliation_e2e",
+      "name": "test_credit_mutation_failure_rolls_back_journal_position_inbox_and_payment",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_payment_reconciliation_e2e",
+      "name": "test_dispute_hold_won_then_stale_open_does_not_remove_credits",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_payment_reconciliation_e2e",
+      "name": "test_event_identity_conflict_even_after_success_cannot_mutate_money",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_payment_reconciliation_e2e",
+      "name": "test_financial_journal_payload_cannot_be_modified_or_reopened",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_payment_reconciliation_e2e",
+      "name": "test_full_refund_after_closed_checkout_and_replay",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_payment_reconciliation_e2e",
+      "name": "test_invalid_refund_is_rejected_without_committing_event[mutation0]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_payment_reconciliation_e2e",
+      "name": "test_invalid_refund_is_rejected_without_committing_event[mutation1]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_payment_reconciliation_e2e",
+      "name": "test_invalid_refund_is_rejected_without_committing_event[mutation2]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_payment_reconciliation_e2e",
+      "name": "test_invalid_refund_is_rejected_without_committing_event[mutation3]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_payment_reconciliation_e2e",
+      "name": "test_legacy_paid_position_is_reconciled_without_second_credit",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_payment_reconciliation_e2e",
+      "name": "test_lost_dispute_never_reopens_on_stale_or_contradictory_event",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_payment_reconciliation_e2e",
+      "name": "test_payment_intent_cannot_fund_two_orders",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_payment_reconciliation_e2e",
+      "name": "test_pending_dispute_and_partial_refund_do_not_allow_overcredit",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_payment_reconciliation_e2e",
+      "name": "test_refund_before_paid_is_durable_and_applied_atomically",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_payment_reconciliation_e2e",
+      "name": "test_tampered_financial_credit_is_detected",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal",
+      "name": "test_authenticated_refund_reverses_credits_once",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal",
+      "name": "test_capture_wrong_owner_amount_currency_identity_and_unpaid_are_refused",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal",
+      "name": "test_checkout_requires_eligible_subscription",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal",
+      "name": "test_credit_checkout_capture_and_retries_only_credit_once",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal",
+      "name": "test_http_roles_csrf_and_unsigned_webhook_are_enforced",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal",
+      "name": "test_paypal_outbox_confirmed_on_provider_acceptance",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal",
+      "name": "test_paypal_uncertain_provider_failure_requires_reconciliation",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal",
+      "name": "test_prorated_subscription_fee_remains_payable_after_termination",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal",
+      "name": "test_settings_sealed_and_no_secret_disclosure",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal",
+      "name": "test_subscription_payment_settles_fee_without_adding_overage_credits",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal",
+      "name": "test_untrusted_approval_url_and_denomination_refused",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal",
+      "name": "test_webhook_event_and_fulfillment_share_atomic_commit",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal",
+      "name": "test_webhook_signature_verified_and_canonical_order_fetched",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_failure_after_funding_rolls_back_history_and_wallet",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_incomplete_or_changed_history_cannot_grant_gross_credit[amount]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_incomplete_or_changed_history_cannot_grant_gross_credit[capture]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_incomplete_or_changed_history_cannot_grant_gross_credit[config_changed]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_incomplete_or_changed_history_cannot_grant_gross_credit[cumulative]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_incomplete_or_changed_history_cannot_grant_gross_credit[currency]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_incomplete_or_changed_history_cannot_grant_gross_credit[duplicate]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_incomplete_or_changed_history_cannot_grant_gross_credit[identity]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_incomplete_or_changed_history_cannot_grant_gross_credit[local_changed]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_incomplete_or_changed_history_cannot_grant_gross_credit[missing]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_incomplete_or_changed_history_cannot_grant_gross_credit[order_changed]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_incomplete_or_changed_history_cannot_grant_gross_credit[pending]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_initial_refunded_or_previously_paid_capture_reconciles_exact_net[False]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_initial_refunded_or_previously_paid_capture_reconciles_exact_net[True]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_money_is_an_exact_eur_decimal_string[ 1]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_money_is_an_exact_eur_decimal_string[-1]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_money_is_an_exact_eur_decimal_string[1.001]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_money_is_an_exact_eur_decimal_string[1.01]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_money_is_an_exact_eur_decimal_string[1.]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_money_is_an_exact_eur_decimal_string[1]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_money_is_an_exact_eur_decimal_string[1e2]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_money_is_an_exact_eur_decimal_string[NaN]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_money_is_an_exact_eur_decimal_string[True]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal_history_reconciliation",
+      "name": "test_refunded_subscription_creates_exact_receivable",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal_reconciliation_e2e",
+      "name": "test_ambiguous_paypal_payout_keeps_hold_and_pending_readiness",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal_reconciliation_e2e",
+      "name": "test_canonical_refund_cannot_be_attributed_to_other_capture",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal_reconciliation_e2e",
+      "name": "test_capture_reversal_and_refund_never_double_debit",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal_reconciliation_e2e",
+      "name": "test_dispute_readback_holds_then_releases_and_rejects_stale_updates",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal_reconciliation_e2e",
+      "name": "test_failed_refund_replay_rolls_back_capture_and_wallet",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal_reconciliation_e2e",
+      "name": "test_multiple_capture_refund_before_fulfillment_replays_atomically",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal_reconciliation_e2e",
+      "name": "test_refund_cannot_cross_provider_environment",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal_reconciliation_e2e",
+      "name": "test_reversal_before_capture_is_replayed_in_capture_transaction",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_paypal_reconciliation_e2e",
+      "name": "test_subscription_refund_records_exact_receivable_without_wallet_credit",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_browser",
+      "name": "test_incremental_user_picker_amendment_and_paypal_configuration[1280]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_browser",
+      "name": "test_incremental_user_picker_amendment_and_paypal_configuration[480]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_browser",
+      "name": "test_admin_reads_actual_outstanding_and_repaid_amount[en]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_browser",
+      "name": "test_admin_reads_actual_outstanding_and_repaid_amount[it]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_browser",
+      "name": "test_owner_confirms_resumes_and_returns_to_settled_debt[1280-en]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_browser",
+      "name": "test_owner_confirms_resumes_and_returns_to_settled_debt[1280-it]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_browser",
+      "name": "test_owner_confirms_resumes_and_returns_to_settled_debt[390-en]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_browser",
+      "name": "test_owner_confirms_resumes_and_returns_to_settled_debt[390-it]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_allocations_are_immutable_and_missing_position_blocks_report",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_already_captured_obsolete_quote_is_retained_as_refund_due",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_authenticated_refunded_initial_repayment_reopens_original_debt",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_authorized_account_erasure_preserves_other_owner_financial_records[erase]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_authorized_account_erasure_preserves_other_owner_financial_records[privacy_purge]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_cent_rounding_surplus_is_separate_and_refunded_first",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_concurrent_checkout_only_one_provider_order_and_pending_target",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_concurrent_fulfillment_delivers_one_allocation",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_dispute_release_after_second_repayment_creates_refund_liability",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_erasure_authorization_is_retired_owner_scoped_and_connection_local",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_exact_repayment_closes_debt_without_wallet_or_fee_mutation",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_failure_rolls_back_capture_allocation_and_fence_then_retries",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_multiple_sources_are_bound_to_original_refund",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_owner_api_quote_csrf_and_regime_guards",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_owner_quote_change_is_checked_before_provider_capture",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_permanent_capture_reversal_reopens_original_receivable",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_refund_before_repayment_fulfillment_is_atomic",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_refund_reopens_same_debt_and_can_be_repaid_again",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_repayment_allowed_for_existing_debt_after_plan_service_disabled",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_uncertain_create_stays_pending_without_second_provider_post",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_verified_webhook_retries_allocate_once",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_actual_frontend_history_and_escaping",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_calendar_boundaries_do_not_drift",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_cancelled_diagnostic_usage_consumes_quota_without_gpu_invoice",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_cancelling_queued_job_releases_quota_reservation",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_concurrent_limited_jobs_cannot_double_spend",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_concurrent_renewal_is_one_credit_debit",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_credit_retry_validation_and_promo",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_credit_usage_report_and_email_are_separate_from_ordinary_invoice",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_defaults_and_admin_unlimited",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_email_html_links_retries_and_language",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_ended_subscription_reverts_to_free_accounting",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_exhausted_credit_blocks_next_job",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_existing_explicit_admin_storage_limit_survives_migration",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_history_without_quotas_is_owner_scoped",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_legal_updates_enqueue_once_and_remove_draft",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_live_checkpoint_and_alerts_are_idempotent",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_manual_daily_limits_inherit_storage_and_block",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_no_overage_without_opt_in",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_notice_smtp_absence_does_not_drop_events",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_overage_ordinary_tariff_credits_and_no_double_invoice",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_privacy_pdf_preserves_all_data_categories[en]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_privacy_pdf_preserves_all_data_categories[it]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_renewal_freezes_plan_and_charges_once",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_retention_change_notifies_and_noop_does_not",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_routes_enforce_owner_admin_and_csrf",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_self_service_cannot_reset_active_period",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_storage_coverage_is_time_bounded_and_does_not_hide_usage",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_storage_unlock_is_time_priced_and_idempotent",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_unfunded_and_cancellation",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_zero_storage_quota_is_not_unlimited",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_canceled_intent_after_async_failure_resolves_pending_signed_event",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_concurrent_signed_expiration_and_canonical_readback",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_nonterminal_failed_or_processing_intent_stays_open[processing]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_nonterminal_failed_or_processing_intent_stays_open[requires_capture]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_nonterminal_failed_or_processing_intent_stays_open[requires_payment_method]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_paid_notification_after_terminal_is_durable_conflict_not_credit",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_paypal_nonterminal_browser_cancel_is_not_financial_cancellation[APPROVED]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_paypal_nonterminal_browser_cancel_is_not_financial_cancellation[CREATED]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_paypal_nonterminal_browser_cancel_is_not_financial_cancellation[PAYER_ACTION_REQUIRED]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_paypal_nonterminal_browser_cancel_is_not_financial_cancellation[PENDING_APPROVAL]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_paypal_paid_after_terminal_keeps_conflict_without_wallet_credit",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_paypal_voided_empty_order_closes_and_stale_retry_never_captures",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_paypal_voided_incomplete_or_changed_history_is_blocked[amount]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_paypal_voided_incomplete_or_changed_history_is_blocked[authorization]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_paypal_voided_incomplete_or_changed_history_is_blocked[capture]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_paypal_voided_incomplete_or_changed_history_is_blocked[changed]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_paypal_voided_incomplete_or_changed_history_is_blocked[config]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_paypal_voided_incomplete_or_changed_history_is_blocked[identity]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_paypal_voided_incomplete_or_changed_history_is_blocked[intent]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_paypal_voided_incomplete_or_changed_history_is_blocked[refund]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_signed_expiration_without_intent_closes_without_network",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_stripe_expired_checkout_readback_closes_exactly_once[False]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_stripe_expired_checkout_readback_closes_exactly_once[True]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_stripe_terminal_proof_fails_closed[captured]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_stripe_terminal_proof_fails_closed[changed]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_stripe_terminal_proof_fails_closed[charge]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_stripe_terminal_proof_fails_closed[config]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_stripe_terminal_proof_fails_closed[drain]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_stripe_terminal_proof_fails_closed[epoch]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_stripe_terminal_proof_fails_closed[mirror]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_stripe_terminal_proof_fails_closed[missing_intent]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_stripe_terminal_proof_fails_closed[paid]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_stripe_terminal_proof_fails_closed[wrong_amount]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_stripe_terminal_proof_fails_closed[wrong_currency]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_stripe_terminal_proof_fails_closed[wrong_id]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_stripe_terminal_proof_fails_closed[wrong_mode]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_stripe_terminal_proof_fails_closed[wrong_owner]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_terminal_financial_graph_erasure_preserves_other_owner[erase]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_terminal_financial_graph_erasure_preserves_other_owner[privacy_purge]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_terminal_proof_cannot_erase_existing_financial_evidence[funded_position]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_terminal_proof_cannot_erase_existing_financial_evidence[pending_paid]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_terminal_proof_cannot_erase_existing_financial_evidence[wallet]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_terminal_proof_cannot_erase_existing_financial_evidence[wrong_pending_identity]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_terminal_receipt_audit_detects_reopened_fence",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_checkout_e2e",
+      "name": "test_terminal_transaction_rolls_back_and_retries",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_recovery_browser",
+      "name": "test_admin_recovers_reference_and_closes_expired_without_new_create[1280-en]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_recovery_browser",
+      "name": "test_admin_recovers_reference_and_closes_expired_without_new_create[1280-it]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_recovery_browser",
+      "name": "test_admin_recovers_reference_and_closes_expired_without_new_create[480-en]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_recovery_browser",
+      "name": "test_admin_recovers_reference_and_closes_expired_without_new_create[480-it]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_recovery_browser",
+      "name": "test_owner_can_complete_recovered_repayment_without_approval_url[en]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_recovery_browser",
+      "name": "test_owner_can_complete_recovered_repayment_without_approval_url[it]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_recovery_browser",
+      "name": "test_owner_resumes_recovered_credit_purchase_from_private_catalog[en]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_terminal_recovery_browser",
+      "name": "test_owner_resumes_recovered_credit_purchase_from_private_catalog[it]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_active_jobs_and_project_symlinks_refuse_dump",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_all_admins_immutable_even_with_multiple_admins",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_central_ledger_cannot_advance_past_outbox_snapshot",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_config_only_and_all_users_dump_selections",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_corrupt_checksum_and_unconfirmed_restore_write_nothing",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_dump_routes_admin_permissions_and_preview",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_dump_selection_closure_and_roundtrip",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_erasure_of_legacy_already_purged_account_removes_old_sandbox",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_failed_file_erasure_remains_retryable_and_blocks_reactivation",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_file_based_global_settings_are_in_dump_and_restore",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_health_probes_remain_available_during_dump_maintenance",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_immediate_erasure_removes_all_retained_copies_and_preserves_others",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_invalid_selection[bad0]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_invalid_selection[bad1]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_invalid_selection[bad2]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_invalid_selection[bad3]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_invalid_selection[bad4]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_project_selection_includes_owner_but_not_other_owned_projects",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_restore_rolls_back_if_publication_fails",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_unsafe_paths_refused[../escape]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_unsafe_paths_refused[/escape]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_unsafe_paths_refused[data/other]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_unsafe_paths_refused[projects/../../x]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_unsafe_paths_refused[projects/abcd/C:/x]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_unsafe_paths_refused[projects/abcd/a\\\\b]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_unsafe_paths_refused[queue/unknown]",
+      "status": "passed",
+      "source": "terminal-closure-final.xml"
+    },
+    {
+      "classname": "tests.test_regime_cancelled_checkout",
+      "name": "test_blocks_money_and_rolls_back[paypal]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_cancelled_checkout",
+      "name": "test_blocks_money_and_rolls_back[stripe]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_cancelled_checkout",
+      "name": "test_closes_only_provider_verified_noncreation[paypal]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_cancelled_checkout",
+      "name": "test_closes_only_provider_verified_noncreation[stripe]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_cancelled_checkout",
+      "name": "test_no_false_negative_after_confirmed_provider",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_cancelled_checkout",
+      "name": "test_requires_caller_transaction",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_checkout_fence",
+      "name": "test_checkout_enrollment_atomic_and_retry",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_checkout_fence",
+      "name": "test_checkout_refuses_regime_drift",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_checkout_fence",
+      "name": "test_checkout_rollback",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_checkout_fence",
+      "name": "test_checkout_settlement_requires_confirmed_dispatch[paypal]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_checkout_fence",
+      "name": "test_checkout_settlement_requires_confirmed_dispatch[stripe]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_checkout_fence",
+      "name": "test_confirmed_dispatch_cannot_settle_during_transition",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_checkout_fence",
+      "name": "test_paypal_refund_receipt_rejects_noncommercial_origin",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_checkout_fence",
+      "name": "test_verified_payment_requires_commercial_origin",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_outbox_integrity_r210",
+      "name": "test_integrity_detects_inconsistencies[DELETE FROM regime_fence_operations WHERE operation_id='checkout:stripe:x'-missing_receipt]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_outbox_integrity_r210",
+      "name": "test_integrity_detects_inconsistencies[UPDATE regime_fence_operations SET status='closed' WHERE operation_id='checkout:stripe:x'-unresolved_checkout_closed]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_outbox_integrity_r210",
+      "name": "test_integrity_detects_inconsistencies[UPDATE regime_payment_outbox SET attempts=2 WHERE operation_id='checkout:stripe:x'-pending_with_attempts]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_outbox_integrity_r210",
+      "name": "test_integrity_detects_inconsistencies[UPDATE regime_payment_outbox SET provider_reference='cs_1' WHERE operation_id='checkout:stripe:x'-unexpected_provider_reference]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_outbox_integrity_r210",
+      "name": "test_integrity_detects_inconsistencies[UPDATE regime_payment_outbox SET state='confirmed', attempts=1 WHERE operation_id='checkout:stripe:x'-missing_provider_reference]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_outbox_integrity_r210",
+      "name": "test_missing_schema_fails_closed",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_outbox_integrity_r210",
+      "name": "test_pending_and_confirmed_state_read_only",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_outbox_reconciliation",
+      "name": "test_confirm_reconcile_is_idempotent[paypal]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_outbox_reconciliation",
+      "name": "test_confirm_reconcile_is_idempotent[stripe]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_outbox_reconciliation",
+      "name": "test_negative_requires_verified_outcome_and_never_closes_fence[paypal]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_outbox_reconciliation",
+      "name": "test_negative_requires_verified_outcome_and_never_closes_fence[stripe]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_outbox_reconciliation",
+      "name": "test_reconciliation_blocks_closed_receipt[paypal]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_outbox_reconciliation",
+      "name": "test_reconciliation_blocks_closed_receipt[stripe]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_outbox_reconciliation",
+      "name": "test_reconciliation_blocks_transition_and_stale_revision[paypal]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_outbox_reconciliation",
+      "name": "test_reconciliation_blocks_transition_and_stale_revision[stripe]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_outbox_reconciliation",
+      "name": "test_rollback_and_provider_conflict",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_outbox_review",
+      "name": "test_missing_schema_is_not_ready",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_outbox_review",
+      "name": "test_review_read_only_and_pagination",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_outbox_review",
+      "name": "test_uncertain_and_confirmed_open_checkout_both_visible",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_readiness_cli_r210",
+      "name": "test_cli_writes_private_report_never_overwrites",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_readiness_cli_r210",
+      "name": "test_empty_existing_db_is_never_ready",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_readiness_cli_r210",
+      "name": "test_invalid_regime_fails[INVALID]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_readiness_cli_r210",
+      "name": "test_invalid_regime_fails[NONCOMMERCIAL]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_readiness_cli_r210",
+      "name": "test_invalid_regime_fails[]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_readiness_cli_r210",
+      "name": "test_invalid_regime_fails[commercial]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_readiness_cli_r210",
+      "name": "test_missing_and_symlink_blocked",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_readiness_cli_r210",
+      "name": "test_snapshot_is_never_modified",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_readiness_hardening_r210",
+      "name": "test_all_directions_are_diagnostic_only[COMMERCIAL-COMMERCIAL]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_readiness_hardening_r210",
+      "name": "test_all_directions_are_diagnostic_only[COMMERCIAL-NON_COMMERCIAL]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_readiness_hardening_r210",
+      "name": "test_all_directions_are_diagnostic_only[NON_COMMERCIAL-COMMERCIAL]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_readiness_hardening_r210",
+      "name": "test_all_directions_are_diagnostic_only[NON_COMMERCIAL-NON_COMMERCIAL]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_readiness_hardening_r210",
+      "name": "test_cli_produces_nonzero_code_and_unprivileged_report[\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_readiness_hardening_r210",
+      "name": "test_cli_produces_nonzero_code_and_unprivileged_report[]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_readiness_hardening_r210",
+      "name": "test_cli_produces_nonzero_code_and_unprivileged_report[not a sqlite database]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_readiness_hardening_r210",
+      "name": "test_malformed_database_fail_closed[COMMERCIAL-NON_COMMERCIAL]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_readiness_hardening_r210",
+      "name": "test_malformed_database_fail_closed[NON_COMMERCIAL-COMMERCIAL]",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_readiness_hardening_r210",
+      "name": "test_symlinked_report_not_overwritten",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_reconciliation_inventory",
+      "name": "test_completed_job_not_active",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_reconciliation_inventory",
+      "name": "test_historic_credit_movements_remain_reconciliation_items",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_reconciliation_inventory",
+      "name": "test_readiness_does_not_authorize_switch_even_without_open_rows",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_reconciliation_inventory",
+      "name": "test_readiness_rejects_unrecognized_regime",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_reconciliation_inventory",
+      "name": "test_reconciliation_inventory_handles_unknown_columns",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_reconciliation_inventory",
+      "name": "test_unknown_schema_fails_closed",
+      "status": "passed",
+      "source": "terminal-final-regression.xml"
+    }
+  ]
+}

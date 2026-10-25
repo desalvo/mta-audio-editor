@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
-from compare_multitrack_models import compare, parse_prediction, score
+from compare_multitrack_models import parse_prediction, score
 
 
 def test_strict_and_agnostic():

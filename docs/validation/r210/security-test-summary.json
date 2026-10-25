@@ -1,0 +1,578 @@
+{
+  "version": "0.3.0-r210",
+  "scope": "Affected security/model/process cases only. Latest result per identity; never added to historical full baseline.",
+  "runs": [
+    {
+      "evidence": "docs/validation/r210/security-process-models.xml",
+      "passed": 104,
+      "skipped": 1,
+      "failed": 1
+    },
+    {
+      "evidence": "docs/validation/r210/security-transkun-restored.xml",
+      "passed": 1,
+      "skipped": 0,
+      "failed": 0
+    },
+    {
+      "evidence": "docs/validation/r210/security-review-gate.xml",
+      "passed": 17,
+      "skipped": 0,
+      "failed": 0
+    },
+    {
+      "evidence": "docs/validation/r210/security-sql.xml",
+      "passed": 4,
+      "skipped": 0,
+      "failed": 0
+    },
+    {
+      "evidence": "docs/validation/r210/security-extra-final.xml",
+      "passed": 19,
+      "skipped": 0,
+      "failed": 0
+    },
+    {
+      "evidence": "docs/validation/r210/security-kernel-pid-final.xml",
+      "passed": 2,
+      "skipped": 0,
+      "failed": 0
+    }
+  ],
+  "distinct_cases": 128,
+  "passed": 127,
+  "skipped": 1,
+  "failed": 0,
+  "complete_baseline_repeated": false,
+  "coverage_recollected": false,
+  "real_provider_or_bank_requests": 0,
+  "external_server_or_github_mutations": 0,
+  "test_dependency_restored": "mido 1.3.3, already declared optional requirement; one missing-dependency failure rerun and passed after restoration. No requirements change or new runtime dependency.",
+  "not_executed": "Actual Torch weights-only/malicious-checkpoint fixture: optional Torch absent. No real neural checkpoint, GPU or native Windows/macOS verification.",
+  "final_source_checks": {
+    "all_app_native_tests_scripts_ruff": "passed",
+    "compileall_app_scripts": "passed",
+    "source_bound_bandit_gate": "passed",
+    "bandit_source_files": 273,
+    "bandit_raw_findings": 168,
+    "raw_high": 0,
+    "raw_medium": 21,
+    "raw_low": 147,
+    "nosec": 0,
+    "scanner_skips": 0
+  },
+  "cases": {
+    "tests.test_r210_security_process_and_models::test_untrusted_model_names_fail_before_any_extraction[../escape]": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_security_process_and_models::test_untrusted_model_names_fail_before_any_extraction[/absolute]": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_security_process_and_models::test_untrusted_model_names_fail_before_any_extraction[C:/escape]": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_security_process_and_models::test_untrusted_model_names_fail_before_any_extraction[a\\\\b]": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_security_process_and_models::test_untrusted_model_names_fail_before_any_extraction[a//b]": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_security_process_and_models::test_untrusted_model_names_fail_before_any_extraction[a/./b]": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_security_process_and_models::test_untrusted_model_names_fail_before_any_extraction[a/../b]": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_security_process_and_models::test_untrusted_model_names_fail_before_any_extraction[x.]": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_security_process_and_models::test_untrusted_model_names_fail_before_any_extraction[x ]": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_security_process_and_models::test_untrusted_model_names_fail_before_any_extraction[CON]": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_security_process_and_models::test_untrusted_model_names_fail_before_any_extraction[a/aux.txt]": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_security_process_and_models::test_untrusted_model_names_fail_before_any_extraction[a/COM1.txt]": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_security_process_and_models::test_alias_and_file_directory_conflicts_fail_before_writes[names0]": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_security_process_and_models::test_alias_and_file_directory_conflicts_fail_before_writes[names1]": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_security_process_and_models::test_alias_and_file_directory_conflicts_fail_before_writes[names2]": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_security_process_and_models::test_links_and_special_archive_entries_are_rejected[41471]": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_security_process_and_models::test_links_and_special_archive_entries_are_rejected[8576]": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_security_process_and_models::test_links_and_special_archive_entries_are_rejected[4480]": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_security_process_and_models::test_expanded_archive_budgets_preflight_all_members[MAX_DOWNLOAD_BYTES]": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_security_process_and_models::test_expanded_archive_budgets_preflight_all_members[MAX_EXPANDED_BYTES]": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_security_process_and_models::test_expanded_archive_budgets_preflight_all_members[MAX_ARCHIVE_MEMBERS]": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_security_process_and_models::test_extraction_does_not_overwrite_existing_or_follow_destination_link": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_security_process_and_models::test_model_download_budget_removes_only_own_partial_file": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_security_process_and_models::test_failed_secondary_download_never_publishes_partial_model": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_security_process_and_models::test_existing_install_is_preserved_without_redownload": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_security_process_and_models::test_revoked_rights_at_publication_preserve_absent_install": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_security_process_and_models::test_delete_and_lookup_require_exact_registered_model[../outside]": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_security_process_and_models::test_delete_and_lookup_require_exact_registered_model[missing]": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_security_process_and_models::test_delete_and_lookup_require_exact_registered_model[/outside]": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_security_process_and_models::test_actual_custom_separator_no_longer_deadlocks_on_pipe_sized_output": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_security_process_and_models::test_separator_cancellation_before_start_never_spawns": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_security_process_and_models::test_separator_log_overflow_and_failure_are_explicit": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_security_process_and_models::test_separator_timeout_stops_its_owned_process": {
+      "state": "passed",
+      "source": "security-kernel-pid-final.xml"
+    },
+    "tests.test_r210_security_process_and_models::test_separator_cancel_stops_worker_and_normal_descendant": {
+      "state": "passed",
+      "source": "security-kernel-pid-final.xml"
+    },
+    "tests.test_r210_checkpoint_weights_security::test_transkun_accepts_only_weights_and_preserves_original_device[best_state_dict]": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_checkpoint_weights_security::test_transkun_accepts_only_weights_and_preserves_original_device[state_dict]": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_checkpoint_weights_security::test_transkun_never_falls_back_to_unrestricted_unpickling[error0]": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_checkpoint_weights_security::test_transkun_never_falls_back_to_unrestricted_unpickling[error1]": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_checkpoint_weights_security::test_executable_or_malformed_weight_objects_are_not_accepted[None]": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_checkpoint_weights_security::test_executable_or_malformed_weight_objects_are_not_accepted[data1]": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_checkpoint_weights_security::test_executable_or_malformed_weight_objects_are_not_accepted[data2]": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_checkpoint_weights_security::test_executable_or_malformed_weight_objects_are_not_accepted[data3]": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_checkpoint_weights_security::test_executable_or_malformed_weight_objects_are_not_accepted[data4]": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_checkpoint_weights_security::test_executable_or_malformed_weight_objects_are_not_accepted[data5]": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_checkpoint_weights_security::test_actual_torch_weights_only_rejects_pickle_execution": {
+      "state": "skipped",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r195_chord_ml_runtime::test_model_root_and_install_delete": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r195_chord_ml_runtime::test_safe_extract_rejects_traversal": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r195_chord_ml_runtime::test_flatten_single_directory": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r195_chord_ml_runtime::test_download_btc_and_chordformer_with_fake_archives": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r195_chord_ml_runtime::test_download_validates_missing_checkpoints": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r195_chord_ml_runtime::test_lab_and_json_parsers": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r195_chord_ml_runtime::test_run_success_and_failure": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r195_chord_ml_runtime::test_extract_adapters_with_mocked_runner": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r195_chord_ml_runtime::test_runtime_available_import_failure": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_backing_vocals_123::test_ui_exposes_second_pass_backing_vocals": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_backing_vocals_123::test_backend_accepts_and_tracks_backing_vocals_option": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_backing_vocals_123::test_configured_ai_separator_uses_no_shell": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_backing_vocals_123::test_ffmpeg_fallback_builds_center_side_outputs": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_stem_dialog_runtime::test_catalog_probes_configured_backing_runtime": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_stem_dialog_runtime::test_catalog_does_not_claim_broken_worker_is_available[absent]": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_stem_dialog_runtime::test_catalog_does_not_claim_broken_worker_is_available[broken]": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_stem_dialog_runtime::test_catalog_does_not_claim_broken_worker_is_available[timeout]": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_stem_dialog_runtime::test_model_download_uses_worker_and_shared_cache": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_stem_dialog_runtime::test_native_download_does_not_launch_server_worker": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_stem_dialog_runtime::test_server_split_stays_in_global_queue": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_stem_dialog_runtime::test_stem_buttons_have_explicit_readable_colors": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_stem_dialog_runtime::test_real_bridge_downloads_without_importing_separator_in_web_runtime": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_remote_vocal_artifact_order::test_backing_filename_cannot_be_selected_as_lead[names0]": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_remote_vocal_artifact_order::test_backing_filename_cannot_be_selected_as_lead[names1]": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_remote_vocal_artifact_order::test_backing_filename_cannot_be_selected_as_lead[names2]": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_remote_vocal_artifact_order::test_identical_silent_artifact_bytes_do_not_imply_missing_stem": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r266_separator_output_paths::test_audio_separator_relative_output_filenames": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_mega53_drum_parts::test_drums_use_same_authorized_inference_pipeline": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_mega53_drum_parts::test_drum_target_rejects_cymbals": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_mega53_drums_percussion_groups::test_two_native_group_sources_requested_from_original_mix": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_mega53_drums_percussion_groups::test_missing_group_stem_is_rejected": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_mega53_adapter_r210::test_catalog_and_policy_identity": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_mega53_adapter_r210::test_not_configured_fails_closed": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_mega53_adapter_r210::test_adapter_with_synthetic_stub": {
+      "state": "passed",
+      "source": "security-extra-final.xml"
+    },
+    "tests.test_mega53_adapter_r210::test_invalid_model_files_are_rejected": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_mega53_primary_secondary_r210::test_uvr_primary_and_mega_secondary": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_mega53_primary_secondary_r210::test_mega53_rejects_unverified_weights": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_mega53_primary_secondary_r210::test_multi_singer_remains_distinct_from_lead_backing": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r201_generic_ace_installer::test_executable_shebang_and_help": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r201_generic_ace_installer::test_legacy_name_removed": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r193_ace_desktop::test_installer_requires_consent": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r193_ace_desktop::test_server_requires_consent_and_install": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r193_ace_desktop::test_status_has_no_network_or_install_side_effect": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r193_ace_desktop::test_autostart_requires_persisted_consent": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r193_ace_desktop::test_autostart_reuses_previous_permission": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r193_ace_desktop::test_native_shutdown_stops_only_owned_worker": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r193_ace_desktop::test_install_progress_fields_and_no_fabricated_model_percent": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_studio_completion_contracts::test_empty_results_preserve_strict_score_schema": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_studio_completion_contracts::test_completed_stage_recovers_without_execution_or_double_usage": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_studio_completion_contracts::test_same_stage_cache_object_invalidates_when_runtime_changes": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_studio_completion_contracts::test_corrupt_stage_is_recomputed_but_links_are_rejected": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_studio_completion_contracts::test_schema_invalid_checkpoint_recomputes_real_stage": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_studio_completion_contracts::test_invalid_computed_music_is_not_persisted_or_acknowledged": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_studio_completion_contracts::test_failed_stage_is_never_cached": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_studio_completion_contracts::test_conversion_real_pcm_io_and_exact_model_arguments[seed-vc]": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_studio_completion_contracts::test_conversion_real_pcm_io_and_exact_model_arguments[rvc]": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_studio_completion_contracts::test_conversion_failure_never_replaces_original_audio": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_studio_completion_contracts::test_transkun_contract_reads_actual_midi_velocity_and_sustain": {
+      "state": "passed",
+      "source": "security-transkun-restored.xml"
+    },
+    "tests.test_r210_studio_completion_contracts::test_text_alignment_melismas_word_ids_and_missing_count": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_studio_completion_contracts::test_dynamic_curves_reach_f0_dynamics_and_neural_inputs": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_studio_completion_contracts::test_offline_runner_blocks_python_network_downloads": {
+      "state": "passed",
+      "source": "security-process-models.xml"
+    },
+    "tests.test_r210_security_review_gate::test_complete_source_bound_review_is_accepted": {
+      "state": "passed",
+      "source": "security-extra-final.xml"
+    },
+    "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[changed_source]": {
+      "state": "passed",
+      "source": "security-extra-final.xml"
+    },
+    "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[new_source]": {
+      "state": "passed",
+      "source": "security-extra-final.xml"
+    },
+    "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[deleted_source]": {
+      "state": "passed",
+      "source": "security-extra-final.xml"
+    },
+    "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[scan_error]": {
+      "state": "passed",
+      "source": "security-extra-final.xml"
+    },
+    "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[missing_file]": {
+      "state": "passed",
+      "source": "security-extra-final.xml"
+    },
+    "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[suppression]": {
+      "state": "passed",
+      "source": "security-extra-final.xml"
+    },
+    "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[high]": {
+      "state": "passed",
+      "source": "security-extra-final.xml"
+    },
+    "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[missing_review]": {
+      "state": "passed",
+      "source": "security-extra-final.xml"
+    },
+    "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[duplicate_review]": {
+      "state": "passed",
+      "source": "security-extra-final.xml"
+    },
+    "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[new_finding]": {
+      "state": "passed",
+      "source": "security-extra-final.xml"
+    },
+    "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[changed_finding]": {
+      "state": "passed",
+      "source": "security-extra-final.xml"
+    },
+    "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[duplicate_scan]": {
+      "state": "passed",
+      "source": "security-extra-final.xml"
+    },
+    "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[wrong_totals]": {
+      "state": "passed",
+      "source": "security-extra-final.xml"
+    },
+    "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[empty_reason]": {
+      "state": "passed",
+      "source": "security-extra-final.xml"
+    },
+    "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[blanket_approval]": {
+      "state": "passed",
+      "source": "security-extra-final.xml"
+    },
+    "tests.test_r210_security_review_gate::test_current_scan_and_complete_review_ledger_agree": {
+      "state": "passed",
+      "source": "security-extra-final.xml"
+    },
+    "tests.test_r210_security_sql_boundaries::test_retention_identifier_allowlist_rejects_request_sql[sandbox_days=1 WHERE id=1; DROP TABLE users; --]": {
+      "state": "passed",
+      "source": "security-sql.xml"
+    },
+    "tests.test_r210_security_sql_boundaries::test_retention_identifier_allowlist_rejects_request_sql[project_days\"]": {
+      "state": "passed",
+      "source": "security-sql.xml"
+    },
+    "tests.test_r210_security_sql_boundaries::test_retention_identifier_allowlist_rejects_request_sql[user_id]": {
+      "state": "passed",
+      "source": "security-sql.xml"
+    },
+    "tests.test_r210_security_sql_boundaries::test_schema_quotes_and_fk_columns_do_not_become_sql": {
+      "state": "passed",
+      "source": "security-sql.xml"
+    },
+    "tests.test_r210_security_process_and_models::test_failed_member_crc_never_publishes_an_installed_model": {
+      "state": "passed",
+      "source": "security-extra-final.xml"
+    }
+  }
+}

@@ -1,0 +1,35 @@
+/* Administration-wide readable controls, reflow and keyboard navigation. */
+body[data-admin-workflow]{--admin-bg:#f8fafc;--admin-panel:#fff;--admin-ink:#0f172a;--admin-muted:#475569;--admin-link:#1d4ed8;--admin-focus:#1d4ed8;--bg:var(--admin-bg);--panel:var(--admin-panel);--ink:var(--admin-ink);--text:var(--admin-ink);--muted:var(--admin-muted);--line:#64748b;--accent:#1d4ed8;background:var(--admin-bg);color:var(--admin-ink);overflow-wrap:anywhere}
+@media(prefers-color-scheme:dark){body[data-admin-workflow]{--admin-bg:#111827;--admin-panel:#1f2937;--admin-ink:#f9fafb;--admin-muted:#d1d5db;--admin-link:#93c5fd;--admin-focus:#facc15;color-scheme:dark}}
+body[data-admin-workflow] [hidden]{display:none!important}
+body[data-admin-workflow] main,body[data-admin-workflow] main>*,body[data-admin-workflow] section,body[data-admin-workflow] fieldset,body[data-admin-workflow] .table-scroll,body[data-admin-workflow] .scroll,body[data-admin-workflow] .settings-form,body[data-admin-workflow] label,body[data-admin-workflow] .profile-row>*{min-width:0;max-width:100%}
+body[data-admin-workflow] header,body[data-admin-workflow] .settings-card,body[data-admin-workflow] main section,body[data-admin-workflow] .metric,body[data-admin-workflow] fieldset{background:var(--admin-panel);background-image:none;color:var(--admin-ink)}
+body[data-admin-workflow] p,body[data-admin-workflow] small,body[data-admin-workflow] .hint,body[data-admin-workflow] th,body[data-admin-workflow] footer{color:var(--admin-muted)}
+body[data-admin-workflow] header p,body[data-admin-workflow] .back{opacity:1}
+body[data-admin-workflow] a{color:var(--admin-link);text-decoration:underline;text-underline-offset:.15em}
+body[data-admin-workflow] input,body[data-admin-workflow] textarea,body[data-admin-workflow] select{background:var(--admin-panel);color:var(--admin-ink);border-color:var(--line);max-width:100%}
+body[data-admin-workflow] button{background:#1d4ed8!important;background-image:none!important;color:#fff!important;border-color:#1d4ed8!important;min-height:36px;white-space:normal;overflow-wrap:anywhere}
+body[data-admin-workflow] button.danger,body[data-admin-workflow] .erase-account{background:#9f1239!important;border-color:#9f1239!important}
+body[data-admin-workflow] button[role=tab][aria-selected=true]{box-shadow:inset 0 -4px 0 #facc15}
+body[data-admin-workflow] :is(button,input,select,textarea,a,summary,[tabindex]):focus-visible{outline:3px solid var(--admin-focus)!important;outline-offset:3px;scroll-margin:20px}
+body[data-admin-workflow] .badge,body[data-admin-workflow] .pill{background:var(--admin-panel);color:var(--admin-ink);border:1px solid var(--line)}
+body[data-admin-workflow] .settings-tabs{display:flex;flex-wrap:wrap;gap:8px;min-width:0}
+body[data-admin-workflow] .settings-tabs button{flex:1 1 140px}
+body[data-admin-workflow] .table-scroll,body[data-admin-workflow] .scroll{overflow:auto;max-width:100%}
+body[data-admin-workflow] pre{white-space:pre-wrap;overflow-wrap:anywhere;max-width:100%;overflow:auto;background:var(--admin-panel);color:var(--admin-ink)}
+body[data-admin-workflow] .settings-top,body[data-admin-workflow] header nav,body[data-admin-workflow] .admin-actions{flex-wrap:wrap;gap:12px}
+body[data-admin-workflow] .profile-row{grid-template-columns:minmax(0,130px) minmax(0,1fr)}
+body[data-admin-workflow] .settings-form.two-col{grid-template-columns:repeat(2,minmax(0,1fr))}
+body[data-admin-workflow] .admin-skip{position:fixed;left:12px;top:-100px;z-index:100000;padding:12px;background:var(--admin-panel);color:var(--admin-link)}
+body[data-admin-workflow] .admin-skip:focus{top:12px}
+@media(max-width:600px){body[data-admin-workflow] .admin-wrap{padding:14px}body[data-admin-workflow] .settings-card{padding:16px}body[data-admin-workflow] .settings-form.two-col{grid-template-columns:minmax(0,1fr)}body[data-admin-workflow] .settings-top{padding:14px}body[data-admin-workflow] .profile-row{grid-template-columns:minmax(0,1fr)}body[data-admin-workflow] .settings-tabs button{flex-basis:120px}}
+
+body[data-admin-workflow] .admin-download{background:var(--admin-panel);color:var(--admin-link)}
+body[data-admin-workflow] button:disabled{opacity:1;background:#475569!important;color:#fff!important;-webkit-text-fill-color:#fff}
+body[data-admin-workflow] :is(input,select,textarea):disabled{opacity:1;color:var(--admin-muted);-webkit-text-fill-color:var(--admin-muted)}
+body[data-admin-workflow] .aj-panel,body[data-admin-workflow] .aj-head,body[data-admin-workflow] .aj-tools,body[data-admin-workflow] .optional-plugin-card{background:var(--admin-panel);color:var(--admin-ink)}
+body[data-admin-workflow] .aj-panel :is(label,td,h2,.aj-summary,.aj-feedback){color:var(--admin-ink)}
+body[data-admin-workflow] .resource-panel :is(.subscription-section,[data-user-results]){background:var(--admin-panel);background-image:none;color:var(--admin-ink)}
+body[data-admin-workflow] .resource-panel :is(summary,[data-selected-user]){color:var(--admin-ink)}
+body[data-admin-workflow] .resource-panel :is(p,small,label,legend){color:var(--admin-ink)}
+body[data-admin-workflow] .resource-panel :is(.access-required,.billing-mode,.renewal-note){background:var(--admin-panel);color:var(--admin-ink)}

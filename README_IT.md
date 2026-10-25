@@ -1,3 +1,45 @@
+> Current PRE-RC handoff: [merchant-wide PayPal observations](docs/MERCHANT_HISTORY_HANDOFF_R210.md). RC false;23/42 criteria(54.8%);new browser acceptance remains blocked.
+
+> Current PRE-RC continuation: [original subscription loss and revised strategy](docs/ORIGINAL_SUBSCRIPTION_LOSS_HANDOFF_R210.md). RC false;23/42 locally verified criteria(54.8%).
+
+> Current PRE-RC handoff: [frozen publication recovery](docs/TWENTY_CYCLE_RECOVERY_HANDOFF_R210.md), 2026-10-25. RC false;23/42 locally verified criteria(54.8%).
+
+**Checkpoint Work 24 ottobre 2026 — PRE-RC:** Dieci cicli interni completati;coordinamento pull autorevole,storage condiviso tramite HTTPS,recupero senza riesecuzione e generazioni gratuite corrette. **B4 verificato localmente;23/42 (54,8%),0/7 macroaree complete;898 casi distinti superati,90 nuovi.RC non raggiunta,cambio di regime disabilitato.** [Handoff](docs/PULL_COORDINATION_HANDOFF_R210.md), [IT/EN guide](docs/PULL_COORDINATION_IT_EN_R210.md), [remaining work](docs/RC_CLOSURE_PLAN_R210.md). Historical records follow.
+
+**Checkpoint Work 24 ottobre 2026 — PRE-RC:** Corrette le verifiche della proprietà e della revisione dei worker lungo heartbeat, contabilizzazione, pubblicazione e recupero. Le conferme già concluse restano idempotenti nelle revisioni successive. **350 casi distinti superati,49 nuovi;22/42 criteri (52,4%),0/7 macroaree complete;RC non raggiunta,cambio di regime disabilitato.** Il prototipo pull non salvato prima dell'interruzione non è incluso. [Handoff corrente](docs/WORKER_EPOCH_HANDOFF_R210.md), [guida IT/EN](docs/WORKER_EPOCH_IT_EN_R210.md), [interventi residui](docs/RC_CLOSURE_PLAN_R210.md). Seguono le note storiche.
+
+**Checkpoint Work 23/10/2026 — PRE-RC:** Completato il flusso di incasso dei crediti esatti già registrati per rimborsi di abbonamenti: pagamento PayPal dell’utente, recupero e UI utente/admin IT/EN. Restano integrate proprietà differita dei worker e storico autenticato dei rimborsi. Criteri verificati: 19/42 (45,2%); nessuna macroarea interamente accettata e RC ancora bloccata. Vedi [handoff attuale](docs/SUBSCRIPTION_RECOVERY_HANDOFF_R210.md), [guida](docs/SUBSCRIPTION_RECOVERIES_IT_EN_R210.md), [accettazione](docs/RC_ACCEPTANCE_REPORT.md), [test](docs/TEST_MATRIX_R210.md) e [blocchi](docs/KNOWN_BLOCKERS_R210.md). Le percentuali precedenti sono stime storiche.
+
+
+> Aggiornamento pre-RC (22/10/2026): conferme e riconciliazione checkout rifiutano riferimenti Stripe/PayPal duplicati; le collisioni legacy bloccano l’audit. 173 test selezionati superati. RC ancora bloccata da verifiche autenticazione provider, worker distribuiti e CI completa.
+
+
+### Prontezza release candidate
+
+MTA 0.3.0-r210 is NOT an accepted RC. Run `python -m app.rc_acceptance` to obtain a fail-closed JSON blocker report; see `docs/R210_RELEASE_CANDIDATE_GATE_IT_EN.md` and `docs/DEVELOPMENT_HANDOFF_R210.md`. Do not enable commercial cutover without authenticated providers, distributed-worker validation and full CI.
+
+> 0.3.0-r210 development update (2026-10-22): I retry di completamento dei job AI rivendicati ora verificano identità del worker originale e barriera chiusa; consultare docs/DEVELOPMENT_HANDOFF_R210.md. Il cambio commerciale resta disabilitato.
+
+I job AI contabilizzati con prenotazione worker richiedono ora l’identità del worker per finalizzare atomicamente accounting, prenotazione e barriera in `ai_billing.finish_job`; vedere `docs/DEVELOPMENT_STATUS.md`. Non certifica i worker distribuiti.
+
+Coerenza worker/ledger/barriera: il controllo SQLite rifiuta ledger terminali con worker attivi e claim conclusi con barriera aperta; 152 test del regime superati. Integrazione completa dei worker e cambio commerciale ancora pendenti. Vedere docs/DEVELOPMENT_STATUS.md.
+
+> **r210 dual-regime status:** La finalizzazione atomica del worker verifica job terminato e contabilità saldata prima di chiudere insieme claim e barriera; non ancora integrata in tutti gli esecutori AI. Vedere `docs/DEVELOPMENT_HANDOFF_R210.md`.
+
+Diagnostica offline del cambio regime: `python -m app.regime_readiness_cli --help` (snapshot SQLite in sola lettura, non autorizza mai il cambio). Vedere `docs/R210_OFFLINE_READINESS_OPERATOR_IT_EN.md` e `docs/DEVELOPMENT_HANDOFF_R210.md` per baseline Git e attività ancora aperte.
+
+## Visibilità licenze AI (r210)
+
+Il catalogo modelli amministrativo AI Studio mostra disponibilità effettiva, modalità e motivo del blocco nel regime corrente; il backend continua a negare i modelli incompatibili. Non costituisce certificazione end-to-end di tutti gli adattatori.
+
+**r210 coordinamento doppio regime:** prenotazioni SQLite persistenti impediscono a worker concorrenti di rivendicare lo stesso job già protetto; restano da integrare tutte le code, la riconciliazione esterna e il cambio amministrativo. Cambio regime disabilitato. See/Vedere [worker claims IT/EN](docs/R210_DISTRIBUTED_WORKER_CLAIMS_IT_EN.md).
+
+
+> Aggiornamento doppio regime MTA 0.3.0-r210: La chiusura contabile dei checkout richiede ora outbox Stripe/PayPal confermata e ricevuta commerciale valida nell’epoca corrente; gli esiti incerti o annullati restano protetti. Il cambio amministrativo del regime rimane disabilitato.
+Nucleo di barriera transazionale SQLite persistente per il futuro cambio regime (non ancora integrato in tutti i percorsi job/pagamenti/webhook; cambio disabilitato).
+
+Nucleo preparatorio per il doppio regime del servizio (non ancora collegato al billing operativo): vedere `docs/R210_DUAL_REGIME_STATUS_IT_EN.md`. 
+
 **Accuratezza multistrumento (r210):** il benchmark MR-MT3 reale completo non è accettato (F1 9,49%, soltanto 2 programmi melodici con una corrispondenza rigorosa). Vedere `docs/R210_MULTITRACK_FINAL_ACCEPTANCE_IT_EN.md` per il controllo di accettazione.
 
 **CI 2026-10-21 (deferred commit):** Restore Docker build visibility for required reviewed docs and preserve binary-exact optional plugin license notices across Windows checkouts; full cross-platform rerun pending. YourMT3+ GPU inference and 10–16-instrument accuracy remain unverified.
@@ -747,3 +789,193 @@ Installazione YourMT3+ ROCm con runtime verificato e benchmark indipendente: `do
 YourMT3 legacy NumPy checkpoint compatibility / Compatibilità checkpoint NumPy legacy YourMT3: pinned verified checkpoint conversion now allowlists historical NumPy serialization names while keeping weights-only loading enabled. Run the installer again on the isolated ROCm host; a complete GPU inference and accuracy certification have not yet been verified.
 
 **Audio-to-MIDI sperimentale (web/native):** MR-MT3 e YourMT3+ sono visualizzati secondo la disponibilità del runtime locale/server, con stato e licenze; caricare un archivio pesi non installa automaticamente il runtime. Vedere `docs/R210_EXPERIMENTAL_AUDIO_MIDI_NATIVE_IT_EN.md`.
+
+
+Dual service regime: backend entry-point guards default to non-commercial. Full mode switching and billing reconciliation remain under development; do not activate commercial mode manually.
+
+### Regimi del servizio (r210, implementazione in corso)
+Il nuovo endpoint pubblico di sola lettura `GET /api/service-regime/terms?lang=it|en` restituisce la bozza del regolamento pertinente al regime attivo, con hash SHA-256 del testo. La finestra Informazioni collega ai termini. Il regime predefinito rimane non commerciale. **Il cambio amministrativo di regime e il billing differenziato riconciliato non sono ancora operativi**; preservare i contratti preesistenti e non distribuire come migrazione commerciale completa. Le bozze richiedono revisione legale prima della pubblicazione contrattuale.
+
+### Regime del servizio — verifica delle transizioni (r210)
+Un amministratore può ottenere un audit non distruttivo tramite `GET /api/admin/service-regime/transition-audit?target=COMMERCIAL` (oppure `NON_COMMERCIAL`). Il risultato indica le attività economiche storiche, le tabelle da riconciliare e le condizioni che bloccano il cambio. **Questo aggiornamento NON abilita ancora il cambio di regime**: prima sono necessarie riconciliazione atomica, consuntivi effettivi e verifiche legali. Non utilizzare come piattaforma commerciale pronta.
+
+### Stato del doppio regime (r210, sviluppo in corso)
+Il regime Non Commerciale rimane predefinito. Le transizioni amministrative sono ancora disabilitate finché non saranno implementati riconciliazione economica, gestione atomica di webhook e sottoscrizioni e consuntivi effettivi. Il modulo `app/noncommercial_allocation.py` produce soltanto bozze ripartite al centesimo, senza addebiti. Non distribuire il doppio regime come funzionalità di produzione completa.
+
+**Sviluppo contabilità doppio regime:** gli amministratori nel regime non commerciale possono ottenere una bozza di ripartizione in sola lettura tramite `POST /api/admin/service-regime/noncommercial-preview` (`start`, `end`, `documented_cost_cents`, `recovered_cents` facoltativo). La bozza utilizza i job AI misurati, rifiuta contabilizzazioni incomplete e non produce addebiti. **Non** equivale a un consuntivo emesso o a un cambio di regime sicuro per la produzione; vedere `docs/DEVELOPMENT_STATUS.md`.
+
+**Doppio regime in sviluppo (r210):** gli amministratori non commerciali possono registrare e consultare consuntivi immutabili di ripartizione mediante `/api/admin/service-regime/noncommercial-statements`, con controllo SHA-256. Non vengono raccolti pagamenti né emesse fatture fiscali. Il cambio di regime in produzione resta disabilitato fino alla riconciliazione economica.
+
+### Doppio regime / riconciliazione (r210)
+L’endpoint amministrativo di sola lettura `/api/admin/service-regime/reconciliation-report?target=COMMERCIAL` elenca posizioni economiche aperte e schemi sconosciuti. Non effettua il cambio regime. Non abilitare la produzione commerciale prima di riconciliazione atomica di pagamenti/webhook e regressione completa.
+
+### Audit del cambio regime (r210, ancora non operativo)
+L'endpoint amministrativo `GET /api/admin/service-regime/transition-plan?target=COMMERCIAL` produce un piano di riconciliazione con inventario contabile e impronta SHA-256. È di sola lettura: **non abilita** il cambio di regime né certifica la chiusura di webhook, crediti e contratti. Il cambio resta disattivato.
+
+### Ammissione dei modelli nel doppio regime (r210, in sviluppo)
+La verifica centralizzata delle licenze AI rifiuta i modelli `free_only` se il server opera in regime `COMMERCIAL`, anche con richieste dirette al backend. Nel regime `NON_COMMERCIAL` tali modelli non sono bloccati automaticamente, ma restano obbligatorie le autorizzazioni specifiche dei singoli checkpoint. Billing e cambio atomico tra regimi NON sono ancora completi e non devono essere attivati in produzione commerciale. Dettagli in `docs/DEVELOPMENT_STATUS.md`.
+
+**Doppio regime (r210, sviluppo incompleto):** sono stati rafforzati i blocchi lato dominio per acquisti storage, assegnazioni crediti e nuove sottoscrizioni self-service in regime Non Commerciale. Il cambio fra regimi non è ancora operativo né pronto per la produzione: servono transazioni atomiche comuni, riconciliazione dei pagamenti/webhook, UI e test end-to-end. Non modificare manualmente `service-regime.json` per abilitare la modalità commerciale.
+
+**Aggiornamento r210 — sottosistemi del doppio regime.** Aggiunte diagnostica amministrativa della barriera (`GET /api/admin/service-regime/operation-fence`), esportazione verificata del consuntivo per periodo (`GET /api/admin/service-regime/noncommercial-statements/export?start=...&end=...`) e protezioni `no-store` per il regolamento pubblico. Le transizioni del regime restano disabilitate fino all'integrazione transazionale completa di job, checkout e webhook. Non usare come attivazione commerciale in produzione.
+
+
+### 2026-10-22 Dual-regime integration note
+
+Introdotto helper transazionale per operazioni locali su database; il cambio regime resta disabilitato fino all’integrazione di pagamenti esterni e job.
+
+
+## r210 — Inbox persistente eventi provider (sviluppo, non attivazione produzione)
+
+È stata introdotta una inbox SQLite persistente per eventi Stripe/PayPal, con identificativi e hash del contenuto, idempotenza attraverso riavvii e modifica economica atomica sulla stessa connessione. Il gestore webhook deve prima verificare la firma del provider e la ricevuta del checkout originale, inclusi regime e revisione. La funzione non è ancora collegata a tutti i flussi reali di checkout, webhook e job. Il cambio di regime resta disabilitato fino all'integrazione e alla riconciliazione verificate.
+
+### Stato transizione dei regimi (2026-10-22)
+L'inizializzazione della barriera ora preserva le transazioni SQLite del chiamante. Il cambio regime rimane **disabilitato** finché non saranno integrati tutti i percorsi job/checkout/webhook, riconciliati gli effetti dei provider esterni e completati i test end-to-end. Non distribuire come cambio regime commerciale pronto per la produzione.
+
+**Sviluppo doppio regime (22 ottobre 2026):** l'inbox persistente dei webhook rifiuta ricevute di checkout non commerciali prima di applicare movimenti economici. I test dei retry per checkout commerciali sono superati. Gli handler reali e l'ammissione dei job non sono ancora integrati integralmente: il cambio di regime rimane disabilitato in attesa di riconciliazione e prove di concorrenza end-to-end.
+
+
+2026-10-22 (commit differito): I nuovi checkout commerciali Stripe/PayPal sono iscritti alla barriera persistente nella stessa transazione che crea l’ordine locale. Il cambio regime resta disabilitato finché non saranno completati job, webhook, riconciliazione e test end-to-end.
+
+
+### 0.3.0-r210 — Deferred transaction hardening
+
+La conferma webhook PayPal ora registra evento verificato e saldo economico in un’unica transazione SQLite; il cambio regime rimane disabilitato fino all’integrazione completa di pagamenti e job.
+
+
+**Stato doppio regime:** le ricevute Stripe dei checkout iscritti alla barriera richiedono origine commerciale. Il cambio regime resta disabilitato in attesa della riconciliazione end-to-end.
+
+
+### r210 — Metered job regime fencing
+Le ammissioni e le chiusure dei job AI contabilizzati condividono ora la barriera persistente di regime; ammissione delle code e cambio regime fra provider restano disabilitati in attesa di integrazione end-to-end.
+
+**Sviluppo differito 22/10/2026:** il rimborso PayPal ora verifica la ricevuta del checkout commerciale originario all'interno della transazione del rimborso. Il cambio regime rimane disabilitato: gli eventi dei provider e i percorsi delle code non ancora integrati richiedono ulteriori interventi. Vedere `docs/DEVELOPMENT_STATUS.md`.
+
+### Integrità sperimentale dei webhook Stripe nei due regimi (r210)
+Gli accrediti e i rimborsi Stripe per checkout commerciali registrati nella barriera salvano l'identità dell'evento autenticato e lo SHA-256 nell'inbox persistente nella stessa transazione locale che modifica il saldo. Gli eventi duplicati con contenuti incompatibili vengono rifiutati. Gli ordini precedenti alla barriera richiedono una riconciliazione separata; il cambio al regime commerciale resta disabilitato fino alla copertura completa degli ingressi e ai test end-to-end.
+
+
+**Verifica regimi (2026-10-22):** i test legacy di crediti e abbonamenti impostano esplicitamente COMMERCIAL; dieci gruppi mirati superati (155 test). Il default operativo resta NON_COMMERCIAL e il cambio atomico non è ancora abilitato.
+
+### r210: dual-regime administrative reporting (deferred)
+The admin endpoints now support verified non-commercial allocation CSV export and a consolidated financial/fence readiness diagnostic. Both are fail-closed and cannot activate the commercial regime. The full regime switch remains disabled pending provider/job coverage and verified settlement.
+
+Aggiornamento sviluppo (22/10/2026): i retry della barriera rifiutano un regime originario incompatibile e operazioni aperte associate a una revisione obsoleta. 65 test mirati superati. Il cambio di regime rimane disabilitato in attesa dell’integrazione end-to-end.
+
+### Diagnostica del doppio regime — copertura dei job contabilizzati
+Il rapporto amministrativo `combined-readiness` verifica anche che i job AI contabilizzati ancora attivi abbiano una ricevuta *aperta* nella barriera transazionale. Job legacy, ricevute mancanti, ricevute già chiuse e schemi di accounting assenti sono segnalati come blocchi; questa diagnostica non attiva il cambio di regime.
+
+
+Disponibile un componente outbox durevole per checkout commerciali (`app/regime_payment_outbox.py`) con idempotenza ed esiti incerti; il collegamento a tutti gli invii reali e il cambio regime restano pendenti.
+
+**Doppio regime — outbox checkout (2026-10-22):** i checkout Stripe/PayPal registrano l’intenzione d’invio con l’ordine locale, persistono lo stato incerto prima della richiesta esterna e registrano la conferma dopo la risposta valida. I retry dopo un esito incerto richiedono riconciliazione, senza reinvio automatico. Cambio di regime ancora disabilitato; test provider reali e CI completa pendenti.
+
+**Riconciliazione del doppio regime (sperimentale):** l'outbox espone
+`reconcile_verified_outcome` per registrare un esito *già verificato* tramite
+il provider quando un checkout ha risposta incerta. La funzione è atomica,
+ma non interroga Stripe/PayPal, non esegue movimenti economici, non ritenta
+automaticamente e non sblocca la barriera. Il cambio regime rimane disabilitato.
+
+### Revisione amministrativa outbox (0.3.0-r210)
+Nuovo endpoint amministrativo di sola lettura `/api/admin/service-regime/payment-outbox-review` per esaminare checkout Stripe/PayPal pendenti, incerti e non ancora chiusi contabilmente. Non effettua incassi o cambi di regime.
+
+**Sicurezza invio pagamenti doppio regime (r210):** la conferma del checkout richiede un tentativo di invio al provider e una ricevuta commerciale ancora aperta; le sole richieste in coda non possono essere confermate. Il doppio regime non è ancora attivabile in produzione: vedere `docs/DEVELOPMENT_STATUS.md`.
+
+Doppio regime in sviluppo: la riconciliazione degli esiti dei provider verifica ora ricevuta commerciale aperta, revisione e stato della transizione prima di aggiornare l’outbox. Il cambio regime commerciale non è ancora abilitato; restano riconciliazione autenticata e migrazione end-to-end.
+
+
+La readiness amministrativa verifica ora la coerenza degli invii checkout; il cambio regime resta disabilitato.
+
+#### r210 — Protezione epoca checkout commerciali (22 ottobre 2026)
+I tentativi di invio e le conferme dei checkout verificano la ricevuta commerciale aperta, il regime e la revisione correnti, rifiutando transizioni in corso ed epoche non aggiornate. Questo controllo locale non abilita ancora il cambio di regime. Vedere `docs/DEVELOPMENT_STATUS.md`.
+
+### Consuntivi personali non commerciali (22 ottobre 2026)
+Gli utenti autenticati possono consultare ed esportare esclusivamente i propri consuntivi non commerciali con verifica di integrità (`/api/service-regime/my-noncommercial-statements`, `/export-csv`). Non sono fatture fiscali e non generano addebiti. Il cambio amministrativo del regime rimane disabilitato.
+
+### Regimi del servizio — riconciliazione checkout non creati
+Il modulo `app/regime_cancelled_checkout.py` permette di chiudere atomicamente ricevute di checkout **solo dopo** la verifica indipendente che il provider non abbia creato l'ordine e se non esiste alcuna evidenza di denaro movimentato. Richiede una transazione SQLite del chiamante; non effettua richieste di rete e non è ancora esposto come operazione amministrativa generale. Il cambio di regime resta disabilitato.
+
+### Chiusura dei periodi non commerciali (0.3.0-r210)
+Quando un amministratore consolida un consuntivo, ora vengono installati nella medesima transazione trigger SQLite che impediscono inserimenti tardivi e modifiche/cancellazioni retroattive dei job contabilizzati nel periodo chiuso, nonché modifiche/cancellazioni del consuntivo stesso. Periodi aperti non sono interessati. Le installazioni con soli consuntivi storici richiedono ancora una migrazione esplicita per attivare i trigger senza una nuova chiusura. La misura non abilita il cambio regime né sostituisce riconciliazione, evidenze dei provider e collaudi end-to-end.
+
+**Doppio regime — nuovo controllo amministrativo:** `POST /api/admin/service-regime/close-negative-checkout` conclude, in una singola transazione, soltanto checkout che il provider ha già verificato come mai creati. Il comando non accetta prove non verificate né risolve esiti incerti. Cambio di regime ancora disabilitato.
+
+### Prenotazione delle transizioni del doppio regime (r210, non attiva in produzione)
+Il registro transazionale SQLite consente di prenotare e annullare una transizione, bloccare nuove operazioni protette e verificare l'hash delle evidenze di riconciliazione. **Non modifica il regime effettivo**: per l'attivazione servono la persistenza atomica del regime, la copertura completa degli ingressi e la riconciliazione autenticata dei provider. Stato in `docs/DEVELOPMENT_STATUS.md`.
+
+**Doppio regime — aggiornamento r210 (commit differito).** Disponibile un percorso di prenotazione di transizione basato esclusivamente su evidenze ricavate in transazione dal database (`app/regime_verified_transition.py`); non accetta dichiarazioni `ready` dell'operatore come prova sufficiente. La transizione effettiva NON è abilitata: occorre completare la riconciliazione e la copertura di tutti gli ingressi. Consultare `docs/DEVELOPMENT_STATUS.md`.
+
+### R210 recupero delle prenotazioni di transizione
+API amministrative per consultare e annullare in sicurezza prenotazioni pendenti del doppio regime, senza abilitare il passaggio al commerciale. Vedere `docs/R210_TRANSITION_RECOVERY_IT_EN.md`.
+
+
+I retry delle prenotazioni verificano ora lo stato della barriera persistente; le ricevute obsolete vengono respinte. Il cambio di regime resta disabilitato.
+
+### Amministrazione del doppio regime (aggiornamento r210)
+La pagina amministrativa include un pannello IT/EN che mostra regime attivo, readiness finanziaria/transazionale, checkout da riconciliare e prenotazioni persistenti. L'amministratore può annullare esplicitamente una prenotazione verificata; **il cambio di regime rimane disabilitato** fino alla conclusione delle verifiche end-to-end. La diagnostica non autorizza operazioni commerciali. Test: `tests/test_r210_service_regime_admin_panel.py`.
+
+**Doppio regime — transizione locale (2026-10-22):** aggiunta la primitiva interna `app/regime_cutover_atomic.py`, che aggiorna l'epoca SQLite in una transazione verificata conservando una barriera persistente. Non è un cambio regime abilitato in produzione: lo stato JSON esterno e gli altri ingressi richiedono ancora riconciliazione. Vedere `docs/DEVELOPMENT_STATUS.md`.
+
+**Doppio regime (r210, sviluppo):** è disponibile il recupero controllato del file esterno del regime dopo un cutover SQLite già registrato (`docs/R210_REGIME_MIRROR_RECOVERY_IT_EN.md`). Il recupero mantiene la barriera chiusa: il cambio amministrativo non è ancora abilitato per la produzione.
+
+**Sicurezza del regime (r210):** l'ammissione delle operazioni commerciali richiede ora una barriera SQLite inizializzata, non in transizione e coerente con regime/revisione del file JSON. Le installazioni non commerciali preesistenti rimangono non commerciali. Il cambio amministrativo non viene abilitato: restano riconciliazione e copertura completa dei provider e worker.
+
+**Aggiornamento sicurezza doppio regime r210 (22 ottobre 2026):** una prenotazione non può più essere annullata dopo il commit del cambio SQLite, nemmeno tramite la funzione interna. È necessario il recupero in avanti del file di configurazione con barriera ancora chiusa. Il cambio regime in produzione non è abilitato. Consultare `docs/DEVELOPMENT_STATUS.md`.
+
+Transizione del regime: introdotta una primitiva interna di finalizzazione fail-closed del cutover, ma il cambio operativo resta disabilitato fino alla riconciliazione autorevole di provider e worker e alla validazione end-to-end. Vedere `docs/R210_REGIME_CUTOVER_FINALIZATION_IT_EN.md`.
+
+**Recupero transizione regime (r210):** la funzione interna `recover_committed_mirror` riallinea il file JSON dopo il commit SQLite senza rilasciare la barriera. Richiede manutenzione esclusiva a livello applicativo e non abilita il cambio commerciale. Vedi `docs/R210_CUTOVER_RECOVERY_ORCHESTRATION_IT_EN.md`.
+
+### Blocco di manutenzione per il regime (r210)
+Il recupero offline del mirror usa `app.regime_maintenance.recover_mirror_exclusively(db_path, mirror_path, transition_id, lock_path)`. Predisporre un file di lock regolare, già esistente e accessibile solo all’operatore. Arrestare o isolare tutte le repliche server e worker prima dell’utilizzo. Il lock POSIX è locale all’host e non abilita il commerciale né riapre la barriera.
+
+### Finalizzazione offline del doppio regime (r210, differita)
+`app.regime_maintenance.finalize_cutover_exclusively` collega il lock di manutenzione esistente alla finalizzazione SQLite transazionale. **Non** è un endpoint HTTP: richiede arresto/esclusione verificata di tutte le repliche, dei worker e dei flussi di pagamento e un controllo autorevole della riconciliazione. Il cambio di regime dalla UI resta disabilitato; consultare `docs/DEVELOPMENT_STATUS.md`.
+
+**Nota doppio regime 22/10/2026:** il rapporto readiness include ora un audit fail-closed della inbox webhook Stripe/PayPal. Non certifica i pagamenti esterni o l’arresto dei worker distribuiti; il cambio commerciale rimane disabilitato.
+
+**Lavoro r210 con commit differito:** la readiness della inbox dei provider rifiuta identità evento duplicate negli schemi legacy, ID evento vuoti ed epoche negative delle ricevute. Il cambio commerciale resta disabilitato: mancano la riconciliazione autenticata e le verifiche end-to-end.
+
+Nota sviluppo doppio regime (r210): la finalizzazione esclusiva richiede una readiness ricavata dal database e non può essere sbloccata da una callback positiva del chiamante. Il cambio resta non disponibile in produzione; vedere `docs/R210_EXCLUSIVE_FINALIZATION_AUTHORITY_IT_EN.md`.
+
+
+### r210 — Worker claim settlement integrity
+
+Integrità della chiusura dei worker: le prenotazioni AI persistenti sono controllate prima della chiusura della barriera contabile; la diagnostica verifica la coerenza tra prenotazioni, ledger e barriera. Il cambio al regime Commerciale resta disabilitato: mancano verifiche con provider reali e worker distribuiti.
+
+**r210 controllo licenze:** il catalogo delle policy espone ammissibilità effettiva e motivo di blocco nel regime attivo. Il backend blocca autorizzazioni esclusivamente non commerciali nel regime commerciale e override Qixuan a pagamento anche se ripristinati da file. Il cambio di regime rimane disabilitato; restano verifiche end-to-end sugli adattatori AI.
+
+## Ripresa sviluppo r210
+
+Il package cumulativo include `docs/DEVELOPMENT_COMPONENTS_R210.json`, `docs/DEVELOPMENT_HANDOFF_R210.md` e `docs/DEVELOPMENT_STATUS.md`, con inventario dei componenti incompleti, test, blocchi e prossimi passi. Il dispatch remoto AI Studio commerciale è negato in assenza di attestazione autenticata dei diritti; non costituisce completamento end-to-end dell’intero prodotto. Doppio regime **70% stimato**, cambio regime disabilitato.
+
+
+### r210 worker billing settlement gate
+Il settlement dei job contabilizzati con claim worker ora verifica ledger terminale, contratto regolato ed epoca della barriera; non certifica la copertura dei worker distribuiti.
+
+
+I rapporti offline sul cambio di regime sono soltanto diagnostici, anche in caso di errore di lettura. Vedere docs/DEVELOPMENT_STATUS.md e docs/validation/r210/30-internal-checkpoints.json.
+
+
+Il recupero dopo crash ora rifiuta job con prenotazioni worker persistenti non risolte; dettagli in docs/DEVELOPMENT_STATUS.md.
+
+
+Il recupero dopo crash ora rifiuta job con prenotazioni worker persistenti non risolte; dettagli in docs/DEVELOPMENT_STATUS.md.
+
+
+**Nota r210 pre-RC:** interrogazioni Stripe/PayPal autenticate e in sola lettura implementate e verificate localmente; riconciliazione definitiva, test sandbox, worker distribuiti e CI generale restano da completare. Cambio regime disabilitato. Consultare `docs/DEVELOPMENT_STATUS.md`.
+
+### Stato riconciliazione r210
+Sono disponibili verifiche autenticate, in sola lettura, di Stripe PaymentIntent e capture PayPal in `app/regime_provider_settlement.py`. Non equivalgono alla riconciliazione contabile completa: restano bloccanti rimborsi/dispute, completezza webhook, obbligazioni legacy e registrazione atomica nel ledger. Dettagli: `docs/R210_PROVIDER_SETTLEMENT_IT_EN.md`.
+
+**Aggiornamento riconciliazione r210 (2026-10-23):** disponibili controlli in sola lettura sullo stato di rimborsi/dispute delle charge Stripe e delle capture PayPal in `app/regime_provider_refund_evidence.py`. Sono osservazioni puntuali, NON autorizzano operazioni finanziarie o produzione. I blocchi end-to-end restano descritti in `docs/DEVELOPMENT_STATUS.md` e `docs/DEVELOPMENT_HANDOFF_R210.md`.
+
+### R210 verifica incrociata dei provider
+
+Verifiche in sola lettura Stripe Checkout/PaymentIntent/charge e PayPal ordine/capture implementate e testate localmente. Non autorizzano crediti o cambio regime. Riconciliazione ledger e prove sandbox restano aperte.
+
+
+### Registro persistente delle evidenze di riconciliazione (r210)
+The provider observation journal records matched, immutable snapshots against confirmed outbox operations. It cannot settle the ledger or authorize a regime switch; authenticated end-to-end reconciliation remains pending. See `docs/DEVELOPMENT_STATUS.md`.
+
+**r210 riconciliazione provider:** le osservazioni remote autenticate possono ora essere registrate atomicamente dopo una nuova verifica dell'identità del checkout (`app/regime_provider_reconcile_service.py`). Questo **non** riconcilia i crediti o le obbligazioni del ledger e non autorizza il cambio di regime. Vedere `docs/DEVELOPMENT_STATUS.md` e `docs/DEVELOPMENT_HANDOFF_R210.md`.

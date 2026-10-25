@@ -1637,5 +1637,14 @@
   "accounted consumption": "consumo contabilizzato",
   "collected GPU consumption": "consumo GPU raccolto",
   "consumption accepted by the server": "consumo accettato dal server",
-  "The job emails are sent when SMTP/SMTPS is configured; per-job consumption accepted by the server is accounted for quotas and billing. This summary covers compute; storage and other components remain in the official Billing reports. Amounts shown are estimates, not invoices.": "Le email dei job partono quando SMTP/SMTPS è configurato; i consumi per job accettati dal server sono contabilizzati per quote e billing. Questo riepilogo riguarda il calcolo; storage e altre componenti restano nei report Billing ufficiali. Gli importi mostrati sono stime, non fatture."
+  "The job emails are sent when SMTP/SMTPS is configured; per-job consumption accepted by the server is accounted for quotas and billing. This summary covers compute; storage and other components remain in the official Billing reports. Amounts shown are estimates, not invoices.": "Le email dei job partono quando SMTP/SMTPS è configurato; i consumi per job accettati dal server sono contabilizzati per quote e billing. Questo riepilogo riguarda il calcolo; storage e altre componenti restano nei report Billing ufficiali. Gli importi mostrati sono stime, non fatture.",
+  "Skip to administration content": "Vai al contenuto amministrativo",
+  "Administration sections": "Sezioni amministrative",
+  "Scrollable table": "Tabella scorrevole",
+  "Scrollable details": "Dettagli scorrevoli",
+  "Rate start {0}": "Inizio tariffa {0}",
+  "Rate end {0}": "Fine tariffa {0}",
+  "Workspace quota {0}": "Quota workspace {0}",
+  "Role {0}": "Ruolo {0}",
+  "Close job list": "Chiudi lista job"
 }

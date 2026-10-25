@@ -40,6 +40,8 @@ def quick_required(uid):
 
 def grant_credits(uid,credits,expected_value,reason,actor,key):
     """Convert nominal credits once; money already on the ledger never changes."""
+    from .service_regime import require_commercial
+    require_commercial("credit grant")
     from . import resource_accounts as r
     amount=r.number(credits)
     with auth.db() as c:
@@ -67,6 +69,8 @@ class CreditAdmissionError(ValueError):
 
 
 def preflight(uid):
+    from .model_license_policy import FREE_ADMISSION
+    if FREE_ADMISSION.get():return
     from . import resource_accounts as r
     if type(uid) is not int or uid<=0 or not auth.db_path().is_file():return
     with auth.db() as c:

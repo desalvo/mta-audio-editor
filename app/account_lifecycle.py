@@ -191,6 +191,8 @@ def retire(uid,actor_id,*,privacy_request=False):
     with auth.db() as con:
         init(con);con.execute('BEGIN IMMEDIATE')
         protected=con.execute('SELECT role FROM users WHERE id=?',(uid,)).fetchone()
+        from .ai_pull_coordinator import request_cancel
+        request_cancel(con,uid)
         if not protected or protected[0]=='admin':raise ValueError('Gli amministratori non possono essere cancellati')
         old=con.execute('SELECT state FROM account_lifecycle WHERE user_id=?',(uid,)).fetchone()
         if old and old[0] in ('deleting','deleted','expired','reactivation_pending'):return {'state':old[0]}
@@ -285,6 +287,15 @@ def listings():
 
 
 def has_accounting(con,uid):
+    for table,query in (
+        ('operator_refunds','SELECT 1 FROM operator_refunds WHERE user_id=? LIMIT 1'),
+        ('nc_contribution_intents','SELECT 1 FROM nc_contribution_intents WHERE user_id=? LIMIT 1'),
+        ('paypal_orders','SELECT 1 FROM paypal_orders WHERE user_id=? LIMIT 1'),
+        ('paypal_subscription_reversals','SELECT 1 FROM paypal_subscription_reversals WHERE user_id=? LIMIT 1'),
+        ('resource_plan_charges','SELECT 1 FROM resource_plan_charges WHERE user_id=? LIMIT 1'),
+    ):
+        if con.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name=?",(table,)).fetchone():
+            if con.execute(query,(uid,)).fetchone():return True
     for table in ('ai_compute_jobs','ai_usage_events','ai_billing_periods','ai_persistent_storage_samples','resource_credits','resource_job_contracts','resource_periods','resource_storage_unlocks','resource_storage_debits','resource_quota_events'):
         if con.execute('SELECT 1 FROM sqlite_master WHERE type="table" AND name=?',(table,)).fetchone() and con.execute('SELECT 1 FROM '+table+' WHERE user_id=? LIMIT 1',(uid,)).fetchone():return True  # noqa: S608 -- identifiers from fixed allowlists or quoted SQLite schema only
     return False
@@ -314,7 +325,46 @@ def _rows_for_user(con,uid,*,linked_jobs=()):
                 for value in linked:
                     for row in con.execute('SELECT rowid AS rowid,* FROM '+quoted+' WHERE '+col+'=?',(value,)):  # noqa: S608 -- SQLite schema identifiers
                         selected.setdefault(name,{})[row['rowid']]=dict(row)
+    # Financial ownership also crosses polymorphic provider/order references.
+    # Keep these fixed queries explicit; no request supplies SQL identifiers.
+    financial_queries=(
+        ('payment_reconciliation_events','SELECT rowid AS rowid,* FROM payment_reconciliation_events WHERE provider=? AND order_id=?'),
+        ('payment_reconciliation_objects','SELECT rowid AS rowid,* FROM payment_reconciliation_objects WHERE provider=? AND order_id=?'),
+        ('payment_reconciliation_disputes','SELECT rowid AS rowid,* FROM payment_reconciliation_disputes WHERE provider=? AND order_id=?'),
+        ('payment_reconciliation_movements','SELECT rowid AS rowid,* FROM payment_reconciliation_movements WHERE provider=? AND order_id=?'),
+    )
+    for provider,order_table,event_table,event_query in (
+        ('stripe','credit_purchase_orders','credit_payment_events','SELECT rowid AS rowid,* FROM credit_payment_events WHERE id=?'),
+        ('paypal','paypal_orders','paypal_events','SELECT rowid AS rowid,* FROM paypal_events WHERE id=?'),
+    ):
+        for order in selected.get(order_table,{}).values():
+            oid=order['id']
+            if 'regime_fence_operations' in meta:
+                for row in con.execute('SELECT rowid AS rowid,* FROM regime_fence_operations WHERE operation_id=?',('checkout:'+provider+':'+oid,)):
+                    selected.setdefault('regime_fence_operations',{})[row['rowid']]=dict(row)
+            for table,query in financial_queries:
+                if table in meta:
+                    for row in con.execute(query,(provider,oid)):
+                        selected.setdefault(table,{})[row['rowid']]=dict(row)
+        # Pending signed observations may name their order before ledger binding.
+        # Never infer ownership for an already-bound event of another order.
+        if 'payment_reconciliation_events' in meta:
+            owned_orders={row['id'] for row in selected.get(order_table,{}).values()}
+            owned_objects={row['object_id'] for row in selected.get('payment_reconciliation_objects',{}).values() if row['provider']==provider}
+            for row in con.execute('SELECT rowid AS rowid,* FROM payment_reconciliation_events WHERE provider=? AND order_id IS NULL',(provider,)):
+                payload=json.loads(row['normalized_json'])
+                if (payload.get('order_id') in owned_orders or any(payload.get(key) in owned_objects for key in ('id','payment_intent','provider_order'))):
+                    selected.setdefault('payment_reconciliation_events',{})[row['rowid']]=dict(row)
+        if event_table in meta:
+            events=[row['event_id'] for row in selected.get('payment_reconciliation_events',{}).values() if row['provider']==provider]
+            for event_id in events:
+                for row in con.execute(event_query,(event_id,)):
+                    selected.setdefault(event_table,{})[row['rowid']]=dict(row)
     changed=True
+    if 'regime_fence_operations' in meta:
+        for refund in selected.get('operator_refunds',{}).values():
+            for row in con.execute('SELECT rowid AS rowid,* FROM regime_fence_operations WHERE operation_id=?',('operator-refund:'+refund['id'],)):
+                selected.setdefault('regime_fence_operations',{})[row['rowid']]=dict(row)
     while changed:
         changed=False
         for name,(quoted,columns) in meta.items():
@@ -338,6 +388,8 @@ def purge(uid,actor,privacy):
             init(con);con.execute('BEGIN IMMEDIATE')
             user=con.execute('SELECT * FROM users WHERE id=?',(uid,)).fetchone()
             if not user or user['role']=='admin' or user['active']:raise ValueError('Account non eliminabile')
+            from .ai_pull_coordinator import erasure_safe, record_erasure
+            erasure_safe(con,uid)
             state=con.execute('SELECT state FROM account_lifecycle WHERE user_id=?',(uid,)).fetchone()
             if not state or state[0] not in ('deleted','expired'):raise ValueError('Account riattivato o non pronto alla cancellazione totale')
             if has_accounting(con,uid) and not privacy:raise ValueError('Dati contabili presenti')
@@ -348,7 +400,7 @@ def purge(uid,actor,privacy):
                 outbox=[dict(r) for r in delivery.execute('SELECT * FROM deliveries') if r['job_id'] in job_ids or r['billing_job_id'] in job_ids]
             if privacy:
                 omit={'sessions','email_tokens','social_identities','model_access_tokens','ai_access_tokens','social_totp_challenges','account_email_mfa'}
-                saved={k:list(v.values()) for k,v in selected.items() if k not in omit and not k.startswith('account_') and k!='users'}
+                saved={k:list(v.values()) for k,v in selected.items() if k not in omit and not k.startswith('account_') and k not in ('users','ai_pull_tasks')}
                 saved['users']=[{k:user[k] for k in ('id','username','email','display_name','created_at')}]
                 blob={'schema':'mta/account-sandbox/v1','rows':saved,'billing_outbox':outbox,'queue':[{k:v for k,v in j.items() if k not in ('payload_json','idempotency_key')} for j in jobs(uid)]}
                 payload=auth._seal(json.dumps(blob,default=str))
@@ -356,8 +408,17 @@ def purge(uid,actor,privacy):
                 with os.fdopen(fd,'w') as out:out.write(payload);out.flush();os.fsync(out.fileno())
                 con.execute('INSERT INTO account_sandboxes VALUES(?,?,?)',(sid,now,now+config['sandbox_days']*86400))
             con.execute('PRAGMA defer_foreign_keys=ON')
+            record_erasure(con,uid)
             con.execute('UPDATE users SET approved_by=NULL WHERE approved_by=?',(uid,))
             # Archive download mail is separate and survives until the project grace deadline.
+            from .subscription_receivables import authorize_account_erasure
+            authorize_account_erasure(con,uid,actor)
+            from .noncommercial_contributions import authorize_account_erasure as authorize_nc_erasure
+            authorize_nc_erasure(con,uid,actor)
+            from .worker_cgroup_recovery import authorize_account_erasure as authorize_worker_erasure
+            authorize_worker_erasure(con,uid,actor)
+            from .worker_loss_resolution import authorize_account_erasure as authorize_loss_erasure
+            authorize_loss_erasure(con,uid,actor)
             for name,rows in selected.items():
                 quoted=meta[name][0]
                 for key in rows:con.execute('DELETE FROM '+quoted+' WHERE rowid=?',(key,))  # noqa: S608 -- identifiers from fixed allowlists or quoted SQLite schema only
@@ -467,6 +528,8 @@ def send_pending():
 
 def tick():
     auth.init_auth_db()
+    from .ai_pull_coordinator import maintenance
+    maintenance()
     with auth.db() as con:
         init(con);pending=[r[0] for r in con.execute("SELECT user_id FROM account_lifecycle WHERE state='deleting'")]
         purge_tasks=[dict(r) for r in con.execute('SELECT * FROM account_purge_jobs')]

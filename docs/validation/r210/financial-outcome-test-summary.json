@@ -1,0 +1,1040 @@
+{
+  "version": "0.3.0-r210",
+  "date": "2026-10-23",
+  "method": "Latest actual execution per exact testcase ID; consolidated evidence, not a new full-suite execution. Original raw run and correction retained.",
+  "passed_distinct": 243,
+  "browser_cases": 12,
+  "current_failures": 0,
+  "current_errors": 0,
+  "current_skips": 0,
+  "reports": [
+    {
+      "report": "failed-charge-primary-run.xml",
+      "cases": 141,
+      "raw_failures": 1,
+      "sha256": "d09864638cba349fa833afb31253a5e43f640cc17cd428f72b7050ba206e6556"
+    },
+    {
+      "report": "failed-charge-identity.xml",
+      "cases": 2,
+      "raw_failures": 0,
+      "sha256": "a77883a21fc73a634829756589b3884c3e02185807aae339d00e4e72df91298d"
+    },
+    {
+      "report": "failed-charge-audit-correction.xml",
+      "cases": 1,
+      "raw_failures": 0,
+      "sha256": "5e29ca3a42cd2d4c55b27b6c03df039408d807d43a0674c5f3cb1d2b8b33417b"
+    },
+    {
+      "report": "failed-charge-admin.xml",
+      "cases": 1,
+      "raw_failures": 0,
+      "sha256": "aed691077fa2c057ec347f2787a4929d1cb5675e44e3af6c15db9b74a037adce"
+    },
+    {
+      "report": "financial-outcome-paypal.xml",
+      "cases": 78,
+      "raw_failures": 0,
+      "sha256": "035db268f452ceb800836573bbf59218f4c0c14b6c12ee5b7b8c7d672f15c9a7"
+    },
+    {
+      "report": "financial-outcome-browser.xml",
+      "cases": 4,
+      "raw_failures": 0,
+      "sha256": "6d524294e0529885fb8a82e980cacb8281ac54df4fc0920eb97dfda6b59d5173"
+    },
+    {
+      "report": "financial-outcome-security-gate.xml",
+      "cases": 17,
+      "raw_failures": 0,
+      "sha256": "837d238d6c026e32a517c56dd5b23c3c660971a161070afd3124f3fd51e44213"
+    }
+  ],
+  "superseded_cases": [
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_readiness_detects_broken_private_failed_proof[journal]",
+      "prior_report": "failed-charge-primary-run.xml",
+      "current_report": "failed-charge-audit-correction.xml"
+    }
+  ],
+  "cases": [
+    {
+      "id": "tests.test_r210_authenticated_ledger_service::test_authenticated_snapshot_journal_and_ledger_commit_together",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_authenticated_ledger_service::test_incomplete_or_changed_authenticated_history_never_credits[changed_order]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_authenticated_ledger_service::test_incomplete_or_changed_authenticated_history_never_credits[currency]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_authenticated_ledger_service::test_incomplete_or_changed_authenticated_history_never_credits[network]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_authenticated_ledger_service::test_incomplete_or_changed_authenticated_history_never_credits[refund_identity]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_authenticated_ledger_service::test_incomplete_or_changed_authenticated_history_never_credits[truncated]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_authenticated_ledger_service::test_refunded_legacy_ledger_without_matching_credit_is_blocked",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_browser::test_failed_checkout_actual_page_closure_or_preserved_hold[False-1280-en]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_browser::test_failed_checkout_actual_page_closure_or_preserved_hold[False-1280-it]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_browser::test_failed_checkout_actual_page_closure_or_preserved_hold[False-390-en]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_browser::test_failed_checkout_actual_page_closure_or_preserved_hold[False-390-it]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_browser::test_failed_checkout_actual_page_closure_or_preserved_hold[True-1280-en]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_browser::test_failed_checkout_actual_page_closure_or_preserved_hold[True-1280-it]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_browser::test_failed_checkout_actual_page_closure_or_preserved_hold[True-390-en]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_browser::test_failed_checkout_actual_page_closure_or_preserved_hold[True-390-it]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_admin_reconciliation_uses_same_private_failed_charge_proof",
+      "report": "failed-charge-admin.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_changed_incomplete_or_unavailable_snapshots_never_clear[canonical]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_changed_incomplete_or_unavailable_snapshots_never_clear[config]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_changed_incomplete_or_unavailable_snapshots_never_clear[duplicate]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_changed_incomplete_or_unavailable_snapshots_never_clear[intent]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_changed_incomplete_or_unavailable_snapshots_never_clear[intent_environment]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_changed_incomplete_or_unavailable_snapshots_never_clear[latest_missing]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_changed_incomplete_or_unavailable_snapshots_never_clear[not_found]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_changed_incomplete_or_unavailable_snapshots_never_clear[over_bound]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_changed_incomplete_or_unavailable_snapshots_never_clear[owner]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_changed_incomplete_or_unavailable_snapshots_never_clear[second_list]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_changed_incomplete_or_unavailable_snapshots_never_clear[timeout]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_changed_incomplete_or_unavailable_snapshots_never_clear[truncated]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_concurrent_readbacks_commit_one_private_proof",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_failed_proof_cannot_adopt_another_orders_charge_binding",
+      "report": "failed-charge-identity.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_late_authenticated_payment_stays_pending_and_cannot_overwrite_proof",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_missing_evidence_is_not_zero[amount_captured]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_missing_evidence_is_not_zero[amount_refunded]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_missing_evidence_is_not_zero[balance_transaction]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_missing_evidence_is_not_zero[captured]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_missing_evidence_is_not_zero[disputed]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_missing_evidence_is_not_zero[failure_balance_transaction]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_missing_evidence_is_not_zero[id]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_missing_evidence_is_not_zero[livemode]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_missing_evidence_is_not_zero[paid]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_missing_evidence_is_not_zero[refunded]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_missing_evidence_is_not_zero[status]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_nonempty_ambiguous_or_monetary_history_stays_blocked[amount-499]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_nonempty_ambiguous_or_monetary_history_stays_blocked[amount-True]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_nonempty_ambiguous_or_monetary_history_stays_blocked[amount_captured-1]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_nonempty_ambiguous_or_monetary_history_stays_blocked[amount_captured-False]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_nonempty_ambiguous_or_monetary_history_stays_blocked[amount_refunded-1]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_nonempty_ambiguous_or_monetary_history_stays_blocked[amount_refunded-False]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_nonempty_ambiguous_or_monetary_history_stays_blocked[balance_transaction-txn_money]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_nonempty_ambiguous_or_monetary_history_stays_blocked[captured-0]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_nonempty_ambiguous_or_monetary_history_stays_blocked[captured-True]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_nonempty_ambiguous_or_monetary_history_stays_blocked[currency-usd]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_nonempty_ambiguous_or_monetary_history_stays_blocked[disputed-True]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_nonempty_ambiguous_or_monetary_history_stays_blocked[failure_balance_transaction-txn_failed]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_nonempty_ambiguous_or_monetary_history_stays_blocked[id-pi_not_charge]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_nonempty_ambiguous_or_monetary_history_stays_blocked[livemode-True]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_nonempty_ambiguous_or_monetary_history_stays_blocked[paid-0]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_nonempty_ambiguous_or_monetary_history_stays_blocked[paid-True]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_nonempty_ambiguous_or_monetary_history_stays_blocked[payment_intent-pi_other]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_nonempty_ambiguous_or_monetary_history_stays_blocked[refunded-True]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_nonempty_ambiguous_or_monetary_history_stays_blocked[status-pending]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_nonempty_ambiguous_or_monetary_history_stays_blocked[status-succeeded]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_owner_http_confirm_get_proof_and_atomic_rollback_retry",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_paginated_failed_charges_close_idempotently_without_money[False]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_paginated_failed_charges_close_idempotently_without_money[True]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_readiness_detects_broken_private_failed_proof[amount]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_readiness_detects_broken_private_failed_proof[journal]",
+      "report": "failed-charge-audit-correction.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_readiness_detects_broken_private_failed_proof[object]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_failed_charge_recovery::test_signed_async_failure_resolves_only_with_canonical_complete_history",
+      "report": "failed-charge-identity.xml"
+    },
+    {
+      "id": "tests.test_r210_financial_outcome_browser::test_actual_account_displays_private_final_conflict_in_both_regimes[1280-en-credits]",
+      "report": "financial-outcome-browser.xml"
+    },
+    {
+      "id": "tests.test_r210_financial_outcome_browser::test_actual_account_displays_private_final_conflict_in_both_regimes[1280-it-credits]",
+      "report": "financial-outcome-browser.xml"
+    },
+    {
+      "id": "tests.test_r210_financial_outcome_browser::test_actual_account_displays_private_final_conflict_in_both_regimes[390-en-credits]",
+      "report": "financial-outcome-browser.xml"
+    },
+    {
+      "id": "tests.test_r210_financial_outcome_browser::test_actual_account_displays_private_final_conflict_in_both_regimes[390-it-credits]",
+      "report": "financial-outcome-browser.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_concurrent_cross_provider_new_ids_admit_only_one",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_failed_provider_lookup_keeps_pending_and_never_recreates[404]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_failed_provider_lookup_keeps_pending_and_never_recreates[timeout]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_fresh_ids_and_other_provider_do_not_escape_pending[paypal]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_fresh_ids_and_other_provider_do_not_escape_pending[stripe]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_legacy_resume_url_rejected[https://checkout.stripe.com/\\r\\nBad]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_legacy_resume_url_rejected[https://checkout.stripe.com:444/]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_legacy_resume_url_rejected[https://checkout.stripe.com:bad/]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_legacy_resume_url_rejected[https://checkout.stripe.com@evil.test/]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_legacy_resume_url_rejected[https://checkout.stripe.com\\\\@evil.test/]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_legacy_resume_url_rejected[https://evil.test/pay]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_legacy_resume_url_rejected[https://user:pw@checkout.stripe.com/]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_legacy_resume_url_rejected[javascript:alert(1)]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_new_checkout_response_uses_same_strict_redirect_boundary[control-paypal]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_new_checkout_response_uses_same_strict_redirect_boundary[control-stripe]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_new_checkout_response_uses_same_strict_redirect_boundary[credentials-paypal]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_new_checkout_response_uses_same_strict_redirect_boundary[credentials-stripe]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_new_checkout_response_uses_same_strict_redirect_boundary[port-paypal]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_new_checkout_response_uses_same_strict_redirect_boundary[port-stripe]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_owner_get_reconciliation_closes_terminal_and_releases_guard",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_owner_paid_and_refund_readback_is_net_and_idempotent",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_owner_probe_rejects_midflight_identity_change[credentials]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_owner_probe_rejects_midflight_identity_change[owner]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_paypal_approved_verify_never_captures_and_preserves_hold",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_private_paginated_history_no_provider_or_credentials",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_subscription_same_period_guard_and_readonly_nc_history",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_unknown_creation_blocks_new_purchase_and_owner_probe",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_valid_provider_redirect_is_stored_resumable_without_redispatch[paypal]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_valid_provider_redirect_is_stored_resumable_without_redispatch[stripe]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_wrong_owner_refused_before_any_provider_io",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_failure_after_funding_rolls_back_history_and_wallet",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[amount]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[capture]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[config_changed]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[cumulative]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[currency]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[duplicate]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[identity]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[local_changed]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[missing]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[order_changed]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[pending]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_initial_refunded_or_previously_paid_capture_reconciles_exact_net[False]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_initial_refunded_or_previously_paid_capture_reconciles_exact_net[True]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_money_is_an_exact_eur_decimal_string[ 1]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_money_is_an_exact_eur_decimal_string[-1]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_money_is_an_exact_eur_decimal_string[1.001]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_money_is_an_exact_eur_decimal_string[1.01]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_money_is_an_exact_eur_decimal_string[1.]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_money_is_an_exact_eur_decimal_string[1]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_money_is_an_exact_eur_decimal_string[1e2]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_money_is_an_exact_eur_decimal_string[NaN]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_money_is_an_exact_eur_decimal_string[True]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_refunded_subscription_creates_exact_receivable",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_reconciliation_e2e::test_ambiguous_paypal_payout_keeps_hold_and_pending_readiness",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_reconciliation_e2e::test_canonical_refund_cannot_be_attributed_to_other_capture",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_reconciliation_e2e::test_capture_reversal_and_refund_never_double_debit",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_reconciliation_e2e::test_dispute_readback_holds_then_releases_and_rejects_stale_updates",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_reconciliation_e2e::test_failed_refund_replay_rolls_back_capture_and_wallet",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_reconciliation_e2e::test_multiple_capture_refund_before_fulfillment_replays_atomically",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_reconciliation_e2e::test_refund_cannot_cross_provider_environment",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_reconciliation_e2e::test_reversal_before_capture_is_replayed_in_capture_transaction",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_reconciliation_e2e::test_subscription_refund_records_exact_receivable_without_wallet_credit",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_terminal_integrity::test_new_provisional_result_waits_for_matching_final_evidence[held-permanent-credits]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_terminal_integrity::test_new_provisional_result_waits_for_matching_final_evidence[held-permanent-repayment]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_terminal_integrity::test_new_provisional_result_waits_for_matching_final_evidence[held-permanent-subscription]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_terminal_integrity::test_new_provisional_result_waits_for_matching_final_evidence[held-released-credits]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_terminal_integrity::test_new_provisional_result_waits_for_matching_final_evidence[held-released-repayment]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_terminal_integrity::test_new_provisional_result_waits_for_matching_final_evidence[held-released-subscription]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_terminal_integrity::test_new_provisional_result_waits_for_matching_final_evidence[uncertain-permanent-credits]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_terminal_integrity::test_new_provisional_result_waits_for_matching_final_evidence[uncertain-permanent-repayment]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_terminal_integrity::test_new_provisional_result_waits_for_matching_final_evidence[uncertain-permanent-subscription]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_terminal_integrity::test_new_provisional_result_waits_for_matching_final_evidence[uncertain-released-credits]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_terminal_integrity::test_new_provisional_result_waits_for_matching_final_evidence[uncertain-released-repayment]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_terminal_integrity::test_new_provisional_result_waits_for_matching_final_evidence[uncertain-released-subscription]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_terminal_integrity::test_older_provisional_evidence_cannot_reopen_terminal_result[permanent-credits]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_terminal_integrity::test_older_provisional_evidence_cannot_reopen_terminal_result[permanent-repayment]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_terminal_integrity::test_older_provisional_evidence_cannot_reopen_terminal_result[permanent-subscription]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_terminal_integrity::test_older_provisional_evidence_cannot_reopen_terminal_result[released-credits]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_terminal_integrity::test_older_provisional_evidence_cannot_reopen_terminal_result[released-repayment]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_terminal_integrity::test_older_provisional_evidence_cannot_reopen_terminal_result[released-subscription]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_terminal_integrity::test_opposite_final_outcome_stays_pending_after_later_same_final_confirmation[permanent-credits]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_terminal_integrity::test_opposite_final_outcome_stays_pending_after_later_same_final_confirmation[permanent-repayment]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_terminal_integrity::test_opposite_final_outcome_stays_pending_after_later_same_final_confirmation[permanent-subscription]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_terminal_integrity::test_opposite_final_outcome_stays_pending_after_later_same_final_confirmation[released-credits]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_terminal_integrity::test_opposite_final_outcome_stays_pending_after_later_same_final_confirmation[released-repayment]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_terminal_integrity::test_opposite_final_outcome_stays_pending_after_later_same_final_confirmation[released-subscription]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_complete_source_bound_review_is_accepted",
+      "report": "financial-outcome-security-gate.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_current_scan_and_complete_review_ledger_agree",
+      "report": "financial-outcome-security-gate.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[blanket_approval]",
+      "report": "financial-outcome-security-gate.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[changed_finding]",
+      "report": "financial-outcome-security-gate.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[changed_source]",
+      "report": "financial-outcome-security-gate.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[deleted_source]",
+      "report": "financial-outcome-security-gate.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[duplicate_review]",
+      "report": "financial-outcome-security-gate.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[duplicate_scan]",
+      "report": "financial-outcome-security-gate.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[empty_reason]",
+      "report": "financial-outcome-security-gate.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[high]",
+      "report": "financial-outcome-security-gate.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[missing_file]",
+      "report": "financial-outcome-security-gate.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[missing_review]",
+      "report": "financial-outcome-security-gate.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[new_finding]",
+      "report": "financial-outcome-security-gate.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[new_source]",
+      "report": "financial-outcome-security-gate.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[scan_error]",
+      "report": "financial-outcome-security-gate.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[suppression]",
+      "report": "financial-outcome-security-gate.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[wrong_totals]",
+      "report": "financial-outcome-security-gate.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_allocations_are_immutable_and_missing_position_blocks_report",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_already_captured_obsolete_quote_is_retained_as_refund_due",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_authenticated_refunded_initial_repayment_reopens_original_debt",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_authorized_account_erasure_preserves_other_owner_financial_records[erase]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_authorized_account_erasure_preserves_other_owner_financial_records[privacy_purge]",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_cent_rounding_surplus_is_separate_and_refunded_first",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_concurrent_checkout_only_one_provider_order_and_pending_target",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_concurrent_fulfillment_delivers_one_allocation",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_dispute_release_after_second_repayment_creates_refund_liability",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_erasure_authorization_is_retired_owner_scoped_and_connection_local",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_exact_repayment_closes_debt_without_wallet_or_fee_mutation",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_failure_rolls_back_capture_allocation_and_fence_then_retries",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_multiple_sources_are_bound_to_original_refund",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_owner_api_quote_csrf_and_regime_guards",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_owner_quote_change_is_checked_before_provider_capture",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_permanent_capture_reversal_reopens_original_receivable",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_refund_before_repayment_fulfillment_is_atomic",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_refund_reopens_same_debt_and_can_be_repaid_again",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_repayment_allowed_for_existing_debt_after_plan_service_disabled",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_uncertain_create_stays_pending_without_second_provider_post",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_verified_webhook_retries_allocate_once",
+      "report": "financial-outcome-paypal.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_canceled_intent_after_async_failure_resolves_pending_signed_event",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_concurrent_signed_expiration_and_canonical_readback",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_nonterminal_failed_or_processing_intent_stays_open[processing]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_nonterminal_failed_or_processing_intent_stays_open[requires_capture]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_nonterminal_failed_or_processing_intent_stays_open[requires_payment_method]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_paid_notification_after_terminal_is_durable_conflict_not_credit",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_paypal_nonterminal_browser_cancel_is_not_financial_cancellation[APPROVED]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_paypal_nonterminal_browser_cancel_is_not_financial_cancellation[CREATED]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_paypal_nonterminal_browser_cancel_is_not_financial_cancellation[PAYER_ACTION_REQUIRED]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_paypal_nonterminal_browser_cancel_is_not_financial_cancellation[PENDING_APPROVAL]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_paypal_paid_after_terminal_keeps_conflict_without_wallet_credit",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_paypal_voided_empty_order_closes_and_stale_retry_never_captures",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_paypal_voided_incomplete_or_changed_history_is_blocked[amount]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_paypal_voided_incomplete_or_changed_history_is_blocked[authorization]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_paypal_voided_incomplete_or_changed_history_is_blocked[capture]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_paypal_voided_incomplete_or_changed_history_is_blocked[changed]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_paypal_voided_incomplete_or_changed_history_is_blocked[config]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_paypal_voided_incomplete_or_changed_history_is_blocked[identity]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_paypal_voided_incomplete_or_changed_history_is_blocked[intent]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_paypal_voided_incomplete_or_changed_history_is_blocked[refund]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_signed_expiration_without_intent_closes_without_network",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_expired_checkout_readback_closes_exactly_once[False]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_expired_checkout_readback_closes_exactly_once[True]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_terminal_proof_fails_closed[captured]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_terminal_proof_fails_closed[changed]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_terminal_proof_fails_closed[charge]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_terminal_proof_fails_closed[config]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_terminal_proof_fails_closed[drain]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_terminal_proof_fails_closed[epoch]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_terminal_proof_fails_closed[mirror]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_terminal_proof_fails_closed[missing_intent]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_terminal_proof_fails_closed[paid]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_terminal_proof_fails_closed[wrong_amount]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_terminal_proof_fails_closed[wrong_currency]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_terminal_proof_fails_closed[wrong_id]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_terminal_proof_fails_closed[wrong_mode]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_terminal_proof_fails_closed[wrong_owner]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_terminal_financial_graph_erasure_preserves_other_owner[erase]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_terminal_financial_graph_erasure_preserves_other_owner[privacy_purge]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_terminal_proof_cannot_erase_existing_financial_evidence[funded_position]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_terminal_proof_cannot_erase_existing_financial_evidence[pending_paid]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_terminal_proof_cannot_erase_existing_financial_evidence[wallet]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_terminal_proof_cannot_erase_existing_financial_evidence[wrong_pending_identity]",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_terminal_receipt_audit_detects_reopened_fence",
+      "report": "failed-charge-primary-run.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_terminal_transaction_rolls_back_and_retries",
+      "report": "failed-charge-primary-run.xml"
+    }
+  ],
+  "complete_baseline_repeated": false,
+  "coverage_recollected": false,
+  "real_provider_requests": 0,
+  "release_candidate": false,
+  "transition_enabled": false
+}

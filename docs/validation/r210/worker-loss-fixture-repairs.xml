@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="2" time="10.928" timestamp="2026-10-23T18:35:18.967986+02:00" hostname="9e4e3f56a5bf"><testcase classname="tests.test_r210_worker_loss_resolution" name="test_billing_report_retains_visible_unknown_loss_instead_of_silent_omission" time="0.188" /><testcase classname="tests.test_r208_project_publication_lock" name="test_project_publication_lock_serializes_processes" time="10.340"><failure message="_queue.Empty">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-22/test_project_publication_lock_0')
+
+    def test_project_publication_lock_serializes_processes(tmp_path):
+        ctx = multiprocessing.get_context('spawn')
+        starts, ends = ctx.Queue(), ctx.Queue()
+        processes = [ctx.Process(target=_hold, args=('same-project', starts, ends, str(tmp_path), .25)) for _ in range(2)]
+        for p in processes: p.start()
+&gt;       times = [(starts.get(timeout=10), ends.get(timeout=10)) for _ in processes]
+                                          ^^^^^^^^^^^^^^^^^^^^
+
+work/tests/test_r208_project_publication_lock.py:23: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;multiprocessing.queues.Queue object at 0x7f47bf44c680&gt;, block = True
+timeout = 9.99999933900017
+
+    def get(self, block=True, timeout=None):
+        if self._closed:
+            raise ValueError(f"Queue {self!r} is closed")
+        if block and timeout is None:
+            with self._rlock:
+                res = self._recv_bytes()
+            self._sem.release()
+        else:
+            if block:
+                deadline = time.monotonic() + timeout
+            if not self._rlock.acquire(block, timeout):
+                raise Empty
+            try:
+                if block:
+                    timeout = deadline - time.monotonic()
+                    if not self._poll(timeout):
+&gt;                       raise Empty
+E                       _queue.Empty
+
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/multiprocessing/queues.py:114: Empty</failure></testcase></testsuite></testsuites>

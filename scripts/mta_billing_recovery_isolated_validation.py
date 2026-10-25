@@ -40,28 +40,28 @@ def main():
 
         before = {j: _job(auth, j) for j in (completed, orphan, recent)}
         dry = ai_billing.recover_stale_jobs(now=now, older_than_seconds=3600, dry_run=True)
-        assert [j["job_id"] for j in dry["candidates"]] == [orphan], dry
-        assert dry["recovered_job_ids"] == [], dry
-        assert {j: _job(auth, j) for j in before} == before, "dry-run altered database"
+        if not ([j["job_id"] for j in dry["candidates"]] == [orphan]):raise AssertionError(dry)
+        if not (dry["recovered_job_ids"] == []):raise AssertionError(dry)
+        if not ({j: _job(auth, j) for j in before} == before):raise AssertionError("dry-run altered database")
         recovered = ai_billing.recover_stale_jobs(now=now, older_than_seconds=3600, dry_run=False)
-        assert recovered["recovered_job_ids"] == [orphan], recovered
+        if not (recovered["recovered_job_ids"] == [orphan]):raise AssertionError(recovered)
         orphan_row = _job(auth, orphan)
-        assert orphan_row["status"] == "failed"
-        assert orphan_row["resource_source"] == "unmetered"
-        assert json.loads(orphan_row["usage_json"]) == {}
-        assert _job(auth, recent)["status"] == "running"
-        assert _job(auth, completed)["status"] == "done"
+        if not (orphan_row["status"] == "failed"):raise AssertionError('Required validation failed')
+        if not (orphan_row["resource_source"] == "unmetered"):raise AssertionError('Required validation failed')
+        if not (json.loads(orphan_row["usage_json"]) == {}):raise AssertionError('Required validation failed')
+        if not (_job(auth, recent)["status"] == "running"):raise AssertionError('Required validation failed')
+        if not (_job(auth, completed)["status"] == "done"):raise AssertionError('Required validation failed')
         repeat = ai_billing.recover_stale_jobs(now=now, older_than_seconds=3600, dry_run=False)
-        assert repeat["recovered_job_ids"] == [], repeat
+        if not (repeat["recovered_job_ids"] == []):raise AssertionError(repeat)
         closed_rejected = False
         try:
             ai_billing.close_period(1, "2026-10-10", "2026-10-10")
         except ValueError:
             closed_rejected = True
-        assert closed_rejected, "Failed orphan was unexpectedly billable"
+        if not (closed_rejected):raise AssertionError("Failed orphan was unexpectedly billable")
         with auth.db() as c:
             count = c.execute("SELECT count(*) FROM ai_billing_periods").fetchone()[0]
-        assert count == 0
+        if not (count == 0):raise AssertionError('Required validation failed')
         print(json.dumps({
             "isolated": True,
             "dry_run_candidates": len(dry["candidates"]),

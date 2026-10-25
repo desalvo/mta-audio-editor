@@ -1,0 +1,4837 @@
+{
+  "schema": "mta-paypal-discovery-evidence-1",
+  "date": "2026-10-24",
+  "passed_distinct": 428,
+  "current_failures": 0,
+  "current_errors": 0,
+  "current_skips": 0,
+  "new_cases": 93,
+  "new_domain_cases": 77,
+  "new_chromium_cases": 16,
+  "chromium_cases": 47,
+  "method": "Latest actual execution per exact testcase ID; overlapping raw reports consolidated, not another execution or global-suite result.",
+  "reports": [
+    {
+      "path": "docs/validation/r210/paypal-discovery-economic-integration.xml",
+      "sha256": "68940a7c6894ad2ccde244c4958a5c3446c129fad346aeb0aa60f3d1c2434170",
+      "executed": 2,
+      "nonpassing": 0
+    },
+    {
+      "path": "docs/validation/r210/paypal-discovery-gross-binding.xml",
+      "sha256": "5282e8555a39757fa6f7eaf9cd3df49b8593f919aeb0b8a6b99041c3e3aa24f3",
+      "executed": 1,
+      "nonpassing": 0
+    },
+    {
+      "path": "docs/validation/r210/paypal-discovery-amount-drift.xml",
+      "sha256": "1f4b5ec3e6f5680300f97659284c5224be5a1cc8c2b7fd4b4cb20f725d7a98ae",
+      "executed": 1,
+      "nonpassing": 0
+    },
+    {
+      "path": "docs/validation/r210/paypal-discovery-domain.xml",
+      "sha256": "2e63fec0b8b0fafbcccf94adcb7f0ac99de781e4b3d8601c3a5943ec05b36e40",
+      "executed": 101,
+      "nonpassing": 0
+    },
+    {
+      "path": "docs/validation/r210/paypal-discovery-regression.xml",
+      "sha256": "4bb130c54db92fbf342803ae63473e56978f3a63494a2fb9ba2f9473a1e89ef6",
+      "executed": 232,
+      "nonpassing": 0
+    },
+    {
+      "path": "docs/validation/r210/paypal-discovery-browser-0.xml",
+      "sha256": "b6781168e2081de4f36210d421b02324da364647e783fe43150e476892ec3a4f",
+      "executed": 4,
+      "nonpassing": 0
+    },
+    {
+      "path": "docs/validation/r210/paypal-discovery-browser-1.xml",
+      "sha256": "9646c71499250bdf931771fef047b41c8832e3cb6dd49763be367621eb2b6389",
+      "executed": 4,
+      "nonpassing": 0
+    },
+    {
+      "path": "docs/validation/r210/paypal-discovery-browser-2.xml",
+      "sha256": "6fc8ba271db268965f2cea32d0032b4212637008697f70a812dd26b584c8183d",
+      "executed": 4,
+      "nonpassing": 0
+    },
+    {
+      "path": "docs/validation/r210/paypal-discovery-browser-3.xml",
+      "sha256": "5772c108fda14c46f967ed9c1e3b58c0235909a4579396a8657bc0b72880ae67",
+      "executed": 4,
+      "nonpassing": 0
+    },
+    {
+      "path": "docs/validation/r210/paypal-discovery-browser-regression-0.xml",
+      "sha256": "0b07ca286afebac60da8f74dc0e0d6365cd2b1cdd48305222ad77e469a45cff0",
+      "executed": 11,
+      "nonpassing": 0
+    },
+    {
+      "path": "docs/validation/r210/paypal-discovery-browser-regression-1.xml",
+      "sha256": "db6ebeb0da2e5d942dffdecb1a574eedfbd897a0f25c2fcfde86a5aa566b3cb5",
+      "executed": 11,
+      "nonpassing": 0
+    },
+    {
+      "path": "docs/validation/r210/paypal-discovery-browser-regression-2.xml",
+      "sha256": "c33a54e8654b287203b5b9813590e99a1bc82cf62d25a95a854b3fb126fe9935",
+      "executed": 11,
+      "nonpassing": 0
+    },
+    {
+      "path": "docs/validation/r210/paypal-discovery-browser-regression-3.xml",
+      "sha256": "f82162e79f89c0584ae6658370d5b83b8ebf0726b9134df43a0f03837a473aa9",
+      "executed": 10,
+      "nonpassing": 0
+    },
+    {
+      "path": "docs/validation/r210/paypal-discovery-gates.xml",
+      "sha256": "d594723e0ed2b09f3784fc700925bd81ca8327074741b4613d4beee1b0a0016b",
+      "executed": 36,
+      "nonpassing": 0
+    }
+  ],
+  "cases": [
+    {
+      "id": "tests/test_r210_account_capture_preflight.py::test_capture_rechecks_original_contract_after_provider_approval[dispatch]",
+      "report": "paypal-discovery-browser-regression-1.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-regression-1.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_account_capture_preflight.py::test_capture_rechecks_original_contract_after_provider_approval[epoch]",
+      "report": "paypal-discovery-browser-regression-3.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-regression-3.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_account_capture_preflight.py::test_capture_rechecks_original_contract_after_provider_approval[inactive]",
+      "report": "paypal-discovery-browser-regression-3.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-regression-3.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_account_capture_preflight.py::test_capture_rechecks_original_contract_after_provider_approval[merchant]",
+      "report": "paypal-discovery-browser-regression-0.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-regression-0.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_account_capture_preflight.py::test_capture_rechecks_original_contract_after_provider_approval[owner]",
+      "report": "paypal-discovery-browser-regression-1.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-regression-1.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_account_capture_preflight.py::test_capture_rechecks_original_contract_after_provider_approval[pending_evidence]",
+      "report": "paypal-discovery-browser-regression-2.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-regression-2.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_account_capture_preflight.py::test_capture_rechecks_original_contract_after_provider_approval[permission]",
+      "report": "paypal-discovery-browser-regression-2.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-regression-2.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_account_capture_preflight.py::test_capture_rechecks_original_contract_after_provider_approval[settled_fee]",
+      "report": "paypal-discovery-browser-regression-0.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-regression-0.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_account_refund_acceptance.py::test_actual_account_refund_amount_wallet_privacy_outage_and_nc_history[1280-en]",
+      "report": "paypal-discovery-browser-regression-2.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-regression-2.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_account_refund_acceptance.py::test_actual_account_refund_amount_wallet_privacy_outage_and_nc_history[1280-it]",
+      "report": "paypal-discovery-browser-regression-1.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-regression-1.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_account_refund_acceptance.py::test_actual_account_refund_amount_wallet_privacy_outage_and_nc_history[390-en]",
+      "report": "paypal-discovery-browser-regression-0.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-regression-0.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_account_refund_acceptance.py::test_actual_account_refund_amount_wallet_privacy_outage_and_nc_history[390-it]",
+      "report": "paypal-discovery-browser-regression-3.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-regression-3.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_admin_reconciliation_uses_same_private_failed_charge_proof",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_changed_incomplete_or_unavailable_snapshots_never_clear[canonical]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_changed_incomplete_or_unavailable_snapshots_never_clear[config]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_changed_incomplete_or_unavailable_snapshots_never_clear[duplicate]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_changed_incomplete_or_unavailable_snapshots_never_clear[intent]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_changed_incomplete_or_unavailable_snapshots_never_clear[intent_environment]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_changed_incomplete_or_unavailable_snapshots_never_clear[latest_missing]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_changed_incomplete_or_unavailable_snapshots_never_clear[not_found]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_changed_incomplete_or_unavailable_snapshots_never_clear[over_bound]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_changed_incomplete_or_unavailable_snapshots_never_clear[owner]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_changed_incomplete_or_unavailable_snapshots_never_clear[second_list]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_changed_incomplete_or_unavailable_snapshots_never_clear[timeout]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_changed_incomplete_or_unavailable_snapshots_never_clear[truncated]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_concurrent_readbacks_commit_one_private_proof",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_failed_proof_cannot_adopt_another_orders_charge_binding",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_late_authenticated_payment_stays_pending_and_cannot_overwrite_proof",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_missing_evidence_is_not_zero[amount_captured]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_missing_evidence_is_not_zero[amount_refunded]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_missing_evidence_is_not_zero[balance_transaction]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_missing_evidence_is_not_zero[captured]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_missing_evidence_is_not_zero[disputed]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_missing_evidence_is_not_zero[failure_balance_transaction]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_missing_evidence_is_not_zero[id]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_missing_evidence_is_not_zero[livemode]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_missing_evidence_is_not_zero[paid]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_missing_evidence_is_not_zero[refunded]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_missing_evidence_is_not_zero[status]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_nonempty_ambiguous_or_monetary_history_stays_blocked[amount-499]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_nonempty_ambiguous_or_monetary_history_stays_blocked[amount-True]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_nonempty_ambiguous_or_monetary_history_stays_blocked[amount_captured-1]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_nonempty_ambiguous_or_monetary_history_stays_blocked[amount_captured-False]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_nonempty_ambiguous_or_monetary_history_stays_blocked[amount_refunded-1]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_nonempty_ambiguous_or_monetary_history_stays_blocked[amount_refunded-False]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_nonempty_ambiguous_or_monetary_history_stays_blocked[balance_transaction-txn_money]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_nonempty_ambiguous_or_monetary_history_stays_blocked[captured-0]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_nonempty_ambiguous_or_monetary_history_stays_blocked[captured-True]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_nonempty_ambiguous_or_monetary_history_stays_blocked[currency-usd]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_nonempty_ambiguous_or_monetary_history_stays_blocked[disputed-True]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_nonempty_ambiguous_or_monetary_history_stays_blocked[failure_balance_transaction-txn_failed]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_nonempty_ambiguous_or_monetary_history_stays_blocked[id-pi_not_charge]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_nonempty_ambiguous_or_monetary_history_stays_blocked[livemode-True]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_nonempty_ambiguous_or_monetary_history_stays_blocked[paid-0]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_nonempty_ambiguous_or_monetary_history_stays_blocked[paid-True]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_nonempty_ambiguous_or_monetary_history_stays_blocked[payment_intent-pi_other]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_nonempty_ambiguous_or_monetary_history_stays_blocked[refunded-True]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_nonempty_ambiguous_or_monetary_history_stays_blocked[status-pending]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_nonempty_ambiguous_or_monetary_history_stays_blocked[status-succeeded]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_owner_http_confirm_get_proof_and_atomic_rollback_retry",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_paginated_failed_charges_close_idempotently_without_money[False]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_paginated_failed_charges_close_idempotently_without_money[True]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_readiness_detects_broken_private_failed_proof[amount]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_readiness_detects_broken_private_failed_proof[journal]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_readiness_detects_broken_private_failed_proof[object]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_failed_charge_recovery.py::test_signed_async_failure_resolves_only_with_canonical_complete_history",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_financial_admin_browser.py::test_admin_diagnostics_remain_readable_during_drain",
+      "report": "paypal-discovery-browser-regression-2.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-regression-2.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_financial_admin_browser.py::test_admin_finance_roles_csrf_and_request_shape",
+      "report": "paypal-discovery-browser-regression-1.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-regression-1.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_financial_admin_browser.py::test_browser_reads_actual_financial_api_and_never_enables_switch[en]",
+      "report": "paypal-discovery-browser-regression-0.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-regression-0.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_financial_admin_browser.py::test_browser_reads_actual_financial_api_and_never_enables_switch[it]",
+      "report": "paypal-discovery-browser-regression-3.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-regression-3.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_financial_outcome_browser.py::test_actual_account_displays_private_final_conflict_in_both_regimes[1280-en-credits]",
+      "report": "paypal-discovery-browser-regression-2.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-regression-2.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_financial_outcome_browser.py::test_actual_account_displays_private_final_conflict_in_both_regimes[1280-it-credits]",
+      "report": "paypal-discovery-browser-regression-1.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-regression-1.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_financial_outcome_browser.py::test_actual_account_displays_private_final_conflict_in_both_regimes[390-en-credits]",
+      "report": "paypal-discovery-browser-regression-0.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-regression-0.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_financial_outcome_browser.py::test_actual_account_displays_private_final_conflict_in_both_regimes[390-it-credits]",
+      "report": "paypal-discovery-browser-regression-3.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-regression-3.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_actual_stripe_two_step_full_or_partial_funds_and_durable_fence",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_bad_inputs_never_dispatch[amount_cents--1]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_bad_inputs_never_dispatch[amount_cents-0]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_bad_inputs_never_dispatch[amount_cents-1.2]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_bad_inputs_never_dispatch[amount_cents-1000000001]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_bad_inputs_never_dispatch[amount_cents-True]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_bad_inputs_never_dispatch[order_id-../x]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_bad_inputs_never_dispatch[provider-other]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_bad_inputs_never_dispatch[reason-bad\\nreason]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_bad_inputs_never_dispatch[reason-x]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_bad_inputs_never_dispatch[request_id-tiny]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_bad_inputs_never_dispatch[target-None]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_cancel_only_prepared_and_conflicting_idempotency_rejected",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_concurrent_preparations_reserve_once_and_concurrent_execution_sends_once",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_exact_revision_required_before_action[cancel--1]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_exact_revision_required_before_action[cancel-0]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_exact_revision_required_before_action[cancel-1.2]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_exact_revision_required_before_action[cancel-None]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_exact_revision_required_before_action[cancel-True]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_exact_revision_required_before_action[execute--1]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_exact_revision_required_before_action[execute-0]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_exact_revision_required_before_action[execute-1.2]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_exact_revision_required_before_action[execute-None]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_exact_revision_required_before_action[execute-True]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_exact_revision_required_before_action[verify--1]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_exact_revision_required_before_action[verify-0]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_exact_revision_required_before_action[verify-1.2]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_exact_revision_required_before_action[verify-None]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_exact_revision_required_before_action[verify-True]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_get_unavailable_after_post_does_not_repost_or_settle",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_invalid_preparation_cannot_reserve_or_send[drain]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_invalid_preparation_cannot_reserve_or_send[extra]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_invalid_preparation_cannot_reserve_or_send[nonadmin]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_invalid_preparation_cannot_reserve_or_send[overamount]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_invalid_preparation_cannot_reserve_or_send[unknownorder]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_invalid_preparation_cannot_reserve_or_send[wrongtarget]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_owner_history_privacy_and_admin_reason_not_disclosed",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_paypal_canonical_refund_moves_real_wallet_once[200]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_paypal_canonical_refund_moves_real_wallet_once[500]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_paypal_timeout_then_get_only_recovery",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_paypal_wrong_receipt_or_merchant_never_closes[amount]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_paypal_wrong_receipt_or_merchant_never_closes[capture]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_paypal_wrong_receipt_or_merchant_never_closes[currency]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_paypal_wrong_receipt_or_merchant_never_closes[custom_id]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_paypal_wrong_receipt_or_merchant_never_closes[merchant]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_paypal_wrong_receipt_or_merchant_never_closes[status]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_pending_and_failed_refunds_need_authenticated_terminal_outcome[canceled]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_pending_and_failed_refunds_need_authenticated_terminal_outcome[failed]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_pending_and_failed_refunds_need_authenticated_terminal_outcome[pending]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_pending_and_failed_refunds_need_authenticated_terminal_outcome[requires_action]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_post_error_stays_uncertain_and_get_failure_stays_pending",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_quote_balance_and_merchant_changes_prevent_dispatch",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_readiness_detects_inconsistent_refund_journal[event]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_readiness_detects_inconsistent_refund_journal[fence]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_readiness_detects_inconsistent_refund_journal[state]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_timeout_and_process_restart_recover_by_exact_get_without_repost",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_unrelated_or_malformed_provider_receipt_keeps_operation_open[amount]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_unrelated_or_malformed_provider_receipt_keeps_operation_open[currency]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_unrelated_or_malformed_provider_receipt_keeps_operation_open[id]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_unrelated_or_malformed_provider_receipt_keeps_operation_open[intent]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_unrelated_or_malformed_provider_receipt_keeps_operation_open[metadata]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_unrelated_or_malformed_provider_receipt_keeps_operation_open[object]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_unrelated_or_malformed_provider_receipt_keeps_operation_open[status]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_recovery.py::test_corrupt_journal_cannot_dispatch_or_clear_drain[context]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_recovery.py::test_corrupt_journal_cannot_dispatch_or_clear_drain[receipt]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_recovery.py::test_corrupt_journal_cannot_dispatch_or_clear_drain[revision]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_recovery.py::test_corrupt_journal_cannot_dispatch_or_clear_drain[schema]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_recovery.py::test_external_balance_change_invalidates_prepared_quote",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_recovery.py::test_multicapture_history_remaining_capture_refund",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_recovery.py::test_operator_refund_actually_clears_surplus_repayment_liability",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_recovery.py::test_original_payment_drift_is_rejected_before_provider_read_or_write[amount_cents-600]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_recovery.py::test_original_payment_drift_is_rejected_before_provider_read_or_write[session_id-cs_other]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_recovery.py::test_original_payment_drift_is_rejected_before_provider_read_or_write[user_id-1]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_recovery.py::test_paypal_subscription_and_repayment_refunds_preserve_exact_receivable[subscription]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_recovery.py::test_paypal_subscription_and_repayment_refunds_preserve_exact_receivable[subscription_reversal]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_recovery.py::test_pending_paypal_needs_completed_receipt_and_canonical_capture",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_recovery.py::test_real_child_exit_after_committed_uncertainty_is_recovered_without_reexecution",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_recovery.py::test_reason_bound_includes_whitespace_and_rejects_before_provider_io",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_recovery.py::test_refund_identity_audit_and_deletion_require_retired_owner_authorization",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_recovery.py::test_role_revoked_during_readback_prevents_dispatch",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_recovery.py::test_wallet_commit_failure_keeps_refund_pending_then_reconciles_once",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_ui.py::test_admin_prepare_confirm_execute_cancel_and_private_owner_view[1280-en-paypal_env]",
+      "report": "paypal-discovery-browser-regression-2.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-regression-2.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_ui.py::test_admin_prepare_confirm_execute_cancel_and_private_owner_view[1280-en-stripe_env]",
+      "report": "paypal-discovery-browser-regression-1.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-regression-1.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_ui.py::test_admin_prepare_confirm_execute_cancel_and_private_owner_view[1280-it-paypal_env]",
+      "report": "paypal-discovery-browser-regression-0.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-regression-0.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_ui.py::test_admin_prepare_confirm_execute_cancel_and_private_owner_view[1280-it-stripe_env]",
+      "report": "paypal-discovery-browser-regression-3.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-regression-3.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_ui.py::test_admin_prepare_confirm_execute_cancel_and_private_owner_view[390-en-paypal_env]",
+      "report": "paypal-discovery-browser-regression-2.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-regression-2.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_ui.py::test_admin_prepare_confirm_execute_cancel_and_private_owner_view[390-en-stripe_env]",
+      "report": "paypal-discovery-browser-regression-1.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-regression-1.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_ui.py::test_admin_prepare_confirm_execute_cancel_and_private_owner_view[390-it-paypal_env]",
+      "report": "paypal-discovery-browser-regression-0.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-regression-0.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_ui.py::test_admin_prepare_confirm_execute_cancel_and_private_owner_view[390-it-stripe_env]",
+      "report": "paypal-discovery-browser-regression-3.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-regression-3.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_ui.py::test_all_actual_owner_admin_templates_load_the_shared_refund_ui",
+      "report": "paypal-discovery-browser-regression-2.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-regression-2.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_ui.py::test_auth_csrf_exact_shapes_private_pagination_and_unknown_action",
+      "report": "paypal-discovery-browser-regression-1.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-regression-1.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_ui.py::test_uncertain_browser_only_recovers_existing_reference[en]",
+      "report": "paypal-discovery-browser-regression-0.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-regression-0.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_ui.py::test_uncertain_browser_only_recovers_existing_reference[it]",
+      "report": "paypal-discovery-browser-regression-3.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-regression-3.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_concurrent_cross_provider_new_ids_admit_only_one",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_failed_provider_lookup_keeps_pending_and_never_recreates[404]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_failed_provider_lookup_keeps_pending_and_never_recreates[timeout]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_fresh_ids_and_other_provider_do_not_escape_pending[paypal]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_fresh_ids_and_other_provider_do_not_escape_pending[stripe]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_legacy_resume_url_rejected[https://checkout.stripe.com/\\r\\nBad]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_legacy_resume_url_rejected[https://checkout.stripe.com:444/]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_legacy_resume_url_rejected[https://checkout.stripe.com:bad/]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_legacy_resume_url_rejected[https://checkout.stripe.com@evil.test/]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_legacy_resume_url_rejected[https://checkout.stripe.com\\\\@evil.test/]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_legacy_resume_url_rejected[https://evil.test/pay]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_legacy_resume_url_rejected[https://user:pw@checkout.stripe.com/]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_legacy_resume_url_rejected[javascript:alert(1)]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_new_checkout_response_uses_same_strict_redirect_boundary[control-paypal]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_new_checkout_response_uses_same_strict_redirect_boundary[control-stripe]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_new_checkout_response_uses_same_strict_redirect_boundary[credentials-paypal]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_new_checkout_response_uses_same_strict_redirect_boundary[credentials-stripe]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_new_checkout_response_uses_same_strict_redirect_boundary[port-paypal]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_new_checkout_response_uses_same_strict_redirect_boundary[port-stripe]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_owner_get_reconciliation_closes_terminal_and_releases_guard",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_owner_paid_and_refund_readback_is_net_and_idempotent",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_owner_probe_rejects_midflight_identity_change[credentials]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_owner_probe_rejects_midflight_identity_change[owner]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_paypal_approved_verify_never_captures_and_preserves_hold",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_private_paginated_history_no_provider_or_credentials",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_subscription_same_period_guard_and_readonly_nc_history",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_unknown_creation_blocks_new_purchase_and_owner_probe",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_valid_provider_redirect_is_stored_resumable_without_redispatch[paypal]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_valid_provider_redirect_is_stored_resumable_without_redispatch[stripe]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_wrong_owner_refused_before_any_provider_io",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments_browser.py::test_actual_private_history_recovery_no_automatic_capture[/account-1280-en]",
+      "report": "paypal-discovery-browser-regression-3.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-regression-3.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments_browser.py::test_actual_private_history_recovery_no_automatic_capture[/account-1280-it]",
+      "report": "paypal-discovery-browser-regression-2.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-regression-2.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments_browser.py::test_actual_private_history_recovery_no_automatic_capture[/account-390-en]",
+      "report": "paypal-discovery-browser-regression-1.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-regression-1.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments_browser.py::test_actual_private_history_recovery_no_automatic_capture[/account-390-it]",
+      "report": "paypal-discovery-browser-regression-0.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-regression-0.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments_browser.py::test_actual_private_history_recovery_no_automatic_capture[/account/credits-1280-en]",
+      "report": "paypal-discovery-browser-regression-3.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-regression-3.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments_browser.py::test_actual_private_history_recovery_no_automatic_capture[/account/credits-1280-it]",
+      "report": "paypal-discovery-browser-regression-2.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-regression-2.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments_browser.py::test_actual_private_history_recovery_no_automatic_capture[/account/credits-390-en]",
+      "report": "paypal-discovery-browser-regression-1.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-regression-1.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments_browser.py::test_actual_private_history_recovery_no_automatic_capture[/account/credits-390-it]",
+      "report": "paypal-discovery-browser-regression-0.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-regression-0.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments_browser.py::test_existing_redirect_and_unknown_reference_after_reload[paypal]",
+      "report": "paypal-discovery-browser-regression-2.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-regression-2.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments_browser.py::test_existing_redirect_and_unknown_reference_after_reload[stripe]",
+      "report": "paypal-discovery-browser-regression-1.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-regression-1.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments_browser.py::test_late_history_response_cannot_restore_old_payment_controls",
+      "report": "paypal-discovery-browser-regression-0.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-regression-0.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal.py::test_authenticated_refund_reverses_credits_once",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal.py::test_capture_wrong_owner_amount_currency_identity_and_unpaid_are_refused",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal.py::test_checkout_requires_eligible_subscription",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal.py::test_credit_checkout_capture_and_retries_only_credit_once",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal.py::test_http_roles_csrf_and_unsigned_webhook_are_enforced",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal.py::test_paypal_outbox_confirmed_on_provider_acceptance",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal.py::test_paypal_uncertain_provider_failure_requires_reconciliation",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal.py::test_prorated_subscription_fee_remains_payable_after_termination",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal.py::test_settings_sealed_and_no_secret_disclosure",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal.py::test_subscription_payment_settles_fee_without_adding_overage_credits",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal.py::test_untrusted_approval_url_and_denomination_refused",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal.py::test_webhook_event_and_fulfillment_share_atomic_commit",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal.py::test_webhook_signature_verified_and_canonical_order_fetched",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_changed_dispute_amount_preserves_old_hold_and_durable_private_review",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-amount-drift.xml",
+          "status": "passed"
+        },
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_combined_historical_refunds_and_dispute_never_publish_gross_or_double_debit",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-economic-integration.xml",
+          "status": "passed"
+        },
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_complete_two_page_readback_applies_each_dispute_once",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_discovered_final_outcomes_and_old_webhooks_cannot_reopen[CANCELED_BY_BUYER-False]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_discovered_final_outcomes_and_old_webhooks_cannot_reopen[CANCELED_BY_BUYER-True]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_discovered_final_outcomes_and_old_webhooks_cannot_reopen[RESOLVED_BUYER_FAVOUR-False]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_discovered_final_outcomes_and_old_webhooks_cannot_reopen[RESOLVED_BUYER_FAVOUR-True]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_discovered_final_outcomes_and_old_webhooks_cannot_reopen[RESOLVED_SELLER_FAVOUR-False]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_discovered_final_outcomes_and_old_webhooks_cannot_reopen[RESOLVED_SELLER_FAVOUR-True]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_discovered_repayment_dispute_reopens_exact_debt_and_release_restores_allocation",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-economic-integration.xml",
+          "status": "passed"
+        },
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_discovery_funds_only_net_and_replays_idempotently[False-False]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_discovery_funds_only_net_and_replays_idempotently[False-True]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_discovery_funds_only_net_and_replays_idempotently[True-False]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_discovery_funds_only_net_and_replays_idempotently[True-True]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_gap_recovery_is_atomic_and_later_gap_never_reopens_an_immutable_event",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_observed_dispute_during_unstable_scan_cannot_disappear_on_later_empty_scan",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_opposing_final_history_is_pending_and_never_releases_permanent_loss[False]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_opposing_final_history_is_pending_and_never_releases_permanent_loss[True]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_original_context_drift_after_remote_discovery_never_settles[amount]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_original_context_drift_after_remote_discovery_never_settles[epoch]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_original_context_drift_after_remote_discovery_never_settles[kind]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_original_context_drift_after_remote_discovery_never_settles[merchant]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_original_context_drift_after_remote_discovery_never_settles[owner]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_original_context_drift_after_remote_discovery_never_settles[provider]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[backslash]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[control]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[credentials]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[duplicate_link]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[duplicate_query]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[duplicate_row]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[empty_continuation]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[environment]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[extra_query]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[filter]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[fragment]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[host]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[method]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[no_links_list]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[object_bound]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[page]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[page_bound]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[path]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[port]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[request_bound]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[size]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[token]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_partial_full_discovery_cannot_clear_an_existing_unknown_gap_or_enable_capture[False]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_partial_full_discovery_cannot_clear_an_existing_unknown_gap_or_enable_capture[True]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_payouts_stay_pending_private_and_can_resolve_with_later_exact_outcome[False-RESOLVED_WITH_OTHER]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_payouts_stay_pending_private_and_can_resolve_with_later_exact_outcome[False-RESOLVED_WITH_PAYOUT]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_payouts_stay_pending_private_and_can_resolve_with_later_exact_outcome[False-UNKNOWN]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_payouts_stay_pending_private_and_can_resolve_with_later_exact_outcome[True-RESOLVED_WITH_OTHER]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_payouts_stay_pending_private_and_can_resolve_with_later_exact_outcome[True-RESOLVED_WITH_PAYOUT]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_payouts_stay_pending_private_and_can_resolve_with_later_exact_outcome[True-UNKNOWN]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[bad_time]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[collection_changed]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[currency]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[detail_changed]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[duplicate_capture]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[empty_transactions]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[foreign_capture]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[gross_mismatch]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[http_error]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[incomplete_membership]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[missing_gross]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[missing_items]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[missing_known]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[naive_time]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[negative]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[non_list]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[order_changed]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[partial_multi]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[single_gross_mismatch]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-gross-binding.xml",
+          "status": "passed"
+        },
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[summary_amount]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[summary_status]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[summary_time]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[wrong_detail]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history_browser.py::test_admin_actual_history_reconciliation_feedback_and_held_money[1280-en]",
+      "report": "paypal-discovery-browser-3.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-3.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history_browser.py::test_admin_actual_history_reconciliation_feedback_and_held_money[1280-it]",
+      "report": "paypal-discovery-browser-2.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-2.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history_browser.py::test_admin_actual_history_reconciliation_feedback_and_held_money[390-en]",
+      "report": "paypal-discovery-browser-1.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-1.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history_browser.py::test_admin_actual_history_reconciliation_feedback_and_held_money[390-it]",
+      "report": "paypal-discovery-browser-0.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-0.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history_browser.py::test_owner_full_page_discovers_holds_then_resolves_without_webhook_or_collection[/account-1280-en]",
+      "report": "paypal-discovery-browser-3.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-3.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history_browser.py::test_owner_full_page_discovers_holds_then_resolves_without_webhook_or_collection[/account-1280-it]",
+      "report": "paypal-discovery-browser-2.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-2.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history_browser.py::test_owner_full_page_discovers_holds_then_resolves_without_webhook_or_collection[/account-390-en]",
+      "report": "paypal-discovery-browser-1.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-1.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history_browser.py::test_owner_full_page_discovers_holds_then_resolves_without_webhook_or_collection[/account-390-it]",
+      "report": "paypal-discovery-browser-0.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-0.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history_browser.py::test_owner_full_page_discovers_holds_then_resolves_without_webhook_or_collection[/account/credits-1280-en]",
+      "report": "paypal-discovery-browser-3.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-3.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history_browser.py::test_owner_full_page_discovers_holds_then_resolves_without_webhook_or_collection[/account/credits-1280-it]",
+      "report": "paypal-discovery-browser-2.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-2.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history_browser.py::test_owner_full_page_discovers_holds_then_resolves_without_webhook_or_collection[/account/credits-390-en]",
+      "report": "paypal-discovery-browser-1.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-1.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history_browser.py::test_owner_full_page_discovers_holds_then_resolves_without_webhook_or_collection[/account/credits-390-it]",
+      "report": "paypal-discovery-browser-0.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-0.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history_browser.py::test_owner_gap_error_refresh_and_actual_recovery[1280-en]",
+      "report": "paypal-discovery-browser-3.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-3.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history_browser.py::test_owner_gap_error_refresh_and_actual_recovery[1280-it]",
+      "report": "paypal-discovery-browser-2.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-2.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history_browser.py::test_owner_gap_error_refresh_and_actual_recovery[390-en]",
+      "report": "paypal-discovery-browser-1.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-1.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history_browser.py::test_owner_gap_error_refresh_and_actual_recovery[390-it]",
+      "report": "paypal-discovery-browser-0.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-browser-0.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_failure_after_funding_rolls_back_history_and_wallet",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_incomplete_or_changed_history_cannot_grant_gross_credit[amount]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_incomplete_or_changed_history_cannot_grant_gross_credit[capture]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_incomplete_or_changed_history_cannot_grant_gross_credit[config_changed]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_incomplete_or_changed_history_cannot_grant_gross_credit[cumulative]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_incomplete_or_changed_history_cannot_grant_gross_credit[currency]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_incomplete_or_changed_history_cannot_grant_gross_credit[duplicate]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_incomplete_or_changed_history_cannot_grant_gross_credit[identity]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_incomplete_or_changed_history_cannot_grant_gross_credit[local_changed]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_incomplete_or_changed_history_cannot_grant_gross_credit[missing]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_incomplete_or_changed_history_cannot_grant_gross_credit[order_changed]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_incomplete_or_changed_history_cannot_grant_gross_credit[pending]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_initial_refunded_or_previously_paid_capture_reconciles_exact_net[False]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_initial_refunded_or_previously_paid_capture_reconciles_exact_net[True]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_money_is_an_exact_eur_decimal_string[ 1]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_money_is_an_exact_eur_decimal_string[-1]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_money_is_an_exact_eur_decimal_string[1.001]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_money_is_an_exact_eur_decimal_string[1.01]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_money_is_an_exact_eur_decimal_string[1.]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_money_is_an_exact_eur_decimal_string[1]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_money_is_an_exact_eur_decimal_string[1e2]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_money_is_an_exact_eur_decimal_string[NaN]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_money_is_an_exact_eur_decimal_string[True]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_refunded_subscription_creates_exact_receivable",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_reconciliation_e2e.py::test_ambiguous_paypal_payout_keeps_hold_and_pending_readiness",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_reconciliation_e2e.py::test_canonical_refund_cannot_be_attributed_to_other_capture",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_reconciliation_e2e.py::test_capture_reversal_and_refund_never_double_debit",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_reconciliation_e2e.py::test_dispute_readback_holds_then_releases_and_rejects_stale_updates",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_reconciliation_e2e.py::test_failed_refund_replay_rolls_back_capture_and_wallet",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_reconciliation_e2e.py::test_multiple_capture_refund_before_fulfillment_replays_atomically",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_reconciliation_e2e.py::test_refund_cannot_cross_provider_environment",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_reconciliation_e2e.py::test_reversal_before_capture_is_replayed_in_capture_transaction",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_reconciliation_e2e.py::test_subscription_refund_records_exact_receivable_without_wallet_credit",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_new_provisional_result_waits_for_matching_final_evidence[held-permanent-credits]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_new_provisional_result_waits_for_matching_final_evidence[held-permanent-repayment]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_new_provisional_result_waits_for_matching_final_evidence[held-permanent-subscription]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_new_provisional_result_waits_for_matching_final_evidence[held-released-credits]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_new_provisional_result_waits_for_matching_final_evidence[held-released-repayment]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_new_provisional_result_waits_for_matching_final_evidence[held-released-subscription]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_new_provisional_result_waits_for_matching_final_evidence[uncertain-permanent-credits]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_new_provisional_result_waits_for_matching_final_evidence[uncertain-permanent-repayment]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_new_provisional_result_waits_for_matching_final_evidence[uncertain-permanent-subscription]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_new_provisional_result_waits_for_matching_final_evidence[uncertain-released-credits]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_new_provisional_result_waits_for_matching_final_evidence[uncertain-released-repayment]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_new_provisional_result_waits_for_matching_final_evidence[uncertain-released-subscription]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_older_provisional_evidence_cannot_reopen_terminal_result[permanent-credits]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_older_provisional_evidence_cannot_reopen_terminal_result[permanent-repayment]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_older_provisional_evidence_cannot_reopen_terminal_result[permanent-subscription]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_older_provisional_evidence_cannot_reopen_terminal_result[released-credits]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_older_provisional_evidence_cannot_reopen_terminal_result[released-repayment]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_older_provisional_evidence_cannot_reopen_terminal_result[released-subscription]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_opposite_final_outcome_stays_pending_after_later_same_final_confirmation[permanent-credits]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_opposite_final_outcome_stays_pending_after_later_same_final_confirmation[permanent-repayment]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_opposite_final_outcome_stays_pending_after_later_same_final_confirmation[permanent-subscription]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_opposite_final_outcome_stays_pending_after_later_same_final_confirmation[released-credits]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_opposite_final_outcome_stays_pending_after_later_same_final_confirmation[released-repayment]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_opposite_final_outcome_stays_pending_after_later_same_final_confirmation[released-subscription]",
+      "report": "paypal-discovery-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_remote_transport_inventory.py::test_current_inventory_matches_review",
+      "report": "paypal-discovery-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_remote_transport_inventory.py::test_inventory_cannot_silently_approve_drift[category]",
+      "report": "paypal-discovery-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_remote_transport_inventory.py::test_inventory_cannot_silently_approve_drift[checker]",
+      "report": "paypal-discovery-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_remote_transport_inventory.py::test_inventory_cannot_silently_approve_drift[hash]",
+      "report": "paypal-discovery-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_remote_transport_inventory.py::test_inventory_cannot_silently_approve_drift[missing]",
+      "report": "paypal-discovery-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_remote_transport_inventory.py::test_inventory_cannot_silently_approve_drift[rationale]",
+      "report": "paypal-discovery-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_remote_transport_inventory.py::test_inventory_cannot_silently_approve_drift[reorder]",
+      "report": "paypal-discovery-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_remote_transport_inventory.py::test_inventory_cannot_silently_approve_drift[source]",
+      "report": "paypal-discovery-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_remote_transport_inventory.py::test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-device/start?x=1]",
+      "report": "paypal-discovery-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_remote_transport_inventory.py::test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-gateway/v1/generate]",
+      "report": "paypal-discovery-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_remote_transport_inventory.py::test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-jobs/execute-audio/whisper]",
+      "report": "paypal-discovery-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_remote_transport_inventory.py::test_new_aliased_transports_require_review[from httpx import AsyncClient as hidden\\nhidden()]",
+      "report": "paypal-discovery-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_remote_transport_inventory.py::test_new_aliased_transports_require_review[from urllib.request import build_opener as hidden\\nx=hidden()\\nx.open(\"https://example.test\")]",
+      "report": "paypal-discovery-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_remote_transport_inventory.py::test_new_aliased_transports_require_review[from urllib.request import urlopen as hidden\\nhidden(\"https://example.test\")]",
+      "report": "paypal-discovery-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_remote_transport_inventory.py::test_new_aliased_transports_require_review[import aiohttp as hidden\\nhidden.ClientSession()]",
+      "report": "paypal-discovery-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_remote_transport_inventory.py::test_new_aliased_transports_require_review[import httpx as hidden\\nhidden.Client()]",
+      "report": "paypal-discovery-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_remote_transport_inventory.py::test_new_aliased_transports_require_review[import socket as hidden\\nhidden.create_connection((\"example.test\",443))]",
+      "report": "paypal-discovery-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_remote_transport_inventory.py::test_supported_device_authorization_still_uses_exact_post[/api/ai-device/poll]",
+      "report": "paypal-discovery-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_remote_transport_inventory.py::test_supported_device_authorization_still_uses_exact_post[/api/ai-device/start]",
+      "report": "paypal-discovery-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_security_review_gate.py::test_complete_source_bound_review_is_accepted",
+      "report": "paypal-discovery-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_security_review_gate.py::test_current_scan_and_complete_review_ledger_agree",
+      "report": "paypal-discovery-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_security_review_gate.py::test_review_cannot_silently_survive_source_or_scan_changes[blanket_approval]",
+      "report": "paypal-discovery-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_security_review_gate.py::test_review_cannot_silently_survive_source_or_scan_changes[changed_finding]",
+      "report": "paypal-discovery-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_security_review_gate.py::test_review_cannot_silently_survive_source_or_scan_changes[changed_source]",
+      "report": "paypal-discovery-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_security_review_gate.py::test_review_cannot_silently_survive_source_or_scan_changes[deleted_source]",
+      "report": "paypal-discovery-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_security_review_gate.py::test_review_cannot_silently_survive_source_or_scan_changes[duplicate_review]",
+      "report": "paypal-discovery-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_security_review_gate.py::test_review_cannot_silently_survive_source_or_scan_changes[duplicate_scan]",
+      "report": "paypal-discovery-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_security_review_gate.py::test_review_cannot_silently_survive_source_or_scan_changes[empty_reason]",
+      "report": "paypal-discovery-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_security_review_gate.py::test_review_cannot_silently_survive_source_or_scan_changes[high]",
+      "report": "paypal-discovery-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_security_review_gate.py::test_review_cannot_silently_survive_source_or_scan_changes[missing_file]",
+      "report": "paypal-discovery-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_security_review_gate.py::test_review_cannot_silently_survive_source_or_scan_changes[missing_review]",
+      "report": "paypal-discovery-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_security_review_gate.py::test_review_cannot_silently_survive_source_or_scan_changes[new_finding]",
+      "report": "paypal-discovery-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_security_review_gate.py::test_review_cannot_silently_survive_source_or_scan_changes[new_source]",
+      "report": "paypal-discovery-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_security_review_gate.py::test_review_cannot_silently_survive_source_or_scan_changes[scan_error]",
+      "report": "paypal-discovery-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_security_review_gate.py::test_review_cannot_silently_survive_source_or_scan_changes[suppression]",
+      "report": "paypal-discovery-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_security_review_gate.py::test_review_cannot_silently_survive_source_or_scan_changes[wrong_totals]",
+      "report": "paypal-discovery-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_subscription_repayment_e2e.py::test_allocations_are_immutable_and_missing_position_blocks_report",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_subscription_repayment_e2e.py::test_already_captured_obsolete_quote_is_retained_as_refund_due",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_subscription_repayment_e2e.py::test_authenticated_refunded_initial_repayment_reopens_original_debt",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_subscription_repayment_e2e.py::test_authorized_account_erasure_preserves_other_owner_financial_records[erase]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_subscription_repayment_e2e.py::test_authorized_account_erasure_preserves_other_owner_financial_records[privacy_purge]",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_subscription_repayment_e2e.py::test_cent_rounding_surplus_is_separate_and_refunded_first",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_subscription_repayment_e2e.py::test_concurrent_checkout_only_one_provider_order_and_pending_target",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_subscription_repayment_e2e.py::test_concurrent_fulfillment_delivers_one_allocation",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_subscription_repayment_e2e.py::test_dispute_release_after_second_repayment_creates_refund_liability",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_subscription_repayment_e2e.py::test_erasure_authorization_is_retired_owner_scoped_and_connection_local",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_subscription_repayment_e2e.py::test_exact_repayment_closes_debt_without_wallet_or_fee_mutation",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_subscription_repayment_e2e.py::test_failure_rolls_back_capture_allocation_and_fence_then_retries",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_subscription_repayment_e2e.py::test_multiple_sources_are_bound_to_original_refund",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_subscription_repayment_e2e.py::test_owner_api_quote_csrf_and_regime_guards",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_subscription_repayment_e2e.py::test_owner_quote_change_is_checked_before_provider_capture",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_subscription_repayment_e2e.py::test_permanent_capture_reversal_reopens_original_receivable",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_subscription_repayment_e2e.py::test_refund_before_repayment_fulfillment_is_atomic",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_subscription_repayment_e2e.py::test_refund_reopens_same_debt_and_can_be_repaid_again",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_subscription_repayment_e2e.py::test_repayment_allowed_for_existing_debt_after_plan_service_disabled",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_subscription_repayment_e2e.py::test_uncertain_create_stays_pending_without_second_provider_post",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_subscription_repayment_e2e.py::test_verified_webhook_retries_allocate_once",
+      "report": "paypal-discovery-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-discovery-regression.xml",
+          "status": "passed"
+        }
+      ]
+    }
+  ],
+  "development_corrections": [
+    "Development domain report47 cases had two fixture failures: malformed empty transactions had not been returned by the filtered mock, and an unstable first collection became consistently empty on retry. Corrected mock and implemented durable previously-observed dispute-ID requirement; final exact cases pass.",
+    "Retained refund provider fixtures originally rejected the newly required dispute-list GET calls. Added explicit empty dispute responses to those isolated refund scenarios, preserving all original refund economics and single-dispatch assertions. All232 selected regressions pass.",
+    "A paid capture returns its existing receipt without new I/O; corrected the new test to require preservation of its pending gap. Unpaid ordinary fulfillment remains blocked until full reconciliation.",
+    "Two initial test-selection commands referenced absent filenames and collected zero tests; corrected existing filenames and ran the232-case regression. These empty attempts are not counted."
+  ],
+  "full_baseline_repeated": false,
+  "coverage_recollected": false,
+  "actual_payment_provider_calls": 0,
+  "release_candidate": false,
+  "transition_enabled": false,
+  "formal_progress": "21/42,50.0%,0/7 whole macroareas; unchanged, A4/A5 remain implementation_pending"
+}

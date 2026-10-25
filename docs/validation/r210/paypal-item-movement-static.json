@@ -1,0 +1,11 @@
+{
+  "ruff": "passed app/native/tests/scripts",
+  "compileall": "passed app/scripts",
+  "javascript_syntax": "passed",
+  "javascript_source_sha256": {
+    "app/static/regime_admin_panel.js": "7d8e44de702722a520d53adc8862f9ded0b11e897d055e2b0e447688371adc84"
+  },
+  "runtime_dependencies_added": 0,
+  "full_baseline_repeated": false,
+  "coverage_recollected": false
+}

@@ -14,8 +14,15 @@ def options():return {'settings':{'backend':'diffsinger','language':'it','pronun
     'expression':{'curves':{'pitch_cents':[{'time_ms':i*50,'value':0} for i in range(1000)]}}}}
 
 
-def test_large_lyrics_curves_roundtrip_in_body_and_keep_header_small(monkeypatch):
+def test_large_lyrics_curves_roundtrip_in_body_and_keep_header_small(monkeypatch,tmp_path):
     from app import ai_remote_client as client
+    from app import auth
+    # This transport fixture produces synthetic bytes and never loads singer or
+    # vocoder weights. Give its data-only adapters an explicit isolated policy;
+    # production's unreviewed neural checkpoints remain denied by the real gate.
+    monkeypatch.setattr(auth,'DATA_ROOT',tmp_path)
+    monkeypatch.setenv('MTA_NEURAL_SINGER_POLICY_MODEL','mta-analysis')
+    monkeypatch.setenv('MTA_DIFFSINGER_VOCODER_POLICY_MODEL','mta-analysis')
     original=score();settings=options();seen=[]
     def transport(request,timeout):
         seen.append(request)

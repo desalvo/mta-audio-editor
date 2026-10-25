@@ -197,6 +197,9 @@ def configure(body):
 
 
 def assign(uid,body,actor,*,self_service=False,expected_price=None,next_plan=None,next_price=None):
+    if self_service:
+        from .service_regime import require_commercial
+        require_commercial("self-service subscription")
     if set(body)-{'plan','cpu_seconds','gpu_seconds','storage_bytes','promo','overage'}:raise ValueError('Invalid quota setting')
     plan=body.get('plan')
     if plan is not None and plan not in (*PLANS,'trial'):raise ValueError('Invalid plan')
@@ -235,6 +238,8 @@ def assign(uid,body,actor,*,self_service=False,expected_price=None,next_plan=Non
 
 
 def grant(uid,amount,reason,actor,key):
+    from .service_regime import require_commercial
+    require_commercial("grant")
     amount=number(amount,integer=True)
     if not amount or not isinstance(reason,str) or not 3<=len(reason)<=300 or not isinstance(key,str) or not 8<=len(key)<=80:raise ValueError('Amount, reason and unique request ID required')
     key='grant:'+key
@@ -506,9 +511,10 @@ def options(uid,body):
 
 
 def transactions(uid):
+    from .subscription_receivables import rows as reversal_rows
     with auth.db() as c:
         init(c)
-        return {'terminations':[dict(row) for row in c.execute('SELECT * FROM resource_contract_terminations WHERE user_id=? ORDER BY terminated_at DESC LIMIT 200',(uid,))],'subscription_fees':[dict(row) for row in c.execute('SELECT * FROM resource_plan_charges WHERE user_id=? ORDER BY period_start DESC LIMIT 200',(uid,))],'credits':[dict(r) for r in c.execute('SELECT * FROM resource_credits WHERE user_id=? ORDER BY created_at DESC LIMIT 200',(uid,))],
+        return {'subscription_reversals':reversal_rows(c,uid),'terminations':[dict(row) for row in c.execute('SELECT * FROM resource_contract_terminations WHERE user_id=? ORDER BY terminated_at DESC LIMIT 200',(uid,))],'subscription_fees':[dict(row) for row in c.execute('SELECT * FROM resource_plan_charges WHERE user_id=? ORDER BY period_start DESC LIMIT 200',(uid,))],'credits':[dict(r) for r in c.execute('SELECT * FROM resource_credits WHERE user_id=? ORDER BY created_at DESC LIMIT 200',(uid,))],
                 'overages':[dict(r) for r in c.execute('SELECT r.job_id,r.period_start,r.charge_micro,b.gross_micro,b.waived_micro FROM resource_job_contracts r JOIN ai_compute_jobs j ON j.id=r.job_id LEFT JOIN resource_job_budgets b ON b.job_id=r.job_id WHERE r.user_id=? AND (r.charge_micro>0 OR b.waived_micro>0) AND j.accounting_excluded=0 ORDER BY r.period_start DESC LIMIT 200',(uid,))]}
 
 
@@ -522,6 +528,8 @@ def _fund(c,p,member):
 
 
 def subscribe(uid,code,expected_price,*,next_plan=None,next_price=None):
+    from .service_regime import require_commercial
+    require_commercial("subscribe")
     if code not in (*PLANS,'trial'):raise ValueError('Invalid plan')
     # Validate the chosen renewal before creating a one-time trial, then apply it
     # in the same assignment transaction (no partially activated trial).

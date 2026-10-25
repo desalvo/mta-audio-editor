@@ -1,0 +1,29 @@
+{
+  "ruff_app_native_tests_scripts": "passed",
+  "compileall_app_scripts": "passed",
+  "javascript_syntax": [
+    "subscriptions",
+    "credit_shop",
+    "owner_payments",
+    "account_limits",
+    "noncommercial_contributions",
+    "operator_refunds",
+    "ai_usage_panel"
+  ],
+  "axe_core_version": "4.14.0",
+  "axe_source_sha256": "20c09fe157a8a34a30e241aaa1fcdade657734f08ab379ecfbeb7d45cc46e878",
+  "chromium": "143.0.7499.0",
+  "playwright": "1.58.0",
+  "runtime_dependencies_added": 0,
+  "full_baseline_repeated": false,
+  "coverage_recollected": false,
+  "javascript_source_sha256": {
+    "app/static/subscriptions.js": "d44f15875e430ac9b715acb249fafb1bb30ad4fdcafed123ee49dcc06cd9db46",
+    "app/static/credit_shop.js": "b7808b1ec39d4ebf2c5b1a57f0e5cda58468feba1bc0ae99c4cb2f64c90e1358",
+    "app/static/owner_payments.js": "b42bcdd68e884b03809b5557c7a7dcf7dceb2ca00786833f2f17f11030863309",
+    "app/static/account_limits.js": "caeb053df513516b5da651d4564478839c5c7d62a01f26b9bac1024f7b8ac058",
+    "app/static/noncommercial_contributions.js": "30c40cf9c1d0b5f967ab1e2d67230c3c7d3a6f2ec023637f2cf823cba1a2699f",
+    "app/static/operator_refunds.js": "331888f09d520b1a8b31a47d2ece8851e57dbad27219136a17752c5576f4fa6e",
+    "app/static/ai_usage_panel.js": "36948517e3daed898ad776e2f7239f5f30faa59ae4493c6d46d5fe5c9b9b2ed6"
+  }
+}

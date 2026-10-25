@@ -9,9 +9,16 @@ def account(tmp_path,monkeypatch):
     monkeypatch.setenv('MTA_DATA_DIR',str(tmp_path));monkeypatch.setenv('MTA_ADMIN_PASSWORD','a-secure-test-password')
     monkeypatch.setattr(auth,'DATA_ROOT',tmp_path);monkeypatch.setattr(storage,'ROOT',tmp_path/'projects');storage.ROOT.mkdir()
     auth.init_auth_db()
+    # Legacy subscription tests explicitly exercise the COMMERCIAL service regime.
+    # Keep the production default NON_COMMERCIAL unchanged.
+    (tmp_path / "service-regime.json").write_text('{"regime":"COMMERCIAL","revision":0}', encoding="utf-8")
     with auth.db() as c:
         c.execute("INSERT INTO users(username,email,password_hash,role,active,email_confirmed,created_at,updated_at) VALUES('quota-user','quota@example.test','unused','user',1,1,1,1)")
         uid=c.execute("SELECT id FROM users WHERE username='quota-user'").fetchone()[0]
+    from app.regime_operation_fence import initialize
+    with auth.db() as c:
+        c.execute('BEGIN IMMEDIATE')
+        initialize(c,initial_regime='COMMERCIAL')
     r.config();ai_billing.set_price('cpu_seconds',10,valid_from=0);ai_billing.set_price('gpu_seconds',20,valid_from=0)
     ai_billing.set_price('disk_gb_hours',100,valid_from=0)
     return uid

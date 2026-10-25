@@ -122,6 +122,14 @@ app.include_router(ai_notification_router)
 app.include_router(ai_token_router)
 app.include_router(ai_gateway_router)
 app.include_router(ai_billing_router)
+from .ai_pull_routes import router as ai_pull_router
+app.include_router(ai_pull_router)
+from .ai_pull_coordinator import PullPending
+
+
+@app.exception_handler(PullPending)
+async def pull_pending_handler(request: Request, exc: PullPending):
+    return JSONResponse(exc.detail(), status_code=409, headers={'Cache-Control': 'no-store'})
 
 
 def _audible_export_project(project: Project) -> Project:
@@ -320,6 +328,7 @@ def _download_lead_backing_model(model_id: str) -> dict:
     return _lead_backing_model_info(model_id)
 
 NATIVE_BLOCKED_PATH_PREFIXES = (
+    "/api/pull-worker/",
     "/account",
     "/admin/",
     "/api/account",
@@ -596,6 +605,7 @@ def _media_job_public(job: dict) -> dict:
 def _is_public(path: str) -> bool:
     return (
         path in {"/api/billing/paypal/webhook", "/api/billing/credits/stripe-webhook", "/privacy/it.pdf", "/privacy/en.pdf", "/terms/it.pdf", "/terms/en.pdf", "/privacy/it/pdf", "/privacy/en/pdf", "/terms/it/pdf", "/terms/en/pdf", "/privacy", "/privacy/it", "/privacy/en", "/terms", "/terms/it", "/terms/en"}
+        or (path.startswith("/service-terms/") and path.rsplit("/", 1)[-1] in {"it", "en"})
         or path.startswith("/static/")
         or path in {"/health", "/api/health", "/api/about", "/oauth-second-factor", "/login", "/register", "/verify-email", "/resend-verification", "/forgot-password", "/reset-password"}
         or path.startswith("/oauth/")
@@ -610,6 +620,7 @@ def _is_public(path: str) -> bool:
 
 @app.middleware("http")
 async def security_middleware(request: Request, call_next):
+    from .ai_pull_routes import authenticated_worker_request
     if NATIVE_SINGLE_USER and (
         request.url.path == "/login"
         or request.url.path == "/logout"
@@ -639,11 +650,12 @@ async def security_middleware(request: Request, call_next):
     )
     # Dedicated AI tokens authorize only the gateway; never grant full MTA session access.
     ai_gateway_token_ok = False
+    pull_worker_token_ok = authenticated_worker_request(request)
     if request.url.path.startswith('/api/ai-gateway/') or request.url.path.startswith('/api/ai-jobs'):
         from .ai_access import authenticate as authenticate_ai_token
         bearer = request.headers.get('authorization', '')
         ai_gateway_token_ok = bearer.lower().startswith('bearer ') and authenticate_ai_token(bearer[7:]) is not None
-    if not _is_public(request.url.path) and user is None and not model_bearer_ok and not ai_gateway_token_ok and not check_basic_auth(request):
+    if not _is_public(request.url.path) and user is None and not model_bearer_ok and not ai_gateway_token_ok and not pull_worker_token_ok and not check_basic_auth(request):
         if request.url.path.startswith("/api/"):
             return auth_failure_response()
         from .admin_navigation import safe_next
@@ -655,7 +667,7 @@ async def security_middleware(request: Request, call_next):
         return response
 
     # API mutations must carry an explicit same-origin request marker.
-    if request.url.path.startswith("/api/") and request.method not in {"GET", "HEAD", "OPTIONS"} and request.headers.get("x-mta-request") != "1" and not ai_gateway_token_ok and request.url.path not in ("/api/billing/credits/stripe-webhook", "/api/billing/paypal/webhook"):
+    if request.url.path.startswith("/api/") and request.method not in {"GET", "HEAD", "OPTIONS"} and request.headers.get("x-mta-request") != "1" and not ai_gateway_token_ok and not pull_worker_token_ok and request.url.path not in ("/api/billing/credits/stripe-webhook", "/api/billing/paypal/webhook"):
         return HTMLResponse("Missing request integrity header", status_code=403)
 
     # Existing job polling, cancellation and saving results remain available after
@@ -674,7 +686,13 @@ async def security_middleware(request: Request, call_next):
         ai_start=path.endswith('/stem-jobs') or ('/extract-' in path and path.endswith('-jobs')) or ('/ai-arranger/' in path and path.endswith(('/start-generation','/generate-and-add','/generate','/jobs'))) or ('/ai-remix/' in path and path.endswith(('/start-generation','/generate-and-add')))
         if ai_start:
             from .resource_access import preflight,CreditAdmissionError
-            try:preflight(int(user['id']))
+            try:
+                from .model_license_policy import evaluate,admission
+                decision=None
+                if '/ai-arranger/' in path or '/ai-remix/' in path:
+                    try:decision=evaluate('ace-step',{})
+                    except (ValueError,OSError,TypeError):pass
+                with admission(decision):preflight(int(user['id']))
             except CreditAdmissionError as exc:
                 return JSONResponse({'detail':str(exc),'code':exc.code,'url':'/account#subscriptions'},status_code=402)
 
@@ -733,7 +751,7 @@ def _template(name: str, **replacements) -> str:
     if name in ("login.html","register.html"):
         from .i18n import current_language
         lang=current_language.get()
-        legal_links=f'<a href="/privacy/{lang}" lang="{lang}">Privacy</a> · <a href="/terms/{lang}" lang="{lang}">{"Termini di servizio" if lang=="it" else "Terms of service"}</a>'
+        legal_links=f'<a href="/privacy/{lang}" lang="{lang}">Privacy</a> · <a href="/terms/{lang}" lang="{lang}">{"Condizioni d’uso" if lang=="it" else "Terms of use"}</a> · <a href="/service-terms/{lang}" lang="{lang}">{"Regolamento del servizio" if lang=="it" else "Service Terms"}</a>'
         text=text.replace("__LEGAL_LINKS__",legal_links)
     for key, value in replacements.items():
         text = text.replace(f"__{key.upper()}__", str(value))
@@ -1038,7 +1056,7 @@ def api_session(request: Request):
     return user
 
 
-@app.get('/account/credits')
+@app.get('/account/credits',response_class=HTMLResponse)
 def credit_purchase_page(request: Request):
     require_user(request)
     return _template('credits.html')
@@ -1135,7 +1153,11 @@ def _workspace_usage_for_user(user_id: int) -> int:
 def api_account_limits(request: Request):
     user=require_user(request)
     from .account_limits import project_storage, summary
-    return summary(user['id'],project_storage(user['id'],list_projects(),pdir))
+    import sqlite3
+    from .regime_operation_fence import FenceBlocked
+    try:return summary(user['id'],project_storage(user['id'],list_projects(),pdir))
+    except (ValueError,sqlite3.DatabaseError,FenceBlocked) as exc:
+        raise HTTPException(409,'Personal accounting unavailable; refresh or contact the administrator') from exc
 
 
 def _storage_payload(request: Request) -> dict:
@@ -1539,8 +1561,8 @@ def vst3_parameters(request: Request, path: str):
 def _stem_runtime_status():
     status = STEM_SPLITTER.status()
     if _ai_external_engine('demucs'):
-        from .ai_worker_registry import resolve_worker
-        status = {**status, 'available': NATIVE_SINGLE_USER or resolve_worker('demucs') is not None,
+        from .ai_worker_registry import execution_available
+        status = {**status, 'available': NATIVE_SINGLE_USER or execution_available('demucs'),
                   'runtime': 'remote' if NATIVE_SINGLE_USER else 'server-worker', 'execution': 'ai-queue'}
     return status
 
@@ -1548,8 +1570,8 @@ def _stem_runtime_status():
 def _execution_ai_catalog():
     catalog=ai_catalog(native=NATIVE_SINGLE_USER)
     if _ai_external_engine('chords-ml'):
-        from .ai_worker_registry import resolve_worker
-        configured=NATIVE_SINGLE_USER or resolve_worker('chords-ml') is not None
+        from .ai_worker_registry import execution_available
+        configured=NATIVE_SINGLE_USER or execution_available('chords-ml')
         catalog['chords']['execution']='ai-queue'
         catalog['chords']['availability_basis']='trusted-worker-configuration'
         for engine in catalog['chords']['engines']:engine['available']=configured
@@ -1715,10 +1737,23 @@ def _check_native_ace_ready():
             raise HTTPException(409,'ACE_SETUP_IN_PROGRESS' if state['task'].get('state') in ('installing','starting_server') else 'ACE_SETUP_REQUIRED')
 
 
+def _ace_execution_available():
+    if NATIVE_SINGLE_USER:
+        return configured_worker() is not None
+    from .ai_worker_registry import execution_available
+    return execution_available('ace-step')
+
+
+def _licensed_generation_start(*args, **kwargs):
+    from .model_license_policy import admission, evaluate
+    with admission(evaluate('ace-step', {})):
+        return ai_arranger_runtime.start(*args, **kwargs)
+
+
 def _generate_ai_preview(plan: dict, project: Project) -> Response:
     """Explicit opt-in external worker output; never mutate the original project."""
     _check_native_ace_ready()
-    if configured_worker() is None and not (NATIVE_SINGLE_USER and _ace_desktop.uses_mta_account()):
+    if not _ace_execution_available() and not (NATIVE_SINGLE_USER and _ace_desktop.uses_mta_account()):
         raise HTTPException(503, 'No verified AI inference executable is configured')
     try:
         if NATIVE_SINGLE_USER and _ace_desktop.uses_mta_account():
@@ -1770,7 +1805,7 @@ def ai_remix_generate(pid: str, request: Request, body: RemixRequest):
     return _generate_ai_preview(plan, project)
 
 
-def _publish_durable_generated_audio(job_id, pid, audio, metadata):
+def _publish_durable_generated_audio(job_id, pid, audio, metadata, *, expected_owner=None):
     """Serialize *all* generated tracks targeting one project across processes.
 
     Per-job outbox locks are insufficient: two independent jobs can otherwise
@@ -1779,8 +1814,16 @@ def _publish_durable_generated_audio(job_id, pid, audio, metadata):
     import hashlib
     from .ai_project_lock import project_publication_lock
     with project_publication_lock(pid):
+        from .ai_pull_coordinator import publication_owner
+        pull_owner = publication_owner(job_id, pid)
+        if pull_owner is not None:
+            if expected_owner is not None and expected_owner != pull_owner:
+                raise ValueError('Conflicting original publication owners')
+            expected_owner = pull_owner
         # Load only after acquiring the project lock to avoid stale snapshots.
         project = load_project(pid)
+        if expected_owner is not None and project.owner_user_id!=expected_owner:
+            raise ValueError('Original project owner changed; publication recovery blocked')
         filename = 'ai-' + job_id + '.wav'
         already = next((track for track in project.tracks if track.filename == filename), None)
         target = audio_path(pid, filename)
@@ -2059,13 +2102,17 @@ def _durable_generation_executor(pid, payload, job_id):
             if source=='unmetered' and not ai_metering_bridge.billing_required(job_id):
                 pass
             else:
-                if source not in ('worker', 'cgroup', 'gpu-kernel-verified','diagnostic-estimate'):
+                if source not in ('worker', 'cgroup', 'gpu-kernel-verified','diagnostic-estimate', 'remote-worker'):
                     raise ValueError('Trusted worker usage has no verified source')
                 ai_metering_bridge.capture(job_id, usage, source)
         # Stable filename provides a publish-once guard for idempotent submissions.
         from . import ai_publish_outbox
-        ai_publish_outbox.stage(job_id, pid, audio, {
-            'wav': meta, 'mode': operation, 'input_source': plan['input_source']})
+        if meta.get('job_id') and __import__('app.ai_pull_coordinator', fromlist=['mode']).mode() == 'pull':
+            from .ai_pull_coordinator import stage_publication
+            stage_publication(meta['job_id'])
+        else:
+            ai_publish_outbox.stage(job_id, pid, audio, {
+                'wav': meta, 'mode': operation, 'input_source': plan['input_source']})
         ai_publish_outbox.recover(_publish_durable_generated_audio, job_id=job_id)
     return generate
 
@@ -2134,7 +2181,7 @@ def ai_arranger_start_generation(pid: str, request: Request, body: RearrangeRequ
     from .project_kinds import require_kind
     require_kind(project, "audio")
     _check_native_ace_ready()
-    if configured_worker() is None and not (NATIVE_SINGLE_USER and _ace_desktop.uses_mta_account()):
+    if not _ace_execution_available() and not (NATIVE_SINGLE_USER and _ace_desktop.uses_mta_account()):
         raise HTTPException(503, 'No trusted AI inference executable is configured')
     # Persist the caller's reproducible request separately from the execution closure.
     # Idempotency keys are namespaced per project and operation.
@@ -2147,7 +2194,7 @@ def ai_arranger_start_generation(pid: str, request: Request, body: RearrangeRequ
     job_id = uuid.uuid4().hex
     executor = _durable_generation_executor(pid, payload, job_id)
     try:
-        accepted, job = ai_arranger_runtime.start(pid, 'arranger', executor, job_id=job_id,
+        accepted, job = _licensed_generation_start(pid, 'arranger', executor, job_id=job_id,
             cancellable=True, payload=payload, idempotency_key=replay_key, defer_spawn=True)
     except ValueError as exc:
         # Reusing a key for different parameters is a client conflict, not an
@@ -2176,7 +2223,7 @@ def ai_remix_start_generation(pid: str, request: Request, body: RemixRequest):
     from .project_kinds import require_kind
     require_kind(project, "audio")
     _check_native_ace_ready()
-    if configured_worker() is None and not (NATIVE_SINGLE_USER and _ace_desktop.uses_mta_account()):
+    if not _ace_execution_available() and not (NATIVE_SINGLE_USER and _ace_desktop.uses_mta_account()):
         raise HTTPException(503, 'No trusted AI inference executable is configured')
     import hashlib
     replay_header = request.headers.get('Idempotency-Key')
@@ -2187,7 +2234,7 @@ def ai_remix_start_generation(pid: str, request: Request, body: RemixRequest):
     job_id = uuid.uuid4().hex
     executor = _durable_generation_executor(pid, payload, job_id)
     try:
-        accepted, job = ai_arranger_runtime.start(pid, 'remix', executor, job_id=job_id,
+        accepted, job = _licensed_generation_start(pid, 'remix', executor, job_id=job_id,
             cancellable=True, payload=payload, idempotency_key=replay_key, defer_spawn=True)
     except ValueError as exc:
         raise HTTPException(409, str(exc)) from exc
@@ -4679,15 +4726,10 @@ def _split_lead_backing_vocals(vocal_stem: Path, output_dir: Path, *, model_id: 
     if command_template:
         values = {"input": str(vocal_stem), "lead": str(lead), "backing": str(backing), "output_dir": str(output_dir)}
         command = [part.format(**values) for part in shlex.split(command_template)]
-        proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-        while proc.poll() is None:
-            if cancel_event is not None and cancel_event.is_set():
-                proc.terminate()
-                raise RuntimeError("stem separation cancelled")
-            time.sleep(0.1)
-        output = proc.stdout.read() if proc.stdout else ""
-        if proc.returncode or not lead.exists() or not backing.exists():
-            raise RuntimeError((output or "lead/backing vocal separator failed")[-3000:])
+        from .separator_process import run
+        run(command,cancel_event=cancel_event)
+        if any(path.is_symlink() or not path.is_file() or path.stat().st_nlink!=1 for path in (lead,backing)):
+            raise RuntimeError("lead/backing vocal separator produced unsafe or missing output")
         return lead, backing, os.getenv("MTA_LEAD_BACKING_MODEL", "configured-ai").strip() or "configured-ai"
     selected = (model_id or LEAD_BACKING_DEFAULT_MODEL).strip()
     if selected == "mvsep-mega53":

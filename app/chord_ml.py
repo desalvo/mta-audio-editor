@@ -5,6 +5,7 @@ import importlib.util
 import json
 import os
 import shutil
+import stat
 import subprocess
 import sys
 import tempfile
@@ -46,6 +47,7 @@ def model_root() -> Path:
 
 
 def model_dir(model_id: str) -> Path:
+    if not isinstance(model_id,str) or model_id not in MODEL_SPECS:raise ValueError("unsupported chord ML model")
     return model_root() / model_id
 
 
@@ -53,15 +55,46 @@ def installed(model_id: str) -> bool:
     return (model_dir(model_id) / ".mta-installed.json").is_file()
 
 
+MAX_DOWNLOAD_BYTES=2*1024**3
+MAX_EXPANDED_BYTES=4*1024**3
+MAX_ARCHIVE_MEMBERS=20000
+
+
 def _safe_extract(zf: zipfile.ZipFile, destination: Path) -> None:
-    root = destination.resolve()
-    for member in zf.infolist():
-        target = (destination / member.filename).resolve()
-        try:
-            target.relative_to(root)
-        except ValueError as exc:
-            raise RuntimeError("unsafe model archive path") from exc
-    zf.extractall(destination)
+    """Preflight the complete cross-platform inventory, then stream privately."""
+    entries=zf.infolist();seen={};total=0
+    if len(entries)>MAX_ARCHIVE_MEMBERS:raise RuntimeError('too many model archive members')
+    for item in entries:
+        name=item.filename.rstrip('/') if item.is_dir() else item.filename
+        parts=name.split('/')
+        if (not name or len(name)>1024 or '\\' in name or ':' in name or '\x00' in name
+                or any(p in ('','.','..') or p.endswith((' ','.')) or
+                    p.split('.')[0].upper() in {'CON','PRN','AUX','NUL',*(f'COM{i}' for i in range(1,10)),*(f'LPT{i}' for i in range(1,10))} for p in parts)):
+            raise RuntimeError('unsafe model archive path')
+        folded=name.casefold();mode=stat.S_IFMT(item.external_attr>>16)
+        if (folded in seen or item.flag_bits&1 or mode not in (0,stat.S_IFREG,stat.S_IFDIR)
+                or (mode==stat.S_IFDIR and not item.is_dir()) or (mode==stat.S_IFREG and item.is_dir())):
+            raise RuntimeError('duplicate, encrypted or special model archive member')
+        seen[folded]=item.is_dir();total+=item.file_size
+        if item.file_size>MAX_DOWNLOAD_BYTES or total>MAX_EXPANDED_BYTES or item.file_size<0:
+            raise RuntimeError('expanded model archive exceeds size limit')
+    for name in seen:
+        if any(seen.get('/'.join(name.split('/')[:i])) is False for i in range(1,len(name.split('/')))):
+            raise RuntimeError('conflicting model archive member paths')
+    if destination.is_symlink() or (destination.exists() and (not destination.is_dir() or any(destination.iterdir()))):
+        raise RuntimeError('model extraction requires a fresh private directory')
+    destination.mkdir(parents=True,exist_ok=True)
+    for item in entries:
+        target=destination/item.filename
+        if item.is_dir():target.mkdir(parents=True,exist_ok=True);continue
+        target.parent.mkdir(parents=True,exist_ok=True)
+        with zf.open(item) as source,target.open('xb') as output:
+            copied=0
+            while block:=source.read(1024*1024):
+                copied+=len(block)
+                if copied>item.file_size:raise RuntimeError('model member exceeds declared size')
+                output.write(block)
+            if copied!=item.file_size:raise RuntimeError('truncated model archive member')
 
 
 def _flatten_single_directory(destination: Path) -> None:
@@ -84,64 +117,59 @@ def _download_zip(url: str, destination: Path) -> None:
     if parsed.scheme != "https" or not parsed.netloc:
         raise ValueError("model downloads require an HTTPS URL")
     req = urllib.request.Request(url, headers={"User-Agent": "MTA-Audio-Editor/0.2"})  # noqa: S310
-    with https_urlopen(req, timeout=180) as response, destination.open("wb") as out:  # noqa: S310
-        shutil.copyfileobj(response, out)
+    created=False
+    try:
+        with https_urlopen(req, timeout=180) as response, destination.open("xb") as out:
+            created=True
+            total=0
+            while block:=response.read(1024*1024):
+                total+=len(block)
+                if total>MAX_DOWNLOAD_BYTES:raise RuntimeError('model download exceeds size limit')
+                out.write(block)
+    except BaseException:
+        if created:destination.unlink(missing_ok=True)
+        raise
 
 
 def download_model(model_id: str) -> dict:
     from .model_license_policy import evaluate_model
-    evaluate_model(model_id)
-    spec = MODEL_SPECS.get(model_id)
-    if not spec:
-        raise ValueError("unsupported chord ML model")
-    root = model_dir(model_id)
-    root.parent.mkdir(parents=True, exist_ok=True)
-    with tempfile.TemporaryDirectory(prefix=f"mta-{model_id}-") as raw:
-        td = Path(raw)
-        archive = td / "model.zip"
-        _download_zip(str(spec["archive"]), archive)
-        unpack = td / "unpack"
-        unpack.mkdir()
-        with zipfile.ZipFile(archive) as zf:
-            _safe_extract(zf, unpack)
-        _flatten_single_directory(unpack)
-        if root.exists():
-            shutil.rmtree(root)
-        shutil.copytree(unpack, root)
-    if model_id == "btc-hcqt":
-        body_zip = root / "btc-body.zip"
-        _download_zip(BTC_BODY_ARCHIVE, body_zip)
-        body_unpack = root / "BTC-ISMIR19"
-        body_tmp = root / ".btc-body"
-        body_tmp.mkdir(exist_ok=True)
-        with zipfile.ZipFile(body_zip) as zf:
-            _safe_extract(zf, body_tmp)
-        _flatten_single_directory(body_tmp)
-        if body_unpack.exists():
-            shutil.rmtree(body_unpack)
-        body_tmp.rename(body_unpack)
-        body_zip.unlink(missing_ok=True)
-        if not (root / "btc_hcqt_beatlesft.pt").is_file():
-            raise RuntimeError("BTC-HCQT checkpoint missing from downloaded archive")
-    else:
-        checkpoints = list((root / "cache_data").glob("*.sdict")) if (root / "cache_data").is_dir() else []
-        if len(checkpoints) < 5:
-            raise RuntimeError("ChordFormer five-fold checkpoints missing from downloaded archive")
-    marker = {
-        "id": model_id,
-        "display_name": spec["display_name"],
-        "source": spec["archive"],
-        "license": spec["license"],
-    }
-    (root / ".mta-installed.json").write_text(json.dumps(marker, indent=2) + "\n", encoding="utf-8")
-    return marker
+    from .ai_project_lock import project_publication_lock
+    target=model_dir(model_id)
+    with project_publication_lock('studio-model:chord-'+model_id):
+        evaluate_model(model_id)
+        if target.exists() or target.is_symlink():raise ValueError('Remove the existing chord model before a new installation')
+        spec=MODEL_SPECS[model_id];target.parent.mkdir(parents=True,exist_ok=True)
+        with tempfile.TemporaryDirectory(prefix='.chord-install-',dir=target.parent) as raw:
+            td=Path(raw);archive=td/'model.zip';unpack=td/'unpack'
+            _download_zip(str(spec['archive']),archive)
+            with zipfile.ZipFile(archive) as zf:_safe_extract(zf,unpack)
+            _flatten_single_directory(unpack)
+            if model_id=='btc-hcqt':
+                body_zip=td/'btc-body.zip';body_tmp=td/'body'
+                _download_zip(BTC_BODY_ARCHIVE,body_zip)
+                with zipfile.ZipFile(body_zip) as zf:_safe_extract(zf,body_tmp)
+                _flatten_single_directory(body_tmp)
+                if (unpack/'BTC-ISMIR19').exists():raise RuntimeError('Conflicting BTC body destination')
+                body_tmp.rename(unpack/'BTC-ISMIR19')
+                if not (unpack/'btc_hcqt_beatlesft.pt').is_file():raise RuntimeError('BTC-HCQT checkpoint missing from downloaded archive')
+            else:
+                checkpoints=list((unpack/'cache_data').glob('*.sdict'))
+                if len(checkpoints)<5:raise RuntimeError('ChordFormer five-fold checkpoints missing from downloaded archive')
+            # Recheck admission before publishing downloaded code and weights.
+            evaluate_model(model_id)
+            marker={key:spec[key] for key in ('id','display_name','license')}|{'source':spec['archive']}
+            (unpack/'.mta-installed.json').write_text(json.dumps(marker,indent=2)+'\n',encoding='utf-8')
+            os.replace(unpack,target)
+        return marker
 
 
 def delete_model(model_id: str) -> bool:
-    root = model_dir(model_id)
-    if not root.exists():
-        return False
-    shutil.rmtree(root)
+    from .ai_project_lock import project_publication_lock
+    target=model_dir(model_id)
+    with project_publication_lock('studio-model:chord-'+model_id):
+        if target.is_symlink():raise ValueError('Unsafe chord model directory')
+        if not target.exists():return False
+        shutil.rmtree(target)
     return True
 
 

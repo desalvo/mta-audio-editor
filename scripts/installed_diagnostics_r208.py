@@ -6,8 +6,8 @@ Exit 0: all required checks pass; 1: failed required check; 2: application missi
 """
 from __future__ import annotations
 import argparse
+import http.client
 from datetime import datetime, timezone
-import hashlib
 import json
 import os
 from pathlib import Path
@@ -21,7 +21,6 @@ import tempfile
 import zipfile
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlsplit
-from urllib.request import Request, urlopen
 
 VERSION = '0.3.0-r208'
 SENSITIVE = re.compile(r'(?i)(password|token|secret|authorization|cookie|api[_-]?key|private[_-]?key)')
@@ -119,17 +118,24 @@ def inspect_server(results,base_url):
         check(results,'server_transport','WARN','HTTP to remote host is unencrypted; avoid credentialed checks')
     endpoints=['/api/health','/openapi.json','/docs/user']
     for endpoint in endpoints:
+        connection=None
         try:
-            req=Request(base_url.rstrip('/')+endpoint,headers={'User-Agent':'MTA-r208-diagnostics','Accept':'application/json,text/html'})
-            with urlopen(req,timeout=8) as response:
-                code=response.status
-                # No server payload copied into diagnostics (may contain private data).
-                ct=response.headers.get('Content-Type','').split(';')[0]
+            # Explicit HTTP(S) transports never follow a redirect to another
+            # host, insecure scheme, local file or custom protocol.
+            transport=http.client.HTTPSConnection if parsed.scheme=='https' else http.client.HTTPConnection
+            connection=transport(parsed.hostname,parsed.port,timeout=8)
+            connection.request('GET',parsed.path.rstrip('/')+endpoint,headers={'User-Agent':'MTA-r208-diagnostics','Accept':'application/json,text/html'})
+            response=connection.getresponse();code=response.status
+            if code>=400:raise HTTPError(base_url,code,response.reason,response.headers,None)
+            # No server payload copied into diagnostics (may contain private data).
+            ct=response.headers.get('Content-Type','').split(';')[0]
             check(results,endpoint,'PASS' if 200<=code<400 else 'FAIL',f'HTTP {code}; content-type={ct}')
         except HTTPError as err:
             check(results,endpoint,'WARN' if err.code in (401,403,404) else 'FAIL',f'HTTP {err.code}')
-        except (URLError,OSError,TimeoutError) as err:
+        except (URLError,OSError,TimeoutError,ValueError,http.client.HTTPException) as err:
             check(results,endpoint,'FAIL',type(err).__name__)
+        finally:
+            if connection:connection.close()
     if shutil.which('docker'):
         r=run_command(['docker','version','--format','{{.Client.Version}}'])
         check(results,'docker_cli','PASS' if r.get('exit_code')==0 else 'WARN',r.get('output','').strip())

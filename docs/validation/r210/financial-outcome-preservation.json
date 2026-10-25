@@ -1,0 +1,38 @@
+{
+  "original_files": 3267,
+  "preceding_checkpoint_files": 3563,
+  "missing_original": [],
+  "missing_preceding": [],
+  "protected_files_checked": 183,
+  "protected_changes": [],
+  "protected_definition": "Original non-test license/manual paths and raster/vector/font/document/audio assets by extension",
+  "python_scripts_changed_since_preceding": [],
+  "executable_modes": {
+    "scripts/install_ace_step.sh": "0o755",
+    "scripts/install_mta.sh": "0o755",
+    "app/ai_unified_adapter.py": "0o755"
+  },
+  "new_paths_since_preceding": [
+    "app/stripe_failed_charge_proof.py",
+    "docs/FINANCIAL_OUTCOMES_IT_EN_R210.md",
+    "docs/FINANCIAL_OUTCOME_HANDOFF_R210.md",
+    "docs/validation/r210/failed-charge-admin.xml",
+    "docs/validation/r210/failed-charge-audit-correction.xml",
+    "docs/validation/r210/failed-charge-bandit.json",
+    "docs/validation/r210/failed-charge-identity.xml",
+    "docs/validation/r210/failed-charge-primary-run.xml",
+    "docs/validation/r210/failed-charge-security-gate-result.json",
+    "docs/validation/r210/failed-charge-security-gate.xml",
+    "docs/validation/r210/financial-outcome-bandit.json",
+    "docs/validation/r210/financial-outcome-browser.xml",
+    "docs/validation/r210/financial-outcome-current-evidence.xml",
+    "docs/validation/r210/financial-outcome-paypal.xml",
+    "docs/validation/r210/financial-outcome-security-gate-result.json",
+    "docs/validation/r210/financial-outcome-security-gate.xml",
+    "docs/validation/r210/financial-outcome-test-summary.json",
+    "tests/test_r210_failed_charge_browser.py",
+    "tests/test_r210_failed_charge_recovery.py",
+    "tests/test_r210_financial_outcome_browser.py",
+    "tests/test_r210_paypal_terminal_integrity.py"
+  ]
+}

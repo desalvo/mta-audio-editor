@@ -36,7 +36,16 @@ def catalog(uid):
         init(c)
         orders=[dict(x) for x in c.execute('SELECT id,amount_cents,created_at,status,paid_at,refunded_cents FROM credit_purchase_orders WHERE user_id=? ORDER BY created_at DESC LIMIT 100',(uid,))]
     from .paypal_payments import settings as paypal_settings
-    return {'paypal':paypal_settings(),'eligible':s['credits_enabled'],'enabled':bool(cfg['credits_enabled']),'subscription':s['subscription'],'denominations_cents':json.loads(cfg['credit_denominations']),'credit_value_micro':s['credit_value_micro'],'credits_micro':s['credits_micro'],'provider':settings(),'orders':orders}
+    paypal=paypal_settings()
+    with auth.db() as c:
+        paypal_orders=[dict(row) for row in c.execute('''SELECT id,kind,amount_cents,created_at,status,checkout_url,
+          provider_order IS NOT NULL AS reference_known FROM paypal_orders WHERE user_id=? ORDER BY created_at DESC LIMIT 100''',(uid,))]
+    from .service_regime import commercial_allowed
+    from .owner_payments import history, safe_url
+    for order in paypal_orders:
+        order['checkout_url']=safe_url(order['checkout_url'],'paypal',paypal.get('environment'))
+    pending=history(uid,0,1)['credit_checkout_pending']
+    return {'credit_checkout_pending':pending,'paypal':paypal,'paypal_orders':paypal_orders,'commercial_payments':commercial_allowed(),'eligible':s['credits_enabled'],'enabled':bool(cfg['credits_enabled']),'subscription':s['subscription'],'denominations_cents':json.loads(cfg['credit_denominations']),'credit_value_micro':s['credit_value_micro'],'credits_micro':s['credits_micro'],'provider':settings(),'orders':orders}
 
 
 def _stripe(data,key,order):
@@ -49,12 +58,15 @@ def _stripe(data,key,order):
 
 
 def checkout(uid,amount,request_id):
+    from .service_regime import require_commercial
+    require_commercial("checkout")
     if type(amount) is not int or not isinstance(request_id,str) or not 8<=len(request_id)<=80:raise ValueError('Invalid purchase request')
     from .legal import snapshot
     base=snapshot()[0]['public_url'];url=urlsplit(base)
     if url.scheme!='https' or not url.hostname or url.username or url.password:raise ValueError('Configure the public HTTPS URL first')
     with auth.db() as c:
-        r.init(c);init(c);c.execute('BEGIN IMMEDIATE');s=r._state(c,uid,0,int(time.time()))
+        from .owner_payments import initialize, guard_pending
+        r.init(c);initialize(c);c.execute('BEGIN IMMEDIATE');s=r._state(c,uid,0,int(time.time()))
         if not s['credits_enabled']:raise ValueError('Credits require an enabled credit service and an active subscription')
         cfg=c.execute('SELECT * FROM resource_config WHERE id=1').fetchone()
         if amount not in json.loads(cfg['credit_denominations']):raise ValueError('Credit denomination changed; refresh the page')
@@ -64,15 +76,35 @@ def checkout(uid,amount,request_id):
         if old:
             if old['amount_cents']!=amount:raise ValueError('Conflicting purchase retry')
             if old['status']=='paid':return {'status':'paid','order_id':old['id']}
-            if old['checkout_url']:return {'checkout_url':old['checkout_url'],'order_id':old['id']}
+            if old['status'] in ('cancelled','canceled','failed','refunded'):return {'status':old['status'],'order_id':old['id']}
+            if old['checkout_url']:
+                from .owner_payments import safe_url
+                target=safe_url(old['checkout_url'],'stripe',None)
+                if old['status']!='pending' or not target:raise ValueError('Checkout needs administrator review')
+                return {'checkout_url':target,'order_id':old['id']}
             order=old['id']
+            from .regime_checkout_fence import enroll
+            enroll(c, 'stripe', order)
         else:
+            guard_pending(c,uid,'credits')
             order=uuid.uuid4().hex;c.execute('INSERT INTO credit_purchase_orders(id,user_id,request_id,amount_cents,credit_value_micro,created_at) VALUES(?,?,?,?,?,?)',(order,uid,request_id,amount,s['credit_value_micro'],int(time.time())))
+            from .regime_checkout_fence import enroll
+            enroll(c, 'stripe', order)
+        from .regime_payment_outbox import enqueue
+        enqueue(c, provider='stripe', order_id=order, request_key='mta-credits-'+order)
         key=auth._open(keys['secret_key'])
     data={'mode':'payment','client_reference_id':order,'metadata[mta_order]':order,'line_items[0][price_data][currency]':'eur','line_items[0][price_data][unit_amount]':str(amount),'line_items[0][price_data][product_data][name]':'MTA Audio Editor credits','line_items[0][quantity]':'1','success_url':base+'/account/credits?payment=received','cancel_url':base+'/account/credits?payment=cancelled'}
-    session=_stripe(data,key,order);target=urlsplit(str(session.get('url','')))
-    if target.scheme!='https' or target.hostname!='checkout.stripe.com' or not isinstance(session.get('id'),str):raise ValueError('Invalid checkout response')
+    from .regime_payment_outbox import mark_attempt_uncertain
     with auth.db() as c:
+        c.execute('BEGIN IMMEDIATE')
+        mark_attempt_uncertain(c, 'checkout:stripe:'+order)
+    from .owner_payments import safe_url
+    session=_stripe(data,key,order)
+    if not safe_url(session.get('url'),'stripe') or not isinstance(session.get('id'),str):raise ValueError('Invalid checkout response')
+    with auth.db() as c:
+        c.execute('BEGIN IMMEDIATE')
+        from .regime_payment_outbox import confirm
+        confirm(c, 'checkout:stripe:'+order, provider_reference=session['id'])
         c.execute('UPDATE credit_purchase_orders SET session_id=?,checkout_url=? WHERE id=? AND status=?',(session['id'],session['url'],order,'pending'))
     return {'checkout_url':session['url'],'order_id':order}
 
@@ -91,32 +123,9 @@ def event(raw,signature):
     payload=json.loads(raw)
     if not isinstance(payload,dict):raise ValueError('Invalid payment event')
     kind=payload.get('type');identifier=payload.get('id')
-    if not isinstance(identifier,str) or len(identifier)>200:raise ValueError('Invalid payment event')
-    if kind not in ('checkout.session.completed','checkout.session.async_payment_succeeded','charge.refunded'):return {'received':True}
-    obj=payload['data']['object']
+    if not isinstance(identifier,str) or not 1<=len(identifier)<=200:raise ValueError('Invalid payment event')
+    if kind not in ('checkout.session.completed','checkout.session.async_payment_succeeded','checkout.session.expired','checkout.session.async_payment_failed','charge.refunded','charge.dispute.created','charge.dispute.updated','charge.dispute.closed','charge.dispute.funds_withdrawn','charge.dispute.funds_reinstated'):return {'received':True}
+    from .payment_reconciliation import process_stripe
     with auth.db() as c:
         c.execute('BEGIN IMMEDIATE')
-        if c.execute('SELECT 1 FROM credit_payment_events WHERE id=?',(identifier,)).fetchone():return {'received':True}
-        if kind=='charge.refunded':
-            order=c.execute('SELECT * FROM credit_purchase_orders WHERE payment_intent=? AND status=?',(obj.get('payment_intent'),'paid')).fetchone()
-            if not order:return {'received':True}
-            refunded=obj.get('amount_refunded')
-            if type(refunded) is not int or not 0<=refunded<=order['amount_cents'] or obj.get('currency')!='eur':raise ValueError('Invalid refund')
-            if refunded<order['refunded_cents']:return {'received':True}
-            delta=(refunded-order['refunded_cents'])*10000
-            if delta:c.execute('INSERT INTO resource_credits VALUES(?,?,?,?,?,?)',('refund:'+identifier,order['user_id'],-delta,None,'Stripe credit refund: '+order['id'],int(time.time())))
-            c.execute('UPDATE credit_purchase_orders SET refunded_cents=? WHERE id=?',(refunded,order['id']))
-        else:
-            if obj.get('payment_status')!='paid':return {'received':True}
-            oid=obj.get('metadata',{}).get('mta_order')
-            order=c.execute('SELECT * FROM credit_purchase_orders WHERE id=?',(oid,)).fetchone()
-            if not order:raise ValueError('Unknown credit purchase')
-            if type(obj.get('amount_total')) is not int or obj.get('amount_total')!=order['amount_cents'] or obj.get('currency')!='eur' or obj.get('client_reference_id')!=order['id']:raise ValueError('Payment amount or identity mismatch')
-            if order['session_id'] is not None and obj.get('id')!=order['session_id']:raise ValueError('Payment session mismatch')
-            if order['status']!='paid':
-                # A later policy change locks usage, but cannot discard money paid
-                # for a checkout legitimately issued before that change.
-                c.execute('INSERT INTO resource_credits VALUES(?,?,?,?,?,?)',('purchase:'+order['id'],order['user_id'],order['amount_cents']*10000,None,'Stripe credit purchase: '+order['id'],int(time.time())))
-                c.execute("UPDATE credit_purchase_orders SET status='paid',paid_at=?,payment_intent=?,session_id=? WHERE id=?",(int(time.time()),obj.get('payment_intent'),obj['id'],order['id']))
-        c.execute('INSERT INTO credit_payment_events VALUES(?,?)',(identifier,int(time.time())))
-    return {'received':True}
+        return process_stripe(c,payload,raw)

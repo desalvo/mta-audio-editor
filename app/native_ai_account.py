@@ -43,6 +43,8 @@ def base_url(value):
 
 
 def _request(server,path,data):
+    if path not in ('/api/ai-device/start','/api/ai-device/poll'):
+        raise ValueError('Unsupported native device authorization path')
     class NoRedirect(HTTPRedirectHandler):
         def redirect_request(self,*args,**kwargs):return None
     request=Request(base_url(server)+path,data=json.dumps(data).encode(),  # noqa: S310 -- HTTPS validated
@@ -109,6 +111,8 @@ def credentials():
 
 
 def execute_arranger(plan,project,resolve_audio,*,cancel_event=None):
+    from .model_license_policy import authorize_remote_execution
+    authorize_remote_execution('ace-step',plan)
     import tempfile
     from .ai_durable_remote_executor import render_source
     from .ai_remote_client import infer_audio,recover_after_lost_response

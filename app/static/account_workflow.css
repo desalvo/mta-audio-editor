@@ -1,0 +1,8 @@
+/* Owner financial pages: predictable contrast and visible keyboard navigation. */
+body[data-owner-workflow] button:not(.paypal-button){background:#165d91;color:#fff;border-color:#82bbeb}
+body[data-owner-workflow] button.danger{background:#9d2436;color:#fff;border-color:#ef9ca8}
+body[data-owner-workflow] .resource-panel .subscription-section{background:#162c40}
+body[data-owner-workflow] .resource-panel .plan-selector{background:#172f46}
+body[data-owner-workflow] .resource-panel .trial-plan{background:#12343d}
+body[data-owner-workflow] :is(button,input,select,textarea,summary,[tabindex="0"]):focus-visible{outline:3px solid #92dcff;outline-offset:3px}
+body[data-owner-workflow] :is(button,input,select,textarea,summary,[tabindex="0"]){scroll-margin-block:88px 24px}

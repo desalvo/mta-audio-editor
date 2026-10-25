@@ -39,6 +39,9 @@ def promote(job_id,usage,source):
                 values.update(candidate);estimated.append(metric)
         if not estimated:return values,source
         envelope=json.dumps({'usage':values,'estimated_resources':estimated},sort_keys=True,allow_nan=False)
+        con.execute('BEGIN IMMEDIATE')
+        from .worker_loss_resolution import note_evidence_in_transaction
+        note_evidence_in_transaction(con,job_id)
         con.execute('CREATE TABLE IF NOT EXISTS ai_trusted_estimate_evidence(job_id TEXT PRIMARY KEY REFERENCES ai_compute_jobs(id) ON DELETE CASCADE,envelope TEXT NOT NULL)')
         prior=con.execute('SELECT envelope FROM ai_trusted_estimate_evidence WHERE job_id=?',(job_id,)).fetchone()
         if prior and prior[0]!=envelope:raise ValueError('Conflicting estimate evidence')

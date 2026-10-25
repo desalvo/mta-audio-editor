@@ -60,7 +60,7 @@ def test_checkout_is_quoted_and_only_signed_paid_event_adds_money(account,monkey
 
 def test_wrong_amount_unpaid_forged_and_refunded_events(account,monkeypatch):
     prepare(account,monkeypatch);order=shop.checkout(account,500,'other-request-123')['order_id']
-    data=paid_event(order);data['data']['object']['payment_status']='unpaid'
+    data=paid_event(order,'evt_unpaid');data['data']['object']['payment_status']='unpaid'
     shop.event(*signed(data));assert r.state(account)['credits_micro']==0
     data=paid_event(order);data['data']['object']['amount_total']=1000
     with pytest.raises(ValueError):shop.event(*signed(data))
@@ -122,3 +122,27 @@ def test_subscription_refusal_never_offers_credits_as_replacement(account):
     e.set_policy(account,{'subscriptions_allowed':True,'access_required':True},1)
     with pytest.raises(resource_access.CreditAdmissionError) as exc:resource_access.preflight(account)
     assert exc.value.code=='subscription_required'
+
+
+def test_stripe_dispatch_outbox_records_verified_session(account, monkeypatch):
+    prepare(account, monkeypatch)
+    order = shop.checkout(account, 500, 'outbox-stripe-registered')
+    with auth.db() as c:
+        row = c.execute('SELECT state,attempts,provider_reference FROM regime_payment_outbox WHERE operation_id=?',
+                        ('checkout:stripe:'+order['order_id'],)).fetchone()
+        assert tuple(row) == ('confirmed', 1, 'cs_test_'+order['order_id'])
+
+
+def test_stripe_uncertain_response_never_retries_automatically(account, monkeypatch):
+    calls = prepare(account, monkeypatch)
+    def interrupted(*args):
+        raise ValueError('provider outcome unknown')
+    monkeypatch.setattr(shop, '_stripe', interrupted)
+    with pytest.raises(ValueError, match='unknown'):
+        shop.checkout(account, 500, 'outbox-stripe-uncertain')
+    with auth.db() as c:
+        row = c.execute('SELECT state,attempts FROM regime_payment_outbox').fetchone()
+        assert tuple(row) == ('uncertain', 1)
+    with pytest.raises(Exception):
+        shop.checkout(account, 500, 'outbox-stripe-uncertain')
+    assert not calls

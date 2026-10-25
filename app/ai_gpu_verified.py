@@ -196,6 +196,9 @@ def persist(job_id,envelope,expected_task):
             or wall<=0 or seconds>wall*1.1+.05 or type(value.get('kernel_count')) is not int or value['kernel_count']<0
             or abs(time.time()-value.get('recorded_at',0))>3600):raise ValueError('Invalid GPU task evidence')
     with db() as con:
+        con.execute('BEGIN IMMEDIATE')
+        from .worker_loss_resolution import note_evidence_in_transaction
+        note_evidence_in_transaction(con,job_id)
         con.execute('''CREATE TABLE IF NOT EXISTS ai_verified_gpu_evidence
           (job_id TEXT PRIMARY KEY,evidence_id TEXT UNIQUE NOT NULL,seconds REAL NOT NULL,envelope TEXT NOT NULL)''')
         existing=con.execute('SELECT envelope FROM ai_verified_gpu_evidence WHERE job_id=?',(job_id,)).fetchone()
@@ -250,6 +253,8 @@ def consume_report(job_id,folder,*,ace=False,expected_segments=None):
     with db() as con:
         con.execute('CREATE TABLE IF NOT EXISTS ai_gpu_evidence_claims(id TEXT PRIMARY KEY,job_id TEXT NOT NULL)')
         con.execute('BEGIN IMMEDIATE')
+        from .worker_loss_resolution import note_evidence_in_transaction
+        note_evidence_in_transaction(con,job_id)
         for identity in ids:
             row=con.execute('SELECT job_id FROM ai_gpu_evidence_claims WHERE id=?',(identity,)).fetchone()
             if row and row[0]!=job_id:raise ValueError('GPU evidence already consumed')

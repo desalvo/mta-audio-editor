@@ -7,7 +7,8 @@ import hashlib
 import secrets
 from pathlib import Path
 from fastapi import APIRouter, HTTPException, Request
-from fastapi.responses import HTMLResponse, Response, RedirectResponse
+from fastapi.responses import HTMLResponse, Response, RedirectResponse, JSONResponse
+from .ai_pull_coordinator import PullPending
 from .auth import require_admin
 from . import ai_billing, ai_access
 
@@ -249,32 +250,13 @@ def _verified_worker_response(result, meta, *, max_bytes=None):
 
 
 def _remote_metering_headers(meta: dict, request_key: str) -> dict[str, str]:
-    """Optional operator-signed CPU evidence for one persisted remote request.
+    from .ai_remote_metering_service import headers
+    return headers(meta, request_key)
 
-    Never attest GPU, anonymous requests, or unisolated process measurements.
-    Missing configuration preserves backwards-compatible result delivery, but
-    malformed *configured* signing policy fails closed.
-    """
-    import json
-    from .ai_remote_metering_attestation import sign_rotating
-    from .ai_remote_keyring import active_keyring
-    key_id = os.getenv('MTA_AI_REMOTE_METERING_SIGNING_KEY_ID', '')
-    if not key_id:
-        return {}
-    if not request_key or not meta.get('process_tree_metered'):
-        return {}
-    usage = meta.get('usage')
-    if not isinstance(usage, dict) or 'cpu_seconds' not in usage:
-        return {}
-    # Operator-selected identity, not a caller-supplied arbitrary claim.
-    worker_id = os.getenv('MTA_AI_REMOTE_METERING_WORKER_ID', '')
-    keys = active_keyring()
-    if key_id not in keys:
-        raise ValueError('Configured metering signing key unavailable or revoked')
-    envelope = sign_rotating(keys[key_id], key_id=key_id,
-        job_id=meta['job_id'], request_id=request_key, worker_id=worker_id,
-        usage={'cpu_seconds': usage['cpu_seconds']})
-    return {'X-MTA-AI-Metering-V2': json.dumps(envelope, sort_keys=True, separators=(',', ':'))}
+
+def _pull_request_binding(key, digest):
+    from .ai_pull_coordinator import mode
+    return {'_request_key': key, '_request_digest': digest} if key and mode() == 'pull' else {}
 
 
 @router.post('/api/ai-jobs/execute')
@@ -303,17 +285,21 @@ def execute_remote_ai_job(request: Request, body: dict):
     key = request.headers.get('x-mta-ai-idempotency-key', '')
     if key:
         try:
-            dedup.admit(identity['user_id'], key, dedup.fingerprint(kind, json.dumps(plan, sort_keys=True).encode(), b''))
+            digest = dedup.fingerprint(kind, json.dumps(plan, sort_keys=True).encode(), b'')
+            dedup.admit(identity['user_id'], key, digest)
         except dedup.DuplicateAIRequest as exc:
             raise HTTPException(409, {'reason': 'duplicate_request', 'state': exc.state, 'job_id': exc.job_id}) from exc
         except ValueError as exc:
             raise HTTPException(400, str(exc)) from exc
     try:
         result, meta = execute_registered_worker(identity['user_id'], kind, plan, token_id=identity['id'],
-            cancel_check=(lambda: dedup.is_cancelled(identity['user_id'], key)) if key else None)
+            cancel_check=(lambda: dedup.is_cancelled(identity['user_id'], key)) if key else None,
+            **_pull_request_binding(key, digest if key else None))
     except WorkerUnavailable as exc:
         if key and not dedup.is_cancelled(identity['user_id'], key): dedup.finalize(identity['user_id'], key, state='failed')
         raise HTTPException(503, str(exc)) from exc
+    except PullPending as exc:
+        return JSONResponse(exc.detail(), status_code=409, headers={'Cache-Control': 'no-store'})
     except RuntimeError as exc:
         if key and dedup.is_cancelled(identity['user_id'], key):
             raise HTTPException(409, 'AI request cancelled; worker stopped') from exc
@@ -344,8 +330,9 @@ def execute_remote_ai_job(request: Request, body: dict):
         try:
             save_result(identity['user_id'], key, result, worker_media_type, worker_job_id, **({'metering_envelope': __import__('json').loads(metering_headers['X-MTA-AI-Metering-V2'])} if metering_headers else {}))
         except (OSError, ValueError) as exc:
-            dedup.finalize(identity['user_id'], key, state='failed')
-            raise HTTPException(503, 'Remote AI result could not be durably published; request cannot be retried') from exc
+            if '_pull_metering_headers' not in meta:
+                dedup.finalize(identity['user_id'], key, state='failed')
+                raise HTTPException(503, 'Remote AI result could not be durably published; request cannot be retried') from exc
         try:
             dedup.finalize(identity['user_id'], key, job_id=worker_job_id)
         except ValueError as exc:
@@ -424,6 +411,12 @@ def remote_request_result(request_key: str, request: Request):
         raise HTTPException(409, 'AI request has no completed result')
     result = load_with_metering(identity['user_id'], request_key, status['job_id'])
     if result is None:
+        from .ai_pull_coordinator import load_request_result
+        try:
+            result = load_request_result(identity['user_id'], request_key, status['job_id'])
+        except (ValueError, __import__('app.regime_operation_fence', fromlist=['FenceBlocked']).FenceBlocked) as exc:
+            raise HTTPException(503, 'Stored remote result evidence is unavailable; inference will not be repeated') from exc
+    if result is None:
         raise HTTPException(410, 'Result not retained or expired; inference will not be repeated')
     payload, media_type, envelope = result
     metering_headers = {'X-MTA-AI-Metering-V2': __import__('json').dumps(envelope, sort_keys=True, separators=(',', ':'))} if envelope is not None else {}
@@ -451,11 +444,11 @@ async def execute_remote_ai_audio_job(kind: str, request: Request):
     identity = ai_access.authenticate(token)
     if not identity:
         raise HTTPException(401, 'Valid AI token required')
-    from .ai_worker_registry import resolve_worker
+    from .ai_worker_registry import execution_available
     from .ai_metering_agent import execute_registered_worker
     from .ai_worker_protocol import WorkerUnavailable
     try:
-        if resolve_worker(kind) is None:
+        if not execution_available(kind):
             raise HTTPException(503, 'This AI model adapter is not installed or enabled')
     except ValueError as exc:
         raise HTTPException(400, str(exc)) from exc
@@ -517,10 +510,13 @@ async def execute_remote_ai_audio_job(kind: str, request: Request):
         result, meta = await run_in_threadpool(execute_registered_worker, identity['user_id'], kind, {'kind': kind, **options},
             token_id=identity['id'], **({'source_json':bytes(data)} if structured else {'source_wav':bytes(data)}),
             **({'timeout_seconds': __import__('app.ai_execution_limits',fromlist=['inference_timeout']).inference_timeout(options)} if kind=='ace-step' else {'timeout_seconds':__import__('app.studio_jobs',fromlist=['studio_policy']).studio_policy()['timeout_seconds']} if kind in ('audio-to-midi','audio-to-midi-basic-pitch','audio-to-midi-yourmt3','audio-to-midi-mr-mt3','audio-to-midi-transkun','vocal-harmony','vocal-synthesis') else {}),
-            cancel_check=(lambda: dedup.is_cancelled(identity['user_id'], key)) if key else None)
+            cancel_check=(lambda: dedup.is_cancelled(identity['user_id'], key)) if key else None,
+            **_pull_request_binding(key, digest if key else None))
     except WorkerUnavailable as exc:
         if key and not dedup.is_cancelled(identity['user_id'], key): dedup.finalize(identity['user_id'], key, state='failed')
         raise HTTPException(503, str(exc)) from exc
+    except PullPending as exc:
+        return JSONResponse(exc.detail(), status_code=409, headers={'Cache-Control': 'no-store'})
     except RuntimeError as exc:
         if key and dedup.is_cancelled(identity['user_id'], key):
             raise HTTPException(409, 'AI request cancelled; worker stopped') from exc
@@ -549,8 +545,9 @@ async def execute_remote_ai_audio_job(kind: str, request: Request):
         try:
             save_result(identity['user_id'], key, result, worker_media_type, worker_job_id, studio_default=kind in ('audio-to-midi','audio-to-midi-basic-pitch','audio-to-midi-yourmt3','audio-to-midi-mr-mt3','audio-to-midi-transkun','vocal-harmony','vocal-synthesis'), **({'metering_envelope': __import__('json').loads(metering_headers['X-MTA-AI-Metering-V2'])} if metering_headers else {}))
         except (OSError, ValueError) as exc:
-            dedup.finalize(identity['user_id'], key, state='failed')
-            raise HTTPException(503, 'Remote AI result could not be durably published; request cannot be retried') from exc
+            if '_pull_metering_headers' not in meta:
+                dedup.finalize(identity['user_id'], key, state='failed')
+                raise HTTPException(503, 'Remote AI result could not be durably published; request cannot be retried') from exc
         try:
             dedup.finalize(identity['user_id'], key, job_id=worker_job_id)
         except ValueError as exc:

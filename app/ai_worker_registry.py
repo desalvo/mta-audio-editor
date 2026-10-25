@@ -84,4 +84,15 @@ def resolve_worker(kind: str) -> Path | None:
 
 
 def available_workers() -> dict[str, bool]:
+    from . import ai_pull_coordinator as pull
+    if pull.mode() == 'pull':
+        return pull.available()
     return {kind: resolve_worker(kind) is not None for kind in sorted(registered_kinds())}
+
+
+def execution_available(kind):
+    """Actual authority execution capability; resolve_worker stays node-local."""
+    from . import ai_pull_coordinator as pull
+    if kind not in registered_kinds():
+        raise ValueError('Unsupported AI worker kind')
+    return pull.available().get(kind, False) if pull.mode() == 'pull' else resolve_worker(kind) is not None

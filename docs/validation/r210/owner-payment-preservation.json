@@ -1,0 +1,35 @@
+{
+  "original_files": 3267,
+  "preceding_checkpoint_files": 3545,
+  "missing_original": [],
+  "missing_preceding": [],
+  "protected_files_checked": 183,
+  "protected_changes": [],
+  "protected_definition": "Original non-test license/manual paths and raster/vector/font/document/audio assets by extension",
+  "python_scripts_changed_since_preceding": [],
+  "executable_modes": {
+    "scripts/install_ace_step.sh": "0o755",
+    "scripts/install_mta.sh": "0o755",
+    "app/ai_unified_adapter.py": "0o755"
+  },
+  "new_paths_since_preceding": [
+    "app/owner_payments.py",
+    "app/static/owner_payments.js",
+    "docs/OWNER_PAYMENTS_IT_EN_R210.md",
+    "docs/OWNER_PAYMENT_RECOVERY_HANDOFF_R210.md",
+    "docs/validation/r210/owner-payment-preservation.json",
+    "docs/validation/r210/owner-payments-bandit.json",
+    "docs/validation/r210/owner-payments-browser-final.xml",
+    "docs/validation/r210/owner-payments-contract.xml",
+    "docs/validation/r210/owner-payments-existing.xml",
+    "docs/validation/r210/owner-payments-late-response.xml",
+    "docs/validation/r210/owner-payments-regression.xml",
+    "docs/validation/r210/owner-payments-security-gate-result.json",
+    "docs/validation/r210/owner-payments-security-gate.xml",
+    "docs/validation/r210/owner-payments-test-summary.json",
+    "docs/validation/r210/owner-payments-url-admission.xml",
+    "docs/validation/r210/owner-payments-valid-redirect.xml",
+    "tests/test_r210_owner_payments.py",
+    "tests/test_r210_owner_payments_browser.py"
+  ]
+}

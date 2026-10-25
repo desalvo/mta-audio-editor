@@ -11,10 +11,8 @@ import argparse
 import datetime as dt
 import hashlib
 import json
-import os
 from pathlib import Path
 import platform
-import shutil
 import subprocess
 import sys
 import time

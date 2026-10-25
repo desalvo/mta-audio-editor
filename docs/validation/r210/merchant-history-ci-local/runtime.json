@@ -1,0 +1,13 @@
+{
+  "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+  "commit": "local-uncommitted",
+  "playwright": "1.64.1",
+  "source_sha256": {
+    "app/paypal_merchant_history.py": "c66c79c4a88251739789cbbbe2a8f6527ace87138fe083b0d91cc177e8429d0d",
+    "app/resource_routes.py": "ff82c948824840ea14b3a6e5bf88deeed32788d49624ce3ffbcb05eeddb7f4a7",
+    "app/static/regime_admin_panel.js": "4ce19405d7d8f2f46f8dae3232afa50284d296651a6a940cbf7bdc3b4de75bb3",
+    "tests/test_r210_paypal_merchant_history_browser.py": "a0a7d1cd416d12ba014d17b9212fa9d6c1f5d74611b887a60176d1a78861eab1",
+    "scripts/run_merchant_history_chromium.py": "ddd803b2efd50ea44da4b6e1eabb991714c82541a15e148038c436a52c0a566e",
+    ".github/workflows/merchant-history-chromium.yml": "579f582d4e8cd38db614cc2772909c85725e4e586db99bb3236a8f7458e1fee4"
+  }
+}

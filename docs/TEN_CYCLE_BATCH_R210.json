@@ -1,0 +1,92 @@
+{
+  "project": "MTA Audio Editor",
+  "release": "0.3.0-r210 PRE-RC",
+  "date": "2026-10-24",
+  "requested_cycles": 10,
+  "cycles": [
+    {
+      "cycle": 1,
+      "state": "complete",
+      "area": "Atomic coordinator/storage admission",
+      "outcome": "Ledger, quotas, rights, original owner and bounded source/result storage commit or roll back together"
+    },
+    {
+      "cycle": 2,
+      "state": "complete",
+      "area": "Scoped node registry and API",
+      "outcome": "One-time keys, exact worker routes, active admin/CSRF and private owner result controls"
+    },
+    {
+      "cycle": 3,
+      "state": "complete",
+      "area": "Durable worker process",
+      "outcome": "Private journal, fixed HTTPS and executables, pre-launch barrier and no replay after uncertainty"
+    },
+    {
+      "cycle": 4,
+      "state": "complete",
+      "area": "Integrated executor admission",
+      "outcome": "Actual token/registered/Arranger/Remix paths; stable ownership even billing-disabled; free-only no paid contract"
+    },
+    {
+      "cycle": 5,
+      "state": "complete",
+      "area": "Frozen completion and client recovery",
+      "outcome": "Known failures close safely; real authority SIGKILL and exact original client GET recovery; signed CPU rotation/revocation"
+    },
+    {
+      "cycle": 6,
+      "state": "complete",
+      "area": "Lifecycle and privacy",
+      "outcome": "Never-assigned cancellation, active holds, owner retirement, actual final erasure and lost-ack cleanup"
+    },
+    {
+      "cycle": 7,
+      "state": "complete",
+      "area": "Operator control and planned recovery",
+      "outcome": "Generation drain, finish-before-drain intents, pause/revoke, audit and closed-only authority rebinding"
+    },
+    {
+      "cycle": 8,
+      "state": "complete",
+      "area": "Independent-process acceptance",
+      "outcome": "Two independent TLS workers with no shared SQLite, dropped responses, actual SIGKILL, one-execution counters and namespace-safe proc identity"
+    },
+    {
+      "cycle": 9,
+      "state": "complete",
+      "area": "Regression and security closure",
+      "outcome": "898 distinct passing cases,284-file static review,30-site transport inventory,full Ruff/compileall; unchanged checkers"
+    },
+    {
+      "cycle": 10,
+      "state": "complete",
+      "area": "Self-contained final handoff",
+      "outcome": "Current criterion inventory,standalone IT/EN operator procedure,complete preservation/source manifest and one final cumulative"
+    }
+  ],
+  "input_archive": "MTA-0.3.0-r210-pre-RC-worker-epoch-integrity-cumulative.zip",
+  "input_sha256": "0f2e01a00ae1a4015e0ff62e4e60fa9606aeba1f45ee34ba42cc6d1b657246c0",
+  "intermediate_packages": 0,
+  "commits": 0,
+  "github_writes": 0,
+  "real_server_mutations": 0,
+  "newly_verified_criteria": [
+    "B4"
+  ],
+  "progress_before": {
+    "verified": 22,
+    "total": 42,
+    "percent": 52.4
+  },
+  "progress_after": {
+    "verified": 23,
+    "total": 42,
+    "percent": 54.8
+  },
+  "whole_macroareas_accepted": 0,
+  "tests_summary": "docs/validation/r210/ten-cycle-test-summary.json",
+  "release_candidate": false,
+  "transition_enabled": false,
+  "delivery": "One final cumulative plus adjacent SHA; save receipt remains outside the archive to avoid self-reference."
+}

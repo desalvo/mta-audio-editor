@@ -24,7 +24,7 @@ def check(package: Path) -> None:
     if package.suffix == '.deb':
         import tarfile
         with subprocess.Popen(cmd, stdout=subprocess.PIPE) as proc:
-            assert proc.stdout is not None
+            if not (proc.stdout is not None):raise AssertionError('Required validation failed')
             with tarfile.open(fileobj=proc.stdout, mode='r|') as archive:
                 members = {('/' + member.name.lstrip('./')): member for member in archive}
             if proc.wait():

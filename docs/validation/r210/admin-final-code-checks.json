@@ -1,0 +1,35 @@
+{
+  "javascript": {
+    "app/static/admin.js": {
+      "sha256": "b13a04b512144dee8aa1a7b72a9ea63dce961fa72b2e223ead9ba8b257a0e032",
+      "syntax": "passed"
+    },
+    "app/static/admin_accessibility.js": {
+      "sha256": "0b3a0852ffd77e9532eb46a1fde9108a88745d7e224679161f20bbd9a820a6fd",
+      "syntax": "passed"
+    },
+    "app/static/ai_jobs.js": {
+      "sha256": "9f458e0714d882d63f3926a35a0a35d470c9d83d9e3b12ff5166ee3c2918a843",
+      "syntax": "passed"
+    },
+    "app/static/ai_tokens.js": {
+      "sha256": "b8230165ed07196489bbe892829d7e0d760c61f23b08f80d454411626770e009",
+      "syntax": "passed"
+    },
+    "app/static/editor_layout.js": {
+      "sha256": "965b2979bcd228f550951582425f76c30406b0da9129da61bdbd06b34e002d6f",
+      "syntax": "passed"
+    },
+    "app/static/subscriptions.js": {
+      "sha256": "1c8fe478cd2bf75d564ad80dd82663f59cd79478ebd9afb303f0c3ddadc4c978",
+      "syntax": "passed"
+    },
+    "app/static/i18n_catalog.js": {
+      "sha256": "284ad01771c0d21f31f3c7a8e4bfee010d1b0f4908edc9c0b292884aee380c3c",
+      "syntax": "passed"
+    }
+  },
+  "python_compileall": "passed",
+  "ruff": "passed",
+  "no_runtime_dependency_changes": true
+}

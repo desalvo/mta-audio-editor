@@ -1,0 +1,7 @@
+# Cutover finalization / Finalizzazione cambio regime — 0.3.0-r210
+
+## Italiano
+È disponibile la primitiva interna `app.regime_cutover_finalize.finalize_cutover`, senza endpoint pubblico. In una transazione esclusiva controlla la ricevuta di cutover, il mirror JSON, l'assenza di operazioni aperte e una callback interna autorevole che certifica la riconciliazione di **tutti** i worker, le code e i provider. Quando queste condizioni risultano vere, registra la finalizzazione e riapre la barriera nello stesso commit SQLite. Errori e rollback mantengono il blocco. L'assenza di una callback completa e della manutenzione esclusiva impedisce l'uso sicuro: **non è autorizzata l'attivazione in produzione**. Non accettare callback basate su input HTTP o costanti `True` in produzione.
+
+## English
+The internal-only `app.regime_cutover_finalize.finalize_cutover` primitive has no public API. In an exclusive transaction it checks the cutover receipt, JSON mirror, absence of open operations and an authoritative internal callback certifying reconciliation across **all** workers, queues and payment providers. Once verified, it records finalization and releases the fence in the same SQLite commit. Errors and rollback retain the block. Until an exhaustive callback and cross-process maintenance lock are wired into the application, **production activation is not authorized**. Never pass HTTP-controlled or constant-true callbacks in production.

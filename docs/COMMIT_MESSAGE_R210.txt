@@ -1,1 +1,1 @@
-feat(r210): integra Vocal Studio, Audio-to-MIDI multitraccia e GM; corregge runtime, MIDI, recupero job, licenze e billing; aggiorna test, manuali e collaudi
+Integrate r210 studios, dual-regime accounting, worker recovery, remote rights gates and durable operator refunds

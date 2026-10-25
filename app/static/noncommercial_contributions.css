@@ -1,0 +1,13 @@
+[data-nc-contributions], [data-nc-contributions] article {min-width:0;overflow-wrap:anywhere}
+[data-nc-contributions] form {display:grid;gap:14px;margin:20px 0;min-width:0}
+[data-nc-contributions] label {display:grid;gap:7px;min-width:0}
+[data-nc-contributions] input:not([type=checkbox]),[data-nc-contributions] textarea,[data-nc-contributions] select {width:100%;max-width:100%;min-width:0;min-height:42px;border:1px solid #52748e;border-radius:7px;background:#0d1c2a;color:#f0f7ff;padding:8px 10px;font:inherit}
+[data-nc-contributions] textarea {min-height:100px;resize:vertical}
+[data-nc-contributions] label:has(>input[type=checkbox]) {display:flex;align-items:center;gap:10px}
+[data-nc-contributions] input[type=checkbox] {width:18px;height:18px;flex:0 0 18px;accent-color:#36a9ef}
+[data-nc-contributions] button {max-width:100%;min-height:42px;border:1px solid #609ac1;border-radius:8px;padding:9px 14px;background:#214863;color:#f0f8ff;cursor:pointer;white-space:normal}
+[data-nc-contributions] button:disabled {opacity:.5;cursor:default}
+[data-nc-contributions] pre {white-space:pre-wrap;overflow-wrap:anywhere;font:inherit}
+[data-nc-contributions] details {margin-top:16px}
+[data-nc-contributions] summary {min-height:40px;cursor:pointer}
+@media(max-width:520px){[data-nc-contributions] article {padding:14px}[data-nc-contributions] button {width:100%}}

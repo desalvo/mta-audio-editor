@@ -59,6 +59,8 @@ def execute(job_id, plan, project, resolve_audio, *, cancel_event=None):
         raise ValueError('Remote execution not configured')
     if cancel_event is not None and cancel_event.is_set():
         raise RuntimeError('Remote generation cancelled before submission')
+    from .model_license_policy import authorize_remote_execution
+    authorize_remote_execution('remix' if plan.get('operation')=='remix' else 'arranger',plan)
     from . import ai_metering_bridge
     from .ai_worker_protocol import verify_preview_wav
     from .ai_execution_limits import inference_timeout

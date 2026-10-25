@@ -2,11 +2,22 @@
 
 Invoked only from the admitted worker with hash-verified administrator assets.
 Never exposed as a filesystem-path API. The upstream configuration is executable
-Python/moduleconf and the trusted checkpoint can contain pickle metadata.
+Python/moduleconf but checkpoint loading accepts only the weights-only PyTorch format.
+Unsupported legacy metadata fails closed; no unrestricted pickle fallback exists.
 """
 import argparse
 import sys
 from pathlib import Path
+
+
+def load_state(torch,checkpoint_path,device):
+    """No unsafe retry, allowlist expansion or executable checkpoint metadata."""
+    checkpoint=torch.load(checkpoint_path,map_location=device,weights_only=True)
+    if not isinstance(checkpoint,dict):raise ValueError('Transkun checkpoint must be a tensor dictionary')
+    state=checkpoint.get('best_state_dict',checkpoint.get('state_dict'))
+    if not isinstance(state,dict) or not state or any(not isinstance(k,str) or not isinstance(v,torch.Tensor) for k,v in state.items()):
+        raise ValueError('Transkun checkpoint has no safe model weights')
+    return state
 
 
 def main():
@@ -23,9 +34,7 @@ def main():
     from transkun.Data import writeMidi
     settings=moduleconf.parseFromFile(args.config)
     model=settings['Model'].module.TransKun(conf=settings['Model'].config).to(args.device)
-    checkpoint=torch.load(args.checkpoint,map_location=args.device,weights_only=False)
-    state=checkpoint.get('best_state_dict',checkpoint.get('state_dict'))
-    if not isinstance(state,dict):raise ValueError('Transkun checkpoint has no model weights')
+    state=load_state(torch,args.checkpoint,args.device)
     # Upstream uses strict=False. Reject missing/unexpected tensors here instead
     # of silently using uninitialized weights under a new upstream architecture.
     model.load_state_dict(state,strict=True);model.eval()

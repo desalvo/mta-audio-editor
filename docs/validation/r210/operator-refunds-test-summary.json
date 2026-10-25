@@ -1,0 +1,1058 @@
+{
+  "version": "0.3.0-r210",
+  "date": "2026-10-24",
+  "passed_distinct": 254,
+  "chromium_cases": 10,
+  "new_workflow_cases": 93,
+  "affected_regression_cases": 125,
+  "gate_cases": 36,
+  "failures": 0,
+  "errors": 0,
+  "skips": 0,
+  "reports": [
+    {
+      "report": "operator-refunds-final.xml",
+      "passed": 92,
+      "sha256": "3f3fbe7b8444411441418127f0621321549d3694ee7300d0688644652347a308"
+    },
+    {
+      "report": "operator-refunds-regression.xml",
+      "passed": 125,
+      "sha256": "c0d2293ec945bffe764c65b2855d326dbdeb6b3f227674fe8da48a026d616072"
+    },
+    {
+      "report": "operator-refunds-gates.xml",
+      "passed": 36,
+      "sha256": "c398912e9a449b9dce96d8d6e377c861c4e8b43b965d319f361c1fb828c7ea48"
+    },
+    {
+      "report": "operator-refunds-input-bound.xml",
+      "passed": 1,
+      "sha256": "726682ebeb5e343857deab8d6c7b7396b5ac5e33079a82e1ed3345a06cf5c283"
+    }
+  ],
+  "cases": [
+    {
+      "id": "tests.test_r210_account_lifecycle::test_email_change_reserves_old_and_pending_email",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_account_lifecycle::test_email_mfa_onboarding_precedes_admin_approval_and_blocks_login_without_otp",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_account_lifecycle::test_email_otp_attempt_limits_cooldown_and_expiry",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_account_lifecycle::test_failed_purge_removes_uncommitted_sandbox",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_account_lifecycle::test_quarantine_removes_settlement_outbox_and_credentials",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_account_lifecycle::test_reactivation_requires_email_then_admin_and_does_not_restore_old_tokens",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_account_lifecycle::test_repeated_retirement_reactivation_revokes_each_archive_without_token_collision",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_account_lifecycle::test_retention_api_admin_only_and_self_deletion_forbidden_to_admin",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_account_lifecycle::test_retention_configuration_validation[settings0]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_account_lifecycle::test_retention_configuration_validation[settings1]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_account_lifecycle::test_retention_configuration_validation[settings2]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_account_lifecycle::test_retention_configuration_validation[settings3]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_account_lifecycle::test_retirement_preserves_identity_accounting_revokes_tokens_and_exports_projects",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_account_lifecycle::test_total_delete_admin_protected_and_explicit_confirmation_required",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_account_lifecycle::test_total_delete_one_confirmation_removes_account_and_accounting",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_account_lifecycle::test_totp_onboarding_guard_and_notification_outbox",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_authenticated_ledger_service::test_authenticated_snapshot_journal_and_ledger_commit_together",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_authenticated_ledger_service::test_incomplete_or_changed_authenticated_history_never_credits[changed_order]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_authenticated_ledger_service::test_incomplete_or_changed_authenticated_history_never_credits[currency]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_authenticated_ledger_service::test_incomplete_or_changed_authenticated_history_never_credits[network]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_authenticated_ledger_service::test_incomplete_or_changed_authenticated_history_never_credits[refund_identity]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_authenticated_ledger_service::test_incomplete_or_changed_authenticated_history_never_credits[truncated]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_authenticated_ledger_service::test_refunded_legacy_ledger_without_matching_credit_is_blocked",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_actual_stripe_two_step_full_or_partial_funds_and_durable_fence",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_bad_inputs_never_dispatch[amount_cents--1]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_bad_inputs_never_dispatch[amount_cents-0]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_bad_inputs_never_dispatch[amount_cents-1.2]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_bad_inputs_never_dispatch[amount_cents-1000000001]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_bad_inputs_never_dispatch[amount_cents-True]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_bad_inputs_never_dispatch[order_id-../x]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_bad_inputs_never_dispatch[provider-other]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_bad_inputs_never_dispatch[reason-bad\\nreason]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_bad_inputs_never_dispatch[reason-x]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_bad_inputs_never_dispatch[request_id-tiny]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_bad_inputs_never_dispatch[target-None]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_cancel_only_prepared_and_conflicting_idempotency_rejected",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_concurrent_preparations_reserve_once_and_concurrent_execution_sends_once",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_exact_revision_required_before_action[cancel--1]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_exact_revision_required_before_action[cancel-0]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_exact_revision_required_before_action[cancel-1.2]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_exact_revision_required_before_action[cancel-None]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_exact_revision_required_before_action[cancel-True]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_exact_revision_required_before_action[execute--1]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_exact_revision_required_before_action[execute-0]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_exact_revision_required_before_action[execute-1.2]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_exact_revision_required_before_action[execute-None]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_exact_revision_required_before_action[execute-True]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_exact_revision_required_before_action[verify--1]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_exact_revision_required_before_action[verify-0]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_exact_revision_required_before_action[verify-1.2]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_exact_revision_required_before_action[verify-None]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_exact_revision_required_before_action[verify-True]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_get_unavailable_after_post_does_not_repost_or_settle",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_invalid_preparation_cannot_reserve_or_send[drain]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_invalid_preparation_cannot_reserve_or_send[extra]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_invalid_preparation_cannot_reserve_or_send[nonadmin]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_invalid_preparation_cannot_reserve_or_send[overamount]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_invalid_preparation_cannot_reserve_or_send[unknownorder]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_invalid_preparation_cannot_reserve_or_send[wrongtarget]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_owner_history_privacy_and_admin_reason_not_disclosed",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_paypal_canonical_refund_moves_real_wallet_once[200]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_paypal_canonical_refund_moves_real_wallet_once[500]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_paypal_timeout_then_get_only_recovery",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_paypal_wrong_receipt_or_merchant_never_closes[amount]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_paypal_wrong_receipt_or_merchant_never_closes[capture]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_paypal_wrong_receipt_or_merchant_never_closes[currency]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_paypal_wrong_receipt_or_merchant_never_closes[custom_id]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_paypal_wrong_receipt_or_merchant_never_closes[merchant]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_paypal_wrong_receipt_or_merchant_never_closes[status]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_pending_and_failed_refunds_need_authenticated_terminal_outcome[canceled]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_pending_and_failed_refunds_need_authenticated_terminal_outcome[failed]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_pending_and_failed_refunds_need_authenticated_terminal_outcome[pending]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_pending_and_failed_refunds_need_authenticated_terminal_outcome[requires_action]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_post_error_stays_uncertain_and_get_failure_stays_pending",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_quote_balance_and_merchant_changes_prevent_dispatch",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_readiness_detects_inconsistent_refund_journal[event]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_readiness_detects_inconsistent_refund_journal[fence]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_readiness_detects_inconsistent_refund_journal[state]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_timeout_and_process_restart_recover_by_exact_get_without_repost",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_unrelated_or_malformed_provider_receipt_keeps_operation_open[amount]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_unrelated_or_malformed_provider_receipt_keeps_operation_open[currency]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_unrelated_or_malformed_provider_receipt_keeps_operation_open[id]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_unrelated_or_malformed_provider_receipt_keeps_operation_open[intent]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_unrelated_or_malformed_provider_receipt_keeps_operation_open[metadata]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_unrelated_or_malformed_provider_receipt_keeps_operation_open[object]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds::test_unrelated_or_malformed_provider_receipt_keeps_operation_open[status]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds_recovery::test_corrupt_journal_cannot_dispatch_or_clear_drain[context]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds_recovery::test_corrupt_journal_cannot_dispatch_or_clear_drain[receipt]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds_recovery::test_corrupt_journal_cannot_dispatch_or_clear_drain[revision]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds_recovery::test_corrupt_journal_cannot_dispatch_or_clear_drain[schema]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds_recovery::test_external_balance_change_invalidates_prepared_quote",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds_recovery::test_multicapture_history_remaining_capture_refund",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds_recovery::test_operator_refund_actually_clears_surplus_repayment_liability",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds_recovery::test_original_payment_drift_is_rejected_before_provider_read_or_write[amount_cents-600]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds_recovery::test_original_payment_drift_is_rejected_before_provider_read_or_write[session_id-cs_other]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds_recovery::test_original_payment_drift_is_rejected_before_provider_read_or_write[user_id-1]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds_recovery::test_paypal_subscription_and_repayment_refunds_preserve_exact_receivable[subscription]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds_recovery::test_paypal_subscription_and_repayment_refunds_preserve_exact_receivable[subscription_reversal]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds_recovery::test_pending_paypal_needs_completed_receipt_and_canonical_capture",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds_recovery::test_real_child_exit_after_committed_uncertainty_is_recovered_without_reexecution",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds_recovery::test_reason_bound_includes_whitespace_and_rejects_before_provider_io",
+      "report": "operator-refunds-input-bound.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds_recovery::test_refund_identity_audit_and_deletion_require_retired_owner_authorization",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds_recovery::test_role_revoked_during_readback_prevents_dispatch",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds_recovery::test_wallet_commit_failure_keeps_refund_pending_then_reconciles_once",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds_ui::test_admin_prepare_confirm_execute_cancel_and_private_owner_view[1280-en-paypal_env]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds_ui::test_admin_prepare_confirm_execute_cancel_and_private_owner_view[1280-en-stripe_env]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds_ui::test_admin_prepare_confirm_execute_cancel_and_private_owner_view[1280-it-paypal_env]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds_ui::test_admin_prepare_confirm_execute_cancel_and_private_owner_view[1280-it-stripe_env]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds_ui::test_admin_prepare_confirm_execute_cancel_and_private_owner_view[390-en-paypal_env]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds_ui::test_admin_prepare_confirm_execute_cancel_and_private_owner_view[390-en-stripe_env]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds_ui::test_admin_prepare_confirm_execute_cancel_and_private_owner_view[390-it-paypal_env]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds_ui::test_admin_prepare_confirm_execute_cancel_and_private_owner_view[390-it-stripe_env]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds_ui::test_all_actual_owner_admin_templates_load_the_shared_refund_ui",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds_ui::test_auth_csrf_exact_shapes_private_pagination_and_unknown_action",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds_ui::test_uncertain_browser_only_recovers_existing_reference[en]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_operator_refunds_ui::test_uncertain_browser_only_recovers_existing_reference[it]",
+      "report": "operator-refunds-final.xml"
+    },
+    {
+      "id": "tests.test_r210_payment_reconciliation_e2e::test_concurrent_delivery_only_one_credit_and_refund",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_payment_reconciliation_e2e::test_credit_mutation_failure_rolls_back_journal_position_inbox_and_payment",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_payment_reconciliation_e2e::test_dispute_hold_won_then_stale_open_does_not_remove_credits",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_payment_reconciliation_e2e::test_event_identity_conflict_even_after_success_cannot_mutate_money",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_payment_reconciliation_e2e::test_financial_journal_payload_cannot_be_modified_or_reopened",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_payment_reconciliation_e2e::test_full_refund_after_closed_checkout_and_replay",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_payment_reconciliation_e2e::test_invalid_refund_is_rejected_without_committing_event[mutation0]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_payment_reconciliation_e2e::test_invalid_refund_is_rejected_without_committing_event[mutation1]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_payment_reconciliation_e2e::test_invalid_refund_is_rejected_without_committing_event[mutation2]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_payment_reconciliation_e2e::test_invalid_refund_is_rejected_without_committing_event[mutation3]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_payment_reconciliation_e2e::test_legacy_paid_position_is_reconciled_without_second_credit",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_payment_reconciliation_e2e::test_lost_dispute_never_reopens_on_stale_or_contradictory_event",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_payment_reconciliation_e2e::test_payment_intent_cannot_fund_two_orders",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_payment_reconciliation_e2e::test_pending_dispute_and_partial_refund_do_not_allow_overcredit",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_payment_reconciliation_e2e::test_refund_before_paid_is_durable_and_applied_atomically",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_payment_reconciliation_e2e::test_tampered_financial_credit_is_detected",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_failure_after_funding_rolls_back_history_and_wallet",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[amount]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[capture]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[config_changed]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[cumulative]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[currency]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[duplicate]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[identity]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[local_changed]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[missing]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[order_changed]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[pending]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_initial_refunded_or_previously_paid_capture_reconciles_exact_net[False]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_initial_refunded_or_previously_paid_capture_reconciles_exact_net[True]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_money_is_an_exact_eur_decimal_string[ 1]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_money_is_an_exact_eur_decimal_string[-1]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_money_is_an_exact_eur_decimal_string[1.001]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_money_is_an_exact_eur_decimal_string[1.01]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_money_is_an_exact_eur_decimal_string[1.]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_money_is_an_exact_eur_decimal_string[1]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_money_is_an_exact_eur_decimal_string[1e2]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_money_is_an_exact_eur_decimal_string[NaN]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_money_is_an_exact_eur_decimal_string[True]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_refunded_subscription_creates_exact_receivable",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_reconciliation_e2e::test_ambiguous_paypal_payout_keeps_hold_and_pending_readiness",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_reconciliation_e2e::test_canonical_refund_cannot_be_attributed_to_other_capture",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_reconciliation_e2e::test_capture_reversal_and_refund_never_double_debit",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_reconciliation_e2e::test_dispute_readback_holds_then_releases_and_rejects_stale_updates",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_reconciliation_e2e::test_failed_refund_replay_rolls_back_capture_and_wallet",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_reconciliation_e2e::test_multiple_capture_refund_before_fulfillment_replays_atomically",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_reconciliation_e2e::test_refund_cannot_cross_provider_environment",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_reconciliation_e2e::test_reversal_before_capture_is_replayed_in_capture_transaction",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_reconciliation_e2e::test_subscription_refund_records_exact_receivable_without_wallet_credit",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_current_inventory_matches_review",
+      "report": "operator-refunds-gates.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_inventory_cannot_silently_approve_drift[category]",
+      "report": "operator-refunds-gates.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_inventory_cannot_silently_approve_drift[checker]",
+      "report": "operator-refunds-gates.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_inventory_cannot_silently_approve_drift[hash]",
+      "report": "operator-refunds-gates.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_inventory_cannot_silently_approve_drift[missing]",
+      "report": "operator-refunds-gates.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_inventory_cannot_silently_approve_drift[rationale]",
+      "report": "operator-refunds-gates.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_inventory_cannot_silently_approve_drift[reorder]",
+      "report": "operator-refunds-gates.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_inventory_cannot_silently_approve_drift[source]",
+      "report": "operator-refunds-gates.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-device/start?x=1]",
+      "report": "operator-refunds-gates.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-gateway/v1/generate]",
+      "report": "operator-refunds-gates.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-jobs/execute-audio/whisper]",
+      "report": "operator-refunds-gates.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_new_aliased_transports_require_review[from httpx import AsyncClient as hidden\\nhidden()]",
+      "report": "operator-refunds-gates.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_new_aliased_transports_require_review[from urllib.request import build_opener as hidden\\nx=hidden()\\nx.open(\"https://example.test\")]",
+      "report": "operator-refunds-gates.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_new_aliased_transports_require_review[from urllib.request import urlopen as hidden\\nhidden(\"https://example.test\")]",
+      "report": "operator-refunds-gates.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_new_aliased_transports_require_review[import aiohttp as hidden\\nhidden.ClientSession()]",
+      "report": "operator-refunds-gates.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_new_aliased_transports_require_review[import httpx as hidden\\nhidden.Client()]",
+      "report": "operator-refunds-gates.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_new_aliased_transports_require_review[import socket as hidden\\nhidden.create_connection((\"example.test\",443))]",
+      "report": "operator-refunds-gates.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_supported_device_authorization_still_uses_exact_post[/api/ai-device/poll]",
+      "report": "operator-refunds-gates.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_supported_device_authorization_still_uses_exact_post[/api/ai-device/start]",
+      "report": "operator-refunds-gates.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_complete_source_bound_review_is_accepted",
+      "report": "operator-refunds-gates.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_current_scan_and_complete_review_ledger_agree",
+      "report": "operator-refunds-gates.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[blanket_approval]",
+      "report": "operator-refunds-gates.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[changed_finding]",
+      "report": "operator-refunds-gates.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[changed_source]",
+      "report": "operator-refunds-gates.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[deleted_source]",
+      "report": "operator-refunds-gates.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[duplicate_review]",
+      "report": "operator-refunds-gates.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[duplicate_scan]",
+      "report": "operator-refunds-gates.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[empty_reason]",
+      "report": "operator-refunds-gates.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[high]",
+      "report": "operator-refunds-gates.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[missing_file]",
+      "report": "operator-refunds-gates.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[missing_review]",
+      "report": "operator-refunds-gates.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[new_finding]",
+      "report": "operator-refunds-gates.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[new_source]",
+      "report": "operator-refunds-gates.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[scan_error]",
+      "report": "operator-refunds-gates.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[suppression]",
+      "report": "operator-refunds-gates.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[wrong_totals]",
+      "report": "operator-refunds-gates.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_allocations_are_immutable_and_missing_position_blocks_report",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_already_captured_obsolete_quote_is_retained_as_refund_due",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_authenticated_refunded_initial_repayment_reopens_original_debt",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_authorized_account_erasure_preserves_other_owner_financial_records[erase]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_authorized_account_erasure_preserves_other_owner_financial_records[privacy_purge]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_cent_rounding_surplus_is_separate_and_refunded_first",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_concurrent_checkout_only_one_provider_order_and_pending_target",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_concurrent_fulfillment_delivers_one_allocation",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_dispute_release_after_second_repayment_creates_refund_liability",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_erasure_authorization_is_retired_owner_scoped_and_connection_local",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_exact_repayment_closes_debt_without_wallet_or_fee_mutation",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_failure_rolls_back_capture_allocation_and_fence_then_retries",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_multiple_sources_are_bound_to_original_refund",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_owner_api_quote_csrf_and_regime_guards",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_owner_quote_change_is_checked_before_provider_capture",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_permanent_capture_reversal_reopens_original_receivable",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_refund_before_repayment_fulfillment_is_atomic",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_refund_reopens_same_debt_and_can_be_repaid_again",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_repayment_allowed_for_existing_debt_after_plan_service_disabled",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_uncertain_create_stays_pending_without_second_provider_post",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_verified_webhook_retries_allocate_once",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_user_erasure_dump::test_active_jobs_and_project_symlinks_refuse_dump",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_user_erasure_dump::test_all_admins_immutable_even_with_multiple_admins",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_user_erasure_dump::test_central_ledger_cannot_advance_past_outbox_snapshot",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_user_erasure_dump::test_config_only_and_all_users_dump_selections",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_user_erasure_dump::test_corrupt_checksum_and_unconfirmed_restore_write_nothing",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_user_erasure_dump::test_dump_routes_admin_permissions_and_preview",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_user_erasure_dump::test_dump_selection_closure_and_roundtrip",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_user_erasure_dump::test_erasure_of_legacy_already_purged_account_removes_old_sandbox",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_user_erasure_dump::test_failed_file_erasure_remains_retryable_and_blocks_reactivation",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_user_erasure_dump::test_file_based_global_settings_are_in_dump_and_restore",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_user_erasure_dump::test_health_probes_remain_available_during_dump_maintenance",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_user_erasure_dump::test_immediate_erasure_removes_all_retained_copies_and_preserves_others",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_user_erasure_dump::test_invalid_selection[bad0]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_user_erasure_dump::test_invalid_selection[bad1]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_user_erasure_dump::test_invalid_selection[bad2]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_user_erasure_dump::test_invalid_selection[bad3]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_user_erasure_dump::test_invalid_selection[bad4]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_user_erasure_dump::test_project_selection_includes_owner_but_not_other_owned_projects",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_user_erasure_dump::test_restore_rolls_back_if_publication_fails",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_user_erasure_dump::test_unsafe_paths_refused[../escape]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_user_erasure_dump::test_unsafe_paths_refused[/escape]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_user_erasure_dump::test_unsafe_paths_refused[data/other]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_user_erasure_dump::test_unsafe_paths_refused[projects/../../x]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_user_erasure_dump::test_unsafe_paths_refused[projects/abcd/C:/x]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_user_erasure_dump::test_unsafe_paths_refused[projects/abcd/a\\\\b]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_user_erasure_dump::test_unsafe_paths_refused[queue/unknown]",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_regime_reconciliation_inventory::test_completed_job_not_active",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_regime_reconciliation_inventory::test_historic_credit_movements_remain_reconciliation_items",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_regime_reconciliation_inventory::test_readiness_does_not_authorize_switch_even_without_open_rows",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_regime_reconciliation_inventory::test_readiness_rejects_unrecognized_regime",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_regime_reconciliation_inventory::test_reconciliation_inventory_handles_unknown_columns",
+      "report": "operator-refunds-regression.xml"
+    },
+    {
+      "id": "tests.test_regime_reconciliation_inventory::test_unknown_schema_fails_closed",
+      "report": "operator-refunds-regression.xml"
+    }
+  ],
+  "method": "Exact testcase union from final successful executions, not a new full suite or coverage run. Earlier focused reports remain historical and are not added again. Final test-only SQL field fault injection was made explicit with fixed SQL literals after execution; production source unchanged.",
+  "full_baseline_repeated": false,
+  "coverage_recollected": false,
+  "actual_provider_requests": 0,
+  "release_candidate": false,
+  "transition_enabled": false
+}

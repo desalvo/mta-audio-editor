@@ -24,7 +24,10 @@ def terminate(process):
 def compute(user_id,kind,plan,**kwargs):
     if user_id==0:
         from .native_ai_routing import is_remote
-        if is_remote('audio-to-midi' if kind.startswith('audio-to-midi-') else kind):return remote_compute(kind,plan,**kwargs)
+        if is_remote('audio-to-midi' if kind.startswith('audio-to-midi-') else kind):
+            from .model_license_policy import authorize_remote_execution
+            authorize_remote_execution(kind,plan)
+            return remote_compute(kind,plan,**kwargs)
     # Runtime removal/upgrade cannot race an active model process.
     from contextlib import nullcontext
     from .ai_project_lock import project_publication_lock
@@ -97,6 +100,8 @@ def _compute(user_id,kind,plan,*,audio=None,score=None,cancelled=lambda:False,ti
 
 def remote_compute(kind,plan,*,audio=None,score=None,cancelled=lambda:False,timeout=3600,progress=None,artifact_mode='music'):
     """One server token, durable request identity, no local fallback or rebilling."""
+    from .model_license_policy import authorize_remote_execution
+    authorize_remote_execution(kind,plan)
     import threading
     from .native_ai_routing import _read
     from . import ai_native_remote_journal as journal

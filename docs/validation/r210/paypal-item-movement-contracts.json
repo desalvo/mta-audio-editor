@@ -1,0 +1,17 @@
+{
+  "contracts": [
+    {
+      "url": "https://raw.githubusercontent.com/paypal/paypal-rest-api-specifications/main/openapi/customer_disputes_v1.json",
+      "retrieved_date": "2026-10-24",
+      "sha256": "a72134c1a48d800f4da69d5c331b5b74ddde3eb71c97fc61c8e221f3aebf035f",
+      "api_version": "1.11"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/paypal/paypal-rest-api-specifications/main/openapi/reporting_transactions_v1.json",
+      "retrieved_date": "2026-10-24",
+      "sha256": "40f2af0c02c204dde9227b14a6f9f91c2a6cc4222fe2c7c20983c6bc6f9e52b4",
+      "api_version": "1.9"
+    }
+  ],
+  "limits": "Public schema snapshots inform parsing,not proof of actual completed settlement. Full third-party schemas are not redistributed."
+}

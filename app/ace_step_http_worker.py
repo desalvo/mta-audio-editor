@@ -65,6 +65,16 @@ def endpoint_base() -> str:
     return value
 
 
+def _authorize_remote_submission(base):
+    # Loopback may be an SSH tunnel or an unrelated server. Its address is
+    # not checkpoint identity and cannot exempt commercial HTTP inference.
+    if not __package__:
+        root = str(Path(__file__).resolve().parents[1])
+        if root not in sys.path:sys.path.insert(0,root)
+    from app.model_license_policy import authorize_remote_execution
+    authorize_remote_execution('ace-step',{})
+
+
 def _request(url: str, data: bytes | None = None, content_type: str | None = None, *, timeout=30) -> bytes:
     headers = {}
     if content_type:
@@ -78,6 +88,13 @@ def _request(url: str, data: bytes | None = None, content_type: str | None = Non
     trusted = urlsplit(base)
     if parsed.scheme != trusted.scheme or parsed.netloc != trusted.netloc or not parsed.path.startswith('/') or parsed.username or parsed.password or parsed.fragment:
         raise ValueError('Untrusted ACE-Step request URL')
+    prefix=trusted.path.rstrip('/')
+    if prefix and parsed.path!=prefix and not parsed.path.startswith(prefix+'/'):
+        raise ValueError('Request path is outside the configured ACE-Step endpoint')
+    if data is not None:
+        relative=parsed.path[len(prefix):]
+        if relative!='/query_result' and not re.fullmatch(r'/mta/tasks/[A-Za-z0-9_-]+/control',relative):
+            _authorize_remote_submission(base)
     req = Request(url, data=data, headers=headers, method='POST' if data is not None else 'GET')  # noqa: S310 -- checked scheme and exact host above
     class NoRedirect(HTTPRedirectHandler):
         def redirect_request(self, request, fp, code, msg, headers, newurl):
@@ -233,6 +250,8 @@ def _run(plan_path: Path, output: Path) -> None:
     plan = json.loads(plan_path.read_text(encoding='utf-8'))
     if plan.get('model_id') != 'ace-step-1.5':
         raise ValueError('This adapter only supports ACE-Step 1.5')
+    base = endpoint_base()
+    _authorize_remote_submission(base)
     budget = inference_timeout(plan)
     started = time.monotonic()
     source = _source_path(plan_path, plan)

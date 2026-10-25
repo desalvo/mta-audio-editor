@@ -56,20 +56,32 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - uses: docker/setup-buildx-action@v3
       - name: Build and publish pinned runtime (CUDA x86_64)
-        uses: docker/build-push-action@v6
-        with:
-          context: third_party/ace-step-1.5
-          file: third_party/ace-step-1.5/Dockerfile
-          platforms: linux/amd64
-          push: true
-          tags: |
-            ghcr.io/${{ github.repository_owner }}/mta-ace-step:${{ steps.pinned.outputs.short }}
-          labels: |
-            org.opencontainers.image.source=https://github.com/ace-step/ACE-Step-1.5
-            org.opencontainers.image.revision=${{ steps.pinned.outputs.sha }}
-            org.opencontainers.image.licenses=MIT
-          provenance: mode=max
-          sbom: true
+        shell: bash
+        env:
+          ACE_SHORT: ${{ steps.pinned.outputs.short }}
+        run: |
+          set -euo pipefail
+          # A pinned upstream Dockerfile uses the external deadsnakes PPA,
+          # which can return transient 503 errors. Never mutate the upstream
+          # Dockerfile or disable installation checks to get a green build.
+          image="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/mta-ace-step:$ACE_SHORT"
+          for attempt in 1 2 3; do
+            if docker buildx build --platform linux/amd64 \
+              --file third_party/ace-step-1.5/Dockerfile \
+              --tag "$image" --label "org.opencontainers.image.source=https://github.com/ace-step/ACE-Step-1.5" \
+              --label "org.opencontainers.image.revision=${{ steps.pinned.outputs.sha }}" \
+              --label 'org.opencontainers.image.licenses=MIT' \
+              --provenance=mode=max --sbom=true --push \
+              third_party/ace-step-1.5; then
+              exit 0
+            fi
+            if [ "$attempt" -eq 3 ]; then
+              echo 'Pinned ACE-Step build failed after 3 attempts' >&2
+              exit 1
+            fi
+            echo "Build attempt $attempt failed; retrying pinned source after cooldown" >&2
+            sleep $((attempt * 30))
+          done
       - name: Summarize immutable upstream reference
         env:
           ACE_SHA: ${{ steps.pinned.outputs.sha }}

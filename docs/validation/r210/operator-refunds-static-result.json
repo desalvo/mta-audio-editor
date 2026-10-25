@@ -1,0 +1,10 @@
+{
+  "project_ruff": "passed; app/native/tests/scripts",
+  "app_scripts_compileall": "passed",
+  "changed_js_syntax": "passed",
+  "runtime_dependencies_added": 0,
+  "security_gate": "operator-refunds-security-result.json",
+  "transport_inventory": "operator-refunds-inventory-result.json",
+  "baseline_repeated": false,
+  "real_provider_calls": 0
+}

@@ -1,0 +1,7 @@
+{
+  "workflow_sha256": "579f582d4e8cd38db614cc2772909c85725e4e586db99bb3236a8f7458e1fee4",
+  "runner_sha256": "ddd803b2efd50ea44da4b6e1eabb991714c82541a15e148038c436a52c0a566e",
+  "validation": "YAML BaseLoader structure;manual-only boolean defaultfalse;read-only permission;strict exact-case runner;always-upload diagnostics",
+  "github_dispatch_executed": false,
+  "local_missing_browser_rejected": true
+}

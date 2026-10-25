@@ -1,0 +1,15 @@
+{
+  "scope": "Affected final-code regression only; not a complete Linux rerun",
+  "xml_in_order": [
+    "repayment-final-regression.xml",
+    "repayment-browser-final.xml",
+    "repayment-ledger-final.xml",
+    "repayment-permanent-reversal.xml",
+    "repayment-erasure-final.xml"
+  ],
+  "distinct_cases": 233,
+  "passed": 233,
+  "failed": 0,
+  "skipped": 0,
+  "superseded_initial_failure": "Early new test assumed an empty global credit table; final assertion preserves all preexisting credit rows. Erasure fixture now names publication columns after the preceding additive owner migration. No enforcement bypassed."
+}

@@ -23,7 +23,7 @@ def midi_events(path):
         raise ValueError('Asynchronous type-2 MIDI files need a dedicated timeline')
     if not 1 <= midi.ticks_per_beat <= 32767:
         raise ValueError('Unsupported MIDI ticks per beat')
-    tempo, ticks, seconds, events = 500000, 0, 0., []
+    tempo, seconds, events = 500000, 0., []
     for event in mido.merge_tracks(midi.tracks):
         ticks_delta = event.time
         if ticks_delta < 0:

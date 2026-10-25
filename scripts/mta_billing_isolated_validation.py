@@ -3,7 +3,6 @@
 import datetime as dt
 import json
 import os
-import sqlite3
 import tempfile
 from pathlib import Path
 
@@ -34,14 +33,14 @@ def main():
         diagnostic = ai_billing.create_job(1,'accounting_validation',started_at=start+7200,diagnostic=True)
         ai_billing.finish_job(diagnostic,'done',{'cpu_seconds':3.0},source='cgroup',finished_at=start+7203)
         preview = ai_billing.report('day',user_id=1,anchor='2026-10-01')
-        assert preview['diagnostic_jobs']==1, preview
-        assert preview['total_micro']==28000, preview
+        if not (preview['diagnostic_jobs']==1):raise AssertionError(preview)
+        if not (preview['total_micro']==28000):raise AssertionError(preview)
         first = ai_billing.close_period(1,'2026-10-01','2026-10-01')
         second = ai_billing.close_period(1,'2026-10-01','2026-10-01')
-        assert first['total_micro']==28000 and not first['already_closed'], first
-        assert second['already_closed'] and second['id']==first['id'], second
+        if not (first['total_micro']==28000 and not first['already_closed']):raise AssertionError(first)
+        if not (second['already_closed'] and second['id']==first['id']):raise AssertionError(second)
         integrity = ai_billing.audit_closed_invoices(user_id=1)
-        assert integrity['ready'] and integrity['invoice_count']==1, integrity
+        if not (integrity['ready'] and integrity['invoice_count']==1):raise AssertionError(integrity)
         try:
             ai_billing.create_job(1,'late',started_at=start+9000)
         except ValueError:

@@ -63,6 +63,13 @@ def db():
     root.mkdir(parents=True, exist_ok=True)
     con = sqlite3.connect(db_path())
     con.row_factory = sqlite3.Row
+    # Immutable subscription records can only be removed by a separately
+    # authorized, owner-scoped account erasure on this exact connection.
+    con.create_function('mta_subscription_erasure',2,lambda table,key:0)
+    con.create_function('mta_nc_erasure',2,lambda table,key:0)
+    con.create_function('mta_worker_erasure',2,lambda table,key:0)
+    con.create_function('mta_worker_loss_erasure',1,lambda key:0)
+    con.create_function('mta_operator_refund_erasure',1,lambda key:0)
     con.execute("PRAGMA foreign_keys=ON")
     try:
         yield con

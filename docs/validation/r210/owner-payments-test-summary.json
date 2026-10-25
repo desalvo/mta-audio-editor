@@ -1,0 +1,956 @@
+{
+  "version": "0.3.0-r210",
+  "date": "2026-10-23",
+  "passed": 231,
+  "failures": 0,
+  "errors": 0,
+  "skips": 0,
+  "browser_cases": 24,
+  "reports": {
+    "owner-payments-contract.xml": 34,
+    "owner-payments-existing.xml": 69,
+    "owner-payments-regression.xml": 79,
+    "owner-payments-browser-final.xml": 23,
+    "owner-payments-security-gate.xml": 17,
+    "owner-payments-late-response.xml": 1,
+    "owner-payments-url-admission.xml": 6,
+    "owner-payments-valid-redirect.xml": 2
+  },
+  "cases": [
+    {
+      "id": "tests.test_r210_account_financial_browser::test_actual_account_page_mounts_private_accounting_without_duplicate_controls[1280-en]",
+      "report": "owner-payments-browser-final.xml"
+    },
+    {
+      "id": "tests.test_r210_account_financial_browser::test_actual_account_page_mounts_private_accounting_without_duplicate_controls[1280-it]",
+      "report": "owner-payments-browser-final.xml"
+    },
+    {
+      "id": "tests.test_r210_account_financial_browser::test_actual_account_page_mounts_private_accounting_without_duplicate_controls[390-en]",
+      "report": "owner-payments-browser-final.xml"
+    },
+    {
+      "id": "tests.test_r210_account_financial_browser::test_actual_account_page_mounts_private_accounting_without_duplicate_controls[390-it]",
+      "report": "owner-payments-browser-final.xml"
+    },
+    {
+      "id": "tests.test_r210_account_financial_browser::test_commercial_controls_fail_closed_and_recover_after_get_failure[1280-en]",
+      "report": "owner-payments-browser-final.xml"
+    },
+    {
+      "id": "tests.test_r210_account_financial_browser::test_commercial_controls_fail_closed_and_recover_after_get_failure[1280-it]",
+      "report": "owner-payments-browser-final.xml"
+    },
+    {
+      "id": "tests.test_r210_account_financial_browser::test_commercial_controls_fail_closed_and_recover_after_get_failure[390-en]",
+      "report": "owner-payments-browser-final.xml"
+    },
+    {
+      "id": "tests.test_r210_account_financial_browser::test_commercial_controls_fail_closed_and_recover_after_get_failure[390-it]",
+      "report": "owner-payments-browser-final.xml"
+    },
+    {
+      "id": "tests.test_r210_account_financial_browser::test_late_previous_language_response_cannot_replace_current_wallet",
+      "report": "owner-payments-browser-final.xml"
+    },
+    {
+      "id": "tests.test_r210_account_financial_browser::test_nc_financial_overview_is_voluntary_private_and_refresh_safe[1280-en]",
+      "report": "owner-payments-browser-final.xml"
+    },
+    {
+      "id": "tests.test_r210_account_financial_browser::test_nc_financial_overview_is_voluntary_private_and_refresh_safe[1280-it]",
+      "report": "owner-payments-browser-final.xml"
+    },
+    {
+      "id": "tests.test_r210_account_financial_browser::test_nc_financial_overview_is_voluntary_private_and_refresh_safe[390-en]",
+      "report": "owner-payments-browser-final.xml"
+    },
+    {
+      "id": "tests.test_r210_account_financial_browser::test_nc_financial_overview_is_voluntary_private_and_refresh_safe[390-it]",
+      "report": "owner-payments-browser-final.xml"
+    },
+    {
+      "id": "tests.test_r210_account_financial_context::test_actual_api_is_private_and_does_not_accept_another_owner_selector",
+      "report": "owner-payments-contract.xml"
+    },
+    {
+      "id": "tests.test_r210_account_financial_context::test_commercial_wallet_remains_distinct_from_cost_shares",
+      "report": "owner-payments-contract.xml"
+    },
+    {
+      "id": "tests.test_r210_account_financial_context::test_nc_cost_shares_are_not_debt_and_unverified_reports_are_not_receipts",
+      "report": "owner-payments-contract.xml"
+    },
+    {
+      "id": "tests.test_r210_account_financial_context::test_receipts_excess_and_other_owners_remain_separate",
+      "report": "owner-payments-contract.xml"
+    },
+    {
+      "id": "tests.test_r210_account_financial_context::test_tampered_receipt_fails_closed_without_private_details",
+      "report": "owner-payments-contract.xml"
+    },
+    {
+      "id": "tests.test_r210_authenticated_ledger_service::test_authenticated_snapshot_journal_and_ledger_commit_together",
+      "report": "owner-payments-contract.xml"
+    },
+    {
+      "id": "tests.test_r210_authenticated_ledger_service::test_incomplete_or_changed_authenticated_history_never_credits[changed_order]",
+      "report": "owner-payments-contract.xml"
+    },
+    {
+      "id": "tests.test_r210_authenticated_ledger_service::test_incomplete_or_changed_authenticated_history_never_credits[currency]",
+      "report": "owner-payments-contract.xml"
+    },
+    {
+      "id": "tests.test_r210_authenticated_ledger_service::test_incomplete_or_changed_authenticated_history_never_credits[network]",
+      "report": "owner-payments-contract.xml"
+    },
+    {
+      "id": "tests.test_r210_authenticated_ledger_service::test_incomplete_or_changed_authenticated_history_never_credits[refund_identity]",
+      "report": "owner-payments-contract.xml"
+    },
+    {
+      "id": "tests.test_r210_authenticated_ledger_service::test_incomplete_or_changed_authenticated_history_never_credits[truncated]",
+      "report": "owner-payments-contract.xml"
+    },
+    {
+      "id": "tests.test_r210_authenticated_ledger_service::test_refunded_legacy_ledger_without_matching_credit_is_blocked",
+      "report": "owner-payments-contract.xml"
+    },
+    {
+      "id": "tests.test_r210_checkout_reference_recovery::test_concurrent_reference_binding_never_reposts_or_claims_payment",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_checkout_reference_recovery::test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[amount]",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_checkout_reference_recovery::test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[config]",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_checkout_reference_recovery::test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[currency]",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_checkout_reference_recovery::test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[drain]",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_checkout_reference_recovery::test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[epoch]",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_checkout_reference_recovery::test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[local]",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_checkout_reference_recovery::test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[mirror]",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_checkout_reference_recovery::test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[mode]",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_checkout_reference_recovery::test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[network]",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_checkout_reference_recovery::test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[not_found]",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_checkout_reference_recovery::test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[owner]",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_checkout_reference_recovery::test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[reference]",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_checkout_reference_recovery::test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[url]",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_checkout_reference_recovery::test_legacy_provider_reference_cannot_be_bound_to_second_local_order",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_checkout_reference_recovery::test_lost_paypal_creation_binds_and_owner_capture_funds_once",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_checkout_reference_recovery::test_lost_stripe_create_response_binds_then_terminal_readback_closes",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_checkout_reference_recovery::test_reference_recovery_endpoint_roles_csrf_and_shape",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_credit_checkout::test_checkout_is_quoted_and_only_signed_paid_event_adds_money",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_credit_checkout::test_eligibility_and_global_switch_are_enforced_on_backend",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_credit_checkout::test_legacy_schema_migrates_before_first_job",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_credit_checkout::test_legal_minimum_exactly_five_fields_and_pdf_omits_optional",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_credit_checkout::test_paid_plan_fees_do_not_consume_overage_credits",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_credit_checkout::test_provider_secrets_are_masked_and_sealed_at_rest",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_credit_checkout::test_stripe_dispatch_outbox_records_verified_session",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_credit_checkout::test_stripe_uncertain_response_never_retries_automatically",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_credit_checkout::test_subscription_refusal_never_offers_credits_as_replacement",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_credit_checkout::test_wrong_amount_unpaid_forged_and_refunded_events",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_credit_checkout::test_zero_credit_overage_refuses_before_queue_entry",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_concurrent_cross_provider_new_ids_admit_only_one",
+      "report": "owner-payments-contract.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_failed_provider_lookup_keeps_pending_and_never_recreates[404]",
+      "report": "owner-payments-contract.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_failed_provider_lookup_keeps_pending_and_never_recreates[timeout]",
+      "report": "owner-payments-contract.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_fresh_ids_and_other_provider_do_not_escape_pending[paypal]",
+      "report": "owner-payments-contract.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_fresh_ids_and_other_provider_do_not_escape_pending[stripe]",
+      "report": "owner-payments-contract.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_legacy_resume_url_rejected[https://checkout.stripe.com/\\r\\nBad]",
+      "report": "owner-payments-contract.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_legacy_resume_url_rejected[https://checkout.stripe.com:444/]",
+      "report": "owner-payments-contract.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_legacy_resume_url_rejected[https://checkout.stripe.com:bad/]",
+      "report": "owner-payments-contract.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_legacy_resume_url_rejected[https://checkout.stripe.com@evil.test/]",
+      "report": "owner-payments-contract.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_legacy_resume_url_rejected[https://checkout.stripe.com\\\\@evil.test/]",
+      "report": "owner-payments-contract.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_legacy_resume_url_rejected[https://evil.test/pay]",
+      "report": "owner-payments-contract.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_legacy_resume_url_rejected[https://user:pw@checkout.stripe.com/]",
+      "report": "owner-payments-contract.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_legacy_resume_url_rejected[javascript:alert(1)]",
+      "report": "owner-payments-contract.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_new_checkout_response_uses_same_strict_redirect_boundary[control-paypal]",
+      "report": "owner-payments-url-admission.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_new_checkout_response_uses_same_strict_redirect_boundary[control-stripe]",
+      "report": "owner-payments-url-admission.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_new_checkout_response_uses_same_strict_redirect_boundary[credentials-paypal]",
+      "report": "owner-payments-url-admission.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_new_checkout_response_uses_same_strict_redirect_boundary[credentials-stripe]",
+      "report": "owner-payments-url-admission.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_new_checkout_response_uses_same_strict_redirect_boundary[port-paypal]",
+      "report": "owner-payments-url-admission.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_new_checkout_response_uses_same_strict_redirect_boundary[port-stripe]",
+      "report": "owner-payments-url-admission.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_owner_get_reconciliation_closes_terminal_and_releases_guard",
+      "report": "owner-payments-contract.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_owner_paid_and_refund_readback_is_net_and_idempotent",
+      "report": "owner-payments-contract.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_owner_probe_rejects_midflight_identity_change[credentials]",
+      "report": "owner-payments-contract.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_owner_probe_rejects_midflight_identity_change[owner]",
+      "report": "owner-payments-contract.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_paypal_approved_verify_never_captures_and_preserves_hold",
+      "report": "owner-payments-contract.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_private_paginated_history_no_provider_or_credentials",
+      "report": "owner-payments-contract.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_subscription_same_period_guard_and_readonly_nc_history",
+      "report": "owner-payments-contract.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_unknown_creation_blocks_new_purchase_and_owner_probe",
+      "report": "owner-payments-contract.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_valid_provider_redirect_is_stored_resumable_without_redispatch[paypal]",
+      "report": "owner-payments-valid-redirect.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_valid_provider_redirect_is_stored_resumable_without_redispatch[stripe]",
+      "report": "owner-payments-valid-redirect.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments::test_wrong_owner_refused_before_any_provider_io",
+      "report": "owner-payments-contract.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments_browser::test_actual_private_history_recovery_no_automatic_capture[/account-1280-en]",
+      "report": "owner-payments-browser-final.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments_browser::test_actual_private_history_recovery_no_automatic_capture[/account-1280-it]",
+      "report": "owner-payments-browser-final.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments_browser::test_actual_private_history_recovery_no_automatic_capture[/account-390-en]",
+      "report": "owner-payments-browser-final.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments_browser::test_actual_private_history_recovery_no_automatic_capture[/account-390-it]",
+      "report": "owner-payments-browser-final.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments_browser::test_actual_private_history_recovery_no_automatic_capture[/account/credits-1280-en]",
+      "report": "owner-payments-browser-final.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments_browser::test_actual_private_history_recovery_no_automatic_capture[/account/credits-1280-it]",
+      "report": "owner-payments-browser-final.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments_browser::test_actual_private_history_recovery_no_automatic_capture[/account/credits-390-en]",
+      "report": "owner-payments-browser-final.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments_browser::test_actual_private_history_recovery_no_automatic_capture[/account/credits-390-it]",
+      "report": "owner-payments-browser-final.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments_browser::test_existing_redirect_and_unknown_reference_after_reload[paypal]",
+      "report": "owner-payments-browser-final.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments_browser::test_existing_redirect_and_unknown_reference_after_reload[stripe]",
+      "report": "owner-payments-browser-final.xml"
+    },
+    {
+      "id": "tests.test_r210_owner_payments_browser::test_late_history_response_cannot_restore_old_payment_controls",
+      "report": "owner-payments-late-response.xml"
+    },
+    {
+      "id": "tests.test_r210_payment_reconciliation_e2e::test_concurrent_delivery_only_one_credit_and_refund",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_payment_reconciliation_e2e::test_credit_mutation_failure_rolls_back_journal_position_inbox_and_payment",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_payment_reconciliation_e2e::test_dispute_hold_won_then_stale_open_does_not_remove_credits",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_payment_reconciliation_e2e::test_event_identity_conflict_even_after_success_cannot_mutate_money",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_payment_reconciliation_e2e::test_financial_journal_payload_cannot_be_modified_or_reopened",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_payment_reconciliation_e2e::test_full_refund_after_closed_checkout_and_replay",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_payment_reconciliation_e2e::test_invalid_refund_is_rejected_without_committing_event[mutation0]",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_payment_reconciliation_e2e::test_invalid_refund_is_rejected_without_committing_event[mutation1]",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_payment_reconciliation_e2e::test_invalid_refund_is_rejected_without_committing_event[mutation2]",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_payment_reconciliation_e2e::test_invalid_refund_is_rejected_without_committing_event[mutation3]",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_payment_reconciliation_e2e::test_legacy_paid_position_is_reconciled_without_second_credit",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_payment_reconciliation_e2e::test_lost_dispute_never_reopens_on_stale_or_contradictory_event",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_payment_reconciliation_e2e::test_payment_intent_cannot_fund_two_orders",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_payment_reconciliation_e2e::test_pending_dispute_and_partial_refund_do_not_allow_overcredit",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_payment_reconciliation_e2e::test_refund_before_paid_is_durable_and_applied_atomically",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_payment_reconciliation_e2e::test_tampered_financial_credit_is_detected",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal::test_authenticated_refund_reverses_credits_once",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal::test_capture_wrong_owner_amount_currency_identity_and_unpaid_are_refused",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal::test_checkout_requires_eligible_subscription",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal::test_credit_checkout_capture_and_retries_only_credit_once",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal::test_http_roles_csrf_and_unsigned_webhook_are_enforced",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal::test_paypal_outbox_confirmed_on_provider_acceptance",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal::test_paypal_uncertain_provider_failure_requires_reconciliation",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal::test_prorated_subscription_fee_remains_payable_after_termination",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal::test_settings_sealed_and_no_secret_disclosure",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal::test_subscription_payment_settles_fee_without_adding_overage_credits",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal::test_untrusted_approval_url_and_denomination_refused",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal::test_webhook_event_and_fulfillment_share_atomic_commit",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal::test_webhook_signature_verified_and_canonical_order_fetched",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_failure_after_funding_rolls_back_history_and_wallet",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[amount]",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[capture]",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[config_changed]",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[cumulative]",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[currency]",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[duplicate]",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[identity]",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[local_changed]",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[missing]",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[order_changed]",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_incomplete_or_changed_history_cannot_grant_gross_credit[pending]",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_initial_refunded_or_previously_paid_capture_reconciles_exact_net[False]",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_initial_refunded_or_previously_paid_capture_reconciles_exact_net[True]",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_money_is_an_exact_eur_decimal_string[ 1]",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_money_is_an_exact_eur_decimal_string[-1]",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_money_is_an_exact_eur_decimal_string[1.001]",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_money_is_an_exact_eur_decimal_string[1.01]",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_money_is_an_exact_eur_decimal_string[1.]",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_money_is_an_exact_eur_decimal_string[1]",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_money_is_an_exact_eur_decimal_string[1e2]",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_money_is_an_exact_eur_decimal_string[NaN]",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_money_is_an_exact_eur_decimal_string[True]",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_paypal_history_reconciliation::test_refunded_subscription_creates_exact_receivable",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_complete_source_bound_review_is_accepted",
+      "report": "owner-payments-security-gate.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_current_scan_and_complete_review_ledger_agree",
+      "report": "owner-payments-security-gate.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[blanket_approval]",
+      "report": "owner-payments-security-gate.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[changed_finding]",
+      "report": "owner-payments-security-gate.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[changed_source]",
+      "report": "owner-payments-security-gate.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[deleted_source]",
+      "report": "owner-payments-security-gate.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[duplicate_review]",
+      "report": "owner-payments-security-gate.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[duplicate_scan]",
+      "report": "owner-payments-security-gate.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[empty_reason]",
+      "report": "owner-payments-security-gate.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[high]",
+      "report": "owner-payments-security-gate.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[missing_file]",
+      "report": "owner-payments-security-gate.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[missing_review]",
+      "report": "owner-payments-security-gate.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[new_finding]",
+      "report": "owner-payments-security-gate.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[new_source]",
+      "report": "owner-payments-security-gate.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[scan_error]",
+      "report": "owner-payments-security-gate.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[suppression]",
+      "report": "owner-payments-security-gate.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[wrong_totals]",
+      "report": "owner-payments-security-gate.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_allocations_are_immutable_and_missing_position_blocks_report",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_already_captured_obsolete_quote_is_retained_as_refund_due",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_authenticated_refunded_initial_repayment_reopens_original_debt",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_authorized_account_erasure_preserves_other_owner_financial_records[erase]",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_authorized_account_erasure_preserves_other_owner_financial_records[privacy_purge]",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_cent_rounding_surplus_is_separate_and_refunded_first",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_concurrent_checkout_only_one_provider_order_and_pending_target",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_concurrent_fulfillment_delivers_one_allocation",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_dispute_release_after_second_repayment_creates_refund_liability",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_erasure_authorization_is_retired_owner_scoped_and_connection_local",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_exact_repayment_closes_debt_without_wallet_or_fee_mutation",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_failure_rolls_back_capture_allocation_and_fence_then_retries",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_multiple_sources_are_bound_to_original_refund",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_owner_api_quote_csrf_and_regime_guards",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_owner_quote_change_is_checked_before_provider_capture",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_permanent_capture_reversal_reopens_original_receivable",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_refund_before_repayment_fulfillment_is_atomic",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_refund_reopens_same_debt_and_can_be_repaid_again",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_repayment_allowed_for_existing_debt_after_plan_service_disabled",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_uncertain_create_stays_pending_without_second_provider_post",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_subscription_repayment_e2e::test_verified_webhook_retries_allocate_once",
+      "report": "owner-payments-regression.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_canceled_intent_after_async_failure_resolves_pending_signed_event",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_concurrent_signed_expiration_and_canonical_readback",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_nonterminal_failed_or_processing_intent_stays_open[processing]",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_nonterminal_failed_or_processing_intent_stays_open[requires_capture]",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_nonterminal_failed_or_processing_intent_stays_open[requires_payment_method]",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_paid_notification_after_terminal_is_durable_conflict_not_credit",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_paypal_nonterminal_browser_cancel_is_not_financial_cancellation[APPROVED]",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_paypal_nonterminal_browser_cancel_is_not_financial_cancellation[CREATED]",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_paypal_nonterminal_browser_cancel_is_not_financial_cancellation[PAYER_ACTION_REQUIRED]",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_paypal_nonterminal_browser_cancel_is_not_financial_cancellation[PENDING_APPROVAL]",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_paypal_paid_after_terminal_keeps_conflict_without_wallet_credit",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_paypal_voided_empty_order_closes_and_stale_retry_never_captures",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_paypal_voided_incomplete_or_changed_history_is_blocked[amount]",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_paypal_voided_incomplete_or_changed_history_is_blocked[authorization]",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_paypal_voided_incomplete_or_changed_history_is_blocked[capture]",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_paypal_voided_incomplete_or_changed_history_is_blocked[changed]",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_paypal_voided_incomplete_or_changed_history_is_blocked[config]",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_paypal_voided_incomplete_or_changed_history_is_blocked[identity]",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_paypal_voided_incomplete_or_changed_history_is_blocked[intent]",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_paypal_voided_incomplete_or_changed_history_is_blocked[refund]",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_signed_expiration_without_intent_closes_without_network",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_expired_checkout_readback_closes_exactly_once[False]",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_expired_checkout_readback_closes_exactly_once[True]",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_terminal_proof_fails_closed[captured]",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_terminal_proof_fails_closed[changed]",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_terminal_proof_fails_closed[charge]",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_terminal_proof_fails_closed[config]",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_terminal_proof_fails_closed[drain]",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_terminal_proof_fails_closed[epoch]",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_terminal_proof_fails_closed[mirror]",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_terminal_proof_fails_closed[missing_intent]",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_terminal_proof_fails_closed[paid]",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_terminal_proof_fails_closed[wrong_amount]",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_terminal_proof_fails_closed[wrong_currency]",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_terminal_proof_fails_closed[wrong_id]",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_terminal_proof_fails_closed[wrong_mode]",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_stripe_terminal_proof_fails_closed[wrong_owner]",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_terminal_financial_graph_erasure_preserves_other_owner[erase]",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_terminal_financial_graph_erasure_preserves_other_owner[privacy_purge]",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_terminal_proof_cannot_erase_existing_financial_evidence[funded_position]",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_terminal_proof_cannot_erase_existing_financial_evidence[pending_paid]",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_terminal_proof_cannot_erase_existing_financial_evidence[wallet]",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_terminal_proof_cannot_erase_existing_financial_evidence[wrong_pending_identity]",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_terminal_receipt_audit_detects_reopened_fence",
+      "report": "owner-payments-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_terminal_checkout_e2e::test_terminal_transaction_rolls_back_and_retries",
+      "report": "owner-payments-existing.xml"
+    }
+  ],
+  "baseline_reused": {
+    "linux_passed": 5228,
+    "linux_skipped": 73,
+    "coverage_percent": 73.6774909797391,
+    "native_passed": 49,
+    "native_skipped": 5,
+    "audit_packages": 31,
+    "audit_known_vulnerabilities": 0
+  },
+  "release_candidate": false,
+  "transition_enabled": false
+}

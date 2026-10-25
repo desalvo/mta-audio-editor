@@ -6,7 +6,6 @@ repo tree is produced by the same GPG pipeline as Pages. No destructive prune he
 activation requires a separately reviewed cleanup strategy.
 """
 import argparse
-import hashlib
 import os
 from pathlib import Path
 

@@ -24,7 +24,7 @@ def test_adapter_with_synthetic_stub(tmp_path, monkeypatch):
     """Contract-only test; no real checkpoint or quality measurement."""
     monkeypatch.setattr('app.model_license_policy.evaluate_model', lambda x: None)
     root=tmp_path/'upstream';root.mkdir()
-    (root/'inference.py').write_text('''import argparse\nfrom pathlib import Path\np=argparse.ArgumentParser()\nfor k in ("model_type", "config_path", "start_check_point", "input_folder", "store_dir"):p.add_argument("--"+k)\na=p.parse_args()\nout=Path(a.store_dir);out.mkdir(parents=True,exist_ok=True)\n(out/"mta_input_lead-vocal.wav").write_bytes(b"RIFFlead")\n(out/"mta_input_back-vocal.wav").write_bytes(b"RIFFback")\n''')
+    (root/'inference.py').write_text('''import argparse,sys\nsys.stderr.write('x'*2_000_000)\nfrom pathlib import Path\np=argparse.ArgumentParser()\nfor k in ("model_type", "config_path", "start_check_point", "input_folder", "store_dir"):p.add_argument("--"+k)\na=p.parse_args()\nout=Path(a.store_dir);out.mkdir(parents=True,exist_ok=True)\n(out/"mta_input_lead-vocal.wav").write_bytes(b"RIFFlead")\n(out/"mta_input_back-vocal.wav").write_bytes(b"RIFFback")\n''')
     config=tmp_path/'config.yaml'; config.write_text('config')
     ckpt=tmp_path/'weight.ckpt'; ckpt.write_bytes(b'checkpoint')
     source=tmp_path/'song.wav';source.write_bytes(b'RIFFsong')

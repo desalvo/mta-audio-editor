@@ -64,23 +64,10 @@ def infer(source, output_dir, cancel_event=None, drum_targets=None):
         cmd = [str(python), str(root / 'inference.py'), '--model_type', 'bs_roformer',
                '--config_path', str(config), '--start_check_point', str(checkpoint),
                '--input_folder', str(inputs), '--store_dir', str(outputs)]
-        process = subprocess.Popen(cmd, cwd=root, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True)
-        try:
-            while process.poll() is None:
-                if cancel_event is not None and cancel_event.is_set():
-                    process.terminate()
-                    try: process.wait(timeout=5)
-                    except subprocess.TimeoutExpired: process.kill(); process.wait()
-                    raise RuntimeError('Mega 53 separation cancelled')
-                import time
-                time.sleep(0.15)
-            error = process.stderr.read() if process.stderr else ''
-            if process.returncode:
-                raise RuntimeError('Mega 53 inference failed: ' + error[-1200:])
-        finally:
-            if process.poll() is None:
-                process.kill(); process.wait()
-            if process.stderr: process.stderr.close()
+        from .separator_process import run
+        try:run(cmd,cwd=root,cancel_event=cancel_event)
+        except (RuntimeError,subprocess.SubprocessError) as exc:
+            raise RuntimeError('Mega 53 inference failed: '+str(exc)) from exc
         # Exact tokens prevent a source labelled "snare" matching some unrelated artifact.
         names = ('kick', 'snare', 'hh', 'toms', 'drums', 'percussion') if drum_targets is not None else ('lead-vocal', 'back-vocal')
         stems = {name: [] for name in names}

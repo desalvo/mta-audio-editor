@@ -1,0 +1,1515 @@
+{
+  "scope": "Distinct latest-result union of affected NC, financial lifecycle, browser and script regressions; not a complete baseline rerun",
+  "xml_in_order": [
+    "nc-collection-final-regression.xml",
+    "nc-collection-browser-final.xml",
+    "nc-script-security-final.xml"
+  ],
+  "distinct_cases": 247,
+  "passed": 247,
+  "failed": 0,
+  "skipped": 0,
+  "complete_baseline_repeated": false,
+  "coverage_recollected": false,
+  "real_provider_or_bank_requests": 0,
+  "manual_external_bank_evidence": "Fixture evidence and operator attestation tested; no real bank verification claimed",
+  "browser": {
+    "engine": "Chromium 143.0.7499.0",
+    "package": "@sparticuz/chromium@143.0.4",
+    "driver": "Playwright 1.58.0",
+    "IT_EN_viewports": [
+      390,
+      1280
+    ],
+    "binary_bundled_in_delivery": false
+  },
+  "optimized_python_validation": [
+    "mta_billing_isolated_validation.py",
+    "mta_billing_recovery_isolated_validation.py"
+  ],
+  "superseded_failures": "Initial event INSERT placeholder count repaired; test credit schema initialized; actual closed-NC-period privacy erasure defect fixed with connection-local owner authorization. Browser horizontal overflow and datetime-local second precision fixed; configuration rerender wait made deterministic. Final case results supersede early logs.",
+  "cases": [
+    {
+      "classname": "tests.test_noncommercial_allocation",
+      "name": "test_allocation_conserves_cost_for_positive_usage",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_noncommercial_allocation",
+      "name": "test_full_recovery_is_never_exceeded",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_noncommercial_allocation",
+      "name": "test_reject_malformed_cost_or_usage[-1-usage0]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_noncommercial_allocation",
+      "name": "test_reject_malformed_cost_or_usage[10-usage2]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_noncommercial_allocation",
+      "name": "test_reject_malformed_cost_or_usage[10-usage3]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_noncommercial_allocation",
+      "name": "test_reject_malformed_cost_or_usage[10-usage4]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_noncommercial_allocation",
+      "name": "test_reject_malformed_cost_or_usage[10-usage5]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_noncommercial_allocation",
+      "name": "test_reject_malformed_cost_or_usage[True-usage1]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_noncommercial_allocation",
+      "name": "test_remaining_recovery_caps_contributions",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_noncommercial_closed_period_guard",
+      "name": "test_closed_period_blocks_late_job",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_noncommercial_closed_period_guard",
+      "name": "test_closed_period_blocks_move_in_and_out",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_noncommercial_closed_period_guard",
+      "name": "test_other_period_writes_allowed",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_noncommercial_closed_period_guard",
+      "name": "test_statement_cannot_be_modified",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_noncommercial_closed_period_guard",
+      "name": "test_transaction_required",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_noncommercial_metered_preview",
+      "name": "test_incomplete_accounting_fails_closed[bad json-worker-completed]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_noncommercial_metered_preview",
+      "name": "test_incomplete_accounting_fails_closed[{\"cpu_seconds\": -1}-worker-completed]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_noncommercial_metered_preview",
+      "name": "test_incomplete_accounting_fails_closed[{\"gpu_seconds\": NaN}-worker-completed]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_noncommercial_metered_preview",
+      "name": "test_incomplete_accounting_fails_closed[{}-unmetered-completed]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_noncommercial_metered_preview",
+      "name": "test_incomplete_accounting_fails_closed[{}-worker-running]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_noncommercial_metered_preview",
+      "name": "test_missing_ledger_is_blocker",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_noncommercial_metered_preview",
+      "name": "test_preview_conserves_cost_without_charging",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_noncommercial_statements",
+      "name": "test_detect_tampering",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_noncommercial_statements",
+      "name": "test_immutable_snapshot_and_no_double_booking",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_noncommercial_statements",
+      "name": "test_rolls_back_invalid_measurement",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r208_global_regression_certification",
+      "name": "test_all_reports_required",
+      "status": "passed",
+      "source": "nc-script-security-final.xml"
+    },
+    {
+      "classname": "tests.test_r208_global_regression_certification",
+      "name": "test_duplicate_report_rejected",
+      "status": "passed",
+      "source": "nc-script-security-final.xml"
+    },
+    {
+      "classname": "tests.test_r208_global_regression_certification",
+      "name": "test_failed_or_corrupt_report_rejected",
+      "status": "passed",
+      "source": "nc-script-security-final.xml"
+    },
+    {
+      "classname": "tests.test_r208_installed_diagnostics",
+      "name": "test_linux_installed_executable",
+      "status": "passed",
+      "source": "nc-script-security-final.xml"
+    },
+    {
+      "classname": "tests.test_r208_installed_diagnostics",
+      "name": "test_macos_bundle_metadata",
+      "status": "passed",
+      "source": "nc-script-security-final.xml"
+    },
+    {
+      "classname": "tests.test_r208_installed_diagnostics",
+      "name": "test_server_unreachable_fails_but_emits_archive",
+      "status": "passed",
+      "source": "nc-script-security-final.xml"
+    },
+    {
+      "classname": "tests.test_r208_installed_diagnostics",
+      "name": "test_windows_installed_executable_without_powershell",
+      "status": "passed",
+      "source": "nc-script-security-final.xml"
+    },
+    {
+      "classname": "tests.test_r208_native_installer_payload_gate",
+      "name": "test_deb_payload_gate[None]",
+      "status": "passed",
+      "source": "nc-script-security-final.xml"
+    },
+    {
+      "classname": "tests.test_r208_native_installer_payload_gate",
+      "name": "test_deb_payload_gate[configure_ai_workers.py]",
+      "status": "passed",
+      "source": "nc-script-security-final.xml"
+    },
+    {
+      "classname": "tests.test_r208_native_installer_payload_gate",
+      "name": "test_deb_payload_gate[gpu_verified_billing.py]",
+      "status": "passed",
+      "source": "nc-script-security-final.xml"
+    },
+    {
+      "classname": "tests.test_r208_native_installer_payload_gate",
+      "name": "test_deb_payload_gate[install_ace_step.sh]",
+      "status": "passed",
+      "source": "nc-script-security-final.xml"
+    },
+    {
+      "classname": "tests.test_r208_native_installer_payload_gate",
+      "name": "test_deb_payload_gate[install_ai_engines.py]",
+      "status": "passed",
+      "source": "nc-script-security-final.xml"
+    },
+    {
+      "classname": "tests.test_r208_native_installer_payload_gate",
+      "name": "test_deb_payload_gate[install_demucs.py]",
+      "status": "passed",
+      "source": "nc-script-security-final.xml"
+    },
+    {
+      "classname": "tests.test_r208_native_installer_payload_gate",
+      "name": "test_deb_payload_gate[install_rocm_userspace.sh]",
+      "status": "passed",
+      "source": "nc-script-security-final.xml"
+    },
+    {
+      "classname": "tests.test_r208_native_installer_payload_gate",
+      "name": "test_wizard_missing_package_helper_never_fetches_unverified_code",
+      "status": "passed",
+      "source": "nc-script-security-final.xml"
+    },
+    {
+      "classname": "tests.test_r209_pages_rpm_distribution",
+      "name": "test_createrepo_indexes_flat_packages_into_pages_repo_root",
+      "status": "passed",
+      "source": "nc-script-security-final.xml"
+    },
+    {
+      "classname": "tests.test_r209_pages_rpm_distribution",
+      "name": "test_indexes_publish_without_rpm_payload",
+      "status": "passed",
+      "source": "nc-script-security-final.xml"
+    },
+    {
+      "classname": "tests.test_r209_pages_rpm_distribution",
+      "name": "test_malformed_release_url_rejected",
+      "status": "passed",
+      "source": "nc-script-security-final.xml"
+    },
+    {
+      "classname": "tests.test_r209_pages_rpm_distribution",
+      "name": "test_missing_signed_metadata_rejected",
+      "status": "passed",
+      "source": "nc-script-security-final.xml"
+    },
+    {
+      "classname": "tests.test_r209_pages_rpm_distribution",
+      "name": "test_pages_payload_size_limit_enforced",
+      "status": "passed",
+      "source": "nc-script-security-final.xml"
+    },
+    {
+      "classname": "tests.test_r209_pages_rpm_distribution",
+      "name": "test_primary_package_subdirectory_reference_rejected",
+      "status": "passed",
+      "source": "nc-script-security-final.xml"
+    },
+    {
+      "classname": "tests.test_r209_pages_rpm_distribution",
+      "name": "test_release_asset_collision_is_replaced_and_verified_by_digest",
+      "status": "passed",
+      "source": "nc-script-security-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_account_lifecycle",
+      "name": "test_email_change_reserves_old_and_pending_email",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_account_lifecycle",
+      "name": "test_email_mfa_onboarding_precedes_admin_approval_and_blocks_login_without_otp",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_account_lifecycle",
+      "name": "test_email_otp_attempt_limits_cooldown_and_expiry",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_account_lifecycle",
+      "name": "test_failed_purge_removes_uncommitted_sandbox",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_account_lifecycle",
+      "name": "test_quarantine_removes_settlement_outbox_and_credentials",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_account_lifecycle",
+      "name": "test_reactivation_requires_email_then_admin_and_does_not_restore_old_tokens",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_account_lifecycle",
+      "name": "test_repeated_retirement_reactivation_revokes_each_archive_without_token_collision",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_account_lifecycle",
+      "name": "test_retention_api_admin_only_and_self_deletion_forbidden_to_admin",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_account_lifecycle",
+      "name": "test_retention_configuration_validation[settings0]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_account_lifecycle",
+      "name": "test_retention_configuration_validation[settings1]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_account_lifecycle",
+      "name": "test_retention_configuration_validation[settings2]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_account_lifecycle",
+      "name": "test_retention_configuration_validation[settings3]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_account_lifecycle",
+      "name": "test_retirement_preserves_identity_accounting_revokes_tokens_and_exports_projects",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_account_lifecycle",
+      "name": "test_total_delete_admin_protected_and_explicit_confirmation_required",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_account_lifecycle",
+      "name": "test_total_delete_one_confirmation_removes_account_and_accounting",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_account_lifecycle",
+      "name": "test_totp_onboarding_guard_and_notification_outbox",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_credit_checkout",
+      "name": "test_checkout_is_quoted_and_only_signed_paid_event_adds_money",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_credit_checkout",
+      "name": "test_eligibility_and_global_switch_are_enforced_on_backend",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_credit_checkout",
+      "name": "test_legacy_schema_migrates_before_first_job",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_credit_checkout",
+      "name": "test_legal_minimum_exactly_five_fields_and_pdf_omits_optional",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_credit_checkout",
+      "name": "test_paid_plan_fees_do_not_consume_overage_credits",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_credit_checkout",
+      "name": "test_provider_secrets_are_masked_and_sealed_at_rest",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_credit_checkout",
+      "name": "test_stripe_dispatch_outbox_records_verified_session",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_credit_checkout",
+      "name": "test_stripe_uncertain_response_never_retries_automatically",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_credit_checkout",
+      "name": "test_subscription_refusal_never_offers_credits_as_replacement",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_credit_checkout",
+      "name": "test_wrong_amount_unpaid_forged_and_refunded_events",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_credit_checkout",
+      "name": "test_zero_credit_overage_refuses_before_queue_entry",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_actual_ledger_e2e",
+      "name": "test_completed_actual_job_closes_period_and_exports_both_languages",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_browser",
+      "name": "test_actual_mounts_and_noncommercial_controls_hide_subscription_forms[admin-en]",
+      "status": "passed",
+      "source": "nc-collection-browser-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_browser",
+      "name": "test_actual_mounts_and_noncommercial_controls_hide_subscription_forms[admin-it]",
+      "status": "passed",
+      "source": "nc-collection-browser-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_browser",
+      "name": "test_actual_mounts_and_noncommercial_controls_hide_subscription_forms[owner-en]",
+      "status": "passed",
+      "source": "nc-collection-browser-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_browser",
+      "name": "test_actual_mounts_and_noncommercial_controls_hide_subscription_forms[owner-it]",
+      "status": "passed",
+      "source": "nc-collection-browser-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_browser",
+      "name": "test_admin_configuration_bank_evidence_excess_refund_and_period_closure[1280-en]",
+      "status": "passed",
+      "source": "nc-collection-browser-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_browser",
+      "name": "test_admin_configuration_bank_evidence_excess_refund_and_period_closure[1280-it]",
+      "status": "passed",
+      "source": "nc-collection-browser-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_browser",
+      "name": "test_admin_configuration_bank_evidence_excess_refund_and_period_closure[390-en]",
+      "status": "passed",
+      "source": "nc-collection-browser-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_browser",
+      "name": "test_admin_configuration_bank_evidence_excess_refund_and_period_closure[390-it]",
+      "status": "passed",
+      "source": "nc-collection-browser-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_browser",
+      "name": "test_commercial_mode_retains_private_nc_history_as_read_only[en]",
+      "status": "passed",
+      "source": "nc-collection-browser-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_browser",
+      "name": "test_commercial_mode_retains_private_nc_history_as_read_only[it]",
+      "status": "passed",
+      "source": "nc-collection-browser-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_browser",
+      "name": "test_owner_optional_amount_report_actual_receipt_and_private_exports[1280-en]",
+      "status": "passed",
+      "source": "nc-collection-browser-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_browser",
+      "name": "test_owner_optional_amount_report_actual_receipt_and_private_exports[1280-it]",
+      "status": "passed",
+      "source": "nc-collection-browser-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_browser",
+      "name": "test_owner_optional_amount_report_actual_receipt_and_private_exports[390-en]",
+      "status": "passed",
+      "source": "nc-collection-browser-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_browser",
+      "name": "test_owner_optional_amount_report_actual_receipt_and_private_exports[390-it]",
+      "status": "passed",
+      "source": "nc-collection-browser-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_e2e",
+      "name": "test_actual_api_owner_admin_and_csrf_boundaries",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_e2e",
+      "name": "test_changed_configuration_preserves_existing_transfer_instructions",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_e2e",
+      "name": "test_concurrent_pledges_and_receipts_are_idempotent_and_conserve_share",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_e2e",
+      "name": "test_erasure_permission_is_owner_scoped_and_connection_local",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_e2e",
+      "name": "test_excess_transfer_is_recorded_as_operator_refund_then_reconciled",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_e2e",
+      "name": "test_external_receipt_requires_authorized_independent_evidence[amount]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_e2e",
+      "name": "test_external_receipt_requires_authorized_independent_evidence[proof]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_e2e",
+      "name": "test_external_receipt_requires_authorized_independent_evidence[reference]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_e2e",
+      "name": "test_external_receipt_requires_authorized_independent_evidence[reversal]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_e2e",
+      "name": "test_external_receipt_requires_authorized_independent_evidence[role]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_e2e",
+      "name": "test_external_receipt_requires_authorized_independent_evidence[self]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_e2e",
+      "name": "test_external_receipt_requires_authorized_independent_evidence[verified]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_e2e",
+      "name": "test_failed_receipt_transaction_rolls_back_and_can_retry",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_e2e",
+      "name": "test_financial_erasure_is_retired_owner_scoped[erase]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_e2e",
+      "name": "test_financial_erasure_is_retired_owner_scoped[privacy_purge]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_e2e",
+      "name": "test_fully_returned_contribution_can_close_without_forced_repayment",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_e2e",
+      "name": "test_history_remains_readable_during_drain_but_cannot_mutate",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_e2e",
+      "name": "test_immutable_financial_rows_and_tamper_detection",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_e2e",
+      "name": "test_invalid_pledge_is_rejected_without_financial_authority[boolean]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_e2e",
+      "name": "test_invalid_pledge_is_rejected_without_financial_authority[commercial]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_e2e",
+      "name": "test_invalid_pledge_is_rejected_without_financial_authority[disabled]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_e2e",
+      "name": "test_invalid_pledge_is_rejected_without_financial_authority[drain]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_e2e",
+      "name": "test_invalid_pledge_is_rejected_without_financial_authority[epoch]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_e2e",
+      "name": "test_invalid_pledge_is_rejected_without_financial_authority[mirror]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_e2e",
+      "name": "test_invalid_pledge_is_rejected_without_financial_authority[over_share]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_e2e",
+      "name": "test_invalid_pledge_is_rejected_without_financial_authority[stale_settings]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_e2e",
+      "name": "test_invalid_pledge_is_rejected_without_financial_authority[wrong_owner]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_e2e",
+      "name": "test_invalid_pledge_is_rejected_without_financial_authority[wrong_statement]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_e2e",
+      "name": "test_optional_receipt_reversal_and_repayment_do_not_touch_usage_or_credits",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_e2e",
+      "name": "test_owner_cannot_select_another_contribution_or_change_server_target",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_e2e",
+      "name": "test_owner_export_is_private_nonfiscal_and_contains_actual_net[en]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_e2e",
+      "name": "test_owner_export_is_private_nonfiscal_and_contains_actual_net[it]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_e2e",
+      "name": "test_partial_collection_schema_never_recreates_lost_receipts",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_e2e",
+      "name": "test_partial_optional_contributions_do_not_require_full_share",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_e2e",
+      "name": "test_reported_transfer_and_excess_are_readiness_blockers",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_e2e",
+      "name": "test_same_external_receipt_cannot_fund_another_account",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_e2e",
+      "name": "test_same_normalized_bank_reference_remains_unique",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_collection_e2e",
+      "name": "test_unpaid_intent_can_cancel_but_reported_transfer_cannot",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_service_switch",
+      "name": "test_commercial_switch_gates_billable_and_keeps_unknown_weights_blocked",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_service_switch",
+      "name": "test_switch_requires_double_confirmation",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_user_statements",
+      "name": "test_invalid_account_id",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_user_statements",
+      "name": "test_invalid_statement_total_fails_closed",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_user_statements",
+      "name": "test_personal_csv_contains_only_own_account",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_user_statements",
+      "name": "test_personal_csv_rejects_formula_account",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_user_statements",
+      "name": "test_tampered_statement_fails_closed",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_noncommercial_user_statements",
+      "name": "test_user_sees_only_own_allocation",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_script_input_security",
+      "name": "test_installed_diagnostics_never_follows_server_redirects",
+      "status": "passed",
+      "source": "nc-script-security-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_script_input_security",
+      "name": "test_installed_diagnostics_rejects_non_web_or_credentialed_urls[file:///etc/hosts]",
+      "status": "passed",
+      "source": "nc-script-security-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_script_input_security",
+      "name": "test_installed_diagnostics_rejects_non_web_or_credentialed_urls[ftp://example.test]",
+      "status": "passed",
+      "source": "nc-script-security-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_script_input_security",
+      "name": "test_installed_diagnostics_rejects_non_web_or_credentialed_urls[https://user:secret@example.test]",
+      "status": "passed",
+      "source": "nc-script-security-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_script_input_security",
+      "name": "test_malicious_junit_produces_failed_shard_report_not_success",
+      "status": "passed",
+      "source": "nc-script-security-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_script_input_security",
+      "name": "test_public_repository_verifier_rejects_unsafe_url_before_network[file:///etc/hosts]",
+      "status": "passed",
+      "source": "nc-script-security-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_script_input_security",
+      "name": "test_public_repository_verifier_rejects_unsafe_url_before_network[ftp://example.test/repo]",
+      "status": "passed",
+      "source": "nc-script-security-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_script_input_security",
+      "name": "test_public_repository_verifier_rejects_unsafe_url_before_network[http://example.test/repo]",
+      "status": "passed",
+      "source": "nc-script-security-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_script_input_security",
+      "name": "test_public_repository_verifier_rejects_unsafe_url_before_network[https://example.test/repo#fragment]",
+      "status": "passed",
+      "source": "nc-script-security-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_script_input_security",
+      "name": "test_public_repository_verifier_rejects_unsafe_url_before_network[https://user:secret@example.test/repo]",
+      "status": "passed",
+      "source": "nc-script-security-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_script_input_security",
+      "name": "test_repository_verifier_does_not_follow_redirect_and_bounds_body",
+      "status": "passed",
+      "source": "nc-script-security-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_script_input_security",
+      "name": "test_repository_xml_entity_expansion_is_rejected",
+      "status": "passed",
+      "source": "nc-script-security-final.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_allocations_are_immutable_and_missing_position_blocks_report",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_already_captured_obsolete_quote_is_retained_as_refund_due",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_authenticated_refunded_initial_repayment_reopens_original_debt",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_authorized_account_erasure_preserves_other_owner_financial_records[erase]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_authorized_account_erasure_preserves_other_owner_financial_records[privacy_purge]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_cent_rounding_surplus_is_separate_and_refunded_first",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_concurrent_checkout_only_one_provider_order_and_pending_target",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_concurrent_fulfillment_delivers_one_allocation",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_dispute_release_after_second_repayment_creates_refund_liability",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_erasure_authorization_is_retired_owner_scoped_and_connection_local",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_exact_repayment_closes_debt_without_wallet_or_fee_mutation",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_failure_rolls_back_capture_allocation_and_fence_then_retries",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_multiple_sources_are_bound_to_original_refund",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_owner_api_quote_csrf_and_regime_guards",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_owner_quote_change_is_checked_before_provider_capture",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_permanent_capture_reversal_reopens_original_receivable",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_refund_before_repayment_fulfillment_is_atomic",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_refund_reopens_same_debt_and_can_be_repaid_again",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_repayment_allowed_for_existing_debt_after_plan_service_disabled",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_uncertain_create_stays_pending_without_second_provider_post",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscription_repayment_e2e",
+      "name": "test_verified_webhook_retries_allocate_once",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_actual_frontend_history_and_escaping",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_calendar_boundaries_do_not_drift",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_cancelled_diagnostic_usage_consumes_quota_without_gpu_invoice",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_cancelling_queued_job_releases_quota_reservation",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_concurrent_limited_jobs_cannot_double_spend",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_concurrent_renewal_is_one_credit_debit",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_credit_retry_validation_and_promo",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_credit_usage_report_and_email_are_separate_from_ordinary_invoice",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_defaults_and_admin_unlimited",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_email_html_links_retries_and_language",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_ended_subscription_reverts_to_free_accounting",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_exhausted_credit_blocks_next_job",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_existing_explicit_admin_storage_limit_survives_migration",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_history_without_quotas_is_owner_scoped",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_legal_updates_enqueue_once_and_remove_draft",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_live_checkpoint_and_alerts_are_idempotent",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_manual_daily_limits_inherit_storage_and_block",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_no_overage_without_opt_in",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_notice_smtp_absence_does_not_drop_events",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_overage_ordinary_tariff_credits_and_no_double_invoice",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_privacy_pdf_preserves_all_data_categories[en]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_privacy_pdf_preserves_all_data_categories[it]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_renewal_freezes_plan_and_charges_once",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_retention_change_notifies_and_noop_does_not",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_routes_enforce_owner_admin_and_csrf",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_self_service_cannot_reset_active_period",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_storage_coverage_is_time_bounded_and_does_not_hide_usage",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_storage_unlock_is_time_priced_and_idempotent",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_unfunded_and_cancellation",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_subscriptions",
+      "name": "test_zero_storage_quota_is_not_unlimited",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_active_jobs_and_project_symlinks_refuse_dump",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_all_admins_immutable_even_with_multiple_admins",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_central_ledger_cannot_advance_past_outbox_snapshot",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_config_only_and_all_users_dump_selections",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_corrupt_checksum_and_unconfirmed_restore_write_nothing",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_dump_routes_admin_permissions_and_preview",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_dump_selection_closure_and_roundtrip",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_erasure_of_legacy_already_purged_account_removes_old_sandbox",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_failed_file_erasure_remains_retryable_and_blocks_reactivation",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_file_based_global_settings_are_in_dump_and_restore",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_health_probes_remain_available_during_dump_maintenance",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_immediate_erasure_removes_all_retained_copies_and_preserves_others",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_invalid_selection[bad0]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_invalid_selection[bad1]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_invalid_selection[bad2]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_invalid_selection[bad3]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_invalid_selection[bad4]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_project_selection_includes_owner_but_not_other_owned_projects",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_restore_rolls_back_if_publication_fails",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_unsafe_paths_refused[../escape]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_unsafe_paths_refused[/escape]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_unsafe_paths_refused[data/other]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_unsafe_paths_refused[projects/../../x]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_unsafe_paths_refused[projects/abcd/C:/x]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_unsafe_paths_refused[projects/abcd/a\\\\b]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_r210_user_erasure_dump",
+      "name": "test_unsafe_paths_refused[queue/unknown]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_readiness_cli_r210",
+      "name": "test_cli_writes_private_report_never_overwrites",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_readiness_cli_r210",
+      "name": "test_empty_existing_db_is_never_ready",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_readiness_cli_r210",
+      "name": "test_invalid_regime_fails[INVALID]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_readiness_cli_r210",
+      "name": "test_invalid_regime_fails[NONCOMMERCIAL]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_readiness_cli_r210",
+      "name": "test_invalid_regime_fails[]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_readiness_cli_r210",
+      "name": "test_invalid_regime_fails[commercial]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_readiness_cli_r210",
+      "name": "test_missing_and_symlink_blocked",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_readiness_cli_r210",
+      "name": "test_snapshot_is_never_modified",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_readiness_hardening_r210",
+      "name": "test_all_directions_are_diagnostic_only[COMMERCIAL-COMMERCIAL]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_readiness_hardening_r210",
+      "name": "test_all_directions_are_diagnostic_only[COMMERCIAL-NON_COMMERCIAL]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_readiness_hardening_r210",
+      "name": "test_all_directions_are_diagnostic_only[NON_COMMERCIAL-COMMERCIAL]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_readiness_hardening_r210",
+      "name": "test_all_directions_are_diagnostic_only[NON_COMMERCIAL-NON_COMMERCIAL]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_readiness_hardening_r210",
+      "name": "test_cli_produces_nonzero_code_and_unprivileged_report[\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_readiness_hardening_r210",
+      "name": "test_cli_produces_nonzero_code_and_unprivileged_report[]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_readiness_hardening_r210",
+      "name": "test_cli_produces_nonzero_code_and_unprivileged_report[not a sqlite database]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_readiness_hardening_r210",
+      "name": "test_malformed_database_fail_closed[COMMERCIAL-NON_COMMERCIAL]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_readiness_hardening_r210",
+      "name": "test_malformed_database_fail_closed[NON_COMMERCIAL-COMMERCIAL]",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_readiness_hardening_r210",
+      "name": "test_symlinked_report_not_overwritten",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_reconciliation_inventory",
+      "name": "test_completed_job_not_active",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_reconciliation_inventory",
+      "name": "test_historic_credit_movements_remain_reconciliation_items",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_reconciliation_inventory",
+      "name": "test_readiness_does_not_authorize_switch_even_without_open_rows",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_reconciliation_inventory",
+      "name": "test_readiness_rejects_unrecognized_regime",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_reconciliation_inventory",
+      "name": "test_reconciliation_inventory_handles_unknown_columns",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    },
+    {
+      "classname": "tests.test_regime_reconciliation_inventory",
+      "name": "test_unknown_schema_fails_closed",
+      "status": "passed",
+      "source": "nc-collection-final-regression.xml"
+    }
+  ]
+}

@@ -39,7 +39,7 @@ def _db():
     return con
 
 
-def register(job_id, billing_job_id, status, usage=None, *, source='unmetered', finished_at=None):
+def register(job_id, billing_job_id, status, usage=None, *, source='unmetered', finished_at=None,worker_id=None,claim_token=None):
     """Persist a validated immutable settlement intent, without charging yet."""
     queue._validate_job_id(job_id)
     queue._validate_job_id(billing_job_id)
@@ -59,8 +59,16 @@ def register(job_id, billing_job_id, status, usage=None, *, source='unmetered', 
         raise ValueError('GPU agent must supply measurements')
     if finished_at is not None and (type(finished_at) is not int or finished_at < 0):
         raise ValueError('Invalid finish timestamp')
+    owner={}
+    if worker_id is not None or claim_token is not None:
+        from .worker_loss_resolution import mark_evidence
+        mark_evidence(billing_job_id,worker_id,claim_token)
+        from .deferred_execution_owner import validate_receipt
+        with ai_billing.db() as c:
+            validate_receipt(c,billing_job_id,worker_id,claim_token,allow_finished=True)
+        owner={'worker_id':worker_id,'claim_token':claim_token}
     intent = json.dumps({'status': status, 'usage': normalized, 'source': source,
-                         'finished_at': finished_at}, sort_keys=True, allow_nan=False)
+                         'finished_at': finished_at,**owner}, sort_keys=True, allow_nan=False)
     with _db() as con:
         con.execute('BEGIN IMMEDIATE')
         old = con.execute('SELECT job_id,billing_job_id,intent_json FROM deliveries WHERE job_id=? OR billing_job_id=?',
@@ -79,7 +87,7 @@ def register(job_id, billing_job_id, status, usage=None, *, source='unmetered', 
 
 
 def register_verified(job_id, billing_job_id, user_id, status, usage=None, *,
-                      source='unmetered', finished_at=None):
+                      source='unmetered', finished_at=None,worker_id=None,claim_token=None):
     """Bind an existing ledger job to a durable inference after ownership checks.
 
     This is an explicit opt-in boundary: neither a billing identity nor GPU
@@ -125,7 +133,13 @@ def register_verified(job_id, billing_job_id, user_id, status, usage=None, *,
         raise ValueError('Billing job kind mismatch')
     if ledger['status'] not in ('running', status):
         raise ValueError('Billing job is in an incompatible state')
-    return register(job_id, billing_job_id, status, usage, source=source, finished_at=finished_at)
+    with ai_billing.db() as c:
+        claims=c.execute("SELECT 1 FROM sqlite_master WHERE name='regime_worker_claims'").fetchone()
+        claimed=c.execute('SELECT 1 FROM regime_worker_claims WHERE operation_id=?',('job:ledger:'+billing_job_id,)).fetchone() if claims else None
+        if claimed or worker_id is not None or claim_token is not None:
+            from .deferred_execution_owner import validate_receipt
+            validate_receipt(c,billing_job_id,worker_id,claim_token,allow_finished=True)
+    return register(job_id, billing_job_id, status, usage, source=source, finished_at=finished_at,worker_id=worker_id,claim_token=claim_token)
 
 
 def deliver(*, job_id=None, on_applied=None):
@@ -154,7 +168,8 @@ def deliver(*, job_id=None, on_applied=None):
             intent = json.loads(record['intent_json'])
             try:
                 ai_billing.finish_job_idempotent(record['billing_job_id'], intent['status'], intent['usage'],
-                                                  source=intent['source'], finished_at=intent['finished_at'])
+                                                  source=intent['source'], finished_at=intent['finished_at'],
+                                                  **({k:intent[k] for k in ('worker_id','claim_token')} if 'worker_id' in intent else {}))
                 if on_applied is not None:
                     on_applied(jid)
             except Exception as exc:

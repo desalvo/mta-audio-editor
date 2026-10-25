@@ -46,3 +46,18 @@ def test_recovery_marks_only_stale_running_jobs_unmetered():
 def test_recovery_rejects_unsafe_threshold(threshold):
     with pytest.raises(ValueError):
         ai_billing.recover_stale_jobs(older_than_seconds=threshold)
+
+@pytest.mark.parametrize('claim_state', ['running', 'finished'])
+def test_recovery_never_bypasses_persisted_worker_claim(claim_state):
+    from app.regime_worker_claims import claim, finish
+    job = ai_billing.create_job(uid(), 'whisper', started_at=100)
+    with db() as con:
+        con.execute('BEGIN IMMEDIATE')
+        claim(con, job, worker_id='remote-1', token='verified-token')
+        if claim_state == 'finished':
+            finish(con, 'job:ledger:' + job, worker_id='remote-1', token='verified-token')
+    report = ai_billing.recover_stale_jobs(now=5000, older_than_seconds=3600, dry_run=False)
+    assert report['recovered_job_ids'] == []
+    assert report['blocked_jobs'] == [{'job_id': job, 'reason': 'worker_claim_requires_audited_resolution'}]
+    with db() as con:
+        assert con.execute('SELECT status FROM ai_compute_jobs WHERE id=?', (job,)).fetchone()[0] == 'running'

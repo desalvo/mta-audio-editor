@@ -92,8 +92,7 @@ def test_checkpoint_allowlists_legacy_numpy_globals_without_unsafe_pickle(tmp_pa
     """Reviewed pinned files can contain NumPy 1.x globals on NumPy 2.x."""
     import contextlib
     import hashlib
-    import numpy as np
-    import torch
+    torch=pytest.importorskip('torch')
     from app import studio_checkpoint as checkpoint
     source=tmp_path/'reviewed.ckpt';source.write_bytes(b'reviewed')
     monkeypatch.setattr(checkpoint,'SIZE',source.stat().st_size)

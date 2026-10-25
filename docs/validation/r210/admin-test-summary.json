@@ -1,0 +1,4157 @@
+{
+  "schema": "mta-admin-acceptance-evidence-1",
+  "date": "2026-10-24",
+  "passed_distinct": 330,
+  "new_cases": 44,
+  "new_chromium_cases": 44,
+  "chromium_cases": 136,
+  "current_failures": 0,
+  "current_errors": 0,
+  "current_skips": 0,
+  "method": "Latest actual execution per exact testcase ID; no sums with overlapping previous cycles or historical full Linux baseline. Consolidated XML is evidence, not another run.",
+  "reports": [
+    {
+      "path": "docs/validation/r210/admin-regression-0.xml",
+      "sha256": "88bd37d0e3772b9a13b1c8d1feb60970fd5fc660b7220fc9942498df8cefa4b8",
+      "executed_testcases": 150
+    },
+    {
+      "path": "docs/validation/r210/admin-regression-1.xml",
+      "sha256": "88971269de949df7e71e0ef956277fe87fc2b17797a0b3fc0816a53076f71863",
+      "executed_testcases": 32
+    },
+    {
+      "path": "docs/validation/r210/admin-regression-2.xml",
+      "sha256": "afaf71139daf77f381c7a1a6c0d41418616e3a7282a986b91dd75794cb16e4f2",
+      "executed_testcases": 68
+    },
+    {
+      "path": "docs/validation/r210/admin-regression-3.xml",
+      "sha256": "d3bdb49764f5743119148bf5f4b5e87b4ca428355983b13de0b673414599a163",
+      "executed_testcases": 34
+    },
+    {
+      "path": "docs/validation/r210/admin-layout-capability-correction.xml",
+      "sha256": "de5160298ebd8fdf3abe5a43035aec5129562521983f0fc1899bf0d084893a26",
+      "executed_testcases": 2
+    },
+    {
+      "path": "docs/validation/r210/admin-workflow-final.xml",
+      "sha256": "95f86a8d9f75c25199898bb64004dbdfb9a6b5ac72eebe9b3d79b9b445530680",
+      "executed_testcases": 28
+    },
+    {
+      "path": "docs/validation/r210/admin-accessibility-delivery-0.xml",
+      "sha256": "7a96f8c6c6ea8148c54600b4298e0f8b96bd96f3ae04ff6a6b65672baf4449ca",
+      "executed_testcases": 4
+    },
+    {
+      "path": "docs/validation/r210/admin-accessibility-delivery-1.xml",
+      "sha256": "f23b13a4606eff8ad8b5f38893b083965d5cb1fbf005ee773a2b307b5f755bb1",
+      "executed_testcases": 4
+    },
+    {
+      "path": "docs/validation/r210/admin-accessibility-delivery-2.xml",
+      "sha256": "096f5609a1b45c1da402c2d23205709c7542136a0e905116e914bd325799820b",
+      "executed_testcases": 4
+    },
+    {
+      "path": "docs/validation/r210/admin-accessibility-delivery-3.xml",
+      "sha256": "2c379ac1dbe4bf8dbf286d36737f6a8f1b45addbcdd29828fc1df02f12feae9c",
+      "executed_testcases": 4
+    },
+    {
+      "path": "docs/validation/r210/admin-token-focus-final.xml",
+      "sha256": "3bf1c2f59cf1dc9cdabd9e1045f89dc7f2c7640b61cc9cf366dd5f4c8d8b1525",
+      "executed_testcases": 4
+    },
+    {
+      "path": "docs/validation/r210/admin-locale-final.xml",
+      "sha256": "234a5fdd57b218a441199a379e3a5d2267d6af563e02c8a038c84436d703deeb",
+      "executed_testcases": 17
+    }
+  ],
+  "superseded_executions": [
+    {
+      "case": "tests.test_r210_admin_workflow_acceptance::test_one_time_token_create_rotate_revoke_and_keyboard_hide[390-it]",
+      "earlier": "admin-workflow-final.xml",
+      "latest": "admin-token-focus-final.xml"
+    },
+    {
+      "case": "tests.test_r210_admin_workflow_acceptance::test_one_time_token_create_rotate_revoke_and_keyboard_hide[390-en]",
+      "earlier": "admin-workflow-final.xml",
+      "latest": "admin-token-focus-final.xml"
+    },
+    {
+      "case": "tests.test_r210_admin_workflow_acceptance::test_one_time_token_create_rotate_revoke_and_keyboard_hide[1280-it]",
+      "earlier": "admin-workflow-final.xml",
+      "latest": "admin-token-focus-final.xml"
+    },
+    {
+      "case": "tests.test_r210_admin_workflow_acceptance::test_one_time_token_create_rotate_revoke_and_keyboard_hide[1280-en]",
+      "earlier": "admin-workflow-final.xml",
+      "latest": "admin-token-focus-final.xml"
+    },
+    {
+      "case": "tests.test_r210_user_locale::test_browser_language[it-IT,it;q=0.9,en;q=0.8-it]",
+      "earlier": "admin-regression-0.xml",
+      "latest": "admin-locale-final.xml"
+    },
+    {
+      "case": "tests.test_r210_user_locale::test_browser_language[it;q=0.2,en-US;q=0.9-en]",
+      "earlier": "admin-regression-0.xml",
+      "latest": "admin-locale-final.xml"
+    },
+    {
+      "case": "tests.test_r210_user_locale::test_browser_language[fr,it;q=0.4-it]",
+      "earlier": "admin-regression-0.xml",
+      "latest": "admin-locale-final.xml"
+    },
+    {
+      "case": "tests.test_r210_user_locale::test_browser_language[it;q=0,en;q=0.5-en]",
+      "earlier": "admin-regression-0.xml",
+      "latest": "admin-locale-final.xml"
+    },
+    {
+      "case": "tests.test_r210_user_locale::test_browser_language[fr-en]",
+      "earlier": "admin-regression-0.xml",
+      "latest": "admin-locale-final.xml"
+    },
+    {
+      "case": "tests.test_r210_user_locale::test_browser_language[it;q=bad,en-en]",
+      "earlier": "admin-regression-0.xml",
+      "latest": "admin-locale-final.xml"
+    },
+    {
+      "case": "tests.test_r210_user_locale::test_new_accounts_quota_and_profile_locale",
+      "earlier": "admin-regression-0.xml",
+      "latest": "admin-locale-final.xml"
+    },
+    {
+      "case": "tests.test_r210_user_locale::test_browser_login_and_profile_override",
+      "earlier": "admin-regression-0.xml",
+      "latest": "admin-locale-final.xml"
+    },
+    {
+      "case": "tests.test_r210_user_locale::test_dynamic_pdf_omits_empty_fields[it-privacy]",
+      "earlier": "admin-regression-0.xml",
+      "latest": "admin-locale-final.xml"
+    },
+    {
+      "case": "tests.test_r210_user_locale::test_dynamic_pdf_omits_empty_fields[it-terms]",
+      "earlier": "admin-regression-0.xml",
+      "latest": "admin-locale-final.xml"
+    },
+    {
+      "case": "tests.test_r210_user_locale::test_dynamic_pdf_omits_empty_fields[en-privacy]",
+      "earlier": "admin-regression-0.xml",
+      "latest": "admin-locale-final.xml"
+    },
+    {
+      "case": "tests.test_r210_user_locale::test_dynamic_pdf_omits_empty_fields[en-terms]",
+      "earlier": "admin-regression-0.xml",
+      "latest": "admin-locale-final.xml"
+    },
+    {
+      "case": "tests.test_r210_user_locale::test_catalog_html_and_template_translation",
+      "earlier": "admin-regression-0.xml",
+      "latest": "admin-locale-final.xml"
+    },
+    {
+      "case": "tests.test_r210_user_locale::test_js_locale_runtime",
+      "earlier": "admin-regression-0.xml",
+      "latest": "admin-locale-final.xml"
+    },
+    {
+      "case": "tests.test_r210_user_locale::test_recipient_locale_is_independent_of_sender",
+      "earlier": "admin-regression-0.xml",
+      "latest": "admin-locale-final.xml"
+    },
+    {
+      "case": "tests.test_r210_user_locale::test_icons_placeholders_and_native_catalog_packaging",
+      "earlier": "admin-regression-0.xml",
+      "latest": "admin-locale-final.xml"
+    },
+    {
+      "case": "tests.test_r210_user_locale::test_metrics_label_translation",
+      "earlier": "admin-regression-0.xml",
+      "latest": "admin-locale-final.xml"
+    }
+  ],
+  "resolved_capability_skips": [
+    {
+      "report": "admin-regression-3.xml",
+      "collection_skip": "tests.test_r210_tracks_top_layout",
+      "resolution": "Test-only WeasyPrint 70.0 installed; both actual collected cases pass in admin-layout-capability-correction.xml."
+    }
+  ],
+  "earlier_attempts": "admin-accessibility-0..3 and admin-workflow-initial are historical failing development attempts. Corrected source, actual response/readback synchronization, header-only snapshot review and opaque-overlay contrast review precede the passing delivery reports. Earlier token count read a stale value before refresh; the final focused cases wait for completion and assert two revoked credentials and zero active after rotate+revoke.",
+  "axe": {
+    "engine": "axe-core 4.14.0, test-only outside shipped tree",
+    "profiles": 16,
+    "surfaces_per_profile": 13,
+    "full_matrix_reports": 208,
+    "mutation_error_recovery_reports": 120,
+    "reports": 328,
+    "violations": 0,
+    "unresolved_supplemental": 0,
+    "opaque_clipped_or_overlaid_text_measurements": 3795,
+    "header_only_empty_tables_reviewed": 89,
+    "excluded_rules": [],
+    "limits": "WCAG2/2.1 A/AA automated rules, real keyboard/focus/names/reflow and explicit supplemental computed opaque contrast/empty table review on current web administration. No OS-native, whole-product or manual assistive-technology certification.",
+    "files": [
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-1280-dark-ai-billing.json",
+        "sha256": "8b7f1e7f4d5d897ab01b6b1c98ab08b42506e145c6e8c82c66fda67e88f90b5b",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-1280-dark-ai-tokens.json",
+        "sha256": "2bfdfb7603aa8560b8ead80204842917194e6c23d8d634b1ef9cea610acbf7bf",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-1280-dark-aiQueue.json",
+        "sha256": "90a83778fd8b8a6e887751df97365fb6f44d6e526cce48af32f375363be707e2",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-1280-dark-diagnostics.json",
+        "sha256": "d63d95bce2e74a766f5a282c626ab88db93932807bd0d543f28087e1b4730ac9",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-1280-dark-job-monitor.json",
+        "sha256": "ec74afc381d13c6a9f4fa1eaa69fe146f0427c80e4cf01ea33585fac34599762",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-1280-dark-legal.json",
+        "sha256": "cfef5ad297a65b676bb1914fab8d3d5d52df83a02e12e9c701d0811cd9c3dea2",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-1280-dark-models.json",
+        "sha256": "31e1e28db785a6f973aadfe1e2734252d492c0bdb025b5763de3389f9f9d88da",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-1280-dark-optional-plugins.json",
+        "sha256": "57728207ecb03f892c61b4a09dcc7c45d07165d6838ced1615d1418749e9662f",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-1280-dark-smtp.json",
+        "sha256": "1552dc9b9f5b74fe08b71d5614ef0f375ec32a5ba690135f4a1c79fac3862147",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-1280-dark-storage.json",
+        "sha256": "b636444d8d6d4ff53ab5a9092d257eaf2769560ffa3448456492039e47213c1b",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-1280-dark-subscriptions.json",
+        "sha256": "1aae1e68927c1396703cc671290bf4b821595cdfa31e3e6303d1d2da1ed0f5e1",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-1280-dark-users.json",
+        "sha256": "3c194acfbbc08fca7753104aed34c9590a7100b5c07bb35bb0620e48b2a9be5c",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-1280-dark-web.json",
+        "sha256": "e989edc7b69fa70de7db3218aad677ebdf988c1eb3f579e07ef91454121c5149",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-1280-light-ai-billing.json",
+        "sha256": "e76709406ab51e4358c572123db7917dc7a64b4ffd31478b9e65d7fa712f85d2",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-1280-light-ai-tokens.json",
+        "sha256": "fb76e48d5a60f31890c011940d8787d7ea2f7ceed476927a84bdbdba543089e8",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-1280-light-aiQueue.json",
+        "sha256": "9cecffcb4612992c919fe7704e402a02402f50343bf761b8c86bddd630274c2a",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-1280-light-diagnostics.json",
+        "sha256": "887aeef09ebf3b16543114ceea77504f516650e9194017fef6b5f5f06de297a5",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-1280-light-job-monitor.json",
+        "sha256": "380eb04b372ede8e61ccdfc73e54268312cba30f8fdaf19174524e47d9b9a540",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-1280-light-legal.json",
+        "sha256": "cba9deb56a156602ad1c2de9f95c8324b12f6b1ac0e124601b7de6d71e4cd523",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-1280-light-models.json",
+        "sha256": "c592d388a4b45189fae5c03687ea013eb8bf1111318e4f556f4fd7f3c1ff8caf",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-1280-light-optional-plugins.json",
+        "sha256": "f0fe5f083c8db7a8245cfaa50981b0c46ee8eb368f6cb21c4ee32428c94f0f61",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-1280-light-smtp.json",
+        "sha256": "672c80e9d5b46613e08111dd090d05ec783ebdf198f224fcd7556acb3ab8a2e3",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-1280-light-storage.json",
+        "sha256": "ba46529811b2307963735da95a9be916188e2a164695702c69bb1afdffca8c4c",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-1280-light-subscriptions.json",
+        "sha256": "e13b5ca0bf7bac5cb6e71e63a68bdc3b29a64471e66bfd89bc3e4dac9056e5d9",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-1280-light-users.json",
+        "sha256": "cf3496432e119c7e2d6f1b42c4a74baf3e79964d6d33fecfa4bbd43edd64b499",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-1280-light-web.json",
+        "sha256": "d12f79733b91ffef49283da221d8498ec4e6dc05e1a109e9f2cc697a7f99fb58",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-390-dark-ai-billing.json",
+        "sha256": "4527616c4060e53fa9f56ea5046081bd34d1125a83ab404add053d149eafded2",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-390-dark-ai-tokens.json",
+        "sha256": "854ece18dfe975683e12031148ec8f820d26acb7005db95fc8dbe0b954610891",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-390-dark-aiQueue.json",
+        "sha256": "e877a9588d90471b4078ba49acaa02816b210be080182d6d4ba52a6e5e745dfe",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-390-dark-diagnostics.json",
+        "sha256": "7b561438a43445cd3207a8f340cc5853cb19a508a8abb4fecc5b491d9d8dc96f",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-390-dark-job-monitor.json",
+        "sha256": "93b67a501bd1068dbfa673bcfd5c8d012425b9070bbcc7b1c878afb02140d81e",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-390-dark-legal.json",
+        "sha256": "acb8b70d33c894eb12bb4e5e7a9ac79f0013b9b77ecab07e003edb95d55b6738",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-390-dark-models.json",
+        "sha256": "a03d1ca4dee291c4d15799a88f246b9b541912319a4ab88d13b72630509db7ca",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-390-dark-optional-plugins.json",
+        "sha256": "77982513d23da7cddb648cc7b9394a75946ba5656bb3605d26d132507ce387af",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-390-dark-smtp.json",
+        "sha256": "e0e037098db457f6504bf073418c2ea1b6d601b969ddd6969d79715db79b6924",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-390-dark-storage.json",
+        "sha256": "a5c282233fa168294863bfe18215ff69f9b5f4157f8a40fa155075064f7b180d",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-390-dark-subscriptions.json",
+        "sha256": "cb4d83c116e4520190f77d9334be47850a066879b8c29fbbdf60fd797efc461b",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-390-dark-users.json",
+        "sha256": "763ebf8347f84d49a1c7622397d8911b3f6be50b239543e069322d13f4be077d",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-390-dark-web.json",
+        "sha256": "33d02889391578898f0d76d66ed2ceb4baa1c23374ab6b6f72b2ea8959899f2a",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-390-light-ai-billing.json",
+        "sha256": "aa6109258dc12bfed3f3eb527819249e65251d173de0104417f1c89079bc9952",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-390-light-ai-tokens.json",
+        "sha256": "da6f4dafe18ab3407fe856d9bc35175771180cdc685c8195db44098e2b5d3651",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-390-light-aiQueue.json",
+        "sha256": "1450055b8dd66eb60de1a6a02339efc1bf4da89fd8bbc5f9543b80d7420604e3",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-390-light-diagnostics.json",
+        "sha256": "beb2033e909e0a2f6eff5826b10fa38aa0531af5c5429199e4e89613aa642c78",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-390-light-job-monitor.json",
+        "sha256": "4dfdb90c2ef45e47a1d3ae5c852122277c9c35c9034c36efc263e0ce6cc472c7",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-390-light-legal.json",
+        "sha256": "03de1f45c83178f97d667f9a5868bc8a2c51408468fd531d27b3465d804ce3c4",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-390-light-models.json",
+        "sha256": "0ef71fd1f1f92b7e8988e428b6744d512b7e749214dd8eab6dd5f3aed997cff0",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-390-light-optional-plugins.json",
+        "sha256": "852b11e8659ac3c91bddea7ac0b64fa05952582373b093bde5f2cf763a8c916e",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-390-light-smtp.json",
+        "sha256": "9146b9d606199cd0252b0a3fb2f02d07cd947faf9b5cad74f17386ee5fecd08f",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-390-light-storage.json",
+        "sha256": "721f4e87cf6ad8751ca3af732a7db4cf5ff606190e042e1152596191538a1405",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-390-light-subscriptions.json",
+        "sha256": "8cf6b704e746cd2328241403a02282d4a3a20b7e217551b10aca0c2741911a5f",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-390-light-users.json",
+        "sha256": "1502bc6ee3ab12e2a14fd2d3b04f5f3ab3d41c5f01c7de80a46fffe55b747ca0",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-en-390-light-web.json",
+        "sha256": "181853d9869b73b3b859646094f77e1eb27f38e70fc5d5cd81dcd7ea78da70d0",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-1280-dark-ai-billing.json",
+        "sha256": "915353a82abbe6cc94aa3718eaf95bfa3d5f77ddeb9496944b14c7026d8a3f61",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-1280-dark-ai-tokens.json",
+        "sha256": "bc693683dd5614de954444174c715a8637180b8419bf0cd3a85c2d10d510e1e5",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-1280-dark-aiQueue.json",
+        "sha256": "16d682c5ac472f6c148c25aa96844cbd6a51a1e6907c535963aa1b63b2ababab",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-1280-dark-diagnostics.json",
+        "sha256": "51a3fa1b135653817c096541b6b670022459a96fb5361b3ef8f6cfdf739668d6",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-1280-dark-job-monitor.json",
+        "sha256": "7a3e7faa4f6ca068ab8f1f57f0d542dcb6720aa136942a519c68f837d8ac5aa3",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-1280-dark-legal.json",
+        "sha256": "5577d3f7ffd74792e159bcd0f7771840a09ea497e205080b4c3348e15759919a",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-1280-dark-models.json",
+        "sha256": "0b58a6faf448ba2611fa3cd04d38ad0eb5f1ff6b260b06f60a9f948f52cce994",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-1280-dark-optional-plugins.json",
+        "sha256": "70e809b4c455f3b3fcdd990bf10c891356f5c1d8fe3582de32ff39ae37253101",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-1280-dark-smtp.json",
+        "sha256": "3eafe76d14e7e5bf61fe2915904f20936d4b91a2779d9176a6ca1faff70725f8",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-1280-dark-storage.json",
+        "sha256": "72bd32df7fcd8ce11791d0ee14563370f5e9660a49ea12b5744cef4fdd7c31ef",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-1280-dark-subscriptions.json",
+        "sha256": "f45c5cda9fd77bcc5f9aac7bdf56ffff43a2e182e37ae761ecbcf3bda5bdee51",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-1280-dark-users.json",
+        "sha256": "9f87c39b4d97263fbafa3b361a2a37687b0fbd44f200e2b1bab856240a97a19c",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-1280-dark-web.json",
+        "sha256": "76d809c896723d9ce1f016499257cf18adb63b1880d47b02efbce78d1d724d17",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-1280-light-ai-billing.json",
+        "sha256": "9a23c8ea8acf53aa6ff3ef28029574bd60404fe66a97ffb3ca8a95fb7c16ee68",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-1280-light-ai-tokens.json",
+        "sha256": "59fa3a763fb0ac861b81df3b782191c01ba574685f50d0e370aca0a664eed112",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-1280-light-aiQueue.json",
+        "sha256": "1740bd5a056fa4f64be05bebcc5aa0eeeeab217ba6773c218460a95c02469b5d",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-1280-light-diagnostics.json",
+        "sha256": "72f7a3bbbca146298dac016dcc6a1bd07ef4cfe143c9430127cce0f7649e2032",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-1280-light-job-monitor.json",
+        "sha256": "422b2fcf6c7b8181412c0b18049849ac84c7d7c04cdc14820d9f7d2b053ab7a3",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-1280-light-legal.json",
+        "sha256": "97ef750bc8abaa1c14a8fca9d8fb69c4bc9364a11bec6ffb07f27a11d1b4efc1",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-1280-light-models.json",
+        "sha256": "483c646f82928a684d889eda591ac430220ecd93f461685cdccfb65325fc0cad",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-1280-light-optional-plugins.json",
+        "sha256": "cf52ec9b2ccba7dd0fa6ed5be7958812bc2594cb059f1c7e5281e490218573da",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-1280-light-smtp.json",
+        "sha256": "6c1e1b67fc8b86f6326b19fbf41108b75310c68223fd80b3cc5b9ebe70ae0532",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-1280-light-storage.json",
+        "sha256": "d33034dee834d95e874edcc1533856343c9139156bf4744fcef4935707258624",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-1280-light-subscriptions.json",
+        "sha256": "77e5b228a4bd0f6d94df89644513e3e73f3d1bf827dab7249b69fd328838262e",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-1280-light-users.json",
+        "sha256": "1dea2ffb2b6d96cd8ee936cd6f70316bb8531c3e86aa9a822d201653509ef218",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-1280-light-web.json",
+        "sha256": "b4b275d7cb4e08f295cbda88ee2e29c022d8e1a5906bc3b1f7080ab422c935b3",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-390-dark-ai-billing.json",
+        "sha256": "39b278f8509b3db7ccb880bea78d3e570897fd778860f62882e89401278ef423",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-390-dark-ai-tokens.json",
+        "sha256": "24c9cb258f7acd3d6a5fcfbeaf77eec87b8e5521cef4b02c4bdfe760edd9047b",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-390-dark-aiQueue.json",
+        "sha256": "511e1effd1a4f9834c7d63af2e39ebd7f9f0ca85ca915c18d134095e61b66143",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-390-dark-diagnostics.json",
+        "sha256": "08747f772e4570286551937f3001ed190b16bd8256b553a639bec4f49acb18be",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-390-dark-job-monitor.json",
+        "sha256": "6e9f6478692d0dc4140a5128cc0b9b768789f24b48750a81ddaf068bd913387b",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-390-dark-legal.json",
+        "sha256": "18746b22bf5ada2c6c345e3d44afd14eb74365db6ecdba60119302ba4d795ba3",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-390-dark-models.json",
+        "sha256": "c523fee972a41a10269600d3de189270d1e9d9cd04c2499e20886383a65b37e0",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-390-dark-optional-plugins.json",
+        "sha256": "dcff7b5bd59d939cd4afde0cffc9c1b3adac56043109b47643348b62819977be",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-390-dark-smtp.json",
+        "sha256": "1208d25368d3d1fe9cbb17f7c7e8d35b9d8159b98652d3a0e025161563ca09c0",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-390-dark-storage.json",
+        "sha256": "f2d56427fcef8668f5d3f11d4be51d5844262d1e29bceb070c5f92071c3fbb10",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-390-dark-subscriptions.json",
+        "sha256": "23d0ee454811167ad63b5eb5f5f84330b169aee81b4e8d0db38f3b58b53d3a00",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-390-dark-users.json",
+        "sha256": "29dac7696cf2e6390703af4ee5d9f91e864688bb44773b1e9739d755fc9de214",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-390-dark-web.json",
+        "sha256": "2eb6c135a66c4cd58bd683484287d94e779273fa9be0b22ddec4ab9d4b9ecd89",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-390-light-ai-billing.json",
+        "sha256": "78ef7efff21caa7fb08b27f505c865a7c7380f166d4a65f189960ea1990510f8",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-390-light-ai-tokens.json",
+        "sha256": "c583ae38d259141408c613f0137b4d954f31bb8ab1269d79f1f272fc6d7104dd",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-390-light-aiQueue.json",
+        "sha256": "b746be4eb95bb4f82800eb20ffba686b01d8147893f724c4c997d2bc6a8a12f3",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-390-light-diagnostics.json",
+        "sha256": "d0f209e8c130d074f4f02b2156041aa4fc0cf900a4db715f139662cbbfeaea13",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-390-light-job-monitor.json",
+        "sha256": "940ee2458a8621fc865c409300804b88d99c92bec297e458d11c1f10401f061c",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-390-light-legal.json",
+        "sha256": "33f0ffd7d83c69a912604040bcdc40570c60ecc7dbc4683e980088178270e0ec",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-390-light-models.json",
+        "sha256": "25ca2a036a5f309816fb342779038a5498a6a8a89c3f2d94de19f4e6794b2284",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-390-light-optional-plugins.json",
+        "sha256": "5df1b569b1b93c4bb1ab08f69d524ee20dc8182b384048f03dd2d635fb0f4b20",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-390-light-smtp.json",
+        "sha256": "5b7cb1c43394eef0e0f7d59dfb7d7a3e2329095ebb512e75a844a0eaadc92926",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-390-light-storage.json",
+        "sha256": "26f50896c66b862bddcac95c4ffc32767e0d767f3235f46482df7c76aecca6d4",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-390-light-subscriptions.json",
+        "sha256": "4e5d96bba8d354e39201f1581c6ffd8daf34e3ca8ade0b43d5df0159ed21f720",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-390-light-users.json",
+        "sha256": "7a4f8bd1d2918a6cb360a7cafd2643f11a39ca1ebc36d45e793229610b2a0f3a",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/commercial-it-390-light-web.json",
+        "sha256": "b7325aad83770a460f9afa73652ab2d8e0b4fe5163423c7b852b6994101e9814",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-1280-ai-billing-recovered.json",
+        "sha256": "9559471bf52f1ccf2d89d60593ca093a1556cb6fb33d05dbcf76edab727e57a9",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-1280-ai-billing.json",
+        "sha256": "b15952dca2ef4fdf66c827144aaa7f39fc278eb4e1f3a195f57f478d141769c3",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-1280-ai-tokens-recovered.json",
+        "sha256": "e90c2bb61cdb2aff2056104835bd09edc959065f8c72e6ce83afb910c8541ac1",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-1280-ai-tokens.json",
+        "sha256": "c7b61a2bfc86ff4aecf54dd5ac0033642ee2e8fbbc2c9b1ec5e1dee74fc542e9",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-1280-extra-demucs-models-recovered.json",
+        "sha256": "7666023535d8e1d2d47856a23d31398ebe2bbd4483b7676ddcf025c83810aa96",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-1280-extra-demucs-models.json",
+        "sha256": "2456b0576808f1bc7044d41b0875d5ba975405594b4be6e13989895dc01857ad",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-1280-extra-jobs-recovered.json",
+        "sha256": "8fd58ed549932d9c2d6e3b6dae1353c09def9a2673ced2cb7e21512d1ce44822",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-1280-extra-jobs.json",
+        "sha256": "4be2c064adda69fd7653cfffc8142a667a847d22d99cdae652dab09a745d39ac",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-1280-extra-legal-settings-recovered.json",
+        "sha256": "df70eb90a290089304cd1ea0783b784e105688c5eb3fd40aa9488c894ca72e18",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-1280-extra-legal-settings.json",
+        "sha256": "42dadd1cff7f0c77c2d08119a6a8d07668971406fdcb89a268a64a0e33d7a4f2",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-1280-extra-settings-recovered.json",
+        "sha256": "f1224a690ece1294023f4bc91d73551bbb6f20453617f902273fb8d6b9b76561",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-1280-extra-settings.json",
+        "sha256": "878d37f0fdf3125af73f428c915a626357402bcac48b630f8b98e00910215e71",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-1280-extra-social-login-recovered.json",
+        "sha256": "220f79e045d5af66a57e559f6a34a07563dd3ec9ecc7de7ad58de19c49462a71",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-1280-extra-social-login.json",
+        "sha256": "e028cba0b1e4db708fab12fac21530ad2b147b96002a4059a41a4b8cde4b713a",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-1280-extra-subscriptions-recovered.json",
+        "sha256": "093a9e70f87ec21006bd05d29da53613a4e1183a466c44e52a0e3bc8e54acd59",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-1280-extra-subscriptions.json",
+        "sha256": "1883597da2a7c3f5a8c586538841c5bc8626f005f2438766d7525701abae7d53",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-1280-extra-web-settings-recovered.json",
+        "sha256": "7eeaee70e6928ca5329b83e67cb4b7fe390b044404cb712870bc6cad657f28be",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-1280-extra-web-settings.json",
+        "sha256": "59f2942255e0e31fbf627e612c95e2f19ca484c49fbc2f9e0739d4603c41fed1",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-1280-smtp-recovered.json",
+        "sha256": "b7260c72a554b4f1a1e5ba080e10bf1ea999cd8f4379f721b3f60d90341224ce",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-1280-smtp.json",
+        "sha256": "bc7aa6f63e055b68f73b481a8e8e595795bcd38f8375d194f8e2c0d30262fd4a",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-1280-storage-recovered.json",
+        "sha256": "234f5ac786d6d5550c342bd0217b28030c98f7e9573ff3635283d6c3902c79c1",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-1280-storage.json",
+        "sha256": "1e1666058b360b29ad0a52a0432e5014c939eec6200c6c24bd519259ff3e3287",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-1280-users-recovered.json",
+        "sha256": "92ec9e5a3ba1960313a689527c678abb1f2e9bb5973837f2593ce2350d8bea88",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-1280-users.json",
+        "sha256": "1347a3b52c69731444827cd455795d77ba6ece4ceed14860b7d71ca5771f4b43",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-390-ai-billing-recovered.json",
+        "sha256": "85dad1c2348523c1aeac9c8c27b5408db1d246cbdc3b737933e7ab97d2874939",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-390-ai-billing.json",
+        "sha256": "98771f49216ce4392c5bc7ffe255c1c3c93edce584568906b3b846b545c2c86e",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-390-ai-tokens-recovered.json",
+        "sha256": "e0ee5e443ffe4cdc83c4bc74b6e77c1888c82176f88c95a643b23fee1f906e90",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-390-ai-tokens.json",
+        "sha256": "de97f22a0730450d0a210ff42606dbd7b439cffacebe2dd6cf68ce2f39e1a46b",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-390-extra-demucs-models-recovered.json",
+        "sha256": "a436d48b5c11a9cecc4994d01cbc83729f38569278cc4d83f200f47bfcdf53ba",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-390-extra-demucs-models.json",
+        "sha256": "cc223c2b64b1f77ae084fd19fbfb080296653e513afecd35cee6975a6a701f35",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-390-extra-jobs-recovered.json",
+        "sha256": "9f927365841dfcb290ae631d6f12f0ffead56ed772dc09451a5ad5c8d1a06466",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-390-extra-jobs.json",
+        "sha256": "cce6dee2cd9f09cec8daa3f4ff97f98c901983669ec3955dc08708630cee8d86",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-390-extra-legal-settings-recovered.json",
+        "sha256": "296601df8617e575e61d2be24cb94588064372d1a70a7b6530c117208493b630",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-390-extra-legal-settings.json",
+        "sha256": "d4cf2db2d82ffa3a7facb61c0e313bd9f41f5ea54e3c32ff944517d65412649b",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-390-extra-settings-recovered.json",
+        "sha256": "4235b93b9ecc46a36cace19bae94f74b299436da42c8f92f1fca811c5a5218d8",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-390-extra-settings.json",
+        "sha256": "8681ba6bb9f5cf1d9a5558504ad191b9f8b940594f32e02f1c21891ca69e40f1",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-390-extra-social-login-recovered.json",
+        "sha256": "16323b106c73a07d6be43cc32b3af629b6a5922dd5c0a53faedb3ed354d447e4",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-390-extra-social-login.json",
+        "sha256": "fddee6f985f7c53d0cc2d77bf66f719e1ef284ac1da512d0fb96bee6a8d20564",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-390-extra-subscriptions-recovered.json",
+        "sha256": "63b32d914328459df1663962a86aee54bff5325d8cf2c68384f99a8f9f0ac2c4",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-390-extra-subscriptions.json",
+        "sha256": "2aea2591000dbfd2f79b901813bd7b9994245ef35b57218bab1b12d231662cef",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-390-extra-web-settings-recovered.json",
+        "sha256": "6a78dfe43e912457c742823160828b4ee253713cf436fab716b1502458a74107",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-390-extra-web-settings.json",
+        "sha256": "2fb1c1e70d1fa343baef89f5b2a5edb7d30a60cab450a1df98fca7a8b71e37cc",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-390-smtp-recovered.json",
+        "sha256": "723a1f3f1fcfa496adc93f8449df0a8161204c8df6467a2f32c66dbf13de9df4",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-390-smtp.json",
+        "sha256": "61582b5459b7cf625f3376228c2e168c15b1bb7068b1ce05f28053632cb75c2f",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-390-storage-recovered.json",
+        "sha256": "1d962511a94c22d205fec27abb066e9e52a262e43957a21f4c1aef0953d93297",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-390-storage.json",
+        "sha256": "2bb1dbfe6d4a161b1d516960a93a20357987449f398ca87de539344a273484af",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-390-users-recovered.json",
+        "sha256": "1ce2fb62120f4665f8e81d7e23d718281dc45781be73b082e5b9d2c6fd3d98a5",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-en-390-users.json",
+        "sha256": "5806a5ee06a25f832d2940b4deb31df8e42b4a197ad2586d96e9541dc88403fe",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-1280-ai-billing-recovered.json",
+        "sha256": "2a6885911266802c1696aebf91bfce99ed2d8becb56fd6c2d52aa12b7ffe78b8",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-1280-ai-billing.json",
+        "sha256": "88913e36d9417f28d43c9adb6e1dded398f82a4b0c9899ce89c466955582821c",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-1280-ai-tokens-recovered.json",
+        "sha256": "be1942d64b22fc92103fbc34551e4a8d5566824e145e1595bf56b7c3aff6f391",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-1280-ai-tokens.json",
+        "sha256": "fd9b79b1a641084e16e43c7796cdd68f34f73029f48c419c3c994bd692f962f2",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-1280-extra-demucs-models-recovered.json",
+        "sha256": "0a38d489ce762c2359519d3d31efe43b73201e10926349e04f21c78fbafe3b35",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-1280-extra-demucs-models.json",
+        "sha256": "676fb8af114bbf3ccad86c3f144d6e78c85bad4c22663dd34d558781b39cd16b",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-1280-extra-jobs-recovered.json",
+        "sha256": "4a6b5f955f88a6c2f5b2bf8f3b2724cfa36af883fd74bf85eacc77447de846cb",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-1280-extra-jobs.json",
+        "sha256": "274e752b1c40336462fbaf594d9a579fa2e4c9ca75e056c33000f8af9928d763",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-1280-extra-legal-settings-recovered.json",
+        "sha256": "da2b8143dd1a3a77cf4f5b63882f6c2c1c4c672fc4d72116cac56f8224661e8b",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-1280-extra-legal-settings.json",
+        "sha256": "dc9002039904b852e12890e814dc2d892c4025360ad085bec5d4bb53b8830bba",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-1280-extra-settings-recovered.json",
+        "sha256": "4c12ca23dbaa3635716d6e37e860c666a727941f4edbd45eff4eacc0105c7c03",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-1280-extra-settings.json",
+        "sha256": "033460c537508d2012ffe83fe4e2bd63457223c889083c105ab0c984593b5369",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-1280-extra-social-login-recovered.json",
+        "sha256": "39cd670f03bc5fbf4fa8171767c78198d2130f948b1f9c2187b602ae71955b9a",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-1280-extra-social-login.json",
+        "sha256": "b9912cdac774f54b1e17d991e98ea01bfee783cb0035590f43335703122f18a5",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-1280-extra-subscriptions-recovered.json",
+        "sha256": "d38efedfda2e9f094da68953c152b84e956b5628c48b3ec479e81cce4f7fadbd",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-1280-extra-subscriptions.json",
+        "sha256": "81d4599eedeb6e809bc587719b176bee58e14afb3009a8c6da783af00e33f585",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-1280-extra-web-settings-recovered.json",
+        "sha256": "74b2fb6e9ebcd4ea8157c3c670b64871f0f72172c3bd0f4400cf2f9445279d9c",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-1280-extra-web-settings.json",
+        "sha256": "8ead352b138f792f8698d9d3d0e8039bbfaa5a667b372fdb2a2f42e85039c66b",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-1280-smtp-recovered.json",
+        "sha256": "dbc944e1c857f449d311fe5038b06397be2669ef6d03100984f7211d1cdb349c",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-1280-smtp.json",
+        "sha256": "c756135fd06a97a0c6947cce553b6f6aa71e5b8627e9cece412a6b1174ec667c",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-1280-storage-recovered.json",
+        "sha256": "98d26b5bae7dd31048c7d7feff5a57a39ca08cedc034684e3f81fce932f14166",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-1280-storage.json",
+        "sha256": "b5b08ab52de404146c26c8a55d5943c5d9f6b33a21421cbd9baffa0fc93c146f",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-1280-users-recovered.json",
+        "sha256": "3cd0b3e4db129705714778d2e77a680bb21451f5c042ba5b2fc5c004df393072",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-1280-users.json",
+        "sha256": "ad98241c1a2be9bc7dbbf8fc17da08aeec82b55cc161d2da043fe30e0dcc0b96",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-390-ai-billing-recovered.json",
+        "sha256": "e58389d2b03ad6d41f30187284167642b78c67fba67381ee78de6d1b289b4e92",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-390-ai-billing.json",
+        "sha256": "fae9dc3ca7417ab09b4e5622e4d6ce60a782ba88aa4bcc6e2c444d6b9132015f",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-390-ai-tokens-recovered.json",
+        "sha256": "1bf2badf6a86aeee3a4b727bb877e77024df0b3d0c44e4f77e9d04b51e0b0aee",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-390-ai-tokens.json",
+        "sha256": "fc02d181a8a34c0e696fb9f1458556e8345905c5afcfbbc8613fab78b411f0f4",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-390-extra-demucs-models-recovered.json",
+        "sha256": "32c85c5772dad9cbf02d38be1691a099d9d723bb53d0c7c5651cfd0d2058db72",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-390-extra-demucs-models.json",
+        "sha256": "798d652c29c817cc0837b8f66bc071fb2dcf9d641b43389e4464e7c76f3803e8",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-390-extra-jobs-recovered.json",
+        "sha256": "3789c41c21f9cea3beae01b5e670d61855e51968ad5260fc48a91b66083a05e9",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-390-extra-jobs.json",
+        "sha256": "b452aec4d338546348dfced6dd9bf5758246501130e834fb8ceaf047c6082222",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-390-extra-legal-settings-recovered.json",
+        "sha256": "6888caeab260d52024559e7978266c14f89dc03cf198c9bf5c7a23d747d3cab1",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-390-extra-legal-settings.json",
+        "sha256": "69c376b50a6d63c9c60130ee7b681a4214969018ca4851c502977e298c294296",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-390-extra-settings-recovered.json",
+        "sha256": "278e04ed2d8b3c983ccffdd5372dfae0d7aa8049e0818968c45c2b7028a2c9e9",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-390-extra-settings.json",
+        "sha256": "53a4e395d8d8c0f6505418b85e869e74e102f5b96776a9249672dc3cbf5cbe22",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-390-extra-social-login-recovered.json",
+        "sha256": "68e76ce681d94ed7bdc7177e0c11132c77e5a7f1772e32143cd5a3b48cfeac8f",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-390-extra-social-login.json",
+        "sha256": "64a8001c00b2adbb80af3badea23be7772b0225c530b7dddf459828ee9e711cb",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-390-extra-subscriptions-recovered.json",
+        "sha256": "abc51dc08ce164dc81e506efe83cd7d015877b925dbde5a61694fcea62f5aeb4",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-390-extra-subscriptions.json",
+        "sha256": "99adf1b4e19a847634707de245a1c32ff5947090141dfdb5a236538282b9f2d5",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-390-extra-web-settings-recovered.json",
+        "sha256": "3e36a0092e977c99e78c072aab93f5efb338063c403b2d00e583268e231ea925",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-390-extra-web-settings.json",
+        "sha256": "d5882ab44c67761f1e6d11fa6b53e92e445ec6a2033641b330aa73e93b01656f",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-390-smtp-recovered.json",
+        "sha256": "803d3488c82ab30e256d3656065bf914f8b678d095e8b1f63b6c05dbd519f3b4",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-390-smtp.json",
+        "sha256": "5c530a89850c1d74dc9af5446dc27439ee71f373d20124e089badc71cd4fefbb",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-390-storage-recovered.json",
+        "sha256": "8aac2b2d09a9c2eaa479e64e986589c3993c32f3fd6c472c9b6a259db1ad005e",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-390-storage.json",
+        "sha256": "68334fdad106e6ae201debe21138bc775f2a654651fbd610b6e8bb2e0cf57c10",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-390-users-recovered.json",
+        "sha256": "5b428877ab44a21303e7611e8ea158c1e1765122c318bb5449f17b8158a89932",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/error-it-390-users.json",
+        "sha256": "51bfb210d863990e1603aedc9eb5c828ab86418a4cd19db3b553fbaa7f369342",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-1280-dark-ai-billing.json",
+        "sha256": "04af74f9d35318107b6dfa143f0ff9419250bdd3c06786c521070ca41a133560",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-1280-dark-ai-tokens.json",
+        "sha256": "ce50951c06f28e12328f0dc9cd3b3d5fd31de13f97be32ec0ea47f2f5d0fa8c0",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-1280-dark-aiQueue.json",
+        "sha256": "aea91faedb16450d5497518c2eac8288fee99638b689ee825319503ccd9fcc55",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-1280-dark-diagnostics.json",
+        "sha256": "4b280dcd3bc7e8984fe054db0f30277601d7f9db5fed5523d27ad5eb1cf56a10",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-1280-dark-job-monitor.json",
+        "sha256": "44d76385d6c2982eb66eb94ce2e9634aeddbcfa2600e9b0cb8f77f38fca3c402",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-1280-dark-legal.json",
+        "sha256": "5a237a13bc79cb4c646a484de052c81a7cea02cc52f84eb4bbe81b2b3e5523d0",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-1280-dark-models.json",
+        "sha256": "89694fa6ff6286aede0b68b0576a01faecc9ab6621d97561cec8c5505710c953",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-1280-dark-optional-plugins.json",
+        "sha256": "e99e3c2dad1b7bf2d2e28a8abe0a1d454aed92879cdb8774148bb23678deb606",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-1280-dark-smtp.json",
+        "sha256": "e6ed6e894b6dbd4b6aaa36da2a3bcb7ee4c899a5ee9bf9a071ae11765c34842f",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-1280-dark-storage.json",
+        "sha256": "097f816781542d2dfd0bcd0ae9bf0a5c23b1fd19d2fe1c4b06c930a2b3211011",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-1280-dark-subscriptions.json",
+        "sha256": "18a4b6e9bfc96f254df0fe2510e689aa080bdabc931161d2273d8813de232e2b",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-1280-dark-users.json",
+        "sha256": "610a7bc891f94096ab91ec2ad2709f1bab948d08b5d1b88cf06fddfd1954042a",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-1280-dark-web.json",
+        "sha256": "b9ff4efc8efe7e75059342250937f33a4925f59c4f9bdc2e90fe6c7f4989d6af",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-1280-light-ai-billing.json",
+        "sha256": "910f5264f997279895729d7713eb2779f0b7743c6be641006be162a25dec9f9a",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-1280-light-ai-tokens.json",
+        "sha256": "ea245985bc3ec3630a619c8a789b9798eccca06569ddde75a5ec17cec8badfe3",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-1280-light-aiQueue.json",
+        "sha256": "6383b9df98b94331ec6e4e9a94eacf884baadb1164f4f01def46c022665111f3",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-1280-light-diagnostics.json",
+        "sha256": "f2d1b8506bcc785c60665bcc0c6cf305bb6f7f42fcf30da10de93f087acfc5da",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-1280-light-job-monitor.json",
+        "sha256": "3a5488045e94d1cafbf19882ed420e18e278d732192bd8194d051a097f476741",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-1280-light-legal.json",
+        "sha256": "12e7cd053ed375438afd4d69f2b4e1f3a589e946531f72bd467169d90e60876b",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-1280-light-models.json",
+        "sha256": "e9b36da042fb5eee76c27b91ccbce4a9d17048e85c26d6d5bd52ff5a6e8b96ec",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-1280-light-optional-plugins.json",
+        "sha256": "a6692fd778bfe1c9e3d6d8223b33e0730dc2a01bd986a0403a59e8ec1645d2e9",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-1280-light-smtp.json",
+        "sha256": "46cdf9773077133f16bca41987f4afd7a26aefd7bd4cfafbb1f97a29f6f5f65b",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-1280-light-storage.json",
+        "sha256": "0c25f4e3aedcdda62b4ca697bc7155d7275c6cff626961e68ac6fa8877b3b99b",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-1280-light-subscriptions.json",
+        "sha256": "319459d7563ebc6be3fed65614237619178048d20ecf19a08b506130a3580571",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-1280-light-users.json",
+        "sha256": "093dc62d0157f59d1ad0802730c39ceb399dd60f9e111f4a46fffed8efc2d963",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-1280-light-web.json",
+        "sha256": "bdf28b2777ecacaeb520b1ecc16896778ca3a5bb97fbb705658fc8103955c559",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-390-dark-ai-billing.json",
+        "sha256": "c540e180922cfb31eb3d9a0890e8d66350a07c0444a081e97dca94b23462ffad",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-390-dark-ai-tokens.json",
+        "sha256": "6cbe01e569d1f19bba4a37e9bdca950ab4d204ca44b1bcc7a19f9e5ef742212c",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-390-dark-aiQueue.json",
+        "sha256": "3bd32285c4442d985861bf3ec68ee91ef55ae8fe0097e44a4cbfd64e940b52da",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-390-dark-diagnostics.json",
+        "sha256": "7c1dc420c63a5b5d842da62bb69df3d261a98ca9c4f646cfb892efc6a1186015",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-390-dark-job-monitor.json",
+        "sha256": "176539cff1248aa1fdc4eabbffb913d01358466a53af8899b2c4de009feb2728",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-390-dark-legal.json",
+        "sha256": "3a1d6a47f14c698b4733e713810ce9bf460a5a4d98f89ea8a254411138826418",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-390-dark-models.json",
+        "sha256": "f1cc4a07970e82d22700d8326290cb06fa926ba686afecc07eb612dfb716c146",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-390-dark-optional-plugins.json",
+        "sha256": "dc80d3b72cdfd30357e82bb0c77bc22b4ae3b62d11e2ff2069d355da2a4e1c8c",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-390-dark-smtp.json",
+        "sha256": "80dd2b98ac25019235d8f48cadcb5691d65b69907588c2c028a99b315f63f98e",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-390-dark-storage.json",
+        "sha256": "4c910f97b45986d862b0d6c7d80b9c776e48ee2dd856e12042138acba032dd45",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-390-dark-subscriptions.json",
+        "sha256": "2f7a827e31cce5bf7ca4cee3263e11020f98410aadfa2e1f6cb0d980cb91687e",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-390-dark-users.json",
+        "sha256": "01b6b8af4288cf7af1513076a7a6cef8987dade6f661ec7a31bbddb978a9e661",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-390-dark-web.json",
+        "sha256": "13ffa8145618f6dc04111c2ea916d073e431ee3014566d94d761ea3dde593d8e",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-390-light-ai-billing.json",
+        "sha256": "8610c3862979c390864d2ca76da84af2a83a885445ccbebcc30042f027961f47",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-390-light-ai-tokens.json",
+        "sha256": "6053d1833d7f5ffbcdc685362300d642ae23d2dc772d73e386f7b3dc5c72ebfe",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-390-light-aiQueue.json",
+        "sha256": "8b5c1bdc696ed49e18fda12f4c657b8d25b393a1b17d9fc21c6a17adaf5f65ff",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-390-light-diagnostics.json",
+        "sha256": "4db84da32112a42ea789072f271fab6770935bd983ad4e76c83fee73d62e6630",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-390-light-job-monitor.json",
+        "sha256": "dd2f7fd0dff31e0f3e174817e62f9548f382c4202c17862135c47a0e55772a59",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-390-light-legal.json",
+        "sha256": "af076ab61e6020fb4ec53f217ffd49ec03a4eb770f91deacaeb18fcad2b57d20",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-390-light-models.json",
+        "sha256": "a37db57e980c9c9ec145a3afcd5fbbcb2908af8d5caebe3d57732130a3832632",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-390-light-optional-plugins.json",
+        "sha256": "260420e685721cf458d3f3fc015aae6444cb3ee85979b6e621b6889f794decdc",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-390-light-smtp.json",
+        "sha256": "e2043e0ae728ef8b40d395bbb90104fe9f716e33008cd846ec759755e4e073ab",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-390-light-storage.json",
+        "sha256": "ec25bb608a86569ae30bf4a42e0a4c4735464bea1349e5753570c2daabcd1b81",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-390-light-subscriptions.json",
+        "sha256": "55db9c1dd487434199a17acba862d91139646ea4c5fcde343a2e4ac738e6e282",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-390-light-users.json",
+        "sha256": "56e42de4fc7d1dda3027056ea269b5cf593f2e64fe373d34184bf4b0ca6e9b69",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-en-390-light-web.json",
+        "sha256": "4dac9009b86824ec7f4a8e8745c0dfa3e5e2e9fdac992de93b9b61b843185e85",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-1280-dark-ai-billing.json",
+        "sha256": "ef36b70340451d64fbc71878078989f8b01e264816565496b633d0fe8846d742",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-1280-dark-ai-tokens.json",
+        "sha256": "129062a66c5a661e2a68fdd5a38dfe35982e32efaa01f2d7450440c55deded37",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-1280-dark-aiQueue.json",
+        "sha256": "754c12f7d1fd1c6ee99df6797d29ec661461dbf3b9e3236d51774f85f4337afb",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-1280-dark-diagnostics.json",
+        "sha256": "8ef14aea96d41376c22f3fc81f5b6d53ed586893c53c9d934dabe6eefe98562c",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-1280-dark-job-monitor.json",
+        "sha256": "f4c6be9d68c7466d76f61c7a4369fb50eedaca055a0367d8b64d3adfa82609cd",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-1280-dark-legal.json",
+        "sha256": "b808c7d465382adb324a17487d5173e3d0c82c7baed99aac9ed3afcb67800b7b",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-1280-dark-models.json",
+        "sha256": "9fbc19437e89d481b67f2003cd9e0ab13a75e1882606fbd6ffe0af19d2b76542",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-1280-dark-optional-plugins.json",
+        "sha256": "bf4772c8b0163057493704da2c7dbc63843214d9845015a16419d07446f2fada",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-1280-dark-smtp.json",
+        "sha256": "d9a3bd13246e901553aada7c9a9c61158ed6d801a4196981259068bd535cdac0",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-1280-dark-storage.json",
+        "sha256": "c541c09730ee6403c6bd6a6e26528f4c40bf42ba98d0d0f23481158fae41017b",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-1280-dark-subscriptions.json",
+        "sha256": "bdd63c6bccd8a6a6e26ce1d66dcf3db6cde7fc90d72b8ce079b7bde53cb24d89",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-1280-dark-users.json",
+        "sha256": "34dd1b7112bfa805f2c3297b7aeb91f6aac4edbd737c05fc22149905d7b8d0fa",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-1280-dark-web.json",
+        "sha256": "3741951ef54e2cfc41dff54aa8cdcc1a84517dcea09bd31d9c7e82e2cad17cc2",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-1280-light-ai-billing.json",
+        "sha256": "0efedfe01bb785c31a86bf9fe22addec0ab72f896e3fe9cee96831847e51dfc9",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-1280-light-ai-tokens.json",
+        "sha256": "98aa23f8de5431779630dcb1f3e11884b91b5e376bbb34fc5e1b452d4118090e",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-1280-light-aiQueue.json",
+        "sha256": "43b3abb76f98bd8966c336a79f612e5b955398ba4adaa1a494f05f3cb2fa64fa",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-1280-light-diagnostics.json",
+        "sha256": "6b9435d90f1a50b3b68171d77aa55495c0d5f6f3ef262106425569a682c6eda1",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-1280-light-job-monitor.json",
+        "sha256": "bcf2450a50c69538eb37366b7728568fbe888521026017cd93e92f7e8cd00255",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-1280-light-legal.json",
+        "sha256": "688dd61d451641058c5f59ecbfd49124cb536e36ed2aa398280bcac267500759",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-1280-light-models.json",
+        "sha256": "d97c4765ddcfb4ceb0dc71190847c608a8c2215e87f1de152978b046c0700fdd",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-1280-light-optional-plugins.json",
+        "sha256": "ed953b8a10aec4a31e242d9975fdd375eee657b976ecda42446b44c04ec4cca7",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-1280-light-smtp.json",
+        "sha256": "318164fe7067bb70e9d93451a8f2b6994242a76d3efc527211d5c983df7ec186",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-1280-light-storage.json",
+        "sha256": "dd499394eb62398bbbfd4cee524d1be8df3e55b2acf120cf3bc4fcd721ddc5c3",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-1280-light-subscriptions.json",
+        "sha256": "eb155b79ef72666e21a954366b4308cec44a36b18a00fbba6055e3ac1e81f3b2",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-1280-light-users.json",
+        "sha256": "743c2c5b080f959ad117b9171ae25d476c17e1cd3ecb8f904918212e60b0b931",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-1280-light-web.json",
+        "sha256": "dd90ce551150eeb3995873eaa76433096bb9690300654eab4fc4f58085f452a9",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-390-dark-ai-billing.json",
+        "sha256": "38d8ff5df3d21acfe44d915230c0a5c65099dd6b27efa60af4cf1856ec1784fc",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-390-dark-ai-tokens.json",
+        "sha256": "9df090d5709f9b464ec53e042e6376438a6ca42ad20475499af1a5353d9a084d",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-390-dark-aiQueue.json",
+        "sha256": "4e7e7dd517ee157d4378e5b84cb8237645defdac991bf72d99e65b1f299b4c50",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-390-dark-diagnostics.json",
+        "sha256": "899057a4b0a96003bb351ac6584c1319eb1f990708d31d8d3fc315a06a694390",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-390-dark-job-monitor.json",
+        "sha256": "9898c54ef5fb890fa78b7870548530cc7fff563ee555900f24040c36a87b19fd",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-390-dark-legal.json",
+        "sha256": "0bbf85650e22eb87143452e88bcff3ff0ba11df93e725fbf8e1c593509a3a685",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-390-dark-models.json",
+        "sha256": "5478f23aa9c5d3cfa731748f52fbeab6678e1eccb9364e188cde87a469aa818f",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-390-dark-optional-plugins.json",
+        "sha256": "49ad568323cee748450f907e68d4aa65fce37a14fd4df36d00e4a214c3310b09",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-390-dark-smtp.json",
+        "sha256": "bc07cfefd6677dcaccc4d7b71ed12356e8d08b06fbdeebec9a3242023d07b3c3",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-390-dark-storage.json",
+        "sha256": "0b006229872f2cf70485029771287b0b75c01a836d1686d7969dec9a0d36787c",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-390-dark-subscriptions.json",
+        "sha256": "a755126f591bad146e2902bf52c3ddc98d4a5f4ab98b6cc668ab5305c631ead2",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-390-dark-users.json",
+        "sha256": "6dc7891d1ea87b8340e8da49962a79f325f514792998239554946939a342c1b0",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-390-dark-web.json",
+        "sha256": "061e4227add2f80fbb1bf8dffa7c37a981dfc78711895fc9828954b2f2cfa194",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-390-light-ai-billing.json",
+        "sha256": "a27705b312799d90665f2c4542e23e8b9dcca2658a2d49ca58b8f23332148a03",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-390-light-ai-tokens.json",
+        "sha256": "e92efef7416670d14af5132033eb35a930c93620579f087230016ea5d5c833b9",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-390-light-aiQueue.json",
+        "sha256": "54d01c9bbe5c5ab7005a4b2bd313be4f5d799e79b2a5e4b00dbcc9ec1b3d702b",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-390-light-diagnostics.json",
+        "sha256": "b07775630dddd8ca9e7b0a434c029a0fd1a253bad55308882770820e332457f0",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-390-light-job-monitor.json",
+        "sha256": "ac6d89b8a3dbc5b22f009916361ef2b9c138803972ae29e430a178d69f22c82b",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-390-light-legal.json",
+        "sha256": "a5d449d7c01ae33e371f954d6d35148e1a9179fc3c4516408b1dca6e4644cf0d",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-390-light-models.json",
+        "sha256": "bb28042acc0f22b397e84fec8a19863001fb7a39bd6c4e580e0932143fb06f91",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-390-light-optional-plugins.json",
+        "sha256": "7d27841763fb4a98ca42a4d150a74cbb8fc0b81b45a4dd0891fb7b6836d2b360",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-390-light-smtp.json",
+        "sha256": "6428d0753f6fc94ce4c3effd6d581a41206d69bfb1a3bab63eaa19a9bf6f661e",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-390-light-storage.json",
+        "sha256": "1feebec8d9bb51c5ec5915709952e2d3d90f7e2a9001db6967ecfed85e6b13c3",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-390-light-subscriptions.json",
+        "sha256": "d163b6f2010696178c511194e811cb66aafc2061268b41f83c8fdc8aec0add2f",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-390-light-users.json",
+        "sha256": "4b4f766086415c30f3b411cf542cb23ea79d9ce2a52b2a1c9330aeb821c4d1d0",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/nc-it-390-light-web.json",
+        "sha256": "9b857308a98fcb7a0f1d74ec4e68b5a84c36432930b421bd48819059b41f2003",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/workflow-en-1280-policy-readback.json",
+        "sha256": "cfdcc45a2b58b6a813554f86beaebe1966c3fca9e5b943d9ca11f7c7ed12c765",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/workflow-en-1280-quota.json",
+        "sha256": "c8cb582316191d1bede66783456f84246ea1c83fa533ee7f1125ccca88deac88",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/workflow-en-1280-retention.json",
+        "sha256": "0ade6c5c08d0b7090ae9bcfd8b0640aacd7f239587abf1762d39dbede83ac75f",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/workflow-en-1280-selected-contract.json",
+        "sha256": "c9220448d0e4aa481a013bd3044bae61a512374d3358c188b7497e414f4abae6",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/workflow-en-1280-token-created-hidden.json",
+        "sha256": "f604c5ac68b8320dcebeeb0d0aa9a515da12579fb20a71b54aed2f6848f5ed01",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/workflow-en-1280-token-revoked.json",
+        "sha256": "6a3c7c1e01c38ab4601e0569b6e92e439f9ffc27825db2b5a5a18681377ea4b7",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/workflow-en-390-policy-readback.json",
+        "sha256": "30f9542b338536de892f1c58e3047b00fcabb313718ed5340c708303fb3ec8f2",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/workflow-en-390-quota.json",
+        "sha256": "ae1771e4395726016463f033c492012e0c5f655af176dae130a5647ccb179a85",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/workflow-en-390-retention.json",
+        "sha256": "2d92c82dec3f212617aadb5cec7726f28019e9ac9ca1a89a8ae73d829159f87f",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/workflow-en-390-selected-contract.json",
+        "sha256": "05ff3946f7525b707e6d2b79ce0fd60156e3dcc592dada0909610796b78a4195",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/workflow-en-390-token-created-hidden.json",
+        "sha256": "da4c92eb9ad52c21f171c0f0629031cdb3e445fb1cf1c4cdb48cdb0f33052c1c",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/workflow-en-390-token-revoked.json",
+        "sha256": "64ca338eac535fd56b397f59016532c2f16a97ca9f28e88e2d79794c690c9249",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/workflow-it-1280-policy-readback.json",
+        "sha256": "e270c2df55ca04f3b19c5d237f9a69e5c64a6bf7fc1b8c5e2ea821cc4b37f3b5",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/workflow-it-1280-quota.json",
+        "sha256": "0760cb8cc24284a4edb870fd2d86036184a68f0a8ec5ed4a950eb62fd69c5a90",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/workflow-it-1280-retention.json",
+        "sha256": "d70b19337421a2d8490d4a6156a9a2af642fc7693003970dcb7cc1b561344ffc",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/workflow-it-1280-selected-contract.json",
+        "sha256": "c580cf1fe18e2d20c9b61ea0e315a23a174222df9ebaaff96097db2683526e98",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/workflow-it-1280-token-created-hidden.json",
+        "sha256": "d190966c94da4bd94b576861f42d1f0bd24380fcd842e8c8deedd6f0a9149095",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/workflow-it-1280-token-revoked.json",
+        "sha256": "1338e8d42922380abf2d8ded596d5a7a5b5f09ca426b1cfb3b7d735a9ac94a80",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/workflow-it-390-policy-readback.json",
+        "sha256": "087a184582af38506580d099e4dec97e70b57517b5f53c4bc2b2f648192afcaf",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/workflow-it-390-quota.json",
+        "sha256": "d8640260860cb04e50b870c30bce10c507a4c19877cc31188ea75ac2e55b6f3d",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/workflow-it-390-retention.json",
+        "sha256": "b38bbaa570ef82b5d9bf95de82f057b10e9c72482c9294280210693a7293947c",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/workflow-it-390-selected-contract.json",
+        "sha256": "96ba4ca26288806bab6d9d73f276d8351f39e96b131e5db33bdf7eabc9e184b3",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/workflow-it-390-token-created-hidden.json",
+        "sha256": "064cb22e95cb192ec19d412acc3eb3dccc1b7470e2b5cebe4302c0ce8636995a",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      },
+      {
+        "path": "docs/validation/r210/admin-axe/workflow-it-390-token-revoked.json",
+        "sha256": "d65f0390fd1c7e9e962b64b4705d27409a8b20da179da9c370ffc81fdc2b5be8",
+        "violations": 0,
+        "unresolved_supplemental": 0
+      }
+    ]
+  },
+  "cases": [
+    {
+      "id": "tests.test_r210_account_acceptance::test_actual_trial_contract_renewal_storage_overage_and_cancel[1280-en]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_acceptance::test_actual_trial_contract_renewal_storage_overage_and_cancel[1280-it]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_acceptance::test_actual_trial_contract_renewal_storage_overage_and_cancel[390-en]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_acceptance::test_actual_trial_contract_renewal_storage_overage_and_cancel[390-it]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_acceptance::test_full_account_and_credit_pages_regime_policy_language_and_keyboard[1280-en-active]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_acceptance::test_full_account_and_credit_pages_regime_policy_language_and_keyboard[1280-en-credits_disabled]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_acceptance::test_full_account_and_credit_pages_regime_policy_language_and_keyboard[1280-en-historical_nc]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_acceptance::test_full_account_and_credit_pages_regime_policy_language_and_keyboard[1280-en-nc]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_acceptance::test_full_account_and_credit_pages_regime_policy_language_and_keyboard[1280-en-no_plan]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_acceptance::test_full_account_and_credit_pages_regime_policy_language_and_keyboard[1280-en-paid]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_acceptance::test_full_account_and_credit_pages_regime_policy_language_and_keyboard[1280-en-permission_disabled]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_acceptance::test_full_account_and_credit_pages_regime_policy_language_and_keyboard[1280-en-trial]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_acceptance::test_full_account_and_credit_pages_regime_policy_language_and_keyboard[1280-it-active]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_acceptance::test_full_account_and_credit_pages_regime_policy_language_and_keyboard[1280-it-credits_disabled]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_acceptance::test_full_account_and_credit_pages_regime_policy_language_and_keyboard[1280-it-historical_nc]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_acceptance::test_full_account_and_credit_pages_regime_policy_language_and_keyboard[1280-it-nc]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_acceptance::test_full_account_and_credit_pages_regime_policy_language_and_keyboard[1280-it-no_plan]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_acceptance::test_full_account_and_credit_pages_regime_policy_language_and_keyboard[1280-it-paid]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_acceptance::test_full_account_and_credit_pages_regime_policy_language_and_keyboard[1280-it-permission_disabled]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_acceptance::test_full_account_and_credit_pages_regime_policy_language_and_keyboard[1280-it-trial]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_acceptance::test_full_account_and_credit_pages_regime_policy_language_and_keyboard[390-en-active]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_acceptance::test_full_account_and_credit_pages_regime_policy_language_and_keyboard[390-en-credits_disabled]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_acceptance::test_full_account_and_credit_pages_regime_policy_language_and_keyboard[390-en-historical_nc]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_acceptance::test_full_account_and_credit_pages_regime_policy_language_and_keyboard[390-en-nc]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_acceptance::test_full_account_and_credit_pages_regime_policy_language_and_keyboard[390-en-no_plan]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_acceptance::test_full_account_and_credit_pages_regime_policy_language_and_keyboard[390-en-paid]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_acceptance::test_full_account_and_credit_pages_regime_policy_language_and_keyboard[390-en-permission_disabled]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_acceptance::test_full_account_and_credit_pages_regime_policy_language_and_keyboard[390-en-trial]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_acceptance::test_full_account_and_credit_pages_regime_policy_language_and_keyboard[390-it-active]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_acceptance::test_full_account_and_credit_pages_regime_policy_language_and_keyboard[390-it-credits_disabled]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_acceptance::test_full_account_and_credit_pages_regime_policy_language_and_keyboard[390-it-historical_nc]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_acceptance::test_full_account_and_credit_pages_regime_policy_language_and_keyboard[390-it-nc]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_acceptance::test_full_account_and_credit_pages_regime_policy_language_and_keyboard[390-it-no_plan]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_acceptance::test_full_account_and_credit_pages_regime_policy_language_and_keyboard[390-it-paid]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_acceptance::test_full_account_and_credit_pages_regime_policy_language_and_keyboard[390-it-permission_disabled]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_acceptance::test_full_account_and_credit_pages_regime_policy_language_and_keyboard[390-it-trial]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_acceptance::test_profile_locale_roundtrip_refreshes_every_owner_financial_panel[en]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_acceptance::test_profile_locale_roundtrip_refreshes_every_owner_financial_panel[it]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_accessibility_acceptance::test_actual_owner_pages_wcag_axe_and_named_keyboard_surfaces[1280-en-/account-commercial]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_accessibility_acceptance::test_actual_owner_pages_wcag_axe_and_named_keyboard_surfaces[1280-en-/account-nc]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_accessibility_acceptance::test_actual_owner_pages_wcag_axe_and_named_keyboard_surfaces[1280-en-/account/credits-commercial]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_accessibility_acceptance::test_actual_owner_pages_wcag_axe_and_named_keyboard_surfaces[1280-en-/account/credits-nc]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_accessibility_acceptance::test_actual_owner_pages_wcag_axe_and_named_keyboard_surfaces[1280-it-/account-commercial]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_accessibility_acceptance::test_actual_owner_pages_wcag_axe_and_named_keyboard_surfaces[1280-it-/account-nc]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_accessibility_acceptance::test_actual_owner_pages_wcag_axe_and_named_keyboard_surfaces[1280-it-/account/credits-commercial]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_accessibility_acceptance::test_actual_owner_pages_wcag_axe_and_named_keyboard_surfaces[1280-it-/account/credits-nc]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_accessibility_acceptance::test_actual_owner_pages_wcag_axe_and_named_keyboard_surfaces[390-en-/account-commercial]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_accessibility_acceptance::test_actual_owner_pages_wcag_axe_and_named_keyboard_surfaces[390-en-/account-nc]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_accessibility_acceptance::test_actual_owner_pages_wcag_axe_and_named_keyboard_surfaces[390-en-/account/credits-commercial]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_accessibility_acceptance::test_actual_owner_pages_wcag_axe_and_named_keyboard_surfaces[390-en-/account/credits-nc]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_accessibility_acceptance::test_actual_owner_pages_wcag_axe_and_named_keyboard_surfaces[390-it-/account-commercial]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_accessibility_acceptance::test_actual_owner_pages_wcag_axe_and_named_keyboard_surfaces[390-it-/account-nc]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_accessibility_acceptance::test_actual_owner_pages_wcag_axe_and_named_keyboard_surfaces[390-it-/account/credits-commercial]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_accessibility_acceptance::test_actual_owner_pages_wcag_axe_and_named_keyboard_surfaces[390-it-/account/credits-nc]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_lifecycle::test_email_change_reserves_old_and_pending_email",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_lifecycle::test_email_mfa_onboarding_precedes_admin_approval_and_blocks_login_without_otp",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_lifecycle::test_email_otp_attempt_limits_cooldown_and_expiry",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_lifecycle::test_failed_purge_removes_uncommitted_sandbox",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_lifecycle::test_quarantine_removes_settlement_outbox_and_credentials",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_lifecycle::test_reactivation_requires_email_then_admin_and_does_not_restore_old_tokens",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_lifecycle::test_repeated_retirement_reactivation_revokes_each_archive_without_token_collision",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_lifecycle::test_retention_api_admin_only_and_self_deletion_forbidden_to_admin",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_lifecycle::test_retention_configuration_validation[settings0]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_lifecycle::test_retention_configuration_validation[settings1]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_lifecycle::test_retention_configuration_validation[settings2]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_lifecycle::test_retention_configuration_validation[settings3]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_lifecycle::test_retirement_preserves_identity_accounting_revokes_tokens_and_exports_projects",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_lifecycle::test_total_delete_admin_protected_and_explicit_confirmation_required",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_lifecycle::test_total_delete_one_confirmation_removes_account_and_accounting",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_account_lifecycle::test_totp_onboarding_guard_and_notification_outbox",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_admin_accessibility::test_entire_administration_axe_keyboard_responsive[dark-1280-en-commercial]",
+      "source": "admin-accessibility-delivery-2.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_admin_accessibility::test_entire_administration_axe_keyboard_responsive[dark-1280-en-nc]",
+      "source": "admin-accessibility-delivery-3.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_admin_accessibility::test_entire_administration_axe_keyboard_responsive[dark-1280-it-commercial]",
+      "source": "admin-accessibility-delivery-0.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_admin_accessibility::test_entire_administration_axe_keyboard_responsive[dark-1280-it-nc]",
+      "source": "admin-accessibility-delivery-1.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_admin_accessibility::test_entire_administration_axe_keyboard_responsive[dark-390-en-commercial]",
+      "source": "admin-accessibility-delivery-2.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_admin_accessibility::test_entire_administration_axe_keyboard_responsive[dark-390-en-nc]",
+      "source": "admin-accessibility-delivery-3.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_admin_accessibility::test_entire_administration_axe_keyboard_responsive[dark-390-it-commercial]",
+      "source": "admin-accessibility-delivery-0.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_admin_accessibility::test_entire_administration_axe_keyboard_responsive[dark-390-it-nc]",
+      "source": "admin-accessibility-delivery-1.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_admin_accessibility::test_entire_administration_axe_keyboard_responsive[light-1280-en-commercial]",
+      "source": "admin-accessibility-delivery-2.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_admin_accessibility::test_entire_administration_axe_keyboard_responsive[light-1280-en-nc]",
+      "source": "admin-accessibility-delivery-3.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_admin_accessibility::test_entire_administration_axe_keyboard_responsive[light-1280-it-commercial]",
+      "source": "admin-accessibility-delivery-0.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_admin_accessibility::test_entire_administration_axe_keyboard_responsive[light-1280-it-nc]",
+      "source": "admin-accessibility-delivery-1.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_admin_accessibility::test_entire_administration_axe_keyboard_responsive[light-390-en-commercial]",
+      "source": "admin-accessibility-delivery-2.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_admin_accessibility::test_entire_administration_axe_keyboard_responsive[light-390-en-nc]",
+      "source": "admin-accessibility-delivery-3.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_admin_accessibility::test_entire_administration_axe_keyboard_responsive[light-390-it-commercial]",
+      "source": "admin-accessibility-delivery-0.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_admin_accessibility::test_entire_administration_axe_keyboard_responsive[light-390-it-nc]",
+      "source": "admin-accessibility-delivery-1.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_admin_queue_social_smtp::test_active_job_cannot_be_excluded",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_admin_queue_social_smtp::test_admin_routes_authorization_and_smtp_submission",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_admin_queue_social_smtp::test_admin_ui_search_selection_and_pagination_in_node",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_admin_queue_social_smtp::test_bulk_is_atomic_and_rechecks_search_and_closed_invoices",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_admin_queue_social_smtp::test_deleted_tombstone_cannot_be_restored_by_stale_admin_selection",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_admin_queue_social_smtp::test_disable_restore_delete_really_excludes_accounting_and_token_totals",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_admin_queue_social_smtp::test_excluding_gpu_slot_never_reallocates_charge_to_other_user",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_admin_queue_social_smtp::test_invalid_search[args0]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_admin_queue_social_smtp::test_invalid_search[args1]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_admin_queue_social_smtp::test_invalid_search[args2]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_admin_queue_social_smtp::test_invalid_search[args3]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_admin_queue_social_smtp::test_invalid_search[args4]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_admin_queue_social_smtp::test_late_ledger_replay_keeps_queue_exclusion",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_admin_queue_social_smtp::test_model_catalog_does_not_call_missing_weights_zero_bytes",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_admin_queue_social_smtp::test_model_inventory_counts_shared_weights_once_and_not_runtime",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_admin_queue_social_smtp::test_queue_search_and_stable_pagination_over_500",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_admin_queue_social_smtp::test_readable_social_help_is_served_only_to_admin",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_admin_queue_social_smtp::test_smtp_refused_recipient_is_not_success",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_admin_queue_social_smtp::test_social_disabled_by_default_encrypted_and_blank_preserves_secret",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_admin_queue_social_smtp::test_social_rejects_unsafe_redirect_base[http://mta.test]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_admin_queue_social_smtp::test_social_rejects_unsafe_redirect_base[https://mta.test/?x=1]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_admin_queue_social_smtp::test_social_rejects_unsafe_redirect_base[https://mta.test/path]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_admin_queue_social_smtp::test_social_rejects_unsafe_redirect_base[https://u:p@mta.test]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_admin_queue_social_smtp::test_social_state_is_single_use_and_pkce_is_bound",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_admin_queue_social_smtp::test_social_totp_requires_code_and_one_time_browser_challenge",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_admin_workflow_acceptance::test_failed_read_clears_stale_controls_and_keyboard_retry[1280-en-/api/admin/smtp-smtp-#smtpLoadStatus]",
+      "source": "admin-workflow-final.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_admin_workflow_acceptance::test_failed_read_clears_stale_controls_and_keyboard_retry[1280-en-/api/admin/users-users-#usersBody [role=alert]]",
+      "source": "admin-workflow-final.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_admin_workflow_acceptance::test_failed_read_clears_stale_controls_and_keyboard_retry[1280-en-/api/storage-storage-#storageSummary[role=alert]]",
+      "source": "admin-workflow-final.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_admin_workflow_acceptance::test_failed_read_clears_stale_controls_and_keyboard_retry[1280-it-/api/admin/smtp-smtp-#smtpLoadStatus]",
+      "source": "admin-workflow-final.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_admin_workflow_acceptance::test_failed_read_clears_stale_controls_and_keyboard_retry[1280-it-/api/admin/users-users-#usersBody [role=alert]]",
+      "source": "admin-workflow-final.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_admin_workflow_acceptance::test_failed_read_clears_stale_controls_and_keyboard_retry[1280-it-/api/storage-storage-#storageSummary[role=alert]]",
+      "source": "admin-workflow-final.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_admin_workflow_acceptance::test_failed_read_clears_stale_controls_and_keyboard_retry[390-en-/api/admin/smtp-smtp-#smtpLoadStatus]",
+      "source": "admin-workflow-final.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_admin_workflow_acceptance::test_failed_read_clears_stale_controls_and_keyboard_retry[390-en-/api/admin/users-users-#usersBody [role=alert]]",
+      "source": "admin-workflow-final.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_admin_workflow_acceptance::test_failed_read_clears_stale_controls_and_keyboard_retry[390-en-/api/storage-storage-#storageSummary[role=alert]]",
+      "source": "admin-workflow-final.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_admin_workflow_acceptance::test_failed_read_clears_stale_controls_and_keyboard_retry[390-it-/api/admin/smtp-smtp-#smtpLoadStatus]",
+      "source": "admin-workflow-final.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_admin_workflow_acceptance::test_failed_read_clears_stale_controls_and_keyboard_retry[390-it-/api/admin/users-users-#usersBody [role=alert]]",
+      "source": "admin-workflow-final.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_admin_workflow_acceptance::test_failed_read_clears_stale_controls_and_keyboard_retry[390-it-/api/storage-storage-#storageSummary[role=alert]]",
+      "source": "admin-workflow-final.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_admin_workflow_acceptance::test_one_time_token_create_rotate_revoke_and_keyboard_hide[1280-en]",
+      "source": "admin-token-focus-final.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_admin_workflow_acceptance::test_one_time_token_create_rotate_revoke_and_keyboard_hide[1280-it]",
+      "source": "admin-token-focus-final.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_admin_workflow_acceptance::test_one_time_token_create_rotate_revoke_and_keyboard_hide[390-en]",
+      "source": "admin-token-focus-final.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_admin_workflow_acceptance::test_one_time_token_create_rotate_revoke_and_keyboard_hide[390-it]",
+      "source": "admin-token-focus-final.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_admin_workflow_acceptance::test_other_administration_read_errors_remain_named_and_retryable[1280-en]",
+      "source": "admin-workflow-final.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_admin_workflow_acceptance::test_other_administration_read_errors_remain_named_and_retryable[1280-it]",
+      "source": "admin-workflow-final.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_admin_workflow_acceptance::test_other_administration_read_errors_remain_named_and_retryable[390-en]",
+      "source": "admin-workflow-final.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_admin_workflow_acceptance::test_other_administration_read_errors_remain_named_and_retryable[390-it]",
+      "source": "admin-workflow-final.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_admin_workflow_acceptance::test_search_selected_contract_and_permission_readback[1280-en]",
+      "source": "admin-workflow-final.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_admin_workflow_acceptance::test_search_selected_contract_and_permission_readback[1280-it]",
+      "source": "admin-workflow-final.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_admin_workflow_acceptance::test_search_selected_contract_and_permission_readback[390-en]",
+      "source": "admin-workflow-final.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_admin_workflow_acceptance::test_search_selected_contract_and_permission_readback[390-it]",
+      "source": "admin-workflow-final.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_admin_workflow_acceptance::test_visible_unique_retention_quota_and_cancelled_deletion[1280-en]",
+      "source": "admin-workflow-final.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_admin_workflow_acceptance::test_visible_unique_retention_quota_and_cancelled_deletion[1280-it]",
+      "source": "admin-workflow-final.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_admin_workflow_acceptance::test_visible_unique_retention_quota_and_cancelled_deletion[390-en]",
+      "source": "admin-workflow-final.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_admin_workflow_acceptance::test_visible_unique_retention_quota_and_cancelled_deletion[390-it]",
+      "source": "admin-workflow-final.xml",
+      "browser": true,
+      "new": true
+    },
+    {
+      "id": "tests.test_r210_ai_job_center::test_cancel_selection_skips_terminal_and_exclusions_prevent_repeat_batches",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_ai_job_center::test_feed_live_progress_public_allowlist_and_queue_positions",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_ai_job_center::test_history_pagination_does_not_change_global_running_badge",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_ai_job_center::test_history_selections_preserve_receipts_and_other_actors",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_ai_job_center::test_invalid_bulk_fail_closed[body0]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_ai_job_center::test_invalid_bulk_fail_closed[body1]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_ai_job_center::test_invalid_bulk_fail_closed[body2]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_ai_job_center::test_invalid_bulk_fail_closed[body3]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_ai_job_center::test_invalid_bulk_fail_closed[body4]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_ai_job_center::test_invalid_bulk_fail_closed[body5]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_ai_job_center::test_invalid_bulk_fail_closed[body6]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_ai_job_center::test_invalid_bulk_fail_closed[body7]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_ai_job_center::test_invalid_bulk_fail_closed[body8]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_ai_job_center::test_job_api_auth_acl_csrf_and_admin_redirect",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_ai_job_center::test_notification_inbox_independent_of_filters_and_ack_survives_reload",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_financial_admin_browser::test_admin_diagnostics_remain_readable_during_drain",
+      "source": "admin-regression-1.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_financial_admin_browser::test_admin_finance_roles_csrf_and_request_shape",
+      "source": "admin-regression-1.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_financial_admin_browser::test_browser_reads_actual_financial_api_and_never_enables_switch[en]",
+      "source": "admin-regression-1.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_financial_admin_browser::test_browser_reads_actual_financial_api_and_never_enables_switch[it]",
+      "source": "admin-regression-1.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_manuals_layout::test_manual_structure_and_assets[admin-en]",
+      "source": "admin-regression-3.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_manuals_layout::test_manual_structure_and_assets[admin]",
+      "source": "admin-regression-3.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_manuals_layout::test_manual_structure_and_assets[user-en]",
+      "source": "admin-regression-3.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_manuals_layout::test_manual_structure_and_assets[user]",
+      "source": "admin-regression-3.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_manuals_layout::test_manual_structure_and_assets[vst3-en]",
+      "source": "admin-regression-3.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_manuals_layout::test_manual_structure_and_assets[vst3-it]",
+      "source": "admin-regression-3.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_manuals_layout::test_shipped_pdf_has_current_version_and_complete_reference[EN-Administrator]",
+      "source": "admin-regression-3.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_manuals_layout::test_shipped_pdf_has_current_version_and_complete_reference[EN-User]",
+      "source": "admin-regression-3.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_manuals_layout::test_shipped_pdf_has_current_version_and_complete_reference[EN-VST3]",
+      "source": "admin-regression-3.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_manuals_layout::test_shipped_pdf_has_current_version_and_complete_reference[IT-Administrator]",
+      "source": "admin-regression-3.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_manuals_layout::test_shipped_pdf_has_current_version_and_complete_reference[IT-User]",
+      "source": "admin-regression-3.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_manuals_layout::test_shipped_pdf_has_current_version_and_complete_reference[IT-VST3]",
+      "source": "admin-regression-3.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_noncommercial_collection_browser::test_actual_mounts_and_noncommercial_controls_hide_subscription_forms[admin-en]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_noncommercial_collection_browser::test_actual_mounts_and_noncommercial_controls_hide_subscription_forms[admin-it]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_noncommercial_collection_browser::test_actual_mounts_and_noncommercial_controls_hide_subscription_forms[owner-en]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_noncommercial_collection_browser::test_actual_mounts_and_noncommercial_controls_hide_subscription_forms[owner-it]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_noncommercial_collection_browser::test_admin_configuration_bank_evidence_excess_refund_and_period_closure[1280-en]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_noncommercial_collection_browser::test_admin_configuration_bank_evidence_excess_refund_and_period_closure[1280-it]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_noncommercial_collection_browser::test_admin_configuration_bank_evidence_excess_refund_and_period_closure[390-en]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_noncommercial_collection_browser::test_admin_configuration_bank_evidence_excess_refund_and_period_closure[390-it]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_noncommercial_collection_browser::test_commercial_mode_retains_private_nc_history_as_read_only[en]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_noncommercial_collection_browser::test_commercial_mode_retains_private_nc_history_as_read_only[it]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_noncommercial_collection_browser::test_owner_optional_amount_report_actual_receipt_and_private_exports[1280-en]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_noncommercial_collection_browser::test_owner_optional_amount_report_actual_receipt_and_private_exports[1280-it]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_noncommercial_collection_browser::test_owner_optional_amount_report_actual_receipt_and_private_exports[390-en]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_noncommercial_collection_browser::test_owner_optional_amount_report_actual_receipt_and_private_exports[390-it]",
+      "source": "admin-regression-2.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_operator_refunds_ui::test_admin_prepare_confirm_execute_cancel_and_private_owner_view[1280-en-paypal_env]",
+      "source": "admin-regression-1.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_operator_refunds_ui::test_admin_prepare_confirm_execute_cancel_and_private_owner_view[1280-en-stripe_env]",
+      "source": "admin-regression-1.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_operator_refunds_ui::test_admin_prepare_confirm_execute_cancel_and_private_owner_view[1280-it-paypal_env]",
+      "source": "admin-regression-1.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_operator_refunds_ui::test_admin_prepare_confirm_execute_cancel_and_private_owner_view[1280-it-stripe_env]",
+      "source": "admin-regression-1.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_operator_refunds_ui::test_admin_prepare_confirm_execute_cancel_and_private_owner_view[390-en-paypal_env]",
+      "source": "admin-regression-1.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_operator_refunds_ui::test_admin_prepare_confirm_execute_cancel_and_private_owner_view[390-en-stripe_env]",
+      "source": "admin-regression-1.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_operator_refunds_ui::test_admin_prepare_confirm_execute_cancel_and_private_owner_view[390-it-paypal_env]",
+      "source": "admin-regression-1.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_operator_refunds_ui::test_admin_prepare_confirm_execute_cancel_and_private_owner_view[390-it-stripe_env]",
+      "source": "admin-regression-1.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_operator_refunds_ui::test_all_actual_owner_admin_templates_load_the_shared_refund_ui",
+      "source": "admin-regression-1.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_operator_refunds_ui::test_auth_csrf_exact_shapes_private_pagination_and_unknown_action",
+      "source": "admin-regression-1.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_operator_refunds_ui::test_uncertain_browser_only_recovers_existing_reference[en]",
+      "source": "admin-regression-1.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_operator_refunds_ui::test_uncertain_browser_only_recovers_existing_reference[it]",
+      "source": "admin-regression-1.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_paypal_item_movement_browser::test_actual_owner_page_exact_partial_multicapture_then_supported_release[/account-1280-en]",
+      "source": "admin-regression-1.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_paypal_item_movement_browser::test_actual_owner_page_exact_partial_multicapture_then_supported_release[/account-1280-it]",
+      "source": "admin-regression-1.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_paypal_item_movement_browser::test_actual_owner_page_exact_partial_multicapture_then_supported_release[/account-390-en]",
+      "source": "admin-regression-1.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_paypal_item_movement_browser::test_actual_owner_page_exact_partial_multicapture_then_supported_release[/account-390-it]",
+      "source": "admin-regression-1.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_paypal_item_movement_browser::test_actual_owner_page_exact_partial_multicapture_then_supported_release[/account/credits-1280-en]",
+      "source": "admin-regression-1.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_paypal_item_movement_browser::test_actual_owner_page_exact_partial_multicapture_then_supported_release[/account/credits-1280-it]",
+      "source": "admin-regression-1.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_paypal_item_movement_browser::test_actual_owner_page_exact_partial_multicapture_then_supported_release[/account/credits-390-en]",
+      "source": "admin-regression-1.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_paypal_item_movement_browser::test_actual_owner_page_exact_partial_multicapture_then_supported_release[/account/credits-390-it]",
+      "source": "admin-regression-1.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_paypal_item_movement_browser::test_admin_canonical_movement_observations_have_no_settlement_action[1280-en]",
+      "source": "admin-regression-1.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_paypal_item_movement_browser::test_admin_canonical_movement_observations_have_no_settlement_action[1280-it]",
+      "source": "admin-regression-1.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_paypal_item_movement_browser::test_admin_canonical_movement_observations_have_no_settlement_action[390-en]",
+      "source": "admin-regression-1.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_paypal_item_movement_browser::test_admin_canonical_movement_observations_have_no_settlement_action[390-it]",
+      "source": "admin-regression-1.xml",
+      "browser": true,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_rc_acceptance::test_cli_exit_and_private_exclusive_report",
+      "source": "admin-regression-3.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_rc_acceptance::test_cli_symlink_report_rejected",
+      "source": "admin-regression-3.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_rc_acceptance::test_forged_evidence_cannot_authorize_rc",
+      "source": "admin-regression-3.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_rc_acceptance::test_no_evidence_is_blocked",
+      "source": "admin-regression-3.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_rc_acceptance::test_snapshot_diagnostic_cannot_authorize_rc",
+      "source": "admin-regression-3.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_current_inventory_matches_review",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_inventory_cannot_silently_approve_drift[category]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_inventory_cannot_silently_approve_drift[checker]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_inventory_cannot_silently_approve_drift[hash]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_inventory_cannot_silently_approve_drift[missing]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_inventory_cannot_silently_approve_drift[rationale]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_inventory_cannot_silently_approve_drift[reorder]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_inventory_cannot_silently_approve_drift[source]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-device/start?x=1]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-gateway/v1/generate]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-jobs/execute-audio/whisper]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_new_aliased_transports_require_review[from httpx import AsyncClient as hidden\\nhidden()]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_new_aliased_transports_require_review[from urllib.request import build_opener as hidden\\nx=hidden()\\nx.open(\"https://example.test\")]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_new_aliased_transports_require_review[from urllib.request import urlopen as hidden\\nhidden(\"https://example.test\")]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_new_aliased_transports_require_review[import aiohttp as hidden\\nhidden.ClientSession()]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_new_aliased_transports_require_review[import httpx as hidden\\nhidden.Client()]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_new_aliased_transports_require_review[import socket as hidden\\nhidden.create_connection((\"example.test\",443))]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_supported_device_authorization_still_uses_exact_post[/api/ai-device/poll]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_supported_device_authorization_still_uses_exact_post[/api/ai-device/start]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_complete_source_bound_review_is_accepted",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_current_scan_and_complete_review_ledger_agree",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[blanket_approval]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[changed_finding]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[changed_source]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[deleted_source]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[duplicate_review]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[duplicate_scan]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[empty_reason]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[high]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[missing_file]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[missing_review]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[new_finding]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[new_source]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[scan_error]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[suppression]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[wrong_totals]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_service_regime_admin_panel::test_admin_refresh_includes_regime",
+      "source": "admin-regression-1.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_service_regime_admin_panel::test_admin_template_embeds_panel",
+      "source": "admin-regression-1.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_service_regime_admin_panel::test_panel_bilingual_and_recovery_checks",
+      "source": "admin-regression-1.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_service_regime_admin_panel::test_panel_uses_admin_read_only_endpoints_and_no_switch",
+      "source": "admin-regression-1.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_sso_admin_links::test_actual_oauth_callback_renders_provider_specific_notice[facebook]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_sso_admin_links::test_actual_oauth_callback_renders_provider_specific_notice[github]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_sso_admin_links::test_actual_oauth_callback_renders_provider_specific_notice[google]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_sso_admin_links::test_admin_client_opens_requested_tab_and_focuses_only_requested_record",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_sso_admin_links::test_admin_email_links_are_absolute_escaped_and_do_not_execute",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_sso_admin_links::test_admin_sso_totp_keeps_destination_until_verified",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_sso_admin_links::test_email_destination_survives_password_login_and_requires_authorization",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_sso_admin_links::test_email_destination_survives_social_login",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_sso_admin_links::test_enabled_providers_have_bundled_marks_and_distinct_styles",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_sso_admin_links::test_known_navigation_destinations[/account]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_sso_admin_links::test_known_navigation_destinations[/admin/ai-billing]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_sso_admin_links::test_known_navigation_destinations[/admin/ai-tokens]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_sso_admin_links::test_known_navigation_destinations[/ai-device?code=ABCD-1234]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_sso_admin_links::test_known_navigation_destinations[/settings?tab=aiQueue&job=job_123]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_sso_admin_links::test_known_navigation_destinations[/settings?tab=users&section=archives&user=42]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_sso_admin_links::test_known_navigation_destinations[/settings?tab=users&section=pending&user=42]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_sso_admin_links::test_legacy_admin_notifications_include_clickable_context",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_sso_admin_links::test_login_destinations_reject_external_or_action_urls[/%2f%2fevil.test]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_sso_admin_links::test_login_destinations_reject_external_or_action_urls[//evil.test]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_sso_admin_links::test_login_destinations_reject_external_or_action_urls[/\\\\evil.test]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_sso_admin_links::test_login_destinations_reject_external_or_action_urls[/api/admin/users/1]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_sso_admin_links::test_login_destinations_reject_external_or_action_urls[/logout]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_sso_admin_links::test_login_destinations_reject_external_or_action_urls[/settings#//evil.test]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_sso_admin_links::test_login_destinations_reject_external_or_action_urls[/settings?job=a/b]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_sso_admin_links::test_login_destinations_reject_external_or_action_urls[/settings?tab=invalid]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_sso_admin_links::test_login_destinations_reject_external_or_action_urls[/settings?tab=users&next=https://evil.test]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_sso_admin_links::test_login_destinations_reject_external_or_action_urls[/settings?tab=users&tab=web]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_sso_admin_links::test_login_destinations_reject_external_or_action_urls[/settings?user=-1]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_sso_admin_links::test_login_destinations_reject_external_or_action_urls[/settings\\r\\nLocation: evil]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_sso_admin_links::test_login_destinations_reject_external_or_action_urls[https://evil.test]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_sso_admin_links::test_notice_names_actual_provider_and_verification[False-facebook]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_sso_admin_links::test_notice_names_actual_provider_and_verification[False-github]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_sso_admin_links::test_notice_names_actual_provider_and_verification[False-google]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_sso_admin_links::test_notice_names_actual_provider_and_verification[True-facebook]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_sso_admin_links::test_notice_names_actual_provider_and_verification[True-github]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_sso_admin_links::test_notice_names_actual_provider_and_verification[True-google]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_sso_admin_links::test_outbox_existing_admin_events_get_links_at_send_time[pending:17:admin:1-pending]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_sso_admin_links::test_outbox_existing_admin_events_get_links_at_send_time[privacy-request:17:123:1-archives]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_sso_admin_links::test_outbox_existing_admin_events_get_links_at_send_time[reactivation-admin:17:123:1-pending]",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_sso_admin_links::test_social_config_public_url_fallback_is_read_only",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_sso_admin_links::test_untrusted_or_missing_public_url_is_not_sent",
+      "source": "admin-regression-0.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_tracks_top_layout::test_three_editor_rows_anchor_tracks_below_browser[False]",
+      "source": "admin-layout-capability-correction.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_tracks_top_layout::test_three_editor_rows_anchor_tracks_below_browser[True]",
+      "source": "admin-layout-capability-correction.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_user_locale::test_browser_language[fr,it;q=0.4-it]",
+      "source": "admin-locale-final.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_user_locale::test_browser_language[fr-en]",
+      "source": "admin-locale-final.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_user_locale::test_browser_language[it-IT,it;q=0.9,en;q=0.8-it]",
+      "source": "admin-locale-final.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_user_locale::test_browser_language[it;q=0,en;q=0.5-en]",
+      "source": "admin-locale-final.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_user_locale::test_browser_language[it;q=0.2,en-US;q=0.9-en]",
+      "source": "admin-locale-final.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_user_locale::test_browser_language[it;q=bad,en-en]",
+      "source": "admin-locale-final.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_user_locale::test_browser_login_and_profile_override",
+      "source": "admin-locale-final.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_user_locale::test_catalog_html_and_template_translation",
+      "source": "admin-locale-final.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_user_locale::test_dynamic_pdf_omits_empty_fields[en-privacy]",
+      "source": "admin-locale-final.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_user_locale::test_dynamic_pdf_omits_empty_fields[en-terms]",
+      "source": "admin-locale-final.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_user_locale::test_dynamic_pdf_omits_empty_fields[it-privacy]",
+      "source": "admin-locale-final.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_user_locale::test_dynamic_pdf_omits_empty_fields[it-terms]",
+      "source": "admin-locale-final.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_user_locale::test_icons_placeholders_and_native_catalog_packaging",
+      "source": "admin-locale-final.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_user_locale::test_js_locale_runtime",
+      "source": "admin-locale-final.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_user_locale::test_metrics_label_translation",
+      "source": "admin-locale-final.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_user_locale::test_new_accounts_quota_and_profile_locale",
+      "source": "admin-locale-final.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_user_locale::test_recipient_locale_is_independent_of_sender",
+      "source": "admin-locale-final.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_zones_layout::test_insert_first_audible_click_is_at_requested_position[123]",
+      "source": "admin-regression-3.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_zones_layout::test_insert_first_audible_click_is_at_requested_position[2250]",
+      "source": "admin-regression-3.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_zones_layout::test_insert_first_audible_click_is_at_requested_position[3456]",
+      "source": "admin-regression-3.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_zones_layout::test_insert_first_audible_click_is_at_requested_position[750]",
+      "source": "admin-regression-3.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_zones_layout::test_layout_validation[bad0]",
+      "source": "admin-regression-3.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_zones_layout::test_layout_validation[bad1]",
+      "source": "admin-regression-3.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_zones_layout::test_layout_validation[bad2]",
+      "source": "admin-regression-3.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_zones_layout::test_layout_validation[bad3]",
+      "source": "admin-regression-3.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_zones_layout::test_layout_validation[bad4]",
+      "source": "admin-regression-3.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_zones_layout::test_layout_validation[bad5]",
+      "source": "admin-regression-3.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_zones_layout::test_layout_validation[bad6]",
+      "source": "admin-regression-3.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_zones_layout::test_marker_edit_tolerates_a_deleted_reference",
+      "source": "admin-regression-3.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_zones_layout::test_marker_render_failure_rolls_back_metadata_and_wav",
+      "source": "admin-regression-3.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_zones_layout::test_marker_save_regenerates_actual_wav_and_keeps_override",
+      "source": "admin-regression-3.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_zones_layout::test_native_layout_is_atomic_and_persistent",
+      "source": "admin-regression-3.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_zones_layout::test_preroll_is_retained_when_zone_is_refreshed",
+      "source": "admin-regression-3.xml",
+      "browser": false,
+      "new": false
+    },
+    {
+      "id": "tests.test_r210_zones_layout::test_user_layouts_are_isolated_and_cascade_on_delete",
+      "source": "admin-regression-3.xml",
+      "browser": false,
+      "new": false
+    }
+  ],
+  "release_candidate": false,
+  "transition_enabled": false
+}

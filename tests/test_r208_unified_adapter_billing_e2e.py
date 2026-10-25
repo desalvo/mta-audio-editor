@@ -79,6 +79,10 @@ def test_each_real_adapter_job_is_metered_billed_and_packaged(operator, kind):
     with db() as con:
         row=con.execute('SELECT kind,status,resource_source,usage_json FROM ai_compute_jobs WHERE id=?', (metadata['job_id'],)).fetchone()
     assert row['kind']==kind and row['status']=='done'
+    with db() as con:
+        owner=con.execute('SELECT state,heartbeat_count FROM regime_worker_claims WHERE operation_id=?',('job:ledger:'+metadata['job_id'],)).fetchone()
+        assert owner['state']=='finished'
+        assert con.execute('SELECT status FROM regime_fence_operations WHERE operation_id=?',('job:ledger:'+metadata['job_id'],)).fetchone()[0]=='closed'
     assert row['resource_source'] in ('worker','cgroup')
     usage=json.loads(row['usage_json'])
     assert usage['cpu_seconds']==metadata['usage']['cpu_seconds']

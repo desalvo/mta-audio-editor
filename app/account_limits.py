@@ -41,12 +41,19 @@ def summary(user_id, storage, *, at=None):
     report={**ai_usage_reporting.aggregate(rows),'billing_enabled':ai_billing.user_billing_enabled(user_id)}
     with auth.db() as con:
         ai_billing._init(con)
+        if not con.in_transaction:con.execute('BEGIN')
+        from .account_financial_context import build
+        financial=build(con,user_id,resource_state)
         periods=[dict(r) for r in con.execute('SELECT start_ts,end_ts,total_micro FROM ai_billing_periods WHERE user_id=?',(user_id,))]
     pending=[];closed=[]
+    closed_ranges=financial['noncommercial']['periods']+[{'start':p['start_ts'],'end':p['end_ts']} for p in periods]
     for row in rows:
-        if row['origin']!='ledger' or row.get('billable')!=1 or row['status']!='done' or row['resource_source']=='unmetered':continue
-        destination=closed if any(p['start_ts']<=row['started_at']<p['end_ts'] for p in periods) else pending
-        destination.append(row)
+        if row['origin']!='ledger' or row.get('billable')!=1 or row['resource_source']=='unmetered':continue
+        is_closed=any(p['start']<=row['started_at']<p['end'] for p in closed_ranges)
+        if row['status']=='done':
+            (closed if is_closed else pending).append(row)
+        elif financial['regime']=='NON_COMMERCIAL' and is_closed and row['status'] in ('completed','success','succeeded','failed','cancelled','canceled'):
+            closed.append(row)
     def total(items,key):return sum(float(r['usage'].get(key,0)) for r in items)
     resources={}
     for name in ('cpu','gpu'):
@@ -61,7 +68,7 @@ def summary(user_id, storage, *, at=None):
           'other_accounted_seconds':max(0,(accounted or 0)-total(closed,key)-total(pending,key))}
         for value in resources[name].values():
             if value is not None and (not math.isfinite(value) or value<0):raise ValueError('Invalid resource summary')
-    return {'user_id':user_id,'as_of':now,'resource_quotas':resource_state,'usage_history':history(user_id,at=now),'storage':{**storage,'quota_bytes':quota_value,'unlimited':quota_value is None,
+    return {'user_id':user_id,'as_of':now,'financial_context':financial,'service_regime':financial['regime'],'resource_quotas':resource_state,'usage_history':history(user_id,at=now),'storage':{**storage,'quota_bytes':quota_value,'unlimited':quota_value is None,
       'remaining_bytes':max(0,quota-storage['used_bytes']) if quota_value is not None else None,
       'percent':storage['used_bytes']/quota*100 if quota else (100 if storage['used_bytes'] else 0) if quota_value is not None else None},
       'resources':resources,'jobs':report['jobs'],'unmetered_jobs':report['unmetered_jobs'],

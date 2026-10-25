@@ -9,6 +9,8 @@ from test_r210_subscriptions import account as account,plan  # noqa: F401
 @pytest.fixture
 def provider(account,monkeypatch):
     from app import legal
+    regime_file = auth.data_root() / 'service-regime.json'
+    regime_file.write_text(json.dumps({'regime':'COMMERCIAL','revision':0}))
     legal.save({'operator_name':'Test','operator_country':'Italy','support_email':'support@example.test','public_url':'https://mta.example.test','effective_date':'2026-10-19'},1)
     paypal.settings({'enabled':True,'environment':'sandbox','client_id':'test-client','client_secret':'test-secret','webhook_id':'test-webhook'})
     orders={};calls=[]
@@ -22,6 +24,9 @@ def provider(account,monkeypatch):
             identifier=path.split('/')[-2];order=orders[identifier];order['status']='COMPLETED'
             order['purchase_units'][0]['payments']={'captures':[{'id':'CAPTURE'+identifier,'status':'COMPLETED','amount':copy.deepcopy(order['purchase_units'][0]['amount'])}]}
             return order
+        if method=='GET' and path.startswith('/v1/customer/disputes?'):return {'items':[],'links':[]}
+        if method=='GET' and path.startswith('/v2/payments/captures/'):
+            return copy.deepcopy(next(x for order in orders.values() for x in order.get('purchase_units',[{}])[0].get('payments',{}).get('captures',[]) if x['id']==path.rsplit('/',1)[1]))
         if method=='GET':return copy.deepcopy(orders[path.split('/')[-1]])
         if path.endswith('/verify-webhook-signature'):return {'verification_status':'SUCCESS'}
         raise AssertionError((method,path))
@@ -111,7 +116,7 @@ def test_authenticated_refund_reverses_credits_once(account,provider,monkeypatch
     paypal.capture(account,order['order_id']);pid=next(iter(orders));capture_id=orders[pid]['purchase_units'][0]['payments']['captures'][0]['id']
     original=paypal._api
     def api(cfg,method,path,*args):
-        if path=='/v2/payments/refunds/REFUND123':return {'id':'REFUND123','status':'COMPLETED','amount':{'value':'2.00','currency_code':'EUR'}}
+        if path=='/v2/payments/refunds/REFUND123':return {'id':'REFUND123','status':'COMPLETED','amount':{'value':'2.00','currency_code':'EUR'},'links':[{'rel':'up','href':'https://api-m.sandbox.paypal.com/v2/payments/captures/'+capture_id}]}
         return original(cfg,method,path,*args)
     monkeypatch.setattr(paypal,'_api',api)
     payload={'id':'refund-event-123','event_type':'PAYMENT.CAPTURE.REFUNDED','resource':{'id':'REFUND123','links':[{'rel':'up','href':'https://api-m.sandbox.paypal.com/v2/payments/captures/'+capture_id}]}}
@@ -146,3 +151,62 @@ def test_prorated_subscription_fee_remains_payable_after_termination(account,pro
     paypal.capture(account,order['order_id'])
     assert r.transactions(account)['subscription_fees'][0]['status']=='paid'
     assert r.state(account)['credits_micro']==0
+
+
+def test_webhook_event_and_fulfillment_share_atomic_commit(account, provider, monkeypatch):
+    """A failure after credits are staged must roll back both money and event."""
+    plan(account)
+    orders, _ = provider
+    local = paypal.checkout(account, {'kind': 'credits', 'amount_cents': 500,
+                                       'request_id': 'webhook-atomic-rollback-123'})
+    pid = next(iter(orders))
+    paypal._api({}, 'POST', '/v2/checkout/orders/' + pid + '/capture')
+    payload = {'id': 'atomic-event-123', 'event_type': 'PAYMENT.CAPTURE.COMPLETED',
+               'resource': {'supplementary_data': {'related_ids': {'order_id': pid}}}}
+    headers = {k: 'test' for k in ['paypal-auth-algo', 'paypal-cert-url',
+               'paypal-transmission-id', 'paypal-transmission-sig',
+               'paypal-transmission-time']}
+    from app import regime_checkout_fence
+    original = regime_checkout_fence.settle_if_enrolled
+    def fail_after_mutation(*args, **kwargs):
+        raise RuntimeError('simulated failure before commit')
+    monkeypatch.setattr(regime_checkout_fence, 'settle_if_enrolled', fail_after_mutation)
+    with pytest.raises(RuntimeError, match='simulated failure'):
+        paypal.webhook(json.dumps(payload).encode(), headers)
+    with auth.db() as c:
+        assert c.execute('SELECT 1 FROM paypal_events WHERE id=?', (payload['id'],)).fetchone() is None
+        assert c.execute('SELECT status FROM paypal_orders WHERE id=?', (local['order_id'],)).fetchone()[0] == 'pending'
+    assert r.state(account)['credits_micro'] == 0
+    monkeypatch.setattr(regime_checkout_fence, 'settle_if_enrolled', original)
+    paypal.webhook(json.dumps(payload).encode(), headers)
+    paypal.webhook(json.dumps(payload).encode(), headers)
+    assert r.state(account)['credits_micro'] == 5_000_000
+    with auth.db() as c:
+        assert c.execute('SELECT COUNT(*) FROM paypal_events WHERE id=?', (payload['id'],)).fetchone()[0] == 1
+
+
+def test_paypal_outbox_confirmed_on_provider_acceptance(account, provider):
+    plan(account)
+    order = paypal.checkout(account, {'kind':'credits','amount_cents':500,'request_id':'paypal-outbox-success-123'})
+    with auth.db() as c:
+        row = c.execute('SELECT state,attempts,provider_reference FROM regime_payment_outbox WHERE operation_id=?',
+                        ('checkout:paypal:'+order['order_id'],)).fetchone()
+        assert tuple(row) == ('confirmed', 1, next(iter(provider[0])))
+
+
+def test_paypal_uncertain_provider_failure_requires_reconciliation(account, provider, monkeypatch):
+    plan(account)
+    calls=[]
+    def unavailable(*args, **kwargs):
+        calls.append(1)
+        raise ValueError('outcome uncertain')
+    monkeypatch.setattr(paypal,'_api',unavailable)
+    request = {'kind':'credits','amount_cents':500,'request_id':'paypal-outbox-failure-123'}
+    with pytest.raises(ValueError, match='uncertain'):
+        paypal.checkout(account, request)
+    with pytest.raises(Exception):
+        paypal.checkout(account, request)
+    assert len(calls) == 1
+    with auth.db() as c:
+        row = c.execute('SELECT state,attempts FROM regime_payment_outbox').fetchone()
+        assert tuple(row) == ('uncertain', 1)

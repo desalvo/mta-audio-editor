@@ -218,6 +218,9 @@ def set_storage(uid,quota_bytes,*,actor,free=False,reason='Storage quota changed
 
 
 def extend_storage(uid,gb,key,max_cost=None):
+    # Paid self-service storage is a commercial transaction, not a free quota change.
+    from .service_regime import require_commercial
+    require_commercial("paid storage extension")
     from . import resource_accounts as r
     gb=r.number(gb)
     if not 0<gb<=100000 or not isinstance(key,str) or not 8<=len(key)<=80:raise ValueError('Invalid storage request')

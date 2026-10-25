@@ -11,7 +11,10 @@ import html
 from pathlib import Path
 import shutil
 from urllib.parse import quote, urlsplit
-import xml.etree.ElementTree as ET
+try:
+    from scripts.repositories import _safe_xml as ET
+except ModuleNotFoundError:
+    import _safe_xml as ET
 
 GIT_BLOB_LIMIT = 45 * 1024 * 1024  # Leave headroom below GitHub's 50 MB warning
 PAGES_SOFT_LIMIT = 900 * 1024 * 1024  # Below the 1 GiB Pages site limit

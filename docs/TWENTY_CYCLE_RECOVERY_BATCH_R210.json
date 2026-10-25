@@ -1,0 +1,149 @@
+{
+  "date": "2026-10-25",
+  "release": "0.3.0-r210 PRE-RC",
+  "requested_cycles": 20,
+  "scope": "Twenty implementation and acceptance cycles within one functional stream: frozen pull Arranger/Remix publication recovery. Not twenty completed macroareas or twenty new RC criteria.",
+  "cycles": [
+    {
+      "cycle": 1,
+      "outcome": "Atomic publication admission",
+      "detail": "Original queue/project/operation/input source bound to pull ledger in its admission transaction",
+      "state": "verified"
+    },
+    {
+      "cycle": 2,
+      "outcome": "Immutable publication intent",
+      "detail": "Dedicated immutable intent, unique inference binding and cascade with private task",
+      "state": "verified"
+    },
+    {
+      "cycle": 3,
+      "outcome": "Real server CPU handoff",
+      "detail": "Actual durable generation factory accepts already trusted remote-worker CPU evidence",
+      "state": "verified"
+    },
+    {
+      "cycle": 4,
+      "outcome": "Real server publication path",
+      "detail": "Live generation uses the same frozen-output staging contract as recovery",
+      "state": "verified"
+    },
+    {
+      "cycle": 5,
+      "outcome": "WAV publication contract",
+      "detail": "Read actual frozen WAV frames/rate/channels; project append verifies PCM bytes",
+      "state": "verified"
+    },
+    {
+      "cycle": 6,
+      "outcome": "Known-output recovery",
+      "detail": "Frozen successful measured WAV only; no new inference, ledger or owner",
+      "state": "verified"
+    },
+    {
+      "cycle": 7,
+      "outcome": "Original-parent death boundary",
+      "detail": "Actual forked scheduler parent exits; live/hidden identity remains held",
+      "state": "verified"
+    },
+    {
+      "cycle": 8,
+      "outcome": "Original execution receipt",
+      "detail": "Persisted original worker/claim restored only for staging; no ownership transfer",
+      "state": "verified"
+    },
+    {
+      "cycle": 9,
+      "outcome": "Scheduler recovery binding",
+      "detail": "Exact project/operation/actor and permitted queue state before staging",
+      "state": "verified"
+    },
+    {
+      "cycle": 10,
+      "outcome": "Cancellation boundary",
+      "detail": "Cancelled task or queue cannot stage or pass actual project-write guard",
+      "state": "verified"
+    },
+    {
+      "cycle": 11,
+      "outcome": "Retired-account boundary",
+      "detail": "Inactive account cannot publish; original owner checked at write boundary",
+      "state": "verified"
+    },
+    {
+      "cycle": 12,
+      "outcome": "Epoch and claim boundary",
+      "detail": "Changed epoch/claim cannot publish or settle running work",
+      "state": "verified"
+    },
+    {
+      "cycle": 13,
+      "outcome": "Conflicting output boundary",
+      "detail": "Existing project/hash/metadata cannot be overwritten by a recovery replay",
+      "state": "verified"
+    },
+    {
+      "cycle": 14,
+      "outcome": "Stage interruption recovery",
+      "detail": "Failure before project write leaves replayable original staging",
+      "state": "verified"
+    },
+    {
+      "cycle": 15,
+      "outcome": "Publication-to-settlement recovery",
+      "detail": "Crash after publication before settlement recovers without duplicate track",
+      "state": "verified"
+    },
+    {
+      "cycle": 16,
+      "outcome": "Ledger commit-to-ack recovery",
+      "detail": "Lost settlement ACK retries original immutable intent without second charge",
+      "state": "verified"
+    },
+    {
+      "cycle": 17,
+      "outcome": "Concurrent saga recovery",
+      "detail": "Private no-follow regular-file lock serializes complete recovery across processes",
+      "state": "verified"
+    },
+    {
+      "cycle": 18,
+      "outcome": "Outbox schema concurrency",
+      "detail": "Schema inspection/ALTER now one BEGIN IMMEDIATE transaction; concurrent worker state-directory creation race repaired with strict permission checks preserved",
+      "state": "verified"
+    },
+    {
+      "cycle": 19,
+      "outcome": "Operator end-to-end controls",
+      "detail": "Active admin/session/CSRF/explicit confirmation, threadpool execution, no-store and durable audit",
+      "state": "verified"
+    },
+    {
+      "cycle": 20,
+      "outcome": "Cumulative evidence and continuation",
+      "detail": "Current source-bound security/transport review, affected regression, standalone handoff and one final cumulative",
+      "state": "verified"
+    }
+  ],
+  "progress_before": {
+    "verified": 23,
+    "total": 42,
+    "percent": 54.8
+  },
+  "progress_after": {
+    "verified": 23,
+    "total": 42,
+    "percent": 54.8
+  },
+  "whole_macroareas_accepted": 0,
+  "release_candidate": false,
+  "transition_enabled": false,
+  "commits": 0,
+  "intermediate_packages": 0,
+  "current_evidence": {
+    "passed": 219,
+    "new_passed": 43,
+    "skipped_real_win32": 1,
+    "unresolved_failures": 0
+  }
+}

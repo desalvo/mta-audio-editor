@@ -87,6 +87,18 @@ def _init(c):
     )''')
     # Safe additive upgrade for deployed SQLite ledgers. No record is deleted.
     columns = {r[1] for r in c.execute('PRAGMA table_info(ai_compute_jobs)')}
+    if 'recovery_evidence_state' not in columns:
+        try:c.execute("ALTER TABLE ai_compute_jobs ADD COLUMN recovery_evidence_state TEXT NOT NULL DEFAULT 'legacy_unknown'")
+        except sqlite3.OperationalError as exc:
+            if 'duplicate column' not in str(exc).lower():raise
+    if 'operator_loss_id' not in columns:
+        try:c.execute('ALTER TABLE ai_compute_jobs ADD COLUMN operator_loss_id TEXT')
+        except sqlite3.OperationalError as exc:
+            if 'duplicate column' not in str(exc).lower():raise
+    if 'worker_scope_count' not in columns:
+        try:c.execute('ALTER TABLE ai_compute_jobs ADD COLUMN worker_scope_count INTEGER NOT NULL DEFAULT 0 CHECK(worker_scope_count>=0)')
+        except sqlite3.OperationalError as exc:
+            if 'duplicate column' not in str(exc).lower():raise
     if 'billable' not in columns:
         c.execute('ALTER TABLE ai_compute_jobs ADD COLUMN billable INTEGER NOT NULL DEFAULT 1 CHECK(billable IN (0,1))')
         # Existing test records retain their measured usage but never incur charges.
@@ -173,7 +185,7 @@ def _validate_usage(values):
     return clean
 
 
-def create_job(user_id: int, kind: str, token_id=None, *, started_at=None, diagnostic=False, billing_exemption_reason=""):
+def create_job(user_id: int, kind: str, token_id=None, *, started_at=None, diagnostic=False, billing_exemption_reason="", _admission_hook=None):
     if not isinstance(kind, str) or not (1 <= len(kind) <= 72) or not all(c.isalnum() or c in '_-.' for c in kind):
         raise ValueError('Invalid job kind')
     if not isinstance(diagnostic, bool):
@@ -188,6 +200,8 @@ def create_job(user_id: int, kind: str, token_id=None, *, started_at=None, diagn
             raise ValueError('User missing or inactive')
         stamp = int(time.time() if started_at is None else started_at)
         c.execute('BEGIN IMMEDIATE')
+        from .regime_job_fence import enroll_metered_job
+        enroll_metered_job(c, job_id)
         if c.execute('SELECT 1 FROM ai_billing_periods WHERE user_id=? AND start_ts<=? AND end_ts>? LIMIT 1',
                      (user_id, stamp, stamp)).fetchone():
             raise ValueError('Cannot create a job inside a closed billing interval')
@@ -195,7 +209,7 @@ def create_job(user_id: int, kind: str, token_id=None, *, started_at=None, diagn
         # time: a migrated LXC must never reprice past jobs with the new host.
         from .ai_billing_profiles import suggested_prices
         hardware = suggested_prices()
-        c.execute('INSERT INTO ai_compute_jobs(id,user_id,token_id,kind,status,started_at,billable) VALUES(?,?,?,?,?,?,?)',
+        c.execute("INSERT INTO ai_compute_jobs(id,user_id,token_id,kind,status,started_at,billable,recovery_evidence_state) VALUES(?,?,?,?,?,?,?,'absent')",
                   (job_id,user_id,token_id,kind,'running',stamp,int(not diagnostic and not billing_exemption_reason)))
         c.execute('CREATE TABLE IF NOT EXISTS ai_job_billing_exemptions(job_id TEXT PRIMARY KEY REFERENCES ai_compute_jobs(id) ON DELETE CASCADE,reason TEXT NOT NULL)')
         if billing_exemption_reason:c.execute('INSERT INTO ai_job_billing_exemptions VALUES(?,?)',(job_id,billing_exemption_reason))
@@ -204,6 +218,9 @@ def create_job(user_id: int, kind: str, token_id=None, *, started_at=None, diagn
         if not diagnostic and not billing_exemption_reason:
             from .resource_accounts import admit
             admit(c,user_id,job_id,stamp)
+        from .job_settlement_contract import snapshot as snapshot_settlement
+        from .resource_accounts import has_limits
+        snapshot_settlement(c,job_id,resource_required=bool(not diagnostic and not billing_exemption_reason and has_limits(user_id,c)))
         suggested = hardware['suggested_micro_per_unit']
         cpu_model, gpu_model = hardware['cpu_model'], hardware['gpu_model']
         c.execute('''INSERT INTO ai_job_hardware_snapshots
@@ -214,6 +231,10 @@ def create_job(user_id: int, kind: str, token_id=None, *, started_at=None, diagn
            suggested['cpu_seconds'],suggested['gpu_slot_seconds_estimated'],
            suggested['disk_gb_hours'],
            'local-advisory' if cpu_model or gpu_model else 'unknown'))
+        if _admission_hook is not None:
+            _admission_hook(c, job_id)
+            if not c.in_transaction:
+                raise ValueError('Admission hook changed transaction ownership')
 
     return job_id
 
@@ -260,7 +281,8 @@ def provision_inference_job(inference_job_id: str, user_id: int, kind: str) -> s
         prepare_upgrade(c)
         c.execute('BEGIN IMMEDIATE')
         from .resource_accounts import has_limits
-        if not user_billing_enabled(user_id, _connection=c) and not has_limits(user_id,c):
+        from . import ai_pull_coordinator as pull
+        if not user_billing_enabled(user_id, _connection=c) and not has_limits(user_id,c) and pull.mode() != 'pull':
             return None
         if not c.execute('SELECT 1 FROM users WHERE id=? AND active=1', (user_id,)).fetchone():
             raise ValueError('Active user required')
@@ -270,16 +292,29 @@ def provision_inference_job(inference_job_id: str, user_id: int, kind: str) -> s
             if int(row['user_id']) != user_id or row['kind'] != kind:
                 raise ValueError('Conflicting durable inference billing identity')
             return ledger_id
+        from .model_license_policy import evaluate, authorize_remote_execution, record_job
+        decision = authorize_remote_execution('ace-step', {}) if pull.mode() == 'pull' else evaluate('ace-step', {})
         stamp = int(time.time())
         if c.execute('SELECT 1 FROM ai_billing_periods WHERE user_id=? AND start_ts<=? AND end_ts>? LIMIT 1',
                      (user_id, stamp, stamp)).fetchone():
             raise ValueError('Cannot provision within closed billing period')
         hardware = suggested_prices()
         rates = hardware['suggested_micro_per_unit']
-        c.execute('INSERT INTO ai_compute_jobs(id,user_id,token_id,kind,status,started_at,billable,queue_job_id) VALUES(?,?,NULL,?,?,?,1,?)',
-                  (ledger_id, user_id, kind, 'running', stamp,inference_job_id))
+        from .regime_job_fence import enroll_metered_job
+        enroll_metered_job(c, ledger_id)
+        c.execute("INSERT INTO ai_compute_jobs(id,user_id,token_id,kind,status,started_at,billable,queue_job_id,recovery_evidence_state) VALUES(?,?,NULL,?,?,?,?,?,'absent')",
+                  (ledger_id, user_id, kind, 'running', stamp,int(decision.billable),inference_job_id))
+        if pull.mode() == 'pull':
+            pull.note_deferred_admission(c, ledger_id)
+        record_job(ledger_id, decision, _connection=c)
+        c.execute('CREATE TABLE IF NOT EXISTS ai_job_billing_exemptions(job_id TEXT PRIMARY KEY REFERENCES ai_compute_jobs(id) ON DELETE CASCADE,reason TEXT NOT NULL)')
+        if not decision.billable:
+            c.execute('INSERT INTO ai_job_billing_exemptions VALUES(?,?)', (ledger_id,'license:'+decision.model_id))
         from .resource_accounts import admit
-        admit(c,user_id,ledger_id,stamp)
+        if decision.billable:
+            admit(c,user_id,ledger_id,stamp)
+        from .job_settlement_contract import snapshot as snapshot_settlement
+        snapshot_settlement(c,ledger_id,resource_required=bool(decision.billable and has_limits(user_id,c)))
         c.execute('INSERT INTO ai_job_hardware_snapshots (job_id,captured_at,model_version,cpu_model,gpu_model,cpu_rate_micro,gpu_rate_micro,storage_rate_micro,origin) VALUES(?,?,?,?,?,?,?,?,?)',
                   (ledger_id, stamp, hardware['model_version'], hardware['cpu_model'], hardware['gpu_model'],
                    rates['cpu_seconds'], rates['gpu_slot_seconds_estimated'], rates['disk_gb_hours'],
@@ -296,7 +331,8 @@ def job_hardware_snapshot(job_id: str) -> dict | None:
         return dict(row) if row else None
 
 
-def finish_job(job_id, status, usage=None, *, source='unmetered', finished_at=None):
+def finish_job(job_id, status, usage=None, *, source='unmetered', finished_at=None,
+               worker_id=None, claim_token=None):
     if status not in ('done','failed','cancelled'):
         raise ValueError('Invalid final job status')
     values = _validate_usage({} if usage is None else usage)
@@ -324,8 +360,12 @@ def finish_job(job_id, status, usage=None, *, source='unmetered', finished_at=No
         prepare_upgrade(c)
         c.execute('BEGIN IMMEDIATE')
         row = c.execute('SELECT user_id,started_at,status FROM ai_compute_jobs WHERE id=?',(job_id,)).fetchone()
+        from .worker_loss_resolution import assert_not_resolved
+        assert_not_resolved(c,job_id)
         if not row or row['status'] != 'running':
             raise ValueError('Job missing or already finalized')
+        from .worker_cgroup_recovery import require_quiescent
+        require_quiescent(c,job_id)
         end = int(time.time() if finished_at is None else finished_at)
         if end < row['started_at']:
             raise ValueError('End precedes start')
@@ -342,6 +382,28 @@ def finish_job(job_id, status, usage=None, *, source='unmetered', finished_at=No
             raise ValueError('Job already finalized by another worker')
         from .resource_accounts import settle
         settle(c,job_id,values)
+        # A claimed execution is completed by its authenticated owner only.
+        # The claim, billable accounting and the original fence are all
+        # updated under this transaction; any failure rolls back the ledger.
+        operation_id = 'job:ledger:' + str(job_id)
+        has_claims = c.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='regime_worker_claims'").fetchone()
+        if has_claims:
+            claim = c.execute('SELECT worker_id,claim_token,state FROM regime_worker_claims WHERE operation_id=?', (operation_id,)).fetchone()
+            if claim is not None:
+                from .regime_operation_fence import FenceBlocked
+                if (not isinstance(worker_id, str) or not isinstance(claim_token, str)
+                        or (worker_id, claim_token) != (claim[0], claim[1])
+                        or claim[2] != 'running'):
+                    raise FenceBlocked('Claimed job completion requires its active worker identity')
+                from .regime_worker_claims import finish as finish_claim
+                finish_claim(c, operation_id, worker_id=worker_id, token=claim_token)
+            elif worker_id is not None or claim_token is not None:
+                raise FenceBlocked('Worker receipt supplied for a job without a claim')
+        elif worker_id is not None or claim_token is not None:
+            from .regime_operation_fence import FenceBlocked
+            raise FenceBlocked('Worker claims schema is unavailable')
+        from .regime_job_fence import settle_metered_job
+        settle_metered_job(c,job_id)
 
 
 
@@ -373,8 +435,24 @@ def recover_stale_jobs(*, older_than_seconds: int = 86400, now: int | None = Non
         candidates = [{'job_id': r['id'], 'user_id': r['user_id'],
                        'kind': r['kind'], 'started_at': r['started_at']} for r in rows]
         recovered = []
-        if not dry_run:
-            for job in candidates:
+        blocked = []
+        # Recovery is operator-assisted, never a worker takeover. A live or
+        # uncertain durable claim must not be bypassed by an old timestamp.
+        for job in candidates:
+            op_id = 'job:ledger:' + job['job_id']
+            claim_schema = c.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='regime_worker_claims'").fetchone()
+            if claim_schema:
+                claim = c.execute('SELECT state FROM regime_worker_claims WHERE operation_id=?', (op_id,)).fetchone()
+                if claim is not None:
+                    blocked.append({'job_id': job['job_id'], 'reason': 'worker_claim_requires_audited_resolution'})
+                    continue
+            fence_schema = c.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='regime_fence_operations'").fetchone()
+            if fence_schema:
+                fence = c.execute('SELECT status FROM regime_fence_operations WHERE operation_id=?', (op_id,)).fetchone()
+                if fence is not None and fence[0] != 'open':
+                    blocked.append({'job_id': job['job_id'], 'reason': 'inconsistent_fence'})
+                    continue
+            if not dry_run:
                 updated = c.execute(
                     "UPDATE ai_compute_jobs SET status='failed', finished_at=?, wall_ms=?, "
                     "usage_json='{}', resource_source='unmetered' "
@@ -382,9 +460,12 @@ def recover_stale_jobs(*, older_than_seconds: int = 86400, now: int | None = Non
                     (current, max(0, current-job['started_at'])*1000, job['job_id'], cutoff),
                 )
                 if updated.rowcount == 1:
+                    from .regime_job_fence import settle_metered_job
+                    settle_metered_job(c, job['job_id'])
                     recovered.append(job['job_id'])
         return {'dry_run': dry_run, 'cutoff': cutoff, 'candidates': candidates,
-                'recovered_job_ids': recovered}
+                'recovered_job_ids': recovered, 'blocked_jobs': blocked}
+
 
 
 def _parse_effective(value, *, default_now=False):
@@ -594,7 +675,9 @@ def report(period='month', *, user_id=None, anchor=None, start=None, end=None, _
         if c.execute("SELECT 1 FROM sqlite_master WHERE name='resource_quota_events'").fetchone():
             ids=[user_id] if user_id is not None else [r[0] for r in c.execute('SELECT DISTINCT user_id FROM resource_quota_events')]
             storage_overusage=[dict(user_id=uid,**s) for uid in ids for s in storage_segments(c,uid,a,b)]
-        return {'storage_overusage':storage_overusage,'gpu_slot_service':slot_service, 'hardware_by_job':hardware_by_job,
+        from .worker_loss_resolution import history as loss_history
+        approved_losses=[r for r in loss_history(c,user_id) if c.execute('SELECT 1 FROM ai_compute_jobs WHERE id=? AND started_at<? AND finished_at>=?',(r['job_id'],b,a)).fetchone()]
+        return {'operator_losses':approved_losses,'storage_overusage':storage_overusage,'gpu_slot_service':slot_service, 'hardware_by_job':hardware_by_job,
 'start_ts':a,'end_ts':b,'currency':'EUR','prices_micro':rates,
                 'billing_enabled_users': sorted({r['user_id'] for r in records if user_billing_enabled(r['user_id'],_connection=c)}),
                 'rows':list(groups.values()),'total_micro':sum(row['cost_micro'] for row in groups.values()),
@@ -771,6 +854,8 @@ def reconcile_period(user_id, start, end):
         jobs = c.execute('SELECT * FROM ai_compute_jobs WHERE accounting_excluded=0 AND user_id=? AND started_at<? '
                          'AND (finished_at IS NULL OR finished_at>=?) ORDER BY started_at,id',
                          (user_id, b, a)).fetchall()
+        from .worker_loss_resolution import audit as audit_losses
+        if not audit_losses(c)['verified']:issue('operator_loss_journal_unverifiable')
         existing = c.execute('SELECT id FROM ai_billing_periods WHERE user_id=? AND start_ts<? AND end_ts>?',
                              (user_id, b, a)).fetchone()
         if existing:
@@ -1068,7 +1153,8 @@ def run_scheduled_closures(*, at=None):
     return output
 
 
-def finish_job_idempotent(job_id, status, usage=None, *, source='unmetered', finished_at=None):
+def finish_job_idempotent(job_id, status, usage=None, *, source='unmetered', finished_at=None,
+                          worker_id=None, claim_token=None):
     """Idempotent retries for durable metering delivery, rejecting conflicts.
 
     The original finish_job remains a compare-and-set. This wrapper does not
@@ -1097,19 +1183,56 @@ def finish_job_idempotent(job_id, status, usage=None, *, source='unmetered', fin
     with db() as c:
         _init(c)
         row = c.execute('SELECT status,finished_at,usage_json,resource_source FROM ai_compute_jobs WHERE id=?', (job_id,)).fetchone()
+        from .worker_loss_resolution import assert_not_resolved
+        assert_not_resolved(c,job_id)
     if row is None:
         raise ValueError('Unknown billing job')
     if row['status'] == 'running':
         try:
-            finish_job(job_id, status, values, source=source, finished_at=finished_at)
+            finish_job(job_id, status, values, source=source, finished_at=finished_at,
+                       worker_id=worker_id, claim_token=claim_token)
             return {'job_id': job_id, 'status': status, 'already_finalized': False}
         except ValueError as exc:
             if str(exc) not in ('Job missing or already finalized', 'Job already finalized by another worker'):
                 raise
         with db() as c:
             row = c.execute('SELECT status,finished_at,usage_json,resource_source FROM ai_compute_jobs WHERE id=?', (job_id,)).fetchone()
-    if (row['status'] != status or row['resource_source'] != source
-            or json.loads(row['usage_json']) != values
-            or (finished_at is not None and finished_at != row['finished_at'])):
-        raise ValueError('Conflicting job finalization retry')
+    # Retries of claimed work require the same durable owner receipt as the
+    # initial completion. A matching ledger value alone proves no ownership.
+    with db() as c:
+        # Re-read ledger, claim, fence and loss decision under one lock. A
+        # previous read cannot authenticate a retry across concurrent recovery.
+        c.execute('BEGIN IMMEDIATE')
+        row = c.execute('SELECT status,finished_at,usage_json,resource_source FROM ai_compute_jobs WHERE id=?',
+                        (job_id,)).fetchone()
+        assert_not_resolved(c,job_id)
+        if row is None:
+            raise ValueError('Unknown billing job')
+        from .worker_cgroup_recovery import require_quiescent
+        require_quiescent(c,job_id)
+        claims_table = c.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='regime_worker_claims'").fetchone()
+        if claims_table:
+            claim = c.execute('SELECT worker_id,claim_token,state FROM regime_worker_claims WHERE operation_id=?',
+                              ('job:ledger:' + str(job_id),)).fetchone()
+            if claim is not None:
+                from .regime_operation_fence import FenceBlocked
+                if (worker_id, claim_token, 'finished') != tuple(claim):
+                    raise FenceBlocked('Claimed job retry requires completed owner receipt')
+                from .regime_worker_claims import verify_owner
+                verify_owner(c, 'job:ledger:' + str(job_id), worker_id=worker_id,
+                             token=claim_token, allow_finished=True)
+                fence = c.execute('SELECT status FROM regime_fence_operations WHERE operation_id=?',
+                                  ('job:ledger:' + str(job_id),)).fetchone()
+                if fence is None or fence[0] != 'closed':
+                    raise FenceBlocked('Claimed job retry requires closed fence')
+            elif worker_id is not None or claim_token is not None:
+                from .regime_operation_fence import FenceBlocked
+                raise FenceBlocked('Unexpected worker receipt on unclaimed job')
+        elif worker_id is not None or claim_token is not None:
+            from .regime_operation_fence import FenceBlocked
+            raise FenceBlocked('Worker claims schema unavailable')
+        if (row['status'] != status or row['resource_source'] != source
+                or json.loads(row['usage_json']) != values
+                or (finished_at is not None and finished_at != row['finished_at'])):
+            raise ValueError('Conflicting job finalization retry')
     return {'job_id': job_id, 'status': status, 'already_finalized': True}

@@ -7,11 +7,13 @@ and show useful hashes if Pages has not deployed by the timeout.
 """
 import argparse
 import hashlib
+import http.client
 from pathlib import Path
 import time
 from urllib.error import HTTPError, URLError
-from urllib.parse import urlencode
-from urllib.request import Request, urlopen
+from urllib.parse import urlencode,urlsplit
+
+MAX_RESPONSE_BYTES=16*1024*1024
 
 
 def sha256(data: bytes) -> str:
@@ -19,15 +21,24 @@ def sha256(data: bytes) -> str:
 
 
 def fetch(url: str, token: str, timeout: float) -> bytes:
+    parsed=urlsplit(url)
+    if parsed.scheme!='https' or not parsed.hostname or parsed.username or parsed.password or parsed.fragment:
+        raise ValueError('Public repository verification requires an HTTPS URL without credentials or fragment')
     # A changing query string prevents intermediate caches from returning a
     # previous generation of repomd.xml when the Pages deployment is delayed.
-    sep = '&' if '?' in url else '?'
-    request = Request(
-        url + sep + urlencode({'mta_verify': token}),
-        headers={'Cache-Control': 'no-cache', 'Pragma': 'no-cache', 'User-Agent': 'mta-pages-publish-verify'},
-    )
-    with urlopen(request, timeout=timeout) as response:
-        return response.read()
+    sep = '&' if parsed.query else '?'
+    connection=http.client.HTTPSConnection(parsed.hostname,parsed.port,timeout=timeout)
+    try:
+        path=(parsed.path or '/')+('?' +parsed.query if parsed.query else '')+sep+urlencode({'mta_verify':token})
+        connection.request('GET',path,headers={'Cache-Control':'no-cache','Pragma':'no-cache','User-Agent':'mta-pages-publish-verify'})
+        response=connection.getresponse()
+        # Verify this exact public URL; never follow redirects to local files,
+        # downgraded HTTP or a different host before release-cleanup approval.
+        if response.status!=200:raise HTTPError(url,response.status,response.reason,response.headers,None)
+        data=response.read(MAX_RESPONSE_BYTES+1)
+        if len(data)>MAX_RESPONSE_BYTES:raise OSError('Public repository response exceeds verification limit')
+        return data
+    finally:connection.close()
 
 
 def verify(staging: Path, base: str, channel: str, run_id: str, max_wait: float = 900,
@@ -55,7 +66,7 @@ def verify(staging: Path, base: str, channel: str, run_id: str, max_wait: float 
                     elif not data:
                         print(f'Pages {target}/{path} is empty (attempt {attempt})', flush=True)
                         good = False
-                except (HTTPError, URLError, TimeoutError, OSError) as exc:
+                except (HTTPError, URLError, TimeoutError, OSError,http.client.HTTPException) as exc:
                     print(f'Pages {target}/{path} unavailable: {exc} (attempt {attempt})', flush=True)
                     good = False
         if good:

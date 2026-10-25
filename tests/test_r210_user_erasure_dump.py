@@ -82,7 +82,7 @@ def test_erasure_of_legacy_already_purged_account_removes_old_sandbox(env):
     # Simulate receipts left by a release predating publication-outbox cleanup.
     from app import ai_publish_outbox
     with ai_publish_outbox._open() as con:
-        con.execute("INSERT INTO publications VALUES('q-ledger','p','hash','{}','published',1,2)")
+        con.execute("INSERT INTO publications(job_id,project_id,audio_sha256,metadata,state,staged_at,published_at) VALUES('q-ledger','p','hash','{}','published',1,2)")
     artifact=queue._ROOT/'publication/q-ledger.wav';artifact.write_bytes(b'private')
     with auth.db() as con:
         con.execute('CREATE TABLE future_queue_detail(job_id TEXT, secret TEXT)')

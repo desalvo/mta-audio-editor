@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="5" time="15.919" timestamp="2026-10-25T00:41:29.944371+08:00" hostname="9723f7e4ae8a"><testcase classname="tests.test_r210_admin_workflow_acceptance" name="test_visible_unique_retention_quota_and_cancelled_deletion[390-it]" time="3.758" /><testcase classname="tests.test_r210_admin_workflow_acceptance" name="test_visible_unique_retention_quota_and_cancelled_deletion[390-en]" time="3.175" /><testcase classname="tests.test_r210_admin_workflow_acceptance" name="test_visible_unique_retention_quota_and_cancelled_deletion[1280-it]" time="2.982" /><testcase classname="tests.test_r210_admin_workflow_acceptance" name="test_visible_unique_retention_quota_and_cancelled_deletion[1280-en]" time="2.874" /><testcase classname="tests.test_r210_admin_workflow_acceptance" name="test_search_selected_contract_and_permission_readback[390-it]" time="2.737"><failure message="AssertionError: [('color-contrast', [['.subscription-section[open=&quot;&quot;]:nth-child(2) &gt; fieldset &gt; p'], ['.subscription-section[open=&quot;&quot;]:...n[open=&quot;&quot;]:nth-child(4) &gt; .settings-form &gt; p:nth-child(7)'], ['p[data-paypal-status=&quot;&quot;]'], ['.access-required'], ...])]&#10;assert [{'id': 'colo...sholds', ...}] == []&#10;  &#10;  Left contains one more item: {'id': 'color-contrast', 'impact': 'serious', 'tags': ['cat.color', 'wcag2aa', 'wcag143', 'TTv5', 'TT13.c', 'EN-301-54... 'Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds', ...}&#10;  Use -v to get more diff">account = 2
+provider = ({'ORDER0001': {'id': 'ORDER0001', 'status': 'COMPLETED', 'purchase_units': [{'reference_id': '0270f777c5954ef5a03022b...1/capture', {}, 'mta-capture-0270f777c5954ef5a03022b629fc8ea1'), ('GET', '/v2/checkout/orders/ORDER0001', None, None)])
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7efc1995cf80&gt;
+nc_browser_config = {'executable_path': '/workspace/scratch/06e635791464/nc-browser-runtime/unpacked/chromium', 'headless': True, 'args': ...dbox', '--disable-dev-shm-usage', '--no-zygote', '--single-process', '--use-gl=angle', '--use-angle=swiftshader', ...]}
+language = 'it', width = 390
+
+    @pytest.mark.parametrize('language',['it','en'])
+    @pytest.mark.parametrize('width',[390,1280])
+    def test_search_selected_contract_and_permission_readback(account,provider,monkeypatch,nc_browser_config,language,width):
+        manager,browser,page,web,calls,errors=start(account,monkeypatch,nc_browser_config,language,width)
+        try:
+            activate(page,'[data-tab=subscriptions]')
+            page.locator('[data-search]').fill('quota-user');page.locator('[data-user-results] button').wait_for()
+            page.locator('[data-search]').focus();page.keyboard.press('ArrowDown');page.keyboard.press('Enter')
+            page.locator('[data-save-policy]').wait_for(state='attached')
+            page.evaluate("document.querySelectorAll('#subscriptionsTab details').forEach(d=&gt;d.open=true)")
+&gt;           scan(page,f'workflow-{language}-{width}-selected-contract')
+
+tests/test_r210_admin_workflow_acceptance.py:68: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+page = &lt;Page url='https://mta.test/settings'&gt;
+name = 'workflow-it-390-selected-contract'
+
+    def scan(page,name):
+        result=page.evaluate("async()=&gt;axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21a','wcag21aa']},resultTypes:['violations','incomplete']})")
+        (ROOT.parent/('admin-debug-'+name+'.json')).write_text(json.dumps(result,indent=2))
+&gt;       assert result['violations']==[],[(x['id'],[n['target'] for n in x['nodes']]) for x in result['violations']]
+E       AssertionError: [('color-contrast', [['.subscription-section[open=""]:nth-child(2) &gt; fieldset &gt; p'], ['.subscription-section[open=""]:...n[open=""]:nth-child(4) &gt; .settings-form &gt; p:nth-child(7)'], ['p[data-paypal-status=""]'], ['.access-required'], ...])]
+E       assert [{'id': 'colo...sholds', ...}] == []
+E         
+E         Left contains one more item: {'id': 'color-contrast', 'impact': 'serious', 'tags': ['cat.color', 'wcag2aa', 'wcag143', 'TTv5', 'TT13.c', 'EN-301-54... 'Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds', ...}
+E         Use -v to get more diff
+
+tests/test_r210_admin_accessibility.py:36: AssertionError</failure></testcase></testsuite></testsuites>

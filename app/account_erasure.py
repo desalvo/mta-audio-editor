@@ -11,10 +11,10 @@ def erase(uid, actor, *, confirmed=False):
     if not admin or admin['role'] != 'admin' or not admin['active']:
         raise ValueError('Amministratore attivo richiesto')
     with life._LOCK:
-        return _erase(uid)
+        return _erase(uid,actor=actor)
 
 
-def _erase(uid):
+def _erase(uid,*,actor=None):
     journal = life.root() / ('erase-' + str(int(uid)) + '.json')
     if journal.is_symlink():
         raise ValueError('Unsafe erasure journal')
@@ -23,8 +23,17 @@ def _erase(uid):
         raise ValueError('Gli amministratori non possono essere eliminati')
     if any(j['state'] in ('queued', 'blocked', 'running') for j in life.jobs(uid)):
         raise ValueError('Attendere la conclusione dei job attivi')
+    from .operator_refunds import require_erasure_ready
+    from .ai_pull_coordinator import erasure_safe, record_erasure
+    with auth.db() as con:
+        require_erasure_ready(con,uid)
+        erasure_safe(con,uid)
     if journal.exists():
         intent = json.loads(journal.read_text())
+        if actor is not None and intent.get('actor')!=actor:
+            intent['actor']=actor
+            from .storage import _atomic_json_write
+            _atomic_json_write(journal,intent)
     else:
         with auth.db() as con:
             life.init(con)
@@ -51,7 +60,7 @@ def _erase(uid):
 
         with auth.db() as con:
             selected, _ = life._rows_for_user(con, uid)
-        intent = {'uid': uid, 'archives': [a['id'] for a in archives], 'sandboxes': sandbox_ids,
+        intent = {'uid': uid, 'actor':actor, 'archives': [a['id'] for a in archives], 'sandboxes': sandbox_ids,
                   'projects': [p.id for p in storage.list_projects(is_admin=True) if p.owner_user_id == uid],
                   'identities': identities + [{'kind':kind,'digest':life.identity(kind,value)} for a in archives for kind,value in (('username',a['username']),('email',a['email'])) if value],
                   'jobs': sorted(sandbox_jobs | {j['job_id'] for j in life.jobs(uid)} | {r['id'] for r in selected.get('ai_compute_jobs', {}).values()})}
@@ -61,6 +70,7 @@ def _erase(uid):
     # Mark first to prevent approval/dispatch while a failed cleanup is retried.
     with auth.db() as con:
         con.execute('BEGIN IMMEDIATE')
+        erasure_safe(con,uid)
         current = con.execute('SELECT role,active FROM users WHERE id=?', (uid,)).fetchone()
         if current and (current['role']=='admin' or current['active']):
             journal.unlink(missing_ok=True)
@@ -90,6 +100,7 @@ def _erase(uid):
     storage.rescan_shared_media(delete_unreferenced=True)
     with auth.db() as con:
         con.execute('BEGIN IMMEDIATE')
+        erasure_safe(con,uid)
         protected = con.execute('SELECT role FROM users WHERE id=?', (uid,)).fetchone()
         if protected and protected[0] == 'admin':
             raise ValueError('Gli amministratori non possono essere eliminati')
@@ -97,6 +108,17 @@ def _erase(uid):
         con.execute('PRAGMA secure_delete=ON')
         con.execute('PRAGMA defer_foreign_keys=ON')
         con.execute('UPDATE users SET approved_by=NULL WHERE approved_by=?', (uid,))
+        from .subscription_receivables import authorize_account_erasure
+        authorize_account_erasure(con,uid,intent.get('actor'))
+        from .noncommercial_contributions import authorize_account_erasure as authorize_nc_erasure
+        authorize_nc_erasure(con,uid,intent.get('actor'))
+        from .worker_cgroup_recovery import authorize_account_erasure as authorize_worker_erasure
+        authorize_worker_erasure(con,uid,intent.get('actor'))
+        from .worker_loss_resolution import authorize_account_erasure as authorize_loss_erasure
+        authorize_loss_erasure(con,uid,intent.get('actor'))
+        from .operator_refunds import authorize_account_erasure as authorize_refund_erasure
+        authorize_refund_erasure(con,uid,intent.get('actor'))
+        record_erasure(con,uid)
         for name, rows in selected.items():
             for key in rows:
                 con.execute('DELETE FROM ' + meta[name][0] + ' WHERE rowid=?', (key,))  # noqa: S608 -- quoted SQLite schema

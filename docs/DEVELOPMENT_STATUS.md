@@ -1,3 +1,485 @@
+> Chromium follow-up: manual workflow **Optional merchant history Chromium**, input **merchant_history_chromium=true**;requires4 real passes/zero skips. See current handoff for exact dispatch/artifact procedure. No GitHub write or CI run was performed here.
+
+## Current checkpoint — merchant-wide observations — 2026-10-25
+
+Read **MERCHANT_HISTORY_HANDOFF_R210.md** first. New: bounded two-pass authenticated PayPal account-history acquisition,private immutable snapshots/admin API and IT/EN consultation panel. **70 current passes,32 new,4 actual Chromium cases blocked by missing engine.** Merchant observations never settle money or certify full history. A4/A5 legacy/partial/actual movement binding remain open. **23/42(54.8%),0/7 whole macroareas;RC false;switching disabled.** Current evidence: `validation/r210/merchant-history-test-summary.json`.
+
+## Current checkpoint — 2026-10-25 — original subscription loss
+
+Read **ORIGINAL_SUBSCRIPTION_LOSS_HANDOFF_R210.md** and the revised **RC_CLOSURE_PLAN_R210.md** first. New closure: immutable original fee/surplus basis, authenticated full-capture reversal to exact owner repayment, no duplicate refund principal, conservative legacy/partial/protection gaps. Current tests: `validation/r210/original-loss-test-summary.json`. **23/42(54.8%),0/7 whole macroareas;RC false;switching disabled.** Previous validated execution/publication work is retained.
+
+## Current continuation — 2026-10-25
+
+Read **TWENTY_CYCLE_RECOVERY_HANDOFF_R210.md** first. New closure: original-owner frozen Arranger/Remix publication after verified parent death, real WAV publication metadata, crash/ACK/concurrency recovery and administrator API. Only newly admitted immutable publication intents qualify. Prior statements that all successful frozen deferred output is unrecoverable are superseded for this exact scope; legacy/unknown work remains held. **23/42 (54.8%),0/7 whole macroareas; RC false, transition disabled.** Current evidence: `validation/r210/twenty-cycle-test-summary.json`.
+
+## Current checkpoint — ten-cycle authoritative pull coordination — 2026-10-24 — PRE-RC
+
+Read **PULL_COORDINATION_HANDOFF_R210.md**, **PULL_COORDINATION_IT_EN_R210.md** and **TEN_CYCLE_BATCH_R210.json**. Ten substantial internal cycles completed without intermediate packages or commits. The actual registered/token and deferred Arranger/Remix paths now use one pinned shared HTTPS authority for admission, owner/epoch, private input/result storage, frozen completion and original-client recovery. Node credentials are scoped; stale/revoked/uncertain workers cannot obtain takeover. Pause/drain/planned recovery, actual erasure, free-only no-charge and namespace-correct process identity/telemetry are integrated.
+
+**B4 locally verified;23/42 (54.8%),0/7 whole macroareas;RC false,switching disabled.** This is a supported single-authority Linux backend, not multi-leader/HA or actual multi-host/kernel certification. **898 distinct affected cases passed,90 new,zero unresolved failures/errors/skips.** Real independent HTTPS worker processes, authority/worker SIGKILL, dropped replies, exact one-execution counters, original request replay and final account erasure are included. Source-bound review284 app files/168 unchanged unsuppressed findings(0 HIGH/21 MEDIUM/147 LOW);transport30 sites/21 files;checkers unchanged. Full Ruff/compileall passed. Historical unrelated Linux/native/coverage/dependency/E6 browser/axe evidence reused. B2/B5/B6,whole-service C2,global/legacy finance,executing-checkpoint rights,enabled cutover and target acceptance remain open. No GitHub/real-server/payment/model/SMTP changes or commit/push/tag/release. Exact case provenance:validation/r210/ten-cycle-test-summary.json.
+
+## Historical checkpoint records (superseded for current progress)
+
+## Current checkpoint — worker ownership and epoch integrity — 2026-10-24 — PRE-RC
+
+Read **WORKER_EPOCH_HANDOFF_R210.md** and **WORKER_EPOCH_IT_EN_R210.md**. After environment recovery, the verified administration cumulative was restored; the interrupted unsaved pull prototype was lost and is not delivered or counted. Shared receipt checks now reject stale or inconsistent worker ownership across claim retry, heartbeat, release, actual billing, deferred publication and recovery. Exact closed historical acknowledgements remain idempotent after later epochs; read-only audit uses one snapshot and flags current epoch/barrier corruption.
+
+**350 distinct affected cases passed, including 49 new; zero current failures/errors/skips.** Actual child death after accounting commit recovers without a second settlement; original uncertain worker holds and quiescence requirements remain enforced. Source-bound static review:279 app files,168 unchanged unsuppressed findings,0 HIGH/21 MEDIUM/147 LOW;transport29 sites/20 files;checkers unchanged. Full Ruff/compileall passed. Historical unrelated Linux/native/coverage/dependency/admin browser/axe evidence reused. **22/42 (52.4%),0/7 complete macroareas;RC false,switching disabled.** Shared coordinator/storage,all-executor quiescence,global/legacy finance,remote executing-checkpoint rights and enabled cutover still require implementation/acceptance. No GitHub/real-server/payment/model/SMTP changes or commit/push/tag/release. Per-case evidence:validation/r210/worker-epoch-test-summary.json.
+
+## Historical checkpoint records (superseded for current progress)
+
+## Current checkpoint — complete current web administration acceptance — 2026-10-24 — PRE-RC
+
+Read **ADMIN_ACCEPTANCE_HANDOFF_R210.md**, **ADMIN_ACCEPTANCE_IT_EN_R210.md** and the restructured **RC_CLOSURE_PLAN_R210.md**. All nine settings tabs, Billing, Tokens, optional catalogue and the job monitor now pass actual local API/SQLite/Chromium acceptance in IT/EN, commercial/NC, 390/1280 px and light/dark themes. Repaired duplicate retention forms, unnamed fields, tab/focus semantics, contrast/reflow and read-error recovery; real retention/quota/permission/token workflows read back their actual effects.
+
+**330 distinct affected cases passed, including 136 actual Chromium;44 new browser cases.328 administration axe reports have zero violations/unresolved supplemental items;no rule exclusions.** Exact latest-case/report provenance: validation/r210/admin-test-summary.json. Source-bound security:279 app Python files,168 reviewed unsuppressed findings(0 HIGH/21 MEDIUM/147 LOW);transport inventory29 sites/20 files,checkers unchanged. Historical unrelated full Linux/C++/coverage/dependency evidence reused. **E6 locally verified:22/42 (52.4%),0/7 whole macroareas;RC false,switching disabled.** Complete enabled-cutover E4/E5,D6,shared coordination/all-executor quiescence,global/legacy financial obligations,payout proof and remote rights/target acceptance remain open. Current web acceptance is not OS-native/manual-assistive-technology/whole-product certification. No GitHub/real-server/actual payment/inference/SMTP changes or commit/push/tag/release.
+
+## Previous checkpoint records (historical)
+
+## Current checkpoint — exact PayPal item allocation and private movement review — 2026-10-24 — PRE-RC
+
+Read **PAYPAL_ITEM_MOVEMENT_HANDOFF_R210.md** and **PAYPAL_ITEM_MOVEMENT_IT_EN_R210.md**. Authenticated canonical item amounts now support exact partial multicapture disputes through atomic ledger settlement and actual IT/EN owner pages. Missing/ambiguous item evidence stays blocked; quantity never multiplies the monetary proof. The administrator has a bounded private movement-observation table with exact decimal display, keyboard scrolling, error recovery and no settlement action. Payout/protection completion still lacks authoritative unique case/capture/completed-transaction binding; these observations never release funds or pass processor fees to users.
+
+**392 distinct affected cases passed, including 30 actual Chromium; 66 new cases (54 domain/12 browser), zero current failures/errors/skips.** Source review: 279 app files, 168 unsuppressed reviewed findings, 0 HIGH/21 MEDIUM/147 LOW; transport inventory 29 sites/20 files, checker unchanged. Prior Linux/C++/coverage/dependency/D4 accessibility evidence reused without rerun. **Formal progress remains 21/42 (50.0%), 0/7 whole macroareas; RC false and switching disabled.** A4/A5 global/ambiguous history, payout settlement, legacy obligations and original permanent fee loss remain open, along with shared coordination, remote attestation, enabled cutover and target acceptance. No actual merchant/real-server/GitHub changes or commit/push/tag/release. Exact evidence: validation/r210/paypal-item-movement-test-summary.json.
+
+## Previous checkpoint records (historical)
+
+## Current checkpoint — PayPal known-order dispute history — 2026-10-24 — PRE-RC
+
+Read **PAYPAL_DISPUTE_HISTORY_HANDOFF_R210.md** and **PAYPAL_DISPUTE_HISTORY_IT_EN_R210.md**. Existing owner/admin GET-only verification now discovers paginated canonical disputes for every capture of the selected known PayPal order, applies exact supported holds/releases with funding/refunds atomically, and exposes private held amounts and unresolved status. Full-gross multicapture allocations are exact; partial/foreign/payout/protection ambiguities remain blocked. Durable history gaps retain previously observed dispute IDs, prevent ordinary unpaid fulfillment bypass and close only with verified complete settlement. No financial provider mutation is available through verification.
+
+**428 distinct affected cases passed, including 47 actual Chromium; 93 new cases (77 domain/16 browser), zero current failures/errors/skips.** Current source-bound review: 278 app Python files, 168 unsuppressed reviewed findings, 0 HIGH/21 MEDIUM/147 LOW; transport inventory 29 sites/20 files. Prior full Linux/C++/coverage/dependency and D4 accessibility evidence reused without rerun. **Formal progress remains 21/42 (50.0%), 0/7 whole macroareas; RC false and switching disabled.** A4/A5 global history, actual payout/protection movements, partial multicapture allocations and legacy/original fee-loss obligations remain implementation pending. Shared coordination, remote rights, enabled cutover and full target acceptance remain open. No GitHub/real-server/actual payment changes or commit/push/tag/release. Exact evidence: validation/r210/paypal-discovery-test-summary.json.
+
+## Earlier checkpoint records (historical; superseded above)
+
+## Current checkpoint — complete local owner Account workflow — 2026-10-24 — PRE-RC
+
+Start with **ACCOUNT_WORKFLOW_HANDOFF_R210.md** and **ACCOUNT_WORKFLOW_IT_EN_R210.md**. The actual Account and Credits pages now complete the local two-regime owner workflow: commercial plan/trial/renewal/cancellation/overage/storage/report controls, authenticated funding and existing-payment recovery, private repayment/refund histories, NC voluntary statements/reports/reviewed receipts and CSV. Locale changes and simultaneous refreshes cannot repeat in-flight mutations or replace newer results; verified payment notices survive the fresh readback. Owner tables have named keyboard scrolling, visible focus, truthful empty/error states and tested contrast.
+
+**315 distinct affected cases have current passing evidence, including 160 Chromium cases; 104 new cases include 94 Chromium. No current failures/errors/skips.** Sixteen axe owner-page combinations passed WCAG2/2.1 A/AA automated checks with zero violations and zero unresolved supplemental contrast items; no whole-product/native accessibility certification is claimed. Provider I/O is simulated. Historical full Linux/C++/coverage/dependency evidence is preserved without rerun. Current source-bound security: 277 app Python files, 168 reviewed unsuppressed findings, 0 HIGH/21 MEDIUM/147 LOW; transport inventory 29 sites /20 files. **D4 locally verified: 21/42 milestones (50.0%),0/7 whole macroareas; RC false and switching disabled.** A4/A5,F3,I1/I4,D6,whole administration/native/target acceptance remain open. No actual merchant, GitHub or real-server mutation; no commit/push/tag/release. Exact per-case provenance and corrected earlier runs: validation/r210/account-workflow-test-summary.json.
+
+## Earlier checkpoint records (historical; superseded above)
+
+## Current checkpoint — operator refund workflow — 2026-10-24 — PRE-RC
+
+Start with **OPERATOR_REFUNDS_HANDOFF_R210.md** and **OPERATOR_REFUNDS_IT_EN_R210.md**. The administrator can prepare an exact refund against a reconciled Stripe credit payment or owned PayPal capture, separately confirm one dispatch, verify authenticated provider receipts and reconcile the real local wallet/receivable ledger. Persistent uncertainty forbids re-dispatch, cancellation or a second refund key for the order. GET-only recovery, immutable identity/audit, private owner history, IT/EN responsive UI, readiness blockers and authorized retired-account erasure are integrated. Supported scope includes PayPal multiple captures, original subscriptions and repayment/surplus refunds. Full provider-wide history and original fee-loss risks remain incomplete.
+
+**254 distinct affected cases passed (93 refund workflow, 125 regressions, 36 gates), including 10 Chromium cases and one actual child-process death after the durable dispatch barrier.** Provider I/O is simulated; no real payment or merchant endpoint was contacted. Historical full Linux/C++/coverage/dependency evidence is preserved without rerun. Current security gate: 277 app Python files, 168 reviewed findings, 0 HIGH /21 MEDIUM /147 LOW, no suppressions. Transport inventory: 29 explicit sites /20 files. Formal acceptance remains **20/42 (47.6%), 0/7 whole macroareas; RC false and switching disabled**. No GitHub/server mutation, commit, push, tag or release.
+
+## Earlier checkpoint records (historical; superseded above)
+
+## Current checkpoint — remote transport rights enforcement — 2026-10-24 — PRE-RC
+
+Start with **REMOTE_RIGHTS_HANDOFF_R210.md**. Direct remote-client inference, raw ACE proxy mutations and standalone ACE HTTP submissions now recheck current model/regime permission before dispatch. Loopback/SSH tunnels have no commercial exemption. Exact gateway URL prefixes and native device-auth paths cannot be repurposed to skip the gate. Historical retrieval/polling/cancellation stays separate. Native IT/EN settings explain blocked/unverified/model-review status without exposing credentials. A checker/source-bound inventory covers 27 explicit Python transport boundaries in 19 files.
+
+**213 distinct affected cases passed, including 4 Chromium dialog cases; no current failures/errors/skips.** Historical financial/worker/global evidence reused without rerun. Current source-bound static gate: 276 app Python files, 168 reviewed findings, 0 HIGH /21 MEDIUM /147 LOW, no suppressions. **20/42 (47.6%), 0/7 whole macroareas; RC false, switching disabled.** F3 authenticated checkpoint/rights exchange and F4 opaque external/all-legacy executor acceptance remain implementation pending. No commercial remote inference enabled, no GitHub/server/real payment/model endpoint mutations.
+
+## Earlier checkpoint records (historical; superseded above)
+
+## Current checkpoint — financial outcome integrity — 2026-10-23 — PRE-RC
+
+Start with **FINANCIAL_OUTCOME_HANDOFF_R210.md**. Authenticated canceled Stripe intents with a complete, bounded, strictly zero-money failed-charge history can now close atomically through owner/admin verification, preserving a private immutable proof and safe new-purchase admission. PayPal final loss/release outcomes cannot be replaced by later incompatible evidence; contradictory final snapshots stay pending, and owner IT/EN history shows a private review warning. No new customer debt, provider payment action or regime switch is introduced.
+
+**243 distinct affected cases have passing latest evidence, including 12 real Chromium cases; zero current failures/errors/skips.** Raw execution/correction provenance is explicit in validation/r210/financial-outcome-test-summary.json; this is not a new global-suite run. Security gate: 276 app Python files, 168 reviewed findings (0 HIGH /21 MEDIUM /147 LOW), no suppressions. Previous baseline/coverage/native/audit evidence reused. **20/42 (47.6%), 0/7 whole macroareas; RC false, switching disabled.** Unknown/financially nonempty histories, provider-wide discovery, permanent original-subscription loss resolution/operator refunds, rights, coordinator, cutover and target acceptance remain open.
+
+## Earlier checkpoint records (historical; superseded above)
+
+## Current checkpoint — private owner payment recovery — 2026-10-23 — PRE-RC
+
+Read **OWNER_PAYMENT_RECOVERY_HANDOFF_R210.md** first. Private paginated Stripe/PayPal local history now appears on the actual account and credits pages, survives eligibility loss, supports validated existing redirects and explicit authenticated GET-only reconciliation. Verification never creates/captures/refunds a provider payment. Unknown creation remains an administrator case. Serialized admission prevents fresh-ID duplicate pending credit purchases across both providers and duplicate subscription fees for the same period. Corrected /account/credits serving JSON instead of HTML. IT/EN errors and delayed locale responses remove stale actions.
+
+**231 distinct affected cases passed, including 24 real Chromium cases; 0 failures/errors/skips.** Security gate refreshed: 275 app files, 168 reviewed findings (0 HIGH /21 MEDIUM /147 LOW), no suppressions. Complete historical baseline/coverage/native/audit retained without repetition. **20/42 (47.6%), 0/7 whole macroareas; RC false, switching disabled.** D4/A5 remain partial: complete accessibility/platform/cutover, legacy/unknown financial histories, remote rights and coordination still require implementation/acceptance. No GitHub/server writes, real money/provider requests, commit, push, tag or release.
+
+## Earlier checkpoint records (historical; superseded above)
+
+## Current checkpoint — regime-aware account financial context — 2026-10-23 — PRE-RC
+
+Read **ACCOUNT_FINANCIAL_HANDOFF_R210.md** first. Personal accounting now separates voluntary NC cost shares, administrator-reviewed receipts, transfer reports awaiting verification, operator refunds, commercial credit wallet and unknown/no-charge job outcomes. Verified NC periods participate in closed-usage totals. Subscription commands are removed after a failed refresh; late prior-language responses cannot replace current wallet controls. Owner identity and generic integrity-error handling are enforced.
+
+**130 distinct affected tests passed, including 31 real Chromium cases; 0 skips/failures.** Full /account mounts passed in IT/EN at 390/1280 px. Security gate refreshed for exactly 274 app files and 168 reviewed findings (0 HIGH /21 MEDIUM /147 LOW), no suppressions. Historical full baseline/coverage/native/audit retained without rerun. **20/42 (47.6%), 0/7 whole macroareas, RC false, switching disabled.** D4 remains partial: this completes the account financial overview/error workflow, not every payment/account/cutover acceptance. No GitHub, real-server or payment changes.
+
+## Earlier checkpoint records (historical; superseded above)
+
+## Current checkpoint — local security review and model/process hardening — 2026-10-23 — PRE-RC
+
+Read **SECURITY_REVIEW_HANDOFF_R210.md** first. Completed a source-bound review of every finding in the current application Bandit scan: **273 Python files, 168 reviewed findings, 0 HIGH / 21 MEDIUM / 147 LOW, no suppressions or skipped checks**. Removed unrestricted Transkun checkpoint loading; fixed custom/Mega 53 separator pipe deadlocks with cancellation, timeout and diagnostic limits; hardened chord/ACE source archives and staged chord installation. `scripts/check_security_review.py` runs the scanner and blocks stale/incomplete reviews or new findings.
+
+**127 distinct affected tests passed, 1 optional-Torch prerequisite skip, zero unresolved failures.** Historical full Linux baseline, coverage, C++ and dependency audit retained without repetition. Formal acceptance stays **20/42 (47.6%), 0/7 whole macroareas, RC false and switching disabled**: this closes the unreviewed local static-baseline debt, not complete platform/model/runtime security or the remaining functional macroareas. No GitHub/real-server changes, commits, pushes, tags, actual model downloads, provider/bank requests or payments.
+
+## Earlier checkpoint records (historical; superseded above)
+
+## Current checkpoint — operator-funded worker loss resolution — 2026-10-23 — PRE-RC
+
+Start with **WORKER_LOSS_RESOLUTION_HANDOFF_R210.md** and DEVELOPMENT_COMPONENTS_R210.json. Original frozen Arranger/Remix results can be recovered without reinference. For newly instrumented, provably quiescent jobs without produced economic evidence, an administrator can explicitly absorb unknown loss: atomic reservation/lease/claim/fence closure, no customer charge, no reallocation, immutable audit, private owner history and IT/EN controls. Producer barriers reject later evidence or normal settlement. NC statements require confirmation that eligible documented costs exclude operator-assumed losses.
+
+**330 distinct affected tests passed; 1 delegated-kernel prerequisite skip; zero unresolved failures.** Prior full Linux baseline/coverage/native/audit reused without repetition. Progress remains **20/42 (47.6%), 0/7 whole macroareas; B2 pending, RC false, switching disabled**. Legacy unknown evidence, complete executor/kernel acceptance, shared coordination, residual provider/rights/cutover/UI/security work remain open. No GitHub/server writes, actual payments, commits, pushes, tags or releases.
+
+## Earlier checkpoint records (historical; superseded by the section above)
+
+## Current checkpoint — durable local worker recovery — 2026-10-23 — PRE-RC
+
+Start with DURABLE_WORKER_RECOVERY_HANDOFF_R210.md. Registered economic cgroups now commit their original supervisor/claim/kernel binding before spawn. Bootstrap admission and recovery share the ledger write barrier, preventing a late child from joining after quiescence. Normal cleanup and authenticated administrator recovery persist immutable receipts. Missing/unverified receipts block financial completion and GPU-lease release. Admin IT/EN UI includes confirmation, durable retry, pagination and retained financial obligations. Scoped retired-account erasure and combined readiness include the journal.
+
+**278 distinct affected cases passed; 1 delegated-kernel prerequisite skip; zero unresolved failures/errors.** Actual supervisor death after registration and before spawn passed; synthetic kernel files and actual API/SQLite/browser paths passed. The opt-in actual nested-cgroup crash test remains unexecuted. Progress stays **20/42 (47.6%), 0/7 whole macroareas; B2 pending, RC false, switching disabled**. Post-crash financial resolution, non-cgroup executor coverage, shared coordinator and full security review remain incomplete. No GitHub/server changes, actual payment/provider requests, full baseline or coverage repetition.
+
+## Previous checkpoint — worker identity and recursive cleanup — 2026-10-23 — PRE-RC
+
+Read WORKER_QUIESCENCE_HANDOFF_R210.md first, then NC_COLLECTION_HANDOFF_R210.md for the retained collection workflow. Unknown Linux process identity no longer implies death; hidden /proc entries require an absence probe. Verifiable scheduler identity is required for Linux/Windows admission/completion and all deferred economic ownership. Recursive cgroup.kill cleanup replaces direct-member PID killing and requires recursive populated=0. Failed cleanup invalidates a pending measurement. Actual supervisor SIGKILL with a surviving external child preserves the economic claim and blocks stale settlement/replay. No audited forced claim closure or distributed recovery is implemented.
+
+**116 affected cases passed, 1 explicit delegated-kernel prerequisite skip; zero unresolved failures. Progress remains 20/42 (47.6%), 0/7 complete macroareas; B2 remains implementation_pending, RC false, switching disabled.** No complete baseline/coverage rerun, GitHub/server modifications or actual payments. Full historical security and other implementation gaps remain open.
+
+## Previous checkpoint — NC collection and script security — 2026-10-23 — PRE-RC
+
+D5 is locally verified for optional bank-transfer collection with explicit administrator review: personal statement, amount confirmation, frozen instructions, report, reviewed partial/full receipt, excess/refund/reversal/closure, private IT/EN history and CSV. No bank API or actual transfers. Fixed authorized erasure of closed NC jobs and regime-specific billing controls. The 33 prior script Ruff issues are resolved; full historical security review remains open.
+
+**Progress: 20/42 equal-weight RC criteria (47.6%); 0/7 full macroareas accepted.** RC false; switching disabled. 247 distinct affected tests passed, including 14 real Chromium cases. Prior full baseline/coverage retained without rerun. Read NC_COLLECTION_HANDOFF_R210.md and NC_COLLECTION_IT_EN_R210.md first. No GitHub/server writes or real payments. Whole-product completion unknown. Remaining implementation is distinct from external prerequisites.
+
+## Previous checkpoints (historical)
+
+## Current checkpoint — terminal checkout recovery, 2026-10-23 — PRE-RC
+
+Authenticated empty terminal checkouts now close atomically; lost creation responses can be bound to an authenticated known provider ID without redispatch. IT/EN operator and owner recovery flows and owner-scoped financial erasure are covered. Read TERMINAL_CHECKOUT_HANDOFF_R210.md and TERMINAL_CHECKOUT_RECOVERY_IT_EN_R210.md first. 323 distinct affected cases passed (overlapping baseline, not full CI). Progress remains 19/42 (45.2%), 0/7 whole macroareas accepted; A5 partial, RC false, switching disabled. Missing implementation and external prerequisites are in KNOWN_BLOCKERS_R210.md. No GitHub/server or real payment changes.
+
+## Previous checkpoints (historical)
+
+## Current checkpoint — subscription recoveries, 2026-10-23 — PRE-RC
+
+- **Version:** 0.3.0-r210; RC not reached; administrative switching disabled. No GitHub/server writes, commits, pushes, tags, releases, real payments or provider requests.
+- **Resume:** existing workspace from MTA-0.3.0-r210-pre-RC-deferred-paypal-history-cumulative.zip, SHA-256 34c4031251f11f1c618bc15020ef38c204b26d090e40fb7eb1f0d70ee37bac8e.
+- **Completed functional flow:** collection of exact existing subscription refund receivables: immutable target/quote, owner confirmation and checkout, resume, verified return, atomic allocation, duplicate/concurrent recovery, refund/dispute/permanent-reversal reopening, explicit rounding/overpayment refund liability, owner/admin IT/EN UI and actual financial report/readiness integration. D3 locally verified; full financial macroarea remains partial.
+- **Account data lifecycle:** new immutable financial rows support existing explicit admin erasure only for the retired owner and current connection. Other users and normal financial deletion remain protected.
+- **Verification:** 233 distinct affected cases passed; final-case union in validation/r210/repayment-test-summary.json; live Chromium IT/EN at 390/1280 px and actual FastAPI/SQLite, provider fixtures only. Whole-project Ruff, app compilation and changed JS syntax passed; zero new-module Bandit findings. Tests and scopes are in TEST_MATRIX_R210.md.
+- **Reused evidence:** prior complete Linux baseline 5,228 passed / 73 skipped, combined coverage 73.67749%; C++ 49 passed / 5 skipped and dependency audit unchanged. No global baseline rerun or coverage recollection.
+- **Progress:** 19/42 equally weighted RC milestones verified locally = 45.2%; 0/7 full macroareas. Whole-product completion unknown; no production validation. Historical 70% estimates remain incomparable.
+- **Pending:** original subscription risk obligations and operator refunds, remaining provider histories/payouts/legacy/uncertain outcomes; distributed coordinator and actual external-worker quiescence; authenticated remote rights; complete guarded cutover; NC contribution collection; remaining UX/platform/security acceptance. External prerequisites remain separately listed in KNOWN_BLOCKERS_R210.md.
+- **Resume:** SUBSCRIPTION_RECOVERY_HANDOFF_R210.md, SUBSCRIPTION_RECOVERIES_IT_EN_R210.md and DEVELOPMENT_COMPONENTS_R210.json. Older notes below are historical, not current status.
+
+## Previous checkpoint (superseded)
+
+## Current continuation checkpoint — 2026-10-23 — PRE-RC (authoritative)
+
+- **Version:** 0.3.0-r210; RC not reached; administrative switching disabled. No GitHub/server changes, commits, pushes, tags, real payments or production access.
+- **Resume source:** MTA-0.3.0-r210-pre-RC-ledger-workers-cumulative.zip, SHA-256 6341ed9b86a45235177df9347d06e7508b4580f61ebb2d1c76d0af7462f0fbec.
+- **New behavior:** original execution owner preserved through deferred Arranger/Remix metering, publication and billing; safe frozen-result recovery and idempotent settlement. PayPal canonical capture/refund history now settles refunded initial captures and paid orders atomically to the net wallet, with fail-closed snapshot/history validation.
+- **Current affected regressions:** 23 final owner/publication tests, 76 scheduler/recovery tests, 108 financial/admin tests passed. These overlap and are not a new complete-suite count. Project Ruff and app compileall passed; two new modules have zero Bandit findings.
+- **Retained baseline:** 5,228 distinct Linux tests passed, 73 skipped; coverage 73.67749% against required 70%; C++ 49 passed / 5 skipped; runtime audit 31 packages / zero known vulnerabilities. Not rerun or recollected after continuation; see TEST_MATRIX_R210.md.
+- **Progress:** 18/42 equally weighted RC milestones locally verified = 42.9%; 0/7 full macroareas accepted. The earlier 70% historical estimate is not comparable; whole-product completion unknown and production validation 0%.
+- **Remaining implementation:** shared multi-host coordinator, actual supervisor/external-worker quiescence, all executor coverage, authenticated remote rights, residual financial histories/payouts/legacy/repayment and uncertain outcomes, guarded complete cutover, NC collection and full account/operator UX. External sandbox/container/platform/hardware limitations are separately recorded.
+- **Resume documents:** CONTINUATION_HANDOFF_R210.md, DEVELOPMENT_COMPONENTS_R210.json, DEVELOPMENT_HANDOFF_R210.md, RC_ACCEPTANCE_REPORT.md, TEST_MATRIX_R210.md and KNOWN_BLOCKERS_R210.md. Historical notes below do not override them.
+- **Delivery:** one cumulative useful pre-RC checkpoint, preserving all original files and protected assets/licenses/manuals; no intermediate deliverable archives.
+
+## Historical development log (superseded by current checkpoint)
+
+## Work baseline — 2026-10-23 (authoritative current checkpoint)
+
+Version 0.3.0-r210; incoming archive MTA-r210-provider-authenticated-journal-handoff-cumulative.zip, 91,395,371 bytes, SHA-256 603c5a5e650178b912605d4203154ea310b2f387e35c9c4c9e719ee30c1d1817, 3,267 members, full CRC passed. GitHub main independently read: 0ad84a5fa0c66d75f75882a0f6e5c6a398470dc6 (unchanged). Extracted cumulative is primary; no remote integration or Git mutation.
+
+Initial environment: Python 3, Node available; pytest/httpx initially absent; dependency installation in progress. No docker/podman executable found. RC remains blocked. Historical 70% is an estimate, not a measured scope denominator. Initial priorities: transactional provider processing and reversal safety; then worker, transition, billing/UI/license entrypoints and available regression.
+
+## 2026-10-23 — Persistent provider evidence journal and finance readiness integration (commit deferred)
+
+- IMPLEMENTED: `app/regime_financial_evidence.py` adds an immutable/idempotent financial observation journal tied to a confirmed checkout outbox and commercial admission. Conflicting event identifiers and mismatching provider references are rejected. SHA-256 canonical JSON checks detect tampering, and missing journal schema or inconsistent records fail the combined finance readiness. The journal never grants an entitlement or approves a cutover.
+- VERIFIED: 207 selected tests passed, 1 known multiprocessing fork deprecation warning, 0 failures; `tests/test_r210_financial_evidence_journal.py` and `tests/test_regime*.py`.
+- LIMITS: journal insertion currently accepts caller-provided evidence; it is NOT an authenticated source by itself. It is not yet wired into a fully authoritative provider-to-ledger capture/refund/dispute transaction path. Historical reversals, webhook ordering, legacy obligations, real provider sandbox E2E and distributed quiescence still block commercial transition and RC. Overall baseline 70% unchanged.
+- GIT BASE: `0ad84a5fa0c66d75f75882a0f6e5c6a398470dc6`, commit still deferred; no Git writes or real provider access.
+- RESUME: wire authenticated adapter result to journal under one transactional reconciliation workflow with refund/dispute and durable ledger obligations; validate absence of stale duplicate provider events; run provider sandbox end-to-end, then global CI and cutover.
+
+## 2026-10-22 — Read-only authenticated provider lookups (commit deferred)
+
+- START: previous cumulative ZIP verified: 91,368,399 bytes, SHA-256 `cb7f4df1953f526bf24b9d7cf13575169a2dd56b390cca59ae335ecd1da11aac`; 3,247 entries, full CRC successful.
+- IMPLEMENTED: `app/regime_provider_probe.py` performs authenticated, read-only GET of fixed Stripe checkout session or PayPal order (with OAuth token), with reference and response validation, fail-closed errors and no entitlement/cutover authorization. Uses injected httpx client for offline tests. No live requests were made.
+- VERIFIED: `174 passed, 1 warning, 0 failed` for `tests/test_r210_provider_probe.py tests/test_regime*.py`. See `docs/validation/r210/provider-readonly-probe-regression.log`.
+- BLOCKED: Must integrate provider readback into durable ledger reconciliation, compare amount/currency and capture/refunds, handle uncertain and legacy obligations, and execute authenticated sandbox E2E. Full multi-node quiescence, administrative transition, IT/EN operator workflow and full CI are still missing. Do not interpret provider `paid`/`COMPLETED` as proof of ledger settlement. Remains PRE-RC; cutover disabled; 70% historical estimate unchanged.
+- VERSION: 0.3.0-r210. GIT BASE: `0ad84a5fa0c66d75f75882a0f6e5c6a398470dc6`. No commit, push, tag, release or production access.
+- NEXT: connect provider status checks to read-only obligation comparisons, reconcile payout/capture details and ledger transactionally, then test sandbox + distributed worker drains.
+
+## 2026-10-22 — Provider reference collision prevention (pre-RC, commit deferred)
+
+- IMPLEMENTED: Stripe/PayPal checkout provider reference is now guarded against reuse across local checkout operations in both `confirm` and `reconcile_verified_outcome`. Financial legacy duplicate references are detected by `audit_checkout_integrity` and prevent finance readiness. Existing records remain preserved; no destructive migration or external provider I/O.
+- VERIFIED: `173 passed, 1 warning`, `0 failed` across `tests/test_regime*.py` and six new Stripe/PayPal integration tests; log `docs/validation/r210/provider-reference-integrity-regression.log`.
+- STATUS: pre-RC, **NOT RC**. Authenticated sandbox provider reconciliation, service-wide worker quiescence and full CI remain BLOCKERS. 70% functional estimate unchanged; administrative cutover remains disabled.
+- GIT: baseline `0ad84a5fa0c66d75f75882a0f6e5c6a398470dc6`; do not commit/push/tag/release. Next commit message must be cumulative across all changes since baseline.
+- RESUME: run `python -m pytest -q tests/test_r210_provider_reference_uniqueness.py tests/test_regime*.py`; then implement signed provider read-only verification and distributed worker coverage before attempting RC.
+
+
+## 2026-10-22 — RC acceptance gate and expanded regression (commit deferred)
+
+- IMPLEMENTED: `app/rc_acceptance.py` standalone offline fail-closed RC acceptance CLI. Eight mandatory E2E acceptance categories surfaced in machine-readable output, with separate explicit declaration vs independently validated evidence. Arbitrary JSON declarations cannot authorize RC or cutover. Exclusive private JSON output; existing files and symlinks cannot be overwritten.
+- VERIFIED: `191 passed, 1 warning` in selected dual-regime and worker tests; CLI included. Initial focused set: 22 passed. Logs `docs/validation/r210/rc-acceptance-regime-regression.log`; sample blockers `docs/validation/r210/rc-acceptance-blockers.json`.
+- STATUS: RC NOT READY, overall weighted dual-regime estimate remains 70%. No authenticated real-provider sandbox tests, distributed workers or entire CI executed. Cutover still disabled. This closes a diagnostic acceptance gate, not any operational priority.
+- GIT BASE: `0ad84a5fa0c66d75f75882a0f6e5c6a398470dc6`; no commit/tag/release; keep cumulative commit summary since this commit.
+- NEXT: authenticated providers and distributed worker E2E with real sandbox/distributed fixtures, then administrative cutover, UI and full CI, before considering RC.
+
+## 2026-10-22 — Claimed AI job idempotent completion owner integration
+
+- SOURCE: `MTA-r210-claimed-worker-crash-recovery-cumulative.zip` verified 91,356,427 bytes; SHA-256 `a542eef4da49a6b9eaf285a2692e9e6f5ef04deea09c22a8dba867c710b0b8fa`, 3,238 members, complete CRC passed.
+- IMPLEMENTED: `app/ai_billing.py::finish_job_idempotent` now accepts `worker_id` and `claim_token`, passes them to first-attempt `finish_job`, and validates completed claim ownership and closed job fence before treating a retry as successful. Rejected receipts cannot silently acknowledge an already-completed job.
+- VERIFIED: 186 pytest cases passed, 0 failures, one existing multiprocessing/fork warning (`tests/test_r210_claimed_billing_completion_integration.py`, `tests/test_r207_stale_recovery.py`, `tests/test_regime*.py`). Five new parameterized/integration cases. Regression log: `docs/validation/r210/claimed-idempotent-owner-regression.log`.
+- LIMITATIONS: only accounting completion/retry path verified; worker adapters, cross-node coordination, authenticated Stripe/PayPal reconciliation, full cutover and entire CI remain OPEN. Do not enable commercial transition. Weighted completion baseline 70%, not increased.
+- GIT: `main` baseline `0ad84a5fa0c66d75f75882a0f6e5c6a398470dc6`, no commit since declared by user; no Git write actions. Commit message must cover all post-baseline changes.
+- RESUME: test `python -m pytest -q tests/test_r210_claimed_billing_completion_integration.py tests/test_r207_stale_recovery.py tests/test_regime*.py`; next implement authenticated provider reconciliation and cover all AI worker execution entrypoints.
+
+## 2026-10-22 — Crash-recovery worker-claim isolation (commit deferred)
+
+- START: validated previous cumulative ZIP (91,354,434 bytes, SHA-256 `6be5c261e77ea8ae2841a4e1f8775b9961fdccd7ef9ca727656e003668c4663d`), 3,237 CRC members intact.
+- IMPLEMENTED: `app/ai_billing.py::recover_stale_jobs` now rejects recovery for any persisted worker claim (running OR finished but unresolved), and anomalous non-open fences; exposes `blocked_jobs` in both dry-run and execution reports. No worker takeover or implied accounting settlement.
+- VERIFIED: 177 test cases passed, 0 failures, 1 existing multiprocessing/fork deprecation warning (`tests/test_r207_stale_recovery.py` + `tests/test_regime*.py`). Two new crash-recovery tests prove DB ledger remains running for both claim states. See `docs/validation/r210/stale-worker-recovery-regression.log`.
+- LIMITS: this is a fail-closed crash-recovery integration, NOT cross-node quiescence or authenticated provider reconciliation. All seven top-level E2E priorities remain incomplete and commercial cutover remains disabled. Overall dual-regime weighted estimate 70% unchanged.
+- GIT: baseline main `0ad84a5fa0c66d75f75882a0f6e5c6a398470dc6`; no Git writes; cumulative message still deferred.
+- NEXT: connect authenticated provider reconciliation, queue/worker adapters and multi-node transition orchestration. Do not remove AI legacy assets or weaken license enforcement.
+
+## 2026-10-22 — Crash-recovery worker-claim isolation (commit deferred)
+
+- START: validated previous cumulative ZIP (91,354,434 bytes, SHA-256 `6be5c261e77ea8ae2841a4e1f8775b9961fdccd7ef9ca727656e003668c4663d`), 3,237 CRC members intact.
+- IMPLEMENTED: `app/ai_billing.py::recover_stale_jobs` now rejects recovery for any persisted worker claim (running OR finished but unresolved), and anomalous non-open fences; exposes `blocked_jobs` in both dry-run and execution reports. No worker takeover or implied accounting settlement.
+- VERIFIED: 177 test cases passed, 0 failures, 1 existing multiprocessing/fork deprecation warning (`tests/test_r207_stale_recovery.py` + `tests/test_regime*.py`). Two new crash-recovery tests prove DB ledger remains running for both claim states. See `docs/validation/r210/stale-worker-recovery-regression.log`.
+- LIMITS: this is a fail-closed crash-recovery integration, NOT cross-node quiescence or authenticated provider reconciliation. All seven top-level E2E priorities remain incomplete and commercial cutover remains disabled. Overall dual-regime weighted estimate 70% unchanged.
+- GIT: baseline main `0ad84a5fa0c66d75f75882a0f6e5c6a398470dc6`; no Git writes; cumulative message still deferred.
+- NEXT: connect authenticated provider reconciliation, queue/worker adapters and multi-node transition orchestration. Do not remove AI legacy assets or weaken license enforcement.
+
+
+## 2026-10-22 — Claimed worker billing completion integration
+
+Implemented the real `app.ai_billing.finish_job(..., worker_id=..., claim_token=...)` path: after metering/accounting, an authenticated claim owner finishes the claim and settles the job fence in the same SQLite transaction. Missing/wrong credentials for an existing claim abort and roll back ledger/accounting. Corrected terminal status compatibility (`done`) in `regime_job_fence.py` and `regime_worker_completion.py`. Four new integration tests verify successful completion and atomic rollback; 171 regime and integration tests passed, one multiprocessing fork warning. This covers the billing ledger execution path, NOT all schedulers/adapters or cross-node deployment. Overall estimate remains 70%, commercial cutover disabled.
+
+Git main baseline: `0ad84a5fa0c66d75f75882a0f6e5c6a398470dc6` (last checked previously); no user-declared later commit, no git operations performed.
+
+## 2026-10-22 additional delivery: offline readiness report hardening
+
+- **Implemented:** a stable diagnostic-only output schema even when the SQLite read fails; explicit `authorization_scope=none`, stat-based file identity recheck, no-clobber output remains in force.
+- **Verified:** 18 readiness CLI tests and 26 focused CLI/worker tests passed; 14 separately invoked regime test modules passed before the orchestration process timed out. The remaining 16 of 30 internal checkpoints are *Python syntax checks*, not feature-development cycles, listed in `docs/validation/r210/30-internal-checkpoints.json`. No false claim of 30 new feature cycles.
+- **Not operational:** no authenticated Stripe/PayPal reconciliation, no safe multi-node cutover, no production payments enabled. Seven priority E2E tracks remain open; **70% weighted estimate** unchanged.
+- **Resume:** inspect this report, `DEVELOPMENT_COMPONENTS_R210.json`, latest tests, and pursue authenticated provider adapters and end-to-end worker integration.
+- **Git baseline:** `0ad84a5fa0c66d75f75882a0f6e5c6a398470dc6` (last verified main; recheck before commit). Commit deferred.
+
+## Cycle 2026-10-22 — 30 internal verification passes / offline readiness hardening
+
+IN PROGRESS at cycle start: validate snapshot identity, fail-closed malformed databases, non-overwrite report, integration tests. All seven E2E priorities remain incomplete; 70% weighted baseline, no automatic cutover.
+
+## 2026-10-22 — Billing path worker settlement gate (commit deferred)
+
+- IMPLEMENTED: `app/regime_job_fence.py::settle_metered_job` (called by `app/ai_billing.py`) now rejects worker receipts for running/unknown ledger states, unsatisfied billable resource contracts, mismatch in worker/fence revision, or non-open original fence. Existing active worker ownership is still blocked. Legacy jobs without claims are unchanged.
+- VERIFIED: 157 `tests/test_regime*.py` passed, 0 failed, 1 existing multiprocessing/fork warning. Five new tests, realistic legacy test fixture updated. No real provider, distributed worker, full CI, or production server verification.
+- OPERATIONAL: the existing local billing fence now checks settlement invariants before closing **when a worker claim exists**. All distributed workers are NOT yet integrated with claims; the change is not an end-to-end distributed completion. No commercial switching enabled.
+- REMAINING: authenticated Stripe/PayPal financial reconciliation, distributed worker admission/completion integration, multi-host cutover, full admin UI and billing E2E, all AI model license attestation, full CI and crash/retry/migration testing. Overall dual-regime weighted estimate **70%** until verified priority-wide integrations complete.
+- GIT: main baseline `0ad84a5fa0c66d75f75882a0f6e5c6a398470dc6`; no Git writes, cumulative commit still deferred.
+
+## 2026-10-22 — Worker/ledger/fence terminal-state integrity regression (commit deferred)
+
+- **START:** verified 91,344,099-byte source cumulative SHA-256 `6f6045fe94e0d97dd2a8a33b577f1b4c47b46932d23a12f79edc71126efb1736`; all 3,228 ZIP CRC entries valid.
+- **IMPLEMENTED:** strengthen `audit_claim_integrity` to reject terminal ledger jobs with a still-running worker claim, and finished worker claims with an open fence regardless of ledger status; preserve the existing running-ledger/closed-fence denial. Added four SQLite-backed regression tests.
+- **VERIFIED:** `pytest -q tests/test_regime*.py` 152 passed, 1 existing multiprocessing/fork warning, no failures; worker-specific selection 18 passed. No production servers, live provider network, or complete MTA CI exercised.
+- **STILL OPEN:** full distributed AI worker integration, provider-authenticated Stripe/PayPal reconciliation, atomic multi-node admin cutover, complete UI/billing/license-adapter E2E and whole-product regression. No priority falsely marked complete; weighted overall dual-regime estimate **70%**, unchanged. Cutover remains fail-closed.
+- **GIT BASELINE:** `desalvo/mta-audio-editor` main `0ad84a5fa0c66d75f75882a0f6e5c6a398470dc6`; commit deferred, no Git writes.
+
+## 2026-10-22 — Atomic AI worker completion handoff (commit deferred)
+
+- **START:** 91,340,345-byte baseline ZIP SHA-256 `88d7dd6b66d900c84b67a3c60ae60a515ace4274226a5da87499421793273119`, full 3,225-member CRC passed; 0.3.0-r210 unchanged.
+- **IMPLEMENTED:** `app/regime_worker_completion.py` is a transaction-owning SQLite worker completion flow. Before atomically finishing a durable claim and settling the corresponding operation fence, it requires the original worker/token, an unchanged regime epoch, a terminal ledger status, and a settled resource contract for billable jobs. Closed identical receipts are idempotent; partial or unverifiable outcomes fail closed. No automatic billing, provider calls, or arbitrary takeover.
+- **VERIFIED:** 14 focused worker tests and 178 regime tests passed (0 failed, 1 fork warning). DB connection cross-owner rejection, rollback, retry, accounting and epoch drift tested; full CI and actual distributed execution not performed.
+- **OPERATIONAL LIMIT:** usable local transaction API, **not wired across all live AI workers**; does not certify distributed safety or permit cutover. Provider-authenticated reconciliation, billing operation, user-facing admin transition, all license adapters and platform regression remain OPEN. Estimated weighted double-regime completion remains **70%**; no unsupported increase.
+- **GIT:** baseline `0ad84a5fa0c66d75f75882a0f6e5c6a398470dc6`, branch main, cumulative suggested commit only; no Git writes or live-server contact.
+
+## 2026-10-22 — Offline operator readiness CLI; Git baseline confirmed (commit deferred)
+
+- **START CHECKS:** source cumulative ZIP 91,334,240 bytes, SHA-256 `98d5f4d63eab64ddc121e00db0356f207e90de6a2f16d7f673225d90f1d4f8a5`, full CRC passed (3,221 entries). Existing 70% functional baseline, not a verified 80%. Python and pytest usable.
+- **IMPLEMENTED:** `app/regime_readiness_cli.py` provides a complete read-only offline SQLite snapshot diagnostic operator flow, including JSON inventory/readiness result, explicit non-success exit status, symlink/missing-file rejection, exclusive 0600 output and no automatic transition authorization. Provider calls, payments and live service changes are intentionally absent.
+- **VERIFIED:** 14 focused tests passed; 178 selected service-regime tests passed, 0 failures, 1 multiprocessing fork warning. See `docs/validation/r210/offline-readiness-regression.log`. Compilation and ZIP CRC/SHA at packaging. Global CI not run.
+- **OPERATIONAL:** offline report tool works against existing local SQLite snapshots only. No real production database access and no end-to-end commercial finance/cutover certification.
+- **GIT PROVENANCE:** checked `desalvo/mta-audio-editor` main, last observed commit `0ad84a5fa0c66d75f75882a0f6e5c6a398470dc6` (2026-10-21 21:37 UTC). No commit/push/tag/release executed; next message is cumulative for uncommitted changes since that SHA, subject to Git-diff review.
+- **REMAINING PRIORITIES:** provider-authenticated reconciliation; entire distributed AI queue fencing; atomic multi-host regime switch; complete operator UI; regime billing proof; license attestation for all executors; complete E2E CI. **No top-level priority is certified complete.** 70% estimate unchanged; fail-closed `transition_enabled=False` remains mandatory.
+
+## 2026-10-22 — Remote AI license dispatch safety and self-contained development handoff (commit deferred)
+
+- START: previous cumulative license effective UI archive; checksum and full ZIP CRC independently rechecked at start. Baseline remains **70% estimated** dual-regime functionality.
+- IMPLEMENTED: `authorize_remote_execution()` enforces actual rights review before remote inference dispatch. The native Studio remote path and server Studio remote queue route no longer synthesize an unreviewed free-only authorization. Remote inference in COMMERCIAL is deliberately denied until authenticated checkpoint/model identity and rights attestation exists. Existing authorized NON_COMMERCIAL flows remain possible, with their model-specific checks.
+- VERIFIED: 19 selected rights/UI/remote tests passed, zero failures; `py_compile` and archive integrity checks. Remote network adapter was mocked; **not** a physical remote-node E2E certification. No general CI, payment-provider sandbox or real server tests.
+- OPERATIONAL: fail-closed pre-dispatch protection on the two updated Studio remote routes. Complete license priority #6 **STILL OPEN**: extend authenticated attestations to remote workers and enumerate/certify every AI adapter and UI; no invented percentage increase.
+- DEVELOPMENT HANDOFF: authoritative pending-state map `docs/DEVELOPMENT_COMPONENTS_R210.json`, explanatory `docs/DEVELOPMENT_HANDOFF_R210.md`, current progress in this file, and latest test report `docs/validation/r210/remote-license-gate-test.log`. These are additive; preserve legacy docs and sources.
+- GOVERNANCE: 0.3.0-r210 unchanged; no commit/push/tag/release, no production server modifications. Next commit message must cover ALL changes since last actual user-performed commit, which is unknown to this package; suggested cumulative wording is a summary, not a verified Git diff.
+
+## 2026-10-22 — Effective AI license status in admin UI (commit deferred)
+
+- **START:** baseline 0.3.0-r210 commercial-license catalog cumulative, 70% estimated functional completeness; original ZIP SHA-256/CRC verified.
+- **IMPLEMENTED:** AI Studio administrator license editor now shows actual active-regime availability, effective licensing mode, and explicit denial reason rather than suggesting configured mode is executable. Saving a review refreshes the effective catalog. Added API-to-policy-to-UI contract test with a manually restored NonCommercial-only policy under COMMERCIAL.
+- **VERIFIED:** node JavaScript syntax check; 59 selected regime/license regressions passed (0 failures); source ZIP full CRC valid. No complete platform CI, real provider, distributed-worker execution, or browser automation was run.
+- **OPERATIONAL SCOPE:** admin catalog/UI parity with model admission for covered routes. **Priority 6 is not yet end-to-end certified for every execution adapter and user interface.** Other six priority areas still open. Fail-closed commercial switch persists.
+- **COMPLETION:** 70% weighted estimate unchanged; not a production-readiness claim. Version 0.3.0-r210 unchanged; no commit/push/tag/release or production action.
+
+## 2026-10-22 — Commercial AI rights admission/catalog consistency (commit deferred)
+
+- **START BASELINE:** cumulative worker-settlement r210, estimated dual-regime completion 70%; no commercial cutover enabled.
+- **IMPLEMENTED:** enforce fail-closed denial for manually restored/imported noncommercial-context overrides in COMMERCIAL; never allow paid Qixuan override even if policy JSON bypasses configuration validation. All catalog entries now expose effective model availability, effective mode, and denial reason, so the administrative model list cannot advertise prohibited execution.
+- **VERIFIED:** 156 regime/license tests passed; 1 multiprocessing fork warning. New restoration/admission/catalog-parity regression is green. No real provider, multi-node, whole-project CI, or production server test.
+- **OPERATIONAL SCOPE:** license policy evaluation and catalog endpoints using `model_license_policy.catalog()`; additional AI extension UIs/adapters require full E2E certification. Priority #6 backend/catalog enforcement advanced, **not certified across every UI and execution path**.
+- **OVERALL PROGRESS:** baseline 70% remains unchanged pending end-to-end evidence. Commercial switch stays disabled. Version remains 0.3.0-r210; no Git operations.
+
+## 2026-10-22 — Worker-claim settlement integrity and broader regime regression (commit deferred)
+
+- **START-OF-CYCLE BASELINE:** cumulative r210 worker-claims archive, 70% indicative dual-regime functionality; requested target +10 percentage points. Existing remote-provider, orchestration and switch gaps prioritized.
+- **IMPLEMENTED:** metered job fence settlement refuses to close while durable AI execution claim is still running; explicit worker finish must precede settlement in same transaction. New read-only cross-table audit compares claim epochs, source fence, original ledger, job state and inconsistent closed/open states; cutover readiness fails closed when audit cannot verify integrity.
+- **VERIFIED:** new focused regression including ownership/settlement/orphan/epoch cases; wider 208-case suite after repair of an obsolete statement-tamper test that expected mutation despite newer SQLite immutability triggers. No Stripe/PayPal sandbox or whole-project CI.
+- **NOT OPERATIONAL E2E:** integration into every AI executor, distributed workers, authenticated settlement, complete admin cutover and provider sandboxes still pending. Commercial switching remains disabled.
+- **PROGRESS:** 70% unchanged; requested 80% NOT demonstrably achieved. These are cross-layer safeguards, not completed macroareas.
+- **GOVERNANCE:** release 0.3.0-r210 unchanged; no git operations, no live-server contact.
+
+## 2026-10-22 — Durable cross-process AI worker ownership (commit deferred)
+
+- **IMPLEMENTED:** `app/regime_worker_claims.py` introduces transaction-scoped exclusive worker claims for already fenced AI ledger jobs, ownership-checked heartbeat, idempotent finish, and no unsafe timeout takeover. `combined_readiness()` now blocks on unknown worker-claim schema or running claims.
+- **VERIFIED:** 192 focused dual-regime tests passed, zero failures; one existing Python `multiprocessing/fork` deprecation warning. Includes cross-connection competing-owner regression. Python compilation and cumulative ZIP verification performed locally.
+- **NOT OPERATIONAL E2E:** Worker claim API is NOT wired to all AI execution queues and distributed runtimes. No remote provider interrogation, authenticated settlement, migration rollout, multi-node deployment, complete CI or commercial transition has been performed. Fail-closed `transition_enabled=False` retained.
+- **PROGRESS:** estimated 70% overall dual-regime functionality, **unchanged**. The requested +10 percentage points to 80% was NOT achieved. The code is a meaningful durable coordination primitive, not completion of the worker macroarea.
+- **GOVERNANCE:** version 0.3.0-r210 unchanged, Git commit deferred, no live server changes. Details in `docs/R210_DISTRIBUTED_WORKER_CLAIMS_IT_EN.md`.
+
+## 2026-10-22 — Post-commit provider inbox readiness hardening
+
+- IMPLEMENTED: `app/regime_inbox_coverage.py` adds fail-closed read-only checks for orphan Stripe/PayPal webhook events, missing inbox schema, invalid checkout receipts and unapplied events.
+- INTEGRATED: `combined_readiness()` includes the inbox audit and records explicit blockers. This never authorizes cutover.
+- VERIFIED: 154 focused regime tests passed, 1 multiprocessing warning; compilation, archive CRC and SHA-256 verified.
+- PENDING: authenticated reconciliation with external providers, full distributed worker exclusion, economic reconciliation, complete admin cutover, full CI regression and production E2E tests.
+- PROGRESS: remains 70% *estimated*; +10 percentage points NOT achieved. Do not enable commercial cutover.
+
+## 2026-10-22 — Cross-process regime maintenance lock (commit deferred)
+
+- **Implemented:** `app/regime_maintenance.py` provides a fail-closed POSIX advisory exclusive lock and an offline SQLite `BEGIN IMMEDIATE` wrapper for committed mirror recovery. It checks unsafe lock paths, prevents concurrent local recovery, requires an existing database, and never opens the regime admission fence.
+- **Verified:** 44 focused tests passed; one Python multiprocessing fork deprecation warning. Tests cover distinct-process exclusion, symlink rejection, missing DB, cutover recovery and transition invariants. Python compilation and ZIP integrity verified.
+- **Still blocked:** all app replicas/workers must be independently quiesced and provider obligations reconciled. Advisory host locks alone are not distributed synchronization; commercial switch stays disabled. Full CI and provider sandbox not run.
+- **Progress:** 70% estimated, unchanged; this work does not close a full end-to-end macroarea or achieve the requested 80%.
+- **Governance:** `0.3.0-r210`, no Git operations, commit deferred; no production changes.
+
+## 2026-10-22 — Transition reservation replay integrity (commit deferred)
+
+- **Implemented:** journal replay requires the original reservation to match a currently active durable fence transition, with the same identity, regime, and revision. A journal-only stale reservation no longer returns idempotent success after a fence reset or revision drift.
+- **Verified:** 48 focused tests passed, including two new stale-replay scenarios. This does not activate a regime switch.
+- **Pending:** complete provider reconciliation, shared coverage of all execution queues, coordinated persistent cutover including the separate regime configuration, administrative UI and full E2E CI.
+- **Progress:** 65% estimated, unchanged from the previous delivered baseline. Requested +10 points was not achieved.
+- **Governance:** version 0.3.0-r210, deferred commit; no production change.
+
+## 2026-10-22 — Administrative verified-negative checkout closure (commit deferred)
+
+- **Implemented:** new admin-only `POST /api/admin/service-regime/close-negative-checkout` with an exact `{provider, order_id}` body. It consumes only a previously stored provider-verified `not_created` outcome (the durable outbox `cancelled` state), owns one SQLite `BEGIN IMMEDIATE` transaction, and atomically closes the financially empty local order and its original checkout fence. It never accepts arbitrary provider proof from the API caller, never creates credits or refunds, and rejects any capture/payment/refund evidence or uncertain outcome. Retry after a successful closure is idempotent.
+- **Verified:** 63 focused pytest cases passed across settlement, outbox, operation fence, readiness and statements; Python compilation succeeded. No external Stripe/PayPal provider fetch, sandbox verification, full CI, or production deployment was performed.
+- **Still pending:** authenticated external provider queries, complete provider/queue orchestration, reconciliation of legacy financial obligations, atomically enabled service regime transition, complete admin UI and full end-to-end regression. `transition_enabled` remains false.
+- **Progress estimate:** **63%** overall (previously 62%), based on limited operational closure; the requested 72% was not achieved and is not claimed. This is an indicative scope-based estimate, not production readiness.
+- **Governance:** version `0.3.0-r210` unchanged; no Git operations or live-server modifications.
+
+## 2026-10-22 — User-visible non-commercial statements (commit deferred)
+
+- **Implemented:** authenticated account-only `GET /api/service-regime/my-noncommercial-statements` and `/export-csv?start=...&end=...`. Both use the persisted, SHA-256-verified allocation documents, redact every other account and refuse tampered totals; CSV rejects spreadsheet formula identifiers. No new charges, no bank/payment actions.
+- **Verified:** 65 related pytest tests passed, including six new tests for account privacy, tamper rejection, invalid totals and CSV safety; compilation verified. General CI and provider sandbox not run.
+- **Still blocked:** authenticated external provider settlement, legacy economic reconciliation, complete queue admission, atomic admin transition, full administrative UI and end-to-end tests. `transition_enabled` stays false.
+- **Progress:** estimated **60%** overall (previously 59%). This is a scope-based planning estimate, **not** the requested five-point increase and **not** production readiness.
+- **Governance:** release `0.3.0-r210` unchanged; no Git operations or live-server changes.
+
+## 2026-10-22 — Verified dispatch required for financial checkout settlement (commit deferred)
+
+- **Implemented:** `settle_if_enrolled()` now verifies a commercial checkout's dispatch outbox is `confirmed` and that the checkout receipt remains open under the current regime epoch before closing the fence. Pending/uncertain/cancelled provider creation cannot be mistaken for completed settlement; legacy orders without outbox retain conservative backward compatibility.
+- **Verified:** 55 focused tests passed, including new Stripe/PayPal settlement-state and transition-in-progress regressions. Python compilation passed. No live provider or full-system end-to-end tests.
+- **Pending:** authenticated provider reconciliation, complete worker/queue admission, legacy financial settlement, atomic admin switch, full IT/EN admin UI and general CI. **Switching remains disabled**.
+- **Progress estimate:** 59% overall dual-regime functionality (unchanged; scoped correctness fix), not production readiness.
+- **Governance:** 0.3.0-r210 unchanged; no Git changes or live server operations.
+
+## 2026-10-22 — Checkout outbox integrity audit (commit deferred)
+
+- **Implemented:** Read-only `audit_checkout_integrity()` cross-checks durable Stripe/PayPal dispatch states, attempt counters, original commercial receipts and fence closure. The existing combined-readiness report now includes this independent check and conservatively blocks transitions on inconsistent or unresolved checkout dispatches.
+- **Verified:** 47 focused tests passed, including seven new checkout-integrity tests; Python compilation checked. No live provider operations, global CI run or production deployment.
+- **Pending:** authenticated provider status lookup, economic settlement, complete AI queue admission, atomically enabled admin transition and IT/EN UI, end-to-end tests.
+- **Progress estimate:** 58% overall dual-regime functionality based on weighted implementation/readiness review, not an automated coverage metric or authorization for deployment.
+- **Governance:** MTA 0.3.0-r210 unchanged, commit deferred.
+
+## 2026-10-22 — Provider outcome reconciliation epoch validation (commit deferred)
+
+- **Implemented:** `app/regime_outcome_receipt.py` validates that provider outcome reconciliation occurs inside a database transaction and against an open, originally commercial checkout with the current regime/revision, rejecting pending transitions, closed receipts and stale epochs. `reconcile_verified_outcome()` now invokes this validation before changing outbox state.
+- **Verified:** 80 related tests passed including four new parameterized receipt/transition cases; Python compilation passed. These are local tests, not external provider sandbox results.
+- **Still pending:** authenticated provider retrieval, complete worker/queue coverage, legacy settlement, atomic administrative regime transition, full UI and end-to-end CI. Switching remains disabled.
+- **Governance:** release 0.3.0-r210 unchanged; no Git operations or live-server changes.
+
+## 2026-10-22 — Read-only payment outbox operational review (commit deferred)
+
+- **Implemented:** `app/regime_outbox_review.py` and admin-only `GET /api/admin/service-regime/payment-outbox-review` expose paginated checkout dispatch states and originating operation-fence receipts. Uncertain and cancelled dispatches, and provider-confirmed orders whose financial checkout operation is still open, remain visible; missing schema and mismatched receipts fail closed. No provider network requests or financial writes are issued by this endpoint.
+- **Verified:** 62 focused tests passed for payment outbox reconciliation, provider inbox, Stripe inbox, metered jobs, regime configuration and new administrative review; Python compilation succeeded. ZIP integrity checked on packaging.
+- **Pending:** authenticated provider-status polling, operator-driven settlement after verification, complete admission of all AI execution queues, atomic administrative service-regime switch and complete end-to-end regression. Regime transitions deliberately remain disabled.
+- **Governance:** 0.3.0-r210 unchanged; no Git commit or production server changes.
+
+## 2026-10-22 — Stripe/PayPal checkout dispatch outbox wired (commit deferred)
+
+- **Implemented:** both production checkout entry points now enroll durable outbox intents in the same local SQLite transaction as commercial checkout admission and local order creation. Before outbound provider I/O, the intent is committed as `uncertain`; a validated provider response records the provider reference as `confirmed` with the local order update. A retry after unknown network outcome is blocked until explicit reconciliation; pre-existing paid or URL-bearing orders retain their previous behavior.
+- **Verified:** 74 related pytest cases passed, including four new integration tests covering both provider confirmations, uncertain responses and no duplicate provider dispatch, plus Python compilation. ZIP CRC and SHA-256 are checked when packaging. Ruff unavailable locally; no production-network or global CI run.
+- **Pending:** operator reconciliation of uncertain outbox records against provider APIs (never blind retry); remainder of webhook/refund and non-metered AI queue coverage, complete financial reconciliation, administrative atomic regime switching, admin UI and full regression. `transition_enabled` remains false.
+- **Governance:** MTA remains 0.3.0-r210; commit deferred; no server or Git operations.
+
+## 2026-10-22 — Durable provider checkout dispatch outbox (commit deferred)
+
+- **Implemented:** `app/regime_payment_outbox.py` adds a transaction-owned, idempotent dispatch intent registry for commercial Stripe/PayPal checkouts, keyed to their existing admission receipt. Dispatch attempts move from `pending` to `uncertain` before network access, with no blind retry after a possible provider acceptance. Explicit provider-reference confirmation is idempotent and conflicts fail closed.
+- **Verified:** 30 focused tests pass across the new outbox, checkout fence, operation fence, regime core and transition audit. No provider network calls. The outbox is a tested primitive, **not yet connected to all live outbound checkout dispatch call sites**.
+- **Pending:** integrate outbox enrollment at actual checkout creation and uncertain-state reconciliation with Stripe/PayPal, complete end-to-end queue/provider fences, safely atomic regime switch, admin UI and full CI. `transition_enabled` remains false.
+- **Governance:** release unchanged at 0.3.0-r210; commit deferred; no production operations.
+
+## 2026-10-22 — Operation identity and epoch replay hardening (commit deferred)
+
+- **Implemented:** hardened `regime_operation_fence.admit()` to reject conflicting repeated admissions for a different required regime and to reject an *open* operation that no longer belongs to the current regime revision. This closes an admission-replay gap while retaining idempotent retries for the original operation. Added two regressions covering the failure cases.
+- **Verified:** 65 relevant pytest cases passed across fence, checkout, Stripe inbox, provider inbox, metered jobs, service regime and atomic local action. Python compilation and ZIP integrity verified. No external provider test or general regression.
+- **Blocked:** no safe administrative regime switch until full queue/worker coverage, provider event handling, economic reconciliation, legal/admin UI and end-to-end concurrent regression are complete. `transition_enabled` remains false.
+- **Governance:** version 0.3.0-r210 unchanged; no Git operations or production server modifications.
+
+## 2026-10-22 — Ten internal dual-regime verification cycles (commit deferred)
+
+- **Implemented:** legacy tests for commercial subscription and credit workflows now explicitly select `COMMERCIAL` in their isolated fixture. Production `NON_COMMERCIAL` default and domain gates are unchanged. This addresses the prior CI false failures from implicit commercial-mode assumptions.
+- **Verified:** ten separate focused pytest groups: regime core (11), commercial domain gates (6), legacy commercial suite (53), operation fence (11), checkout/provider/Stripe inbox (15), PayPal (11), metered job fence (20), reconciliation and transition audits (13), statements and terms (10), AI license admission (5): **155 passed** across the named groups, zero failures. Python compilation and cumulative ZIP CRC checked in packaging. No provider-network tests.
+- **Still blocked:** actual switch remains disabled. No administrative regime transition, full provider reconciliation, complete queue enrollment or global CI was made operational in this cycle. The ten cycles are test-group verification passes, not ten independent feature closures.
+- **Governance:** version 0.3.0-r210 unchanged; no commit/push/tag/release or real-server changes.
+
+## 2026-10-22 — Metered AI job barrier integration (commit deferred)
+
+- **Implemented:** `app/regime_job_fence.py` now enrolls new metered jobs in the durable regime fence in the same transaction as ledger creation, verifies configured regime/revision, and settles the fence when metering is finalized or an operator explicitly recovers a stale job. This also applies to durable inference job provisioning. Legacy unfenced billing jobs can still complete, without inventing historical admissions.
+- **Verified:** 20 new parameterized admission cases (two regimes, two revisions, five scenarios); 33 existing fence tests; 21 existing billing tests, all passed. Changed Python modules compile. This is **not** a claim that all queue/worker admission paths are fenced.
+- **Pending:** complete queue-level admission, Stripe/PayPal provider inbox hookups including refunds, financial reconciliation, atomic regime switch across all producers, admin UI and global CI. Regime switching intentionally remains disabled.
+- **Constraints:** 0.3.0-r210; no Git operations or production deployment.
+
+## 2026-10-22 — Stripe checkout-origin receipt validation (commit deferred)
+
+- Implemented verification of the original commercial checkout receipt before processing signed Stripe paid/refund events when a fence entry exists. Legacy uninstrumented orders remain explicitly subject to transition reconciliation.
+- Verified: 10 focused fence tests passed; Python compilation passed. Four older credit-checkout tests still fail because they assume commercial mode under the new NON_COMMERCIAL default, and must be run with an explicit commercial fixture. No global regression or external Stripe sandbox test was run.
+- Pending: end-to-end provider inbox integration, job fencing, reconciliation and actual administrative switch. Transition remains disabled.
+
+## 2026-10-22 — PayPal webhook fulfillment atomicity (commit deferred)
+
+- **Implemented:** verified `PAYMENT.CAPTURE.COMPLETED` webhook identifiers are committed in the same SQLite transaction as PayPal capture records, balance/receivable mutation, order completion and checkout-fence settlement. The event is not written after fulfillment in a separate transaction. Handles previously paid orders and repeated events without duplicate crediting.
+- **Verified:** 50 related tests passed, including a new forced failure at fence settlement that rolls back staged credits, capture records, payment status and event registration, followed by a successful idempotent retry. Python compilation passed.
+- **Still open:** Stripe and PayPal refund/other handler convergence on shared inbox, complete AI job fencing, external provider sandbox concurrency tests, financial reconciliation, atomic administrative service-regime switch, UI and global CI regression. `transition_enabled` remains false; **do not deploy as an enabled commercial-mode switch**.
+- **Constraints:** release 0.3.0-r210, no Git commit, push, tag or production-server operations.
+
+## 2026-10-22 — Consolidated regime transaction integration (commit deferred)
+
+- **Implemented:** a transaction-owning `execute_atomic` wrapper for **database-local** job/checkout/webhook mutations, sharing a SQLite `BEGIN IMMEDIATE` transaction with durable operation admission and settlement. Retries of closed operation IDs do not reapply mutations. Callback exceptions roll back both business data and enrollment.
+- **Verified:** 30 focused tests pass across operation fence and service-regime suites (including new rollback, retry-after-restart, wrong-regime and transaction-ownership cases); Python compilation passes.
+- **Not complete:** external Stripe/PayPal capture and webhook delivery are not atomic with SQLite, nor are all existing job/checkout/webhook endpoints wired into the fence. A persistent provider event inbox/outbox with settlement reconciliation, revisioned switch transaction, reconciliation of legacy entitlements, admin UI and end-to-end concurrency/CI are still required. `transition_enabled` intentionally remains false. Do not deploy this as commercial regime switching.
+- **Constraints:** no Git or production-server operations; release stays 0.3.0-r210.
+
+## 2026-10-22 — Durable regime operation-fence primitive (commit deferred)
+
+- **Implemented:** `app/regime_operation_fence.py` adds a SQLite-backed durable operation ledger for `job`, `checkout`, and `webhook` admissions, idempotent operation identities, explicit settlement, revision checking and exclusive transition reservation via caller-owned `BEGIN IMMEDIATE`. Open operations survive restart and block transition reservation. No automatic expiry of external payment operations.
+- **Verified:** local tests cover persistent open operations, idempotent retries, regime rejection and concurrent SQLite connections.
+- **NOT YET INTEGRATED:** existing job, Stripe and PayPal entry points are NOT universally enrolled in the fence, and the file-backed regime setting is NOT yet atomically committed with payment reconciliation. Transition remains disabled (`transition_enabled=false`) intentionally. Do not advertise a complete atomic barrier or deploy mode switching until all entry points and provider settlement/restart races have end-to-end tests.
+- Version 0.3.0-r210; no Git or production-server changes.
+
+## 2026-10-22 — Five internal dual-regime safety cycles (commit deferred)
+
+1. **Reconciliation inventory:** new `app/regime_reconciliation.py` inventories open jobs, subscriptions, payment orders and historic economic positions with explicit unknown-schema states; never treats absent tables as settled. Historical financial rows remain reconciliation items, not deleted data.
+2. **Statement integrity:** listing now cross-checks hashed statement payload against stored accounting period and prohibits a posting-enabled statement masquerading as an allocation.
+3. **Operator readiness:** read-only readiness report inventories blockers and explains missing service-wide job fencing and atomic payment/webhook settlement. Does not approve switching.
+4. **Administrative API:** `GET /api/admin/service-regime/reconciliation-report?target=COMMERCIAL|NON_COMMERCIAL`, authenticated as administrator, makes the report available without changing money or service state.
+5. **Verification:** 42 focused tests passed (including added regression tests); changed Python files compile. Full CI, external payment sandboxes, job/webhook concurrency and multi-platform browser tests NOT run.
+
+**NOT COMPLETE / BLOCKED:** atomic switch coordinated with all producers and webhook consumers, outstanding legacy commercial obligations settlement, legal acceptance/versioning, billing settlement, cross-regime model-rights admission on every execution path, end-to-end UI and CI. Regime switch remains disabled. Do NOT deploy as a production-ready commercial mode. Version remains 0.3.0-r210; no git changes performed by assistant.
+
+## 2026-10-21 — Dual-regime service groundwork (post-user commit)
+
+- **Implemented:** isolated, fail-closed `app/service_regime.py` with stable `NON_COMMERCIAL` and `COMMERCIAL` identifiers, safe non-overwriting default provision, strict record parsing and read-only transition blockers. Does **not** change accounting or production billing.
+- **Verified:** 11 focused tests passed, Python source compiled.
+- **Open / blocked:** authenticated persistent admin settings, transactional regime switch, immutable accounting reconciliation, cost-allocation statements, subscriptions/credits gating, server-side license admission, IT/EN legal terms publication and acceptance, native and server UI, full regression and CI. The selectable regime is **not live** and must not be exposed as a working feature.
+- **Git/deployment:** user already committed previous work; no commit or real-server changes performed in this cycle.
+
 
 ## 2026-10-21 — Experimental Audio-to-MIDI exposed to native clients / Audio-to-MIDI sperimentale nelle app native
 
@@ -1016,3 +1498,253 @@ Ten sequential passes: (1) incoming ZIP checksum/CRC; (2) extraction and status 
 - Implemented: tightly scoped NumPy 1.x and 2.x qualified global spellings for the pinned YourMT3 weights-only checkpoint converter. `weights_only=True`, pinned size/SHA-256, tensor validation and no executable deserialization remain unchanged.
 - Verified: regression test of both serialized qualified names and `weights_only=True`, plus Python compilation; real checkpoint conversion and ROCm inference pending on operator host.
 - Pending: upload/report result from verified YourMT3 conversion and full GPU benchmark; accuracy acceptance remains open.
+
+
+## 2026-10-21 — Dual-regime backend admission gates
+- Implemented: persistent mode lookup defaults to NON_COMMERCIAL; resource subscription/credit checkout routes and service entry points reject new commercial transactions in that mode; public/admin read-only mode endpoints; IT/EN preliminary legal drafts.
+- Verified: focused tests and Python compilation (see accompanying delivery summary).
+- Pending: atomic regime switching, legacy billing reconciliation, NC cost allocation and statements, payment webhook transition semantics, complete legal review/publication, native/admin UI, model-license enforcement and full CI.
+- Safety: no commercial activation or regime change is exposed without those guards. Historical credits and subscriptions are preserved.
+
+- Regression finding: legacy tests/test_r210_credit_access.py assumes commercial credit grants are enabled by default; fails under newly required NON_COMMERCIAL default. Not waived; test fixtures and broader billing behavior still need a mode-aware migration.
+
+## r210 — Service regimes, next cycle (2026-10-21)
+- Implemented/tested: public `/api/service-regime/terms?lang=it|en` returns regime-specific IT/EN legal draft, revision marker, SHA-256 and explicit legal-review flag; About now links to service terms. Expanded the four bilingual legal drafts. Tests: 20 passed in three scoped suites; Python compile and app.js syntax passed.
+- Implemented previously: non-commercial default, conservative persistence and guards against new commercial credit/subscription purchases.
+- BLOCKED / NOT COMPLETE: administrative switch with atomic, audited reconciliation; legacy credit and subscription balances, pending payment webhooks, outstanding contracts and running-job regime snapshots; periodic nonprofit cost allocation / invoices; server-wide license adjudication; authenticated read/write administrator UI; full regressions and real server deployment. The admin API still reports `transition_enabled: false` deliberately. Do not deploy as a complete dual-mode billing system. Terms are drafts and must receive operator/legal review before public contractual use.
+- Update: Public `/service-terms/it|en` HTML view added with escaping and no-cache; login/register and About link to the SAME regime-specific terms view. 21 scoped tests passed, Python compile and JavaScript syntax successful.
+
+## 2026-10-22 — Operational dual-regime migration readiness audit
+- Implemented: read-only administrator transition audit endpoint `/api/admin/service-regime/transition-audit?target=COMMERCIAL|NON_COMMERCIAL`, with authentication, explicit counts for legacy subscriptions, credits, unsettled contracts, running jobs, Stripe/PayPal orders, storage entitlements and spending pools. Missing legacy schema fails closed; history is never mutated. Counts and current revision are available for a migration plan.
+- Verified: 24 focused service-regime tests passed (including 3 new audit tests); Python module syntax passed. No general CI or actual payments processed.
+- Still NOT operational / BLOCKED: atomic financial migration across SQLite and provider webhooks, periodic NC actual-cost allocation, outstanding credits refunds and settlements, immutable accepted-job snapshots, server-wide license enforcement, complete admin regime-change UI, legal signoff and full CI. The new endpoint reports `transition_enabled=false` and does NOT change the persisted regime. Commercial rollout must not be enabled yet.
+- Version remains 0.3.0-r210. Commit deferred. No Git or production changes.
+
+## 2026-10-22 — CI failure remediation and conservative NC cost allocation
+- **Baseline:** the dual regime remains fail-closed; the previous transition-audit package has no atomic regime switching or end-to-end cost settlement. No production services or historical financial data touched.
+- **CI fixes:** removed three Ruff F401 unused imports identified in uploaded Python 3.14 Quality logs. The pinned ACE-Step Docker build failed because the external deadsnakes PPA returned HTTP 503; added up to three bounded retries of the *unchanged pinned upstream* Dockerfile build, preserving image tags, attestations and failure on persistent errors. An upstream PPA outage is not guaranteed to be cured.
+- **Implemented:** `app/noncommercial_allocation.py`, cent-exact pro-rata draft cost allocation and recoverable remainder guard. Does not post charges, issue invoices, mutate usage measurements or reconcile webhook state.
+- **Verified:** 61 focused tests passed, one opt-in model test skipped; Python compilation and YAML parsing passed. Ruff executable not available in this environment; CI rerun required. Complete CI and end-to-end billing tests not run.
+- **Blocked:** atomic regime transitions, webhook reconciliation, legacy settlement, statements integrated with storage/CPU/GPU ledger, centralized license decisions and admin mode switching. Dual regime NOT production-ready.
+- **Version/commit:** 0.3.0-r210 unchanged; deferred commit, no Git operations.
+
+## 2026-10-22 — Non-commercial metered ledger preview
+- **Implemented:** read-only, admin-only `/api/admin/service-regime/noncommercial-preview` connecting the existing AI job ledger to the deterministic cost allocator. Uses explicitly supplied documented cost and already-recovered cents, rejects incomplete/unverified measurements and unfinished jobs, and never posts money, changes usage or issues invoices.
+- **Verified:** focused tests include cost-cap conservation, filtering, zero database mutations, and fail-closed incomplete ledger; targeted suites passed. This is a DRAFT estimator with CPU/GPU duration as a combined proxy, not a certified final allocation tariff or storage-inclusive reconciled statement.
+- **NOT COMPLETE / deployment blocked:** period locking, documented cost provenance and independent CPU/GPU/storage cost pools, durable statements, refund/over-recovery reconciliation, payment webhook lifecycle, atomic regime switches, admin UI, license enforcement and full CI. `transition_enabled=false` is retained. Do not expose commercial mode on live servers on the strength of this preview.
+- Version unchanged at 0.3.0-r210; no Git actions or production server actions. Commit remains deferred.
+
+### r210 — Non-commercial statement snapshots (2026-10-22)
+- **Implemented and tested:** Admin-only, non-commercial statement snapshot endpoint and listing, atomic SQLite transaction, exact-cent allocations from the measured job ledger, duplicate/overlap refusal, tamper-evident SHA-256 verification, no payment collection.
+- **Verified:** focused tests for statements, meter preview, regime core and transition audit (24 passing). The statement is an *allocation record*, not a legally issued invoice; externally declared cost evidence still requires verification.
+- **Open / blocking full activation:** audited accounting of outstanding legacy credits/subscriptions and webhook events, atomically consistent regime transitions, AI license authorization enforced for every job type, UI regime switch and complete end-to-end CI. **Commercial mode switching remains disabled** and must not be enabled in production.
+
+## 2026-10-22 — Ten internal review gates, transition plan increment
+- Scope: ten internal checks: (1) archive baseline, (2) config revision, (3) financial inventory, (4) open jobs, (5) credit rows, (6) payment schema uncertainty, (7) non-commercial statement integrity, (8) no-mutation snapshot, (9) transition readiness gate, (10) focused regression/package verification.
+- Implemented: `app/regime_transition_plan.py` and admin-only `GET /api/admin/service-regime/transition-plan?target=COMMERCIAL|NON_COMMERCIAL`. The JSON response is deterministic and SHA-256 verified, includes a non-mutating inventory, config revision and statement hashes. It always explicitly denies transition readiness because atomic cross-process job/payment/webhook fencing is not implemented.
+- Verified: 53 distinct targeted tests passed, including four new transition plan cases. General CI and real concurrent payment-provider validation not completed.
+- BLOCKED/NOT OPERATIONAL: shared write fence across jobs, settlements and provider webhooks, coordinated rollback/retry, full commercial/noncommercial billing lifecycle, license authorization at every worker, administrative switch UI, jurisdiction-specific reviewed terms, complete end-to-end tests. Do not enable commercial operation. Version 0.3.0-r210, no Git/production actions, commit deferred.
+
+## 2026-10-22 — Dual-regime centralized AI admission hardening (additional development cycle)
+- Implemented: server-side commercial-regime rejection for `free_only` AI models inside the shared `evaluate_model` admission function; the same rule applies through standard AI job admission, independently of the model selector UI. Unknown/disabled checkpoints remain denied in both modes. Non-commercial mode does not blanket-block NC/free-only models.
+- Verified: 44 scoped regression tests passed across licensing, statement allocation, reconciliation and regime foundation; Python compilation passed. Tests include both regimes and license modes.
+- Blocked and NOT production ready: shared atomic barriers across payment/webhook/job workers, migration and reconciliation of legacy balances, acceptance and job snapshots, commercial regime-switch endpoint and admin UI, and complete CI/end-to-end. The regime-switch remains deliberately disabled; the change above is defense in depth, not completion of the dual-regime service.
+- Version unchanged: 0.3.0-r210. No Git operation or real server modification.
+
+## 2026-10-22 — Additional direct-domain non-commercial safeguards
+- Implemented: block self-service paid storage extensions (`resource_entitlements.extend_storage`), nominal credit grants (`resource_access.grant_credits`) and direct self-service subscriptions (`resource_accounts.assign(..., self_service=True)`) when the current service regime is NON_COMMERCIAL. These checks prevent bypass through internal callers and preserve administrative free quota assignment.
+- Verified: 32 scoped service-regime tests passed; Python compilation succeeded. No external services contacted.
+- Still blocked, NOT operational: atomic shared admission/transition fencing across job submissions, payment checkouts and provider webhooks; completed financial settlement and balance migrations; noncommercial statement delivery, payment handling and overshoot reconciliation; admin switch UI and comprehensive end-to-end regression. Do not enable the commercial transition or deploy as dual-regime production-ready.
+
+### 2026-10-22 — Three focused regime subsystems (post-commit, r210)
+
+- **Implemented and tested (bounded subarea: operation fence):** persistent operation admission already present; this cycle adds read-only visibility into open job/checkout/webhook counts and strict verification of asynchronous operation receipts against original regime/revision. The diagnostic reports `all_entry_points_instrumented=false` and `transition_enabled=false` truthfully.
+- **Implemented and tested (bounded subarea: noncommercial statements):** exported statements are selected by exact period and verified against stored hashes before returning any record; no posting, invoices, or charges are created.
+- **Implemented and tested (bounded subarea: terms publication):** public IT/EN regime-specific terms API responds with no-store/nosniff headers to avoid retaining the wrong regime document after a switch; existing versioned content and review warning retained.
+- **Verified:** 36 selected tests passed covering these subareas and existing regime core, AI admission, and commercial gates. Python compilation passed. Full repository regression and deployment tests not run.
+- **Still blocked / not implemented:** end-to-end enrollment of all job/checkout/webhook paths into one SQLite fence; safe atomic regime transition; outstanding financial settlements and reconciliation; complete admin switching UI; production provider concurrency tests. These subareas do NOT amount to an operational dual regime and `transition_enabled` remains false.
+
+
+### 0.3.0-r210 — Provider event inbox, current development cycle
+- Implemented: `regime_operation_fence.apply_provider_event` to apply already-authenticated Stripe/PayPal events atomically with durable event-ID and SHA-256 deduplication in a single SQLite transaction. Rejects conflicting payloads and unknown checkouts; rolls back on errors.
+- Verified: 43 targeted tests passed, zero failed; Python compilation. Tests cover duplicate delivery, changed digest, rollback/retry, absent checkout, persistence after reopening DB, and related regime modules.
+- Pending: wire and audit *every* real payment-provider webhook, checkout, refund, job admission and worker path; provider signature verification and original-regime semantics; coordinated database transitions; multi-process concurrency and complete CI regression.
+- Blocked: actual regime switching remains `transition_enabled: false`. No claim of end-to-end production safety.
+
+## 2026-10-22 — Transaction ownership hardening (commit deferred)
+
+- **Implemented:** fence schema creation no longer invokes SQLite `executescript()` which commits caller-owned transactions implicitly. `initialize()` now preserves an active `BEGIN IMMEDIATE`, ensuring admission/schema setup can be rolled back together. Two new rollback tests prevent regressions.
+- **Verified:** 51 targeted tests passed; changed Python files compiled, ZIP CRC checked at packaging.
+- **Blocked, NOT operational:** Stripe/PayPal and job entrypoints still bypass the durable shared fence; provider-side effects are not transactionally coordinated with the local checkout outbox; regime transition remains disabled. Commercial-mode production activation is **not authorized** by this package. Full CI and provider sandbox concurrency tests not executed.
+- **Constraints:** version 0.3.0-r210; no Git operations or real-server changes.
+
+## 22 October 2026 — Provider inbox admission-epoch hardening (post-commit, deferred)
+
+- **Implemented:** provider inbox refuses to apply payment mutations originating from a `NON_COMMERCIAL` checkout receipt. Previous commercial checkout receipts remain usable with idempotent event replay handling.
+- **Verified:** 18 fence/inbox/atomic-action tests passed; no tests failed in those modules.
+- **Not completed:** Stripe/PayPal handlers and all job admission paths are not yet wired to the shared fence; atomic regime transition, legacy settlement/reconciliation, administrative switch, full regression and live-provider integration remain pending. `transition_enabled` stays false. Do not deploy as a ready commercial regime.
+- Version 0.3.0-r210 unchanged; no Git operations or server deployment.
+
+
+### 2026-10-22 — Commercial checkout fence admission (deferred commit)
+- Implemented `app/regime_checkout_fence.py`: checkout enrollment is atomic with the local Stripe/PayPal order insert, and rejects regime/revision drift and transitions. Payment providers are contacted after releasing the local transaction.
+- Stripe paid confirmation and PayPal completed capture settle tracked checkout receipts in the existing database transaction; Stripe full refund also settles open receipts. Pre-fence orders are explicitly NOT synthesized as enrolled; legacy obligations still require reconciliation.
+- Verified: 44 focused tests passed; Python compilation passed. Ruff not available in this environment, no full CI or real-provider testing performed.
+- **Not complete:** signed webhook events have not all been migrated to the shared provider inbox, job admissions remain uninstrumented, transition remains disabled; no production deployment authorized.
+
+## 2026-10-22 — PayPal refund receipt admission guard (deferred commit)
+- Implemented: PayPal authenticated refund handler verifies original commercial checkout admission using `verify_enrolled_payment` inside its `BEGIN IMMEDIATE` refund transaction, before mutating refund and credit records. Existing legacy checkout behavior remains read-only compatible and subject to reconciliation.
+- Verified: 81 targeted tests passed, zero failed, covering PayPal, checkout, inbox, reconciliations, and AI job fencing. Source compilation and cumulative ZIP integrity verified.
+- Pending: signed Stripe provider inbox handling for all event variants; exhaustive queue admission; provider sandbox and general CI regression; administrative atomic regime switch and financial reconciliation. `transition_enabled` remains false.
+- Constraints: 0.3.0-r210 unchanged; no Git operations or production changes.
+
+## 2026-10-22 — Authenticated Stripe webhook transactional inbox (deferred commit)
+- **Implemented:** `app/regime_stripe_inbox.py` and integration into `app/credit_purchases.py` for both successful Stripe checkout events and refunds. For tracked commercial checkout receipts, the digest and provider event ID are written to the durable inbox in the same `BEGIN IMMEDIATE` transaction as wallet mutations and legacy `credit_payment_events`; conflicting payload reuse is rejected. Legacy pre-fence orders retain their original handling and require separate transition reconciliation.
+- **Verified:** 55 focused tests passed including checkout, PayPal, metered job fence and provider inbox suites; new coverage includes Stripe duplicate event identity, conflicting payload, rollback and disallowed noncommercial checkout receipts. Python compilation passed. Original cumulative archive CRC verified.
+- **Known test failures:** 15 legacy tests in `test_r210_credit_checkout.py` and `test_r210_credit_access.py` fail under the `NON_COMMERCIAL` default because they assume commercial credit/subscription operations. Do not alter the default or weaken backend guards merely to satisfy those tests; update fixtures to explicitly configure commercial mode in a separate cycle and rerun the entire regression.
+- **Pending:** user-facing administrative regime transition still disabled; not all external provider event types or AI queue ingress paths are fenced. No live provider sandbox validation, no complete CI regression, no production deployment. Ruff unavailable locally.
+
+## 2026-10-22 — Consolidated administrative reporting (post-commit, deferred)
+- **Implemented:** verified non-commercial statement CSV export (`/api/admin/service-regime/noncommercial-statements/export-csv`), with hash verification, amount consistency checks and safe account-ID handling. This is a technical allocation export, not a fiscal invoice or collection mechanism.
+- **Implemented:** unified read-only reconciliation/fence readiness endpoint (`/api/admin/service-regime/combined-readiness`), which detects a missing fence, regime drift, open operations, pending transition and uncovered entry paths. It fails closed and cannot authorize switching.
+- **Verified:** 69 targeted tests passed including new tamper, schema, fence and financial-report cases; Python compile and ZIP integrity checks performed.
+- **Pending / blocked:** full end-to-end job queue instrumentation, provider-event coverage, economic settlement, atomic administrator switch, production UI and provider sandbox / full CI validation. Therefore neither full dual-regime activation nor two complete end-to-end macroareas are claimed.
+- No commit, push, tag, release or production server changes. Version remains 0.3.0-r210.
+
+## 2026-10-22 — Active metered-job coverage in regime readiness (commit deferred)
+- **Implemented:** read-only, fail-closed `audit_unfenced_metered_jobs()` checks active entries in `ai_compute_jobs` against the durable `job:ledger:<id>` operation fence; detects missing receipts and prematurely settled fence records. Results are included in `combined_readiness` and prevent any readiness claim if coverage is absent or incomplete.
+- **Verified:** 67 focused/regression tests passed (0 failed), including three new tests covering missing accounting schema, legacy jobs, active fenced jobs, prematurely settled receipts and terminal jobs; Python compilation and cumulative ZIP CRC to be checked at packaging.
+- **Still open:** service-wide queue admission, full provider-event coverage, financial reconciliation, atomic administrative regime transition, full CI, and live payment integration. The switch remains disabled. No production actions or git operations.
+
+## 2026-10-22 — Provider outbox explicit reconciliation (deferred commit)
+- **Implemented:** `reconcile_verified_outcome` for both Stripe and PayPal, recording verified checkout creation outcomes within a caller-owned SQLite transaction. Confirmed references are idempotent, conflicting references are rejected, and a verified negative outcome never automatically settles money or closes the parent checkout fence.
+- **Verified:** 24 focused tests passed (including five new reconciliation cases), Python compile and ZIP integrity checks. No provider sandbox or live reconciliation executed.
+- **Pending:** authenticated provider query adapters and operational reconciliation scheduling; full queues, refund/webhook coverage, atomically guarded regime switch, admin UI, full regression. Commercial regime switching remains disabled.
+- **Policy:** version 0.3.0-r210 unchanged; no Git operations or server deployment.
+
+## 2026-10-22 — Provider dispatch confirmation safety (commit deferred)
+- Corrected `regime_payment_outbox.confirm`: confirmation now requires an existing **open commercial checkout** and an outbox marked `uncertain` (dispatch attempted); a merely enqueued `pending` checkout cannot be mistaken for a provider-accepted order.
+- Confirmation remains idempotent for an identical verified provider reference and rejects contradictory references or closed checkout receipts.
+- Added two regression tests for pending dispatch and closed receipts. **92 tests passed** across regime, checkout and subscription suites; no full application test run or live provider sandbox tests were performed.
+- **Still blocked:** provider-authenticated automated reconciliation, service-wide AI admission fencing, financial settlement of legacy obligations, atomic regime switch, admin UI and general CI. The dual regime is NOT enabled for production.
+- Version remains 0.3.0-r210; no Git or production server actions.
+
+### 2026-10-22 — checkout dispatch and confirmation epoch enforcement
+- Implemented: both `mark_attempt_uncertain` and `confirm` enforce the same open commercial checkout receipt and current regime epoch checks already used for verified provider outcome reconciliation. This rejects sends or confirmations during a reserved transition or after an epoch change.
+- Verified: 62 focused tests passed across outbox, Stripe inbox, checkout fence, operation fence and metered AI job admission; Python compilation passed.
+- Pending: authenticated provider-side reconciliation, full coverage of legacy and asynchronous entries, atomic administrator regime switching, complete UI and general regression.
+- Blocked: production commercial activation remains disabled until these workflows are end-to-end safe. The changes do not perform network calls or authorize changing the regime.
+
+### 2026-10-22 — Verified negative checkout closure (post-commit, deferred)
+- Implemented `app/regime_cancelled_checkout.py`: transaction-local closure for Stripe/PayPal checkout dispatches already independently provider-verified as **not created**, with strict no-money checks and idempotent fence settlement. No automatic provider polling or external network activity.
+- Verified by `tests/test_regime_cancelled_checkout.py`; the backend entrypoint is deliberately not enabled for arbitrary operators until the provider authentication/evidence workflow has been integrated.
+- Still pending: authenticated provider polling, migration/legacy settlement, remaining queue coverage, atomic regime switch, administrative UI and comprehensive regression; switching remains disabled.
+
+### 2026-10-22 — Finalized noncommercial period immutability (commit deferred)
+- **Implemented:** `app/noncommercial_period_guard.py` installs SQLite INSERT/UPDATE/DELETE guards on the metered-job ledger and UPDATE/DELETE guards on finalized noncommercial statements. These are created inside the statement-closing write transaction, rejecting retroactive edits and late-arriving metered jobs for already finalized periods, including writes that bypass HTTP routes. Other accounting periods are unaffected.
+- **Verified:** 71 related tests passed, including five new focused guard tests, with zero failures; Python compilation successful. Historic tamper-detection regression now verifies both SQL prevention and SHA-256 detection after deliberately disabling the SQL trigger for its corruption simulation.
+- **Limitations:** These guards are installed when a new statement is closed. Legacy deployments containing old statements but no subsequent close require an explicit migration step before the guard can be claimed active there. SQLite file-level administrator access can remove triggers; external tamper-evident archival and payment cost substantiation are separate concerns. No full CI or live provider end-to-end validation was performed.
+- **Still open:** authenticated provider reconciliation, atomic service-regime switching, service-wide queue fencing, production billing integration, complete administration UI and full cross-platform regression. Commercial switching remains disabled. Estimated overall functional progress 62% (previously 61%), not the requested 71%.
+
+### 2026-10-22 — Durable administrative transition reservation (commit deferred)
+- Implemented `app/regime_transition_journal.py`, a durable, SQLite-transaction-local transition reservation journal. Reserves the operation fence only after an explicit structured reconciliation snapshot is marked ready and unresolved list empty; records SHA-256 of evidence, rejects mismatched replay, persists across restarts, and supports transaction-safe abort.
+- Verified: 47 focused tests passed (transition journal, operation fence, checkout outbox, checkout admission, metered AI job fence). No provider calls, commit or deployment performed.
+- **NOT COMPLETE:** The reported reconciliation evidence is supplied by caller; production readiness cannot be inferred from this primitive. No authorized admin endpoint to finalize the effective regime exists. JSON configuration and the SQLite barrier do not yet share a crash-safe atomic commit protocol. The service-wide admission coverage and authenticated provider reconciliations are not complete. Public switching remains disabled.
+- **Progress estimate 64%** (63% previously). Not a production-readiness measure; requested 73% was not reached.
+
+### 2026-10-22 — Verified database-derived transition reservation (deferred commit)
+- Implemented `app/regime_verified_transition.py`: an explicit transaction-owned reservation path that derives financial/readiness evidence from the current database and refuses operator-supplied `ready` flags as authorization.
+- Validates regime revision, fence coverage, metered job coverage, checkout integrity and automated-transition readiness inside a caller-owned write transaction. Fails closed until all are independently verifiable.
+- Added `tests/test_regime_verified_transition.py` covering incomplete schemas, stale revisions and missing transaction ownership.
+- Verified: 33 selected tests passed; Python compilation passed. Full CI, provider sandbox and end-to-end regime switching not executed.
+- Blocked: service-wide admission fencing, verified provider reconciliation, fully atomic regime cutover and admin UI. Transition remains disabled; no production enablement is claimed.
+
+## R210 — Administrative transition reservation recovery (2026-10-22)
+- **Implemented:** read-only admin reservation inspection and guarded transactional cancellation APIs, including revision, identity, journal/fence consistency and restart recovery checks.
+- **Verified:** 36 related pytest cases passed; Python compile, archive integrity and CRC checked.
+- **Pending:** authenticated provider settlement, full entry-point coverage, atomic regime cutover, IT/EN administrator UI and full CI/end-to-end regression. Regime switching remains disabled.
+
+## 2026-10-22 — Post-commit dual-regime administration panel
+
+- **Implemented:** Bilingual IT/EN administrative service-regime panel in the existing web settings page, reused by shared native/web UI where that page is available. Reads active regime, combined-readiness, payment outbox review and durable transition reservations. Supports guarded cancellation of an inconsistent/pending reservation via the existing admin endpoint; no client-side regime switch is exposed. The panel does not silently report readiness if any request fails.
+- **Verified:** 69 focused unit/regression tests pass in the combined fence, transition and UI group; `node --check` passes for `regime_admin_panel.js` and `admin.js`.
+- **Pending:** End-to-end payment-provider sandbox tests, completion of all worker admission entry points, verified financial reconciliation, atomic active-regime switch, fully tested commercial UI/billing and full CI regression. Do NOT enable switching or deploy commercial mode based on the panel alone.
+- **Progress:** planning estimate 67% (previous 65%, +2 percentage points). No independently validated basis for the requested 75%; estimated progress is not a release readiness certificate.
+
+### 2026-10-22 — Database-local service-regime cutover (deferred)
+- Implemented `app/regime_cutover_atomic.py`: a caller-owned SQLite transaction can commit the database epoch of a previously reserved transition after an internal readiness callback passes. A persistent `regime_cutover_commits` receipt is recorded, preserving compatibility with existing journal tables.
+- Critically the barrier remains `transitioning=1`; this is **not** a public or production-enabled regime switch. The external `service-regime.json` and uninstrumented worker/provider paths have not been atomically reconciled. Operator recovery remains necessary.
+- Test scope: 20 passing targeted tests (7 new); no full CI run. No external payment provider tests.
+- Still open: atomic external configuration reconciliation, complete ingress coverage, authenticated provider reconciliation, end-to-end migrations/rollback and UI activation. Estimated completion remains 67%; target +10 percentage points not met.
+
+### 2026-10-22 — Regime mirror cutover recovery (incremental)
+- **Implemented:** `app/regime_cutover_mirror.py` for read-only inspection and crash-retryable external configuration reconciliation after an existing SQLite cutover receipt; strict receipt/revision checks; atomic file replacement and fsync; never unlocks operation barrier.
+- **Verified:** 117 correlated regime tests passed, including 5 new mirror-recovery tests. Full global regression and provider sandbox tests were not executed.
+- **Blocked/open:** cross-process maintenance integration, certified reconciliation and coverage of every external payment/AI worker entry, admin cutover activation, general CI and production-ready end-to-end testing. The service regime switch remains disabled.
+
+### 2026-10-22 — Commercial authorization checks active SQLite fence (deferred)
+- **Implemented:** `current_regime()` verifies a matching initialized SQLite fence for COMMERCIAL, matching revision and regime with `service-regime.json` and ensuring `transitioning=0`; read-only SQLite access, no database initialization side effects. Uninitialized NON_COMMERCIAL deployments keep their default.
+- **Verified:** 142 relevant tests passing, including 6 new epoch-gate cases; no general test or provider sandbox was run.
+- **Open:** the effective administrative cutover, complete reconciliation and ingress coverage. This guard does not make service transitions available. Functional progress remains estimated at 68%, not 78%.
+
+### 2026-10-22 — Post-cutover abort safety (deferred)
+- Implemented: both direct and verified transition abort paths reject a transaction whose transition ID has an existing committed SQLite cutover receipt. Prevents reopening the admission fence in the interval before the JSON regime mirror is recovered.
+- Verified: 23 cutover/journal tests and 31 adjacent transition/fence/outbox tests passed (54 total test executions, no failures). Source compiles.
+- Pending: full coverage certification of payment/webhook/AI entry points, provider-side reconciliations, coordinated maintenance mode and authorized final activation; global CI and production cutover were NOT executed. Current estimated overall functional completeness remains 68%, not the requested 78%.
+
+### 2026-10-22 — Internal cutover finalization primitive (deferred commit)
+- **Implemented:** `app/regime_cutover_finalize.py`, transactionally finalizing a committed and synchronized cutover under a required authoritative reconciliation callback; prevents reopening with stale mirror, pending operations or failed verification. Four new tests added.
+- **Verified:** 72 targeted cutover, fence, checkout, payment outbox and metered-job tests passed; Python compilation and cumulative ZIP CRC checked.
+- **Pending/blocked:** no complete production-grade provider/worker readiness implementation or maintenance lock, no public activation endpoint, no live provider sandbox / full CI; service regime change remains disabled.
+
+## r210 deferred regime cycle — committed mirror recovery (2026-10-22)
+- Implemented: `app/regime_cutover_recovery.py` coordinates committed SQLite cutover mirror recovery under a caller-owned transaction and required external exclusive maintenance lock.
+- Verified: guard against open operations, idempotent replay, wrong epochs, and barrier preservation; 52 related tests passed.
+- Pending: provider-authenticated reconciliation, verified complete worker/job admission coverage, actual maintenance lock orchestration, admin switch endpoint, production-scale concurrency and full CI regression. The change DOES NOT enable COMMERCIAL switching.
+- Version remains 0.3.0-r210; no Git operations or production deployment.
+
+### 2026-10-22 — Exclusive offline cutover finalization (deferred)
+- **Implemented:** `finalize_cutover_exclusively` in `app/regime_maintenance.py` joins an existing POSIX cross-process maintenance lock, SQLite `BEGIN IMMEDIATE`, receipt/mirror validation, authoritative readiness callback, and durable finalization in one local administrative operation. Missing lock, negative readiness, or stale mirror fail closed.
+- **Verified:** 40 focused regression tests passed, 1 multiprocessing `fork()` deprecation warning; Python compilation successful. This only covers the single-host local maintenance procedure.
+- **Blocked:** authoritative certification of every provider, webhook, remote worker and Kubernetes replica is not implemented and cannot be substituted by a caller returning `True`. No public regime switch endpoint or production cutover is enabled. General CI and live sandbox end-to-end tests remain unrun.
+- **Progress:** estimated functional completeness remains 70%; requested 80% milestone not achieved. Version fixed at 0.3.0-r210, Git commit deferred.
+
+### 2026-10-22 — Provider inbox integrity (deferred commit)
+- Implemented: fail-closed detection of duplicate `(provider,event_id)` identities on legacy inbox schemas, blank event identifiers and negative checkout receipt epochs in `app/regime_inbox_coverage.py`.
+- Verified: 36 related tests passed; one multiprocessing fork deprecation warning; Python compilation passed.
+- Still open: authenticated provider outcome retrieval, service-wide worker fencing, reconciliation of legacy liabilities, admin cutover activation, full CI and real-provider end-to-end tests. Commercial cutover remains disabled. No +10 percentage-point functional completion claim.
+
+## 2026-10-22 — Exclusive finalization authority hardening (post-commit, deferred)
+
+- **Implemented:** `finalize_cutover_exclusively` now verifies the database-derived combined readiness under `BEGIN IMMEDIATE`, in addition to any external callback; a caller-provided `True` can no longer release the fence without proven provider/worker coverage.
+- **Verified:** 165 targeted regime-related tests passed, 1 multiprocessing deprecation warning; Python module compiles. Includes a regression for callback-only bypass.
+- **Pending:** authenticated external provider reconciliation; distributed worker admission barrier; production-safe atomic administrative cutover; full CI/E2E.
+- **Progress:** 70% prior estimate retained: this is hardening, not a completed end-to-end macroarea. Requested +10 percentage points not achieved.
+- **Safety:** No real server changes; no Git operations.
+
+## 2026-10-22 — Provider settlement evidence cycle (0.3.0-r210)
+- Implemented: `app/regime_provider_settlement.py`, authenticated read-only Stripe Checkout + PaymentIntent and PayPal capture reconciliation against exact expected amount/currency; no ledger writes or entitlement/cutover authorization.
+- Verified: `202 passed, 1 warning` in `tests/test_regime*.py tests/test_service_regime*.py` including 5 new settlement tests. Full CI/provider sandbox NOT run.
+- Operational: read-only provider evidence verification with injected HTTP client; this is NOT an end-to-end commercial settlement pipeline.
+- Blocking: refunds, disputes, pending webhook delivery, legacy obligations, durable atomic ledger reconciliation, external sandbox and distributed integration remain open. Baseline completion estimate remains 70%.
+- Git baseline: `0ad84a5fa0c66d75f75882a0f6e5c6a398470dc6` (no commit performed).
+
+## 2026-10-23 — Reversal observation and fail-closed reconciliation continuation (deferred commit)
+- **Implemented:** `app/regime_provider_refund_evidence.py` provides read-only authenticated Stripe charge inspection (paid/captured/succeeded, exact zero refunds, complete empty charge refund list, explicit no-dispute flag) and PayPal capture inspection (only completed captures pass); both explicitly refuse entitlement or cutover authorization.
+- **Verified:** 221 regime tests passed, one known multiprocessing/fork warning; 19 new refund/reversal tests plus 5 prior settlement tests; input SHA-256 and full CRC verified. No live provider endpoints contacted (HTTP mocked).
+- **NOT complete:** Stripe charge snapshots cannot prove that a later dispute/refund will not occur; PayPal capture lookup does not prove absence of refunds/disputes. No durable transactional matching to local financial ledger or legacy obligations, pending webhook resolution, idempotent provider event closure or end-to-end certified reconciliation. Thus Stripe/PayPal macroarea remains **OPEN** and transition remains fail-closed.
+- **Baseline Git:** `0ad84a5fa0c66d75f75882a0f6e5c6a398470dc6`. No Git operations. Version stays 0.3.0-r210.
+
+## 2026-10-23 — Provider cross-evidence (r210, commit deferred)
+
+- Implemented `verify_stripe_payment_with_reversals`: authenticated Checkout → PaymentIntent → latest charge linkage, currency/amount verification, and strict refund/dispute flags at observation time. The extra lookups are independent snapshots, **not an atomic provider snapshot**. No ledger writes or entitlement grants.
+- Implemented `verify_paypal_payment_with_capture_observations`: order capture totals and individually retrieved captures, rejecting non-completed states. Capture status alone does **not** prove refund/dispute absence.
+- Added `tests/test_regime_provider_cross_evidence_r210.py` (6 tests). Selected regime suite: **227 passed, one multiprocessing fork warning**. Remote live/sandbox tests not executed.
+- **Actual blocker to complete financial reconciliation:** authoritative transaction processing and persistent atomic ledger entries covering webhook ordering, refunds, disputes, historical liabilities and provider reconciliation must be connected and validated; external sandbox credentials are unavailable. Do not mark RC ready or open regime barrier.
+- Git baseline remains `0ad84a5fa0c66d75f75882a0f6e5c6a398470dc6`; no Git actions taken.
+
+## 2026-10-23 — Authenticated provider-to-journal handoff (0.3.0-r210; commit deferred)
+- **Implemented:** `app/regime_provider_reconcile_service.py` now orchestrates the authenticated Stripe/PayPal settlement and reversal/capture observation before a database transaction; rechecks checkout ownership and confirmed provider identity under `BEGIN IMMEDIATE`; records immutable financial observation in the same atomic write with idempotent replay protection. Explicitly does not grant credits, settle the economic ledger, approve cutover or authorize production.
+- **Verified:** 216 tests passed, one known multiprocessing/fork warning (`tests/test_regime*.py` plus financial journal and handoff tests). Added `tests/test_r210_provider_reconcile_service.py` with transaction, tampering, changed checkout, replay and fail-closed scenarios. Real provider sandbox and all-product regression not executed.
+- **Remaining blockers:** durable ledger settlement of financial liabilities and reversals, legacy balance mapping, webhook ordering / delivery resolution, provider refund/dispute pagination and historical verification, reconciliation of subscriptions and credits, external authenticated sandbox tests. The macroarea is **OPEN**, RC remains blocked, overall historical functional estimate stays 70%.
+- **Git baseline:** `0ad84a5fa0c66d75f75882a0f6e5c6a398470dc6`. No git mutations.

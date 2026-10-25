@@ -1,0 +1,139 @@
+{
+  "scope": "AST call-site inventory of principal registered/native/remote transports, not proof of every legacy AI path",
+  "call_sites": [
+    {
+      "file": "app/ai_billing_routes.py",
+      "line": 312,
+      "call": "execute_registered_worker"
+    },
+    {
+      "file": "app/ai_durable_remote_executor.py",
+      "line": 74,
+      "call": "infer_and_register_remote_settlement"
+    },
+    {
+      "file": "app/ai_metering_agent.py",
+      "line": 360,
+      "call": "_execute_registered_worker"
+    },
+    {
+      "file": "app/ai_metering_agent.py",
+      "line": 296,
+      "call": "run_cgroup_process"
+    },
+    {
+      "file": "app/ai_metering_agent.py",
+      "line": 298,
+      "call": "run_metered_process"
+    },
+    {
+      "file": "app/ai_metering_bridge.py",
+      "line": 217,
+      "call": "infer_audio"
+    },
+    {
+      "file": "app/ai_metering_bridge.py",
+      "line": 232,
+      "call": "infer_durable_remote"
+    },
+    {
+      "file": "app/ai_server_execution.py",
+      "line": 32,
+      "call": "execute_registered_worker"
+    },
+    {
+      "file": "app/ai_worker_protocol.py",
+      "line": 348,
+      "call": "run_cgroup_process"
+    },
+    {
+      "file": "app/main.py",
+      "line": 7535,
+      "call": "recover_after_lost_response"
+    },
+    {
+      "file": "app/main.py",
+      "line": 7587,
+      "call": "recover_after_lost_response"
+    },
+    {
+      "file": "app/main.py",
+      "line": 1727,
+      "call": "execute_arranger"
+    },
+    {
+      "file": "app/main.py",
+      "line": 2034,
+      "call": "execute_arranger"
+    },
+    {
+      "file": "app/native_ai_account.py",
+      "line": 130,
+      "call": "recover_after_lost_response"
+    },
+    {
+      "file": "app/native_ai_account.py",
+      "line": 145,
+      "call": "infer_audio"
+    },
+    {
+      "file": "app/native_ai_routing.py",
+      "line": 101,
+      "call": "recover_after_lost_response"
+    },
+    {
+      "file": "app/native_ai_routing.py",
+      "line": 104,
+      "call": "infer_audio"
+    },
+    {
+      "file": "app/studio_compute.py",
+      "line": 46,
+      "call": "execute_registered_worker"
+    },
+    {
+      "file": "app/studio_compute.py",
+      "line": 30,
+      "call": "remote_compute"
+    },
+    {
+      "file": "app/studio_compute.py",
+      "line": 129,
+      "call": "recover_after_lost_response"
+    },
+    {
+      "file": "app/studio_compute.py",
+      "line": 132,
+      "call": "infer_audio"
+    },
+    {
+      "file": "app/studio_compute.py",
+      "line": 72,
+      "call": "run_metered_process"
+    }
+  ],
+  "coverage_groups": [
+    {
+      "path": "Registered server workers",
+      "guard": "evaluate + ledger fence + persistent owner claim + owner heartbeat + atomic finish",
+      "tests": "test_r208_unified_adapter_billing_e2e.py",
+      "limitation": "single SQLite database; no multi-host service"
+    },
+    {
+      "path": "Native Studio local",
+      "guard": "evaluate + native process supervision",
+      "limitation": "no server ledger, deliberate NC standalone mode; platform builds still required"
+    },
+    {
+      "path": "Native routing / account Arranger / direct Studio remote / durable executor / durable bridge",
+      "guard": "authorize_remote_execution before source staging or transport",
+      "tests": "test_r210_remote_license_dispatch_gate.py",
+      "limitation": "commercial remote inference stays blocked without authenticated checkpoint rights attestation"
+    },
+    {
+      "path": "Durable Arranger/Remix queue",
+      "guard": "existing local durable queue and publication/billing outboxes",
+      "limitation": "owner claim credentials not propagated through all deferred settlements; not certified distributed"
+    }
+  ]
+}

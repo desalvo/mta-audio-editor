@@ -68,4 +68,5 @@ def test_each_remote_kind_never_uses_local_fallback(kind,tmp_path,monkeypatch):
     source=tmp_path/'audio.wav';source.write_bytes(b'RIFF'+b'\0'*4+b'WAVE')
     monkeypatch.setattr(ai_remote_client,'infer_audio',lambda *a,**kw: (_ for _ in ()).throw(ai_remote_client.RemoteAIError('remote-offline')))
     with pytest.raises(ai_remote_client.RemoteAIError,match='remote-offline'):
-        route.infer(kind,source)
+        # Use the licensed DSP route for this transport-only drumsep case.
+        route.infer(kind,source,{'model':'dsp'} if kind=='drumsep' else None)

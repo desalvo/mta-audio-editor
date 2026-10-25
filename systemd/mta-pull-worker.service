@@ -1,0 +1,26 @@
+[Unit]
+Description=MTA optional private pull worker
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/mta
+User=mta-worker
+Group=mta-worker
+StateDirectory=mta-pull-worker
+StateDirectoryMode=0700
+Environment=MTA_DATA_DIR=/var/lib/mta-pull-worker/config
+Environment=MTA_AI_WORKER_ENABLED=true
+EnvironmentFile=/etc/mta/pull-worker.env
+ExecStart=/opt/mta/venv/bin/python -m app.ai_pull_worker --config /etc/mta/pull-worker.json --state /var/lib/mta-pull-worker/journal --watch
+Restart=on-failure
+RestartPreventExitStatus=78
+RestartSec=10
+KillMode=control-group
+NoNewPrivileges=true
+PrivateTmp=true
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

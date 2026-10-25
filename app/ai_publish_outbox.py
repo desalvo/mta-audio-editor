@@ -44,12 +44,17 @@ def _open():
         con.row_factory = sqlite3.Row
         con.execute('PRAGMA journal_mode=WAL')
         con.execute('PRAGMA busy_timeout=30000')
+        # Serialize schema inspection and alteration across new processes.
+        con.execute('BEGIN IMMEDIATE')
         con.execute('''CREATE TABLE IF NOT EXISTS publications (
           job_id TEXT PRIMARY KEY, project_id TEXT NOT NULL,
           audio_sha256 TEXT NOT NULL, metadata TEXT NOT NULL,
           state TEXT NOT NULL CHECK(state IN ('pending','published')),
           staged_at REAL NOT NULL, published_at REAL
         )''')
+        if 'owner_json' not in {row[1] for row in con.execute('PRAGMA table_info(publications)')}:
+            con.execute('ALTER TABLE publications ADD COLUMN owner_json TEXT')
+        con.execute('COMMIT')
         for suffix in ('', '-wal', '-shm', '-journal'):
             path = Path(str(db) + suffix)
             _check_outbox_file(path)
@@ -99,6 +104,12 @@ def stage(job_id, project_id, audio, metadata):
         raise ValueError('Nonempty audio bytes required')
     if not isinstance(metadata, dict):
         raise ValueError('Publication metadata required')
+    from .deferred_execution_owner import receipt_for
+    owner=receipt_for(job_id)
+    if owner:
+        from .worker_loss_resolution import mark_evidence
+        mark_evidence(owner['ledger_id'],owner['worker_id'],owner['claim_token'])
+    owner_json=json.dumps(owner,sort_keys=True,allow_nan=False) if owner else None
     encoded = json.dumps(metadata, sort_keys=True, allow_nan=False)
     digest = hashlib.sha256(audio).hexdigest()
     path = _stage_path(job_id)
@@ -106,7 +117,7 @@ def stage(job_id, project_id, audio, metadata):
         previous = con.execute('SELECT * FROM publications WHERE job_id=?', (job_id,)).fetchone()
         if previous:
             previous = _validated_publication(previous)
-            if (previous['project_id'], previous['audio_sha256'], previous['metadata']) != (str(project_id), digest, encoded):
+            if (previous['project_id'], previous['audio_sha256'], previous['metadata'],previous.get('owner_json')) != (str(project_id), digest, encoded,owner_json):
                 raise ValueError('Conflicting staged publication replay')
             # A pending replay must not silently accept lost, swapped or tampered
             # staging: recovery would otherwise fail much later, after acceptance.
@@ -114,7 +125,7 @@ def stage(job_id, project_id, audio, metadata):
                 contents, _ = _read_stage_regular(path)
                 if hashlib.sha256(contents).hexdigest() != digest:
                     raise ValueError('Staged WAV checksum mismatch on replay')
-            return dict(previous)
+            return {k:v for k,v in previous.items() if k!='owner_json'}
     # Only ever publish a complete temporary file; never overwrite an existing stage.
     fd, tmp = tempfile.mkstemp(prefix='.stage-', suffix='.wav', dir=path.parent)
     try:
@@ -137,15 +148,15 @@ def stage(job_id, project_id, audio, metadata):
                     raise ValueError('Conflicting staged audio')
         with _open() as con:
             con.execute('BEGIN IMMEDIATE')
-            con.execute("INSERT OR IGNORE INTO publications(job_id,project_id,audio_sha256,metadata,state,staged_at) VALUES(?,?,?,?, 'pending',?)",
-                        (job_id, str(project_id), digest, encoded, time.time()))
+            con.execute("INSERT OR IGNORE INTO publications(job_id,project_id,audio_sha256,metadata,state,staged_at,owner_json) VALUES(?,?,?,?, 'pending',?,?)",
+                        (job_id, str(project_id), digest, encoded, time.time(),owner_json))
             row = con.execute('SELECT * FROM publications WHERE job_id=?', (job_id,)).fetchone()
             row = _validated_publication(row)
-            if (row['project_id'], row['audio_sha256'], row['metadata']) != (str(project_id), digest, encoded):
+            if (row['project_id'], row['audio_sha256'], row['metadata'],row.get('owner_json')) != (str(project_id), digest, encoded,owner_json):
                 con.execute('ROLLBACK')
                 raise ValueError('Conflicting publication registration')
             con.execute('COMMIT')
-            return dict(row)
+            return {k:v for k,v in row.items() if k!='owner_json'}
     finally:
         Path(tmp).unlink(missing_ok=True)
 
@@ -218,6 +229,13 @@ def _validated_publication(row):
         raise ValueError('Invalid publication metadata') from exc
     if not isinstance(metadata, dict) or json.dumps(metadata, sort_keys=True, allow_nan=False) != item['metadata']:
         raise ValueError('Inconsistent publication metadata')
+    if item.get('owner_json') is not None:
+        from .deferred_execution_owner import validate_persisted
+        validate_persisted(json.loads(item['owner_json']),item['job_id'])
+    else:
+        from .deferred_execution_owner import receipt_for
+        if receipt_for(item['job_id']) is not None:
+            raise ValueError('Claimed publication is missing its execution owner')
     if item['state'] not in ('pending', 'published'):
         raise ValueError('Invalid publication state')
     staged = item['staged_at']

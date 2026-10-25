@@ -36,10 +36,20 @@ def _read() -> dict:
 
 
 def public_settings() -> dict:
-    return {'workers': {kind: {'mode': _read().get('workers', {}).get(kind, {}).get('mode','local'),
-                               'url': _read().get('workers', {}).get(kind, {}).get('url',''),
-                               'has_token': bool(_read().get('workers', {}).get(kind, {}).get('token'))}
-                        for kind in sorted(set(KINDS)|set(_read().get('workers',{})))}}
+    from .service_regime import current_regime,Regime
+    data=_read()
+    try:
+        regime=current_regime().value
+        state='blocked_unattested' if regime==Regime.COMMERCIAL.value else 'model_review_required'
+    except (ValueError,OSError):
+        regime=None;state='blocked_unverifiable'
+    return {'remote_policy':{'state':state,'service_regime':regime,
+                            'commercial_remote_inference_enabled':False,
+                            'historical_operations_require_owner_authentication':True},
+            'workers':{kind:{'mode':data.get('workers',{}).get(kind,{}).get('mode','local'),
+                             'url':data.get('workers',{}).get(kind,{}).get('url',''),
+                             'has_token':bool(data.get('workers',{}).get(kind,{}).get('token'))}
+                       for kind in sorted(set(KINDS)|set(data.get('workers',{})))}}
 
 
 def configure(kind: str, mode: str, url: str = '', token: str = '') -> dict:
@@ -82,6 +92,8 @@ def is_remote(kind: str) -> bool:
 
 def infer(kind: str, audio: Path, options: dict | None = None) -> tuple[dict, str]:
     """Infer remotely, returning validated JSON and/or named WAV data. No fallback."""
+    from .model_license_policy import authorize_remote_execution
+    authorize_remote_execution(kind,options or {})
     from .ai_remote_client import infer_audio, recover_after_lost_response, RemoteAIError
     from . import ai_native_remote_journal as pending
     from .ai_worker_artifacts import SAFE_NAME, MAX_FILES

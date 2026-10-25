@@ -1,0 +1,70 @@
+{
+  "blockers": [
+    "administrative_cutover_and_rollback_e2e",
+    "ai_licensing_all_executors_e2e",
+    "commercial_noncommercial_billing_e2e",
+    "database_readiness_not_supplied",
+    "distributed_ai_workers_quiescence_e2e",
+    "full_ci_regression",
+    "paypal_authenticated_sandbox_reconciliation",
+    "stripe_authenticated_sandbox_reconciliation",
+    "webhook_retry_and_pending_inbox_e2e"
+  ],
+  "candidate": false,
+  "checks": {
+    "administrative_cutover_and_rollback_e2e": {
+      "claimed_pass": false,
+      "provided": false,
+      "requires_independent_validation": true,
+      "status": "unverified"
+    },
+    "ai_licensing_all_executors_e2e": {
+      "claimed_pass": false,
+      "provided": false,
+      "requires_independent_validation": true,
+      "status": "unverified"
+    },
+    "commercial_noncommercial_billing_e2e": {
+      "claimed_pass": false,
+      "provided": false,
+      "requires_independent_validation": true,
+      "status": "unverified"
+    },
+    "distributed_ai_workers_quiescence_e2e": {
+      "claimed_pass": false,
+      "provided": false,
+      "requires_independent_validation": true,
+      "status": "unverified"
+    },
+    "full_ci_regression": {
+      "claimed_pass": false,
+      "provided": false,
+      "requires_independent_validation": true,
+      "status": "unverified"
+    },
+    "paypal_authenticated_sandbox_reconciliation": {
+      "claimed_pass": false,
+      "provided": false,
+      "requires_independent_validation": true,
+      "status": "unverified"
+    },
+    "stripe_authenticated_sandbox_reconciliation": {
+      "claimed_pass": false,
+      "provided": false,
+      "requires_independent_validation": true,
+      "status": "unverified"
+    },
+    "webhook_retry_and_pending_inbox_e2e": {
+      "claimed_pass": false,
+      "provided": false,
+      "requires_independent_validation": true,
+      "status": "unverified"
+    }
+  },
+  "cutover_authorized": false,
+  "database_diagnostic": null,
+  "reason": "Provider settlement and distributed execution require independent end-to-end verification",
+  "release_authorized": false,
+  "status": "BLOCKED",
+  "version": "0.3.0-r210"
+}

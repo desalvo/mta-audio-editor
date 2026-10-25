@@ -1,0 +1,55 @@
+# Coordinamento pull / Pull coordination — r210 PRE-RC
+
+## Italiano
+
+Il backend opzionale usa un unico server MTA autorevole e uno o più worker Linux indipendenti. Tutti gli input, risultati e vincoli contabili rimangono nel server; i worker comunicano soltanto tramite HTTPS verificato. Non condividere SQLite su NFS/SMB e non avviare autorità indipendenti con copie dello stesso database. Il default resta l'esecuzione locale. Non viene modificato alcun server automaticamente.
+
+| Limite | Valore |
+| --- | --- |
+| Input e risultato per lavoro | 16 MiB ciascuno; score anche validato entro 8 MiB |
+| Piano JSON | 8 KiB, opzioni finite e senza percorsi/comandi |
+| Payload conservati/prenotati | 128 MiB logici complessivi; non è una quota fisica del filesystem |
+| Lavori conservati | Massimo256; capacità esaurita rifiuta nuove ammissioni senza cancellare lavori incerti |
+| Risultati economicamente conclusi | 7 giorni, poi eliminati dalla manutenzione |
+| Conferme opache dopo cancellazione/pruning | 90 giorni; nessun proprietario, input, risultato o nonce in chiaro |
+| Telemetria | CPU misurata del processo ammesso; nessuna autocertificazione GPU/energia |
+
+### Preparazione e credenziali
+
+1. Installare lo stesso codice MTA e i runtime dei modelli autorizzati sui nodi. Gli eseguibili/interpreti sono scelti esclusivamente dall'operatore tramite il registro esistente. Le decisioni di licenza del server e del nodo devono corrispondere esattamente. La corrispondenza non certifica il checkpoint caricato: l'inferenza remota commerciale resta bloccata.
+2. Con una sessione amministrativa attiva, usare `POST /api/admin/pull-workers`, corpo `{"name":"worker-01","kinds":["whisper","ace-step"]}`, intestazione `X-MTA-Request: 1`. Conservare una volta sola la credenziale restituita. `GET /api/admin/pull-workers` non la restituisce. Un token AI utente non può amministrare i nodi.
+3. Preparare sul worker un file proprietario0600, ad esempio `/etc/mta/pull-worker.json`, con `{"url":"https://AUTHORITY","credential":"NODE.CREDENTIAL","ca_file":"/etc/mta/authority-ca.pem"}`. Il campo `ca_file` è facoltativo per CA di sistema. Non usare query, credenziali nell'URL, altri path o redirect. Non inserire segreti nella cronologia shell o nei log.
+4. Avviare `python -m app.ai_pull_worker --config /etc/mta/pull-worker.json --state /var/lib/mta-pull-worker/journal --watch` con directory di stato proprietaria0700. Configurare gli eseguibili con `MTA_AI_WORKER_ENABLED=true` e le variabili del registro. Il file `systemd/mta-pull-worker.service` è soltanto un modello opzionale, non installato/abilitato. Personalizzare utente, percorsi e ambiente nel proprio ambiente isolato prima dell'uso.
+5. Selezionare sul server `MTA_AI_EXECUTION_MODE=pull` soltanto dopo la registrazione dei nodi. La modalità non può essere scelta da un utente API. Nessun errore provoca fallback locale o una seconda inferenza. `GET /api/ai-jobs/worker-capabilities` mostra la capacità del backend; le licenze continuano a essere controllate separatamente.
+
+### Arresto, recupero e cancellazione
+
+Per svuotare il backend, leggere `authority.generation` da `GET /api/admin/pull-workers`; inviare `POST /api/admin/pull-workers/drain` con `{"accepting":false,"expected_generation":GENERATION,"confirm":true}` e l'intestazione amministrativa. Le nuove ammissioni sono bloccate, ma i lavori già ammessi possono terminare. `pending=0` riguarda questo backend, non certifica tutto il servizio o i processi kernel. Le vecchie generazioni del comando vengono rifiutate. Riabilitare solo con la nuova generazione e conferma esplicita.
+
+`PATCH /api/admin/pull-workers/NODE` con `{"accepting":false}` sospende nuove assegnazioni a un nodo e permette le conclusioni originali. `DELETE` revoca la credenziale: non arresta fisicamente il processo e non libera il suo lavoro. Prima di revocare, drenare e verificare i lavori attivi. Una revoca durante un'esecuzione può lasciare un blocco intenzionale che richiede il recupero fisico ancora non accettato per tutti i worker. `GET /api/admin/pull-workers/audit` espone gli ultimi100 eventi amministrativi, senza credenziali o media.
+
+Un errore di rete non autorizza a cancellare il journal o creare una nuova istanza. Lo stato `ready` può riconsegnare soltanto la conclusione congelata. Lo stato `dispatched` dopo un crash esce con codice78 e richiede verifica dell'operatore: non riesegue il modello. Anche il servizio di esempio evita il riavvio automatico di questo stato. Conservare i dati originali e verificare i processi/cgroup sul nodo. Nessun heartbeat scaduto, PID mancante o dichiarazione amministrativa sostituisce la prova di arresto.
+
+Un risultato già congelato può completare la contabilizzazione originale tramite `POST /api/admin/pull-executions/JOB/recover`, corpo `{"confirm_recover":true}`; non viene richiamato alcun modello. I client originali mantengono la stessa chiave e usano `/api/ai-jobs/request-status/KEY` e `/request-result/KEY`. La revoca della chiave di firma può bloccare il risultato firmato, senza un nuovo addebito o una nuova inferenza. I risultati della propria sessione sono disponibili anche in `/api/account/pull-executions` e `/{JOB}/result`, solo dopo conclusione economica. I risultati scaduti non vengono rigenerati.
+
+L'account disattivato non riceve nuove assegnazioni o input. I lavori mai assegnati possono essere chiusi senza inventare utilizzo; quelli incerti restano sospesi e impediscono la cancellazione definitiva. L'erasure conclusa rimuove i payload centrali e permette al worker originale di cancellare un risultato locale con conferma persa. Il lavoro ignoto, le copie di backup/WAL e i dischi remoti richiedono procedure di conservazione/quiescenza dell'operatore: non viene promessa una cancellazione fisica universale.
+
+Per un riavvio del solo processo mantenere host, boot, directory dati e namespace PID originali. Per un reboot/spostamento pianificato: fermare l'autorità originale, bloccare nuove ammissioni, concludere tutti i vincoli e revocare tutti i nodi **prima** di spostare la copia completa. Il comando locale `python -m app.ai_pull_coordinator --inspect` mostra il binding salvato. Dopo lo spostamento utilizzare esclusivamente `--rebind-closed --expected-binding HASH --actor ADMIN_ID --reason "motivazione documentata di almeno venti caratteri" --confirm-closed-rebind`. Il comando rifiuta lavoro attivo/incerto, nodi non revocati, operazioni aperte, binding errato o attore non amministratore. Mantiene l'ammissione sospesa; servono nuove credenziali e una successiva riabilitazione esplicita. Non usare la procedura come failover o per forzare un reboot inatteso con worker incerti.
+
+**Avanzamento RC:23/42,54,8%,nessuna macroarea interamente accettata.** Mancano ancora recupero fisico di tutti gli esecutori, prove reali multi-host/target, finanza globale/legacy, attestazioni dei checkpoint e cambio completo di regime. Il passaggio di regime resta disabilitato.
+
+## English
+
+The optional backend has one Linux MTA authority and independent Linux workers. Inputs, frozen outputs, claims and economic state stay at the authority; workers use verified HTTPS and never open its SQLite file or mount project storage. Local mode remains the default. Independent cloned authorities, network-mounted SQLite, multi-leader/HA deployment and automatic failover are unsupported. Supported bounds are16 MiB per input/result,8 KiB finite path-free options,128 MiB logical retained/reserved payload and256 retained jobs. Closed artifacts expire after7 days; opaque exact acknowledgements after90 days. No GPU/energy attribution or executing-checkpoint rights certificate is provided.
+
+An active administrator registers a node with `POST /api/admin/pull-workers` (`name`,`kinds`) and `X-MTA-Request: 1`; save the one-time credential in an owner-only0600 configuration containing `url`,`credential`,optional `ca_file`. Use a0700 state directory and the existing operator-controlled worker executable/interpreter registry. Run `python -m app.ai_pull_worker --config /etc/mta/pull-worker.json --state /var/lib/mta-pull-worker/journal --watch`. The optional systemd template is not installed or enabled. Enable `MTA_AI_EXECUTION_MODE=pull` on the authority explicitly. Node rights decisions must exactly match the admitted authority policy; this is not checkpoint attestation, and commercial remote inference remains denied.
+
+Read the current generation from the admin node list, then confirm `/api/admin/pull-workers/drain` with `accepting:false`,`expected_generation`,`confirm:true`. Existing admitted work can finish; stale controls cannot reopen admission. Node PATCH pauses new assignment; DELETE revokes the key without claiming process termination or releasing held work. Drain before revoking. The private audit endpoint returns the latest100 operator events. Pull-scope `pending=0` never certifies whole-service or kernel quiescence.
+
+Keep the original journal on transport failure. A ready outcome can retry only its frozen completion; a dispatched outcome after supervisor death exits78 and never reexecutes inference. Credential/authority/CA drift and malformed acknowledgements require review. Unknown descendants remain held. Do not infer termination from a missing PID/heartbeat or delete state to obtain another assignment. `/api/admin/pull-executions/JOB/recover` with explicit confirmation delivers existing frozen accounting only. Original clients retain their idempotency key and use the existing request-status/result GET endpoints; revocation, expiration or unavailable results never authorize inference replay. Owner result endpoints remain private and require completed accounting.
+
+Retirement prevents new source transfer; only never-dispatched work can close without measurements. Uncertain work blocks final account erasure. Closed erasure deletes central payloads and permits the original node to clear a lost-response private result via an opaque acknowledgement. Backup/WAL retention and uncertain remote disks still need operator procedures; this is not a universal physical-erasure claim.
+
+Process restart is supported on the same bound authority. Planned reboot/storage/PID-namespace moves require stopping the old authority, pausing admission, settling all operations and revoking every node before copying the complete state. Use the local `--inspect` and guarded `--rebind-closed` command shown above with the exact stored hash, active administrator ID, documented reason and explicit confirmation. It rejects all uncertain work, keeps admission paused and grants no old credential or takeover. Unexpected loss with uncertain workers remains blocked; physical recovery is still pending under B2/B5/B6.
+
+**RC progress:23/42 (54.8%),0/7 complete macroareas.** Whole-service cutover, global/legacy finance, remote checkpoint rights and actual multi-host/kernel/container/OS/GPU/audio/VST acceptance remain open. Read `PULL_COORDINATION_HANDOFF_R210.md` for exact source/proof provenance and next work. No RC, real-server change or commit is implied.

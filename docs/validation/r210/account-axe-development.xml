@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="11.313" timestamp="2026-10-24T15:10:24.958568+02:00" hostname="3a349086255d"><testcase classname="tests.test_r210_account_accessibility_acceptance" name="test_actual_owner_pages_wcag_axe_and_named_keyboard_surfaces[390-it-/account-commercial]" time="9.705"><failure message="AssertionError: [('scrollable-region-focusable', 'serious', [['.subscription-section &gt; .table-scroll'], ['div[data-content=&quot;&quot;] &gt; .table-scroll'], ['.ai-resource-panel &gt; div:nth-child(7)']])]&#10;assert [{'id': 'scro...Safari', ...}] == []&#10;  &#10;  Left contains one more item: {'id': 'scrollable-region-focusable', 'impact': 'serious', 'tags': ['cat.keyboard', 'wcag2a', 'wcag211', 'wcag213', 'T...'TT4.a', ...], 'description': 'Ensure elements that have scrollable content are accessible by keyboard in Safari', ...}&#10;  Use -v to get more diff">request = &lt;FixtureRequest for &lt;Function test_actual_owner_pages_wcag_axe_and_named_keyboard_surfaces[390-it-/account-commercial]&gt;&gt;
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fdec0ff90a0&gt;
+nc_browser_config = {'executable_path': '/workspace/scratch/06e635791464/nc-browser-runtime/unpacked/chromium', 'headless': True, 'args': ...dbox', '--disable-dev-shm-usage', '--no-zygote', '--single-process', '--use-gl=angle', '--use-angle=swiftshader', ...]}
+regime = 'commercial', path = '/account', language = 'it', width = 390
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-11/test_actual_owner_pages_wcag_a0')
+
+    @pytest.mark.parametrize('regime',['commercial','nc'])
+    @pytest.mark.parametrize('path',['/account','/account/credits'])
+    @pytest.mark.parametrize('language',['it','en'])
+    @pytest.mark.parametrize('width',[390,1280])
+    def test_actual_owner_pages_wcag_axe_and_named_keyboard_surfaces(request,monkeypatch,nc_browser_config,regime,path,language,width,tmp_path):
+        from playwright.sync_api import sync_playwright
+        if regime=='nc':
+            env=request.getfixturevalue('nc_env');uid=env[1];enable(env)
+            with auth.db() as c:c.execute('UPDATE users SET language=?,limits_expanded=1 WHERE id=?',(language,uid))
+        else:
+            uid=request.getfixturevalue('account');request.getfixturevalue('provider');configure(uid,'no_plan',language);prepare(uid,monkeypatch)
+        supplied=os.environ.get('MTA_TEST_AXE_CORE');assert supplied and Path(supplied).is_file(),'Test-only axe-core path required for owner accessibility acceptance'
+        web=client(uid,monkeypatch);calls=[];errors=[]
+        with sync_playwright() as pw:
+            browser=pw.chromium.launch(**nc_browser_config);page=browser.new_page(viewport={'width':width,'height':1000},locale='en-GB')
+            page.on('pageerror',lambda e:errors.append(str(e)));page.route('**/*',serve(web,calls));page.goto('https://mta.test'+path)
+            page.locator('[data-owner-payments] button').first.wait_for();page.locator('[data-refund-content] p').first.wait_for()
+            if path=='/account':
+                page.locator('[data-account-financial]').wait_for()
+                page.evaluate("document.querySelectorAll('details').forEach(d=&gt;d.open=true)")
+            else:page.locator('[data-credit-content] p').first.wait_for()
+            page.add_script_tag(path=supplied)
+            result=page.evaluate("async()=&gt;axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21a','wcag21aa']},resultTypes:['violations','incomplete']})")
+            report=Path(__file__).resolve().parents[1]/'docs/validation/r210/account-axe';report.mkdir(exist_ok=True)
+            (report/f'{regime}-{path.rsplit("/",1)[-1]}-{language}-{width}.json').write_text(json.dumps(result,indent=2)+'\n')
+&gt;           assert result['violations']==[],[(v['id'],v['impact'],[n['target'] for n in v['nodes']]) for v in result['violations']]
+E           AssertionError: [('scrollable-region-focusable', 'serious', [['.subscription-section &gt; .table-scroll'], ['div[data-content=""] &gt; .table-scroll'], ['.ai-resource-panel &gt; div:nth-child(7)']])]
+E           assert [{'id': 'scro...Safari', ...}] == []
+E             
+E             Left contains one more item: {'id': 'scrollable-region-focusable', 'impact': 'serious', 'tags': ['cat.keyboard', 'wcag2a', 'wcag211', 'wcag213', 'T...'TT4.a', ...], 'description': 'Ensure elements that have scrollable content are accessible by keyboard in Safari', ...}
+E             Use -v to get more diff
+
+tests/test_r210_account_accessibility_acceptance.py:45: AssertionError</failure></testcase></testsuite></testsuites>

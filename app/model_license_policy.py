@@ -3,7 +3,7 @@
 Cost recovery is not automatically NonCommercial. Acknowledgement records the
 operator's decision; it does not grant rights or override the original terms.
 """
-from contextlib import contextmanager
+from contextlib import contextmanager, nullcontext
 from contextvars import ContextVar
 from dataclasses import dataclass, asdict
 import hashlib
@@ -165,6 +165,23 @@ def selected(kind,plan):
     return 'sam-audio' if kind=='sam-audio' else kind
 
 
+def authorize_remote_execution(kind, plan):
+    """Deny unreviewed remote inference before dispatch, including native routes.
+
+    A remote server is not proof of license compliance. The requesting host
+    must authorize the actual model against its current service regime.
+    """
+    from .service_regime import current_regime, Regime
+    decision = evaluate(kind, plan)
+    if current_regime() == Regime.COMMERCIAL:
+        # No provider/model attestation is exchanged with the remote worker yet.
+        # Even locally reviewed rights cannot prove the remote checkpoint identity.
+        raise LicenseDenied('Remote AI inference requires authenticated model identity and rights attestation in commercial service')
+    if decision.mode != 'free_only' and not commercial_service_enabled():
+        raise LicenseDenied('Remote AI licensing is not approved under the current service configuration')
+    return decision
+
+
 def evaluate(kind,plan):
     primary=evaluate_model(selected(kind,plan));decisions=[primary];asset_ids=[]
     if kind=='audio-to-midi-transkun':asset_ids.append(plan.get('options',{}).get('asset_id',''))
@@ -191,8 +208,25 @@ def evaluate_model(model_id):
     custom=overrides().get(model_id,{})
     mode=custom.get('mode',known[1])
     if mode not in ('disabled','free_only','cost_recovery'):raise LicenseDenied('Invalid model licensing mode')
+    # Re-evaluate rights at the admission boundary, including policy files
+    # imported/restored without passing through the administrative writer.
+    if model_id == 'diffsinger-qixuan' and mode == 'cost_recovery':
+        raise LicenseDenied('Qixuan cannot be enabled for paid inference')
+    if custom.get('authorization_basis') == 'noncommercial_context' and mode != 'disabled':
+        if mode != 'free_only':
+            raise LicenseDenied('Noncommercial-context authorization cannot be billed')
+        from .service_regime import current_regime, Regime
+        if current_regime() == Regime.COMMERCIAL:
+            raise LicenseDenied('Noncommercial-context authorization is incompatible with commercial service')
     if mode=='cost_recovery' and not commercial_service_enabled():
         raise LicenseDenied('Commercial service is globally disabled; this model must have a reviewed free-only authorization')
+    # Enforce the active service regime at the model admission boundary, not
+    # merely in the model picker. The commercial regime may not run a free-only
+    # model absent a separately reviewed commercial authorization recorded as
+    # cost_recovery in the version-specific operator policy.
+    from .service_regime import current_regime, Regime
+    if current_regime() == Regime.COMMERCIAL and mode == 'free_only':
+        raise LicenseDenied('Free-only model is not authorized for the commercial service: '+model_id)
     if mode=='disabled':raise LicenseDenied('Model disabled pending license review: '+model_id+'. Contact the administrator; cost recovery alone does not grant permission.')
     source=custom.get('evidence_url') or known[2]
     fingerprint=hashlib.sha256(json.dumps({'model':model_id,'license':known[0],'policy':custom,'source':source},sort_keys=True).encode()).hexdigest()
@@ -255,14 +289,32 @@ def configure(model_id,body,actor_id):
 
 
 def catalog():
+    """Present effective regime admission, not merely the operator's selected mode.
+
+    This catalog must not offer an enabled model that the server rejects. Errors
+    reading regime/rights policy are represented as unavailable (fail closed).
+    """
     from .model_rights_dossiers import DOSSIERS
     custom=overrides()
-    return [{'id':name,'license':license_name,'default_mode':default,'mode':custom.get(name,{}).get('mode',default),
+    items=[]
+    for name,(license_name,default,source) in descriptors().items():
+        selected_mode=custom.get(name,{}).get('mode',default)
+        try:
+            decision=evaluate_model(name)
+            available=True
+            effective_mode=decision.mode
+            denial=None
+        except (LicenseDenied, ValueError, OSError) as exc:
+            available=False
+            effective_mode='disabled'
+            denial=str(exc)
+        items.append({'id':name,'license':license_name,'default_mode':default,
+             'mode':selected_mode,'effective_mode':effective_mode,
+             'available_in_current_regime':available,'license_denial_reason':denial,
              'license_url':source,'operator_review':custom.get(name),
              'manual_activation_does_not_grant_rights':True,'rights_dossier':DOSSIERS.get(name),
-             'requires_second_confirmation':name in RESTRICTED_MODELS or name not in CATALOG}
-            for name,(license_name,default,source) in descriptors().items()]
-
+             'requires_second_confirmation':name in RESTRICTED_MODELS or name not in CATALOG})
+    return items
 
 def descriptors():
     from .ai_worker_registry import extensions
@@ -273,9 +325,9 @@ def descriptors():
                for name in extensions()},**CATALOG}
 
 
-def record_job(job_id,decision):
+def record_job(job_id,decision,*,_connection=None):
     from .ai_billing import db
-    with db() as con:
+    with (db() if _connection is None else nullcontext(_connection)) as con:
         con.execute('''CREATE TABLE IF NOT EXISTS ai_job_license_snapshots(
             job_id TEXT PRIMARY KEY REFERENCES ai_compute_jobs(id) ON DELETE CASCADE,
             model_id TEXT NOT NULL,mode TEXT NOT NULL,policy_json TEXT NOT NULL)''')

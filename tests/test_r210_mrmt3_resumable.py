@@ -1,5 +1,4 @@
 """Resumable MR-MT3 checkpoints: integrity guards only, never claimed model accuracy."""
-import json
 import pytest
 import numpy as np
 from scripts.run_mrmt3_resumable import accept_window, atomic_json, budget_exhausted, serializable_tokens

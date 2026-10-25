@@ -1,0 +1,18 @@
+{
+  "raw_report": "nc-collection-bandit.json",
+  "raw_nc_module_findings": 0,
+  "raw_xml_helper_findings": 1,
+  "findings": [
+    {
+      "test_id": "B405",
+      "file": "scripts/repositories/_safe_xml.py",
+      "line": 7,
+      "severity": "LOW",
+      "classification": "reviewed import-level false positive",
+      "reason": "ElementTree is used only for TreeBuilder, ElementTree and ParseError. No ElementTree parse/fromstring/XMLParser call consumes input. Expat parses bounded chunks; StartDoctypeDeclHandler, EntityDeclHandler and ExternalEntityRefHandler reject DTD/entity processing.",
+      "negative_test_evidence": "tests/test_r210_script_input_security.py::test_repository_xml_entity_expansion_is_rejected; test_malicious_junit_produces_failed_shard_report_not_success; nc-script-security-final.xml",
+      "suppressed": false
+    }
+  ],
+  "full_historical_app_review_closed": false
+}

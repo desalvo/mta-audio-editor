@@ -35,6 +35,7 @@ for(const id of ['diagnosticsEnabled','diagnosticsStatus','smtpForm','webSetting
 let fail=false;
 const context={console,document:{querySelector:s=>elements[s],querySelectorAll:()=>buttons},
 fetch:async url=>({ok:!fail,headers:{get:()=> 'application/json'},json:async()=>url.includes('diagnostics')?{enabled:true}:{disk:{},models:{}},text:async()=> 'Access denied'}),alert(){}};
+context.window=context;
 vm.createContext(context);vm.runInContext(fs.readFileSync(process.argv[1],'utf8'),context);
 (async()=>{
  buttons[6].onclick();await new Promise(setImmediate);

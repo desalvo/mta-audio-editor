@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="13.545" timestamp="2026-10-24T14:44:29.534538+02:00" hostname="3a349086255d"><testcase classname="tests.test_r210_account_acceptance" name="test_full_account_and_credit_pages_regime_policy_language_and_keyboard[390-it-no_plan]" time="12.107"><failure message="AssertionError: assert 1 == 0&#10; +  where 1 = count()&#10; +    where count = &lt;Locator frame=&lt;Frame name= url='https://mta.test/account'&gt; selector='img:not([alt])'&gt;.count&#10; +      where &lt;Locator frame=&lt;Frame name= url='https://mta.test/account'&gt; selector='img:not([alt])'&gt; = locator('img:not([alt])')&#10; +        where locator = &lt;Page url='https://mta.test/account'&gt;.locator">account = 2
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f6f8987acc0&gt;
+nc_browser_config = {'executable_path': '/workspace/scratch/06e635791464/nc-browser-runtime/unpacked/chromium', 'headless': True, 'args': ...dbox', '--disable-dev-shm-usage', '--no-zygote', '--single-process', '--use-gl=angle', '--use-angle=swiftshader', ...]}
+scenario = 'no_plan', language = 'it', width = 390
+
+    @pytest.mark.parametrize('scenario',['no_plan','active','paid','trial','credits_disabled','permission_disabled','nc','historical_nc'])
+    @pytest.mark.parametrize('language',['it','en'])
+    @pytest.mark.parametrize('width',[390,1280])
+    def test_full_account_and_credit_pages_regime_policy_language_and_keyboard(account,monkeypatch,nc_browser_config,scenario,language,width):
+        from playwright.sync_api import sync_playwright
+        configure(account,scenario,language);web=client(account,monkeypatch);calls=[];errors=[]
+        with sync_playwright() as pw:
+            browser=pw.chromium.launch(**nc_browser_config);page=browser.new_page(viewport={'width':width,'height':1000},locale='it-IT' if language=='it' else 'en-GB')
+            page.on('pageerror',lambda e:errors.append(str(e)));page.route('**/*',serve(web,calls));page.goto('https://mta.test/account')
+            page.locator('[data-account-financial]').wait_for();page.locator('[data-payment-refunds] [data-refund-content] p').first.wait_for()
+            assert page.locator('html').get_attribute('lang')==language
+            assert page.locator('[data-payment-refunds] h2').inner_text()==('Rimborsi dei pagamenti' if language=='it' else 'Payment refunds')
+            if scenario in ('nc','historical_nc'):
+                assert page.locator('[data-resource-account]').is_hidden()
+                assert page.locator('[data-activate],[data-cancel],[data-overage]').count()==0
+                assert ('non sono un debito' if language=='it' else 'not a debt') in page.locator('[data-account-financial]').inner_text()
+            else:
+                page.locator('[data-resource-account] [data-content] .credits-total').wait_for()
+                assert page.locator('[data-resource-account]').is_visible()
+                if scenario=='no_plan':assert page.locator('[data-activate=trial]').count()==1
+                if scenario=='paid':assert page.get_by_role('button',name='Paga abbonamento con PayPal' if language=='it' else 'Pay subscription with PayPal',exact=False).count()==0
+                if scenario in ('active','trial','paid','credits_disabled','permission_disabled'):assert page.locator('[data-cancel]').count()==1
+            # Keyboard reaches the named refresh control, without an artificial click.
+            page.locator('#accountLimitsRefresh').focus();assert page.locator('#accountLimitsRefresh').evaluate('e=&gt;document.activeElement===e')
+            page.keyboard.press('Enter');page.locator('[data-account-financial]').wait_for()
+&gt;           assert_accessible_owner_page(page)
+
+tests/test_r210_account_acceptance.py:83: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+page = &lt;Page url='https://mta.test/account'&gt;
+
+    def assert_accessible_owner_page(page):
+        assert page.locator('main').count()==1
+        assert page.locator('h1').count()==1
+        assert page.evaluate('document.documentElement.scrollWidth&lt;=innerWidth')
+        missing=page.locator('input:not([type=hidden]),select,textarea').evaluate_all("els=&gt;els.filter(e=&gt;e.getClientRects().length&amp;&amp;!e.disabled&amp;&amp;!(e.labels?.length||e.getAttribute('aria-label')||e.getAttribute('aria-labelledby'))).map(e=&gt;e.outerHTML)")
+        assert missing==[]
+&gt;       assert page.locator('img:not([alt])').count()==0
+E       AssertionError: assert 1 == 0
+E        +  where 1 = count()
+E        +    where count = &lt;Locator frame=&lt;Frame name= url='https://mta.test/account'&gt; selector='img:not([alt])'&gt;.count
+E        +      where &lt;Locator frame=&lt;Frame name= url='https://mta.test/account'&gt; selector='img:not([alt])'&gt; = locator('img:not([alt])')
+E        +        where locator = &lt;Page url='https://mta.test/account'&gt;.locator
+
+tests/test_r210_account_acceptance.py:55: AssertionError</failure></testcase></testsuite></testsuites>

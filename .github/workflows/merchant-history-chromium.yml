@@ -1,0 +1,44 @@
+name: Optional merchant history Chromium
+on:
+  workflow_dispatch:
+    inputs:
+      merchant_history_chromium:
+        description: Run the four real merchant-history IT/EN desktop/mobile cases
+        type: boolean
+        required: true
+        default: false
+permissions:
+  contents: read
+jobs:
+  merchant-history-chromium:
+    if: ${{ inputs.merchant_history_chromium }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      MTA_TEST_OFFLINE: '1'
+      MTA_DATA_DIR: ${{ runner.temp }}/mta-merchant-history-data
+      MTA_AI_JOB_STATE_DIR: ${{ runner.temp }}/mta-merchant-history-jobs
+      PYTHONPATH: .
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+          cache: pip
+      - name: Install isolated test dependencies
+        run: |
+          python -m pip install -r requirements-dev.txt playwright==1.51.0
+          python -m pip check
+      - name: Install actual Chromium and Linux dependencies
+        run: python -m playwright install --with-deps chromium
+      - name: Run real UI and API acceptance (zero skips)
+        run: python scripts/run_merchant_history_chromium.py --output merchant-history-ci
+      - name: Upload Chromium acceptance diagnostics
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: merchant-history-chromium-${{ github.run_id }}
+          if-no-files-found: warn
+          path: merchant-history-ci/

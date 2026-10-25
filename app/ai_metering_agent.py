@@ -29,7 +29,11 @@ def _io(pid: int) -> tuple[int, int] | None:
     """Read Linux /proc per-PID physical block IO, if accessible."""
     try:
         pairs = {}
-        for line in Path(f'/proc/{pid}/io').read_text().splitlines():
+        from .linux_proc_view import directory
+        process = directory(pid)
+        if process is None:
+            return None
+        for line in (process / 'io').read_text().splitlines():
             key, _, value = line.partition(':')
             if key in {'read_bytes', 'write_bytes'}:
                 pairs[key] = int(value.strip())
@@ -42,6 +46,19 @@ def _io(pid: int) -> tuple[int, int] | None:
 
 def _descendants(parent_pid: int) -> set[int]:
     """Return observed descendants using per-PID PPid fields, never host load counters."""
+    from .linux_proc_view import directory
+    process = directory(parent_pid)
+    if process is None:
+        # A child may have exited during proc lookup. Observe without reaping;
+        # wait4 still collects its exact usage. An alive/unverifiable child
+        # never gains an isolation certificate from a missing proc entry.
+        try:
+            if os.waitid(os.P_PID, parent_pid, os.WEXITED | os.WNOHANG | os.WNOWAIT) is not None:
+                return set()
+        except (OSError, ChildProcessError):
+            pass
+        return {parent_pid}  # Unknown proc view cannot certify isolation.
+    parent_pid = int(process.name) if process.name != 'self' else int(Path('/proc/self/stat').read_text().split()[0])
     ppid = {}
     for entry in Path('/proc').iterdir():
         if not entry.name.isdigit():
@@ -142,7 +159,8 @@ def run_metered_process(argv: list[str], *, cwd: str, timeout_seconds: int = 360
 
 def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=None,
                               timeout_seconds: int = 1200, source_wav: bytes | None = None, source_json: bytes | None = None,
-                              cancel_check: Callable[[], bool] | None = None, license_decision=None) -> tuple[bytes, dict]:
+                              cancel_check: Callable[[], bool] | None = None, license_decision=None,
+                              _request_key=None, _request_digest=None) -> tuple[bytes, dict]:
     """Run the administrator-installed AI worker and persist measured usage.
 
     Unsupported GPU/process-tree telemetry is omitted, not guessed. Output is
@@ -155,6 +173,12 @@ def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=
     from .ai_worker_protocol import verify_preview_wav, WorkerUnavailable, MAX_REQUEST_BYTES
     from .ai_worker_registry import resolve_worker
     from .ai_worker_artifacts import package_artifacts
+
+    from . import ai_pull_coordinator as pull
+    if pull.mode() == 'pull':
+        return pull.execute(user_id, kind, plan, token_id=token_id, timeout_seconds=timeout_seconds,
+                            source_wav=source_wav, source_json=source_json, cancel_check=cancel_check,
+                            request_key=_request_key, request_digest=_request_digest)
 
     from .ai_worker_protocol import _ace_remote_cleanup as _ace_cleanup
     worker = resolve_worker(kind)
@@ -233,6 +257,20 @@ def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=
         from .ai_worker_registry import worker_python
         args = ([worker_python(kind), str(worker)] if worker.suffix == '.py' else [str(worker)])
         args += ['--request', str(request_path), '--output', str(output_path)]
+        # Deferred workers reuse the scheduler's owner; publication and billing
+        # outboxes retain that same immutable receipt through recovery.
+        if defer_settlement:
+            from .deferred_execution_owner import credentials_for
+            claim_credentials=credentials_for(job_id)
+        else:
+            import secrets
+            import socket
+            from .regime_worker_claims import claim
+            claim_credentials={'worker_id':'local:'+socket.gethostname()+':'+str(os.getpid()),
+                               'claim_token':secrets.token_hex(32)}
+            with ai_billing.db() as con:
+                con.execute('BEGIN IMMEDIATE')
+                claim(con,job_id,worker_id=claim_credentials['worker_id'],token=claim_credentials['claim_token'])
         result = None
         gpu_slot_acquired = False
         observed_at = float('-inf')
@@ -240,6 +278,11 @@ def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=
             nonlocal observed_at
             if final or time.monotonic() - observed_at >= 2:
                 observed_at = time.monotonic()
+                if claim_credentials and not final:
+                    from .regime_worker_claims import heartbeat
+                    with ai_billing.db() as con:
+                        con.execute('BEGIN IMMEDIATE')
+                        heartbeat(con,'job:ledger:'+job_id,worker_id=claim_credentials['worker_id'],token=claim_credentials['claim_token'])
                 try:
                     from .ai_torch_diagnostics import store_report
                     report = read_report(directory, job_id)
@@ -275,7 +318,7 @@ def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=
                 gpu_slot_acquired = True
             if os.getenv('MTA_AI_CGROUP_PARENT'):
                 from .ai_cgroup_metering import run_cgroup_process
-                result = run_cgroup_process(args, cwd=folder, timeout_seconds=timeout_seconds, cancel_check=worker_cancel_check, env={**os.environ,'MTA_AI_PROGRESS_FILE':str(directory/'progress.json'),'MTA_AI_SUPERVISOR_CPU_PROGRESS':'0' if kind=='ace-step' else '1','MTA_AI_VERIFIED_REPORT_DIR':str(directory),'MTA_AI_JOB_MAX_ARTIFACT_MIB':str(artifact_limit_mib)})
+                result = run_cgroup_process(args, cwd=folder, timeout_seconds=timeout_seconds, cancel_check=worker_cancel_check, env={**os.environ,'MTA_AI_PROGRESS_FILE':str(directory/'progress.json'),'MTA_AI_SUPERVISOR_CPU_PROGRESS':'0' if kind=='ace-step' else '1','MTA_AI_VERIFIED_REPORT_DIR':str(directory),'MTA_AI_JOB_MAX_ARTIFACT_MIB':str(artifact_limit_mib)}, owner_receipt={'job_id':job_id,**claim_credentials})
             else:
                 result = run_metered_process(args, cwd=folder, timeout_seconds=timeout_seconds, cancel_check=worker_cancel_check, env={**os.environ,'MTA_AI_PROGRESS_FILE':str(directory/'progress.json'),'MTA_AI_SUPERVISOR_CPU_PROGRESS':'0' if kind=='ace-step' else '1','MTA_AI_VERIFIED_REPORT_DIR':str(directory),'MTA_AI_JOB_MAX_ARTIFACT_MIB':str(artifact_limit_mib)})
             if cancel_check is not None and cancel_check():
@@ -309,7 +352,7 @@ def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=
             diagnostic_checkpoint(final=True)
             from .ai_trusted_estimates import promote
             usage,metered_source=promote(job_id,usage,metered_source)
-            if not defer_settlement:ai_billing.finish_job(job_id, 'done', usage or None,source=metered_source)
+            if not defer_settlement:ai_billing.finish_job(job_id, 'done', usage or None,source=metered_source,**claim_credentials)
             diagnostics = dict(result.gpu_diagnostics or {})
             profile_report = read_report(directory, job_id)
             if profile_report:
@@ -321,6 +364,8 @@ def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=
                              'gpu_diagnostics': diagnostics, 'media_type': media_type}
         except BaseException:
             diagnostic_checkpoint(final=True)
+            from .worker_cgroup_recovery import require_quiescent
+            with ai_billing.db() as con:require_quiescent(con,job_id)
             terminal_status='cancelled' if cancel_check is not None and cancel_check() else 'failed'
             if gpu_slot_acquired:
                 # Do not silently finalize a job if its lease cannot be
@@ -328,16 +373,18 @@ def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=
                 gpu_slots.release(job_id, aborted=True)
                 gpu_slot_acquired = False
             if result is None:
-                ai_billing.finish_job(job_id, terminal_status, source='unmetered')
+                ai_billing.finish_job(job_id, terminal_status, source='unmetered',**claim_credentials)
             else:
                 ai_billing.finish_job(job_id, terminal_status, result.usage if result.isolated else None,
-                                      source=result.source if result.isolated else 'unmetered')
+                                      source=result.source if result.isolated else 'unmetered',**claim_credentials)
             raise
 
 
-def execute_registered_worker(user_id,kind,plan,*,token_id=None,timeout_seconds=1200,source_wav=None,source_json=None,cancel_check=None):
+def execute_registered_worker(user_id,kind,plan,*,token_id=None,timeout_seconds=1200,source_wav=None,source_json=None,cancel_check=None,
+                              _request_key=None,_request_digest=None):
     from .ai_global_execution import execute
     from .model_license_policy import evaluate
     decision=evaluate(kind,plan)
     return execute(user_id,kind,lambda cancelled:_execute_registered_worker(user_id,kind,plan,license_decision=decision,
-        token_id=token_id,timeout_seconds=timeout_seconds,source_wav=source_wav,source_json=source_json,cancel_check=cancelled),cancel_check=cancel_check,license_decision=decision)
+        token_id=token_id,timeout_seconds=timeout_seconds,source_wav=source_wav,source_json=source_json,cancel_check=cancelled,
+        _request_key=_request_key,_request_digest=_request_digest),cancel_check=cancel_check,license_decision=decision)

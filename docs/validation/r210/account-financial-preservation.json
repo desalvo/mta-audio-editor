@@ -1,0 +1,41 @@
+{
+  "original_files": 3267,
+  "preceding_checkpoint_files": 3521,
+  "missing_original": [],
+  "missing_preceding": [],
+  "protected_files_checked": 183,
+  "protected_changes": [],
+  "protected_definition": "Original non-test license/manual paths and raster/vector/font/document/audio assets by extension",
+  "python_scripts_changed_since_preceding": [],
+  "executable_modes": {
+    "scripts/install_ace_step.sh": "0o755",
+    "scripts/install_mta.sh": "0o755",
+    "app/ai_unified_adapter.py": "0o755"
+  },
+  "new_paths_since_preceding": [
+    "app/account_financial_context.py",
+    "docs/ACCOUNT_FINANCIAL_HANDOFF_R210.md",
+    "docs/validation/r210/account-financial-bandit.json",
+    "docs/validation/r210/account-financial-browser-final.log",
+    "docs/validation/r210/account-financial-browser-final.xml",
+    "docs/validation/r210/account-financial-domain.log",
+    "docs/validation/r210/account-financial-domain.xml",
+    "docs/validation/r210/account-financial-final.log",
+    "docs/validation/r210/account-financial-final.xml",
+    "docs/validation/r210/account-financial-page.log",
+    "docs/validation/r210/account-financial-page.xml",
+    "docs/validation/r210/account-financial-preservation.json",
+    "docs/validation/r210/account-financial-repayment.log",
+    "docs/validation/r210/account-financial-repayment.xml",
+    "docs/validation/r210/account-financial-review-gate.log",
+    "docs/validation/r210/account-financial-review-gate.xml",
+    "docs/validation/r210/account-financial-review-result.json",
+    "docs/validation/r210/account-financial-review-result.log",
+    "docs/validation/r210/account-financial-ruff.log",
+    "docs/validation/r210/account-financial-stale-response.log",
+    "docs/validation/r210/account-financial-stale-response.xml",
+    "docs/validation/r210/account-financial-test-summary.json",
+    "tests/test_r210_account_financial_browser.py",
+    "tests/test_r210_account_financial_context.py"
+  ]
+}

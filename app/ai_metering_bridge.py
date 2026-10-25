@@ -48,7 +48,12 @@ def capture(job_id, usage, source):
             rows=con.execute('SELECT id FROM ai_compute_jobs WHERE queue_job_id=? AND user_id=?',(job_id,_identity(job_id)[0])).fetchall()
         if len(rows)==1:ledger_id=rows[0][0]
         require_evidence(ledger_id,normalized)
-    encoded = json.dumps({'usage': normalized, 'source': source}, sort_keys=True, allow_nan=False)
+    from .deferred_execution_owner import receipt_for
+    owner=receipt_for(job_id)
+    if owner:
+        from .worker_loss_resolution import mark_evidence
+        mark_evidence(owner['ledger_id'],owner['worker_id'],owner['claim_token'])
+    encoded = json.dumps({'usage': normalized, 'source': source,**({'execution_owner':owner} if owner else {})}, sort_keys=True, allow_nan=False)
     with queue._db() as con:
         con.execute('''CREATE TABLE IF NOT EXISTS ai_metering_evidence
                        (job_id TEXT PRIMARY KEY, evidence_json TEXT NOT NULL)''')
@@ -101,8 +106,14 @@ def register_settlement(job_id, status='done'):
     ledger_id = prior_ledger_id or ai_billing.provision_inference_job(job_id, user, operation)
     if ledger_id is None:
         raise ValueError('Billing opt-in changed during finalization')
+    owner=evidence.get('execution_owner')
+    credentials={}
+    if owner is not None:
+        if not isinstance(owner,dict) or set(owner)!={'inference_id','ledger_id','worker_id','claim_token'} or owner['inference_id']!=job_id or owner['ledger_id']!=ledger_id:
+            raise ValueError('Invalid deferred execution owner binding')
+        credentials={k:owner[k] for k in ('worker_id','claim_token')}
     ai_billing_outbox.register_verified(job_id, ledger_id, user, status,
-                                       evidence['usage'], source=evidence['source'])
+                                       evidence['usage'], source=evidence['source'],**credentials)
     return True
 
 
@@ -204,6 +215,8 @@ def infer_durable_remote(local_job_id, *, base_url, token, wav, options=None,
     user, operation = _identity(local_job_id)
     if operation not in ('arranger', 'remix'):
         raise ValueError('Unsupported durable remote operation')
+    from .model_license_policy import authorize_remote_execution
+    authorize_remote_execution(operation,options or {})
     if not isinstance(worker_id, str) or re.fullmatch(r'[A-Za-z0-9_-]{1,128}', worker_id) is None:
         raise ValueError('Invalid remote worker identity')
     # Remote request keys must remain unchanged over restarts and across workers.

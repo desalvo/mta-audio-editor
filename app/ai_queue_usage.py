@@ -145,5 +145,9 @@ class CpuProgress:
 def process_cpu(pid):
     """Exact process CPU counters sampled from procfs, without host-wide load."""
     import os
-    fields = Path(f'/proc/{pid}/stat').read_text().rsplit(')', 1)[1].split()
+    from .linux_proc_view import directory
+    process = directory(pid)
+    if process is None:
+        raise FileNotFoundError('Process CPU evidence is unavailable')
+    fields = (process / 'stat').read_text().rsplit(')', 1)[1].split()
     return (int(fields[11])+int(fields[12]))/os.sysconf('SC_CLK_TCK')

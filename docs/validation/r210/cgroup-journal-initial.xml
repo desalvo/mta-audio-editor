@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="40" time="6.194" timestamp="2026-10-23T17:34:23.185603+02:00" hostname="9e4e3f56a5bf"><testcase classname="tests.test_r210_worker_quiescence_safety" name="test_unreadable_proc_is_unknown_not_dead[PermissionError]" time="0.001" /><testcase classname="tests.test_r210_worker_quiescence_safety" name="test_unreadable_proc_is_unknown_not_dead[OSError]" time="0.000" /><testcase classname="tests.test_r210_worker_quiescence_safety" name="test_unreadable_proc_is_unknown_not_dead[ValueError]" time="0.001" /><testcase classname="tests.test_r210_worker_quiescence_safety" name="test_malformed_proc_is_unknown[]" time="0.000" /><testcase classname="tests.test_r210_worker_quiescence_safety" name="test_malformed_proc_is_unknown[malformed]" time="0.000" /><testcase classname="tests.test_r210_worker_quiescence_safety" name="test_malformed_proc_is_unknown[1 (x) R 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 ]" time="0.000" /><testcase classname="tests.test_r210_worker_quiescence_safety" name="test_missing_boot_identity_does_not_prove_death" time="0.000" /><testcase classname="tests.test_r210_worker_quiescence_safety" name="test_absent_proc_is_confirmed_dead[FileNotFoundError]" time="0.000" /><testcase classname="tests.test_r210_worker_quiescence_safety" name="test_absent_proc_is_confirmed_dead[ProcessLookupError]" time="0.000" /><testcase classname="tests.test_r210_worker_quiescence_safety" name="test_hidden_proc_is_not_dead[False]" time="0.000" /><testcase classname="tests.test_r210_worker_quiescence_safety" name="test_hidden_proc_is_not_dead[True]" time="0.000" /><testcase classname="tests.test_r210_worker_quiescence_safety" name="test_invalid_pid_never_probes_a_process_group[0]" time="0.000" /><testcase classname="tests.test_r210_worker_quiescence_safety" name="test_invalid_pid_never_probes_a_process_group[-1]" time="0.000" /><testcase classname="tests.test_r210_worker_quiescence_safety" name="test_invalid_pid_never_probes_a_process_group[True]" time="0.000" /><testcase classname="tests.test_r210_worker_quiescence_safety" name="test_invalid_pid_never_probes_a_process_group[None]" time="0.000" /><testcase classname="tests.test_r210_worker_quiescence_safety" name="test_invalid_pid_never_probes_a_process_group[123]" time="0.000" /><testcase classname="tests.test_r210_worker_quiescence_safety" name="test_dead_kernel_states[Z]" time="0.000" /><testcase classname="tests.test_r210_worker_quiescence_safety" name="test_dead_kernel_states[X]" time="0.000" /><testcase classname="tests.test_r210_worker_quiescence_safety" name="test_dead_kernel_states[x]" time="0.000" /><testcase classname="tests.test_r210_worker_quiescence_safety" name="test_unknown_identity_preserves_original_owner_and_no_receipt[queued]" time="0.015" /><testcase classname="tests.test_r210_worker_quiescence_safety" name="test_unknown_identity_preserves_original_owner_and_no_receipt[running]" time="0.014" /><testcase classname="tests.test_r210_worker_quiescence_safety" name="test_new_claim_requires_verifiable_scheduler_identity[None]" time="0.015" /><testcase classname="tests.test_r210_worker_quiescence_safety" name="test_new_claim_requires_verifiable_scheduler_identity[]" time="0.011" /><testcase classname="tests.test_r210_worker_quiescence_safety" name="test_identity_loss_before_completion_never_creates_terminal_receipt" time="5.016"><failure message="assert False&#10; +  where False = wait(5)&#10; +    where wait = &lt;threading.Event at 0x7f4569dfcce0: unset&gt;.wait">isolated = PosixPath('/tmp/pytest-of-root/pytest-0/test_identity_loss_before_comp0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f4569dd6e40&gt;
+
+    def test_identity_loss_before_completion_never_creates_terminal_receipt(isolated, monkeypatch):
+        entered = threading.Event()
+        release = threading.Event()
+        def run(*_):
+            entered.set()
+            assert release.wait(5)
+        _, job = queue.start('p', 'test', run, job_id='lost-identity')
+&gt;       assert entered.wait(5)
+E       assert False
+E        +  where False = wait(5)
+E        +    where wait = &lt;threading.Event at 0x7f4569dfcce0: unset&gt;.wait
+
+tests/test_r210_worker_quiescence_safety.py:121: AssertionError</failure></testcase><testcase classname="tests.test_r210_worker_quiescence_safety" name="test_deferred_owner_cannot_claim_with_unknown_identity[None]" time="0.132"><failure message="AssertionError: assert False&#10; +  where False = &lt;function _claim at 0x7f456beffc40&gt;('unknown-owner')&#10; +    where &lt;function _claim at 0x7f456beffc40&gt; = queue._claim">isolated = PosixPath('/tmp/pytest-of-root/pytest-0/test_deferred_owner_cannot_cla0')
+operator = 1
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f4569dfd130&gt;
+identity = None
+
+    @pytest.mark.parametrize('identity', [None, ''])
+    def test_deferred_owner_cannot_claim_with_unknown_identity(isolated, operator, monkeypatch, identity):
+        from app import ai_billing, auth
+        from app.deferred_execution_owner import execution_scope
+        from app.regime_operation_fence import FenceBlocked
+        queue.start('p', 'arranger', None, job_id='unknown-owner', defer_spawn=True,
+                    payload={'schema_version': 1, 'actor_user_id': operator, 'adapter': 'arranger'})
+        ledger = ai_billing.provision_inference_job('unknown-owner', operator, 'arranger')
+&gt;       assert queue._claim('unknown-owner')
+E       AssertionError: assert False
+E        +  where False = &lt;function _claim at 0x7f456beffc40&gt;('unknown-owner')
+E        +    where &lt;function _claim at 0x7f456beffc40&gt; = queue._claim
+
+tests/test_r210_worker_quiescence_safety.py:140: AssertionError</failure></testcase><testcase classname="tests.test_r210_worker_quiescence_safety" name="test_deferred_owner_cannot_claim_with_unknown_identity[]" time="0.108"><failure message="AssertionError: assert False&#10; +  where False = &lt;function _claim at 0x7f456beffc40&gt;('unknown-owner')&#10; +    where &lt;function _claim at 0x7f456beffc40&gt; = queue._claim">isolated = PosixPath('/tmp/pytest-of-root/pytest-0/test_deferred_owner_cannot_cla1')
+operator = 1
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f4569527b30&gt;
+identity = ''
+
+    @pytest.mark.parametrize('identity', [None, ''])
+    def test_deferred_owner_cannot_claim_with_unknown_identity(isolated, operator, monkeypatch, identity):
+        from app import ai_billing, auth
+        from app.deferred_execution_owner import execution_scope
+        from app.regime_operation_fence import FenceBlocked
+        queue.start('p', 'arranger', None, job_id='unknown-owner', defer_spawn=True,
+                    payload={'schema_version': 1, 'actor_user_id': operator, 'adapter': 'arranger'})
+        ledger = ai_billing.provision_inference_job('unknown-owner', operator, 'arranger')
+&gt;       assert queue._claim('unknown-owner')
+E       AssertionError: assert False
+E        +  where False = &lt;function _claim at 0x7f456beffc40&gt;('unknown-owner')
+E        +    where &lt;function _claim at 0x7f456beffc40&gt; = queue._claim
+
+tests/test_r210_worker_quiescence_safety.py:140: AssertionError</failure></testcase><testcase classname="tests.test_r210_worker_quiescence_safety" name="test_real_supervisor_death_does_not_prove_external_worker_exit" time="0.350" /><testcase classname="tests.test_r210_worker_quiescence_safety" name="test_nested_workers_are_killed_and_not_billed" time="0.003" /><testcase classname="tests.test_r210_worker_quiescence_safety" name="test_missing_recursive_kill_refuses_spawn" time="0.001" /><testcase classname="tests.test_r210_worker_quiescence_safety" name="test_empty_group_returns_only_its_measured_usage" time="0.002" /><testcase classname="tests.test_r210_worker_quiescence_safety" name="test_cancellation_or_timeout_stops_nested_workers_without_measurement[during_run]" time="0.002" /><testcase classname="tests.test_r210_worker_quiescence_safety" name="test_cancellation_or_timeout_stops_nested_workers_without_measurement[after_exit]" time="0.002" /><testcase classname="tests.test_r210_worker_quiescence_safety" name="test_cancellation_or_timeout_stops_nested_workers_without_measurement[timeout]" time="0.006" /><testcase classname="tests.test_r210_worker_quiescence_safety" name="test_unknown_quiescence_is_never_a_measurement" time="0.002" /><testcase classname="tests.test_r210_worker_quiescence_safety" name="test_empty_cleanup_failure_invalidates_pending_measurement" time="0.002" /><testcase classname="tests.test_r210_worker_quiescence_safety" name="test_kill_waits_for_recursive_empty" time="0.001" /><testcase classname="tests.test_regime_worker_claim_integrity_r210" name="test_running_worker_prevents_atomic_settlement" time="0.005" /><testcase classname="tests.test_regime_worker_claim_integrity_r210" name="test_reject_orphan_claim_and_epoch_mismatch" time="0.001" /><testcase classname="tests.test_regime_worker_claim_integrity_r210" name="test_closed_fence_with_running_worker_detected" time="0.001" /><testcase classname="tests.test_regime_worker_claim_integrity_r210" name="test_missing_schema_is_not_reported_clean" time="0.000" /></testsuite></testsuites>

@@ -11,6 +11,7 @@ import logging
 import os
 import re
 import signal
+import sqlite3
 import subprocess
 import sys
 import time
@@ -23,10 +24,15 @@ from .ai_metering_agent import Measurement
 # The child enters the dedicated cgroup *before* exec'ing the worker. No
 # preexec_fn (unsafe from a multithreaded server) and no shell are involved.
 _CHILD = '''import os,sys
-cg, cwd, exe, *args = sys.argv[1:]
+cg, cwd, scope, package_root, exe, *args = sys.argv[1:]
 try:
-    with open(os.path.join(cg, "cgroup.procs"), "w") as f:
-        f.write(str(os.getpid()))
+    if scope:
+        sys.path.insert(0, package_root)
+        from app.worker_cgroup_recovery import enter_before_exec
+        enter_before_exec(scope, cg)
+    else:
+        with open(os.path.join(cg, "cgroup.procs"), "w") as f:
+            f.write(str(os.getpid()))
     os.chdir(cwd)
     os.execvpe(exe, [exe, *args], os.environ)
 except BaseException as ex:
@@ -199,7 +205,31 @@ def _pids(path: Path) -> list[int]:
     return [int(x) for x in (path / 'cgroup.procs').read_text().split()]
 
 
-def run_cgroup_process(argv: list[str], *, cwd: str, timeout_seconds: int = 3600, parent: str | None = None, cancel_event: Event | None = None, cancel_check=None, env: dict[str, str] | None = None) -> Measurement:
+def _stop_cgroup(path: Path, *, timeout_seconds: float = 2.0) -> None:
+    """Kill the entire kernel subtree and require recursive quiescence.
+
+    PID lists and process groups miss nested cgroups/setsid descendants and
+    can target recycled PIDs. Keep a failed group for operator inspection.
+    This proof applies only to this local cgroup, never remote worker activity.
+    """
+    try:
+        _assert_empty(path)
+        return
+    except RuntimeError:
+        pass
+    (path / 'cgroup.kill').write_text('1')
+    deadline = time.monotonic() + timeout_seconds
+    while True:
+        try:
+            _assert_empty(path)
+            return
+        except RuntimeError:
+            if time.monotonic() >= deadline:
+                raise RuntimeError('AI cgroup quiescence remains unverified') from None
+            time.sleep(0.02)
+
+
+def run_cgroup_process(argv: list[str], *, cwd: str, timeout_seconds: int = 3600, parent: str | None = None, cancel_event: Event | None = None, cancel_check=None, env: dict[str, str] | None = None, owner_receipt: dict | None = None) -> Measurement:
     """Execute an operator-selected worker in an isolated delegated cgroup.
 
     Raises instead of returning guessed values if group telemetry is missing.
@@ -231,6 +261,7 @@ def run_cgroup_process(argv: list[str], *, cwd: str, timeout_seconds: int = 3600
     job_group = root / ('mta-' + uuid.uuid4().hex)
     job_group.mkdir(mode=0o700)
     proc = None
+    scope_id = None
     stderr_reader = None
     started = time.monotonic()
     try:
@@ -238,10 +269,20 @@ def run_cgroup_process(argv: list[str], *, cwd: str, timeout_seconds: int = 3600
         _cpu(job_group)
         _io(job_group)
         _assert_empty(job_group)
+        if not (job_group / 'cgroup.kill').is_file():
+            raise RuntimeError('Recursive AI cancellation requires cgroup.kill')
         # Cancellation can arrive during delegated cgroup setup.
         if (cancel_event is not None and cancel_event.is_set()) or (cancel_check is not None and cancel_check()):
             raise RuntimeError('AI worker cancelled; metering invalid')
-        proc = subprocess.Popen([sys.executable, '-c', _CHILD, str(job_group), cwd, *argv],
+        from .deferred_execution_owner import cgroup_receipt
+        active_owner=cgroup_receipt()
+        if active_owner is not None and owner_receipt is not None and active_owner!=owner_receipt:
+            raise RuntimeError('Worker cgroup ownership conflicts with active inference')
+        owner_receipt=owner_receipt if owner_receipt is not None else active_owner
+        if owner_receipt is not None:
+            from .worker_cgroup_recovery import register
+            scope_id = register(job_group, owner_receipt['job_id'], owner_receipt)
+        proc = subprocess.Popen([sys.executable, '-c', _CHILD, str(job_group), cwd, scope_id or '', str(Path(__file__).resolve().parent.parent), *argv],
                                 stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
                                 stderr=subprocess.PIPE, start_new_session=True, env=env)
         stderr_reader = _BoundedStderr(proc.stderr)
@@ -260,14 +301,12 @@ def run_cgroup_process(argv: list[str], *, cwd: str, timeout_seconds: int = 3600
         while proc.poll() is None:
             live_cpu.publish(lambda: _cpu(job_group))
             if (cancel_event is not None and cancel_event.is_set()) or (cancel_check is not None and cancel_check()):
-                try: os.killpg(proc.pid, signal.SIGKILL)
-                except ProcessLookupError: pass
-                proc.wait()
+                _stop_cgroup(job_group)
+                proc.wait(timeout=2)
                 raise RuntimeError('AI worker cancelled; metering invalid')
             if time.monotonic() - started >= timeout_seconds:
-                try: os.killpg(proc.pid, signal.SIGKILL)
-                except ProcessLookupError: pass
-                proc.wait()
+                _stop_cgroup(job_group)
+                proc.wait(timeout=2)
                 raise TimeoutError('AI worker timed out; metering invalid')
             if gpu_diagnostics_enabled:
                 try:
@@ -291,14 +330,12 @@ def run_cgroup_process(argv: list[str], *, cwd: str, timeout_seconds: int = 3600
         if (cancel_event is not None and cancel_event.is_set()) or (cancel_check is not None and cancel_check()):
             raise RuntimeError('AI worker cancelled; metering invalid')
         # Child processes may continue after the original process exits.
-        remaining = _pids(job_group)
-        if remaining:
+        try:
+            _assert_empty(job_group)
+        except RuntimeError:
             # Do not bill an unfinished group; forcibly cancel its descendants.
-            for pid in remaining:
-                try: os.kill(pid, signal.SIGKILL)
-                except ProcessLookupError: pass
+            _stop_cgroup(job_group)
             raise RuntimeError('AI worker left running descendants; metering invalid')
-        _assert_empty(job_group)
         if proc.returncode != 0:
             detail = stderr_reader.finish() if stderr_reader is not None else ''
             failure = _worker_failure(detail, proc.returncode)
@@ -320,23 +357,37 @@ def run_cgroup_process(argv: list[str], *, cwd: str, timeout_seconds: int = 3600
                             'billable': False, 'coverage': 'sampled_process_fdinfo_only'}
                            if gpu_diagnostics_enabled else None)
     finally:
+        # Stop a bootstrap still outside the cgroup before attesting cleanup.
+        # Its transactional admission gate also refuses any committed receipt.
         if proc is not None and proc.poll() is None:
             try: os.killpg(proc.pid, signal.SIGKILL)
             except ProcessLookupError: pass
-            proc.wait()
+            try:
+                proc.wait(timeout=2)
+            except subprocess.TimeoutExpired:
+                _LOG.error('AI worker exit remains unverified: %s', job_group.name)
+        # Kernel subtree cancellation includes processes that changed session
+        # or entered child cgroups. Never remove an unverified/nonempty group.
+        quiescent = False
+        try:
+            _stop_cgroup(job_group)
+            if scope_id is not None:
+                from .worker_cgroup_recovery import owner_quiescent
+                owner_quiescent(scope_id)
+            quiescent = True
+        except (OSError, RuntimeError, sqlite3.DatabaseError):
+            _LOG.error('AI cgroup cleanup incomplete; quiescence unverified: %s', job_group.name)
         if stderr_reader is not None:
             stderr_reader.finish()
-        # A non-empty cgroup cannot be removed. Kill remaining children and
-        # refuse to return a metered result when cleanup is incomplete.
-        try:
-            for pid in _pids(job_group):
-                try: os.kill(pid, signal.SIGKILL)
-                except ProcessLookupError: pass
-            for _ in range(15):
-                try:
-                    job_group.rmdir()
-                    break
-                except OSError:
-                    time.sleep(0.05)
-        except OSError:
-            pass
+        if quiescent:
+            try:
+                # Empty descendants are removed bottom-up, never followed
+                # outside the operator-delegated kernel hierarchy.
+                for child in sorted(job_group.rglob('*'), key=lambda p: len(p.parts), reverse=True):
+                    if child.is_dir() and not child.is_symlink():
+                        child.rmdir()
+                job_group.rmdir()
+            except OSError:
+                _LOG.warning('Empty AI cgroup retained for operator cleanup: %s', job_group.name)
+        elif sys.exc_info()[0] is None:
+            raise RuntimeError('AI cgroup cleanup failed; metering invalid')

@@ -1,0 +1,6 @@
+[data-payment-refunds]{min-width:0;overflow-wrap:anywhere}
+[data-payment-refunds] article{border-top:1px solid var(--border,#aaa);padding:1rem 0}
+[data-payment-refunds] .settings-form{display:grid;gap:.75rem;margin:1rem 0;min-width:0}
+[data-payment-refunds] label{display:grid;gap:.35rem;min-width:0}
+[data-payment-refunds] select,[data-payment-refunds] input,[data-payment-refunds] textarea{max-width:100%;width:100%;min-width:0;box-sizing:border-box}
+[data-payment-refunds] button{white-space:normal;max-width:100%;margin:.2rem}

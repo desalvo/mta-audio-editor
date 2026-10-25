@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="47" time="9.353" timestamp="2026-10-24T23:17:30.738449+08:00" hostname="9723f7e4ae8a"><testcase classname="tests.test_r210_paypal_dispute_history" name="test_discovery_funds_only_net_and_replays_idempotently[False-False]" time="0.215" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_discovery_funds_only_net_and_replays_idempotently[False-True]" time="0.210" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_discovery_funds_only_net_and_replays_idempotently[True-False]" time="0.206" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_discovery_funds_only_net_and_replays_idempotently[True-True]" time="0.202" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_discovered_final_outcomes_and_old_webhooks_cannot_reopen[RESOLVED_SELLER_FAVOUR-False]" time="0.232" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_discovered_final_outcomes_and_old_webhooks_cannot_reopen[RESOLVED_SELLER_FAVOUR-True]" time="0.198" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_discovered_final_outcomes_and_old_webhooks_cannot_reopen[CANCELED_BY_BUYER-False]" time="0.183" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_discovered_final_outcomes_and_old_webhooks_cannot_reopen[CANCELED_BY_BUYER-True]" time="0.203" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_discovered_final_outcomes_and_old_webhooks_cannot_reopen[RESOLVED_BUYER_FAVOUR-False]" time="0.187" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_discovered_final_outcomes_and_old_webhooks_cannot_reopen[RESOLVED_BUYER_FAVOUR-True]" time="0.199" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_payouts_stay_pending_private_and_can_resolve_with_later_exact_outcome[False-RESOLVED_WITH_PAYOUT]" time="0.230" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_payouts_stay_pending_private_and_can_resolve_with_later_exact_outcome[False-RESOLVED_WITH_OTHER]" time="0.205" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_payouts_stay_pending_private_and_can_resolve_with_later_exact_outcome[False-UNKNOWN]" time="0.191" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_payouts_stay_pending_private_and_can_resolve_with_later_exact_outcome[True-RESOLVED_WITH_PAYOUT]" time="0.202" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_payouts_stay_pending_private_and_can_resolve_with_later_exact_outcome[True-RESOLVED_WITH_OTHER]" time="0.196" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_payouts_stay_pending_private_and_can_resolve_with_later_exact_outcome[True-UNKNOWN]" time="0.211" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[missing_items]" time="0.196" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[non_list]" time="0.189" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[summary_status]" time="0.179" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[summary_amount]" time="0.195" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[summary_time]" time="0.199" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[wrong_detail]" time="0.180" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[foreign_capture]" time="0.181" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[duplicate_capture]" time="0.170" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[partial_multi]" time="0.167" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[negative]" time="0.176" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[currency]" time="0.175" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[bad_time]" time="0.182" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[naive_time]" time="0.176" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[empty_transactions]" time="0.176"><failure message="Failed: DID NOT RAISE any of (ValueError, FenceBlocked)">account = 2
+provider = ({'ORDER0001': {'id': 'ORDER0001', 'status': 'COMPLETED', 'purchase_units': [{'reference_id': '7cb5eb810f4f43adacb08a2...), ('GET', '/v2/payments/captures/CAPTURE222', None, None), ('GET', '/v2/checkout/orders/ORDER0001', None, None), ...])
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f693dafe510&gt;
+defect = 'empty_transactions'
+
+    @pytest.mark.parametrize('defect',['missing_items','non_list','summary_status','summary_amount','summary_time','wrong_detail','foreign_capture','duplicate_capture','partial_multi','negative','currency','bad_time','naive_time','empty_transactions','missing_gross','gross_mismatch','incomplete_membership','collection_changed','detail_changed','order_changed','http_error','missing_known'])
+    def test_unverifiable_history_never_funds_and_retains_durable_gap(account,provider,monkeypatch,defect):
+        local,order,docs,calls,hook=fixture(account,provider,monkeypatch,multi=defect in ('partial_multi','missing_gross','gross_mismatch','incomplete_membership'))
+        document=docs['PP-D-123'];reads=[]
+        if defect=='foreign_capture':document['disputed_transactions'][0]['seller_transaction_id']='CAPTURE999'
+        if defect=='duplicate_capture':document['disputed_transactions']*=2
+        if defect=='partial_multi':document['dispute_amount']['value']='4.00'
+        if defect=='negative':document['dispute_amount']['value']='-1'
+        if defect=='currency':document['dispute_amount']['currency_code']='USD'
+        if defect=='bad_time':document['update_time']='2026-13-99T01:00:00Z'
+        if defect=='naive_time':document['update_time']='2026-10-24T01:00:00'
+        if defect=='empty_transactions':document['disputed_transactions']=[]
+        if defect=='missing_gross':document['disputed_transactions'][0].pop('gross_amount')
+        if defect=='gross_mismatch':document['disputed_transactions'][0]['gross_amount']['value']='2.00'
+        def override(cfg,path):
+            reads.append(path)
+            if path.startswith('/v1/customer/disputes?'):
+                cid=parse_qs(urlsplit(path).query)['disputed_transaction_id'][0]
+                if defect=='missing_items':return {'links':[]}
+                if defect=='non_list':return {'items':{}}
+                if defect=='http_error':raise ValueError('Simulated permission/HTTP failure')
+                if defect=='foreign_capture':return {'items':[{k:document[k] for k in ('dispute_id','status','update_time','dispute_amount')}],'links':[]}
+                if defect in ('summary_status','summary_amount','summary_time') and cid=='CAPTURE111':
+                    row={k:copy.deepcopy(document[k]) for k in ('dispute_id','status','update_time','dispute_amount')}
+                    row[{'summary_status':'status','summary_amount':'dispute_amount','summary_time':'update_time'}[defect]]='bad';return {'items':[row],'links':[]}
+                if defect=='incomplete_membership' and cid=='CAPTURE222':return {'items':[],'links':[]}
+                if defect=='collection_changed' and sum(x.startswith('/v1/customer/disputes?') for x in reads)&gt;2:return {'items':[],'links':[]}
+            if path=='/v1/customer/disputes/PP-D-123':
+                if defect=='wrong_detail':return {**document,'dispute_id':'PP-D-999'}
+                if defect=='detail_changed' and reads.count(path)&gt;1:return {**document,'update_time':'2026-10-24T05:00:00Z'}
+            if defect=='order_changed' and path.startswith('/v2/checkout/orders/') and reads.count(path)&gt;=3:return {**copy.deepcopy(order),'status':'APPROVED'}
+        hook['run']=override
+        if defect=='missing_known':
+            hook['run']=None;service.reconcile_paypal(local);assert resources.state(account)['credits_micro']==3_000_000
+            docs.clear();hook['run']=override
+&gt;       with pytest.raises((ValueError,FenceBlocked)):service.reconcile_paypal(local)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE any of (ValueError, FenceBlocked)
+
+tests/test_r210_paypal_dispute_history.py:126: Failed</failure></testcase><testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[missing_gross]" time="0.174" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[gross_mismatch]" time="0.187" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[incomplete_membership]" time="0.185" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[collection_changed]" time="0.181"><failure message="Failed: DID NOT RAISE any of (ValueError, FenceBlocked)">account = 2
+provider = ({'ORDER0001': {'id': 'ORDER0001', 'status': 'COMPLETED', 'purchase_units': [{'reference_id': '32c2c0eef51d4727809d809...), ('GET', '/v2/payments/captures/CAPTURE222', None, None), ('GET', '/v2/checkout/orders/ORDER0001', None, None), ...])
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f693daff200&gt;
+defect = 'collection_changed'
+
+    @pytest.mark.parametrize('defect',['missing_items','non_list','summary_status','summary_amount','summary_time','wrong_detail','foreign_capture','duplicate_capture','partial_multi','negative','currency','bad_time','naive_time','empty_transactions','missing_gross','gross_mismatch','incomplete_membership','collection_changed','detail_changed','order_changed','http_error','missing_known'])
+    def test_unverifiable_history_never_funds_and_retains_durable_gap(account,provider,monkeypatch,defect):
+        local,order,docs,calls,hook=fixture(account,provider,monkeypatch,multi=defect in ('partial_multi','missing_gross','gross_mismatch','incomplete_membership'))
+        document=docs['PP-D-123'];reads=[]
+        if defect=='foreign_capture':document['disputed_transactions'][0]['seller_transaction_id']='CAPTURE999'
+        if defect=='duplicate_capture':document['disputed_transactions']*=2
+        if defect=='partial_multi':document['dispute_amount']['value']='4.00'
+        if defect=='negative':document['dispute_amount']['value']='-1'
+        if defect=='currency':document['dispute_amount']['currency_code']='USD'
+        if defect=='bad_time':document['update_time']='2026-13-99T01:00:00Z'
+        if defect=='naive_time':document['update_time']='2026-10-24T01:00:00'
+        if defect=='empty_transactions':document['disputed_transactions']=[]
+        if defect=='missing_gross':document['disputed_transactions'][0].pop('gross_amount')
+        if defect=='gross_mismatch':document['disputed_transactions'][0]['gross_amount']['value']='2.00'
+        def override(cfg,path):
+            reads.append(path)
+            if path.startswith('/v1/customer/disputes?'):
+                cid=parse_qs(urlsplit(path).query)['disputed_transaction_id'][0]
+                if defect=='missing_items':return {'links':[]}
+                if defect=='non_list':return {'items':{}}
+                if defect=='http_error':raise ValueError('Simulated permission/HTTP failure')
+                if defect=='foreign_capture':return {'items':[{k:document[k] for k in ('dispute_id','status','update_time','dispute_amount')}],'links':[]}
+                if defect in ('summary_status','summary_amount','summary_time') and cid=='CAPTURE111':
+                    row={k:copy.deepcopy(document[k]) for k in ('dispute_id','status','update_time','dispute_amount')}
+                    row[{'summary_status':'status','summary_amount':'dispute_amount','summary_time':'update_time'}[defect]]='bad';return {'items':[row],'links':[]}
+                if defect=='incomplete_membership' and cid=='CAPTURE222':return {'items':[],'links':[]}
+                if defect=='collection_changed' and sum(x.startswith('/v1/customer/disputes?') for x in reads)&gt;2:return {'items':[],'links':[]}
+            if path=='/v1/customer/disputes/PP-D-123':
+                if defect=='wrong_detail':return {**document,'dispute_id':'PP-D-999'}
+                if defect=='detail_changed' and reads.count(path)&gt;1:return {**document,'update_time':'2026-10-24T05:00:00Z'}
+            if defect=='order_changed' and path.startswith('/v2/checkout/orders/') and reads.count(path)&gt;=3:return {**copy.deepcopy(order),'status':'APPROVED'}
+        hook['run']=override
+        if defect=='missing_known':
+            hook['run']=None;service.reconcile_paypal(local);assert resources.state(account)['credits_micro']==3_000_000
+            docs.clear();hook['run']=override
+        with pytest.raises((ValueError,FenceBlocked)):service.reconcile_paypal(local)
+        assert resources.state(account)['credits_micro']==(3_000_000 if defect=='missing_known' else 0)
+        current=report();assert current['pending']&gt;=1
+        assert owner_payments.history(account)['items'][0]['financial_review_pending']
+        # Repeated failures reuse the pending gap instead of creating duplicates.
+        before=current['pending']
+&gt;       with pytest.raises((ValueError,FenceBlocked)):service.reconcile_paypal(local)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE any of (ValueError, FenceBlocked)
+
+tests/test_r210_paypal_dispute_history.py:132: Failed</failure></testcase><testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[detail_changed]" time="0.180" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[order_changed]" time="0.172" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[http_error]" time="0.179" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[missing_known]" time="0.204" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_gap_recovery_is_atomic_and_later_gap_never_reopens_an_immutable_event" time="0.198" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_original_context_drift_after_remote_discovery_never_settles[owner]" time="0.192" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_original_context_drift_after_remote_discovery_never_settles[merchant]" time="0.201" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_original_context_drift_after_remote_discovery_never_settles[amount]" time="0.188" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_original_context_drift_after_remote_discovery_never_settles[kind]" time="0.172" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_original_context_drift_after_remote_discovery_never_settles[provider]" time="0.180" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_original_context_drift_after_remote_discovery_never_settles[epoch]" time="0.167" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_opposing_final_history_is_pending_and_never_releases_permanent_loss[False]" time="0.185" /><testcase classname="tests.test_r210_paypal_dispute_history" name="test_opposing_final_history_is_pending_and_never_releases_permanent_loss[True]" time="0.185" /></testsuite></testsuites>

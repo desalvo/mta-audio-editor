@@ -9,7 +9,6 @@ from __future__ import annotations
 import argparse
 import json
 import os
-import pwd
 import socket
 import sys
 import time

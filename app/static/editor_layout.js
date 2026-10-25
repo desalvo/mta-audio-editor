@@ -115,7 +115,7 @@ function monitorPosition(){
 function attachMonitor(){
  const launch=document.getElementById('aj-launch');if(!ready||!launch)return;
  if(!document.getElementById('aj-drag')){
-  const handle=document.createElement('button');handle.id='aj-drag';handle.className='aj-drag';handle.type='button';handle.textContent='⠿';handle.title=text('Move AI monitor · arrows to move, Home to reset','Sposta monitor AI · frecce per muovere, Home per ripristinare');handle.setAttribute('aria-label',handle.title);launch.before(handle);
+  const handle=document.createElement('button');handle.id='aj-drag';handle.className='aj-drag';handle.type='button';handle.innerHTML='<svg viewBox="0 0 16 20" width="16" height="20" aria-hidden="true" focusable="false"><g fill="currentColor"><circle cx="5" cy="4" r="1.5"/><circle cx="11" cy="4" r="1.5"/><circle cx="5" cy="10" r="1.5"/><circle cx="11" cy="10" r="1.5"/><circle cx="5" cy="16" r="1.5"/><circle cx="11" cy="16" r="1.5"/></g></svg>';handle.title=text('Move AI monitor · arrows to move, Home to reset','Sposta monitor AI · frecce per muovere, Home per ripristinare');handle.setAttribute('aria-label',handle.title);launch.before(handle);
   handle.onpointerdown=e=>{if(e.button!==0)return;e.preventDefault();handle.setPointerCapture(e.pointerId);const r=handle.getBoundingClientRect();drag={dx:e.clientX-r.left,dy:e.clientY-r.top}};
   handle.onpointermove=e=>{if(!drag)return;const width=launch.offsetWidth+handle.offsetWidth+4,height=launch.offsetHeight;prefs.job_position={x:Math.max(0,Math.min(1,(e.clientX-drag.dx-8)/Math.max(1,innerWidth-width-16))),y:Math.max(0,Math.min(1,(e.clientY-drag.dy-8)/Math.max(1,innerHeight-height-16)))};monitorPosition()};
   new ResizeObserver(monitorPosition).observe(launch);

@@ -1,0 +1,428 @@
+{
+  "date": "2026-10-25",
+  "unique_passed": 70,
+  "new_passed": 32,
+  "skipped": 4,
+  "unresolved_failures": 0,
+  "reports": [
+    {
+      "report": "merchant-history-acceptance.xml",
+      "passed": 25,
+      "failed": 0,
+      "skipped": 4
+    },
+    {
+      "report": "merchant-history-gates.xml",
+      "passed": 36,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "report": "merchant-history-ci-gate.xml",
+      "passed": 9,
+      "failed": 0,
+      "skipped": 0
+    }
+  ],
+  "historical_baselines_reused_not_added": true,
+  "browser_prerequisite": "Chromium engine unavailable; attempted official installation returned truncated archives; no browser runtime found locally or as a reusable Library runtime. Four actual API/Chromium tests prepared but not run.",
+  "real_merchant_calls": 0,
+  "regime_changes": 0,
+  "runtime": {
+    "python": "3.12.14",
+    "pytest": "9.1.1",
+    "fastapi": "0.142.2",
+    "pydantic": "2.14.1",
+    "httpx": "0.28.1",
+    "ruff": "0.17.2",
+    "bandit": "1.9.4"
+  },
+  "source_hashes": {
+    "app/paypal_merchant_history.py": "c66c79c4a88251739789cbbbe2a8f6527ace87138fe083b0d91cc177e8429d0d",
+    "app/resource_routes.py": "ff82c948824840ea14b3a6e5bf88deeed32788d49624ce3ffbcb05eeddb7f4a7",
+    "app/static/regime_admin_panel.js": "4ce19405d7d8f2f46f8dae3232afa50284d296651a6a940cbf7bdc3b4de75bb3",
+    ".github/workflows/merchant-history-chromium.yml": "579f582d4e8cd38db614cc2772909c85725e4e586db99bb3236a8f7458e1fee4",
+    "scripts/run_merchant_history_chromium.py": "ddd803b2efd50ea44da4b6e1eabb991714c82541a15e148038c436a52c0a566e",
+    "tests/test_r210_paypal_merchant_history_browser.py": "7d866745299feff4ebdf7e31d2b0452e404ccdcd4db2b56c1a0848a465605d98"
+  },
+  "cases": [
+    {
+      "class": "tests.test_r210_financial_admin_browser",
+      "name": "test_admin_diagnostics_remain_readable_during_drain",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_financial_admin_browser",
+      "name": "test_admin_finance_roles_csrf_and_request_shape",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_paypal_merchant_history",
+      "name": "test_bad_or_unconfirmed_range_never_contacts_provider[2026-09-01-2026-09-02T00:00:00Z-True]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_paypal_merchant_history",
+      "name": "test_bad_or_unconfirmed_range_never_contacts_provider[2026-09-01T00:00:00Z-2026-09-02T00:00:00Z-False]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_paypal_merchant_history",
+      "name": "test_bad_or_unconfirmed_range_never_contacts_provider[2026-09-01T00:00:00Z-2026-11-05T00:00:00Z-True]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_paypal_merchant_history",
+      "name": "test_bad_or_unconfirmed_range_never_contacts_provider[2026-09-02T00:00:00Z-2026-09-01T00:00:00Z-True]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_paypal_merchant_history",
+      "name": "test_incomplete_or_changed_readback_never_commits[actor_revoked]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_paypal_merchant_history",
+      "name": "test_incomplete_or_changed_readback_never_commits[changed_pass]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_paypal_merchant_history",
+      "name": "test_incomplete_or_changed_readback_never_commits[configuration]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_paypal_merchant_history",
+      "name": "test_incomplete_or_changed_readback_never_commits[count_mismatch]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_paypal_merchant_history",
+      "name": "test_incomplete_or_changed_readback_never_commits[duplicate]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_paypal_merchant_history",
+      "name": "test_incomplete_or_changed_readback_never_commits[malformed_money]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_paypal_merchant_history",
+      "name": "test_incomplete_or_changed_readback_never_commits[missing_total]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_paypal_merchant_history",
+      "name": "test_incomplete_or_changed_readback_never_commits[string_page]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_paypal_merchant_history",
+      "name": "test_incomplete_or_changed_readback_never_commits[timeout]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_paypal_merchant_history",
+      "name": "test_incomplete_or_changed_readback_never_commits[too_many_pages]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_paypal_merchant_history",
+      "name": "test_incomplete_or_changed_readback_never_commits[unknown_status]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_paypal_merchant_history",
+      "name": "test_incomplete_or_changed_readback_never_commits[wrong_page]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_paypal_merchant_history",
+      "name": "test_metadata_and_semantic_corruption_cannot_relabel_snapshot",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_paypal_merchant_history",
+      "name": "test_non_eur_pending_observations_remain_nonsettlement_data",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_paypal_merchant_history",
+      "name": "test_pagination_covers_same_id_with_distinct_reporting_entries",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_paypal_merchant_history",
+      "name": "test_private_actual_admin_api_session_csrf_confirmation_and_details",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_paypal_merchant_history",
+      "name": "test_reader_and_acquisition_require_active_administrator",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_paypal_merchant_history",
+      "name": "test_snapshot_corruption_stays_blocked",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_paypal_merchant_history",
+      "name": "test_stable_global_query_persists_private_fixed_dto_without_money_mutation",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_paypal_merchant_history_browser",
+      "name": "test_actual_admin_history_confirmation_readback_and_reload[1280-en]",
+      "status": "skipped"
+    },
+    {
+      "class": "tests.test_r210_paypal_merchant_history_browser",
+      "name": "test_actual_admin_history_confirmation_readback_and_reload[1280-it]",
+      "status": "skipped"
+    },
+    {
+      "class": "tests.test_r210_paypal_merchant_history_browser",
+      "name": "test_actual_admin_history_confirmation_readback_and_reload[390-en]",
+      "status": "skipped"
+    },
+    {
+      "class": "tests.test_r210_paypal_merchant_history_browser",
+      "name": "test_actual_admin_history_confirmation_readback_and_reload[390-it]",
+      "status": "skipped"
+    },
+    {
+      "class": "tests.test_r210_remote_transport_inventory",
+      "name": "test_current_inventory_matches_review",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[category]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[checker]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[hash]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[missing]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[rationale]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[reorder]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[source]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_remote_transport_inventory",
+      "name": "test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-device/start?x=1]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_remote_transport_inventory",
+      "name": "test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-gateway/v1/generate]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_remote_transport_inventory",
+      "name": "test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-jobs/execute-audio/whisper]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[from httpx import AsyncClient as hidden\\nhidden()]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[from urllib.request import build_opener as hidden\\nx=hidden()\\nx.open(\"https://example.test\")]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[from urllib.request import urlopen as hidden\\nhidden(\"https://example.test\")]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[import aiohttp as hidden\\nhidden.ClientSession()]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[import httpx as hidden\\nhidden.Client()]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[import socket as hidden\\nhidden.create_connection((\"example.test\",443))]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_remote_transport_inventory",
+      "name": "test_supported_device_authorization_still_uses_exact_post[/api/ai-device/poll]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_remote_transport_inventory",
+      "name": "test_supported_device_authorization_still_uses_exact_post[/api/ai-device/start]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_security_review_gate",
+      "name": "test_complete_source_bound_review_is_accepted",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_security_review_gate",
+      "name": "test_current_scan_and_complete_review_ledger_agree",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[blanket_approval]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[changed_finding]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[changed_source]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[deleted_source]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[duplicate_review]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[duplicate_scan]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[empty_reason]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[high]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[missing_file]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[missing_review]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[new_finding]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[new_source]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[scan_error]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[suppression]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[wrong_totals]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_merchant_chromium_gate",
+      "name": "test_exact_real_coverage_passes",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_merchant_chromium_gate",
+      "name": "test_incomplete_or_skipped_coverage_fails[missing]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_merchant_chromium_gate",
+      "name": "test_incomplete_or_skipped_coverage_fails[duplicate]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_merchant_chromium_gate",
+      "name": "test_incomplete_or_skipped_coverage_fails[skipped]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_merchant_chromium_gate",
+      "name": "test_incomplete_or_skipped_coverage_fails[failure]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_merchant_chromium_gate",
+      "name": "test_incomplete_or_skipped_coverage_fails[error]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_merchant_chromium_gate",
+      "name": "test_incomplete_or_skipped_coverage_fails[wrong_scope]",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_merchant_chromium_gate",
+      "name": "test_malformed_or_absent_report_fails",
+      "status": "passed"
+    },
+    {
+      "class": "tests.test_r210_merchant_chromium_gate",
+      "name": "test_dtd_is_never_accepted",
+      "status": "passed"
+    }
+  ],
+  "optional_ci": {
+    "workflow": ".github/workflows/merchant-history-chromium.yml",
+    "input": "merchant_history_chromium=true",
+    "strict_browser_cases_required": 4,
+    "local_strict_run": "rejected four skipped browser cases as required;not a CI pass",
+    "remote_ci_status": "not_run;user must apply files and dispatch",
+    "unit_gate_tests_passed": 9
+  }
+}

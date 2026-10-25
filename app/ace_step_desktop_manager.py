@@ -469,7 +469,8 @@ def _download_source(folder):
                 dest=extraction/info.filename
                 if not dest.resolve().is_relative_to(extraction.resolve()) or (info.external_attr>>16)&0o170000==0o120000:
                     raise RuntimeError('ACE_SOURCE_ARCHIVE_UNSAFE')
-            z.extractall(extraction)  # noqa: S202 -- every member and size validated above
+            from .chord_ml import _safe_extract
+            _safe_extract(z,extraction)
         roots=list(extraction.iterdir())
         if len(roots)!=1 or not (roots[0]/'pyproject.toml').is_file() or not (roots[0]/'uv.lock').is_file():
             raise RuntimeError('ACE_SOURCE_ARCHIVE_INVALID')

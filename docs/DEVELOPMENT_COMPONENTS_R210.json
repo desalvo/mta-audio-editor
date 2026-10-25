@@ -1,0 +1,778 @@
+{
+  "schema_version": 2,
+  "project": "MTA Audio Editor",
+  "release": "0.3.0-r210",
+  "updated_utc": "2026-10-25",
+  "baseline_archive": "MTA-r210-provider-authenticated-journal-handoff-cumulative.zip",
+  "baseline_sha256": "603c5a5e650178b912605d4203154ea310b2f387e35c9c4c9e719ee30c1d1817",
+  "git_baseline": {
+    "repository": "https://github.com/desalvo/mta-audio-editor",
+    "branch": "main",
+    "verified_head": "0ad84a5fa0c66d75f75882a0f6e5c6a398470dc6",
+    "comparison": "Exact working Git blob SHA-1 vs complete baseline tree; missing baseline paths: zero"
+  },
+  "commit_deferred": true,
+  "release_candidate": false,
+  "transition_enabled": false,
+  "progress": {
+    "definition": "Equal-weight RC acceptance milestone checklist, NOT full-product feature completion or code coverage",
+    "numerator": 23,
+    "denominator": 42,
+    "percent": 54.8,
+    "accepted_macroareas": 0,
+    "macroarea_denominator": 7,
+    "historical_dual_regime_estimate_percent": 70,
+    "historical_estimate_is_comparable": false,
+    "full_product_completion_percent": null,
+    "production_validation_percent": 0
+  },
+  "areas": [
+    {
+      "id": "A",
+      "title": "Provider reconciliation",
+      "state": "partial",
+      "accepted_end_to_end": false,
+      "checks": [
+        {
+          "id": "A1",
+          "criterion": "Stripe authenticated readback binds journal, refund/dispute pages and actual credit ledger",
+          "state": "verified",
+          "evidence": "tests/test_r210_authenticated_ledger_service.py",
+          "weight": 1
+        },
+        {
+          "id": "A2",
+          "criterion": "Stripe signed events cover replay, concurrency, refunds-before-payment and disputes",
+          "state": "verified",
+          "evidence": "tests/test_r210_payment_reconciliation_e2e.py",
+          "weight": 1
+        },
+        {
+          "id": "A3",
+          "criterion": "PayPal multicapture refunds, individual capture reversals and common dispute outcomes",
+          "state": "verified",
+          "evidence": "tests/test_r210_paypal_reconciliation_e2e.py",
+          "weight": 1
+        },
+        {
+          "id": "A4",
+          "criterion": "Complete PayPal historical discovery, refunded initial captures, ambiguous payout and multicapture dispute allocation",
+          "state": "implementation_pending",
+          "evidence": "Partial implementation: tests/test_r210_paypal_history_reconciliation.py; complete dispute/payout discovery and allocation still pending New partial workflow: bounded authenticated capture-filtered PayPal dispute collection/detail rereads, exact full-gross multicapture allocation, atomic risk/refund/funding and durable observed-ID gaps, private IT/EN owner/admin error/recovery. PAYPAL_DISPUTE_HISTORY_HANDOFF_R210.md;428 affected cases,47 Chromium. Global merchant history,payout/protection money movements,partial multicapture,legacy and original permanent fee loss remain open. Exact partial multicapture allocation is now supported when canonical item amounts uniquely bind every capture and sum to the dispute total;private movement observations are operator-visible but never settlement authority.392 distinct affected cases/30 Chromium;PAYPAL_ITEM_MOVEMENT_HANDOFF_R210.md. Missing/ambiguous item allocation,global history and actual payout/protection transaction proof remain open. MERCHANT_HISTORY_HANDOFF_R210.md:merchant-wide requested-window stable acquisition/private admin API/IT-EN panel implemented;61 affected cases pass,23 new,4 browser prerequisite skips. No complete account-history,actual cash settlement,global conservation or whole A4 acceptance.",
+          "weight": 1
+        },
+        {
+          "id": "A5",
+          "criterion": "Complete legacy obligations, all terminal/uncertain checkout outcomes and subscription reversal repayment",
+          "state": "implementation_pending",
+          "evidence": "Partial: strict authenticated failed-charge closure, proof audit and owner/admin recovery/re-admission; immutable PayPal final outcome conflicts with private owner IT/EN review status. 243 affected cases incl. 12 Chromium, no current failures. docs/FINANCIAL_OUTCOME_HANDOFF_R210.md. Partial: private owner paginated Stripe/PayPal local history, trusted resumption, GET-only authenticated reconciliation, same-owner serialized cross-provider pending credit and same-period subscription admission, actual account/credits IT/EN error/eligibility/locale recovery. 231 affected cases incl. 24 Chromium. docs/OWNER_PAYMENT_RECOVERY_HANDOFF_R210.md. Partial: exact subscription refund receivables, authenticated empty terminal Stripe/PayPal closure, known-ID uncertain-create recovery and IT/EN owner/operator workflows; tests/test_r210_terminal_checkout_e2e.py; tests/test_r210_checkout_reference_recovery.py; tests/test_r210_terminal_recovery_browser.py; docs/TERMINAL_CHECKOUT_HANDOFF_R210.md. Legacy, unknown references, failed-charge histories, original subscription risks and operator refunds still pending. Operator refunds now locally completed for exact reconciled Stripe credit payments and PayPal captures (credits/subscription/repayment/surplus), with single dispatch, GET-only recovery, immutable audit, private IT/EN UI and erasure integration. 254 affected cases /10 Chromium. docs/OPERATOR_REFUNDS_HANDOFF_R210.md. This does not close complete legacy/provider-wide history or original fee-loss obligations; state remains implementation_pending. New partial workflow: bounded authenticated capture-filtered PayPal dispute collection/detail rereads, exact full-gross multicapture allocation, atomic risk/refund/funding and durable observed-ID gaps, private IT/EN owner/admin error/recovery. PAYPAL_DISPUTE_HISTORY_HANDOFF_R210.md;428 affected cases,47 Chromium. Global merchant history,payout/protection money movements,partial multicapture,legacy and original permanent fee loss remain open. Original full-capture loss repayment now implemented with immutable original fee/surplus,nonduplicated refunds/private repayment/erasure;ORIGINAL_SUBSCRIPTION_LOSS_HANDOFF_R210.md. Global/legacy/partial/protection obligations remain pending;criterion unchanged.",
+          "weight": 1
+        },
+        {
+          "id": "A6",
+          "criterion": "Actual Stripe and PayPal sandbox readback and lifecycle verification",
+          "state": "environment_blocked",
+          "evidence": "tests/test_r210_real_provider_sandbox.py",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "title": "AI execution ownership",
+      "state": "partial",
+      "accepted_end_to_end": false,
+      "checks": [
+        {
+          "id": "B1",
+          "criterion": "Registered direct workers claim, heartbeat and finish with atomic ledger/fence settlement",
+          "state": "verified",
+          "evidence": "tests/test_r208_unified_adapter_billing_e2e.py Ten-cycle backend integration: PULL_COORDINATION_HANDOFF_R210.md; registered/deferred original ownership, free-only no-charge, pull admission barrier with pre-drain intents and original client result recovery. This does not complete whole-service drain or every legacy executor.",
+          "weight": 1
+        },
+        {
+          "id": "B2",
+          "criterion": "Actual supervisor-crash recovery with external worker quiescence proof",
+          "state": "implementation_pending",
+          "evidence": "Partial local cgroup workflow implemented: prelaunch original supervisor/claim binding, transactional bootstrap admission, immutable kernel quiescence receipts, admin API/IT-EN UI, financial finalization and GPU-lease barrier. Actual prelaunch supervisor SIGKILL and synthetic kernel/API/browser fixtures pass. Actual delegated nested-cgroup crash test is prepared but skipped; post-crash economic resolution and other executor coverage remain pending. docs/DURABLE_WORKER_RECOVERY_HANDOFF_R210.md; docs/validation/r210/cgroup-journal-summary.json.; partial extension: original frozen recovery and explicit operator-funded unknown loss resolution, immutable audit, reservation/lease release and evidence barriers, IT/EN API/browser/NC privacy checks; docs/WORKER_LOSS_RESOLUTION_HANDOFF_R210.md. Real delegated-kernel acceptance and complete executor coverage remain pending.",
+          "weight": 1
+        },
+        {
+          "id": "B3",
+          "criterion": "Propagate owner credentials through deferred Arranger/Remix publication and billing outboxes",
+          "state": "verified",
+          "evidence": "tests/test_r210_deferred_owner_e2e.py; docs/validation/r210/continuation-deferred-final.log Current local ownership epoch hardening: WORKER_EPOCH_HANDOFF_R210.md;350 distinct affected cases including49 new. No distributed authority/pull backend acceptance; existing criterion state unchanged. Ten-cycle backend integration: PULL_COORDINATION_HANDOFF_R210.md; registered/deferred original ownership, free-only no-charge, pull admission barrier with pre-drain intents and original client result recovery. This does not complete whole-service drain or every legacy executor.",
+          "weight": 1
+        },
+        {
+          "id": "B4",
+          "criterion": "Shared multi-host coordinator and storage/locking backend",
+          "state": "verified",
+          "evidence": "PULL_COORDINATION_HANDOFF_R210.md; actual authority admission/claims/rights/input-result storage, HTTPS-only independent worker processes, original deferred/API request bindings, SIGKILL/response-loss/no-reexecution and atomic billing. 90 new/898 distinct affected passing cases. Single pinned Linux authority only; no worker SQLite/network-mounted DB, automatic takeover or HA. B2/B5/B6 and whole-service C2 remain separate, unaccepted.",
+          "weight": 1
+        },
+        {
+          "id": "B5",
+          "criterion": "Prove ownership/metering for every legacy/local/native executor entry",
+          "state": "implementation_pending",
+          "evidence": "docs/validation/r210/work-ai-entrypoints.json Current local ownership epoch hardening: WORKER_EPOCH_HANDOFF_R210.md;350 distinct affected cases including49 new. No distributed authority/pull backend acceptance; existing criterion state unchanged.",
+          "weight": 1
+        },
+        {
+          "id": "B6",
+          "criterion": "Multi-host worker loss, partition, drain and no duplicate execution acceptance",
+          "state": "environment_blocked",
+          "evidence": null,
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "id": "C",
+      "title": "Administrative cutover",
+      "state": "partial",
+      "accepted_end_to_end": false,
+      "checks": [
+        {
+          "id": "C1",
+          "criterion": "Persistent reservation, local concurrency and transaction primitives",
+          "state": "verified",
+          "evidence": "tests/test_regime_transition_journal.py",
+          "weight": 1
+        },
+        {
+          "id": "C2",
+          "criterion": "Distributed admission barrier and service-wide drain",
+          "state": "implementation_pending",
+          "evidence": " Ten-cycle backend integration: PULL_COORDINATION_HANDOFF_R210.md; registered/deferred original ownership, free-only no-charge, pull admission barrier with pre-drain intents and original client result recovery. This does not complete whole-service drain or every legacy executor.",
+          "weight": 1
+        },
+        {
+          "id": "C3",
+          "criterion": "Resolve every financial obligation before cutover",
+          "state": "implementation_pending",
+          "evidence": " Original full-capture loss repayment now implemented with immutable original fee/surplus,nonduplicated refunds/private repayment/erasure;ORIGINAL_SUBSCRIPTION_LOSS_HANDOFF_R210.md. Global/legacy/partial/protection obligations remain pending;criterion unchanged.",
+          "weight": 1
+        },
+        {
+          "id": "C4",
+          "criterion": "Local mirror/cutover recovery invariants",
+          "state": "verified",
+          "evidence": "tests/test_regime_cutover_recovery.py",
+          "weight": 1
+        },
+        {
+          "id": "C5",
+          "criterion": "Enabled safe transition in both directions through actual administrator API",
+          "state": "implementation_pending",
+          "evidence": null,
+          "weight": 1
+        },
+        {
+          "id": "C6",
+          "criterion": "Cross-host crash and concurrent transition end-to-end acceptance",
+          "state": "implementation_pending",
+          "evidence": null,
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "id": "D",
+      "title": "Billing by regime",
+      "state": "partial",
+      "accepted_end_to_end": false,
+      "checks": [
+        {
+          "id": "D1",
+          "criterion": "Actual done ledger -> immutable NC period -> private IT/EN CSV export",
+          "state": "verified",
+          "evidence": "tests/test_r210_noncommercial_actual_ledger_e2e.py",
+          "weight": 1
+        },
+        {
+          "id": "D2",
+          "criterion": "Commercial subscription quotes, credit checkout, authenticated funding and common refunds",
+          "state": "verified",
+          "evidence": "tests/test_r210_credit_checkout.py; tests/test_r210_paypal.py",
+          "weight": 1
+        },
+        {
+          "id": "D3",
+          "criterion": "Collect/settle exact subscription reversal receivables",
+          "state": "verified",
+          "evidence": "tests/test_r210_subscription_repayment_e2e.py; tests/test_r210_subscription_repayment_browser.py; docs/SUBSCRIPTION_RECOVERY_HANDOFF_R210.md (existing exact refund-generated receivables; original-payment risk and operator refunds still A4/A5)",
+          "weight": 1
+        },
+        {
+          "id": "D4",
+          "criterion": "Complete account-facing experience for both regimes",
+          "state": "verified",
+          "evidence": "Complete local owner /account and /account/credits IT/EN 390/1280 workflow, both regimes, trial/renewal/cancel/overage/storage/reports, Stripe/PayPal funding/returns/pending recovery, exact existing repayment/refund history, NC voluntary statement/receipt/CSV, privacy/error/locale/in-flight/stale safety; 104 new cases incl. 94 Chromium, 315 distinct affected latest passing cases incl. 160 Chromium, scoped axe16 zero violations/unresolved. docs/ACCOUNT_WORKFLOW_HANDOFF_R210.md; docs/validation/r210/account-workflow-test-summary.json. Actual sandbox, enabled cutover D6, complete admin/native/product accessibility and full target acceptance remain separate and open.",
+          "weight": 1
+        },
+        {
+          "id": "D5",
+          "criterion": "NC voluntary contribution settlement beyond immutable allocation statements",
+          "state": "verified",
+          "evidence": "Manual external bank-evidence collection: tests/test_r210_noncommercial_collection_e2e.py; tests/test_r210_noncommercial_collection_browser.py; docs/NC_COLLECTION_HANDOFF_R210.md. No automated bank authentication or real transfers claimed.",
+          "weight": 1
+        },
+        {
+          "id": "D6",
+          "criterion": "Account balances and periods across enabled administrative cutover",
+          "state": "implementation_pending",
+          "evidence": null,
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "id": "E",
+      "title": "Administrator IT/EN UI",
+      "state": "partial",
+      "accepted_end_to_end": false,
+      "checks": [
+        {
+          "id": "E1",
+          "criterion": "Financial positions use actual database API in Chromium IT/EN",
+          "state": "verified",
+          "evidence": "tests/test_r210_financial_admin_browser.py",
+          "weight": 1
+        },
+        {
+          "id": "E2",
+          "criterion": "Diagnostics remain readable during a reserved drain",
+          "state": "verified",
+          "evidence": "tests/test_r210_financial_admin_browser.py",
+          "weight": 1
+        },
+        {
+          "id": "E3",
+          "criterion": "Explicit confirmed reconciliation button traverses API/service and changes actual wallet in browser tests",
+          "state": "verified",
+          "evidence": "tests/test_r210_financial_admin_browser.py",
+          "weight": 1
+        },
+        {
+          "id": "E4",
+          "criterion": "Complete sensitive regime-switch operator workflow",
+          "state": "implementation_pending",
+          "evidence": null,
+          "weight": 1
+        },
+        {
+          "id": "E5",
+          "criterion": "Complete transition progress, audit and forward recovery controls",
+          "state": "implementation_pending",
+          "evidence": null,
+          "weight": 1
+        },
+        {
+          "id": "E6",
+          "criterion": "Full accessibility and responsive acceptance for the entire administration",
+          "state": "verified",
+          "evidence": "Complete current local web administration:all9 settings tabs,Billing,Tokens,optional catalogue,job monitor;IT/EN/commercial-NC/390-1280/light-dark,real API/SQLite,keyboard/focus,names/reflow/read-error recovery and actual retention/quota/permissions/token readback.330 distinct affected cases,136 Chromium,44 new browser cases;328 axe reports,zero violations/unresolved,no rule exclusions. docs/ADMIN_ACCEPTANCE_HANDOFF_R210.md;docs/validation/r210/admin-test-summary.json. E4/E5 future enabled-cutover workflow,native/manual assistive-technology/whole-product/target certification remain separate.",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "id": "F",
+      "title": "AI model permissions",
+      "state": "partial",
+      "accepted_end_to_end": false,
+      "checks": [
+        {
+          "id": "F1",
+          "criterion": "Backend policy, catalog and restricted model admission checks",
+          "state": "verified",
+          "evidence": "tests/test_service_regime_commercial_gates.py",
+          "weight": 1
+        },
+        {
+          "id": "F2",
+          "criterion": "Routed and direct transport boundaries reject disallowed remote execution before dispatch",
+          "state": "verified",
+          "evidence": "Prior five routed guards plus raw client, gateway and standalone ACE HTTP including loopback/tunnels; exact gateway prefix and device path isolation. 213 affected cases, 4 shipped-dialog Chromium cases. docs/REMOTE_RIGHTS_HANDOFF_R210.md; tests/test_r210_remote_transport_rights.py; scripts/check_remote_transport_inventory.py.",
+          "weight": 1
+        },
+        {
+          "id": "F3",
+          "criterion": "Authenticated remote checkpoint identity and rights attestation",
+          "state": "implementation_pending",
+          "evidence": "Still pending: no authenticated executing-checkpoint/rights attestation protocol exists. Commercial remote execution remains fully denied, not enabled by this cycle.",
+          "weight": 1
+        },
+        {
+          "id": "F4",
+          "criterion": "Rights and bypass acceptance for every legacy executor",
+          "state": "implementation_pending",
+          "evidence": "Partial: 29 explicit app-owned Python transport sites classified with exact source/call/checker hashes, direct bypass acceptance and native policy visibility completed. Opaque commands, native/runtime libraries, dynamic networking and full legacy executor acceptance remain open. docs/security/REMOTE_TRANSPORT_REVIEW_R210.json.",
+          "weight": 1
+        },
+        {
+          "id": "F5",
+          "criterion": "Native NC guarantees on all supported operating systems",
+          "state": "environment_blocked",
+          "evidence": null,
+          "weight": 1
+        },
+        {
+          "id": "F6",
+          "criterion": "Complete independent rights review of every optional installed checkpoint",
+          "state": "implementation_pending",
+          "evidence": null,
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "id": "G",
+      "title": "Release verification",
+      "state": "partial",
+      "accepted_end_to_end": false,
+      "checks": [
+        {
+          "id": "G1",
+          "criterion": "Incoming CRC/SHA and exact Git tree comparison, no baseline files missing",
+          "state": "verified",
+          "evidence": "docs/validation/r210/work-git-comparison.json",
+          "weight": 1
+        },
+        {
+          "id": "G2",
+          "criterion": "Entire available Linux baseline with repairs, plus affected final-code regression; no complete target CI claim",
+          "state": "verified",
+          "evidence": "docs/validation/r210/work-final-global-0.log; docs/validation/r210/work-final-global-1.log; docs/validation/r210/continuation-financial-regression.log; continuation-deferred-final.log; continuation-deferred-regression.log; docs/validation/r210/repayment-test-summary.json; docs/validation/r210/nc-collection-test-summary.json",
+          "weight": 1
+        },
+        {
+          "id": "G3",
+          "criterion": "App/native/tests/all-scripts Ruff, Python compilation and changed JavaScript syntax",
+          "state": "verified",
+          "evidence": "docs/validation/r210/nc-collection-all-ruff.log; docs/NC_COLLECTION_HANDOFF_R210.md; complete source-bound local Bandit review and fail-closed review gate, docs/security/APP_SECURITY_REVIEW_R210.json, docs/validation/r210/security-test-summary.json (not deployment security certification).",
+          "weight": 1
+        },
+        {
+          "id": "G4",
+          "criterion": "Available C++ audio-engine build and native DSP regression",
+          "state": "verified",
+          "evidence": "docs/validation/r210/work-native-build.log",
+          "weight": 1
+        },
+        {
+          "id": "G5",
+          "criterion": "Container images, Podman/Docker and Kubernetes execution",
+          "state": "environment_blocked",
+          "evidence": null,
+          "weight": 1
+        },
+        {
+          "id": "G6",
+          "criterion": "Windows/macOS native, GPU models, real VST plugins and hardware acceptance",
+          "state": "environment_blocked",
+          "evidence": null,
+          "weight": 1
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "software": "Partial; see per-criterion status",
+    "simulated_e2e": "Actual local ledger/claim/contract/API and IT-EN Chromium plus synthetic kernel boundaries; actual supervisor SIGKILL before spawn verified; delegated-kernel acceptance unexecuted",
+    "real_provider_sandbox": "Not executed: no isolated configured sandbox credentials/database supplied",
+    "production": "Not executed; no live requests, payments or server modifications"
+  },
+  "guardrails": [
+    "No commit, push, tag or release",
+    "Keep safe switching disabled",
+    "No production credentials or payments",
+    "Do not infer future reversal absence from a provider snapshot",
+    "Local SQLite ownership is not multi-host coordination"
+  ],
+  "next_actions": [
+    "Resume ADMIN_ACCEPTANCE_HANDOFF_R210.md and the admin-accessibility cumulative;read RC_CLOSURE_PLAN_R210.md.22/42,0/7 whole macroareas;RC false,switching disabled. Preserve accepted baseline;no helper-sized ZIPs or unrelated reruns.",
+    "Implement I1/B4 shared authoritative coordinator+storage/locking across actual admission/execution/publication/settlement;then all-executor quiescence and C2 distributed drain. SQLite/local leases/read-only diagnostics are not acceptance.",
+    "Independent implementation:A4/A5 global/legacy financial obligations and original permanent fee loss;F3 authenticated executing-checkpoint/rights exchange,F4 opaque executors,F6 independent rights review. Payout/protection settlement requires unique authoritative completed-movement evidence;keep unproven funds held.",
+    "After coordination+finance:integrated liability migration,two-way enabled cutover,C3/C5/C6/D6/E4/E5 and complete operator progress/audit/recovery. Real sandbox,kernel,multi-host,containers,OS/GPU/audio/VST prerequisites remain external. No merchant/real-server/GitHub mutation."
+  ],
+  "test_results": {
+    "full_available_linux": {
+      "passed": 5228,
+      "skipped": 73
+    },
+    "distinct_testcases": 5301,
+    "line_and_branch_coverage_percent": 73.6774909797391,
+    "coverage_threshold_percent": 70,
+    "coverage_gate_passed": true,
+    "full_target_ci_passed": false,
+    "baseline_scope": "5228 passed / 73 skipped and coverage belong to the preceding complete Linux baseline; not recollected after continuation changes",
+    "continuation": {
+      "financial_regression_passed": 108,
+      "deferred_publication_final_passed": 23,
+      "arranger_recovery_regression_passed": 76,
+      "note": "Counts overlap; do not sum with baseline or one another. Additional earlier focused runs retained as historical logs."
+    },
+    "subscription_repayment_cycle": {
+      "scope": "Affected final-code regression only; see repayment-test-summary.json for distinct union",
+      "full_baseline_repeated": false,
+      "coverage_recollected": false,
+      "real_provider_requests": 0,
+      "passed_distinct": 233,
+      "skipped": 0,
+      "failed": 0
+    },
+    "terminal_checkout_cycle": {
+      "distinct_cases": 323,
+      "passed": 323,
+      "failed": 0,
+      "skipped": 0,
+      "full_baseline_repeated": false,
+      "coverage_recollected": false,
+      "real_provider_requests": 0,
+      "evidence": "docs/validation/r210/terminal-test-summary.json"
+    },
+    "nc_collection_cycle": {
+      "distinct_cases": 247,
+      "passed": 247,
+      "failed": 0,
+      "skipped": 0,
+      "complete_baseline_repeated": false,
+      "coverage_recollected": false,
+      "real_provider_or_bank_requests": 0,
+      "evidence": "docs/validation/r210/nc-collection-test-summary.json"
+    },
+    "durable_worker_recovery_cycle": {
+      "passed_distinct": 278,
+      "skipped": 1,
+      "failed": 0,
+      "complete_baseline_repeated": false,
+      "coverage_recollected": false,
+      "real_provider_requests": 0,
+      "evidence": "docs/validation/r210/cgroup-journal-summary.json"
+    },
+    "worker_loss_resolution_cycle": {
+      "distinct_cases": 331,
+      "passed": 330,
+      "skipped": 1,
+      "failed": 0,
+      "complete_baseline_repeated": false,
+      "coverage_recollected": false,
+      "evidence": "docs/validation/r210/worker-loss-test-summary.json"
+    },
+    "security_hardening_cycle": {
+      "distinct_cases": 128,
+      "passed": 127,
+      "skipped": 1,
+      "failed": 0,
+      "complete_baseline_repeated": false,
+      "coverage_recollected": false,
+      "evidence": "docs/validation/r210/security-test-summary.json"
+    },
+    "account_financial_cycle": {
+      "distinct_cases": 130,
+      "passed": 130,
+      "skipped": 0,
+      "failed": 0,
+      "real_chromium_cases": 31,
+      "complete_baseline_repeated": false,
+      "coverage_recollected": false,
+      "evidence": "docs/validation/r210/account-financial-test-summary.json"
+    },
+    "owner_payment_recovery_cycle": {
+      "distinct_cases": 231,
+      "passed": 231,
+      "real_chromium_cases": 24,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "complete_baseline_repeated": false,
+      "coverage_recollected": false,
+      "real_provider_requests": 0,
+      "evidence": "docs/validation/r210/owner-payments-test-summary.json"
+    },
+    "financial_outcome_integrity_cycle": {
+      "passed_distinct": 243,
+      "current_failures": 0,
+      "current_errors": 0,
+      "current_skips": 0,
+      "real_chromium_cases": 12,
+      "complete_baseline_repeated": false,
+      "coverage_recollected": false,
+      "evidence": "docs/validation/r210/financial-outcome-test-summary.json",
+      "method": "Latest actual execution per exact testcase ID; consolidated evidence, not a new full-suite execution. Original raw run and correction retained.",
+      "real_provider_requests": 0
+    },
+    "remote_transport_rights_cycle": {
+      "passed_distinct": 213,
+      "real_chromium_cases": 4,
+      "current_failures": 0,
+      "current_errors": 0,
+      "current_skips": 0,
+      "complete_baseline_repeated": false,
+      "coverage_recollected": false,
+      "real_remote_inference_calls": 0,
+      "evidence": "docs/validation/r210/remote-rights-test-summary.json"
+    },
+    "operator_refunds_cycle": {
+      "passed_distinct": 254,
+      "new_workflow": 93,
+      "affected_regression": 125,
+      "gates": 36,
+      "chromium": 10,
+      "real_child_process_death": 1,
+      "current_failures": 0,
+      "current_errors": 0,
+      "current_skips": 0,
+      "full_baseline_repeated": false,
+      "coverage_recollected": false,
+      "actual_provider_calls": 0,
+      "evidence": "docs/validation/r210/operator-refunds-test-summary.json"
+    },
+    "owner_account_workflow_cycle": {
+      "passed_distinct": 315,
+      "new_cases": 104,
+      "new_chromium_cases": 94,
+      "new_domain_cases": 10,
+      "chromium_cases": 160,
+      "current_failures": 0,
+      "current_errors": 0,
+      "current_skips": 0,
+      "complete_baseline_repeated": false,
+      "coverage_recollected": false,
+      "actual_payment_provider_requests": 0,
+      "evidence": "docs/validation/r210/account-workflow-test-summary.json"
+    },
+    "paypal_dispute_history_cycle": {
+      "passed_distinct": 428,
+      "new_cases": 93,
+      "new_domain_cases": 77,
+      "new_chromium_cases": 16,
+      "chromium_cases": 47,
+      "current_failures": 0,
+      "current_errors": 0,
+      "current_skips": 0,
+      "full_baseline_repeated": false,
+      "coverage_recollected": false,
+      "actual_payment_provider_calls": 0,
+      "evidence": "docs/validation/r210/paypal-discovery-test-summary.json"
+    },
+    "paypal_item_movement_cycle": {
+      "passed_distinct": 392,
+      "new_cases": 66,
+      "new_domain_cases": 54,
+      "new_chromium_cases": 12,
+      "chromium_cases": 30,
+      "current_failures": 0,
+      "current_errors": 0,
+      "current_skips": 0,
+      "full_baseline_repeated": false,
+      "coverage_recollected": false,
+      "actual_payment_provider_calls": 0,
+      "evidence": "docs/validation/r210/paypal-item-movement-test-summary.json"
+    },
+    "admin_acceptance": {
+      "passed_distinct": 330,
+      "chromium_cases": 136,
+      "new_cases": 44,
+      "new_browser_cases": 44,
+      "current_failures": 0,
+      "current_errors": 0,
+      "current_skips": 0,
+      "axe_reports": 328,
+      "axe_violations": 0,
+      "unresolved_supplemental": 0,
+      "summary": "docs/validation/r210/admin-test-summary.json",
+      "scope": "Current local web administration E6,not new enabled-cutover/native/whole-product/target certification;overlaps prior counts."
+    },
+    "original_subscription_loss": {
+      "passed_distinct": 345,
+      "new_cases": 14,
+      "failed": 0,
+      "skipped": 0,
+      "historical_baseline_repeated": false,
+      "fresh_browser_run": false,
+      "real_provider_calls": 0,
+      "evidence": "docs/validation/r210/original-loss-test-summary.json"
+    }
+  },
+  "security_review": {
+    "ruff": "passed",
+    "new_runtime_dependencies": 0,
+    "pip_audit_runtime_requirements": {
+      "packages": 31,
+      "known_vulnerabilities": 0,
+      "skipped_packages": 0
+    },
+    "bandit": {
+      "high": 0,
+      "medium": 21,
+      "low": 147,
+      "source_files": 285,
+      "reviewed_findings": 168,
+      "nosec": 0,
+      "scanner_skips": 0,
+      "review_ledger": "docs/security/APP_SECURITY_REVIEW_R210.json",
+      "gate": "scripts/check_security_review.py",
+      "note": "Complete local static scan dispositions, not a clean zero-findings or complete deployment security certification. Historical raw 22 medium/146 low superseded.",
+      "current_raw_scan": "docs/validation/r210/merchant-history-bandit.json"
+    },
+    "continuation_new_modules": {
+      "modules": [
+        "app/deferred_execution_owner.py",
+        "app/paypal_reconciliation.py"
+      ],
+      "bandit_findings": 0,
+      "project_ruff": "passed",
+      "compileall_app": "passed",
+      "new_runtime_dependencies": 0
+    },
+    "subscription_repayment_cycle": {
+      "module": "app/subscription_receivables.py",
+      "bandit_findings": 0,
+      "project_ruff": "passed",
+      "compileall_app": "passed",
+      "changed_javascript_syntax": "passed",
+      "new_runtime_dependencies": 0
+    },
+    "terminal_checkout_cycle": {
+      "modules": [
+        "app/checkout_terminal_outcomes.py",
+        "app/checkout_reference_recovery.py"
+      ],
+      "bandit_findings": 0,
+      "project_ruff": "passed (app native tests scripts/k8s-wizard.py)",
+      "all_scripts_ruff": "33 preexisting issues recorded for review",
+      "compileall_app": "passed",
+      "changed_javascript_syntax": "passed",
+      "new_runtime_dependencies": 0
+    },
+    "nc_collection_cycle": {
+      "nc_module_bandit_findings": 0,
+      "xml_helper_raw_low_findings": 1,
+      "reviewed_import_false_positive": "B405: ElementTree constructs only; bounded Expat rejects DTD/entities. Retained without suppression.",
+      "all_app_native_tests_scripts_ruff": "passed; 33 prior script issues resolved",
+      "compileall_app_scripts": "passed",
+      "changed_javascript_syntax": "passed",
+      "optimized_isolated_billing_validators": "both passed under python -O",
+      "new_runtime_dependencies": 0,
+      "full_app_bandit_repeated": false
+    },
+    "durable_worker_recovery_cycle": {
+      "new_module": "app/worker_cgroup_recovery.py",
+      "bandit_findings": 0,
+      "whole_app_native_tests_scripts_ruff": "passed",
+      "changed_js_syntax": "passed",
+      "compileall_app": "passed",
+      "new_runtime_dependencies": 0,
+      "full_security_review_closed": false
+    },
+    "worker_loss_resolution_cycle": {
+      "ruff": "passed all app/native/tests/scripts",
+      "compileall": "passed app/scripts",
+      "js_syntax": "passed three changed files",
+      "new_module_bandit_findings": 0,
+      "new_runtime_dependencies": 0,
+      "full_security_review_closed": false
+    },
+    "security_hardening_cycle": {
+      "static_baseline_review_complete": true,
+      "new_runtime_dependencies": 0,
+      "all_app_native_tests_scripts_ruff": "passed",
+      "compileall_app_scripts": "passed",
+      "source_bound_review_gate": "passed",
+      "actual_torch_validation": "not executed; optional runtime absent",
+      "whole_product_security_certified": false
+    },
+    "account_financial_cycle": {
+      "source_bound_gate": "passed; all existing findings matched unchanged code after line shifts, three changed/new app paths reviewed explicitly",
+      "all_app_native_tests_scripts_ruff": "passed",
+      "compileall_app_scripts": "passed",
+      "changed_js_syntax": "passed",
+      "new_runtime_dependencies": 0
+    },
+    "owner_payment_recovery_cycle": {
+      "source_bound_gate": "passed; six changed/new app sources explicitly reviewed; existing finding code unchanged apart from line shifts",
+      "whole_app_native_tests_scripts_ruff": "passed",
+      "compileall_app_scripts": "passed",
+      "changed_js_syntax": "passed",
+      "new_runtime_dependencies": 0
+    },
+    "financial_outcome_integrity_cycle": {
+      "whole_app_native_tests_scripts_ruff": "passed",
+      "app_scripts_compileall": "passed",
+      "changed_js_syntax": "passed",
+      "source_bound_gate": "passed; five changed/new app Python sources explicitly reviewed, no new findings",
+      "new_runtime_dependencies": 0
+    },
+    "remote_transport_rights_cycle": {
+      "all_app_native_tests_scripts_ruff": "passed",
+      "app_scripts_compileall": "passed",
+      "changed_js_syntax": "passed",
+      "source_bound_security_gate": "passed; five changed app modules explicitly reviewed, no new findings",
+      "python_transport_inventory": "27 reviewed sites /19 files; checker and source/call hashes verified",
+      "commercial_remote_inference_enabled": false,
+      "new_runtime_dependencies": 0
+    },
+    "operator_refunds_cycle": {
+      "ruff": "passed for app/native/tests/scripts",
+      "compileall": "app/scripts passed",
+      "javascript": "syntax passed",
+      "security_review": "277 sources /168 exact reviewed findings; no new findings or suppressions",
+      "transport_inventory": "29 reviewed sites /20 files; checker unchanged",
+      "runtime_dependencies_added": 0
+    },
+    "owner_account_workflow_cycle": {
+      "ruff": "passed app/native/tests/scripts",
+      "compileall": "passed app/scripts",
+      "javascript_syntax": "passed seven changed sources",
+      "security_review": "277 sources /168 reviewed findings, no new warnings or suppressions; two changed Python modules explicitly reviewed",
+      "transport_inventory": "29 sites /20 files, checker unchanged",
+      "runtime_dependencies_added": 0,
+      "test_only_axe": "4.14.0 externally supplied, not shipped"
+    },
+    "paypal_dispute_history_cycle": {
+      "ruff": "passed app/native/tests/scripts",
+      "compileall": "app/scripts passed",
+      "javascript_syntax": "two changed files passed",
+      "source_security": "278 files/168 reviewed findings,no new findings or suppressions;four Python paths explicitly reviewed",
+      "transport_inventory": "29 sites/20 files,checker unchanged",
+      "runtime_dependencies_added": 0
+    },
+    "paypal_item_movement_cycle": {
+      "ruff": "passed app/native/tests/scripts",
+      "compileall": "passed app/scripts",
+      "javascript_syntax": "passed changed admin script",
+      "source_review": "279 files/168 reviewed unsuppressed findings;four changed/new Python paths explicitly reviewed",
+      "transport_inventory": "29 sites/20 files,checker/source hashes unchanged",
+      "runtime_dependencies_added": 0
+    }
+  },
+  "resume_checkpoint": {
+    "archive": "MTA-0.3.0-r210-pre-RC-paypal-item-movement-cumulative.zip",
+    "sha256": "e3858030a43caf314ae40e876b6a517ac9c0f01e02d5cdc31c4617ce1f942c65",
+    "input_bytes": 93593153,
+    "input_files": 3792,
+    "meaning": "Complete saved input SHA/CRC/every manifest byte/hash/mode verified before editing;all paths/protected assets/modes preserved. Output checksum is adjacent to avoid self-reference.",
+    "current_handoff": "docs/MERCHANT_HISTORY_HANDOFF_R210.md",
+    "current_archive": "MTA-0.3.0-r210-pre-RC-merchant-history-cumulative.zip"
+  },
+  "latest_checkpoint": {
+    "handoff": "docs/MERCHANT_HISTORY_HANDOFF_R210.md",
+    "strategy": "docs/RC_EXECUTION_STRATEGY_R210.json",
+    "test_summary": "docs/validation/r210/merchant-history-test-summary.json",
+    "unique_affected_passed": 70,
+    "new_passed": 32,
+    "browser_skipped": 4,
+    "scope": "Merchant-wide requested-window acquisition/observation only; financial settlement/global A4 acceptance remain open",
+    "optional_ci_workflow": ".github/workflows/merchant-history-chromium.yml",
+    "ci_status": "prepared_not_run;requiresuserdispatch"
+  },
+  "publication_recovery_checkpoint": {
+    "handoff": "docs/TWENTY_CYCLE_RECOVERY_HANDOFF_R210.md",
+    "scope": "Supported new immutable-intent frozen successful WAV publication recovery; no whole B2/B5 acceptance",
+    "release_candidate": false,
+    "transition_enabled": false
+  }
+}

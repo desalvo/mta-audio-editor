@@ -1,0 +1,14 @@
+{
+  "version": "0.3.0-r210",
+  "macroarea": "Stripe/PayPal reconciliation",
+  "status": "blocked_before_end_to_end_completion",
+  "tested": "227 passed, 1 warning",
+  "remaining": [
+    "atomic local ledger transition with provider outcome",
+    "refund and dispute event history",
+    "webhook replay and ordering reconciliation",
+    "legacy obligations",
+    "provider sandbox validation"
+  ],
+  "production_authorized": false
+}

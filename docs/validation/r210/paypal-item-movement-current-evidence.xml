@@ -1,0 +1,1963 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite name="paypal-item-movement-latest-actual-evidence" tests="392" failures="0" errors="0" skipped="0">
+  <testcase classname="tests.test_r210_financial_admin_browser" name="test_admin_diagnostics_remain_readable_during_drain" time="0.167">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-ui-regression-3.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_financial_admin_browser" name="test_admin_finance_roles_csrf_and_request_shape" time="0.333">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-ui-regression-2.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_financial_admin_browser" name="test_browser_reads_actual_financial_api_and_never_enables_switch[en]" time="1.506">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-ui-regression-1.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_financial_admin_browser" name="test_browser_reads_actual_financial_api_and_never_enables_switch[it]" time="1.652">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-ui-regression-0.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_actual_stripe_two_step_full_or_partial_funds_and_durable_fence" time="0.555">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_bad_inputs_never_dispatch[amount_cents--1]" time="0.352">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_bad_inputs_never_dispatch[amount_cents-0]" time="0.366">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_bad_inputs_never_dispatch[amount_cents-1.2]" time="0.323">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_bad_inputs_never_dispatch[amount_cents-1000000001]" time="0.386">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_bad_inputs_never_dispatch[amount_cents-True]" time="0.304">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_bad_inputs_never_dispatch[order_id-../x]" time="0.231">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_bad_inputs_never_dispatch[provider-other]" time="0.349">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_bad_inputs_never_dispatch[reason-bad\nreason]" time="0.306">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_bad_inputs_never_dispatch[reason-x]" time="0.297">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_bad_inputs_never_dispatch[request_id-tiny]" time="0.276">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_bad_inputs_never_dispatch[target-None]" time="0.312">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_cancel_only_prepared_and_conflicting_idempotency_rejected" time="0.281">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_concurrent_preparations_reserve_once_and_concurrent_execution_sends_once" time="0.289">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_exact_revision_required_before_action[cancel--1]" time="0.158">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_exact_revision_required_before_action[cancel-0]" time="0.154">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_exact_revision_required_before_action[cancel-1.2]" time="0.158">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_exact_revision_required_before_action[cancel-None]" time="0.174">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_exact_revision_required_before_action[cancel-True]" time="0.179">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_exact_revision_required_before_action[execute--1]" time="0.187">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_exact_revision_required_before_action[execute-0]" time="0.202">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_exact_revision_required_before_action[execute-1.2]" time="0.173">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_exact_revision_required_before_action[execute-None]" time="0.197">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_exact_revision_required_before_action[execute-True]" time="0.170">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_exact_revision_required_before_action[verify--1]" time="0.160">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_exact_revision_required_before_action[verify-0]" time="0.185">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_exact_revision_required_before_action[verify-1.2]" time="0.212">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_exact_revision_required_before_action[verify-None]" time="0.166">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_exact_revision_required_before_action[verify-True]" time="0.160">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_get_unavailable_after_post_does_not_repost_or_settle" time="0.200">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_invalid_preparation_cannot_reserve_or_send[drain]" time="0.250">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_invalid_preparation_cannot_reserve_or_send[extra]" time="0.215">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_invalid_preparation_cannot_reserve_or_send[nonadmin]" time="0.262">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_invalid_preparation_cannot_reserve_or_send[overamount]" time="0.347">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_invalid_preparation_cannot_reserve_or_send[unknownorder]" time="0.238">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_invalid_preparation_cannot_reserve_or_send[wrongtarget]" time="0.245">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_owner_history_privacy_and_admin_reason_not_disclosed" time="0.180">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_paypal_canonical_refund_moves_real_wallet_once[200]" time="0.236">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_paypal_canonical_refund_moves_real_wallet_once[500]" time="0.220">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_paypal_timeout_then_get_only_recovery" time="0.239">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_paypal_wrong_receipt_or_merchant_never_closes[amount]" time="0.202">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_paypal_wrong_receipt_or_merchant_never_closes[capture]" time="0.210">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_paypal_wrong_receipt_or_merchant_never_closes[currency]" time="0.236">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_paypal_wrong_receipt_or_merchant_never_closes[custom_id]" time="0.189">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_paypal_wrong_receipt_or_merchant_never_closes[merchant]" time="0.212">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_paypal_wrong_receipt_or_merchant_never_closes[status]" time="0.215">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_pending_and_failed_refunds_need_authenticated_terminal_outcome[canceled]" time="0.177">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_pending_and_failed_refunds_need_authenticated_terminal_outcome[failed]" time="0.172">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_pending_and_failed_refunds_need_authenticated_terminal_outcome[pending]" time="0.192">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_pending_and_failed_refunds_need_authenticated_terminal_outcome[requires_action]" time="0.186">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_post_error_stays_uncertain_and_get_failure_stays_pending" time="0.178">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_quote_balance_and_merchant_changes_prevent_dispatch" time="0.186">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_readiness_detects_inconsistent_refund_journal[event]" time="0.168">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_readiness_detects_inconsistent_refund_journal[fence]" time="0.161">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_readiness_detects_inconsistent_refund_journal[state]" time="0.187">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_timeout_and_process_restart_recover_by_exact_get_without_repost" time="0.208">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_unrelated_or_malformed_provider_receipt_keeps_operation_open[amount]" time="0.179">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_unrelated_or_malformed_provider_receipt_keeps_operation_open[currency]" time="0.170">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_unrelated_or_malformed_provider_receipt_keeps_operation_open[id]" time="0.167">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_unrelated_or_malformed_provider_receipt_keeps_operation_open[intent]" time="0.167">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_unrelated_or_malformed_provider_receipt_keeps_operation_open[metadata]" time="0.168">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_unrelated_or_malformed_provider_receipt_keeps_operation_open[object]" time="0.176">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds" name="test_unrelated_or_malformed_provider_receipt_keeps_operation_open[status]" time="0.165">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds_recovery" name="test_corrupt_journal_cannot_dispatch_or_clear_drain[context]" time="0.159">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds_recovery" name="test_corrupt_journal_cannot_dispatch_or_clear_drain[receipt]" time="0.173">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds_recovery" name="test_corrupt_journal_cannot_dispatch_or_clear_drain[revision]" time="0.173">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds_recovery" name="test_corrupt_journal_cannot_dispatch_or_clear_drain[schema]" time="0.189">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds_recovery" name="test_external_balance_change_invalidates_prepared_quote" time="0.227">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds_recovery" name="test_multicapture_history_remaining_capture_refund" time="0.200">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds_recovery" name="test_operator_refund_actually_clears_surplus_repayment_liability" time="0.245">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds_recovery" name="test_original_payment_drift_is_rejected_before_provider_read_or_write[amount_cents-600]" time="0.193">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds_recovery" name="test_original_payment_drift_is_rejected_before_provider_read_or_write[session_id-cs_other]" time="0.174">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds_recovery" name="test_original_payment_drift_is_rejected_before_provider_read_or_write[user_id-1]" time="0.175">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds_recovery" name="test_paypal_subscription_and_repayment_refunds_preserve_exact_receivable[subscription]" time="0.210">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds_recovery" name="test_paypal_subscription_and_repayment_refunds_preserve_exact_receivable[subscription_reversal]" time="0.232">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds_recovery" name="test_pending_paypal_needs_completed_receipt_and_canonical_capture" time="0.214">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds_recovery" name="test_real_child_exit_after_committed_uncertainty_is_recovered_without_reexecution" time="0.448">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds_recovery" name="test_reason_bound_includes_whitespace_and_rejects_before_provider_io" time="0.148">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds_recovery" name="test_refund_identity_audit_and_deletion_require_retired_owner_authorization" time="0.266">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds_recovery" name="test_role_revoked_during_readback_prevents_dispatch" time="0.174">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_operator_refunds_recovery" name="test_wallet_commit_failure_keeps_refund_pending_then_reconciles_once" time="0.209">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_owner_payments" name="test_concurrent_cross_provider_new_ids_admit_only_one" time="0.203">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_owner_payments" name="test_failed_provider_lookup_keeps_pending_and_never_recreates[404]" time="0.162">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_owner_payments" name="test_failed_provider_lookup_keeps_pending_and_never_recreates[timeout]" time="0.151">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_owner_payments" name="test_fresh_ids_and_other_provider_do_not_escape_pending[paypal]" time="0.156">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_owner_payments" name="test_fresh_ids_and_other_provider_do_not_escape_pending[stripe]" time="0.180">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_owner_payments" name="test_legacy_resume_url_rejected[https://checkout.stripe.com/\r\nBad]" time="0.000">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_owner_payments" name="test_legacy_resume_url_rejected[https://checkout.stripe.com:444/]" time="0.000">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_owner_payments" name="test_legacy_resume_url_rejected[https://checkout.stripe.com:bad/]" time="0.000">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_owner_payments" name="test_legacy_resume_url_rejected[https://checkout.stripe.com@evil.test/]" time="0.000">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_owner_payments" name="test_legacy_resume_url_rejected[https://checkout.stripe.com\\@evil.test/]" time="0.000">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_owner_payments" name="test_legacy_resume_url_rejected[https://evil.test/pay]" time="0.000">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_owner_payments" name="test_legacy_resume_url_rejected[https://user:pw@checkout.stripe.com/]" time="0.000">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_owner_payments" name="test_legacy_resume_url_rejected[javascript:alert(1)]" time="0.000">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_owner_payments" name="test_new_checkout_response_uses_same_strict_redirect_boundary[control-paypal]" time="0.153">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_owner_payments" name="test_new_checkout_response_uses_same_strict_redirect_boundary[control-stripe]" time="0.151">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_owner_payments" name="test_new_checkout_response_uses_same_strict_redirect_boundary[credentials-paypal]" time="0.157">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_owner_payments" name="test_new_checkout_response_uses_same_strict_redirect_boundary[credentials-stripe]" time="0.163">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_owner_payments" name="test_new_checkout_response_uses_same_strict_redirect_boundary[port-paypal]" time="0.156">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_owner_payments" name="test_new_checkout_response_uses_same_strict_redirect_boundary[port-stripe]" time="0.151">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_owner_payments" name="test_owner_get_reconciliation_closes_terminal_and_releases_guard" time="0.213">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_owner_payments" name="test_owner_paid_and_refund_readback_is_net_and_idempotent" time="0.168">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_owner_payments" name="test_owner_probe_rejects_midflight_identity_change[credentials]" time="0.160">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_owner_payments" name="test_owner_probe_rejects_midflight_identity_change[owner]" time="0.157">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_owner_payments" name="test_paypal_approved_verify_never_captures_and_preserves_hold" time="0.181">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_owner_payments" name="test_private_paginated_history_no_provider_or_credentials" time="0.658">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_owner_payments" name="test_subscription_same_period_guard_and_readonly_nc_history" time="0.187">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_owner_payments" name="test_unknown_creation_blocks_new_purchase_and_owner_probe" time="0.181">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_owner_payments" name="test_valid_provider_redirect_is_stored_resumable_without_redispatch[paypal]" time="0.152">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_owner_payments" name="test_valid_provider_redirect_is_stored_resumable_without_redispatch[stripe]" time="0.160">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_owner_payments" name="test_wrong_owner_refused_before_any_provider_io" time="0.183">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_changed_dispute_amount_preserves_old_hold_and_durable_private_review" time="0.165">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_combined_historical_refunds_and_dispute_never_publish_gross_or_double_debit" time="0.177">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_complete_two_page_readback_applies_each_dispute_once" time="0.176">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_discovered_final_outcomes_and_old_webhooks_cannot_reopen[CANCELED_BY_BUYER-False]" time="0.187">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_discovered_final_outcomes_and_old_webhooks_cannot_reopen[CANCELED_BY_BUYER-True]" time="0.180">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_discovered_final_outcomes_and_old_webhooks_cannot_reopen[RESOLVED_BUYER_FAVOUR-False]" time="0.181">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_discovered_final_outcomes_and_old_webhooks_cannot_reopen[RESOLVED_BUYER_FAVOUR-True]" time="0.182">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_discovered_final_outcomes_and_old_webhooks_cannot_reopen[RESOLVED_SELLER_FAVOUR-False]" time="0.188">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_discovered_final_outcomes_and_old_webhooks_cannot_reopen[RESOLVED_SELLER_FAVOUR-True]" time="0.201">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_discovered_repayment_dispute_reopens_exact_debt_and_release_restores_allocation" time="0.194">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_discovery_funds_only_net_and_replays_idempotently[False-False]" time="0.207">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_discovery_funds_only_net_and_replays_idempotently[False-True]" time="0.200">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_discovery_funds_only_net_and_replays_idempotently[True-False]" time="0.192">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_discovery_funds_only_net_and_replays_idempotently[True-True]" time="0.191">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_gap_recovery_is_atomic_and_later_gap_never_reopens_an_immutable_event" time="0.181">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_observed_dispute_during_unstable_scan_cannot_disappear_on_later_empty_scan" time="0.155">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_opposing_final_history_is_pending_and_never_releases_permanent_loss[False]" time="0.184">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_opposing_final_history_is_pending_and_never_releases_permanent_loss[True]" time="0.190">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_original_context_drift_after_remote_discovery_never_settles[amount]" time="0.176">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_original_context_drift_after_remote_discovery_never_settles[epoch]" time="0.189">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_original_context_drift_after_remote_discovery_never_settles[kind]" time="0.166">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_original_context_drift_after_remote_discovery_never_settles[merchant]" time="0.168">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_original_context_drift_after_remote_discovery_never_settles[owner]" time="0.160">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_original_context_drift_after_remote_discovery_never_settles[provider]" time="0.168">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[backslash]" time="0.165">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[control]" time="0.171">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[credentials]" time="0.172">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[duplicate_link]" time="0.166">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[duplicate_query]" time="0.164">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[duplicate_row]" time="0.209">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[empty_continuation]" time="0.200">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[environment]" time="0.160">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[extra_query]" time="0.171">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[filter]" time="0.179">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[fragment]" time="0.166">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[host]" time="0.173">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[method]" time="0.171">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[no_links_list]" time="0.171">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[object_bound]" time="0.164">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[page]" time="0.170">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[page_bound]" time="0.160">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[path]" time="0.170">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[port]" time="0.163">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[request_bound]" time="0.159">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[size]" time="0.168">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[token]" time="0.168">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_partial_full_discovery_cannot_clear_an_existing_unknown_gap_or_enable_capture[False]" time="0.176">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_partial_full_discovery_cannot_clear_an_existing_unknown_gap_or_enable_capture[True]" time="0.180">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_payouts_stay_pending_private_and_can_resolve_with_later_exact_outcome[False-RESOLVED_WITH_OTHER]" time="0.181">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_payouts_stay_pending_private_and_can_resolve_with_later_exact_outcome[False-RESOLVED_WITH_PAYOUT]" time="0.177">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_payouts_stay_pending_private_and_can_resolve_with_later_exact_outcome[False-UNKNOWN]" time="0.177">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_payouts_stay_pending_private_and_can_resolve_with_later_exact_outcome[True-RESOLVED_WITH_OTHER]" time="0.184">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_payouts_stay_pending_private_and_can_resolve_with_later_exact_outcome[True-RESOLVED_WITH_PAYOUT]" time="0.178">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_payouts_stay_pending_private_and_can_resolve_with_later_exact_outcome[True-UNKNOWN]" time="0.177">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[bad_time]" time="0.176">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[collection_changed]" time="0.184">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[currency]" time="0.181">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[detail_changed]" time="0.178">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[duplicate_capture]" time="0.181">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[empty_transactions]" time="0.208">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[foreign_capture]" time="0.167">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[gross_mismatch]" time="0.174">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[http_error]" time="0.166">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[incomplete_membership]" time="0.198">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[missing_gross]" time="0.187">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[missing_items]" time="0.176">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[missing_known]" time="0.170">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[naive_time]" time="0.173">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[negative]" time="0.197">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[non_list]" time="0.176">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[order_changed]" time="0.191">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[partial_multi]" time="0.166">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[single_gross_mismatch]" time="0.171">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[summary_amount]" time="0.165">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[summary_status]" time="0.161">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[summary_time]" time="0.173">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history" name="test_unverifiable_history_never_funds_and_retains_durable_gap[wrong_detail]" time="0.172">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history_browser" name="test_admin_actual_history_reconciliation_feedback_and_held_money[1280-en]" time="1.511">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-ui-regression-3.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history_browser" name="test_admin_actual_history_reconciliation_feedback_and_held_money[1280-it]" time="2.579">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-ui-regression-2.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history_browser" name="test_admin_actual_history_reconciliation_feedback_and_held_money[390-en]" time="1.359">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-ui-regression-1.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history_browser" name="test_admin_actual_history_reconciliation_feedback_and_held_money[390-it]" time="1.817">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-ui-regression-0.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history_browser" name="test_owner_full_page_discovers_holds_then_resolves_without_webhook_or_collection[/account-1280-en]" time="12.957">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-ui-regression-3.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history_browser" name="test_owner_full_page_discovers_holds_then_resolves_without_webhook_or_collection[/account-1280-it]" time="7.562">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-ui-regression-2.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history_browser" name="test_owner_full_page_discovers_holds_then_resolves_without_webhook_or_collection[/account-390-en]" time="11.441">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-ui-regression-1.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history_browser" name="test_owner_full_page_discovers_holds_then_resolves_without_webhook_or_collection[/account-390-it]" time="7.087">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-ui-regression-0.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history_browser" name="test_owner_full_page_discovers_holds_then_resolves_without_webhook_or_collection[/account/credits-1280-en]" time="3.507">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-ui-regression-3.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history_browser" name="test_owner_full_page_discovers_holds_then_resolves_without_webhook_or_collection[/account/credits-1280-it]" time="4.158">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-ui-regression-2.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history_browser" name="test_owner_full_page_discovers_holds_then_resolves_without_webhook_or_collection[/account/credits-390-en]" time="3.104">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-ui-regression-1.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history_browser" name="test_owner_full_page_discovers_holds_then_resolves_without_webhook_or_collection[/account/credits-390-it]" time="5.752">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-ui-regression-0.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history_browser" name="test_owner_gap_error_refresh_and_actual_recovery[1280-en]" time="1.949">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-ui-regression-3.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history_browser" name="test_owner_gap_error_refresh_and_actual_recovery[1280-it]" time="2.486">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-ui-regression-2.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history_browser" name="test_owner_gap_error_refresh_and_actual_recovery[390-en]" time="2.787">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-ui-regression-1.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_dispute_history_browser" name="test_owner_gap_error_refresh_and_actual_recovery[390-it]" time="3.358">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-ui-regression-0.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_history_reconciliation" name="test_failure_after_funding_rolls_back_history_and_wallet" time="0.357">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_history_reconciliation" name="test_incomplete_or_changed_history_cannot_grant_gross_credit[amount]" time="0.719">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_history_reconciliation" name="test_incomplete_or_changed_history_cannot_grant_gross_credit[capture]" time="0.572">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_history_reconciliation" name="test_incomplete_or_changed_history_cannot_grant_gross_credit[config_changed]" time="0.428">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_history_reconciliation" name="test_incomplete_or_changed_history_cannot_grant_gross_credit[cumulative]" time="0.354">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_history_reconciliation" name="test_incomplete_or_changed_history_cannot_grant_gross_credit[currency]" time="0.584">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_history_reconciliation" name="test_incomplete_or_changed_history_cannot_grant_gross_credit[duplicate]" time="0.484">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_history_reconciliation" name="test_incomplete_or_changed_history_cannot_grant_gross_credit[identity]" time="0.520">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_history_reconciliation" name="test_incomplete_or_changed_history_cannot_grant_gross_credit[local_changed]" time="0.305">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_history_reconciliation" name="test_incomplete_or_changed_history_cannot_grant_gross_credit[missing]" time="0.335">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_history_reconciliation" name="test_incomplete_or_changed_history_cannot_grant_gross_credit[order_changed]" time="0.411">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_history_reconciliation" name="test_incomplete_or_changed_history_cannot_grant_gross_credit[pending]" time="0.416">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_history_reconciliation" name="test_initial_refunded_or_previously_paid_capture_reconciles_exact_net[False]" time="0.546">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_history_reconciliation" name="test_initial_refunded_or_previously_paid_capture_reconciles_exact_net[True]" time="0.380">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_history_reconciliation" name="test_money_is_an_exact_eur_decimal_string[ 1]" time="0.000">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_history_reconciliation" name="test_money_is_an_exact_eur_decimal_string[-1]" time="0.000">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_history_reconciliation" name="test_money_is_an_exact_eur_decimal_string[1.001]" time="0.000">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_history_reconciliation" name="test_money_is_an_exact_eur_decimal_string[1.01]" time="0.000">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_history_reconciliation" name="test_money_is_an_exact_eur_decimal_string[1.]" time="0.001">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_history_reconciliation" name="test_money_is_an_exact_eur_decimal_string[1]" time="0.002">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_history_reconciliation" name="test_money_is_an_exact_eur_decimal_string[1e2]" time="0.001">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_history_reconciliation" name="test_money_is_an_exact_eur_decimal_string[NaN]" time="0.004">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_history_reconciliation" name="test_money_is_an_exact_eur_decimal_string[True]" time="0.001">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_history_reconciliation" name="test_refunded_subscription_creates_exact_receivable" time="0.422">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movement_browser" name="test_actual_owner_page_exact_partial_multicapture_then_supported_release[/account-1280-en]" time="7.998">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-browser-3.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movement_browser" name="test_actual_owner_page_exact_partial_multicapture_then_supported_release[/account-1280-it]" time="8.546">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-browser-2.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movement_browser" name="test_actual_owner_page_exact_partial_multicapture_then_supported_release[/account-390-en]" time="4.015">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-browser-1.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movement_browser" name="test_actual_owner_page_exact_partial_multicapture_then_supported_release[/account-390-it]" time="6.818">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-browser-0.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movement_browser" name="test_actual_owner_page_exact_partial_multicapture_then_supported_release[/account/credits-1280-en]" time="2.448">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-browser-3.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movement_browser" name="test_actual_owner_page_exact_partial_multicapture_then_supported_release[/account/credits-1280-it]" time="2.266">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-browser-2.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movement_browser" name="test_actual_owner_page_exact_partial_multicapture_then_supported_release[/account/credits-390-en]" time="4.657">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-browser-1.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movement_browser" name="test_actual_owner_page_exact_partial_multicapture_then_supported_release[/account/credits-390-it]" time="3.167">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-browser-0.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movement_browser" name="test_admin_canonical_movement_observations_have_no_settlement_action[1280-en]" time="1.368">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-exact-money-browser.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movement_browser" name="test_admin_canonical_movement_observations_have_no_settlement_action[1280-it]" time="1.434">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-exact-money-browser.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movement_browser" name="test_admin_canonical_movement_observations_have_no_settlement_action[390-en]" time="1.295">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-exact-money-browser.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movement_browser" name="test_admin_canonical_movement_observations_have_no_settlement_action[390-it]" time="1.651">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-exact-money-browser.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_admin_only_safe_movement_dto_and_corrupt_observation_fail_closed" time="0.662">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[BUYER-both]" time="0.191">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[BUYER-fund_movements]" time="0.181">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[BUYER-money_movements]" time="0.182">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[BUYER-none]" time="0.187">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[PAYMENT_PROCESSOR-both]" time="0.206">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[PAYMENT_PROCESSOR-fund_movements]" time="0.195">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[PAYMENT_PROCESSOR-money_movements]" time="0.199">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[PAYMENT_PROCESSOR-none]" time="0.190">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[SELLER-both]" time="0.208">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[SELLER-fund_movements]" time="0.448">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[SELLER-money_movements]" time="0.186">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[SELLER-none]" time="0.190">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_exact_partial_multicapture_first_funding_release_loss_and_replay[RESOLVED_BUYER_FAVOUR-False]" time="0.282">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_exact_partial_multicapture_first_funding_release_loss_and_replay[RESOLVED_BUYER_FAVOUR-True]" time="0.216">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_exact_partial_multicapture_first_funding_release_loss_and_replay[RESOLVED_SELLER_FAVOUR-False]" time="0.271">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_exact_partial_multicapture_first_funding_release_loss_and_replay[RESOLVED_SELLER_FAVOUR-True]" time="0.225">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_false_valued_malformed_movement_field_cannot_authorize_a_seller_release[0]" time="0.172">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_false_valued_malformed_movement_field_cannot_authorize_a_seller_release[False]" time="0.193">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_false_valued_malformed_movement_field_cannot_authorize_a_seller_release[None]" time="0.193">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_false_valued_malformed_movement_field_cannot_authorize_a_seller_release[]" time="0.171">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_false_valued_malformed_movement_field_cannot_authorize_a_seller_release[value0]" time="0.190">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[capture_overflow]" time="0.203">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[control_id]" time="0.176">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[currency]" time="0.214">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[duplicate_cross_capture]" time="0.183">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[duplicate_id]" time="0.180">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[empty_items]" time="0.195">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[excess_items]" time="0.196">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[global_mismatch]" time="0.233">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[long_id]" time="0.185">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[malformed_item]" time="0.190">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[missing_id]" time="0.169">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[missing_items]" time="0.170">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[missing_money]" time="0.195">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[negative]" time="0.235">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[numeric_quantity]" time="0.197">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[wrong_type]" time="0.174">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[zero]" time="0.236">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[zero_quantity]" time="0.220">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_malformed_movement_collection_requires_durable_history_review[invalid_money]" time="0.213">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_malformed_movement_collection_requires_durable_history_review[non_list]" time="0.181">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_malformed_movement_collection_requires_durable_history_review[non_object]" time="0.167">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_malformed_movement_collection_requires_durable_history_review[over_bound]" time="0.185">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_malformed_movement_collection_requires_durable_history_review[wrong_currency]" time="0.201">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_optional_or_unproven_movement_fields_remain_observations_not_payment_proof[asset]" time="0.181">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_optional_or_unproven_movement_fields_remain_observations_not_payment_proof[bad_time]" time="0.178">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_optional_or_unproven_movement_fields_remain_observations_not_payment_proof[missing_amount]" time="0.188">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_optional_or_unproven_movement_fields_remain_observations_not_payment_proof[missing_direction]" time="0.182">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_optional_or_unproven_movement_fields_remain_observations_not_payment_proof[missing_party]" time="0.185">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_optional_or_unproven_movement_fields_remain_observations_not_payment_proof[missing_time]" time="0.177">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_optional_or_unproven_movement_fields_remain_observations_not_payment_proof[unknown_reason]" time="0.181">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_partial_multicapture_original_subscription_risk_does_not_mint_credit" time="0.184">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_item_movements" name="test_private_movement_report_bounded_and_deduplicated_across_two_captures" time="0.197">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-domain.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_reconciliation_e2e" name="test_ambiguous_paypal_payout_keeps_hold_and_pending_readiness" time="0.662">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_reconciliation_e2e" name="test_canonical_refund_cannot_be_attributed_to_other_capture" time="0.395">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_reconciliation_e2e" name="test_capture_reversal_and_refund_never_double_debit" time="0.536">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_reconciliation_e2e" name="test_dispute_readback_holds_then_releases_and_rejects_stale_updates" time="0.549">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_reconciliation_e2e" name="test_failed_refund_replay_rolls_back_capture_and_wallet" time="0.465">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_reconciliation_e2e" name="test_multiple_capture_refund_before_fulfillment_replays_atomically" time="0.475">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_reconciliation_e2e" name="test_refund_cannot_cross_provider_environment" time="0.390">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_reconciliation_e2e" name="test_reversal_before_capture_is_replayed_in_capture_transaction" time="0.487">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_reconciliation_e2e" name="test_subscription_refund_records_exact_receivable_without_wallet_credit" time="0.577">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_terminal_integrity" name="test_new_provisional_result_waits_for_matching_final_evidence[held-permanent-credits]" time="0.181">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_terminal_integrity" name="test_new_provisional_result_waits_for_matching_final_evidence[held-permanent-repayment]" time="0.200">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_terminal_integrity" name="test_new_provisional_result_waits_for_matching_final_evidence[held-permanent-subscription]" time="0.182">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_terminal_integrity" name="test_new_provisional_result_waits_for_matching_final_evidence[held-released-credits]" time="0.177">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_terminal_integrity" name="test_new_provisional_result_waits_for_matching_final_evidence[held-released-repayment]" time="0.205">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_terminal_integrity" name="test_new_provisional_result_waits_for_matching_final_evidence[held-released-subscription]" time="0.194">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_terminal_integrity" name="test_new_provisional_result_waits_for_matching_final_evidence[uncertain-permanent-credits]" time="0.189">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_terminal_integrity" name="test_new_provisional_result_waits_for_matching_final_evidence[uncertain-permanent-repayment]" time="0.231">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_terminal_integrity" name="test_new_provisional_result_waits_for_matching_final_evidence[uncertain-permanent-subscription]" time="0.193">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_terminal_integrity" name="test_new_provisional_result_waits_for_matching_final_evidence[uncertain-released-credits]" time="0.254">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_terminal_integrity" name="test_new_provisional_result_waits_for_matching_final_evidence[uncertain-released-repayment]" time="0.334">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_terminal_integrity" name="test_new_provisional_result_waits_for_matching_final_evidence[uncertain-released-subscription]" time="0.256">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_terminal_integrity" name="test_older_provisional_evidence_cannot_reopen_terminal_result[permanent-credits]" time="0.432">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_terminal_integrity" name="test_older_provisional_evidence_cannot_reopen_terminal_result[permanent-repayment]" time="0.298">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_terminal_integrity" name="test_older_provisional_evidence_cannot_reopen_terminal_result[permanent-subscription]" time="0.310">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_terminal_integrity" name="test_older_provisional_evidence_cannot_reopen_terminal_result[released-credits]" time="0.344">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_terminal_integrity" name="test_older_provisional_evidence_cannot_reopen_terminal_result[released-repayment]" time="0.516">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_terminal_integrity" name="test_older_provisional_evidence_cannot_reopen_terminal_result[released-subscription]" time="0.468">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_terminal_integrity" name="test_opposite_final_outcome_stays_pending_after_later_same_final_confirmation[permanent-credits]" time="0.189">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_terminal_integrity" name="test_opposite_final_outcome_stays_pending_after_later_same_final_confirmation[permanent-repayment]" time="0.213">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_terminal_integrity" name="test_opposite_final_outcome_stays_pending_after_later_same_final_confirmation[permanent-subscription]" time="0.201">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_terminal_integrity" name="test_opposite_final_outcome_stays_pending_after_later_same_final_confirmation[released-credits]" time="0.190">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_terminal_integrity" name="test_opposite_final_outcome_stays_pending_after_later_same_final_confirmation[released-repayment]" time="0.212">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_paypal_terminal_integrity" name="test_opposite_final_outcome_stays_pending_after_later_same_final_confirmation[released-subscription]" time="0.195">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_remote_transport_inventory" name="test_current_inventory_matches_review" time="1.596">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-gates.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_remote_transport_inventory" name="test_inventory_cannot_silently_approve_drift[category]" time="0.001">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-gates.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_remote_transport_inventory" name="test_inventory_cannot_silently_approve_drift[checker]" time="0.001">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-gates.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_remote_transport_inventory" name="test_inventory_cannot_silently_approve_drift[hash]" time="0.001">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-gates.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_remote_transport_inventory" name="test_inventory_cannot_silently_approve_drift[missing]" time="0.001">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-gates.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_remote_transport_inventory" name="test_inventory_cannot_silently_approve_drift[rationale]" time="0.001">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-gates.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_remote_transport_inventory" name="test_inventory_cannot_silently_approve_drift[reorder]" time="0.002">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-gates.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_remote_transport_inventory" name="test_inventory_cannot_silently_approve_drift[source]" time="0.002">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-gates.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_remote_transport_inventory" name="test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-device/start?x=1]" time="0.000">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-gates.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_remote_transport_inventory" name="test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-gateway/v1/generate]" time="0.006">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-gates.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_remote_transport_inventory" name="test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-jobs/execute-audio/whisper]" time="0.000">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-gates.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_remote_transport_inventory" name="test_new_aliased_transports_require_review[from httpx import AsyncClient as hidden\nhidden()]" time="0.002">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-gates.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_remote_transport_inventory" name="test_new_aliased_transports_require_review[from urllib.request import build_opener as hidden\nx=hidden()\nx.open(&quot;https://example.test&quot;)]" time="0.002">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-gates.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_remote_transport_inventory" name="test_new_aliased_transports_require_review[from urllib.request import urlopen as hidden\nhidden(&quot;https://example.test&quot;)]" time="0.002">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-gates.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_remote_transport_inventory" name="test_new_aliased_transports_require_review[import aiohttp as hidden\nhidden.ClientSession()]" time="0.002">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-gates.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_remote_transport_inventory" name="test_new_aliased_transports_require_review[import httpx as hidden\nhidden.Client()]" time="0.002">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-gates.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_remote_transport_inventory" name="test_new_aliased_transports_require_review[import socket as hidden\nhidden.create_connection((&quot;example.test&quot;,443))]" time="0.002">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-gates.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_remote_transport_inventory" name="test_supported_device_authorization_still_uses_exact_post[/api/ai-device/poll]" time="0.001">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-gates.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_remote_transport_inventory" name="test_supported_device_authorization_still_uses_exact_post[/api/ai-device/start]" time="0.003">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-gates.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_security_review_gate" name="test_complete_source_bound_review_is_accepted" time="0.002">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-gates.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_security_review_gate" name="test_current_scan_and_complete_review_ledger_agree" time="0.018">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-gates.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_security_review_gate" name="test_review_cannot_silently_survive_source_or_scan_changes[blanket_approval]" time="0.001">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-gates.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_security_review_gate" name="test_review_cannot_silently_survive_source_or_scan_changes[changed_finding]" time="0.001">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-gates.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_security_review_gate" name="test_review_cannot_silently_survive_source_or_scan_changes[changed_source]" time="0.002">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-gates.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_security_review_gate" name="test_review_cannot_silently_survive_source_or_scan_changes[deleted_source]" time="0.001">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-gates.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_security_review_gate" name="test_review_cannot_silently_survive_source_or_scan_changes[duplicate_review]" time="0.001">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-gates.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_security_review_gate" name="test_review_cannot_silently_survive_source_or_scan_changes[duplicate_scan]" time="0.001">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-gates.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_security_review_gate" name="test_review_cannot_silently_survive_source_or_scan_changes[empty_reason]" time="0.001">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-gates.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_security_review_gate" name="test_review_cannot_silently_survive_source_or_scan_changes[high]" time="0.001">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-gates.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_security_review_gate" name="test_review_cannot_silently_survive_source_or_scan_changes[missing_file]" time="0.001">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-gates.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_security_review_gate" name="test_review_cannot_silently_survive_source_or_scan_changes[missing_review]" time="0.001">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-gates.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_security_review_gate" name="test_review_cannot_silently_survive_source_or_scan_changes[new_finding]" time="0.001">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-gates.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_security_review_gate" name="test_review_cannot_silently_survive_source_or_scan_changes[new_source]" time="0.002">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-gates.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_security_review_gate" name="test_review_cannot_silently_survive_source_or_scan_changes[scan_error]" time="0.001">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-gates.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_security_review_gate" name="test_review_cannot_silently_survive_source_or_scan_changes[suppression]" time="0.001">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-gates.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_security_review_gate" name="test_review_cannot_silently_survive_source_or_scan_changes[wrong_totals]" time="0.001">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-gates.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_service_regime_admin_panel" name="test_admin_refresh_includes_regime" time="0.001">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-ui-regression-2.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_service_regime_admin_panel" name="test_admin_template_embeds_panel" time="0.001">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-ui-regression-0.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_service_regime_admin_panel" name="test_panel_bilingual_and_recovery_checks" time="0.001">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-ui-regression-3.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_service_regime_admin_panel" name="test_panel_uses_admin_read_only_endpoints_and_no_switch" time="0.001">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-ui-regression-1.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_subscription_repayment_e2e" name="test_allocations_are_immutable_and_missing_position_blocks_report" time="0.181">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_subscription_repayment_e2e" name="test_already_captured_obsolete_quote_is_retained_as_refund_due" time="0.209">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_subscription_repayment_e2e" name="test_authenticated_refunded_initial_repayment_reopens_original_debt" time="0.226">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_subscription_repayment_e2e" name="test_authorized_account_erasure_preserves_other_owner_financial_records[erase]" time="0.303">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_subscription_repayment_e2e" name="test_authorized_account_erasure_preserves_other_owner_financial_records[privacy_purge]" time="0.314">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_subscription_repayment_e2e" name="test_cent_rounding_surplus_is_separate_and_refunded_first" time="0.182">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_subscription_repayment_e2e" name="test_concurrent_checkout_only_one_provider_order_and_pending_target" time="0.178">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_subscription_repayment_e2e" name="test_concurrent_fulfillment_delivers_one_allocation" time="0.180">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_subscription_repayment_e2e" name="test_dispute_release_after_second_repayment_creates_refund_liability" time="0.209">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_subscription_repayment_e2e" name="test_erasure_authorization_is_retired_owner_scoped_and_connection_local" time="0.237">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_subscription_repayment_e2e" name="test_exact_repayment_closes_debt_without_wallet_or_fee_mutation" time="0.180">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_subscription_repayment_e2e" name="test_failure_rolls_back_capture_allocation_and_fence_then_retries" time="0.194">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_subscription_repayment_e2e" name="test_multiple_sources_are_bound_to_original_refund" time="0.203">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_subscription_repayment_e2e" name="test_owner_api_quote_csrf_and_regime_guards" time="0.305">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_subscription_repayment_e2e" name="test_owner_quote_change_is_checked_before_provider_capture" time="0.224">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_subscription_repayment_e2e" name="test_permanent_capture_reversal_reopens_original_receivable" time="0.231">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_subscription_repayment_e2e" name="test_refund_before_repayment_fulfillment_is_atomic" time="0.181">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_subscription_repayment_e2e" name="test_refund_reopens_same_debt_and_can_be_repaid_again" time="0.183">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_subscription_repayment_e2e" name="test_repayment_allowed_for_existing_debt_after_plan_service_disabled" time="0.217">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_subscription_repayment_e2e" name="test_uncertain_create_stays_pending_without_second_provider_post" time="0.183">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+  <testcase classname="tests.test_r210_subscription_repayment_e2e" name="test_verified_webhook_retries_allocate_once" time="0.186">
+    <properties>
+      <property name="actual_source_report" value="paypal-item-movement-regression.xml" />
+    </properties>
+  </testcase>
+</testsuite>

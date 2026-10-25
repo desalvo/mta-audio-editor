@@ -133,21 +133,45 @@ def configure_execution_settings(body):
 def _process_identity(pid):
     """Linux boot ID and process start tick; prevent PID-reuse false positives.
 
+    None means confirmed absent/exited; '' means unavailable, never dead.
     Windows uses a query-only process creation identity; other OSes use PID checks.
     """
+    if type(pid) is not int or pid <= 0:
+        return ''
     if sys.platform == 'win32':
         from .windows_process_identity import process_identity
         return process_identity(pid)
     try:
         boot = Path('/proc/sys/kernel/random/boot_id').read_text().strip()
-        stat = Path(f'/proc/{int(pid)}/stat').read_text()
+        if not boot:
+            return ''
+    except (OSError, ValueError):
+        return ''
+    try:
+        from .linux_proc_view import directory
+        process = directory(pid)
+        if process is None:
+            raise FileNotFoundError('Namespace-local process is not visible')
+        stat = (process / 'stat').read_text()
         # Field 2 (comm) may contain spaces or parentheses.
         fields = stat.rsplit(')', 1)[1].split()
-        if fields[0] == 'Z':
+        if fields[0] in ('Z', 'X', 'x'):
             return None
+        if not fields[19].isdigit() or int(fields[19]) <= 0:
+            return ''
         return f'{boot}:{fields[19]}'  # field 22 (starttime)
+    except (FileNotFoundError, ProcessLookupError):
+        # hidepid/proc mount restrictions can conceal a process which is
+        # still alive. Only ESRCH from the kernel proves absence here.
+        try:
+            os.kill(pid, 0)
+        except ProcessLookupError:
+            return None
+        except OSError:
+            pass
+        return ''
     except (OSError, ValueError, IndexError):
-        return None
+        return ''
 
 
 def _recover_dead_runners(con):
@@ -334,7 +358,12 @@ def _claim(job_id):
         if not row or row['state'] != 'queued' or not first or first[0] != job_id or running >= _limit():
             con.execute('COMMIT')
             return False
-        con.execute("UPDATE jobs SET state='running', started_at=?, phase='preparing',message='Preparing source audio',runner_pid=?,runner_identity=? WHERE job_id=?", (time.time(), os.getpid(), _process_identity(os.getpid()), job_id))
+        identity = _process_identity(os.getpid())
+        if not identity and sys.platform in ('linux', 'win32'):
+            con.execute("UPDATE jobs SET message='Waiting for verifiable scheduler identity' WHERE job_id=?", (job_id,))
+            con.execute('COMMIT')
+            return False
+        con.execute("UPDATE jobs SET state='running', started_at=?, phase='preparing',message='Preparing source audio',runner_pid=?,runner_identity=? WHERE job_id=?", (time.time(), os.getpid(), identity, job_id))
         con.execute('COMMIT')
         return True
 
@@ -429,43 +458,45 @@ def _spawn(job_id, fn, *, cancellable=False):
             else:
                 return
             try:
-                from .ai_global_execution import current_job,current_cancel
-                context_token=current_job.set(job_id)
-                cancel_token=current_cancel.set(stop)
-                try:
-                    if cancellable:
-                        fn(progress, stop)
-                    else:
-                        fn(progress)
-                finally:
-                    current_job.reset(context_token)
-                    current_cancel.reset(cancel_token)
-                state, message = 'completed', ('AI processing complete; remote result ready' if current['operation'].startswith('worker:') else 'Generated track added to project')
-                # A normal return is not a durable commit. For audio-generating
-                # adapters require the publication receipt and (when explicitly
-                # associated) the ledger acknowledgement before completion.
-                if durable_audio_job(job_id):
-                    from . import ai_metering_bridge
+                from .deferred_execution_owner import execution_scope
+                with execution_scope(job_id,stop):
+                    from .ai_global_execution import current_job,current_cancel
+                    context_token=current_job.set(job_id)
+                    cancel_token=current_cancel.set(stop)
                     try:
-                        if (read_payload(job_id) or {}).get('actor_user_id') is not None:
-                            ai_metering_bridge.register_settlement(job_id)
-                    except Exception:
-                        # The audio can be published, but without verified usage
-                        # a billable job must never be announced completed.
-                        state, message = 'interrupted', 'Billing finalization pending verified metering'
-                    from . import ai_finalization
-                    evidence = ai_finalization.readiness(job_id)
-                    if evidence['publication'] == 'published' and evidence['billing'] == 'pending':
+                        if cancellable:
+                            fn(progress, stop)
+                        else:
+                            fn(progress)
+                    finally:
+                        current_job.reset(context_token)
+                        current_cancel.reset(cancel_token)
+                    state, message = 'completed', ('AI processing complete; remote result ready' if current['operation'].startswith('worker:') else 'Generated track added to project')
+                    # A normal return is not a durable commit. For audio-generating
+                    # adapters require the publication receipt and (when explicitly
+                    # associated) the ledger acknowledgement before completion.
+                    if durable_audio_job(job_id):
+                        from . import ai_metering_bridge
                         try:
-                            from . import ai_billing_outbox
-                            ai_billing_outbox.deliver(job_id=job_id)
+                            if (read_payload(job_id) or {}).get('actor_user_id') is not None:
+                                ai_metering_bridge.register_settlement(job_id)
                         except Exception:
-                            # The durable outbox keeps the pending settlement for recovery.
-                            # A missing acknowledgement is handled by readiness() below.
-                            state, message = 'interrupted', 'Billing outbox delivery pending recovery'
+                            # The audio can be published, but without verified usage
+                            # a billable job must never be announced completed.
+                            state, message = 'interrupted', 'Billing finalization pending verified metering'
+                        from . import ai_finalization
                         evidence = ai_finalization.readiness(job_id)
-                    if not evidence['ready']:
-                        state, message = 'interrupted', 'Publication or billing awaits durable recovery'
+                        if evidence['publication'] == 'published' and evidence['billing'] == 'pending':
+                            try:
+                                from . import ai_billing_outbox
+                                ai_billing_outbox.deliver(job_id=job_id)
+                            except Exception:
+                                # The durable outbox keeps the pending settlement for recovery.
+                                # A missing acknowledgement is handled by readiness() below.
+                                state, message = 'interrupted', 'Billing outbox delivery pending recovery'
+                            evidence = ai_finalization.readiness(job_id)
+                        if not evidence['ready']:
+                            state, message = 'interrupted', 'Publication or billing awaits durable recovery'
             except Exception as exc:
                 state, message = ('cancelled', 'Cancelled during inference') if stop.is_set() else ('failed', str(exc)[:500])
             # Capture genuine backend counters before deleting the progress
@@ -495,7 +526,11 @@ def _spawn(job_id, fn, *, cancellable=False):
                 if cancelled_row[0]:
                     state, message = 'cancelled', 'Job cancelled; worker exited and output discarded'
                 stamp = time.time()
-                changed = con.execute("UPDATE jobs SET state=?,phase=?,message=?,completed_at=?,progress_percent=? WHERE job_id=? AND state='running' AND runner_pid=? AND runner_identity IS ?", (state, state, message, stamp, 100 if state == 'completed' else None, job_id, os.getpid(), _process_identity(os.getpid())))
+                identity = _process_identity(os.getpid())
+                if not identity and sys.platform in ('linux', 'win32'):
+                    con.execute('ROLLBACK')
+                    return  # Unknown ownership cannot authorize a terminal receipt.
+                changed = con.execute("UPDATE jobs SET state=?,phase=?,message=?,completed_at=?,progress_percent=? WHERE job_id=? AND state='running' AND runner_pid=? AND runner_identity IS ?", (state, state, message, stamp, 100 if state == 'completed' else None, job_id, os.getpid(), identity))
                 if changed.rowcount:
                     con.execute('UPDATE jobs SET progress_source=?,progress_estimated=?,steps_completed=?,steps_total=? WHERE job_id=?', (progress_metadata.get('progress_source'), progress_metadata.get('progress_estimated'), progress_metadata.get('steps_completed'), progress_metadata.get('steps_total'), job_id))
                     if gpu_metadata:

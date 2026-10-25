@@ -1,0 +1,43 @@
+{
+  "original_files": 3267,
+  "preceding_checkpoint_files": 3585,
+  "missing_original": [],
+  "missing_preceding": [],
+  "protected_files_checked": 183,
+  "protected_changes": [],
+  "protected_definition": "Original non-test license/manual paths and raster/vector/font/document/audio assets by extension",
+  "python_scripts_changed_since_preceding": [],
+  "executable_modes": {
+    "scripts/install_ace_step.sh": "0o755",
+    "scripts/install_mta.sh": "0o755",
+    "app/ai_unified_adapter.py": "0o755"
+  },
+  "new_paths_since_preceding": [
+    "docs/REMOTE_INFERENCE_IT_EN_R210.md",
+    "docs/REMOTE_RIGHTS_HANDOFF_R210.md",
+    "docs/security/REMOTE_TRANSPORT_REVIEW_R210.json",
+    "docs/security/REMOTE_TRANSPORT_REVIEW_R210.md",
+    "docs/validation/r210/remote-rights-auth-positive.xml",
+    "docs/validation/r210/remote-rights-bandit.json",
+    "docs/validation/r210/remote-rights-current-evidence.xml",
+    "docs/validation/r210/remote-rights-direct.xml",
+    "docs/validation/r210/remote-rights-existing.xml",
+    "docs/validation/r210/remote-rights-historical.xml",
+    "docs/validation/r210/remote-rights-input.xml",
+    "docs/validation/r210/remote-rights-inventory-result.json",
+    "docs/validation/r210/remote-rights-inventory.xml",
+    "docs/validation/r210/remote-rights-local-ace.xml",
+    "docs/validation/r210/remote-rights-loopback.xml",
+    "docs/validation/r210/remote-rights-prefix-positive.xml",
+    "docs/validation/r210/remote-rights-prefix.xml",
+    "docs/validation/r210/remote-rights-preservation.json",
+    "docs/validation/r210/remote-rights-recovery-ui.xml",
+    "docs/validation/r210/remote-rights-security-result.json",
+    "docs/validation/r210/remote-rights-security.xml",
+    "docs/validation/r210/remote-rights-test-summary.json",
+    "scripts/check_remote_transport_inventory.py",
+    "tests/test_r210_remote_rights_ui.py",
+    "tests/test_r210_remote_transport_inventory.py",
+    "tests/test_r210_remote_transport_rights.py"
+  ]
+}

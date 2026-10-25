@@ -1,0 +1,196 @@
+[
+  {
+    "pass": 1,
+    "type": "pytest",
+    "path": "tests/test_regime_admin_closure.py",
+    "result": "PASS",
+    "note": "Observed before batch timeout; individual stdout captured in execution log, summary only"
+  },
+  {
+    "pass": 2,
+    "type": "pytest",
+    "path": "tests/test_regime_atomic_action.py",
+    "result": "PASS",
+    "note": "Observed before batch timeout; individual stdout captured in execution log, summary only"
+  },
+  {
+    "pass": 3,
+    "type": "pytest",
+    "path": "tests/test_regime_cancelled_checkout.py",
+    "result": "PASS",
+    "note": "Observed before batch timeout; individual stdout captured in execution log, summary only"
+  },
+  {
+    "pass": 4,
+    "type": "pytest",
+    "path": "tests/test_regime_checkout_fence.py",
+    "result": "PASS",
+    "note": "Observed before batch timeout; individual stdout captured in execution log, summary only"
+  },
+  {
+    "pass": 5,
+    "type": "pytest",
+    "path": "tests/test_regime_cutover_atomic.py",
+    "result": "PASS",
+    "note": "Observed before batch timeout; individual stdout captured in execution log, summary only"
+  },
+  {
+    "pass": 6,
+    "type": "pytest",
+    "path": "tests/test_regime_cutover_finalize.py",
+    "result": "PASS",
+    "note": "Observed before batch timeout; individual stdout captured in execution log, summary only"
+  },
+  {
+    "pass": 7,
+    "type": "pytest",
+    "path": "tests/test_regime_cutover_mirror.py",
+    "result": "PASS",
+    "note": "Observed before batch timeout; individual stdout captured in execution log, summary only"
+  },
+  {
+    "pass": 8,
+    "type": "pytest",
+    "path": "tests/test_regime_cutover_recovery.py",
+    "result": "PASS",
+    "note": "Observed before batch timeout; individual stdout captured in execution log, summary only"
+  },
+  {
+    "pass": 9,
+    "type": "pytest",
+    "path": "tests/test_regime_exclusive_finalization.py",
+    "result": "PASS",
+    "note": "Observed before batch timeout; individual stdout captured in execution log, summary only"
+  },
+  {
+    "pass": 10,
+    "type": "pytest",
+    "path": "tests/test_regime_inbox_coverage.py",
+    "result": "PASS",
+    "note": "Observed before batch timeout; individual stdout captured in execution log, summary only"
+  },
+  {
+    "pass": 11,
+    "type": "pytest",
+    "path": "tests/test_regime_maintenance.py",
+    "result": "PASS",
+    "note": "Observed before batch timeout; individual stdout captured in execution log, summary only"
+  },
+  {
+    "pass": 12,
+    "type": "pytest",
+    "path": "tests/test_regime_operation_fence.py",
+    "result": "PASS",
+    "note": "Observed before batch timeout; individual stdout captured in execution log, summary only"
+  },
+  {
+    "pass": 13,
+    "type": "pytest",
+    "path": "tests/test_regime_outbox_integrity_r210.py",
+    "result": "PASS",
+    "note": "Observed before batch timeout; individual stdout captured in execution log, summary only"
+  },
+  {
+    "pass": 14,
+    "type": "pytest",
+    "path": "tests/test_regime_outbox_reconciliation.py",
+    "result": "PASS",
+    "note": "Observed before batch timeout; individual stdout captured in execution log, summary only"
+  },
+  {
+    "pass": 15,
+    "type": "python syntax compilation",
+    "path": "app/regime_admin_closure.py",
+    "result": "PASS"
+  },
+  {
+    "pass": 16,
+    "type": "python syntax compilation",
+    "path": "app/regime_cancelled_checkout.py",
+    "result": "PASS"
+  },
+  {
+    "pass": 17,
+    "type": "python syntax compilation",
+    "path": "app/regime_checkout_fence.py",
+    "result": "PASS"
+  },
+  {
+    "pass": 18,
+    "type": "python syntax compilation",
+    "path": "app/regime_cutover_atomic.py",
+    "result": "PASS"
+  },
+  {
+    "pass": 19,
+    "type": "python syntax compilation",
+    "path": "app/regime_cutover_finalize.py",
+    "result": "PASS"
+  },
+  {
+    "pass": 20,
+    "type": "python syntax compilation",
+    "path": "app/regime_cutover_mirror.py",
+    "result": "PASS"
+  },
+  {
+    "pass": 21,
+    "type": "python syntax compilation",
+    "path": "app/regime_cutover_recovery.py",
+    "result": "PASS"
+  },
+  {
+    "pass": 22,
+    "type": "python syntax compilation",
+    "path": "app/regime_inbox_coverage.py",
+    "result": "PASS"
+  },
+  {
+    "pass": 23,
+    "type": "python syntax compilation",
+    "path": "app/regime_job_fence.py",
+    "result": "PASS"
+  },
+  {
+    "pass": 24,
+    "type": "python syntax compilation",
+    "path": "app/regime_maintenance.py",
+    "result": "PASS"
+  },
+  {
+    "pass": 25,
+    "type": "python syntax compilation",
+    "path": "app/regime_operation_fence.py",
+    "result": "PASS"
+  },
+  {
+    "pass": 26,
+    "type": "python syntax compilation",
+    "path": "app/regime_outbox_review.py",
+    "result": "PASS"
+  },
+  {
+    "pass": 27,
+    "type": "python syntax compilation",
+    "path": "app/regime_outcome_receipt.py",
+    "result": "PASS"
+  },
+  {
+    "pass": 28,
+    "type": "python syntax compilation",
+    "path": "app/regime_payment_outbox.py",
+    "result": "PASS"
+  },
+  {
+    "pass": 29,
+    "type": "python syntax compilation",
+    "path": "app/regime_readiness_cli.py",
+    "result": "PASS"
+  },
+  {
+    "pass": 30,
+    "type": "python syntax compilation",
+    "path": "app/regime_reconciliation.py",
+    "result": "PASS"
+  }
+]

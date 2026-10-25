@@ -1,0 +1,959 @@
+{
+  "version": "0.3.0-r210",
+  "date": "2026-10-24",
+  "method": "Latest passing actual execution per exact testcase ID; original reports retained, repeated local ACE cases counted once. Not a new full-suite or coverage execution.",
+  "passed_distinct": 213,
+  "browser_cases": 4,
+  "current_failures": 0,
+  "current_errors": 0,
+  "current_skips": 0,
+  "reports": [
+    {
+      "report": "remote-rights-existing.xml",
+      "passed": 41,
+      "sha256": "31b3a243674aa79ce7f41f719ef3381dfdd759752800b7949850251010039a34"
+    },
+    {
+      "report": "remote-rights-direct.xml",
+      "passed": 25,
+      "sha256": "f39a9b5a44b18819cea7df429b7a5bbf04ae5f14cac5e13730d5aed6417b5a0f"
+    },
+    {
+      "report": "remote-rights-inventory.xml",
+      "passed": 17,
+      "sha256": "d0f38388cc273cc751bfb45a744a851600aa73a50e7737464bb8eb9b2125c1b2"
+    },
+    {
+      "report": "remote-rights-recovery-ui.xml",
+      "passed": 89,
+      "sha256": "b6752d077efc4d3c9bf0f8e34c524da29c98ebffb5d22d690dc4ea485555f595"
+    },
+    {
+      "report": "remote-rights-historical.xml",
+      "passed": 6,
+      "sha256": "19d6806068930ec7736d05901dd1357148a35f2604df5e564a54b0aaa536bbc3"
+    },
+    {
+      "report": "remote-rights-loopback.xml",
+      "passed": 3,
+      "sha256": "3b654eb8e559fbfccb7b0ae2a7ff4dbe5ecd4276121d98e0e180003a865cd029"
+    },
+    {
+      "report": "remote-rights-local-ace.xml",
+      "passed": 5,
+      "sha256": "1e1d402503f291686d8a47a72f40761bdaf4750ad258c7aa435b6a3da6b75733"
+    },
+    {
+      "report": "remote-rights-auth-positive.xml",
+      "passed": 2,
+      "sha256": "9b7673f531f56cc65f8085285756d41d99699d31fa079198f97450506eb97d4b"
+    },
+    {
+      "report": "remote-rights-prefix.xml",
+      "passed": 4,
+      "sha256": "295a1b57cc048884416b46373f9907beaacf0953435a6a4f65e4675295957042"
+    },
+    {
+      "report": "remote-rights-prefix-positive.xml",
+      "passed": 1,
+      "sha256": "a81f6f1be47d37690c6a1820ae451bea4f7f1c4a2e793c4e3877d12225f62e99"
+    },
+    {
+      "report": "remote-rights-security.xml",
+      "passed": 17,
+      "sha256": "23c2722eb71ab05d5a249c12e8918ec83d6379befbfc8f7bec46b7b44bb93abe"
+    },
+    {
+      "report": "remote-rights-input.xml",
+      "passed": 8,
+      "sha256": "18886419318d0212a0dc98e50418dce9d8f0c9efd89b5485de37a36bf0c65442"
+    }
+  ],
+  "repeated_cases": [
+    {
+      "id": "tests.test_r191_ace_http_e2e::test_cover_http_roundtrip[False-False]",
+      "prior_report": "remote-rights-existing.xml",
+      "latest_report": "remote-rights-local-ace.xml"
+    },
+    {
+      "id": "tests.test_r191_ace_http_e2e::test_cover_http_roundtrip[False-True]",
+      "prior_report": "remote-rights-existing.xml",
+      "latest_report": "remote-rights-local-ace.xml"
+    },
+    {
+      "id": "tests.test_r191_ace_http_e2e::test_cover_http_roundtrip[True-False]",
+      "prior_report": "remote-rights-existing.xml",
+      "latest_report": "remote-rights-local-ace.xml"
+    },
+    {
+      "id": "tests.test_r191_ace_http_e2e::test_cover_http_roundtrip[True-True]",
+      "prior_report": "remote-rights-existing.xml",
+      "latest_report": "remote-rights-local-ace.xml"
+    },
+    {
+      "id": "tests.test_r191_ace_http_e2e::test_health_rejects_html",
+      "prior_report": "remote-rights-existing.xml",
+      "latest_report": "remote-rights-local-ace.xml"
+    }
+  ],
+  "cases": [
+    {
+      "id": "tests.test_r191_ace_http_e2e::test_cover_http_roundtrip[False-False]",
+      "report": "remote-rights-local-ace.xml"
+    },
+    {
+      "id": "tests.test_r191_ace_http_e2e::test_cover_http_roundtrip[False-True]",
+      "report": "remote-rights-local-ace.xml"
+    },
+    {
+      "id": "tests.test_r191_ace_http_e2e::test_cover_http_roundtrip[True-False]",
+      "report": "remote-rights-local-ace.xml"
+    },
+    {
+      "id": "tests.test_r191_ace_http_e2e::test_cover_http_roundtrip[True-True]",
+      "report": "remote-rights-local-ace.xml"
+    },
+    {
+      "id": "tests.test_r191_ace_http_e2e::test_health_rejects_html",
+      "report": "remote-rights-local-ace.xml"
+    },
+    {
+      "id": "tests.test_r207_ai_gateway_reverse_proxy::test_gateway_only_allowed_paths",
+      "report": "remote-rights-existing.xml"
+    },
+    {
+      "id": "tests.test_r207_ai_gateway_reverse_proxy::test_proxy_files_keep_ace_private",
+      "report": "remote-rights-existing.xml"
+    },
+    {
+      "id": "tests.test_r207_ai_gateway_reverse_proxy::test_public_gateway_endpoint_allowlisted",
+      "report": "remote-rights-existing.xml"
+    },
+    {
+      "id": "tests.test_r207_gateway_adapter_coverage::test_backing_vocals_artifact_security",
+      "report": "remote-rights-existing.xml"
+    },
+    {
+      "id": "tests.test_r207_gateway_adapter_coverage::test_gateway_authorization_methods_size_and_audit",
+      "report": "remote-rights-existing.xml"
+    },
+    {
+      "id": "tests.test_r207_gateway_adapter_coverage::test_gateway_proxy_success_limits_and_errors",
+      "report": "remote-rights-existing.xml"
+    },
+    {
+      "id": "tests.test_r207_gateway_adapter_coverage::test_gateway_upstream_validation[file:///tmp/a-False]",
+      "report": "remote-rights-existing.xml"
+    },
+    {
+      "id": "tests.test_r207_gateway_adapter_coverage::test_gateway_upstream_validation[http://127.0.0.1:8001-True]",
+      "report": "remote-rights-existing.xml"
+    },
+    {
+      "id": "tests.test_r207_gateway_adapter_coverage::test_gateway_upstream_validation[http://192.168.1.2:8001-True]",
+      "report": "remote-rights-existing.xml"
+    },
+    {
+      "id": "tests.test_r207_gateway_adapter_coverage::test_gateway_upstream_validation[http://8.8.8.8:8001-False]",
+      "report": "remote-rights-existing.xml"
+    },
+    {
+      "id": "tests.test_r207_gateway_adapter_coverage::test_gateway_upstream_validation[http://example.org-False]",
+      "report": "remote-rights-existing.xml"
+    },
+    {
+      "id": "tests.test_r207_gateway_adapter_coverage::test_gateway_upstream_validation[http://localhost:8001/-True]",
+      "report": "remote-rights-existing.xml"
+    },
+    {
+      "id": "tests.test_r207_gateway_adapter_coverage::test_gateway_upstream_validation[http://user:password@127.0.0.1-False]",
+      "report": "remote-rights-existing.xml"
+    },
+    {
+      "id": "tests.test_r207_gateway_adapter_coverage::test_gateway_upstream_validation[https://example.org-True]",
+      "report": "remote-rights-existing.xml"
+    },
+    {
+      "id": "tests.test_r207_gateway_adapter_coverage::test_gateway_upstream_validation[https://example.org/api/admin-False]",
+      "report": "remote-rights-existing.xml"
+    },
+    {
+      "id": "tests.test_r207_gateway_adapter_coverage::test_gateway_upstream_validation[nonsense-False]",
+      "report": "remote-rights-existing.xml"
+    },
+    {
+      "id": "tests.test_r207_gateway_adapter_coverage::test_singer_separation_invalid_options[bad0]",
+      "report": "remote-rights-existing.xml"
+    },
+    {
+      "id": "tests.test_r207_gateway_adapter_coverage::test_singer_separation_invalid_options[bad1]",
+      "report": "remote-rights-existing.xml"
+    },
+    {
+      "id": "tests.test_r207_gateway_adapter_coverage::test_singer_separation_invalid_options[bad2]",
+      "report": "remote-rights-existing.xml"
+    },
+    {
+      "id": "tests.test_r207_gateway_adapter_coverage::test_singer_separation_invalid_options[bad3]",
+      "report": "remote-rights-existing.xml"
+    },
+    {
+      "id": "tests.test_r207_gateway_adapter_coverage::test_singer_separation_invalid_options[bad4]",
+      "report": "remote-rights-existing.xml"
+    },
+    {
+      "id": "tests.test_r207_gateway_adapter_coverage::test_singer_separation_invalid_options[bad5]",
+      "report": "remote-rights-existing.xml"
+    },
+    {
+      "id": "tests.test_r207_gateway_adapter_coverage::test_singer_separation_selected_and_all",
+      "report": "remote-rights-existing.xml"
+    },
+    {
+      "id": "tests.test_r207_gateway_adapter_coverage::test_unified_cli_main",
+      "report": "remote-rights-existing.xml"
+    },
+    {
+      "id": "tests.test_r207_gateway_adapter_coverage::test_unified_drumsep_and_missing_model",
+      "report": "remote-rights-existing.xml"
+    },
+    {
+      "id": "tests.test_r207_gateway_adapter_coverage::test_unified_manifest_validation",
+      "report": "remote-rights-existing.xml"
+    },
+    {
+      "id": "tests.test_r207_gateway_adapter_coverage::test_unified_subprocess_models",
+      "report": "remote-rights-existing.xml"
+    },
+    {
+      "id": "tests.test_r207_gateway_adapter_coverage::test_unified_transcripts_and_chords",
+      "report": "remote-rights-existing.xml"
+    },
+    {
+      "id": "tests.test_r207_native_remote_routes::test_each_remote_kind_never_uses_local_fallback[backing-vocals]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r207_native_remote_routes::test_each_remote_kind_never_uses_local_fallback[chords-ml]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r207_native_remote_routes::test_each_remote_kind_never_uses_local_fallback[demucs]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r207_native_remote_routes::test_each_remote_kind_never_uses_local_fallback[drumsep]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r207_native_remote_routes::test_each_remote_kind_never_uses_local_fallback[sam-audio]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r207_native_remote_routes::test_each_remote_kind_never_uses_local_fallback[singer-separation]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r207_native_remote_routes::test_each_remote_kind_never_uses_local_fallback[whisper]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r207_native_remote_routes::test_independent_native_worker_modes_and_private_tokens",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r207_native_remote_routes::test_remote_inference_wav_and_json_zip",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r207_native_remote_routes::test_remote_rejects_unsafe_zip_and_does_not_fallback",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r207_native_remote_routes::test_remote_requires_https_and_token",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r207_remote_native_transport::test_endpoint_rejects_insecure_or_embedded_credentials",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r207_remote_native_transport::test_network_failure_never_starts_local_worker",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r207_remote_native_transport::test_oversized_and_unidentified_output_rejected",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r207_remote_native_transport::test_rejects_arbitrary_worker_and_paths",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r207_remote_native_transport::test_remote_success_and_job_identity",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_native_remote_history_ui::test_history_rejects_unconfigured_and_unknown_models",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_native_remote_history_ui::test_native_history_ui_is_non_inferential",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_native_remote_history_ui::test_native_remote_history_uses_saved_credentials_without_exposing_them",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_native_remote_history_ui::test_remote_errors_do_not_start_inference",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_cooperative_cancellation::test_cancel_after_result_bytes_prevents_sink",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_cooperative_cancellation::test_cancelled_inference_never_contacts_server",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_cooperative_cancellation::test_cancelled_recovery_never_contacts_server",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_cooperative_cancellation::test_cancelled_result_cannot_call_metering_sink",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_bad_urls_rejected_before_network[http://example.org]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_bad_urls_rejected_before_network[https://example.org/#x]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_bad_urls_rejected_before_network[https://example.org/%61pi/ai-jobs]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_bad_urls_rejected_before_network[https://example.org/api/other]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_bad_urls_rejected_before_network[https://example.org:0]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_bad_urls_rejected_before_network[https://example.org:443:]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_bad_urls_rejected_before_network[https://example.org:bogus]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_bad_urls_rejected_before_network[https://example.org?token=1]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_bad_urls_rejected_before_network[https://example.org\\\\evil]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_bad_urls_rejected_before_network[https://user@example.org]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_decoder_rejects_invalid_json_values[{\"\":1}]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_decoder_rejects_invalid_json_values[{\"foo\\\\bar\":1}]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_decoder_rejects_invalid_json_values[{\"x\":-Infinity}]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_decoder_rejects_invalid_json_values[{\"x\":Infinity}]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_decoder_rejects_invalid_json_values[{\"x\":NaN}]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_invalid_options_preflight[1]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_invalid_options_preflight[abc]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_invalid_options_preflight[nan]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_invalid_options_preflight[options0]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_invalid_options_preflight[options4]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_invalid_options_preflight[options5]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_invalid_options_preflight[options6]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_invalid_options_preflight[options7]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_invalid_request_id_preflight[3]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_invalid_request_id_preflight[False]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_invalid_request_id_preflight[]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_invalid_request_id_preflight[key2]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_invalid_request_id_preflight[short]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_invalid_request_id_preflight[x\\nx\\nx\\nx\\nx\\nx\\nx\\nx\\nx\\nx\\nx\\nx\\nx\\nx\\nx\\nx\\n]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_invalid_result_headers[extra0]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_invalid_result_headers[extra1]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_invalid_result_headers[extra2]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_invalid_result_headers[extra3]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_invalid_result_headers[extra4]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_invalid_result_headers[extra5]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_invalid_timeouts_preflight[False--1]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_invalid_timeouts_preflight[False-0]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_invalid_timeouts_preflight[False-30]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_invalid_timeouts_preflight[False-False]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_invalid_timeouts_preflight[False-None]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_invalid_timeouts_preflight[False-inf]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_invalid_timeouts_preflight[False-nan]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_invalid_timeouts_preflight[True--1]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_invalid_timeouts_preflight[True-0]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_invalid_timeouts_preflight[True-30]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_invalid_timeouts_preflight[True-False]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_invalid_timeouts_preflight[True-None]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_invalid_timeouts_preflight[True-inf]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_invalid_timeouts_preflight[True-nan]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_invalid_tokens_preflight[1]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_invalid_tokens_preflight[None]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_invalid_tokens_preflight[\\xe9]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_invalid_tokens_preflight[]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_invalid_tokens_preflight[two words]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_invalid_tokens_preflight[x\\nZ]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_invalid_tokens_preflight[x\\rY]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_invalid_tokens_preflight[x\\tY]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r208_remote_transport_boundary_matrix::test_invalid_tokens_preflight[xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_license_dispatch_gate::test_every_remote_entry_rejects_before_source_or_transport[durable-bridge]",
+      "report": "remote-rights-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_license_dispatch_gate::test_every_remote_entry_rejects_before_source_or_transport[durable-executor]",
+      "report": "remote-rights-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_license_dispatch_gate::test_every_remote_entry_rejects_before_source_or_transport[native-arranger]",
+      "report": "remote-rights-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_license_dispatch_gate::test_every_remote_entry_rejects_before_source_or_transport[native-routing]",
+      "report": "remote-rights-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_license_dispatch_gate::test_every_remote_entry_rejects_before_source_or_transport[studio-direct]",
+      "report": "remote-rights-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_license_dispatch_gate::test_remote_commercial_denied_even_if_known_local_model",
+      "report": "remote-rights-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_license_dispatch_gate::test_remote_denied_before_transport",
+      "report": "remote-rights-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_license_dispatch_gate::test_remote_noncommercial_still_evaluates_model",
+      "report": "remote-rights-existing.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_rights_ui::test_settings_policy_is_not_connection_or_model_authorization[commercial]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_rights_ui::test_settings_policy_is_not_connection_or_model_authorization[nc]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_rights_ui::test_settings_policy_is_not_connection_or_model_authorization[unverifiable]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_rights_ui::test_shipped_native_dialog_explains_block_but_keeps_existing_work_controls[1280-en]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_rights_ui::test_shipped_native_dialog_explains_block_but_keeps_existing_work_controls[1280-it]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_rights_ui::test_shipped_native_dialog_explains_block_but_keeps_existing_work_controls[390-en]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_rights_ui::test_shipped_native_dialog_explains_block_but_keeps_existing_work_controls[390-it]",
+      "report": "remote-rights-recovery-ui.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_current_inventory_matches_review",
+      "report": "remote-rights-inventory.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_inventory_cannot_silently_approve_drift[category]",
+      "report": "remote-rights-inventory.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_inventory_cannot_silently_approve_drift[checker]",
+      "report": "remote-rights-inventory.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_inventory_cannot_silently_approve_drift[hash]",
+      "report": "remote-rights-inventory.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_inventory_cannot_silently_approve_drift[missing]",
+      "report": "remote-rights-inventory.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_inventory_cannot_silently_approve_drift[rationale]",
+      "report": "remote-rights-inventory.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_inventory_cannot_silently_approve_drift[reorder]",
+      "report": "remote-rights-inventory.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_inventory_cannot_silently_approve_drift[source]",
+      "report": "remote-rights-inventory.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-device/start?x=1]",
+      "report": "remote-rights-inventory.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-gateway/v1/generate]",
+      "report": "remote-rights-inventory.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-jobs/execute-audio/whisper]",
+      "report": "remote-rights-inventory.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_new_aliased_transports_require_review[from httpx import AsyncClient as hidden\\nhidden()]",
+      "report": "remote-rights-inventory.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_new_aliased_transports_require_review[from urllib.request import build_opener as hidden\\nx=hidden()\\nx.open(\"https://example.test\")]",
+      "report": "remote-rights-inventory.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_new_aliased_transports_require_review[from urllib.request import urlopen as hidden\\nhidden(\"https://example.test\")]",
+      "report": "remote-rights-inventory.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_new_aliased_transports_require_review[import aiohttp as hidden\\nhidden.ClientSession()]",
+      "report": "remote-rights-inventory.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_new_aliased_transports_require_review[import httpx as hidden\\nhidden.Client()]",
+      "report": "remote-rights-inventory.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_new_aliased_transports_require_review[import socket as hidden\\nhidden.create_connection((\"example.test\",443))]",
+      "report": "remote-rights-inventory.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_supported_device_authorization_still_uses_exact_post[/api/ai-device/poll]",
+      "report": "remote-rights-auth-positive.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_inventory::test_supported_device_authorization_still_uses_exact_post[/api/ai-device/start]",
+      "report": "remote-rights-auth-positive.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_client_historical_operations_stay_available_under_commercial_denial[cancel]",
+      "report": "remote-rights-historical.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_client_historical_operations_stay_available_under_commercial_denial[capabilities]",
+      "report": "remote-rights-historical.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_client_historical_operations_stay_available_under_commercial_denial[list]",
+      "report": "remote-rights-historical.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_client_historical_operations_stay_available_under_commercial_denial[recover]",
+      "report": "remote-rights-historical.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_client_historical_operations_stay_available_under_commercial_denial[resources]",
+      "report": "remote-rights-historical.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_client_historical_operations_stay_available_under_commercial_denial[status]",
+      "report": "remote-rights-historical.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_commercial_metadata_and_existing_task_polling_are_not_new_inference[GET-health]",
+      "report": "remote-rights-direct.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_commercial_metadata_and_existing_task_polling_are_not_new_inference[GET-v1/audio]",
+      "report": "remote-rights-direct.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_commercial_metadata_and_existing_task_polling_are_not_new_inference[GET-v1/models]",
+      "report": "remote-rights-direct.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_commercial_metadata_and_existing_task_polling_are_not_new_inference[POST-query_result]",
+      "report": "remote-rights-direct.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_configured_gateway_polling_still_works_without_new_inference",
+      "report": "remote-rights-prefix-positive.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_disabled_nc_policy_cannot_use_direct_transport[ace-request]",
+      "report": "remote-rights-direct.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_disabled_nc_policy_cannot_use_direct_transport[ace-run]",
+      "report": "remote-rights-direct.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_disabled_nc_policy_cannot_use_direct_transport[client]",
+      "report": "remote-rights-direct.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_disabled_nc_policy_cannot_use_direct_transport[gateway]",
+      "report": "remote-rights-direct.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_gateway_mutations_cannot_forward_commercial_work[release_task]",
+      "report": "remote-rights-direct.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_gateway_mutations_cannot_forward_commercial_work[v1/audio]",
+      "report": "remote-rights-direct.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_gateway_mutations_cannot_forward_commercial_work[v1/generate]",
+      "report": "remote-rights-direct.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_gateway_mutations_cannot_forward_commercial_work[v1/init]",
+      "report": "remote-rights-direct.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_gateway_mutations_cannot_forward_commercial_work[v1/models]",
+      "report": "remote-rights-direct.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_gateway_prefix_cannot_be_forged_as_polling_exemption[/api/ai-gatewayevil/query_result]",
+      "report": "remote-rights-prefix.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_gateway_prefix_cannot_be_forged_as_polling_exemption[/other/query_result]",
+      "report": "remote-rights-prefix.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_gateway_prefix_cannot_be_forged_as_polling_exemption[/release_task]",
+      "report": "remote-rights-prefix.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_gateway_prefix_cannot_be_forged_as_polling_exemption[/xxxxxxxxxxxxxx/query_result]",
+      "report": "remote-rights-prefix.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_loopback_or_tunnel_does_not_exempt_commercial_inference[http://127.0.0.1:8001]",
+      "report": "remote-rights-loopback.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_loopback_or_tunnel_does_not_exempt_commercial_inference[http://[::1]:8001]",
+      "report": "remote-rights-loopback.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_loopback_or_tunnel_does_not_exempt_commercial_inference[http://localhost:8001]",
+      "report": "remote-rights-loopback.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_malformed_model_selection_is_value_error_without_transport[123-options1]",
+      "report": "remote-rights-input.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_malformed_model_selection_is_value_error_without_transport[None-options0]",
+      "report": "remote-rights-input.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_malformed_model_selection_is_value_error_without_transport[audio-to-midi-transkun-options7]",
+      "report": "remote-rights-input.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_malformed_model_selection_is_value_error_without_transport[kind2-options2]",
+      "report": "remote-rights-input.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_malformed_model_selection_is_value_error_without_transport[vocal-synthesis-options4]",
+      "report": "remote-rights-input.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_malformed_model_selection_is_value_error_without_transport[vocal-synthesis-options6]",
+      "report": "remote-rights-input.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_malformed_model_selection_is_value_error_without_transport[whisper-invalid]",
+      "report": "remote-rights-input.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_malformed_model_selection_is_value_error_without_transport[whisper-options3]",
+      "report": "remote-rights-input.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_native_gateway_token_still_cannot_skip_accounted_endpoint",
+      "report": "remote-rights-direct.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_raw_client_commercial_denies_before_source_validation_or_network[arranger]",
+      "report": "remote-rights-direct.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_raw_client_commercial_denies_before_source_validation_or_network[audio-to-midi-basic-pitch]",
+      "report": "remote-rights-direct.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_raw_client_commercial_denies_before_source_validation_or_network[audio-to-midi-yourmt3]",
+      "report": "remote-rights-direct.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_raw_client_commercial_denies_before_source_validation_or_network[demucs]",
+      "report": "remote-rights-direct.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_raw_client_commercial_denies_before_source_validation_or_network[remix]",
+      "report": "remote-rights-direct.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_raw_client_commercial_denies_before_source_validation_or_network[vocal-harmony]",
+      "report": "remote-rights-direct.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_raw_client_commercial_denies_before_source_validation_or_network[whisper]",
+      "report": "remote-rights-direct.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_remote_ace_read_and_cancel_skip_inference_gate[/health-None]",
+      "report": "remote-rights-direct.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_remote_ace_read_and_cancel_skip_inference_gate[/mta/tasks/existing/control-{}]",
+      "report": "remote-rights-direct.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_remote_ace_read_and_cancel_skip_inference_gate[/query_result-{}]",
+      "report": "remote-rights-direct.xml"
+    },
+    {
+      "id": "tests.test_r210_remote_transport_rights::test_standalone_remote_worker_denies_before_missing_audio_or_dns",
+      "report": "remote-rights-direct.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_complete_source_bound_review_is_accepted",
+      "report": "remote-rights-security.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_current_scan_and_complete_review_ledger_agree",
+      "report": "remote-rights-security.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[blanket_approval]",
+      "report": "remote-rights-security.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[changed_finding]",
+      "report": "remote-rights-security.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[changed_source]",
+      "report": "remote-rights-security.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[deleted_source]",
+      "report": "remote-rights-security.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[duplicate_review]",
+      "report": "remote-rights-security.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[duplicate_scan]",
+      "report": "remote-rights-security.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[empty_reason]",
+      "report": "remote-rights-security.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[high]",
+      "report": "remote-rights-security.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[missing_file]",
+      "report": "remote-rights-security.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[missing_review]",
+      "report": "remote-rights-security.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[new_finding]",
+      "report": "remote-rights-security.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[new_source]",
+      "report": "remote-rights-security.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[scan_error]",
+      "report": "remote-rights-security.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[suppression]",
+      "report": "remote-rights-security.xml"
+    },
+    {
+      "id": "tests.test_r210_security_review_gate::test_review_cannot_silently_survive_source_or_scan_changes[wrong_totals]",
+      "report": "remote-rights-security.xml"
+    }
+  ],
+  "full_baseline_repeated": false,
+  "coverage_recollected": false,
+  "real_remote_inference_calls": 0,
+  "commercial_remote_inference_enabled": false,
+  "release_candidate": false,
+  "transition_enabled": false
+}

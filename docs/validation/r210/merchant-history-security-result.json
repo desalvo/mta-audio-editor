@@ -1,0 +1,12 @@
+{
+  "reviewed_findings": 168,
+  "source_files": 285,
+  "raw_severity": {
+    "HIGH": 0,
+    "MEDIUM": 21,
+    "LOW": 147
+  },
+  "scan_review_passed": true,
+  "release_candidate": false,
+  "transition_enabled": false
+}

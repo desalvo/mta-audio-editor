@@ -48,6 +48,11 @@ async def ai_gateway(path: str, request: Request):
     data = await request.body()
     if len(data) > MAX_BODY:
         raise HTTPException(413, 'AI request too large')
+    if request.method=='POST' and path!='query_result':
+        from .model_license_policy import authorize_remote_execution, LicenseDenied
+        try:authorize_remote_execution('ace-step',{})
+        except (LicenseDenied,ValueError,OSError) as exc:
+            raise HTTPException(403,'Remote inference is unavailable under the current model rights policy') from exc
     status = 502
     body = b''
     try:

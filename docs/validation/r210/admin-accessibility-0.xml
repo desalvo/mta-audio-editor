@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="4" time="60.647" timestamp="2026-10-25T00:38:00.244908+08:00" hostname="9723f7e4ae8a"><testcase classname="tests.test_r210_admin_accessibility" name="test_entire_administration_axe_keyboard_responsive[light-390-it-commercial]" time="15.327" /><testcase classname="tests.test_r210_admin_accessibility" name="test_entire_administration_axe_keyboard_responsive[light-1280-it-commercial]" time="14.605"><failure message="AssertionError: {'any': [{'id': 'color-contrast', 'data': {'fgColor': None, 'bgColor': None, 'contrastRatio': 0, 'fontSize': '9.8pt (13px)', ...}, 'relatedNodes': [], 'impact': 'serious', ...}], 'all': [], 'none': [], 'impact': 'serious', ...}&#10;assert False&#10; +  where False = all(&lt;generator object scan.&lt;locals&gt;.&lt;genexpr&gt; at 0x7f17d8edece0&gt;)">account = 2
+provider = ({'ORDER0001': {'id': 'ORDER0001', 'status': 'COMPLETED', 'purchase_units': [{'reference_id': '87ca800f54a3407f82ecba8...1/capture', {}, 'mta-capture-87ca800f54a3407f82ecba849ff998c9'), ('GET', '/v2/checkout/orders/ORDER0001', None, None)])
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f17fa726600&gt;
+nc_browser_config = {'executable_path': '/workspace/scratch/06e635791464/nc-browser-runtime/unpacked/chromium', 'headless': True, 'args': ...dbox', '--disable-dev-shm-usage', '--no-zygote', '--single-process', '--use-gl=angle', '--use-angle=swiftshader', ...]}
+regime = 'commercial', language = 'it', width = 1280, theme = 'light'
+
+    @pytest.mark.parametrize('regime',['commercial','nc'])
+    @pytest.mark.parametrize('language',['it','en'])
+    @pytest.mark.parametrize('width',[390,1280])
+    @pytest.mark.parametrize('theme',['light','dark'])
+    def test_entire_administration_axe_keyboard_responsive(account,provider,monkeypatch,nc_browser_config,regime,language,width,theme):
+        from playwright.sync_api import sync_playwright
+        supplied=os.environ.get('MTA_TEST_AXE_CORE')
+        if not supplied:pytest.skip('Supply test-only axe-core; missing prerequisite is not acceptance')
+        assert Path(supplied).is_file()
+        web=setup(account,monkeypatch,regime,language);calls=[];errors=[]
+        with sync_playwright() as pw:
+            browser=pw.chromium.launch(**nc_browser_config);page=browser.new_page(viewport={'width':width,'height':1000},color_scheme=theme,locale='it-IT' if language=='it' else 'en-GB')
+            page.on('pageerror',lambda e:errors.append(str(e)));page.route('**/*',serve(web,calls));page.goto('https://mta.test/settings');page.wait_for_load_state('networkidle');page.add_script_tag(path=supplied)
+            assert page.locator('html').get_attribute('lang')==language
+            for tab in TABS:
+                page.locator('[data-tab="'+tab+'"]').click();page.wait_for_load_state('networkidle')
+                page.evaluate("document.querySelectorAll('details').forEach(d=&gt;{if(d.getClientRects().length)d.open=true})")
+                assert page.locator('[data-tab="'+tab+'"]').get_attribute('aria-selected')=='true'
+                scan(page,f'{regime}-{language}-{width}-{theme}-{tab}')
+            # Tablist has exactly one Tab stop and keyboard changes the real page.
+            page.locator('[data-tab=legal]').focus();page.keyboard.press('Home');assert page.locator('[data-tab=web]').evaluate('e=&gt;e===document.activeElement')
+            page.keyboard.press('ArrowRight');assert page.locator('#storageTab').is_visible()
+            assert page.locator('[role=tab][tabindex="0"]').count()==1
+            # Inline optional plugin catalogue: no install/build/download is invoked.
+            page.locator('[data-tab=web]').click();page.locator('[data-optional-vst3] &gt; button').click();page.wait_for_load_state('networkidle')
+            scan(page,f'{regime}-{language}-{width}-{theme}-optional-plugins')
+            for name in ['ai-billing','ai-tokens']:
+                page.goto('https://mta.test/admin/'+name);page.wait_for_load_state('networkidle');page.add_script_tag(path=supplied);page.evaluate("document.querySelectorAll('details').forEach(d=&gt;d.open=true)")
+                scan(page,f'{regime}-{language}-{width}-{theme}-{name}')
+            # Persistent non-modal job monitor supports focus, keyboard close/return.
+            page.locator('#aj-launch').focus();page.keyboard.press('Enter');page.locator('#aj-panel').wait_for();page.wait_for_load_state('networkidle')
+            assert page.locator('#aj-close').evaluate('e=&gt;e===document.activeElement')
+&gt;           scan(page,f'{regime}-{language}-{width}-{theme}-job-monitor')
+
+tests/test_r210_admin_accessibility.py:108: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+page = &lt;Page url='https://mta.test/admin/ai-tokens'&gt;
+name = 'commercial-it-1280-light-job-monitor'
+
+    def scan(page,name):
+        result=page.evaluate("async()=&gt;axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21a','wcag21aa']},resultTypes:['violations','incomplete']})")
+        (ROOT.parent/('admin-debug-'+name+'.json')).write_text(json.dumps(result,indent=2))
+        assert result['violations']==[],[(x['id'],[n['target'] for n in x['nodes']]) for x in result['violations']]
+        contrast=[];empty=[]
+        for rule in result['incomplete']:
+            if rule['id']=='th-has-data-cells':
+                for node in rule['nodes']:
+                    table=page.locator(node['target'][0]);assert '&lt;td' not in node['html']
+                    assert table.locator('th').count()&gt;0
+                    empty.append({'target':node['target'],'review':'Header-only empty dataset; no data cells to associate. No header hidden or disabled.'})
+                continue
+            assert rule['id']=='color-contrast',rule['id']
+            for node in rule['nodes']:
+&gt;               assert all(x.get('data',{}).get('messageKey')=='elmPartiallyObscured' for x in node['any']),node
+E               AssertionError: {'any': [{'id': 'color-contrast', 'data': {'fgColor': None, 'bgColor': None, 'contrastRatio': 0, 'fontSize': '9.8pt (13px)', ...}, 'relatedNodes': [], 'impact': 'serious', ...}], 'all': [], 'none': [], 'impact': 'serious', ...}
+E               assert False
+E                +  where False = all(&lt;generator object scan.&lt;locals&gt;.&lt;genexpr&gt; at 0x7f17d8edece0&gt;)
+
+tests/test_r210_admin_accessibility.py:47: AssertionError</failure></testcase><testcase classname="tests.test_r210_admin_accessibility" name="test_entire_administration_axe_keyboard_responsive[dark-390-it-commercial]" time="14.111" /><testcase classname="tests.test_r210_admin_accessibility" name="test_entire_administration_axe_keyboard_responsive[dark-1280-it-commercial]" time="16.018"><failure message="AssertionError: {'any': [{'id': 'color-contrast', 'data': {'fgColor': None, 'bgColor': None, 'contrastRatio': 0, 'fontSize': '9.8pt (13px)', ...}, 'relatedNodes': [], 'impact': 'serious', ...}], 'all': [], 'none': [], 'impact': 'serious', ...}&#10;assert False&#10; +  where False = all(&lt;generator object scan.&lt;locals&gt;.&lt;genexpr&gt; at 0x7f17d994edc0&gt;)">account = 2
+provider = ({'ORDER0001': {'id': 'ORDER0001', 'status': 'COMPLETED', 'purchase_units': [{'reference_id': '9ada9ad7b34e4c83a917cd0...1/capture', {}, 'mta-capture-9ada9ad7b34e4c83a917cd014a0fd9c2'), ('GET', '/v2/checkout/orders/ORDER0001', None, None)])
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f17d8d0c470&gt;
+nc_browser_config = {'executable_path': '/workspace/scratch/06e635791464/nc-browser-runtime/unpacked/chromium', 'headless': True, 'args': ...dbox', '--disable-dev-shm-usage', '--no-zygote', '--single-process', '--use-gl=angle', '--use-angle=swiftshader', ...]}
+regime = 'commercial', language = 'it', width = 1280, theme = 'dark'
+
+    @pytest.mark.parametrize('regime',['commercial','nc'])
+    @pytest.mark.parametrize('language',['it','en'])
+    @pytest.mark.parametrize('width',[390,1280])
+    @pytest.mark.parametrize('theme',['light','dark'])
+    def test_entire_administration_axe_keyboard_responsive(account,provider,monkeypatch,nc_browser_config,regime,language,width,theme):
+        from playwright.sync_api import sync_playwright
+        supplied=os.environ.get('MTA_TEST_AXE_CORE')
+        if not supplied:pytest.skip('Supply test-only axe-core; missing prerequisite is not acceptance')
+        assert Path(supplied).is_file()
+        web=setup(account,monkeypatch,regime,language);calls=[];errors=[]
+        with sync_playwright() as pw:
+            browser=pw.chromium.launch(**nc_browser_config);page=browser.new_page(viewport={'width':width,'height':1000},color_scheme=theme,locale='it-IT' if language=='it' else 'en-GB')
+            page.on('pageerror',lambda e:errors.append(str(e)));page.route('**/*',serve(web,calls));page.goto('https://mta.test/settings');page.wait_for_load_state('networkidle');page.add_script_tag(path=supplied)
+            assert page.locator('html').get_attribute('lang')==language
+            for tab in TABS:
+                page.locator('[data-tab="'+tab+'"]').click();page.wait_for_load_state('networkidle')
+                page.evaluate("document.querySelectorAll('details').forEach(d=&gt;{if(d.getClientRects().length)d.open=true})")
+                assert page.locator('[data-tab="'+tab+'"]').get_attribute('aria-selected')=='true'
+                scan(page,f'{regime}-{language}-{width}-{theme}-{tab}')
+            # Tablist has exactly one Tab stop and keyboard changes the real page.
+            page.locator('[data-tab=legal]').focus();page.keyboard.press('Home');assert page.locator('[data-tab=web]').evaluate('e=&gt;e===document.activeElement')
+            page.keyboard.press('ArrowRight');assert page.locator('#storageTab').is_visible()
+            assert page.locator('[role=tab][tabindex="0"]').count()==1
+            # Inline optional plugin catalogue: no install/build/download is invoked.
+            page.locator('[data-tab=web]').click();page.locator('[data-optional-vst3] &gt; button').click();page.wait_for_load_state('networkidle')
+            scan(page,f'{regime}-{language}-{width}-{theme}-optional-plugins')
+            for name in ['ai-billing','ai-tokens']:
+                page.goto('https://mta.test/admin/'+name);page.wait_for_load_state('networkidle');page.add_script_tag(path=supplied);page.evaluate("document.querySelectorAll('details').forEach(d=&gt;d.open=true)")
+                scan(page,f'{regime}-{language}-{width}-{theme}-{name}')
+            # Persistent non-modal job monitor supports focus, keyboard close/return.
+            page.locator('#aj-launch').focus();page.keyboard.press('Enter');page.locator('#aj-panel').wait_for();page.wait_for_load_state('networkidle')
+            assert page.locator('#aj-close').evaluate('e=&gt;e===document.activeElement')
+&gt;           scan(page,f'{regime}-{language}-{width}-{theme}-job-monitor')
+
+tests/test_r210_admin_accessibility.py:108: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+page = &lt;Page url='https://mta.test/admin/ai-tokens'&gt;
+name = 'commercial-it-1280-dark-job-monitor'
+
+    def scan(page,name):
+        result=page.evaluate("async()=&gt;axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21a','wcag21aa']},resultTypes:['violations','incomplete']})")
+        (ROOT.parent/('admin-debug-'+name+'.json')).write_text(json.dumps(result,indent=2))
+        assert result['violations']==[],[(x['id'],[n['target'] for n in x['nodes']]) for x in result['violations']]
+        contrast=[];empty=[]
+        for rule in result['incomplete']:
+            if rule['id']=='th-has-data-cells':
+                for node in rule['nodes']:
+                    table=page.locator(node['target'][0]);assert '&lt;td' not in node['html']
+                    assert table.locator('th').count()&gt;0
+                    empty.append({'target':node['target'],'review':'Header-only empty dataset; no data cells to associate. No header hidden or disabled.'})
+                continue
+            assert rule['id']=='color-contrast',rule['id']
+            for node in rule['nodes']:
+&gt;               assert all(x.get('data',{}).get('messageKey')=='elmPartiallyObscured' for x in node['any']),node
+E               AssertionError: {'any': [{'id': 'color-contrast', 'data': {'fgColor': None, 'bgColor': None, 'contrastRatio': 0, 'fontSize': '9.8pt (13px)', ...}, 'relatedNodes': [], 'impact': 'serious', ...}], 'all': [], 'none': [], 'impact': 'serious', ...}
+E               assert False
+E                +  where False = all(&lt;generator object scan.&lt;locals&gt;.&lt;genexpr&gt; at 0x7f17d994edc0&gt;)
+
+tests/test_r210_admin_accessibility.py:47: AssertionError</failure></testcase></testsuite></testsuites>

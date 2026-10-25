@@ -1,0 +1,4430 @@
+{
+  "schema": "mta-paypal-item-movement-evidence-1",
+  "date": "2026-10-24",
+  "passed_distinct": 392,
+  "new_cases": 66,
+  "new_domain_cases": 54,
+  "new_chromium_cases": 12,
+  "chromium_cases": 30,
+  "current_failures": 0,
+  "current_errors": 0,
+  "current_skips": 0,
+  "method": "Latest actual execution per exact testcase ID, overlapping exact-money browser cases deduplicated; consolidated report is evidence, not another run.",
+  "reports": [
+    {
+      "path": "docs/validation/r210/paypal-item-movement-domain.xml",
+      "sha256": "b82f07679c62b64a5d32bbfa8ac028b2147dc761fa5334050957cffd3c06ba88",
+      "executed": 54,
+      "nonpassing": 0
+    },
+    {
+      "path": "docs/validation/r210/paypal-item-movement-regression.xml",
+      "sha256": "24c38e2ac1a9f9388ff0ffa5186e23294a1d5d4add5b3f347a5b9d376eba3ebb",
+      "executed": 266,
+      "nonpassing": 0
+    },
+    {
+      "path": "docs/validation/r210/paypal-item-movement-browser-0.xml",
+      "sha256": "30c8482961a3957a0cff4e8118e1c0a6892c6124ddfc65df2a81d814d5183574",
+      "executed": 3,
+      "nonpassing": 0
+    },
+    {
+      "path": "docs/validation/r210/paypal-item-movement-browser-1.xml",
+      "sha256": "42d6fea4eedbe1ec38a36a88b4c5451a796a3a7d985918e99ff510e32263486d",
+      "executed": 3,
+      "nonpassing": 0
+    },
+    {
+      "path": "docs/validation/r210/paypal-item-movement-browser-2.xml",
+      "sha256": "258815b6f8ce32fb441d0d0ef14a66bee88cbbd7057012e2b5da191ddb84a8cb",
+      "executed": 3,
+      "nonpassing": 0
+    },
+    {
+      "path": "docs/validation/r210/paypal-item-movement-browser-3.xml",
+      "sha256": "cad344bfc6f67bdcdfb8c2d03f6c6aed3e1e6b2ed7743f9dc335d9e097e7e0fa",
+      "executed": 3,
+      "nonpassing": 0
+    },
+    {
+      "path": "docs/validation/r210/paypal-item-movement-ui-regression-0.xml",
+      "sha256": "da751cc25942a56f94f2e245f7b02857a899c96122c8b5d40ba7ec02811c0bc2",
+      "executed": 6,
+      "nonpassing": 0
+    },
+    {
+      "path": "docs/validation/r210/paypal-item-movement-ui-regression-1.xml",
+      "sha256": "a71683d55c7d9df6c31036018cb61118ff85a7ecac22318bc695f7302ff22c32",
+      "executed": 6,
+      "nonpassing": 0
+    },
+    {
+      "path": "docs/validation/r210/paypal-item-movement-ui-regression-2.xml",
+      "sha256": "84838b01548451f585d422194712e4cc89b64d85c45d6210e5142c258b05031a",
+      "executed": 6,
+      "nonpassing": 0
+    },
+    {
+      "path": "docs/validation/r210/paypal-item-movement-ui-regression-3.xml",
+      "sha256": "ca515bfa37b97b3d1f2f8130eccadbcb65d7b094ad0bba5e716d137053d30abe",
+      "executed": 6,
+      "nonpassing": 0
+    },
+    {
+      "path": "docs/validation/r210/paypal-item-movement-exact-money-browser.xml",
+      "sha256": "baf56f30e2eafbf552e7c09a66ece1b56ba2a83d6664b33951a665e623fd4ba1",
+      "executed": 4,
+      "nonpassing": 0
+    },
+    {
+      "path": "docs/validation/r210/paypal-item-movement-gates.xml",
+      "sha256": "cdc5d93a06b10c98c2968d592526c045da2921c1ccaede181b4b6c2bb05d33bc",
+      "executed": 36,
+      "nonpassing": 0
+    }
+  ],
+  "cases": [
+    {
+      "id": "tests/test_r210_financial_admin_browser.py::test_admin_diagnostics_remain_readable_during_drain",
+      "report": "paypal-item-movement-ui-regression-3.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-ui-regression-3.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_financial_admin_browser.py::test_admin_finance_roles_csrf_and_request_shape",
+      "report": "paypal-item-movement-ui-regression-2.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-ui-regression-2.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_financial_admin_browser.py::test_browser_reads_actual_financial_api_and_never_enables_switch[en]",
+      "report": "paypal-item-movement-ui-regression-1.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-ui-regression-1.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_financial_admin_browser.py::test_browser_reads_actual_financial_api_and_never_enables_switch[it]",
+      "report": "paypal-item-movement-ui-regression-0.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-ui-regression-0.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_actual_stripe_two_step_full_or_partial_funds_and_durable_fence",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_bad_inputs_never_dispatch[amount_cents--1]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_bad_inputs_never_dispatch[amount_cents-0]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_bad_inputs_never_dispatch[amount_cents-1.2]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_bad_inputs_never_dispatch[amount_cents-1000000001]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_bad_inputs_never_dispatch[amount_cents-True]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_bad_inputs_never_dispatch[order_id-../x]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_bad_inputs_never_dispatch[provider-other]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_bad_inputs_never_dispatch[reason-bad\\nreason]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_bad_inputs_never_dispatch[reason-x]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_bad_inputs_never_dispatch[request_id-tiny]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_bad_inputs_never_dispatch[target-None]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_cancel_only_prepared_and_conflicting_idempotency_rejected",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_concurrent_preparations_reserve_once_and_concurrent_execution_sends_once",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_exact_revision_required_before_action[cancel--1]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_exact_revision_required_before_action[cancel-0]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_exact_revision_required_before_action[cancel-1.2]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_exact_revision_required_before_action[cancel-None]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_exact_revision_required_before_action[cancel-True]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_exact_revision_required_before_action[execute--1]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_exact_revision_required_before_action[execute-0]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_exact_revision_required_before_action[execute-1.2]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_exact_revision_required_before_action[execute-None]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_exact_revision_required_before_action[execute-True]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_exact_revision_required_before_action[verify--1]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_exact_revision_required_before_action[verify-0]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_exact_revision_required_before_action[verify-1.2]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_exact_revision_required_before_action[verify-None]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_exact_revision_required_before_action[verify-True]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_get_unavailable_after_post_does_not_repost_or_settle",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_invalid_preparation_cannot_reserve_or_send[drain]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_invalid_preparation_cannot_reserve_or_send[extra]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_invalid_preparation_cannot_reserve_or_send[nonadmin]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_invalid_preparation_cannot_reserve_or_send[overamount]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_invalid_preparation_cannot_reserve_or_send[unknownorder]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_invalid_preparation_cannot_reserve_or_send[wrongtarget]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_owner_history_privacy_and_admin_reason_not_disclosed",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_paypal_canonical_refund_moves_real_wallet_once[200]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_paypal_canonical_refund_moves_real_wallet_once[500]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_paypal_timeout_then_get_only_recovery",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_paypal_wrong_receipt_or_merchant_never_closes[amount]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_paypal_wrong_receipt_or_merchant_never_closes[capture]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_paypal_wrong_receipt_or_merchant_never_closes[currency]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_paypal_wrong_receipt_or_merchant_never_closes[custom_id]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_paypal_wrong_receipt_or_merchant_never_closes[merchant]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_paypal_wrong_receipt_or_merchant_never_closes[status]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_pending_and_failed_refunds_need_authenticated_terminal_outcome[canceled]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_pending_and_failed_refunds_need_authenticated_terminal_outcome[failed]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_pending_and_failed_refunds_need_authenticated_terminal_outcome[pending]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_pending_and_failed_refunds_need_authenticated_terminal_outcome[requires_action]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_post_error_stays_uncertain_and_get_failure_stays_pending",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_quote_balance_and_merchant_changes_prevent_dispatch",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_readiness_detects_inconsistent_refund_journal[event]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_readiness_detects_inconsistent_refund_journal[fence]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_readiness_detects_inconsistent_refund_journal[state]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_timeout_and_process_restart_recover_by_exact_get_without_repost",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_unrelated_or_malformed_provider_receipt_keeps_operation_open[amount]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_unrelated_or_malformed_provider_receipt_keeps_operation_open[currency]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_unrelated_or_malformed_provider_receipt_keeps_operation_open[id]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_unrelated_or_malformed_provider_receipt_keeps_operation_open[intent]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_unrelated_or_malformed_provider_receipt_keeps_operation_open[metadata]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_unrelated_or_malformed_provider_receipt_keeps_operation_open[object]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds.py::test_unrelated_or_malformed_provider_receipt_keeps_operation_open[status]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_recovery.py::test_corrupt_journal_cannot_dispatch_or_clear_drain[context]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_recovery.py::test_corrupt_journal_cannot_dispatch_or_clear_drain[receipt]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_recovery.py::test_corrupt_journal_cannot_dispatch_or_clear_drain[revision]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_recovery.py::test_corrupt_journal_cannot_dispatch_or_clear_drain[schema]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_recovery.py::test_external_balance_change_invalidates_prepared_quote",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_recovery.py::test_multicapture_history_remaining_capture_refund",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_recovery.py::test_operator_refund_actually_clears_surplus_repayment_liability",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_recovery.py::test_original_payment_drift_is_rejected_before_provider_read_or_write[amount_cents-600]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_recovery.py::test_original_payment_drift_is_rejected_before_provider_read_or_write[session_id-cs_other]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_recovery.py::test_original_payment_drift_is_rejected_before_provider_read_or_write[user_id-1]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_recovery.py::test_paypal_subscription_and_repayment_refunds_preserve_exact_receivable[subscription]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_recovery.py::test_paypal_subscription_and_repayment_refunds_preserve_exact_receivable[subscription_reversal]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_recovery.py::test_pending_paypal_needs_completed_receipt_and_canonical_capture",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_recovery.py::test_real_child_exit_after_committed_uncertainty_is_recovered_without_reexecution",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_recovery.py::test_reason_bound_includes_whitespace_and_rejects_before_provider_io",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_recovery.py::test_refund_identity_audit_and_deletion_require_retired_owner_authorization",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_recovery.py::test_role_revoked_during_readback_prevents_dispatch",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_operator_refunds_recovery.py::test_wallet_commit_failure_keeps_refund_pending_then_reconciles_once",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_concurrent_cross_provider_new_ids_admit_only_one",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_failed_provider_lookup_keeps_pending_and_never_recreates[404]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_failed_provider_lookup_keeps_pending_and_never_recreates[timeout]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_fresh_ids_and_other_provider_do_not_escape_pending[paypal]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_fresh_ids_and_other_provider_do_not_escape_pending[stripe]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_legacy_resume_url_rejected[https://checkout.stripe.com/\\r\\nBad]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_legacy_resume_url_rejected[https://checkout.stripe.com:444/]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_legacy_resume_url_rejected[https://checkout.stripe.com:bad/]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_legacy_resume_url_rejected[https://checkout.stripe.com@evil.test/]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_legacy_resume_url_rejected[https://checkout.stripe.com\\\\@evil.test/]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_legacy_resume_url_rejected[https://evil.test/pay]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_legacy_resume_url_rejected[https://user:pw@checkout.stripe.com/]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_legacy_resume_url_rejected[javascript:alert(1)]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_new_checkout_response_uses_same_strict_redirect_boundary[control-paypal]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_new_checkout_response_uses_same_strict_redirect_boundary[control-stripe]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_new_checkout_response_uses_same_strict_redirect_boundary[credentials-paypal]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_new_checkout_response_uses_same_strict_redirect_boundary[credentials-stripe]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_new_checkout_response_uses_same_strict_redirect_boundary[port-paypal]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_new_checkout_response_uses_same_strict_redirect_boundary[port-stripe]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_owner_get_reconciliation_closes_terminal_and_releases_guard",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_owner_paid_and_refund_readback_is_net_and_idempotent",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_owner_probe_rejects_midflight_identity_change[credentials]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_owner_probe_rejects_midflight_identity_change[owner]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_paypal_approved_verify_never_captures_and_preserves_hold",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_private_paginated_history_no_provider_or_credentials",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_subscription_same_period_guard_and_readonly_nc_history",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_unknown_creation_blocks_new_purchase_and_owner_probe",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_valid_provider_redirect_is_stored_resumable_without_redispatch[paypal]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_valid_provider_redirect_is_stored_resumable_without_redispatch[stripe]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_owner_payments.py::test_wrong_owner_refused_before_any_provider_io",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_changed_dispute_amount_preserves_old_hold_and_durable_private_review",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_combined_historical_refunds_and_dispute_never_publish_gross_or_double_debit",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_complete_two_page_readback_applies_each_dispute_once",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_discovered_final_outcomes_and_old_webhooks_cannot_reopen[CANCELED_BY_BUYER-False]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_discovered_final_outcomes_and_old_webhooks_cannot_reopen[CANCELED_BY_BUYER-True]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_discovered_final_outcomes_and_old_webhooks_cannot_reopen[RESOLVED_BUYER_FAVOUR-False]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_discovered_final_outcomes_and_old_webhooks_cannot_reopen[RESOLVED_BUYER_FAVOUR-True]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_discovered_final_outcomes_and_old_webhooks_cannot_reopen[RESOLVED_SELLER_FAVOUR-False]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_discovered_final_outcomes_and_old_webhooks_cannot_reopen[RESOLVED_SELLER_FAVOUR-True]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_discovered_repayment_dispute_reopens_exact_debt_and_release_restores_allocation",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_discovery_funds_only_net_and_replays_idempotently[False-False]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_discovery_funds_only_net_and_replays_idempotently[False-True]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_discovery_funds_only_net_and_replays_idempotently[True-False]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_discovery_funds_only_net_and_replays_idempotently[True-True]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_gap_recovery_is_atomic_and_later_gap_never_reopens_an_immutable_event",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_observed_dispute_during_unstable_scan_cannot_disappear_on_later_empty_scan",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_opposing_final_history_is_pending_and_never_releases_permanent_loss[False]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_opposing_final_history_is_pending_and_never_releases_permanent_loss[True]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_original_context_drift_after_remote_discovery_never_settles[amount]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_original_context_drift_after_remote_discovery_never_settles[epoch]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_original_context_drift_after_remote_discovery_never_settles[kind]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_original_context_drift_after_remote_discovery_never_settles[merchant]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_original_context_drift_after_remote_discovery_never_settles[owner]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_original_context_drift_after_remote_discovery_never_settles[provider]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[backslash]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[control]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[credentials]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[duplicate_link]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[duplicate_query]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[duplicate_row]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[empty_continuation]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[environment]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[extra_query]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[filter]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[fragment]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[host]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[method]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[no_links_list]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[object_bound]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[page]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[page_bound]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[path]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[port]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[request_bound]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[size]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_pagination_failures_do_not_follow_untrusted_links_or_grant_credit[token]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_partial_full_discovery_cannot_clear_an_existing_unknown_gap_or_enable_capture[False]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_partial_full_discovery_cannot_clear_an_existing_unknown_gap_or_enable_capture[True]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_payouts_stay_pending_private_and_can_resolve_with_later_exact_outcome[False-RESOLVED_WITH_OTHER]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_payouts_stay_pending_private_and_can_resolve_with_later_exact_outcome[False-RESOLVED_WITH_PAYOUT]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_payouts_stay_pending_private_and_can_resolve_with_later_exact_outcome[False-UNKNOWN]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_payouts_stay_pending_private_and_can_resolve_with_later_exact_outcome[True-RESOLVED_WITH_OTHER]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_payouts_stay_pending_private_and_can_resolve_with_later_exact_outcome[True-RESOLVED_WITH_PAYOUT]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_payouts_stay_pending_private_and_can_resolve_with_later_exact_outcome[True-UNKNOWN]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[bad_time]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[collection_changed]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[currency]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[detail_changed]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[duplicate_capture]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[empty_transactions]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[foreign_capture]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[gross_mismatch]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[http_error]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[incomplete_membership]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[missing_gross]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[missing_items]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[missing_known]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[naive_time]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[negative]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[non_list]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[order_changed]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[partial_multi]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[single_gross_mismatch]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[summary_amount]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[summary_status]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[summary_time]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history.py::test_unverifiable_history_never_funds_and_retains_durable_gap[wrong_detail]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history_browser.py::test_admin_actual_history_reconciliation_feedback_and_held_money[1280-en]",
+      "report": "paypal-item-movement-ui-regression-3.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-ui-regression-3.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history_browser.py::test_admin_actual_history_reconciliation_feedback_and_held_money[1280-it]",
+      "report": "paypal-item-movement-ui-regression-2.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-ui-regression-2.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history_browser.py::test_admin_actual_history_reconciliation_feedback_and_held_money[390-en]",
+      "report": "paypal-item-movement-ui-regression-1.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-ui-regression-1.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history_browser.py::test_admin_actual_history_reconciliation_feedback_and_held_money[390-it]",
+      "report": "paypal-item-movement-ui-regression-0.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-ui-regression-0.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history_browser.py::test_owner_full_page_discovers_holds_then_resolves_without_webhook_or_collection[/account-1280-en]",
+      "report": "paypal-item-movement-ui-regression-3.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-ui-regression-3.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history_browser.py::test_owner_full_page_discovers_holds_then_resolves_without_webhook_or_collection[/account-1280-it]",
+      "report": "paypal-item-movement-ui-regression-2.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-ui-regression-2.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history_browser.py::test_owner_full_page_discovers_holds_then_resolves_without_webhook_or_collection[/account-390-en]",
+      "report": "paypal-item-movement-ui-regression-1.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-ui-regression-1.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history_browser.py::test_owner_full_page_discovers_holds_then_resolves_without_webhook_or_collection[/account-390-it]",
+      "report": "paypal-item-movement-ui-regression-0.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-ui-regression-0.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history_browser.py::test_owner_full_page_discovers_holds_then_resolves_without_webhook_or_collection[/account/credits-1280-en]",
+      "report": "paypal-item-movement-ui-regression-3.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-ui-regression-3.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history_browser.py::test_owner_full_page_discovers_holds_then_resolves_without_webhook_or_collection[/account/credits-1280-it]",
+      "report": "paypal-item-movement-ui-regression-2.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-ui-regression-2.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history_browser.py::test_owner_full_page_discovers_holds_then_resolves_without_webhook_or_collection[/account/credits-390-en]",
+      "report": "paypal-item-movement-ui-regression-1.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-ui-regression-1.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history_browser.py::test_owner_full_page_discovers_holds_then_resolves_without_webhook_or_collection[/account/credits-390-it]",
+      "report": "paypal-item-movement-ui-regression-0.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-ui-regression-0.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history_browser.py::test_owner_gap_error_refresh_and_actual_recovery[1280-en]",
+      "report": "paypal-item-movement-ui-regression-3.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-ui-regression-3.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history_browser.py::test_owner_gap_error_refresh_and_actual_recovery[1280-it]",
+      "report": "paypal-item-movement-ui-regression-2.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-ui-regression-2.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history_browser.py::test_owner_gap_error_refresh_and_actual_recovery[390-en]",
+      "report": "paypal-item-movement-ui-regression-1.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-ui-regression-1.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_dispute_history_browser.py::test_owner_gap_error_refresh_and_actual_recovery[390-it]",
+      "report": "paypal-item-movement-ui-regression-0.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-ui-regression-0.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_failure_after_funding_rolls_back_history_and_wallet",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_incomplete_or_changed_history_cannot_grant_gross_credit[amount]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_incomplete_or_changed_history_cannot_grant_gross_credit[capture]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_incomplete_or_changed_history_cannot_grant_gross_credit[config_changed]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_incomplete_or_changed_history_cannot_grant_gross_credit[cumulative]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_incomplete_or_changed_history_cannot_grant_gross_credit[currency]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_incomplete_or_changed_history_cannot_grant_gross_credit[duplicate]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_incomplete_or_changed_history_cannot_grant_gross_credit[identity]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_incomplete_or_changed_history_cannot_grant_gross_credit[local_changed]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_incomplete_or_changed_history_cannot_grant_gross_credit[missing]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_incomplete_or_changed_history_cannot_grant_gross_credit[order_changed]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_incomplete_or_changed_history_cannot_grant_gross_credit[pending]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_initial_refunded_or_previously_paid_capture_reconciles_exact_net[False]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_initial_refunded_or_previously_paid_capture_reconciles_exact_net[True]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_money_is_an_exact_eur_decimal_string[ 1]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_money_is_an_exact_eur_decimal_string[-1]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_money_is_an_exact_eur_decimal_string[1.001]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_money_is_an_exact_eur_decimal_string[1.01]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_money_is_an_exact_eur_decimal_string[1.]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_money_is_an_exact_eur_decimal_string[1]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_money_is_an_exact_eur_decimal_string[1e2]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_money_is_an_exact_eur_decimal_string[NaN]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_money_is_an_exact_eur_decimal_string[True]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_history_reconciliation.py::test_refunded_subscription_creates_exact_receivable",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movement_browser.py::test_actual_owner_page_exact_partial_multicapture_then_supported_release[/account-1280-en]",
+      "report": "paypal-item-movement-browser-3.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-browser-3.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movement_browser.py::test_actual_owner_page_exact_partial_multicapture_then_supported_release[/account-1280-it]",
+      "report": "paypal-item-movement-browser-2.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-browser-2.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movement_browser.py::test_actual_owner_page_exact_partial_multicapture_then_supported_release[/account-390-en]",
+      "report": "paypal-item-movement-browser-1.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-browser-1.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movement_browser.py::test_actual_owner_page_exact_partial_multicapture_then_supported_release[/account-390-it]",
+      "report": "paypal-item-movement-browser-0.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-browser-0.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movement_browser.py::test_actual_owner_page_exact_partial_multicapture_then_supported_release[/account/credits-1280-en]",
+      "report": "paypal-item-movement-browser-3.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-browser-3.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movement_browser.py::test_actual_owner_page_exact_partial_multicapture_then_supported_release[/account/credits-1280-it]",
+      "report": "paypal-item-movement-browser-2.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-browser-2.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movement_browser.py::test_actual_owner_page_exact_partial_multicapture_then_supported_release[/account/credits-390-en]",
+      "report": "paypal-item-movement-browser-1.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-browser-1.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movement_browser.py::test_actual_owner_page_exact_partial_multicapture_then_supported_release[/account/credits-390-it]",
+      "report": "paypal-item-movement-browser-0.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-browser-0.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movement_browser.py::test_admin_canonical_movement_observations_have_no_settlement_action[1280-en]",
+      "report": "paypal-item-movement-exact-money-browser.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-browser-3.xml",
+          "status": "passed"
+        },
+        {
+          "report": "paypal-item-movement-exact-money-browser.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movement_browser.py::test_admin_canonical_movement_observations_have_no_settlement_action[1280-it]",
+      "report": "paypal-item-movement-exact-money-browser.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-browser-2.xml",
+          "status": "passed"
+        },
+        {
+          "report": "paypal-item-movement-exact-money-browser.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movement_browser.py::test_admin_canonical_movement_observations_have_no_settlement_action[390-en]",
+      "report": "paypal-item-movement-exact-money-browser.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-browser-1.xml",
+          "status": "passed"
+        },
+        {
+          "report": "paypal-item-movement-exact-money-browser.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movement_browser.py::test_admin_canonical_movement_observations_have_no_settlement_action[390-it]",
+      "report": "paypal-item-movement-exact-money-browser.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-browser-0.xml",
+          "status": "passed"
+        },
+        {
+          "report": "paypal-item-movement-exact-money-browser.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_admin_only_safe_movement_dto_and_corrupt_observation_fail_closed",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[BUYER-both]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[BUYER-fund_movements]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[BUYER-money_movements]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[BUYER-none]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[PAYMENT_PROCESSOR-both]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[PAYMENT_PROCESSOR-fund_movements]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[PAYMENT_PROCESSOR-money_movements]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[PAYMENT_PROCESSOR-none]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[SELLER-both]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[SELLER-fund_movements]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[SELLER-money_movements]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_canonical_movement_review_never_releases_payout_or_charges_fee_to_customer[SELLER-none]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_exact_partial_multicapture_first_funding_release_loss_and_replay[RESOLVED_BUYER_FAVOUR-False]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_exact_partial_multicapture_first_funding_release_loss_and_replay[RESOLVED_BUYER_FAVOUR-True]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_exact_partial_multicapture_first_funding_release_loss_and_replay[RESOLVED_SELLER_FAVOUR-False]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_exact_partial_multicapture_first_funding_release_loss_and_replay[RESOLVED_SELLER_FAVOUR-True]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_false_valued_malformed_movement_field_cannot_authorize_a_seller_release[0]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_false_valued_malformed_movement_field_cannot_authorize_a_seller_release[False]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_false_valued_malformed_movement_field_cannot_authorize_a_seller_release[None]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_false_valued_malformed_movement_field_cannot_authorize_a_seller_release[]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_false_valued_malformed_movement_field_cannot_authorize_a_seller_release[value0]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[capture_overflow]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[control_id]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[currency]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[duplicate_cross_capture]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[duplicate_id]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[empty_items]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[excess_items]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[global_mismatch]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[long_id]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[malformed_item]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[missing_id]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[missing_items]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[missing_money]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[negative]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[numeric_quantity]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[wrong_type]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[zero]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_item_ambiguities_preserve_pending_gap_and_no_gross_credit[zero_quantity]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_malformed_movement_collection_requires_durable_history_review[invalid_money]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_malformed_movement_collection_requires_durable_history_review[non_list]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_malformed_movement_collection_requires_durable_history_review[non_object]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_malformed_movement_collection_requires_durable_history_review[over_bound]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_malformed_movement_collection_requires_durable_history_review[wrong_currency]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_optional_or_unproven_movement_fields_remain_observations_not_payment_proof[asset]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_optional_or_unproven_movement_fields_remain_observations_not_payment_proof[bad_time]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_optional_or_unproven_movement_fields_remain_observations_not_payment_proof[missing_amount]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_optional_or_unproven_movement_fields_remain_observations_not_payment_proof[missing_direction]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_optional_or_unproven_movement_fields_remain_observations_not_payment_proof[missing_party]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_optional_or_unproven_movement_fields_remain_observations_not_payment_proof[missing_time]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_optional_or_unproven_movement_fields_remain_observations_not_payment_proof[unknown_reason]",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_partial_multicapture_original_subscription_risk_does_not_mint_credit",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_item_movements.py::test_private_movement_report_bounded_and_deduplicated_across_two_captures",
+      "report": "paypal-item-movement-domain.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-domain.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_reconciliation_e2e.py::test_ambiguous_paypal_payout_keeps_hold_and_pending_readiness",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_reconciliation_e2e.py::test_canonical_refund_cannot_be_attributed_to_other_capture",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_reconciliation_e2e.py::test_capture_reversal_and_refund_never_double_debit",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_reconciliation_e2e.py::test_dispute_readback_holds_then_releases_and_rejects_stale_updates",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_reconciliation_e2e.py::test_failed_refund_replay_rolls_back_capture_and_wallet",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_reconciliation_e2e.py::test_multiple_capture_refund_before_fulfillment_replays_atomically",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_reconciliation_e2e.py::test_refund_cannot_cross_provider_environment",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_reconciliation_e2e.py::test_reversal_before_capture_is_replayed_in_capture_transaction",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_reconciliation_e2e.py::test_subscription_refund_records_exact_receivable_without_wallet_credit",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_new_provisional_result_waits_for_matching_final_evidence[held-permanent-credits]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_new_provisional_result_waits_for_matching_final_evidence[held-permanent-repayment]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_new_provisional_result_waits_for_matching_final_evidence[held-permanent-subscription]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_new_provisional_result_waits_for_matching_final_evidence[held-released-credits]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_new_provisional_result_waits_for_matching_final_evidence[held-released-repayment]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_new_provisional_result_waits_for_matching_final_evidence[held-released-subscription]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_new_provisional_result_waits_for_matching_final_evidence[uncertain-permanent-credits]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_new_provisional_result_waits_for_matching_final_evidence[uncertain-permanent-repayment]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_new_provisional_result_waits_for_matching_final_evidence[uncertain-permanent-subscription]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_new_provisional_result_waits_for_matching_final_evidence[uncertain-released-credits]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_new_provisional_result_waits_for_matching_final_evidence[uncertain-released-repayment]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_new_provisional_result_waits_for_matching_final_evidence[uncertain-released-subscription]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_older_provisional_evidence_cannot_reopen_terminal_result[permanent-credits]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_older_provisional_evidence_cannot_reopen_terminal_result[permanent-repayment]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_older_provisional_evidence_cannot_reopen_terminal_result[permanent-subscription]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_older_provisional_evidence_cannot_reopen_terminal_result[released-credits]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_older_provisional_evidence_cannot_reopen_terminal_result[released-repayment]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_older_provisional_evidence_cannot_reopen_terminal_result[released-subscription]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_opposite_final_outcome_stays_pending_after_later_same_final_confirmation[permanent-credits]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_opposite_final_outcome_stays_pending_after_later_same_final_confirmation[permanent-repayment]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_opposite_final_outcome_stays_pending_after_later_same_final_confirmation[permanent-subscription]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_opposite_final_outcome_stays_pending_after_later_same_final_confirmation[released-credits]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_opposite_final_outcome_stays_pending_after_later_same_final_confirmation[released-repayment]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_paypal_terminal_integrity.py::test_opposite_final_outcome_stays_pending_after_later_same_final_confirmation[released-subscription]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_remote_transport_inventory.py::test_current_inventory_matches_review",
+      "report": "paypal-item-movement-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_remote_transport_inventory.py::test_inventory_cannot_silently_approve_drift[category]",
+      "report": "paypal-item-movement-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_remote_transport_inventory.py::test_inventory_cannot_silently_approve_drift[checker]",
+      "report": "paypal-item-movement-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_remote_transport_inventory.py::test_inventory_cannot_silently_approve_drift[hash]",
+      "report": "paypal-item-movement-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_remote_transport_inventory.py::test_inventory_cannot_silently_approve_drift[missing]",
+      "report": "paypal-item-movement-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_remote_transport_inventory.py::test_inventory_cannot_silently_approve_drift[rationale]",
+      "report": "paypal-item-movement-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_remote_transport_inventory.py::test_inventory_cannot_silently_approve_drift[reorder]",
+      "report": "paypal-item-movement-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_remote_transport_inventory.py::test_inventory_cannot_silently_approve_drift[source]",
+      "report": "paypal-item-movement-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_remote_transport_inventory.py::test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-device/start?x=1]",
+      "report": "paypal-item-movement-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_remote_transport_inventory.py::test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-gateway/v1/generate]",
+      "report": "paypal-item-movement-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_remote_transport_inventory.py::test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-jobs/execute-audio/whisper]",
+      "report": "paypal-item-movement-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_remote_transport_inventory.py::test_new_aliased_transports_require_review[from httpx import AsyncClient as hidden\\nhidden()]",
+      "report": "paypal-item-movement-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_remote_transport_inventory.py::test_new_aliased_transports_require_review[from urllib.request import build_opener as hidden\\nx=hidden()\\nx.open(\"https://example.test\")]",
+      "report": "paypal-item-movement-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_remote_transport_inventory.py::test_new_aliased_transports_require_review[from urllib.request import urlopen as hidden\\nhidden(\"https://example.test\")]",
+      "report": "paypal-item-movement-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_remote_transport_inventory.py::test_new_aliased_transports_require_review[import aiohttp as hidden\\nhidden.ClientSession()]",
+      "report": "paypal-item-movement-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_remote_transport_inventory.py::test_new_aliased_transports_require_review[import httpx as hidden\\nhidden.Client()]",
+      "report": "paypal-item-movement-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_remote_transport_inventory.py::test_new_aliased_transports_require_review[import socket as hidden\\nhidden.create_connection((\"example.test\",443))]",
+      "report": "paypal-item-movement-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_remote_transport_inventory.py::test_supported_device_authorization_still_uses_exact_post[/api/ai-device/poll]",
+      "report": "paypal-item-movement-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_remote_transport_inventory.py::test_supported_device_authorization_still_uses_exact_post[/api/ai-device/start]",
+      "report": "paypal-item-movement-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_security_review_gate.py::test_complete_source_bound_review_is_accepted",
+      "report": "paypal-item-movement-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_security_review_gate.py::test_current_scan_and_complete_review_ledger_agree",
+      "report": "paypal-item-movement-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_security_review_gate.py::test_review_cannot_silently_survive_source_or_scan_changes[blanket_approval]",
+      "report": "paypal-item-movement-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_security_review_gate.py::test_review_cannot_silently_survive_source_or_scan_changes[changed_finding]",
+      "report": "paypal-item-movement-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_security_review_gate.py::test_review_cannot_silently_survive_source_or_scan_changes[changed_source]",
+      "report": "paypal-item-movement-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_security_review_gate.py::test_review_cannot_silently_survive_source_or_scan_changes[deleted_source]",
+      "report": "paypal-item-movement-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_security_review_gate.py::test_review_cannot_silently_survive_source_or_scan_changes[duplicate_review]",
+      "report": "paypal-item-movement-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_security_review_gate.py::test_review_cannot_silently_survive_source_or_scan_changes[duplicate_scan]",
+      "report": "paypal-item-movement-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_security_review_gate.py::test_review_cannot_silently_survive_source_or_scan_changes[empty_reason]",
+      "report": "paypal-item-movement-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_security_review_gate.py::test_review_cannot_silently_survive_source_or_scan_changes[high]",
+      "report": "paypal-item-movement-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_security_review_gate.py::test_review_cannot_silently_survive_source_or_scan_changes[missing_file]",
+      "report": "paypal-item-movement-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_security_review_gate.py::test_review_cannot_silently_survive_source_or_scan_changes[missing_review]",
+      "report": "paypal-item-movement-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_security_review_gate.py::test_review_cannot_silently_survive_source_or_scan_changes[new_finding]",
+      "report": "paypal-item-movement-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_security_review_gate.py::test_review_cannot_silently_survive_source_or_scan_changes[new_source]",
+      "report": "paypal-item-movement-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_security_review_gate.py::test_review_cannot_silently_survive_source_or_scan_changes[scan_error]",
+      "report": "paypal-item-movement-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_security_review_gate.py::test_review_cannot_silently_survive_source_or_scan_changes[suppression]",
+      "report": "paypal-item-movement-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_security_review_gate.py::test_review_cannot_silently_survive_source_or_scan_changes[wrong_totals]",
+      "report": "paypal-item-movement-gates.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-gates.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_service_regime_admin_panel.py::test_admin_refresh_includes_regime",
+      "report": "paypal-item-movement-ui-regression-2.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-ui-regression-2.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_service_regime_admin_panel.py::test_admin_template_embeds_panel",
+      "report": "paypal-item-movement-ui-regression-0.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-ui-regression-0.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_service_regime_admin_panel.py::test_panel_bilingual_and_recovery_checks",
+      "report": "paypal-item-movement-ui-regression-3.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-ui-regression-3.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_service_regime_admin_panel.py::test_panel_uses_admin_read_only_endpoints_and_no_switch",
+      "report": "paypal-item-movement-ui-regression-1.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-ui-regression-1.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_subscription_repayment_e2e.py::test_allocations_are_immutable_and_missing_position_blocks_report",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_subscription_repayment_e2e.py::test_already_captured_obsolete_quote_is_retained_as_refund_due",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_subscription_repayment_e2e.py::test_authenticated_refunded_initial_repayment_reopens_original_debt",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_subscription_repayment_e2e.py::test_authorized_account_erasure_preserves_other_owner_financial_records[erase]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_subscription_repayment_e2e.py::test_authorized_account_erasure_preserves_other_owner_financial_records[privacy_purge]",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_subscription_repayment_e2e.py::test_cent_rounding_surplus_is_separate_and_refunded_first",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_subscription_repayment_e2e.py::test_concurrent_checkout_only_one_provider_order_and_pending_target",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_subscription_repayment_e2e.py::test_concurrent_fulfillment_delivers_one_allocation",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_subscription_repayment_e2e.py::test_dispute_release_after_second_repayment_creates_refund_liability",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_subscription_repayment_e2e.py::test_erasure_authorization_is_retired_owner_scoped_and_connection_local",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_subscription_repayment_e2e.py::test_exact_repayment_closes_debt_without_wallet_or_fee_mutation",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_subscription_repayment_e2e.py::test_failure_rolls_back_capture_allocation_and_fence_then_retries",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_subscription_repayment_e2e.py::test_multiple_sources_are_bound_to_original_refund",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_subscription_repayment_e2e.py::test_owner_api_quote_csrf_and_regime_guards",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_subscription_repayment_e2e.py::test_owner_quote_change_is_checked_before_provider_capture",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_subscription_repayment_e2e.py::test_permanent_capture_reversal_reopens_original_receivable",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_subscription_repayment_e2e.py::test_refund_before_repayment_fulfillment_is_atomic",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_subscription_repayment_e2e.py::test_refund_reopens_same_debt_and_can_be_repaid_again",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_subscription_repayment_e2e.py::test_repayment_allowed_for_existing_debt_after_plan_service_disabled",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_subscription_repayment_e2e.py::test_uncertain_create_stays_pending_without_second_provider_post",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "tests/test_r210_subscription_repayment_e2e.py::test_verified_webhook_retries_allocate_once",
+      "report": "paypal-item-movement-regression.xml",
+      "status": "passed",
+      "executions": [
+        {
+          "report": "paypal-item-movement-regression.xml",
+          "status": "passed"
+        }
+      ]
+    }
+  ],
+  "development_notes": [
+    "Two unused test imports detected by Ruff were removed; final whole-tree lint is clean.",
+    "Movement readback validates false-valued malformed fields too; a malformed empty dictionary cannot masquerade as an absent movement and release a seller-favour case.",
+    "Exact decimal cent strings and BigInt formatting avoid JavaScript rounding of large observation amounts; four final actual-browser cases prove90071992547409.93 EUR in both locales.",
+    "Public API contracts establish initiation observations but no unique completed transaction-to-dispute settlement proof. No payout/protection settlement was guessed; continue independent exact item allocation and private admin review."
+  ],
+  "runtime_dependencies_added": 0,
+  "full_baseline_repeated": false,
+  "coverage_recollected": false,
+  "actual_payment_provider_calls": 0,
+  "release_candidate": false,
+  "transition_enabled": false,
+  "formal_progress": "21/42,50.0%,0/7 whole macroareas; A4/A5 still implementation_pending"
+}

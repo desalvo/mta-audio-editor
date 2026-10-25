@@ -1,0 +1,40 @@
+{
+  "original_files": 3267,
+  "preceding_checkpoint_files": 3611,
+  "missing_original": [],
+  "missing_preceding": [],
+  "protected_files_checked": 183,
+  "protected_changes": [],
+  "protected_definition": "Original non-test license/manual paths and raster/vector/font/document/audio assets by extension",
+  "python_scripts_changed_since_preceding": [],
+  "executable_modes": {
+    "scripts/install_ace_step.sh": "0o755",
+    "scripts/install_mta.sh": "0o755",
+    "app/ai_unified_adapter.py": "0o755"
+  },
+  "new_paths_since_preceding": [
+    "app/operator_refunds.py",
+    "app/static/operator_refunds.css",
+    "app/static/operator_refunds.js",
+    "docs/OPERATOR_REFUNDS_HANDOFF_R210.md",
+    "docs/OPERATOR_REFUNDS_IT_EN_R210.md",
+    "docs/validation/r210/operator-refunds-bandit.json",
+    "docs/validation/r210/operator-refunds-current-evidence.xml",
+    "docs/validation/r210/operator-refunds-final-service.xml",
+    "docs/validation/r210/operator-refunds-final.xml",
+    "docs/validation/r210/operator-refunds-gates.xml",
+    "docs/validation/r210/operator-refunds-input-bound.xml",
+    "docs/validation/r210/operator-refunds-inventory-result.json",
+    "docs/validation/r210/operator-refunds-preservation.json",
+    "docs/validation/r210/operator-refunds-recovery.xml",
+    "docs/validation/r210/operator-refunds-regression.xml",
+    "docs/validation/r210/operator-refunds-security-result.json",
+    "docs/validation/r210/operator-refunds-service.xml",
+    "docs/validation/r210/operator-refunds-static-result.json",
+    "docs/validation/r210/operator-refunds-test-summary.json",
+    "docs/validation/r210/operator-refunds-ui.xml",
+    "tests/test_r210_operator_refunds.py",
+    "tests/test_r210_operator_refunds_recovery.py",
+    "tests/test_r210_operator_refunds_ui.py"
+  ]
+}

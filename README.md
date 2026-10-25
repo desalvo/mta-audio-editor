@@ -1,3 +1,53 @@
+> Current PRE-RC handoff: [merchant-wide PayPal observations](docs/MERCHANT_HISTORY_HANDOFF_R210.md). RC false;23/42 criteria(54.8%);new browser acceptance remains blocked.
+
+> Current PRE-RC continuation: [original subscription loss and revised strategy](docs/ORIGINAL_SUBSCRIPTION_LOSS_HANDOFF_R210.md). RC false;23/42 locally verified criteria(54.8%).
+
+> Current PRE-RC handoff: [frozen publication recovery](docs/TWENTY_CYCLE_RECOVERY_HANDOFF_R210.md), 2026-10-25. RC false;23/42 locally verified criteria(54.8%).
+
+**Work checkpoint 2026-10-24 — PRE-RC:** Ten internal cycles completed;authoritative pull execution/shared HTTPS storage,crash-safe client recovery and free-only accounting. **B4 locally verified;23/42 (54.8%),0/7 complete macroareas;898 distinct passing cases,90 new.RC false,switching disabled.** [Handoff](docs/PULL_COORDINATION_HANDOFF_R210.md), [IT/EN guide](docs/PULL_COORDINATION_IT_EN_R210.md), [remaining work](docs/RC_CLOSURE_PLAN_R210.md). Historical records follow.
+
+**Work checkpoint 2026-10-24 — PRE-RC:** Worker receipt/epoch integrity now spans heartbeat, completion, accounting and deferred recovery; exact closed acknowledgements survive later epochs without reexecution/recharging. **350 distinct affected cases passed,49 new;22/42 (52.4%),0/7 complete macroareas,RC false,switching disabled.** The interrupted unsaved pull prototype is not included. [Current handoff](docs/WORKER_EPOCH_HANDOFF_R210.md), [IT/EN guide](docs/WORKER_EPOCH_IT_EN_R210.md), [remaining ordered work](docs/RC_CLOSURE_PLAN_R210.md). Historical records follow.
+
+**Work checkpoint 2026-10-24 — PRE-RC:** Complete current web administration acceptance:330 affected cases passed,136 Chromium,44 new browser cases,328 axe reports with zero violations/unresolved items. **E6 locally verified;22/42 (52.4%),0/7 whole macroareas. RC false;switching disabled.** [Current handoff](docs/ADMIN_ACCEPTANCE_HANDOFF_R210.md), [IT/EN guide](docs/ADMIN_ACCEPTANCE_IT_EN_R210.md), [ordered remaining work](docs/RC_CLOSURE_PLAN_R210.md). Historical records follow.
+
+**Work checkpoint 2026-10-24 — PRE-RC:** Exact provider-item partial PayPal allocations and private operator movement review now traverse real local ledger/API/IT-EN browser workflows. 392 affected cases passed, 30 Chromium; formal 21/42 (50%), 0/7 whole macroareas. RC false, switching disabled; unproven payouts stay held. [Current handoff](docs/PAYPAL_ITEM_MOVEMENT_HANDOFF_R210.md), [IT/EN guide](docs/PAYPAL_ITEM_MOVEMENT_IT_EN_R210.md), [remaining work](docs/KNOWN_BLOCKERS_R210.md).
+
+**Work checkpoint 2026-10-24 — PRE-RC:** PayPal known-order dispute discovery now traverses authenticated history, actual local ledger and private IT/EN owner/admin UI. 428 affected cases passed, 47 Chromium. Formal 21/42 (50.0%), 0/7 whole macroareas; RC false, switching disabled. [Current handoff](docs/PAYPAL_DISPUTE_HISTORY_HANDOFF_R210.md), [IT/EN guide](docs/PAYPAL_DISPUTE_HISTORY_IT_EN_R210.md), [remaining work](docs/KNOWN_BLOCKERS_R210.md). Global history, payouts, partial multicapture and legacy obligations remain open.
+
+**Work checkpoint 2026-10-24 — PRE-RC:**  Complete local owner Account/Credits workflow in both regimes, IT/EN 390/1280, payment recovery, error/locale/concurrency safety and scoped accessibility. **315 affected cases passed, 160 Chromium; D4 locally verified, 21/42 (50.0%), 0/7 whole macroareas. RC false; switching disabled.** [Current handoff](docs/ACCOUNT_WORKFLOW_HANDOFF_R210.md), [owner guide IT/EN](docs/ACCOUNT_WORKFLOW_IT_EN_R210.md), [remaining work](docs/KNOWN_BLOCKERS_R210.md). Historical baselines below are reused.
+
+**Work checkpoint 2026-10-24 — PRE-RC:**  Complete local operator refund workflow: two-step admin confirmation, one durable provider dispatch, authenticated GET-only uncertainty recovery, exact canonical ledger settlement, private IT/EN owner/admin UI and guarded erasure. **254 affected cases passed, including 10 Chromium; formal 20/42 (47.6%), RC false and switching disabled.** [Current handoff](docs/OPERATOR_REFUNDS_HANDOFF_R210.md), [IT/EN operator guide](docs/OPERATOR_REFUNDS_IT_EN_R210.md), [remaining implementation and external prerequisites](docs/KNOWN_BLOCKERS_R210.md). Historical validated baselines below remain preserved.
+
+
+> Pre-RC update (2026-10-22): checkout confirmations/reconciliation reject duplicate Stripe/PayPal provider references; legacy collisions block integrity audit. 173 selected tests passed. Release candidate remains blocked by authenticated provider, distributed-worker and full-CI verification.
+
+
+### Release candidate readiness
+
+MTA 0.3.0-r210 is NOT an accepted RC. Run `python -m app.rc_acceptance` to obtain a fail-closed JSON blocker report; see `docs/R210_RELEASE_CANDIDATE_GATE_IT_EN.md` and `docs/DEVELOPMENT_HANDOFF_R210.md`. Do not enable commercial cutover without authenticated providers, distributed-worker validation and full CI.
+
+> 0.3.0-r210 development update (2026-10-22): Claimed AI job completion retries now verify original worker identity and closed fence; see docs/DEVELOPMENT_HANDOFF_R210.md. The commercial cutover remains disabled.
+
+Claimed metered AI jobs now require their worker identity to finalize accounting, claim and fence atomically in `ai_billing.finish_job`; see `docs/DEVELOPMENT_STATUS.md`. Not a certification of distributed workers.
+
+Worker/ledger/fence consistency: new SQLite audit rejects terminal ledgers with active worker claims and completed worker claims with open fences; 152 regime tests passed. Full worker integration and commercial cutover remain pending. See docs/DEVELOPMENT_STATUS.md.
+
+> **r210 dual-regime status:** Atomic worker completion now checks settled accounting and terminal job status before closing claim/fence together; not yet wired to all AI workers. See `docs/DEVELOPMENT_HANDOFF_R210.md`.
+
+Offline service-regime readiness: `python -m app.regime_readiness_cli --help` (read-only SQLite snapshot, always denies automatic cutover). See `docs/R210_OFFLINE_READINESS_OPERATOR_IT_EN.md` and `docs/DEVELOPMENT_HANDOFF_R210.md` for Git baseline and unresolved development tasks.
+
+## AI license visibility (r210)
+
+The administrator AI Studio model catalog shows effective availability, mode, and denial reason for the active regime; blocked models remain blocked by backend admission. This is not full cross-adapter E2E certification.
+
+**r210 dual-regime coordination:** durable SQLite worker execution claims prevent competing workers from claiming the same already-fenced ledger job; full queue wiring, external settlement and safe regime cutover remain pending. Switching remains disabled. See/Vedere [worker claims IT/EN](docs/R210_DISTRIBUTED_WORKER_CLAIMS_IT_EN.md).
+
+
+> MTA 0.3.0-r210 dual-regime update: Checkout settlement now requires a confirmed Stripe/PayPal dispatch outbox and a valid current-epoch commercial receipt; uncertain or cancelled dispatches remain fenced. The administrator regime switch is still disabled.
+Durable SQLite operation-fence primitive for future atomic regime switching (not yet wired to all job/payment/webhook paths; regime switching remains disabled).
+
+Preparatory dual service-regime core (not yet wired to production billing): see `docs/R210_DUAL_REGIME_STATUS_IT_EN.md`. 
+
 **Multitrack accuracy (r210):** The full real MR-MT3 benchmark remains unaccepted (F1 9.49%, only 2 melodic programs with a strict match). See `docs/R210_MULTITRACK_FINAL_ACCEPTANCE_IT_EN.md` for the new fail-closed acceptance audit.
 
 **CI 2026-10-21 (deferred commit):** Restore Docker build visibility for required reviewed docs and preserve binary-exact optional plugin license notices across Windows checkouts; full cross-platform rerun pending. YourMT3+ GPU inference and 10–16-instrument accuracy remain unverified.
@@ -12,13 +62,13 @@ MR-MT3 CPU progress: resumable runner supports `--time-budget-seconds` (cooperat
 
 > **2026-10-21 CI maintenance / Manutenzione CI:** Fixed 15 reported Ruff findings in isolated tests (unused imports, mocked path literals and deterministic random input), without suppressing project lint rules. Focused verification: 47 passed. Multi-instrument 10–16 quality remains **unverified and open**, awaiting authorized model weights and labeled representative audio/MIDI.
 
-**Current r210 verification,21October2026:** 4,735 distinct cases verified across the complete regression and final failed-case retry; 98 skipped. Qixuan existing-bank IT/FR software, native UI zoom, audio/MIDI project modes, musical transport/metronome and quantization verified. Twelve real Qixuan CPU cases passed; IT/FR remain disclosed cross-language projections. [Current bilingual report](docs/R210_QIXUAN_MIDI_NATIVE_IT_EN.md). Physical target/listening acceptance and the historical10–16-instrument accuracy gate remain distinct. All earlier status entries below are historical.
+**Current r210 verification, 21October2026:** 4, 735 distinct cases verified across the complete regression and final failed-case retry; 98 skipped. Qixuan existing-bank IT/FR software, native UI zoom, audio/MIDI project modes, musical transport/metronome and quantization verified. Twelve real Qixuan CPU cases passed; IT/FR remain disclosed cross-language projections. [Current bilingual report](docs/R210_QIXUAN_MIDI_NATIVE_IT_EN.md). Physical target/listening acceptance and the historical10–16-instrument accuracy gate remain distinct. All earlier status entries below are historical.
 
-**Current r210 verification, 21 October 2026:** 4,680 passed, zero failures/errors, 98 skipped. Fixed tariff navigation and added engine-grouped per-file AI administration. Qixuan IT/FR profiles passed eight actual CPU ONNX cases; these are disclosed cross-language projections. **10–16-instrument accuracy remains unmet, beyond hardware acceptance.** [Current bilingual report](docs/R210_ADMIN_QIXUAN_ACCURACY_IT_EN.md). All earlier status entries below are historical.
+**Current r210 verification, 21 October 2026:** 4, 680 passed, zero failures/errors, 98 skipped. Fixed tariff navigation and added engine-grouped per-file AI administration. Qixuan IT/FR profiles passed eight actual CPU ONNX cases; these are disclosed cross-language projections. **10–16-instrument accuracy remains unmet, beyond hardware acceptance.** [Current bilingual report](docs/R210_ADMIN_QIXUAN_ACCURACY_IT_EN.md). All earlier status entries below are historical.
 
 **Current r210 verification, 21 October 2026:** 4598 passed, 0 failures/errors, 98 skipped. Fixed combined Deep channel/controller routing, empty-score handling, source-duration note bounds and final cancellation. [Current bilingual report](docs/R210_COMBINED_RESULTS_IT_EN.md) · [Runtime/target acceptance guide](docs/R210_DIFFSINGER_DEEP_ACCEPTANCE_IT_EN.md). Multi-instrument accuracy and Qixuan IT/FR remain open; this is not full three-area certification. Earlier checkpoints below are historical.
 
-**21 October 2026 — current r210 verification:** 4,608 passed, 0 failed, 80 skipped, 6 warnings (524.10 s). Final changed-area checks: 68 passed; the last vocal identity adjustment also passed real Qixuan→YourMT3 PS inference. Real DiffSinger ONNX singing and the metered Deep pipeline/replay now work. The ten–sixteen instrument accuracy gate remains unmet and is not a hardware-only limitation. See [current bilingual report](docs/R210_DIFFSINGER_DEEP_CLOSURE_IT_EN.md) and [acceptance guide](docs/R210_DIFFSINGER_DEEP_ACCEPTANCE_IT_EN.md). Version remains 0.3.0-r210.
+**21 October 2026 — current r210 verification:** 4, 608 passed, 0 failed, 80 skipped, 6 warnings (524.10 s). Final changed-area checks: 68 passed; the last vocal identity adjustment also passed real Qixuan→YourMT3 PS inference. Real DiffSinger ONNX singing and the metered Deep pipeline/replay now work. The ten–sixteen instrument accuracy gate remains unmet and is not a hardware-only limitation. See [current bilingual report](docs/R210_DIFFSINGER_DEEP_CLOSURE_IT_EN.md) and [acceptance guide](docs/R210_DIFFSINGER_DEEP_ACCEPTANCE_IT_EN.md). Version remains 0.3.0-r210.
 
 **Final general regression / Regressione generale finale: 4.596 passed, 0 failed, 80 skipped, 6 warnings.**
 
@@ -30,7 +80,7 @@ Earlier validation checkpoints below are historical; use the current report for 
 
 ---
 
-**Current status, 21 October 2026 — 0.3.0-r210:** complete general offline regression: **4,579 passed, 0 failed, 85 skipped, 6 warnings**. Fixed remote lead/backing artifact selection, reconciled legacy harnesses and added offline isolation without weakening authentication or license policy. Complete authorized neural bundles, musical benchmarks and asset/browser/target acceptance remain; the three macroareas are not certified fully complete.
+**Current status, 21 October 2026 — 0.3.0-r210:** complete general offline regression: **4, 579 passed, 0 failed, 85 skipped, 6 warnings**. Fixed remote lead/backing artifact selection, reconciled legacy harnesses and added offline isolation without weakening authentication or license policy. Complete authorized neural bundles, musical benchmarks and asset/browser/target acceptance remain; the three macroareas are not certified fully complete.
 
 [Final bilingual report](docs/R210_OFFLINE_FINALIZATION_IT_EN.md) · [Cumulative suggested commit](docs/COMMIT_MESSAGE_R210.txt).
 
@@ -443,7 +493,7 @@ Instrument note matching now uses a pitch/onset index while preserving one-to-on
 Improved offline MIDI benchmark input limits and tolerance validation, StageCache directory safety, and GM portable synthesizer closed-handle errors. Offline verification: 70 passed, 7 skipped, 0 failed; hardware/core GM controller tests skipped in this environment. Neural asset inference, full regression, browser/native acceptance and musical benchmarks remain outstanding. No Git operations or production changes.
 
 ### r210 MIDI benchmark bounded matching (21 October 2026)
-Dense matching graphs above 1,000,000 candidate note pairs now fail explicitly instead of risking unbounded CPU/memory use. Local targeted validation: 72 passed, 0 failed, 12 skipped. Neural/hardware acceptance and full offline regression are still open.
+Dense matching graphs above 1, 000, 000 candidate note pairs now fail explicitly instead of risking unbounded CPU/memory use. Local targeted validation: 72 passed, 0 failed, 12 skipped. Neural/hardware acceptance and full offline regression are still open.
 
 ### r210 finalization readiness (21 October 2026)
 The three Studio/Vocal, multitrack transcription and GM workstreams are implemented in substantial part but **not yet certified complete**. The offline MIDI benchmark now uses bounded, inode-validated input opening, rejecting non-regular paths and symlink redirection. Local focused verification: 121 passed / 0 failed / 9 skipped in two disjoint batches. Real licensed model inference, project-wide regression, cross-client playback and musical quality acceptance remain open; see `docs/DEVELOPMENT_STATUS.md`. No deployment or Git operation was performed.
@@ -514,3 +564,194 @@ Verified YourMT3+ ROCm standalone setup and strict benchmark: `docs/R210_YOURMT3
 YourMT3 legacy NumPy checkpoint compatibility / Compatibilità checkpoint NumPy legacy YourMT3: pinned verified checkpoint conversion now allowlists historical NumPy serialization names while keeping weights-only loading enabled. Run the installer again on the isolated ROCm host; a complete GPU inference and accuracy certification have not yet been verified.
 
 **Experimental Audio-to-MIDI (web/native):** MR-MT3 and YourMT3+ are displayed when the local/server runtime is available, with license/status controls; a managed model bundle does not itself install a runtime. See `docs/R210_EXPERIMENTAL_AUDIO_MIDI_NATIVE_IT_EN.md`.
+
+
+Dual service regime: backend entry-point guards default to non-commercial. Full mode switching and billing reconciliation remain under development; do not activate commercial mode manually.
+
+### Service regimes (r210, implementation in progress)
+A new read-only public `GET /api/service-regime/terms?lang=en|it` returns the draft terms for the active server regime, with text SHA-256. The About dialog links to published terms. Non-commercial remains the safe default. **Administrative regime switching and reconciled, regime-specific billing are not operational yet**; preserve historical contracts and do not deploy commercial migration on the strength of these endpoints. Review legal drafts before contractual publication.
+
+### Service regimes — transition readiness audit (r210)
+Administrators may query `GET /api/admin/service-regime/transition-audit?target=COMMERCIAL` (or `NON_COMMERCIAL`) for a read-only inventory of legacy financial obligations and active jobs. **This does not enable changing regimes:** atomic settlement, actual-cost nonprofit statements and legal review remain required. Not ready for commercial rollout.
+
+### Dual service regimes status (r210, work in progress)
+Non-commercial remains the default. Administrative transitions remain disabled until financial reconciliation, atomic subscription/webhook handling and actual periodic statements are implemented. `app/noncommercial_allocation.py` computes cent-exact draft allocations only; it never bills users. Do not deploy dual regimes as a complete production feature.
+
+**Dual-regime accounting development:** Administrators in the default non-commercial regime can request a read-only allocation draft with `POST /api/admin/service-regime/noncommercial-preview` (`start`, `end`, `documented_cost_cents`, optional `recovered_cents`). The draft draws from measured AI jobs, refuses incomplete metering and has no payment side effects. It is **not** an issued statement or a production-safe dual-regime switch; see `docs/DEVELOPMENT_STATUS.md`.
+
+**Service-regime work in progress (r210):** non-commercial administrators can freeze and retrieve tamper-evident, read-only cost-allocation statement snapshots via `/api/admin/service-regime/noncommercial-statements`. This does not collect funds, issue tax invoices, or enable commercial regime switching. Production regime switching remains unavailable pending economic reconciliation.
+
+### Dual service regime / reconciliation (r210)
+The read-only administrator endpoint `/api/admin/service-regime/reconciliation-report?target=COMMERCIAL` inventories outstanding financial obligations and unknown schemas. It does not switch regimes. Do not enable commercial production until atomic payment/webhook reconciliation and full regression have been validated.
+
+### Service-regime transition audit (r210, not operational)
+Admin-only `GET /api/admin/service-regime/transition-plan?target=COMMERCIAL` provides a SHA-256 integrity-stamped reconciliation plan and accounting inventory. It is read-only and **does not enable** switching or certify settlement of webhooks, credits, or contracts. Switching remains disabled.
+
+### Dual-regime model admission (r210, in progress)
+The shared AI license admission rejects models marked `free_only` when the service is set to `COMMERCIAL`, even if invoked directly via its backend. `NON_COMMERCIAL` does not automatically reject these models; licensing of every particular checkpoint remains mandatory. Dual-regime billing and atomic switching remain unfinished and MUST NOT be enabled for commercial production. See `docs/DEVELOPMENT_STATUS.md`.
+
+**Dual-regime status (r210, incomplete):** direct-domain guards now reject paid storage extensions, credit grants, and self-service subscriptions in Non-Commercial mode. Switching regimes is not yet operational or production-ready: shared atomic fencing, payment/webhook reconciliation, administration UI, and end-to-end tests remain outstanding. Never manually edit `service-regime.json` to enable Commercial mode.
+
+**r210 dual-regime subsystem update.** Added administrator operation-fence diagnostics (`GET /api/admin/service-regime/operation-fence`), integrity-checked noncommercial statement export (`GET /api/admin/service-regime/noncommercial-statements/export?start=...&end=...`), and `no-store` public legal terms. Service-regime switching remains disabled until all job, checkout, and webhook entry paths share the transaction barrier and financial reconciliation is validated. Do not treat as production commercial enablement.
+
+
+### 2026-10-22 Dual-regime integration note
+
+Transaction-bound regime operation helper implemented for local DB workflows only; regime switching is still disabled pending external payment and worker integration.
+
+
+## r210 — Durable provider event inbox (development, not production activation)
+
+A persistent, database-local Stripe/PayPal event inbox now supports digest-pinned event identities and atomic application of authenticated provider events to the same SQLite connection, with rollback and restart-safe idempotency. The provider handler must authenticate signatures, validate the originating enrolled checkout and its regime/revision, and use this helper in the existing business transaction. This primitive is NOT yet wired into all live checkout, webhook and job entry points. Switching between commercial and non-commercial regimes remains disabled until those paths and reconciliation are integrated and verified.
+
+### Service-regime transition status (2026-10-22)
+The operation fence now preserves caller-owned SQLite transactions during initialization. Service-regime switching remains **disabled** pending exhaustive job/checkout/webhook integration, external-provider outbox reconciliation, and end-to-end verification. Do not deploy as production-ready dual-regime commercial switching.
+
+**Dual service regime development (22 October 2026):** the durable payment-event inbox now rejects noncommercial checkout receipts before applying a payment mutation. Commercial receipt replay tests pass. Actual provider handlers/job admission are not fully enrolled; switching the regime remains disabled pending integrated reconciliation and concurrency validation.
+
+
+2026-10-22 (deferred): Commercial Stripe/PayPal checkout admissions are now enrolled in the durable operation fence in the same transaction as local order creation. The service-regime switch remains disabled pending job and webhook integration, reconciliation, and full end-to-end tests.
+
+
+### 0.3.0-r210 — Deferred transaction hardening
+
+PayPal webhook completion now writes the signed event receipt and economic settlement in one SQLite transaction; regime switching remains disabled pending full payment/job fencing.
+
+
+**Service-regime status:** Stripe webhook receipt checks require enrolled checkout origin to be commercial. Switching regimes remains disabled pending end-to-end reconciliation.
+
+
+### r210 — Metered job regime fencing
+Metered AI job ledger admission and settlement now share the durable service-regime fence; queue admission and cross-provider regime switching remain disabled pending end-to-end integration.
+
+**2026-10-22 deferred development:** PayPal refund processing now checks its originating commercial checkout receipt inside the refund database transaction. This does not enable switching service regimes: unreconciled provider events and uninstrumented queue paths remain blockers. See `docs/DEVELOPMENT_STATUS.md`.
+
+### Experimental dual-regime Stripe webhook integrity (r210)
+Stripe credit fulfillment and refunds for enrolled commercial checkouts now record authenticated webhook event identity and SHA-256 in the durable provider inbox within the same local database transaction as the credit mutation. Duplicate event IDs with conflicting payloads are rejected. Legacy non-enrolled orders remain subject to reconciliation; the commercial service regime switch stays disabled pending complete ingress coverage and end-to-end validation.
+
+
+**Service regime verification (2026-10-22):** Legacy commercial-credit/subscription test fixture explicitly sets COMMERCIAL; ten targeted regression groups passed (155 tests). NON_COMMERCIAL is still the production default; atomic regime switching is not yet enabled.
+
+### r210: dual-regime administrative reporting (deferred)
+The admin endpoints now support verified non-commercial allocation CSV export and a consolidated financial/fence readiness diagnostic. Both are fail-closed and cannot activate the commercial regime. The full regime switch remains disabled pending provider/job coverage and verified settlement.
+
+Development update (2026-10-22): operation-fence retries now reject mismatched original regime and open operations with stale regime revision. 65 targeted tests passed. Dual-regime activation remains disabled pending full end-to-end integration.
+
+### Dual-regime diagnostics — metered-job admission coverage
+The administrative `combined-readiness` report also checks whether active metered AI jobs retain an *open* durable transaction-fence receipt. Legacy jobs, missing or prematurely settled receipts, and missing accounting schemas are reported as blockers. This diagnostic does not enable regime switching.
+
+
+A durable commercial-checkout dispatch outbox primitive (`app/regime_payment_outbox.py`) now records idempotent intent and uncertain provider outcomes; production checkout dispatch integration and regime switching remain pending.
+
+**Dual-regime checkout outbox (2026-10-22):** Stripe/PayPal checkout creation now atomically enrolls the local dispatch intent; the intent becomes uncertain before an outbound request and records a confirmed provider reference after a validated response. Unknown outcomes require reconciliation instead of automatic resend. Regime switching remains disabled; live-provider and full CI tests are pending.
+
+**Dual-regime reconciliation (experimental):** The checkout outbox exposes
+`reconcile_verified_outcome` for use *after* a trusted provider query verifies
+whether an uncertain checkout was created. It records the verified result
+atomically, but does not query the provider, move money, automatically retry,
+or release the checkout fence. Regime switching remains disabled pending
+integration and end-to-end validation.
+
+### Dual-regime payment outbox review (0.3.0-r210)
+An admin-only read-only endpoint `/api/admin/service-regime/payment-outbox-review` now enumerates pending, uncertain and financially unsettled Stripe/PayPal checkout operations. This is not payment settlement or an enabled regime switch.
+
+**Dual-regime payment dispatch safety (r210):** checkout confirmation requires an attempted provider dispatch and an open commercial fence; requests merely queued in the outbox cannot be confirmed. See `docs/DEVELOPMENT_STATUS.md` for remaining deployment blockers.
+
+Dual-regime work-in-progress: provider outcome reconciliation now validates open commercial checkout admission, revision and transition state before updating the outbox. This is not an enabled commercial regime switch; authenticated provider reconciliation and end-to-end migration are still pending.
+
+
+Dual-regime checkout dispatch consistency is now checked in combined administrative readiness; regime switching remains disabled.
+
+#### r210 — Commercial checkout epoch guards (2026-10-22)
+Both dispatch attempts and provider checkout confirmations now verify the original open commercial receipt against the current service regime and revision, rejecting in-progress transitions and stale epochs. This is a local safeguard, not a completed commercial regime switch. See `docs/DEVELOPMENT_STATUS.md`.
+
+### Non-commercial contribution statements (2026-10-22)
+Users can now view and export only their own hash-verified non-commercial cost allocations via authenticated endpoints (`/api/service-regime/my-noncommercial-statements`, `/export-csv`). These are non-fiscal contribution statements; no charge is posted. Administrative regime switching is still disabled.
+
+### Service regimes — verified non-created checkout reconciliation
+`app/regime_cancelled_checkout.py` offers atomic settlement for checkout receipts **only after** an independently authenticated provider determination that the order was never created, and only when no monetary activity is present. It requires a caller-owned SQLite transaction and makes no network calls. It is not yet exposed as a general administrative operation; regime switching remains disabled.
+
+### Closed noncommercial accounting periods (0.3.0-r210)
+Closing an allocation statement now installs SQLite triggers within the same transaction to reject late metered jobs, retroactive changes/deletions in closed periods, and changes/deletions of finalized statements. Open periods remain writable. Existing deployments with only previously closed statements require an explicit migration to activate these guards without another close. This does not enable service-regime switching, provider reconciliation, or commercial production deployment.
+
+**Dual service regime — new administrative action:** `POST /api/admin/service-regime/close-negative-checkout` atomically settles only checkouts previously verified as not created by the provider. It does not accept unverified evidence or resolve uncertain outcomes. Regime switching remains disabled.
+
+### Dual-regime transition reservation (r210, experimental, disabled for production)
+An internal SQLite transition journal can persist a reservation and block further fenced admissions, with evidence hash, retry protection and abort. It does **not** change the active service regime. Production transitions remain disabled pending atomic persistence of the effective regime, exhaustive entrypoint instrumentation and authenticated provider reconciliation. See `docs/DEVELOPMENT_STATUS.md`.
+
+**Dual service regime — r210 deferred update.** A database-derived, transaction-bound transition reservation path (`app/regime_verified_transition.py`) now rejects an operator-provided `ready` declaration as sufficient clearance. Actual switching is NOT enabled until provider reconciliation and full entry-point fencing are verified. See `docs/DEVELOPMENT_STATUS.md`.
+
+### R210 transition reservation recovery
+Administrator inspection and guarded abort APIs for pending dual-regime transition reservations; this does not enable a commercial cutover. See `docs/R210_TRANSITION_RECOVERY_IT_EN.md`.
+
+
+Transition reservation retries now validate the durable fence state; stale replay is refused. Dual-regime switching remains disabled.
+
+### Dual-regime administration (r210 incremental)
+The server administration page includes a bilingual read-only regime dashboard for active-regime status, combined financial/operation readiness, unresolved payment dispatches and transition reservations. An administrator may explicitly abort a verified pending transition reservation; **switching modes remains disabled** pending audited end-to-end coordination. The dashboard is diagnostic and cannot authorize commercial transactions. Regression: `tests/test_r210_service_regime_admin_panel.py`.
+
+**Dual regime — database-local transition (2026-10-22):** added the internal `app/regime_cutover_atomic.py` primitive to atomically update the SQLite regime epoch under a persistent barrier and record a durable cutover receipt. This is not a production-enabled switch: the external JSON configuration and remaining entry points still require reconciliation. See `docs/DEVELOPMENT_STATUS.md`.
+
+**Dual service regime (r210, development):** controlled recovery of the external regime file after a committed SQLite cutover is available (`docs/R210_REGIME_MIRROR_RECOVERY_IT_EN.md`). Recovery keeps the operation barrier held: administrative switching is not enabled for production.
+
+**Dual service regime epoch safety (r210):** commercial domain admission now requires a coherent, non-transitioning SQLite operation fence matching the persistent JSON regime/revision. Legacy uninitialized noncommercial installations remain noncommercial. This does not enable administrator cutover; reconciliation and provider/worker integration are still pending.
+
+**r210 dual-regime safety update (2026-10-22):** Transition reservations can no longer be aborted after the SQLite cutover receipt is committed, even through internal code paths. Forward mirror recovery is required while the fence remains held. This does not enable production regime switching. See `docs/DEVELOPMENT_STATUS.md`.
+
+Service-regime transition: an internal fail-closed cutover finalization primitive is available for controlled integration; activation remains disabled pending authoritative provider/worker reconciliation and full end-to-end validation. See `docs/R210_REGIME_CUTOVER_FINALIZATION_IT_EN.md`.
+
+**Service regime cutover recovery (r210):** internal `recover_committed_mirror` safely reconciles an already committed SQLite regime epoch with the JSON mirror while retaining the admissions fence. It requires exclusive application maintenance coordination and does not enable commercial switching. See `docs/R210_CUTOVER_RECOVERY_ORCHESTRATION_IT_EN.md`.
+
+### Service-regime maintenance lock (r210)
+Offline mirror recovery uses `app.regime_maintenance.recover_mirror_exclusively(db_path, mirror_path, transition_id, lock_path)`. Provision a *preexisting regular lock file* accessible to only the maintenance operator, and quiesce every server and worker replica before invoking. This POSIX host lock is not cluster-wide and never enables commercial mode or releases the admission fence.
+
+### Deferred offline dual-regime finalization (r210)
+`app.regime_maintenance.finalize_cutover_exclusively` combines the pre-existing maintenance lock and transactional cutover finalization. It is **not** an HTTP endpoint and may only run when all instances and external payment/AI workers are independently quiesced and an authoritative readiness callback validates their state. The normal administrative regime switch remains disabled; see `docs/DEVELOPMENT_STATUS.md`.
+
+**2026-10-22 dual-regime note:** The readiness report now includes a fail-closed Stripe/PayPal webhook inbox audit. It is not a certification of provider settlement or distributed-worker quiescence; commercial cutover remains disabled.
+
+**Deferred r210 regime work:** Provider inbox readiness now rejects duplicate event identities in legacy schemas, empty event IDs and invalid negative receipt epochs. This does not enable commercial regime switching; authenticated provider reconciliation and end-to-end validation remain pending.
+
+Service-regime development note (r210): exclusive cutover finalization now fails closed on database-derived readiness, even when a caller-supplied callback approves it. The switch remains unavailable in production; see `docs/R210_EXCLUSIVE_FINALIZATION_AUTHORITY_IT_EN.md`.
+
+
+### r210 — Worker claim settlement integrity
+
+Worker settlement integrity: durable AI worker claims are checked before ledger fence settlement, and cross-table claim consistency is included in fail-closed switch diagnostics. Commercial regime transition remains disabled; external provider and distributed end-to-end validation is pending.
+
+**r210 license rights gate:** The model policy catalog now reports effective admission/denial per active service regime, while server admission rejects noncommercial-only rights and paid Qixuan overrides even when restored from policy files. Commercial cutover remains disabled; full AI adapter E2E certification is pending.
+
+## R210 development continuation / handoff
+
+This cumulative package contains `docs/DEVELOPMENT_COMPONENTS_R210.json`, `docs/DEVELOPMENT_HANDOFF_R210.md`, and the chronological `docs/DEVELOPMENT_STATUS.md` with unfinished components, tested changes, risks and next steps. Commercial remote AI Studio dispatch fails closed until authenticated remote rights attestation; this is **not** whole-system E2E completion. Current weighted dual-regime estimate: **70%**, transition remains disabled.
+
+
+### r210 worker billing settlement gate
+Worker-claimed metered job settlement now checks terminal ledger, settled contract, and fence epoch; this does not certify distributed worker coverage.
+
+
+Offline cutover readiness reports are diagnostic only, including failed inspections. See docs/DEVELOPMENT_STATUS.md and docs/validation/r210/30-internal-checkpoints.json.
+
+
+Crash recovery now refuses stale jobs with unresolved durable worker claims; see docs/DEVELOPMENT_STATUS.md.
+
+
+Crash recovery now refuses stale jobs with unresolved durable worker claims; see docs/DEVELOPMENT_STATUS.md.
+
+
+**r210 pre-RC note:** Authenticated read-only Stripe/PayPal probes are implemented and locally tested; settlement validation, sandbox tests, distributed worker coverage and full CI are not completed. Regime cutover remains disabled. See `docs/DEVELOPMENT_STATUS.md`.
+
+### r210 reconciliation status
+Authenticated read-only Stripe payment-intent and PayPal capture checks are available in `app/regime_provider_settlement.py`. This is not full ledger settlement: refunds/disputes, webhook completeness, legacy liabilities and atomic local reconciliation remain blocked. Details: `docs/R210_PROVIDER_SETTLEMENT_IT_EN.md`.
+
+**r210 deferred reconciliation update (2026-10-23):** Read-only Stripe charge reversal/dispute state and PayPal capture status checks are available in `app/regime_provider_refund_evidence.py`. These are snapshots, NOT financial or production authorization. See `docs/DEVELOPMENT_STATUS.md` and `docs/DEVELOPMENT_HANDOFF_R210.md` for pending end-to-end work.
+
+### R210 provider cross-evidence
+
+Read-only Stripe Checkout/PaymentIntent/charge and PayPal order/capture checks are implemented and locally tested. They do not authorize fulfillment or regime switching. Ledger reconciliation and sandbox validation remain open.
+
+
+### Persistent reconciliation evidence journal (r210)
+The provider observation journal records matched, immutable snapshots against confirmed outbox operations. It cannot settle the ledger or authorize a regime switch; authenticated end-to-end reconciliation remains pending. See `docs/DEVELOPMENT_STATUS.md`.
+
+**r210 provider reconciliation:** authenticated remote observations can now be journaled atomically with a checkout identity recheck (`app/regime_provider_reconcile_service.py`). This does **not** reconcile credits/ledger liabilities or authorize commercial cutover. See `docs/DEVELOPMENT_STATUS.md` and `docs/DEVELOPMENT_HANDOFF_R210.md`.

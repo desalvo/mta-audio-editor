@@ -1,0 +1,98 @@
+{
+  "date": "2026-10-25",
+  "release": "0.3.0-r210 PRE-RC",
+  "measure": "Original 42 equal-weight acceptance criteria; never count helpers, test variants or internal cycles as completed criteria",
+  "progress": {
+    "verified": 23,
+    "total": 42,
+    "percent": 54.8,
+    "whole_macroareas_accepted": 0
+  },
+  "batch_exit": "Finish the actual owner/operator workflow, transaction/crash/privacy boundaries, affected regression and self-contained handoff, or record a concrete blocker and continue an independent stream",
+  "verification": "Reuse unchanged historical baselines; run current changed-boundary regression once after implementation stabilizes, then only failures or newly changed boundaries",
+  "delivery": "One useful cumulative at a durable functional checkpoint; no helper/test-only packages; no commit or GitHub/server/provider mutations",
+  "workstreams": [
+    {
+      "priority": 1,
+      "criteria": [
+        "A4",
+        "A5",
+        "C3"
+      ],
+      "stream": "Provider/legacy financial conservation",
+      "delivered": "New original payment fee/surplus basis and authenticated full-capture reversal -> exact private existing repayment; refund overlap/rounding/replay/concurrency and erasure covered",
+      "remaining_implementation": [
+        "Global merchant history and unique actual payout/protection movement binding",
+        "Safe migration of legacy original fee basis",
+        "Partial reversal/protected dispute allocation with completed-movement evidence"
+      ],
+      "external": [
+        "Isolated provider sandbox credentials and complete seeded canonical history"
+      ],
+      "exit": "All original liabilities and every legacy/unknown case accounted for; no ambiguous movement interpreted as cash loss",
+      "merchant_observation_checkpoint": {
+        "handoff": "docs/MERCHANT_HISTORY_HANDOFF_R210.md",
+        "delivered": "Actual stable merchant-wide requested-window acquisition/admin API and IT/EN panel; read-only observations",
+        "remaining": "Unique actual completed movement/case/capture binding and complete legacy/global conservation; not A4 acceptance",
+        "browser_prerequisite": "Manual-only merchant-history-chromium.yml, merchant_history_chromium=true;four exact real Chromium passes required; local strict gate rejects missing-engine skips"
+      }
+    },
+    {
+      "priority": 2,
+      "criteria": [
+        "B2",
+        "B5",
+        "F3",
+        "F4",
+        "F6"
+      ],
+      "stream": "Every executor and authenticated checkpoint rights",
+      "reuse": "Pull authority and frozen publication complete for documented topology; do not rebuild or rerun unchanged tests",
+      "remaining_implementation": [
+        "One complete per-entry ownership/rights inventory, with current bypasses repaired through actual admission paths",
+        "Remote uncertain-node/kernel recovery and every legacy executor",
+        "Authenticated executing-checkpoint identity/rights protocol"
+      ],
+      "external": [
+        "Delegated kernels/independent hosts",
+        "Authorized installed weights and independent grants/review"
+      ],
+      "exit": "Every actual entry has its original owner, approved rights and verifiable completion or a held uncertain state; no policy hash treated as loaded-weight proof"
+    },
+    {
+      "priority": 3,
+      "criteria": [
+        "C2",
+        "C3",
+        "C5",
+        "C6",
+        "D6",
+        "E4",
+        "E5"
+      ],
+      "stream": "Integrated drain, liabilities, two-way cutover and operator UI",
+      "dependency": "Complete executor and finance coverage first; keep global switching disabled",
+      "exit": "Actual API/UI with both directions, balances/period continuity, crash/concurrency and forward recovery; no separate preparatory UI package"
+    },
+    {
+      "priority": 4,
+      "criteria": [
+        "A6",
+        "B6",
+        "F5",
+        "G5",
+        "G6"
+      ],
+      "stream": "Target acceptance",
+      "external": [
+        "Isolated merchant sandboxes",
+        "Multi-host partitions and writable delegated cgroups",
+        "Docker/Podman/Kubernetes",
+        "Supported native OS, GPU/audio, real model/plugin targets"
+      ],
+      "exit": "Execute exact missing target checks once prerequisites exist; do not rerun unrelated successful Linux suites"
+    }
+  ],
+  "release_candidate": false,
+  "transition_enabled": false
+}

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="13" time="71.997" timestamp="2026-10-24T14:58:20.032536+02:00" hostname="3a349086255d"><testcase classname="tests.test_r210_account_payment_acceptance" name="test_full_credit_checkout_trusted_return_and_only_verified_funding[390-it-stripe]" time="8.777" /><testcase classname="tests.test_r210_account_payment_acceptance" name="test_full_credit_checkout_trusted_return_and_only_verified_funding[390-it-paypal]" time="4.370" /><testcase classname="tests.test_r210_account_payment_acceptance" name="test_full_credit_checkout_trusted_return_and_only_verified_funding[390-en-stripe]" time="4.404" /><testcase classname="tests.test_r210_account_payment_acceptance" name="test_full_credit_checkout_trusted_return_and_only_verified_funding[390-en-paypal]" time="2.922" /><testcase classname="tests.test_r210_account_payment_acceptance" name="test_full_credit_checkout_trusted_return_and_only_verified_funding[1280-it-stripe]" time="5.220" /><testcase classname="tests.test_r210_account_payment_acceptance" name="test_full_credit_checkout_trusted_return_and_only_verified_funding[1280-it-paypal]" time="4.705" /><testcase classname="tests.test_r210_account_payment_acceptance" name="test_full_credit_checkout_trusted_return_and_only_verified_funding[1280-en-stripe]" time="3.961" /><testcase classname="tests.test_r210_account_payment_acceptance" name="test_full_credit_checkout_trusted_return_and_only_verified_funding[1280-en-paypal]" time="6.041" /><testcase classname="tests.test_r210_account_payment_acceptance" name="test_inflight_mutation_survives_locale_change_without_second_action_or_stale_redirect[it-trial]" time="13.140" /><testcase classname="tests.test_r210_account_payment_acceptance" name="test_inflight_mutation_survives_locale_change_without_second_action_or_stale_redirect[it-credit_stripe]" time="6.913" /><testcase classname="tests.test_r210_account_payment_acceptance" name="test_inflight_mutation_survives_locale_change_without_second_action_or_stale_redirect[it-credit_paypal]" time="3.677" /><testcase classname="tests.test_r210_account_payment_acceptance" name="test_inflight_mutation_survives_locale_change_without_second_action_or_stale_redirect[en-trial]" time="5.322" /><testcase classname="tests.test_r210_account_payment_acceptance" name="test_inflight_mutation_survives_locale_change_without_second_action_or_stale_redirect[en-credit_stripe]" time="0.516"><failure message="ValueError: Wait one second before replacing this contract">account = 2, provider = ({}, [])
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fb213e86a20&gt;
+nc_browser_config = {'executable_path': '/workspace/scratch/06e635791464/nc-browser-runtime/unpacked/chromium', 'headless': True, 'args': ...dbox', '--disable-dev-shm-usage', '--no-zygote', '--single-process', '--use-gl=angle', '--use-angle=swiftshader', ...]}
+workflow = 'credit_stripe', language = 'en'
+
+    @pytest.mark.parametrize('workflow',['trial','credit_stripe','credit_paypal'])
+    @pytest.mark.parametrize('language',['it','en'])
+    def test_inflight_mutation_survives_locale_change_without_second_action_or_stale_redirect(account,provider,monkeypatch,nc_browser_config,workflow,language):
+        from playwright.sync_api import sync_playwright
+        configure(account,'no_plan' if workflow=='trial' else 'active',language)
+&gt;       if workflow=='credit_stripe':prepare(account,monkeypatch)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_r210_account_payment_acceptance.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_r210_credit_checkout.py:22: in prepare
+    plan(account);shop.settings({'secret_key':'sk_test_test','webhook_secret':'whsec_test'})
+    ^^^^^^^^^^^^^
+tests/test_r210_subscriptions.py:29: in plan
+    r.configure({'enabled':True,'credits_enabled':True,'plans':[p]});return r.assign(uid,{'plan':'day','overage':True},1)
+                                                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+uid = 2, body = {'plan': 'day', 'overage': True}, actor = 1
+self_service = False, expected_price = None, next_plan = None, next_price = None
+
+    def assign(uid,body,actor,*,self_service=False,expected_price=None,next_plan=None,next_price=None):
+        if self_service:
+            from .service_regime import require_commercial
+            require_commercial("self-service subscription")
+        if set(body)-{'plan','cpu_seconds','gpu_seconds','storage_bytes','promo','overage'}:raise ValueError('Invalid quota setting')
+        plan=body.get('plan')
+        if plan is not None and plan not in (*PLANS,'trial'):raise ValueError('Invalid plan')
+        with auth.db() as c:
+            init(c);c.execute('BEGIN IMMEDIATE')
+            if not c.execute('SELECT 1 FROM users WHERE id=?',(uid,)).fetchone():raise ValueError('Unknown user')
+            if self_service:
+                cfg=dict(c.execute('SELECT * FROM resource_config').fetchone());price=c.execute('SELECT price_micro FROM resource_plans WHERE code=?',('week' if plan=='trial' else plan,)).fetchone()
+                from .resource_entitlements import policy
+                if not policy(c,uid)['subscriptions_allowed']:raise ValueError('Subscriptions are not enabled for this user')
+                if plan=='trial':price=[0]
+                if not cfg['enabled'] or not cfg['self_service'] or not price:raise ValueError('Self-service subscription is disabled')
+                if number(expected_price,integer=True)!=price[0]:raise ValueError('Plan price changed; review current price')
+                if c.execute('SELECT 1 FROM resource_periods WHERE user_id=? AND plan IS NOT NULL AND end&gt;?',(uid,int(time.time()))).fetchone():raise ValueError('A subscription period is already active')
+            # A new contract starts now. Existing contract evidence is immutable.
+            stamp=int(time.time());prior=c.execute('SELECT 1 FROM resource_periods WHERE user_id=? AND start=?',(uid,stamp)).fetchone()
+&gt;           if prior:raise ValueError('Wait one second before replacing this contract')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           ValueError: Wait one second before replacing this contract
+
+app/resource_accounts.py:219: ValueError</failure></testcase></testsuite></testsuites>

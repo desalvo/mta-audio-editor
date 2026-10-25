@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="16" time="232.378" timestamp="2026-10-24T15:12:41.427502+02:00" hostname="3a349086255d"><testcase classname="tests.test_r210_account_acceptance" name="test_full_account_and_credit_pages_regime_policy_language_and_keyboard[390-it-trial]" time="10.924" /><testcase classname="tests.test_r210_account_acceptance" name="test_full_account_and_credit_pages_regime_policy_language_and_keyboard[390-it-historical_nc]" time="12.550" /><testcase classname="tests.test_r210_account_acceptance" name="test_full_account_and_credit_pages_regime_policy_language_and_keyboard[390-en-trial]" time="9.634" /><testcase classname="tests.test_r210_account_acceptance" name="test_full_account_and_credit_pages_regime_policy_language_and_keyboard[390-en-historical_nc]" time="12.552" /><testcase classname="tests.test_r210_account_acceptance" name="test_full_account_and_credit_pages_regime_policy_language_and_keyboard[1280-it-trial]" time="14.336" /><testcase classname="tests.test_r210_account_acceptance" name="test_full_account_and_credit_pages_regime_policy_language_and_keyboard[1280-it-historical_nc]" time="8.693" /><testcase classname="tests.test_r210_account_acceptance" name="test_full_account_and_credit_pages_regime_policy_language_and_keyboard[1280-en-trial]" time="19.049" /><testcase classname="tests.test_r210_account_acceptance" name="test_full_account_and_credit_pages_regime_policy_language_and_keyboard[1280-en-historical_nc]" time="22.225" /><testcase classname="tests.test_r210_account_acceptance" name="test_actual_trial_contract_renewal_storage_overage_and_cancel[1280-en]" time="40.027"><failure message="playwright._impl._errors.TimeoutError: Timeout 30000ms exceeded while waiting for event &quot;response&quot;">account = 2
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f315e529760&gt;
+nc_browser_config = {'executable_path': '/workspace/scratch/06e635791464/nc-browser-runtime/unpacked/chromium', 'headless': True, 'args': ...dbox', '--disable-dev-shm-usage', '--no-zygote', '--single-process', '--use-gl=angle', '--use-angle=swiftshader', ...]}
+language = 'en', width = 1280
+
+    @pytest.mark.parametrize('language',['it','en'])
+    @pytest.mark.parametrize('width',[390,1280])
+    def test_actual_trial_contract_renewal_storage_overage_and_cancel(account,monkeypatch,nc_browser_config,language,width):
+        from playwright.sync_api import sync_playwright
+        configure(account,'no_plan',language);web=client(account,monkeypatch);calls=[];errors=[]
+        with sync_playwright() as pw:
+            browser=pw.chromium.launch(**nc_browser_config);page=browser.new_page(viewport={'width':width,'height':1000},timezone_id='UTC')
+            page.on('pageerror',lambda e:errors.append(str(e)));page.route('**/*',serve(web,calls));page.goto('https://mta.test/account#subscriptions')
+            trial=page.locator('[data-activate=trial]');trial.wait_for();page.locator('[data-trial-next]').select_option('month')
+            page.once('dialog',lambda d:d.dismiss());trial.click();assert resources.state(account)['subscription'] is None
+            page.once('dialog',lambda d:d.accept());trial.click();page.locator('[data-cancel]').wait_for()
+            initial=resources.state(account);assert initial['subscription']=='trial' and initial['next_plan']['plan']=='month'
+            resources.grant(account,5_000_000,'storage funds',1,'full-page-storage-grant')
+            page.locator('[data-resource-account] [data-refresh]').click();page.locator('[data-overage]').wait_for()
+&gt;           with page.expect_response(lambda r:'/api/account/subscription' in r.url and r.request.method=='PATCH'):page.locator('[data-overage]').uncheck()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_r210_account_acceptance.py:111: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/root/.local/lib/python3.12/site-packages/playwright/_impl/_sync_base.py:85: in __exit__
+    self._event.value
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;playwright._impl._sync_base.EventInfo object at 0x7f315e3674a0&gt;
+
+    @property
+    def value(self) -&gt; T:
+        while not self._future.done():
+            self._sync_base._dispatcher_fiber.switch()
+        asyncio._set_running_loop(self._sync_base._loop)
+        exception = self._future.exception()
+        if exception:
+&gt;           raise exception
+E           playwright._impl._errors.TimeoutError: Timeout 30000ms exceeded while waiting for event "response"
+
+/root/.local/lib/python3.12/site-packages/playwright/_impl/_sync_base.py:59: TimeoutError</failure></testcase><testcase classname="tests.test_r210_account_payment_acceptance" name="test_full_credit_checkout_trusted_return_and_only_verified_funding[390-it-paypal]" time="7.462" /><testcase classname="tests.test_r210_account_payment_acceptance" name="test_full_credit_checkout_trusted_return_and_only_verified_funding[1280-it-paypal]" time="31.536" /><testcase classname="tests.test_r210_account_payment_acceptance" name="test_inflight_mutation_survives_locale_change_without_second_action_or_stale_redirect[it-credit_stripe]" time="8.973" /><testcase classname="tests.test_r210_account_payment_acceptance" name="test_inflight_mutation_survives_locale_change_without_second_action_or_stale_redirect[en-credit_paypal]" time="9.005" /><testcase classname="tests.test_r210_account_payment_acceptance" name="test_noncommercial_owner_return_url_never_attempts_automatic_capture[repayment-/account/credits]" time="7.311" /><testcase classname="tests.test_r210_account_resilience_acceptance" name="test_actual_nc_owner_statement_pledge_report_receipt_csv_and_language[390-en]" time="8.576" /><testcase classname="tests.test_r210_account_resilience_acceptance" name="test_full_page_financial_outage_clears_stale_controls_and_explicitly_recovers[it-/account/credits]" time="7.243" /></testsuite></testsuites>

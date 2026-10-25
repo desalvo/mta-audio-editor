@@ -1,0 +1,7 @@
+# IT — Finalizzazione esclusiva: fonte autorevole
+
+La finalizzazione esclusiva del cambio di regime non accetta una callback applicativa positiva come prova sufficiente. Richiede un rapporto di readiness derivato dal database nella transazione SQLite di manutenzione, senza obbligazioni aperte, con tutti i punti di ingresso dichiarati verificati. Allo stato attuale `combined_readiness` restituisce intenzionalmente `ready_for_automatic_transition=false`: il rilascio della barriera resta quindi bloccato finché non saranno realmente coordinati provider e worker distribuiti. Non impostare artificialmente il campo a `true`. Il test di regressione copre il tentativo con callback che restituisce `True`. Nessun test con provider di pagamento reali è stato eseguito in questo ciclo.
+
+# EN — Exclusive finalization: authoritative source
+
+Exclusive cutover finalization does not accept a positive application callback as sufficient clearance. It also requires database-derived readiness evaluated inside the maintenance SQLite transaction, with no unresolved obligations and all entry points verified. Currently `combined_readiness` intentionally returns `ready_for_automatic_transition=false`, so the fence stays closed until payment providers and distributed workers are actually coordinated. Do not manually force that field to `true`. A regression test covers a caller callback returning `True`. No live payment provider tests were run in this cycle.

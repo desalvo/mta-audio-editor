@@ -114,6 +114,8 @@ def test_real_worker_live_and_final_cpu(tmp_path, monkeypatch):
 def test_process_cpu_uses_only_utime_and_stime(monkeypatch):
     from pathlib import Path
     from app.ai_queue_usage import process_cpu
+    from app import linux_proc_view
+    monkeypatch.setattr(linux_proc_view,'directory',lambda pid:Path('/proc')/str(pid))
     fields=['S']+['999']*10+['120','30']+['999']*20
     monkeypatch.setattr(Path,'read_text',lambda self:'123 (worker with ) name) '+' '.join(fields))
     monkeypatch.setattr(os,'sysconf',lambda name:100)

@@ -305,12 +305,12 @@ def register_routes(app,project_for_actor,actor,publish):
         if any(t is None or t.kind!=('audio' if body.operation=='audio-to-midi' else 'midi') for t in tracks):raise HTTPException(422,'Select source tracks of the required type')
         if body.operation=='vocal-harmony' and len(tracks)!=1:raise HTTPException(422,'Select one melody MIDI track')
         if any(key not in body.track_ids or type(value) is not int or not 0<=value<=127 for key,value in body.programs.items()):raise HTTPException(422,'Invalid program assignment')
-        from .ai_worker_registry import resolve_worker
+        from .ai_worker_registry import execution_available
         from .native_ai_routing import is_remote
         remote=os.getenv('MTA_NATIVE_SINGLE_USER','').lower()=='true' and is_remote(body.operation)
         primary_kind=('audio-to-midi-basic-pitch' if body.operation=='audio-to-midi' and body.mode!='fast' else
                       'audio-to-midi-'+body.transcriber if body.operation=='audio-to-midi' and body.transcriber!='default' else body.operation)
-        if not remote and resolve_worker(primary_kind) is None:raise HTTPException(503,'Model not installed or disabled; contact the administrator or install it from Studio models')
+        if not remote and not execution_available(primary_kind):raise HTTPException(503,'Model not installed or disabled; contact the administrator or install it from Studio models')
         if body.operation=='audio-to-midi' and body.mode=='fast' and (body.transcriber if body.transcriber!='default' else os.getenv('MTA_STUDIO_TRANSCRIBER','basic-pitch'))=='basic-pitch' and any(t.type in ('drums','click') for t in tracks):raise HTTPException(422,'Basic Pitch does not transcribe percussion; select pitched source tracks')
         from .vocal_harmony import HarmonySettings
         if body.operation=='vocal-synthesis':
@@ -379,16 +379,16 @@ def register_routes(app,project_for_actor,actor,publish):
             except ValueError as exc:raise HTTPException(422,str(exc)) from exc
         if body.mode!='fast':
             if body.operation!='audio-to-midi':raise HTTPException(422,'Multi-model mode applies to transcription only')
-            if not remote and any(resolve_worker('audio-to-midi-'+backend) is None for backend in ('basic-pitch','yourmt3')):
+            if not remote and any(not execution_available('audio-to-midi-'+backend) for backend in ('basic-pitch','yourmt3')):
                 raise HTTPException(503,'Accurate mode requires both YourMT3 and Basic Pitch; install and enable both models')
             if body.mode=='maximum':
-                if not (user['id']==0 and is_remote('demucs')) and resolve_worker('demucs') is None:
+                if not (user['id']==0 and is_remote('demucs')) and not execution_available('demucs'):
                     raise HTTPException(503,'Maximum mode also requires the installed Demucs htdemucs separation worker')
         from .model_license_policy import evaluate,LicenseDenied,admission
         try:
             if remote:
-                from .model_license_policy import Decision
-                decision=Decision('remote:'+body.operation,'free_only','configured remote server',hashlib.sha256(body.operation.encode()).hexdigest())
+                from .model_license_policy import authorize_remote_execution
+                decision=authorize_remote_execution(body.operation, {'settings':body.settings})
             else:decision=(evaluate('audio-to-midi-yourmt3',{})
                       if body.operation=='audio-to-midi' and body.mode!='fast' else
                       evaluate('audio-to-midi-'+body.transcriber,{'options':{'asset_id':body.specialist_asset}})

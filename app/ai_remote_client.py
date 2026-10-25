@@ -78,6 +78,12 @@ def infer_audio(base_url: str, token: str, kind: str, wav: bytes, options: dict 
     if cancel_event is not None and cancel_event.is_set():
         raise RemoteAIError("Remote AI cancelled before submission")
     endpoint = _endpoint(base_url, kind)
+    if options is not None and not isinstance(options, dict):
+        raise ValueError('AI options must be an object')
+    from .model_license_policy import authorize_remote_execution
+    try:authorize_remote_execution(kind, options if options is not None else {})
+    except (AttributeError,TypeError,KeyError) as exc:
+        raise ValueError('Invalid remote model selection options') from exc
     if not isinstance(token, str) or not token or len(token) > 4096 or any(ord(c) < 33 or ord(c) > 126 for c in token):
         raise ValueError('A valid remote AI bearer token is required')
     if source_format not in ('wav','score') or (source_format=='score' and kind not in ('vocal-harmony','vocal-synthesis')):raise ValueError('Unsupported remote source format')

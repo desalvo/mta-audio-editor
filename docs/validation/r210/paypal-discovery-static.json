@@ -1,0 +1,12 @@
+{
+  "ruff": "passed app/native/tests/scripts",
+  "compileall": "passed app/scripts",
+  "javascript_syntax": "two changed sources passed",
+  "javascript_source_sha256": {
+    "app/static/owner_payments.js": "3742de460d978d994f8830971f897caba28da50269a35dbcf7ea7db73c3cd644",
+    "app/static/regime_admin_panel.js": "f90d2f075ceedd516e52416d272cc3dce3e335c87d386406471ce77a2de55e02"
+  },
+  "runtime_dependencies_added": 0,
+  "baseline_repeated": false,
+  "coverage_recollected": false
+}
