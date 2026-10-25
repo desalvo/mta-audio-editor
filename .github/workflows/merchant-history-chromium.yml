@@ -1,3 +1,12 @@
+# r210 Chromium CI context hotfix — 2026-10-25
+# Replace .github/workflows/merchant-history-chromium.yml only.
+# Parent repository commit observed: a2e975b4d003bed3f41c0dd0d769519d500c9a54.
+# Run40145618544 failed before creating jobs; no browser acceptance was executed.
+# runner.temp is unavailable in jobs.<job>.env; it is permitted in step env.
+# Validation: YAML/context-scope checks and nine existing strict-gate tests pass.
+# GitHub engine acceptance is pending; no remote write/commit/dispatch was made.
+# Dispatch Optional merchant history Chromium with merchant_history_chromium=true.
+# Require acceptance.json accepted:true,passed:4,skipped:0. RC remains false.
 name: Optional merchant history Chromium
 on:
   workflow_dispatch:
@@ -16,8 +25,6 @@ jobs:
     timeout-minutes: 20
     env:
       MTA_TEST_OFFLINE: '1'
-      MTA_DATA_DIR: ${{ runner.temp }}/mta-merchant-history-data
-      MTA_AI_JOB_STATE_DIR: ${{ runner.temp }}/mta-merchant-history-jobs
       PYTHONPATH: .
     steps:
       - uses: actions/checkout@v7
@@ -34,6 +41,9 @@ jobs:
       - name: Install actual Chromium and Linux dependencies
         run: python -m playwright install --with-deps chromium
       - name: Run real UI and API acceptance (zero skips)
+        env:
+          MTA_DATA_DIR: ${{ runner.temp }}/mta-merchant-history-data
+          MTA_AI_JOB_STATE_DIR: ${{ runner.temp }}/mta-merchant-history-jobs
         run: python scripts/run_merchant_history_chromium.py --output merchant-history-ci
       - name: Upload Chromium acceptance diagnostics
         if: always()
