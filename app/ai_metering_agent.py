@@ -23,6 +23,7 @@ class Measurement:
     source: str
     isolated: bool = True
     gpu_diagnostics: dict[str, float] | None = None
+    pid: int | None = None
 
 
 def _io(pid: int) -> tuple[int, int] | None:
@@ -92,6 +93,8 @@ def run_metered_process(argv: list[str], *, cwd: str, timeout_seconds: int = 360
         raise ValueError('Invalid process arguments')
     if timeout_seconds <= 0 or timeout_seconds > 86400:
         raise ValueError('Invalid timeout')
+    if cancel_check is not None and cancel_check():
+        raise RuntimeError('AI worker cancelled before execution')
     started = time.monotonic()
     proc = subprocess.Popen(argv, cwd=cwd, stdin=subprocess.DEVNULL,
                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
@@ -154,7 +157,7 @@ def run_metered_process(argv: list[str], *, cwd: str, timeout_seconds: int = 360
     if max_io:
         usage['disk_read_bytes'] = float(max_io[0])
         usage['disk_write_bytes'] = float(max_io[1])
-    return Measurement(-1 if timed_out else proc.returncode, elapsed, usage, 'worker', not detected_descendants)
+    return Measurement(-1 if timed_out else proc.returncode, elapsed, usage, 'worker', not detected_descendants, pid=proc.pid)
 
 
 def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=None,
@@ -174,6 +177,9 @@ def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=
     from .ai_worker_registry import resolve_worker
     from .ai_worker_artifacts import package_artifacts
 
+    from .ai_global_execution import current_job,active_owner
+    if current_job.get() is not None:
+        active_owner(user_id)
     from . import ai_pull_coordinator as pull
     if pull.mode() == 'pull':
         return pull.execute(user_id, kind, plan, token_id=token_id, timeout_seconds=timeout_seconds,
@@ -216,6 +222,8 @@ def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=
     license_decision=license_decision or evaluate(kind,plan)
     job_id=job_id or ai_billing.create_job(user_id,kind,token_id,billing_exemption_reason=('license:'+license_decision.model_id) if not license_decision.billable else '')
     record_job(job_id,license_decision)
+    from .ai_execution_policy import admitted_env
+    policy_env=admitted_env(kind,license_decision)
     if queue_id:
         with ai_billing.db() as con:
             ai_billing._init(con);con.execute('UPDATE ai_compute_jobs SET queue_job_id=? WHERE id=?',(queue_id,job_id))
@@ -318,9 +326,9 @@ def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=
                 gpu_slot_acquired = True
             if os.getenv('MTA_AI_CGROUP_PARENT'):
                 from .ai_cgroup_metering import run_cgroup_process
-                result = run_cgroup_process(args, cwd=folder, timeout_seconds=timeout_seconds, cancel_check=worker_cancel_check, env={**os.environ,'MTA_AI_PROGRESS_FILE':str(directory/'progress.json'),'MTA_AI_SUPERVISOR_CPU_PROGRESS':'0' if kind=='ace-step' else '1','MTA_AI_VERIFIED_REPORT_DIR':str(directory),'MTA_AI_JOB_MAX_ARTIFACT_MIB':str(artifact_limit_mib)}, owner_receipt={'job_id':job_id,**claim_credentials})
+                result = run_cgroup_process(args, cwd=folder, timeout_seconds=timeout_seconds, cancel_check=worker_cancel_check, env={**os.environ,**policy_env,'MTA_AI_PROGRESS_FILE':str(directory/'progress.json'),'MTA_AI_SUPERVISOR_CPU_PROGRESS':'0' if kind=='ace-step' else '1','MTA_AI_VERIFIED_REPORT_DIR':str(directory),'MTA_AI_JOB_MAX_ARTIFACT_MIB':str(artifact_limit_mib)}, owner_receipt={'job_id':job_id,**claim_credentials})
             else:
-                result = run_metered_process(args, cwd=folder, timeout_seconds=timeout_seconds, cancel_check=worker_cancel_check, env={**os.environ,'MTA_AI_PROGRESS_FILE':str(directory/'progress.json'),'MTA_AI_SUPERVISOR_CPU_PROGRESS':'0' if kind=='ace-step' else '1','MTA_AI_VERIFIED_REPORT_DIR':str(directory),'MTA_AI_JOB_MAX_ARTIFACT_MIB':str(artifact_limit_mib)})
+                result = run_metered_process(args, cwd=folder, timeout_seconds=timeout_seconds, cancel_check=worker_cancel_check, env={**os.environ,**policy_env,'MTA_AI_PROGRESS_FILE':str(directory/'progress.json'),'MTA_AI_SUPERVISOR_CPU_PROGRESS':'0' if kind=='ace-step' else '1','MTA_AI_VERIFIED_REPORT_DIR':str(directory),'MTA_AI_JOB_MAX_ARTIFACT_MIB':str(artifact_limit_mib)})
             if cancel_check is not None and cancel_check():
                 raise RuntimeError('AI worker cancelled; result discarded')
             diagnostic_checkpoint(final=True)

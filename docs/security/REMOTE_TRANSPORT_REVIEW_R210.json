@@ -64,7 +64,7 @@
       "line": 69,
       "call": "http.client.HTTPSConnection",
       "call_sha256": "7d699db894bae95facb054b74f994127231d0704684bbd305e8df575e93156a5",
-      "source_sha256": "4d9fb383e025374a07ce234a14f50962b983b55c686e74183126f19c67f41fd3",
+      "source_sha256": "f512bbcfeafa8fedeae73c5098c15910d33790a856b6990cff1009d8542570cb",
       "category": "inference_guarded",
       "boundary": "Private operator-owned pull control only: fixed validated HTTPS origin and paths, verified system/operator CA, no redirects/proxies; bearer grants only exact claim/heartbeat/completion routes. Authority and node recheck NC model policy; no checkpoint attestation or commercial enablement.",
       "verification": "Actual TLS and independent worker processes, untrusted CA before credential transmission, redirect rejection, credential/CA journal drift rejection, exact API scope, partition and SIGKILL recovery in test_r210_pull_transport.py and companion acceptance tests."
@@ -149,10 +149,10 @@
     {
       "path": "app/auth.py",
       "function": "_oauth_json",
-      "line": 571,
+      "line": 617,
       "call": "app.secure_https.https_urlopen",
       "call_sha256": "c09252cdd7cc155687642807834eac7f6889cb44732a0694710fbdf4878bad1f",
-      "source_sha256": "7147ef7bd5f341550706076f2e6c8ee9871d35402d4835113b7b93d18afeae19",
+      "source_sha256": "b65363439c52c5892b97c134dcc8b325765645ec447ceb6d555b3c5330de9fae",
       "category": "authentication",
       "boundary": "OAuth/account/device credentials only. Native device helper now accepts exactly /api/ai-device/start and /poll; it cannot post to inference paths.",
       "verification": "Explicit caller/path review and test_r210_remote_transport_inventory.py native helper path-denial cases; existing device-account authorization tests are retained."
@@ -204,10 +204,10 @@
     {
       "path": "app/main.py",
       "function": "_download_drumsep_model",
-      "line": 5680,
+      "line": 5682,
       "call": "app.secure_https.https_urlopen",
       "call_sha256": "fd771985fbe61914d1a66f8e20a3d6c9e97471e6258b9d9b1917cd28b5480d39",
-      "source_sha256": "683a457781aa33222110ff88e8b69ba90c8de01831eacbd61ad41acf4c3ed79f",
+      "source_sha256": "372265915f55359ba5cf48da0a7548017ac46ff6bb6d9f719b6f4236089e2ecd",
       "category": "asset_download",
       "boundary": "Model/source/bank installation or source-metadata GET, not an audio inference dispatch. Download integrity, rights and external runtime acceptance remain separate.",
       "verification": "Explicit callsite review: response writes bounded installation assets or source manifests, no audio/score inference payload. Prior download/archive/security tests retained."
@@ -343,5 +343,9 @@
   "owner_workflow_review": "Reviewed exact source diff against operator-refunds input: owner-bound parameterized pending-period query exposes only own period timestamps. APPROVED PayPal capture now rechecks commercial regime, immutable original order/merchant configuration, active owner, pending financial evidence, current quote/permission/period, original fence epoch and confirmed matching outbox after authenticated GET and before collecting money. BEGIN IMMEDIATE is limited to local checks; no network call under the database lock. Existing capture idempotency key and original-epoch completed-receipt fulfillment remain intact. Existing warning code is identical, no new warnings or suppression. Browser resumption is explicit and separate from GET-only history verification.",
   "paypal_dispute_history_review": "PayPal merchant client call shape unchanged; newly used financial paths are fixed GET-only. Pagination links are parsed only after exact merchant host/path/query/method checks and never followed. Original owner/configuration/epoch is rechecked at transactional settlement; no new remote model permission.",
   "item_movement_continuation": "No new raw transport call or changed source at the29 reviewed sites. Item/movement parsing consumes canonical existing PayPal GET snapshots only; no reporting/payment POST, supplied URLs, model permissions or inferred settlement authority introduced.",
-  "call_hash_format": "ast-fields-json-v1"
+  "call_hash_format": "ast-fields-json-v1",
+  "executor_boundary_continuation": {
+    "date": "2026-10-26",
+    "scope": "Only the unchanged explicit main.py transport site source hash refreshed after native/server legacy routing guards;call shape,function,line,category/disposition and checker unchanged. No new transport."
+  }
 }

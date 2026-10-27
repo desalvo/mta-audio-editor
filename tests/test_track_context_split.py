@@ -24,12 +24,13 @@ def test_track_context_menu_exposes_separate_action():
 
 
 @pytest.mark.skipif(shutil.which("ffmpeg") is None, reason="FFmpeg required")
-def test_existing_track_can_start_stem_job_and_original_track_is_kept(tmp_path, monkeypatch):
+def test_existing_track_can_start_stem_job_and_original_track_is_kept(tmp_path, monkeypatch, local_native_ai):
     import app.main as main
     import app.storage as storage
     from app.models import Clip, Track
 
     monkeypatch.setattr(storage, "ROOT", tmp_path.resolve())
+    monkeypatch.setenv("MTA_NATIVE_SINGLE_USER", "true")
     monkeypatch.setenv("MTA_ALLOW_INSECURE_NO_AUTH", "true")
 
     project = storage.create_project("Context split")

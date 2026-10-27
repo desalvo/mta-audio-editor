@@ -14,6 +14,7 @@ def test_remote_commercial_denied_even_if_known_local_model(monkeypatch):
 
 def test_remote_denied_before_transport(monkeypatch):
     from app import native_ai_routing
+    monkeypatch.setenv('MTA_NATIVE_SINGLE_USER','true')
     monkeypatch.setattr(native_ai_routing, 'is_remote', lambda kind: True)
     monkeypatch.setattr(licenses, 'authorize_remote_execution', Mock(side_effect=licenses.LicenseDenied('blocked')))
     remote = Mock()

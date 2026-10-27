@@ -48,7 +48,8 @@ _SCHEMA = '''CREATE TABLE IF NOT EXISTS jobs (
 def _db():
     _ROOT.mkdir(parents=True, mode=0o700, exist_ok=True)
     os.chmod(_ROOT, 0o700)
-    con = sqlite3.connect(str(_ROOT / 'jobs.sqlite3'), timeout=30, isolation_level=None)
+    from .regime_service_lease import connect
+    con = connect(str(_ROOT / 'jobs.sqlite3'), timeout=30, isolation_level=None)
     con.row_factory = sqlite3.Row
     con.execute('PRAGMA busy_timeout=30000')
     con.execute('PRAGMA journal_mode=WAL')

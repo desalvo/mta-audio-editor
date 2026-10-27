@@ -1,0 +1,306 @@
+{
+  "security": {
+    "reviewed_findings": 165,
+    "source_files": 293,
+    "raw_severity": {
+      "HIGH": 0,
+      "MEDIUM": 21,
+      "LOW": 144
+    },
+    "scan_review_passed": true,
+    "release_candidate": false,
+    "transition_enabled": false
+  },
+  "relocated_unchanged_findings": [
+    {
+      "path": "app/account_lifecycle.py",
+      "test_id": "B608",
+      "old_line": 172,
+      "new_line": 174,
+      "old_id": "02a8d9fd0d260de5d8f2812bc4763d51097a421a5df171cda04e4cc37a3575b7",
+      "new_id": "1e8bea894b5a1d7bf3534a3e961b65f8c267900c2e24a37afe0964e3d629055d",
+      "basis": "Exact finding fields and surrounding source text identical after removing report line-number prefixes; call/statement and existing disposition unchanged."
+    },
+    {
+      "path": "app/account_lifecycle.py",
+      "test_id": "B608",
+      "old_line": 300,
+      "new_line": 302,
+      "old_id": "af9a214499f57c8e169f5ea6a3e0d8350523cb31ad8663ea9f5d551565739100",
+      "new_id": "989bff5a3bf54645f26ab1b3c7a0dbf35f6643d262a929de5754d6d6209b7dc4",
+      "basis": "Exact finding fields and surrounding source text identical after removing report line-number prefixes; call/statement and existing disposition unchanged."
+    },
+    {
+      "path": "app/account_lifecycle.py",
+      "test_id": "B608",
+      "old_line": 320,
+      "new_line": 322,
+      "old_id": "d84b29138a280312c73aaeb03c6f3ce91b31fd088b1e82f4b1a178015d14fd70",
+      "new_id": "2f024ac1c92d7b0731bca2ffc7a2cdcb23398ced36e56318dc0554db55fbdb9d",
+      "basis": "Exact finding fields and surrounding source text identical after removing report line-number prefixes; call/statement and existing disposition unchanged."
+    },
+    {
+      "path": "app/account_lifecycle.py",
+      "test_id": "B608",
+      "old_line": 326,
+      "new_line": 328,
+      "old_id": "15f5833b03aa30346d9e4b2901c3072cf940ee04d068bc3e7e1578b74b39e369",
+      "new_id": "6bc0b598470b04c0900a0c92da42cdae634b36372b2a6a6594fb99a5dbe6c7aa",
+      "basis": "Exact finding fields and surrounding source text identical after removing report line-number prefixes; call/statement and existing disposition unchanged."
+    },
+    {
+      "path": "app/account_lifecycle.py",
+      "test_id": "B608",
+      "old_line": 378,
+      "new_line": 380,
+      "old_id": "f6ba2fdade8c16e7948c25d7b965a4eeaafa042276fc96324142e2f67c10b7ae",
+      "new_id": "fe9e6432fb0d3ec5d8e19c1c5aefd7dbf0930d58851099dbeef9509f92d426c7",
+      "basis": "Exact finding fields and surrounding source text identical after removing report line-number prefixes; call/statement and existing disposition unchanged."
+    },
+    {
+      "path": "app/account_lifecycle.py",
+      "test_id": "B608",
+      "old_line": 424,
+      "new_line": 426,
+      "old_id": "1a317e87d67eac7f46fc5879cbf2713d3cba5b47166d0c54392aa3ce99913984",
+      "new_id": "1f7701df0b553453e309cb29c8dde8e054e8e0ca6a9c1264d5884124442526b8",
+      "basis": "Exact finding fields and surrounding source text identical after removing report line-number prefixes; call/statement and existing disposition unchanged."
+    },
+    {
+      "path": "app/account_lifecycle.py",
+      "test_id": "B608",
+      "old_line": 448,
+      "new_line": 450,
+      "old_id": "c73f2dca70e31a94b9f6d53ae3181f431041dc25ae13d7dbe97ab2f8cf15c989",
+      "new_id": "32c1b4a1b9f59e2682db5bb166c284a24580c3a7832b6229568274f602264d1c",
+      "basis": "Exact finding fields and surrounding source text identical after removing report line-number prefixes; call/statement and existing disposition unchanged."
+    },
+    {
+      "path": "app/auth.py",
+      "test_id": "B105",
+      "old_line": 490,
+      "new_line": 499,
+      "old_id": "c92fab9fb5f92e2155192e721be28573eba46fe94f8450840e24ab84d74b8dc4",
+      "new_id": "7f0b2eaccf01784ea0420b87c4158c7b510e9b787cf2fa46731e7cafa96dd835",
+      "basis": "Exact finding fields and surrounding source text identical after removing report line-number prefixes; call/statement and existing disposition unchanged."
+    },
+    {
+      "path": "app/auth.py",
+      "test_id": "B105",
+      "old_line": 491,
+      "new_line": 500,
+      "old_id": "99180b619fadd441fefc601b2c50e17cf7e56f723e38c4f3c38aefb3e6c29191",
+      "new_id": "fac0d15aeb357a7538548e004751c72b6578c07254323389b9ce721eaaff12c6",
+      "basis": "Exact finding fields and surrounding source text identical after removing report line-number prefixes; call/statement and existing disposition unchanged."
+    },
+    {
+      "path": "app/auth.py",
+      "test_id": "B105",
+      "old_line": 494,
+      "new_line": 503,
+      "old_id": "73f802c9db328af60d22cdd538cb024074ec659ee6b19d1bd2ca77957baa85a1",
+      "new_id": "3b71092747ed4d786614c5019c54323ae313cb968e37ebbf92da71717b9f72d3",
+      "basis": "Exact finding fields and surrounding source text identical after removing report line-number prefixes; call/statement and existing disposition unchanged."
+    },
+    {
+      "path": "app/auth.py",
+      "test_id": "B105",
+      "old_line": 495,
+      "new_line": 504,
+      "old_id": "2fc95f9160e1af6d8b9960abc9b3581bdadc487beca4043b88e7d63386dc9178",
+      "new_id": "a99ae2f9d7b6ba250b84ad5bafa27a111552d5e877be16cd9118f2a9cbe1cb1e",
+      "basis": "Exact finding fields and surrounding source text identical after removing report line-number prefixes; call/statement and existing disposition unchanged."
+    },
+    {
+      "path": "app/auth.py",
+      "test_id": "B105",
+      "old_line": 498,
+      "new_line": 507,
+      "old_id": "36e72b701a968feac4c02d3f02692e17382fa105b7c5437540e5c49615962f36",
+      "new_id": "adaf57122a792ac98df2e64f467daacb57d810117b1c0616fcc85a4593dfdf6a",
+      "basis": "Exact finding fields and surrounding source text identical after removing report line-number prefixes; call/statement and existing disposition unchanged."
+    },
+    {
+      "path": "app/auth.py",
+      "test_id": "B105",
+      "old_line": 499,
+      "new_line": 508,
+      "old_id": "59fece1c2a2bed095c87349f8c7c1a592d6be4c15df95c344e2ace77d3adab3a",
+      "new_id": "9fa5282faffea67829e2b41004fdcdaa2237ba745111568debfd206c3c897175",
+      "basis": "Exact finding fields and surrounding source text identical after removing report line-number prefixes; call/statement and existing disposition unchanged."
+    },
+    {
+      "path": "app/auth.py",
+      "test_id": "B105",
+      "old_line": 737,
+      "new_line": 746,
+      "old_id": "abb99f8184e67ee275c0723b42450b8982fbd676890bcd71b2b734bdadada903",
+      "new_id": "060834056c383bcc659ec50dccb0c40eef97103624a03e26e1204377f8e51f04",
+      "basis": "Exact finding fields and surrounding source text identical after removing report line-number prefixes; call/statement and existing disposition unchanged."
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B603",
+      "old_line": 251,
+      "new_line": 253,
+      "old_id": "17af7391dd1b529ef38342e6bd24aa002e9642040795359c574af795924a65b4",
+      "new_id": "8fa1aef5298473123a241b3295fa550ef56b1c79cb6f6ba446db9946fd9ac08c",
+      "basis": "Exact finding fields and surrounding source text identical after removing report line-number prefixes; call/statement and existing disposition unchanged."
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B107",
+      "old_line": 929,
+      "new_line": 931,
+      "old_id": "48fdf19a53566707efd23264d4969594823d270d661a26f195e0790f5ded2221",
+      "new_id": "3d9361e98c85cbbbf62467fabb05a1dd61c5a761cb14c7da0382ac1a7e63af0b",
+      "basis": "Exact finding fields and surrounding source text identical after removing report line-number prefixes; call/statement and existing disposition unchanged."
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B107",
+      "old_line": 979,
+      "new_line": 981,
+      "old_id": "69f4ce5a47a968fe5420d52d6c19b4b86163dffaa9f526be9a9977e2bdafa5ca",
+      "new_id": "afb56c8135ef84004382f13038e2767680e6c5d992035ee873e759635b77f208",
+      "basis": "Exact finding fields and surrounding source text identical after removing report line-number prefixes; call/statement and existing disposition unchanged."
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B404",
+      "old_line": 1543,
+      "new_line": 1545,
+      "old_id": "e531de29d2f408c89a5b1242e4ac4f876862e828e6cf0455821adc0533ff125a",
+      "new_id": "1cba2b9e42f833f437540f4ac9d65ce01a38a213a0814c287adc3e2821ccf3b9",
+      "basis": "Exact finding fields and surrounding source text identical after removing report line-number prefixes; call/statement and existing disposition unchanged."
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B603",
+      "old_line": 1553,
+      "new_line": 1555,
+      "old_id": "6d50aa9ee1881b03e9a67f5e16c4e26555b720498b853d52c719f7cf016d50df",
+      "new_id": "150de41aea1f30389f31f62c62e876bed79a71048fd688edf7a93f18b1c2d1c7",
+      "basis": "Exact finding fields and surrounding source text identical after removing report line-number prefixes; call/statement and existing disposition unchanged."
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B607",
+      "old_line": 2917,
+      "new_line": 2919,
+      "old_id": "5ca2e5d641041ee69f687e3250889a62027b4f8d39df17eaf26c9fe4dde721db",
+      "new_id": "cdac7668861b4484f56443d8639d15011c6cf13f03b889d1dc96b57c9459459b",
+      "basis": "Exact finding fields and surrounding source text identical after removing report line-number prefixes; call/statement and existing disposition unchanged."
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B603",
+      "old_line": 2917,
+      "new_line": 2919,
+      "old_id": "bcd8bf0e020dff464fff0f5ba8079eb04aa24c8dbf6097ba58abf3ab1d892dd4",
+      "new_id": "24b58a5d418cb71aa4903fb1f129fb779af4f647a67a6f6cdf021775f3f1aeab",
+      "basis": "Exact finding fields and surrounding source text identical after removing report line-number prefixes; call/statement and existing disposition unchanged."
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B607",
+      "old_line": 3398,
+      "new_line": 3400,
+      "old_id": "0290b1f093289b705b7c73b8b370ccece068e154f30850869134b51b400dc7cd",
+      "new_id": "1b1c61632509ee7d91955a9cdbb1781ced83b540b10a3929fd0593318097893a",
+      "basis": "Exact finding fields and surrounding source text identical after removing report line-number prefixes; call/statement and existing disposition unchanged."
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B603",
+      "old_line": 3398,
+      "new_line": 3400,
+      "old_id": "152e44f96774287991e793b63f7af8ae0dfc3bb02a10707d64fc104c5b3e8d68",
+      "new_id": "4d9ddc85996b3800fb4001763e63ec3afe9c14797445d5ac51cec723f7c6ad76",
+      "basis": "Exact finding fields and surrounding source text identical after removing report line-number prefixes; call/statement and existing disposition unchanged."
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B607",
+      "old_line": 3420,
+      "new_line": 3422,
+      "old_id": "5923d22e97410978048882dce2850ed0127ec0184ae3f1bc0a56289185fab793",
+      "new_id": "1df75ce64525d7c2af0e824a1a659aa2a2d20f5b23de79a5d9e6964f971ea84b",
+      "basis": "Exact finding fields and surrounding source text identical after removing report line-number prefixes; call/statement and existing disposition unchanged."
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B603",
+      "old_line": 3420,
+      "new_line": 3422,
+      "old_id": "cb76139c3a011f106ad521b2117fd5202c87b49c9ec4870c293f6578069afd97",
+      "new_id": "2acf51219434f73f753de5cdf034313fb3d45bb7f1d8e392f4752967c342b9a5",
+      "basis": "Exact finding fields and surrounding source text identical after removing report line-number prefixes; call/statement and existing disposition unchanged."
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B603",
+      "old_line": 4753,
+      "new_line": 4755,
+      "old_id": "aafcc241fe542bb5958e95958011c4a7f2435fb65724d478195cf10ed6e19452",
+      "new_id": "67aeaab4aad1fa80ebf91373ea1e2054dfcaf1e9ed1fbfc7db0748560f559532",
+      "basis": "Exact finding fields and surrounding source text identical after removing report line-number prefixes; call/statement and existing disposition unchanged."
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B404",
+      "old_line": 4878,
+      "new_line": 4880,
+      "old_id": "7a7e91c312c60bc7dda59adb0f15174ad05741e2207cbd6f0072ad0a8c4fe96f",
+      "new_id": "df0e90a903c22fa85b078ae0858fa753bae3dc5ab2ce9a3fee5edcdf415de759",
+      "basis": "Exact finding fields and surrounding source text identical after removing report line-number prefixes; call/statement and existing disposition unchanged."
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B603",
+      "old_line": 4890,
+      "new_line": 4892,
+      "old_id": "8a8f56e48a86f3aded1f552f872daab7ad2b1ef5e3aa573b78ceca683fad313b",
+      "new_id": "0efb2b285608bc06ef4ae9cba9971ac393ca13774887011d34f13201b873d736",
+      "basis": "Exact finding fields and surrounding source text identical after removing report line-number prefixes; call/statement and existing disposition unchanged."
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B603",
+      "old_line": 5720,
+      "new_line": 5722,
+      "old_id": "59ab01e09d1b4203d2bdd0e66c849547eadb164aed00c5eb8ed2606cdcfb706b",
+      "new_id": "b720433c94cbdbdc3336e605aeabbbf8b9af046ef6ede3a685f6a901a133d32c",
+      "basis": "Exact finding fields and surrounding source text identical after removing report line-number prefixes; call/statement and existing disposition unchanged."
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B603",
+      "old_line": 7191,
+      "new_line": 7193,
+      "old_id": "98556dcfc72580e2f780aa60725596b6e2d51be4e2598180368e571ba39d75d4",
+      "new_id": "a1a82c1ebe85f0aa274abd66d38e5b97aa95e173f68e5c34acc87955dd7d99be",
+      "basis": "Exact finding fields and surrounding source text identical after removing report line-number prefixes; call/statement and existing disposition unchanged."
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B603",
+      "old_line": 7403,
+      "new_line": 7405,
+      "old_id": "4cb8b05b1cab53012e8c5d27546a21447ff9bbdde8d6effe70a19b6436a92f6f",
+      "new_id": "d41c00e68c8b88015ff5651b8cfc84227272f9185e6471153d71bda7de0f6a7f",
+      "basis": "Exact finding fields and surrounding source text identical after removing report line-number prefixes; call/statement and existing disposition unchanged."
+    }
+  ],
+  "new_trust_dispositions": 0,
+  "suppressions_added": 0,
+  "transport": {
+    "reviewed_sites": 30,
+    "source_files": 21,
+    "inventory_passed": true,
+    "remote_model_attestation_complete": false,
+    "release_candidate": false
+  },
+  "scan_path": "docs/validation/r210/admin-cutover-hardened-bandit.json",
+  "scan_sha256": "e6c24baf956df8b466f647ce63836cb3d79fcb4d96e9bbeb08bcbf9d235cff33"
+}

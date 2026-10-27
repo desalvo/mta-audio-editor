@@ -61,7 +61,8 @@ def now_ts() -> int:
 def db():
     root = data_root()
     root.mkdir(parents=True, exist_ok=True)
-    con = sqlite3.connect(db_path())
+    from .regime_service_lease import connect
+    con = connect(db_path())
     con.row_factory = sqlite3.Row
     # Immutable subscription records can only be removed by a separately
     # authorized, owner-scoped account erasure on this exact connection.
@@ -141,7 +142,52 @@ def _add_column(con: sqlite3.Connection, table: str, definition: str) -> None:
             con.execute("UPDATE users SET workspace_quota_explicit=1 WHERE role='admin' AND workspace_quota_bytes NOT IN (0,5368709120)")
 
 
+_AUTH_SCHEMA_READS = (
+    ('SELECT * FROM users LIMIT 0', frozenset('''id username email display_name password_hash role active email_confirmed
+        pending_email totp_secret_enc totp_pending_enc totp_enabled created_at updated_at approved_at approved_by
+        last_login_at workspace_quota_bytes workspace_quota_explicit language browser_language limits_expanded'''.split())),
+    ('SELECT * FROM email_tokens LIMIT 0', frozenset('id user_id purpose token_hash expires_at used_at'.split())),
+    ('SELECT * FROM social_identities LIMIT 0', frozenset('id user_id provider subject created_at'.split())),
+    ('SELECT * FROM sessions LIMIT 0', frozenset('id user_id token_hash created_at expires_at user_agent_hash'.split())),
+    ('SELECT * FROM model_access_tokens LIMIT 0', frozenset('id user_id token_hash scopes label created_at expires_at revoked_at'.split())),
+    ('SELECT * FROM smtp_config LIMIT 0', frozenset('id host port security username password_enc from_email from_name'.split())),
+)
+
+
+def _auth_schema_ready(con) -> bool:
+    """Inspect the actual database on every call; no stale path/process cache.
+
+    Complete installations must authenticate readers while another connection
+    holds BEGIN IMMEDIATE. Even INSERT OR IGNORE claims SQLite's writer slot.
+    """
+    try:
+        for sql, required in _AUTH_SCHEMA_READS:
+            cursor = con.execute(sql)
+            if not required <= {column[0] for column in cursor.description}:
+                return False
+        if not con.execute("SELECT 1 FROM sqlite_master WHERE type='index' AND name='idx_model_access_tokens_user'").fetchone():
+            return False
+        if not con.execute('SELECT 1 FROM smtp_config WHERE id=1').fetchone():
+            return False
+        return not os.getenv('MTA_ADMIN_PASSWORD', '') or bool(con.execute('SELECT 1 FROM users LIMIT 1').fetchone())
+    except sqlite3.OperationalError as exc:
+        if 'no such table:' in str(exc):
+            return False
+        raise
+
+
 def init_auth_db() -> None:
+    from .regime_service_lease import fence_held
+    if fence_held():
+        # Recovery must use the existing authentication schema, never migrate
+        # or provision defaults in the middle of a committed financial cutover.
+        with db() as con:
+            con.execute('SELECT id,role,active FROM users LIMIT 0')
+            con.execute('SELECT token_hash FROM sessions LIMIT 0')
+        return
+    with db() as con:
+        if _auth_schema_ready(con):
+            return
     with db() as con:
         con.executescript("""
         CREATE TABLE IF NOT EXISTS users(

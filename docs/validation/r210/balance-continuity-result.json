@@ -1,0 +1,64 @@
+{
+  "date": "2026-10-26",
+  "base_commit": "9fc85ce79bee9871696dea9396565395a415aa72",
+  "reports": [
+    {
+      "path": "docs/validation/r210/balance-continuity-initial.xml",
+      "sha256": "71a8d2938011aa943ec0e582689d7bd279cf5e7d7e36bb6dbfd76073054e0a16",
+      "passed": 8,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/validation/r210/balance-continuity-integration.xml",
+      "sha256": "c4045cb9df826325d33e8ddb08f5b0068de3b058ab8bab93c6225a1178636fa0",
+      "passed": 48,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/validation/r210/balance-continuity-maintenance.xml",
+      "sha256": "fb66e87cd45d6169808127bd7092776c5330aec3284c492043c425f7d6928d64",
+      "passed": 16,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/validation/r210/balance-continuity-gates.xml",
+      "sha256": "4bbfa8ce2cb7647ea1ec6fa39b44dc57c23ce1c1b0f1a8654e2ad42bb5346f53",
+      "passed": 6,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    }
+  ],
+  "distinct_current": {
+    "passed": 70,
+    "failed": 0,
+    "error": 0,
+    "skipped": 0
+  },
+  "new_cases": 11,
+  "source_sha256": {
+    "app/regime_balance_continuity.py": "a9888d50e85c8076f473c6c2ba9e34f9bc4eb10db835d9ab822131cab3f62163",
+    "app/regime_maintenance.py": "d21b237683307a88c5dfe2b9745989874ad04a5e0c111bba54e85edb809fbb46",
+    "tests/test_r210_balance_continuity.py": "44cfb101ef5f3fbd6966d4634dc87ad13131e80ee97205c2b13ee32810bb3e1f"
+  },
+  "scope": "Exact internal financial-row conservation across DB cutover,mirror and finalize in both directions;real account tables/wallet/period/history. Authoritative readiness callbacks are explicit test doubles;this is not enabled administrator API acceptance.",
+  "original_criterion": "D6 remains implementation_pending;C2,C3,C5 still require implementation. No macroarea is accepted.",
+  "security": {
+    "app_files": 290,
+    "reviewed_findings": 165,
+    "high": 0,
+    "medium": 21,
+    "low": 144,
+    "findings_unchanged": true
+  },
+  "selection_correction": "An unmatched transition glob caused one no-collection invocation;corrected selection,no production/test expectations changed.",
+  "release_candidate": false,
+  "accepted_original_criteria": 23,
+  "original_criteria": 42
+}

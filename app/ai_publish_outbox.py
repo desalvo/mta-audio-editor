@@ -39,7 +39,8 @@ def _open():
     db = _root() / 'outbox.sqlite3'
     for suffix in ('', '-wal', '-shm', '-journal'):
         _check_outbox_file(Path(str(db) + suffix))
-    con = sqlite3.connect(db, isolation_level=None, timeout=30)
+    from .regime_service_lease import connect
+    con = connect(db, isolation_level=None, timeout=30)
     try:
         con.row_factory = sqlite3.Row
         con.execute('PRAGMA journal_mode=WAL')

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="16" time="36.109" timestamp="2026-10-26T19:37:36.407522+01:00" hostname="7291289a56a1"><testcase classname="tests.test_r210_admin_cutover_e2e" name="test_actual_admin_roundtrip_preserves_wallet_periods_and_real_nc_history" time="5.754" /><testcase classname="tests.test_r210_admin_cutover_e2e" name="test_real_registered_builtin_harmony_and_measured_nc_statement_survive_actual_return_cutover" time="3.988" /><testcase classname="tests.test_r210_admin_cutover_e2e" name="test_interruption_keeps_barrier_auth_and_original_finances_then_forward_recovers[False]" time="1.173" /><testcase classname="tests.test_r210_admin_cutover_e2e" name="test_interruption_keeps_barrier_auth_and_original_finances_then_forward_recovers[True]" time="1.283" /><testcase classname="tests.test_r210_admin_cutover_e2e" name="test_unverifiable_or_financially_unsupported_states_refuse_actual_api[provider]" time="0.911" /><testcase classname="tests.test_r210_admin_cutover_e2e" name="test_unverifiable_or_financially_unsupported_states_refuse_actual_api[history]" time="0.822" /><testcase classname="tests.test_r210_admin_cutover_e2e" name="test_unverifiable_or_financially_unsupported_states_refuse_actual_api[credit]" time="0.725" /><testcase classname="tests.test_r210_admin_cutover_e2e" name="test_unverifiable_or_financially_unsupported_states_refuse_actual_api[priced-plan]" time="0.943" /><testcase classname="tests.test_r210_admin_cutover_e2e" name="test_unverifiable_or_financially_unsupported_states_refuse_actual_api[missing-schema]" time="0.935" /><testcase classname="tests.test_r210_admin_cutover_e2e" name="test_unverifiable_or_financially_unsupported_states_refuse_actual_api[unknown-journal]" time="0.927" /><testcase classname="tests.test_r210_admin_cutover_e2e" name="test_unverifiable_or_financially_unsupported_states_refuse_actual_api[running-job]" time="1.012" /><testcase classname="tests.test_r210_admin_cutover_e2e" name="test_preview_staleness_auth_csrf_default_off_and_confirmation_are_not_bypassable" time="1.274" /><testcase classname="tests.test_r210_admin_cutover_e2e" name="test_live_accounting_connection_blocks_exclusive_cutover" time="0.978" /><testcase classname="tests.test_r210_admin_cutover_e2e" name="test_independent_process_lease_blocks_api_and_sigkill_releases_only_os_lock" time="1.818" /><testcase classname="tests.test_r210_admin_cutover_e2e" name="test_actual_api_process_sigkill_after_sqlite_commit_preserves_durable_barrier" time="3.443"><failure message="AssertionError: /workspace/scratch/06e635791464/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.&#10;    from starlette.testclient import TestClient as TestClient  # noqa&#10;  Traceback (most recent call last):&#10;    File &quot;&lt;string&gt;&quot;, line 10, in &lt;module&gt;&#10;  RuntimeError: Crash injection not reached&#10;  &#10;assert 1 == -&lt;Signals.SIGKILL: 9&gt;&#10; +  where 1 = CompletedProcess(args=['/workspace/scratch/06e635791464/work/../venv/bin/python', '-c', &quot;import json,os,signal,sys\nfr...ceback (most recent call last):\n  File &quot;&lt;string&gt;&quot;, line 10, in &lt;module&gt;\nRuntimeError: Crash injection not reached\n').returncode&#10; +  and   &lt;Signals.SIGKILL: 9&gt; = signal.SIGKILL">ready = (&lt;starlette.testclient.TestClient object at 0x7f23255117f0&gt;, 2, 1)
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f2325edf8f0&gt;
+
+    def test_actual_api_process_sigkill_after_sqlite_commit_preserves_durable_barrier(ready, monkeypatch):
+        client, uid, _ = ready
+        body = begin(client, identifier='real-process-crash')
+        script = '''import json,os,signal,sys
+    from app import main,regime_admin_cutover as cutover
+    from fastapi.testclient import TestClient
+    data=json.load(sys.stdin)
+    def crash(*args):os.kill(os.getpid(),signal.SIGKILL)
+    cutover.reconcile_mirror=crash
+    client=TestClient(main.app)
+    client.cookies.update(data['cookies'])
+    client.post('/api/admin/service-regime/cutovers',headers={'X-MTA-Request':'1'},json=data['body'])
+    raise RuntimeError('Crash injection not reached')
+    '''
+        outcome = subprocess.run([sys.executable, '-c', script], input=json.dumps({'body': body, 'cookies': dict(client.cookies)}),
+                                 capture_output=True, text=True, timeout=30, env=dict(os.environ))
+&gt;       assert outcome.returncode == -signal.SIGKILL, outcome.stderr
+E       AssertionError: /workspace/scratch/06e635791464/venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+E           from starlette.testclient import TestClient as TestClient  # noqa
+E         Traceback (most recent call last):
+E           File "&lt;string&gt;", line 10, in &lt;module&gt;
+E         RuntimeError: Crash injection not reached
+E         
+E       assert 1 == -&lt;Signals.SIGKILL: 9&gt;
+E        +  where 1 = CompletedProcess(args=['/workspace/scratch/06e635791464/work/../venv/bin/python', '-c', "import json,os,signal,sys\nfr...ceback (most recent call last):\n  File "&lt;string&gt;", line 10, in &lt;module&gt;\nRuntimeError: Crash injection not reached\n').returncode
+E        +  and   &lt;Signals.SIGKILL: 9&gt; = signal.SIGKILL
+
+tests/test_r210_admin_cutover_e2e.py:253: AssertionError</failure></testcase><testcase classname="tests.test_r210_admin_cutover_e2e" name="test_changed_original_receipt_cannot_rebaseline_or_abort_committed_transition" time="1.319" /></testsuite></testsuites>

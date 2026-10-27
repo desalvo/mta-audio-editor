@@ -1,0 +1,46 @@
+name: Optional administrative cutover Chromium
+on:
+  workflow_dispatch:
+    inputs:
+      admin_cutover_chromium:
+        description: Run nine actual UI/API cutover and recovery cases
+        type: boolean
+        required: true
+        default: false
+permissions:
+  contents: read
+jobs:
+  admin-cutover-chromium:
+    if: ${{ inputs.admin_cutover_chromium }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      MTA_TEST_OFFLINE: '1'
+      PYTHONPATH: .
+      MTA_ALLOW_INSECURE_NO_AUTH: 'false'
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+          cache: pip
+      - name: Install isolated test dependencies
+        run: |
+          python -m pip install -r requirements-dev.txt playwright==1.51.0
+          python -m pip check
+      - name: Install actual Chromium and Linux dependencies
+        run: python -m playwright install --with-deps chromium
+      - name: Run real UI and API acceptance (zero skips)
+        env:
+          MTA_DATA_DIR: ${{ runner.temp }}/mta-admin-cutover-data
+          MTA_AI_JOB_STATE_DIR: ${{ runner.temp }}/mta-admin-cutover-jobs
+        run: python scripts/run_admin_cutover_chromium.py --output admin-cutover-ci
+      - name: Upload Chromium acceptance diagnostics
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: admin-cutover-chromium-${{ github.run_id }}
+          if-no-files-found: warn
+          path: admin-cutover-ci/

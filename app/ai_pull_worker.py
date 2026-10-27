@@ -106,8 +106,10 @@ def _task(value, instance):
         raise ValueError('Invalid worker receipt')
     if value.get('cancelled') is True:
         return b''
-    if set(value) != {'job_id','kind','instance','nonce','source_kind','source_sha256','timeout','plan','policy','source_b64'}:
+    if set(value)-{'model_requirement'} != {'job_id','kind','instance','nonce','source_kind','source_sha256','timeout','plan','policy','source_b64'}:
         raise ValueError('Invalid assignment fields')
+    if 'model_requirement' in value and not isinstance(value['model_requirement'],dict):
+        raise ValueError('Invalid model requirement')
     from .ai_worker_registry import registered_kinds
     from .ai_remote_transport import validate_audio_options
     if value['kind'] not in registered_kinds() or type(value['timeout']) is not int or not 1 <= value['timeout'] <= 86400:
@@ -136,11 +138,21 @@ def _run(client, journal, state):
     from .ai_worker_registry import resolve_worker, worker_python
     from .ai_worker_artifacts import package_artifacts, _verify_wav_bytes
     from .ai_metering_agent import run_metered_process
+    from .ai_execution_policy import KEY
     if asdict(authorize_remote_execution(task['kind'], task['plan'])) != task['policy']:
         raise ValueError('Worker model policy differs from admitted authority policy')
     worker = resolve_worker(task['kind'])
     if worker is None:
         raise ValueError('Operator-selected engine is unavailable on this worker')
+    from .ai_model_attestation import CONTEXT,RECEIPT,context,validate
+    model_requirement=task.get('model_requirement')
+    if model_requirement is not None:
+        if (task['kind']!='audio-to-midi-basic-pitch'
+                or model_requirement.get('schema')!='mta-basic-pitch-load-1'
+                or model_requirement.get('policy')!=task['policy']
+                or worker!=Path(__file__).with_name('ai_studio_adapter.py')
+                or hashlib.sha256(worker.read_bytes()).hexdigest()!=model_requirement.get('adapter_sha256')):
+            raise ValueError('Unsupported or changed attested adapter')
     cancelled = False
     pulse_at = float('-inf')
     def heartbeat():
@@ -189,7 +201,7 @@ def _run(client, journal, state):
         state['task'] = {k: task[k] for k in ('job_id', 'instance', 'nonce')}
         _write(journal, state)
         measurement = run_metered_process(command, cwd=folder, timeout_seconds=task['timeout'], cancel_check=heartbeat,
-            env={**os.environ, 'MTA_AI_PROGRESS_FILE': str(directory / 'progress.json'),
+            env={**os.environ,CONTEXT:protocol.encode(context(task)) if model_requirement else '',RECEIPT:str(directory/'model-receipt.json') if model_requirement else '', **{KEY:protocol.encode({'schema':'mta-execution-policy-1','kind':task['kind'],'decision':task['policy']})}, 'MTA_AI_PROGRESS_FILE': str(directory / 'progress.json'),
                  'MTA_AI_JOB_MAX_ARTIFACT_MIB': '16'})
         if not measurement.isolated:
             raise WorkerUncertain('Unverified worker descendants; retain original assignment without settlement')
@@ -199,11 +211,17 @@ def _run(client, journal, state):
         if measurement.exit_code:
             return outcome
         try:
+            model_receipt=None
+            if model_requirement is not None:
+                model_receipt=protocol.decode(private_file(directory/'model-receipt.json',limit=8192))
+                if measurement.pid is None:raise ValueError('Original measured worker PID required')
+                validate(model_receipt,model_requirement,task,pid=measurement.pid)
             payload, media = package_artifacts(directory, max_bytes=protocol.MAX_BYTES)
             protocol.validate_payload(payload, media)
         except (ValueError, OSError):
             return outcome
-        return {'status': 'done', 'cpu_seconds': outcome['cpu_seconds'], 'media_type': media,
+        extra={'model_receipt':model_receipt} if model_receipt is not None else {}
+        return extra | {'status': 'done', 'cpu_seconds': outcome['cpu_seconds'], 'media_type': media,
                 'result_b64': base64.b64encode(payload).decode()}
 
 

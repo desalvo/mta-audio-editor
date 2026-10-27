@@ -1,0 +1,118 @@
+{
+  "date": "2026-10-26",
+  "base_commit": "9fc85ce79bee9871696dea9396565395a415aa72",
+  "reports": [
+    {
+      "report": "subscription-basis-finance.xml",
+      "passed": 345,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "report": "subscription-basis-browser.xml",
+      "passed": 4,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "report": "subscription-basis-gates-first.xml",
+      "passed": 45,
+      "failed": 1,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "report": "subscription-basis-gates-resolution.xml",
+      "passed": 1,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    }
+  ],
+  "current_distinct": {
+    "passed": 395,
+    "failed": 0,
+    "error": 0,
+    "skipped": 0
+  },
+  "source_sha256": {
+    "app/subscription_basis_audit.py": "48c20571e0bebee009a8fe4ddaa58d7d5b9d446af99aec35df1e85b91267e27a",
+    "app/payment_reconciliation.py": "bf1dcbf57b3052685572f77e3f0fd702a55a47d65c74425539f09e4596b2b6e5",
+    "app/resource_routes.py": "b018818249aff1b8e6b69f6533609a659f8fa264c30fadc4ee9ffc6d7a458e5e",
+    "app/static/regime_admin_panel.js": "d336651f92a051a6a03719945ed027e0f2adda107694b20814218566e7ec6ce7"
+  },
+  "new_audit_api_cases": 27,
+  "new_actual_chromium_cases": 4,
+  "security": {
+    "reviewed_findings": 168,
+    "source_files": 286,
+    "raw_severity": {
+      "HIGH": 0,
+      "MEDIUM": 21,
+      "LOW": 147
+    },
+    "scan_review_passed": true,
+    "release_candidate": false,
+    "transition_enabled": false
+  },
+  "remote_transport": {
+    "reviewed_sites": 30,
+    "source_files": 21,
+    "passed": true
+  },
+  "checks": {
+    "ruff_app_scripts_tests": "passed",
+    "changed_python_compilation": "passed",
+    "changed_javascript_syntax": "passed",
+    "git_diff_whitespace": "passed"
+  },
+  "corrections": [
+    {
+      "report": "subscription-basis-gates-first.xml",
+      "case": "tests.test_r210_security_review_gate::test_current_scan_and_complete_review_ledger_agree",
+      "failure": "Stored raw Bandit scan lacked new module metrics after source-bound review refresh",
+      "fix": "Saved complete current raw scan and updated current_scan pointer; scanner/checker/expectations unchanged",
+      "resolution": "subscription-basis-gates-resolution.xml"
+    }
+  ],
+  "runtime": {
+    "python": "3.12.14",
+    "pytest": "9.1.1",
+    "fastapi": "0.142.2",
+    "pydantic": "2.12.5",
+    "httpx": "0.28.1",
+    "playwright": "1.51.0",
+    "bandit": "1.9.4",
+    "ruff": "0.16.10"
+  },
+  "full_ci_repeated": false,
+  "historical_counts_added": false,
+  "real_provider_calls": 0,
+  "progress": {
+    "verified": 23,
+    "total": 42,
+    "percent": 54.8,
+    "whole_macroareas": 0
+  },
+  "release_candidate": false,
+  "transition_enabled": false,
+  "legacy_block": "Independent original applied-fee/surplus evidence unavailable; mutable current records are insufficient.",
+  "gitleaks_delta": {
+    "version": "8.24.3",
+    "official_binary_checksum_verified": true,
+    "patch_findings": 0,
+    "full_changed_files_findings": 5,
+    "introduced_findings": 0,
+    "explanation": "All5 whole-file findings are byte-identical baseline public source-checksum lines at27/42/90/102/221 in APP_SECURITY_REVIEW_R210.json; already reviewed by the committed historical Gitleaks disposition. No new exclusion, allowlist or fingerprint was added. Actual patch scan returned0 findings."
+  },
+  "delivery_validation": {
+    "baseline": "9fc85ce79bee9871696dea9396565395a415aa72",
+    "clean_apply_check": "passed",
+    "applied_file_bytes_and_modes": "all match",
+    "github_mutations": 0,
+    "commits": 0,
+    "intermediate_zips": 0
+  }
+}

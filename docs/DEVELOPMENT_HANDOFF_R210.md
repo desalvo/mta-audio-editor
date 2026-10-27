@@ -1,3 +1,57 @@
+## Current hotfix — export polling SQLite contention — 2026-10-26
+
+Read EXPORT_SQLITE_CONTENTION_R210.md first. Complete cumulative: **MTA-0.3.0-r210-pre-RC-export-sqlite-hotfix-cumulative.zip**. Existing-schema authentication and project-owner lifecycle reads no longer acquire the writer slot for repeated schema/default initialization;API auto-locale detection no longer persists preferences on every poll. Genuine missing schema/default/index migration and admin bootstrap remain active.58 affected functional passes,11 new,including six actual project/track MP3/WAV/FLAC exports,polling/download under a real held SQLite writer and ffprobe codec verification. A current source-security agreement gate also passes. Exact proof:validation/r210/export-auth-contention-result.json. No server/provider/GitHub mutation or commit.
+
+Original23/42(54.8%),0/7 macroareas,RC false;general switching remains disabled and local mode default-off. Prior cutover API/UI and its9-case manual Chromium CI are included and retain their documented acceptance limits. Earlier records below are historical where superseded;do not repeat unchanged full CI or rebuild the completed initializer/cutover work.
+
+## Current continuation — actual local admin cutover/API/UI — 2026-10-26
+
+Read ADMIN_CUTOVER_LOCAL_R210.md first. Complete cumulative: **MTA-0.3.0-r210-pre-RC-admin-cutover-cumulative.zip**. Actual default-off local-authority maintenance API now previews,confirms,conserves,commits,mirrors,finalizes and recovers the original operation. Cross-process HTTP/accounting/queue/outbox leases and persistent post-crash write denial are integrated. Real two-way API,registered built-in harmony/CPU/NC history,SIGKILL,login and second-administrator recovery pass. IT/EN UI includes confirmation,audit,progress,forward recovery and original-identity retry after response loss/reload. Exact current validation:validation/r210/admin-cutover-result.json.
+
+**Original macroarea request remains unmet:23/42(54.8%),0/7;RC false.** The bounded no-provider-history profile does not close broad C2/C3/C5/D6 or replace missing provider/legacy/distributed implementation. Global coverage/readiness/RC gates remain blocked;default switching stays off. UI implementation awaits9 actual Chromium passes;the local runner correctly rejects9 prerequisite skips. After the user commits,run the new manual/default-off **Optional administrative cutover Chromium**,input **admin_cutover_chromium=true**. No unchanged full CI,GitHub/server/provider/model mutation or commit was performed. Earlier handoff priorities are historical where superseded;reuse this implementation rather than rebuilding primitives.
+
+## Current resume — D6/macroarea closure request
+
+User now requests at least one original macroarea closed. Goal not yet met. Read CUMULATIVE_HANDOFF_R210.md,BALANCE_CONTINUITY_R210.md and validation/r210/macroarea-closure-blockers.json. D5/6 is closest;complete C2+C3+C5+D6 through actual administrative API before promoting D. Preserve the new original financial conservation receipt at internal DB commit/finalize. Do not accept internal readiness doubles or flip hardcoded coverage/readiness flags as closure. No commit;full cumulative contains all post9fc85ce changes. Prior AI pilot/target work is retained and is not the next isolated-helper priority.
+
+## Current resume — 2026-10-26
+
+Read CUMULATIVE_HANDOFF_R210.md,MODEL_ATTESTATION_PILOT_R210.md and RC_FINAL_WORK_QUEUE_R210.md first. The complete model-attestation cumulative includes every uncommitted change after9fc85ce;do not restore older packages over it. Trusted-node Basic Pitch load receipts/requirements are now implemented;they do not complete F3 for every remote path or satisfy real-model target acceptance. Original23/42,RC false. Remaining code and target requirements are separate in the pilot/runbook. Historical entries below do not override current source/proof.
+
+## Current cumulative checkpoint — 2026-10-26 — server/native executor boundaries
+
+Read **CUMULATIVE_HANDOFF_R210.md** first. Current complete delivery: **MTA-0.3.0-r210-pre-RC-executor-boundaries-cumulative.zip** plus adjacent SHA256. Contains all uncommitted changes after9fc85ce, prior subscription-evidence/active-owner work, original assets/licenses/manuals and recovered historical logs. User will commit later. Default delivery is now a complete cumulative when possible, at substantial checkpoints; no helper-sized ZIPs. Do not apply an old patch over this integrated archive.
+
+New implementation closes the insecure-no-auth flag selecting a local server inference fallback, rejects invalid/non-native zero Studio actors before model/native credential effects, and reserves synchronous stem compatibility for native applications with readable rights denial. Servers use existing authenticated asynchronous jobs. Original owner/project ACL, registered CPU/accounting and native local/remote output workflows are retained. **194 distinct affected current cases pass,26 new;zero unresolved failures/errors/skips**. Evidence:validation/r210/executor-boundaries-result.json. Previous current-boundary/financial/CI proofs are retained without a new full baseline;counts overlap.
+
+Source-bound security286 app files/165 reviewed unsuppressed findings(0 HIGH/21 MEDIUM/144 LOW),transport30 sites/21 files,unchanged checkers;Ruff/changed Python compilation pass. Cumulative preserves612 historical logs recovered with exact original SHA/bytes/modes,overwriting no source. Refreshed full source manifest and preservation records accompany the archive.
+
+**23/42(54.8%),0/7 whole macroareas;RC false;switching disabled.** Remaining14 implementation/functional/rights criteria and5 external acceptance criteria are listed in the cumulative handoff and unchanged component checklist. F3 protocol,all-executor/kernel/rights coverage,global/legacy finance and actual integrated two-way cutover are not claimed complete. No staging/commit/push/tag/release or GitHub/server/provider/model mutation. Historical records below do not override this handoff.
+
+## Current implementation — 2026-10-26 — active execution owner and supervised source preparation
+
+Read **EXECUTION_OWNER_HANDOFF_R210.md** first, then RC_FINAL_WORK_QUEUE_R210.md. The existing uncommitted delta on9fc85ce now includes the previous subscription-evidence workflow plus active durable scheduler-owner validation before nested/local/pull dispatch, stale/foreign/terminal/cancelled context rejection, pre-spawn cancellation, and bounded/cancellable FFmpeg source preparation sharing the inference budget. Same-owner FIFO nesting and existing output/publication metadata are preserved. No new model/provider/server/GitHub action or commit.
+
+**347 distinct affected cases passed,37 new;zero unresolved failures/errors/skips.** Exact current XML/failure/correction/source provenance:validation/r210/execution-owner-result.json. Includes actual token API/ledger, scheduler/process/subprocess, pull/deferred and Studio paths. Source-bound security now286 files/165 unsuppressed reviewed findings(0 HIGH/21 MEDIUM/144 LOW);three findings removed with the unsupervised FFmpeg call/import, two launch findings re-reviewed at relocated lines. Transport30 sites/21 files unchanged. Historical full CI and source-identical financial evidence reused; no unrelated full-suite rerun.
+
+**23/42(54.8%),0/7 whole macroareas;RC false;switching disabled.** This completes the common registered-dispatch/source-preparation path; all-executor/opaque coverage, the F3 checkpoint/rights protocol, independent rights and actual kernel/OS/multi-host proof remain open. Do not relabel missing implementation as an external-only block. Keep the single cumulative uncommitted patch; user commit remains deferred. Current queue/handoff overrides the historical records below.
+
+## Work organization — 2026-10-26 — authoritative next actions
+
+Read **RC_FINAL_WORK_QUEUE_R210.md** and **SUBSCRIPTION_EVIDENCE_HANDOFF_R210.md**. Resume the current uncommitted delta on9fc85ce; the user will commit later. The former next_actions/resume pointer wrongly referred to the old admin/item-movement checkpoint and rebuilding B4. Those pointers are corrected; accepted B4 and existing CI/test evidence are reused.
+
+One queue: every-executor ownership/rights; remaining provider/legacy conservation; then one integrated two-way cutover/backend/UI stream. External acceptance proceeds only with its actual prerequisites. Original denominator unchanged: **23/42(54.8%),0/7 whole macroareas;14 criteria still need implementation/review and5 need external target acceptance. RC false;switching disabled.** No new product test run or code change was needed for this documentation reorganization. Keep one cumulative uncommitted delta and the existing patch identity; no extra ZIP/package per helper.
+
+The dated records below preserve historical work; their old resume instructions do not override this queue.
+
+## Current continuation — 2026-10-26 — full CI confirmed and legacy subscription evidence
+
+Read **SUBSCRIPTION_EVIDENCE_HANDOFF_R210.md** first. Committed baseline is **9fc85ce79bee9871696dea9396565395a415aa72**. Full manual CI run40257635101 is complete: all12 verification/build jobs pass; three publication jobs skipped; Quality6448 passed/104 prerequisite skips,75.84% coverage,1210.94s. Combined live VST3/MIDI and numeric MIDI browser cases both passed. The earlier pending-first-full notes below are historical. No rerun requested.
+
+New local workflow fixes legacy paid subscriptions silently escaping original-basis checks before a permanent reversal. Complete-set read-only evidence audit verifies immutable original split/identity, capture totals and funded EUR position; payment report/combined readiness retain unknown cases. Admin-only no-store paginated API and IT/EN keyboard/paging/error/retry panel complete the review path. No fee is reconstructed from current mutable records; no debt or provider mutation is created. Current affected finance345 passes plus4 new actual Chromium cases; security/transport and exact evidence are in validation/r210/subscription-basis-result.json. Historical original-split proof is unavailable, so legacy migration remains blocked; continue every-executor ownership/rights independently.
+
+**23/42(54.8%),0/7 whole macroareas;RC false;switching disabled.** Full CI success does not accept the104 omitted target cases, installed native/hardware execution or the other incomplete financial/executor/cutover criteria. One patch, no intermediate ZIP, no staging/commit/push/tag/release or GitHub/server/provider write. Next commit summary must include only changes after9fc85ce. The cumulative archive manifest remains historical until another cumulative is necessary.
+
 ## Quality correction and faster opt-in full validation — 2026-10-25 — PRE-RC
 
 Publication guard: ordinary Quality cannot unlock Docker/main or early-main publication. Full validation is required; a push message containing [full-ci] also opts into full scope. The existing tag and manual-dispatch publication boundaries remain.

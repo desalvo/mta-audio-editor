@@ -1,3 +1,25 @@
+## Current continuation — actual local admin cutover/API/UI — 2026-10-26
+
+Read ADMIN_CUTOVER_LOCAL_R210.md first. Complete cumulative: **MTA-0.3.0-r210-pre-RC-admin-cutover-cumulative.zip**. Actual default-off local-authority maintenance API now previews,confirms,conserves,commits,mirrors,finalizes and recovers the original operation. Cross-process HTTP/accounting/queue/outbox leases and persistent post-crash write denial are integrated. Real two-way API,registered built-in harmony/CPU/NC history,SIGKILL,login and second-administrator recovery pass. IT/EN UI includes confirmation,audit,progress,forward recovery and original-identity retry after response loss/reload. Exact current validation:validation/r210/admin-cutover-result.json.
+
+**Original macroarea request remains unmet:23/42(54.8%),0/7;RC false.** The bounded no-provider-history profile does not close broad C2/C3/C5/D6 or replace missing provider/legacy/distributed implementation. Global coverage/readiness/RC gates remain blocked;default switching stays off. UI implementation awaits9 actual Chromium passes;the local runner correctly rejects9 prerequisite skips. After the user commits,run the new manual/default-off **Optional administrative cutover Chromium**,input **admin_cutover_chromium=true**. No unchanged full CI,GitHub/server/provider/model mutation or commit was performed. Earlier handoff priorities are historical where superseded;reuse this implementation rather than rebuilding primitives.
+
+## Current priority — user macroarea closure request — 2026-10-26
+
+Read current cumulative handoff and BALANCE_CONTINUITY_R210.md. Request remains unmet:0/7 whole macroareas. D5/6 is closest but actual D6 depends on C2,C3,C5. The conservation component is now integrated with maintenance finalization;do not count its callback-based internal tests as enabled admin cutover. Complete C2+C3+C5+D6 together;older executor-first/helper iteration directions below are superseded.23/42 acceptance score unchanged,no commit/remote mutation.
+
+## Latest cumulative — 2026-10-26
+
+Resume **CUMULATIVE_HANDOFF_R210.md** and the complete executor-boundaries cumulative. Strict server/native routing and native-only legacy compatibility now pass194 distinct affected cases/26 new. Previous subscription evidence and active-owner work is integrated. Source/assets/licenses/manuals/historical logs are preserved;full manifest refreshed. Commit deferred;no repeated unchanged full CI.23/42(54.8%),0/7 macroareas;RC false,switching disabled. Follow the original remaining implementation and external criteria,not the historical patch-only directions below.
+
+## Latest implementation — 2026-10-26
+
+Resume **EXECUTION_OWNER_HANDOFF_R210.md**. Common registered ownership/source-preparation path now passes347 distinct affected cases/37 new:active original durable scheduler actor/incarnation before local/pull dispatch, pre-spawn cancellation and bounded cancellable conversion. Retain the existing coordinator and unchanged financial/CI evidence. Remaining every-executor coverage and F3 protocol still need implementation/review; actual target evidence remains separate. No completed criterion is newly claimed:23/42(54.8%),0/7 macroareas;RC false,switching disabled. User commit deferred;one cumulative uncommitted delta.
+
+## Latest checkpoint — 2026-10-26
+
+Read **SUBSCRIPTION_EVIDENCE_HANDOFF_R210.md**. Full CI40257635101 on9fc85ce is verified green, including combined live VST3/MIDI. Current local complete-set legacy-basis audit/API/IT-EN panel prevents unproved originals from appearing verified before a loss. No historical original-split proof exists here, so automatic migration is blocked. This is an A5/C3 defect repair, not full criterion closure. Continue independent every-executor ownership/rights work next; do not repeat the unchanged full CI or call target-build success runtime acceptance. **23/42(54.8%),0/7 macroareas;RC false.**
+
 # Execution plan — 2026-10-25
 
 **23/42 criteria (54.8%),0/7 whole macroareas;RC false;switching disabled.** The checklist measures original acceptance criteria, not internal cycles, helper count or number of tests. Keep every criterion and denominator unchanged. Start `MERCHANT_HISTORY_HANDOFF_R210.md`; executable work order and explicit stop conditions are in `RC_EXECUTION_STRATEGY_R210.json`.

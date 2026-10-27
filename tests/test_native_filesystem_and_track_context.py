@@ -139,7 +139,7 @@ def test_batch_file_delete(tmp_path, monkeypatch):
 
 
 @pytest.mark.skipif(shutil.which("ffmpeg") is None, reason="FFmpeg required")
-def test_contextual_track_stem_job_adds_stems_without_duplicate_source(tmp_path, monkeypatch):
+def test_contextual_track_stem_job_adds_stems_without_duplicate_source(tmp_path, monkeypatch, local_native_ai):
     import app.main as main
     import app.storage as storage
     from app.models import Clip, Track
@@ -157,6 +157,7 @@ def test_contextual_track_stem_job_adds_stems_without_duplicate_source(tmp_path,
         pytest.fail('Stem worker did not commit its terminal queue receipt')
 
     monkeypatch.setattr(storage, "ROOT", tmp_path.resolve())
+    monkeypatch.setenv("MTA_NATIVE_SINGLE_USER", "true")
     monkeypatch.setenv("MTA_ALLOW_INSECURE_NO_AUTH", "true")
 
     source = tmp_path / "track.wav"

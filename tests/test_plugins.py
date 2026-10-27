@@ -96,6 +96,8 @@ def test_stem_split_imports_generated_tracks(tmp_path, monkeypatch):
     import app.storage as storage
 
     monkeypatch.setattr(storage, "ROOT", tmp_path.resolve())
+    monkeypatch.setattr(main, "NATIVE_SINGLE_USER", True)
+    monkeypatch.setenv("MTA_NATIVE_SINGLE_USER", "true")
     monkeypatch.setenv("MTA_ALLOW_INSECURE_NO_AUTH", "true")
     monkeypatch.setattr(main.STEM_SPLITTER, "available", staticmethod(lambda: True))
     monkeypatch.setattr(main, "ffprobe", lambda path: {"streams": [{"codec_type": "audio"}]})

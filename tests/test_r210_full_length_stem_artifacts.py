@@ -10,9 +10,10 @@ import pytest
 
 from app import ai_payload_limits as limits, ai_worker_artifacts as artifacts
 from app.ai_unified_adapter import _artifacts
+from test_r210_queue_identity_stem_metering import env as env  # noqa: F401
 
 
-def test_six_stems_over_old_limits_roundtrip_server_cache_and_native(tmp_path, monkeypatch):
+def test_six_stems_over_old_limits_roundtrip_server_cache_and_native(tmp_path, monkeypatch,env):
     from app import ai_result_cache as cache, ai_remote_client as client
     from app import ai_server_execution as server, native_ai_routing as native
     from app.ai_billing_routes import _verified_worker_response
@@ -46,12 +47,14 @@ def test_six_stems_over_old_limits_roundtrip_server_cache_and_native(tmp_path, m
     verified = client._read_verified_result(response, expected_request_id=key, require_attestation=True)
     assert verified == (payload, mime, meta['job_id'])
     # Exercise web result unpacking as well as native remote consumption.
-    monkeypatch.setattr(server, 'identity', lambda: 1)
+    from app import ai_metering_agent as agent,ai_global_execution as execution
     monkeypatch.setattr('app.ai_metering_agent.execute_registered_worker', lambda *a, **kw: (payload, meta))
     def convert(args, **kw):
+        assert not kw['cancel_check']()
         Path(args[-1]).write_bytes(b'input fixture')
-    monkeypatch.setattr(server.subprocess, 'run', convert)
-    result, job = server.infer('demucs', entries[0][0])
+        return agent.Measurement(0,0,{},'unmetered',False)
+    monkeypatch.setattr(agent, 'run_metered_process', convert)
+    result, job = execution.execute(env,'demucs',lambda _:server.infer('demucs', entries[0][0]))
     assert job == meta['job_id'] and len(result['audio']) == 6
     del result
     monkeypatch.setattr(native, '_read', lambda: {'workers': {'demucs': {
@@ -103,18 +106,22 @@ def test_cache_and_remote_still_reject_oversized_results(tmp_path, monkeypatch):
         client._read_verified_result(response)
 
 
-def test_server_manifest_is_not_charged_to_audio_budget(tmp_path, monkeypatch):
+def test_server_manifest_is_not_charged_to_audio_budget(tmp_path, monkeypatch,env):
     import zipfile
     from app import ai_server_execution as server
-    monkeypatch.setattr(server, 'identity', lambda: 1)
+    from app import ai_metering_agent as agent,ai_global_execution as execution
     monkeypatch.setattr(limits, 'MAX_ARTIFACT_BYTES', 4)
     buffer = io.BytesIO()
     with zipfile.ZipFile(buffer, 'w') as z:
         z.writestr('stem.wav', b'RIFF'); z.writestr('manifest.json', json.dumps({'version': 1}))
     monkeypatch.setattr('app.ai_metering_agent.execute_registered_worker',
                         lambda *a, **kw: (buffer.getvalue(), {'job_id': 'job'}))
-    monkeypatch.setattr(server.subprocess, 'run', lambda args, **kw: Path(args[-1]).write_bytes(b'fixture'))
-    result, job = server.infer('demucs', tmp_path / 'source.wav')
+    def convert(args,**kw):
+        assert not kw['cancel_check']()
+        Path(args[-1]).write_bytes(b'fixture')
+        return agent.Measurement(0,0,{},'unmetered',False)
+    monkeypatch.setattr(agent,'run_metered_process',convert)
+    result, job = execution.execute(env,'demucs',lambda _:server.infer('demucs', tmp_path / 'source.wav'))
     assert result['audio'] == {'stem.wav': b'RIFF'} and job == 'job'
 
 

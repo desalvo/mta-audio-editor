@@ -189,7 +189,10 @@ def test_web_track_separation_is_queued_and_publishes_stems(project,monkeypatch,
     project.tracks=[Track(id='t',name='Source',filename=source.name,duration_ms=100,
         clips=[Clip(id='x',source_end_ms=100)])]
     storage.save_project(project)
-    monkeypatch.setattr(main,'NATIVE_SINGLE_USER',remote)
+    # Both cases exercise native browser UI: standalone local or configured
+    # remote. A diagnostic server is not a standalone native application.
+    monkeypatch.setattr(main,'NATIVE_SINGLE_USER',True)
+    monkeypatch.setenv('MTA_NATIVE_SINGLE_USER','true')
     from app import native_ai_routing
     monkeypatch.setattr(native_ai_routing,'is_remote',lambda kind:remote)
     monkeypatch.setattr(main.STEM_SPLITTER,'available',lambda:not remote)

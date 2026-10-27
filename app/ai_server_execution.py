@@ -1,36 +1,54 @@
 """Web jobs and token clients share registered, metered server workers."""
 import io
 import json
-import os
 from pathlib import Path
-import subprocess
 import tempfile
+import time
 import zipfile
 
 
 def enabled(native=False):
-    return not native and os.getenv('MTA_ALLOW_INSECURE_NO_AUTH','').lower() not in ('1','true','yes','on')
+    # A diagnostic authentication bypass cannot select unowned local inference.
+    # Only an explicitly native application may use the standalone local path.
+    return not native
 
 
 def identity():
-    from .ai_global_execution import current_job
-    from . import ai_arranger_runtime as queue
-    jid=current_job.get()
-    if jid:
-        with queue._db() as con:row=con.execute('SELECT actor_user_id FROM jobs WHERE job_id=?',(jid,)).fetchone()
-        if row and type(row[0]) is int and row[0]>0:return row[0]
-    raise ValueError('Authenticated global AI job required')
+    from .ai_global_execution import active_owner
+    return active_owner()
 
 
 def infer(kind,source,options=None,*,cancel_check=None,raw=False):
-    from .ai_metering_agent import execute_registered_worker
+    from .ai_metering_agent import execute_registered_worker,run_metered_process
+    from .ai_global_execution import active_owner,current_cancel
+    from .model_license_policy import evaluate
+    from .ai_execution_limits import inference_timeout
+    from .ai_payload_limits import MAX_SOURCE_BYTES
     user_id=identity()
+    plan={'kind':kind,**(options or {})}
+    if plan['kind']!=kind:raise ValueError('AI plan cannot override the registered engine')
+    evaluate(kind,plan)
+    budget=inference_timeout(options or {})
+    started=time.monotonic()
+    def cancelled():
+        active_owner(user_id)
+        event=current_cancel.get()
+        return bool(event and event.is_set()) or bool(cancel_check and cancel_check())
     with tempfile.TemporaryDirectory(prefix='mta-server-input-') as folder:
         wav=Path(folder)/'input.wav'
-        subprocess.run(['ffmpeg','-y','-v','error','-i',str(source),'-acodec','pcm_s16le',str(wav)],check=True,capture_output=True)
+        prepared=run_metered_process(['ffmpeg','-nostdin','-y','-v','error','-i',str(source),
+            '-fs',str(MAX_SOURCE_BYTES+1),'-acodec','pcm_s16le',str(wav)],cwd=folder,
+            timeout_seconds=budget,cancel_check=cancelled)
+        if prepared.exit_code or time.monotonic()-started>=budget:
+            raise RuntimeError('AI source preparation failed or timed out')
+        if cancelled():raise RuntimeError('AI job cancelled after source preparation')
+        if not 0<wav.stat().st_size<=MAX_SOURCE_BYTES:
+            raise ValueError('Prepared AI source exceeds size limit or is empty')
         audio=wav.read_bytes()
-        payload,meta=execute_registered_worker(user_id,kind,{'kind':kind,**(options or {})},source_wav=audio,
-            cancel_check=cancel_check,timeout_seconds=__import__('app.ai_execution_limits',fromlist=['inference_timeout']).inference_timeout(options or {}))
+        remaining=int(budget-(time.monotonic()-started))
+        if remaining<1:raise RuntimeError('AI source preparation exhausted inference budget')
+        payload,meta=execute_registered_worker(user_id,kind,plan,source_wav=audio,
+            cancel_check=cancelled,timeout_seconds=remaining)
     if raw:
         from .ai_worker_protocol import verify_preview_wav
         with tempfile.TemporaryDirectory(prefix='mta-server-result-') as folder:

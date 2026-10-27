@@ -1,0 +1,61 @@
+{
+  "date": "2026-10-26",
+  "base_commit": "9fc85ce79bee9871696dea9396565395a415aa72",
+  "restored_from_sha256": "f68cc31f69de2ebee6d2f52d141d3ab84309254aa27948b534ffb4998319386f",
+  "reports": [
+    {
+      "path": "docs/validation/r210/singing-loaded-configuration.xml",
+      "sha256": "2b60371f634cdd0795ba2780201ed4d044d8eb8757a9475399db7f05c2ae3ace",
+      "passed": 38,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/validation/r210/singing-loaded-security.xml",
+      "sha256": "7052cf78e059867c4c35e7b43601fd2d3783880838a991f1b1940a470ea29382",
+      "passed": 1,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/validation/r210/singing-loaded-compatibility.xml",
+      "sha256": "380798158d392f1a7a416c6d50531fcecd4c8c716f2e0d20d3faf1736bbb7f64",
+      "passed": 1,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    }
+  ],
+  "distinct_current": {
+    "passed": 40,
+    "failed": 0,
+    "error": 0,
+    "skipped": 0
+  },
+  "new_cases": 8,
+  "source_sha256": {
+    "app/diffsinger_onnx.py": "8b9bd328e7e9a3f3c076bb8aea3a6b948ee64ce4a82cd558b1ba37df777e5bfa",
+    "app/diffsinger_bridge.py": "1b36855e8e757482a9bb2eff340fb201ee5382e4d52840bafa86fe8ec0949abc",
+    "tests/test_r210_singing_loaded_configuration.py": "e3b3323d9ebc67487eae91f6573522a78e2df4e2d889455ca15f16139b6b3445"
+  },
+  "security": {
+    "files": 287,
+    "findings": 165,
+    "high": 0,
+    "medium": 21,
+    "low": 144,
+    "relocated_finding": "Unchanged fixed operator DiffSinger B603 call moved from line192 to191;same call/code,review retained.",
+    "scan": "docs/validation/r210/singing-loaded-bandit.json"
+  },
+  "scope": "Real parsing and WAV generation with synthetic acoustic/vocoder sessions; not actual voicebank inference. No model download or real provider/server action.",
+  "limitations": [
+    "Native external OpenVPI still reopens its own runtime files; parser fix is not proof of opaque loaded bytes.",
+    "Remaining authenticated remote/executor load protocol and independent model rights remain open."
+  ],
+  "release_candidate": false,
+  "accepted_criteria": 23,
+  "total_criteria": 42,
+  "compatibility": "Uppercase inventory SHA256 remains supported,as by the existing safe_file policy."
+}

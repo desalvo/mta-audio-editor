@@ -6,6 +6,7 @@ components. Model files may contain executable pickle/code: only operator-owned
 bundles may be admitted. All inference still runs in existing isolated workers.
 """
 import hashlib
+from functools import lru_cache
 import io
 import json
 import os
@@ -154,6 +155,26 @@ def validate_manifest(value):
     return value
 
 
+def _file_identity(info):
+    return (info.st_dev,info.st_ino,info.st_mode,info.st_nlink,info.st_size,
+            info.st_mtime_ns,info.st_ctime_ns)
+
+
+@lru_cache(maxsize=32768)
+def _verified_digest(path,identity):
+    # Avoid rehashing multi-GiB immutable checkpoints at every policy heartbeat.
+    # ctime catches replacements/writes even if an operator restores mtime.
+    fd=os.open(path,os.O_RDONLY|getattr(os,'O_NOFOLLOW',0)|getattr(os,'O_NONBLOCK',0))
+    with os.fdopen(fd,'rb') as stream:
+        info=os.fstat(stream.fileno())
+        if not stat.S_ISREG(info.st_mode) or info.st_nlink!=1 or _file_identity(info)!=identity:
+            raise ValueError('Managed asset changed during verification')
+        digest=hashlib.file_digest(stream,'sha256').hexdigest()
+        if _file_identity(os.fstat(stream.fileno()))!=identity:
+            raise ValueError('Managed asset changed during verification')
+        return digest
+
+
 def manifest(asset_id,verify=False):
     if not isinstance(asset_id,str) or not ID.fullmatch(asset_id):raise ValueError('Invalid managed asset ID')
     folder=root()/asset_id;receipt=folder/'receipt.json';path=folder/'manifest.json'
@@ -165,13 +186,20 @@ def manifest(asset_id,verify=False):
     value=validate_manifest(json.loads(data))
     if value['id']!=asset_id:raise ValueError('Managed asset identity mismatch')
     if verify:
+        # Runtime imports and checkpoint discovery must not see unpinned files
+        # added after installation, including links inside otherwise empty dirs.
+        allowed=set(value['files'])|{'manifest.json','receipt.json'}
+        for target in folder.rglob('*'):
+            if target.is_symlink() or (not target.is_dir() and target.relative_to(folder).as_posix() not in allowed):
+                raise ValueError('Unpinned/unsafe managed asset file')
         for name,entry in value['files'].items():
             target=folder/name
             if target.is_symlink() or not target.resolve().is_relative_to(folder.resolve()) or not target.is_file() or target.stat().st_nlink!=1:
                 raise ValueError('Unsafe/missing managed asset file')
-            with target.open('rb') as stream:
-                if target.stat().st_size!=entry['bytes'] or hashlib.file_digest(stream,'sha256').hexdigest()!=entry['sha256']:
-                    raise ValueError('Managed asset file checksum mismatch: '+name)
+            identity=_file_identity(target.stat())
+            if (identity[4]!=entry['bytes'] or _verified_digest(target,identity)!=entry['sha256']
+                    or _file_identity(target.stat())!=identity):
+                raise ValueError('Managed asset file checksum mismatch: '+name)
     return {**value,'enabled':record.get('enabled') is True,'folder':folder}
 
 

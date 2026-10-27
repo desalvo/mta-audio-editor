@@ -140,11 +140,19 @@ def test_worker_checkpoint_keeps_cpu_and_gpu_together(ledger, tmp_path, monkeypa
         return agent.Measurement(0,1,{'cpu_seconds':2.5},'worker',True)
     monkeypatch.setattr(agent,'run_metered_process',measured)
     monkeypatch.delenv('MTA_AI_CGROUP_PARENT',raising=False)
+    # A historical completed row is not an execution permit. This live worker
+    # fixture must acquire the same real scheduler identity as production.
+    with queue._db() as c:
+        c.execute("UPDATE jobs SET state='queued',completed_at=NULL,runner_pid=?,runner_identity=? WHERE job_id='job'",
+                  (os.getpid(),queue._process_identity(os.getpid())))
+    assert queue._claim('job')
     token=ai_global_execution.current_job.set('job')
     try:
         agent._execute_registered_worker(ledger,'whisper',{})
     finally:
         ai_global_execution.current_job.reset(token)
+    with queue._db() as c:
+        c.execute("UPDATE jobs SET state='completed',completed_at=2 WHERE job_id='job'")
     with auth.db() as con:
         diagnostics=list(read(con,ledger).values())
     assert diagnostics == [{'cpu_seconds_estimated':2,'gpu_seconds_estimated':3}]

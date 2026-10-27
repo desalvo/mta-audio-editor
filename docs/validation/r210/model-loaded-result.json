@@ -1,0 +1,46 @@
+{
+  "date": "2026-10-26",
+  "base_commit": "9fc85ce79bee9871696dea9396565395a415aa72",
+  "reports": [
+    {
+      "path": "docs/validation/r210/model-loaded-final.xml",
+      "sha256": "2dabdd35336f5b6e479a1d9785fc7d7d59b4751558eec86c156b17b25e160124",
+      "passed": 38,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/validation/r210/model-loaded-diffsinger.xml",
+      "sha256": "d2441d2224bd37fddb0e65178349134a9deadb9ef80420fc35f7cf8522e5ae74",
+      "passed": 21,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    }
+  ],
+  "distinct_current": {
+    "passed": 59,
+    "failed": 0,
+    "error": 0,
+    "skipped": 0
+  },
+  "new_cases": 11,
+  "source_sha256": {
+    "app/ai_model_bytes.py": "fdcf600ccf14c0d8a66eca2c7e75775ecdb61cd86eabfe7e3f90ad1bd531bef0",
+    "app/ai_studio_adapter.py": "3ae878a363ca68ff4f70b3a06b170172b86639b31a8987d01161f1d605556b45",
+    "app/diffsinger_onnx.py": "dfd5bee7c91011bf639cada75a48d5ce8c02a6ce4299edc3dea88d02dfc6770b",
+    "tests/test_r210_basic_pitch_loaded_identity.py": "208dd27a86f1d78303db0c4b89752a6238d57ebb5296b9198581cc6d65c99d8b",
+    "tests/test_r210_basic_pitch_loaded_runtime.py": "2786a60eb62ddee05f9a9398b49f5e0d45f23d2d504d7d2c491340ee80cd1137"
+  },
+  "runtime": {
+    "onnx": "1.17.0",
+    "onnxruntime": "1.20.1",
+    "scope": "Actual CPU runtime with synthetic Identity graph only. No pretrained checkpoint/Basic Pitch prediction/voicebank acceptance."
+  },
+  "limitations": [
+    "Other opaque/native/remote adapters still need load binding and rights protocol.",
+    "Commercial remote inference and cutover remain disabled."
+  ],
+  "release_candidate": false
+}

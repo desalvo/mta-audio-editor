@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="12" skipped="0" tests="15" time="2.093" timestamp="2026-10-26T17:50:56.989797+01:00" hostname="c53dfbfa14f6"><testcase classname="tests.test_r210_pull_model_attestation" name="test_requirement_frozen_at_admission_and_nonpilot_denied_before_ledger" time="0.170" /><testcase classname="tests.test_r210_pull_model_attestation" name="test_bad_loaded_receipt_never_freezes_settles_or_publishes[missing]" time="0.110"><failure message="AssertionError: assert ('running', 'running', 'open') == ('running', '...d', 'running')&#10;  &#10;  At index 1 diff: 'running' != 'claimed'&#10;  Use -v to get more diff">authority = (1, {'node_id': '3d80ab3b9fff2f2fc420956dc21ba22f', 'credential': '[REDACTED_EPHEMERAL_TEST_CREDENTIAL]', 'shown_once': True}, PosixPath('/tmp/pytest-of-root/pytest-0/test_bad_loaded_receipt_never_0'))
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f2171d76f60&gt;
+field = 'missing'
+
+    @pytest.mark.parametrize('field',['missing','model','job','instance','nonce','policy','source','pid-bool','schema'])
+    def test_bad_loaded_receipt_never_freezes_settles_or_publishes(authority,monkeypatch,field):
+        node,job,assignment=admit(authority,monkeypatch);proof=receipt(assignment)
+        if field=='model':proof['model_sha256']='0'*64
+        elif field in ['job','instance','nonce','source']:
+            key={'job':'job_id','source':'source_sha256'}.get(field,field);proof['context'][key]='0'*len(proof['context'][key])
+        elif field=='policy':proof['context']['policy']={**proof['context']['policy'],'policy_sha256':'0'*64}
+        elif field=='pid-bool':proof['pid']=True
+        elif field=='schema':proof['schema']='other'
+        data=outcome()
+        if field!='missing':data['model_receipt']=proof
+        with pytest.raises(ValueError):central.complete(node['credential'],job,assignment['instance'],assignment['nonce'],data)
+        assert task(job)['state']=='dispatched'
+&gt;       assert economic(job)==('running','claimed','running')
+E       AssertionError: assert ('running', 'running', 'open') == ('running', '...d', 'running')
+E         
+E         At index 1 diff: 'running' != 'claimed'
+E         Use -v to get more diff
+
+tests/test_r210_pull_model_attestation.py:56: AssertionError</failure></testcase><testcase classname="tests.test_r210_pull_model_attestation" name="test_bad_loaded_receipt_never_freezes_settles_or_publishes[model]" time="0.099"><failure message="AssertionError: assert ('running', 'running', 'open') == ('running', '...d', 'running')&#10;  &#10;  At index 1 diff: 'running' != 'claimed'&#10;  Use -v to get more diff">authority = (1, {'node_id': 'f38c4aa23b0d1c12bd4a17800217b25d', 'credential': '[REDACTED_EPHEMERAL_TEST_CREDENTIAL]', 'shown_once': True}, PosixPath('/tmp/pytest-of-root/pytest-0/test_bad_loaded_receipt_never_1'))
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f2171d76900&gt;
+field = 'model'
+
+    @pytest.mark.parametrize('field',['missing','model','job','instance','nonce','policy','source','pid-bool','schema'])
+    def test_bad_loaded_receipt_never_freezes_settles_or_publishes(authority,monkeypatch,field):
+        node,job,assignment=admit(authority,monkeypatch);proof=receipt(assignment)
+        if field=='model':proof['model_sha256']='0'*64
+        elif field in ['job','instance','nonce','source']:
+            key={'job':'job_id','source':'source_sha256'}.get(field,field);proof['context'][key]='0'*len(proof['context'][key])
+        elif field=='policy':proof['context']['policy']={**proof['context']['policy'],'policy_sha256':'0'*64}
+        elif field=='pid-bool':proof['pid']=True
+        elif field=='schema':proof['schema']='other'
+        data=outcome()
+        if field!='missing':data['model_receipt']=proof
+        with pytest.raises(ValueError):central.complete(node['credential'],job,assignment['instance'],assignment['nonce'],data)
+        assert task(job)['state']=='dispatched'
+&gt;       assert economic(job)==('running','claimed','running')
+E       AssertionError: assert ('running', 'running', 'open') == ('running', '...d', 'running')
+E         
+E         At index 1 diff: 'running' != 'claimed'
+E         Use -v to get more diff
+
+tests/test_r210_pull_model_attestation.py:56: AssertionError</failure></testcase><testcase classname="tests.test_r210_pull_model_attestation" name="test_bad_loaded_receipt_never_freezes_settles_or_publishes[job]" time="0.108"><failure message="AssertionError: assert ('running', 'running', 'open') == ('running', '...d', 'running')&#10;  &#10;  At index 1 diff: 'running' != 'claimed'&#10;  Use -v to get more diff">authority = (1, {'node_id': '8f7d286e2fc05f270d115b65b6267255', 'credential': '[REDACTED_EPHEMERAL_TEST_CREDENTIAL]', 'shown_once': True}, PosixPath('/tmp/pytest-of-root/pytest-0/test_bad_loaded_receipt_never_2'))
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f2171d769f0&gt;
+field = 'job'
+
+    @pytest.mark.parametrize('field',['missing','model','job','instance','nonce','policy','source','pid-bool','schema'])
+    def test_bad_loaded_receipt_never_freezes_settles_or_publishes(authority,monkeypatch,field):
+        node,job,assignment=admit(authority,monkeypatch);proof=receipt(assignment)
+        if field=='model':proof['model_sha256']='0'*64
+        elif field in ['job','instance','nonce','source']:
+            key={'job':'job_id','source':'source_sha256'}.get(field,field);proof['context'][key]='0'*len(proof['context'][key])
+        elif field=='policy':proof['context']['policy']={**proof['context']['policy'],'policy_sha256':'0'*64}
+        elif field=='pid-bool':proof['pid']=True
+        elif field=='schema':proof['schema']='other'
+        data=outcome()
+        if field!='missing':data['model_receipt']=proof
+        with pytest.raises(ValueError):central.complete(node['credential'],job,assignment['instance'],assignment['nonce'],data)
+        assert task(job)['state']=='dispatched'
+&gt;       assert economic(job)==('running','claimed','running')
+E       AssertionError: assert ('running', 'running', 'open') == ('running', '...d', 'running')
+E         
+E         At index 1 diff: 'running' != 'claimed'
+E         Use -v to get more diff
+
+tests/test_r210_pull_model_attestation.py:56: AssertionError</failure></testcase><testcase classname="tests.test_r210_pull_model_attestation" name="test_bad_loaded_receipt_never_freezes_settles_or_publishes[instance]" time="0.107"><failure message="AssertionError: assert ('running', 'running', 'open') == ('running', '...d', 'running')&#10;  &#10;  At index 1 diff: 'running' != 'claimed'&#10;  Use -v to get more diff">authority = (1, {'node_id': 'de821bdc3c94a7245f655ea583f53459', 'credential': '[REDACTED_EPHEMERAL_TEST_CREDENTIAL]', 'shown_once': True}, PosixPath('/tmp/pytest-of-root/pytest-0/test_bad_loaded_receipt_never_3'))
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f2171cb3020&gt;
+field = 'instance'
+
+    @pytest.mark.parametrize('field',['missing','model','job','instance','nonce','policy','source','pid-bool','schema'])
+    def test_bad_loaded_receipt_never_freezes_settles_or_publishes(authority,monkeypatch,field):
+        node,job,assignment=admit(authority,monkeypatch);proof=receipt(assignment)
+        if field=='model':proof['model_sha256']='0'*64
+        elif field in ['job','instance','nonce','source']:
+            key={'job':'job_id','source':'source_sha256'}.get(field,field);proof['context'][key]='0'*len(proof['context'][key])
+        elif field=='policy':proof['context']['policy']={**proof['context']['policy'],'policy_sha256':'0'*64}
+        elif field=='pid-bool':proof['pid']=True
+        elif field=='schema':proof['schema']='other'
+        data=outcome()
+        if field!='missing':data['model_receipt']=proof
+        with pytest.raises(ValueError):central.complete(node['credential'],job,assignment['instance'],assignment['nonce'],data)
+        assert task(job)['state']=='dispatched'
+&gt;       assert economic(job)==('running','claimed','running')
+E       AssertionError: assert ('running', 'running', 'open') == ('running', '...d', 'running')
+E         
+E         At index 1 diff: 'running' != 'claimed'
+E         Use -v to get more diff
+
+tests/test_r210_pull_model_attestation.py:56: AssertionError</failure></testcase><testcase classname="tests.test_r210_pull_model_attestation" name="test_bad_loaded_receipt_never_freezes_settles_or_publishes[nonce]" time="0.098"><failure message="AssertionError: assert ('running', 'running', 'open') == ('running', '...d', 'running')&#10;  &#10;  At index 1 diff: 'running' != 'claimed'&#10;  Use -v to get more diff">authority = (1, {'node_id': '3bd4f208f9f25d2e9dddbe0be52f22a7', 'credential': '[REDACTED_EPHEMERAL_TEST_CREDENTIAL]', 'shown_once': True}, PosixPath('/tmp/pytest-of-root/pytest-0/test_bad_loaded_receipt_never_4'))
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f2171ca2810&gt;
+field = 'nonce'
+
+    @pytest.mark.parametrize('field',['missing','model','job','instance','nonce','policy','source','pid-bool','schema'])
+    def test_bad_loaded_receipt_never_freezes_settles_or_publishes(authority,monkeypatch,field):
+        node,job,assignment=admit(authority,monkeypatch);proof=receipt(assignment)
+        if field=='model':proof['model_sha256']='0'*64
+        elif field in ['job','instance','nonce','source']:
+            key={'job':'job_id','source':'source_sha256'}.get(field,field);proof['context'][key]='0'*len(proof['context'][key])
+        elif field=='policy':proof['context']['policy']={**proof['context']['policy'],'policy_sha256':'0'*64}
+        elif field=='pid-bool':proof['pid']=True
+        elif field=='schema':proof['schema']='other'
+        data=outcome()
+        if field!='missing':data['model_receipt']=proof
+        with pytest.raises(ValueError):central.complete(node['credential'],job,assignment['instance'],assignment['nonce'],data)
+        assert task(job)['state']=='dispatched'
+&gt;       assert economic(job)==('running','claimed','running')
+E       AssertionError: assert ('running', 'running', 'open') == ('running', '...d', 'running')
+E         
+E         At index 1 diff: 'running' != 'claimed'
+E         Use -v to get more diff
+
+tests/test_r210_pull_model_attestation.py:56: AssertionError</failure></testcase><testcase classname="tests.test_r210_pull_model_attestation" name="test_bad_loaded_receipt_never_freezes_settles_or_publishes[policy]" time="0.093"><failure message="AssertionError: assert ('running', 'running', 'open') == ('running', '...d', 'running')&#10;  &#10;  At index 1 diff: 'running' != 'claimed'&#10;  Use -v to get more diff">authority = (1, {'node_id': 'bf0626199649081f7676ef16b9fdd98a', 'credential': '[REDACTED_EPHEMERAL_TEST_CREDENTIAL]', 'shown_once': True}, PosixPath('/tmp/pytest-of-root/pytest-0/test_bad_loaded_receipt_never_5'))
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f2171cc6cc0&gt;
+field = 'policy'
+
+    @pytest.mark.parametrize('field',['missing','model','job','instance','nonce','policy','source','pid-bool','schema'])
+    def test_bad_loaded_receipt_never_freezes_settles_or_publishes(authority,monkeypatch,field):
+        node,job,assignment=admit(authority,monkeypatch);proof=receipt(assignment)
+        if field=='model':proof['model_sha256']='0'*64
+        elif field in ['job','instance','nonce','source']:
+            key={'job':'job_id','source':'source_sha256'}.get(field,field);proof['context'][key]='0'*len(proof['context'][key])
+        elif field=='policy':proof['context']['policy']={**proof['context']['policy'],'policy_sha256':'0'*64}
+        elif field=='pid-bool':proof['pid']=True
+        elif field=='schema':proof['schema']='other'
+        data=outcome()
+        if field!='missing':data['model_receipt']=proof
+        with pytest.raises(ValueError):central.complete(node['credential'],job,assignment['instance'],assignment['nonce'],data)
+        assert task(job)['state']=='dispatched'
+&gt;       assert economic(job)==('running','claimed','running')
+E       AssertionError: assert ('running', 'running', 'open') == ('running', '...d', 'running')
+E         
+E         At index 1 diff: 'running' != 'claimed'
+E         Use -v to get more diff
+
+tests/test_r210_pull_model_attestation.py:56: AssertionError</failure></testcase><testcase classname="tests.test_r210_pull_model_attestation" name="test_bad_loaded_receipt_never_freezes_settles_or_publishes[source]" time="0.090"><failure message="AssertionError: assert ('running', 'running', 'open') == ('running', '...d', 'running')&#10;  &#10;  At index 1 diff: 'running' != 'claimed'&#10;  Use -v to get more diff">authority = (1, {'node_id': 'f00ab587b1896807ab1407125d23af47', 'credential': '[REDACTED_EPHEMERAL_TEST_CREDENTIAL]', 'shown_once': True}, PosixPath('/tmp/pytest-of-root/pytest-0/test_bad_loaded_receipt_never_6'))
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f2171d76900&gt;
+field = 'source'
+
+    @pytest.mark.parametrize('field',['missing','model','job','instance','nonce','policy','source','pid-bool','schema'])
+    def test_bad_loaded_receipt_never_freezes_settles_or_publishes(authority,monkeypatch,field):
+        node,job,assignment=admit(authority,monkeypatch);proof=receipt(assignment)
+        if field=='model':proof['model_sha256']='0'*64
+        elif field in ['job','instance','nonce','source']:
+            key={'job':'job_id','source':'source_sha256'}.get(field,field);proof['context'][key]='0'*len(proof['context'][key])
+        elif field=='policy':proof['context']['policy']={**proof['context']['policy'],'policy_sha256':'0'*64}
+        elif field=='pid-bool':proof['pid']=True
+        elif field=='schema':proof['schema']='other'
+        data=outcome()
+        if field!='missing':data['model_receipt']=proof
+        with pytest.raises(ValueError):central.complete(node['credential'],job,assignment['instance'],assignment['nonce'],data)
+        assert task(job)['state']=='dispatched'
+&gt;       assert economic(job)==('running','claimed','running')
+E       AssertionError: assert ('running', 'running', 'open') == ('running', '...d', 'running')
+E         
+E         At index 1 diff: 'running' != 'claimed'
+E         Use -v to get more diff
+
+tests/test_r210_pull_model_attestation.py:56: AssertionError</failure></testcase><testcase classname="tests.test_r210_pull_model_attestation" name="test_bad_loaded_receipt_never_freezes_settles_or_publishes[pid-bool]" time="0.099"><failure message="AssertionError: assert ('running', 'running', 'open') == ('running', '...d', 'running')&#10;  &#10;  At index 1 diff: 'running' != 'claimed'&#10;  Use -v to get more diff">authority = (1, {'node_id': 'e92c11aeaea4a06297b36121720c50c8', 'credential': '[REDACTED_EPHEMERAL_TEST_CREDENTIAL]', 'shown_once': True}, PosixPath('/tmp/pytest-of-root/pytest-0/test_bad_loaded_receipt_never_7'))
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f2171cc6ea0&gt;
+field = 'pid-bool'
+
+    @pytest.mark.parametrize('field',['missing','model','job','instance','nonce','policy','source','pid-bool','schema'])
+    def test_bad_loaded_receipt_never_freezes_settles_or_publishes(authority,monkeypatch,field):
+        node,job,assignment=admit(authority,monkeypatch);proof=receipt(assignment)
+        if field=='model':proof['model_sha256']='0'*64
+        elif field in ['job','instance','nonce','source']:
+            key={'job':'job_id','source':'source_sha256'}.get(field,field);proof['context'][key]='0'*len(proof['context'][key])
+        elif field=='policy':proof['context']['policy']={**proof['context']['policy'],'policy_sha256':'0'*64}
+        elif field=='pid-bool':proof['pid']=True
+        elif field=='schema':proof['schema']='other'
+        data=outcome()
+        if field!='missing':data['model_receipt']=proof
+        with pytest.raises(ValueError):central.complete(node['credential'],job,assignment['instance'],assignment['nonce'],data)
+        assert task(job)['state']=='dispatched'
+&gt;       assert economic(job)==('running','claimed','running')
+E       AssertionError: assert ('running', 'running', 'open') == ('running', '...d', 'running')
+E         
+E         At index 1 diff: 'running' != 'claimed'
+E         Use -v to get more diff
+
+tests/test_r210_pull_model_attestation.py:56: AssertionError</failure></testcase><testcase classname="tests.test_r210_pull_model_attestation" name="test_bad_loaded_receipt_never_freezes_settles_or_publishes[schema]" time="0.105"><failure message="AssertionError: assert ('running', 'running', 'open') == ('running', '...d', 'running')&#10;  &#10;  At index 1 diff: 'running' != 'claimed'&#10;  Use -v to get more diff">authority = (1, {'node_id': '5a4294e1c5d8e7297337c3103208b21c', 'credential': '[REDACTED_EPHEMERAL_TEST_CREDENTIAL]', 'shown_once': True}, PosixPath('/tmp/pytest-of-root/pytest-0/test_bad_loaded_receipt_never_8'))
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f2171cc5fd0&gt;
+field = 'schema'
+
+    @pytest.mark.parametrize('field',['missing','model','job','instance','nonce','policy','source','pid-bool','schema'])
+    def test_bad_loaded_receipt_never_freezes_settles_or_publishes(authority,monkeypatch,field):
+        node,job,assignment=admit(authority,monkeypatch);proof=receipt(assignment)
+        if field=='model':proof['model_sha256']='0'*64
+        elif field in ['job','instance','nonce','source']:
+            key={'job':'job_id','source':'source_sha256'}.get(field,field);proof['context'][key]='0'*len(proof['context'][key])
+        elif field=='policy':proof['context']['policy']={**proof['context']['policy'],'policy_sha256':'0'*64}
+        elif field=='pid-bool':proof['pid']=True
+        elif field=='schema':proof['schema']='other'
+        data=outcome()
+        if field!='missing':data['model_receipt']=proof
+        with pytest.raises(ValueError):central.complete(node['credential'],job,assignment['instance'],assignment['nonce'],data)
+        assert task(job)['state']=='dispatched'
+&gt;       assert economic(job)==('running','claimed','running')
+E       AssertionError: assert ('running', 'running', 'open') == ('running', '...d', 'running')
+E         
+E         At index 1 diff: 'running' != 'claimed'
+E         Use -v to get more diff
+
+tests/test_r210_pull_model_attestation.py:56: AssertionError</failure></testcase><testcase classname="tests.test_r210_pull_model_attestation" name="test_valid_authenticated_receipt_frozen_with_result_and_replay_conflict_denied" time="0.180"><failure message="app.regime_operation_fence.FenceBlocked: Conflicting immutable worker completion">authority = (1, {'node_id': '26a75a1a1a1213e58087646dccd7fc3b', 'credential': '[REDACTED_EPHEMERAL_TEST_CREDENTIAL]', 'shown_once': True}, PosixPath('/tmp/pytest-of-root/pytest-0/test_valid_authenticated_recei0'))
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f2171cc7320&gt;
+
+    def test_valid_authenticated_receipt_frozen_with_result_and_replay_conflict_denied(authority,monkeypatch):
+        node,job,assignment=admit(authority,monkeypatch)
+        data=outcome()|{'model_receipt':receipt(assignment)}
+        args=(node['credential'],job,assignment['instance'],assignment['nonce'])
+        assert central.complete(*args,data)['acknowledged']
+        assert economic(job)==('done','finished','closed')
+        frozen=json.loads(task(job)['completion_json'])
+        assert frozen['model_receipt']==data['model_receipt']
+        assert frozen['result_sha256']==hashlib.sha256(source_audio()).hexdigest()
+        assert central.complete(*args,data)['acknowledged']
+        changed={**data,'model_receipt':{**data['model_receipt'],'pid':43}}
+&gt;       with pytest.raises(ValueError):central.complete(*args,changed)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_r210_pull_model_attestation.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+credential = '[REDACTED_EPHEMERAL_TEST_CREDENTIAL]'
+job = '36c98d0e6911463d8b812ab809784f82'
+instance = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+nonce = 'a166cae7ae650ac4ae94cb971942a9a20f546e28d041cf46943bf73b2f44929b'
+outcome = {'status': 'done', 'cpu_seconds': 1.25, 'media_type': 'audio/wav', 'result_b64': 'UklGRiQCAABXQVZFZm10IBAAAAABAAEARKwA...AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==', ...}
+
+    def complete(credential, job, instance, nonce, outcome):
+        if not isinstance(outcome, dict) or set(outcome)-{'model_receipt'} != {'status', 'cpu_seconds', 'media_type', 'result_b64'}:
+            raise ValueError('Invalid pull completion fields')
+        status, cpu, media = outcome['status'], outcome['cpu_seconds'], outcome['media_type']
+        if status not in ('done', 'failed', 'cancelled') or (cpu is not None and
+                (type(cpu) not in (int, float) or not math.isfinite(cpu) or not 0 &lt;= cpu &lt;= 86400 * 4096)):
+            raise ValueError('Invalid pull status or measured CPU')
+        encoded = outcome['result_b64']
+        if not isinstance(encoded, str) or len(encoded) &gt; 4 * MAX_BYTES // 3 + 8:
+            raise ValueError('Oversized pull result')
+        payload = base64.b64decode(encoded, validate=True)
+        if status == 'done':
+            validate_payload(payload, media)
+        elif payload or media is not None:
+            raise ValueError('Failed/cancelled execution cannot publish output')
+        proof = encode({'status': status, 'cpu_seconds': cpu, 'media_type': media,
+                        'result_sha256': hashlib.sha256(payload).hexdigest()})
+        if 'model_receipt' in outcome:
+            if len(encode(outcome['model_receipt']))&gt;8192:raise ValueError('Oversized model receipt')
+            proof=encode({**decode(proof),'model_receipt':outcome['model_receipt']})
+        with transaction() as c:
+            node = node_record(c, credential)
+            receipt = _ack_key(node['id'], job, instance, nonce)
+            retired = c.execute('SELECT completion_sha256 FROM ai_pull_acknowledgements WHERE receipt=?', (receipt,)).fetchone()
+            if retired:
+                if not hmac.compare_digest(retired[0], hashlib.sha256(proof.encode()).hexdigest()):
+                    raise FenceBlocked('Conflicting retired worker acknowledgement')
+                return {'job_id': job, 'acknowledged': True}
+            row = _assigned(c, credential, job, instance, nonce)
+            required=c.execute('SELECT requirement_json FROM ai_pull_model_requirements WHERE job_id=?',(job,)).fetchone()
+            if required and status=='done':
+                from .ai_model_attestation import validate
+                validate(outcome.get('model_receipt'),decode(required[0]),dict(row)|{'policy':decode(row['policy_json'])})
+            elif 'model_receipt' in outcome:
+                raise ValueError('Unexpected model receipt')
+            if row['state'] in ('frozen', 'done'):
+                if decode(row['completion_json'])['worker_proof_sha256'] != hashlib.sha256(proof.encode()).hexdigest():
+&gt;                   raise FenceBlocked('Conflicting immutable worker completion')
+E                   app.regime_operation_fence.FenceBlocked: Conflicting immutable worker completion
+
+app/ai_pull_coordinator.py:507: FenceBlocked</failure></testcase><testcase classname="tests.test_r210_pull_model_attestation" name="test_wrong_authenticated_node_cannot_submit_receipt" time="0.117"><failure message="app.regime_operation_fence.FenceBlocked: Original pull assignment required">authority = (1, {'node_id': '89259458b61a5345c84f1549ca1f9150', 'credential': '[REDACTED_EPHEMERAL_TEST_CREDENTIAL]', 'shown_once': True}, PosixPath('/tmp/pytest-of-root/pytest-0/test_wrong_authenticated_node_0'))
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f2171cc64e0&gt;
+
+    def test_wrong_authenticated_node_cannot_submit_receipt(authority,monkeypatch):
+        _,job,assignment=admit(authority,monkeypatch)
+        other=central.register('foreign-node',[KIND])
+&gt;       with pytest.raises(ValueError):central.complete(other['credential'],job,assignment['instance'],assignment['nonce'],outcome()|{'model_receipt':receipt(assignment)})
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_r210_pull_model_attestation.py:76: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/ai_pull_coordinator.py:498: in complete
+    row = _assigned(c, credential, job, instance, nonce)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+c = &lt;sqlite3.Connection object at 0x7f2171d44400&gt;
+credential = '[REDACTED_EPHEMERAL_TEST_CREDENTIAL]'
+job = '5b8585830ce24d50a17eae432e17a131'
+instance = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+nonce = '3f770bfa7479bd81ede97c59ccf6a9a6a310e3b63d1b8f5f174066439cba6852'
+
+    def _assigned(c, credential, job, instance, nonce):
+        node = node_record(c, credential)
+        row = c.execute('SELECT * FROM ai_pull_tasks WHERE job_id=?', (job,)).fetchone()
+        if (not row or row['node_id'] != node['id'] or row['instance'] != instance
+                or not isinstance(nonce, str) or not hmac.compare_digest(row['nonce'] or '', nonce)):
+&gt;           raise FenceBlocked('Original pull assignment required')
+E           app.regime_operation_fence.FenceBlocked: Original pull assignment required
+
+app/ai_pull_coordinator.py:418: FenceBlocked</failure></testcase><testcase classname="tests.test_r210_pull_model_attestation" name="test_opaque_adapter_refused_before_process" time="0.154"><failure message="app.regime_operation_fence.FenceBlocked: Original worker instance still owns uncertain execution">authority = (1, {'node_id': '6ae413efc1a45883308a0abc1de7d3ae', 'credential': '[REDACTED_EPHEMERAL_TEST_CREDENTIAL]', 'shown_once': True}, PosixPath('/tmp/pytest-of-root/pytest-0/test_opaque_adapter_refused_be0'))
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f2171ca1010&gt;
+
+    def test_opaque_adapter_refused_before_process(authority,monkeypatch):
+        node,job,_=admit(authority,monkeypatch)
+        monkeypatch.setenv('MTA_AI_WORKER_AUDIO_TO_MIDI_BASIC_PITCH_EXECUTABLE',str(authority[2]/'fixed_worker.py'))
+&gt;       assert worker.run_once(DirectClient(node['credential']),authority[2]/'attested-state')
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_r210_pull_model_attestation.py:83: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/ai_pull_worker.py:251: in run_once
+    result = client.call('claim', {'instance': state['instance']})
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_r210_pull_coordinator.py:43: in call
+    return {'task': central.assignment(self.credential, **body)}
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+credential = '[REDACTED_EPHEMERAL_TEST_CREDENTIAL]'
+instance = 'dc83ff0009ce3550244526e01c6b71d3'
+
+    def assignment(credential, instance):
+        if not isinstance(instance, str) or not HEX.fullmatch(instance):
+            raise ValueError('Invalid worker instance')
+        with transaction() as c:
+            node = node_record(c, credential)
+            old = c.execute("SELECT * FROM ai_pull_tasks WHERE node_id=? AND state='dispatched'", (node['id'],)).fetchone()
+            if old and old['instance'] != instance:
+&gt;               raise FenceBlocked('Original worker instance still owns uncertain execution')
+E               app.regime_operation_fence.FenceBlocked: Original worker instance still owns uncertain execution
+
+app/ai_pull_coordinator.py:387: FenceBlocked</failure></testcase><testcase classname="tests.test_r210_pull_model_attestation" name="test_real_receipt_writer_is_exclusive_and_bound_to_actual_pid" time="0.003" /><testcase classname="tests.test_r210_pull_model_attestation" name="test_record_is_not_emitted_if_onnx_constructor_fails" time="0.005" /></testsuite></testsuites>

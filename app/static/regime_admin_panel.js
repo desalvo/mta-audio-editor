@@ -107,5 +107,41 @@
     };
     root.append(box);
   }
-  frame();merchantPanel();refresh();window.mtaRefreshServiceRegime=refresh;
+  function subscriptionEvidencePanel(){
+    const it=locale()==='it',box=document.createElement('section');box.dataset.subscriptionEvidence='';box.style.overflowWrap='anywhere';
+    const title=document.createElement('h3');title.textContent=it?'Prove originali degli abbonamenti':'Original subscription evidence';
+    const note=document.createElement('p');note.textContent=it?'La verifica include gli abbonamenti incassati anche senza storni. Una base mancante richiede prove storiche della quota applicata e del surplus: il prezzo attuale e il saldo rimborsi non bastano. Questa lettura non crea debiti e non abilita transizioni.':'Checks include paid subscriptions before any reversal. Missing basis requires historical evidence of the applied fee and surplus; today’s price and refund balance are insufficient. Readback creates no debt and enables no transition.';
+    const load=document.createElement('button'),more=document.createElement('button');load.type=more.type='button';
+    load.textContent=it?'Verifica prove abbonamenti':'Check subscription evidence';more.textContent=it?'Carica altri casi':'Load more cases';more.hidden=true;
+    const status=document.createElement('p');status.setAttribute('role','status');status.setAttribute('aria-live','polite');
+    const cases=document.createElement('ul');cases.setAttribute('aria-label',it?'Casi abbonamento da verificare':'Subscription cases requiring review');
+    const reasons={
+      original_payment_basis_missing:it?'Base originale mancante':'Original basis missing',
+      original_payment_identity_invalid:it?'Identità del pagamento incoerente':'Payment identity invalid',
+      original_payment_basis_conflict:it?'Base originale incoerente':'Original basis conflicts',
+      original_capture_total_unproved:it?'Totale catture non dimostrato':'Capture total unproved',
+      original_funding_position_unproved:it?'Posizione di incasso non dimostrata':'Funding position unproved',
+      original_payment_basis_unbound:it?'Base senza pagamento originale valido':'Basis has no valid original payment',
+      subscription_order_schema_missing:it?'Registro ordini non disponibile':'Order schema unavailable',
+      subscription_capture_schema_missing:it?'Registro catture non disponibile':'Capture schema unavailable'
+    };
+    let offset=0,active=false;
+    async function read(reset){
+      if(active)return;active=true;load.disabled=more.disabled=true;
+      if(reset){offset=0;cases.replaceChildren();more.hidden=true;}
+      status.textContent=it?'Verifica in corso…':'Checking…';
+      try{
+        const data=await get('/api/admin/service-regime/subscription-evidence?limit=25&offset='+offset);
+        if(typeof data.verified!=='boolean'||!Number.isSafeInteger(data.total)||data.total<0||!Array.isArray(data.items))throw Error('Invalid evidence response');
+        for(const item of data.items){const row=document.createElement('li');row.textContent=(item.order_id??'—')+' · '+(reasons[item.reason]??item.reason);cases.append(row);}
+        offset+=data.items.length;more.hidden=offset>=data.total||data.items.length===0;
+        status.textContent=data.verified?(it?'Basi originali verificate per i pagamenti registrati; restano separate le altre verifiche finanziarie.':'Original bases verified for recorded payments; other financial checks remain separate.'):
+          (it?'Prove mancanti o incoerenti: ':'Missing or conflicting evidence: ')+data.total+(it?'. Riconciliazione contabile bloccata.':'. Accounting verification blocked.');
+      }catch(error){cases.replaceChildren();offset=0;more.hidden=true;status.textContent=(it?'Verifica non disponibile: ':'Verification unavailable: ')+error.message;}
+      finally{active=false;load.disabled=more.disabled=false;}
+    }
+    load.onclick=()=>read(true);more.onclick=()=>read(false);
+    box.append(title,note,load,more,status,cases);root.append(box);
+  }
+  frame();merchantPanel();subscriptionEvidencePanel();refresh();window.mtaRefreshServiceRegime=refresh;
 })();

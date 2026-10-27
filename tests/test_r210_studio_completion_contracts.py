@@ -158,11 +158,13 @@ def test_conversion_failure_never_replaces_original_audio(tmp_path,monkeypatch):
 def test_transkun_contract_reads_actual_midi_velocity_and_sustain(tmp_path,monkeypatch):
     import mido
     from app import transkun_adapter as tk
-    value={'id':'piano','kind':'transkun','folder':tmp_path,'bindings':{'runtime_root':'runtime','checkpoint':'model.pt','config':'config.conf'}}
+    value={'id':'piano','kind':'transkun','folder':tmp_path,'bindings':{'runtime_root':'runtime','checkpoint':'model.pt','config':'config.conf'},'files':{'model.pt':{'sha256':'a'*64},'config.conf':{'sha256':'b'*64}}}
     monkeypatch.setattr('app.studio_asset_registry.runtime',lambda *a,**k:(value,Path(sys.executable)))
     source=tmp_path/'piano.wav';sf.write(source,np.zeros(48000),48000)
     def inference(argv,**kwargs):
         assert 'transkun_runner.py' in argv[1] and '--checkpoint' in argv and '--config' in argv
+        assert argv[argv.index('--checkpoint-sha256')+1]=='a'*64
+        assert argv[argv.index('--config-sha256')+1]=='b'*64
         midi=mido.MidiFile();track=mido.MidiTrack();midi.tracks.append(track)
         track.extend([mido.Message('note_on',note=60,velocity=85,time=0),mido.Message('control_change',control=64,value=127,time=0),mido.Message('note_off',note=60,velocity=0,time=480)])
         midi.save(argv[argv.index('--output')+1])

@@ -1,0 +1,145 @@
+{
+  "date": "2026-10-26",
+  "target": "MTA0.3.0-r210 Release Candidate",
+  "decision": "BLOCKED_PRE_RC",
+  "candidate": false,
+  "cutover_authorized": false,
+  "progress": {
+    "definition": "Equal-weight RC acceptance milestone checklist, NOT full-product feature completion or code coverage",
+    "numerator": 23,
+    "denominator": 42,
+    "percent": 54.8,
+    "accepted_macroareas": 0,
+    "macroarea_denominator": 7,
+    "historical_dual_regime_estimate_percent": 70,
+    "historical_estimate_is_comparable": false,
+    "full_product_completion_percent": null,
+    "production_validation_percent": 0
+  },
+  "remaining_original_criteria": [
+    {
+      "area": "A",
+      "id": "A4",
+      "criterion": "Complete PayPal historical discovery, refunded initial captures, ambiguous payout and multicapture dispute allocation",
+      "state": "implementation_pending"
+    },
+    {
+      "area": "A",
+      "id": "A5",
+      "criterion": "Complete legacy obligations, all terminal/uncertain checkout outcomes and subscription reversal repayment",
+      "state": "implementation_pending"
+    },
+    {
+      "area": "A",
+      "id": "A6",
+      "criterion": "Actual Stripe and PayPal sandbox readback and lifecycle verification",
+      "state": "environment_blocked"
+    },
+    {
+      "area": "B",
+      "id": "B2",
+      "criterion": "Actual supervisor-crash recovery with external worker quiescence proof",
+      "state": "implementation_pending"
+    },
+    {
+      "area": "B",
+      "id": "B5",
+      "criterion": "Prove ownership/metering for every legacy/local/native executor entry",
+      "state": "implementation_pending"
+    },
+    {
+      "area": "B",
+      "id": "B6",
+      "criterion": "Multi-host worker loss, partition, drain and no duplicate execution acceptance",
+      "state": "environment_blocked"
+    },
+    {
+      "area": "C",
+      "id": "C2",
+      "criterion": "Distributed admission barrier and service-wide drain",
+      "state": "implementation_pending"
+    },
+    {
+      "area": "C",
+      "id": "C3",
+      "criterion": "Resolve every financial obligation before cutover",
+      "state": "implementation_pending"
+    },
+    {
+      "area": "C",
+      "id": "C5",
+      "criterion": "Enabled safe transition in both directions through actual administrator API",
+      "state": "implementation_pending"
+    },
+    {
+      "area": "C",
+      "id": "C6",
+      "criterion": "Cross-host crash and concurrent transition end-to-end acceptance",
+      "state": "implementation_pending"
+    },
+    {
+      "area": "D",
+      "id": "D6",
+      "criterion": "Account balances and periods across enabled administrative cutover",
+      "state": "implementation_pending"
+    },
+    {
+      "area": "E",
+      "id": "E4",
+      "criterion": "Complete sensitive regime-switch operator workflow",
+      "state": "implementation_pending"
+    },
+    {
+      "area": "E",
+      "id": "E5",
+      "criterion": "Complete transition progress, audit and forward recovery controls",
+      "state": "implementation_pending"
+    },
+    {
+      "area": "F",
+      "id": "F3",
+      "criterion": "Authenticated remote checkpoint identity and rights attestation",
+      "state": "implementation_pending"
+    },
+    {
+      "area": "F",
+      "id": "F4",
+      "criterion": "Rights and bypass acceptance for every legacy executor",
+      "state": "implementation_pending"
+    },
+    {
+      "area": "F",
+      "id": "F5",
+      "criterion": "Native NC guarantees on all supported operating systems",
+      "state": "environment_blocked"
+    },
+    {
+      "area": "F",
+      "id": "F6",
+      "criterion": "Complete independent rights review of every optional installed checkpoint",
+      "state": "implementation_pending"
+    },
+    {
+      "area": "G",
+      "id": "G5",
+      "criterion": "Container images, Podman/Docker and Kubernetes execution",
+      "state": "environment_blocked"
+    },
+    {
+      "area": "G",
+      "id": "G6",
+      "criterion": "Windows/macOS native, GPU models, real VST plugins and hardware acceptance",
+      "state": "environment_blocked"
+    }
+  ],
+  "current_delivery": "Complete cumulative source checkpoint,not a release candidate",
+  "not_external_only": "Fourteen criteria still require implementation/functional or independent rights review;five are environment/target blocked. Do not describe all blockers as external credentials.",
+  "baseline_ci": "40257635101 on9fc85ce succeeded;104 prerequisite skips remain unaccepted;current changed boundaries have affected local proof,not a new full CI",
+  "evidence": [
+    "docs/validation/r210/executor-boundaries-result.json",
+    "docs/validation/r210/execution-owner-result.json",
+    "docs/validation/r210/subscription-basis-result.json"
+  ],
+  "no_criteria_removed": true,
+  "commits_or_remote_mutations": 0
+}

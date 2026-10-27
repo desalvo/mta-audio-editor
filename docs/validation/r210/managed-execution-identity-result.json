@@ -1,0 +1,84 @@
+{
+  "date": "2026-10-26",
+  "base_commit": "9fc85ce79bee9871696dea9396565395a415aa72",
+  "reports": [
+    {
+      "path": "docs/validation/r210/managed-execution-identity-initial.xml",
+      "sha256": "299ab4d2cd51e63af5be4a94cfd340d2e20d27b8cb71fe1c607dd65255ec7daa",
+      "passed": 14,
+      "failed": 1,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/validation/r210/managed-execution-identity-regressions.xml",
+      "sha256": "8dbaff54629793b7d58a751f9c1e9ad55f4844bd2168d256774f4a4e8aab55c5",
+      "passed": 92,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/validation/r210/managed-execution-identity-consumers.xml",
+      "sha256": "97c34751aeb7c8d54dfbae1f6aa2f3b41c258e2a2d65e47c41f03e0ad4184079",
+      "passed": 66,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/validation/r210/managed-execution-identity-gates.xml",
+      "sha256": "09a53e0b050dc25a0bf4d7f7a1f44419a4ffd65bf830c4ba013489921d3b6afa",
+      "passed": 6,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/validation/r210/managed-execution-identity-final.xml",
+      "sha256": "95251671dd46b2f85ca1dfc1f8e2d49df75965094315d8750f7f9778e483501c",
+      "passed": 50,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    }
+  ],
+  "distinct_current": {
+    "passed": 176,
+    "failed": 0,
+    "error": 0,
+    "skipped": 0
+  },
+  "new_cases": 16,
+  "source_sha256": {
+    "app/model_license_policy.py": "4b373a236500c72f08a3f269ddbe65619acadc4b2cfbff81086ffb86e4047921",
+    "app/studio_asset_registry.py": "38b5a865090bd157765f6534255a90afb169baf03c500f2f6cd42fff98e1559d",
+    "tests/test_r210_managed_execution_identity.py": "f40802370e50f06b171012d8b22a1becce56a2120ccbbac2c8430098b98215fc"
+  },
+  "correction": "Initial old-snapshot fixture referenced nonexistent trigger: replaced fixture with authentic old-version admission decision; all immutable triggers remain enabled. Only failed case rerun; original XML preserved.",
+  "no_collection_note": "A consumer selection containing an unmatched test_r210_asset glob collected no tests; corrected selection without implementation changes. Not counted as a product failure or pass.",
+  "scope": "Synthetic managed packages, actual independent installation roots, real authenticated coordinator calls/SQLite ledger/journal and subprocess. Existing real HTTPS and SIGKILL/partition regressions passed. No real models or independent hosts.",
+  "limitations": [
+    "File identity at verification time is not proof of loaded bytes or kernel confinement.",
+    "Commercial remote admission remains denied.",
+    "No whole F3/F4/F6 closure or RC claim."
+  ],
+  "security": {
+    "app_files": 286,
+    "findings": 165,
+    "high": 0,
+    "medium": 21,
+    "low": 144,
+    "findings_identities_unchanged": true,
+    "scanner_suppressions_added": false
+  },
+  "release_candidate": false,
+  "accepted_original_criteria": 23,
+  "original_criteria": 42,
+  "final_rerun_reason": "Descriptor/stat cache changed registry verification after the first reports. Reran all new identity cases plus managed registry/audit and worker lifecycle consumers; unaffected HTTPS/protocol reports reused.",
+  "failure_report_redaction": {
+    "path": "docs/validation/r210/managed-execution-identity-initial.xml",
+    "original_sha256": "f1bd2f4ca82566477b6ecefb1737e8be6c29ce6767537e881dbf8a70782c0f19",
+    "reason": "Initial fixture traceback exposed generated ephemeral worker credential; only credential text redacted, failure/outcome/traceback retained."
+  }
+}

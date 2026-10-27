@@ -74,7 +74,7 @@ def finalize_cutover_exclusively(db_path: Path, mirror_path: Path,
     provider/webhook/worker entry points. This function does not claim that a
     local flock can fence remote Kubernetes replicas. Never call from HTTP.
     """
-    from .regime_cutover_finalize import finalize_cutover
+    from .regime_balance_continuity import finalize_preserving_balances
 
     if not callable(readiness_check):
         raise FenceBlocked('Authoritative readiness callback required')
@@ -96,7 +96,7 @@ def finalize_cutover_exclusively(db_path: Path, mirror_path: Path,
                         report.get('unresolved') or
                         report.get('fence', {}).get('all_entry_points_instrumented') is not True):
                     raise FenceBlocked('Provider and worker entry coverage is not authoritatively verified')
-                result = finalize_cutover(connection, mirror_path=Path(mirror_path),
+                result = finalize_preserving_balances(connection, mirror_path=Path(mirror_path),
                                           transition_id=transition_id,
                                           readiness_check=readiness_check)
                 connection.commit()

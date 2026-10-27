@@ -5,7 +5,6 @@ Uses the existing metered worker protocol. No downloads, user code, instrument
 classification, synthetic filler parts or claimed GPU acceleration.
 """
 import argparse
-import hashlib
 import importlib.metadata
 import json
 import math
@@ -35,9 +34,16 @@ def model_path():
         raise RuntimeError('Basic Pitch 0.4.0 is required by this adapter')
     from basic_pitch import build_icassp_2022_model_path, FilenameSuffix
     path = build_icassp_2022_model_path(FilenameSuffix.onnx)
-    if path.is_symlink() or hashlib.sha256(path.read_bytes()).hexdigest() != MODEL_SHA256:
-        raise RuntimeError('Basic Pitch ONNX model failed integrity verification')
+    from app.ai_model_bytes import verified_model_bytes
+    verified_model_bytes(path,MODEL_SHA256,max_bytes=64*1024*1024)
     return path
+
+
+def model_bytes():
+    """Bind ORT's input to verified bytes, never reopen a checked model path."""
+    path=model_path()
+    from app.ai_model_bytes import verified_model_bytes
+    return verified_model_bytes(path,MODEL_SHA256,max_bytes=64*1024*1024)
 
 
 def transcribe(source, options):
@@ -65,7 +71,7 @@ def transcribe(source, options):
     if not isinstance(name, str) or not 1 <= len(name) <= 200:
         raise ValueError('Invalid transcription name')
     progress('loading-model', 'Verifying and loading Basic Pitch ONNX on CPU')
-    path = model_path()
+    verified_model = model_bytes()
     import onnxruntime as ort
     ort.disable_telemetry_events()
     from basic_pitch.inference import predict, Model
@@ -76,7 +82,9 @@ def transcribe(source, options):
     settings.inter_op_num_threads = 1
     model = Model.__new__(Model)
     model.model_type = Model.MODEL_TYPES.ONNX
-    model.model = ort.InferenceSession(str(path), sess_options=settings, providers=['CPUExecutionProvider'])
+    model.model = ort.InferenceSession(verified_model, sess_options=settings, providers=['CPUExecutionProvider'])
+    from app.ai_model_attestation import record_loaded
+    record_loaded(verified_model)
     if model.model_type != Model.MODEL_TYPES.ONNX:
         raise RuntimeError('This adapter requires the tested ONNX CPU backend')
     progress('transcribing', 'Transcribing the isolated source; total work is not reported by the model')
@@ -168,4 +176,7 @@ if __name__ == '__main__':
     else:
         if not args.request or not args.output:parser.error('--request and --output are required')
         if args.request.stat().st_size > 256*1024:raise ValueError('Studio request exceeds 256 KiB')
-        infer(json.loads(args.request.read_text()), args.output)
+        plan=json.loads(args.request.read_text())
+        from app.ai_execution_policy import verify_plan
+        verify_plan(plan)
+        infer(plan, args.output)

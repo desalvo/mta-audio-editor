@@ -1,5 +1,5 @@
 {
-  "date": "2026-10-25",
+  "date": "2026-10-26",
   "release": "0.3.0-r210 PRE-RC",
   "measure": "Original 42 equal-weight acceptance criteria; never count helpers, test variants or internal cycles as completed criteria",
   "progress": {
@@ -9,8 +9,8 @@
     "whole_macroareas_accepted": 0
   },
   "batch_exit": "Finish the actual owner/operator workflow, transaction/crash/privacy boundaries, affected regression and self-contained handoff, or record a concrete blocker and continue an independent stream",
-  "verification": "Reuse unchanged historical baselines; run current changed-boundary regression once after implementation stabilizes, then only failures or newly changed boundaries",
-  "delivery": "One useful cumulative at a durable functional checkpoint; no helper/test-only packages; no commit or GitHub/server/provider mutations",
+  "verification": "Reuse full CI40257635101 for unchanged baseline boundaries, source-identical financial proof and current347-case active-owner regression. Run only affected scope after a source/boundary change; rerun failures/new changes only. No full suite repeated in this continuation.",
+  "delivery": "Complete cumulative source archive with all original assets/licenses/manuals/historical evidence and refreshed hash/mode manifest at substantial checkpoints when possible. No intermediate ZIP per helper. User commits later;no remote mutation.",
   "workstreams": [
     {
       "priority": 1,
@@ -20,7 +20,7 @@
         "C3"
       ],
       "stream": "Provider/legacy financial conservation",
-      "delivered": "New original payment fee/surplus basis and authenticated full-capture reversal -> exact private existing repayment; refund overlap/rounding/replay/concurrency and erasure covered",
+      "delivered": "New original payment fee/surplus basis and authenticated full-capture reversal -> exact private existing repayment; refund overlap/rounding/replay/concurrency and erasure covered;complete-set pre-loss original-basis integrity audit/admin API/IT-EN review and readiness blocker",
       "remaining_implementation": [
         "Global merchant history and unique actual payout/protection movement binding",
         "Safe migration of legacy original fee basis",
@@ -35,7 +35,8 @@
         "delivered": "Actual stable merchant-wide requested-window acquisition/admin API and IT/EN panel; read-only observations",
         "remaining": "Unique actual completed movement/case/capture binding and complete legacy/global conservation; not A4 acceptance",
         "browser_prerequisite": "Manual-only merchant-history-chromium.yml, merchant_history_chromium=true;four exact real Chromium passes required; local strict gate rejects missing-engine skips"
-      }
+      },
+      "legacy_evidence_block": "Independent original applied fee/surplus evidence is unavailable. Do not derive it from mutable current charges/refund balances or gross receipts. No automatic migration accepted."
     },
     {
       "priority": 2,
@@ -57,7 +58,8 @@
         "Delegated kernels/independent hosts",
         "Authorized installed weights and independent grants/review"
       ],
-      "exit": "Every actual entry has its original owner, approved rights and verifiable completion or a held uncertain state; no policy hash treated as loaded-weight proof"
+      "exit": "Every actual entry has its original owner, approved rights and verifiable completion or a held uncertain state; no policy hash treated as loaded-weight proof",
+      "delivered": "Current common registered executor path: original active scheduler actor/process incarnation validated before nested/local/pull execution; source conversion licensing, cancellation, size and remaining-time supervision. EXECUTION_OWNER_HANDOFF_R210.md. All-executor/F3/installed-target exits remain pending."
     },
     {
       "priority": 3,
@@ -94,5 +96,35 @@
     }
   ],
   "release_candidate": false,
-  "transition_enabled": false
+  "transition_enabled": false,
+  "current_handoff": "docs/CUMULATIVE_HANDOFF_R210.md",
+  "verified_ci": {
+    "run": 40257635101,
+    "commit": "9fc85ce79bee9871696dea9396565395a415aa72",
+    "conclusion": "success",
+    "test_suite": "full",
+    "passed": 6448,
+    "prerequisite_skips": 104,
+    "coverage_percent": 75.84,
+    "combined_live_vst3_midi": "passed",
+    "repeat_required_now": false
+  },
+  "next_independent_stream": "Every executor and authenticated checkpoint rights (B2/B5/F3/F4/F6); keep finance and cutover criteria open.",
+  "current_queue": "docs/RC_FINAL_WORK_QUEUE_R210.md",
+  "completed_reuse": [
+    "B4 pinned-authority coordinator/storage backend",
+    "Current merchant-history acquisition and confirmed four-case Chromium flow",
+    "Current original full-capture loss and frozen-output recovery workflows",
+    "Full CI40257635101 on9fc85ce including live VST3/MIDI",
+    "Current subscription evidence audit/API/IT-EN panel and395 distinct affected cases",
+    "Active scheduler-owner gate before nested/local/pull dispatch and supervised cancellable bounded server source preparation;347 distinct affected current passes,37 new. Does not close all-executor/F3/kernel acceptance.",
+    "Strict server/native routing and native-only synchronous/zero-actor compatibility;194 distinct current affected passes,26 new;CUMULATIVE_HANDOFF_R210.md."
+  ],
+  "no_rework": [
+    "Do not reimplement B4 from old next_actions",
+    "Do not resume the old admin/item-movement archive as current head",
+    "Do not redo static/security/transport checks when their source boundary has not changed",
+    "Do not count CI/build success as missing sandbox/installed target acceptance"
+  ],
+  "current_archive": "MTA-0.3.0-r210-pre-RC-executor-boundaries-cumulative.zip"
 }

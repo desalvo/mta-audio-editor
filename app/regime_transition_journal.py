@@ -87,7 +87,13 @@ def abort(connection: sqlite3.Connection, *, transition_id: str) -> None:
 
 def pending(connection: sqlite3.Connection) -> list[dict]:
     try:
-        rows = connection.execute("SELECT id,source_regime,target_regime,source_revision,evidence_sha256 FROM regime_transition_journal WHERE status='reserved'").fetchall()
+        finalized = connection.execute("SELECT 1 FROM sqlite_master WHERE name='regime_cutover_finalizations'").fetchone()
+        if finalized:
+            rows = connection.execute("""SELECT id,source_regime,target_regime,source_revision,evidence_sha256
+                FROM regime_transition_journal WHERE status='reserved' AND NOT EXISTS
+                (SELECT 1 FROM regime_cutover_finalizations f WHERE f.transition_id=regime_transition_journal.id)""").fetchall()
+        else:
+            rows = connection.execute("SELECT id,source_regime,target_regime,source_revision,evidence_sha256 FROM regime_transition_journal WHERE status='reserved'").fetchall()
     except sqlite3.OperationalError:
         return []
     return [dict(id=r[0], source=r[1], target=r[2], revision=r[3], evidence_sha256=r[4]) for r in rows]

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="36.604" timestamp="2026-10-26T19:35:44.242163+01:00" hostname="7291289a56a1"><testcase classname="tests.test_r210_admin_cutover_e2e" name="test_real_registered_builtin_harmony_and_measured_nc_statement_survive_actual_return_cutover" time="35.410"><failure message="AssertionError: {&quot;detail&quot;:&quot;Full financial/worker reconciliation required: ai_compute_job_diagnostics&quot;}&#10;assert 409 == 200&#10; +  where 409 = &lt;Response [409 Conflict]&gt;.status_code">ready = (&lt;starlette.testclient.TestClient object at 0x7f9d27888650&gt;, 2, 1)
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f9d25a01be0&gt;
+
+    def test_real_registered_builtin_harmony_and_measured_nc_statement_survive_actual_return_cutover(ready, monkeypatch):
+        client, uid, _ = ready
+        body = begin(client)
+        assert client.post(BASE, headers=HEADERS, json=body).status_code == 200
+        from app import ai_metering_agent, ai_studio_adapter
+        from app.studio_score import Score
+        from app.music_interchange import MusicResult, MusicPart
+        from app.models import MidiNote
+        monkeypatch.setenv('MTA_AI_WORKER_ENABLED', 'true')
+        monkeypatch.setenv('MTA_AI_WORKER_VOCAL_HARMONY_EXECUTABLE', str(Path(ai_studio_adapter.__file__).resolve()))
+        monkeypatch.setenv('MTA_AI_WORKER_VOCAL_HARMONY_PYTHON', sys.executable)
+        monkeypatch.delenv('MTA_AI_CGROUP_PARENT', raising=False)
+        score = Score(music=MusicResult(parts=[MusicPart(id='melody', name='Melody', notes=[
+            MidiNote(id='n', pitch=60, start_ms=0, duration_ms=500)])])).model_dump_json().encode()
+        start = int(time.time()) - 1
+        payload, meta = ai_metering_agent.execute_registered_worker(uid, 'vocal-harmony', {}, source_json=score, timeout_seconds=30)
+        assert payload and meta['usage']['cpu_seconds'] &gt; 0 and meta['metering_source'] == 'worker'
+        statement = client.post('/api/admin/service-regime/noncommercial-statements', headers=HEADERS,
+            json={'start': start, 'end': int(time.time()) + 1, 'documented_cost_cents': 10,
+                  'operator_cost_exclusion_confirmed': True})
+        assert statement.status_code == 200, statement.text
+        assert statement.json()['jobs_count'] == 1
+        with auth.db() as con:
+            con.execute('BEGIN IMMEDIATE')
+            original = snapshot(con)
+&gt;       back = begin(client, target='COMMERCIAL', identifier='with-real-job-back')
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_r210_admin_cutover_e2e.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+client = &lt;starlette.testclient.TestClient object at 0x7f9d27888650&gt;
+target = 'COMMERCIAL', identifier = 'with-real-job-back'
+
+    def begin(client, *, target='NON_COMMERCIAL', identifier='actual-cutover-1'):
+        review = client.get(BASE + '/preview', params={'target': target})
+&gt;       assert review.status_code == 200, review.text
+E       AssertionError: {"detail":"Full financial/worker reconciliation required: ai_compute_job_diagnostics"}
+E       assert 409 == 200
+E        +  where 409 = &lt;Response [409 Conflict]&gt;.status_code
+
+tests/test_r210_admin_cutover_e2e.py:45: AssertionError</failure></testcase></testsuite></testsuites>

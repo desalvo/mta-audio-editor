@@ -19,7 +19,7 @@ def test_native_remote_score_token_queue_cpu_and_durable_recovery(tmp_path,monke
     from app import native_ai_routing,ai_remote_client
     from app.studio_compute import remote_compute
     monkeypatch.setenv('MTA_DATA_DIR',str(tmp_path/'data'))
-    monkeypatch.setenv('MTA_NATIVE_SINGLE_USER','false')
+    monkeypatch.setenv('MTA_NATIVE_SINGLE_USER','true')
     monkeypatch.setenv('MTA_ALLOW_INSECURE_NO_AUTH','true')
     monkeypatch.setenv('MTA_AI_WORKER_ENABLED','true')
     monkeypatch.setenv('MTA_ADMIN_PASSWORD',secrets.token_urlsafe(32))
@@ -41,8 +41,10 @@ def test_native_remote_score_token_queue_cpu_and_durable_recovery(tmp_path,monke
     def transport(request,timeout):
         requests.append((request.get_method(),urlsplit(request.full_url).path))
         # Separate logical server context: never inherit a native queue job.
-        response=contextvars.Context().run(client.request,request.get_method(),urlsplit(request.full_url).path,
-            headers=dict(request.header_items()),content=request.data)
+        with monkeypatch.context() as server_context:
+            server_context.setenv('MTA_NATIVE_SINGLE_USER','false')
+            response=contextvars.Context().run(client.request,request.get_method(),urlsplit(request.full_url).path,
+                headers=dict(request.header_items()),content=request.data)
         if response.status_code>=400:raise HTTPError(request.full_url,response.status_code,response.text,response.headers,None)
         return Response(response)
     monkeypatch.setattr(ai_remote_client,'https_urlopen',transport)

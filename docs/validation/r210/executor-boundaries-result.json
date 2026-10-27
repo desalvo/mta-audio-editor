@@ -1,0 +1,118 @@
+{
+  "date": "2026-10-26",
+  "base_commit": "9fc85ce79bee9871696dea9396565395a415aa72",
+  "reports": [
+    {
+      "report": "executor-native-boundary-first.xml",
+      "raw_sha256": "263a508a45d9f9713c2915f5441b0bdda458b4c0093e805fa87279ed20ca3585",
+      "passed": 34,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "report": "executor-native-boundary-domain.xml",
+      "raw_sha256": "8d22dec63055c36f91aba17830523c19b96692ee864a3662558c1ba339bf9a75",
+      "passed": 49,
+      "failed": 1,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "report": "executor-native-boundary-paths.xml",
+      "raw_sha256": "6b8ecd2c961c7110dba402088d41c6dc525d7e6b88d5f480c61d2e3682945f0f",
+      "passed": 22,
+      "failed": 4,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "report": "executor-native-boundary-path-resolution.xml",
+      "raw_sha256": "ac6635d8919a987e84dd5ead4eb5028e1babf9979793e7c80fc722fee0a6f9ec",
+      "passed": 4,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "report": "executor-native-boundary-remaining.xml",
+      "raw_sha256": "1302fd6577dc0d445c10aa1d32d53620409ca55dd0a6612423ca60a55b5eb6a8",
+      "passed": 48,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "report": "executor-native-boundary-gates.xml",
+      "raw_sha256": "d3ce1023c35d276d13f4e79a598c74ffaf57cace56cd3243e585f24734596853",
+      "passed": 37,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "report": "executor-native-boundary-license.xml",
+      "raw_sha256": "03e4ba816b9ccf5e6b41b8ab693e37f37e1c35eb78713d576c8175336ac64ba9",
+      "passed": 2,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    }
+  ],
+  "current_distinct": {
+    "passed": 194,
+    "failed": 0,
+    "error": 0,
+    "skipped": 0
+  },
+  "new_cases": 26,
+  "source_sha256": {
+    "app/main.py": "2d1e7b23e18ab30bbcce53ae45b6d4fc2fbfe71be4e90735631a4795a28ccddb",
+    "app/ai_server_execution.py": "5fb504b2d2e870499630a628b234e5c78a24bc7bd9393878935a675e334d19bc",
+    "app/studio_compute.py": "775c819c0887898972c3a18211a3b60dc2a794f0a2a638baccb97a924713fcd0"
+  },
+  "security": {
+    "reviewed_findings": 165,
+    "source_files": 286,
+    "raw_severity": {
+      "HIGH": 0,
+      "MEDIUM": 21,
+      "LOW": 144
+    },
+    "scan_review_passed": true,
+    "release_candidate": false,
+    "transition_enabled": false
+  },
+  "transport": {
+    "sites": 30,
+    "files": 21,
+    "passed": true
+  },
+  "ruff_app_scripts_tests": "passed",
+  "changed_python_compilation": "passed",
+  "full_ci_repeated": false,
+  "real_model_provider_or_server_calls": 0,
+  "previous_evidence": "Source-unchanged active-owner/metered-supervisor behavior and unchanged financial boundaries retained; do not sum overlapping counts",
+  "corrections": [
+    {
+      "report": "executor-native-boundary-domain.xml",
+      "cause": "Local splitter test represented native behavior as a diagnostic server; correct strict routing refused the unowned fallback.",
+      "resolution": "Explicit native mode for local/remote browser scenarios, preserving publication/queue/reopen assertions;resolved in executor-native-boundary-paths.xml."
+    },
+    {
+      "report": "executor-native-boundary-paths.xml",
+      "cause": "Four older native/local split fixtures used anonymous diagnostic server identity.",
+      "resolution": "Use existing explicit local_native_ai fixture and native environment. No production guard or assertions weakened;executor-native-boundary-path-resolution.xml."
+    }
+  ],
+  "xml_text_preserved": "Trailing whitespace is encoded with character entities;parsed original failure text/results remain identical;raw SHA retained",
+  "progress": {
+    "verified": 23,
+    "total": 42,
+    "percent": 54.8,
+    "whole_macroareas": 0
+  },
+  "release_candidate": false,
+  "transition_enabled": false,
+  "final_source_bound_gate": "executor-native-boundary-final-gate.xml"
+}

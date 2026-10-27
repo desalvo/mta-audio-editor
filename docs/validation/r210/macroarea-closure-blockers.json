@@ -1,0 +1,111 @@
+{
+  "date": "2026-10-26",
+  "requested_goal": "Close at least one original macroarea",
+  "goal_met": false,
+  "accepted_macroareas": 0,
+  "closest_area": "D",
+  "closest_area_verified": 5,
+  "closest_area_total": 6,
+  "D6_dependencies": [
+    "C2",
+    "C3",
+    "C5"
+  ],
+  "hardcoded_gate_evidence": [
+    {
+      "path": "app/regime_operation_fence.py",
+      "function": "inspect",
+      "field": "all_entry_points_instrumented",
+      "value": false
+    },
+    {
+      "path": "app/regime_reconciliation.py",
+      "function": "combined_readiness",
+      "field": "ready_for_automatic_transition",
+      "value": false
+    }
+  ],
+  "areas": [
+    {
+      "id": "A",
+      "title": "Provider reconciliation",
+      "open_code": [
+        "A4",
+        "A5"
+      ],
+      "open_targets": [
+        "A6"
+      ]
+    },
+    {
+      "id": "B",
+      "title": "AI execution ownership",
+      "open_code": [
+        "B2",
+        "B5"
+      ],
+      "open_targets": [
+        "B6"
+      ]
+    },
+    {
+      "id": "C",
+      "title": "Administrative cutover",
+      "open_code": [
+        "C2",
+        "C3",
+        "C5",
+        "C6"
+      ],
+      "open_targets": []
+    },
+    {
+      "id": "D",
+      "title": "Billing by regime",
+      "open_code": [
+        "D6"
+      ],
+      "open_targets": []
+    },
+    {
+      "id": "E",
+      "title": "Administrator IT/EN UI",
+      "open_code": [
+        "E4",
+        "E5"
+      ],
+      "open_targets": []
+    },
+    {
+      "id": "F",
+      "title": "AI model permissions",
+      "open_code": [
+        "F3",
+        "F4",
+        "F6"
+      ],
+      "open_targets": [
+        "F5"
+      ]
+    },
+    {
+      "id": "G",
+      "title": "Release verification",
+      "open_code": [],
+      "open_targets": [
+        "G5",
+        "G6"
+      ]
+    }
+  ],
+  "latest_local_implementation": {
+    "handoff": "docs/ADMIN_CUTOVER_LOCAL_R210.md",
+    "actual_API_roundtrip_tested": true,
+    "readiness_doubles_used_for_positive_API_tests": false,
+    "local_default_off_mode": "local-authority-v1",
+    "global_readiness_replaced": false,
+    "original_criteria_promoted": false,
+    "browser_cases_pending": 9,
+    "remaining": "General provider/legacy financial reconciliation and distributed/every-entry coverage still require implementation/acceptance;new actual UI requires Chromium."
+  }
+}

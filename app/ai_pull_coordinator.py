@@ -76,6 +76,15 @@ SCHEMA = [
     '''CREATE TRIGGER IF NOT EXISTS ai_pull_metering_immutable BEFORE UPDATE ON ai_pull_tasks
        WHEN OLD.metering_json IS NOT NULL AND NEW.metering_json IS NOT OLD.metering_json
        BEGIN SELECT RAISE(ABORT,'Immutable pull delivery evidence'); END''',
+    """CREATE TABLE IF NOT EXISTS ai_pull_model_requirements(
+       job_id TEXT PRIMARY KEY REFERENCES ai_pull_tasks(job_id) ON DELETE CASCADE,
+       requirement_json TEXT NOT NULL)""",
+    """CREATE TRIGGER IF NOT EXISTS ai_pull_model_requirement_immutable BEFORE UPDATE ON ai_pull_model_requirements
+       BEGIN SELECT RAISE(ABORT,'Immutable model requirement'); END""",
+    """CREATE TRIGGER IF NOT EXISTS ai_pull_model_requirement_delete BEFORE DELETE ON ai_pull_model_requirements
+       WHEN EXISTS(SELECT 1 FROM ai_pull_tasks WHERE job_id=OLD.job_id AND state!='done')
+       BEGIN SELECT RAISE(ABORT,'Active model requirement'); END""",
+
 ]
 
 
@@ -219,7 +228,9 @@ def available():
     for row in nodes():
         if row['enabled'] and row['accepting']:
             supported.update(decode(row['kinds_json']))
-    return {k: k in supported for k in sorted(registered_kinds())}
+    pilot=os.getenv('MTA_PULL_MODEL_ATTESTATION','off')
+    if pilot not in ('off','basic-pitch-v1'):raise ValueError('Invalid model attestation setting')
+    return {k: k in supported and (pilot=='off' or k=='audio-to-midi-basic-pitch') for k in sorted(registered_kinds())}
 
 
 def _policy(row):
@@ -255,6 +266,8 @@ def enqueue(uid, kind, plan, *, source_wav=None, source_json=None, timeout_secon
             raise ValueError('Unsupported structured source')
         validate(source)
     decision = authorize_remote_execution(kind, plan)
+    from .ai_model_attestation import requirement
+    model_requirement=requirement(kind,decision)
     from .ai_global_execution import current_job
     from . import ai_arranger_runtime as queue
     ledger = None
@@ -300,6 +313,8 @@ def enqueue(uid, kind, plan, *, source_wav=None, source_json=None, timeout_secon
             VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,'queued',?)''',
             (job, uid, kind, encode(plan), encode(asdict(decision)), 'wav' if source_wav is not None else 'score' if source_json is not None else 'none',
              hashlib.sha256(source).hexdigest(), source, int(deferred), encode(owner), timeout_seconds, request_key, request_digest, int(time.time())))
+        if model_requirement is not None:
+            c.execute('INSERT INTO ai_pull_model_requirements VALUES(?,?)',(job,encode(model_requirement)))
         if deferred and kind == 'ace-step' and plan.get('input_source') in ('master', 'track'):
             payload = decode(entry['payload_json'])
             if payload.get('actor_user_id') != uid or payload.get('adapter') != entry['operation']:
@@ -390,7 +405,9 @@ def assignment(credential, instance):
         if row['cancelled'] or not active or not active[0] or _request_cancelled(c, row):
             return {'job_id': row['job_id'], 'instance': instance, 'nonce': row['nonce'], 'cancelled': True}
         _policy(row)
-        return {k: row[k] for k in ('job_id', 'kind', 'instance', 'nonce', 'source_kind', 'source_sha256', 'timeout')} | {
+        required=c.execute('SELECT requirement_json FROM ai_pull_model_requirements WHERE job_id=?',(row['job_id'],)).fetchone()
+        extra={'model_requirement':decode(required[0])} if required else {}
+        return extra | {k: row[k] for k in ('job_id', 'kind', 'instance', 'nonce', 'source_kind', 'source_sha256', 'timeout')} | {
             'plan': decode(row['plan_json']), 'policy': decode(row['policy_json']),
             'source_b64': base64.b64encode(row['source']).decode()}
 
@@ -453,7 +470,7 @@ def validate_payload(payload, media):
 
 
 def complete(credential, job, instance, nonce, outcome):
-    if not isinstance(outcome, dict) or set(outcome) != {'status', 'cpu_seconds', 'media_type', 'result_b64'}:
+    if not isinstance(outcome, dict) or set(outcome)-{'model_receipt'} != {'status', 'cpu_seconds', 'media_type', 'result_b64'}:
         raise ValueError('Invalid pull completion fields')
     status, cpu, media = outcome['status'], outcome['cpu_seconds'], outcome['media_type']
     if status not in ('done', 'failed', 'cancelled') or (cpu is not None and
@@ -469,6 +486,9 @@ def complete(credential, job, instance, nonce, outcome):
         raise ValueError('Failed/cancelled execution cannot publish output')
     proof = encode({'status': status, 'cpu_seconds': cpu, 'media_type': media,
                     'result_sha256': hashlib.sha256(payload).hexdigest()})
+    if 'model_receipt' in outcome:
+        if len(encode(outcome['model_receipt']))>8192:raise ValueError('Oversized model receipt')
+        proof=encode({**decode(proof),'model_receipt':outcome['model_receipt']})
     with transaction() as c:
         node = node_record(c, credential)
         receipt = _ack_key(node['id'], job, instance, nonce)
@@ -478,6 +498,13 @@ def complete(credential, job, instance, nonce, outcome):
                 raise FenceBlocked('Conflicting retired worker acknowledgement')
             return {'job_id': job, 'acknowledged': True}
         row = _assigned(c, credential, job, instance, nonce)
+        required=c.execute('SELECT requirement_json FROM ai_pull_model_requirements WHERE job_id=?',(job,)).fetchone()
+        if required and status=='done':
+            if row['state']=='dispatched':_policy(row)
+            from .ai_model_attestation import validate
+            validate(outcome.get('model_receipt'),decode(required[0]),dict(row)|{'policy':decode(row['policy_json'])})
+        elif 'model_receipt' in outcome:
+            raise ValueError('Unexpected model receipt')
         if row['state'] in ('frozen', 'done'):
             if decode(row['completion_json'])['worker_proof_sha256'] != hashlib.sha256(proof.encode()).hexdigest():
                 raise FenceBlocked('Conflicting immutable worker completion')

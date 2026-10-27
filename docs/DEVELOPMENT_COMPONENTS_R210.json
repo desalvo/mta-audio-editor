@@ -2,7 +2,7 @@
   "schema_version": 2,
   "project": "MTA Audio Editor",
   "release": "0.3.0-r210",
-  "updated_utc": "2026-10-25",
+  "updated_utc": "2026-10-26",
   "baseline_archive": "MTA-r210-provider-authenticated-journal-handoff-cumulative.zip",
   "baseline_sha256": "603c5a5e650178b912605d4203154ea310b2f387e35c9c4c9e719ee30c1d1817",
   "git_baseline": {
@@ -65,7 +65,7 @@
           "id": "A5",
           "criterion": "Complete legacy obligations, all terminal/uncertain checkout outcomes and subscription reversal repayment",
           "state": "implementation_pending",
-          "evidence": "Partial: strict authenticated failed-charge closure, proof audit and owner/admin recovery/re-admission; immutable PayPal final outcome conflicts with private owner IT/EN review status. 243 affected cases incl. 12 Chromium, no current failures. docs/FINANCIAL_OUTCOME_HANDOFF_R210.md. Partial: private owner paginated Stripe/PayPal local history, trusted resumption, GET-only authenticated reconciliation, same-owner serialized cross-provider pending credit and same-period subscription admission, actual account/credits IT/EN error/eligibility/locale recovery. 231 affected cases incl. 24 Chromium. docs/OWNER_PAYMENT_RECOVERY_HANDOFF_R210.md. Partial: exact subscription refund receivables, authenticated empty terminal Stripe/PayPal closure, known-ID uncertain-create recovery and IT/EN owner/operator workflows; tests/test_r210_terminal_checkout_e2e.py; tests/test_r210_checkout_reference_recovery.py; tests/test_r210_terminal_recovery_browser.py; docs/TERMINAL_CHECKOUT_HANDOFF_R210.md. Legacy, unknown references, failed-charge histories, original subscription risks and operator refunds still pending. Operator refunds now locally completed for exact reconciled Stripe credit payments and PayPal captures (credits/subscription/repayment/surplus), with single dispatch, GET-only recovery, immutable audit, private IT/EN UI and erasure integration. 254 affected cases /10 Chromium. docs/OPERATOR_REFUNDS_HANDOFF_R210.md. This does not close complete legacy/provider-wide history or original fee-loss obligations; state remains implementation_pending. New partial workflow: bounded authenticated capture-filtered PayPal dispute collection/detail rereads, exact full-gross multicapture allocation, atomic risk/refund/funding and durable observed-ID gaps, private IT/EN owner/admin error/recovery. PAYPAL_DISPUTE_HISTORY_HANDOFF_R210.md;428 affected cases,47 Chromium. Global merchant history,payout/protection money movements,partial multicapture,legacy and original permanent fee loss remain open. Original full-capture loss repayment now implemented with immutable original fee/surplus,nonduplicated refunds/private repayment/erasure;ORIGINAL_SUBSCRIPTION_LOSS_HANDOFF_R210.md. Global/legacy/partial/protection obligations remain pending;criterion unchanged.",
+          "evidence": "Partial: strict authenticated failed-charge closure, proof audit and owner/admin recovery/re-admission; immutable PayPal final outcome conflicts with private owner IT/EN review status. 243 affected cases incl. 12 Chromium, no current failures. docs/FINANCIAL_OUTCOME_HANDOFF_R210.md. Partial: private owner paginated Stripe/PayPal local history, trusted resumption, GET-only authenticated reconciliation, same-owner serialized cross-provider pending credit and same-period subscription admission, actual account/credits IT/EN error/eligibility/locale recovery. 231 affected cases incl. 24 Chromium. docs/OWNER_PAYMENT_RECOVERY_HANDOFF_R210.md. Partial: exact subscription refund receivables, authenticated empty terminal Stripe/PayPal closure, known-ID uncertain-create recovery and IT/EN owner/operator workflows; tests/test_r210_terminal_checkout_e2e.py; tests/test_r210_checkout_reference_recovery.py; tests/test_r210_terminal_recovery_browser.py; docs/TERMINAL_CHECKOUT_HANDOFF_R210.md. Legacy, unknown references, failed-charge histories, original subscription risks and operator refunds still pending. Operator refunds now locally completed for exact reconciled Stripe credit payments and PayPal captures (credits/subscription/repayment/surplus), with single dispatch, GET-only recovery, immutable audit, private IT/EN UI and erasure integration. 254 affected cases /10 Chromium. docs/OPERATOR_REFUNDS_HANDOFF_R210.md. This does not close complete legacy/provider-wide history or original fee-loss obligations; state remains implementation_pending. New partial workflow: bounded authenticated capture-filtered PayPal dispute collection/detail rereads, exact full-gross multicapture allocation, atomic risk/refund/funding and durable observed-ID gaps, private IT/EN owner/admin error/recovery. PAYPAL_DISPUTE_HISTORY_HANDOFF_R210.md;428 affected cases,47 Chromium. Global merchant history,payout/protection money movements,partial multicapture,legacy and original permanent fee loss remain open. Original full-capture loss repayment now implemented with immutable original fee/surplus,nonduplicated refunds/private repayment/erasure;ORIGINAL_SUBSCRIPTION_LOSS_HANDOFF_R210.md. Global/legacy/partial/protection obligations remain pending;criterion unchanged. 2026-10-26: complete-set original subscription basis audit before losses, private admin-only no-store API/IT-EN paged error/retry panel, ledger/combined-readiness blocker. Historical split proof missing, no guessed migration/debt. SUBSCRIPTION_EVIDENCE_HANDOFF_R210.md; whole criterion remains open.",
           "weight": 1
         },
         {
@@ -94,7 +94,7 @@
           "id": "B2",
           "criterion": "Actual supervisor-crash recovery with external worker quiescence proof",
           "state": "implementation_pending",
-          "evidence": "Partial local cgroup workflow implemented: prelaunch original supervisor/claim binding, transactional bootstrap admission, immutable kernel quiescence receipts, admin API/IT-EN UI, financial finalization and GPU-lease barrier. Actual prelaunch supervisor SIGKILL and synthetic kernel/API/browser fixtures pass. Actual delegated nested-cgroup crash test is prepared but skipped; post-crash economic resolution and other executor coverage remain pending. docs/DURABLE_WORKER_RECOVERY_HANDOFF_R210.md; docs/validation/r210/cgroup-journal-summary.json.; partial extension: original frozen recovery and explicit operator-funded unknown loss resolution, immutable audit, reservation/lease release and evidence barriers, IT/EN API/browser/NC privacy checks; docs/WORKER_LOSS_RESOLUTION_HANDOFF_R210.md. Real delegated-kernel acceptance and complete executor coverage remain pending.",
+          "evidence": "Partial local cgroup workflow implemented: prelaunch original supervisor/claim binding, transactional bootstrap admission, immutable kernel quiescence receipts, admin API/IT-EN UI, financial finalization and GPU-lease barrier. Actual prelaunch supervisor SIGKILL and synthetic kernel/API/browser fixtures pass. Actual delegated nested-cgroup crash test is prepared but skipped; post-crash economic resolution and other executor coverage remain pending. docs/DURABLE_WORKER_RECOVERY_HANDOFF_R210.md; docs/validation/r210/cgroup-journal-summary.json.; partial extension: original frozen recovery and explicit operator-funded unknown loss resolution, immutable audit, reservation/lease release and evidence barriers, IT/EN API/browser/NC privacy checks; docs/WORKER_LOSS_RESOLUTION_HANDOFF_R210.md. Real delegated-kernel acceptance and complete executor coverage remain pending. EXECUTION_OWNER_HANDOFF_R210.md: active durable original actor/scheduler checks before local/pull dispatch and source conversion, pre-spawn cancellation and supervised bounded preparation;347 distinct affected cases,37 new. Scoped path complete, not all-executor/kernel/rights acceptance;criterion remains open.",
           "weight": 1
         },
         {
@@ -115,7 +115,7 @@
           "id": "B5",
           "criterion": "Prove ownership/metering for every legacy/local/native executor entry",
           "state": "implementation_pending",
-          "evidence": "docs/validation/r210/work-ai-entrypoints.json Current local ownership epoch hardening: WORKER_EPOCH_HANDOFF_R210.md;350 distinct affected cases including49 new. No distributed authority/pull backend acceptance; existing criterion state unchanged.",
+          "evidence": "docs/validation/r210/work-ai-entrypoints.json Current local ownership epoch hardening: WORKER_EPOCH_HANDOFF_R210.md;350 distinct affected cases including49 new. No distributed authority/pull backend acceptance; existing criterion state unchanged. EXECUTION_OWNER_HANDOFF_R210.md: active durable original actor/scheduler checks before local/pull dispatch and source conversion, pre-spawn cancellation and supervised bounded preparation;347 distinct affected cases,37 new. Scoped path complete, not all-executor/kernel/rights acceptance;criterion remains open. CUMULATIVE_HANDOFF_R210.md:strict server/native dispatch regardless of diagnostic auth bypass,native-only zero Studio actor and synchronous compatibility model-rights/side-effect barrier;194 distinct affected cases/26 new. Full all-executor/opaque/checkpoint-rights acceptance remains open.",
           "weight": 1
         },
         {
@@ -144,14 +144,14 @@
           "id": "C2",
           "criterion": "Distributed admission barrier and service-wide drain",
           "state": "implementation_pending",
-          "evidence": " Ten-cycle backend integration: PULL_COORDINATION_HANDOFF_R210.md; registered/deferred original ownership, free-only no-charge, pull admission barrier with pre-drain intents and original client result recovery. This does not complete whole-service drain or every legacy executor.",
+          "evidence": " Ten-cycle backend integration: PULL_COORDINATION_HANDOFF_R210.md; registered/deferred original ownership, free-only no-charge, pull admission barrier with pre-drain intents and original client result recovery. This does not complete whole-service drain or every legacy executor. 2026-10-26: ADMIN_CUTOVER_LOCAL_R210.md. Local service leases now cover full HTTP/accounting/queue/outbox lifetimes across authority processes;managed durable barriers block financial writes after a crash. Narrow profile only;whole distributed/every-executor acceptance remains pending.",
           "weight": 1
         },
         {
           "id": "C3",
           "criterion": "Resolve every financial obligation before cutover",
           "state": "implementation_pending",
-          "evidence": " Original full-capture loss repayment now implemented with immutable original fee/surplus,nonduplicated refunds/private repayment/erasure;ORIGINAL_SUBSCRIPTION_LOSS_HANDOFF_R210.md. Global/legacy/partial/protection obligations remain pending;criterion unchanged.",
+          "evidence": " Original full-capture loss repayment now implemented with immutable original fee/surplus,nonduplicated refunds/private repayment/erasure;ORIGINAL_SUBSCRIPTION_LOSS_HANDOFF_R210.md. Global/legacy/partial/protection obligations remain pending;criterion unchanged. 2026-10-26: complete-set original subscription basis audit before losses, private admin-only no-store API/IT-EN paged error/retry panel, ledger/combined-readiness blocker. Historical split proof missing, no guessed migration/debt. SUBSCRIPTION_EVIDENCE_HANDOFF_R210.md; whole criterion remains open. 2026-10-26: ADMIN_CUTOVER_LOCAL_R210.md. Strict local profile refuses configured providers,any provider/ambiguous financial history,unreviewed schemas,priced/negative/unsettled obligations and unknown execution. This does not resolve missing general provider/legacy obligations or accept C3.",
           "weight": 1
         },
         {
@@ -165,7 +165,7 @@
           "id": "C5",
           "criterion": "Enabled safe transition in both directions through actual administrator API",
           "state": "implementation_pending",
-          "evidence": null,
+          "evidence": " 2026-10-26: ADMIN_CUTOVER_LOCAL_R210.md. Actual authenticated default-off local-authority two-way API and immutable request/audit/forward recovery implemented and tested without readiness doubles. General provider-history/distributed transition remains incomplete;original criterion not promoted.",
           "weight": 1
         },
         {
@@ -222,7 +222,7 @@
           "id": "D6",
           "criterion": "Account balances and periods across enabled administrative cutover",
           "state": "implementation_pending",
-          "evidence": null,
+          "evidence": "BALANCE_CONTINUITY_R210.md:internal conserving DB commit/finalize and maintenance integration,17-table exact original ledger/period/NC-history receipt;70 affected passes/11 new. Internal tests explicitly use readiness doubles. Enabled actual administrator cutover remains unavailable pending C2,C3,C5;D6 remains unaccepted. 2026-10-26: ADMIN_CUTOVER_LOCAL_R210.md. Actual bounded local administrator API conserves real operator credit balances/free periods,registered built-in harmony/CPU ledger and actual NC history across both directions and crashes. This scoped result does not close original integrated D6 pending broad C2/C3/C5 and UI acceptance.",
           "weight": 1
         }
       ]
@@ -258,14 +258,14 @@
           "id": "E4",
           "criterion": "Complete sensitive regime-switch operator workflow",
           "state": "implementation_pending",
-          "evidence": null,
+          "evidence": " 2026-10-26: ADMIN_CUTOVER_LOCAL_R210.md. Actual IT/EN preview/confirmation panel and original-operation response-loss/reload retry implemented. Nine genuine Chromium/API cases prepared;local9 prerequisite skips correctly rejected. Original workflow acceptance remains pending.",
           "weight": 1
         },
         {
           "id": "E5",
           "criterion": "Complete transition progress, audit and forward recovery controls",
           "state": "implementation_pending",
-          "evidence": null,
+          "evidence": " 2026-10-26: ADMIN_CUTOVER_LOCAL_R210.md. Private paginated committed/finalized audit records original and finalizing administrators;forward recovery controls retain original receipt and never abort committed epochs. Backend tested;new UI still needs actual Chromium. Original criterion remains pending.",
           "weight": 1
         },
         {
@@ -301,14 +301,14 @@
           "id": "F3",
           "criterion": "Authenticated remote checkpoint identity and rights attestation",
           "state": "implementation_pending",
-          "evidence": "Still pending: no authenticated executing-checkpoint/rights attestation protocol exists. Commercial remote execution remains fully denied, not enabled by this cycle.",
+          "evidence": "MODEL_ATTESTATION_PILOT_R210.md:opt-in Basic Pitch immutable model/rights/adapter requirements,authenticated original assignment and loaded receipt/PID/result proof,loss/replay/revocation/retention implemented.222 affected passes,24 new;genuine model acceptance skipped without reviewed installed runtime. Other engines/transports still need code and independent runtime/rights acceptance;not whole F3. Commercial remote remains denied.",
           "weight": 1
         },
         {
           "id": "F4",
           "criterion": "Rights and bypass acceptance for every legacy executor",
           "state": "implementation_pending",
-          "evidence": "Partial: 29 explicit app-owned Python transport sites classified with exact source/call/checker hashes, direct bypass acceptance and native policy visibility completed. Opaque commands, native/runtime libraries, dynamic networking and full legacy executor acceptance remain open. docs/security/REMOTE_TRANSPORT_REVIEW_R210.json.",
+          "evidence": "Partial: 29 explicit app-owned Python transport sites classified with exact source/call/checker hashes, direct bypass acceptance and native policy visibility completed. Opaque commands, native/runtime libraries, dynamic networking and full legacy executor acceptance remain open. docs/security/REMOTE_TRANSPORT_REVIEW_R210.json. EXECUTION_OWNER_HANDOFF_R210.md: active durable original actor/scheduler checks before local/pull dispatch and source conversion, pre-spawn cancellation and supervised bounded preparation;347 distinct affected cases,37 new. Scoped path complete, not all-executor/kernel/rights acceptance;criterion remains open. CUMULATIVE_HANDOFF_R210.md:strict server/native dispatch regardless of diagnostic auth bypass,native-only zero Studio actor and synchronous compatibility model-rights/side-effect barrier;194 distinct affected cases/26 new. Full all-executor/opaque/checkpoint-rights acceptance remains open.",
           "weight": 1
         },
         {
@@ -344,7 +344,7 @@
           "id": "G2",
           "criterion": "Entire available Linux baseline with repairs, plus affected final-code regression; no complete target CI claim",
           "state": "verified",
-          "evidence": "docs/validation/r210/work-final-global-0.log; docs/validation/r210/work-final-global-1.log; docs/validation/r210/continuation-financial-regression.log; continuation-deferred-final.log; continuation-deferred-regression.log; docs/validation/r210/repayment-test-summary.json; docs/validation/r210/nc-collection-test-summary.json",
+          "evidence": "docs/validation/r210/work-final-global-0.log; docs/validation/r210/work-final-global-1.log; docs/validation/r210/continuation-financial-regression.log; continuation-deferred-final.log; continuation-deferred-regression.log; docs/validation/r210/repayment-test-summary.json; docs/validation/r210/nc-collection-test-summary.json; docs/validation/r210/ci-full-confirmed-40257635101.json: full6448 passed/104 prerequisite skips,75.84%,combined live VST3/MIDI passed,all12 verify/build jobs successful; target/runtime requirements still open.",
           "weight": 1
         },
         {
@@ -392,10 +392,13 @@
     "Local SQLite ownership is not multi-host coordination"
   ],
   "next_actions": [
-    "Resume ADMIN_ACCEPTANCE_HANDOFF_R210.md and the admin-accessibility cumulative;read RC_CLOSURE_PLAN_R210.md.22/42,0/7 whole macroareas;RC false,switching disabled. Preserve accepted baseline;no helper-sized ZIPs or unrelated reruns.",
-    "Implement I1/B4 shared authoritative coordinator+storage/locking across actual admission/execution/publication/settlement;then all-executor quiescence and C2 distributed drain. SQLite/local leases/read-only diagnostics are not acceptance.",
-    "Independent implementation:A4/A5 global/legacy financial obligations and original permanent fee loss;F3 authenticated executing-checkpoint/rights exchange,F4 opaque executors,F6 independent rights review. Payout/protection settlement requires unique authoritative completed-movement evidence;keep unproven funds held.",
-    "After coordination+finance:integrated liability migration,two-way enabled cutover,C3/C5/C6/D6/E4/E5 and complete operator progress/audit/recovery. Real sandbox,kernel,multi-host,containers,OS/GPU/audio/VST prerequisites remain external. No merchant/real-server/GitHub mutation."
+    "After the user-selected commit,run Optional administrative cutover Chromium with admin_cutover_chromium=true;require9 actual passes/zero skips and matching source hashes. Then complete remaining general financial/worker readiness and integrated original macroarea criteria;do not promote the narrow local profile or rebuild its now tested API/lease/conservation/recovery components.",
+    "Close original macroarea D by completing C2+C3+C5+D6 as one real administrative API/conservation stream;reuse BALANCE_CONTINUITY_R210.md. No promotion from internal callback tests;keep original source coverage/readiness gates until full implementation/proof.",
+    "Restore the complete current cumulative and read CUMULATIVE_HANDOFF_R210.md plus RC_FINAL_WORK_QUEUE_R210.md. Current Git base9fc85ce;all changes uncommitted,user will commit later. Reuse B4 and the valid affected/CI evidence;do not apply old patches or rebuild accepted work.",
+    "Complete one integrated every-executor admission/ownership/rights stream: B5/F4 coverage of actual legacy/local/native entries, B2 crash/quiescence, F3 executing-checkpoint protocol and F6 independent rights. Existing coordinator, frozen-output recovery, metering signatures and reviewed transport inventory are reusable, not loaded-checkpoint proof.",
+    "Complete remaining A4/A5/C3 implementation for global/unknown histories, unique completed payout/protection allocation and conservation. Exact legacy original-split migration is blocked where independent historical proof is absent; do not infer it. Switch to an independent entry when such proof blocks one case.",
+    "After executor and finance exits, finish C2/C3/C5/C6/D6/E4/E5 together: actual service-wide drain, liabilities, both administrator cutovers, balances/period preservation, UI, crash/concurrency and forward recovery. Keep switching disabled until the original combined acceptance criteria pass.",
+    "Run only missing target acceptance A6/B6/F5/G5/G6 when isolated prerequisites and authorization exist. Full CI on9fc85ce and395 distinct current affected cases are evidence to reuse, not reasons to repeat unchanged tests. Publish no RC, GitHub/server mutation or intermediate package."
   ],
   "test_results": {
     "full_available_linux": {
@@ -595,6 +598,50 @@
       "fresh_browser_run": false,
       "real_provider_calls": 0,
       "evidence": "docs/validation/r210/original-loss-test-summary.json"
+    },
+    "subscription_evidence_review": {
+      "affected_finance_passed": 345,
+      "new_actual_chromium_passed": 4,
+      "new_audit_api_cases": 27,
+      "new_browser_cases": 4,
+      "evidence": "docs/validation/r210/subscription-basis-result.json",
+      "full_baseline_repeated": false,
+      "real_provider_calls": 0
+    },
+    "execution_owner_path": {
+      "passed_distinct": 347,
+      "new_cases": 37,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "full_ci_repeated": false,
+      "real_model_or_provider_calls": 0,
+      "evidence": "docs/validation/r210/execution-owner-result.json"
+    },
+    "executor_boundaries": {
+      "passed_distinct": 194,
+      "new_cases": 26,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "full_ci_repeated": false,
+      "real_provider_or_model_calls": 0,
+      "evidence": "docs/validation/r210/executor-boundaries-result.json"
+    },
+    "admin_cutover_local": {
+      "distinct_available_passed": 503,
+      "new_available_passed": 26,
+      "browser_prerequisite_skips": 9,
+      "browser_actual_passes": 0,
+      "proof": "docs/validation/r210/admin-cutover-result.json",
+      "scope": "Bounded local-maintenance actual API;UI implementation awaits Chromium;general original macroarea not accepted."
+    },
+    "export_sqlite_contention": {
+      "functional_passed": 58,
+      "new_passed": 11,
+      "source_security_agreement_passed": 1,
+      "scope": "Actual authenticated project/track MP3/WAV/FLAC FFmpeg export,poll/download and codec verification under held SQLite writer;auth/schema migration/locale/local cutover regressions. No server deployment confirmation.",
+      "proof": "docs/validation/r210/export-auth-contention-result.json"
     }
   },
   "security_review": {
@@ -608,15 +655,15 @@
     "bandit": {
       "high": 0,
       "medium": 21,
-      "low": 147,
-      "source_files": 285,
-      "reviewed_findings": 168,
+      "low": 144,
+      "source_files": 286,
+      "reviewed_findings": 165,
       "nosec": 0,
       "scanner_skips": 0,
       "review_ledger": "docs/security/APP_SECURITY_REVIEW_R210.json",
       "gate": "scripts/check_security_review.py",
-      "note": "Complete local static scan dispositions, not a clean zero-findings or complete deployment security certification. Historical raw 22 medium/146 low superseded.",
-      "current_raw_scan": "docs/validation/r210/merchant-history-bandit.json"
+      "note": "Three findings removed with the unsupervised FFmpeg call/import;two unchanged operator-controlled launch boundaries explicitly reviewed at new locations. No suppressions/scanner changes;not whole-platform certification.",
+      "current_raw_scan": "docs/validation/r210/executor-boundaries-bandit.json"
     },
     "continuation_new_modules": {
       "modules": [
@@ -747,32 +794,60 @@
       "source_review": "279 files/168 reviewed unsuppressed findings;four changed/new Python paths explicitly reviewed",
       "transport_inventory": "29 sites/20 files,checker/source hashes unchanged",
       "runtime_dependencies_added": 0
+    },
+    "admin_cutover_local": {
+      "app_sources": 293,
+      "reviewed_findings": 165,
+      "high": 0,
+      "medium": 21,
+      "low": 144,
+      "new_dispositions": 0,
+      "transport_sites": 30,
+      "transport_files": 21,
+      "proof": "docs/validation/r210/admin-cutover-source-gates.json"
     }
   },
   "resume_checkpoint": {
-    "archive": "MTA-0.3.0-r210-pre-RC-paypal-item-movement-cumulative.zip",
-    "sha256": "e3858030a43caf314ae40e876b6a517ac9c0f01e02d5cdc31c4617ce1f942c65",
-    "input_bytes": 93593153,
-    "input_files": 3792,
-    "meaning": "Complete saved input SHA/CRC/every manifest byte/hash/mode verified before editing;all paths/protected assets/modes preserved. Output checksum is adjacent to avoid self-reference.",
-    "current_handoff": "docs/MERCHANT_HISTORY_HANDOFF_R210.md",
-    "current_archive": "MTA-0.3.0-r210-pre-RC-merchant-history-cumulative.zip"
+    "date": "2026-10-26",
+    "handoff": "docs/EXPORT_SQLITE_CONTENTION_R210.md",
+    "archive": "MTA-0.3.0-r210-pre-RC-export-sqlite-hotfix-cumulative.zip",
+    "base_commit": "9fc85ce79bee9871696dea9396565395a415aa72",
+    "commit_deferred": true,
+    "release_candidate": false
   },
   "latest_checkpoint": {
-    "handoff": "docs/MERCHANT_HISTORY_HANDOFF_R210.md",
-    "strategy": "docs/RC_EXECUTION_STRATEGY_R210.json",
-    "test_summary": "docs/validation/r210/merchant-history-test-summary.json",
-    "unique_affected_passed": 70,
-    "new_passed": 32,
-    "browser_skipped": 4,
-    "scope": "Merchant-wide requested-window acquisition/observation only; financial settlement/global A4 acceptance remain open",
-    "optional_ci_workflow": ".github/workflows/merchant-history-chromium.yml",
-    "ci_status": "prepared_not_run;requiresuserdispatch"
+    "date": "2026-10-26",
+    "handoff": "docs/EXPORT_SQLITE_CONTENTION_R210.md",
+    "archive": "MTA-0.3.0-r210-pre-RC-export-sqlite-hotfix-cumulative.zip",
+    "base_commit": "9fc85ce79bee9871696dea9396565395a415aa72",
+    "commit_deferred": true,
+    "release_candidate": false
   },
   "publication_recovery_checkpoint": {
     "handoff": "docs/TWENTY_CYCLE_RECOVERY_HANDOFF_R210.md",
     "scope": "Supported new immutable-intent frozen successful WAV publication recovery; no whole B2/B5 acceptance",
     "release_candidate": false,
     "transition_enabled": false
+  },
+  "current_committed_baseline": {
+    "sha": "9fc85ce79bee9871696dea9396565395a415aa72",
+    "source": "Read-only GitHub checkout; full workflow40257635101 independently verified success",
+    "pending_delta": "Integrated cumulative: original subscription evidence,active owner/source lifecycle,strict server/native/legacy synchronous execution boundaries,current proof/status/strategy and full preserved manifest. User commit deferred."
+  },
+  "work_organization": {
+    "date": "2026-10-26",
+    "commit_deferred_by_user": true,
+    "single_uncommitted_delta": true,
+    "intermediate_packages": false,
+    "definition_of_done": "Original full macroarea acceptance or a concrete, documented blocker; no helper/test-count stopping rule",
+    "reuse_policy": "Source/boundary changes select affected verification; unchanged evidence is retained. No repeat of the existing full suite solely because work continues.",
+    "queue": "docs/RC_FINAL_WORK_QUEUE_R210.md",
+    "remaining_criteria": {
+      "implementation_or_review_pending": 14,
+      "external_target_blocked": 5,
+      "total": 19
+    },
+    "not_a_full_product_percentage": true,
+    "delivery": "Complete cumulative archive at each substantial checkpoint when possible,not only a patch;no ZIP per helper. Commit remains deferred."
   }
 }

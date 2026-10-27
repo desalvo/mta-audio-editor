@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="6.653" timestamp="2026-10-26T19:34:54.060543+01:00" hostname="7291289a56a1"><testcase classname="tests.test_r210_admin_cutover_e2e" name="test_real_registered_builtin_harmony_and_measured_nc_statement_survive_actual_return_cutover" time="3.858"><failure message="sqlite3.OperationalError: database is locked">user_id = 2, kind = 'vocal-harmony'
+call = &lt;function execute_registered_worker.&lt;locals&gt;.&lt;lambda&gt; at 0x7f48437cfec0&gt;
+cancel_check = None
+license_decision = Decision(model_id='mta-analysis', mode='cost_recovery', source='https://github.com/desalvo/mta-audio-editor', policy_sha256='9b9ff0c12c55d7c4d6cdbbaafe1e2791f631d1c834d1a1a06b1b707b02037079', operator_review=False)
+
+    def execute(user_id,kind,call,*,cancel_check=None,license_decision=None):
+        from . import ai_arranger_runtime as queue
+        if type(user_id) is not int or user_id&lt;=0:
+            raise ValueError('Authenticated AI execution owner required')
+        if current_job.get() is not None:
+            active_owner(user_id)
+            event=current_cancel.get()
+            if cancel_check and cancel_check():
+                raise RuntimeError('AI job cancelled before dispatch')
+            return call(lambda:bool(event and event.is_set()) or bool(cancel_check and cancel_check()))
+        done=threading.Event();result={};jid=uuid.uuid4().hex
+        def run(progress,stop):
+            def cancelled():return stop.is_set() or bool(cancel_check and cancel_check())
+            try:
+                if cancelled():raise RuntimeError('AI job cancelled before dispatch')
+                result['value']=call(cancelled)
+            except BaseException as exc:
+                result['error']=exc
+                raise
+            finally:done.set()
+        from .model_license_policy import admission
+        with admission(license_decision):
+            queue.start('remote-user-'+str(user_id),'worker:'+kind,run,job_id=jid,cancellable=True,
+                payload={'schema_version':1,'actor_user_id':user_id,'kind':kind,'remote_inference':True})
+        try:
+            while True:
+&gt;               state=queue.get(jid)
+                      ^^^^^^^^^^^^^^
+
+app/ai_global_execution.py:65: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/ai_arranger_runtime.py:305: in get
+    with _db() as con:
+         ^^^^^
+app/ai_arranger_runtime.py:52: in _db
+    con = connect(str(_ROOT / 'jobs.sqlite3'), timeout=30, isolation_level=None)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/regime_service_lease.py:132: in connect
+    return sqlite3.connect(*args, factory=_Connection, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/regime_service_lease.py:99: in __init__
+    if not _owns_lease() and fence_held():
+                             ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def fence_held():
+        """Read durable barrier without entering the accounting connection factory."""
+        from . import auth
+        path = auth.db_path()
+        if not path.exists():
+            return False
+        con = sqlite3.connect(path.resolve().as_uri() + '?mode=ro', uri=True, timeout=0)
+        try:
+&gt;           if not con.execute("SELECT 1 FROM sqlite_master WHERE name='regime_admin_cutovers'").fetchone():
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           sqlite3.OperationalError: database is locked
+
+app/regime_service_lease.py:80: OperationalError
+
+During handling of the above exception, another exception occurred:
+
+ready = (&lt;starlette.testclient.TestClient object at 0x7f4843b50d10&gt;, 2, 1)
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f48611d59a0&gt;
+
+    def test_real_registered_builtin_harmony_and_measured_nc_statement_survive_actual_return_cutover(ready, monkeypatch):
+        client, uid, _ = ready
+        body = begin(client)
+        assert client.post(BASE, headers=HEADERS, json=body).status_code == 200
+        from app import ai_metering_agent, ai_studio_adapter
+        from app.studio_score import Score
+        from app.music_interchange import MusicResult, MusicPart
+        from app.models import MidiNote
+        monkeypatch.setenv('MTA_AI_WORKER_ENABLED', 'true')
+        monkeypatch.setenv('MTA_AI_WORKER_VOCAL_HARMONY_EXECUTABLE', str(Path(ai_studio_adapter.__file__).resolve()))
+        monkeypatch.setenv('MTA_AI_WORKER_VOCAL_HARMONY_PYTHON', sys.executable)
+        monkeypatch.delenv('MTA_AI_CGROUP_PARENT', raising=False)
+        score = Score(music=MusicResult(parts=[MusicPart(id='melody', name='Melody', notes=[
+            MidiNote(id='n', pitch=60, start_ms=0, duration_ms=500)])])).model_dump_json().encode()
+        start = int(time.time()) - 1
+&gt;       payload, meta = ai_metering_agent.execute_registered_worker(uid, 'vocal-harmony', {}, source_json=score, timeout_seconds=30)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_r210_admin_cutover_e2e.py:108: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/ai_metering_agent.py:396: in execute_registered_worker
+    return execute(user_id,kind,lambda cancelled:_execute_registered_worker(user_id,kind,plan,license_decision=decision,
+app/ai_global_execution.py:75: in execute
+    try:queue.cancel(jid)
+        ^^^^^^^^^^^^^^^^^
+app/ai_arranger_runtime.py:600: in cancel
+    with _db() as con:
+         ^^^^^
+app/ai_arranger_runtime.py:52: in _db
+    con = connect(str(_ROOT / 'jobs.sqlite3'), timeout=30, isolation_level=None)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/regime_service_lease.py:132: in connect
+    return sqlite3.connect(*args, factory=_Connection, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/regime_service_lease.py:99: in __init__
+    if not _owns_lease() and fence_held():
+                             ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def fence_held():
+        """Read durable barrier without entering the accounting connection factory."""
+        from . import auth
+        path = auth.db_path()
+        if not path.exists():
+            return False
+        con = sqlite3.connect(path.resolve().as_uri() + '?mode=ro', uri=True, timeout=0)
+        try:
+&gt;           if not con.execute("SELECT 1 FROM sqlite_master WHERE name='regime_admin_cutovers'").fetchone():
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           sqlite3.OperationalError: database is locked
+
+app/regime_service_lease.py:80: OperationalError</failure></testcase></testsuite></testsuites>

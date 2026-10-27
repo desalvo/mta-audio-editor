@@ -84,11 +84,12 @@ def test_frozen_demucs_runs_in_process_without_spawning_native_gui(tmp_path, mon
 
 
 @pytest.mark.skipif(shutil.which("ffmpeg") is None, reason="FFmpeg required")
-def test_stem_split_without_original_mix_never_adds_original_track(tmp_path, monkeypatch):
+def test_stem_split_without_original_mix_never_adds_original_track(tmp_path, monkeypatch, local_native_ai):
     import app.main as main
     import app.storage as storage
 
     monkeypatch.setattr(storage, "ROOT", tmp_path.resolve())
+    monkeypatch.setenv("MTA_NATIVE_SINGLE_USER", "true")
     monkeypatch.setenv("MTA_ALLOW_INSECURE_NO_AUTH", "true")
 
     mp3 = tmp_path / "song.mp3"

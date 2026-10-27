@@ -269,6 +269,8 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     data = json.loads(args.request.read_text(encoding='utf-8'))
+    from app.ai_execution_policy import verify_plan
+    verify_plan(data)
     from app.ai_torch_diagnostics import profile_call
     # Child backends must profile themselves. Never profile the idle parent
     # waiting for Demucs/SAM; one singer report covers only its own invocation.

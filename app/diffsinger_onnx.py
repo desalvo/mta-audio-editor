@@ -15,9 +15,11 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 def inventory():
     from app.diffsinger_bridge import safe_file
     from app.studio_asset_registry import validate_manifest,relative
-    path=safe_file(os.environ['MTA_DIFFSINGER_ONNX_INVENTORY'],os.environ['MTA_DIFFSINGER_ONNX_INVENTORY_SHA256'])
-    if path.stat().st_size>4*1024**2:raise ValueError('ONNX inventory too large')
-    value=validate_manifest(json.loads(path.read_text()))
+    from app.ai_model_bytes import verified_model_bytes
+    path=Path(os.environ['MTA_DIFFSINGER_ONNX_INVENTORY'])
+    if not path.is_absolute():raise ValueError('Absolute ONNX inventory required')
+    raw=verified_model_bytes(path,os.environ['MTA_DIFFSINGER_ONNX_INVENTORY_SHA256'].lower(),max_bytes=4*1024**2)
+    value=validate_manifest(json.loads(raw))
     if value['kind']!='diffsinger' or value.get('format')!='openutau-onnx':raise ValueError('Wrong ONNX inventory kind')
     root=path.parent
     def asset(name):
@@ -32,6 +34,13 @@ def inventory():
     # Includes notices and the complete author package, not just selected weights.
     for name in value['files']:asset(name)
     return value,asset
+
+
+def asset_bytes(value,asset,name,*,limit):
+    """Parse the exact bytes pinned by the verified inventory, never a reopened path."""
+    from app.ai_model_bytes import verified_model_bytes
+    path=asset(name)
+    return verified_model_bytes(path,value['files'][name]['sha256'],max_bytes=limit)
 
 
 def token_inputs(phones,mapping,languages,default_language):
@@ -94,12 +103,14 @@ def acoustic_inputs(ds,config,phones,languages,defaults,steps=32):
     return feed
 
 
-def session(path):
+def session(path,expected_sha256):
     import onnxruntime as ort
     ort.disable_telemetry_events()
     options=ort.SessionOptions();options.intra_op_num_threads=min(4,os.cpu_count() or 1);options.inter_op_num_threads=1
     # No custom operator libraries or model-provided executable code.
-    return ort.InferenceSession(str(path),sess_options=options,providers=['CPUExecutionProvider'])
+    from app.ai_model_bytes import verified_model_bytes
+    data=verified_model_bytes(path,expected_sha256,max_bytes=4*1024**3)
+    return ort.InferenceSession(data,sess_options=options,providers=['CPUExecutionProvider'])
 
 
 def run(request_path,output_path):
@@ -117,9 +128,7 @@ def run(request_path,output_path):
     if os.getenv('MTA_NEURAL_SINGER_SHA256') and os.environ['MTA_NEURAL_SINGER_SHA256'].lower()!=value['files'][bindings['acoustic']]['sha256']:
         raise ValueError('ONNX acoustic selection checksum mismatch')
     def config(name):
-        path=asset(bindings[name])
-        if path.stat().st_size>1024**2:raise ValueError('ONNX config too large')
-        result=yaml.safe_load(path.read_text())
+        result=yaml.safe_load(asset_bytes(value,asset,bindings[name],limit=1024**2))
         if not isinstance(result,dict):raise ValueError('Invalid ONNX config')
         return result
     cfg=config('config');vcfg=config('vocoder_config')
@@ -133,8 +142,8 @@ def run(request_path,output_path):
     if cfg.get('vocoder')!=vcfg.get('name'):raise ValueError('Wrong ONNX vocoder package')
     vocoder=asset(str(PurePosixPath(bindings['vocoder_config']).parent/vcfg['model']))
     if vocoder!=asset(bindings['vocoder']):raise ValueError('Vocoder binding does not match config')
-    phones=json.loads(asset(str(folder/cfg['phonemes'])).read_text())
-    langs=json.loads(asset(str(folder/cfg['languages'])).read_text())
+    phones=json.loads(asset_bytes(value,asset,str(folder/cfg['phonemes']),limit=1024**2))
+    langs=json.loads(asset_bytes(value,asset,str(folder/cfg['languages']),limit=1024**2))
     path=Path(request_path)
     if path.stat().st_size>1024**2:raise ValueError('Singing request too large')
     request=json.loads(path.read_text())
@@ -144,11 +153,11 @@ def run(request_path,output_path):
     request=select_score_phonemes(request,lexicon_path=os.getenv('MTA_DIFFSINGER_LEXICON',''),lexicon_sha256=os.getenv('MTA_DIFFSINGER_LEXICON_SHA256',''))
     ds=ds_from_request(request)
     feed=acoustic_inputs(ds,cfg,phones,langs,value.get('expression_defaults',{}),int(os.getenv('MTA_DIFFSINGER_ONNX_STEPS','32')))
-    model=session(acoustic);names={i.name for i in model.get_inputs()}
+    model=session(acoustic,value['files'][bindings['acoustic']]['sha256']);names={i.name for i in model.get_inputs()}
     if names-set(feed):raise ValueError('Unsupported required ONNX inputs: '+str(sorted(names-set(feed))))
     mel=model.run(['mel'],{k:v for k,v in feed.items() if k in names})[0]
     if mel.shape!=(1,feed['f0'].shape[1],128) or not np.isfinite(mel).all():raise ValueError('Invalid inferred mel')
-    model=session(vocoder)
+    model=session(vocoder,value['files'][bindings['vocoder']]['sha256'])
     if {i.name for i in model.get_inputs()}!={'mel','f0'}:raise ValueError('Unsupported ONNX vocoder inputs')
     wave=model.run(['waveform'],{'mel':mel,'f0':feed['f0']})[0]
     if wave.ndim!=2 or wave.shape[0]!=1 or not np.isfinite(wave).all() or wave.shape[1]!=mel.shape[1]*512:

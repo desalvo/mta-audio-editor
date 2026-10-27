@@ -21,7 +21,15 @@ def terminate(process):
     process.wait()
 
 
+def _require_actor(user_id):
+    if type(user_id) is not int or user_id<0:
+        raise ValueError('Invalid Studio execution owner')
+    if user_id==0 and os.getenv('MTA_NATIVE_SINGLE_USER','').lower()!='true':
+        raise ValueError('Standalone Studio execution requires a native application')
+
+
 def compute(user_id,kind,plan,**kwargs):
+    _require_actor(user_id)
     if user_id==0:
         from .native_ai_routing import is_remote
         if is_remote('audio-to-midi' if kind.startswith('audio-to-midi-') else kind):
@@ -41,6 +49,7 @@ def compute(user_id,kind,plan,**kwargs):
 
 
 def _compute(user_id,kind,plan,*,audio=None,score=None,cancelled=lambda:False,timeout=3600,progress=None,artifact_mode='music'):
+    _require_actor(user_id)
     if user_id>0:
         from .ai_metering_agent import execute_registered_worker
         payload,meta=execute_registered_worker(user_id,kind,plan,source_wav=audio,source_json=score,
@@ -48,7 +57,7 @@ def _compute(user_id,kind,plan,*,audio=None,score=None,cancelled=lambda:False,ti
     else:
         # Local single-user jobs have no server ledger or billing identity.
         from .model_license_policy import evaluate
-        evaluate(kind,plan)
+        decision=evaluate(kind,plan)
         if os.getenv('MTA_NATIVE_SINGLE_USER','').lower()!='true':
             raise ValueError('Studio inference requires an authenticated server user or a native application')
         from .ai_worker_registry import worker_python,resolve_worker
@@ -65,7 +74,8 @@ def _compute(user_id,kind,plan,*,audio=None,score=None,cancelled=lambda:False,ti
                 validate(score);(root/'score.json').write_bytes(score);request['source_score']=str(root/'score.json')
             (root/'request.json').write_text(json.dumps(request,allow_nan=False))
             args=[worker_python(kind),str(worker),'--request',str(root/'request.json'),'--output',str(root/'preview.wav')]
-            env={**os.environ,'MTA_AI_PROGRESS_FILE':str(progress or root/'progress.json')}
+            from .ai_execution_policy import admitted_env
+            env={**os.environ,**admitted_env(kind,decision),'MTA_AI_PROGRESS_FILE':str(progress or root/'progress.json')}
             usage={}
             if hasattr(os,'wait4'):
                 from .ai_metering_agent import run_metered_process
@@ -74,6 +84,7 @@ def _compute(user_id,kind,plan,*,audio=None,score=None,cancelled=lambda:False,ti
                 if progress:_atomic_json_write(Path(progress),{'phase':'worker-exited',**usage})
                 if result.exit_code:raise RuntimeError('Local studio worker failed, was cancelled or timed out')
             else:
+                if cancelled():raise RuntimeError('Job cancelled before local worker execution')
                 process=subprocess.Popen(args,cwd=folder,env=env,stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
                 deadline=time.monotonic()+timeout
                 try:
@@ -102,6 +113,7 @@ def remote_compute(kind,plan,*,audio=None,score=None,cancelled=lambda:False,time
     """One server token, durable request identity, no local fallback or rebilling."""
     from .model_license_policy import authorize_remote_execution
     authorize_remote_execution(kind,plan)
+    _require_actor(0)
     import threading
     from .native_ai_routing import _read
     from . import ai_native_remote_journal as journal

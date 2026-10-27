@@ -9,3 +9,8 @@ mir_eval==0.8.2
 pydantic==2.12.5
 numba==0.68.0
 llvmlite==0.50.0
+
+# Trusted child policy admission imports the shared data-root/regime reader.
+# These provide its exception/types and QR import;no HTTP server is started.
+fastapi==0.142.2
+qrcode==8.2

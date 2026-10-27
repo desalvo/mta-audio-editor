@@ -106,8 +106,13 @@ def availability(username,email):
 
 
 def info(uid):
+    from .regime_service_lease import fence_held
     with auth.db() as con:
-        init(con);row=con.execute('SELECT * FROM account_lifecycle WHERE user_id=?',(uid,)).fetchone()
+        columns = {row[1] for row in con.execute('PRAGMA table_info(account_lifecycle)')}
+        required = {'user_id', 'state', 'second_factor_required', 'deleted_at', 'project_deadline',
+                    'request_kind', 'requested_at', 'archive_lease', 'mfa_method'}
+        if not required <= columns and not fence_held():init(con)
+        row=con.execute('SELECT * FROM account_lifecycle WHERE user_id=?',(uid,)).fetchone()
     return dict(row) if row else {'state':'legacy','second_factor_required':0}
 
 

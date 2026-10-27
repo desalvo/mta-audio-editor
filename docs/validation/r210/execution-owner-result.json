@@ -1,0 +1,157 @@
+{
+  "date": "2026-10-26",
+  "base_commit": "9fc85ce79bee9871696dea9396565395a415aa72",
+  "reports": [
+    {
+      "report": "execution-owner-regression-first.xml",
+      "passed": 64,
+      "failed": 1,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "report": "execution-owner-regression-intermediate.xml",
+      "passed": 0,
+      "failed": 1,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "report": "execution-owner-regression-resolution.xml",
+      "passed": 2,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "report": "execution-owner-new.xml",
+      "passed": 34,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "report": "execution-owner-extra.xml",
+      "passed": 3,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "report": "execution-owner-affected-first.xml",
+      "passed": 198,
+      "failed": 2,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "report": "execution-owner-affected-resolution.xml",
+      "passed": 2,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "report": "execution-owner-gates.xml",
+      "passed": 46,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    }
+  ],
+  "current_distinct": {
+    "passed": 347,
+    "failed": 0,
+    "error": 0,
+    "skipped": 0
+  },
+  "new_cases": 37,
+  "source_sha256": {
+    "app/ai_global_execution.py": "f52f484940e12645be04bd1d0ede5cddc313c9530d54f265b5e2f1cbe4782d36",
+    "app/ai_metering_agent.py": "91eb0259fb1e83bce03082baab5957ccfd9e70feef8ed392218b8ed86e210851",
+    "app/ai_server_execution.py": "c6460346108fc69b231ec98d3d809ccc1b2559fa46598533fd38927e63780a60",
+    "app/studio_compute.py": "0ab1bad43af8cd597154dbf99e0f46a0237d1ac66a317af6d5a1c3999ad550b2"
+  },
+  "security": {
+    "reviewed_findings": 165,
+    "source_files": 286,
+    "raw_severity": {
+      "HIGH": 0,
+      "MEDIUM": 21,
+      "LOW": 144
+    },
+    "scan_review_passed": true,
+    "release_candidate": false,
+    "transition_enabled": false
+  },
+  "remote_transport": {
+    "reviewed_sites": 30,
+    "source_files": 21,
+    "passed": true
+  },
+  "checks": {
+    "ruff_app_scripts_tests": "passed",
+    "changed_python_compile": "passed",
+    "git_diff_whitespace": "passed"
+  },
+  "corrections": [
+    {
+      "reports": [
+        "execution-owner-regression-first.xml",
+        "execution-owner-regression-intermediate.xml"
+      ],
+      "case": "tests.test_r210_universal_queue_usage::test_worker_checkpoint_keeps_cpu_and_gpu_together",
+      "cause": "Old checkpoint fixture executed under a completed queue row; a new active claim additionally needed the recorded admission supervisor and a final completed state for the existing final-metrics assertion.",
+      "resolution": "Fixture now acquires the actual scheduler claim, executes as its original owner, then marks terminal for the original accounted-metrics assertions; production guard/expectations not weakened. execution-owner-regression-resolution.xml."
+    },
+    {
+      "report": "execution-owner-affected-first.xml",
+      "cases": [
+        "test_six_stems_over_old_limits_roundtrip_server_cache_and_native",
+        "test_server_manifest_is_not_charged_to_audio_budget"
+      ],
+      "cause": "Artifact fixtures mocked removed server.subprocess.run.",
+      "resolution": "Use the supervised conversion boundary inside the real global scheduler, recheck its cancellation callback, and retain every original large-artifact/cache/native assertion. execution-owner-affected-resolution.xml."
+    }
+  ],
+  "reused_evidence": [
+    {
+      "path": "docs/validation/r210/ci-full-confirmed-40257635101.json",
+      "scope": "Unchanged baseline/target-build boundaries; no current full-CI claim for the uncommitted delta"
+    },
+    {
+      "path": "docs/validation/r210/subscription-basis-result.json",
+      "scope": "Unchanged financial audit/API/UI source hashes; current security gates superseded by the165-finding review here; counts overlap, do not sum"
+    }
+  ],
+  "runtime": {
+    "python": "3.12.14"
+  },
+  "real_provider_or_model_calls": 0,
+  "full_ci_repeated": false,
+  "progress": {
+    "verified": 23,
+    "total": 42,
+    "percent": 54.8,
+    "whole_macroareas": 0
+  },
+  "release_candidate": false,
+  "transition_enabled": false,
+  "limits": [
+    "Scheduler owner/process identity is not external worker or cgroup quiescence proof",
+    "Native fallback test is a Linux simulation, not installed Windows/macOS acceptance",
+    "Preparation CPU is not newly billed; this is supervision, not whole-pipeline metering certification",
+    "F3 protocol, all legacy/executor coverage and independent checkpoint rights remain incomplete"
+  ],
+  "xml_representation": {
+    "report": "execution-owner-regression-intermediate.xml",
+    "original_raw_sha256": "4214fb2ca070636f8c525abd1a600051c5508d5f347007537f867a675d78d498",
+    "change": "Trailing spaces represented as XML character entities; parsed failure text/outcome identical. Original raw retained in scratch owner-regression-resolution.xml."
+  },
+  "gitleaks_delta": {
+    "version": "8.24.3",
+    "whole_patch_findings": 1,
+    "introduced_secrets": 0,
+    "whole_patch_note": "Only unchanged public source-checksum context for app/ai_token_routes.py; exact baseline line matches and is not an added diff line. Actual added lines scanned independently; no new exclusion or allowlist."
+  }
+}

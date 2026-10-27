@@ -1,12 +1,12 @@
 {
   "schema": "mta-security-review-1",
   "bandit_version": "1.9.4",
-  "scope": "All 285 current app Python files; 168 unchanged unsuppressed findings matched by function and exact normalized code excerpt. Merchant-wide read-only history collection, bounded stable pages, immutable private DTOs, administrator/CSRF/configuration checks and no money settlement reviewed in docs/MERCHANT_HISTORY_HANDOFF_R210.md. No full-platform or checkpoint-rights certification.",
+  "scope": "All293 app Python sources;165 existing unsuppressed findings,0 HIGH/21 MEDIUM/144 LOW. Existing-schema authentication/account-owner polling now uses read-only preflight;API language detection no longer writes preferences during polling. Permissions,real migrations and cutover/RC gates preserved. No new trust disposition or suppression.",
   "source_sha256": {
     "app/__init__.py": "eb3205cb75b2a7474361060d9b8d89329c29272cd8978ba62b6290b9a29b7550",
     "app/account_erasure.py": "cefeaa9ff969e6be3b3d118ba689b0a3bf06fc21093cabd51f7ab606f11ab35e",
     "app/account_financial_context.py": "0a7749ce17ecd76126453cbdaa4d571e4cb9214d29d1c35ba2d0f5f12e526e0b",
-    "app/account_lifecycle.py": "f3d6bda0e99f2ce045836020452ad6769fd602fbd45bc40daede7fd44ff5220a",
+    "app/account_lifecycle.py": "562941288cae99d02a98567b7adf5566853c9dd9f6805b8350574d38d5f06b51",
     "app/account_limits.py": "15d4b17175386e08b4283a764559767dff344395eeb1ecc3089d1a7ce773219e",
     "app/account_mfa.py": "327ffaf732eeda25fad86e5521514f9430f65b6eaf26dea17277451e5a6e44b0",
     "app/account_routes.py": "25049dea0a992f351d757831b1730648a34ef991c40301ee3fba72d4fbbfcce2",
@@ -27,11 +27,11 @@
     "app/ai_access.py": "8ca028716c25ef3a677bf26f096868e65fc1793185f090acd3d26697051e9b35",
     "app/ai_amd_smi_collector.py": "1fe0af0b3a9ce13765c4bbc3572698f966464d0ddc7e249ca28e3820d68af50b",
     "app/ai_arranger.py": "4542cfa2668487c1ab309a5758aa593d37a8c18e60ee91b8a73e681047cabbc3",
-    "app/ai_arranger_runtime.py": "ca44f0b02aea84f309daf89593d4bd79df6e215c329badd3bc4fe49e5cbbb398",
+    "app/ai_arranger_runtime.py": "28c5b8c8aaa8f5aaa57da30894cbecd0d8cedce46025f94d6d9e290851c171c2",
     "app/ai_async_track_transaction.py": "cc197d7afb09c65394019db140ad05a6e75009fe9572b4b5634bb173fa5b8a16",
     "app/ai_backend_models.py": "4dc7ae6d47016cf686df0b70333cbf2d835703461ae3f2e3c570c201dd8d3f6e",
     "app/ai_billing.py": "ebafc6b42e800b9ed186089f98bcff5b0508047a5c50cad056bed22593929946",
-    "app/ai_billing_outbox.py": "971eb37c38c2b5a252e58cc21edf98c50751dd61319fcc630c7901dac769ebc3",
+    "app/ai_billing_outbox.py": "03a01c828d5cdbfa2d983074beb0e76d1d3dff4634edde45cee19420b53e6ef6",
     "app/ai_billing_profiles.py": "23684927e45bdf3801be4ccddff7c94673c8ed818a3e328118eeb6e372d65922",
     "app/ai_billing_readiness.py": "7bdbbaae5f8aa19be45dd9891f5aeae273eb33de9a81d0a24cbb6364f07193a2",
     "app/ai_billing_routes.py": "0357d39625f19a74b6ff4df42f989c4f8e9eebed8dfc753f06b660f09e57cef5",
@@ -42,9 +42,10 @@
     "app/ai_device_auth.py": "5af5b48cef66c34b18f1bed6ae738553c452131da86bc603a4fa263f68451e5a",
     "app/ai_durable_remote_executor.py": "d31426b85058d2442328a6532e2910135f5c1a853fab2f24a3fe30766ac3a287",
     "app/ai_execution_limits.py": "6110c24edd1311d570d0bcd6cab62422bae840425d6b3d9c23334d46494121b1",
+    "app/ai_execution_policy.py": "2be2765f683de25bf4dbaace26f40698b49412ec5aa7576e46a105e6e62914ec",
     "app/ai_finalization.py": "5e76aa10adc53b7cbc6515bf0e06d63ee08065735d1d47de89c549270d19ad33",
     "app/ai_gateway.py": "2c75e63fda4c8b829b4cfc299b8c41f36e92040d8dd24144a64e64c4793ab63f",
-    "app/ai_global_execution.py": "02eaf7866bbfcc31f0a52749f8f1b718d694fbea8ee3e4dc82cd1b6d622df032",
+    "app/ai_global_execution.py": "f52f484940e12645be04bd1d0ede5cddc313c9530d54f265b5e2f1cbe4782d36",
     "app/ai_gpu_attribution_report.py": "2bb048100e554924e064c658e990d5a1b58de207380598bab8c78e36b680ec5b",
     "app/ai_gpu_diagnostic_session.py": "5dedbbeac1488d9cfc8ac9113ee629e8e9bc6f8e185994109367a73fe5fca432",
     "app/ai_gpu_energy_estimator.py": "e87d6787164e6f937259a063c3c741060bd5dc7bd830b6fa4fc73104ffd96d6c",
@@ -58,8 +59,10 @@
     "app/ai_job_queue.py": "1a03fdf6215f5b4c1741378945d2d888e654c8b2325e7b5a7bb2480df9bc447d",
     "app/ai_job_views.py": "d4d7bf9a3123cf54f9343899dff63a56a4b63d5b3d8b5fbf56b352baf535bd21",
     "app/ai_media_identity.py": "c20028e2d47d1add5a08c095f62cdd681866119f59d788e4c96188b483132941",
-    "app/ai_metering_agent.py": "e1ccd5ea955e622a0a8be014afdbbb3cd98e8a8e9ec603dda655f7f0ced329d9",
+    "app/ai_metering_agent.py": "43bc8ef7e5aef5eb12f36960b46e8f95e8f83f88e7890bee589a0f414d6ba812",
     "app/ai_metering_bridge.py": "792ebf36d5a3c2cea95f64e6b5bac19c8d13054147a8cf27f9129caac87c6629",
+    "app/ai_model_attestation.py": "0edc6a05021ff9e1e5cefa8a6e972d22ed4e1ece973214f94a4e18d98c01f53f",
+    "app/ai_model_bytes.py": "fdcf600ccf14c0d8a66eca2c7e75775ecdb61cd86eabfe7e3f90ad1bd531bef0",
     "app/ai_model_download.py": "ef8a2b180203eac208fe3fa7f4edc6c1cff0e025a7b2319be2abcc581812bfde",
     "app/ai_models.py": "27fd2f626be6706cb91cd06ce7af80395cb32e10669147db367beffc50a2cc00",
     "app/ai_native_remote_journal.py": "2ae103fce708e07452fbd45d5ff6da60c8afd94e184d14914e9a7ed87001df95",
@@ -70,10 +73,10 @@
     "app/ai_profiled_backend.py": "5365667a02cc9e8bf3459f57d716eff8e952a3508f48e41c424e5d528476a5fd",
     "app/ai_project_lock.py": "98f68f2f60581a861f468a928339841a3aba250e155510752c1ecc08127289b1",
     "app/ai_proxmox_gpu_agent_client.py": "f0818b79fcca6561fb7f9863a0ccf9cd3bbcf0643314c9836946de9e8aa6e8b6",
-    "app/ai_publish_outbox.py": "d9e2b86400e02654f55cb0cb29b53344be8738913fe5a44ffc4fc44ad5d670e9",
-    "app/ai_pull_coordinator.py": "8866771d0f354ef5d1cbb379206875174d65f8e250065ae362fc258d9397ea51",
+    "app/ai_publish_outbox.py": "4bf5069c14559fefe768c00c829b2b30ed6ea932e68f8558113f7a85866d88bb",
+    "app/ai_pull_coordinator.py": "fc09340b037baeddb13effd1ee93e9d7a0cd98f5bafda3c1ac42e420c1c02b50",
     "app/ai_pull_routes.py": "f9bf4e9e1f0e3e92097399b4239a0f70ddfb14a4e17423a09e8d9c9965ca8452",
-    "app/ai_pull_worker.py": "4d9fb383e025374a07ce234a14f50962b983b55c686e74183126f19c67f41fd3",
+    "app/ai_pull_worker.py": "f512bbcfeafa8fedeae73c5098c15910d33790a856b6990cff1009d8542570cb",
     "app/ai_queue_admin.py": "19a02a2451a931722e4d28fbac21fb83f4f0483842b645e59bf46fe82250976d",
     "app/ai_queue_usage.py": "e03c04980049f3582055123e0236dc3679265acf13ab0db00af5b40302fd222b",
     "app/ai_recovered_stem_transaction.py": "5799a9f78b9ec07cedb9be2109d8b5d0fa02b996a6355623267a5c52c63b9be2",
@@ -84,13 +87,13 @@
     "app/ai_remote_transport.py": "21f727505bfe14d97ae80d80099f85e7fd1c1aab73f00f5c1f803eed4408e141",
     "app/ai_request_dedup.py": "a31b0bca32439ba887c3d0c87178442e49307e5117b150d3038e097419fcb4b2",
     "app/ai_result_cache.py": "44b24c96a4c30f4a43ff7ca1379af9651085363b47e4f6358be5e5aed453acf1",
-    "app/ai_server_execution.py": "4ea9d3da3e8a46f0e841aa0fc895c68b74f0e2c8917ea33098a49135a8dfe57d",
+    "app/ai_server_execution.py": "5fb504b2d2e870499630a628b234e5c78a24bc7bd9393878935a675e334d19bc",
     "app/ai_storage_sampler.py": "70952a614de1dd53e69fd3ad80d787f931e9899228be46d19f90ef64b76e300b",
-    "app/ai_studio_adapter.py": "cc43bc71fb359442457519e37075f51887287316377f4dad82aa0f43e9e6082d",
+    "app/ai_studio_adapter.py": "0397865a47ce1443498833d1e73febc192c3db7b6ba3de4115368b1e089619f8",
     "app/ai_token_routes.py": "c437a893c2bbb76bdaf53e27b46ace1fb006a834c35469c272332fee26956177",
     "app/ai_torch_diagnostics.py": "a639fcd5c98fd9519ec0855b8f02cdad3088abe4d41372259178fd3535466ce8",
     "app/ai_trusted_estimates.py": "1103bf458c9f8912b04fd0f676d2699f67ddcbbbb743c6f156f0b790b0c5a552",
-    "app/ai_unified_adapter.py": "3f4cdff278521566a4a80acb5b3e6c6ae1277596cebb2b6a379a5bc276d09ffd",
+    "app/ai_unified_adapter.py": "6501e23ae7b6df8412602b32010fca3b0d89a7a18b0c831aa1014da876dc0827",
     "app/ai_upload_transaction.py": "2fbaf2ad0b181a20827f681c8fbe2f40bc076e3eef9e92cf1a3d748b13580ed5",
     "app/ai_usage_reporting.py": "6e923d652d894a132075dec2262c20ca8def518ac56df0c8b13721f105b2675f",
     "app/ai_worker_artifacts.py": "9b539711f09c9d85a22a11480452b6d931c8ee10b3f40cc72bd45272b9952a28",
@@ -99,7 +102,7 @@
     "app/audio_backend.py": "4d91382bcd6eb8e6c7792c52e440df2dd50a01db1cb31eeee4ebaf1835cc064c",
     "app/audio_capture.py": "26a01076a34baf456ba33f48bd52a604e518e8bf713be9f84a4d4cd8be18ea15",
     "app/audio_engine.py": "1b7579278628d91bc9b019e101e30ff4462fe0a8ca6ec7334b5ec5af2d77040d",
-    "app/auth.py": "7147ef7bd5f341550706076f2e6c8ee9871d35402d4835113b7b93d18afeae19",
+    "app/auth.py": "b65363439c52c5892b97c134dcc8b325765645ec447ceb6d555b3c5330de9fae",
     "app/auto_mix.py": "3442404b21070e085cece068342e8eed85c3f48c02d4ce48253e633de45f04bf",
     "app/backing_vocals_runtime.py": "239ce5d955c0ebf757c551f42e31655addff266017738fe86af7011c68175494",
     "app/bounce.py": "64a4f122bec6287d090713e1e52b77f25d0a2bb5fd4a815e53f7433c54910f61",
@@ -115,8 +118,8 @@
     "app/deferred_execution_owner.py": "75dbedb7bcb9dad0ef5496fe93407188e0b238d41cfc676bfc80978e4220a067",
     "app/demucs_runtime.py": "4934f13aa5145a2315a27416a84c0cb8aa9b96b25f0f5e1139b7c284a24a1e0d",
     "app/diagnostic_bundle.py": "4dec1e08e02793482b8d46cbdedbe2bf7cf2afadeacabe6d920c9a6e59485189",
-    "app/diffsinger_bridge.py": "419bf8f96575d49e0faef795728515cefa376d06862fc50dc0e87b540780d2fe",
-    "app/diffsinger_onnx.py": "cdadad81261ff08fe17e9c92bc196acd2a0c41bd28e40c69e1ab0656a0b394eb",
+    "app/diffsinger_bridge.py": "1b36855e8e757482a9bb2eff340fb201ee5382e4d52840bafa86fe8ec0949abc",
+    "app/diffsinger_onnx.py": "8b9bd328e7e9a3f3c076bb8aea3a6b948ee64ce4a82cd558b1ba37df777e5bfa",
     "app/drumsep_onnx_worker.py": "72e5d05477481c9f4100dc4d2899e2f5107ed3e90cd634ee252fb5cb6f04f9e8",
     "app/editor_layout.py": "ebab4f9c61dfde7f105c8ba9a30025029a4ef96af772137b0a32ca4d1ff1e5a6",
     "app/fs_durability.py": "2d8f75d663a856c15c278e41ad0eb08ce26a0fef9dea43dbbabc16670928aa62",
@@ -130,7 +133,7 @@
     "app/linux_proc_view.py": "76faadb240dc3af7f2ecfbdd2c5b1016d0a6f6c100afd4bacb1bbfb0118fd022",
     "app/live_mixer.py": "c6ff8e9b9b7cc66b5f6cf7c3c44b46991eecf387803e6f8c8323c7352ec9a291",
     "app/live_sources.py": "729653cab99964a56a4d56716e76e40e7b9c01ee7cce215679780c0703828dae",
-    "app/main.py": "683a457781aa33222110ff88e8b69ba90c8de01831eacbd61ad41acf4c3ed79f",
+    "app/main.py": "372265915f55359ba5cf48da0a7548017ac46ff6bb6d9f719b6f4236089e2ecd",
     "app/mega53_runtime.py": "bdbe09d28be536419f308dc8b448d5f1a552d9ce37168724ca19bbf013b35947",
     "app/metronome_grid.py": "65c3e06fd4215ac561a5cb085d0c92fada782a519331e76f861fd01124f0cf02",
     "app/midi.py": "bfc599a17318a7dfccd050ec430de588420df2f4fe6dded4fd8d7e69e82bad1c",
@@ -144,7 +147,7 @@
     "app/mlive_mp3.py": "d83e56a2142fed65fe0ad85053c18aa0af293186f271619b22bb3ca3b557fe31",
     "app/model_asset_admin.py": "d435e1bb234cb7b95de4fcbb1aa369f527505fa151c0334799407e0428f0009f",
     "app/model_asset_admin_routes.py": "82151d07e47b67087bc7694a71eb1812bfc32b454b573f84c44330a9e39fb29d",
-    "app/model_license_policy.py": "2e6a84b9a50caef219dc37507b3ccf390b110ecc6059a5843cc769ea3c11d78b",
+    "app/model_license_policy.py": "4b373a236500c72f08a3f269ddbe65619acadc4b2cfbff81086ffb86e4047921",
     "app/model_rights_dossiers.py": "2fb23833835874c23885c22dfb03cc22aa52748f4494f83c506d7e6c86783605",
     "app/model_storage.py": "99a7c255f886ae7bf1cd6a9506455592f2efd0da9aaba8327a8940a916b1da6b",
     "app/model_updater.py": "aa50118f8302fc913d4f5e89cf87d73fcdea818d74f2597a1f7f8dba03a370a1",
@@ -178,7 +181,7 @@
     "app/optional_plugins.py": "c68736e44bbe75d365e92883d9dc74b339b93a8cd419489a7c7c4d6862893e55",
     "app/owner_payments.py": "8183773f0f13da9022e6111963e063d67ca96852e179b21d150de05948fd5331",
     "app/payment_reconcile_service.py": "2d7325d3d13ef1549eff4ada4513b24941fbe86712740534e548a3907219da29",
-    "app/payment_reconciliation.py": "20a9962097844f2c2bb6f688aaee07e42598a57288bbba373ca8353ca82154f8",
+    "app/payment_reconciliation.py": "bf1dcbf57b3052685572f77e3f0fd702a55a47d65c74425539f09e4596b2b6e5",
     "app/paypal_dispute_details.py": "e81dbc26dfddafa4b35b743be3d7a1ad3c272716be3eefd16d8e1e31821ca36a",
     "app/paypal_dispute_history.py": "ed2655b839c09f98b0400e8ddd307621482ea8f64c3b10eea11b1a64720938bc",
     "app/paypal_merchant_history.py": "c66c79c4a88251739789cbbbe2a8f6527ace87138fe083b0d91cc177e8429d0d",
@@ -192,6 +195,8 @@
     "app/qixuan_profiles.py": "0cf26f379cc704c483db8a3b902fb8f8456af8e2af955d7a395fd22b59e469c7",
     "app/rc_acceptance.py": "c7f524b417dd7748d67ba7fe53fff4980e86b6c4dabb560124bc7cb4d1739f91",
     "app/regime_admin_closure.py": "632f0a4862c42087ece9d2d0abf8eac80d29b43b20e02a32fda18a015c3d6753",
+    "app/regime_admin_cutover.py": "fcb1e7017bdd72e0c6a11fbfb99c23298f2d4a2dca9c20494393522be8ad1e9c",
+    "app/regime_balance_continuity.py": "a9888d50e85c8076f473c6c2ba9e34f9bc4eb10db835d9ab822131cab3f62163",
     "app/regime_cancelled_checkout.py": "e615cb1c34be47634f0965de84a2e942207d890b64a56948cf7669f48b267cc0",
     "app/regime_checkout_fence.py": "35ba9deba845583d0f5fe718dd849ed17e9ed3a6496a9a101db681ff46ee412d",
     "app/regime_cutover_atomic.py": "e00f84aa63deaf574b6b0519f5d45bd05bd7298a32bcb1a81100c8d89870a027",
@@ -201,7 +206,8 @@
     "app/regime_financial_evidence.py": "039d56f0258a21b51c835dd2a2c2f577c4838cb55142aab0fbb8b674ebf58315",
     "app/regime_inbox_coverage.py": "edeb9db36433d2e39a1739302e71046521dd7fb930b361363afcdeb824d7dd5a",
     "app/regime_job_fence.py": "1ffda4238676db30f1912dfd37ebf6d052243ff8744e3720d0fe2a50069843de",
-    "app/regime_maintenance.py": "f0d626aed81dec1adc7f77dd47220961fc6e196e49bc1d1ff5a4565189f998d8",
+    "app/regime_local_readiness.py": "e1815a9dc589ccaa5839d2ce76bf7811ea94c01a8f7c4b916daad38a95513761",
+    "app/regime_maintenance.py": "d21b237683307a88c5dfe2b9745989874ad04a5e0c111bba54e85edb809fbb46",
     "app/regime_operation_fence.py": "8b3f282dca97f2dfd76d219bb07db9d3f612a2f7b457826b7331f233e1822484",
     "app/regime_outbox_review.py": "19be67ed7244a6b89ca6e6edbc7760bc945e44a1039872f92a0d20647a1ab59e",
     "app/regime_outcome_receipt.py": "a3b6acf56658db1f1980d557f9664a888c546b87aa5f0a8c1c87a1e6817271ec",
@@ -212,8 +218,9 @@
     "app/regime_provider_settlement.py": "9825631f9e41b555b76b115a92b3308d75df773fb85383ce3d84d958a1420463",
     "app/regime_readiness_cli.py": "71971d925ab56b227df835f1640c964b792cda1d6591373a27b97823cfb015c5",
     "app/regime_reconciliation.py": "fc2b1f313ec88a010bac5df04d06ed5ed42a383a4cfd8ed1d97b5491b6dce6f3",
+    "app/regime_service_lease.py": "c1fac888b879a2366e64d80ed2d116c2cbe9a382b08e651bb7e4bc93ac615b71",
     "app/regime_stripe_inbox.py": "a1d7723e5183e20005d3258655ff187ff1a025dd57fe2df21506457f59ff25ca",
-    "app/regime_transition_journal.py": "046189bed79eec6d3640912def8e5318013826acaa9b9d1247c14606a0cdff7f",
+    "app/regime_transition_journal.py": "b9c7be5c1bff75cb56f2d3d99a0fbfcdc786d16875ed16fe86f7dac14c35eebb",
     "app/regime_transition_plan.py": "41541c0a80d51b88db7831f50af38111482cc83fccb820a5be0de633f254b65a",
     "app/regime_verified_transition.py": "15e691c71529114ca99b9287d579a0784c94e6e3003ef514c66fe60c5fcaf596",
     "app/regime_worker_claims.py": "3132cadb943f3c8b53562a39af882b58adcc7e29c97ee7225c71a4531bfbcd8f",
@@ -222,7 +229,7 @@
     "app/resource_accounts.py": "2dc800e315afe726f9a9caef777a97f387ce04245de2755cacc21da3d3c662da",
     "app/resource_contracts.py": "2391fc86d1a57f5441a3a0b34336782e02331a69d033150f0ed2e0f4fdec6343",
     "app/resource_entitlements.py": "eacd7fac7f0ae7d4c892bf6656e41f963e1db4d715cb7aeb6237fd761d3d7297",
-    "app/resource_routes.py": "ff82c948824840ea14b3a6e5bf88deeed32788d49624ce3ffbcb05eeddb7f4a7",
+    "app/resource_routes.py": "197d15ae91910241d618dbdff69a0bc40897823e5d236f7aa6490bcf8376ec53",
     "app/restore_dump.py": "1d273bb4487938bc70d311ff813f5c25ead8635560f49fb4391e07c9da8c4352",
     "app/rights_registry.py": "bafd7abc6257d6f2a95036b9a7735d648d9a3879b980e1fb50228707d7b98dbe",
     "app/runtime_paths.py": "a9e5da0f3f4abb1a753e2574e1298f37537de72c1b9d311597fddfa96b33c753",
@@ -246,12 +253,12 @@
     "app/storage.py": "ac6be4056866d11630c2c23fb46312a84af652d7c91c420db285610d7b357d91",
     "app/stripe_failed_charge_proof.py": "b13cb73079090adce0ef6ad1c7e21599697711c590ee7c478ed1453a23689925",
     "app/studio_admin.py": "ea7ce1fcad4ec2e75cc270a7fb7728b8de12773ec59c1c84c37f1b12b76e8acc",
-    "app/studio_asset_registry.py": "99a7d45ff4d594d04294a45e492033b215a12157419fcfb449190ac9d6e36937",
+    "app/studio_asset_registry.py": "38b5a865090bd157765f6534255a90afb169baf03c500f2f6cd42fff98e1559d",
     "app/studio_assets/yourmt3_t5_compat.py": "71a3617401c0af3f87affedc882efce2b8fd4dac7fa355b78b709659eb9fcd21",
     "app/studio_audio.py": "1711c4e0728abee69b841b44d5697df58aa8329514626dec62aaa86a8d6083e8",
     "app/studio_catalog.py": "fe0cba9be5ff05d96893cf31fc3c9d3b28bc6b77b8f0eb2346cca4d67da43f26",
     "app/studio_checkpoint.py": "cf11e27d4bbbceb26f384ed1b8b060aeb25c8da41da060d3452d0b12252beb6e",
-    "app/studio_compute.py": "1517e7a10e2ee01727186b5283cf0a8c9d36822347a831d32446587283013485",
+    "app/studio_compute.py": "5fd0f01325727efcab0a044583a3447b08f3ff04ff9d5e661001cf7b98fb0cda",
     "app/studio_jobs.py": "c178405eada5504d2909036ff166f09f92aad0129dd8fcd0cbc5a57853eb06bd",
     "app/studio_midi_benchmark.py": "1dda9eb9be209a6f3798f8b45eb3a3a254f76aa665bd47060f26ce46e5a03e8b",
     "app/studio_multitrack.py": "b423000390da122cdcf006e4c386d9c80b3bd8f7ef932ec8c953517523fdc3d3",
@@ -259,11 +266,12 @@
     "app/studio_parameters.py": "279b5d76516c67a8770d0d85fbbc1117b28b292a98835013a4f6688008bffac9",
     "app/studio_score.py": "b667d6e54287b3959b44d1b8cd2b8126505df396340aec2cd12a0839338f21b4",
     "app/studio_stage_cache.py": "4bde92832321b0494d3ce9be72e28d429a833692d993c61cf01f2da82603dea7",
+    "app/subscription_basis_audit.py": "48c20571e0bebee009a8fe4ddaa58d7d5b9d446af99aec35df1e85b91267e27a",
     "app/subscription_receivables.py": "6d4027e9898365a39f859df7d21cdb739f9c6246185850f35494bde4d1f1f112",
     "app/timeline_editing.py": "5bfbe968ba505ca7f393d4e8046ad94e7c6f05d1dbf108cc3909239ec95758a1",
     "app/transcription_timing.py": "b70274158cf7e9d5a8fcaf09957a3858620fd1b63d1858967c8a54cf8091f50d",
-    "app/transkun_adapter.py": "fd0caee67b1f2f6a5ba8a1066a316d71f2ffb8ed93552a84c5541b728c28923d",
-    "app/transkun_runner.py": "c99b5b56cbbc1c42d8501c9e6e901a0b200e4ad0f1a20b09ea7d9e909020792b",
+    "app/transkun_adapter.py": "a4ec3cf8f0932e5ab36429f7129749a9f2626e76d5372d628a69469f916c8923",
+    "app/transkun_runner.py": "7a9bf660b759a4dfb890f4214877c2d7e4674985361264ef03a1118b17f2ba59",
     "app/user_preferences.py": "43fdd055cb6985c3154d88d0a939c9faf12749de73d8fc7a142a0d96cd366678",
     "app/uvr_kara_integrity.py": "45a323c56569bef81aa2fc0403b70ecac907993635b581feb2a442f26d39a5ee",
     "app/version.py": "6ee6a8b9b345501b39886e7aa32ad63f179ba4a7cc0e98f7842c83fe621648ca",
@@ -319,49 +327,49 @@
       "verification": "Reviewed the complete SQL-producing function and identifier quoting; current targeted SQL adversarial tests plus retained account/erasure/planning coverage."
     },
     {
-      "id": "02a8d9fd0d260de5d8f2812bc4763d51097a421a5df171cda04e4cc37a3575b7",
+      "id": "1d85caf8224a8d1a616629cfbae090b41816f415f3289955129f1f62fa2189ef",
       "disposition": "false_positive",
       "rationale": "The table name comes solely from the literal sessions/model_access_tokens/ai_access_tokens tuple; time and owner are bound values.",
       "boundary": "Database schema identifiers or fixed internal allowlists only; API values remain SQL parameters.",
       "verification": "Reviewed the complete SQL-producing function and identifier quoting; current targeted SQL adversarial tests plus retained account/erasure/planning coverage."
     },
     {
-      "id": "af9a214499f57c8e169f5ea6a3e0d8350523cb31ad8663ea9f5d551565739100",
+      "id": "6af25156a27be86968bf90fb354d854366f2f31c1a4579ad63ea2547a2ede866",
       "disposition": "false_positive",
       "rationale": "Only literal internal ledger table names enter SQL; table existence is checked using a parameter, and user_id is always bound.",
       "boundary": "Database schema identifiers or fixed internal allowlists only; API values remain SQL parameters.",
       "verification": "Reviewed the complete SQL-producing function and identifier quoting; current targeted SQL adversarial tests plus retained account/erasure/planning coverage."
     },
     {
-      "id": "d84b29138a280312c73aaeb03c6f3ce91b31fd088b1e82f4b1a178015d14fd70",
+      "id": "607132f6da06b05383a3a627d5ef762b69480f0573c89e78ddf87dfde2239507",
       "disposition": "false_positive",
       "rationale": "Table names originate from sqlite_master and are double-quote escaped; owner/job columns come from fixed tuples. FK child columns from PRAGMA are also double-quote escaped. All row identity values are bound.",
       "boundary": "Database schema identifiers or fixed internal allowlists only; API values remain SQL parameters.",
       "verification": "Reviewed the complete SQL-producing function and identifier quoting; current targeted SQL adversarial tests plus retained account/erasure/planning coverage."
     },
     {
-      "id": "15f5833b03aa30346d9e4b2901c3072cf940ee04d068bc3e7e1578b74b39e369",
+      "id": "0b8ae6f091cc4576131782b149b3736b6d3d2cbdb680d0c6a0d03762ae06acac",
       "disposition": "false_positive",
       "rationale": "Table names originate from sqlite_master and are double-quote escaped; owner/job columns come from fixed tuples. FK child columns from PRAGMA are also double-quote escaped. All row identity values are bound.",
       "boundary": "Database schema identifiers or fixed internal allowlists only; API values remain SQL parameters.",
       "verification": "Reviewed the complete SQL-producing function and identifier quoting; current targeted SQL adversarial tests plus retained account/erasure/planning coverage."
     },
     {
-      "id": "f6ba2fdade8c16e7948c25d7b965a4eeaafa042276fc96324142e2f67c10b7ae",
+      "id": "a39a20d616d69a9d8518d134136a814b33514b07161e5247064c4a99d71f8cc2",
       "disposition": "false_positive",
       "rationale": "Table names originate from sqlite_master and are double-quote escaped; owner/job columns come from fixed tuples. FK child columns from PRAGMA are also double-quote escaped. All row identity values are bound.",
       "boundary": "Database schema identifiers or fixed internal allowlists only; API values remain SQL parameters.",
       "verification": "Reviewed the complete SQL-producing function and identifier quoting; current targeted SQL adversarial tests plus retained account/erasure/planning coverage."
     },
     {
-      "id": "1a317e87d67eac7f46fc5879cbf2713d3cba5b47166d0c54392aa3ce99913984",
+      "id": "a7f46cc024d1f1d1f336063d0755092d8f3f8621676c0da459083c02b25c13e8",
       "disposition": "false_positive",
       "rationale": "Deletion table identifiers are schema-derived and double-quote escaped by _rows_for_user; deletion rowids are separately bound.",
       "boundary": "Database schema identifiers or fixed internal allowlists only; API values remain SQL parameters.",
       "verification": "Reviewed the complete SQL-producing function and identifier quoting; current targeted SQL adversarial tests plus retained account/erasure/planning coverage."
     },
     {
-      "id": "c73f2dca70e31a94b9f6d53ae3181f431041dc25ae13d7dbe97ab2f8cf15c989",
+      "id": "0148b92fa7dccaf1f5e1321c9e88ec51068200c48c53ba4424b50348c580ab99",
       "disposition": "false_positive",
       "rationale": "The database-discovered table identifier is double-quote escaped, while the fixed job_id column compares a bound job identity.",
       "boundary": "Database schema identifiers or fixed internal allowlists only; API values remain SQL parameters.",
@@ -599,7 +607,7 @@
       "verification": "Module process entry points are included in this source-bound ledger; no source #nosec or Bandit skip flags are introduced."
     },
     {
-      "id": "4da9e312c86ae900cd6afa4ee99ee1f65766680fb8cffd2c2c63aaa0ca89093a",
+      "id": "c6a4f25f5650730716635311217f136e9ecf113669266b60c6e9646c98a4d326",
       "disposition": "reviewed_trust_boundary",
       "rationale": "Generic argv belongs to the internal registered worker layer, not an HTTP executable field. Commands run without a shell and under a process session with explicit timeout/usage handling.",
       "boundary": "Trusted operator installation/configuration controls executables and PATH; untrusted request values are separate argv/data, never shell program text.",
@@ -653,27 +661,6 @@
       "rationale": "WHERE contains only literal user_id and optional state clauses. User/state/pagination values are validated and bound rather than concatenated.",
       "boundary": "Database schema identifiers or fixed internal allowlists only; API values remain SQL parameters.",
       "verification": "Reviewed the complete SQL-producing function and identifier quoting; current targeted SQL adversarial tests plus retained account/erasure/planning coverage."
-    },
-    {
-      "id": "0e8431619c3eb762d06fed3d08f7a455bcb02104e3bedc6e44f6f37271c60499",
-      "disposition": "false_positive",
-      "rationale": "Importing subprocess does not itself execute code. Concrete process calls in this module are separately reviewed below. FFmpeg receives a project-resolved local source and a private temporary output. The following inference call enters registered worker admission; there is no caller-selected executable.",
-      "boundary": "Module import alone does not receive or execute an untrusted shell command.",
-      "verification": "Module process entry points are included in this source-bound ledger; no source #nosec or Bandit skip flags are introduced."
-    },
-    {
-      "id": "4c45ac8e2a42ba9ca181e7ab14ecb4df99ca02fc224ea27671c4a8c85b968037",
-      "disposition": "reviewed_trust_boundary",
-      "rationale": "FFmpeg receives a project-resolved local source and a private temporary output. The following inference call enters registered worker admission; there is no caller-selected executable. PATH lookup is an explicit deployment trust requirement, not proof that the external binary is safe.",
-      "boundary": "Trusted operator installation/configuration controls executables and PATH; untrusted request values are separate argv/data, never shell program text.",
-      "verification": "Reviewed producer and call-site source; retained model/codec/plugin tests plus current real separator, archive and admission regressions. Actual optional binaries/platforms remain externally unverified."
-    },
-    {
-      "id": "9dc83187bdcf7b07a18c981252abce25796ed265cbe5ed83a90a1a8f494a1fd2",
-      "disposition": "reviewed_trust_boundary",
-      "rationale": "FFmpeg receives a project-resolved local source and a private temporary output. The following inference call enters registered worker admission; there is no caller-selected executable.",
-      "boundary": "Trusted operator installation/configuration controls executables and PATH; untrusted request values are separate argv/data, never shell program text.",
-      "verification": "Reviewed producer and call-site source; retained model/codec/plugin tests plus current real separator, archive and admission regressions. Actual optional binaries/platforms remain externally unverified."
     },
     {
       "id": "4bfb265be224b6a2538996c092959b42adf0673f9040d4faba30d17d403b7972",
@@ -802,49 +789,49 @@
       "verification": "Reviewed producer and call-site source; retained model/codec/plugin tests plus current real separator, archive and admission regressions. Actual optional binaries/platforms remain externally unverified."
     },
     {
-      "id": "c92fab9fb5f92e2155192e721be28573eba46fe94f8450840e24ab84d74b8dc4",
+      "id": "cfa0e4b80fd7ffe13a80765eb3d32c90f447644d40196cb0c4ffa9268549fdd3",
       "disposition": "false_positive",
       "rationale": "The flagged literal/default in <module> is an empty or absent token value, boolean/None field, environment-variable name, OAuth endpoint/type, or fixed SQL statement; it is not a usable credential. Actual authentication/configuration values are generated, verified or stored separately.",
       "boundary": "No usable secret is introduced by the flagged source literal or optional empty parameter.",
       "verification": "Read exact flagged context and corresponding auth/config route; active-token verification and account ACL are covered by retained authentication tests."
     },
     {
-      "id": "99180b619fadd441fefc601b2c50e17cf7e56f723e38c4f3c38aefb3e6c29191",
+      "id": "75947d2e77962e42096e05a74eee929fbb46623549559a5bb746cbb9f549ed6d",
       "disposition": "false_positive",
       "rationale": "The flagged literal/default in <module> is an empty or absent token value, boolean/None field, environment-variable name, OAuth endpoint/type, or fixed SQL statement; it is not a usable credential. Actual authentication/configuration values are generated, verified or stored separately.",
       "boundary": "No usable secret is introduced by the flagged source literal or optional empty parameter.",
       "verification": "Read exact flagged context and corresponding auth/config route; active-token verification and account ACL are covered by retained authentication tests."
     },
     {
-      "id": "73f802c9db328af60d22cdd538cb024074ec659ee6b19d1bd2ca77957baa85a1",
+      "id": "32bfe760ddceb5b2b98c0661d93fe55d5c008dcbe13d64581952d9368bbfe1a7",
       "disposition": "false_positive",
       "rationale": "The flagged literal/default in <module> is an empty or absent token value, boolean/None field, environment-variable name, OAuth endpoint/type, or fixed SQL statement; it is not a usable credential. Actual authentication/configuration values are generated, verified or stored separately.",
       "boundary": "No usable secret is introduced by the flagged source literal or optional empty parameter.",
       "verification": "Read exact flagged context and corresponding auth/config route; active-token verification and account ACL are covered by retained authentication tests."
     },
     {
-      "id": "2fc95f9160e1af6d8b9960abc9b3581bdadc487beca4043b88e7d63386dc9178",
+      "id": "c27acfa9a98fd46337d8b510e61fa5eb8f24da5cf99ce88b43e2bfc5c006ec98",
       "disposition": "false_positive",
       "rationale": "The flagged literal/default in <module> is an empty or absent token value, boolean/None field, environment-variable name, OAuth endpoint/type, or fixed SQL statement; it is not a usable credential. Actual authentication/configuration values are generated, verified or stored separately.",
       "boundary": "No usable secret is introduced by the flagged source literal or optional empty parameter.",
       "verification": "Read exact flagged context and corresponding auth/config route; active-token verification and account ACL are covered by retained authentication tests."
     },
     {
-      "id": "36e72b701a968feac4c02d3f02692e17382fa105b7c5437540e5c49615962f36",
+      "id": "5e88ffb103743def1fdb10d571f81cc7d95013700f56eff00e84a82001a44981",
       "disposition": "false_positive",
       "rationale": "The flagged literal/default in <module> is an empty or absent token value, boolean/None field, environment-variable name, OAuth endpoint/type, or fixed SQL statement; it is not a usable credential. Actual authentication/configuration values are generated, verified or stored separately.",
       "boundary": "No usable secret is introduced by the flagged source literal or optional empty parameter.",
       "verification": "Read exact flagged context and corresponding auth/config route; active-token verification and account ACL are covered by retained authentication tests."
     },
     {
-      "id": "59fece1c2a2bed095c87349f8c7c1a592d6be4c15df95c344e2ace77d3adab3a",
+      "id": "c31546912004b4a54757d1327ec017f99c37232303a37e5bbd64f57fdf78074f",
       "disposition": "false_positive",
       "rationale": "The flagged literal/default in <module> is an empty or absent token value, boolean/None field, environment-variable name, OAuth endpoint/type, or fixed SQL statement; it is not a usable credential. Actual authentication/configuration values are generated, verified or stored separately.",
       "boundary": "No usable secret is introduced by the flagged source literal or optional empty parameter.",
       "verification": "Read exact flagged context and corresponding auth/config route; active-token verification and account ACL are covered by retained authentication tests."
     },
     {
-      "id": "abb99f8184e67ee275c0723b42450b8982fbd676890bcd71b2b734bdadada903",
+      "id": "fd65567724424461513bda8519dd52c57835bf53e188a2293881dc9b73ad98eb",
       "disposition": "false_positive",
       "rationale": "The flagged literal/default in create_model_access_token is an empty or absent token value, boolean/None field, environment-variable name, OAuth endpoint/type, or fixed SQL statement; it is not a usable credential. Actual authentication/configuration values are generated, verified or stored separately.",
       "boundary": "No usable secret is introduced by the flagged source literal or optional empty parameter.",
@@ -928,7 +915,7 @@
       "verification": "Module process entry points are included in this source-bound ledger; no source #nosec or Bandit skip flags are introduced."
     },
     {
-      "id": "c8b52310e2144aeb6025aa31b5f184d25510a7a644c2374c8a01c7f4ed6508c8",
+      "id": "29919cc492fe09a1efe61440100fa0cdef2e23bae26467e524ef3cc579b33d7e",
       "disposition": "reviewed_trust_boundary",
       "rationale": "Pinned interpreter/script/config/checkpoint/environment digests are checked through safe_file/runtime_sha before fixed offline runner argv. The executable configuration is an explicit trusted asset boundary.",
       "boundary": "Trusted operator installation/configuration controls executables and PATH; untrusted request values are separate argv/data, never shell program text.",
@@ -949,119 +936,119 @@
       "verification": "Module process entry points are included in this source-bound ledger; no source #nosec or Bandit skip flags are introduced."
     },
     {
-      "id": "17af7391dd1b529ef38342e6bd24aa002e9642040795359c574af795924a65b4",
+      "id": "8fa1aef5298473123a241b3295fa550ef56b1c79cb6f6ba446db9946fd9ac08c",
       "disposition": "reviewed_trust_boundary",
       "rationale": "Fixed renderer/inspection/registered model argv uses project-owned paths, enumerated targets and bounded numeric/filter serialization. Optional interpreter paths come from operator configuration; custom separator now runs through the bounded process helper. Reviewed entry point: _lead_backing_engine_available.",
       "boundary": "Trusted operator installation/configuration controls executables and PATH; untrusted request values are separate argv/data, never shell program text.",
       "verification": "Reviewed producer and call-site source; retained model/codec/plugin tests plus current real separator, archive and admission regressions. Actual optional binaries/platforms remain externally unverified."
     },
     {
-      "id": "48fdf19a53566707efd23264d4969594823d270d661a26f195e0790f5ded2221",
+      "id": "3d9361e98c85cbbbf62467fabb05a1dd61c5a761cb14c7da0382ac1a7e63af0b",
       "disposition": "false_positive",
       "rationale": "The flagged literal/default in verify_email_page is an empty or absent token value, boolean/None field, environment-variable name, OAuth endpoint/type, or fixed SQL statement; it is not a usable credential. Actual authentication/configuration values are generated, verified or stored separately.",
       "boundary": "No usable secret is introduced by the flagged source literal or optional empty parameter.",
       "verification": "Read exact flagged context and corresponding auth/config route; active-token verification and account ACL are covered by retained authentication tests."
     },
     {
-      "id": "69f4ce5a47a968fe5420d52d6c19b4b86163dffaa9f526be9a9977e2bdafa5ca",
+      "id": "afb56c8135ef84004382f13038e2767680e6c5d992035ee873e759635b77f208",
       "disposition": "false_positive",
       "rationale": "The flagged literal/default in reset_password_page is an empty or absent token value, boolean/None field, environment-variable name, OAuth endpoint/type, or fixed SQL statement; it is not a usable credential. Actual authentication/configuration values are generated, verified or stored separately.",
       "boundary": "No usable secret is introduced by the flagged source literal or optional empty parameter.",
       "verification": "Read exact flagged context and corresponding auth/config route; active-token verification and account ACL are covered by retained authentication tests."
     },
     {
-      "id": "e531de29d2f408c89a5b1242e4ac4f876862e828e6cf0455821adc0533ff125a",
+      "id": "1cba2b9e42f833f437540f4ac9d65ce01a38a213a0814c287adc3e2821ccf3b9",
       "disposition": "false_positive",
       "rationale": "Importing subprocess does not itself execute code. Concrete process calls in this module are separately reviewed below. Fixed renderer/inspection/registered model argv uses project-owned paths, enumerated targets and bounded numeric/filter serialization. Optional interpreter paths come from operator configuration; custom separator now runs through the bounded process helper.",
       "boundary": "Module import alone does not receive or execute an untrusted shell command.",
       "verification": "Module process entry points are included in this source-bound ledger; no source #nosec or Bandit skip flags are introduced."
     },
     {
-      "id": "6d50aa9ee1881b03e9a67f5e16c4e26555b720498b853d52c719f7cf016d50df",
+      "id": "150de41aea1f30389f31f62c62e876bed79a71048fd688edf7a93f18b1c2d1c7",
       "disposition": "reviewed_trust_boundary",
       "rationale": "Fixed renderer/inspection/registered model argv uses project-owned paths, enumerated targets and bounded numeric/filter serialization. Optional interpreter paths come from operator configuration; custom separator now runs through the bounded process helper. Reviewed entry point: vst3_parameters.",
       "boundary": "Trusted operator installation/configuration controls executables and PATH; untrusted request values are separate argv/data, never shell program text.",
       "verification": "Reviewed producer and call-site source; retained model/codec/plugin tests plus current real separator, archive and admission regressions. Actual optional binaries/platforms remain externally unverified."
     },
     {
-      "id": "5ca2e5d641041ee69f687e3250889a62027b4f8d39df17eaf26c9fe4dde721db",
+      "id": "cdac7668861b4484f56443d8639d15011c6cf13f03b889d1dc96b57c9459459b",
       "disposition": "reviewed_trust_boundary",
       "rationale": "Fixed renderer/inspection/registered model argv uses project-owned paths, enumerated targets and bounded numeric/filter serialization. Optional interpreter paths come from operator configuration; custom separator now runs through the bounded process helper. Reviewed entry point: _normalize_audio_to_project_rate. PATH lookup is an explicit deployment trust requirement, not proof that the external binary is safe.",
       "boundary": "Trusted operator installation/configuration controls executables and PATH; untrusted request values are separate argv/data, never shell program text.",
       "verification": "Reviewed producer and call-site source; retained model/codec/plugin tests plus current real separator, archive and admission regressions. Actual optional binaries/platforms remain externally unverified."
     },
     {
-      "id": "bcd8bf0e020dff464fff0f5ba8079eb04aa24c8dbf6097ba58abf3ab1d892dd4",
+      "id": "24b58a5d418cb71aa4903fb1f129fb779af4f647a67a6f6cdf021775f3f1aeab",
       "disposition": "reviewed_trust_boundary",
       "rationale": "Fixed renderer/inspection/registered model argv uses project-owned paths, enumerated targets and bounded numeric/filter serialization. Optional interpreter paths come from operator configuration; custom separator now runs through the bounded process helper. Reviewed entry point: _normalize_audio_to_project_rate.",
       "boundary": "Trusted operator installation/configuration controls executables and PATH; untrusted request values are separate argv/data, never shell program text.",
       "verification": "Reviewed producer and call-site source; retained model/codec/plugin tests plus current real separator, archive and admission regressions. Actual optional binaries/platforms remain externally unverified."
     },
     {
-      "id": "0290b1f093289b705b7c73b8b370ccece068e154f30850869134b51b400dc7cd",
+      "id": "1b1c61632509ee7d91955a9cdbb1781ced83b540b10a3929fd0593318097893a",
       "disposition": "reviewed_trust_boundary",
       "rationale": "Fixed renderer/inspection/registered model argv uses project-owned paths, enumerated targets and bounded numeric/filter serialization. Optional interpreter paths come from operator configuration; custom separator now runs through the bounded process helper. Reviewed entry point: _native_remote_infer. PATH lookup is an explicit deployment trust requirement, not proof that the external binary is safe.",
       "boundary": "Trusted operator installation/configuration controls executables and PATH; untrusted request values are separate argv/data, never shell program text.",
       "verification": "Reviewed producer and call-site source; retained model/codec/plugin tests plus current real separator, archive and admission regressions. Actual optional binaries/platforms remain externally unverified."
     },
     {
-      "id": "152e44f96774287991e793b63f7af8ae0dfc3bb02a10707d64fc104c5b3e8d68",
+      "id": "4d9ddc85996b3800fb4001763e63ec3afe9c14797445d5ac51cec723f7c6ad76",
       "disposition": "reviewed_trust_boundary",
       "rationale": "Fixed renderer/inspection/registered model argv uses project-owned paths, enumerated targets and bounded numeric/filter serialization. Optional interpreter paths come from operator configuration; custom separator now runs through the bounded process helper. Reviewed entry point: _native_remote_infer.",
       "boundary": "Trusted operator installation/configuration controls executables and PATH; untrusted request values are separate argv/data, never shell program text.",
       "verification": "Reviewed producer and call-site source; retained model/codec/plugin tests plus current real separator, archive and admission regressions. Actual optional binaries/platforms remain externally unverified."
     },
     {
-      "id": "5923d22e97410978048882dce2850ed0127ec0184ae3f1bc0a56289185fab793",
+      "id": "1df75ce64525d7c2af0e824a1a659aa2a2d20f5b23de79a5d9e6964f971ea84b",
       "disposition": "reviewed_trust_boundary",
       "rationale": "Fixed renderer/inspection/registered model argv uses project-owned paths, enumerated targets and bounded numeric/filter serialization. Optional interpreter paths come from operator configuration; custom separator now runs through the bounded process helper. Reviewed entry point: _text_music_worker. PATH lookup is an explicit deployment trust requirement, not proof that the external binary is safe.",
       "boundary": "Trusted operator installation/configuration controls executables and PATH; untrusted request values are separate argv/data, never shell program text.",
       "verification": "Reviewed producer and call-site source; retained model/codec/plugin tests plus current real separator, archive and admission regressions. Actual optional binaries/platforms remain externally unverified."
     },
     {
-      "id": "cb76139c3a011f106ad521b2117fd5202c87b49c9ec4870c293f6578069afd97",
+      "id": "2acf51219434f73f753de5cdf034313fb3d45bb7f1d8e392f4752967c342b9a5",
       "disposition": "reviewed_trust_boundary",
       "rationale": "Fixed renderer/inspection/registered model argv uses project-owned paths, enumerated targets and bounded numeric/filter serialization. Optional interpreter paths come from operator configuration; custom separator now runs through the bounded process helper. Reviewed entry point: _text_music_worker.",
       "boundary": "Trusted operator installation/configuration controls executables and PATH; untrusted request values are separate argv/data, never shell program text.",
       "verification": "Reviewed producer and call-site source; retained model/codec/plugin tests plus current real separator, archive and admission regressions. Actual optional binaries/platforms remain externally unverified."
     },
     {
-      "id": "aafcc241fe542bb5958e95958011c4a7f2435fb65724d478195cf10ed6e19452",
+      "id": "67aeaab4aad1fa80ebf91373ea1e2054dfcaf1e9ed1fbfc7db0748560f559532",
       "disposition": "reviewed_trust_boundary",
       "rationale": "Fixed renderer/inspection/registered model argv uses project-owned paths, enumerated targets and bounded numeric/filter serialization. Optional interpreter paths come from operator configuration; custom separator now runs through the bounded process helper. Reviewed entry point: _split_lead_backing_vocals.",
       "boundary": "Trusted operator installation/configuration controls executables and PATH; untrusted request values are separate argv/data, never shell program text.",
       "verification": "Reviewed producer and call-site source; retained model/codec/plugin tests plus current real separator, archive and admission regressions. Actual optional binaries/platforms remain externally unverified."
     },
     {
-      "id": "7a7e91c312c60bc7dda59adb0f15174ad05741e2207cbd6f0072ad0a8c4fe96f",
+      "id": "df0e90a903c22fa85b078ae0858fa753bae3dc5ab2ce9a3fee5edcdf415de759",
       "disposition": "false_positive",
       "rationale": "Importing subprocess does not itself execute code. Concrete process calls in this module are separately reviewed below. Fixed renderer/inspection/registered model argv uses project-owned paths, enumerated targets and bounded numeric/filter serialization. Optional interpreter paths come from operator configuration; custom separator now runs through the bounded process helper.",
       "boundary": "Module import alone does not receive or execute an untrusted shell command.",
       "verification": "Module process entry points are included in this source-bound ledger; no source #nosec or Bandit skip flags are introduced."
     },
     {
-      "id": "8a8f56e48a86f3aded1f552f872daab7ad2b1ef5e3aa573b78ceca683fad313b",
+      "id": "0efb2b285608bc06ef4ae9cba9971ac393ca13774887011d34f13201b873d736",
       "disposition": "reviewed_trust_boundary",
       "rationale": "Fixed renderer/inspection/registered model argv uses project-owned paths, enumerated targets and bounded numeric/filter serialization. Optional interpreter paths come from operator configuration; custom separator now runs through the bounded process helper. Reviewed entry point: _sam_audio_extract.",
       "boundary": "Trusted operator installation/configuration controls executables and PATH; untrusted request values are separate argv/data, never shell program text.",
       "verification": "Reviewed producer and call-site source; retained model/codec/plugin tests plus current real separator, archive and admission regressions. Actual optional binaries/platforms remain externally unverified."
     },
     {
-      "id": "59ab01e09d1b4203d2bdd0e66c849547eadb164aed00c5eb8ed2606cdcfb706b",
+      "id": "b720433c94cbdbdc3336e605aeabbbf8b9af046ef6ede3a685f6a901a133d32c",
       "disposition": "reviewed_trust_boundary",
       "rationale": "Fixed renderer/inspection/registered model argv uses project-owned paths, enumerated targets and bounded numeric/filter serialization. Optional interpreter paths come from operator configuration; custom separator now runs through the bounded process helper. Reviewed entry point: _drumsep_extract.",
       "boundary": "Trusted operator installation/configuration controls executables and PATH; untrusted request values are separate argv/data, never shell program text.",
       "verification": "Reviewed producer and call-site source; retained model/codec/plugin tests plus current real separator, archive and admission regressions. Actual optional binaries/platforms remain externally unverified."
     },
     {
-      "id": "3e0d69bd00338a41de67abc6db5ced3df520acb317cad43b9402ecba9cca3e77",
+      "id": "a1a82c1ebe85f0aa274abd66d38e5b97aa95e173f68e5c34acc87955dd7d99be",
       "disposition": "reviewed_trust_boundary",
       "rationale": "Fixed renderer/inspection/registered model argv uses project-owned paths, enumerated targets and bounded numeric/filter serialization. Optional interpreter paths come from operator configuration; custom separator now runs through the bounded process helper. Reviewed entry point: _render_karaoke_video.",
       "boundary": "Trusted operator installation/configuration controls executables and PATH; untrusted request values are separate argv/data, never shell program text.",
       "verification": "Reviewed producer and call-site source; retained model/codec/plugin tests plus current real separator, archive and admission regressions. Actual optional binaries/platforms remain externally unverified."
     },
     {
-      "id": "667304944f085d8a201f3d53ea3b8d0ade0cce3020dbbf4c745400af6ea68bfa",
+      "id": "d41c00e68c8b88015ff5651b8cfc84227272f9185e6471153d71bda7de0f6a7f",
       "disposition": "reviewed_trust_boundary",
       "rationale": "Fixed renderer/inspection/registered model argv uses project-owned paths, enumerated targets and bounded numeric/filter serialization. Optional interpreter paths come from operator configuration; custom separator now runs through the bounded process helper. Reviewed entry point: _karaoke_export_worker.",
       "boundary": "Trusted operator installation/configuration controls executables and PATH; untrusted request values are separate argv/data, never shell program text.",
@@ -1390,7 +1377,7 @@
       "verification": "Reviewed producer and call-site source; retained model/codec/plugin tests plus current real separator, archive and admission regressions. Actual optional binaries/platforms remain externally unverified."
     },
     {
-      "id": "3794be895fc494bd06d9227d4568aff3f3663be0ee4ab28604caf7dee72a2578",
+      "id": "6eccacae33786526acaff995fb36f059d7a278f1dd66d438682c39d0047b5dd8",
       "disposition": "reviewed_trust_boundary",
       "rationale": "Registered local interpreter/adapter controls the worker command. Windows taskkill path derives from the trusted system directory and numeric process PID; no shell is invoked.",
       "boundary": "Trusted operator installation/configuration controls executables and PATH; untrusted request values are separate argv/data, never shell program text.",
@@ -1404,7 +1391,7 @@
       "verification": "Module process entry points are included in this source-bound ledger; no source #nosec or Bandit skip flags are introduced."
     },
     {
-      "id": "df859cd1b7d3933f5c9ad6cd78d13efd5316e6f68bff62b05aa5eb44f1128309",
+      "id": "00dca32a1bd559d4da7bb02a5e576e0b0b0ea3c92f6f892a638be96c59b527d9",
       "disposition": "reviewed_trust_boundary",
       "rationale": "Managed manifest verifies every file digest and exact component rights, and safe_file pins the interpreter. The fixed Transkun runner now loads only weights-only compatible state; no unsafe retry exists.",
       "boundary": "Trusted operator installation/configuration controls executables and PATH; untrusted request values are separate argv/data, never shell program text.",
@@ -1490,7 +1477,7 @@
     "review": "New owner-derived account financial context validates UID through parameterized SQL, verifies private NC/loss histories, exposes only aggregate own totals and no combined debt. Account limits begins a read snapshot after schema setup and includes verified NC closed period ranges. The authenticated limits route returns a generic 409 for unverifiable context without leaking journal identities. No new subprocess, dynamic SQL or suppression. All existing findings matched unchanged code after line-number shifts.",
     "evidence": "tests/test_r210_account_financial_context.py; tests/test_r210_account_financial_browser.py; account-financial-final.xml"
   },
-  "current_scan": "docs/validation/r210/merchant-history-bandit.json",
+  "current_scan": "docs/validation/r210/export-auth-contention-bandit.json",
   "owner_payment_continuation": {
     "date": "2026-10-23",
     "reviewed_sources": [
@@ -1575,5 +1562,92 @@
     "review": "Reviewed bounded provider item allocation with distinct identifiers, positive exact EUR cents, per-capture gross ceilings, global exact total and no quantity multiplication. Only canonical repeated-read documents produce this evidence; no proportional estimate or browser-provided allocation. Only a digest/count/method of the item proof is retained, not customer/item descriptions. Movement observations have fixed bounded safe DTO fields, exact decimal cent text for large amounts, finite party/direction/reason labels, unknown-field warnings and an immutable evidence digest. Initiation and provider settlement/protection/fee labels never prove completion or grant a release. Both legacy/current arrays remain separate observations, never summed as independent cash. Admin-only journal readback is bounded and revalidates DTOs; corruption returns generic409 without leaking content. No owner DTO contains these private observations. Admin rendering uses textContent and named keyboard-scrolling regions, with no settlement controls. Existing monetary outcome, original owner/merchant/epoch and terminal guards remain; no new network client, subprocess, dynamic SQL, warnings or suppressions. All previous warning code is identical after line-number shifts.",
     "evidence": "paypal-item-movement-domain.xml; new full owner/admin browser reports; retained financial regressions; source-bound gates",
     "limits": "Payout/protection settlement still lacks unique completed transaction-to-case proof. Partial allocation without complete unambiguous item evidence, global merchant history, legacy obligations and full target/distributed acceptance remain open."
-  }
+  },
+  "subscription_basis_continuation": {
+    "date": "2026-10-26",
+    "reviewed_paths": [
+      "app/subscription_basis_audit.py",
+      "app/payment_reconciliation.py",
+      "app/resource_routes.py",
+      "app/static/regime_admin_panel.js"
+    ],
+    "review": "Fixed SQL statements with parameter-bound identifiers/pagination. Full-set verification independent of page bounds; no inferred original fee, DDL or financial mutation. Standalone read snapshot rolled back, caller-owned transactions preserved. Administrator-only GET returns bounded order/reason DTOs and no-store headers; schema errors use generic409. UI renders values with textContent, clears stale cases on read failure, supplies labels/keyboard pagination and has no money/migration action. Existing168 finding identities and dispositions are unchanged.",
+    "evidence": "docs/validation/r210/subscription-basis-result.json; docs/SUBSCRIPTION_EVIDENCE_HANDOFF_R210.md"
+  },
+  "execution_owner_continuation": {
+    "date": "2026-10-26",
+    "reviewed_paths": [
+      "app/ai_global_execution.py",
+      "app/ai_metering_agent.py",
+      "app/ai_server_execution.py",
+      "app/studio_compute.py"
+    ],
+    "review": "The durable queue row must be running and bound to a positive exact user and the current verifiable scheduler process incarnation before slot reuse, local/pull dispatch or source preparation. Pending/terminal/foreign/cancelled/missing identities fail before source/model/billing effects. Native fallback and wait4 reject pre-cancelled launches. FFmpeg now runs through the existing no-shell supervised runner with a source size ceiling and remaining wall-clock budget; its usage is not promoted to user invoice evidence. All SQL is fixed with bound identifiers; no new network or subprocess primitive. Existing direct-child/process-group limitations remain, not delegated-kernel proof.",
+    "relocated_findings": [
+      {
+        "path": "app/ai_metering_agent.py",
+        "old_line": 96,
+        "new_line": 98,
+        "test_id": "B603",
+        "reason": "Same fixed operator-selected executable/caller boundary, now preceded by cancellation; argv cannot be chosen through the user API."
+      },
+      {
+        "path": "app/studio_compute.py",
+        "old_line": 77,
+        "new_line": 78,
+        "test_id": "B603",
+        "reason": "Same fixed operator-selected executable/caller boundary, now preceded by cancellation; argv cannot be chosen through the user API."
+      }
+    ],
+    "removed_findings": [
+      {
+        "path": "app/ai_server_execution.py",
+        "test_id": "B404",
+        "line": 6,
+        "reason": "Unsupervised subprocess import/call removed; fixed command now passed to existing supervised runner"
+      },
+      {
+        "path": "app/ai_server_execution.py",
+        "test_id": "B607",
+        "line": 30,
+        "reason": "Unsupervised subprocess import/call removed; fixed command now passed to existing supervised runner"
+      },
+      {
+        "path": "app/ai_server_execution.py",
+        "test_id": "B603",
+        "line": 30,
+        "reason": "Unsupervised subprocess import/call removed; fixed command now passed to existing supervised runner"
+      }
+    ],
+    "evidence": "docs/validation/r210/execution-owner-result.json"
+  },
+  "executor_boundary_continuation": {
+    "date": "2026-10-26",
+    "reviewed_paths": [
+      "app/ai_server_execution.py",
+      "app/studio_compute.py",
+      "app/main.py"
+    ],
+    "review": "Server routing no longer uses the insecure authentication diagnostic flag to choose unowned local inference. Native-only Studio validates a nonnegative exact actor and requires declared native context for zero, including before any saved credential read. The legacy synchronous stem endpoint is native-only, rights-gated and rejects server invocation with409 before upload copy/model/project mutation, preserving owner ACL. Native/real account token test contexts are now explicit. Three existing subprocess findings have only line relocation from preceding guards;original trust dispositions retained. No new executable/transport/checker/suppression.",
+    "finding_line_relocations": [
+      {
+        "path": "app/main.py",
+        "before": 7184,
+        "after": 7189
+      },
+      {
+        "path": "app/main.py",
+        "before": 7396,
+        "after": 7401
+      },
+      {
+        "path": "app/studio_compute.py",
+        "before": 78,
+        "after": 87
+      }
+    ],
+    "evidence": "docs/validation/r210/executor-boundaries-result.json",
+    "native_error_mapping": "Denied or unverifiable native compatibility-model rights now return readable HTTP409 before upload copy; no unchecked exception or model side effect."
+  },
+  "current_scan_sha256": "6501324f08c8c2887b48f50f9a809e220e2c47b15fc85a934325dce9ba2e36ce"
 }

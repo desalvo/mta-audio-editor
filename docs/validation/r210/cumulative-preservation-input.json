@@ -1,0 +1,9 @@
+{
+  "source_archive_sha256": "dd0e2bc81a521770c2edd7bf58d0cfee9cc6e05420fb0855d7f6f5936cb48d79",
+  "manifest_files": 4253,
+  "restored_missing_historical_logs": 612,
+  "missing_non_log_paths": 0,
+  "existing_source_overwritten": 0,
+  "all_restored_bytes_hashes_modes_matched": true,
+  "purpose": "Preserve historical evidence in the complete cumulative;Git checkout intentionally excludes logs."
+}

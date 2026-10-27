@@ -113,6 +113,8 @@ async def _mta_application_lifespan(_app):
             stop_accounts()
 
 app = FastAPI(title="MTA Audio Editor", version=APP_VERSION, docs_url=None, redoc_url=None, openapi_url=None, lifespan=_mta_application_lifespan)
+from .regime_service_lease import ServiceLeaseMiddleware
+app.add_middleware(ServiceLeaseMiddleware)
 from .ai_device_auth import router as ai_device_router
 from .ai_notification_routes import router as ai_notification_router
 from .optional_plugin_routes import router as optional_plugin_router
@@ -636,7 +638,7 @@ async def security_middleware(request: Request, call_next):
     browser_lang=i18n.browser_language(request.headers.get("accept-language",dict(user).get("browser_language","en") if user else "en"))
     preference=dict(user).get("language","auto") if user else "auto"
     i18n.current_language.set(i18n.effective(preference,browser_lang))
-    if user and dict(user).get("id",0)>0 and "language" in user.keys() and not NATIVE_SINGLE_USER and preference=="auto" and browser_lang!=dict(user).get("browser_language","en"):
+    if user and dict(user).get("id",0)>0 and "language" in user.keys() and not NATIVE_SINGLE_USER and preference=="auto" and not request.url.path.startswith('/api/') and browser_lang!=dict(user).get("browser_language","en"):
         from .auth import db as locale_db
         with locale_db() as con:con.execute("UPDATE users SET browser_language=? WHERE id=?",(browser_lang,user["id"]))
     model_bearer_ok = (
@@ -6014,6 +6016,13 @@ async def split_stems_compat(
     from .project_kinds import require_kind, ProjectKindError
     if project_id:require_kind(_project_for_actor(request, project_id), "audio")
     elif target == "MIDI":raise ProjectKindError("MIDI projects cannot receive audio stems; choose an audio or mixed project type")
+    from .ai_server_execution import enabled
+    if enabled(NATIVE_SINGLE_USER):
+        raise HTTPException(409,'Use asynchronous stem-jobs endpoints for authenticated server inference')
+    from .model_license_policy import evaluate
+    try:evaluate('demucs',{'model':model})
+    except (ValueError,OSError) as exc:
+        raise HTTPException(409,'Demucs model rights are unavailable or unapproved') from exc
     if Path(file.filename or "").suffix.lower() != ".mp3":
         raise HTTPException(400, "stem separation currently accepts MP3 input")
     if not STEM_SPLITTER.available():

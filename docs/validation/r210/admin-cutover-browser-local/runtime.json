@@ -1,0 +1,18 @@
+{
+  "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+  "commit": "local-uncommitted",
+  "playwright": null,
+  "source_sha256": {
+    "app/regime_service_lease.py": "c1fac888b879a2366e64d80ed2d116c2cbe9a382b08e651bb7e4bc93ac615b71",
+    "app/regime_local_readiness.py": "e6dc031ac04ca75b6ced9b3943d02723c81087d3b8c3fa91f2f40202e9192cee",
+    "app/regime_admin_cutover.py": "df9d2430e30700270f7ae12d17c473b2dc3b1a094221b6d23ec0c49bb7a9a787",
+    "app/regime_balance_continuity.py": "a9888d50e85c8076f473c6c2ba9e34f9bc4eb10db835d9ab822131cab3f62163",
+    "app/resource_routes.py": "197d15ae91910241d618dbdff69a0bc40897823e5d236f7aa6490bcf8376ec53",
+    "app/static/regime_cutover_panel.js": "d379a661511c657eba249b7e2172a4ee090e4aaa0293c55870e6bf8e58f69be9",
+    "app/templates/admin.html": "77cdf23d515a684148ff642948dbd12bc0b77e589fba09366e880fec56b6ee7d",
+    "tests/test_r210_admin_cutover_browser.py": "712887590ff95d0166fdb7a006b367bace6f14a868373be424a5cb54081f6705",
+    "tests/test_r210_admin_cutover_e2e.py": "edb78b7d2c65bc7300d62522dfd4976b5b0ddf4d0d143a754eaf496a93a7124e",
+    "scripts/run_admin_cutover_chromium.py": "2a44bc8f6b6473f22331547d7dfe97fa8881840fbc1c7b2427bdd8f60874b3a5",
+    ".github/workflows/admin-cutover-chromium.yml": "4db3cda1103d0036c3b86c7d6dedc93963273b2a5edb5ce148bfb9379fd5b826"
+  }
+}

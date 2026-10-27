@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="0.718" timestamp="2026-10-26T12:30:57.772224+01:00" hostname="581064bf8695"><testcase classname="tests.test_r210_universal_queue_usage" name="test_worker_checkpoint_keeps_cpu_and_gpu_together" time="0.263"><failure message="AssertionError: assert (3.0 == 3 and 'profiled_kernels_diagnostic' == 'accounted'&#10;  &#10;  - accounted&#10;  + profiled_kernels_diagnostic)">tests/test_r210_universal_queue_usage.py:159: in test_worker_checkpoint_keeps_cpu_and_gpu_together
+    assert value['gpu_seconds']==3 and value['gpu_metrics_status']=='accounted'
+E   AssertionError: assert (3.0 == 3 and 'profiled_kernels_diagnostic' == 'accounted'
+E&#32;&#32;&#32;&#32;&#32;
+E     - accounted
+E     + profiled_kernels_diagnostic)</failure></testcase></testsuite></testsuites>

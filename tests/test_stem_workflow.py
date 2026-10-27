@@ -9,11 +9,12 @@ WRITE = {"X-MTA-Request": "1"}
 
 
 @pytest.mark.skipif(shutil.which("ffmpeg") is None, reason="FFmpeg required")
-def test_async_stem_workflow_persists_project_and_progress(tmp_path, monkeypatch):
+def test_async_stem_workflow_persists_project_and_progress(tmp_path, monkeypatch, local_native_ai):
     import app.main as main
     import app.storage as storage
 
     monkeypatch.setattr(storage, "ROOT", tmp_path.resolve())
+    monkeypatch.setenv("MTA_NATIVE_SINGLE_USER", "true")
     monkeypatch.setenv("MTA_ALLOW_INSECURE_NO_AUTH", "true")
 
     source = tmp_path / "song.mp3"

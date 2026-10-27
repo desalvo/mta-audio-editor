@@ -23,6 +23,8 @@ def transcribe(source,options):
         subprocess.run([str(python),str(Path(__file__).with_name('transkun_runner.py')),
             '--source',str(Path(source).resolve()),'--output',str(target),
             '--checkpoint',str(binding(value,'checkpoint')),'--config',str(binding(value,'config')),
+            '--checkpoint-sha256',value['files'][value['bindings']['checkpoint']]['sha256'],
+            '--config-sha256',value['files'][value['bindings']['config']]['sha256'],
             '--runtime',str(binding(value,'runtime_root')),'--device',device],
             cwd=binding(value,'runtime_root'),env=environment,stdin=subprocess.DEVNULL,
             stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,timeout=600,check=True)

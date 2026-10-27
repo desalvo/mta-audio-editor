@@ -281,6 +281,81 @@ def public_service_regime():
     from .service_regime import current_regime
     return {'regime':current_regime().value}
 
+
+@router.get('/api/admin/service-regime/cutovers/preview')
+def admin_cutover_preview(request: Request, target: str):
+    actor = auth.require_admin(request)
+    from . import regime_admin_cutover as cutover
+    from .regime_operation_fence import FenceBlocked
+    try:
+        return cutover.preview(target=target, actor=int(actor['id']))
+    except (ValueError, TypeError) as exc:
+        raise HTTPException(422, 'Invalid transition target or financial basis') from exc
+    except (FenceBlocked, sqlite3.DatabaseError) as exc:
+        raise HTTPException(409, str(exc) if isinstance(exc, FenceBlocked) else 'Cutover audit unavailable') from exc
+    except OSError as exc:
+        raise HTTPException(409, 'Local-authority cutover prerequisites unavailable') from exc
+
+
+@router.get('/api/admin/service-regime/cutovers')
+def admin_cutover_history(request: Request, limit: int = 25, offset: int = 0):
+    actor = auth.require_admin(request)
+    from . import regime_admin_cutover as cutover
+    from .regime_operation_fence import FenceBlocked
+    try:
+        return cutover.history(actor=int(actor['id']), limit=limit, offset=offset)
+    except ValueError as exc:
+        raise HTTPException(422, 'Invalid audit page') from exc
+    except (FenceBlocked, sqlite3.DatabaseError) as exc:
+        raise HTTPException(409, 'Administrative audit unavailable') from exc
+
+
+@router.post('/api/admin/service-regime/cutovers')
+def admin_execute_cutover(request: Request, body: dict):
+    actor = auth.require_admin(request)
+    if set(body) != {'request_id', 'target', 'expected_revision', 'preview_sha256', 'confirm'}:
+        raise HTTPException(422, 'Exact transition confirmation required')
+    from . import regime_admin_cutover as cutover
+    from .regime_operation_fence import FenceBlocked
+    try:
+        return cutover.execute(identifier=body['request_id'], target=body['target'],
+            expected_revision=body['expected_revision'], preview_sha256=body['preview_sha256'],
+            confirm=body['confirm'], actor=int(actor['id']))
+    except (ValueError, TypeError) as exc:
+        raise HTTPException(422, 'Invalid transition confirmation') from exc
+    except (FenceBlocked, sqlite3.DatabaseError) as exc:
+        raise HTTPException(409, str(exc) if isinstance(exc, FenceBlocked) else 'Cutover blocked; inspect audit before retry') from exc
+    except OSError as exc:
+        raise HTTPException(503, 'Cutover interrupted; inspect audit and use forward recovery') from exc
+
+
+@router.get('/api/admin/service-regime/cutovers/{identifier}')
+def admin_cutover_status(identifier: str, request: Request):
+    actor = auth.require_admin(request)
+    from . import regime_admin_cutover as cutover
+    result = cutover.status(identifier=identifier, actor=int(actor['id']))
+    if result is None:
+        raise HTTPException(404, 'No committed transition with this identity')
+    return result
+
+
+@router.post('/api/admin/service-regime/cutovers/{identifier}/recover')
+def admin_recover_cutover(identifier: str, request: Request, body: dict):
+    actor = auth.require_admin(request)
+    if set(body) != {'expected_revision', 'confirm'}:
+        raise HTTPException(422, 'Exact recovery confirmation required')
+    from . import regime_admin_cutover as cutover
+    from .regime_operation_fence import FenceBlocked
+    try:
+        return cutover.recover(identifier=identifier, expected_revision=body['expected_revision'],
+                               confirm=body['confirm'], actor=int(actor['id']))
+    except (ValueError, TypeError) as exc:
+        raise HTTPException(422, 'Invalid recovery confirmation') from exc
+    except (FenceBlocked, sqlite3.DatabaseError) as exc:
+        raise HTTPException(409, str(exc) if isinstance(exc, FenceBlocked) else 'Forward recovery blocked') from exc
+    except OSError as exc:
+        raise HTTPException(503, 'Recovery interrupted; original barrier remains held') from exc
+
 @router.get('/api/admin/service-regime')
 def admin_service_regime(request:Request):
     auth.require_admin(request)
@@ -790,3 +865,18 @@ def _merchant_history_response(fn):
         raise HTTPException(403,'Active administrator required') from exc
     except sqlite3.DatabaseError as exc:
         raise HTTPException(409,'Merchant history unavailable') from exc
+
+
+@router.get('/api/admin/service-regime/subscription-evidence')
+def subscription_evidence(request:Request,offset:int=0,limit:int=50):
+    auth.require_admin(request)
+    from fastapi.responses import JSONResponse
+    from .subscription_basis_audit import review
+    if not 1<=limit<=200 or offset<0:
+        raise HTTPException(422,'Invalid subscription evidence pagination')
+    with auth.db() as connection:
+        try:
+            return JSONResponse(review(connection,offset=offset,limit=limit),
+                                headers={'Cache-Control':'no-store','Pragma':'no-cache'})
+        except sqlite3.DatabaseError as exc:
+            raise HTTPException(409,'Original subscription evidence unavailable') from exc

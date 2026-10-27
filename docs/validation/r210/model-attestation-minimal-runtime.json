@@ -1,0 +1,11 @@
+{
+  "policy_admission_passed": true,
+  "installed_top_level": [
+    "fastapi==0.142.2",
+    "qrcode==8.2",
+    "pydantic==2.12.5"
+  ],
+  "model_runtime_or_weights_installed": false,
+  "scope": "Fresh venv with only shared policy import dependencies and their transitives;no model inference.",
+  "harness_correction": "Driver initially used system Python without qrcode;corrected to project venv for generating admission. Minimal target then passed."
+}

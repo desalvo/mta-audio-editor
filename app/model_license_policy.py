@@ -183,7 +183,7 @@ def authorize_remote_execution(kind, plan):
 
 
 def evaluate(kind,plan):
-    primary=evaluate_model(selected(kind,plan));decisions=[primary];asset_ids=[]
+    primary=evaluate_model(selected(kind,plan));decisions=[primary];asset_ids=[];inventories=[]
     if kind=='audio-to-midi-transkun':asset_ids.append(plan.get('options',{}).get('asset_id',''))
     if kind=='vocal-synthesis':
         settings=plan.get('settings',{})
@@ -195,10 +195,20 @@ def evaluate(kind,plan):
             import os
             decisions.append(evaluate_model(os.getenv('MTA_DIFFSINGER_VOCODER_POLICY_MODEL','diffsinger-vocoder')))
     if asset_ids:
-        from .studio_asset_registry import policies
-        for asset_id in sorted(set(asset_ids)):decisions.extend(policies(asset_id))
+        from .studio_asset_registry import manifest
+        for asset_id in sorted(set(asset_ids)):
+            value=manifest(asset_id,verify=True)
+            if not value['enabled']:raise LicenseDenied('Managed model asset is disabled')
+            decisions.extend(evaluate_model(notice['policy_model']) for notice in value['licenses'])
+            # Portable identity: bind bytes, component permissions and runtime
+            # bindings, never an installation path or a mutable enabled flag.
+            inventories.append({k:v for k,v in value.items() if k not in ('folder','enabled')})
     if len(decisions)==1:return primary
-    digest=hashlib.sha256(''.join(d.policy_sha256 for d in decisions).encode()).hexdigest()
+    material=(''.join(d.policy_sha256 for d in decisions) if not inventories else
+              json.dumps({'schema':'mta-managed-execution-1',
+                          'policies':[asdict(d) for d in decisions],
+                          'assets':inventories},sort_keys=True,separators=(',',':'),allow_nan=False))
+    digest=hashlib.sha256(material.encode()).hexdigest()
     return Decision(primary.model_id,'free_only' if any(not d.billable for d in decisions) else 'cost_recovery',
                     primary.source,digest,any(d.operator_review for d in decisions))
 

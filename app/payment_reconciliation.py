@@ -286,6 +286,9 @@ def report(c,*,limit=50,offset=0):
     from .subscription_receivables import original_loss_review
     original_losses=original_loss_review(c)
     if not original_losses['verified']:issues.append('subscription_original_loss_unverified')
+    from .subscription_basis_audit import review as basis_review
+    original_basis=basis_review(c,limit=limit,offset=offset)
+    if not original_basis['verified']:issues.append('subscription_original_basis_unverified')
     positions=[dict(zip(keys,row)) for row in rows]
     from .checkout_terminal_outcomes import terminal_receipt
     for position in positions:
@@ -294,6 +297,6 @@ def report(c,*,limit=50,offset=0):
         if position['provider']=='paypal':
             from .paypal_dispute_details import admin_reviews
             position['movement_reviews']=admin_reviews(c,position['order_id'])
-    return {'verified':not issues,'pending':pending,'subscription_reversal_due_micro':receivables,'subscription_repayment_refund_due_micro':repayment_refunds,'subscription_risk_micro':subscription_risk,'subscription_original_loss_review':original_losses,'active_disputes':active,'positions':positions,
+    return {'verified':not issues,'pending':pending,'subscription_reversal_due_micro':receivables,'subscription_repayment_refund_due_micro':repayment_refunds,'subscription_risk_micro':subscription_risk,'subscription_original_loss_review':original_losses,'subscription_original_basis_review':original_basis,'active_disputes':active,'positions':positions,
             'total':c.execute('SELECT count(*) FROM payment_reconciliation_positions').fetchone()[0],
             'issues':issues,'transition_safe':False,'scope':'authenticated events; future reversals remain possible'}

@@ -1,0 +1,138 @@
+{
+  "schema": "mta-ci-verification-1",
+  "verified_utc": "2026-10-26",
+  "run": {
+    "id": 40257635101,
+    "status": "completed",
+    "conclusion": "success",
+    "head_sha": "9fc85ce79bee9871696dea9396565395a415aa72",
+    "event": "workflow_dispatch",
+    "run_attempt": 1,
+    "html_url": "https://github.com/desalvo/mta-audio-editor/actions/runs/40257635101",
+    "updated_at": "2026-10-26T02:59:23Z"
+  },
+  "jobs": [
+    {
+      "id": 121362814478,
+      "name": "SAST and dependency audit",
+      "conclusion": "success",
+      "status": "completed"
+    },
+    {
+      "id": 121362814686,
+      "name": "VST3 SDK compile (Linux)",
+      "conclusion": "success",
+      "status": "completed"
+    },
+    {
+      "id": 121362814711,
+      "name": "Quality and unit tests",
+      "conclusion": "success",
+      "status": "completed"
+    },
+    {
+      "id": 121369307422,
+      "name": "Container production gate",
+      "conclusion": "success",
+      "status": "completed"
+    },
+    {
+      "id": 121369307424,
+      "name": "Native macOS installer (x64)",
+      "conclusion": "success",
+      "status": "completed"
+    },
+    {
+      "id": 121369307425,
+      "name": "iOS / iPadOS archive",
+      "conclusion": "success",
+      "status": "completed"
+    },
+    {
+      "id": 121369307448,
+      "name": "Linux native (arm64) DEB/RPM",
+      "conclusion": "success",
+      "status": "completed"
+    },
+    {
+      "id": 121369307454,
+      "name": "Android APK / AAB",
+      "conclusion": "success",
+      "status": "completed"
+    },
+    {
+      "id": 121369307468,
+      "name": "Native macOS installer (arm64)",
+      "conclusion": "success",
+      "status": "completed"
+    },
+    {
+      "id": 121369307493,
+      "name": "Linux native (x86_64) DEB/RPM",
+      "conclusion": "success",
+      "status": "completed"
+    },
+    {
+      "id": 121369307510,
+      "name": "Build Windows Chordino runtime",
+      "conclusion": "success",
+      "status": "completed"
+    },
+    {
+      "id": 121369523591,
+      "name": "Native Windows installer",
+      "conclusion": "success",
+      "status": "completed"
+    },
+    {
+      "id": 121371943497,
+      "name": "Publish Docker Hub image",
+      "conclusion": "skipped",
+      "status": "completed"
+    },
+    {
+      "id": 121375583519,
+      "name": "Publish desktop/mobile installers to GitHub Release",
+      "conclusion": "skipped",
+      "status": "completed"
+    },
+    {
+      "id": 121375583668,
+      "name": "Publish rolling early-main packages",
+      "conclusion": "skipped",
+      "status": "completed"
+    }
+  ],
+  "quality": {
+    "job_id": 121362814711,
+    "suite": "full",
+    "passed": 6448,
+    "skipped": 104,
+    "failed": 0,
+    "coverage_percent": 75.84,
+    "test_seconds": 1210.94,
+    "combined_live_vst3_midi": "passed",
+    "numeric_midi_browser": "passed",
+    "log_excerpts": [
+      "2026-10-26T02:13:42.3747774Z   MTA_TEST_SUITE: full",
+      "2026-10-26T02:25:11.4712930Z tests/test_r210_midi_numeric_browser.py .                                [ 56%]",
+      "2026-10-26T02:30:53.0117672Z tests/test_r210_server_vst3_browser.py .                                 [ 75%]",
+      "2026-10-26T02:34:00.8502306Z Required test coverage of 70% reached. Total coverage: 75.84%",
+      "2026-10-26T02:34:00.8506759Z 12.81s call     tests/test_r210_server_vst3_browser.py::test_real_browser_live_play_pause_seek_parameter_update_and_stop",
+      "2026-10-26T02:34:00.8573599Z ======== 6448 passed, 104 skipped, 7115 warnings in 1210.94s (0:20:10) ========="
+    ]
+  },
+  "limits": [
+    "104 prerequisite skips remain unaccepted target checks",
+    "Build success does not prove installed native runtime or all supported target acceptance",
+    "No publication occurred; manual-dispatch publication jobs skipped"
+  ],
+  "progress": {
+    "verified": 23,
+    "total": 42,
+    "percent": 54.8,
+    "whole_macroareas": 0
+  },
+  "release_candidate": false,
+  "transition_enabled": false
+}

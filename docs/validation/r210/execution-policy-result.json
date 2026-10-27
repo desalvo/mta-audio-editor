@@ -1,0 +1,89 @@
+{
+  "date": "2026-10-26",
+  "base_commit": "9fc85ce79bee9871696dea9396565395a415aa72",
+  "reports": [
+    {
+      "path": "docs/validation/r210/transkun-loaded-initial.xml",
+      "sha256": "d05c56615149b517e759fd5dd3c6c43e0bc85f9474c92a5b30779b4c6b83d746",
+      "passed": 24,
+      "failed": 0,
+      "error": 0,
+      "skipped": 1
+    },
+    {
+      "path": "docs/validation/r210/execution-policy-initial.xml",
+      "sha256": "f42df19d80dd68715815ad8cc2c1b53e02d0c65a4bde3cbdd94ecd17354c007c",
+      "passed": 72,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/validation/r210/execution-policy-native.xml",
+      "sha256": "8e321fc9f2fecc20059ef763d767721dc6bfe55bf3454c82a15e44006aad4bbd",
+      "passed": 2,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/validation/r210/execution-policy-integration.xml",
+      "sha256": "b522f1d7bcdd775e6a65f7331b04f04d80430b1130726d612aeb0c4710635b21",
+      "passed": 119,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/validation/r210/execution-policy-gates.xml",
+      "sha256": "7fb9dac42a6792a31d70a1b9cdf43c91b57775354c5e0a33fed9e311d1ff1231",
+      "passed": 6,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    }
+  ],
+  "distinct_current": {
+    "passed": 223,
+    "failed": 0,
+    "error": 0,
+    "skipped": 1
+  },
+  "new_cases": 15,
+  "source_sha256": {
+    "app/ai_execution_policy.py": "2be2765f683de25bf4dbaace26f40698b49412ec5aa7576e46a105e6e62914ec",
+    "app/ai_metering_agent.py": "5878e1b1a69b49eea20c9834d56045ffe46d390d980d9e044aaff1236470a264",
+    "app/ai_pull_worker.py": "8e11f1caa3f0390a2714cf0893fbf955ddffa4cd48ee092c0d8b688905e3552f",
+    "app/studio_compute.py": "5fd0f01325727efcab0a044583a3447b08f3ff04ff9d5e661001cf7b98fb0cda",
+    "app/ai_studio_adapter.py": "92917f32049658497559e84d1e8a54807d1383a22fb2128cc62ac8fb47c4b223",
+    "app/ai_unified_adapter.py": "6501e23ae7b6df8412602b32010fca3b0d89a7a18b0c831aa1014da876dc0827",
+    "app/transkun_adapter.py": "a4ec3cf8f0932e5ab36429f7129749a9f2626e76d5372d628a69469f916c8923",
+    "app/transkun_runner.py": "7a9bf660b759a4dfb890f4214877c2d7e4674985361264ef03a1118b17f2ba59",
+    "tests/test_r210_execution_policy_binding.py": "0346daaefd3639a6dbbcba440d70543d8078859fb6faae87a4cf2b5c8b26e2c6",
+    "tests/test_r210_checkpoint_weights_security.py": "6b876f2beb0f79ef26e64463533935fc9bbfc6a8f8ef071005e38aa780e6f27f",
+    "tests/test_r210_studio_completion_contracts.py": "8c4206be9f7d197a7f285256081600df63f5f93a1cd01c59a1d8b90efe68119a"
+  },
+  "scope": "Parent/child consistency for supported Studio/unified entrypoints across native,registered,cgroup and pull launch envelopes;Transkun verified stream/config parser. Actual native harmony,registered and pull child verification with original accounting plus actual HTTPS/partition/SIGKILL regressions. Synthetic weights/configs only.",
+  "skip": "Original optional real Torch weights-only test: Torch is not installed. It remains an unmet runtime prerequisite,not a pass.",
+  "warnings": "Initial combined report includes an existing background project-GC fixture teardown warning (invalid project path) and FastAPI/httpx deprecation. No warning suppression or production GC change; later integration run had only deprecation.",
+  "security": {
+    "source_files": 288,
+    "findings": 165,
+    "high": 0,
+    "medium": 21,
+    "low": 144,
+    "relocations": [
+      "Transkun B603 same fixed command plus trusted hash arguments at line23.",
+      "Studio B603 same subprocess at line87->88 after policy environment insertion."
+    ],
+    "transport_sites": 30,
+    "transport_files": 21,
+    "changed_transport": "Only unchanged ai_pull_worker.py WorkerClient.call source hash refreshed;call/function/line/category unchanged."
+  },
+  "limitations": [
+    "Envelope is not an authenticated remote loaded-checkpoint attestation.",
+    "Opaque operator/native runtime code remains a separate trust boundary.",
+    "Commercial remote inference/cutover remain disabled;F3/F4/F6 and whole B2/B5 remain open."
+  ],
+  "release_candidate": false
+}

@@ -1,0 +1,129 @@
+{
+  "date": "2026-10-26",
+  "base_commit": "9fc85ce79bee9871696dea9396565395a415aa72",
+  "reports": [
+    {
+      "path": "docs/validation/r210/model-attestation-initial.xml",
+      "sha256": "70f851c3f99e0b0e3bd04840232d5ba1d6cfe0376c7e4447289fb48fe26bec14",
+      "passed": 3,
+      "failed": 12,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/validation/r210/model-attestation-resolution.xml",
+      "sha256": "3e4bc2d832808bda9be42bba133a5d4ce566098b602856b5070280749fb21a73",
+      "passed": 15,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/validation/r210/model-attestation-integration.xml",
+      "sha256": "6b5ce68952c607ac339ae8c8ad55b034d9760424f2f33f78c8f281466e732794",
+      "passed": 114,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/validation/r210/model-attestation-worker.xml",
+      "sha256": "d398a53942b5152763f7c5515df0ebb896848f32f2dc7fc5322ccdb32709257a",
+      "passed": 4,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/validation/r210/model-attestation-recovery.xml",
+      "sha256": "4a1f573d0296fd82d24279f91bed76a4b007b6c61165e504ebe8f74ad711db1f",
+      "passed": 82,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/validation/r210/model-attestation-real-prerequisite.xml",
+      "sha256": "13d307afa858966d35a394b31535f24aff7a0a81046b5afa9fb186a9e174dc28",
+      "passed": 0,
+      "failed": 0,
+      "error": 0,
+      "skipped": 1
+    },
+    {
+      "path": "docs/validation/r210/model-attestation-gates.xml",
+      "sha256": "93a7ac88a5ab7b664e0b6f3b04ff0d8d4b85b824d1f15d6ae27f6a0841557d7f",
+      "passed": 6,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/validation/r210/model-attestation-minimal.xml",
+      "sha256": "50a684094d75e99fd5adf8fbfa3c76e796ce88b9cc01a6afece8abf677577d70",
+      "passed": 5,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/validation/r210/model-attestation-final-checklist.xml",
+      "sha256": "99e5db8a27f9ca0e2c76181ce191f0b8d0fd2e1ec4778e3385975418114fcf0e",
+      "passed": 5,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/validation/r210/model-attestation-availability.xml",
+      "sha256": "d7d258ccbaad2dd7470b253aa2a697fc27859a5a4faea5b6621b90bcae7dcbd3",
+      "passed": 1,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    }
+  ],
+  "distinct_current": {
+    "passed": 222,
+    "failed": 0,
+    "error": 0,
+    "skipped": 1
+  },
+  "new_cases": 25,
+  "new_passed": 24,
+  "new_skipped": 1,
+  "source_sha256": {
+    "app/ai_model_attestation.py": "0edc6a05021ff9e1e5cefa8a6e972d22ed4e1ece973214f94a4e18d98c01f53f",
+    "app/ai_pull_coordinator.py": "fc09340b037baeddb13effd1ee93e9d7a0cd98f5bafda3c1ac42e420c1c02b50",
+    "app/ai_pull_worker.py": "f512bbcfeafa8fedeae73c5098c15910d33790a856b6990cff1009d8542570cb",
+    "app/ai_metering_agent.py": "43bc8ef7e5aef5eb12f36960b46e8f95e8f83f88e7890bee589a0f414d6ba812",
+    "app/ai_studio_adapter.py": "0397865a47ce1443498833d1e73febc192c3db7b6ba3de4115368b1e089619f8",
+    "tests/test_r210_pull_model_attestation.py": "2284fb1d76b130b663cfdd2e1130791e9bff83504b4921e7a59572ccedf44afe",
+    "tests/test_r210_pull_model_attestation_real.py": "321ab359e67cf87329ad66fbc6ae5a8395c639c2b68ee6fb7abd3460d8008845",
+    "requirements-studio-basic-pitch.txt": "eb40436cbe7f9b0c22d1b5bb53e39e5f26072676ced2300c80da7a56f2cc73ce"
+  },
+  "initial_corrections": "Twelve initial test failures were fixture expectations: actual running/open state names, FenceBlocked exception type, and original claimed worker instance journal. Production guards were not relaxed. Original failure XML retained; ephemeral fixture credentials only redacted.",
+  "redaction": {
+    "path": "model-attestation-initial.xml",
+    "original_sha256": "1064a2dd1aa88ab203d530daf633a265682d09edadf539523a687e2090ae550b",
+    "reason": "Remove generated ephemeral worker credentials from failure trace while retaining failure text/outcomes."
+  },
+  "scope": "Authenticated HTTPS assignment/completion and loss/replay/revocation; immutable admission/rights/result evidence; actual receipt writer PID matches reaped process. Loaded supervisor success uses an explicit process double. Genuine pretrained Basic Pitch execution is an unmet separate prerequisite,not a claimed pass.",
+  "skip": "MTA_STUDIO_PYTHON with installed reviewed Basic Pitch runtime/weights absent;opt-in real test remains skipped.",
+  "security": {
+    "app_files": 289,
+    "findings": 165,
+    "high": 0,
+    "medium": 21,
+    "low": 144,
+    "finding_relocation": "Unchanged metering Popen B603 line98->99 after Measurement.pid field;exact code unchanged.",
+    "transport_sites": 30,
+    "transport_files": 21,
+    "transport_rebind": "Only unchanged ai_pull_worker HTTP call source hash refreshed."
+  },
+  "release_candidate": false,
+  "commercial_remote_enabled": false,
+  "accepted_original_criteria": 23,
+  "total_original_criteria": 42,
+  "minimal_runtime": "Fresh policy-only venv passed with FastAPI0.142.2,qrcode8.2,Pydantic2.12.5;receipt writer passed under python -S with no server modules. Model weights/runtime not installed. See model-attestation-minimal-runtime.json."
+}

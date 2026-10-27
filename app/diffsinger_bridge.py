@@ -29,9 +29,8 @@ def reviewed_lexicon(path, sha256):
     if not path or not sha256:
         raise ValueError('A bank-specific, SHA-256-pinned lexicon is required')
     asset = safe_file(path, sha256)
-    if asset.stat().st_size > 1024 * 1024:
-        raise ValueError('DiffSinger lexicon too large')
-    payload = json.loads(asset.read_text(encoding='utf-8'))
+    from app.ai_model_bytes import verified_model_bytes
+    payload = json.loads(verified_model_bytes(asset,sha256.lower(),max_bytes=1024*1024))
     if not isinstance(payload, dict) or payload.get('schema') != 'mta-diffsinger-lexicon-1':
         raise ValueError('Unrecognized DiffSinger lexicon format')
     language = payload.get('language')
@@ -217,7 +216,8 @@ def run(request_path,output_path):
     # than hashing a vocoder which is not actually selected by the runtime.
     import yaml
     config_path=safe_file(str(experiment_dir/'config.yaml'),os.environ.get('MTA_DIFFSINGER_CONFIG_SHA256',''))
-    config=yaml.safe_load(config_path.read_text())
+    from app.ai_model_bytes import verified_model_bytes
+    config=yaml.safe_load(verified_model_bytes(config_path,os.environ['MTA_DIFFSINGER_CONFIG_SHA256'].lower(),max_bytes=1024**2))
     if not isinstance(config,dict) or config.get('base_config'):
         raise ValueError('Use a flattened OpenVPI experiment config')
     selected_vocoder=Path(config.get('vocoder_ckpt',''))

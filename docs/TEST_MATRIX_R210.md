@@ -1,3 +1,7 @@
+## Current cumulative — 2026-10-26
+
+See validation/r210/executor-boundaries-result.json:194 distinct current affected passes,26 new,zero unresolved failures/errors/skips. Coverage includes explicit native/server boundary,actual async native publication,denied synchronous server upload/model work,token/score/CPU recovery and affected stem/publication/locking fixtures. Earlier347-case active-owner and395-case financial counts overlap and are not added. Full CI40257635101 on9fc85ce is retained baseline evidence (6448 passes/104 prerequisite skips/75.84%);no full current-source CI claim or target hardware/provider acceptance. Current raw Bandit286 files/165 unsuppressed reviewed findings(0 HIGH/21 MEDIUM/144 LOW);transport30 sites/21 files. Original fixture failures and resolution reports are retained. Current cumulative manifest/preservation records include restored historical logs without rerunning their tests.
+
 > Chromium follow-up: manual workflow **Optional merchant history Chromium**, input **merchant_history_chromium=true**;requires4 real passes/zero skips. See current handoff for exact dispatch/artifact procedure. No GitHub write or CI run was performed here.
 
 ## Current checkpoint — merchant-wide observations — 2026-10-25

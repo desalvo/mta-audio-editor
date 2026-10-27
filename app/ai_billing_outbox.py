@@ -23,7 +23,8 @@ from . import platform_file_lock as fcntl
 def _db():
     queue._ROOT.mkdir(parents=True, exist_ok=True, mode=0o700)
     path = queue._ROOT / 'billing-outbox.sqlite3'
-    con = sqlite3.connect(path, isolation_level=None, timeout=30)
+    from .regime_service_lease import connect
+    con = connect(path, isolation_level=None, timeout=30)
     con.row_factory = sqlite3.Row
     con.execute('PRAGMA journal_mode=WAL')
     con.execute('PRAGMA busy_timeout=30000')
