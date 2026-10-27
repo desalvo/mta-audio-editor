@@ -1,0 +1,96 @@
+{
+  "date": "2026-10-27",
+  "status": "PRE-RC",
+  "confirmed_commit": "b8fed59b6caaf4b9a0a719e12257628ceb717751",
+  "ci_run": 40432353021,
+  "ci_quality_job": 121952833392,
+  "ci_sast_job": 121952833172,
+  "observed_ci": {
+    "quality": {
+      "passed": 6390,
+      "failed": 1,
+      "skipped": 46,
+      "coverage_percent": 76.01,
+      "seconds": 742.52
+    },
+    "sast": {
+      "failure": "Gitleaks four public source-hash false positives",
+      "later_audits_not_certified": true
+    }
+  },
+  "local": {
+    "tests_passed": 42,
+    "tests_failed": 0,
+    "tests_skipped": 0,
+    "new_negative_tests": 2,
+    "ruff": "passed",
+    "compilation": "passed",
+    "gitleaks_version": "8.24.3",
+    "commit_scan": {
+      "commit": "b8fed59b6caaf4b9a0a719e12257628ceb717751",
+      "commits": 1,
+      "bytes": 4511917,
+      "findings": 0,
+      "uses_corrected_config": true
+    },
+    "negative_controls": "Two unrelated synthetic credentials still detected;old config reproduces four original findings",
+    "new_delta_scan": {
+      "method": "Real Gitleaks8.24.3 stdin scan of complete textual delta against exact previous cumulative",
+      "findings": 0,
+      "paths": [
+        ".gitleaks.toml",
+        "docs/CI_REPAIR_B8FED59_R210.md",
+        "docs/COMMIT_MESSAGE_R210_CUMULATIVE.txt",
+        "docs/CUMULATIVE_HANDOFF_R210.md",
+        "docs/DEVELOPMENT_COMPONENTS_R210.json",
+        "docs/DEVELOPMENT_HANDOFF_R210.md",
+        "docs/DEVELOPMENT_STATUS.md",
+        "docs/RC_FINAL_WORK_QUEUE_R210.md",
+        "docs/validation/r210/ci-b8fed59-gitleaks-commit.json",
+        "docs/validation/r210/ci-b8fed59-gitleaks-controls.json",
+        "docs/validation/r210/ci-b8fed59-policy-regression.xml",
+        "docs/validation/r210/ci-b8fed59-result.json",
+        "tests/test_r207_gateway_adapter_coverage.py"
+      ]
+    }
+  },
+  "unchanged_acceptance": {
+    "accepted": 23,
+    "total": 42,
+    "macroareas_accepted": 0,
+    "macroareas_total": 7,
+    "rc": false
+  },
+  "not_repeated": [
+    "6390 previously green CI tests",
+    "58 unchanged export tests",
+    "full CI",
+    "browser acceptance"
+  ],
+  "changed_production_python": false,
+  "remote_mutation": false,
+  "new_commit_created": false,
+  "next_action": "User commits repair;run standard CI on new SHA;separate manual admin cutover Chromium remains pending",
+  "evidence": {
+    "docs/validation/r210/ci-b8fed59-policy-regression.xml": {
+      "sha256": "c8a2094b6e34cefa13a91e6b9b220f9bc9e45f02a05df723de11343cbb3a231f",
+      "bytes": 6235
+    },
+    "docs/validation/r210/ci-b8fed59-gitleaks-controls.json": {
+      "sha256": "2aeeed0343e01b31685ae49e9213dbdde8e40341c4540f3db9def3d9503c276e",
+      "bytes": 526
+    },
+    "docs/validation/r210/ci-b8fed59-gitleaks-commit.json": {
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    ".gitleaks.toml": {
+      "sha256": "1d4dee46a9e2caa3187f47d56848dca36dbd6b0ac5e0795cd4d3bb8613b6dee2",
+      "bytes": 765
+    },
+    "tests/test_r207_gateway_adapter_coverage.py": {
+      "sha256": "6c0c92eec62a09d45fe1d3bdd3f4cd6c5f5c5ffda34637622084405101e4351c",
+      "bytes": 12445
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "gitleaks": "8.24.3",
+  "scope": "Exact four CI lines via real scanner stdin; synthetic negative controls",
+  "cases": [
+    {
+      "case": "old",
+      "exit_code": 1,
+      "findings": 4
+    },
+    {
+      "case": "corrected",
+      "exit_code": 0,
+      "findings": 0
+    },
+    {
+      "case": "synthetic-hex",
+      "exit_code": 1,
+      "findings": 1,
+      "secrets_redacted": true
+    },
+    {
+      "case": "synthetic-token",
+      "exit_code": 1,
+      "findings": 1,
+      "secrets_redacted": true
+    }
+  ]
+}

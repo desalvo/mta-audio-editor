@@ -229,11 +229,33 @@ def test_backing_vocals_artifact_security(tmp_path, monkeypatch):
 
 
 def test_unified_cli_main(tmp_path, monkeypatch):
+    from app import ai_execution_policy as binding, model_license_policy as rights
+    monkeypatch.setenv('MTA_DATA_DIR', str(tmp_path/'data'))
     source, output = _staged(tmp_path)
     request = tmp_path/'request.json'
-    request.write_text(json.dumps({'kind': 'whisper', 'source_audio': source}))
+    plan = {'kind': 'whisper', 'source_audio': source}
+    request.write_text(json.dumps(plan))
+    monkeypatch.setenv(binding.KEY, binding.admitted_env('whisper', rights.evaluate('whisper', plan))[binding.KEY])
     seen = []
     monkeypatch.setattr(unified, 'infer', lambda plan, out: seen.append((plan, out)))
     monkeypatch.setattr(sys, 'argv', ['worker', '--request', str(request), '--output', str(output)])
     unified.main()
-    assert seen[0][1] == output
+    assert seen == [(plan, output)]
+
+
+@pytest.mark.parametrize('admission', ['missing', 'wrong-kind'])
+def test_unified_cli_requires_original_admission(tmp_path, monkeypatch, admission):
+    from app import ai_execution_policy as binding, model_license_policy as rights
+    monkeypatch.setenv('MTA_DATA_DIR', str(tmp_path/'data'))
+    source, output = _staged(tmp_path)
+    request = tmp_path/'request.json'
+    request.write_text(json.dumps({'kind': 'whisper', 'source_audio': source}))
+    monkeypatch.delenv(binding.KEY, raising=False)
+    if admission == 'wrong-kind':
+        monkeypatch.setenv(binding.KEY, binding.admitted_env('vocal-harmony', rights.evaluate('vocal-harmony', {}))[binding.KEY])
+    seen = []
+    monkeypatch.setattr(unified, 'infer', lambda *args: seen.append(args))
+    monkeypatch.setattr(sys, 'argv', ['worker', '--request', str(request), '--output', str(output)])
+    with pytest.raises(ValueError, match='Original admitted worker'):
+        unified.main()
+    assert seen == [] and not output.exists()

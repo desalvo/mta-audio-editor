@@ -1,7 +1,7 @@
 {
   "version": "0.3.0-r210",
   "status": "PRE-RC",
-  "base_commit": "9fc85ce79bee9871696dea9396565395a415aa72",
+  "base_commit": "b8fed59b6caaf4b9a0a719e12257628ceb717751",
   "excluded_self": "docs/validation/r210/work-source-manifest.json",
   "files": [
     {
@@ -108,8 +108,8 @@
     },
     {
       "path": ".gitleaks.toml",
-      "bytes": 374,
-      "sha256": "784c9fec6e6ea8c2deedce4742dcb5f8128ca346b67983416ca864d59cd78b98",
+      "bytes": 765,
+      "sha256": "1d4dee46a9e2caa3187f47d56848dca36dbd6b0ac5e0795cd4d3bb8613b6dee2",
       "mode": "0o644"
     },
     {
@@ -4529,6 +4529,12 @@
       "mode": "0o644"
     },
     {
+      "path": "docs/CI_REPAIR_B8FED59_R210.md",
+      "bytes": 3197,
+      "sha256": "68f384ed371b01d9ed5207b4d1cbfbd130789317378598771392db2e122e17ee",
+      "mode": "0o644"
+    },
+    {
       "path": "docs/CI_SDK_MIDI_PROGRESS_R210.md",
       "bytes": 5103,
       "sha256": "cf4b5bf2841ee8604c8105c198507f4f6d0fd629f4d2601f950f6657f480d6cf",
@@ -4554,8 +4560,8 @@
     },
     {
       "path": "docs/COMMIT_MESSAGE_R210_CUMULATIVE.txt",
-      "bytes": 101,
-      "sha256": "e497852efba0cd9b089cdc9fa8ec251c81f87c4f532f0c47d78df282000d04e9",
+      "bytes": 87,
+      "sha256": "0f63e7c5f3749fc08473e485471aed916308cb0dfddbf49ac7d5d6983f9df2ed",
       "mode": "0o644"
     },
     {
@@ -4602,8 +4608,8 @@
     },
     {
       "path": "docs/CUMULATIVE_HANDOFF_R210.md",
-      "bytes": 16593,
-      "sha256": "4ea01093728a4e2ef721806f6460590e5f2abe389cba37d3c5e3d50e52c65713",
+      "bytes": 18071,
+      "sha256": "04fbd40924a1289d2b844eacfcc911bda14e887232819de5c523c75874c45a2d",
       "mode": "0o644"
     },
     {
@@ -4620,20 +4626,20 @@
     },
     {
       "path": "docs/DEVELOPMENT_COMPONENTS_R210.json",
-      "bytes": 47697,
-      "sha256": "8a6aee93e244ed9596f1fe204de92d4359c4ba27287450409b90e7031e13cc58",
+      "bytes": 48102,
+      "sha256": "83a4cc48b347a613f6ec0ff29640ab3d6a13beada16e34c88aec4ea0163202dd",
       "mode": "0o644"
     },
     {
       "path": "docs/DEVELOPMENT_HANDOFF_R210.md",
-      "bytes": 46464,
-      "sha256": "d84a77253354b9813dfdd83a636a27068af32479424163a2241725d8cec04ba2",
+      "bytes": 47942,
+      "sha256": "ee9f75bc037588ff9a6b9b63560116ec2b5d04bda327fd125c296a612872744c",
       "mode": "0o644"
     },
     {
       "path": "docs/DEVELOPMENT_STATUS.md",
-      "bytes": 309603,
-      "sha256": "b2d964a537291b05b97d0936bd26aeaf8276b6cba675c1acb01a437a059ed938",
+      "bytes": 311081,
+      "sha256": "28f0b6ea2d95f9fe4e888e5fc09d719cf30450a289525887efe3f83968081486",
       "mode": "0o644"
     },
     {
@@ -5778,8 +5784,8 @@
     },
     {
       "path": "docs/RC_FINAL_WORK_QUEUE_R210.md",
-      "bytes": 11672,
-      "sha256": "fbb152c363133131430ec294197b8d2e7811b46ee2dd0f99a83bdea8eb24ebc2",
+      "bytes": 13150,
+      "sha256": "93bf0b5c0ca1135fac798520df997af90787c3865222b374904a6fdec4476ef2",
       "mode": "0o644"
     },
     {
@@ -9338,6 +9344,30 @@
       "path": "docs/validation/r210/cgroup-journal-summary.json",
       "bytes": 60479,
       "sha256": "4a6bf863a8780207ac6684225f145807ec35912f0feb89aff36eb56ff607edb0",
+      "mode": "0o644"
+    },
+    {
+      "path": "docs/validation/r210/ci-b8fed59-gitleaks-commit.json",
+      "bytes": 3,
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "mode": "0o644"
+    },
+    {
+      "path": "docs/validation/r210/ci-b8fed59-gitleaks-controls.json",
+      "bytes": 526,
+      "sha256": "2aeeed0343e01b31685ae49e9213dbdde8e40341c4540f3db9def3d9503c276e",
+      "mode": "0o644"
+    },
+    {
+      "path": "docs/validation/r210/ci-b8fed59-policy-regression.xml",
+      "bytes": 6235,
+      "sha256": "c8a2094b6e34cefa13a91e6b9b220f9bc9e45f02a05df723de11343cbb3a231f",
+      "mode": "0o644"
+    },
+    {
+      "path": "docs/validation/r210/ci-b8fed59-result.json",
+      "bytes": 3180,
+      "sha256": "efc61c2242d012a94919404ee53d818b4f386fbb433fed6a56af14f5915c4267",
       "mode": "0o644"
     },
     {
@@ -15474,8 +15504,8 @@
     },
     {
       "path": "tests/test_r207_gateway_adapter_coverage.py",
-      "bytes": 11169,
-      "sha256": "4c687e1e3fae0397d518cb046d5da866f5c3598b930ae1bf782e1abdcf8a9ce0",
+      "bytes": 12445,
+      "sha256": "6c0c92eec62a09d45fe1d3bdd3f4cd6c5f5c5ffda34637622084405101e4351c",
       "mode": "0o644"
     },
     {

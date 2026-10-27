@@ -2,7 +2,7 @@
   "schema_version": 2,
   "project": "MTA Audio Editor",
   "release": "0.3.0-r210",
-  "updated_utc": "2026-10-26",
+  "updated_utc": "2026-10-27",
   "baseline_archive": "MTA-r210-provider-authenticated-journal-handoff-cumulative.zip",
   "baseline_sha256": "603c5a5e650178b912605d4203154ea310b2f387e35c9c4c9e719ee30c1d1817",
   "git_baseline": {
@@ -849,5 +849,13 @@
     },
     "not_a_full_product_percentage": true,
     "delivery": "Complete cumulative archive at each substantial checkpoint when possible,not only a patch;no ZIP per helper. Commit remains deferred."
+  },
+  "latest_confirmed_commit": "b8fed59b6caaf4b9a0a719e12257628ceb717751",
+  "latest_continuation": {
+    "summary": "CI repair: real original-admission CLI test and exact public-source hash Gitleaks exclusions",
+    "archive": "MTA-0.3.0-r210-pre-RC-ci-repair-cumulative.zip",
+    "result": "docs/validation/r210/ci-b8fed59-result.json",
+    "commit_deferred": true,
+    "rc_criteria_unchanged": true
   }
 }

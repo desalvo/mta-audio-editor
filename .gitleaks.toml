@@ -2,9 +2,14 @@
 useDefault = true
 
 [allowlist]
-description = "Public SHA-256 fingerprint of the reverse-engineered MTA XOR transport table"
+description = "Exact public SHA-256 fingerprints of MTA transport and reviewed source files"
 # Global allowlist syntax supported by the CI-pinned Gitleaks 8.24.3.
 # Default regexTarget is the extracted secret; allow only this exact public hash.
 regexes = [
-  """^bcb30443707bdc8b651c1a58aa4152438ce5a6632cc98b294501eb08adbb3547$"""
+  """^bcb30443707bdc8b651c1a58aa4152438ce5a6632cc98b294501eb08adbb3547$""",
+  # app/auth.py before/after export contention hotfix; public source integrity.
+  """^d62a2a29be4a4e6a8a870624c49dec3b64b17e9db0ab001b95a08aee20868e97$""",
+  """^b65363439c52c5892b97c134dcc8b325765645ec447ceb6d555b3c5330de9fae$""",
+  # tests/test_r210_export_auth_contention.py; public regression source integrity.
+  """^86e8a6c4353f8ac2e358a6ca04302ea6e5ada3257c3134f09b77b6ffce3dc9a7$"""
 ]
