@@ -1,7 +1,7 @@
 {
   "version": "0.3.0-r210",
   "status": "PRE-RC",
-  "base_commit": "772fbe7508cc08266466a3746bb51f0fe5d0179b",
+  "base_commit": "5891082820d3d69bd8bd3ea0be06117d5639c135",
   "excluded_self": "docs/validation/r210/work-source-manifest.json",
   "files": [
     {
@@ -4577,6 +4577,18 @@
       "mode": "0o644"
     },
     {
+      "path": "docs/CI_STRIPE_REFUND_FIX_5891082.md",
+      "bytes": 6869,
+      "sha256": "cde175148c4eb770b0b58ca3c0fa5d3619232a4e713b7ca8491e93c5b61a334a",
+      "mode": "0o644"
+    },
+    {
+      "path": "docs/CI_STRIPE_REFUND_FIX_5891082.patch",
+      "bytes": 4820,
+      "sha256": "33ad28121616e32b14c6939207d22379f4401c0d9e5d7d45630b207a04609350",
+      "mode": "0o644"
+    },
+    {
       "path": "docs/CI_TIMEOUT_R208_IT.md",
       "bytes": 638,
       "sha256": "848041ba6566897f033ad19dde8bd704a48193a521beef42978f36d1a06f94d9",
@@ -4584,8 +4596,8 @@
     },
     {
       "path": "docs/COMMIT_MESSAGE_R210.txt",
-      "bytes": 112,
-      "sha256": "d508bd72f72854841d51fc0dd0bb1ef13270aaf7fec42f7e23e49defd210a702",
+      "bytes": 59,
+      "sha256": "c0e14e20e0d9c177474b73cab8c4e58ed4bc75f7f7242ba6827d721259ff64ed",
       "mode": "0o644"
     },
     {
@@ -4614,8 +4626,8 @@
     },
     {
       "path": "docs/CONTINUATION_HANDOFF_R210.md",
-      "bytes": 25587,
-      "sha256": "1fa7b96b5b2088d12e7ec39b5fd7b9604ecdfbd7337c208054b3fd2c7ab8bd61",
+      "bytes": 27196,
+      "sha256": "c27bcb1cda314f4b8c3ccfe53111ed6500822170492020b8bc17ab8047ead914",
       "mode": "0o644"
     },
     {
@@ -4644,8 +4656,8 @@
     },
     {
       "path": "docs/CUMULATIVE_HANDOFF_R210.md",
-      "bytes": 30961,
-      "sha256": "90a6e95f7dc2bcb730148d303fc25bc2d7adc00506aa1edbb111ca7d9c2466d9",
+      "bytes": 32570,
+      "sha256": "3d389eccbf54b1e6247eb6506dc75f316a42eecbbef0d9f7d5fcf125edb1a8e0",
       "mode": "0o644"
     },
     {
@@ -4662,20 +4674,20 @@
     },
     {
       "path": "docs/DEVELOPMENT_COMPONENTS_R210.json",
-      "bytes": 52911,
-      "sha256": "a93d9c421ae6e93c40d3a7b01c05b6334a5595f8cbb653aaf5a59c7a97cb4d00",
+      "bytes": 53514,
+      "sha256": "067d7cfc6807aac19e54e2d531ceaadf738869ae09c0affbf7d75c3fed410528",
       "mode": "0o644"
     },
     {
       "path": "docs/DEVELOPMENT_HANDOFF_R210.md",
-      "bytes": 60202,
-      "sha256": "6df0b8106fb15d0c61aa66a01c04fa4472dcc8a3432fe0fef404e81594bcac93",
+      "bytes": 61811,
+      "sha256": "ff3190ed5c9afb85eeff3ac5b2f23ee57c895803b018b43cff216f280d20c7e8",
       "mode": "0o644"
     },
     {
       "path": "docs/DEVELOPMENT_STATUS.md",
-      "bytes": 323341,
-      "sha256": "a812251f3b47f99b5d3eb456e635bf8e27c80222b00eb0b8d6a9e1ff290b8351",
+      "bytes": 324950,
+      "sha256": "58cca9ef0cafb9c45df2717641534cede60aedc0fdc63a6fc56c69aca3034beb",
       "mode": "0o644"
     },
     {
@@ -9443,6 +9455,54 @@
       "mode": "0o644"
     },
     {
+      "path": "docs/validation/r210/ci-5891082-gitleaks.json",
+      "bytes": 3,
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "mode": "0o644"
+    },
+    {
+      "path": "docs/validation/r210/ci-5891082-observation.json",
+      "bytes": 19256,
+      "sha256": "f46b0c870e97c01fb5244efe7ef06ae9513a34e08f29864469864fda905e24ff",
+      "mode": "0o644"
+    },
+    {
+      "path": "docs/validation/r210/ci-5891082-refunds-backend.xml",
+      "bytes": 13811,
+      "sha256": "773a81b6d4bd8bd8a1b153daa71e7d5442213a62671cb6651650f6104a393669",
+      "mode": "0o644"
+    },
+    {
+      "path": "docs/validation/r210/ci-5891082-refunds-browser-history.xml",
+      "bytes": 12168,
+      "sha256": "980d2dfc18a26d4deef6ebbd9e69f922d4f3021da575190d75e6b1404d3c938a",
+      "mode": "0o644"
+    },
+    {
+      "path": "docs/validation/r210/ci-5891082-refunds-contract.xml",
+      "bytes": 3215,
+      "sha256": "00f7777245b36df722bfdeaf675b54af14a51c3511a1eabb60293156ca20c973",
+      "mode": "0o644"
+    },
+    {
+      "path": "docs/validation/r210/ci-5891082-refunds-first.xml",
+      "bytes": 335705,
+      "sha256": "425a1447f5d699eb38f34f3f5b7cc2014398dbc8c27844d9e0078b83a5fc8915",
+      "mode": "0o644"
+    },
+    {
+      "path": "docs/validation/r210/ci-5891082-refunds-repro.xml",
+      "bytes": 2628,
+      "sha256": "5e79ab4a78b01dd0a40054deff8a4bab00879784f2807e830b34f7622ebb9884",
+      "mode": "0o644"
+    },
+    {
+      "path": "docs/validation/r210/ci-5891082-result.json",
+      "bytes": 44394,
+      "sha256": "b0b14c00ef3178c0fa169ee7911c555739351f1426811b70de822f98adec2297",
+      "mode": "0o644"
+    },
+    {
       "path": "docs/validation/r210/ci-b8fed59-gitleaks-commit.json",
       "bytes": 3,
       "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
@@ -11100,8 +11160,8 @@
     },
     {
       "path": "docs/validation/r210/release-decision-current.json",
-      "bytes": 4728,
-      "sha256": "6f89f02a53150ae989d09d0b9687d93d11f7bbf331231716a7bcd21421207331",
+      "bytes": 5041,
+      "sha256": "c03d610bb8aed5642443371428257aa859d54aa924c6e36aab6bacda192fa5b9",
       "mode": "0o644"
     },
     {
@@ -18456,8 +18516,8 @@
     },
     {
       "path": "tests/test_r210_operator_refunds.py",
-      "bytes": 17056,
-      "sha256": "9a9aaef17ec9c2a9221fac0f7eea92acf2f7689c01a9759e95e7fa56790e0b60",
+      "bytes": 18734,
+      "sha256": "5332bfeffc81ff047484d72eef9b238e5040ce8751bfe735b1c1d2c9d8f792f5",
       "mode": "0o644"
     },
     {

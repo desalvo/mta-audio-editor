@@ -1,1 +1,1 @@
-Complete service admission draining and harden Stripe, transition recovery, legacy execution and export polling
+Fix Stripe refund test fixtures for canonical paid history

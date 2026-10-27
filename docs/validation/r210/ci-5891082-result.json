@@ -1,0 +1,1050 @@
+{
+  "date": "2026-10-27",
+  "committed_baseline": "5891082820d3d69bd8bd3ea0be06117d5639c135",
+  "run_id": 40550957081,
+  "quality_job_id": 122354241894,
+  "ci_original_failure": "60 failures from a shared incomplete Stripe refund transport fixture;not a coverage/SAST failure",
+  "source_change": "Only tests/test_r210_operator_refunds.py;no production,workflow,dependency,scanner or threshold change",
+  "fix": [
+    "Canonical session payment mode and explicit test livemode",
+    "Settled intent amount_capturable and original successful charge ancestry",
+    "Complete captured/refunded/disputed/balance-transaction evidence",
+    "Charge-filtered/paged GET history with exact query and limit100;refund totals drive full-refund flag",
+    "Nine real refund-prepare refusals for wrong/missing/nonboolean environment at session/intent/charge;no provider POST,journal creation or wallet movement"
+  ],
+  "production_python_files_byte_identical": 299,
+  "original_ci_failures_covered": 60,
+  "missing_ci_failure_identities": [],
+  "distinct_latest": {
+    "passed": 156,
+    "failed": 0,
+    "error": 0,
+    "skipped": 0
+  },
+  "new_negative_cases": 9,
+  "actual_chromium_cases": 14,
+  "browser_runtime": "Playwright1.51.0;actual Chromium134.0.6998.35 build1161,matching the CI-pinned runner",
+  "reports": [
+    {
+      "path": "docs/validation/r210/ci-5891082-refunds-repro.xml",
+      "sha256": "5e79ab4a78b01dd0a40054deff8a4bab00879784f2807e830b34f7622ebb9884",
+      "collected": 1,
+      "passed": 0,
+      "failed": 1,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/validation/r210/ci-5891082-refunds-first.xml",
+      "sha256": "425a1447f5d699eb38f34f3f5b7cc2014398dbc8c27844d9e0078b83a5fc8915",
+      "collected": 81,
+      "passed": 29,
+      "failed": 52,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/validation/r210/ci-5891082-refunds-contract.xml",
+      "sha256": "00f7777245b36df722bfdeaf675b54af14a51c3511a1eabb60293156ca20c973",
+      "collected": 19,
+      "passed": 19,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/validation/r210/ci-5891082-refunds-backend.xml",
+      "sha256": "773a81b6d4bd8bd8a1b153daa71e7d5442213a62671cb6651650f6104a393669",
+      "collected": 90,
+      "passed": 89,
+      "failed": 1,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/validation/r210/ci-5891082-refunds-browser-history.xml",
+      "sha256": "980d2dfc18a26d4deef6ebbd9e69f922d4f3021da575190d75e6b1404d3c938a",
+      "collected": 75,
+      "passed": 75,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    }
+  ],
+  "cases": [
+    {
+      "module": "tests.test_r210_account_refund_acceptance",
+      "case": "test_actual_account_refund_amount_wallet_privacy_outage_and_nc_history[1280-en]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_account_refund_acceptance",
+      "case": "test_actual_account_refund_amount_wallet_privacy_outage_and_nc_history[1280-it]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_account_refund_acceptance",
+      "case": "test_actual_account_refund_amount_wallet_privacy_outage_and_nc_history[390-en]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_account_refund_acceptance",
+      "case": "test_actual_account_refund_amount_wallet_privacy_outage_and_nc_history[390-it]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_actual_stripe_two_step_full_or_partial_funds_and_durable_fence",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_bad_inputs_never_dispatch[amount_cents--1]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_bad_inputs_never_dispatch[amount_cents-0]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_bad_inputs_never_dispatch[amount_cents-1.2]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_bad_inputs_never_dispatch[amount_cents-1000000001]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_bad_inputs_never_dispatch[amount_cents-True]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_bad_inputs_never_dispatch[order_id-../x]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_bad_inputs_never_dispatch[provider-other]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_bad_inputs_never_dispatch[reason-bad\\nreason]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_bad_inputs_never_dispatch[reason-x]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_bad_inputs_never_dispatch[request_id-tiny]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_bad_inputs_never_dispatch[target-None]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_cancel_only_prepared_and_conflicting_idempotency_rejected",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_concurrent_preparations_reserve_once_and_concurrent_execution_sends_once",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_exact_revision_required_before_action[cancel--1]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_exact_revision_required_before_action[cancel-0]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_exact_revision_required_before_action[cancel-1.2]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_exact_revision_required_before_action[cancel-None]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_exact_revision_required_before_action[cancel-True]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_exact_revision_required_before_action[execute--1]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_exact_revision_required_before_action[execute-0]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_exact_revision_required_before_action[execute-1.2]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_exact_revision_required_before_action[execute-None]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_exact_revision_required_before_action[execute-True]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_exact_revision_required_before_action[verify--1]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_exact_revision_required_before_action[verify-0]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_exact_revision_required_before_action[verify-1.2]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_exact_revision_required_before_action[verify-None]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_exact_revision_required_before_action[verify-True]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_get_unavailable_after_post_does_not_repost_or_settle",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_invalid_preparation_cannot_reserve_or_send[drain]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_invalid_preparation_cannot_reserve_or_send[extra]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_invalid_preparation_cannot_reserve_or_send[nonadmin]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_invalid_preparation_cannot_reserve_or_send[overamount]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_invalid_preparation_cannot_reserve_or_send[unknownorder]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_invalid_preparation_cannot_reserve_or_send[wrongtarget]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_owner_history_privacy_and_admin_reason_not_disclosed",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_paypal_canonical_refund_moves_real_wallet_once[200]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_paypal_canonical_refund_moves_real_wallet_once[500]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_paypal_timeout_then_get_only_recovery",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_paypal_wrong_receipt_or_merchant_never_closes[amount]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_paypal_wrong_receipt_or_merchant_never_closes[capture]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_paypal_wrong_receipt_or_merchant_never_closes[currency]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_paypal_wrong_receipt_or_merchant_never_closes[custom_id]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_paypal_wrong_receipt_or_merchant_never_closes[merchant]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_paypal_wrong_receipt_or_merchant_never_closes[status]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_pending_and_failed_refunds_need_authenticated_terminal_outcome[canceled]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_pending_and_failed_refunds_need_authenticated_terminal_outcome[failed]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_pending_and_failed_refunds_need_authenticated_terminal_outcome[pending]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_pending_and_failed_refunds_need_authenticated_terminal_outcome[requires_action]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_post_error_stays_uncertain_and_get_failure_stays_pending",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_quote_balance_and_merchant_changes_prevent_dispatch",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_readiness_detects_inconsistent_refund_journal[event]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_readiness_detects_inconsistent_refund_journal[fence]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_readiness_detects_inconsistent_refund_journal[state]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_refund_prepare_rejects_wrong_missing_or_nonboolean_stripe_environment[0-charge]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_refund_prepare_rejects_wrong_missing_or_nonboolean_stripe_environment[0-intent]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_refund_prepare_rejects_wrong_missing_or_nonboolean_stripe_environment[0-session]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_refund_prepare_rejects_wrong_missing_or_nonboolean_stripe_environment[None-charge]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_refund_prepare_rejects_wrong_missing_or_nonboolean_stripe_environment[None-intent]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_refund_prepare_rejects_wrong_missing_or_nonboolean_stripe_environment[None-session]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_refund_prepare_rejects_wrong_missing_or_nonboolean_stripe_environment[True-charge]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_refund_prepare_rejects_wrong_missing_or_nonboolean_stripe_environment[True-intent]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_refund_prepare_rejects_wrong_missing_or_nonboolean_stripe_environment[True-session]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_timeout_and_process_restart_recover_by_exact_get_without_repost",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_unrelated_or_malformed_provider_receipt_keeps_operation_open[amount]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_unrelated_or_malformed_provider_receipt_keeps_operation_open[currency]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_unrelated_or_malformed_provider_receipt_keeps_operation_open[id]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_unrelated_or_malformed_provider_receipt_keeps_operation_open[intent]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_unrelated_or_malformed_provider_receipt_keeps_operation_open[metadata]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_unrelated_or_malformed_provider_receipt_keeps_operation_open[object]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds",
+      "case": "test_unrelated_or_malformed_provider_receipt_keeps_operation_open[status]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds_recovery",
+      "case": "test_corrupt_journal_cannot_dispatch_or_clear_drain[context]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds_recovery",
+      "case": "test_corrupt_journal_cannot_dispatch_or_clear_drain[receipt]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds_recovery",
+      "case": "test_corrupt_journal_cannot_dispatch_or_clear_drain[revision]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds_recovery",
+      "case": "test_corrupt_journal_cannot_dispatch_or_clear_drain[schema]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds_recovery",
+      "case": "test_external_balance_change_invalidates_prepared_quote",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds_recovery",
+      "case": "test_multicapture_history_remaining_capture_refund",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds_recovery",
+      "case": "test_operator_refund_actually_clears_surplus_repayment_liability",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds_recovery",
+      "case": "test_original_payment_drift_is_rejected_before_provider_read_or_write[amount_cents-600]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds_recovery",
+      "case": "test_original_payment_drift_is_rejected_before_provider_read_or_write[session_id-cs_other]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds_recovery",
+      "case": "test_original_payment_drift_is_rejected_before_provider_read_or_write[user_id-1]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds_recovery",
+      "case": "test_paypal_subscription_and_repayment_refunds_preserve_exact_receivable[subscription]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds_recovery",
+      "case": "test_paypal_subscription_and_repayment_refunds_preserve_exact_receivable[subscription_reversal]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds_recovery",
+      "case": "test_pending_paypal_needs_completed_receipt_and_canonical_capture",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds_recovery",
+      "case": "test_real_child_exit_after_committed_uncertainty_is_recovered_without_reexecution",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds_recovery",
+      "case": "test_reason_bound_includes_whitespace_and_rejects_before_provider_io",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds_recovery",
+      "case": "test_refund_identity_audit_and_deletion_require_retired_owner_authorization",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds_recovery",
+      "case": "test_role_revoked_during_readback_prevents_dispatch",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds_recovery",
+      "case": "test_wallet_commit_failure_keeps_refund_pending_then_reconciles_once",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-backend.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds_ui",
+      "case": "test_admin_prepare_confirm_execute_cancel_and_private_owner_view[1280-en-paypal_env]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds_ui",
+      "case": "test_admin_prepare_confirm_execute_cancel_and_private_owner_view[1280-en-stripe_env]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds_ui",
+      "case": "test_admin_prepare_confirm_execute_cancel_and_private_owner_view[1280-it-paypal_env]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds_ui",
+      "case": "test_admin_prepare_confirm_execute_cancel_and_private_owner_view[1280-it-stripe_env]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds_ui",
+      "case": "test_admin_prepare_confirm_execute_cancel_and_private_owner_view[390-en-paypal_env]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds_ui",
+      "case": "test_admin_prepare_confirm_execute_cancel_and_private_owner_view[390-en-stripe_env]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds_ui",
+      "case": "test_admin_prepare_confirm_execute_cancel_and_private_owner_view[390-it-paypal_env]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds_ui",
+      "case": "test_admin_prepare_confirm_execute_cancel_and_private_owner_view[390-it-stripe_env]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds_ui",
+      "case": "test_all_actual_owner_admin_templates_load_the_shared_refund_ui",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds_ui",
+      "case": "test_auth_csrf_exact_shapes_private_pagination_and_unknown_action",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds_ui",
+      "case": "test_uncertain_browser_only_recovers_existing_reference[en]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_operator_refunds_ui",
+      "case": "test_uncertain_browser_only_recovers_existing_reference[it]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_actual_confirmed_api_refuses_unstable_then_recovers_original_payment[admin]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_actual_confirmed_api_refuses_unstable_then_recovers_original_payment[owner]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_changed_or_missing_provider_history_is_atomic[detail_conflict]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_changed_or_missing_provider_history_is_atomic[duplicate_attempt]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_changed_or_missing_provider_history_is_atomic[empty_disputed]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_changed_or_missing_provider_history_is_atomic[extra_success]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_changed_or_missing_provider_history_is_atomic[late_webhook]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_changed_or_missing_provider_history_is_atomic[missing_field]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_changed_or_missing_provider_history_is_atomic[missing_success]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_changed_or_missing_provider_history_is_atomic[refund_missing]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_changed_or_missing_provider_history_is_atomic[second_pass]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_changed_or_missing_provider_history_is_atomic[timeout]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_contradictory_ancestry_never_changes_financial_records[charge-amount_captured-499]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_contradictory_ancestry_never_changes_financial_records[charge-balance_transaction-None]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_contradictory_ancestry_never_changes_financial_records[charge-disputed-True]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_contradictory_ancestry_never_changes_financial_records[charge-failure_balance_transaction-txn_failure]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_contradictory_ancestry_never_changes_financial_records[charge-livemode-True]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_contradictory_ancestry_never_changes_financial_records[charge-paid-1]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_contradictory_ancestry_never_changes_financial_records[charge-refunded-True]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_contradictory_ancestry_never_changes_financial_records[intent-amount_capturable-1]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_contradictory_ancestry_never_changes_financial_records[intent-amount_received-True]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_contradictory_ancestry_never_changes_financial_records[intent-latest_charge-ch_missing]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_contradictory_ancestry_never_changes_financial_records[intent-livemode-True]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_contradictory_ancestry_never_changes_financial_records[prior-amount_captured-1]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_contradictory_ancestry_never_changes_financial_records[prior-failure_balance_transaction-txn_failure]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_contradictory_ancestry_never_changes_financial_records[prior-paid-True]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_contradictory_ancestry_never_changes_financial_records[prior-payment_intent-pi_other]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_contradictory_ancestry_never_changes_financial_records[prior-status-pending]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_contradictory_ancestry_never_changes_financial_records[refund-amount-True]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_contradictory_ancestry_never_changes_financial_records[refund-payment_intent-pi_other]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_contradictory_ancestry_never_changes_financial_records[refund-status-pending]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_contradictory_ancestry_never_changes_financial_records[session-amount_total-500.0]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_contradictory_ancestry_never_changes_financial_records[session-livemode-True]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_contradictory_ancestry_never_changes_financial_records[session-payment_intent-ch_wrong]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_empty_canceled_intent_requires_stable_readback_and_journal[appearing_charge]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_empty_canceled_intent_requires_stable_readback_and_journal[changed_intent]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_empty_canceled_intent_requires_stable_readback_and_journal[environment]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_empty_canceled_intent_requires_stable_readback_and_journal[webhook]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_entire_readback_budget_stops_before_any_ledger_write[deadline]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_entire_readback_budget_stops_before_any_ledger_write[requests]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_exact_refund_and_dispute_preserve_actual_wallet[lost-2000000]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_exact_refund_and_dispute_preserve_actual_wallet[needs_response-2000000]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_exact_refund_and_dispute_preserve_actual_wallet[won-3000000]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_nonfinancial_customer_changes_do_not_pollute_snapshot_or_block_replay",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_paginated_attempt_ancestry_refund_and_private_receipt_are_idempotent",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_paid_receipt_wallet_and_inbox_roll_back_together_after_local_failure",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_signed_hold_during_readback_cannot_be_overwritten_by_old_won_snapshot",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_two_individually_valid_passes_with_different_money_are_refused",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_wrong_checkout_mode_is_not_a_credit_purchase[setup]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    },
+    {
+      "module": "tests.test_r210_stripe_paid_history",
+      "case": "test_wrong_checkout_mode_is_not_a_credit_purchase[subscription]",
+      "state": "passed",
+      "report": "docs/validation/r210/ci-5891082-refunds-browser-history.xml"
+    }
+  ],
+  "changed_test_sha256": "5332bfeffc81ff047484d72eef9b238e5040ce8751bfe735b1c1d2c9d8f792f5",
+  "fixture_initial_corrections": "The first fixture revision asserted queries without the actual limit100 pagination parameter;corrected to exact real query.One new negative case expected an environment error message before the stricter missing-field projection;it now asserts typed ProviderProbeError plus unchanged wallet/no dispatch,without coupling the safety invariant to validation ordering.Original assertions remain active.",
+  "source_boundaries_reused": {
+    "Bandit": "299 app sources/164 existing reviewed findings,0HIGH/21MEDIUM/143LOW;source equality and retained exact scan/ledger validated",
+    "transport": "30 reviewed sites/21 files;source-bound gate passed",
+    "admission": "170 reviewed boundaries/299 sources;source-bound gate passed",
+    "original_CI_SAST": "passed on5891082",
+    "original_CI_coverage": "76.78% exceeds unchanged70% threshold;not recollected with the targeted run"
+  },
+  "progress": {
+    "accepted": 25,
+    "total": 42,
+    "percent": 59.5,
+    "macroareas_accepted": 0,
+    "release_candidate": false,
+    "criterion_promoted": false
+  },
+  "quality": {
+    "ruff": "passed",
+    "changed_test_compilation": "passed",
+    "gitleaks": "Checksum-verified Gitleaks8.24.3 complete introduced-line delta:zero findings;config/ignore/allowlist unchanged.",
+    "gitleaks_report": "docs/validation/r210/ci-5891082-gitleaks.json"
+  },
+  "full_CI_repeated": false,
+  "new_GitHub_CI_green_claim": false,
+  "remote_or_Git_mutations": false,
+  "next_commit_message": "Fix Stripe refund test fixtures for canonical paid history",
+  "standalone_patch": {
+    "path": "docs/CI_STRIPE_REFUND_FIX_5891082.patch",
+    "sha256": "33ad28121616e32b14c6939207d22379f4401c0d9e5d7d45630b207a04609350",
+    "applies_to_committed_fixture": true,
+    "patched_bytes_match_validated_source": true
+  },
+  "verified_committed_blob_sha1": {
+    "tests/test_r210_operator_refunds.py": "7d49c0fbbcc4fec9f465eb70cfc822e25685c210",
+    "app/stripe_paid_history.py": "b2e618c743313bc81d5fb6596bf759fafee5c788",
+    "app/service_admission.py": "f7c92b0264b9df6c01f2b7f4fe208fcc9d51b56d"
+  }
+}

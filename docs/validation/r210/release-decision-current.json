@@ -128,9 +128,12 @@
     "docs/validation/r210/stripe-stable-history-result.json",
     "docs/validation/r210/legacy-executor-result.json",
     "docs/validation/r210/export-exclusive-result.json",
-    "docs/validation/r210/service-admission-result.json"
+    "docs/validation/r210/service-admission-result.json",
+    "docs/validation/r210/ci-5891082-result.json"
   ],
   "no_criteria_removed": true,
   "commits_or_remote_mutations": 0,
-  "accepted_E5_provenance": "Existing accepted E5 from prior checkpoint;no criterion promoted in the export recovery turn."
+  "accepted_E5_provenance": "Existing accepted E5 from prior checkpoint;no criterion promoted in the export recovery turn.",
+  "latest_user_commit": "5891082820d3d69bd8bd3ea0be06117d5639c135",
+  "latest_CI": "40550957081:Quality failed on60 shared-fixture cases,SAST passed.Coverage76.78%exceeds70%;all60 failures repaired in156 local distinct passes.Next GitHub confirmation pending."
 }

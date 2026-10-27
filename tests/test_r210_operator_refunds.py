@@ -22,6 +22,18 @@ from test_r210_paypal import provider as provider  # noqa: F401
 def stripe_env(account,monkeypatch):
     order=purchase(account,monkeypatch);client_class=httpx.Client
     state={'order':order,'refunds':{},'posts':[],'gets':[],'post_status':'succeeded','timeout':False,'get_error':False,'post_error':False,'after_post':None}
+    # Full canonical paid ancestry,matching the production two-pass readback.
+    # These are provider responses,not caller-supplied settlement authority.
+    state['documents']={
+        'session':{'id':'cs_test_'+order,'mode':'payment','status':'complete','payment_status':'paid',
+            'amount_total':500,'currency':'eur','client_reference_id':order,'metadata':{'mta_order':order},
+            'payment_intent':'pi_test','livemode':False},
+        'intent':{'id':'pi_test','status':'succeeded','amount':500,'amount_received':500,
+            'amount_capturable':0,'currency':'eur','latest_charge':'ch_test','livemode':False},
+        'charge':{'id':'ch_test','payment_intent':'pi_test','amount':500,'amount_captured':500,
+            'currency':'eur','status':'succeeded','paid':True,'captured':True,'disputed':False,
+            'balance_transaction':'txn_test_paid','failure_balance_transaction':None,'livemode':False},
+    }
     def handle(request):
         assert request.url.host=='api.stripe.com'
         assert request.headers['authorization']=='Bearer sk_test_test'
@@ -41,11 +53,19 @@ def stripe_env(account,monkeypatch):
         if path.startswith('/v1/refunds/'):
             if state['get_error']:return httpx.Response(503,json={})
             body=state['refunds'].get(path.rsplit('/',1)[1]);return httpx.Response(200 if body else 404,json=copy.deepcopy(body or {}))
-        if path.endswith('/cs_test_'+order):body={'id':'cs_test_'+order,'status':'complete','payment_status':'paid','amount_total':500,'currency':'eur','client_reference_id':order,'metadata':{'mta_order':order},'payment_intent':'pi_test'}
-        elif path.endswith('/pi_test'):body={'id':'pi_test','status':'succeeded','amount':500,'amount_received':500,'currency':'eur','latest_charge':'ch_test'}
-        elif path.endswith('/ch_test'):body={'id':'ch_test','payment_intent':'pi_test','amount':500,'currency':'eur','paid':True,'captured':True,'amount_refunded':total}
-        elif path.endswith('/refunds'):body={'data':list(state['refunds'].values()),'has_more':False}
-        elif path.endswith('/disputes'):body={'data':[],'has_more':False}
+        charge={**state['documents']['charge'],'amount_refunded':total,'refunded':total==500}
+        if path.endswith('/cs_test_'+order):body=state['documents']['session']
+        elif path.endswith('/pi_test'):body=state['documents']['intent']
+        elif path.endswith('/ch_test'):body=charge
+        elif path=='/v1/charges':
+            assert dict(request.url.params)=={'payment_intent':'pi_test','limit':'100'}
+            body={'data':[charge],'has_more':False}
+        elif path.endswith('/refunds'):
+            assert dict(request.url.params)=={'charge':'ch_test','limit':'100'}
+            body={'data':list(state['refunds'].values()),'has_more':False}
+        elif path.endswith('/disputes'):
+            assert dict(request.url.params)=={'charge':'ch_test','limit':'100'}
+            body={'data':[],'has_more':False}
         else:raise AssertionError(path)
         return httpx.Response(200,json=copy.deepcopy(body))
     monkeypatch.setattr(refunds.httpx,'Client',lambda **kw:client_class(transport=httpx.MockTransport(handle),**kw))
@@ -81,6 +101,19 @@ def test_actual_stripe_two_step_full_or_partial_funds_and_durable_fence(stripe_e
     assert create(stripe_env)['state']=='settled' and len(stripe_env['posts'])==1
     second=create(stripe_env,amount=300,key='second-refund-request');assert refunds.execute(actor(),second['id'],0)['state']=='settled'
     assert resources.state(account)['credits_micro']==0 and audit()['settled']==2
+
+
+@pytest.mark.parametrize('kind',['session','intent','charge'])
+@pytest.mark.parametrize('mode',[True,None,0])
+def test_refund_prepare_rejects_wrong_missing_or_nonboolean_stripe_environment(stripe_env,account,kind,mode):
+    from app.regime_provider_probe import ProviderProbeError
+    document=stripe_env['documents'][kind]
+    if mode is None:document.pop('livemode')
+    else:document['livemode']=mode
+    before=resources.state(account)['credits_micro']
+    with pytest.raises(ProviderProbeError):create(stripe_env)
+    assert stripe_env['posts']==[] and refunds.overview()['items']==[]
+    assert resources.state(account)['credits_micro']==before
 
 
 @pytest.mark.parametrize('field,value',[('amount_cents',True),('amount_cents',0),('amount_cents',-1),('amount_cents',1.2),('amount_cents',1_000_000_001),('provider','other'),('order_id','../x'),('target',None),('reason','x'),('reason','bad\nreason'),('request_id','tiny')])

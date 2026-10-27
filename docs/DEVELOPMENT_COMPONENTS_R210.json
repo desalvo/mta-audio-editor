@@ -850,9 +850,9 @@
     "transition_enabled": false
   },
   "current_committed_baseline": {
-    "sha": "9fc85ce79bee9871696dea9396565395a415aa72",
-    "source": "Read-only GitHub checkout; full workflow40257635101 independently verified success",
-    "pending_delta": "Integrated cumulative: original subscription evidence,active owner/source lifecycle,strict server/native/legacy synchronous execution boundaries,current proof/status/strategy and full preserved manifest. User commit deferred."
+    "sha": "5891082820d3d69bd8bd3ea0be06117d5639c135",
+    "source": "User confirmation plus read-only run40550957081/artifact/commit metadata;critical source/test Git blobs match delivered cumulative",
+    "pending_delta": "Only Stripe refund fixture contract,9 negative cases,CI evidence and standalone handoff/manifest."
   },
   "work_organization": {
     "date": "2026-10-26",
@@ -870,8 +870,8 @@
     "not_a_full_product_percentage": true,
     "delivery": "Complete cumulative archive at each substantial checkpoint when possible,not only a patch;no ZIP per helper. Commit remains deferred."
   },
-  "latest_confirmed_commit": "772fbe7508cc08266466a3746bb51f0fe5d0179b",
-  "latest_continuation": "docs/SERVICE_ADMISSION_DRAIN_R210.md",
+  "latest_confirmed_commit": "5891082820d3d69bd8bd3ea0be06117d5639c135",
+  "latest_continuation": "docs/CI_STRIPE_REFUND_FIX_5891082.md",
   "latest_confirmed_cutover_chromium": {
     "date": "2026-10-27",
     "commit": "772fbe7508cc08266466a3746bb51f0fe5d0179b",
@@ -940,7 +940,7 @@
     "no_tests_rerun": true,
     "no_remote_mutations": true
   },
-  "next_commit_scope": "All uncommitted Stripe,E5,legacy,export SQLite recovery and completed C2 admission/drain after772fbe7508cc08266466a3746bb51f0fe5d0179b;no commit performed.",
+  "next_commit_scope": "Only Stripe refund fixture and CI repair evidence/docs after confirmed5891082820d3d69bd8bd3ea0be06117d5639c135.",
   "legacy_execution_continuation": {
     "handoff": "docs/LEGACY_EXECUTION_BOUNDARIES_R210.md",
     "result": "docs/validation/r210/legacy-executor-result.json",
@@ -981,5 +981,28 @@
     "handoff": "docs/SERVICE_ADMISSION_DRAIN_R210.md",
     "financial_transition_authorized": false,
     "external_target_acceptance": false
+  },
+  "latest_observed_ci": {
+    "run_id": 40550957081,
+    "sha": "5891082820d3d69bd8bd3ea0be06117d5639c135",
+    "quality": {
+      "passed": 6818,
+      "failed": 60,
+      "skipped": 114,
+      "coverage_percent": 76.78,
+      "seconds": 1000.85
+    },
+    "sast": "passed",
+    "SDK": "passed",
+    "subsequent_builds": "skipped behind Quality dependency",
+    "local_repair": "156 distinct cases pass,all60 CI failures covered;14 actual Chromium;new GitHub confirmation pending"
+  },
+  "ci_refund_fixture_repair": {
+    "proof": "docs/validation/r210/ci-5891082-result.json",
+    "production_code_changed": false,
+    "criterion_promoted": false,
+    "passed_distinct": 156,
+    "new_cases": 9,
+    "browser_cases": 14
   }
 }

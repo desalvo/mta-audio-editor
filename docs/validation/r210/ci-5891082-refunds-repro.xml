@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="2.067" timestamp="2026-10-27T22:48:32.856862+02:00" hostname="e9935a374697"><testcase classname="tests.test_r210_operator_refunds" name="test_actual_stripe_two_step_full_or_partial_funds_and_durable_fence" time="0.488"><failure message="app.regime_provider_probe.ProviderProbeError: Stripe financial environment mismatch">stripe_env = {'order': '87f64f1a07784b4e941590a9aa5e2a30', 'refunds': {}, 'posts': [], 'gets': ['/v1/checkout/sessions/cs_test_87f64f1a07784b4e941590a9aa5e2a30', '/v1/checkout/sessions/cs_test_87f64f1a07784b4e941590a9aa5e2a30'], ...}
+account = 2
+
+    def test_actual_stripe_two_step_full_or_partial_funds_and_durable_fence(stripe_env,account):
+&gt;       item=create(stripe_env);assert item['state']=='prepared' and not stripe_env['posts']
+             ^^^^^^^^^^^^^^^^^^
+
+tests/test_r210_operator_refunds.py:73: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_r210_operator_refunds.py:62: in create
+    def create(env,**kw):return refunds.prepare(actor(),body(env['order'],**kw))
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/operator_refunds.py:196: in prepare
+    _reconcile(body['provider'],body['order_id'])
+app/operator_refunds.py:161: in _reconcile
+    result=reconcile_checkout(provider,order_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/payment_reconcile_service.py:220: in reconcile_checkout
+    with httpx.Client(timeout=15,follow_redirects=False) as client:return reconcile_stripe(order_id,client=client,expected_owner=expected_owner)
+                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/payment_reconcile_service.py:72: in reconcile_stripe
+    document = collect(client, key, initial)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/stripe_paid_history.py:51: in collect
+    environment(session)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+doc = {'id': 'cs_test_87f64f1a07784b4e941590a9aa5e2a30', 'status': 'complete', 'payment_status': 'paid', 'amount_total': 500, ...}
+
+    def environment(doc):
+        if doc.get('livemode') is not live:
+&gt;           raise ProviderProbeError('Stripe financial environment mismatch')
+E           app.regime_provider_probe.ProviderProbeError: Stripe financial environment mismatch
+
+app/stripe_paid_history.py:48: ProviderProbeError</failure></testcase></testsuite></testsuites>
