@@ -5,6 +5,8 @@ not assert artistic quality or guarantee that source structure is preserved.
 """
 from __future__ import annotations
 
+from .service_admission import admitted
+
 import argparse
 import json
 import math
@@ -16,6 +18,7 @@ import wave
 from .ai_worker_protocol import WorkerUnavailable, configured_worker
 
 
+@admitted('ace-diagnostic')
 def test_live_inference(*, seconds: float = 5.0, timeout_seconds: int = 1200) -> dict:
     """Generate an original synthetic input WAV and demand a decodable WAV output."""
     if not 1 <= seconds <= 15:

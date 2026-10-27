@@ -29,6 +29,7 @@ def test_remote_requires_https_and_token(tmp_path,monkeypatch):
 
 
 def test_remote_inference_wav_and_json_zip(tmp_path,monkeypatch):
+    monkeypatch.setenv('MTA_NATIVE_SINGLE_USER', 'true')
     monkeypatch.setenv('MTA_NATIVE_AI_CONFIG',str(tmp_path/'remote.json'))
     route.configure('whisper','remote','https://mta.example.org','secret')
     source=tmp_path/'source.wav';source.write_bytes(b'RIFF' + b'\0'*4+b'WAVE'+b'\0'*12)
@@ -45,6 +46,7 @@ def test_remote_inference_wav_and_json_zip(tmp_path,monkeypatch):
 
 
 def test_remote_rejects_unsafe_zip_and_does_not_fallback(tmp_path,monkeypatch):
+    monkeypatch.setenv('MTA_NATIVE_SINGLE_USER', 'true')
     monkeypatch.setenv('MTA_NATIVE_AI_CONFIG',str(tmp_path/'remote.json'))
     route.configure('demucs','remote','https://mta.example.org','secret')
     source=tmp_path/'source.wav';source.write_bytes(b'RIFF'+b'\0'*4+b'WAVE')
@@ -62,6 +64,7 @@ def test_remote_rejects_unsafe_zip_and_does_not_fallback(tmp_path,monkeypatch):
 
 @pytest.mark.parametrize('kind', ['whisper','chords-ml','demucs','drumsep','sam-audio','singer-separation','backing-vocals'])
 def test_each_remote_kind_never_uses_local_fallback(kind,tmp_path,monkeypatch):
+    monkeypatch.setenv('MTA_NATIVE_SINGLE_USER', 'true')
     monkeypatch.setenv('MTA_NATIVE_AI_CONFIG',str(tmp_path/'remote.json'))
     from app import ai_remote_client
     route.configure(kind,'remote','https://mta.example.org','private-token')

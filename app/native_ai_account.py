@@ -111,6 +111,8 @@ def credentials():
 
 
 def execute_arranger(plan,project,resolve_audio,*,cancel_event=None):
+    from .native_ai_routing import require_native
+    require_native()
     from .model_license_policy import authorize_remote_execution
     authorize_remote_execution('ace-step',plan)
     import tempfile

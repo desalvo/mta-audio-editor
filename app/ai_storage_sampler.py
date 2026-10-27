@@ -12,6 +12,9 @@ from .auth import db
 from . import ai_billing
 
 
+from .service_admission import admitted
+
+@admitted('storage-sampling')
 def sample_all(*, root=None, sampled_at=None):
     configured = root if root is not None else os.getenv('MTA_AI_USER_STORAGE_ROOT', '')
     if not configured:

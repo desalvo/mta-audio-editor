@@ -6,6 +6,7 @@ adapter. Running work is never automatically replayed after process death,
 because its external side effects may already have happened.
 """
 from __future__ import annotations
+from .service_admission import worker_thread
 import json
 import re
 import os
@@ -548,7 +549,7 @@ def _spawn(job_id, fn, *, cancellable=False):
                 _LOCAL.pop(job_id, None)
                 _CANCELLABLE.discard(job_id)
 
-    threading.Thread(target=execute, daemon=True, name='mta-ai-job-' + job_id[:8]).start()
+    worker_thread(target=execute, daemon=True, name='mta-ai-job-' + job_id[:8]).start()
     return True
 
 

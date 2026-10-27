@@ -6,6 +6,8 @@ No user-supplied FFmpeg expression or shell command is accepted.
 """
 from __future__ import annotations
 
+from .service_admission import worker_thread
+
 import importlib.util
 import json
 import os
@@ -13,7 +15,6 @@ import shutil
 import subprocess
 import re
 import queue
-import threading
 import sys
 from copy import deepcopy
 from pathlib import Path
@@ -635,7 +636,7 @@ class DemucsStemSplitter:
             finally:
                 lines.put(None)
 
-        reader = threading.Thread(target=_read_output, daemon=True, name="demucs-output")
+        reader = worker_thread(target=_read_output, daemon=True, name="demucs-output")
         reader.start()
         stream_done = False
         while True:

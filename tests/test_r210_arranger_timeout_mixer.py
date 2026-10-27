@@ -88,6 +88,7 @@ assert.match(values.aiRemixPlanResult.textContent,/1–240/);
 
 
 def test_custom_budget_reaches_cgroup_supervisor_without_changing_metering(monkeypatch,tmp_path):
+    monkeypatch.setenv('MTA_NATIVE_SINGLE_USER', 'true')
     from app import ai_worker_protocol as protocol, ai_cgroup_metering, audio_engine
     from app.models import Project, Track
     worker=tmp_path/'worker.py';worker.write_text('# installed trusted worker')

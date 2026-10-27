@@ -1,0 +1,35 @@
+{
+  "date": "2026-10-27",
+  "commit": "772fbe7508cc08266466a3746bb51f0fe5d0179b",
+  "run_id": 40505295056,
+  "job_id": 122192943308,
+  "conclusion": "success",
+  "passed": 9,
+  "failed": 0,
+  "skipped": 0,
+  "scope": "actual_local_authority_cutover_chromium_api_only",
+  "python": "3.12.15",
+  "chromium": "134.0.6998.35",
+  "playwright_build": "1161",
+  "checks": [
+    "IT/EN desktop/mobile actual UI/API two-way cutover,wallet and periods,keyboard and audit",
+    "IT/EN committed failure forward recovery with confirmation",
+    "IT/EN lost response reload and original request replay",
+    "Unknown financial history blocks confirmation"
+  ],
+  "artifact": {
+    "id": 12734319462,
+    "name": "admin-cutover-chromium-40505295056",
+    "sha256": "8ebce285ec3a2913968076757b5c86625529abc6969757a6d476ed941909477a"
+  },
+  "evidence_method": "GitHub job success and strict runner console result;artifact not downloaded",
+  "release_candidate": false,
+  "transition_authorized": false,
+  "original_acceptance_unchanged": {
+    "accepted": 23,
+    "total": 42,
+    "accepted_macroareas": 0,
+    "macroareas": 7
+  },
+  "no_local_test_rerun": true
+}

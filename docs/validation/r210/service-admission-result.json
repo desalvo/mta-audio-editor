@@ -1,0 +1,2680 @@
+{
+  "date": "2026-10-27",
+  "criterion": {
+    "id": "C2",
+    "original_text": "Distributed admission barrier and service-wide drain",
+    "accepted": true,
+    "original_weight": 1,
+    "wording_and_weight_unchanged": true
+  },
+  "base_commit": "772fbe7508cc08266466a3746bb51f0fe5d0179b",
+  "baseline_archive": "MTA-0.3.0-r210-pre-RC-export-sqlite-recovery-cumulative.zip",
+  "baseline_archive_sha256": "8f85757aa3af2b885d3d88fa70ce44efe16503f1a2ea4b598d14916a10775c01",
+  "checkpoint_reused": "docs/development-pending/C2_SERVICE_ADMISSION_WIP.patch",
+  "distinct_latest": {
+    "passed": 321,
+    "failed": 0,
+    "error": 0,
+    "skipped": 0
+  },
+  "new_C2_cases": 71,
+  "cases": [
+    {
+      "module": "tests.test_model_updater_coverage_100",
+      "case": "test_https_and_atomic_write",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_model_updater_coverage_100",
+      "case": "test_update_once_installs_and_then_detects_unchanged",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_model_updater_coverage_100",
+      "case": "test_update_once_manifest_failure_and_disabled",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_model_updater_coverage_100",
+      "case": "test_update_once_rejects_bad_digest_and_invalid_entries",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r207_automatic_storage_sampler",
+      "case": "test_missing_user_dir_is_zero",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r207_automatic_storage_sampler",
+      "case": "test_no_storage_charges_across_unobserved_multi_day_gap",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r207_automatic_storage_sampler",
+      "case": "test_rejects_symlinks",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r207_automatic_storage_sampler",
+      "case": "test_samples_only_assigned_user_directory",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r208_cgroup_cancellation_settlement",
+      "case": "test_cancel_check_blocks_cgroup_before_setup",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r208_cgroup_cancellation_settlement",
+      "case": "test_cgroup_source_contains_pre_spawn_and_post_exit_barriers",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r208_cgroup_cancellation_settlement",
+      "case": "test_pre_cancelled_cgroup_does_not_resolve_delegate",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r208_planning_job_history",
+      "case": "test_planning_history_rejects_invalid_filters[arguments0]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r208_planning_job_history",
+      "case": "test_planning_history_rejects_invalid_filters[arguments1]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r208_planning_job_history",
+      "case": "test_planning_history_rejects_invalid_filters[arguments2]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r208_planning_job_history",
+      "case": "test_planning_history_rejects_invalid_filters[arguments3]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r208_planning_job_history",
+      "case": "test_planning_history_rejects_invalid_filters[arguments4]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r208_planning_job_history",
+      "case": "test_planning_history_rejects_invalid_filters[arguments5]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r208_planning_job_history",
+      "case": "test_planning_history_rejects_invalid_filters[arguments6]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r208_planning_job_history",
+      "case": "test_planning_history_scoped_paginated_and_detached",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r208_planning_sqlite_path_hardening",
+      "case": "test_rejects_database_swapped_after_startup",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r208_planning_sqlite_path_hardening",
+      "case": "test_rejects_sidecar_swapped_after_startup",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r208_planning_sqlite_path_hardening",
+      "case": "test_rejects_symlink_ancestor",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r208_planning_sqlite_path_hardening",
+      "case": "test_rejects_symlink_sidecar_at_creation",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_account_lifecycle",
+      "case": "test_email_change_reserves_old_and_pending_email",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_account_lifecycle",
+      "case": "test_email_mfa_onboarding_precedes_admin_approval_and_blocks_login_without_otp",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_account_lifecycle",
+      "case": "test_email_otp_attempt_limits_cooldown_and_expiry",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_account_lifecycle",
+      "case": "test_failed_purge_removes_uncommitted_sandbox",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_account_lifecycle",
+      "case": "test_quarantine_removes_settlement_outbox_and_credentials",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_account_lifecycle",
+      "case": "test_reactivation_requires_email_then_admin_and_does_not_restore_old_tokens",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_account_lifecycle",
+      "case": "test_repeated_retirement_reactivation_revokes_each_archive_without_token_collision",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_account_lifecycle",
+      "case": "test_retention_api_admin_only_and_self_deletion_forbidden_to_admin",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_account_lifecycle",
+      "case": "test_retention_configuration_validation[settings0]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_account_lifecycle",
+      "case": "test_retention_configuration_validation[settings1]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_account_lifecycle",
+      "case": "test_retention_configuration_validation[settings2]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_account_lifecycle",
+      "case": "test_retention_configuration_validation[settings3]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_account_lifecycle",
+      "case": "test_retirement_preserves_identity_accounting_revokes_tokens_and_exports_projects",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_account_lifecycle",
+      "case": "test_total_delete_admin_protected_and_explicit_confirmation_required",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_account_lifecycle",
+      "case": "test_total_delete_one_confirmation_removes_account_and_accounting",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_account_lifecycle",
+      "case": "test_totp_onboarding_guard_and_notification_outbox",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "case": "test_actual_admin_roundtrip_preserves_wallet_periods_and_real_nc_history",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "case": "test_actual_api_process_sigkill_after_sqlite_commit_preserves_durable_barrier",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "case": "test_changed_original_receipt_cannot_rebaseline_or_abort_committed_transition",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "case": "test_forward_recovery_records_the_actual_second_administrator",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "case": "test_independent_process_lease_blocks_api_and_sigkill_releases_only_os_lock",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "case": "test_interruption_keeps_barrier_auth_and_original_finances_then_forward_recovers[False]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "case": "test_interruption_keeps_barrier_auth_and_original_finances_then_forward_recovers[True]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "case": "test_live_accounting_connection_blocks_exclusive_cutover",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "case": "test_preview_staleness_auth_csrf_default_off_and_confirmation_are_not_bypassable",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "case": "test_real_registered_builtin_harmony_and_measured_nc_statement_survive_actual_return_cutover",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "case": "test_unverifiable_or_financially_unsupported_states_refuse_actual_api[credit]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "case": "test_unverifiable_or_financially_unsupported_states_refuse_actual_api[history]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "case": "test_unverifiable_or_financially_unsupported_states_refuse_actual_api[missing-schema]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "case": "test_unverifiable_or_financially_unsupported_states_refuse_actual_api[priced-plan]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "case": "test_unverifiable_or_financially_unsupported_states_refuse_actual_api[provider]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "case": "test_unverifiable_or_financially_unsupported_states_refuse_actual_api[running-job]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "case": "test_unverifiable_or_financially_unsupported_states_refuse_actual_api[unknown-journal]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "case": "test_unverifiable_or_financially_unsupported_states_refuse_actual_api[unprefixed-legacy-schema]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_cgroup_worker_diagnostics",
+      "case": "test_worker_diagnostic_does_not_echo_unstructured_stderr",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_cgroup_worker_diagnostics",
+      "case": "test_worker_diagnostic_redacts_secret_and_url",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_cgroup_worker_diagnostics",
+      "case": "test_worker_stderr_is_drained_and_bounded",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_deferred_owner_e2e",
+      "case": "test_claimed_inference_rejects_missing_or_forged_owner[arranger]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_deferred_owner_e2e",
+      "case": "test_claimed_inference_rejects_missing_or_forged_owner[remix]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_deferred_owner_e2e",
+      "case": "test_crash_after_metering_or_publication_recovers_without_reexecution[arranger-False]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_deferred_owner_e2e",
+      "case": "test_crash_after_metering_or_publication_recovers_without_reexecution[arranger-True]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_deferred_owner_e2e",
+      "case": "test_crash_after_metering_or_publication_recovers_without_reexecution[remix-False]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_deferred_owner_e2e",
+      "case": "test_crash_after_metering_or_publication_recovers_without_reexecution[remix-True]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_deferred_owner_e2e",
+      "case": "test_ledger_commit_before_ack_retries_with_original_owner[arranger]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_deferred_owner_e2e",
+      "case": "test_ledger_commit_before_ack_retries_with_original_owner[remix]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_deferred_owner_e2e",
+      "case": "test_lost_heartbeat_cancels_and_prevents_new_evidence_or_staging[arranger]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_deferred_owner_e2e",
+      "case": "test_lost_heartbeat_cancels_and_prevents_new_evidence_or_staging[remix]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_deferred_owner_e2e",
+      "case": "test_real_scheduler_deferred_completion_has_one_owner_and_charge[arranger]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_deferred_owner_e2e",
+      "case": "test_real_scheduler_deferred_completion_has_one_owner_and_charge[remix]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_deferred_owner_e2e",
+      "case": "test_removed_publication_owner_cannot_downgrade_to_legacy[arranger]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_deferred_owner_e2e",
+      "case": "test_removed_publication_owner_cannot_downgrade_to_legacy[remix]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_deferred_owner_e2e",
+      "case": "test_unknown_or_changed_owner_blocks_publication_and_settlement[arranger]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_deferred_owner_e2e",
+      "case": "test_unknown_or_changed_owner_blocks_publication_and_settlement[remix]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_actual_diagnostic_web_job_cannot_execute_local_model",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_actual_native_local_analysis_still_publishes_without_server_invoice",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_auth_diagnostics_never_switch_server_to_unowned_local_inference[1]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_auth_diagnostics_never_switch_server_to_unowned_local_inference[]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_auth_diagnostics_never_switch_server_to_unowned_local_inference[false]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_auth_diagnostics_never_switch_server_to_unowned_local_inference[on]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_auth_diagnostics_never_switch_server_to_unowned_local_inference[true]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_auth_diagnostics_never_switch_server_to_unowned_local_inference[yes]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_invalid_studio_actor_rejected_before_model_or_config[inner--1]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_invalid_studio_actor_rejected_before_model_or_config[inner-1.0]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_invalid_studio_actor_rejected_before_model_or_config[inner-1]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_invalid_studio_actor_rejected_before_model_or_config[inner-False]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_invalid_studio_actor_rejected_before_model_or_config[inner-None]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_invalid_studio_actor_rejected_before_model_or_config[inner-True]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_invalid_studio_actor_rejected_before_model_or_config[public--1]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_invalid_studio_actor_rejected_before_model_or_config[public-1.0]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_invalid_studio_actor_rejected_before_model_or_config[public-1]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_invalid_studio_actor_rejected_before_model_or_config[public-False]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_invalid_studio_actor_rejected_before_model_or_config[public-None]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_invalid_studio_actor_rejected_before_model_or_config[public-True]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_native_compat_license_denial_is_readable_and_has_no_upload_side_effect",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_server_sync_stem_compat_rejects_before_file_or_model_effects[account]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_server_sync_stem_compat_rejects_before_file_or_model_effects[diagnostic]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_server_zero_actor_cannot_read_native_token_or_launch[inner]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_server_zero_actor_cannot_read_native_token_or_launch[public]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_server_zero_actor_cannot_read_native_token_or_launch[remote]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_export_auth_contention",
+      "case": "test_database_replacement_is_not_hidden_by_a_process_cache",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_export_auth_contention",
+      "case": "test_ready_auth_and_owner_checks_remain_read_only_with_another_writer",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_export_auth_contention",
+      "case": "test_real_export_poll_and_download_work_while_sqlite_writer_is_held[project-flac]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_export_auth_contention",
+      "case": "test_real_export_poll_and_download_work_while_sqlite_writer_is_held[project-mp3]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_export_auth_contention",
+      "case": "test_real_export_poll_and_download_work_while_sqlite_writer_is_held[project-wav]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_export_auth_contention",
+      "case": "test_real_export_poll_and_download_work_while_sqlite_writer_is_held[track-flac]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_export_auth_contention",
+      "case": "test_real_export_poll_and_download_work_while_sqlite_writer_is_held[track-mp3]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_export_auth_contention",
+      "case": "test_real_export_poll_and_download_work_while_sqlite_writer_is_held[track-wav]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_export_auth_contention",
+      "case": "test_real_missing_schema_or_defaults_still_migrate[index]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_export_auth_contention",
+      "case": "test_real_missing_schema_or_defaults_still_migrate[language]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_export_auth_contention",
+      "case": "test_real_missing_schema_or_defaults_still_migrate[smtp-row]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_barrier_reuses_original_connection_without_committing_its_transaction",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_barrier_timeout_is_bounded_restored_and_its_reader_is_released",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_exact_barrier_schema_read_fails_closed_under_exclusive_writer",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_locked_authentication_has_no_cached_positive_or_false_logout",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_locked_mutations_are_not_advertised_as_replayable[DELETE]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_locked_mutations_are_not_advertised_as_replayable[POST]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_locked_mutations_are_not_advertised_as_replayable[PUT]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_missing_barrier_evidence_is_unavailable_and_never_retryable[missing-row]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_missing_barrier_evidence_is_unavailable_and_never_retryable[missing-table]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_non_lock_operational_error_is_not_masked_as_transient",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_only_actual_sqlite_lock_errors_are_retryable[database disk image is malformed-False]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_only_actual_sqlite_lock_errors_are_retryable[database is locked-True]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_only_actual_sqlite_lock_errors_are_retryable[database table is locked: users-True]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_only_actual_sqlite_lock_errors_are_retryable[no such table: users-False]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_only_actual_sqlite_lock_errors_are_retryable[syntax error-False]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_original_export_survives_exclusive_lock_and_polls_download_after_release[project-flac]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_original_export_survives_exclusive_lock_and_polls_download_after_release[project-mp3]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_original_export_survives_exclusive_lock_and_polls_download_after_release[project-wav]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_original_export_survives_exclusive_lock_and_polls_download_after_release[track-flac]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_original_export_survives_exclusive_lock_and_polls_download_after_release[track-mp3]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_original_export_survives_exclusive_lock_and_polls_download_after_release[track-wav]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_production_browser_read_retry_never_replays_mutations_and_keeps_original_poll",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_actual_accounted_api_still_runs_once_replays_and_keeps_foreign_user_out[json]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_actual_accounted_api_still_runs_once_replays_and_keeps_foreign_user_out[wav]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_native_legacy_policy_denial_precedes_worker_and_source[external]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_native_legacy_policy_denial_precedes_worker_and_source[project]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_native_project_worker_ignoring_sigterm_is_killed_and_reaped[cancel]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_native_project_worker_ignoring_sigterm_is_killed_and_reaped[timeout]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_native_project_worker_receives_original_policy_and_actual_cpu",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_native_studio_no_wait4_fallback_stops_its_own_session",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_nc_gateway_rejects_unowned_work_and_result_reads_before_transport[GET-v1/audio]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_nc_gateway_rejects_unowned_work_and_result_reads_before_transport[POST-query_result]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_nc_gateway_rejects_unowned_work_and_result_reads_before_transport[POST-release_task]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_nc_gateway_rejects_unowned_work_and_result_reads_before_transport[POST-v1/audio]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_nc_gateway_rejects_unowned_work_and_result_reads_before_transport[POST-v1/generate]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_nc_gateway_rejects_unowned_work_and_result_reads_before_transport[POST-v1/init]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_nc_gateway_rejects_unowned_work_and_result_reads_before_transport[POST-v1/models]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_server_cannot_use_native_credentials_or_legacy_worker[-arranger]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_server_cannot_use_native_credentials_or_legacy_worker[-external]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_server_cannot_use_native_credentials_or_legacy_worker[-project]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_server_cannot_use_native_credentials_or_legacy_worker[-routing]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_server_cannot_use_native_credentials_or_legacy_worker[1-arranger]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_server_cannot_use_native_credentials_or_legacy_worker[1-external]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_server_cannot_use_native_credentials_or_legacy_worker[1-project]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_server_cannot_use_native_credentials_or_legacy_worker[1-routing]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_server_cannot_use_native_credentials_or_legacy_worker[false-arranger]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_server_cannot_use_native_credentials_or_legacy_worker[false-external]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_server_cannot_use_native_credentials_or_legacy_worker[false-project]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_server_cannot_use_native_credentials_or_legacy_worker[false-routing]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_optional_plugins",
+      "case": "test_builder_targets_vst3_only_and_handles_chow_subdirectory",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_optional_plugins",
+      "case": "test_catalog_is_pinned_licensed_and_sorted",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_optional_plugins",
+      "case": "test_frozen_app_includes_catalog_and_licenses_and_install_option",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_optional_plugins",
+      "case": "test_install_publishes_atomically_after_verified_source_and_license",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_optional_plugins",
+      "case": "test_license_tampering_refuses_catalog",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_optional_plugins",
+      "case": "test_overdue_or_disabled_catalog_cannot_install",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_optional_plugins",
+      "case": "test_periodic_check_uses_fixed_revision_and_reports_mismatch",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_optional_plugins",
+      "case": "test_untrusted_selection_refused[ids0]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_optional_plugins",
+      "case": "test_untrusted_selection_refused[ids1]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_optional_plugins",
+      "case": "test_untrusted_selection_refused[ids2]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_optional_plugins",
+      "case": "test_untrusted_selection_refused[ids3]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_optional_plugins",
+      "case": "test_untrusted_selection_refused[mverb]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-functional-final.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_call_fingerprint_does_not_depend_on_python_ast_dump",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_current_inventory_matches_review",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_inventory_cannot_silently_approve_drift[category]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_inventory_cannot_silently_approve_drift[checker]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_inventory_cannot_silently_approve_drift[hash]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_inventory_cannot_silently_approve_drift[missing]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_inventory_cannot_silently_approve_drift[rationale]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_inventory_cannot_silently_approve_drift[reorder]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_inventory_cannot_silently_approve_drift[source]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-device/start?x=1]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-gateway/v1/generate]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-jobs/execute-audio/whisper]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_new_aliased_transports_require_review[from httpx import AsyncClient as hidden\\nhidden()]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_new_aliased_transports_require_review[from urllib.request import build_opener as hidden\\nx=hidden()\\nx.open(\"https://example.test\")]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_new_aliased_transports_require_review[from urllib.request import urlopen as hidden\\nhidden(\"https://example.test\")]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_new_aliased_transports_require_review[import aiohttp as hidden\\nhidden.ClientSession()]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_new_aliased_transports_require_review[import httpx as hidden\\nhidden.Client()]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_new_aliased_transports_require_review[import socket as hidden\\nhidden.create_connection((\"example.test\",443))]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_supported_device_authorization_still_uses_exact_post[/api/ai-device/poll]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_supported_device_authorization_still_uses_exact_post[/api/ai-device/start]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_complete_source_bound_review_is_accepted",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_current_scan_and_complete_review_ledger_agree",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[blanket_approval]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[changed_finding]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[changed_source]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[deleted_source]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[duplicate_review]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[duplicate_scan]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[empty_reason]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[high]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[missing_file]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[missing_review]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[new_finding]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[new_source]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[scan_error]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[suppression]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[wrong_totals]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "case": "test_actual_admin_api_auth_csrf_private_read_and_generation",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "case": "test_actual_supervisor_sigkill_never_expires_original_work",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "case": "test_drain_confirmation_types_are_not_coerced[confirm-False]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "case": "test_drain_confirmation_types_are_not_coerced[draining-1]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "case": "test_drain_confirmation_types_are_not_coerced[expected_generation--1]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "case": "test_drain_confirmation_types_are_not_coerced[expected_generation-True]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "case": "test_drain_confirmation_types_are_not_coerced[identifier-../foreign]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "case": "test_full_drain_blocks_new_work_and_explicit_resume_preserves_generation",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "case": "test_lookalike_continuation_paths_cannot_create_work[/api/admin/service-admissionevil]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "case": "test_lookalike_continuation_paths_cannot_create_work[/api/billing/credits/stripe-webhook/evil]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "case": "test_lookalike_continuation_paths_cannot_create_work[/api/projects/p/audio-capture/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/pcm]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "case": "test_lookalike_continuation_paths_cannot_create_work[/api/pull-worker/ffffffffffffffffffffffffffffffff/dispatch]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "case": "test_lookalike_continuation_paths_cannot_create_work[/api/pull-worker/foreign/complete]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "case": "test_missing_or_foreign_journal_never_reopens_admission[corrupt]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "case": "test_missing_or_foreign_journal_never_reopens_admission[foreign-instance]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "case": "test_missing_or_foreign_journal_never_reopens_admission[missing-instance]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "case": "test_missing_or_foreign_journal_never_reopens_admission[missing-journal]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "case": "test_missing_or_foreign_journal_never_reopens_admission[unknown-build]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "case": "test_mode_removal_cannot_release_durable_barrier",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "case": "test_pending_ledger_queue_and_original_file_receipts_block_ready",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "case": "test_predrain_request_can_finish_nested_original_background_work",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "case": "test_sleeping_periodic_cycle_cannot_mutate_after_barrier",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "case": "test_stale_replay_foreign_actor_and_audit_immutability",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "case": "test_streaming_and_background_response_keep_admission_until_finished",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "case": "test_unexpected_exception_leaves_original_uncertain_admission",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission",
+      "case": "test_websocket_lifetime_is_counted_and_new_connection_refused",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_acceptance",
+      "case": "test_actual_admin_upgrade_route_checks_csrf_exact_body_and_keeps_gate_closed",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_acceptance",
+      "case": "test_actual_main_restart_under_drain_skips_work_then_explicit_resume_bootstraps_once",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_acceptance",
+      "case": "test_independent_process_admission_and_drain_serialize_at_original_journal",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_acceptance",
+      "case": "test_missing_or_extra_executable_journal_schema_is_not_accepted[CREATE TRIGGER foreign_code AFTER INSERT ON admissions BEGIN DELETE FROM events;END]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_acceptance",
+      "case": "test_missing_or_extra_executable_journal_schema_is_not_accepted[CREATE VIEW forged_admissions AS SELECT * FROM admissions]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_acceptance",
+      "case": "test_missing_or_extra_executable_journal_schema_is_not_accepted[DROP TRIGGER immutable_admission]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_acceptance",
+      "case": "test_new_build_handoff_keeps_original_rows_and_gate_closed",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_acceptance",
+      "case": "test_online_backup_and_offline_restore_preserve_original_gate_instance_and_uncertain_work",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_acceptance",
+      "case": "test_original_http_capture_finishes_and_import_child_remains_tracked_under_drain",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_acceptance",
+      "case": "test_original_legacy_side_effects_and_unknown_roots_block_drain[deleting-account]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_acceptance",
+      "case": "test_original_legacy_side_effects_and_unknown_roots_block_drain[purge-recovery]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_acceptance",
+      "case": "test_original_legacy_side_effects_and_unknown_roots_block_drain[sending-mail]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_acceptance",
+      "case": "test_original_legacy_side_effects_and_unknown_roots_block_drain[unsafe-project-root]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_acceptance",
+      "case": "test_read_snapshot_blocks_resume_until_pending_audit_has_finished",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_acceptance",
+      "case": "test_real_changed_source_build_handoff_in_independent_process_fences_old_replica",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_acceptance",
+      "case": "test_registered_local_worker_heartbeat_publication_and_single_charge_finish_under_drain[arranger]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_acceptance",
+      "case": "test_registered_local_worker_heartbeat_publication_and_single_charge_finish_under_drain[remix]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_acceptance",
+      "case": "test_second_thread_start_cannot_replace_original_running_ticket",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_acceptance",
+      "case": "test_timer_entry_is_denied_before_any_work_when_barrier_held[sampler]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_acceptance",
+      "case": "test_timer_entry_is_denied_before_any_work_when_barrier_held[scheduler]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_acceptance",
+      "case": "test_truncated_or_unsafe_original_journal_never_reinitializes_open[empty]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_acceptance",
+      "case": "test_truncated_or_unsafe_original_journal_never_reinitializes_open[malformed-seal]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_acceptance",
+      "case": "test_truncated_or_unsafe_original_journal_never_reinitializes_open[public-journal]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_acceptance",
+      "case": "test_truncated_or_unsafe_original_journal_never_reinitializes_open[public-seal]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_acceptance",
+      "case": "test_upgrade_never_discards_original_unfinished_or_foreign_work[active]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_acceptance",
+      "case": "test_upgrade_never_discards_original_unfinished_or_foreign_work[foreign]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_acceptance",
+      "case": "test_upgrade_never_discards_original_unfinished_or_foreign_work[open]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_acceptance",
+      "case": "test_upgrade_never_discards_original_unfinished_or_foreign_work[pending]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_acceptance",
+      "case": "test_upgrade_never_discards_original_unfinished_or_foreign_work[stale]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_acceptance",
+      "case": "test_vst3_lifetime_ticket_covers_real_child_and_failed_cleanup_is_never_drained[False]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_acceptance",
+      "case": "test_vst3_lifetime_ticket_covers_real_child_and_failed_cleanup_is_never_drained[True]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "case": "test_actual_source_bound_service_admission_review",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-inventory-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "case": "test_new_alias_boundaries_are_discovered[from asyncio import create_task as schedule\\nschedule(work())]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-inventory-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "case": "test_new_alias_boundaries_are_discovered[from concurrent.futures import ProcessPoolExecutor\\nProcessPoolExecutor()]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-inventory-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "case": "test_new_alias_boundaries_are_discovered[from fastapi import FastAPI\\napp=FastAPI()]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-inventory-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "case": "test_new_alias_boundaries_are_discovered[from multiprocessing import Process as Worker\\nWorker(target=run)]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-inventory-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "case": "test_new_alias_boundaries_are_discovered[from threading import Thread as Alias\\nAlias(target=run)]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-inventory-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "case": "test_new_alias_boundaries_are_discovered[import sqlite3 as db\\ndb.connect(path)]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-inventory-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "case": "test_new_alias_boundaries_are_discovered[import subprocess as tasks\\ntasks.Popen(command)]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-inventory-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "case": "test_unclassified_or_omitted_boundary_and_stale_source_are_rejected",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-inventory-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_pull",
+      "case": "test_independent_authority_process_is_fenced_before_db_or_queue_mutation",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_pull",
+      "case": "test_no_timeout_converts_a_dispatched_remote_worker_into_drained",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_pull",
+      "case": "test_queued_original_work_finishes_over_tls_after_full_service_barrier[None]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_pull",
+      "case": "test_queued_original_work_finishes_over_tls_after_full_service_barrier[claim]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_pull",
+      "case": "test_queued_original_work_finishes_over_tls_after_full_service_barrier[complete]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "case": "test_active_admin_required_for_all_lifecycle_paths",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "case": "test_committed_report_proves_original_receipts_and_only_forward_recovery",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "case": "test_corruption_or_missing_evidence_never_offers_unsafe_recovery[balance]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "case": "test_corruption_or_missing_evidence_never_offers_unsafe_recovery[mirror]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "case": "test_corruption_or_missing_evidence_never_offers_unsafe_recovery[orphan_commit]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "case": "test_corruption_or_missing_evidence_never_offers_unsafe_recovery[second_reservation]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "case": "test_corruption_or_missing_evidence_never_offers_unsafe_recovery[wrong_epoch]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "case": "test_legacy_commit_is_reported_without_adopting_admin_authority",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "case": "test_old_aborted_history_does_not_gain_invented_actor_and_pages_are_complete",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "case": "test_read_only_initial_status_has_real_counts_and_private_role_guard",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "case": "test_recovery_settings_remain_accessible_after_commit",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "case": "test_reservation_abort_keeps_epoch_money_and_exact_actor_audit",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "case": "test_tracked_open_work_is_visible_and_not_certified_as_total_service_drain",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_user_erasure_dump",
+      "case": "test_active_jobs_and_project_symlinks_refuse_dump",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_user_erasure_dump",
+      "case": "test_all_admins_immutable_even_with_multiple_admins",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_user_erasure_dump",
+      "case": "test_central_ledger_cannot_advance_past_outbox_snapshot",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_user_erasure_dump",
+      "case": "test_config_only_and_all_users_dump_selections",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_user_erasure_dump",
+      "case": "test_corrupt_checksum_and_unconfirmed_restore_write_nothing",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_user_erasure_dump",
+      "case": "test_dump_routes_admin_permissions_and_preview",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_user_erasure_dump",
+      "case": "test_dump_selection_closure_and_roundtrip",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_user_erasure_dump",
+      "case": "test_erasure_of_legacy_already_purged_account_removes_old_sandbox",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_user_erasure_dump",
+      "case": "test_failed_file_erasure_remains_retryable_and_blocks_reactivation",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_user_erasure_dump",
+      "case": "test_file_based_global_settings_are_in_dump_and_restore",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_user_erasure_dump",
+      "case": "test_health_probes_remain_available_during_dump_maintenance",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_user_erasure_dump",
+      "case": "test_immediate_erasure_removes_all_retained_copies_and_preserves_others",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_user_erasure_dump",
+      "case": "test_invalid_selection[bad0]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_user_erasure_dump",
+      "case": "test_invalid_selection[bad1]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_user_erasure_dump",
+      "case": "test_invalid_selection[bad2]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_user_erasure_dump",
+      "case": "test_invalid_selection[bad3]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_user_erasure_dump",
+      "case": "test_invalid_selection[bad4]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_user_erasure_dump",
+      "case": "test_project_selection_includes_owner_but_not_other_owned_projects",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_user_erasure_dump",
+      "case": "test_restore_rolls_back_if_publication_fails",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_user_erasure_dump",
+      "case": "test_unsafe_paths_refused[../escape]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_user_erasure_dump",
+      "case": "test_unsafe_paths_refused[/escape]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_user_erasure_dump",
+      "case": "test_unsafe_paths_refused[data/other]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_user_erasure_dump",
+      "case": "test_unsafe_paths_refused[projects/../../x]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_user_erasure_dump",
+      "case": "test_unsafe_paths_refused[projects/abcd/C:/x]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_user_erasure_dump",
+      "case": "test_unsafe_paths_refused[projects/abcd/a\\\\b]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    },
+    {
+      "module": "tests.test_r210_user_erasure_dump",
+      "case": "test_unsafe_paths_refused[queue/unknown]",
+      "state": "passed",
+      "report": "docs/validation/r210/service-admission-acceptance-final.xml"
+    }
+  ],
+  "reports": [
+    {
+      "path": "docs/validation/r210/service-admission-resume.xml",
+      "sha256": "5175adc6c98868e55611c8be9fd210de1b6a05f5c183540cabd4e981c2791157",
+      "collected": 31,
+      "passed": 31,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/validation/r210/service-admission-acceptance-first.xml",
+      "sha256": "fd5fff366ab40fcdd823687c3e7e1bdb649b64ca72692f18ca37df050f65f7ca",
+      "collected": 14,
+      "passed": 13,
+      "failed": 1,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/validation/r210/service-admission-integrated.xml",
+      "sha256": "ad05541aea37d3e3ca2523ab2568730aff4cc801e8f834c9b4f7354c3d37cd55",
+      "collected": 71,
+      "passed": 71,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/validation/r210/service-admission-lifetimes.xml",
+      "sha256": "c989a0d5ec1b9f312510b4457ee7107a5cc113e09e7f8deef2fbf192421844d7",
+      "collected": 47,
+      "passed": 45,
+      "failed": 2,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/validation/r210/service-admission-local-worker.xml",
+      "sha256": "5645faecfb12772782e45592dae92f2294bb3906b447bacd7fd02a304e431360",
+      "collected": 2,
+      "passed": 2,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/validation/r210/service-admission-functional-final.xml",
+      "sha256": "2220cf404af516d7eb2772f75ff5ea51fe4c33d0f08faa35c072df789ad83855",
+      "collected": 197,
+      "passed": 197,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/validation/r210/service-admission-scope-final.xml",
+      "sha256": "c95150580a0d0dad6ebf98e6a623e663baefd05db6914d4c36b23c3e9d9d5c99",
+      "collected": 78,
+      "passed": 78,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/validation/r210/service-admission-backup.xml",
+      "sha256": "793e78dcba9faf9337f646d59c2e9f83fe728d151a31fb314bfda66cc95028e5",
+      "collected": 27,
+      "passed": 26,
+      "failed": 1,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/validation/r210/service-admission-backup-final.xml",
+      "sha256": "aa2d3debd373f3bf562931f311660f1674f708b79ea9cfd8afe269c80527565d",
+      "collected": 30,
+      "passed": 30,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/validation/r210/service-admission-acceptance-final.xml",
+      "sha256": "c8d1ab460a8a99857bfaf7a0474985429a605f1455a04ea259b5cd8d4f396e4f",
+      "collected": 161,
+      "passed": 161,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/validation/r210/service-admission-security-gates.xml",
+      "sha256": "5c8f1ef1d870c6e3c55cb389d7cc9d2bdf54d6c818562b7cd158499607f15ecf",
+      "collected": 37,
+      "passed": 37,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/validation/r210/service-admission-inventory-final.xml",
+      "sha256": "99371a22dc5df9d05b1c02750dc583409858242db33bd0e92571111d3466785a",
+      "collected": 9,
+      "passed": 9,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    }
+  ],
+  "source_sha256": {
+    "app/service_admission.py": "e688813d898b13c25a113068cbdd757f170088241160a33f7b427074cf3c76f1",
+    "app/service_admission_routes.py": "2ee7d19c917217cc0989dfa73cdce8f0c28c6629213e542a620447748b421f67",
+    "app/service_drain_obligations.py": "30384850095d8b7745f1d0c55687a1afccdc55d319d7ef156cf1d4987a2e51fe",
+    "app/regime_service_lease.py": "1f5c8de729a144b2b6ef4d5e7c47e90e32599541ec3a2991c2bc774873fd71af",
+    "app/main.py": "d91109db80c08e43bc3195a3b186ea06cb723c3745074c5a7c084f29d292375d",
+    "app/audio_capture.py": "3ff571db7d8a926b380b0dc738d4dfd5b8c30cc16197e06b9d66728efa31de3a",
+    "app/server_vst3.py": "fbed5f653f8cc3308afba6ba98d54550e461221c753683c568dd58f06dc9ac48",
+    "app/admin_dump.py": "c9600065219c35ec1a20bfe5626187ecaeeb3ba0cfd9f96b0be189d231614c2e",
+    "app/ai_billing_scheduler.py": "1bd09b22d784b0b0aa8af7a610a8aace76bed9d698b82e8f81d7f00f72e3db57",
+    "app/ai_storage_sampler.py": "03e700ce4fe6b799a75959ac4bfd4ce4185f06c0a8fc5e98718d2421a72168b6",
+    "app/deferred_execution_owner.py": "e20d7f1e99c5fa9288793ea99ed8c03034f78fccc3376eb71cccd7f8f1938f74",
+    "app/studio_compute.py": "79f4e4722a84c95eb8505033c9ec53abd44133bfd35023e111a768fc39cd98ce",
+    "app/ai_cgroup_metering.py": "b96d194039510236cab8ff8aaee7d18a2ebfd665684f5caf082f2740feb672f4",
+    "app/ai_metering_agent.py": "b54e1344209a4decf9c3ddc11694d204529022185e584f8aa0ab368ece40580b",
+    "app/ace_step_live_smoke.py": "53ac6d65d1401b3fa27dddce6f6b629dd91da71aa532f5c05990548eaf1d5d7d",
+    "app/ace_step_desktop_manager.py": "e2d5e575febb9ec016251de4cc64683385c458f7254338ae6c398e593a474720",
+    "app/plugins.py": "b0b42afc7a4c2f5f180e965135accfc99ff63273615e1d9af279b3257d638acc",
+    "app/model_updater.py": "d1071ba5576ea4975eca06c108ff49d1815b794214ff28e77ffa41af66fa0032",
+    "app/storage.py": "603f1c07e718b78d2fe3a5d91279e46cc5f2abef6ec4abcab3edc978943e4d5c",
+    "app/account_lifecycle.py": "dc2a034d92b49c76f4953cfce42da64432edf54283d5b31ccc78456115a7c59c",
+    "app/ai_notifications.py": "c2645a42a7aa798d733a31927e01d13d52b13bec156fa4b6de6889ae725afa63",
+    "app/optional_plugins.py": "9e00f0044bada305564ccf63c3d2949ba8b6299793cb2eee285d6b775cf505a1",
+    "app/ai_arranger_runtime.py": "02e340a5bcca197863879463cc9c96204b3a3676c3d808d13b1baa78a874dda8",
+    "app/ai_planning_sqlite.py": "8ffc8a2083b6f1c1d463ad1d881aed0ed1f24cc7aefd70b7e67971d0afaf8722",
+    "scripts/check_service_admission_inventory.py": "7146777e44094f727c8d6fe787da212879a601ca58577825f412b82e736b6dc3",
+    "tests/test_r210_service_admission.py": "fe1d6c0b4d0a294feb88e34ab3613cabdadb7f02a4e411a5c93d389df5b10264",
+    "tests/test_r210_service_admission_pull.py": "0588d82985d4b36bde72a8ae35235b55e0284fd87c5d630eecf2c1e8f8211168",
+    "tests/test_r210_service_admission_acceptance.py": "be97078ab1c4ee3afc3cc961676b6ed99a00a739cbf1fb21e21f508d94d7cac1",
+    "tests/test_r210_service_admission_inventory.py": "4882891da6bb43ac5f2264ce31937e826508647e58cafb2af6b9c05dcd65acd9"
+  },
+  "inventory": {
+    "inventory_passed": true,
+    "source_files": 299,
+    "reviewed_sites": 170,
+    "scope": "Supported single pinned Linux authority replicas and HTTPS-only original workers",
+    "financial_transition_authorized": false,
+    "external_kernel_or_multihost_accepted": false,
+    "release_candidate": false
+  },
+  "security": {
+    "security": {
+      "reviewed_findings": 164,
+      "source_files": 299,
+      "raw_severity": {
+        "HIGH": 0,
+        "MEDIUM": 21,
+        "LOW": 143
+      },
+      "scan_review_passed": true,
+      "release_candidate": false,
+      "transition_enabled": false
+    },
+    "transport": {
+      "reviewed_sites": 30,
+      "source_files": 21,
+      "inventory_passed": true,
+      "remote_model_attestation_complete": false,
+      "release_candidate": false
+    },
+    "finding_code_unchanged": true,
+    "relocated_findings": [
+      {
+        "path": "app/account_lifecycle.py",
+        "test_id": "B608",
+        "old_line": 66,
+        "new_line": 67,
+        "old_id": "d3ea08927fc2b2717a63d40f11ec2d56f1e04316b650c44185d21d3c5ab83ee3",
+        "new_id": "f4b81586f6700f0cbe7a0e617a8eb2c6a02ceb514b5f82b5f0aad21e3b582b9a",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/account_lifecycle.py",
+        "test_id": "B608",
+        "old_line": 101,
+        "new_line": 102,
+        "old_id": "61ea3b800a878104bc2db4422b476834b100e115b326ad33a7d8eebdb52a1deb",
+        "new_id": "b9cbd207d79ec2272c581a21b1fe0950def263caf1d9d5ab9ac4845813cf2a79",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/account_lifecycle.py",
+        "test_id": "B608",
+        "old_line": 177,
+        "new_line": 178,
+        "old_id": "1d85caf8224a8d1a616629cfbae090b41816f415f3289955129f1f62fa2189ef",
+        "new_id": "1ca4575d8ccc8c794ed82da6fa76768fdf2ddda6ed3b189ff6fc3c99fb1edec1",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/account_lifecycle.py",
+        "test_id": "B608",
+        "old_line": 305,
+        "new_line": 306,
+        "old_id": "6af25156a27be86968bf90fb354d854366f2f31c1a4579ad63ea2547a2ede866",
+        "new_id": "60bcf2635ba05b6c258bcf2e60b7ae04e0f1693c92841c5f1b95f736c3190b5e",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/account_lifecycle.py",
+        "test_id": "B608",
+        "old_line": 325,
+        "new_line": 326,
+        "old_id": "607132f6da06b05383a3a627d5ef762b69480f0573c89e78ddf87dfde2239507",
+        "new_id": "1cc2967a53b97b46ecf7df88bc64f252e3df6d2e76b08c94002c8a79c3800d5f",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/account_lifecycle.py",
+        "test_id": "B608",
+        "old_line": 331,
+        "new_line": 332,
+        "old_id": "0b8ae6f091cc4576131782b149b3736b6d3d2cbdb680d0c6a0d03762ae06acac",
+        "new_id": "db30439bd5ae2eb0015ca846c73b8a3b97c4e8b25f4f8d3cccec867437914a9c",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/account_lifecycle.py",
+        "test_id": "B608",
+        "old_line": 383,
+        "new_line": 384,
+        "old_id": "a39a20d616d69a9d8518d134136a814b33514b07161e5247064c4a99d71f8cc2",
+        "new_id": "a1c6612c5419e3798d2dfa3b31d2d4285908589694ec4c8e7b9a675f5a479230",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/account_lifecycle.py",
+        "test_id": "B608",
+        "old_line": 429,
+        "new_line": 430,
+        "old_id": "a7f46cc024d1f1d1f336063d0755092d8f3f8621676c0da459083c02b25c13e8",
+        "new_id": "f74d7b0354837e07e54f1b3ac727e873fd1343cecfa83141165e6dfba8f29fa3",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/account_lifecycle.py",
+        "test_id": "B608",
+        "old_line": 453,
+        "new_line": 454,
+        "old_id": "0148b92fa7dccaf1f5e1321c9e88ec51068200c48c53ba4424b50348c580ab99",
+        "new_id": "7f873aee4b129870f02b8aba37f2e6c33df51be9dc3414516d17369e3fca6e45",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/ace_step_desktop_manager.py",
+        "test_id": "B404",
+        "old_line": 13,
+        "new_line": 14,
+        "old_id": "4eac42323345d5dd61e3f5d99603de3ace9ccce492142f9ce4a50210a5d65c9a",
+        "new_id": "759dc8de9fbe702386d5e8413a3ea2ad8f1b85df73ede97304c97ac801dd9d89",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/ace_step_desktop_manager.py",
+        "test_id": "B105",
+        "old_line": 67,
+        "new_line": 68,
+        "old_id": "c640459ef8fc9e354b530ac796b7d7677d0e61c9826695021a7dfa8079a36a3b",
+        "new_id": "3eb7d376507f3a7c8f71a7014164efb45e624a7c0bd21ddaa0517b98ede4fcca",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/ace_step_desktop_manager.py",
+        "test_id": "B603",
+        "old_line": 161,
+        "new_line": 162,
+        "old_id": "45586ef4a1aee774ffdde682d1087e90ee8b145c6f233cf704f10e722636190f",
+        "new_id": "97b8c472dc0080ba1fea16c2c48161effa37488d32d0d90c6d19c81c99e0b091",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/ace_step_desktop_manager.py",
+        "test_id": "B603",
+        "old_line": 329,
+        "new_line": 330,
+        "old_id": "7e2dc836bf6a42ed1b94a9ea4a9d27c4d681d0321f424b115697bf36fca2ce40",
+        "new_id": "8b2d9c38154ff951a775cfd1eb0d9ba64cb1cec5735558ed2b44fcecb73757f4",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/ace_step_live_smoke.py",
+        "test_id": "B404",
+        "old_line": 39,
+        "new_line": 42,
+        "old_id": "2fae286206f244893baa7cc302243dc7e79bf83a2bc137bfdad4b4a4b1cd58f8",
+        "new_id": "62641105768cf06a2ea30e77719b2ed908fc92f6d62287a330f39d3014fc2db4",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/ace_step_live_smoke.py",
+        "test_id": "B603",
+        "old_line": 44,
+        "new_line": 47,
+        "old_id": "3951582e895de697a198b36ae65b72585ca909c2e12cc44334592d0d5665276d",
+        "new_id": "9e94f47438cd7b66249b0615dd384beed55724aa03212f960679b5d6ee2e079c",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/admin_dump.py",
+        "test_id": "B608",
+        "old_line": 390,
+        "new_line": 412,
+        "old_id": "ccb60f21692a20aa6ae7680b2c3b205067dc964e755dab0d554bcf28fa1b4942",
+        "new_id": "10a58f3eed68f78ad049df83251e911f9bc9e79de444d5785675f364b3679ccc",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/ai_cgroup_metering.py",
+        "test_id": "B603",
+        "old_line": 285,
+        "new_line": 286,
+        "old_id": "29c252c136247acb92152b0a719e69442d9187e7e32c997aa7b73ba910beeebb",
+        "new_id": "a8941aae44845f130c8b0430480e13155071e5f3d87f8f4a0d3e5e51eb53bb46",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/ai_metering_agent.py",
+        "test_id": "B404",
+        "old_line": 11,
+        "new_line": 13,
+        "old_id": "630ca8b1a2b188ca86af80590263b7f81eb6f110781c51dfa804b859ed76cb4c",
+        "new_id": "e42c13d4eb60d1d8f6590b9d422d3b68e4272a39aac3ea8526c3a6fb5cbd8bdf",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/ai_metering_agent.py",
+        "test_id": "B603",
+        "old_line": 100,
+        "new_line": 102,
+        "old_id": "19d3a5dd11bc7825b3b712366664294e3dd7c255189a0211b1fbaf3df16f02aa",
+        "new_id": "9ea976fe16d53bb622a6699ea406d267db483950b7ea397c19dc233ff7c3f84e",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/ai_notifications.py",
+        "test_id": "B105",
+        "old_line": 122,
+        "new_line": 123,
+        "old_id": "776d7b19567797acf0747666d3cada84028d15067d1645270a6dc5727c8a44c4",
+        "new_id": "eb976b5cd46675e3335e73818115b1220b32b40e7dfbb94632f97045bf60e217",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/main.py",
+        "test_id": "B404",
+        "old_line": 15,
+        "new_line": 16,
+        "old_id": "7768f5c2cff87774f0cad4c9c80f6bdf4753a34407b06027cdd9ccadae90acb5",
+        "new_id": "a9e8f5b2aeff93f8a9c0055bd664c0529da3b9e8df6470f70604a95e327da4ae",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/main.py",
+        "test_id": "B603",
+        "old_line": 253,
+        "new_line": 275,
+        "old_id": "8fa1aef5298473123a241b3295fa550ef56b1c79cb6f6ba446db9946fd9ac08c",
+        "new_id": "2d98793fe2764c4ce0cddc23fec5d106728d689bc3e6218da9d204d14d570839",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/main.py",
+        "test_id": "B107",
+        "old_line": 943,
+        "new_line": 965,
+        "old_id": "79c75615b3b1c6a6010a8415052e250952eaf45af9e3d3f3ad461c54f552f213",
+        "new_id": "7265c0decca3f48a45be6615196397dc1a0fdbf4a488de8a6cbdc6359af29b49",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/main.py",
+        "test_id": "B107",
+        "old_line": 993,
+        "new_line": 1015,
+        "old_id": "0b2726ed0a77fbc75f71f4b68b9540608c5f24dfaac9760ecee39ddc8717965d",
+        "new_id": "98399c6fee3a493bad192ae3892d6d117f714315bd22beeba8537b2c7fa727a3",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/main.py",
+        "test_id": "B404",
+        "old_line": 1557,
+        "new_line": 1579,
+        "old_id": "3a873eaf2d6307a7d1c4f9c303a0f13436ed81a94ae8b0d7abd4757244a23498",
+        "new_id": "22ed586316f621e6e1a266b166b0298f5f84f689183821f88f8cc66d717437e3",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/main.py",
+        "test_id": "B603",
+        "old_line": 1567,
+        "new_line": 1589,
+        "old_id": "4e6b73c8e2843ae790dc835092070573a496e428d67a97116d5dcd45a92b0d92",
+        "new_id": "e28b8118359e8f1572ad6bfe2cafc8abd34b453b4058255a9405a48a9190608f",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/main.py",
+        "test_id": "B607",
+        "old_line": 2931,
+        "new_line": 2953,
+        "old_id": "16c1036248862318810e429008b299c8a308b766021eeb2bad8c627391f1c54b",
+        "new_id": "9eed78d5d3bcffc524190394bcc9485b39404bc77e425b9ec65f64318cbfb7ab",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/main.py",
+        "test_id": "B603",
+        "old_line": 2931,
+        "new_line": 2953,
+        "old_id": "25d782d076cd3369a24983dd009d4b4b91140e9b38cbd30b858f13606a5b1dca",
+        "new_id": "54f6737674b3ce8f65b33c097dcd85ae1b4a57a0e733e3acbdb099ecb3102cf3",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/main.py",
+        "test_id": "B607",
+        "old_line": 3412,
+        "new_line": 3434,
+        "old_id": "223bcf7b8d553013a423dc4ec5cd37723ddfec41e119ea2a43833940b11e2959",
+        "new_id": "20df377dc5743cd73529e4b6a33207c5b886a69aa8300b42a342cd5d9c3e6345",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/main.py",
+        "test_id": "B603",
+        "old_line": 3412,
+        "new_line": 3434,
+        "old_id": "557f7beb8d80d686a215f6c634ccf22c4208c5208b9f2b0ccd3b648daac7e856",
+        "new_id": "d1bb8e4f5d0b9f305c1aa1c19c9f2803b18155e6d660b5787bb0f84bf79ffc79",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/main.py",
+        "test_id": "B607",
+        "old_line": 3434,
+        "new_line": 3456,
+        "old_id": "74cf2a9de0978f8696c2445fa002857b1fe31ccdd5c30c646a35cdb9fb92d1bf",
+        "new_id": "2676c752c7d005f0fd1cf601fa29e686cc0f4ce1224b27d18db83007fcf3294c",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/main.py",
+        "test_id": "B603",
+        "old_line": 3434,
+        "new_line": 3456,
+        "old_id": "713738315705afed2fb653490a48d1b72d10e9fda9320ba45579ba6131a4fa54",
+        "new_id": "2766934237869f98399a5124490c840ccb59408a0129e1b409aca05ce7316f26",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/main.py",
+        "test_id": "B603",
+        "old_line": 4767,
+        "new_line": 4789,
+        "old_id": "589b0c9a5f1d4b99c621167fb409091dd955f23c0a03a637555cce427a3cb3ce",
+        "new_id": "85da69b544e409540b86a3399978e1d3e838dd463230ce6250b011706bac9c96",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/main.py",
+        "test_id": "B404",
+        "old_line": 4892,
+        "new_line": 4914,
+        "old_id": "d76eaa9505007fd39401eb9158198411d808fd0fc802fa2f6345578d84a888fd",
+        "new_id": "d1707ef39936fe0efee2d2a5395b02d48c4e0181c2314adb1b348e04913a149e",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/main.py",
+        "test_id": "B603",
+        "old_line": 4904,
+        "new_line": 4926,
+        "old_id": "65d0bf3e795e8eba1f5936773bfdef441273e7bc371d3745a2d5aad8c6aabfae",
+        "new_id": "c9c389615cc55fe87105971744f5f2f1180e4fe2568656f0bcc2b91f9af62b4d",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/main.py",
+        "test_id": "B603",
+        "old_line": 5734,
+        "new_line": 5756,
+        "old_id": "df8c5031237d958301e5a7ae23af515d58efaed0552edcd5178c1ab1b34905f4",
+        "new_id": "d10e53cc79d7c36c028094262f8a754c095448880669034d86949b375fc6a4db",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/main.py",
+        "test_id": "B603",
+        "old_line": 7205,
+        "new_line": 7227,
+        "old_id": "7b2e4440c9dd7352ecf04314461215d776f44dadcdd56e0ea7666655be2e7e54",
+        "new_id": "8109a1a96229a5b99091c5b9beb964de997d74e33f5aabcc021c0ef087ca8ea4",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/main.py",
+        "test_id": "B603",
+        "old_line": 7417,
+        "new_line": 7439,
+        "old_id": "43ee81b50aff8c6b4a611c24ec0bf88d3822277680fdc6842382acc750f010e6",
+        "new_id": "34061bd1d58fd88fd2ac33f8accfec25865012393a5b4f57e267b679d8feb993",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/optional_plugins.py",
+        "test_id": "B404",
+        "old_line": 14,
+        "new_line": 16,
+        "old_id": "19408595173d39bda981c49447a6e631bce676c532aeb615642e32bba967688c",
+        "new_id": "0f3346877cb64d3083957461eaeef7d4a89a8c1b6aa912624f2ea7fdb4ff6aac",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/optional_plugins.py",
+        "test_id": "B603",
+        "old_line": 66,
+        "new_line": 68,
+        "old_id": "226f7811fd496c161006af46ef47876078425714f2a76a3cdcce6b53e907309e",
+        "new_id": "e7366877f633e804d8e57572d6e694db72091951d4ffb933d6453256558318b4",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/optional_plugins.py",
+        "test_id": "B607",
+        "old_line": 101,
+        "new_line": 103,
+        "old_id": "563f3e124f2daab574a49827c717147a9ee6dad776377a358c77e7bd14b65887",
+        "new_id": "ddf9eff4a2dee1bf08ddc21e20f8f808cd8208c53b445dbcdb755adbc91f2a4d",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/optional_plugins.py",
+        "test_id": "B603",
+        "old_line": 101,
+        "new_line": 103,
+        "old_id": "4bc7e9f4038bafe0fd15c71bca248fc4f6d2c97b5ff6fc4d7165d1d81dfb74d1",
+        "new_id": "9cb60536be1812bc45945881b628faec8346dac5978e107ca9bb86320d31074b",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/plugins.py",
+        "test_id": "B404",
+        "old_line": 13,
+        "new_line": 15,
+        "old_id": "4130ea3fd13d489ef26a84e290919c2d05e686d9adce540a0b3dea0903df6621",
+        "new_id": "1365ad51339e98c1f09b3cc8c6ae085529a017bb004c7186fd35b41018cfaf40",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/plugins.py",
+        "test_id": "B603",
+        "old_line": 616,
+        "new_line": 617,
+        "old_id": "eae6a20b749bc0078c5cdc7871728828f9553c41553153d2b7292a8ab3e09709",
+        "new_id": "6f43a2d71f7b902b272282a4c1ab60073cbd1489437ddd56a5e1f3830679e347",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/storage.py",
+        "test_id": "B404",
+        "old_line": 6,
+        "new_line": 8,
+        "old_id": "65ea09b119894093f12b9816bd8cc80c161d98f49983007b79e396187fcd155f",
+        "new_id": "488fbb989d8769c9294de18b90b8cc52e98d96fcae4793aa1ae77e44b91e8c75",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/storage.py",
+        "test_id": "B607",
+        "old_line": 616,
+        "new_line": 619,
+        "old_id": "38a52f1ee920446baa9373d427ff81ad18376446e99b256f9085bf547e7121c5",
+        "new_id": "34b852e09e056fd6ec45fda9700ad10912883326137a15071f5522f546dc3503",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/storage.py",
+        "test_id": "B603",
+        "old_line": 616,
+        "new_line": 619,
+        "old_id": "c5820320e3f837b3d6704e7e4b6a891a5e293a000f747613186057d3f22f2be4",
+        "new_id": "73732087aae92411e1a73a59bfc4b1e20828867bb9bb7e91cc26f5fb765819d4",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/storage.py",
+        "test_id": "B607",
+        "old_line": 625,
+        "new_line": 628,
+        "old_id": "b3cdf3dad2b934d9d7d00ed6f4261af29da45a463d99504c4e5b7718d89d11f0",
+        "new_id": "c44d9e67752977f46835e87f900beb21174cc078fbd50a170c5ef28d98ad2ef5",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/storage.py",
+        "test_id": "B603",
+        "old_line": 625,
+        "new_line": 628,
+        "old_id": "a35efacda3a67d625accbecc7fde0135681869d3a7657017e47fcdee76dd4542",
+        "new_id": "a8045298f02ae286c913bfebc02990e0ff89efbe7ec1a3b83c6b0b8fb49a95cd",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/storage.py",
+        "test_id": "B607",
+        "old_line": 628,
+        "new_line": 631,
+        "old_id": "c7080ddd5b0a0f9219fd37f72d30b35da02a2b10939798ded334f689cc15c041",
+        "new_id": "0b4361863a1a43eea924495cb7010e8b6a5d40f445983e5b660305ed79ffa300",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/storage.py",
+        "test_id": "B603",
+        "old_line": 628,
+        "new_line": 631,
+        "old_id": "288920757f08f6ecff98cc491ef26bc25c6e51e1613f3e45b80b98bf2fe89ce2",
+        "new_id": "93a72208c6b95cc9cc07d2c317169bd651934492dc7b180609303c326c0fb177",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/storage.py",
+        "test_id": "B607",
+        "old_line": 632,
+        "new_line": 635,
+        "old_id": "12fbcd3d1123e68f106029b24d25fbb5311c41ff509ada170ca53ba0fc5fe901",
+        "new_id": "aa9daf47cbc6371c4d6dd370f31a3022b8dc04d03d399552f97951fcca7f8c8a",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/storage.py",
+        "test_id": "B603",
+        "old_line": 632,
+        "new_line": 635,
+        "old_id": "9d3834582433481e16189dd16dfbe663e7d0c5f9bf3c6c09c7bede41cbd12a57",
+        "new_id": "04e1ea59bbfa7285b78b2a0d142e6bd57879d30f612eb186473084fedad3bd0f",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/studio_compute.py",
+        "test_id": "B404",
+        "old_line": 7,
+        "new_line": 11,
+        "old_id": "28687e719a5ef962eea269febddc2fc001d677bf59b3b4878d48a361ff7fd94d",
+        "new_id": "2ed1a419005e0c4a787438cb831c9f0141e3c313c44d81486004c0a72a229cbb",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/studio_compute.py",
+        "test_id": "B603",
+        "old_line": 19,
+        "new_line": 23,
+        "old_id": "7f08300ed2b86fa15588cbaa20a90d6be5d0839a6caa4904b7c13dc3ebb44362",
+        "new_id": "1e16a5b4eebdf91706d0bdc67590d6b44b9f027c705b4dabbaf705354552b049",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      },
+      {
+        "path": "app/studio_compute.py",
+        "test_id": "B603",
+        "old_line": 88,
+        "new_line": 93,
+        "old_id": "3681f282dadc4dc698495cd88a551fc174aad5fdd00d98c6e58869952894b58a",
+        "new_id": "6559d8d00ffa880c94e52822e9c1c529decc86a093d454005e706165b218efb4",
+        "basis": "Exact warning fields and code unchanged after removal of report line-number prefixes;original explicit disposition retained."
+      }
+    ],
+    "new_suppressions": false,
+    "new_network_boundaries": false
+  },
+  "progress": {
+    "before": 24,
+    "after": 25,
+    "denominator": 42,
+    "percent_before": 57.1,
+    "percent_after": 59.5,
+    "macroareas_accepted": 0,
+    "release_candidate": false
+  },
+  "declaration": "Original C2 verified for B4 supported single pinned local Linux authority replicas and authenticated HTTPS-only workers. Not HA/NFS,external kernel,multi-host physical target or financial transition authorization.",
+  "actual_boundaries": [
+    "Authenticated admin HTTP/CSRF/generation controls and original identity replay",
+    "ASGI HTTP/stream/background/WebSocket full lifetime",
+    "Independent process concurrent admission/drain and SIGKILL no-expiry",
+    "Independent HTTPS CLI workers with dropped claim/completion response,one execution",
+    "Registered local worker,actual heartbeat/publication/accounting,single charge",
+    "Actual uploaded PCM/original capture finalization and async media publication",
+    "Real controlled child process at VST3 Session boundary,failed shutdown retains ticket;not a real plugin acceptance",
+    "Independent process with actually modified source build,zero-work explicit handoff,fenced old replica",
+    "Original admission journal/instance backup and offline restore,no uncertainty reset",
+    "Strict schema/trigger/private-file/empty-journal negative controls"
+  ],
+  "not_accepted": [
+    "C3 every financial obligation",
+    "C5 general two-way enabled cutover",
+    "C6/B6 actual multi-host crash/partition target",
+    "B2 external kernel quiescence",
+    "B5/F4 every-executor billing/rights",
+    "Native/GPU/plugin/hardware acceptance"
+  ],
+  "initial_failures": {
+    "acceptance_first": "Concurrent resume can be refused immediately by the nonblocking OS lease;test now accepts this safe refusal and checks explicit retry after snapshot.No barrier assertion weakened.",
+    "lifetimes": "New local-worker fixture had no administrator bootstrap;created a separate real active administrator instead of assuming ID1/role.",
+    "backup": "Original generic restore rejected all triggers.The new admission database now accepts only its exact bundled schema and immutable triggers;all other database schema restrictions remain unchanged."
+  },
+  "quality": {
+    "ruff_app_scripts_tests_native": "passed",
+    "python_compileall_app": "passed",
+    "no_new_dependency_or_network_command": true,
+    "gitleaks": "Gitleaks8.24.3 current complete introduced-line delta passes;zero findings,no config/ignore/allowlist changes.Four public source digests in the new inventory now have strict explicit sha256: algorithm labels;not secret values.Source checker exact equality and negative mutations pass.",
+    "gitleaks_report": "docs/validation/r210/service-admission-gitleaks.json",
+    "gitleaks_config_unchanged": true
+  },
+  "unchanged_evidence_reused": [
+    "Accepted E5 Chromium",
+    "Known-order Stripe stable history/concurrency",
+    "Previous confirmed standard CI40480180716 and cutover40505295056 on772fbe7",
+    "Unaffected hardware/native/runtime/dependency proofs"
+  ],
+  "real_server_provider_github_or_git_mutations": false,
+  "provenance": "Latest outcome per exact testcase identity across affected runs;initial failures retained.197-case run predates the final opt-in schema/backup guard;unchanged default-off boundaries reuse it.161 final integration cases exercise the final constructor/schema/backup and original API boundaries;37 final security/transport cases pass.321 distinct latest passes are an affected union,not a rerun full suite or321 new cases."
+}

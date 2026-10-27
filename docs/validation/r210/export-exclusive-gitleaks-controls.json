@@ -1,0 +1,15 @@
+{
+  "engine": "gitleaks8.24.3",
+  "official_archive_sha256": "9991e0b2903da4c8f6122b5c3186448b927a5da4deef1fe45271c3793f4ee29c",
+  "negative_fresh_unrelated_auth_secret_detected": true,
+  "negative_exit": 1,
+  "negative_findings": 1,
+  "raw_synthetic_secret_retained": false,
+  "one_new_exact_public_digest_exception": true,
+  "default_rules_retained": true,
+  "whole_paths_or_commits_excluded": false,
+  "final_delta_exit": 0,
+  "final_delta_findings": 0,
+  "baseline_archive_sha256": "b2d5529761f62abca039af588ce90f7296a9ffcdbb90e33b748334692ea04b1c",
+  "scope": "Every inserted/replaced UTF-8 source/evidence/documentation/manifest line in the complete delivery vs previous full cumulative;unchanged original lines blanked at their original positions;no binary changes."
+}

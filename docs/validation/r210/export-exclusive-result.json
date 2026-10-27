@@ -1,0 +1,1235 @@
+{
+  "date": "2026-10-27",
+  "target": "MTA0.3.0-r210 PRE-RC",
+  "baseline_archive": "MTA-0.3.0-r210-pre-RC-legacy-execution-cumulative.zip",
+  "baseline_archive_sha256": "b2d5529761f62abca039af588ce90f7296a9ffcdbb90e33b748334692ea04b1c",
+  "base_commit": "772fbe7508cc08266466a3746bb51f0fe5d0179b",
+  "scope": "Exclusive reader-blocking SQLite contention on barrier/auth/export polling and completed download;private503 and bounded read-only browser recovery on original job",
+  "distinct_latest": {
+    "passed": 143,
+    "failed": 0,
+    "error": 0,
+    "skipped": 0
+  },
+  "new_cases": 22,
+  "reports": [
+    {
+      "path": "docs/validation/r210/export-exclusive-first.xml",
+      "sha256": "0ae6b0000a5d9bc431ff54c32943580647a36bbec80bf08da72c0b51951e7def",
+      "collected": 15,
+      "passed": 14,
+      "failed": 1,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/validation/r210/export-exclusive-auth-recheck.xml",
+      "sha256": "6d52bc9538ff7dbcacb4937d49013ae7fdd28a9034ba525c8e88eec1a77a25a0",
+      "collected": 1,
+      "passed": 1,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/validation/r210/export-exclusive-final.xml",
+      "sha256": "58509fcfd4c139ef0a57f54ce60d7efe60d9e38aac99cc6feda4e527a2e214cd",
+      "collected": 26,
+      "passed": 26,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/validation/r210/export-exclusive-regression.xml",
+      "sha256": "510da4e6a86f3dc842f22e216d707407a87d0e13dd1dffabc14c7a6891e99fa0",
+      "collected": 106,
+      "passed": 106,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/validation/r210/export-exclusive-browser-functions-final.xml",
+      "sha256": "d5564d910181e268c7a6466b842f8b27f3d514ca823c153dd83192c82475e3f6",
+      "collected": 1,
+      "passed": 1,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    },
+    {
+      "path": "docs/validation/r210/export-exclusive-security-gates.xml",
+      "sha256": "3f166aaf9703e43ea4fa20d53ea91c8eb505cd1a6d2980351d0ee738c9ca87e5",
+      "collected": 37,
+      "passed": 37,
+      "failed": 0,
+      "error": 0,
+      "skipped": 0
+    }
+  ],
+  "cases": [
+    {
+      "module": "tests.test_auth",
+      "case": "test_activation_notifies_all_admins",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_auth",
+      "case": "test_login_mockup_is_mobile_friendly",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_auth",
+      "case": "test_login_page_and_session_cookie",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_auth",
+      "case": "test_registration_rejects_missing_email",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_auth",
+      "case": "test_registration_requires_email_confirmation_before_activation",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_auth",
+      "case": "test_smtp_configuration_password_is_not_returned",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_auth",
+      "case": "test_totp_roundtrip_and_qr",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_auth_extended",
+      "case": "test_admin_role_delete_and_last_admin_guards",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_auth_extended",
+      "case": "test_authentication_session_profile_and_password_paths",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_auth_extended",
+      "case": "test_resend_profile_email_and_password_reset_flows",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_auth_extended",
+      "case": "test_smtp_full_test_send_and_validation_paths",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_auth_extended",
+      "case": "test_totp_enable_disable_and_failure_paths",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_configured_project_export",
+      "case": "test_configured_export_request_model_contains_audio_parameters",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_configured_project_export",
+      "case": "test_export_dialog_asks_name_and_format_specific_parameters",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_configured_project_export",
+      "case": "test_native_export_asks_filesystem_destination",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_configured_project_export",
+      "case": "test_native_export_dialog_extension_validation",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_export_normalization_174",
+      "case": "test_render_mix_normalization_uses_peak_analysis",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_project_export_jobs",
+      "case": "test_project_export_job_download_support_is_present",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_account_lifecycle",
+      "case": "test_email_change_reserves_old_and_pending_email",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_account_lifecycle",
+      "case": "test_email_mfa_onboarding_precedes_admin_approval_and_blocks_login_without_otp",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_account_lifecycle",
+      "case": "test_email_otp_attempt_limits_cooldown_and_expiry",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_account_lifecycle",
+      "case": "test_failed_purge_removes_uncommitted_sandbox",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_account_lifecycle",
+      "case": "test_quarantine_removes_settlement_outbox_and_credentials",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_account_lifecycle",
+      "case": "test_reactivation_requires_email_then_admin_and_does_not_restore_old_tokens",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_account_lifecycle",
+      "case": "test_repeated_retirement_reactivation_revokes_each_archive_without_token_collision",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_account_lifecycle",
+      "case": "test_retention_api_admin_only_and_self_deletion_forbidden_to_admin",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_account_lifecycle",
+      "case": "test_retention_configuration_validation[settings0]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_account_lifecycle",
+      "case": "test_retention_configuration_validation[settings1]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_account_lifecycle",
+      "case": "test_retention_configuration_validation[settings2]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_account_lifecycle",
+      "case": "test_retention_configuration_validation[settings3]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_account_lifecycle",
+      "case": "test_retirement_preserves_identity_accounting_revokes_tokens_and_exports_projects",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_account_lifecycle",
+      "case": "test_total_delete_admin_protected_and_explicit_confirmation_required",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_account_lifecycle",
+      "case": "test_total_delete_one_confirmation_removes_account_and_accounting",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_account_lifecycle",
+      "case": "test_totp_onboarding_guard_and_notification_outbox",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "case": "test_actual_admin_roundtrip_preserves_wallet_periods_and_real_nc_history",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "case": "test_actual_api_process_sigkill_after_sqlite_commit_preserves_durable_barrier",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "case": "test_changed_original_receipt_cannot_rebaseline_or_abort_committed_transition",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "case": "test_forward_recovery_records_the_actual_second_administrator",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "case": "test_independent_process_lease_blocks_api_and_sigkill_releases_only_os_lock",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "case": "test_interruption_keeps_barrier_auth_and_original_finances_then_forward_recovers[False]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "case": "test_interruption_keeps_barrier_auth_and_original_finances_then_forward_recovers[True]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "case": "test_live_accounting_connection_blocks_exclusive_cutover",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "case": "test_preview_staleness_auth_csrf_default_off_and_confirmation_are_not_bypassable",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "case": "test_real_registered_builtin_harmony_and_measured_nc_statement_survive_actual_return_cutover",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "case": "test_unverifiable_or_financially_unsupported_states_refuse_actual_api[credit]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "case": "test_unverifiable_or_financially_unsupported_states_refuse_actual_api[history]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "case": "test_unverifiable_or_financially_unsupported_states_refuse_actual_api[missing-schema]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "case": "test_unverifiable_or_financially_unsupported_states_refuse_actual_api[priced-plan]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "case": "test_unverifiable_or_financially_unsupported_states_refuse_actual_api[provider]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "case": "test_unverifiable_or_financially_unsupported_states_refuse_actual_api[running-job]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "case": "test_unverifiable_or_financially_unsupported_states_refuse_actual_api[unknown-journal]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "case": "test_unverifiable_or_financially_unsupported_states_refuse_actual_api[unprefixed-legacy-schema]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_export_auth_contention",
+      "case": "test_database_replacement_is_not_hidden_by_a_process_cache",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_export_auth_contention",
+      "case": "test_ready_auth_and_owner_checks_remain_read_only_with_another_writer",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_export_auth_contention",
+      "case": "test_real_export_poll_and_download_work_while_sqlite_writer_is_held[project-flac]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_export_auth_contention",
+      "case": "test_real_export_poll_and_download_work_while_sqlite_writer_is_held[project-mp3]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_export_auth_contention",
+      "case": "test_real_export_poll_and_download_work_while_sqlite_writer_is_held[project-wav]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_export_auth_contention",
+      "case": "test_real_export_poll_and_download_work_while_sqlite_writer_is_held[track-flac]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_export_auth_contention",
+      "case": "test_real_export_poll_and_download_work_while_sqlite_writer_is_held[track-mp3]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_export_auth_contention",
+      "case": "test_real_export_poll_and_download_work_while_sqlite_writer_is_held[track-wav]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_export_auth_contention",
+      "case": "test_real_missing_schema_or_defaults_still_migrate[index]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_export_auth_contention",
+      "case": "test_real_missing_schema_or_defaults_still_migrate[language]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_export_auth_contention",
+      "case": "test_real_missing_schema_or_defaults_still_migrate[smtp-row]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_barrier_reuses_original_connection_without_committing_its_transaction",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_barrier_timeout_is_bounded_restored_and_its_reader_is_released",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_exact_barrier_schema_read_fails_closed_under_exclusive_writer",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_locked_authentication_has_no_cached_positive_or_false_logout",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_locked_mutations_are_not_advertised_as_replayable[DELETE]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_locked_mutations_are_not_advertised_as_replayable[POST]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_locked_mutations_are_not_advertised_as_replayable[PUT]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_missing_barrier_evidence_is_unavailable_and_never_retryable[missing-row]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_missing_barrier_evidence_is_unavailable_and_never_retryable[missing-table]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_non_lock_operational_error_is_not_masked_as_transient",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_only_actual_sqlite_lock_errors_are_retryable[database disk image is malformed-False]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_only_actual_sqlite_lock_errors_are_retryable[database is locked-True]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_only_actual_sqlite_lock_errors_are_retryable[database table is locked: users-True]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_only_actual_sqlite_lock_errors_are_retryable[no such table: users-False]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_only_actual_sqlite_lock_errors_are_retryable[syntax error-False]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_original_export_survives_exclusive_lock_and_polls_download_after_release[project-flac]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_original_export_survives_exclusive_lock_and_polls_download_after_release[project-mp3]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_original_export_survives_exclusive_lock_and_polls_download_after_release[project-wav]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_original_export_survives_exclusive_lock_and_polls_download_after_release[track-flac]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_original_export_survives_exclusive_lock_and_polls_download_after_release[track-mp3]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_original_export_survives_exclusive_lock_and_polls_download_after_release[track-wav]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "case": "test_production_browser_read_retry_never_replays_mutations_and_keeps_original_poll",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-browser-functions-final.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_call_fingerprint_does_not_depend_on_python_ast_dump",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_current_inventory_matches_review",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_inventory_cannot_silently_approve_drift[category]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_inventory_cannot_silently_approve_drift[checker]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_inventory_cannot_silently_approve_drift[hash]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_inventory_cannot_silently_approve_drift[missing]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_inventory_cannot_silently_approve_drift[rationale]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_inventory_cannot_silently_approve_drift[reorder]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_inventory_cannot_silently_approve_drift[source]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-device/start?x=1]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-gateway/v1/generate]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-jobs/execute-audio/whisper]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_new_aliased_transports_require_review[from httpx import AsyncClient as hidden\\nhidden()]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_new_aliased_transports_require_review[from urllib.request import build_opener as hidden\\nx=hidden()\\nx.open(\"https://example.test\")]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_new_aliased_transports_require_review[from urllib.request import urlopen as hidden\\nhidden(\"https://example.test\")]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_new_aliased_transports_require_review[import aiohttp as hidden\\nhidden.ClientSession()]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_new_aliased_transports_require_review[import httpx as hidden\\nhidden.Client()]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_new_aliased_transports_require_review[import socket as hidden\\nhidden.create_connection((\"example.test\",443))]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_supported_device_authorization_still_uses_exact_post[/api/ai-device/poll]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_supported_device_authorization_still_uses_exact_post[/api/ai-device/start]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_complete_source_bound_review_is_accepted",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_current_scan_and_complete_review_ledger_agree",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[blanket_approval]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[changed_finding]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[changed_source]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[deleted_source]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[duplicate_review]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[duplicate_scan]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[empty_reason]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[high]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[missing_file]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[missing_review]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[new_finding]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[new_source]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[scan_error]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[suppression]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[wrong_totals]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-security-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "case": "test_active_admin_required_for_all_lifecycle_paths",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "case": "test_committed_report_proves_original_receipts_and_only_forward_recovery",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "case": "test_corruption_or_missing_evidence_never_offers_unsafe_recovery[balance]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "case": "test_corruption_or_missing_evidence_never_offers_unsafe_recovery[mirror]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "case": "test_corruption_or_missing_evidence_never_offers_unsafe_recovery[orphan_commit]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "case": "test_corruption_or_missing_evidence_never_offers_unsafe_recovery[second_reservation]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "case": "test_corruption_or_missing_evidence_never_offers_unsafe_recovery[wrong_epoch]",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "case": "test_legacy_commit_is_reported_without_adopting_admin_authority",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "case": "test_old_aborted_history_does_not_gain_invented_actor_and_pages_are_complete",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "case": "test_read_only_initial_status_has_real_counts_and_private_role_guard",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "case": "test_recovery_settings_remain_accessible_after_commit",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "case": "test_reservation_abort_keeps_epoch_money_and_exact_actor_audit",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "case": "test_tracked_open_work_is_visible_and_not_certified_as_total_service_drain",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r213_plugin_modal_track_export",
+      "case": "test_browser_generated_audio_uses_save_picker_when_available",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r213_plugin_modal_track_export",
+      "case": "test_native_bridge_can_write_preselected_generated_audio_path",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r213_plugin_modal_track_export",
+      "case": "test_native_track_export_asks_destination_before_render_job",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r213_plugin_modal_track_export",
+      "case": "test_plugin_setup_modal_stacks_above_inspector_overlay",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r213_plugin_modal_track_export",
+      "case": "test_r213_mobile_build_numbers_match_revision",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r217_plugin_mp3_export",
+      "case": "test_plugin_track_mp3_export_asks_parameters_before_destination",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r217_plugin_mp3_export",
+      "case": "test_track_export_api_carries_codec_settings_and_metadata",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    },
+    {
+      "module": "tests.test_r217_plugin_mp3_export",
+      "case": "test_track_renderer_writes_id3_metadata_and_requested_bitrate",
+      "state": "passed",
+      "report": "docs/validation/r210/export-exclusive-regression.xml"
+    }
+  ],
+  "initial_failure_resolution": "One initial authentication fixture asserted200 during unrelated scheduler startup. The deliberate-lock installed-server fixture now avoids lifespan background schedulers,matching existing export tests;isolated recheck and all final affected cases pass. No authentication/output assertions weakened.",
+  "source_sha256": {
+    "app/auth.py": "7197a25d08ec5924510a2a4fd02809b5f894b7f908ce73ac13be47b3277a537c",
+    "app/regime_service_lease.py": "0ac0002ff6b5b4167a399457a2187a401c217d1449bed5f7cd76b35b95c3f10a",
+    "app/sqlite_availability.py": "365fb1b80404d3441fdf9cd06570f21a7a2a7f0ecbc41f716c4a40ca8bcf79da",
+    "app/main.py": "6f3dac6e4716028d6c7926196d5805aeb4cde1a457bb9b248e10b5f05474eb4a",
+    "app/static/app.js": "2bd36638528d10884d0ff3bdcd9028cda1f76391725cc934d218b1381f30b9fe",
+    "app/templates/index.html": "2ebd77237d03a1ca54453c73318ef10337e03cf8af3c4d20f3c3e9bcaddf15f7",
+    "tests/test_r210_export_exclusive_contention.py": "cf341d23c6caf14ab236e6b6024f1767537466625a211e6ec60b4f63ec8a429d",
+    "tests/export_sqlite_busy.cjs": "3e5afd4938e5e5b255b469aadd3fc749842f46ccefd1732a8bbf239824d74e8f"
+  },
+  "actual_exports": {
+    "formats": [
+      "mp3",
+      "wav",
+      "flac"
+    ],
+    "kinds": [
+      "project",
+      "track"
+    ],
+    "reserved_writer_cases": 6,
+    "exclusive_reader_lock_cases": 6,
+    "encoder": "actual FFmpeg",
+    "downloaded_codec_check": "actual ffprobe",
+    "one_original_job_per_exclusive_case": true,
+    "output_reencoded_on_retry": false
+  },
+  "browser_functions": {
+    "engine": "Node executes shipped API/read-retry/poll/download function bodies",
+    "actual_chromium": false,
+    "get_retry_attempts": 4,
+    "completed_download_retry": "Explicit opt-in only for project/track/karaoke export callbacks;same job and original URL;save/finish/terminal once",
+    "mutation_replay": false,
+    "general_completion_callback_replay": false
+  },
+  "security": {
+    "security": {
+      "reviewed_findings": 164,
+      "source_files": 296,
+      "raw_severity": {
+        "HIGH": 0,
+        "MEDIUM": 21,
+        "LOW": 143
+      },
+      "scan_review_passed": true,
+      "release_candidate": false,
+      "transition_enabled": false
+    },
+    "transport": {
+      "reviewed_sites": 30,
+      "source_files": 21,
+      "inventory_passed": true,
+      "remote_model_attestation_complete": false,
+      "release_candidate": false
+    },
+    "relocated_identical_findings": [
+      {
+        "path": "app/auth.py",
+        "test_id": "B105",
+        "old_line": 536,
+        "new_line": 535,
+        "old_id": "cfa0e4b80fd7ffe13a80765eb3d32c90f447644d40196cb0c4ffa9268549fdd3",
+        "new_id": "497d7ff6f4556f934d9fe2f49fe03e370c1d773c33cf7181d15cdcc093e2c660",
+        "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+      },
+      {
+        "path": "app/auth.py",
+        "test_id": "B105",
+        "old_line": 537,
+        "new_line": 536,
+        "old_id": "75947d2e77962e42096e05a74eee929fbb46623549559a5bb746cbb9f549ed6d",
+        "new_id": "4aefd709a76fd11ffeb08f3de158cc0f3f0b048563ee2fbfef9f2f005d37e3b1",
+        "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+      },
+      {
+        "path": "app/auth.py",
+        "test_id": "B105",
+        "old_line": 540,
+        "new_line": 539,
+        "old_id": "32bfe760ddceb5b2b98c0661d93fe55d5c008dcbe13d64581952d9368bbfe1a7",
+        "new_id": "d189676f11c72b7f49c740123ad3674cb19f0705b871066782e0e8b2925be86a",
+        "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+      },
+      {
+        "path": "app/auth.py",
+        "test_id": "B105",
+        "old_line": 541,
+        "new_line": 540,
+        "old_id": "c27acfa9a98fd46337d8b510e61fa5eb8f24da5cf99ce88b43e2bfc5c006ec98",
+        "new_id": "f7ada2fdfac2f6c40105df6b661c79daef2115490cb253c588bc3290b0169eda",
+        "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+      },
+      {
+        "path": "app/auth.py",
+        "test_id": "B105",
+        "old_line": 544,
+        "new_line": 543,
+        "old_id": "5e88ffb103743def1fdb10d571f81cc7d95013700f56eff00e84a82001a44981",
+        "new_id": "87ed571747cb3db3d7f335a4c369a82e547f2be66c94ed2757873f33cd051581",
+        "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+      },
+      {
+        "path": "app/auth.py",
+        "test_id": "B105",
+        "old_line": 545,
+        "new_line": 544,
+        "old_id": "c31546912004b4a54757d1327ec017f99c37232303a37e5bbd64f57fdf78074f",
+        "new_id": "0587b4ae0ea3543c0e5ea1534000a9527aa11b1ef2598956e28772379fc4b442",
+        "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+      },
+      {
+        "path": "app/auth.py",
+        "test_id": "B105",
+        "old_line": 783,
+        "new_line": 782,
+        "old_id": "fd65567724424461513bda8519dd52c57835bf53e188a2293881dc9b73ad98eb",
+        "new_id": "d9116a31418ba98a809161a2ccd50cb8e38c3c66333d566f743c124c524cedac",
+        "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+      },
+      {
+        "path": "app/main.py",
+        "test_id": "B107",
+        "old_line": 931,
+        "new_line": 943,
+        "old_id": "3d9361e98c85cbbbf62467fabb05a1dd61c5a761cb14c7da0382ac1a7e63af0b",
+        "new_id": "79c75615b3b1c6a6010a8415052e250952eaf45af9e3d3f3ad461c54f552f213",
+        "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+      },
+      {
+        "path": "app/main.py",
+        "test_id": "B107",
+        "old_line": 981,
+        "new_line": 993,
+        "old_id": "afb56c8135ef84004382f13038e2767680e6c5d992035ee873e759635b77f208",
+        "new_id": "0b2726ed0a77fbc75f71f4b68b9540608c5f24dfaac9760ecee39ddc8717965d",
+        "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+      },
+      {
+        "path": "app/main.py",
+        "test_id": "B404",
+        "old_line": 1545,
+        "new_line": 1557,
+        "old_id": "1cba2b9e42f833f437540f4ac9d65ce01a38a213a0814c287adc3e2821ccf3b9",
+        "new_id": "3a873eaf2d6307a7d1c4f9c303a0f13436ed81a94ae8b0d7abd4757244a23498",
+        "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+      },
+      {
+        "path": "app/main.py",
+        "test_id": "B603",
+        "old_line": 1555,
+        "new_line": 1567,
+        "old_id": "150de41aea1f30389f31f62c62e876bed79a71048fd688edf7a93f18b1c2d1c7",
+        "new_id": "4e6b73c8e2843ae790dc835092070573a496e428d67a97116d5dcd45a92b0d92",
+        "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+      },
+      {
+        "path": "app/main.py",
+        "test_id": "B607",
+        "old_line": 2919,
+        "new_line": 2931,
+        "old_id": "cdac7668861b4484f56443d8639d15011c6cf13f03b889d1dc96b57c9459459b",
+        "new_id": "16c1036248862318810e429008b299c8a308b766021eeb2bad8c627391f1c54b",
+        "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+      },
+      {
+        "path": "app/main.py",
+        "test_id": "B603",
+        "old_line": 2919,
+        "new_line": 2931,
+        "old_id": "24b58a5d418cb71aa4903fb1f129fb779af4f647a67a6f6cdf021775f3f1aeab",
+        "new_id": "25d782d076cd3369a24983dd009d4b4b91140e9b38cbd30b858f13606a5b1dca",
+        "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+      },
+      {
+        "path": "app/main.py",
+        "test_id": "B607",
+        "old_line": 3400,
+        "new_line": 3412,
+        "old_id": "1b1c61632509ee7d91955a9cdbb1781ced83b540b10a3929fd0593318097893a",
+        "new_id": "223bcf7b8d553013a423dc4ec5cd37723ddfec41e119ea2a43833940b11e2959",
+        "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+      },
+      {
+        "path": "app/main.py",
+        "test_id": "B603",
+        "old_line": 3400,
+        "new_line": 3412,
+        "old_id": "4d9ddc85996b3800fb4001763e63ec3afe9c14797445d5ac51cec723f7c6ad76",
+        "new_id": "557f7beb8d80d686a215f6c634ccf22c4208c5208b9f2b0ccd3b648daac7e856",
+        "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+      },
+      {
+        "path": "app/main.py",
+        "test_id": "B607",
+        "old_line": 3422,
+        "new_line": 3434,
+        "old_id": "1df75ce64525d7c2af0e824a1a659aa2a2d20f5b23de79a5d9e6964f971ea84b",
+        "new_id": "74cf2a9de0978f8696c2445fa002857b1fe31ccdd5c30c646a35cdb9fb92d1bf",
+        "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+      },
+      {
+        "path": "app/main.py",
+        "test_id": "B603",
+        "old_line": 3422,
+        "new_line": 3434,
+        "old_id": "2acf51219434f73f753de5cdf034313fb3d45bb7f1d8e392f4752967c342b9a5",
+        "new_id": "713738315705afed2fb653490a48d1b72d10e9fda9320ba45579ba6131a4fa54",
+        "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+      },
+      {
+        "path": "app/main.py",
+        "test_id": "B603",
+        "old_line": 4755,
+        "new_line": 4767,
+        "old_id": "67aeaab4aad1fa80ebf91373ea1e2054dfcaf1e9ed1fbfc7db0748560f559532",
+        "new_id": "589b0c9a5f1d4b99c621167fb409091dd955f23c0a03a637555cce427a3cb3ce",
+        "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+      },
+      {
+        "path": "app/main.py",
+        "test_id": "B404",
+        "old_line": 4880,
+        "new_line": 4892,
+        "old_id": "df0e90a903c22fa85b078ae0858fa753bae3dc5ab2ce9a3fee5edcdf415de759",
+        "new_id": "d76eaa9505007fd39401eb9158198411d808fd0fc802fa2f6345578d84a888fd",
+        "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+      },
+      {
+        "path": "app/main.py",
+        "test_id": "B603",
+        "old_line": 4892,
+        "new_line": 4904,
+        "old_id": "0efb2b285608bc06ef4ae9cba9971ac393ca13774887011d34f13201b873d736",
+        "new_id": "65d0bf3e795e8eba1f5936773bfdef441273e7bc371d3745a2d5aad8c6aabfae",
+        "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+      },
+      {
+        "path": "app/main.py",
+        "test_id": "B603",
+        "old_line": 5722,
+        "new_line": 5734,
+        "old_id": "b720433c94cbdbdc3336e605aeabbbf8b9af046ef6ede3a685f6a901a133d32c",
+        "new_id": "df8c5031237d958301e5a7ae23af515d58efaed0552edcd5178c1ab1b34905f4",
+        "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+      },
+      {
+        "path": "app/main.py",
+        "test_id": "B603",
+        "old_line": 7193,
+        "new_line": 7205,
+        "old_id": "a1a82c1ebe85f0aa274abd66d38e5b97aa95e173f68e5c34acc87955dd7d99be",
+        "new_id": "7b2e4440c9dd7352ecf04314461215d776f44dadcdd56e0ea7666655be2e7e54",
+        "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+      },
+      {
+        "path": "app/main.py",
+        "test_id": "B603",
+        "old_line": 7405,
+        "new_line": 7417,
+        "old_id": "d41c00e68c8b88015ff5651b8cfc84227272f9185e6471153d71bda7de0f6a7f",
+        "new_id": "43ee81b50aff8c6b4a611c24ec0bf88d3822277680fdc6842382acc750f010e6",
+        "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+      }
+    ],
+    "new_suppressions": false,
+    "new_network_boundaries": false
+  },
+  "quality": {
+    "ruff_app_scripts_tests_native": "passed",
+    "python_compileall_app": "passed",
+    "javascript_syntax": "passed",
+    "gitleaks": "Gitleaks8.24.3 introduced-line delta passed;zero findings after explicit disposition of one exact public app/auth.py SHA-256;fresh unrelated secret negative control detected. Default rules/no path or commit exclusions unchanged.",
+    "gitleaks_report": "docs/validation/r210/export-exclusive-gitleaks.json",
+    "gitleaks_controls": "docs/validation/r210/export-exclusive-gitleaks-controls.json"
+  },
+  "no_repeated_full_ci": true,
+  "unchanged_prior_proofs_reused": [
+    "Stripe known-order history/concurrency",
+    "E5 actual32-case Chromium",
+    "Legacy gateway/native executor boundaries",
+    "Confirmed standard CI40480180716 on772fbe7"
+  ],
+  "C2_checkpoint": {
+    "applied_to_application": false,
+    "accepted": false,
+    "path": "docs/development-pending/C2_SERVICE_ADMISSION_WIP.patch",
+    "preliminary_proofs_not_current_acceptance": true
+  },
+  "progress": {
+    "accepted": 24,
+    "total": 42,
+    "percent": 57.1,
+    "macroareas_accepted": 0,
+    "criterion_promoted": false,
+    "release_candidate": false
+  },
+  "limits": [
+    "Exact production lock-owning transaction is not established by redacted diagnostics",
+    "Persistent locks or corrupt/missing barrier evidence remain unavailable and require operator diagnosis",
+    "No update or validation on real server,provider,GPU/native hardware",
+    "No background writer killed or database journal mode changed"
+  ],
+  "git_or_remote_mutation": false
+}

@@ -35,6 +35,8 @@ def test_remote_noncommercial_still_evaluates_model(monkeypatch):
 
 @pytest.mark.parametrize('entry',['native-routing','native-arranger','durable-executor','studio-direct','durable-bridge'])
 def test_every_remote_entry_rejects_before_source_or_transport(monkeypatch,entry):
+    if entry in ('native-routing','native-arranger','studio-direct'):
+        monkeypatch.setenv('MTA_NATIVE_SINGLE_USER', 'true')
     from app import native_ai_routing,native_ai_account,ai_durable_remote_executor,ai_metering_bridge
     from pathlib import Path
     gate=Mock(side_effect=licenses.LicenseDenied('blocked by rights gate'))

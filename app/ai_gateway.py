@@ -10,6 +10,7 @@ from . import ai_access
 
 router = APIRouter()
 ALLOWED = {'health','release_task','query_result','v1/audio','v1/init','v1/models','v1/generate','v1/health'}
+METADATA = frozenset({'health', 'v1/health', 'v1/models'})
 # The proxy must never route public traffic to raw ACE-Step; clients authenticate here.
 MAX_BODY = 32 * 1024 * 1024
 
@@ -53,6 +54,17 @@ async def ai_gateway(path: str, request: Request):
         try:authorize_remote_execution('ace-step',{})
         except (LicenseDenied,ValueError,OSError) as exc:
             raise HTTPException(403,'Remote inference is unavailable under the current model rights policy') from exc
+    # The old upstream task IDs have no original user/ledger binding. Neither
+    # authentication nor the model's NC policy makes a raw task owner-scoped.
+    # Existing requests/results stay available via the accounted job API; never
+    # create a second execution or proxy an arbitrary upstream result here.
+    if request.method != 'GET' or path not in METADATA:
+        raise HTTPException(409, {
+            'reason': 'accounted_ai_endpoint_required',
+            'message': 'Use the authenticated /api/ai-jobs endpoints for execution and owner-scoped results',
+            'execution_endpoint': '/api/ai-jobs/execute-audio/ace-step',
+            'history_endpoint': '/api/ai-jobs/requests',
+        }, headers={'Cache-Control': 'private, no-store'})
     status = 502
     body = b''
     try:

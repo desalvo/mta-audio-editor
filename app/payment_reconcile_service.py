@@ -16,7 +16,6 @@ import httpx
 from . import auth
 from .regime_operation_fence import FenceBlocked
 from .regime_provider_probe import _get, _reference, ProviderProbeError
-from .regime_provider_settlement import verify_stripe_settlement
 
 
 def _pages(client,path,headers,params,*,max_items=None):
@@ -40,6 +39,15 @@ def _pages(client,path,headers,params,*,max_items=None):
     raise ProviderProbeError('Provider history exceeds reconciliation bound')
 
 
+def _stripe_journal_version(c):
+    """Compare known and unbound webhook events across lock-free provider I/O."""
+    version = hashlib.sha256()
+    if c.execute("SELECT 1 FROM sqlite_master WHERE name='payment_reconciliation_events'").fetchone():
+        for row in c.execute("SELECT event_id,digest,state,order_id FROM payment_reconciliation_events WHERE provider='stripe' ORDER BY event_id"):
+            version.update(json.dumps(tuple(row), separators=(',', ':'), allow_nan=False).encode()+b'\n')
+    return version.hexdigest()
+
+
 def reconcile_stripe(order_id,*,client,expected_owner=None):
     from . import credit_purchases as shop
     from .payment_reconciliation import process_stripe
@@ -51,48 +59,33 @@ def reconcile_stripe(order_id,*,client,expected_owner=None):
         if row is None or (expected_owner is not None and (type(expected_owner) is not int or row['user_id']!=expected_owner)):
             raise ValueError('Payment unavailable')
         initial=dict(row)
+        journal = _stripe_journal_version(c)
     session_id=_reference(initial['session_id'])
     if not session_id.startswith('cs_') or not key.startswith(('sk_test_','sk_live_')):
         raise ProviderProbeError('Invalid Stripe reference or credentials')
+    from .stripe_paid_history import collect, ReadbackBudget
+    client = ReadbackBudget(client)
     headers={'Authorization':'Bearer '+key}
     first=_get(client,'https://api.stripe.com/v1/checkout/sessions/'+session_id,headers)
     if first.get('status')!='complete' or first.get('payment_status')!='paid':
-        return _stripe_unpaid(initial,key,first,client=client)
-    observation=verify_stripe_settlement(session_id,key,initial['amount_cents'],'EUR',client=client)
-    headers={'Authorization':'Bearer '+key}
-    session=_get(client,'https://api.stripe.com/v1/checkout/sessions/'+session_id,headers)
-    if (session.get('id')!=session_id or session.get('payment_intent')!=observation['payment_intent']
-        or session.get('status')!='complete' or session.get('payment_status')!='paid'
-        or session.get('amount_total')!=initial['amount_cents'] or session.get('currency')!='eur'
-        or session.get('client_reference_id')!=order_id
-        or session.get('metadata',{}).get('mta_order')!=order_id):raise ProviderProbeError('Canonical checkout identity mismatch')
-    intent=_get(client,'https://api.stripe.com/v1/payment_intents/'+observation['payment_intent'],headers)
-    charge_id=_reference(intent.get('latest_charge'))
-    charge=_get(client,'https://api.stripe.com/v1/charges/'+charge_id,headers)
-    if (intent.get('id')!=observation['payment_intent'] or charge.get('id')!=charge_id
-        or charge.get('payment_intent')!=observation['payment_intent']
-        or type(charge.get('amount')) is not int or charge['amount']!=initial['amount_cents']
-        or charge.get('currency')!='eur' or charge.get('paid') is not True
-        or charge.get('captured') is not True):raise ProviderProbeError('Canonical charge identity mismatch')
-    refunds=_pages(client,'refunds',headers,{'charge':charge_id})
-    total=0
-    for refund in refunds:
-        if (refund.get('charge')!=charge_id or refund.get('payment_intent')!=observation['payment_intent']
-            or type(refund.get('amount')) is not int or refund['amount']<=0 or refund.get('currency')!='eur'):
-            raise ProviderProbeError('Refund identity mismatch')
-        if refund.get('status')=='succeeded':total+=refund['amount']
-        elif refund.get('status') not in ('failed','canceled'):raise ProviderProbeError('Pending or unknown provider refund')
-    if type(charge.get('amount_refunded')) is not int or total!=charge['amount_refunded'] or not 0<=total<=initial['amount_cents']:
-        raise ProviderProbeError('Refund history changed or incomplete')
-    disputes=_pages(client,'disputes',headers,{'charge':charge_id})
-    for dispute in disputes:
-        if dispute.get('charge')!=charge_id or dispute.get('payment_intent')!=observation['payment_intent']:
-            raise ProviderProbeError('Dispute identity mismatch')
+        return _stripe_unpaid(initial,key,first,client=client,journal=journal)
+    document = collect(client, key, initial)
+    if collect(client, key, initial) != document:
+        raise ProviderProbeError('Stripe financial history changed during readback')
+    session, intent, charge = (document[name] for name in ('session', 'intent', 'charge'))
+    refunds, disputes = document['refunds'], document['disputes']
+    total = sum(item['amount'] for item in refunds if item['status'] == 'succeeded')
+    observation = {'provider': 'stripe', 'reference': session_id, 'payment_intent': intent['id'],
+                   'amount_minor': initial['amount_cents'], 'currency': 'EUR',
+                   'remote_payment_observed': True, 'refunds_and_disputes_verified': False,
+                   'local_ledger_reconciled': False, 'authorizes_entitlement': False,
+                   'authorizes_cutover': False}
+    charge_id = charge['id']
     # A stable content identity prevents repeated snapshots from funding twice.
-    document={'session':session,'charge':charge,'refunds':refunds,'disputes':disputes}
     snapshot=hashlib.sha256(json.dumps(document,sort_keys=True,allow_nan=False).encode()).hexdigest()
     observation={**observation,'charge_id':charge_id,'refunded_minor':total,
-                 'dispute_ids':sorted(x['id'] for x in disputes),'snapshot_digest':snapshot}
+                 'dispute_ids':sorted(x['id'] for x in disputes),'snapshot_digest':snapshot,
+                 'known_paid_history':document}
     with auth.db() as c:
         c.execute('BEGIN IMMEDIATE')
         current=c.execute('SELECT * FROM credit_purchase_orders WHERE id=?',(order_id,)).fetchone()
@@ -100,6 +93,8 @@ def reconcile_stripe(order_id,*,client,expected_owner=None):
         if current is None or any(current[k]!=initial[k] for k in immutable):raise FenceBlocked('Order changed during provider reconciliation')
         if auth._open(c.execute('SELECT secret_key FROM credit_payment_config WHERE id=1').fetchone()[0])!=key:
             raise FenceBlocked('Provider configuration changed during reconciliation')
+        if _stripe_journal_version(c) != journal:
+            raise FenceBlocked('Stripe event journal changed during readback; refresh again')
         operation='checkout:stripe:'+order_id
         evidence=record_observation(c,operation,observation,evidence_id='stripe:'+snapshot)
         events=[{'id':'reconcile:paid:'+snapshot,'type':'checkout.session.completed','data':{'object':session}},
@@ -147,7 +142,7 @@ def reconcile_paypal(order_id,*,expected_owner=None):
     return {**result,'provider':'paypal','ledger_reconciled':result.get('status')=='paid','refunds':len(history),'disputes':len({x['hold_id'].split(':')[1] for x in risk_history}),'financial_review_pending':pending,'history_scope':'known_order_captures_and_disputes','transition_authorized':False}
 
 
-def _stripe_unpaid(order,key,session,*,client):
+def _stripe_unpaid(order,key,session,*,client,journal):
     from .checkout_terminal_outcomes import stripe_identity,settle_empty
     stripe_identity(session,order)
     if session.get('status') not in ('open','complete','expired') or session.get('payment_status')!='unpaid':
@@ -183,6 +178,12 @@ def _stripe_unpaid(order,key,session,*,client):
             raise FenceBlocked('Stripe order changed during terminal readback')
         if auth._open(c.execute('SELECT secret_key FROM credit_payment_config WHERE id=1').fetchone()[0])!=key:
             raise FenceBlocked('Stripe configuration changed during terminal readback')
+        if _stripe_journal_version(c) != journal:
+            from .checkout_terminal_outcomes import terminal_receipt
+            if current['status'] != 'cancelled' or terminal_receipt(c,'stripe',order['id']) is None:
+                raise FenceBlocked('Stripe event journal changed during terminal readback; refresh again')
+            # A concurrent matching terminal close can replay. settle_empty
+            # still verifies its original proof and rejects related money/risk.
         return settle_empty(c,'stripe',current,reference=session['id'],outcome=outcome,intent=intent,failed_charge_proof=failed_proof)
 
 

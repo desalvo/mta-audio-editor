@@ -11,7 +11,6 @@ import json
 import os
 import stat
 from pathlib import Path
-import sqlite3
 from uuid import uuid4
 
 from .ai_job_queue import MAX_JOBS, MAX_PLAN_BYTES, _safe_plan
@@ -75,7 +74,8 @@ class SQLitePlanningQueue:
     def _connect(self):
         path = Path(self.path)
         self._check_path(path)
-        db = sqlite3.connect(self.path, timeout=10, isolation_level=None)
+        from .regime_service_lease import connect
+        db = connect(self.path, timeout=10, isolation_level=None)
         try:
             self._check_path(path)
             db.execute('PRAGMA busy_timeout=10000')

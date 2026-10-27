@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="27" time="8.967" timestamp="2026-10-27T18:11:20.778213+01:00" hostname="bbe0ad057f21"><testcase classname="tests.test_r210_service_admission_acceptance" name="test_online_backup_and_offline_restore_preserve_original_gate_instance_and_uncertain_work" time="0.450"><failure message="ValueError: Executable database schema not supported">dump_env = (1, 2, 3, 4)
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-16/test_online_backup_and_offline0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fa4ea63c590&gt;
+
+    def test_online_backup_and_offline_restore_preserve_original_gate_instance_and_uncertain_work(dump_env,tmp_path,monkeypatch):
+        from app import admin_dump as dump
+        import zipfile
+        monkeypatch.setenv('MTA_SERVICE_ADMISSION',gate.MODE)
+        original=gate.reserve('original-unverified-work')
+        archive=dump.create({'all_users':True,'all_projects':True})
+        try:
+            with zipfile.ZipFile(archive) as z:
+                assert {'data/service-admission.sqlite3','data/service-admission.instance'}&lt;=set(z.namelist())
+            restored=tmp_path/'restored-data'
+&gt;           dump.restore(archive,data_dir=restored,queue_dir=tmp_path/'restored-queue',gpu_dir=tmp_path/'restored-gpu',service_stopped=True)
+
+tests/test_r210_service_admission_acceptance.py:323: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/admin_dump.py:394: in restore
+    if (source / relative).exists(): _validate_database(source / relative)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/mta-restore-validate-efk3kj7c/data/service-admission.sqlite3')
+
+    def _validate_database(path):
+        with closing(sqlite3.connect(path)) as con:
+            if con.execute("SELECT 1 FROM sqlite_master WHERE type IN ('trigger','view') OR lower(sql) LIKE '%virtual table%'").fetchone():
+&gt;               raise ValueError('Executable database schema not supported')
+E               ValueError: Executable database schema not supported
+
+app/admin_dump.py:368: ValueError</failure></testcase><testcase classname="tests.test_r210_user_erasure_dump" name="test_all_admins_immutable_even_with_multiple_admins" time="0.383" /><testcase classname="tests.test_r210_user_erasure_dump" name="test_immediate_erasure_removes_all_retained_copies_and_preserves_others" time="0.502" /><testcase classname="tests.test_r210_user_erasure_dump" name="test_erasure_of_legacy_already_purged_account_removes_old_sandbox" time="0.466" /><testcase classname="tests.test_r210_user_erasure_dump" name="test_failed_file_erasure_remains_retryable_and_blocks_reactivation" time="0.444" /><testcase classname="tests.test_r210_user_erasure_dump" name="test_dump_selection_closure_and_roundtrip" time="0.402" /><testcase classname="tests.test_r210_user_erasure_dump" name="test_project_selection_includes_owner_but_not_other_owned_projects" time="0.375" /><testcase classname="tests.test_r210_user_erasure_dump" name="test_config_only_and_all_users_dump_selections" time="0.301" /><testcase classname="tests.test_r210_user_erasure_dump" name="test_invalid_selection[bad0]" time="0.315" /><testcase classname="tests.test_r210_user_erasure_dump" name="test_invalid_selection[bad1]" time="0.306" /><testcase classname="tests.test_r210_user_erasure_dump" name="test_invalid_selection[bad2]" time="0.325" /><testcase classname="tests.test_r210_user_erasure_dump" name="test_invalid_selection[bad3]" time="0.319" /><testcase classname="tests.test_r210_user_erasure_dump" name="test_invalid_selection[bad4]" time="0.296" /><testcase classname="tests.test_r210_user_erasure_dump" name="test_active_jobs_and_project_symlinks_refuse_dump" time="0.319" /><testcase classname="tests.test_r210_user_erasure_dump" name="test_unsafe_paths_refused[../escape]" time="0.001" /><testcase classname="tests.test_r210_user_erasure_dump" name="test_unsafe_paths_refused[/escape]" time="0.000" /><testcase classname="tests.test_r210_user_erasure_dump" name="test_unsafe_paths_refused[projects/../../x]" time="0.001" /><testcase classname="tests.test_r210_user_erasure_dump" name="test_unsafe_paths_refused[projects/abcd/C:/x]" time="0.000" /><testcase classname="tests.test_r210_user_erasure_dump" name="test_unsafe_paths_refused[data/other]" time="0.000" /><testcase classname="tests.test_r210_user_erasure_dump" name="test_unsafe_paths_refused[queue/unknown]" time="0.000" /><testcase classname="tests.test_r210_user_erasure_dump" name="test_unsafe_paths_refused[projects/abcd/a\\b]" time="0.001" /><testcase classname="tests.test_r210_user_erasure_dump" name="test_corrupt_checksum_and_unconfirmed_restore_write_nothing" time="0.318" /><testcase classname="tests.test_r210_user_erasure_dump" name="test_restore_rolls_back_if_publication_fails" time="0.319" /><testcase classname="tests.test_r210_user_erasure_dump" name="test_dump_routes_admin_permissions_and_preview" time="0.356" /><testcase classname="tests.test_r210_user_erasure_dump" name="test_health_probes_remain_available_during_dump_maintenance" time="0.875" /><testcase classname="tests.test_r210_user_erasure_dump" name="test_central_ledger_cannot_advance_past_outbox_snapshot" time="0.372" /><testcase classname="tests.test_r210_user_erasure_dump" name="test_file_based_global_settings_are_in_dump_and_restore" time="0.327" /></testsuite></testsuites>

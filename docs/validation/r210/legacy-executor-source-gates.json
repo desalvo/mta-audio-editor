@@ -1,0 +1,81 @@
+{
+  "security": {
+    "reviewed_findings": 164,
+    "source_files": 295,
+    "raw_severity": {
+      "HIGH": 0,
+      "MEDIUM": 21,
+      "LOW": 143
+    },
+    "scan_review_passed": true,
+    "release_candidate": false,
+    "transition_enabled": false
+  },
+  "transport": {
+    "reviewed_sites": 30,
+    "source_files": 21,
+    "inventory_passed": true,
+    "remote_model_attestation_complete": false,
+    "release_candidate": false
+  },
+  "finding_changes": [
+    {
+      "path": "app/ai_metering_agent.py",
+      "test": "B404",
+      "line": 11,
+      "change": "identical reviewed code/AST; context relocation"
+    },
+    {
+      "path": "app/ai_metering_agent.py",
+      "test": "B603",
+      "line": 100,
+      "change": "identical reviewed code/AST; context relocation"
+    },
+    {
+      "path": "app/ai_worker_protocol.py",
+      "test": "B603",
+      "line": 111,
+      "change": "explicit native launch/session review"
+    },
+    {
+      "path": "app/ai_worker_protocol.py",
+      "test": "B603",
+      "line": 385,
+      "change": "identical reviewed code/AST; context relocation"
+    },
+    {
+      "path": "app/ai_worker_protocol.py",
+      "test": "B603",
+      "line": 390,
+      "change": "identical reviewed code/AST; context relocation"
+    },
+    {
+      "path": "app/ai_worker_protocol.py",
+      "test": "B603",
+      "line": 432,
+      "change": "identical reviewed code/AST; context relocation"
+    },
+    {
+      "path": "app/native_ai_routing.py",
+      "test": "B107",
+      "line": 60,
+      "change": "identical reviewed code/AST; context relocation"
+    },
+    {
+      "path": "app/studio_compute.py",
+      "test": "B603",
+      "line": 88,
+      "change": "explicit native launch/session review"
+    }
+  ],
+  "removed_findings": [
+    {
+      "file": "app/ai_worker_protocol.py",
+      "test": "B603",
+      "line": 359
+    }
+  ],
+  "checkers_changed": false,
+  "new_suppressions": 0,
+  "release_candidate": false
+}

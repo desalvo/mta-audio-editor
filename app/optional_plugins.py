@@ -3,6 +3,8 @@
 Catalog entries are code-reviewed, never provided by an HTTP caller. Source and
 transitive notices remain alongside the build for local use/repackaging review.
 """
+from .service_admission import admitted
+from .service_admission import worker_thread
 import copy
 import datetime as dt
 import hashlib
@@ -123,6 +125,7 @@ def install_one(spec,notify=lambda *_:None):
     return {'id':spec['id'],'revision':spec['revision'],'bundles':sorted(bundles)}
 
 
+@admitted('optional-plugin-install')
 def install(ids,notify=lambda *_:None,on_result=lambda *_:None):
     selected=select(ids)
     results=[]
@@ -137,6 +140,7 @@ def install(ids,notify=lambda *_:None,on_result=lambda *_:None):
     return results
 
 
+@admitted('optional-plugins')
 def start(ids):
     select(ids)
     if not _LOCK.acquire(blocking=False):raise ValueError('A plugin installation is already running')
@@ -159,7 +163,7 @@ def start(ids):
             for state in job['plugins'].values():
                 if state['state'] in ('queued','installing'):state.update(state='failed',error=type(exc).__name__)
         finally:job['finished_at']=time.time();_LOCK.release()
-    threading.Thread(target=execute,daemon=True,name='mta-optional-vst3').start()
+    worker_thread(target=execute,daemon=True,name='mta-optional-vst3').start()
     return copy.deepcopy(job)
 
 

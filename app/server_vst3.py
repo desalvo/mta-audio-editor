@@ -3,6 +3,7 @@
 Only administrator-installed plugins from trusted roots can execute. Plugin code
 and dry preparation run in a disposable worker process group, never ASGI.
 """
+from .service_admission import admitted,worker_thread
 import atexit
 from dataclasses import dataclass,field
 import json
@@ -29,6 +30,7 @@ class Entry:
     initializer: object=None
     editor: object=None
     preparation: dict=field(default_factory=dict)
+    admission: object=None
 
 
 class Sessions:
@@ -49,6 +51,8 @@ class Sessions:
                         logging.getLogger(__name__).exception('Could not persist original VST3 editor before session close')
                 entry.session.close()
             if entry.initializer and entry.initializer is not threading.current_thread():entry.initializer.join(timeout=3)
+            from .service_admission import release
+            release(entry.admission)
 
     def reap(self,now=None):
         now=time.monotonic() if now is None else now
@@ -59,6 +63,7 @@ class Sessions:
         with self.lock:keys=list(self.entries)
         for key in keys:self.close(key)
 
+    @admitted('vst3-start')
     def start(self,owner,project,paths,client,cursor,*,asynchronous=False,monitor=False):
         self.reap()
         with self.lock:previous=[key for key,e in self.entries.items() if e.owner==owner and e.client==client]
@@ -67,7 +72,8 @@ class Sessions:
             limit=max(1,min(64,int(os.getenv('MTA_SERVER_VST3_MAX_SESSIONS','8'))))
             if len(self.entries)>=limit:raise HTTPException(429,'Live VST3 capacity reached. Stop another session or contact the administrator.')
             if sum(e.owner==owner for e in self.entries.values())>=2:raise HTTPException(429,'At most two live VST3 sessions per user are allowed.')
-            token=uuid.uuid4().hex;entry=Entry(owner,project.id,client);self.entries[token]=entry
+            from .service_admission import reserve
+            token=uuid.uuid4().hex;entry=Entry(owner,project.id,client,admission=reserve('vst3-session'));self.entries[token]=entry
             if self.reaper is None:
                 def clean():
                     while True:
@@ -88,7 +94,7 @@ class Sessions:
                 if not asynchronous:self.close(token);raise
                 with self.lock:entry.error=str(exc);entry.touched=time.monotonic()
         if asynchronous:
-            entry.initializer=threading.Thread(target=initialize,name='mta-server-vst3-prepare',daemon=True)
+            entry.initializer=worker_thread(target=initialize,name='mta-server-vst3-prepare',daemon=True)
             entry.initializer.start()
             return {'session_id':token,'state':'preparing','failed':False}
         return initialize()

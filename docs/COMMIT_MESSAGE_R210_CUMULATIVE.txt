@@ -1,1 +1,1 @@
-Fix admitted-policy CLI regression test and exact public-hash Gitleaks false positives
+Harden Stripe reconciliation, transition recovery and legacy AI execution boundaries

@@ -2,20 +2,9 @@
 
 ## Architecture and client endpoint
 
-```text
-Native MTA client or browser
-   HTTPS 443 + per-user AI bearer token (native AI requests)
-              |
-      Kubernetes Ingress NGINX / HAProxy, or Docker HAProxy
-              | all paths incl. /api/ai-gateway/*
-              v
-       MTA app web server (VM/LXC private-IP:8080)
-        | authenticates token; records per-user usage
-        v
-       ACE-Step (127.0.0.1:8001, private ONLY)
-```
+Native clients connect their own MTA account to the server HTTPS origin,for example `https://mta.example.org`. API clients use personal bearer tokens with the accounted `/api/ai-jobs/*` endpoints. The reverse proxy forwards these requests unchanged to MTA;MTA binds execution and retained results to the original account,queue,ledger and request key. Raw ACE-Step stays on its private endpoint. Browser clients use normal MTA login and project permissions.
 
-**Browser:** `https://mta.example.org/` and normal MTA user login. **Native ACE-Step remote configuration:** base URL `https://mta.example.org:443/api/ai-gateway` and individual bearer token (`mta_ai_...`) issued by the MTA admin in **`https://mta.example.org/admin/ai-tokens`**. The native app keeps its own MTA backend locally; only ACE-Step processing is sent over HTTPS. The worker automatically calls `${BASE}/release_task`, `${BASE}/query_result` and `${BASE}/v1/audio`. The proxy must preserve those paths, headers, request bodies and HTTP methods, with **no rewrite**. The gateway authenticates the bearer token on every request and does **not** pass it through to raw ACE-Step.
+`/api/ai-gateway` is now authenticated GET-only health/model metadata. Raw generation,query_result and v1/audio access are refused because upstream task IDs have no original account/ledger binding. Migrate native Arranger to its MTA-account connection;do not point it at the legacy gateway. Original accounted results remain owner-scoped;unbound historical upstream tasks require isolated operator review. See `LEGACY_EXECUTION_BOUNDARIES_R210.md` for complete IT/EN migration and current limits.
 
 ## Configure VM/LXC
 
@@ -31,7 +20,7 @@ The YAML files in `deploy/remote-ai/kubernetes/` create a selectorless Service a
 4. Choose exactly ONE ingress: `kubectl apply -f deploy/remote-ai/kubernetes/ingress-nginx.yaml` for community ingress-nginx class `nginx`, OR `kubectl apply -f deploy/remote-ai/kubernetes/ingress-haproxy.yaml` for class `haproxy`. The IngressClass must match the controller installed in your cluster.
 5. Restrict traffic to the backend VM with firewall/security groups. Ingress exposes only MTA; it NEVER proxies raw ACE-Step directly.
 
-The NGINX example includes body size and long timeouts. The HAProxy Ingress controller example uses standard Kubernetes Ingress objects; ensure the installed controller has suitable upload limits and read/write timeouts for large audio files, configured via that controller's documented ConfigMap/annotations. Both proxies route all paths unchanged. The application gateway currently limits each AI request body to **32 MiB**; audio larger than this will be rejected with HTTP 413 even if the Ingress allows a larger size.
+The NGINX example includes body size and long timeouts. The HAProxy Ingress controller example uses standard Kubernetes Ingress objects; ensure the installed controller has suitable upload limits and read/write timeouts for large audio files, configured via that controller's documented ConfigMap/annotations. Both proxies route all paths unchanged. Size the proxy for the current `app/ai_payload_limits.py` upload/result budgets and the configured inference timeout. The old32MiB metadata gateway limit is not the accounted audio-transfer budget.
 
 ## Docker HAProxy without Kubernetes
 
@@ -42,12 +31,12 @@ The NGINX example includes body size and long timeouts. The HAProxy Ingress cont
 
 ## Token lifecycle, resource accounting and billing readiness
 
-MTA admin issues multiple independent tokens for active MTA users in `/admin/ai-tokens`, each with a label identifying client/device. Tokens are shown only on issuance and are stored hashed; the administrator can rotate or revoke individual tokens. `GET /api/admin/ai-usage` returns per-user counts, elapsed HTTP wall time and byte totals; `GET /api/account/ai-usage` shows a user's own totals. **CPU seconds, GPU seconds and energy are NOT yet measured or attributed**: parallel workloads and queue time would make HTTP wall time materially different from billable utilization. Do not use wall time for billing. A job-aware scheduler/worker with CPU and GPU process counters, shared-GPU attribution, durable job IDs, quotas and audited rates is needed before billing.
+Native account approval issues a revocable token for the original user/instance;administrator-issued API tokens also remain owner-scoped. Preserve original request keys and use request-status/request-result/history endpoints for read-only recovery. Accounted registered executions retain their actual measured resources and original ledger/claim. Missing GPU or process-tree evidence is not fabricated from HTTP wall time. Metadata traffic audit remains diagnostic only;it is not an inference invoice. General rights/remote checkpoint/native hardware acceptance remains incomplete.
 
 ## Security checklist and diagnostics
 
 - HTTPS termination must preserve `Authorization: Bearer <user token>` through to **MTA**. Never route `/api/ai-gateway/` directly to ACE-Step.
 - Restrict MTA backend port 8080 to proxy networks. Never expose ACE-Step port 8001. Separate internal ACE-Step authorization can be configured independently.
 - Do not enable `MTA_ALLOW_INSECURE_NO_AUTH` for network-facing MTA; keep standard MTA login enabled.
-- Client token errors: 401 unauthorized/revoked; 404 path not allowed; 413 body too large; 502 ACE-Step connection failure. A browser login session alone does not authorize the gateway API; a dedicated AI token is required.
-- `curl --fail-with-body https://mta.example.org/api/health` tests the MTA site; `curl -i -H 'Authorization: Bearer YOUR_USER_TOKEN' https://mta.example.org/api/ai-gateway/health` tests token authentication and routing. Do not print actual tokens in build logs.
+- Client token errors:401 unauthorized/revoked;403 token/model-policy refusal;404 path not allowed;409 raw gateway operation requires the accounted API;413 body too large;502 metadata upstream connection failure. A browser login session alone does not authorize the gateway API; a dedicated AI token is required.
+- GET `https://mta.example.org/api/health` tests the MTA site. Use your configured authenticated API client for GET `/api/ai-gateway/health`;keep credentials out of commands and build logs.

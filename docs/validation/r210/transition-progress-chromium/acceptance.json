@@ -1,0 +1,10 @@
+{
+  "accepted": true,
+  "criterion": "E5",
+  "passed": 32,
+  "failed": 0,
+  "skipped": 0,
+  "scope": "transition_progress_audit_and_forward_recovery_controls",
+  "general_cutover_authorized": false,
+  "release_candidate": false
+}

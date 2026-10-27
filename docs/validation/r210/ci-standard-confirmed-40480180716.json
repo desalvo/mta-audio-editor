@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-27",
+  "commit": "772fbe7508cc08266466a3746bb51f0fe5d0179b",
+  "run_id": 40480180716,
+  "quality": {
+    "job_id": 122108234185,
+    "conclusion": "success",
+    "passed": 6393,
+    "skipped": 46,
+    "failed": 0,
+    "coverage_percent": 76.01,
+    "seconds": 564.3
+  },
+  "sast": {
+    "job_id": 122108233822,
+    "conclusion": "success",
+    "bandit": "success",
+    "dependency_audit": "success",
+    "secret_scan": "success",
+    "trivy_filesystem": "success"
+  },
+  "other_jobs": "VST3 SDK,container production gate,Windows Chordino and all native/mobile builds successful;three publication jobs intentionally skipped",
+  "scope": "Standard CI;optional admin cutover Chromium not included",
+  "rc": false,
+  "original_acceptance": {
+    "accepted": 23,
+    "total": 42,
+    "macroareas_accepted": 0,
+    "macroareas_total": 7
+  },
+  "no_tests_rerun": true,
+  "no_remote_mutations": true
+}

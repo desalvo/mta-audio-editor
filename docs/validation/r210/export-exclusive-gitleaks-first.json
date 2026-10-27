@@ -1,0 +1,42 @@
+[
+ {
+  "RuleID": "generic-api-key",
+  "Description": "Detected a Generic API Key, potentially exposing access to various services and sensitive operations.",
+  "StartLine": 105,
+  "EndLine": 105,
+  "StartColumn": 11,
+  "EndColumn": 86,
+  "Match": "auth.py\": \"REDACTED\"",
+  "Secret": "REDACTED",
+  "File": "../gitleaks-export-delta/docs/security/APP_SECURITY_REVIEW_R210.json",
+  "SymlinkFile": "",
+  "Commit": "",
+  "Entropy": 3.8388615,
+  "Author": "",
+  "Email": "",
+  "Date": "",
+  "Message": "",
+  "Tags": [],
+  "Fingerprint": "../gitleaks-export-delta/docs/security/APP_SECURITY_REVIEW_R210.json:generic-api-key:105"
+ },
+ {
+  "RuleID": "generic-api-key",
+  "Description": "Detected a Generic API Key, potentially exposing access to various services and sensitive operations.",
+  "StartLine": 933,
+  "EndLine": 933,
+  "StartColumn": 11,
+  "EndColumn": 86,
+  "Match": "auth.py\": \"REDACTED\"",
+  "Secret": "REDACTED",
+  "File": "../gitleaks-export-delta/docs/validation/r210/export-exclusive-result.json",
+  "SymlinkFile": "",
+  "Commit": "",
+  "Entropy": 3.8388615,
+  "Author": "",
+  "Email": "",
+  "Date": "",
+  "Message": "",
+  "Tags": [],
+  "Fingerprint": "../gitleaks-export-delta/docs/validation/r210/export-exclusive-result.json:generic-api-key:933"
+ }
+]

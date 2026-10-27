@@ -1,0 +1,828 @@
+{
+  "date": "2026-10-27",
+  "base_commit": "772fbe7508cc08266466a3746bb51f0fe5d0179b",
+  "criterion": {
+    "id": "E5",
+    "original_text": "Complete transition progress, audit and forward recovery controls",
+    "accepted": true,
+    "denominator_unchanged": 42,
+    "weight_unchanged": 1
+  },
+  "progress": {
+    "before": 23,
+    "after": 24,
+    "total": 42,
+    "percent": 57.1,
+    "accepted_macroareas": 0,
+    "release_candidate": false
+  },
+  "browser": {
+    "accepted": true,
+    "criterion": "E5",
+    "passed": 32,
+    "failed": 0,
+    "skipped": 0,
+    "scope": "transition_progress_audit_and_forward_recovery_controls",
+    "general_cutover_authorized": false,
+    "release_candidate": false
+  },
+  "distinct_latest_passes": 118,
+  "new_cases": 44,
+  "unresolved_failures": 0,
+  "skips": 0,
+  "provenance": "Latest case result wins;initial failures retained;obsolete renamed full-settings identity excluded. Product source fingerprints from actual32-case run all still match. Only runner failure-artifact cleanup changed afterwards;current parser revalidated the same XML and new stale-acceptance negative control passed. No browser rerun for that harness-only change.",
+  "source_gates": {
+    "security": {
+      "reviewed_findings": 165,
+      "source_files": 295,
+      "raw_severity": {
+        "HIGH": 0,
+        "MEDIUM": 21,
+        "LOW": 144
+      },
+      "scan_review_passed": true,
+      "release_candidate": false,
+      "transition_enabled": false
+    },
+    "transport": {
+      "reviewed_sites": 30,
+      "source_files": 21,
+      "inventory_passed": true,
+      "remote_model_attestation_complete": false,
+      "release_candidate": false
+    },
+    "finding_identities_unchanged": true,
+    "new_suppressions": false,
+    "activation_flags_changed": false,
+    "review": "Fixed SQL lifecycle reads under consistent transaction;active admin and exact original reservation/revision/confirmation;exclusive local lease;immutable abort actor audit;committed operations never aborted or adopted;no financial/provider writes;new metadata schema explicitly reviewed."
+  },
+  "quality": {
+    "ruff_all_app_scripts_tests": "passed",
+    "changed_python_compilation": "passed",
+    "javascript_syntax": "passed",
+    "gitleaks": "8.24.3 complete delta,zero findings,no new exceptions"
+  },
+  "scope": "General operator lifecycle progress,audit,safe precommit abort and receipt-bound forward recovery;full settings IT/EN390/1280;legacy/missing evidence stays blocked. Not general financial/distributed cutover acceptance.",
+  "remote_mutations": false,
+  "commit_or_staging": false,
+  "cases": [
+    {
+      "module": "tests.test_r210_admin_cutover_browser",
+      "name": "test_actual_committed_recovery_requires_confirmation_and_preserves_wallet[en]",
+      "latest_report": "transition-progress-chromium/pytest.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_browser",
+      "name": "test_actual_committed_recovery_requires_confirmation_and_preserves_wallet[it]",
+      "latest_report": "transition-progress-chromium/pytest.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_browser",
+      "name": "test_actual_cutover_roundtrip_wallet_periods_keyboard_and_audit[1280-en]",
+      "latest_report": "transition-progress-chromium/pytest.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_browser",
+      "name": "test_actual_cutover_roundtrip_wallet_periods_keyboard_and_audit[1280-it]",
+      "latest_report": "transition-progress-chromium/pytest.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_browser",
+      "name": "test_actual_cutover_roundtrip_wallet_periods_keyboard_and_audit[390-en]",
+      "latest_report": "transition-progress-chromium/pytest.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_browser",
+      "name": "test_actual_cutover_roundtrip_wallet_periods_keyboard_and_audit[390-it]",
+      "latest_report": "transition-progress-chromium/pytest.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_browser",
+      "name": "test_lost_response_reload_retries_only_original_identity_without_second_cutover[en]",
+      "latest_report": "transition-progress-chromium/pytest.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_browser",
+      "name": "test_lost_response_reload_retries_only_original_identity_without_second_cutover[it]",
+      "latest_report": "transition-progress-chromium/pytest.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_browser",
+      "name": "test_unknown_financial_history_cannot_enable_confirmation",
+      "latest_report": "transition-progress-chromium/pytest.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "name": "test_actual_admin_roundtrip_preserves_wallet_periods_and_real_nc_history",
+      "latest_report": "transition-progress-regression.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "name": "test_actual_api_process_sigkill_after_sqlite_commit_preserves_durable_barrier",
+      "latest_report": "transition-progress-regression.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "name": "test_changed_original_receipt_cannot_rebaseline_or_abort_committed_transition",
+      "latest_report": "transition-progress-regression.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "name": "test_forward_recovery_records_the_actual_second_administrator",
+      "latest_report": "transition-progress-regression.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "name": "test_independent_process_lease_blocks_api_and_sigkill_releases_only_os_lock",
+      "latest_report": "transition-progress-regression.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "name": "test_interruption_keeps_barrier_auth_and_original_finances_then_forward_recovers[False]",
+      "latest_report": "transition-progress-regression.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "name": "test_interruption_keeps_barrier_auth_and_original_finances_then_forward_recovers[True]",
+      "latest_report": "transition-progress-regression.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "name": "test_live_accounting_connection_blocks_exclusive_cutover",
+      "latest_report": "transition-progress-regression.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "name": "test_preview_staleness_auth_csrf_default_off_and_confirmation_are_not_bypassable",
+      "latest_report": "transition-progress-regression.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "name": "test_real_registered_builtin_harmony_and_measured_nc_statement_survive_actual_return_cutover",
+      "latest_report": "transition-progress-regression.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "name": "test_unverifiable_or_financially_unsupported_states_refuse_actual_api[credit]",
+      "latest_report": "transition-progress-regression.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "name": "test_unverifiable_or_financially_unsupported_states_refuse_actual_api[history]",
+      "latest_report": "transition-progress-regression.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "name": "test_unverifiable_or_financially_unsupported_states_refuse_actual_api[missing-schema]",
+      "latest_report": "transition-progress-regression.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "name": "test_unverifiable_or_financially_unsupported_states_refuse_actual_api[priced-plan]",
+      "latest_report": "transition-progress-regression.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "name": "test_unverifiable_or_financially_unsupported_states_refuse_actual_api[provider]",
+      "latest_report": "transition-progress-regression.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "name": "test_unverifiable_or_financially_unsupported_states_refuse_actual_api[running-job]",
+      "latest_report": "transition-progress-regression.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "name": "test_unverifiable_or_financially_unsupported_states_refuse_actual_api[unknown-journal]",
+      "latest_report": "transition-progress-regression.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_admin_cutover_e2e",
+      "name": "test_unverifiable_or_financially_unsupported_states_refuse_actual_api[unprefixed-legacy-schema]",
+      "latest_report": "transition-progress-regression.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_call_fingerprint_does_not_depend_on_python_ast_dump",
+      "latest_report": "transition-progress-gates.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_current_inventory_matches_review",
+      "latest_report": "transition-progress-gates.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[category]",
+      "latest_report": "transition-progress-gates.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[checker]",
+      "latest_report": "transition-progress-gates.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[hash]",
+      "latest_report": "transition-progress-gates.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[missing]",
+      "latest_report": "transition-progress-gates.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[rationale]",
+      "latest_report": "transition-progress-gates.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[reorder]",
+      "latest_report": "transition-progress-gates.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[source]",
+      "latest_report": "transition-progress-gates.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-device/start?x=1]",
+      "latest_report": "transition-progress-gates.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-gateway/v1/generate]",
+      "latest_report": "transition-progress-gates.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-jobs/execute-audio/whisper]",
+      "latest_report": "transition-progress-gates.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[from httpx import AsyncClient as hidden\\nhidden()]",
+      "latest_report": "transition-progress-gates.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[from urllib.request import build_opener as hidden\\nx=hidden()\\nx.open(\"https://example.test\")]",
+      "latest_report": "transition-progress-gates.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[from urllib.request import urlopen as hidden\\nhidden(\"https://example.test\")]",
+      "latest_report": "transition-progress-gates.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[import aiohttp as hidden\\nhidden.ClientSession()]",
+      "latest_report": "transition-progress-gates.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[import httpx as hidden\\nhidden.Client()]",
+      "latest_report": "transition-progress-gates.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[import socket as hidden\\nhidden.create_connection((\"example.test\",443))]",
+      "latest_report": "transition-progress-gates.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_supported_device_authorization_still_uses_exact_post[/api/ai-device/poll]",
+      "latest_report": "transition-progress-gates.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_supported_device_authorization_still_uses_exact_post[/api/ai-device/start]",
+      "latest_report": "transition-progress-gates.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_complete_source_bound_review_is_accepted",
+      "latest_report": "transition-progress-gates.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_current_scan_and_complete_review_ledger_agree",
+      "latest_report": "transition-progress-gates.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[blanket_approval]",
+      "latest_report": "transition-progress-gates.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[changed_finding]",
+      "latest_report": "transition-progress-gates.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[changed_source]",
+      "latest_report": "transition-progress-gates.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[deleted_source]",
+      "latest_report": "transition-progress-gates.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[duplicate_review]",
+      "latest_report": "transition-progress-gates.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[duplicate_scan]",
+      "latest_report": "transition-progress-gates.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[empty_reason]",
+      "latest_report": "transition-progress-gates.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[high]",
+      "latest_report": "transition-progress-gates.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[missing_file]",
+      "latest_report": "transition-progress-gates.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[missing_review]",
+      "latest_report": "transition-progress-gates.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[new_finding]",
+      "latest_report": "transition-progress-gates.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[new_source]",
+      "latest_report": "transition-progress-gates.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[scan_error]",
+      "latest_report": "transition-progress-gates.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[suppression]",
+      "latest_report": "transition-progress-gates.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[wrong_totals]",
+      "latest_report": "transition-progress-gates.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "name": "test_active_admin_required_for_all_lifecycle_paths",
+      "latest_report": "transition-progress-functional-final.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "name": "test_committed_report_proves_original_receipts_and_only_forward_recovery",
+      "latest_report": "transition-progress-functional-final.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "name": "test_corruption_or_missing_evidence_never_offers_unsafe_recovery[balance]",
+      "latest_report": "transition-progress-functional-final.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "name": "test_corruption_or_missing_evidence_never_offers_unsafe_recovery[mirror]",
+      "latest_report": "transition-progress-functional-final.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "name": "test_corruption_or_missing_evidence_never_offers_unsafe_recovery[orphan_commit]",
+      "latest_report": "transition-progress-functional-final.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "name": "test_corruption_or_missing_evidence_never_offers_unsafe_recovery[second_reservation]",
+      "latest_report": "transition-progress-functional-final.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "name": "test_corruption_or_missing_evidence_never_offers_unsafe_recovery[wrong_epoch]",
+      "latest_report": "transition-progress-functional-final.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "name": "test_legacy_commit_is_reported_without_adopting_admin_authority",
+      "latest_report": "transition-progress-functional-final.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "name": "test_old_aborted_history_does_not_gain_invented_actor_and_pages_are_complete",
+      "latest_report": "transition-progress-functional-final.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "name": "test_read_only_initial_status_has_real_counts_and_private_role_guard",
+      "latest_report": "transition-progress-functional-final.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "name": "test_recovery_settings_remain_accessible_after_commit",
+      "latest_report": "transition-progress-functional-final.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "name": "test_reservation_abort_keeps_epoch_money_and_exact_actor_audit",
+      "latest_report": "transition-progress-functional-final.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress",
+      "name": "test_tracked_open_work_is_visible_and_not_certified_as_total_service_drain",
+      "latest_report": "transition-progress-functional-final.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress_browser",
+      "name": "test_failed_progress_read_clears_actions_and_refresh_recovers[en]",
+      "latest_report": "transition-progress-chromium/pytest.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress_browser",
+      "name": "test_failed_progress_read_clears_actions_and_refresh_recovers[it]",
+      "latest_report": "transition-progress-chromium/pytest.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress_browser",
+      "name": "test_full_shipped_settings_progress_accessibility[committed-1280-en]",
+      "latest_report": "transition-progress-chromium/pytest.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress_browser",
+      "name": "test_full_shipped_settings_progress_accessibility[committed-1280-it]",
+      "latest_report": "transition-progress-chromium/pytest.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress_browser",
+      "name": "test_full_shipped_settings_progress_accessibility[committed-390-en]",
+      "latest_report": "transition-progress-chromium/pytest.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress_browser",
+      "name": "test_full_shipped_settings_progress_accessibility[committed-390-it]",
+      "latest_report": "transition-progress-chromium/pytest.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress_browser",
+      "name": "test_full_shipped_settings_progress_accessibility[idle-1280-en]",
+      "latest_report": "transition-progress-chromium/pytest.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress_browser",
+      "name": "test_full_shipped_settings_progress_accessibility[idle-1280-it]",
+      "latest_report": "transition-progress-chromium/pytest.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress_browser",
+      "name": "test_full_shipped_settings_progress_accessibility[idle-390-en]",
+      "latest_report": "transition-progress-chromium/pytest.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress_browser",
+      "name": "test_full_shipped_settings_progress_accessibility[idle-390-it]",
+      "latest_report": "transition-progress-chromium/pytest.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress_browser",
+      "name": "test_progress_poll_follows_independent_cancellation_without_mutating",
+      "latest_report": "transition-progress-chromium/pytest.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress_browser",
+      "name": "test_reserved_cancel_keyboard_confirmation_actor_audit[1280-en]",
+      "latest_report": "transition-progress-chromium/pytest.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress_browser",
+      "name": "test_reserved_cancel_keyboard_confirmation_actor_audit[1280-it]",
+      "latest_report": "transition-progress-chromium/pytest.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress_browser",
+      "name": "test_reserved_cancel_keyboard_confirmation_actor_audit[390-en]",
+      "latest_report": "transition-progress-chromium/pytest.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress_browser",
+      "name": "test_reserved_cancel_keyboard_confirmation_actor_audit[390-it]",
+      "latest_report": "transition-progress-chromium/pytest.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress_browser",
+      "name": "test_unverified_and_legacy_commits_show_reason_without_unsafe_controls[conflict-en]",
+      "latest_report": "transition-progress-chromium/pytest.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress_browser",
+      "name": "test_unverified_and_legacy_commits_show_reason_without_unsafe_controls[conflict-it]",
+      "latest_report": "transition-progress-chromium/pytest.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress_browser",
+      "name": "test_unverified_and_legacy_commits_show_reason_without_unsafe_controls[disabled-en]",
+      "latest_report": "transition-progress-chromium/pytest.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress_browser",
+      "name": "test_unverified_and_legacy_commits_show_reason_without_unsafe_controls[disabled-it]",
+      "latest_report": "transition-progress-chromium/pytest.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress_browser",
+      "name": "test_unverified_and_legacy_commits_show_reason_without_unsafe_controls[legacy-en]",
+      "latest_report": "transition-progress-chromium/pytest.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress_browser",
+      "name": "test_unverified_and_legacy_commits_show_reason_without_unsafe_controls[legacy-it]",
+      "latest_report": "transition-progress-chromium/pytest.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress_browser",
+      "name": "test_unverified_and_legacy_commits_show_reason_without_unsafe_controls[mirror-en]",
+      "latest_report": "transition-progress-chromium/pytest.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress_browser",
+      "name": "test_unverified_and_legacy_commits_show_reason_without_unsafe_controls[mirror-it]",
+      "latest_report": "transition-progress-chromium/pytest.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress_gate",
+      "name": "test_altered_progress_evidence_is_not_accepted[class]",
+      "latest_report": "transition-progress-regression.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress_gate",
+      "name": "test_altered_progress_evidence_is_not_accepted[duplicate]",
+      "latest_report": "transition-progress-regression.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress_gate",
+      "name": "test_altered_progress_evidence_is_not_accepted[error]",
+      "latest_report": "transition-progress-regression.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress_gate",
+      "name": "test_altered_progress_evidence_is_not_accepted[failure]",
+      "latest_report": "transition-progress-regression.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress_gate",
+      "name": "test_altered_progress_evidence_is_not_accepted[missing]",
+      "latest_report": "transition-progress-regression.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress_gate",
+      "name": "test_altered_progress_evidence_is_not_accepted[skip]",
+      "latest_report": "transition-progress-regression.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress_gate",
+      "name": "test_complete_progress_case_set_is_required",
+      "latest_report": "transition-progress-regression.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_r210_transition_progress_gate",
+      "name": "test_missing_pinned_prerequisite_clears_stale_acceptance",
+      "latest_report": "transition-progress-gate-final.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_regime_reconciliation_inventory",
+      "name": "test_completed_job_not_active",
+      "latest_report": "transition-progress-gates.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_regime_reconciliation_inventory",
+      "name": "test_historic_credit_movements_remain_reconciliation_items",
+      "latest_report": "transition-progress-gates.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_regime_reconciliation_inventory",
+      "name": "test_readiness_does_not_authorize_switch_even_without_open_rows",
+      "latest_report": "transition-progress-gates.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_regime_reconciliation_inventory",
+      "name": "test_readiness_rejects_unrecognized_regime",
+      "latest_report": "transition-progress-gates.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_regime_reconciliation_inventory",
+      "name": "test_reconciliation_inventory_handles_unknown_columns",
+      "latest_report": "transition-progress-gates.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_regime_reconciliation_inventory",
+      "name": "test_unknown_schema_fails_closed",
+      "latest_report": "transition-progress-gates.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_regime_transition_journal",
+      "name": "test_failed_reservation_rolls_back",
+      "latest_report": "transition-progress-regression.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_regime_transition_journal",
+      "name": "test_idempotency_and_conflicting_replay",
+      "latest_report": "transition-progress-regression.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_regime_transition_journal",
+      "name": "test_open_checkout_blocks_reservation",
+      "latest_report": "transition-progress-regression.xml",
+      "passed": true
+    },
+    {
+      "module": "tests.test_regime_transition_journal",
+      "name": "test_persistent_reservation_blocks_new_job",
+      "latest_report": "transition-progress-regression.xml",
+      "passed": true
+    }
+  ],
+  "evidence": {
+    "docs/validation/r210/transition-progress-api.xml": {
+      "sha256": "99af930aafc4f553ee3c01453645b991c339782cf17a6f4951c9dadcf1428685",
+      "bytes": 3198
+    },
+    "docs/validation/r210/transition-progress-browser.xml": {
+      "sha256": "26a882815b9f0495e4d31876cc99985bff105e5c95626cf5abbc3703f5037a45",
+      "bytes": 12456
+    },
+    "docs/validation/r210/transition-progress-functional-final.xml": {
+      "sha256": "008532ecaf937582ea09f4f83b24cb7dbd5ab7e7e91d221a731e43f67f985e38",
+      "bytes": 5533
+    },
+    "docs/validation/r210/transition-progress-initial.xml": {
+      "sha256": "edde99e16298747824c05d2a347df368545a0f6b9926f4d1bf93ad8bb9749e8b",
+      "bytes": 4509
+    },
+    "docs/validation/r210/transition-progress-regression.xml": {
+      "sha256": "0db7c33f16f0e5a90be57a80640394e848715ef06646d1e5fea8f5f61def9daf",
+      "bytes": 4549
+    },
+    "docs/validation/r210/transition-progress-gate-final.xml": {
+      "sha256": "ad2dfd5dcc0aacc9f7d9a53d04530c530e23cccc9395b11a946cc62699e4d640",
+      "bytes": 390
+    },
+    "docs/validation/r210/transition-progress-gates.xml": {
+      "sha256": "4f691ce7a15d4e3c2682ee8494a11cd0becd52d172cfb7dbc4772cf4d6df92e8",
+      "bytes": 6970
+    },
+    "docs/validation/r210/transition-progress-chromium/pytest.xml": {
+      "sha256": "c070740a2424121eb3dd84fd03e35b68b8c1e780a03e245191b2dc8ea86cd12a",
+      "bytes": 5331
+    },
+    "docs/validation/r210/transition-progress-chromium/runtime.json": {
+      "sha256": "6820e733f81e680e5f6ac1c9997fa82ed4fa569a1b4185095b6aec8ad1bec391",
+      "bytes": 1801
+    },
+    "docs/validation/r210/transition-progress-chromium/acceptance.json": {
+      "sha256": "7d5dbd62383d32e20b40d0229e9ebf750ecb96e31edb37e18da7583535c49bc6",
+      "bytes": 230
+    },
+    "docs/validation/r210/transition-progress-source-gates.json": {
+      "sha256": "84e2ca83a3c0ad91f01b7b7e51ff7e8e0dc50b4875e78eab736e37c6a51d1304",
+      "bytes": 847
+    },
+    "docs/validation/r210/transition-progress-bandit.json": {
+      "sha256": "5935fd5c2c38a78e9a6daeb0dd84f83a01239f9244652f2187c291f4aff6b68c",
+      "bytes": 254754
+    }
+  }
+}

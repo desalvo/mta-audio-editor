@@ -15,6 +15,11 @@ import zipfile
 KINDS = ('audio-to-midi','vocal-harmony','vocal-synthesis','whisper','chords-ml','demucs','drumsep','sam-audio','singer-separation','backing-vocals','markers')
 
 
+def require_native():
+    if os.getenv('MTA_NATIVE_SINGLE_USER', '').lower() != 'true':
+        raise ValueError('Standalone AI execution requires a native application')
+
+
 def _file() -> Path:
     return Path(os.getenv('MTA_NATIVE_AI_CONFIG', str(Path.home()/'.config'/'mta-audio-editor'/'remote-workers.json'))).expanduser()
 
@@ -92,6 +97,7 @@ def is_remote(kind: str) -> bool:
 
 def infer(kind: str, audio: Path, options: dict | None = None) -> tuple[dict, str]:
     """Infer remotely, returning validated JSON and/or named WAV data. No fallback."""
+    require_native()
     from .model_license_policy import authorize_remote_execution
     authorize_remote_execution(kind,options or {})
     from .ai_remote_client import infer_audio, recover_after_lost_response, RemoteAIError

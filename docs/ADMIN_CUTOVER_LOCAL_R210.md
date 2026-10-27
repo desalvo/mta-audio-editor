@@ -1,3 +1,9 @@
+## Confirmed actual Chromium acceptance — 2026-10-27
+
+Run40505295056,job122192943308,on committed **772fbe7508cc08266466a3746bb51f0fe5d0179b** passes the strict real Chromium acceptance: **9 passed,0 failed,0 skipped**. Includes IT/EN desktop/mobile actual UI/API roundtrip,wallet/period preservation,keyboard/audit,committed failure recovery,original-identity retry after lost response/reload,and refusal for unknown financial history. Chromium134.0.6998.35,Python3.12.15. Exact observation/artifact identity:validation/r210/admin-cutover-chromium-confirmed-40505295056.json. The previously pending nine-case browser prerequisite is now satisfied;do not request or repeat it unchanged.
+
+This validates the restricted default-off local-authority maintenance UI/API profile only. It does not resolve general distributed admission/drain,all provider/legacy financial obligations,or broad C2/C3/C5/D6/E4/E5. Original23/42(54.8%),0/7whole macroareas;RC false. No production transition authorized or server changed. Standard CI on the same SHA remains green (run40480180716). Continue on residual implementation,without another validation-only package or unchanged full CI. Earlier pending-Chromium notes below are historical where superseded.
+
 # Administrative cutover continuation — 2026-10-26 — PRE-RC
 
 **The requested original macroarea closure is not yet accepted.** Original score remains23/42(54.8%),0/7 whole macroareas,RC false. D6,C2,C3,C5,E4,E5 remain pending. This continuation delivers an actual, default-off local maintenance API and operator panel; it does not certify broad provider-history/distributed production switching. Do not narrow the original criteria to this profile and mark a macroarea accepted.

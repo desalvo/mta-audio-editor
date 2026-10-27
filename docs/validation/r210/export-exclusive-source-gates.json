@@ -1,0 +1,232 @@
+{
+  "security": {
+    "reviewed_findings": 164,
+    "source_files": 296,
+    "raw_severity": {
+      "HIGH": 0,
+      "MEDIUM": 21,
+      "LOW": 143
+    },
+    "scan_review_passed": true,
+    "release_candidate": false,
+    "transition_enabled": false
+  },
+  "transport": {
+    "reviewed_sites": 30,
+    "source_files": 21,
+    "inventory_passed": true,
+    "remote_model_attestation_complete": false,
+    "release_candidate": false
+  },
+  "relocated_identical_findings": [
+    {
+      "path": "app/auth.py",
+      "test_id": "B105",
+      "old_line": 536,
+      "new_line": 535,
+      "old_id": "cfa0e4b80fd7ffe13a80765eb3d32c90f447644d40196cb0c4ffa9268549fdd3",
+      "new_id": "497d7ff6f4556f934d9fe2f49fe03e370c1d773c33cf7181d15cdcc093e2c660",
+      "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+    },
+    {
+      "path": "app/auth.py",
+      "test_id": "B105",
+      "old_line": 537,
+      "new_line": 536,
+      "old_id": "75947d2e77962e42096e05a74eee929fbb46623549559a5bb746cbb9f549ed6d",
+      "new_id": "4aefd709a76fd11ffeb08f3de158cc0f3f0b048563ee2fbfef9f2f005d37e3b1",
+      "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+    },
+    {
+      "path": "app/auth.py",
+      "test_id": "B105",
+      "old_line": 540,
+      "new_line": 539,
+      "old_id": "32bfe760ddceb5b2b98c0661d93fe55d5c008dcbe13d64581952d9368bbfe1a7",
+      "new_id": "d189676f11c72b7f49c740123ad3674cb19f0705b871066782e0e8b2925be86a",
+      "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+    },
+    {
+      "path": "app/auth.py",
+      "test_id": "B105",
+      "old_line": 541,
+      "new_line": 540,
+      "old_id": "c27acfa9a98fd46337d8b510e61fa5eb8f24da5cf99ce88b43e2bfc5c006ec98",
+      "new_id": "f7ada2fdfac2f6c40105df6b661c79daef2115490cb253c588bc3290b0169eda",
+      "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+    },
+    {
+      "path": "app/auth.py",
+      "test_id": "B105",
+      "old_line": 544,
+      "new_line": 543,
+      "old_id": "5e88ffb103743def1fdb10d571f81cc7d95013700f56eff00e84a82001a44981",
+      "new_id": "87ed571747cb3db3d7f335a4c369a82e547f2be66c94ed2757873f33cd051581",
+      "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+    },
+    {
+      "path": "app/auth.py",
+      "test_id": "B105",
+      "old_line": 545,
+      "new_line": 544,
+      "old_id": "c31546912004b4a54757d1327ec017f99c37232303a37e5bbd64f57fdf78074f",
+      "new_id": "0587b4ae0ea3543c0e5ea1534000a9527aa11b1ef2598956e28772379fc4b442",
+      "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+    },
+    {
+      "path": "app/auth.py",
+      "test_id": "B105",
+      "old_line": 783,
+      "new_line": 782,
+      "old_id": "fd65567724424461513bda8519dd52c57835bf53e188a2293881dc9b73ad98eb",
+      "new_id": "d9116a31418ba98a809161a2ccd50cb8e38c3c66333d566f743c124c524cedac",
+      "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B107",
+      "old_line": 931,
+      "new_line": 943,
+      "old_id": "3d9361e98c85cbbbf62467fabb05a1dd61c5a761cb14c7da0382ac1a7e63af0b",
+      "new_id": "79c75615b3b1c6a6010a8415052e250952eaf45af9e3d3f3ad461c54f552f213",
+      "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B107",
+      "old_line": 981,
+      "new_line": 993,
+      "old_id": "afb56c8135ef84004382f13038e2767680e6c5d992035ee873e759635b77f208",
+      "new_id": "0b2726ed0a77fbc75f71f4b68b9540608c5f24dfaac9760ecee39ddc8717965d",
+      "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B404",
+      "old_line": 1545,
+      "new_line": 1557,
+      "old_id": "1cba2b9e42f833f437540f4ac9d65ce01a38a213a0814c287adc3e2821ccf3b9",
+      "new_id": "3a873eaf2d6307a7d1c4f9c303a0f13436ed81a94ae8b0d7abd4757244a23498",
+      "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B603",
+      "old_line": 1555,
+      "new_line": 1567,
+      "old_id": "150de41aea1f30389f31f62c62e876bed79a71048fd688edf7a93f18b1c2d1c7",
+      "new_id": "4e6b73c8e2843ae790dc835092070573a496e428d67a97116d5dcd45a92b0d92",
+      "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B607",
+      "old_line": 2919,
+      "new_line": 2931,
+      "old_id": "cdac7668861b4484f56443d8639d15011c6cf13f03b889d1dc96b57c9459459b",
+      "new_id": "16c1036248862318810e429008b299c8a308b766021eeb2bad8c627391f1c54b",
+      "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B603",
+      "old_line": 2919,
+      "new_line": 2931,
+      "old_id": "24b58a5d418cb71aa4903fb1f129fb779af4f647a67a6f6cdf021775f3f1aeab",
+      "new_id": "25d782d076cd3369a24983dd009d4b4b91140e9b38cbd30b858f13606a5b1dca",
+      "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B607",
+      "old_line": 3400,
+      "new_line": 3412,
+      "old_id": "1b1c61632509ee7d91955a9cdbb1781ced83b540b10a3929fd0593318097893a",
+      "new_id": "223bcf7b8d553013a423dc4ec5cd37723ddfec41e119ea2a43833940b11e2959",
+      "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B603",
+      "old_line": 3400,
+      "new_line": 3412,
+      "old_id": "4d9ddc85996b3800fb4001763e63ec3afe9c14797445d5ac51cec723f7c6ad76",
+      "new_id": "557f7beb8d80d686a215f6c634ccf22c4208c5208b9f2b0ccd3b648daac7e856",
+      "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B607",
+      "old_line": 3422,
+      "new_line": 3434,
+      "old_id": "1df75ce64525d7c2af0e824a1a659aa2a2d20f5b23de79a5d9e6964f971ea84b",
+      "new_id": "74cf2a9de0978f8696c2445fa002857b1fe31ccdd5c30c646a35cdb9fb92d1bf",
+      "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B603",
+      "old_line": 3422,
+      "new_line": 3434,
+      "old_id": "2acf51219434f73f753de5cdf034313fb3d45bb7f1d8e392f4752967c342b9a5",
+      "new_id": "713738315705afed2fb653490a48d1b72d10e9fda9320ba45579ba6131a4fa54",
+      "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B603",
+      "old_line": 4755,
+      "new_line": 4767,
+      "old_id": "67aeaab4aad1fa80ebf91373ea1e2054dfcaf1e9ed1fbfc7db0748560f559532",
+      "new_id": "589b0c9a5f1d4b99c621167fb409091dd955f23c0a03a637555cce427a3cb3ce",
+      "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B404",
+      "old_line": 4880,
+      "new_line": 4892,
+      "old_id": "df0e90a903c22fa85b078ae0858fa753bae3dc5ab2ce9a3fee5edcdf415de759",
+      "new_id": "d76eaa9505007fd39401eb9158198411d808fd0fc802fa2f6345578d84a888fd",
+      "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B603",
+      "old_line": 4892,
+      "new_line": 4904,
+      "old_id": "0efb2b285608bc06ef4ae9cba9971ac393ca13774887011d34f13201b873d736",
+      "new_id": "65d0bf3e795e8eba1f5936773bfdef441273e7bc371d3745a2d5aad8c6aabfae",
+      "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B603",
+      "old_line": 5722,
+      "new_line": 5734,
+      "old_id": "b720433c94cbdbdc3336e605aeabbbf8b9af046ef6ede3a685f6a901a133d32c",
+      "new_id": "df8c5031237d958301e5a7ae23af515d58efaed0552edcd5178c1ab1b34905f4",
+      "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B603",
+      "old_line": 7193,
+      "new_line": 7205,
+      "old_id": "a1a82c1ebe85f0aa274abd66d38e5b97aa95e173f68e5c34acc87955dd7d99be",
+      "new_id": "7b2e4440c9dd7352ecf04314461215d776f44dadcdd56e0ea7666655be2e7e54",
+      "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+    },
+    {
+      "path": "app/main.py",
+      "test_id": "B603",
+      "old_line": 7405,
+      "new_line": 7417,
+      "old_id": "d41c00e68c8b88015ff5651b8cfc84227272f9185e6471153d71bda7de0f6a7f",
+      "new_id": "43ee81b50aff8c6b4a611c24ec0bf88d3822277680fdc6842382acc750f010e6",
+      "basis": "Exact warning fields and code text match after removing report line-number prefixes;unchanged statement and original explicit disposition retained."
+    }
+  ],
+  "new_suppressions": false,
+  "new_network_boundaries": false
+}

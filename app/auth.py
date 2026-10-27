@@ -178,14 +178,13 @@ def _auth_schema_ready(con) -> bool:
 
 def init_auth_db() -> None:
     from .regime_service_lease import fence_held
-    if fence_held():
-        # Recovery must use the existing authentication schema, never migrate
-        # or provision defaults in the middle of a committed financial cutover.
-        with db() as con:
+    with db() as con:
+        if fence_held(con):
+            # Recovery uses the same existing snapshot and never provisions
+            # defaults in the middle of a committed financial cutover.
             con.execute('SELECT id,role,active FROM users LIMIT 0')
             con.execute('SELECT token_hash FROM sessions LIMIT 0')
-        return
-    with db() as con:
+            return
         if _auth_schema_ready(con):
             return
     with db() as con:

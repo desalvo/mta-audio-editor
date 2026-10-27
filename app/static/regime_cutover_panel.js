@@ -16,6 +16,17 @@
     blocked:'Change unavailable: complete prerequisites or reconciliation. No new transition was started.',uncertain:'Check the outcome in the audit. Resume only this same operation; a second transition will not be created.',
     empty:'No recorded transitions.',audit:'Transition audit',committed:'Update committed; service held pending recovery',finalized:'Completed',confirm:'Confirm the displayed change while preserving balances and periods? Service will pause briefly.',confirmRecovery:'Complete this already committed change by forward recovery? Balances and periods must still match their originals.',failed:'Audit unavailable. Retry without starting another transition.'
   };
+  Object.assign(words,it?{
+    modeDisabled:'Recupero locale non attivo; verificare la configurazione di manutenzione.',lifecycle:'Avanzamento della transizione',idle:'Nessun passaggio attivo',reserved:'Prenotazione registrata; ingressi bloccati',aborted:'Prenotazione annullata prima del commit',
+    evidence:'Prove originali o coerenza non verificabili: mantenere il blocco e richiedere revisione.',legacy:'Passaggio storico: recupero in manutenzione con le prove originali; nessun annullamento disponibile.',
+    tracked:'Operazioni registrate ancora aperte (non certifica tutti gli executor)',unavailable:'Avanzamento non disponibile: aggiornare prima di agire.',unknown:'Data o autore non registrati nello storico',
+    abort:'Annulla questa prenotazione',confirmAbort:'Annullare soltanto questa prenotazione non ancora committata? Il regime e i saldi restano invariati.'
+  }:{
+    modeDisabled:'Local recovery inactive; review the maintenance configuration.',lifecycle:'Transition progress',idle:'No active transition',reserved:'Reservation recorded; admission held',aborted:'Reservation cancelled before commit',
+    evidence:'Original evidence or consistency unverified: keep the barrier held and request review.',legacy:'Historical commit: maintenance recovery with original evidence required; cancellation unavailable.',
+    tracked:'Tracked operations still open (does not certify every executor)',unavailable:'Progress unavailable: refresh before acting.',unknown:'Date or actor not recorded in historical evidence',
+    abort:'Cancel this reservation',confirmAbort:'Cancel only this reservation before commit? The regime and balances remain unchanged.'
+  });
   const box=document.createElement('section');box.dataset.regimeCutover='';box.style.overflowWrap='anywhere';
   const title=document.createElement('h3');title.textContent=words.title;
   const note=document.createElement('p');note.textContent=words.note;
@@ -30,13 +41,15 @@
   const auditTitle=document.createElement('h4');auditTitle.textContent=words.audit;
   const auditStatus=document.createElement('p');auditStatus.setAttribute('role','status');auditStatus.dataset.cutoverAuditStatus='';
   const records=document.createElement('ul');records.dataset.cutoverAudit='';
-  box.append(title,note,label,check,review,execute,retry,status,auditTitle,refresh,auditStatus,records,more);host.append(box);
-  const key='mta-pending-regime-cutover';let pending=null,preview=null,busy=false,offset=0,listEpoch=0,listing=false;
+  const progress=document.createElement('p');progress.dataset.cutoverProgress='';progress.setAttribute('role','status');progress.setAttribute('aria-live','polite');
+  const cancel=button(words.abort);cancel.hidden=true;cancel.dataset.cutoverAbort='';
+  box.append(title,note,label,check,review,execute,retry,status,progress,cancel,auditTitle,refresh,auditStatus,records,more);host.append(box);
+  const key='mta-pending-regime-cutover';let pending=null,preview=null,busy=false,offset=0,listEpoch=0,listing=false,lifecycle=null,pollTimer=null;
   try{const stored=JSON.parse(sessionStorage.getItem(key)||'null');
     if(stored&&/^[A-Za-z0-9_-]{8,100}$/.test(stored.request_id)&&/^[a-f0-9]{64}$/.test(stored.preview_sha256)&&Number.isSafeInteger(stored.expected_revision)&&stored.expected_revision>=0&&['COMMERCIAL','NON_COMMERCIAL'].includes(stored.target)&&stored.confirm===true)pending={request_id:stored.request_id,target:stored.target,expected_revision:stored.expected_revision,preview_sha256:stored.preview_sha256,confirm:true};
   }catch(_){/* A malformed local hint is never authority to change the server. */}
   function remember(value){pending=value;try{if(value)sessionStorage.setItem(key,JSON.stringify(value));else sessionStorage.removeItem(key);}catch(_){/* Backend identity remains durable. */}controls();}
-  function controls(){check.disabled=busy||!!pending;target.disabled=busy||!!pending;execute.disabled=busy||!!pending||!preview;retry.hidden=!pending;retry.disabled=busy;refresh.disabled=busy||listing;more.disabled=busy||listing;for(const b of box.querySelectorAll('[data-cutover-recovery]'))b.disabled=busy||listing;}
+  function controls(){check.disabled=busy||!!pending;target.disabled=busy||!!pending;execute.disabled=busy||!!pending||!preview||!lifecycle||lifecycle.phase!=='idle';retry.hidden=!pending;retry.disabled=busy;refresh.disabled=busy||listing;more.disabled=busy||listing;cancel.disabled=busy||listing;for(const b of box.querySelectorAll('[data-cutover-recovery]'))b.disabled=busy||listing||lifecycle?.active?.id!==b.dataset.cutoverRecovery||lifecycle?.active?.action!=='forward_recovery';}
   async function request(path,body){const response=await fetch('/api/admin/service-regime/cutovers'+path,{method:body?'POST':'GET',credentials:'same-origin',cache:'no-store',headers:body?{'Content-Type':'application/json','X-MTA-Request':'1'}:{},body:body?JSON.stringify(body):undefined});
     if(!response.ok){const error=Error('HTTP '+response.status);error.httpStatus=response.status;throw error;}return response.json();}
   function complete(result){if(result.phase==='finalized'&&result.barrier_held===false){remember(null);status.textContent=words.done;return true;}status.textContent=words.uncertain;return false;}
@@ -44,26 +57,55 @@
     const epoch=++listEpoch;listing=true;controls();
     if(reset){offset=0;records.replaceChildren();more.hidden=true;}
     auditStatus.textContent=words.loading;
-    try{const data=await request('?limit=25&offset='+offset);
+    try{const data=await request('/lifecycle?limit=25&offset='+offset);
       if(epoch!==listEpoch)return;
       if(!Array.isArray(data.items)||!Number.isSafeInteger(data.total))throw Error('Invalid audit');
-      if(!data.total)records.textContent=words.empty;
+      showProgress(data);
+      if(!data.total){const empty=document.createElement('li');empty.textContent=words.empty;records.append(empty);}
       for(const row of data.items){
         const item=document.createElement('li');item.dataset.cutoverId=row.id;
-        const text=document.createElement('span');text.textContent=row.id+' · '+row.source+' → '+row.target+' · '+row.revision+' · '+(row.phase==='finalized'?words.finalized:words.committed)+' · '+row.created_at;item.append(text);
-        for(const event of row.events||[]){const detail=document.createElement('p');detail.textContent=(event.phase==='finalized'?words.finalized:words.committed)+' · '+event.actor_id+' · '+event.created_at;item.append(detail);}
+        const text=document.createElement('span');text.textContent=row.id+' · '+row.source+' → '+row.target+' · '+row.revision+' · '+(words[row.phase]||words.evidence)+' · '+(row.created_at||words.unknown);item.append(text);
+        for(const event of row.events||[]){const detail=document.createElement('p');detail.textContent=(words[event.phase]||words.evidence)+' · '+event.actor_id+' · '+event.created_at;item.append(detail);}
         if(pending?.request_id===row.id&&row.phase==='finalized'){complete(row);preview=null;}
-        if(row.phase==='committed'&&row.barrier_held===true){const recover=button(words.recover);recover.dataset.cutoverRecovery='';recover.disabled=busy||listing;recover.onclick=async()=>{
-          if(busy||!confirm(words.confirmRecovery+' '+row.id+' · '+row.target+' · '+row.revision))return;
+        if(row.phase==='committed'&&row.barrier_held===true){const recover=button(words.recover);recover.dataset.cutoverRecovery=row.id;recover.disabled=busy||listing;recover.onclick=async()=>{
+          if(busy||lifecycle?.active?.id!==row.id||lifecycle.active.action!=='forward_recovery'||!confirm(words.confirmRecovery+' '+row.id+' · '+row.target+' · '+row.revision))return;
           busy=true;controls();recover.disabled=true;status.textContent=words.working;
           try{const result=await request('/'+encodeURIComponent(row.id)+'/recover',{expected_revision:row.revision,confirm:true});complete(result);await list(true);}
-          catch(_){status.textContent=words.uncertain;}finally{busy=false;recover.disabled=false;controls();}
+          catch(_){status.textContent=words.uncertain;}finally{busy=false;recover.disabled=false;controls();refresh.focus();}
         };item.append(' ',recover);}records.append(item);
       }
       offset+=data.items.length;more.hidden=offset>=data.total||!data.items.length;auditStatus.textContent='';
-    }catch(_){if(epoch===listEpoch){auditStatus.textContent=words.failed;more.hidden=true;}}
+    }catch(_){if(epoch===listEpoch){auditStatus.textContent=words.failed;more.hidden=true;lifecycle=null;progress.textContent=words.unavailable;cancel.hidden=true;}}
     finally{if(epoch===listEpoch){listing=false;controls();}}
   }
+  function showProgress(data){
+    if(data.schema!=='mta-transition-status-1'||!['idle','reserved','committed','blocked'].includes(data.phase)||typeof data.integrity_verified!=='boolean'||!data.fence||typeof data.fence.transitioning!=='boolean')throw Error('Invalid lifecycle');
+    lifecycle=data;
+    const f=data.fence,counts=f.open_by_kind;
+    if(!counts||!['job','checkout','webhook'].every(k=>Number.isSafeInteger(counts[k])&&counts[k]>=0))throw Error('Invalid operation counts');
+    progress.textContent=words.lifecycle+': '+(data.phase==='idle'?words.idle:words[data.phase]||words.evidence)+' · '+f.regime+' · '+f.revision+' · '+words.tracked+': '+counts.job+' / '+counts.checkout+' / '+counts.webhook;
+    if(data.active)progress.textContent+=' · '+data.active.id+' · '+data.active.source+' → '+data.active.target;
+    if(data.reason)progress.textContent+=' · '+(data.reason==='legacy_commit_requires_maintenance'?words.legacy:data.reason==='recovery_mode_disabled'?words.modeDisabled:words.evidence);
+    cancel.hidden=!(data.integrity_verified&&data.active?.action==='abort_reservation');
+    controls();schedule();
+  }
+  function schedule(){clearTimeout(pollTimer);if(!document.hidden&&lifecycle&&['reserved','committed'].includes(lifecycle.phase))pollTimer=setTimeout(poll,5000);}
+  async function poll(){
+    if(busy||listing){schedule();return;}
+    const prior=JSON.stringify([lifecycle?.phase,lifecycle?.fence,lifecycle?.active]);
+    try{const data=await request('/lifecycle?limit=1&offset=0');showProgress(data);
+      if(JSON.stringify([data.phase,data.fence,data.active])!==prior)await list(true);
+    }catch(_){lifecycle=null;progress.textContent=words.unavailable;cancel.hidden=true;controls();}
+  }
+  document.addEventListener('visibilitychange',()=>{clearTimeout(pollTimer);if(!document.hidden)poll();});
+  cancel.onclick=async()=>{
+    const row=lifecycle?.active;
+    if(busy||listing||row?.action!=='abort_reservation'||!confirm(words.confirmAbort+' '+row.id+' · '+row.source_revision))return;
+    busy=true;controls();status.textContent=words.working;
+    try{await request('/reservations/'+encodeURIComponent(row.id)+'/abort',{expected_revision:row.source_revision,confirm:true});preview=null;review.textContent='';status.textContent=words.aborted;}
+    catch(_){status.textContent=words.uncertain;}
+    finally{await list(true);busy=false;controls();refresh.focus();}
+  };
   async function sendOriginal(){
     if(busy||!pending)return;busy=true;controls();status.textContent=words.working;
     try{const result=await request('',pending);complete(result);}

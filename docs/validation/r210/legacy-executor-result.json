@@ -1,0 +1,2817 @@
+{
+  "date": "2026-10-27",
+  "baseline_archive_sha256": "621902dbd3b23a564c937a8d42ddb65d5070d744efc4c5228820720e1dcadfb5",
+  "base_commit": "772fbe7508cc08266466a3746bb51f0fe5d0179b",
+  "scope": "Legacy raw gateway retirement, native-only direct execution and bounded process cleanup; not whole every-executor RC acceptance",
+  "passed": 434,
+  "failed": 0,
+  "errors": 0,
+  "skipped": 0,
+  "new_passed": 28,
+  "reports": [
+    {
+      "path": "docs/validation/r210/legacy-executor-first.xml",
+      "sha256": "9e70ba3b6bf0c0bcf48de0dd1b73bfc53306b3ce41403813e1656bc7d1a51d3b",
+      "collected": 100,
+      "failures": 22,
+      "errors": 0,
+      "skips": 0
+    },
+    {
+      "path": "docs/validation/r210/legacy-executor-functional.xml",
+      "sha256": "35b69e3a0cf267fab89fac61615fa7e946731c4dfdcae95aca40a538277e5d71",
+      "collected": 123,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0
+    },
+    {
+      "path": "docs/validation/r210/legacy-executor-regression.xml",
+      "sha256": "5554b80089d375bb11f29c93eab7a33540aa2610669bb36192daa2ba7a9dff90",
+      "collected": 163,
+      "failures": 1,
+      "errors": 0,
+      "skips": 0
+    },
+    {
+      "path": "docs/validation/r210/legacy-executor-final.xml",
+      "sha256": "9ef5726cef46d94e165d975eb047cb22f693043dd6e2cf5a79d0aef5944a07fc",
+      "collected": 89,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0
+    },
+    {
+      "path": "docs/validation/r210/legacy-executor-studio.xml",
+      "sha256": "aae089973cc0335ef8d9e4fbf82e79111f6ccf8d61bfa0dc6af74f84052f17fd",
+      "collected": 73,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0
+    },
+    {
+      "path": "docs/validation/r210/legacy-executor-gates.xml",
+      "sha256": "513262d8b0019bbc75f738e88e43d2d171fd90e14b44cd459f593f6a68024b39",
+      "collected": 37,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0
+    }
+  ],
+  "superseded_case_identities": [
+    [
+      "tests.test_r210_remote_transport_rights",
+      "test_commercial_metadata_and_existing_task_polling_are_not_new_inference[GET-health]"
+    ],
+    [
+      "tests.test_r210_remote_transport_rights",
+      "test_commercial_metadata_and_existing_task_polling_are_not_new_inference[GET-v1/models]"
+    ],
+    [
+      "tests.test_r210_remote_transport_rights",
+      "test_commercial_metadata_and_existing_task_polling_are_not_new_inference[GET-v1/audio]"
+    ],
+    [
+      "tests.test_r210_remote_transport_rights",
+      "test_commercial_metadata_and_existing_task_polling_are_not_new_inference[POST-query_result]"
+    ]
+  ],
+  "source_sha256": {
+    "app/ai_gateway.py": "8a618601080cab61e27922991c5c6fa9ea60c0496b6185187e74b5baa30bd00b",
+    "app/ai_metering_agent.py": "9bbfb5e573b79efb0d79bc2d39362f4c902b2eeb0d678258b3343201855846b3",
+    "app/ai_worker_protocol.py": "963c626e5f4613e1f2ce79c5b5ba96305ff71f626b8d8dd0806d0912a09eb3d4",
+    "app/native_ai_account.py": "2883d422e7098469f7a9464d5652f26a7600288dfe29f448165e4cfc2fe60f63",
+    "app/native_ai_routing.py": "3902bd322ad0b7563cf9c357e9889c1c6990dc35e8098476de813d317d667919",
+    "app/studio_compute.py": "d21bcf7d3d14c45c2a0e71eaca137ec71d27551a5577ab58481454f0935aa864",
+    "tests/conftest.py": "36d54b3ca4d87c6ae123c20b5dbe904e216c34280eefe5a889e3030fbb45ffb9",
+    "tests/test_r180_worker_protocol_and_pdc.py": "a92bc9d97436611527bc49adfcc76e8ee90cef3d76c8e2327a09d1c78f8a5df5",
+    "tests/test_r184_ai_audio_transfer.py": "f6195a649e9972550a1aea68e84fcb7e44156f8687dc412ca66887d94b1d2419",
+    "tests/test_r207_gateway_adapter_coverage.py": "ef5294aa0356315bda7253c694b5f79cdd4dbe84fbd8d23cbaa9695e5bea508b",
+    "tests/test_r207_native_remote_routes.py": "524f9e7543d1405755f021de5a6e3331c961993a690de3108ddec499add2a1b2",
+    "tests/test_r208_legacy_supervised_lifecycle.py": "37bc5c741b9821450852f527bda8bb4154b29c13dcb45384a0a50d29034d756c",
+    "tests/test_r208_native_pending_recovery.py": "92dc9190ed336f14be73b8114d2bcea588774ff08621eff4ab27fc26b41ff079",
+    "tests/test_r208_worker_preflight_and_cgroup_environment.py": "16a534ac7bbafd18664b6e82ee30af4f59ffd16b3decb5cb623cbbd8cb283760",
+    "tests/test_r210_ace_task_control.py": "8a513e4a6695e540c219495f5f55cfe25ebc0515aa9bf9a0edcb80e3787aaf07",
+    "tests/test_r210_arranger_timeout_mixer.py": "e09a55b1fafcc41434c1b4a16853cfb4e787d93c5d566b3b67e2fd845cff6b71",
+    "tests/test_r210_full_length_stem_artifacts.py": "606a82ba165dfe907de6a0e7305bfbab8789676dea7ed851f8ce9853ef6c2157",
+    "tests/test_r210_native_local_setup.py": "f7795b09b414d2202a023b978267837c1f22b25e01669a892415270e30fc80a2",
+    "tests/test_r210_remote_license_dispatch_gate.py": "46dcb1135e711b4bd49151da05d3527eed24d48789967ec7d75b4370a84c64f3",
+    "tests/test_r210_remote_transport_rights.py": "e12ccd120047d4b401d4c0969566280863de2ad0aed87dc1b61421dac28d1d43",
+    "tests/test_r210_legacy_executor_closure.py": "05e96793bd6002ffc07987a513479e1c5b0057c1cb71a3ba6d9004e067babd63"
+  },
+  "cases": [
+    {
+      "module": "tests.test_r180_worker_protocol_and_pdc",
+      "case": "test_native_pdc_mix_compiles_and_runs",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r180_worker_protocol_and_pdc",
+      "case": "test_worker_file_contract_and_validation",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r180_worker_protocol_and_pdc",
+      "case": "test_worker_rejects_invalid_audio",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r180_worker_protocol_and_pdc",
+      "case": "test_worker_requires_admin_opt_in",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r184_ai_audio_transfer",
+      "case": "test_native_dsp_contract_is_present",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r184_ai_audio_transfer",
+      "case": "test_native_preview_crossfade_compiles",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r184_ai_audio_transfer",
+      "case": "test_source_path_is_not_user_controlled",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r184_ai_audio_transfer",
+      "case": "test_worker_receives_audio_and_returns_preview",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "case": "test_backing_vocals_artifact_security",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "case": "test_gateway_authorization_methods_size_and_audit",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "case": "test_gateway_proxy_success_limits_and_errors",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "case": "test_gateway_upstream_validation[file:///tmp/a-False]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "case": "test_gateway_upstream_validation[http://127.0.0.1:8001-True]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "case": "test_gateway_upstream_validation[http://192.168.1.2:8001-True]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "case": "test_gateway_upstream_validation[http://8.8.8.8:8001-False]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "case": "test_gateway_upstream_validation[http://example.org-False]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "case": "test_gateway_upstream_validation[http://localhost:8001/-True]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "case": "test_gateway_upstream_validation[http://user:password@127.0.0.1-False]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "case": "test_gateway_upstream_validation[https://example.org-True]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "case": "test_gateway_upstream_validation[https://example.org/api/admin-False]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "case": "test_gateway_upstream_validation[nonsense-False]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "case": "test_singer_separation_invalid_options[bad0]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "case": "test_singer_separation_invalid_options[bad1]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "case": "test_singer_separation_invalid_options[bad2]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "case": "test_singer_separation_invalid_options[bad3]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "case": "test_singer_separation_invalid_options[bad4]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "case": "test_singer_separation_invalid_options[bad5]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "case": "test_singer_separation_selected_and_all",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "case": "test_unified_cli_main",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "case": "test_unified_cli_requires_original_admission[missing]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "case": "test_unified_cli_requires_original_admission[wrong-kind]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "case": "test_unified_drumsep_and_missing_model",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "case": "test_unified_manifest_validation",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "case": "test_unified_subprocess_models",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r207_gateway_adapter_coverage",
+      "case": "test_unified_transcripts_and_chords",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r207_native_remote_routes",
+      "case": "test_each_remote_kind_never_uses_local_fallback[backing-vocals]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r207_native_remote_routes",
+      "case": "test_each_remote_kind_never_uses_local_fallback[chords-ml]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r207_native_remote_routes",
+      "case": "test_each_remote_kind_never_uses_local_fallback[demucs]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r207_native_remote_routes",
+      "case": "test_each_remote_kind_never_uses_local_fallback[drumsep]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r207_native_remote_routes",
+      "case": "test_each_remote_kind_never_uses_local_fallback[sam-audio]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r207_native_remote_routes",
+      "case": "test_each_remote_kind_never_uses_local_fallback[singer-separation]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r207_native_remote_routes",
+      "case": "test_each_remote_kind_never_uses_local_fallback[whisper]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r207_native_remote_routes",
+      "case": "test_independent_native_worker_modes_and_private_tokens",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r207_native_remote_routes",
+      "case": "test_remote_inference_wav_and_json_zip",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r207_native_remote_routes",
+      "case": "test_remote_rejects_unsafe_zip_and_does_not_fallback",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r207_native_remote_routes",
+      "case": "test_remote_requires_https_and_token",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r207_process_metering",
+      "case": "test_invalid_invocation",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r207_process_metering",
+      "case": "test_metered_child_cpu_and_io",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r207_process_metering",
+      "case": "test_metering_timeout",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r207_process_metering",
+      "case": "test_no_double_counting_of_output_payload",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r207_process_metering",
+      "case": "test_no_host_cpu_is_charged",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r207_process_metering",
+      "case": "test_registered_worker_error_is_tracked",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r207_remote_singer_end_to_end",
+      "case": "test_remote_singer_failure_never_starts_local",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r207_remote_singer_end_to_end",
+      "case": "test_remote_singer_inference_no_local_fallback",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r208_active_remote_process_stop",
+      "case": "test_cancellation_before_worker_exit",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r208_active_remote_process_stop",
+      "case": "test_cancellation_does_not_block_success",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r208_active_remote_process_stop",
+      "case": "test_cancellation_kills_live_process_group",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r208_discovered_artifact_download",
+      "case": "test_discovered_download_reuses_existing_result_without_inference",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r208_discovered_artifact_download",
+      "case": "test_old_completed_request_does_not_require_history_pagination",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r208_discovered_artifact_download",
+      "case": "test_remote_history_download_ui_never_imports_without_receipt",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r208_discovered_artifact_download",
+      "case": "test_unknown_or_incomplete_discovered_key_cannot_download",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r208_legacy_supervised_lifecycle",
+      "case": "test_legacy_worker_cancel_running",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r208_legacy_supervised_lifecycle",
+      "case": "test_legacy_worker_failed_exit",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r208_legacy_supervised_lifecycle",
+      "case": "test_legacy_worker_precancel_skips_execution",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r208_legacy_supervised_lifecycle",
+      "case": "test_legacy_worker_timeout",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r208_native_pending_artifact_e2e",
+      "case": "test_changed_settings_fail_closed",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r208_native_pending_artifact_e2e",
+      "case": "test_download_read_only_keeps_journal[application/json-{\"result\":true}-json]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r208_native_pending_artifact_e2e",
+      "case": "test_download_read_only_keeps_journal[application/zip-PK\\x03\\x04result-zip]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r208_native_pending_artifact_e2e",
+      "case": "test_download_read_only_keeps_journal[audio/wav-RIFF____WAVE-wav]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r208_native_pending_artifact_e2e",
+      "case": "test_recovery_failure_does_not_discard_journal",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r208_native_pending_artifact_e2e",
+      "case": "test_unowned_request_blocked",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r208_native_pending_management_e2e",
+      "case": "test_corrupt_record_is_visible_but_not_queryable",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r208_native_pending_management_e2e",
+      "case": "test_duplicate_submission_remains_pending_and_complete_removes",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r208_native_pending_management_e2e",
+      "case": "test_legacy_entry_is_not_remote_queryable",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r208_native_pending_management_e2e",
+      "case": "test_pending_metadata_does_not_expose_token_audio_or_input",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r208_native_pending_management_e2e",
+      "case": "test_status_endpoint_rejects_changed_worker_settings",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r208_native_pending_management_e2e",
+      "case": "test_status_endpoint_uses_get_only_and_current_token",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r208_native_pending_management_e2e",
+      "case": "test_unowned_requests_are_rejected",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r208_native_pending_recovery",
+      "case": "test_corrupt_pending_fails_closed",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r208_native_pending_recovery",
+      "case": "test_pending_keeps_id_and_never_reposts",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r208_native_pending_recovery",
+      "case": "test_pending_remains_after_failed_recovery",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r208_native_pending_recovery",
+      "case": "test_separate_inputs_have_distinct_identities",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r208_native_remote_history_pagination",
+      "case": "test_history_supports_more_than_first_fifty_requests",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r208_native_remote_history_ui",
+      "case": "test_history_rejects_unconfigured_and_unknown_models",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r208_native_remote_history_ui",
+      "case": "test_native_history_ui_is_non_inferential",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r208_native_remote_history_ui",
+      "case": "test_native_remote_history_uses_saved_credentials_without_exposing_them",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r208_native_remote_history_ui",
+      "case": "test_remote_errors_do_not_start_inference",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r208_unified_adapter_billing_e2e",
+      "case": "test_admin_artifact_policy_is_frozen_and_not_overridden_by_plan",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r208_unified_adapter_billing_e2e",
+      "case": "test_cancellation_during_artifact_packaging_cannot_bill_success",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r208_unified_adapter_billing_e2e",
+      "case": "test_each_real_adapter_job_is_metered_billed_and_packaged[backing-vocals]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r208_unified_adapter_billing_e2e",
+      "case": "test_each_real_adapter_job_is_metered_billed_and_packaged[chords-ml]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r208_unified_adapter_billing_e2e",
+      "case": "test_each_real_adapter_job_is_metered_billed_and_packaged[demucs]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r208_unified_adapter_billing_e2e",
+      "case": "test_each_real_adapter_job_is_metered_billed_and_packaged[drumsep]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r208_unified_adapter_billing_e2e",
+      "case": "test_each_real_adapter_job_is_metered_billed_and_packaged[sam-audio]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r208_unified_adapter_billing_e2e",
+      "case": "test_each_real_adapter_job_is_metered_billed_and_packaged[singer-separation]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r208_unified_adapter_billing_e2e",
+      "case": "test_each_real_adapter_job_is_metered_billed_and_packaged[whisper]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r208_unified_adapter_billing_e2e",
+      "case": "test_free_only_real_worker_bypasses_paid_admission_without_losing_accounting",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r208_worker_preflight_and_cgroup_environment",
+      "case": "test_cancel_during_render_never_starts_worker",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r208_worker_preflight_and_cgroup_environment",
+      "case": "test_cgroup_worker_receives_progress_environment",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r208_worker_preflight_and_cgroup_environment",
+      "case": "test_pre_cancelled_worker_never_resolves_or_renders",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_ace_task_control",
+      "case": "test_adapter_forwards_budget_and_cancels_backend_after_failure",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_ace_task_control",
+      "case": "test_budget_is_bounded_and_cannot_be_extended[14401]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_ace_task_control",
+      "case": "test_budget_is_bounded_and_cannot_be_extended[3600]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_ace_task_control",
+      "case": "test_budget_is_bounded_and_cannot_be_extended[59]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_ace_task_control",
+      "case": "test_budget_is_bounded_and_cannot_be_extended[True]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_ace_task_control",
+      "case": "test_cancel_before_execution_does_not_start_model",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_ace_task_control",
+      "case": "test_cancellation_of_pending_ace_task_is_not_expired_before_execution",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_ace_task_control",
+      "case": "test_checkpoint_stops_child_for_cancel_or_selected_budget[False]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_ace_task_control",
+      "case": "test_checkpoint_stops_child_for_cancel_or_selected_budget[True]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_ace_task_control",
+      "case": "test_failure_classification_survives_redacted_zip_without_secret",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_ace_task_control",
+      "case": "test_generate_button_cancels_reopened_job_instead_of_submitting_again",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_ace_task_control",
+      "case": "test_long_generation_passes_600_seconds_and_profiles_gpu_thread",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_ace_task_control",
+      "case": "test_project_cancel_http_auth_csrf_and_access",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_ace_task_control",
+      "case": "test_project_cancel_route_authorizes_before_job_and_rejects_other_project",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_ace_task_control",
+      "case": "test_real_adapter_termination_delivers_http_cancel",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_ace_task_control",
+      "case": "test_running_queue_cancellation_is_not_hidden_by_worker_progress",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_ace_task_control",
+      "case": "test_runtime_control_auth_ceiling_and_fixed_task_scope",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_ace_task_control",
+      "case": "test_supervisor_delivers_cancel_even_after_adapter_is_killed",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "case": "test_cancellation_probe_failure_does_not_spawn_child",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "case": "test_cancelled_context_rejects_new_stage_before_callback[callback]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "case": "test_cancelled_context_rejects_new_stage_before_callback[event]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "case": "test_cancelled_context_rejects_new_stage_before_callback[persisted]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "case": "test_failed_or_unbounded_source_conversion_never_dispatches[empty]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "case": "test_failed_or_unbounded_source_conversion_never_dispatches[failed]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "case": "test_failed_or_unbounded_source_conversion_never_dispatches[oversized]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "case": "test_independent_process_cannot_reuse_live_parent_scheduler_identity",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "case": "test_inner_dispatch_rechecks_owner_after_outer_admission[local]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "case": "test_inner_dispatch_rechecks_owner_after_outer_admission[pull]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "case": "test_invalid_global_owner_never_creates_queue_job[-1]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "case": "test_invalid_global_owner_never_creates_queue_job[0]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "case": "test_invalid_global_owner_never_creates_queue_job[1]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "case": "test_invalid_global_owner_never_creates_queue_job[None]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "case": "test_invalid_global_owner_never_creates_queue_job[True]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "case": "test_missing_queue_context_does_not_become_a_new_permit",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "case": "test_native_fallback_pre_cancel_never_spawns",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "case": "test_nested_cross_owner_rejected_but_same_owner_keeps_one_slot",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "case": "test_pre_cancelled_process_does_not_execute_actual_child",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "case": "test_public_worker_rejects_foreign_owner_before_routing_or_ledger[local]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "case": "test_public_worker_rejects_foreign_owner_before_routing_or_ledger[pull]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "case": "test_server_conversion_cancellation_reaps_child_and_never_enters_model",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "case": "test_server_rejects_before_source_process[cancelled]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "case": "test_server_rejects_before_source_process[engine_override]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "case": "test_server_rejects_before_source_process[license_denied]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "case": "test_server_source_conversion_rejects_inactive_context",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "case": "test_source_preparation_uses_one_remaining_budget_and_preserves_bound_identity",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "case": "test_terminal_or_unstarted_queue_context_never_dispatches[blocked]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "case": "test_terminal_or_unstarted_queue_context_never_dispatches[cancelled]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "case": "test_terminal_or_unstarted_queue_context_never_dispatches[completed]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "case": "test_terminal_or_unstarted_queue_context_never_dispatches[failed]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "case": "test_terminal_or_unstarted_queue_context_never_dispatches[interrupted]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "case": "test_terminal_or_unstarted_queue_context_never_dispatches[queued]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "case": "test_wrong_supervisor_or_unknown_identity_is_not_execution_authority[missing_actor]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "case": "test_wrong_supervisor_or_unknown_identity_is_not_execution_authority[missing_identity]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "case": "test_wrong_supervisor_or_unknown_identity_is_not_execution_authority[runner_identity]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "case": "test_wrong_supervisor_or_unknown_identity_is_not_execution_authority[runner_pid]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_arranger_timeout_mixer",
+      "case": "test_adapter_polls_past_old_limit_but_stops_at_custom_budget",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_arranger_timeout_mixer",
+      "case": "test_arranger_posts_selected_budget_and_rejects_invalid_without_request",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_arranger_timeout_mixer",
+      "case": "test_budget_survives_plan_and_durable_request_roundtrip[RearrangeRequest]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_arranger_timeout_mixer",
+      "case": "test_budget_survives_plan_and_durable_request_roundtrip[RemixRequest]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_arranger_timeout_mixer",
+      "case": "test_compact_actual_channel_controls_fit_normal_dock_height",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_arranger_timeout_mixer",
+      "case": "test_custom_budget_reaches_cgroup_supervisor_without_changing_metering",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_arranger_timeout_mixer",
+      "case": "test_invalid_budgets_fail_closed[0]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_arranger_timeout_mixer",
+      "case": "test_invalid_budgets_fail_closed[14401]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_arranger_timeout_mixer",
+      "case": "test_invalid_budgets_fail_closed[3600.5]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_arranger_timeout_mixer",
+      "case": "test_invalid_budgets_fail_closed[3600]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_arranger_timeout_mixer",
+      "case": "test_invalid_budgets_fail_closed[59]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_arranger_timeout_mixer",
+      "case": "test_invalid_budgets_fail_closed[True]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_arranger_timeout_mixer",
+      "case": "test_mixer_resize_moves_top_and_keeps_bottom[False-240]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_arranger_timeout_mixer",
+      "case": "test_mixer_resize_moves_top_and_keeps_bottom[False-400]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_arranger_timeout_mixer",
+      "case": "test_mixer_resize_moves_top_and_keeps_bottom[True-240]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_arranger_timeout_mixer",
+      "case": "test_mixer_resize_moves_top_and_keeps_bottom[True-400]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_policy_binding",
+      "case": "test_actual_child_entry_rejects_before_reading_score_or_loading_models",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_policy_binding",
+      "case": "test_child_rejects_missing_changed_or_malformed_original_policy[digest]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_policy_binding",
+      "case": "test_child_rejects_missing_changed_or_malformed_original_policy[duplicate]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_policy_binding",
+      "case": "test_child_rejects_missing_changed_or_malformed_original_policy[kind]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_policy_binding",
+      "case": "test_child_rejects_missing_changed_or_malformed_original_policy[missing]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_policy_binding",
+      "case": "test_child_rejects_missing_changed_or_malformed_original_policy[review-type]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_policy_binding",
+      "case": "test_child_rejects_missing_changed_or_malformed_original_policy[schema]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_policy_binding",
+      "case": "test_native_parent_actual_studio_adapter_preserves_output_and_no_server_invoice",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_policy_binding",
+      "case": "test_pull_parent_propagates_original_assignment_to_actual_child",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_policy_binding",
+      "case": "test_registered_child_cannot_adopt_different_current_policy",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_policy_binding",
+      "case": "test_registered_parent_overwrites_inherited_policy_and_real_child_verifies",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_policy_binding",
+      "case": "test_transkun_config_is_private_exact_copy_removed_after_parse",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_policy_binding",
+      "case": "test_transkun_loader_uses_verified_stream_after_path_replacement",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_policy_binding",
+      "case": "test_transkun_tamper_rejected_before_deserializer_or_executable_configuration[checkpoint]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_policy_binding",
+      "case": "test_transkun_tamper_rejected_before_deserializer_or_executable_configuration[config]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_actual_diagnostic_web_job_cannot_execute_local_model",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_actual_native_local_analysis_still_publishes_without_server_invoice",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_auth_diagnostics_never_switch_server_to_unowned_local_inference[1]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_auth_diagnostics_never_switch_server_to_unowned_local_inference[]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_auth_diagnostics_never_switch_server_to_unowned_local_inference[false]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_auth_diagnostics_never_switch_server_to_unowned_local_inference[on]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_auth_diagnostics_never_switch_server_to_unowned_local_inference[true]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_auth_diagnostics_never_switch_server_to_unowned_local_inference[yes]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_invalid_studio_actor_rejected_before_model_or_config[inner--1]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_invalid_studio_actor_rejected_before_model_or_config[inner-1.0]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_invalid_studio_actor_rejected_before_model_or_config[inner-1]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_invalid_studio_actor_rejected_before_model_or_config[inner-False]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_invalid_studio_actor_rejected_before_model_or_config[inner-None]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_invalid_studio_actor_rejected_before_model_or_config[inner-True]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_invalid_studio_actor_rejected_before_model_or_config[public--1]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_invalid_studio_actor_rejected_before_model_or_config[public-1.0]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_invalid_studio_actor_rejected_before_model_or_config[public-1]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_invalid_studio_actor_rejected_before_model_or_config[public-False]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_invalid_studio_actor_rejected_before_model_or_config[public-None]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_invalid_studio_actor_rejected_before_model_or_config[public-True]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_native_compat_license_denial_is_readable_and_has_no_upload_side_effect",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_server_sync_stem_compat_rejects_before_file_or_model_effects[account]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_server_sync_stem_compat_rejects_before_file_or_model_effects[diagnostic]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_server_zero_actor_cannot_read_native_token_or_launch[inner]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_server_zero_actor_cannot_read_native_token_or_launch[public]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_executor_boundaries",
+      "case": "test_server_zero_actor_cannot_read_native_token_or_launch[remote]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_full_length_stem_artifacts",
+      "case": "test_cache_and_remote_still_reject_oversized_results",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_full_length_stem_artifacts",
+      "case": "test_native_upload_reads_beyond_old_32mib_limit",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_full_length_stem_artifacts",
+      "case": "test_oversize_source_rejected_before_job_or_billing",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_full_length_stem_artifacts",
+      "case": "test_server_manifest_is_not_charged_to_audio_budget",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_full_length_stem_artifacts",
+      "case": "test_shared_source_and_result_limits_agree",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_full_length_stem_artifacts",
+      "case": "test_six_stems_over_old_limits_roundtrip_server_cache_and_native",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_full_length_stem_artifacts",
+      "case": "test_sparse_oversize_stem_rejected_before_read_or_manifest",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_full_length_stem_artifacts",
+      "case": "test_worker_size_failure_has_specific_safe_diagnostic",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_full_length_stem_artifacts",
+      "case": "test_zip_overhead_is_separate_from_uncompressed_budget",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_global_ai_execution",
+      "case": "test_authenticated_token_worker_uses_global_queue_and_owner_receipt",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_global_ai_execution",
+      "case": "test_markers_and_chord_options_are_available_in_unified_protocol",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_global_ai_execution",
+      "case": "test_native_future_engine_uses_shared_token_and_keeps_it_private",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_global_ai_execution",
+      "case": "test_operator_registry_supports_future_engine_and_rejects_bad_config",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_global_ai_execution",
+      "case": "test_orphan_remote_admission_does_not_block_fifo",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_global_ai_execution",
+      "case": "test_production_server_requires_authenticated_queue_identity",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_global_ai_execution",
+      "case": "test_queued_cancel_does_not_dispatch",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_global_ai_execution",
+      "case": "test_server_raw_wav_preserves_publication_metadata",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_global_ai_execution",
+      "case": "test_server_runtime_configuration_is_private_and_preserves_settings",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_global_ai_execution",
+      "case": "test_server_whisper_cannot_bill_an_unprofiled_cli",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_global_ai_execution",
+      "case": "test_token_and_nested_web_jobs_share_one_fifo_slot",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_actual_accounted_api_still_runs_once_replays_and_keeps_foreign_user_out",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_actual_accounted_api_still_runs_once_replays_and_keeps_foreign_user_out[json]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_actual_accounted_api_still_runs_once_replays_and_keeps_foreign_user_out[wav]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_native_legacy_policy_denial_precedes_worker_and_source[external]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_native_legacy_policy_denial_precedes_worker_and_source[project]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_native_project_worker_ignoring_sigterm_is_killed_and_reaped[cancel]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_native_project_worker_ignoring_sigterm_is_killed_and_reaped[timeout]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_native_project_worker_receives_original_policy_and_actual_cpu",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_native_studio_no_wait4_fallback_stops_its_own_session",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_nc_gateway_rejects_unowned_work_and_result_reads_before_transport[GET-v1/audio]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_nc_gateway_rejects_unowned_work_and_result_reads_before_transport[POST-query_result]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_nc_gateway_rejects_unowned_work_and_result_reads_before_transport[POST-release_task]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_nc_gateway_rejects_unowned_work_and_result_reads_before_transport[POST-v1/audio]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_nc_gateway_rejects_unowned_work_and_result_reads_before_transport[POST-v1/generate]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_nc_gateway_rejects_unowned_work_and_result_reads_before_transport[POST-v1/init]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_nc_gateway_rejects_unowned_work_and_result_reads_before_transport[POST-v1/models]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_server_cannot_use_native_credentials_or_legacy_worker[-arranger]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_server_cannot_use_native_credentials_or_legacy_worker[-external]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_server_cannot_use_native_credentials_or_legacy_worker[-project]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_server_cannot_use_native_credentials_or_legacy_worker[-routing]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_server_cannot_use_native_credentials_or_legacy_worker[1-arranger]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_server_cannot_use_native_credentials_or_legacy_worker[1-external]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_server_cannot_use_native_credentials_or_legacy_worker[1-project]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_server_cannot_use_native_credentials_or_legacy_worker[1-routing]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_server_cannot_use_native_credentials_or_legacy_worker[false-arranger]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_server_cannot_use_native_credentials_or_legacy_worker[false-external]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_server_cannot_use_native_credentials_or_legacy_worker[false-project]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_executor_closure",
+      "case": "test_server_cannot_use_native_credentials_or_legacy_worker[false-routing]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_native_account_mail",
+      "case": "test_account_reports_combine_tokens_without_cross_user_data_or_gpu_charge",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_native_account_mail",
+      "case": "test_device_approval_creates_one_active_token_per_user_instance",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_native_account_mail",
+      "case": "test_device_denial_expiry_and_poll_throttle",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_native_account_mail",
+      "case": "test_device_http_csrf_auth_and_personal_admin_preferences_acl",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_native_account_mail",
+      "case": "test_device_rejects_inactive_unverified_accounts[False-False]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_native_account_mail",
+      "case": "test_device_rejects_inactive_unverified_accounts[False-True]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_native_account_mail",
+      "case": "test_device_rejects_inactive_unverified_accounts[True-False]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_native_account_mail",
+      "case": "test_diagnostics_are_persistent_separate_and_never_increase_billing",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_native_account_mail",
+      "case": "test_digest_uses_completion_window_so_long_jobs_are_not_lost",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_native_account_mail",
+      "case": "test_mail_retry_preserves_terminal_order_and_never_changes_job",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_native_account_mail",
+      "case": "test_mime_email_has_embedded_logo_and_stable_message_id",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_native_account_mail",
+      "case": "test_native_enrollment_keeps_secret_private_and_shares_all_engine_tokens",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_native_account_mail",
+      "case": "test_native_enrollment_rejects_unsafe_urls[file:///tmp/test]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_native_account_mail",
+      "case": "test_native_enrollment_rejects_unsafe_urls[http://mta.example.com]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_native_account_mail",
+      "case": "test_native_enrollment_rejects_unsafe_urls[https://example.com/?token=x]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_native_account_mail",
+      "case": "test_native_enrollment_rejects_unsafe_urls[https://example.com/other]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_native_account_mail",
+      "case": "test_native_enrollment_rejects_unsafe_urls[https://user:password@example.com]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_native_account_mail",
+      "case": "test_recovery_from_interrupted_to_completed_emails_the_new_terminal_state",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_native_account_mail",
+      "case": "test_remote_audio_exec_leaves_event_loop_responsive_and_attributes_same_token",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_native_account_mail",
+      "case": "test_smtp_disabled_does_not_enqueue_or_send_old_jobs",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_native_account_mail",
+      "case": "test_start_terminal_emails_html_logo_zero_cost_and_diagnostic_only_gpu",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_native_local_setup",
+      "case": "test_help_and_native_setup_markup_are_in_one_current_language",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_native_local_setup",
+      "case": "test_installer_watchdog_handles_silent_process",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_native_local_setup",
+      "case": "test_mac_supervisor_does_not_depend_on_linux_proc_or_fabricate_tree_metering",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_native_local_setup",
+      "case": "test_missing_runtime_reports_failure_and_does_not_start_server",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_native_local_setup",
+      "case": "test_native_adapter_uses_managed_python_and_not_frozen_gui_executable",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_native_local_setup",
+      "case": "test_no_install_without_selection_consent",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_native_local_setup",
+      "case": "test_ready_status_notification_follows_backend_readiness_even_without_dialog",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_native_local_setup",
+      "case": "test_select_local_installs_starts_and_waits_for_http_readiness",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_native_local_setup",
+      "case": "test_selecting_local_preserves_an_already_running_adapter",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_native_local_setup",
+      "case": "test_source_archive_rejects_unsafe_members[../../escape]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_native_local_setup",
+      "case": "test_source_archive_rejects_unsafe_members[/absolute/file]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_license_dispatch_gate",
+      "case": "test_every_remote_entry_rejects_before_source_or_transport[durable-bridge]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_license_dispatch_gate",
+      "case": "test_every_remote_entry_rejects_before_source_or_transport[durable-executor]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_license_dispatch_gate",
+      "case": "test_every_remote_entry_rejects_before_source_or_transport[native-arranger]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_license_dispatch_gate",
+      "case": "test_every_remote_entry_rejects_before_source_or_transport[native-routing]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_license_dispatch_gate",
+      "case": "test_every_remote_entry_rejects_before_source_or_transport[studio-direct]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_license_dispatch_gate",
+      "case": "test_remote_commercial_denied_even_if_known_local_model",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_license_dispatch_gate",
+      "case": "test_remote_denied_before_transport",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_license_dispatch_gate",
+      "case": "test_remote_noncommercial_still_evaluates_model",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-regression.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_call_fingerprint_does_not_depend_on_python_ast_dump",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_current_inventory_matches_review",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_inventory_cannot_silently_approve_drift[category]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_inventory_cannot_silently_approve_drift[checker]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_inventory_cannot_silently_approve_drift[hash]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_inventory_cannot_silently_approve_drift[missing]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_inventory_cannot_silently_approve_drift[rationale]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_inventory_cannot_silently_approve_drift[reorder]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_inventory_cannot_silently_approve_drift[source]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-device/start?x=1]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-gateway/v1/generate]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-jobs/execute-audio/whisper]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_new_aliased_transports_require_review[from httpx import AsyncClient as hidden\\nhidden()]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_new_aliased_transports_require_review[from urllib.request import build_opener as hidden\\nx=hidden()\\nx.open(\"https://example.test\")]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_new_aliased_transports_require_review[from urllib.request import urlopen as hidden\\nhidden(\"https://example.test\")]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_new_aliased_transports_require_review[import aiohttp as hidden\\nhidden.ClientSession()]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_new_aliased_transports_require_review[import httpx as hidden\\nhidden.Client()]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_new_aliased_transports_require_review[import socket as hidden\\nhidden.create_connection((\"example.test\",443))]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_supported_device_authorization_still_uses_exact_post[/api/ai-device/poll]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "case": "test_supported_device_authorization_still_uses_exact_post[/api/ai-device/start]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_client_historical_operations_stay_available_under_commercial_denial[cancel]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_client_historical_operations_stay_available_under_commercial_denial[capabilities]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_client_historical_operations_stay_available_under_commercial_denial[list]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_client_historical_operations_stay_available_under_commercial_denial[recover]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_client_historical_operations_stay_available_under_commercial_denial[resources]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_client_historical_operations_stay_available_under_commercial_denial[status]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_commercial_metadata_does_not_start_inference[GET-health]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_commercial_metadata_does_not_start_inference[GET-v1/models]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_configured_gateway_polling_still_works_without_new_inference",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_disabled_nc_policy_cannot_use_direct_transport[ace-request]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_disabled_nc_policy_cannot_use_direct_transport[ace-run]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_disabled_nc_policy_cannot_use_direct_transport[client]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_disabled_nc_policy_cannot_use_direct_transport[gateway]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_gateway_mutations_cannot_forward_commercial_work[release_task]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_gateway_mutations_cannot_forward_commercial_work[v1/audio]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_gateway_mutations_cannot_forward_commercial_work[v1/generate]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_gateway_mutations_cannot_forward_commercial_work[v1/init]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_gateway_mutations_cannot_forward_commercial_work[v1/models]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_gateway_prefix_cannot_be_forged_as_polling_exemption[/api/ai-gatewayevil/query_result]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_gateway_prefix_cannot_be_forged_as_polling_exemption[/other/query_result]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_gateway_prefix_cannot_be_forged_as_polling_exemption[/release_task]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_gateway_prefix_cannot_be_forged_as_polling_exemption[/xxxxxxxxxxxxxx/query_result]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_loopback_or_tunnel_does_not_exempt_commercial_inference[http://127.0.0.1:8001]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_loopback_or_tunnel_does_not_exempt_commercial_inference[http://[::1]:8001]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_loopback_or_tunnel_does_not_exempt_commercial_inference[http://localhost:8001]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_malformed_model_selection_is_value_error_without_transport[123-options1]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_malformed_model_selection_is_value_error_without_transport[None-options0]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_malformed_model_selection_is_value_error_without_transport[audio-to-midi-transkun-options7]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_malformed_model_selection_is_value_error_without_transport[kind2-options2]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_malformed_model_selection_is_value_error_without_transport[vocal-synthesis-options4]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_malformed_model_selection_is_value_error_without_transport[vocal-synthesis-options6]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_malformed_model_selection_is_value_error_without_transport[whisper-invalid]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_malformed_model_selection_is_value_error_without_transport[whisper-options3]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_native_gateway_token_still_cannot_skip_accounted_endpoint",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_raw_client_commercial_denies_before_source_validation_or_network[arranger]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_raw_client_commercial_denies_before_source_validation_or_network[audio-to-midi-basic-pitch]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_raw_client_commercial_denies_before_source_validation_or_network[audio-to-midi-yourmt3]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_raw_client_commercial_denies_before_source_validation_or_network[demucs]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_raw_client_commercial_denies_before_source_validation_or_network[remix]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_raw_client_commercial_denies_before_source_validation_or_network[vocal-harmony]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_raw_client_commercial_denies_before_source_validation_or_network[whisper]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_remote_ace_read_and_cancel_skip_inference_gate[/health-None]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_remote_ace_read_and_cancel_skip_inference_gate[/mta/tasks/existing/control-{}]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_remote_ace_read_and_cancel_skip_inference_gate[/query_result-{}]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_rights",
+      "case": "test_standalone_remote_worker_denies_before_missing_audio_or_dns",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_complete_source_bound_review_is_accepted",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_current_scan_and_complete_review_ledger_agree",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[blanket_approval]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[changed_finding]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[changed_source]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[deleted_source]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[duplicate_review]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[duplicate_scan]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[empty_reason]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[high]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[missing_file]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[missing_review]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[new_finding]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[new_source]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[scan_error]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[suppression]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "case": "test_review_cannot_silently_survive_source_or_scan_changes[wrong_totals]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_studio_completion_lifecycle",
+      "case": "test_bundle_builder_streams_pinned_bytes_and_notices",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_studio_completion_lifecycle",
+      "case": "test_empty_audio_result_completes_without_creating_placeholder_tracks",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_studio_completion_lifecycle",
+      "case": "test_explicit_syllable_phones_require_actual_reviewed_inventory",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_studio_completion_lifecycle",
+      "case": "test_managed_upload_requires_role_and_explicit_rights",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_studio_large_remote_options",
+      "case": "test_authenticated_endpoint_decodes_large_score_body_before_worker",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_studio_large_remote_options",
+      "case": "test_duplicate_keys_wrong_kind_and_oversize_rejected",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_studio_large_remote_options",
+      "case": "test_large_lyrics_curves_roundtrip_in_body_and_keep_header_small",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_studio_large_remote_options",
+      "case": "test_large_transport_keeps_typed_and_path_validation[value0]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_studio_large_remote_options",
+      "case": "test_large_transport_keeps_typed_and_path_validation[value1]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_studio_large_remote_options",
+      "case": "test_large_transport_keeps_typed_and_path_validation[value2]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_studio_remote_score",
+      "case": "test_native_remote_score_token_queue_cpu_and_durable_recovery",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_studio_remote_score",
+      "case": "test_score_cannot_be_sent_to_an_audio_model_or_use_untrusted_paths",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_studio_workflows",
+      "case": "test_admin_policy_is_validated_and_uninstall_protects_active_jobs",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_studio_workflows",
+      "case": "test_commit_gate_rejects_ambiguous_late_cancellation",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_studio_workflows",
+      "case": "test_harmony_structured_score_real_server_ledger",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_studio_workflows",
+      "case": "test_manual_import_updates_publication_receipt",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_studio_workflows",
+      "case": "test_private_diagnostics_zip_and_missing_jobs",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_studio_workflows",
+      "case": "test_project_changed_during_worker_keeps_reviewable_result",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_studio_workflows",
+      "case": "test_real_harmony_queue_auto_publication_and_reopen",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_studio_workflows",
+      "case": "test_results_can_be_reviewed_and_imported_idempotently",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_studio_workflows",
+      "case": "test_retention_only_removes_terminal_private_results",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_studio_workflows",
+      "case": "test_score_transport_denies_client_paths_before_running",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_studio_workflows",
+      "case": "test_source_region_uses_clip_offset_delay_and_gain",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_studio_workflows",
+      "case": "test_studio_validates_source_range_and_harmony_settings",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_studio_workflows",
+      "case": "test_zero_credit_admission_is_actionable",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-studio.xml"
+    },
+    {
+      "module": "tests.test_r210_universal_queue_usage",
+      "case": "test_ace_verified_values_preserved",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_universal_queue_usage",
+      "case": "test_historical_all_adapters_in_queue_and_admin[backing-vocals]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_universal_queue_usage",
+      "case": "test_historical_all_adapters_in_queue_and_admin[chords-ml]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_universal_queue_usage",
+      "case": "test_historical_all_adapters_in_queue_and_admin[demucs]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_universal_queue_usage",
+      "case": "test_historical_all_adapters_in_queue_and_admin[future-adapter]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_universal_queue_usage",
+      "case": "test_historical_all_adapters_in_queue_and_admin[markers]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_universal_queue_usage",
+      "case": "test_historical_all_adapters_in_queue_and_admin[sam-audio]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_universal_queue_usage",
+      "case": "test_historical_all_adapters_in_queue_and_admin[singer-separation]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_universal_queue_usage",
+      "case": "test_historical_all_adapters_in_queue_and_admin[whisper]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_universal_queue_usage",
+      "case": "test_live_cpu_preserves_progress_and_ace_backend",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_universal_queue_usage",
+      "case": "test_live_cpu_rejects_bad_values[-1]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_universal_queue_usage",
+      "case": "test_live_cpu_rejects_bad_values[2]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_universal_queue_usage",
+      "case": "test_live_cpu_rejects_bad_values[True]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_universal_queue_usage",
+      "case": "test_live_cpu_rejects_bad_values[inf]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_universal_queue_usage",
+      "case": "test_live_cpu_rejects_bad_values[nan]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_universal_queue_usage",
+      "case": "test_live_sidecar_does_not_replace_multistage_sum",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_universal_queue_usage",
+      "case": "test_multiple_components_and_running_diagnostics",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_universal_queue_usage",
+      "case": "test_process_cpu_uses_only_utime_and_stime",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_universal_queue_usage",
+      "case": "test_queue_ui_labels_missing_zero_and_diagnostic",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_universal_queue_usage",
+      "case": "test_real_worker_live_and_final_cpu",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_universal_queue_usage",
+      "case": "test_unverified_gpu_never_promoted[cgroup-None]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_universal_queue_usage",
+      "case": "test_unverified_gpu_never_promoted[gpu-kernel-verified-8]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_universal_queue_usage",
+      "case": "test_unverified_gpu_never_promoted[gpu-kernel-verified-None]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_universal_queue_usage",
+      "case": "test_unverified_gpu_never_promoted[unmetered-None]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_universal_queue_usage",
+      "case": "test_unverified_gpu_never_promoted[worker-None]",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_universal_queue_usage",
+      "case": "test_worker_checkpoint_keeps_cpu_and_gpu_together",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    },
+    {
+      "module": "tests.test_r210_universal_queue_usage",
+      "case": "test_zero_distinct_from_missing_and_owner_isolation",
+      "state": "passed",
+      "report": "docs/validation/r210/legacy-executor-final.xml"
+    }
+  ],
+  "provenance": "Last result for each actual case wins.22 initial expected native-profile/gateway-contract failures were corrected in explicit test prerequisites/assertions. The Mac regression exposed missing platform-specific process-tree handling in the shared runner and is corrected in production; original failure XML retained. One non-existent gate filename collected nothing and counted no pass. No unchanged full CI, provider/model/GPU, Chromium or installed Windows/macOS acceptance rerun.",
+  "test_trust_boundary": "Positive transport/CPU tests launch real controlled generated worker processes, real queue/ledger/claims and token API. Some _descendants probes are explicit doubles because workspace procfs does not expose exact namespace ancestry; no cgroup/escaped-worker/kernel certification. Simulated darwin/no-wait4 paths run on Linux and are not installed-OS proof.",
+  "security": {
+    "security": {
+      "reviewed_findings": 164,
+      "source_files": 295,
+      "raw_severity": {
+        "HIGH": 0,
+        "MEDIUM": 21,
+        "LOW": 143
+      },
+      "scan_review_passed": true,
+      "release_candidate": false,
+      "transition_enabled": false
+    },
+    "transport": {
+      "reviewed_sites": 30,
+      "source_files": 21,
+      "inventory_passed": true,
+      "remote_model_attestation_complete": false,
+      "release_candidate": false
+    },
+    "finding_changes": [
+      {
+        "path": "app/ai_metering_agent.py",
+        "test": "B404",
+        "line": 11,
+        "change": "identical reviewed code/AST; context relocation"
+      },
+      {
+        "path": "app/ai_metering_agent.py",
+        "test": "B603",
+        "line": 100,
+        "change": "identical reviewed code/AST; context relocation"
+      },
+      {
+        "path": "app/ai_worker_protocol.py",
+        "test": "B603",
+        "line": 111,
+        "change": "explicit native launch/session review"
+      },
+      {
+        "path": "app/ai_worker_protocol.py",
+        "test": "B603",
+        "line": 385,
+        "change": "identical reviewed code/AST; context relocation"
+      },
+      {
+        "path": "app/ai_worker_protocol.py",
+        "test": "B603",
+        "line": 390,
+        "change": "identical reviewed code/AST; context relocation"
+      },
+      {
+        "path": "app/ai_worker_protocol.py",
+        "test": "B603",
+        "line": 432,
+        "change": "identical reviewed code/AST; context relocation"
+      },
+      {
+        "path": "app/native_ai_routing.py",
+        "test": "B107",
+        "line": 60,
+        "change": "identical reviewed code/AST; context relocation"
+      },
+      {
+        "path": "app/studio_compute.py",
+        "test": "B603",
+        "line": 88,
+        "change": "explicit native launch/session review"
+      }
+    ],
+    "removed_findings": [
+      {
+        "file": "app/ai_worker_protocol.py",
+        "test": "B603",
+        "line": 359
+      }
+    ],
+    "checkers_changed": false,
+    "new_suppressions": 0,
+    "release_candidate": false
+  },
+  "acceptance": {
+    "numerator": 24,
+    "denominator": 42,
+    "percent": 57.1,
+    "original_criteria_promoted": [],
+    "macroareas_accepted": 0,
+    "release_candidate": false,
+    "goal_of_increasing_RC_percentage_met": false,
+    "remaining": "B5 still requires exhaustive every-executor ownership/metering evidence;B2 delegated-kernel proof,F3 executing checkpoint attestation,F4 bypass coverage and independent rights/target criteria remain separate. No score changed merely for adding guards or tests."
+  },
+  "static_verification": {
+    "ruff": "app native tests scripts:passed",
+    "python_compileall": "app native and new regression:passed",
+    "gitleaks": {
+      "version": "8.24.3",
+      "download_sha256": "9991e0b2903da4c8f6122b5c3186448b927a5da4deef1fe45271c3793f4ee29c",
+      "download_matches_official_checksums": true,
+      "config_changed": false,
+      "introduced_text_bytes": 794978,
+      "findings": 0,
+      "report": "docs/validation/r210/legacy-executor-gitleaks-final.json",
+      "report_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "initial_scan": "docs/validation/r210/legacy-executor-gitleaks.json",
+      "initial_result": "Whole changed files included four unchanged baseline public app-source hashes and a preexisting documentation-only curl placeholder. They are not secrets and are absent from introduced-line scan. The obsolete curl placeholder was replaced with credential-free prose. No allowlist/fingerprint added."
+    }
+  }
+}

@@ -1,5 +1,5 @@
 {
-  "date": "2026-10-26",
+  "date": "2026-10-27",
   "requested_goal": "Close at least one original macroarea",
   "goal_met": false,
   "accepted_macroareas": 0,
@@ -52,7 +52,6 @@
       "id": "C",
       "title": "Administrative cutover",
       "open_code": [
-        "C2",
         "C3",
         "C5",
         "C6"
@@ -71,8 +70,7 @@
       "id": "E",
       "title": "Administrator IT/EN UI",
       "open_code": [
-        "E4",
-        "E5"
+        "E4"
       ],
       "open_targets": []
     },
@@ -105,7 +103,52 @@
     "local_default_off_mode": "local-authority-v1",
     "global_readiness_replaced": false,
     "original_criteria_promoted": false,
-    "browser_cases_pending": 9,
-    "remaining": "General provider/legacy financial reconciliation and distributed/every-entry coverage still require implementation/acceptance;new actual UI requires Chromium."
+    "browser_cases_pending": 0,
+    "remaining": "General provider/legacy financial reconciliation and distributed/every-entry coverage still require implementation/acceptance;local nine-case Chromium acceptance now passes.",
+    "browser_evidence": "docs/validation/r210/admin-cutover-chromium-confirmed-40505295056.json"
+  },
+  "latest_financial_stream": {
+    "handoff": "docs/STRIPE_CHECKOUT_HISTORY_R210.md",
+    "known_order_Stripe_readback_completed": true,
+    "original_criteria_promoted": false
+  },
+  "accepted_criteria": 25,
+  "latest_operator_acceptance": {
+    "criterion": "E5",
+    "accepted": true,
+    "evidence": "docs/E5_TRANSITION_PROGRESS_ACCEPTANCE_R210.md",
+    "browser_passes": 32,
+    "general_backend_criteria_promoted": false
+  },
+  "latest_executor_stream": {
+    "handoff": "docs/LEGACY_EXECUTION_BOUNDARIES_R210.md",
+    "raw_gateway_and_native_legacy_boundary_complete": true,
+    "B5_F4_promoted": false,
+    "progress_unchanged": "24/42,57.1%,0/7 macroareas"
+  },
+  "latest_export_recovery": {
+    "handoff": "docs/EXPORT_SQLITE_EXCLUSIVE_RECOVERY_R210.md",
+    "criterion_promoted": false
+  },
+  "inactive_C2_checkpoint": {
+    "state": "integrated and accepted",
+    "source_applied": true,
+    "handoff": "docs/SERVICE_ADMISSION_DRAIN_R210.md"
+  },
+  "completed_dependencies": [
+    "C2"
+  ],
+  "latest_C2_acceptance": {
+    "criterion": "C2",
+    "state": "verified",
+    "new_cases": 71,
+    "distinct_affected_passes": 321,
+    "final_integration_cases": 161,
+    "source_security_transport_cases": 37,
+    "inventory_boundaries": 170,
+    "proof": "docs/validation/r210/service-admission-result.json",
+    "handoff": "docs/SERVICE_ADMISSION_DRAIN_R210.md",
+    "financial_transition_authorized": false,
+    "external_target_acceptance": false
   }
 }

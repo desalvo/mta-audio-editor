@@ -80,8 +80,8 @@ def test_gateway_mutations_cannot_forward_commercial_work(commercial,monkeypatch
     assert result.status_code==403 and sent==[] and 'private' not in result.text
 
 
-@pytest.mark.parametrize('method,path',[('GET','health'),('GET','v1/models'),('GET','v1/audio'),('POST','query_result')])
-def test_commercial_metadata_and_existing_task_polling_are_not_new_inference(commercial,monkeypatch,method,path):
+@pytest.mark.parametrize('method,path',[('GET','health'),('GET','v1/models')])
+def test_commercial_metadata_does_not_start_inference(commercial,monkeypatch,method,path):
     client,sent=gateway_client(monkeypatch)
     result=client.request(method,'/api/ai-gateway/'+path,headers={'authorization':'Bearer valid'},content=b'{}')
     assert result.status_code==200 and len(sent)==1

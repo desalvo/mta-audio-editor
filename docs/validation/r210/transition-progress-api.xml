@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="12" time="4.639" timestamp="2026-10-27T14:36:35.179015+01:00" hostname="e0757190c092"><testcase classname="tests.test_r210_transition_progress" name="test_read_only_initial_status_has_real_counts_and_private_role_guard" time="0.855" /><testcase classname="tests.test_r210_transition_progress" name="test_reservation_abort_keeps_epoch_money_and_exact_actor_audit" time="0.237"><failure message="app.regime_operation_fence.FenceBlocked: Financial snapshot requires a write transaction">ready = (&lt;starlette.testclient.TestClient object at 0x7fa90f096de0&gt;, 2, 1)
+
+    def test_reservation_abort_keeps_epoch_money_and_exact_actor_audit(ready):
+        from app.regime_balance_continuity import snapshot
+        client,_,actor=ready;identifier=reserve_actual(ready)
+&gt;       with auth.db() as con:before=snapshot(con)
+                                     ^^^^^^^^^^^^^
+
+tests/test_r210_transition_progress.py:49: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+connection = &lt;app.regime_service_lease._Connection object at 0x7fa9113ae050&gt;
+
+    def snapshot(connection):
+&gt;       if not connection.in_transaction:raise FenceBlocked('Financial snapshot requires a write transaction')
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       app.regime_operation_fence.FenceBlocked: Financial snapshot requires a write transaction
+
+app/regime_balance_continuity.py:49: FenceBlocked</failure></testcase><testcase classname="tests.test_r210_transition_progress" name="test_committed_report_proves_original_receipts_and_only_forward_recovery" time="0.365" /><testcase classname="tests.test_r210_transition_progress" name="test_corruption_or_missing_evidence_never_offers_unsafe_recovery[balance]" time="0.308" /><testcase classname="tests.test_r210_transition_progress" name="test_corruption_or_missing_evidence_never_offers_unsafe_recovery[mirror]" time="0.295" /><testcase classname="tests.test_r210_transition_progress" name="test_corruption_or_missing_evidence_never_offers_unsafe_recovery[second_reservation]" time="0.310" /><testcase classname="tests.test_r210_transition_progress" name="test_corruption_or_missing_evidence_never_offers_unsafe_recovery[orphan_commit]" time="0.308" /><testcase classname="tests.test_r210_transition_progress" name="test_corruption_or_missing_evidence_never_offers_unsafe_recovery[wrong_epoch]" time="0.294" /><testcase classname="tests.test_r210_transition_progress" name="test_tracked_open_work_is_visible_and_not_certified_as_total_service_drain" time="0.244" /><testcase classname="tests.test_r210_transition_progress" name="test_old_aborted_history_does_not_gain_invented_actor_and_pages_are_complete" time="0.418" /><testcase classname="tests.test_r210_transition_progress" name="test_legacy_commit_is_reported_without_adopting_admin_authority" time="0.270" /><testcase classname="tests.test_r210_transition_progress" name="test_active_admin_required_for_all_lifecycle_paths" time="0.249" /></testsuite></testsuites>

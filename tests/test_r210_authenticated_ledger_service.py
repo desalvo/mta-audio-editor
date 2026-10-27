@@ -11,10 +11,12 @@ from test_r210_payment_reconciliation_e2e import purchase, snapshot
 
 
 def transport(order,*,refunds=True,mutate=None):
-    session={'id':'cs_test_'+order,'status':'complete','payment_status':'paid','amount_total':500,
-             'currency':'eur','client_reference_id':order,'metadata':{'mta_order':order},'payment_intent':'pi_test'}
-    intent={'id':'pi_test','status':'succeeded','amount':500,'amount_received':500,'currency':'eur','latest_charge':'ch_test'}
-    charge={'id':'ch_test','payment_intent':'pi_test','amount':500,'currency':'eur','paid':True,'captured':True,'amount_refunded':200 if refunds else 0}
+    session={'id':'cs_test_'+order,'mode':'payment','status':'complete','payment_status':'paid','amount_total':500,
+             'currency':'eur','client_reference_id':order,'metadata':{'mta_order':order},'payment_intent':'pi_test','livemode':False}
+    intent={'id':'pi_test','status':'succeeded','amount':500,'amount_received':500,'currency':'eur','latest_charge':'ch_test','amount_capturable':0,'livemode':False}
+    charge={'id':'ch_test','payment_intent':'pi_test','amount':500,'currency':'eur','paid':True,'captured':True,'amount_refunded':200 if refunds else 0,
+            'amount_captured':500,'status':'succeeded','refunded':False,'disputed':False,'balance_transaction':'txn_charge',
+            'failure_balance_transaction':None,'livemode':False}
     refund={'id':'re_first','charge':'ch_test','payment_intent':'pi_test','amount':200,'currency':'eur','status':'succeeded'}
     calls=[]
     def handle(request):
@@ -24,6 +26,8 @@ def transport(order,*,refunds=True,mutate=None):
         if path.endswith('/'+session['id']):body=copy.deepcopy(session)
         elif path.endswith('/pi_test'):body=copy.deepcopy(intent)
         elif path.endswith('/ch_test'):body=copy.deepcopy(charge)
+        elif path.endswith('/charges'):body={'data':[copy.deepcopy(charge)],'has_more':False}
+        elif path.endswith('/refunds/re_first'):body=copy.deepcopy(refund)
         elif path.endswith('/refunds'):
             body={'data':[refund] if refunds and not request.url.params.get('starting_after') else [],'has_more':bool(refunds and not request.url.params.get('starting_after'))}
         elif path.endswith('/disputes'):body={'data':[],'has_more':False}

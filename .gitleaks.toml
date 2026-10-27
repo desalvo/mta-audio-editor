@@ -10,6 +10,8 @@ regexes = [
   # app/auth.py before/after export contention hotfix; public source integrity.
   """^d62a2a29be4a4e6a8a870624c49dec3b64b17e9db0ab001b95a08aee20868e97$""",
   """^b65363439c52c5892b97c134dcc8b325765645ec447ceb6d555b3c5330de9fae$""",
+  # app/auth.py after exclusive-reader export recovery; exact public source SHA-256.
+  """^7197a25d08ec5924510a2a4fd02809b5f894b7f908ce73ac13be47b3277a537c$""",
   # tests/test_r210_export_auth_contention.py; public regression source integrity.
   """^86e8a6c4353f8ac2e358a6ca04302ea6e5ada3257c3134f09b77b6ffce3dc9a7$"""
 ]

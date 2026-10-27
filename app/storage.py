@@ -1,3 +1,5 @@
+from .service_admission import admitted
+from .service_admission import worker_thread
 import hashlib
 from .fs_durability import sync_directory
 import json
@@ -491,6 +493,7 @@ def _gc_worker(pid: str) -> None:
             _GC_ACTIVE.discard(pid)
 
 
+@admitted('project-gc')
 def schedule_project_gc(pid: str, candidates: set[str] | None = None, *, reconcile_orphans: bool = False) -> None:
     try:
         reconcile_project_gc(pid, None if reconcile_orphans else (candidates or set()))
@@ -500,7 +503,7 @@ def schedule_project_gc(pid: str, candidates: set[str] | None = None, *, reconci
         if pid in _GC_ACTIVE:
             return
         _GC_ACTIVE.add(pid)
-    threading.Thread(target=_gc_worker, args=(pid,), name=f"mta-gc-{pid}", daemon=True).start()
+    worker_thread(target=_gc_worker, args=(pid,), name=f"mta-gc-{pid}", daemon=True).start()
 
 
 def resume_pending_gc() -> None:

@@ -68,34 +68,59 @@ def lease(*, exclusive=False):
         os.close(fd)
 
 
-def fence_held():
-    """Read durable barrier without entering the accounting connection factory."""
+def fence_held(connection=None):
+    """One consistent read;reuse an existing connection instead of self-locking.
+
+    BUSY/LOCKED never means an absent barrier. A bounded unavailable response
+    preserves authentication and existing jobs until an original read succeeds.
+    """
     from . import auth
+    from .sqlite_availability import BarrierUnavailable
     path = auth.db_path()
-    if not path.exists():
+    if connection is None and not path.exists():
         return False
-    con = sqlite3.connect(path.resolve().as_uri() + '?mode=ro', uri=True, timeout=5)
+    con = connection
+    owns_transaction = False
+    previous_timeout = None
     try:
+        if con is None:
+            con = sqlite3.connect(path.resolve().as_uri() + '?mode=ro', uri=True, timeout=.25)
+        previous_timeout = int(con.execute('PRAGMA busy_timeout').fetchone()[0])
+        con.execute('PRAGMA busy_timeout='+str(min(previous_timeout,250)))
+        if not con.in_transaction:
+            con.execute('BEGIN')
+            owns_transaction = True
         if not con.execute("SELECT 1 FROM sqlite_master WHERE name='regime_admin_cutovers'").fetchone():
             return False
         row = con.execute('SELECT transitioning FROM regime_fence_state WHERE singleton=1').fetchone()
         if row is None:
-            raise FenceBlocked('Service barrier state unavailable')
+            raise BarrierUnavailable(None)
         return bool(row[0]) or bool(con.execute("SELECT 1 FROM regime_admin_cutovers WHERE phase!='finalized' LIMIT 1").fetchone())
+    except sqlite3.Error as exc:
+        raise BarrierUnavailable(exc) from exc
     finally:
-        con.close()
+        if con is not None:
+            if owns_transaction and con.in_transaction: con.rollback()
+            if connection is None: con.close()
+            elif previous_timeout is not None: con.execute('PRAGMA busy_timeout='+str(previous_timeout))
 
 
 class _Connection(sqlite3.Connection):
     def __init__(self, *args, **kwargs):
-        self._service_lease = lease()
-        self._service_lease.__enter__()
+        from .service_admission import operation
+        self._admission = operation('database',database=True)
+        self._admission.__enter__()
+        self._service_lease = None
+        initialized = False
         try:
+            self._service_lease = lease()
+            self._service_lease.__enter__()
             super().__init__(*args, **kwargs)
+            initialized = True
             # An interrupted cutover outlives the flock. New non-owner database
             # connections may inspect it, but cannot mutate any financial/schema
             # state. Login/session operations remain available for recovery.
-            if not _owns_lease() and fence_held():
+            if not _owns_lease() and fence_held(self):
                 writes = {sqlite3.SQLITE_INSERT, sqlite3.SQLITE_UPDATE, sqlite3.SQLITE_DELETE}
                 ddl = {sqlite3.SQLITE_CREATE_INDEX, sqlite3.SQLITE_CREATE_TABLE,
                        sqlite3.SQLITE_CREATE_TRIGGER, sqlite3.SQLITE_CREATE_VIEW,
@@ -110,7 +135,12 @@ class _Connection(sqlite3.Connection):
                     return sqlite3.SQLITE_OK
                 self.set_authorizer(authorize)
         except BaseException:
-            self.close()
+            if initialized: super().close()
+            active = self._service_lease
+            self._service_lease = None
+            if active is not None: active.__exit__(None,None,None)
+            self._admission.__exit__(None,None,None)
+            self._admission = None
             raise
 
     def __exit__(self, *args):
@@ -127,6 +157,9 @@ class _Connection(sqlite3.Connection):
             self._service_lease = None
             if active is not None:
                 active.__exit__(None, None, None)
+            admission = self._admission
+            self._admission = None
+            if admission is not None: admission.__exit__(None,None,None)
 
 
 def connect(*args, **kwargs):
@@ -142,7 +175,8 @@ class ServiceLeaseMiddleware:
         if scope['type'] != 'http':
             return await self.app(scope, receive, send)
         path = scope.get('path', '')
-        if path.startswith('/api/admin/service-regime/cutovers'):
+        if path.startswith('/api/admin/service-regime/cutovers') or path in {
+                '/api/admin/service-admission','/api/admin/service-admission/change','/api/admin/service-admission/upgrade'}:
             return await self.app(scope, receive, send)
         active = lease()
         entered = False
@@ -154,9 +188,12 @@ class ServiceLeaseMiddleware:
             login = path == '/login' and scope['method'] == 'POST'
             if fence_held() and not (recovery_read or login):
                 raise FenceBlocked('Service cutover requires administrative recovery')
-        except FenceBlocked:
+        except FenceBlocked as exc:
             if entered:
                 active.__exit__(None, None, None)
+            from .sqlite_availability import BarrierUnavailable,response as unavailable
+            if isinstance(exc,BarrierUnavailable):
+                return await unavailable(exc,method=scope['method'])(scope,receive,send)
             from starlette.responses import JSONResponse
             response = JSONResponse({'detail': 'Service maintenance in progress; retry after administrative recovery'},
                                     status_code=503, headers={'Retry-After': '5', 'Cache-Control': 'no-store'})

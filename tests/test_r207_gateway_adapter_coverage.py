@@ -73,9 +73,9 @@ def test_gateway_proxy_success_limits_and_errors(monkeypatch):
     monkeypatch.setattr(httpx, 'AsyncClient', FakeAsyncClient)
     client = TestClient(web)
     headers = {'Authorization': 'Bearer valid', 'Content-Type': 'application/json'}
-    ok = client.post('/api/ai-gateway/v1/generate?seed=3', headers=headers, content=b'{}')
+    ok = client.get('/api/ai-gateway/health?seed=3', headers=headers)
     assert ok.status_code == 200 and ok.content == b'answer'
-    assert captured[-1][1] == 'https://worker.example.org/v1/generate'
+    assert captured[-1][1] == 'https://worker.example.org/health'
     assert captured[-1][2]['headers']['authorization'] == 'Bearer private-internal-token'
     assert captured[-1][2]['params']['seed'] == '3'
     monkeypatch.setattr(ai_gateway, 'MAX_BODY', 3)
@@ -83,7 +83,7 @@ def test_gateway_proxy_success_limits_and_errors(monkeypatch):
     monkeypatch.setattr(ai_gateway, 'MAX_BODY', 100)
     for error in ('runtime', 'timeout'):
         mode['value'] = error
-        assert client.post('/api/ai-gateway/v1/generate', headers=headers, content=b'x').status_code == 502
+        assert client.get('/api/ai-gateway/health', headers=headers).status_code == 502
     assert len(calls) == 4 and all(call[1] == 3 for call in calls)
 
 

@@ -1,15 +1,15 @@
 {
   "schema": "mta-remote-transport-review-1",
-  "date": "2026-10-25",
+  "date": "2026-10-27",
   "scope": "Explicit app-owned Python HTTP/client/openers and socket constructors. Opaque operator commands, native libraries and dynamic code are separate trust boundaries; this inventory never grants rights or proves a remote checkpoint.",
   "sites": [
     {
       "path": "app/ace_step_desktop_manager.py",
       "function": "_health_ready",
-      "line": 374,
+      "line": 375,
       "call": "opener.open",
       "call_sha256": "63ae96350316fd0819d6ede56db4cb83c0ad453d9a8ac042424e0f16c980e79a",
-      "source_sha256": "958a4a6f57f0f91cdd1a906117182f04df6311fa1237d8fd85b6733c5d55470a",
+      "source_sha256": "e2d5e575febb9ec016251de4cc64683385c458f7254338ae6c398e593a474720",
       "category": "local_health",
       "boundary": "Loopback ACE health probe or fixed AF_UNIX GPU telemetry socket; no audio/score model work is submitted. Local operator process trust remains separate.",
       "verification": "Explicit health URL/AF_UNIX snapshot review; previous desktop-manager and Proxmox telemetry tests are retained. This is not remote worker attestation."
@@ -17,10 +17,10 @@
     {
       "path": "app/ace_step_desktop_manager.py",
       "function": "_download_source",
-      "line": 453,
+      "line": 454,
       "call": "urllib.request.build_opener().open",
       "call_sha256": "b984d459adfb0e9a501b00e7d85d9a67b93f9b1d1b9b772c54e6fc687c1fefd3",
-      "source_sha256": "958a4a6f57f0f91cdd1a906117182f04df6311fa1237d8fd85b6733c5d55470a",
+      "source_sha256": "e2d5e575febb9ec016251de4cc64683385c458f7254338ae6c398e593a474720",
       "category": "asset_download",
       "boundary": "Model/source/bank installation or source-metadata GET, not an audio inference dispatch. Download integrity, rights and external runtime acceptance remain separate.",
       "verification": "Explicit callsite review: response writes bounded installation assets or source manifests, no audio/score inference payload. Prior download/archive/security tests retained."
@@ -39,13 +39,13 @@
     {
       "path": "app/ai_gateway.py",
       "function": "ai_gateway",
-      "line": 65,
+      "line": 77,
       "call": "httpx.AsyncClient",
       "call_sha256": "0d2567f0b09295f656e27b2a6d5088d04885739c03aefd0ab2a9110147be4d0a",
-      "source_sha256": "2c75e63fda4c8b829b4cfc299b8c41f36e92040d8dd24144a64e64c4793ab63f",
-      "category": "inference_guarded",
-      "boundary": "Direct mutation/inference rechecks current model/regime rights before network. Commercial remote inference remains denied without authenticated checkpoint rights.",
-      "verification": "tests/test_r210_remote_transport_rights.py and test_r210_remote_license_dispatch_gate.py exercise direct, gateway and standalone denial without source/network execution."
+      "source_sha256": "8a618601080cab61e27922991c5c6fa9ea60c0496b6185187e74b5baa30bd00b",
+      "category": "recovery_or_metadata",
+      "boundary": "Authenticated GET-only fixed health/model metadata. Raw generation and upstream task/result access are refused before transport; accounted original-owner execution/result APIs replace these unbound legacy operations.",
+      "verification": "test_r210_legacy_executor_closure.py: legacy work/result paths deny without network; actual accounted JSON/WAV execution, CPU ledger, exact read-only replay and foreign-owner refusal pass. Existing metadata/error proxy regressions retained."
     },
     {
       "path": "app/ai_proxmox_gpu_agent_client.py",
@@ -149,10 +149,10 @@
     {
       "path": "app/auth.py",
       "function": "_oauth_json",
-      "line": 617,
+      "line": 616,
       "call": "app.secure_https.https_urlopen",
       "call_sha256": "c09252cdd7cc155687642807834eac7f6889cb44732a0694710fbdf4878bad1f",
-      "source_sha256": "b65363439c52c5892b97c134dcc8b325765645ec447ceb6d555b3c5330de9fae",
+      "source_sha256": "7197a25d08ec5924510a2a4fd02809b5f894b7f908ce73ac13be47b3277a537c",
       "category": "authentication",
       "boundary": "OAuth/account/device credentials only. Native device helper now accepts exactly /api/ai-device/start and /poll; it cannot post to inference paths.",
       "verification": "Explicit caller/path review and test_r210_remote_transport_inventory.py native helper path-denial cases; existing device-account authorization tests are retained."
@@ -204,10 +204,10 @@
     {
       "path": "app/main.py",
       "function": "_download_drumsep_model",
-      "line": 5682,
+      "line": 5716,
       "call": "app.secure_https.https_urlopen",
       "call_sha256": "fd771985fbe61914d1a66f8e20a3d6c9e97471e6258b9d9b1917cd28b5480d39",
-      "source_sha256": "372265915f55359ba5cf48da0a7548017ac46ff6bb6d9f719b6f4236089e2ecd",
+      "source_sha256": "d91109db80c08e43bc3195a3b186ea06cb723c3745074c5a7c084f29d292375d",
       "category": "asset_download",
       "boundary": "Model/source/bank installation or source-metadata GET, not an audio inference dispatch. Download integrity, rights and external runtime acceptance remain separate.",
       "verification": "Explicit callsite review: response writes bounded installation assets or source manifests, no audio/score inference payload. Prior download/archive/security tests retained."
@@ -237,10 +237,10 @@
     {
       "path": "app/model_updater.py",
       "function": "_read_url",
-      "line": 40,
+      "line": 41,
       "call": "app.secure_https.https_urlopen",
       "call_sha256": "a87081dd5231f6dfaced8ab50e5948df4c1b63f7203818518cba6ee8ff3a1e3b",
-      "source_sha256": "aa50118f8302fc913d4f5e89cf87d73fcdea818d74f2597a1f7f8dba03a370a1",
+      "source_sha256": "d1071ba5576ea4975eca06c108ff49d1815b794214ff28e77ffa41af66fa0032",
       "category": "asset_download",
       "boundary": "Model/source/bank installation or source-metadata GET, not an audio inference dispatch. Download integrity, rights and external runtime acceptance remain separate.",
       "verification": "Explicit callsite review: response writes bounded installation assets or source manifests, no audio/score inference payload. Prior download/archive/security tests retained."
@@ -251,7 +251,7 @@
       "line": 52,
       "call": "urllib.request.build_opener().open",
       "call_sha256": "04c1aa86d16840d4d11ad50f354d876af93e116bce541d035868ca58722b61fb",
-      "source_sha256": "2cf6390d4c7749e349f5c84e075f0171768b324a4d43cf83a9844037550ac9f6",
+      "source_sha256": "2883d422e7098469f7a9464d5652f26a7600288dfe29f448165e4cfc2fe60f63",
       "category": "authentication",
       "boundary": "OAuth/account/device credentials only. Native device helper now accepts exactly /api/ai-device/start and /poll; it cannot post to inference paths.",
       "verification": "Explicit caller/path review and test_r210_remote_transport_inventory.py native helper path-denial cases; existing device-account authorization tests are retained."
@@ -281,10 +281,10 @@
     {
       "path": "app/payment_reconcile_service.py",
       "function": "reconcile_checkout",
-      "line": 219,
+      "line": 220,
       "call": "httpx.Client",
       "call_sha256": "640ea6d45e47f6f9ab9849c76b8a6f4ee501c51c2d30c1205de6a692994d28db",
-      "source_sha256": "2d7325d3d13ef1549eff4ada4513b24941fbe86712740534e548a3907219da29",
+      "source_sha256": "8aee3544bced246eea16fa5e56227e4e077f1be88e85d3223de12843ea862833",
       "category": "payment_provider",
       "boundary": "Authenticated payment creation/readback, independently fenced by financial policy. No model inference or model-rights authority is supplied by this HTTP boundary.",
       "verification": "Explicit provider-adapter review; prior financial-outcome/owner-payment tests and immutable receipt evidence retained without rerunning unrelated financial scopes."

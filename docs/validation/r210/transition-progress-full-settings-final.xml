@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="4" skipped="0" tests="8" time="139.333" timestamp="2026-10-27T14:41:17.119878+01:00" hostname="e0757190c092"><testcase classname="tests.test_r210_transition_progress_browser" name="test_full_shipped_settings_progress_accessibility[idle-390-it]" time="4.520" /><testcase classname="tests.test_r210_transition_progress_browser" name="test_full_shipped_settings_progress_accessibility[idle-390-en]" time="2.867" /><testcase classname="tests.test_r210_transition_progress_browser" name="test_full_shipped_settings_progress_accessibility[idle-1280-it]" time="3.074" /><testcase classname="tests.test_r210_transition_progress_browser" name="test_full_shipped_settings_progress_accessibility[idle-1280-en]" time="3.325" /><testcase classname="tests.test_r210_transition_progress_browser" name="test_full_shipped_settings_progress_accessibility[committed-390-it]" time="31.382"><failure message="playwright._impl._errors.TimeoutError: Page.goto: Timeout 30000ms exceeded.&#10;Call log:&#10;  - navigating to &quot;https://mta.test/settings&quot;, waiting until &quot;load&quot;">ready = (&lt;starlette.testclient.TestClient object at 0x7f05248b0890&gt;, 2, 1)
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f051ed9f5f0&gt;
+chromium_capability = None, language = 'it', width = 390, phase = 'committed'
+
+    @pytest.mark.parametrize('language',['it','en'])
+    @pytest.mark.parametrize('width',[390,1280])
+    @pytest.mark.parametrize('phase',['idle','committed'])
+    def test_full_shipped_settings_progress_accessibility(ready,monkeypatch,chromium_capability,language,width,phase):
+        from playwright.sync_api import sync_playwright,expect
+        from test_r210_account_acceptance import serve
+        supplied=os.environ.get('MTA_TEST_AXE_CORE')
+        if not supplied:pytest.skip('Pinned test-only axe-core required')
+        web,_,actor=ready
+        with auth.db() as con:con.execute('UPDATE users SET language=? WHERE id=?',(language,actor))
+        if phase=='committed':committed_actual(ready,monkeypatch)
+        calls=[];errors=[]
+        with sync_playwright() as p:
+            browser=p.chromium.launch(headless=True,args=['--no-sandbox'])
+            page=browser.new_page(viewport={'width':width,'height':1000})
+            page.on('pageerror',lambda e:errors.append(str(e)));page.route('**/*',serve(web,calls))
+&gt;           page.goto('https://mta.test/settings');page.wait_for_load_state('networkidle')
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_r210_transition_progress_browser.py:105: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../venv/lib/python3.12/site-packages/playwright/sync_api/_generated.py:9020: in goto
+    self._sync(
+../venv/lib/python3.12/site-packages/playwright/_impl/_page.py:552: in goto
+    return await self._main_frame.goto(**locals_to_params(locals()))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../venv/lib/python3.12/site-packages/playwright/_impl/_frame.py:145: in goto
+    await self._channel.send("goto", locals_to_params(locals()))
+../venv/lib/python3.12/site-packages/playwright/_impl/_connection.py:61: in send
+    return await self._connection.wrap_api_call(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;playwright._impl._connection.Connection object at 0x7f051e1c2ae0&gt;
+cb = &lt;function Channel.send.&lt;locals&gt;.&lt;lambda&gt; at 0x7f051e1a5e40&gt;
+is_internal = False
+
+    async def wrap_api_call(
+        self, cb: Callable[[], Any], is_internal: bool = False
+    ) -&gt; Any:
+        if self._api_zone.get():
+            return await cb()
+        task = asyncio.current_task(self._loop)
+        st: List[inspect.FrameInfo] = getattr(task, "__pw_stack__", inspect.stack())
+        parsed_st = _extract_stack_trace_information_from_stack(st, is_internal)
+        self._api_zone.set(parsed_st)
+        try:
+            return await cb()
+        except Exception as error:
+&gt;           raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+E           playwright._impl._errors.TimeoutError: Page.goto: Timeout 30000ms exceeded.
+E           Call log:
+E             - navigating to "https://mta.test/settings", waiting until "load"
+
+../venv/lib/python3.12/site-packages/playwright/_impl/_connection.py:528: TimeoutError</failure></testcase><testcase classname="tests.test_r210_transition_progress_browser" name="test_full_shipped_settings_progress_accessibility[committed-390-en]" time="30.993"><failure message="playwright._impl._errors.TimeoutError: Page.goto: Timeout 30000ms exceeded.&#10;Call log:&#10;  - navigating to &quot;https://mta.test/settings&quot;, waiting until &quot;load&quot;">ready = (&lt;starlette.testclient.TestClient object at 0x7f051ed0a690&gt;, 2, 1)
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f051ed0bce0&gt;
+chromium_capability = None, language = 'en', width = 390, phase = 'committed'
+
+    @pytest.mark.parametrize('language',['it','en'])
+    @pytest.mark.parametrize('width',[390,1280])
+    @pytest.mark.parametrize('phase',['idle','committed'])
+    def test_full_shipped_settings_progress_accessibility(ready,monkeypatch,chromium_capability,language,width,phase):
+        from playwright.sync_api import sync_playwright,expect
+        from test_r210_account_acceptance import serve
+        supplied=os.environ.get('MTA_TEST_AXE_CORE')
+        if not supplied:pytest.skip('Pinned test-only axe-core required')
+        web,_,actor=ready
+        with auth.db() as con:con.execute('UPDATE users SET language=? WHERE id=?',(language,actor))
+        if phase=='committed':committed_actual(ready,monkeypatch)
+        calls=[];errors=[]
+        with sync_playwright() as p:
+            browser=p.chromium.launch(headless=True,args=['--no-sandbox'])
+            page=browser.new_page(viewport={'width':width,'height':1000})
+            page.on('pageerror',lambda e:errors.append(str(e)));page.route('**/*',serve(web,calls))
+&gt;           page.goto('https://mta.test/settings');page.wait_for_load_state('networkidle')
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_r210_transition_progress_browser.py:105: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../venv/lib/python3.12/site-packages/playwright/sync_api/_generated.py:9020: in goto
+    self._sync(
+../venv/lib/python3.12/site-packages/playwright/_impl/_page.py:552: in goto
+    return await self._main_frame.goto(**locals_to_params(locals()))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../venv/lib/python3.12/site-packages/playwright/_impl/_frame.py:145: in goto
+    await self._channel.send("goto", locals_to_params(locals()))
+../venv/lib/python3.12/site-packages/playwright/_impl/_connection.py:61: in send
+    return await self._connection.wrap_api_call(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;playwright._impl._connection.Connection object at 0x7f051edf26f0&gt;
+cb = &lt;function Channel.send.&lt;locals&gt;.&lt;lambda&gt; at 0x7f05241f4f40&gt;
+is_internal = False
+
+    async def wrap_api_call(
+        self, cb: Callable[[], Any], is_internal: bool = False
+    ) -&gt; Any:
+        if self._api_zone.get():
+            return await cb()
+        task = asyncio.current_task(self._loop)
+        st: List[inspect.FrameInfo] = getattr(task, "__pw_stack__", inspect.stack())
+        parsed_st = _extract_stack_trace_information_from_stack(st, is_internal)
+        self._api_zone.set(parsed_st)
+        try:
+            return await cb()
+        except Exception as error:
+&gt;           raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+E           playwright._impl._errors.TimeoutError: Page.goto: Timeout 30000ms exceeded.
+E           Call log:
+E             - navigating to "https://mta.test/settings", waiting until "load"
+
+../venv/lib/python3.12/site-packages/playwright/_impl/_connection.py:528: TimeoutError</failure></testcase><testcase classname="tests.test_r210_transition_progress_browser" name="test_full_shipped_settings_progress_accessibility[committed-1280-it]" time="31.093"><failure message="playwright._impl._errors.TimeoutError: Page.goto: Timeout 30000ms exceeded.&#10;Call log:&#10;  - navigating to &quot;https://mta.test/settings&quot;, waiting until &quot;load&quot;">ready = (&lt;starlette.testclient.TestClient object at 0x7f051f6a49b0&gt;, 2, 1)
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f051f6a7680&gt;
+chromium_capability = None, language = 'it', width = 1280, phase = 'committed'
+
+    @pytest.mark.parametrize('language',['it','en'])
+    @pytest.mark.parametrize('width',[390,1280])
+    @pytest.mark.parametrize('phase',['idle','committed'])
+    def test_full_shipped_settings_progress_accessibility(ready,monkeypatch,chromium_capability,language,width,phase):
+        from playwright.sync_api import sync_playwright,expect
+        from test_r210_account_acceptance import serve
+        supplied=os.environ.get('MTA_TEST_AXE_CORE')
+        if not supplied:pytest.skip('Pinned test-only axe-core required')
+        web,_,actor=ready
+        with auth.db() as con:con.execute('UPDATE users SET language=? WHERE id=?',(language,actor))
+        if phase=='committed':committed_actual(ready,monkeypatch)
+        calls=[];errors=[]
+        with sync_playwright() as p:
+            browser=p.chromium.launch(headless=True,args=['--no-sandbox'])
+            page=browser.new_page(viewport={'width':width,'height':1000})
+            page.on('pageerror',lambda e:errors.append(str(e)));page.route('**/*',serve(web,calls))
+&gt;           page.goto('https://mta.test/settings');page.wait_for_load_state('networkidle')
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_r210_transition_progress_browser.py:105: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../venv/lib/python3.12/site-packages/playwright/sync_api/_generated.py:9020: in goto
+    self._sync(
+../venv/lib/python3.12/site-packages/playwright/_impl/_page.py:552: in goto
+    return await self._main_frame.goto(**locals_to_params(locals()))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../venv/lib/python3.12/site-packages/playwright/_impl/_frame.py:145: in goto
+    await self._channel.send("goto", locals_to_params(locals()))
+../venv/lib/python3.12/site-packages/playwright/_impl/_connection.py:61: in send
+    return await self._connection.wrap_api_call(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;playwright._impl._connection.Connection object at 0x7f051e7d4680&gt;
+cb = &lt;function Channel.send.&lt;locals&gt;.&lt;lambda&gt; at 0x7f0525fb6160&gt;
+is_internal = False
+
+    async def wrap_api_call(
+        self, cb: Callable[[], Any], is_internal: bool = False
+    ) -&gt; Any:
+        if self._api_zone.get():
+            return await cb()
+        task = asyncio.current_task(self._loop)
+        st: List[inspect.FrameInfo] = getattr(task, "__pw_stack__", inspect.stack())
+        parsed_st = _extract_stack_trace_information_from_stack(st, is_internal)
+        self._api_zone.set(parsed_st)
+        try:
+            return await cb()
+        except Exception as error:
+&gt;           raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+E           playwright._impl._errors.TimeoutError: Page.goto: Timeout 30000ms exceeded.
+E           Call log:
+E             - navigating to "https://mta.test/settings", waiting until "load"
+
+../venv/lib/python3.12/site-packages/playwright/_impl/_connection.py:528: TimeoutError</failure></testcase><testcase classname="tests.test_r210_transition_progress_browser" name="test_full_shipped_settings_progress_accessibility[committed-1280-en]" time="30.959"><failure message="playwright._impl._errors.TimeoutError: Page.goto: Timeout 30000ms exceeded.&#10;Call log:&#10;  - navigating to &quot;https://mta.test/settings&quot;, waiting until &quot;load&quot;">ready = (&lt;starlette.testclient.TestClient object at 0x7f05247e8ec0&gt;, 2, 1)
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f05247e9f40&gt;
+chromium_capability = None, language = 'en', width = 1280, phase = 'committed'
+
+    @pytest.mark.parametrize('language',['it','en'])
+    @pytest.mark.parametrize('width',[390,1280])
+    @pytest.mark.parametrize('phase',['idle','committed'])
+    def test_full_shipped_settings_progress_accessibility(ready,monkeypatch,chromium_capability,language,width,phase):
+        from playwright.sync_api import sync_playwright,expect
+        from test_r210_account_acceptance import serve
+        supplied=os.environ.get('MTA_TEST_AXE_CORE')
+        if not supplied:pytest.skip('Pinned test-only axe-core required')
+        web,_,actor=ready
+        with auth.db() as con:con.execute('UPDATE users SET language=? WHERE id=?',(language,actor))
+        if phase=='committed':committed_actual(ready,monkeypatch)
+        calls=[];errors=[]
+        with sync_playwright() as p:
+            browser=p.chromium.launch(headless=True,args=['--no-sandbox'])
+            page=browser.new_page(viewport={'width':width,'height':1000})
+            page.on('pageerror',lambda e:errors.append(str(e)));page.route('**/*',serve(web,calls))
+&gt;           page.goto('https://mta.test/settings');page.wait_for_load_state('networkidle')
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_r210_transition_progress_browser.py:105: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../venv/lib/python3.12/site-packages/playwright/sync_api/_generated.py:9020: in goto
+    self._sync(
+../venv/lib/python3.12/site-packages/playwright/_impl/_page.py:552: in goto
+    return await self._main_frame.goto(**locals_to_params(locals()))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../venv/lib/python3.12/site-packages/playwright/_impl/_frame.py:145: in goto
+    await self._channel.send("goto", locals_to_params(locals()))
+../venv/lib/python3.12/site-packages/playwright/_impl/_connection.py:61: in send
+    return await self._connection.wrap_api_call(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;playwright._impl._connection.Connection object at 0x7f05241767b0&gt;
+cb = &lt;function Channel.send.&lt;locals&gt;.&lt;lambda&gt; at 0x7f051e08dee0&gt;
+is_internal = False
+
+    async def wrap_api_call(
+        self, cb: Callable[[], Any], is_internal: bool = False
+    ) -&gt; Any:
+        if self._api_zone.get():
+            return await cb()
+        task = asyncio.current_task(self._loop)
+        st: List[inspect.FrameInfo] = getattr(task, "__pw_stack__", inspect.stack())
+        parsed_st = _extract_stack_trace_information_from_stack(st, is_internal)
+        self._api_zone.set(parsed_st)
+        try:
+            return await cb()
+        except Exception as error:
+&gt;           raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+E           playwright._impl._errors.TimeoutError: Page.goto: Timeout 30000ms exceeded.
+E           Call log:
+E             - navigating to "https://mta.test/settings", waiting until "load"
+
+../venv/lib/python3.12/site-packages/playwright/_impl/_connection.py:528: TimeoutError</failure></testcase></testsuite></testsuites>

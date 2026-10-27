@@ -18,7 +18,7 @@ def stripe_fixture(account,monkeypatch,*,intent=False):
     session={'id':'cs_test_'+local,'mode':'payment','status':'expired','payment_status':'unpaid',
              'amount_total':500,'currency':'eur','client_reference_id':local,'metadata':{'mta_order':local},
              'payment_intent':'pi_terminal' if intent else None}
-    pi={'id':'pi_terminal','status':'canceled','amount':500,'currency':'eur','amount_received':0,'amount_capturable':0,'latest_charge':None}
+    pi={'id':'pi_terminal','status':'canceled','amount':500,'currency':'eur','amount_received':0,'amount_capturable':0,'latest_charge':None,'livemode':False}
     calls=[]
     def handle(request):
         assert request.method=='GET' and request.headers['authorization']=='Bearer sk_test_test'
@@ -51,7 +51,7 @@ def test_stripe_expired_checkout_readback_closes_exactly_once(account,monkeypatc
         again=service.reconcile_stripe(local,client=client)
     assert first['checkout_closed'] and again['duplicate'] and first['outcome']=='expired'
     assert_closed(local,'stripe',account)
-    assert len(calls)==(8 if intent else 4)
+    assert len(calls)==(12 if intent else 4)
     assert stripe.checkout(account,500,'reconciliation-e2e-123')=={'status':'cancelled','order_id':local}
 
 

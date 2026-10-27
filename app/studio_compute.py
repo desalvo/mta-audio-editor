@@ -1,4 +1,8 @@
 """Registered studio execution shared by authenticated server and local native."""
+
+from .service_admission import admitted
+
+from .service_admission import worker_thread
 import io
 import json
 import os
@@ -28,6 +32,7 @@ def _require_actor(user_id):
         raise ValueError('Standalone Studio execution requires a native application')
 
 
+@admitted('studio-inference')
 def compute(user_id,kind,plan,**kwargs):
     _require_actor(user_id)
     if user_id==0:
@@ -85,7 +90,8 @@ def _compute(user_id,kind,plan,*,audio=None,score=None,cancelled=lambda:False,ti
                 if result.exit_code:raise RuntimeError('Local studio worker failed, was cancelled or timed out')
             else:
                 if cancelled():raise RuntimeError('Job cancelled before local worker execution')
-                process=subprocess.Popen(args,cwd=folder,env=env,stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+                process=subprocess.Popen(args,cwd=folder,env=env,stdin=subprocess.DEVNULL,
+                    stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=(os.name=='posix'))
                 deadline=time.monotonic()+timeout
                 try:
                     while process.poll() is None:
@@ -132,7 +138,7 @@ def remote_compute(kind,plan,*,audio=None,score=None,cancelled=lambda:False,time
                 try:cancel_remote_request(cfg['url'],cfg['token'],key,timeout_seconds=5)
                 except RuntimeError:pass
                 return
-    thread=threading.Thread(target=watch,daemon=True,name='mta-studio-remote-cancel');thread.start()
+    thread=worker_thread(target=watch,daemon=True,name='mta-studio-remote-cancel');thread.start()
     try:
         if progress:
             from .storage import _atomic_json_write

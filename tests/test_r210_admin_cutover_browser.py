@@ -7,7 +7,7 @@ from app import auth, regime_admin_cutover as cutover
 from test_r210_admin_cutover_e2e import ready as ready, account as account, BASE  # noqa: F401
 
 
-def browser_session(client, language, browser, width, *, lost_reply=False):
+def browser_session(client, language, browser, width, *, lost_reply=False, fail_lifecycle=None):
     page = browser.new_page(viewport={'width': width, 'height': 850})
     errors = []
     posts = []
@@ -21,7 +21,9 @@ def browser_session(client, language, browser, width, *, lost_reply=False):
                 <main id="serviceRegimePanel"><h2>MTA</h2></main>
                 <script src="/static/regime_cutover_panel.js"></script></html>''')
             return
-        if url.path == BASE and route.request.method == 'GET' and flags['audit_unavailable']:
+        if url.path==BASE+'/lifecycle' and fail_lifecycle and fail_lifecycle[0]:
+            route.fulfill(status=503,content_type='application/json',body='{}');return
+        if url.path in (BASE,BASE+'/lifecycle') and route.request.method == 'GET' and flags['audit_unavailable']:
             route.fulfill(status=503, content_type='application/json', body='{}')
             return
         if route.request.method == 'POST':

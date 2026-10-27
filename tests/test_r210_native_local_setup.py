@@ -131,11 +131,11 @@ vm.createContext(ctx);vm.runInContext(process.argv[1],ctx);
 
 
 def test_mac_supervisor_does_not_depend_on_linux_proc_or_fabricate_tree_metering(local,monkeypatch):
+    monkeypatch.setenv('MTA_NATIVE_SINGLE_USER', 'true')
     import wave
     from app import ai_worker_protocol as protocol,ai_metering_agent,audio_engine
     from app.models import Project,Track
-    # Preserve the source checkout's interpreter in this isolated Unix test.
-    monkeypatch.delenv('MTA_NATIVE_SINGLE_USER')
+    # The operator-configured test worker uses this checkout's interpreter.
     worker=local/'worker.py'
     worker.write_text('import argparse,wave\np=argparse.ArgumentParser();p.add_argument("--request");p.add_argument("--output");a=p.parse_args()\nwith wave.open(a.output,"wb") as w:\n w.setnchannels(1);w.setsampwidth(2);w.setframerate(44100);w.writeframes(bytes(882))\n')
     worker.chmod(0o700)

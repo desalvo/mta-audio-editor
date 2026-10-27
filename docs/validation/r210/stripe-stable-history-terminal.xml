@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="121" time="31.145" timestamp="2026-10-27T14:13:29.066953+01:00" hostname="e0757190c092"><testcase classname="tests.test_r210_stripe_paid_history" name="test_empty_canceled_intent_requires_stable_readback_and_journal[appearing_charge]" time="0.321" /><testcase classname="tests.test_r210_stripe_paid_history" name="test_empty_canceled_intent_requires_stable_readback_and_journal[changed_intent]" time="0.274" /><testcase classname="tests.test_r210_stripe_paid_history" name="test_empty_canceled_intent_requires_stable_readback_and_journal[environment]" time="0.271" /><testcase classname="tests.test_r210_stripe_paid_history" name="test_empty_canceled_intent_requires_stable_readback_and_journal[webhook]" time="0.307"><failure message="app.regime_operation_fence.FenceBlocked: Stripe event journal changed during terminal readback; refresh again">account = 2
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f0804c30770&gt;
+change = 'webhook'
+
+    @pytest.mark.parametrize('change',['appearing_charge','changed_intent','environment','webhook'])
+    def test_empty_canceled_intent_requires_stable_readback_and_journal(account,monkeypatch,change):
+        from test_r210_terminal_checkout_e2e import stripe_fixture, assert_closed
+        local,session,intent,mock,calls=stripe_fixture(account,monkeypatch,intent=True)
+        original=mock.handler
+        counts=Counter()
+        def handler(request):
+            response=original(request);body=response.json();path=request.url.path;counts[path]+=1
+            if change=='appearing_charge' and path=='/v1/charges' and counts[path]==2:
+                body={'data':[{'id':'ch_appeared'}],'has_more':False}
+            if change=='changed_intent' and path=='/v1/payment_intents/pi_terminal' and counts[path]==2:
+                body['latest_charge']='ch_changed'
+            if change=='environment' and path=='/v1/payment_intents/pi_terminal':body['livemode']=True
+            if change=='webhook' and path.endswith(session['id']) and counts[path]==2:
+                shop.event(*signed(dispute('needs_response',200,'evt_empty_race')))
+            return httpx.Response(200,json=body)
+        with httpx.Client(transport=httpx.MockTransport(handler)) as remote,pytest.raises(ValueError):
+&gt;           service.reconcile_stripe(local,client=remote)
+
+tests/test_r210_stripe_paid_history.py:225: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/payment_reconcile_service.py:69: in reconcile_stripe
+    return _stripe_unpaid(initial,key,first,client=client,journal=journal)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+order = {'id': 'c61f01e1ae244f18a4c849bbd633c6c4', 'user_id': 2, 'request_id': 'reconciliation-e2e-123', 'amount_cents': 500, ...}
+key = 'sk_test_test'
+session = {'id': 'cs_test_c61f01e1ae244f18a4c849bbd633c6c4', 'mode': 'payment', 'status': 'expired', 'payment_status': 'unpaid', ...}
+client = &lt;httpx.Client object at 0x7f0804c31340&gt;
+journal = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
+
+    def _stripe_unpaid(order,key,session,*,client,journal):
+        from .checkout_terminal_outcomes import stripe_identity,settle_empty
+        stripe_identity(session,order)
+        if session.get('status') not in ('open','complete','expired') or session.get('payment_status')!='unpaid':
+            raise ProviderProbeError('Unknown or contradictory Stripe checkout state')
+        intent=session.get('payment_intent')
+        if 'payment_intent' not in session:raise ProviderProbeError('Incomplete Stripe checkout proof')
+        headers={'Authorization':'Bearer '+key};terminal=False;outcome='expired';failed_proof=None
+        if intent is None:terminal=session['status']=='expired'
+        elif session['status'] in ('expired','complete'):
+            intent=_reference(intent)
+            if not intent.startswith('pi_'):raise ProviderProbeError('Invalid Stripe intent reference')
+            document=_get(client,'https://api.stripe.com/v1/payment_intents/'+intent,headers)
+            if (document.get('id')!=intent or type(document.get('amount')) is not int or document['amount']!=order['amount_cents']
+                or document.get('currency')!='eur'):raise ProviderProbeError('Unpaid Stripe intent identity mismatch')
+            if document.get('status')=='canceled':
+                if (type(document.get('amount_received')) is not int or document['amount_received']!=0
+                    or type(document.get('amount_capturable')) is not int or document['amount_capturable']!=0
+                    or 'latest_charge' not in document):
+                    raise ProviderProbeError('Canceled Stripe intent has unresolved charge history')
+                from .stripe_failed_charge_proof import prove
+                charges=_pages(client,'charges',headers,{'payment_intent':intent},max_items=100)
+                failed_proof=prove(client,key,intent,order['amount_cents'],document,charges)
+                terminal=True;outcome='expired' if session['status']=='expired' else 'canceled_intent'
+            elif document.get('status') not in ('requires_payment_method','requires_confirmation','requires_action','processing','requires_capture'):
+                raise ProviderProbeError('Contradictory Stripe payment intent status')
+        final=_get(client,'https://api.stripe.com/v1/checkout/sessions/'+_reference(order['session_id']),headers)
+        if final!=session:raise ProviderProbeError('Stripe unpaid snapshot changed')
+        if not terminal:return {'provider':'stripe','order_id':order['id'],'status':'pending','outcome':'provider_pending','checkout_closed':False,'ledger_reconciled':False,'transition_authorized':False}
+        with auth.db() as c:
+            c.execute('BEGIN IMMEDIATE')
+            current=c.execute('SELECT * FROM credit_purchase_orders WHERE id=?',(order['id'],)).fetchone()
+            if current is None or any(current[k]!=order[k] for k in ('user_id','amount_cents','session_id','credit_value_micro')):
+                raise FenceBlocked('Stripe order changed during terminal readback')
+            if auth._open(c.execute('SELECT secret_key FROM credit_payment_config WHERE id=1').fetchone()[0])!=key:
+                raise FenceBlocked('Stripe configuration changed during terminal readback')
+            if _stripe_journal_version(c) != journal:
+&gt;               raise FenceBlocked('Stripe event journal changed during terminal readback; refresh again')
+E               app.regime_operation_fence.FenceBlocked: Stripe event journal changed during terminal readback; refresh again
+
+app/payment_reconcile_service.py:181: FenceBlocked</failure></testcase><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_stripe_expired_checkout_readback_closes_exactly_once[False]" time="0.373" /><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_stripe_expired_checkout_readback_closes_exactly_once[True]" time="0.258" /><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_canceled_intent_after_async_failure_resolves_pending_signed_event" time="0.247" /><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_signed_expiration_without_intent_closes_without_network" time="0.228" /><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_nonterminal_failed_or_processing_intent_stays_open[requires_payment_method]" time="0.255" /><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_nonterminal_failed_or_processing_intent_stays_open[processing]" time="0.327" /><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_nonterminal_failed_or_processing_intent_stays_open[requires_capture]" time="0.238" /><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_stripe_terminal_proof_fails_closed[wrong_id]" time="0.221" /><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_stripe_terminal_proof_fails_closed[wrong_owner]" time="0.197" /><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_stripe_terminal_proof_fails_closed[wrong_amount]" time="0.192" /><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_stripe_terminal_proof_fails_closed[wrong_currency]" time="0.228" /><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_stripe_terminal_proof_fails_closed[paid]" time="0.203" /><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_stripe_terminal_proof_fails_closed[wrong_mode]" time="0.215" /><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_stripe_terminal_proof_fails_closed[missing_intent]" time="0.240" /><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_stripe_terminal_proof_fails_closed[captured]" time="0.214" /><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_stripe_terminal_proof_fails_closed[charge]" time="0.465" /><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_stripe_terminal_proof_fails_closed[changed]" time="0.257" /><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_stripe_terminal_proof_fails_closed[config]" time="0.270" /><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_stripe_terminal_proof_fails_closed[epoch]" time="0.269" /><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_stripe_terminal_proof_fails_closed[drain]" time="0.287" /><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_stripe_terminal_proof_fails_closed[mirror]" time="0.280" /><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_terminal_transaction_rolls_back_and_retries" time="0.256" /><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_concurrent_signed_expiration_and_canonical_readback" time="0.275"><failure message="app.regime_operation_fence.FenceBlocked: Stripe event journal changed during terminal readback; refresh again">account = 2
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f0802bbac60&gt;
+
+    def test_concurrent_signed_expiration_and_canonical_readback(account,monkeypatch):
+        local,session,_,mock,_=stripe_fixture(account,monkeypatch)
+        event={'id':'evt_expired_race','type':'checkout.session.expired','data':{'object':session}}
+        def run(i):
+            if i%2:return stripe.event(*signed(event))
+            with httpx.Client(transport=mock) as client:return service.reconcile_stripe(local,client=client)
+&gt;       with ThreadPoolExecutor(max_workers=4) as pool:list(pool.map(run,range(4)))
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_r210_terminal_checkout_e2e.py:133: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/concurrent/futures/_base.py:619: in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/concurrent/futures/_base.py:317: in _result_or_cancel
+    return fut.result(timeout)
+           ^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/concurrent/futures/_base.py:456: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/concurrent/futures/_base.py:401: in __get_result
+    raise self._exception
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/concurrent/futures/thread.py:59: in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_r210_terminal_checkout_e2e.py:132: in run
+    with httpx.Client(transport=mock) as client:return service.reconcile_stripe(local,client=client)
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/payment_reconcile_service.py:69: in reconcile_stripe
+    return _stripe_unpaid(initial,key,first,client=client,journal=journal)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+order = {'id': '6fd898fd04804c87a2112d9d613a1609', 'user_id': 2, 'request_id': 'reconciliation-e2e-123', 'amount_cents': 500, ...}
+key = 'sk_test_test'
+session = {'id': 'cs_test_6fd898fd04804c87a2112d9d613a1609', 'mode': 'payment', 'status': 'expired', 'payment_status': 'unpaid', ...}
+client = &lt;httpx.Client object at 0x7f0802bbbf80&gt;
+journal = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
+
+    def _stripe_unpaid(order,key,session,*,client,journal):
+        from .checkout_terminal_outcomes import stripe_identity,settle_empty
+        stripe_identity(session,order)
+        if session.get('status') not in ('open','complete','expired') or session.get('payment_status')!='unpaid':
+            raise ProviderProbeError('Unknown or contradictory Stripe checkout state')
+        intent=session.get('payment_intent')
+        if 'payment_intent' not in session:raise ProviderProbeError('Incomplete Stripe checkout proof')
+        headers={'Authorization':'Bearer '+key};terminal=False;outcome='expired';failed_proof=None
+        if intent is None:terminal=session['status']=='expired'
+        elif session['status'] in ('expired','complete'):
+            intent=_reference(intent)
+            if not intent.startswith('pi_'):raise ProviderProbeError('Invalid Stripe intent reference')
+            document=_get(client,'https://api.stripe.com/v1/payment_intents/'+intent,headers)
+            if (document.get('id')!=intent or type(document.get('amount')) is not int or document['amount']!=order['amount_cents']
+                or document.get('currency')!='eur'):raise ProviderProbeError('Unpaid Stripe intent identity mismatch')
+            if document.get('status')=='canceled':
+                if (type(document.get('amount_received')) is not int or document['amount_received']!=0
+                    or type(document.get('amount_capturable')) is not int or document['amount_capturable']!=0
+                    or 'latest_charge' not in document):
+                    raise ProviderProbeError('Canceled Stripe intent has unresolved charge history')
+                from .stripe_failed_charge_proof import prove
+                charges=_pages(client,'charges',headers,{'payment_intent':intent},max_items=100)
+                failed_proof=prove(client,key,intent,order['amount_cents'],document,charges)
+                terminal=True;outcome='expired' if session['status']=='expired' else 'canceled_intent'
+            elif document.get('status') not in ('requires_payment_method','requires_confirmation','requires_action','processing','requires_capture'):
+                raise ProviderProbeError('Contradictory Stripe payment intent status')
+        final=_get(client,'https://api.stripe.com/v1/checkout/sessions/'+_reference(order['session_id']),headers)
+        if final!=session:raise ProviderProbeError('Stripe unpaid snapshot changed')
+        if not terminal:return {'provider':'stripe','order_id':order['id'],'status':'pending','outcome':'provider_pending','checkout_closed':False,'ledger_reconciled':False,'transition_authorized':False}
+        with auth.db() as c:
+            c.execute('BEGIN IMMEDIATE')
+            current=c.execute('SELECT * FROM credit_purchase_orders WHERE id=?',(order['id'],)).fetchone()
+            if current is None or any(current[k]!=order[k] for k in ('user_id','amount_cents','session_id','credit_value_micro')):
+                raise FenceBlocked('Stripe order changed during terminal readback')
+            if auth._open(c.execute('SELECT secret_key FROM credit_payment_config WHERE id=1').fetchone()[0])!=key:
+                raise FenceBlocked('Stripe configuration changed during terminal readback')
+            if _stripe_journal_version(c) != journal:
+&gt;               raise FenceBlocked('Stripe event journal changed during terminal readback; refresh again')
+E               app.regime_operation_fence.FenceBlocked: Stripe event journal changed during terminal readback; refresh again
+
+app/payment_reconcile_service.py:181: FenceBlocked</failure></testcase><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_paid_notification_after_terminal_is_durable_conflict_not_credit" time="0.287" /><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_paypal_paid_after_terminal_keeps_conflict_without_wallet_credit" time="0.249" /><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_terminal_receipt_audit_detects_reopened_fence" time="0.227" /><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_terminal_proof_cannot_erase_existing_financial_evidence[wallet]" time="0.207" /><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_terminal_proof_cannot_erase_existing_financial_evidence[funded_position]" time="0.215" /><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_terminal_proof_cannot_erase_existing_financial_evidence[pending_paid]" time="0.219" /><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_terminal_proof_cannot_erase_existing_financial_evidence[wrong_pending_identity]" time="0.215" /><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_paypal_voided_empty_order_closes_and_stale_retry_never_captures" time="0.244" /><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_paypal_nonterminal_browser_cancel_is_not_financial_cancellation[CREATED]" time="0.197" /><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_paypal_nonterminal_browser_cancel_is_not_financial_cancellation[APPROVED]" time="0.229" /><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_paypal_nonterminal_browser_cancel_is_not_financial_cancellation[PAYER_ACTION_REQUIRED]" time="0.501" /><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_paypal_nonterminal_browser_cancel_is_not_financial_cancellation[PENDING_APPROVAL]" time="0.277" /><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_terminal_financial_graph_erasure_preserves_other_owner[erase]" time="0.427" /><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_terminal_financial_graph_erasure_preserves_other_owner[privacy_purge]" time="0.483" /><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_paypal_voided_incomplete_or_changed_history_is_blocked[capture]" time="0.285" /><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_paypal_voided_incomplete_or_changed_history_is_blocked[refund]" time="0.267" /><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_paypal_voided_incomplete_or_changed_history_is_blocked[authorization]" time="0.262" /><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_paypal_voided_incomplete_or_changed_history_is_blocked[amount]" time="0.234" /><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_paypal_voided_incomplete_or_changed_history_is_blocked[identity]" time="0.231" /><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_paypal_voided_incomplete_or_changed_history_is_blocked[intent]" time="0.222" /><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_paypal_voided_incomplete_or_changed_history_is_blocked[changed]" time="0.216" /><testcase classname="tests.test_r210_terminal_checkout_e2e" name="test_paypal_voided_incomplete_or_changed_history_is_blocked[config]" time="0.228" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_paginated_failed_charges_close_idempotently_without_money[False]" time="0.246" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_paginated_failed_charges_close_idempotently_without_money[True]" time="0.217" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_nonempty_ambiguous_or_monetary_history_stays_blocked[status-pending]" time="0.217" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_nonempty_ambiguous_or_monetary_history_stays_blocked[status-succeeded]" time="0.200" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_nonempty_ambiguous_or_monetary_history_stays_blocked[paid-True]" time="0.185" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_nonempty_ambiguous_or_monetary_history_stays_blocked[paid-0]" time="0.200" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_nonempty_ambiguous_or_monetary_history_stays_blocked[captured-True]" time="0.205" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_nonempty_ambiguous_or_monetary_history_stays_blocked[captured-0]" time="0.206" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_nonempty_ambiguous_or_monetary_history_stays_blocked[amount_captured-1]" time="0.218" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_nonempty_ambiguous_or_monetary_history_stays_blocked[amount_captured-False]" time="0.234" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_nonempty_ambiguous_or_monetary_history_stays_blocked[amount_refunded-1]" time="0.249" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_nonempty_ambiguous_or_monetary_history_stays_blocked[amount_refunded-False]" time="0.215" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_nonempty_ambiguous_or_monetary_history_stays_blocked[refunded-True]" time="0.225" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_nonempty_ambiguous_or_monetary_history_stays_blocked[disputed-True]" time="0.263" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_nonempty_ambiguous_or_monetary_history_stays_blocked[balance_transaction-txn_money]" time="0.364" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_nonempty_ambiguous_or_monetary_history_stays_blocked[failure_balance_transaction-txn_failed]" time="0.237" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_nonempty_ambiguous_or_monetary_history_stays_blocked[amount-499]" time="0.259" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_nonempty_ambiguous_or_monetary_history_stays_blocked[amount-True]" time="0.237" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_nonempty_ambiguous_or_monetary_history_stays_blocked[currency-usd]" time="0.268" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_nonempty_ambiguous_or_monetary_history_stays_blocked[payment_intent-pi_other]" time="0.211" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_nonempty_ambiguous_or_monetary_history_stays_blocked[livemode-True]" time="0.199" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_nonempty_ambiguous_or_monetary_history_stays_blocked[id-pi_not_charge]" time="0.200" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_missing_evidence_is_not_zero[id]" time="0.198" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_missing_evidence_is_not_zero[status]" time="0.211" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_missing_evidence_is_not_zero[paid]" time="0.211" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_missing_evidence_is_not_zero[captured]" time="0.218" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_missing_evidence_is_not_zero[amount_captured]" time="0.196" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_missing_evidence_is_not_zero[amount_refunded]" time="0.201" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_missing_evidence_is_not_zero[balance_transaction]" time="0.200" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_missing_evidence_is_not_zero[failure_balance_transaction]" time="0.195" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_missing_evidence_is_not_zero[refunded]" time="0.195" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_missing_evidence_is_not_zero[disputed]" time="0.208" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_missing_evidence_is_not_zero[livemode]" time="0.191" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_changed_incomplete_or_unavailable_snapshots_never_clear[canonical]" time="0.182" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_changed_incomplete_or_unavailable_snapshots_never_clear[second_list]" time="0.203" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_changed_incomplete_or_unavailable_snapshots_never_clear[intent]" time="0.201" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_changed_incomplete_or_unavailable_snapshots_never_clear[owner]" time="0.190" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_changed_incomplete_or_unavailable_snapshots_never_clear[config]" time="0.187" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_changed_incomplete_or_unavailable_snapshots_never_clear[duplicate]" time="0.188" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_changed_incomplete_or_unavailable_snapshots_never_clear[latest_missing]" time="0.196" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_changed_incomplete_or_unavailable_snapshots_never_clear[intent_environment]" time="0.192" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_changed_incomplete_or_unavailable_snapshots_never_clear[truncated]" time="0.191" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_changed_incomplete_or_unavailable_snapshots_never_clear[timeout]" time="0.190" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_changed_incomplete_or_unavailable_snapshots_never_clear[not_found]" time="0.192" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_changed_incomplete_or_unavailable_snapshots_never_clear[over_bound]" time="0.194" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_owner_http_confirm_get_proof_and_atomic_rollback_retry" time="0.775" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_concurrent_readbacks_commit_one_private_proof" time="0.217"><failure message="app.regime_operation_fence.FenceBlocked: Stripe event journal changed during terminal readback; refresh again">account = 2
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f0802b81370&gt;
+
+    def test_concurrent_readbacks_commit_one_private_proof(account,monkeypatch):
+        local,_,mock,_=failed_history(account,monkeypatch)
+        def verify(_):
+            with httpx.Client(transport=mock) as remote:return service.reconcile_stripe(local,client=remote,expected_owner=account)
+&gt;       with ThreadPoolExecutor(max_workers=3) as pool:results=list(pool.map(verify,range(3)))
+                                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_r210_failed_charge_recovery.py:143: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/concurrent/futures/_base.py:619: in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/concurrent/futures/_base.py:317: in _result_or_cancel
+    return fut.result(timeout)
+           ^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/concurrent/futures/_base.py:456: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/concurrent/futures/_base.py:401: in __get_result
+    raise self._exception
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/concurrent/futures/thread.py:59: in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_r210_failed_charge_recovery.py:142: in verify
+    with httpx.Client(transport=mock) as remote:return service.reconcile_stripe(local,client=remote,expected_owner=account)
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/payment_reconcile_service.py:69: in reconcile_stripe
+    return _stripe_unpaid(initial,key,first,client=client,journal=journal)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+order = {'id': '13b291cfe4df4c39be103d5da20a82c0', 'user_id': 2, 'request_id': 'reconciliation-e2e-123', 'amount_cents': 500, ...}
+key = 'sk_test_test'
+session = {'id': 'cs_test_13b291cfe4df4c39be103d5da20a82c0', 'mode': 'payment', 'status': 'expired', 'payment_status': 'unpaid', ...}
+client = &lt;httpx.Client object at 0x7f07d4565940&gt;
+journal = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
+
+    def _stripe_unpaid(order,key,session,*,client,journal):
+        from .checkout_terminal_outcomes import stripe_identity,settle_empty
+        stripe_identity(session,order)
+        if session.get('status') not in ('open','complete','expired') or session.get('payment_status')!='unpaid':
+            raise ProviderProbeError('Unknown or contradictory Stripe checkout state')
+        intent=session.get('payment_intent')
+        if 'payment_intent' not in session:raise ProviderProbeError('Incomplete Stripe checkout proof')
+        headers={'Authorization':'Bearer '+key};terminal=False;outcome='expired';failed_proof=None
+        if intent is None:terminal=session['status']=='expired'
+        elif session['status'] in ('expired','complete'):
+            intent=_reference(intent)
+            if not intent.startswith('pi_'):raise ProviderProbeError('Invalid Stripe intent reference')
+            document=_get(client,'https://api.stripe.com/v1/payment_intents/'+intent,headers)
+            if (document.get('id')!=intent or type(document.get('amount')) is not int or document['amount']!=order['amount_cents']
+                or document.get('currency')!='eur'):raise ProviderProbeError('Unpaid Stripe intent identity mismatch')
+            if document.get('status')=='canceled':
+                if (type(document.get('amount_received')) is not int or document['amount_received']!=0
+                    or type(document.get('amount_capturable')) is not int or document['amount_capturable']!=0
+                    or 'latest_charge' not in document):
+                    raise ProviderProbeError('Canceled Stripe intent has unresolved charge history')
+                from .stripe_failed_charge_proof import prove
+                charges=_pages(client,'charges',headers,{'payment_intent':intent},max_items=100)
+                failed_proof=prove(client,key,intent,order['amount_cents'],document,charges)
+                terminal=True;outcome='expired' if session['status']=='expired' else 'canceled_intent'
+            elif document.get('status') not in ('requires_payment_method','requires_confirmation','requires_action','processing','requires_capture'):
+                raise ProviderProbeError('Contradictory Stripe payment intent status')
+        final=_get(client,'https://api.stripe.com/v1/checkout/sessions/'+_reference(order['session_id']),headers)
+        if final!=session:raise ProviderProbeError('Stripe unpaid snapshot changed')
+        if not terminal:return {'provider':'stripe','order_id':order['id'],'status':'pending','outcome':'provider_pending','checkout_closed':False,'ledger_reconciled':False,'transition_authorized':False}
+        with auth.db() as c:
+            c.execute('BEGIN IMMEDIATE')
+            current=c.execute('SELECT * FROM credit_purchase_orders WHERE id=?',(order['id'],)).fetchone()
+            if current is None or any(current[k]!=order[k] for k in ('user_id','amount_cents','session_id','credit_value_micro')):
+                raise FenceBlocked('Stripe order changed during terminal readback')
+            if auth._open(c.execute('SELECT secret_key FROM credit_payment_config WHERE id=1').fetchone()[0])!=key:
+                raise FenceBlocked('Stripe configuration changed during terminal readback')
+            if _stripe_journal_version(c) != journal:
+&gt;               raise FenceBlocked('Stripe event journal changed during terminal readback; refresh again')
+E               app.regime_operation_fence.FenceBlocked: Stripe event journal changed during terminal readback; refresh again
+
+app/payment_reconcile_service.py:181: FenceBlocked</failure></testcase><testcase classname="tests.test_r210_failed_charge_recovery" name="test_readiness_detects_broken_private_failed_proof[object]" time="0.194" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_readiness_detects_broken_private_failed_proof[amount]" time="0.182" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_readiness_detects_broken_private_failed_proof[journal]" time="0.212" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_late_authenticated_payment_stays_pending_and_cannot_overwrite_proof" time="0.193" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_failed_proof_cannot_adopt_another_orders_charge_binding" time="0.198" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_signed_async_failure_resolves_only_with_canonical_complete_history" time="0.518" /><testcase classname="tests.test_r210_failed_charge_recovery" name="test_admin_reconciliation_uses_same_private_failed_charge_proof" time="0.236" /><testcase classname="tests.test_r210_checkout_reference_recovery" name="test_lost_stripe_create_response_binds_then_terminal_readback_closes" time="0.357" /><testcase classname="tests.test_r210_checkout_reference_recovery" name="test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[reference]" time="0.181" /><testcase classname="tests.test_r210_checkout_reference_recovery" name="test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[owner]" time="0.186" /><testcase classname="tests.test_r210_checkout_reference_recovery" name="test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[amount]" time="0.180" /><testcase classname="tests.test_r210_checkout_reference_recovery" name="test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[currency]" time="0.201" /><testcase classname="tests.test_r210_checkout_reference_recovery" name="test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[mode]" time="0.194" /><testcase classname="tests.test_r210_checkout_reference_recovery" name="test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[config]" time="0.203" /><testcase classname="tests.test_r210_checkout_reference_recovery" name="test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[local]" time="0.206" /><testcase classname="tests.test_r210_checkout_reference_recovery" name="test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[epoch]" time="0.189" /><testcase classname="tests.test_r210_checkout_reference_recovery" name="test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[drain]" time="0.295" /><testcase classname="tests.test_r210_checkout_reference_recovery" name="test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[mirror]" time="0.189" /><testcase classname="tests.test_r210_checkout_reference_recovery" name="test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[network]" time="0.174" /><testcase classname="tests.test_r210_checkout_reference_recovery" name="test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[not_found]" time="0.196" /><testcase classname="tests.test_r210_checkout_reference_recovery" name="test_invalid_or_changing_recovery_proof_keeps_uncertain_dispatch[url]" time="0.217" /><testcase classname="tests.test_r210_checkout_reference_recovery" name="test_concurrent_reference_binding_never_reposts_or_claims_payment" time="0.242" /><testcase classname="tests.test_r210_checkout_reference_recovery" name="test_lost_paypal_creation_binds_and_owner_capture_funds_once" time="0.249" /><testcase classname="tests.test_r210_checkout_reference_recovery" name="test_legacy_provider_reference_cannot_be_bound_to_second_local_order" time="0.251" /><testcase classname="tests.test_r210_checkout_reference_recovery" name="test_reference_recovery_endpoint_roles_csrf_and_shape" time="0.362" /></testsuite></testsuites>

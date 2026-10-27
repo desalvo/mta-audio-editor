@@ -18,6 +18,7 @@ def _wav(path):
 
 
 def test_worker_receives_audio_and_returns_preview(monkeypatch, tmp_path):
+    monkeypatch.setenv('MTA_NATIVE_SINGLE_USER', 'true')
     source = tmp_path / 'source.wav'
     _wav(source)
     worker = tmp_path / 'worker'
@@ -40,6 +41,7 @@ shutil.copyfile(input_path,args[args.index('--output')+1])
 
 
 def test_source_path_is_not_user_controlled(monkeypatch, tmp_path):
+    monkeypatch.setenv('MTA_NATIVE_SINGLE_USER', 'true')
     monkeypatch.setenv('MTA_AI_WORKER_ENABLED', 'true')
     exe = tmp_path / 'worker'
     exe.write_text('#!/bin/sh\nexit 0\n')

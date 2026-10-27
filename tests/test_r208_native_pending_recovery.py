@@ -7,6 +7,7 @@ from app import ai_remote_client
 
 
 def setup(tmp_path, monkeypatch):
+    monkeypatch.setenv('MTA_NATIVE_SINGLE_USER', 'true')
     monkeypatch.setenv('MTA_NATIVE_AI_CONFIG', str(tmp_path / 'settings.json'))
     routing.configure('whisper', 'remote', 'https://example.org', 'private')
     wav = tmp_path / 'voice.wav'
@@ -15,6 +16,7 @@ def setup(tmp_path, monkeypatch):
 
 
 def test_pending_keeps_id_and_never_reposts(tmp_path, monkeypatch):
+    monkeypatch.setenv('MTA_NATIVE_SINGLE_USER', 'true')
     wav = setup(tmp_path, monkeypatch)
     calls = []
     def lost(*args, **kwargs):
@@ -34,6 +36,7 @@ def test_pending_keeps_id_and_never_reposts(tmp_path, monkeypatch):
 
 
 def test_pending_remains_after_failed_recovery(tmp_path, monkeypatch):
+    monkeypatch.setenv('MTA_NATIVE_SINGLE_USER', 'true')
     wav = setup(tmp_path, monkeypatch)
     def failed(*args, **kwargs):
         raise ai_remote_client.RemoteAIError('unavailable')
@@ -45,6 +48,7 @@ def test_pending_remains_after_failed_recovery(tmp_path, monkeypatch):
 
 
 def test_corrupt_pending_fails_closed(tmp_path, monkeypatch):
+    monkeypatch.setenv('MTA_NATIVE_SINGLE_USER', 'true')
     wav = setup(tmp_path, monkeypatch)
     request_id, _, fingerprint = journal.begin('https://example.org', 'private', 'whisper', wav.read_bytes(), None)
     journal._entry(fingerprint).write_text('INVALID')

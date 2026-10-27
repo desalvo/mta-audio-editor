@@ -1,14 +1,14 @@
 {
-  "date": "2026-10-26",
+  "date": "2026-10-27",
   "target": "MTA0.3.0-r210 Release Candidate",
   "decision": "BLOCKED_PRE_RC",
   "candidate": false,
   "cutover_authorized": false,
   "progress": {
     "definition": "Equal-weight RC acceptance milestone checklist, NOT full-product feature completion or code coverage",
-    "numerator": 23,
+    "numerator": 25,
     "denominator": 42,
-    "percent": 54.8,
+    "percent": 59.5,
     "accepted_macroareas": 0,
     "macroarea_denominator": 7,
     "historical_dual_regime_estimate_percent": 70,
@@ -55,12 +55,6 @@
     },
     {
       "area": "C",
-      "id": "C2",
-      "criterion": "Distributed admission barrier and service-wide drain",
-      "state": "implementation_pending"
-    },
-    {
-      "area": "C",
       "id": "C3",
       "criterion": "Resolve every financial obligation before cutover",
       "state": "implementation_pending"
@@ -87,12 +81,6 @@
       "area": "E",
       "id": "E4",
       "criterion": "Complete sensitive regime-switch operator workflow",
-      "state": "implementation_pending"
-    },
-    {
-      "area": "E",
-      "id": "E5",
-      "criterion": "Complete transition progress, audit and forward recovery controls",
       "state": "implementation_pending"
     },
     {
@@ -132,14 +120,17 @@
       "state": "environment_blocked"
     }
   ],
-  "current_delivery": "Complete cumulative source checkpoint,not a release candidate",
-  "not_external_only": "Fourteen criteria still require implementation/functional or independent rights review;five are environment/target blocked. Do not describe all blockers as external credentials.",
-  "baseline_ci": "40257635101 on9fc85ce succeeded;104 prerequisite skips remain unaccepted;current changed boundaries have affected local proof,not a new full CI",
+  "current_delivery": "Complete cumulative with accepted C2 service admission/drain;PRE-RC,no financial cutover authorization",
+  "not_external_only": "12 criteria still require implementation/functional or independent rights review;5 are target/environment blocked.",
+  "baseline_ci": "Confirmed standard40480180716 on772fbe7508cc08266466a3746bb51f0fe5d0179b;6393passed46skipped;optional cutover40505295056 ninepasses. Current changes have affected local proof,no new full CI.",
   "evidence": [
-    "docs/validation/r210/executor-boundaries-result.json",
-    "docs/validation/r210/execution-owner-result.json",
-    "docs/validation/r210/subscription-basis-result.json"
+    "docs/validation/r210/transition-progress-result.json",
+    "docs/validation/r210/stripe-stable-history-result.json",
+    "docs/validation/r210/legacy-executor-result.json",
+    "docs/validation/r210/export-exclusive-result.json",
+    "docs/validation/r210/service-admission-result.json"
   ],
   "no_criteria_removed": true,
-  "commits_or_remote_mutations": 0
+  "commits_or_remote_mutations": 0,
+  "accepted_E5_provenance": "Existing accepted E5 from prior checkpoint;no criterion promoted in the export recovery turn."
 }

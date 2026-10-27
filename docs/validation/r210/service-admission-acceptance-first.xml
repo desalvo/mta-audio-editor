@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="14" time="4.229" timestamp="2026-10-27T17:54:52.313653+01:00" hostname="bbe0ad057f21"><testcase classname="tests.test_r210_service_admission_acceptance" name="test_actual_main_restart_under_drain_skips_work_then_explicit_resume_bootstraps_once" time="0.850" /><testcase classname="tests.test_r210_service_admission_acceptance" name="test_new_build_handoff_keeps_original_rows_and_gate_closed" time="0.133" /><testcase classname="tests.test_r210_service_admission_acceptance" name="test_upgrade_never_discards_original_unfinished_or_foreign_work[open]" time="0.109" /><testcase classname="tests.test_r210_service_admission_acceptance" name="test_upgrade_never_discards_original_unfinished_or_foreign_work[active]" time="0.116" /><testcase classname="tests.test_r210_service_admission_acceptance" name="test_upgrade_never_discards_original_unfinished_or_foreign_work[pending]" time="0.116" /><testcase classname="tests.test_r210_service_admission_acceptance" name="test_upgrade_never_discards_original_unfinished_or_foreign_work[stale]" time="0.125" /><testcase classname="tests.test_r210_service_admission_acceptance" name="test_upgrade_never_discards_original_unfinished_or_foreign_work[foreign]" time="0.114" /><testcase classname="tests.test_r210_service_admission_acceptance" name="test_original_http_capture_finishes_and_import_child_remains_tracked_under_drain" time="0.737" /><testcase classname="tests.test_r210_service_admission_acceptance" name="test_vst3_lifetime_ticket_covers_real_child_and_failed_cleanup_is_never_drained[False]" time="0.132" /><testcase classname="tests.test_r210_service_admission_acceptance" name="test_vst3_lifetime_ticket_covers_real_child_and_failed_cleanup_is_never_drained[True]" time="0.116" /><testcase classname="tests.test_r210_service_admission_acceptance" name="test_independent_process_admission_and_drain_serialize_at_original_journal" time="0.608" /><testcase classname="tests.test_r210_service_admission_acceptance" name="test_read_snapshot_blocks_resume_until_pending_audit_has_finished" time="0.222"><failure message="AssertionError: assert (not [FenceBlocked('Service activity or another cutover holds the lease')])">authority = (1, PosixPath('/tmp/pytest-of-root/pytest-10/test_read_snapshot_blocks_resu0'))
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f92a90384d0&gt;
+
+    def test_read_snapshot_blocks_resume_until_pending_audit_has_finished(authority,monkeypatch):
+        from app import service_drain_obligations
+        change(authority);original=service_drain_obligations.audit;entered=threading.Event();finish=threading.Event();results=[];errors=[]
+        def audit():entered.set();assert finish.wait(4);return original()
+        monkeypatch.setattr(service_drain_obligations,'audit',audit)
+        def read():
+            try:results.append(status(authority))
+            except Exception as exc:errors.append(exc)
+        def resume():
+            try:results.append(change(authority,generation=1,draining=False))
+            except Exception as exc:errors.append(exc)
+        first=threading.Thread(target=read);first.start();assert entered.wait(2)
+        second=threading.Thread(target=resume);second.start();time.sleep(.1)
+        assert not results
+        finish.set();first.join(5);second.join(5)
+&gt;       assert not errors and len(results)==2
+E       AssertionError: assert (not [FenceBlocked('Service activity or another cutover holds the lease')])
+
+tests/test_r210_service_admission_acceptance.py:181: AssertionError</failure></testcase><testcase classname="tests.test_r210_service_admission_acceptance" name="test_timer_entry_is_denied_before_any_work_when_barrier_held[scheduler]" time="0.135" /><testcase classname="tests.test_r210_service_admission_acceptance" name="test_timer_entry_is_denied_before_any_work_when_barrier_held[sampler]" time="0.162" /></testsuite></testsuites>

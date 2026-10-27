@@ -1,5 +1,6 @@
 """Account approval, retirement, project recovery and private retention jobs."""
 from __future__ import annotations
+from .service_admission import admitted
 import hashlib
 import hmac
 import html
@@ -531,6 +532,7 @@ def send_pending():
             return
 
 
+@admitted('account-retention')
 def tick():
     auth.init_auth_db()
     from .ai_pull_coordinator import maintenance

@@ -1,3 +1,4 @@
+from .service_admission import worker_thread
 from .vst3_transport import runtime_available as vst_host_runtime
 from contextlib import asynccontextmanager
 from .fs_durability import sync_directory
@@ -96,13 +97,31 @@ from .ai_worker_protocol import configured_worker, run_worker_with_project_audio
 
 @asynccontextmanager
 async def _mta_application_lifespan(_app):
-    _start_diagnostic_cleanup()
-    _start_background_services()
-    _restore_persisted_ai_queue()
-    _start_kara_checkpoint_repair()
+    from .service_admission import operation
+    startup_stop = threading.Event()
+    def bootstrap():
+        with operation('startup'):
+            _start_diagnostic_cleanup()
+            _start_background_services()
+            _restore_persisted_ai_queue()
+            _start_kara_checkpoint_repair()
+    try:
+        bootstrap()
+    except __import__('app.regime_operation_fence',fromlist=['FenceBlocked']).FenceBlocked:
+        # Recovery/login must remain reachable after every authority replica
+        # restarts under a durable drain. No background repair runs until resume.
+        def wait_for_admission():
+            while not startup_stop.wait(.2):
+                try:
+                    bootstrap()
+                    return
+                except __import__('app.regime_operation_fence',fromlist=['FenceBlocked']).FenceBlocked:
+                    continue
+        threading.Thread(target=wait_for_admission,name='mta-admission-startup',daemon=True).start()
     try:
         yield
     finally:
+        startup_stop.set()
         _cleanup_session_previews_on_shutdown()
         from .server_vst3 import sessions as _live_vst3_sessions
         _live_vst3_sessions.shutdown()
@@ -154,7 +173,7 @@ def _start_diagnostic_cleanup():
     # Cleanup works even with collection disabled; daemon stops on process exit.
     def loop():
         import time as _time
-        while True:
+        def clean():
             try:
                 _mta_diagnostics.clean()
             except (OSError, RuntimeError):
@@ -166,6 +185,9 @@ def _start_diagnostic_cleanup():
                 cleanup_if_due()
             except (OSError,ValueError,RuntimeError):
                 LOGGER.warning("Studio result retention unavailable",exc_info=True)
+        while True:
+            from .service_admission import periodic
+            periodic('diagnostic-retention',clean)
             _time.sleep(3600)
     _mta_diagnostics.install_event_capture()
     threading.Thread(target=loop, daemon=True, name="mta-diagnostic-retention").start()
@@ -214,7 +236,7 @@ def _start_background_services():
                 auto_start_server()
             except Exception:
                 LOGGER.exception("Optional desktop ACE-Step autostart failed")
-        threading.Thread(target=_launch_optional_ace_step, daemon=True,
+        worker_thread(target=_launch_optional_ace_step, daemon=True,
                          name="mta-desktop-ace-autostart").start()
 
 
@@ -296,7 +318,7 @@ def _start_kara_checkpoint_repair() -> None:
             ensure_kara_2(LEAD_BACKING_MODEL_DIR / 'UVR_MDXNET_KARA_2.onnx', download)
         except Exception as exc:
             LOGGER.warning('UVR KARA 2 optional checkpoint repair skipped or failed: %s', exc)
-    threading.Thread(target=repair, daemon=True, name='mta-uvr-kara2-checkpoint-repair').start()
+    worker_thread(target=repair, daemon=True, name='mta-uvr-kara2-checkpoint-repair').start()
 
 
 def _download_lead_backing_model(model_id: str) -> dict:
@@ -622,6 +644,18 @@ def _is_public(path: str) -> bool:
 
 @app.middleware("http")
 async def security_middleware(request: Request, call_next):
+    from .sqlite_availability import BarrierUnavailable,is_busy,response
+    import sqlite3
+    try:
+        return await _security_middleware(request,call_next)
+    except BarrierUnavailable as exc:
+        return response(exc,method=request.method)
+    except sqlite3.OperationalError as exc:
+        if is_busy(exc): return response(exc,method=request.method)
+        raise
+
+
+async def _security_middleware(request: Request, call_next):
     from .ai_pull_routes import authenticated_worker_request
     if NATIVE_SINGLE_USER and (
         request.url.path == "/login"
@@ -3161,7 +3195,7 @@ def start_waveform_job(pid: str, track_id: str, request: Request, force: bool = 
     }
     with MEDIA_JOB_LOCK:
         MEDIA_JOBS[job_id] = job
-    threading.Thread(target=_waveform_worker, args=(job_id, pid, track_id), daemon=True, name=f"waveform-{job_id}").start()
+    worker_thread(target=_waveform_worker, args=(job_id, pid, track_id), daemon=True, name=f"waveform-{job_id}").start()
     return _media_job_public(job)
 
 
@@ -3348,7 +3382,7 @@ async def start_track_import_job(
     with MEDIA_JOB_LOCK:
         MEDIA_JOBS[job_id] = job
     try:
-        threading.Thread(
+        worker_thread(
             target=_track_import_worker,
             args=(job_id, pid, filename, Path(file.filename or filename).name, name, type, offset_ms, sync_mode, reference_track_id, first_track),
             daemon=True,
@@ -4029,7 +4063,7 @@ def start_youtube_import_job(pid: str, request: Request, body: dict):
     }
     with MEDIA_JOB_LOCK:
         MEDIA_JOBS[job_id] = job
-    threading.Thread(
+    worker_thread(
         target=_youtube_import_worker,
         args=(
             job_id, pid, url, str(body.get("name", ""))[:200], str(body.get("type", "other")),
@@ -4144,7 +4178,7 @@ def _start_bounce(pid,request,track_id=None):
     with MEDIA_JOB_LOCK:
         MEDIA_JOBS[jid]={'id':jid,'kind':'bounce','project_id':pid,'status':'queued',
             'progress':0,'message':'Bounce queued','created_at':now,'updated_at':now,'result':None,'error':None}
-    threading.Thread(target=_bounce_worker,args=(jid,pid,track_id),daemon=True,name='bounce-'+jid).start()
+    worker_thread(target=_bounce_worker,args=(jid,pid,track_id),daemon=True,name='bounce-'+jid).start()
     return {'bounce_job_id':jid}
 
 
@@ -4661,7 +4695,7 @@ async def start_mta_import_job(request: Request, file: UploadFile = File(...)):
     }
     with MEDIA_JOB_LOCK:
         MEDIA_JOBS[job_id] = job
-    threading.Thread(
+    worker_thread(
         target=_mta_import_worker,
         args=(job_id, project.id, Path(file.filename or "source.mta").name),
         daemon=True,
@@ -7046,7 +7080,7 @@ def start_track_export_job(pid: str, track_id: str, request: Request, body: Trac
     }
     with MEDIA_JOB_LOCK:
         MEDIA_JOBS[job_id] = job
-    threading.Thread(target=_track_export_worker, args=(job_id, pid, track_id, req.model_dump()), daemon=True).start()
+    worker_thread(target=_track_export_worker, args=(job_id, pid, track_id, req.model_dump()), daemon=True).start()
     return _media_job_public(job)
 
 
@@ -7366,7 +7400,7 @@ def start_configured_project_export_job(pid: str, req: ProjectExportRequest, req
     }
     with MEDIA_JOB_LOCK:
         MEDIA_JOBS[job_id] = job
-    threading.Thread(
+    worker_thread(
         target=_configured_export_worker,
         args=(job_id, pid, req.model_dump(mode="json")),
         daemon=True,
@@ -7436,7 +7470,7 @@ async def start_karaoke_export_job(
     job = {"id": job_id, "kind": "project-export", "project_id": pid, "status": "queued", "progress": 5, "message": "Export MP4 in coda", "created_at": now, "updated_at": now, "result": None, "error": None}
     with MEDIA_JOB_LOCK:
         MEDIA_JOBS[job_id] = job
-    threading.Thread(
+    worker_thread(
         target=_karaoke_export_worker,
         args=(job_id, pid, str(background_path) if background_path else None, include_chords),
         daemon=True,
@@ -8032,7 +8066,7 @@ def desktop_ace_test(request: Request):
     with _ace_test_guard:
         if _ace_test_state.get('state')=='running': return dict(_ace_test_state)
         _ace_test_state={'state':'running'}
-    threading.Thread(target=_run_ace_test,daemon=True,name='mta-ace-smoke').start()
+    worker_thread(target=_run_ace_test,daemon=True,name='mta-ace-smoke').start()
     return {'state':'running'}
 
 
@@ -8241,3 +8275,25 @@ from .project_kinds import ProjectKindError as _ProjectKindError
 @app.exception_handler(_ProjectKindError)
 async def _project_kind_conflict(request, exc):
     return JSONResponse({"detail": str(exc), "code": "project_type_conflict"}, status_code=409)
+
+
+from .service_admission_routes import router as _service_admission_router
+app.include_router(_service_admission_router)
+from .service_admission import ServiceAdmissionMiddleware
+app.add_middleware(ServiceAdmissionMiddleware)
+
+
+import sqlite3 as _sqlite_errors
+
+@app.exception_handler(_sqlite_errors.OperationalError)
+async def _sqlite_operation_error(request,exc):
+    from .sqlite_availability import is_busy,response
+    if is_busy(exc): return response(exc,method=request.method)
+    raise exc
+
+from .sqlite_availability import BarrierUnavailable as _BarrierUnavailable
+
+@app.exception_handler(_BarrierUnavailable)
+async def _barrier_read_unavailable(request,exc):
+    from .sqlite_availability import response
+    return response(exc,method=request.method)

@@ -99,7 +99,7 @@ def verify_preview_wav(path: Path) -> dict:
 
 
 def _run_supervised_legacy_worker(command: list[str], directory: Path, timeout_seconds: int,
-                                  cancel_event=None) -> None:
+                                  cancel_event=None, *, env=None) -> None:
     """Supervise a legacy worker and reap its process group on every exit path.
 
     The legacy protocol does not provide trusted CPU/GPU usage and must not be
@@ -110,7 +110,7 @@ def _run_supervised_legacy_worker(command: list[str], directory: Path, timeout_s
     try:
         process = subprocess.Popen(command, shell=False, cwd=str(directory),
                                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                                   start_new_session=(os.name == 'posix'))
+                                   start_new_session=(os.name == 'posix'), env=env)
     except OSError as exc:
         raise WorkerUnavailable('AI worker could not start') from exc
     deadline = time.monotonic() + timeout_seconds
@@ -149,6 +149,10 @@ def run_external_worker(plan: dict, *, timeout_seconds: int = 1200,
 
     This non-realtime legacy entrypoint is not automatically a metered AI job.
     """
+    from .native_ai_routing import require_native
+    require_native()
+    from .model_license_policy import evaluate
+    decision = evaluate('ace-step', plan)
     worker = configured_worker()
     if worker is None:
         raise WorkerUnavailable('No trusted AI inference executable is configured')
@@ -164,7 +168,9 @@ def run_external_worker(plan: dict, *, timeout_seconds: int = 1200,
         request.write_bytes(raw)
         request.chmod(0o600)
         command = worker_command(worker) + ['--request', str(request), '--output', str(output)]
-        _run_supervised_legacy_worker(command, directory, timeout_seconds, cancel_event)
+        from .ai_execution_policy import admitted_env
+        _run_supervised_legacy_worker(command, directory, timeout_seconds, cancel_event,
+                                     env={**os.environ, **admitted_env('ace-step', decision)})
         if cancel_event is not None and cancel_event.is_set():
             raise WorkerUnavailable('AI worker cancelled')
         audio, info = _snapshot_preview_wav(output)
@@ -235,6 +241,10 @@ def run_worker_with_project_audio(plan: dict, project, resolve_audio, *, timeout
     Worker receives workspace-relative source filenames in request['source_audio'].
     Current protocol supports WAV only; other codecs require a trusted converter.
     """
+    from .native_ai_routing import require_native
+    require_native()
+    from .model_license_policy import evaluate
+    decision = evaluate('ace-step', plan)
     worker = configured_worker()
     if worker is None:
         raise WorkerUnavailable('No trusted AI inference executable is configured')
@@ -331,11 +341,12 @@ def run_worker_with_project_audio(plan: dict, project, resolve_audio, *, timeout
         request.write_bytes(raw)
         request.chmod(0o600)
         command = worker_command(worker) + ['--request', str(request), '--output', str(output)]
-        environment = {**os.environ, **({'MTA_AI_PROGRESS_FILE': str(progress_file)} if progress_file else {})}
+        from .ai_execution_policy import admitted_env
+        environment = {**os.environ, **admitted_env('ace-step', decision),
+                       **({'MTA_AI_PROGRESS_FILE': str(progress_file)} if progress_file else {})}
         # The trusted local process is reaped with wait4, so billed CPU time
         # is observed rather than inferred from elapsed wall time. A worker
         # spawning descendants cannot be billed as fully metered by wait4.
-        import signal
         import time
         metered_usage = None
         metered_source = None
@@ -355,48 +366,20 @@ def run_worker_with_project_audio(plan: dict, project, resolve_audio, *, timeout
             metered_source = "cgroup"
             result = measurement
         elif os.name == 'posix' and hasattr(os, 'wait4'):
-            from .ai_metering_agent import _descendants
-            with subprocess.Popen(command, shell=False, cwd=str(directory),
-                                  stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                                  env=environment, start_new_session=True) as proc:
-                deadline = time.monotonic() + timeout_seconds
-                had_descendants = sys.platform != 'linux'
-                try:
-                    while True:
-                        child, status, stats = os.wait4(proc.pid, os.WNOHANG)
-                        if child == proc.pid:
-                            proc.returncode = os.waitstatus_to_exitcode(status)
-                            if not had_descendants:
-                                metered_usage = {'cpu_seconds': max(0.0, stats.ru_utime + stats.ru_stime)}
-                                metered_source = 'worker'
-                            break
-                        if sys.platform == 'linux':had_descendants |= bool(_descendants(proc.pid))
-                        if (cancel_event is not None and cancel_event.is_set()) or time.monotonic() >= deadline:
-                            timed_out = not (cancel_event is not None and cancel_event.is_set())
-                            os.killpg(proc.pid, signal.SIGTERM)
-                            try:
-                                child, status, stats = os.wait4(proc.pid, 0)
-                            except ChildProcessError:
-                                pass
-                            proc.returncode = -signal.SIGTERM
-                            raise WorkerUnavailable('AI worker timed out' if timed_out else 'AI worker cancelled')
-                        if cancel_event is not None:
-                            cancel_event.wait(0.2)
-                        else:
-                            time.sleep(0.2)
-                finally:
-                    # Kill unmetered descendants even if their parent exited.
-                    try:
-                        os.killpg(proc.pid, signal.SIGKILL)
-                    except ProcessLookupError:
-                        pass
-                    if proc.returncode is None:
-                        try:
-                            os.wait4(proc.pid, 0)
-                        except ChildProcessError:
-                            pass
-                        proc.returncode = -signal.SIGKILL
-            result = proc
+            # Use the same bounded supervisor as registered jobs. The former
+            # SIGTERM + blocking wait4 could hang forever on a worker ignoring
+            # SIGTERM, preventing cancellation and leaving the queue occupied.
+            from .ai_metering_agent import run_metered_process
+            try:
+                result = run_metered_process(command, cwd=str(directory), timeout_seconds=timeout_seconds,
+                    cancel_check=cancel_event.is_set if cancel_event is not None else None, env=environment)
+            except RuntimeError as exc:
+                raise WorkerUnavailable(str(exc)) from exc
+            if result.exit_code:
+                raise WorkerUnavailable('AI worker failed or timed out')
+            if result.isolated and sys.platform == 'linux':
+                metered_usage = dict(result.usage)
+                metered_source = 'worker'
         elif cancel_event is None:
             try:
                 result = subprocess.run(command, shell=False, cwd=str(directory), capture_output=True,

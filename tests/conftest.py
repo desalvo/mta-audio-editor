@@ -21,6 +21,7 @@ if OFFLINE:
 def local_native_ai(monkeypatch):
     """Explicit local unit-test route, without disabling server authentication."""
     from app import main,native_ai_routing
+    monkeypatch.setenv('MTA_NATIVE_SINGLE_USER','true')
     monkeypatch.setattr(main,'NATIVE_SINGLE_USER',True)
     monkeypatch.setattr(native_ai_routing,'is_remote',lambda kind:False)
 

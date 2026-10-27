@@ -1,0 +1,60 @@
+{
+  "state": "HISTORICAL_CHECKPOINT_INTEGRATED_AND_SUPERSEDED",
+  "applied_to_shipped_application": true,
+  "criterion": "C2",
+  "progress_credit": 1,
+  "paths": [
+    "app/account_lifecycle.py",
+    "app/ace_step_desktop_manager.py",
+    "app/ai_arranger_runtime.py",
+    "app/ai_notifications.py",
+    "app/ai_planning_sqlite.py",
+    "app/audio_capture.py",
+    "app/main.py",
+    "app/model_updater.py",
+    "app/optional_plugins.py",
+    "app/regime_service_lease.py",
+    "app/server_vst3.py",
+    "app/storage.py",
+    "app/service_admission.py",
+    "app/service_admission_routes.py",
+    "app/service_drain_obligations.py",
+    "tests/test_r210_service_admission.py",
+    "tests/test_r210_service_admission_pull.py"
+  ],
+  "known_unvalidated_changes": [
+    "whole-source build fingerprint and explicit build upgrade API",
+    "long-lived capture/VST3 admission lifetimes",
+    "exhaustive entry-point inventory",
+    "final integrated regression and security review"
+  ],
+  "preliminary_reports": [
+    "service-admission-and-export-first.xml",
+    "service-admission-regression.xml",
+    "service-admission-pull-first.xml"
+  ],
+  "instruction": "Do not reapply historical patch;current completed code and acceptance are in docs/SERVICE_ADMISSION_DRAIN_R210.md and docs/validation/r210/service-admission-result.json",
+  "patch_sha256": "c5222c87c2c2d023b09d5ea3c92073ca6991a44569929e1fc526d888295359e0",
+  "checkpoint_source_sha256": {
+    "app/account_lifecycle.py": "dc2a034d92b49c76f4953cfce42da64432edf54283d5b31ccc78456115a7c59c",
+    "app/ace_step_desktop_manager.py": "78245234d93af107a6bb285de20162a6e7b8f688ead3555661a4d4a745414aaa",
+    "app/ai_arranger_runtime.py": "02e340a5bcca197863879463cc9c96204b3a3676c3d808d13b1baa78a874dda8",
+    "app/ai_notifications.py": "c2645a42a7aa798d733a31927e01d13d52b13bec156fa4b6de6889ae725afa63",
+    "app/ai_planning_sqlite.py": "8ffc8a2083b6f1c1d463ad1d881aed0ed1f24cc7aefd70b7e67971d0afaf8722",
+    "app/audio_capture.py": "3ff571db7d8a926b380b0dc738d4dfd5b8c30cc16197e06b9d66728efa31de3a",
+    "app/main.py": "d91109db80c08e43bc3195a3b186ea06cb723c3745074c5a7c084f29d292375d",
+    "app/model_updater.py": "d1071ba5576ea4975eca06c108ff49d1815b794214ff28e77ffa41af66fa0032",
+    "app/optional_plugins.py": "92f2983f07a618f1dba7ffea4fb2fd7064b8bd1bc8b4a5cea42bf8c99f0ebc01",
+    "app/regime_service_lease.py": "1f5c8de729a144b2b6ef4d5e7c47e90e32599541ec3a2991c2bc774873fd71af",
+    "app/server_vst3.py": "e491f7a1a545a018c358d60c746d75570cf8cf8666d5be47d996c95b8cd0ca09",
+    "app/storage.py": "603f1c07e718b78d2fe3a5d91279e46cc5f2abef6ec4abcab3edc978943e4d5c",
+    "app/service_admission.py": "46942f705618d881c3fb0ba6ce91a4475e178a82a853c73c8b4c5ccd31fb07a3",
+    "app/service_admission_routes.py": "2ee7d19c917217cc0989dfa73cdce8f0c28c6629213e542a620447748b421f67",
+    "app/service_drain_obligations.py": "ac40ee2ea684fc1c9c09e9841b2e8e4da6a89ee05859fa99e57df1b61dd6fcbd",
+    "tests/test_r210_service_admission.py": "fe1d6c0b4d0a294feb88e34ab3613cabdadb7f02a4e411a5c93d389df5b10264",
+    "tests/test_r210_service_admission_pull.py": "0588d82985d4b36bde72a8ae35235b55e0284fd87c5d630eecf2c1e8f8211168"
+  },
+  "patch_dry_run_on_delivery_source": "passed17paths;not applied",
+  "criterion_accepted": true,
+  "previous_unvalidated_list_is_historical": true
+}

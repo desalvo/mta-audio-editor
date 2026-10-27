@@ -1,0 +1,545 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="22" skipped="0" tests="100" time="3.675" timestamp="2026-10-27T15:56:46.517280+01:00" hostname="2131b745082e"><testcase classname="tests.test_r180_worker_protocol_and_pdc" name="test_worker_requires_admin_opt_in" time="0.001"><failure message="ValueError: Standalone AI execution requires a native application">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fc2c854e3c0&gt;
+
+    def test_worker_requires_admin_opt_in(monkeypatch):
+        monkeypatch.delenv('MTA_AI_WORKER_ENABLED', raising=False)
+        monkeypatch.setenv('MTA_AI_WORKER_EXECUTABLE', '/bin/true')
+        assert configured_worker() is None
+        with pytest.raises(WorkerUnavailable):
+&gt;           run_external_worker({'prompt': 'x'})
+
+tests/test_r180_worker_protocol_and_pdc.py:13: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/ai_worker_protocol.py:153: in run_external_worker
+    require_native()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def require_native():
+        if os.getenv('MTA_NATIVE_SINGLE_USER', '').lower() != 'true':
+&gt;           raise ValueError('Standalone AI execution requires a native application')
+E           ValueError: Standalone AI execution requires a native application
+
+app/native_ai_routing.py:20: ValueError</failure></testcase><testcase classname="tests.test_r180_worker_protocol_and_pdc" name="test_worker_file_contract_and_validation" time="0.003"><failure message="ValueError: Standalone AI execution requires a native application">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_worker_file_contract_and_0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fc2c7e9d8e0&gt;
+
+    def test_worker_file_contract_and_validation(tmp_path, monkeypatch):
+        script = tmp_path / 'worker.py'
+        script.write_text("#!/usr/bin/env python3\nimport argparse, json, wave\np=argparse.ArgumentParser(); p.add_argument('--request'); p.add_argument('--output'); a=p.parse_args()\nassert json.load(open(a.request))['model_id']=='test-model'\nwith wave.open(a.output,'wb') as w:\n w.setnchannels(1);w.setsampwidth(2);w.setframerate(44100);w.writeframes(b'\\0\\0'*441)\n")
+        script.chmod(0o700)
+        monkeypatch.setenv('MTA_AI_WORKER_ENABLED', 'true')
+        monkeypatch.setenv('MTA_AI_WORKER_EXECUTABLE', str(script))
+&gt;       data, info = run_external_worker({'model_id': 'test-model'}, timeout_seconds=10)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_r180_worker_protocol_and_pdc.py:21: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/ai_worker_protocol.py:153: in run_external_worker
+    require_native()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def require_native():
+        if os.getenv('MTA_NATIVE_SINGLE_USER', '').lower() != 'true':
+&gt;           raise ValueError('Standalone AI execution requires a native application')
+E           ValueError: Standalone AI execution requires a native application
+
+app/native_ai_routing.py:20: ValueError</failure></testcase><testcase classname="tests.test_r180_worker_protocol_and_pdc" name="test_worker_rejects_invalid_audio" time="0.001" /><testcase classname="tests.test_r180_worker_protocol_and_pdc" name="test_native_pdc_mix_compiles_and_runs" time="0.795" /><testcase classname="tests.test_r184_ai_audio_transfer" name="test_worker_receives_audio_and_returns_preview" time="0.001"><failure message="ValueError: Standalone AI execution requires a native application">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fc2c7d44b00&gt;
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_worker_receives_audio_and0')
+
+    def test_worker_receives_audio_and_returns_preview(monkeypatch, tmp_path):
+        source = tmp_path / 'source.wav'
+        _wav(source)
+        worker = tmp_path / 'worker'
+        worker.write_text('''#!/usr/bin/env python3
+    import json,sys,pathlib,shutil
+    args=sys.argv
+    req=json.loads(pathlib.Path(args[args.index('--request')+1]).read_text())
+    assert len(req['source_audio'])==1
+    input_path=pathlib.Path(req['source_audio'][0]['filename'])
+    assert input_path.exists()
+    assert not input_path.is_absolute()
+    shutil.copyfile(input_path,args[args.index('--output')+1])
+    ''')
+        worker.chmod(0o700)
+        monkeypatch.setenv('MTA_AI_WORKER_ENABLED', 'true')
+        monkeypatch.setenv('MTA_AI_WORKER_EXECUTABLE', str(worker))
+        project = SimpleNamespace(id='project1', tracks=[SimpleNamespace(id='t1', filename='source.wav')])
+&gt;       data, meta = run_worker_with_project_audio({'scope': 'project'}, project, lambda pid, filename: source)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_r184_ai_audio_transfer.py:38: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/ai_worker_protocol.py:245: in run_worker_with_project_audio
+    require_native()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def require_native():
+        if os.getenv('MTA_NATIVE_SINGLE_USER', '').lower() != 'true':
+&gt;           raise ValueError('Standalone AI execution requires a native application')
+E           ValueError: Standalone AI execution requires a native application
+
+app/native_ai_routing.py:20: ValueError</failure></testcase><testcase classname="tests.test_r184_ai_audio_transfer" name="test_source_path_is_not_user_controlled" time="0.001"><failure message="AssertionError: Regex pattern did not match.&#10;  Expected regex: 'WAV source'&#10;  Actual message: 'Standalone AI execution requires a native application'">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fc2c854e180&gt;
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_source_path_is_not_user_c0')
+
+    def test_source_path_is_not_user_controlled(monkeypatch, tmp_path):
+        monkeypatch.setenv('MTA_AI_WORKER_ENABLED', 'true')
+        exe = tmp_path / 'worker'
+        exe.write_text('#!/bin/sh\nexit 0\n')
+        exe.chmod(0o700)
+        monkeypatch.setenv('MTA_AI_WORKER_EXECUTABLE', str(exe))
+        project = SimpleNamespace(id='p', tracks=[SimpleNamespace(id='t', filename='../outside.wav')])
+&gt;       with pytest.raises(ValueError, match='WAV source'):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'WAV source'
+E         Actual message: 'Standalone AI execution requires a native application'
+
+tests/test_r184_ai_audio_transfer.py:49: AssertionError</failure></testcase><testcase classname="tests.test_r184_ai_audio_transfer" name="test_native_dsp_contract_is_present" time="0.000" /><testcase classname="tests.test_r184_ai_audio_transfer" name="test_native_preview_crossfade_compiles" time="0.202" /><testcase classname="tests.test_r208_worker_preflight_and_cgroup_environment" name="test_pre_cancelled_worker_never_resolves_or_renders" time="0.001"><failure message="ValueError: Standalone AI execution requires a native application">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fc2c7d471a0&gt;
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_pre_cancelled_worker_neve0')
+
+    def test_pre_cancelled_worker_never_resolves_or_renders(monkeypatch, tmp_path):
+        executable = tmp_path / 'worker.py'
+        executable.write_text('pass')
+        monkeypatch.setattr(worker, 'configured_worker', lambda: executable)
+        cancelled = threading.Event()
+        cancelled.set()
+        with pytest.raises(worker.WorkerUnavailable, match='cancelled'):
+&gt;           worker.run_worker_with_project_audio({'input_source': 'track', 'input_track_id': 't'},
+                                                 _project(), lambda *_: pytest.fail('resolved after cancellation'),
+                                                 cancel_event=cancelled)
+
+tests/test_r208_worker_preflight_and_cgroup_environment.py:23: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/ai_worker_protocol.py:245: in run_worker_with_project_audio
+    require_native()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def require_native():
+        if os.getenv('MTA_NATIVE_SINGLE_USER', '').lower() != 'true':
+&gt;           raise ValueError('Standalone AI execution requires a native application')
+E           ValueError: Standalone AI execution requires a native application
+
+app/native_ai_routing.py:20: ValueError</failure></testcase><testcase classname="tests.test_r208_worker_preflight_and_cgroup_environment" name="test_cancel_during_render_never_starts_worker" time="0.143"><failure message="ValueError: Standalone AI execution requires a native application">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fc2c7d477d0&gt;
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_cancel_during_render_neve0')
+
+    def test_cancel_during_render_never_starts_worker(monkeypatch, tmp_path):
+        executable = tmp_path / 'worker.py'
+        executable.write_text('pass')
+        monkeypatch.setattr(worker, 'configured_worker', lambda: executable)
+        cancelled = threading.Event()
+        source = tmp_path / 't.wav'
+        source.write_bytes(b'a')
+        from app import audio_engine
+        def render(*args, **kwargs):
+            cancelled.set()
+            pytest.fail('render should not start after cancellation')
+        # Cancel as source resolution completes, before rendering.
+        monkeypatch.setattr(audio_engine, 'render_track', render)
+        def resolve(*args):
+            cancelled.set()
+            return source
+        with pytest.raises(worker.WorkerUnavailable, match='cancelled'):
+            # The cancellation immediately before track rendering must stop the call.
+&gt;           worker.run_worker_with_project_audio({'input_source': 'track', 'input_track_id': 't'},
+                                                 _project(), resolve, cancel_event=cancelled)
+
+tests/test_r208_worker_preflight_and_cgroup_environment.py:46: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/ai_worker_protocol.py:245: in run_worker_with_project_audio
+    require_native()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def require_native():
+        if os.getenv('MTA_NATIVE_SINGLE_USER', '').lower() != 'true':
+&gt;           raise ValueError('Standalone AI execution requires a native application')
+E           ValueError: Standalone AI execution requires a native application
+
+app/native_ai_routing.py:20: ValueError</failure></testcase><testcase classname="tests.test_r208_worker_preflight_and_cgroup_environment" name="test_cgroup_worker_receives_progress_environment" time="0.008"><failure message="ValueError: Standalone AI execution requires a native application">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fc2c371a5a0&gt;
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_cgroup_worker_receives_pr0')
+
+    def test_cgroup_worker_receives_progress_environment(monkeypatch, tmp_path):
+        executable = tmp_path / 'worker.py'
+        executable.write_text('pass')
+        monkeypatch.setattr(worker, 'configured_worker', lambda: executable)
+        monkeypatch.setenv('MTA_AI_CGROUP_PARENT', '/sys/fs/cgroup/delegated')
+        source = tmp_path / 't.wav'
+        with wave.open(str(source), 'wb') as f:
+            f.setnchannels(1); f.setsampwidth(2); f.setframerate(44100); f.writeframes(b'\0\0' * 441)
+        from app import audio_engine, ai_cgroup_metering
+        monkeypatch.setattr(audio_engine, 'render_track', lambda track, src, dst, **kw: Path(dst).write_bytes(source.read_bytes()))
+        progress = tmp_path / 'progress.json'
+        called = {}
+        def fake_cgroup(command, **kwargs):
+            called.update(kwargs)
+            output = Path(command[command.index('--output') + 1])
+            output.write_bytes(source.read_bytes())
+            return SimpleNamespace(usage={'cpu_seconds': 0.3}, exit_code=0)
+        monkeypatch.setattr(ai_cgroup_metering, 'run_cgroup_process', fake_cgroup)
+&gt;       _, meta = worker.run_worker_with_project_audio({'input_source': 'track', 'input_track_id': 't'},
+                                                       _project(), lambda *_: source, progress_file=progress)
+
+tests/test_r208_worker_preflight_and_cgroup_environment.py:68: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/ai_worker_protocol.py:245: in run_worker_with_project_audio
+    require_native()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def require_native():
+        if os.getenv('MTA_NATIVE_SINGLE_USER', '').lower() != 'true':
+&gt;           raise ValueError('Standalone AI execution requires a native application')
+E           ValueError: Standalone AI execution requires a native application
+
+app/native_ai_routing.py:20: ValueError</failure></testcase><testcase classname="tests.test_r207_gateway_adapter_coverage" name="test_gateway_upstream_validation[http://127.0.0.1:8001-True]" time="0.001" /><testcase classname="tests.test_r207_gateway_adapter_coverage" name="test_gateway_upstream_validation[http://localhost:8001/-True]" time="0.001" /><testcase classname="tests.test_r207_gateway_adapter_coverage" name="test_gateway_upstream_validation[http://192.168.1.2:8001-True]" time="0.001" /><testcase classname="tests.test_r207_gateway_adapter_coverage" name="test_gateway_upstream_validation[https://example.org-True]" time="0.000" /><testcase classname="tests.test_r207_gateway_adapter_coverage" name="test_gateway_upstream_validation[http://8.8.8.8:8001-False]" time="0.000" /><testcase classname="tests.test_r207_gateway_adapter_coverage" name="test_gateway_upstream_validation[http://example.org-False]" time="0.000" /><testcase classname="tests.test_r207_gateway_adapter_coverage" name="test_gateway_upstream_validation[file:///tmp/a-False]" time="0.001" /><testcase classname="tests.test_r207_gateway_adapter_coverage" name="test_gateway_upstream_validation[http://user:password@127.0.0.1-False]" time="0.000" /><testcase classname="tests.test_r207_gateway_adapter_coverage" name="test_gateway_upstream_validation[https://example.org/api/admin-False]" time="0.000" /><testcase classname="tests.test_r207_gateway_adapter_coverage" name="test_gateway_upstream_validation[nonsense-False]" time="0.000" /><testcase classname="tests.test_r207_gateway_adapter_coverage" name="test_gateway_authorization_methods_size_and_audit" time="0.012" /><testcase classname="tests.test_r207_gateway_adapter_coverage" name="test_gateway_proxy_success_limits_and_errors" time="0.009"><failure message="assert (409 == 200)&#10; +  where 409 = &lt;Response [409 Conflict]&gt;.status_code">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fc2c3723f20&gt;
+
+    def test_gateway_proxy_success_limits_and_errors(monkeypatch):
+        web = FastAPI()
+        web.include_router(ai_gateway.router)
+        monkeypatch.setattr(ai_gateway.ai_access, 'authenticate', lambda _: {'id': 2, 'user_id': 3})
+        calls = []
+        monkeypatch.setattr(ai_gateway.ai_access, 'usage', lambda *args: calls.append(args))
+        monkeypatch.setenv('MTA_ACE_STEP_URL', 'https://worker.example.org')
+        monkeypatch.setenv('MTA_ACE_STEP_TOKEN', 'private-internal-token')
+        captured = []
+        mode = {'value': 'ok'}
+    
+        class FakeAsyncClient:
+            def __init__(self, **kwargs):
+                assert kwargs['trust_env'] is False and kwargs['follow_redirects'] is False
+            async def __aenter__(self):
+                return self
+            async def __aexit__(self, *_):
+                return False
+            async def request(self, method, url, **kwargs):
+                captured.append((method, url, kwargs))
+                if mode['value'] == 'runtime':
+                    raise RuntimeError('upstream gone')
+                if mode['value'] == 'timeout':
+                    raise httpx.ConnectTimeout('no response')
+                return httpx.Response(200, content=b'answer', headers={'content-type': 'audio/wav'})
+    
+        monkeypatch.setattr(httpx, 'AsyncClient', FakeAsyncClient)
+        client = TestClient(web)
+        headers = {'Authorization': 'Bearer valid', 'Content-Type': 'application/json'}
+        ok = client.post('/api/ai-gateway/v1/generate?seed=3', headers=headers, content=b'{}')
+&gt;       assert ok.status_code == 200 and ok.content == b'answer'
+E       assert (409 == 200)
+E        +  where 409 = &lt;Response [409 Conflict]&gt;.status_code
+
+tests/test_r207_gateway_adapter_coverage.py:77: AssertionError</failure></testcase><testcase classname="tests.test_r207_gateway_adapter_coverage" name="test_unified_manifest_validation" time="0.007" /><testcase classname="tests.test_r207_gateway_adapter_coverage" name="test_unified_transcripts_and_chords" time="0.035" /><testcase classname="tests.test_r207_gateway_adapter_coverage" name="test_unified_drumsep_and_missing_model" time="0.029" /><testcase classname="tests.test_r207_gateway_adapter_coverage" name="test_unified_subprocess_models" time="0.019" /><testcase classname="tests.test_r207_gateway_adapter_coverage" name="test_singer_separation_invalid_options[bad0]" time="0.001" /><testcase classname="tests.test_r207_gateway_adapter_coverage" name="test_singer_separation_invalid_options[bad1]" time="0.001" /><testcase classname="tests.test_r207_gateway_adapter_coverage" name="test_singer_separation_invalid_options[bad2]" time="0.001" /><testcase classname="tests.test_r207_gateway_adapter_coverage" name="test_singer_separation_invalid_options[bad3]" time="0.001" /><testcase classname="tests.test_r207_gateway_adapter_coverage" name="test_singer_separation_invalid_options[bad4]" time="0.001" /><testcase classname="tests.test_r207_gateway_adapter_coverage" name="test_singer_separation_invalid_options[bad5]" time="0.001" /><testcase classname="tests.test_r207_gateway_adapter_coverage" name="test_singer_separation_selected_and_all" time="0.004" /><testcase classname="tests.test_r207_gateway_adapter_coverage" name="test_backing_vocals_artifact_security" time="0.009" /><testcase classname="tests.test_r207_gateway_adapter_coverage" name="test_unified_cli_main" time="0.003" /><testcase classname="tests.test_r207_gateway_adapter_coverage" name="test_unified_cli_requires_original_admission[missing]" time="0.001" /><testcase classname="tests.test_r207_gateway_adapter_coverage" name="test_unified_cli_requires_original_admission[wrong-kind]" time="0.001" /><testcase classname="tests.test_r207_native_remote_routes" name="test_independent_native_worker_modes_and_private_tokens" time="0.004" /><testcase classname="tests.test_r207_native_remote_routes" name="test_remote_requires_https_and_token" time="0.001" /><testcase classname="tests.test_r207_native_remote_routes" name="test_remote_inference_wav_and_json_zip" time="0.001"><failure message="ValueError: Standalone AI execution requires a native application">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_remote_inference_wav_and_0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fc2c3721cd0&gt;
+
+    def test_remote_inference_wav_and_json_zip(tmp_path,monkeypatch):
+        monkeypatch.setenv('MTA_NATIVE_AI_CONFIG',str(tmp_path/'remote.json'))
+        route.configure('whisper','remote','https://mta.example.org','secret')
+        source=tmp_path/'source.wav';source.write_bytes(b'RIFF' + b'\0'*4+b'WAVE'+b'\0'*12)
+        from app import ai_remote_client
+        def mock_transport(url,token,kind,wav,options,**kwargs):
+            assert token=='secret' and kind=='whisper' and wav.startswith(b'RIFF')
+            z=io.BytesIO()
+            with zipfile.ZipFile(z,'w') as archive:
+                archive.writestr('transcript.json',json.dumps({'lines':[{'time_ms':0,'text':'hello'}]}))
+            return z.getvalue(),'application/zip','job-123'
+        monkeypatch.setattr(ai_remote_client,'infer_audio',mock_transport)
+&gt;       result,job_id=route.infer('whisper',source,{'model':'turbo'})
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_r207_native_remote_routes.py:43: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/native_ai_routing.py:100: in infer
+    require_native()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def require_native():
+        if os.getenv('MTA_NATIVE_SINGLE_USER', '').lower() != 'true':
+&gt;           raise ValueError('Standalone AI execution requires a native application')
+E           ValueError: Standalone AI execution requires a native application
+
+app/native_ai_routing.py:20: ValueError</failure></testcase><testcase classname="tests.test_r207_native_remote_routes" name="test_remote_rejects_unsafe_zip_and_does_not_fallback" time="0.001"><failure message="AssertionError: Regex pattern did not match.&#10;  Expected regex: 'Unsafe'&#10;  Actual message: 'Standalone AI execution requires a native application'">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_remote_rejects_unsafe_zip0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fc2c3747650&gt;
+
+    def test_remote_rejects_unsafe_zip_and_does_not_fallback(tmp_path,monkeypatch):
+        monkeypatch.setenv('MTA_NATIVE_AI_CONFIG',str(tmp_path/'remote.json'))
+        route.configure('demucs','remote','https://mta.example.org','secret')
+        source=tmp_path/'source.wav';source.write_bytes(b'RIFF'+b'\0'*4+b'WAVE')
+        from app import ai_remote_client
+        archive=io.BytesIO()
+        with zipfile.ZipFile(archive,'w') as z:z.writestr('../escape.wav',b'RIFFaaaaWAVE')
+        monkeypatch.setattr(ai_remote_client,'infer_audio',lambda *a,**kw:(archive.getvalue(),'application/zip','job-1'))
+&gt;       with pytest.raises(ValueError,match='Unsafe'):route.infer('demucs',source)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'Unsafe'
+E         Actual message: 'Standalone AI execution requires a native application'
+
+tests/test_r207_native_remote_routes.py:55: AssertionError</failure></testcase><testcase classname="tests.test_r207_native_remote_routes" name="test_each_remote_kind_never_uses_local_fallback[whisper]" time="0.001"><failure message="ValueError: Standalone AI execution requires a native application">kind = 'whisper'
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_each_remote_kind_never_us0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fc2c37445f0&gt;
+
+    @pytest.mark.parametrize('kind', ['whisper','chords-ml','demucs','drumsep','sam-audio','singer-separation','backing-vocals'])
+    def test_each_remote_kind_never_uses_local_fallback(kind,tmp_path,monkeypatch):
+        monkeypatch.setenv('MTA_NATIVE_AI_CONFIG',str(tmp_path/'remote.json'))
+        from app import ai_remote_client
+        route.configure(kind,'remote','https://mta.example.org','private-token')
+        source=tmp_path/'audio.wav';source.write_bytes(b'RIFF'+b'\0'*4+b'WAVE')
+        monkeypatch.setattr(ai_remote_client,'infer_audio',lambda *a,**kw: (_ for _ in ()).throw(ai_remote_client.RemoteAIError('remote-offline')))
+        with pytest.raises(ai_remote_client.RemoteAIError,match='remote-offline'):
+            # Use the licensed DSP route for this transport-only drumsep case.
+&gt;           route.infer(kind,source,{'model':'dsp'} if kind=='drumsep' else None)
+
+tests/test_r207_native_remote_routes.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/native_ai_routing.py:100: in infer
+    require_native()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def require_native():
+        if os.getenv('MTA_NATIVE_SINGLE_USER', '').lower() != 'true':
+&gt;           raise ValueError('Standalone AI execution requires a native application')
+E           ValueError: Standalone AI execution requires a native application
+
+app/native_ai_routing.py:20: ValueError</failure></testcase><testcase classname="tests.test_r207_native_remote_routes" name="test_each_remote_kind_never_uses_local_fallback[chords-ml]" time="0.001"><failure message="ValueError: Standalone AI execution requires a native application">kind = 'chords-ml'
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_each_remote_kind_never_us1')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fc2c3722750&gt;
+
+    @pytest.mark.parametrize('kind', ['whisper','chords-ml','demucs','drumsep','sam-audio','singer-separation','backing-vocals'])
+    def test_each_remote_kind_never_uses_local_fallback(kind,tmp_path,monkeypatch):
+        monkeypatch.setenv('MTA_NATIVE_AI_CONFIG',str(tmp_path/'remote.json'))
+        from app import ai_remote_client
+        route.configure(kind,'remote','https://mta.example.org','private-token')
+        source=tmp_path/'audio.wav';source.write_bytes(b'RIFF'+b'\0'*4+b'WAVE')
+        monkeypatch.setattr(ai_remote_client,'infer_audio',lambda *a,**kw: (_ for _ in ()).throw(ai_remote_client.RemoteAIError('remote-offline')))
+        with pytest.raises(ai_remote_client.RemoteAIError,match='remote-offline'):
+            # Use the licensed DSP route for this transport-only drumsep case.
+&gt;           route.infer(kind,source,{'model':'dsp'} if kind=='drumsep' else None)
+
+tests/test_r207_native_remote_routes.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/native_ai_routing.py:100: in infer
+    require_native()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def require_native():
+        if os.getenv('MTA_NATIVE_SINGLE_USER', '').lower() != 'true':
+&gt;           raise ValueError('Standalone AI execution requires a native application')
+E           ValueError: Standalone AI execution requires a native application
+
+app/native_ai_routing.py:20: ValueError</failure></testcase><testcase classname="tests.test_r207_native_remote_routes" name="test_each_remote_kind_never_uses_local_fallback[demucs]" time="0.001"><failure message="ValueError: Standalone AI execution requires a native application">kind = 'demucs'
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_each_remote_kind_never_us2')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fc2c374cd10&gt;
+
+    @pytest.mark.parametrize('kind', ['whisper','chords-ml','demucs','drumsep','sam-audio','singer-separation','backing-vocals'])
+    def test_each_remote_kind_never_uses_local_fallback(kind,tmp_path,monkeypatch):
+        monkeypatch.setenv('MTA_NATIVE_AI_CONFIG',str(tmp_path/'remote.json'))
+        from app import ai_remote_client
+        route.configure(kind,'remote','https://mta.example.org','private-token')
+        source=tmp_path/'audio.wav';source.write_bytes(b'RIFF'+b'\0'*4+b'WAVE')
+        monkeypatch.setattr(ai_remote_client,'infer_audio',lambda *a,**kw: (_ for _ in ()).throw(ai_remote_client.RemoteAIError('remote-offline')))
+        with pytest.raises(ai_remote_client.RemoteAIError,match='remote-offline'):
+            # Use the licensed DSP route for this transport-only drumsep case.
+&gt;           route.infer(kind,source,{'model':'dsp'} if kind=='drumsep' else None)
+
+tests/test_r207_native_remote_routes.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/native_ai_routing.py:100: in infer
+    require_native()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def require_native():
+        if os.getenv('MTA_NATIVE_SINGLE_USER', '').lower() != 'true':
+&gt;           raise ValueError('Standalone AI execution requires a native application')
+E           ValueError: Standalone AI execution requires a native application
+
+app/native_ai_routing.py:20: ValueError</failure></testcase><testcase classname="tests.test_r207_native_remote_routes" name="test_each_remote_kind_never_uses_local_fallback[drumsep]" time="0.001"><failure message="ValueError: Standalone AI execution requires a native application">kind = 'drumsep'
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_each_remote_kind_never_us3')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fc2c374fb30&gt;
+
+    @pytest.mark.parametrize('kind', ['whisper','chords-ml','demucs','drumsep','sam-audio','singer-separation','backing-vocals'])
+    def test_each_remote_kind_never_uses_local_fallback(kind,tmp_path,monkeypatch):
+        monkeypatch.setenv('MTA_NATIVE_AI_CONFIG',str(tmp_path/'remote.json'))
+        from app import ai_remote_client
+        route.configure(kind,'remote','https://mta.example.org','private-token')
+        source=tmp_path/'audio.wav';source.write_bytes(b'RIFF'+b'\0'*4+b'WAVE')
+        monkeypatch.setattr(ai_remote_client,'infer_audio',lambda *a,**kw: (_ for _ in ()).throw(ai_remote_client.RemoteAIError('remote-offline')))
+        with pytest.raises(ai_remote_client.RemoteAIError,match='remote-offline'):
+            # Use the licensed DSP route for this transport-only drumsep case.
+&gt;           route.infer(kind,source,{'model':'dsp'} if kind=='drumsep' else None)
+
+tests/test_r207_native_remote_routes.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/native_ai_routing.py:100: in infer
+    require_native()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def require_native():
+        if os.getenv('MTA_NATIVE_SINGLE_USER', '').lower() != 'true':
+&gt;           raise ValueError('Standalone AI execution requires a native application')
+E           ValueError: Standalone AI execution requires a native application
+
+app/native_ai_routing.py:20: ValueError</failure></testcase><testcase classname="tests.test_r207_native_remote_routes" name="test_each_remote_kind_never_uses_local_fallback[sam-audio]" time="0.002"><failure message="ValueError: Standalone AI execution requires a native application">kind = 'sam-audio'
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_each_remote_kind_never_us4')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fc2c374e8d0&gt;
+
+    @pytest.mark.parametrize('kind', ['whisper','chords-ml','demucs','drumsep','sam-audio','singer-separation','backing-vocals'])
+    def test_each_remote_kind_never_uses_local_fallback(kind,tmp_path,monkeypatch):
+        monkeypatch.setenv('MTA_NATIVE_AI_CONFIG',str(tmp_path/'remote.json'))
+        from app import ai_remote_client
+        route.configure(kind,'remote','https://mta.example.org','private-token')
+        source=tmp_path/'audio.wav';source.write_bytes(b'RIFF'+b'\0'*4+b'WAVE')
+        monkeypatch.setattr(ai_remote_client,'infer_audio',lambda *a,**kw: (_ for _ in ()).throw(ai_remote_client.RemoteAIError('remote-offline')))
+        with pytest.raises(ai_remote_client.RemoteAIError,match='remote-offline'):
+            # Use the licensed DSP route for this transport-only drumsep case.
+&gt;           route.infer(kind,source,{'model':'dsp'} if kind=='drumsep' else None)
+
+tests/test_r207_native_remote_routes.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/native_ai_routing.py:100: in infer
+    require_native()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def require_native():
+        if os.getenv('MTA_NATIVE_SINGLE_USER', '').lower() != 'true':
+&gt;           raise ValueError('Standalone AI execution requires a native application')
+E           ValueError: Standalone AI execution requires a native application
+
+app/native_ai_routing.py:20: ValueError</failure></testcase><testcase classname="tests.test_r207_native_remote_routes" name="test_each_remote_kind_never_uses_local_fallback[singer-separation]" time="0.002"><failure message="ValueError: Standalone AI execution requires a native application">kind = 'singer-separation'
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_each_remote_kind_never_us5')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fc2c374c7d0&gt;
+
+    @pytest.mark.parametrize('kind', ['whisper','chords-ml','demucs','drumsep','sam-audio','singer-separation','backing-vocals'])
+    def test_each_remote_kind_never_uses_local_fallback(kind,tmp_path,monkeypatch):
+        monkeypatch.setenv('MTA_NATIVE_AI_CONFIG',str(tmp_path/'remote.json'))
+        from app import ai_remote_client
+        route.configure(kind,'remote','https://mta.example.org','private-token')
+        source=tmp_path/'audio.wav';source.write_bytes(b'RIFF'+b'\0'*4+b'WAVE')
+        monkeypatch.setattr(ai_remote_client,'infer_audio',lambda *a,**kw: (_ for _ in ()).throw(ai_remote_client.RemoteAIError('remote-offline')))
+        with pytest.raises(ai_remote_client.RemoteAIError,match='remote-offline'):
+            # Use the licensed DSP route for this transport-only drumsep case.
+&gt;           route.infer(kind,source,{'model':'dsp'} if kind=='drumsep' else None)
+
+tests/test_r207_native_remote_routes.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/native_ai_routing.py:100: in infer
+    require_native()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def require_native():
+        if os.getenv('MTA_NATIVE_SINGLE_USER', '').lower() != 'true':
+&gt;           raise ValueError('Standalone AI execution requires a native application')
+E           ValueError: Standalone AI execution requires a native application
+
+app/native_ai_routing.py:20: ValueError</failure></testcase><testcase classname="tests.test_r207_native_remote_routes" name="test_each_remote_kind_never_uses_local_fallback[backing-vocals]" time="0.001"><failure message="ValueError: Standalone AI execution requires a native application">kind = 'backing-vocals'
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_each_remote_kind_never_us6')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fc2c374cdd0&gt;
+
+    @pytest.mark.parametrize('kind', ['whisper','chords-ml','demucs','drumsep','sam-audio','singer-separation','backing-vocals'])
+    def test_each_remote_kind_never_uses_local_fallback(kind,tmp_path,monkeypatch):
+        monkeypatch.setenv('MTA_NATIVE_AI_CONFIG',str(tmp_path/'remote.json'))
+        from app import ai_remote_client
+        route.configure(kind,'remote','https://mta.example.org','private-token')
+        source=tmp_path/'audio.wav';source.write_bytes(b'RIFF'+b'\0'*4+b'WAVE')
+        monkeypatch.setattr(ai_remote_client,'infer_audio',lambda *a,**kw: (_ for _ in ()).throw(ai_remote_client.RemoteAIError('remote-offline')))
+        with pytest.raises(ai_remote_client.RemoteAIError,match='remote-offline'):
+            # Use the licensed DSP route for this transport-only drumsep case.
+&gt;           route.infer(kind,source,{'model':'dsp'} if kind=='drumsep' else None)
+
+tests/test_r207_native_remote_routes.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/native_ai_routing.py:100: in infer
+    require_native()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def require_native():
+        if os.getenv('MTA_NATIVE_SINGLE_USER', '').lower() != 'true':
+&gt;           raise ValueError('Standalone AI execution requires a native application')
+E           ValueError: Standalone AI execution requires a native application
+
+app/native_ai_routing.py:20: ValueError</failure></testcase><testcase classname="tests.test_r208_native_pending_recovery" name="test_pending_keeps_id_and_never_reposts" time="0.001"><failure message="ValueError: Standalone AI execution requires a native application">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_pending_keeps_id_and_neve0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fc2c374c200&gt;
+
+    def test_pending_keeps_id_and_never_reposts(tmp_path, monkeypatch):
+        wav = setup(tmp_path, monkeypatch)
+        calls = []
+        def lost(*args, **kwargs):
+            calls.append(('post', kwargs['request_id']))
+            raise ai_remote_client.RemoteAIError('connection lost')
+        monkeypatch.setattr(ai_remote_client, 'infer_audio', lost)
+        with pytest.raises(ai_remote_client.RemoteAIError, match='connection lost'):
+&gt;           routing.infer('whisper', wav)
+
+tests/test_r208_native_pending_recovery.py:25: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/native_ai_routing.py:100: in infer
+    require_native()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def require_native():
+        if os.getenv('MTA_NATIVE_SINGLE_USER', '').lower() != 'true':
+&gt;           raise ValueError('Standalone AI execution requires a native application')
+E           ValueError: Standalone AI execution requires a native application
+
+app/native_ai_routing.py:20: ValueError</failure></testcase><testcase classname="tests.test_r208_native_pending_recovery" name="test_pending_remains_after_failed_recovery" time="0.001"><failure message="ValueError: Standalone AI execution requires a native application">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_pending_remains_after_fai0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fc2c3723710&gt;
+
+    def test_pending_remains_after_failed_recovery(tmp_path, monkeypatch):
+        wav = setup(tmp_path, monkeypatch)
+        def failed(*args, **kwargs):
+            raise ai_remote_client.RemoteAIError('unavailable')
+        monkeypatch.setattr(ai_remote_client, 'infer_audio', failed)
+&gt;       with pytest.raises(ai_remote_client.RemoteAIError): routing.infer('whisper', wav)
+                                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_r208_native_pending_recovery.py:41: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/native_ai_routing.py:100: in infer
+    require_native()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def require_native():
+        if os.getenv('MTA_NATIVE_SINGLE_USER', '').lower() != 'true':
+&gt;           raise ValueError('Standalone AI execution requires a native application')
+E           ValueError: Standalone AI execution requires a native application
+
+app/native_ai_routing.py:20: ValueError</failure></testcase><testcase classname="tests.test_r208_native_pending_recovery" name="test_corrupt_pending_fails_closed" time="0.003"><failure message="ValueError: Standalone AI execution requires a native application">tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_corrupt_pending_fails_clo0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fc2c3793dd0&gt;
+
+    def test_corrupt_pending_fails_closed(tmp_path, monkeypatch):
+        wav = setup(tmp_path, monkeypatch)
+        request_id, _, fingerprint = journal.begin('https://example.org', 'private', 'whisper', wav.read_bytes(), None)
+        journal._entry(fingerprint).write_text('INVALID')
+        with pytest.raises(RuntimeError, match='damaged'):
+&gt;           routing.infer('whisper', wav)
+
+tests/test_r208_native_pending_recovery.py:52: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/native_ai_routing.py:100: in infer
+    require_native()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def require_native():
+        if os.getenv('MTA_NATIVE_SINGLE_USER', '').lower() != 'true':
+&gt;           raise ValueError('Standalone AI execution requires a native application')
+E           ValueError: Standalone AI execution requires a native application
+
+app/native_ai_routing.py:20: ValueError</failure></testcase><testcase classname="tests.test_r208_native_pending_recovery" name="test_separate_inputs_have_distinct_identities" time="0.004" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_raw_client_commercial_denies_before_source_validation_or_network[whisper]" time="0.001" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_raw_client_commercial_denies_before_source_validation_or_network[demucs]" time="0.001" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_raw_client_commercial_denies_before_source_validation_or_network[audio-to-midi-basic-pitch]" time="0.001" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_raw_client_commercial_denies_before_source_validation_or_network[audio-to-midi-yourmt3]" time="0.001" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_raw_client_commercial_denies_before_source_validation_or_network[vocal-harmony]" time="0.001" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_raw_client_commercial_denies_before_source_validation_or_network[arranger]" time="0.001" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_raw_client_commercial_denies_before_source_validation_or_network[remix]" time="0.001" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_disabled_nc_policy_cannot_use_direct_transport[client]" time="0.001" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_disabled_nc_policy_cannot_use_direct_transport[gateway]" time="0.007" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_disabled_nc_policy_cannot_use_direct_transport[ace-request]" time="0.001" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_disabled_nc_policy_cannot_use_direct_transport[ace-run]" time="0.005" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_gateway_mutations_cannot_forward_commercial_work[release_task]" time="0.058" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_gateway_mutations_cannot_forward_commercial_work[v1/init]" time="0.007" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_gateway_mutations_cannot_forward_commercial_work[v1/generate]" time="0.005" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_gateway_mutations_cannot_forward_commercial_work[v1/audio]" time="0.005" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_gateway_mutations_cannot_forward_commercial_work[v1/models]" time="0.005" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_commercial_metadata_and_existing_task_polling_are_not_new_inference[GET-health]" time="0.007" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_commercial_metadata_and_existing_task_polling_are_not_new_inference[GET-v1/models]" time="0.006" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_commercial_metadata_and_existing_task_polling_are_not_new_inference[GET-v1/audio]" time="0.005"><failure message="assert (409 == 200)&#10; +  where 409 = &lt;Response [409 Conflict]&gt;.status_code">commercial = None
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fc2c374f860&gt;
+method = 'GET', path = 'v1/audio'
+
+    @pytest.mark.parametrize('method,path',[('GET','health'),('GET','v1/models'),('GET','v1/audio'),('POST','query_result')])
+    def test_commercial_metadata_and_existing_task_polling_are_not_new_inference(commercial,monkeypatch,method,path):
+        client,sent=gateway_client(monkeypatch)
+        result=client.request(method,'/api/ai-gateway/'+path,headers={'authorization':'Bearer valid'},content=b'{}')
+&gt;       assert result.status_code==200 and len(sent)==1
+E       assert (409 == 200)
+E        +  where 409 = &lt;Response [409 Conflict]&gt;.status_code
+
+tests/test_r210_remote_transport_rights.py:87: AssertionError</failure></testcase><testcase classname="tests.test_r210_remote_transport_rights" name="test_commercial_metadata_and_existing_task_polling_are_not_new_inference[POST-query_result]" time="0.005"><failure message="assert (409 == 200)&#10; +  where 409 = &lt;Response [409 Conflict]&gt;.status_code">commercial = None
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fc2c7cf65d0&gt;
+method = 'POST', path = 'query_result'
+
+    @pytest.mark.parametrize('method,path',[('GET','health'),('GET','v1/models'),('GET','v1/audio'),('POST','query_result')])
+    def test_commercial_metadata_and_existing_task_polling_are_not_new_inference(commercial,monkeypatch,method,path):
+        client,sent=gateway_client(monkeypatch)
+        result=client.request(method,'/api/ai-gateway/'+path,headers={'authorization':'Bearer valid'},content=b'{}')
+&gt;       assert result.status_code==200 and len(sent)==1
+E       assert (409 == 200)
+E        +  where 409 = &lt;Response [409 Conflict]&gt;.status_code
+
+tests/test_r210_remote_transport_rights.py:87: AssertionError</failure></testcase><testcase classname="tests.test_r210_remote_transport_rights" name="test_native_gateway_token_still_cannot_skip_accounted_endpoint" time="0.006" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_standalone_remote_worker_denies_before_missing_audio_or_dns" time="0.446" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_remote_ace_read_and_cancel_skip_inference_gate[/health-None]" time="0.002" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_remote_ace_read_and_cancel_skip_inference_gate[/query_result-{}]" time="0.001" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_remote_ace_read_and_cancel_skip_inference_gate[/mta/tasks/existing/control-{}]" time="0.001" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_client_historical_operations_stay_available_under_commercial_denial[status]" time="0.004" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_client_historical_operations_stay_available_under_commercial_denial[recover]" time="0.002" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_client_historical_operations_stay_available_under_commercial_denial[cancel]" time="0.001" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_client_historical_operations_stay_available_under_commercial_denial[list]" time="0.001" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_client_historical_operations_stay_available_under_commercial_denial[resources]" time="0.001" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_client_historical_operations_stay_available_under_commercial_denial[capabilities]" time="0.001" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_loopback_or_tunnel_does_not_exempt_commercial_inference[http://127.0.0.1:8001]" time="0.001" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_loopback_or_tunnel_does_not_exempt_commercial_inference[http://localhost:8001]" time="0.002" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_loopback_or_tunnel_does_not_exempt_commercial_inference[http://[::1]:8001]" time="0.001" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_gateway_prefix_cannot_be_forged_as_polling_exemption[/api/ai-gatewayevil/query_result]" time="0.001" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_gateway_prefix_cannot_be_forged_as_polling_exemption[/xxxxxxxxxxxxxx/query_result]" time="0.001" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_gateway_prefix_cannot_be_forged_as_polling_exemption[/other/query_result]" time="0.001" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_gateway_prefix_cannot_be_forged_as_polling_exemption[/release_task]" time="0.001" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_configured_gateway_polling_still_works_without_new_inference" time="0.001" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_malformed_model_selection_is_value_error_without_transport[None-options0]" time="0.000" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_malformed_model_selection_is_value_error_without_transport[123-options1]" time="0.001" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_malformed_model_selection_is_value_error_without_transport[kind2-options2]" time="0.000" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_malformed_model_selection_is_value_error_without_transport[whisper-options3]" time="0.000" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_malformed_model_selection_is_value_error_without_transport[vocal-synthesis-options4]" time="0.000" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_malformed_model_selection_is_value_error_without_transport[whisper-invalid]" time="0.000" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_malformed_model_selection_is_value_error_without_transport[vocal-synthesis-options6]" time="0.000" /><testcase classname="tests.test_r210_remote_transport_rights" name="test_malformed_model_selection_is_value_error_without_transport[audio-to-midi-transkun-options7]" time="0.001" /></testsuite></testsuites>

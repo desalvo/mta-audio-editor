@@ -183,6 +183,15 @@ def _create_snapshot(data, uids, pids):
             con.commit(); con.execute('VACUUM')
         # Export only settled outbox entries for included jobs, never pending work.
         files = {'data/auth.sqlite3': stage / 'auth.sqlite3', 'queue/jobs.sqlite3': stage / 'jobs.sqlite3', 'data/.auth-secret': auth.secret_path()}
+        from . import service_admission
+        if service_admission.active():
+            # Preserve original held/uncertain admissions and their instance.
+            # Never export a WAL database by copying only its main file.
+            target=stage/'service-admission.sqlite3'
+            with closing(service_admission._connect()) as src,closing(sqlite3.connect(target)) as dst:
+                src.backup(dst)
+            files['data/service-admission.sqlite3']=target
+            files['data/service-admission.instance']=service_admission.path().with_suffix('.instance')
         outbox = queue._ROOT / 'billing-outbox.sqlite3'
         if outbox.is_file():
             _snapshot(outbox.absolute(), stage / 'billing-outbox.sqlite3')
@@ -297,7 +306,7 @@ def _safe_name(name):
     if not name or '\\' in name or '\x00' in name or p.is_absolute() or any(x in ('', '.', '..') for x in name.split('/')) or ':' in name:
         raise ValueError('Unsafe dump path')
     parts = p.parts
-    valid = (name in ('data/auth.sqlite3', 'data/.auth-secret', 'queue/jobs.sqlite3', 'queue/billing-outbox.sqlite3', 'gpu/key', 'gpu/policy.json', 'reference/operator-environment.json', 'data/.diagnostics/enabled.json', 'data/.model-settings/blacklist.json', 'data/.model-settings/catalog.json')
+    valid = (name in ('data/auth.sqlite3', 'data/.auth-secret', 'data/service-admission.sqlite3', 'data/service-admission.instance', 'queue/jobs.sqlite3', 'queue/billing-outbox.sqlite3', 'gpu/key', 'gpu/policy.json', 'reference/operator-environment.json', 'data/.diagnostics/enabled.json', 'data/.model-settings/blacklist.json', 'data/.model-settings/catalog.json')
              or len(parts) == 3 and parts[:2] == ('data', '.account-retention') and parts[2].split('.')[0].isalnum() and parts[2].endswith(('.zip', '.sandbox'))
              or len(parts) == 3 and parts[:2] == ('data', '.ai-result-cache') and len(parts[2].split('.')[0]) == 64 and all(c in '0123456789abcdef' for c in parts[2].split('.')[0]) and parts[2].endswith(('.json', '.bin'))
              or name == 'queue/publication/outbox.sqlite3'
@@ -320,6 +329,8 @@ def inspect(path, *, stage=None):
                 or not isinstance(manifest.get('project_ids'), list) or any(not isinstance(p, str) or not storage.PID_RE.fullmatch(p) for p in manifest['project_ids'])):
             raise ValueError('Invalid selection manifest')
         records = manifest['entries']
+        if ('data/service-admission.sqlite3' in records) != ('data/service-admission.instance' in records):
+            raise ValueError('Original service admission journal/instance pair required')
         if set(records) != {e.filename for e in entries} - {'manifest.json'} or not {'data/auth.sqlite3', 'data/.auth-secret', 'queue/jobs.sqlite3'} <= set(records): raise ValueError('Incomplete dump')
         total = 0
         for entry in entries:
@@ -381,6 +392,17 @@ def restore(path, *, data_dir, queue_dir, gpu_dir, service_stopped=False):
             source = Path(folder)
             for relative in ('data/auth.sqlite3','queue/jobs.sqlite3','queue/billing-outbox.sqlite3','queue/publication/outbox.sqlite3'):
                 if (source / relative).exists(): _validate_database(source / relative)
+            admission=source/'data/service-admission.sqlite3'
+            if admission.exists():
+                instance=(source/'data/service-admission.instance').read_text()
+                with closing(sqlite3.connect(admission)) as con:
+                    from .service_admission import validate_journal
+                    validate_journal(con)
+                    if con.execute('PRAGMA integrity_check').fetchone()[0]!='ok':
+                        raise ValueError('Invalid original admission database')
+                    state=con.execute('SELECT instance,phase FROM state WHERE singleton=1').fetchone()
+                    if not re.fullmatch('[a-f0-9]{64}',instance) or state is None or state[0]!=instance or state[1] not in {'open','draining'}:
+                        raise ValueError('Original service admission instance/state unavailable')
             database = source / 'data/auth.sqlite3'
             with closing(sqlite3.connect(database)) as con:
                 if con.execute('PRAGMA integrity_check').fetchone()[0] != 'ok' or con.execute('PRAGMA foreign_key_check').fetchone(): raise ValueError('Invalid authentication database')

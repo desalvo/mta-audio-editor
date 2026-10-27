@@ -18,6 +18,7 @@ def _worker(tmp_path, monkeypatch, body):
 
 
 def test_legacy_worker_precancel_skips_execution(tmp_path, monkeypatch):
+    monkeypatch.setenv('MTA_NATIVE_SINGLE_USER', 'true')
     marker = tmp_path / 'started'
     _worker(tmp_path, monkeypatch, f'from pathlib import Path\nPath({str(marker)!r}).write_text("started")\n')
     event = threading.Event()
@@ -28,6 +29,7 @@ def test_legacy_worker_precancel_skips_execution(tmp_path, monkeypatch):
 
 
 def test_legacy_worker_cancel_running(tmp_path, monkeypatch):
+    monkeypatch.setenv('MTA_NATIVE_SINGLE_USER', 'true')
     marker = tmp_path / 'started'
     _worker(tmp_path, monkeypatch, f'from pathlib import Path\nimport time\nPath({str(marker)!r}).write_text("started")\ntime.sleep(15)\n')
     event = threading.Event()
@@ -50,12 +52,14 @@ def test_legacy_worker_cancel_running(tmp_path, monkeypatch):
 
 
 def test_legacy_worker_timeout(tmp_path, monkeypatch):
+    monkeypatch.setenv('MTA_NATIVE_SINGLE_USER', 'true')
     _worker(tmp_path, monkeypatch, 'import time\ntime.sleep(15)\n')
     with pytest.raises(WorkerUnavailable, match='timed out'):
         run_external_worker({'prompt': 'hello'}, timeout_seconds=1)
 
 
 def test_legacy_worker_failed_exit(tmp_path, monkeypatch):
+    monkeypatch.setenv('MTA_NATIVE_SINGLE_USER', 'true')
     _worker(tmp_path, monkeypatch, 'raise SystemExit(7)\n')
     with pytest.raises(WorkerUnavailable, match='unsuccessfully'):
         run_external_worker({'prompt': 'hello'}, timeout_seconds=2)

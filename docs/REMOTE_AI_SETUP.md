@@ -1,4 +1,4 @@
-# Remote AI processing — server and client setup (r207)
+# Remote AI processing — server and client setup (r210)
 
 ## Current supported path: remote ACE-Step from an MTA server
 
@@ -30,19 +30,14 @@ The worker explicitly rejects remote HTTP, arbitrary/nonallowlisted hosts, redir
 
 A local SSH tunnel also works without HTTPS by pointing the worker to `http://127.0.0.1:8001` with a forwarded port.
 
-### Client devices and native applications — current limitation
+### Native applications and API clients — current accounted transport
 
-Browser clients can access a remote authenticated **MTA web server**, so the server performs ACE-Step inference without installing models on the browsing device. Existing native Windows/macOS/Linux packages, however, start a **local** MTA service and are **not yet wired** to switch all AI tasks to a remote MTA server through an in-app setting. This release does not implement a general-purpose remote inference mode for Demucs, Whisper, chord analysis or every other AI feature. Such a mode requires authenticated project/audio transfer and asynchronous job/result handling in the native client; a server URL alone does not make those operations remote.
+Connect the native installation through **Native AI processing → MTA server for all remote AI engines → Connect account**,using the MTA HTTPS origin (for example `https://mta.example.org`). Approve the instance with its original account. For Arranger/ACE select the MTA-account connection. Remote unavailability does not select local inference as fallback. Current model/regime rights remain enforced;commercial remote inference is still blocked without the required complete attestation.
 
-Do not expose API access tokens to browser JavaScript or ship shared credentials with native binaries. Use user/session authentication to the MTA server and ensure access control on each project and job.
+External API clients use a personal bearer token with `POST /api/ai-jobs/execute-audio/ace-step` for WAV or `/api/ai-jobs/execute` for a self-contained JSON plan. Persist an original `X-MTA-AI-Idempotency-Key` before submission. Recover lost responses through original-owner request status/result/history;do not submit another inference. Never send host file paths or executable commands.
 
-## Recommended unified public endpoint (MTA AI gateway)
+### Legacy gateway migration
 
-For per-user authorization and accounting, **do not expose ACE-Step's raw API**.
-Use `https://mta.example.org:443` for the MTA UI, and **`https://mta.example.org:443/api/ai-gateway`** as the **ACE-Step endpoint** in native clients. Copy an individual `mta_ai_...` bearer token issued from MTA administration; never use the private ACE-Step service key on a client. The application forwards `POST /release_task` to `POST /api/ai-gateway/release_task`, and so on. The HTTPS proxy forwards ALL `/api/ai-gateway/*` requests to **MTA**, not directly to ACE-Step.
+`/api/ai-gateway` now permits only authenticated GET health/model metadata. Raw generation/init and unbound upstream task polling/audio retrieval are refused before upstream transport. HTTP wall time/traffic are not resource measurements. Existing accounted requests/results remain accessible under `/api/ai-jobs`;a historical raw task without account/ledger proof cannot be automatically adopted or rebilled. Preserve its files/journals for isolated operator reconciliation.
 
-On the backend, `MTA_ACE_STEP_URL=http://127.0.0.1:8001` (same VM/LXC) and `MTA_AI_WORKER_ENABLED=true`. Bind ACE-Step to loopback; the MTA web server may bind to the VM/LXC's private IP for reverse proxy access. External clients only access MTA's HTTPS origin.
-
-Usage currently records authenticated request count, wall duration and bytes per user. `cpu_seconds`, `gpu_seconds` and `gpu_energy_joules` are nullable, **not measured yet**, therefore not suitable for billing. A task-aware GPU/CPU measurement collector will be required for chargeable usage.
-
-See `REMOTE_AI_REVERSE_PROXY.md` for complete Kubernetes and Docker examples.
+Forward `/api/ai-jobs/*` unchanged through HTTPS to **MTA**,preserving Authorization and request headers. Keep raw ACE-Step private. The old `/api/ai-gateway` URL is not an inference/download endpoint for native clients. See `LEGACY_EXECUTION_BOUNDARIES_R210.md` for IT/EN migration,exact regression evidence and acceptance limits,and `REMOTE_AI_REVERSE_PROXY.md` for proxy examples. This documentation is not confirmation of a deployment or certification of every optional runtime.

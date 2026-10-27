@@ -17,7 +17,8 @@ import sys
 import time
 import uuid
 from pathlib import Path
-from threading import Event, Thread, Lock
+from threading import Event, Lock
+from .service_admission import worker_thread as Thread
 
 from .ai_metering_agent import Measurement
 

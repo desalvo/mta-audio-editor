@@ -6,6 +6,7 @@ from app.ai_worker_protocol import configured_worker, run_external_worker, verif
 ROOT = Path(__file__).resolve().parents[1]
 
 def test_worker_requires_admin_opt_in(monkeypatch):
+    monkeypatch.setenv('MTA_NATIVE_SINGLE_USER', 'true')
     monkeypatch.delenv('MTA_AI_WORKER_ENABLED', raising=False)
     monkeypatch.setenv('MTA_AI_WORKER_EXECUTABLE', '/bin/true')
     assert configured_worker() is None
@@ -13,6 +14,7 @@ def test_worker_requires_admin_opt_in(monkeypatch):
         run_external_worker({'prompt': 'x'})
 
 def test_worker_file_contract_and_validation(tmp_path, monkeypatch):
+    monkeypatch.setenv('MTA_NATIVE_SINGLE_USER', 'true')
     script = tmp_path / 'worker.py'
     script.write_text("#!/usr/bin/env python3\nimport argparse, json, wave\np=argparse.ArgumentParser(); p.add_argument('--request'); p.add_argument('--output'); a=p.parse_args()\nassert json.load(open(a.request))['model_id']=='test-model'\nwith wave.open(a.output,'wb') as w:\n w.setnchannels(1);w.setsampwidth(2);w.setframerate(44100);w.writeframes(b'\\0\\0'*441)\n")
     script.chmod(0o700)

@@ -282,6 +282,26 @@ def public_service_regime():
     return {'regime':current_regime().value}
 
 
+@router.get('/api/admin/service-regime/cutovers/lifecycle')
+def cutover_lifecycle(request:Request,offset:int=0,limit:int=25):
+    actor=auth.require_admin(request)
+    from .regime_transition_status import overview
+    from fastapi.responses import JSONResponse
+    try:
+        return JSONResponse(call(lambda:overview(actor=actor['id'],offset=offset,limit=limit)),
+                            headers={'Cache-Control':'no-store','Pragma':'no-cache'})
+    except sqlite3.DatabaseError:
+        raise HTTPException(409,'Transition lifecycle unavailable') from None
+
+
+@router.post('/api/admin/service-regime/cutovers/reservations/{identifier}/abort')
+def cutover_abort_reservation(identifier:str,request:Request,body:dict):
+    actor=auth.require_admin(request)
+    if set(body)!={'expected_revision','confirm'}:raise HTTPException(422,'Exact reservation confirmation required')
+    from .regime_transition_status import abort_reservation
+    return call(lambda:abort_reservation(actor=actor['id'],identifier=identifier,**body))
+
+
 @router.get('/api/admin/service-regime/cutovers/preview')
 def admin_cutover_preview(request: Request, target: str):
     actor = auth.require_admin(request)

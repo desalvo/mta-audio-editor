@@ -5,6 +5,8 @@ again using that receipt. Claim ownership is never transferred automatically.
 All records live in the existing authoritative local ledger; this does not
 claim distributed multi-host coordination.
 """
+
+from .service_admission import worker_thread
 from contextlib import contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass,field
@@ -121,7 +123,7 @@ def execution_scope(inference_id,cancel_event):
                     heartbeat(c,'job:ledger:'+owner.ledger_id,worker_id=owner.worker_id,token=owner.claim_token)
             except Exception as exc:
                 owner.lost.set();errors.append(exc);cancel_event.set();return
-    thread=threading.Thread(target=pulse,daemon=True,name='mta-owner-heartbeat') if owner else None
+    thread=worker_thread(target=pulse,daemon=True,name='mta-owner-heartbeat') if owner else None
     if thread:thread.start()
     try:
         yield owner

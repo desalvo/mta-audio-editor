@@ -314,6 +314,7 @@ def test_project_cancel_http_auth_csrf_and_access(monkeypatch):
 
 @pytest.mark.skipif(sys.platform != 'linux', reason='Production Linux wait4 supervisor')
 def test_real_adapter_termination_delivers_http_cancel(monkeypatch, tmp_path):
+    monkeypatch.setenv('MTA_NATIVE_SINGLE_USER', 'true')
     from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
     import time
     import wave

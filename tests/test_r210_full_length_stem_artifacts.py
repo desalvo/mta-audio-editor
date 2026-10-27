@@ -14,6 +14,7 @@ from test_r210_queue_identity_stem_metering import env as env  # noqa: F401
 
 
 def test_six_stems_over_old_limits_roundtrip_server_cache_and_native(tmp_path, monkeypatch,env):
+    monkeypatch.setenv('MTA_NATIVE_SINGLE_USER', 'true')
     from app import ai_result_cache as cache, ai_remote_client as client
     from app import ai_server_execution as server, native_ai_routing as native
     from app.ai_billing_routes import _verified_worker_response
@@ -133,6 +134,7 @@ def test_worker_size_failure_has_specific_safe_diagnostic():
 
 
 def test_native_upload_reads_beyond_old_32mib_limit(tmp_path, monkeypatch):
+    monkeypatch.setenv('MTA_NATIVE_SINGLE_USER', 'true')
     from app import native_ai_routing as native, ai_remote_client as client
     path = tmp_path / 'source.wav'
     with path.open('wb') as stream:

@@ -49,11 +49,10 @@ def prove(client, key, intent, amount, initial, charges):
     if not charges:
         if initial['latest_charge'] is not None:
             raise ProviderProbeError('Latest charge missing from provider history')
-        return None  # Retain the existing empty-history receipt format.
     live = key.startswith('sk_live_')
     if initial.get('livemode') is not live:
         raise ProviderProbeError('Canceled intent environment mismatch')
-    if initial['latest_charge'] not in {item.get('id') for item in charges}:
+    if charges and initial['latest_charge'] not in {item.get('id') for item in charges}:
         raise ProviderProbeError('Latest charge missing from provider history')
     headers = {'Authorization': 'Bearer ' + key}
     verified = []
@@ -71,4 +70,6 @@ def prove(client, key, intent, amount, initial, charges):
     fields = ('id', 'amount', 'currency', 'status', 'amount_received', 'amount_capturable', 'latest_charge', 'livemode')
     if any(field not in document or type(document[field]) is not type(initial[field]) or document[field] != initial[field] for field in fields):
         raise ProviderProbeError('Canceled intent changed during failed-charge proof')
-    return {'schema': 'stripe-failed-charges-1', 'charges': normalized}
+    # Empty history needs the same collection/intent reread. Retain the old
+    # receipt shape only after verifying that the empty collection stayed empty.
+    return {'schema': 'stripe-failed-charges-1', 'charges': normalized} if normalized else None

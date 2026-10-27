@@ -14,6 +14,7 @@ def _project():
 
 
 def test_pre_cancelled_worker_never_resolves_or_renders(monkeypatch, tmp_path):
+    monkeypatch.setenv('MTA_NATIVE_SINGLE_USER', 'true')
     executable = tmp_path / 'worker.py'
     executable.write_text('pass')
     monkeypatch.setattr(worker, 'configured_worker', lambda: executable)
@@ -26,6 +27,7 @@ def test_pre_cancelled_worker_never_resolves_or_renders(monkeypatch, tmp_path):
 
 
 def test_cancel_during_render_never_starts_worker(monkeypatch, tmp_path):
+    monkeypatch.setenv('MTA_NATIVE_SINGLE_USER', 'true')
     executable = tmp_path / 'worker.py'
     executable.write_text('pass')
     monkeypatch.setattr(worker, 'configured_worker', lambda: executable)
@@ -48,6 +50,7 @@ def test_cancel_during_render_never_starts_worker(monkeypatch, tmp_path):
 
 
 def test_cgroup_worker_receives_progress_environment(monkeypatch, tmp_path):
+    monkeypatch.setenv('MTA_NATIVE_SINGLE_USER', 'true')
     executable = tmp_path / 'worker.py'
     executable.write_text('pass')
     monkeypatch.setattr(worker, 'configured_worker', lambda: executable)

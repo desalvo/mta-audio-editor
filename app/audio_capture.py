@@ -26,6 +26,7 @@ class Capture:
     sequence:int=0
     touched:float=field(default_factory=time.monotonic)
     lock:object=field(default_factory=threading.RLock)
+    admission:object=None
 
 
 _LOCK=threading.RLock();_CAPTURES={};_REAPER=None
@@ -35,6 +36,8 @@ def close(token):
     with _LOCK:entry=_CAPTURES.pop(token,None)
     if entry:
         with entry.lock:entry.folder.cleanup()
+        from .service_admission import release
+        release(entry.admission)
 
 
 def shutdown():
@@ -65,7 +68,8 @@ def register_routes(app,project_for_actor,actor):
         with _LOCK:
             if len(_CAPTURES)>=16 or any(c.owner==owner for c in _CAPTURES.values()):raise HTTPException(429,'An audio recording is already active or server capture capacity is full')
             token=uuid.uuid4().hex;folder=tempfile.TemporaryDirectory(prefix='mta-capture-')
-            _CAPTURES[token]=Capture(owner,pid,rate,offset,folder,storage_owner=project.owner_user_id)
+            from .service_admission import reserve
+            _CAPTURES[token]=Capture(owner,pid,rate,offset,folder,storage_owner=project.owner_user_id,admission=reserve('audio-capture'))
             (Path(folder.name)/'capture.f32').touch(mode=0o600)
             if _REAPER is None:
                 def reap():
@@ -105,7 +109,8 @@ def register_routes(app,project_for_actor,actor):
         entry=get(request,pid,token)
         # Existing import waits only for staging; decoding/publication is async.
         try:
-            with entry.lock:
+            from .service_admission import existing
+            with existing(entry.admission), entry.lock:
                 if body.get('sequence')!=entry.sequence or not entry.size:raise HTTPException(409,'Recording is empty or has unacknowledged audio packets')
                 import numpy as np
                 import soundfile as sf

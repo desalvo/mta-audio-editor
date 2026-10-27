@@ -1,4 +1,5 @@
 from __future__ import annotations
+from .service_admission import admitted
 from app.secure_https import https_urlopen
 import hashlib, json, logging, os, re, tempfile, threading, time, zipfile
 from pathlib import Path
@@ -245,6 +246,7 @@ def cached_catalog()->list[dict]:
         raw=json.loads(CATALOG_FILE.read_text(encoding='utf-8'));return raw.get('models',[]) if isinstance(raw,dict) else []
     except Exception:return []
 
+@admitted('model-update')
 def update_once(model_ids:set[str]|None=None,force=False,prefetch_server=False)->dict:
     if not ENABLED and not prefetch_server:
         return {"updated":[],"unchanged":[],"errors":[]}
@@ -342,7 +344,10 @@ def server_inventory()->dict:
     return {"models":models,"blacklist":sorted(blacklist),"auto_update":ENABLED,"interval_seconds":INTERVAL,"manifest_url":MANIFEST_URL}
 
 def _loop():
-    while True:update_once(prefetch_server=True);time.sleep(INTERVAL)
+    while True:
+        from .service_admission import periodic
+        periodic('model-update',lambda:update_once(prefetch_server=True))
+        time.sleep(INTERVAL)
 def start_background_updater():
     global _started
     if not ENABLED or _started:return

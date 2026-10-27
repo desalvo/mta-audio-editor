@@ -1,0 +1,15 @@
+{
+  "archive_sha256": "e5ff7d77eb919d44bbc08e8e02a0a83b65128e6aeacdcf9d182b328bf993712b",
+  "files": 3,
+  "structured_events": 972,
+  "exception_type_counts": {
+    "ValueError": 2,
+    "RuntimeError": 12,
+    "OperationalError": 20,
+    "LicenseDenied": 4
+  },
+  "scope": "Redacted structured status/events,no SQL text,raw traceback or transaction ownership. Exact writer cannot be established from this archive.",
+  "user_traceback": "security_middleware/session_user/init_auth_db/fence_held:SELECT sqlite_master;sqlite3.OperationalError:database is locked",
+  "source_server_runtime": "Python3.12.15;PID110838;observed2026-10-27",
+  "raw_diagnostics_in_source_archive": false
+}

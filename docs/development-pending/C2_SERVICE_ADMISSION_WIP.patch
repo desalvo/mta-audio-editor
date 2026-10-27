@@ -1,0 +1,1347 @@
+--- a/app/account_lifecycle.py
++++ b/app/account_lifecycle.py
+@@ -1,5 +1,6 @@
+ """Account approval, retirement, project recovery and private retention jobs."""
+ from __future__ import annotations
++from .service_admission import admitted
+ import hashlib
+ import hmac
+ import html
+@@ -531,6 +532,7 @@
+             return
+ 
+ 
++@admitted('account-retention')
+ def tick():
+     auth.init_auth_db()
+     from .ai_pull_coordinator import maintenance
+--- a/app/ace_step_desktop_manager.py
++++ b/app/ace_step_desktop_manager.py
+@@ -4,6 +4,7 @@
+ commands. Model downloads and future automatic starts follow saved consent.
+ """
+ from __future__ import annotations
++from .service_admission import worker_thread
+ import os
+ import json
+ import signal
+@@ -225,7 +226,7 @@
+     with _LOCK:
+         if _TASK.get('state')=='installing' or _SETUP_ACTIVE: return status()
+         _TASK={'state':'installing','id':uuid.uuid4().hex}
+-    threading.Thread(target=_perform_install,daemon=True,name='mta-ace-install').start()
++    worker_thread(target=_perform_install,daemon=True,name='mta-ace-install').start()
+     return status()
+ 
+ 
+@@ -430,7 +431,7 @@
+         finally:
+             with _LOCK:
+                 _SETUP_ACTIVE = False
+-    threading.Thread(target=setup, daemon=True, name='mta-ace-local-setup').start()
++    worker_thread(target=setup, daemon=True, name='mta-ace-local-setup').start()
+     return status()
+ 
+ 
+--- a/app/ai_arranger_runtime.py
++++ b/app/ai_arranger_runtime.py
+@@ -6,6 +6,7 @@
+ because its external side effects may already have happened.
+ """
+ from __future__ import annotations
++from .service_admission import worker_thread
+ import json
+ import re
+ import os
+@@ -548,7 +549,7 @@
+                 _LOCAL.pop(job_id, None)
+                 _CANCELLABLE.discard(job_id)
+ 
+-    threading.Thread(target=execute, daemon=True, name='mta-ai-job-' + job_id[:8]).start()
++    worker_thread(target=execute, daemon=True, name='mta-ai-job-' + job_id[:8]).start()
+     return True
+ 
+ 
+--- a/app/ai_notifications.py
++++ b/app/ai_notifications.py
+@@ -4,6 +4,7 @@
+ across a crash after remote acceptance. Failures never stop inference or billing.
+ """
+ from __future__ import annotations
++from .service_admission import admitted
+ import datetime as dt
+ import hashlib
+ import html
+@@ -250,6 +251,7 @@
+     return {'sent':sent,'failed':failed,'smtp_configured':True}
+ 
+ 
++@admitted('notifications')
+ def tick():
+     # Expired approval replies must not keep a recoverable credential forever.
+     with auth.db() as con:
+--- a/app/ai_planning_sqlite.py
++++ b/app/ai_planning_sqlite.py
+@@ -11,7 +11,6 @@
+ import os
+ import stat
+ from pathlib import Path
+-import sqlite3
+ from uuid import uuid4
+ 
+ from .ai_job_queue import MAX_JOBS, MAX_PLAN_BYTES, _safe_plan
+@@ -75,7 +74,8 @@
+     def _connect(self):
+         path = Path(self.path)
+         self._check_path(path)
+-        db = sqlite3.connect(self.path, timeout=10, isolation_level=None)
++        from .regime_service_lease import connect
++        db = connect(self.path, timeout=10, isolation_level=None)
+         try:
+             self._check_path(path)
+             db.execute('PRAGMA busy_timeout=10000')
+--- a/app/audio_capture.py
++++ b/app/audio_capture.py
+@@ -26,6 +26,7 @@
+     sequence:int=0
+     touched:float=field(default_factory=time.monotonic)
+     lock:object=field(default_factory=threading.RLock)
++    admission:object=None
+ 
+ 
+ _LOCK=threading.RLock();_CAPTURES={};_REAPER=None
+@@ -35,6 +36,8 @@
+     with _LOCK:entry=_CAPTURES.pop(token,None)
+     if entry:
+         with entry.lock:entry.folder.cleanup()
++        from .service_admission import release
++        release(entry.admission)
+ 
+ 
+ def shutdown():
+@@ -65,7 +68,8 @@
+         with _LOCK:
+             if len(_CAPTURES)>=16 or any(c.owner==owner for c in _CAPTURES.values()):raise HTTPException(429,'An audio recording is already active or server capture capacity is full')
+             token=uuid.uuid4().hex;folder=tempfile.TemporaryDirectory(prefix='mta-capture-')
+-            _CAPTURES[token]=Capture(owner,pid,rate,offset,folder,storage_owner=project.owner_user_id)
++            from .service_admission import reserve
++            _CAPTURES[token]=Capture(owner,pid,rate,offset,folder,storage_owner=project.owner_user_id,admission=reserve('audio-capture'))
+             (Path(folder.name)/'capture.f32').touch(mode=0o600)
+             if _REAPER is None:
+                 def reap():
+@@ -105,7 +109,8 @@
+         entry=get(request,pid,token)
+         # Existing import waits only for staging; decoding/publication is async.
+         try:
+-            with entry.lock:
++            from .service_admission import existing
++            with existing(entry.admission), entry.lock:
+                 if body.get('sequence')!=entry.sequence or not entry.size:raise HTTPException(409,'Recording is empty or has unacknowledged audio packets')
+                 import numpy as np
+                 import soundfile as sf
+--- a/app/main.py
++++ b/app/main.py
+@@ -1,3 +1,4 @@
++from .service_admission import worker_thread
+ from .vst3_transport import runtime_available as vst_host_runtime
+ from contextlib import asynccontextmanager
+ from .fs_durability import sync_directory
+@@ -96,13 +97,31 @@
+ 
+ @asynccontextmanager
+ async def _mta_application_lifespan(_app):
+-    _start_diagnostic_cleanup()
+-    _start_background_services()
+-    _restore_persisted_ai_queue()
+-    _start_kara_checkpoint_repair()
++    from .service_admission import operation
++    startup_stop = threading.Event()
++    def bootstrap():
++        with operation('startup'):
++            _start_diagnostic_cleanup()
++            _start_background_services()
++            _restore_persisted_ai_queue()
++            _start_kara_checkpoint_repair()
++    try:
++        bootstrap()
++    except __import__('app.regime_operation_fence',fromlist=['FenceBlocked']).FenceBlocked:
++        # Recovery/login must remain reachable after every authority replica
++        # restarts under a durable drain. No background repair runs until resume.
++        def wait_for_admission():
++            while not startup_stop.wait(.2):
++                try:
++                    bootstrap()
++                    return
++                except __import__('app.regime_operation_fence',fromlist=['FenceBlocked']).FenceBlocked:
++                    continue
++        threading.Thread(target=wait_for_admission,name='mta-admission-startup',daemon=True).start()
+     try:
+         yield
+     finally:
++        startup_stop.set()
+         _cleanup_session_previews_on_shutdown()
+         from .server_vst3 import sessions as _live_vst3_sessions
+         _live_vst3_sessions.shutdown()
+@@ -154,7 +173,7 @@
+     # Cleanup works even with collection disabled; daemon stops on process exit.
+     def loop():
+         import time as _time
+-        while True:
++        def clean():
+             try:
+                 _mta_diagnostics.clean()
+             except (OSError, RuntimeError):
+@@ -166,6 +185,9 @@
+                 cleanup_if_due()
+             except (OSError,ValueError,RuntimeError):
+                 LOGGER.warning("Studio result retention unavailable",exc_info=True)
++        while True:
++            from .service_admission import periodic
++            periodic('diagnostic-retention',clean)
+             _time.sleep(3600)
+     _mta_diagnostics.install_event_capture()
+     threading.Thread(target=loop, daemon=True, name="mta-diagnostic-retention").start()
+@@ -214,7 +236,7 @@
+                 auto_start_server()
+             except Exception:
+                 LOGGER.exception("Optional desktop ACE-Step autostart failed")
+-        threading.Thread(target=_launch_optional_ace_step, daemon=True,
++        worker_thread(target=_launch_optional_ace_step, daemon=True,
+                          name="mta-desktop-ace-autostart").start()
+ 
+ 
+@@ -296,7 +318,7 @@
+             ensure_kara_2(LEAD_BACKING_MODEL_DIR / 'UVR_MDXNET_KARA_2.onnx', download)
+         except Exception as exc:
+             LOGGER.warning('UVR KARA 2 optional checkpoint repair skipped or failed: %s', exc)
+-    threading.Thread(target=repair, daemon=True, name='mta-uvr-kara2-checkpoint-repair').start()
++    worker_thread(target=repair, daemon=True, name='mta-uvr-kara2-checkpoint-repair').start()
+ 
+ 
+ def _download_lead_backing_model(model_id: str) -> dict:
+@@ -3173,7 +3195,7 @@
+     }
+     with MEDIA_JOB_LOCK:
+         MEDIA_JOBS[job_id] = job
+-    threading.Thread(target=_waveform_worker, args=(job_id, pid, track_id), daemon=True, name=f"waveform-{job_id}").start()
++    worker_thread(target=_waveform_worker, args=(job_id, pid, track_id), daemon=True, name=f"waveform-{job_id}").start()
+     return _media_job_public(job)
+ 
+ 
+@@ -3360,7 +3382,7 @@
+     with MEDIA_JOB_LOCK:
+         MEDIA_JOBS[job_id] = job
+     try:
+-        threading.Thread(
++        worker_thread(
+             target=_track_import_worker,
+             args=(job_id, pid, filename, Path(file.filename or filename).name, name, type, offset_ms, sync_mode, reference_track_id, first_track),
+             daemon=True,
+@@ -4041,7 +4063,7 @@
+     }
+     with MEDIA_JOB_LOCK:
+         MEDIA_JOBS[job_id] = job
+-    threading.Thread(
++    worker_thread(
+         target=_youtube_import_worker,
+         args=(
+             job_id, pid, url, str(body.get("name", ""))[:200], str(body.get("type", "other")),
+@@ -4156,7 +4178,7 @@
+     with MEDIA_JOB_LOCK:
+         MEDIA_JOBS[jid]={'id':jid,'kind':'bounce','project_id':pid,'status':'queued',
+             'progress':0,'message':'Bounce queued','created_at':now,'updated_at':now,'result':None,'error':None}
+-    threading.Thread(target=_bounce_worker,args=(jid,pid,track_id),daemon=True,name='bounce-'+jid).start()
++    worker_thread(target=_bounce_worker,args=(jid,pid,track_id),daemon=True,name='bounce-'+jid).start()
+     return {'bounce_job_id':jid}
+ 
+ 
+@@ -4673,7 +4695,7 @@
+     }
+     with MEDIA_JOB_LOCK:
+         MEDIA_JOBS[job_id] = job
+-    threading.Thread(
++    worker_thread(
+         target=_mta_import_worker,
+         args=(job_id, project.id, Path(file.filename or "source.mta").name),
+         daemon=True,
+@@ -7058,7 +7080,7 @@
+     }
+     with MEDIA_JOB_LOCK:
+         MEDIA_JOBS[job_id] = job
+-    threading.Thread(target=_track_export_worker, args=(job_id, pid, track_id, req.model_dump()), daemon=True).start()
++    worker_thread(target=_track_export_worker, args=(job_id, pid, track_id, req.model_dump()), daemon=True).start()
+     return _media_job_public(job)
+ 
+ 
+@@ -7378,7 +7400,7 @@
+     }
+     with MEDIA_JOB_LOCK:
+         MEDIA_JOBS[job_id] = job
+-    threading.Thread(
++    worker_thread(
+         target=_configured_export_worker,
+         args=(job_id, pid, req.model_dump(mode="json")),
+         daemon=True,
+@@ -7448,7 +7470,7 @@
+     job = {"id": job_id, "kind": "project-export", "project_id": pid, "status": "queued", "progress": 5, "message": "Export MP4 in coda", "created_at": now, "updated_at": now, "result": None, "error": None}
+     with MEDIA_JOB_LOCK:
+         MEDIA_JOBS[job_id] = job
+-    threading.Thread(
++    worker_thread(
+         target=_karaoke_export_worker,
+         args=(job_id, pid, str(background_path) if background_path else None, include_chords),
+         daemon=True,
+@@ -8044,7 +8066,7 @@
+     with _ace_test_guard:
+         if _ace_test_state.get('state')=='running': return dict(_ace_test_state)
+         _ace_test_state={'state':'running'}
+-    threading.Thread(target=_run_ace_test,daemon=True,name='mta-ace-smoke').start()
++    worker_thread(target=_run_ace_test,daemon=True,name='mta-ace-smoke').start()
+     return {'state':'running'}
+ 
+ 
+@@ -8255,6 +8277,12 @@
+     return JSONResponse({"detail": str(exc), "code": "project_type_conflict"}, status_code=409)
+ 
+ 
++from .service_admission_routes import router as _service_admission_router
++app.include_router(_service_admission_router)
++from .service_admission import ServiceAdmissionMiddleware
++app.add_middleware(ServiceAdmissionMiddleware)
++
++
+ import sqlite3 as _sqlite_errors
+ 
+ @app.exception_handler(_sqlite_errors.OperationalError)
+--- a/app/model_updater.py
++++ b/app/model_updater.py
+@@ -1,4 +1,5 @@
+ from __future__ import annotations
++from .service_admission import admitted
+ from app.secure_https import https_urlopen
+ import hashlib, json, logging, os, re, tempfile, threading, time, zipfile
+ from pathlib import Path
+@@ -245,6 +246,7 @@
+         raw=json.loads(CATALOG_FILE.read_text(encoding='utf-8'));return raw.get('models',[]) if isinstance(raw,dict) else []
+     except Exception:return []
+ 
++@admitted('model-update')
+ def update_once(model_ids:set[str]|None=None,force=False,prefetch_server=False)->dict:
+     if not ENABLED and not prefetch_server:
+         return {"updated":[],"unchanged":[],"errors":[]}
+@@ -342,7 +344,10 @@
+     return {"models":models,"blacklist":sorted(blacklist),"auto_update":ENABLED,"interval_seconds":INTERVAL,"manifest_url":MANIFEST_URL}
+ 
+ def _loop():
+-    while True:update_once(prefetch_server=True);time.sleep(INTERVAL)
++    while True:
++        from .service_admission import periodic
++        periodic('model-update',lambda:update_once(prefetch_server=True))
++        time.sleep(INTERVAL)
+ def start_background_updater():
+     global _started
+     if not ENABLED or _started:return
+--- a/app/optional_plugins.py
++++ b/app/optional_plugins.py
+@@ -3,6 +3,8 @@
+ Catalog entries are code-reviewed, never provided by an HTTP caller. Source and
+ transitive notices remain alongside the build for local use/repackaging review.
+ """
++from .service_admission import admitted
++from .service_admission import worker_thread
+ import copy
+ import datetime as dt
+ import hashlib
+@@ -137,6 +139,7 @@
+     return results
+ 
+ 
++@admitted('optional-plugins')
+ def start(ids):
+     select(ids)
+     if not _LOCK.acquire(blocking=False):raise ValueError('A plugin installation is already running')
+@@ -159,7 +162,7 @@
+             for state in job['plugins'].values():
+                 if state['state'] in ('queued','installing'):state.update(state='failed',error=type(exc).__name__)
+         finally:job['finished_at']=time.time();_LOCK.release()
+-    threading.Thread(target=execute,daemon=True,name='mta-optional-vst3').start()
++    worker_thread(target=execute,daemon=True,name='mta-optional-vst3').start()
+     return copy.deepcopy(job)
+ 
+ 
+--- a/app/regime_service_lease.py
++++ b/app/regime_service_lease.py
+@@ -107,10 +107,16 @@
+ 
+ class _Connection(sqlite3.Connection):
+     def __init__(self, *args, **kwargs):
+-        self._service_lease = lease()
+-        self._service_lease.__enter__()
+-        try:
++        from .service_admission import operation
++        self._admission = operation('database',database=True)
++        self._admission.__enter__()
++        self._service_lease = None
++        initialized = False
++        try:
++            self._service_lease = lease()
++            self._service_lease.__enter__()
+             super().__init__(*args, **kwargs)
++            initialized = True
+             # An interrupted cutover outlives the flock. New non-owner database
+             # connections may inspect it, but cannot mutate any financial/schema
+             # state. Login/session operations remain available for recovery.
+@@ -129,7 +135,12 @@
+                     return sqlite3.SQLITE_OK
+                 self.set_authorizer(authorize)
+         except BaseException:
+-            self.close()
++            if initialized: super().close()
++            active = self._service_lease
++            self._service_lease = None
++            if active is not None: active.__exit__(None,None,None)
++            self._admission.__exit__(None,None,None)
++            self._admission = None
+             raise
+ 
+     def __exit__(self, *args):
+@@ -146,6 +157,9 @@
+             self._service_lease = None
+             if active is not None:
+                 active.__exit__(None, None, None)
++            admission = self._admission
++            self._admission = None
++            if admission is not None: admission.__exit__(None,None,None)
+ 
+ 
+ def connect(*args, **kwargs):
+@@ -161,7 +175,8 @@
+         if scope['type'] != 'http':
+             return await self.app(scope, receive, send)
+         path = scope.get('path', '')
+-        if path.startswith('/api/admin/service-regime/cutovers'):
++        if path.startswith('/api/admin/service-regime/cutovers') or path in {
++                '/api/admin/service-admission','/api/admin/service-admission/change','/api/admin/service-admission/upgrade'}:
+             return await self.app(scope, receive, send)
+         active = lease()
+         entered = False
+--- a/app/server_vst3.py
++++ b/app/server_vst3.py
+@@ -3,6 +3,7 @@
+ Only administrator-installed plugins from trusted roots can execute. Plugin code
+ and dry preparation run in a disposable worker process group, never ASGI.
+ """
++from .service_admission import worker_thread
+ import atexit
+ from dataclasses import dataclass,field
+ import json
+@@ -29,6 +30,7 @@
+     initializer: object=None
+     editor: object=None
+     preparation: dict=field(default_factory=dict)
++    admission: object=None
+ 
+ 
+ class Sessions:
+@@ -49,6 +51,8 @@
+                         logging.getLogger(__name__).exception('Could not persist original VST3 editor before session close')
+                 entry.session.close()
+             if entry.initializer and entry.initializer is not threading.current_thread():entry.initializer.join(timeout=3)
++            from .service_admission import release
++            release(entry.admission)
+ 
+     def reap(self,now=None):
+         now=time.monotonic() if now is None else now
+@@ -67,7 +71,8 @@
+             limit=max(1,min(64,int(os.getenv('MTA_SERVER_VST3_MAX_SESSIONS','8'))))
+             if len(self.entries)>=limit:raise HTTPException(429,'Live VST3 capacity reached. Stop another session or contact the administrator.')
+             if sum(e.owner==owner for e in self.entries.values())>=2:raise HTTPException(429,'At most two live VST3 sessions per user are allowed.')
+-            token=uuid.uuid4().hex;entry=Entry(owner,project.id,client);self.entries[token]=entry
++            from .service_admission import reserve
++            token=uuid.uuid4().hex;entry=Entry(owner,project.id,client,admission=reserve('vst3-session'));self.entries[token]=entry
+             if self.reaper is None:
+                 def clean():
+                     while True:
+@@ -88,7 +93,7 @@
+                 if not asynchronous:self.close(token);raise
+                 with self.lock:entry.error=str(exc);entry.touched=time.monotonic()
+         if asynchronous:
+-            entry.initializer=threading.Thread(target=initialize,name='mta-server-vst3-prepare',daemon=True)
++            entry.initializer=worker_thread(target=initialize,name='mta-server-vst3-prepare',daemon=True)
+             entry.initializer.start()
+             return {'session_id':token,'state':'preparing','failed':False}
+         return initialize()
+--- a/app/storage.py
++++ b/app/storage.py
+@@ -1,3 +1,5 @@
++from .service_admission import admitted
++from .service_admission import worker_thread
+ import hashlib
+ from .fs_durability import sync_directory
+ import json
+@@ -491,6 +493,7 @@
+             _GC_ACTIVE.discard(pid)
+ 
+ 
++@admitted('project-gc')
+ def schedule_project_gc(pid: str, candidates: set[str] | None = None, *, reconcile_orphans: bool = False) -> None:
+     try:
+         reconcile_project_gc(pid, None if reconcile_orphans else (candidates or set()))
+@@ -500,7 +503,7 @@
+         if pid in _GC_ACTIVE:
+             return
+         _GC_ACTIVE.add(pid)
+-    threading.Thread(target=_gc_worker, args=(pid,), name=f"mta-gc-{pid}", daemon=True).start()
++    worker_thread(target=_gc_worker, args=(pid,), name=f"mta-gc-{pid}", daemon=True).start()
+ 
+ 
+ def resume_pending_gc() -> None:
+--- /dev/null
++++ b/app/service_admission.py
+@@ -0,0 +1,389 @@
++"""Durable service admission/drain for one pinned authority and HTTPS workers.
++
++The authority's journal is local SQLite, never a worker-mounted database or an
++HA lease. Lost processes do not expire admissions or certify worker quiescence.
++"""
++from contextlib import contextmanager, closing
++from contextvars import ContextVar
++from functools import lru_cache
++import hashlib
++import os
++from pathlib import Path
++import re
++import secrets
++import sqlite3
++import stat
++import threading
++import time
++
++from .regime_operation_fence import FenceBlocked
++
++MODE = 'authority-v1'
++_CURRENT = ContextVar('mta_service_admission', default=None)
++_CONTROL = ContextVar('mta_service_control', default=False)
++_SCHEMA = '''
++CREATE TABLE state(singleton INTEGER PRIMARY KEY CHECK(singleton=1),
++ generation INTEGER NOT NULL,phase TEXT NOT NULL CHECK(phase IN ('open','draining')),
++ build TEXT NOT NULL,instance TEXT NOT NULL,drain_id TEXT);
++CREATE TABLE admissions(id TEXT PRIMARY KEY,nonce TEXT NOT NULL,source TEXT NOT NULL,
++ parent TEXT,generation INTEGER NOT NULL,pid INTEGER NOT NULL,
++ state TEXT NOT NULL CHECK(state IN ('open','closed')),created REAL NOT NULL,closed REAL);
++CREATE TABLE events(seq INTEGER PRIMARY KEY AUTOINCREMENT,drain_id TEXT NOT NULL,
++ action TEXT NOT NULL CHECK(action IN ('begin','resume','upgrade')),actor INTEGER NOT NULL,
++ generation INTEGER NOT NULL,created REAL NOT NULL);
++CREATE TRIGGER immutable_admission BEFORE UPDATE ON admissions WHEN
++ OLD.id IS NOT NEW.id OR OLD.nonce IS NOT NEW.nonce OR OLD.source IS NOT NEW.source OR
++ OLD.parent IS NOT NEW.parent OR OLD.generation IS NOT NEW.generation OR OLD.pid IS NOT NEW.pid OR
++ OLD.created IS NOT NEW.created OR OLD.state!='open' OR NEW.state!='closed' OR NEW.closed IS NULL
++ BEGIN SELECT RAISE(ABORT,'Immutable service admission'); END;
++CREATE TRIGGER no_admission_delete BEFORE DELETE ON admissions
++ BEGIN SELECT RAISE(ABORT,'Immutable service admission'); END;
++CREATE TRIGGER no_event_update BEFORE UPDATE ON events
++ BEGIN SELECT RAISE(ABORT,'Immutable service drain event'); END;
++CREATE TRIGGER no_event_delete BEFORE DELETE ON events
++ BEGIN SELECT RAISE(ABORT,'Immutable service drain event'); END;
++CREATE INDEX active_admissions ON admissions(state);
++'''
++
++
++def path():
++    from .auth import data_root
++    return data_root() / 'service-admission.sqlite3'
++
++
++def active():
++    setting = os.getenv('MTA_SERVICE_ADMISSION', 'off')
++    if setting not in ('off', MODE):
++        raise FenceBlocked('Unknown service admission protocol')
++    return setting == MODE or path().exists() or path().is_symlink() or path().with_suffix('.instance').exists()
++
++
++@lru_cache(maxsize=1)
++def build():
++    # Pin the actual participating implementation, not mutable VERSION/build text.
++    root = Path(__file__).parent
++    sources = sorted(root.rglob('*.py'))
++    if not sources or any(p.is_symlink() for p in sources):
++        raise FenceBlocked('Complete authority source inventory required')
++    return hashlib.sha256(b''.join(p.relative_to(root).as_posix().encode()+b'\0'+p.read_bytes() for p in sources)).hexdigest()
++
++
++def _connect(*, create=False, journal=None, inspect_build=False):
++    target = Path(journal) if journal else path()
++    seal = target.with_suffix('.instance')
++    if not target.exists():
++        if seal.exists() or seal.is_symlink():
++            raise FenceBlocked('Original service admission journal is missing')
++        if not create or os.getenv('MTA_SERVICE_ADMISSION') != MODE:
++            raise FenceBlocked('Service admission journal is unavailable')
++        if os.getenv('MTA_NATIVE_SINGLE_USER','').lower() in {'true','1','yes','on'}:
++            raise FenceBlocked('Service admission authority is server-only')
++        target.parent.mkdir(mode=0o700,parents=True,exist_ok=True)
++        try:
++            fd = os.open(target,os.O_CREAT|os.O_EXCL|os.O_WRONLY|os.O_NOFOLLOW,0o600)
++            os.close(fd)
++        except FileExistsError:
++            pass
++    info = target.lstat()
++    if not stat.S_ISREG(info.st_mode) or info.st_nlink != 1:
++        raise FenceBlocked('Unsafe service admission journal')
++    if not seal.exists():
++        if not create or info.st_size:
++            raise FenceBlocked('Original service admission instance is missing')
++        try:
++            fd = os.open(seal,os.O_CREAT|os.O_EXCL|os.O_WRONLY|os.O_NOFOLLOW,0o600)
++            with os.fdopen(fd,'w') as out:
++                out.write(secrets.token_hex(32));out.flush();os.fsync(out.fileno())
++        except FileExistsError:
++            pass
++    seal_info = seal.lstat()
++    if not stat.S_ISREG(seal_info.st_mode) or seal_info.st_nlink != 1 or seal_info.st_size != 64:
++        raise FenceBlocked('Unsafe service admission instance')
++    instance = seal.read_text()
++    con = sqlite3.connect(target.resolve().as_uri()+'?mode=rw',uri=True,timeout=10,isolation_level=None)
++    con.row_factory = sqlite3.Row
++    try:
++        con.execute('PRAGMA busy_timeout=10000')
++        con.execute('BEGIN IMMEDIATE')
++        present = con.execute("SELECT 1 FROM sqlite_master WHERE name='state'").fetchone()
++        if not present:
++            if not create or target.stat().st_size != 0:
++                raise FenceBlocked('Unverifiable service admission journal')
++            for statement in _SCHEMA.split(';\n'):
++                if statement.strip(): con.execute(statement)
++            con.execute("INSERT INTO state VALUES(1,0,'open',?,?,NULL)",(build(),instance))
++        row = con.execute('SELECT * FROM state WHERE singleton=1').fetchone()
++        if row is None or not inspect_build and row['build'] != build() or row['instance'] != instance:
++            raise FenceBlocked('Service admission build differs from pinned authority')
++        con.execute('COMMIT')
++        if not present:
++            con.execute('PRAGMA journal_mode=WAL')
++            from .fs_durability import sync_directory
++            sync_directory(target.parent)
++        return con
++    except BaseException:
++        con.close()
++        raise
++
++
++def _valid(con, ticket):
++    if (not isinstance(ticket,dict) or ticket.get('pid') != os.getpid()
++            or ticket.get('path') != str(path())):
++        raise FenceBlocked('Original service admission required')
++    row = con.execute('SELECT * FROM admissions WHERE id=?',(ticket['id'],)).fetchone()
++    if (row is None or row['state'] != 'open' or row['pid'] != ticket['pid']
++            or not secrets.compare_digest(row['nonce'],ticket['nonce'])):
++        raise FenceBlocked('Original active service admission required')
++    return row
++
++
++def reserve(source):
++    if not active(): return None
++    if not isinstance(source,str) or not re.fullmatch(r'[a-zA-Z0-9_.:-]{1,100}',source):
++        raise ValueError('Invalid service admission source')
++    with closing(_connect(create=True)) as con:
++        con.execute('BEGIN IMMEDIATE')
++        parent = _CURRENT.get()
++        previous = _valid(con,parent) if parent else None
++        state = con.execute('SELECT * FROM state WHERE singleton=1').fetchone()
++        if state['phase'] != 'open' and previous is None:
++            raise FenceBlocked('Service admission is draining')
++        ticket = {'id':secrets.token_hex(16),'nonce':secrets.token_hex(32),
++                  'pid':os.getpid(),'path':str(path())}
++        con.execute("INSERT INTO admissions VALUES(?,?,?,?,?,?,'open',?,NULL)",
++            (ticket['id'],ticket['nonce'],source,previous['id'] if previous else None,
++             state['generation'],ticket['pid'],time.time()))
++        con.execute('COMMIT')
++        return ticket
++
++
++def release(ticket):
++    if ticket is None: return
++    # Keep the original journal path on cleanup; a different configured root
++    # cannot close or silently adopt an earlier authority's admission.
++    if ticket['pid'] != os.getpid(): raise FenceBlocked('Foreign admission process')
++    with closing(_connect(journal=ticket['path'])) as con:
++        con.execute('BEGIN IMMEDIATE')
++        row = con.execute('SELECT nonce,state FROM admissions WHERE id=?',(ticket['id'],)).fetchone()
++        if row is None or not secrets.compare_digest(row['nonce'],ticket['nonce']):
++            raise FenceBlocked('Original service admission required')
++        if row['state'] == 'open':
++            con.execute("UPDATE admissions SET state='closed',closed=? WHERE id=?",(time.time(),ticket['id']))
++        con.execute('COMMIT')
++
++
++@contextmanager
++def operation(source, *, independent=False, database=False):
++    if not active() or (database and _CONTROL.get()):
++        yield
++        return
++    previous = _CURRENT.get()
++    if previous and not independent:
++        with closing(_connect()) as con: _valid(con,previous)
++        yield
++        return
++    ticket = reserve(source)
++    token = _CURRENT.set(ticket)
++    completed = False
++    try:
++        yield
++        completed = True
++    finally:
++        _CURRENT.reset(token)
++        if completed: release(ticket)
++
++
++@contextmanager
++def existing(ticket):
++    if not active():
++        yield
++        return
++    with closing(_connect()) as con: _valid(con,ticket)
++    token = _CURRENT.set(ticket)
++    try: yield
++    finally: _CURRENT.reset(token)
++
++
++@contextmanager
++def control():
++    token = _CONTROL.set(True)
++    try: yield
++    finally: _CONTROL.reset(token)
++
++
++def periodic(source, call):
++    """A sleeping scheduler owns no work; each actual cycle needs admission."""
++    try:
++        with operation(source): return call()
++    except FenceBlocked:
++        return None  # Durable work stays in its original journal; no retry/expiry.
++
++
++class _Thread(threading.Thread):
++    def start(self):
++        # Reserve before another process can close admission, not after scheduling.
++        self._admission = reserve('thread:'+re.sub(r'[^a-zA-Z0-9_.:-]','_',self.name)[:90])
++        try: return super().start()
++        except BaseException:
++            release(self._admission)
++            raise
++
++    def run(self):
++        token = _CURRENT.set(self._admission)
++        completed = False
++        try:
++            result = super().run()
++            completed = True
++            return result
++        finally:
++            _CURRENT.reset(token)
++            if completed: release(self._admission)
++
++
++def worker_thread(*args, **kwargs):
++    return _Thread(*args,**kwargs) if active() else threading.Thread(*args,**kwargs)
++
++
++def admitted(source):
++    from functools import wraps
++    def decorate(call):
++        @wraps(call)
++        def invoke(*args,**kwargs):
++            with operation(source): return call(*args,**kwargs)
++        return invoke
++    return decorate
++
++
++def _actor(actor):
++    from . import auth
++    if type(actor) is not int or actor <= 0: raise FenceBlocked('Active administrator required')
++    with control(), auth.db() as con:
++        if not con.execute("SELECT 1 FROM users WHERE id=? AND role='admin' AND active=1",(actor,)).fetchone():
++            raise FenceBlocked('Active administrator required')
++
++
++def change(*, actor, expected_generation, draining, identifier, confirm):
++    if (type(expected_generation) is not int or expected_generation < 0 or type(draining) is not bool
++            or confirm is not True or not isinstance(identifier,str) or not re.fullmatch(r'[a-zA-Z0-9_-]{8,100}',identifier)):
++        raise ValueError('Exact generation,identity and explicit confirmation required')
++    _actor(actor)
++    with closing(_connect(create=True)) as con:
++        con.execute('BEGIN IMMEDIATE')
++        state = con.execute('SELECT * FROM state WHERE singleton=1').fetchone()
++        action = 'begin' if draining else 'resume'
++        old = con.execute('SELECT * FROM events WHERE drain_id=? AND action=?',(identifier,action)).fetchone()
++        if old:
++            if old['actor'] != actor or old['generation'] != expected_generation+1:
++                raise FenceBlocked('Service drain identity conflict')
++            con.execute('COMMIT')
++            return inspect(actor=actor)
++        if state['generation'] != expected_generation or (state['phase']=='draining') == draining:
++            raise FenceBlocked('Service drain generation conflict')
++        if not draining and state['drain_id'] != identifier:
++            raise FenceBlocked('Original drain identity required')
++        generation = expected_generation+1
++        con.execute('UPDATE state SET generation=?,phase=?,drain_id=? WHERE singleton=1',
++            (generation,'draining' if draining else 'open',identifier if draining else None))
++        con.execute('INSERT INTO events(drain_id,action,actor,generation,created) VALUES(?,?,?,?,?)',
++            (identifier,action,actor,generation,time.time()))
++        con.execute('COMMIT')
++    return inspect(actor=actor)
++
++
++def inspect(*, actor):
++    _actor(actor)
++    if not active(): return {'enabled':False,'phase':'off','drained':False,'transition_authorized':False}
++    with closing(_connect(create=True,inspect_build=True)) as con:
++        con.execute('BEGIN')
++        if con.execute('PRAGMA quick_check').fetchone()[0] != 'ok':
++            raise FenceBlocked('Service admission integrity unavailable')
++        state = dict(con.execute('SELECT generation,phase,drain_id,build AS pinned_build FROM state WHERE singleton=1').fetchone())
++        counts = {r[0]:r[1] for r in con.execute("SELECT source,COUNT(*) FROM admissions WHERE state='open' GROUP BY source")}
++        history = [dict(r) for r in con.execute('SELECT drain_id,action,actor,generation,created FROM events ORDER BY seq DESC LIMIT 100')]
++    from .service_drain_obligations import audit
++    from .regime_service_lease import lease
++    try:
++        with control(), lease(exclusive=True): pending = audit()
++    except FenceBlocked:
++        pending = {'verified':False,'count':None,'reasons':['service_activity_or_cutover_lease']}
++    return {**state,'enabled':True,'current_build':build(),'build_matches':state['pinned_build']==build(),
++            'active_by_source':counts,'active_count':sum(counts.values()),
++            'pending':pending,'drained':state['phase']=='draining' and state['pinned_build']==build() and not counts and pending['verified'] and not pending['count'],
++            'audit':history,'transition_authorized':False,'release_candidate':False}
++
++
++def upgrade(*,actor,expected_generation,expected_build,confirm):
++    """Explicit new-build handoff;retain every original admission/audit row."""
++    if (type(expected_generation) is not int or expected_generation<0 or confirm is not True
++            or not isinstance(expected_build,str) or not re.fullmatch('[a-f0-9]{64}',expected_build)):
++        raise ValueError('Exact previous build,generation and confirmation required')
++    _actor(actor)
++    from .regime_service_lease import lease
++    from .service_drain_obligations import audit
++    with control(),lease(exclusive=True),closing(_connect(inspect_build=True)) as con:
++        con.execute('BEGIN IMMEDIATE')
++        state=con.execute('SELECT * FROM state WHERE singleton=1').fetchone()
++        pending=audit()
++        if (state['phase']!='draining' or state['generation']!=expected_generation
++                or state['build']!=expected_build or state['build']==build()
++                or con.execute("SELECT 1 FROM admissions WHERE state='open' LIMIT 1").fetchone()
++                or not pending['verified'] or pending['count']):
++            raise FenceBlocked('Original service work must be fully drained before build handoff')
++        con.execute('UPDATE state SET build=?,generation=generation+1 WHERE singleton=1',(build(),))
++        con.execute("INSERT INTO events(drain_id,action,actor,generation,created) VALUES(?,'upgrade',?,?,?)",
++            (state['drain_id'],actor,expected_generation+1,time.time()))
++        con.execute('COMMIT')
++    return inspect(actor=actor)
++
++
++def continuation(scope):
++    """Only existing, independently authenticated settlement/stop control routes.
++
++    This never authorizes a new background admission. Their handlers still
++    require original user/node/task/nonce/signature before any business effect.
++    """
++    path_ = scope.get('path','');method = scope.get('method','')
++    if path_ in {'/api/admin/service-admission','/api/admin/service-admission/change'}:
++        return (path_=='/api/admin/service-admission' and method=='GET') or (path_.endswith('/change') and method=='POST')
++    if path_=='/api/admin/service-admission/upgrade' and method=='POST':return True
++    if path_ == '/login' and method in {'GET','POST'}: return True
++    if method in {'GET','HEAD'} and (path_ in {'/settings','/api/health'} or path_.startswith('/static/')): return True
++    if method=='POST' and path_ in {'/api/pull-worker/claim','/api/billing/paypal/webhook','/api/billing/credits/stripe-webhook'}: return True
++    if method=='POST' and re.fullmatch(r'/api/pull-worker/[a-f0-9]{32}/(heartbeat|complete)',path_): return True
++    if method=='DELETE' and re.fullmatch(r'/api/projects/[A-Za-z0-9_-]+/(audio-capture|vst3-live)/[a-f0-9]{32}',path_): return True
++    if method=='POST' and re.fullmatch(r'/api/projects/[A-Za-z0-9_-]+/audio-capture/[a-f0-9]{32}/finish',path_): return True
++    base = '/api/admin/service-regime/cutovers'
++    if method=='GET' and (path_==base or re.fullmatch(base+r'/(preview|lifecycle|[A-Za-z0-9_-]{1,120})',path_)): return True
++    if method=='POST' and (path_==base or re.fullmatch(base+r'/[A-Za-z0-9_-]{1,120}/recover',path_)
++            or re.fullmatch(base+r'/reservations/[A-Za-z0-9_-]{1,120}/abort',path_)): return True
++    return False
++
++
++async def serve(scope, receive, send, call):
++    if scope['type'] not in {'http','websocket'} or not active(): return await call(scope,receive,send)
++    if scope['type']=='http' and continuation(scope):
++        with control(): return await call(scope,receive,send)
++    try:
++        admission = operation('http' if scope['type']=='http' else 'websocket')
++        admission.__enter__()
++    except (FenceBlocked,sqlite3.Error,OSError):
++        if scope['type']=='websocket': return await send({'type':'websocket.close','code':1013})
++        from starlette.responses import JSONResponse
++        return await JSONResponse({'detail':'Service admission is draining;existing work is retained'},status_code=503,
++            headers={'Retry-After':'5','Cache-Control':'no-store'})(scope,receive,send)
++    try:
++        result = await call(scope,receive,send)
++    except BaseException:
++        import sys
++        admission.__exit__(*sys.exc_info())
++        raise
++    else:
++        admission.__exit__(None,None,None)
++        return result
++
++
++class ServiceAdmissionMiddleware:
++    def __init__(self,app): self.app = app
++
++    async def __call__(self,scope,receive,send):
++        return await serve(scope,receive,send,self.app)
+--- /dev/null
++++ b/app/service_admission_routes.py
+@@ -0,0 +1,45 @@
++"""Active-admin,CSRF-protected service drain control;never change regime/money."""
++from fastapi import APIRouter,HTTPException,Request
++from fastapi.responses import JSONResponse
++import sqlite3
++
++from . import auth,service_admission as admission
++from .regime_operation_fence import FenceBlocked
++
++router = APIRouter()
++NO_STORE = {'Cache-Control':'private, no-store','Pragma':'no-cache'}
++
++
++def _actor(request,write=False):
++    user = auth.session_user(request)
++    if not user: raise HTTPException(401,'Authentication required')
++    if user['role']!='admin' or not user['active']: raise HTTPException(403,'Active administrator required')
++    if write and request.headers.get('x-mta-request')!='1': raise HTTPException(403,'Request integrity marker required')
++    return user['id']
++
++
++@router.get('/api/admin/service-admission')
++def status(request:Request):
++    actor = _actor(request)
++    try: return JSONResponse(admission.inspect(actor=actor),headers=NO_STORE)
++    except (FenceBlocked,sqlite3.Error,OSError) as exc: raise HTTPException(409,'Service admission evidence unavailable') from exc
++
++
++@router.post('/api/admin/service-admission/change')
++def change(request:Request,body:dict):
++    actor = _actor(request,True)
++    if set(body)!={'expected_generation','draining','identifier','confirm'}:
++        raise HTTPException(400,'Exact service admission control fields required')
++    try: return JSONResponse(admission.change(actor=actor,**body),headers=NO_STORE)
++    except ValueError as exc: raise HTTPException(400,str(exc)) from exc
++    except (FenceBlocked,sqlite3.Error,OSError) as exc: raise HTTPException(409,'Service admission conflict or evidence unavailable') from exc
++
++
++@router.post('/api/admin/service-admission/upgrade')
++def upgrade(request:Request,body:dict):
++    actor=_actor(request,True)
++    if set(body)!={'expected_generation','expected_build','confirm'}:
++        raise HTTPException(400,'Exact service build handoff fields required')
++    try:return JSONResponse(admission.upgrade(actor=actor,**body),headers=NO_STORE)
++    except ValueError as exc:raise HTTPException(400,str(exc)) from exc
++    except (FenceBlocked,sqlite3.Error,OSError) as exc:raise HTTPException(409,'Service build handoff is not verified') from exc
+--- /dev/null
++++ b/app/service_drain_obligations.py
+@@ -0,0 +1,78 @@
++"""Read-only unfinished-work audit; financial solvency remains a separate gate."""
++from contextlib import closing
++from pathlib import Path
++import sqlite3
++import stat
++
++
++def _read(path):
++    info = path.lstat()
++    if not stat.S_ISREG(info.st_mode) or info.st_nlink != 1:
++        raise ValueError('Unsafe original work journal')
++    con = sqlite3.connect(path.resolve().as_uri()+'?mode=ro',uri=True,timeout=2)
++    try:
++        con.execute('BEGIN')
++        if con.execute('PRAGMA quick_check').fetchone()[0] != 'ok':
++            raise ValueError('Work journal integrity unavailable')
++        return con
++    except BaseException:
++        con.close()
++        raise
++
++
++def audit():
++    from . import auth, ai_arranger_runtime as queue, storage
++    counts = {};reasons = []
++    try:
++        with closing(_read(auth.db_path())) as con:
++            tables = {r[0] for r in con.execute("SELECT name FROM sqlite_master WHERE type='table'")}
++            if 'regime_fence_operations' in tables:
++                counts['fenced_operations'] = con.execute("SELECT COUNT(*) FROM regime_fence_operations WHERE status!='closed'").fetchone()[0]
++            if 'ai_compute_jobs' in tables:
++                if {'regime_fence_operations','regime_worker_claims'} <= tables:
++                    counts['unverified_workers'] = con.execute('''SELECT COUNT(*) FROM ai_compute_jobs j
++                        LEFT JOIN regime_fence_operations f ON f.operation_id='job:ledger:'||j.id
++                        LEFT JOIN regime_worker_claims c ON c.operation_id=f.operation_id
++                        WHERE j.status NOT IN ('done','failed','cancelled') OR f.status IS NOT 'closed'
++                         OR c.state IS NOT 'finished' ''').fetchone()[0]
++                else:
++                    counts['unverified_workers'] = con.execute('SELECT COUNT(*) FROM ai_compute_jobs').fetchone()[0]
++            if 'ai_pull_tasks' in tables:
++                counts['pull_execution'] = con.execute("SELECT COUNT(*) FROM ai_pull_tasks WHERE state!='done'").fetchone()[0]
++            if 'regime_worker_claims' in tables:
++                from .regime_worker_claims import audit_claim_integrity
++                if not audit_claim_integrity(con)['safe']:raise ValueError('Original worker claim integrity unavailable')
++            if 'ai_gpu_slot_leases' in tables:
++                counts['gpu_leases'] = con.execute("SELECT COUNT(*) FROM ai_gpu_slot_leases WHERE state='active'").fetchone()[0]
++            if 'regime_admin_cutovers' in tables:
++                counts['cutover_recovery'] = con.execute("SELECT COUNT(*) FROM regime_admin_cutovers WHERE phase!='finalized'").fetchone()[0]
++            if 'regime_payment_outbox' in tables:
++                # Provider effects without an original durable terminal receipt
++                # require the existing payment recovery; never infer completion.
++                columns = {r[1] for r in con.execute('PRAGMA table_info(regime_payment_outbox)')}
++                if 'state' not in columns: raise ValueError('Unknown payment intent schema')
++                counts['payment_intents'] = con.execute("SELECT COUNT(*) FROM regime_payment_outbox WHERE state NOT IN ('confirmed','cancelled')").fetchone()[0]
++        checks = (
++            (queue._ROOT/'jobs.sqlite3','queue',"SELECT COUNT(*) FROM jobs j LEFT JOIN terminal_receipts t ON t.job_id=j.job_id WHERE j.state NOT IN ('completed','failed','cancelled') OR t.state IS NOT j.state"),
++            (queue._ROOT/'billing-outbox.sqlite3','billing_outbox',"SELECT COUNT(*) FROM deliveries WHERE state!='delivered'"),
++            (queue._ROOT/'publication/outbox.sqlite3','publication_outbox',"SELECT COUNT(*) FROM publications WHERE state!='published'"),
++        )
++        for file,key,sql in checks:
++            if file.exists() or file.is_symlink():
++                with closing(_read(file)) as con: counts[key] = con.execute(sql).fetchone()[0]
++        # Original unfinished filesystem publication/ingest intents predate an
++        # activation too. Their absence is never reconstructed from a PID/clock.
++        root = Path(storage.ROOT)
++        pending = 0
++        if root.exists():
++            for folder in root.iterdir():
++                if folder.is_symlink(): raise ValueError('Unverified project journal root')
++                if not folder.is_dir() or folder.name.startswith('.'): continue
++                for item in folder.iterdir():
++                    if item.name.endswith(('.pending.json','-pending.json')):
++                        pending += 1
++        counts['file_publications'] = pending
++    except (OSError,sqlite3.Error,ValueError) as exc:
++        reasons.append(type(exc).__name__)
++    return {'verified':not reasons,'count':sum(counts.values()) if not reasons else None,
++            'by_kind':counts,'reasons':reasons,'financial_obligations_certified':False}
+--- /dev/null
++++ b/tests/test_r210_service_admission.py
+@@ -0,0 +1,237 @@
++"""Whole-service durable admission/drain through actual HTTP/process boundaries."""
++import asyncio
++from contextlib import closing
++import os
++from pathlib import Path
++import signal
++import sqlite3
++import subprocess
++import sys
++import threading
++import time
++
++from fastapi import FastAPI, WebSocket
++from fastapi.responses import StreamingResponse
++from fastapi.testclient import TestClient
++import pytest
++
++from app import auth, service_admission as gate, storage
++from app.regime_operation_fence import FenceBlocked
++from app.regime_service_lease import ServiceLeaseMiddleware
++from app.service_admission_routes import router
++from test_r210_queue_identity_stem_metering import env as env  # noqa: F401
++
++
++@pytest.fixture
++def authority(env,tmp_path,monkeypatch):
++    monkeypatch.setenv('MTA_SERVICE_ADMISSION',gate.MODE)
++    monkeypatch.setenv('MTA_NATIVE_SINGLE_USER','false')
++    monkeypatch.setattr(storage,'ROOT',tmp_path/'projects');storage.ROOT.mkdir()
++    with gate.operation('provision'): pass
++    return env,tmp_path
++
++
++def change(authority,*,generation=0,draining=True,identifier='drain-original'):
++    return gate.change(actor=authority[0],expected_generation=generation,draining=draining,
++        identifier=identifier,confirm=True)
++
++
++def status(authority): return gate.inspect(actor=authority[0])
++
++
++def test_full_drain_blocks_new_work_and_explicit_resume_preserves_generation(authority):
++    stopped=change(authority)
++    assert stopped['drained'] and stopped['generation']==1 and not stopped['transition_authorized']
++    with pytest.raises(FenceBlocked):
++        with gate.operation('new-work'): pytest.fail('New work admitted')
++    with pytest.raises(FenceBlocked):
++        with auth.db(): pytest.fail('Direct accounting connection admitted')
++    assert change(authority,generation=1,draining=False)['phase']=='open'
++    with gate.operation('new-work'): pass
++    assert status(authority)['generation']==2
++
++
++def test_predrain_request_can_finish_nested_original_background_work(authority):
++    started=threading.Event();finish=threading.Event();done=[]
++    with gate.operation('accepted-request'):
++        assert not change(authority)['drained']
++        def work():
++            started.set();assert finish.wait(4)
++            with auth.db() as c:assert c.execute('SELECT COUNT(*) FROM users').fetchone()[0]
++            done.append(True)
++        thread=gate.worker_thread(target=work,name='accepted-child');thread.start()
++    assert started.wait(3)
++    snapshot=status(authority)
++    assert not snapshot['drained'] and snapshot['active_count']==1
++    finish.set();thread.join(5);assert not thread.is_alive() and done==[True]
++    assert status(authority)['drained']
++
++
++def test_sleeping_periodic_cycle_cannot_mutate_after_barrier(authority):
++    change(authority);called=[]
++    assert gate.periodic('scheduler',lambda:called.append(True)) is None
++    assert not called and status(authority)['drained']
++
++
++def test_unexpected_exception_leaves_original_uncertain_admission(authority):
++    with pytest.raises(RuntimeError):
++        with gate.operation('uncertain-worker'):raise RuntimeError('Unverified external state')
++    assert change(authority)['active_by_source']=={'uncertain-worker':1}
++    assert not status(authority)['drained']
++
++
++@pytest.mark.parametrize('field,value',[('expected_generation',True),('expected_generation',-1),
++    ('draining',1),('confirm',False),('identifier','../foreign')])
++def test_drain_confirmation_types_are_not_coerced(authority,field,value):
++    body={'actor':authority[0],'expected_generation':0,'draining':True,
++          'identifier':'drain-original','confirm':True};body[field]=value
++    with pytest.raises(ValueError):gate.change(**body)
++    assert status(authority)['phase']=='open'
++
++
++def test_stale_replay_foreign_actor_and_audit_immutability(authority):
++    first=change(authority)
++    assert change(authority)==first
++    with pytest.raises(FenceBlocked):change(authority,generation=0,identifier='another-drain')
++    with gate.control(),auth.db() as c:
++        c.execute("INSERT INTO users(username,email,password_hash,role,active,email_confirmed,created_at,updated_at) VALUES('reader','reader@example.test','unused','user',1,1,1,1)")
++        other=c.execute("SELECT id FROM users WHERE username='reader'").fetchone()[0]
++    with pytest.raises(FenceBlocked):gate.inspect(actor=other)
++    with closing(sqlite3.connect(gate.path())) as c:
++        with pytest.raises(sqlite3.IntegrityError):c.execute("DELETE FROM events")
++        with pytest.raises(sqlite3.IntegrityError):c.execute("UPDATE admissions SET source='forged'")
++
++
++@pytest.mark.parametrize('damage',['missing-journal','missing-instance','foreign-instance','unknown-build','corrupt'])
++def test_missing_or_foreign_journal_never_reopens_admission(authority,monkeypatch,damage):
++    change(authority);file=gate.path();seal=file.with_suffix('.instance')
++    monkeypatch.setenv('MTA_SERVICE_ADMISSION','off')
++    if damage=='missing-journal':file.unlink()
++    elif damage=='missing-instance':seal.unlink()
++    elif damage=='foreign-instance':seal.write_text('f'*64)
++    elif damage=='unknown-build':
++        with sqlite3.connect(file) as c:c.execute("UPDATE state SET build='foreign'")
++    else:file.write_bytes(b'not SQLite')
++    with pytest.raises((FenceBlocked,sqlite3.Error)):
++        with gate.operation('new-work'):pytest.fail('Damaged barrier was bypassed')
++
++
++def test_mode_removal_cannot_release_durable_barrier(authority,monkeypatch):
++    change(authority);monkeypatch.setenv('MTA_SERVICE_ADMISSION','off')
++    assert gate.active()
++    with pytest.raises(FenceBlocked):gate.reserve('new-work')
++    assert status(authority)['drained']
++
++
++def web_app():
++    app=FastAPI();app.include_router(router)
++    app.add_middleware(ServiceLeaseMiddleware)
++    app.add_middleware(gate.ServiceAdmissionMiddleware)
++    @app.post('/work')
++    def work():return {'ok':True}
++    @app.get('/stream')
++    async def stream():
++        async def frames():
++            yield b'first';await asyncio.sleep(.05);yield b'last'
++        return StreamingResponse(frames())
++    @app.websocket('/socket')
++    async def socket(ws:WebSocket):
++        await ws.accept()
++        from starlette.websockets import WebSocketDisconnect
++        try:
++            while True:await ws.receive_text()
++        except WebSocketDisconnect:pass
++    return app
++
++
++def test_actual_admin_api_auth_csrf_private_read_and_generation(authority):
++    from test_r210_legal_documents import cookie
++    with TestClient(web_app()) as client:
++        assert client.get('/api/admin/service-admission').status_code==401
++        client.cookies.update(cookie(authority[0]))
++        body={'expected_generation':0,'draining':True,'identifier':'drain-web','confirm':True}
++        assert client.post('/api/admin/service-admission/change',json=body).status_code==403
++        response=client.post('/api/admin/service-admission/change',headers={'X-MTA-Request':'1'},json=body)
++        assert response.status_code==200,response.text
++        assert response.json()['drained'] and response.headers['cache-control']=='private, no-store'
++        assert client.post('/work').status_code==503
++        response=client.get('/api/admin/service-admission')
++        assert response.status_code==200 and response.json()['drained']
++        body.update(expected_generation=1,draining=False)
++        assert client.post('/api/admin/service-admission/change',headers={'X-MTA-Request':'1'},json=body).status_code==200
++        assert client.post('/work').status_code==200
++
++
++def test_websocket_lifetime_is_counted_and_new_connection_refused(authority):
++    from starlette.websockets import WebSocketDisconnect
++    with TestClient(web_app()) as client:
++        with client.websocket_connect('/socket'):
++            assert change(authority)['active_by_source']=={'websocket':1}
++        assert status(authority)['drained']
++        with pytest.raises(WebSocketDisconnect) as exc:
++            with client.websocket_connect('/socket'):pytest.fail('New websocket admitted')
++        assert exc.value.code==1013
++
++
++def test_streaming_and_background_response_keep_admission_until_finished(authority):
++    from starlette.background import BackgroundTask
++    app=web_app();started=threading.Event();finish=threading.Event()
++    @app.get('/background')
++    def background():
++        from fastapi.responses import Response
++        def wait():started.set();assert finish.wait(5)
++        return Response('ok',background=BackgroundTask(wait))
++    errors=[]
++    with TestClient(app) as client:
++        def request():
++            try:assert client.get('/background').status_code==200
++            except BaseException as exc:errors.append(exc)
++        t=threading.Thread(target=request);t.start();assert started.wait(3)
++        assert not change(authority)['drained']
++        finish.set();t.join(6);assert not errors and not t.is_alive()
++        assert status(authority)['drained']
++
++
++def test_actual_supervisor_sigkill_never_expires_original_work(authority):
++    marker=authority[1]/'child-started'
++    code='''import os,time
++from pathlib import Path
++from app import service_admission as a
++with a.operation('independent-process'):
++ Path(os.environ['MTA_DRAIN_MARKER']).touch()
++ while True:time.sleep(.02)
++'''
++    env={**os.environ,'MTA_DATA_DIR':str(auth.data_root()),'MTA_DRAIN_MARKER':str(marker),
++         'PYTHONPATH':str(Path(__file__).resolve().parents[1])}
++    proc=subprocess.Popen([sys.executable,'-c',code],env=env,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
++    try:
++        deadline=time.monotonic()+5
++        while not marker.exists() and time.monotonic()<deadline:
++            if proc.poll() is not None:raise AssertionError(proc.communicate()[1].decode())
++            time.sleep(.01)
++        assert marker.exists()
++        assert not change(authority)['drained']
++        os.kill(proc.pid,signal.SIGKILL);proc.wait(5)
++        assert status(authority)['active_by_source']=={'independent-process':1}
++        assert not status(authority)['drained']
++    finally:
++        if proc.poll() is None:proc.kill();proc.wait(5)
++
++
++def test_pending_ledger_queue_and_original_file_receipts_block_ready(authority):
++    with gate.control(),auth.db() as c:
++        from app.regime_operation_fence import initialize,admit
++        c.execute('BEGIN IMMEDIATE');initialize(c);admit(c,'original-checkout','checkout')
++    folder=storage.ROOT/'project';folder.mkdir();(folder/'.ordinary-upload-pending.json').write_text('{}')
++    result=change(authority)
++    assert not result['drained'] and result['pending']['by_kind']['fenced_operations']==1
++    assert result['pending']['by_kind']['file_publications']==1
++
++
++@pytest.mark.parametrize('path_',['/api/admin/service-admissionevil','/api/pull-worker/foreign/complete',
++    '/api/pull-worker/'+'f'*32+'/dispatch','/api/billing/credits/stripe-webhook/evil',
++    '/api/projects/p/audio-capture/'+'a'*32+'/pcm'])
++def test_lookalike_continuation_paths_cannot_create_work(authority,path_):
++    change(authority)
++    with TestClient(web_app()) as client:
++        assert client.post(path_).status_code==503
+--- /dev/null
++++ b/tests/test_r210_service_admission_pull.py
+@@ -0,0 +1,85 @@
++"""Actual TLS/independent worker processes drain only original admitted work."""
++import os
++import subprocess
++import time
++
++import pytest
++from app import auth,service_admission as gate,storage
++from test_r210_pull_coordinator import authority as authority,enqueue,economic  # noqa: F401
++from test_r208_unified_adapter_billing_e2e import operator as operator  # noqa: F401
++from test_r210_pull_lifecycle import api as api  # noqa: F401
++from test_r210_pull_transport import https as https,cli  # noqa: F401
++
++
++@pytest.fixture
++def drain(authority,api,https,tmp_path,monkeypatch):
++    monkeypatch.setenv('MTA_SERVICE_ADMISSION',gate.MODE)
++    monkeypatch.setattr(storage,'ROOT',tmp_path/'projects');storage.ROOT.mkdir()
++    with gate.operation('provision'):pass
++    return api[2]
++
++
++@pytest.mark.parametrize('lost',[None,'claim','complete'])
++def test_queued_original_work_finishes_over_tls_after_full_service_barrier(authority,api,https,drain,lost):
++    job=enqueue(authority)
++    before=gate.change(actor=drain,expected_generation=0,draining=True,identifier='drain-tls',confirm=True)
++    assert not before['drained'] and before['pending']['by_kind']['pull_execution']==1
++    # This is the actual protected application,not a mocked rights/admission API.
++    response=api[0].post('/api/ai-jobs/execute',json={'kind':'whisper','plan':{}},headers={'X-MTA-Request':'1'})
++    assert response.status_code==503
++    args,env,folder=cli(authority,https,'service-drain-node')
++    env={**env,'MTA_SERVICE_ADMISSION':'off'}
++    if lost:https['drops'][lost]=1
++    first=subprocess.run(args,env=env,capture_output=True,timeout=20)
++    assert first.returncode==(1 if lost else 0),first.stderr
++    if lost:
++        if lost=='claim':
++            assert economic_in_control(job)==('running','running','open')
++            assert not gate.inspect(actor=drain)['drained']
++        second=subprocess.run(args,env=env,capture_output=True,timeout=20)
++        assert second.returncode==0,second.stderr
++    assert economic_in_control(job)==('done','finished','closed')
++    assert (authority[2]/'execution-count').read_bytes()==b'1'
++    assert gate.inspect(actor=drain)['drained']
++    assert not list(folder.rglob('*.sqlite*'))
++    assert api[0].post('/api/ai-jobs/execute',json={'kind':'whisper','plan':{}}).status_code==503
++
++
++def economic_in_control(job):
++    with gate.control():return economic(job)
++
++
++def test_independent_authority_process_is_fenced_before_db_or_queue_mutation(authority,api,https,drain):
++    gate.change(actor=drain,expected_generation=0,draining=True,identifier='drain-process',confirm=True)
++    code='''from app import auth
++from app.regime_operation_fence import FenceBlocked
++try:
++ with auth.db() as c:c.execute("UPDATE users SET display_name='unauthorized-new-work'")
++except FenceBlocked:print('refused')
++else:raise SystemExit('New authority process bypassed admission')
++'''
++    from pathlib import Path
++    import sys
++    env={**os.environ,'MTA_DATA_DIR':str(auth.data_root()),'PYTHONPATH':str(Path(__file__).resolve().parents[1]),
++         'MTA_SERVICE_ADMISSION':'off'}
++    result=subprocess.run([sys.executable,'-c',code],env=env,capture_output=True,text=True,timeout=8)
++    assert result.returncode==0 and result.stdout.strip()=='refused',result.stderr
++    with gate.control(),auth.db() as c:
++        assert not c.execute("SELECT 1 FROM users WHERE display_name='unauthorized-new-work'").fetchone()
++
++
++def test_no_timeout_converts_a_dispatched_remote_worker_into_drained(authority,api,https,drain):
++    from app import ai_pull_coordinator as central
++    job=enqueue(authority)
++    task=central.assignment(authority[1]['credential'],'a'*32)
++    gate.change(actor=drain,expected_generation=0,draining=True,identifier='drain-held',confirm=True)
++    with gate.control(),auth.db() as c:
++        c.execute('UPDATE ai_pull_tasks SET created_at=0 WHERE job_id=?',(job,))
++    # Age is not external worker quiescence. Existing worker ownership,nonce,
++    # output and financial fences cannot be replaced by this service protocol.
++    for _ in range(3):
++        value=gate.inspect(actor=drain)
++        assert not value['drained'] and value['pending']['by_kind']['pull_execution']==1
++        time.sleep(.01)
++    with gate.control():
++        assert central.assignment(authority[1]['credential'],'a'*32)['nonce']==task['nonce']

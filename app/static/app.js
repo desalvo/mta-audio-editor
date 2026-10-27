@@ -215,7 +215,27 @@ function mobileSaveRemoteFile(url,filename,mime='application/octet-stream',share
   }catch(e){toast('Filesystem mobile non disponibile: '+e.message);return false}
 }
 
-async function api(url,opt={}){const origin=document.querySelector('#utilityBody')?.firstElementChild;opt.headers=opt.headers||{};if((opt.method||'GET').toUpperCase()!=='GET')opt.headers['X-MTA-Request']='1';const r=await fetch(url,opt);if(!r.ok){let message=await r.text();try{const d=JSON.parse(message);message=typeof d.detail==='string'?d.detail:message}catch(_){}throw new Error(message)}const ct=r.headers.get('content-type')||'';if(!ct.includes('json'))return r;const data=await r.json();if((opt.method||'GET').toUpperCase()==='PUT')window.MtaEditorLayout?.audioPublished(data);if((opt.method||'GET').toUpperCase()==='PUT'&&current?.id===data?.id&&url==='/api/projects/'+data.id)persistedProjectSnapshot=JSON.parse(JSON.stringify(data));const accepted=data?.job_id?data:data?.job?.id?{...data.job,job_id:data.job.id}:data?.id&&data.project_id&&data.status?{...data,job_id:data.id}:null;if((opt.method||'GET').toUpperCase()==='POST'&&accepted){const origins=window.mtaAiJobOrigins||=new Map();if(!origins.has(accepted.job_id))origins.set(accepted.job_id,origin);window.dispatchEvent(new CustomEvent('mta:ai-job-accepted',{detail:{...accepted,origin}}));}return data}
+async function fetchReadWithBusyRetry(url,opt={}){
+  const method=(opt.method||'GET').toUpperCase(),safe=method==='GET'||method==='HEAD';
+  for(let attempt=0;;attempt++){
+    const response=await fetch(url,opt);
+    if(!safe||response.status!==503||attempt>=3)return response;
+    let data;try{data=await response.clone().json()}catch(_){return response}
+    if(data.code!=='database_busy'||data.retryable!==true)return response;
+    const seconds=Number(response.headers.get('retry-after'));
+    const delay=Number.isFinite(seconds)&&seconds>0?Math.min(5000,seconds*1000):1000;
+    try{await response.body?.cancel()}catch(_){}
+    await new Promise(resolve=>setTimeout(resolve,delay));
+  }
+}
+async function apiFailure(response,method='GET'){
+  let message=await response.text(),data=null;
+  try{data=JSON.parse(message);if(typeof data.detail==='string')message=data.detail}catch(_){}
+  const error=new Error(message);error.status=response.status;error.code=data?.code;
+  error.retryableRead=response.status===503&&data?.code==='database_busy'&&data?.retryable===true&&['GET','HEAD'].includes(method);
+  return error;
+}
+async function api(url,opt={}){const origin=document.querySelector('#utilityBody')?.firstElementChild;opt.headers=opt.headers||{};if((opt.method||'GET').toUpperCase()!=='GET')opt.headers['X-MTA-Request']='1';const r=await fetchReadWithBusyRetry(url,opt);if(!r.ok)throw await apiFailure(r,(opt.method||'GET').toUpperCase());const ct=r.headers.get('content-type')||'';if(!ct.includes('json'))return r;const data=await r.json();if((opt.method||'GET').toUpperCase()==='PUT')window.MtaEditorLayout?.audioPublished(data);if((opt.method||'GET').toUpperCase()==='PUT'&&current?.id===data?.id&&url==='/api/projects/'+data.id)persistedProjectSnapshot=JSON.parse(JSON.stringify(data));const accepted=data?.job_id?data:data?.job?.id?{...data.job,job_id:data.job.id}:data?.id&&data.project_id&&data.status?{...data,job_id:data.id}:null;if((opt.method||'GET').toUpperCase()==='POST'&&accepted){const origins=window.mtaAiJobOrigins||=new Map();if(!origins.has(accepted.job_id))origins.set(accepted.job_id,origin);window.dispatchEvent(new CustomEvent('mta:ai-job-accepted',{detail:{...accepted,origin}}));}return data}
 function esc(s){return String(s??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 function toast(s){const t=$('#toast');t.textContent=trDynamic(s);t.style.display='block';clearTimeout(t._timer);t._timer=setTimeout(()=>t.style.display='none',4200)}
 function setRenderPlaybackPreparing(active){const b=$('#playMaster'),t=$('#toast');if(active){if(b){b.dataset.prepareText=b.textContent||'▶';b.textContent='…';b.title='Preparazione render in corso';b.classList.add('preparing')}if(t){clearTimeout(t._timer);t.textContent='Preparazione del render in corso, attendere…';t.style.display='block'}}else{if(b){if(b.classList.contains('preparing'))b.textContent='▶';b.classList.remove('preparing');b.title='Play / Preview';MtaPlaybackPrep.transportButton(window.playbackActuallyRunning()?'playing':playbackPaused||waPlaybackPaused?'paused':'stopped')}if(t&&t.textContent==='Preparazione del render in corso, attendere…')t.style.display='none'}}
@@ -3045,20 +3065,29 @@ function uploadWithProgress(url,formData,title){
     xhr.send(formData);
   });
 }
-async function pollMediaJob(jobId,title,onDone,onFinish=null,origin=null){
+async function pollMediaJob(jobId,title,onDone,onFinish=null,origin=null,retryCompletedRead=false){
   origin ||= $('#utilityBody')?.firstElementChild;
   window.mtaAiJobs?.origin?.(jobId,origin);
   clearTimeout(mediaProgressTimer);
+  let completing=false;
   try{
     const job=await api(`/api/media-jobs/${jobId}`);
-    if(['completed','failed','cancelled'].includes(job.status))window.mtaAiJobs?.terminal?.(jobId);
+    if(['failed','cancelled'].includes(job.status))window.mtaAiJobs?.terminal?.(jobId);
     const live=mediaPartialText(job);
     const visible=!!(origin?.isConnected&&!origin.closest('.hidden'));
     if(visible){showMediaProgress(title,job.progress,job.message,live||job.error||'',job.cancel_supported&&['queued','running'].includes(job.status)?jobId:'');origin=$('#utilityBody')?.firstElementChild;window.mtaAiJobs?.origin?.(jobId,origin);}
-    if(job.status==='completed'){setMobileBusy(false);try{await onDone(job,visible);if(visible&&typeof window!=='undefined')window.mtaAiJobs?.handled?.(jobId);}finally{if(onFinish)onFinish(job)}return}
+    if(job.status==='completed'){completing=true;await onDone(job,visible);window.mtaAiJobs?.terminal?.(jobId);setMobileBusy(false);if(visible&&typeof window!=='undefined')window.mtaAiJobs?.handled?.(jobId);if(onFinish)onFinish(job);return}
     if(job.status==='failed'||job.status==='cancelled'){setMobileBusy(false);if(visible&&typeof window!=='undefined')window.mtaAiJobs?.handled?.(jobId);if(onFinish)onFinish(job);toast(job.status==='cancelled'?'Estrazione annullata':(job.error||'Operazione fallita'));return}
-    mediaProgressTimer=setTimeout(()=>pollMediaJob(jobId,title,onDone,onFinish,origin),500);
-  }catch(e){setMobileBusy(false);if(onFinish)onFinish(null);toast(e.message)}
+    mediaProgressTimer=setTimeout(()=>pollMediaJob(jobId,title,onDone,onFinish,origin,retryCompletedRead),500);
+  }catch(e){
+    if(e.retryableRead&&(!completing||retryCompletedRead)){
+      const visible=!!(origin?.isConnected&&!origin.closest('.hidden'));
+      if(visible){showMediaProgress(title,-1,tr('Waiting for the server database; the original job is retained','Database occupato: attesa sul job originale'));origin=$('#utilityBody')?.firstElementChild;window.mtaAiJobs?.origin?.(jobId,origin);}
+      mediaProgressTimer=setTimeout(()=>pollMediaJob(jobId,title,onDone,onFinish,origin,retryCompletedRead),1000);
+      return;
+    }
+    setMobileBusy(false);if(onFinish)onFinish(null);toast(e.message)
+  }
 }
 async function blobToDataUrl(blob){return await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result||''));reader.onerror=()=>reject(reader.error||new Error('Impossibile leggere il file generato'));reader.readAsDataURL(blob)})}
 async function saveGeneratedBlob(blob,filename,mime='application/octet-stream'){
@@ -3091,8 +3120,8 @@ async function downloadWithProgress(url,filename,title,share=false,mime='applica
   if(isMobileClient()&&mobileSaveRemoteFile(url,filename,mime,share)){
     setMobileBusy(false);$('#utilityBackdrop')?.classList.add('hidden');return;
   }
-  const response=await fetch(url);
-  if(!response.ok)throw new Error(await response.text());
+  const response=await fetchReadWithBusyRetry(url);
+  if(!response.ok)throw await apiFailure(response);
   const total=Number(response.headers.get('content-length')||0),reader=response.body?.getReader(),chunks=[];let loaded=0,blob;
   if(reader){
     while(true){const {done,value}=await reader.read();if(done)break;chunks.push(value);loaded+=value.length;if(total)showMediaProgress(title,90+Math.round(loaded/total*10),'Download del file')}
@@ -4103,7 +4132,7 @@ async function exportTrack(id,format,options=null){
       const mime={wav:'audio/wav',mp3:'audio/mpeg',flac:'audio/flac'}[ext]||'application/octet-stream';
       await downloadWithProgress(result.download_url,result.filename||`${safeTrackName}.${ext}`,'Export traccia',false,mime,nativeOutputPath);
       toast(nativeOutputPath?`Export traccia salvato in ${nativeOutputPath}`:'Export traccia completato');
-    });
+    },null,null,true);
   }catch(e){setMobileBusy(false);toast(e.message)}
 }
 
@@ -4209,7 +4238,7 @@ async function executeConfiguredExport(config,slots=[]){
       if(isMobileClient())mobileSaveRemoteFile(result.download_url,filename,mime,!!config.share);
       else await downloadWithProgress(result.download_url,filename,'Export progetto',false,mime,nativeOutputPath);
       $('#utilityBackdrop')?.classList.add('hidden');pendingExportConfig=null;toast(config.share?'Output pronto per la condivisione':'Export completato');
-    });
+    },null,null,true);
   }catch(e){setMobileBusy(false);toast(e.message)}
 }
 function openExportMapping(plan,config=pendingExportConfig){
@@ -4639,7 +4668,7 @@ async function startKaraokeExport(){
       if(isMobileClient())mobileSaveRemoteFile(result.download_url,filename,'video/mp4',false);
       else await downloadWithProgress(result.download_url,filename,'Export MP4 Karaoke',false,'video/mp4',nativeOutputPath);
       toast('MP4 karaoke esportato');
-    },()=>{karaokeExportPending=false});
+    },()=>{karaokeExportPending=false},null,true);
   }catch(e){karaokeExportPending=false;setMobileBusy(false);toast('Export MP4 fallito: '+e.message)}
 }
 async function recalculateBpmFromTrack(trackId){

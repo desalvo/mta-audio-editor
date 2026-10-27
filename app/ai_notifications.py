@@ -4,6 +4,7 @@ Mail is at-least-once with stable Message-ID; SMTP cannot guarantee exactly-once
 across a crash after remote acceptance. Failures never stop inference or billing.
 """
 from __future__ import annotations
+from .service_admission import admitted
 import datetime as dt
 import hashlib
 import html
@@ -250,6 +251,7 @@ def deliver(limit=25):
     return {'sent':sent,'failed':failed,'smtp_configured':True}
 
 
+@admitted('notifications')
 def tick():
     # Expired approval replies must not keep a recoverable credential forever.
     with auth.db() as con:

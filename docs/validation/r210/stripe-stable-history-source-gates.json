@@ -1,0 +1,25 @@
+{
+  "security": {
+    "reviewed_findings": 165,
+    "source_files": 294,
+    "raw_severity": {
+      "HIGH": 0,
+      "MEDIUM": 21,
+      "LOW": 144
+    },
+    "scan_review_passed": true,
+    "release_candidate": false,
+    "transition_enabled": false
+  },
+  "transport": {
+    "reviewed_sites": 30,
+    "source_files": 21,
+    "inventory_passed": true,
+    "remote_model_attestation_complete": false,
+    "release_candidate": false
+  },
+  "finding_identities_unchanged": true,
+  "checker_changes": false,
+  "new_suppressions": false,
+  "review": "Three fixed-source finance changes reviewed:GET-only exact canonical objects,full independent rereads,typed financial identities,zero-money prior failure evidence,private bounded DTO receipt,webhook generation comparison inside original accounting transaction,and total read/time budget. No payment mutation or global transition authority."
+}

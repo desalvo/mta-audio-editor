@@ -6,9 +6,12 @@ isolation. Shared host GPU utilisation is NOT attributable to a user.
 """
 from __future__ import annotations
 
+from .service_admission import admitted
+
 import os
 import signal
 import subprocess
+import sys
 import time
 from pathlib import Path
 from dataclasses import dataclass
@@ -101,10 +104,13 @@ def run_metered_process(argv: list[str], *, cwd: str, timeout_seconds: int = 360
                             start_new_session=True, env=env)  # noqa: S603 -- operator-controlled executable only
     from .ai_queue_usage import CpuProgress, process_cpu
     live_cpu = CpuProgress(env)
-    max_io = _io(proc.pid)
+    linux = sys.platform == 'linux'
+    max_io = _io(proc.pid) if linux else None
     timed_out = False
     cancelled = False
-    detected_descendants = False
+    # wait4 exists on macOS too, but /proc-based tree evidence does not. CPU
+    # for its direct child never certifies an unobserved native process tree.
+    detected_descendants = not linux
     try:
         while True:
             pid, status, rusage = os.wait4(proc.pid, os.WNOHANG)
@@ -112,10 +118,11 @@ def run_metered_process(argv: list[str], *, cwd: str, timeout_seconds: int = 360
                 break
             # wait4 and /proc/<pid>/io cover the direct child only. If it
             # creates other processes, do not pretend the account is complete.
-            if _descendants(proc.pid):
+            if linux and _descendants(proc.pid):
                 detected_descendants = True
-            live_cpu.publish(lambda: process_cpu(proc.pid))
-            current = _io(proc.pid)
+            if linux:
+                live_cpu.publish(lambda: process_cpu(proc.pid))
+            current = _io(proc.pid) if linux else None
             if current:
                 max_io = tuple(max(a, b) for a, b in zip(max_io, current)) if max_io else current
             if cancel_check is not None and cancel_check():
@@ -388,6 +395,7 @@ def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=
             raise
 
 
+@admitted('registered-inference')
 def execute_registered_worker(user_id,kind,plan,*,token_id=None,timeout_seconds=1200,source_wav=None,source_json=None,cancel_check=None,
                               _request_key=None,_request_digest=None):
     from .ai_global_execution import execute

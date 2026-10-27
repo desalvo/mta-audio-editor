@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="8" skipped="0" tests="8" time="14.585" timestamp="2026-10-27T14:40:34.128563+01:00" hostname="e0757190c092"><testcase classname="tests.test_r210_transition_progress_browser" name="test_full_shipped_settings_progress_accessibility[idle-390-it]" time="3.325"><failure message="AssertionError: [{'id': 'list', 'nodes': [['ul[data-cutover-audit=&quot;&quot;]']]}]&#10;assert [{'id': 'list...audit=&quot;&quot;]']]}] == []&#10;  &#10;  Left contains one more item: {'id': 'list', 'nodes': [['ul[data-cutover-audit=&quot;&quot;]']]}&#10;  Use -v to get more diff">ready = (&lt;starlette.testclient.TestClient object at 0x7f1fb4ece270&gt;, 2, 1)
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f1fd28aaa80&gt;
+chromium_capability = None, language = 'it', width = 390, phase = 'idle'
+
+    @pytest.mark.parametrize('language',['it','en'])
+    @pytest.mark.parametrize('width',[390,1280])
+    @pytest.mark.parametrize('phase',['idle','committed'])
+    def test_full_shipped_settings_progress_accessibility(ready,monkeypatch,chromium_capability,language,width,phase):
+        from playwright.sync_api import sync_playwright,expect
+        from test_r210_account_acceptance import serve
+        supplied=os.environ.get('MTA_TEST_AXE_CORE')
+        if not supplied:pytest.skip('Pinned test-only axe-core required')
+        web,_,actor=ready
+        if phase=='committed':committed_actual(ready,monkeypatch)
+        with auth.db() as con:con.execute('UPDATE users SET language=? WHERE id=?',(language,actor))
+        calls=[];errors=[]
+        with sync_playwright() as p:
+            browser=p.chromium.launch(headless=True,args=['--no-sandbox'])
+            page=browser.new_page(viewport={'width':width,'height':1000})
+            page.on('pageerror',lambda e:errors.append(str(e)));page.route('**/*',serve(web,calls))
+            page.goto('https://mta.test/settings');page.wait_for_load_state('networkidle')
+            expect(page.locator('[data-cutover-progress]')).to_contain_text(('Nessun passaggio attivo' if language=='it' else 'No active transition') if phase=='idle' else ('in attesa del recupero' if language=='it' else 'pending recovery'))
+            if phase=='committed':
+                page.once('dialog',lambda dialog:dialog.accept())
+                recover=page.locator('[data-cutover-recovery]');expect(recover).to_be_enabled();recover.focus();page.keyboard.press('Enter')
+                expect(page.locator('[data-cutover-progress]')).to_contain_text('Nessun passaggio attivo' if language=='it' else 'No active transition')
+            assert page.locator('[data-regime-cutover]').count()==1
+            page.add_script_tag(path=supplied)
+            result=page.evaluate("async()=&gt;{const r=await axe.run(document.querySelector('[data-regime-cutover]'));return r.violations.map(x=&gt;({id:x.id,nodes:x.nodes.map(n=&gt;n.target)}))}")
+&gt;           assert result==[],result
+E           AssertionError: [{'id': 'list', 'nodes': [['ul[data-cutover-audit=""]']]}]
+E           assert [{'id': 'list...audit=""]']]}] == []
+E             
+E             Left contains one more item: {'id': 'list', 'nodes': [['ul[data-cutover-audit=""]']]}
+E             Use -v to get more diff
+
+tests/test_r210_transition_progress_browser.py:114: AssertionError</failure></testcase><testcase classname="tests.test_r210_transition_progress_browser" name="test_full_shipped_settings_progress_accessibility[idle-390-en]" time="2.800"><failure message="AssertionError: [{'id': 'list', 'nodes': [['ul[data-cutover-audit=&quot;&quot;]']]}]&#10;assert [{'id': 'list...audit=&quot;&quot;]']]}] == []&#10;  &#10;  Left contains one more item: {'id': 'list', 'nodes': [['ul[data-cutover-audit=&quot;&quot;]']]}&#10;  Use -v to get more diff">ready = (&lt;starlette.testclient.TestClient object at 0x7f1fb505d730&gt;, 2, 1)
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f1fd28aa510&gt;
+chromium_capability = None, language = 'en', width = 390, phase = 'idle'
+
+    @pytest.mark.parametrize('language',['it','en'])
+    @pytest.mark.parametrize('width',[390,1280])
+    @pytest.mark.parametrize('phase',['idle','committed'])
+    def test_full_shipped_settings_progress_accessibility(ready,monkeypatch,chromium_capability,language,width,phase):
+        from playwright.sync_api import sync_playwright,expect
+        from test_r210_account_acceptance import serve
+        supplied=os.environ.get('MTA_TEST_AXE_CORE')
+        if not supplied:pytest.skip('Pinned test-only axe-core required')
+        web,_,actor=ready
+        if phase=='committed':committed_actual(ready,monkeypatch)
+        with auth.db() as con:con.execute('UPDATE users SET language=? WHERE id=?',(language,actor))
+        calls=[];errors=[]
+        with sync_playwright() as p:
+            browser=p.chromium.launch(headless=True,args=['--no-sandbox'])
+            page=browser.new_page(viewport={'width':width,'height':1000})
+            page.on('pageerror',lambda e:errors.append(str(e)));page.route('**/*',serve(web,calls))
+            page.goto('https://mta.test/settings');page.wait_for_load_state('networkidle')
+            expect(page.locator('[data-cutover-progress]')).to_contain_text(('Nessun passaggio attivo' if language=='it' else 'No active transition') if phase=='idle' else ('in attesa del recupero' if language=='it' else 'pending recovery'))
+            if phase=='committed':
+                page.once('dialog',lambda dialog:dialog.accept())
+                recover=page.locator('[data-cutover-recovery]');expect(recover).to_be_enabled();recover.focus();page.keyboard.press('Enter')
+                expect(page.locator('[data-cutover-progress]')).to_contain_text('Nessun passaggio attivo' if language=='it' else 'No active transition')
+            assert page.locator('[data-regime-cutover]').count()==1
+            page.add_script_tag(path=supplied)
+            result=page.evaluate("async()=&gt;{const r=await axe.run(document.querySelector('[data-regime-cutover]'));return r.violations.map(x=&gt;({id:x.id,nodes:x.nodes.map(n=&gt;n.target)}))}")
+&gt;           assert result==[],result
+E           AssertionError: [{'id': 'list', 'nodes': [['ul[data-cutover-audit=""]']]}]
+E           assert [{'id': 'list...audit=""]']]}] == []
+E             
+E             Left contains one more item: {'id': 'list', 'nodes': [['ul[data-cutover-audit=""]']]}
+E             Use -v to get more diff
+
+tests/test_r210_transition_progress_browser.py:114: AssertionError</failure></testcase><testcase classname="tests.test_r210_transition_progress_browser" name="test_full_shipped_settings_progress_accessibility[idle-1280-it]" time="2.796"><failure message="AssertionError: [{'id': 'list', 'nodes': [['ul[data-cutover-audit=&quot;&quot;]']]}]&#10;assert [{'id': 'list...audit=&quot;&quot;]']]}] == []&#10;  &#10;  Left contains one more item: {'id': 'list', 'nodes': [['ul[data-cutover-audit=&quot;&quot;]']]}&#10;  Use -v to get more diff">ready = (&lt;starlette.testclient.TestClient object at 0x7f1fb1569820&gt;, 2, 1)
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f1fb1b990d0&gt;
+chromium_capability = None, language = 'it', width = 1280, phase = 'idle'
+
+    @pytest.mark.parametrize('language',['it','en'])
+    @pytest.mark.parametrize('width',[390,1280])
+    @pytest.mark.parametrize('phase',['idle','committed'])
+    def test_full_shipped_settings_progress_accessibility(ready,monkeypatch,chromium_capability,language,width,phase):
+        from playwright.sync_api import sync_playwright,expect
+        from test_r210_account_acceptance import serve
+        supplied=os.environ.get('MTA_TEST_AXE_CORE')
+        if not supplied:pytest.skip('Pinned test-only axe-core required')
+        web,_,actor=ready
+        if phase=='committed':committed_actual(ready,monkeypatch)
+        with auth.db() as con:con.execute('UPDATE users SET language=? WHERE id=?',(language,actor))
+        calls=[];errors=[]
+        with sync_playwright() as p:
+            browser=p.chromium.launch(headless=True,args=['--no-sandbox'])
+            page=browser.new_page(viewport={'width':width,'height':1000})
+            page.on('pageerror',lambda e:errors.append(str(e)));page.route('**/*',serve(web,calls))
+            page.goto('https://mta.test/settings');page.wait_for_load_state('networkidle')
+            expect(page.locator('[data-cutover-progress]')).to_contain_text(('Nessun passaggio attivo' if language=='it' else 'No active transition') if phase=='idle' else ('in attesa del recupero' if language=='it' else 'pending recovery'))
+            if phase=='committed':
+                page.once('dialog',lambda dialog:dialog.accept())
+                recover=page.locator('[data-cutover-recovery]');expect(recover).to_be_enabled();recover.focus();page.keyboard.press('Enter')
+                expect(page.locator('[data-cutover-progress]')).to_contain_text('Nessun passaggio attivo' if language=='it' else 'No active transition')
+            assert page.locator('[data-regime-cutover]').count()==1
+            page.add_script_tag(path=supplied)
+            result=page.evaluate("async()=&gt;{const r=await axe.run(document.querySelector('[data-regime-cutover]'));return r.violations.map(x=&gt;({id:x.id,nodes:x.nodes.map(n=&gt;n.target)}))}")
+&gt;           assert result==[],result
+E           AssertionError: [{'id': 'list', 'nodes': [['ul[data-cutover-audit=""]']]}]
+E           assert [{'id': 'list...audit=""]']]}] == []
+E             
+E             Left contains one more item: {'id': 'list', 'nodes': [['ul[data-cutover-audit=""]']]}
+E             Use -v to get more diff
+
+tests/test_r210_transition_progress_browser.py:114: AssertionError</failure></testcase><testcase classname="tests.test_r210_transition_progress_browser" name="test_full_shipped_settings_progress_accessibility[idle-1280-en]" time="2.662"><failure message="AssertionError: [{'id': 'list', 'nodes': [['ul[data-cutover-audit=&quot;&quot;]']]}]&#10;assert [{'id': 'list...audit=&quot;&quot;]']]}] == []&#10;  &#10;  Left contains one more item: {'id': 'list', 'nodes': [['ul[data-cutover-audit=&quot;&quot;]']]}&#10;  Use -v to get more diff">ready = (&lt;starlette.testclient.TestClient object at 0x7f1fb0e75820&gt;, 2, 1)
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f1fb21b3560&gt;
+chromium_capability = None, language = 'en', width = 1280, phase = 'idle'
+
+    @pytest.mark.parametrize('language',['it','en'])
+    @pytest.mark.parametrize('width',[390,1280])
+    @pytest.mark.parametrize('phase',['idle','committed'])
+    def test_full_shipped_settings_progress_accessibility(ready,monkeypatch,chromium_capability,language,width,phase):
+        from playwright.sync_api import sync_playwright,expect
+        from test_r210_account_acceptance import serve
+        supplied=os.environ.get('MTA_TEST_AXE_CORE')
+        if not supplied:pytest.skip('Pinned test-only axe-core required')
+        web,_,actor=ready
+        if phase=='committed':committed_actual(ready,monkeypatch)
+        with auth.db() as con:con.execute('UPDATE users SET language=? WHERE id=?',(language,actor))
+        calls=[];errors=[]
+        with sync_playwright() as p:
+            browser=p.chromium.launch(headless=True,args=['--no-sandbox'])
+            page=browser.new_page(viewport={'width':width,'height':1000})
+            page.on('pageerror',lambda e:errors.append(str(e)));page.route('**/*',serve(web,calls))
+            page.goto('https://mta.test/settings');page.wait_for_load_state('networkidle')
+            expect(page.locator('[data-cutover-progress]')).to_contain_text(('Nessun passaggio attivo' if language=='it' else 'No active transition') if phase=='idle' else ('in attesa del recupero' if language=='it' else 'pending recovery'))
+            if phase=='committed':
+                page.once('dialog',lambda dialog:dialog.accept())
+                recover=page.locator('[data-cutover-recovery]');expect(recover).to_be_enabled();recover.focus();page.keyboard.press('Enter')
+                expect(page.locator('[data-cutover-progress]')).to_contain_text('Nessun passaggio attivo' if language=='it' else 'No active transition')
+            assert page.locator('[data-regime-cutover]').count()==1
+            page.add_script_tag(path=supplied)
+            result=page.evaluate("async()=&gt;{const r=await axe.run(document.querySelector('[data-regime-cutover]'));return r.violations.map(x=&gt;({id:x.id,nodes:x.nodes.map(n=&gt;n.target)}))}")
+&gt;           assert result==[],result
+E           AssertionError: [{'id': 'list', 'nodes': [['ul[data-cutover-audit=""]']]}]
+E           assert [{'id': 'list...audit=""]']]}] == []
+E             
+E             Left contains one more item: {'id': 'list', 'nodes': [['ul[data-cutover-audit=""]']]}
+E             Use -v to get more diff
+
+tests/test_r210_transition_progress_browser.py:114: AssertionError</failure></testcase><testcase classname="tests.test_r210_transition_progress_browser" name="test_full_shipped_settings_progress_accessibility[committed-390-it]" time="0.604"><failure message="sqlite3.DatabaseError: not authorized">ready = (&lt;starlette.testclient.TestClient object at 0x7f1fb15cc170&gt;, 2, 1)
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f1fb15cce60&gt;
+chromium_capability = None, language = 'it', width = 390, phase = 'committed'
+
+    @pytest.mark.parametrize('language',['it','en'])
+    @pytest.mark.parametrize('width',[390,1280])
+    @pytest.mark.parametrize('phase',['idle','committed'])
+    def test_full_shipped_settings_progress_accessibility(ready,monkeypatch,chromium_capability,language,width,phase):
+        from playwright.sync_api import sync_playwright,expect
+        from test_r210_account_acceptance import serve
+        supplied=os.environ.get('MTA_TEST_AXE_CORE')
+        if not supplied:pytest.skip('Pinned test-only axe-core required')
+        web,_,actor=ready
+        if phase=='committed':committed_actual(ready,monkeypatch)
+&gt;       with auth.db() as con:con.execute('UPDATE users SET language=? WHERE id=?',(language,actor))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.DatabaseError: not authorized
+
+tests/test_r210_transition_progress_browser.py:99: DatabaseError</failure></testcase><testcase classname="tests.test_r210_transition_progress_browser" name="test_full_shipped_settings_progress_accessibility[committed-390-en]" time="0.589"><failure message="sqlite3.DatabaseError: not authorized">ready = (&lt;starlette.testclient.TestClient object at 0x7f1fb0f7cef0&gt;, 2, 1)
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f1fb15cc260&gt;
+chromium_capability = None, language = 'en', width = 390, phase = 'committed'
+
+    @pytest.mark.parametrize('language',['it','en'])
+    @pytest.mark.parametrize('width',[390,1280])
+    @pytest.mark.parametrize('phase',['idle','committed'])
+    def test_full_shipped_settings_progress_accessibility(ready,monkeypatch,chromium_capability,language,width,phase):
+        from playwright.sync_api import sync_playwright,expect
+        from test_r210_account_acceptance import serve
+        supplied=os.environ.get('MTA_TEST_AXE_CORE')
+        if not supplied:pytest.skip('Pinned test-only axe-core required')
+        web,_,actor=ready
+        if phase=='committed':committed_actual(ready,monkeypatch)
+&gt;       with auth.db() as con:con.execute('UPDATE users SET language=? WHERE id=?',(language,actor))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.DatabaseError: not authorized
+
+tests/test_r210_transition_progress_browser.py:99: DatabaseError</failure></testcase><testcase classname="tests.test_r210_transition_progress_browser" name="test_full_shipped_settings_progress_accessibility[committed-1280-it]" time="0.625"><failure message="sqlite3.DatabaseError: not authorized">ready = (&lt;starlette.testclient.TestClient object at 0x7f1fb15b7050&gt;, 2, 1)
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f1fb15b4200&gt;
+chromium_capability = None, language = 'it', width = 1280, phase = 'committed'
+
+    @pytest.mark.parametrize('language',['it','en'])
+    @pytest.mark.parametrize('width',[390,1280])
+    @pytest.mark.parametrize('phase',['idle','committed'])
+    def test_full_shipped_settings_progress_accessibility(ready,monkeypatch,chromium_capability,language,width,phase):
+        from playwright.sync_api import sync_playwright,expect
+        from test_r210_account_acceptance import serve
+        supplied=os.environ.get('MTA_TEST_AXE_CORE')
+        if not supplied:pytest.skip('Pinned test-only axe-core required')
+        web,_,actor=ready
+        if phase=='committed':committed_actual(ready,monkeypatch)
+&gt;       with auth.db() as con:con.execute('UPDATE users SET language=? WHERE id=?',(language,actor))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.DatabaseError: not authorized
+
+tests/test_r210_transition_progress_browser.py:99: DatabaseError</failure></testcase><testcase classname="tests.test_r210_transition_progress_browser" name="test_full_shipped_settings_progress_accessibility[committed-1280-en]" time="0.600"><failure message="sqlite3.DatabaseError: not authorized">ready = (&lt;starlette.testclient.TestClient object at 0x7f1fb0f42ea0&gt;, 2, 1)
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f1fb15cd6a0&gt;
+chromium_capability = None, language = 'en', width = 1280, phase = 'committed'
+
+    @pytest.mark.parametrize('language',['it','en'])
+    @pytest.mark.parametrize('width',[390,1280])
+    @pytest.mark.parametrize('phase',['idle','committed'])
+    def test_full_shipped_settings_progress_accessibility(ready,monkeypatch,chromium_capability,language,width,phase):
+        from playwright.sync_api import sync_playwright,expect
+        from test_r210_account_acceptance import serve
+        supplied=os.environ.get('MTA_TEST_AXE_CORE')
+        if not supplied:pytest.skip('Pinned test-only axe-core required')
+        web,_,actor=ready
+        if phase=='committed':committed_actual(ready,monkeypatch)
+&gt;       with auth.db() as con:con.execute('UPDATE users SET language=? WHERE id=?',(language,actor))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.DatabaseError: not authorized
+
+tests/test_r210_transition_progress_browser.py:99: DatabaseError</failure></testcase></testsuite></testsuites>

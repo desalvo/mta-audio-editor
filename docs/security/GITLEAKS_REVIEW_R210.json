@@ -572,5 +572,18 @@
       "historical_source_region_sha256": "2cd7a3d37efa26262ee4cdef3567468659d704e16a21b418d23ad19416dcf2f2"
     }
   ],
-  "release_candidate": false
+  "release_candidate": false,
+  "export_exclusive_public_digest_review": {
+    "date": "2026-10-27",
+    "value": "7197a25d08ec5924510a2a4fd02809b5f894b7f908ce73ac13be47b3277a537c",
+    "source": "app/auth.py",
+    "classification": "Exact reproducible public source SHA-256,not source contents or authentication material",
+    "observed_locations": [
+      "docs/security/APP_SECURITY_REVIEW_R210.json",
+      "docs/validation/r210/export-exclusive-result.json"
+    ],
+    "rule": "generic-api-key",
+    "disposition": "One exact anchored public-digest allowlist;no regex/path/commit exclusion expansion",
+    "verification": "Recomputed SHA-256 from actual reviewed app/auth.py;fresh unrelated synthetic secret negative control must still fail"
+  }
 }

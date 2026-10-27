@@ -1,0 +1,25 @@
+{
+  "security": {
+    "reviewed_findings": 165,
+    "source_files": 295,
+    "raw_severity": {
+      "HIGH": 0,
+      "MEDIUM": 21,
+      "LOW": 144
+    },
+    "scan_review_passed": true,
+    "release_candidate": false,
+    "transition_enabled": false
+  },
+  "transport": {
+    "reviewed_sites": 30,
+    "source_files": 21,
+    "inventory_passed": true,
+    "remote_model_attestation_complete": false,
+    "release_candidate": false
+  },
+  "finding_identities_unchanged": true,
+  "new_suppressions": false,
+  "activation_flags_changed": false,
+  "review": "Fixed SQL lifecycle reads under consistent transaction;active admin and exact original reservation/revision/confirmation;exclusive local lease;immutable abort actor audit;committed operations never aborted or adopted;no financial/provider writes;new metadata schema explicitly reviewed."
+}

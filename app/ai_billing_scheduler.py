@@ -5,6 +5,9 @@ import logging
 from .ai_billing import run_scheduled_closures
 
 
+from .service_admission import admitted
+
+@admitted('billing-scheduler')
 def main():
     from .ai_storage_sampler import sample_all
     print(json.dumps({'storage': sample_all()}, sort_keys=True))

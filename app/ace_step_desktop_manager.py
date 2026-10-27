@@ -4,6 +4,7 @@ Use packaged uv and an official pinned source archive, without shell bootstrap
 commands. Model downloads and future automatic starts follow saved consent.
 """
 from __future__ import annotations
+from .service_admission import worker_thread
 import os
 import json
 import signal
@@ -177,7 +178,7 @@ def _run_with_progress(command: list[str], *, cwd: Path | None, timeout: int, ph
                 elif len(line)<2000:line+=char
         except (OSError,ValueError):
             closed.set()
-    reader=threading.Thread(target=read,daemon=True,name='mta-ace-install-progress');reader.start()
+    reader=worker_thread(target=read,daemon=True,name='mta-ace-install-progress');reader.start()
     deadline=time.monotonic()+timeout
     try:
         while proc.poll() is None or not lines.empty():
@@ -225,7 +226,7 @@ def install(*, confirmed: bool) -> dict:
     with _LOCK:
         if _TASK.get('state')=='installing' or _SETUP_ACTIVE: return status()
         _TASK={'state':'installing','id':uuid.uuid4().hex}
-    threading.Thread(target=_perform_install,daemon=True,name='mta-ace-install').start()
+    worker_thread(target=_perform_install,daemon=True,name='mta-ace-install').start()
     return status()
 
 
@@ -430,7 +431,7 @@ def ensure_local(*, confirmed: bool):
         finally:
             with _LOCK:
                 _SETUP_ACTIVE = False
-    threading.Thread(target=setup, daemon=True, name='mta-ace-local-setup').start()
+    worker_thread(target=setup, daemon=True, name='mta-ace-local-setup').start()
     return status()
 
 
