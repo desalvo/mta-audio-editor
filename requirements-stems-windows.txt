@@ -4,7 +4,7 @@
 --extra-index-url https://download.pytorch.org/whl/cpu
 torch==2.14.1+cpu
 # Keep torchvision C++ operators (including nms) aligned with PyTorch.
-torchvision==0.29.1+cpu
+torchvision==0.29.2+cpu
 demucs==4.1.0
 msgpack==1.2.3
 urllib3==2.8.0

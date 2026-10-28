@@ -1,4 +1,4 @@
-fastapi==0.142.2
+fastapi==0.162.0
 uvicorn==0.54.0
 websockets==16.0
 python-multipart==0.0.32
@@ -12,10 +12,10 @@ reportlab==4.4.9
 PyMuPDF==1.28.2
 
 # YouTube audio import.
-yt-dlp==2026.8.19
+yt-dlp==2026.10.21
 
 # Waveform DSP, DrumSep STFT/ISTFT and source-separation postprocessing.
-scipy>=1.16.0,<1.18.0
+scipy>=1.18.1,<1.19.0
 soundfile>=0.14.0,<0.15
 
 # Shared native/server VST3 host, including headless browser live processing.
