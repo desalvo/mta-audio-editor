@@ -1,0 +1,1606 @@
+{
+  "schema": "mta-known-child-tree-accounting-1",
+  "date": "2026-10-29",
+  "timezone": "Europe/Rome",
+  "base_commit": "8ed30091686bbb48722b8b73faf2927472d01d50",
+  "input_archive": "MTA-0.3.0-r210-pre-RC-ci-40858-cumulative.zip",
+  "input_sha256": "a24735415f1fcfe233e81f0929549b784e98f4d5abc7b8b93ee79494828ae774",
+  "passed": 248,
+  "new_cases": 13,
+  "failed": 0,
+  "errors": 0,
+  "skipped": 0,
+  "production_sources_changed": [
+    "app/ai_metering_agent.py"
+  ],
+  "reports": [
+    {
+      "path": "docs/validation/r210/ffmpeg-ci-functional.xml",
+      "sha256": "7531da763cf41d8f48358ca3521867a469a153dfa508636f1ed6b234d67de1c9"
+    },
+    {
+      "path": "docs/validation/r210/ffmpeg-ci-tree-final.xml",
+      "sha256": "e89fbcbc6ae208191512a7d3b8eba2ec5feb628c7ceee01ac40808821e54d4d1"
+    },
+    {
+      "path": "docs/validation/r210/ffmpeg-ci-gates.xml",
+      "sha256": "3acaaab8f76abdb7e2cd9d5636c0907a4275303bc8004b5a61704550dfed8571"
+    },
+    {
+      "path": "docs/validation/r210/ffmpeg-ci-execution-inventory.xml",
+      "sha256": "90a3b916794b5095b93795ee36e3ec0ab520d57370094523e57810ee614644f6"
+    },
+    {
+      "path": "docs/validation/r210/ffmpeg-ci-cgroup-contract.xml",
+      "sha256": "22b447f094cdb6656f4dc586a592cd6e1c7da8e9f4261282939e0f0d67d13148"
+    }
+  ],
+  "cases": [
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_native_demucs_denies_before_runtime_output_or_frozen_import[disabled-False]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_native_demucs_denies_before_runtime_output_or_frozen_import[disabled-True]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_native_demucs_denies_before_runtime_output_or_frozen_import[commercial_free_only-False]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_native_demucs_denies_before_runtime_output_or_frozen_import[commercial_free_only-True]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_native_demucs_denies_before_runtime_output_or_frozen_import[commercial_off-False]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_native_demucs_denies_before_runtime_output_or_frozen_import[commercial_off-True]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_native_demucs_denies_before_runtime_output_or_frozen_import[corrupt-False]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_native_demucs_denies_before_runtime_output_or_frozen_import[corrupt-True]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_native_demucs_cannot_replace_an_unknown_request_with_a_different_checkpoint[foreign-0-False]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_native_demucs_cannot_replace_an_unknown_request_with_a_different_checkpoint[foreign-0-True]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_native_demucs_cannot_replace_an_unknown_request_with_a_different_checkpoint[foreign-2-False]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_native_demucs_cannot_replace_an_unknown_request_with_a_different_checkpoint[foreign-2-True]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_native_demucs_cannot_replace_an_unknown_request_with_a_different_checkpoint[/unreviewed/weights.pt-6-False]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_native_demucs_cannot_replace_an_unknown_request_with_a_different_checkpoint[/unreviewed/weights.pt-6-True]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_operator_local_repository_is_not_a_checkpoint_permission[False]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_operator_local_repository_is_not_a_checkpoint_permission[True]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_cardinality_profile_cannot_inject_an_unreviewed_model_after_initial_admission",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_demucs_revocation_from_progress_callback_prevents_the_actual_launch[False]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_demucs_revocation_from_progress_callback_prevents_the_actual_launch[True]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_demucs_inference_revocation_prevents_result_delivery_and_preserves_argv[False]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_demucs_inference_revocation_prevents_result_delivery_and_preserves_argv[True]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_backing_loader_rejects_revocation_before_runtime_load[UVR_MDXNET_KARA_2.onnx]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_backing_loader_rejects_revocation_before_runtime_load[mel_band_roformer_karaoke_gabox_v2.ckpt]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_backing_engine_grant_cannot_authorize_arbitrary_checkpoint_files[/unreviewed/weights.onnx]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_backing_engine_grant_cannot_authorize_arbitrary_checkpoint_files[../UVR_MDXNET_KARA_2.onnx]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_backing_engine_grant_cannot_authorize_arbitrary_checkpoint_files[foreign.onnx]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_backing_engine_grant_cannot_authorize_arbitrary_checkpoint_files[operator-provided.ckpt]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_backing_engine_grant_cannot_authorize_arbitrary_checkpoint_files[None]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_backing_load_revocation_cannot_mark_the_cached_runtime_admitted",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_loaded_backing_runtime_rechecks_current_permission_and_exact_selector",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[ffmpeg-center-side-policy]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[ffmpeg-center-side-native]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[ffmpeg-center-side-unified]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[mvsep-mega53-policy]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[mvsep-mega53-native]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[mvsep-mega53-unified]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[uvr_mdxnet_kara_2-policy]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[uvr_mdxnet_kara_2-native]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[uvr_mdxnet_kara_2-unified]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_opaque_command_rejection_precedes_actual_queue_and_ledger_admission",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_actual_token_api_denies_opaque_command_without_worker_or_ledger[json]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_actual_token_api_denies_opaque_command_without_worker_or_ledger[wav]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_builtin_dsp_actual_child_outputs_preserve_center_side_pcm_and_current_policy",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_registered_dsp_cannot_fabricate_single_process_measurement_for_ffmpeg_child",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_backing_revocation_inside_inference_does_not_release_result",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_rocm_loaded_callback_rechecks_current_rights_before_every_chunk",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_legacy_separator_rights",
+      "name": "test_fixed_tool_sharing_metered_group_is_stopped_and_reaped_without_signalling_parent",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_known_worker_tree_accounting",
+      "name": "test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[complete-demucs-plan0]",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_known_worker_tree_accounting",
+      "name": "test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[complete-sam-audio-plan1]",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_known_worker_tree_accounting",
+      "name": "test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[complete-singer-separation-plan2]",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_known_worker_tree_accounting",
+      "name": "test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[complete-backing-vocals-plan3]",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_known_worker_tree_accounting",
+      "name": "test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[complete-backing-vocals-plan4]",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_known_worker_tree_accounting",
+      "name": "test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[complete-drumsep-plan5]",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_known_worker_tree_accounting",
+      "name": "test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[cancelled-demucs-plan0]",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_known_worker_tree_accounting",
+      "name": "test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[cancelled-sam-audio-plan1]",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_known_worker_tree_accounting",
+      "name": "test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[cancelled-singer-separation-plan2]",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_known_worker_tree_accounting",
+      "name": "test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[cancelled-backing-vocals-plan3]",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_known_worker_tree_accounting",
+      "name": "test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[cancelled-backing-vocals-plan4]",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_known_worker_tree_accounting",
+      "name": "test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[cancelled-drumsep-plan5]",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r208_unified_adapter_billing_e2e",
+      "name": "test_each_real_adapter_job_is_metered_billed_and_packaged[whisper]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r208_unified_adapter_billing_e2e",
+      "name": "test_each_real_adapter_job_is_metered_billed_and_packaged[chords-ml]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r208_unified_adapter_billing_e2e",
+      "name": "test_each_real_adapter_job_is_metered_billed_and_packaged[demucs]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r208_unified_adapter_billing_e2e",
+      "name": "test_each_real_adapter_job_is_metered_billed_and_packaged[drumsep]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r208_unified_adapter_billing_e2e",
+      "name": "test_each_real_adapter_job_is_metered_billed_and_packaged[sam-audio]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r208_unified_adapter_billing_e2e",
+      "name": "test_each_real_adapter_job_is_metered_billed_and_packaged[singer-separation]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r208_unified_adapter_billing_e2e",
+      "name": "test_each_real_adapter_job_is_metered_billed_and_packaged[backing-vocals]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r208_unified_adapter_billing_e2e",
+      "name": "test_free_only_real_worker_bypasses_paid_admission_without_losing_accounting",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r208_unified_adapter_billing_e2e",
+      "name": "test_cancellation_during_artifact_packaging_cannot_bill_success",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r208_unified_adapter_billing_e2e",
+      "name": "test_admin_artifact_policy_is_frozen_and_not_overridden_by_plan",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_internal_registered_entry_requires_actual_scheduler_owner",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_revoked_token_cannot_dispatch_from_an_original_running_queue",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_actual_cancelled_child_preserves_reaped_cpu_and_no_artifact",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[ace-step]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[arranger]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[audio-to-midi]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[audio-to-midi-basic-pitch]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[audio-to-midi-mr-mt3]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[audio-to-midi-transkun]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[audio-to-midi-yourmt3]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[backing-vocals]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[chords-ml]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[demucs]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[drumsep]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[markers]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[remix]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[sam-audio]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[singer-separation]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[vocal-harmony]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[vocal-synthesis]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[whisper]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_actual_api_queue_wait_rechecks_original_credential_before_dispatch[revoke]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_actual_api_queue_wait_rechecks_original_credential_before_dispatch[foreign]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_actual_api_queue_wait_rechecks_original_credential_before_dispatch[inactive]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_json_entry_rejects_nested_worker_control_before_queue[source_score]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_json_entry_rejects_nested_worker_control_before_queue[source_audio]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_json_entry_rejects_nested_worker_control_before_queue[input_path]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_json_entry_rejects_nested_worker_control_before_queue[output_path]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_json_entry_rejects_nested_worker_control_before_queue[command]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_json_entry_rejects_nested_worker_control_before_queue[executable]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_json_entry_rejects_nested_worker_control_before_queue[cwd]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_json_entry_rejects_nested_worker_control_before_queue[shell]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_malformed_wav_never_creates_a_ledger_or_claim",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_unverifiable_process_tree_keeps_original_claim_without_publication",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_running_token_revocation_stops_actual_process_and_retains_measured_cpu",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_pending_evidence_api_is_private_retains_identity_and_never_reexecutes[tree-json]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_pending_evidence_api_is_private_retains_identity_and_never_reexecutes[tree-wav]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_pending_evidence_api_is_private_retains_identity_and_never_reexecutes[sensor-json]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_pending_evidence_api_is_private_retains_identity_and_never_reexecutes[sensor-wav]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_operator_extension_cannot_bypass_the_same_owner_metering_contract",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_running_revocation_returns_private_api_cancellation_instead_of_server_error[json]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_running_revocation_returns_private_api_cancellation_instead_of_server_error[wav]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_cancel_between_ledger_admission_and_popen_has_typed_private_response[json]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_cancel_between_ledger_admission_and_popen_has_typed_private_response[wav]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_terminal_or_unstarted_queue_context_never_dispatches[queued]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_terminal_or_unstarted_queue_context_never_dispatches[blocked]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_terminal_or_unstarted_queue_context_never_dispatches[completed]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_terminal_or_unstarted_queue_context_never_dispatches[failed]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_terminal_or_unstarted_queue_context_never_dispatches[cancelled]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_terminal_or_unstarted_queue_context_never_dispatches[interrupted]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_missing_queue_context_does_not_become_a_new_permit",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_nested_cross_owner_rejected_but_same_owner_keeps_one_slot",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_public_worker_rejects_foreign_owner_before_routing_or_ledger[local]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_public_worker_rejects_foreign_owner_before_routing_or_ledger[pull]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_wrong_supervisor_or_unknown_identity_is_not_execution_authority[runner_pid]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_wrong_supervisor_or_unknown_identity_is_not_execution_authority[runner_identity]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_wrong_supervisor_or_unknown_identity_is_not_execution_authority[missing_identity]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_wrong_supervisor_or_unknown_identity_is_not_execution_authority[missing_actor]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_cancelled_context_rejects_new_stage_before_callback[persisted]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_cancelled_context_rejects_new_stage_before_callback[event]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_cancelled_context_rejects_new_stage_before_callback[callback]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_server_source_conversion_rejects_inactive_context",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_invalid_global_owner_never_creates_queue_job[0]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_invalid_global_owner_never_creates_queue_job[-1]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_invalid_global_owner_never_creates_queue_job[True]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_invalid_global_owner_never_creates_queue_job[None]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_invalid_global_owner_never_creates_queue_job[1]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_pre_cancelled_process_does_not_execute_actual_child",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_cancellation_probe_failure_does_not_spawn_child",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_native_fallback_pre_cancel_never_spawns",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_server_conversion_cancellation_reaps_child_and_never_enters_model",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_server_rejects_before_source_process[cancelled]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_server_rejects_before_source_process[license_denied]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_server_rejects_before_source_process[engine_override]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_failed_or_unbounded_source_conversion_never_dispatches[failed]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_failed_or_unbounded_source_conversion_never_dispatches[oversized]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_failed_or_unbounded_source_conversion_never_dispatches[empty]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_source_preparation_uses_one_remaining_budget_and_preserves_bound_identity",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_independent_process_cannot_reuse_live_parent_scheduler_identity",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_inner_dispatch_rechecks_owner_after_outer_admission[local]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_inner_dispatch_rechecks_owner_after_outer_admission[pull]",
+      "status": "passed",
+      "report": "ffmpeg-ci-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_worker_quiescence_safety",
+      "name": "test_unreadable_proc_is_unknown_not_dead[PermissionError]",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_worker_quiescence_safety",
+      "name": "test_unreadable_proc_is_unknown_not_dead[OSError]",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_worker_quiescence_safety",
+      "name": "test_unreadable_proc_is_unknown_not_dead[ValueError]",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_worker_quiescence_safety",
+      "name": "test_malformed_proc_is_unknown[]",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_worker_quiescence_safety",
+      "name": "test_malformed_proc_is_unknown[malformed]",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_worker_quiescence_safety",
+      "name": "test_malformed_proc_is_unknown[1 (x) R 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 ]",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_worker_quiescence_safety",
+      "name": "test_missing_boot_identity_does_not_prove_death",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_worker_quiescence_safety",
+      "name": "test_absent_proc_is_confirmed_dead[FileNotFoundError]",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_worker_quiescence_safety",
+      "name": "test_absent_proc_is_confirmed_dead[ProcessLookupError]",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_worker_quiescence_safety",
+      "name": "test_hidden_proc_is_not_dead[False]",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_worker_quiescence_safety",
+      "name": "test_hidden_proc_is_not_dead[True]",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_worker_quiescence_safety",
+      "name": "test_invalid_pid_never_probes_a_process_group[0]",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_worker_quiescence_safety",
+      "name": "test_invalid_pid_never_probes_a_process_group[-1]",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_worker_quiescence_safety",
+      "name": "test_invalid_pid_never_probes_a_process_group[True]",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_worker_quiescence_safety",
+      "name": "test_invalid_pid_never_probes_a_process_group[None]",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_worker_quiescence_safety",
+      "name": "test_invalid_pid_never_probes_a_process_group[123]",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_worker_quiescence_safety",
+      "name": "test_dead_kernel_states[Z]",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_worker_quiescence_safety",
+      "name": "test_dead_kernel_states[X]",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_worker_quiescence_safety",
+      "name": "test_dead_kernel_states[x]",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_worker_quiescence_safety",
+      "name": "test_unknown_identity_preserves_original_owner_and_no_receipt[queued]",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_worker_quiescence_safety",
+      "name": "test_unknown_identity_preserves_original_owner_and_no_receipt[running]",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_worker_quiescence_safety",
+      "name": "test_new_claim_requires_verifiable_scheduler_identity[None]",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_worker_quiescence_safety",
+      "name": "test_new_claim_requires_verifiable_scheduler_identity[]",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_worker_quiescence_safety",
+      "name": "test_identity_loss_before_completion_never_creates_terminal_receipt",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_worker_quiescence_safety",
+      "name": "test_deferred_owner_cannot_claim_with_unknown_identity[None]",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_worker_quiescence_safety",
+      "name": "test_deferred_owner_cannot_claim_with_unknown_identity[]",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_worker_quiescence_safety",
+      "name": "test_real_supervisor_death_does_not_prove_external_worker_exit",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_worker_quiescence_safety",
+      "name": "test_nested_workers_are_killed_and_not_billed",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_worker_quiescence_safety",
+      "name": "test_missing_recursive_kill_refuses_spawn",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_worker_quiescence_safety",
+      "name": "test_empty_group_returns_only_its_measured_usage",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_worker_quiescence_safety",
+      "name": "test_cancellation_or_timeout_stops_nested_workers_without_measurement[during_run]",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_worker_quiescence_safety",
+      "name": "test_cancellation_or_timeout_stops_nested_workers_without_measurement[after_exit]",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_worker_quiescence_safety",
+      "name": "test_cancellation_or_timeout_stops_nested_workers_without_measurement[timeout]",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_worker_quiescence_safety",
+      "name": "test_unknown_quiescence_is_never_a_measurement",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_worker_quiescence_safety",
+      "name": "test_empty_cleanup_failure_invalidates_pending_measurement",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_worker_quiescence_safety",
+      "name": "test_kill_waits_for_recursive_empty",
+      "status": "passed",
+      "report": "ffmpeg-ci-tree-final.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_complete_source_bound_review_is_accepted",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[changed_source]",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[new_source]",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[deleted_source]",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[scan_error]",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[missing_file]",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[suppression]",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[high]",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[missing_review]",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[duplicate_review]",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[new_finding]",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[changed_finding]",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[duplicate_scan]",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[wrong_totals]",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[empty_reason]",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_review_cannot_silently_survive_source_or_scan_changes[blanket_approval]",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_current_scan_and_complete_review_ledger_agree",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_current_inventory_matches_review",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_call_fingerprint_does_not_depend_on_python_ast_dump",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[from urllib.request import urlopen as hidden\\nhidden(\"https://example.test\")]",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[import httpx as hidden\\nhidden.Client()]",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[from httpx import AsyncClient as hidden\\nhidden()]",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[from urllib.request import build_opener as hidden\\nx=hidden()\\nx.open(\"https://example.test\")]",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[import socket as hidden\\nhidden.create_connection((\"example.test\",443))]",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_new_aliased_transports_require_review[import aiohttp as hidden\\nhidden.ClientSession()]",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[source]",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[missing]",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[category]",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[rationale]",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[hash]",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[checker]",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_inventory_cannot_silently_approve_drift[reorder]",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-gateway/v1/generate]",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-jobs/execute-audio/whisper]",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_native_authorization_helper_cannot_be_repurposed_for_inference[/api/ai-device/start?x=1]",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_supported_device_authorization_still_uses_exact_post[/api/ai-device/start]",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_supported_device_authorization_still_uses_exact_post[/api/ai-device/poll]",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_actual_source_bound_service_admission_review",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_new_alias_boundaries_are_discovered[from threading import Thread as Alias\\nAlias(target=run)]",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_new_alias_boundaries_are_discovered[import sqlite3 as db\\ndb.connect(path)]",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_new_alias_boundaries_are_discovered[from asyncio import create_task as schedule\\nschedule(work())]",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_new_alias_boundaries_are_discovered[from concurrent.futures import ProcessPoolExecutor\\nProcessPoolExecutor()]",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_new_alias_boundaries_are_discovered[from multiprocessing import Process as Worker\\nWorker(target=run)]",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_new_alias_boundaries_are_discovered[from fastapi import FastAPI\\napp=FastAPI()]",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_new_alias_boundaries_are_discovered[import subprocess as tasks\\ntasks.Popen(command)]",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_unclassified_or_omitted_boundary_and_stale_source_are_rejected",
+      "status": "passed",
+      "report": "ffmpeg-ci-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_current_complete_execution_entry_review",
+      "status": "passed",
+      "report": "ffmpeg-ci-execution-inventory.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[from subprocess import Popen as launch\\nlaunch(command)]",
+      "status": "passed",
+      "report": "ffmpeg-ci-execution-inventory.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[import subprocess as child\\nchild.run(command)]",
+      "status": "passed",
+      "report": "ffmpeg-ci-execution-inventory.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[from onnxruntime import InferenceSession as Load\\nLoad(model)]",
+      "status": "passed",
+      "report": "ffmpeg-ci-execution-inventory.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[from fastapi import APIRouter\\nr=APIRouter()\\n@r.post(\"/new-worker\")\\ndef invoke():pass]",
+      "status": "passed",
+      "report": "ffmpeg-ci-execution-inventory.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[from fastapi import APIRouter\\nr=APIRouter()\\n@r.api_route(\"/proxy/{path:path}\",methods=[\"POST\"])\\ndef invoke():pass]",
+      "status": "passed",
+      "report": "ffmpeg-ci-execution-inventory.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_new_execution_aliases_and_routes_need_review[from arbitrary import transcribe as job\\njob(source)]",
+      "status": "passed",
+      "report": "ffmpeg-ci-execution-inventory.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_sibling_local_imports_do_not_rewrite_other_functions",
+      "status": "passed",
+      "report": "ffmpeg-ci-execution-inventory.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[omit]",
+      "status": "passed",
+      "report": "ffmpeg-ci-execution-inventory.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[family]",
+      "status": "passed",
+      "report": "ffmpeg-ci-execution-inventory.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[proof]",
+      "status": "passed",
+      "report": "ffmpeg-ci-execution-inventory.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[checker]",
+      "status": "passed",
+      "report": "ffmpeg-ci-execution-inventory.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[native-source]",
+      "status": "passed",
+      "report": "ffmpeg-ci-execution-inventory.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_review_cannot_omit_or_reclassify_an_entry_without_review[contract]",
+      "status": "passed",
+      "report": "ffmpeg-ci-execution-inventory.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_native_and_operator_sources_are_part_of_complete_binding",
+      "status": "passed",
+      "report": "ffmpeg-ci-execution-inventory.xml"
+    },
+    {
+      "module": "tests.test_r210_known_worker_tree_accounting",
+      "name": "test_known_tree_keeps_cgroup_runner_contract",
+      "status": "passed",
+      "report": "ffmpeg-ci-cgroup-contract.xml"
+    }
+  ],
+  "source_hashes": [
+    {
+      "path": "app/ai_metering_agent.py",
+      "sha256": "17aa26e623a473b83f2b1c5c6696e284a5f42c54acc3b4626df0b48f5e04dfbc"
+    },
+    {
+      "path": "tests/test_r210_known_worker_tree_accounting.py",
+      "sha256": "a5a3663631a3d5fe785b32fa529f2da9a6b40aed43400f6d237b84ae43a0ab51"
+    },
+    {
+      "path": "tests/test_r210_legacy_separator_rights.py",
+      "sha256": "33bfc90435469e6315389f8bdccea2955039d1339b8bbe9949d65e2354ede047"
+    }
+  ],
+  "real_ffmpeg_missed_child_reproduced_before_fix": true,
+  "real_ffmpeg_missed_child_guard_passes_after_fix": true,
+  "new_cgroup_case_is_synthetic": true,
+  "physical_cgroup_new_acceptance": false,
+  "security": {
+    "APP_SECURITY": {
+      "reviewed_findings": 165,
+      "source_files": 304,
+      "raw_severity": {
+        "HIGH": 0,
+        "MEDIUM": 21,
+        "LOW": 144
+      },
+      "scan_review_passed": true,
+      "release_candidate": false,
+      "transition_enabled": false
+    },
+    "SERVICE_ADMISSION": {
+      "inventory_passed": true,
+      "source_files": 304,
+      "reviewed_sites": 170,
+      "scope": "Supported single pinned Linux authority replicas and HTTPS-only original workers",
+      "financial_transition_authorized": false,
+      "external_kernel_or_multihost_accepted": false,
+      "release_candidate": false
+    },
+    "AI_EXECUTION": {
+      "inventory_passed": true,
+      "runtime_source_files": 551,
+      "reviewed_boundaries": 782,
+      "families": 10,
+      "hardware_model_rights_or_kernel_attestation": false,
+      "release_candidate": false
+    },
+    "REMOTE_TRANSPORT": {
+      "reviewed_sites": 30,
+      "source_files": 21,
+      "inventory_passed": true,
+      "remote_model_attestation_complete": false,
+      "release_candidate": false
+    }
+  },
+  "ruff": "passed",
+  "apple_reuse": {
+    "run_id": 40858613243,
+    "13_current_source_hashes_match": true,
+    "passed": 32,
+    "rerun": false
+  },
+  "full_suite_repeated": false,
+  "coverage_recomputed_locally": false,
+  "prior_optional_skips_remain_open": true,
+  "original_progress": {
+    "accepted": 28,
+    "total": 42,
+    "percent": 66.7,
+    "accepted_macroareas": [
+      "E"
+    ],
+    "criteria_promoted": [],
+    "release_candidate": false
+  },
+  "no_commit_or_remote_mutations": true,
+  "secret_scan_scope": "Introduced/replaced text versus exact input;unchanged accepted input bytes reused. Initial whole-file scan flagged4unchanged source SHA256 values,verified against input and retained in redacted diagnosis. No new exclusions or scanner changes."
+}

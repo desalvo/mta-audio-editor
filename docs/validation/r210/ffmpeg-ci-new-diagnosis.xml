@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="1.666" timestamp="2026-10-29T15:17:18.318647+01:00" hostname="9f17c61118ba"><testcase classname="tests.test_r210_known_worker_tree_accounting" name="test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[complete-demucs-plan0]" time="0.888"><failure message="AssertionError: assert ('running', 'unmetered', '{}') == ('running', 'unmetered', None)&#10;  &#10;  At index 2 diff: '{}' != None&#10;  Use -v to get more diff">operator = 1
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f240e6c9e20&gt;
+kind = 'demucs', plan = {'model': 'htdemucs'}, outcome = 'complete'
+
+    @pytest.mark.parametrize('kind,plan',ROUTES)
+    @pytest.mark.parametrize('outcome',['complete','cancelled'])
+    def test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated(
+            operator,monkeypatch,kind,plan,outcome):
+        monkeypatch.delenv('MTA_AI_WORKER_'+kind.upper().replace('-','_')+'_EXECUTABLE')
+        monkeypatch.setenv('MTA_AI_UNIFIED_WORKERS_ENABLED','true')
+        monkeypatch.setenv('MTA_AI_WORKER_'+kind.upper().replace('-','_')+'_PYTHON',sys.executable)
+        monkeypatch.setenv('MTA_LEAD_BACKING_DEFAULT_MODEL','ffmpeg-center-side')
+        monkeypatch.delenv('MTA_LEAD_BACKING_COMMAND',raising=False)
+        called=[]
+        def measured(args,**kwargs):
+            assert Path(args[1]).name=='ai_unified_adapter.py'
+            called.append(args)
+            measurement=agent.Measurement(0,.1,{'cpu_seconds':.05},'worker',True)
+            if outcome=='cancelled':raise agent.WorkerInterrupted(measurement)
+            return measurement
+        monkeypatch.setattr(agent,'run_metered_process',measured)
+        monkeypatch.setattr('app.ai_worker_artifacts.package_artifacts',lambda *a,**kw:pytest.fail('Unverified tree published artifacts'))
+        with pytest.raises(agent.WorkerUncertain) as error:
+            agent.execute_registered_worker(operator,kind,plan,source_wav=source_audio())
+        assert len(called)==1 and error.value.job_id
+        with ai_billing.db() as c:
+            row=c.execute('SELECT status,resource_source,usage_json FROM ai_compute_jobs WHERE id=?',(error.value.job_id,)).fetchone()
+&gt;           assert tuple(row)==('running','unmetered',None)
+E           AssertionError: assert ('running', 'unmetered', '{}') == ('running', 'unmetered', None)
+E             
+E             At index 2 diff: '{}' != None
+E             Use -v to get more diff
+
+tests/test_r210_known_worker_tree_accounting.py:38: AssertionError</failure></testcase></testsuite></testsuites>

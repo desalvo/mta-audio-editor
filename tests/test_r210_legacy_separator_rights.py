@@ -250,6 +250,9 @@ def test_registered_dsp_cannot_fabricate_single_process_measurement_for_ffmpeg_c
     monkeypatch.delenv('MTA_AI_WORKER_BACKING_VOCALS_EXECUTABLE')
     monkeypatch.setenv('MTA_AI_UNIFIED_WORKERS_ENABLED', 'true')
     monkeypatch.setenv('MTA_AI_WORKER_BACKING_VOCALS_PYTHON', sys.executable)
+    # Reproduce a short-lived FFmpeg child missed between /proc samples.
+    # The known worker topology must still forbid direct-child-only billing.
+    monkeypatch.setattr(ai_metering_agent, '_descendants', lambda pid: set())
     with pytest.raises(ai_metering_agent.WorkerUncertain) as error:
         ai_metering_agent.execute_registered_worker(
             operator, 'backing-vocals', {'model': 'ffmpeg-center-side'}, source_wav=source_audio())

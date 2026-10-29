@@ -1,0 +1,3235 @@
+{
+  "schema": "mta-ffmpeg-tree-source-reuse-1",
+  "input_sha256": "a24735415f1fcfe233e81f0929549b784e98f4d5abc7b8b93ee79494828ae774",
+  "runtime_delta": "app/ai_metering_agent.py",
+  "unchanged_app_sources": 303,
+  "unchanged_runtime_assets": [
+    {
+      "path": ".github/dependabot.yml",
+      "sha256": "a66a6109b6b13392aeb0835076f3ce9dcac619f4f8afff119588ce2348b77e30"
+    },
+    {
+      "path": ".github/workflows/ace-step-bundle.yml",
+      "sha256": "6656485b3b7a8a4e47d8e64deb41ca663467544afafa019ca2598a0072b4f215"
+    },
+    {
+      "path": ".github/workflows/ace-step-runtime.yml",
+      "sha256": "dc67e271c4d4781a4f83de96ce3ead3fcd34b5c1cbc08c89485eae0ab6803253"
+    },
+    {
+      "path": ".github/workflows/ace-step-update.yml",
+      "sha256": "c38b7a5b5c156b17b99cbad590d97acb96f89bb5d016b3628ad3967161223128"
+    },
+    {
+      "path": ".github/workflows/admin-cutover-chromium.yml",
+      "sha256": "4db3cda1103d0036c3b86c7d6dedc93963273b2a5edb5ce148bfb9379fd5b826"
+    },
+    {
+      "path": ".github/workflows/ci-cd.yml",
+      "sha256": "a13af6fd47fd7f255290272a290c4da12975dcc5964be6fae2058b412c2ead7b"
+    },
+    {
+      "path": ".github/workflows/codeql.yml",
+      "sha256": "672b3a564e6664b4228690d00e59975bc08316ca480acedd7784364a151f15a6"
+    },
+    {
+      "path": ".github/workflows/global-regression-shards.yml",
+      "sha256": "ff2af3180de53514e53beccd9d0909bdb6f5d5a7712ec11dec9a5c442ead524b"
+    },
+    {
+      "path": ".github/workflows/ios-model-rights.yml",
+      "sha256": "df321e252535fce30c989084f90dfe2ff7e854cdb16a711adaddea27b380b0f6"
+    },
+    {
+      "path": ".github/workflows/merchant-history-chromium.yml",
+      "sha256": "92763ccfe5258e9b28e4f25bf3ab7652dff03f9fc578f6b58282cb0f97ae7f55"
+    },
+    {
+      "path": ".github/workflows/optional-vst3-review.yml",
+      "sha256": "ad6f5ee4f981476fab045bc278c4709b69eaba0e1bb20f4eb2c77ce34b0cba1a"
+    },
+    {
+      "path": ".github/workflows/proxmox-gpu-agent-deb.yml",
+      "sha256": "a22b2519693e6f577610d137ae84a6cffd19113a55837ee948b970e5a3d3140d"
+    },
+    {
+      "path": ".github/workflows/sensitive-operator-chromium.yml",
+      "sha256": "050446e5a6b626b48d8902d07b9358f60ec9e82ba6873505568b91107bf701bb"
+    },
+    {
+      "path": ".github/workflows/server-native-runtime-validation.yml",
+      "sha256": "5ceb9ba3d40bc6de3e1da72fac2afd369ead927aba659dc5eefcfdbbed9a6cb9"
+    },
+    {
+      "path": ".github/workflows/server-package-repository-validation.yml",
+      "sha256": "1d87292a91adbedefc951395fc67eb91853c44996cc86ed3aa586be178a40cda"
+    },
+    {
+      "path": ".github/workflows/server-pages-publish.yml",
+      "sha256": "68aa36c2862971840c65ee8e2e18e9c17c0da1ba57f2fb8e0f4a3fc6e9b6f98a"
+    },
+    {
+      "path": ".github/workflows/service-drain-cutover-chromium.yml",
+      "sha256": "ce6d17c5d726edff14249711d7408328d1586d9a52a4ba7f2f7936045fa63a8d"
+    },
+    {
+      "path": "app/__init__.py",
+      "sha256": "eb3205cb75b2a7474361060d9b8d89329c29272cd8978ba62b6290b9a29b7550"
+    },
+    {
+      "path": "app/account_erasure.py",
+      "sha256": "cefeaa9ff969e6be3b3d118ba689b0a3bf06fc21093cabd51f7ab606f11ab35e"
+    },
+    {
+      "path": "app/account_financial_context.py",
+      "sha256": "0a7749ce17ecd76126453cbdaa4d571e4cb9214d29d1c35ba2d0f5f12e526e0b"
+    },
+    {
+      "path": "app/account_lifecycle.py",
+      "sha256": "dc2a034d92b49c76f4953cfce42da64432edf54283d5b31ccc78456115a7c59c"
+    },
+    {
+      "path": "app/account_limits.py",
+      "sha256": "15d4b17175386e08b4283a764559767dff344395eeb1ecc3089d1a7ce773219e"
+    },
+    {
+      "path": "app/account_mfa.py",
+      "sha256": "327ffaf732eeda25fad86e5521514f9430f65b6eaf26dea17277451e5a6e44b0"
+    },
+    {
+      "path": "app/account_routes.py",
+      "sha256": "25049dea0a992f351d757831b1730648a34ef991c40301ee3fba72d4fbbfcce2"
+    },
+    {
+      "path": "app/ace_gpu_process_meter.py",
+      "sha256": "48be281bf714cfe2d8414ed03d759a43e81f7ce2315b8febd6d9172d6c746c04"
+    },
+    {
+      "path": "app/ace_gpu_profiler.py",
+      "sha256": "7fbc1690578ca45088bf10c92d7fef13417d8fe4114644a017e6381db6388925"
+    },
+    {
+      "path": "app/ace_model_cache.py",
+      "sha256": "fb41e1be65741ed13761d5792d5f14f8a878afc469c7d3ad1ce1e9d5b079c3c2"
+    },
+    {
+      "path": "app/ace_profile_server.py",
+      "sha256": "92aa99c3ea428cdcacac103cbbc45223954a2ae08f5f088519b3732d8f24c93f"
+    },
+    {
+      "path": "app/ace_step_desktop_manager.py",
+      "sha256": "e2d5e575febb9ec016251de4cc64683385c458f7254338ae6c398e593a474720"
+    },
+    {
+      "path": "app/ace_step_http_worker.py",
+      "sha256": "b3e453cb558843b7f79431a7130968842a0bfd03a602d0afae0018233b9835fe"
+    },
+    {
+      "path": "app/ace_step_live_smoke.py",
+      "sha256": "53ac6d65d1401b3fa27dddce6f6b629dd91da71aa532f5c05990548eaf1d5d7d"
+    },
+    {
+      "path": "app/ace_step_local.py",
+      "sha256": "66e766cdc71b64468773a600b478a5cbe2f0cfda09fe2484417d16965a1bd8a3"
+    },
+    {
+      "path": "app/ace_step_readiness.py",
+      "sha256": "2e065faa004b6492573a2d98b9fbc060c3f81ceb54ac3c4a57e7ce5557a9fa27"
+    },
+    {
+      "path": "app/ace_task_control.py",
+      "sha256": "d41ce8f69d1470e2fd22ab008e8f7f3275c375d8881022f1469980e5277ffc24"
+    },
+    {
+      "path": "app/ace_task_progress.py",
+      "sha256": "dc94627cc3a1aba22cf86cc40d9f2c265607bed18660fd95a2cb0d2fb1337b69"
+    },
+    {
+      "path": "app/admin_dump.py",
+      "sha256": "c9600065219c35ec1a20bfe5626187ecaeeb3ba0cfd9f96b0be189d231614c2e"
+    },
+    {
+      "path": "app/admin_dump_routes.py",
+      "sha256": "aecf5f7e83457dccf5db05d53d1fff5ef27458ff33dc6e6978627eee57824679"
+    },
+    {
+      "path": "app/admin_navigation.py",
+      "sha256": "1b559c7fef7a74168c4d2c169db4886213b9aaeb75f1812c813a72722df22970"
+    },
+    {
+      "path": "app/ai_access.py",
+      "sha256": "8ca028716c25ef3a677bf26f096868e65fc1793185f090acd3d26697051e9b35"
+    },
+    {
+      "path": "app/ai_amd_smi_collector.py",
+      "sha256": "1fe0af0b3a9ce13765c4bbc3572698f966464d0ddc7e249ca28e3820d68af50b"
+    },
+    {
+      "path": "app/ai_arranger.py",
+      "sha256": "4542cfa2668487c1ab309a5758aa593d37a8c18e60ee91b8a73e681047cabbc3"
+    },
+    {
+      "path": "app/ai_arranger_runtime.py",
+      "sha256": "02e340a5bcca197863879463cc9c96204b3a3676c3d808d13b1baa78a874dda8"
+    },
+    {
+      "path": "app/ai_async_track_transaction.py",
+      "sha256": "cc197d7afb09c65394019db140ad05a6e75009fe9572b4b5634bb173fa5b8a16"
+    },
+    {
+      "path": "app/ai_backend_models.py",
+      "sha256": "4dc7ae6d47016cf686df0b70333cbf2d835703461ae3f2e3c570c201dd8d3f6e"
+    },
+    {
+      "path": "app/ai_billing.py",
+      "sha256": "ebafc6b42e800b9ed186089f98bcff5b0508047a5c50cad056bed22593929946"
+    },
+    {
+      "path": "app/ai_billing_outbox.py",
+      "sha256": "03a01c828d5cdbfa2d983074beb0e76d1d3dff4634edde45cee19420b53e6ef6"
+    },
+    {
+      "path": "app/ai_billing_profiles.py",
+      "sha256": "23684927e45bdf3801be4ccddff7c94673c8ed818a3e328118eeb6e372d65922"
+    },
+    {
+      "path": "app/ai_billing_readiness.py",
+      "sha256": "7bdbbaae5f8aa19be45dd9891f5aeae273eb33de9a81d0a24cbb6364f07193a2"
+    },
+    {
+      "path": "app/ai_billing_routes.py",
+      "sha256": "c8c5e5e6b70b85c9d3db7365c3576b2d2dc465466ba8c8810510db34b86d3b42"
+    },
+    {
+      "path": "app/ai_billing_scheduler.py",
+      "sha256": "1bd09b22d784b0b0aa8af7a610a8aace76bed9d698b82e8f81d7f00f72e3db57"
+    },
+    {
+      "path": "app/ai_cgroup_launcher.py",
+      "sha256": "982d32ea4611bedd701bb7ea401cae3e318fae81d6afb6122d18f15a74fd814e"
+    },
+    {
+      "path": "app/ai_cgroup_metering.py",
+      "sha256": "b96d194039510236cab8ff8aaee7d18a2ebfd665684f5caf082f2740feb672f4"
+    },
+    {
+      "path": "app/ai_compute_diagnostics.py",
+      "sha256": "4f4132e323990949ff82a989db5b6fb2105e9e41eae770caa6aad84c9e254a2d"
+    },
+    {
+      "path": "app/ai_device_auth.py",
+      "sha256": "5af5b48cef66c34b18f1bed6ae738553c452131da86bc603a4fa263f68451e5a"
+    },
+    {
+      "path": "app/ai_durable_remote_executor.py",
+      "sha256": "d31426b85058d2442328a6532e2910135f5c1a853fab2f24a3fe30766ac3a287"
+    },
+    {
+      "path": "app/ai_execution_limits.py",
+      "sha256": "6110c24edd1311d570d0bcd6cab62422bae840425d6b3d9c23334d46494121b1"
+    },
+    {
+      "path": "app/ai_execution_policy.py",
+      "sha256": "2be2765f683de25bf4dbaace26f40698b49412ec5aa7576e46a105e6e62914ec"
+    },
+    {
+      "path": "app/ai_finalization.py",
+      "sha256": "5e76aa10adc53b7cbc6515bf0e06d63ee08065735d1d47de89c549270d19ad33"
+    },
+    {
+      "path": "app/ai_gateway.py",
+      "sha256": "8a618601080cab61e27922991c5c6fa9ea60c0496b6185187e74b5baa30bd00b"
+    },
+    {
+      "path": "app/ai_global_execution.py",
+      "sha256": "f52f484940e12645be04bd1d0ede5cddc313c9530d54f265b5e2f1cbe4782d36"
+    },
+    {
+      "path": "app/ai_gpu_attribution_report.py",
+      "sha256": "2bb048100e554924e064c658e990d5a1b58de207380598bab8c78e36b680ec5b"
+    },
+    {
+      "path": "app/ai_gpu_diagnostic_session.py",
+      "sha256": "5dedbbeac1488d9cfc8ac9113ee629e8e9bc6f8e185994109367a73fe5fca432"
+    },
+    {
+      "path": "app/ai_gpu_energy_estimator.py",
+      "sha256": "e87d6787164e6f937259a063c3c741060bd5dc7bd830b6fa4fc73104ffd96d6c"
+    },
+    {
+      "path": "app/ai_gpu_process_meter.py",
+      "sha256": "bafd269418e044ba91c884ce879cec8bda5daaed2aa9db1f52412bcd28053e6c"
+    },
+    {
+      "path": "app/ai_gpu_shared_estimator.py",
+      "sha256": "6b80ddcf9a32782964fa48cd0faa27638e19f5a7ebb0ea4427e455c3c8802a09"
+    },
+    {
+      "path": "app/ai_gpu_slot_accounting.py",
+      "sha256": "15e842e010110280cb86b8ec3ca57365ff868c199458a3038c76951afb4ff758"
+    },
+    {
+      "path": "app/ai_gpu_verified.py",
+      "sha256": "e0ca3ceb0b59c4fd943d27b2453222ea72de5ec2f066100abff17c97e354ba66"
+    },
+    {
+      "path": "app/ai_hip_event_meter.py",
+      "sha256": "6f572b1a9920cf7e9e5162579a4458acd22d333f5a2f3d2b2e1ea5a9c9a6349e"
+    },
+    {
+      "path": "app/ai_install_catalog.py",
+      "sha256": "ca6e82cdfa9adb57923e0c51b538b528ea877815ea36f26ec3ec88a3d5cc6afe"
+    },
+    {
+      "path": "app/ai_job_context.py",
+      "sha256": "be385d81da8ab7ce6d3c5ba18982c5a23c19a3305d37ff6b3356d07f43b25f35"
+    },
+    {
+      "path": "app/ai_job_queue.py",
+      "sha256": "1a03fdf6215f5b4c1741378945d2d888e654c8b2325e7b5a7bb2480df9bc447d"
+    },
+    {
+      "path": "app/ai_job_views.py",
+      "sha256": "d4d7bf9a3123cf54f9343899dff63a56a4b63d5b3d8b5fbf56b352baf535bd21"
+    },
+    {
+      "path": "app/ai_media_identity.py",
+      "sha256": "c20028e2d47d1add5a08c095f62cdd681866119f59d788e4c96188b483132941"
+    },
+    {
+      "path": "app/ai_metering_bridge.py",
+      "sha256": "792ebf36d5a3c2cea95f64e6b5bac19c8d13054147a8cf27f9129caac87c6629"
+    },
+    {
+      "path": "app/ai_model_attestation.py",
+      "sha256": "640de33803b6b306b0f9005e5a1d1ddd965065ccba6ebb0b8c674ee0d7c2dc10"
+    },
+    {
+      "path": "app/ai_model_bytes.py",
+      "sha256": "fdcf600ccf14c0d8a66eca2c7e75775ecdb61cd86eabfe7e3f90ad1bd531bef0"
+    },
+    {
+      "path": "app/ai_model_download.py",
+      "sha256": "ef8a2b180203eac208fe3fa7f4edc6c1cff0e025a7b2319be2abcc581812bfde"
+    },
+    {
+      "path": "app/ai_models.py",
+      "sha256": "27fd2f626be6706cb91cd06ce7af80395cb32e10669147db367beffc50a2cc00"
+    },
+    {
+      "path": "app/ai_native_remote_journal.py",
+      "sha256": "2ae103fce708e07452fbd45d5ff6da60c8afd94e184d14914e9a7ed87001df95"
+    },
+    {
+      "path": "app/ai_notification_routes.py",
+      "sha256": "c9572bd27f8dcf3210d0617853780fccd7b158d89123946e890625e854df7c66"
+    },
+    {
+      "path": "app/ai_notifications.py",
+      "sha256": "c2645a42a7aa798d733a31927e01d13d52b13bec156fa4b6de6889ae725afa63"
+    },
+    {
+      "path": "app/ai_payload_limits.py",
+      "sha256": "4ed1c2ab2567005161245df0c55f411e8a36f02697fc5264dc8cc84ad857bc33"
+    },
+    {
+      "path": "app/ai_planning_sqlite.py",
+      "sha256": "8ffc8a2083b6f1c1d463ad1d881aed0ed1f24cc7aefd70b7e67971d0afaf8722"
+    },
+    {
+      "path": "app/ai_profiled_backend.py",
+      "sha256": "5b8951e5cdbca3258db7f6a66082dc56a9ba6b7f0e19ed75463a3e85dd4b25e4"
+    },
+    {
+      "path": "app/ai_project_lock.py",
+      "sha256": "98f68f2f60581a861f468a928339841a3aba250e155510752c1ecc08127289b1"
+    },
+    {
+      "path": "app/ai_proxmox_gpu_agent_client.py",
+      "sha256": "f0818b79fcca6561fb7f9863a0ccf9cd3bbcf0643314c9836946de9e8aa6e8b6"
+    },
+    {
+      "path": "app/ai_publish_outbox.py",
+      "sha256": "4bf5069c14559fefe768c00c829b2b30ed6ea932e68f8558113f7a85866d88bb"
+    },
+    {
+      "path": "app/ai_pull_coordinator.py",
+      "sha256": "7bb7816746393a44b44fcadb2fe7527aa7aed6c29b3e823c8453c311b1beb6ab"
+    },
+    {
+      "path": "app/ai_pull_routes.py",
+      "sha256": "f9bf4e9e1f0e3e92097399b4239a0f70ddfb14a4e17423a09e8d9c9965ca8452"
+    },
+    {
+      "path": "app/ai_pull_worker.py",
+      "sha256": "d2ac8882117daa13884909d784c249e24d791ae15b4342909f73f31ca78c9d5d"
+    },
+    {
+      "path": "app/ai_queue_admin.py",
+      "sha256": "19a02a2451a931722e4d28fbac21fb83f4f0483842b645e59bf46fe82250976d"
+    },
+    {
+      "path": "app/ai_queue_usage.py",
+      "sha256": "e03c04980049f3582055123e0236dc3679265acf13ab0db00af5b40302fd222b"
+    },
+    {
+      "path": "app/ai_recovered_stem_transaction.py",
+      "sha256": "5799a9f78b9ec07cedb9be2109d8b5d0fa02b996a6355623267a5c52c63b9be2"
+    },
+    {
+      "path": "app/ai_remote_client.py",
+      "sha256": "c9a1e7ac7a6fc01af77194bef70c18a3d463ba31ca4dc17d247d02234f8a0acd"
+    },
+    {
+      "path": "app/ai_remote_keyring.py",
+      "sha256": "c0d64b458876c97b0b305ac49417c6dc319f82831230dd843f43f5f1ba5115c5"
+    },
+    {
+      "path": "app/ai_remote_metering_attestation.py",
+      "sha256": "df12573a4727fd3e5dfb81960f031df63a2935288e44b068d1b11b0af08f4be1"
+    },
+    {
+      "path": "app/ai_remote_metering_service.py",
+      "sha256": "2b826398fefe6af370fa03004d9b308af01ab9e64fff83ac37176f866c72363a"
+    },
+    {
+      "path": "app/ai_remote_transport.py",
+      "sha256": "21f727505bfe14d97ae80d80099f85e7fd1c1aab73f00f5c1f803eed4408e141"
+    },
+    {
+      "path": "app/ai_request_dedup.py",
+      "sha256": "a31b0bca32439ba887c3d0c87178442e49307e5117b150d3038e097419fcb4b2"
+    },
+    {
+      "path": "app/ai_result_cache.py",
+      "sha256": "44b24c96a4c30f4a43ff7ca1379af9651085363b47e4f6358be5e5aed453acf1"
+    },
+    {
+      "path": "app/ai_server_execution.py",
+      "sha256": "b108e0318c2e23b7e6ae336c3f9a9ba3442b4a98044aee6e5522589d4d4c531c"
+    },
+    {
+      "path": "app/ai_storage_sampler.py",
+      "sha256": "03e700ce4fe6b799a75959ac4bfd4ce4185f06c0a8fc5e98718d2421a72168b6"
+    },
+    {
+      "path": "app/ai_studio_adapter.py",
+      "sha256": "62856cb1a67a669d56e9b875ef13890460db349a74c59cf36260b0c8684f9423"
+    },
+    {
+      "path": "app/ai_token_routes.py",
+      "sha256": "c437a893c2bbb76bdaf53e27b46ace1fb006a834c35469c272332fee26956177"
+    },
+    {
+      "path": "app/ai_torch_diagnostics.py",
+      "sha256": "a639fcd5c98fd9519ec0855b8f02cdad3088abe4d41372259178fd3535466ce8"
+    },
+    {
+      "path": "app/ai_trusted_estimates.py",
+      "sha256": "1103bf458c9f8912b04fd0f676d2699f67ddcbbbb743c6f156f0b790b0c5a552"
+    },
+    {
+      "path": "app/ai_unified_adapter.py",
+      "sha256": "22c3a002b700478206203ba5c4e361dd6bcac02f10c03087507ab9ab18f3e559"
+    },
+    {
+      "path": "app/ai_upload_transaction.py",
+      "sha256": "2fbaf2ad0b181a20827f681c8fbe2f40bc076e3eef9e92cf1a3d748b13580ed5"
+    },
+    {
+      "path": "app/ai_usage_reporting.py",
+      "sha256": "6e923d652d894a132075dec2262c20ca8def518ac56df0c8b13721f105b2675f"
+    },
+    {
+      "path": "app/ai_worker_artifacts.py",
+      "sha256": "9b539711f09c9d85a22a11480452b6d931c8ee10b3f40cc72bd45272b9952a28"
+    },
+    {
+      "path": "app/ai_worker_protocol.py",
+      "sha256": "963c626e5f4613e1f2ce79c5b5ba96305ff71f626b8d8dd0806d0912a09eb3d4"
+    },
+    {
+      "path": "app/ai_worker_registry.py",
+      "sha256": "32704ece263e9003fb9af86d7e69ccf12ecf5c9161e4156a281b07d73aef7b30"
+    },
+    {
+      "path": "app/audio_backend.py",
+      "sha256": "4d91382bcd6eb8e6c7792c52e440df2dd50a01db1cb31eeee4ebaf1835cc064c"
+    },
+    {
+      "path": "app/audio_capture.py",
+      "sha256": "3ff571db7d8a926b380b0dc738d4dfd5b8c30cc16197e06b9d66728efa31de3a"
+    },
+    {
+      "path": "app/audio_engine.py",
+      "sha256": "1b7579278628d91bc9b019e101e30ff4462fe0a8ca6ec7334b5ec5af2d77040d"
+    },
+    {
+      "path": "app/auth.py",
+      "sha256": "7197a25d08ec5924510a2a4fd02809b5f894b7f908ce73ac13be47b3277a537c"
+    },
+    {
+      "path": "app/auto_mix.py",
+      "sha256": "3442404b21070e085cece068342e8eed85c3f48c02d4ce48253e633de45f04bf"
+    },
+    {
+      "path": "app/backing_vocals_runtime.py",
+      "sha256": "ef66ec8dee81f4c999ef1ea624a7cbb22d29ba56b4e6e516cd1c828c5268baaa"
+    },
+    {
+      "path": "app/bounce.py",
+      "sha256": "64a4f122bec6287d090713e1e52b77f25d0a2bb5fd4a815e53f7433c54910f61"
+    },
+    {
+      "path": "app/checkout_reference_recovery.py",
+      "sha256": "1ac3a548b8a59c5c2301c0c5fb99f6502b6d737578756c83b7c6fcd3190a08e8"
+    },
+    {
+      "path": "app/checkout_terminal_outcomes.py",
+      "sha256": "3e5790f8fc7ac22002e04ba0b5f972e147cb141b63f3a9a4a49759dd01ed2eae"
+    },
+    {
+      "path": "app/chord_ml.py",
+      "sha256": "86ba5a55507dd13bb80936ed610d3fe1eef20ec786fd765734733c3c66ff02af"
+    },
+    {
+      "path": "app/chordino_runtime.py",
+      "sha256": "1f68de3b0d7c4b4a50f7b509941b4e55e5b31f788727e7b2f75ed0cc745b29c4"
+    },
+    {
+      "path": "app/codec.py",
+      "sha256": "a67fe5d5390db89c24bb4c7b5c1c52b68e066db098badfdd700695cba2919d4c"
+    },
+    {
+      "path": "app/configure_ace_gpu_profiler.py",
+      "sha256": "5a5554a196c01e12d9ad1812f9b8efc157a90832d7d674a02da89ed209b44967"
+    },
+    {
+      "path": "app/cpp_audio.py",
+      "sha256": "c5493e46e1eeeb6903208ea12472ac5a19d80516a4ef488880dd965800463801"
+    },
+    {
+      "path": "app/cpp_timeline.py",
+      "sha256": "0c0d70eb5ab21517a6c1b76c7750b936a88227f5fb1b893478f5ef9ca749eac7"
+    },
+    {
+      "path": "app/credit_purchases.py",
+      "sha256": "850f4580e1c2077456c24b10129b05c9c5263637ccf18a50bb02c18555abf8b0"
+    },
+    {
+      "path": "app/deferred_execution_owner.py",
+      "sha256": "e20d7f1e99c5fa9288793ea99ed8c03034f78fccc3376eb71cccd7f8f1938f74"
+    },
+    {
+      "path": "app/demucs_runtime.py",
+      "sha256": "4934f13aa5145a2315a27416a84c0cb8aa9b96b25f0f5e1139b7c284a24a1e0d"
+    },
+    {
+      "path": "app/diagnostic_bundle.py",
+      "sha256": "4dec1e08e02793482b8d46cbdedbe2bf7cf2afadeacabe6d920c9a6e59485189"
+    },
+    {
+      "path": "app/diffsinger_bridge.py",
+      "sha256": "27055c93551c2abee3b1925cf406d1a3c6ffb6a3a07d3cee73dea2bd9cb195ef"
+    },
+    {
+      "path": "app/diffsinger_onnx.py",
+      "sha256": "8dac6440e42a18978ea46326079c81394e73d51599799b8d9c6e9ee5f4c49b12"
+    },
+    {
+      "path": "app/docs/MTA-Audio-Editor-Administrator-Manual-EN.pdf",
+      "sha256": "5a3df8a233241eeb9acd10def31f9a1e55e6dcb48f73e1dd1057dac9c7046800"
+    },
+    {
+      "path": "app/docs/MTA-Audio-Editor-Administrator-Manual-IT.pdf",
+      "sha256": "235b5994191f62ddcdd4e9c682bb4736acd1420231241787b466a0a0d652b80d"
+    },
+    {
+      "path": "app/docs/MTA-Audio-Editor-Brochure-EN.pdf",
+      "sha256": "572da389b665f8c5a570bc097862ab8f2ef80b1c1312b17238bc5d0f3b0286a6"
+    },
+    {
+      "path": "app/docs/MTA-Audio-Editor-Brochure-IT.pdf",
+      "sha256": "00f01532f6e438989597f65849831a3cfb73512fc7f18cf82fd41787af9a6cf5"
+    },
+    {
+      "path": "app/docs/MTA-Audio-Editor-M-Live-Merish-MP3-Format-Specification-EN.pdf",
+      "sha256": "74b04b03b8dded62bf7e641abfd10691fd488c9aaac4e52c7094d2c3330a00dc"
+    },
+    {
+      "path": "app/docs/MTA-Audio-Editor-M-Live-Merish-MP3-Format-Specification-IT.pdf",
+      "sha256": "d0aafb69b19a1f245b2d943cf9a923612776879cc45e9d6916df49d80fc4d043"
+    },
+    {
+      "path": "app/docs/MTA-Audio-Editor-MTA-Format-Specification-EN.pdf",
+      "sha256": "a00ba4855ab5b2055d3017231619478423fa425f7435d19e64e87b108622871d"
+    },
+    {
+      "path": "app/docs/MTA-Audio-Editor-MTA-Format-Specification-IT.pdf",
+      "sha256": "361ef397a250affe682124eada09d496ab0a9da84be53a7ff2580502013dbcad"
+    },
+    {
+      "path": "app/docs/MTA-Audio-Editor-User-Manual-EN.pdf",
+      "sha256": "31fa38dc75399529edfae85b3200729f892da2cf6ff78a442a3e141a894d54ef"
+    },
+    {
+      "path": "app/docs/MTA-Audio-Editor-User-Manual-IT.pdf",
+      "sha256": "37a1764836b37f8931489ad2590b521fb1e450d7274e1cd37f24c474e33a8a93"
+    },
+    {
+      "path": "app/docs/MTA-Audio-Editor-VST3-Manual-EN.pdf",
+      "sha256": "03069b538730f0e46f7edad3d484d9bd2a28ec2e9740c3390f47a522bf25e33e"
+    },
+    {
+      "path": "app/docs/MTA-Audio-Editor-VST3-Manual-IT.pdf",
+      "sha256": "68a871181b6cf3fd338d34d2f6792fcb585e09f10180fc328c5f1d524018e9ff"
+    },
+    {
+      "path": "app/docs/account-lifecycle.html",
+      "sha256": "d07c79e03ad8c004905d656d7a08b9b77140bd02ffcb79156e810c4d3183a7e5"
+    },
+    {
+      "path": "app/docs/admin-en.html",
+      "sha256": "c7190335b25aaef91b0d04ac3c58a22c901c5468f49faeb2241a707476a70344"
+    },
+    {
+      "path": "app/docs/admin.html",
+      "sha256": "eb54dabfffcbd6734c576edfe9d52facae3313a7e678a75e5b488125ad5fb3c3"
+    },
+    {
+      "path": "app/docs/application-dump.html",
+      "sha256": "b4842f7963878f697eaf91e95d86123b870cd487f3dcea911f5380cb1d774370"
+    },
+    {
+      "path": "app/docs/doc.css",
+      "sha256": "593caa91ece9851bd55e480d2123d37d2e9a6e629339bba3981fc617f0952c9f"
+    },
+    {
+      "path": "app/docs/legal/privacy-en.html",
+      "sha256": "da6d11c67ffb98ada28468617c979eb7493a5a4f4147b02aaa45dd1c5ed6a3f6"
+    },
+    {
+      "path": "app/docs/legal/privacy-it.html",
+      "sha256": "45be57ed335a89c120a0d79296ffef47df0eedee4f258380ebae564ea4327a5f"
+    },
+    {
+      "path": "app/docs/legal/terms-en.html",
+      "sha256": "c6cc9f89478b5788ed0a5db3bf982ecdb58a7b61a0d137f418ed7a8732f54d36"
+    },
+    {
+      "path": "app/docs/legal/terms-it.html",
+      "sha256": "87a72e9700a6d79e580dc40760a92c44a78535441df253602ac5daca080ea779"
+    },
+    {
+      "path": "app/docs/social-login.html",
+      "sha256": "e007399853d9ed6e71a255bd5c12e8f06ba5539db3f2a290329d3242405d2092"
+    },
+    {
+      "path": "app/docs/user-en.html",
+      "sha256": "f73427a777627c4150b22877227befe5d106b491b0177e217510ce0669b0414a"
+    },
+    {
+      "path": "app/docs/user.html",
+      "sha256": "dfff20bb592f5fb88129f33c5352f97d984c484eddf082a256bd3ab301e2cf0e"
+    },
+    {
+      "path": "app/docs/vst3-en.html",
+      "sha256": "cce632c639395f1dae4e3d45131ec8b330d2de9e8a706a076816be3003db7137"
+    },
+    {
+      "path": "app/docs/vst3-it.html",
+      "sha256": "747bccef5867ed1bfc7548522c70b351ed9c981f1197f5c5e18e20acb63d4d04"
+    },
+    {
+      "path": "app/drumsep_onnx_worker.py",
+      "sha256": "0858dd1b003942654ae0da859fa36e26a3d646e8bf0afffc4a4b595e90e07412"
+    },
+    {
+      "path": "app/editor_layout.py",
+      "sha256": "ebab4f9c61dfde7f105c8ba9a30025029a4ef96af772137b0a32ca4d1ff1e5a6"
+    },
+    {
+      "path": "app/fs_durability.py",
+      "sha256": "2d8f75d663a856c15c278e41ad0eb08ce26a0fef9dea43dbbabc16670928aa62"
+    },
+    {
+      "path": "app/gm_banks.py",
+      "sha256": "8f5519646655b7ded5b9df77acda9c0820c2aa1d5650b6ff4fe90e4fea46be66"
+    },
+    {
+      "path": "app/gm_installer.py",
+      "sha256": "7e8ad61776b4464883028e482af2b2ad97424f445a64bd261fcf43f0fee08890"
+    },
+    {
+      "path": "app/gm_instruments.py",
+      "sha256": "a54d33ec1ceaf70d12f3fdb0dd5f9fed5df14a3d86f7f06ef83a2fc0c6495cb0"
+    },
+    {
+      "path": "app/gm_portable.py",
+      "sha256": "ff965188048a6be0180bff83cf40f37112c88f553cf5751c3e00ae0fe98f293a"
+    },
+    {
+      "path": "app/i18n.py",
+      "sha256": "eb5b62ade2caabcd6f913c1bbf3536c98ae9904428b7024419cd44a3fcabe1f9"
+    },
+    {
+      "path": "app/i18n_catalog.json",
+      "sha256": "7eeca96e7cb1419854691755a3c1cda51dae2fee06413e88501d04def806206b"
+    },
+    {
+      "path": "app/job_settlement_contract.py",
+      "sha256": "3f038a80e05e1414999b89f130c97b6e87ee8eaa954464062f2eab19ac68b018"
+    },
+    {
+      "path": "app/legal.py",
+      "sha256": "a764112349637d1cc15492fe60e3f77057e71d9fb3fead4d19fa75c2e94aac42"
+    },
+    {
+      "path": "app/linux_proc_view.py",
+      "sha256": "76faadb240dc3af7f2ecfbdd2c5b1016d0a6f6c100afd4bacb1bbfb0118fd022"
+    },
+    {
+      "path": "app/live_mixer.py",
+      "sha256": "c6ff8e9b9b7cc66b5f6cf7c3c44b46991eecf387803e6f8c8323c7352ec9a291"
+    },
+    {
+      "path": "app/live_sources.py",
+      "sha256": "729653cab99964a56a4d56716e76e40e7b9c01ee7cce215679780c0703828dae"
+    },
+    {
+      "path": "app/main.py",
+      "sha256": "b42393500b23f15c14b7e8b3b1ce41d5875e01d9d904156d060c31f989e8b997"
+    },
+    {
+      "path": "app/mega53_runtime.py",
+      "sha256": "bdbe09d28be536419f308dc8b448d5f1a552d9ce37168724ca19bbf013b35947"
+    },
+    {
+      "path": "app/metronome_grid.py",
+      "sha256": "65c3e06fd4215ac561a5cb085d0c92fada782a519331e76f861fd01124f0cf02"
+    },
+    {
+      "path": "app/midi.py",
+      "sha256": "bfc599a17318a7dfccd050ec430de588420df2f4fe6dded4fd8d7e69e82bad1c"
+    },
+    {
+      "path": "app/midi_devices.py",
+      "sha256": "dd19f0d76871b9d93d37f35a35d03c1f7b072892c851a6155497fd6ecc3d5284"
+    },
+    {
+      "path": "app/midi_metronome.py",
+      "sha256": "961922e793e0b76570c66d0bf2114dddc993fab972a46bd2f80a31a573a63b00"
+    },
+    {
+      "path": "app/midi_monitor.py",
+      "sha256": "27e1d1d9592cad17264e65ba2fc8e94ff11bba62fd756d8ad5d14f44c9552728"
+    },
+    {
+      "path": "app/midi_render.py",
+      "sha256": "1d2ada7f3254c22ca81948976c9e3ad24d0e1d773727cfbac153cb95d562a8ba"
+    },
+    {
+      "path": "app/midi_routes.py",
+      "sha256": "9e5c8677fc1278ec6b42c5ac01a6119c29a75abdad66bb3ec47242ebf30ac469"
+    },
+    {
+      "path": "app/midi_smf.py",
+      "sha256": "20486d0f8fdc7afbc0859645d3616517901cdaabc9951880a865909bee6cc478"
+    },
+    {
+      "path": "app/midi_ump.py",
+      "sha256": "5bc915e5a04b841937fec3ebb7ec453fd48dc37b7eb03fcfe0c9d2c0b3825bee"
+    },
+    {
+      "path": "app/mlive_mp3.py",
+      "sha256": "d83e56a2142fed65fe0ad85053c18aa0af293186f271619b22bb3ca3b557fe31"
+    },
+    {
+      "path": "app/model_asset_admin.py",
+      "sha256": "d435e1bb234cb7b95de4fcbb1aa369f527505fa151c0334799407e0428f0009f"
+    },
+    {
+      "path": "app/model_asset_admin_routes.py",
+      "sha256": "82151d07e47b67087bc7694a71eb1812bfc32b454b573f84c44330a9e39fb29d"
+    },
+    {
+      "path": "app/model_license_policy.py",
+      "sha256": "5348282dc65f64afe3a692a803bb0d90afcd19cf07138657a9517549a42165a0"
+    },
+    {
+      "path": "app/model_rights_dossiers.py",
+      "sha256": "2fb23833835874c23885c22dfb03cc22aa52748f4494f83c506d7e6c86783605"
+    },
+    {
+      "path": "app/model_selectors.py",
+      "sha256": "5af81aea974cc537ddb63ef5b4e2390b165e91dff789a6babca39bb95bc37b9a"
+    },
+    {
+      "path": "app/model_storage.py",
+      "sha256": "99a7c255f886ae7bf1cd6a9506455592f2efd0da9aaba8327a8940a916b1da6b"
+    },
+    {
+      "path": "app/model_updater.py",
+      "sha256": "2ceb9df25b17d70d46427bda86fc5a52a9adabe0587b6af944d469306d0ce977"
+    },
+    {
+      "path": "app/models.py",
+      "sha256": "662df5d8644d050ac61dd5367ec72b0a6dbc1fa8e5defcf78f07c15bdb2ee615"
+    },
+    {
+      "path": "app/mp3g.py",
+      "sha256": "8cf260e75c2fee4ab397008d9f5aa36186791002082f723da9673d28e75c6a3a"
+    },
+    {
+      "path": "app/mrmt3_adapter.py",
+      "sha256": "f6817b71cd21089e1c8eb8cfd41389546a853bb28f836aecb53d5a823b9b258e"
+    },
+    {
+      "path": "app/mrmt3_checkpoint.py",
+      "sha256": "1d22fa45ccdadbf2aec366f8457daf519d6de2c0362aadcae339b91486e6f305"
+    },
+    {
+      "path": "app/mrmt3_decode.py",
+      "sha256": "f23b8655b2cb7dafe947049870047e8d55eff5f8bf0a504d418a1e74aaafec26"
+    },
+    {
+      "path": "app/mta_reverse.py",
+      "sha256": "bf12e048a68b5ed8a8a92c50e7ff77a7fb270b134215ed00db0cb5b57991baab"
+    },
+    {
+      "path": "app/mta_writer.py",
+      "sha256": "75e2202f8e7f49b867f8652a5cc89643ced8fbe8903dfaae6bfdb2de68b0b6a2"
+    },
+    {
+      "path": "app/music_channels.py",
+      "sha256": "5486f7e76d150476499ecb64ade0bc3c134512d95c6edad2a86d73971bd79d1c"
+    },
+    {
+      "path": "app/music_interchange.py",
+      "sha256": "e8b5a5d4468f88ddf6f330b2710ee2b0a14f1f503140207916579bb14a08c12b"
+    },
+    {
+      "path": "app/music_publication.py",
+      "sha256": "2ebd385691c6969e8c909e5083fe5e069fba4e56bc4ef292a1e02203675374cd"
+    },
+    {
+      "path": "app/music_reconciliation.py",
+      "sha256": "87c3775cfaa3672415222b3a93bb1424b540b752fce364741b4c531570e64aed"
+    },
+    {
+      "path": "app/music_text.py",
+      "sha256": "705fc71f4d50fe66557ef95e29375003c3ccac5bf69ba46939280ee3872b6b44"
+    },
+    {
+      "path": "app/musical_clock.py",
+      "sha256": "0798fc9c58ebc36a0478fe36981d6963a53fd1755ad2ee9c264dd5b782a24557"
+    },
+    {
+      "path": "app/native_ai_account.py",
+      "sha256": "2883d422e7098469f7a9464d5652f26a7600288dfe29f448165e4cfc2fe60f63"
+    },
+    {
+      "path": "app/native_ai_routing.py",
+      "sha256": "3902bd322ad0b7563cf9c357e9889c1c6990dc35e8098476de813d317d667919"
+    },
+    {
+      "path": "app/native_capture.py",
+      "sha256": "b07c3a0311fc9146ba795d7066d8a8b86ddb018c7296affbeb314be8ea05dc72"
+    },
+    {
+      "path": "app/native_device_io.py",
+      "sha256": "ff53d69372d2eac53edfd49a52adab34c3fd475dfa7d761149e7d056450540ba"
+    },
+    {
+      "path": "app/native_dsp.py",
+      "sha256": "de96e9e6a81b9af61e83d10eb666e382235ea646b0e85bf5abaa60a11178d1ae"
+    },
+    {
+      "path": "app/native_midi.py",
+      "sha256": "250b4fd5d76c4947520ed787343d69dd0574ba939f7e0be28fb560ce047166e2"
+    },
+    {
+      "path": "app/native_transport.py",
+      "sha256": "5afb6d300825eb62aa949e8ee7cf79e8fddb1c6e7ae351a6eac6f8c50e5e95bb"
+    },
+    {
+      "path": "app/neural_vocal_adapter.py",
+      "sha256": "2f1924a1938726cb03f5166886fc3448400756931df440fb1ff06b586c01804e"
+    },
+    {
+      "path": "app/noncommercial_allocation.py",
+      "sha256": "f1c5fb384951b5442fbde94d14578b0caa3f0167b0079d8364ec6c6746e958df"
+    },
+    {
+      "path": "app/noncommercial_contributions.py",
+      "sha256": "936b65925764e6638d004a719ccfcf5180dd0adece4a1151d2add91e0c465d32"
+    },
+    {
+      "path": "app/noncommercial_period_guard.py",
+      "sha256": "ddad79e3d14ab96b62f44ca6b2bae769f3d1ff620796a726122891b7cbc1adaf"
+    },
+    {
+      "path": "app/noncommercial_statements.py",
+      "sha256": "93147e1a0debd44a1a91fcb5863be9a0607723e66d1bd08bc6ea31452a2ec5d8"
+    },
+    {
+      "path": "app/operator_refunds.py",
+      "sha256": "02ca302453559952a0226cd7079002d412f7798b3d329ba4af4cedcc6fe360b2"
+    },
+    {
+      "path": "app/optional_plugin_licenses/chow-tape.txt",
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    {
+      "path": "app/optional_plugin_licenses/dragonfly.txt",
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    {
+      "path": "app/optional_plugin_licenses/mverb.txt",
+      "sha256": "c61f12da7cdad526bdcbed47a4c0a603e60dbbfdaf8b66933cd088e9132c303f"
+    },
+    {
+      "path": "app/optional_plugin_licenses/surge-xt.txt",
+      "sha256": "d4c0fe570b3750d909691ce5f494c9cd11ee047bbbedda9a5d75cc548e4df06b"
+    },
+    {
+      "path": "app/optional_plugin_routes.py",
+      "sha256": "b649566cc4529a6e481653f6741a9dd8be9a77e368b300c67b0ab13f6b2e4f03"
+    },
+    {
+      "path": "app/optional_plugins.py",
+      "sha256": "9e00f0044bada305564ccf63c3d2949ba8b6299793cb2eee285d6b775cf505a1"
+    },
+    {
+      "path": "app/optional_plugins_catalog.json",
+      "sha256": "b5c3ef981b1a76bbc8e0031ee71226fc91fd4de62b9915af5f024f8350934985"
+    },
+    {
+      "path": "app/owner_payments.py",
+      "sha256": "8183773f0f13da9022e6111963e063d67ca96852e179b21d150de05948fd5331"
+    },
+    {
+      "path": "app/payment_reconcile_service.py",
+      "sha256": "359d631353e79ba12a9aac62ce4f4fe4febde72b35c4d8df67a67e6c5e1963e9"
+    },
+    {
+      "path": "app/payment_reconciliation.py",
+      "sha256": "bf1dcbf57b3052685572f77e3f0fd702a55a47d65c74425539f09e4596b2b6e5"
+    },
+    {
+      "path": "app/paypal_dispute_details.py",
+      "sha256": "e81dbc26dfddafa4b35b743be3d7a1ad3c272716be3eefd16d8e1e31821ca36a"
+    },
+    {
+      "path": "app/paypal_dispute_history.py",
+      "sha256": "4b1882fcd7f0b2f7598301206ed7f558d02180a5d1aca7a632a85590393c5306"
+    },
+    {
+      "path": "app/paypal_merchant_history.py",
+      "sha256": "6a64b4cc8998a3c855cfceb42ecec8d5f235d43504a069291678285f9cd1b293"
+    },
+    {
+      "path": "app/paypal_merchant_reconcile.py",
+      "sha256": "1dbde889203cded042e0760264418012ea1296b0cedec6104289dc656c611a5d"
+    },
+    {
+      "path": "app/paypal_payments.py",
+      "sha256": "91b2aa0b4818ecd8c924424c939e917e109a2ef85d9753282026814426e0f17b"
+    },
+    {
+      "path": "app/paypal_reconciliation.py",
+      "sha256": "23521a2ca55147063873bec9c5b829c0fa827b129c07fe04b74d5bd3f11e1dfc"
+    },
+    {
+      "path": "app/paypal_report_reconciliation.py",
+      "sha256": "bd7214c1ca515fb2602a8e2c68e529b9d3e1e8b6245c244d5b5cc1ec03b43766"
+    },
+    {
+      "path": "app/paypal_settlement_reports.py",
+      "sha256": "9aeff3f43ad10b61097ae8c17688c62bb699c94fec667bf6cc5cdf4590e4c8eb"
+    },
+    {
+      "path": "app/platform_file_lock.py",
+      "sha256": "f465c089ff94a35fe80708e26b8ed69bcc8cf1dbfd8004f12a2051065ffb2a74"
+    },
+    {
+      "path": "app/plugins.py",
+      "sha256": "9555c7881354aaff3fec7082f4429bc929d4d52b1d0949280eb0fccbdf4eee6d"
+    },
+    {
+      "path": "app/preview_publish.py",
+      "sha256": "72b54e1ec35c11b6367d193188eb19621673654fa3aefb52c5b54fe5fd2a887a"
+    },
+    {
+      "path": "app/project_kinds.py",
+      "sha256": "d2043a15db7f478bf7aca0e9d6e1205e09d9886e5c56ea5d786d2ad6ba8181f1"
+    },
+    {
+      "path": "app/project_media_usage.py",
+      "sha256": "85300cbd24bf3df6fa8b4c34b7a4b4aa94d77471b7858bd69b50ae7f0990e3f6"
+    },
+    {
+      "path": "app/qixuan_profiles.py",
+      "sha256": "0cf26f379cc704c483db8a3b902fb8f8456af8e2af955d7a395fd22b59e469c7"
+    },
+    {
+      "path": "app/rc_acceptance.py",
+      "sha256": "c7f524b417dd7748d67ba7fe53fff4980e86b6c4dabb560124bc7cb4d1739f91"
+    },
+    {
+      "path": "app/regime_admin_closure.py",
+      "sha256": "632f0a4862c42087ece9d2d0abf8eac80d29b43b20e02a32fda18a015c3d6753"
+    },
+    {
+      "path": "app/regime_admin_cutover.py",
+      "sha256": "ad64b10daad349002fa7ac2a7d8c08e166ac3db9c3d4c1754ddb18f230ede54a"
+    },
+    {
+      "path": "app/regime_balance_continuity.py",
+      "sha256": "a9888d50e85c8076f473c6c2ba9e34f9bc4eb10db835d9ab822131cab3f62163"
+    },
+    {
+      "path": "app/regime_cancelled_checkout.py",
+      "sha256": "e615cb1c34be47634f0965de84a2e942207d890b64a56948cf7669f48b267cc0"
+    },
+    {
+      "path": "app/regime_checkout_fence.py",
+      "sha256": "35ba9deba845583d0f5fe718dd849ed17e9ed3a6496a9a101db681ff46ee412d"
+    },
+    {
+      "path": "app/regime_cutover_atomic.py",
+      "sha256": "e00f84aa63deaf574b6b0519f5d45bd05bd7298a32bcb1a81100c8d89870a027"
+    },
+    {
+      "path": "app/regime_cutover_finalize.py",
+      "sha256": "2cd54dc9637822b47d72764255f657d5aff67c532631edb038c88f237de1a84b"
+    },
+    {
+      "path": "app/regime_cutover_mirror.py",
+      "sha256": "ebcf67dfbfaba5c8b3b3678117b1cb5b3bd5a6036a1e3b103867de9aef06a2ee"
+    },
+    {
+      "path": "app/regime_cutover_recovery.py",
+      "sha256": "f28c69a9cc8715e25ecb268954280f06777b17589cedd8751c941ff31de0ed90"
+    },
+    {
+      "path": "app/regime_financial_evidence.py",
+      "sha256": "039d56f0258a21b51c835dd2a2c2f577c4838cb55142aab0fbb8b674ebf58315"
+    },
+    {
+      "path": "app/regime_inbox_coverage.py",
+      "sha256": "edeb9db36433d2e39a1739302e71046521dd7fb930b361363afcdeb824d7dd5a"
+    },
+    {
+      "path": "app/regime_job_fence.py",
+      "sha256": "1ffda4238676db30f1912dfd37ebf6d052243ff8744e3720d0fe2a50069843de"
+    },
+    {
+      "path": "app/regime_local_readiness.py",
+      "sha256": "276c5703725bf219d2762331ce8c28468b6d62f042777f4a8f751c98d39fee43"
+    },
+    {
+      "path": "app/regime_maintenance.py",
+      "sha256": "d21b237683307a88c5dfe2b9745989874ad04a5e0c111bba54e85edb809fbb46"
+    },
+    {
+      "path": "app/regime_operation_fence.py",
+      "sha256": "8b3f282dca97f2dfd76d219bb07db9d3f612a2f7b457826b7331f233e1822484"
+    },
+    {
+      "path": "app/regime_operator_preflight.py",
+      "sha256": "c2710003dbd04c837fa528946c7b8c3ff774b4906ecd62f0245f395a703eff20"
+    },
+    {
+      "path": "app/regime_outbox_review.py",
+      "sha256": "19be67ed7244a6b89ca6e6edbc7760bc945e44a1039872f92a0d20647a1ab59e"
+    },
+    {
+      "path": "app/regime_outcome_receipt.py",
+      "sha256": "a3b6acf56658db1f1980d557f9664a888c546b87aa5f0a8c1c87a1e6817271ec"
+    },
+    {
+      "path": "app/regime_payment_outbox.py",
+      "sha256": "b13b3fc5464e95627b4cc033bdc374382e85564dc31bd11633d9a35da3705f2f"
+    },
+    {
+      "path": "app/regime_provider_probe.py",
+      "sha256": "9f69d32f9bcee9def24a85e67f4d0275db6208ff8de8dde10bfc1cbb63f5a474"
+    },
+    {
+      "path": "app/regime_provider_reconcile_service.py",
+      "sha256": "8bd2421aa1c246608348116c034d574cb351b4d8e2f4400849aca988f0ecbdef"
+    },
+    {
+      "path": "app/regime_provider_refund_evidence.py",
+      "sha256": "11350bd0e5adb05d01fd65a42cee5518132c3cdb621f25a168f688fae859fbe6"
+    },
+    {
+      "path": "app/regime_provider_settlement.py",
+      "sha256": "9825631f9e41b555b76b115a92b3308d75df773fb85383ce3d84d958a1420463"
+    },
+    {
+      "path": "app/regime_readiness_cli.py",
+      "sha256": "71971d925ab56b227df835f1640c964b792cda1d6591373a27b97823cfb015c5"
+    },
+    {
+      "path": "app/regime_reconciliation.py",
+      "sha256": "fc2b1f313ec88a010bac5df04d06ed5ed42a383a4cfd8ed1d97b5491b6dce6f3"
+    },
+    {
+      "path": "app/regime_service_lease.py",
+      "sha256": "1f5c8de729a144b2b6ef4d5e7c47e90e32599541ec3a2991c2bc774873fd71af"
+    },
+    {
+      "path": "app/regime_stripe_inbox.py",
+      "sha256": "a1d7723e5183e20005d3258655ff187ff1a025dd57fe2df21506457f59ff25ca"
+    },
+    {
+      "path": "app/regime_transition_journal.py",
+      "sha256": "b9c7be5c1bff75cb56f2d3d99a0fbfcdc786d16875ed16fe86f7dac14c35eebb"
+    },
+    {
+      "path": "app/regime_transition_plan.py",
+      "sha256": "41541c0a80d51b88db7831f50af38111482cc83fccb820a5be0de633f254b65a"
+    },
+    {
+      "path": "app/regime_transition_status.py",
+      "sha256": "1df50a0a652df6ce417088e383fa71f7f413da860be2e10a49ba1743d0c0804a"
+    },
+    {
+      "path": "app/regime_verified_transition.py",
+      "sha256": "15e691c71529114ca99b9287d579a0784c94e6e3003ef514c66fe60c5fcaf596"
+    },
+    {
+      "path": "app/regime_worker_claims.py",
+      "sha256": "3132cadb943f3c8b53562a39af882b58adcc7e29c97ee7225c71a4531bfbcd8f"
+    },
+    {
+      "path": "app/regime_worker_completion.py",
+      "sha256": "4892ae71dce9005a74a373b08ae7926eade68aab4e99d834050e4176e697ba81"
+    },
+    {
+      "path": "app/resource_access.py",
+      "sha256": "84b77b08a5996deedd904075c9ae434e3be502276c18ad76341d4edeb352817f"
+    },
+    {
+      "path": "app/resource_accounts.py",
+      "sha256": "2dc800e315afe726f9a9caef777a97f387ce04245de2755cacc21da3d3c662da"
+    },
+    {
+      "path": "app/resource_contracts.py",
+      "sha256": "2391fc86d1a57f5441a3a0b34336782e02331a69d033150f0ed2e0f4fdec6343"
+    },
+    {
+      "path": "app/resource_entitlements.py",
+      "sha256": "eacd7fac7f0ae7d4c892bf6656e41f963e1db4d715cb7aeb6237fd761d3d7297"
+    },
+    {
+      "path": "app/resource_routes.py",
+      "sha256": "01da9980413a58cc13bb35e457f83e1e294eeb89d2c88b264b6e9e43992d3c53"
+    },
+    {
+      "path": "app/restore_dump.py",
+      "sha256": "1d273bb4487938bc70d311ff813f5c25ead8635560f49fb4391e07c9da8c4352"
+    },
+    {
+      "path": "app/rights_registry.py",
+      "sha256": "bafd7abc6257d6f2a95036b9a7735d648d9a3879b980e1fb50228707d7b98dbe"
+    },
+    {
+      "path": "app/runtime_paths.py",
+      "sha256": "52faed738879a23272f17dfa8030d739740b6240a9771f93d2df6dd1060bbf2d"
+    },
+    {
+      "path": "app/sam_audio_compat.py",
+      "sha256": "2a1b7e83a06f4715713e968542496e5d1a0e597c39056d654770639bc281b008"
+    },
+    {
+      "path": "app/sam_audio_worker.py",
+      "sha256": "60855ae0b60bef712da38156f44333d6e0f85e93cd84710cec4d831028b458b2"
+    },
+    {
+      "path": "app/sample_editor.py",
+      "sha256": "c6bbb685ecb6d7c1f5215e82837c29fbf51b189c7790f0bba6a60eac3406010e"
+    },
+    {
+      "path": "app/secure_https.py",
+      "sha256": "b546e0757d3e9129f7efff87e59ab24ffd20f7498bec0f4424fb12b9d802a10b"
+    },
+    {
+      "path": "app/security.py",
+      "sha256": "0a99b14f9ddd461a41af672cb6440f798e4eb8bd86e92cbad6c4e5cfc02c7981"
+    },
+    {
+      "path": "app/seed_audio_export.py",
+      "sha256": "33bab5cdaa599ecdae48fa7e40b772468b799ff86ce83e335d0c77da9f6c1750"
+    },
+    {
+      "path": "app/seed_checkpoint.py",
+      "sha256": "b4836e60bdddc7919009d8a1103651c689e27f5d2e65d42f2c8e6bd813893c6b"
+    },
+    {
+      "path": "app/seed_vc_runner.py",
+      "sha256": "e338226ef679b38bd0f1ee36c4d90da6677331f28c856991c27229c89f2ea5c2"
+    },
+    {
+      "path": "app/separator_process.py",
+      "sha256": "05bbc63a23d8385ce68c71a05ee31ae4dd1c348152fda914361305215a752a7c"
+    },
+    {
+      "path": "app/server_vst3.py",
+      "sha256": "fbed5f653f8cc3308afba6ba98d54550e461221c753683c568dd58f06dc9ac48"
+    },
+    {
+      "path": "app/server_vst3_display.py",
+      "sha256": "06f76b7d99d79b0172fd500ab5bc3c70b55862276c5f6b12313fd10fdfce088e"
+    },
+    {
+      "path": "app/server_vst3_editor.py",
+      "sha256": "2f6ec9e431706484392d535f1ccc3265f6b0628f7e8f9460cf8132443ed98084"
+    },
+    {
+      "path": "app/server_vst3_worker.py",
+      "sha256": "fdc3224b6c887a6d902b5206c4b2b04b00551c4b88ebd5cec4eb3c49fa987319"
+    },
+    {
+      "path": "app/service_admission.py",
+      "sha256": "2a202eecd314795b88b310a4dec50907ae24b759f209f8c4bc8d23702dc07600"
+    },
+    {
+      "path": "app/service_admission_routes.py",
+      "sha256": "2ee7d19c917217cc0989dfa73cdce8f0c28c6629213e542a620447748b421f67"
+    },
+    {
+      "path": "app/service_drain_obligations.py",
+      "sha256": "eb020888886dbb62e060aea8e517d83f061800e69073422e0f3322eace8306ae"
+    },
+    {
+      "path": "app/service_regime.py",
+      "sha256": "a537a8a7b502c9ad4c54a65c10543b2faedaead3a16bd8b19f2551ca50f12f83"
+    },
+    {
+      "path": "app/social_settings.py",
+      "sha256": "24a97547b4516e43765f6b1aef4bf06f576f7ff2fa46574aa228719a449910ad"
+    },
+    {
+      "path": "app/social_totp.py",
+      "sha256": "35c23d4b3b880e627bb2c10d29e8c37c5db8ae3d9ff7f7a06804f523ee7e651e"
+    },
+    {
+      "path": "app/social_ui.py",
+      "sha256": "4f90381d7eff2da0cc3cc8edb2581a58a2f28c32808b9e4b5bebec483c640a80"
+    },
+    {
+      "path": "app/sqlite_availability.py",
+      "sha256": "365fb1b80404d3441fdf9cd06570f21a7a2a7f0ecbc41f716c4a40ca8bcf79da"
+    },
+    {
+      "path": "app/static/account.js",
+      "sha256": "8644c294a7d740245ce781b0e7397ef9f56b629b167bdd7582973afce6aa89f4"
+    },
+    {
+      "path": "app/static/account_lifecycle.js",
+      "sha256": "eb93616bc23ec69bd67270e46cbe1a3eb4b2db66e83beff97e2f112928ef41ed"
+    },
+    {
+      "path": "app/static/account_limits.js",
+      "sha256": "caeb053df513516b5da651d4564478839c5c7d62a01f26b9bac1024f7b8ac058"
+    },
+    {
+      "path": "app/static/account_workflow.css",
+      "sha256": "7adf644620d75439b8c1a4641e255500ef5d5c1dfd30fb86a4a9bcb3dde2e480"
+    },
+    {
+      "path": "app/static/admin.js",
+      "sha256": "b13a04b512144dee8aa1a7b72a9ea63dce961fa72b2e223ead9ba8b257a0e032"
+    },
+    {
+      "path": "app/static/admin_accessibility.css",
+      "sha256": "7a32ecd24c277670adabdbece4b3086bcbc9b20c210f3cc00305217c7be3fdbe"
+    },
+    {
+      "path": "app/static/admin_accessibility.js",
+      "sha256": "d804864df8f9e48baa4e83bc6846d85ee6c571e4dc99f9739715dd842dad00f1"
+    },
+    {
+      "path": "app/static/admin_controls.css",
+      "sha256": "2e8eb5ba3598bd99b61313b5e7374bcf8df3f0f05c00fcc415ec62ef6bfeb051"
+    },
+    {
+      "path": "app/static/admin_dump.js",
+      "sha256": "52e0b2246c11d48420ea89ca8d2e71489cc0a5e84bf44fe4978f9344e8ee54cf"
+    },
+    {
+      "path": "app/static/admin_links.js",
+      "sha256": "8e1dd507f478503081b04c9e7f5a408e78134cbd859e62d00c295cf0c72e9568"
+    },
+    {
+      "path": "app/static/ai_admin.css",
+      "sha256": "52b58352cd6035f50d120f8a0c935083653c386c2d9b529ab8b2589b1559433b"
+    },
+    {
+      "path": "app/static/ai_jobs.css",
+      "sha256": "f72ad1c6b70849728f109edbecfc06da1f65d10973a47c4793da0e754b05350a"
+    },
+    {
+      "path": "app/static/ai_jobs.js",
+      "sha256": "9f458e0714d882d63f3926a35a0a35d470c9d83d9e3b12ff5166ee3c2918a843"
+    },
+    {
+      "path": "app/static/ai_studio.css",
+      "sha256": "f37cb5734791d95a78bebe1ccaab970656e8a276040a41b74f94dea7f67ed1e8"
+    },
+    {
+      "path": "app/static/ai_studio.js",
+      "sha256": "99d653233fb56492e58caef1c3ccb4577d5e0868b4a4cc01d7f60a538cb5736f"
+    },
+    {
+      "path": "app/static/ai_tokens.js",
+      "sha256": "b8230165ed07196489bbe892829d7e0d760c61f23b08f80d454411626770e009"
+    },
+    {
+      "path": "app/static/ai_usage_panel.css",
+      "sha256": "09371f58f3a0bd8f0ffb87ca5a1b2faef49a50262739b36306e26158e45734c9"
+    },
+    {
+      "path": "app/static/ai_usage_panel.js",
+      "sha256": "36948517e3daed898ad776e2f7239f5f30faa59ae4493c6d46d5fe5c9b9b2ed6"
+    },
+    {
+      "path": "app/static/app.css",
+      "sha256": "3f384807d2523885dc32afff4c4e09429fefd01f15c05897e650c47174c25b4f"
+    },
+    {
+      "path": "app/static/app.js",
+      "sha256": "2bd36638528d10884d0ff3bdcd9028cda1f76391725cc934d218b1381f30b9fe"
+    },
+    {
+      "path": "app/static/audio_capture.js",
+      "sha256": "35bced64b929beb014dc96d37906200518959773365aa9e1c300cf258acb6328"
+    },
+    {
+      "path": "app/static/audio_capture_worklet.js",
+      "sha256": "9a7e53d96f016f7446f38f1545ba371049e31d5d65b858497b43f0a2ff70627d"
+    },
+    {
+      "path": "app/static/auth.css",
+      "sha256": "ef05a42c95ad5cba39de3843df3cf1c3aced0e94c8872d38c3afeffb7e7f8d90"
+    },
+    {
+      "path": "app/static/credit_notice.js",
+      "sha256": "a890accb63ab1b03570530c5ecfa067ed33c77261f1231352b2b5ab9ec813007"
+    },
+    {
+      "path": "app/static/credit_shop.js",
+      "sha256": "b7808b1ec39d4ebf2c5b1a57f0e5cda58468feba1bc0ae99c4cb2f64c90e1358"
+    },
+    {
+      "path": "app/static/daw-studio-background.png",
+      "sha256": "c7a9406ee70783cd5b4aa901805ab552deddbcb013b552d0dd6d7b9337a59166"
+    },
+    {
+      "path": "app/static/docs-assets/ai-vocal-midi-workflow.png",
+      "sha256": "3100e53ea065609af2fd113e6e4e5147787e59603197a143f3262d66d4aa05cc"
+    },
+    {
+      "path": "app/static/docs-assets/apple-logo-user.png",
+      "sha256": "02ba31c78ae0561025d751a08d0961d7b5bc6a39da17bbf90291e32d146a97f2"
+    },
+    {
+      "path": "app/static/docs-assets/architecture.png",
+      "sha256": "a08d4f9e38c8d30f24b58746fc0b576608768f4670e6b6422952de5fac6b9d30"
+    },
+    {
+      "path": "app/static/docs-assets/architecture.svg",
+      "sha256": "93507a60b3d15bc5f88c799848aa06d545be5cf4b519b2afcf61b13f6ae151ef"
+    },
+    {
+      "path": "app/static/docs-assets/brochure-en-page1-clean.png",
+      "sha256": "f318f752d7ebc2c2f03c560f854c13b58f4c500b7de404ae68cbea662233bfda"
+    },
+    {
+      "path": "app/static/docs-assets/brochure-en.png",
+      "sha256": "dfe46d82dc72663a54248231da9171ce786740a7770e43e887198595b93370f1"
+    },
+    {
+      "path": "app/static/docs-assets/brochure-it.png",
+      "sha256": "0dff077d27fa410afec0c3bd209606e29b567929a74c1452a7d16b075c01772b"
+    },
+    {
+      "path": "app/static/docs-assets/brochure-page2-en.png",
+      "sha256": "4e20f07c65308088c59c7e9641ecd71ed32c5122ba10e4f17a1e5b5218fd453d"
+    },
+    {
+      "path": "app/static/docs-assets/brochure-page2-it.png",
+      "sha256": "7b80a145d2a7a20fa129050e9c008bee34f8747ac91b66c38e090b30ab6f6f30"
+    },
+    {
+      "path": "app/static/docs-assets/brochure-page3-en.png",
+      "sha256": "afc8df1b401ca47753d2fa1570d42b050c6dac868d8897e2178fb03d96ae2670"
+    },
+    {
+      "path": "app/static/docs-assets/brochure-page3-it.png",
+      "sha256": "5743550ae9b7ace49f5ba450a4239822657ff1ab4ec124e62b24f3f54563bff2"
+    },
+    {
+      "path": "app/static/docs-assets/brochure-page4-en.png",
+      "sha256": "f97c27a0554e1a58b44bfee789ff8bedacddb502e65876fc79654478193e0a32"
+    },
+    {
+      "path": "app/static/docs-assets/brochure-page4-it.png",
+      "sha256": "0dd38f5185bc333d1272e6f2b53d4f7b1aec8227bd1c664762ffdbaf3d456cb7"
+    },
+    {
+      "path": "app/static/docs-assets/ci-pipeline.png",
+      "sha256": "1a4d71c17fecf05b0b9f5434f92ee8a2d68c0946cd0948ccc77c0ede76392d66"
+    },
+    {
+      "path": "app/static/docs-assets/ci-pipeline.svg",
+      "sha256": "53dd97ea0a5fbe1eebcefb8224c056d75e4884dbb5acf66f17f70752004d558a"
+    },
+    {
+      "path": "app/static/docs-assets/cover-admin-en.png",
+      "sha256": "812850403c341c5d3544b247f844d11f53d908c0e921efc73798c82ed7e40325"
+    },
+    {
+      "path": "app/static/docs-assets/cover-admin-it.png",
+      "sha256": "282e803b604267fbe8df45cbc37b749481ae28fd27dfe4fe848bf992d0c690ee"
+    },
+    {
+      "path": "app/static/docs-assets/cover-base-en.png",
+      "sha256": "1eaf39a3f57718346d4480e1e99f57d5a64b94d58d5a02273ea54935d83ec464"
+    },
+    {
+      "path": "app/static/docs-assets/cover-base-it.png",
+      "sha256": "f8b6d027319a8ce10bfc7d2412403625bb9ac349356d21cff7262c933bfefe82"
+    },
+    {
+      "path": "app/static/docs-assets/cover-daw-studio.png",
+      "sha256": "c7a9406ee70783cd5b4aa901805ab552deddbcb013b552d0dd6d7b9337a59166"
+    },
+    {
+      "path": "app/static/docs-assets/cover-user-en.png",
+      "sha256": "ef7ad1f3e72313d76ac8cd1204eee77bda54891c78cdaeda82ca5441d6982164"
+    },
+    {
+      "path": "app/static/docs-assets/cover-user-it.png",
+      "sha256": "8de45e307e6b00adaff093b8f778fe3520c31c14b3e52f3dc310514ec9651904"
+    },
+    {
+      "path": "app/static/docs-assets/daw-overview.png",
+      "sha256": "c30f42d50c1937589f287abb3974d7113df4996d0c9da2da1524662e423bd8d6"
+    },
+    {
+      "path": "app/static/docs-assets/doc.css",
+      "sha256": "593caa91ece9851bd55e480d2123d37d2e9a6e629339bba3981fc617f0952c9f"
+    },
+    {
+      "path": "app/static/docs-assets/edit-workflow.png",
+      "sha256": "baa193742c3b65741654c08925f895b05f32d594a9ad205213441d4ea7c6f341"
+    },
+    {
+      "path": "app/static/docs-assets/edit-workflow.svg",
+      "sha256": "2155abafcace7bf258ac2b3067f067aa1c831d9a90ef1db83854b001a47051dc"
+    },
+    {
+      "path": "app/static/docs-assets/export-panel.png",
+      "sha256": "12d436d9e3ccf0a3b629e9dfea7db0d2bc64f6c68220fbc23cac884a4057b473"
+    },
+    {
+      "path": "app/static/docs-assets/inspector.png",
+      "sha256": "1194512dae6d19055dbaf37c6b977b4e439a67c58ff1f53e6fc1011df4a100e5"
+    },
+    {
+      "path": "app/static/docs-assets/midi-controller-lanes.png",
+      "sha256": "91af18942c4dea258e49a9fc8c593dde3f9ded47594b9f4913ff91303d56dd8f"
+    },
+    {
+      "path": "app/static/docs-assets/mixer.png",
+      "sha256": "637a054a432e64dee2d4620038297f9e5f0cb962636cf571c8616dc284a86c91"
+    },
+    {
+      "path": "app/static/docs-assets/mobile-connection.png",
+      "sha256": "f9be8448ace0711b4eb111d1f870a4fc0fdba9c8a61bddda3e399c53eb104f27"
+    },
+    {
+      "path": "app/static/docs-assets/mobile-connection.svg",
+      "sha256": "8f4b3855c19207ddf83ec2da09af517bfa3e67d83fb102e10863d3b4691d03b0"
+    },
+    {
+      "path": "app/static/docs-assets/mta-layout.png",
+      "sha256": "0e689e4ec385dfa75a9960b1e0357dbbf710319f8610cfb1a132e53998a0d4ef"
+    },
+    {
+      "path": "app/static/docs-assets/mta-layout.svg",
+      "sha256": "7038107574731f8f1ed960d2ca3a4cda6ea95e9f825b662137ed1523ba28e48f"
+    },
+    {
+      "path": "app/static/docs-assets/mta-profiles.png",
+      "sha256": "eb81c9096bc64b88429503c353d5945573f29b903c29b7d049537254293791c5"
+    },
+    {
+      "path": "app/static/docs-assets/mta-profiles.svg",
+      "sha256": "cfe8925b0c9b8ff729cda4305521c260659b0408f6c903c06ea9e7a6056060b3"
+    },
+    {
+      "path": "app/static/docs-assets/playback-sync.png",
+      "sha256": "8129755924c8128554e0fac00ab77e6c578d1ee2aacd26bf210699c5c2378d32"
+    },
+    {
+      "path": "app/static/docs-assets/playback-sync.svg",
+      "sha256": "2c6c43394cbc254b318303747d856cddf4a9954e1cb34f0e52a49058400b8dfb"
+    },
+    {
+      "path": "app/static/docs-assets/plugin-editor.png",
+      "sha256": "83165ba231609447ff3f388022deed23fc3051eb8659704c86895fbd38098ee7"
+    },
+    {
+      "path": "app/static/docs-assets/project-lifecycle.png",
+      "sha256": "d598048a1bc3aa05183600389de5214b140aac1484313519a4af22f679e10cef"
+    },
+    {
+      "path": "app/static/docs-assets/project-lifecycle.svg",
+      "sha256": "b14234e84f9d15c1e952bf336747befa4a8491456ea755079985963df66c4017"
+    },
+    {
+      "path": "app/static/docs-assets/r210-music-assets.png",
+      "sha256": "e9f7da2ac311374fcaba8c2bc1455e40b5ad88428ab0be088d5dcfee391d6f9b"
+    },
+    {
+      "path": "app/static/docs-assets/r210-vocal-synthesis.png",
+      "sha256": "34fd084f2f05d996bbbcb28be18512e316e71c8b05e040bb7805b4535f123615"
+    },
+    {
+      "path": "app/static/docs-assets/r210/admin-billing.png",
+      "sha256": "64d80e47f005599e0a4796b731466a22ebf967c18ee5fc608c72b96c84598939"
+    },
+    {
+      "path": "app/static/docs-assets/r210/admin-settings.png",
+      "sha256": "a56523f29334e8786b72c4ebe4ac3ba8c584ff3e5beb4d5bd188b58624153b8a"
+    },
+    {
+      "path": "app/static/docs-assets/r210/context-en.png",
+      "sha256": "7a7467c47a2cba2573d349a2ed758e2c48e413482365dea955f9c1c18490819e"
+    },
+    {
+      "path": "app/static/docs-assets/r210/context-it.png",
+      "sha256": "ca6f4023acb4605af3e98ad17e359ebd94c5c7c3f727c9a6fa07026a6721d9b1"
+    },
+    {
+      "path": "app/static/docs-assets/r210/execution-en.svg",
+      "sha256": "28469c15dcf48f472ff796fd0dc4083dcb47926f5ebda7bbc77ed2120b8ce2fe"
+    },
+    {
+      "path": "app/static/docs-assets/r210/execution-it.svg",
+      "sha256": "65b907287d7dfe48b8edb83572f6392b784be84008fa9b95612807fffab86b00"
+    },
+    {
+      "path": "app/static/docs-assets/r210/jobs-en.png",
+      "sha256": "e849b44112e460452cd5955ce9ea15617cd134818f6bdc2d81231a281983e3fa"
+    },
+    {
+      "path": "app/static/docs-assets/r210/jobs-it.png",
+      "sha256": "f26b7c9c4b8c214809f1df2e68b1370c86422008e0d4d093c27ab915e77e4dfb"
+    },
+    {
+      "path": "app/static/docs-assets/r210/metronome-en.png",
+      "sha256": "58e66109e35a8955db50929e6781c949c779311abaf49d8b34ae05cb06c92a55"
+    },
+    {
+      "path": "app/static/docs-assets/r210/metronome-it.png",
+      "sha256": "439df183df9541828ee010a7bc2727ea0fadfeb554c43734d6ed77051f08b699"
+    },
+    {
+      "path": "app/static/docs-assets/r210/mixer-en.png",
+      "sha256": "2b60a7c70fa890b33a35302cc1e38389f5add73909234ff56e822fe981b2dc43"
+    },
+    {
+      "path": "app/static/docs-assets/r210/mixer-it.png",
+      "sha256": "abdc7d1ccc5c4a99739e9fdfb2d0a3a34430f417af078d48578ad5fcae9647bc"
+    },
+    {
+      "path": "app/static/docs-assets/r210/pcm-budget-en.svg",
+      "sha256": "ec34af0b9447dd9ff78c59aa6c4fa256d0fbbfd26da7148de6d57230207d1092"
+    },
+    {
+      "path": "app/static/docs-assets/r210/pcm-budget-it.svg",
+      "sha256": "b71f7a10a836924553df203980f6d20a6654042e87122c59e1d33ee075871fa3"
+    },
+    {
+      "path": "app/static/docs-assets/r210/toolbar-en.png",
+      "sha256": "86e40872ae3cfa96ffb53c318a433f3013e12365f9a0aa907007639b578cfc86"
+    },
+    {
+      "path": "app/static/docs-assets/r210/toolbar-it.png",
+      "sha256": "91a8393de94c120546169679a07a4a876ca35e251149f053544444e198a21250"
+    },
+    {
+      "path": "app/static/docs-assets/r210/user-account.png",
+      "sha256": "cf8bae11afbf241e60d34ae7206bfd195fbffa9390659cf82b676918ceaf4e06"
+    },
+    {
+      "path": "app/static/docs-assets/r210/workspace-en.png",
+      "sha256": "9eb6c7a6329d5506f7cdbe5b687eb8abbd99c696b563824bd390758d4a0ed012"
+    },
+    {
+      "path": "app/static/docs-assets/r210/workspace-it.png",
+      "sha256": "4b9e7eb350ace64c0f7e922214ee3e01a511df8979ffa3651733e63f8b813858"
+    },
+    {
+      "path": "app/static/docs-assets/spec-cover-en.png",
+      "sha256": "58ce8b2beda65c61588427ff0736fe96d304d9cc552bd5d2dadb0685f6726658"
+    },
+    {
+      "path": "app/static/docs-assets/spec-cover-it.png",
+      "sha256": "97f6b5cb58d8a413b02bc24520c260bffe9ee49a54edbe8a1045e12f0b03b8b0"
+    },
+    {
+      "path": "app/static/docs-assets/timeline.png",
+      "sha256": "7638aa67c9f2ef2bbf4730d72b59d7b7e4737fbc39fe0948cdc3ae0bb9a0b463"
+    },
+    {
+      "path": "app/static/docs-assets/transport.png",
+      "sha256": "2567492c95ceeb414dcc272cff4eb5dce295d80914643b97bcde3223d2514428"
+    },
+    {
+      "path": "app/static/docs-assets/tux-user.png",
+      "sha256": "f8fe1c21b3ec4f2c445aad0b3ab87cf9210143c3573dc7e8d21c9e8ac0f6224f"
+    },
+    {
+      "path": "app/static/editor_layout.css",
+      "sha256": "49000af1920a2b6eef0c564ae4b127ace8962506445270ca6b0bda116c3627d9"
+    },
+    {
+      "path": "app/static/editor_layout.js",
+      "sha256": "965b2979bcd228f550951582425f76c30406b0da9129da61bdbd06b34e002d6f"
+    },
+    {
+      "path": "app/static/i18n_catalog.js",
+      "sha256": "284ad01771c0d21f31f3c7a8e4bfee010d1b0f4908edc9c0b292884aee380c3c"
+    },
+    {
+      "path": "app/static/legal.css",
+      "sha256": "8148c75e2fe82371e9a16cec3c8e7e93f8c7e603167dde1b375085c6f33c408d"
+    },
+    {
+      "path": "app/static/localization.js",
+      "sha256": "9a71a3555134547e52a36ae8582b424cdbc5e3343fecbc4b53b229052dc59a1a"
+    },
+    {
+      "path": "app/static/login-background.png",
+      "sha256": "cb11ce2abef99e3571893ed914219b19370042be51de51d97631afa83e83902c"
+    },
+    {
+      "path": "app/static/logo.svg",
+      "sha256": "e1b6ae09453816897033be5e2c1ec9ebdb84b4c613b924a636cb5d6a7e085a35"
+    },
+    {
+      "path": "app/static/mail-logo.png",
+      "sha256": "e155a3d0d931c74f16a1e74a4f30df1ef24d4e8a0203892995eb755cec3f43c0"
+    },
+    {
+      "path": "app/static/metronome_graph.js",
+      "sha256": "e1c4bbb1592c4314b83f8b06f9b4fa7c820663d59361035eda6d25b6e468e6bf"
+    },
+    {
+      "path": "app/static/midi.css",
+      "sha256": "d3c6b30699a6002ab7f7cdb39c06da8f145a91e2c024a2c2e3d6394d2a6e419e"
+    },
+    {
+      "path": "app/static/midi.js",
+      "sha256": "276acaef054ec8cb13737e7c1d17602f00d92670bba633b0b00ae1842b51ce7d"
+    },
+    {
+      "path": "app/static/midi_advanced.js",
+      "sha256": "f93a0180772f47ab254efa4ade55c0b04ac9cb5ac6f3b8b942fdd58382f06715"
+    },
+    {
+      "path": "app/static/midi_controllers.js",
+      "sha256": "13f3b233fc79f3bd9477a9c47764af70e731fa41fa90c36e2333d6a9c874e20a"
+    },
+    {
+      "path": "app/static/midi_editing.js",
+      "sha256": "3aec2f5919dd11a359761263cea45ec7a1ea89043efce50980a007f3c2559640"
+    },
+    {
+      "path": "app/static/midi_live.js",
+      "sha256": "e94e4470155986f4d66085301bbfa5d440be08be61143ae25b34d06cd8e15b2c"
+    },
+    {
+      "path": "app/static/midi_native_output.js",
+      "sha256": "9b05e52552d38da5209f617c3189bfd0da393728c2f8b8b925e467e26e272744"
+    },
+    {
+      "path": "app/static/midi_protocols.js",
+      "sha256": "a4aea971ceee8ec41df3aac879b1b0882b02168c4ab9383e631956ca1b4bfe3a"
+    },
+    {
+      "path": "app/static/midi_rules.js",
+      "sha256": "e0622fc4f33cb83fb8ab9170c7e8a239dd76ffc8076ef280cd5af72936839198"
+    },
+    {
+      "path": "app/static/midi_tempo.js",
+      "sha256": "33c51eaca3cbae0c30361b8699e991d8bb6fb203060f6d24333f167064a31551"
+    },
+    {
+      "path": "app/static/mockup-reference.png",
+      "sha256": "f9d91b64805ae2fb5925b957e34e09e79c22d644fb83bb462697d1c227e93312"
+    },
+    {
+      "path": "app/static/model_asset_admin.js",
+      "sha256": "79d3bd6cb6f011cc981f10b8164c0b28ca6546fc66fdd2454bdda1b31ddd7272"
+    },
+    {
+      "path": "app/static/mta-audio-editor-mark.svg",
+      "sha256": "9c33f713590896c72b8a710897af1df59bcc2b95d3ebf7ea5abf094d7efbff88"
+    },
+    {
+      "path": "app/static/musical_clock.js",
+      "sha256": "f793c06f779340121eb0990e0fc310a0d67d17e3b5a65cb1c74f71b00832e171"
+    },
+    {
+      "path": "app/static/native_audio_io.js",
+      "sha256": "5ac7647cb8fa2737107a01a13aea709d8ec0a972878150d3bbfb05723334fe30"
+    },
+    {
+      "path": "app/static/native_transport.js",
+      "sha256": "d4c19976dc128fac4d46178c420defd9d81f61a95b7cf3e67ffdf29cc0d0db7e"
+    },
+    {
+      "path": "app/static/native_ui_zoom.js",
+      "sha256": "fac4db20488304e7670b3441d7f25ec68281e237d40723782cdc325d9f3920b0"
+    },
+    {
+      "path": "app/static/noncommercial_contributions.css",
+      "sha256": "599c29d4f910b226c9c527298fd6bf45d1439ec48839ddd2ecb03c81b8126a1b"
+    },
+    {
+      "path": "app/static/noncommercial_contributions.js",
+      "sha256": "30c40cf9c1d0b5f967ab1e2d67230c3c7d3a6f2ec023637f2cf823cba1a2699f"
+    },
+    {
+      "path": "app/static/operator_refunds.css",
+      "sha256": "eaa2b20d860fb2a9382c3d15f9ed66123ad73ddcf2e88002a27d9f8edc402c85"
+    },
+    {
+      "path": "app/static/operator_refunds.js",
+      "sha256": "331888f09d520b1a8b31a47d2ece8851e57dbad27219136a17752c5576f4fa6e"
+    },
+    {
+      "path": "app/static/optional_plugins.css",
+      "sha256": "c90a83acfd288619dd2977005e2346e98267ca745f29a3b54ed02da64b9e98e0"
+    },
+    {
+      "path": "app/static/optional_plugins.js",
+      "sha256": "72b3827f872a5304b700321215e2570a2ff38f77b273f9a91c298518d4969ee1"
+    },
+    {
+      "path": "app/static/owner_payments.js",
+      "sha256": "3742de460d978d994f8830971f897caba28da50269a35dbcf7ea7db73c3cd644"
+    },
+    {
+      "path": "app/static/playback_prep.js",
+      "sha256": "fc84944394940b5d071643436807a275be3ce73184fb269194a4a1d720d33af1"
+    },
+    {
+      "path": "app/static/regime_admin_panel.js",
+      "sha256": "dcdb5cd50a554b5b109a7c962bc8041dd1bc0fe2128f64c914aa682b6d3e5447"
+    },
+    {
+      "path": "app/static/regime_cutover_panel.js",
+      "sha256": "ab4a67be60ded72d73dc68b78e148b4c15b10e3f8721e1cfa063ab875a76bf69"
+    },
+    {
+      "path": "app/static/resource_access.js",
+      "sha256": "54e5132345d66686306166017b1a5bc6e5900f72a536bc345be2459b60ac7e26"
+    },
+    {
+      "path": "app/static/server_pcm_worker.js",
+      "sha256": "eae038413d16678684c3d522ce10ea0c9e738281cac370de3772b497a360453e"
+    },
+    {
+      "path": "app/static/server_pcm_worklet.js",
+      "sha256": "ff60b15d6e37ee5f24b52517a3603047c158da596b5a4909d3eabf9b55b87bf7"
+    },
+    {
+      "path": "app/static/server_vst3.js",
+      "sha256": "eb17aad7e43a6723c241ed131469ebcfdef4e6230562bc0d76c07cad7514efa7"
+    },
+    {
+      "path": "app/static/server_vst3_editor.js",
+      "sha256": "2d4ffdb6cf7260c64cf58522ddb36be7fe49dda843c6ca1b2763cc2560a583e7"
+    },
+    {
+      "path": "app/static/service_drain_panel.js",
+      "sha256": "4f488c289f455329dc133f38d642f2b36deac04589bc202e3c611cdfc071536b"
+    },
+    {
+      "path": "app/static/social/facebook.png",
+      "sha256": "a3c4f14c54929f56a44c8d7a551ad1b40c3f9fa8369da3a7a2b218f9d9831597"
+    },
+    {
+      "path": "app/static/social/github.svg",
+      "sha256": "ccd84c89b1056345608fc3489357f8acc7397e49a3cdc2d418b6c8016911d47b"
+    },
+    {
+      "path": "app/static/social/google.png",
+      "sha256": "d1ce9c2af0b10a7333abc99bc706f9a6a199e5b65bf3e3009624f076b8638e6a"
+    },
+    {
+      "path": "app/static/studio_extended.js",
+      "sha256": "f213b86460587892675009b63fa05b5033643145b6f26dc6e7cf92f5abf3daa7"
+    },
+    {
+      "path": "app/static/subscriptions.css",
+      "sha256": "351f7c0fd564508eb07860a853e66b14f8c5f7658ec76562f00c90c37027496b"
+    },
+    {
+      "path": "app/static/subscriptions.js",
+      "sha256": "95fe2ca1ee0408c4cddc1df33114ae4bbe5aa07df3bd0f72d466ec1513af8e23"
+    },
+    {
+      "path": "app/static/timeline_rules.js",
+      "sha256": "a28080b2d310a171e26a1f30161b38e35ba1a9a0947481b5242efeda51863594"
+    },
+    {
+      "path": "app/static/user_preferences.js",
+      "sha256": "6a878b968106b96bd81c7c86c44ed009151d95c7a7f471dacb0a3b2e74a15433"
+    },
+    {
+      "path": "app/static/worker_loss_admin.js",
+      "sha256": "71986d0c229ff55a95988d165f450f8e561587d851d3cba5169cda9e1fe8bdc8"
+    },
+    {
+      "path": "app/static/worker_loss_history.js",
+      "sha256": "657afc8cd509fdce9cd1a67c52507512412460cbad82441fac46c77c972de6da"
+    },
+    {
+      "path": "app/static/worker_recovery_admin.js",
+      "sha256": "ce399ee76535e44c54076e18ff6de10ad948accfaba2d48ba7264f745f3e3419"
+    },
+    {
+      "path": "app/storage.py",
+      "sha256": "603f1c07e718b78d2fe3a5d91279e46cc5f2abef6ec4abcab3edc978943e4d5c"
+    },
+    {
+      "path": "app/stripe_failed_charge_proof.py",
+      "sha256": "eeb33009f2623729477d2b7d663403d6501effd6256c0e88c3a16786fc0b8c17"
+    },
+    {
+      "path": "app/stripe_paid_history.py",
+      "sha256": "a7f1d845fca563f0cc9f4db1e48bca8bacbb3d8e19f81b393c6de6d649532d08"
+    },
+    {
+      "path": "app/studio_admin.py",
+      "sha256": "ea7ce1fcad4ec2e75cc270a7fb7728b8de12773ec59c1c84c37f1b12b76e8acc"
+    },
+    {
+      "path": "app/studio_asset_registry.py",
+      "sha256": "38b5a865090bd157765f6534255a90afb169baf03c500f2f6cd42fff98e1559d"
+    },
+    {
+      "path": "app/studio_assets/Apache-2.0.txt",
+      "sha256": "77fd4710def9ec3c0f6225800e0235f15a425abd4a8b03559127fcd782612049"
+    },
+    {
+      "path": "app/studio_assets/CMUDICT-LICENSE.txt",
+      "sha256": "6770f122f550ac08bbbc86519455acd42ff333138e83ce048bc528140a1aa569"
+    },
+    {
+      "path": "app/studio_assets/PortAudio-LICENSE.txt",
+      "sha256": "a61ed92bedc10050411c5aa00896201f437647912844a965ac8882ce52522e86"
+    },
+    {
+      "path": "app/studio_assets/admin_external_sources.json",
+      "sha256": "56e1a1d8901b08330ece587a8b4829f036069576aae28089bd2c20856d4aa92f"
+    },
+    {
+      "path": "app/studio_assets/oddvoices_assets.json",
+      "sha256": "4713a13aa4d54e11f69366c4c6ebc084a0e70fe31ef30c700b1a3a818254a47c"
+    },
+    {
+      "path": "app/studio_assets/sounddevice-LICENSE.txt",
+      "sha256": "b6eea21bbafbaf7a2177e492f1be6b5efc6f4e708b1980773de51cdaa52f8211"
+    },
+    {
+      "path": "app/studio_assets/yourmt3_sources.json",
+      "sha256": "8fd9eecd11a5d6432d5d7e2870a65b0203335b2b02de9793e3479dadee54ea1b"
+    },
+    {
+      "path": "app/studio_assets/yourmt3_t5_compat.py",
+      "sha256": "71a3617401c0af3f87affedc882efce2b8fd4dac7fa355b78b709659eb9fcd21"
+    },
+    {
+      "path": "app/studio_audio.py",
+      "sha256": "1711c4e0728abee69b841b44d5697df58aa8329514626dec62aaa86a8d6083e8"
+    },
+    {
+      "path": "app/studio_catalog.py",
+      "sha256": "b856ef157392ef09710f12e7621569b693c63a4a9a511180c8380b3ebed978f2"
+    },
+    {
+      "path": "app/studio_checkpoint.py",
+      "sha256": "cf11e27d4bbbceb26f384ed1b8b060aeb25c8da41da060d3452d0b12252beb6e"
+    },
+    {
+      "path": "app/studio_compute.py",
+      "sha256": "79f4e4722a84c95eb8505033c9ec53abd44133bfd35023e111a768fc39cd98ce"
+    },
+    {
+      "path": "app/studio_jobs.py",
+      "sha256": "c178405eada5504d2909036ff166f09f92aad0129dd8fcd0cbc5a57853eb06bd"
+    },
+    {
+      "path": "app/studio_midi_benchmark.py",
+      "sha256": "1dda9eb9be209a6f3798f8b45eb3a3a254f76aa665bd47060f26ce46e5a03e8b"
+    },
+    {
+      "path": "app/studio_multitrack.py",
+      "sha256": "b423000390da122cdcf006e4c386d9c80b3bd8f7ef932ec8c953517523fdc3d3"
+    },
+    {
+      "path": "app/studio_offline_runner.py",
+      "sha256": "a976a0552f97a74eeb73d3b0c7ac59dd78252fc2a2c0d062d39a348c988f8f96"
+    },
+    {
+      "path": "app/studio_parameters.py",
+      "sha256": "279b5d76516c67a8770d0d85fbbc1117b28b292a98835013a4f6688008bffac9"
+    },
+    {
+      "path": "app/studio_score.py",
+      "sha256": "b667d6e54287b3959b44d1b8cd2b8126505df396340aec2cd12a0839338f21b4"
+    },
+    {
+      "path": "app/studio_stage_cache.py",
+      "sha256": "4bde92832321b0494d3ce9be72e28d429a833692d993c61cf01f2da82603dea7"
+    },
+    {
+      "path": "app/subscription_basis_audit.py",
+      "sha256": "48c20571e0bebee009a8fe4ddaa58d7d5b9d446af99aec35df1e85b91267e27a"
+    },
+    {
+      "path": "app/subscription_receivables.py",
+      "sha256": "6d4027e9898365a39f859df7d21cdb739f9c6246185850f35494bde4d1f1f112"
+    },
+    {
+      "path": "app/templates/account.html",
+      "sha256": "73605a618d6f5171731a78e3204054b18cd7b350b22a95d188094c3c53c9f7a8"
+    },
+    {
+      "path": "app/templates/admin.html",
+      "sha256": "225c0bf9268764d3a1e22c8a2ded0743688e12023975c71d865a944fc060ba91"
+    },
+    {
+      "path": "app/templates/ai_billing.html",
+      "sha256": "aa371d9ac80d887a7f192411ab9e447997f5f484ea87f77c1db83e082d621ff5"
+    },
+    {
+      "path": "app/templates/ai_tokens.html",
+      "sha256": "b18265c1697cdf3a4f68651dbb3fc6e21df97bf60fa2946d29428fc15fa31150"
+    },
+    {
+      "path": "app/templates/credits.html",
+      "sha256": "457060edbd1f67ef90c18f45c9b80d1d2f91ad16757860987d1ccbd1bd5bb444"
+    },
+    {
+      "path": "app/templates/forgot-password.html",
+      "sha256": "67bcd52f9abd0e1528307ab018eb7dcb4816f444ae2cd1f55ef4f4516e0cc7b3"
+    },
+    {
+      "path": "app/templates/index.html",
+      "sha256": "2ebd77237d03a1ca54453c73318ef10337e03cf8af3c4d20f3c3e9bcaddf15f7"
+    },
+    {
+      "path": "app/templates/legal.html",
+      "sha256": "983861ef5aa3a741996ce331318e5173aef1275fc7f64fa03c80e5064fccf395"
+    },
+    {
+      "path": "app/templates/login.html",
+      "sha256": "2ccd4610bc20ed4fe31ec4fc5b6d4135d68e3e7b383a974b31172bf66138b779"
+    },
+    {
+      "path": "app/templates/message.html",
+      "sha256": "4a27dc85e159010a112d460aa513693a3f9c86a876c67bb453da9c0dc74ca84a"
+    },
+    {
+      "path": "app/templates/register.html",
+      "sha256": "c79c4cc30811249c991698004ac87db22486e25cf4956ed5cbad849023919ada"
+    },
+    {
+      "path": "app/templates/reset-password.html",
+      "sha256": "b9710f40ebd544cb226bef770d192ff1628325fcbe1c3a418a6ce18571e8c5c8"
+    },
+    {
+      "path": "app/timeline_editing.py",
+      "sha256": "5bfbe968ba505ca7f393d4e8046ad94e7c6f05d1dbf108cc3909239ec95758a1"
+    },
+    {
+      "path": "app/transcription_timing.py",
+      "sha256": "b70274158cf7e9d5a8fcaf09957a3858620fd1b63d1858967c8a54cf8091f50d"
+    },
+    {
+      "path": "app/transkun_adapter.py",
+      "sha256": "ce0037850b775fb0184f2a7fadcd9233164290d6474185e4084bca8eb7e2859f"
+    },
+    {
+      "path": "app/transkun_runner.py",
+      "sha256": "7671b1a8bb28d918182ab2bdc373cd4b34f80c1f4c131710cda27bb5811c22f6"
+    },
+    {
+      "path": "app/user_preferences.py",
+      "sha256": "43fdd055cb6985c3154d88d0a939c9faf12749de73d8fc7a142a0d96cd366678"
+    },
+    {
+      "path": "app/uvr_kara_integrity.py",
+      "sha256": "45a323c56569bef81aa2fc0403b70ecac907993635b581feb2a442f26d39a5ee"
+    },
+    {
+      "path": "app/version.py",
+      "sha256": "6ee6a8b9b345501b39886e7aa32ad63f179ba4a7cc0e98f7842c83fe621648ca"
+    },
+    {
+      "path": "app/vocal_banks.py",
+      "sha256": "184861bb4cb7a15f14795fb5598d48f304e6adc7c0309baf039667474530f6e3"
+    },
+    {
+      "path": "app/vocal_conversion.py",
+      "sha256": "60e659e0f788b9915f22e4e72329643cd8b1370ba4810c587cafc11108aa4505"
+    },
+    {
+      "path": "app/vocal_expression.py",
+      "sha256": "90c8d9c9d4118b9d136ff245e0ca4a8c47e009253fdc6eb3137e59ad2a6131a6"
+    },
+    {
+      "path": "app/vocal_g2p_bridge.py",
+      "sha256": "26f4fda4de8f7db9d7b23afe1d44313d203773bb333035479b75999f9f4caa6c"
+    },
+    {
+      "path": "app/vocal_harmony.py",
+      "sha256": "a3fce1870c56222152451f9e3011840981bcc4bc0807f1b63f4d0a3878575596"
+    },
+    {
+      "path": "app/vocal_phonemizer.py",
+      "sha256": "093c42c8ebb50daa8172f8da1669db324ec211b60c2ab66f05019e954fc34a11"
+    },
+    {
+      "path": "app/vocal_synthesis.py",
+      "sha256": "ddde8c8ffd1aa81ff834ac00f9ea71381baaf5777b12dd41c9851fc8a06f26c1"
+    },
+    {
+      "path": "app/vst3_editor.py",
+      "sha256": "09b66e64ee150559ef30ba45072f4cf23d40c19349953c73788974cc6d442d03"
+    },
+    {
+      "path": "app/vst3_host.py",
+      "sha256": "bf8981aa543dcd5e24abe1bd2b301d70c08202601827b71a494cf30d02e461ad"
+    },
+    {
+      "path": "app/vst3_live.py",
+      "sha256": "337f75ee8e5a20c82b456b18e02f8259c1e3b15a2c9d64db4f7412ee0a4621b5"
+    },
+    {
+      "path": "app/vst3_live_graph.py",
+      "sha256": "bc43474803acfa4b4eb6f4def9747dc06a549858adf0f3b099398327cf008c21"
+    },
+    {
+      "path": "app/vst3_project_state.py",
+      "sha256": "27dfe98e43140657d617b76a4339cbf6b7b389396724407069c4bf664291b976"
+    },
+    {
+      "path": "app/vst3_sandbox.py",
+      "sha256": "3043c5a326c1c63e107c2112dee7f60347f08bf9cab6902468cab5d76bdebf9d"
+    },
+    {
+      "path": "app/vst3_sidechain.py",
+      "sha256": "1c446b99b61bd08a67d42806b70e409264cc00c9e3942bdcbba240e07cf63d5a"
+    },
+    {
+      "path": "app/vst3_tempo_map.py",
+      "sha256": "eafe0755be24d38a192090517ccae210b6ff6ec9cc2a066f82e49def82b8ddd4"
+    },
+    {
+      "path": "app/vst3_transport.py",
+      "sha256": "0bf998c832e88b3939905b83875da337c7bf2afe463021ca4d7df774606db940"
+    },
+    {
+      "path": "app/vst3_x11.py",
+      "sha256": "c26bf4acf33165d110a8467bf39cff757c5060a7a91048482191a5e3c2bce3ad"
+    },
+    {
+      "path": "app/windows_process_identity.py",
+      "sha256": "8074c582663855a295354ce565b99f6310302e32551f10d96373b813080b9d90"
+    },
+    {
+      "path": "app/worker_cgroup_recovery.py",
+      "sha256": "ff5dded11e2d45f77fe93bee1f2d6464273a823b1eebf10e5c2d773f4b96f7d3"
+    },
+    {
+      "path": "app/worker_loss_resolution.py",
+      "sha256": "7ebb16374c5188f69d536f38e7937dd2c663b58f319b496dc9830a02fa6f467c"
+    },
+    {
+      "path": "app/yourmt3_adapter.py",
+      "sha256": "dd52171e63aab2512693e963c945fec52dea5f5e59367d268573c1cdac0c681b"
+    },
+    {
+      "path": "mobile/android/README.md",
+      "sha256": "d9cd8058116b60331ba1610044483485172b66cadbd395c280c4cf0d15b5ebac"
+    },
+    {
+      "path": "mobile/android/app/build.gradle.kts",
+      "sha256": "f64cfc34f43407032b26069924b093a958aa93bfbf7952c295b4181b4a812493"
+    },
+    {
+      "path": "mobile/android/app/src/main/AndroidManifest.xml",
+      "sha256": "016b39a26f87b21a9286660805a96e5c8544b1f271851935e25e971539f30c8e"
+    },
+    {
+      "path": "mobile/android/app/src/main/assets/README.txt",
+      "sha256": "888886b1f27ee2b976f6ef94425a9804d48c4145027b925c87e7eef35f8dff40"
+    },
+    {
+      "path": "mobile/android/app/src/main/java/com/desalvo/mtaaudioeditor/mobile/DemucsModelManager.java",
+      "sha256": "9678b44a761ba17841ff1facce3198e176559d507a09c95a28a11117a8cec31a"
+    },
+    {
+      "path": "mobile/android/app/src/main/java/com/desalvo/mtaaudioeditor/mobile/GitHubUpdateManager.java",
+      "sha256": "8167e830ba78ad728dc68efcf64d1f750adea42304cbcc4ed7fe9d12ee1e8ab6"
+    },
+    {
+      "path": "mobile/android/app/src/main/java/com/desalvo/mtaaudioeditor/mobile/MainActivity.java",
+      "sha256": "79a880580597353998377fbfac0bb342dc7911e956fb481bff895b6d1e503660"
+    },
+    {
+      "path": "mobile/android/app/src/main/res/drawable/mta_app_icon.png",
+      "sha256": "d90debccc3429a648509b831fbf9261439e4cfa31d466a9b361c73f746c241df"
+    },
+    {
+      "path": "mobile/android/app/src/main/res/values/strings.xml",
+      "sha256": "b08f24b3f7249b6642bca6a4232bd809200515c5d7ee98eb59e093e951c07a90"
+    },
+    {
+      "path": "mobile/android/app/src/main/res/xml/file_paths.xml",
+      "sha256": "687bf31edc6dda8ce9c0751119cd5475cac537bb466b646e5cd678f0d4ed934c"
+    },
+    {
+      "path": "mobile/android/build.gradle.kts",
+      "sha256": "eafc4af9ce6b7190e01563d9243b4bbcead454bc910c33d1e91baeb5284e83dc"
+    },
+    {
+      "path": "mobile/android/gradle.properties",
+      "sha256": "949550ad13b20c9dbd693a5c4dd59896c55bc5c441f473b1e83ed1e5ccca6923"
+    },
+    {
+      "path": "mobile/android/settings.gradle.kts",
+      "sha256": "35ab15767ab4685b223461c5313dfd7e69991be5fabf0bf6d40c9ba618133099"
+    },
+    {
+      "path": "mobile/ios/MTAEditorMobile.xcodeproj/project.pbxproj",
+      "sha256": "57eaee7eaae2e463c8d01c930e550a76339f8f165e536ce2b851d6876fb98dc1"
+    },
+    {
+      "path": "mobile/ios/MTAEditorMobile.xcodeproj/xcshareddata/xcschemes/MTAEditorMobile.xcscheme",
+      "sha256": "a4a3587d4141621f30cd1f83b38a9d58e9fe56d73e724822365ecf5117634227"
+    },
+    {
+      "path": "mobile/ios/MTAEditorMobile/AppDelegate.swift",
+      "sha256": "a56c5a2874b0bbb81d4842166349cda6f26bf314ea5938a21c237ead7695a800"
+    },
+    {
+      "path": "mobile/ios/MTAEditorMobile/Assets.xcassets/AppIcon.appiconset/Contents.json",
+      "sha256": "c61030be7ec9c0184bdcc650de6397ab5f7e971b0f971eb19bc642232ec8fbce"
+    },
+    {
+      "path": "mobile/ios/MTAEditorMobile/Assets.xcassets/AppIcon.appiconset/icon-1024.png",
+      "sha256": "22c3eae86a9d750d540693d2de829731b57127f2525bd05ab6a022ea2a2e7903"
+    },
+    {
+      "path": "mobile/ios/MTAEditorMobile/Assets.xcassets/AppIcon.appiconset/icon-20@1x.png",
+      "sha256": "fa4523580215ba11fd9f6c036c2d9a69e08f31f242e0777631f6d50a17fde96f"
+    },
+    {
+      "path": "mobile/ios/MTAEditorMobile/Assets.xcassets/AppIcon.appiconset/icon-20@2x.png",
+      "sha256": "7ecf06f1a4f72a5ba7b404d1e2272bdffdf76dcbdfa68693f075bff14cfcedeb"
+    },
+    {
+      "path": "mobile/ios/MTAEditorMobile/Assets.xcassets/AppIcon.appiconset/icon-20@3x.png",
+      "sha256": "7b0231ebfcab6e79b34f795a0c72cbc7e0bb4590689cf198c885eb49cbfc6421"
+    },
+    {
+      "path": "mobile/ios/MTAEditorMobile/Assets.xcassets/AppIcon.appiconset/icon-29@1x.png",
+      "sha256": "c7fe6cb3a0737a0e56d4a3a30098712cdd86bb6b96725260a95e252926236487"
+    },
+    {
+      "path": "mobile/ios/MTAEditorMobile/Assets.xcassets/AppIcon.appiconset/icon-29@2x.png",
+      "sha256": "721e9e2b85d10d2d17df15dcb6c8616b2b44d6fca29e69d123d610731304a6e4"
+    },
+    {
+      "path": "mobile/ios/MTAEditorMobile/Assets.xcassets/AppIcon.appiconset/icon-29@3x.png",
+      "sha256": "a4aca6911c51a2ce2339594f31ba1b9af14862dd507863a3457ec4ade6d4e058"
+    },
+    {
+      "path": "mobile/ios/MTAEditorMobile/Assets.xcassets/AppIcon.appiconset/icon-40@1x.png",
+      "sha256": "7ecf06f1a4f72a5ba7b404d1e2272bdffdf76dcbdfa68693f075bff14cfcedeb"
+    },
+    {
+      "path": "mobile/ios/MTAEditorMobile/Assets.xcassets/AppIcon.appiconset/icon-40@2x.png",
+      "sha256": "c5b8a2e5ae55575d1e2949441beea18a0ca758b70ef0e1209881a8c74232fb52"
+    },
+    {
+      "path": "mobile/ios/MTAEditorMobile/Assets.xcassets/AppIcon.appiconset/icon-40@3x.png",
+      "sha256": "e709b2f522673f0c8c35ff2a3bb7815ea1f2daab0741c4e0ea4a63ec669a3cc3"
+    },
+    {
+      "path": "mobile/ios/MTAEditorMobile/Assets.xcassets/AppIcon.appiconset/icon-60@2x.png",
+      "sha256": "e709b2f522673f0c8c35ff2a3bb7815ea1f2daab0741c4e0ea4a63ec669a3cc3"
+    },
+    {
+      "path": "mobile/ios/MTAEditorMobile/Assets.xcassets/AppIcon.appiconset/icon-60@3x.png",
+      "sha256": "9cb0114da0addf8973b825c069de70b875f21b95c6922a5d8f13ad7ca6457faa"
+    },
+    {
+      "path": "mobile/ios/MTAEditorMobile/Assets.xcassets/AppIcon.appiconset/icon-76@1x.png",
+      "sha256": "be4aac2ee3a4a42b36b511ba23413bf89e29ab4d024b53ad83d557670edad53b"
+    },
+    {
+      "path": "mobile/ios/MTAEditorMobile/Assets.xcassets/AppIcon.appiconset/icon-76@2x.png",
+      "sha256": "25575a1a0b9679bbbfa4526561e93aecebade3791de7e650c09c8ba74075193b"
+    },
+    {
+      "path": "mobile/ios/MTAEditorMobile/Assets.xcassets/AppIcon.appiconset/icon-83.5@2x.png",
+      "sha256": "8fa9d02bd6e7d9259a95da8ba9efe26a7033194e95e2b62171c520f958f4f025"
+    },
+    {
+      "path": "mobile/ios/MTAEditorMobile/Assets.xcassets/Contents.json",
+      "sha256": "10e3b5dc202f1cd9fad1f688c8fc9fe9e9669bf3f8295e67d216b10fd99b6f49"
+    },
+    {
+      "path": "mobile/ios/MTAEditorMobile/Info.plist",
+      "sha256": "95fb73e75aaadc6b066011d929140778423b532e9740700daa657b7b6202798b"
+    },
+    {
+      "path": "mobile/ios/MTAEditorMobile/LocalModelRights.swift",
+      "sha256": "86c2deb1c58370afd03e46f189cc9ee2cd4d958c0a58e10ad67ae317b0fb7ba0"
+    },
+    {
+      "path": "mobile/ios/MTAEditorMobile/LocalStemEngine.swift",
+      "sha256": "6ce2e71f3bfa770ef7aea25d57e4e71f5311fac83781fc8a8b7ac3ca5d999a7b"
+    },
+    {
+      "path": "mobile/ios/MTAEditorMobile/MobileWebViewController.swift",
+      "sha256": "591d015a51ed78a0a328f1e619e1270924b05f3d8e63c320fc7f082e32c0c49f"
+    },
+    {
+      "path": "mobile/ios/MTAEditorMobile/Models/README.txt",
+      "sha256": "3987bd9c02be9c37a22aa23e741cb168e1b558de420fe25950699cba70ad7d5c"
+    },
+    {
+      "path": "mobile/ios/MTAEditorMobile/Models/model-rights.json",
+      "sha256": "6d2a9a7d0b29be389342ad98eac2f6d69b46fd0fd4e1ee2046ed22598aed7455"
+    },
+    {
+      "path": "mobile/ios/MTAEditorMobile/NativeUpdateManager.swift",
+      "sha256": "7f2d3ccea62b05758e551ce7f95e8892f2b36ef442b59502b84ccaa150c210de"
+    },
+    {
+      "path": "mobile/ios/README.md",
+      "sha256": "9b06e334c4b0502b8e2511344d61694626aba9ea6350cc2816f286d39d44cd23"
+    },
+    {
+      "path": "native/README.md",
+      "sha256": "9b333e3e5a16c893a50590fc31d328498fac388eb83f21921ba58793c6d56bf6"
+    },
+    {
+      "path": "native/audio_core/CMakeLists.txt",
+      "sha256": "2780fcd4573d349366d2435b10c99b4064e16439e3509db2e73df157aab6de87"
+    },
+    {
+      "path": "native/audio_core/audio_core.cpp",
+      "sha256": "c05dd328cb17743991677818ccbaa67e2e5dd5a8016bcc4f563e9f6257c6d456"
+    },
+    {
+      "path": "native/audio_core/block_spsc.hpp",
+      "sha256": "26acbdbdabe1a1f51ce06f942d20f2f0d2e1fdce68928feac6d94dacdf9ffac2"
+    },
+    {
+      "path": "native/audio_core/device_transport.cpp",
+      "sha256": "818df4be0a2b6ec8898b2351aa4713d3412b8bca70aa3612043e38449c7f8d77"
+    },
+    {
+      "path": "native/audio_core/device_transport.h",
+      "sha256": "729f12ee68b92b3cb2cd54c661f7092cd83b74aea7f10ef99fe73afada39f73a"
+    },
+    {
+      "path": "native/audio_core/gm_synth.cpp",
+      "sha256": "950f53e0940078170ad531e846bc8b96d51f4b8ff79c61c8e395b9c98a6fb11c"
+    },
+    {
+      "path": "native/audio_core/native_block_guard.hpp",
+      "sha256": "42e92220bb1b7b254faef3908231fad0a14919e6092b12f26cc33c9d97cb8c78"
+    },
+    {
+      "path": "native/audio_core/native_crossfade.hpp",
+      "sha256": "732ff5cce168757642d1f6183cf9c9b529e797e8f3901a9d7d7b48050387da8c"
+    },
+    {
+      "path": "native/audio_core/native_dc_blocker.hpp",
+      "sha256": "420d77708312d0e2bfc6184dc8d5a4ced29b8f475cd6d8ccc6f0106fb7a3edd1"
+    },
+    {
+      "path": "native/audio_core/native_gain_ramp.hpp",
+      "sha256": "075f0acf7b213675cebe43303997455714a0a8e755c89994bc0215c80da7de05"
+    },
+    {
+      "path": "native/audio_core/native_mix_matrix.hpp",
+      "sha256": "d7dcc82ec4fb8c4390601747ef74bc580efdb08afb25ee8344b22036b7082366"
+    },
+    {
+      "path": "native/audio_core/native_noise_gate.hpp",
+      "sha256": "1e7326bb4bc30593be4840d416b180da796d60475202634bdb02c17acc610961"
+    },
+    {
+      "path": "native/audio_core/native_pcm_interleave.hpp",
+      "sha256": "dca47dacc723d20d6492d2ff25427bc169f74cf61439b64330202f99874cb718"
+    },
+    {
+      "path": "native/audio_core/native_pdc_mix.hpp",
+      "sha256": "885a979225c019f4748896cbc0881477e40f321d114531fa4dcdc76d285fa8ea"
+    },
+    {
+      "path": "native/audio_core/native_peak_meter.hpp",
+      "sha256": "f234f1ed26b3aecb3c0fc24afc2f0bfc439e8e433d268d1f01d979bf8c27a053"
+    },
+    {
+      "path": "native/audio_core/native_soft_clip.hpp",
+      "sha256": "0476df5cefc99356c6d40c4b56147497e5e616989450d5191c94926add1b3e45"
+    },
+    {
+      "path": "native/audio_core/native_stereo_pan.hpp",
+      "sha256": "bce5e8366e975ecd9d7ae6c0dd41a0a9ff7a918296add86e257c2175ceebd7ec"
+    },
+    {
+      "path": "native/audio_core/render_dsp.cpp",
+      "sha256": "727eba496dc46eb7aa0a1f4da53b2cae0f29e42e0db0287467d19eaecaffe386"
+    },
+    {
+      "path": "native/audio_core/render_dsp.h",
+      "sha256": "ca4f0f39e5429bd36f3c9eaaa5c090c5a1e4fd5b67e5016b2bcb954eb711a7a6"
+    },
+    {
+      "path": "native/audio_core/timeline_plan.cpp",
+      "sha256": "dc1af696ed15c0b686ec3ed0e3b4358b56de1d947368d1606084505a6129d8a7"
+    },
+    {
+      "path": "native/audio_core/timeline_plan.h",
+      "sha256": "5be10c2222f7f36ea5abc9f006016007d34d294a9f4b8bafa8fc76b8307d07ca"
+    },
+    {
+      "path": "native/audio_core/vocal_synth.cpp",
+      "sha256": "0d62217e044cdd7b1d550eb9cce58e9a2c427633c50320ec71376271dac942ba"
+    },
+    {
+      "path": "native/audio_core/vst3_event_audio_pump.hpp",
+      "sha256": "e85fef5007647e042aa367593a6134b4a1ee39a43be2858f7c070bc518808dde"
+    },
+    {
+      "path": "native/audio_core/vst3_event_dispatch.hpp",
+      "sha256": "7b7cb8437e596349ed644bb6e920fe0ba2921ba584d5b95310b0bc99203432e5"
+    },
+    {
+      "path": "native/audio_core/vst3_event_packet.hpp",
+      "sha256": "53d2f06dad2bff9a5ebcbab7a59a5d3ecaa06b1c8997559b69fa5e91d61e5055"
+    },
+    {
+      "path": "native/audio_core/vst3_latency_line.hpp",
+      "sha256": "a574aa8e769460ea199cdea6a2c24b73d06693080032a5bd3e05ec6bb2e5be9e"
+    },
+    {
+      "path": "native/audio_core/vst3_latency_policy.hpp",
+      "sha256": "647197046768938a9f33964c57d5275359053570e741e0b8ad2568357aa066f2"
+    },
+    {
+      "path": "native/audio_core/vst3_parallel_mix.hpp",
+      "sha256": "1f262cae1643c2bc705b3e477bb96bd2ef04c47f8c102c3f944354b8a6bd38b3"
+    },
+    {
+      "path": "native/audio_core/vst3_pdc_plan.hpp",
+      "sha256": "c8fefca1de2f36eaaefb957077083b306bd01b386401db032275906275525193"
+    },
+    {
+      "path": "native/audio_core/vst3_pdc_processor.hpp",
+      "sha256": "8482fd8920339cfff851616d144a9b21d6905353dc3f9714c89e57043247f88b"
+    },
+    {
+      "path": "native/audio_core/vst3_playout_bridge.hpp",
+      "sha256": "8a1133f984b5ca657b45937b2b6191c2eacde2ac98c69371753d1b9a923b25b9"
+    },
+    {
+      "path": "native/audio_core/vst3_recovery_policy.hpp",
+      "sha256": "5e6e765fb5825f185255f129ecb954899e979a8732a7eb0afaa9f64b0ee2c051"
+    },
+    {
+      "path": "native/audio_core/vst3_rt_contract.hpp",
+      "sha256": "506ab0c621379536d77b7cd5ee0e30a4e5d432914770d0ac230efae2b2248a1f"
+    },
+    {
+      "path": "native/audio_core/vst3_runtime_api.cpp",
+      "sha256": "07ebf864263e9b4bd9fcd1d94bf6439a300ab348e28bb753cabb0278aafd7f0e"
+    },
+    {
+      "path": "native/audio_core/vst3_runtime_api.h",
+      "sha256": "8cfd9947e0c578579ed505a9c2ab140582d200ae9d7596e4dfacbf700fe8093b"
+    },
+    {
+      "path": "native/audio_core/vst3_runtime_preflight.hpp",
+      "sha256": "40cbfc7432a3d26265eaff9f5bd0165260c9e4ce4d90628d80e7a635410da101"
+    },
+    {
+      "path": "native/audio_core/vst3_worker_events.hpp",
+      "sha256": "80d82a450035d02e1ba1d33d6f628e3668cb6c9d11ee52a601d6b4f37855f378"
+    },
+    {
+      "path": "native/audio_core/vst3_worker_pump.hpp",
+      "sha256": "be18714fbade9bc1b5770e3447abf2281036bc36bc6cdb30c5836d81b9b6eaf8"
+    },
+    {
+      "path": "native/audio_core/vst3_worker_runtime.hpp",
+      "sha256": "04a1528e180d625b16454d9fc6855528ad27357ce5f88a49c0e1d94dc3fcdde4"
+    },
+    {
+      "path": "native/generate_native_metadata.py",
+      "sha256": "fcd8fae04466dcc5c55bba056ccd971123dd2b5639ac7abcc6e3e9ef58dab188"
+    },
+    {
+      "path": "native/gui_dialogs.py",
+      "sha256": "83d6a64e5f6336ddbdd6635d4131b48f930fdfe813b3feef3e7b5d01f5c62bb0"
+    },
+    {
+      "path": "native/host_transport/MtaHostTransport.h",
+      "sha256": "c7c806d5869a28403ed342e551939e6e5053939b144005b62889e8bacef2b815"
+    },
+    {
+      "path": "native/host_transport/MtaSidechainMethods.h",
+      "sha256": "e72663230014fc1acab6cadb389a086b121a0d723255af16ce173f847f8dcacc"
+    },
+    {
+      "path": "native/host_transport/MtaUmpEvents.inc",
+      "sha256": "af59642447c518151856ad6b90f6ab353f7adfd9cfcd57fbe061e182540bf421"
+    },
+    {
+      "path": "native/icons/mta-audio-editor-1024.png",
+      "sha256": "d90debccc3429a648509b831fbf9261439e4cfa31d466a9b361c73f746c241df"
+    },
+    {
+      "path": "native/icons/mta-audio-editor-mark.svg",
+      "sha256": "9c33f713590896c72b8a710897af1df59bcc2b95d3ebf7ea5abf094d7efbff88"
+    },
+    {
+      "path": "native/icons/mta-audio-editor.icns",
+      "sha256": "9778d1ffb612074d7c38b51faa067f4b2352e64a5cca49d2c565d60553b55c68"
+    },
+    {
+      "path": "native/icons/mta-audio-editor.ico",
+      "sha256": "fa6cb38a2c5b46bc4209bf3ad73c3070cc5ed1b09cfa4a7966494e6bd33fe6db"
+    },
+    {
+      "path": "native/macos-localizations/en.lproj/InfoPlist.strings",
+      "sha256": "d77cb37dc0fd23e8cf5b0f060a4a106630395e5496479bbc6044177aac65be01"
+    },
+    {
+      "path": "native/macos-localizations/it.lproj/InfoPlist.strings",
+      "sha256": "930c8b4c00899237c3802e3b281133a329147ed15fd70d4697efcfb60e4b8737"
+    },
+    {
+      "path": "native/model_manager.py",
+      "sha256": "9652c6d900ecb23c53c7f6bdb6a385086d1961d44911a94732e00799958106eb"
+    },
+    {
+      "path": "native/mta_audio_editor_native.py",
+      "sha256": "36ba94149bff41b1cf49969b369260d758603e3b5a2e5b53ade678696192853c"
+    },
+    {
+      "path": "native/mta_audio_editor_native.spec",
+      "sha256": "ea61bfb0153be58fadf7e29166d14a4f798e44b9b6a4de0053c24393b4343428"
+    },
+    {
+      "path": "native/server_display/vendor/XSERVER-COPYING",
+      "sha256": "c9f90a6669109aad6c9a7c3b46cc2c574221a73b792afa419336816b49da5c11"
+    },
+    {
+      "path": "native/server_display/vendor/xorg-server-21.1.24.tar.xz",
+      "sha256": "1a4eb36ca65cc3b1b936566d677a9786e13c11cd5806e951ac55f3f5ce3984af"
+    },
+    {
+      "path": "native/third_party/miniaudio/README.md",
+      "sha256": "d06f1f4ea16d4be5bacfaa731e0bd240b20bd4fd0dd4de4ed723e1ee2fdb4a45"
+    },
+    {
+      "path": "native/third_party/miniaudio/miniaudio.h",
+      "sha256": "7e4f3f13c8fe66df2080ac3dd12a89193e3c2463cb7f067c798abd7331cd8ee6"
+    },
+    {
+      "path": "native/third_party/oddvoices/LICENSE",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "path": "native/third_party/oddvoices/README.md",
+      "sha256": "6a4c7bf21ef0d23109f74ca1a8d1b5ae82c39d8294c2c79fe90f1b1a331aaa2b"
+    },
+    {
+      "path": "native/third_party/oddvoices/cpp/src/deque.hpp",
+      "sha256": "76b52c38fdda2b5c7f0b7fb968109d0885dda93dc54e090b9e7e793f706f4d6a"
+    },
+    {
+      "path": "native/third_party/oddvoices/cpp/src/g2p.cpp",
+      "sha256": "4a950fca5e21d72089b9deccff5b9d51cda28e89e100eb857347ff1556385057"
+    },
+    {
+      "path": "native/third_party/oddvoices/cpp/src/g2p.hpp",
+      "sha256": "1475560ba91fd7d087690b1442a85c90dfa2b9e81cc0b6ae82fe5c724fd8cdf1"
+    },
+    {
+      "path": "native/third_party/oddvoices/cpp/src/liboddvoices.cpp",
+      "sha256": "26c6ddf7e2832d56bba18bd255a6c0d2a56fdda1121140f0ed664a27f86043cb"
+    },
+    {
+      "path": "native/third_party/oddvoices/cpp/src/liboddvoices.hpp",
+      "sha256": "abc7a16daf531b4301cbea1e52972680e56379454e0140a3e5432623b384586e"
+    },
+    {
+      "path": "native/third_party/oddvoices/cpp/src/pitch.cpp",
+      "sha256": "3e035a6dff8eb8bc734c6a576179c312b791939abd5b4d82b0a74cff59248025"
+    },
+    {
+      "path": "native/third_party/oddvoices/cpp/src/pitch.hpp",
+      "sha256": "6f9c739457cb370d7c3327b1e59cb366b8e302ec6fb4d7fb35f9a127d14c40f1"
+    },
+    {
+      "path": "native/third_party/oddvoices/cpp/src/sine_table_256.inc",
+      "sha256": "7a3bbee7147aa1e811668f72cb1b44170c4be36ff677c36a3a90955b29105a5f"
+    },
+    {
+      "path": "native/third_party/oddvoices/docs/usage.md",
+      "sha256": "3e0fe2a24abb296e0ddfe14a85038e26b9a4bfaba072a97ff80f2d87e431b605"
+    },
+    {
+      "path": "native/third_party/oddvoices/provenance.json",
+      "sha256": "e43927e935f174fed4e7c8b7fed9ea95e10e3d779206bbd03b8af1f6e7322ee5"
+    },
+    {
+      "path": "native/third_party/oddvoices/python/oddvoices/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "native/third_party/oddvoices/python/oddvoices/corpus.py",
+      "sha256": "0ab964dbcd6ea0581d018661e103f22f6d5847b5d412796092a006f20006fcb5"
+    },
+    {
+      "path": "native/third_party/oddvoices/python/oddvoices/phonology.py",
+      "sha256": "1642cbfa2190a1334d8f47582b6faf9a5914d5c1eb0e06af3871f1a36e30a5ac"
+    },
+    {
+      "path": "native/third_party/oddvoices/python/oddvoices/utils.py",
+      "sha256": "934f7e4b381a6c115991f9fc75bb6854d3f1127f53922d32c570a40e3200adc4"
+    },
+    {
+      "path": "native/third_party/oddvoices/scripts/compile_voices.py",
+      "sha256": "8e36b5205a8434e81133867f493aad1adbb76a7765fa5f2ce186a801a45a3a35"
+    },
+    {
+      "path": "native/third_party/oddvoices/voices/LICENSE",
+      "sha256": "1adf75443b6c88c9072ef0c68056d8ed7cba07432e8a79b2a43e66ed8b551fdc"
+    },
+    {
+      "path": "native/third_party/tinysoundfont/LICENSE",
+      "sha256": "ef10cb839de73fb6d5d32ea7151979e87809a6df70dc7e7ee8457ae1c9e7aa7e"
+    },
+    {
+      "path": "native/third_party/tinysoundfont/tsf.h",
+      "sha256": "70d55963c98f60ebb81518eaa1f25d46888d5180eb5f5289fd6b74ffc177d197"
+    },
+    {
+      "path": "native/ui_zoom.py",
+      "sha256": "76d13889f31a35ffed9157f31cbb447a086b5ab353a579f0978aad50b50fa5ae"
+    },
+    {
+      "path": "native/update_manager.py",
+      "sha256": "d09c5eddfeb2c423a3f44634ae00b6fe1f27ed246d7ea2f06173c120c43a1464"
+    },
+    {
+      "path": "native/vst3_probe/CMakeLists.txt",
+      "sha256": "ab1af23e413d9306180bf18a41a3e515cf353f8302bc825b07c44601b76c11c4"
+    },
+    {
+      "path": "native/vst3_probe/READINESS_GATES.md",
+      "sha256": "25be39ff7b4854129ec60c601217f3308174e6e8f9741bc743cfdc370f9a1996"
+    },
+    {
+      "path": "native/vst3_probe/__init__.py",
+      "sha256": "463f1a446db3de7ac5c2385dede61ba06aebea61777c674b65bf5df85d0bfda7"
+    },
+    {
+      "path": "native/vst3_probe/async_bridge.py",
+      "sha256": "a6537c5e3b783bfd125ce1baf1ccd91d6ed6e6da6eddffa979598769bcccd550"
+    },
+    {
+      "path": "native/vst3_probe/batch_wav_cli.py",
+      "sha256": "dff30628aa0bcea52a2ddbe589f95067c1e09451c48e21f730584eff55097e70"
+    },
+    {
+      "path": "native/vst3_probe/latency_plan.py",
+      "sha256": "daeea925ff558d0929f50a3ba157902ee70eeba744524a2b839fd279f08118b5"
+    },
+    {
+      "path": "native/vst3_probe/main.cpp",
+      "sha256": "40cc258f703ae6fc1dc5d9db2301667c37b5b2bc74c285f9e9c46341726e935c"
+    },
+    {
+      "path": "native/vst3_probe/native_chain.py",
+      "sha256": "77d3a648b1cdbc5d6950b0bbfec762fcb6781f3aec8ed7b5f1d99927be875f91"
+    },
+    {
+      "path": "native/vst3_probe/native_rt_harness.py",
+      "sha256": "c79c5da6f2f69c982856e9f2c53004790e171a532b5802451091bf9df49e7c64"
+    },
+    {
+      "path": "native/vst3_probe/offline_graph.py",
+      "sha256": "bacc06ac7a59baf3e9d0bd47aba6af144af4071ccfc4cd174fed0dc91f3f65ca"
+    },
+    {
+      "path": "native/vst3_probe/offline_session.py",
+      "sha256": "1dafd53131837fbb6cb09850af7e47018466ee274a1f8083ae478d3f68ca322c"
+    },
+    {
+      "path": "native/vst3_probe/ordered_bridge.py",
+      "sha256": "681407d8708248e8e9d721c1e9f02e12e5666071877665de8103387ebdad0606"
+    },
+    {
+      "path": "native/vst3_probe/playout.py",
+      "sha256": "ee0c96dfd29972a2638f8b9e9072a8fd610a7b0393f83d9008219e5bc95e0b28"
+    },
+    {
+      "path": "native/vst3_probe/probe.py",
+      "sha256": "b1d97f04cb460c0931267f8f7a5a125f7f5036c9c535d404c4f1023fcf4f90ab"
+    },
+    {
+      "path": "native/vst3_probe/render_wav_cli.py",
+      "sha256": "c16cfad1229d9527d8753cad20d4b16592416bf96bdd8526d42da50fb1c5e197"
+    },
+    {
+      "path": "native/vst3_probe/state_store.py",
+      "sha256": "7748ab2493546a39af224c7c6936f993636ab5efd9052aa09be1b21c692da2d6"
+    },
+    {
+      "path": "native/vst3_probe/stream_worker.py",
+      "sha256": "6a4132b1c1804c1a117cd4b43ab8d943ae4c285ba88abd2f4c785ed9f49594ec"
+    },
+    {
+      "path": "native/vst3_probe/supervised_worker.py",
+      "sha256": "3f40ea0952ff46b1ea8b4706b046e65350b9a075a65f06bc9b26a9dedbbcbb4d"
+    },
+    {
+      "path": "native/windows-installer.iss",
+      "sha256": "ed41022f02bc789805f4afcabc68f1fac36ef5a09958168c66882a4f860a953a"
+    },
+    {
+      "path": "native/windows-version-info.txt",
+      "sha256": "33ffd09b1cf783a7c2e94fc164c4d5b780e8db82e7054709041f586c0f0691df"
+    },
+    {
+      "path": "scripts/ace_gpu_benchmark.py",
+      "sha256": "90cafb5384621e7d4769c6968a2157fec45235a1382c627590ccc7ecc5e8c440"
+    },
+    {
+      "path": "scripts/acquire_merchant_range.py",
+      "sha256": "3ffc5b07ab9ff105449336c2d982ce2081e60324c9eb790937d7aab3b5bd871a"
+    },
+    {
+      "path": "scripts/audit_merchant_coverage.py",
+      "sha256": "07cc2ee768ac99abfe80326b895e13aa85d4a3f6cd3702805580a4649208516a"
+    },
+    {
+      "path": "scripts/audit_multitrack_acceptance.py",
+      "sha256": "d3e99522c5777a2de69b58019a61f613802823532617c544886e2d5563247d71"
+    },
+    {
+      "path": "scripts/audit_paired_midi.py",
+      "sha256": "d9c782cfe1f414e1c53b02b2436ac7adb943364fcc17418c1b775ecbe272b0dc"
+    },
+    {
+      "path": "scripts/benchmark_ai_concurrency.py",
+      "sha256": "effa0ccc371e174e6230ebc5a0f605fc3b4820c50570a1a9ee129b4d9fc10516"
+    },
+    {
+      "path": "scripts/build_audio_core.py",
+      "sha256": "1cb9d30c6448bef737d6cbd9665cf7430d0051622341e6c7dea5de2652d38853"
+    },
+    {
+      "path": "scripts/build_chordino_unix.sh",
+      "sha256": "a10aef5fb2be291c5b27860320cba8413e844729167d6ddc19a8a28efe0ef44c"
+    },
+    {
+      "path": "scripts/build_docs.py",
+      "sha256": "1ce57decb01355c2666b737137c803da35434b5cfc1a5f87f6924818a64ca798"
+    },
+    {
+      "path": "scripts/build_early_update_manifest.py",
+      "sha256": "34a571fdc5d1f5b2c655ae22263c39755a8e3ac65e2a096a13ff48a367d55d17"
+    },
+    {
+      "path": "scripts/build_mlive_mp3_spec.py",
+      "sha256": "47dae2c9a5d0289bea61b3e9f20c616bf5a7129b8edf0a40f5de47c5c7b0a27d"
+    },
+    {
+      "path": "scripts/build_qixuan_onnx_bundle.py",
+      "sha256": "1e481780d1d6d9727735be36ffe2997274ae54c30b5607561cb915ded9fdfb68"
+    },
+    {
+      "path": "scripts/build_r210_cumulative.py",
+      "sha256": "80e45fbfd8e28017c916e777ece87efb40111e9012e28c99e5324a218f911fcf"
+    },
+    {
+      "path": "scripts/build_server_display.py",
+      "sha256": "c765fbc693cac5af5914c4068a84df367f3050c5226fd58fc44d759834279c58"
+    },
+    {
+      "path": "scripts/build_studio_bundle.py",
+      "sha256": "54ceab90ac352b1898b4e94c0c07086409fc6274df63ad8b835c64953215993f"
+    },
+    {
+      "path": "scripts/build_vst3_manuals.py",
+      "sha256": "4280577df092e81fd4ba035b6a61e68bb3a16f8f4c568c80b56d954021901d37"
+    },
+    {
+      "path": "scripts/build_vst3_runtime.py",
+      "sha256": "04278ff6181cf38e2980608e10d202b2f067dcd1b758182c1ec9caa9f9b83881"
+    },
+    {
+      "path": "scripts/certify_ai_r208.py",
+      "sha256": "7c1c59211bc563c5ae7c62d97d938196c7197a0c31629c593d3eeea312c2dba1"
+    },
+    {
+      "path": "scripts/check_ai_execution_inventory.py",
+      "sha256": "3e92827094b9581acec3fd604816b783af1a67803befd087400bb54985b94bfb"
+    },
+    {
+      "path": "scripts/check_audio_midi_quality.py",
+      "sha256": "66e36be15d175c4ca9632eb2be33a926d4b9861bed0c768e0d5dd324c2e3e8ce"
+    },
+    {
+      "path": "scripts/check_diffsinger_ready.py",
+      "sha256": "10e27b5646a306358bc4d579211d7bac00c6e205f0cd138a8085ccaa90e35c57"
+    },
+    {
+      "path": "scripts/check_gm_soundfont.py",
+      "sha256": "8d27e3195acdd6b8143fd70f69d6dae68bdd4b4bdd8562c176b1a7579a0bec87"
+    },
+    {
+      "path": "scripts/check_ios_model_rights.py",
+      "sha256": "db6551886cc8cd8a00a4c871b3f15c4e7467dd96076e34934b0cb5ce4f8aec79"
+    },
+    {
+      "path": "scripts/check_mta_gpu_agent_mount.py",
+      "sha256": "408fd85067d1f792e5c6cf7df79bdc8c791bc66cec2cc9af9456b6a3652549f7"
+    },
+    {
+      "path": "scripts/check_neural_validation_assets.py",
+      "sha256": "ec8b6deff3b71a08e9c3036d72f7f8218a3f42f1d29ec32cab9c237e284ef4c7"
+    },
+    {
+      "path": "scripts/check_remote_transport_inventory.py",
+      "sha256": "b5ea2a19b6870e29b4c140f5fcb565cab9b6d0ef80e381041cf965fb1459dc6a"
+    },
+    {
+      "path": "scripts/check_security_review.py",
+      "sha256": "89e974d3635e72ee67c90d12dea68c728c31c7eea9a0bc0b4347476abf31cb97"
+    },
+    {
+      "path": "scripts/check_service_admission_inventory.py",
+      "sha256": "7146777e44094f727c8d6fe787da212879a601ca58577825f412b82e736b6dc3"
+    },
+    {
+      "path": "scripts/cleanup_ai_results.py",
+      "sha256": "c42efc21361f10eee47bcd10fe50147861397835238c93208cc24d50d5ecf2c1"
+    },
+    {
+      "path": "scripts/compare_multitrack_models.py",
+      "sha256": "2a35024a00a02c8f068c45e8dde9b7890f0f468e10a3ffbcbb3be01e355fad2a"
+    },
+    {
+      "path": "scripts/configure_ai_workers.py",
+      "sha256": "e84cb4593da176952433c5601d043492d4aafcc828cc06e8c5a106545d609d69"
+    },
+    {
+      "path": "scripts/crash_inject_ai_outbox_r208.py",
+      "sha256": "df19be7054dcafae42ed00575fe3fc9a1478f20de739fcd177419cf7bfe7bee8"
+    },
+    {
+      "path": "scripts/diagnose_linux_r208.sh",
+      "sha256": "21993a4422121a83fecec26e2edc432635e4458dacbb89fbfe001d353aa6f80e"
+    },
+    {
+      "path": "scripts/diagnose_macos_r208.sh",
+      "sha256": "313522c55202ab2754ff70306054680503895a2cf5b33db6ebc6a07d8425c643"
+    },
+    {
+      "path": "scripts/diagnose_server_r208.sh",
+      "sha256": "7a365e55c6acdfa71ef7670e60689a16dc9ddafbe214d7b32bafa635a8b3187f"
+    },
+    {
+      "path": "scripts/diagnose_windows_r208.ps1",
+      "sha256": "ffc9e489ec9b266ebb1feee90b2ac435e74a02914b8371259751b5525e497fdc"
+    },
+    {
+      "path": "scripts/evaluate_mrmt3_alignment.py",
+      "sha256": "dc794bfab9964b8dce3a8c0bdb238aaf68090e04c7481293862f599430d733fe"
+    },
+    {
+      "path": "scripts/export_demucs_coreml.py",
+      "sha256": "f0c0c5ae000827aec1962663de3d2f1f52c04011d7c430aef303cd5188ce3e88"
+    },
+    {
+      "path": "scripts/fetch_live_vst3_test_plugin.py",
+      "sha256": "ca9d03dd92126d9c15f416f63145024bf4c4573ab59404a975be1836b2e513bc"
+    },
+    {
+      "path": "scripts/gpu_accounting_probe.py",
+      "sha256": "aad4c4e533fe4f3b15590f7bab4d803769019922aef84ff4e54e649364b44a2b"
+    },
+    {
+      "path": "scripts/gpu_verified_billing.py",
+      "sha256": "c13406017d54e4f5b5095a4d6532023677d422783da7c63741d39ba68efe4ae4"
+    },
+    {
+      "path": "scripts/hip_event_probe.cpp",
+      "sha256": "75f090da5393642d18e16b87fdef9afceb25da0df2c48ddc598c8638dcc93564"
+    },
+    {
+      "path": "scripts/install_ace_step.sh",
+      "sha256": "4528ae5e905163af9eec614413b18c72c183bc518a2ef5484ead4a4c696582e6"
+    },
+    {
+      "path": "scripts/install_ai_engines.py",
+      "sha256": "bcbc751e87cedc523a06564cc217637aa367a48a17f238342dee5c28dfa73ca3"
+    },
+    {
+      "path": "scripts/install_amdsmi_sidecar.py",
+      "sha256": "7c75de1b756f1f30a483acccddd8ba8d3f4460d899898b2cefe1654d50c09114"
+    },
+    {
+      "path": "scripts/install_demucs.py",
+      "sha256": "b182083746eec6f70eecf946a2225665e8ef93ab02a31ae640bf8d3520d5d716"
+    },
+    {
+      "path": "scripts/install_gm_soundfont.py",
+      "sha256": "325ce0fc48a7a6435053d161d0adc5d0118a47eddc6f7f051771c1097477a764"
+    },
+    {
+      "path": "scripts/install_mta.sh",
+      "sha256": "1876ad84d459d74f586812a26b792e38f6f9ccf04f31625d13b0a7b494a7f327"
+    },
+    {
+      "path": "scripts/install_mta_native.sh",
+      "sha256": "f6842c2440167972ba760eb63f89156b3a7ea021c7162d930ae3947b17b7de02"
+    },
+    {
+      "path": "scripts/install_mta_native_wizard.sh",
+      "sha256": "3e8b9316e15d1dd6759d3643aaa6c42de1693650f58e076760688aeb967d7248"
+    },
+    {
+      "path": "scripts/install_mta_proxmox_gpu_agent.sh",
+      "sha256": "b5002eb798373e1b3e726ec0850833c4eefea6a9212853ae11b14be7f5ec116b"
+    },
+    {
+      "path": "scripts/install_music_assets.py",
+      "sha256": "106f70a6286ec6bd82d20a01fb45d9ff6f14e7f426204a6ef3cf1e37294172ee"
+    },
+    {
+      "path": "scripts/install_optional_vst3.py",
+      "sha256": "77d83bc0961d5fa34665bc1384d58ae523919332305b64d1144abfd5961e0776"
+    },
+    {
+      "path": "scripts/install_rocm_userspace.sh",
+      "sha256": "fead5b51c9f2890c4be2730d9b3fc520a43616b51646d99c1d3395c87b823bce"
+    },
+    {
+      "path": "scripts/install_studio_mrmt3.py",
+      "sha256": "1223fef71cd9a021a923c6cf3feea14feac2d4b09f6315c29897736351bd4330"
+    },
+    {
+      "path": "scripts/install_studio_yourmt3.py",
+      "sha256": "7bb2644eaf78e4820e3358682afbfe19c39bf72d16fdeee7daf607221832549b"
+    },
+    {
+      "path": "scripts/install_studio_yourmt3_ps.py",
+      "sha256": "5648bca5bf837a507fb6c044dea74f8215d23d8fd84d84098fb4491979adab32"
+    },
+    {
+      "path": "scripts/installed_diagnostics_r208.py",
+      "sha256": "2965af4903711ecfcf047fa7d9858d9a5be270177b171a9cd810082ba5f5bf98"
+    },
+    {
+      "path": "scripts/k8s-wizard.py",
+      "sha256": "61866afe3ae8f4bab4466cd2970aeadd77df217d838280ac62025813dcc4fdf9"
+    },
+    {
+      "path": "scripts/license_gate.py",
+      "sha256": "d205669b8ec236ecec22111d262f63bfae4573f1744219f44f8647c9ae702e78"
+    },
+    {
+      "path": "scripts/manage_studio_assets.py",
+      "sha256": "68e14d1b83c30682447c1f322c7a47a9667572983f30009e783571927560ebef"
+    },
+    {
+      "path": "scripts/manual_reference.py",
+      "sha256": "ec006383e22900379a712ed11221f075813447a0b2a21907eacc7729d700bf2a"
+    },
+    {
+      "path": "scripts/mta_billing_isolated_validation.py",
+      "sha256": "e5433fd1c8366ffbee0d061fb535fb358e40c9ca5f5fa845b2bcb20897ee61fc"
+    },
+    {
+      "path": "scripts/mta_billing_recovery_isolated_validation.py",
+      "sha256": "d3a83c3862b4609f22c41f7a9487bff1c3a51815cb90568ce1264e1670c3bc3f"
+    },
+    {
+      "path": "scripts/mta_gpu_agent_ct_diagnostic.py",
+      "sha256": "5d6882d36d2b547f3168a981891925cfbcca1228ddca1c5d3489b8a60306c5dc"
+    },
+    {
+      "path": "scripts/mta_proxmox_gpu_agent.py",
+      "sha256": "bfe08e8ecb98751208e45358ba5900a12b4bf67ca1238c876edabdada5fcf75a"
+    },
+    {
+      "path": "scripts/mta_proxmox_gpu_preflight.py",
+      "sha256": "4e46a7107b977f75af711ae8b08bcb5047b78c974745324c6d5a7c3eae071d08"
+    },
+    {
+      "path": "scripts/mta_proxmox_gpu_readiness.py",
+      "sha256": "478bb4d5e27a73435f0910c11a7bb41c655f0637f2a575be5a0e98b70f9ad1bc"
+    },
+    {
+      "path": "scripts/mta_proxmox_tag_sync.py",
+      "sha256": "a8ecb8dff710d463dbbbef0a562f8599bc505b8174924b1259644a2868644f1b"
+    },
+    {
+      "path": "scripts/package.sh",
+      "sha256": "fb8db57da2abfaaf87b16fffbc58ba5d51ddbcb17d17151c4967081cec474eab"
+    },
+    {
+      "path": "scripts/package_native_linux.sh",
+      "sha256": "c944cfcf08a02d7a2bc271b98516e4f7d419423231e1b54f44a55a2696561410"
+    },
+    {
+      "path": "scripts/patch_vst3_runtime.py",
+      "sha256": "cb70a261f00abc4b9435c8d1e9845aabfc972a37d09ccd62f9179e549764eb01"
+    },
+    {
+      "path": "scripts/production_gate.sh",
+      "sha256": "5c276d7d43fb8c50c98d3330077a17079da836017ab7b48fe4695b34922ccc8c"
+    },
+    {
+      "path": "scripts/provision_chordino_windows.ps1",
+      "sha256": "c84b18bb3b729af7d65e2d287a32004ac375a50d5f208d36bccb23bbac875771"
+    },
+    {
+      "path": "scripts/reconcile_paypal_reports.py",
+      "sha256": "c7dbf1197a9a8eca52443a93170da3212f44266338dfa249158bd53723fe2a5c"
+    },
+    {
+      "path": "scripts/render_gm_midi.py",
+      "sha256": "271155b3d6d3ac026aad910754b69b2ae600e76aead64f16d5f61b0cc86cae6d"
+    },
+    {
+      "path": "scripts/report_audio_to_midi_quality.py",
+      "sha256": "d2ad4182805679f9c64beb2b5b4b50ede6eaed7a664332af1e4c69f736f75ef1"
+    },
+    {
+      "path": "scripts/repositories/_safe_xml.py",
+      "sha256": "5b962ac24cde87308d4587f74b86179447be5c2b46c796a9c402923e80dbad75"
+    },
+    {
+      "path": "scripts/repositories/build_indexes.sh",
+      "sha256": "3d4b183588cdacb6049f7c071fff73c1b1616025a8d11987652153325c19f5f7"
+    },
+    {
+      "path": "scripts/repositories/install_repository.sh",
+      "sha256": "3202942b61e8c28de9e6960089ed7c32e93accdfab0d8c35f0082549d9fbbb51"
+    },
+    {
+      "path": "scripts/repositories/preflight_package_copy.py",
+      "sha256": "33c740b2deeddf08c68b9c2c13a7bba2e06a450200996d44320372f22931f6af"
+    },
+    {
+      "path": "scripts/repositories/prepare_signed_pages_release.sh",
+      "sha256": "1328f138362c53ac40dce2ccd2f574eba4e069a56014eb91015ff5160575cb33"
+    },
+    {
+      "path": "scripts/repositories/publish_pages_rpm_indexes.py",
+      "sha256": "c8f5265958217a270727f15c613399d5f09ff979c0076601431b1a187bc9ee11"
+    },
+    {
+      "path": "scripts/repositories/r2_publish.py",
+      "sha256": "8e483bb8e1adac29ba33cd61197918738db10c489eb8804f264a9e5d12cdd4ff"
+    },
+    {
+      "path": "scripts/repositories/restore_previous_channel.py",
+      "sha256": "010e3eab6b14cf576674dfe0e70600df8d879baf8741ba6e776aad0a1351660d"
+    },
+    {
+      "path": "scripts/repositories/retain_channel_packages.py",
+      "sha256": "2f78e3cad889dcfb565e9707ab1a21fc8ea1fffb2686ce8889912ed08aed8549"
+    },
+    {
+      "path": "scripts/repositories/test_signed_apt_repository_ci.sh",
+      "sha256": "d1ed581116fd4f2beda84627291c473b9baf7363bde3bad483cea302befc23b7"
+    },
+    {
+      "path": "scripts/repositories/test_signed_rpm_repository_ci.sh",
+      "sha256": "0999d34a92eece781d95913f695ab2ab36c868559ae85743c444fe4d0c7d33ab"
+    },
+    {
+      "path": "scripts/repositories/verify_public_pages.py",
+      "sha256": "9aa5519f86468c75e48f66e2a2cac3695c4b49316f2dd097fe00bce22b071256"
+    },
+    {
+      "path": "scripts/resolve_ace_step_version.py",
+      "sha256": "8f091352108b3dbf6d2a7e3b339b4a77c33475fbe0a97337fc2f8595d253d8e6"
+    },
+    {
+      "path": "scripts/restore_application_dump.py",
+      "sha256": "567779d4f00b746b5fd7499a4e4c740342cf926cabe0fd0493ccc1e961ab56a2"
+    },
+    {
+      "path": "scripts/review_optional_vst3.py",
+      "sha256": "36153de0399891619634209709a455cbbc450f59c7a62789aff9e7e06de31252"
+    },
+    {
+      "path": "scripts/run_admin_cutover_chromium.py",
+      "sha256": "afd89fde359f7d9f85db51b4210cd32ba102fa16840381027985439c5d3b470c"
+    },
+    {
+      "path": "scripts/run_global_regression_shard.py",
+      "sha256": "98246be08a41feb3a381c2cfe627c19e478b9d19f65b495c8d186097055143f1"
+    },
+    {
+      "path": "scripts/run_ios_model_rights_acceptance.py",
+      "sha256": "a48e75d7809013e0845f73b0f22abf8aed970f70b45acc19b617f485dcb6d33e"
+    },
+    {
+      "path": "scripts/run_merchant_history_chromium.py",
+      "sha256": "9787e28521fbec9e701c26a55e1b59b2654137bf1f8bc4af099ee815f04dbd8a"
+    },
+    {
+      "path": "scripts/run_mrmt3_gpu_benchmark.py",
+      "sha256": "6e4062b0640df956427e7820d649cb9de7fa75c331f369fd1081afc86a63b091"
+    },
+    {
+      "path": "scripts/run_mrmt3_resumable.py",
+      "sha256": "4139e70fad409bae1d910f232f1de2df76a2e6c6a9786f33de3dc8eb4d3b599b"
+    },
+    {
+      "path": "scripts/run_quality_tests.py",
+      "sha256": "07b0c3cf72b6b508dc76b1b323fc1fdc79d092cf73ab28b317645a10c1d0ec3d"
+    },
+    {
+      "path": "scripts/run_r210_browser_acceptance.py",
+      "sha256": "c1b61a4d331a838a1a69114d90b46477ece3fee89ba59bd0596699e1a72d4eee"
+    },
+    {
+      "path": "scripts/run_transition_progress_chromium.py",
+      "sha256": "f2cbea218a9e84d8dc20452478e85771b46b3c1c208c113f81d1cdbe6a52ca2a"
+    },
+    {
+      "path": "scripts/run_yourmt3_verified_benchmark.py",
+      "sha256": "a13d3c7250c7ace52f86033562092ebbe95fe466954b0e36f43ebe5fcc29b80d"
+    },
+    {
+      "path": "scripts/server_packages/build_deb.sh",
+      "sha256": "c48c7b8877181c819a526325907d51f97154d6899aa72bca359736312e5aa5d1"
+    },
+    {
+      "path": "scripts/server_packages/build_rpm.sh",
+      "sha256": "74b21512cce46073fb39b33c83312ad3a5a6cc702101a03bb5f8b95dfc044e38"
+    },
+    {
+      "path": "scripts/server_packages/check_system_services.sh",
+      "sha256": "70d47c6459eb3704cdc593bc2fb7a8fd0996eddb66d20e0adf3805043927b017"
+    },
+    {
+      "path": "scripts/server_packages/el10_preflight.sh",
+      "sha256": "dff7263547bb4429b548a2143a11a4deefd5606c17d4270938c8f6898206ddd2"
+    },
+    {
+      "path": "scripts/server_packages/http_smoke.py",
+      "sha256": "9c3dbff644dd9ded9d54f18d5710772914c8953f5dd2bd1f5eb2901a3cdec898"
+    },
+    {
+      "path": "scripts/server_packages/install_runtime.py",
+      "sha256": "8c1c601da4557de75a6e4713f90b082513077f095cde30779f01cb1e830b5e87"
+    },
+    {
+      "path": "scripts/server_packages/mta-billing-scheduler.service",
+      "sha256": "4b1abb2264cba320d2eb011479dcdbb37d8895af8627c7cf18e7217ea21220c0"
+    },
+    {
+      "path": "scripts/server_packages/mta-billing-scheduler.timer",
+      "sha256": "6f85802979672ca35604eb23efa20d176ef2dae74fca88f1f2f8da78c71de6c5"
+    },
+    {
+      "path": "scripts/server_packages/mta-server.service",
+      "sha256": "842f80044e769bd86819bcf1212916f364d8f19e15fd13704afb1c64b1a7ecfa"
+    },
+    {
+      "path": "scripts/server_packages/postinst",
+      "sha256": "7275d6c077bfcde2ed1c637c14cc544c08cebe5702d9842866b6aaed5c43e8b1"
+    },
+    {
+      "path": "scripts/server_packages/preinst",
+      "sha256": "714ea50e7fbced74a7b177b635eee11855d8838c14324ad46a38403dfa74d430"
+    },
+    {
+      "path": "scripts/server_packages/prepare_runtime.py",
+      "sha256": "6d41230e6656c067adfd2cdbdcd4b40e340c33fa8aae15be613c994d93e0adbd"
+    },
+    {
+      "path": "scripts/server_packages/prerm",
+      "sha256": "cbd437e3d1e775573af84eeee3fec8d1fac18a0962031668bcfd556271ca75de"
+    },
+    {
+      "path": "scripts/server_packages/smoke_offline_payload.py",
+      "sha256": "161661aedcbd62f65c05a95fa3552f358715b93af2469c34ac7e32889d305640"
+    },
+    {
+      "path": "scripts/server_packages/test_deb_upgrade.sh",
+      "sha256": "f77f0c3cffcf254a037e98e726e1af572ec464aeea8e8d6b40e04b2ef002618c"
+    },
+    {
+      "path": "scripts/server_packages/test_deb_version_cycle.sh",
+      "sha256": "37a51229fd5134080b70038dbc506c3b9471142c2dc76e74e89c3d82c43825e7"
+    },
+    {
+      "path": "scripts/server_packages/test_rpm_upgrade.sh",
+      "sha256": "5aefda0756635047fbb660993caad74165d91be6643cee4423993d3a95c111f2"
+    },
+    {
+      "path": "scripts/server_packages/test_rpm_version_cycle.sh",
+      "sha256": "26fac4acf61ec959bee67396a93743864be1a3078dcf6c0bfb111ad26478c4f0"
+    },
+    {
+      "path": "scripts/server_packages/validate_stage.py",
+      "sha256": "95474790031ced65a0be8a5f6ddafa19af3ca0b175b4cd8347349c915c25e7ad"
+    },
+    {
+      "path": "scripts/server_packages/verify_native_installers.py",
+      "sha256": "417fe5d402cc3861470b2a6005b6ea7a5b7e18792ce438c2be51e794edd013aa"
+    },
+    {
+      "path": "scripts/server_packages/verify_offline_runtime.py",
+      "sha256": "decaaf733fd24e1f2aaf8fb91ea753aa7da75dce1c190cc6680d8742b4ba8c80"
+    },
+    {
+      "path": "scripts/server_packages/wheelhouse_lock.py",
+      "sha256": "d7ee95464fa164e34d3ae12984c417ce8c291fd7217f646098cd37a60e1ae83d"
+    },
+    {
+      "path": "scripts/test_vst3_adelay_chain.py",
+      "sha256": "d26982d97b68bfa0a4ec2885909e166c885da8a299026101dbeedb728882833a"
+    },
+    {
+      "path": "scripts/test_vst3_adelay_events.py",
+      "sha256": "e3e4d482518158578bf92793e2b09f40d5c9e8f4a9a9da3bb4739e34d994be71"
+    },
+    {
+      "path": "scripts/test_vst3_adelay_native_bridge.py",
+      "sha256": "ed37871d80e91267a1f7a93dcb2472ad27b51f9db5cd6365503ce4b278091b4f"
+    },
+    {
+      "path": "scripts/test_vst3_adelay_offline.py",
+      "sha256": "eabe124c8b3dad28240923fce4e3db8ff0d827c77521de78f2e96e863193e952"
+    },
+    {
+      "path": "scripts/test_vst3_adelay_session.py",
+      "sha256": "d214a1e479f1ef658a88d29251a78cd367f528d9d91c3ec915b33cbc89c3c938"
+    },
+    {
+      "path": "scripts/test_vst3_adelay_stream.py",
+      "sha256": "f7ce03a3cb8c95b95eaa0c8feba4f8601a4df631fb751b9ec3339b0d31263567"
+    },
+    {
+      "path": "scripts/test_vst3_adelay_variable.py",
+      "sha256": "e2eeeba8585d16ddfb407c539bc2dca0ff18d7c9bf46d9bae7bd435c339bc0d1"
+    },
+    {
+      "path": "scripts/unattended_certification_r208.py",
+      "sha256": "7af3f48ae4100ea2980832ef4c15688bf95bf1b33b3b5568d2f3bdabe1551f12"
+    },
+    {
+      "path": "scripts/update_manuals_r210.py",
+      "sha256": "ac5ecb20a91ca6839ef28bc915c8b432694af712ecee7842d49c2e9d58f47dc4"
+    },
+    {
+      "path": "scripts/update_studio_manuals.py",
+      "sha256": "a6607a556464fe4b61d848a53c8a5a9ec53781b6d980198cc9d2735a3f51d008"
+    },
+    {
+      "path": "scripts/validate_audio_presets.py",
+      "sha256": "e155f1ccf1f300b269c8595f61fb1a0426d9be0578923616c51b0e527df7b280"
+    },
+    {
+      "path": "scripts/validate_cpp_live_controls.py",
+      "sha256": "ffbc8b23018b833b89ff27f17065678139d256648b325d1325bccb064245f988"
+    },
+    {
+      "path": "scripts/validate_editor_layout.py",
+      "sha256": "c470966576d59cfaa8ffe6af9daa7861438d74971d109a62b54d9d13b38ee814"
+    },
+    {
+      "path": "scripts/validate_midi_studio.py",
+      "sha256": "12629237d92e01250a42bfb91b3f1e3735b17c36319ea1366ed0c3de92eac694"
+    },
+    {
+      "path": "scripts/validate_playback_preparation.py",
+      "sha256": "65f7410120f15911f3b931e56cba69441dc64f1c049eb588673a142c9939c9c8"
+    },
+    {
+      "path": "scripts/validate_transport_position.py",
+      "sha256": "1d067e5e58db59a57f3d24e140797e212acbaaec3623285299496fbc63a16d7d"
+    },
+    {
+      "path": "scripts/vendor_ace_step.sh",
+      "sha256": "131954d84fd12b51df6da0e8063333b067570065695e039213ba3c71221f813d"
+    },
+    {
+      "path": "scripts/verify_ace_step_bundle.py",
+      "sha256": "2cdae42f064fd8990d88525cc799a47b67dc53aba03029149fdd55edd418aa9c"
+    },
+    {
+      "path": "scripts/verify_global_regression.py",
+      "sha256": "4ea547defb81b9f21eada3cf5fc7adcbc3af4a78bedaa341f9087e27915735c8"
+    },
+    {
+      "path": "scripts/verify_music_hardware.py",
+      "sha256": "9ef03bbd36b2fc85da3372af30e992e1724147e5f617f209828df716079009dd"
+    }
+  ],
+  "checkers": [
+    {
+      "path": "scripts/check_security_review.py",
+      "sha256": "89e974d3635e72ee67c90d12dea68c728c31c7eea9a0bc0b4347476abf31cb97"
+    },
+    {
+      "path": "scripts/check_service_admission_inventory.py",
+      "sha256": "7146777e44094f727c8d6fe787da212879a601ca58577825f412b82e736b6dc3"
+    },
+    {
+      "path": "scripts/check_ai_execution_inventory.py",
+      "sha256": "3e92827094b9581acec3fd604816b783af1a67803befd087400bb54985b94bfb"
+    },
+    {
+      "path": "scripts/check_remote_transport_inventory.py",
+      "sha256": "b5ea2a19b6870e29b4c140f5fcb565cab9b6d0ef80e381041cf965fb1459dc6a"
+    }
+  ],
+  "reuse": "Unchanged Apple13inputs/32SDKchecks;finances/web/Chromium/loader/F3 proofs. No repeated real model,fullCI or hardware acceptance."
+}

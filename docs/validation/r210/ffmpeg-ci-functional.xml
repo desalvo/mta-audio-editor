@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="12" skipped="0" tests="150" time="87.829" timestamp="2026-10-29T15:16:35.495582+01:00" hostname="9f17c61118ba"><testcase classname="tests.test_r210_legacy_separator_rights" name="test_native_demucs_denies_before_runtime_output_or_frozen_import[disabled-False]" time="0.123" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_native_demucs_denies_before_runtime_output_or_frozen_import[disabled-True]" time="0.002" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_native_demucs_denies_before_runtime_output_or_frozen_import[commercial_free_only-False]" time="0.009" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_native_demucs_denies_before_runtime_output_or_frozen_import[commercial_free_only-True]" time="0.008" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_native_demucs_denies_before_runtime_output_or_frozen_import[commercial_off-False]" time="0.002" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_native_demucs_denies_before_runtime_output_or_frozen_import[commercial_off-True]" time="0.002" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_native_demucs_denies_before_runtime_output_or_frozen_import[corrupt-False]" time="0.002" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_native_demucs_denies_before_runtime_output_or_frozen_import[corrupt-True]" time="0.003" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_native_demucs_cannot_replace_an_unknown_request_with_a_different_checkpoint[foreign-0-False]" time="0.002" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_native_demucs_cannot_replace_an_unknown_request_with_a_different_checkpoint[foreign-0-True]" time="0.002" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_native_demucs_cannot_replace_an_unknown_request_with_a_different_checkpoint[foreign-2-False]" time="0.002" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_native_demucs_cannot_replace_an_unknown_request_with_a_different_checkpoint[foreign-2-True]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_native_demucs_cannot_replace_an_unknown_request_with_a_different_checkpoint[/unreviewed/weights.pt-6-False]" time="0.002" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_native_demucs_cannot_replace_an_unknown_request_with_a_different_checkpoint[/unreviewed/weights.pt-6-True]" time="0.002" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_operator_local_repository_is_not_a_checkpoint_permission[False]" time="0.002" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_operator_local_repository_is_not_a_checkpoint_permission[True]" time="0.002" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_cardinality_profile_cannot_inject_an_unreviewed_model_after_initial_admission" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_demucs_revocation_from_progress_callback_prevents_the_actual_launch[False]" time="0.014" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_demucs_revocation_from_progress_callback_prevents_the_actual_launch[True]" time="0.002" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_demucs_inference_revocation_prevents_result_delivery_and_preserves_argv[False]" time="0.064" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_demucs_inference_revocation_prevents_result_delivery_and_preserves_argv[True]" time="0.006" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_backing_loader_rejects_revocation_before_runtime_load[UVR_MDXNET_KARA_2.onnx]" time="0.004" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_backing_loader_rejects_revocation_before_runtime_load[mel_band_roformer_karaoke_gabox_v2.ckpt]" time="0.002" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_backing_engine_grant_cannot_authorize_arbitrary_checkpoint_files[/unreviewed/weights.onnx]" time="0.004" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_backing_engine_grant_cannot_authorize_arbitrary_checkpoint_files[../UVR_MDXNET_KARA_2.onnx]" time="0.002" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_backing_engine_grant_cannot_authorize_arbitrary_checkpoint_files[foreign.onnx]" time="0.002" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_backing_engine_grant_cannot_authorize_arbitrary_checkpoint_files[operator-provided.ckpt]" time="0.003" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_backing_engine_grant_cannot_authorize_arbitrary_checkpoint_files[None]" time="0.002" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_backing_load_revocation_cannot_mark_the_cached_runtime_admitted" time="0.003" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_loaded_backing_runtime_rechecks_current_permission_and_exact_selector" time="0.003" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[ffmpeg-center-side-policy]" time="0.003" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[ffmpeg-center-side-native]" time="2.846" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[ffmpeg-center-side-unified]" time="0.011" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[mvsep-mega53-policy]" time="0.002" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[mvsep-mega53-native]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[mvsep-mega53-unified]" time="0.003" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[uvr_mdxnet_kara_2-policy]" time="0.003" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[uvr_mdxnet_kara_2-native]" time="0.001" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_opaque_command_cannot_borrow_dsp_or_other_checkpoint_rights[uvr_mdxnet_kara_2-unified]" time="0.003" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_opaque_command_rejection_precedes_actual_queue_and_ledger_admission" time="0.351" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_actual_token_api_denies_opaque_command_without_worker_or_ledger[json]" time="0.814" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_actual_token_api_denies_opaque_command_without_worker_or_ledger[wav]" time="0.281" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_builtin_dsp_actual_child_outputs_preserve_center_side_pcm_and_current_policy" time="0.454" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_registered_dsp_cannot_fabricate_single_process_measurement_for_ffmpeg_child" time="1.648" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_backing_revocation_inside_inference_does_not_release_result" time="0.008" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_rocm_loaded_callback_rechecks_current_rights_before_every_chunk" time="0.005" /><testcase classname="tests.test_r210_legacy_separator_rights" name="test_fixed_tool_sharing_metered_group_is_stopped_and_reaped_without_signalling_parent" time="0.309" /><testcase classname="tests.test_r210_known_worker_tree_accounting" name="test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[complete-demucs-plan0]" time="1.051"><failure message="AssertionError: assert ('running', 'unmetered', '{}') == ('running', 'unmetered', None)&#10;  &#10;  At index 2 diff: '{}' != None&#10;  Use -v to get more diff">operator = 1
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f03f18ecef0&gt;
+kind = 'demucs', plan = {'model': 'htdemucs'}, outcome = 'complete'
+
+    @pytest.mark.parametrize('kind,plan',ROUTES)
+    @pytest.mark.parametrize('outcome',['complete','cancelled'])
+    def test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated(
+            operator,monkeypatch,kind,plan,outcome):
+        monkeypatch.delenv('MTA_AI_WORKER_'+kind.upper().replace('-','_')+'_EXECUTABLE')
+        monkeypatch.setenv('MTA_AI_UNIFIED_WORKERS_ENABLED','true')
+        monkeypatch.setenv('MTA_AI_WORKER_'+kind.upper().replace('-','_')+'_PYTHON',sys.executable)
+        monkeypatch.setenv('MTA_LEAD_BACKING_DEFAULT_MODEL','ffmpeg-center-side')
+        monkeypatch.delenv('MTA_LEAD_BACKING_COMMAND',raising=False)
+        called=[]
+        def measured(args,**kwargs):
+            assert Path(args[1]).name=='ai_unified_adapter.py'
+            called.append(args)
+            measurement=agent.Measurement(0,.1,{'cpu_seconds':.05},'worker',True)
+            if outcome=='cancelled':raise agent.WorkerInterrupted(measurement)
+            return measurement
+        monkeypatch.setattr(agent,'run_metered_process',measured)
+        monkeypatch.setattr('app.ai_worker_artifacts.package_artifacts',lambda *a,**kw:pytest.fail('Unverified tree published artifacts'))
+        with pytest.raises(agent.WorkerUncertain) as error:
+            agent.execute_registered_worker(operator,kind,plan,source_wav=source_audio())
+        assert len(called)==1 and error.value.job_id
+        with ai_billing.db() as c:
+            row=c.execute('SELECT status,resource_source,usage_json FROM ai_compute_jobs WHERE id=?',(error.value.job_id,)).fetchone()
+&gt;           assert tuple(row)==('running','unmetered',None)
+E           AssertionError: assert ('running', 'unmetered', '{}') == ('running', 'unmetered', None)
+E             
+E             At index 2 diff: '{}' != None
+E             Use -v to get more diff
+
+tests/test_r210_known_worker_tree_accounting.py:38: AssertionError</failure></testcase><testcase classname="tests.test_r210_known_worker_tree_accounting" name="test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[complete-sam-audio-plan1]" time="1.226"><failure message="AssertionError: assert ('running', 'unmetered', '{}') == ('running', 'unmetered', None)&#10;  &#10;  At index 2 diff: '{}' != None&#10;  Use -v to get more diff">operator = 1
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f03f18ecdd0&gt;
+kind = 'sam-audio', plan = {'model': 'sam-audio-small'}, outcome = 'complete'
+
+    @pytest.mark.parametrize('kind,plan',ROUTES)
+    @pytest.mark.parametrize('outcome',['complete','cancelled'])
+    def test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated(
+            operator,monkeypatch,kind,plan,outcome):
+        monkeypatch.delenv('MTA_AI_WORKER_'+kind.upper().replace('-','_')+'_EXECUTABLE')
+        monkeypatch.setenv('MTA_AI_UNIFIED_WORKERS_ENABLED','true')
+        monkeypatch.setenv('MTA_AI_WORKER_'+kind.upper().replace('-','_')+'_PYTHON',sys.executable)
+        monkeypatch.setenv('MTA_LEAD_BACKING_DEFAULT_MODEL','ffmpeg-center-side')
+        monkeypatch.delenv('MTA_LEAD_BACKING_COMMAND',raising=False)
+        called=[]
+        def measured(args,**kwargs):
+            assert Path(args[1]).name=='ai_unified_adapter.py'
+            called.append(args)
+            measurement=agent.Measurement(0,.1,{'cpu_seconds':.05},'worker',True)
+            if outcome=='cancelled':raise agent.WorkerInterrupted(measurement)
+            return measurement
+        monkeypatch.setattr(agent,'run_metered_process',measured)
+        monkeypatch.setattr('app.ai_worker_artifacts.package_artifacts',lambda *a,**kw:pytest.fail('Unverified tree published artifacts'))
+        with pytest.raises(agent.WorkerUncertain) as error:
+            agent.execute_registered_worker(operator,kind,plan,source_wav=source_audio())
+        assert len(called)==1 and error.value.job_id
+        with ai_billing.db() as c:
+            row=c.execute('SELECT status,resource_source,usage_json FROM ai_compute_jobs WHERE id=?',(error.value.job_id,)).fetchone()
+&gt;           assert tuple(row)==('running','unmetered',None)
+E           AssertionError: assert ('running', 'unmetered', '{}') == ('running', 'unmetered', None)
+E             
+E             At index 2 diff: '{}' != None
+E             Use -v to get more diff
+
+tests/test_r210_known_worker_tree_accounting.py:38: AssertionError</failure></testcase><testcase classname="tests.test_r210_known_worker_tree_accounting" name="test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[complete-singer-separation-plan2]" time="1.075"><failure message="AssertionError: assert ('running', 'unmetered', '{}') == ('running', 'unmetered', None)&#10;  &#10;  At index 2 diff: '{}' != None&#10;  Use -v to get more diff">operator = 1
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f03f18efbc0&gt;
+kind = 'singer-separation', plan = {'model': 'sam-audio-small'}
+outcome = 'complete'
+
+    @pytest.mark.parametrize('kind,plan',ROUTES)
+    @pytest.mark.parametrize('outcome',['complete','cancelled'])
+    def test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated(
+            operator,monkeypatch,kind,plan,outcome):
+        monkeypatch.delenv('MTA_AI_WORKER_'+kind.upper().replace('-','_')+'_EXECUTABLE')
+        monkeypatch.setenv('MTA_AI_UNIFIED_WORKERS_ENABLED','true')
+        monkeypatch.setenv('MTA_AI_WORKER_'+kind.upper().replace('-','_')+'_PYTHON',sys.executable)
+        monkeypatch.setenv('MTA_LEAD_BACKING_DEFAULT_MODEL','ffmpeg-center-side')
+        monkeypatch.delenv('MTA_LEAD_BACKING_COMMAND',raising=False)
+        called=[]
+        def measured(args,**kwargs):
+            assert Path(args[1]).name=='ai_unified_adapter.py'
+            called.append(args)
+            measurement=agent.Measurement(0,.1,{'cpu_seconds':.05},'worker',True)
+            if outcome=='cancelled':raise agent.WorkerInterrupted(measurement)
+            return measurement
+        monkeypatch.setattr(agent,'run_metered_process',measured)
+        monkeypatch.setattr('app.ai_worker_artifacts.package_artifacts',lambda *a,**kw:pytest.fail('Unverified tree published artifacts'))
+        with pytest.raises(agent.WorkerUncertain) as error:
+            agent.execute_registered_worker(operator,kind,plan,source_wav=source_audio())
+        assert len(called)==1 and error.value.job_id
+        with ai_billing.db() as c:
+            row=c.execute('SELECT status,resource_source,usage_json FROM ai_compute_jobs WHERE id=?',(error.value.job_id,)).fetchone()
+&gt;           assert tuple(row)==('running','unmetered',None)
+E           AssertionError: assert ('running', 'unmetered', '{}') == ('running', 'unmetered', None)
+E             
+E             At index 2 diff: '{}' != None
+E             Use -v to get more diff
+
+tests/test_r210_known_worker_tree_accounting.py:38: AssertionError</failure></testcase><testcase classname="tests.test_r210_known_worker_tree_accounting" name="test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[complete-backing-vocals-plan3]" time="1.216"><failure message="AssertionError: assert ('running', 'unmetered', '{}') == ('running', 'unmetered', None)&#10;  &#10;  At index 2 diff: '{}' != None&#10;  Use -v to get more diff">operator = 1
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f03f18ec830&gt;
+kind = 'backing-vocals', plan = {'model': 'ffmpeg-center-side'}
+outcome = 'complete'
+
+    @pytest.mark.parametrize('kind,plan',ROUTES)
+    @pytest.mark.parametrize('outcome',['complete','cancelled'])
+    def test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated(
+            operator,monkeypatch,kind,plan,outcome):
+        monkeypatch.delenv('MTA_AI_WORKER_'+kind.upper().replace('-','_')+'_EXECUTABLE')
+        monkeypatch.setenv('MTA_AI_UNIFIED_WORKERS_ENABLED','true')
+        monkeypatch.setenv('MTA_AI_WORKER_'+kind.upper().replace('-','_')+'_PYTHON',sys.executable)
+        monkeypatch.setenv('MTA_LEAD_BACKING_DEFAULT_MODEL','ffmpeg-center-side')
+        monkeypatch.delenv('MTA_LEAD_BACKING_COMMAND',raising=False)
+        called=[]
+        def measured(args,**kwargs):
+            assert Path(args[1]).name=='ai_unified_adapter.py'
+            called.append(args)
+            measurement=agent.Measurement(0,.1,{'cpu_seconds':.05},'worker',True)
+            if outcome=='cancelled':raise agent.WorkerInterrupted(measurement)
+            return measurement
+        monkeypatch.setattr(agent,'run_metered_process',measured)
+        monkeypatch.setattr('app.ai_worker_artifacts.package_artifacts',lambda *a,**kw:pytest.fail('Unverified tree published artifacts'))
+        with pytest.raises(agent.WorkerUncertain) as error:
+            agent.execute_registered_worker(operator,kind,plan,source_wav=source_audio())
+        assert len(called)==1 and error.value.job_id
+        with ai_billing.db() as c:
+            row=c.execute('SELECT status,resource_source,usage_json FROM ai_compute_jobs WHERE id=?',(error.value.job_id,)).fetchone()
+&gt;           assert tuple(row)==('running','unmetered',None)
+E           AssertionError: assert ('running', 'unmetered', '{}') == ('running', 'unmetered', None)
+E             
+E             At index 2 diff: '{}' != None
+E             Use -v to get more diff
+
+tests/test_r210_known_worker_tree_accounting.py:38: AssertionError</failure></testcase><testcase classname="tests.test_r210_known_worker_tree_accounting" name="test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[complete-backing-vocals-plan4]" time="0.806"><failure message="AssertionError: assert ('running', 'unmetered', '{}') == ('running', 'unmetered', None)&#10;  &#10;  At index 2 diff: '{}' != None&#10;  Use -v to get more diff">operator = 1
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f03f18ee2a0&gt;
+kind = 'backing-vocals', plan = {}, outcome = 'complete'
+
+    @pytest.mark.parametrize('kind,plan',ROUTES)
+    @pytest.mark.parametrize('outcome',['complete','cancelled'])
+    def test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated(
+            operator,monkeypatch,kind,plan,outcome):
+        monkeypatch.delenv('MTA_AI_WORKER_'+kind.upper().replace('-','_')+'_EXECUTABLE')
+        monkeypatch.setenv('MTA_AI_UNIFIED_WORKERS_ENABLED','true')
+        monkeypatch.setenv('MTA_AI_WORKER_'+kind.upper().replace('-','_')+'_PYTHON',sys.executable)
+        monkeypatch.setenv('MTA_LEAD_BACKING_DEFAULT_MODEL','ffmpeg-center-side')
+        monkeypatch.delenv('MTA_LEAD_BACKING_COMMAND',raising=False)
+        called=[]
+        def measured(args,**kwargs):
+            assert Path(args[1]).name=='ai_unified_adapter.py'
+            called.append(args)
+            measurement=agent.Measurement(0,.1,{'cpu_seconds':.05},'worker',True)
+            if outcome=='cancelled':raise agent.WorkerInterrupted(measurement)
+            return measurement
+        monkeypatch.setattr(agent,'run_metered_process',measured)
+        monkeypatch.setattr('app.ai_worker_artifacts.package_artifacts',lambda *a,**kw:pytest.fail('Unverified tree published artifacts'))
+        with pytest.raises(agent.WorkerUncertain) as error:
+            agent.execute_registered_worker(operator,kind,plan,source_wav=source_audio())
+        assert len(called)==1 and error.value.job_id
+        with ai_billing.db() as c:
+            row=c.execute('SELECT status,resource_source,usage_json FROM ai_compute_jobs WHERE id=?',(error.value.job_id,)).fetchone()
+&gt;           assert tuple(row)==('running','unmetered',None)
+E           AssertionError: assert ('running', 'unmetered', '{}') == ('running', 'unmetered', None)
+E             
+E             At index 2 diff: '{}' != None
+E             Use -v to get more diff
+
+tests/test_r210_known_worker_tree_accounting.py:38: AssertionError</failure></testcase><testcase classname="tests.test_r210_known_worker_tree_accounting" name="test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[complete-drumsep-plan5]" time="0.853"><failure message="AssertionError: assert ('running', 'unmetered', '{}') == ('running', 'unmetered', None)&#10;  &#10;  At index 2 diff: '{}' != None&#10;  Use -v to get more diff">operator = 1
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f03f18efa70&gt;
+kind = 'drumsep', plan = {'model': 'sam-audio-small'}, outcome = 'complete'
+
+    @pytest.mark.parametrize('kind,plan',ROUTES)
+    @pytest.mark.parametrize('outcome',['complete','cancelled'])
+    def test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated(
+            operator,monkeypatch,kind,plan,outcome):
+        monkeypatch.delenv('MTA_AI_WORKER_'+kind.upper().replace('-','_')+'_EXECUTABLE')
+        monkeypatch.setenv('MTA_AI_UNIFIED_WORKERS_ENABLED','true')
+        monkeypatch.setenv('MTA_AI_WORKER_'+kind.upper().replace('-','_')+'_PYTHON',sys.executable)
+        monkeypatch.setenv('MTA_LEAD_BACKING_DEFAULT_MODEL','ffmpeg-center-side')
+        monkeypatch.delenv('MTA_LEAD_BACKING_COMMAND',raising=False)
+        called=[]
+        def measured(args,**kwargs):
+            assert Path(args[1]).name=='ai_unified_adapter.py'
+            called.append(args)
+            measurement=agent.Measurement(0,.1,{'cpu_seconds':.05},'worker',True)
+            if outcome=='cancelled':raise agent.WorkerInterrupted(measurement)
+            return measurement
+        monkeypatch.setattr(agent,'run_metered_process',measured)
+        monkeypatch.setattr('app.ai_worker_artifacts.package_artifacts',lambda *a,**kw:pytest.fail('Unverified tree published artifacts'))
+        with pytest.raises(agent.WorkerUncertain) as error:
+            agent.execute_registered_worker(operator,kind,plan,source_wav=source_audio())
+        assert len(called)==1 and error.value.job_id
+        with ai_billing.db() as c:
+            row=c.execute('SELECT status,resource_source,usage_json FROM ai_compute_jobs WHERE id=?',(error.value.job_id,)).fetchone()
+&gt;           assert tuple(row)==('running','unmetered',None)
+E           AssertionError: assert ('running', 'unmetered', '{}') == ('running', 'unmetered', None)
+E             
+E             At index 2 diff: '{}' != None
+E             Use -v to get more diff
+
+tests/test_r210_known_worker_tree_accounting.py:38: AssertionError</failure></testcase><testcase classname="tests.test_r210_known_worker_tree_accounting" name="test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[cancelled-demucs-plan0]" time="0.876"><failure message="AssertionError: assert ('running', 'unmetered', '{}') == ('running', 'unmetered', None)&#10;  &#10;  At index 2 diff: '{}' != None&#10;  Use -v to get more diff">operator = 1
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f03f2a74b90&gt;
+kind = 'demucs', plan = {'model': 'htdemucs'}, outcome = 'cancelled'
+
+    @pytest.mark.parametrize('kind,plan',ROUTES)
+    @pytest.mark.parametrize('outcome',['complete','cancelled'])
+    def test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated(
+            operator,monkeypatch,kind,plan,outcome):
+        monkeypatch.delenv('MTA_AI_WORKER_'+kind.upper().replace('-','_')+'_EXECUTABLE')
+        monkeypatch.setenv('MTA_AI_UNIFIED_WORKERS_ENABLED','true')
+        monkeypatch.setenv('MTA_AI_WORKER_'+kind.upper().replace('-','_')+'_PYTHON',sys.executable)
+        monkeypatch.setenv('MTA_LEAD_BACKING_DEFAULT_MODEL','ffmpeg-center-side')
+        monkeypatch.delenv('MTA_LEAD_BACKING_COMMAND',raising=False)
+        called=[]
+        def measured(args,**kwargs):
+            assert Path(args[1]).name=='ai_unified_adapter.py'
+            called.append(args)
+            measurement=agent.Measurement(0,.1,{'cpu_seconds':.05},'worker',True)
+            if outcome=='cancelled':raise agent.WorkerInterrupted(measurement)
+            return measurement
+        monkeypatch.setattr(agent,'run_metered_process',measured)
+        monkeypatch.setattr('app.ai_worker_artifacts.package_artifacts',lambda *a,**kw:pytest.fail('Unverified tree published artifacts'))
+        with pytest.raises(agent.WorkerUncertain) as error:
+            agent.execute_registered_worker(operator,kind,plan,source_wav=source_audio())
+        assert len(called)==1 and error.value.job_id
+        with ai_billing.db() as c:
+            row=c.execute('SELECT status,resource_source,usage_json FROM ai_compute_jobs WHERE id=?',(error.value.job_id,)).fetchone()
+&gt;           assert tuple(row)==('running','unmetered',None)
+E           AssertionError: assert ('running', 'unmetered', '{}') == ('running', 'unmetered', None)
+E             
+E             At index 2 diff: '{}' != None
+E             Use -v to get more diff
+
+tests/test_r210_known_worker_tree_accounting.py:38: AssertionError</failure></testcase><testcase classname="tests.test_r210_known_worker_tree_accounting" name="test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[cancelled-sam-audio-plan1]" time="0.776"><failure message="AssertionError: assert ('running', 'unmetered', '{}') == ('running', 'unmetered', None)&#10;  &#10;  At index 2 diff: '{}' != None&#10;  Use -v to get more diff">operator = 1
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f03f18ecf50&gt;
+kind = 'sam-audio', plan = {'model': 'sam-audio-small'}, outcome = 'cancelled'
+
+    @pytest.mark.parametrize('kind,plan',ROUTES)
+    @pytest.mark.parametrize('outcome',['complete','cancelled'])
+    def test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated(
+            operator,monkeypatch,kind,plan,outcome):
+        monkeypatch.delenv('MTA_AI_WORKER_'+kind.upper().replace('-','_')+'_EXECUTABLE')
+        monkeypatch.setenv('MTA_AI_UNIFIED_WORKERS_ENABLED','true')
+        monkeypatch.setenv('MTA_AI_WORKER_'+kind.upper().replace('-','_')+'_PYTHON',sys.executable)
+        monkeypatch.setenv('MTA_LEAD_BACKING_DEFAULT_MODEL','ffmpeg-center-side')
+        monkeypatch.delenv('MTA_LEAD_BACKING_COMMAND',raising=False)
+        called=[]
+        def measured(args,**kwargs):
+            assert Path(args[1]).name=='ai_unified_adapter.py'
+            called.append(args)
+            measurement=agent.Measurement(0,.1,{'cpu_seconds':.05},'worker',True)
+            if outcome=='cancelled':raise agent.WorkerInterrupted(measurement)
+            return measurement
+        monkeypatch.setattr(agent,'run_metered_process',measured)
+        monkeypatch.setattr('app.ai_worker_artifacts.package_artifacts',lambda *a,**kw:pytest.fail('Unverified tree published artifacts'))
+        with pytest.raises(agent.WorkerUncertain) as error:
+            agent.execute_registered_worker(operator,kind,plan,source_wav=source_audio())
+        assert len(called)==1 and error.value.job_id
+        with ai_billing.db() as c:
+            row=c.execute('SELECT status,resource_source,usage_json FROM ai_compute_jobs WHERE id=?',(error.value.job_id,)).fetchone()
+&gt;           assert tuple(row)==('running','unmetered',None)
+E           AssertionError: assert ('running', 'unmetered', '{}') == ('running', 'unmetered', None)
+E             
+E             At index 2 diff: '{}' != None
+E             Use -v to get more diff
+
+tests/test_r210_known_worker_tree_accounting.py:38: AssertionError</failure></testcase><testcase classname="tests.test_r210_known_worker_tree_accounting" name="test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[cancelled-singer-separation-plan2]" time="0.918"><failure message="AssertionError: assert ('running', 'unmetered', '{}') == ('running', 'unmetered', None)&#10;  &#10;  At index 2 diff: '{}' != None&#10;  Use -v to get more diff">operator = 1
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f03f2a7c410&gt;
+kind = 'singer-separation', plan = {'model': 'sam-audio-small'}
+outcome = 'cancelled'
+
+    @pytest.mark.parametrize('kind,plan',ROUTES)
+    @pytest.mark.parametrize('outcome',['complete','cancelled'])
+    def test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated(
+            operator,monkeypatch,kind,plan,outcome):
+        monkeypatch.delenv('MTA_AI_WORKER_'+kind.upper().replace('-','_')+'_EXECUTABLE')
+        monkeypatch.setenv('MTA_AI_UNIFIED_WORKERS_ENABLED','true')
+        monkeypatch.setenv('MTA_AI_WORKER_'+kind.upper().replace('-','_')+'_PYTHON',sys.executable)
+        monkeypatch.setenv('MTA_LEAD_BACKING_DEFAULT_MODEL','ffmpeg-center-side')
+        monkeypatch.delenv('MTA_LEAD_BACKING_COMMAND',raising=False)
+        called=[]
+        def measured(args,**kwargs):
+            assert Path(args[1]).name=='ai_unified_adapter.py'
+            called.append(args)
+            measurement=agent.Measurement(0,.1,{'cpu_seconds':.05},'worker',True)
+            if outcome=='cancelled':raise agent.WorkerInterrupted(measurement)
+            return measurement
+        monkeypatch.setattr(agent,'run_metered_process',measured)
+        monkeypatch.setattr('app.ai_worker_artifacts.package_artifacts',lambda *a,**kw:pytest.fail('Unverified tree published artifacts'))
+        with pytest.raises(agent.WorkerUncertain) as error:
+            agent.execute_registered_worker(operator,kind,plan,source_wav=source_audio())
+        assert len(called)==1 and error.value.job_id
+        with ai_billing.db() as c:
+            row=c.execute('SELECT status,resource_source,usage_json FROM ai_compute_jobs WHERE id=?',(error.value.job_id,)).fetchone()
+&gt;           assert tuple(row)==('running','unmetered',None)
+E           AssertionError: assert ('running', 'unmetered', '{}') == ('running', 'unmetered', None)
+E             
+E             At index 2 diff: '{}' != None
+E             Use -v to get more diff
+
+tests/test_r210_known_worker_tree_accounting.py:38: AssertionError</failure></testcase><testcase classname="tests.test_r210_known_worker_tree_accounting" name="test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[cancelled-backing-vocals-plan3]" time="0.746"><failure message="AssertionError: assert ('running', 'unmetered', '{}') == ('running', 'unmetered', None)&#10;  &#10;  At index 2 diff: '{}' != None&#10;  Use -v to get more diff">operator = 1
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f03f18ed940&gt;
+kind = 'backing-vocals', plan = {'model': 'ffmpeg-center-side'}
+outcome = 'cancelled'
+
+    @pytest.mark.parametrize('kind,plan',ROUTES)
+    @pytest.mark.parametrize('outcome',['complete','cancelled'])
+    def test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated(
+            operator,monkeypatch,kind,plan,outcome):
+        monkeypatch.delenv('MTA_AI_WORKER_'+kind.upper().replace('-','_')+'_EXECUTABLE')
+        monkeypatch.setenv('MTA_AI_UNIFIED_WORKERS_ENABLED','true')
+        monkeypatch.setenv('MTA_AI_WORKER_'+kind.upper().replace('-','_')+'_PYTHON',sys.executable)
+        monkeypatch.setenv('MTA_LEAD_BACKING_DEFAULT_MODEL','ffmpeg-center-side')
+        monkeypatch.delenv('MTA_LEAD_BACKING_COMMAND',raising=False)
+        called=[]
+        def measured(args,**kwargs):
+            assert Path(args[1]).name=='ai_unified_adapter.py'
+            called.append(args)
+            measurement=agent.Measurement(0,.1,{'cpu_seconds':.05},'worker',True)
+            if outcome=='cancelled':raise agent.WorkerInterrupted(measurement)
+            return measurement
+        monkeypatch.setattr(agent,'run_metered_process',measured)
+        monkeypatch.setattr('app.ai_worker_artifacts.package_artifacts',lambda *a,**kw:pytest.fail('Unverified tree published artifacts'))
+        with pytest.raises(agent.WorkerUncertain) as error:
+            agent.execute_registered_worker(operator,kind,plan,source_wav=source_audio())
+        assert len(called)==1 and error.value.job_id
+        with ai_billing.db() as c:
+            row=c.execute('SELECT status,resource_source,usage_json FROM ai_compute_jobs WHERE id=?',(error.value.job_id,)).fetchone()
+&gt;           assert tuple(row)==('running','unmetered',None)
+E           AssertionError: assert ('running', 'unmetered', '{}') == ('running', 'unmetered', None)
+E             
+E             At index 2 diff: '{}' != None
+E             Use -v to get more diff
+
+tests/test_r210_known_worker_tree_accounting.py:38: AssertionError</failure></testcase><testcase classname="tests.test_r210_known_worker_tree_accounting" name="test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[cancelled-backing-vocals-plan4]" time="1.709"><failure message="AssertionError: assert ('running', 'unmetered', '{}') == ('running', 'unmetered', None)&#10;  &#10;  At index 2 diff: '{}' != None&#10;  Use -v to get more diff">operator = 1
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f03f2a7e2a0&gt;
+kind = 'backing-vocals', plan = {}, outcome = 'cancelled'
+
+    @pytest.mark.parametrize('kind,plan',ROUTES)
+    @pytest.mark.parametrize('outcome',['complete','cancelled'])
+    def test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated(
+            operator,monkeypatch,kind,plan,outcome):
+        monkeypatch.delenv('MTA_AI_WORKER_'+kind.upper().replace('-','_')+'_EXECUTABLE')
+        monkeypatch.setenv('MTA_AI_UNIFIED_WORKERS_ENABLED','true')
+        monkeypatch.setenv('MTA_AI_WORKER_'+kind.upper().replace('-','_')+'_PYTHON',sys.executable)
+        monkeypatch.setenv('MTA_LEAD_BACKING_DEFAULT_MODEL','ffmpeg-center-side')
+        monkeypatch.delenv('MTA_LEAD_BACKING_COMMAND',raising=False)
+        called=[]
+        def measured(args,**kwargs):
+            assert Path(args[1]).name=='ai_unified_adapter.py'
+            called.append(args)
+            measurement=agent.Measurement(0,.1,{'cpu_seconds':.05},'worker',True)
+            if outcome=='cancelled':raise agent.WorkerInterrupted(measurement)
+            return measurement
+        monkeypatch.setattr(agent,'run_metered_process',measured)
+        monkeypatch.setattr('app.ai_worker_artifacts.package_artifacts',lambda *a,**kw:pytest.fail('Unverified tree published artifacts'))
+        with pytest.raises(agent.WorkerUncertain) as error:
+            agent.execute_registered_worker(operator,kind,plan,source_wav=source_audio())
+        assert len(called)==1 and error.value.job_id
+        with ai_billing.db() as c:
+            row=c.execute('SELECT status,resource_source,usage_json FROM ai_compute_jobs WHERE id=?',(error.value.job_id,)).fetchone()
+&gt;           assert tuple(row)==('running','unmetered',None)
+E           AssertionError: assert ('running', 'unmetered', '{}') == ('running', 'unmetered', None)
+E             
+E             At index 2 diff: '{}' != None
+E             Use -v to get more diff
+
+tests/test_r210_known_worker_tree_accounting.py:38: AssertionError</failure></testcase><testcase classname="tests.test_r210_known_worker_tree_accounting" name="test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[cancelled-drumsep-plan5]" time="0.697"><failure message="AssertionError: assert ('running', 'unmetered', '{}') == ('running', 'unmetered', None)&#10;  &#10;  At index 2 diff: '{}' != None&#10;  Use -v to get more diff">operator = 1
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f03f18eeba0&gt;
+kind = 'drumsep', plan = {'model': 'sam-audio-small'}, outcome = 'cancelled'
+
+    @pytest.mark.parametrize('kind,plan',ROUTES)
+    @pytest.mark.parametrize('outcome',['complete','cancelled'])
+    def test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated(
+            operator,monkeypatch,kind,plan,outcome):
+        monkeypatch.delenv('MTA_AI_WORKER_'+kind.upper().replace('-','_')+'_EXECUTABLE')
+        monkeypatch.setenv('MTA_AI_UNIFIED_WORKERS_ENABLED','true')
+        monkeypatch.setenv('MTA_AI_WORKER_'+kind.upper().replace('-','_')+'_PYTHON',sys.executable)
+        monkeypatch.setenv('MTA_LEAD_BACKING_DEFAULT_MODEL','ffmpeg-center-side')
+        monkeypatch.delenv('MTA_LEAD_BACKING_COMMAND',raising=False)
+        called=[]
+        def measured(args,**kwargs):
+            assert Path(args[1]).name=='ai_unified_adapter.py'
+            called.append(args)
+            measurement=agent.Measurement(0,.1,{'cpu_seconds':.05},'worker',True)
+            if outcome=='cancelled':raise agent.WorkerInterrupted(measurement)
+            return measurement
+        monkeypatch.setattr(agent,'run_metered_process',measured)
+        monkeypatch.setattr('app.ai_worker_artifacts.package_artifacts',lambda *a,**kw:pytest.fail('Unverified tree published artifacts'))
+        with pytest.raises(agent.WorkerUncertain) as error:
+            agent.execute_registered_worker(operator,kind,plan,source_wav=source_audio())
+        assert len(called)==1 and error.value.job_id
+        with ai_billing.db() as c:
+            row=c.execute('SELECT status,resource_source,usage_json FROM ai_compute_jobs WHERE id=?',(error.value.job_id,)).fetchone()
+&gt;           assert tuple(row)==('running','unmetered',None)
+E           AssertionError: assert ('running', 'unmetered', '{}') == ('running', 'unmetered', None)
+E             
+E             At index 2 diff: '{}' != None
+E             Use -v to get more diff
+
+tests/test_r210_known_worker_tree_accounting.py:38: AssertionError</failure></testcase><testcase classname="tests.test_r208_unified_adapter_billing_e2e" name="test_each_real_adapter_job_is_metered_billed_and_packaged[whisper]" time="0.847" /><testcase classname="tests.test_r208_unified_adapter_billing_e2e" name="test_each_real_adapter_job_is_metered_billed_and_packaged[chords-ml]" time="0.894" /><testcase classname="tests.test_r208_unified_adapter_billing_e2e" name="test_each_real_adapter_job_is_metered_billed_and_packaged[demucs]" time="0.810" /><testcase classname="tests.test_r208_unified_adapter_billing_e2e" name="test_each_real_adapter_job_is_metered_billed_and_packaged[drumsep]" time="0.798" /><testcase classname="tests.test_r208_unified_adapter_billing_e2e" name="test_each_real_adapter_job_is_metered_billed_and_packaged[sam-audio]" time="0.834" /><testcase classname="tests.test_r208_unified_adapter_billing_e2e" name="test_each_real_adapter_job_is_metered_billed_and_packaged[singer-separation]" time="0.942" /><testcase classname="tests.test_r208_unified_adapter_billing_e2e" name="test_each_real_adapter_job_is_metered_billed_and_packaged[backing-vocals]" time="0.794" /><testcase classname="tests.test_r208_unified_adapter_billing_e2e" name="test_free_only_real_worker_bypasses_paid_admission_without_losing_accounting" time="1.451" /><testcase classname="tests.test_r208_unified_adapter_billing_e2e" name="test_cancellation_during_artifact_packaging_cannot_bill_success" time="1.205" /><testcase classname="tests.test_r208_unified_adapter_billing_e2e" name="test_admin_artifact_policy_is_frozen_and_not_overridden_by_plan" time="1.849" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_internal_registered_entry_requires_actual_scheduler_owner" time="0.337" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_revoked_token_cannot_dispatch_from_an_original_running_queue" time="0.907" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_actual_cancelled_child_preserves_reaped_cpu_and_no_artifact" time="0.239" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_every_builtin_kind_actual_api_process_owner_meter_and_replay[ace-step]" time="1.381" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_every_builtin_kind_actual_api_process_owner_meter_and_replay[arranger]" time="1.876" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_every_builtin_kind_actual_api_process_owner_meter_and_replay[audio-to-midi]" time="1.386" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_every_builtin_kind_actual_api_process_owner_meter_and_replay[audio-to-midi-basic-pitch]" time="1.395" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_every_builtin_kind_actual_api_process_owner_meter_and_replay[audio-to-midi-mr-mt3]" time="1.754" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_every_builtin_kind_actual_api_process_owner_meter_and_replay[audio-to-midi-transkun]" time="1.451" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_every_builtin_kind_actual_api_process_owner_meter_and_replay[audio-to-midi-yourmt3]" time="1.037" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_every_builtin_kind_actual_api_process_owner_meter_and_replay[backing-vocals]" time="1.059" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_every_builtin_kind_actual_api_process_owner_meter_and_replay[chords-ml]" time="1.126" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_every_builtin_kind_actual_api_process_owner_meter_and_replay[demucs]" time="0.977" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_every_builtin_kind_actual_api_process_owner_meter_and_replay[drumsep]" time="0.993" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_every_builtin_kind_actual_api_process_owner_meter_and_replay[markers]" time="1.026" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_every_builtin_kind_actual_api_process_owner_meter_and_replay[remix]" time="1.327" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_every_builtin_kind_actual_api_process_owner_meter_and_replay[sam-audio]" time="1.610" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_every_builtin_kind_actual_api_process_owner_meter_and_replay[singer-separation]" time="1.396" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_every_builtin_kind_actual_api_process_owner_meter_and_replay[vocal-harmony]" time="1.026" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_every_builtin_kind_actual_api_process_owner_meter_and_replay[vocal-synthesis]" time="1.079" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_every_builtin_kind_actual_api_process_owner_meter_and_replay[whisper]" time="1.016" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_actual_api_queue_wait_rechecks_original_credential_before_dispatch[revoke]" time="1.463" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_actual_api_queue_wait_rechecks_original_credential_before_dispatch[foreign]" time="1.181" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_actual_api_queue_wait_rechecks_original_credential_before_dispatch[inactive]" time="1.171" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_json_entry_rejects_nested_worker_control_before_queue[source_score]" time="0.244" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_json_entry_rejects_nested_worker_control_before_queue[source_audio]" time="0.255" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_json_entry_rejects_nested_worker_control_before_queue[input_path]" time="0.278" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_json_entry_rejects_nested_worker_control_before_queue[output_path]" time="0.256" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_json_entry_rejects_nested_worker_control_before_queue[command]" time="0.257" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_json_entry_rejects_nested_worker_control_before_queue[executable]" time="0.256" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_json_entry_rejects_nested_worker_control_before_queue[cwd]" time="0.258" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_json_entry_rejects_nested_worker_control_before_queue[shell]" time="0.238" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_malformed_wav_never_creates_a_ledger_or_claim" time="0.657" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_unverifiable_process_tree_keeps_original_claim_without_publication" time="0.855" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_running_token_revocation_stops_actual_process_and_retains_measured_cpu" time="2.716" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_pending_evidence_api_is_private_retains_identity_and_never_reexecutes[tree-json]" time="1.023" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_pending_evidence_api_is_private_retains_identity_and_never_reexecutes[tree-wav]" time="1.170" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_pending_evidence_api_is_private_retains_identity_and_never_reexecutes[sensor-json]" time="1.123" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_pending_evidence_api_is_private_retains_identity_and_never_reexecutes[sensor-wav]" time="1.066" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_operator_extension_cannot_bypass_the_same_owner_metering_contract" time="1.021" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_running_revocation_returns_private_api_cancellation_instead_of_server_error[json]" time="2.814" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_running_revocation_returns_private_api_cancellation_instead_of_server_error[wav]" time="3.543" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_cancel_between_ledger_admission_and_popen_has_typed_private_response[json]" time="1.024" /><testcase classname="tests.test_r210_execution_entry_acceptance" name="test_cancel_between_ledger_admission_and_popen_has_typed_private_response[wav]" time="0.770" /><testcase classname="tests.test_r210_active_execution_owner" name="test_terminal_or_unstarted_queue_context_never_dispatches[queued]" time="0.181" /><testcase classname="tests.test_r210_active_execution_owner" name="test_terminal_or_unstarted_queue_context_never_dispatches[blocked]" time="0.189" /><testcase classname="tests.test_r210_active_execution_owner" name="test_terminal_or_unstarted_queue_context_never_dispatches[completed]" time="0.209" /><testcase classname="tests.test_r210_active_execution_owner" name="test_terminal_or_unstarted_queue_context_never_dispatches[failed]" time="0.203" /><testcase classname="tests.test_r210_active_execution_owner" name="test_terminal_or_unstarted_queue_context_never_dispatches[cancelled]" time="0.189" /><testcase classname="tests.test_r210_active_execution_owner" name="test_terminal_or_unstarted_queue_context_never_dispatches[interrupted]" time="0.232" /><testcase classname="tests.test_r210_active_execution_owner" name="test_missing_queue_context_does_not_become_a_new_permit" time="0.186" /><testcase classname="tests.test_r210_active_execution_owner" name="test_nested_cross_owner_rejected_but_same_owner_keeps_one_slot" time="0.627" /><testcase classname="tests.test_r210_active_execution_owner" name="test_public_worker_rejects_foreign_owner_before_routing_or_ledger[local]" time="0.189" /><testcase classname="tests.test_r210_active_execution_owner" name="test_public_worker_rejects_foreign_owner_before_routing_or_ledger[pull]" time="0.193" /><testcase classname="tests.test_r210_active_execution_owner" name="test_wrong_supervisor_or_unknown_identity_is_not_execution_authority[runner_pid]" time="0.206" /><testcase classname="tests.test_r210_active_execution_owner" name="test_wrong_supervisor_or_unknown_identity_is_not_execution_authority[runner_identity]" time="0.201" /><testcase classname="tests.test_r210_active_execution_owner" name="test_wrong_supervisor_or_unknown_identity_is_not_execution_authority[missing_identity]" time="0.213" /><testcase classname="tests.test_r210_active_execution_owner" name="test_wrong_supervisor_or_unknown_identity_is_not_execution_authority[missing_actor]" time="0.203" /><testcase classname="tests.test_r210_active_execution_owner" name="test_cancelled_context_rejects_new_stage_before_callback[persisted]" time="0.195" /><testcase classname="tests.test_r210_active_execution_owner" name="test_cancelled_context_rejects_new_stage_before_callback[event]" time="0.216" /><testcase classname="tests.test_r210_active_execution_owner" name="test_cancelled_context_rejects_new_stage_before_callback[callback]" time="0.194" /><testcase classname="tests.test_r210_active_execution_owner" name="test_server_source_conversion_rejects_inactive_context" time="0.188" /><testcase classname="tests.test_r210_active_execution_owner" name="test_invalid_global_owner_never_creates_queue_job[0]" time="0.169" /><testcase classname="tests.test_r210_active_execution_owner" name="test_invalid_global_owner_never_creates_queue_job[-1]" time="0.173" /><testcase classname="tests.test_r210_active_execution_owner" name="test_invalid_global_owner_never_creates_queue_job[True]" time="0.193" /><testcase classname="tests.test_r210_active_execution_owner" name="test_invalid_global_owner_never_creates_queue_job[None]" time="0.387" /><testcase classname="tests.test_r210_active_execution_owner" name="test_invalid_global_owner_never_creates_queue_job[1]" time="0.200" /><testcase classname="tests.test_r210_active_execution_owner" name="test_pre_cancelled_process_does_not_execute_actual_child" time="0.001" /><testcase classname="tests.test_r210_active_execution_owner" name="test_cancellation_probe_failure_does_not_spawn_child" time="0.001" /><testcase classname="tests.test_r210_active_execution_owner" name="test_native_fallback_pre_cancel_never_spawns" time="0.191" /><testcase classname="tests.test_r210_active_execution_owner" name="test_server_conversion_cancellation_reaps_child_and_never_enters_model" time="0.279" /><testcase classname="tests.test_r210_active_execution_owner" name="test_server_rejects_before_source_process[cancelled]" time="0.182" /><testcase classname="tests.test_r210_active_execution_owner" name="test_server_rejects_before_source_process[license_denied]" time="0.213" /><testcase classname="tests.test_r210_active_execution_owner" name="test_server_rejects_before_source_process[engine_override]" time="0.201" /><testcase classname="tests.test_r210_active_execution_owner" name="test_failed_or_unbounded_source_conversion_never_dispatches[failed]" time="0.266" /><testcase classname="tests.test_r210_active_execution_owner" name="test_failed_or_unbounded_source_conversion_never_dispatches[oversized]" time="0.257" /><testcase classname="tests.test_r210_active_execution_owner" name="test_failed_or_unbounded_source_conversion_never_dispatches[empty]" time="0.274" /><testcase classname="tests.test_r210_active_execution_owner" name="test_source_preparation_uses_one_remaining_budget_and_preserves_bound_identity" time="0.255" /><testcase classname="tests.test_r210_active_execution_owner" name="test_independent_process_cannot_reuse_live_parent_scheduler_identity" time="0.711" /><testcase classname="tests.test_r210_active_execution_owner" name="test_inner_dispatch_rechecks_owner_after_outer_admission[local]" time="0.210" /><testcase classname="tests.test_r210_active_execution_owner" name="test_inner_dispatch_rechecks_owner_after_outer_admission[pull]" time="0.239" /></testsuite></testsuites>

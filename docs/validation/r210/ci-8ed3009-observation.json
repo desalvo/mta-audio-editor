@@ -1,0 +1,101 @@
+{
+  "date": "2026-10-29",
+  "timezone": "Europe/Rome",
+  "commit": "8ed30091686bbb48722b8b73faf2927472d01d50",
+  "run_id": 40866015704,
+  "url": "https://github.com/desalvo/mta-audio-editor/actions/runs/40866015704",
+  "mode": "standard unit",
+  "quality": {
+    "job_id": 123420863146,
+    "conclusion": "failure",
+    "passed": 7132,
+    "failed": 1,
+    "errors": 0,
+    "skipped": 50,
+    "warnings": 1023,
+    "seconds": 719.49,
+    "coverage_percent": 76.71,
+    "coverage_threshold_percent": 70
+  },
+  "sast": {
+    "job_id": 123420862344,
+    "conclusion": "success"
+  },
+  "vst3_sdk": {
+    "job_id": 123420862722,
+    "conclusion": "success"
+  },
+  "jobs": [
+    {
+      "id": 123420862344,
+      "name": "SAST and dependency audit",
+      "conclusion": "success"
+    },
+    {
+      "id": 123420862722,
+      "name": "VST3 SDK compile (Linux)",
+      "conclusion": "success"
+    },
+    {
+      "id": 123420863146,
+      "name": "Quality and unit tests",
+      "conclusion": "failure"
+    },
+    {
+      "id": 123427879518,
+      "name": "Native macOS installer (${{ matrix.arch }})",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 123427879866,
+      "name": "Build Windows Chordino runtime",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 123427880095,
+      "name": "iOS / iPadOS archive",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 123427880238,
+      "name": "Linux native (${{ matrix.arch }}) DEB/RPM",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 123427880522,
+      "name": "Container production gate",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 123427880744,
+      "name": "Android APK / AAB",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 123427880974,
+      "name": "Publish Docker Hub image",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 123427881895,
+      "name": "Publish rolling early-main packages",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 123427881902,
+      "name": "Native Windows installer",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 123427882766,
+      "name": "Publish desktop/mobile installers to GitHub Release",
+      "conclusion": "skipped"
+    }
+  ],
+  "tracked_git_blobs": 4176,
+  "all_input_blob_hashes_match": true,
+  "original8_failures_resolved": true,
+  "full_ci": false,
+  "no_remote_mutations": true,
+  "release_candidate": false
+}

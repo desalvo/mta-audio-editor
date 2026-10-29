@@ -295,6 +295,13 @@ def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=
             defer_settlement=job_id is not None
     from .model_license_policy import evaluate,record_job
     license_decision=license_decision or evaluate(kind,plan)
+    # These fixed adapter routes spawn children by construction. A short-lived
+    # child can finish between /proc samples; absence from samples cannot turn
+    # direct-child wait4 into complete tree accounting, including cancellation.
+    tree_metering_required = worker == Path(__file__).with_name('ai_unified_adapter.py').resolve() and (
+        kind in {'demucs', 'sam-audio', 'singer-separation'}
+        or (kind == 'backing-vocals' and license_decision.model_id == 'mta-analysis')
+        or (kind == 'drumsep' and license_decision.model_id == 'sam-audio'))
     job_id=job_id or ai_billing.create_job(user_id,kind,token_id,billing_exemption_reason=('license:'+license_decision.model_id) if not license_decision.billable else '')
     record_job(job_id,license_decision)
     from .ai_execution_policy import admitted_env
@@ -411,7 +418,7 @@ def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=
                 result = run_cgroup_process(args, cwd=folder, timeout_seconds=timeout_seconds, cancel_check=worker_cancel_check, env={**os.environ,**policy_env,'MTA_AI_PROGRESS_FILE':str(directory/'progress.json'),'MTA_AI_SUPERVISOR_CPU_PROGRESS':'0' if kind=='ace-step' else '1','MTA_AI_VERIFIED_REPORT_DIR':str(directory),'MTA_AI_JOB_MAX_ARTIFACT_MIB':str(artifact_limit_mib)}, owner_receipt={'job_id':job_id,**claim_credentials})
             else:
                 result = run_metered_process(args, cwd=folder, timeout_seconds=timeout_seconds, cancel_check=worker_cancel_check, env={**os.environ,**policy_env,'MTA_AI_PROGRESS_FILE':str(directory/'progress.json'),'MTA_AI_SUPERVISOR_CPU_PROGRESS':'0' if kind=='ace-step' else '1','MTA_AI_VERIFIED_REPORT_DIR':str(directory),'MTA_AI_JOB_MAX_ARTIFACT_MIB':str(artifact_limit_mib)})
-            if not result.isolated:
+            if not result.isolated or (tree_metering_required and result.source != 'cgroup'):
                 raise WorkerUncertain('Worker process-tree metering is unverified; original owner retained')
             try:
                 require_dispatch_identity(user_id, token_id)
@@ -467,7 +474,8 @@ def _execute_registered_worker(user_id: int, kind: str, plan: dict, *, token_id=
         except BaseException as exc:
             if isinstance(exc, WorkerInterrupted):
                 result = exc.measurement
-            if isinstance(exc, WorkerUncertain) or (result is not None and not result.isolated):
+            if isinstance(exc, WorkerUncertain) or (result is not None and (
+                    not result.isolated or (tree_metering_required and result.source != 'cgroup'))):
                 raise WorkerUncertain('Worker process-tree metering is unverified; original owner retained', job_id=job_id) from exc
             diagnostic_checkpoint(final=True)
             from .worker_cgroup_recovery import require_quiescent

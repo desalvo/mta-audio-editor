@@ -59,7 +59,7 @@
     "app/ai_job_queue.py": "sha256:1a03fdf6215f5b4c1741378945d2d888e654c8b2325e7b5a7bb2480df9bc447d",
     "app/ai_job_views.py": "sha256:d4d7bf9a3123cf54f9343899dff63a56a4b63d5b3d8b5fbf56b352baf535bd21",
     "app/ai_media_identity.py": "sha256:c20028e2d47d1add5a08c095f62cdd681866119f59d788e4c96188b483132941",
-    "app/ai_metering_agent.py": "sha256:1c2316e13fe70f54ba0ca06ab727e84c3959f433e418c06116aac2377ed02a61",
+    "app/ai_metering_agent.py": "sha256:17aa26e623a473b83f2b1c5c6696e284a5f42c54acc3b4626df0b48f5e04dfbc",
     "app/ai_metering_bridge.py": "sha256:792ebf36d5a3c2cea95f64e6b5bac19c8d13054147a8cf27f9129caac87c6629",
     "app/ai_model_attestation.py": "sha256:640de33803b6b306b0f9005e5a1d1ddd965065ccba6ebb0b8c674ee0d7c2dc10",
     "app/ai_model_bytes.py": "sha256:fdcf600ccf14c0d8a66eca2c7e75775ecdb61cd86eabfe7e3f90ad1bd531bef0",
@@ -1717,56 +1717,60 @@
       "call": "subprocess.Popen",
       "shape_sha256": "73f85c67d1ee19e1fb08ec894a61451a99f0983872e7da6cd9e92042abf4e846",
       "family": "registered_server",
-      "boundary": "Authenticated token or web owner enters the durable FIFO; exact active scheduler/account/token is rechecked before dispatch and publication. Immutable claim/fence/license/ledger own metering; unknown process trees or measurements retain original work without result or invented zero.",
+      "boundary": "Authenticated token or web owner enters the durable FIFO; exact active scheduler/account/token is rechecked before dispatch and publication. Immutable claim/fence/license/ledger own metering; unknown process trees or measurements retain original work without result or invented zero. Known internal child-spawning routes now require cgroup tree measurement despite empty proc samples;normal/cancelled direct-child accounting remains held.",
       "evidence": [
         "tests/test_r210_execution_entry_acceptance.py",
         "tests/test_r210_active_execution_owner.py",
-        "tests/test_r208_unified_adapter_billing_e2e.py"
+        "tests/test_r208_unified_adapter_billing_e2e.py",
+        "tests/test_r210_known_worker_tree_accounting.py"
       ]
     },
     {
       "path": "app/ai_metering_agent.py",
       "function": "_execute_registered_worker",
-      "line": 411,
+      "line": 418,
       "kind": "inference_call",
       "call": "ai_cgroup_metering.run_cgroup_process",
       "shape_sha256": "f3e85a6ec02b97523de0a7d310170a0ccb4efa09cef639bd0da3cb1036a68e2b",
       "family": "registered_server",
-      "boundary": "Authenticated token or web owner enters the durable FIFO; exact active scheduler/account/token is rechecked before dispatch and publication. Immutable claim/fence/license/ledger own metering; unknown process trees or measurements retain original work without result or invented zero.",
+      "boundary": "Authenticated token or web owner enters the durable FIFO; exact active scheduler/account/token is rechecked before dispatch and publication. Immutable claim/fence/license/ledger own metering; unknown process trees or measurements retain original work without result or invented zero. Known internal child-spawning routes now require cgroup tree measurement despite empty proc samples;normal/cancelled direct-child accounting remains held.",
       "evidence": [
         "tests/test_r210_execution_entry_acceptance.py",
         "tests/test_r210_active_execution_owner.py",
-        "tests/test_r208_unified_adapter_billing_e2e.py"
+        "tests/test_r208_unified_adapter_billing_e2e.py",
+        "tests/test_r210_known_worker_tree_accounting.py"
       ]
     },
     {
       "path": "app/ai_metering_agent.py",
       "function": "_execute_registered_worker",
-      "line": 413,
+      "line": 420,
       "kind": "inference_call",
       "call": "run_metered_process",
       "shape_sha256": "a1254fc5b2024066c0ba0f8934aac757f7f3177ec837051945eb4e904ad5aba0",
       "family": "registered_server",
-      "boundary": "Authenticated token or web owner enters the durable FIFO; exact active scheduler/account/token is rechecked before dispatch and publication. Immutable claim/fence/license/ledger own metering; unknown process trees or measurements retain original work without result or invented zero.",
+      "boundary": "Authenticated token or web owner enters the durable FIFO; exact active scheduler/account/token is rechecked before dispatch and publication. Immutable claim/fence/license/ledger own metering; unknown process trees or measurements retain original work without result or invented zero. Known internal child-spawning routes now require cgroup tree measurement despite empty proc samples;normal/cancelled direct-child accounting remains held.",
       "evidence": [
         "tests/test_r210_execution_entry_acceptance.py",
         "tests/test_r210_active_execution_owner.py",
-        "tests/test_r208_unified_adapter_billing_e2e.py"
+        "tests/test_r208_unified_adapter_billing_e2e.py",
+        "tests/test_r210_known_worker_tree_accounting.py"
       ]
     },
     {
       "path": "app/ai_metering_agent.py",
       "function": "execute_registered_worker",
-      "line": 497,
+      "line": 505,
       "kind": "inference_call",
       "call": "_execute_registered_worker",
       "shape_sha256": "7268d8dcee611bd4ba6d2510338a929fb82213c3e16869df6fae80c1ff39faeb",
       "family": "registered_server",
-      "boundary": "Authenticated token or web owner enters the durable FIFO; exact active scheduler/account/token is rechecked before dispatch and publication. Immutable claim/fence/license/ledger own metering; unknown process trees or measurements retain original work without result or invented zero.",
+      "boundary": "Authenticated token or web owner enters the durable FIFO; exact active scheduler/account/token is rechecked before dispatch and publication. Immutable claim/fence/license/ledger own metering; unknown process trees or measurements retain original work without result or invented zero. Known internal child-spawning routes now require cgroup tree measurement despite empty proc samples;normal/cancelled direct-child accounting remains held.",
       "evidence": [
         "tests/test_r210_execution_entry_acceptance.py",
         "tests/test_r210_active_execution_owner.py",
-        "tests/test_r208_unified_adapter_billing_e2e.py"
+        "tests/test_r208_unified_adapter_billing_e2e.py",
+        "tests/test_r210_known_worker_tree_accounting.py"
       ]
     },
     {
@@ -11816,5 +11820,10 @@
     "registry_has_any_approved_real_checkpoint": false,
     "F4_F5_F6_promoted": false,
     "server_app_sources_unchanged": true
+  },
+  "ffmpeg_tree_review": {
+    "date": "2026-10-29",
+    "scope": "Only fixed topology refusal;no new runtime entry/call shape,remote authority or cgroup certification",
+    "proof": "docs/validation/r210/ffmpeg-ci-result.json"
   }
 }

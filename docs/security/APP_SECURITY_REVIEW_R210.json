@@ -59,7 +59,7 @@
     "app/ai_job_queue.py": "1a03fdf6215f5b4c1741378945d2d888e654c8b2325e7b5a7bb2480df9bc447d",
     "app/ai_job_views.py": "d4d7bf9a3123cf54f9343899dff63a56a4b63d5b3d8b5fbf56b352baf535bd21",
     "app/ai_media_identity.py": "c20028e2d47d1add5a08c095f62cdd681866119f59d788e4c96188b483132941",
-    "app/ai_metering_agent.py": "1c2316e13fe70f54ba0ca06ab727e84c3959f433e418c06116aac2377ed02a61",
+    "app/ai_metering_agent.py": "17aa26e623a473b83f2b1c5c6696e284a5f42c54acc3b4626df0b48f5e04dfbc",
     "app/ai_metering_bridge.py": "792ebf36d5a3c2cea95f64e6b5bac19c8d13054147a8cf27f9129caac87c6629",
     "app/ai_model_attestation.py": "640de33803b6b306b0f9005e5a1d1ddd965065ccba6ebb0b8c674ee0d7c2dc10",
     "app/ai_model_bytes.py": "fdcf600ccf14c0d8a66eca2c7e75775ecdb61cd86eabfe7e3f90ad1bd531bef0",
@@ -1488,7 +1488,7 @@
     "review": "New owner-derived account financial context validates UID through parameterized SQL, verifies private NC/loss histories, exposes only aggregate own totals and no combined debt. Account limits begins a read snapshot after schema setup and includes verified NC closed period ranges. The authenticated limits route returns a generic 409 for unverifiable context without leaking journal identities. No new subprocess, dynamic SQL or suppression. All existing findings matched unchanged code after line-number shifts.",
     "evidence": "tests/test_r210_account_financial_context.py; tests/test_r210_account_financial_browser.py; account-financial-final.xml"
   },
-  "current_scan": "docs/validation/r210/legacy-separator-bandit.json",
+  "current_scan": "docs/validation/r210/ffmpeg-ci-bandit.json",
   "owner_payment_continuation": {
     "date": "2026-10-23",
     "reviewed_sources": [
@@ -1660,7 +1660,7 @@
     "evidence": "docs/validation/r210/executor-boundaries-result.json",
     "native_error_mapping": "Denied or unverifiable native compatibility-model rights now return readable HTTP409 before upload copy; no unchecked exception or model side effect."
   },
-  "current_scan_sha256": "6215fc77895e479bd8cde7269decffd053c1ccde3b7afeab0dc5a53823f07951",
+  "current_scan_sha256": "c799c554ca72d1e975da8e782b27bc24fb2ac1feafad6e2712bd48dee1ebd984",
   "date": "2026-10-29",
   "export_exclusive_contention_review": {
     "date": "2026-10-27",
@@ -2487,5 +2487,10 @@
     "proof": "tests/test_r210_legacy_separator_rights.py",
     "criteria_promoted": [],
     "scope": "Direct desktop Demucs,closed backing checkpoint selectors,current loaded permissions,opaque-command refusal and explicit DSP. Not whole F4/F5/F6 or kernel acceptance."
+  },
+  "ffmpeg_tree_review": {
+    "date": "2026-10-29",
+    "scope": "Known built-in subprocess topology cannot gain direct-child wait4 certification from empty samples;normal and WorkerInterrupted paths retain original owner. Only ai_metering_agent.py runtime bytes changed;all165 existing finding identities exactly unchanged.",
+    "proof": "docs/validation/r210/ffmpeg-ci-result.json"
   }
 }

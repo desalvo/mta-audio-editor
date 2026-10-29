@@ -1,3 +1,17 @@
+## Checkpoint corrente — accounting dei figli FFmpeg — 29 ottobre 2026
+
+Leggere **FFMPEG_TREE_ACCOUNTING_R210.md** e `validation/r210/ffmpeg-ci-result.json`. Baseline confermata **8ed30091686bbb48722b8b73faf2927472d01d50**,tutti4176blob tracciati identici all’input. La CI standard40866015704 risolve gli8fallimenti precedenti ma fallisce1caso FFmpeg:7132passati,50skip,copertura76,71%;SAST e SDK VST3 passano. Il difetto reale è riprodotto:un figlio breve sfugge ai campioni/proc.
+
+I percorsi del worker interno che avviano figli ora richiedono accounting dell’albero anche se wait4 appare isolato:Demucs,SAM,singer-separation,DSP FFmpeg e DrumSep/SAM. Completamento e cancellazione conservano job/claim originali incerti prima di output/addebito,senza CPU inventata. Percorso cgroup conservato;serve la delega effettiva per completare questi lavori locali. **248test locali distinti passati,13nuovi,zero failure/error/skip correnti**,compreso vero FFmpeg con osservatore vuoto. Il caso positivo cgroup è sintetico,non prova kernel.
+
+Bandit304sorgenti/165finding(0HIGH/21MED/144LOW),C2 170confini,runtime551sorgenti/782punti,HTTP30siti/21file;gate e Ruff passano. Nessun checker,soglia,workflow o dipendenza modificato. Apple32controlli/build già acquisiti e13hash invariati:non ripetere iOS. Dopo il commit dell’utente verificare CI standard Quality/SAST;nessun verde remoto del nuovo delta ancora disponibile.
+
+**28/42(66,7%),E completa1/7,RC aperta;nessun criterio promosso.** Residui originali invariati,non tutti esterni. Cumulativo unico:**MTA-0.3.0-r210-pre-RC-ffmpeg-tree-cumulative.zip**,con tutti4825percorsi e log di ingresso conservati. Nessun commit o modifica GitHub/server/provider. Commit suggerito:`Require tree accounting for known subprocess workers`.
+
+---
+
+Cronologia precedente,superata dove incompatibile con il checkpoint corrente:
+
 ## Checkpoint corrente — CI corretta e prova Apple acquisita — 29 ottobre 2026
 
 Leggere **CI_40858_REPAIR_R210.md** e `validation/r210/ci-40858-result.json`. Baseline ora confermata **96c27c37e508564edc1cd4aee978896b1612e5a5**: tutti4164blob tracciati corrispondono al precedente cumulativo. La CI standard40858442206 fallisce8test obsoleti(7122passati,50skip,copertura76,67%);SAST e SDK VST3 Linux passano. Le fixture corrette conservano account/coda attivi,diritti espliciti per byte sintetici e default Whisper condiviso. Nessun codice di produzione,workflow,soglia o opt-in modificato. **26test mirati passati,3nuovi,zero failure/error/skip**;tutti8i fallimenti coperti.

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="3.673" timestamp="2026-10-29T15:16:08.529657+01:00" hostname="9f17c61118ba"><testcase classname="tests.test_r210_legacy_separator_rights" name="test_registered_dsp_cannot_fabricate_single_process_measurement_for_ffmpeg_child" time="1.740"><failure message="Failed: DID NOT RAISE WorkerUncertain">operator = 1
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fa1874f4710&gt;
+
+    def test_registered_dsp_cannot_fabricate_single_process_measurement_for_ffmpeg_child(operator, monkeypatch):
+        from app import ai_metering_agent, ai_billing
+        monkeypatch.delenv('MTA_LEAD_BACKING_COMMAND', raising=False)
+        monkeypatch.delenv('MTA_AI_WORKER_BACKING_VOCALS_EXECUTABLE')
+        monkeypatch.setenv('MTA_AI_UNIFIED_WORKERS_ENABLED', 'true')
+        monkeypatch.setenv('MTA_AI_WORKER_BACKING_VOCALS_PYTHON', sys.executable)
+        # Reproduce a short-lived FFmpeg child missed between /proc samples.
+        # The known worker topology must still forbid direct-child-only billing.
+        monkeypatch.setattr(ai_metering_agent, '_descendants', lambda pid: set())
+&gt;       with pytest.raises(ai_metering_agent.WorkerUncertain) as error:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE WorkerUncertain
+
+tests/test_r210_legacy_separator_rights.py:256: Failed</failure></testcase></testsuite></testsuites>

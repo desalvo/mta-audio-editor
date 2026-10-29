@@ -59,7 +59,7 @@
     "app/ai_job_queue.py": "sha256:1a03fdf6215f5b4c1741378945d2d888e654c8b2325e7b5a7bb2480df9bc447d",
     "app/ai_job_views.py": "sha256:d4d7bf9a3123cf54f9343899dff63a56a4b63d5b3d8b5fbf56b352baf535bd21",
     "app/ai_media_identity.py": "sha256:c20028e2d47d1add5a08c095f62cdd681866119f59d788e4c96188b483132941",
-    "app/ai_metering_agent.py": "sha256:1c2316e13fe70f54ba0ca06ab727e84c3959f433e418c06116aac2377ed02a61",
+    "app/ai_metering_agent.py": "sha256:17aa26e623a473b83f2b1c5c6696e284a5f42c54acc3b4626df0b48f5e04dfbc",
     "app/ai_metering_bridge.py": "sha256:792ebf36d5a3c2cea95f64e6b5bac19c8d13054147a8cf27f9129caac87c6629",
     "app/ai_model_attestation.py": "sha256:640de33803b6b306b0f9005e5a1d1ddd965065ccba6ebb0b8c674ee0d7c2dc10",
     "app/ai_model_bytes.py": "sha256:fdcf600ccf14c0d8a66eca2c7e75775ecdb61cd86eabfe7e3f90ad1bd531bef0",
@@ -758,7 +758,7 @@
       "ast_sha256": "73f85c67d1ee19e1fb08ec894a61451a99f0983872e7da6cd9e92042abf4e846",
       "disposition": "request_lifetime",
       "boundary": "Reviewed synchronous caller chain under a full request,finite tracked child,registered inference or install admission;parent waits through process/result cleanup. Reader/heartbeat/cancel helper threads now have independent tickets. Parent/unknown external loss leaves original admission or ledger held.",
-      "verification": "Exact source/caller review plus pinned hashes;service-admission-functional-final.xml and service-admission-scope-final.xml include actual HTTP/TLS/local worker,heartbeat,PCM publication,subprocess stop,SIGKILL,build handoff and denial controls. No hardware/rights certification inferred. Execution-entry acceptance rechecks original active actor/token; cancelled direct CPU retained and observer failures reaped/held."
+      "verification": "Exact source/caller review plus pinned hashes;service-admission-functional-final.xml and service-admission-scope-final.xml include actual HTTP/TLS/local worker,heartbeat,PCM publication,subprocess stop,SIGKILL,build handoff and denial controls. No hardware/rights certification inferred. Execution-entry acceptance rechecks original active actor/token; cancelled direct CPU retained and observer failures reaped/held. Known-child topology precludes wait4-only completion or cancellation settlement;see tests/test_r210_known_worker_tree_accounting.py."
     },
     {
       "path": "app/ai_model_download.py",
@@ -2257,5 +2257,10 @@
     "proof": "tests/test_r210_legacy_separator_rights.py",
     "criteria_promoted": [],
     "scope": "Direct desktop Demucs,closed backing checkpoint selectors,current loaded permissions,opaque-command refusal and explicit DSP. Not whole F4/F5/F6 or kernel acceptance."
+  },
+  "ffmpeg_tree_review": {
+    "date": "2026-10-29",
+    "scope": "Only fixed topology refusal;no new runtime entry/call shape,remote authority or cgroup certification",
+    "proof": "docs/validation/r210/ffmpeg-ci-result.json"
   }
 }
