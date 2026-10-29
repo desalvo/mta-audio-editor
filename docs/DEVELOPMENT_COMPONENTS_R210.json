@@ -2,14 +2,14 @@
   "schema_version": 2,
   "project": "MTA Audio Editor",
   "release": "0.3.0-r210",
-  "updated_utc": "2026-10-28",
-  "baseline_archive": "MTA-0.3.0-r210-pre-RC-reviewed-checkpoint-cumulative.zip",
-  "baseline_sha256": "5ab4eaeb894c739920bed0d334d947beab0154b203ab92f727b029a43ce4d4a2",
+  "updated_utc": "2026-10-29",
+  "baseline_archive": "MTA-0.3.0-r210-pre-RC-ios-rights-cumulative.zip",
+  "baseline_sha256": "e638eb04aa6a04b87397efd4dda3416a359d6ac52747d86cbc1e47c779a367fd",
   "git_baseline": {
     "repository": "https://github.com/desalvo/mta-audio-editor",
     "branch": "main",
-    "verified_head": "4c3c73afe6d3829aad155c23f5f1bbb6d375433a",
-    "comparison": "Read-only confirmed run/commit/artifact metadata; exact fixture Git blob matches validated cumulative; commit lists the19 expected fixture/evidence/docs paths. No fresh complete Git tree comparison claimed."
+    "verified_head": "96c27c37e508564edc1cd4aee978896b1612e5a5",
+    "comparison": "Complete read-only untruncated Git tree:all4164 tracked blob hashes equal delivered input;docs/validation/r210/ci-96c27c3-commit-comparison.json"
   },
   "commit_deferred": true,
   "release_candidate": false,
@@ -309,7 +309,7 @@
           "id": "F4",
           "criterion": "Rights and bypass acceptance for every legacy executor",
           "state": "implementation_pending",
-          "evidence": "Partial: 29 explicit app-owned Python transport sites classified with exact source/call/checker hashes, direct bypass acceptance and native policy visibility completed. Opaque commands, native/runtime libraries, dynamic networking and full legacy executor acceptance remain open. docs/security/REMOTE_TRANSPORT_REVIEW_R210.json. EXECUTION_OWNER_HANDOFF_R210.md: active durable original actor/scheduler checks before local/pull dispatch and source conversion, pre-spawn cancellation and supervised bounded preparation;347 distinct affected cases,37 new. Scoped path complete, not all-executor/kernel/rights acceptance;criterion remains open. CUMULATIVE_HANDOFF_R210.md:strict server/native dispatch regardless of diagnostic auth bypass,native-only zero Studio actor and synchronous compatibility model-rights/side-effect barrier;194 distinct affected cases/26 new. Full all-executor/opaque/checkpoint-rights acceptance remains open. 2026-10-27: LEGACY_EXECUTION_BOUNDARIES_R210.md;raw gateway work/result access refused,native-only direct execution and admitted policy,bounded stubborn-worker cancellation/native session cleanup;434 distinct affected passes,28new. Finite legacy substream completed;full criterion remains open. 2026-10-29:DIRECT_EXECUTOR_RIGHTS_R210.md;18 direct entry policy checks and component-bound offline wrappers with real script/role/rights refusal,470 distinct passes/97new/7 explicit skips. Entire original F4 remains open for full native/opaque/dynamic acceptance. 2026-10-29:DIRECT_EXECUTOR_RIGHTS_R210.md;18 direct entry policy checks and component-bound offline wrappers with real script/role/rights refusal,507 distinct passes/99new/7 explicit skips. Entire original F4 remains open for full native/opaque/dynamic acceptance. 2026-10-29:MODEL_SELECTOR_BOUNDARIES_R210.md;Whisper/SAM/Demucs selector bypasses and environment/profile overrides refused before worker/ledger;274 distinct passes/44new. Entire every-executor criterion remains open;not F6 installed-weight rights. 2026-10-29:LEGACY_SEPARATOR_ACCEPTANCE_R210.md;direct Demucs/backing and cached/ROCm revocation,opaque-command refusal and explicit DSP;286distinct affected passes/47new. Entire F4 remains open,including current/offline CoreML and full opaque/native/dynamic acceptance. 2026-10-29:IOS_LOCAL_MODEL_RIGHTS_R210.md;integrated bundled-review/source-byte/Keychain/compiled-inventory/per-prediction admission and build guards.90local distinct passes/41new. Apple32-check+actual-app-build acceptance is prepared but BLOCKED,not executed;real registry empty. Entire F4 remains pending.",
+          "evidence": "Partial: 29 explicit app-owned Python transport sites classified with exact source/call/checker hashes, direct bypass acceptance and native policy visibility completed. Opaque commands, native/runtime libraries, dynamic networking and full legacy executor acceptance remain open. docs/security/REMOTE_TRANSPORT_REVIEW_R210.json. EXECUTION_OWNER_HANDOFF_R210.md: active durable original actor/scheduler checks before local/pull dispatch and source conversion, pre-spawn cancellation and supervised bounded preparation;347 distinct affected cases,37 new. Scoped path complete, not all-executor/kernel/rights acceptance;criterion remains open. CUMULATIVE_HANDOFF_R210.md:strict server/native dispatch regardless of diagnostic auth bypass,native-only zero Studio actor and synchronous compatibility model-rights/side-effect barrier;194 distinct affected cases/26 new. Full all-executor/opaque/checkpoint-rights acceptance remains open. 2026-10-27: LEGACY_EXECUTION_BOUNDARIES_R210.md;raw gateway work/result access refused,native-only direct execution and admitted policy,bounded stubborn-worker cancellation/native session cleanup;434 distinct affected passes,28new. Finite legacy substream completed;full criterion remains open. 2026-10-29:DIRECT_EXECUTOR_RIGHTS_R210.md;18 direct entry policy checks and component-bound offline wrappers with real script/role/rights refusal,470 distinct passes/97new/7 explicit skips. Entire original F4 remains open for full native/opaque/dynamic acceptance. 2026-10-29:DIRECT_EXECUTOR_RIGHTS_R210.md;18 direct entry policy checks and component-bound offline wrappers with real script/role/rights refusal,507 distinct passes/99new/7 explicit skips. Entire original F4 remains open for full native/opaque/dynamic acceptance. 2026-10-29:MODEL_SELECTOR_BOUNDARIES_R210.md;Whisper/SAM/Demucs selector bypasses and environment/profile overrides refused before worker/ledger;274 distinct passes/44new. Entire every-executor criterion remains open;not F6 installed-weight rights. 2026-10-29:LEGACY_SEPARATOR_ACCEPTANCE_R210.md;direct Demucs/backing and cached/ROCm revocation,opaque-command refusal and explicit DSP;286distinct affected passes/47new. Entire F4 remains open,including current/offline CoreML and full opaque/native/dynamic acceptance. 2026-10-29:IOS_LOCAL_MODEL_RIGHTS_R210.md;integrated bundled-review/source-byte/Keychain/compiled-inventory/per-prediction admission and build guards.90local distinct passes/41new. Apple32-check+actual-app-build acceptance is prepared but BLOCKED,not executed;real registry empty. Entire F4 remains pending. 2026-10-29:CI_40858_REPAIR_R210.md;actual Apple40858613243 supersedes the earlier SDK block:32exact checks,real Keychain,unsigned iOS app build and13current source hashes verified. No real neural or installed-device/full-F4 acceptance;criterion remains open.",
           "weight": 1
         },
         {
@@ -393,9 +393,9 @@
     "Local SQLite ownership is not multi-host coordination"
   ],
   "next_actions": [
-    "After the user commits,run Optional iOS model rights with ios_model_rights=true. Require32 exact actual SDK checks,zero skips,unsigned iOS app compilation and current hashes. Do not dispatch automatically or claim this closes all F4/F5/F6.",
-    "Do not rebuild the iOS contract or the prior direct/Demucs/backing/selector/settlement blocks. Continue complete opaque/native/dynamic acceptance and independent installed checkpoint rights.",
-    "Continue general provider/original legacy obligations without fabricated financial basis or readiness. Preserve all42 original criterion wordings/weights/states and target requirements;no real service/Git mutation authorized."
+    "After the user commits,review the next ordinary Quality standard run for the repaired8cases. All5affected modules remain in the standard unit suite;no agent dispatch or Git mutation.",
+    "Reuse current Apple40858613243 acceptance:32actual SDK checks,Keychain and unsigned app build,13unchanged source hashes. Do not repeat unchanged iOS/full acceptance. F4entire/F5/F6 still open;real CoreML registry empty.",
+    "Continue complete legacy/opaque/native/dynamic acceptance and original financial obligations. Preserve all42 original requirements/weights/states;no real server/provider/Git mutations authorized."
   ],
   "test_results": {
     "full_available_linux": {
@@ -723,6 +723,17 @@
       "native_SDK_status": "blocked",
       "full_baseline_repeated": false,
       "evidence": "docs/validation/r210/ios-rights-result.json"
+    },
+    "ci_40858_repair": {
+      "proof": "docs/validation/r210/ci-40858-result.json",
+      "passed": 26,
+      "new_cases": 3,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "production_sources_changed": false,
+      "original_failed_cases_repaired": 8,
+      "full_suite_repeated": false
     }
   },
   "security_review": {
@@ -927,14 +938,22 @@
       "runtime_sources": 547,
       "runtime_points": 783,
       "checker_or_suppression_changes": false
+    },
+    "ci_40858_repair": {
+      "ruff_changed_test_sources": "passed",
+      "production_sources_review_ledgers_checkers_thresholds_suppressions": "byte-identical to input",
+      "remote_sast_commit": "96c27c37e508564edc1cd4aee978896b1612e5a5",
+      "remote_sast_job": 123395258444,
+      "remote_sast_conclusion": "success",
+      "no_new_runtime_dependencies": true
     }
   },
   "resume_checkpoint": {
     "date": "2026-10-29",
-    "handoff": "docs/IOS_LOCAL_MODEL_RIGHTS_R210.md",
-    "proof": "docs/validation/r210/ios-rights-result.json",
-    "archive": "MTA-0.3.0-r210-pre-RC-ios-rights-cumulative.zip",
-    "base_commit": "4c3c73afe6d3829aad155c23f5f1bbb6d375433a",
+    "handoff": "docs/CI_40858_REPAIR_R210.md",
+    "proof": "docs/validation/r210/ci-40858-result.json",
+    "archive": "MTA-0.3.0-r210-pre-RC-ci-40858-cumulative.zip",
+    "base_commit": "96c27c37e508564edc1cd4aee978896b1612e5a5",
     "accepted_criteria": 28,
     "original_criteria_total": 42,
     "percent": 66.7,
@@ -948,10 +967,10 @@
   },
   "latest_checkpoint": {
     "date": "2026-10-29",
-    "handoff": "docs/IOS_LOCAL_MODEL_RIGHTS_R210.md",
-    "proof": "docs/validation/r210/ios-rights-result.json",
-    "archive": "MTA-0.3.0-r210-pre-RC-ios-rights-cumulative.zip",
-    "base_commit": "4c3c73afe6d3829aad155c23f5f1bbb6d375433a",
+    "handoff": "docs/CI_40858_REPAIR_R210.md",
+    "proof": "docs/validation/r210/ci-40858-result.json",
+    "archive": "MTA-0.3.0-r210-pre-RC-ci-40858-cumulative.zip",
+    "base_commit": "96c27c37e508564edc1cd4aee978896b1612e5a5",
     "accepted_criteria": 28,
     "original_criteria_total": 42,
     "percent": 66.7,
@@ -970,12 +989,12 @@
     "transition_enabled": false
   },
   "current_committed_baseline": {
-    "sha": "4c3c73afe6d3829aad155c23f5f1bbb6d375433a",
-    "source": "User confirmation and read-only full run40584085026,commit/artifact/job/log metadata; fixture Git blob b0858a770a9ee7ec327fc74a425888a7cca02ef0 matches delivered bytes.",
-    "pending_delta": "Uncommitted B5 execution ownership,guarded C2 drain/E4 administration plus F3 authenticated reviewed remote-checkpoint profile,real HTTPS/model acceptance,rights/license provenance and bounded WAV/artifact repairs. No full financial/backend cutover or RC claim."
+    "sha": "96c27c37e508564edc1cd4aee978896b1612e5a5",
+    "source": "Both supplied GitHub runs and artifact metadata;entire4164-blob tree matched delivered input",
+    "pending_delta": "Six test fixture/behavior files repair8standard CI failures,3new denial tests;current CI/Apple evidence and documentation. No production-code change."
   },
   "work_organization": {
-    "date": "2026-10-28",
+    "date": "2026-10-29",
     "commit_deferred_by_user": true,
     "single_uncommitted_delta": true,
     "intermediate_packages": false,
@@ -989,10 +1008,10 @@
     },
     "not_a_full_product_percentage": true,
     "delivery": "Complete cumulative archive at each substantial checkpoint when possible,not only a patch;no ZIP per helper. Commit remains deferred.",
-    "uncommitted_scope": "Uncommitted B5 execution ownership,guarded C2 drain/E4 administration plus F3 authenticated reviewed remote-checkpoint profile,real HTTPS/model acceptance,rights/license provenance and bounded WAV/artifact repairs. No full financial/backend cutover or RC claim."
+    "uncommitted_scope": "Repair8standard CI regressions through explicit active-account/model-permission fixtures and actual shared Whisper default behavior;record verified Apple SDK/app-build success. No production source,threshold,workflow or original criterion change."
   },
-  "latest_confirmed_commit": "4c3c73afe6d3829aad155c23f5f1bbb6d375433a",
-  "latest_continuation": "docs/IOS_LOCAL_MODEL_RIGHTS_R210.md",
+  "latest_confirmed_commit": "96c27c37e508564edc1cd4aee978896b1612e5a5",
+  "latest_continuation": "docs/CI_40858_REPAIR_R210.md",
   "latest_confirmed_cutover_chromium": {
     "date": "2026-10-27",
     "commit": "772fbe7508cc08266466a3746bb51f0fe5d0179b",
@@ -1061,7 +1080,7 @@
     "no_tests_rerun": true,
     "no_remote_mutations": true
   },
-  "next_commit_scope": "Uncommitted B5/drain/E4/F3/merchant plus authenticated fixed-host settlement recovery,original immutable allocation and same-document replay. No general financial cutover or RC claim.",
+  "next_commit_scope": "Repair8standard CI regressions through explicit active-account/model-permission fixtures and actual shared Whisper default behavior;record verified Apple SDK/app-build success. No production source,threshold,workflow or original criterion change.",
   "legacy_execution_continuation": {
     "handoff": "docs/LEGACY_EXECUTION_BOUNDARIES_R210.md",
     "result": "docs/validation/r210/legacy-executor-result.json",
@@ -1106,49 +1125,159 @@
     "external_target_acceptance": false
   },
   "latest_observed_ci": {
-    "date": "2026-10-28",
-    "commit": "4c3c73afe6d3829aad155c23f5f1bbb6d375433a",
-    "run_id": 40584085026,
-    "url": "https://github.com/desalvo/mta-audio-editor/actions/runs/40584085026",
-    "mode": "full",
+    "schema": "mta-ci-96c27c3-observation-1",
+    "date": "2026-10-29",
+    "timezone": "Europe/Rome",
+    "commit": "96c27c37e508564edc1cd4aee978896b1612e5a5",
+    "mode": "standard unit",
     "quality": {
-      "job_id": 122470833556,
-      "passed": 6887,
-      "failed": 0,
+      "run_id": 40858442206,
+      "job_id": 123395258375,
+      "conclusion": "failure",
+      "passed": 7122,
+      "failed": 8,
       "errors": 0,
-      "skipped": 114,
-      "warnings": 1016,
-      "seconds": 1331.27,
-      "coverage_percent": 76.88,
-      "required_coverage_percent": 70,
-      "log_evidence": [
-        "2026-10-27T21:34:59.6056226Z Required test coverage of 70% reached. Total coverage: 76.88%",
-        "2026-10-27T21:34:59.6112998Z ======== 6887 passed, 114 skipped, 1016 warnings in 1331.27s (0:22:11) ========="
-      ]
+      "skipped": 50,
+      "warnings": 1028,
+      "seconds": 872.26,
+      "coverage_percent": 76.67,
+      "coverage_threshold_percent": 70,
+      "coverage_gate_passed": true,
+      "log": "docs/validation/r210/ci-123395258375.log"
     },
     "sast": {
-      "job_id": 122470833363,
+      "job_id": 123395258444,
       "conclusion": "success"
     },
-    "jobs": {
-      "success": 14,
-      "skipped": 1,
-      "failure": 0,
-      "cancelled": 0,
-      "skipped_job": "Publish desktop/mobile installers to GitHub Release (tag-only)"
+    "vst3_sdk": {
+      "job_id": 123395258278,
+      "conclusion": "success"
     },
+    "jobs": [
+      {
+        "id": 123395258278,
+        "name": "VST3 SDK compile (Linux)",
+        "conclusion": "success"
+      },
+      {
+        "id": 123395258375,
+        "name": "Quality and unit tests",
+        "conclusion": "failure"
+      },
+      {
+        "id": 123395258444,
+        "name": "SAST and dependency audit",
+        "conclusion": "success"
+      },
+      {
+        "id": 123403894394,
+        "name": "Build Windows Chordino runtime",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 123403894630,
+        "name": "iOS / iPadOS archive",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 123403895261,
+        "name": "Linux native (${{ matrix.arch }}) DEB/RPM",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 123403895612,
+        "name": "Container production gate",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 123403895626,
+        "name": "Android APK / AAB",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 123403895631,
+        "name": "Publish desktop/mobile installers to GitHub Release",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 123403895958,
+        "name": "Publish Docker Hub image",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 123403896206,
+        "name": "Native Windows installer",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 123403896344,
+        "name": "Native macOS installer (${{ matrix.arch }})",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 123403896972,
+        "name": "Publish rolling early-main packages",
+        "conclusion": "skipped"
+      }
+    ],
     "ios": {
-      "job_id": 122484486026,
-      "unsigned_archive": "success",
-      "signed_IPA": false,
-      "signed_IPA_log": "2026-10-27T21:36:09.7752160Z Apple signing secrets not configured; skipping signed IPA.",
-      "testflight_step": "skipped",
-      "app_store_distribution_verified": false
+      "run_id": 40858613243,
+      "job_id": 123395824171,
+      "conclusion": "success",
+      "artifact_id": 12890806512,
+      "artifact_sha256": "1ee2817e4217a7068fef8a40816b6ef6d99346bf27d72e0f6b28b7365813986c",
+      "artifact_files": [
+        {
+          "path": "docs/validation/r210/ci-40858613243-ios/acceptance.json",
+          "sha256": "3995190e864b304e75503b54b7e7576f6299ca99cd0247a1ccc458158b9d899f"
+        },
+        {
+          "path": "docs/validation/r210/ci-40858613243-ios/compile-policy.log",
+          "sha256": "841e352905d74f4b0dfba3472a523679d0268d519ecba4f4d62d8c01a819d316"
+        },
+        {
+          "path": "docs/validation/r210/ci-40858613243-ios/ios-build.log",
+          "sha256": "065464cd08c8086d2601fd6972ae772353fc372c1603ee2107fcbd511e3aacea"
+        },
+        {
+          "path": "docs/validation/r210/ci-40858613243-ios/native-checks.json",
+          "sha256": "594936a2cfec0ba505852786c1f78d3bac200f96d7a8372a8c63b48d8c77ede1"
+        },
+        {
+          "path": "docs/validation/r210/ci-40858613243-ios/native-policy-tests.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "docs/validation/r210/ci-40858613243-ios/review-inputs.log",
+          "sha256": "ffc2a6db2b3a04ac85396567e81620e3a799cc3cef1f54d5bb23c90f182c95f0"
+        },
+        {
+          "path": "docs/validation/r210/ci-40858613243-ios/swift-version.log",
+          "sha256": "72d273d214e5f1b03fe2e3738d3f23046e0b6d5fc013e6e35fa1bd5a5f4d2ae6"
+        },
+        {
+          "path": "docs/validation/r210/ci-40858613243-ios/xcode-version.log",
+          "sha256": "a8be4f9af0a29137fe7e59b9928056d4a0df297bb46ba40f80eaa6b0ae982f12"
+        }
+      ],
+      "accepted": true,
+      "passed": 32,
+      "skipped": 0,
+      "actual_keychain_test": true,
+      "ios_app_compiled": true,
+      "current_source_hashes_verified": true,
+      "full_F4_accepted": false,
+      "installed_OS_acceptance": false,
+      "real_neural_model_inference": false,
+      "signed_IPA": false
     },
-    "evidence": "docs/validation/r210/ci-4c3c73a-observation.json",
-    "no_tests_rerun_locally": true,
+    "git_comparison": {
+      "tracked_blobs": 4164,
+      "all_match_delivered_input": true,
+      "evidence": "docs/validation/r210/ci-96c27c3-commit-comparison.json"
+    },
     "no_remote_mutations_by_agent": true,
-    "rc": false
+    "release_candidate": false
   },
   "ci_refund_fixture_repair": {
     "proof": "docs/validation/r210/ci-5891082-result.json",
@@ -1167,8 +1296,8 @@
   "historical_complete_tree_comparison": {
     "repository": "https://github.com/desalvo/mta-audio-editor",
     "branch": "main",
-    "verified_head": "0ad84a5fa0c66d75f75882a0f6e5c6a398470dc6",
-    "comparison": "Exact working Git blob SHA-1 vs complete baseline tree; missing baseline paths: zero"
+    "verified_head": "4c3c73afe6d3829aad155c23f5f1bbb6d375433a",
+    "comparison": "Read-only confirmed run/commit/artifact metadata; exact fixture Git blob matches validated cumulative; commit lists the19 expected fixture/evidence/docs paths. No fresh complete Git tree comparison claimed."
   },
   "latest_confirmed_full_ci": {
     "date": "2026-10-28",
@@ -1354,10 +1483,70 @@
     "proof": "docs/validation/r210/ios-rights-result.json",
     "passed": 90,
     "new_cases": 41,
-    "native_sdk_status": "blocked",
-    "native_sdk_passed": 0,
+    "native_sdk_status": "passed",
+    "native_sdk_passed": 32,
     "native_sdk_prepared": 32,
     "real_checkpoint_reviews": 0,
-    "original_criteria_promoted": []
+    "original_criteria_promoted": [],
+    "native_sdk_executed": true,
+    "native_sdk_skipped": 0,
+    "ios_app_compiled": true,
+    "actual_keychain_test": true,
+    "current_source_hashes_verified": true,
+    "native_sdk_proof": "docs/validation/r210/ci-40858613243-ios/acceptance.json",
+    "whole_F4_accepted": false
+  },
+  "latest_confirmed_ios_model_rights": {
+    "run_id": 40858613243,
+    "job_id": 123395824171,
+    "conclusion": "success",
+    "artifact_id": 12890806512,
+    "artifact_sha256": "1ee2817e4217a7068fef8a40816b6ef6d99346bf27d72e0f6b28b7365813986c",
+    "artifact_files": [
+      {
+        "path": "docs/validation/r210/ci-40858613243-ios/acceptance.json",
+        "sha256": "3995190e864b304e75503b54b7e7576f6299ca99cd0247a1ccc458158b9d899f"
+      },
+      {
+        "path": "docs/validation/r210/ci-40858613243-ios/compile-policy.log",
+        "sha256": "841e352905d74f4b0dfba3472a523679d0268d519ecba4f4d62d8c01a819d316"
+      },
+      {
+        "path": "docs/validation/r210/ci-40858613243-ios/ios-build.log",
+        "sha256": "065464cd08c8086d2601fd6972ae772353fc372c1603ee2107fcbd511e3aacea"
+      },
+      {
+        "path": "docs/validation/r210/ci-40858613243-ios/native-checks.json",
+        "sha256": "594936a2cfec0ba505852786c1f78d3bac200f96d7a8372a8c63b48d8c77ede1"
+      },
+      {
+        "path": "docs/validation/r210/ci-40858613243-ios/native-policy-tests.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "docs/validation/r210/ci-40858613243-ios/review-inputs.log",
+        "sha256": "ffc2a6db2b3a04ac85396567e81620e3a799cc3cef1f54d5bb23c90f182c95f0"
+      },
+      {
+        "path": "docs/validation/r210/ci-40858613243-ios/swift-version.log",
+        "sha256": "72d273d214e5f1b03fe2e3738d3f23046e0b6d5fc013e6e35fa1bd5a5f4d2ae6"
+      },
+      {
+        "path": "docs/validation/r210/ci-40858613243-ios/xcode-version.log",
+        "sha256": "a8be4f9af0a29137fe7e59b9928056d4a0df297bb46ba40f80eaa6b0ae982f12"
+      }
+    ],
+    "accepted": true,
+    "passed": 32,
+    "skipped": 0,
+    "actual_keychain_test": true,
+    "ios_app_compiled": true,
+    "current_source_hashes_verified": true,
+    "full_F4_accepted": false,
+    "installed_OS_acceptance": false,
+    "real_neural_model_inference": false,
+    "signed_IPA": false,
+    "commit": "96c27c37e508564edc1cd4aee978896b1612e5a5",
+    "proof": "docs/validation/r210/ci-40858613243-ios/acceptance.json"
   }
 }

@@ -4,6 +4,7 @@ Production defaults are unchanged. Integration runs which intentionally require
 the network must be selected and authorized separately.
 """
 import ipaddress
+import json
 import os
 import socket
 
@@ -15,6 +16,24 @@ if OFFLINE:
     os.environ['MTA_UVR_KARA2_AUTO_REPAIR']='0'
     os.environ['HF_HUB_OFFLINE']='1'
     os.environ['TRANSFORMERS_OFFLINE']='1'
+
+
+@pytest.fixture
+def reviewed_backing_policy(tmp_path, monkeypatch):
+    """Synthetic permission for artifact fixtures; never approves real weights."""
+    from app import auth, model_license_policy
+    monkeypatch.setattr(auth, 'DATA_ROOT', tmp_path / 'auth')
+    path = tmp_path / 'fixture-license-policy.json'
+    monkeypatch.setattr(model_license_policy, '_path', lambda: path)
+    path.write_text(json.dumps({'uvr-kara-2': {
+        'mode': 'free_only', 'authorization_basis': 'written_permission',
+        'evidence_url': 'https://example.test/synthetic-artifact-fixture',
+        'reason': 'Synthetic transport bytes only; no real checkpoint rights',
+        'acknowledge_responsibility': True, 'confirm_risk_twice': True,
+        'free_access_confirmed': True,
+    }}))
+    assert not model_license_policy.evaluate('backing-vocals', {'model': 'uvr_mdxnet_kara_2'}).billable
+    return path
 
 
 @pytest.fixture

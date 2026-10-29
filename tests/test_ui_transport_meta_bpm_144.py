@@ -3,11 +3,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_lyrics_default_is_whisper_turbo():
-    ai = (ROOT / "app/ai_models.py").read_text(encoding="utf-8")
-    music = (ROOT / "app/music_text.py").read_text(encoding="utf-8")
-    assert 'MTA_LYRICS_WHISPER_MODEL", "turbo"' in ai
-    assert 'MTA_LYRICS_WHISPER_MODEL' in music and '"turbo"' in music
+def test_lyrics_default_is_whisper_turbo(monkeypatch):
+    from app import ai_models,model_selectors
+    monkeypatch.delenv('MTA_LYRICS_WHISPER_MODEL',raising=False)
+    assert model_selectors.whisper_model()=='turbo'
+    assert model_selectors.whisper_model('')=='turbo'
+    assert ai_models.LYRICS_DEFAULT_MODEL=='turbo'
+    monkeypatch.setenv('MTA_LYRICS_WHISPER_MODEL','tiny.en')
+    assert model_selectors.whisper_model()=='tiny.en'
 
 
 def test_meta_panel_is_responsive_and_expandable():

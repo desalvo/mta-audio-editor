@@ -1,0 +1,138 @@
+{
+  "actual_keychain_test" : true,
+  "checks" : [
+    {
+      "name" : "empty registry denies",
+      "status" : "passed"
+    },
+    {
+      "name" : "unknown checkpoint denies",
+      "status" : "passed"
+    },
+    {
+      "name" : "path selector denies",
+      "status" : "passed"
+    },
+    {
+      "name" : "wrong stem count denies",
+      "status" : "passed"
+    },
+    {
+      "name" : "unknown source format denies",
+      "status" : "passed"
+    },
+    {
+      "name" : "expired permission denies",
+      "status" : "passed"
+    },
+    {
+      "name" : "future review denies",
+      "status" : "passed"
+    },
+    {
+      "name" : "commercial grant denies",
+      "status" : "passed"
+    },
+    {
+      "name" : "NC label is not authorization",
+      "status" : "passed"
+    },
+    {
+      "name" : "credentialed reference denies",
+      "status" : "passed"
+    },
+    {
+      "name" : "missing license denies",
+      "status" : "passed"
+    },
+    {
+      "name" : "changed notice denies",
+      "status" : "passed"
+    },
+    {
+      "name" : "actual source bytes required",
+      "status" : "passed"
+    },
+    {
+      "name" : "server fingerprint is not authority",
+      "status" : "passed"
+    },
+    {
+      "name" : "source link denies",
+      "status" : "passed"
+    },
+    {
+      "name" : "compiled root link denies",
+      "status" : "passed"
+    },
+    {
+      "name" : "compiled member link denies",
+      "status" : "passed"
+    },
+    {
+      "name" : "compiled bytes tampering denies",
+      "status" : "passed"
+    },
+    {
+      "name" : "compiled extra member denies",
+      "status" : "passed"
+    },
+    {
+      "name" : "missing secure receipt denies",
+      "status" : "passed"
+    },
+    {
+      "name" : "disk receipt cannot grant rights",
+      "status" : "passed"
+    },
+    {
+      "name" : "foreign receipt identity denies",
+      "status" : "passed"
+    },
+    {
+      "name" : "loaded review revocation denies",
+      "status" : "passed"
+    },
+    {
+      "name" : "loaded review replacement denies",
+      "status" : "passed"
+    },
+    {
+      "name" : "loaded grant expiry denies",
+      "status" : "passed"
+    },
+    {
+      "name" : "valid offline receipt survives object restart",
+      "status" : "passed"
+    },
+    {
+      "name" : "compiled member rename denies",
+      "status" : "passed"
+    },
+    {
+      "name" : "receipt failure restores original installation",
+      "status" : "passed"
+    },
+    {
+      "name" : "publish failure is rolled back",
+      "status" : "passed"
+    },
+    {
+      "name" : "missing source denies",
+      "status" : "passed"
+    },
+    {
+      "name" : "real isolated keychain roundtrip",
+      "status" : "passed"
+    },
+    {
+      "name" : "reviewed compiled source inventory accepted",
+      "status" : "passed"
+    }
+  ],
+  "failed" : 0,
+  "passed" : 32,
+  "real_neural_model_inference" : false,
+  "schema" : "mta-ios-rights-sdk-tests-1",
+  "skipped" : 0
+}

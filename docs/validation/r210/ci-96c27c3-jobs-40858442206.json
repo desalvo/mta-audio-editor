@@ -1,0 +1,390 @@
+{
+  "run_id": 40858442206,
+  "head_sha": "96c27c37e508564edc1cd4aee978896b1612e5a5",
+  "jobs": [
+    {
+      "id": 123395258278,
+      "name": "VST3 SDK compile (Linux)",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 40858442206,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Checkout official Steinberg VST3 SDK with submodules",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Verify Steinberg SDK license and mandatory submodules",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Compile and link VST3 probe with real SDK",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Build Steinberg ADelay reference plugin and exercise 128 offline blocks and verify delayed audio",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Post Checkout official Steinberg VST3 SDK with submodules",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13
+        }
+      ]
+    },
+    {
+      "id": 123395258375,
+      "name": "Quality and unit tests",
+      "status": "completed",
+      "conclusion": "failure",
+      "run_id": 40858442206,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-python@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Build sample-accurate VST3 host runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Run pip install -r requirements-dev.txt -r requirements-vst3.txt",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Run pip check",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Compile",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "Build documentation PDFs",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8
+        },
+        {
+          "name": "Install FFmpeg for DSP preset validation",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "Select Quality validation scope",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Prepare real browser server VST3 regression",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 11
+        },
+        {
+          "name": "Validate audio presets against FFmpeg",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12
+        },
+        {
+          "name": "Compile isolated C++20 VST3 probe without SDK",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13
+        },
+        {
+          "name": "Ruff",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14
+        },
+        {
+          "name": "Fetch hash-pinned live VST3 test effect",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15
+        },
+        {
+          "name": "Unit tests and coverage gate",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 16
+        },
+        {
+          "name": "Upload test diagnostics (including failed runs)",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 17
+        },
+        {
+          "name": "Upload coverage",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 18
+        },
+        {
+          "name": "Post Run actions/setup-python@v7",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 35
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 36
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 37
+        }
+      ]
+    },
+    {
+      "id": 123395258444,
+      "name": "SAST and dependency audit",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 40858442206,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/setup-python@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Run pip install -r requirements-dev.txt",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Run pip check",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "License redistribution guard",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Bandit SAST",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "Python dependency audit",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8
+        },
+        {
+          "name": "Secret scan",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "Trivy filesystem scan",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Post Trivy filesystem scan",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 18
+        },
+        {
+          "name": "Post Run actions/setup-python@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 19
+        },
+        {
+          "name": "Post Run actions/checkout@v7",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 20
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 21
+        }
+      ]
+    },
+    {
+      "id": 123403894394,
+      "name": "Build Windows Chordino runtime",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 40858442206,
+      "logs_url": null,
+      "steps": null
+    },
+    {
+      "id": 123403894630,
+      "name": "iOS / iPadOS archive",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 40858442206,
+      "logs_url": null,
+      "steps": null
+    },
+    {
+      "id": 123403895261,
+      "name": "Linux native (${{ matrix.arch }}) DEB/RPM",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 40858442206,
+      "logs_url": null,
+      "steps": null
+    },
+    {
+      "id": 123403895612,
+      "name": "Container production gate",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 40858442206,
+      "logs_url": null,
+      "steps": null
+    },
+    {
+      "id": 123403895626,
+      "name": "Android APK / AAB",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 40858442206,
+      "logs_url": null,
+      "steps": null
+    },
+    {
+      "id": 123403895631,
+      "name": "Publish desktop/mobile installers to GitHub Release",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 40858442206,
+      "logs_url": null,
+      "steps": null
+    },
+    {
+      "id": 123403895958,
+      "name": "Publish Docker Hub image",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 40858442206,
+      "logs_url": null,
+      "steps": null
+    },
+    {
+      "id": 123403896206,
+      "name": "Native Windows installer",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 40858442206,
+      "logs_url": null,
+      "steps": null
+    },
+    {
+      "id": 123403896344,
+      "name": "Native macOS installer (${{ matrix.arch }})",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 40858442206,
+      "logs_url": null,
+      "steps": null
+    },
+    {
+      "id": 123403896972,
+      "name": "Publish rolling early-main packages",
+      "status": "completed",
+      "conclusion": "skipped",
+      "run_id": 40858442206,
+      "logs_url": null,
+      "steps": null
+    }
+  ]
+}

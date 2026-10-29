@@ -61,17 +61,17 @@ def test_native_download_does_not_launch_server_worker(monkeypatch,tmp_path):
     main._lead_backing_engine_available()
 
 
-def test_server_split_stays_in_global_queue(monkeypatch,tmp_path):
+def test_server_split_stays_in_global_queue(monkeypatch,tmp_path,reviewed_backing_policy):
     monkeypatch.setattr(main,'_ai_external_engine',lambda kind: kind=='backing-vocals')
     calls=[]
     def infer(kind,source,options):
         calls.append((kind,options))
         return {'audio':{'lead.wav':b'lead','backing.wav':b'backing'}},'server-job'
     monkeypatch.setattr(main,'_native_remote_infer',infer)
-    lead,backing,method=main._split_lead_backing_vocals(tmp_path/'source.wav',tmp_path/'out')
+    lead,backing,method=main._split_lead_backing_vocals(tmp_path/'source.wav',tmp_path/'out',model_id='uvr_mdxnet_kara_2')
     assert lead.read_bytes()==b'lead' and backing.read_bytes()==b'backing'
     assert method=='remote:server-job'
-    assert calls[0][0]=='backing-vocals'
+    assert calls==[('backing-vocals',{'model':'uvr_mdxnet_kara_2'})]
 
 
 def test_stem_buttons_have_explicit_readable_colors():

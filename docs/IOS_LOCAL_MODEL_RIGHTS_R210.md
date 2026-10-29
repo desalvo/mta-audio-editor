@@ -1,3 +1,5 @@
+> Aggiornamento del 29 ottobre2026: la prova Apple reale è ora acquisita e supera il blocco SDK descritto nel documento storico sotto. Run40858613243,commit96c27c3:32controlli SDK passati,zero skip,vero Keychain e build unsigned iOS riuscita;13hash sorgenti correnti verificati. Leggere **CI_40858_REPAIR_R210.md** e `validation/r210/ci-40858613243-ios/acceptance.json`. Nessuna prova neurale/device/RC o promozione dell’intero F4/F5/F6. Il precedente rapporto locale bloccato è conservato,non riscritto.
+
 # Core ML iOS — ammissione locale dei diritti
 
 29 ottobre2026 · MTA0.3.0-r210 PRE-RC · baseline confermata `4c3c73afe6d3829aad155c23f5f1bbb6d375433a`.

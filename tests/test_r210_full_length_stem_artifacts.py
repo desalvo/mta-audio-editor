@@ -149,10 +149,13 @@ def test_native_upload_reads_beyond_old_32mib_limit(tmp_path, monkeypatch):
     assert native.infer('demucs', path)[0]['json']['result.json'] == {'ok': True}
 
 
-def test_oversize_source_rejected_before_job_or_billing(tmp_path, monkeypatch):
+def test_oversize_source_rejected_before_job_or_billing(tmp_path, monkeypatch, env):
     from app import ai_metering_agent as agent, ai_worker_registry, ai_billing
     monkeypatch.setattr(ai_worker_registry, 'resolve_worker', lambda _: tmp_path / 'trusted.py')
     monkeypatch.setattr(limits, 'MAX_SOURCE_BYTES', 4)
     monkeypatch.setattr(ai_billing, 'create_job', lambda *a, **kw: pytest.fail('No billing job may be opened'))
     with pytest.raises(ValueError, match='source audio exceeds size limit'):
-        agent.execute_registered_worker(1, 'demucs', {'kind': 'demucs'}, source_wav=b'12345')
+        agent.execute_registered_worker(env, 'demucs', {'kind': 'demucs'}, source_wav=b'12345')
+    from app import auth
+    with auth.db() as con:
+        assert con.execute('SELECT count(*) FROM ai_compute_jobs').fetchone()[0]==0

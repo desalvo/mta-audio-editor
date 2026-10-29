@@ -1,0 +1,200 @@
+{
+  "schema": "mta-ci-40858-repair-1",
+  "date": "2026-10-29",
+  "timezone": "Europe/Rome",
+  "base_commit": "96c27c37e508564edc1cd4aee978896b1612e5a5",
+  "input_archive": "MTA-0.3.0-r210-pre-RC-ios-rights-cumulative.zip",
+  "input_sha256": "e638eb04aa6a04b87397efd4dda3416a359d6ac52747d86cbc1e47c779a367fd",
+  "production_code_changed": false,
+  "test_sources": [
+    {
+      "path": "tests/conftest.py",
+      "sha256": "1a3f99a2f921687c43849c638f20f4261e84582a741578b49c04bf9be329843c"
+    },
+    {
+      "path": "tests/test_r210_full_length_stem_artifacts.py",
+      "sha256": "21c85ec9730e24bd4cba691d646eb043d833edde77baefe84740c7d857b9538f"
+    },
+    {
+      "path": "tests/test_r210_remote_vocal_artifact_order.py",
+      "sha256": "be09f06e59bf9a3a005cbdca2b6c34c8104c7007ebcf127072fddcb00f1ff5ad"
+    },
+    {
+      "path": "tests/test_r210_stem_dialog_runtime.py",
+      "sha256": "1760e24fb84d4c575fc8767d24a8db858af68c0730319a12f27236db09b0603e"
+    },
+    {
+      "path": "tests/test_text_analysis_ui_162.py",
+      "sha256": "7f539117806615a4e0ffc644e41bc4e127c73f60b7bacec1ba4c6da27e65e1f9"
+    },
+    {
+      "path": "tests/test_ui_transport_meta_bpm_144.py",
+      "sha256": "f24c47cc99faca01d302ca2b57e61d9f64dcaf780c73268e8be9876850be2c65"
+    }
+  ],
+  "observed_failed_cases": 8,
+  "repaired_failed_cases": 8,
+  "passed": 26,
+  "new_cases": 3,
+  "failed": 0,
+  "errors": 0,
+  "skipped": 0,
+  "report": {
+    "path": "docs/validation/r210/ci-40858-focused.xml",
+    "sha256": "b20383672cac2202d22f731c65ffe41f6764b9923c8a0e84dd29d5360544bc60"
+  },
+  "cases": [
+    {
+      "module": "tests.test_r210_full_length_stem_artifacts",
+      "name": "test_oversize_source_rejected_before_job_or_billing",
+      "status": "passed"
+    },
+    {
+      "module": "tests.test_r210_remote_vocal_artifact_order",
+      "name": "test_backing_filename_cannot_be_selected_as_lead[names0]",
+      "status": "passed"
+    },
+    {
+      "module": "tests.test_r210_remote_vocal_artifact_order",
+      "name": "test_backing_filename_cannot_be_selected_as_lead[names1]",
+      "status": "passed"
+    },
+    {
+      "module": "tests.test_r210_remote_vocal_artifact_order",
+      "name": "test_backing_filename_cannot_be_selected_as_lead[names2]",
+      "status": "passed"
+    },
+    {
+      "module": "tests.test_r210_remote_vocal_artifact_order",
+      "name": "test_identical_silent_artifact_bytes_do_not_imply_missing_stem",
+      "status": "passed"
+    },
+    {
+      "module": "tests.test_r210_remote_vocal_artifact_order",
+      "name": "test_unreviewed_remote_split_is_denied_before_transport_or_output[{}]",
+      "status": "passed"
+    },
+    {
+      "module": "tests.test_r210_remote_vocal_artifact_order",
+      "name": "test_unreviewed_remote_split_is_denied_before_transport_or_output[{\"uvr-kara-2\":{\"mode\":\"disabled\"}}]",
+      "status": "passed"
+    },
+    {
+      "module": "tests.test_r210_remote_vocal_artifact_order",
+      "name": "test_unreviewed_remote_split_is_denied_before_transport_or_output[{]",
+      "status": "passed"
+    },
+    {
+      "module": "tests.test_r210_stem_dialog_runtime",
+      "name": "test_catalog_probes_configured_backing_runtime",
+      "status": "passed"
+    },
+    {
+      "module": "tests.test_r210_stem_dialog_runtime",
+      "name": "test_catalog_does_not_claim_broken_worker_is_available[absent]",
+      "status": "passed"
+    },
+    {
+      "module": "tests.test_r210_stem_dialog_runtime",
+      "name": "test_catalog_does_not_claim_broken_worker_is_available[broken]",
+      "status": "passed"
+    },
+    {
+      "module": "tests.test_r210_stem_dialog_runtime",
+      "name": "test_catalog_does_not_claim_broken_worker_is_available[timeout]",
+      "status": "passed"
+    },
+    {
+      "module": "tests.test_r210_stem_dialog_runtime",
+      "name": "test_model_download_uses_worker_and_shared_cache",
+      "status": "passed"
+    },
+    {
+      "module": "tests.test_r210_stem_dialog_runtime",
+      "name": "test_native_download_does_not_launch_server_worker",
+      "status": "passed"
+    },
+    {
+      "module": "tests.test_r210_stem_dialog_runtime",
+      "name": "test_server_split_stays_in_global_queue",
+      "status": "passed"
+    },
+    {
+      "module": "tests.test_r210_stem_dialog_runtime",
+      "name": "test_stem_buttons_have_explicit_readable_colors",
+      "status": "passed"
+    },
+    {
+      "module": "tests.test_r210_stem_dialog_runtime",
+      "name": "test_real_bridge_downloads_without_importing_separator_in_web_runtime",
+      "status": "passed"
+    },
+    {
+      "module": "tests.test_text_analysis_ui_162",
+      "name": "test_whisper_turbo_is_default_everywhere",
+      "status": "passed"
+    },
+    {
+      "module": "tests.test_text_analysis_ui_162",
+      "name": "test_chord_job_does_not_expose_inline_chords",
+      "status": "passed"
+    },
+    {
+      "module": "tests.test_text_analysis_ui_162",
+      "name": "test_analysis_dialogs_warn_about_long_processing_time",
+      "status": "passed"
+    },
+    {
+      "module": "tests.test_text_analysis_ui_162",
+      "name": "test_native_hides_open_local_project_action",
+      "status": "passed"
+    },
+    {
+      "module": "tests.test_ui_transport_meta_bpm_144",
+      "name": "test_lyrics_default_is_whisper_turbo",
+      "status": "passed"
+    },
+    {
+      "module": "tests.test_ui_transport_meta_bpm_144",
+      "name": "test_meta_panel_is_responsive_and_expandable",
+      "status": "passed"
+    },
+    {
+      "module": "tests.test_ui_transport_meta_bpm_144",
+      "name": "test_pdf_preview_uses_the_real_generated_pdf",
+      "status": "passed"
+    },
+    {
+      "module": "tests.test_ui_transport_meta_bpm_144",
+      "name": "test_fast_playback_and_spacebar_regressions",
+      "status": "passed"
+    },
+    {
+      "module": "tests.test_ui_transport_meta_bpm_144",
+      "name": "test_track_context_can_recalculate_bpm",
+      "status": "passed"
+    }
+  ],
+  "scope": {
+    "oversize": "Real active account and scheduler fixture reaches unchanged source limit;no billing ledger created",
+    "remote_artifacts": "Synthetic explicit free-only permission reaches unchanged artifact mapping;unreviewed,disabled,malformed permissions remain denied before transport/output",
+    "whisper": "Both actual direct/progressive entry functions consume turbo through the current selector using a fake runtime;no weights downloaded",
+    "standard_unit_selection_unchanged": true,
+    "full_suite_repeated": false,
+    "ios_sdk_repeated": false,
+    "coverage_recomputed_locally": false,
+    "prior_acceptance_reused_only_for_identical_production_bytes": true
+  },
+  "original_progress": {
+    "accepted": 28,
+    "total": 42,
+    "percent": 66.7,
+    "accepted_macroareas": [
+      "E"
+    ],
+    "criteria_promoted": [],
+    "release_candidate": false
+  },
+  "no_commit_or_remote_mutation": true,
+  "ruff": "Passed on all6changed test files"
+}

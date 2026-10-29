@@ -1,0 +1,155 @@
+{
+  "schema": "mta-ci-96c27c3-observation-1",
+  "date": "2026-10-29",
+  "timezone": "Europe/Rome",
+  "commit": "96c27c37e508564edc1cd4aee978896b1612e5a5",
+  "mode": "standard unit",
+  "quality": {
+    "run_id": 40858442206,
+    "job_id": 123395258375,
+    "conclusion": "failure",
+    "passed": 7122,
+    "failed": 8,
+    "errors": 0,
+    "skipped": 50,
+    "warnings": 1028,
+    "seconds": 872.26,
+    "coverage_percent": 76.67,
+    "coverage_threshold_percent": 70,
+    "coverage_gate_passed": true,
+    "log": "docs/validation/r210/ci-123395258375.log"
+  },
+  "sast": {
+    "job_id": 123395258444,
+    "conclusion": "success"
+  },
+  "vst3_sdk": {
+    "job_id": 123395258278,
+    "conclusion": "success"
+  },
+  "jobs": [
+    {
+      "id": 123395258278,
+      "name": "VST3 SDK compile (Linux)",
+      "conclusion": "success"
+    },
+    {
+      "id": 123395258375,
+      "name": "Quality and unit tests",
+      "conclusion": "failure"
+    },
+    {
+      "id": 123395258444,
+      "name": "SAST and dependency audit",
+      "conclusion": "success"
+    },
+    {
+      "id": 123403894394,
+      "name": "Build Windows Chordino runtime",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 123403894630,
+      "name": "iOS / iPadOS archive",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 123403895261,
+      "name": "Linux native (${{ matrix.arch }}) DEB/RPM",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 123403895612,
+      "name": "Container production gate",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 123403895626,
+      "name": "Android APK / AAB",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 123403895631,
+      "name": "Publish desktop/mobile installers to GitHub Release",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 123403895958,
+      "name": "Publish Docker Hub image",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 123403896206,
+      "name": "Native Windows installer",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 123403896344,
+      "name": "Native macOS installer (${{ matrix.arch }})",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 123403896972,
+      "name": "Publish rolling early-main packages",
+      "conclusion": "skipped"
+    }
+  ],
+  "ios": {
+    "run_id": 40858613243,
+    "job_id": 123395824171,
+    "conclusion": "success",
+    "artifact_id": 12890806512,
+    "artifact_sha256": "1ee2817e4217a7068fef8a40816b6ef6d99346bf27d72e0f6b28b7365813986c",
+    "artifact_files": [
+      {
+        "path": "docs/validation/r210/ci-40858613243-ios/acceptance.json",
+        "sha256": "3995190e864b304e75503b54b7e7576f6299ca99cd0247a1ccc458158b9d899f"
+      },
+      {
+        "path": "docs/validation/r210/ci-40858613243-ios/compile-policy.log",
+        "sha256": "841e352905d74f4b0dfba3472a523679d0268d519ecba4f4d62d8c01a819d316"
+      },
+      {
+        "path": "docs/validation/r210/ci-40858613243-ios/ios-build.log",
+        "sha256": "065464cd08c8086d2601fd6972ae772353fc372c1603ee2107fcbd511e3aacea"
+      },
+      {
+        "path": "docs/validation/r210/ci-40858613243-ios/native-checks.json",
+        "sha256": "594936a2cfec0ba505852786c1f78d3bac200f96d7a8372a8c63b48d8c77ede1"
+      },
+      {
+        "path": "docs/validation/r210/ci-40858613243-ios/native-policy-tests.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "docs/validation/r210/ci-40858613243-ios/review-inputs.log",
+        "sha256": "ffc2a6db2b3a04ac85396567e81620e3a799cc3cef1f54d5bb23c90f182c95f0"
+      },
+      {
+        "path": "docs/validation/r210/ci-40858613243-ios/swift-version.log",
+        "sha256": "72d273d214e5f1b03fe2e3738d3f23046e0b6d5fc013e6e35fa1bd5a5f4d2ae6"
+      },
+      {
+        "path": "docs/validation/r210/ci-40858613243-ios/xcode-version.log",
+        "sha256": "a8be4f9af0a29137fe7e59b9928056d4a0df297bb46ba40f80eaa6b0ae982f12"
+      }
+    ],
+    "accepted": true,
+    "passed": 32,
+    "skipped": 0,
+    "actual_keychain_test": true,
+    "ios_app_compiled": true,
+    "current_source_hashes_verified": true,
+    "full_F4_accepted": false,
+    "installed_OS_acceptance": false,
+    "real_neural_model_inference": false,
+    "signed_IPA": false
+  },
+  "git_comparison": {
+    "tracked_blobs": 4164,
+    "all_match_delivered_input": true,
+    "evidence": "docs/validation/r210/ci-96c27c3-commit-comparison.json"
+  },
+  "no_remote_mutations_by_agent": true,
+  "release_candidate": false
+}

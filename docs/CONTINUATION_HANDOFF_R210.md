@@ -1,3 +1,15 @@
+## Checkpoint corrente — CI corretta e prova Apple acquisita — 29 ottobre 2026
+
+Leggere **CI_40858_REPAIR_R210.md** e `validation/r210/ci-40858-result.json`. Baseline ora confermata **96c27c37e508564edc1cd4aee978896b1612e5a5**: tutti4164blob tracciati corrispondono al precedente cumulativo. La CI standard40858442206 fallisce8test obsoleti(7122passati,50skip,copertura76,67%);SAST e SDK VST3 Linux passano. Le fixture corrette conservano account/coda attivi,diritti espliciti per byte sintetici e default Whisper condiviso. Nessun codice di produzione,workflow,soglia o opt-in modificato. **26test mirati passati,3nuovi,zero failure/error/skip**;tutti8i fallimenti coperti.
+
+**Apple40858613243 acquisito:32controlli SDK reali passati,zero skip,vero Keychain isolato e compilazione unsigned dell’app riuscita.** Artefatto verificato con digest remoto e13hash sorgenti correnti,conservato in `validation/r210/ci-40858613243-ios/`. Supera il precedente blocco locale Xcode,senza riscriverlo. Non è inferenza neurale,device fisico o intero F4/F5/F6;il registro CoreML reale resta vuoto. Non ripetere il workflow Apple invariato.
+
+**28/42(66,7%),E completa1/7,RC aperta;nessuna promozione di criterio.** Dopo il commit dell’utente verificare il prossimo Quality standard. La fullCI storica su4c3 non certifica il nuovo delta. Riusare le prove delle sorgenti di produzione identiche;restano14criteri originali,con lavoro economico/legacy/esecutori non tutto esterno. Cumulativo unico:**MTA-0.3.0-r210-pre-RC-ci-40858-cumulative.zip**,con tutti4805percorsi e log di ingresso conservati. Nessun commit o modifica remota eseguito. Commit suggerito:`Align CI fixtures with execution and model rights guards`.
+
+---
+
+Cronologia precedente,superata dove incompatibile con il checkpoint corrente:
+
 ## Checkpoint corrente — contratto Core ML iOS e build — 29 ottobre 2026
 
 Leggere **IOS_LOCAL_MODEL_RIGHTS_R210.md** e `validation/r210/ios-rights-result.json`. **28/42(66,7%),E completa1/7,PRE-RC;nessun criterio promosso,l’aumento numerico richiesto non è raggiunto.** Contratto iOS integrato tra revisione nel bundle,byte sorgenti,compilazione,ricevuta Keychain,inventario compilato,cache,revoca per chunk e consegna. Registro di produzione vuoto:zero checkpoint reali approvati;modelli legacy conservati ma senza grant automatico. Build/refresh non scaricano asset privi di revisione corrispondente.

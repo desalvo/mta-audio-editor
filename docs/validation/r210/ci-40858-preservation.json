@@ -1,0 +1,279 @@
+{
+  "schema": "mta-ci-40858-preservation-1",
+  "input_archive": "MTA-0.3.0-r210-pre-RC-ios-rights-cumulative.zip",
+  "input_sha256": "e638eb04aa6a04b87397efd4dda3416a359d6ac52747d86cbc1e47c779a367fd",
+  "input_bytes": 98884818,
+  "input_paths": 4805,
+  "input_log_paths": 641,
+  "all_input_paths_preserved": true,
+  "all_input_log_bytes_identical": true,
+  "all_input_modes_preserved": true,
+  "zipinfo_metadata_preserved": true,
+  "original_criteria": [
+    {
+      "id": "A1",
+      "criterion": "Stripe authenticated readback binds journal, refund/dispute pages and actual credit ledger",
+      "state": "verified",
+      "weight": 1
+    },
+    {
+      "id": "A2",
+      "criterion": "Stripe signed events cover replay, concurrency, refunds-before-payment and disputes",
+      "state": "verified",
+      "weight": 1
+    },
+    {
+      "id": "A3",
+      "criterion": "PayPal multicapture refunds, individual capture reversals and common dispute outcomes",
+      "state": "verified",
+      "weight": 1
+    },
+    {
+      "id": "A4",
+      "criterion": "Complete PayPal historical discovery, refunded initial captures, ambiguous payout and multicapture dispute allocation",
+      "state": "implementation_pending",
+      "weight": 1
+    },
+    {
+      "id": "A5",
+      "criterion": "Complete legacy obligations, all terminal/uncertain checkout outcomes and subscription reversal repayment",
+      "state": "implementation_pending",
+      "weight": 1
+    },
+    {
+      "id": "A6",
+      "criterion": "Actual Stripe and PayPal sandbox readback and lifecycle verification",
+      "state": "environment_blocked",
+      "weight": 1
+    },
+    {
+      "id": "B1",
+      "criterion": "Registered direct workers claim, heartbeat and finish with atomic ledger/fence settlement",
+      "state": "verified",
+      "weight": 1
+    },
+    {
+      "id": "B2",
+      "criterion": "Actual supervisor-crash recovery with external worker quiescence proof",
+      "state": "implementation_pending",
+      "weight": 1
+    },
+    {
+      "id": "B3",
+      "criterion": "Propagate owner credentials through deferred Arranger/Remix publication and billing outboxes",
+      "state": "verified",
+      "weight": 1
+    },
+    {
+      "id": "B4",
+      "criterion": "Shared multi-host coordinator and storage/locking backend",
+      "state": "verified",
+      "weight": 1
+    },
+    {
+      "id": "B5",
+      "criterion": "Prove ownership/metering for every legacy/local/native executor entry",
+      "state": "verified",
+      "weight": 1
+    },
+    {
+      "id": "B6",
+      "criterion": "Multi-host worker loss, partition, drain and no duplicate execution acceptance",
+      "state": "environment_blocked",
+      "weight": 1
+    },
+    {
+      "id": "C1",
+      "criterion": "Persistent reservation, local concurrency and transaction primitives",
+      "state": "verified",
+      "weight": 1
+    },
+    {
+      "id": "C2",
+      "criterion": "Distributed admission barrier and service-wide drain",
+      "state": "verified",
+      "weight": 1
+    },
+    {
+      "id": "C3",
+      "criterion": "Resolve every financial obligation before cutover",
+      "state": "implementation_pending",
+      "weight": 1
+    },
+    {
+      "id": "C4",
+      "criterion": "Local mirror/cutover recovery invariants",
+      "state": "verified",
+      "weight": 1
+    },
+    {
+      "id": "C5",
+      "criterion": "Enabled safe transition in both directions through actual administrator API",
+      "state": "implementation_pending",
+      "weight": 1
+    },
+    {
+      "id": "C6",
+      "criterion": "Cross-host crash and concurrent transition end-to-end acceptance",
+      "state": "implementation_pending",
+      "weight": 1
+    },
+    {
+      "id": "D1",
+      "criterion": "Actual done ledger -> immutable NC period -> private IT/EN CSV export",
+      "state": "verified",
+      "weight": 1
+    },
+    {
+      "id": "D2",
+      "criterion": "Commercial subscription quotes, credit checkout, authenticated funding and common refunds",
+      "state": "verified",
+      "weight": 1
+    },
+    {
+      "id": "D3",
+      "criterion": "Collect/settle exact subscription reversal receivables",
+      "state": "verified",
+      "weight": 1
+    },
+    {
+      "id": "D4",
+      "criterion": "Complete account-facing experience for both regimes",
+      "state": "verified",
+      "weight": 1
+    },
+    {
+      "id": "D5",
+      "criterion": "NC voluntary contribution settlement beyond immutable allocation statements",
+      "state": "verified",
+      "weight": 1
+    },
+    {
+      "id": "D6",
+      "criterion": "Account balances and periods across enabled administrative cutover",
+      "state": "implementation_pending",
+      "weight": 1
+    },
+    {
+      "id": "E1",
+      "criterion": "Financial positions use actual database API in Chromium IT/EN",
+      "state": "verified",
+      "weight": 1
+    },
+    {
+      "id": "E2",
+      "criterion": "Diagnostics remain readable during a reserved drain",
+      "state": "verified",
+      "weight": 1
+    },
+    {
+      "id": "E3",
+      "criterion": "Explicit confirmed reconciliation button traverses API/service and changes actual wallet in browser tests",
+      "state": "verified",
+      "weight": 1
+    },
+    {
+      "id": "E4",
+      "criterion": "Complete sensitive regime-switch operator workflow",
+      "state": "verified",
+      "weight": 1
+    },
+    {
+      "id": "E5",
+      "criterion": "Complete transition progress, audit and forward recovery controls",
+      "state": "verified",
+      "weight": 1
+    },
+    {
+      "id": "E6",
+      "criterion": "Full accessibility and responsive acceptance for the entire administration",
+      "state": "verified",
+      "weight": 1
+    },
+    {
+      "id": "F1",
+      "criterion": "Backend policy, catalog and restricted model admission checks",
+      "state": "verified",
+      "weight": 1
+    },
+    {
+      "id": "F2",
+      "criterion": "Routed and direct transport boundaries reject disallowed remote execution before dispatch",
+      "state": "verified",
+      "weight": 1
+    },
+    {
+      "id": "F3",
+      "criterion": "Authenticated remote checkpoint identity and rights attestation",
+      "state": "verified",
+      "weight": 1
+    },
+    {
+      "id": "F4",
+      "criterion": "Rights and bypass acceptance for every legacy executor",
+      "state": "implementation_pending",
+      "weight": 1
+    },
+    {
+      "id": "F5",
+      "criterion": "Native NC guarantees on all supported operating systems",
+      "state": "environment_blocked",
+      "weight": 1
+    },
+    {
+      "id": "F6",
+      "criterion": "Complete independent rights review of every optional installed checkpoint",
+      "state": "implementation_pending",
+      "weight": 1
+    },
+    {
+      "id": "G1",
+      "criterion": "Incoming CRC/SHA and exact Git tree comparison, no baseline files missing",
+      "state": "verified",
+      "weight": 1
+    },
+    {
+      "id": "G2",
+      "criterion": "Entire available Linux baseline with repairs, plus affected final-code regression; no complete target CI claim",
+      "state": "verified",
+      "weight": 1
+    },
+    {
+      "id": "G3",
+      "criterion": "App/native/tests/all-scripts Ruff, Python compilation and changed JavaScript syntax",
+      "state": "verified",
+      "weight": 1
+    },
+    {
+      "id": "G4",
+      "criterion": "Available C++ audio-engine build and native DSP regression",
+      "state": "verified",
+      "weight": 1
+    },
+    {
+      "id": "G5",
+      "criterion": "Container images, Podman/Docker and Kubernetes execution",
+      "state": "environment_blocked",
+      "weight": 1
+    },
+    {
+      "id": "G6",
+      "criterion": "Windows/macOS native, GPU models, real VST plugins and hardware acceptance",
+      "state": "environment_blocked",
+      "weight": 1
+    }
+  ],
+  "progress": {
+    "definition": "Equal-weight RC acceptance milestone checklist, NOT full-product feature completion or code coverage",
+    "numerator": 28,
+    "denominator": 42,
+    "percent": 66.7,
+    "accepted_macroareas": 1,
+    "macroarea_denominator": 7,
+    "historical_dual_regime_estimate_percent": 70,
+    "historical_estimate_is_comparable": false,
+    "full_product_completion_percent": null,
+    "production_validation_percent": 0
+  },
+  "release_candidate": false
+}
