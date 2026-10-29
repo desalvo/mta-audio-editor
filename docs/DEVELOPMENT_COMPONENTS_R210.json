@@ -3,13 +3,13 @@
   "project": "MTA Audio Editor",
   "release": "0.3.0-r210",
   "updated_utc": "2026-10-29",
-  "baseline_archive": "MTA-0.3.0-r210-pre-RC-ci-40858-cumulative.zip",
-  "baseline_sha256": "a24735415f1fcfe233e81f0929549b784e98f4d5abc7b8b93ee79494828ae774",
+  "baseline_archive": "MTA-0.3.0-r210-pre-RC-ffmpeg-tree-cumulative.zip",
+  "baseline_sha256": "4f184c5f4cb2915cc824334d3abb128f9147edeb11c34eaa7b128bd83abf4817",
   "git_baseline": {
     "repository": "https://github.com/desalvo/mta-audio-editor",
     "branch": "main",
-    "verified_head": "8ed30091686bbb48722b8b73faf2927472d01d50",
-    "comparison": "Complete untruncated read-only tree comparison:all4176 tracked blobs match exact delivered input;CI40866015704 commit metadata"
+    "verified_head": "dafdff6a1d5a8fc5670e9125297406c5df470231",
+    "comparison": "Complete untruncated read-only tree comparison:all4193 tracked blob hashes match delivered input;run40912981261 commit metadata"
   },
   "commit_deferred": true,
   "release_candidate": false,
@@ -393,9 +393,9 @@
     "Local SQLite ownership is not multi-host coordination"
   ],
   "next_actions": [
-    "After the user commits,review ordinary Quality/SAST for the known-child fix. No automatic dispatch/Git mutation.",
-    "Reuse Apple40858613243 and unchanged financial/web/loader proofs;13Apple hashes match. Real cgroup/kernel/multi-host and whole-F4/F5/F6 acceptance remains open.",
-    "Continue remaining original financial/legacy/executor acceptance;preserve all42criteria wording/weights/states and explicit external target gaps."
+    "After the user commits,review standard Quality/SAST for the queue contention repair. No automatic dispatch or Git mutation.",
+    "Reuse unchanged Apple40858613243,FFmpeg/worker,finances/web/loader proofs;13Apple hashes match. Real kernel/multi-host/physicalOS and complete financial/executor criteria remain open.",
+    "Continue remaining original financial/legacy/rights/executor work;preserve42criterion wording/weights/states. No real server/provider actions authorized."
   ],
   "test_results": {
     "full_available_linux": {
@@ -743,6 +743,15 @@
       "skipped": 0,
       "full_suite_repeated": false,
       "proof": "docs/validation/r210/ffmpeg-ci-result.json"
+    },
+    "queue_barrier_contention": {
+      "passed": 145,
+      "new_cases": 9,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "full_suite_repeated": false,
+      "proof": "docs/validation/r210/queue-busy-result.json"
     }
   },
   "security_review": {
@@ -964,14 +973,23 @@
       "ruff": "passed",
       "existing_finding_ids_unchanged": 165,
       "checker_suppression_threshold_changes": false
+    },
+    "queue_barrier_contention": {
+      "production_sources_changed": [
+        "app/ai_arranger_runtime.py"
+      ],
+      "gates": "docs/validation/r210/queue-busy-source-gates.json",
+      "ruff": "passed",
+      "existing_finding_ids_unchanged": 165,
+      "checker_suppression_threshold_changes": false
     }
   },
   "resume_checkpoint": {
     "date": "2026-10-29",
-    "handoff": "docs/FFMPEG_TREE_ACCOUNTING_R210.md",
-    "proof": "docs/validation/r210/ffmpeg-ci-result.json",
-    "archive": "MTA-0.3.0-r210-pre-RC-ffmpeg-tree-cumulative.zip",
-    "base_commit": "8ed30091686bbb48722b8b73faf2927472d01d50",
+    "handoff": "docs/QUEUE_BARRIER_CONTENTION_R210.md",
+    "proof": "docs/validation/r210/queue-busy-result.json",
+    "archive": "MTA-0.3.0-r210-pre-RC-queue-busy-cumulative.zip",
+    "base_commit": "dafdff6a1d5a8fc5670e9125297406c5df470231",
     "accepted_criteria": 28,
     "original_criteria_total": 42,
     "percent": 66.7,
@@ -985,10 +1003,10 @@
   },
   "latest_checkpoint": {
     "date": "2026-10-29",
-    "handoff": "docs/FFMPEG_TREE_ACCOUNTING_R210.md",
-    "proof": "docs/validation/r210/ffmpeg-ci-result.json",
-    "archive": "MTA-0.3.0-r210-pre-RC-ffmpeg-tree-cumulative.zip",
-    "base_commit": "8ed30091686bbb48722b8b73faf2927472d01d50",
+    "handoff": "docs/QUEUE_BARRIER_CONTENTION_R210.md",
+    "proof": "docs/validation/r210/queue-busy-result.json",
+    "archive": "MTA-0.3.0-r210-pre-RC-queue-busy-cumulative.zip",
+    "base_commit": "dafdff6a1d5a8fc5670e9125297406c5df470231",
     "accepted_criteria": 28,
     "original_criteria_total": 42,
     "percent": 66.7,
@@ -1007,9 +1025,9 @@
     "transition_enabled": false
   },
   "current_committed_baseline": {
-    "sha": "8ed30091686bbb48722b8b73faf2927472d01d50",
-    "source": "Run40866015704 and complete4176blob comparison against delivered input",
-    "pending_delta": "Known internal child topology refuses direct-child-only completion/cancellation accounting;1runtime file,2test files,source-bound reviews and documentation."
+    "sha": "dafdff6a1d5a8fc5670e9125297406c5df470231",
+    "source": "Run40912981261 and complete4193blob comparison against exact input",
+    "pending_delta": "Bounded typed BUSY/LOCKED queue observation retry;private queue and joined thread lifecycle for known-tree test fixtures;9new regression cases and current proof/docs."
   },
   "work_organization": {
     "date": "2026-10-29",
@@ -1026,10 +1044,10 @@
     },
     "not_a_full_product_percentage": true,
     "delivery": "Complete cumulative archive at each substantial checkpoint when possible,not only a patch;no ZIP per helper. Commit remains deferred.",
-    "uncommitted_scope": "Require full tree accounting for known internal subprocess workers,including missed short-lived children and cancellation;retain original uncertain owner and cgroup contract;13new tests and current CI/security evidence."
+    "uncommitted_scope": "Bounded retry of typed busy queue observations without reexecuting original workers;isolated known-tree fixtures with joined threads;9new real-lock/regression cases and current CI/source-review documentation."
   },
-  "latest_confirmed_commit": "8ed30091686bbb48722b8b73faf2927472d01d50",
-  "latest_continuation": "docs/FFMPEG_TREE_ACCOUNTING_R210.md",
+  "latest_confirmed_commit": "dafdff6a1d5a8fc5670e9125297406c5df470231",
+  "latest_continuation": "docs/QUEUE_BARRIER_CONTENTION_R210.md",
   "latest_confirmed_cutover_chromium": {
     "date": "2026-10-27",
     "commit": "772fbe7508cc08266466a3746bb51f0fe5d0179b",
@@ -1098,7 +1116,7 @@
     "no_tests_rerun": true,
     "no_remote_mutations": true
   },
-  "next_commit_scope": "Require full tree accounting for known internal subprocess workers,including missed short-lived children and cancellation;retain original uncertain owner and cgroup contract;13new tests and current CI/security evidence.",
+  "next_commit_scope": "Bounded retry of typed busy queue observations without reexecuting original workers;isolated known-tree fixtures with joined threads;9new real-lock/regression cases and current CI/source-review documentation.",
   "legacy_execution_continuation": {
     "handoff": "docs/LEGACY_EXECUTION_BOUNDARIES_R210.md",
     "result": "docs/validation/r210/legacy-executor-result.json",
@@ -1145,102 +1163,100 @@
   "latest_observed_ci": {
     "date": "2026-10-29",
     "timezone": "Europe/Rome",
-    "commit": "8ed30091686bbb48722b8b73faf2927472d01d50",
-    "run_id": 40866015704,
-    "url": "https://github.com/desalvo/mta-audio-editor/actions/runs/40866015704",
+    "commit": "dafdff6a1d5a8fc5670e9125297406c5df470231",
+    "run_id": 40912981261,
+    "url": "https://github.com/desalvo/mta-audio-editor/actions/runs/40912981261",
     "mode": "standard unit",
     "quality": {
-      "job_id": 123420863146,
+      "job_id": 123585628451,
       "conclusion": "failure",
-      "passed": 7132,
+      "passed": 7145,
       "failed": 1,
       "errors": 0,
       "skipped": 50,
-      "warnings": 1023,
-      "seconds": 719.49,
+      "warnings": 1027,
+      "seconds": 1089.52,
       "coverage_percent": 76.71,
       "coverage_threshold_percent": 70
     },
     "sast": {
-      "job_id": 123420862344,
+      "job_id": 123585627963,
       "conclusion": "success"
     },
     "vst3_sdk": {
-      "job_id": 123420862722,
+      "job_id": 123585627630,
       "conclusion": "success"
     },
     "jobs": [
       {
-        "id": 123420862344,
-        "name": "SAST and dependency audit",
-        "conclusion": "success"
-      },
-      {
-        "id": 123420862722,
+        "id": 123585627630,
         "name": "VST3 SDK compile (Linux)",
         "conclusion": "success"
       },
       {
-        "id": 123420863146,
+        "id": 123585627963,
+        "name": "SAST and dependency audit",
+        "conclusion": "success"
+      },
+      {
+        "id": 123585628451,
         "name": "Quality and unit tests",
         "conclusion": "failure"
       },
       {
-        "id": 123427879518,
-        "name": "Native macOS installer (${{ matrix.arch }})",
-        "conclusion": "skipped"
-      },
-      {
-        "id": 123427879866,
-        "name": "Build Windows Chordino runtime",
-        "conclusion": "skipped"
-      },
-      {
-        "id": 123427880095,
-        "name": "iOS / iPadOS archive",
-        "conclusion": "skipped"
-      },
-      {
-        "id": 123427880238,
-        "name": "Linux native (${{ matrix.arch }}) DEB/RPM",
-        "conclusion": "skipped"
-      },
-      {
-        "id": 123427880522,
+        "id": 123598698003,
         "name": "Container production gate",
         "conclusion": "skipped"
       },
       {
-        "id": 123427880744,
+        "id": 123598698111,
+        "name": "Build Windows Chordino runtime",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 123598698437,
+        "name": "Linux native (${{ matrix.arch }}) DEB/RPM",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 123598698541,
+        "name": "iOS / iPadOS archive",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 123598698578,
         "name": "Android APK / AAB",
         "conclusion": "skipped"
       },
       {
-        "id": 123427880974,
+        "id": 123598699094,
+        "name": "Native macOS installer (${{ matrix.arch }})",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 123598699746,
         "name": "Publish Docker Hub image",
         "conclusion": "skipped"
       },
       {
-        "id": 123427881895,
-        "name": "Publish rolling early-main packages",
-        "conclusion": "skipped"
-      },
-      {
-        "id": 123427881902,
+        "id": 123598699976,
         "name": "Native Windows installer",
         "conclusion": "skipped"
       },
       {
-        "id": 123427882766,
+        "id": 123598700401,
         "name": "Publish desktop/mobile installers to GitHub Release",
+        "conclusion": "skipped"
+      },
+      {
+        "id": 123598700871,
+        "name": "Publish rolling early-main packages",
         "conclusion": "skipped"
       }
     ],
-    "tracked_git_blobs": 4176,
-    "all_input_blob_hashes_match": true,
-    "original8_failures_resolved": true,
-    "full_ci": false,
-    "no_remote_mutations": true,
+    "all_input_tracked_blobs_match": true,
+    "tracked_blobs": 4193,
+    "no_remote_mutations_by_agent": true,
     "release_candidate": false
   },
   "ci_refund_fixture_repair": {
@@ -1260,8 +1276,8 @@
   "historical_complete_tree_comparison": {
     "repository": "https://github.com/desalvo/mta-audio-editor",
     "branch": "main",
-    "verified_head": "96c27c37e508564edc1cd4aee978896b1612e5a5",
-    "comparison": "Complete read-only untruncated Git tree:all4164 tracked blob hashes equal delivered input;docs/validation/r210/ci-96c27c3-commit-comparison.json"
+    "verified_head": "8ed30091686bbb48722b8b73faf2927472d01d50",
+    "comparison": "Complete untruncated read-only tree comparison:all4176 tracked blobs match exact delivered input;CI40866015704 commit metadata"
   },
   "latest_confirmed_full_ci": {
     "date": "2026-10-28",

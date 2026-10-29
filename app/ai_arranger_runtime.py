@@ -303,10 +303,20 @@ def list_jobs(limit=100):
 
 
 def get(job_id):
-    with _db() as con:
-        _recover_dead_runners(con)
-        row = con.execute('SELECT * FROM jobs WHERE job_id=?', (job_id,)).fetchone()
-        return _with_live_progress(_public(con, row)) if row else None
+    from .sqlite_availability import BarrierUnavailable
+    # The connection's fail-closed barrier read has a short BUSY budget. A
+    # transient schema lock must not abort the original worker's observation.
+    # Retry only that typed BUSY/LOCKED condition,never start/claim/execute work.
+    for attempt in range(3):
+        try:
+            with _db() as con:
+                _recover_dead_runners(con)
+                row = con.execute('SELECT * FROM jobs WHERE job_id=?', (job_id,)).fetchone()
+                return _with_live_progress(_public(con, row)) if row else None
+        except BarrierUnavailable as exc:
+            if not exc.retryable or attempt == 2:
+                raise
+            time.sleep(.05)
 
 
 def job_operation(job_id):

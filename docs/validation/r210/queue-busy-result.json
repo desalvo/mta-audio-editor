@@ -1,0 +1,993 @@
+{
+  "schema": "mta-queue-barrier-contention-1",
+  "date": "2026-10-29",
+  "timezone": "Europe/Rome",
+  "base_commit": "dafdff6a1d5a8fc5670e9125297406c5df470231",
+  "input_archive": "MTA-0.3.0-r210-pre-RC-ffmpeg-tree-cumulative.zip",
+  "input_sha256": "4f184c5f4cb2915cc824334d3abb128f9147edeb11c34eaa7b128bd83abf4817",
+  "passed": 145,
+  "new_cases": 9,
+  "failed": 0,
+  "errors": 0,
+  "skipped": 0,
+  "production_sources_changed": [
+    "app/ai_arranger_runtime.py"
+  ],
+  "test_sources_changed": [
+    "tests/test_r210_known_worker_tree_accounting.py"
+  ],
+  "new_test_sources": [
+    "tests/test_r210_queue_barrier_contention.py"
+  ],
+  "reports": [
+    {
+      "path": "docs/validation/r210/queue-busy-functional.xml",
+      "sha256": "959a13e8e2556ceecfe9998f1b978363ae854b721d63ff41190b6c4e7477bd3c"
+    },
+    {
+      "path": "docs/validation/r210/queue-busy-isolated-final.xml",
+      "sha256": "2d3a93d4eec86edbad7581c4c6b5a9780501dfa17f64fd4f032afce6dd4fefd3"
+    },
+    {
+      "path": "docs/validation/r210/queue-busy-gates.xml",
+      "sha256": "e660e1602f78895d37c8dfc7534de75b8de23280f7944800cefc08871a0aa8f9"
+    },
+    {
+      "path": "docs/validation/r210/queue-busy-thread-final.xml",
+      "sha256": "9d5d4cca5acaee36e4cd29ae4caa3dec037fbbeac894a06ca5020b150855d7be"
+    }
+  ],
+  "cases": [
+    {
+      "module": "tests.test_r210_queue_barrier_contention",
+      "name": "test_actual_exclusive_queue_read_recovers_original_state",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_queue_barrier_contention",
+      "name": "test_persistent_exclusive_queue_is_still_unavailable_after_three_attempts",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_queue_barrier_contention",
+      "name": "test_unknown_barrier_maintenance_and_other_sql_errors_are_not_retried[error0]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_queue_barrier_contention",
+      "name": "test_unknown_barrier_maintenance_and_other_sql_errors_are_not_retried[error1]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_queue_barrier_contention",
+      "name": "test_unknown_barrier_maintenance_and_other_sql_errors_are_not_retried[error2]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_queue_barrier_contention",
+      "name": "test_unknown_barrier_maintenance_and_other_sql_errors_are_not_retried[error3]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_queue_barrier_contention",
+      "name": "test_missing_job_is_not_retried_or_recreated",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_queue_barrier_contention",
+      "name": "test_actual_execution_preserves_result_error_and_identity_after_busy_terminal_poll[False]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_queue_barrier_contention",
+      "name": "test_actual_execution_preserves_result_error_and_identity_after_busy_terminal_poll[True]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_known_worker_tree_accounting",
+      "name": "test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[complete-demucs-plan0]",
+      "status": "passed",
+      "report": "queue-busy-thread-final.xml"
+    },
+    {
+      "module": "tests.test_r210_known_worker_tree_accounting",
+      "name": "test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[complete-sam-audio-plan1]",
+      "status": "passed",
+      "report": "queue-busy-thread-final.xml"
+    },
+    {
+      "module": "tests.test_r210_known_worker_tree_accounting",
+      "name": "test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[complete-singer-separation-plan2]",
+      "status": "passed",
+      "report": "queue-busy-thread-final.xml"
+    },
+    {
+      "module": "tests.test_r210_known_worker_tree_accounting",
+      "name": "test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[complete-backing-vocals-plan3]",
+      "status": "passed",
+      "report": "queue-busy-thread-final.xml"
+    },
+    {
+      "module": "tests.test_r210_known_worker_tree_accounting",
+      "name": "test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[complete-backing-vocals-plan4]",
+      "status": "passed",
+      "report": "queue-busy-thread-final.xml"
+    },
+    {
+      "module": "tests.test_r210_known_worker_tree_accounting",
+      "name": "test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[complete-drumsep-plan5]",
+      "status": "passed",
+      "report": "queue-busy-thread-final.xml"
+    },
+    {
+      "module": "tests.test_r210_known_worker_tree_accounting",
+      "name": "test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[cancelled-demucs-plan0]",
+      "status": "passed",
+      "report": "queue-busy-thread-final.xml"
+    },
+    {
+      "module": "tests.test_r210_known_worker_tree_accounting",
+      "name": "test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[cancelled-sam-audio-plan1]",
+      "status": "passed",
+      "report": "queue-busy-thread-final.xml"
+    },
+    {
+      "module": "tests.test_r210_known_worker_tree_accounting",
+      "name": "test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[cancelled-singer-separation-plan2]",
+      "status": "passed",
+      "report": "queue-busy-thread-final.xml"
+    },
+    {
+      "module": "tests.test_r210_known_worker_tree_accounting",
+      "name": "test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[cancelled-backing-vocals-plan3]",
+      "status": "passed",
+      "report": "queue-busy-thread-final.xml"
+    },
+    {
+      "module": "tests.test_r210_known_worker_tree_accounting",
+      "name": "test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[cancelled-backing-vocals-plan4]",
+      "status": "passed",
+      "report": "queue-busy-thread-final.xml"
+    },
+    {
+      "module": "tests.test_r210_known_worker_tree_accounting",
+      "name": "test_known_tree_retains_original_owner_even_when_wait4_samples_look_isolated[cancelled-drumsep-plan5]",
+      "status": "passed",
+      "report": "queue-busy-thread-final.xml"
+    },
+    {
+      "module": "tests.test_r210_known_worker_tree_accounting",
+      "name": "test_known_tree_keeps_cgroup_runner_contract",
+      "status": "passed",
+      "report": "queue-busy-thread-final.xml"
+    },
+    {
+      "module": "tests.test_r210_global_ai_execution",
+      "name": "test_token_and_nested_web_jobs_share_one_fifo_slot",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_global_ai_execution",
+      "name": "test_queued_cancel_does_not_dispatch",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_global_ai_execution",
+      "name": "test_orphan_remote_admission_does_not_block_fifo",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_global_ai_execution",
+      "name": "test_operator_registry_supports_future_engine_and_rejects_bad_config",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_global_ai_execution",
+      "name": "test_markers_and_chord_options_are_available_in_unified_protocol",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_global_ai_execution",
+      "name": "test_native_future_engine_uses_shared_token_and_keeps_it_private",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_global_ai_execution",
+      "name": "test_production_server_requires_authenticated_queue_identity",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_global_ai_execution",
+      "name": "test_authenticated_token_worker_uses_global_queue_and_owner_receipt",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_global_ai_execution",
+      "name": "test_server_raw_wav_preserves_publication_metadata",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_global_ai_execution",
+      "name": "test_server_runtime_configuration_is_private_and_preserves_settings",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_global_ai_execution",
+      "name": "test_server_whisper_cannot_bill_an_unprofiled_cli",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_terminal_or_unstarted_queue_context_never_dispatches[queued]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_terminal_or_unstarted_queue_context_never_dispatches[blocked]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_terminal_or_unstarted_queue_context_never_dispatches[completed]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_terminal_or_unstarted_queue_context_never_dispatches[failed]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_terminal_or_unstarted_queue_context_never_dispatches[cancelled]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_terminal_or_unstarted_queue_context_never_dispatches[interrupted]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_missing_queue_context_does_not_become_a_new_permit",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_nested_cross_owner_rejected_but_same_owner_keeps_one_slot",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_public_worker_rejects_foreign_owner_before_routing_or_ledger[local]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_public_worker_rejects_foreign_owner_before_routing_or_ledger[pull]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_wrong_supervisor_or_unknown_identity_is_not_execution_authority[runner_pid]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_wrong_supervisor_or_unknown_identity_is_not_execution_authority[runner_identity]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_wrong_supervisor_or_unknown_identity_is_not_execution_authority[missing_identity]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_wrong_supervisor_or_unknown_identity_is_not_execution_authority[missing_actor]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_cancelled_context_rejects_new_stage_before_callback[persisted]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_cancelled_context_rejects_new_stage_before_callback[event]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_cancelled_context_rejects_new_stage_before_callback[callback]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_server_source_conversion_rejects_inactive_context",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_invalid_global_owner_never_creates_queue_job[0]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_invalid_global_owner_never_creates_queue_job[-1]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_invalid_global_owner_never_creates_queue_job[True]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_invalid_global_owner_never_creates_queue_job[None]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_invalid_global_owner_never_creates_queue_job[1]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_pre_cancelled_process_does_not_execute_actual_child",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_cancellation_probe_failure_does_not_spawn_child",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_native_fallback_pre_cancel_never_spawns",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_server_conversion_cancellation_reaps_child_and_never_enters_model",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_server_rejects_before_source_process[cancelled]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_server_rejects_before_source_process[license_denied]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_server_rejects_before_source_process[engine_override]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_failed_or_unbounded_source_conversion_never_dispatches[failed]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_failed_or_unbounded_source_conversion_never_dispatches[oversized]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_failed_or_unbounded_source_conversion_never_dispatches[empty]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_source_preparation_uses_one_remaining_budget_and_preserves_bound_identity",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_independent_process_cannot_reuse_live_parent_scheduler_identity",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_inner_dispatch_rechecks_owner_after_outer_admission[local]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_active_execution_owner",
+      "name": "test_inner_dispatch_rechecks_owner_after_outer_admission[pull]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_queue_identity_stem_metering",
+      "name": "test_legacy_stem_admission_persists_authenticated_actor_and_real_cpu",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_queue_identity_stem_metering",
+      "name": "test_old_queue_owner_recovered_only_from_unique_explicit_ledger_link",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_queue_identity_stem_metering",
+      "name": "test_queue_name_is_not_guessed_from_project_owner_or_ambiguous_ledger",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_queue_identity_stem_metering",
+      "name": "test_queue_ui_has_visible_user_column_and_escapes_names",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_queue_identity_stem_metering",
+      "name": "test_model_download_also_persists_actor",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_internal_registered_entry_requires_actual_scheduler_owner",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_revoked_token_cannot_dispatch_from_an_original_running_queue",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_actual_cancelled_child_preserves_reaped_cpu_and_no_artifact",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[ace-step]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[arranger]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[audio-to-midi]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[audio-to-midi-basic-pitch]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[audio-to-midi-mr-mt3]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[audio-to-midi-transkun]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[audio-to-midi-yourmt3]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[backing-vocals]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[chords-ml]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[demucs]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[drumsep]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[markers]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[remix]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[sam-audio]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[singer-separation]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[vocal-harmony]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[vocal-synthesis]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_every_builtin_kind_actual_api_process_owner_meter_and_replay[whisper]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_actual_api_queue_wait_rechecks_original_credential_before_dispatch[revoke]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_actual_api_queue_wait_rechecks_original_credential_before_dispatch[foreign]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_actual_api_queue_wait_rechecks_original_credential_before_dispatch[inactive]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_json_entry_rejects_nested_worker_control_before_queue[source_score]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_json_entry_rejects_nested_worker_control_before_queue[source_audio]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_json_entry_rejects_nested_worker_control_before_queue[input_path]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_json_entry_rejects_nested_worker_control_before_queue[output_path]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_json_entry_rejects_nested_worker_control_before_queue[command]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_json_entry_rejects_nested_worker_control_before_queue[executable]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_json_entry_rejects_nested_worker_control_before_queue[cwd]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_json_entry_rejects_nested_worker_control_before_queue[shell]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_malformed_wav_never_creates_a_ledger_or_claim",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_unverifiable_process_tree_keeps_original_claim_without_publication",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_running_token_revocation_stops_actual_process_and_retains_measured_cpu",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_pending_evidence_api_is_private_retains_identity_and_never_reexecutes[tree-json]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_pending_evidence_api_is_private_retains_identity_and_never_reexecutes[tree-wav]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_pending_evidence_api_is_private_retains_identity_and_never_reexecutes[sensor-json]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_pending_evidence_api_is_private_retains_identity_and_never_reexecutes[sensor-wav]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_operator_extension_cannot_bypass_the_same_owner_metering_contract",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_running_revocation_returns_private_api_cancellation_instead_of_server_error[json]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_running_revocation_returns_private_api_cancellation_instead_of_server_error[wav]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_cancel_between_ledger_admission_and_popen_has_typed_private_response[json]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_acceptance",
+      "name": "test_cancel_between_ledger_admission_and_popen_has_typed_private_response[wav]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "name": "test_exact_barrier_schema_read_fails_closed_under_exclusive_writer",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "name": "test_barrier_reuses_original_connection_without_committing_its_transaction",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "name": "test_barrier_timeout_is_bounded_restored_and_its_reader_is_released",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "name": "test_missing_barrier_evidence_is_unavailable_and_never_retryable[missing-row]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "name": "test_missing_barrier_evidence_is_unavailable_and_never_retryable[missing-table]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "name": "test_locked_mutations_are_not_advertised_as_replayable[POST]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "name": "test_locked_mutations_are_not_advertised_as_replayable[PUT]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "name": "test_locked_mutations_are_not_advertised_as_replayable[DELETE]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "name": "test_non_lock_operational_error_is_not_masked_as_transient",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "name": "test_locked_authentication_has_no_cached_positive_or_false_logout",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "name": "test_original_export_survives_exclusive_lock_and_polls_download_after_release[project-mp3]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "name": "test_original_export_survives_exclusive_lock_and_polls_download_after_release[project-wav]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "name": "test_original_export_survives_exclusive_lock_and_polls_download_after_release[project-flac]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "name": "test_original_export_survives_exclusive_lock_and_polls_download_after_release[track-mp3]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "name": "test_original_export_survives_exclusive_lock_and_polls_download_after_release[track-wav]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "name": "test_original_export_survives_exclusive_lock_and_polls_download_after_release[track-flac]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "name": "test_only_actual_sqlite_lock_errors_are_retryable[database is locked-True]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "name": "test_only_actual_sqlite_lock_errors_are_retryable[database table is locked: users-True]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "name": "test_only_actual_sqlite_lock_errors_are_retryable[no such table: users-False]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "name": "test_only_actual_sqlite_lock_errors_are_retryable[syntax error-False]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "name": "test_only_actual_sqlite_lock_errors_are_retryable[database disk image is malformed-False]",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_export_exclusive_contention",
+      "name": "test_production_browser_read_retry_never_replays_mutations_and_keeps_original_poll",
+      "status": "passed",
+      "report": "queue-busy-functional.xml"
+    },
+    {
+      "module": "tests.test_r210_security_review_gate",
+      "name": "test_current_scan_and_complete_review_ledger_agree",
+      "status": "passed",
+      "report": "queue-busy-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_remote_transport_inventory",
+      "name": "test_current_inventory_matches_review",
+      "status": "passed",
+      "report": "queue-busy-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_service_admission_inventory",
+      "name": "test_actual_source_bound_service_admission_review",
+      "status": "passed",
+      "report": "queue-busy-gates.xml"
+    },
+    {
+      "module": "tests.test_r210_execution_entry_inventory",
+      "name": "test_current_complete_execution_entry_review",
+      "status": "passed",
+      "report": "queue-busy-gates.xml"
+    }
+  ],
+  "sources": [
+    {
+      "path": "app/ai_arranger_runtime.py",
+      "sha256": "c9da0bbbf3a8f795275646a5c599d9752a56b546e2ce5bbc89d37bc3019c64e6"
+    },
+    {
+      "path": "tests/test_r210_known_worker_tree_accounting.py",
+      "sha256": "7ab36045703bb39491992c2e73703036642eff9e238e4569a01c2129c95eb49a"
+    },
+    {
+      "path": "tests/test_r210_queue_barrier_contention.py",
+      "sha256": "2c3adfc6863baf60b3172a6c3b89c1c3c682dc50aeb944320a60bbf5e06ccd34"
+    }
+  ],
+  "real_exclusive_sqlite_reproduced_before_fix": true,
+  "transient_read_recovered": true,
+  "persistent_busy_fails_after_attempts": 3,
+  "nonretryable_errors_not_retried": true,
+  "worker_callback_executed_once": true,
+  "original_result_error_and_job_identity_retained": true,
+  "fixtures_have_private_queue_and_join_threads": true,
+  "security": {
+    "APP_SECURITY": {
+      "reviewed_findings": 165,
+      "source_files": 304,
+      "raw_severity": {
+        "HIGH": 0,
+        "MEDIUM": 21,
+        "LOW": 144
+      },
+      "scan_review_passed": true,
+      "release_candidate": false,
+      "transition_enabled": false
+    },
+    "SERVICE_ADMISSION": {
+      "inventory_passed": true,
+      "source_files": 304,
+      "reviewed_sites": 170,
+      "scope": "Supported single pinned Linux authority replicas and HTTPS-only original workers",
+      "financial_transition_authorized": false,
+      "external_kernel_or_multihost_accepted": false,
+      "release_candidate": false
+    },
+    "AI_EXECUTION": {
+      "inventory_passed": true,
+      "runtime_source_files": 551,
+      "reviewed_boundaries": 782,
+      "families": 10,
+      "hardware_model_rights_or_kernel_attestation": false,
+      "release_candidate": false
+    },
+    "REMOTE_TRANSPORT": {
+      "reviewed_sites": 30,
+      "source_files": 21,
+      "inventory_passed": true,
+      "remote_model_attestation_complete": false,
+      "release_candidate": false
+    }
+  },
+  "ruff": "passed",
+  "apple_reuse": {
+    "run_id": 40858613243,
+    "current_source_hashes_match": 13,
+    "sdk_checks_passed": 32,
+    "rerun": false
+  },
+  "full_suite_repeated": false,
+  "coverage_recomputed_locally": false,
+  "new_physical_kernel_or_model_acceptance": false,
+  "secret_scan_scope": "Introduced/replaced text versus exact input;unchanged accepted content reused;scanner/config/exclusions unchanged",
+  "original_progress": {
+    "accepted": 28,
+    "total": 42,
+    "percent": 66.7,
+    "accepted_macroareas": [
+      "E"
+    ],
+    "criteria_promoted": [],
+    "release_candidate": false
+  },
+  "no_commit_or_remote_mutations": true
+}

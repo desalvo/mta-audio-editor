@@ -27,7 +27,7 @@
     "app/ai_access.py": "sha256:8ca028716c25ef3a677bf26f096868e65fc1793185f090acd3d26697051e9b35",
     "app/ai_amd_smi_collector.py": "sha256:1fe0af0b3a9ce13765c4bbc3572698f966464d0ddc7e249ca28e3820d68af50b",
     "app/ai_arranger.py": "sha256:4542cfa2668487c1ab309a5758aa593d37a8c18e60ee91b8a73e681047cabbc3",
-    "app/ai_arranger_runtime.py": "sha256:02e340a5bcca197863879463cc9c96204b3a3676c3d808d13b1baa78a874dda8",
+    "app/ai_arranger_runtime.py": "sha256:c9da0bbbf3a8f795275646a5c599d9752a56b546e2ce5bbc89d37bc3019c64e6",
     "app/ai_async_track_transaction.py": "sha256:cc197d7afb09c65394019db140ad05a6e75009fe9572b4b5634bb173fa5b8a16",
     "app/ai_backend_models.py": "sha256:4dc7ae6d47016cf686df0b70333cbf2d835703461ae3f2e3c570c201dd8d3f6e",
     "app/ai_billing.py": "sha256:ebafc6b42e800b9ed186089f98bcff5b0508047a5c50cad056bed22593929946",
@@ -11825,5 +11825,10 @@
     "date": "2026-10-29",
     "scope": "Only fixed topology refusal;no new runtime entry/call shape,remote authority or cgroup certification",
     "proof": "docs/validation/r210/ffmpeg-ci-result.json"
+  },
+  "queue_barrier_busy_review": {
+    "date": "2026-10-29",
+    "scope": "Only queue.get observation retries,3 attempts for typed retryable barrier BUSY/LOCKED;fresh validation each time. No worker admission/execution/payment replay or missing-fence acceptance. Unknown/maintenance errors remain immediate failures.",
+    "proof": "docs/validation/r210/queue-busy-result.json"
   }
 }

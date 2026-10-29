@@ -1,0 +1,99 @@
+{
+  "date": "2026-10-29",
+  "timezone": "Europe/Rome",
+  "commit": "dafdff6a1d5a8fc5670e9125297406c5df470231",
+  "run_id": 40912981261,
+  "url": "https://github.com/desalvo/mta-audio-editor/actions/runs/40912981261",
+  "mode": "standard unit",
+  "quality": {
+    "job_id": 123585628451,
+    "conclusion": "failure",
+    "passed": 7145,
+    "failed": 1,
+    "errors": 0,
+    "skipped": 50,
+    "warnings": 1027,
+    "seconds": 1089.52,
+    "coverage_percent": 76.71,
+    "coverage_threshold_percent": 70
+  },
+  "sast": {
+    "job_id": 123585627963,
+    "conclusion": "success"
+  },
+  "vst3_sdk": {
+    "job_id": 123585627630,
+    "conclusion": "success"
+  },
+  "jobs": [
+    {
+      "id": 123585627630,
+      "name": "VST3 SDK compile (Linux)",
+      "conclusion": "success"
+    },
+    {
+      "id": 123585627963,
+      "name": "SAST and dependency audit",
+      "conclusion": "success"
+    },
+    {
+      "id": 123585628451,
+      "name": "Quality and unit tests",
+      "conclusion": "failure"
+    },
+    {
+      "id": 123598698003,
+      "name": "Container production gate",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 123598698111,
+      "name": "Build Windows Chordino runtime",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 123598698437,
+      "name": "Linux native (${{ matrix.arch }}) DEB/RPM",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 123598698541,
+      "name": "iOS / iPadOS archive",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 123598698578,
+      "name": "Android APK / AAB",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 123598699094,
+      "name": "Native macOS installer (${{ matrix.arch }})",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 123598699746,
+      "name": "Publish Docker Hub image",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 123598699976,
+      "name": "Native Windows installer",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 123598700401,
+      "name": "Publish desktop/mobile installers to GitHub Release",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 123598700871,
+      "name": "Publish rolling early-main packages",
+      "conclusion": "skipped"
+    }
+  ],
+  "all_input_tracked_blobs_match": true,
+  "tracked_blobs": 4193,
+  "no_remote_mutations_by_agent": true,
+  "release_candidate": false
+}

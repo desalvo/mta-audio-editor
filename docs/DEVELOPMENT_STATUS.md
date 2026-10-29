@@ -1,3 +1,17 @@
+## Checkpoint corrente — contesa SQLite nel polling della coda — 29 ottobre 2026
+
+Leggere **QUEUE_BARRIER_CONTENTION_R210.md** e `validation/r210/queue-busy-result.json`. Baseline confermata **dafdff6a1d5a8fc5670e9125297406c5df470231**:4193blob tracciati corrispondono all’input. CI40912981261:7145passati,1fallimento BarrierUnavailable retryable nel polling,50skip,copertura76,71%;SAST/VST3 passano. La lettura SQLite bloccata è riprodotta con lock reale;il log non identifica il detentore concorrente.
+
+Il getter ritenta soltanto la stessa osservazione quando la barriera segnala BUSY/LOCKED,fino a3volte con verifica corrente;nessuna riesecuzione di worker/ammissione/pubblicazione/pagamenti. Manutenzione,stato sconosciuto e altri errori falliscono subito;contesa persistente resta indisponibile. Le13fixture recenti ora hanno coda privata e attendono il termine effettivo dei thread prima di ripristinare i percorsi. **145test distinti correnti passati,9nuovi,zero failure/error/skip.**
+
+Bandit304sorgenti/165finding(0HIGH/21MED/144LOW),C2 170confini,runtime551sorgenti/782punti,HTTP30siti/21file;gate e Ruff passano. Un solo runtime modificato;FFmpeg/loader/F3/native/workflow invariati. Apple32controlli/build e13hash invariati riusati. Nessuna fullsuite o copertura locale ripetuta;dopo il commit verificare Quality/SAST standard.
+
+**28/42(66,7%),E completa1/7,RC aperta;nessun criterio promosso.** I14residui originali non sono tutti esterni. Cumulativo unico:**MTA-0.3.0-r210-pre-RC-queue-busy-cumulative.zip**,tutti4853percorsi/660log di ingresso conservati. Nessun commit o intervento GitHub/server/provider. Commit suggerito:`Retry busy queue observations and isolate worker tests`.
+
+---
+
+Cronologia precedente,superata dove incompatibile con il checkpoint corrente:
+
 ## Checkpoint corrente — accounting dei figli FFmpeg — 29 ottobre 2026
 
 Leggere **FFMPEG_TREE_ACCOUNTING_R210.md** e `validation/r210/ffmpeg-ci-result.json`. Baseline confermata **8ed30091686bbb48722b8b73faf2927472d01d50**,tutti4176blob tracciati identici all’input. La CI standard40866015704 risolve gli8fallimenti precedenti ma fallisce1caso FFmpeg:7132passati,50skip,copertura76,71%;SAST e SDK VST3 passano. Il difetto reale è riprodotto:un figlio breve sfugge ai campioni/proc.

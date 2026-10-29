@@ -1,6 +1,7 @@
 """Fixed multi-process routes cannot gain wait4 isolation from missed samples."""
 import json
 import sys
+import time
 from pathlib import Path
 
 import pytest
@@ -11,6 +12,22 @@ ROUTES=[('demucs',{'model':'htdemucs'}),('sam-audio',{'model':'sam-audio-small'}
         ('singer-separation',{'model':'sam-audio-small'}),
         ('backing-vocals',{'model':'ffmpeg-center-side'}),
         ('backing-vocals',{}),('drumsep',{'model':'sam-audio-small'})]
+
+
+@pytest.fixture(autouse=True)
+def isolated_queue(tmp_path,monkeypatch):
+    from app import ai_arranger_runtime as queue
+    monkeypatch.setattr(queue,'_ROOT',tmp_path/'queue')
+    original=queue.worker_thread;threads=[]
+    def create(*args,**kwargs):
+        thread=original(*args,**kwargs);threads.append(thread);return thread
+    monkeypatch.setattr(queue,'worker_thread',create)
+    with queue._MUTEX:prior=set(queue._LOCAL)
+    yield
+    deadline=time.monotonic()+5
+    for thread in threads:thread.join(max(0,deadline-time.monotonic()))
+    with queue._MUTEX:remaining=set(queue._LOCAL)-prior
+    assert not remaining and all(not thread.is_alive() for thread in threads), 'Original worker thread must finish before queue path restoration'
 
 
 @pytest.mark.parametrize('kind,plan',ROUTES)

@@ -1,0 +1,38 @@
+{
+  "APP_SECURITY": {
+    "reviewed_findings": 165,
+    "source_files": 304,
+    "raw_severity": {
+      "HIGH": 0,
+      "MEDIUM": 21,
+      "LOW": 144
+    },
+    "scan_review_passed": true,
+    "release_candidate": false,
+    "transition_enabled": false
+  },
+  "SERVICE_ADMISSION": {
+    "inventory_passed": true,
+    "source_files": 304,
+    "reviewed_sites": 170,
+    "scope": "Supported single pinned Linux authority replicas and HTTPS-only original workers",
+    "financial_transition_authorized": false,
+    "external_kernel_or_multihost_accepted": false,
+    "release_candidate": false
+  },
+  "AI_EXECUTION": {
+    "inventory_passed": true,
+    "runtime_source_files": 551,
+    "reviewed_boundaries": 782,
+    "families": 10,
+    "hardware_model_rights_or_kernel_attestation": false,
+    "release_candidate": false
+  },
+  "REMOTE_TRANSPORT": {
+    "reviewed_sites": 30,
+    "source_files": 21,
+    "inventory_passed": true,
+    "remote_model_attestation_complete": false,
+    "release_candidate": false
+  }
+}

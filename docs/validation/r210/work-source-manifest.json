@@ -1,7 +1,7 @@
 {
   "version": "0.3.0-r210",
   "status": "PRE-RC",
-  "base_commit": "8ed30091686bbb48722b8b73faf2927472d01d50",
+  "base_commit": "dafdff6a1d5a8fc5670e9125297406c5df470231",
   "excluded_self": "docs/validation/r210/work-source-manifest.json",
   "files": [
     {
@@ -378,8 +378,8 @@
     },
     {
       "path": "app/ai_arranger_runtime.py",
-      "bytes": 37512,
-      "sha256": "02e340a5bcca197863879463cc9c96204b3a3676c3d808d13b1baa78a874dda8",
+      "bytes": 38019,
+      "sha256": "c9da0bbbf3a8f795275646a5c599d9752a56b546e2ce5bbc89d37bc3019c64e6",
       "mode": "0o644"
     },
     {
@@ -4686,8 +4686,8 @@
     },
     {
       "path": "docs/CONTINUATION_HANDOFF_R210.md",
-      "bytes": 55380,
-      "sha256": "4b62a9872b667ad082f153392f9ee016499be2b2481afe6cb05b5c05ae4d0347",
+      "bytes": 57168,
+      "sha256": "571040184bba133ce1dc4011be4e029700f93dcf345253f2e1030b3b50b17695",
       "mode": "0o644"
     },
     {
@@ -4740,8 +4740,8 @@
     },
     {
       "path": "docs/DEVELOPMENT_COMPONENTS_R210.json",
-      "bytes": 78980,
-      "sha256": "b010848810596bbbe1ec11e13732e31d5904b683785e736dd20da6e6ed63899c",
+      "bytes": 79497,
+      "sha256": "0dd7836cf3f1353b025a8007be6c35f6b61e3f4433c0ebe5a3f52c36335d0850",
       "mode": "0o644"
     },
     {
@@ -4752,8 +4752,8 @@
     },
     {
       "path": "docs/DEVELOPMENT_STATUS.md",
-      "bytes": 353134,
-      "sha256": "b387e02becc7ab1aed55d6dda84afa3493f2d39a703e21ef4c979cf2fbe99d2e",
+      "bytes": 354922,
+      "sha256": "2c2bd06a67afe69beba66eb78f130d6fc116e9f819d891e26ba191c9a44fb761",
       "mode": "0o644"
     },
     {
@@ -5567,6 +5567,12 @@
       "mode": "0o644"
     },
     {
+      "path": "docs/QUEUE_BARRIER_CONTENTION_R210.md",
+      "bytes": 8576,
+      "sha256": "13b4f436e258c79c76e8bac5e3e6925ce9e95f23a8d8100c81833308dbd35561",
+      "mode": "0o644"
+    },
+    {
       "path": "docs/R172_NATIVE_PDC_EN.md",
       "bytes": 596,
       "sha256": "ee4901cc861b887c6dd54ce807860c910313bdbd9a996f0b7d8d4b31385e9c57",
@@ -6000,8 +6006,8 @@
     },
     {
       "path": "docs/RC_FINAL_WORK_QUEUE_R210.md",
-      "bytes": 47262,
-      "sha256": "8c7a142c848dfaa3ea6707f029a205e67dfcd35907d8e61229cc4ee766c89bb8",
+      "bytes": 49050,
+      "sha256": "2cc6a15cdbb6081e3a5df8b4d4b83b451521f117a346997fe4cad8b1681585a2",
       "mode": "0o644"
     },
     {
@@ -6570,14 +6576,14 @@
     },
     {
       "path": "docs/security/AI_EXECUTION_REVIEW_R210.json",
-      "bytes": 679608,
-      "sha256": "0d619cc848d84b4ff9a83d996b35bd9c4a17cae45b334d216870905ea175e148",
+      "bytes": 679989,
+      "sha256": "f52a5d980ab72a231c3b7615a4131010ed9227d281526992a1154c1ba4d93ffa",
       "mode": "0o644"
     },
     {
       "path": "docs/security/APP_SECURITY_REVIEW_R210.json",
-      "bytes": 219032,
-      "sha256": "6b617b4ee32a1a1fd3b84d3404b7e1da1edc8e92d475054ec6854e61bb4a2751",
+      "bytes": 219414,
+      "sha256": "612982a9a8a3afce0881ed3f0c5cb22427aed3bbb466d4e308a0398ccdb413f0",
       "mode": "0o644"
     },
     {
@@ -6606,8 +6612,8 @@
     },
     {
       "path": "docs/security/SERVICE_ADMISSION_REVIEW_R210.json",
-      "bytes": 189249,
-      "sha256": "a280b5338c1b14d4b2315ab6c34b29c4d49011cf07a5212d22564fec9938accc",
+      "bytes": 189745,
+      "sha256": "28f9b083e61796798246fad8cde8997c0b744d51ccb45594b4c5ad0a96efe1a0",
       "mode": "0o644"
     },
     {
@@ -9629,6 +9635,12 @@
       "mode": "0o644"
     },
     {
+      "path": "docs/validation/r210/ci-123585628451.log",
+      "bytes": 1045225,
+      "sha256": "f6be08dae48bff5bdc71cd9572ac08387f4487b3acab057c6a70188b616912e6",
+      "mode": "0o644"
+    },
+    {
       "path": "docs/validation/r210/ci-40858-focused.xml",
       "bytes": 3827,
       "sha256": "b20383672cac2202d22f731c65ffe41f6764b9923c8a0e84dd29d5360544bc60",
@@ -9812,6 +9824,12 @@
       "path": "docs/validation/r210/ci-b8fed59-result.json",
       "bytes": 3180,
       "sha256": "efc61c2242d012a94919404ee53d818b4f386fbb433fed6a56af14f5915c4267",
+      "mode": "0o644"
+    },
+    {
+      "path": "docs/validation/r210/ci-dafdff6-observation.json",
+      "bytes": 2323,
+      "sha256": "5b2d3db3d3870257f7abbb72670d4dc8d321d31ee373dff1afd1ee74ad409d12",
       "mode": "0o644"
     },
     {
@@ -12488,6 +12506,132 @@
       "path": "docs/validation/r210/quality-ci-fix-result.json",
       "bytes": 1735,
       "sha256": "bbecf3200653f28f6c9ffd27feb7840e2d53431bd00bf3e58f2618dc5a875e55",
+      "mode": "0o644"
+    },
+    {
+      "path": "docs/validation/r210/queue-busy-bandit.json",
+      "bytes": 257437,
+      "sha256": "eb2642595d30055d1bf344f52a7286af02df9342a6a2e53c077fdcb3fbc96def",
+      "mode": "0o644"
+    },
+    {
+      "path": "docs/validation/r210/queue-busy-bandit.log",
+      "bytes": 382,
+      "sha256": "fc3b3ab4a0964ba593fa0ea7035f6740a8d3853f0ad8b75fac0f4ec3fb30483a",
+      "mode": "0o644"
+    },
+    {
+      "path": "docs/validation/r210/queue-busy-diagnosis.log",
+      "bytes": 6563,
+      "sha256": "c721952f6bfee25721819b5dbd3323fe3b3f3a811740a63c61230bd4643b42c0",
+      "mode": "0o644"
+    },
+    {
+      "path": "docs/validation/r210/queue-busy-diagnosis.xml",
+      "bytes": 6641,
+      "sha256": "241ff5a12931421c2bdd7d052b5429e56d497c33ecf2371099084bf067671f8a",
+      "mode": "0o644"
+    },
+    {
+      "path": "docs/validation/r210/queue-busy-functional.log",
+      "bytes": 693,
+      "sha256": "2d7559740a1f3cc6357717409c330953bf201343ca5ead5169cd9f81dd7abf21",
+      "mode": "0o644"
+    },
+    {
+      "path": "docs/validation/r210/queue-busy-functional.xml",
+      "bytes": 22761,
+      "sha256": "959a13e8e2556ceecfe9998f1b978363ae854b721d63ff41190b6c4e7477bd3c",
+      "mode": "0o644"
+    },
+    {
+      "path": "docs/validation/r210/queue-busy-gates.log",
+      "bytes": 99,
+      "sha256": "fd85a70e188fe9ecb492f054ee645ba7afb1859f069d55b35c7558bae91fea93",
+      "mode": "0o644"
+    },
+    {
+      "path": "docs/validation/r210/queue-busy-gates.xml",
+      "bytes": 775,
+      "sha256": "e660e1602f78895d37c8dfc7534de75b8de23280f7944800cefc08871a0aa8f9",
+      "mode": "0o644"
+    },
+    {
+      "path": "docs/validation/r210/queue-busy-gitleaks.json",
+      "bytes": 3,
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "mode": "0o644"
+    },
+    {
+      "path": "docs/validation/r210/queue-busy-isolated-final.log",
+      "bytes": 100,
+      "sha256": "4249074eb717e4dc5469e88494466e40a7b7021ab38e73509c678d14dc028ee7",
+      "mode": "0o644"
+    },
+    {
+      "path": "docs/validation/r210/queue-busy-isolated-final.xml",
+      "bytes": 2720,
+      "sha256": "2d3a93d4eec86edbad7581c4c6b5a9780501dfa17f64fd4f032afce6dd4fefd3",
+      "mode": "0o644"
+    },
+    {
+      "path": "docs/validation/r210/queue-busy-preservation.json",
+      "bytes": 7874,
+      "sha256": "6332f76ae14bb26c47cbe091ac0c63355ddd4160e7eccedcb2e27c76049ed34c",
+      "mode": "0o644"
+    },
+    {
+      "path": "docs/validation/r210/queue-busy-reproduced.log",
+      "bytes": 5348,
+      "sha256": "fe84de3d1163751a35d559a9da3ccc9c97ebda92dbdf3ed15a034c4f635b85cf",
+      "mode": "0o644"
+    },
+    {
+      "path": "docs/validation/r210/queue-busy-reproduced.xml",
+      "bytes": 5440,
+      "sha256": "ff895bce4f449d29950f113b7c5b66c6a34d53bc5d5e0bfc47c492a1a7aa30a0",
+      "mode": "0o644"
+    },
+    {
+      "path": "docs/validation/r210/queue-busy-result.json",
+      "bytes": 37807,
+      "sha256": "44a7238c3f21af3b527db87c2b2b6f5630a85987484ad34d22fda8f9b6693a0f",
+      "mode": "0o644"
+    },
+    {
+      "path": "docs/validation/r210/queue-busy-reuse.json",
+      "bytes": 118575,
+      "sha256": "c18936c4436953fcdd101e0f62d13085bbea5a0ef895dca19b23504d0b1d5b3b",
+      "mode": "0o644"
+    },
+    {
+      "path": "docs/validation/r210/queue-busy-ruff-final.log",
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "mode": "0o644"
+    },
+    {
+      "path": "docs/validation/r210/queue-busy-ruff.log",
+      "bytes": 19,
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "mode": "0o644"
+    },
+    {
+      "path": "docs/validation/r210/queue-busy-source-gates.json",
+      "bytes": 1017,
+      "sha256": "e9039eea9a8473ef9c2ee02131b7e1ae644881ad200d3136b175bc9bbc1d8d6e",
+      "mode": "0o644"
+    },
+    {
+      "path": "docs/validation/r210/queue-busy-thread-final.log",
+      "bytes": 100,
+      "sha256": "cd3f597a2f550a26d66acb4c9042b274ba0313ba6570b6d9feb4c0ffacd9af23",
+      "mode": "0o644"
+    },
+    {
+      "path": "docs/validation/r210/queue-busy-thread-final.xml",
+      "bytes": 2720,
+      "sha256": "9d5d4cca5acaee36e4cd29ae4caa3dec037fbbeac894a06ca5020b150855d7be",
       "mode": "0o644"
     },
     {
@@ -19938,8 +20082,8 @@
     },
     {
       "path": "tests/test_r210_known_worker_tree_accounting.py",
-      "bytes": 3770,
-      "sha256": "a5a3663631a3d5fe785b32fa529f2da9a6b40aed43400f6d237b84ae43a0ab51",
+      "bytes": 4530,
+      "sha256": "7ab36045703bb39491992c2e73703036642eff9e238e4569a01c2129c95eb49a",
       "mode": "0o644"
     },
     {
@@ -20594,6 +20738,12 @@
       "path": "tests/test_r210_quality_profiles.py",
       "bytes": 4184,
       "sha256": "cc0428ae22ab3b997624876faac5537af061e767aa49301e1fca2e184d84b320",
+      "mode": "0o644"
+    },
+    {
+      "path": "tests/test_r210_queue_barrier_contention.py",
+      "bytes": 4843,
+      "sha256": "2c3adfc6863baf60b3172a6c3b89c1c3c682dc50aeb944320a60bbf5e06ccd34",
       "mode": "0o644"
     },
     {

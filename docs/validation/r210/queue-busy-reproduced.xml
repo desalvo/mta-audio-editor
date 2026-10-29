@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="1.314" timestamp="2026-10-29T18:07:44.170341+01:00" hostname="8ccc61b3dba4"><testcase classname="tests.test_r210_queue_barrier_contention" name="test_actual_exclusive_queue_read_recovers_original_state" time="0.518"><failure message="app.sqlite_availability.BarrierUnavailable: Service barrier read temporarily unavailable">connection = &lt;app.regime_service_lease._Connection object at 0x7f6925611250&gt;
+
+    def fence_held(connection=None):
+        """One consistent read;reuse an existing connection instead of self-locking.
+    
+        BUSY/LOCKED never means an absent barrier. A bounded unavailable response
+        preserves authentication and existing jobs until an original read succeeds.
+        """
+        from . import auth
+        from .sqlite_availability import BarrierUnavailable
+        path = auth.db_path()
+        if connection is None and not path.exists():
+            return False
+        con = connection
+        owns_transaction = False
+        previous_timeout = None
+        try:
+            if con is None:
+                con = sqlite3.connect(path.resolve().as_uri() + '?mode=ro', uri=True, timeout=.25)
+            previous_timeout = int(con.execute('PRAGMA busy_timeout').fetchone()[0])
+            con.execute('PRAGMA busy_timeout='+str(min(previous_timeout,250)))
+            if not con.in_transaction:
+                con.execute('BEGIN')
+                owns_transaction = True
+&gt;           if not con.execute("SELECT 1 FROM sqlite_master WHERE name='regime_admin_cutovers'").fetchone():
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           sqlite3.OperationalError: database is locked
+
+app/regime_service_lease.py:93: OperationalError
+
+The above exception was the direct cause of the following exception:
+
+env = 1
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7f69256346e0&gt;
+
+    def test_actual_exclusive_queue_read_recovers_original_state(env,monkeypatch):
+        terminal_row(env)
+        original=leases.fence_held;busy=[]
+        with exclusive_queue() as lock:
+            def inspect(connection=None):
+                try:return original(connection)
+                except BarrierUnavailable as exc:
+                    assert exc.retryable
+                    busy.append(exc);lock.rollback();lock.close()
+                    raise
+            monkeypatch.setattr(leases,'fence_held',inspect)
+&gt;           state=queue.get('original-busy-job')
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_r210_queue_barrier_contention.py:42: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+app/ai_arranger_runtime.py:306: in get
+    with _db() as con:
+         ^^^^^
+app/ai_arranger_runtime.py:53: in _db
+    con = connect(str(_ROOT / 'jobs.sqlite3'), timeout=30, isolation_level=None)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/regime_service_lease.py:166: in connect
+    return sqlite3.connect(*args, factory=_Connection, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/regime_service_lease.py:123: in __init__
+    if not _owns_lease() and fence_held(self):
+                             ^^^^^^^^^^^^^^^^
+tests/test_r210_queue_barrier_contention.py:36: in inspect
+    try:return original(connection)
+               ^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+connection = &lt;app.regime_service_lease._Connection object at 0x7f6925611250&gt;
+
+    def fence_held(connection=None):
+        """One consistent read;reuse an existing connection instead of self-locking.
+    
+        BUSY/LOCKED never means an absent barrier. A bounded unavailable response
+        preserves authentication and existing jobs until an original read succeeds.
+        """
+        from . import auth
+        from .sqlite_availability import BarrierUnavailable
+        path = auth.db_path()
+        if connection is None and not path.exists():
+            return False
+        con = connection
+        owns_transaction = False
+        previous_timeout = None
+        try:
+            if con is None:
+                con = sqlite3.connect(path.resolve().as_uri() + '?mode=ro', uri=True, timeout=.25)
+            previous_timeout = int(con.execute('PRAGMA busy_timeout').fetchone()[0])
+            con.execute('PRAGMA busy_timeout='+str(min(previous_timeout,250)))
+            if not con.in_transaction:
+                con.execute('BEGIN')
+                owns_transaction = True
+            if not con.execute("SELECT 1 FROM sqlite_master WHERE name='regime_admin_cutovers'").fetchone():
+                return False
+            row = con.execute('SELECT transitioning FROM regime_fence_state WHERE singleton=1').fetchone()
+            if row is None:
+                raise BarrierUnavailable(None)
+            return bool(row[0]) or bool(con.execute("SELECT 1 FROM regime_admin_cutovers WHERE phase!='finalized' LIMIT 1").fetchone())
+        except sqlite3.Error as exc:
+&gt;           raise BarrierUnavailable(exc) from exc
+E           app.sqlite_availability.BarrierUnavailable: Service barrier read temporarily unavailable
+
+app/regime_service_lease.py:100: BarrierUnavailable</failure></testcase></testsuite></testsuites>
